@@ -68,7 +68,7 @@ public final class Store extends ACreate {
     boolean ok = true;
     try {
       store(in, file);
-      ok = info(QUERY_EXECUTED_X_X, "", job().perf);
+      ok = info(QUERY_EXECUTED_X_X, "", job().performance);
     } catch(final IOException ex) {
       Util.debug(ex);
       ok = error(FILE_NOT_SAVED_X, file);

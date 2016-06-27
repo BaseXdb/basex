@@ -11,6 +11,14 @@ public final class Performance {
   private long time = System.nanoTime();
 
   /**
+   * Returns the start time.
+   * @return execution time
+   */
+  public long start() {
+    return time;
+  }
+
+  /**
    * Returns the measured execution time in nanoseconds.
    * @return execution time
    */

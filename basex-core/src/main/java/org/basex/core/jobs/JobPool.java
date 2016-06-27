@@ -3,7 +3,7 @@ package org.basex.core.jobs;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.basex.util.list.*;
+import org.basex.core.*;
 
 /**
  * Job pool.
@@ -12,24 +12,38 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class JobPool {
+  /** Number of queries to be queued. */
+  public static final int MAXQUERIES = 1000;
   /** Running jobs. */
-  private final Map<String, Job> jobs = new ConcurrentHashMap<>();
+  public final Map<String, Job> jobs = new ConcurrentHashMap<>();
+  /** Cached results. */
+  public final Map<String, JobResult> results = new ConcurrentHashMap<>();
+
+  /**
+   * Constructor.
+   * @param sopts static options
+   */
+  public JobPool(final StaticOptions sopts) {
+    // check cached results every 60 seconds
+    final Timer timer = new Timer(true);
+    timer.scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        final int co = sopts.get(StaticOptions.CACHETIMEOUT);
+        for(final Map.Entry<String, JobResult> entry : results.entrySet()) {
+          final JobResult result = entry.getValue();
+          if(result != null && !result.valid(co)) jobs.remove(entry.getKey());
+        }
+      }
+    }, 0, 60000);
+  }
 
   /**
    * Adds a job.
    * @param job job
    */
   public void add(final Job job) {
-    jobs.put(Long.toString(job.hashCode()), job);
-  }
-
-  /**
-   * Returns a job.
-   * @param id process id
-   * @return job, or {@code null}
-   */
-  public Job get(final String id) {
-    return jobs.get(id);
+    jobs.put(job.job().id(), job);
   }
 
   /**
@@ -37,25 +51,7 @@ public final class JobPool {
    * @param job job
    */
   public void remove(final Job job) {
-    jobs.remove(Long.toString(job.hashCode()));
-  }
-
-  /**
-   * Returns the number of jobs.
-   * @return number of jobs
-   */
-  public int size() {
-    return jobs.size();
-  }
-
-  /**
-   * Returns all query ids.
-   * @return query ids
-   */
-  public TokenList ids() {
-    final TokenList list = new TokenList(size());
-    for(final String id : jobs.keySet()) list.add(id);
-    return list;
+    jobs.remove(job.job().id());
   }
 
   /**

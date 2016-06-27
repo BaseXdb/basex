@@ -62,7 +62,7 @@ public final class CreateIndex extends ACreate {
     boolean ok = true;
     try {
       create(type, data, this);
-      ok = info(INDEX_CREATED_X_X, type, job().perf);
+      ok = info(INDEX_CREATED_X_X, type, job().performance);
     } catch(final IOException ex) {
       ok = error(Util.message(ex));
     } finally {

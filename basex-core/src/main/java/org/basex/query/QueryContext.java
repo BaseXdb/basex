@@ -210,16 +210,16 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Parses the specified query.
    * @param query query string
-   * @param path file path (may be {@code null})
+   * @param uri base URI (may be {@code null})
    * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
-  public MainModule parseMain(final String query, final String path, final StaticContext sc)
+  public MainModule parseMain(final String query, final String uri, final StaticContext sc)
       throws QueryException {
 
     info.query = query;
-    final QueryParser qp = new QueryParser(query, path, this, sc);
+    final QueryParser qp = new QueryParser(query, uri, this, sc);
     root = qp.parseMain();
     if(updating) updating = (qp.sc.mixUpdates && qp.sc.dynFuncCall) || root.expr.has(Flag.UPD);
     return root;

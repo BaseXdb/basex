@@ -53,7 +53,7 @@ public final class DropIndex extends ACreate {
     boolean ok = true;
     try {
       drop(type, data);
-      ok = info(INDEX_DROPPED_X_X, type, job().perf);
+      ok = info(INDEX_DROPPED_X_X, type, job().performance);
     } catch(final IOException ex) {
       ok = error(Util.message(ex));
     } finally {

@@ -51,7 +51,7 @@ public final class OptimizeAll extends ACreate {
     }
 
     final Open open = new Open(data.meta.name);
-    return open.run(context) ? info(DB_OPTIMIZED_X, data.meta.name, job().perf) :
+    return open.run(context) ? info(DB_OPTIMIZED_X, data.meta.name, job().performance) :
       error(open.info());
   }
 

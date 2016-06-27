@@ -34,7 +34,7 @@ public final class RepoInstall extends ARepo {
   protected boolean run() {
     try {
       final boolean exists = new RepoManager(context, info).install(args[0]);
-      return info(exists ? PKG_REPLACED_X_X : PKG_INSTALLED_X_X, args[0], job().perf);
+      return info(exists ? PKG_REPLACED_X_X : PKG_INSTALLED_X_X, args[0], job().performance);
     } catch(final QueryException ex) {
       return error(Util.message(ex));
     }

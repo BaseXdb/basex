@@ -72,7 +72,7 @@ public final class StaticOptions extends Options {
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
   /** Timeout (seconds) for remembering result of asynchronous queries. */
-  public static final NumberOption ASYNCTIMEOUT = new NumberOption("ASYNCTIMEOUT", 3600);
+  public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
 
   /** Comment: written to options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");

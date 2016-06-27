@@ -38,7 +38,7 @@ public final class Retrieve extends ACreate {
 
     try(final BufferInput bi = new BufferInput(bin)) {
       for(int b; (b = bi.read()) != -1;) out.write(b);
-      return info(QUERY_EXECUTED_X_X, "", job().perf);
+      return info(QUERY_EXECUTED_X_X, "", job().performance);
     } catch(final IOException ex) {
       return error(ex.toString());
     }

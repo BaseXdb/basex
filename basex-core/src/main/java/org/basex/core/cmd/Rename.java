@@ -63,7 +63,7 @@ public final class Rename extends ACreate {
     if(!finishUpdate()) return false;
 
     // return info message
-    return info(RES_RENAMED_X_X, c, job().perf) && ok;
+    return info(RES_RENAMED_X_X, c, job().performance) && ok;
   }
 
   /**

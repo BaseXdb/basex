@@ -15,13 +15,13 @@ import org.basex.util.*;
  */
 public abstract class Job {
   /** Child jobs. */
-  private final ArrayList<Job> children = new ArrayList<>(0);
+  private final List<Job> children = Collections.synchronizedList(new ArrayList<Job>(0));
   /** Job context. */
   private JobContext jc = new JobContext(this);
 
   /** This flag indicates that a job is updating. */
   public boolean updating;
-  /** Stopped flag. */
+  /** State of job. */
   public JobState state = JobState.OK;
 
   /** Timer. */
@@ -42,7 +42,7 @@ public abstract class Job {
   public final void register(final Context ctx) {
     ctx.jobs.add(this);
     ctx.locks.acquire(this);
-    jc.perf = new Performance();
+    jc.performance = new Performance();
     // non-admin users: stop process after timeout
     if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
   }
@@ -81,9 +81,8 @@ public abstract class Job {
   /**
    * Pops the last job.
    */
-  public final void popJob() {
-    final int last = children.size() - 1;
-    children.remove(last);
+  public final synchronized void popJob() {
+    children.remove(children.size() - 1);
   }
 
   /**
@@ -108,12 +107,12 @@ public abstract class Job {
   }
 
   /**
-   * Sets a new job state.
-   * @param st new state
+   * Sends a new job state.
+   * @param js new state
    */
-  final void state(final JobState st) {
-    for(final Job job : children) job.state(st);
-    state = st;
+  final void state(final JobState js) {
+    for(final Job job : children) job.state(js);
+    state = js;
     stopTimeout();
   }
 
@@ -129,6 +128,29 @@ public abstract class Job {
    */
   protected void abort() {
     for(final Job job : children) job.abort();
+  }
+
+  /**
+   * Starts a timeout thread.
+   * @param ms milliseconds to wait; deactivated if set to 0
+   */
+  protected void startTimeout(final long ms) {
+    if(ms == 0) return;
+    timer = new Timer(true);
+    timer.schedule(new TimerTask() {
+      @Override
+      public void run() { timeout(); }
+    }, ms);
+  }
+
+  /**
+   * Stops the timeout thread.
+   */
+  protected void stopTimeout() {
+    if(timer != null) {
+      timer.cancel();
+      timer = null;
+    }
   }
 
   /**
@@ -174,31 +196,5 @@ public abstract class Job {
   final void jobContext(final JobContext ctx) {
     for(final Job ch : children) ch.jobContext(ctx);
     jc = ctx;
-  }
-
-  // PRIVATE FUNCTIONS ============================================================================
-
-  /**
-   * Starts a timeout thread.
-   * @param ms milliseconds to wait; deactivated if set to 0
-   */
-  private void startTimeout(final long ms) {
-    if(ms == 0) return;
-
-    timer = new Timer(true);
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() { timeout(); }
-    }, ms);
-  }
-
-  /**
-   * Stops the timeout thread.
-   */
-  private void stopTimeout() {
-    if(timer != null) {
-      timer.cancel();
-      timer = null;
-    }
   }
 }

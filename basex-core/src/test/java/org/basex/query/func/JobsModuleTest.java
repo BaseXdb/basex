@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.query.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -19,7 +20,15 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /** Very slow query. */
   private static final String VERY_SLOW_QUERY = "\"(1 to 10000000000)[.=1]\"";
   /** Slow query. */
-  private static final String SLOW_QUERY = "\"(1 to 1000000)[.=1]\"";
+  private static final String SLOW_QUERY = "\"(1 to 10000000)[.=1]\"";
+
+  /** Wait until all queries have been processed. */
+  @After
+  public void clean() {
+    while(!query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "]").isEmpty()) {
+      Performance.sleep(10);
+    }
+  }
 
   /** Test method. */
   @Test
@@ -46,7 +55,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void finished() {
+  public void running() {
     final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
     query(_JOBS_FINISHED.args(id), "false");
     query(_JOBS_STOP.args(id));
@@ -89,13 +98,14 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void result() throws IOException {
     // receive result of asynchronous execution
-    query("let $query := " + _JOBS_EVAL.args(SLOW_QUERY) + " return ("
-        + _HOF_UNTIL.args("  function($result) { "
-        + _JOBS_FINISHED.args("$query") + " }, function($curr) { prof:sleep(100) }, ()") + ","
-        + _JOBS_RESULT.args("$query") + ')', "1");
+    query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " map{}", " map{'cache':true()}") +
+        " return ("
+        + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args("$q") + " },"
+            + "function($c) { }, ()") + ","
+        + _JOBS_RESULT.args("$q") + ')', "1");
 
     // receive asynchronous result
-    String id = query(_JOBS_EVAL.args(SLOW_QUERY));
+    String id = query(_JOBS_EVAL.args(SLOW_QUERY, " map{}", " map{'cache':true()}"));
     while(true) {
       try {
         assertEquals("1", eval(_JOBS_RESULT.args(id)));
@@ -105,9 +115,10 @@ public final class JobsModuleTest extends AdvancedQueryTest {
         assertSame(JOBS_RUNNING_X, ex.error());
       }
     }
+    clean();
 
     // receive asynchronous result
-    id = query(_JOBS_EVAL.args(SLOW_QUERY, " map {}", " map { 'cache': false() }"));
+    id = query(_JOBS_EVAL.args(SLOW_QUERY));
     while(true) {
       try {
         eval(_JOBS_RESULT.args(id));

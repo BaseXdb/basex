@@ -53,9 +53,18 @@ public final class QueryProcessor extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public void parse() throws QueryException {
+    parse(null);
+  }
+
+  /**
+   * Parses the query.
+   * @param uri base URI
+   * @throws QueryException query exception
+   */
+  public void parse(final String uri) throws QueryException {
     if(parsed) return;
     try {
-      qc.parseMain(query, null, sc);
+      qc.parseMain(query, uri, sc);
     } finally {
       parsed = true;
       updating = qc.updating;
@@ -80,16 +89,6 @@ public final class QueryProcessor extends Job implements Closeable {
   public Iter iter() throws QueryException {
     parse();
     return qc.iter();
-  }
-
-  /**
-   * Deprecated; use {@link #value} instead.
-   * @return result value
-   * @throws QueryException query exception
-   */
-  @Deprecated
-  public Value execute() throws QueryException {
-    return value();
   }
 
   /**

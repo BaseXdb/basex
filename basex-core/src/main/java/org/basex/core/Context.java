@@ -5,7 +5,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.random.*;
-import org.basex.query.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
@@ -28,8 +27,6 @@ public final class Context {
   public final ClientBlocker blocker;
   /** Job pool. */
   public final JobPool jobs;
-  /** Asynchronous queries. */
-  public final QueryPool queries;
   /** Options. */
   public final MainOptions options;
   /** Static options. */
@@ -108,7 +105,6 @@ public final class Context {
     repo = ctx.repo;
     log = ctx.log;
     jobs = ctx.jobs;
-    queries = ctx.queries;
   }
 
   /**
@@ -128,8 +124,7 @@ public final class Context {
     log = new Log(soptions);
     user = users.get(UserText.ADMIN);
     listener = null;
-    jobs = new JobPool();
-    queries = new QueryPool();
+    jobs = new JobPool(soptions);
   }
 
   /**

@@ -13,11 +13,11 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class JobsList extends StandardFunc {
+public final class JobsResults extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final TokenList list = new TokenList(size());
-    for(final String id : qc.context.jobs.jobs.keySet()) list.add(id);
+    for(final String id : qc.context.jobs.results.keySet()) list.add(id);
     return StrSeq.get(list);
   }
 

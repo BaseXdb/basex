@@ -118,7 +118,7 @@ public final class CreateDB extends ACreate {
 
       if(options.get(MainOptions.CREATEONLY)) new Close().run(context);
 
-      return info(parser.info() + DB_CREATED_X_X, name, job().perf);
+      return info(parser.info() + DB_CREATED_X_X, name, job().performance);
     } catch(final JobException ex) {
       throw ex;
     } catch(final IOException ex) {

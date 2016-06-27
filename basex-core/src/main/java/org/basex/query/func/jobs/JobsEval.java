@@ -1,11 +1,13 @@
 package org.basex.query.func.jobs;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -25,7 +27,7 @@ public final class JobsEval extends StandardFunc {
     /** Query base-uri. */
     public static final StringOption BASE_URI = new StringOption("base-uri");
     /** Cache result. */
-    public static final BooleanOption CACHE = new BooleanOption("cache", true);
+    public static final BooleanOption CACHE = new BooleanOption("cache", false);
   }
 
   @Override
@@ -40,24 +42,22 @@ public final class JobsEval extends StandardFunc {
     final boolean cache = opts.get(EvalOptions.CACHE);
 
     final Context ctx = qc.context;
-    final QueryPool queries = ctx.queries;
     final QueryProcessor qp = new QueryProcessor(string(query), ctx);
     qp.http(qc.http);
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
-      final Value val = queries.copy(it.getValue().iter(), ctx);
+      final Value val = CachedXQuery.copy(it.getValue().iter(), ctx);
       if(key.isEmpty()) qp.context(val);
       else qp.bind(key, val);
     }
+    qp.parse(uri);
 
-    // set base uri
-    final String path = ctx.options.get(MainOptions.QUERYPATH);
-    if(uri != null) ctx.options.set(MainOptions.QUERYPATH, uri);
-    try {
-      qp.parse();
-    } finally {
-      ctx.options.set(MainOptions.QUERYPATH, path);
-    }
-    return Str.get(queries.add(qp, cache, info));
+    // check if number of maximum queries has been reached
+    if(ctx.jobs.jobs.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
+
+    final CachedXQuery job = new CachedXQuery(qp, cache, info);
+    new Thread(job).start();
+
+    return Str.get(job.job().id());
   }
 }

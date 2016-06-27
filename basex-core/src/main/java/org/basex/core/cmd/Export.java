@@ -44,7 +44,7 @@ public final class Export extends Command {
     try {
       final Data data = context.data();
       export(data, args[0], options, this);
-      return info(DB_EXPORTED_X, data.meta.name, job().perf);
+      return info(DB_EXPORTED_X, data.meta.name, job().performance);
     } catch(final IOException ex) {
       return error(Util.message(ex));
     }

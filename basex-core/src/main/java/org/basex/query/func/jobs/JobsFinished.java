@@ -1,5 +1,6 @@
 package org.basex.query.func.jobs;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -15,6 +16,9 @@ public final class JobsFinished extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String id = Token.string(toToken(exprs[0], qc));
-    return Bln.get(qc.context.queries.finished(id));
+    final JobPool pool = qc.context.jobs;
+    final JobResult result = pool.results.get(id);
+    // returns true if job is unknown and if no result exists, or it has been finished
+    return Bln.get(!pool.jobs.containsKey(id) && (result == null || result.finished()));
   }
 }

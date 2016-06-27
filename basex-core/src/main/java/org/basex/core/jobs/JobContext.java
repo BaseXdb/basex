@@ -11,10 +11,10 @@ import org.basex.util.*;
  */
 public class JobContext {
   /** Query id. */
-  private static long jobId;
+  private static long jobId = -1;
 
   /** Performance measurements. */
-  public Performance perf;
+  public Performance performance;
   /** Listener, watching for information. */
   public InfoListener listener;
 

@@ -48,7 +48,7 @@ public final class Optimize extends ACreate {
         data.meta.dirty = true;
       }
       optimize(data, this);
-      ok = info(DB_OPTIMIZED_X, meta.name, job().perf);
+      ok = info(DB_OPTIMIZED_X, meta.name, job().performance);
     } catch(final IOException ex) {
       ok = error(Util.message(ex));
     } finally {

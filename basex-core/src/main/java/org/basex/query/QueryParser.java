@@ -124,12 +124,12 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param query query string
-   * @param path file path (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
+   * @param uri base URI (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
    * @param qctx query context
    * @param sctx static context (can be {@code null})
    * @throws QueryException query exception
    */
-  public QueryParser(final String query, final String path, final QueryContext qctx,
+  public QueryParser(final String query, final String uri, final QueryContext qctx,
       final StaticContext sctx) throws QueryException {
 
     super(query);
@@ -138,7 +138,7 @@ public class QueryParser extends InputParser {
 
     // set path to query file
     final MainOptions opts = qctx.context.options;
-    sc.baseURI(path != null ? path : opts.get(MainOptions.QUERYPATH));
+    sc.baseURI(uri != null ? uri : opts.get(MainOptions.QUERYPATH));
 
     // bind external variables
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {

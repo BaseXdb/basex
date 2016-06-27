@@ -48,7 +48,7 @@ public final class Restore extends ABackup {
     // try to restore database
     try {
       restore(db, backup, soptions, this);
-      return !closed || new Open(db).run(context) ? info(DB_RESTORED_X, backup, job().perf) :
+      return !closed || new Open(db).run(context) ? info(DB_RESTORED_X, backup, job().performance) :
         error(DB_NOT_RESTORED_X, db);
     } catch(final IOException ex) {
       Util.debug(ex);
