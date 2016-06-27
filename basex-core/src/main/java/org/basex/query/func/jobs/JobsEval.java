@@ -46,7 +46,7 @@ public final class JobsEval extends StandardFunc {
     qp.http(qc.http);
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
-      final Value val = CachedXQuery.copy(it.getValue().iter(), ctx);
+      final Value val = CachedXQuery.copy(it.getValue().iter(), ctx, qc);
       if(key.isEmpty()) qp.context(val);
       else qp.bind(key, val);
     }
@@ -55,8 +55,7 @@ public final class JobsEval extends StandardFunc {
     // check if number of maximum queries has been reached
     if(ctx.jobs.jobs.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
-    final CachedXQuery job = new CachedXQuery(qp, cache, info);
-    new Thread(job).start();
+    final CachedXQuery job = new CachedXQuery(qp, info, cache);
 
     return Str.get(job.job().id());
   }

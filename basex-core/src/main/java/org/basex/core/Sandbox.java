@@ -105,8 +105,11 @@ public abstract class Sandbox {
     final ArrayOutput ao = new ArrayOutput();
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.sc.baseURI(BASEURI);
+      qp.register(context);
       try(final Serializer ser = qp.getSerializer(ao)) {
         qp.value().serialize(ser);
+      } finally {
+        qp.unregister(context);
       }
     }
     return ao.toString();

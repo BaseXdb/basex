@@ -172,16 +172,16 @@ public final class ServerQuery extends Job {
    * @throws IOException I/O Exception
    */
   private void parse() throws IOException {
-    if(!parsed) {
-      try {
-        final Performance perf = new Performance();
-        qp().parse();
-        qp.qc.info.parsing = perf.time();
-        parsed = true;
-      } catch(final QueryException ex) {
-        throw new BaseXException(ex);
-      }
+    if(parsed) return;
+
+    final Performance perf = new Performance();
+    try {
+      qp().parse();
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
     }
+    qp.qc.info.parsing = perf.time();
+    parsed = true;
   }
 
   /**

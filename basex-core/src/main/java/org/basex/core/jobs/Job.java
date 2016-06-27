@@ -42,6 +42,8 @@ public abstract class Job {
   public final void register(final Context ctx) {
     ctx.jobs.add(this);
     ctx.locks.acquire(this);
+    checkStop();
+
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
     if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
@@ -113,7 +115,7 @@ public abstract class Job {
   final void state(final JobState js) {
     for(final Job job : children) job.state(js);
     state = js;
-    stopTimeout();
+    if(js != JobState.OK) stopTimeout();
   }
 
   /**
@@ -128,29 +130,6 @@ public abstract class Job {
    */
   protected void abort() {
     for(final Job job : children) job.abort();
-  }
-
-  /**
-   * Starts a timeout thread.
-   * @param ms milliseconds to wait; deactivated if set to 0
-   */
-  protected void startTimeout(final long ms) {
-    if(ms == 0) return;
-    timer = new Timer(true);
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() { timeout(); }
-    }, ms);
-  }
-
-  /**
-   * Stops the timeout thread.
-   */
-  protected void stopTimeout() {
-    if(timer != null) {
-      timer.cancel();
-      timer = null;
-    }
   }
 
   /**
@@ -194,7 +173,32 @@ public abstract class Job {
    * @param ctx job context
    */
   final void jobContext(final JobContext ctx) {
-    for(final Job ch : children) ch.jobContext(ctx);
+    for(final Job job : children) job.jobContext(ctx);
     jc = ctx;
+  }
+
+  // PRIVATE FUNCTIONS ============================================================================
+
+  /**
+   * Starts a timeout thread.
+   * @param ms milliseconds to wait; deactivated if set to 0
+   */
+  private void startTimeout(final long ms) {
+    if(ms == 0) return;
+    timer = new Timer(true);
+    timer.schedule(new TimerTask() {
+      @Override
+      public void run() { timeout(); }
+    }, ms);
+  }
+
+  /**
+   * Stops the timeout thread.
+   */
+  private void stopTimeout() {
+    if(timer != null) {
+      timer.cancel();
+      timer = null;
+    }
   }
 }

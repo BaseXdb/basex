@@ -55,19 +55,22 @@ public final class JobsModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void running() {
+  public void finished() {
     final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
+    Performance.sleep(100);
     query(_JOBS_FINISHED.args(id), "false");
     query(_JOBS_STOP.args(id));
-    while(query(_JOBS_STOP.args(id)).equals("false")) Thread.yield();
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
     query(_JOBS_FINISHED.args("12345"), "true");
   }
 
   /** Test method. */
   @Test
   public void list() {
-    final String id = query(_JOBS_EVAL.args(SLOW_QUERY));
+    final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
+    Performance.sleep(100);
     query(_JOBS_LIST.args() + " = '" + id + "'", "true");
+    query(_JOBS_STOP.args(id));
   }
 
   /**
@@ -76,6 +79,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void stop() throws IOException {
     final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
+    Performance.sleep(100);
     query(_JOBS_STOP.args(id));
 
     // check if query was interrupted
@@ -101,24 +105,11 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " map{}", " map{'cache':true()}") +
         " return ("
         + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args("$q") + " },"
-            + "function($c) { }, ()") + ","
+            + "function($c) { Q{java:java.lang.Thread}yield() }, ()") + ","
         + _JOBS_RESULT.args("$q") + ')', "1");
 
-    // receive asynchronous result
-    String id = query(_JOBS_EVAL.args(SLOW_QUERY, " map{}", " map{'cache':true()}"));
-    while(true) {
-      try {
-        assertEquals("1", eval(_JOBS_RESULT.args(id)));
-        break;
-      } catch(final QueryException ex) {
-        // query is still running: check error code
-        assertSame(JOBS_RUNNING_X, ex.error());
-      }
-    }
-    clean();
-
-    // receive asynchronous result
-    id = query(_JOBS_EVAL.args(SLOW_QUERY));
+    // ensure that the result will not be cached
+    String id = query(_JOBS_EVAL.args(SLOW_QUERY));
     while(true) {
       try {
         eval(_JOBS_RESULT.args(id));
@@ -129,6 +120,21 @@ public final class JobsModuleTest extends AdvancedQueryTest {
         // query is still running: check error code
         assertSame(JOBS_RUNNING_X, ex.error());
       }
+      Thread.yield();
     }
+
+    // receive cached result
+    id = query(_JOBS_EVAL.args(SLOW_QUERY, " map{}", " map{'cache':true()}"));
+    while(true) {
+      try {
+        assertEquals("1", eval(_JOBS_RESULT.args(id)));
+        break;
+      } catch(final QueryException ex) {
+        // query is still running: check error code
+        assertSame(JOBS_RUNNING_X, ex.error());
+      }
+      Thread.yield();
+    }
+    clean();
   }
 }

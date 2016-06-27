@@ -32,23 +32,32 @@ final class CachedXQuery extends Job implements Runnable {
   /**
    * Constructor.
    * @param qp query processor
-   * @param cache cache results
    * @param info input info
+   * @param cache cache results
    */
-  CachedXQuery(final QueryProcessor qp, final boolean cache, final InputInfo info) {
-    this.qp = pushJob(qp);
+  CachedXQuery(final QueryProcessor qp, final InputInfo info, final boolean cache) {
+    this.qp = qp;
     this.info = info;
     context = qp.qc.context;
     updating = qp.updating;
-    if(cache) context.jobs.results.put(job().id(), result);
+
+    // cache result
+    final JobPool pool = context.jobs;
+    final String id = job().id();
+    if(cache) pool.results.put(id, result);
+
+    // start thread; do not continue unless job has been added to the job pool
+    new Thread(this).start();
+    while(pool.jobs.get(id) != null) Thread.yield();
   }
 
   @Override
   public void run() {
     try {
       // register query
+      pushJob(qp);
       register(context);
-      result.value = copy(qp.iter(), context);
+      result.value = copy(qp.iter(), context, qp.qc);
       result.time = System.currentTimeMillis();
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
@@ -74,12 +83,16 @@ final class CachedXQuery extends Job implements Runnable {
    * Creates a context-independent copy of the iterator results.
    * @param ctx database context
    * @param iter result iterator
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  static Value copy(final Iter iter, final Context ctx) throws QueryException {
+  static Value copy(final Iter iter, final Context ctx, final QueryContext qc)
+      throws QueryException {
+
     final ValueBuilder vb = new ValueBuilder();
     for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       if(it instanceof FItem) throw BASX_FITEM_X.get(null, it);
       final Data data = it.data();
       if(data != null && !data.inMemory()) it = ((DBNode) it).dbNodeCopy(ctx.options);
