@@ -73,13 +73,16 @@ public final class FnSort extends StandardFunc {
             final Value v1 = vl.get(i1), v2 = vl.get(i2);
             final long s1 = v1.size(), s2 = v2.size(), sl = Math.min(s1, s2);
             for(int v = 0; v < sl; v++) {
-              final Item it1 = v1.itemAt(v), it2 = v2.itemAt(v);
-              if(!it1.comparable(it2)) {
-                throw it1 instanceof FItem ? FIEQ_X.get(sf.info, it1.type) :
-                      it2 instanceof FItem ? FIEQ_X.get(sf.info, it2.type) :
-                      diffError(it1, it2, sf.info);
+              Item m = v1.itemAt(v), n = v2.itemAt(v);
+              if(m == Dbl.NAN || m == Flt.NAN) m = null;
+              if(n == Dbl.NAN || n == Flt.NAN) n = null;
+              if(m != null && n != null && !m.comparable(n)) {
+                throw m instanceof FItem ? FIEQ_X.get(sf.info, m.type) :
+                      n instanceof FItem ? FIEQ_X.get(sf.info, n.type) :
+                      diffError(m, n, sf.info);
               }
-              final int d = it1.diff(it2, sf.sc.collation, sf.info);
+              final int d = m == null ? n == null ? 0 : -1 : n == null ? 1 :
+                m.diff(n, sf.sc.collation, sf.info);
               if(d != 0 && d != Item.UNDEF) return d;
             }
             return (int) (s1 - s2);
