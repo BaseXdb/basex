@@ -42,8 +42,6 @@ public abstract class Job {
   public final void register(final Context ctx) {
     ctx.jobs.add(this);
     ctx.locks.acquire(this);
-    checkStop();
-
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
     if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);

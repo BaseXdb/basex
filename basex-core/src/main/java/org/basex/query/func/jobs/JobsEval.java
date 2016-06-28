@@ -32,7 +32,7 @@ public final class JobsEval extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] query = toToken(exprs[0], qc);
+    final String query = string(toToken(exprs[0], qc));
     final HashMap<String, Value> bindings = toBindings(1, qc);
 
     final EvalOptions opts = new EvalOptions();
@@ -42,7 +42,7 @@ public final class JobsEval extends StandardFunc {
     final boolean cache = opts.get(EvalOptions.CACHE);
 
     final Context ctx = qc.context;
-    final QueryProcessor qp = new QueryProcessor(string(query), ctx);
+    final QueryProcessor qp = new QueryProcessor(query, ctx);
     qp.http(qc.http);
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
@@ -56,7 +56,6 @@ public final class JobsEval extends StandardFunc {
     if(ctx.jobs.jobs.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
     final CachedXQuery job = new CachedXQuery(qp, info, cache);
-
     return Str.get(job.job().id());
   }
 }

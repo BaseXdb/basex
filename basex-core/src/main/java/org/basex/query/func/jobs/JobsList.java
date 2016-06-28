@@ -1,5 +1,8 @@
 package org.basex.query.func.jobs;
 
+import java.util.*;
+
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -16,8 +19,9 @@ import org.basex.util.list.*;
 public final class JobsList extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final TokenList list = new TokenList(size());
-    for(final String id : qc.context.jobs.jobs.keySet()) list.add(id);
+    final Map<String, Job> jobs = qc.context.jobs.jobs;
+    final TokenList list = new TokenList(jobs.size());
+    for(final String id : jobs.keySet()) list.add(id);
     return StrSeq.get(list);
   }
 
