@@ -79,8 +79,7 @@ public class XQueryEval extends StandardFunc {
     final Perm tmp = user.perm("");
     String uri = path;
     Timer to = null;
-
-    if(qc.parent != null) throw BXXQ_NESTED.get(info);
+    if(qc.parent != null && qc.parent.parent != null) throw BXXQ_NESTED.get(info);
 
     try(final QueryContext qctx = new QueryContext(qc)) {
       if(exprs.length > 2) {
