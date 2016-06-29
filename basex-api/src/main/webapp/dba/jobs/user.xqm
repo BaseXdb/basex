@@ -11,7 +11,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'users';
+declare variable $_:CAT := 'jobs';
 (:~ Sub category :)
 declare variable $_:SUB := 'user';
 

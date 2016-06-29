@@ -1,5 +1,5 @@
 (:~
- : Kill sessions.
+ : Stops jobs.
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
@@ -7,17 +7,18 @@ module namespace _ = 'dba/databases';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'users';
+declare variable $_:CAT := 'jobs';
 
 (:~
- : Kills DBA sessions.
+ : Stops jobs.
  : @param  $id  session ids
  :)
 declare
   %rest:GET
-  %rest:path("/dba/kill-dba")
+  %rest:path("/dba/stop-job")
   %rest:query-param("id", "{$ids}")
   %output:method("html")
 function _:drop(
@@ -25,8 +26,8 @@ function _:drop(
 ) {
   cons:check(),
   try {
-    Sessions:ids()[. = $ids] ! Sessions:close(.),
-    web:redirect($_:CAT, map { 'info': 'Killed sessions: ' || count($ids) })
+    util:eval("$i ! jobs:stop(.)", map { 'i': $ids }),
+    web:redirect($_:CAT, map { 'info': 'Stopped jobs: ' || count($ids) })
   } catch * {
     web:redirect($_:CAT, map { 'error': $err:description })
   }

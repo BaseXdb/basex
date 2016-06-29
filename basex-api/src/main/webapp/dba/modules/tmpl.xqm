@@ -59,8 +59,8 @@ declare function tmpl:wrap(
           cons:check(),
           let $cats := 
             let $top := $options('top')
-            for $cat in ('Databases', 'Queries', 'Logs', 'Users', 'Files', 'Settings', 'Logout')
-            let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
+            for $cat in ('Databases', 'Queries', 'Logs', 'Jobs &amp; Users', 'Files', 'Settings', 'Logout')
+            let $link := <a href="{ lower-case(replace($cat, ' .*', '')) }">{ $cat }</a>
             return if($top = $link) then (
               <b>{ $link }</b>
             ) else (

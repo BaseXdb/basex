@@ -15,9 +15,9 @@ function buttons() {
       if(n == 'global') continue;
 
       if(s == "optimize" || s == "optimize-all" || s == "drop-backup" ||
-         s == "drop-db" || s == "drop-pattern" || s == "drop-user" ||
+         s == "drop-db" || s == "drop-pattern" || s == "drop-user" || s == "stop-job" ||
          s == "kill-session" || s == "restore" || s == "backup" || s == "delete" ||
-         s == "delete-files" || s == "delete-logs" || s == "kill") {
+         s == "delete-files" || s == "delete-logs" || s == "kill-session") {
         e = c > 0;
       }
       button.disabled = !e;

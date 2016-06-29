@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/users';
+module namespace _ = 'dba/jobs';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace Session = 'http://basex.org/modules/session';
@@ -13,10 +13,10 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'users';
+declare variable $_:CAT := 'jobs';
 
 (:~
- : Users page.
+ : Jobs and users page.
  : @param  $sort   table sort key
  : @param  $error  error message
  : @param  $info   info message
@@ -24,12 +24,12 @@ declare variable $_:CAT := 'users';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/users")
+  %rest:path("/dba/jobs")
   %rest:query-param("sort", "{$sort}", "")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
   %output:method("html")
-function _:users(
+function _:jobs(
   $sort   as xs:string,
   $error  as xs:string?,
   $info   as xs:string?
@@ -40,7 +40,9 @@ function _:users(
   let $data := try {
     util:eval('element result {
       element users { user:list-details() },
-      element sessions { admin:sessions() }
+      element sessions { admin:sessions() },
+      element jobs { jobs:list-details() },
+      element current-job { jobs:current() }
     }')
   } catch * {
     element error { $cons:DATA-ERROR || ': ' || $err:description }
@@ -51,12 +53,73 @@ function _:users(
     <tr>
       <td width='49%'>
         <form action="{ $_:CAT }" method="post" class="update">
+        <h2>Jobs</h2>
+        {
+          let $entries :=
+            let $curr := $data/current-job
+            for $job in $data/jobs/job
+            let $id := $job/@id
+            let $ms := xs:dayTimeDuration($job/@duration) div xs:dayTimeDuration('PT0.001S')
+            order by $ms descending
+            return <e id='{ $id || (" (you)"[$id = $curr]) }' type='{ $job/@type }'
+              sec='{ $ms div 1000 }' state='{ $job/@state }' user='{ $job/@user }'/>
+            
+          let $headers := (
+            element id { html:label($entries, ('ID', 'IDs')) },
+            element type { 'Type' },
+            element sec { 'Seconds' },
+            element state { 'State' },
+            element user { 'User' }
+          )
+          let $buttons := (
+            html:button('stop-job', 'Stop', true())
+          )
+          let $link := function($value) { 'job' }
+          return html:table($entries, $headers, $buttons)
+        }
+        </form>
+        <form action="{ $_:CAT }" method="post" class="update">
+        <h2>Browser Sessions</h2>
+        {
+          let $entries :=
+            for $id in Sessions:ids()
+            let $_ := prof:dump(Sessions:names($id))
+            for $session in Sessions:get($id, $cons:SESSION-KEY)
+            let $name := $session/name || ' (you)'[Session:id() = $id]
+            let $addr := (string-join($session/(host, port), ":")[.], 'local')[1]
+            let $access := format-dateTime(Sessions:accessed($id), '[Y]-[M2]-[D2], [H]:[m]:[s]')
+            return <e id='{ $id }' user='{ $name }' addr='{ $addr }' access='{ $access }'/>
+          let $headers := (
+            element id { attribute type { 'id' } },
+            element user { 'User' },
+            element addr { 'Address' },
+            element access { 'Last Access' }
+          )
+          let $buttons := (
+            html:button('kill-session', 'Kill', true())
+          )
+          return html:table($entries, $headers, $buttons)
+        }
+        </form>
+        <h2>Database Clients</h2>
+        {
+          let $entries := $data/sessions/session/<e addr='{ @address }' user='{ @user }'/>
+          let $headers := (
+            element addr { html:label($entries, ('Session', 'Sessions')) },
+            element user { 'Address' }
+          )
+          return html:table($entries, $headers, ())
+        }
+      </td>
+      <td class='vertical'/>
+      <td width='49%'>
+        <form action="{ $_:CAT }" method="post" class="update">
         <h2>Users</h2>
         {
           let $entries := $data/users/user/<e name='{ @name }' perm='{ @permission }'/>
           let $headers := (
-            <name>{ html:label($entries, ('User', 'Users')) }</name>,
-            <perm>Permission</perm>
+            element name { html:label($entries, ('User', 'Users')) },
+            element perm { 'Permission' }
           )
           let $buttons := (
             html:button('create-user', 'Create…'),
@@ -67,40 +130,6 @@ function _:users(
         }
         </form>
         <div>&#xa0;</div>
-      </td>
-      <td class='vertical'/>
-      <td width='49%'>
-        <form action="{ $_:CAT }" method="post" class="update">
-        <h2>Browser Sessions</h2>
-        {
-          let $entries :=
-            for $id in Sessions:ids()
-            for $session in Sessions:get($id, $cons:SESSION-KEY)
-            let $name := $session/name || ' (you)'[Session:id() = $id]
-            let $addr := (string-join($session/(host, port), ":")[.], 'local')[1]
-            let $access := format-dateTime(Sessions:accessed($id), '[Y]-[M2]-[D2], [H]:[m]:[s]')
-            return <e id='{ $id }' user='{ $name }' addr='{ $addr }' access='{ $access }'/>
-          let $headers := (
-            <id type='id'/>,
-            <user>User</user>,
-            <addr>Address</addr>,
-            <access>Last Access</access>
-          )
-          let $buttons := (
-            html:button('kill-dba', 'Kill', true())
-          )
-          return html:table($entries, $headers, $buttons)
-        }
-        </form>
-        <h2>Database Client Sessions</h2>
-        {
-          let $entries := $data/sessions/session/<e addr='{ @address }' user='{ @user }'/>
-          let $headers := (
-            <addr>{ html:label($entries, ('Session', 'Sessions')) }</addr>,
-            <user>Address</user>
-          )
-          return html:table($entries, $headers, ())
-        }
       </td>
     </tr>
   )
@@ -114,7 +143,7 @@ function _:users(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/users")
+  %rest:path("/dba/jobs")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %rest:query-param("id",     "{$ids}")
@@ -126,7 +155,8 @@ function _:action(
 ) {
   web:redirect($action,
     if($action = 'create-user') then map { }
-    else if($action = 'kill-dba') then map { 'id': $ids }
+    else if($action = 'kill-session') then map { 'id': $ids }
+    else if($action = 'stop-job') then map { 'id': $ids }
     else map { 'name': $names, 'redirect': $_:CAT }
   )
 };
