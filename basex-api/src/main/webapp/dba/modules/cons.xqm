@@ -11,7 +11,7 @@ import module namespace Session = 'http://basex.org/modules/session';
 declare variable $cons:DATA-ERROR := 'Could not retrieve data';
 
 (:~ Session key. :)
-declare variable $cons:SESSION-KEY := "session";
+declare variable $cons:SESSION-KEY := "dba-session";
 (:~ Current session. :)
 declare variable $cons:SESSION := Session:get($cons:SESSION-KEY);
 

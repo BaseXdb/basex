@@ -83,12 +83,19 @@ function _:jobs(
         {
           let $entries :=
             for $id in Sessions:ids()
-            let $_ := prof:dump(Sessions:names($id))
-            for $session in Sessions:get($id, $cons:SESSION-KEY)
-            let $name := $session/name || ' (you)'[Session:id() = $id]
-            let $addr := (string-join($session/(host, port), ":")[.], 'local')[1]
+            for $name in Sessions:names($id)
+            for $session in Sessions:get($id, $name)
             let $access := format-dateTime(Sessions:accessed($id), '[Y]-[M2]-[D2], [H]:[m]:[s]')
-            return <e id='{ $id }' user='{ $name }' addr='{ $addr }' access='{ $access }'/>
+            let $dba := $session instance of element(dba-session)
+            let $key := $id || '|' || $name
+            return if($dba) then (
+              let $user := $session/name || ' (you)'[Session:id() = $id]
+              let $addr := (string-join($session/(host, port), ":")[.], 'local')[1]
+              return <e id='{ $key }' user='{ $user }' addr='{ $addr }' access='{ $access }'/>
+            ) else (
+              let $user := 'Application' || ' (you)'[Session:id() = $id]
+              return <e id='{ $key }' user='{ $user }' addr='–' access='{ $access }'/>
+            )
           let $headers := (
             element id { attribute type { 'id' } },
             element user { 'User' },

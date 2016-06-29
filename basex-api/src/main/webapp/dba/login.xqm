@@ -159,7 +159,7 @@ declare %private function _:accept(
   $port  as xs:string
 ) {
   Session:set($cons:SESSION-KEY,
-    element session {
+    element dba-session {
       element name { $name },
       element pass { $pass },
       element host { $host }[$host],

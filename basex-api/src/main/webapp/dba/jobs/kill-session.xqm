@@ -13,7 +13,7 @@ declare variable $_:CAT := 'jobs';
 
 (:~
  : Kills DBA sessions.
- : @param  $id  session ids
+ : @param  $id session ids (including names)
  :)
 declare
   %rest:GET
@@ -21,11 +21,12 @@ declare
   %rest:query-param("id", "{$ids}")
   %output:method("html")
 function _:drop(
-  $ids  as xs:string*
+  $ids as xs:string*
 ) {
   cons:check(),
   try {
-    Sessions:ids()[. = $ids] ! Sessions:close(.),
+    for $id in $ids
+    return Sessions:delete(substring-before($id, '|'), substring-after($id, '|')),
     web:redirect($_:CAT, map { 'info': 'Killed sessions: ' || count($ids) })
   } catch * {
     web:redirect($_:CAT, map { 'error': $err:description })
