@@ -7,8 +7,10 @@ package org.basex.core.jobs;
  * @author Christian Gruen
  */
 public enum JobState {
-  /** OK. */
-  OK,
+  /** Queued. */
+  QUEUED,
+  /** Running. */
+  RUNNING,
   /** Stopped. */
   STOPPED,
   /** Timeout. */

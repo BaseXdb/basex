@@ -164,7 +164,7 @@ public enum QueryError {
   // Jobs module
 
   /** Jobs error. */
-  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown result id: %."),
+  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown job id: %."),
   /** Jobs error. */
   JOBS_RUNNING_X(JOBS, "running", "Query is still running: %."),
   /** Jobs error. */

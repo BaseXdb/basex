@@ -38,6 +38,8 @@ public interface RestXqText {
   /** Token "forward". */
   byte[] FORWARD = token("forward");
 
+  /** RESTXQ string. */
+  String RESTXQ = "RESTXQ";
   /** WADL prefix. */
   String WADL = "wadl:";
   /** WADL namespace. */

@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class CachedXQuery extends Job implements Runnable {
+final class ScheduledXQuery extends Job implements Runnable {
   /** Result. */
   private final JobResult result = new JobResult();
   /** Input info. */
@@ -35,7 +35,7 @@ final class CachedXQuery extends Job implements Runnable {
    * @param info input info
    * @param cache cache results
    */
-  CachedXQuery(final QueryProcessor qp, final InputInfo info, final boolean cache) {
+  ScheduledXQuery(final QueryProcessor qp, final InputInfo info, final boolean cache) {
     this.qp = qp;
     this.info = info;
     context = qp.qc.context;
@@ -99,5 +99,10 @@ final class CachedXQuery extends Job implements Runnable {
       vb.add(it);
     }
     return vb.value();
+  }
+
+  @Override
+  public String toString() {
+    return qp.toString();
   }
 }

@@ -36,6 +36,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption LANGKEYS = new BooleanOption("LANGKEYS", false);
   /** Applied locking algorithm: local (database) vs. global (job) locking. */
   public static final BooleanOption GLOBALLOCK = new BooleanOption("GLOBALLOCK", false);
+  /** Timeout (seconds) for remembering result of asynchronous queries. */
+  public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
 
   /** Comment: written to options file. */
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
@@ -71,8 +73,6 @@ public final class StaticOptions extends Options {
   public static final BooleanOption LOG = new BooleanOption("LOG", true);
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
-  /** Timeout (seconds) for remembering result of asynchronous queries. */
-  public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
 
   /** Comment: written to options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");

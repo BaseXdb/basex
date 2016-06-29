@@ -17,12 +17,12 @@ public abstract class Job {
   /** Child jobs. */
   private final List<Job> children = Collections.synchronizedList(new ArrayList<Job>(0));
   /** Job context. */
-  private JobContext jc = new JobContext();
+  private JobContext jc = new JobContext(this);
 
   /** This flag indicates that a job is updating. */
   public boolean updating;
   /** State of job. */
-  public JobState state = JobState.OK;
+  public JobState state = JobState.RUNNING;
 
   /** Timer. */
   private Timer timer;
@@ -40,6 +40,7 @@ public abstract class Job {
    * @param ctx context
    */
   public final void register(final Context ctx) {
+    jc.context = ctx;
     ctx.jobs.add(this);
     ctx.locks.acquire(this);
     jc.performance = new Performance();
@@ -113,14 +114,14 @@ public abstract class Job {
   final void state(final JobState js) {
     for(final Job job : children) job.state(js);
     state = js;
-    if(js != JobState.OK) stopTimeout();
+    if(js != JobState.RUNNING) stopTimeout();
   }
 
   /**
    * Checks if the job was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
-    if(state != JobState.OK) throw new JobException();
+    if(state != JobState.RUNNING) throw new JobException();
   }
 
   /**

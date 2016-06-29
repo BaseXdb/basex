@@ -138,7 +138,6 @@ public final class ClientListener extends Thread {
         } catch(final BaseXException ex) {
           ok = false;
           info = ex.getMessage();
-          if(info.startsWith(INTERRUPTED)) info = TIMEOUT_EXCEEDED;
         }
 
         // send 0 to mark end of result

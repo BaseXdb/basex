@@ -32,31 +32,31 @@ public final class JobsModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void eval() {
-    query(_JOBS_EVAL.args("1"));
-    query(_JOBS_EVAL.args(".", " map { '': '1' }"));
-    query(_JOBS_EVAL.args(".", " map { '': <a/> }"));
-    query(_JOBS_EVAL.args("declare variable $a external;$a", " map { 'a': <a/> }"));
-    query(_JOBS_EVAL.args("\"static-base-uri()\"", " map { 'base-uri': 'abc.xq' }"));
+  public void schedule() {
+    query(_JOBS_SCHEDULE.args("1"));
+    query(_JOBS_SCHEDULE.args(".", " map { '': '1' }"));
+    query(_JOBS_SCHEDULE.args(".", " map { '': <a/> }"));
+    query(_JOBS_SCHEDULE.args("declare variable $a external;$a", " map { 'a': <a/> }"));
+    query(_JOBS_SCHEDULE.args("\"static-base-uri()\"", " map { 'base-uri': 'abc.xq' }"));
     // some errors will only be detected at runtime
-    query(_JOBS_EVAL.args("\"db:open('db')\""));
-    query(_JOBS_EVAL.args("1+<a/>"));
+    query(_JOBS_SCHEDULE.args("\"db:open('db')\""));
+    query(_JOBS_SCHEDULE.args("1+<a/>"));
 
     // database creation
     error(_DB_OPEN.args("db"), BXDB_OPEN_X);
-    query(_PROF_VOID.args(_JOBS_EVAL.args("\"db:open('db')\"")) + ',' + _DB_CREATE.args("db"));
-    query(_JOBS_EVAL.args("\"db:drop('db')\"") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
-    query(_JOBS_EVAL.args("delete node <a/>"));
+    query(_PROF_VOID.args(_JOBS_SCHEDULE.args("\"db:open('db')\"")) + ',' + _DB_CREATE.args("db"));
+    query(_JOBS_SCHEDULE.args("\"db:drop('db')\"") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
+    query(_JOBS_SCHEDULE.args("delete node <a/>"));
 
     // errors
-    error(_JOBS_EVAL.args("1+"), CALCEXPR);
-    error(_JOBS_EVAL.args("1, delete node <a/>"), UPALL);
+    error(_JOBS_SCHEDULE.args("1+"), CALCEXPR);
+    error(_JOBS_SCHEDULE.args("1, delete node <a/>"), UPALL);
   }
 
   /** Test method. */
   @Test
   public void finished() {
-    final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
+    final String id = query(_JOBS_SCHEDULE.args(VERY_SLOW_QUERY));
     Performance.sleep(100);
     query(_JOBS_FINISHED.args(id), "false");
     query(_JOBS_STOP.args(id));
@@ -67,7 +67,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void list() {
-    final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
+    final String id = query(_JOBS_SCHEDULE.args(VERY_SLOW_QUERY));
     Performance.sleep(100);
     query(_JOBS_LIST.args() + " = '" + id + "'", "true");
     query(_JOBS_STOP.args(id));
@@ -78,7 +78,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
    * @throws IOException I/O exception */
   @Test
   public void stop() throws IOException {
-    final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
+    final String id = query(_JOBS_SCHEDULE.args(VERY_SLOW_QUERY));
     Performance.sleep(100);
     query(_JOBS_STOP.args(id));
 
@@ -102,14 +102,14 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void result() throws IOException {
     // receive result of asynchronous execution
-    query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " map{}", " map{'cache':true()}") +
+    query("let $q := " + _JOBS_SCHEDULE.args(SLOW_QUERY, " map{}", " map{'cache':true()}") +
         " return ("
         + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args("$q") + " },"
             + "function($c) { Q{java:java.lang.Thread}yield() }, ()") + ","
         + _JOBS_RESULT.args("$q") + ')', "1");
 
     // ensure that the result will not be cached
-    String id = query(_JOBS_EVAL.args(SLOW_QUERY));
+    String id = query(_JOBS_SCHEDULE.args(SLOW_QUERY));
     while(true) {
       try {
         eval(_JOBS_RESULT.args(id));
@@ -124,7 +124,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     }
 
     // receive cached result
-    id = query(_JOBS_EVAL.args(SLOW_QUERY, " map{}", " map{'cache':true()}"));
+    id = query(_JOBS_SCHEDULE.args(SLOW_QUERY, " map{}", " map{'cache':true()}"));
     while(true) {
       try {
         assertEquals("1", eval(_JOBS_RESULT.args(id)));

@@ -40,6 +40,7 @@ abstract class RESTCmd extends Command {
     super(max(session.cmds));
     this.session = session;
     cmds = session.cmds;
+    job().type(RESTText.REST);
   }
 
   @Override

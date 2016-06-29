@@ -21,7 +21,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class JobsEval extends StandardFunc {
+public final class JobsSchedule extends StandardFunc {
   /** Eval options. */
   public static class EvalOptions extends Options {
     /** Query base-uri. */
@@ -46,7 +46,7 @@ public final class JobsEval extends StandardFunc {
     qp.http(qc.http);
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
-      final Value val = CachedXQuery.copy(it.getValue().iter(), ctx, qc);
+      final Value val = ScheduledXQuery.copy(it.getValue().iter(), ctx, qc);
       if(key.isEmpty()) qp.context(val);
       else qp.bind(key, val);
     }
@@ -55,7 +55,7 @@ public final class JobsEval extends StandardFunc {
     // check if number of maximum queries has been reached
     if(ctx.jobs.jobs.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
-    final CachedXQuery job = new CachedXQuery(qp, info, cache);
+    final ScheduledXQuery job = new ScheduledXQuery(qp, info, cache);
     return Str.get(job.job().id());
   }
 }

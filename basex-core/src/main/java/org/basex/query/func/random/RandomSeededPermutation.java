@@ -25,7 +25,7 @@ public final class RandomSeededPermutation extends StandardFunc {
     final Iter iter = qc.iter(exprs[1]);
     for(Item item; (item = iter.next()) != null;) {
       final int ls = list.size();
-      int l = r.nextInt(ls + 1);
+      final int l = r.nextInt(ls + 1);
       if(l < ls) {
         final Item it = list.get(l);
         list.set(l, item);

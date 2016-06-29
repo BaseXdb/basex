@@ -21,6 +21,8 @@ interface RESTText {
   /** Name. */
   QNm Q_RESOURCE = new QNm(QueryText.REST_PREFIX, "resource", REST_URI);
 
+  /** REST. */
+  String REST = "REST";
   /** Attribute. */
   String RESOURCES = "resources";
   /** Attribute. */

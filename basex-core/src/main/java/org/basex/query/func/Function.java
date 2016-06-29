@@ -1063,7 +1063,7 @@ public enum Function {
   /* Jobs Module. */
 
   /** XQuery function. */
-  _JOBS_EVAL(JobsEval.class, "eval(string[,bindings[,options]])",
+  _JOBS_SCHEDULE(JobsSchedule.class, "schedule(string[,bindings[,options]])",
       arg(STR, ITEM, MAP_O), STR, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),
@@ -1073,6 +1073,9 @@ public enum Function {
   _JOBS_STOP(JobsStop.class, "stop(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_LIST(JobsList.class, "list()", arg(), STR_ZM, flag(NDT), JOBS_URI),
+  /** XQuery function. */
+  _JOBS_LIST_DETAILS(JobsListDetails.class, "list-details([id])",
+      arg(STR), ELM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_RESULTS(JobsResults.class, "results()", arg(), STR_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */

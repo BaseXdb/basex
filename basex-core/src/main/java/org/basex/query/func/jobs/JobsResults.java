@@ -19,6 +19,8 @@ import org.basex.util.list.*;
 public final class JobsResults extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    checkAdmin(qc);
+
     final Map<String, JobResult> results = qc.context.jobs.results;
     final TokenList list = new TokenList(results.size());
     for(final String id : results.keySet()) list.add(id);
