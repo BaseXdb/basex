@@ -7,6 +7,9 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.core.locks.*;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -54,5 +57,15 @@ public final class JobsResult extends Command {
     } finally {
       results.remove(id);
     }
+  }
+
+  @Override
+  public void databases(final LockResult lr) {
+    // No locks needed
+  }
+
+  @Override
+  public void build(final CmdBuilder cb) {
+    cb.init(Cmd.JOBS + " " + CmdJobs.RESULT).args();
   }
 }

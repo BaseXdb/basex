@@ -46,19 +46,18 @@ final class ScheduledXQuery extends Job implements Runnable {
     final String id = job().id();
     if(cache) pool.results.put(id, result);
 
-    // start thread; do not continue unless job has been added to the job pool
+    // start thread; only continue if job has been added to the job pool, or if it is finished
     new Thread(this).start();
-    while(pool.jobs.get(id) != null) Thread.yield();
+    while(context.jobs.jobs.get(id) == null && result.time == 0) Thread.yield();
   }
 
   @Override
   public void run() {
     try {
-      // register query
+      // register query. order is important!
       pushJob(qp);
       register(context);
       result.value = copy(qp.iter(), context, qp.qc);
-      result.time = System.currentTimeMillis();
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
       context.jobs.results.remove(job().id());
@@ -67,9 +66,10 @@ final class ScheduledXQuery extends Job implements Runnable {
     } catch(final Throwable ex) {
       result.exception = BXXQ_UNEXPECTED_X.get(info, ex);
     } finally {
-      // close and invalidate query after result has been assigned
+      // close and invalidate query after result has been assigned. order is important!
       qp.close();
       unregister(context);
+      result.time = System.currentTimeMillis();
       popJob();
     }
   }

@@ -134,6 +134,9 @@ public final class PermissionTest extends SandboxTest {
     no(new AlterPassword(NAME, NAME), testSession);
     no(new AlterUser(NAME, "test2"), testSession);
     no(new Flush(), testSession);
+
+    no(new JobsList(), testSession);
+    no(new JobsStop("job0"), testSession);
   }
 
   /** Tests all commands where read permission is needed. */
@@ -179,6 +182,9 @@ public final class PermissionTest extends SandboxTest {
     no(new AlterUser(NAME, "test2"), testSession);
     no(new Flush(), testSession);
     ok(new Close(), testSession);
+
+    no(new JobsList(), testSession);
+    no(new JobsStop("job0"), testSession);
   }
 
   /** Tests all commands where write permission is needed. */
@@ -228,6 +234,9 @@ public final class PermissionTest extends SandboxTest {
     no(new Grant("none", NAME), testSession);
     no(new AlterPassword(NAME, NAME), testSession);
     no(new AlterUser(NAME, "test2"), testSession);
+
+    no(new JobsList(), testSession);
+    no(new JobsStop("job0"), testSession);
   }
 
   /** Tests all commands where create permission is needed. */
@@ -256,6 +265,9 @@ public final class PermissionTest extends SandboxTest {
     no(new Grant("none", NAME), testSession);
     no(new AlterPassword(NAME, NAME), testSession);
     no(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
+
+    no(new JobsList(), testSession);
+    no(new JobsStop("job0"), testSession);
   }
 
   /** Tests all commands where admin permission is needed. */
@@ -284,6 +296,9 @@ public final class PermissionTest extends SandboxTest {
     ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
 
     ok(new XQuery("Q{java.lang.String}new('x')"), testSession);
+
+    ok(new JobsList(), testSession);
+    ok(new JobsStop("job0"), testSession);
   }
 
   /** Drops users. */

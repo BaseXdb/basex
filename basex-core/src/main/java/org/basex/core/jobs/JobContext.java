@@ -21,7 +21,7 @@ public final class JobContext {
   public Context context;
 
   /** Root job. */
-  private final Job job;
+  final Job root;
 
   /** Job id. Will be set via if job is being registered. */
   private String id;
@@ -33,7 +33,7 @@ public final class JobContext {
    * @param job job
    */
   JobContext(final Job job) {
-    this.job = job;
+    this.root = job;
   }
 
   /**
@@ -61,11 +61,11 @@ public final class JobContext {
    * @return name
    */
   public String type() {
-    return tp != null ? tp : Util.className(job);
+    return tp != null ? tp : Util.className(root);
   }
 
   @Override
   public String toString() {
-    return job.toString();
+    return root.toString();
   }
 }

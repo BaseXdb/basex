@@ -50,6 +50,7 @@ public final class CommandLockingTest extends SandboxTest {
   /** StringList containing java module test lock strings. */
   private static final StringList MODULE_LIST = new StringList(DBLocking.MODULE_PREFIX
       + QueryModuleTest.LOCK1, DBLocking.MODULE_PREFIX + QueryModuleTest.LOCK2);
+
   /**
    * Test commands affecting databases.
    */
@@ -86,6 +87,9 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new InfoIndex(), false, CTX_LIST);
     ckDBs(new InfoStorage(), false, CTX_LIST);
     ckDBs(new Inspect(), false, CTX_LIST);
+    ckDBs(new JobsList(), false, NONE);
+    ckDBs(new JobsResult("job0"), false, NONE);
+    ckDBs(new JobsStop("job0"), false, NONE);
     ckDBs(new Kill(NAME), true, ADMIN_LIST);
     ckDBs(new List(), false, null);
     ckDBs(new List(NAME), false, NAME_LIST);
@@ -289,12 +293,10 @@ public final class CommandLockingTest extends SandboxTest {
   /**
    * Test if the right databases are identified for locking. Required databases are exact,
    * no additional ones allowed.
-   *
    * Pass empty string for currently opened database, {@code null} for all.
-   *
-   * @param cmd Command to test
-   * @param up Updating command?
-   * @param dbs Required and allowed databases
+   * @param cmd command to test
+   * @param up updating command?
+   * @param dbs required and allowed databases
    */
   private static void ckDBs(final Command cmd, final boolean up, final StringList dbs) {
     ckDBs(cmd, up, dbs, dbs);
@@ -303,12 +305,10 @@ public final class CommandLockingTest extends SandboxTest {
   /**
    * Test if the right databases are identified for locking. Required databases are exact,
    * no additional ones allowed.
-   *
    * Pass empty string for currently opened database, {@code null} for all.
-   *
-   * @param cmd Command to test
-   * @param read Required and allowed databases for read lock
-   * @param write Required and allowed databases for write lock
+   * @param cmd command to test
+   * @param read required and allowed databases for read lock
+   * @param write required and allowed databases for write lock
    */
   private static void ckDBs(final Command cmd, final StringList read, final StringList write) {
     ckDBs(cmd, read, read, write, write);
@@ -316,13 +316,11 @@ public final class CommandLockingTest extends SandboxTest {
 
   /**
    * Test if the right databases are identified for locking.
-   *
    * Pass empty string for currently opened database, {@code null} for all.
-   *
-   * @param cmd Command to test
-   * @param up Updating command?
-   * @param req Required databases
-   * @param allow Allowed databases
+   * @param cmd command to test
+   * @param up updating command?
+   * @param req required databases
+   * @param allow allowed databases
    */
   private static void ckDBs(final Command cmd, final boolean up, final StringList req,
       final StringList allow) {
@@ -331,14 +329,12 @@ public final class CommandLockingTest extends SandboxTest {
 
   /**
    * Test if the right databases are identified for locking.
-   *
    * Pass empty string for currently opened database, {@code null} for all.
-   *
-   * @param cmd Command to test
-   * @param reqRd Required databases for read locks
-   * @param allowRd Allowed databases for read locks
-   * @param reqWt Required databases for write locks
-   * @param allowWt Allowed databases for write locks
+   * @param cmd command to test
+   * @param reqRd required databases for read locks
+   * @param allowRd allowed databases for read locks
+   * @param reqWt required databases for write locks
+   * @param allowWt allowed databases for write locks
    */
   private static void ckDBs(final Command cmd, final StringList reqRd, final StringList allowRd,
                             final StringList reqWt, final StringList allowWt) {

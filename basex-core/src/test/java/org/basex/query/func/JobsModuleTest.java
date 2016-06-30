@@ -5,7 +5,10 @@ import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.*;
 
+import org.basex.core.jobs.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -28,6 +31,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     while(!query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "]").isEmpty()) {
       Performance.sleep(10);
     }
+    query(_JOBS_RESULTS.args() + " ! " + _JOBS_RESULT.args(" ."));
   }
 
   /** Test method. */
@@ -57,9 +61,11 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void finished() {
     final String id = query(_JOBS_SCHEDULE.args(VERY_SLOW_QUERY));
-    Performance.sleep(100);
-    query(_JOBS_FINISHED.args(id), "false");
-    query(_JOBS_STOP.args(id));
+    try {
+      query(_JOBS_FINISHED.args(id), "false");
+    } finally {
+      query(_JOBS_STOP.args(id));
+    }
     while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
     query(_JOBS_FINISHED.args("12345"), "true");
   }
@@ -68,9 +74,25 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void list() {
     final String id = query(_JOBS_SCHEDULE.args(VERY_SLOW_QUERY));
-    Performance.sleep(100);
-    query(_JOBS_LIST.args() + " = '" + id + "'", "true");
-    query(_JOBS_STOP.args(id));
+    try {
+      query(_JOBS_LIST.args() + " = '" + id + "'", "true");
+    } finally {
+      query(_JOBS_STOP.args(id));
+    }
+  }
+
+  /** Test method. */
+  @Test
+  public void listDetails() {
+    final String id = query(_JOBS_SCHEDULE.args(VERY_SLOW_QUERY));
+    try {
+      final String list = query(_JOBS_LIST_DETAILS.args() + "[@id = '" + id + "']");
+      query(list + "/@user/string()", UserText.ADMIN);
+      query(list + "/@state/string()", JobState.RUNNING.toString().toLowerCase(Locale.ENGLISH));
+      query(list + "/@duration/string() castable as xs:dayTimeDuration", "true");
+    } finally {
+      query(_JOBS_STOP.args(id));
+    }
   }
 
   /**
@@ -79,7 +101,6 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void stop() throws IOException {
     final String id = query(_JOBS_SCHEDULE.args(VERY_SLOW_QUERY));
-    Performance.sleep(100);
     query(_JOBS_STOP.args(id));
 
     // check if query was interrupted
@@ -136,5 +157,15 @@ public final class JobsModuleTest extends AdvancedQueryTest {
       Thread.yield();
     }
     clean();
+  }
+
+  /**
+   * Test method.
+   */
+  @Test
+  public void results() {
+    final String id = query(_JOBS_SCHEDULE.args("1", " map{}", " map{'cache':true()}"));
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
+    query(_JOBS_RESULTS.args(), id);
   }
 }

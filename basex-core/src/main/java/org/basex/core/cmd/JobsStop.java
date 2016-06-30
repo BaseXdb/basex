@@ -6,6 +6,9 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.core.locks.*;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 
 /**
@@ -42,5 +45,15 @@ public final class JobsStop extends Command {
     // remove potentially cached result
     ctx.jobs.results.remove(id);
     return job != null;
+  }
+
+  @Override
+  public void databases(final LockResult lr) {
+    // No locks needed
+  }
+
+  @Override
+  public void build(final CmdBuilder cb) {
+    cb.init(Cmd.JOBS + " " + CmdJobs.STOP).args();
   }
 }

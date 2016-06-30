@@ -585,6 +585,24 @@ public class CommandTest extends SandboxTest {
 
   /** Command test. */
   @Test
+  public final void jobsList() {
+    ok(new JobsList());
+  }
+
+  /** Command test. */
+  @Test
+  public final void jobsResult() {
+    no(new JobsResult("job1"));
+  }
+
+  /** Command test. */
+  @Test
+  public final void jobsStop() {
+    ok(new JobsStop("job1"));
+  }
+
+  /** Command test. */
+  @Test
   public final void showUsers() {
     ok(new ShowUsers());
     ok(new ShowUsers(NAME));

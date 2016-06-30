@@ -8,6 +8,9 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.core.locks.*;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -57,5 +60,15 @@ public final class JobsList extends Command {
     }
     out.println(table.sort().finish());
     return true;
+  }
+
+  @Override
+  public void databases(final LockResult lr) {
+    // No locks needed
+  }
+
+  @Override
+  public void build(final CmdBuilder cb) {
+    cb.init(Cmd.JOBS + " " + CmdJobs.LIST).args();
   }
 }
