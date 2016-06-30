@@ -40,7 +40,7 @@ public final class JobsStop extends Command {
    */
   public static boolean stop(final Context ctx, final String id) {
     // send stop signal
-    final Job job = ctx.jobs.jobs.get(id);
+    final Job job = ctx.jobs.queued.get(id);
     if(job != null) job.stop();
     // remove potentially cached result
     ctx.jobs.results.remove(id);

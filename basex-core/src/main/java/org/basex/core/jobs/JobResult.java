@@ -18,15 +18,6 @@ public final class JobResult {
   public long time;
 
   /**
-   * Checks if the result is still valid.
-   * @param seconds seconds to wait
-   * @return result of check
-   */
-  public boolean valid(final int seconds) {
-    return System.currentTimeMillis() - time >= seconds * 1000L;
-  }
-
-  /**
    * Checks if the query result is finished.
    * @return result of check
    */

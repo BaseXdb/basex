@@ -26,8 +26,8 @@ final class ScheduledXQuery extends Job implements Runnable {
   private final InputInfo info;
   /** Query processor. */
   private final QueryProcessor qp;
-  /** Database context. */
-  private final Context context;
+  /** Caching flag. */
+  private final boolean cache;
 
   /**
    * Constructor.
@@ -38,29 +38,30 @@ final class ScheduledXQuery extends Job implements Runnable {
   ScheduledXQuery(final QueryProcessor qp, final InputInfo info, final boolean cache) {
     this.qp = qp;
     this.info = info;
-    context = qp.qc.context;
+    this.cache = cache;
     updating = qp.updating;
 
     // cache result
-    final JobPool pool = context.jobs;
+    final JobPool pool = qp.qc.context.jobs;
     final String id = job().id();
     if(cache) pool.results.put(id, result);
 
     // start thread; only continue if job has been added to the job pool, or if it is finished
     new Thread(this).start();
-    while(context.jobs.jobs.get(id) == null && result.time == 0) Thread.yield();
+    while(pool.queued.get(id) == null && result.time == 0) Thread.yield();
   }
 
   @Override
   public void run() {
+    final Context ctx = qp.qc.context;
     try {
       // register query. order is important!
       pushJob(qp);
-      register(context);
-      result.value = copy(qp.iter(), context, qp.qc);
+      register(ctx);
+      result.value = copy(qp.iter(), ctx, qp.qc);
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
-      context.jobs.results.remove(job().id());
+      ctx.jobs.results.remove(job().id());
     } catch(final QueryException ex) {
       result.exception = ex;
     } catch(final Throwable ex) {
@@ -68,8 +69,9 @@ final class ScheduledXQuery extends Job implements Runnable {
     } finally {
       // close and invalidate query after result has been assigned. order is important!
       qp.close();
-      unregister(context);
+      unregister(ctx);
       result.time = System.currentTimeMillis();
+      if(cache) ctx.jobs.schedule(this);
       popJob();
     }
   }

@@ -18,14 +18,13 @@ public abstract class Job {
   private final List<Job> children = Collections.synchronizedList(new ArrayList<Job>(0));
   /** Job context. */
   private JobContext jc = new JobContext(this);
+  /** Timer. */
+  private Timer timer;
 
   /** This flag indicates that a job is updating. */
   public boolean updating;
   /** State of job. */
   public JobState state = JobState.RUNNING;
-
-  /** Timer. */
-  private Timer timer;
 
   /**
    * Returns the job context.

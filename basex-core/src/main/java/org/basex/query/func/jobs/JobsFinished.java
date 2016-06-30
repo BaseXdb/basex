@@ -21,6 +21,6 @@ public final class JobsFinished extends StandardFunc {
     final JobPool pool = qc.context.jobs;
     final JobResult result = pool.results.get(id);
     // returns true if job is unknown and if no result exists, or it has been finished
-    return Bln.get(!pool.jobs.containsKey(id) && (result == null || result.finished()));
+    return Bln.get(!pool.queued.containsKey(id) && (result == null || result.finished()));
   }
 }

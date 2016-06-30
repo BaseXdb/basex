@@ -40,8 +40,8 @@ public final class JobsList extends Command {
     table.header.add(STATE);
     table.header.add(USER);
 
-    final Map<String, Job> jobs = context.jobs.jobs;
-    for(final Job job : jobs.values()) {
+    final Map<String, Job> queued = context.jobs.queued;
+    for(final Job job : queued.values()) {
       final TokenList tl = new TokenList(3);
       final JobContext jc = job.job();
       tl.add(jc.id());

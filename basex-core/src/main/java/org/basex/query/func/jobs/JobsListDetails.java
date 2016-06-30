@@ -38,15 +38,15 @@ public final class JobsListDetails extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
 
-    final Map<String, Job> jobs = qc.context.jobs.jobs;
-    final Set<String> set = exprs.length == 0 ? jobs.keySet() :
+    final Map<String, Job> queued = qc.context.jobs.queued;
+    final Set<String> set = exprs.length == 0 ? queued.keySet() :
       Collections.singleton(Token.string(toToken(exprs[0], qc)));
 
     final int ml = qc.context.soptions.get(StaticOptions.LOGMSGMAXLEN);
     final ValueBuilder vb = new ValueBuilder();
     for(final String key : set) {
       // skips jobs that finished in between
-      final Job job = jobs.get(key);
+      final Job job = queued.get(key);
       if(job == null) continue;
 
       final JobContext jc = job.job();

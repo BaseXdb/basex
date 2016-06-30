@@ -14,28 +14,22 @@ import org.basex.core.*;
 public final class JobPool {
   /** Number of queries to be queued. */
   public static final int MAXQUERIES = 1000;
-  /** Running jobs. */
-  public final Map<String, Job> jobs = new ConcurrentHashMap<>();
+  /** Queued or running jobs. */
+  public final Map<String, Job> queued = new ConcurrentHashMap<>();
   /** Cached results. */
   public final Map<String, JobResult> results = new ConcurrentHashMap<>();
+
+  /** Timer. */
+  public final Timer timer = new Timer(true);
+  /** Timeout (ms). */
+  public final long timeout;
 
   /**
    * Constructor.
    * @param sopts static options
    */
   public JobPool(final StaticOptions sopts) {
-    // check cached results every 60 seconds
-    final Timer timer = new Timer(true);
-    timer.scheduleAtFixedRate(new TimerTask() {
-      @Override
-      public void run() {
-        final int co = sopts.get(StaticOptions.CACHETIMEOUT);
-        for(final Map.Entry<String, JobResult> entry : results.entrySet()) {
-          final JobResult result = entry.getValue();
-          if(result != null && !result.valid(co)) jobs.remove(entry.getKey());
-        }
-      }
-    }, 0, 60000);
+    timeout = sopts.get(StaticOptions.CACHETIMEOUT) * 1000L;
   }
 
   /**
@@ -43,7 +37,8 @@ public final class JobPool {
    * @param job job
    */
   public void add(final Job job) {
-    jobs.put(job.job().id(), job);
+    final String id = job.job().id();
+    queued.put(id, job);
   }
 
   /**
@@ -51,7 +46,7 @@ public final class JobPool {
    * @param job job
    */
   public void remove(final Job job) {
-    jobs.remove(job.job().id());
+    queued.remove(job.job().id());
   }
 
   /**
@@ -59,7 +54,20 @@ public final class JobPool {
    */
   public void close() {
     // stop running queries
-    for(final Job job : jobs.values()) job.stop();
-    while(!jobs.isEmpty()) Thread.yield();
+    for(final Job job : queued.values()) job.stop();
+    while(!queued.isEmpty()) Thread.yield();
+  }
+
+  /**
+   * Schedules a result.
+   * @param job job
+   */
+  public void schedule(final Job job) {
+    timer.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        results.remove(job.job().id());
+      }
+    }, timeout);
   }
 }

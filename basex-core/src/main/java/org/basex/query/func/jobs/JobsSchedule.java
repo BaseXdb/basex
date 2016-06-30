@@ -53,7 +53,7 @@ public final class JobsSchedule extends StandardFunc {
     qp.parse(uri);
 
     // check if number of maximum queries has been reached
-    if(ctx.jobs.jobs.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
+    if(ctx.jobs.queued.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
     final ScheduledXQuery job = new ScheduledXQuery(qp, info, cache);
     return Str.get(job.job().id());
