@@ -575,7 +575,7 @@ public class FnHttpTest extends HTTPTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals(fakeConn2.out.toString(), "<a>test</a>");
+    assertEquals("<a>test</a>", fakeConn2.out.toString());
   }
 
   /**
@@ -599,7 +599,7 @@ public class FnHttpTest extends HTTPTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals(fakeConn2.out.toString(), "<a>test</a>");
+    assertEquals("<a>test</a>", fakeConn2.out.toString());
   }
 
   /**

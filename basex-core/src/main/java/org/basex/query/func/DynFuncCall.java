@@ -88,7 +88,7 @@ public final class DynFuncCall extends FuncCall {
         SeqType rt = ft.type;
         if(tp instanceof MapType && !rt.mayBeZero())
           rt = rt.withOcc(rt.one() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-        seqType = ft.type;
+        seqType = rt;
       }
     }
 

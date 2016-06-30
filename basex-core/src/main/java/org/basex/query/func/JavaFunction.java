@@ -188,12 +188,10 @@ public abstract class JavaFunction extends Arr {
     final Object module  = modules.findModule(className);
     if(module != null) {
       final Method meth = moduleMethod(module, name, args.length, types, qc, ii);
-      if(meth != null) {
-        final Requires req = meth.getAnnotation(Requires.class);
-        final Perm perm = req == null ? Perm.ADMIN :
-          Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
-        return new JavaModuleFunc(sc, ii, module, meth, args, perm);
-      }
+      final Requires req = meth.getAnnotation(Requires.class);
+      final Perm perm = req == null ? Perm.ADMIN :
+        Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
+      return new JavaModuleFunc(sc, ii, module, meth, args, perm);
     }
 
     // try to find matching Java variable or method
@@ -220,7 +218,7 @@ public abstract class JavaFunction extends Arr {
    * @param types types provided in the query (can be {@code null})
    * @param qc query context
    * @param ii input info
-   * @return method if found, {@code null} otherwise
+   * @return method if found
    * @throws QueryException query exception
    */
   private static Method moduleMethod(final Object module, final String name, final int arity,

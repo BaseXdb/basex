@@ -78,7 +78,7 @@ public final class BaseXGUI extends Main {
         // open specified file
         final ArrayList<IOFile> xqfiles = new ArrayList<>();
         for(final String file : files.finish()) {
-          if(file.matches("^.*\\" + IO.BASEXSUFFIX + "[^.]*$")) continue;
+          if(file.contains(IO.BASEXSUFFIX)) continue;
 
           final IOFile io = new IOFile(file);
           final boolean xml = file.endsWith(IO.XMLSUFFIX);
