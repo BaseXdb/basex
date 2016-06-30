@@ -63,7 +63,7 @@ public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWil
    * Returns the complete path (path + name) of this node as a string.
    * @return path string
    */
-  public String path() {
+  public final String path() {
     return string(preparePath(concat(path, SLASH, name)));
   }
 
@@ -73,13 +73,13 @@ public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWil
   abstract void load();
 
   @Override
-  public void treeWillExpand(final TreeExpansionEvent e) throws ExpandVetoException {
+  public void treeWillExpand(final TreeExpansionEvent e) {
     if(equals(e.getPath().getLastPathComponent()))
       load();
   }
 
   @Override
-  public void treeWillCollapse(final TreeExpansionEvent e) throws ExpandVetoException { }
+  public void treeWillCollapse(final TreeExpansionEvent e) { }
 
   @Override
   public String toString() {

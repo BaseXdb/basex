@@ -38,7 +38,7 @@ public class BaseXTree extends JTree {
    * @param r right distance
    * @return self reference
    */
-  public BaseXTree border(final int t, final int l, final int b, final int r) {
+  public final BaseXTree border(final int t, final int l, final int b, final int r) {
     setBorder(BaseXLayout.border(t, l, b, r));
     return this;
   }

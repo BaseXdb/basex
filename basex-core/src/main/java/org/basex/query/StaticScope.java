@@ -59,7 +59,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * included in the map, too).
    * @return documentation
    */
-  public TokenObjMap<TokenList> doc() {
+  public final TokenObjMap<TokenList> doc() {
     if(doc == null) return null;
 
     final TokenObjMap<TokenList> map = new TokenObjMap<>();

@@ -30,7 +30,7 @@ public class TokenParser {
   /**
    * Resets the cursor position.
    */
-  public void reset() {
+  public final void reset() {
     pos = 0;
   }
 
@@ -38,7 +38,7 @@ public class TokenParser {
    * Checks if the parser will return more codepoints.
    * @return result of check
    */
-  public boolean more() {
+  public final boolean more() {
     return pos < size;
   }
 
@@ -46,7 +46,7 @@ public class TokenParser {
    * Returns the current codepoint and advances the cursor.
    * @return current codepoint, or {@code -1}
    */
-  public int next() {
+  public final int next() {
     final int p = pos;
     if(p < size) {
       pos += cl(token, p);
@@ -60,7 +60,7 @@ public class TokenParser {
    * @param ch codepoint to be consumed
    * @return indicates if the codepoint was consumed
    */
-  public boolean consume(final int ch) {
+  public final boolean consume(final int ch) {
     final int p = pos;
     if(p >= size || cp(token, p) != ch) return false;
     pos += cl(token, p);

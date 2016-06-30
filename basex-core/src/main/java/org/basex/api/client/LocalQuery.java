@@ -57,7 +57,7 @@ public class LocalQuery extends Query {
   }
 
   @Override
-  public String info() throws IOException {
+  public String info() {
     return ql.info();
   }
 

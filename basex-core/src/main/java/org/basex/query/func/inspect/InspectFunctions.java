@@ -55,7 +55,7 @@ public final class InspectFunctions extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     if(exprs.length == 0) qc.funcs.compile(qc, true);
     return this;
   }

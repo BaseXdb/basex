@@ -67,7 +67,7 @@ public class TreeFolder extends TreeNode {
    * @param target node to append filtered nodes
    * @return number of remaining nodes that can be added
    */
-  public int addLeaves(final byte[] filter, final int cmax, final TreeFolder target) {
+  public final int addLeaves(final byte[] filter, final int cmax, final TreeFolder target) {
     final TokenBoolMap tbm = context.data().resources.children(subfolder(), false);
     final List<byte[]> keys = new ArrayList<>(tbm.size());
 
@@ -128,7 +128,7 @@ public class TreeFolder extends TreeNode {
   /**
    * Removes all children from this node.
    */
-  public void removeChildren() {
+  public final void removeChildren() {
     removeAllChildren();
     loaded = false;
   }
@@ -136,7 +136,7 @@ public class TreeFolder extends TreeNode {
   /**
    * Reloads this node without repainting the tree.
    */
-  public void reload() {
+  public final void reload() {
     removeChildren();
     load();
   }

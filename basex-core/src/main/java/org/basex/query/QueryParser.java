@@ -781,7 +781,7 @@ public class QueryParser extends InputParser {
    * @param info input info
    * @throws QueryException query exception
    */
-  public void module(final String path, final String uri, final InputInfo info)
+  public final void module(final String path, final String uri, final InputInfo info)
       throws QueryException {
 
     // get absolute path

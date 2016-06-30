@@ -20,9 +20,9 @@ public final class JobPool {
   public final Map<String, JobResult> results = new ConcurrentHashMap<>();
 
   /** Timer. */
-  public final Timer timer = new Timer(true);
+  private final Timer timer = new Timer(true);
   /** Timeout (ms). */
-  public final long timeout;
+  private final long timeout;
 
   /**
    * Constructor.
@@ -36,7 +36,7 @@ public final class JobPool {
    * Adds a job.
    * @param job job
    */
-  public void add(final Job job) {
+  void add(final Job job) {
     final String id = job.job().id();
     queued.put(id, job);
   }
@@ -45,7 +45,7 @@ public final class JobPool {
    * Removes a job.
    * @param job job
    */
-  public void remove(final Job job) {
+  void remove(final Job job) {
     queued.remove(job.job().id());
   }
 

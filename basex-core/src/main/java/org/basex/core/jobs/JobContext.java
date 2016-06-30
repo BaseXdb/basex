@@ -21,7 +21,7 @@ public final class JobContext {
   public Context context;
 
   /** Root job. */
-  final Job root;
+  private final Job root;
 
   /** Job id. Will be set via if job is being registered. */
   private String id;

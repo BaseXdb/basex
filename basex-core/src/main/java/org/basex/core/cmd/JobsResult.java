@@ -33,7 +33,7 @@ public final class JobsResult extends Command {
   }
 
   @Override
-  protected boolean run() throws IOException {
+  protected boolean run() {
     final String id = args[0];
     final JobPool jobs = context.jobs;
     final Map<String, JobResult> results = jobs.results;

@@ -53,7 +53,7 @@ abstract class TextDecoder {
    * @return question mark
    * @throws IOException I/O exception
    */
-  int invalid() throws IOException {
+  final int invalid() throws IOException {
     if(validate) throw new InputException();
     return Token.REPLACEMENT;
   }

@@ -46,7 +46,7 @@ abstract class CsvSerializer extends StandardSerializer {
    * @param fields fields to be printed
    * @throws IOException I/O exception
    */
-  void record(final TokenList fields) throws IOException {
+  final void record(final TokenList fields) throws IOException {
     // print fields, skip trailing empty contents
     final int fs = fields.size();
     for(int i = 0; i < fs; i++) {

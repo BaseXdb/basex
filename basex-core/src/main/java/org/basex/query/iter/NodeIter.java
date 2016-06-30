@@ -14,7 +14,7 @@ public abstract class NodeIter extends Iter {
   public abstract ANode next() throws QueryException;
 
   @Override
-  public ANode get(final long i) throws QueryException {
+  public ANode get(final long i) {
     return null;
   }
 }

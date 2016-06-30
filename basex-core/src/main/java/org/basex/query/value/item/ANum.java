@@ -107,7 +107,7 @@ public abstract class ANum extends Item {
   public abstract ANum round(final int scale, final boolean even);
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item test(final QueryContext qc, final InputInfo ii) {
     return dbl() == qc.pos ? this : null;
   }
 

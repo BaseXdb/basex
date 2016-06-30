@@ -148,7 +148,7 @@ public final class DialogFonts extends BaseXDialog {
   private void monoFonts() {
     new GUIWorker<Boolean>() {
       @Override
-      protected Boolean doInBackground() throws Exception {
+      protected Boolean doInBackground() {
         final Graphics g = getGraphics();
         final StringList monos = new StringList();
         for(final String name : fonts) {

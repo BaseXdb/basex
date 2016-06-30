@@ -10,7 +10,7 @@ import java.io.*;
  */
 public final class NewlineOutput extends PrintOutput {
   /** Print output. */
-  protected final PrintOutput po;
+  private final PrintOutput po;
   /** Newline token. */
   private final byte[] newline;
 

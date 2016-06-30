@@ -2,8 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.*;
-
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
@@ -27,7 +25,7 @@ public final class JobsStop extends Command {
   }
 
   @Override
-  protected boolean run() throws IOException {
+  protected boolean run() {
     final boolean stopped = stop(context, args[0]);
     return info(JOBS_STOPPED_X, stopped ? 1 : 0);
   }

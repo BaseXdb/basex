@@ -34,7 +34,7 @@ public abstract class JsonConverter {
    * @param func fallback function
    * @return self reference
    */
-  public JsonConverter fallback(final JsonFallback func) {
+  public final JsonConverter fallback(final JsonFallback func) {
     fallback = func;
     return this;
   }
@@ -45,7 +45,7 @@ public abstract class JsonConverter {
    * @throws IOException I/O exception
    * @return result
    */
-  public Item convert(final IO input) throws IOException {
+  public final Item convert(final IO input) throws IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
     return convert(new NewlineInput(input).encoding(encoding).content(), input.path());
   }
@@ -57,7 +57,7 @@ public abstract class JsonConverter {
    * @throws QueryIOException query I/O exception
    * @return result
    */
-  public Item convert(final byte[] input, final String path) throws QueryIOException {
+  public final Item convert(final byte[] input, final String path) throws QueryIOException {
     JsonParser.parse(Token.string(input), path, jopts, this);
     return finish();
   }

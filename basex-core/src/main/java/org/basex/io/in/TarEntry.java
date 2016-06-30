@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  */
 public final class TarEntry {
   /** GNU tar entry with a long name. */
-  public static final String LONGNAME = "././@LongLink";
+  private static final String LONGNAME = "././@LongLink";
 
   /** Entry size. */
   private final long size;

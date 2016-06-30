@@ -28,7 +28,7 @@ public abstract class GUIWorker<T> {
   /**
    * Executes this worker.
    */
-  public void execute() {
+  public final void execute() {
     new SwingWorker<T, T>() {
       @Override
       protected T doInBackground() throws Exception {

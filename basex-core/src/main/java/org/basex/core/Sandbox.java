@@ -43,11 +43,9 @@ public abstract class Sandbox {
   protected static final String REST_ROOT = HTTP_ROOT + REST + '/';
 
   /** Default output stream. */
-  public static final PrintStream OUT = System.out;
+  protected static final PrintStream OUT = System.out;
   /** Default error stream. */
-  public static final PrintStream ERR = System.err;
-  /** Null output stream. */
-  public static final PrintStream NULL = new PrintStream(new NullOutput());
+  protected static final PrintStream ERR = System.err;
   /** Test name. */
   protected static final String NAME = Util.className(Sandbox.class);
   /** Database context. */

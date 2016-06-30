@@ -40,7 +40,7 @@ abstract class JsonXmlConverter extends JsonConverter {
    * Returns the current element.
    * @return element
    */
-  FElem element() {
+  final FElem element() {
     if(curr == null) curr = new FElem(JSON);
     return curr;
   }
@@ -77,7 +77,7 @@ abstract class JsonXmlConverter extends JsonConverter {
    * @param name JSON name
    * @param type data type
    */
-  void addType(final FElem elem, final byte[] name, final byte[] type) {
+  final void addType(final FElem elem, final byte[] name, final byte[] type) {
     // merge type information
     if(merge) {
       // check if name exists and contains no whitespaces

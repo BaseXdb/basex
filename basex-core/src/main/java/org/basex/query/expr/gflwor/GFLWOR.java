@@ -903,19 +903,19 @@ public final class GFLWOR extends ParseExpr {
 
     @Deprecated
     @Override
-    public Iter iter(final QueryContext qc) throws QueryException {
+    public Iter iter(final QueryContext qc) {
       throw Util.notExpected();
     }
 
     @Deprecated
     @Override
-    public Value value(final QueryContext qc) throws QueryException {
+    public Value value(final QueryContext qc) {
       throw Util.notExpected();
     }
 
     @Deprecated
     @Override
-    public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    public Item item(final QueryContext qc, final InputInfo ii) {
       throw Util.notExpected();
     }
 

@@ -376,18 +376,17 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+  public final boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
     return it instanceof ADate && hasTz() == ((ADate) it).hasTz() && eq(it, null, null, ii);
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
+  public final int hash(final InputInfo ii) {
     return seconds().add(days().multiply(DAYSECONDS)).intValue();
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));

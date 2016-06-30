@@ -30,8 +30,6 @@ public interface DataText {
   String DBFSIZE = "FSIZE";
   /** Number of documents. */
   String DBNDOCS = "NDOCS";
-  /** Encoding. */
-  String DBENC = "ENCODING";
   /** Whitespace chopping. */
   String DBCHOP = "CHOPPED";
   /** Path indexing. */

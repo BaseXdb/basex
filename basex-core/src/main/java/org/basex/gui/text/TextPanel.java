@@ -147,7 +147,7 @@ public class TextPanel extends BaseXPanel {
    * Returns a currently marked string if it does not extend over more than one line.
    * @return search string
    */
-  public String searchString() {
+  public final String searchString() {
     final String string = editor.copy();
     return string.indexOf('\n') != -1 ? "" : string;
   }
@@ -278,7 +278,7 @@ public class TextPanel extends BaseXPanel {
   /**
    * Adds or removes a comment.
    */
-  public void comment() {
+  public final void comment() {
     final int caret = editor.pos();
     if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
@@ -288,7 +288,7 @@ public class TextPanel extends BaseXPanel {
    * Case conversion.
    * @param cs case type
    */
-  public void toCase(final Case cs) {
+  public final void toCase(final Case cs) {
     final int caret = editor.pos();
     if(editor.toCase(cs)) hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
@@ -297,7 +297,7 @@ public class TextPanel extends BaseXPanel {
   /**
    * Sorts text.
    */
-  public void sort() {
+  public final void sort() {
     final int caret = editor.pos();
     final DialogSort ds = new DialogSort(gui);
     if(!ds.ok() || !editor.sort()) return;
@@ -310,7 +310,7 @@ public class TextPanel extends BaseXPanel {
   /**
    * Formats the selected text.
    */
-  public void format() {
+  public final void format() {
     final int caret = editor.pos();
     if(editor.format(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
@@ -698,7 +698,7 @@ public class TextPanel extends BaseXPanel {
    * Refreshes the layout.
    * @param f used font
    */
-  public void refreshLayout(final Font f) {
+  public final void refreshLayout(final Font f) {
     setFont(f);
     scroll.refreshLayout();
   }
@@ -709,7 +709,7 @@ public class TextPanel extends BaseXPanel {
    * Pastes a string.
    * @param string string to be pasted
    */
-  public void paste(final String string) {
+  public final void paste(final String string) {
     final int pos = editor.pos();
     if(editor.selected()) editor.delete();
     editor.add(string);

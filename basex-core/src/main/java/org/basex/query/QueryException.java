@@ -96,7 +96,7 @@ public class QueryException extends Exception {
    * Returns the error column.
    * @return error column
    */
-  public int column() {
+  public final int column() {
     return info == null ? 0 : info.column();
   }
 
@@ -104,7 +104,7 @@ public class QueryException extends Exception {
    * Returns the marked error column.
    * @return marked error column
    */
-  public int markedColumn() {
+  public final int markedColumn() {
     return markedCol;
   }
 
@@ -112,7 +112,7 @@ public class QueryException extends Exception {
    * Returns the error line.
    * @return error line
    */
-  public int line() {
+  public final int line() {
     return info == null ? 0 : info.line();
   }
 
@@ -120,7 +120,7 @@ public class QueryException extends Exception {
    * Returns the file.
    * @return error line
    */
-  public String file() {
+  public final String file() {
     return info == null ? null : info.path();
   }
 
@@ -128,7 +128,7 @@ public class QueryException extends Exception {
    * Returns suggestions for code suggestions.
    * @return suggestions
    */
-  public StringList suggest() {
+  public final StringList suggest() {
     return suggest == null ? new StringList() : suggest;
   }
 
@@ -138,7 +138,7 @@ public class QueryException extends Exception {
    * @param sug code suggestions
    * @return self reference
    */
-  public QueryException suggest(final InputParser qp, final StringList sug) {
+  public final QueryException suggest(final InputParser qp, final StringList sug) {
     suggest = sug;
     pos(qp);
     return this;
@@ -149,7 +149,7 @@ public class QueryException extends Exception {
    * @param ii input info
    * @return self reference
    */
-  public QueryException add(final InputInfo ii) {
+  public final QueryException add(final InputInfo ii) {
     if(ii != null) stack.add(ii);
     return this;
   }
@@ -159,7 +159,7 @@ public class QueryException extends Exception {
    * @param ii input info
    * @return self reference
    */
-  public QueryException info(final InputInfo ii) {
+  public final QueryException info(final InputInfo ii) {
     info = ii;
     return this;
   }
@@ -168,7 +168,7 @@ public class QueryException extends Exception {
    * Returns the input info.
    * @return input info
    */
-  public InputInfo info() {
+  public final InputInfo info() {
     return info;
   }
 
@@ -177,7 +177,7 @@ public class QueryException extends Exception {
    * @param val error value
    * @return self reference
    */
-  public QueryException value(final Value val) {
+  public final QueryException value(final Value val) {
     value = val;
     return this;
   }
@@ -187,7 +187,7 @@ public class QueryException extends Exception {
    * @param err error
    * @return self reference
    */
-  QueryException error(final QueryError err) {
+  final QueryException error(final QueryError err) {
     error = err;
     return this;
   }
@@ -196,7 +196,7 @@ public class QueryException extends Exception {
    * Finds line and column for the specified query parser.
    * @param parser parser
    */
-  void pos(final InputParser parser) {
+  final void pos(final InputParser parser) {
     markedCol = parser.mark;
     if(info != null) return;
     // check if line/column information has already been added
@@ -208,7 +208,7 @@ public class QueryException extends Exception {
    * Returns the error name.
    * @return error name
    */
-  public QNm qname() {
+  public final QNm qname() {
     return name;
   }
 
@@ -216,7 +216,7 @@ public class QueryException extends Exception {
    * Returns the error.
    * @return error
    */
-  public QueryError error() {
+  public final QueryError error() {
     return error;
   }
 
@@ -224,7 +224,7 @@ public class QueryException extends Exception {
    * Returns the error value.
    * @return error value
    */
-  public Value value() {
+  public final Value value() {
     return value;
   }
 
@@ -259,7 +259,7 @@ public class QueryException extends Exception {
    * Makes this exception uncatchable by a {@code try/catch} expression.
    * @return self reference for convenience
    */
-  public QueryException notCatchable() {
+  public final QueryException notCatchable() {
     catchable = false;
     return this;
   }

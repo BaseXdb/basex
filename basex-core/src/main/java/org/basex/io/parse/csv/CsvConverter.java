@@ -57,7 +57,7 @@ public abstract class CsvConverter extends Job {
    * @return result
    * @throws IOException I/O exception
    */
-  public Item convert(final IO input) throws IOException {
+  public final Item convert(final IO input) throws IOException {
     try(final NewlineInput in = new NewlineInput(input)) {
       nli = in;
       CsvParser.parse(in.encoding(copts.get(CsvParserOptions.ENCODING)), copts, this);

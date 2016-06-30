@@ -199,7 +199,7 @@ public abstract class Preds extends ParseExpr {
    * @return expression
    * @throws QueryException query exception
    */
-  public Expr merge(final Expr root, final QueryContext qc, final VarScope scp)
+  public final Expr merge(final Expr root, final QueryContext qc, final VarScope scp)
       throws QueryException {
 
     // only one predicate can be rewritten; root expression must yield nodes

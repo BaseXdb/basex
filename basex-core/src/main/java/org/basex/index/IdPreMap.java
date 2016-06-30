@@ -69,7 +69,7 @@ public class IdPreMap {
    * @param file file to write to
    * @throws IOException I/O error while writing to the file
    */
-  public void write(final IOFile file) throws IOException {
+  public final void write(final IOFile file) throws IOException {
     try(final DataOutput out = new DataOutput(file)) {
       out.writeNum(baseid);
       out.writeNum(rows);
@@ -85,7 +85,7 @@ public class IdPreMap {
    * Finishes database creation.
    * @param base last id
    */
-  public void finish(final int base) {
+  public final void finish(final int base) {
     baseid = base;
   }
 

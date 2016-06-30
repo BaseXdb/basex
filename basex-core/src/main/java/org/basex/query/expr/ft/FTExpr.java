@@ -44,7 +44,7 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public FTExpr optimize(final QueryContext qc, final VarScope scp) {
     return this;
   }
 

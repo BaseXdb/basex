@@ -208,27 +208,6 @@ public final class MemValues extends ValueIndex {
   }
 
   /**
-   * Checks the consistency of the index structure.
-   */
-  public void check() {
-    final IntMap set = new IntMap();
-    final int s = lenList.size();
-    for(int m = 1; m < s; m++) {
-      final int len = lenList.get(m);
-      final int[] ids = idsList.get(m);
-      for(int i = 0; i < len; i++) {
-        if(set.contains(ids[i])) {
-          final int old = set.get(ids[i]);
-          throw Util.notExpected(
-            "Duplicate id: " + ids[i] + ", pos: " + old + "/" + m + ", text: " +
-            string(values.key(m)) + "/" + string(values.key(old)));
-        }
-        set.put(ids[i], m);
-      }
-    }
-  }
-
-  /**
    * Returns a string representation of the index structure.
    * @param all include database contents in the representation. During updates, database lookups
    *        must be avoided, as the data structures will be inconsistent.

@@ -51,7 +51,7 @@ public abstract class ExprInfo {
    * @param atts optional attribute names and values
    * @return tree node
    */
-  protected FElem planElem(final Object... atts) {
+  protected final FElem planElem(final Object... atts) {
     final FElem el = new FElem(info());
     final int al = atts.length;
     for(int a = 0; a < al - 1; a += 2) {
@@ -66,7 +66,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param exprs expressions
    */
-  protected void addPlan(final FElem plan, final FElem el, final Object... exprs) {
+  protected final void addPlan(final FElem plan, final FElem el, final Object... exprs) {
     plan.add(el);
     for(final Object expr : exprs) {
       if(expr instanceof ExprInfo) {
@@ -89,7 +89,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param expr expressions
    */
-  protected void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
+  protected final void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
     addPlan(plan, el, (Object) expr);
   }
 

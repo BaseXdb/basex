@@ -45,7 +45,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** Include content type flag. */
   final boolean content;
   /** Undeclare prefixes. */
-  final boolean undecl;
+  private final boolean undecl;
 
   /** Media type. */
   private final String media;
@@ -209,7 +209,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   @Override
-  protected void openDoc(final byte[] name) throws IOException {
+  protected void openDoc(final byte[] name) {
     sep = false;
   }
 

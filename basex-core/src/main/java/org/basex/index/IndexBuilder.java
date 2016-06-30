@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public abstract class IndexBuilder extends Job {
   /** Performance. */
-  protected final Performance perf = new Performance();
+  private final Performance perf = new Performance();
 
   /** Data reference. */
   protected final Data data;
@@ -149,7 +149,7 @@ public abstract class IndexBuilder extends Job {
    * </ul>
    * @return split factor
    */
-  protected final int splitFactor() {
+  private int splitFactor() {
     return type == IndexType.FULLTEXT ? 1000000 : 100000;
   }
 

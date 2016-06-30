@@ -26,7 +26,7 @@ public final class LibraryModule extends Module {
    * @param modules imported modules
    * @param sc static context
    */
-  public LibraryModule(final QNm name, final String doc, final TokenObjMap<StaticFunc> funcs,
+  LibraryModule(final QNm name, final String doc, final TokenObjMap<StaticFunc> funcs,
       final TokenObjMap<StaticVar> vars, final TokenSet modules, final StaticContext sc) {
     super(null, doc, funcs, vars, modules, sc, null);
     this.name = name;

@@ -189,7 +189,7 @@ public abstract class IO {
    * @param suffixes suffixes to compare with
    * @return result of check
    */
-  public boolean hasSuffix(final String... suffixes) {
+  public final boolean hasSuffix(final String... suffixes) {
     final int i = pth.lastIndexOf('.');
     if(i == -1) return false;
     final String suf = pth.substring(i).toLowerCase(Locale.ENGLISH);
@@ -210,7 +210,7 @@ public abstract class IO {
    * Sets the input length.
    * @param length length
    */
-  public void length(final long length) {
+  public final void length(final long length) {
     len = length;
   }
 

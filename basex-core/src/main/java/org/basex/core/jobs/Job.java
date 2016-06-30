@@ -107,16 +107,6 @@ public abstract class Job {
   }
 
   /**
-   * Sends a new job state.
-   * @param js new state
-   */
-  final void state(final JobState js) {
-    for(final Job job : children) job.state(js);
-    state = js;
-    if(js != JobState.RUNNING) stopTimeout();
-  }
-
-  /**
    * Checks if the job was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
@@ -198,5 +188,15 @@ public abstract class Job {
       timer.cancel();
       timer = null;
     }
+  }
+
+  /**
+   * Sends a new job state.
+   * @param js new state
+   */
+  private void state(final JobState js) {
+    for(final Job job : children) job.state(js);
+    state = js;
+    if(js != JobState.RUNNING) stopTimeout();
   }
 }

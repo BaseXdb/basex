@@ -17,11 +17,11 @@ import org.basex.util.list.*;
  */
 public final class ValueCache implements Iterable<byte[]> {
   /** Keys. */
-  public TokenSet keys = new TokenSet();
+  private final TokenSet keys = new TokenSet();
   /** Ids. */
-  public ArrayList<IntList> ids = new ArrayList<>();
+  private final ArrayList<IntList> ids = new ArrayList<>();
   /** Positions. */
-  public ArrayList<IntList> pos;
+  private final ArrayList<IntList> pos;
 
   /**
    * Caches the text and id for a node with specified pre value.
@@ -129,7 +129,7 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param key key
    * @return id list
    */
-  public IntList ids(final byte[] key) {
+  IntList ids(final byte[] key) {
     return ids.get(keys.id(key) - 1);
   }
 
@@ -138,7 +138,7 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param key key
    * @return id list, or {@code null}
    */
-  public IntList pos(final byte[] key) {
+  IntList pos(final byte[] key) {
     return pos != null ? pos.get(keys.id(key) - 1) : null;
   }
 }

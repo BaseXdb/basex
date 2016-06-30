@@ -140,8 +140,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
+  public final Expr inline(final QueryContext qc, final VarScope scp, final Var var,
+      final Expr ex) {
     // values do not contain variable references
     return null;
   }

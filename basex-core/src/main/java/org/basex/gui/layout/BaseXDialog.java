@@ -146,7 +146,7 @@ public abstract class BaseXDialog extends JDialog {
    * Creates a OK and CANCEL button.
    * @return button list
    */
-  protected BaseXBack okCancel() {
+  protected final BaseXBack okCancel() {
     return newButtons(B_OK, B_CANCEL);
   }
 
@@ -155,7 +155,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param buttons button names or objects
    * @return button list
    */
-  public BaseXBack newButtons(final Object... buttons) {
+  public final BaseXBack newButtons(final Object... buttons) {
     // horizontal/vertical layout
     final BaseXBack pnl = new BaseXBack(false).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));

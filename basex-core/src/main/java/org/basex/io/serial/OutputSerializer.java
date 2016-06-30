@@ -28,9 +28,9 @@ public abstract class OutputSerializer extends Serializer {
   protected byte[] itemsep;
 
   /** Number of spaces to indent. */
-  protected final int indents;
+  private final int indents;
   /** Tabular character. */
-  protected final char tab;
+  private final char tab;
 
   /**
    * Constructor.

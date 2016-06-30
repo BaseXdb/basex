@@ -31,54 +31,6 @@ final class ProjectFiles {
   private ProjectCache cache;
 
   /**
-   * Returns the current file cache.
-   * @param root root directory
-   * @return id, or {@code null} if newer file cache exists
-   * @throws InterruptedException interruption
-   */
-  ProjectCache cache(final IOFile root) throws InterruptedException {
-    final ProjectCache pc = cache;
-    if(pc == null) {
-      // no file cache available: create and return new one
-      cache = new ProjectCache();
-      add(root, cache);
-      cache.finish();
-    } else {
-      // wait until file cache is initialized
-      while(!pc.valid()) {
-        Thread.yield();
-        // file cache was replaced with newer version
-        if(pc != cache) throw new InterruptedException();
-      }
-    }
-    // return existing file cache
-    return cache;
-  }
-
-  /**
-   * Recursively populates the cache.
-   * @param root root directory
-   * @param pc file cache
-   * @throws InterruptedException interruption
-   */
-  void add(final IOFile root, final ProjectCache pc) throws InterruptedException {
-    // check if file cache was replaced or invalidated
-    if(pc != cache) throw new InterruptedException();
-
-    final IOFile[] files = root.children();
-    for(final IOFile file : files) {
-      if(file.name().equals(IO.IGNORESUFFIX)) return;
-    }
-    for(final IOFile file : files) {
-      if(file.isDir()) {
-        add(file, pc);
-      } else {
-        pc.add(file.path());
-      }
-    }
-  }
-
-  /**
    * Invalidates the file cache.
    */
   void reset() {
@@ -186,6 +138,54 @@ final class ProjectFiles {
   // PRIVATE METHODS ==============================================================================
 
   /**
+   * Returns the current file cache.
+   * @param root root directory
+   * @return id, or {@code null} if newer file cache exists
+   * @throws InterruptedException interruption
+   */
+  private ProjectCache cache(final IOFile root) throws InterruptedException {
+    final ProjectCache pc = cache;
+    if(pc == null) {
+      // no file cache available: create and return new one
+      cache = new ProjectCache();
+      add(root, cache);
+      cache.finish();
+    } else {
+      // wait until file cache is initialized
+      while(!pc.valid()) {
+        Thread.yield();
+        // file cache was replaced with newer version
+        if(pc != cache) throw new InterruptedException();
+      }
+    }
+    // return existing file cache
+    return cache;
+  }
+
+  /**
+   * Recursively populates the cache.
+   * @param root root directory
+   * @param pc file cache
+   * @throws InterruptedException interruption
+   */
+  private void add(final IOFile root, final ProjectCache pc) throws InterruptedException {
+    // check if file cache was replaced or invalidated
+    if(pc != cache) throw new InterruptedException();
+
+    final IOFile[] files = root.children();
+    for(final IOFile file : files) {
+      if(file.name().equals(IO.IGNORESUFFIX)) return;
+    }
+    for(final IOFile file : files) {
+      if(file.isDir()) {
+        add(file, pc);
+      } else {
+        pc.add(file.path());
+      }
+    }
+  }
+
+  /**
    * Chooses tokens from the file cache that match the specified pattern.
    * @param pattern file pattern
    * @param search search string
@@ -197,7 +197,7 @@ final class ProjectFiles {
    * @param id search id
    * @throws InterruptedException interruption
    */
-  private void filter(final String pattern, final int[] search, final int mode,
+  private static void filter(final String pattern, final int[] search, final int mode,
       final TreeSet<String> results, final HashSet<String> exclude, final boolean pathSearch,
       final ProjectCache pc, final long id) throws InterruptedException {
 

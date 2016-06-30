@@ -10,14 +10,14 @@ import org.basex.io.*;
  * @author Christian Gruen
  */
 public final class QueryInput {
-  /** Original input string (resource URI, database path or XML string). */
-  public final String original;
   /** Input reference. */
   public final IO io;
   /** Database name ({@code null} indicates that no name can be extracted from original path). */
   public String dbName;
+  /** Original input string (resource URI, database path or XML string). */
+  final String original;
   /** Database path (empty string indicates root). */
-  public String dbPath = "";
+  String dbPath = "";
 
 
   /**

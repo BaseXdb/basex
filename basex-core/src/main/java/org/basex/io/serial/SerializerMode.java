@@ -50,7 +50,7 @@ public enum SerializerMode {
    * Returns serialization parameters.
    * @return parameters
    */
-  public SerializerOptions get() {
+  public final SerializerOptions get() {
     if(options == null) {
       options = new SerializerOptions();
       init(options);

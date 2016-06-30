@@ -207,7 +207,7 @@ public class IntList extends ElementList {
    * Returns an array with all elements and resets the array size.
    * @return array
    */
-  public int[] next() {
+  public final int[] next() {
     final int[] lst = Arrays.copyOf(list, size);
     reset();
     return lst;
@@ -218,7 +218,7 @@ public class IntList extends ElementList {
    * Warning: the function must only be called if the list is discarded afterwards.
    * @return array (internal representation!)
    */
-  public int[] finish() {
+  public final int[] finish() {
     final int[] lst = list;
     list = null;
     final int s = size;
@@ -229,7 +229,7 @@ public class IntList extends ElementList {
    * Removes duplicate entries.
    * @return self reference
    */
-  public IntList distinct() {
+  public final IntList distinct() {
     if(!isEmpty()) {
       int i = 1;
       for(int j = 1; j < size; ++j) {
@@ -246,7 +246,7 @@ public class IntList extends ElementList {
    * See {@link Array#createOrder(int[], boolean)} for more details.
    * @return array with new order
    */
-  public int[] createOrder() {
+  public final int[] createOrder() {
     final IntList il = Array.number(size);
     il.sort(list, true);
     return il.finish();

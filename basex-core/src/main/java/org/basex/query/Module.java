@@ -30,7 +30,7 @@ public abstract class Module extends StaticScope {
    * @param sctx static context
    * @param info input info
    */
-  public Module(final VarScope scp, final String xqdoc, final TokenObjMap<StaticFunc> funcs,
+  Module(final VarScope scp, final String xqdoc, final TokenObjMap<StaticFunc> funcs,
       final TokenObjMap<StaticVar> vars, final TokenSet imports, final StaticContext sctx,
       final InputInfo info) {
     super(scp, xqdoc, sctx, info);
@@ -43,7 +43,7 @@ public abstract class Module extends StaticScope {
    * Return static variables.
    * @return static variables
    */
-  public TokenObjMap<StaticVar> vars() {
+  public final TokenObjMap<StaticVar> vars() {
     return vars;
   }
 
@@ -51,7 +51,7 @@ public abstract class Module extends StaticScope {
    * Return static functions.
    * @return static functions
    */
-  public TokenObjMap<StaticFunc> funcs() {
+  public final TokenObjMap<StaticFunc> funcs() {
     return funcs;
   }
 }

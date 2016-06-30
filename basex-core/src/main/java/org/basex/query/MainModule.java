@@ -65,7 +65,7 @@ public final class MainModule extends Module {
    * @param sc static context
    * @param info input info
    */
-  public MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
+  MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
       final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
       final TokenSet imports, final StaticContext sc, final InputInfo info) {
 

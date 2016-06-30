@@ -24,7 +24,7 @@ public abstract class Main {
    * Returns the command-line arguments.
    * @return arguments
    */
-  String[] args() {
+  final String[] args() {
     return args;
   }
 

@@ -36,7 +36,7 @@ abstract class AUser extends Command {
    * @param opt indicates if user/database argument is optional
    * @return success flag
    */
-  boolean run(final int off, final boolean opt) {
+  final boolean run(final int off, final boolean opt) {
     final String name = args[off];
     final String pattern = off + 1 < args.length ? args[off + 1] : "";
 

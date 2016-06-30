@@ -186,7 +186,7 @@ public abstract class AQuery extends Command {
    * @param ctx context
    * @return serialization parameters
    */
-  public String parameters(final Context ctx) {
+  public final String parameters(final Context ctx) {
     try {
       qp(args[0], ctx);
       parse(null);
@@ -204,7 +204,7 @@ public abstract class AQuery extends Command {
    * Binds the HTTP context.
    * @param value HTTP context
    */
-  public void http(final Object value) {
+  public final void http(final Object value) {
     http = value;
   }
 

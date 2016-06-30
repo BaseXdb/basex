@@ -23,7 +23,7 @@ public abstract class Option<O> {
    * Returns the name of the option.
    * @return name
    */
-  public String name() {
+  public final String name() {
     return name;
   }
 

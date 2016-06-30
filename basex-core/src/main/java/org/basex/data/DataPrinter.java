@@ -54,7 +54,7 @@ public final class DataPrinter {
    * Adds an entry for the specified pre value.
    * @param pre node to be added
    */
-  public void add(final int pre) {
+  private void add(final int pre) {
     final int k = data.kind(pre);
     final TokenList tl = new TokenList();
     tl.add(pre);

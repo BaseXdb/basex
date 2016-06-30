@@ -47,7 +47,7 @@ public abstract class ConsoleReader implements AutoCloseable {
    * Create a new password reader for this console.
    * @return a new instance of {@link PasswordReader}
    */
-  public PasswordReader pwReader() {
+  public final PasswordReader pwReader() {
     return pwReader;
   }
 

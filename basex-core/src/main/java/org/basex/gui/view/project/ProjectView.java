@@ -193,7 +193,7 @@ public final class ProjectView extends BaseXPanel {
    * @param reset invalidate the file cache
    * @param parse parse
    */
-  void refresh(final boolean reset, final boolean parse) {
+  private void refresh(final boolean reset, final boolean parse) {
     if(reset) files.reset();
     filter.refresh(true);
 

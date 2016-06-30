@@ -27,14 +27,14 @@ public final class HttpRequest {
   public boolean isMultipart;
 
   /** Authentication method (Default: basic authentication). */
-  public AuthMethod authMethod = AuthMethod.BASIC;
+  AuthMethod authMethod = AuthMethod.BASIC;
 
   /**
    * Returns the value of the specified attribute.
    * @param name name of request attribute
    * @return value
    */
-  public String attribute(final Request name) {
+  String attribute(final Request name) {
     return attributes.get(name);
   }
 

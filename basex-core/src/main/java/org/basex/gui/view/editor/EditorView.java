@@ -716,7 +716,7 @@ public final class EditorView extends View {
    * @param input query input
    * @param lib library flag
    */
-  public void parse(final String input, final boolean lib) {
+  private void parse(final String input, final boolean lib) {
     final int id = ++parseID;
     new Timer(true).schedule(new TimerTask() {
       @Override

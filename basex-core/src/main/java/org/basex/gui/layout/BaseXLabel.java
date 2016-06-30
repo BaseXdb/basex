@@ -50,7 +50,7 @@ public class BaseXLabel extends JLabel {
    * @param r right distance
    * @return self reference
    */
-  public BaseXLabel border(final int t, final int l, final int b, final int r) {
+  public final BaseXLabel border(final int t, final int l, final int b, final int r) {
     setBorder(BaseXLayout.border(t, l, b, r));
     return this;
   }
@@ -60,7 +60,7 @@ public class BaseXLabel extends JLabel {
    * @param c color
    * @return self reference
    */
-  public BaseXLabel color(final Color c) {
+  public final BaseXLabel color(final Color c) {
     setForeground(c);
     return this;
   }
@@ -72,7 +72,7 @@ public class BaseXLabel extends JLabel {
    * @param icon flag for displaying a warning or error icon
    * @return self reference
    */
-  public BaseXLabel setText(final String text, final Msg icon) {
+  public final BaseXLabel setText(final String text, final Msg icon) {
     setIcon(text == null ? null : icon.small);
     setText(text == null ? " " : text);
     return this;
@@ -82,7 +82,7 @@ public class BaseXLabel extends JLabel {
    * Chooses a large font.
    * @return self reference
    */
-  public BaseXLabel large() {
+  public final BaseXLabel large() {
     final Font f = getFont();
     setFont(new Font(f.getName(), Font.BOLD, (int) (f.getSize2D() * 1.4)));
     return this;

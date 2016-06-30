@@ -75,7 +75,7 @@ public class BufferInput extends InputStream {
    * Returns the IO reference or {@code null}.
    * @return file reference
    */
-  public IO io() {
+  public final IO io() {
     return input;
   }
 

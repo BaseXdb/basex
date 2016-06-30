@@ -137,7 +137,7 @@ public class BaseXTextField extends JTextField {
    * @param win windows reference
    * @return self reference
    */
-  public BaseXTextField history(final StringsOption so, final Window win) {
+  public final BaseXTextField history(final StringsOption so, final Window win) {
     final GUI gui;
     final BaseXDialog dialog;
     if(win instanceof BaseXDialog) {
@@ -181,7 +181,7 @@ public class BaseXTextField extends JTextField {
    * @param label text of the hint
    * @return self reference
    */
-  public BaseXTextField hint(final String label) {
+  public final BaseXTextField hint(final String label) {
     if(hint == null) {
       hint = new BaseXTextHint(label, this);
     } else {
@@ -201,7 +201,7 @@ public class BaseXTextField extends JTextField {
    * Assigns the current value.
    * @return success flag
    */
-  public boolean assign() {
+  public final boolean assign() {
     return check(true);
   }
 
@@ -209,7 +209,7 @@ public class BaseXTextField extends JTextField {
    * Checks the current value.
    * @return success flag
    */
-  public boolean check() {
+  public final boolean check() {
     return check(false);
   }
 

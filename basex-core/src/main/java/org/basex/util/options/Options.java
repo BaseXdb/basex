@@ -412,7 +412,7 @@ public class Options implements Iterable<Option<?>> {
    * @param option option to be found
    * @return map
    */
-  public HashMap<String, String> toMap(final StringOption option) {
+  public final HashMap<String, String> toMap(final StringOption option) {
     final String input = get(option).trim();
     final HashMap<String, String> map = new HashMap<>();
     final StringBuilder key = new StringBuilder();
@@ -492,7 +492,7 @@ public class Options implements Iterable<Option<?>> {
    * @param type media type
    * @throws BaseXException database exception
    */
-  public synchronized void assign(final MediaType type) throws BaseXException {
+  public final synchronized void assign(final MediaType type) throws BaseXException {
     for(final Entry<String, String> entry : type.parameters().entrySet()) {
       if(options.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
@@ -508,7 +508,7 @@ public class Options implements Iterable<Option<?>> {
    * @param string options string
    * @throws BaseXException database exception
    */
-  public synchronized void assign(final String string) throws BaseXException {
+  public final synchronized void assign(final String string) throws BaseXException {
     final int sl = string.length();
     int i = 0;
     while(i < sl) {
@@ -534,7 +534,7 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Map map, final boolean error, final InputInfo ii)
+  public final synchronized void assign(final Map map, final boolean error, final InputInfo ii)
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {

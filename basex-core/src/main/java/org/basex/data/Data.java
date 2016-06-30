@@ -297,7 +297,7 @@ public abstract class Data {
    * @param kind node kind
    * @return distance
    */
-  public int dist(final int pre, final int kind) {
+  public final int dist(final int pre, final int kind) {
     switch(kind) {
       case ELEM:
         return table.read4(pre, 4);
@@ -867,7 +867,7 @@ public abstract class Data {
    * @param kind node kind
    * @param value value
    */
-  public void dist(final int pre, final int kind, final int value) {
+  public final void dist(final int pre, final int kind, final int value) {
     if(kind == ATTR) table.write1(pre, 0, value << 3 | ATTR);
     else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, value);
   }
