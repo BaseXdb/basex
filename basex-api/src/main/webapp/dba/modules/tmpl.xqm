@@ -46,7 +46,8 @@ declare function tmpl:wrap(
       { $options('scripts') ! <script type="text/javascript" src="static/{.}"/> }
     </head>
     <body>
-      <div class="right"><img style='padding-left:10px;padding-bottom:10px;' src="static/basex.svg"/></div>
+      <div class="right"><img style='padding-left:10px;padding-bottom:10px;'
+        src="static/basex.svg"/></div>
       <h1>Database Administration</h1>
       <div>{
         let $emph := <span>{(element b {
@@ -59,8 +60,9 @@ declare function tmpl:wrap(
           cons:check(),
           let $cats := 
             let $top := $options('top')
-            for $cat in ('Databases', 'Queries', 'Logs', 'Jobs &amp; Users', 'Files', 'Settings', 'Logout')
-            let $link := <a href="{ lower-case(replace($cat, ' .*', '')) }">{ $cat }</a>
+            for $cat in ('Databases', 'Queries', 'Logs', 'Jobs &amp; Users', 'Files',
+              'Settings', 'Logout')
+            let $link := <a href="{ lower-case(replace($cat, ' &amp; ', '-')) }">{ $cat }</a>
             return if($top = $link) then (
               <b>{ $link }</b>
             ) else (

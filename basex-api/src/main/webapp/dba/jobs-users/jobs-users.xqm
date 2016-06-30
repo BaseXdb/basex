@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/jobs';
+module namespace _ = 'dba/jobs-users';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace Session = 'http://basex.org/modules/session';
@@ -13,7 +13,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'jobs';
+declare variable $_:CAT := 'jobs-users';
 
 (:~
  : Jobs and users page.
@@ -24,12 +24,12 @@ declare variable $_:CAT := 'jobs';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/jobs")
+  %rest:path("/dba/jobs-users")
   %rest:query-param("sort", "{$sort}", "")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
   %output:method("html")
-function _:jobs(
+function _:jobs-users(
   $sort   as xs:string,
   $error  as xs:string?,
   $info   as xs:string?
@@ -60,16 +60,18 @@ function _:jobs(
             for $job in $data/jobs/job
             let $id := $job/@id
             let $ms := xs:dayTimeDuration($job/@duration) div xs:dayTimeDuration('PT0.001S')
+            let $you := if($id = $curr) then '✓' else '–'
             order by $ms descending
-            return <e id='{ $id || (" (you)"[$id = $curr]) }' type='{ $job/@type }'
-              sec='{ $ms div 1000 }' state='{ $job/@state }' user='{ $job/@user }'/>
+            return <e id='{ $id }' type='{ $job/@type }'
+              sec='{ $ms div 1000 }' state='{ $job/@state }' user='{ $job/@user }' you='{ $you }'/>
             
           let $headers := (
             element id { html:label($entries, ('ID', 'IDs')) },
             element type { 'Type' },
             element sec { 'Seconds' },
             element state { 'State' },
-            element user { 'User' }
+            element user { 'User' },
+            element you { 'Yourself' }
           )
           let $buttons := (
             html:button('stop-job', 'Stop', true())
@@ -79,28 +81,25 @@ function _:jobs(
         }
         </form>
         <form action="{ $_:CAT }" method="post" class="update">
-        <h2>Browser Sessions</h2>
+        <h2>Server Sessions</h2>
         {
           let $entries :=
             for $id in Sessions:ids()
             for $name in Sessions:names($id)
             for $session in Sessions:get($id, $name)
-            let $access := format-dateTime(Sessions:accessed($id), '[Y]-[M2]-[D2], [H]:[m]:[s]')
-            let $dba := $session instance of element(dba-session)
-            let $key := $id || '|' || $name
-            return if($dba) then (
-              let $user := $session/name || ' (you)'[Session:id() = $id]
-              let $addr := (string-join($session/(host, port), ":")[.], 'local')[1]
-              return <e id='{ $key }' user='{ $user }' addr='{ $addr }' access='{ $access }'/>
-            ) else (
-              let $user := 'Application' || ' (you)'[Session:id() = $id]
-              return <e id='{ $key }' user='{ $user }' addr='–' access='{ $access }'/>
-            )
+            let $access := html:date(Sessions:accessed($id))
+            let $you := if(Session:id() = $id) then '✓' else '–'
+            let $value :=
+              if ($session instance of element()) then $session/name
+              else if($session instance of xs:string) then $session else ()
+            return <e id='{ $id || '|' || $name }' name='{ $name }' value='{ $value }'
+             access='{ $access }' you='{ $you }'/>
           let $headers := (
-            element id { attribute type { 'id' } },
-            element user { 'User' },
-            element addr { 'Address' },
-            element access { 'Last Access' }
+            element id { attribute type { 'id' }, html:label($entries, ('ID', 'IDs')) },
+            element name { 'Name' },
+            element value { 'Value' },
+            element access { 'Last Access' },
+            element you { 'Yourself' }
           )
           let $buttons := (
             html:button('kill-session', 'Kill', true())
@@ -123,10 +122,14 @@ function _:jobs(
         <form action="{ $_:CAT }" method="post" class="update">
         <h2>Users</h2>
         {
-          let $entries := $data/users/user/<e name='{ @name }' perm='{ @permission }'/>
+          let $entries :=
+            for $entry in $data/users/user
+            let $you := if($cons:SESSION/name = $entry/@name) then '✓' else '–'
+            return <e name='{ $entry/@name }' perm='{ $entry/@permission }' you='{ $you }'/>
           let $headers := (
             element name { html:label($entries, ('User', 'Users')) },
-            element perm { 'Permission' }
+            element perm { 'Permission' },
+            element you { 'Yourself' }
           )
           let $buttons := (
             html:button('create-user', 'Create…'),
@@ -150,7 +153,7 @@ function _:jobs(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/jobs")
+  %rest:path("/dba/jobs-users")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %rest:query-param("id",     "{$ids}")

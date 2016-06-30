@@ -278,9 +278,7 @@ declare function html:table(
               ) else if($header/@type = 'decimal') then (
                 try { format-number(number(.), '#.00') } catch * { . }
               ) else if($header/@type = 'dateTime') then (
-                let $zone := timezone-from-dateTime(current-dateTime())
-                let $dt := fn:adjust-dateTime-to-timezone(xs:dateTime(.), $zone)
-                return format-dateTime($dt, '[Y0000]-[M00]-[D00], [H00]:[m00]')
+                html:date(xs:dateTime(.))
               )
               else .
             )
@@ -368,4 +366,17 @@ declare function html:link(
   $params  as map(*)
 ) as element(a) {
   html:link($text, web:create-url($target, $params))
+};
+
+(:~ 
+ : Formats a date.
+ : @param  $date  date
+ : @return string
+ :)
+declare function html:date(
+  $date as xs:dateTime
+) {
+  let $zone := timezone-from-dateTime(current-dateTime())
+  let $dt := fn:adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
+  return format-dateTime($dt, '[Y0000]-[M00]-[D00], [H00]:[m00]:[s00]')
 };

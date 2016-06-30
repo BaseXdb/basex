@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/users';
+module namespace _ = 'dba/jobs-users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,7 +11,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'jobs';
+declare variable $_:CAT := 'jobs-users';
 (:~ Sub category :)
 declare variable $_:SUB := 'user';
 

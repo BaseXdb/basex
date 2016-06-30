@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/users';
+module namespace _ = 'dba/jobs-users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';

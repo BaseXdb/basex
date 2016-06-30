@@ -142,7 +142,6 @@ declare %rest:path("/dba/logout") function _:logout(
   return (
     admin:write-log('DBA user was logged out: ' || $name),
     Session:delete($cons:SESSION-KEY),
-    Session:close(),
     web:redirect("/dba/login", map { 'nane': $name, 'url': $url })
   )
 };
