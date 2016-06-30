@@ -9,17 +9,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
-import org.basex.core.parse.Commands.Cmd;
-import org.basex.core.parse.Commands.CmdAlter;
-import org.basex.core.parse.Commands.CmdCreate;
-import org.basex.core.parse.Commands.CmdDrop;
-import org.basex.core.parse.Commands.CmdIndex;
-import org.basex.core.parse.Commands.CmdIndexInfo;
-import org.basex.core.parse.Commands.CmdInfo;
-import org.basex.core.parse.Commands.CmdOptimize;
-import org.basex.core.parse.Commands.CmdPerm;
-import org.basex.core.parse.Commands.CmdRepo;
-import org.basex.core.parse.Commands.CmdShow;
+import org.basex.core.parse.Commands.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -181,6 +171,16 @@ final class StringParser extends CmdParser {
         return new Kill(string(cmd));
       case RESTORE:
         return new Restore(name(cmd));
+      case JOBS:
+        switch(consume(CmdJobs.class, cmd)) {
+          case LIST:
+            return new JobsList();
+          case STOP:
+            return new JobsStop(name(cmd));
+          case RESULT:
+            return new JobsResult(name(cmd));
+        }
+        break;
       case SHOW:
         switch(consume(CmdShow.class, cmd)) {
           case SESSIONS:

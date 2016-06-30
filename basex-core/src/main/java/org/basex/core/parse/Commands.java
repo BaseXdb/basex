@@ -69,6 +69,12 @@ public interface Commands {
   String INFO_INDEX = "info-index";
   /** Command string: "info-storage". */
   String INFO_STORAGE = "info-storage";
+  /** Command string: "jobs-list". */
+  String JOBS_LIST = "jobs-list";
+  /** Command string: "jobs-stop". */
+  String JOBS_STOP = "jobs-stop";
+  /** Command string: "jobs-result". */
+  String JOBS_RESULT = "jobs-result";
   /** Command string: "kill". */
   String KILL = "kill";
   /** Command string: "list". */
@@ -130,6 +136,8 @@ public interface Commands {
   String QUERY = "query";
   /** Command attribute: "type". */
   String TYPE = "type";
+  /** Command attribute: "id". */
+  String ID = "id";
   /** Command attribute: "start". */
   String START = "start";
   /** Command attribute: "end". */
@@ -161,6 +169,8 @@ public interface Commands {
   enum CmdOptimize { NULL, ALL }
   /** Show commands. */
   enum CmdShow { SESSIONS, USERS, BACKUPS }
+  /** Jobs commands. */
+  enum CmdJobs { LIST, STOP, RESULT }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Index types. */
@@ -175,13 +185,13 @@ public interface Commands {
   /** Command definitions. */
   enum Cmd {
     ADD(HELPADD), ALTER(HELPALTER), CHECK(HELPCHECK), CLOSE(HELPCLOSE), COPY(HELPCOPY),
-    CREATE(HELPCREATE), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
-    EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH), GET(HELPGET), GRANT(HELPGRANT),
-    HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT), KILL(HELPKILL), LIST(HELPLIST),
+    CREATE(HELPCREATE), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT), EXPORT(HELPEXPORT),
+    FIND(HELPFIND), FLUSH(HELPFLUSH), GET(HELPGET), GRANT(HELPGRANT), HELP(HELPHELP),
+    INFO(HELPINFO), INSPECT(HELPINSPECT), JOBS(HELPJOBS), KILL(HELPKILL), LIST(HELPLIST),
     OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), QUIT(HELPEXIT),
     RENAME(HELPRENAME), REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE),
-    RETRIEVE(HELPRETRIEVE), RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET),
-    SHOW(HELPSHOW), STORE(HELPSTORE), TEST(HELPTEST), XQUERY(HELPXQUERY);
+    RETRIEVE(HELPRETRIEVE), RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET), SHOW(HELPSHOW),
+    STORE(HELPSTORE), TEST(HELPTEST), XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;

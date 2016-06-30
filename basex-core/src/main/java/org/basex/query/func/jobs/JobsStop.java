@@ -1,6 +1,5 @@
 package org.basex.query.func.jobs;
 
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -18,12 +17,7 @@ public final class JobsStop extends StandardFunc {
     checkAdmin(qc);
 
     final String id = Token.string(toToken(exprs[0], qc));
-    final JobPool pool = qc.context.jobs;
-    // send stop signal
-    final Job job = pool.jobs.get(id);
-    if(job != null) job.stop();
-    // remove potentially cached result
-    pool.results.remove(id);
+    org.basex.core.cmd.JobsStop.stop(qc.context, id);
     return null;
   }
 }

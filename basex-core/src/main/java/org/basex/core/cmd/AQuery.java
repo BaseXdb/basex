@@ -103,9 +103,6 @@ public abstract class AQuery extends Command {
           qp.close();
           info.serializing += p.time();
         }
-        // dump some query info
-        //out.flush();
-
         // remove string list if global locking is used and if query is updating
         if(soptions.get(StaticOptions.GLOBALLOCK) && qp.updating) {
           info.readLocked = null;

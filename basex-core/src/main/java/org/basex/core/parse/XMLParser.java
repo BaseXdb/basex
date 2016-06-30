@@ -118,6 +118,12 @@ final class XMLParser extends CmdParser {
       return new InfoIndex(value(root, TYPE));
     if(e.equals(INFO_STORAGE) && check(root, START + '?', END + '?'))
       return new InfoStorage(value(root, START), value(root, END));
+    if(e.equals(JOBS_LIST))
+      return new JobsList();
+    if(e.equals(JOBS_STOP) && check(root, ID))
+      return new JobsStop(value(root, ID));
+    if(e.equals(JOBS_RESULT) && check(root, ID))
+      return new JobsResult(value(root, ID));
     if(e.equals(KILL) && check(root, TARGET))
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))

@@ -31,8 +31,8 @@ public final class JobsResult extends StandardFunc {
     if(result.value == null && result.exception == null) throw JOBS_RUNNING_X.get(info, id);
 
     try {
-      if(result.value != null) return result.value;
-      throw result.exception;
+      if(result.value == null) throw result.exception;
+      return result.value;
     } finally {
       results.remove(id);
     }

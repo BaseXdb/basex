@@ -164,6 +164,10 @@ public interface Text {
   String S_PW = "password";
   /** Command keyword. */
   String S_DIR = "dir";
+  /** Command keyword. */
+  String S_LIST = "list";
+  /** Command keyword. */
+  String S_STOP = "stop";
 
   /** Index info. */
   String LI_STRUCTURE = LI + "Structure: ";
@@ -395,6 +399,10 @@ public interface Text {
   /** Command help. */
   String[] HELPEXECUTE = {
     '[' + S_INPUT + ']', lang("c_execute1"), lang("c_execute2", S_INPUT)
+  };
+  /** Command help. */
+  String[] HELPJOBS = {
+    '[' + S_LIST + '|' + S_STOP + ']', lang("c_jobs1"), lang("c_jobs2")
   };
   /** Command help. */
   String[] HELPKILL = {
@@ -732,6 +740,8 @@ public interface Text {
   String PKG_INSTALLED_X_X = lang("pkg_installed_%_%");
   /** Package replaced. */
   String PKG_REPLACED_X_X = lang("pkg_replaced_%_%");
+  /** Jobs stopped. */
+  String JOBS_STOPPED_X = lang("jobs_stopped_%");
 
   // GENERAL COMMANDS =========================================================
 
@@ -781,6 +791,14 @@ public interface Text {
   String PATH = lang("path");
   /** Input. */
   String INPUT = lang("input");
+  /** "Jobs". */
+  String JOBS = lang("jobs");
+  /** "Duration". */
+  String DURATION = lang("duration");
+  /** "State". */
+  String STATE = lang("state");
+  /** "User". */
+  String USER = lang("user");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
 
