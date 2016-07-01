@@ -28,10 +28,13 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /** Wait until all queries have been processed. */
   @After
   public void clean() {
+    // wait for running jobs
     while(!query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "]").isEmpty()) {
       Performance.sleep(10);
     }
-    query(_JOBS_RESULTS.args() + " ! " + _JOBS_RESULT.args(" ."));
+    // consume cached results
+    query("for $id in " + _JOBS_RESULTS.args() +
+        " return try { " + _JOBS_RESULT.args(" $id") + " } catch * { }");
   }
 
   /** Test method. */
@@ -156,7 +159,11 @@ public final class JobsModuleTest extends AdvancedQueryTest {
       }
       Thread.yield();
     }
-    clean();
+
+    // receive cached error
+    id = query(_JOBS_SCHEDULE.args("\"db:open('db')\"", " map{}", " map{'cache':true()}"));
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
+    error(_JOBS_RESULT.args(id), BXDB_OPEN_X);
   }
 
   /**
@@ -164,8 +171,14 @@ public final class JobsModuleTest extends AdvancedQueryTest {
    */
   @Test
   public void results() {
-    final String id = query(_JOBS_SCHEDULE.args("1", " map{}", " map{'cache':true()}"));
+    // check if result is cached
+    String id = query(_JOBS_SCHEDULE.args("1", " map{}", " map{'cache':true()}"));
     while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
     query(_JOBS_RESULTS.args(), id);
+
+    // check if error is cached
+    id = query(_JOBS_SCHEDULE.args("\"db:open('db')\"", " map{}", " map{'cache':true()}"));
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
+    query(_JOBS_RESULTS.args() + " ='" + id + "'", true);
   }
 }
