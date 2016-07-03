@@ -40,21 +40,17 @@ public final class JobsList extends Command {
     table.header.add(STATE);
     table.header.add(USER);
 
-    final Map<String, Job> queued = context.jobs.queued;
-    for(final Job job : queued.values()) {
-      final TokenList tl = new TokenList(3);
+    final Map<String, Job> active = context.jobs.active;
+    for(final Job job : active.values()) {
       final JobContext jc = job.job();
+      final TokenList tl = new TokenList(5);
       tl.add(jc.id());
       tl.add(jc.type());
-      final JobState js;
       if(jc.performance != null) {
         final long ms = (System.nanoTime() - jc.performance.start()) / 1000000;
         tl.add(new DTDur(ms).string(null));
-        js = job.state;
-      } else {
-        js = JobState.QUEUED;
       }
-      tl.add(js.toString().toLowerCase(Locale.ENGLISH));
+      tl.add(job.state.toString().toLowerCase(Locale.ENGLISH));
       tl.add(jc.context.user().name());
       table.contents.add(tl);
     }
@@ -64,7 +60,7 @@ public final class JobsList extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    // No locks needed
+    // no locks needed
   }
 
   @Override

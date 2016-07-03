@@ -32,7 +32,7 @@ public final class Info extends AInfo {
 
   @Override
   public void databases(final LockResult lr) {
-    // No locks needed
+    // no locks needed
   }
 
   /**

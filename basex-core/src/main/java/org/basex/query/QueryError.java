@@ -164,11 +164,13 @@ public enum QueryError {
   // Jobs module
 
   /** Jobs error. */
-  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown job id: %."),
+  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown job: %."),
   /** Jobs error. */
-  JOBS_RUNNING_X(JOBS, "running", "Query is still running: %."),
+  JOBS_RUNNING_X(JOBS, "running", "Result is not available yet: %."),
   /** Jobs error. */
   JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
+  /** Jobs error. */
+  JOBS_RANGE(JOBS, "range", "Value out of range: %."),
 
   // JSON module
 

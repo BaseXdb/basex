@@ -21,6 +21,6 @@ abstract class AGet extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    // No locks needed
+    // no locks needed
   }
 }

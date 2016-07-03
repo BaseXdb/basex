@@ -30,7 +30,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   public void clean() {
     // wait for running jobs
     while(!query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "]").isEmpty()) {
-      Performance.sleep(10);
+      Performance.sleep(1);
     }
     // consume cached results
     query("for $id in " + _JOBS_RESULTS.args() +
@@ -56,8 +56,50 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query(_JOBS_SCHEDULE.args("delete node <a/>"));
 
     // errors
-    error(_JOBS_SCHEDULE.args("1+"), CALCEXPR);
-    error(_JOBS_SCHEDULE.args("1, delete node <a/>"), UPALL);
+    query(_JOBS_SCHEDULE.args("1+"));
+    query(_JOBS_SCHEDULE.args("1, delete node <a/>"));
+    error(_JOBS_SCHEDULE.args("1+<a/>", "()", " map{ 'start':'12345' }"), DATEFORMAT_X_X_X);
+    error(_JOBS_SCHEDULE.args("1+<a/>", "()", " map{ 'repeat':'12345' }"), DATEFORMAT_X_X_X);
+    error(_JOBS_SCHEDULE.args("1+<a/>", "()", " map{ 'repeat':'-PT1S' }"), JOBS_RANGE);
+  }
+
+  /** Test method. */
+  @Test
+  public void scheduleStart() {
+    // delayed execution
+    final String id = query(_JOBS_SCHEDULE.args(" 'prof:sleep(200)'", "()",
+        " map{ 'start': 'PT0.2S' }"));
+    // ensure that query is not run again
+    Performance.sleep(100);
+    query(_JOBS_FINISHED.args(id), "true");
+    Performance.sleep(200);
+    query(_JOBS_FINISHED.args(id), "false");
+    Performance.sleep(200);
+    query(_JOBS_FINISHED.args(id), "true");
+  }
+
+  /** Test method. */
+  @Test
+  public void scheduleRepeat() {
+    // scheduled execution
+    final String id = query(_JOBS_SCHEDULE.args(" 'prof:sleep(400)'", "()",
+        " map{ 'repeat': 'PT1S' }"));
+    // ensure that query is running
+    Performance.sleep(200);
+    query(_JOBS_FINISHED.args(id), "false");
+    // ensure that query is scheduled
+    Performance.sleep(700);
+    query(_JOBS_FINISHED.args(id), "true");
+    // ensure that next query is running
+    Performance.sleep(200);
+    query(_JOBS_FINISHED.args(id), "false");
+    // stop query, wait
+    query(_JOBS_STOP.args(id));
+    Performance.sleep(400);
+    // ensure that query is not run again
+    query(_JOBS_FINISHED.args(id), "true");
+    Performance.sleep(400);
+    query(_JOBS_FINISHED.args(id), "true");
   }
 
   /** Test method. */
@@ -69,7 +111,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     } finally {
       query(_JOBS_STOP.args(id));
     }
-    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(1);
     query(_JOBS_FINISHED.args("12345"), "true");
   }
 
@@ -126,10 +168,10 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void result() throws IOException {
     // receive result of asynchronous execution
-    query("let $q := " + _JOBS_SCHEDULE.args(SLOW_QUERY, " map{}", " map{'cache':true()}") +
+    query("let $q := " + _JOBS_SCHEDULE.args(SLOW_QUERY, "()", " map{'cache':true()}") +
         " return ("
         + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args("$q") + " },"
-            + "function($c) { Q{java:java.lang.Thread}yield() }, ()") + ","
+            + "function($c) { prof:sleep(1) }, ()") + ","
         + _JOBS_RESULT.args("$q") + ')', "1");
 
     // ensure that the result will not be cached
@@ -144,11 +186,11 @@ public final class JobsModuleTest extends AdvancedQueryTest {
         // query is still running: check error code
         assertSame(JOBS_RUNNING_X, ex.error());
       }
-      Thread.yield();
+      Performance.sleep(1);
     }
 
     // receive cached result
-    id = query(_JOBS_SCHEDULE.args(SLOW_QUERY, " map{}", " map{'cache':true()}"));
+    id = query(_JOBS_SCHEDULE.args(SLOW_QUERY, "()", " map{'cache':true()}"));
     while(true) {
       try {
         assertEquals("1", eval(_JOBS_RESULT.args(id)));
@@ -157,12 +199,12 @@ public final class JobsModuleTest extends AdvancedQueryTest {
         // query is still running: check error code
         assertSame(JOBS_RUNNING_X, ex.error());
       }
-      Thread.yield();
+      Performance.sleep(1);
     }
 
     // receive cached error
-    id = query(_JOBS_SCHEDULE.args("\"db:open('db')\"", " map{}", " map{'cache':true()}"));
-    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
+    id = query(_JOBS_SCHEDULE.args("\"db:open('db')\"", "()", " map{'cache':true()}"));
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(1);
     error(_JOBS_RESULT.args(id), BXDB_OPEN_X);
   }
 
@@ -172,13 +214,18 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void results() {
     // check if result is cached
-    String id = query(_JOBS_SCHEDULE.args("1", " map{}", " map{'cache':true()}"));
-    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
+    String id = query(_JOBS_SCHEDULE.args("1", "()", " map{'cache':true()}"));
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(1);
     query(_JOBS_RESULTS.args(), id);
 
     // check if error is cached
-    id = query(_JOBS_SCHEDULE.args("\"db:open('db')\"", " map{}", " map{'cache':true()}"));
-    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(10);
+    id = query(_JOBS_SCHEDULE.args("1+", "()", " map{'cache':true()}"));
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(1);
+    query(_JOBS_RESULTS.args() + " ='" + id + "'", true);
+
+    // check if error is cached
+    id = query(_JOBS_SCHEDULE.args("\"db:open('db')\"", "()", " map{'cache':true()}"));
+    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(1);
     query(_JOBS_RESULTS.args() + " ='" + id + "'", true);
   }
 }

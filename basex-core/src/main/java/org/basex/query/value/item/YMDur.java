@@ -18,9 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class YMDur extends Dur {
-  /** YearMonth pattern. */
-  private static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP + "M)?");
-
   /**
    * Constructor.
    * @param value duration item
@@ -76,7 +73,7 @@ public final class YMDur extends Dur {
   public YMDur(final byte[] value, final InputInfo ii) throws QueryException {
     super(AtomType.YMD);
     final String val = Token.string(value).trim();
-    final Matcher mt = DUR.matcher(val);
+    final Matcher mt = YMD.matcher(val);
     if(!mt.matches() || val.endsWith("P")) throw dateError(value, XYMD, ii);
     yearMonth(value, mt, ii);
     sec = BigDecimal.ZERO;

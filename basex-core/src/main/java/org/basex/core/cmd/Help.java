@@ -40,6 +40,6 @@ public final class Help extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    // No locks needed
+    // no locks needed
   }
 }

@@ -14,7 +14,11 @@ import org.basex.util.*;
 public final class ProfSleep extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Performance.sleep(toLong(exprs[0], qc));
+    final long ms = toLong(exprs[0], qc);
+    for(int m = 0; m < ms; m++) {
+      Performance.sleep(1);
+      qc.checkStop();
+    }
     return null;
   }
 }

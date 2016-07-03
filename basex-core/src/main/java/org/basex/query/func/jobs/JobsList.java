@@ -21,9 +21,9 @@ public final class JobsList extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
 
-    final Map<String, Job> queued = qc.context.jobs.queued;
-    final TokenList list = new TokenList(queued.size());
-    for(final String id : queued.keySet()) list.add(id);
+    final Map<String, Job> active = qc.context.jobs.active;
+    final TokenList list = new TokenList(active.size());
+    for(final String id : active.keySet()) list.add(id);
     return StrSeq.get(list);
   }
 

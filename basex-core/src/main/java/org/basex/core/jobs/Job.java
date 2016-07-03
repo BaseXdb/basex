@@ -24,7 +24,9 @@ public abstract class Job {
   /** This flag indicates that a job is updating. */
   public boolean updating;
   /** State of job. */
-  public JobState state = JobState.RUNNING;
+  public JobState state = JobState.SCHEDULED;
+  /** Stopped flag. */
+  private boolean stopped;
 
   /**
    * Returns the job context.
@@ -40,8 +42,10 @@ public abstract class Job {
    */
   public final void register(final Context ctx) {
     jc.context = ctx;
-    ctx.jobs.add(this);
+    ctx.jobs.register(this);
+    state(JobState.QUEUED);
     ctx.locks.acquire(this);
+    state(JobState.RUNNING);
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
     if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
@@ -54,7 +58,7 @@ public abstract class Job {
   public final void unregister(final Context ctx) {
     stopTimeout();
     ctx.locks.release(this);
-    ctx.jobs.remove(this);
+    ctx.jobs.unregister(this);
   }
 
   /**
@@ -110,7 +114,18 @@ public abstract class Job {
    * Checks if the job was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
-    if(state != JobState.RUNNING) throw new JobException();
+    if(stopped) throw new JobException();
+  }
+
+  /**
+   * Sends a new job state.
+   * @param js new state
+   */
+  public void state(final JobState js) {
+    for(final Job job : children) job.state(js);
+    state = js;
+    stopped = js == JobState.STOPPED || js == JobState.TIMEOUT || js == JobState.MEMORY;
+    if(stopped) stopTimeout();
   }
 
   /**
@@ -188,15 +203,5 @@ public abstract class Job {
       timer.cancel();
       timer = null;
     }
-  }
-
-  /**
-   * Sends a new job state.
-   * @param js new state
-   */
-  private void state(final JobState js) {
-    for(final Job job : children) job.state(js);
-    state = js;
-    if(js != JobState.RUNNING) stopTimeout();
   }
 }

@@ -39,7 +39,7 @@ public final class JobsResult extends Command {
     final Map<String, JobResult> results = jobs.results;
     final JobResult result = results.get(id);
     if(result == null) return error(JOBS_UNKNOWN_X.desc, id);
-    if(result.value == null && result.exception == null) error(JOBS_RUNNING_X.desc, id);
+    if(!result.finished()) error(JOBS_RUNNING_X.desc, id);
 
     try {
       if(result.value == null) throw result.exception;
@@ -61,7 +61,7 @@ public final class JobsResult extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    // No locks needed
+    // no locks needed
   }
 
   @Override

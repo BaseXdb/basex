@@ -668,7 +668,7 @@ public enum Function {
   _CLIENT_INFO(ClientInfo.class, "info(id)", arg(URI), STR, flag(NDT), CLIENT_URI),
   /** XQuery function. */
   _CLIENT_QUERY(ClientQuery.class, "query(id,query[,bindings])",
-      arg(URI, STR, ITEM), ITEM_ZO, flag(NDT), CLIENT_URI),
+      arg(URI, STR, MAP_ZO), ITEM_ZO, flag(NDT), CLIENT_URI),
   /** XQuery function. */
   _CLIENT_CLOSE(ClientClose.class, "close(id)", arg(URI), EMP, flag(NDT), CLIENT_URI),
 
@@ -1064,7 +1064,7 @@ public enum Function {
 
   /** XQuery function. */
   _JOBS_SCHEDULE(JobsSchedule.class, "schedule(string[,bindings[,options]])",
-      arg(STR, ITEM, MAP_O), STR, flag(NDT), JOBS_URI),
+      arg(STR, MAP_ZO, MAP_ZO), STR, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
@@ -1306,13 +1306,13 @@ public enum Function {
 
   /** XQuery function. */
   _XQUERY_EVAL(XQueryEval.class, "eval(string[,bindings[,options]])",
-      arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
+      arg(STR, MAP_ZO, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_UPDATE(XQueryUpdate.class, "update(string[,bindings[,options]])",
-      arg(STR, ITEM, ITEM), ITEM_ZM, flag(UPD), XQUERY_URI),
+      arg(STR, MAP_ZO, ITEM), ITEM_ZM, flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_INVOKE(XQueryInvoke.class, "invoke(uri[,bindings[,options]])",
-      arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
+      arg(STR, MAP_ZO, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse.class, "parse(string[,options])",
       arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),

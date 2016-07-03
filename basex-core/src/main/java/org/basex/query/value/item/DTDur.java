@@ -18,10 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DTDur extends Dur {
-  /** DayTime pattern. */
-  private static final Pattern DUR = Pattern.compile(
-      "(-?)P(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+(\\.\\d+)?)S)?)?");
-
   /**
    * Constructor.
    * @param dur duration item
@@ -122,7 +118,7 @@ public final class DTDur extends Dur {
     super(AtomType.DTD);
 
     final String val = Token.string(value).trim();
-    final Matcher mt = DUR.matcher(val);
+    final Matcher mt = DTD.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) throw dateError(value, XDTD, ii);
     dayTime(value, mt, 2, ii);
   }

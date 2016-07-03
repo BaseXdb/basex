@@ -7,6 +7,8 @@ package org.basex.core.jobs;
  * @author Christian Gruen
  */
 public enum JobState {
+  /** Scheduled. */
+  SCHEDULED,
   /** Queued. */
   QUEUED,
   /** Running. */

@@ -31,7 +31,7 @@ public final class ShowSessions extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    // No locks needed
+    // no locks needed
   }
 
   @Override

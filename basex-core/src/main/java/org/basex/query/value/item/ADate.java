@@ -36,10 +36,11 @@ public abstract class ADate extends ADateDur {
   static final String ZONE = "((\\+|-)" + DD + ':' + DD + "|Z)?";
   /** Day per months. */
   static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
   /** Date pattern. */
-  private static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);
+  public static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);
   /** Time pattern. */
-  private static final Pattern TIME = Pattern.compile(
+  public static final Pattern TIME = Pattern.compile(
       DD + ':' + DD + ':' + "(\\d{2}(\\.\\d+)?)" + ZONE);
 
   /** Year.

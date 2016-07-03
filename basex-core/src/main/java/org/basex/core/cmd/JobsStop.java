@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
@@ -37,17 +39,21 @@ public final class JobsStop extends Command {
    * @return return success flag
    */
   public static boolean stop(final Context ctx, final String id) {
-    // send stop signal
-    final Job job = ctx.jobs.queued.get(id);
+    // stop scheduled task
+    final TimerTask task = ctx.jobs.tasks.get(id);
+    if(task != null) task.cancel();
+    // send stop signal to job
+    final Job job = ctx.jobs.active.get(id);
     if(job != null) job.stop();
     // remove potentially cached result
     ctx.jobs.results.remove(id);
-    return job != null;
+
+    return job != null || task != null;
   }
 
   @Override
   public void databases(final LockResult lr) {
-    // No locks needed
+    // no locks needed
   }
 
   @Override

@@ -38,31 +38,28 @@ public final class JobsListDetails extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
 
-    final Map<String, Job> queued = qc.context.jobs.queued;
-    final Set<String> set = exprs.length == 0 ? queued.keySet() :
+    final Map<String, Job> active = qc.context.jobs.active;
+    final Set<String> set = exprs.length == 0 ? active.keySet() :
       Collections.singleton(Token.string(toToken(exprs[0], qc)));
 
     final int ml = qc.context.soptions.get(StaticOptions.LOGMSGMAXLEN);
     final ValueBuilder vb = new ValueBuilder();
     for(final String key : set) {
       // skips jobs that finished in between
-      final Job job = queued.get(key);
+      final Job job = active.get(key);
       if(job == null) continue;
 
       final JobContext jc = job.job();
-      final FElem elem = new FElem(JOB).add(ID, key).add(TYPE, jc.type());
-      elem.add(chop(normalize(token(jc.toString())), ml));
-
-      final JobState state;
+      final FElem elem = new FElem(JOB);
+      elem.add(ID, key);
+      elem.add(TYPE, jc.type());
       if(jc.performance != null) {
         final long ms = (System.nanoTime() - jc.performance.start()) / 1000000;
         elem.add(DURATION, new DTDur(ms).string(info));
-        state = job.state;
-      } else {
-        state = JobState.QUEUED;
       }
-      elem.add(STATE, state.toString().toLowerCase(Locale.ENGLISH));
+      elem.add(STATE, job.state.toString().toLowerCase(Locale.ENGLISH));
       elem.add(USER, jc.context.user().name());
+      elem.add(chop(normalize(token(jc.toString())), ml));
       vb.add(elem);
     }
     return vb.value();

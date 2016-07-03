@@ -48,7 +48,7 @@ public abstract class ADateDur extends Item {
   /** BigDecimal: 2. */
   static final BigDecimal BD2 = BigDecimal.valueOf(2);
 
-  /** Seconds and milliseconds ({@code 0-59.\d+}). {@code -1}: undefined. */
+  /** Seconds and milliseconds. {@code -1}: undefined. */
   public BigDecimal sec;
 
   /**
