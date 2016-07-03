@@ -1,6 +1,7 @@
 package org.basex.query.func.jobs;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.util.Token.*;
 
 import java.math.*;
 import java.util.*;
@@ -11,6 +12,7 @@ import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.func.xquery.XQueryEval.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -28,8 +30,6 @@ public final class ScheduledXQuery extends Job implements Runnable {
   private final JobResult result = new JobResult();
   /** Variable bindings. */
   private final HashMap<String, Value> bindings;
-  /** Options. */
-  private final ScheduleOptions opts;
   /** Input info. */
   private final InputInfo info;
   /** Caching flag. */
@@ -38,6 +38,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
   private final String query;
   /** Database context. */
   private final Context ctx;
+  /** Base URI. */
+  private final String uri;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -49,17 +51,20 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @param opts options
    * @param info input info
    * @param qc query context
+   * @param sc static context
    * @throws QueryException query exception
    */
   ScheduledXQuery(final String query, final HashMap<String, Value> bindings,
-      final ScheduleOptions opts, final InputInfo info, final QueryContext qc)
-      throws QueryException {
+      final ScheduleOptions opts, final InputInfo info, final QueryContext qc,
+      final StaticContext sc) throws QueryException {
 
     this.query = query;
     this.bindings = bindings;
-    this.opts = opts;
     this.info = info;
     this.cache = opts.get(ScheduleOptions.CACHE);
+
+    final String bu = opts.get(XQueryOptions.BASE_URI);
+    uri = bu != null ? bu : string(sc.baseURI().string());
     ctx = qc.context;
 
     final JobPool pool = ctx.jobs;
@@ -151,7 +156,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
       if(key.isEmpty()) proc.context(value);
       else proc.bind(key, value);
     }
-    proc.parse(opts.get(ScheduleOptions.BASE_URI));
+    proc.parse(uri);
     updating = proc.updating;
     return proc;
   }

@@ -23,6 +23,8 @@ import org.basex.util.*;
 public final class JobsSchedule extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    checkAdmin(qc);
+
     final String query = string(toToken(exprs[0], qc));
     final HashMap<String, Value> bindings = toBindings(1, qc);
 
@@ -31,6 +33,8 @@ public final class JobsSchedule extends StandardFunc {
 
     // copy variable values
     final Context ctx = qc.context;
+    if(qc.parent != null && qc.parent.parent != null) throw BXXQ_NESTED.get(info);
+
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
       bindings.put(key, ScheduledXQuery.copy(it.getValue().iter(), ctx, qc));
@@ -39,7 +43,7 @@ public final class JobsSchedule extends StandardFunc {
     // check if number of maximum queries has been reached
     if(ctx.jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
-    final ScheduledXQuery job = new ScheduledXQuery(query, bindings, opts, info, qc);
+    final ScheduledXQuery job = new ScheduledXQuery(query, bindings, opts, info, qc, sc);
     return Str.get(job.job().id());
   }
 }

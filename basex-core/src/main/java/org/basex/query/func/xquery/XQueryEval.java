@@ -75,44 +75,48 @@ public class XQueryEval extends StandardFunc {
 
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final User user = qc.context.user();
-    final Perm tmp = user.perm("");
-    String uri = path;
-    Timer to = null;
+    final Options opts = new XQueryOptions();
+    if(exprs.length > 2) toOptions(2, Q_OPTIONS, opts, qc);
+
     if(qc.parent != null && qc.parent.parent != null) throw BXXQ_NESTED.get(info);
 
-    try(final QueryContext qctx = new QueryContext(qc)) {
-      if(exprs.length > 2) {
-        final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
-        final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
-        if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
-        user.perm(perm);
+    final User user = qc.context.user();
+    final Perm tmp = user.perm("");
+    Timer to = null;
 
-        // initial memory consumption: enforce garbage collection and calculate usage
-        final long mb = opts.get(XQueryOptions.MEMORY);
-        if(mb != 0) {
-          Performance.gc(2);
-          final long limit = Performance.memory() + (mb << 20);
-          to = new Timer(true);
-          to.schedule(new TimerTask() {
-            @Override
-            public void run() {
-              // limit reached: perform garbage collection and check again
-              if(Performance.memory() > limit) qctx.memory();
-            }
-          }, 500, 500);
-        }
-        final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
-        if(ms != 0) {
-          if(to == null) to = new Timer(true);
-          to.schedule(new TimerTask() {
-            @Override
-            public void run() { qctx.timeout(); }
-          }, ms);
-        }
-        final String bu = opts.get(XQueryOptions.BASE_URI);
-        if(bu != null) uri = bu;
+    final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
+    if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
+    user.perm(perm);
+
+    try(final QueryContext qctx = new QueryContext(qc)) {
+      // limit memory consumption: enforce garbage collection and calculate usage
+      final long mb = opts.get(XQueryOptions.MEMORY);
+      if(mb != 0) {
+        Performance.gc(2);
+        final long limit = Performance.memory() + (mb << 20);
+        to = new Timer(true);
+        to.schedule(new TimerTask() {
+          @Override
+          public void run() {
+            // limit reached: perform garbage collection and check again
+            if(Performance.memory() > limit) qctx.memory();
+          }
+        }, 500, 500);
       }
+
+      // timeout
+      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
+      if(ms != 0) {
+        if(to == null) to = new Timer(true);
+        to.schedule(new TimerTask() {
+          @Override
+          public void run() { qctx.timeout(); }
+        }, ms);
+      }
+
+      // base-uri: adopt specified uri, passed on uri, or uri from parent query
+      final String bu = opts.get(XQueryOptions.BASE_URI);
+      String uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
 
       // evaluate query
       try {

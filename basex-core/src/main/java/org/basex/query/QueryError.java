@@ -52,7 +52,7 @@ public enum QueryError {
   /** XQST0010. */
   BASX_OPTDECL_X(BASX, 10, "Database option not allowed in library module: %."),
 
-  // Admin module
+  // Admin Module
 
   /** BXAD0001. */
   BXAD_TODAY(BXAD, 1, "Today's log file cannot be deleted."),
@@ -61,7 +61,7 @@ public enum QueryError {
   /** BXAD0003. */
   BXAD_TYPE_X(BXAD, 3, "Log type must consist of uppercase letters: \"%\"."),
 
-  // Client module
+  // Client Module
 
   /** BXCL0001. */
   BXCL_CONN_X(BXCL, 1, "Connection failed: %"),
@@ -76,7 +76,7 @@ public enum QueryError {
   /** BXCL0006. */
   BXCL_FITEM_X(BXCL, 6, "Result is a function item: %."),
 
-  // Conversion module
+  // Conversion Module
 
   /** BXCO0001. */
   BXCO_STRING_X(BXCO, 1, "String conversion: %."),
@@ -89,14 +89,14 @@ public enum QueryError {
   /** BXCO0004. */
   BXCO_INVBASEDIG_X_X(BXCO, 4, "Invalid digit for base %: %."),
 
-  // CSV module
+  // CSV Module
 
   /** BXCS0001. */
   BXCS_PARSE_X(BXCS, 1, "CSV parser: %."),
   /** BXCS0002. */
   BXCS_SERIAL_X(BXCS, 2, "CSV serializer: %."),
 
-  // Database module
+  // Database Module
 
   /** BXDB0001. */
   BXDB_NODB_X_X(BXDB, 1, "Database node expected, % found: %."),
@@ -139,29 +139,29 @@ public enum QueryError {
   /** BXDB0016. */
   BXDB_SAME_X(BXDB, 16, "Name of source and target database is equal: %."),
 
-  // Fetch module
+  // Fetch Module
 
   /** BXFE0001. */
   BXFE_IO_X(BXFE, 1, "%"),
   /** BXFE0002. */
   BXFE_ENCODING_X(BXFE, 2, "Unknown encoding '%'."),
 
-  // Fulltext module
+  // Fulltext Module
 
   /** BXFT0001. */
   BXFT_MATCH(BXFT, 1, "Wildcards and fuzzy option cannot be specified both."),
 
-  // HTML module
+  // HTML Module
 
   /** BXHL0001. */
   BXHL_IO_X(BXHL, 1, "%"),
 
-  // Inspection module
+  // Inspection Module
 
   /** Util error. */
   INSPECT_UNKNOWN_X(INSPECT, "unknown", "Component '%' does not exist."),
 
-  // Jobs module
+  // Jobs Module
 
   /** Jobs error. */
   JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown job: %."),
@@ -172,7 +172,7 @@ public enum QueryError {
   /** Jobs error. */
   JOBS_RANGE(JOBS, "range", "Value out of range: %."),
 
-  // JSON module
+  // JSON Module
 
   /** BXJS0001. */
   BXJS_PARSE_X_X_X(BXJS, 1, "JSON parser (%:%): %."),
@@ -185,24 +185,24 @@ public enum QueryError {
   /** BXJS0003. */
   BXJS_INVALID_X(BXJS, 1, "'%':'%' is not supported by the target format."),
 
-  // Output module
+  // Output Module
 
   /** BXOU0001. */
   ERRFORMAT_X_X(BXOU, 1, "%: %."),
 
-  // Process module
+  // Process Module
 
   /** BXPR9999. */
   BXPR_ENC_X(BXPR, 9999, "Unknown encoding '%'."),
 
-  // Random module
+  // Random Module
 
   /** BXRA0001. */
   BXRA_BOUNDS_X(BXRA, 1, "Maximum value is out of bounds: %."),
   /** BXRA0001. */
   BXRA_NUM_X(BXRA, 2, "Number of values is negative: %."),
 
-  // Repository module
+  // Repository Module
 
   /** BXRE0001. */
   BXRE_WHICH_X(BXRE, 1, "Package '%' does not exist."),
@@ -229,12 +229,12 @@ public enum QueryError {
   /** BXRE0011. */
   BXRE_JARFAIL_X(BXRE, 11, "Reading JAR descriptor failed: %."),
 
-  // XSLT module
+  // XSLT Module
 
   /** BXSL0001. */
   BXSL_ERROR_X(BXSL, 1, "%"),
 
-  // SQL module
+  // SQL Module
 
   /** BXSQ0001. */
   BXSQ_ERROR_X(BXSQ, 1, "An SQL exception occurred: '%'"),
@@ -253,7 +253,7 @@ public enum QueryError {
   /** BXSQ0007. */
   BXSQ_DRIVER_X(BXSQ, 7, "Could not initialize supplied driver: '%'"),
 
-  // Validation module
+  // Validation Module
 
   /** BXVA0001. */
   BXVA_FAIL_X(BXVA, 1, "Validation failed: %"),
@@ -264,14 +264,14 @@ public enum QueryError {
   /** BXVA0004. */
   BXVA_XSDVERSION_X(BXVA, 4, "No XML Schema implementation found for version '%'."),
 
-  // Web module
+  // Web Module
 
   /** BXWE0001. */
   BXWE_INVALID_X(BXWE, 2, "%."),
   /** BXWE0002. */
   BXWE_CODES_X(BXWE, 2, "URL contains invalid characters: %"),
 
-  // XQuery module
+  // XQuery Module
 
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
@@ -290,7 +290,7 @@ public enum QueryError {
   /** BXXQ0006. */
   BXXQ_UNEXPECTED_X(BXXQ, 6, "Unexpected error: %"),
 
-  // Unit module
+  // Unit Module
 
   /** UNIT0001. */
   UNIT_ASSERT(UNIT, 1, "Assertion failed."),
