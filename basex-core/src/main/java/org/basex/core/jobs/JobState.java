@@ -18,5 +18,7 @@ public enum JobState {
   /** Timeout. */
   TIMEOUT,
   /** Memory. */
-  MEMORY;
+  MEMORY,
+  /** Cached. */
+  CACHED;
 }

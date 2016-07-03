@@ -97,10 +97,8 @@ public class XQueryEval extends StandardFunc {
         to = new Timer(true);
         to.schedule(new TimerTask() {
           @Override
-          public void run() {
-            // limit reached: perform garbage collection and check again
-            if(Performance.memory() > limit) qctx.memory();
-          }
+          // limit reached: stop query
+          public void run() { if(Performance.memory() > limit) qctx.memory(); }
         }, 500, 500);
       }
 
@@ -139,6 +137,7 @@ public class XQueryEval extends StandardFunc {
         final ItemList cache = new ItemList();
         final Iter iter = qctx.iter();
         for(Item it; (it = iter.next()) != null;) {
+          qctx.checkStop();
           qc.checkStop();
           cache.add(it);
         }

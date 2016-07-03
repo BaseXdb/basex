@@ -10,6 +10,8 @@ public final class ScheduleOptions extends Options {
   public static final BooleanOption CACHE = new BooleanOption("cache", false);
   /** Start date/time/duration. */
   public static final StringOption START = new StringOption("start", "");
+  /** End date/duration. */
+  public static final StringOption END = new StringOption("end", "");
   /** Interval after which query will be repeated. */
-  public static final StringOption INTERVAL = new StringOption("repeat", "");
+  public static final StringOption INTERVAL = new StringOption("interval", "");
 }

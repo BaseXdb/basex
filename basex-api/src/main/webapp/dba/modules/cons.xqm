@@ -41,7 +41,7 @@ declare variable $cons:OPTION :=
     'maxchars': 100000,
     'maxrows': 500,
     'timeout': 10,
-    'memory': 200,
+    'memory': 300,
     'permission': 'admin'
   }
   return try {

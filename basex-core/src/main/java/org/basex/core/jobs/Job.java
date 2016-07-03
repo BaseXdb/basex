@@ -124,8 +124,10 @@ public abstract class Job {
   public void state(final JobState js) {
     for(final Job job : children) job.state(js);
     state = js;
-    stopped = js == JobState.STOPPED || js == JobState.TIMEOUT || js == JobState.MEMORY;
-    if(stopped) stopTimeout();
+    if(js == JobState.STOPPED || js == JobState.TIMEOUT || js == JobState.MEMORY) {
+      stopped = true;
+      stopTimeout();
+    }
   }
 
   /**

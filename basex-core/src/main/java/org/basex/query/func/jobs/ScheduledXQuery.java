@@ -27,7 +27,7 @@ import org.basex.util.*;
  */
 public final class ScheduledXQuery extends Job implements Runnable {
   /** Result. */
-  private final JobResult result = new JobResult();
+  private final JobResult result = new JobResult(this);
   /** Variable bindings. */
   private final HashMap<String, Value> bindings;
   /** Input info. */
@@ -36,10 +36,10 @@ public final class ScheduledXQuery extends Job implements Runnable {
   private final boolean cache;
   /** Query string. */
   private final String query;
-  /** Database context. */
-  private final Context ctx;
   /** Base URI. */
   private final String uri;
+  /** Repeat flag. */
+  private final boolean repeat;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -62,42 +62,59 @@ public final class ScheduledXQuery extends Job implements Runnable {
     this.bindings = bindings;
     this.info = info;
     this.cache = opts.get(ScheduleOptions.CACHE);
+    this.job().context = qc.context;
 
     final String bu = opts.get(XQueryOptions.BASE_URI);
     uri = bu != null ? bu : string(sc.baseURI().string());
-    ctx = qc.context;
 
-    final JobPool pool = ctx.jobs;
+    final JobPool pool = qc.context.jobs;
     final String id = job().id();
-    if(cache) pool.results.put(id, result);
 
     // check when job is to be started
     final String del = opts.get(ScheduleOptions.START);
-    long delay = 0;
-    if(!del.isEmpty()) {
-      qc.initDateTime();
-      if(Dur.DTD.matcher(del).matches()) {
-        delay = ms(new DTDur(Token.token(del), info));
-      } else if(ADate.TIME.matcher(del).matches()) {
-        delay = ms(new DTDur(new Tim(Token.token(del), info), (ADate) qc.time, info));
-        while(delay <= 0) delay += 86400;
-      } else {
-        delay = ms(new DTDur(new Dtm(Token.token(del), info), (ADate) qc.datm, info));
-      }
-      if(delay < 0) throw JOBS_RANGE.get(info, del);
-    }
+    final long delay = del.isEmpty() ? 0 : ms(del, qc);
+    if(delay < 0) throw JOBS_RANGE.get(info, del);
 
     // check when job is to be repeated
     long interval = 0;
     final String inter = opts.get(ScheduleOptions.INTERVAL);
     if(!inter.isEmpty()) interval = ms(new DTDur(Token.token(inter), info));
     if(interval < 1000 && interval != 0) throw JOBS_RANGE.get(info, inter);
+    repeat = interval > 0;
 
-    // start thread and wait until job is registered or time was assigned
-    pool.scheduleJob(this, delay, interval);
+    // check when job is to be stopped
+    final String dur = opts.get(ScheduleOptions.END);
+    final long duration = dur.isEmpty() ? Long.MAX_VALUE : ms(dur, qc);
+    if(duration <= delay) throw JOBS_RANGE.get(info, dur);
 
-    // no delay: wait until query is queued
-    do Performance.sleep(1); while(delay == 0 && pool.active.get(id) == null && !result.finished());
+    if(cache) {
+      if(repeat) throw JOBS_CONFLICT.get(info);
+      pool.results.put(id, result);
+    }
+
+    // start job task and wait until job is registered or time was assigned
+    new JobTask(this, pool, delay, interval, duration);
+  }
+
+  /**
+   * Returns a delay.
+   * @param string string with dayTimeDuration, date, or dateTime
+   * @param qc query context
+   * @return milliseconds to wait
+   * @throws QueryException query exception
+   */
+  private long ms(final String string, final QueryContext qc) throws QueryException {
+    qc.initDateTime();
+
+    // dayTimeDuration
+    if(Dur.DTD.matcher(string).matches()) return ms(new DTDur(Token.token(string), info));
+    // time
+    if(ADate.TIME.matcher(string).matches()) {
+      long duration = ms(new DTDur(new Tim(Token.token(string), info), (ADate) qc.time, info));
+      while(duration <= 0) duration += 86400;
+    }
+    // dateTime
+    return ms(new DTDur(new Dtm(Token.token(string), info), (ADate) qc.datm, info));
   }
 
   /**
@@ -111,6 +128,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
 
   @Override
   public void run() {
+    final Context ctx = job().context;
     try {
       // parse, push and register query. order is important!
       qp = parse();
@@ -126,14 +144,20 @@ public final class ScheduledXQuery extends Job implements Runnable {
       result.exception = BXXQ_UNEXPECTED_X.get(info, ex);
     } finally {
       // close and invalidate query after result has been assigned. order is important!
-      result.time = System.currentTimeMillis();
-      if(cache) ctx.jobs.scheduleResult(this);
+      result.time = job().performance.time();
+      if(cache) {
+        ctx.jobs.scheduleResult(this);
+        state(JobState.CACHED);
+      } else {
+        state(JobState.SCHEDULED);
+      }
 
       if(qp != null) {
         qp.close();
         unregister(ctx);
         popJob();
         qp = null;
+        job().performance = null;
       }
     }
   }
@@ -149,7 +173,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @throws QueryException query exception
    */
   QueryProcessor parse() throws QueryException {
-    final QueryProcessor proc = new QueryProcessor(query, ctx);
+    final QueryProcessor proc = new QueryProcessor(query, job().context);
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
       final Value value = it.getValue();

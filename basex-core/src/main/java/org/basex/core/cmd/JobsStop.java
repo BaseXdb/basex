@@ -40,7 +40,7 @@ public final class JobsStop extends Command {
    */
   public static boolean stop(final Context ctx, final String id) {
     // stop scheduled task
-    final TimerTask task = ctx.jobs.tasks.get(id);
+    final TimerTask task = ctx.jobs.tasks.remove(id);
     if(task != null) task.cancel();
     // send stop signal to job
     final Job job = ctx.jobs.active.get(id);

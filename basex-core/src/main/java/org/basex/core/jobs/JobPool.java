@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
-import org.basex.query.func.jobs.*;
 
 /**
  * Job pool.
@@ -20,10 +19,10 @@ public final class JobPool {
   /** Cached results. */
   public final Map<String, JobResult> results = new ConcurrentHashMap<>();
   /** Timer tasks. */
-  public final Map<String, TimerTask> tasks = new ConcurrentHashMap<>();
+  public final Map<String, JobTask> tasks = new ConcurrentHashMap<>();
 
   /** Timer. */
-  private final Timer timer = new Timer(true);
+  final Timer timer = new Timer(true);
   /** Timeout (ms). */
   private final long timeout;
 
@@ -60,29 +59,6 @@ public final class JobPool {
     timer.cancel();
     for(final Job job : active.values()) job.stop();
     while(!active.isEmpty()) Thread.yield();
-  }
-
-  /**
-   * Schedules a job.
-   * @param job job
-   * @param delay delay in milliseconds
-   * @param interval milliseconds after which the job will be repeated
-   */
-  public void scheduleJob(final ScheduledXQuery job, final long delay, final long interval) {
-    final String id = job.job().id();
-    final TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        // skip execution if same job is still running
-        if(active.get(id) == null) new Thread(job).start();
-      }
-    };
-    tasks.put(id, task);
-    if(interval > 0) {
-      timer.scheduleAtFixedRate(task, delay, interval);
-    } else {
-      timer.schedule(task, delay);
-    }
   }
 
   /**

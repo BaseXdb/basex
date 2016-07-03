@@ -10,18 +10,28 @@ import org.basex.query.value.*;
  * @author Christian Gruen
  */
 public final class JobResult {
+  /** Job. */
+  public final Job job;
   /** Query result. */
   public Value value;
   /** Exception. */
   public QueryException exception;
-  /** Timestamp. */
+  /** Evaluation time (ns). */
   public long time;
 
   /**
-   * Checks if the query result is finished.
+   * Job.
+   * @param job job
+   */
+  public JobResult(final Job job) {
+    this.job = job;
+  }
+
+  /**
+   * Checks if the query result has been cached.
    * @return result of check
    */
-  public boolean finished() {
-    return time != 0;
+  public boolean cached() {
+    return job.state == JobState.CACHED;
   }
 }
