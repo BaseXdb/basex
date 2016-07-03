@@ -2,7 +2,6 @@ package org.basex.query.func.sql;
 
 import static java.sql.DriverManager.*;
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.sql.*;
@@ -21,9 +20,6 @@ import org.basex.util.options.*;
  * @author Rositsa Shadura
  */
 public final class SqlConnect extends SqlFn {
-  /** QName. */
-  private static final QNm Q_OPTIONS = new QNm(SQL_PREFIX, "options", SQL_URI);
-
   /** Auto-commit mode. */
   private static final String AUTO_COMM = "autocommit";
   /** User. */
@@ -44,7 +40,7 @@ public final class SqlConnect extends SqlFn {
         final String pass = string(toToken(exprs[2], qc));
         if(exprs.length == 4) {
           // connection options
-          final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
+          final Options opts = toOptions(3, new Options(), qc);
           // extract auto-commit mode from options
           boolean ac = true;
           final HashMap<String, String> options = opts.free();

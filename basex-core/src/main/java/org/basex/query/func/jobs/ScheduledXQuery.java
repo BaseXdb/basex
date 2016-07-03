@@ -144,7 +144,6 @@ public final class ScheduledXQuery extends Job implements Runnable {
       result.exception = BXXQ_UNEXPECTED_X.get(info, ex);
     } finally {
       // close and invalidate query after result has been assigned. order is important!
-      result.time = job().performance.time();
       if(cache) {
         ctx.jobs.scheduleResult(this);
         state(JobState.CACHED);
@@ -153,6 +152,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
       }
 
       if(qp != null) {
+        result.time = job().performance.time();
         qp.close();
         unregister(ctx);
         popJob();

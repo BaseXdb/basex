@@ -1,7 +1,6 @@
 package org.basex.query.func.archive;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.archive.ArchiveText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -27,7 +26,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
     checkCreate(qc);
 
     final IOFile root = new IOFile(toPath(0, qc).toString());
-    final ArchOptions opts = toOptions(1, Q_OPTIONS, new ArchOptions(), qc);
+    final ArchOptions opts = toOptions(1, new ArchOptions(), qc);
     final Iter entries;
     if(exprs.length > 2) {
       entries = qc.iter(exprs[2]);

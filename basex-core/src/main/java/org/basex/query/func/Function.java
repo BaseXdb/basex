@@ -243,7 +243,7 @@ public enum Function {
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri.class, "iri-to-uri(string)", arg(STR_ZO), STR),
   /** XQuery function. */
-  JSON_DOC(FnJsonDoc.class, "json-doc(uri[,options])", arg(STR_ZO, ITEM), DOC_ZO),
+  JSON_DOC(FnJsonDoc.class, "json-doc(uri[,options])", arg(STR_ZO, MAP_O), DOC_ZO),
   /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */
@@ -311,7 +311,7 @@ public enum Function {
   /** XQuery function. */
   XML_TO_JSON(FnXmlToJson.class, "xml-to-json(node[,options])", arg(NOD_ZO, MAP_O), STR_ZO),
   /** XQuery function. */
-  PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, ITEM), ITEM_ZO),
+  PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, MAP_O), ITEM_ZO),
   /** XQuery function. */
   PARSE_XML(FnParseXml.class, "parse-xml(string)", arg(STR_ZO), DOC_O, flag(CNS)),
   /** XQuery function. */
@@ -563,10 +563,10 @@ public enum Function {
 
   /** XQuery function. */
   _ARCHIVE_CREATE(ArchiveCreate.class, "create(entries,contents[,options])",
-      arg(ITEM_ZM, ITEM_ZM, ITEM), B64, ARCHIVE_URI),
+      arg(ITEM_ZM, ITEM_ZM, MAP_O), B64, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_CREATE_FROM(ArchiveCreateFrom.class, "create-from(path[,options[,entries]])",
-      arg(STR, ITEM, ITEM_ZM), EMP, ARCHIVE_URI),
+      arg(STR, MAP_O, ITEM_ZM), EMP, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries.class, "entries(archive)", arg(B64), ELM_ZM, ARCHIVE_URI),
   /** XQuery function. */
@@ -585,7 +585,7 @@ public enum Function {
   _ARCHIVE_DELETE(ArchiveDelete.class, "delete(archive,entries)",
       arg(B64, ITEM_ZM), B64, ARCHIVE_URI),
   /** XQuery function. */
-  _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)", arg(B64), ELM, ARCHIVE_URI),
+  _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)", arg(B64), MAP_O, ARCHIVE_URI),
 
   /* Binary Module. */
 
@@ -792,12 +792,12 @@ public enum Function {
   _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ADD(DbAdd.class, "add(database,input[,path[,options]])",
-      arg(STR, NOD, STR, ITEM), EMP, flag(UPD), DB_URI),
+      arg(STR, NOD, STR, MAP_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_DELETE(DbDelete.class, "delete(database,path)", arg(STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_CREATE(DbCreate.class, "create(name[,inputs[,paths[,options]]])",
-      arg(STR, ITEM_ZM, STR_ZM, ITEM), EMP, flag(UPD), DB_URI),
+      arg(STR, ITEM_ZM, STR_ZM, MAP_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_DROP(DbDrop.class, "drop(database)", arg(ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
@@ -805,10 +805,10 @@ public enum Function {
       flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_REPLACE(DbReplace.class, "replace(database,path,input[,options])",
-      arg(STR, STR, ITEM, ITEM), EMP, flag(UPD), DB_URI),
+      arg(STR, STR, ITEM, MAP_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize.class, "optimize(database[,all[,options]])",
-      arg(STR, BLN, ITEM), EMP, flag(UPD), DB_URI),
+      arg(STR, BLN, MAP_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RETRIEVE(DbRetrieve.class, "retrieve(database,path)", arg(STR, STR), B64, flag(NDT), DB_URI),
   /** XQuery function. */
@@ -840,7 +840,7 @@ public enum Function {
   /** XQuery function. */
   _FETCH_BINARY(FetchBinary.class, "binary(uri)", arg(STR), B64, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_XML(FetchXml.class, "xml(uri[,options])", arg(STR, ITEM), DOC_ZO, flag(NDT), FETCH_URI),
+  _FETCH_XML(FetchXml.class, "xml(uri[,options])", arg(STR, MAP_O), DOC_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType.class, "content-type(uri)", arg(STR), STR, flag(NDT),
       FETCH_URI),
@@ -942,10 +942,10 @@ public enum Function {
 
   /** XQuery function. */
   _FT_CONTAINS(FtContains.class, "contains(input,terms[,options])",
-      arg(ITEM, ITEM_ZM, ITEM), BLN, flag(NDT), FT_URI),
+      arg(ITEM, ITEM_ZM, MAP_O), BLN, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_SEARCH(FtSearch.class, "search(database,terms[,options])",
-      arg(STR, ITEM_ZM, ITEM), TXT_ZM, flag(NDT), FT_URI),
+      arg(STR, ITEM_ZM, MAP_O), TXT_ZM, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_COUNT(FtCount.class, "count(nodes)", arg(NOD_ZM), ITR, FT_URI),
   /** XQuery function. */
@@ -959,9 +959,9 @@ public enum Function {
   _FT_TOKENS(FtTokens.class, "tokens(database[,prefix])", arg(STR, STR), ITEM_ZM, flag(NDT),
       FT_URI),
   /** XQuery function. */
-  _FT_TOKENIZE(FtTokenize.class, "tokenize(string[,options])", arg(STR, ITEM), STR_ZM, FT_URI),
+  _FT_TOKENIZE(FtTokenize.class, "tokenize(string[,options])", arg(STR, MAP_O), STR_ZM, FT_URI),
   /** XQuery function. */
-  _FT_NORMALIZE(FtNormalize.class, "normalize(string[,options])", arg(STR, ITEM), STR, FT_URI),
+  _FT_NORMALIZE(FtNormalize.class, "normalize(string[,options])", arg(STR, MAP_O), STR, FT_URI),
 
   /* Hash Module. */
 
@@ -1011,7 +1011,7 @@ public enum Function {
   /** XQuery function. */
   _HTML_PARSER(HtmlParser.class, "parser()", arg(), STR, HTML_URI),
   /** XQuery function. */
-  _HTML_PARSE(HtmlParse.class, "parse(input[,options)", arg(STR, ITEM), DOC_O, HTML_URI),
+  _HTML_PARSE(HtmlParse.class, "parse(input[,options)", arg(STR, MAP_O), DOC_O, HTML_URI),
 
   /* HTTP Module. */
 
@@ -1064,7 +1064,7 @@ public enum Function {
 
   /** XQuery function. */
   _JOBS_SCHEDULE(JobsSchedule.class, "schedule(string[,bindings[,options]])",
-      arg(STR, MAP_ZO, MAP_ZO), STR, flag(NDT), JOBS_URI),
+      arg(STR, MAP_ZO, MAP_O), STR, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
@@ -1170,7 +1170,7 @@ public enum Function {
   _SQL_INIT(SqlInit.class, "init(class)", arg(STR), EMP, flag(NDT), SQL_URI),
   /** XQuery function. */
   _SQL_CONNECT(SqlConnect.class, "connect(url[,user[,pass[,options]]]]])",
-      arg(STR, STR, STR, NOD_ZO), ITR, flag(NDT), SQL_URI),
+      arg(STR, STR, STR, MAP_O), ITR, flag(NDT), SQL_URI),
   /** XQuery function. */
   _SQL_PREPARE(SqlPrepare.class, "prepare(id,statement)", arg(ITR, STR), ITR, flag(NDT), SQL_URI),
   /** XQuery function. */
@@ -1304,19 +1304,19 @@ public enum Function {
 
   /** XQuery function. */
   _XQUERY_EVAL(XQueryEval.class, "eval(string[,bindings[,options]])",
-      arg(STR, MAP_ZO, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
+      arg(STR, MAP_ZO, MAP_O), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_UPDATE(XQueryUpdate.class, "update(string[,bindings[,options]])",
-      arg(STR, MAP_ZO, ITEM), ITEM_ZM, flag(UPD), XQUERY_URI),
+      arg(STR, MAP_ZO, MAP_O), ITEM_ZM, flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_INVOKE(XQueryInvoke.class, "invoke(uri[,bindings[,options]])",
-      arg(STR, MAP_ZO, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
+      arg(STR, MAP_ZO, MAP_O), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse.class, "parse(string[,options])",
-      arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),
+      arg(STR, MAP_O), NOD, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_PARSE_URI(XQueryParseUri.class, "parse-uri(uri[,options])",
-      arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),
+      arg(STR, MAP_O), NOD, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin.class, "fork-join(functions[,options])",
       arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), XQUERY_URI),
@@ -1329,10 +1329,10 @@ public enum Function {
   _XSLT_VERSION(XsltVersion.class, "version()", arg(), STR, XSLT_URI),
   /** XQuery function. */
   _XSLT_TRANSFORM(XsltTransform.class, "transform(input,stylesheet[,params])",
-      arg(ITEM, ITEM, ITEM), NOD, flag(NDT), XSLT_URI),
+      arg(ITEM, ITEM, MAP_O), NOD, flag(NDT), XSLT_URI),
   /** XQuery function. */
   _XSLT_TRANSFORM_TEXT(XsltTransformText.class, "transform-text(input,stylesheet[,params])",
-      arg(ITEM, ITEM, ITEM), STR, flag(NDT), XSLT_URI),
+      arg(ITEM, ITEM, MAP_O), STR, flag(NDT), XSLT_URI),
 
   /* ZIP Module. */
 

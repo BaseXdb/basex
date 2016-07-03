@@ -310,11 +310,10 @@ final class Unit {
 
   /**
    * Returns a token representation of the measured time.
-   *
    * @param p performance
    * @return time
    */
   static byte[] time(final Performance p) {
-    return new DTDur(p.time() / 1000000).string(null);
+    return DTDur.get(p.time() / 1000000).string(null);
   }
 }

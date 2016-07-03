@@ -19,12 +19,6 @@ interface ArchiveText {
 
   /** QName. */
   QNm Q_ENTRY = new QNm(ARCHIVE_PREFIX, "entry", ARCHIVE_URI);
-  /** QName. */
-  QNm Q_OPTIONS = new QNm(ARCHIVE_PREFIX, "options", ARCHIVE_URI);
-  /** QName. */
-  QNm Q_FORMAT = new QNm(ARCHIVE_PREFIX, "format", ARCHIVE_URI);
-  /** QName. */
-  QNm Q_ALGORITHM = new QNm(ARCHIVE_PREFIX, "algorithm", ARCHIVE_URI);
   /** Root node test. */
   NodeTest ENTRY = new NodeTest(Q_ENTRY);
 

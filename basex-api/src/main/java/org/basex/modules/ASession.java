@@ -46,19 +46,17 @@ final class ASession {
   /**
    * Returns the creation time.
    * @return creation time
-   * @throws QueryException query exception
    */
-  Dtm created() throws QueryException {
-    return new Dtm(session.getCreationTime(), null);
+  Dtm created() {
+    return Dtm.get(session.getCreationTime());
   }
 
   /**
    * Returns the last access time.
    * @return creation time
-   * @throws QueryException query exception
    */
-  Dtm accessed() throws QueryException {
-    return new Dtm(session.getLastAccessedTime(), null);
+  Dtm accessed() {
+    return Dtm.get(session.getLastAccessedTime());
   }
 
   /**

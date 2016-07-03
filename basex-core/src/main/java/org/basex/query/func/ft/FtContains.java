@@ -21,7 +21,7 @@ public final class FtContains extends FtAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = qc.value(exprs[0]);
     final Value query = qc.value(exprs[1]);
-    final FtContainsOptions opts = toOptions(2, Q_OPTIONS, new FtContainsOptions(), qc);
+    final FtContainsOptions opts = toOptions(2, new FtContainsOptions(), qc);
 
     final FTOpt tmp = qc.ftOpt();
     final FTOpt opt = new FTOpt().copy(tmp);

@@ -23,13 +23,10 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class FetchXml extends StandardFunc {
-  /** Element: options. */
-  private static final QNm Q_OPTIONS = new QNm("options");
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] in = toToken(exprs[0], qc);
-    final Options opts = toOptions(1, Q_OPTIONS, new Options(), qc);
+    final Options opts = toOptions(1, new Options(), qc);
     if(!Uri.uri(in).isValid()) throw INVDOC_X.get(info, in);
 
     final IO input = IO.get(string(in));

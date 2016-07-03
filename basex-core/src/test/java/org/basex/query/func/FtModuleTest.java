@@ -67,7 +67,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
     // check buggy options
     error(_FT_CONTAINS.args("x", "x", " map { 'x':'y' }"), INVALIDOPT_X);
     error(_FT_CONTAINS.args("x", "x", " map { 'mode':'' }"), INVALIDOPT_X);
-    error(_FT_CONTAINS.args("x", "x", " 1"), ELMMAP_X_X_X);
+    error(_FT_CONTAINS.args("x", "x", " 1"), MAP_X_X);
   }
 
   /** Test method. */
@@ -110,7 +110,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
     // check buggy options
     error(_FT_SEARCH.args(NAME, "x", " map { 'x':'y' }"), INVALIDOPT_X);
     error(_FT_SEARCH.args(NAME, "x", " map { 'mode':'' }"), INVALIDOPT_X);
-    error(_FT_SEARCH.args(NAME, "x", " 1"), ELMMAP_X_X_X);
+    error(_FT_SEARCH.args(NAME, "x", " 1"), MAP_X_X);
   }
 
   /** Test method. */

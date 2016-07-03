@@ -267,17 +267,14 @@ public abstract class StandardFunc extends Arr {
    * Parses the options at the specified index.
    * @param <E> options type
    * @param i index of options argument
-   * @param qnm QName (can be {@code null})
    * @param opts options
    * @param qc query context
    * @return passed on options
    * @throws QueryException query exception
    */
-  protected final <E extends Options> E toOptions(final int i, final QNm qnm, final E opts,
-      final QueryContext qc) throws QueryException {
-
-    return i >= exprs.length ? opts :
-      new FuncOptions(qnm, info).assign(exprs[i].item(qc, info), opts);
+  protected final <E extends Options> E toOptions(final int i, final E opts, final QueryContext qc)
+      throws QueryException {
+    return i >= exprs.length ? opts : new FuncOptions(info).assign(exprs[i].item(qc, info), opts);
   }
 
   /**

@@ -18,9 +18,6 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 abstract class DbNew extends DbAccess {
-  /** Element: parameters. */
-  static final QNm Q_OPTIONS = new QNm("options");
-
   /**
    * Creates a {@link Data} instance for the specified document.
    * @param input input item (node or string)

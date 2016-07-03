@@ -36,14 +36,13 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
     count(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "", " map { }"), 1);
     count(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         " map { 'format':'zip', 'algorithm':'deflate' }"), 1);
-    count(_ARCHIVE_CREATE.args("X", "", "<archive:options/>"), 1);
+    count(_ARCHIVE_CREATE.args("X", "", " map {}"), 1);
     count(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options><archive:format value='zip'/>" +
-        "<archive:algorithm value='deflate'/></archive:options>"), 1);
+        " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
     count(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options><archive:format value='zip'/></archive:options>"), 1);
+        " map { 'format': 'zip' }"), 1);
     count(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options><archive:format value='gzip'/></archive:options>"), 1);
+        " map { 'format': 'gzip' }"), 1);
 
     // different number of entries and contents
     error(_ARCHIVE_CREATE.args("X", "()"), ARCH_DIFF_X_X);
@@ -72,13 +71,13 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "", " map { 'x':'y' }"),
         INVALIDOPT_X);
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options><archive:format value='rar'/></archive:options>"), ARCH_UNKNOWN);
+        " map { 'format': 'xxx' }"), ARCH_UNKNOWN);
     // algorithm not supported
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options><archive:algorithm value='unknown'/></archive:options>"), ARCH_SUPP_X_X);
+        " map { 'algorithm': 'unknown' }"), ARCH_SUPP_X_X);
     // algorithm not supported
     error(_ARCHIVE_CREATE.args("('x','y')", "('a','b')",
-        "<archive:options><archive:format value='gzip'/></archive:options>"), ARCH_ONE_X);
+        " map { 'format': 'gzip' }"), ARCH_ONE_X);
   }
 
   /** Test method. */
@@ -113,10 +112,8 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
   @Test
   public void options() {
     // read entries
-    query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(ZIP)) + "//@value/data()",
-        "zip\ndeflate");
-    query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(GZIP)) + "//@value/data()",
-        "gzip\ndeflate");
+    query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(ZIP)) + "?format", "zip");
+    query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(GZIP)) + "?algorithm", "deflate");
   }
 
   /** Test method. */
@@ -204,8 +201,7 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
         _ARCHIVE_UPDATE.args(" .", "<archive:entry>X</archive:entry>", "Y") + " ! " +
         _ARCHIVE_EXTRACT_TEXT.args(" ."), "Y");
     // updates an existing entry
-    error(_ARCHIVE_CREATE.args("X", "X",
-        "<archive:options><archive:format value='gzip'/></archive:options>") + " ! " +
+    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " ! " +
         _ARCHIVE_UPDATE.args(" .", "X", "Y"), ARCH_MODIFY_X);
   }
 
@@ -223,8 +219,7 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
           "let $c := " + _ARCHIVE_DELETE.args("$a", "$b[position() > 1]") +
           "return count(archive:entries($c))", "1");
     // updates an existing entry
-    error(_ARCHIVE_CREATE.args("X", "X",
-        "<archive:options><archive:format value='gzip'/></archive:options>") + " ! " +
+    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " ! " +
         _ARCHIVE_DELETE.args(" .", "X"), ARCH_MODIFY_X);
   }
 

@@ -39,9 +39,10 @@ public final class FuncOptions {
 
   /**
    * Constructor.
+   * @param info input info
    */
-  public FuncOptions() {
-    this(null, null);
+  public FuncOptions(final InputInfo info) {
+    this(null, info);
   }
 
   /**

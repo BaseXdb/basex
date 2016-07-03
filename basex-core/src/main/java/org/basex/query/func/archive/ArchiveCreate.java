@@ -25,7 +25,7 @@ public class ArchiveCreate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter entries = qc.iter(exprs[0]), contents = qc.iter(exprs[1]);
-    final ArchOptions opts = toOptions(2, Q_OPTIONS, new ArchOptions(), qc);
+    final ArchOptions opts = toOptions(2, new ArchOptions(), qc);
 
     // check options
     final String format = opts.get(ArchOptions.FORMAT);

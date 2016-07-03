@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.build.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -15,11 +16,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class JsonSerialize extends JsonFn {
+public final class JsonSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = qc.iter(exprs[0]);
-    final JsonSerialOptions jopts = toOptions(1, Q_OPTIONS, new JsonSerialOptions(), qc);
+    final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);

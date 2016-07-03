@@ -18,6 +18,6 @@ public final class FileLastModified extends FileFn {
   public Item item(final QueryContext qc) throws IOException, QueryException {
     final Path path = toPath(0, qc);
     final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-    return new Dtm(attrs.lastModifiedTime().toMillis(), info);
+    return Dtm.get(attrs.lastModifiedTime().toMillis());
   }
 }

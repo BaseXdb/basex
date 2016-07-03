@@ -1,7 +1,6 @@
 package org.basex.query.func.xslt;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -28,9 +27,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class XsltTransform extends XsltFn {
-  /** Element: parameters. */
-  private static final QNm Q_PARAMETERS = new QNm("parameters", XSLT_URI);
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
@@ -50,7 +46,7 @@ public class XsltTransform extends XsltFn {
     checkCreate(qc);
     final IO in = read(exprs[0], qc);
     final IO xsl = read(exprs[1], qc);
-    final Options opts = toOptions(2, Q_PARAMETERS, new Options(), qc);
+    final Options opts = toOptions(2, new Options(), qc);
 
     final PrintStream tmp = System.err;
     final ArrayOutput ao = new ArrayOutput();

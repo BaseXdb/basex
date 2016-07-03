@@ -67,16 +67,6 @@ public final class Dtm extends ADate {
 
   /**
    * Constructor.
-   * @param ms milliseconds since January 1, 1970, 00:00:00 GMT
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public Dtm(final long ms, final InputInfo ii) throws QueryException {
-    this(Token.token(DateTime.format(new Date(ms))), ii);
-  }
-
-  /**
-   * Constructor.
    * @param date date
    * @param dur duration
    * @param plus plus/minus flag
@@ -108,5 +98,18 @@ public final class Dtm extends ADate {
     return type == dtm.type && yea == dtm.yea && mon == dtm.mon && day == dtm.day &&
         hou == dtm.hou && min == dtm.min && tz == dtm.tz &&
         sec == null ? dtm.sec == null : sec.compareTo(dtm.sec) == 0;
+  }
+
+  /**
+   * Returns a dateTime item for the specified milliseconds.
+   * @param ms milliseconds since January 1, 1970, 00:00:00 GMT
+   * @return dateTime instance
+   */
+  public static Dtm get(final long ms) {
+    try {
+      return new Dtm(Token.token(DateTime.format(new Date(ms))), null);
+    } catch(final QueryException ex) {
+      throw Util.notExpected();
+    }
   }
 }

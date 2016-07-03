@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class ConvertIntegerToDateTime extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new Dtm(toLong(exprs[0], qc), info);
+    return Dtm.get(toLong(exprs[0], qc));
   }
 }

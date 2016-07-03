@@ -18,7 +18,7 @@ public final class DbOptimize extends DbNew {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
     final boolean all = exprs.length > 1 && toBoolean(exprs[1], qc);
-    final Options opts = toOptions(2, Q_OPTIONS, new Options(), qc);
+    final Options opts = toOptions(2, new Options(), qc);
     qc.updates().add(new DBOptimize(data, all, opts, qc, info), qc);
     return null;
   }

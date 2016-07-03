@@ -12,9 +12,6 @@ import org.basex.util.ft.*;
  * @author Christian Gruen
  */
 abstract class FtAccess extends StandardFunc {
-  /** Element: options. */
-  static final QNm Q_OPTIONS = new QNm("options");
-
   /**
    * Parses fulltext options.
    * @param ftexpr full-text expression

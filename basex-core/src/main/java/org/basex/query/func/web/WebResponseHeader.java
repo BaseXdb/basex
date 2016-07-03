@@ -35,8 +35,8 @@ public final class WebResponseHeader extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final HashMap<String, String> output = toOptions(0, null, new Options(), qc).free();
-    final HashMap<String, String> http = toOptions(1, null, new Options(), qc).free();
+    final HashMap<String, String> output = toOptions(0, new Options(), qc).free();
+    final HashMap<String, String> http = toOptions(1, new Options(), qc).free();
 
     // HTTP response
     if(!http.containsKey(CACHE_CONTROL)) http.put(CACHE_CONTROL, CACHE_CONTROL_DEFAULT);

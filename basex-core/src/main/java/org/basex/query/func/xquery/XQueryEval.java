@@ -25,10 +25,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class XQueryEval extends StandardFunc {
-  /** QName. */
-  private static final QNm Q_OPTIONS =
-      new QNm(QueryText.XQUERY_PREFIX, "options", QueryText.XQUERY_URI);
-
   /** XQuery options. */
   public static class XQueryOptions extends Options {
     /** Permission. */
@@ -76,7 +72,7 @@ public class XQueryEval extends StandardFunc {
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final Options opts = new XQueryOptions();
-    if(exprs.length > 2) toOptions(2, Q_OPTIONS, opts, qc);
+    if(exprs.length > 2) toOptions(2, opts, qc);
 
     if(qc.parent != null && qc.parent.parent != null) throw BXXQ_NESTED.get(info);
 

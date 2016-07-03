@@ -39,11 +39,11 @@ public final class DTDur extends Dur {
 
   /**
    * Timezone constructor.
-   * @param ms milliseconds
+   * @param sec seconds
    */
-  public DTDur(final long ms) {
+  public DTDur(final BigDecimal sec) {
     super(AtomType.DTD);
-    sec = BigDecimal.valueOf(ms).divide(BD1000);
+    this.sec = sec;
   }
 
   /**
@@ -147,5 +147,14 @@ public final class DTDur extends Dur {
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it.type == type) return sec.subtract(((ADateDur) it).sec).signum();
     throw diffError(it, this, ii);
+  }
+
+  /**
+   * Returns a dayTimeDuration item for the specified milliseconds.
+   * @param ms milliseconds
+   * @return dateTime instance
+   */
+  public static DTDur get(final long ms) {
+    return new DTDur(BigDecimal.valueOf(ms).divide(BD1000));
   }
 }

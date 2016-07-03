@@ -9,7 +9,7 @@ import java.util.zip.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class ArchiveOptions extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Map item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final B64 archive = toB64(exprs[0], qc, false);
     final String format;
     int level = -1;
@@ -38,12 +38,14 @@ public final class ArchiveOptions extends StandardFunc {
     }
 
     // create result element
-    final FElem e = new FElem(Q_OPTIONS).declareNS();
-    if(format != null) e.add(new FElem(Q_FORMAT).add(VALUE, format));
+    Map map = Map.EMPTY;
+    if(format != null) {
+      map = map.put(Str.get(ArchOptions.FORMAT.name()), Str.get(format), ii);
+    }
     if(level >= 0) {
       final String lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
-      e.add(new FElem(Q_ALGORITHM).add(VALUE, lvl));
+      map = map.put(Str.get(ArchOptions.ALGORITHM.name()), Str.get(lvl), ii);
     }
-    return e;
+    return map;
   }
 }

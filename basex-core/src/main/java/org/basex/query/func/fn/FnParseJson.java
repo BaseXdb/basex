@@ -8,7 +8,6 @@ import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -42,10 +41,7 @@ public class FnParseJson extends Parse {
       final InputInfo ii) throws QueryException {
 
     final JsonParserOptions opts = new JsonParserOptions();
-    if(exprs.length > 1) {
-      final Map options = toMap(exprs[1], qc);
-      new FuncOptions(null, info).acceptUnknown().assign(options, opts);
-    }
+    if(exprs.length > 1) new FuncOptions(info).acceptUnknown().assign(toMap(exprs[1], qc), opts);
 
     final boolean esc = opts.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);

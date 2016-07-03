@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -26,10 +25,6 @@ public class XQueryParse extends StandardFunc {
   private static final byte[] PREFIX = token("prefix");
   /** Token. */
   private static final byte[] URI = token("uri");
-
-  /** QName. */
-  private static final QNm Q_OPTIONS = new QNm(QueryText.XQUERY_PREFIX, "options",
-    QueryText.XQUERY_URI);
 
   /** XQuery options. */
   public static class XQueryOptions extends Options {
@@ -59,7 +54,7 @@ public class XQueryParse extends StandardFunc {
 
     boolean compile = false, plan = true, pass = false;
     if(exprs.length > 1) {
-      final Options opts = toOptions(1, Q_OPTIONS, new XQueryOptions(), qc);
+      final Options opts = toOptions(1, new XQueryOptions(), qc);
       compile = opts.get(XQueryOptions.COMPILE);
       plan = opts.get(XQueryOptions.PLAN);
       pass = opts.get(XQueryOptions.PASS);

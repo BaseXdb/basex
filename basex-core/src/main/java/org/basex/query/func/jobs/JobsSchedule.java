@@ -29,7 +29,7 @@ public final class JobsSchedule extends StandardFunc {
     final HashMap<String, Value> bindings = toBindings(1, qc);
 
     final ScheduleOptions opts = new ScheduleOptions();
-    if(exprs.length > 2) toOptions(2, null, opts, qc);
+    if(exprs.length > 2) toOptions(2, opts, qc);
 
     // copy variable values
     final Context ctx = qc.context;

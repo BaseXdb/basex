@@ -797,6 +797,10 @@ public interface Text {
   String DURATION = lang("duration");
   /** "State". */
   String STATE = lang("state");
+  /** "Start". */
+  String START = lang("start");
+  /** "End". */
+  String END = lang("end");
   /** "User". */
   String USER = lang("user");
   /** External Variables. */

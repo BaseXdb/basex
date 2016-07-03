@@ -35,7 +35,7 @@ public class FtTokenize extends FtAccess {
    */
   protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
     final byte[] token = toToken(exprs[0], qc);
-    final FtTokenizeOptions opts = toOptions(1, Q_OPTIONS, new FtTokenizeOptions(), qc);
+    final FtTokenizeOptions opts = toOptions(1, new FtTokenizeOptions(), qc);
 
     final FTOpt opt = new FTOpt().copy(qc.ftOpt());
     final FTDiacritics dc = opts.get(FtTokenizeOptions.DIACRITICS);
