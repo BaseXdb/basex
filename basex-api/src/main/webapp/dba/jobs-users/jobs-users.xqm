@@ -51,7 +51,7 @@ function _:jobs-users(
 
   return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
     <tr>
-      <td width='49%'>
+      <td width='69%'>
         <form action="{ $_:CAT }" method="post" class="update">
         <h2>Jobs</h2>
         {
@@ -62,22 +62,25 @@ function _:jobs-users(
             let $ms := xs:dayTimeDuration($job/@duration) div xs:dayTimeDuration('PT0.001S')
             let $you := if($id = $curr) then '✓' else '–'
             order by $ms descending
-            return <e id='{ $id }' type='{ $job/@type }'
-              sec='{ $ms div 1000 }' state='{ $job/@state }' user='{ $job/@user }' you='{ $you }'/>
+            return <e id='{ $id }' type='{ $job/@type }' state='{ $job/@state }'
+              user='{ $job/@user }' sec='{ $ms div 1000 }' start='{ $job/@start}'
+              end='{ $job/@end }' you='{ $you }'/>
             
           let $headers := (
-            element id { html:label($entries, ('ID', 'IDs')) },
-            element type { 'Type' },
-            element sec { 'Seconds' },
-            element state { 'State' },
-            element user { 'User' },
-            element you { 'Yourself' }
+            <id>{ html:label($entries, ('ID', 'IDs')) }</id>,
+            <type>Type</type>,
+            <state>State</state>,
+            <user>User</user>,
+            <sec type='number' order='desc'>Seconds</sec>,
+            <start type='dateTime' order='desc'>Start</start>,
+            <end type='dateTime' order='desc'>End</end>,
+            <you>You</you>
           )
           let $buttons := (
             html:button('stop-job', 'Stop', true())
           )
           let $link := function($value) { 'job' }
-          return html:table($entries, $headers, $buttons)
+          return html:table($entries, $headers, $buttons, map {}, $sort, $link)
         }
         </form>
         <form action="{ $_:CAT }" method="post" class="update">
@@ -87,7 +90,7 @@ function _:jobs-users(
             for $id in Sessions:ids()
             for $name in Sessions:names($id)
             for $session in Sessions:get($id, $name)
-            let $access := html:date(Sessions:accessed($id))
+            let $access := Sessions:accessed($id)
             let $you := if(Session:id() = $id) then '✓' else '–'
             let $value :=
               if ($session instance of element()) then $session/name
@@ -95,11 +98,11 @@ function _:jobs-users(
             return <e id='{ $id || '|' || $name }' name='{ $name }' value='{ $value }'
              access='{ $access }' you='{ $you }'/>
           let $headers := (
-            element id { attribute type { 'id' }, html:label($entries, ('ID', 'IDs')) },
-            element name { 'Name' },
-            element value { 'Value' },
-            element access { 'Last Access' },
-            element you { 'Yourself' }
+            <id type='id'>{  html:label($entries, ('ID', 'IDs')) }</id>,
+            <name>Name</name>,
+            <value>Value</value>,
+            <access type='dateTime' order='desc'>Last Access</access>,
+            <you>You</you>
           )
           let $buttons := (
             html:button('kill-session', 'Kill', true())
@@ -111,14 +114,14 @@ function _:jobs-users(
         {
           let $entries := $data/sessions/session/<e addr='{ @address }' user='{ @user }'/>
           let $headers := (
-            element addr { html:label($entries, ('Session', 'Sessions')) },
-            element user { 'Address' }
+            <addr>{ html:label($entries, ('Session', 'Sessions')) }</addr>,
+            <user>Address</user>
           )
           return html:table($entries, $headers, ())
         }
       </td>
       <td class='vertical'/>
-      <td width='49%'>
+      <td width='29%'>
         <form action="{ $_:CAT }" method="post" class="update">
         <h2>Users</h2>
         {
@@ -127,16 +130,16 @@ function _:jobs-users(
             let $you := if($cons:SESSION/name = $entry/@name) then '✓' else '–'
             return <e name='{ $entry/@name }' perm='{ $entry/@permission }' you='{ $you }'/>
           let $headers := (
-            element name { html:label($entries, ('User', 'Users')) },
-            element perm { 'Permission' },
-            element you { 'Yourself' }
+            <name>{ html:label($entries, ('User', 'Users')) }</name>,
+            <perm>Permission</perm>,
+            <you>You</you>
           )
           let $buttons := (
             html:button('create-user', 'Create…'),
             html:button('drop-user', 'Drop', true())
           )
           let $link := function($value) { 'user' }
-          return html:table($entries, $headers, $buttons, map {}, $sort, $link)
+          return html:table($entries, $headers, $buttons)
         }
         </form>
         <div>&#xa0;</div>

@@ -258,10 +258,11 @@ declare function html:table(
             ) else (
               function($a) { $a }
             )
-          return for $entry in $entries
-                 let $key := $entry/@*[name() eq $sort]
-                 order by $order($key) empty greatest collation '?lang=en'
-                 return $entry
+          return
+            for $entry in $entries
+            order by string($entry/@*[name() = $sort])[.] ! $order(.)
+              empty greatest collation '?lang=en'
+            return $entry
         )
 
         let $max := $cons:OPTION($cons:K-MAX-ROWS)
@@ -276,7 +277,7 @@ declare function html:table(
               if($header/@type = 'bytes') then (
                 try { prof:human(xs:integer(.)) } catch * { . }
               ) else if($header/@type = 'decimal') then (
-                try { format-number(number(.), '#.00') } catch * { . }
+                try { format-number(number(.), '0.00') } catch * { . }
               ) else if($header/@type = 'dateTime') then (
                 html:date(xs:dateTime(.))
               )
