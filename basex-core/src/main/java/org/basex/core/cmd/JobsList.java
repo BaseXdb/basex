@@ -80,9 +80,9 @@ public final class JobsList extends Command {
   public static TokenList ids(final Context ctx) {
     final JobPool jobs = ctx.jobs;
     final Set<String> set = new HashSet<>();
+    for(final String id : jobs.results.keySet()) set.add(id);
     for(final String id : jobs.active.keySet()) set.add(id);
     for(final String id : jobs.tasks.keySet()) set.add(id);
-    for(final String id : jobs.results.keySet()) set.add(id);
     final TokenList list = new TokenList(set.size());
     for(final String id : set) list.add(id);
     return sort(list);

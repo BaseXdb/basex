@@ -41,7 +41,7 @@ public final class JobTask extends TimerTask {
     this.delay = delay;
     this.interval = interval;
     final long time = System.currentTimeMillis();
-    start = time + start;
+    start = time + delay;
     end = duration == Long.MAX_VALUE ? duration : time + duration;
 
     jobs.tasks.put(job.job().id(), this);

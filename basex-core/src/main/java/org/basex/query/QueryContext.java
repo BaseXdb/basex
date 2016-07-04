@@ -97,13 +97,13 @@ public final class QueryContext extends Job implements Closeable {
   public boolean scoring;
 
   /** Current Date. */
-  public Item date;
+  public Dat date;
   /** Current DateTime. */
-  public Item datm;
+  public Dtm datm;
   /** Current Time. */
-  public Item time;
+  public Tim time;
   /** Current timezone. */
-  public Item zone;
+  public DTDur zone;
   /** Current nanoseconds. */
   public long nano;
 
