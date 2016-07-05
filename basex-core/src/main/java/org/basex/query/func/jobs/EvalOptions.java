@@ -3,7 +3,7 @@ package org.basex.query.func.jobs;
 import org.basex.util.options.*;
 
 /** Scheduling options. */
-public final class ScheduleOptions extends Options {
+public final class EvalOptions extends Options {
   /** Query base-uri. */
   public static final StringOption BASE_URI = new StringOption("base-uri");
   /** Cache result. */

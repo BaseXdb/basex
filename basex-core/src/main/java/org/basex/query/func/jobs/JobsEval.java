@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class JobsSchedule extends StandardFunc {
+public final class JobsEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
@@ -28,7 +28,7 @@ public final class JobsSchedule extends StandardFunc {
     final String query = string(toToken(exprs[0], qc));
     final HashMap<String, Value> bindings = toBindings(1, qc);
 
-    final ScheduleOptions opts = new ScheduleOptions();
+    final EvalOptions opts = new EvalOptions();
     if(exprs.length > 2) toOptions(2, opts, qc);
 
     // copy variable values

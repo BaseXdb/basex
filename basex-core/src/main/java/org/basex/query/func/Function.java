@@ -1063,7 +1063,7 @@ public enum Function {
   /* Jobs Module. */
 
   /** XQuery function. */
-  _JOBS_SCHEDULE(JobsSchedule.class, "schedule(string[,bindings[,options]])",
+  _JOBS_EVAL(JobsEval.class, "eval(string[,bindings[,options]])",
       arg(STR, MAP_ZO, MAP_O), STR, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),

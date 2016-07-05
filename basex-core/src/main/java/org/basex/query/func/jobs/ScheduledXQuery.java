@@ -20,7 +20,7 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
- * Asynchronous query.
+ * Scheduled XQuery.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -55,13 +55,13 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @throws QueryException query exception
    */
   ScheduledXQuery(final String query, final HashMap<String, Value> bindings,
-      final ScheduleOptions opts, final InputInfo info, final QueryContext qc,
+      final EvalOptions opts, final InputInfo info, final QueryContext qc,
       final StaticContext sc) throws QueryException {
 
     this.query = query;
     this.bindings = bindings;
     this.info = info;
-    this.cache = opts.get(ScheduleOptions.CACHE);
+    this.cache = opts.get(EvalOptions.CACHE);
     this.job().context = qc.context;
 
     final String bu = opts.get(XQueryOptions.BASE_URI);
@@ -71,18 +71,18 @@ public final class ScheduledXQuery extends Job implements Runnable {
     final String id = job().id();
 
     // check when job is to be started
-    final String del = opts.get(ScheduleOptions.START);
+    final String del = opts.get(EvalOptions.START);
     final long delay = del.isEmpty() ? 0 : ms(del, 0, qc);
 
     // check when job is to be repeated
     long interval = 0;
-    final String inter = opts.get(ScheduleOptions.INTERVAL);
+    final String inter = opts.get(EvalOptions.INTERVAL);
     if(!inter.isEmpty()) interval = ms(new DTDur(Token.token(inter), info));
     if(interval < 1000 && interval != 0) throw JOBS_RANGE.get(info, inter);
     repeat = interval > 0;
 
     // check when job is to be stopped
-    final String dur = opts.get(ScheduleOptions.END);
+    final String dur = opts.get(EvalOptions.END);
     final long duration = dur.isEmpty() ? Long.MAX_VALUE : ms(dur, delay, qc);
 
     if(cache) {
@@ -177,7 +177,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @return query processor
    * @throws QueryException query exception
    */
-  QueryProcessor parse() throws QueryException {
+  private QueryProcessor parse() throws QueryException {
     final QueryProcessor proc = new QueryProcessor(query, job().context);
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
