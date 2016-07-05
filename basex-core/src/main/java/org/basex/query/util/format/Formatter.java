@@ -252,7 +252,7 @@ public abstract class Formatter extends FormatUtil {
 
         // parse presentation modifier(s) and width modifier
         final DateFormat fp = new DateFormat(substring(marker, 1), pres, ii);
-        if(max) {
+        if(max && fp.max == Integer.MAX_VALUE) {
           // limit maximum length of numeric output
           int mx = 0;
           final int fl = fp.primary.length;
