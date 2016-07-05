@@ -80,8 +80,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       if(printKey) {
         if(key == null) throw error("Element '%' has no key.", type);
-        key = escape(key, escapedKey);
-        if(!printedKeys.add(key)) throw error("Duplicate key: %.", key);
+        key = escape(key, escapedKey, true);
         out.print('"');
         out.print(norm(key));
         out.print("\":");
@@ -104,7 +103,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
       } else if(eq(type, STRING)) {
         final byte[] value = value(iter, type);
         out.print('"');
-        if(value != null) out.print(norm(escape(value, escaped)));
+        if(value != null) out.print(norm(escape(value, escaped, false)));
         out.print('"');
       } else if(eq(type, NUMBER)) {
         final byte[] value = value(iter, type);
@@ -216,31 +215,55 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * Returns a possibly escaped value.
    * @param value value to escape
    * @param escape escape flag
+   * @param key key
    * @return escaped value
    * @throws QueryIOException I/O exception
    */
-  private static byte[] escape(final byte[] value, final boolean escape) throws QueryIOException {
-    if(escape) {
-      if(contains(value, '\\')) {
-        final TokenParser tp = new TokenParser(value);
-        while(tp.more()) {
-          int c = tp.next();
-          if(c == '\\') {
-            if(!tp.more()) throw JSON_ESCAPE_X.getIO(value);
-            c = tp.next();
-            if(indexOf(ESCAPES, c) == -1) throw JSON_ESCAPE_X.getIO(value);
-            if(c == 'u') {
+  private byte[] escape(final byte[] value, final boolean escape, final boolean key)
+      throws QueryIOException {
+
+    final TokenBuilder raw = new TokenBuilder();
+    if(escape && contains(value, '\\')) {
+      final TokenParser tp = new TokenParser(value);
+      while(tp.more()) {
+        int cp = tp.next();
+        if(cp == '\\') {
+          if(!tp.more()) throw JSON_ESCAPE_X.getIO(value);
+          switch(tp.next()) {
+            case 'u':
+              cp = 0;
               for(int i = 0; i < 4; i++) {
                 if(!tp.more()) throw JSON_ESCAPE_X.getIO(value);
-                c = tp.next();
-                if(c < '0' || c > '9' && c < 'A' || c > 'F' && c < 'a' || c > 'f')
+                int c = tp.next();
+                if(c < 0x30 || c > 0x39 && c < 0x41 || c > 0x46 && c < 0x61 || c > 0x66)
                   throw JSON_ESCAPE_X.getIO(value);
+                cp = (cp << 4) + c - (c >= 0x61 ? 0x57 : c >= 0x41 ? 0x37 : 0x30);
               }
-            }
+              raw.add(cp);
+              break;
+            case '"': case '\\': case '/':
+              raw.add(cp); break;
+            case 'b':
+              raw.add('\b'); break;
+            case 'f':
+              raw.add('\f'); break;
+            case 'n':
+              raw.add('\n'); break;
+            case 'r':
+              raw.add('\r'); break;
+            case 't':
+              raw.add('\t'); break;
+            default:
+              throw JSON_ESCAPE_X.getIO(value);
           }
+        } else {
+          raw.add(cp);
         }
       }
+    } else {
+      raw.add(value);
     }
+    if(key && !printedKeys.add(raw.finish())) throw error("Duplicate key: %.", value);
 
     final TokenBuilder tb = new TokenBuilder();
     boolean bs = false;
