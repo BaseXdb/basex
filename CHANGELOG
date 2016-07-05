@@ -1,3 +1,28 @@
+VERSION 8.5 (July 4, 2016) ---------------------------------------------
+
+ DATABASE JOBS
+ - all registered database jobs are now centrally administered
+ - jobs can be scheduled (periodical execution, start/end time)
+ - job results can be cached and retrieved later on
+ - new Jobs Module: XQuery functions for managing jobs
+ - new commands: JOBS [LIST|RESULT|STOP]
+ - DBA: visualization of currently registered jobs
+
+ XQUERY
+ - parallel execution via xquery:fork-join (thank you, James Wright!)
+ - alignments with the latest changes in the XQuery 3.1 specification
+ - easy chaining of update operations with the 'update' keyword
+ - numerous optimizations, smarter rewritings and heuristics
+
+ XQUERY MODULES
+ - File, Conversion, Fetch Module: handling of invalid XML characters
+ - Inspection Module: inspect:function-annotations added
+
+ OPTIONS
+ - LOGPATH: custom path for logging data
+ - CACHETIMEOUT: timeout for dropping cached job results
+ - AUTHMETHOD: `custom` added to skip authentication 
+
 VERSION 8.4.4 (May 3, 2016) --------------------------------------------
 
  Minor bug fixes and tweaks.
