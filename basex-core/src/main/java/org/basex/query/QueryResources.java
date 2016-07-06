@@ -338,18 +338,26 @@ public final class QueryResources {
     for(final Data data : datas) {
       // compare input path
       final String orig = data.meta.original;
-      if(!orig.isEmpty() && IO.get(orig).eq(qi.io)) return data;
+      if(!orig.isEmpty() && IO.get(orig).eq(qi.io)) {
+        // reset database path: indicates that database includes all files of the original path
+        qi.dbPath = "";
+        return data;
+      }
       // compare database name
       final String name = data.meta.name, dbName = qi.dbName;
       if(Prop.CASE ? name.equals(dbName) : name.equalsIgnoreCase(dbName)) return data;
     }
 
     // open new database
-    final Data data = open(qi);
+    Data data = open(qi);
     if(data != null) return data;
 
     // otherwise, create new instance
-    return create(qi, single, info);
+    data = create(qi, single, info);
+    // reset database path: indicates that all documents were parsed
+    qi.dbPath = "";
+    return data;
+
   }
 
   /**
@@ -404,9 +412,6 @@ public final class QueryResources {
     } catch(final IOException ex) {
       throw IOERR_X.get(ii, ex);
     }
-    // reset database path: indicates that all documents were parsed
-    input.dbPath = "";
-
     return addData(data);
   }
 
