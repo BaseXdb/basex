@@ -51,9 +51,13 @@ public final class DBAdd extends DBUpdate {
   @Override
   public void merge(final Update update) throws QueryException {
     final DBAdd add = (DBAdd) update;
-    if(replace || add.replace)
-      throw UPMULTDOC_X_X.get(info, data.meta.name, newDocs.inputs.get(0).path);
-
+    if(replace || add.replace) {
+      final NewInput input = newDocs.inputs.get(0), addInput = add.newDocs.inputs.get(0);
+      String path = input.path, addPath = addInput.path;
+      if(input.io != null) path += '/' + input.io.name();
+      if(addInput.io != null) addPath += '/' + addInput.io.name();
+      if(path.equals(addPath)) throw UPMULTDOC_X_X.get(info, data.meta.name, addPath);
+    }
     newDocs.merge(add.newDocs);
   }
 

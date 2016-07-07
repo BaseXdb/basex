@@ -319,12 +319,12 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
 
     final String addcache = " map { 'addcache': true() }";
-    query(_DB_ADD.args(NAME, "<cache/>", "cache1.xml", addcache));
-    query(EXISTS.args(_DB_OPEN.args(NAME, "cache1.xml")), "true");
-    query(_DB_ADD.args(NAME, " \"<cache/>\"", "cache2.xml", addcache));
-    query(EXISTS.args(_DB_OPEN.args(NAME, "cache2.xml")), "true");
-    query(_DB_ADD.args(NAME, XML, "cache3.xml", addcache));
-    query(EXISTS.args(_DB_OPEN.args(NAME, "cache3.xml")), "true");
+    query(_DB_ADD.args(NAME, "<cache/>", "C1.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "C1.xml")), "true");
+    query(_DB_ADD.args(NAME, " \"<cache/>\"", "C2.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "C2.xml")), "true");
+    query(_DB_ADD.args(NAME, XML, "C3.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "C3.xml")), "true");
 
     error(_DB_ADD.args(NAME, CSV, "csv.xml",
         " map { 'parser':('csv','html') }"), INVALIDOPT_X);
@@ -555,20 +555,28 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/html"), 1);
 
     final String addcache = " map { 'addcache': true() }";
-    query(_DB_REPLACE.args(NAME, "cache1.xml", "<cache/>", addcache));
-    query(EXISTS.args(_DB_OPEN.args(NAME, "cache1.xml")), "true");
-    query(_DB_REPLACE.args(NAME, "cache2.xml", " \"<cache/>\"", addcache));
-    query(EXISTS.args(_DB_OPEN.args(NAME, "cache2.xml")), "true");
-    query(_DB_REPLACE.args(NAME, "cache3.xml", XML, addcache));
-    query(EXISTS.args(_DB_OPEN.args(NAME, "cache3.xml")), "true");
+    query(_DB_REPLACE.args(NAME, "1.xml", "<cache/>", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "1.xml")), "true");
+    query(_DB_REPLACE.args(NAME, "2.xml", " \"<cache/>\"", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "2.xml")), "true");
+    query(_DB_REPLACE.args(NAME, "3.xml", XML, addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "3.xml")), "true");
 
-    // replace same target more than once
-    error("(1 to 2) ! " + _DB_REPLACE.args(NAME, "cache3.xml", XML), UPMULTDOC_X_X);
-    error("(1 to 2) ! " + _DB_REPLACE.args(NAME, "cacheX.xml", XML), UPMULTDOC_X_X);
-    error(_DB_ADD.args(NAME, XML, "cacheX.xml") + ',' + _DB_REPLACE.args(NAME, "cacheX.xml", XML),
+    // GH-1302: replace same target more than once
+    error("(1 to 2) ! " + _DB_REPLACE.args(NAME, "3.xml", XML), UPMULTDOC_X_X);
+    error("(1 to 2) ! " + _DB_REPLACE.args(NAME, "X.xml", XML), UPMULTDOC_X_X);
+    error(_DB_ADD.args(NAME, XML, "X.xml") + ',' + _DB_REPLACE.args(NAME, "X.xml", XML),
         UPMULTDOC_X_X);
-    error(_DB_REPLACE.args(NAME, "cacheX.xml", XML) + ',' + _DB_ADD.args(NAME, XML, "cacheX.xml"),
+    error(_DB_REPLACE.args(NAME, "X.xml", XML) + ',' + _DB_ADD.args(NAME, XML, "X.xml"),
         UPMULTDOC_X_X);
+
+    // GH-1302: check replacements of existing and new paths
+    query(_DB_REPLACE.args(NAME, "3.xml", XML) + ',' + _DB_REPLACE.args(NAME, "4.xml", XML));
+    query(_DB_REPLACE.args(NAME, "3.xml", "<a/>") + ',' + _DB_REPLACE.args(NAME, "5.xml", "<a/>"));
+
+    // GH-1302: check replacements of new paths
+    query(_DB_REPLACE.args(NAME, "6.xml", XML) + ',' + _DB_REPLACE.args(NAME, "7.xml", XML));
+    query(_DB_REPLACE.args(NAME, "8.xml", "<a/>") + ',' + _DB_REPLACE.args(NAME, "9.xml", "<a/>"));
   }
 
   /** Test method. */
