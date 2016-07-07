@@ -74,7 +74,10 @@ public class XQueryEval extends StandardFunc {
     final Options opts = new XQueryOptions();
     if(exprs.length > 2) toOptions(2, opts, qc);
 
-    if(qc.parent != null && qc.parent.parent != null) throw BXXQ_NESTED.get(info);
+    // allow limited number of nested calls
+    QueryContext qcAnc = qc;
+    for(int c = 5; qcAnc != null && c > 0; c--) qcAnc = qcAnc.parent;
+    if(qcAnc != null) throw BXXQ_NESTED.get(info);
 
     final User user = qc.context.user();
     final Perm tmp = user.perm("");
