@@ -48,7 +48,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /** Locking instance used for testing. */
-  private final DBLocking locks = new DBLocking(context);
+  private final DBLocking locks = new DBLocking();
   /** Objects used for locking. */
   private final String[] objects = new String[5];
   /** Empty string array for convenience. */
@@ -608,7 +608,8 @@ public final class LockingTest extends SandboxTest {
       final Command cmd = new Cmd(writing);
       locks.acquire(
         readObjects != null ? new StringList().add(readObjects) : null,
-        writeObjects != null ? new StringList().add(writeObjects) : null);
+        writeObjects != null ? new StringList().add(writeObjects) : null,
+        context);
 
       // We hold the lock, count down
       if(countDown != null) countDown.countDown();

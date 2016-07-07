@@ -22,31 +22,21 @@ public final class JobLocking implements Locking {
   private final LinkedList<Object> queue = new LinkedList<>();
   /** Mutex object. */
   private final Object mutex = new Object();
-  /** Database context. */
-  private final StaticOptions sopts;
 
   /** Number of active readers. */
   private int readers;
   /** Writer flag. */
   private boolean writer;
 
-  /**
-   * Default constructor.
-   * @param ctx database context
-   */
-  public JobLocking(final Context ctx) {
-    this.sopts = ctx.soptions;
-  }
-
   @Override
-  public void acquire(final Job job) {
+  public void acquire(final Job job, final Context ctx) {
     final Object o = new Object();
 
+    final int parallel = Math.max(ctx.soptions.get(StaticOptions.PARALLEL), 1);
     synchronized(mutex) {
       // add object to queue
       queue.add(o);
 
-      final int parallel = Math.max(sopts.get(StaticOptions.PARALLEL), 1);
       while(true) {
         if(!writer && o == queue.get(0)) {
           if(job.updating) {

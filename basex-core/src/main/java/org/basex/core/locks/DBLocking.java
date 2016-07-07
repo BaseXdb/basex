@@ -90,37 +90,27 @@ public final class DBLocking implements Locking {
    * everything, an empty array lock nothing.
    */
   private final ConcurrentMap<Long, StringList> readLocked = new ConcurrentHashMap<>();
-  /** Database context. */
-  private final Context ctx;
-
-  /**
-   * Constructor.
-   * @param ctx context
-   */
-  public DBLocking(final Context ctx) {
-    this.ctx = ctx;
-  }
 
   @Override
-  public void acquire(final Job job) {
+  public void acquire(final Job job, final Context ctx) {
     // get touched databases
     final LockResult lr = new LockResult();
     job.databases(lr);
-    final StringList write = prepareLock(lr.write, lr.writeAll);
-    final StringList read = write == null ? null : prepareLock(lr.read, lr.readAll);
-    acquire(read, write);
+    final Data data = ctx.data();
+    final StringList write = prepareLock(lr.write, lr.writeAll, data);
+    final StringList read = write == null ? null : prepareLock(lr.read, lr.readAll, data);
+    acquire(read, write, ctx);
   }
 
   /**
    * Prepares the string list for locking.
    * @param sl string list
    * @param all lock all databases
+   * @param data data reference
    * @return string list, or {@code null} if all databases need to be locked
    */
-  private StringList prepareLock(final StringList sl, final boolean all) {
+  private StringList prepareLock(final StringList sl, final boolean all, final Data data) {
     if(all) return null;
-
-    final Data data = ctx.data();
     for(int d = 0; d < sl.size(); d++) {
       // replace context reference with real database name, or remove it if no database is open
       if(sl.get(d).equals(DBLocking.CONTEXT)) {
@@ -137,8 +127,9 @@ public final class DBLocking implements Locking {
    * Global locking is performed if the passed on reference is {@code null}
    * @param write names of databases to put write locks on.
    * Global locking is performed if the passed on reference is {@code null}
+   * @param ctx database context
    */
-  void acquire(final StringList read, final StringList write) {
+  void acquire(final StringList read, final StringList write, final Context ctx) {
     final long thread = Thread.currentThread().getId();
     if(writeLocked.containsKey(thread) || readLocked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");

@@ -1,5 +1,6 @@
 package org.basex.core.locks;
 
+import org.basex.core.*;
 import org.basex.core.jobs.*;
 
 /**
@@ -12,8 +13,9 @@ public interface Locking {
   /**
    * Acquires locks for the specified job.
    * @param job job to be queued
+   * @param ctx database context of client
    */
-  void acquire(final Job job);
+  void acquire(final Job job, final Context ctx);
 
   /**
    * Removes locks for the specified job.

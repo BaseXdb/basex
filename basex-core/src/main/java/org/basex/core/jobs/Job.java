@@ -44,7 +44,7 @@ public abstract class Job {
     jc.context = ctx;
     ctx.jobs.register(this);
     state(JobState.QUEUED);
-    ctx.locks.acquire(this);
+    ctx.locks.acquire(this, ctx);
     state(JobState.RUNNING);
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
