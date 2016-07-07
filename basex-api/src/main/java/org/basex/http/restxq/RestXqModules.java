@@ -38,7 +38,7 @@ public final class RestXqModules {
   /**
    * Initializes the module cache.
    */
-  void init() {
+  public void init() {
     modules = new HashMap<>();
   }
 

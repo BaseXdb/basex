@@ -42,6 +42,13 @@ public final class Restxq extends QueryModule {
   }
 
   /**
+   * Initializes the RESTXQ module cache.
+   */
+  public void init() {
+    RestXqModules.get().init();
+  }
+
+  /**
    * Returns the servlet request instance.
    * @return request
    * @throws QueryException query exception
