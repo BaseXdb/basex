@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
+import org.basex.data.*;
 import org.basex.util.*;
 
 /**
@@ -30,5 +31,15 @@ abstract class AInfo extends Command {
    */
   static void info(final TokenBuilder tb, final Object key, final Object val) {
     tb.add(' ').add(key.toString()).add(COLS).add(val.toString()).add(NL);
+  }
+
+  /**
+   * Formats the specified input.
+   * @param tb token builder
+   * @param prop meta property
+   * @param meta meta data
+   */
+  static void info(final TokenBuilder tb, final MetaProp prop, final MetaData meta) {
+    info(tb, prop.name(), prop.value(meta));
   }
 }

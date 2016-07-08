@@ -47,8 +47,6 @@ public final class MetaData {
   /** Indicates if a full-text index exists. */
   public boolean ftindex;
 
-  /** Flag for whitespace chopping. */
-  public boolean chop;
   /** Flag for activated automatic index update. */
   public boolean updindex;
   /** Flag for automatic index updating. */
@@ -126,7 +124,6 @@ public final class MetaData {
   public MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
     this.name = name;
     path = sopts != null ? sopts.dbPath(name) : null;
-    chop = options.get(MainOptions.CHOP);
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);
     createtoken = options.get(MainOptions.TOKENINDEX);
@@ -375,7 +372,6 @@ public final class MetaData {
         else if(k.equals(DBTIME))     time         = toLong(v);
         else if(k.equals(DBFSIZE))    filesize     = toLong(v);
         else if(k.equals(DBFTDC))     diacritics   = toBool(v);
-        else if(k.equals(DBCHOP))     chop         = toBool(v);
         else if(k.equals(DBUPDIDX))   updindex     = toBool(v);
         else if(k.equals(DBAUTOOPT))  autooptimize = toBool(v);
         else if(k.equals(DBTXTIDX))   textindex    = toBool(v);
@@ -424,7 +420,6 @@ public final class MetaData {
     writeInfo(out, DBFSIZE,    filesize);
     writeInfo(out, DBNDOCS,    ndocs);
     writeInfo(out, DBSIZE,     size);
-    writeInfo(out, DBCHOP,     chop);
     writeInfo(out, DBUPDIDX,   updindex);
     writeInfo(out, DBAUTOOPT,  autooptimize);
     writeInfo(out, DBTXTIDX,   textindex);

@@ -20,6 +20,9 @@ public enum Perm {
   /** Admin permission (global). */
   ADMIN;
 
+  /** Cached enums (faster). */
+  public static final Perm[] VALUES = values();
+
   /**
    * Returns the permission with more privileges.
    * @param perm permission to be compared
@@ -35,7 +38,7 @@ public enum Perm {
    * @return permission, or {@code null} if no match is found
    */
   public static Perm get(final String perm) {
-    for(final Perm p : values()) if(p.toString().equals(perm)) return p;
+    for(final Perm p : VALUES) if(p.toString().equals(perm)) return p;
     return null;
   }
 

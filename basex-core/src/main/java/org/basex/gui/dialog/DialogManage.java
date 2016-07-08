@@ -198,7 +198,7 @@ public final class DialogManage extends BaseXDialog {
         final MetaData meta = new MetaData(db, ctx.options, ctx.soptions);
         try {
           meta.read();
-          info = InfoDB.db(meta, true, true, true);
+          info = InfoDB.db(meta, true, true);
         } catch(final IOException ex) {
           info = Util.message(ex);
         }

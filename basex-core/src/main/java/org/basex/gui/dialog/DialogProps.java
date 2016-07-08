@@ -295,7 +295,7 @@ public final class DialogProps extends BaseXDialog {
       if(di != null) di.action(true);
     }
 
-    dbInfo.setText(InfoDB.db(data.meta, true, false, true));
+    dbInfo.setText(InfoDB.db(data.meta, true, false));
     nsInfo.setText(data.nspaces.info());
 
     optimize.setEnabled(outofdate);

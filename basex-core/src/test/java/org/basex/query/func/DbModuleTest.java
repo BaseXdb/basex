@@ -235,6 +235,13 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void property() {
+    query(_DB_PROPERTY.args(NAME, "name"), NAME);
+    error(_DB_PROPERTY.args(NAME, "xyz"), BXDB_PROP_X);
+  }
+
+  /** Test method. */
+  @Test
   public void nodeID() {
     query(_DB_NODE_ID.args(" /html"), "1");
     query(_DB_NODE_ID.args(" / | /html"), "0\n1");

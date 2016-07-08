@@ -138,6 +138,8 @@ public enum QueryError {
   BXDB_NOBACKUP_X(BXDB, 15, "No backup found: %."),
   /** BXDB0016. */
   BXDB_SAME_X(BXDB, 16, "Name of source and target database is equal: %."),
+  /** BXDB0017. */
+  BXDB_PROP_X(BXDB, 17, "Unknown database property: %."),
 
   // Fetch Module
 

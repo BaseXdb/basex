@@ -765,8 +765,6 @@ public interface Text {
   String NAME = lang("name");
   /** "Size". */
   String SIZE = lang("size");
-  /** "Nodes". */
-  String NODES = lang("nodes");
   /** "Type". */
   String TYPE = lang("type");
   /** "Input path". */
@@ -775,12 +773,6 @@ public interface Text {
   String TIMESTAMP = lang("timestamp");
   /** "Resources". */
   String RESOURCES = lang("resources");
-  /** "Documents". */
-  String DOCUMENTS = lang("documents");
-  /** "Binaries". */
-  String BINARIES = lang("binaries");
-  /** "Input Size". */
-  String INPUT_SIZE = lang("input_size");
   /** "Encoding". */
   String ENCODING = lang("encoding");
   /** "Method". */
@@ -844,8 +836,6 @@ public interface Text {
   String PATH_INDEX = lang("path_index");
   /** Info on token index. */
   String TOKEN_INDEX = lang("token_index");
-  /** Info on up-to-date. */
-  String UP_TO_DATE = lang("up_to_date");
 
   /** Info on elements. */
   String ELEMENTS = lang("elements");

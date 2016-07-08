@@ -3,14 +3,10 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
-import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.Cmd;
-import org.basex.core.parse.Commands.CmdInfo;
-import org.basex.core.users.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -31,8 +27,7 @@ public final class InfoDB extends AInfo {
 
   @Override
   protected boolean run() throws IOException {
-    final boolean create = context.user().has(Perm.CREATE);
-    out.print(db(context.data().meta, false, true, create));
+    out.print(db(context.data().meta, false, true));
     return true;
   }
 
@@ -46,54 +41,36 @@ public final class InfoDB extends AInfo {
    * @param meta meta data
    * @param bold header bold header flag
    * @param index add index information
-   * @param create create permissions
    * @return info string
    */
-  public static String db(final MetaData meta, final boolean bold, final boolean index,
-      final boolean create) {
-
+  public static String db(final MetaData meta, final boolean bold, final boolean index) {
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ? new TokenBuilder().bold().add('%').norm().toString() : "%") + NL;
     tb.addExt(header, DB_PROPS);
-    info(tb, NAME, meta.name);
-    info(tb, SIZE, Performance.format(meta.dbsize()));
-    info(tb, NODES, meta.size);
+    info(tb, MetaProp.NAME, meta);
+    info(tb, MetaProp.SIZE.name(), Performance.format(meta.dbsize()));
+    info(tb, MetaProp.NODES, meta);
 
     // count number of raw files
-    info(tb, DOCUMENTS, meta.ndocs);
-    info(tb, BINARIES, meta.path != null ? meta.binaries().descendants().size() : 0);
-    info(tb, TIMESTAMP, DateTime.format(new Date(meta.dbtime())));
-    info(tb, UP_TO_DATE, meta.uptodate);
+    info(tb, MetaProp.DOCUMENTS, meta);
+    info(tb, MetaProp.BINARIES, meta);
+    info(tb, MetaProp.TIMESTAMP, meta);
+    info(tb, MetaProp.UPTODATE, meta);
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
     tb.add(NL).addExt(header, RES_PROPS);
-    if(create && !meta.original.isEmpty()) info(tb, INPUT_PATH, meta.original);
-    if(meta.filesize != 0) info(tb, INPUT_SIZE, Performance.format(meta.filesize));
-    info(tb, TIMESTAMP, DateTime.format(new Date(meta.time)));
+    info(tb, MetaProp.INPUTPATH, meta);
+    info(tb, MetaProp.INPUTSIZE.name(), Performance.format(meta.filesize));
+    info(tb, MetaProp.INPUTDATE, meta);
 
     if(index) {
       tb.add(NL).addExt(header, INDEXES);
       if(meta.oldindex()) {
         tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
-        info(tb, MainOptions.TEXTINDEX.name(), meta.textindex);
-        info(tb, MainOptions.ATTRINDEX.name(), meta.attrindex);
-        info(tb, MainOptions.TOKENINDEX.name(), meta.tokenindex);
-        info(tb, MainOptions.FTINDEX.name(), meta.ftindex);
-        info(tb, MainOptions.TEXTINCLUDE.name(), meta.textinclude);
-        info(tb, MainOptions.ATTRINCLUDE.name(), meta.attrinclude);
-        info(tb, MainOptions.TOKENINCLUDE.name(), meta.tokeninclude);
-        info(tb, MainOptions.FTINCLUDE.name(), meta.ftinclude);
-        info(tb, MainOptions.LANGUAGE.name(), meta.language);
-        info(tb, MainOptions.STEMMING.name(), meta.stemming);
-        info(tb, MainOptions.CASESENS.name(), meta.casesens);
-        info(tb, MainOptions.DIACRITICS.name(), meta.diacritics);
-        info(tb, MainOptions.STOPWORDS.name(), meta.stopwords);
-        info(tb, MainOptions.UPDINDEX.name(), meta.updindex);
-        info(tb, MainOptions.AUTOOPTIMIZE.name(), meta.autooptimize);
-        info(tb, MainOptions.MAXCATS.name(), meta.maxcats);
-        info(tb, MainOptions.MAXLEN.name(), meta.maxlen);
-        info(tb, MainOptions.SPLITSIZE.name(), meta.splitsize);
+        for(final MetaProp prop : MetaProp.VALUES) {
+          if(prop.index) info(tb, prop, meta);
+        }
       }
     }
     return tb.toString();

@@ -1,7 +1,6 @@
 package org.basex.query.func.db;
 
 import org.basex.core.cmd.*;
-import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -20,7 +19,6 @@ public final class DbInfo extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
-    final boolean create = qc.context.user().has(Perm.CREATE);
-    return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
+    return toNode(InfoDB.db(data.meta, false, true), DATABASE);
   }
 }

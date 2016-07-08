@@ -781,7 +781,9 @@ public enum Function {
   /** XQuery function. */
   _DB_SYSTEM(DbSystem.class, "system()", arg(), STR, DB_URI),
   /** XQuery function. */
-  _DB_INFO(DbInfo.class, "info(database)", arg(ITEM), STR, DB_URI),
+  _DB_INFO(DbInfo.class, "info(database)", arg(STR), STR, DB_URI),
+  /** XQuery function. */
+  _DB_PROPERTY(DbProperty.class, "property(database,name)", arg(STR, STR), ITEM, DB_URI),
   /** XQuery function. */
   _DB_NODE_ID(DbNodeId.class, "node-id(nodes)", arg(NOD_ZM), ITR_ZM, DB_URI),
   /** XQuery function. */
