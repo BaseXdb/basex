@@ -88,13 +88,21 @@ function _:jobs-users(
         {
           let $entries :=
             for $id in Sessions:ids()
-            for $name in Sessions:names($id)
-            for $session in Sessions:get($id, $name)
             let $access := Sessions:accessed($id)
             let $you := if(Session:id() = $id) then '✓' else '–'
-            let $value :=
-              if ($session instance of element()) then $session/name
-              else if($session instance of xs:string) then $session else ()
+            for $name in Sessions:names($id)
+            for $value in try {
+              let $attr := Sessions:get($id, $name)
+              return if($attr instance of element()) then (
+                $attr/name
+              ) else if($attr instance of xs:string) then (
+                $attr
+              ) else (
+                '...'
+              )
+            } catch bxerr:BXSE0002 {
+              (: ignore non-XQuery session values :)
+            }
             return <e id='{ $id || '|' || $name }' name='{ $name }' value='{ $value }'
              access='{ $access }' you='{ $you }'/>
           let $headers := (
