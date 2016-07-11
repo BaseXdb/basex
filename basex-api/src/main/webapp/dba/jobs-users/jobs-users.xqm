@@ -79,8 +79,7 @@ function _:jobs-users(
           let $buttons := (
             html:button('stop-job', 'Stop', true())
           )
-          let $link := function($value) { 'job' }
-          return html:table($entries, $headers, $buttons, map {}, $sort, $link)
+          return html:table($entries, $headers, $buttons, map {}, $sort)
         }
         </form>
         <form action="{ $_:CAT }" method="post" class="update">
@@ -147,7 +146,7 @@ function _:jobs-users(
             html:button('drop-user', 'Drop', true())
           )
           let $link := function($value) { 'user' }
-          return html:table($entries, $headers, $buttons)
+          return html:table($entries, $headers, $buttons, map {}, (), $link)
         }
         </form>
         <div>&#xa0;</div>
