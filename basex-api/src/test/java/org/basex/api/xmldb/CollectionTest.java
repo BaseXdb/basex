@@ -316,7 +316,7 @@ public final class CollectionTest extends XMLDBBaseTest {
 
     // the following tests are database specific...
     assertEquals(COLL, coll.getProperty("name"));
-    assertEquals("true", coll.getProperty("chop"));
+    assertEquals("false", coll.getProperty("casesens"));
   }
 
   @Test
