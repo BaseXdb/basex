@@ -33,8 +33,6 @@ public final class JobsEval extends StandardFunc {
 
     // copy variable values
     final Context ctx = qc.context;
-    if(qc.parent != null && qc.parent.parent != null) throw BXXQ_NESTED.get(info);
-
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
       bindings.put(key, ScheduledXQuery.copy(it.getValue().iter(), ctx, qc));

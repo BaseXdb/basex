@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.util.concurrent.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -24,15 +25,17 @@ public final class XQueryForkJoin extends StandardFunc {
       if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
         throw ZEROFUNCS_X_X.get(info, func.type, func);
     }
-    if(qc.parent != null) throw BXXQ_NESTED.get(info);
 
     final ForkJoinPool pool = new ForkJoinPool();
     final ForkJoinTask task = new ForkJoinTask(funcs, qc, info);
     try {
       return pool.invoke(task);
     } catch(final Exception ex) {
+      // pass on query and job exceptions
       final Throwable e = Util.rootException(ex);
-      throw e instanceof QueryException ? (QueryException) e : BXXQ_UNEXPECTED_X.get(info, e);
+      if(e instanceof QueryException) throw (QueryException) e;
+      if(e instanceof JobException) throw (JobException) e;
+      throw BXXQ_UNEXPECTED_X.get(info, e);
     } finally {
       // required?
       pool.shutdown();
