@@ -71,9 +71,6 @@ public final class MemData extends Data {
   }
 
   @Override
-  public void close() { }
-
-  @Override
   public void createIndex(final IndexType type, final Command cmd) throws IOException {
     final IndexBuilder ib;
     switch(type) {

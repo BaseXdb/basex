@@ -34,8 +34,6 @@ public final class DiskData extends Data {
   private DataAccess texts;
   /** Values access file. */
   private DataAccess values;
-  /** Closed flag. */
-  private boolean closed;
 
   /**
    * Default constructor, called from {@link Open#open}.
@@ -135,7 +133,7 @@ public final class DiskData extends Data {
   @Override
   public synchronized void close() {
     if(closed) return;
-    closed = true;
+    super.close();
     try {
       write();
       table.close();

@@ -108,6 +108,8 @@ public abstract class Data {
 
   /** Table access file. */
   protected TableAccess table;
+  /** Closed flag. */
+  protected boolean closed;
 
   /**
    * Default constructor.
@@ -120,7 +122,17 @@ public abstract class Data {
   /**
    * Closes the database.
    */
-  public abstract void close();
+  public void close() {
+    closed = true;
+  }
+
+  /**
+   * Indicates if the database has been closed.
+   * @return result of check
+   */
+  public final boolean closed() {
+    return closed;
+  }
 
   /**
    * Drops the specified index.

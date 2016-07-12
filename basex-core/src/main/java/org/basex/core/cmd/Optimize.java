@@ -75,9 +75,11 @@ public final class Optimize extends ACreate {
   /**
    * Optimizes a database after updates.
    * @param data data
-   * @throws IOException I/O Exception during index rebuild
+   * @throws IOException I/O Exception
    */
   public static void finish(final Data data) throws IOException {
+    // do nothing if database has been closed
+    if(data.closed()) return;
     // GH-676: optimize database and rebuild index structures if ID has turned negative
     if(data.meta.lastid < data.meta.size - 1) optimizeIds(data);
     // GH-1035: auto-optimize database
