@@ -5,9 +5,7 @@ import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
-import java.util.*;
 
-import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -150,7 +148,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     try {
       final String list = query(_JOBS_LIST_DETAILS.args() + "[@id = '" + id + "']");
       query(list + "/@user/string()", UserText.ADMIN);
-      query(list + "/@state/string()", JobState.RUNNING.toString().toLowerCase(Locale.ENGLISH));
+      query(list + "/@state/string() = ('running', 'queued')", true);
       query(list + "/@duration/string() castable as xs:dayTimeDuration", "true");
     } finally {
       query(_JOBS_STOP.args(id));
