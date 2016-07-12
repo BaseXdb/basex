@@ -54,16 +54,16 @@ public final class Add extends ACreate {
       if(!build()) return false;
 
       // skip update if fragment is empty
+      final Data data = context.data();
       if(clip.data.meta.size > 1) {
-        if(!startUpdate()) return false;
+        if(!startUpdate(data)) return false;
 
         context.invalidate();
-        final Data data = context.data();
         final AtomicUpdateCache auc = new AtomicUpdateCache(data);
         auc.addInsert(data.meta.size, -1, clip);
         auc.execute(false);
 
-        if(!finishUpdate()) return false;
+        if(!finishUpdate(data)) return false;
       }
       return info(RES_ADDED_X, job().performance);
     } finally {

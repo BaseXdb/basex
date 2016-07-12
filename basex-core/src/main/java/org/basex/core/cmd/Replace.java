@@ -51,12 +51,12 @@ public final class Replace extends ACreate {
     final IOFile bin = data.meta.binary(path);
     if(!data.inMemory() && bin == null) return error(PATH_INVALID_X, args[0]);
 
-    if(!startUpdate()) return false;
+    if(!startUpdate(data)) return false;
     boolean ok = true;
     try {
       ok = replace(data, bin, path);
     } finally {
-      ok &= finishUpdate();
+      ok &= finishUpdate(data);
     }
     return ok;
   }

@@ -42,13 +42,17 @@ public final class OptimizeAll extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
+    if(!startUpdate(data)) return false;
+    boolean ok = true;
     try {
       optimizeAll(data, context, options, this);
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      ok = error(Util.message(ex));
     } finally {
       context.closeDB();
+      ok &= finishUpdate(data);
     }
+    if(!ok) return false;
 
     final Open open = new Open(data.meta.name);
     return open.run(context) ? info(DB_OPTIMIZED_X, data.meta.name, job().performance) :
@@ -102,10 +106,10 @@ public final class OptimizeAll extends ACreate {
 
     final DiskData odata = (DiskData) data;
     final MetaData ometa = odata.meta;
-    final String name = ometa.name;
 
     // check if database is also pinned by other users
-    if(context.datas.pins(ometa.name) > 1) throw new BaseXException(DB_PINNED_X, name);
+    final String name = ometa.name;
+    if(context.datas.pins(name) > 1) throw new BaseXException(DB_PINNED_X, name);
 
     // adopt original index options
     options.set(MainOptions.TEXTINDEX, ometa.textindex);
@@ -129,33 +133,35 @@ public final class OptimizeAll extends ACreate {
     // build database and index structures
     if(cmd != null) cmd.size = ometa.size;
     final StaticOptions sopts = context.soptions;
-    final String tname = sopts.randomDbName(name);
+    final String tmpName = sopts.randomDbName(name);
     final DBParser parser = new DBParser(odata, options, cmd);
-    try(final DiskBuilder builder = new DiskBuilder(tname, parser, sopts, options)) {
-      final DiskData dt = builder.build();
+    try(final DiskBuilder builder = new DiskBuilder(tmpName, parser, sopts, options)) {
+      final DiskData ndata = builder.build();
+      final MetaData nmeta = ndata.meta;
       try {
-        // adopt original meta data
-        dt.meta.createtext = ometa.createtext;
-        dt.meta.createattr = ometa.createattr;
-        dt.meta.createtoken = ometa.createtoken;
-        dt.meta.createft = ometa.createft;
-        dt.meta.filesize = ometa.filesize;
-        dt.meta.dirty = true;
-        CreateIndex.create(dt, cmd);
+        // adopt original meta data, create new index structures
+        nmeta.createtext = ometa.createtext;
+        nmeta.createattr = ometa.createattr;
+        nmeta.createtoken = ometa.createtoken;
+        nmeta.createft = ometa.createft;
+        nmeta.original = ometa.original;
+        nmeta.filesize = ometa.filesize;
+        nmeta.time = ometa.time;
+        nmeta.dirty = true;
+        CreateIndex.create(ndata, cmd);
 
         // move binary files
-        final IOFile bin = data.meta.binaries();
-        if(bin.exists()) bin.rename(dt.meta.binaries());
-        final IOFile upd = odata.meta.updateFile();
-        if(upd.exists()) upd.copyTo(dt.meta.updateFile());
+        final IOFile bin = ometa.binaries();
+        if(bin.exists()) bin.rename(nmeta.binaries());
       } finally {
-        dt.close();
+        ndata.close();
       }
     }
+
     // close old database instance, drop it and rename temporary database
-    Close.close(data, context);
+    Close.close(odata, context);
     if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);
-    if(!AlterDB.alter(tname, name, sopts)) throw new BaseXException(DB_NOT_RENAMED_X, tname);
+    if(!AlterDB.alter(tmpName, name, sopts)) throw new BaseXException(DB_NOT_RENAMED_X, tmpName);
   }
 
   /**

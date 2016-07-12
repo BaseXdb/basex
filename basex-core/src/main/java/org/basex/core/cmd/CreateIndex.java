@@ -58,7 +58,7 @@ public final class CreateIndex extends ACreate {
     data.meta.names(type, options);
     data.meta.splitsize = options.get(MainOptions.SPLITSIZE);
 
-    if(!startUpdate()) return false;
+    if(!startUpdate(data)) return false;
     boolean ok = true;
     try {
       create(type, data, this);
@@ -66,7 +66,7 @@ public final class CreateIndex extends ACreate {
     } catch(final IOException ex) {
       ok = error(Util.message(ex));
     } finally {
-      ok &= finishUpdate();
+      ok &= finishUpdate(data);
     }
     return ok;
   }

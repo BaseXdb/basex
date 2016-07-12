@@ -38,13 +38,13 @@ public final class Optimize extends ACreate {
     final MetaData meta = data.meta;
     size = meta.size;
 
-    if(!startUpdate()) return false;
+    if(!startUpdate(data)) return false;
     boolean ok = true;
     try {
       // reassign autooptimize flag
-      final boolean autoopt = options.get(MainOptions.AUTOOPTIMIZE);
-      if(autoopt != data.meta.autooptimize) {
-        data.meta.autooptimize = autoopt;
+      final boolean autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
+      if(autooptimize != data.meta.autooptimize) {
+        data.meta.autooptimize = autooptimize;
         data.meta.dirty = true;
       }
       optimize(data, this);
@@ -52,7 +52,7 @@ public final class Optimize extends ACreate {
     } catch(final IOException ex) {
       ok = error(Util.message(ex));
     } finally {
-      ok &= finishUpdate();
+      ok &= finishUpdate(data);
     }
     return ok;
   }

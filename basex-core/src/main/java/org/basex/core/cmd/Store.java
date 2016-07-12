@@ -64,7 +64,7 @@ public final class Store extends ACreate {
       return error(PATH_INVALID_X, create ? path : args[0]);
 
     // start update
-    if(lock && !startUpdate()) return false;
+    if(lock && !startUpdate(data)) return false;
     boolean ok = true;
     try {
       store(in, file);
@@ -73,7 +73,7 @@ public final class Store extends ACreate {
       Util.debug(ex);
       ok = error(FILE_NOT_SAVED_X, file);
     } finally {
-      if(lock) ok &= finishUpdate();
+      if(lock) ok &= finishUpdate(data);
     }
     return ok;
   }

@@ -109,11 +109,11 @@ public final class CreateDB extends ACreate {
         data = context.data();
       }
 
-      if(!startUpdate()) return false;
+      if(!startUpdate(data)) return false;
       try {
         CreateIndex.create(data, this);
       } finally {
-        if(!finishUpdate()) return false;
+        if(!finishUpdate(data)) return false;
       }
 
       if(options.get(MainOptions.CREATEONLY)) new Close().run(context);

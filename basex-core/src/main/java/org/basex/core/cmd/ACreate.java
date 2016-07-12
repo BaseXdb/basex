@@ -7,7 +7,9 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
+import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Abstract class for database creation commands.
@@ -73,18 +75,33 @@ public abstract class ACreate extends Command {
 
   /**
    * Starts an update operation.
+   * @param data data reference
    * @return success flag
    */
-  final boolean startUpdate() {
-    return startUpdate(context.data());
+  final boolean startUpdate(final Data data) {
+    try {
+      data.startUpdate(options);
+      return true;
+    } catch(final IOException ex) {
+      info(Util.message(ex));
+      return false;
+    }
   }
 
   /**
    * Finalizes an update operation.
+   * @param data data reference
    * @return success flag
    */
-  final boolean finishUpdate() {
-    return finishUpdate(context.data());
+  final boolean finishUpdate(final Data data) {
+    try {
+      Optimize.finish(data);
+      data.finishUpdate(options);
+      return true;
+    } catch(final IOException ex) {
+      info(Util.message(ex));
+      return false;
+    }
   }
 
   @Override

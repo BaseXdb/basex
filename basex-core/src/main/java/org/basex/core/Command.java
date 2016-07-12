@@ -359,37 +359,6 @@ public abstract class Command extends Job {
   }
 
   /**
-   * Starts an update operation.
-   * @param data data reference
-   * @return success flag
-   */
-  protected final boolean startUpdate(final Data data) {
-    try {
-      data.startUpdate(options);
-      return true;
-    } catch(final IOException ex) {
-      info(Util.message(ex));
-      return false;
-    }
-  }
-
-  /**
-   * Finalizes an update operation.
-   * @param data data reference
-   * @return success flag
-   */
-  protected final boolean finishUpdate(final Data data) {
-    try {
-      Optimize.finish(data);
-      data.finishUpdate(options);
-      return true;
-    } catch(final IOException ex) {
-      info(Util.message(ex));
-      return false;
-    }
-  }
-
-  /**
    * Returns the specified command option.
    * @param string string to be found
    * @param type options enumeration

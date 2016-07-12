@@ -49,7 +49,7 @@ public final class DropIndex extends ACreate {
     }
     data.meta.names(type, options);
 
-    if(!startUpdate()) return false;
+    if(!startUpdate(data)) return false;
     boolean ok = true;
     try {
       drop(type, data);
@@ -57,7 +57,7 @@ public final class DropIndex extends ACreate {
     } catch(final IOException ex) {
       ok = error(Util.message(ex));
     } finally {
-      ok &= finishUpdate();
+      ok &= finishUpdate(data);
     }
     return ok;
   }

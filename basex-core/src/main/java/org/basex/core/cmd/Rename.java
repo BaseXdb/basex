@@ -34,7 +34,7 @@ public final class Rename extends ACreate {
     if(trg == null) return error(NAME_INVALID_X, args[1]);
 
     // start update
-    if(!startUpdate()) return false;
+    if(!startUpdate(data)) return false;
 
     boolean ok = true;
     int c = 0;
@@ -60,7 +60,7 @@ public final class Rename extends ACreate {
     }
 
     // finish update
-    if(!finishUpdate()) return false;
+    if(!finishUpdate(data)) return false;
 
     // return info message
     return info(RES_RENAMED_X_X, c, job().performance) && ok;
