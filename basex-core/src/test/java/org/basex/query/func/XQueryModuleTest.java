@@ -84,6 +84,7 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     // run slow and fast query and check that results are returned in the correct order
     query(_XQUERY_FORK_JOIN.args("(function() { (1 to 10000000)[.=1] }, true#0)"), "1\ntrue");
     query(_XQUERY_FORK_JOIN.args("(true#0, function() { (1 to 10000000)[.=1] })"), "true\n1");
+    query(_XQUERY_FORK_JOIN.args("()"), "");
 
     // errors
     error(_XQUERY_FORK_JOIN.args(" count#1"), ZEROFUNCS_X_X);

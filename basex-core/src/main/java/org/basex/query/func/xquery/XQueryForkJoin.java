@@ -10,6 +10,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -25,6 +26,7 @@ public final class XQueryForkJoin extends StandardFunc {
       if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
         throw ZEROFUNCS_X_X.get(info, func.type, func);
     }
+    if(funcs.isEmpty()) return Empty.SEQ;
 
     final ForkJoinPool pool = new ForkJoinPool();
     final ForkJoinTask task = new ForkJoinTask(funcs, qc, info);
