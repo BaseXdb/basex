@@ -65,7 +65,7 @@ final class ForkJoinTask extends RecursiveTask<Value> {
       } finally {
         qc.close();
       }
-    } else {
+    } else if(l > 1) {
       // split the work and join the results in the correct order
       final int m = s + l / 2;
       final ForkJoinTask task2 = new ForkJoinTask(funcs, qc, ii, m, e);
