@@ -17,6 +17,7 @@ import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -302,6 +303,7 @@ public final class HttpClient {
     // choose serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    sopts.set(SerializerOptions.NEWLINE, Newline.NL);
 
     String src = null, method = null;
     for(final Entry<String, String> entry : atts.entrySet()) {
