@@ -1591,15 +1591,6 @@ public enum QueryError {
   }
 
   /**
-   * Throws an exception for circular static variables.
-   * @param var variable expression
-   * @return never
-   */
-  public static QueryException circVarError(final StaticVar var) {
-    return CIRCVAR_X.get(var.info, var);
-  }
-
-  /**
    * Chops the specified value to a maximum size.
    * @param value value
    * @param info input info

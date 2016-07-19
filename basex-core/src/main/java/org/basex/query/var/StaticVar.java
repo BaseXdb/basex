@@ -49,8 +49,8 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public void compile(final QueryContext qc) throws QueryException {
-    if(expr == null) throw VAREMPTY_X.get(info, '$' + Token.string(name.string()));
-    if(dontEnter) throw circVarError(this);
+    if(expr == null) throw VAREMPTY_X.get(info, name());
+    if(dontEnter) throw CIRCVAR_X.get(info, name());
 
     if(!compiled) {
       dontEnter = true;
@@ -80,12 +80,12 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   Value value(final QueryContext qc) throws QueryException {
-    if(dontEnter) throw circVarError(this);
+    if(dontEnter) throw CIRCVAR_X.get(info, name());
 
     if(lazy) {
       if(!compiled) throw Util.notExpected(this + " was not compiled.");
     } else {
-      if(expr == null) throw VAREMPTY_X.get(info, this);
+      if(expr == null) throw VAREMPTY_X.get(info, name());
     }
 
     if(val != null) return val;
@@ -150,7 +150,7 @@ public final class StaticVar extends StaticDecl {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
-    tb.add(VARIABLE).add(' ').add(DOLLAR).add(name.string());
+    tb.add(VARIABLE).add(' ').add(name());
     if(type != null) tb.add(' ').add(AS).add(' ').addExt(type);
     if(external) tb.add(' ').add(EXTERNAL);
     if(expr != null) tb.add(' ').add(ASSIGN).add(' ').addExt(expr);
@@ -160,6 +160,14 @@ public final class StaticVar extends StaticDecl {
   @Override
   public byte[] id() {
     return Token.concat(new byte[] { '$' }, name.id());
+  }
+
+  /**
+   * Returns the name of the variable.
+   * @return name
+   */
+  private String name() {
+    return new TokenBuilder().add(DOLLAR).add(name.string()).toString();
   }
 
   /**
