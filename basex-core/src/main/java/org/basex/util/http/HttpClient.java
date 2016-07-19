@@ -192,9 +192,8 @@ public final class HttpClient {
       // otherwise @media-type of <http:body/> is considered
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
       if(request.isMultipart) {
-        final String b = request.payloadAtts.get(BOUNDARY);
         ct = new TokenBuilder().add(ct).add("; ").add(BOUNDARY).add('=').
-            add(b.isEmpty() ? DEFAULT_BOUNDARY : b).toString();
+            add(request.boundary()).toString();
       }
     }
     conn.setRequestProperty(CONTENT_TYPE, ct);
@@ -302,7 +301,7 @@ public final class HttpClient {
    */
   private static void writeMultipart(final HttpRequest request, final OutputStream out)
       throws IOException {
-    final String boundary = request.payloadAtts.get(BOUNDARY);
+    final String boundary = request.boundary();
     for(final Part part : request.parts) writePart(part, out, boundary);
     out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
   }

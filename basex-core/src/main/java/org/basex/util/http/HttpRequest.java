@@ -1,10 +1,11 @@
 package org.basex.util.http;
 
+import static org.basex.util.http.HttpText.*;
+
 import java.util.*;
 
 import org.basex.core.StaticOptions.AuthMethod;
 import org.basex.query.util.list.*;
-import org.basex.util.http.HttpText.*;
 
 /**
  * Container for parsed data from {@code <http:request/>}.
@@ -36,6 +37,15 @@ public final class HttpRequest {
    */
   String attribute(final Request name) {
     return attributes.get(name);
+  }
+
+  /**
+   * Returns a valid boundary.
+   * @return boundary string
+   */
+  String boundary() {
+    final String boundary = payloadAtts.get(BOUNDARY);
+    return boundary == null || boundary.isEmpty() ? DEFAULT_BOUNDARY : boundary;
   }
 
   /**
