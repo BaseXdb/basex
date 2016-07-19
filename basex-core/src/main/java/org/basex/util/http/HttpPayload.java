@@ -157,7 +157,7 @@ public final class HttpPayload {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
-    MediaType mt = MediaType.TEXT_PLAIN;
+    MediaType type = MediaType.TEXT_PLAIN;
 
     // extract headers
     for(byte[] l = line; l != null && l.length > 0;) {
@@ -165,18 +165,18 @@ public final class HttpPayload {
       if(pos > 0) {
         final byte[] key = substring(l, 0, pos);
         final byte[] val = trim(substring(l, pos + 1));
-        if(eq(lc(key), CONTENT_TYPE_LC)) mt = new MediaType(string(val));
+        if(eq(lc(key), CONTENT_TYPE_LC)) type = new MediaType(string(val));
         if(val.length != 0 && parts != null)
           parts.add(new FElem(Q_HEADER).add(NAME, key).add(VALUE, val));
       }
       l = readLine();
     }
     if(parts != null) {
-      parts.add(new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), mt.toString()));
+      parts.add(new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type.toString()));
     }
 
-    final byte[] pl = extractPart(sep, end, mt.parameters().get(CHARSET));
-    if(payloads != null) payloads.add(parse(pl, mt));
+    final byte[] payload = extractPart(sep, end, type.parameters().get(CHARSET));
+    if(payloads != null) payloads.add(parse(payload, type));
     return true;
   }
 
@@ -304,33 +304,33 @@ public final class HttpPayload {
   public static Value value(final IO input, final MainOptions options, final MediaType type)
       throws IOException, QueryException {
 
-    Value val = null;
+    Value value = null;
     if(type.is(MediaType.APPLICATION_JSON)) {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
       opts.assign(type);
-      val = JsonConverter.get(opts).convert(input);
+      value = JsonConverter.get(opts).convert(input);
     } else if(type.is(MediaType.TEXT_CSV)) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
       opts.assign(type);
-      val = CsvConverter.get(opts).convert(input);
+      value = CsvConverter.get(opts).convert(input);
     } else if(type.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
       opts.assign(type);
-      val = new DBNode(new HtmlParser(input, options, opts));
+      value = new DBNode(new HtmlParser(input, options, opts));
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
       final String enc = type.parameters().get(CHARSET);
-      val = Str.get(URLDecoder.decode(string(input.read()), enc == null ? Strings.UTF8 : enc));
+      value = Str.get(URLDecoder.decode(string(input.read()), enc == null ? Strings.UTF8 : enc));
     } else if(type.isXML()) {
-      val = new DBNode(input);
+      value = new DBNode(input);
     } else if(type.isText()) {
-      val = Str.get(new NewlineInput(input).content());
+      value = Str.get(new NewlineInput(input).content());
     } else if(type.isMultipart()) {
       try(final InputStream is = input.inputStream()) {
         final HttpPayload hp = new HttpPayload(is, true, null, options);
         hp.extractParts(concat(DASHES, hp.boundary(type)), null);
-        val = hp.payloads();
+        value = hp.payloads();
       }
     }
-    return val == null ? new B64(input.read()) : val;
+    return value == null ? new B64(input.read()) : value;
   }
 }

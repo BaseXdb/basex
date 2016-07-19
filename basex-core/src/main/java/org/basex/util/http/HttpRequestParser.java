@@ -35,6 +35,16 @@ public final class HttpRequestParser {
   }
 
   /**
+   * Parses HTTP request data.
+   * @param request request element (can be {@code null})
+   * @return parsed request
+   * @throws QueryException query exception
+   */
+  public HttpRequest parse(final ANode request) throws QueryException {
+    return parse(request, null);
+  }
+
+  /**
    * Parses an <http:request/> element.
    * @param request request element (can be {@code null})
    * @param bodies content items
@@ -54,7 +64,7 @@ public final class HttpRequestParser {
       checkRequest(req);
 
       // it is an error if content is set for HTTP verbs which must be empty
-      final ANode payload = parseHdrs(request.children(), req.headers);
+      final ANode payload = parseHeaders(request.children(), req.headers);
       final String method = req.attribute(Request.METHOD);
       if(Strings.eq(method, TRACE, DELETE) && (payload != null || bodies != null))
         throw HC_REQ_X.get(info, "Body not expected for method " + method);
@@ -64,11 +74,11 @@ public final class HttpRequestParser {
         // single part request
         if(pl.eq(Q_BODY)) {
           final Item it = bodies != null ? bodies.next() : null;
-          parseBody(payload, it, req.payloadAttrs, req.bodyContent);
+          parseBody(payload, it, req.payloadAtts, req.bodyContent);
           req.isMultipart = false;
           // multipart request
         } else if(pl.eq(Q_MULTIPART)) {
-          parseMultipart(payload, bodies, req.payloadAttrs, req.parts);
+          parseMultipart(payload, bodies, req.payloadAtts, req.parts);
           req.isMultipart = true;
         } else {
           throw HC_REQ_X.get(info, "Unknown payload element: " + payload.qname());
@@ -81,11 +91,11 @@ public final class HttpRequestParser {
   /**
    * Parses the attributes of an element.
    * @param element element
-   * @param attrs map for parsed attributes
+   * @param atts map for parsed attributes
    */
-  private static void parseAttrs(final ANode element, final HashMap<String, String> attrs) {
+  private static void parseAtts(final ANode element, final HashMap<String, String> atts) {
     for(final ANode attr : element.attributes()) {
-      attrs.put(string(attr.name()), string(attr.string()));
+      atts.put(string(attr.name()), string(attr.string()));
     }
   }
 
@@ -95,7 +105,7 @@ public final class HttpRequestParser {
    * @param hdrs map for parsed headers
    * @return body or multipart
    */
-  private static ANode parseHdrs(final BasicNodeIter iter, final HashMap<String, String> hdrs) {
+  private static ANode parseHeaders(final BasicNodeIter iter, final HashMap<String, String> hdrs) {
     for(final ANode node : iter) {
       final QNm nm = node.qname();
       if(nm == null) continue;
@@ -118,17 +128,17 @@ public final class HttpRequestParser {
    * Parses <http:body/> element.
    * @param body body element
    * @param contItem content item
-   * @param attrs map for parsed body attributes
+   * @param atts map for parsed body attributes
    * @param bodyContent item cache for parsed body content
    * @throws QueryException query exception
    */
-  private void parseBody(final ANode body, final Item contItem, final HashMap<String, String> attrs,
+  private void parseBody(final ANode body, final Item contItem, final HashMap<String, String> atts,
       final ItemList bodyContent) throws QueryException {
 
-    parseAttrs(body, attrs);
-    checkBody(body, attrs);
+    parseAtts(body, atts);
+    checkBody(body, atts);
 
-    if(attrs.get(SRC) == null) {
+    if(atts.get(SRC) == null) {
       // no linked resource for setting request content
       if(contItem == null) {
         // content is set from <http:body/> children
@@ -144,25 +154,25 @@ public final class HttpRequestParser {
    * Parses a <http:multipart/> element.
    * @param multipart multipart element
    * @param contItems content items
-   * @param attrs map for multipart attributes
+   * @param atts map for multipart attributes
    * @param parts list for multipart parts
    * @throws QueryException query exception
    */
   private void parseMultipart(final ANode multipart, final Iter contItems,
-      final HashMap<String, String> attrs, final ArrayList<Part> parts) throws QueryException {
+      final HashMap<String, String> atts, final ArrayList<Part> parts) throws QueryException {
 
-    parseAttrs(multipart, attrs);
-    if(attrs.get(SerializerOptions.MEDIA_TYPE.name()) == null)
+    parseAtts(multipart, atts);
+    if(atts.get(SerializerOptions.MEDIA_TYPE.name()) == null)
       throw HC_REQ_X.get(info, "Attribute media-type of http:multipart is mandatory");
 
     final BasicNodeIter prts = multipart.children();
     while(true) {
       final Part p = new Part();
-      final ANode partBody = parseHdrs(prts, p.headers);
+      final ANode partBody = parseHeaders(prts, p.headers);
       if(partBody == null) break;
       // content is set from <http:body/> children or from $bodies parameter
       final Item ci = contItems == null ? null : contItems.next();
-      parseBody(partBody, ci, p.bodyAttrs, p.bodyContent);
+      parseBody(partBody, ci, p.bodyAtts, p.bodyContent);
       parts.add(p);
     }
   }
@@ -213,19 +223,19 @@ public final class HttpRequestParser {
   /**
    * Checks consistency of attributes for <http:body/>.
    * @param body body
-   * @param bodyAttrs body attributes
+   * @param bodyAtts body attributes
    * @throws QueryException query exception
    */
-  private void checkBody(final ANode body, final HashMap<String, String> bodyAttrs)
+  private void checkBody(final ANode body, final HashMap<String, String> bodyAtts)
       throws QueryException {
 
     // @media-type is mandatory
-    if(bodyAttrs.get(SerializerOptions.MEDIA_TYPE.name()) == null)
+    if(bodyAtts.get(SerializerOptions.MEDIA_TYPE.name()) == null)
       throw HC_REQ_X.get(info, "Attribute media-type of http:body is mandatory");
 
     // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present
-    if(bodyAttrs.get(SRC) != null && (bodyAttrs.size() > 2 || body.children().next() != null))
+    if(bodyAtts.get(SRC) != null && (bodyAtts.size() > 2 || body.children().next() != null))
       throw HC_ATTR.get(info);
 
   }

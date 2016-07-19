@@ -10,12 +10,11 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.core.*;
-import org.basex.core.StaticOptions.AuthMethod;
+import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -23,8 +22,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.http.HttpRequest.Part;
-import org.basex.util.http.HttpText.Request;
+import org.basex.util.http.HttpRequest.*;
 import org.basex.util.options.Options.*;
 
 /**
@@ -57,7 +55,7 @@ public final class HttpClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public Iter sendRequest(final byte[] href, final ANode request, final Iter bodies)
+  public ValueIter sendRequest(final byte[] href, final ANode request, final Iter bodies)
       throws QueryException {
 
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);
@@ -72,7 +70,7 @@ public final class HttpClient {
       if(url == null || url.isEmpty()) throw HC_URL.get(info);
       conn = connect(url, req);
 
-      if(req.bodyContent.size() != 0 || !req.parts.isEmpty()) {
+      if(!req.bodyContent.isEmpty() || !req.parts.isEmpty()) {
         setContentType(conn, req);
         setRequestContent(conn.getOutputStream(), req);
       }
@@ -180,7 +178,7 @@ public final class HttpClient {
   }
 
   /**
-   * Sets content type of HTTP request.
+   * Sets the content type of the HTTP request.
    * @param conn HTTP connection
    * @param request request data
    */
@@ -192,9 +190,9 @@ public final class HttpClient {
       ct = contType;
     } else {
       // otherwise @media-type of <http:body/> is considered
-      ct = request.payloadAttrs.get(SerializerOptions.MEDIA_TYPE.name());
+      ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
       if(request.isMultipart) {
-        final String b = request.payloadAttrs.get(BOUNDARY);
+        final String b = request.payloadAtts.get(BOUNDARY);
         ct = new TokenBuilder().add(ct).add("; ").add(BOUNDARY).add('=').
             add(b.isEmpty() ? DEFAULT_BOUNDARY : b).toString();
       }
@@ -203,7 +201,7 @@ public final class HttpClient {
   }
 
   /**
-   * Parsing header for digest authentication.
+   * Parses the header for digest authentication.
    * @param auth authorization string
    * @return values values
    */
@@ -238,7 +236,7 @@ public final class HttpClient {
     if(request.isMultipart) {
       writeMultipart(request, out);
     } else {
-      writePayload(request.bodyContent, request.payloadAttrs, out);
+      writePayload(request.bodyContent, request.payloadAtts, out);
     }
     out.close();
   }
@@ -253,62 +251,45 @@ public final class HttpClient {
   private static void writePayload(final ItemList payload, final HashMap<String, String> atts,
       final OutputStream out) throws IOException {
 
-    // detect method (specified by @method or derived from @media-type)
-    String method = atts.get(SerializerOptions.METHOD.name());
-    if(method == null) {
-      final MediaType type = new MediaType(atts.get(SerializerOptions.MEDIA_TYPE.name()));
-      if(type.is(MediaType.APPLICATION_HTML_XML)) {
-        method = SerialMethod.XHTML.toString();
-      } else if(type.is(MediaType.TEXT_HTML)) {
-        method = SerialMethod.HTML.toString();
-      } else if(type.isXML()) {
-        method = SerialMethod.XML.toString();
-      } else if(type.isText()) {
-        method = SerialMethod.TEXT.toString();
-      } else {
-        // default serialization method is XML
-        method = SerialMethod.XML.toString();
-      }
-    }
-
-    // write content depending on the method
-    final String src = atts.get(SRC);
-    if(src == null) {
-      write(payload, atts, method, out);
-    } else {
-      final IOUrl io = new IOUrl(src);
-      if(Strings.eq(method, BINARY)) {
-        out.write(io.read());
-      } else {
-        final ItemList buffer = new ItemList().add(Str.get(new TextInput(io).content()));
-        write(buffer, atts, method, out);
-      }
-    }
-  }
-
-  /**
-   * Writes the payload of a body using the serialization parameters.
-   * @param payload payload
-   * @param attrs payload attributes
-   * @param method serialization method
-   * @param out connection output stream
-   * @throws IOException I/O Exception
-   */
-  private static void write(final ItemList payload, final HashMap<String, String> attrs,
-      final String method, final OutputStream out) throws IOException {
-
-    // extract serialization parameters
+    // choose serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, method);
     sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    for(final Entry<String, String> attr : attrs.entrySet()) {
-      final String key = attr.getKey();
-      if(!key.equals(SRC)) sopts.assign(key, attr.getValue());
-    }
 
-    // serialize items according to the parameters
-    try(final Serializer ser = Serializer.get(out, sopts)) {
-      for(final Item it : payload) ser.serialize(it);
+    String src = null, method = null;
+    for(final Entry<String, String> entry : atts.entrySet()) {
+      final String key = entry.getKey(), value = entry.getValue();
+      if(key.equals(SRC)) {
+        src = value;
+      } else if(key.equals(SerializerOptions.METHOD.name())) {
+        method = value.equals(BINARY) ? SerialMethod.BASEX.toString() : value;
+      } else {
+        sopts.assign(key, value);
+        // no method specified (yet): choose method based on media type
+        if(method == null && key.equals(SerializerOptions.MEDIA_TYPE.name())) {
+          final MediaType type = new MediaType(value);
+          if(type.is(MediaType.APPLICATION_HTML_XML)) {
+            method = SerialMethod.XHTML.toString();
+          } else if(type.is(MediaType.TEXT_HTML)) {
+            method = SerialMethod.HTML.toString();
+          } else if(type.isXML()) {
+            method = SerialMethod.XML.toString();
+          } else if(type.isText()) {
+            method = SerialMethod.TEXT.toString();
+          } else {
+            method = SerialMethod.BASEX.toString();
+          }
+        }
+      }
+    }
+    sopts.assign(SerializerOptions.METHOD.name(), method);
+
+    // serialize payload
+    if(src != null) {
+      out.write(IO.get(src).read());
+    } else {
+      try(final Serializer ser = Serializer.get(out, sopts)) {
+        for(final Item it : payload) ser.serialize(it);
+      }
     }
   }
 
@@ -321,7 +302,7 @@ public final class HttpClient {
    */
   private static void writeMultipart(final HttpRequest request, final OutputStream out)
       throws IOException {
-    final String boundary = request.payloadAttrs.get(BOUNDARY);
+    final String boundary = request.payloadAtts.get(BOUNDARY);
     for(final Part part : request.parts) writePart(part, out, boundary);
     out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
   }
@@ -341,6 +322,10 @@ public final class HttpClient {
     boundTb.add("--").add(boundary).add(CRLF);
     out.write(boundTb.finish());
 
+    final HashMap<String, String> bodyAtts = part.bodyAtts;
+    final String mt = bodyAtts.get(SerializerOptions.MEDIA_TYPE.name());
+    if(!part.headers.containsKey(CONTENT_TYPE)) part.headers.put(CONTENT_TYPE, mt);
+
     // write headers
     for(final Entry<String, String> header : part.headers.entrySet()) {
       final TokenBuilder hdrTb = new TokenBuilder();
@@ -350,7 +335,7 @@ public final class HttpClient {
     out.write(CRLF);
 
     // write content
-    writePayload(part.bodyContent, part.bodyAttrs, out);
+    writePayload(part.bodyContent, bodyAtts, out);
     out.write(CRLF);
   }
 }
