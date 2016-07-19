@@ -52,20 +52,20 @@ public final class HttpRequestParser {
    * @throws QueryException query exception
    */
   public HttpRequest parse(final ANode request, final Iter bodies) throws QueryException {
-    final HttpRequest req = new HttpRequest();
+    final HttpRequest hr = new HttpRequest();
 
     if(request != null) {
       for(final ANode attr : request.attributes()) {
         final String key = string(attr.name());
         final Request r = Request.get(key);
         if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
-        req.attributes.put(r, string(attr.string()));
+        hr.attributes.put(r, string(attr.string()));
       }
-      checkRequest(req);
+      checkRequest(hr);
 
       // it is an error if content is set for HTTP verbs which must be empty
-      final ANode payload = parseHeaders(request.children(), req.headers);
-      final String method = req.attribute(Request.METHOD);
+      final ANode payload = parseHeaders(request.children(), hr.headers);
+      final String method = hr.attribute(Request.METHOD);
       if(Strings.eq(method, TRACE, DELETE) && (payload != null || bodies != null))
         throw HC_REQ_X.get(info, "Body not expected for method " + method);
 
@@ -74,18 +74,18 @@ public final class HttpRequestParser {
         // single part request
         if(pl.eq(Q_BODY)) {
           final Item it = bodies != null ? bodies.next() : null;
-          parseBody(payload, it, req.payloadAtts, req.bodyContent);
-          req.isMultipart = false;
+          parseBody(payload, it, hr.payloadAtts, hr.payload);
+          hr.isMultipart = false;
           // multipart request
         } else if(pl.eq(Q_MULTIPART)) {
-          parseMultipart(payload, bodies, req.payloadAtts, req.parts);
-          req.isMultipart = true;
+          parseMultipart(payload, bodies, hr.payloadAtts, hr.parts);
+          hr.isMultipart = true;
         } else {
           throw HC_REQ_X.get(info, "Unknown payload element: " + payload.qname());
         }
       }
     }
-    return req;
+    return hr;
   }
 
   /**
@@ -129,11 +129,11 @@ public final class HttpRequestParser {
    * @param body body element
    * @param contItem content item
    * @param atts map for parsed body attributes
-   * @param bodyContent item cache for parsed body content
+   * @param payload payload
    * @throws QueryException query exception
    */
   private void parseBody(final ANode body, final Item contItem, final HashMap<String, String> atts,
-      final ItemList bodyContent) throws QueryException {
+      final ItemList payload) throws QueryException {
 
     parseAtts(body, atts);
     checkBody(body, atts);
@@ -142,10 +142,10 @@ public final class HttpRequestParser {
       // no linked resource for setting request content
       if(contItem == null) {
         // content is set from <http:body/> children
-        for(final ANode n : body.children()) bodyContent.add(n);
+        for(final ANode n : body.children()) payload.add(n);
       } else {
         // content is set from $bodies parameter
-        bodyContent.add(contItem);
+        payload.add(contItem);
       }
     }
   }
@@ -165,15 +165,15 @@ public final class HttpRequestParser {
     if(atts.get(SerializerOptions.MEDIA_TYPE.name()) == null)
       throw HC_REQ_X.get(info, "Attribute media-type of http:multipart is mandatory");
 
-    final BasicNodeIter prts = multipart.children();
+    final BasicNodeIter iter = multipart.children();
     while(true) {
-      final Part p = new Part();
-      final ANode partBody = parseHeaders(prts, p.headers);
+      final Part part = new Part();
+      final ANode partBody = parseHeaders(iter, part.headers);
       if(partBody == null) break;
       // content is set from <http:body/> children or from $bodies parameter
       final Item ci = contItems == null ? null : contItems.next();
-      parseBody(partBody, ci, p.bodyAtts, p.bodyContent);
-      parts.add(p);
+      parseBody(partBody, ci, part.bodyAtts, part.bodyContents);
+      parts.add(part);
     }
   }
 

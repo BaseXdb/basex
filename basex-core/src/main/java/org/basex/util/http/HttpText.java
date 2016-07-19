@@ -20,6 +20,8 @@ public interface HttpText {
   String AUTHORIZATION = "Authorization";
   /** HTTP header: Content-Type. */
   String CONTENT_TYPE = "Content-Type";
+  /** HTTP header: Content-Transfer-Encoding. */
+  String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
   /** HTTP header: Location. */
   String LOCATION = "Location";
   /** HTTP header: Accept. */
@@ -42,7 +44,7 @@ public interface HttpText {
 
   /** Default multipart boundary. */
   String DEFAULT_BOUNDARY = "1BEF0A57BE110FD467A";
-  /** boundary marker. */
+  /** Boundary marker. */
   String BOUNDARY = "boundary";
   /** HTTP method TRACE. */
   String TRACE = "TRACE";
@@ -72,9 +74,6 @@ public interface HttpText {
   /** Carriage return/line feed. */
   byte[] CRLF = { '\r', '\n' };
 
-  /** HTTP header Content-Type lower case. */
-  byte[] CONTENT_TYPE_LC = token("content-type");
-
   /** Response attribute: status. */
   byte[] STATUS = token("status");
   /** Response attribute: message. */
@@ -85,8 +84,10 @@ public interface HttpText {
   /** Header attribute: value. */
   String VALUE = "value";
 
-  /** Method binary. */
+  /** Binary string. */
   String BINARY = "binary";
+  /** Base64 string. */
+  String BASE64 = "base64";
 
   /** Request attributes. */
   enum Request {

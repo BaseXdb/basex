@@ -20,8 +20,8 @@ public final class HttpRequest {
   public final HashMap<String, String> headers = new HashMap<>();
   /** Body or multipart attributes. */
   public final HashMap<String, String> payloadAtts = new HashMap<>();
-  /** Body content. */
-  public final ItemList bodyContent = new ItemList();
+  /** Payload. */
+  public final ItemList payload = new ItemList();
   /** Parts in case of multipart request. */
   public final ArrayList<Part> parts = new ArrayList<>();
   /** Indicator for multipart request. */
@@ -59,6 +59,6 @@ public final class HttpRequest {
     /** Attributes of part body. */
     public final HashMap<String, String> bodyAtts = new HashMap<>();
     /** Content of part body. */
-    public final ItemList bodyContent = new ItemList();
+    public final ItemList bodyContents = new ItemList();
   }
 }

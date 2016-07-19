@@ -225,7 +225,7 @@ public class FnHttpTest extends HTTPTest {
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
-    assertFalse(r.bodyContent.isEmpty());
+    assertFalse(r.payload.isEmpty());
     assertEquals(1, r.payloadAtts.size());
   }
 
@@ -264,17 +264,17 @@ public class FnHttpTest extends HTTPTest {
     final Iterator<Part> i = r.parts.iterator();
     Part part = i.next();
     assertEquals(2, part.headers.size());
-    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyContents.size());
     assertEquals(1, part.bodyAtts.size());
 
     part = i.next();
     assertEquals(1, part.headers.size());
-    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyContents.size());
     assertEquals(1, part.bodyAtts.size());
 
     part = i.next();
     assertEquals(0, part.headers.size());
-    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyContents.size());
     assertEquals(1, part.bodyAtts.size());
   }
 
@@ -318,17 +318,17 @@ public class FnHttpTest extends HTTPTest {
     final Iterator<Part> i = r.parts.iterator();
     Part part = i.next();
     assertEquals(2, part.headers.size());
-    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyContents.size());
     assertEquals(1, part.bodyAtts.size());
 
     part = i.next();
     assertEquals(1, part.headers.size());
-    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyContents.size());
     assertEquals(1, part.bodyAtts.size());
 
     part = i.next();
     assertEquals(0, part.headers.size());
-    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyContents.size());
     assertEquals(1, part.bodyAtts.size());
   }
 
@@ -475,26 +475,26 @@ public class FnHttpTest extends HTTPTest {
     p1.headers.put("Content-Type", "text/plain; charset=us-ascii");
     p1.bodyAtts.put("media-type", "text/plain");
     final String plain = "...plain text....";
-    p1.bodyContent.add(Str.get(plain + '\n'));
+    p1.bodyContents.add(Str.get(plain + '\n'));
 
     final Part p2 = new Part();
     p2.headers.put("Content-Type", "text/richtext");
     p2.bodyAtts.put("media-type", "text/richtext");
     final String rich = ".... richtext version...";
-    p2.bodyContent.add(Str.get(rich));
+    p2.bodyContents.add(Str.get(rich));
 
     final Part p3 = new Part();
     p3.headers.put("Content-Type", "text/x-whatever");
     p3.bodyAtts.put("media-type", "text/x-whatever");
     final String fancy = ".... fanciest formatted version...";
-    p3.bodyContent.add(Str.get(fancy));
+    p3.bodyContents.add(Str.get(fancy));
 
     req.parts.add(p1);
     req.parts.add(p2);
     req.parts.add(p3);
 
-    final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient.setRequestContent(fakeConn.getOutputStream(), req);
+    final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
+    HttpClient.writePayload(conn.getOutputStream(), req);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
         + plain + Prop.NL + CRLF
@@ -505,7 +505,38 @@ public class FnHttpTest extends HTTPTest {
         + "--boundary42--" + CRLF;
 
     // Compare results
-    assertEquals(expResult, fakeConn.getOutputStream().toString());
+    assertEquals(expResult, conn.getOutputStream().toString());
+  }
+
+
+  /**
+   * Tests method setRequestContent of HttpClient.
+   * @throws IOException I/O Exception
+   */
+  @Test
+  public void writeMultipartMessage2() throws IOException {
+    final HttpRequest req = new HttpRequest();
+    req.isMultipart = true;
+    req.payloadAtts.put("media-type", "multipart/mixed");
+    req.payloadAtts.put("boundary", "boundary");
+    final Part p1 = new Part();
+    p1.headers.put("Content-Type", "application/octet-stream");
+    p1.bodyAtts.put("media-type", "application/octet-stream");
+    p1.bodyContents.add(new B64(new byte[] { -1 }));
+
+    req.parts.add(p1);
+
+    final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
+    HttpClient.writePayload(conn.getOutputStream(), req);
+    final String expResult = "--boundary" + CRLF
+        + "Content-Type: application/octet-stream" + CRLF
+        + "Content-Transfer-Encoding: base64" + CRLF
+        + CRLF
+        + "/w==" + Prop.NL + CRLF
+        + "--boundary--" + CRLF;
+
+    // Compare results
+    assertEquals(expResult, conn.getOutputStream().toString());
   }
 
   /**
@@ -517,40 +548,40 @@ public class FnHttpTest extends HTTPTest {
   public void writeMessage() throws IOException {
     // Case 1: No method, media-type='text/xml'
     final HttpRequest req1 = new HttpRequest();
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
+    final FakeHttpConnection conn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     req1.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     // Node child
     final FElem e1 = new FElem("a").add("a");
-    req1.bodyContent.add(e1);
+    req1.payload.add(e1);
     // String item child
-    req1.bodyContent.add(Str.get("<b>b</b>"));
-    HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString(Strings.UTF8));
+    req1.payload.add(Str.get("<b>b</b>"));
+    HttpClient.writePayload(conn1.getOutputStream(), req1);
+    assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", conn1.out.toString(Strings.UTF8));
 
     // Case 2: No method, media-type='text/plain'
     final HttpRequest req2 = new HttpRequest();
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
+    final FakeHttpConnection conn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     req2.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/plain");
     // Node child
     final FElem e2 = new FElem("a").add("a");
-    req2.bodyContent.add(e2);
+    req2.payload.add(e2);
     // String item child
-    req2.bodyContent.add(Str.get("<b>b</b>"));
-    HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals("a<b>b</b>", fakeConn2.out.toString());
+    req2.payload.add(Str.get("<b>b</b>"));
+    HttpClient.writePayload(conn2.getOutputStream(), req2);
+    assertEquals("a<b>b</b>", conn2.out.toString());
 
     // Case 3: method='text', media-type='text/xml'
     final HttpRequest req3 = new HttpRequest();
-    final FakeHttpConnection fakeConn3 = new FakeHttpConnection(new URL("http://www.test.com"));
+    final FakeHttpConnection conn3 = new FakeHttpConnection(new URL("http://www.test.com"));
     req3.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     req3.payloadAtts.put("method", "text");
     // Node child
     final FElem e3 = new FElem("a").add("a");
-    req3.bodyContent.add(e3);
+    req3.payload.add(e3);
     // String item child
-    req3.bodyContent.add(Str.get("<b>b</b>"));
-    HttpClient.setRequestContent(fakeConn3.getOutputStream(), req3);
-    assertEquals("a<b>b</b>", fakeConn3.out.toString());
+    req3.payload.add(Str.get("<b>b</b>"));
+    HttpClient.writePayload(conn3.getOutputStream(), req3);
+    assertEquals("a<b>b</b>", conn3.out.toString());
   }
 
   /**
@@ -562,19 +593,19 @@ public class FnHttpTest extends HTTPTest {
     // Case 1: content is xs:base64Binary
     final HttpRequest req1 = new HttpRequest();
     req1.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    req1.bodyContent.add(new B64(token("test")));
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(Strings.UTF8), "test");
+    req1.payload.add(new B64(token("test")));
+    final FakeHttpConnection conn1 = new FakeHttpConnection(new URL("http://www.test.com"));
+    HttpClient.writePayload(conn1.getOutputStream(), req1);
+    assertEquals(conn1.out.toString(Strings.UTF8), "test");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
     req2.payloadAtts.put("method", SerialMethod.BASEX.toString());
     final FElem e3 = new FElem("a").add("test");
-    req2.bodyContent.add(e3);
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals("<a>test</a>", fakeConn2.out.toString());
+    req2.payload.add(e3);
+    final FakeHttpConnection conn2 = new FakeHttpConnection(new URL("http://www.test.com"));
+    HttpClient.writePayload(conn2.getOutputStream(), req2);
+    assertEquals("<a>test</a>", conn2.out.toString());
   }
 
   /**
@@ -586,19 +617,19 @@ public class FnHttpTest extends HTTPTest {
     // Case 1: content is xs:hexBinary
     final HttpRequest req1 = new HttpRequest();
     req1.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    req1.bodyContent.add(new Hex(token("test")));
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(Strings.UTF8), "test");
+    req1.payload.add(new Hex(token("test")));
+    final FakeHttpConnection conn1 = new FakeHttpConnection(new URL("http://www.test.com"));
+    HttpClient.writePayload(conn1.getOutputStream(), req1);
+    assertEquals(conn1.out.toString(Strings.UTF8), "test");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
     req2.payloadAtts.put("method", SerialMethod.BASEX.toString());
     final FElem e3 = new FElem("a").add("test");
-    req2.bodyContent.add(e3);
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals("<a>test</a>", fakeConn2.out.toString());
+    req2.payload.add(e3);
+    final FakeHttpConnection conn2 = new FakeHttpConnection(new URL("http://www.test.com"));
+    HttpClient.writePayload(conn2.getOutputStream(), req2);
+    assertEquals("<a>test</a>", conn2.out.toString());
   }
 
   /**
@@ -616,13 +647,13 @@ public class FnHttpTest extends HTTPTest {
     req.payloadAtts.put("src", file.url());
     req.payloadAtts.put("method", "binary");
     // HTTP connection
-    final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient.setRequestContent(fakeConn.getOutputStream(), req);
+    final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
+    HttpClient.writePayload(conn.getOutputStream(), req);
 
     // Delete file
     file.delete();
 
-    assertEquals(fakeConn.out.toString(Strings.UTF8), "test");
+    assertEquals(conn.out.toString(Strings.UTF8), "test");
   }
 
   /**
@@ -706,9 +737,9 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='text/x-whatever'/>"
         + "</http:multipart>" + "</http:response> ";
     expected.add(new DBNode(new IOContent(response)).children().next());
-    expected.add(Str.get("...plain text....\n\n"));
-    expected.add(Str.get(".... richtext...\n"));
-    expected.add(Str.get(".... fanciest formatted version  \n...\n"));
+    expected.add(Str.get("...plain text....\n"));
+    expected.add(Str.get(".... richtext..."));
+    expected.add(Str.get(".... fanciest formatted version  \n..."));
     compare(expected.value(), returned);
   }
 
@@ -784,9 +815,9 @@ public class FnHttpTest extends HTTPTest {
         + "</http:multipart>" + "</http:response>";
     expected.add(new DBNode(new IOContent(response)).children().next());
     expected.add(Str.get("This is implicitly typed plain ASCII text.\n"
-        + "It does NOT end with a linebreak.\n"));
+        + "It does NOT end with a linebreak."));
     expected.add(Str.get("This is explicitly typed plain ASCII text.\n"
-        + "It DOES end with a linebreak.\n\n"));
+        + "It DOES end with a linebreak.\n"));
 
     compare(expected.value(), returned);
   }

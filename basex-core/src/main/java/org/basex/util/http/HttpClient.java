@@ -15,6 +15,7 @@ import java.util.Map.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -70,9 +71,9 @@ public final class HttpClient {
       if(url == null || url.isEmpty()) throw HC_URL.get(info);
       conn = connect(url, req);
 
-      if(!req.bodyContent.isEmpty() || !req.parts.isEmpty()) {
+      if(!req.payload.isEmpty() || !req.parts.isEmpty()) {
         setContentType(conn, req);
-        setRequestContent(conn.getOutputStream(), req);
+        writePayload(conn.getOutputStream(), req);
       }
 
       return new HttpResponse(info, options).getResponse(conn, body, mediaType).iter();
@@ -224,20 +225,68 @@ public final class HttpClient {
   }
 
   /**
-   * Set HTTP request content.
+   * Writes the HTTP request payload.
    * @param out output stream
    * @param request request data
    * @throws IOException I/O exception
    */
-  public static void setRequestContent(final OutputStream out, final HttpRequest request)
+  public static void writePayload(final OutputStream out, final HttpRequest request)
       throws IOException {
 
     if(request.isMultipart) {
-      writeMultipart(request, out);
+      final String boundary = request.boundary();
+      for(final Part part : request.parts) {
+        // write content to cache
+        final ArrayOutput ao = new ArrayOutput();
+        writePayload(part.bodyContents, part.bodyAtts, ao);
+
+        // write boundary preceded by "--"
+        out.write(new TokenBuilder().add("--").add(boundary).add(CRLF).finish());
+
+        // write headers
+        for(final Entry<String, String> header : part.headers.entrySet())
+          writeHeader(header.getKey(), header.getValue(), out);
+        if(!part.headers.containsKey(CONTENT_TYPE))
+          writeHeader(CONTENT_TYPE, part.bodyAtts.get(SerializerOptions.MEDIA_TYPE.name()), out);
+
+        // choose Base64 if content includes non-ASCII characters
+        byte[] contents = ao.finish();
+        boolean base64 = false;
+        for(final byte b : contents) base64 |= b < 0;
+
+        // write content
+        if(base64) {
+          writeHeader(CONTENT_TRANSFER_ENCODING, BASE64, out);
+          out.write(CRLF);
+          contents = Base64.encode(contents);
+          final int bl = contents.length;
+          for(int b = 0; b < bl; b += 76) {
+            out.write(contents, b, Math.min(76, bl - b));
+            out.write(CRLF);
+          }
+        } else {
+          out.write(CRLF);
+          out.write(contents);
+        }
+        out.write(CRLF);
+      }
+      out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
     } else {
-      writePayload(request.bodyContent, request.payloadAtts, out);
+      writePayload(request.payload, request.payloadAtts, out);
     }
     out.close();
+  }
+
+  /**
+   * Writes a single header.
+   * @param key key
+   * @param value value
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  public static void writeHeader(final String key, final String value, final OutputStream out)
+      throws IOException {
+    out.write(new TokenBuilder().add(key).add(": ").add(value).add(CRLF).finish());
   }
 
   /**
@@ -290,51 +339,5 @@ public final class HttpClient {
         for(final Item it : payload) ser.serialize(it);
       }
     }
-  }
-
-  /**
-   * Writes parts of multipart message in the output stream of the HTTP
-   * connection.
-   * @param request request data
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  private static void writeMultipart(final HttpRequest request, final OutputStream out)
-      throws IOException {
-    final String boundary = request.boundary();
-    for(final Part part : request.parts) writePart(part, out, boundary);
-    out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
-  }
-
-  /**
-   * Writes a single part of a multipart message.
-   * @param part part
-   * @param out connection output stream
-   * @param boundary boundary
-   * @throws IOException I/O exception
-   */
-  private static void writePart(final Part part, final OutputStream out, final String boundary)
-      throws IOException {
-
-    // write boundary preceded by "--"
-    final TokenBuilder boundTb = new TokenBuilder();
-    boundTb.add("--").add(boundary).add(CRLF);
-    out.write(boundTb.finish());
-
-    final HashMap<String, String> bodyAtts = part.bodyAtts;
-    final String mt = bodyAtts.get(SerializerOptions.MEDIA_TYPE.name());
-    if(!part.headers.containsKey(CONTENT_TYPE)) part.headers.put(CONTENT_TYPE, mt);
-
-    // write headers
-    for(final Entry<String, String> header : part.headers.entrySet()) {
-      final TokenBuilder hdrTb = new TokenBuilder();
-      hdrTb.add(header.getKey()).add(": ").add(header.getValue()).add(CRLF);
-      out.write(hdrTb.finish());
-    }
-    out.write(CRLF);
-
-    // write content
-    writePayload(part.bodyContent, bodyAtts, out);
-    out.write(CRLF);
   }
 }

@@ -160,13 +160,17 @@ public final class HttpPayload {
     MediaType type = MediaType.TEXT_PLAIN;
 
     // extract headers
+    boolean base64 = false;
     for(byte[] l = line; l != null && l.length > 0;) {
       final int pos = indexOf(l, ':');
       if(pos > 0) {
-        final byte[] key = substring(l, 0, pos);
-        final byte[] val = trim(substring(l, pos + 1));
-        if(eq(lc(key), CONTENT_TYPE_LC)) type = new MediaType(string(val));
-        if(val.length != 0 && parts != null)
+        final String key = string(substring(l, 0, pos)), val = string(trim(substring(l, pos + 1)));
+        if(key.equalsIgnoreCase(CONTENT_TYPE)) {
+          type = new MediaType(val);
+        } else if(key.equalsIgnoreCase(CONTENT_TRANSFER_ENCODING)) {
+          base64 = val.equals(BASE64);
+        }
+        if(!val.isEmpty() && parts != null)
           parts.add(new FElem(Q_HEADER).add(NAME, key).add(VALUE, val));
       }
       l = readLine();
@@ -175,8 +179,11 @@ public final class HttpPayload {
       parts.add(new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type.toString()));
     }
 
-    final byte[] payload = extractPart(sep, end, type.parameters().get(CHARSET));
-    if(payloads != null) payloads.add(parse(payload, type));
+    byte[] payload = extractPart(sep, end, type.parameters().get(CHARSET));
+    if(payloads != null) {
+      if(base64) payload = Base64.decode(payload);
+      payloads.add(parse(payload, type));
+    }
     return true;
   }
 
@@ -221,7 +228,8 @@ public final class HttpPayload {
         while(readLine() != null);
         break;
       }
-      bl.add(line).add(CRLF);
+      if(!bl.isEmpty()) bl.add(CRLF);
+      bl.add(line);
     }
     return new TextInput(new IOContent(bl.finish())).encoding(enc).content();
   }
