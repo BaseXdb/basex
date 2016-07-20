@@ -12,7 +12,6 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.gflwor.GFLWOR.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -49,7 +48,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private boolean compiled;
 
   /** Local variables in the scope of this function. */
-  private final VarScope scope;
+  private final VarScope vs;
   /** Non-local variable bindings. */
   private final Map<Var, Expr> global;
 
@@ -61,11 +60,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param expr function body
    * @param anns annotations
    * @param global bindings for non-local variables
-   * @param scope scope
+   * @param vs scope
    */
   public Closure(final InputInfo info, final SeqType type, final Var[] args, final Expr expr,
-      final AnnList anns, final Map<Var, Expr> global, final VarScope scope) {
-    this(info, null, type, args, expr, anns, global, scope);
+      final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
+    this(info, null, type, args, expr, anns, global, vs);
   }
 
   /**
@@ -77,17 +76,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param expr function expression
    * @param anns annotations
    * @param global bindings for non-local variables
-   * @param scope variable scope
+   * @param vs variable scope
    */
   Closure(final InputInfo info, final QNm name, final SeqType type, final Var[] args,
-      final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope scope) {
+      final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
     super(info, expr);
     this.name = name;
     this.args = args;
     this.type = type;
     this.anns = anns;
     this.global = global == null ? Collections.<Var, Expr>emptyMap() : global;
-    this.scope = scope;
+    this.vs = vs;
   }
 
   @Override
@@ -134,13 +133,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       e.getKey().refineType(bound.seqType(), cc);
     }
 
-    scope.prepareCompile(cc);
+    cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, type != null ? type : expr.seqType(), cc.sc());
+      expr = cc.error(qe, expr);
     } finally {
-      scope.finishCompile(this, cc);
+      cc.removeScope(this);
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -155,7 +154,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     seqType = FuncType.get(anns, rt, args).seqType();
     size = 1;
 
-    scope.prepareCompile(cc);
+    cc.pushScope(vs);
     try {
       // inline all values in the closure
       final Iterator<Entry<Var, Expr>> cls = global.entrySet().iterator();
@@ -193,9 +192,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // add all newly added bindings
       if(add != null) global.putAll(add);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, type != null ? type : expr.seqType(), cc.sc());
+      expr = cc.error(qe, expr);
     } finally {
-      scope.finishCompile(this, cc);
+      cc.removeScope(this);
     }
 
     // only evaluate if the closure is empty, so we don't lose variables
@@ -226,22 +225,21 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    final VarScope scp = scope.copy(cc, vs);
-    cc.pushScope(scp);
-
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    cc.pushScope(new VarScope(vs.sc));
     try {
+      vs.copy(cc, vm);
       final HashMap<Var, Expr> nl = new HashMap<>();
       for(final Entry<Var, Expr> e : global.entrySet()) {
-        nl.put(vs.get(e.getKey().id), e.getValue().copy(cc, vs));
+        nl.put(vm.get(e.getKey().id), e.getValue().copy(cc, vm));
       }
       final Var[] vars = args.clone();
       final int vl = vars.length;
-      for(int v = 0; v < vl; v++) vars[v] = vs.get(vars[v].id);
+      for(int v = 0; v < vl; v++) vars[v] = vm.get(vars[v].id);
 
-      final Expr e = expr.copy(cc, vs);
+      final Expr e = expr.copy(cc, vm);
       e.markTailCalls(null);
-      return copyType(new Closure(info, name, type, vars, e, anns, nl, scp));
+      return copyType(new Closure(info, name, type, vars, e, anns, nl, cc.vs()));
     } finally {
       cc.removeScope();
     }
@@ -257,18 +255,18 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // create let bindings for all variables
     final LinkedList<Clause> cls =
         exprs.length == 0 && global.isEmpty() ? null : new LinkedList<Clause>();
-    final IntObjMap<Var> vs = new IntObjMap<>();
+    final IntObjMap<Var> vm = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      cls.add(new Let(cc.copy(args[a], vs), exprs[a], false).optimize(cc));
+      cls.add(new Let(cc.copy(args[a], vm), exprs[a], false).optimize(cc));
     }
     for(final Entry<Var, Expr> e : global.entrySet()) {
-      cls.add(new Let(cc.copy(e.getKey(), vs), e.getValue(), false).optimize(cc));
+      cls.add(new Let(cc.copy(e.getKey(), vm), e.getValue(), false).optimize(cc));
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(cc, vs), rt = type == null ? cpy :
-      new TypeCheck(scope.sc, ii, cpy, type, true).optimize(cc);
+    final Expr cpy = expr.copy(cc, vm), rt = type == null ? cpy :
+      new TypeCheck(vs.sc, ii, cpy, type, true).optimize(cc);
 
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(cc);
   }
@@ -303,7 +301,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } else if(body.isValue()) {
       // we can type check immediately
       final Value val = (Value) body;
-      checked = type.instance(val) ? val : type.promote(val, null, false, qc, scope.sc, info);
+      checked = type.instance(val) ? val : type.promote(val, null, false, qc, vs.sc, info);
     } else {
       // check at each call
       if(argType.type.instanceOf(type.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
@@ -311,10 +309,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         final Occ occ = argType.occ.intersect(type.occ);
         if(occ == null) throw QueryError.typeError(body, type, null, info);
       }
-      checked = new TypeCheck(scope.sc, info, body, type, true);
+      checked = new TypeCheck(vs.sc, info, body, type, true);
     }
 
-    return new FuncItem(scope.sc, anns, name, args, ft, checked, scope.stackSize());
+    return new FuncItem(vs.sc, anns, name, args, ft, checked, vs.stackSize());
   }
 
   @Override

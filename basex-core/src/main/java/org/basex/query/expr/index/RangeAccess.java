@@ -51,7 +51,7 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new RangeAccess(info, index, ictx);
   }
 

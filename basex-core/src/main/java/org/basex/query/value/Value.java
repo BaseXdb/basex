@@ -147,7 +147,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public Value copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public Value copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return this;
   }
 

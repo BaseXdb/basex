@@ -101,8 +101,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new FTNot(info, exprs[0].copy(cc, vs));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new FTNot(info, exprs[0].copy(cc, vm));
   }
 
   @Override

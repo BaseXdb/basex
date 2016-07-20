@@ -14,7 +14,6 @@ import org.basex.query.expr.index.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.path.Test.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -140,7 +139,7 @@ public abstract class Path extends ParseExpr {
           steps[s] = step.compile(cc);
         } catch(final QueryException ex) {
           // replace original expression with error
-          steps[s] = FnError.get(ex, seqType, cc.sc());
+          steps[s] = cc.error(ex, this);
         }
         // no axis step: invalidate context value
         if(!as) cc.qc.value = null;

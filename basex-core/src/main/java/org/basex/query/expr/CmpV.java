@@ -199,7 +199,7 @@ public final class CmpV extends Cmp {
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
-      e = Function.NOT.get(cc.sc(), info, e1);
+      e = cc.function(Function.NOT, info, e1);
     }
     return e;
   }
@@ -233,8 +233,8 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new CmpV(exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), op, coll, sc, info);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
   }
 
   @Override

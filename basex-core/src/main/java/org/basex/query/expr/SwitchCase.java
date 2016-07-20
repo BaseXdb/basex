@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -39,15 +38,15 @@ public final class SwitchCase extends Arr {
         exprs[e] = exprs[e].compile(cc);
       } catch(final QueryException ex) {
         // replace original expression with error
-        exprs[e] = FnError.get(ex, exprs[e].seqType(), cc.sc());
+        exprs[e] = cc.error(ex, exprs[e]);
       }
     }
     return this;
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new SwitchCase(info, copyAll(cc, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new SwitchCase(info, copyAll(cc, vm, exprs));
   }
 
   @Override
@@ -59,7 +58,7 @@ public final class SwitchCase extends Arr {
       try {
         nw = exprs[i].inline(var, ex, cc);
       } catch(final QueryException qe) {
-        nw = FnError.get(qe, exprs[i].seqType(), cc.sc());
+        nw = cc.error(qe, exprs[i]);
       }
       if(nw != null) {
         exprs[i] = nw;

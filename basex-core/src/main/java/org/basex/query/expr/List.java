@@ -151,8 +151,8 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return copyType(new List(info, copyAll(cc, vs, exprs)));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new List(info, copyAll(cc, vm, exprs)));
   }
 
   @Override

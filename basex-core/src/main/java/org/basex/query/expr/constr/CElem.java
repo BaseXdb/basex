@@ -136,9 +136,9 @@ public final class CElem extends CName {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new CElem(sc, info, name.copy(cc, vs), comp ? null : nspaces.copy(),
-        copyAll(cc, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new CElem(sc, info, name.copy(cc, vm), comp ? null : nspaces.copy(),
+        copyAll(cc, vm, exprs));
   }
 
   /**

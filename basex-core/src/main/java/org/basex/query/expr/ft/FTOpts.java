@@ -63,7 +63,7 @@ public final class FTOpts extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new FTOpts(info, exprs[0].copy(cc, vs), new FTOpt().copy(opt));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new FTOpts(info, exprs[0].copy(cc, vm), new FTOpt().copy(opt));
   }
 }

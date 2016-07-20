@@ -129,9 +129,9 @@ public final class For extends ForLet {
   }
 
   @Override
-  public For copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new For(cc.copy(var, vs), cc.copy(pos, vs), cc.copy(score, vs),
-        expr.copy(cc, vs), empty);
+  public For copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new For(cc.copy(var, vm), cc.copy(pos, vm), cc.copy(score, vm),
+        expr.copy(cc, vm), empty);
   }
 
   @Override
@@ -209,7 +209,7 @@ public final class For extends ForLet {
     }
 
     // attach predicates to axis path or filter, or create a new filter
-    if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(cc.sc(), info, pred);
+    if(pred.seqType().mayBeNumber()) pred = cc.function(Function.BOOLEAN, info, pred);
 
     addPredicate(pred);
     return true;

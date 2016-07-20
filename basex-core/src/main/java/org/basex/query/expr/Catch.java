@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -56,7 +55,7 @@ public final class Catch extends Single {
       expr = expr.compile(cc);
       seqType = expr.seqType();
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType(), cc.sc());
+      expr = cc.error(qe, expr);
     }
     return this;
   }
@@ -83,14 +82,14 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final Var[] vrs = new Var[NAMES.length];
     final int vl = vrs.length;
-    for(int v = 0; v < vl; v++) vrs[v] = cc.scope().addNew(NAMES[v], TYPES[v], false, cc.qc, info);
+    for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(NAMES[v], TYPES[v], false, cc.qc, info);
     final Catch ctch = new Catch(info, codes.clone(), vrs);
     final int val = vars.length;
-    for(int v = 0; v < val; v++) vs.put(vars[v].id, ctch.vars[v]);
-    ctch.expr = expr.copy(cc, vs);
+    for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
+    ctch.expr = expr.copy(cc, vm);
     return ctch;
   }
 
@@ -101,7 +100,7 @@ public final class Catch extends Single {
       if(sub == null) return null;
       expr = sub;
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, seqType, cc.sc());
+      expr = cc.error(qe, expr);
     }
     return this;
   }

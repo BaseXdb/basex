@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -36,7 +35,7 @@ abstract class Logical extends Arr {
       } catch(final QueryException qe) {
         // first expression is evaluated eagerly
         if(i == 0) throw qe;
-        exprs[i] = FnError.get(qe, exprs[i].seqType(), cc.sc());
+        exprs[i] = cc.error(qe, exprs[i]);
       }
     }
     return optimize(cc);
@@ -94,7 +93,7 @@ abstract class Logical extends Arr {
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[i + 1];
         System.arraycopy(arr, 0, nw, 0, i);
-        nw[i] = FnError.get(qe, seqType(), cc.sc());
+        nw[i] = cc.error(qe, this);
         exprs = nw;
         change = true;
         break;

@@ -89,7 +89,7 @@ public final class Var extends ExprInfo {
    * @param qc query context
    * @param sc static context
    */
-  Var(final Var var, final QueryContext qc, final StaticContext sc) {
+  public Var(final Var var, final QueryContext qc, final StaticContext sc) {
     this(var.name, var.type, var.param, qc, sc, var.info);
     promote = var.promote;
     seqType = var.seqType;
@@ -101,8 +101,8 @@ public final class Var extends ExprInfo {
    * @return sequence type (not {@code null})
    */
   public SeqType seqType() {
-    final SeqType intersect = type != null ? type.intersect(seqType) : null;
-    return intersect != null ? intersect : type != null ? type : seqType;
+    final SeqType st = type != null ? type.intersect(seqType) : null;
+    return st != null ? st : type != null ? type : seqType;
   }
 
   /**

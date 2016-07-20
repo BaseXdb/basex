@@ -59,8 +59,8 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new FTScope(info, exprs[0].copy(cc, vs), same, unit);
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new FTScope(info, exprs[0].copy(cc, vm), same, unit);
   }
 
   @Override

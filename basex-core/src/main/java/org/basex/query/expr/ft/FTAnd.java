@@ -140,8 +140,8 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    final FTAnd copy = new FTAnd(info, Arr.copyAll(cc, vs, exprs));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final FTAnd copy = new FTAnd(info, Arr.copyAll(cc, vm, exprs));
     if(negated != null) copy.negated = negated.clone();
     return copy;
   }

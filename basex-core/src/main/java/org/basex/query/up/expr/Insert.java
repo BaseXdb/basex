@@ -107,9 +107,9 @@ public final class Insert extends Update {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Insert(sc, info, exprs[1].copy(cc, vs), first, last, before, after,
-        exprs[0].copy(cc, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Insert(sc, info, exprs[1].copy(cc, vm), first, last, before, after,
+        exprs[0].copy(cc, vm));
   }
 
   @Override

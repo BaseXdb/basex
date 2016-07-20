@@ -12,7 +12,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -48,15 +47,12 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param type declared return type
    * @param expr function body
    * @param doc current xqdoc cache
-   * @param sc static context
-   * @param scope variable scope
+   * @param vs variable scope
    * @param info input info
    */
   StaticFunc(final AnnList anns, final QNm name, final Var[] args, final SeqType type,
-      final Expr expr, final String doc, final StaticContext sc, final VarScope scope,
-      final InputInfo info) {
-
-    super(sc, anns, name, type, scope, doc, info);
+      final Expr expr, final String doc, final VarScope vs, final InputInfo info) {
+    super(anns, name, type, vs, doc, info);
     this.args = args;
     this.expr = expr;
     updating = anns.contains(Annotation.UPDATING);
@@ -70,7 +66,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final Value cv = cc.qc.value;
     cc.qc.value = null;
 
-    scope.prepareCompile(cc);
+    cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
 
@@ -85,9 +81,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         }
       }
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType(), sc);
+      expr = cc.error(qe, expr);
     } finally {
-      scope.finishCompile(this, cc);
+      cc.removeScope(this);
       cc.qc.value = cv;
     }
 
@@ -145,7 +141,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public int stackFrameSize() {
-    return scope.stackSize();
+    return vs.stackSize();
   }
 
   @Override
@@ -280,14 +276,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
-    final IntObjMap<Var> vs = new IntObjMap<>();
+    final IntObjMap<Var> vars = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      cls.add(new Let(cc.copy(args[a], vs), exprs[a], false).optimize(cc));
+      cls.add(new Let(cc.copy(args[a], vars), exprs[a], false).optimize(cc));
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(cc, vs);
+    final Expr cpy = expr.copy(cc, vars);
     return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(cc);
   }
 

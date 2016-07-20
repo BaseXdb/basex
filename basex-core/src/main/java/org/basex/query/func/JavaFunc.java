@@ -61,8 +61,8 @@ final class JavaFunc extends JavaFunction {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new JavaFunc(sc, info, clazz, method, types, copyAll(cc, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new JavaFunc(sc, info, clazz, method, types, copyAll(cc, vm, exprs));
   }
 
   /**

@@ -112,13 +112,12 @@ public final class LocalVars {
    * @return the removed context's variable scope
    */
   public VarScope popContext() {
-    return vars.remove(vars.size() - 1).scope;
+    return vars.remove(vars.size() - 1).vs;
   }
 
   /**
    * Opens a new sub-scope inside the current one. The returned marker has to be supplied to the
-   * corresponding call to {@link #closeScope(int)} in order to mark the variables as
-   * inaccessible.
+   * corresponding call to {@link #closeScope(int)} in order to mark the variables as inaccessible.
    * @return marker for the current bindings
    */
   public int openScope() {

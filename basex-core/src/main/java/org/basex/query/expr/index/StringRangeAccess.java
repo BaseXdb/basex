@@ -89,7 +89,7 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new StringRangeAccess(info, index, ictx);
   }
 

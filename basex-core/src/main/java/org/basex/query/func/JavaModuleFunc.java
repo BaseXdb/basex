@@ -88,8 +88,8 @@ final class JavaModuleFunc extends JavaFunction {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new JavaModuleFunc(sc, info, module, method, copyAll(cc, vs, exprs), perm);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new JavaModuleFunc(sc, info, module, method, copyAll(cc, vm, exprs), perm);
   }
 
   @Override

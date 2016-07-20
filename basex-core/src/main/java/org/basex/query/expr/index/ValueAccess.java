@@ -199,8 +199,8 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return copyType(new ValueAccess(info, expr.copy(cc, vs), type, test, ictx));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new ValueAccess(info, expr.copy(cc, vm), type, test, ictx));
   }
 
   @Override

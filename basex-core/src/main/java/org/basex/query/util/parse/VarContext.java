@@ -18,7 +18,7 @@ public final class VarContext {
   /** Non-local variable bindings for closures. */
   final HashMap<Var, Expr> bindings;
   /** Current scope containing all variables and the closure. */
-  final VarScope scope;
+  final VarScope vs;
 
   /**
    * Constructor.
@@ -27,7 +27,7 @@ public final class VarContext {
    */
   VarContext(final HashMap<Var, Expr> bindings, final StaticContext sc) {
     this.bindings = bindings;
-    scope = new VarScope(sc);
+    vs = new VarScope(sc);
   }
 
   /**
@@ -35,7 +35,7 @@ public final class VarContext {
    * @param var variable
    */
   void add(final Var var) {
-    scope.add(var);
+    vs.add(var);
     stack.push(var);
   }
 }

@@ -82,8 +82,8 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public StaticFuncCall copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    final Expr[] args = Arr.copyAll(cc, vs, exprs);
+  public StaticFuncCall copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Expr[] args = Arr.copyAll(cc, vm, exprs);
     final StaticFuncCall call = new StaticFuncCall(name, args, sc, func, info);
     call.seqType = seqType;
     call.size = size;

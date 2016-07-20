@@ -70,9 +70,9 @@ public final class Condition extends Single {
   }
 
   @Override
-  public Condition copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Condition(start, cc.copy(item, vs), cc.copy(pos, vs), cc.copy(prev, vs),
-        cc.copy(next, vs), expr.copy(cc, vs), info);
+  public Condition copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Condition(start, cc.copy(item, vm), cc.copy(pos, vm), cc.copy(prev, vm),
+        cc.copy(next, vm), expr.copy(cc, vm), info);
   }
 
   /**

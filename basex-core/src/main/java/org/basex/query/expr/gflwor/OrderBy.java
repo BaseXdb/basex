@@ -182,8 +182,8 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public OrderBy copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new OrderBy(Arr.copyAll(cc, vs, refs), Arr.copyAll(cc, vs, keys), info);
+  public OrderBy copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new OrderBy(Arr.copyAll(cc, vm, refs), Arr.copyAll(cc, vm, keys), info);
   }
 
   @Override
@@ -262,8 +262,8 @@ public final class OrderBy extends Clause {
     }
 
     @Override
-    public Key copy(final CompileContext cc, final IntObjMap<Var> vs) {
-      return new Key(info, expr.copy(cc, vs), desc, least, coll);
+    public Key copy(final CompileContext cc, final IntObjMap<Var> vm) {
+      return new Key(info, expr.copy(cc, vm), desc, least, coll);
     }
 
     @Override

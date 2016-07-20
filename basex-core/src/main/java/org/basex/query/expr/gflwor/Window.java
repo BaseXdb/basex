@@ -294,10 +294,10 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Window copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public Window copy(final CompileContext cc, final IntObjMap<Var> vm) {
     try {
-      return new Window(sliding, cc.copy(var, vs), expr.copy(cc, vs), start.copy(cc, vs), only,
-          end != null ? end.copy(cc, vs) : null);
+      return new Window(sliding, cc.copy(var, vm), expr.copy(cc, vm), start.copy(cc, vm), only,
+          end != null ? end.copy(cc, vm) : null);
     } catch(final QueryException e) {
       // checks have already been done
       throw Util.notExpected(e);

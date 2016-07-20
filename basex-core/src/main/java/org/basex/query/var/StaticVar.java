@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -31,17 +30,16 @@ public final class StaticVar extends StaticDecl {
 
   /**
    * Constructor for a variable declared in a query.
-   * @param sc static context
-   * @param scope variable scope
+   * @param vs variable scope
    * @param anns annotations
    * @param var variable
    * @param expr expression to be bound
    * @param external external flag
    * @param doc current xqdoc cache
    */
-  StaticVar(final StaticContext sc, final VarScope scope, final AnnList anns, final Var var,
-      final Expr expr, final boolean external, final String doc) {
-    super(sc, anns, var.name, var.type, scope, doc, var.info);
+  StaticVar(final VarScope vs, final AnnList anns, final Var var, final Expr expr,
+      final boolean external, final String doc) {
+    super(anns, var.name, var.type, vs, doc, var.info);
     this.expr = expr;
     this.external = external;
     lazy = anns.contains(Annotation._BASEX_LAZY);
@@ -54,18 +52,18 @@ public final class StaticVar extends StaticDecl {
 
     if(!compiled) {
       dontEnter = true;
-      scope.prepareCompile(cc);
+      cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
       } catch(final QueryException qe) {
         compiled = true;
         if(lazy) {
-          expr = FnError.get(qe, expr.seqType(), sc);
+          expr = cc.error(qe, expr);
           return;
         }
         throw qe.notCatchable();
       } finally {
-        scope.finishCompile(this, cc);
+        cc.removeScope(this);
         dontEnter = false;
       }
 
@@ -92,7 +90,7 @@ public final class StaticVar extends StaticDecl {
     if(val != null) return val;
     dontEnter = true;
 
-    final int fp = scope.enter(qc);
+    final int fp = vs.enter(qc);
     try {
       return bind(expr.value(qc));
     } catch(final QueryException qe) {

@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -53,7 +52,7 @@ public final class If extends Arr {
         exprs[b] = exprs[b].compile(cc);
       } catch (final QueryException ex) {
         // replace original expression with error
-        exprs[b] = FnError.get(ex, seqType, cc.sc());
+        exprs[b] = cc.error(ex, this);
       }
     }
     return optimize(cc);
@@ -95,18 +94,18 @@ public final class If extends Arr {
         if(b == Bln.FALSE) {
           // if(A) then false() else true() -> not(A)
           cc.info(OPTPRE_X, this);
-          return Function.NOT.get(cc.sc(), info, a).optimize(cc);
+          return cc.function(Function.NOT, info, a).optimize(cc);
         }
         // if(A) then B else true() -> not(A) or B
         cc.info(OPTREWRITE_X, this);
-        final Expr notA = Function.NOT.get(cc.sc(), info, a).optimize(cc);
+        final Expr notA = cc.function(Function.NOT, info, a).optimize(cc);
         return new Or(info, notA, b).optimize(cc);
       }
 
       if(b == Bln.FALSE) {
         // if(A) then false() else C -> not(A) and C
         cc.info(OPTREWRITE_X, this);
-        final Expr notA = Function.NOT.get(cc.sc(), info, a).optimize(cc);
+        final Expr notA = cc.function(Function.NOT, info, a).optimize(cc);
         return new And(info, notA, c).optimize(cc);
       }
 
@@ -163,7 +162,6 @@ public final class If extends Arr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-
     final Expr sub = cond.inline(var, ex, cc);
     if(sub != null) cond = sub;
     boolean te = false;
@@ -173,7 +171,7 @@ public final class If extends Arr {
       try {
         nw = exprs[i].inline(var, ex, cc);
       } catch(final QueryException qe) {
-        nw = FnError.get(qe, seqType, cc.sc());
+        nw = cc.error(qe, this);
       }
       if(nw != null) {
         exprs[i] = nw;
@@ -184,9 +182,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public If copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return copyType(new If(info, cond.copy(cc, vs),
-        exprs[0].copy(cc, vs), exprs[1].copy(cc, vs)));
+  public If copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new If(info, cond.copy(cc, vm),
+        exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override
@@ -223,15 +221,13 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr typeCheck(final TypeCheck tc, final CompileContext cc)
-      throws QueryException {
+  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      final SeqType tp = exprs[e].seqType();
       try {
         exprs[e] = tc.check(exprs[e], cc);
       } catch(final QueryException ex) {
-        exprs[e] = FnError.get(ex, tp, cc.sc());
+        exprs[e] = cc.error(ex, exprs[e]);
       }
     }
     return optimize(cc);

@@ -30,15 +30,13 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @param expr bound expression, possibly {@code null}
    * @param ext {@code external} flag
    * @param doc current xqdoc cache
-   * @param sc static context
-   * @param scope variable scope
+   * @param vs variable scope
    * @return static variable reference
    * @throws QueryException query exception
    */
   public StaticVar declare(final Var var, final AnnList anns, final Expr expr, final boolean ext,
-      final String doc, final StaticContext sc, final VarScope scope) throws QueryException {
-
-    final StaticVar sv = new StaticVar(sc, scope, anns, var, expr, ext, doc);
+      final String doc, final VarScope vs) throws QueryException {
+    final StaticVar sv = new StaticVar(vs, anns, var, expr, ext, doc);
     final VarEntry ve = vars.get(var.name);
     if(ve != null) ve.setVar(sv);
     else vars.put(var.name, new VarEntry(sv));

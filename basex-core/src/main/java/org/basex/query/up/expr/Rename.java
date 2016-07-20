@@ -80,8 +80,8 @@ public final class Rename extends Update {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Rename(sc, info, exprs[0].copy(cc, vs), exprs[1].copy(cc, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Rename(sc, info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
   }
 
   @Override

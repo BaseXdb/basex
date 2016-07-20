@@ -438,9 +438,9 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    final FTWords ftw = new FTWords(info, query.copy(cc, vs), mode,
-        occ == null ? null : Arr.copyAll(cc, vs, occ));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final FTWords ftw = new FTWords(info, query.copy(cc, vm), mode,
+        occ == null ? null : Arr.copyAll(cc, vm, occ));
     if(ftt != null) ftw.ftt = ftt.copy(ftw);
     ftw.tokens = tokens;
     ftw.data = data;

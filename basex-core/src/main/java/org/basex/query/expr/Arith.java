@@ -60,8 +60,8 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Arith copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return copyType(new Arith(info, exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), calc));
+  public Arith copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new Arith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), calc));
   }
 
   @Override

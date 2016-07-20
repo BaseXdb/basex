@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -19,7 +18,7 @@ import org.basex.util.hash.*;
  */
 public final class FuncLit extends Single implements Scope {
   /** Variable scope. */
-  private final VarScope scope;
+  private final VarScope vs;
   /** Annotations. */
   private AnnList anns;
   /** Function name. */
@@ -38,17 +37,17 @@ public final class FuncLit extends Single implements Scope {
    * @param args formal parameters
    * @param expr function body
    * @param ft function type
-   * @param scope variable scope
+   * @param vs variable scope
    * @param info input info
    */
   FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr, final FuncType ft,
-      final VarScope scope, final InputInfo info) {
+      final VarScope vs, final InputInfo info) {
 
     super(info, expr);
     this.anns = anns;
     this.name = name;
     this.args = args;
-    this.scope = scope;
+    this.vs = vs;
     check = ft == null;
     seqType = (ft == null ? FuncType.arity(args.length) : ft).seqType();
   }
@@ -64,14 +63,14 @@ public final class FuncLit extends Single implements Scope {
       seqType = sf.funcType().seqType();
     }
 
-    scope.prepareCompile(cc);
+    cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
       expr.markTailCalls(null);
     } catch(final QueryException e) {
-      expr = FnError.get(e, seqType, scope.sc);
+      expr = cc.error(e, this);
     } finally {
-      scope.finishCompile(this, cc);
+      cc.removeScope(this);
     }
   }
 
@@ -83,20 +82,20 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(scope.sc, anns, name, args, (FuncType) seqType.type, expr, qc.value, qc.pos,
-        qc.size, scope.stackSize());
+    return new FuncItem(vs.sc, anns, name, args, (FuncType) seqType.type, expr, qc.value, qc.pos,
+        qc.size, vs.stackSize());
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    final VarScope scp = new VarScope(scope.sc);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final VarScope scp = new VarScope(vs.sc);
     cc.pushScope(scp);
     try {
       final int al = args.length;
       final Var[] arg = new Var[al];
-      for(int a = 0; a < al; a++) arg[a] = cc.copy(args[a], vs);
+      for(int a = 0; a < al; a++) arg[a] = cc.copy(args[a], vm);
 
-      final Expr call = expr.copy(cc, vs);
+      final Expr call = expr.copy(cc, vm);
       return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, scp, info);
     } finally {
       cc.removeScope();

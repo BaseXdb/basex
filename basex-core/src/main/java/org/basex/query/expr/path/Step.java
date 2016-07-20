@@ -104,7 +104,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public abstract Step copy(CompileContext cc, IntObjMap<Var> vs);
+  public abstract Step copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
    * Checks if this step has no predicates and uses the specified axis text.

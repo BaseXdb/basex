@@ -28,16 +28,16 @@ public final class MainModule extends Module {
 
   /**
    * Creates a new main module for a context item declared in the prolog.
-   * @param scope variable scope
+   * @param vs variable scope
    * @param expr root expression
    * @param type optional type
    * @param doc documentation
    * @param info input info
    * @return main module
    */
-  public static MainModule get(final VarScope scope, final Expr expr, final SeqType type,
+  public static MainModule get(final VarScope vs, final Expr expr, final SeqType type,
       final String doc, final InputInfo info) {
-    return new MainModule(scope.sc, scope, expr, type, doc, info, null, null, null);
+    return new MainModule(vs.sc, vs, expr, type, doc, info, null, null, null);
   }
 
   /**
@@ -55,7 +55,7 @@ public final class MainModule extends Module {
   /**
    * Constructor.
    * @param sc static context
-   * @param scope variable scope
+   * @param vs variable scope
    * @param expr root expression
    * @param declType optional type (can be {@code null})
    * @param doc documentation (can be {@code null})
@@ -64,11 +64,11 @@ public final class MainModule extends Module {
    * @param vars static variables (can be {@code null})
    * @param imports namespace URIs of imported modules (can be {@code null})
    */
-  MainModule(final StaticContext sc, final VarScope scope, final Expr expr, final SeqType declType,
+  MainModule(final StaticContext sc, final VarScope vs, final Expr expr, final SeqType declType,
       final String doc, final InputInfo info, final TokenObjMap<StaticFunc> funcs,
       final TokenObjMap<StaticVar> vars, final TokenSet imports) {
 
-    super(sc, scope, doc, info, funcs, vars, imports);
+    super(sc, vs, doc, info, funcs, vars, imports);
     this.expr = expr;
     this.declType = declType;
   }
@@ -78,11 +78,11 @@ public final class MainModule extends Module {
     if(compiled) return;
     compiled = true;
 
-    scope.prepareCompile(cc);
+    cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
     } finally {
-      scope.finishCompile(this, cc);
+      cc.removeScope(this);
     }
   }
 
@@ -93,7 +93,7 @@ public final class MainModule extends Module {
    * @throws QueryException evaluation exception
    */
   ItemList cache(final QueryContext qc) throws QueryException {
-    final int fp = scope.enter(qc);
+    final int fp = vs.enter(qc);
     try {
       final Iter iter = expr.iter(qc);
       final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
@@ -114,7 +114,7 @@ public final class MainModule extends Module {
   Iter iter(final QueryContext qc) throws QueryException {
     if(declType != null) return cache(qc).iter();
 
-    final int fp = scope.enter(qc);
+    final int fp = vs.enter(qc);
     final Iter iter = expr.iter(qc);
     return new Iter() {
       @Override

@@ -336,25 +336,23 @@ public final class QueryContext extends Job implements Closeable {
       // cache results
       ItemList results = root.cache(this);
 
-      if(updates != null) {
-        // only perform updates if no parent context exists
-        if(parent == null) {
-          // create copies of results that will be modified by an update operation
-          final ItemList cache = updates.cache;
-          final HashSet<Data> datas = updates.prepare(this);
-          final StringList dbs = updates.databases();
-          check(results, datas, dbs);
-          check(cache, datas, dbs);
+      // only perform updates if no parent context exists
+      if(updates != null && parent == null) {
+        // create copies of results that will be modified by an update operation
+        final ItemList cache = updates.cache;
+        final HashSet<Data> datas = updates.prepare(this);
+        final StringList dbs = updates.databases();
+        check(results, datas, dbs);
+        check(cache, datas, dbs);
 
-          // invalidate current node set in context, apply updates
-          if(context.data() != null) context.invalidate();
-          updates.apply(this);
+        // invalidate current node set in context, apply updates
+        if(context.data() != null) context.invalidate();
+        updates.apply(this);
 
-          // append cached outputs
-          if(!cache.isEmpty()) {
-            if(results.isEmpty()) results = cache;
-            else results.add(cache.value());
-          }
+        // append cached outputs
+        if(!cache.isEmpty()) {
+          if(results.isEmpty()) results = cache;
+          else results.add(cache.value());
         }
       }
       return results.iter();
@@ -511,7 +509,9 @@ public final class QueryContext extends Job implements Closeable {
    * @param string evaluation info
    */
   public void evalInfo(final String string) {
-    (parent != null ? parent.info : info).evalInfo(string);
+    QueryContext qc = this;
+    while(qc.parent != null) qc = qc.parent;
+    qc.info.evalInfo(string);
   }
 
   /**

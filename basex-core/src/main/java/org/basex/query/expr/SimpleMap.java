@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -55,7 +54,7 @@ public abstract class SimpleMap extends Arr {
           exprs[e] = exprs[e].compile(cc);
         } catch(final QueryException ex) {
           // replace original expression with error
-          exprs[e] = FnError.get(ex, seqType, cc.sc());
+          exprs[e] = cc.error(ex, this);
         }
         cc.qc.value = null;
       }

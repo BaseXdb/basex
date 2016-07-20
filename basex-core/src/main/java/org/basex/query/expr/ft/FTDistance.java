@@ -106,9 +106,9 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new FTDistance(info, exprs[0].copy(cc, vs),
-        min.copy(cc, vs), max.copy(cc, vs), unit);
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new FTDistance(info, exprs[0].copy(cc, vm),
+        min.copy(cc, vm), max.copy(cc, vm), unit);
   }
 
   @Override

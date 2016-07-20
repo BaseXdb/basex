@@ -77,8 +77,8 @@ public abstract class Cmp extends Arr {
     switch(check(comp, it)) {
       case  0: return Bln.TRUE;
       case  1: return Bln.FALSE;
-      case  2: return Function.EXISTS.get(cc.sc(), info, args);
-      case  3: return Function.EMPTY.get(cc.sc(), info, args);
+      case  2: return cc.function(Function.EXISTS, info, args);
+      case  3: return cc.function(Function.EMPTY, info, args);
       default: return this;
     }
   }
@@ -100,12 +100,11 @@ public abstract class Cmp extends Arr {
     final Expr[] args = ((Arr) exprs[0]).exprs;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    final StaticContext sc = cc.sc();
     switch(check(comp, it)) {
       case  0: return Bln.TRUE;
       case  1: return Bln.FALSE;
-      case  2: return Function.BOOLEAN.get(sc, info, Function.STRING.get(sc, info, args));
-      case  3: return Function.NOT.get(sc, info, Function.STRING.get(sc, info, args));
+      case  2: return cc.function(Function.BOOLEAN, info, cc.function(Function.STRING, info, args));
+      case  3: return cc.function(Function.NOT, info, cc.function(Function.STRING, info, args));
       default: return this;
     }
   }

@@ -78,7 +78,7 @@ public final class Or extends Logical {
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
       final Expr ex = new And(info, inner).optimize(cc);
-      return Function.NOT.get(cc.sc(), info, ex).optimize(cc);
+      return cc.function(Function.NOT, info, ex).optimize(cc);
     }
 
     // return single expression if it yields a boolean
@@ -107,8 +107,8 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Or copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Or(info, copyAll(cc, vs, exprs));
+  public Or copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Or(info, copyAll(cc, vm, exprs));
   }
 
   @Override

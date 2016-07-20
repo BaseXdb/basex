@@ -25,18 +25,16 @@ public abstract class StaticDecl extends StaticScope {
 
   /**
    * Constructor.
-   * @param sc static context
    * @param anns annotations
    * @param name name
    * @param type declared return type
-   * @param scope variable scope
+   * @param vs variable scope
    * @param doc xqdoc documentation
    * @param info input info
    */
-  protected StaticDecl(final StaticContext sc, final AnnList anns, final QNm name,
-      final SeqType type, final VarScope scope, final String doc, final InputInfo info) {
-
-    super(sc, scope, doc, info);
+  protected StaticDecl(final AnnList anns, final QNm name, final SeqType type, final VarScope vs,
+      final String doc, final InputInfo info) {
+    super(vs.sc, vs, doc, info);
     this.anns = anns;
     this.name = name;
     this.type = type;

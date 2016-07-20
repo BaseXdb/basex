@@ -57,8 +57,8 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new FTContent(info, exprs[0].copy(cc, vs), content);
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new FTContent(info, exprs[0].copy(cc, vm), content);
   }
 
   @Override

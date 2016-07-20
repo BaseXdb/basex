@@ -223,14 +223,14 @@ public final class FuncItem extends FItem implements Scope {
 
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
-    final IntObjMap<Var> vs = new IntObjMap<>();
+    final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      cls.add(new Let(cc.copy(params[p], vs), exprs[p], false).optimize(cc));
+      cls.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
     }
 
     // copy the function body
-    final Expr rt = expr.copy(cc, vs);
+    final Expr rt = expr.copy(cc, vm);
 
     rt.accept(new ASTVisitor() {
       @Override

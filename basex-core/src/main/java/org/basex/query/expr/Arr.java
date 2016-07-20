@@ -67,17 +67,17 @@ public abstract class Arr extends ParseExpr {
    * Creates a deep copy of the given array.
    * @param <T> element type
    * @param cc compilation context
-   * @param vs variable mapping
+   * @param vm variable mapping
    * @param arr array to copy
    * @return deep copy of the array
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Expr> T[] copyAll(final CompileContext cc, final IntObjMap<Var> vs,
+  public static <T extends Expr> T[] copyAll(final CompileContext cc, final IntObjMap<Var> vm,
       final T[] arr) {
 
     final T[] copy = arr.clone();
     final int cl = copy.length;
-    for(int c = 0; c < cl; c++) copy[c] = (T) copy[c].copy(cc, vs);
+    for(int c = 0; c < cl; c++) copy[c] = (T) copy[c].copy(cc, vm);
     return copy;
   }
 

@@ -30,7 +30,7 @@ public final class FnCount extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     // skip non-deterministic and variable expressions
     final Expr e = exprs[0];
     if(e.has(Flag.NDT) || e.has(Flag.UPD) || e instanceof VarRef) return this;
@@ -39,7 +39,7 @@ public final class FnCount extends StandardFunc {
     if(c >= 0) return Int.get(c);
 
     if(e instanceof MapKeys) {
-      return Function._MAP_SIZE.get(sc, info, ((MapKeys) e).exprs);
+      return cc.function(Function._MAP_SIZE, info, ((MapKeys) e).exprs);
     }
     return this;
   }

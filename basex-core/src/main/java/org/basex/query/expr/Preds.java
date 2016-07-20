@@ -11,7 +11,6 @@ import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -59,7 +58,7 @@ public abstract class Preds extends ParseExpr {
           preds[p] = preds[p].compile(cc);
         } catch(final QueryException ex) {
           // replace original expression with error
-          preds[p] = FnError.get(ex, seqType, cc.sc());
+          preds[p] = cc.error(ex, this);
         }
       }
     } finally {
@@ -100,7 +99,7 @@ public abstract class Preds extends ParseExpr {
           for(final Expr e : Arrays.asList(preds).subList(0, p)) el.add(e);
           for(final Expr a : and) {
             // wrap test with boolean() if the result is numeric
-            el.add(Function.BOOLEAN.get(cc.sc(), info, a).optimizeEbv(cc));
+            el.add(cc.function(Function.BOOLEAN, info, a).optimizeEbv(cc));
           }
           for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) el.add(e);
           preds = el.finish();

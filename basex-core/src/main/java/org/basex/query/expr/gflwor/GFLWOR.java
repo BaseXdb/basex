@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -740,7 +739,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        ret = FnError.get(qe, ret.seqType(), cc.sc());
+        ret = cc.error(qe, ret);
         return true;
       }
     }
@@ -750,10 +749,10 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final LinkedList<Clause> cls = new LinkedList<>();
-    for(final Clause clause : clauses) cls.add(clause.copy(cc, vs));
-    return copyType(new GFLWOR(info, cls, ret.copy(cc, vs)));
+    for(final Clause clause : clauses) cls.add(clause.copy(cc, vm));
+    return copyType(new GFLWOR(info, cls, ret.copy(cc, vm)));
   }
 
   /**
@@ -912,7 +911,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     @Override
-    public abstract Clause copy(CompileContext cc, IntObjMap<Var> vs);
+    public abstract Clause copy(CompileContext cc, IntObjMap<Var> vm);
 
     /**
      * Checks if the given clause (currently: let or where) can be slid over this clause.

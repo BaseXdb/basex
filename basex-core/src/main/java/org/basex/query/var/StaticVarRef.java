@@ -71,7 +71,7 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final StaticVarRef ref = new StaticVarRef(info, name, sc);
     ref.var = var;
     return ref;

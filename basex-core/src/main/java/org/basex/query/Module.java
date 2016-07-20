@@ -23,17 +23,17 @@ public abstract class Module extends StaticScope {
   /**
    * Constructor.
    * @param sc static context
-   * @param scp variable scope (can be {@code null})
+   * @param vs variable scope (can be {@code null})
    * @param doc documentation (can be {@code null})
    * @param info input info (can be {@code null})
    * @param funcs user-defined functions (can be {@code null})
    * @param vars static variables (can be {@code null})
    * @param imports namespace URIs of imported modules (can be {@code null})
    */
-  Module(final StaticContext sc, final VarScope scp, final String doc, final InputInfo info,
+  Module(final StaticContext sc, final VarScope vs, final String doc, final InputInfo info,
       final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
       final TokenSet imports) {
-    super(sc, scp, doc, info);
+    super(sc, vs, doc, info);
     this.funcs = funcs;
     this.vars = vars;
     this.imports = imports;

@@ -49,8 +49,8 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    final Except ex = new Except(info, copyAll(cc, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Except ex = new Except(info, copyAll(cc, vm, exprs));
     ex.iterable = iterable;
     return copyType(ex);
   }

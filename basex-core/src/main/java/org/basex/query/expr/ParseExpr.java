@@ -129,6 +129,7 @@ public abstract class ParseExpr extends Expr {
 
   // OPTIMIZATIONS ================================================================================
 
+
   /**
    * Pre-evaluates the specified expression.
    * @param cc compilation context
@@ -150,7 +151,7 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Adds an optimization info for pre-evaluating the specified expression.
-   * @param ex optimized expression
+   * @param ex original or optimized expression (can be {@code null})
    * @param cc compilation context
    * @return optimized expression
    */

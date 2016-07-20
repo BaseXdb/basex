@@ -51,8 +51,8 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new CTxt(sc, info, exprs[0].copy(cc, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new CTxt(sc, info, exprs[0].copy(cc, vm));
   }
 
   @Override

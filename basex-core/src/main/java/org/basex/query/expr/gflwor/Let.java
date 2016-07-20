@@ -109,8 +109,8 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public Let copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Let(cc.copy(var, vs), expr.copy(cc, vs), scoring);
+  public Let copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Let(cc.copy(var, vm), expr.copy(cc, vm), scoring);
   }
 
   @Override
@@ -129,7 +129,7 @@ public final class Let extends ForLet {
    * @throws QueryException query exception
    */
   Expr inlineExpr(final CompileContext cc) throws QueryException {
-    return scoring ? Function._FT_SCORE.get(cc.sc(), info, expr).optimize(cc) :
+    return scoring ? cc.function(Function._FT_SCORE, info, expr).optimize(cc) :
       var.checked(expr, cc);
   }
 

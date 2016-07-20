@@ -2,7 +2,11 @@ package org.basex.query;
 
 import java.util.*;
 
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -44,16 +48,26 @@ public final class CompileContext {
 
   /**
    * Removes a variable scope from the stack.
+   * @return the removed element
    */
-  public void removeScope() {
-    scopes.remove(scopes.size() - 1);
+  public VarScope removeScope() {
+    return scopes.remove(scopes.size() - 1);
+  }
+
+  /**
+   * Prepares the variable scope for being compiled.
+   * This method should be run after compiling a scope.
+   * @param scope scope
+   */
+  public void removeScope(final Scope scope) {
+    removeScope().cleanUp(scope);
   }
 
   /**
    * Returns the current variable scope.
    * @return variable scope
    */
-  public VarScope scope() {
+  public VarScope vs() {
     return scopes.get(scopes.size() - 1);
   }
 
@@ -62,19 +76,43 @@ public final class CompileContext {
    * @return static context
    */
   public StaticContext sc() {
-    return scope().sc;
+    return vs().sc;
   }
 
   /**
    * Creates a new copy of the given variable in this scope.
    * @param var variable to copy (can be {@code null})
-   * @param vs variable mapping (can be {@code null})
+   * @param vm variable mapping (can be {@code null})
    * @return new variable
    */
-  public Var copy(final Var var, final IntObjMap<Var> vs) {
+  public Var copy(final Var var, final IntObjMap<Var> vm) {
     if(var == null) return null;
-    final Var v = scope().addCopy(var, this);
-    if(vs != null) vs.put(var.id, v);
+    final VarScope vs = vs();
+    final Var v = vs.add(new Var(var, qc, vs.sc));
+    if(vm != null) vm.put(var.id, v);
     return v;
+  }
+
+  /**
+   * Creates an error function instance.
+   * @param qe exception to be raised
+   * @param expr expression
+   * @return function
+   */
+  public StandardFunc error(final QueryException qe, final Expr expr) {
+    return FnError.get(qe, expr.seqType(), sc());
+  }
+
+  /**
+   * Creates and returns an optimized function instance.
+   * @param func function
+   * @param info input info
+   * @param exprs expressions
+   * @return function
+   * @throws QueryException query exception
+   */
+  public Expr function(final Function func, final InputInfo info, final Expr... exprs)
+      throws QueryException {
+    return func.get(sc(), info, exprs).optimize(this);
   }
 }

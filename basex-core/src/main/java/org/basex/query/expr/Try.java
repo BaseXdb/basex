@@ -122,8 +122,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Try(info, expr.copy(cc, vs), Arr.copyAll(cc, vs, catches));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Try(info, expr.copy(cc, vm), Arr.copyAll(cc, vm, catches));
   }
 
   @Override

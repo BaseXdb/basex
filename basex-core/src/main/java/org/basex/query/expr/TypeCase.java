@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -62,7 +61,7 @@ public final class TypeCase extends Single {
       }
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FnError.get(ex, expr.seqType(), cc.sc());
+      expr = cc.error(ex, expr);
     }
     return optimize(cc);
   }
@@ -78,14 +77,14 @@ public final class TypeCase extends Single {
     try {
       return super.inline(v, ex, cc);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType(), cc.sc());
+      expr = cc.error(qe, expr);
       return this;
     }
   }
 
   @Override
-  public TypeCase copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new TypeCase(info, cc.copy(var, vs), types.clone(), expr.copy(cc, vs));
+  public TypeCase copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new TypeCase(info, cc.copy(var, vm), types.clone(), expr.copy(cc, vm));
   }
 
   /**

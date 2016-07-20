@@ -173,9 +173,9 @@ public class QueryParser extends InputParser {
       localVars.pushContext(null);
       final Expr expr = expr();
       if(expr == null) throw alter == null ? error(EXPREMPTY) : error();
-      final VarScope scope = localVars.popContext();
+      final VarScope vs = localVars.popContext();
 
-      final MainModule mm = new MainModule(sc, scope, expr, null, moduleDoc, null,
+      final MainModule mm = new MainModule(sc, vs, expr, null, moduleDoc, null,
           funcs, vars, imports);
       finish(mm);
       check(mm);
@@ -847,8 +847,8 @@ public class QueryParser extends InputParser {
     localVars.pushContext(null);
     final Expr e = check(single(), NOVARDECL);
     final SeqType declType = sc.contextType != null ? sc.contextType : SeqType.ITEM;
-    final VarScope scope = localVars.popContext();
-    qc.ctxItem = MainModule.get(scope, e, declType, currDoc.toString(), info());
+    final VarScope vs = localVars.popContext();
+    qc.ctxItem = MainModule.get(vs, e, declType, currDoc.toString(), info());
 
     if(module != null) throw error(DECITEM);
     if(!sc.mixUpdates && e.has(Flag.UPD)) throw error(UPCTX, e);
@@ -872,9 +872,9 @@ public class QueryParser extends InputParser {
       wsCheck(ASSIGN);
       bind = check(single(), NOVARDECL);
     }
-    final VarScope scope = localVars.popContext();
+    final VarScope vs = localVars.popContext();
     final String doc = currDoc.toString();
-    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, doc, sc, scope);
+    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, doc, vs);
     vars.put(sv.id(), sv);
   }
 
@@ -915,9 +915,9 @@ public class QueryParser extends InputParser {
 
     final SeqType type = optAsType();
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
-    final VarScope scope = localVars.popContext();
-    final StaticFunc func = qc.funcs.declare(anns, name, args, type, expr, currDoc.toString(), sc,
-        scope, ii);
+    final VarScope vs = localVars.popContext();
+    final StaticFunc func = qc.funcs.declare(
+        anns, name, args, type, expr, currDoc.toString(), vs, ii);
     funcs.put(func.id(), func);
   }
 
@@ -2088,7 +2088,7 @@ public class QueryParser extends InputParser {
           }
         } else if(consume(QUESTION)) {
           // parses the "Lookup" rule
-          e = new Lookup(info(), sc, keySpecifier(), e);
+          e = new Lookup(info(), keySpecifier(), e);
         }
       } while(e != old);
     }
@@ -2146,7 +2146,7 @@ public class QueryParser extends InputParser {
     // unary lookup
     final int ip = pos;
     if(consume(QUESTION)) {
-      if(!wsConsume(COMMA) && !consume(PAREN2)) return new Lookup(info(), sc, keySpecifier());
+      if(!wsConsume(COMMA) && !consume(PAREN2)) return new Lookup(info(), keySpecifier());
       pos = ip;
     }
     // context value
@@ -2238,8 +2238,8 @@ public class QueryParser extends InputParser {
       wsCheck(PAREN2);
       final SeqType type = optAsType();
       final Expr body = enclosedExpr();
-      final VarScope scope = localVars.popContext();
-      return new Closure(info(), type, args, body, anns, global, scope);
+      final VarScope vs = localVars.popContext();
+      return new Closure(info(), type, args, body, anns, global, vs);
     }
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);

@@ -108,8 +108,8 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Treat(info, expr.copy(cc, vs), seqType);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Treat(info, expr.copy(cc, vm), seqType);
   }
 
   @Override

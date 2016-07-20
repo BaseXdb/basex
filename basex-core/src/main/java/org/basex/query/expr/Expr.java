@@ -290,10 +290,10 @@ public abstract class Expr extends ExprInfo {
   /**
    * Copies an expression. Used for inlining functions, or for copying static queries.
    * @param cc compilation context
-   * @param vs mapping from old variable IDs to new variable copies
+   * @param vm mapping from old variable IDs to new variable copies
    * @return copied expression
    */
-  public abstract Expr copy(CompileContext cc, IntObjMap<Var> vs);
+  public abstract Expr copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
    * <p>This method is e.g. overwritten by expressions like {@link CmpG}, {@link CmpV},

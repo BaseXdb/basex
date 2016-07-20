@@ -244,17 +244,17 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public GroupBy copy(final CompileContext cc, final IntObjMap<Var> vs) {
+  public GroupBy copy(final CompileContext cc, final IntObjMap<Var> vm) {
     // copy the pre-grouping expressions
-    final Expr[] pEx = Arr.copyAll(cc, vs, preExpr);
+    final Expr[] pEx = Arr.copyAll(cc, vm, preExpr);
 
     // create fresh copies of the post-grouping variables
     final Var[] ps = new Var[post.length];
     final int pl = ps.length;
-    for(int p = 0; p < pl; p++) ps[p] = cc.copy(post[p], vs);
+    for(int p = 0; p < pl; p++) ps[p] = cc.copy(post[p], vm);
 
     // done
-    return new GroupBy(Arr.copyAll(cc, vs, specs), pEx, ps, nonOcc, info);
+    return new GroupBy(Arr.copyAll(cc, vm, specs), pEx, ps, nonOcc, info);
   }
 
   @Override
@@ -357,8 +357,8 @@ public final class GroupBy extends Clause {
     }
 
     @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-      final Spec spec = new Spec(info, cc.copy(var, vs), expr.copy(cc, vs), coll);
+    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+      final Spec spec = new Spec(info, cc.copy(var, vm), expr.copy(cc, vm), coll);
       spec.occluded = occluded;
       return spec;
     }

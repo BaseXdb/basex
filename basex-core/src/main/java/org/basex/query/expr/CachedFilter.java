@@ -91,8 +91,8 @@ public class CachedFilter extends Filter {
   }
 
   @Override
-  public Filter copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return copyType(new CachedFilter(info, root.copy(cc, vs), Arr.copyAll(cc, vs, preds)));
+  public Filter copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new CachedFilter(info, root.copy(cc, vm), Arr.copyAll(cc, vm, preds)));
   }
 
   @Override

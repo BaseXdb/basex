@@ -177,7 +177,7 @@ public final class CmpG extends Cmp {
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
       cc.info(OPTREWRITE_X, this);
-      return Function.NOT.get(cc.sc(), info, e1);
+      return cc.function(Function.NOT, info, e1);
     }
 
     // rewrite expr CMP (range expression or number)
@@ -329,8 +329,8 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public CmpG copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new CmpG(exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), op, coll, sc, info);
+  public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new CmpG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
   }
 
   @Override

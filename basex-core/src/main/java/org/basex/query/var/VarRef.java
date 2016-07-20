@@ -83,8 +83,8 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public VarRef copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    final Var nw = vs.get(var.id);
+  public VarRef copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Var nw = vm.get(var.id);
     return new VarRef(info, nw != null ? nw : var).optimize(cc);
   }
 

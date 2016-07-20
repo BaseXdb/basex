@@ -84,8 +84,8 @@ public final class Quantifier extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Quantifier(info, expr.copy(cc, vs), every);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new Quantifier(info, expr.copy(cc, vm), every);
   }
 
   @Override
