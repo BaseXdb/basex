@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.SeqType.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -36,7 +35,7 @@ public final class UtilLastFrom extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     seqType = exprs[0].seqType().withOcc(Occ.ZERO_ONE);
     return this;
   }

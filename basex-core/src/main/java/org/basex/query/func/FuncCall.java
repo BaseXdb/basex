@@ -44,8 +44,8 @@ public abstract class FuncCall extends Arr {
   abstract Value[] evalArgs(final QueryContext qc) throws QueryException;
 
   @Override
-  public final void markTailCalls(final QueryContext qc) {
-    if(qc != null) qc.compInfo(QueryText.OPTTCE_X, this);
+  public final void markTailCalls(final CompileContext cc) {
+    if(cc != null) cc.info(QueryText.OPTTCE_X, this);
     tailCall = true;
   }
 

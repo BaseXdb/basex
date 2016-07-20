@@ -37,18 +37,18 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     try {
-      for(final Pragma p : pragmas) p.init(qc, info);
-      expr = expr.compile(qc, scp);
+      for(final Pragma p : pragmas) p.init(cc.qc, info);
+      expr = expr.compile(cc);
     } finally {
-      for(final Pragma p : pragmas) p.finish(qc);
+      for(final Pragma p : pragmas) p.finish(cc.qc);
     }
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) {
+  public Expr optimize(final CompileContext cc) {
     seqType = expr.seqType();
     size = expr.size();
     return this;
@@ -70,11 +70,11 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
     final int pl = prag.length;
     for(int p = 0; p < pl; p++) prag[p] = prag[p].copy();
-    return copyType(new Extension(info, prag, expr.copy(qc, scp, vs)));
+    return copyType(new Extension(info, prag, expr.copy(cc, vs)));
   }
 
   @Override

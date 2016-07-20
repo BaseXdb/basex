@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -28,8 +27,9 @@ public final class FnData extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
-    final SeqType st = (exprs.length > 0 ? exprs[0] : qc.value != null ? qc.value : this).seqType();
+  protected Expr opt(final CompileContext cc) {
+    final Expr expr = exprs.length > 0 ? exprs[0] : cc.qc.value != null ? cc.qc.value : this;
+    final SeqType st = expr.seqType();
     if(st.type instanceof NodeType) {
       seqType = SeqType.get(AtomType.ATM, st.occ);
     } else if(!st.mayBeArray()) {

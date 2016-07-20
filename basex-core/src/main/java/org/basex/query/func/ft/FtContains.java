@@ -40,12 +40,13 @@ public final class FtContains extends FtAccess {
     if(cs != null) opt.cs = cs;
 
     qc.ftOpt(opt);
-    final FTExpr fte;
+    final FTWords ftw;
     try {
-      fte = new FTWords(info, query, mode, null).compile(qc, null);
+      ftw = new FTWords(info, query, mode, null);
+      ftw.prepare(qc);
     } finally {
       qc.ftOpt(tmp);
     }
-    return new FTContains(input, options(fte, opts), info).item(qc, info);
+    return new FTContains(input, options(ftw, opts), info).item(qc, info);
   }
 }

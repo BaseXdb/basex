@@ -103,7 +103,7 @@ final class IterPosStep extends Step {
   }
 
   @Override
-  public Step copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new IterPosStep(info, axis, test.copy(), Arr.copyAll(qc, scp, vs, preds)));
+  public Step copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new IterPosStep(info, axis, test.copy(), Arr.copyAll(cc, vs, preds)));
   }
 }

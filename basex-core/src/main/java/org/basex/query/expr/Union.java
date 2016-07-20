@@ -29,14 +29,14 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.optimize(qc, scp);
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    super.optimize(cc);
 
     final ExprList el = new ExprList(exprs.length);
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands
-        qc.compInfo(OPTREMOVE_X_X, this, ex);
+        cc.info(OPTREMOVE_X_X, this, ex);
       } else {
         el.add(ex);
       }
@@ -51,8 +51,8 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Union un = new Union(info, copyAll(qc, scp, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final Union un = new Union(info, copyAll(cc, vs, exprs));
     un.iterable = iterable;
     return copyType(un);
   }

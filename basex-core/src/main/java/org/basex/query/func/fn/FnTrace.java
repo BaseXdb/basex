@@ -10,7 +10,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -41,7 +40,7 @@ public final class FnTrace extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     seqType = exprs[0].seqType();
     return this;
   }

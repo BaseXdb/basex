@@ -28,13 +28,13 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public ContextValue compile(final QueryContext qc, final VarScope scp) {
-    return optimize(qc, scp);
+  public ContextValue compile(final CompileContext cc) {
+    return optimize(cc);
   }
 
   @Override
-  public ContextValue optimize(final QueryContext qc, final VarScope scp) {
-    if(qc.value != null) seqType = qc.value.seqType();
+  public ContextValue optimize(final CompileContext cc) {
+    if(cc.qc.value != null) seqType = cc.qc.value.seqType();
     return this;
   }
 
@@ -64,7 +64,7 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
     return copyType(new ContextValue(info));
   }
 

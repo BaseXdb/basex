@@ -72,10 +72,10 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    ftexpr = ftexpr.compile(qc, scp);
-    return expr.isEmpty() ? optPre(Bln.FALSE, qc) : this;
+  public Expr compile(final CompileContext cc) throws QueryException {
+    super.compile(cc);
+    ftexpr = ftexpr.compile(cc);
+    return expr.isEmpty() ? optPre(Bln.FALSE, cc) : this;
   }
 
   @Override
@@ -94,14 +94,12 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-
-    final Expr sub = expr.inline(qc, scp, var, ex);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    final Expr sub = expr.inline(var, ex, cc);
     if(sub != null) expr = sub;
-    final FTExpr fte = ftexpr.inline(qc, scp, var, ex);
+    final FTExpr fte = ftexpr.inline(var, ex, cc);
     if(fte != null) ftexpr = fte;
-    return sub != null || fte != null ? optimize(qc, scp) : null;
+    return sub != null || fte != null ? optimize(cc) : null;
   }
 
   @Override
@@ -126,8 +124,8 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTContains(expr.copy(qc, scp, vs), ftexpr.copy(qc, scp, vs), info);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTContains(expr.copy(cc, vs), ftexpr.copy(cc, vs), info);
   }
 
   @Override

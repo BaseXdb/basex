@@ -30,8 +30,8 @@ public final class CMap extends Arr {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    return allAreValues() ? preEval(qc) : this;
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return allAreValues() ? preEval(cc) : this;
   }
 
   @Override
@@ -50,8 +50,8 @@ public final class CMap extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CMap(info, copyAll(qc, scp, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new CMap(info, copyAll(cc, vs, exprs));
   }
 
   @Override

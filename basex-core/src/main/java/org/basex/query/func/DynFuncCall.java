@@ -69,13 +69,13 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     if(body().has(Flag.NDT)) ndt = true;
-    return super.compile(qc, scp);
+    return super.compile(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr f = body();
     final Type tp = f.seqType().type;
 
@@ -94,7 +94,7 @@ public final class DynFuncCall extends FuncCall {
 
     // maps and arrays can only contain fully evaluated values, so this is safe
     if((f instanceof Map || f instanceof org.basex.query.value.array.Array) && allAreValues())
-      return optPre(value(qc), qc);
+      return optPre(value(cc.qc), cc);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function
@@ -102,7 +102,7 @@ public final class DynFuncCall extends FuncCall {
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
         checkUpdating(fe);
         final Expr[] args = Arrays.copyOf(exprs, nargs);
-        final Expr in = fe.inlineExpr(args, qc, scp, info);
+        final Expr in = fe.inlineExpr(args, cc, info);
         if(in != null) return in;
       }
     } else if(f instanceof Item) {
@@ -150,8 +150,8 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] copy = copyAll(qc, scp, vs, exprs);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final Expr[] copy = copyAll(cc, vs, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
     final DynFuncCall call = new DynFuncCall(info, sc, upd, ndt, copy[last], args);

@@ -35,10 +35,10 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
-    for(int e = 0; e < el; e++) exprs[e] = exprs[e].compile(qc, scp);
-    return optimize(qc, scp);
+    for(int e = 0; e < el; e++) exprs[e] = exprs[e].compile(cc);
+    return optimize(cc);
   }
 
   @Override
@@ -59,27 +59,25 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    return inlineAll(qc, scp, exprs, var, ex) ? optimize(qc, scp) : null;
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    return inlineAll(exprs, var, ex, cc) ? optimize(cc) : null;
   }
 
   /**
    * Creates a deep copy of the given array.
    * @param <T> element type
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @param vs variable mapping
    * @param arr array to copy
    * @return deep copy of the array
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Expr> T[] copyAll(final QueryContext qc, final VarScope scp,
-      final IntObjMap<Var> vs, final T[] arr) {
+  public static <T extends Expr> T[] copyAll(final CompileContext cc, final IntObjMap<Var> vs,
+      final T[] arr) {
 
     final T[] copy = arr.clone();
     final int cl = copy.length;
-    for(int c = 0; c < cl; c++) copy[c] = (T) copy[c].copy(qc, scp, vs);
+    for(int c = 0; c < cl; c++) copy[c] = (T) copy[c].copy(cc, vs);
     return copy;
   }
 

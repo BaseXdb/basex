@@ -44,33 +44,33 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    cond = cond.compile(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    cond = cond.compile(cc);
     // choose branches to compile
-    final int[] branches = cond.isValue() ? new int[] { branch(qc) } : new int[] { 0, 1 };
+    final int[] branches = cond.isValue() ? new int[] { branch(cc.qc) } : new int[] { 0, 1 };
     for(final int b : branches) {
       try {
-        exprs[b] = exprs[b].compile(qc, scp);
+        exprs[b] = exprs[b].compile(cc);
       } catch (final QueryException ex) {
         // replace original expression with error
-        exprs[b] = FnError.get(ex, seqType, scp.sc);
+        exprs[b] = FnError.get(ex, seqType, cc.sc());
       }
     }
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // static condition: return branch in question
-    cond = cond.optimizeEbv(qc, scp);
-    if(cond.isValue()) return optPre(exprs[branch(qc)], qc);
+    cond = cond.optimizeEbv(cc);
+    if(cond.isValue()) return optPre(exprs[branch(cc.qc)], cc);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(exprs[0].sameAs(exprs[1])) return optPre(exprs[0], qc);
+    if(exprs[0].sameAs(exprs[1])) return optPre(exprs[0], cc);
 
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
-      qc.compInfo(OPTREWRITE_X, this);
+      cc.info(OPTREWRITE_X, this);
       cond = ((Arr) cond).exprs[0];
       final Expr tmp = exprs[0];
       exprs[0] = exprs[1];
@@ -83,37 +83,37 @@ public final class If extends Arr {
       if(b == Bln.TRUE) {
         if(c == Bln.FALSE) {
           // if(A) then true() else false() -> xs:boolean(A)
-          qc.compInfo(OPTPRE_X, this);
-          return compBln(a, info, scp.sc);
+          cc.info(OPTPRE_X, this);
+          return compBln(a, info, cc.sc());
         }
         // if(A) then true() else C -> A or C
-        qc.compInfo(OPTREWRITE_X, this);
-        return new Or(info, a, c).optimize(qc, scp);
+        cc.info(OPTREWRITE_X, this);
+        return new Or(info, a, c).optimize(cc);
       }
 
       if(c == Bln.TRUE) {
         if(b == Bln.FALSE) {
           // if(A) then false() else true() -> not(A)
-          qc.compInfo(OPTPRE_X, this);
-          return Function.NOT.get(scp.sc, info, a).optimize(qc, scp);
+          cc.info(OPTPRE_X, this);
+          return Function.NOT.get(cc.sc(), info, a).optimize(cc);
         }
         // if(A) then B else true() -> not(A) or B
-        qc.compInfo(OPTREWRITE_X, this);
-        final Expr notA = Function.NOT.get(scp.sc, info, a).optimize(qc, scp);
-        return new Or(info, notA, b).optimize(qc, scp);
+        cc.info(OPTREWRITE_X, this);
+        final Expr notA = Function.NOT.get(cc.sc(), info, a).optimize(cc);
+        return new Or(info, notA, b).optimize(cc);
       }
 
       if(b == Bln.FALSE) {
         // if(A) then false() else C -> not(A) and C
-        qc.compInfo(OPTREWRITE_X, this);
-        final Expr notA = Function.NOT.get(scp.sc, info, a).optimize(qc, scp);
-        return new And(info, notA, c).optimize(qc, scp);
+        cc.info(OPTREWRITE_X, this);
+        final Expr notA = Function.NOT.get(cc.sc(), info, a).optimize(cc);
+        return new And(info, notA, c).optimize(cc);
       }
 
       if(c == Bln.FALSE) {
         // if(A) then B else false() -> A and B
-        qc.compInfo(OPTREWRITE_X, this);
-        return new And(info, a, b).optimize(qc, scp);
+        cc.info(OPTREWRITE_X, this);
+        return new And(info, a, b).optimize(cc);
       }
     }
 
@@ -162,32 +162,31 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
 
-    final Expr sub = cond.inline(qc, scp, var, ex);
+    final Expr sub = cond.inline(var, ex, cc);
     if(sub != null) cond = sub;
     boolean te = false;
     final int es = exprs.length;
     for(int i = 0; i < es; i++) {
       Expr nw;
       try {
-        nw = exprs[i].inline(qc, scp, var, ex);
+        nw = exprs[i].inline(var, ex, cc);
       } catch(final QueryException qe) {
-        nw = FnError.get(qe, seqType, scp.sc);
+        nw = FnError.get(qe, seqType, cc.sc());
       }
       if(nw != null) {
         exprs[i] = nw;
         te = true;
       }
     }
-    return te || sub != null ? optimize(qc, scp) : null;
+    return te || sub != null ? optimize(cc) : null;
   }
 
   @Override
-  public If copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new If(info, cond.copy(qc, scp, vs),
-        exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs)));
+  public If copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new If(info, cond.copy(cc, vs),
+        exprs[0].copy(cc, vs), exprs[1].copy(cc, vs)));
   }
 
   @Override
@@ -196,9 +195,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public void markTailCalls(final QueryContext qc) {
-    exprs[0].markTailCalls(qc);
-    exprs[1].markTailCalls(qc);
+  public void markTailCalls(final CompileContext cc) {
+    exprs[0].markTailCalls(cc);
+    exprs[1].markTailCalls(cc);
   }
 
   @Override
@@ -224,17 +223,17 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr typeCheck(final TypeCheck tc, final QueryContext qc, final VarScope scp)
+  public Expr typeCheck(final TypeCheck tc, final CompileContext cc)
       throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       final SeqType tp = exprs[e].seqType();
       try {
-        exprs[e] = tc.check(exprs[e], qc, scp);
+        exprs[e] = tc.check(exprs[e], cc);
       } catch(final QueryException ex) {
-        exprs[e] = FnError.get(ex, tp, scp.sc);
+        exprs[e] = FnError.get(ex, tp, cc.sc());
       }
     }
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 }

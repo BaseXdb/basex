@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -32,7 +31,7 @@ public class HofId extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final QueryContext qc, final VarScope scp) {
+  protected final Expr opt(final CompileContext cc) {
     return exprs[0];
   }
 }

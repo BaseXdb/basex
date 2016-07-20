@@ -15,7 +15,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -332,7 +331,7 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
       final InputInfo ii) {
     return null;
   }

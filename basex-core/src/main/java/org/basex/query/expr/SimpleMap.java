@@ -46,33 +46,33 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Value cv = qc.value;
+  public final Expr compile(final CompileContext cc) throws QueryException {
+    final Value cv = cc.qc.value;
     try {
       final int el = exprs.length;
       for(int e = 0; e < el; e++) {
         try {
-          exprs[e] = exprs[e].compile(qc, scp);
+          exprs[e] = exprs[e].compile(cc);
         } catch(final QueryException ex) {
           // replace original expression with error
-          exprs[e] = FnError.get(ex, seqType, scp.sc);
+          exprs[e] = FnError.get(ex, seqType, cc.sc());
         }
-        qc.value = null;
+        cc.qc.value = null;
       }
     } finally {
-      qc.value = cv;
+      cc.qc.value = cv;
     }
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     seqType = SeqType.get(exprs[exprs.length - 1].seqType().type, Occ.ZERO_MORE);
 
     // rewrite path with empty steps
-    for(final Expr expr : exprs) if(expr.isEmpty()) return optPre(qc);
+    for(final Expr expr : exprs) if(expr.isEmpty()) return optPre(cc);
 
-    return allAreValues() ? optPre(value(qc), qc) : this;
+    return allAreValues() ? optPre(value(cc.qc), cc) : this;
   }
 
   @Override

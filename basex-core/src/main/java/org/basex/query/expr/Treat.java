@@ -34,13 +34,13 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    return super.compile(qc, scp).optimize(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return super.compile(cc).optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    return expr.isValue() ? optPre(value(qc), qc) : this;
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return expr.isValue() ? optPre(value(cc.qc), cc) : this;
   }
 
   @Override
@@ -108,8 +108,8 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Treat(info, expr.copy(qc, scp, vs), seqType);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Treat(info, expr.copy(cc, vs), seqType);
   }
 
   @Override

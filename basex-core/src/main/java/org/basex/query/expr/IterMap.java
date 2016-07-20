@@ -69,7 +69,7 @@ final class IterMap extends SimpleMap {
   }
 
   @Override
-  public IterMap copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new IterMap(info, Arr.copyAll(qc, scp, vs, exprs)));
+  public IterMap copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new IterMap(info, Arr.copyAll(cc, vs, exprs)));
   }
 }

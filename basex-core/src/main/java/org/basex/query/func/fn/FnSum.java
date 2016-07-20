@@ -47,7 +47,7 @@ public final class FnSum extends Aggr {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     final Expr e1 = exprs[0], e2 = exprs.length == 2 ? exprs[1] : null;
     final Type st1 = e1.seqType().type, st2 = e2 != null ? e2.seqType().type : st1;
     if(st1.isNumberOrUntyped() && st2.isNumberOrUntyped()) seqType = Calc.type(st1, st2).seqType();

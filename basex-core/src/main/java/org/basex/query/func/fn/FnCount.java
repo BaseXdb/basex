@@ -30,7 +30,7 @@ public final class FnCount extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     // skip non-deterministic and variable expressions
     final Expr e = exprs[0];
     if(e.has(Flag.NDT) || e.has(Flag.UPD) || e instanceof VarRef) return this;

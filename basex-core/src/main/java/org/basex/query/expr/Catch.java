@@ -51,12 +51,12 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch compile(final QueryContext qc, final VarScope scp) {
+  public Catch compile(final CompileContext cc) {
     try {
-      expr = expr.compile(qc, scp);
+      expr = expr.compile(cc);
       seqType = expr.seqType();
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType(), scp.sc);
+      expr = FnError.get(qe, expr.seqType(), cc.sc());
     }
     return this;
   }
@@ -83,25 +83,25 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
     final Var[] vrs = new Var[NAMES.length];
     final int vl = vrs.length;
-    for(int v = 0; v < vl; v++) vrs[v] = scp.addNew(NAMES[v], TYPES[v], false, qc, info);
+    for(int v = 0; v < vl; v++) vrs[v] = cc.scope().addNew(NAMES[v], TYPES[v], false, cc.qc, info);
     final Catch ctch = new Catch(info, codes.clone(), vrs);
     final int val = vars.length;
     for(int v = 0; v < val; v++) vs.put(vars[v].id, ctch.vars[v]);
-    ctch.expr = expr.copy(qc, scp, vs);
+    ctch.expr = expr.copy(cc, vs);
     return ctch;
   }
 
   @Override
-  public Catch inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex) {
+  public Catch inline(final Var var, final Expr ex, final CompileContext cc) {
     try {
-      final Expr sub = expr.inline(qc, scp, var, ex);
+      final Expr sub = expr.inline(var, ex, cc);
       if(sub == null) return null;
       expr = sub;
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, seqType, scp.sc);
+      expr = FnError.get(qe, seqType, cc.sc());
     }
     return this;
   }
@@ -109,19 +109,16 @@ public final class Catch extends Single {
   /**
    * Returns this clause as an inlineable expression.
    * @param ex caught exception
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return equivalent expression
    * @throws QueryException query exception during inlining
    */
-  Expr asExpr(final QueryException ex, final QueryContext qc, final VarScope scp)
-      throws QueryException {
-
+  Expr asExpr(final QueryException ex, final CompileContext cc) throws QueryException {
     if(expr.isValue()) return expr;
     int i = 0;
     Expr e = expr;
     for(final Value v : values(ex)) {
-      final Expr e2 = e.inline(qc, scp, vars[i++], v);
+      final Expr e2 = e.inline(vars[i++], v, cc);
       if(e2 != null) e = e2;
       if(e.isValue()) break;
     }

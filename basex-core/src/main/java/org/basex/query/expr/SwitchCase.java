@@ -31,43 +31,42 @@ public final class SwitchCase extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) {
+  public Expr compile(final CompileContext cc) {
     // compile and simplify branches
     final int es = exprs.length;
     for(int e = 0; e < es; e++) {
       try {
-        exprs[e] = exprs[e].compile(qc, scp);
+        exprs[e] = exprs[e].compile(cc);
       } catch(final QueryException ex) {
         // replace original expression with error
-        exprs[e] = FnError.get(ex, exprs[e].seqType(), scp.sc);
+        exprs[e] = FnError.get(ex, exprs[e].seqType(), cc.sc());
       }
     }
     return this;
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new SwitchCase(info, copyAll(qc, scp, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new SwitchCase(info, copyAll(cc, vs, exprs));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     boolean change = false;
     final int es = exprs.length;
     for(int i = 0; i < es; i++) {
       Expr nw;
       try {
-        nw = exprs[i].inline(qc, scp, var, ex);
+        nw = exprs[i].inline(var, ex, cc);
       } catch(final QueryException qe) {
-        nw = FnError.get(qe, exprs[i].seqType(), scp.sc);
+        nw = FnError.get(qe, exprs[i].seqType(), cc.sc());
       }
       if(nw != null) {
         exprs[i] = nw;
         change = true;
       }
     }
-    return change ? optimize(qc, scp) : null;
+    return change ? optimize(cc) : null;
   }
 
   @Override

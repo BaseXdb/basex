@@ -40,56 +40,52 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    return compile(qc, scp, null);
+  public TypeCase compile(final CompileContext cc) throws QueryException {
+    return compile(cc, null);
   }
 
   /**
    * Compiles the expression.
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @param v value to be bound
    * @return resulting item
    * @throws QueryException query exception
    */
-  TypeCase compile(final QueryContext qc, final VarScope scp, final Value v)
+  TypeCase compile(final CompileContext cc, final Value v)
       throws QueryException {
-    final Value val = var != null && v != null ? var.checkType(v, qc, true) : null;
+    final Value val = var != null && v != null ? var.checkType(v, cc.qc, true) : null;
     try {
-      super.compile(qc, scp);
+      super.compile(cc);
       if(val != null) {
-        final Expr inlined = expr.inline(qc, scp, var, val);
+        final Expr inlined = expr.inline(var, val, cc);
         if(inlined != null) expr = inlined;
       }
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FnError.get(ex, expr.seqType(), scp.sc);
+      expr = FnError.get(ex, expr.seqType(), cc.sc());
     }
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public TypeCase optimize(final QueryContext qc, final VarScope scp) {
+  public TypeCase optimize(final CompileContext cc) {
     seqType = expr.seqType();
     return this;
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
+  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
     try {
-      return super.inline(qc, scp, v, ex);
+      return super.inline(v, ex, cc);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType(), scp.sc);
+      expr = FnError.get(qe, expr.seqType(), cc.sc());
       return this;
     }
   }
 
   @Override
-  public TypeCase copy(final QueryContext qc, final VarScope scp,
-      final IntObjMap<Var> vs) {
-    final Var v = var == null ? null : scp.addCopy(var, qc);
-    if(var != null) vs.put(var.id, v);
-    return new TypeCase(info, v, types.clone(), expr.copy(qc, scp, vs));
+  public TypeCase copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new TypeCase(info, cc.copy(var, vs), types.clone(), expr.copy(cc, vs));
   }
 
   /**
@@ -155,8 +151,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public void markTailCalls(final QueryContext qc) {
-    expr.markTailCalls(qc);
+  public void markTailCalls(final CompileContext cc) {
+    expr.markTailCalls(cc);
   }
 
   @Override

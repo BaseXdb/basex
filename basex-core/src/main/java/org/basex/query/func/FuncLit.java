@@ -20,8 +20,6 @@ import org.basex.util.hash.*;
 public final class FuncLit extends Single implements Scope {
   /** Variable scope. */
   private final VarScope scope;
-  /** Static context. */
-  private final StaticContext sc;
   /** Annotations. */
   private AnnList anns;
   /** Function name. */
@@ -41,63 +39,68 @@ public final class FuncLit extends Single implements Scope {
    * @param expr function body
    * @param ft function type
    * @param scope variable scope
-   * @param sc static context
    * @param info input info
    */
   FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr, final FuncType ft,
-      final VarScope scope, final StaticContext sc, final InputInfo info) {
+      final VarScope scope, final InputInfo info) {
 
     super(info, expr);
     this.anns = anns;
     this.name = name;
     this.args = args;
     this.scope = scope;
-    this.sc = sc;
     check = ft == null;
     seqType = (ft == null ? FuncType.arity(args.length) : ft).seqType();
   }
 
   @Override
-  public void compile(final QueryContext qc) throws QueryException {
+  public void comp(final CompileContext cc) throws QueryException {
     if(compiled) return;
     compiled = true;
 
     if(check) {
-      final StaticFunc sf = qc.funcs.get(name, args.length, info, true);
+      final StaticFunc sf = cc.qc.funcs.get(name, args.length, info, true);
       anns = sf.anns;
       seqType = sf.funcType().seqType();
     }
 
+    scope.prepareCompile(cc);
     try {
-      expr = expr.compile(qc, scope);
+      expr = expr.compile(cc);
       expr.markTailCalls(null);
     } catch(final QueryException e) {
-      expr = FnError.get(e, seqType, sc);
+      expr = FnError.get(e, seqType, scope.sc);
     } finally {
-      scope.cleanUp(this);
+      scope.finishCompile(this, cc);
     }
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    compile(qc);
-    return expr.isValue() ? preEval(qc) : this;
+  public Expr compile(final CompileContext cc) throws QueryException {
+    comp(cc);
+    return expr.isValue() ? preEval(cc) : this;
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(sc, anns, name, args, (FuncType) seqType.type, expr, qc.value, qc.pos,
+    return new FuncItem(scope.sc, anns, name, args, (FuncType) seqType.type, expr, qc.value, qc.pos,
         qc.size, scope.stackSize());
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vars) {
-    final VarScope vs = new VarScope(sc);
-    final int al = args.length;
-    final Var[] arg = new Var[al];
-    for(int a = 0; a < al; a++) vars.put(args[a].id, arg[a] = vs.addCopy(args[a], qc));
-    final Expr call = expr.copy(qc, vs, vars);
-    return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, vs, sc, info);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final VarScope scp = new VarScope(scope.sc);
+    cc.pushScope(scp);
+    try {
+      final int al = args.length;
+      final Var[] arg = new Var[al];
+      for(int a = 0; a < al; a++) arg[a] = cc.copy(args[a], vs);
+
+      final Expr call = expr.copy(cc, vs);
+      return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, scp, info);
+    } finally {
+      cc.removeScope();
+    }
   }
 
   @Override

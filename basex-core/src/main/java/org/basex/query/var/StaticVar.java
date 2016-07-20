@@ -48,14 +48,15 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
-  public void compile(final QueryContext qc) throws QueryException {
+  public void comp(final CompileContext cc) throws QueryException {
     if(expr == null) throw VAREMPTY_X.get(info, name());
     if(dontEnter) throw CIRCVAR_X.get(info, name());
 
     if(!compiled) {
       dontEnter = true;
+      scope.prepareCompile(cc);
       try {
-        expr = expr.compile(qc, scope);
+        expr = expr.compile(cc);
       } catch(final QueryException qe) {
         compiled = true;
         if(lazy) {
@@ -64,12 +65,12 @@ public final class StaticVar extends StaticDecl {
         }
         throw qe.notCatchable();
       } finally {
-        scope.cleanUp(this);
+        scope.finishCompile(this, cc);
         dontEnter = false;
       }
 
       compiled = true;
-      if(!lazy || expr.isValue()) bind(value(qc));
+      if(!lazy || expr.isValue()) bind(value(cc.qc));
     }
   }
 

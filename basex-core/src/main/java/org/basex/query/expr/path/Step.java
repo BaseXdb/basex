@@ -79,30 +79,32 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // check if test will never yield results
-    if(!test.optimize(qc)) return Empty.SEQ;
+    if(!test.optimize(cc.qc)) {
+      cc.info(OPTNAME_X, test);
+      return Empty.SEQ;
+    }
 
     // optimize predicates
-    final Expr e = super.optimize(qc, scp);
+    final Expr e = super.optimize(cc);
     if(e != this) return e;
 
     // compute result size
     seqType(seqType, Long.MAX_VALUE);
-    if(size == 0) return optPre(qc);
+    if(size == 0) return optPre(cc);
 
     // choose best implementation
     return copyType(get(info, axis, test, preds));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    return inlineAll(qc, scp, preds, var, ex) ? optimize(qc, scp) : null;
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    return inlineAll(preds, var, ex, cc) ? optimize(cc) : null;
   }
 
   @Override
-  public abstract Step copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
+  public abstract Step copy(CompileContext cc, IntObjMap<Var> vs);
 
   /**
    * Checks if this step has no predicates and uses the specified axis text.

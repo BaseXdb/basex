@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -29,8 +28,8 @@ public final class FnFunctionLookup extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
-    qc.funcs.compile(qc, true);
+  protected Expr opt(final CompileContext cc) {
+    cc.qc.funcs.compile(cc, true);
     return this;
   }
 }

@@ -261,15 +261,17 @@ public final class QueryContext extends Job implements Closeable {
   public void compile() throws QueryException {
     if(compiled) return;
 
+    final CompileContext cc = new CompileContext(this);
     try {
       // set database options
       final StringList opts = tempOpts;
       final int os = opts.size();
       for(int o = 0; o < os; o += 2) {
+        final String key = opts.get(o), val = opts.get(o + 1);
         try {
-          context.options.assign(opts.get(o).toUpperCase(Locale.ENGLISH), opts.get(o + 1));
+          context.options.assign(key.toUpperCase(Locale.ENGLISH), val);
         } catch(final BaseXException ex) {
-          throw BASX_VALUE_X_X.get(null, opts.get(o), opts.get(o + 1));
+          throw BASX_VALUE_X_X.get(null, key, val);
         }
       }
       // set tail call option after assignment database option
@@ -281,7 +283,7 @@ public final class QueryContext extends Job implements Closeable {
       if(ctxItem != null) {
         // evaluate initial expression
         try {
-          ctxItem.compile(this);
+          ctxItem.comp(cc);
           value = ctxItem.cache(this).value();
         } catch(final QueryException ex) {
           // only {@link ParseExpr} instances may lead to a missing context
@@ -303,27 +305,19 @@ public final class QueryContext extends Job implements Closeable {
         value = root.sc.contextType.promote(value, null, true, this, root.sc, null);
       }
 
-      // dynamic compilation
-      analyze();
+      try {
+        // compile the expression
+        if(root != null) QueryCompiler.compile(cc, root);
+        // compile global functions.
+        else funcs.compile(cc);
+      } catch(final StackOverflowError ex) {
+        Util.debug(ex);
+        throw BASX_STACKOVERFLOW.get(null, ex);
+      }
+
       info.runtime = true;
     } finally {
       compiled = true;
-    }
-  }
-
-  /**
-   * Compiles all used functions and the root expression.
-   * @throws QueryException query exception
-   */
-  private void analyze() throws QueryException {
-    try {
-      // compile the expression
-      if(root != null) QueryCompiler.compile(this, root);
-      // compile global functions.
-      else funcs.compile(this);
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASX_STACKOVERFLOW.get(null, ex);
     }
   }
 
@@ -476,7 +470,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param sc static context
    */
   public void context(final Value val, final StaticContext sc) {
-    ctxItem = MainModule.get(val, new VarScope(sc), null, null, sc, null);
+    ctxItem = MainModule.get(new VarScope(sc), val, null, null, null);
   }
 
   /**
@@ -510,15 +504,6 @@ public final class QueryContext extends Job implements Closeable {
       throws QueryException {
     final byte[] n = token(name);
     bindings.put(QNm.resolve(indexOf(n, '$') == 0 ? substring(n, 1) : n, sc), val);
-  }
-
-  /**
-   * Adds some compilation info.
-   * @param string evaluation info
-   * @param ext text text extensions
-   */
-  public void compInfo(final String string, final Object... ext) {
-    info.compInfo(string,  ext);
   }
 
   /**
@@ -575,7 +560,7 @@ public final class QueryContext extends Job implements Closeable {
     final FElem e = new FElem(QueryText.QUERY_PLAN);
     e.add(QueryText.COMPILED, token(compiled));
     if(root != null) {
-      for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
+      for(final StaticScope ss : QueryCompiler.usedDecls(root)) ss.plan(e);
       root.plan(e);
     } else {
       funcs.plan(e);

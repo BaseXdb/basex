@@ -175,8 +175,8 @@ public class QueryParser extends InputParser {
       if(expr == null) throw alter == null ? error(EXPREMPTY) : error();
       final VarScope scope = localVars.popContext();
 
-      final MainModule mm = new MainModule(
-          expr, scope, null, moduleDoc, funcs, vars, imports, sc, null);
+      final MainModule mm = new MainModule(sc, scope, expr, null, moduleDoc, null,
+          funcs, vars, imports);
       finish(mm);
       check(mm);
       return mm;
@@ -846,9 +846,9 @@ public class QueryParser extends InputParser {
 
     localVars.pushContext(null);
     final Expr e = check(single(), NOVARDECL);
-    final SeqType declType = sc.contextType == null ? SeqType.ITEM : sc.contextType;
+    final SeqType declType = sc.contextType != null ? sc.contextType : SeqType.ITEM;
     final VarScope scope = localVars.popContext();
-    qc.ctxItem = MainModule.get(e, scope, declType, currDoc.toString(), sc, info());
+    qc.ctxItem = MainModule.get(scope, e, declType, currDoc.toString(), info());
 
     if(module != null) throw error(DECITEM);
     if(!sc.mixUpdates && e.has(Flag.UPD)) throw error(UPCTX, e);
@@ -1055,13 +1055,10 @@ public class QueryParser extends InputParser {
         // add new copies for all non-grouping variables
         final Var[] ngrp = new Var[ng.size()];
         for(int i = ng.size(); --i >= 0;) {
-          final VarRef v = ng.get(i);
-
+          final VarRef ref = ng.get(i);
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
-          final Var nv = localVars.add(new Var(v.var.name, null, false, qc, sc, v.var.info));
-          // [LW] should be done everywhere
-          if(v.seqType().one()) nv.refineType(SeqType.get(v.seqType().type, Occ.ONE_MORE), qc);
+          final Var nv = localVars.add(new Var(ref.var.name, null, false, qc, sc, ref.var.info));
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }
@@ -2242,7 +2239,7 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosedExpr();
       final VarScope scope = localVars.popContext();
-      return new Closure(info(), type, args, body, anns, global, sc, scope);
+      return new Closure(info(), type, args, body, anns, global, scope);
     }
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);

@@ -91,8 +91,8 @@ public final class Replace extends Update {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Replace(sc, info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), value);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Replace(sc, info, exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), value);
   }
 
   @Override

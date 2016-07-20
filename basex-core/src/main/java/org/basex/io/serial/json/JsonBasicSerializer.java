@@ -234,7 +234,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
               cp = 0;
               for(int i = 0; i < 4; i++) {
                 if(!tp.more()) throw JSON_ESCAPE_X.getIO(value);
-                int c = tp.next();
+                final int c = tp.next();
                 if(c < 0x30 || c > 0x39 && c < 0x41 || c > 0x46 && c < 0x61 || c > 0x66)
                   throw JSON_ESCAPE_X.getIO(value);
                 cp = (cp << 4) + c - (c >= 0x61 ? 0x57 : c >= 0x41 ? 0x37 : 0x30);

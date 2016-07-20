@@ -133,10 +133,10 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
-      qc.compInfo(OPTSWAP_X, this);
+      cc.info(OPTSWAP_X, this);
       op = op.swap();
     }
 
@@ -145,22 +145,22 @@ public final class CmpG extends Cmp {
     final SeqType st1 = e1.seqType();
 
     // one value is empty (e.g.: () = local:expensive() )
-    if(oneIsEmpty()) return optPre(Bln.FALSE, qc);
+    if(oneIsEmpty()) return optPre(Bln.FALSE, cc);
 
     // rewrite count() function
     if(e1.isFunction(Function.COUNT)) {
-      final Expr e = compCount(op.op, scp);
+      final Expr e = compCount(op.op, cc);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
+        cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
       }
     }
 
     // rewrite string-length() function
     if(e1.isFunction(Function.STRING_LENGTH)) {
-      final Expr e = compStringLength(op.op, scp);
+      final Expr e = compStringLength(op.op, cc);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
+        cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
       }
     }
@@ -169,15 +169,15 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
       if(e != this) {
-        qc.compInfo(OPTREWRITE_X, this);
+        cc.info(OPTREWRITE_X, this);
         return e;
       }
     }
 
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
-      qc.compInfo(OPTREWRITE_X, this);
-      return Function.NOT.get(scp.sc, info, e1);
+      cc.info(OPTREWRITE_X, this);
+      return Function.NOT.get(cc.sc(), info, e1);
     }
 
     // rewrite expr CMP (range expression or number)
@@ -186,32 +186,32 @@ public final class CmpG extends Cmp {
     if(e == this) e = CmpSR.get(this);
     if(e != this) {
       // pre-evaluate optimized expression
-      qc.compInfo(OPTREWRITE_X, this);
-      return allAreValues() ? e.preEval(qc) : e;
+      cc.info(OPTREWRITE_X, this);
+      return allAreValues() ? e.preEval(cc) : e;
     }
 
     // choose evaluation strategy
     final SeqType st2 = e2.seqType();
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
       atomic = true;
-      qc.compInfo(OPTATOMIC_X, this);
+      cc.info(OPTATOMIC_X, this);
     }
 
     // pre-evaluate values
-    if(allAreValues()) return preEval(qc);
+    if(allAreValues()) return preEval(cc);
 
     // pre-evaluate equality test if operands are equal, deterministic, and can be compared
     if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
-        (!e1.has(Flag.CTX) || qc.value != null)) {
+        (!e1.has(Flag.CTX) || cc.qc.value != null)) {
       // currently limited to strings (function items are invalid, numbers may be NaN)
       final SeqType st = e1.seqType();
-      if(st.oneOrMore() && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
+      if(st.oneOrMore() && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, cc);
     }
     return this;
   }
 
   @Override
-  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
+  public Expr optimizeEbv(final CompileContext cc) {
     // e.g.: exists(...) = true() -> exists(...)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpG.EQ && exprs[1] == Bln.TRUE || op == OpG.NE && exprs[1] == Bln.FALSE) &&
@@ -303,15 +303,14 @@ public final class CmpG extends Cmp {
   /**
    * Creates a union of the existing and the specified expressions.
    * @param g general comparison
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return resulting expression or {@code null}
    * @throws QueryException query exception
    */
-  CmpG union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
+  CmpG union(final CmpG g, final CompileContext cc) throws QueryException {
     if(op != g.op || coll != g.coll || !exprs[0].sameAs(g.exprs[0])) return null;
 
-    final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(qc, scp);
+    final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(cc);
     final CmpG cmp = new CmpG(exprs[0], list, op, coll, sc, info);
     final SeqType st = list.seqType();
     cmp.atomic = atomic && st.zeroOrOne() && !st.mayBeArray();
@@ -330,8 +329,8 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public CmpG copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpG(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, sc, info);
+  public CmpG copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new CmpG(exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), op, coll, sc, info);
   }
 
   @Override

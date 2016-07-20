@@ -29,8 +29,8 @@ public final class And extends Logical {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Expr c = super.optimize(qc, scp);
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    final Expr c = super.optimize(cc);
     if(c != this) return c;
 
     final int es = exprs.length;
@@ -67,19 +67,19 @@ public final class And extends Logical {
       }
 
       // expression will always return false
-      if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
+      if(e == Bln.FALSE) return optPre(Bln.FALSE, cc);
       // skip expression yielding true
       if(e != Bln.TRUE) list.add(e);
     }
 
     // all arguments return true
-    if(list.isEmpty()) return optPre(Bln.TRUE, qc);
+    if(list.isEmpty()) return optPre(Bln.TRUE, cc);
 
     if(es != list.size()) {
-      qc.compInfo(OPTREWRITE_X, this);
+      cc.info(OPTREWRITE_X, this);
       exprs = list.finish();
     }
-    compFlatten(qc);
+    compFlatten(cc);
 
     boolean not = true;
     for(final Expr expr : exprs) {
@@ -90,16 +90,16 @@ public final class And extends Logical {
     }
 
     if(not) {
-      qc.compInfo(OPTREWRITE_X, this);
+      cc.info(OPTREWRITE_X, this);
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
-      final Expr ex = new Or(info, inner).optimize(qc, scp);
-      return Function.NOT.get(scp.sc, info, ex).optimize(qc, scp);
+      final Expr ex = new Or(info, inner).optimize(cc);
+      return Function.NOT.get(cc.sc(), info, ex).optimize(cc);
     }
 
     // return single expression if it yields a boolean
-    return exprs.length == 1 ? compBln(exprs[0], info, scp.sc) : this;
+    return exprs.length == 1 ? compBln(exprs[0], info, cc.sc()) : this;
   }
 
   @Override
@@ -123,8 +123,8 @@ public final class And extends Logical {
   }
 
   @Override
-  public And copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vars) {
-    return new And(info, copyAll(qc, scp, vars, exprs));
+  public And copy(final CompileContext cc, final IntObjMap<Var> vars) {
+    return new And(info, copyAll(cc, vars, exprs));
   }
 
   @Override

@@ -51,17 +51,17 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    cond = cond.compile(qc, scp);
-    for(final SwitchCase sc : cases) sc.compile(qc, scp);
-    return optimize(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    cond = cond.compile(cc);
+    for(final SwitchCase sc : cases) sc.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // check if expression can be pre-evaluated
-    final Expr ex = opt(qc);
-    if(ex != this) return optPre(ex, qc);
+    final Expr ex = opt(cc);
+    if(ex != this) return optPre(ex, cc);
 
     // expression could not be pre-evaluated
     seqType = cases[0].exprs[0].seqType();
@@ -72,17 +72,17 @@ public final class Switch extends ParseExpr {
 
   /**
    * Optimizes the expression.
-   * @param qc query context
+   * @param cc compilation context
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  private Expr opt(final QueryContext qc) throws QueryException {
+  private Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate cases
     final boolean pre = cond.isValue();
     // cache expressions
     final ExprList cache = new ExprList();
 
-    final Item it = pre ? cond.atomItem(qc, info) : null;
+    final Item it = pre ? cond.atomItem(cc.qc, info) : null;
     final ArrayList<SwitchCase> tmp = new ArrayList<>();
     for(final SwitchCase sc : cases) {
       final int sl = sc.exprs.length;
@@ -92,12 +92,12 @@ public final class Switch extends ParseExpr {
         final Expr ex = sc.exprs[e];
         if(pre && ex.isValue()) {
           // includes check for empty sequence (null reference)
-          final Item cs = ex.item(qc, info);
+          final Item cs = ex.item(cc.qc, info);
           if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) return ret;
-          qc.compInfo(OPTREMOVE_X_X, description(), ex);
+          cc.info(OPTREMOVE_X_X, description(), ex);
         } else if(cache.contains(ex)) {
           // case has already been checked before
-          qc.compInfo(OPTREMOVE_X_X, description(), ex);
+          cc.info(OPTREMOVE_X_X, description(), ex);
         } else {
           cache.add(ex);
           el.add(ex);
@@ -114,7 +114,7 @@ public final class Switch extends ParseExpr {
 
     if(tmp.size() != cases.length) {
       // branches have changed
-      qc.compInfo(OPTREWRITE_X, this);
+      cc.info(OPTREWRITE_X, this);
       cases = tmp.toArray(new SwitchCase[tmp.size()]);
     }
     return this;
@@ -164,15 +164,14 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    boolean change = inlineAll(qc, scp, cases, var, ex);
-    final Expr cn = cond.inline(qc, scp, var, ex);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    boolean change = inlineAll(cases, var, ex, cc);
+    final Expr cn = cond.inline(var, ex, cc);
     if(cn != null) {
       change = true;
       cond = cn;
     }
-    return change ? optimize(qc, scp) : null;
+    return change ? optimize(cc) : null;
   }
 
   /**
@@ -198,8 +197,8 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Switch(info, cond.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, cases));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Switch(info, cond.copy(cc, vs), Arr.copyAll(cc, vs, cases));
   }
 
   @Override
@@ -215,8 +214,8 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls(final QueryContext qc) {
-    for(final SwitchCase sc : cases) sc.markTailCalls(qc);
+  public void markTailCalls(final CompileContext cc) {
+    for(final SwitchCase sc : cases) sc.markTailCalls(cc);
   }
 
   @Override

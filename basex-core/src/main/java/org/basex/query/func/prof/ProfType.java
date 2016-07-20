@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -29,8 +28,8 @@ public final class ProfType extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
-    return type(qc);
+  protected Expr opt(final CompileContext cc) {
+    return type(cc.qc);
   }
 
   /**

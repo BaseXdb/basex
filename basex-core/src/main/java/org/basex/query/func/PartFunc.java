@@ -54,8 +54,8 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(allAreValues()) return preEval(qc);
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    if(allAreValues()) return preEval(cc);
 
     final Expr f = body();
     final SeqType t = f.seqType();
@@ -91,7 +91,7 @@ public final class PartFunc extends Arr {
       while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
       vars[h] = scp.addNew(f.argName(holes[h]), null, false, qc, info);
       args[a] = new VarRef(info, vars[h]);
-      vars[h].refineType(ft.argTypes[a], qc);
+      vars[h].refineType(ft.argTypes[a], null);
     }
     final int al = args.length;
     while(++a < al) args[a] = exprs[a - hl].value(qc);
@@ -114,9 +114,9 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new PartFunc(sc, info, body().copy(qc, scp, vs),
-        copyAll(qc, scp, vs, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new PartFunc(sc, info, body().copy(cc, vs),
+        copyAll(cc, vs, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
   }
 
   @Override

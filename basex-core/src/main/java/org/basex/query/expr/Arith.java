@@ -35,7 +35,7 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st1 = exprs[0].seqType();
     final SeqType st2 = exprs[1].seqType();
     final Type t1 = st1.type, t2 = st2.type;
@@ -47,7 +47,7 @@ public final class Arith extends Arr {
     } else if(o1 && o2) {
       seqType = SeqType.ITEM;
     }
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(cc.qc, info) : this, cc);
   }
 
   @Override
@@ -60,8 +60,8 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Arith copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new Arith(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), calc));
+  public Arith copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new Arith(info, exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), calc));
   }
 
   @Override

@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -57,19 +56,19 @@ public final class FnForEach extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     if(allAreValues() && exprs[0].size() < UNROLL_LIMIT) {
       // unroll the loop
-      qc.compInfo(QueryText.OPTUNROLL_X, this);
+      cc.info(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       final int len = (int) seq.size();
 
       // fn:for-each(...)
       final Expr[] results = new Expr[len];
       for(int i = 0; i < len; i++) {
-        results[i] = new DynFuncCall(info, sc, exprs[1], seq.itemAt(i)).optimize(qc, scp);
+        results[i] = new DynFuncCall(info, sc, exprs[1], seq.itemAt(i)).optimize(cc);
       }
-      return new List(info, results).optimize(qc, scp);
+      return new List(info, results).optimize(cc);
     }
     return this;
   }

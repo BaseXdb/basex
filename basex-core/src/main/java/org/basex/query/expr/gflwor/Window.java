@@ -251,17 +251,17 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp);
-    start.compile(qc, scp);
-    if(end != null) end.compile(qc, scp);
-    return optimize(qc, scp);
+  public Clause compile(final CompileContext cc) throws QueryException {
+    expr = expr.compile(cc);
+    start.compile(cc);
+    if(end != null) end.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public Clause optimize(final QueryContext qc, final VarScope sc) throws QueryException {
+  public Clause optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    var.refineType(st.withOcc(Occ.ZERO_MORE), qc);
+    var.refineType(st.withOcc(Occ.ZERO_MORE), cc);
     return this;
   }
 
@@ -282,24 +282,22 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex)
+  public Clause inline(final Var v, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final Expr e = expr.inline(qc, scp, v, ex);
-    final Condition st = start.inline(qc, scp, v, ex);
-    final Condition en = end == null ? null : end.inline(qc, scp, v, ex);
+    final Expr e = expr.inline(v, ex, cc);
+    final Condition st = start.inline(v, ex, cc);
+    final Condition en = end == null ? null : end.inline(v, ex, cc);
     if(e != null) expr = e;
     if(st != null) start = st;
     if(en != null) end = en;
-    return e != null || st != null || en != null ? optimize(qc, scp) : null;
+    return e != null || st != null || en != null ? optimize(cc) : null;
   }
 
   @Override
-  public Window copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.addCopy(var, qc);
-    vs.put(var.id, v);
+  public Window copy(final CompileContext cc, final IntObjMap<Var> vs) {
     try {
-      return new Window(sliding, v, expr.copy(qc, scp, vs), start.copy(qc, scp, vs), only,
-          end != null ? end.copy(qc, scp, vs) : null);
+      return new Window(sliding, cc.copy(var, vs), expr.copy(cc, vs), start.copy(cc, vs), only,
+          end != null ? end.copy(cc, vs) : null);
     } catch(final QueryException e) {
       // checks have already been done
       throw Util.notExpected(e);

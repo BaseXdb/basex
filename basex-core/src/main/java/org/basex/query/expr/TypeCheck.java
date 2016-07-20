@@ -44,18 +44,18 @@ public final class TypeCheck extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp);
-    return optimize(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    expr = expr.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType argType = expr.seqType();
 
     // return type is already correct
     if(argType.instanceOf(seqType)) {
-      qc.compInfo(QueryText.OPTTYPE_X, seqType);
+      cc.info(QueryText.OPTTYPE_X, seqType);
       return expr;
     }
 
@@ -63,12 +63,12 @@ public final class TypeCheck extends Single {
     if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
       if(!seqType.occ.check(1)) throw QueryError.typeError(expr, seqType, null, info);
       final FuncItem fi = (FuncItem) expr;
-      return optPre(fi.coerceTo((FuncType) seqType.type, qc, info, true), qc);
+      return optPre(fi.coerceTo((FuncType) seqType.type, cc.qc, info, true), cc);
     }
 
     // we can type check immediately
     if(expr.isValue()) {
-      return optPre(value(qc), qc);
+      return optPre(value(cc.qc), cc);
     }
 
     // check at each call
@@ -77,9 +77,9 @@ public final class TypeCheck extends Single {
       if(occ == null) throw QueryError.typeError(expr, seqType, null, info);
     }
 
-    final Expr opt = expr.typeCheck(this, qc, scp);
+    final Expr opt = expr.typeCheck(this, cc);
     if(opt != null) {
-      qc.compInfo(OPTTYPE_X, seqType);
+      cc.info(OPTTYPE_X, seqType);
       return opt;
     }
 
@@ -135,8 +135,8 @@ public final class TypeCheck extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new TypeCheck(sc, info, expr.copy(qc, scp, vs), seqType, promote);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new TypeCheck(sc, info, expr.copy(cc, vs), seqType, promote);
   }
 
   @Override
@@ -163,13 +163,11 @@ public final class TypeCheck extends Single {
   /**
    * Creates an expression that checks the given expression's return type.
    * @param ex expression to check
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return the resulting expression
    * @throws QueryException query exception
    */
-  public Expr check(final Expr ex, final QueryContext qc, final VarScope scp)
-      throws QueryException {
-    return new TypeCheck(sc, info, ex, seqType, promote).optimize(qc, scp);
+  public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
+    return new TypeCheck(sc, info, ex, seqType, promote).optimize(cc);
   }
 }

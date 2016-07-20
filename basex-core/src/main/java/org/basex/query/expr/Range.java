@@ -32,14 +32,14 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     Expr e = this;
     if(oneIsEmpty()) {
       e = Empty.SEQ;
     } else if(allAreValues()) {
-      e = value(qc);
+      e = value(cc.qc);
     }
-    return optPre(e, qc);
+    return optPre(e, cc);
   }
 
   @Override
@@ -61,8 +61,8 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Range(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Range(info, exprs[0].copy(cc, vs), exprs[1].copy(cc, vs));
   }
 
   @Override

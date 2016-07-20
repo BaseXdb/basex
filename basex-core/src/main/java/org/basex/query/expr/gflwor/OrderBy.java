@@ -132,7 +132,7 @@ public final class OrderBy extends Clause {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    for(final Key k : keys) k.plan(e);
+    for(final Key key : keys) key.plan(e);
     plan.add(e);
   }
 
@@ -146,24 +146,24 @@ public final class OrderBy extends Clause {
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Key k : keys) if(k.has(flag)) return true;
+    for(final Key key : keys) if(key.has(flag)) return true;
     return false;
   }
 
   @Override
-  public OrderBy compile(final QueryContext qc, final VarScope sc) throws QueryException {
-    for(final Key k : keys) k.compile(qc, sc);
+  public OrderBy compile(final CompileContext cc) throws QueryException {
+    for(final Key key : keys) key.compile(cc);
     return this;
   }
 
   @Override
-  public OrderBy optimize(final QueryContext qc, final VarScope scp) {
+  public OrderBy optimize(final CompileContext cc) {
     return this;
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Key k : keys) if(!k.removable(var)) return false;
+    for(final Key key : keys) if(!key.removable(var)) return false;
     return true;
   }
 
@@ -173,17 +173,17 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp, final Var var,
-      final Expr ex) throws QueryException {
+  public Clause inline(final Var var, final Expr ex,
+      final CompileContext cc) throws QueryException {
     for(int r = refs.length; --r >= 0;) {
       if(var.is(refs[r].var)) refs = Array.delete(refs, r);
     }
-    return inlineAll(qc, scp, keys, var, ex) ? optimize(qc, scp) : null;
+    return inlineAll(keys, var, ex, cc) ? optimize(cc) : null;
   }
 
   @Override
-  public OrderBy copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new OrderBy(Arr.copyAll(qc, scp, vs, refs), Arr.copyAll(qc, scp, vs, keys), info);
+  public OrderBy copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new OrderBy(Arr.copyAll(cc, vs, refs), Arr.copyAll(cc, vs, keys), info);
   }
 
   @Override
@@ -262,8 +262,8 @@ public final class OrderBy extends Clause {
     }
 
     @Override
-    public Key copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-      return new Key(info, expr.copy(qc, scp, vs), desc, least, coll);
+    public Key copy(final CompileContext cc, final IntObjMap<Var> vs) {
+      return new Key(info, expr.copy(cc, vs), desc, least, coll);
     }
 
     @Override

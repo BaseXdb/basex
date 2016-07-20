@@ -13,7 +13,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -39,7 +38,7 @@ public final class InspectFunctions extends StandardFunc {
       try {
         final IO io = checkPath(0, qc);
         qc.parse(Token.string(io.read()), io.path(), sc);
-        qc.funcs.compile(qc, true);
+        qc.funcs.compile(new CompileContext(qc), true);
       } catch(final IOException ex) {
         throw IOERR_X.get(info, ex);
       }
@@ -55,8 +54,8 @@ public final class InspectFunctions extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
-    if(exprs.length == 0) qc.funcs.compile(qc, true);
+  protected Expr opt(final CompileContext cc) {
+    if(exprs.length == 0) cc.qc.funcs.compile(cc, true);
     return this;
   }
 

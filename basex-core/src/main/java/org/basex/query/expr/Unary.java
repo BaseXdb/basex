@@ -34,13 +34,13 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    return super.compile(qc, scp).optimize(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return super.compile(cc).optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(expr.isValue()) return preEval(qc);
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    if(expr.isValue()) return preEval(cc);
 
     final SeqType st = expr.seqType();
     final Type t = st.type;
@@ -72,8 +72,8 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new Unary(info, expr.copy(qc, scp, vs), minus));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new Unary(info, expr.copy(cc, vs), minus));
   }
 
   @Override

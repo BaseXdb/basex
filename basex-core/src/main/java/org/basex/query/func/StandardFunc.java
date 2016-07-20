@@ -70,30 +70,29 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
     return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
-        !allAreValues() ? opt(qc, scp) : sig.type.zeroOrOne() ? item(qc, info) : value(qc), qc);
+        !allAreValues() ? opt(cc) : sig.type.zeroOrOne() ? item(cc.qc, info) : value(cc.qc), cc);
   }
 
   /**
    * Performs function specific optimizations.
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return evaluated item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     return this;
   }
 
   @Override
-  public final StandardFunc copy(final QueryContext qc, final VarScope scp,
+  public final StandardFunc copy(final CompileContext cc,
       final IntObjMap<Var> vs) {
     final int es = exprs.length;
     final Expr[] arg = new Expr[es];
-    for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(qc, scp, vs);
+    for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(cc, vs);
     return copyType(sig.get(sc, info, arg));
   }
 

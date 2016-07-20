@@ -29,30 +29,30 @@ abstract class Logical extends Arr {
   }
 
   @Override
-  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public final Expr compile(final CompileContext cc) throws QueryException {
     for(int i = 0; i < exprs.length; i++) {
       try {
-        exprs[i] = exprs[i].compile(qc, scp);
+        exprs[i] = exprs[i].compile(cc);
       } catch(final QueryException qe) {
         // first expression is evaluated eagerly
         if(i == 0) throw qe;
-        exprs[i] = FnError.get(qe, exprs[i].seqType(), scp.sc);
+        exprs[i] = FnError.get(qe, exprs[i].seqType(), cc.sc());
       }
     }
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     final boolean and = this instanceof And;
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
     for(final Expr expr : exprs) {
-      final Expr ex = expr.optimizeEbv(qc, scp);
+      final Expr ex = expr.optimizeEbv(cc);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
-        qc.compInfo(OPTREMOVE_X_X, this, expr);
-        if(ex.ebv(qc, info).bool(info) ^ and) return Bln.get(!and);
+        cc.info(OPTREMOVE_X_X, this, expr);
+        if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
       }
@@ -63,10 +63,10 @@ abstract class Logical extends Arr {
   }
 
   @Override
-  public final void markTailCalls(final QueryContext qc) {
+  public final void markTailCalls(final CompileContext cc) {
     // if the last expression surely returns a boolean, we can jump to it
     final Expr last = exprs[exprs.length - 1];
-    if(last.seqType().eq(SeqType.BLN)) last.markTailCalls(qc);
+    if(last.seqType().eq(SeqType.BLN)) last.markTailCalls(cc);
   }
 
   @Override
@@ -77,13 +77,12 @@ abstract class Logical extends Arr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     final Expr[] arr = exprs;
     boolean change = false;
     for(int i = 0; i < arr.length; i++) {
       try {
-        final Expr e = arr[i].inline(qc, scp, var, ex);
+        final Expr e = arr[i].inline(var, ex, cc);
         if(e != null) {
           arr[i] = e;
           change = true;
@@ -95,20 +94,20 @@ abstract class Logical extends Arr {
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[i + 1];
         System.arraycopy(arr, 0, nw, 0, i);
-        nw[i] = FnError.get(qe, seqType(), scp.sc);
+        nw[i] = FnError.get(qe, seqType(), cc.sc());
         exprs = nw;
         change = true;
         break;
       }
     }
-    return change ? optimize(qc, scp) : null;
+    return change ? optimize(cc) : null;
   }
 
   /**
    * Flattens nested logical expressions.
-   * @param qc query context
+   * @param cc compilation context
    */
-  final void compFlatten(final QueryContext qc) {
+  final void compFlatten(final CompileContext cc) {
     // flatten nested expressions
     final ExprList tmp = new ExprList(exprs.length);
     final boolean and = this instanceof And;
@@ -116,7 +115,7 @@ abstract class Logical extends Arr {
     for(final Expr ex : exprs) {
       if(and && ex instanceof And || or && ex instanceof Or) {
         for(final Expr e : ((Arr) ex).exprs) tmp.add(e);
-        qc.compInfo(OPTFLAT_X_X, description(), ex);
+        cc.info(OPTFLAT_X_X, description(), ex);
       } else {
         tmp.add(ex);
       }

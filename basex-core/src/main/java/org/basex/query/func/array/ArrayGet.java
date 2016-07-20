@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -26,7 +25,7 @@ public final class ArrayGet extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
     if(st.type instanceof ArrayType) {
       final SeqType rt = ((ArrayType) st.type).type;

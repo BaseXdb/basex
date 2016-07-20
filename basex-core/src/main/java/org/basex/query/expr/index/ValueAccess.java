@@ -191,17 +191,16 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    final Expr sub = expr.inline(qc, scp, var, ex);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    final Expr sub = expr.inline(var, ex, cc);
     if(sub == null) return null;
     expr = sub;
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new ValueAccess(info, expr.copy(qc, scp, vs), type, test, ictx));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new ValueAccess(info, expr.copy(cc, vs), type, test, ictx));
   }
 
   @Override

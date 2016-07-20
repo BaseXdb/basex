@@ -60,10 +60,10 @@ final class CachedStep extends Step {
   }
 
   @Override
-  public Step copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Step copy(final CompileContext cc, final IntObjMap<Var> vs) {
     final int pl = preds.length;
     final Expr[] pred = new Expr[pl];
-    for(int p = 0; p < pl; p++) pred[p] = preds[p].copy(qc, scp, vs);
+    for(int p = 0; p < pl; p++) pred[p] = preds[p].copy(cc, vs);
     return copyType(new CachedStep(info, axis, test.copy(), pred));
   }
 }

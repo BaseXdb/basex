@@ -32,13 +32,13 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) {
-    return optimize(qc, scp);
+  public Expr compile(final CompileContext cc) {
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) {
-    final Value v = qc.value;
+  public Expr optimize(final CompileContext cc) {
+    final Value v = cc.qc.value;
     return v != null && v.type == NodeType.DOC && v.size() == 1 ? v : this;
   }
 
@@ -55,7 +55,7 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
     return new Root(info);
   }
 

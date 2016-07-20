@@ -44,8 +44,8 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope o) throws QueryException {
-    var.compile(qc);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    var.comp(cc);
     seqType = var.seqType();
     return var.val != null ? var.val : this;
   }
@@ -71,7 +71,7 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
     final StaticVarRef ref = new StaticVarRef(info, name, sc);
     ref.var = var;
     return ref;
@@ -99,7 +99,7 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
+  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
     return null;
   }
 

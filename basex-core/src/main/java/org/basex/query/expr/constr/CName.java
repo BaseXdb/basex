@@ -46,9 +46,9 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    name = name.compile(qc, scp);
-    return super.compile(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    name = name.compile(cc);
+    return super.compile(cc);
   }
 
   /**
@@ -113,13 +113,11 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-
-    final boolean changed = inlineAll(qc, scp, exprs, var, ex);
-    final Expr sub = name.inline(qc, scp, var, ex);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    final boolean changed = inlineAll(exprs, var, ex, cc);
+    final Expr sub = name.inline(var, ex, cc);
     if(sub != null) name = sub;
-    return sub != null || changed ? optimize(qc, scp) : null;
+    return sub != null || changed ? optimize(cc) : null;
   }
 
   @Override

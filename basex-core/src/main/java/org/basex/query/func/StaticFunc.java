@@ -63,35 +63,36 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public void compile(final QueryContext qc) {
+  public void comp(final CompileContext cc) {
     if(compiled || expr == null) return;
     compiling = compiled = true;
 
-    final Value cv = qc.value;
-    qc.value = null;
+    final Value cv = cc.qc.value;
+    cc.qc.value = null;
 
+    scope.prepareCompile(cc);
     try {
-      expr = expr.compile(qc, scope);
+      expr = expr.compile(cc);
 
       if(type != null) {
         // remove redundant casts
         if((type.type == AtomType.BLN || type.type == AtomType.FLT ||
             type.type == AtomType.DBL || type.type == AtomType.QNM ||
             type.type == AtomType.URI) && type.eq(expr.seqType())) {
-          qc.compInfo(OPTTYPE_X, type);
+          cc.info(OPTTYPE_X, type);
         } else {
-          expr = new TypeCheck(sc, info, expr, type, true).optimize(qc, scope);
+          expr = new TypeCheck(sc, info, expr, type, true).optimize(cc);
         }
       }
     } catch(final QueryException qe) {
       expr = FnError.get(qe, expr.seqType(), sc);
     } finally {
-      scope.cleanUp(this);
-      qc.value = cv;
+      scope.finishCompile(this, cc);
+      cc.qc.value = cv;
     }
 
     // convert all function calls in tail position to proper tail calls
-    expr.markTailCalls(qc);
+    expr.markTailCalls(cc);
 
     compiling = false;
   }
@@ -271,39 +272,37 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
-      final InputInfo ii) throws QueryException {
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
+      throws QueryException {
 
-    if(!inline(qc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
-    qc.compInfo(OPTINLINE_X, id());
+    if(!inline(cc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
+    cc.info(OPTINLINE_X, id());
 
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      final Var old = args[a], v = scp.addCopy(old, qc);
-      vs.put(old.id, v);
-      cls.add(new Let(v, exprs[a], false).optimize(qc, scp));
+      cls.add(new Let(cc.copy(args[a], vs), exprs[a], false).optimize(cc));
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(qc, scp, vs);
-    return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(qc, scp);
+    final Expr cpy = expr.copy(cc, vs);
+    return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(cc);
   }
 
   /**
    * Checks if inlining conditions are given.
-   * @param qc query context
+   * @param cc compilation context
    * @param anns annotations
    * @param expr expression
    * @return result of check
    */
-  public static boolean inline(final QueryContext qc, final AnnList anns, final Expr expr) {
+  public static boolean inline(final CompileContext cc, final AnnList anns, final Expr expr) {
     final Ann ann = anns.get(Annotation._BASEX_INLINE);
     final long limit;
     if(ann == null) {
-      limit = qc.context.options.get(MainOptions.INLINELIMIT);;
+      limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);;
     } else {
       final Item[] args = ann.args();
       limit = args.length > 0 ? ((ANum) args[0]).itr() : Long.MAX_VALUE;

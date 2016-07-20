@@ -42,13 +42,13 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     if(exprs.length != 2) return this;
 
     final Expr ks = exprs[0], fs = exprs[1];
     if(ks.isValue() && (fs instanceof Map || fs instanceof Array)) {
       // guaranteed to be fully evaluated
-      return optPre(value(qc), qc);
+      return optPre(value(cc.qc), cc);
     }
 
     final Type tp = fs.seqType().type;
@@ -70,19 +70,19 @@ public final class Lookup extends Arr {
         // one function, rewrite to for-each or function call
         final Expr opt = ks.size() == 1 || ks.seqType().one()
             ? new DynFuncCall(info, sc, fs, ks) : Function.FOR_EACH.get(sc, info, exprs);
-        return optPre(opt, qc).optimize(qc, scp);
+        return optPre(opt, cc).optimize(cc);
       }
 
       if(ks.isValue()) {
         // keys are constant, so we do not duplicate work in the inner loop
         final LinkedList<Clause> clauses = new LinkedList<>();
-        final Var f = scp.addNew(new QNm("f"), null, false, qc, info);
+        final Var f = cc.scope().addNew(new QNm("f"), null, false, cc.qc, info);
         clauses.add(new For(f, null, null, fs, false));
-        final Var k = scp.addNew(new QNm("k"), null, false, qc, info);
+        final Var k = cc.scope().addNew(new QNm("k"), null, false, cc.qc, info);
         clauses.add(new For(k, null, null, ks, false));
         final VarRef rf = new VarRef(info, f), rk = new VarRef(info, k);
         final DynFuncCall ret = new DynFuncCall(info, sc, rf, rk);
-        return optPre(new GFLWOR(info, clauses, ret), qc).optimize(qc, scp);
+        return optPre(new GFLWOR(info, clauses, ret), cc).optimize(cc);
       }
     }
 
@@ -171,8 +171,8 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public Lookup copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new Lookup(info, sc, copyAll(qc, scp, vs, exprs)));
+  public Lookup copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new Lookup(info, sc, copyAll(cc, vs, exprs)));
   }
 
   @Override

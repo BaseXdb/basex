@@ -29,8 +29,8 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Expr c = super.optimize(qc, scp);
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    final Expr c = super.optimize(cc);
     if(c != this) return c;
 
     final int es = exprs.length;
@@ -40,7 +40,7 @@ public final class Or extends Logical {
       if(e instanceof CmpG) {
         // merge adjacent comparisons
         while(i + 1 < es && exprs[i + 1] instanceof CmpG) {
-          final Expr tmp = ((CmpG) e).union((CmpG) exprs[i + 1], qc, scp);
+          final Expr tmp = ((CmpG) e).union((CmpG) exprs[i + 1], cc);
           if(tmp != null) {
             e = tmp;
             i++;
@@ -50,19 +50,19 @@ public final class Or extends Logical {
         }
       }
       // expression will always return true
-      if(e == Bln.TRUE) return optPre(Bln.TRUE, qc);
+      if(e == Bln.TRUE) return optPre(Bln.TRUE, cc);
       // skip expression yielding false
       if(e != Bln.FALSE) list.add(e);
     }
 
     // all arguments return false
-    if(list.isEmpty()) return optPre(Bln.FALSE, qc);
+    if(list.isEmpty()) return optPre(Bln.FALSE, cc);
 
     if(es != list.size()) {
-      qc.compInfo(OPTREWRITE_X, this);
+      cc.info(OPTREWRITE_X, this);
       exprs = list.finish();
     }
-    compFlatten(qc);
+    compFlatten(cc);
 
     boolean not = true;
     for(final Expr expr : exprs) {
@@ -73,16 +73,16 @@ public final class Or extends Logical {
     }
 
     if(not) {
-      qc.compInfo(OPTREWRITE_X, this);
+      cc.info(OPTREWRITE_X, this);
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
-      final Expr ex = new And(info, inner).optimize(qc, scp);
-      return Function.NOT.get(scp.sc, info, ex).optimize(qc, scp);
+      final Expr ex = new And(info, inner).optimize(cc);
+      return Function.NOT.get(cc.sc(), info, ex).optimize(cc);
     }
 
     // return single expression if it yields a boolean
-    return exprs.length == 1 ? compBln(exprs[0], info, scp.sc) : this;
+    return exprs.length == 1 ? compBln(exprs[0], info, cc.sc()) : this;
   }
 
   @Override
@@ -107,8 +107,8 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Or copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Or(info, copyAll(qc, scp, vs, exprs));
+  public Or copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Or(info, copyAll(cc, vs, exprs));
   }
 
   @Override

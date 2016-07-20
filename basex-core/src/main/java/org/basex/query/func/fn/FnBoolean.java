@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -21,19 +20,19 @@ public final class FnBoolean extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Expr e = exprs[0].optimizeEbv(qc, scp);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr e = exprs[0].optimizeEbv(cc);
     exprs[0] = e;
     // simplify, e.g.: boolean(true())) -> true()
     return e.seqType().eq(SeqType.BLN) ? e : this;
   }
 
   @Override
-  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
+  public Expr optimizeEbv(final CompileContext cc) {
     // if A is not numeric: expr[boolean(A)] -> expr[A]
     final Expr e = exprs[0];
     if(!e.seqType().mayBeNumber()) {
-      qc.compInfo(QueryText.OPTREWRITE_X, this);
+      cc.info(QueryText.OPTREWRITE_X, this);
       return e;
     }
     return this;

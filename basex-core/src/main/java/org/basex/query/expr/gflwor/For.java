@@ -115,13 +115,13 @@ public final class For extends ForLet {
   }
 
   @Override
-  public For optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public For optimize(final CompileContext cc) throws QueryException {
     final SeqType tp = expr.seqType();
     final boolean emp = empty && tp.mayBeZero();
     seqType = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
-    var.refineType(seqType, qc);
-    if(pos != null) pos.refineType(SeqType.ITR, qc);
-    if(score != null) score.refineType(SeqType.DBL, qc);
+    var.refineType(seqType, cc);
+    if(pos != null) pos.refineType(SeqType.ITR, cc);
+    if(score != null) score.refineType(SeqType.DBL, cc);
     size = emp ? -1 : 1;
     var.size = size;
     var.data = expr.data();
@@ -129,14 +129,9 @@ public final class For extends ForLet {
   }
 
   @Override
-  public For copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.addCopy(var, qc);
-    vs.put(var.id, v);
-    final Var p = pos == null ? null : scp.addCopy(pos, qc);
-    if(p != null) vs.put(pos.id, p);
-    final Var s = score == null ? null : scp.addCopy(score, qc);
-    if(s != null) vs.put(score.id, s);
-    return new For(v, p, s, expr.copy(qc, scp, vs), empty);
+  public For copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new For(cc.copy(var, vs), cc.copy(pos, vs), cc.copy(score, vs),
+        expr.copy(cc, vs), empty);
   }
 
   @Override
@@ -191,33 +186,30 @@ public final class For extends ForLet {
 
   /**
    * Tries to add the given expression as a predicate to the loop expression.
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @param ex expression to add as predicate
    * @return success
    * @throws QueryException query exception
    */
-  public boolean toPredicate(final QueryContext qc, final VarScope scp, final Expr ex)
-      throws QueryException {
-
+  public boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
     if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;
 
     // reset context value (will not be accessible in predicate)
-    final Value cv = qc.value;
+    final Value cv = cc.qc.value;
     Expr pred = ex;
     try {
-      qc.value = null;
+      cc.qc.value = null;
       // assign type of iterated items to context expression
       final ContextValue c = new ContextValue(info);
       c.seqType = expr.seqType().type.seqType();
-      final Expr r = ex.inline(qc, scp, var, c);
+      final Expr r = ex.inline(var, c, cc);
       if(r != null) pred = r;
     } finally {
-      qc.value = cv;
+      cc.qc.value = cv;
     }
 
     // attach predicates to axis path or filter, or create a new filter
-    if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(scp.sc, info, pred);
+    if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(cc.sc(), info, pred);
 
     addPredicate(pred);
     return true;

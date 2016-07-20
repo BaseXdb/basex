@@ -35,12 +35,12 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) {
-    return optimize(qc, scp);
+  public Expr compile(final CompileContext cc) {
+    return optimize(cc);
   }
 
   @Override
-  public VarRef optimize(final QueryContext qc, final VarScope scp) {
+  public VarRef optimize(final CompileContext cc) {
     seqType = var.seqType();
     size = var.size;
     return this;
@@ -77,15 +77,15 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
+  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
     // [LW] Is copying always necessary?
-    return var.is(v) ? ex.isValue() ? ex : ex.copy(qc, scp, new IntObjMap<Var>()) : null;
+    return var.is(v) ? ex.isValue() ? ex : ex.copy(cc, new IntObjMap<Var>()) : null;
   }
 
   @Override
-  public VarRef copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public VarRef copy(final CompileContext cc, final IntObjMap<Var> vs) {
     final Var nw = vs.get(var.id);
-    return new VarRef(info, nw != null ? nw : var).optimize(qc, scp);
+    return new VarRef(info, nw != null ? nw : var).optimize(cc);
   }
 
   @Override

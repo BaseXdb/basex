@@ -16,6 +16,7 @@ import org.basex.util.*;
 public abstract class CNode extends Arr {
   /** Static context. */
   final StaticContext sc;
+
   /**
    * Constructor.
    * @param sc static context

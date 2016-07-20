@@ -53,22 +53,22 @@ public final class Quantifier extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    return super.compile(qc, scp).optimize(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return super.compile(cc).optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // return pre-evaluated result
-    if(expr.isValue()) return optPre(item(qc, info), qc);
+    if(expr.isValue()) return optPre(item(cc.qc, info), cc);
 
     // pre-evaluate satisfy clause if it is a value
     if(expr instanceof GFLWOR && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
-        qc.compInfo(OPTPRE_X, value);
-        return Bln.get(value.ebv(qc, info).bool(info));
+        cc.info(OPTPRE_X, value);
+        return Bln.get(value.ebv(cc.qc, info).bool(info));
       }
     }
     return this;
@@ -84,8 +84,8 @@ public final class Quantifier extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Quantifier(info, expr.copy(qc, scp, vs), every);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Quantifier(info, expr.copy(cc, vs), every);
   }
 
   @Override

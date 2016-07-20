@@ -60,22 +60,20 @@ public abstract class Expr extends ExprInfo {
   /**
    * Compiles and optimizes the expression, assigns types and cardinalities.
    * This method will be initially called by {@link QueryContext#compile()}.
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return optimized expression
    * @throws QueryException query exception
    */
-  public abstract Expr compile(QueryContext qc, VarScope scp) throws QueryException;
+  public abstract Expr compile(CompileContext cc) throws QueryException;
 
   /**
    * Optimizes an already compiled expression without recompiling its sub-expressions.
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return optimized expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     return this;
   }
 
@@ -87,7 +85,7 @@ public abstract class Expr extends ExprInfo {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public abstract Iter iter(final QueryContext qc) throws QueryException;
+  public abstract Iter iter(QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the expression and returns the resulting item,
@@ -99,7 +97,7 @@ public abstract class Expr extends ExprInfo {
    * @return item or {@code null}
    * @throws QueryException query exception
    */
-  public abstract Item item(final QueryContext qc, final InputInfo ii) throws QueryException;
+  public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns the resulting value.
@@ -129,7 +127,7 @@ public abstract class Expr extends ExprInfo {
    * @return item or {@code null}
    * @throws QueryException query exception
    */
-  public abstract Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException;
+  public abstract Item atomItem(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns the atomized items.
@@ -138,7 +136,7 @@ public abstract class Expr extends ExprInfo {
    * @return atomized item
    * @throws QueryException query exception
    */
-  public abstract Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException;
+  public abstract Value atomValue(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * <p>Checks if the effective boolean value can be computed for this expression:</p>
@@ -154,7 +152,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException;
+  public abstract Item ebv(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Performs a predicate test and returns the item the if test was successful.
@@ -163,7 +161,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item test(final QueryContext qc, final InputInfo ii) throws QueryException;
+  public abstract Item test(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Tests if this is an empty sequence. This function is only overwritten
@@ -213,7 +211,7 @@ public abstract class Expr extends ExprInfo {
    * @param flag flag to be checked
    * @return result of check
    */
-  public abstract boolean has(final Flag flag);
+  public abstract boolean has(Flag flag);
 
   /**
    * Checks if the given variable is used by this expression.
@@ -238,11 +236,11 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link Preds#removable} if one of the variables is used within a predicate.</li>
    *   <li>{@link Path#removable} if the variable occurs within the path.</li>
    * </ul>
-   * This method is called by {@link For#toPredicate(QueryContext, VarScope, Expr)}.
+   * This method is called by {@link For#toPredicate(CompileContext, Expr)}.
    * @param var variable to be replaced
    * @return result of check
    */
-  public abstract boolean removable(final Var var);
+  public abstract boolean removable(Var var);
 
   /**
    * Checks how often a variable is used in this expression.
@@ -251,39 +249,36 @@ public abstract class Expr extends ExprInfo {
    * @param var variable to look for
    * @return how often the variable is used, see {@link VarUsage}
    */
-  public abstract VarUsage count(final Var var);
+  public abstract VarUsage count(Var var);
 
   /**
    * Inlines an expression into this one, replacing all references to the given variable.
    * This function is e.g. called by {@link GFLWOR#inlineLets} and {@link For#toPredicate},
    * and the variable reference is replaced in {@link VarRef#inline}.
-   * @param qc query context for reoptimization
-   * @param scp variable scope for reoptimization
    * @param var variable to replace
    * @param ex expression to inline
+   * @param cc compilation context
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public abstract Expr inline(final QueryContext qc, final VarScope scp, final Var var,
-      final Expr ex) throws QueryException;
+  public abstract Expr inline(Var var, Expr ex, CompileContext cc) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
-   * @param qc query context
-   * @param scp variable scope
    * @param arr array
    * @param var variable to replace
    * @param ex expression to inline
+   * @param cc compilation context
    * @return {@code true} if the array has changed, {@code false} otherwise
    * @throws QueryException query exception
    */
-  protected static boolean inlineAll(final QueryContext qc, final VarScope scp, final Expr[] arr,
-      final Var var, final Expr ex) throws QueryException {
+  protected static boolean inlineAll(final Expr[] arr, final Var var, final Expr ex,
+      final CompileContext cc) throws QueryException {
 
     boolean change = false;
     final int al = arr.length;
     for(int a = 0; a < al; a++) {
-      final Expr e = arr[a].inline(qc, scp, var, ex);
+      final Expr e = arr[a].inline(var, ex, cc);
       if(e != null) {
         arr[a] = e;
         change = true;
@@ -293,14 +288,12 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Copies an expression.
-   * Will be useful for inlining functions, or for copying static queries.
-   * @param qc query context
-   * @param scp variable scope for creating new variables
+   * Copies an expression. Used for inlining functions, or for copying static queries.
+   * @param cc compilation context
    * @param vs mapping from old variable IDs to new variable copies
    * @return copied expression
    */
-  public abstract Expr copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
+  public abstract Expr copy(CompileContext cc, IntObjMap<Var> vs);
 
   /**
    * <p>This method is e.g. overwritten by expressions like {@link CmpG}, {@link CmpV},
@@ -312,17 +305,16 @@ public abstract class Expr extends ExprInfo {
    * <p>Example in {@link CmpV}:
    * <code>if($x eq true())</code> is rewritten to <code>if($x)</code> if {@code $x}
    * is known to return a single boolean.</p>
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return optimized expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimizeEbv(final CompileContext cc) throws QueryException {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
     if(st.type instanceof NodeType && st.oneOrMore() && !has(Flag.UPD) && !has(Flag.NDT)) {
-      qc.compInfo(QueryText.OPTREWRITE_X, this);
+      cc.info(QueryText.OPTREWRITE_X, this);
       return Bln.TRUE;
     }
     return this;
@@ -401,10 +393,10 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Finds and marks tail calls, enabling TCO.
-   * @param qc query context, {@code null} if the changes should not be reported
+   * @param cc compilation context, {@code null} if the changes should not be reported
    */
   @SuppressWarnings("unused")
-  public void markTailCalls(final QueryContext qc) { }
+  public void markTailCalls(final CompileContext cc) { }
 
   /**
    * Traverses this expression, notifying the visitor of declared and used variables,
@@ -436,14 +428,12 @@ public abstract class Expr extends ExprInfo {
   /**
    * Tries to push the given type check inside this expression.
    * @param tc type check to push into the expression
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return the resulting expression if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected Expr typeCheck(final TypeCheck tc, final QueryContext qc, final VarScope scp)
-      throws QueryException {
+  protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     return null;
   }
 }

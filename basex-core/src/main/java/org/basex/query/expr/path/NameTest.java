@@ -1,7 +1,5 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -71,7 +69,6 @@ public final class NameTest extends Test {
     if(results) results = kind != Kind.NAME ||
         (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
 
-    if(!results) qc.compInfo(OPTNAME_X, name);
     return results;
   }
 

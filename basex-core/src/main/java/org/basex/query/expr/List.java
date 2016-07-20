@@ -37,14 +37,14 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     final int es = exprs.length;
-    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(qc, scp);
-    return optimize(qc, scp);
+    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // remove empty sequences
     int p = 0;
     for(final Expr expr : exprs) {
@@ -52,7 +52,7 @@ public final class List extends Arr {
     }
 
     if(p != exprs.length) {
-      qc.compInfo(OPTREMOVE_X_X, this, Empty.SEQ);
+      cc.info(OPTREMOVE_X_X, this, Empty.SEQ);
       if(p < 2) return p == 0 ? Empty.SEQ : exprs[0];
       final Expr[] es = new Expr[p];
       System.arraycopy(exprs, 0, es, 0, p);
@@ -79,7 +79,7 @@ public final class List extends Arr {
         final Value[] vs = new Value[exprs.length];
         int c = 0;
         for(final Expr expr : exprs) {
-          final Value v = expr.value(qc);
+          final Value v = expr.value(cc.qc);
           if(c == 0) all = v.type;
           else if(all != v.type) all = null;
           vs[c++] = v;
@@ -100,7 +100,7 @@ public final class List extends Arr {
           for(int i = 0; i < c; i++) vb.add(vs[i]);
           val = vb.value();
         }
-        qc.compInfo(OPTREWRITE_X, val);
+        cc.info(OPTREWRITE_X, val);
         return val;
       }
     }
@@ -151,8 +151,8 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new List(info, copyAll(qc, scp, vs, exprs)));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return copyType(new List(info, copyAll(cc, vs, exprs)));
   }
 
   @Override

@@ -45,8 +45,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
-  /** Static context. */
-  private final StaticContext sc;
   /** Compilation flag. */
   private boolean compiled;
 
@@ -63,13 +61,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param expr function body
    * @param anns annotations
    * @param global bindings for non-local variables
-   * @param sc static context
    * @param scope scope
    */
   public Closure(final InputInfo info, final SeqType type, final Var[] args, final Expr expr,
-      final AnnList anns, final Map<Var, Expr> global, final StaticContext sc,
-      final VarScope scope) {
-    this(info, null, type, args, expr, anns, global, sc, scope);
+      final AnnList anns, final Map<Var, Expr> global, final VarScope scope) {
+    this(info, null, type, args, expr, anns, global, scope);
   }
 
   /**
@@ -81,12 +77,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param expr function expression
    * @param anns annotations
    * @param global bindings for non-local variables
-   * @param sc static context
    * @param scope variable scope
    */
   Closure(final InputInfo info, final QNm name, final SeqType type, final Var[] args,
-      final Expr expr, final AnnList anns, final Map<Var, Expr> global, final StaticContext sc,
-      final VarScope scope) {
+      final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope scope) {
     super(info, expr);
     this.name = name;
     this.args = args;
@@ -94,7 +88,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.anns = anns;
     this.global = global == null ? Collections.<Var, Expr>emptyMap() : global;
     this.scope = scope;
-    this.sc = sc;
   }
 
   @Override
@@ -123,12 +116,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public void compile(final QueryContext qc) throws QueryException {
-    compile(qc, null);
+  public void comp(final CompileContext cc) throws QueryException {
+    compile(cc);
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     if(compiled) return this;
     compiled = true;
 
@@ -136,59 +129,61 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // compile closure
     for(final Entry<Var, Expr> e : global.entrySet()) {
-      final Expr bound = e.getValue().compile(qc, scp);
+      final Expr bound = e.getValue().compile(cc);
       e.setValue(bound);
-      e.getKey().refineType(bound.seqType(), qc);
+      e.getKey().refineType(bound.seqType(), cc);
     }
 
+    scope.prepareCompile(cc);
     try {
-      expr = expr.compile(qc, scope);
+      expr = expr.compile(cc);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, type != null ? type : expr.seqType(), scp.sc);
+      expr = FnError.get(qe, type != null ? type : expr.seqType(), cc.sc());
     } finally {
-      scope.cleanUp(this);
+      scope.finishCompile(this, cc);
     }
 
     // convert all function calls in tail position to proper tail calls
-    expr.markTailCalls(qc);
+    expr.markTailCalls(cc);
 
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType r = expr.seqType(), rt = type == null || r.instanceOf(type) ? r : type;
     seqType = FuncType.get(anns, rt, args).seqType();
     size = 1;
 
+    scope.prepareCompile(cc);
     try {
       // inline all values in the closure
       final Iterator<Entry<Var, Expr>> cls = global.entrySet().iterator();
       Map<Var, Expr> add = null;
+      final int limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
       while(cls.hasNext()) {
         final Entry<Var, Expr> e = cls.next();
         final Var v = e.getKey();
         final Expr c = e.getValue();
         if(c instanceof Value) {
           // values are always inlined into the closure
-          final Expr inlined = expr.inline(qc, scope, v, v.checkType((Value) c, qc, true));
+          final Expr inlined = expr.inline(v, v.checkType((Value) c, cc.qc, true), cc);
           if(inlined != null) expr = inlined;
           cls.remove();
         } else if(c instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
           final Closure cl = (Closure) c;
           if(!cl.has(Flag.NDT) && !cl.has(Flag.UPD) && cl.global.size() < 5
-              && expr.count(v) != VarUsage.MORE_THAN_ONCE
-              && cl.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT)) {
-            qc.compInfo(OPTINLINE_X, e);
+              && expr.count(v) != VarUsage.MORE_THAN_ONCE && cl.exprSize() < limit) {
+            cc.info(OPTINLINE_X, e);
             for(final Entry<Var, Expr> e2 : cl.global.entrySet()) {
-              final Var v2 = e2.getKey(), v2c = scope.addCopy(v2, qc);
+              final Var v2 = cc.copy(e2.getKey(), null);
               if(add == null) add = new HashMap<>();
-              add.put(v2c, e2.getValue());
-              e2.setValue(new VarRef(cl.info, v2c));
+              add.put(v2, e2.getValue());
+              e2.setValue(new VarRef(cl.info, v2));
             }
 
-            final Expr inlined = expr.inline(qc, scope, v, cl);
+            final Expr inlined = expr.inline(v, cl, cc);
             if(inlined != null) expr = inlined;
             cls.remove();
           }
@@ -198,13 +193,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // add all newly added bindings
       if(add != null) global.putAll(add);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, type != null ? type : expr.seqType(), scp.sc);
+      expr = FnError.get(qe, type != null ? type : expr.seqType(), cc.sc());
     } finally {
-      scope.cleanUp(this);
+      scope.finishCompile(this, cc);
     }
 
     // only evaluate if the closure is empty, so we don't lose variables
-    return global.isEmpty() ? preEval(qc) : this;
+    return global.isEmpty() ? preEval(cc) : this;
   }
 
   @Override
@@ -217,67 +212,65 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     boolean change = false;
     for(final Entry<Var, Expr> entry : global.entrySet()) {
-      final Expr e = entry.getValue().inline(qc, scp, var, ex);
+      final Expr e = entry.getValue().inline(var, ex, cc);
       if(e != null) {
         change = true;
         entry.setValue(e);
       }
     }
 
-    return change ? optimize(qc, scp) : null;
+    return change ? optimize(cc) : null;
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final VarScope v = scope.copy(qc, vs);
-    final HashMap<Var, Expr> nl = new HashMap<>();
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      final Var var = vs.get(e.getKey().id);
-      final Expr ex = e.getValue().copy(qc, scp, vs);
-      nl.put(var, ex);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final VarScope scp = scope.copy(cc, vs);
+    cc.pushScope(scp);
+
+    try {
+      final HashMap<Var, Expr> nl = new HashMap<>();
+      for(final Entry<Var, Expr> e : global.entrySet()) {
+        nl.put(vs.get(e.getKey().id), e.getValue().copy(cc, vs));
+      }
+      final Var[] vars = args.clone();
+      final int vl = vars.length;
+      for(int v = 0; v < vl; v++) vars[v] = vs.get(vars[v].id);
+
+      final Expr e = expr.copy(cc, vs);
+      e.markTailCalls(null);
+      return copyType(new Closure(info, name, type, vars, e, anns, nl, scp));
+    } finally {
+      cc.removeScope();
     }
-    final Var[] vars = args.clone();
-    final int al = vars.length;
-    for(int a = 0; a < al; a++) vars[a] = vs.get(vars[a].id);
-    final Expr e = expr.copy(qc, v, vs);
-    e.markTailCalls(null);
-    return copyType(new Closure(info, name, type, vars, e, anns, nl, sc, v));
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
-      final InputInfo ii) throws QueryException {
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
+      throws QueryException {
 
     if(expr.has(Flag.CTX)) return null;
 
-    qc.compInfo(OPTINLINE_X, this);
+    cc.info(OPTINLINE_X, this);
     // create let bindings for all variables
     final LinkedList<Clause> cls =
         exprs.length == 0 && global.isEmpty() ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      final Var old = args[a], v = scp.addCopy(old, qc);
-      vs.put(old.id, v);
-      cls.add(new Let(v, exprs[a], false).optimize(qc, scp));
+      cls.add(new Let(cc.copy(args[a], vs), exprs[a], false).optimize(cc));
     }
-
     for(final Entry<Var, Expr> e : global.entrySet()) {
-      final Var old = e.getKey(), v = scp.addCopy(old, qc);
-      vs.put(old.id, v);
-      cls.add(new Let(v, e.getValue(), false).optimize(qc, scp));
+      cls.add(new Let(cc.copy(e.getKey(), vs), e.getValue(), false).optimize(cc));
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(qc, scp, vs), rt = type == null ? cpy :
-      new TypeCheck(sc, ii, cpy, type, true).optimize(qc, scp);
+    final Expr cpy = expr.copy(cc, vs), rt = type == null ? cpy :
+      new TypeCheck(scope.sc, ii, cpy, type, true).optimize(cc);
 
-    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(qc, scp);
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(cc);
   }
 
   @Override
@@ -310,7 +303,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } else if(body.isValue()) {
       // we can type check immediately
       final Value val = (Value) body;
-      checked = type.instance(val) ? val : type.promote(val, null, false, qc, sc, info);
+      checked = type.instance(val) ? val : type.promote(val, null, false, qc, scope.sc, info);
     } else {
       // check at each call
       if(argType.type.instanceOf(type.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
@@ -318,10 +311,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         final Occ occ = argType.occ.intersect(type.occ);
         if(occ == null) throw QueryError.typeError(body, type, null, info);
       }
-      checked = new TypeCheck(sc, info, body, type, true);
+      checked = new TypeCheck(scope.sc, info, body, type, true);
     }
 
-    return new FuncItem(sc, anns, name, args, ft, checked, scope.stackSize());
+    return new FuncItem(scope.sc, anns, name, args, ft, checked, scope.stackSize());
   }
 
   @Override
@@ -459,7 +452,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       refs[a] = new VarRef(info, arg[a]);
     }
     final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, info);
-    return new Closure(info, name, SeqType.ITEM_ZM, arg, call.fun, new AnnList(), null, sc, scp);
+    return new Closure(info, name, SeqType.ITEM_ZM, arg, call.fun, new AnnList(), null, scp);
   }
 
   @Override

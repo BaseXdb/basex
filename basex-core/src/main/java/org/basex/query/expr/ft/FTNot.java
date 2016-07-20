@@ -30,8 +30,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+  public FTExpr compile(final CompileContext cc) throws QueryException {
+    super.compile(cc);
     return exprs[0] instanceof FTNot ? exprs[0].exprs[0] : this;
   }
 
@@ -101,8 +101,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTNot(info, exprs[0].copy(qc, scp, vs));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTNot(info, exprs[0].copy(cc, vs));
   }
 
   @Override

@@ -28,7 +28,7 @@ public final class LibraryModule extends Module {
    */
   LibraryModule(final QNm name, final String doc, final TokenObjMap<StaticFunc> funcs,
       final TokenObjMap<StaticVar> vars, final TokenSet modules, final StaticContext sc) {
-    super(null, doc, funcs, vars, modules, sc, null);
+    super(sc, null, doc, null, funcs, vars, modules);
     this.name = name;
   }
 
@@ -46,7 +46,7 @@ public final class LibraryModule extends Module {
   }
 
   @Override
-  public void compile(final QueryContext qc) {
+  public void comp(final CompileContext cc) {
   }
 
   @Override

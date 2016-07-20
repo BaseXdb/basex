@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -27,7 +26,7 @@ public final class MapGet extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
     if(st.type instanceof MapType) {
       final SeqType rt = ((MapType) st.type).type;

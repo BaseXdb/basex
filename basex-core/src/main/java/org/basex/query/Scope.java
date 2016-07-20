@@ -14,14 +14,14 @@ public interface Scope {
    * @param visitor visitor
    * @return continue flag
    */
-  boolean visit(final ASTVisitor visitor);
+  boolean visit(ASTVisitor visitor);
 
   /**
    * Compiles the expression contained in this scope.
-   * @param qc query context
+   * @param cc compilation context
    * @throws QueryException compilation errors
    */
-  void compile(QueryContext qc) throws QueryException;
+  void comp(CompileContext cc) throws QueryException;
 
   /**
    * Checks if this scope has already been compiled.

@@ -82,11 +82,11 @@ public abstract class Test {
 
   /**
    * Optimizes the expression.
-   * @param qc query context
+   * @param cc compilation context
    * @return false if test always returns false
    */
   @SuppressWarnings("unused")
-  public boolean optimize(final QueryContext qc) {
+  public boolean optimize(final QueryContext cc) {
     return true;
   }
 

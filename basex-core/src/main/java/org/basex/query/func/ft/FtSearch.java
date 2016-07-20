@@ -36,9 +36,10 @@ public final class FtSearch extends FtAccess {
 
     final FTOpt tmp = qc.ftOpt();
     qc.ftOpt(opt);
-    final FTExpr fte = new FTWords(info, data, terms, mode).compile(qc, null);
+    final FTWords ftw = new FTWords(info, data, terms, mode);
+    ftw.prepare(qc);
     qc.ftOpt(tmp);
-    return new FTIndexAccess(info, options(fte, opts), ic).iter(qc);
+    return new FTIndexAccess(info, options(ftw, opts), ic).iter(qc);
   }
 
   @Override

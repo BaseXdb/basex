@@ -31,13 +31,13 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Value v = qc.value;
+  public Expr compile(final CompileContext cc) throws QueryException {
+    final Value v = cc.qc.value;
     try {
-      qc.value = null;
-      return super.compile(qc, scp);
+      cc.qc.value = null;
+      return super.compile(cc);
     } finally {
-      qc.value = v;
+      cc.qc.value = v;
     }
   }
 
@@ -95,8 +95,8 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new TransformWith(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new TransformWith(info, exprs[0].copy(cc, vs), exprs[1].copy(cc, vs));
   }
 
   @Override

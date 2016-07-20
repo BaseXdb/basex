@@ -60,15 +60,15 @@ public final class Where extends Clause {
   }
 
   @Override
-  public Where compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp);
-    return optimize(qc, scp);
+  public Where compile(final CompileContext cc) throws QueryException {
+    expr = expr.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public Where optimize(final QueryContext qc, final VarScope sc) throws QueryException {
-    expr = expr.optimizeEbv(qc, sc);
-    if(expr.isValue()) expr = expr.ebv(qc, info);
+  public Where optimize(final CompileContext cc) throws QueryException {
+    expr = expr.optimizeEbv(cc);
+    if(expr.isValue()) expr = expr.ebv(cc.qc, info);
     return this;
   }
 
@@ -83,17 +83,17 @@ public final class Where extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp, final Var var,
-      final Expr ex) throws QueryException {
-    final Expr sub = expr.inline(qc, scp, var, ex);
+  public Clause inline(final Var var, final Expr ex,
+      final CompileContext cc) throws QueryException {
+    final Expr sub = expr.inline(var, ex, cc);
     if(sub == null) return null;
     expr = sub;
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public Where copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Where(expr.copy(qc, scp, vs), info);
+  public Where copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Where(expr.copy(cc, vs), info);
   }
 
   @Override

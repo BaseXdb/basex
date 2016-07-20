@@ -57,18 +57,18 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    super.compile(cc);
 
     // disallow call of private functions from module with different uri
     if(func.anns.contains(Annotation.PRIVATE) && !func.sc.baseURI().eq(sc.baseURI()))
       throw FUNCPRIVATE_X.get(info, name.string());
 
     // compile mutually recursive functions
-    func.compile(qc);
+    func.comp(cc);
 
     // try to inline the function
-    final Expr inl = func.inlineExpr(exprs, qc, scp, info);
+    final Expr inl = func.inlineExpr(exprs, cc, info);
     if(inl != null) return inl;
 
     seqType = func.seqType();
@@ -76,14 +76,14 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public StaticFuncCall optimize(final QueryContext qc, final VarScope scp) {
+  public StaticFuncCall optimize(final CompileContext cc) {
     // do not inline a static function after compilation as it must be recursive
     return this;
   }
 
   @Override
-  public StaticFuncCall copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] args = Arr.copyAll(qc, scp, vs, exprs);
+  public StaticFuncCall copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final Expr[] args = Arr.copyAll(cc, vs, exprs);
     final StaticFuncCall call = new StaticFuncCall(name, args, sc, func, info);
     call.seqType = seqType;
     call.size = size;

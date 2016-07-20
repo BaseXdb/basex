@@ -53,8 +53,8 @@ public final class JobsListDetails extends StandardFunc {
     for(final byte[] key : ids) {
       final String id = string(key);
       Job job = jobs.active.get(id);
-      JobTask jt = jobs.tasks.get(id);
-      JobResult jr = jobs.results.get(id);
+      final JobTask jt = jobs.tasks.get(id);
+      final JobResult jr = jobs.results.get(id);
       if(job == null && jr != null) job = jr.job;
       if(job == null && jt != null) job = jt.job;
       if(job == null) continue;

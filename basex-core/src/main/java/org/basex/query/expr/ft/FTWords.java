@@ -49,6 +49,8 @@ public final class FTWords extends FTExpr {
   private int pos;
   /** Fast evaluation. */
   private boolean fast;
+  /** Compilation flag. */
+  private boolean compiled;
 
   /**
    * Constructor for scan-based evaluation.
@@ -73,9 +75,9 @@ public final class FTWords extends FTExpr {
    */
   public FTWords(final InputInfo info, final Data data, final Value query, final FTMode mode) {
     super(info);
+    this.data = data;
     this.query = query;
     this.mode = mode;
-    this.data = data;
   }
 
   @Override
@@ -85,21 +87,32 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTWords compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public FTWords compile(final CompileContext cc) throws QueryException {
+    if(compiled) return this;
+    compiled = true;
+
     if(occ != null) {
       final int ol = occ.length;
-      for(int o = 0; o < ol; ++o) occ[o] = occ[o].compile(qc, scp);
+      for(int o = 0; o < ol; ++o) occ[o] = occ[o].compile(cc);
     }
+    query = query.compile(cc);
 
-    // compile only once
-    if(tokens == null) {
-      query = query.compile(qc, scp);
-      if(query.isValue()) tokens = tokens(qc);
-      // choose fast evaluation for default settings
-      fast = mode == FTMode.ANY && tokens != null && occ == null;
-      if(ftt == null) ftt = new FTTokenizer(this, qc);
-    }
+    prepare(cc.qc);
     return this;
+  }
+
+  /**
+   * Prepares query evaluation.
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  public void prepare(final QueryContext qc) throws QueryException {
+    // pre-evaluate tokens, choose fast evaluation for default search options
+    if(query.isValue()) {
+      tokens = tokens(qc);
+      fast = mode == FTMode.ANY && occ == null;
+    }
+    ftt = new FTTokenizer(this, qc);
   }
 
   @Override
@@ -412,22 +425,22 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    boolean change = occ != null && inlineAll(qc, scp, occ, var, ex);
-    final Expr q = query.inline(qc, scp, var, ex);
+    boolean change = occ != null && inlineAll(occ, var, ex, cc);
+    final Expr q = query.inline(var, ex, cc);
     if(q != null) {
       query = q;
       change = true;
     }
-    return change ? optimize(qc, scp) : null;
+    return change ? optimize(cc) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final FTWords ftw = new FTWords(info, query.copy(qc, scp, vs), mode,
-        occ == null ? null : Arr.copyAll(qc, scp, vs, occ));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final FTWords ftw = new FTWords(info, query.copy(cc, vs), mode,
+        occ == null ? null : Arr.copyAll(cc, vs, occ));
     if(ftt != null) ftw.ftt = ftt.copy(ftw);
     ftw.tokens = tokens;
     ftw.data = data;

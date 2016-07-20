@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -21,18 +20,18 @@ public final class FnExists extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     // ignore non-deterministic expressions (e.g.: error())
     final Expr e = exprs[0];
     return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.UPD) ? this : Bln.get(e.size() != 0);
   }
 
   @Override
-  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
+  public Expr optimizeEbv(final CompileContext cc) {
     // if(exists(node*)) -> if(node*)
     final Expr e = exprs[0];
     if(e.seqType().type instanceof NodeType) {
-      qc.compInfo(QueryText.OPTREWRITE_X, this);
+      cc.info(QueryText.OPTREWRITE_X, this);
       return e;
     }
     return this;

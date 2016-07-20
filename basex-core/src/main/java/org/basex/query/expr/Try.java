@@ -42,27 +42,27 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     try {
-      super.compile(qc, scp);
-      if(expr.isValue()) return optPre(expr, qc);
+      super.compile(cc);
+      if(expr.isValue()) return optPre(expr, cc);
     } catch(final QueryException ex) {
       if(!ex.isCatchable()) throw ex;
       for(final Catch c : catches) {
         if(c.matches(ex)) {
           // found a matching clause, compile and inline error message
-          return optPre(c.compile(qc, scp).asExpr(ex, qc, scp), qc);
+          return optPre(c.compile(cc).asExpr(ex, cc), cc);
         }
       }
       throw ex;
     }
 
-    for(final Catch c : catches) c.compile(qc, scp);
-    return optimize(qc, scp);
+    for(final Catch c : catches) c.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) {
+  public Expr optimize(final CompileContext cc) {
     seqType = expr.seqType();
     for(final Catch c : catches) {
       if(!c.expr.isFunction(Function.ERROR)) seqType = seqType.union(c.seqType());
@@ -96,14 +96,12 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     boolean change = false;
     try {
-      final Expr sub = expr.inline(qc, scp, var, ex);
+      final Expr sub = expr.inline(var, ex, cc);
       if(sub != null) {
-        if(sub.isValue()) return optPre(sub, qc);
+        if(sub.isValue()) return optPre(sub, cc);
         expr = sub;
         change = true;
       }
@@ -112,20 +110,20 @@ public final class Try extends Single {
       for(final Catch c : catches) {
         if(c.matches(qe)) {
           // found a matching clause, inline variable and error message
-          final Catch nw = c.inline(qc, scp, var, ex);
-          return optPre((nw == null ? c : nw).asExpr(qe, qc, scp), qc);
+          final Catch nw = c.inline(var, ex, cc);
+          return optPre((nw == null ? c : nw).asExpr(qe, cc), cc);
         }
       }
       throw qe;
     }
 
-    for(final Catch c : catches) change |= c.inline(qc, scp, var, ex) != null;
+    for(final Catch c : catches) change |= c.inline(var, ex, cc) != null;
     return change ? this : null;
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Try(info, expr.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, catches));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Try(info, expr.copy(cc, vs), Arr.copyAll(cc, vs, catches));
   }
 
   @Override
@@ -146,8 +144,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public void markTailCalls(final QueryContext qc) {
-    for(final Catch c : catches) c.markTailCalls(qc);
+  public void markTailCalls(final CompileContext cc) {
+    for(final Catch c : catches) c.markTailCalls(cc);
   }
 
   @Override

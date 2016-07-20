@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -40,14 +39,14 @@ public final class FnFoldLeft extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
-      qc.compInfo(QueryText.OPTUNROLL_X, this);
+      cc.info(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       Expr e = exprs[1];
       for(final Item it : seq) {
-        e = new DynFuncCall(info, sc, exprs[2], e, it).optimize(qc, scp);
+        e = new DynFuncCall(info, sc, exprs[2], e, it).optimize(cc);
       }
       return e;
     }

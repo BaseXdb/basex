@@ -39,24 +39,24 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    return super.compile(qc, scp).optimize(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return super.compile(cc).optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
     if(st.one() && !st.mayBeArray()) seqType = SeqType.get(seqType.type, Occ.ONE);
 
     // pre-evaluate value
-    if(expr.isValue()) return optPre(value(qc), qc);
+    if(expr.isValue()) return optPre(value(cc.qc), cc);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
     final Type t = seqType.type;
     if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
         t == AtomType.QNM || t == AtomType.URI) && seqType.eq(expr.seqType())) {
-      optPre(expr, qc);
+      optPre(expr, cc);
       return expr;
     }
     size = seqType.occ();
@@ -76,8 +76,8 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Cast copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Cast(sc, info, expr.copy(qc, scp, vs), seqType);
+  public Cast copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Cast(sc, info, expr.copy(cc, vs), seqType);
   }
 
   @Override

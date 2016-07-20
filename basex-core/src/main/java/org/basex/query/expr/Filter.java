@@ -81,26 +81,26 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    root = root.compile(qc, scp);
+  public final Expr compile(final CompileContext cc) throws QueryException {
+    root = root.compile(cc);
     // invalidate current context value (will be overwritten by filter)
-    final Value init = qc.value;
-    qc.value = Path.initial(qc, root);
+    final Value init = cc.qc.value;
+    cc.qc.value = Path.initial(cc, root);
     try {
-      return super.compile(qc, scp);
+      return super.compile(cc);
     } finally {
-      qc.value = init;
+      cc.qc.value = init;
     }
   }
 
   @Override
-  public final Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Expr e = merge(root, qc, scp);
+  public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
+    final Expr e = merge(root, cc);
     if(e != this) {
-      qc.compInfo(QueryText.OPTREWRITE_X, this);
+      cc.info(QueryText.OPTREWRITE_X, this);
       return e;
     }
-    return super.optimizeEbv(qc, scp);
+    return super.optimizeEbv(cc);
   }
 
   /**
@@ -115,32 +115,32 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     // return empty root
-    if(root.isEmpty()) return optPre(qc);
+    if(root.isEmpty()) return optPre(cc);
 
     // remember current context value (will be temporarily overwritten)
-    final Value cv = qc.value;
+    final Value cv = cc.qc.value;
     try {
-      qc.value = Path.initial(qc, root);
-      final Expr e = super.optimize(qc, scp);
+      cc.qc.value = Path.initial(cc, root);
+      final Expr e = super.optimize(cc);
       if(e != this) return e;
     } finally {
-      qc.value = cv;
+      cc.qc.value = cv;
     }
 
     // check result size
     seqType(root.seqType(), root.size());
-    if(size == 0) return optPre(qc);
+    if(size == 0) return optPre(cc);
 
     // if possible, convert filter to root or path expression
     final Expr ex = simplify(root, preds);
-    if(ex != null) return ex.optimize(qc, scp);
+    if(ex != null) return ex.optimize(cc);
 
     // try to rewrite filter to index access
     if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
       final Path ip = Path.get(info, root, Step.get(info, SELF, Test.NOD, preds));
-      final Expr ie = ip.index(qc, Path.initial(qc, root));
+      final Expr ie = ip.index(cc, Path.initial(cc, root));
       if(ie != ip) return ie;
     }
 
@@ -160,7 +160,7 @@ public abstract class Filter extends Preds {
           e = FnSubsequence.eval((Value) e, e.size(), 1);
         } else {
           // rewrite positional predicate to basex:last-from
-          e = Function._UTIL_LAST_FROM.get(scp.sc, info, e);
+          e = Function._UTIL_LAST_FROM.get(cc.sc(), info, e);
         }
         opt = true;
       } else if(pos != null) {
@@ -169,10 +169,10 @@ public abstract class Filter extends Preds {
           e = FnSubsequence.eval((Value) e, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> basex:item-at(expr, pos.min)
-          e = Function._UTIL_ITEM_AT.get(scp.sc, info, e, Int.get(pos.min));
+          e = Function._UTIL_ITEM_AT.get(cc.sc(), info, e, Int.get(pos.min));
         } else {
           // example: expr[pos] -> basex:item-range(expr, pos.min, pos.max)
-          e = Function._UTIL_ITEM_RANGE.get(scp.sc, info, e, Int.get(pos.min), Int.get(pos.max));
+          e = Function._UTIL_ITEM_RANGE.get(cc.sc(), info, e, Int.get(pos.min), Int.get(pos.max));
         }
         opt = true;
       } else if(num(pred)) {
@@ -180,7 +180,7 @@ public abstract class Filter extends Preds {
          *   example: expr[pos] -> basex:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets.
          *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = Function._UTIL_ITEM_AT.get(scp.sc, info, e, pred);
+        e = Function._UTIL_ITEM_AT.get(cc.sc(), info, e, pred);
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
@@ -189,8 +189,8 @@ public abstract class Filter extends Preds {
     }
 
     if(opt) {
-      qc.compInfo(QueryText.OPTREWRITE_X, this);
-      return e.optimize(qc, scp);
+      cc.info(QueryText.OPTREWRITE_X, this);
+      return e.optimize(cc);
     }
 
     // standard iterator
@@ -217,14 +217,12 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-
-    final Expr rt = root == null ? null : root.inline(qc, scp, var, ex);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    final Expr rt = root == null ? null : root.inline(var, ex, cc);
     if(rt != null) root = rt;
 
-    final boolean pr = inlineAll(qc, scp, preds, var, ex);
-    return pr || rt != null ? optimize(qc, scp) : null;
+    final boolean pr = inlineAll(preds, var, ex, cc);
+    return pr || rt != null ? optimize(cc) : null;
   }
 
   @Override

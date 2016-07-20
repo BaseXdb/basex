@@ -108,7 +108,7 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public Pos copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Pos copy(final CompileContext cc, final IntObjMap<Var> vs) {
     return new Pos(min, max, info);
   }
 

@@ -28,60 +28,61 @@ public final class MainModule extends Module {
 
   /**
    * Creates a new main module for a context item declared in the prolog.
-   * @param expr root expression
    * @param scope variable scope
-   * @param doc documentation
+   * @param expr root expression
    * @param type optional type
-   * @param sc static context
+   * @param doc documentation
    * @param info input info
    * @return main module
    */
-  public static MainModule get(final Expr expr, final VarScope scope, final SeqType type,
-      final String doc, final StaticContext sc, final InputInfo info) {
-    return new MainModule(expr, scope, type, doc, null, null, null, sc, info);
+  public static MainModule get(final VarScope scope, final Expr expr, final SeqType type,
+      final String doc, final InputInfo info) {
+    return new MainModule(scope.sc, scope, expr, type, doc, info, null, null, null);
   }
 
   /**
    * Creates a new main module for the specified function.
-   * @param uf user-defined function
+   * @param sf user-defined function
    * @param args arguments
    * @return main module
    * @throws QueryException query exception
    */
-  public static MainModule get(final StaticFunc uf, final Expr[] args) throws QueryException {
-    final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-    return new MainModule(sfc, new VarScope(uf.sc), null, null, null, null, null, uf.sc, null);
+  public static MainModule get(final StaticFunc sf, final Expr[] args) throws QueryException {
+    final StaticFuncCall expr = new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf);
+    return new MainModule(sf.sc, new VarScope(sf.sc), expr, null, null, null, null, null, null);
   }
 
   /**
    * Constructor.
-   * @param expr root expression
-   * @param scope variable scope
-   * @param doc documentation
-   * @param funcs user-defined functions
-   * @param vars static variables
-   * @param imports namespace URIs of imported modules
-   * @param declType optional type
    * @param sc static context
-   * @param info input info
+   * @param scope variable scope
+   * @param expr root expression
+   * @param declType optional type (can be {@code null})
+   * @param doc documentation (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @param funcs user-defined functions (can be {@code null})
+   * @param vars static variables (can be {@code null})
+   * @param imports namespace URIs of imported modules (can be {@code null})
    */
-  MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
-      final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
-      final TokenSet imports, final StaticContext sc, final InputInfo info) {
+  MainModule(final StaticContext sc, final VarScope scope, final Expr expr, final SeqType declType,
+      final String doc, final InputInfo info, final TokenObjMap<StaticFunc> funcs,
+      final TokenObjMap<StaticVar> vars, final TokenSet imports) {
 
-    super(scope, doc, funcs, vars, imports, sc, info);
+    super(sc, scope, doc, info, funcs, vars, imports);
     this.expr = expr;
     this.declType = declType;
   }
 
   @Override
-  public void compile(final QueryContext qc) throws QueryException {
+  public void comp(final CompileContext cc) throws QueryException {
     if(compiled) return;
+    compiled = true;
+
+    scope.prepareCompile(cc);
     try {
-      compiled = true;
-      expr = expr.compile(qc, scope);
+      expr = expr.compile(cc);
     } finally {
-      scope.cleanUp(this);
+      scope.finishCompile(this, cc);
     }
   }
 
@@ -99,7 +100,6 @@ public final class MainModule extends Module {
       for(Item it; (it = iter.next()) != null;) cache.add(it);
       if(declType != null) declType.treat(cache.value(), null, info);
       return cache;
-
     } finally {
       VarScope.exit(fp, qc);
     }

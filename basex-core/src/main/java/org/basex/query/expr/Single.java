@@ -32,8 +32,8 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    expr = expr.compile(cc);
     return this;
   }
 
@@ -53,12 +53,11 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    final Expr sub = expr.inline(qc, scp, var, ex);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    final Expr sub = expr.inline(var, ex, cc);
     if(sub == null) return null;
     expr = sub;
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override

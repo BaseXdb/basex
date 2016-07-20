@@ -53,19 +53,19 @@ public final class VarScope {
    * @param info input info
    * @return the variable
    */
-  public Var addNew(final QNm name, final SeqType st, final boolean param,
-      final QueryContext qc, final InputInfo info) {
+  public Var addNew(final QNm name, final SeqType st, final boolean param, final QueryContext qc,
+      final InputInfo info) {
     return add(new Var(name, st, param, qc, sc, info));
   }
 
   /**
    * Creates a new copy of the given variable in this scope.
    * @param var variable to copy
-   * @param qc query context
+   * @param cc compilation context
    * @return the variable
    */
-  public Var addCopy(final Var var, final QueryContext qc) {
-    return add(new Var(var, qc, sc));
+  public Var addCopy(final Var var, final CompileContext cc) {
+    return add(new Var(var, cc.qc, sc));
   }
 
   /**
@@ -87,11 +87,22 @@ public final class VarScope {
   }
 
   /**
+   * Prepares the variable scope for being compiled.
+   * @param cc compilation context
+   */
+  public void prepareCompile(final CompileContext cc) {
+    cc.pushScope(this);
+  }
+
+  /**
    * Deletes all unused variables from this scope and assigns stack slots.
    * This method should be run after compiling the scope.
    * @param expr the scope
+   * @param cc compilation context
    */
-  public void cleanUp(final Scope expr) {
+  public void finishCompile(final Scope expr, final CompileContext cc) {
+    cc.removeScope();
+
     final BitSet declared = new BitSet();
     final BitSet used = new BitSet();
     expr.visit(new ASTVisitor() {
@@ -150,14 +161,14 @@ public final class VarScope {
   }
 
   /**
-   * Copies this VarScope.
-   * @param qc query context
+   * Returns a copy of this variable scope.
+   * @param cc compilation context
    * @param vs variable mapping
    * @return copied scope
    */
-  public VarScope copy(final QueryContext qc, final IntObjMap<Var> vs) {
-    final VarScope cscp = new VarScope(sc);
-    for(final Var v : vars) vs.put(v.id, cscp.addCopy(v, qc));
-    return cscp;
+  public VarScope copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final VarScope scp = new VarScope(sc);
+    for(final Var v : vars) vs.put(v.id, scp.addCopy(v, cc));
+    return scp;
   }
 }

@@ -169,10 +169,10 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // swap expressions
     if(swap()) {
-      qc.compInfo(OPTSWAP_X, this);
+      cc.info(OPTSWAP_X, this);
       op = op.swap();
     }
 
@@ -183,29 +183,29 @@ public final class CmpV extends Cmp {
 
     Expr e = this;
     if(oneIsEmpty()) {
-      e = optPre(qc);
+      e = optPre(cc);
     } else if(allAreValues()) {
-      e = preEval(qc);
+      e = preEval(cc);
     } else if(e1.isFunction(Function.COUNT)) {
-      e = compCount(op, scp);
-      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
+      e = compCount(op, cc);
+      if(e != this) cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
-      e = compStringLength(op, scp);
-      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
+      e = compStringLength(op, cc);
+      if(e != this) cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
       e = Pos.get(op, e2, e, info);
-      if(e != this) qc.compInfo(OPTREWRITE_X, this);
+      if(e != this) cc.info(OPTREWRITE_X, this);
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
-      e = Function.NOT.get(scp.sc, info, e1);
+      e = Function.NOT.get(cc.sc(), info, e1);
     }
     return e;
   }
 
   @Override
-  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
+  public Expr optimizeEbv(final CompileContext cc) {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpV.EQ && exprs[1] == Bln.TRUE || op == OpV.NE && exprs[1] == Bln.FALSE) &&
@@ -233,8 +233,8 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpV(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, sc, info);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new CmpV(exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), op, coll, sc, info);
   }
 
   @Override

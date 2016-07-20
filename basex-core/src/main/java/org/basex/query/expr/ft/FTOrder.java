@@ -39,8 +39,8 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOrder(info, exprs[0].copy(qc, scp, vs));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTOrder(info, exprs[0].copy(cc, vs));
   }
 
   @Override

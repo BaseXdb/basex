@@ -26,9 +26,9 @@ public final class InterSect extends Set {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.optimize(qc, scp);
-    return oneIsEmpty() ? optPre(qc) : this;
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    super.optimize(cc);
+    return oneIsEmpty() ? optPre(cc) : this;
   }
 
   @Override
@@ -53,8 +53,8 @@ public final class InterSect extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final InterSect is = new InterSect(info, copyAll(qc, scp, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final InterSect is = new InterSect(info, copyAll(cc, vs, exprs));
     is.iterable = iterable;
     return copyType(is);
   }

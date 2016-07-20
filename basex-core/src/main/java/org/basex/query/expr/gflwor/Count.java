@@ -60,13 +60,13 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Count compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    return optimize(qc, scp);
+  public Count compile(final CompileContext cc) throws QueryException {
+    return optimize(cc);
   }
 
   @Override
-  public Count optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    var.refineType(SeqType.ITR, qc);
+  public Count optimize(final CompileContext cc) throws QueryException {
+    var.refineType(SeqType.ITR, cc);
     return this;
   }
 
@@ -81,15 +81,13 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
+  public Clause inline(final Var v, final Expr ex, final CompileContext cc) {
     return null;
   }
 
   @Override
-  public Count copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.addCopy(var, qc);
-    vs.put(var.id, v);
-    return new Count(v);
+  public Count copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Count(cc.copy(var, vs));
   }
 
   @Override

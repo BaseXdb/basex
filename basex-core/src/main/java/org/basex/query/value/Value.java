@@ -47,7 +47,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Value compile(final QueryContext qc, final VarScope scp) {
+  public final Value compile(final CompileContext cc) {
     return this;
   }
 
@@ -140,14 +140,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Expr inline(final QueryContext qc, final VarScope scp, final Var var,
-      final Expr ex) {
+  public final Expr inline(final Var var, final Expr ex,
+      final CompileContext cc) {
     // values do not contain variable references
     return null;
   }
 
   @Override
-  public Value copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public Value copy(final CompileContext cc, final IntObjMap<Var> vs) {
     return this;
   }
 

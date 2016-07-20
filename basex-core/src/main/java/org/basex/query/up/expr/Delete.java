@@ -47,8 +47,8 @@ public final class Delete extends Update {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Delete(sc, info, exprs[0].copy(qc, scp, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Delete(sc, info, exprs[0].copy(cc, vs));
   }
 
   @Override

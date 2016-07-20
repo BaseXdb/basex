@@ -37,14 +37,14 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public FTExpr compile(final CompileContext cc) throws QueryException {
     final int es = exprs.length;
-    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(qc, scp);
+    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(cc);
     return this;
   }
 
   @Override
-  public FTExpr optimize(final QueryContext qc, final VarScope scp) {
+  public FTExpr optimize(final CompileContext cc) {
     return this;
   }
 
@@ -84,13 +84,13 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return inlineAll(qc, scp, exprs, var, ex) ? optimize(qc, scp) : null;
+    return inlineAll(exprs, var, ex, cc) ? optimize(cc) : null;
   }
 
   @Override
-  public abstract FTExpr copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
+  public abstract FTExpr copy(CompileContext cc, IntObjMap<Var> vs);
 
   /**
    * Checks if sub expressions of a mild not operator violate the grammar.

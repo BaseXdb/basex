@@ -88,10 +88,10 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final CompileContext cc) throws QueryException {
     seqType = SeqType.get(AtomType.BLN,
         exprs[0].size() == 1 && exprs[1].size() == 1 ? Occ.ONE : Occ.ZERO_ONE);
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(cc.qc, info) : this, cc);
   }
 
   @Override
@@ -109,8 +109,8 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpN(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, info);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new CmpN(exprs[0].copy(cc, vs), exprs[1].copy(cc, vs), op, info);
   }
 
   @Override

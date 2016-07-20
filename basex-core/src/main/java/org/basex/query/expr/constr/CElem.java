@@ -43,10 +43,10 @@ public final class CElem extends CName {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     final int s = addNS();
     try {
-      return super.compile(qc, scp);
+      return super.compile(cc);
     } finally {
       sc.ns.size(s);
     }
@@ -136,9 +136,9 @@ public final class CElem extends CName {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CElem(sc, info, name.copy(qc, scp, vs), comp ? null : nspaces.copy(),
-        copyAll(qc, scp, vs, exprs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new CElem(sc, info, name.copy(cc, vs), comp ? null : nspaces.copy(),
+        copyAll(cc, vs, exprs));
   }
 
   /**

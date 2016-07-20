@@ -80,8 +80,8 @@ public final class Rename extends Update {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Rename(sc, info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Rename(sc, info, exprs[0].copy(cc, vs), exprs[1].copy(cc, vs));
   }
 
   @Override

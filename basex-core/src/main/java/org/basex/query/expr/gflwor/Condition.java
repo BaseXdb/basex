@@ -52,34 +52,27 @@ public final class Condition extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp);
-    return optimize(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    expr = expr.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public Condition optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.optimizeEbv(qc, scp);
+  public Condition optimize(final CompileContext cc) throws QueryException {
+    expr = expr.optimizeEbv(cc);
     return this;
   }
 
   @Override
-  public Condition inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+  public Condition inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return (Condition) super.inline(qc, scp, var, ex);
+    return (Condition) super.inline(var, ex, cc);
   }
 
   @Override
-  public Condition copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var it = item == null ? null : scp.addCopy(item, qc),
-              ps = pos  == null ? null : scp.addCopy(pos, qc),
-              pr = prev == null ? null : scp.addCopy(prev, qc),
-              nx = next == null ? null : scp.addCopy(next, qc);
-    if(it != null) vs.put(item.id, it);
-    if(ps != null) vs.put(pos.id,  ps);
-    if(pr != null) vs.put(prev.id, pr);
-    if(nx != null) vs.put(next.id, nx);
-    return new Condition(start, it, ps, pr, nx, expr.copy(qc, scp, vs), info);
+  public Condition copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Condition(start, cc.copy(item, vs), cc.copy(pos, vs), cc.copy(prev, vs),
+        cc.copy(next, vs), expr.copy(cc, vs), info);
   }
 
   /**

@@ -80,27 +80,27 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Clause c = super.compile(qc, scp);
-    var.refineType(scoring ? SeqType.DBL : expr.seqType(), qc);
+  public Clause compile(final CompileContext cc) throws QueryException {
+    final Clause c = super.compile(cc);
+    var.refineType(scoring ? SeqType.DBL : expr.seqType(), cc);
     return c;
   }
 
   @Override
-  public Let optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Let optimize(final CompileContext cc) throws QueryException {
     if(!scoring && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
       if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.promote)) {
-        qc.compInfo(OPTTYPE_X, tc.seqType());
+        cc.info(OPTTYPE_X, tc.seqType());
         expr = tc.expr;
       }
     }
 
     seqType = scoring ? SeqType.DBL : expr.seqType();
-    var.refineType(seqType, qc);
+    var.refineType(seqType, cc);
     if(var.checksType() && expr.isValue()) {
-      expr = var.checkType((Value) expr, qc, true);
-      var.refineType(expr.seqType(), qc);
+      expr = var.checkType((Value) expr, cc.qc, true);
+      var.refineType(expr.seqType(), cc);
     }
     size = scoring ? 1 : expr.size();
     var.size = size;
@@ -109,10 +109,8 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public Let copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.addCopy(var, qc);
-    vs.put(var.id, v);
-    return new Let(v, expr.copy(qc, scp, vs), scoring);
+  public Let copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Let(cc.copy(var, vs), expr.copy(cc, vs), scoring);
   }
 
   @Override
@@ -126,14 +124,13 @@ public final class Let extends ForLet {
 
   /**
    * Returns an expression that is appropriate for inlining.
-   * @param qc query context
-   * @param scp variable scope
+   * @param cc compilation context
    * @return inlineable expression
    * @throws QueryException query exception
    */
-  Expr inlineExpr(final QueryContext qc, final VarScope scp) throws QueryException {
-    return scoring ? Function._FT_SCORE.get(scp.sc, info, expr).optimize(qc, scp)
-                   : var.checked(expr, qc, scp);
+  Expr inlineExpr(final CompileContext cc) throws QueryException {
+    return scoring ? Function._FT_SCORE.get(cc.sc(), info, expr).optimize(cc) :
+      var.checked(expr, cc);
   }
 
   @Override

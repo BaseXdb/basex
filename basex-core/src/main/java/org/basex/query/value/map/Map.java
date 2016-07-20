@@ -16,7 +16,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -346,7 +345,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
       final InputInfo ii) {
     return null;
   }

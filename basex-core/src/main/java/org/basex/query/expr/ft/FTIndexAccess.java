@@ -75,14 +75,13 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    return ftexpr.inline(qc, scp, var, ex) == null ? null : optimize(qc, scp);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    return ftexpr.inline(var, ex, cc) == null ? null : optimize(cc);
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTIndexAccess(info, ftexpr.copy(qc, scp, vs), ictx);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTIndexAccess(info, ftexpr.copy(cc, vs), ictx);
   }
 
   @Override

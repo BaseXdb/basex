@@ -39,9 +39,9 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    weight = weight.compile(qc, scp);
-    return super.compile(qc, scp);
+  public FTExpr compile(final CompileContext cc) throws QueryException {
+    weight = weight.compile(cc);
+    return super.compile(cc);
   }
 
   // called by sequential variant
@@ -100,20 +100,20 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    boolean change = inlineAll(qc, scp, exprs, var, ex);
-    final Expr w = weight.inline(qc, scp, var, ex);
+    boolean change = inlineAll(exprs, var, ex, cc);
+    final Expr w = weight.inline(var, ex, cc);
     if(w != null) {
       weight = w;
       change = true;
     }
-    return change ? optimize(qc, scp) : null;
+    return change ? optimize(cc) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTWeight(info, exprs[0].copy(qc, scp, vs), weight.copy(qc, scp, vs));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTWeight(info, exprs[0].copy(cc, vs), weight.copy(cc, vs));
   }
 
   @Override

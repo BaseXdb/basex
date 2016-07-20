@@ -37,9 +37,9 @@ abstract class ForLet extends Clause {
   }
 
   @Override
-  public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp);
-    return optimize(qc, scp);
+  public Clause compile(final CompileContext cc) throws QueryException {
+    expr = expr.compile(cc);
+    return optimize(cc);
   }
 
   @Override
@@ -58,14 +58,14 @@ abstract class ForLet extends Clause {
   }
 
   @Override
-  public final Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex)
+  public final Clause inline(final Var v, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    final Expr sub = expr.inline(qc, scp, v, ex);
+    final Expr sub = expr.inline(v, ex, cc);
     if(sub == null) return null;
     expr = sub;
     // call compile instead of optimize, because many new optimizations may be triggered by inlining
-    return compile(qc, scp);
+    return compile(cc);
   }
 
   @Override

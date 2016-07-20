@@ -128,17 +128,16 @@ public final class Functions extends TokenSet {
    * @param ft function type
    * @param expr function body
    * @param scp variable scope
-   * @param sc static context
    * @param info input info
    * @param runtime run-time flag
    * @param updating flag for updating functions
    * @return the function expression
    */
   private static Expr closureOrFItem(final AnnList anns, final QNm name, final Var[] params,
-      final FuncType ft, final Expr expr, final VarScope scp, final StaticContext sc,
-      final InputInfo info, final boolean runtime, final boolean updating) {
-    return runtime ? new FuncItem(sc, anns, name, params, ft, expr, scp.stackSize()) :
-      new Closure(info, name, updating ? null : ft.type, params, expr, anns, null, sc, scp);
+      final FuncType ft, final Expr expr, final VarScope scp, final InputInfo info,
+      final boolean runtime, final boolean updating) {
+    return runtime ? new FuncItem(scp.sc, anns, name, params, ft, expr, scp.stackSize()) :
+      new Closure(info, name, updating ? null : ft.type, params, expr, anns, null, scp);
   }
 
   /**
@@ -163,7 +162,7 @@ public final class Functions extends TokenSet {
       final Expr e = new Cast(sc, info, new VarRef(info, args[0]), type.seqType());
       final AnnList anns = new AnnList();
       final FuncType ft = FuncType.get(anns, e.seqType(), args);
-      return closureOrFItem(anns, name, args, ft, e, scp, sc, info, runtime, false);
+      return closureOrFItem(anns, name, args, ft, e, scp, info, runtime, false);
     }
 
     // built-in functions
@@ -189,8 +188,8 @@ public final class Functions extends TokenSet {
       }
 
       return sf.has(Flag.CTX) || sf.has(Flag.POS)
-          ? new FuncLit(anns, name, args, sf, ft, scp, sc, info)
-          : closureOrFItem(anns, name, args, fn.type(arity, anns), sf, scp, sc, info, runtime, upd);
+          ? new FuncLit(anns, name, args, sf, ft, scp, info)
+          : closureOrFItem(anns, name, args, fn.type(arity, anns), sf, scp, info, runtime, upd);
     }
 
     // user-defined function
@@ -207,8 +206,7 @@ public final class Functions extends TokenSet {
 
       final boolean upd = sf.updating;
       final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, info);
-      final Expr f = closureOrFItem(
-          tf.anns, sf.name, args, ft, tf.fun, scp, sc, info, runtime, upd);
+      final Expr f = closureOrFItem(tf.anns, sf.name, args, ft, tf.fun, scp, info, runtime, upd);
       if(upd) qc.updating();
       return f;
     }
@@ -224,7 +222,7 @@ public final class Functions extends TokenSet {
       args[v] = new VarRef(info, vs[v]);
     }
     final Expr jf = JavaFunction.get(name, args, qc, sc, info);
-    return jf == null ? null : new FuncLit(new AnnList(), name, vs, jf, jt, scp, sc, info);
+    return jf == null ? null : new FuncLit(new AnnList(), name, vs, jf, jt, scp, info);
   }
 
   /**

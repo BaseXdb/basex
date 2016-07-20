@@ -113,7 +113,7 @@ public class XQueryEval extends StandardFunc {
 
       // base-uri: adopt specified uri, passed on uri, or uri from parent query
       final String bu = opts.get(XQueryOptions.BASE_URI);
-      String uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
+      final String uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
 
       // evaluate query
       try {

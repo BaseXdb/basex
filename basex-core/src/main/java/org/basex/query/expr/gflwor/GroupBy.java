@@ -209,18 +209,18 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public GroupBy compile(final QueryContext qc, final VarScope sc) throws QueryException {
-    for(final Expr e : preExpr) e.compile(qc, sc);
-    for(final Spec b : specs) b.compile(qc, sc);
-    return optimize(qc, sc);
+  public GroupBy compile(final CompileContext cc) throws QueryException {
+    for(final Expr e : preExpr) e.compile(cc);
+    for(final Spec b : specs) b.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public GroupBy optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public GroupBy optimize(final CompileContext cc) throws QueryException {
     final int pl = preExpr.length;
     for(int p = 0; p < pl; p++) {
       final SeqType it = preExpr[p].seqType();
-      post[p].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), qc);
+      post[p].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), cc);
     }
     return this;
   }
@@ -237,28 +237,24 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public Clause inline(final QueryContext qc, final VarScope scp, final Var var,
-      final Expr ex) throws QueryException {
-    final boolean b = inlineAll(qc, scp, specs, var, ex), p = inlineAll(qc, scp, preExpr, var, ex);
-    return b || p ? optimize(qc, scp) : null;
+  public Clause inline(final Var var, final Expr ex,
+      final CompileContext cc) throws QueryException {
+    final boolean b = inlineAll(specs, var, ex, cc), p = inlineAll(preExpr, var, ex, cc);
+    return b || p ? optimize(cc) : null;
   }
 
   @Override
-  public GroupBy copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+  public GroupBy copy(final CompileContext cc, final IntObjMap<Var> vs) {
     // copy the pre-grouping expressions
-    final Expr[] pEx = Arr.copyAll(qc, scp, vs, preExpr);
+    final Expr[] pEx = Arr.copyAll(cc, vs, preExpr);
 
     // create fresh copies of the post-grouping variables
     final Var[] ps = new Var[post.length];
     final int pl = ps.length;
-    for(int p = 0; p < pl; p++) {
-      final Var old = post[p];
-      ps[p] = scp.addCopy(old, qc);
-      vs.put(old.id, ps[p]);
-    }
+    for(int p = 0; p < pl; p++) ps[p] = cc.copy(post[p], vs);
 
     // done
-    return new GroupBy(Arr.copyAll(qc, scp, vs, specs), pEx, ps, nonOcc, info);
+    return new GroupBy(Arr.copyAll(cc, vs, specs), pEx, ps, nonOcc, info);
   }
 
   @Override
@@ -361,10 +357,8 @@ public final class GroupBy extends Clause {
     }
 
     @Override
-    public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-      final Var v = scp.addCopy(var, qc);
-      vs.put(var.id, v);
-      final Spec spec = new Spec(info, v, expr.copy(qc, scp, vs), coll);
+    public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+      final Spec spec = new Spec(info, cc.copy(var, vs), expr.copy(cc, vs), coll);
       spec.occluded = occluded;
       return spec;
     }

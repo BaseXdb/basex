@@ -39,9 +39,9 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    win = win.compile(qc, scp);
-    return super.compile(qc, scp);
+  public FTExpr compile(final CompileContext cc) throws QueryException {
+    win = win.compile(cc);
+    return super.compile(cc);
   }
 
   @Override
@@ -93,17 +93,17 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final boolean e = inlineAll(qc, scp, exprs, var, ex);
-    final Expr w = win.inline(qc, scp, var, ex);
+    final boolean e = inlineAll(exprs, var, ex, cc);
+    final Expr w = win.inline(var, ex, cc);
     if(w != null) win = w;
-    return e || w != null ? optimize(qc, scp) : null;
+    return e || w != null ? optimize(cc) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTWindow(info, exprs[0].copy(qc, scp, vs), win.copy(qc, scp, vs), unit);
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTWindow(info, exprs[0].copy(cc, vs), win.copy(cc, vs), unit);
   }
 
   @Override

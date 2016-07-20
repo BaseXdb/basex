@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -42,7 +41,7 @@ public final class FnRemove extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
+  protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
     seqType = SeqType.get(st.type, st.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     return this;

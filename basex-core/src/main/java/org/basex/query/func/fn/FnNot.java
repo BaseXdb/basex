@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -20,17 +19,17 @@ public final class FnNot extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr e = exprs[0];
     // simplify: not(empty(A)) -> exists(A)
     if(e.isFunction(Function.EMPTY)) {
-      qc.compInfo(QueryText.OPTREWRITE_X, this);
+      cc.info(QueryText.OPTREWRITE_X, this);
       exprs = ((Arr) e).exprs;
       return Function.EXISTS.get(sc, info, exprs);
     }
     // simplify: not(exists(A)) -> empty(A)
     if(e.isFunction(Function.EXISTS)) {
-      qc.compInfo(QueryText.OPTREWRITE_X, this);
+      cc.info(QueryText.OPTREWRITE_X, this);
       exprs = ((Arr) e).exprs;
       return Function.EMPTY.get(sc, info, exprs);
     }
@@ -41,10 +40,10 @@ public final class FnNot extends StandardFunc {
     }
     // simplify: not(not(A)) -> boolean(A)
     if(e.isFunction(Function.NOT)) {
-      return compBln(((Arr) e).exprs[0], info, scp.sc);
+      return compBln(((Arr) e).exprs[0], info, cc.sc());
     }
     // simplify, e.g.: not(boolean(A)) -> not(A)
-    exprs[0] = e.optimizeEbv(qc, scp);
+    exprs[0] = e.optimizeEbv(cc);
     return this;
   }
 }

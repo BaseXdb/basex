@@ -7,7 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -163,24 +163,29 @@ public final class FuncItem extends FItem implements Scope {
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
 
-    final VarScope vsc = new VarScope(sc);
+    final VarScope scp = new VarScope(sc);
     final Var[] vars = new Var[pl];
     final Expr[] refs = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vars[p] = vsc.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
+      vars[p] = scp.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
       refs[p] = new VarRef(ii, vars[p]);
     }
 
     final Expr e = new DynFuncCall(ii, sc, this, refs);
-    final Expr optimized = opt ? e.optimize(qc, vsc) : e, checked;
+
+    final CompileContext cc = new CompileContext(qc);
+    cc.pushScope(scp);
+
+    final Expr optimized = opt ? e.optimize(cc) : e, checked;
     if(ft.type == null || tp.type != null && tp.type.instanceOf(ft.type)) {
       checked = optimized;
     } else {
       final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.type, true);
-      checked = opt ? tc.optimize(qc, vsc) : tc;
+      checked = opt ? tc.optimize(cc) : tc;
     }
     checked.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vars, ft, checked, vsc.stackSize());
+
+    return new FuncItem(sc, anns, name, vars, ft, checked, scp.stackSize());
   }
 
   @Override
@@ -195,7 +200,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public void compile(final QueryContext qc) {
+  public void comp(final CompileContext cc) {
     // nothing to do here
   }
 
@@ -210,24 +215,22 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
-    if(!StaticFunc.inline(qc, anns, expr) || expr.has(Flag.CTX)) return null;
-    qc.compInfo(OPTINLINE_X, this);
+    if(!StaticFunc.inline(cc, anns, expr) || expr.has(Flag.CTX)) return null;
+    cc.info(OPTINLINE_X, this);
 
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      final Var old = params[p], v = scp.addCopy(old, qc);
-      vs.put(old.id, v);
-      cls.add(new Let(v, exprs[p], false).optimize(qc, scp));
+      cls.add(new Let(cc.copy(params[p], vs), exprs[p], false).optimize(cc));
     }
 
     // copy the function body
-    final Expr rt = expr.copy(qc, scp, vs);
+    final Expr rt = expr.copy(cc, vs);
 
     rt.accept(new ASTVisitor() {
       @Override
@@ -241,7 +244,7 @@ public final class FuncItem extends FItem implements Scope {
         return true;
       }
     });
-    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(qc, scp);
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(cc);
   }
 
   @Override

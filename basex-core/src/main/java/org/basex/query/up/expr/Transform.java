@@ -48,9 +48,9 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    for(final Let copy : copies) copy.expr = copy.expr.compile(qc, scp);
-    return super.compile(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    for(final Let copy : copies) copy.expr = copy.expr.compile(cc);
+    return super.compile(cc);
   }
 
   @Override
@@ -107,16 +107,15 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-    final boolean cp = inlineAll(qc, scp, copies, var, ex);
-    return inlineAll(qc, scp, exprs, var, ex) || cp ? optimize(qc, scp) : null;
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    final boolean changed = inlineAll(copies, var, ex, cc);
+    return inlineAll(exprs, var, ex, cc) || changed ? optimize(cc) : null;
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Transform(info, copyAll(qc, scp, vs, copies), exprs[0].copy(qc, scp, vs),
-        exprs[1].copy(qc, scp, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new Transform(info, copyAll(cc, vs, copies), exprs[0].copy(cc, vs),
+        exprs[1].copy(cc, vs));
   }
 
   @Override

@@ -64,8 +64,8 @@ final class CmpSR extends Single {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    return expr.isValue() ? optPre(item(qc, info), qc) : this;
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return expr.isValue() ? optPre(item(cc.qc, info), cc) : this;
   }
 
   /**
@@ -170,8 +170,8 @@ final class CmpSR extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpSR(expr.copy(qc, scp, vs), min, mni, max, mxi, coll, info);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new CmpSR(expr.copy(cc, vs), min, mni, max, mxi, coll, info);
   }
 
   @Override

@@ -34,8 +34,8 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+  public FTExpr compile(final CompileContext cc) throws QueryException {
+    super.compile(cc);
     boolean not = true;
     for(final FTExpr expr : exprs) not &= expr instanceof FTNot;
     if(not) {
@@ -140,8 +140,8 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final FTAnd copy = new FTAnd(info, Arr.copyAll(qc, scp, vs, exprs));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    final FTAnd copy = new FTAnd(info, Arr.copyAll(cc, vs, exprs));
     if(negated != null) copy.negated = negated.clone();
     return copy;
   }

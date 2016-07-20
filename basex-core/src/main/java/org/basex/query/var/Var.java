@@ -117,16 +117,16 @@ public final class Var extends ExprInfo {
    * Tries to refine the compile-time type of this variable through the type of the bound
    * expression.
    * @param st sequence type of the bound expression
-   * @param qc query context
+   * @param cc compilation context (can be {@code null})
    * @throws QueryException query exception
    */
-  public void refineType(final SeqType st, final QueryContext qc) throws QueryException {
+  public void refineType(final SeqType st, final CompileContext cc) throws QueryException {
     if(st == null) return;
 
     if(type != null) {
       if(type.occ.intersect(st.occ) == null) throw INVPROMOTE_X_X_X.get(info, this, st, type);
       if(st.instanceOf(type)) {
-        qc.compInfo(QueryText.OPTTYPE_X, this);
+        if(cc != null) cc.info(QueryText.OPTTYPE_X, this);
         type = null;
       } else if(!st.promotable(type)) {
         return;
@@ -151,14 +151,13 @@ public final class Var extends ExprInfo {
   /**
    * Returns an equivalent to the given expression that checks this variable's type.
    * @param ex expression
-   * @param scp variable scope
-   * @param qc query context
+   * @param cc compilation context
    * @return checked expression
    * @throws QueryException query exception
    */
-  public Expr checked(final Expr ex, final QueryContext qc, final VarScope scp)
+  public Expr checked(final Expr ex, final CompileContext cc)
       throws QueryException {
-    return checksType() ? new TypeCheck(sc, info, ex, type, promote).optimize(qc, scp) : ex;
+    return checksType() ? new TypeCheck(sc, info, ex, type, promote).optimize(cc) : ex;
   }
 
   /**

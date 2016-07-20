@@ -45,29 +45,29 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    ts = ts.compile(qc, scp);
+  public Expr compile(final CompileContext cc) throws QueryException {
+    ts = ts.compile(cc);
     // static condition: return branch in question
     if(ts.isValue()) {
-      final Value val = ts.value(qc);
+      final Value val = ts.value(cc.qc);
       for(final TypeCase tc : cases) {
-        if(tc.matches(val)) return optPre(tc.compile(qc, scp, (Value) ts).expr, qc);
+        if(tc.matches(val)) return optPre(tc.compile(cc, (Value) ts).expr, cc);
       }
     }
     // compile branches
-    for(final TypeCase tc : cases) tc.compile(qc, scp);
+    for(final TypeCase tc : cases) tc.compile(cc);
 
-    return optimize(qc, scp);
+    return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) {
+  public Expr optimize(final CompileContext cc) {
     // return first branch if all branches are equal (e.g., empty) and use no variables
     final TypeCase tc = cases[0];
     boolean eq = tc.var == null;
     final int cl = cases.length;
     for(int c = 1; eq && c < cl; c++) eq = tc.expr.sameAs(cases[c].expr);
-    if(eq) return optPre(tc.expr, qc);
+    if(eq) return optPre(tc.expr, cc);
 
     // combine return types
     seqType = cases[0].seqType();
@@ -110,21 +110,19 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-      throws QueryException {
-
-    boolean change = inlineAll(qc, scp, cases, var, ex);
-    final Expr t = ts.inline(qc, scp, var, ex);
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    boolean change = inlineAll(cases, var, ex, cc);
+    final Expr t = ts.inline(var, ex, cc);
     if(t != null) {
       change = true;
       ts = t;
     }
-    return change ? optimize(qc, scp) : null;
+    return change ? optimize(cc) : null;
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new TypeSwitch(info, ts.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, cases));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new TypeSwitch(info, ts.copy(cc, vs), Arr.copyAll(cc, vs, cases));
   }
 
   @Override
@@ -139,8 +137,8 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public void markTailCalls(final QueryContext qc) {
-    for(final TypeCase t : cases) t.markTailCalls(qc);
+  public void markTailCalls(final CompileContext cc) {
+    for(final TypeCase t : cases) t.markTailCalls(cc);
   }
 
   @Override

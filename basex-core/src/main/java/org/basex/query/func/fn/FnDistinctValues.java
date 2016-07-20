@@ -16,7 +16,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -58,28 +57,28 @@ public final class FnDistinctValues extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final SeqType st = exprs[0].seqType();
     if(st.type instanceof NodeType) {
       seqType = SeqType.get(AtomType.ATM, st.occ);
     } else if(!st.mayBeArray()) {
       seqType = st;
     }
-    return exprs.length == 1 ? cmpDist(qc) : this;
+    return exprs.length == 1 ? cmpDist(cc) : this;
   }
 
   /**
    * Pre-evaluates distinct-values() function, utilizing database statistics.
-   * @param qc query context
+   * @param cc compilation context
    * @return original or optimized expression
    * @throws QueryException query exception
    */
-  private Expr cmpDist(final QueryContext qc) throws QueryException {
+  private Expr cmpDist(final CompileContext cc) throws QueryException {
     // can only be performed on axis paths
     if(!(exprs[0] instanceof AxisPath)) return this;
 
     // try to get statistics for resulting nodes
-    final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).pathNodes(qc);
+    final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).pathNodes(cc);
     if(nodes == null) return this;
     // loop through all nodes
     final HashItemSet is = new HashItemSet();

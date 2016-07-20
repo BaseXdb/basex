@@ -30,11 +30,12 @@ public final class FTOpts extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public FTExpr compile(final CompileContext cc) throws QueryException {
+    final QueryContext qc = cc.qc;
     final FTOpt tmp = qc.ftOpt();
     qc.ftOpt(opt.copy(tmp));
     if(opt.sw != null && qc.value != null && qc.value.data() != null) opt.sw.comp(qc.value.data());
-    exprs[0] = exprs[0].compile(qc, scp);
+    exprs[0] = exprs[0].compile(cc);
     qc.ftOpt(tmp);
     return exprs[0];
   }
@@ -62,7 +63,7 @@ public final class FTOpts extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTOpts(info, exprs[0].copy(qc, scp, vs), new FTOpt().copy(opt));
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTOpts(info, exprs[0].copy(cc, vs), new FTOpt().copy(opt));
   }
 }

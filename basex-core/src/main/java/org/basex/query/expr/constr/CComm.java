@@ -45,8 +45,8 @@ public final class CComm extends CNode {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CComm(sc, info, exprs[0].copy(qc, scp, vs));
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new CComm(sc, info, exprs[0].copy(cc, vs));
   }
 
   @Override

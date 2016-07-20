@@ -22,8 +22,8 @@ final class QueryCompiler {
   /** Number of scopes from which on linear search is replaced by a hash map. */
   private static final int MAP_THRESHOLD = 16;
 
-  /** Query context. */
-  private final QueryContext qc;
+  /** Compilation context. */
+  private final CompileContext cc;
 
   /** Result list. */
   private final ArrayList<Scope[]> result = new ArrayList<>();
@@ -43,11 +43,11 @@ final class QueryCompiler {
 
   /**
    * Constructor.
-   * @param qc query context
+   * @param cc compilation context
    * @param root root expression
    */
-  private QueryCompiler(final QueryContext qc, final Scope root) {
-    this.qc = qc;
+  private QueryCompiler(final CompileContext cc, final Scope root) {
+    this.cc = cc;
     add(root);
   }
 
@@ -96,12 +96,12 @@ final class QueryCompiler {
 
   /**
    * Compiles all necessary parts of this query.
-   * @param qc query context
+   * @param cc compilation context
    * @param root root expression
    * @throws QueryException compilation errors
    */
-  public static void compile(final QueryContext qc, final MainModule root) throws QueryException {
-    if(!root.compiled()) new QueryCompiler(qc, root).compile();
+  public static void compile(final CompileContext cc, final MainModule root) throws QueryException {
+    if(!root.compiled()) new QueryCompiler(cc, root).compile();
   }
 
   /**
@@ -110,10 +110,10 @@ final class QueryCompiler {
    */
   private void compile() throws QueryException {
     // compile the used scopes only
-    for(final Scope[] comp : components(0)) circCheck(comp).compile(qc);
+    for(final Scope[] comp : components(0)) circCheck(comp).comp(cc);
 
     // check for circular variable declarations without compiling the unused scopes
-    for(final StaticVar v : qc.vars) {
+    for(final StaticVar v : cc.qc.vars) {
       if(id(v) == -1) for(final Scope[] comp : components(add(v))) circCheck(comp);
     }
   }

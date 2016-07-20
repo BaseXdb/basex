@@ -46,10 +46,10 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    min = min.compile(qc, scp);
-    max = max.compile(qc, scp);
-    return super.compile(qc, scp);
+  public FTExpr compile(final CompileContext cc) throws QueryException {
+    min = min.compile(cc);
+    max = max.compile(cc);
+    return super.compile(cc);
   }
 
   @Override
@@ -97,20 +97,18 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final Expr mn = min.inline(qc, scp, var, ex), mx = max.inline(qc, scp, var, ex);
+    final Expr mn = min.inline(var, ex, cc), mx = max.inline(var, ex, cc);
     if(mn != null) min = mn;
     if(mx != null) max = mx;
-
-    return inlineAll(qc, scp, exprs, var, ex) || mn != null || mx != null
-        ? optimize(qc, scp) : null;
+    return inlineAll(exprs, var, ex, cc) || mn != null || mx != null ? optimize(cc) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTDistance(info, exprs[0].copy(qc, scp, vs),
-        min.copy(qc, scp, vs), max.copy(qc, scp, vs), unit);
+  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vs) {
+    return new FTDistance(info, exprs[0].copy(cc, vs),
+        min.copy(cc, vs), max.copy(cc, vs), unit);
   }
 
   @Override

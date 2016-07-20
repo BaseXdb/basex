@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -62,11 +61,11 @@ public abstract class Cmp extends Arr {
    * This method is called if the first operand of the comparison expression is a
    * {@code count()} function.
    * @param comp comparator
-   * @param scp variable scope
+   * @param cc compilation context
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Expr compCount(final OpV comp, final VarScope scp) throws QueryException {
+  final Expr compCount(final OpV comp, final CompileContext cc) throws QueryException {
     // evaluate argument
     final Expr a = exprs[1];
     if(!(a instanceof Item)) return this;
@@ -78,8 +77,8 @@ public abstract class Cmp extends Arr {
     switch(check(comp, it)) {
       case  0: return Bln.TRUE;
       case  1: return Bln.FALSE;
-      case  2: return Function.EXISTS.get(scp.sc, info, args);
-      case  3: return Function.EMPTY.get(scp.sc, info, args);
+      case  2: return Function.EXISTS.get(cc.sc(), info, args);
+      case  3: return Function.EMPTY.get(cc.sc(), info, args);
       default: return this;
     }
   }
@@ -88,11 +87,11 @@ public abstract class Cmp extends Arr {
    * This method is called if the first operand of the comparison expression is a
    * {@code string-length()} function.
    * @param comp comparator
-   * @param scp variable scope
+   * @param cc compilation context
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Expr compStringLength(final OpV comp, final VarScope scp) throws QueryException {
+  final Expr compStringLength(final OpV comp, final CompileContext cc) throws QueryException {
     // evaluate argument
     final Expr a = exprs[1];
     if(!(a instanceof Item)) return this;
@@ -101,11 +100,12 @@ public abstract class Cmp extends Arr {
     final Expr[] args = ((Arr) exprs[0]).exprs;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
+    final StaticContext sc = cc.sc();
     switch(check(comp, it)) {
       case  0: return Bln.TRUE;
       case  1: return Bln.FALSE;
-      case  2: return Function.BOOLEAN.get(scp.sc, info, Function.STRING.get(scp.sc, info, args));
-      case  3: return Function.NOT.get(scp.sc, info, Function.STRING.get(scp.sc, info, args));
+      case  2: return Function.BOOLEAN.get(sc, info, Function.STRING.get(sc, info, args));
+      case  3: return Function.NOT.get(sc, info, Function.STRING.get(sc, info, args));
       default: return this;
     }
   }
