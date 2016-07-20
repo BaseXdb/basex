@@ -129,7 +129,7 @@ final class QueryCompiler {
       for(final Scope scp : comp) {
         if(scp instanceof StaticVar) {
           final StaticVar var = (StaticVar) scp;
-          //throw CIRCVAR_X.get(var.info, var.id());
+          throw CIRCVAR_X.get(var.info, var.id());
         }
       }
     }
