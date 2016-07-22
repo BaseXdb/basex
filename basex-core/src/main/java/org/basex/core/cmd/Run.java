@@ -46,18 +46,12 @@ public final class Run extends Execute {
           // interpret as commands if input ends with command script suffix
           if(file.hasSuffix(IO.BXSSUFFIX)) return init(input, ctx);
           // otherwise, interpret input as xquery
-          list.add(new XQuery(input));
+          commands.add(new XQuery(input).baseURI(file.path()));
         } catch(final IOException ex) {
           error = Util.message(ex);
         }
       }
     }
-    ctx.options.set(MainOptions.QUERYPATH, file.path());
     return error == null;
-  }
-
-  @Override
-  protected void finish(final Context ctx) {
-    ctx.options.set(MainOptions.QUERYPATH, "");
   }
 }

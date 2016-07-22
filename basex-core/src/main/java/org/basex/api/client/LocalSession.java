@@ -121,7 +121,7 @@ public class LocalSession extends Session {
   @Override
   protected void execute(final String command, final OutputStream output) throws BaseXException {
     try {
-      execute(new CommandParser(command, ctx).parseSingle(), output);
+      execute(CommandParser.get(command, ctx).parseSingle(), output);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }

@@ -43,7 +43,7 @@ final class RESTCommand extends RESTCmd {
   static RESTCommand get(final RESTSession session, final String input) throws BaseXException {
     try {
       open(session);
-      session.add(new CommandParser(input, session.context).parseSingle());
+      session.add(CommandParser.get(input, session.context).parseSingle());
       return new RESTCommand(session);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);

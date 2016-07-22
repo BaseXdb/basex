@@ -178,14 +178,13 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @throws QueryException query exception
    */
   private QueryProcessor parse() throws QueryException {
-    final QueryProcessor proc = new QueryProcessor(query, job().context);
-    for(final Entry<String, Value> it : bindings.entrySet()) {
-      final String key = it.getKey();
-      final Value value = it.getValue();
+    final QueryProcessor proc = new QueryProcessor(query, uri, job().context);
+    for(final Entry<String, Value> binding : bindings.entrySet()) {
+      final String key = binding.getKey();
+      final Value value = binding.getValue();
       if(key.isEmpty()) proc.context(value);
       else proc.bind(key, value);
     }
-    proc.parse(uri);
     updating = proc.updating;
     return proc;
   }

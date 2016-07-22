@@ -26,7 +26,7 @@ public final class XQuery extends AQuery {
    * Binds a variable.
    * @param name name of variable (if {@code null}, value will be bound as context value)
    * @param value value to be bound
-   * @return reference
+   * @return self reference
    */
   public XQuery bind(final String name, final String value) {
     return bind(name, value, null);
@@ -37,7 +37,7 @@ public final class XQuery extends AQuery {
    * @param name name of variable (if {@code null}, value will be bound as context value)
    * @param value value to be bound
    * @param type type
-   * @return reference
+   * @return self reference
    */
   public XQuery bind(final String name, final String value, final String type) {
     vars.put(name, new String[] { value, type });

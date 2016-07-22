@@ -68,10 +68,11 @@ public abstract class CLI extends Main {
   /**
    * Parses and executes the input string.
    * @param in input commands
+   * @param uri base uri (can be {@code null})
    * @throws IOException database exception
    */
-  protected final void execute(final String in) throws IOException {
-    execute(new CommandParser(in, context).pwReader(PWREADER));
+  protected final void execute(final String in, final String uri) throws IOException {
+    execute(CommandParser.get(in, context).pwReader(PWREADER).baseURI(uri));
   }
 
   /**

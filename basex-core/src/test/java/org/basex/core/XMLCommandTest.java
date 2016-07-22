@@ -157,7 +157,7 @@ public final class XMLCommandTest extends SandboxTest {
    */
   private static void ok(final String xml) {
     try {
-      new CommandParser(xml, context).parse();
+      CommandParser.get(xml, context).parse();
     } catch(final QueryException ex) {
       fail(Util.message(ex));
     }
@@ -169,7 +169,7 @@ public final class XMLCommandTest extends SandboxTest {
    */
   private static void no(final String xml) {
     try {
-      new CommandParser(xml, context).parse();
+      CommandParser.get(xml, context).parse();
       fail('"' + xml + "\" was supposed to fail.");
     } catch(final QueryException ex) {
       /* expected */

@@ -43,6 +43,8 @@ public abstract class Command extends Job {
   protected PrintOutput out;
   /** Optional input source. */
   protected InputSource in;
+  /** Base URI. */
+  protected String uri;
 
   /** Exception, resulting from command execution. */
   protected Exception exception;
@@ -284,6 +286,15 @@ public abstract class Command extends Job {
     return cb.toString();
   }
 
+  /**
+   * Sets a base URI.
+   * @param base base URI
+   * @return self reference
+   */
+  public Command baseURI(final String base) {
+    uri = base;
+    return this;
+  }
 
   @Override
   public final String toString() {

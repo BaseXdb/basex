@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public class Execute extends Command {
   /** Commands to execute. */
-  final ArrayList<Command> list = new ArrayList<>();
+  final ArrayList<Command> commands = new ArrayList<>();
   /** Error message. */
   String error;
 
@@ -39,41 +39,36 @@ public class Execute extends Command {
 
   @Override
   public final void databases(final LockResult lr) {
-    lr.writeAll = true;
+    if(updating) lr.writeAll = true;
+    else lr.readAll = true;
   }
 
   @Override
   protected boolean run() {
-    try {
-      if(!init(context)) return error(error);
+    if(!init(context)) return error(error);
 
-      final StringBuilder sb = new StringBuilder();
-      for(final Command c : list) {
-        if(c.openDB && context.data() == null) return error(NO_DB_OPENED);
-        try {
-          final boolean ok = pushJob(c).run(context, out);
-          sb.append(c.info());
-          if(!ok) {
-            exception = c.exception();
-            return error(sb.toString());
-          }
-        } finally {
-          popJob();
+    final StringBuilder sb = new StringBuilder();
+    for(final Command cmd : commands) {
+      if(cmd.openDB && context.data() == null) return error(NO_DB_OPENED);
+      try {
+        final boolean ok = pushJob(cmd).run(context, out);
+        sb.append(cmd.info());
+        if(!ok) {
+          exception = cmd.exception();
+          return error(sb.toString());
         }
+      } finally {
+        popJob();
       }
-      return info(sb.toString().replaceAll("\r?\n?$", ""));
-    } finally {
-      finish(context);
     }
+    return info(sb.toString().replaceAll("\r?\n?$", ""));
   }
 
   @Override
   public final boolean updating(final Context ctx) {
-    if(!init(ctx)) return true;
-    for(final Command c : list) {
-      if(!c.updating(ctx)) return true;
-    }
-    return false;
+    if(!init(ctx)) return false;
+    for(final Command cmd : commands) updating |= cmd.updating(ctx);
+    return updating;
   }
 
   /**
@@ -92,23 +87,15 @@ public class Execute extends Command {
    * @return success flag
    */
   final boolean init(final String input, final Context ctx) {
-    if(list.isEmpty() && error == null) {
+    if(commands.isEmpty() && error == null) {
       try {
-        Collections.addAll(list, new CommandParser(input, ctx).parse());
+        Collections.addAll(commands, CommandParser.get(input, ctx).baseURI(uri).parse());
       } catch(final QueryException ex) {
         error = Util.message(ex);
         return false;
       }
     }
     return error == null;
-  }
-
-  /**
-   * Finalizes command execution.
-   * @param ctx database context
-   */
-  @SuppressWarnings("unused")
-  void finish(final Context ctx) {
   }
 
   @Override

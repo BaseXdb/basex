@@ -82,9 +82,7 @@ public class BaseX extends CLI {
             val = io.string();
             base = io.path();
           }
-          execute(new Set(MainOptions.QUERYPATH, base), false);
-          execute(val);
-          execute(new Set(MainOptions.QUERYPATH, ""), false);
+          execute(val, base);
           console = false;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
@@ -117,9 +115,7 @@ public class BaseX extends CLI {
             val = io.string();
             base = io.path();
           }
-          execute(new Set(MainOptions.QUERYPATH, base), false);
-          execute(new XQuery(val), verbose);
-          execute(new Set(MainOptions.QUERYPATH, ""), false);
+          execute(new XQuery(val).baseURI(base), verbose);
           console = false;
         } else if(c == 'r') {
           // parse number of runs
@@ -188,7 +184,7 @@ public class BaseX extends CLI {
         if(in.isEmpty()) continue;
 
         try {
-          if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
+          if(!execute(CommandParser.get(in, context).pwReader(cr.pwReader()))) {
             // show goodbye message if method returns false
             Util.outln(BYE[new Random().nextInt(4)]);
             break;

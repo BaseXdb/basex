@@ -73,7 +73,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new DropDB(NAME), true, NAME_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
     ckDBs(new DropUser(NAME), true, ADMIN_LIST);
-    ckDBs(new Execute("RUN " + FILE), true, null);
+    ckDBs(new Execute("RUN " + FILE), false, null);
     ckDBs(new Export(FILE), false, CTX_LIST);
     ckDBs(new Find("token"), false, CTX_LIST);
     ckDBs(new Flush(), true, CTX_LIST);
@@ -104,7 +104,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new RepoDelete("http://www.pkg3.com", null), true, REPO_LIST);
     ckDBs(new Restore(NAME), true, BACKUP_NAME);
     ckDBs(new Retrieve(FILE), false, CTX_LIST);
-    ckDBs(new Run(FILE), true, null);
+    ckDBs(new Run(FILE), false, null);
     ckDBs(new Set(NAME, NAME), false, NONE);
     ckDBs(new ShowBackups(), false, BACKUP_LIST);
     ckDBs(new ShowSessions(), false, NONE);

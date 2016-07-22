@@ -13,17 +13,39 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class CommandParser {
+public abstract class CommandParser {
+  /** Input string. */
+  final String input;
   /** Context. */
-  private final CmdParser parser;
+  final Context ctx;
+
+  /** Password reader. */
+  PasswordReader pwReader;
+  /** Base URI. */
+  String uri = "";
+  /** Parse single command. */
+  boolean single;
+  /** XQuery suggestions. */
+  boolean suggest;
+
+  /**
+   * Constructor.
+   * @param input input string
+   * @param ctx database context
+   */
+  CommandParser(final String input, final Context ctx) {
+    this.ctx = ctx;
+    this.input = input;
+  }
 
   /**
    * Constructor.
    * @param input input
    * @param ctx context
+   * @return command parser
    */
-  public CommandParser(final String input, final Context ctx) {
-    parser = input.startsWith("<") ? new XMLParser(input, ctx) : new StringParser(input, ctx);
+  public static CommandParser get(final String input, final Context ctx) {
+    return input.startsWith("<") ? new XMLParser(input, ctx) : new StringParser(input, ctx);
   }
 
   /**
@@ -31,18 +53,38 @@ public final class CommandParser {
    * @param pr password reader
    * @return self reference
    */
-  public CommandParser pwReader(final PasswordReader pr) {
-    parser.pwReader(pr);
+  public final CommandParser pwReader(final PasswordReader pr) {
+    pwReader = pr;
     return this;
   }
 
   /**
-   * Parses the input as single command and returns the resulting command.
-   * @return command
+   * Attaches a base URI.
+   * @param base base URI
+   * @return self reference
+   */
+  public final CommandParser baseURI(final String base) {
+    uri = base;
+    return this;
+  }
+
+  /**
+   * XQuery suggestions.
+   * @return self reference
+   */
+  public final CommandParser suggest() {
+    suggest = true;
+    return this;
+  }
+
+  /**
+   * Restricts parsing to a single command.
+   * @return self reference
    * @throws QueryException query exception
    */
-  public Command parseSingle() throws QueryException {
-    return parse(true, false)[0];
+  public final Command parseSingle() throws QueryException {
+    single = true;
+    return parse()[0];
   }
 
   /**
@@ -50,30 +92,17 @@ public final class CommandParser {
    * @return commands
    * @throws QueryException query exception
    */
-  public Command[] parse() throws QueryException {
-    return parse(false, false);
-  }
-
-  /**
-   * Parses the input and creates command completions on the way.
-   * @return commands
-   * @throws QueryException query exception
-   */
-  public Command[] suggest() throws QueryException {
-    return parse(false, true);
-  }
-
-  /**
-   * Parses the input and returns a command list.
-   * @param single input must only contain a single command
-   * @param suggest suggest flag
-   * @return commands
-   * @throws QueryException query exception
-   */
-  private Command[] parse(final boolean single, final boolean suggest) throws QueryException {
+  public final Command[] parse() throws QueryException {
     final ArrayList<Command> cmds = new ArrayList<>();
-    parser.parse(cmds, single, suggest);
+    parse(cmds);
     if(!single || cmds.size() == 1) return cmds.toArray(new Command[cmds.size()]);
     throw new QueryException(null, new QNm(), Text.SINGLE_CMD);
   }
+
+  /**
+   * Parses the input and fills the command list.
+   * @param cmds container for created commands
+   * @throws QueryException query exception
+   */
+  protected abstract void parse(final ArrayList<Command> cmds) throws QueryException;
 }

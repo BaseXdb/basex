@@ -23,7 +23,7 @@ import org.basex.util.similarity.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class StringParser extends CmdParser {
+final class StringParser extends CommandParser {
   /** Current parser. */
   private InputParser parser;
 
@@ -43,10 +43,10 @@ final class StringParser extends CmdParser {
       final String line = sc.next().trim();
       if(line.isEmpty() || line.startsWith("#")) continue;
       parser = new InputParser(line);
-      parser.file = ctx.options.get(MainOptions.QUERYPATH);
+      parser.file = uri;
       while(parser.more()) {
         final Cmd cmd = consume(Cmd.class, null);
-        if(cmd != null) cmds.add(parse(cmd));
+        if(cmd != null) cmds.add(parse(cmd).baseURI(uri));
         if(parser.more() && !parser.consume(';')) throw help(null, cmd);
       }
     }

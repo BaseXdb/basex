@@ -12,7 +12,6 @@ import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.dot.*;
@@ -175,7 +174,7 @@ public abstract class AQuery extends Command {
    */
   private QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
-      qp = pushJob(new QueryProcessor(query, ctx));
+      qp = pushJob(new QueryProcessor(query, uri, ctx));
       if(info == null) info = qp.qc.info;
     }
     return qp;
@@ -233,11 +232,7 @@ public abstract class AQuery extends Command {
     // show dot plan
     try {
       if(options.get(MainOptions.DOTPLAN)) {
-        final String path = options.get(MainOptions.QUERYPATH);
-        final String dot = path.isEmpty() ? "plan.dot" :
-            new IOFile(path).name().replaceAll("\\..*?$", ".dot");
-
-        try(final BufferOutput bo = new BufferOutput(dot)) {
+        try(final BufferOutput bo = new BufferOutput("plan.dot")) {
           try(final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
             d.serialize(qp.plan());
           }

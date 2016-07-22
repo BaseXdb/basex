@@ -20,25 +20,19 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class RESTRun extends RESTQuery {
-  /** Path. */
-  private final String path;
-
   /**
    * Constructor.
    * @param session REST session
    * @param vars external variables
    * @param val context value
-   * @param path path to query file
    */
-  private RESTRun(final RESTSession session, final Map<String, String[]> vars, final String val,
-      final String path) {
+  private RESTRun(final RESTSession session, final Map<String, String[]> vars, final String val) {
     super(session, vars, val);
-    this.path = path;
   }
 
   @Override
   protected void run0() throws IOException {
-    query(path);
+    query();
   }
 
   /**
@@ -69,7 +63,9 @@ final class RESTRun extends RESTQuery {
     // interpret as commands if input ends with command script suffix
     if(file.hasSuffix(IO.BXSSUFFIX)) {
       try {
-        for(final Command cmd : new CommandParser(input, context).parse()) session.add(cmd);
+        for(final Command cmd : CommandParser.get(input, context).parse()) {
+          session.add(cmd.baseURI(file.path()));
+        }
       } catch(final QueryException ex) {
         throw new IOException(ex);
       }
@@ -79,6 +75,6 @@ final class RESTRun extends RESTQuery {
     }
 
     // perform query
-    return new RESTRun(session, vars, val, file.path());
+    return new RESTRun(session, vars, val);
   }
 }

@@ -177,7 +177,7 @@ public final class GUIInput extends BaseXTextField {
     try {
       pre = excl ? "!" : "";
       final String suf = getText().substring(pre.length());
-      new CommandParser(suf, gui.context).suggest();
+      CommandParser.get(suf, gui.context).suggest().parse();
     } catch(final QueryException ex) {
       sl = ex.suggest();
       final int marked = ex.markedColumn() + (excl ? 2 : 1);

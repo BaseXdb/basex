@@ -142,12 +142,11 @@ public abstract class W3CTS extends Main {
       System.exit(1);
     }
 
+    if(!new IOFile(path).isAbsolute()) path = new IOFile(".", path + '/').path();
     queries = path + "Queries/XQuery/";
     expected = path + "ExpectedTestResults/";
     results = path + "ReportingResults/Results/";
-    /* Reports. */
     final String report = path + "ReportingResults/";
-    /* Test sources. */
     final String sources = path + "TestSources/";
 
     final Performance perf = new Performance();
@@ -274,8 +273,7 @@ public abstract class W3CTS extends Main {
       final Item state = states.itemAt(s);
       final String inname = text("*:query/@name", state);
       final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
-      context.options.set(MainOptions.QUERYPATH, query.path());
-      final String in = read(query);
+      final String in = query.string();
       String er = null;
       Value value = null;
 
@@ -288,7 +286,7 @@ public abstract class W3CTS extends Main {
       }
 
       context.options.set(MainOptions.QUERYINFO, compile);
-      try(final QueryProcessor qp = new QueryProcessor(in, context)) {
+      try(final QueryProcessor qp = new QueryProcessor(in, query.path(), context)) {
         if(curr != null) qp.context(curr);
         context.options.set(MainOptions.QUERYINFO, false);
 
@@ -321,6 +319,7 @@ public abstract class W3CTS extends Main {
           }
 
         } catch(final Exception ex) {
+          Util.debug(ex);
           if(!(ex instanceof QueryException || ex instanceof IOException)) {
             Util.errln("\n*** " + outname + " ***");
             Util.errln(in + '\n');
@@ -345,7 +344,7 @@ public abstract class W3CTS extends Main {
         for(final Item item : expOut) {
           final String resFile = string(item.string(null));
           final IOFile exp = new IOFile(expected + pth + resFile);
-          result.add(read(exp).replaceAll("\r\n|\r|\n", Prop.NL));
+          result.add(exp.string().replaceAll("\r\n|\r|\n", Prop.NL));
         }
 
         final Value cmpFiles = nodes("*:output-file/@compare", state);
@@ -509,6 +508,7 @@ public abstract class W3CTS extends Main {
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p))) il.add(p);
       return DBNodeSeq.get(il, d, false, false);
     } catch(final IOException ex) {
+      Util.debug(ex);
       return Str.get(Long.toString(System.nanoTime()));
     }
   }
@@ -539,7 +539,7 @@ public abstract class W3CTS extends Main {
     final long ns = nodes.size();
     for(int n = 0; n < ns; ++n) {
       final byte[] nm = nodes.itemAt(n).string(null);
-      String src = srcs.get(string(nm));
+      String src = new IOFile(path).resolve(srcs.get(string(nm))).path();
       if(!tb.isEmpty()) tb.add(", ");
       tb.add(nm);
 
@@ -598,15 +598,16 @@ public abstract class W3CTS extends Main {
    * @param pth file path
    * @param qp query processor
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private void eval(final Value nodes, final Value vars, final String pth, final QueryProcessor qp)
-      throws QueryException {
+      throws QueryException, IOException {
 
     final long ns = nodes.size();
     for(int n = 0; n < ns; ++n) {
       final String file = pth + string(nodes.itemAt(n).string(null)) + IO.XQSUFFIX;
-      final String in = read(new IOFile(queries + file));
-      try(final QueryProcessor xq = new QueryProcessor(in, context)) {
+      final IO io = new IOFile(queries, file);
+      try(final QueryProcessor xq = new QueryProcessor(io.string(), io.path(), context)) {
         qp.bind(string(vars.itemAt(n).string(null)), xq.value());
       }
     }
@@ -635,11 +636,12 @@ public abstract class W3CTS extends Main {
    * @param nm test name
    * @param error XQTS error
    * @return error message
+   * @throws IOException I/O exception
    */
-  private String error(final String nm, final String error) {
+  private String error(final String nm, final String error) throws IOException {
     final String error2 = expected + nm + ".log";
     final IO file = new IOFile(error2);
-    return file.exists() ? error + '/' + read(file) : error;
+    return file.exists() ? error + '/' + file.string() : error;
   }
 
   /**
@@ -682,20 +684,6 @@ public abstract class W3CTS extends Main {
   private static void print(final PrintOutput po, final String f) throws IOException {
     try(final BufferedReader br = new BufferedReader(new FileReader(f))) {
       for(String line; (line = br.readLine()) != null;) po.println(line);
-    }
-  }
-
-  /**
-   * Returns the contents of the specified file.
-   * @param fl file to be read
-   * @return content
-   */
-  private static String read(final IO fl) {
-    try {
-      return fl.string();
-    } catch(final IOException ex) {
-      Util.errln(ex);
-      return "";
     }
   }
 
@@ -748,6 +736,8 @@ public abstract class W3CTS extends Main {
           currTime = true;
         } else if(c == 'c') {
           compile = true;
+        } else if(c == 'd') {
+          Prop.debug = true;
         } else if(c == 'm') {
           minimum = true;
         } else if(c == 'g') {
@@ -787,6 +777,7 @@ public abstract class W3CTS extends Main {
         " [pat] perform tests starting with a pattern" + NL +
         " -c     print compilation steps" + NL +
         " -C     run tests depending on current time" + NL +
+        " -d     debugging mode" + NL +
         " -g     <test-group> test group to test" + NL +
         " -h     show this help" + NL +
         " -m     minimum conformance" + NL +

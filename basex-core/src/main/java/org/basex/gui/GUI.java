@@ -357,7 +357,7 @@ public final class GUI extends JFrame {
     if(cmd || exc) {
       try {
         // parse and execute all commands
-        final CommandParser cp = new CommandParser(in.substring(exc ? 1 : 0), context);
+        final CommandParser cp = CommandParser.get(in.substring(exc ? 1 : 0), context);
         if(pwReader == null) pwReader = new PasswordReader() {
           @Override
           public String password() {

@@ -26,7 +26,7 @@ public final class ModuleTest extends SandboxTest {
   }
 
   /**
-   * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)} method.
+   * Tests the {@link QueryContext#parseLibrary} method.
    */
   @Test
   public void module() {
@@ -39,7 +39,7 @@ public final class ModuleTest extends SandboxTest {
   }
 
   /**
-   * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)} method.
+   * Tests the {@link QueryContext#parseLibrary} method.
    * @throws Exception exception
    */
   @Test

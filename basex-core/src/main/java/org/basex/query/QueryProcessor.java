@@ -43,9 +43,20 @@ public final class QueryProcessor extends Job implements Closeable {
    * @param ctx database context
    */
   public QueryProcessor(final String query, final Context ctx) {
+    this(query, null, ctx);
+  }
+
+  /**
+   * Default constructor.
+   * @param query query string
+   * @param uri base uri (can be {@code null})
+   * @param ctx database context
+   */
+  public QueryProcessor(final String query, final String uri, final Context ctx) {
     this.query = query;
     qc = pushJob(new QueryContext(ctx));
     sc = new StaticContext(qc);
+    sc.baseURI(uri);
   }
 
   /**
@@ -53,18 +64,9 @@ public final class QueryProcessor extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public void parse() throws QueryException {
-    parse(null);
-  }
-
-  /**
-   * Parses the query.
-   * @param uri base URI
-   * @throws QueryException query exception
-   */
-  public void parse(final String uri) throws QueryException {
     if(parsed) return;
     try {
-      qc.parseMain(query, uri, sc);
+      qc.parseMain(query, null, sc);
     } finally {
       parsed = true;
       updating = qc.updating;

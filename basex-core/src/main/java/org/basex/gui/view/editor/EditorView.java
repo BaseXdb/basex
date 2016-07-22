@@ -15,7 +15,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import org.basex.build.json.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.gui.*;
@@ -520,17 +519,16 @@ public final class EditorView extends View {
         if(edit.opened()) edit.save();
       }
     }
-
-    IOFile file = editor.file();
     editor.last = in;
 
+    IOFile file = editor.file();
     final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
     if(editor.script && run) {
       // run query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(string(in)));
     } else if(xquery || run) {
       // check if input is/might be an xquery main module
-      String input = in.length == 0 ? "()" : string(in);
+      String input = string(in);
       boolean lib = QueryProcessor.isLibrary(input);
       final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
       if(exec && lib) {
@@ -542,17 +540,16 @@ public final class EditorView extends View {
         }
       }
 
-      gui.context.options.set(MainOptions.QUERYPATH, file.path());
       if(!lib && exec) {
         // run query if forced, or if realtime execution is activated
-        gui.execute(true, new XQuery(input));
+        gui.execute(true, new XQuery(input).baseURI(file.path()));
         execFile = file;
       } else if(action == Action.TEST) {
         // run query if forced, or if realtime execution is activated
         gui.execute(true, new Test(file.path()));
         execFile = file;
       } else {
-        parse(input, lib);
+        parse(input, file, lib);
       }
     } else if(file.hasSuffix(IO.JSONSUFFIX)) {
       try {
@@ -569,7 +566,7 @@ public final class EditorView extends View {
         // check XML syntax
         if(startsWith(in, '<') || !editor.script) new XmlParser().parse(ai);
         // check command script
-        if(editor.script) new CommandParser(string(in), gui.context).parse();
+        if(editor.script) CommandParser.get(string(in), gui.context).parse();
         info(null);
       } catch(final Exception ex) {
         info(ex);
@@ -714,9 +711,10 @@ public final class EditorView extends View {
   /**
    * Parses the current query after a little delay.
    * @param input query input
+   * @param file file
    * @param lib library flag
    */
-  private void parse(final String input, final boolean lib) {
+  private void parse(final String input, final IO file, final boolean lib) {
     final int id = ++parseID;
     new Timer(true).schedule(new TimerTask() {
       @Override
@@ -728,7 +726,7 @@ public final class EditorView extends View {
         // parse query
         try(final QueryContext qc = new QueryContext(gui.context)) {
           parseQC = qc;
-          qc.parse(input, lib, null, null);
+          qc.parse(input, lib, file.path(), null);
           if(id == parseID) info(null);
         } catch(final QueryException ex) {
           if(id == parseID) info(ex);

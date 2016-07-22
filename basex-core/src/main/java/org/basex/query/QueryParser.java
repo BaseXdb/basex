@@ -124,7 +124,7 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param query query string
-   * @param uri base URI (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
+   * @param uri base URI (can be {@code null}
    * @param qctx query context
    * @param sctx static context (can be {@code null})
    * @throws QueryException query exception
@@ -138,7 +138,7 @@ public class QueryParser extends InputParser {
 
     // set path to query file
     final MainOptions opts = qctx.context.options;
-    sc.baseURI(uri != null ? uri : opts.get(MainOptions.QUERYPATH));
+    if(uri != null && sc.baseURI() == Uri.EMPTY) sc.baseURI(uri);
 
     // bind external variables
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
@@ -806,19 +806,19 @@ public class QueryParser extends InputParser {
     }
 
     qc.modStack.push(tPath);
-    final StaticContext sub = new StaticContext(qc);
-    final LibraryModule lib = new QueryParser(qu, io.path(), qc, sub).parseLibrary(false);
+    final StaticContext sctx = new StaticContext(qc);
+    final LibraryModule lib = new QueryParser(qu, io.path(), qc, sctx).parseLibrary(false);
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match
     if(!uri.equals(string(muri))) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, muri);
 
     // check if context value declaration types are compatible to each other
-    if(sub.contextType != null) {
+    if(sctx.contextType != null) {
       if(sc.contextType == null) {
-        sc.contextType = sub.contextType;
-      } else if(!sub.contextType.eq(sc.contextType)) {
-        throw error(CITYPES_X_X, sub.contextType, sc.contextType);
+        sc.contextType = sctx.contextType;
+      } else if(!sctx.contextType.eq(sc.contextType)) {
+        throw error(CITYPES_X_X, sctx.contextType, sc.contextType);
       }
     }
     qc.modStack.pop();

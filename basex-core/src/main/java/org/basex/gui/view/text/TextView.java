@@ -179,7 +179,7 @@ public final class TextView extends View {
       else parse = true;
     }
     // create new command instance
-    if(parse) cmd = new CommandParser(command.toString(), gui.context).parseSingle();
+    if(parse) cmd = CommandParser.get(command.toString(), gui.context).parseSingle();
   }
 
   /**

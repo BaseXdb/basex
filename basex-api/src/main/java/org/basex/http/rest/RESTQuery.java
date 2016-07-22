@@ -35,19 +35,17 @@ class RESTQuery extends RESTCmd {
 
   @Override
   protected void run0() throws IOException {
-    query(session.context.soptions.get(StaticOptions.WEBPATH));
+    query();
   }
 
   /**
    * Evaluates the specified query.
-   * @param path query path
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  final void query(final String path) throws IOException {
+  final void query() throws IOException {
     // set base path and serialization parameters
     final HTTPContext http = session.http;
-    context.options.set(MainOptions.QUERYPATH, path);
     context.options.set(MainOptions.SERIALIZER, http.sopts());
     http.initResponse();
 
@@ -89,7 +87,7 @@ class RESTQuery extends RESTCmd {
       final Map<String, String[]> vars, final String val) throws IOException {
 
     open(session);
-    session.add(new XQuery(query));
+    session.add(new XQuery(query).baseURI(session.context.soptions.get(StaticOptions.WEBPATH)));
     return new RESTQuery(session, vars, val);
   }
 }

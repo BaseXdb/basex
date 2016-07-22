@@ -92,7 +92,7 @@ public final class StaticContext {
 
   /**
    * Sets the static base URI.
-   * @param uri uri to be set ({@code null} invalidates URI)
+   * @param uri uri to be set: an empty URI will be ignored, {@code null} invalidates the URI
    */
   public void baseURI(final String uri) {
     String string = "";

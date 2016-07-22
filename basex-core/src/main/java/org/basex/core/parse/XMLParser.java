@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class XMLParser extends CmdParser {
+final class XMLParser extends CommandParser {
   /**
    * Constructor.
    * @param input input
@@ -48,7 +48,7 @@ final class XMLParser extends CmdParser {
         }
       }
       try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
-        for(final Item ia : qp.value()) cmds.add(command(ia));
+        for(final Item ia : qp.value()) cmds.add(command(ia).baseURI(uri));
       }
     } catch(final IOException ex) {
       throw error(Text.STOPPED_AT + '%', ex);
