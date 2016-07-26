@@ -124,7 +124,7 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param query query string
-   * @param uri base URI (can be {@code null}
+   * @param uri base URI (can be {@code null}; only passed on if not bound to static context yet)
    * @param qctx query context
    * @param sctx static context (can be {@code null})
    * @throws QueryException query exception
@@ -138,7 +138,7 @@ public class QueryParser extends InputParser {
 
     // set path to query file
     final MainOptions opts = qctx.context.options;
-    if(uri != null && sc.baseURI() == Uri.EMPTY) sc.baseURI(uri);
+    if(uri != null) sc.baseURI(uri);
 
     // bind external variables
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
@@ -777,7 +777,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the specified module, checking function and variable references at the end.
    * @param path file path
-   * @param uri module uri
+   * @param uri base URI of module
    * @param info input info
    * @throws QueryException query exception
    */
@@ -806,14 +806,15 @@ public class QueryParser extends InputParser {
     }
 
     qc.modStack.push(tPath);
-    final StaticContext sctx = new StaticContext(qc);
-    final LibraryModule lib = new QueryParser(qu, io.path(), qc, sctx).parseLibrary(false);
+    final QueryParser qp = new QueryParser(qu, io.path(), qc, null);
+    final LibraryModule lib = qp.parseLibrary(false);
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match
     if(!uri.equals(string(muri))) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, muri);
 
     // check if context value declaration types are compatible to each other
+    final StaticContext sctx = qp.sc;
     if(sctx.contextType != null) {
       if(sc.contextType == null) {
         sc.contextType = sctx.contextType;

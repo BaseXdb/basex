@@ -61,13 +61,13 @@ public class XQueryParse extends StandardFunc {
     }
 
     try(final QueryContext qctx = new QueryContext(qc.context)) {
-      final StaticScope ss = qctx.parse(string(query), path, null);
-      final boolean library = ss instanceof LibraryModule;
+      final Module mod = qctx.parse(string(query), path, null);
+      final boolean library = mod instanceof LibraryModule;
 
       final FElem root;
       if(library) {
         root = new FElem(LIBRARY_MODULE);
-        final LibraryModule lib = (LibraryModule) ss;
+        final LibraryModule lib = (LibraryModule) mod;
         root.add(PREFIX, lib.name.string());
         root.add(URI, lib.name.uri());
       } else {

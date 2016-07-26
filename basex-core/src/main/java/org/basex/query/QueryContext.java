@@ -183,28 +183,28 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Parses the specified query.
    * @param query query string
-   * @param path file path (may be {@code null})
+   * @param uri base URI (may be {@code null})
    * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
-  public StaticScope parse(final String query, final String path, final StaticContext sc)
+  public Module parse(final String query, final String uri, final StaticContext sc)
       throws QueryException {
-    return parse(query, QueryProcessor.isLibrary(query), path, sc);
+    return parse(query, QueryProcessor.isLibrary(query), uri, sc);
   }
 
   /**
    * Parses the specified query.
    * @param query query string
    * @param library library/main module
-   * @param path file path (may be {@code null})
+   * @param uri base URI (may be {@code null})
    * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
-  public StaticScope parse(final String query, final boolean library, final String path,
+  public Module parse(final String query, final boolean library, final String uri,
       final StaticContext sc) throws QueryException {
-    return library ? parseLibrary(query, path, sc) : parseMain(query, path, sc);
+    return library ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
   }
 
   /**
@@ -228,17 +228,17 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Parses the specified module.
    * @param query query string
-   * @param path file path (may be {@code null})
+   * @param uri base URI (may be {@code null})
    * @param sc static context (may be {@code null})
    * @return name of module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String query, final String path, final StaticContext sc)
+  public LibraryModule parseLibrary(final String query, final String uri, final StaticContext sc)
       throws QueryException {
 
     info.query = query;
     try {
-      return new QueryParser(query, path, this, sc).parseLibrary(true);
+      return new QueryParser(query, uri, this, sc).parseLibrary(true);
     } finally {
       // library module itself is not updating
       updating = false;

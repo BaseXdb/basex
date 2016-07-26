@@ -129,7 +129,7 @@ public final class StaticContext {
    * Returns an IO reference for the specified path.
    * If a base URI exists, it is merged with the path.
    * @param path file path
-   * @param uri module namespace (can be {@code null})
+   * @param uri module namespace (can be {@code null}, only relevant for custom resolver)
    * @return io reference
    */
   public IO resolve(final String path, final String uri) {
