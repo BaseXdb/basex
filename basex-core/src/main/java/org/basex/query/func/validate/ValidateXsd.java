@@ -94,8 +94,8 @@ public class ValidateXsd extends ValidateFn {
 
         final Validator v = s.newValidator();
         v.setErrorHandler(handler);
-        final String url = in.url();
-        v.validate(url.isEmpty() ? new StreamSource(in.inputStream()) : new StreamSource(url));
+        v.validate(in instanceof IOContent || in instanceof IOStream ?
+            new StreamSource(in.inputStream()) : new StreamSource(in.url()));
       }
     });
   }
