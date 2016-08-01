@@ -295,7 +295,7 @@ public abstract class Formatter extends FormatUtil {
             } else if(fp.max < sl) {
               s = frac(frac, fp.max);
             } else {
-              final int fl = fp.primary.length;
+              final int fl = length(fp.primary);
               if(fl != 1 && fl != sl) s = frac(frac, fl);
             }
           }
