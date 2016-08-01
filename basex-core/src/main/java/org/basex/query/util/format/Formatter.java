@@ -228,7 +228,6 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'f':
             frac = date.sec().remainder(BigDecimal.ONE);
-            num = frac.movePointRight(3).intValue();
             err = dat;
             break;
           case 'Z':
@@ -287,10 +286,9 @@ public abstract class Formatter extends FormatUtil {
             fp.primary = ONE;
             tb.add(formatInt(num, fp));
           }
-        } else {
-          // output fractional component
-          if(frac != null && frac.compareTo(BigDecimal.ZERO) != 0) {
-            String s = frac.toString().replace("0.", "");
+        } else if(frac != null) {
+          String s = frac.toString().replace("0.", "").replaceAll("0+$", "");
+          if(frac.compareTo(BigDecimal.ZERO) != 0) {
             final int sl = s.length();
             if(fp.min > sl) {
               s = frac(frac, fp.min);
@@ -300,8 +298,9 @@ public abstract class Formatter extends FormatUtil {
               final int fl = fp.primary.length;
               if(fl != 1 && fl != sl) s = frac(frac, fl);
             }
-            num = Strings.toLong(s);
           }
+          tb.add(number(token(s), fp, fp.first));
+        } else {
           tb.add(formatInt(num, fp));
         }
       } else {
@@ -319,7 +318,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    */
   private static String frac(final BigDecimal num, final int len) {
-    final String s = num.setScale(len, RoundingMode.HALF_UP).toString();
+    final String s = num.setScale(len, RoundingMode.DOWN).toString();
     final int d = s.indexOf('.');
     return d == -1 ? s : s.substring(d + 1);
   }
@@ -350,7 +349,7 @@ public abstract class Formatter extends FormatUtil {
     } else {
       final String seq = sequence(ch);
       if(seq != null) alpha(tb, num, seq);
-      else tb.add(number(n, fp, zeroes(ch)));
+      else tb.add(number(n, fp, ch));
     }
 
     // finalize formatted string
@@ -437,7 +436,7 @@ public abstract class Formatter extends FormatUtil {
 
     int n = c == 0 ? num / 60 : num % 60;
     if(num < 0) n = -n;
-    return number(n, new IntFormat(format.toArray(), null), zeroes(format.cp(0)));
+    return number(n, new IntFormat(format.toArray(), null), format.cp(0));
   }
 
   /**
@@ -546,10 +545,24 @@ public abstract class Formatter extends FormatUtil {
    * Creates a number character sequence.
    * @param num number to be formatted
    * @param fp format parser
-   * @param zero zero digit
+   * @param first first digit
    * @return number character sequence
    */
-  private byte[] number(final long num, final FormatParser fp, final int zero) {
+  private byte[] number(final long num, final FormatParser fp, final int first) {
+    final byte[] n = number(token(num), fp, first);
+    return concat(n, ordinal(num, fp.ordinal));
+  }
+
+  /**
+   * Creates a number character sequence.
+   * @param num number to be formatted
+   * @param fp format parser
+   * @param first first digit
+   * @return number character sequence
+   */
+  private byte[] number(final byte[] num, final FormatParser fp, final int first) {
+    final int zero = zeroes(first);
+
     // cache characters of presentation modifier
     final int[] mod = new TokenParser(fp.primary).toArray();
     final int modSize = mod.length;
@@ -578,8 +591,7 @@ public abstract class Formatter extends FormatUtil {
 
     // cache characters in reverse order
     final IntList reverse = new IntList();
-    final byte[] in = token(num);
-    int inPos = in.length - 1, modPos = modSize - 1;
+    int inPos = num.length - 1, modPos = modSize - 1;
 
     // add numbers and separators
     int min = fp.min, max = fp.max;
@@ -590,7 +602,7 @@ public abstract class Formatter extends FormatUtil {
         ch = mod[modPos--];
         if(inPos >= 0) {
           if(ch == '#' && sep) reverse.add(sepChar);
-          if(ch == '#' || ch >= zero && ch <= zero + 9) ch = in[inPos--] - '0' + zero;
+          if(ch == '#' || ch >= zero && ch <= zero + 9) ch = num[inPos--] - '0' + zero;
         } else {
           // add remaining modifiers
           if(ch == '#') break;
@@ -600,7 +612,7 @@ public abstract class Formatter extends FormatUtil {
       } else if(inPos >= 0) {
         // add remaining numbers
         if(sep) reverse.add(sepChar);
-        ch = in[inPos--] - '0' + zero;
+        ch = num[inPos--] - '0' + zero;
       } else {
         // add minimum number of digits
         ch = zero;
@@ -612,6 +624,6 @@ public abstract class Formatter extends FormatUtil {
     // reverse result and add ordinal suffix
     final TokenBuilder result = new TokenBuilder();
     for(int rs = reverse.size() - 1; rs >= 0; --rs) result.add(reverse.get(rs));
-    return result.add(ordinal(num, fp.ordinal)).finish();
+    return result.finish();
   }
 }
