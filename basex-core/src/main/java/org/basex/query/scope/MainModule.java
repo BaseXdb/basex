@@ -1,8 +1,9 @@
-package org.basex.query;
+package org.basex.query.scope;
 
 import java.util.*;
 
 import org.basex.core.locks.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -64,9 +65,10 @@ public final class MainModule extends Module {
    * @param vars static variables (can be {@code null})
    * @param imports namespace URIs of imported modules (can be {@code null})
    */
-  MainModule(final StaticContext sc, final VarScope vs, final Expr expr, final SeqType declType,
-      final String doc, final InputInfo info, final TokenObjMap<StaticFunc> funcs,
-      final TokenObjMap<StaticVar> vars, final TokenSet imports) {
+  public MainModule(final StaticContext sc, final VarScope vs, final Expr expr,
+      final SeqType declType, final String doc, final InputInfo info,
+      final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
+      final TokenSet imports) {
 
     super(sc, vs, doc, info, funcs, vars, imports);
     this.expr = expr;
@@ -92,7 +94,7 @@ public final class MainModule extends Module {
    * @return result
    * @throws QueryException evaluation exception
    */
-  ItemList cache(final QueryContext qc) throws QueryException {
+  public ItemList cache(final QueryContext qc) throws QueryException {
     final int fp = vs.enter(qc);
     try {
       final Iter iter = expr.iter(qc);
@@ -111,7 +113,7 @@ public final class MainModule extends Module {
    * @return result iterator
    * @throws QueryException query exception
    */
-  Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     if(declType != null) return cache(qc).iter();
 
     final int fp = vs.enter(qc);
@@ -157,7 +159,7 @@ public final class MainModule extends Module {
    * @param qc query context
    * @return result of check
    */
-  boolean databases(final LockResult lr, final QueryContext qc) {
+  public boolean databases(final LockResult lr, final QueryContext qc) {
     return expr.accept(new LockVisitor(lr, qc));
   }
 

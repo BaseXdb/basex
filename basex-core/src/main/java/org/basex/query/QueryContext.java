@@ -23,6 +23,7 @@ import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
+import org.basex.query.scope.*;
 import org.basex.query.up.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
@@ -132,8 +133,7 @@ public final class QueryContext extends Job implements Closeable {
   final TokenList modStack = new TokenList();
 
   /** Initial context value. */
-  MainModule ctxItem;
-
+  public MainModule ctxItem;
   /** Root expression of the query. */
   public MainModule root;
 

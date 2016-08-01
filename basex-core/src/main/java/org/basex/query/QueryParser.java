@@ -32,6 +32,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.scope.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;

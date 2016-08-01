@@ -13,6 +13,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.iter.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;

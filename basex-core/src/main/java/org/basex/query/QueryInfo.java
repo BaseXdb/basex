@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;

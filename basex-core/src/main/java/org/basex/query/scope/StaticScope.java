@@ -1,9 +1,10 @@
-package org.basex.query;
+package org.basex.query.scope;
 
 import java.io.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.var.*;
