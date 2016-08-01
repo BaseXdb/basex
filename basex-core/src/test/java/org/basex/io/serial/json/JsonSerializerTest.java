@@ -29,7 +29,7 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("'x'", "'x'", format);
     serialize("1", "1", format);
     serialize("true()", "true", format);
-    serialize("<_/>", "'<_/>'", format);
+    serialize("<_/>", "'<_\\/>'", format);
 
     serialize("<json/>", "''", format);
     serialize("<json type='object'/>", "{}", format);
@@ -66,7 +66,7 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("'x'", "'x'", format);
     serialize("1", "1", format);
     serialize("true()", "true", format);
-    serialize("<_/>", "'<_/>'", format);
+    serialize("<_/>", "'<_\\/>'", format);
 
     serialize("<json/>", "''", format);
     serialize("<json type='object'/>", "{}", format);

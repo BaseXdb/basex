@@ -164,14 +164,15 @@ public abstract class JsonSerializer extends StandardSerializer {
 
     if(escape) {
       switch(cp) {
-        case '\b': out.print("\\b"); break;
-        case '\f': out.print("\\f"); break;
-        case '\n': out.print("\\n"); break;
-        case '\r': out.print("\\r"); break;
-        case '\t': out.print("\\t"); break;
-        case '"': out.print("\\\""); break;
+        case '\b': out.print("\\b");  break;
+        case '\f': out.print("\\f");  break;
+        case '\n': out.print("\\n");  break;
+        case '\r': out.print("\\r");  break;
+        case '\t': out.print("\\t");  break;
+        case '"' : out.print("\\\""); break;
+        case '/' : out.print("\\/");  break;
         case '\\': out.print("\\\\"); break;
-        default: out.print(cp); break;
+        default  : out.print(cp);     break;
       }
     } else {
       out.print(cp);
