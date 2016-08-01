@@ -447,6 +447,7 @@ public final class FTWords extends FTExpr {
     ftw.first = first;
     ftw.pos = pos;
     ftw.fast = fast;
+    ftw.compiled = compiled;
     return ftw;
   }
 

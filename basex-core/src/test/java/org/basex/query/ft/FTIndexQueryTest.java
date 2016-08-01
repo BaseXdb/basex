@@ -1,4 +1,4 @@
-package org.basex.query.index;
+package org.basex.query.ft;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
@@ -52,7 +52,6 @@ public final class FTIndexQueryTest extends FTData {
     assertQuery("Ext 2", _FT_MARK.args(" //*[text() contains text {'A B'} all words], 'b'"));
     assertQuery("Ext 3", _FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
   }
-
 
   /**
    * Tests mixed content.
