@@ -176,7 +176,7 @@ public class QueryParser extends InputParser {
       if(expr == null) throw alter == null ? error(EXPREMPTY) : error();
       final VarScope vs = localVars.popContext();
 
-      final MainModule mm = new MainModule(sc, vs, expr, null, doc, null, funcs, vars, imports);
+      final MainModule mm = new MainModule(vs, expr, null, doc, null, funcs, vars, imports);
       finish(mm);
       check(mm);
       return mm;

@@ -38,7 +38,7 @@ public final class MainModule extends Module {
    */
   public static MainModule get(final VarScope vs, final Expr expr, final SeqType type,
       final String doc, final InputInfo info) {
-    return new MainModule(vs.sc, vs, expr, type, doc, info, null, null, null);
+    return new MainModule(vs, expr, type, doc, info, null, null, null);
   }
 
   /**
@@ -50,12 +50,11 @@ public final class MainModule extends Module {
    */
   public static MainModule get(final StaticFunc sf, final Expr[] args) throws QueryException {
     final StaticFuncCall expr = new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf);
-    return new MainModule(sf.sc, new VarScope(sf.sc), expr, null, null, null, null, null, null);
+    return new MainModule(new VarScope(sf.sc), expr, null, null, null, null, null, null);
   }
 
   /**
    * Constructor.
-   * @param sc static context
    * @param vs variable scope
    * @param expr root expression
    * @param declType optional type (can be {@code null})
@@ -65,12 +64,11 @@ public final class MainModule extends Module {
    * @param vars static variables (can be {@code null})
    * @param imports namespace URIs of imported modules (can be {@code null})
    */
-  public MainModule(final StaticContext sc, final VarScope vs, final Expr expr,
-      final SeqType declType, final String doc, final InputInfo info,
-      final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
+  public MainModule(final VarScope vs, final Expr expr, final SeqType declType, final String doc,
+      final InputInfo info, final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
       final TokenSet imports) {
 
-    super(sc, vs, doc, info, funcs, vars, imports);
+    super(vs.sc, vs, doc, info, funcs, vars, imports);
     this.expr = expr;
     this.declType = declType;
   }

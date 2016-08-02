@@ -39,7 +39,7 @@ public final class CreateDB extends ACreate {
   /**
    * Constructor, specifying an initial database input.
    * @param name name of database
-   * @param input input reference (local/remote file or XML string; can be {@code null})
+   * @param input input reference (local/remote file path or XML string; can be {@code null})
    */
   public CreateDB(final String name, final String input) {
     super(name, input);
