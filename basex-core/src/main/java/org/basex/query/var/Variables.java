@@ -44,7 +44,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
-   * Checks if none of the variables contains an updating expression.
+   * Ensures that none of the variable expressions is updating.
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {

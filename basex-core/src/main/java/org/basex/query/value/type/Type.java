@@ -6,7 +6,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * XQuery item types.
+ * XQuery types.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -154,43 +154,43 @@ public interface Type {
   }
 
   /**
-   * Casts the specified item to this item type.
+   * Casts the specified item to this type.
    * @param item item to be converted
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return new item
+   * @return cast value
    * @throws QueryException query exception
    */
   Value cast(final Item item, final QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**
-   * Casts the specified Java value to this item type.
+   * Casts the specified Java value to this type.
    * @param value Java value
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return new item
+   * @return cast value
    * @throws QueryException query exception
    */
   Value cast(final Object value, QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**
-   * Casts the specified string to this item type.
+   * Casts the specified string to this type.
    * @param value string object
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return new item
+   * @return cast value
    * @throws QueryException query exception
    */
   Value castString(final String value, QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**
-   * Returns a sequence type with this item type.
+   * Returns a sequence type with this type.
    * @return sequence type
    */
   SeqType seqType();

@@ -172,7 +172,7 @@ public final class Var extends ExprInfo {
       throws QueryException {
 
     if(!checksType() || type.instance(val)) return val;
-    if(promote) return type.promote(val, name, opt, qc, sc, info);
+    if(promote) return type.promote(val, name, qc, sc, info, opt);
     throw QueryError.typeError(val, type, name, info);
   }
 

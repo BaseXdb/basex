@@ -1342,7 +1342,7 @@ public enum QueryError {
   /**
    * Throws a query exception. If {@link InputInfo#internal()} returns {@code true},
    * a static error instance ({@link QueryException#ERROR}) will be returned.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param ext extended info
    * @return query exception
    */

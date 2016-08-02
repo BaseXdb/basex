@@ -356,13 +356,13 @@ public final class SeqType {
   }
 
   /**
-   * Tries to cast the given item to this sequence type.
+   * Casts the given item to this sequence type.
    * @param item item to cast
    * @param qc query context
    * @param sc static context
    * @param info input info
-   * @param error return error
-   * @return promoted item
+   * @param error raise error, or return {@code null}
+   * @return cast value
    * @throws QueryException query exception
    */
   public Value cast(final Item item, final QueryContext qc, final StaticContext sc,
@@ -390,7 +390,7 @@ public final class SeqType {
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return resulting value
+   * @return cast value
    * @throws QueryException query exception
    */
   public Value cast(final Value value, final QueryContext qc, final StaticContext sc,
@@ -437,15 +437,15 @@ public final class SeqType {
    * Promotes a value to the type of this sequence type.
    * @param value value to convert
    * @param name variable name (can be {@code null})
-   * @param opt if the result should be optimized
    * @param qc query context
    * @param sc static context
    * @param ii input info
+   * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
-  public Value promote(final Value value, final QNm name, final boolean opt, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+  public Value promote(final Value value, final QNm name, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     final int n = (int) value.size();
     if(!occ.check(n)) throw QueryError.typeError(value, this, name, ii);
@@ -462,7 +462,7 @@ public final class SeqType {
           cache = new ItemList(n);
           for(int j = 0; j < i; j++) cache.add(value.itemAt(j));
         }
-        promote(it, name, opt, cache, qc, sc, ii);
+        promote(it, name, cache, qc, sc, ii, opt);
       }
     }
     return cache != null ? cache.value(type) : value;
@@ -472,15 +472,15 @@ public final class SeqType {
    * Promotes an item to the type of this sequence type.
    * @param item item to promote
    * @param name variable name (can be {@code null})
-   * @param opt if the result should be optimized
    * @param cache item cache
    * @param qc query context
    * @param sc static context
    * @param ii input info
+   * @param opt if the result should be optimized
    * @throws QueryException query exception
    */
-  public void promote(final Item item, final QNm name, final boolean opt, final ItemList cache,
-      final QueryContext qc, final StaticContext sc, final InputInfo ii) throws QueryException {
+  public void promote(final Item item, final QNm name, final ItemList cache, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
       for(final Item atom : item.atomValue(ii)) {

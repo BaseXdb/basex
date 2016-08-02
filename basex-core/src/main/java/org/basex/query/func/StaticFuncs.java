@@ -127,36 +127,35 @@ public final class StaticFuncs extends ExprInfo {
    */
   public void check(final QueryContext qc) throws QueryException {
     // initialize function calls
-    int id = 0;
     for(final FuncCache fc : funcs.values()) {
       final StaticFuncCall call = fc.calls.isEmpty() ? null : fc.calls.get(0);
       if(fc.func == null) {
-        // check if another function with same name exists
-        int oid = 0;
-        final IntList al = new IntList();
+        // raise error (no function found)...
+        final IntList arities = new IntList();
         for(final FuncCache ofc : funcs.values()) {
-          if(oid++ == id) continue;
-          if(ofc.func != null && call.name.eq(ofc.name())) al.add(ofc.func.arity());
+          if(fc != ofc && ofc.func != null && call.name.eq(ofc.name()))
+            arities.add(ofc.func.arity());
         }
-        if(!al.isEmpty()) {
-          final StringBuilder exp = new StringBuilder();
-          final int as = al.size();
+        if(!arities.isEmpty()) {
+          // include arities in error message if another function with same name exists:
+          final StringBuilder ext = new StringBuilder();
+          final int as = arities.size();
           int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
           for(int a = 0; a < as; a++) {
-            final int m = al.get(a);
+            final int m = arities.get(a);
             if(m < min) min = m;
             if(m > max) max = m;
           }
           if(as > 1 && max - min + 1 == as) {
-            exp.append(min).append('-').append(max);
+            ext.append(min).append('-').append(max);
           } else {
             for(int a = 0; a < as; a++) {
-              if(a != 0) exp.append(a + 1 < as ? ", " : " or ");
-              exp.append(al.get(a));
+              if(a != 0) ext.append(a + 1 < as ? ", " : " or ");
+              ext.append(arities.get(a));
             }
           }
           final int ar = call.exprs.length;
-          throw FUNCTYPES_X_X_X_X.get(call.info, call.name.string(), ar, ar == 1 ? "" : "s", exp);
+          throw FUNCTYPES_X_X_X_X.get(call.info, call.name.string(), ar, ar == 1 ? "" : "s", ext);
         }
 
         // if not, indicate that function is unknown
@@ -169,7 +168,6 @@ public final class StaticFuncs extends ExprInfo {
         // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }
-      id++;
     }
   }
 

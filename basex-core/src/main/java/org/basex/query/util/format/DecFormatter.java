@@ -52,20 +52,12 @@ public final class DecFormatter extends FormatUtil {
   public int permille = '\u2030';
 
   /**
-   * Default constructor.
-   * @throws QueryException query exception
-   */
-  public DecFormatter() throws QueryException {
-    this(null, null);
-  }
-
-  /**
    * Constructor.
-   * @param info input info
-   * @param map decimal format
+   * @param map decimal format (can be {@code null})
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DecFormatter(final InputInfo info, final TokenMap map) throws QueryException {
+  public DecFormatter(final TokenMap map, final InputInfo info) throws QueryException {
     // assign map values
     int z = '0';
     if(map != null) {

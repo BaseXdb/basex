@@ -50,8 +50,7 @@ public final class TypeCase extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  TypeCase compile(final CompileContext cc, final Value v)
-      throws QueryException {
+  TypeCase compile(final CompileContext cc, final Value v) throws QueryException {
     final Value val = var != null && v != null ? var.checkType(v, cc.qc, true) : null;
     try {
       super.compile(cc);

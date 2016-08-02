@@ -28,7 +28,7 @@ abstract class ProcFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Result exec(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
+    checkAdmin(qc);
 
     // arguments
     final TokenList tl = new TokenList();

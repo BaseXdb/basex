@@ -73,6 +73,9 @@ public final class InspectStaticContext extends StandardFunc {
         return StrSeq.get(sl);
       case DECIMAL_FORMATS:
         map = Map.EMPTY;
+        // enforce creation of default formatter
+        sctx.decFormat(Token.EMPTY);
+        // loop through all formatters
         for(final byte[] format : sctx.decFormats) {
           final DecFormatter df = sctx.decFormats.get(format);
           map = map.put(Str.get(format), Map.EMPTY.

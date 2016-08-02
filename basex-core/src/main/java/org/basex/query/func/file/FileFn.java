@@ -20,7 +20,7 @@ import org.basex.util.*;
 abstract class FileFn extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
+    checkAdmin(qc);
     try {
       return item(qc);
     } catch(final NoSuchFileException ex) {
