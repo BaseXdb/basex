@@ -59,11 +59,11 @@ public class Options implements Iterable<Option<?>> {
   private static final String PROPUSER = "# Local Options";
 
   /** Map with option names and definition. */
-  private final TreeMap<String, Option<?>> options = new TreeMap<>();
+  private final TreeMap<String, Option<?>> options;
   /** Map with option names and values. */
-  private final TreeMap<String, Object> values = new TreeMap<>();
+  private final TreeMap<String, Object> values;
   /** Free option definitions. */
-  private final HashMap<String, String> free = new HashMap<>();
+  private final HashMap<String, String> free;
 
   /** Options, cached from an input file. */
   private final StringList user = new StringList();
@@ -82,6 +82,9 @@ public class Options implements Iterable<Option<?>> {
    * @param opts options file
    */
   protected Options(final IOFile opts) {
+    options = new TreeMap<>();
+    values = new TreeMap<>();
+    free = new HashMap<>();
     try {
       for(final Option<?> opt : options(getClass())) {
         if(opt instanceof Comment) continue;
@@ -99,13 +102,11 @@ public class Options implements Iterable<Option<?>> {
    * Constructor with options to be copied.
    * @param opts options
    */
+  @SuppressWarnings("unchecked")
   protected Options(final Options opts) {
-    for(final Entry<String, Option<?>> e : opts.options.entrySet())
-      options.put(e.getKey(), e.getValue());
-    for(final Entry<String, Object> e : opts.values.entrySet())
-      values.put(e.getKey(), e.getValue());
-    for(final Entry<String, String> e : opts.free.entrySet())
-      free.put(e.getKey(), e.getValue());
+    options = (TreeMap<String, Option<?>>) opts.options.clone();
+    values = (TreeMap<String, Object>) opts.values.clone();
+    free = (HashMap<String, String>) opts.free.clone();
     user.add(opts.user);
     file = opts.file;
   }

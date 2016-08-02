@@ -102,10 +102,10 @@ public class QueryParser extends InputParser {
 
   /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();
-  /** XQDoc cache. */
-  private final StringBuilder currDoc = new StringBuilder();
   /** Current XQDoc string. */
-  private String moduleDoc = "";
+  private final StringBuilder currDoc = new StringBuilder();
+  /** XQDoc string of module. */
+  private String doc = "";
 
   /** Alternative error code. */
   private QueryError alter;
@@ -175,8 +175,7 @@ public class QueryParser extends InputParser {
       if(expr == null) throw alter == null ? error(EXPREMPTY) : error();
       final VarScope vs = localVars.popContext();
 
-      final MainModule mm = new MainModule(sc, vs, expr, null, moduleDoc, null,
-          funcs, vars, imports);
+      final MainModule mm = new MainModule(sc, vs, expr, null, doc, null, funcs, vars, imports);
       finish(mm);
       check(mm);
       return mm;
@@ -190,7 +189,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses a library module.
    * Parses the "ModuleDecl" rule.
-   * @param check if functions and variables should be checked
+   * @param check check functions and variables
    * @return name of the module
    * @throws QueryException query exception
    */
@@ -225,7 +224,7 @@ public class QueryParser extends InputParser {
       if(check) check(null);
 
       qc.modStack.pop();
-      return new LibraryModule(module, moduleDoc, funcs, vars, imports, sc);
+      return new LibraryModule(module, doc, funcs, vars, imports, sc);
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
@@ -273,12 +272,6 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
-
-    // set default decimal format
-    final byte[] empty = new QNm(EMPTY).id();
-    if(sc.decFormats.get(empty) == null) {
-      sc.decFormats.put(empty, new DecFormatter());
-    }
   }
 
   /**
@@ -290,6 +283,7 @@ public class QueryParser extends InputParser {
     // check function calls and variable references
     qc.funcs.check(qc);
     qc.vars.check();
+
     // check updating semantics (skip if updates and values can be mixed)
     if(qc.updating && !sc.mixUpdates) {
       qc.funcs.checkUp();
@@ -656,7 +650,7 @@ public class QueryParser extends InputParser {
     } while(n != map.size());
 
     // completes the format declaration
-    sc.decFormats.put(name.id(), new DecFormatter(info(), map));
+    sc.decFormats.put(name.id(), new DecFormatter(map, info()));
     return true;
   }
 
@@ -873,8 +867,7 @@ public class QueryParser extends InputParser {
       bind = check(single(), NOVARDECL);
     }
     final VarScope vs = localVars.popContext();
-    final String doc = currDoc.toString();
-    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, doc, vs);
+    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, currDoc.toString(), vs);
     vars.put(sv.id(), sv);
   }
 
@@ -4025,37 +4018,37 @@ public class QueryParser extends InputParser {
    */
   private void comment() throws QueryException {
     ++pos;
-    final boolean doc = next() == '~';
-    if(doc) {
+    final boolean xqdoc = next() == '~';
+    if(xqdoc) {
       currDoc.setLength(0);
       ++pos;
     }
-    comment(false, doc);
+    comment(false, xqdoc);
   }
 
   /**
    * Consumes a comment.
    * @param nested nested flag
-   * @param doc xqdoc flag
+   * @param xqdoc xqdoc flag
    * @throws QueryException query exception
    */
-  private void comment(final boolean nested, final boolean doc) throws QueryException {
+  private void comment(final boolean nested, final boolean xqdoc) throws QueryException {
     while(++pos < length) {
       char curr = curr();
       if(curr == '(' && next() == ':') {
         ++pos;
-        comment(true, doc);
+        comment(true, xqdoc);
         curr = curr();
       }
       if(curr == ':' && next() == ')') {
         pos += 2;
-        if(!nested && moduleDoc.isEmpty()) {
-          moduleDoc = currDoc.toString().trim();
+        if(!nested && doc.isEmpty()) {
+          doc = currDoc.toString().trim();
           currDoc.setLength(0);
         }
         return;
       }
-      if(doc) currDoc.append(curr);
+      if(xqdoc) currDoc.append(curr);
     }
     throw error(COMCLOSE);
   }

@@ -136,6 +136,22 @@ public final class StaticContext {
     return resolver == null ? resolve(path) : resolver.resolve(path, uri, baseURI);
   }
 
+  /**
+   * Returns a decimal format.
+   * @param id format id
+   * @return decimal format, or {@code null}
+   * @throws QueryException query exception
+   */
+  public DecFormatter decFormat(final byte[] id) throws QueryException {
+    DecFormatter df = decFormats.get(id);
+    if(df == null && eq(id, EMPTY)) {
+      // lazy instantiation of default decimal format
+      df = new DecFormatter(null, null);
+      decFormats.put(id, df);
+    }
+    return df;
+  }
+
   @Override
   public String toString() {
     return Util.className(this) + '[' + baseIO() + ']';

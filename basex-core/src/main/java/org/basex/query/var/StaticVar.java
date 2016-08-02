@@ -103,7 +103,7 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Checks for the correct placement of updating expressions in this variable.
+   * Ensures that the variable expression is not updating.
    * @throws QueryException query exception
    */
   void checkUp() throws QueryException {

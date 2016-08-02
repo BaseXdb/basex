@@ -110,7 +110,7 @@ public final class TypeCheck extends Single {
           if(it == null || st.instance(it)) {
             cache.add(it);
           } else {
-            st.promote(it, null, false, cache, qc, sc, info);
+            st.promote(it, null, cache, qc, sc, info, false);
           }
         }
 
@@ -130,7 +130,7 @@ public final class TypeCheck extends Single {
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = expr.value(qc);
     if(seqType.instance(val)) return val;
-    if(promote) return seqType.promote(val, null, false, qc, sc, info);
+    if(promote) return seqType.promote(val, null, qc, sc, info, false);
     throw INVCAST_X_X_X.get(info, val.seqType(), seqType, val);
   }
 
