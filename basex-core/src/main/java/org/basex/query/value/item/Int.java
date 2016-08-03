@@ -93,7 +93,7 @@ public final class Int extends ANum {
 
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) {
-    return value == qc.pos ? this : null;
+    return value == qc.focus.pos ? this : null;
   }
 
   @Override

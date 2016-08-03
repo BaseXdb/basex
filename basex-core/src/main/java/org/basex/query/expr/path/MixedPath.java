@@ -20,6 +20,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class MixedPath extends Path {
+  /** Focus. */
+  private final QueryFocus focus = new QueryFocus();
+
   /**
    * Constructor.
    * @param info input info
@@ -56,15 +59,15 @@ public final class MixedPath extends Path {
       sz = rt.size();
     }
 
-    final Value cv = qc.value;
-    final long cp = qc.pos, cs = qc.size;
+    final QueryFocus qf = qc.focus;
+    qc.focus = focus;
     try {
       // loop through all expressions
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         // set context position and size
-        qc.size = sz;
-        qc.pos = 1;
+        focus.size = sz;
+        focus.pos = 1;
 
         // loop through all input items; cache nodes and items
         final ANodeList nodes = new ANodeList().check();
@@ -72,7 +75,7 @@ public final class MixedPath extends Path {
         final Expr step = steps[s];
         for(Item it; (it = iter.next()) != null;) {
           if(!(it instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, it.type, it);
-          qc.value = it;
+          focus.value = it;
 
           // loop through all resulting items
           final Iter ir = qc.iter(step);
@@ -80,7 +83,7 @@ public final class MixedPath extends Path {
             if(i instanceof ANode) nodes.add((ANode) i);
             else items.add(i);
           }
-          qc.pos++;
+          focus.pos++;
         }
 
         if(items.isEmpty()) {
@@ -98,9 +101,7 @@ public final class MixedPath extends Path {
       }
       return iter;
     } finally {
-      qc.value = cv;
-      qc.size = cs;
-      qc.pos = cp;
+      qc.focus = qf;
     }
   }
 

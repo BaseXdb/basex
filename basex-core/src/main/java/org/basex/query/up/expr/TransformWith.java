@@ -32,12 +32,13 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    final Value v = cc.qc.value;
+    final QueryFocus focus = cc.qc.focus;
+    final Value v = focus.value;
     try {
-      cc.qc.value = null;
+      focus.value = null;
       return super.compile(cc);
     } finally {
-      cc.qc.value = v;
+      focus.value = v;
     }
   }
 
@@ -57,7 +58,8 @@ public final class TransformWith extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Updates upd = qc.updates();
-    final Value cv = qc.value;
+    final QueryFocus qf = qc.focus;
+    final Value cv = qf.value;
 
     final ValueBuilder vb = new ValueBuilder();
     try {
@@ -68,7 +70,7 @@ public final class TransformWith extends Arr {
         // copy node to main memory data instance
         it = ((ANode) it).dbNodeCopy(qc.context.options);
         // set resulting node as context
-        qc.value = it;
+        qf.value = it;
 
         final Updates updates = new Updates(true);
         qc.updates = updates;
@@ -83,7 +85,7 @@ public final class TransformWith extends Arr {
       }
     } finally {
       qc.updates = upd;
-      qc.value = cv;
+      qf.value = cv;
     }
     return vb.value();
   }

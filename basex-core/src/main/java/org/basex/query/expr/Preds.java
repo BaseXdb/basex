@@ -48,9 +48,10 @@ public abstract class Preds extends ParseExpr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    final Value init = cc.qc.value;
+    final QueryFocus focus = cc.qc.focus;
+    final Value init = focus.value;
     // never compile predicates with empty sequence as context value (#1016)
-    if(init != null && init.isEmpty()) cc.qc.value = null;
+    if(init != null && init.isEmpty()) focus.value = null;
     try {
       final int pl = preds.length;
       for(int p = 0; p < pl; ++p) {
@@ -62,7 +63,7 @@ public abstract class Preds extends ParseExpr {
         }
       }
     } finally {
-      cc.qc.value = init;
+      focus.value = init;
     }
     return optimize(cc);
   }
@@ -172,8 +173,9 @@ public abstract class Preds extends ParseExpr {
    */
   protected final boolean preds(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
-    final Value cv = qc.value;
-    qc.value = item;
+    final QueryFocus qf = qc.focus;
+    final Value cv = qf.value;
+    qf.value = item;
     try {
       double s = qc.scoring ? 0 : -1;
       for(final Expr pred : preds) {
@@ -184,7 +186,7 @@ public abstract class Preds extends ParseExpr {
       if(s > 0) item.score(Scoring.avg(s, preds.length));
       return true;
     } finally {
-      qc.value = cv;
+      qf.value = cv;
     }
   }
 

@@ -202,7 +202,7 @@ public final class CmpG extends Cmp {
 
     // pre-evaluate equality test if operands are equal, deterministic, and can be compared
     if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
-        (!e1.has(Flag.CTX) || cc.qc.value != null)) {
+        (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       // currently limited to strings (function items are invalid, numbers may be NaN)
       final SeqType st = e1.seqType();
       if(st.oneOrMore() && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, cc);

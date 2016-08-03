@@ -114,7 +114,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = ebv(qc, info);
-    return (it instanceof ANum ? it.dbl(info) == qc.pos : it.bool(info)) ? it : null;
+    return (it instanceof ANum ? it.dbl(info) == qc.focus.pos : it.bool(info)) ? it : null;
   }
 
   @Override
@@ -226,7 +226,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Value ctxValue(final QueryContext qc) throws QueryException {
-    final Value v = qc.value;
+    final Value v = qc.focus.value;
     if(v != null) return v;
     throw NOCTX_X.get(info, this);
   }

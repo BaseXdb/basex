@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Iterative step expression without numeric predicates.
+ * Step expression: iterative evaluation (no positional access).
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen

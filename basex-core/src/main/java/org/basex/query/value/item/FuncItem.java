@@ -36,12 +36,8 @@ public final class FuncItem extends FItem implements Scope {
   /** Formal parameters. */
   private final Var[] params;
 
-  /** Context value. */
-  private final Value ctxValue;
-  /** Context position. */
-  private final long pos;
-  /** Context length. */
-  private final long size;
+  /** Query focus. */
+  private final QueryFocus focus;
 
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
@@ -58,7 +54,7 @@ public final class FuncItem extends FItem implements Scope {
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
       final FuncType type, final Expr expr, final int stackSize) {
-    this(sc, anns, name, params, type, expr, null, 0, 0, stackSize);
+    this(sc, anns, name, params, type, expr, new QueryFocus(), stackSize);
   }
 
   /**
@@ -69,14 +65,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param params function arguments
    * @param type function type
    * @param expr function body
-   * @param ctxValue context value
-   * @param pos context position
-   * @param size context size
+   * @param focus query focus
    * @param stackSize stack-frame size
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final Value ctxValue, final long pos, final long size,
-      final int stackSize) {
+      final FuncType type, final Expr expr, final QueryFocus focus, final int stackSize) {
 
     super(type, anns);
     this.name = name;
@@ -84,9 +77,7 @@ public final class FuncItem extends FItem implements Scope {
     this.expr = expr;
     this.stackSize = stackSize;
     this.sc = sc;
-    this.ctxValue = ctxValue;
-    this.pos = pos;
-    this.size = size;
+    this.focus = focus;
   }
 
   @Override
@@ -118,19 +109,14 @@ public final class FuncItem extends FItem implements Scope {
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
     // bind variables and cache context
-    final Value cv = qc.value;
-    final long ps = qc.pos, sz = qc.size;
+    final QueryFocus qf = qc.focus;
+    qc.focus = focus;
     try {
-      qc.value = ctxValue;
-      qc.pos = pos;
-      qc.size = size;
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return qc.value(expr);
     } finally {
-      qc.value = cv;
-      qc.pos = ps;
-      qc.size = sz;
+      qc.focus = qf;
     }
   }
 
@@ -138,19 +124,14 @@ public final class FuncItem extends FItem implements Scope {
   public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
     // bind variables and cache context
-    final Value cv = qc.value;
-    final long ps = qc.pos, sz = qc.size;
+    final QueryFocus qf = qc.focus;
+    qc.focus = focus;
     try {
-      qc.value = ctxValue;
-      qc.pos = pos;
-      qc.size = size;
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return expr.item(qc, ii);
     } finally {
-      qc.value = cv;
-      qc.pos = ps;
-      qc.size = sz;
+      qc.focus = qf;
     }
   }
 

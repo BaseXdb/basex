@@ -78,11 +78,7 @@ public final class QueryContext extends Job implements Closeable {
   final StringList tempOpts = new StringList();
 
   /** Current context value. */
-  public Value value;
-  /** Current context position. */
-  public long pos = 1;
-  /** Current context size. */
-  public long size = 1;
+  public QueryFocus focus = new QueryFocus();
 
   /** Full-text position data (needed for highlighting full-text results). */
   public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
@@ -284,7 +280,7 @@ public final class QueryContext extends Job implements Closeable {
         // evaluate initial expression
         try {
           ctxItem.comp(cc);
-          value = ctxItem.cache(this).value();
+          focus.value = ctxItem.cache(this).value();
         } catch(final QueryException ex) {
           // only {@link ParseExpr} instances may lead to a missing context
           throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
@@ -295,14 +291,14 @@ public final class QueryContext extends Job implements Closeable {
         if(nodes != null) {
           if(!context.perm(Perm.READ, nodes.data().meta.name))
             throw BASX_PERM_X.get(null, Perm.READ);
-          value = resources.compile(nodes);
+          focus.value = resources.compile(nodes);
         }
       }
 
       // if specified, convert context value to specified type
       // [LW] should not be necessary
-      if(value != null && root.sc.contextType != null) {
-        value = root.sc.contextType.promote(value, null, this, root.sc, null, true);
+      if(focus.value != null && root.sc.contextType != null) {
+        focus.value = root.sc.contextType.promote(focus.value, null, this, root.sc, null, true);
       }
 
       try {
@@ -423,7 +419,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return data reference
    */
   public Data data() {
-    return value != null ? value.data() : null;
+    return focus.value != null ? focus.value.data() : null;
   }
 
   @Override

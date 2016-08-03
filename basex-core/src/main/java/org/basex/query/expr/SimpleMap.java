@@ -46,7 +46,8 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
-    final Value cv = cc.qc.value;
+    final QueryFocus focus = cc.qc.focus;
+    final Value cv = focus.value;
     try {
       final int el = exprs.length;
       for(int e = 0; e < el; e++) {
@@ -56,10 +57,10 @@ public abstract class SimpleMap extends Arr {
           // replace original expression with error
           exprs[e] = cc.error(ex, this);
         }
-        cc.qc.value = null;
+        focus.value = null;
       }
     } finally {
-      cc.qc.value = cv;
+      focus.value = cv;
     }
     return optimize(cc);
   }

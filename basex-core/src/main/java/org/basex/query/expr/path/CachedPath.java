@@ -20,6 +20,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CachedPath extends AxisPath {
+  /** Focus. */
+  private final QueryFocus focus = new QueryFocus();
+
   /**
    * Constructor.
    * @param info input info
@@ -32,8 +35,9 @@ final class CachedPath extends AxisPath {
 
   @Override
   protected NodeIter nodeIter(final QueryContext qc) throws QueryException {
-    final long cp = qc.pos, cs = qc.size;
-    final Value cv = qc.value, r = root != null ? qc.value(root) : cv;
+    final QueryFocus qf = qc.focus;
+    final Value r = root != null ? qc.value(root) : qf.value;
+    qc.focus = focus;
     final ANodeList list = new ANodeList().check();
     try {
       if(r != null) {
@@ -42,17 +46,15 @@ final class CachedPath extends AxisPath {
           // ensure that root only returns nodes
           if(root != null && !(it instanceof ANode))
             throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
-          qc.value = it;
+          focus.value = it;
           iter(0, list, qc);
         }
       } else {
-        qc.value = null;
+        focus.value = null;
         iter(0, list, qc);
       }
     } finally {
-      qc.value = cv;
-      qc.size = cs;
-      qc.pos = cp;
+      qc.focus = qf;
     }
     return list.iter();
   }
@@ -72,7 +74,7 @@ final class CachedPath extends AxisPath {
     final boolean more = step + 1 != steps.length;
     for(ANode node; (node = ni.next()) != null;) {
       if(more) {
-        qc.value = node;
+        focus.value = node;
         iter(step + 1, list, qc);
       } else {
         qc.checkStop();

@@ -64,8 +64,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     if(compiled || expr == null) return;
     compiling = compiled = true;
 
-    final Value cv = cc.qc.value;
-    cc.qc.value = null;
+    final QueryFocus focus = cc.qc.focus;
+    final Value cv = focus.value;
+    focus.value = null;
 
     cc.pushScope(vs);
     try {
@@ -85,7 +86,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       expr = cc.error(qe, expr);
     } finally {
       cc.removeScope(this);
-      cc.qc.value = cv;
+      focus.value = cv;
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -155,14 +156,15 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       throws QueryException {
 
     // reset context and evaluate function
-    final Value cv = qc.value;
-    qc.value = null;
+    final QueryFocus qf = qc.focus;
+    final Value cv = qf.value;
+    qf.value = null;
     try {
       final int al = args.length;
       for(int a = 0; a < al; a++) qc.set(args[a], arg[a]);
       return expr.item(qc, ii);
     } finally {
-      qc.value = cv;
+      qf.value = cv;
     }
   }
 
@@ -171,14 +173,15 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       throws QueryException {
 
     // reset context and evaluate function
-    final Value cv = qc.value;
-    qc.value = null;
+    final QueryFocus qf = qc.focus;
+    final Value cv = qf.value;
+    qf.value = null;
     try {
       final int al = args.length;
       for(int a = 0; a < al; a++) qc.set(args[a], arg[a]);
       return qc.value(expr);
     } finally {
-      qc.value = cv;
+      qf.value = cv;
     }
   }
 

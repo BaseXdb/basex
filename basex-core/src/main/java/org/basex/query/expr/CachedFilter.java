@@ -17,6 +17,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public class CachedFilter extends Filter {
+  /** Focus. */
+  private final QueryFocus focus = new QueryFocus();
+
   /**
    * Constructor.
    * @param info input info
@@ -35,27 +38,26 @@ public class CachedFilter extends Filter {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     Value val = root.value(qc);
-    final Value cv = qc.value;
-    final long cs = qc.size, cp = qc.pos;
-
+    final QueryFocus qf = qc.focus;
+    qc.focus = focus;
     try {
       // evaluate first predicate, based on incoming value
       final ItemList buffer = new ItemList();
       Expr pred = preds[0];
       long vs = val.size();
-      qc.size = vs;
-      qc.pos = 1;
+      focus.size = vs;
+      focus.pos = 1;
 
       final boolean scoring = qc.scoring;
       for(int s = 0; s < vs; s++) {
         final Item item = val.itemAt(s);
-        qc.value = item;
+        focus.value = item;
         final Item test = pred.test(qc, info);
         if(test != null) {
           if(scoring) item.score(test.score());
           buffer.add(item);
         }
-        qc.pos++;
+        focus.pos++;
       }
       // save memory
       val = null;
@@ -65,18 +67,18 @@ public class CachedFilter extends Filter {
       for(int i = 1; i < pl; i++) {
         vs = buffer.size();
         pred = preds[i];
-        qc.size = vs;
-        qc.pos = 1;
+        focus.size = vs;
+        focus.pos = 1;
         int c = 0;
         for(int s = 0; s < vs; ++s) {
           final Item item = buffer.get(s);
-          qc.value = item;
+          focus.value = item;
           final Item test = pred.test(qc, info);
           if(test != null) {
             if(scoring) item.score(test.score());
             buffer.set(c++, item);
           }
-          qc.pos++;
+          focus.pos++;
         }
         buffer.size(c);
       }
@@ -84,9 +86,7 @@ public class CachedFilter extends Filter {
       // return resulting values
       return buffer.value();
     } finally {
-      qc.value = cv;
-      qc.size = cs;
-      qc.pos = cp;
+      qc.focus = qf;
     }
   }
 

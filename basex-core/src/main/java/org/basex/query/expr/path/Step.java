@@ -196,7 +196,7 @@ public abstract class Step extends Preds {
    * @throws QueryException query exception
    */
   final ANode checkNode(final QueryContext qc) throws QueryException {
-    final Value v = qc.value;
+    final Value v = qc.focus.value;
     if(v instanceof ANode) return (ANode) v;
     throw v == null ? NOCTX_X.get(info, this) : STEPNODE_X_X_X.get(info, this, v.type, v);
   }

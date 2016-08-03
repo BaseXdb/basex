@@ -353,7 +353,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Compares the current and specified expression for equality. {@code false} may be returned,
    * even if the expressions are equal.
-   * @param cmp expression to be compared
+   * @param cmp expression to be compared (can be {@code null})
    * @return result of check
    */
   public boolean sameAs(final Expr cmp) {

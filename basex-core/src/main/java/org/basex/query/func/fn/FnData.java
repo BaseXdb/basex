@@ -28,7 +28,8 @@ public final class FnData extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr = exprs.length > 0 ? exprs[0] : cc.qc.value != null ? cc.qc.value : this;
+    final Value v = cc.qc.focus.value;
+    final Expr expr = exprs.length > 0 ? exprs[0] : v != null ? v : this;
     final SeqType st = expr.seqType();
     if(st.type instanceof NodeType) {
       seqType = SeqType.get(AtomType.ATM, st.occ);

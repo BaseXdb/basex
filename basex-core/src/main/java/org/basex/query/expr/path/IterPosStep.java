@@ -75,8 +75,9 @@ final class IterPosStep extends Step {
        * @throws QueryException query exception
        */
       private boolean preds(final ANode node) throws QueryException {
-        final Value cv = qc.value;
-        qc.value = node;
+        final QueryFocus qf = qc.focus;
+        final Value cv = qf.value;
+        qf.value = node;
         try {
           double s = qc.scoring ? 0 : -1;
           final int pl = preds.length;
@@ -95,7 +96,7 @@ final class IterPosStep extends Step {
           }
           if(s > 0) node.score(Scoring.avg(s, preds.length));
         } finally {
-          qc.value = cv;
+          qf.value = cv;
         }
         return true;
       }

@@ -17,7 +17,7 @@ public final class FnLast extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Int.get(qc.size);
+    return Int.get(qc.focus.size);
   }
 
   @Override

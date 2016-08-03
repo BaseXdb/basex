@@ -125,8 +125,9 @@ public abstract class Path extends ParseExpr {
     // no steps
     if(steps.length == 0) return root == null ? new ContextValue(info) : root;
 
-    final Value init = cc.qc.value, cv = initial(cc);
-    cc.qc.value = cv;
+    final QueryFocus focus = cc.qc.focus;
+    final Value init = focus.value, cv = initial(cc);
+    focus.value = cv;
     final boolean doc = cv != null && cv.type == NodeType.DOC;
     try {
       final int sl = steps.length;
@@ -142,11 +143,11 @@ public abstract class Path extends ParseExpr {
           steps[s] = cc.error(ex, this);
         }
         // no axis step: invalidate context value
-        if(!as) cc.qc.value = null;
+        if(!as) focus.value = null;
       }
     } finally {
       if(doc) cv.type = NodeType.DOC;
-      cc.qc.value = init;
+      focus.value = init;
     }
     // optimize path
     return optimize(cc);
@@ -383,7 +384,7 @@ public abstract class Path extends ParseExpr {
    */
   public static Value initial(final CompileContext cc, final Expr root) {
     // current context value
-    final Value v = cc != null ? cc.qc.value : null;
+    final Value v = cc != null ? cc.qc.focus.value : null;
     // no root or context expression: return context
     if(root == null || root instanceof ContextValue) return v;
     // root reference
@@ -880,12 +881,13 @@ public abstract class Path extends ParseExpr {
 
     // #1202: during inlining, expressions will be optimized, which are based on the context value
     boolean changed = false;
-    final Value init = cc.qc.value;
-    cc.qc.value = null;
+    final QueryFocus focus = cc.qc.focus;
+    final Value init = focus.value;
+    focus.value = null;
     try {
       changed = inlineAll(steps, var, ex, cc);
     } finally {
-      cc.qc.value = init;
+      focus.value = init;
     }
 
     if(root != null) {

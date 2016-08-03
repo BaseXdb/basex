@@ -38,7 +38,7 @@ public final class Root extends Simple {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    final Value v = cc.qc.value;
+    final Value v = cc.qc.focus.value;
     return v != null && v.type == NodeType.DOC && v.size() == 1 ? v : this;
   }
 

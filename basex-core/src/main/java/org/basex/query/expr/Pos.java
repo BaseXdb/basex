@@ -104,7 +104,7 @@ public final class Pos extends Simple {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Bln.get(matches(qc.pos));
+    return Bln.get(matches(qc.focus.pos));
   }
 
   @Override

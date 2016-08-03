@@ -108,7 +108,7 @@ public abstract class ANum extends Item {
 
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) {
-    return dbl() == qc.pos ? this : null;
+    return dbl() == qc.focus.pos ? this : null;
   }
 
   @Override

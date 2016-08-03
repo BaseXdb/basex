@@ -84,12 +84,13 @@ public abstract class Filter extends Preds {
   public final Expr compile(final CompileContext cc) throws QueryException {
     root = root.compile(cc);
     // invalidate current context value (will be overwritten by filter)
-    final Value init = cc.qc.value;
-    cc.qc.value = Path.initial(cc, root);
+    final QueryFocus focus = cc.qc.focus;
+    final Value init = focus.value;
+    focus.value = Path.initial(cc, root);
     try {
       return super.compile(cc);
     } finally {
-      cc.qc.value = init;
+      focus.value = init;
     }
   }
 
@@ -120,13 +121,14 @@ public abstract class Filter extends Preds {
     if(root.isEmpty()) return optPre(cc);
 
     // remember current context value (will be temporarily overwritten)
-    final Value cv = cc.qc.value;
+    final QueryFocus focus = cc.qc.focus;
+    final Value cv = focus.value;
     try {
-      cc.qc.value = Path.initial(cc, root);
+      focus.value = Path.initial(cc, root);
       final Expr e = super.optimize(cc);
       if(e != this) return e;
     } finally {
-      cc.qc.value = cv;
+      focus.value = cv;
     }
 
     // check result size

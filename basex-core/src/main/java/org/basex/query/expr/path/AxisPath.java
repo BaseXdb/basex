@@ -51,7 +51,8 @@ public abstract class AxisPath extends Path {
         return iter(qc);
       case ENABLED:
         // caching is possible: remember context value
-        cvalue = qc.value instanceof DBNode ? ((DBNode) qc.value).finish() : qc.value;
+        final Value value = qc.focus.value;
+        cvalue = value instanceof DBNode ? ((DBNode) value).finish() : value;
         state = Caching.READY;
         break;
       case READY:
@@ -84,12 +85,12 @@ public abstract class AxisPath extends Path {
    * @return result of check
    */
   private boolean sameContext(final QueryContext qc) {
-    final Value cv = qc.value;
+    final Value v = qc.focus.value;
     // context value has not changed...
-    if(cv == cvalue && (cv == null || cv.sameAs(cvalue))) return true;
+    if(v == cvalue && (v == null || v.sameAs(cvalue))) return true;
     // otherwise, if path starts with root node, compare roots of cached and new context value
-    return root instanceof Root && cv instanceof ANode && cvalue instanceof ANode &&
-        ((ANode) cvalue).root().sameAs(((ANode) cv).root());
+    return root instanceof Root && v instanceof ANode && cvalue instanceof ANode &&
+        ((ANode) cvalue).root().sameAs(((ANode) v).root());
   }
 
   /**
@@ -138,10 +139,10 @@ public abstract class AxisPath extends Path {
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof AxisPath)) return false;
     final AxisPath ap = (AxisPath) cmp;
-    if((root == null || ap.root == null) && root != ap.root ||
-        steps.length != ap.steps.length || root != null && !root.sameAs(ap.root)) return false;
+    if(root == null ? ap.root != null : !root.sameAs(ap.root)) return false;
 
     final int sl = steps.length;
+    if(sl != ap.steps.length) return false;
     for(int s = 0; s < sl; s++) {
       if(!steps[s].sameAs(ap.steps[s])) return false;
     }

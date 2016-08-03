@@ -195,17 +195,18 @@ public final class For extends ForLet {
     if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;
 
     // reset context value (will not be accessible in predicate)
-    final Value cv = cc.qc.value;
+    final QueryFocus focus = cc.qc.focus;
+    final Value v = focus.value;
     Expr pred = ex;
     try {
-      cc.qc.value = null;
+      focus.value = null;
       // assign type of iterated items to context expression
-      final ContextValue c = new ContextValue(info);
-      c.seqType = expr.seqType().type.seqType();
-      final Expr r = ex.inline(var, c, cc);
+      final ContextValue cv = new ContextValue(info);
+      cv.seqType = expr.seqType().type.seqType();
+      final Expr r = ex.inline(var, cv, cc);
       if(r != null) pred = r;
     } finally {
-      cc.qc.value = cv;
+      focus.value = v;
     }
 
     // attach predicates to axis path or filter, or create a new filter

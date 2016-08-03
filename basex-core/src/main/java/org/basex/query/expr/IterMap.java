@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Simple map expression: iterative evaluation.
+ * Simple map expression: iterative evaluation (no positional access).
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -34,35 +34,29 @@ final class IterMap extends SimpleMap {
 
       @Override
       public Item next() throws QueryException {
-        final Value cv = qc.value;
-        // local copy of variable (faster)
-        int p = pos;
-        if(p == -1) {
-          values[++p] = cv;
-          iter[p] = qc.iter(exprs[0]);
+        final QueryFocus qf = qc.focus;
+        final Value cv = qf.value;
+        if(pos == -1) {
+          iter[++pos] = qc.iter(exprs[0]);
+          values[pos] = cv;
         }
+        qf.value = values[pos];
 
         try {
-          qc.value = values[p];
           while(true) {
-            final Item it = iter[p].next();
+            final Item it = iter[pos].next();
             if(it == null) {
-              iter[p] = null;
-              if(--p == -1) {
-                pos = p;
-                return null;
-              }
-            } else if(p < sz - 1) {
-              qc.value = it;
-              values[++p] = it;
-              iter[p] = qc.iter(exprs[p]);
+              if(--pos == -1) return null;
+            } else if(pos < sz - 1) {
+              qf.value = it;
+              values[++pos] = it;
+              iter[pos] = qc.iter(exprs[pos]);
             } else {
-              pos = p;
               return it;
             }
           }
         } finally {
-          qc.value = cv;
+          qf.value = cv;
         }
       }
     };

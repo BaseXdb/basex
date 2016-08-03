@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -16,6 +15,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CachedMap extends SimpleMap {
+  /** Focus. */
+  private final QueryFocus focus = new QueryFocus();
+
   /**
    * Constructor.
    * @param info input info
@@ -32,27 +34,27 @@ final class CachedMap extends SimpleMap {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value cv = qc.value;
-    final long cp = qc.pos, cs = qc.size;
+    Value result = qc.value(exprs[0]);
+
+    final QueryFocus qf = qc.focus;
+    qc.focus = focus;
     try {
-      ItemList result = qc.value(exprs[0]).cache();
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
-        qc.pos = 0;
-        qc.size = result.size();
-        final ItemList vb = new ItemList(result.size());
+        final Expr ex = exprs[e];
+        focus.pos = 0;
+        focus.size = result.size();
+        final ValueBuilder vb = new ValueBuilder();
         for(final Item it : result) {
-          qc.pos++;
-          qc.value = it;
-          vb.add(qc.value(exprs[e]));
+          focus.pos++;
+          focus.value = it;
+          vb.add(qc.value(ex));
         }
-        result = vb;
+        result = vb.value();
       }
-      return result.value();
+      return result;
     } finally {
-      qc.value = cv;
-      qc.size = cs;
-      qc.pos = cp;
+      qc.focus = qf;
     }
   }
 

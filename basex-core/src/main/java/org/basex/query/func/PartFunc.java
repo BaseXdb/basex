@@ -100,7 +100,7 @@ public final class PartFunc extends Arr {
     final FuncType tp = FuncType.get(anns, ft.type, vars);
     final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
         false, f, args);
-    return new FuncItem(sc, anns, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
+    return new FuncItem(sc, anns, null, vars, tp, fc, qc.focus, scp.stackSize());
   }
 
   @Override

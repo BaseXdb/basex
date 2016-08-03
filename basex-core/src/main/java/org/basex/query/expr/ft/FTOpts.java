@@ -2,6 +2,7 @@ package org.basex.query.expr.ft;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -34,7 +35,8 @@ public final class FTOpts extends FTExpr {
     final QueryContext qc = cc.qc;
     final FTOpt tmp = qc.ftOpt();
     qc.ftOpt(opt.copy(tmp));
-    if(opt.sw != null && qc.value != null && qc.value.data() != null) opt.sw.comp(qc.value.data());
+    final Value value = qc.focus.value;
+    if(opt.sw != null && value != null && value.data() != null) opt.sw.comp(value.data());
     exprs[0] = exprs[0].compile(cc);
     qc.ftOpt(tmp);
     return exprs[0];
