@@ -527,20 +527,28 @@ public final class EditorView extends View {
       // run query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(string(in)));
     } else if(xquery || run) {
-      // check if input is/might be an xquery main module
+      // check if input is an XQuery main or library module
       String input = string(in);
       boolean lib = QueryProcessor.isLibrary(input);
+
+      // check if query is to be executed
       final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
-      if(exec && lib) {
-        final EditorArea ea = execEditor();
-        if(ea != null) {
-          file = ea.file();
-          input = string(ea.getText());
-          lib = false;
+      if(exec) {
+        if(lib) {
+          // library module: run recently evaluated main module
+          final EditorArea ea = execEditor();
+          if(ea != null) {
+            file = ea.file();
+            input = string(ea.getText());
+            lib = false;
+          }
         }
+      } else if(input.isEmpty()) {
+        // parse empty query: replace with empty sequence (suppresses errors for plain text files)
+        input = "()";
       }
 
-      if(!lib && exec) {
+      if(exec && !lib) {
         // run query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input).baseURI(file.path()));
         execFile = file;
@@ -588,7 +596,7 @@ public final class EditorView extends View {
   }
 
   /**
-   * Returns the editor that has been executed last.
+   * Returns the editor whose contents have been executed last.
    * @return editor
    */
   private EditorArea execEditor() {
