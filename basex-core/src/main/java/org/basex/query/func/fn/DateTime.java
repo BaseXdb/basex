@@ -14,7 +14,6 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 abstract class DateTime extends StandardFunc {
-
   /**
    * Checks if the specified item is a Duration item. If it is untyped,
    * a duration is returned.
@@ -22,7 +21,7 @@ abstract class DateTime extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  Dur checkDur(final Item it) throws QueryException {
+  protected Dur checkDur(final Item it) throws QueryException {
     if(it instanceof Dur) return (Dur) it;
     if(it.type.isUntyped()) return new Dur(it.string(info), info);
     throw castError(it, AtomType.DUR, info);
@@ -37,7 +36,7 @@ abstract class DateTime extends StandardFunc {
    * @return date
    * @throws QueryException query exception
    */
-  ADate checkDate(final Item it, final AtomType t, final QueryContext qc)
+  protected ADate checkDate(final Item it, final AtomType t, final QueryContext qc)
       throws QueryException {
     return (ADate) (it.type.isUntyped() ? t.cast(it, qc, sc, info) : checkType(it, t));
   }
@@ -47,7 +46,7 @@ abstract class DateTime extends StandardFunc {
    * @param it input item
    * @return timezone
    */
-  static DTDur zon(final ADate it) {
+  protected static DTDur zon(final ADate it) {
     return it.hasTz() ? new DTDur(0, it.tz()) : null;
   }
 
@@ -59,7 +58,7 @@ abstract class DateTime extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  ADate adjust(final Item it, final AtomType t, final QueryContext qc)
+  protected ADate adjust(final Item it, final AtomType t, final QueryContext qc)
       throws QueryException {
 
     final ADate ad;

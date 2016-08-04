@@ -36,7 +36,7 @@ import org.xml.sax.*;
  */
 final class DigitalSignature {
   /** Canonicalization algorithms. */
-  private static final TokenMap CANONICALIZATIONS = new TokenMap();
+  private static final TokenMap CANONICALS = new TokenMap();
   /** Signature digest algorithms. */
   private static final TokenMap DIGESTS = new TokenMap();
   /** Signature algorithms. */
@@ -56,14 +56,10 @@ final class DigitalSignature {
 
   // initializations
   static {
-    CANONICALIZATIONS.put("inclusive-with-comments",
-        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS);
-    CANONICALIZATIONS.put("exclusive-with-comments",
-        CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS);
-    CANONICALIZATIONS.put("inclusive",
-        CanonicalizationMethod.INCLUSIVE);
-    CANONICALIZATIONS.put("exclusive",
-        CanonicalizationMethod.EXCLUSIVE);
+    CANONICALS.put("inclusive-with-comments", CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS);
+    CANONICALS.put("exclusive-with-comments", CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS);
+    CANONICALS.put("inclusive", CanonicalizationMethod.INCLUSIVE);
+    CANONICALS.put("exclusive", CanonicalizationMethod.EXCLUSIVE);
 
     DIGESTS.put("sha1", DigestMethod.SHA1);
     DIGESTS.put("sha256", DigestMethod.SHA256);
@@ -110,7 +106,7 @@ final class DigitalSignature {
     // checking input variables
     byte[] b = c;
     if(b.length == 0) b = DEFC;
-    b = CANONICALIZATIONS.get(lc(b));
+    b = CANONICALS.get(lc(b));
     if(b == null) throw CX_CANINV.get(info, c);
     final String canonicalization = string(b);
 

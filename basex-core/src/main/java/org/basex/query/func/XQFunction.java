@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.value.*;

@@ -30,19 +30,14 @@ public final class QueryResources {
   /** Database context. */
   private final QueryContext qc;
 
+  /** Module loader. */
+  private ModuleLoader modules;
   /** Collections: single nodes and sequences. */
   private final ArrayList<Value> colls = new ArrayList<>(1);
   /** Names of collections. */
   private final ArrayList<String> collNames = new ArrayList<>(1);
-  /** Opened databases (both temporary and persistent ones). */
-  private final ArrayList<Data> datas = new ArrayList<>(1);
   /** Indicates if the first database in the context is globally opened. */
   private boolean globalData;
-
-  /** Module loader. */
-  private ModuleLoader modules;
-  /** External resources. */
-  private Map<Class<? extends QueryResource>, QueryResource> external;
 
   /** Textual resources. Required for test APIs. */
   private Map<String, String[]> texts;
@@ -50,6 +45,11 @@ public final class QueryResources {
   private Map<String, IO> stop;
   /** Cached thesaurus files. Required for test APIs. */
   private Map<String, IO> thes;
+
+  /** Opened databases (both temporary and persistent ones). [SINGLE] */
+  private final ArrayList<Data> datas = new ArrayList<>(1);
+  /** External resources [SINGLE]. */
+  private Map<Class<? extends QueryResource>, QueryResource> external;
 
   /**
    * Constructor.

@@ -15,9 +15,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CachedMap extends SimpleMap {
-  /** Focus. */
-  private final QueryFocus focus = new QueryFocus();
-
   /**
    * Constructor.
    * @param info input info
@@ -36,7 +33,7 @@ final class CachedMap extends SimpleMap {
   public Value value(final QueryContext qc) throws QueryException {
     Value result = qc.value(exprs[0]);
 
-    final QueryFocus qf = qc.focus;
+    final QueryFocus qf = qc.focus, focus = new QueryFocus();
     qc.focus = focus;
     try {
       final int el = exprs.length;

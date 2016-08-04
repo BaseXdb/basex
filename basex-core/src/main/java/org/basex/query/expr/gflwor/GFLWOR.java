@@ -854,6 +854,7 @@ public final class GFLWOR extends ParseExpr {
   public abstract static class Clause extends ParseExpr {
     /** All variables declared in this clause. */
     final Var[] vars;
+
     /**
      * Constructor.
      * @param info input info

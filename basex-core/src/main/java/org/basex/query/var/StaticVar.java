@@ -36,7 +36,7 @@ public final class StaticVar extends StaticDecl {
    * @param var variable
    * @param expr expression to be bound
    * @param external external flag
-   * @param doc current xqdoc cache
+   * @param doc xqdoc string
    */
   StaticVar(final VarScope vs, final AnnList anns, final Var var, final Expr expr,
       final boolean external, final String doc) {

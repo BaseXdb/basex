@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 final class JDBCConnections implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
-  /** Map with all open connections and prepared statements with unique ids. */
+  /** Map with all open connections and prepared statements with unique ids [SINGLE]. */
   private final IntObjMap<Object> conns = new IntObjMap<>();
 
   /**

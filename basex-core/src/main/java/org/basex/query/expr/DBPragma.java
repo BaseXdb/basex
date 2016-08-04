@@ -19,7 +19,7 @@ import org.basex.util.options.*;
 public final class DBPragma extends Pragma {
   /** Option key. */
   private final Option<?> option;
-  /** Cached value. */
+  /** Cached value [SINGLE]. */
   private Object old;
 
   /**

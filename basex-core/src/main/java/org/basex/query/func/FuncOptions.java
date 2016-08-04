@@ -34,7 +34,7 @@ public final class FuncOptions {
   /** Input info. */
   private final InputInfo info;
 
-  /** Reject unknown options. */
+  /** Accept unknown options. */
   private boolean acceptUnknown;
 
   /**

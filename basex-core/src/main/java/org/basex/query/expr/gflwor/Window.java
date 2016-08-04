@@ -36,7 +36,7 @@ public final class Window extends Clause {
   private Expr expr;
   /** The start condition. */
   private Condition start;
-  /** the {@code only} flag. */
+  /** The {@code only} flag. */
   private final boolean only;
   /** The end condition, possibly {@code null}. */
   private Condition end;

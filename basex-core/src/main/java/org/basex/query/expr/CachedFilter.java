@@ -17,9 +17,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public class CachedFilter extends Filter {
-  /** Focus. */
-  private final QueryFocus focus = new QueryFocus();
-
   /**
    * Constructor.
    * @param info input info
@@ -38,7 +35,7 @@ public class CachedFilter extends Filter {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     Value val = root.value(qc);
-    final QueryFocus qf = qc.focus;
+    final QueryFocus qf = qc.focus, focus = new QueryFocus();
     qc.focus = focus;
     try {
       // evaluate first predicate, based on incoming value

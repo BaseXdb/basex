@@ -9,7 +9,12 @@ import org.basex.query.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 
-/** Abstract validator class. */
+/**
+ * Abstract validator class.
+ *
+ * @author BaseX Team 2005-16, BSD License
+ * @author Christian Gruen
+ */
 abstract class Validation {
   /** Temporary schema instance. */
   private IOFile schema;

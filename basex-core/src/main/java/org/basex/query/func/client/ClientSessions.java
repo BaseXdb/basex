@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Opened database client sessions.
+ * Opened database client sessions [SINGLE].
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen

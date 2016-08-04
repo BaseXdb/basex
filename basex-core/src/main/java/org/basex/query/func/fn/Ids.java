@@ -30,7 +30,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class Ids extends StandardFunc {
-  /** Hash map for data references and id flags. */
+  /** Hash map for data references and id flags [SINGLE]. */
   final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
 
   /**

@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
 public final class FTContains extends Single {
   /** Full-text parser. */
   private final FTLexer lex;
-  /** Full-text expression. */
+  /** Full-text expression. [SINGLE] */
   public FTExpr ftexpr;
 
   /**

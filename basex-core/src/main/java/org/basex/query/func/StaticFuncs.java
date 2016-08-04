@@ -46,7 +46,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param args formal parameters
    * @param type declared return type
    * @param expr function body
-   * @param doc current xqdoc cache
+   * @param doc xqdoc string
    * @param vs variable scope
    * @param ii input info
    * @return static function reference

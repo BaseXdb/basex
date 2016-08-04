@@ -20,9 +20,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class MixedPath extends Path {
-  /** Focus. */
-  private final QueryFocus focus = new QueryFocus();
-
   /**
    * Constructor.
    * @param info input info
@@ -59,7 +56,7 @@ public final class MixedPath extends Path {
       sz = rt.size();
     }
 
-    final QueryFocus qf = qc.focus;
+    final QueryFocus qf = qc.focus, focus = new QueryFocus();
     qc.focus = focus;
     try {
       // loop through all expressions

@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FnFormatInteger extends StandardFunc {
-  /** Pattern cache. */
+  /** Pattern cache [SINGLE]. */
   private final TokenObjMap<FormatParser> formats = new TokenObjMap<>();
 
   @Override

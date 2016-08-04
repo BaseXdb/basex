@@ -29,7 +29,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @param anns annotations
    * @param expr bound expression, possibly {@code null}
    * @param ext {@code external} flag
-   * @param doc current xqdoc cache
+   * @param doc xqdoc string
    * @param vs variable scope
    * @return static variable reference
    * @throws QueryException query exception

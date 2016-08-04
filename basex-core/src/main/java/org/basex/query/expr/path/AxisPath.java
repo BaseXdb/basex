@@ -24,11 +24,11 @@ public abstract class AxisPath extends Path {
     /** Caching is disabled. */ DISABLED
   }
 
-  /** Current state. */
+  /** Current state [SINGLE]. */
   private Caching state = Caching.INIT;
-  /** Cached result. */
+  /** Cached result [SINGLE]. */
   private Value cached;
-  /** Cached context value. */
+  /** Cached context value [SINGLE]. */
   private Value cvalue;
 
   /**

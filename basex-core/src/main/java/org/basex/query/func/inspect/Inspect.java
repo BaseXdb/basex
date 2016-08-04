@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Inspect function.
+ * Abstract inspector class.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen

@@ -50,7 +50,7 @@ public abstract class Test {
   /** Indicates if test will match exactly one node (e.g.: @id). */
   public boolean unique;
 
-  /** Mutable QName instance. */
+  /** Mutable QName instance [SINGLE]. */
   final QNm tmpq = new QNm();
 
   /**

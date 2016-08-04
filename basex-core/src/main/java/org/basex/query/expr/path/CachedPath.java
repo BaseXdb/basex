@@ -20,9 +20,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CachedPath extends AxisPath {
-  /** Focus. */
-  private final QueryFocus focus = new QueryFocus();
-
   /**
    * Constructor.
    * @param info input info
@@ -35,7 +32,7 @@ final class CachedPath extends AxisPath {
 
   @Override
   protected NodeIter nodeIter(final QueryContext qc) throws QueryException {
-    final QueryFocus qf = qc.focus;
+    final QueryFocus qf = qc.focus, focus = new QueryFocus();
     final Value r = root != null ? qc.value(root) : qf.value;
     qc.focus = focus;
     final ANodeList list = new ANodeList().check();
@@ -74,7 +71,7 @@ final class CachedPath extends AxisPath {
     final boolean more = step + 1 != steps.length;
     for(ANode node; (node = ni.next()) != null;) {
       if(more) {
-        focus.value = node;
+        qc.focus.value = node;
         iter(step + 1, list, qc);
       } else {
         qc.checkStop();

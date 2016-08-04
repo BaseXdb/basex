@@ -20,14 +20,15 @@ import org.basex.util.hash.*;
 public final class FuncLit extends Single implements Scope {
   /** Variable scope. */
   private final VarScope vs;
-  /** Annotations. */
-  private AnnList anns;
   /** Function name. */
   private final QNm name;
   /** Formal parameters. */
   private final Var[] args;
   /** If the function's type should be checked at compile time. */
   private final boolean check;
+
+  /** Annotations. */
+  private AnnList anns;
   /** Compilation flag. */
   private boolean compiled;
 

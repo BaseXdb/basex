@@ -47,7 +47,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param args arguments
    * @param type declared return type
    * @param expr function body
-   * @param doc current xqdoc cache
+   * @param doc xqdoc string
    * @param vs variable scope
    * @param info input info
    */

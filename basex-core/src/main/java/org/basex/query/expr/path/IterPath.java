@@ -19,9 +19,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class IterPath extends AxisPath {
-  /** Focus. */
-  private final QueryFocus focus = new QueryFocus();
-
   /**
    * Constructor.
    * @param info input info
@@ -35,20 +32,17 @@ final class IterPath extends AxisPath {
   @Override
   protected NodeIter nodeIter(final QueryContext qc) {
     return new NodeIter() {
-      final boolean r = root != null;
-      final int sz = steps.length + (r ? 1 : 0);
-      final Expr[] exprs = r ? new ExprList(sz).add(root).add(steps).finish() : steps;
-      final Iter[] iter = new Iter[sz];
+      Expr[] exprs;
+      Iter[] iter;
+      QueryFocus focus;
       ANode last;
-      int pos = -1;
+      int pos, sz;
+      boolean r;
 
       @Override
       public ANode next() throws QueryException {
         final QueryFocus qf = qc.focus;
-        if(pos == -1) {
-          iter[++pos] = qc.iter(exprs[0]);
-          focus.value = qf.value;
-        }
+        if(exprs == null) init(qf);
         qc.focus = focus;
 
         try {
@@ -74,6 +68,16 @@ final class IterPath extends AxisPath {
         } finally {
           qc.focus = qf;
         }
+      }
+
+      private void init(final QueryFocus qf) throws QueryException {
+        r = root != null;
+        sz = steps.length + (r ? 1 : 0);
+        exprs = r ? new ExprList(sz).add(root).add(steps).finish() : steps;
+        iter = new Iter[sz];
+        iter[0] = qc.iter(exprs[0]);
+        focus = new QueryFocus();
+        focus.value = qf.value;
       }
     };
   }

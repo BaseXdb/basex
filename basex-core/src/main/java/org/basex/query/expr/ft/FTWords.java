@@ -27,9 +27,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {
-  /** All matches. */
+  /** All matches [SINGLE]. */
   FTMatches matches = new FTMatches();
-  /** Flag for first evaluation. */
+  /** Flag for first evaluation [SINGLE]. */
   boolean first;
   /** Search mode; default: {@link FTMode#ANY}. */
   FTMode mode = FTMode.ANY;

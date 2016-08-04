@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  */
 abstract class ClientFn extends StandardFunc {
   /**
-   * Returns the sessions handler.
+   * Returns the sessions handler [SINGLE].
    * @param qc query context
    * @return connection handler
    */

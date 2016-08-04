@@ -32,22 +32,22 @@ import org.basex.util.list.*;
 final class DataUpdates {
   /** Data reference. */
   private final Data data;
-  /** Pre values of target nodes. */
-  private IntList nodes = new IntList(0);
-  /** Mapping between pre values of the target nodes and all node updates
-   * which operate on this target. */
-  private IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<>();
-  /** Atomic update cache. */
-  private AtomicUpdateCache auc;
-
-  /** Database updates. */
-  private final List<DBUpdate> dbUpdates = new LinkedList<>();
-  /** Put operations which reflect all changes made during the snapshot, hence executed
-   * after updates have been carried out. */
-  private final IntObjMap<Put> puts = new IntObjMap<>();
-
   /** Write databases back to disk. */
   private final boolean writeback;
+
+  /** Mapping between pre values of the target nodes and all node updates
+   * which operate on this target [SINGLE]. */
+  private IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<>();
+  /** Database updates [SINGLE]. */
+  private final List<DBUpdate> dbUpdates = new LinkedList<>();
+  /** Put operations which reflect all changes made during the snapshot, hence executed
+   * after updates have been carried out [SINGLE]. */
+  private final IntObjMap<Put> puts = new IntObjMap<>();
+
+  /** Pre values of target nodes. */
+  private IntList nodes = new IntList(0);
+  /** Atomic update cache. */
+  private AtomicUpdateCache auc;
   /** Number of updates. */
   private int size;
 
