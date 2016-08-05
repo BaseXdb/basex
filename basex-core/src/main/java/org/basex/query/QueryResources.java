@@ -115,7 +115,11 @@ public final class QueryResources {
   public synchronized <R extends QueryResource> R index(final Class<? extends R> resource) {
     if(external == null) external = new HashMap<>();
     if(!external.containsKey(resource)) {
-      external.put(resource, Reflect.get(resource));
+      try {
+        external.put(resource, resource.newInstance());
+      } catch(final Throwable ex) {
+        throw Util.notExpected(ex);
+      }
     }
     return (R) external.get(resource);
   }
