@@ -172,16 +172,11 @@ public class DBNode extends ANode {
 
   @Override
   public final QNm qname() {
-    return type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI ?
-      qname(new QNm()) : null;
-  }
-
-  @Override
-  public final QNm qname(final QNm name) {
-    // update the name and uri strings in the specified QName
-    final byte[][] qname = data.qname(pre, kind());
-    name.set(qname[0], qname[1]);
-    return name;
+    if(type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI) {
+      final byte[][] qname = data.qname(pre, kind());
+      return new QNm(qname[0], qname[1]);
+    }
+    return null;
   }
 
   @Override

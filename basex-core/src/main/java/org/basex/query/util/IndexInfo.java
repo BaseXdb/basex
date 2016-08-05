@@ -209,7 +209,7 @@ public final class IndexInfo {
    *   <li> //*[@x = 'TEXT']        -> x </li>
    *   <li> //@x[. = 'TEXT']        -> x </lI>
    * </ul>
-   * @return local name and namespace uri (result, or name or uri, can be {@code null})
+   * @return local name and namespace uri (either result, name, and uri can be {@code null})
    */
   private byte[][] qname() {
     Step s = step;

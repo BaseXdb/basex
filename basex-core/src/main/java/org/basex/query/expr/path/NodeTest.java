@@ -52,7 +52,7 @@ public final class NodeTest extends Test {
   @Override
   public boolean eq(final ANode node) {
     return node.type == type &&
-      (name == null || node.qname(tmpq).eq(name)) &&
+      (name == null || node.qname().eq(name)) &&
       (ext == null || ext == AtomType.ATY || ext == AtomType.UTY ||
       type == NodeType.ATT && (ext == AtomType.AST || ext == AtomType.AAT || ext == AtomType.ATM));
   }

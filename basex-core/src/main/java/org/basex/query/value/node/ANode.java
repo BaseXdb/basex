@@ -110,9 +110,8 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the name of the node, composed of an optional prefix and the local name.
-   * This function must only be called for element and attribute nodes.
-   * It is more efficient than calling {@link #qname}, as no {@link QNm}
-   * instance is created.
+   * This function must only be called for elements, attributes and pi's.
+   * It is more efficient than calling {@link #qname}, as no {@link QNm} instance must be created.
    * @return name
    */
   public byte[] name() {
@@ -127,16 +126,6 @@ public abstract class ANode extends Item {
   public QNm qname() {
     return null;
   }
-
-  /**
-   * Updates the specified with the information of the current node.
-   * This is more efficient than calling {@link #qname}, as an existing
-   * {@link QNm} instance is reused.
-   * This function must only be called for elements, attributes and pi's.
-   * @param nm temporary qname
-   * @return name
-   */
-  public abstract QNm qname(final QNm nm);
 
   /**
    * Minimizes the memory consumption of the node.
