@@ -129,8 +129,7 @@ public final class Let extends ForLet {
    * @throws QueryException query exception
    */
   Expr inlineExpr(final CompileContext cc) throws QueryException {
-    return scoring ? cc.function(Function._FT_SCORE, info, expr).optimize(cc) :
-      var.checked(expr, cc);
+    return scoring ? cc.function(Function._FT_SCORE, info, expr) : var.checked(expr, cc);
   }
 
   @Override

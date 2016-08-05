@@ -292,7 +292,8 @@ public abstract class Expr extends ExprInfo {
    * It is utilized by {@link VarRef#inline}, {@link FuncItem#inlineExpr},
    * {@link Closure#inlineExpr} and {@link StaticFunc#inlineExpr}.
    * @param cc compilation context
-   * @param vm mapping from old variable IDs to new variable copies
+   * @param vm mapping from old variable IDs to new variable copies.
+   *           Required by {@link Closure#copy} and {@link VarRef#copy}
    * @return copied expression
    */
   public abstract Expr copy(CompileContext cc, IntObjMap<Var> vm);

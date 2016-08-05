@@ -64,8 +64,9 @@ public final class Lookup extends Arr {
       if(oneInput) {
         // one function, rewrite to for-each or function call
         final Expr opt = ks.size() == 1 || ks.seqType().one()
-            ? new DynFuncCall(info, cc.sc(), fs, ks) : cc.function(Function.FOR_EACH, info, exprs);
-        return optPre(opt, cc).optimize(cc);
+            ? new DynFuncCall(info, cc.sc(), fs, ks).optimize(cc)
+            : cc.function(Function.FOR_EACH, info, exprs);
+        return optPre(opt, cc);
       }
 
       if(ks.isValue()) {

@@ -94,19 +94,17 @@ public final class If extends Arr {
         if(b == Bln.FALSE) {
           // if(A) then false() else true() -> not(A)
           cc.info(OPTPRE_X, this);
-          return cc.function(Function.NOT, info, a).optimize(cc);
+          return cc.function(Function.NOT, info, a);
         }
         // if(A) then B else true() -> not(A) or B
         cc.info(OPTREWRITE_X, this);
-        final Expr notA = cc.function(Function.NOT, info, a).optimize(cc);
-        return new Or(info, notA, b).optimize(cc);
+        return new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
       }
 
       if(b == Bln.FALSE) {
         // if(A) then false() else C -> not(A) and C
         cc.info(OPTREWRITE_X, this);
-        final Expr notA = cc.function(Function.NOT, info, a).optimize(cc);
-        return new And(info, notA, c).optimize(cc);
+        return new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
       }
 
       if(c == Bln.FALSE) {

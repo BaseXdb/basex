@@ -186,13 +186,13 @@ public abstract class Filter extends Preds {
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
-        e = e instanceof Filter ? ((Filter) e).addPred(pred) : get(info, e, pred);
+        e = (e instanceof Filter ? ((Filter) e).addPred(pred) : get(info, e, pred)).optimize(cc);
       }
     }
 
     if(opt) {
       cc.info(QueryText.OPTREWRITE_X, this);
-      return e.optimize(cc);
+      return e;
     }
 
     // standard iterator

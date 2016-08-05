@@ -78,7 +78,7 @@ public final class Or extends Logical {
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
       final Expr ex = new And(info, inner).optimize(cc);
-      return cc.function(Function.NOT, info, ex).optimize(cc);
+      return cc.function(Function.NOT, info, ex);
     }
 
     // return single expression if it yields a boolean
