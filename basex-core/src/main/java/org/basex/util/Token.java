@@ -1067,6 +1067,7 @@ public final class Token {
    */
   public static byte[] normalize(final byte[] token) {
     final int l = token.length;
+    if(l == 0) return token;
     final byte[] tmp = new byte[l];
     int c = 0;
     boolean ws1 = true;

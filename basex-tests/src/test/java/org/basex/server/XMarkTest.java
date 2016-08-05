@@ -1,4 +1,4 @@
-package org.basex.local.single;
+package org.basex.server;
 
 import static org.basex.core.Text.*;
 
@@ -23,6 +23,8 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class XMarkTest {
+  /** Test user. */
+  private static final String USER = "xmark";
   /** Name of database. */
   private static final String DB = "111mb";
 
@@ -109,8 +111,6 @@ public final class XMarkTest {
     + "count( for $p in $auction/site/people/person where empty($p/profile/@income) return $p ) } "
     + "</na> </result>"
   };
-  /** Queries to exclude. */
-  private static final IntList EXCLUDE = new IntList().add(8, 9, 10, 11, 12);
 
   /** Server flag. */
   private static BaseXServer server;
@@ -124,10 +124,10 @@ public final class XMarkTest {
     // only start server if it is not already running
     if(!BaseXServer.ping(StaticOptions.HOST.value(), StaticOptions.PORT.value()))
       server = new BaseXServer();
-    try(final ClientSession cs = createClient()) {
-      if(!Boolean.valueOf(cs.query("db:exists('" + DB + "')").execute())) {
-        throw new BaseXException("Database '" + DB + "' was not found.");
-      }
+
+    try(final ClientSession cs = createClient(true)) {
+      cs.execute("create user xmark xmark");
+      cs.execute("grant read on " + DB + " to xmark");
     }
   }
 
@@ -148,19 +148,24 @@ public final class XMarkTest {
    */
   @Test
   public void test() throws Exception {
+    final IntList exclude = new IntList(new int[] { 11, 12 });
     final TokenBuilder tb = new TokenBuilder().add(DB).add(Prop.NL);
 
-    try(final ClientSession cs = createClient()) {
+    try(final ClientSession cs = createClient(false)) {
       cs.execute(new Open(DB));
 
       // ignore first run
       System.out.println("Warming up...");
       for(int i = 1; i <= 20; i++) {
-        if(!EXCLUDE.contains(i)) {
+        if(!exclude.contains(i)) {
           try(final ClientQuery cq = cs.query(QUERIES[i - 1])) {
             final Performance p = new Performance();
             cq.execute();
             System.out.println(i + ": " + p);
+          } catch(final BaseXException ex) {
+            // too slow queries will be stopped after client timeout
+            System.out.println(i + ": " + ex);
+            exclude.add(i);
           }
         }
       }
@@ -170,7 +175,7 @@ public final class XMarkTest {
         tb.add(String.format("%02d", i)).add("  ");
         final BigDecimal max = BigDecimal.valueOf(MAX);
         try(final ClientQuery cq = cs.query(QUERIES[i - 1])) {
-          if(EXCLUDE.contains(i)) {
+          if(exclude.contains(i)) {
             tb.add("1000000");
           } else {
             double min = Double.MAX_VALUE;
@@ -198,11 +203,12 @@ public final class XMarkTest {
 
   /**
    * Creates a client instance.
+   * @param admin admin user
    * @return client instance
    * @throws IOException I/O exception
    */
-  private static ClientSession createClient() throws IOException {
-    return new ClientSession(S_LOCALHOST, StaticOptions.PORT.value(),
-        UserText.ADMIN, UserText.ADMIN);
+  private static ClientSession createClient(final boolean admin) throws IOException {
+    final String user = admin ? UserText.ADMIN : USER;
+    return new ClientSession(S_LOCALHOST, StaticOptions.PORT.value(), user, user);
   }
 }

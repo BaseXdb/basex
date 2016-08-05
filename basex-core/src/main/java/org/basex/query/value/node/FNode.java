@@ -7,7 +7,6 @@ import org.basex.core.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -30,11 +29,6 @@ public abstract class FNode extends ANode {
   public byte[] string() {
     if(value == null) value = Token.EMPTY;
     return value;
-  }
-
-  @Override
-  public final QNm qname(final QNm nm) {
-    return qname();
   }
 
   @Override

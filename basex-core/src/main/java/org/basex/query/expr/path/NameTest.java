@@ -88,10 +88,10 @@ public final class NameTest extends Test {
       // namespaces wildcard: only check local name
       case NAME: return Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
-      case URI: return Token.eq(name.uri(), node.qname(tmpq).uri());
+      case URI: return Token.eq(name.uri(), node.qname().uri());
       // check attributes, or check everything
       default: return type == NodeType.ATT && name.uri().length == 0 ?
-        Token.eq(local, node.name()) : name.eq(node.qname(tmpq));
+        Token.eq(local, node.name()) : name.eq(node.qname());
     }
   }
 
