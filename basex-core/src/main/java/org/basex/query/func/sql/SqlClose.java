@@ -2,8 +2,6 @@ package org.basex.query.func.sql;
 
 import static org.basex.query.QueryError.*;
 
-import java.sql.*;
-
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -18,19 +16,15 @@ public final class SqlClose extends SqlFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
-    try {
-      final int id = (int) toLong(exprs[0], qc);
-      final JDBCConnections jdbc = jdbc(qc);
-      final Object obj = jdbc.get(id);
-      if(obj instanceof Connection) {
-        ((Connection) obj).close();
-      } else {
-        ((PreparedStatement) obj).close();
-      }
+
+    final int id = (int) toLong(exprs[0], qc);
+    final JDBCConnections jdbc = jdbc(qc);
+    try(final AutoCloseable sql = jdbc.get(id)) {
+      // try-with-resources: resource will automatically be closed
       jdbc.remove(id);
-      return null;
-    } catch(final SQLException ex) {
+    } catch(final Exception ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
+    return null;
   }
 }

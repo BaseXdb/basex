@@ -102,6 +102,7 @@ public final class Updates {
    * node has already been added to the pending update list, the corresponding
    * data reference and the pre value of the given target node within this
    * database table are calculated. Otherwise a new data instance is created.
+   * This function is called during query evaluation.
    *
    * @param target target fragment
    * @param qc query context
@@ -119,12 +120,15 @@ public final class Updates {
      * In this case a database has already been created.
      */
     final int ancID = anc.id;
-    MemData data = fragmentIDs.get(ancID);
-    // if data doesn't exist, create a new one
-    if(data == null) {
-      data = (MemData) anc.dbNodeCopy(qc.context.options).data();
-      // create a mapping between the fragment id and the data reference
-      fragmentIDs.put(ancID, data);
+    MemData data;
+    synchronized(fragmentIDs) {
+      data = fragmentIDs.get(ancID);
+      // if data doesn't exist, create a new one
+      if(data == null) {
+        data = (MemData) anc.dbNodeCopy(qc.context.options).data();
+        // create a mapping between the fragment id and the data reference
+        fragmentIDs.put(ancID, data);
+      }
     }
 
     // determine the pre value of the target node within its database
@@ -133,7 +137,7 @@ public final class Updates {
   }
 
   /**
-   * Prepares update operations.
+   * Prepares update operations. Called after query evaluation.
    * @param qc query context
    * @return updated data references
    * @throws QueryException query exception
@@ -145,7 +149,7 @@ public final class Updates {
   }
 
   /**
-   * Executes all updates.
+   * Executes all updates. Called after query evaluation.
    * @param qc query context
    * @throws QueryException query exception
    */
@@ -154,7 +158,7 @@ public final class Updates {
   }
 
   /**
-   * Returns the names of all databases that will be updated.
+   * Returns the names of all databases that will be updated. Called after query evaluation.
    * @return databases
    */
   public StringList databases() {

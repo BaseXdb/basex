@@ -26,12 +26,12 @@ public final class TransformModifier extends ContextModifier {
   private final Set<Data> refs = new HashSet<>();
 
   @Override
-  public void addData(final Data data) {
+  public synchronized void addData(final Data data) {
     refs.add(data);
   }
 
   @Override
-  void add(final Update up, final QueryContext qc) throws QueryException {
+  synchronized void add(final Update up, final QueryContext qc) throws QueryException {
     // Disallow side-effecting updates within transform expressions.
     if(!(up instanceof NodeUpdate)) throw BASX_DBTRANSFORM.get(up.info());
 

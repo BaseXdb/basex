@@ -25,7 +25,7 @@ final class ClientSessions implements QueryResource {
    * @param cs client session
    * @return session id
    */
-  Uri add(final ClientSession cs) {
+  synchronized Uri add(final ClientSession cs) {
     final byte[] uri = Token.token(Prop.PROJECT_NAME + "://" + cs + '/' + ++lastId);
     conns.put(uri, cs);
     return Uri.uri(uri);
@@ -36,7 +36,7 @@ final class ClientSessions implements QueryResource {
    * @param id session id
    * @return session
    */
-  ClientSession get(final Uri id) {
+  synchronized ClientSession get(final Uri id) {
     return conns.get(id.string());
   }
 
@@ -44,15 +44,15 @@ final class ClientSessions implements QueryResource {
    * Removes a session.
    * @param id session id
    */
-  void remove(final Uri id) {
+  synchronized void remove(final Uri id) {
     conns.delete(id.string());
   }
 
   @Override
   public void close() {
-    for(final byte[] c : conns) {
-      try(final ClientSession cs = conns.get(c)) {
-        /* close */
+    for(final ClientSession cs : conns.values()) {
+      try {
+        if(cs != null) cs.close();
       } catch(final IOException ex) {
         Util.debug(ex);
       }

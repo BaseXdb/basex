@@ -68,7 +68,7 @@ public final class QueryContext extends Job implements Closeable {
   public QueryResources resources;
   /** HTTP context. */
   public Object http;
-  /** Pending updates. */
+  /** Update container. */
   public Updates updates;
 
   /** Global database options (will be reassigned after query execution). */
@@ -410,10 +410,10 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Returns a reference to the updates.
-   * @return updates
+   * Returns a reference to the updates container.
+   * @return updates container
    */
-  public Updates updates() {
+  public synchronized Updates updates() {
     if(updates == null) updates = new Updates(false);
     return updates;
   }

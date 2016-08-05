@@ -28,7 +28,7 @@ abstract class RegEx extends StandardFunc {
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
+  protected Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
       final boolean check) throws QueryException {
 
     final byte[] pat = toToken(pattern, qc);
@@ -36,11 +36,10 @@ abstract class RegEx extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder(pat);
     if(mod != null) tb.add(0).add(mod);
     final byte[] key = tb.finish();
-    Pattern p = patterns.get(key);
-    if(p == null) {
-      p = RegExParser.parse(pat, mod, info, check);
-      patterns.put(key, p);
+
+    synchronized(patterns) {
+      if(!patterns.contains(key)) patterns.put(key, RegExParser.parse(pat, mod, info, check));
     }
-    return p;
+    return patterns.get(key);
   }
 }

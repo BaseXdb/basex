@@ -28,11 +28,9 @@ public final class FnFormatInteger extends StandardFunc {
     if(it == null) return Str.ZERO;
     final long num = toLong(it);
 
-    FormatParser fp = formats.get(pic);
-    if(fp == null) {
-      fp = new IntFormat(pic, info);
-      formats.put(pic, fp);
+    synchronized(formats) {
+      if(!formats.contains(pic)) formats.put(pic, new IntFormat(pic, info));
     }
-    return Str.get(Formatter.get(lng).formatInt(num, fp));
+    return Str.get(Formatter.get(lng).formatInt(num, formats.get(pic)));
   }
 }
