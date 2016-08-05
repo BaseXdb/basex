@@ -163,6 +163,7 @@ public final class XMarkTest {
             cq.execute();
             System.out.println(i + ": " + p);
           } catch(final BaseXException ex) {
+            // too slow queries will be stopped after client timeout
             System.out.println(i + ": " + ex);
             exclude.add(i);
           }
