@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -38,11 +40,13 @@ public final class Extension extends Single {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
+    final ArrayList<Object> cache = new ArrayList<>();
+    for(final Pragma p : pragmas) cache.add(p.init(cc.qc, info));
     try {
-      for(final Pragma p : pragmas) p.init(cc.qc, info);
       expr = expr.compile(cc);
     } finally {
-      for(final Pragma p : pragmas) p.finish(cc.qc);
+      int c = 0;
+      for(final Pragma p : pragmas) p.finish(cc.qc, cache.get(c++));
     }
     return optimize(cc);
   }
@@ -61,11 +65,13 @@ public final class Extension extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final ArrayList<Object> cache = new ArrayList<>();
+    for(final Pragma p : pragmas) cache.add(p.init(qc, info));
     try {
-      for(final Pragma p : pragmas) p.init(qc, info);
       return qc.value(expr);
     } finally {
-      for(final Pragma p : pragmas) p.finish(qc);
+      int c = 0;
+      for(final Pragma p : pragmas) p.finish(qc, cache.get(c++));
     }
   }
 

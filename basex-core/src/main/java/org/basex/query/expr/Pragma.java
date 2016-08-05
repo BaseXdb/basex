@@ -39,15 +39,17 @@ public abstract class Pragma extends ExprInfo {
    * Initializes the pragma expression.
    * @param qc query context
    * @param info input info
+   * @return cached information
    * @throws QueryException query exception
    */
-  abstract void init(final QueryContext qc, final InputInfo info) throws QueryException;
+  abstract Object init(final QueryContext qc, final InputInfo info) throws QueryException;
 
   /**
    * Finalizes the pragma expression.
    * @param qc query context
+   * @param cache TODO
    */
-  abstract void finish(final QueryContext qc);
+  abstract void finish(final QueryContext qc, Object cache);
 
   /**
    * Indicates if an expression has the specified compiler property.
