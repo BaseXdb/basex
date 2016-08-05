@@ -19,8 +19,6 @@ import org.basex.util.options.*;
 public final class DBPragma extends Pragma {
   /** Option key. */
   private final Option<?> option;
-  /** Cached value. */
-  private Object old;
 
   /**
    * Constructor.
@@ -34,18 +32,19 @@ public final class DBPragma extends Pragma {
   }
 
   @Override
-  void init(final QueryContext qc, final InputInfo info) throws QueryException {
-    old = qc.context.options.get(option);
+  Object init(final QueryContext qc, final InputInfo info) throws QueryException {
+    final Object old = qc.context.options.get(option);
     try {
       qc.context.options.assign(option.name(), string(value));
     } catch(final BaseXException ex) {
       throw BASX_VALUE_X_X.get(info, option.name(), value);
     }
+    return old;
   }
 
   @Override
-  void finish(final QueryContext qc) {
-    qc.context.options.put(option, old);
+  void finish(final QueryContext qc, final Object cache) {
+    qc.context.options.put(option, cache);
   }
 
   @Override

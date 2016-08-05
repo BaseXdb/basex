@@ -22,11 +22,12 @@ public final class BaseXPragma extends Pragma {
   }
 
   @Override
-  void init(final QueryContext qc, final InputInfo info) {
+  Object init(final QueryContext qc, final InputInfo info) {
+    return null;
   }
 
   @Override
-  void finish(final QueryContext qc) {
+  void finish(final QueryContext qc, final Object cache) {
   }
 
   @Override
