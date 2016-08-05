@@ -12,7 +12,7 @@ import org.basex.util.*;
  */
 public final class QueryStack {
   /** Initial stack size. */
-  private static final int INIT = 1 << 5;
+  private static final int INIT = 1 << 3;
   /** The currently assigned values. */
   private Value[] stack = new Value[INIT];
   /** The currently assigned variables. */

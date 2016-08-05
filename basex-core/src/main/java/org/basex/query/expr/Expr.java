@@ -289,6 +289,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Copies an expression. Used for inlining functions, or for copying static queries.
+   * It is utilized by {@link VarRef#inline}, {@link FuncItem#inlineExpr},
+   * {@link Closure#inlineExpr} and {@link StaticFunc#inlineExpr}.
    * @param cc compilation context
    * @param vm mapping from old variable IDs to new variable copies
    * @return copied expression
