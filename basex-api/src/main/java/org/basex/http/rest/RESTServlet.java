@@ -16,15 +16,18 @@ import org.basex.util.http.*;
 public final class RESTServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws IOException {
+    // open database if name was specified
     final RESTSession session = new RESTSession(http, http.context(true));
-    final RESTCmd cmd = code(session);
+    final String db = http.db(), path = http.dbpath();
+    if(!db.isEmpty()) session.add(new Open(db, path));
+
+    // generate and run commands
+    final RESTCmd cmd = command(session);
     try {
       cmd.execute(session.context);
     } catch(final BaseXException ex) {
-      // catch "database not found" message
-      final String msg = Open.dbnf(http.db());
-      if(ex.getMessage().equals(msg)) throw HTTPCode.NOT_FOUND_X.get(msg);
-      throw ex;
+      // ignore error if code was assigned (same error message)
+      if(cmd.code == null) throw ex;
     }
 
     final HTTPCode code = cmd.code;
@@ -32,12 +35,12 @@ public final class RESTServlet extends BaseXServlet {
   }
 
   /**
-   * Returns the correct code for the specified HTTP method, or an exception.
+   * Creates and returns a REST command.
    * @param session session
    * @return code
    * @throws IOException I/O exception
    */
-  private static RESTCmd code(final RESTSession session) throws IOException {
+  private static RESTCmd command(final RESTSession session) throws IOException {
     final String mth = session.http.method;
     if(mth.equals(HttpMethod.GET.name()))    return RESTGet.get(session);
     if(mth.equals(HttpMethod.POST.name()))   return RESTPost.get(session);

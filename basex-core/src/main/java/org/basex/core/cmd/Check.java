@@ -27,7 +27,7 @@ public final class Check extends Command {
   @Override
   protected boolean run() {
     // close existing database
-    new Close().run(context);
+    close(context);
 
     // input (can be path or XML string)
     final String input = args[0];
@@ -94,6 +94,6 @@ public final class Check extends Command {
 
   @Override
   public boolean newData(final Context ctx) {
-    return new Close().run(ctx);
+    return close(ctx);
   }
 }

@@ -51,7 +51,7 @@ class RESTQuery extends RESTCmd {
     context.options.set(MainOptions.SERIALIZER, http.sopts());
     http.initResponse();
 
-    for(final Command cmd : cmds) {
+    for(final Command cmd : session.commands) {
       if(cmd instanceof XQuery) {
         final XQuery xq = (XQuery) cmd;
         // create query instance
@@ -87,9 +87,6 @@ class RESTQuery extends RESTCmd {
   @SuppressWarnings("unused")
   static RESTQuery get(final RESTSession session, final String query,
       final Map<String, String[]> vars, final String val) throws IOException {
-
-    open(session);
-    session.add(new XQuery(query));
-    return new RESTQuery(session, vars, val);
+    return new RESTQuery(session.add(new XQuery(query)), vars, val);
   }
 }

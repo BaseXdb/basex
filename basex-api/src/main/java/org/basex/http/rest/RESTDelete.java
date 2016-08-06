@@ -16,7 +16,7 @@ final class RESTDelete {
   private RESTDelete() { }
 
   /**
-   * Creates a new instance of this command.
+   * Creates and returns a REST command.
    * @param session REST session
    * @return command
    * @throws IOException I/O exception
@@ -29,11 +29,8 @@ final class RESTDelete {
     if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
     // open database to ensure it exists
-    session.add(new Open(db));
     final String path = http.dbpath();
-    if(path.isEmpty()) session.add(new DropDB(db));
-    else session.add(new Delete(path));
-
-    return new RESTExec(session);
+    session.add(path.isEmpty() ? new DropDB(db) : new Delete(path));
+    return new RESTExec(session, false);
   }
 }

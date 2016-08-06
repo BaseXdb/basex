@@ -31,7 +31,7 @@ final class RESTRetrieve extends RESTCmd {
   @Override
   protected void run0() throws IOException {
     // open addressed database
-    for(final Command cmd : cmds) run(cmd);
+    for(final Command cmd : session.commands) run(cmd);
 
     final HTTPContext http = session.http;
     final SerializerOptions sopts = http.sopts();
@@ -76,9 +76,7 @@ final class RESTRetrieve extends RESTCmd {
    * @return command
    */
   static RESTCmd get(final RESTSession session) {
-    final HTTPContext http = session.http;
-    final String db = http.db();
-    if(db.isEmpty()) return new RESTList(session.add(new List()));
-    return new RESTRetrieve(session.add(new Open(db)));
+    final String db = session.http.db();
+    return db.isEmpty() ? new RESTList(session.add(new List())) : new RESTRetrieve(session);
   }
 }

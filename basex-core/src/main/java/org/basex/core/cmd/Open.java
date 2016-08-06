@@ -43,7 +43,7 @@ public final class Open extends Command {
     // check if database is already opened
     Data data = context.data();
     if(data == null || !data.meta.name.equals(db)) {
-      new Close().run(context);
+      close(context);
       try {
         data = open(db, context, options);
         context.openDB(data);
@@ -68,7 +68,7 @@ public final class Open extends Command {
 
   @Override
   public boolean newData(final Context ctx) {
-    return new Close().run(ctx);
+    return close(ctx);
   }
 
   /**
@@ -89,7 +89,7 @@ public final class Open extends Command {
       Data data = context.datas.pin(name);
       if(data == null) {
         // check if the addressed database exists
-        if(!context.soptions.dbExists(name)) throw new BaseXException(dbnf(name));
+        if(!context.soptions.dbExists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
 
         // do not open a database that is currently updated
         final MetaData meta = new MetaData(name, options, context.soptions);
@@ -101,14 +101,5 @@ public final class Open extends Command {
       }
       return data;
     }
-  }
-
-  /**
-   * Returns an error message for an unknown database.
-   * @param name name of database
-   * @return error message
-   */
-  public static String dbnf(final String name) {
-    return Util.info(DB_NOT_FOUND_X, name);
   }
 }

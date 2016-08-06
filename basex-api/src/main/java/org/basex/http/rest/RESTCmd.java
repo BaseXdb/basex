@@ -26,8 +26,6 @@ import org.basex.util.list.*;
 abstract class RESTCmd extends Command {
   /** REST session. */
   final RESTSession session;
-  /** Commands. */
-  final ArrayList<Command> cmds;
 
   /** Return code (may be {@code null}). */
   HTTPCode code;
@@ -37,15 +35,14 @@ abstract class RESTCmd extends Command {
    * @param session REST session
    */
   RESTCmd(final RESTSession session) {
-    super(max(session.cmds));
+    super(max(session.commands));
     this.session = session;
-    cmds = session.cmds;
     job().type(RESTText.REST);
   }
 
   @Override
   public void databases(final LockResult lr) {
-    for(final Command cmd : cmds) {
+    for(final Command cmd : session.commands) {
       // collect local locks and merge it with global lock list
       final LockResult tmp = new LockResult();
       cmd.databases(tmp);
@@ -56,12 +53,12 @@ abstract class RESTCmd extends Command {
   @Override
   public boolean updating(final Context ctx) {
     boolean up = false;
-    for(final Command cmd : cmds) up |= cmd.updating(ctx);
+    for(final Command cmd : session.commands) up |= cmd.updating(ctx);
     return up;
   }
 
   @Override
-  protected final boolean run() {
+  protected final boolean run() throws IOException {
     try {
       run0();
       return true;
@@ -99,8 +96,13 @@ abstract class RESTCmd extends Command {
   final void run(final Command cmd, final OutputStream os) throws HTTPException {
     try {
       final boolean ok = pushJob(cmd).run(context, os);
-      error(cmd.info());
-      if(!ok) throw HTTPCode.BAD_REQUEST_X.get(cmd.info());
+      // only return info of last command
+      final String info = cmd.info();
+      error(info);
+      if(!ok) {
+        if(cmd instanceof Open) code = HTTPCode.NOT_FOUND_X;
+        throw HTTPCode.BAD_REQUEST_X.get(info);
+      }
     } finally {
       popJob();
     }
@@ -124,15 +126,6 @@ abstract class RESTCmd extends Command {
       el.add(list.get(0));
       root.add(el);
     }
-  }
-
-  /**
-   * Adds a command or opening the addressed database.
-   * @param session REST session
-   */
-  static void open(final RESTSession session) {
-    final String db = session.http.db();
-    if(!db.isEmpty()) session.add(new Open(db, session.http.dbpath()));
   }
 
   /**
