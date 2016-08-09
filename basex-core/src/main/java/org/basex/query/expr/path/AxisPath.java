@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import static org.basex.query.expr.path.PathCache.State;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -15,21 +16,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AxisPath extends Path {
-  /** Caching states. */
-  private enum Caching {
-    /** Initialize caching.  */ INIT,
-    /** Caching is possible. */ ENABLED,
-    /** Ready to cache.      */ READY,
-    /** Results are cached.  */ CACHED,
-    /** Caching is disabled. */ DISABLED
-  }
-
-  /** Current state. */
-  private Caching state = Caching.INIT;
-  /** Cached result. */
-  private Value cached;
-  /** Cached context value. */
-  private Value cvalue;
+  /** Thread-safe path caching. */
+  private final ThreadLocal<PathCache> caches = new ThreadLocal<PathCache>() {
+    @Override
+    public PathCache initialValue() {
+      return new PathCache();
+    }
+  };
 
   /**
    * Constructor.
@@ -43,53 +36,41 @@ public abstract class AxisPath extends Path {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    switch(state) {
+    final PathCache cache = caches.get();
+    switch(cache.state) {
       case INIT:
-        // initialize caching flag
-        state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD)
-            ? Caching.ENABLED : Caching.DISABLED;
+        // first invocation: initialize caching flag
+        cache.state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD)
+            ? State.ENABLED : State.DISABLED;
         return iter(qc);
       case ENABLED:
-        // caching is possible: remember context value
-        cvalue = qc.value instanceof DBNode ? ((DBNode) qc.value).finish() : qc.value;
-        state = Caching.READY;
+        // second invocation, caching is enabled: cache context value (copy light-weight db nodes)
+        cache.initial = qc.value instanceof DBNode ? ((DBNode) qc.value).finish() : qc.value;
+        cache.state = State.READY;
         break;
       case READY:
-        // values are ready to cache
-        if(sameContext(qc)) {
-          cached = nodeIter(qc).value();
-          state = Caching.CACHED;
+        // third invocation, ready for caching: cache result if context has not changed
+        if(cache.sameContext(qc.value, root)) {
+          cache.result = nodeIter(qc).value();
+          cache.state = State.CACHED;
         } else {
-          // disable caching if context has changed (expected to change frequently)
-          state = Caching.DISABLED;
+          // disable caching if context has changed
+          cache.state = State.DISABLED;
         }
         break;
       case CACHED:
-        // last result was cached
-        if(!sameContext(qc)) {
-          // disable caching if context has changed (expected to change frequently)
-          cached = null;
-          state = Caching.DISABLED;
+        // further invocations, result is cached: disable caching if context has changed
+        if(!cache.sameContext(qc.value, root)) {
+          cache.result = null;
+          cache.state = State.DISABLED;
         }
         break;
       case DISABLED:
     }
-    // return new iterator or cached values
-    return cached == null ? nodeIter(qc) : cached.iter();
-  }
 
-  /**
-   * Checks if the specified context value is different to the cached one.
-   * @param qc query context
-   * @return result of check
-   */
-  private boolean sameContext(final QueryContext qc) {
-    final Value cv = qc.value;
-    // context value has not changed...
-    if(cv == cvalue && (cv == null || cv.sameAs(cvalue))) return true;
-    // otherwise, if path starts with root node, compare roots of cached and new context value
-    return root instanceof Root && cv instanceof ANode && cvalue instanceof ANode &&
-        ((ANode) cvalue).root().sameAs(((ANode) cv).root());
+    // iterate or return cached values
+    final Value result = cache.result;
+    return result == null ? nodeIter(qc) : result.iter();
   }
 
   /**
