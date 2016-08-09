@@ -42,7 +42,7 @@ public abstract class ContextModifier {
    * @param qc query context
    * @throws QueryException query exception
    */
-  void add(final Update update, final QueryContext qc) throws QueryException {
+  synchronized void add(final Update update, final QueryContext qc) throws QueryException {
     if(update instanceof DataUpdate) {
       final DataUpdate dataUp = (DataUpdate) update;
       final Data data = dataUp.data();
@@ -79,6 +79,7 @@ public abstract class ContextModifier {
 
   /**
    * Adds the names of all databases to be updated to the specified list.
+   * Called by a single thread after query evaluation.
    * @param db databases
    */
   void databases(final StringList db) {
@@ -92,6 +93,7 @@ public abstract class ContextModifier {
 
   /**
    * Prepares the update operations and adds all databases to be updated to the specified list.
+   * Called by a single thread after query evaluation.
    * @param qc query context
    * @param datas updated data references
    * @throws QueryException query exception
@@ -107,7 +109,7 @@ public abstract class ContextModifier {
   }
 
   /**
-   * Applies all updates.
+   * Applies all updates. Called by a single thread after query evaluation.
    * @param qc query context
    * @throws QueryException query exception
    */

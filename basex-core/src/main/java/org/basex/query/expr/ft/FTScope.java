@@ -34,12 +34,12 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex) {
+  protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
     if(same) {
       int s = -1;
-      for(final FTStringMatch sm : mtc) {
+      for(final FTStringMatch sm : match) {
         if(sm.exclude) continue;
-        final int p = pos(sm.start, lex);
+        final int p = pos(sm.start, lexer);
         if(s == -1) s = p;
         else if(s != p) return false;
       }
@@ -47,12 +47,12 @@ public final class FTScope extends FTFilter {
     }
     int c = 0;
     final BoolList bl = new BoolList();
-    for(final FTStringMatch sm : mtc) {
+    for(final FTStringMatch sm : match) {
       if(sm.exclude) continue;
       c++;
-      final int p = pos(sm.start, lex);
+      final int p = pos(sm.start, lexer);
       final int s = bl.size();
-      if(p < s && bl.get(p) && p == pos(sm.end, lex)) return false;
+      if(p < s && bl.get(p) && p == pos(sm.end, lexer)) return false;
       bl.set(p, true);
     }
     return c > 1;

@@ -18,7 +18,7 @@ public final class Exit extends Command {
 
   @Override
   protected boolean run() {
-    return new Close().run(context);
+    return close(context);
   }
 
   @Override

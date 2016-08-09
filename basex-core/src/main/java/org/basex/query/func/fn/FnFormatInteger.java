@@ -16,8 +16,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FnFormatInteger extends StandardFunc {
-  /** Pattern cache [SINGLE]. */
-  private final TokenObjMap<FormatParser> formats = new TokenObjMap<>();
+  /** Pattern cache. */
+  private final TokenObjMap<IntFormat> formats = new TokenObjMap<>();
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -28,11 +28,14 @@ public final class FnFormatInteger extends StandardFunc {
     if(it == null) return Str.ZERO;
     final long num = toLong(it);
 
-    FormatParser fp = formats.get(pic);
-    if(fp == null) {
-      fp = new IntFormat(pic, info);
-      formats.put(pic, fp);
+    IntFormat format;
+    synchronized(formats) {
+      format = formats.get(pic);
+      if(format == null) {
+        format = new IntFormat(pic, info);
+        formats.put(pic, format);
+      }
     }
-    return Str.get(Formatter.get(lng).formatInt(num, fp));
+    return Str.get(Formatter.get(lng).formatInt(num, format));
   }
 }

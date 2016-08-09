@@ -21,26 +21,30 @@ abstract class RegEx extends StandardFunc {
 
   /**
    * Returns a regular expression pattern.
-   * @param pattern input pattern
+   * @param regex pattern
    * @param modifier modifier item
    * @param qc query context
    * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
+  protected Pattern pattern(final Expr regex, final Expr modifier, final QueryContext qc,
       final boolean check) throws QueryException {
 
-    final byte[] pat = toToken(pattern, qc);
+    final byte[] pat = toToken(regex, qc);
     final byte[] mod = modifier != null ? toToken(modifier, qc) : null;
     final TokenBuilder tb = new TokenBuilder(pat);
     if(mod != null) tb.add(0).add(mod);
     final byte[] key = tb.finish();
-    Pattern p = patterns.get(key);
-    if(p == null) {
-      p = RegExParser.parse(pat, mod, info, check);
-      patterns.put(key, p);
+
+    Pattern pattern;
+    synchronized(patterns) {
+      pattern = patterns.get(key);
+      if(pattern == null) {
+        pattern = RegExParser.parse(pat, mod, info, check);
+        patterns.put(key, pattern);
+      }
     }
-    return p;
+    return pattern;
   }
 }

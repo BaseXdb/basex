@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class FTOpts extends FTExpr {
+public final class FTOptions extends FTExpr {
   /** FTOptions. */
   private final FTOpt opt;
 
@@ -23,9 +23,9 @@ public final class FTOpts extends FTExpr {
    * Constructor.
    * @param info input info
    * @param expr expression
-   * @param opt ft options
+   * @param opt full-text options
    */
-  public FTOpts(final InputInfo info, final FTExpr expr, final FTOpt opt) {
+  public FTOptions(final InputInfo info, final FTExpr expr, final FTOpt opt) {
     super(info, expr);
     this.opt = opt;
   }
@@ -34,12 +34,14 @@ public final class FTOpts extends FTExpr {
   public FTExpr compile(final CompileContext cc) throws QueryException {
     final QueryContext qc = cc.qc;
     final FTOpt tmp = qc.ftOpt();
-    qc.ftOpt(opt.copy(tmp));
+    qc.ftOpt(opt.assign(tmp));
     final Value value = qc.focus.value;
-    if(opt.sw != null && value != null && value.data() != null) opt.sw.comp(value.data());
-    exprs[0] = exprs[0].compile(cc);
-    qc.ftOpt(tmp);
-    return exprs[0];
+    try {
+      if(opt.sw != null && value != null && value.data() != null) opt.sw.comp(value.data());
+      return exprs[0].compile(cc);
+    } finally {
+      qc.ftOpt(tmp);
+    }
   }
 
   @Override
@@ -66,6 +68,6 @@ public final class FTOpts extends FTExpr {
 
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new FTOpts(info, exprs[0].copy(cc, vm), new FTOpt().copy(opt));
+    return new FTOptions(info, exprs[0].copy(cc, vm), new FTOpt().assign(opt));
   }
 }

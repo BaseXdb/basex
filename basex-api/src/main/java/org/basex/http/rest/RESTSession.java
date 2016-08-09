@@ -13,10 +13,10 @@ import org.basex.http.*;
  * @author Christian Gruen
  */
 final class RESTSession {
+  /** Commands to be executed. */
+  final ArrayList<Command> commands = new ArrayList<>();
   /** HTTP context. */
   final HTTPContext http;
-  /** Commands to be executed. */
-  final ArrayList<Command> cmds = new ArrayList<>();
   /** Client context. */
   final Context context;
 
@@ -36,7 +36,7 @@ final class RESTSession {
    * @return self reference
    */
   RESTSession add(final Command cmd) {
-    cmds.add(cmd);
+    commands.add(cmd);
     return this;
   }
 
@@ -47,7 +47,7 @@ final class RESTSession {
    * @return self reference
    */
   RESTSession add(final Command cmd, final InputStream is) {
-    cmds.add(cmd);
+    commands.add(cmd);
     cmd.setInput(is);
     return this;
   }

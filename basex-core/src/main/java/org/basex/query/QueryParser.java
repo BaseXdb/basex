@@ -328,9 +328,8 @@ public class QueryParser extends InputParser {
       final int i = pos;
       if(wsConsumeWs(DECLARE)) {
         if(wsConsumeWs(DEFAULT)) {
-          if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
-             !emptyOrderDecl() && !decimalFormatDecl(true))
-            throw error(DECLINCOMPLETE);
+          if(!defaultNamespaceDecl() && !defaultCollationDecl() && !emptyOrderDecl() &&
+             !decimalFormatDecl(true)) throw error(DECLINCOMPLETE);
         } else if(wsConsumeWs(BOUNDARY_SPACE)) {
           boundarySpaceDecl();
         } else if(wsConsumeWs(BASE_URI)) {
@@ -348,9 +347,10 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(NAMESPACE)) {
           namespaceDecl();
         } else if(wsConsumeWs(FT_OPTION)) {
+          // subsequent assignment required to enable duplicate checks
           final FTOpt fto = new FTOpt();
           while(ftMatchOption(fto));
-          qc.ftOpt().copy(fto);
+          qc.ftOpt().assign(fto);
         } else {
           pos = i;
           return;
@@ -3346,15 +3346,18 @@ public class QueryParser extends InputParser {
     while(ftMatchOption(fto)) found = true;
 
     // check if specified language is not available
-    if(fto.ln == null) fto.ln = Language.def();
-    if(!Tokenizer.supportFor(fto.ln)) throw error(FTNOTOK_X, fto.ln);
-    if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln)) throw error(FTNOSTEM_X, fto.ln);
+    if(found) {
+      if(fto.ln == null) fto.ln = Language.def();
+      if(!Tokenizer.supportFor(fto.ln)) throw error(FTNOTOK_X, fto.ln);
+      if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln))
+        throw error(FTNOSTEM_X, fto.ln);
+    }
 
     // consume weight option
     if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosedExpr());
 
     // skip options if none were specified...
-    return found ? new FTOpts(info(), expr, fto) : expr;
+    return found ? new FTOptions(info(), expr, fto) : expr;
   }
 
   /**

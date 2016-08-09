@@ -41,7 +41,7 @@ public abstract class FTFilter extends FTExpr {
   @Override
   public final FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FTNode it = exprs[0].item(qc, info);
-    filter(qc, it, qc.ftToken);
+    filter(qc, it, qc.ftLexer);
     return it;
   }
 
@@ -53,6 +53,7 @@ public abstract class FTFilter extends FTExpr {
       public FTNode next() throws QueryException {
         FTNode it;
         while((it = ir.next()) != null) {
+          // only create lexer if content needs to be parsed
           if(filter(qc, it, content() ? new FTLexer().init(it.string(info)) : null)) break;
         }
         return it;
@@ -64,16 +65,16 @@ public abstract class FTFilter extends FTExpr {
    * Evaluates the position filters.
    * @param qc query context
    * @param item input node
-   * @param lex tokenizer
+   * @param lexer lexer (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean filter(final QueryContext qc, final FTNode item, final FTLexer lex)
+  private boolean filter(final QueryContext qc, final FTNode item, final FTLexer lexer)
       throws QueryException {
 
     final FTMatches all = item.matches();
     for(int a = 0; a < all.size(); a++) {
-      if(!filter(qc, all.match[a], lex)) all.delete(a--);
+      if(!filter(qc, all.match[a], lexer)) all.delete(a--);
     }
     return !all.isEmpty();
   }
@@ -81,17 +82,17 @@ public abstract class FTFilter extends FTExpr {
   /**
    * Evaluates the filter expression.
    * @param qc query context
-   * @param m full-text match
-   * @param ft tokenizer
+   * @param match full-text match
+   * @param lexer lexer (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  protected abstract boolean filter(final QueryContext qc, final FTMatch m, final FTLexer ft)
+  protected abstract boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer)
       throws QueryException;
 
   /**
    * Checks if the filter requires the whole text node to be parsed.
-   * Is overwritten by some filters to perform other checks.
+   * Is overwritten by {@link FTContent} to perform other checks.
    * @return result of check
    */
   boolean content() {
@@ -100,13 +101,12 @@ public abstract class FTFilter extends FTExpr {
 
   /**
    * Calculates a position value, dependent on the specified unit.
-   * @param p word position
-   * @param ft tokenizer
+   * @param pos word position
+   * @param lexer tokenizer (can be {@code null} if {@link #unit} is {@link FTUnit#WORDS})
    * @return new position
    */
-  final int pos(final int p, final FTLexer ft) {
-    // ft can be zero if unit is WORDS
-    return unit == FTUnit.WORDS ? p : ft.pos(p, unit);
+  final int pos(final int pos, final FTLexer lexer) {
+    return unit == FTUnit.WORDS ? pos : lexer.pos(pos, unit);
   }
 
   @Override

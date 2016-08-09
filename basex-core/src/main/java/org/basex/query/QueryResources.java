@@ -46,9 +46,9 @@ public final class QueryResources {
   /** Cached thesaurus files. Required for test APIs. */
   private Map<String, IO> thes;
 
-  /** Opened databases (both temporary and persistent ones). [SINGLE] */
+  /** Opened databases (both temporary and persistent ones). */
   private final ArrayList<Data> datas = new ArrayList<>(1);
-  /** External resources [SINGLE]. */
+  /** External resources. */
   private Map<Class<? extends QueryResource>, QueryResource> external;
 
   /**
@@ -84,26 +84,6 @@ public final class QueryResources {
   }
 
   /**
-   * Adds an external resource.
-   * @param ext external resource
-   */
-  public synchronized void add(final QueryResource ext) {
-    if(external == null) external = new HashMap<>();
-    external.put(ext.getClass(), ext);
-  }
-
-  /**
-   * Returns an external resource of the specified class.
-   * @param <R> resource
-   * @param resource external resource
-   * @return resource
-   */
-  @SuppressWarnings("unchecked")
-  public synchronized <R extends QueryResource> R get(final Class<? extends R> resource) {
-    return external != null ? (R) external.get(resource) : null;
-  }
-
-  /**
    * Closes all opened data references that have not been added by the global context.
    */
   void close() {
@@ -115,6 +95,33 @@ public final class QueryResources {
     if(external != null) {
       for(final QueryResource c : external.values()) c.close();
     }
+  }
+
+  /**
+   * Returns the globally opened database.
+   * @return database or {@code null} if no database is globally opened
+   */
+  Data globalData() {
+    return globalData ? datas.get(0) : null;
+  }
+
+  /**
+   * Returns or creates an external resource of the specified class.
+   * @param <R> resource
+   * @param resource external resource
+   * @return resource
+   */
+  @SuppressWarnings("unchecked")
+  public synchronized <R extends QueryResource> R index(final Class<? extends R> resource) {
+    if(external == null) external = new HashMap<>();
+    if(!external.containsKey(resource)) {
+      try {
+        external.put(resource, resource.newInstance());
+      } catch(final Throwable ex) {
+        throw Util.notExpected(ex);
+      }
+    }
+    return (R) external.get(resource);
   }
 
   /**
@@ -213,8 +220,7 @@ public final class QueryResources {
   }
 
   /**
-   * Removes and closes a database if it has not been added by the global context.
-   * Called during updates.
+   * Removes and closes a database. Called during updates.
    * @param name name of database to be removed
    */
   public void remove(final String name) {
@@ -230,7 +236,7 @@ public final class QueryResources {
   }
 
   /**
-   * Returns the document path of a textual resource and its encoding.
+   * Returns the document path of a textual resource and its encoding. Only required for test APIs.
    * @param uri resource uri
    * @return path and encoding, or {@code null}
    */
@@ -239,7 +245,7 @@ public final class QueryResources {
   }
 
   /**
-   * Returns stop words. Called during parsing.
+   * Returns stop words. Called during parsing, and only required for test APIs.
    * @param path resource path
    * @param sc static context
    * @return file reference
@@ -249,21 +255,13 @@ public final class QueryResources {
   }
 
   /**
-   * Returns a thesaurus file. Called during parsing.
+   * Returns a thesaurus file. Called during parsing, and only required for Test APIs.
    * @param path resource path
    * @param sc static context
    * @return file reference
    */
   public IO thesaurus(final String path, final StaticContext sc) {
     return thes != null ? thes.get(path) : sc.resolve(path, null);
-  }
-
-  /**
-   * Returns the globally opened database.
-   * @return database or {@code null} if no database is globally opened
-   */
-  Data globalData() {
-    return globalData ? datas.get(0) : null;
   }
 
   // TEST APIS ====================================================================================
@@ -331,7 +329,7 @@ public final class QueryResources {
    * @return document
    * @throws QueryException query exception
    */
-  private synchronized Data data(final QueryInput qi, final InputInfo info, final boolean single)
+  private Data data(final QueryInput qi, final InputInfo info, final boolean single)
       throws QueryException {
 
     // check opened databases

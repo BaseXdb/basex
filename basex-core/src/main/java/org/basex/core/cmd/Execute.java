@@ -34,7 +34,7 @@ public class Execute extends Command {
 
   @Override
   public final boolean newData(final Context ctx) {
-    return new Close().run(ctx);
+    return close(ctx);
   }
 
   @Override

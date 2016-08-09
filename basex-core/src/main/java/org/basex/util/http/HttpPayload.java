@@ -250,7 +250,7 @@ public final class HttpPayload {
   /**
    * Returns a map with multipart form data.
    * @param type media type
-   * @return map or {@code null}
+   * @return map with file names and contents
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
@@ -258,28 +258,29 @@ public final class HttpPayload {
     // parse boundary, create helper arrays
     final byte[] bound = concat(DASHES, boundary(type)), last = concat(bound, DASHES);
 
-    final HashMap<String, Value> map = new HashMap<>();
+    final HashMap<String, Value> data = new HashMap<>();
     final ByteList cont = new ByteList();
     int lines = -1;
-    String name = null, fn = null;
+    String name = null, filename = null;
     for(byte[] line; (line = readLine()) != null;) {
       if(lines >= 0) {
         if(startsWith(line, bound)) {
-          Value val = map.get(name);
-          if(val == null && fn != null) val = Map.EMPTY;
-          if(fn != null && val instanceof Map) {
-            final Map m = (Map) val;
-            final Str k = Str.get(fn);
-            final Value v = new ValueBuilder().add(m.get(k, info)).add(
-                new B64(cont.next())).value();
-            val = m.put(k, v, info);
+          // get old value
+          Value val = data.get(name);
+          if(filename != null) {
+            // assign file and contents, join multiple files
+            final Map map = val instanceof Map ? (Map) val : Map.EMPTY;
+            final Str file = Str.get(filename);
+            final B64 contents = new B64(cont.next());
+            final Value files = new ValueBuilder().add(map.get(file, info)).add(contents).value();
+            val = map.put(file, files, info);
           } else {
-            val = Str.get(cont.next());
+            // assign string, join multiple strings
+            final Str v = Str.get(cont.next());
+            val = val == null ? v : new ValueBuilder().add(val).add(v).value();
           }
-          if(!name.isEmpty()) {
-            final Value v = map.get(name);
-            map.put(name, v == null ? val : new ValueBuilder().add(val).add(v).value());
-          }
+
+          if(!name.isEmpty()) data.put(name, val);
           lines = -1;
           if(eq(line, last)) break;
         } else {
@@ -287,15 +288,17 @@ public final class HttpPayload {
           cont.add(line);
         }
       } else if(startsWith(line, CONTENT_DISPOSITION)) {
-        name = contains(line, token(NAME + '=')) ? string(line).
-          replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[\\]", "") : null;
-        fn = contains(line, token(FILENAME + '=')) ? string(line).replaceAll("^.*" + FILENAME +
-            "=\"|\"$", "") : null;
+        // get key and file name
+        name = contains(line, token(NAME + '=')) ?
+          string(line).replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[\\]", "") : null;
+        filename = contains(line, token(FILENAME + '=')) ?
+          string(line).replaceAll("^.*" + FILENAME + "=\"|\"$", "") : null;
       } else if(line.length == 0) {
         lines = 0;
       }
     }
-    return map;
+
+    return data;
   }
 
   // STATIC METHODS =====================================================================

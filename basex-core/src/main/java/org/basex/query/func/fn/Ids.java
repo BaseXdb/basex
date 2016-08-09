@@ -30,8 +30,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class Ids extends StandardFunc {
-  /** Hash map for data references and id flags [SINGLE]. */
-  final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
+  /** Hash map for data references and id flags. */
+  private final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
 
   /**
    * Returns referenced nodes.
@@ -80,10 +80,16 @@ abstract class Ids extends StandardFunc {
     final Data data = root.data();
     if(data == null || !(idref ? data.meta.tokenindex : data.meta.attrindex)) return false;
     // check if index names contain id attributes
-    if(!indexed.containsKey(data)) {
-      indexed.put(data, new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref));
+
+    Boolean index;
+    synchronized(indexed) {
+      index = indexed.get(data);
+      if(index == null) {
+        index = new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref);
+        indexed.put(data, index);
+      }
     }
-    return indexed.get(data);
+    return index;
   }
 
   /**

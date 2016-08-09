@@ -3,6 +3,7 @@ package org.basex.http.rest;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.http.*;
 import org.basex.util.*;
 
 /**
@@ -12,18 +13,23 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class RESTExec extends RESTCmd {
+  /** Create flag. */
+  private final boolean create;
+
   /**
    * Constructor.
    * @param session REST session
+   * @param create create flag
    */
-  RESTExec(final RESTSession session) {
+  RESTExec(final RESTSession session, final boolean create) {
     super(session);
+    this.create = create;
   }
 
   @Override
   protected void run0() throws IOException {
-    // execute command and return info of last command
-    for(final Command c : cmds) run(c);
+    for(final Command c : session.commands) run(c);
     session.http.res.getOutputStream().write(Token.token(info()));
+    if(create) code = HTTPCode.CREATED_X;
   }
 }

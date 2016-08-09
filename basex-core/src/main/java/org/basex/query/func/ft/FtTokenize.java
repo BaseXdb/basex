@@ -37,7 +37,7 @@ public class FtTokenize extends FtAccess {
     final byte[] token = toToken(exprs[0], qc);
     final FtTokenizeOptions opts = toOptions(1, new FtTokenizeOptions(), qc);
 
-    final FTOpt opt = new FTOpt().copy(qc.ftOpt());
+    final FTOpt opt = new FTOpt().assign(qc.ftOpt());
     final FTDiacritics dc = opts.get(FtTokenizeOptions.DIACRITICS);
     if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);
     final Boolean st = opts.get(FtTokenizeOptions.STEMMING);
@@ -48,9 +48,9 @@ public class FtTokenize extends FtAccess {
     if(cs != null) opt.cs = cs;
 
     final TokenList tl = new TokenList();
-    final FTLexer ftl = new FTLexer(opt).init(token);
-    if(all) ftl.all();
-    while(ftl.hasNext()) tl.add(ftl.nextToken());
+    final FTLexer lexer = new FTLexer(opt).init(token);
+    if(all) lexer.all();
+    while(lexer.hasNext()) tl.add(lexer.nextToken());
     return tl;
   }
 }

@@ -106,7 +106,7 @@ public abstract class ACreate extends Command {
 
   @Override
   public boolean newData(final Context ctx) {
-    if(newData) new Close().run(ctx);
+    if(newData) close(ctx);
     return newData;
   }
 

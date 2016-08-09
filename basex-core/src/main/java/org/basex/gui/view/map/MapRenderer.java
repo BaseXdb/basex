@@ -76,9 +76,9 @@ final class MapRenderer {
 
     // get index on first pre value
     int ll = 0;
-    final FTLexer lex = new FTLexer().original().init(s);
-    while(lex.hasNext()) {
-      final FTSpan span = lex.next();
+    final FTLexer lexer = new FTLexer().original().init(s);
+    while(lexer.hasNext()) {
+      final FTSpan span = lexer.next();
       byte[] tok = span.text;
       int wl = 0;
 
@@ -121,7 +121,7 @@ final class MapRenderer {
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl;
-      if(lex.paragraph()) {
+      if(lexer.paragraph()) {
         // new paragraph
         ll = 0;
         yy += fh;

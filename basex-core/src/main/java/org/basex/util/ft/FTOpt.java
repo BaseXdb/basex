@@ -37,7 +37,7 @@ public final class FTOpt extends ExprInfo {
    * @param opt parent full-text options
    * @return self reference
    */
-  public FTOpt copy(final FTOpt opt) {
+  public FTOpt assign(final FTOpt opt) {
     for(final Entry<FTFlag, Boolean> f : opt.map.entrySet()) {
       final FTFlag fl = f.getKey();
       if(map.get(fl) == null) map.put(fl, f.getValue());
@@ -52,14 +52,14 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
-   * Copies the full-text options from the specified database meta data.
+   * Assigns the full-text options from the specified database meta data.
    * @param md meta data
    * @return self reference
    */
-  public FTOpt copy(final MetaData md) {
-    cs = md.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
+  public FTOpt assign(final MetaData md) {
     set(DC, md.diacritics);
     set(ST, md.stemming);
+    cs = md.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
     ln = md.language;
     return this;
   }
@@ -79,7 +79,7 @@ public final class FTOpt extends ExprInfo {
    * @return true if flag has been set
    */
   public boolean isSet(final FTFlag flag) {
-    return map.get(flag) != null;
+    return map.containsKey(flag);
   }
 
   /**

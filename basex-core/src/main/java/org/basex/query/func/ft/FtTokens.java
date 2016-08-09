@@ -23,9 +23,9 @@ public final class FtTokens extends StandardFunc {
     final Data data = checkData(qc);
     byte[] entry = exprs.length < 2 ? Token.EMPTY : toToken(exprs[1], qc);
     if(entry.length != 0) {
-      final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
-      ftl.init(entry);
-      entry = ftl.nextToken();
+      final FTLexer lexer = new FTLexer(new FTOpt().assign(data.meta));
+      lexer.init(entry);
+      entry = lexer.nextToken();
     }
     return IndexFn.entries(data, new IndexEntries(entry, IndexType.FULLTEXT), this);
   }

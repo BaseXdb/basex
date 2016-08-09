@@ -30,7 +30,7 @@ final class RESTCommand extends RESTCmd {
     http.sopts().set(SerializerOptions.METHOD, SerialMethod.TEXT);
     http.initResponse();
 
-    for(final Command cmd : cmds) run(cmd, http.res.getOutputStream());
+    for(final Command cmd : session.commands) run(cmd, http.res.getOutputStream());
   }
 
   /**
@@ -42,7 +42,6 @@ final class RESTCommand extends RESTCmd {
    */
   static RESTCommand get(final RESTSession session, final String input) throws BaseXException {
     try {
-      open(session);
       session.add(CommandParser.get(input, session.context).parseSingle());
       return new RESTCommand(session);
     } catch(final QueryException ex) {

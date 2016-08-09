@@ -21,7 +21,7 @@ final class RESTGet {
   private RESTGet() { }
 
   /**
-   * Creates REST code.
+   * Creates and returns a REST command.
    * @param session REST session
    * @return code
    * @throws IOException I/O exception

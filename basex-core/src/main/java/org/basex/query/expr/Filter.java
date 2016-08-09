@@ -186,7 +186,7 @@ public abstract class Filter extends Preds {
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
-        e = (e instanceof Filter ? ((Filter) e).addPred(pred) : get(info, e, pred)).optimize(cc);
+        e = e instanceof Filter ? ((Filter) e).addPred(pred) : get(info, e, pred);
       }
     }
 

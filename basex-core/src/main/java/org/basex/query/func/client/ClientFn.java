@@ -16,20 +16,6 @@ import org.basex.query.value.type.*;
  */
 abstract class ClientFn extends StandardFunc {
   /**
-   * Returns the sessions handler [SINGLE].
-   * @param qc query context
-   * @return connection handler
-   */
-  static ClientSessions sessions(final QueryContext qc) {
-    ClientSessions res = qc.resources.get(ClientSessions.class);
-    if(res == null) {
-      res = new ClientSessions();
-      qc.resources.add(res);
-    }
-    return res;
-  }
-
-  /**
    * Returns a connection and removes it from list with opened connections if
    * requested.
    * @param qc query context
@@ -38,10 +24,20 @@ abstract class ClientFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final ClientSession session(final QueryContext qc, final boolean del) throws QueryException {
+    final ClientSessions sessions = sessions(qc);
     final Uri id = (Uri) checkAtomic(exprs[0], qc, AtomType.URI);
-    final ClientSession cs = sessions(qc).get(id);
+    final ClientSession cs = sessions.get(id);
     if(cs == null) throw BXCL_NOTAVL_X.get(info, id);
-    if(del) sessions(qc).remove(id);
+    if(del) sessions.remove(id);
     return cs;
+  }
+
+  /**
+   * Returns the sessions handler.
+   * @param qc query context
+   * @return connection handler
+   */
+  static ClientSessions sessions(final QueryContext qc) {
+    return qc.resources.index(ClientSessions.class);
   }
 }

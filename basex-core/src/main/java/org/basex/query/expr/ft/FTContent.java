@@ -32,16 +32,16 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex) {
+  protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
     if(content == FTContents.START) {
-      for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
+      for(final FTStringMatch sm : match) if(sm.start == 0) return true;
     } else if(content == FTContents.END) {
-      final int p = lex.count() - 1;
-      for(final FTStringMatch sm : mtc) if(sm.end == p) return true;
+      final int p = lexer.count() - 1;
+      for(final FTStringMatch sm : match) if(sm.end == p) return true;
     } else {
-      final int s = lex.count();
+      final int s = lexer.count();
       final boolean[] bl = new boolean[s];
-      for(final FTStringMatch sm : mtc) {
+      for(final FTStringMatch sm : match) {
         if(sm.gaps) continue;
         for(int p = sm.start; p <= sm.end; ++p) bl[p] = true;
       }

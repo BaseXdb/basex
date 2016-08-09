@@ -22,8 +22,8 @@ abstract class SqlFn extends StandardFunc {
    */
   final Connection connection(final QueryContext qc) throws QueryException {
     final int id = (int) toLong(exprs[0], qc);
-    final Object obj = jdbc(qc).get(id);
-    if(obj instanceof Connection) return (Connection) obj;
+    final Object ac = jdbc(qc).get(id);
+    if(ac instanceof Connection) return (Connection) ac;
     throw BXSQ_CONN_X.get(info, id);
   }
 
@@ -33,11 +33,6 @@ abstract class SqlFn extends StandardFunc {
    * @return connection handler
    */
   static JDBCConnections jdbc(final QueryContext qc) {
-    JDBCConnections res = qc.resources.get(JDBCConnections.class);
-    if(res == null) {
-      res = new JDBCConnections();
-      qc.resources.add(res);
-    }
-    return res;
+    return qc.resources.index(JDBCConnections.class);
   }
 }

@@ -196,7 +196,7 @@ public abstract class Command extends Job {
 
   /**
    * Closes an open data reference and returns {@code true} if this command will change the
-   * {@link Context#data()} reference. This method is required by the GUI progress dialog.
+   * {@link Context#data()} reference. This method is only required by the GUI.
    * @param ctx database context
    * @return result of check
    */
@@ -206,7 +206,7 @@ public abstract class Command extends Job {
   }
 
   /**
-   * Enforces a maximum number of query results. This method is required by the GUI.
+   * Enforces a maximum number of query results. This method is only required by the GUI.
    * @param max maximum number of results (ignored if negative)
    */
   public final void maxResults(final int max) {
@@ -215,7 +215,7 @@ public abstract class Command extends Job {
 
   /**
    * Returns true if this command returns a progress value.
-   * This method is required by the GUI progress dialog.
+   * This method is only required by the GUI.
    * @return result of check
    */
   public boolean supportsProg() {
@@ -224,7 +224,7 @@ public abstract class Command extends Job {
 
   /**
    * Returns true if this command can be stopped.
-   * This method is required by the GUI progress dialog.
+   * This method is only required by the GUI.
    * @return result of check
    */
   public boolean stoppable() {
@@ -388,11 +388,19 @@ public abstract class Command extends Job {
    * Closes the specified database if it is currently opened and only pinned once.
    * @param ctx database context
    * @param db database to be closed
-   * @return closed flag
+   * @return {@code true} if opened database was closed
    */
   protected static boolean close(final Context ctx, final String db) {
-    final boolean close = ctx.data() != null && db.equals(ctx.data().meta.name)
-        && ctx.datas.pins(db) == 1;
-    return close && new Close().run(ctx);
+    final Data data = ctx.data();
+    return data != null && db.equals(data.meta.name) && ctx.datas.pins(db) == 1 && close(ctx);
+  }
+
+  /**
+   * Closes the current database.
+   * @param ctx database context
+   * @return {@code true} if no database was opened, or if database was closed
+   */
+  protected static boolean close(final Context ctx) {
+    return new Close().run(ctx);
   }
 }

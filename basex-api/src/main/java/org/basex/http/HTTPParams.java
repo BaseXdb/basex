@@ -122,8 +122,7 @@ public final class HTTPParams {
 
     try(final InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, options);
-      final HashMap<String, Value> mp = hp.multiForm(type);
-      for(final Entry<String, Value> entry : mp.entrySet()) {
+      for(final Entry<String, Value> entry : hp.multiForm(type).entrySet()) {
         form.put(entry.getKey(), entry.getValue());
       }
     }

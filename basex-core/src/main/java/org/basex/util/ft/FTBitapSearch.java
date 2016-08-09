@@ -7,10 +7,9 @@ import org.basex.query.expr.ft.*;
 import org.basex.util.list.*;
 
 /**
- * Generalized search algorithm based on the Bitap string matching algorithm.
- * The implementation is based on the implementation in Wikipedia, but uses
- * {@link BitSet} for fast bit operation. This version works with a set of
- * needles and each one of it can be matched in the haystack.
+ * Generalized search algorithm based on the Bitap string matching algorithm. The implementation is
+ * based on the implementation in Wikipedia, but uses {@link BitSet} for fast bit operation. This
+ * version works with a set of needles and each one of it can be matched in the haystack.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov

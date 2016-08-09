@@ -53,31 +53,31 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex)
+  protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer)
       throws QueryException {
 
     final long mn = toLong(min, qc), mx = toLong(max, qc);
-    mtc.sort();
+    match.sort();
 
-    final FTMatch match = new FTMatch();
+    final FTMatch ftm = new FTMatch();
     FTStringMatch last = null, first = null;
-    for(final FTStringMatch sm : mtc) {
+    for(final FTStringMatch sm : match) {
       if(sm.exclude) {
-        match.add(sm);
+        ftm.add(sm);
       } else {
         if(first == null) {
           first = sm;
         } else {
-          final int d = pos(sm.start, lex) - pos(last.end, lex) - 1;
+          final int d = pos(sm.start, lexer) - pos(last.end, lexer) - 1;
           if(d < mn || d > mx) return false;
         }
         last = sm;
       }
     }
     first.end = last.end;
-    mtc.reset();
-    mtc.add(first);
-    mtc.add(match);
+    match.reset();
+    match.add(first);
+    match.add(ftm);
     return true;
   }
 

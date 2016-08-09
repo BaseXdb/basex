@@ -23,7 +23,7 @@ final class RESTPut {
   private RESTPut() { }
 
   /**
-   * Creates REST code.
+   * Creates and returns a REST command.
    * @param session REST session
    * @return code
    * @throws IOException I/O exception
@@ -70,23 +70,20 @@ final class RESTPut {
     // store data as XML or raw file, depending on content type
     final String path = http.dbpath();
     if(path.isEmpty()) {
+      // do not OPEN database
+      session.commands.clear();
       if(xml) {
         session.add(new CreateDB(db), is);
       } else {
-        session.add(new CreateDB(db));
-        session.add(new Store(db), is);
+        session.add(new CreateDB(db)).add(new Store(db), is);
       }
     } else {
-      session.add(new Open(db));
       if(xml) {
         session.add(new Replace(path), is);
       } else {
-        session.add(new Delete(path));
-        session.add(new Store(path), is);
+        session.add(new Delete(path)).add(new Store(path), is);
       }
     }
-    final RESTExec cmd = new RESTExec(session);
-    cmd.code = HTTPCode.CREATED_X;
-    return cmd;
+    return new RESTExec(session, true);
   }
 }

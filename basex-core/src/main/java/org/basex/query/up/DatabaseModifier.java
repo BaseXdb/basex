@@ -23,7 +23,7 @@ final class DatabaseModifier extends ContextModifier {
   }
 
   @Override
-  void add(final Update update, final QueryContext qc) throws QueryException {
+  synchronized void add(final Update update, final QueryContext qc) throws QueryException {
     // check permissions
     if(update instanceof NameUpdate) {
       if(!qc.context.perm(Perm.CREATE, ((NameUpdate) update).name()))
