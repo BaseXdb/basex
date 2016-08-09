@@ -23,8 +23,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FTContains extends Single {
-  /** Full-text parser. */
-  private final FTLexer lex;
   /** Full-text expression. */
   public FTExpr ftexpr;
 
@@ -38,37 +36,39 @@ public final class FTContains extends Single {
     super(info, expr);
     this.ftexpr = ftexpr;
     seqType = SeqType.BLN;
-    lex = new FTLexer(new FTOpt());
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final boolean scoring = qc.scoring;
     final Iter iter = expr.iter(qc);
-    final FTLexer tmp = qc.ftToken;
 
-    qc.ftToken = lex;
-    double s = 0;
-    int c = 0;
-    boolean f = false;
-    final FTPosData ftPosData = qc.ftPosData;
-    for(Item it; (it = iter.next()) != null;) {
-      lex.init(it.string(info));
-      final FTNode item = ftexpr.item(qc, info);
-      final FTMatches all = item.matches();
-      if(all.matches()) {
-        f = true;
-        if(scoring) s += item.score();
-        // cache entry for visualizations or ft:mark/ft:extract
-        if(ftPosData != null && it instanceof DBNode) {
-          final DBNode node = (DBNode) it;
-          ftPosData.add(node.data(), node.pre(), all);
+    final FTLexer tmp = qc.ftLexer, lexer = new FTLexer(new FTOpt());
+    qc.ftLexer = lexer;
+    try {
+      double s = 0;
+      int c = 0;
+      boolean f = false;
+      final FTPosData ftPosData = qc.ftPosData;
+      for(Item it; (it = iter.next()) != null;) {
+        lexer.init(it.string(info));
+        final FTNode item = ftexpr.item(qc, info);
+        final FTMatches all = item.matches();
+        if(all.matches()) {
+          f = true;
+          if(scoring) s += item.score();
+          // cache entry for visualizations or ft:mark/ft:extract
+          if(ftPosData != null && it instanceof DBNode) {
+            final DBNode node = (DBNode) it;
+            ftPosData.add(node.data(), node.pre(), all);
+          }
         }
+        c++;
       }
-      c++;
+      return scoring ? Bln.get(f, Scoring.avg(s, c)) : Bln.get(f);
+    } finally {
+      qc.ftLexer = tmp;
     }
-    qc.ftToken = tmp;
-    return scoring ? Bln.get(f, Scoring.avg(s, c)) : Bln.get(f);
   }
 
   @Override

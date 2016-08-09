@@ -45,32 +45,32 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext qc, final FTMatch mtc, final FTLexer lex)
+  protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer)
       throws QueryException {
 
     final int n = (int) toLong(win, qc) - 1;
-    mtc.sort();
+    match.sort();
 
     FTStringMatch f = null;
-    for(final FTStringMatch m : mtc) {
+    for(final FTStringMatch m : match) {
       if(m.exclude) continue;
       if(f == null) f = m;
       f.gaps |= m.end - f.end > 1;
       f.end = m.end;
-      if(pos(f.end, lex) - pos(f.start, lex) > n) return false;
+      if(pos(f.end, lexer) - pos(f.start, lexer) > n) return false;
     }
     if(f == null) return false;
 
-    final int w = n - pos(f.end, lex) + pos(f.start, lex);
-    for(int s = pos(f.start, lex) - w; s <= pos(f.start, lex); ++s) {
+    final int w = n - pos(f.end, lexer) + pos(f.start, lexer);
+    for(int s = pos(f.start, lexer) - w; s <= pos(f.start, lexer); ++s) {
       boolean h = false;
-      for(final FTStringMatch m : mtc) {
-        h = m.exclude && pos(m.start, lex) >= s && pos(m.end, lex) <= s + w;
+      for(final FTStringMatch m : match) {
+        h = m.exclude && pos(m.start, lexer) >= s && pos(m.end, lexer) <= s + w;
         if(h) break;
       }
       if(!h) {
-        mtc.reset();
-        mtc.add(f);
+        match.reset();
+        match.add(f);
         return true;
       }
     }

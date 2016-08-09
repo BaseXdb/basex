@@ -1,6 +1,9 @@
 package org.basex.util.ft;
 
 import java.util.Map.Entry;
+
+import static org.basex.util.ft.FTFlag.*;
+
 import java.util.*;
 
 import org.basex.index.*;
@@ -10,8 +13,8 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Performs full-text lexing on token. Calls tokenizers, stemmers matching to
- * full-text options to achieve this.
+ * Performs full-text lexing on token. Calls tokenizers, stemmers matching to full-text options
+ * to achieve this.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
@@ -20,7 +23,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   /** Tokenizer. */
   private final Tokenizer tok;
   /** Full-text options. */
-  private final FTOpt ftopt;
+  private final FTOpt ftOpt;
   /** Text to be tokenized. */
   private byte[] text = Token.EMPTY;
 
@@ -44,13 +47,13 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
   /**
    * Default constructor.
-   * @param ftopt full-text options
+   * @param ftOpt full-text options
    */
-  public FTLexer(final FTOpt ftopt) {
-    this.ftopt = ftopt;
+  public FTLexer(final FTOpt ftOpt) {
+    this.ftOpt = ftOpt;
 
     // check if language option is provided:
-    Language lang = ftopt != null ? ftopt.ln : null;
+    Language lang = ftOpt != null ? ftOpt.ln : null;
     if(lang == null) lang = Language.def();
 
     // use default tokenizer if specific tokenizer is not available.
@@ -61,12 +64,12 @@ public final class FTLexer extends FTIterator implements IndexToken {
         break;
       }
     }
-    tok = tk.get(ftopt);
+    tok = tk.get(ftOpt);
     iter = tok;
 
     // wrap original iterator
-    if(ftopt != null && ftopt.is(FTFlag.ST)) {
-      if(ftopt.sd == null) {
+    if(ftOpt != null && ftOpt.is(FTFlag.ST)) {
+      if(ftOpt.sd == null) {
         // use default stemmer if specific stemmer is not available.
         Stemmer st = Stemmer.IMPL.get(0);
         for(final Stemmer stem : Stemmer.IMPL) {
@@ -77,7 +80,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
         }
         iter = st.get(lang, iter);
       } else {
-        iter = new DictionaryStemmer(ftopt.sd, iter);
+        iter = new DictionaryStemmer(ftOpt.sd, iter);
       }
     }
   }
@@ -102,17 +105,21 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
   /**
    * Initializes the iterator.
+   * @return self reference
    */
-  public void init() {
+  public FTLexer init() {
     init(text);
+    return this;
   }
 
   /**
    * Sets the Levenshtein error.
    * @param ls error
+   * @return self reference
    */
-  public void lserror(final int ls) {
+  public FTLexer lserror(final int ls) {
     lserror = ls;
+    return this;
   }
 
   /**
@@ -182,7 +189,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
    * @return full-text options (may be {@code null})
    */
   public FTOpt ftOpt() {
-    return ftopt;
+    return ftOpt;
   }
 
   /**
@@ -204,11 +211,11 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Calculates a position value, dependent on the specified unit. Does not have
-   * to be implemented by all tokenizers. Returns 0 if not implemented.
+   * Calculates a position value, dependent on the specified unit.
+   * Does not have to be implemented by all tokenizers.
    * @param word word position
    * @param unit unit
-   * @return new position
+   * @return new position ({@code 0} if not implemented)
    */
   public int pos(final int word, final FTUnit unit) {
     return tok.pos(word, unit);
@@ -221,6 +228,25 @@ public final class FTLexer extends FTIterator implements IndexToken {
    */
   public int[][] info() {
     return tok.info();
+  }
+
+  /**
+   * Returns a new lexer, adopting the tokenizer options.
+   * @param opt full-text options
+   * @return lexer
+   */
+  public FTLexer copy(final FTOpt opt) {
+    // assign options to text:
+    final FTOpt to = ftOpt;
+    to.set(ST, opt.is(ST));
+    to.set(DC, opt.is(DC));
+    to.ln = opt.ln;
+    to.th = opt.th;
+    to.sd = opt.sd;
+    // only change case in insensitive mode
+    to.cs = opt.cs != null && opt.cs != FTCase.INSENSITIVE ? FTCase.SENSITIVE :
+      FTCase.INSENSITIVE;
+    return new FTLexer(to).init(text());
   }
 
   /**

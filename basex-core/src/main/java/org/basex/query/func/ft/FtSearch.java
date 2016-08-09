@@ -28,17 +28,13 @@ public final class FtSearch extends FtAccess {
     final IndexContext ic = new IndexContext(data, false);
     if(!data.meta.ftindex) throw BXDB_INDEX_X.get(info, data.meta.name, IndexType.FULLTEXT);
 
-    final FTOpt opt = new FTOpt().copy(data.meta);
+    final FTOpt opt = new FTOpt().assign(data.meta);
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
     if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
-    final FTOpt tmp = qc.ftOpt();
-    qc.ftOpt(opt);
-    final FTWords ftw = new FTWords(info, data, terms, mode);
-    ftw.prepare(qc);
-    qc.ftOpt(tmp);
+    final FTWords ftw = new FTWords(info, data, terms, mode).init(qc, opt);
     return new FTIndexAccess(info, options(ftw, opts), ic).iter(qc);
   }
 

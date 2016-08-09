@@ -23,8 +23,7 @@ public final class FtContains extends FtAccess {
     final Value query = qc.value(exprs[1]);
     final FtContainsOptions opts = toOptions(2, new FtContainsOptions(), qc);
 
-    final FTOpt tmp = qc.ftOpt();
-    final FTOpt opt = new FTOpt().copy(tmp);
+    final FTOpt opt = new FTOpt().assign(qc.ftOpt());
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
@@ -39,14 +38,7 @@ public final class FtContains extends FtAccess {
     final FTCase cs = opts.get(FtContainsOptions.CASE);
     if(cs != null) opt.cs = cs;
 
-    qc.ftOpt(opt);
-    final FTWords ftw;
-    try {
-      ftw = new FTWords(info, query, mode, null);
-      ftw.prepare(qc);
-    } finally {
-      qc.ftOpt(tmp);
-    }
+    final FTWords ftw = new FTWords(info, query, mode, null).init(qc, opt);
     return new FTContains(input, options(ftw, opts), info).item(qc, info);
   }
 }

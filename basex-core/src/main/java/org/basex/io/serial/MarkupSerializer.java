@@ -176,9 +176,9 @@ abstract class MarkupSerializer extends StandardSerializer {
         out.print(CDATA_C);
       }
     } else {
-      final FTLexer lex = new FTLexer().original().init(val);
-      while(lex.hasNext()) {
-        final FTSpan span = lex.next();
+      final FTLexer lexer = new FTLexer().original().init(val);
+      while(lexer.hasNext()) {
+        final FTSpan span = lexer.next();
         if(!span.del && ftp.contains(span.pos)) out.print((char) TokenBuilder.MARK);
         final byte[] text = span.text;
         final int tl = text.length;

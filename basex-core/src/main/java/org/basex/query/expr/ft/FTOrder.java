@@ -27,7 +27,7 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lex) {
+  protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
     int pos = 0, start = 0;
     for(final FTStringMatch sm : match) {
       if(sm.exclude || pos == sm.pos) continue;

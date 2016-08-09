@@ -85,10 +85,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Full-text position data (needed for highlighting full-text results). */
   public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
-  /** Available collations. */
-  public TokenObjMap<Collation> collations;
-  /** Current full-text token. */
-  public FTLexer ftToken;
+  /** Current full-text lexer. */
+  public FTLexer ftLexer;
   /** Current full-text options. */
   private FTOpt ftOpt;
   /** Full-text token positions (needed for highlighting full-text results). */
@@ -106,6 +104,9 @@ public final class QueryContext extends Job implements Closeable {
   public DTDur zone;
   /** Current nanoseconds. */
   public long nano;
+
+  /** Available collations. */
+  public TokenObjMap<Collation> collations;
 
   /** Strings to lock defined by read-lock option. */
   public final StringList readLocks = new StringList(0);
@@ -535,7 +536,7 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Returns the current full-text options. Creates a new instance if called first.
+   * Returns the current full-text options. Creates a new instance if called for the first time.
    * @return full-text options
    */
   public FTOpt ftOpt() {

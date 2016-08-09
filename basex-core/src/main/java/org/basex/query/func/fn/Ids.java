@@ -81,12 +81,15 @@ abstract class Ids extends StandardFunc {
     if(data == null || !(idref ? data.meta.tokenindex : data.meta.attrindex)) return false;
     // check if index names contain id attributes
 
+    Boolean index;
     synchronized(indexed) {
-      if(!indexed.containsKey(data)) {
-        indexed.put(data, new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref));
+      index = indexed.get(data);
+      if(index == null) {
+        index = new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref);
+        indexed.put(data, index);
       }
     }
-    return indexed.get(data);
+    return index;
   }
 
   /**

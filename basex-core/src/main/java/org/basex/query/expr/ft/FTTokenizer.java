@@ -6,8 +6,10 @@ import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.util.ft.*;
+import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.ft.FTBitapSearch.TokenComparator;
+import org.basex.util.ft.FTBitapSearch.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 import org.basex.util.similarity.*;
@@ -19,39 +21,47 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 final class FTTokenizer {
-  /** Full-text options. */
-  final FTOpt opt;
+  /** Token comparator. */
+  final TokenComparator cmp;
 
   /** Wildcard object cache. */
   private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<>();
   /** Token cache. */
   private final TokenObjMap<FTTokens> cache = new TokenObjMap<>();
-  /** Token comparator. */
-  private final TokenComparator cmp;
   /** Levenshtein reference. */
   private final Levenshtein ls;
-  /** Calling expression. */
-  private final FTWords words;
+  /** Input info. */
+  private final InputInfo info;
+  /** Full-text options. */
+  private final FTOpt opt;
+
+  /** All matches. */
+  FTMatches matches = new FTMatches();
+  /** Flag for first evaluation. */
+  boolean first;
+  /** Query position. */
+  int pos;
 
   /**
    * Constructor.
-   * @param words full-text words
+   * @param opt full-text options
    * @param qc query context
+   * @param info input info
    */
-  FTTokenizer(final FTWords words, final QueryContext qc) {
-    this(words, qc.ftOpt(), new Levenshtein(qc.context.options.get(MainOptions.LSERROR)));
+  FTTokenizer(final FTOpt opt, final QueryContext qc, final InputInfo info) {
+    this(opt, new Levenshtein(qc.context.options.get(MainOptions.LSERROR)), info);
   }
 
   /**
    * Constructor.
-   * @param words full-text words
    * @param opt full-text options
    * @param ls Levenshtein distance calculation
+   * @param info input info
    */
-  private FTTokenizer(final FTWords words, final FTOpt opt, final Levenshtein ls) {
-    this.words = words;
+  private FTTokenizer(final FTOpt opt, final Levenshtein ls, final InputInfo info) {
     this.opt = opt;
     this.ls = ls;
+    this.info = info;
 
     cmp = new TokenComparator() {
       @Override
@@ -61,7 +71,7 @@ final class FTTokenizer {
           ftw = wcCache.get(qu);
           if(ftw == null) {
             ftw = new FTWildcard(qu);
-            if(!ftw.parse()) throw FTWILDCARD_X.get(words.info, qu);
+            if(!ftw.parse()) throw FTWILDCARD_X.get(info, qu);
             wcCache.put(qu, ftw);
           }
           // simple characters
@@ -80,25 +90,6 @@ final class FTTokenizer {
           eq(in, qu));
       }
     };
-  }
-
-  /**
-   * Returns a new lexer, adopting the tokenizer options.
-   * @param lex input lexer
-   * @return lexer
-   */
-  FTLexer lexer(final FTLexer lex) {
-    // assign options to text:
-    final FTOpt to = lex.ftOpt();
-    to.set(ST, opt.is(ST));
-    to.set(DC, opt.is(DC));
-    to.ln = opt.ln;
-    to.th = opt.th;
-    to.sd = opt.sd;
-    // only change case in insensitive mode
-    to.cs = opt.cs != null && opt.cs != FTCase.INSENSITIVE ? FTCase.SENSITIVE :
-      FTCase.INSENSITIVE;
-    return new FTLexer(to).init(lex.text());
   }
 
   /**
@@ -121,7 +112,7 @@ final class FTTokenizer {
 
       // if thesaurus is required, add the terms which extend the query:
       if(opt.th != null) {
-        for(final byte[] ext : opt.th.find(words.info, query)) {
+        for(final byte[] ext : opt.th.find(info, query)) {
           // parse each extension term to a set of tokens:
           final TokenList tl = new TokenList(1);
           quLex.init(ext);
@@ -135,33 +126,10 @@ final class FTTokenizer {
   }
 
   /**
-   * Checks if the first token contains the second full-text term.
-   * @param query cached query tokens
-   * @param input input text
-   * @return number of occurrences
-   * @throws QueryException query exception
-   */
-  int contains(final FTTokens query, final FTLexer input) throws QueryException {
-    input.init();
-    final FTBitapSearch bs = new FTBitapSearch(input, query, cmp);
-    int c = 0;
-    while(bs.hasNext()) {
-      final int pos = bs.next();
-      words.add(pos, pos + query.length() - 1);
-      ++c;
-    }
-
-    words.matches.pos++;
-    words.first = false;
-    return c;
-  }
-
-  /**
    * Copies this FTTokenizer.
-   * @param ftw calling expression
    * @return copy
    */
-  FTTokenizer copy(final FTWords ftw) {
-    return new FTTokenizer(ftw, opt, ls);
+  FTTokenizer copy() {
+    return new FTTokenizer(opt, ls, info);
   }
 }

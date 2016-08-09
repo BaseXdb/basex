@@ -108,8 +108,8 @@ public final class FTIndexAccess extends Simple {
   public String toString() {
     Expr e = ftexpr;
     if(ftexpr instanceof FTWords) {
-      final FTWords f = (FTWords) ftexpr;
-      if(f.mode == FTMode.ANY && f.occ == null && f.ftt == null) e = f.query;
+      final FTWords ftw = (FTWords) ftexpr;
+      if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) e = ftw.query;
     }
     return Function._FT_SEARCH.toString(Str.get(ictx.data.meta.name), e);
   }
