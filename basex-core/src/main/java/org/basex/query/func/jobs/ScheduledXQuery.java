@@ -12,7 +12,6 @@ import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.func.xquery.XQueryEval.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -64,11 +63,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
     this.cache = opts.get(EvalOptions.CACHE);
     this.job().context = qc.context;
 
-    final String bu = opts.get(XQueryOptions.BASE_URI);
+    final String bu = opts.get(EvalOptions.BASE_URI);
     uri = bu != null ? bu : string(sc.baseURI().string());
-
-    final JobPool pool = qc.context.jobs;
-    final String id = job().id();
 
     // check when job is to be started
     final String del = opts.get(EvalOptions.START);
@@ -78,12 +74,25 @@ public final class ScheduledXQuery extends Job implements Runnable {
     long interval = 0;
     final String inter = opts.get(EvalOptions.INTERVAL);
     if(!inter.isEmpty()) interval = ms(new DTDur(Token.token(inter), info));
-    if(interval < 1000 && interval != 0) throw JOBS_RANGE.get(info, inter);
+    if(interval < 1000 && interval != 0) throw JOBS_RANGE_X.get(info, inter);
     repeat = interval > 0;
 
     // check when job is to be stopped
     final String dur = opts.get(EvalOptions.END);
     final long duration = dur.isEmpty() ? Long.MAX_VALUE : ms(dur, delay, qc);
+
+    // custom job id: check if it has already been assigned
+    final JobPool pool = qc.context.jobs;
+    String id = opts.get(EvalOptions.ID);
+    if(id != null) {
+      if(id.startsWith(JobContext.PREFIX))
+        throw JOBS_ID_INVALID_X.get(info, id);
+      if(pool.tasks.containsKey(id) || pool.active.containsKey(id) || pool.results.containsKey(id))
+        throw JOBS_ID_EXISTS_X.get(info, id);
+      job().id(id);
+    } else {
+      id = job().id();
+    }
 
     if(cache) {
       if(repeat) throw JOBS_CONFLICT.get(info);
@@ -118,7 +127,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
       // dateTime
       ms = ms(new DTDur(new Dtm(Token.token(string), info), qc.datm, info));
     }
-    if(ms <= min) throw JOBS_RANGE.get(info, string);
+    if(ms <= min) throw JOBS_RANGE_X.get(info, string);
     return ms;
   }
 

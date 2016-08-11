@@ -171,9 +171,13 @@ public enum QueryError {
   /** Jobs error. */
   JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
   /** Jobs error. */
-  JOBS_RANGE(JOBS, "range", "Value out of range: %."),
+  JOBS_RANGE_X(JOBS, "range", "Value out of range: %."),
   /** Jobs error. */
   JOBS_CONFLICT(JOBS, "conflict", "Either 'cache' or 'interval' option is allowed."),
+  /** Jobs error. */
+  JOBS_ID_EXISTS_X(JOBS, "id", "Job id already exists: %."),
+  /** Jobs error. */
+  JOBS_ID_INVALID_X(JOBS, "id", "Invalid job name: %."),
 
   // JSON Module
 

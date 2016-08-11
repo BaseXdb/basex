@@ -10,6 +10,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class JobContext {
+  /** Job prefix. */
+  public static final String PREFIX = "job";
   /** Query id. */
   private static long jobId = -1;
 
@@ -37,13 +39,21 @@ public final class JobContext {
   }
 
   /**
+   * Sets a custom id.
+   * @param string custom id string
+   */
+  public void id(final String string) {
+    id = string;
+  }
+
+  /**
    * Returns the id of the root job.
    * @return id
    */
   public String id() {
     if(id == null) {
       jobId = Math.max(0, jobId + 1);
-      id = "job" + jobId;
+      id = PREFIX + jobId;
     }
     return id;
   }
