@@ -81,26 +81,27 @@ public final class ScheduledXQuery extends Job implements Runnable {
     final String dur = opts.get(EvalOptions.END);
     final long duration = dur.isEmpty() ? Long.MAX_VALUE : ms(dur, delay, qc);
 
-    // custom job id: check if it has already been assigned
     final JobPool pool = qc.context.jobs;
-    String id = opts.get(EvalOptions.ID);
-    if(id != null) {
-      if(id.startsWith(JobContext.PREFIX))
-        throw JOBS_ID_INVALID_X.get(info, id);
-      if(pool.tasks.containsKey(id) || pool.active.containsKey(id) || pool.results.containsKey(id))
-        throw JOBS_ID_EXISTS_X.get(info, id);
-      job().id(id);
-    } else {
-      id = job().id();
-    }
+    synchronized(pool.tasks) {
+      // custom job id: check if it is invalid or has already been assigned
+      String id = opts.get(EvalOptions.ID);
+      if(id != null) {
+        if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(info, id);
+        if(pool.tasks.containsKey(id) || pool.active.containsKey(id) ||
+            pool.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
+        job().id(id);
+      } else {
+        id = job().id();
+      }
 
-    if(cache) {
-      if(repeat) throw JOBS_CONFLICT.get(info);
-      pool.results.put(id, result);
-    }
+      if(cache) {
+        if(repeat) throw JOBS_CONFLICT.get(info);
+        pool.results.put(id, result);
+      }
 
-    // start job task and wait until job is registered or time was assigned
-    new JobTask(this, pool, delay, interval, duration);
+      // start job task and wait until job is registered or time was assigned
+      new JobTask(this, pool, delay, interval, duration);
+    }
   }
 
   /**
