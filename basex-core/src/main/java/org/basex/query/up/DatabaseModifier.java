@@ -7,7 +7,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.name.*;
-import org.basex.util.*;
 
 /**
  * The database modifier holds all database updates during a snapshot.
@@ -31,11 +30,6 @@ final class DatabaseModifier extends ContextModifier {
     } else if(update instanceof DataUpdate) {
       if(!qc.context.perm(Perm.WRITE, ((DataUpdate) update).data().meta.name))
         throw BASX_PERM_X.get(update.info(), Perm.WRITE);
-    } else if(update instanceof UserUpdate) {
-      if(!qc.context.perm(Perm.ADMIN, null))
-        throw BASX_PERM_X.get(update.info(), Perm.ADMIN);
-    } else {
-      throw Util.notExpected("Unknown update type: " + update);
     }
     super.add(update, qc);
   }

@@ -144,16 +144,18 @@ public final class Users {
   }
 
   /**
-   * Returns table with all users, or users from a specified database.
+   * Returns table with all users, or users from a specific database.
+   * The list will only contain the current user if no admin permissions are available.
    * @param db database (can be {@code null})
+   * @param ctx database context
    * @return user information
    */
-  public synchronized Table info(final String db) {
+  public synchronized Table info(final String db, final Context ctx) {
     final Table table = new Table();
     table.description = Text.USERS_X;
 
     for(final String info : S_USERINFO) table.header.add(info);
-    for(final User user : users(db)) {
+    for(final User user : users(db, ctx)) {
       final TokenList tl = new TokenList();
       tl.add(user.name());
       tl.add(user.perm(db).toString());
@@ -163,18 +165,24 @@ public final class Users {
   }
 
   /**
-   * Returns all users, or users from a specified database.
+   * Returns all users, or users that have permissions for a specific database.
+   * The list will only contain the current user if no admin permissions are available.
    * @param db database (can be {@code null})
+   * @param ctx database context
    * @return user information
    */
-  public synchronized ArrayList<User> users(final String db) {
+  public synchronized ArrayList<User> users(final String db, final Context ctx) {
+    final User curr = ctx.user();
+    final boolean admin = curr.has(Perm.ADMIN);
     final ArrayList<User> tmp = new ArrayList<>();
     for(final User user : users.values()) {
-      if(db == null) {
-        tmp.add(user);
-      } else {
-        final Entry<String, Perm> entry = user.find(db);
-        if(entry != null) tmp.add(user);
+      if(admin || curr == user) {
+        if(db == null) {
+          tmp.add(user);
+        } else {
+          final Entry<String, Perm> entry = user.find(db);
+          if(entry != null) tmp.add(user);
+        }
       }
     }
     return tmp;

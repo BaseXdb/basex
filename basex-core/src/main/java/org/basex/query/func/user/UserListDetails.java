@@ -3,8 +3,9 @@ package org.basex.query.func.user;
 import static org.basex.core.users.UserText.*;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
+import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -25,10 +26,10 @@ public final class UserListDetails extends UserList {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
+    final Context ctx = qc.context;
     final User u = exprs.length > 0 ? toUser(0, qc) : null;
     final ValueBuilder vb = new ValueBuilder();
-    for(final User us : u != null ? Collections.singletonList(u) : qc.context.users.users(null)) {
+    for(final User us : u != null ? Collections.singletonList(u) : ctx.users.users(null, ctx)) {
       final String perm = us.perm((String) null).toString();
       final FElem user = new FElem(USER).add(NAME, us.name()).add(PERMISSION, perm);
       for(final Entry<Algorithm, EnumMap<Code, String>> codes : us.alg().entrySet()) {

@@ -30,14 +30,14 @@ public final class ShowUsers extends Command {
    * @param db database (can be {@code null})
    */
   public ShowUsers(final String db) {
-    super(Perm.ADMIN, db == null ? "" : db);
+    super(Perm.NONE, db == null ? "" : db);
   }
 
   @Override
   protected boolean run() throws IOException {
     final String name = args[0];
     if(!name.isEmpty() && !Databases.validName(name)) return error(NAME_INVALID_X, name);
-    out.println(context.users.info(name.isEmpty() ? null : name).finish());
+    out.println(context.users.info(name.isEmpty() ? null : name, context).finish());
     return true;
   }
 
