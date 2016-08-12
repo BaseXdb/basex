@@ -321,6 +321,8 @@ public enum QueryError {
   /** User error. */
   USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),
   /** User error. */
+  USER_PASSWORD_X(USER, "password", "Wrong password supplied for user '%'."),
+  /** User error. */
   USER_ADMIN(USER, "admin", "User 'admin' cannot be modified."),
   /** User error. */
   USER_EQUAL_X(USER, "equal", "Name of old and new user is equal: %."),

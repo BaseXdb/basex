@@ -186,4 +186,12 @@ public final class UserModuleTest extends AdvancedQueryTest {
     // redundant operations
     error(_USER_PASSWORD.args(NAME, "") + ',' + _USER_PASSWORD.args(NAME, ""), USER_UPDATE_X_X);
   }
+
+  /** Test method. */
+  @Test public void check() {
+    query(_USER_CHECK.args(UserText.ADMIN, UserText.ADMIN));
+    error(_USER_CHECK.args("", "x"), USER_NAME_X);
+    error(_USER_CHECK.args("x", "x"), USER_UNKNOWN_X);
+    error(_USER_CHECK.args(UserText.ADMIN, "x"), USER_PASSWORD_X);
+  }
 }
