@@ -21,8 +21,7 @@ public abstract class Iter {
 
   /**
    * Returns the specified item, or an arbitrary item if the index is invalid.
-   * This method needs to be implemented - and should only be called - if
-   * {@link Iter#size()} returns the correct number of results.
+   * If this method is implemented by an iterator, {@link #size} needs to be implemented as well.
    * @param i value offset
    * @return specified item
    * @throws QueryException query exception
@@ -33,9 +32,8 @@ public abstract class Iter {
   }
 
   /**
-   * Returns the iterator size. Note: {@code -1} is returned if the
-   * result size is unknown. If this method is implemented by an iterator,
-   * {@link #get} needs to be implemented as well.
+   * Returns the iterator size. Note: {@code -1} is returned if the result size is unknown.
+   * If this method is implemented by an iterator, {@link #get} needs to be implemented as well.
    * @return number of entries
    */
   public long size() {

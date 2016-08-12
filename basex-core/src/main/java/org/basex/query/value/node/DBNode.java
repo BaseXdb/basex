@@ -265,13 +265,13 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter ancestor() {
-    return new BasicNodeIter() {
+  public final DBNodeIter ancestor() {
+    return new DBNodeIter(data) {
       private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);
 
       @Override
-      public ANode next() {
+      public DBNode next() {
         curr = data.parent(curr, kind);
         if(curr == -1) return null;
         kind = data.kind(curr);
@@ -282,13 +282,13 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter ancestorOrSelf() {
-    return new BasicNodeIter() {
+  public final DBNodeIter ancestorOrSelf() {
+    return new DBNodeIter(data) {
       private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);
 
       @Override
-      public ANode next() {
+      public DBNode next() {
         if(curr == -1) return null;
         kind = data.kind(curr);
         node.set(curr, kind);
@@ -299,31 +299,39 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter attributes() {
-    return new BasicNodeIter() {
+  public final DBNodeIter attributes() {
+    return new DBNodeIter(data) {
       final DBNode node = finish();
-      final int last = pre + data.attSize(pre, data.kind(pre));
+      final int size = data.attSize(pre, data.kind(pre));
       int curr = pre + 1;
 
       @Override
       public DBNode next() {
-        if(curr == last) return null;
+        if(curr == pre + size) return null;
         final DBNode n = node;
         n.set(curr++, Data.ATTR);
         return n;
       }
+      @Override
+      public ANode get(final long i) {
+        final DBNode n = node;
+        n.set(pre + 1 + (int) i, Data.ATTR);
+        return n;
+      }
+      @Override
+      public long size() { return size - 1; }
     };
   }
 
   @Override
-  public final BasicNodeIter children() {
-    return new BasicNodeIter() {
+  public final DBNodeIter children() {
+    return new DBNodeIter(data) {
       int kind = data.kind(pre), curr = pre + data.attSize(pre, kind);
       final int last = pre + data.size(pre, kind);
       final DBNode node = finish();
 
       @Override
-      public ANode next() {
+      public DBNode next() {
         if(curr == last) return null;
         final Data d = data;
         kind = d.kind(curr);
@@ -335,8 +343,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter descendant() {
-    return new BasicNodeIter() {
+  public final DBNodeIter descendant() {
+    return new DBNodeIter(data) {
       int kind = data.kind(pre), curr = pre + data.attSize(pre, kind);
       final int last = pre + data.size(pre, kind);
       final DBNode node = finish();
@@ -353,14 +361,14 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter descendantOrSelf() {
-    return new BasicNodeIter() {
+  public final DBNodeIter descendantOrSelf() {
+    return new DBNodeIter(data) {
       final DBNode node = finish();
       final int last = pre + data.size(pre, data.kind(pre));
       int curr = pre;
 
       @Override
-      public ANode next() {
+      public DBNode next() {
         if(curr == last) return null;
         final int k = data.kind(curr);
         node.set(curr, k);
@@ -371,15 +379,15 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter following() {
-    return new BasicNodeIter() {
+  public final DBNodeIter following() {
+    return new DBNodeIter(data) {
       private final DBNode node = finish();
       final int sz = data.meta.size;
       int kind = data.kind(pre);
       int curr = pre + data.size(pre, kind);
 
       @Override
-      public ANode next() {
+      public DBNode next() {
         if(curr == sz) return null;
         kind = data.kind(curr);
         node.set(curr, kind);
@@ -390,8 +398,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter followingSibling() {
-    return new BasicNodeIter() {
+  public final DBNodeIter followingSibling() {
+    return new DBNodeIter(data) {
       private final DBNode node = finish();
       int kind = data.kind(pre);
       private final int pp = data.parent(pre, kind);
@@ -399,26 +407,12 @@ public class DBNode extends ANode {
       int curr = pp == -1 ? 0 : pre + data.size(pre, kind);
 
       @Override
-      public ANode next() {
+      public DBNode next() {
         if(curr == sz) return null;
         kind = data.kind(curr);
         node.set(curr, kind);
         curr += data.size(curr, kind);
         return node;
-      }
-    };
-  }
-
-  @Override
-  public final BasicNodeIter parentIter() {
-    return new BasicNodeIter() {
-      private boolean all;
-
-      @Override
-      public ANode next() {
-        if(all) return null;
-        all = true;
-        return parent();
       }
     };
   }
@@ -446,7 +440,7 @@ public class DBNode extends ANode {
     // check if a document has a single element as child
     ID t = type.id();
     if(type == NodeType.DOC) {
-      final BasicNodeIter ir = children();
+      final DBNodeIter ir = children();
       final ANode n = ir.next();
       if(n != null && n.type == NodeType.ELM && ir.next() == null) t = NodeType.DEL.id();
     }
@@ -478,7 +472,9 @@ public class DBNode extends ANode {
         tb.add(name()).add(" {\"").add(Token.chop(string(), 32)).add("\"}");
         break;
       case ELM:
-        tb.add(name()).add(" {...}");
+        tb.add(name()).add(" {");
+        if(hasChildren() || attributes().size() != 0) tb.add("...");
+        tb.add('}');
         break;
       case DOC:
         tb.add("{\"").add(data.text(pre, true)).add("\"}");

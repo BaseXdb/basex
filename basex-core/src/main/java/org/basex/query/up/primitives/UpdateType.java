@@ -52,6 +52,7 @@ public enum UpdateType {
 
   // User operations
 
+  /** Update info.          */ USERINFO,
   /** Change user name.     */ USERGRANT,
   /** Change password.      */ USERPASSWORD,
   /** Drop user.            */ USERDROP,

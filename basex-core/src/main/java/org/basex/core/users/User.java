@@ -3,6 +3,7 @@ package org.basex.core.users;
 import static org.basex.core.users.UserText.*;
 import static org.basex.util.Strings.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.eq;
 import static org.basex.util.XMLAccess.*;
 
 import java.util.*;
@@ -52,22 +53,31 @@ public final class User {
     name = string(attribute("Root", user, NAME));
     perm = attribute(name, user, PERMISSION, Perm.values());
 
-    for(final ANode password : children(user, PASSWORD)) {
-      final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
-      final Algorithm algo = attribute(name, password, ALGORITHM, Algorithm.values());
-      if(passwords.containsKey(algo)) throw new BaseXException(
-          name + ": Algorithm \"" + algo + "\" supplied more than once.");
-      passwords.put(algo, ec);
+    for(final ANode child : children(user)) {
+      if(eq(child.qname().id(), PASSWORD)) {
+        final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
+        final Algorithm algo = attribute(name, child, ALGORITHM, Algorithm.values());
+        if(passwords.containsKey(algo)) throw new BaseXException(
+            name + ": Algorithm \"" + algo + "\" supplied more than once.");
+        passwords.put(algo, ec);
 
-      for(final ANode code : children(password, null)) {
-        final Code cd = value(name, code.qname().id(), algo.codes);
-        if(ec.containsKey(cd)) throw new BaseXException(
-            name + ", " + algo + ": Code \"" + code + "\" supplied more than once.");
-        ec.put(cd, string(code.string()));
-      }
-      for(final Code code : algo.codes) {
-        if(ec.get(code) == null)
-          throw new BaseXException(name + ", " + algo + ": Code \"" + code + "\" missing.");
+        for(final ANode code : children(child)) {
+          final Code cd = value(name, code.qname().id(), algo.codes);
+          if(ec.containsKey(cd)) throw new BaseXException(
+              name + ", " + algo + ": Code \"" + code + "\" supplied more than once.");
+          ec.put(cd, string(code.string()));
+        }
+        for(final Code code : algo.codes) {
+          if(ec.get(code) == null)
+            throw new BaseXException(name + ", " + algo + ": Code \"" + code + "\" missing.");
+        }
+      } else if(eq(child.qname().id(), DATABASE)) {
+        // parse local permissions
+        final String nm = string(attribute(name, child, PATTERN));
+        final Perm prm = attribute(name, child, PERMISSION, Perm.values());
+        locals.put(nm, prm);
+      } else {
+        throw new BaseXException(name + ": invalid element: <" + child.qname() + "/>.");
       }
     }
 
@@ -76,36 +86,27 @@ public final class User {
       if(passwords.get(algo) == null) throw new BaseXException(
           name + ": Algorithm \"" + algo + "\" missing.");
     }
-
-    // parse local permissions
-    for(final ANode database : children(user, DATABASE)) {
-      final String nm = string(attribute(name, database, PATTERN));
-      final Perm prm = attribute(name, database, PERMISSION, Perm.values());
-      locals.put(nm, prm);
-    }
   }
 
   /**
    * Writes permissions to the specified XML builder.
-   * @param xml xml builder
+   * @param root root element
    */
-  synchronized void write(final XMLBuilder xml) {
-    xml.open(USER, NAME, name, PERMISSION, perm);
-    if(!passwords.isEmpty()) {
-      for(final Entry<Algorithm, EnumMap<Code, String>> algo : passwords.entrySet()) {
-        xml.open(PASSWORD, ALGORITHM, algo.getKey());
-        for(final Entry<Code, String> code : algo.getValue().entrySet()) {
-          final String v = code.getValue();
-          if(!v.isEmpty()) xml.open(code.getKey()).text(v).close();
-        }
-        xml.close();
+  synchronized void toXML(final FElem root) {
+    final FElem user = new FElem(USER).add(NAME, name).add(PERMISSION, perm.toString());
+    for(final Entry<Algorithm, EnumMap<Code, String>> algo : passwords.entrySet()) {
+      final FElem pw = new FElem(PASSWORD).add(ALGORITHM, algo.getKey().toString());
+      for(final Entry<Code, String> code : algo.getValue().entrySet()) {
+        final String v = code.getValue();
+        if(!v.isEmpty()) pw.add(new FElem(code.getKey().toString()).add(v));
       }
-      for(final Entry<String, Perm> local : locals.entrySet()) {
-        xml.open(DATABASE, PATTERN, local.getKey(), PERMISSION, local.getValue());
-        xml.close();
-      }
+      user.add(pw);
     }
-    xml.close();
+    for(final Entry<String, Perm> local : locals.entrySet()) {
+      user.add(new FElem(DATABASE).add(PATTERN, local.getKey()).
+          add(PERMISSION, local.getValue().toString()));
+    }
+    root.add(user);
   }
 
   /**
@@ -260,12 +261,5 @@ public final class User {
    */
   static String digest(final String name, final String password) {
     return md5(name + ':' + Prop.NAME + ':' + password);
-  }
-
-  @Override
-  public String toString() {
-    final XMLBuilder xml = new XMLBuilder().indent();
-    write(xml);
-    return xml.toString();
   }
 }

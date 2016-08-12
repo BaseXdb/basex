@@ -32,7 +32,7 @@ public final class CreateUser extends AUser {
 
     final Users users = context.users;
     users.add(new User(name, pw));
-    users.write();
+    users.write(context);
     return info(USER_CREATED_X, args[0]);
   }
 

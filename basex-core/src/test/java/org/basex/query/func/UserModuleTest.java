@@ -188,6 +188,21 @@ public final class UserModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
+  @Test public void info() {
+    query(_USER_INFO.args(), "<info/>");
+  }
+
+  /** Test method. */
+  @Test public void updateInfo() {
+    query(_USER_UPDATE_INFO.args("<info>A</info>"));
+    query(_USER_INFO.args(), "<info>A</info>");
+    query(_USER_UPDATE_INFO.args("<info/>"));
+
+    // invalid input
+    error(_USER_UPDATE_INFO.args("<abc/>"), ELM_X_X);
+  }
+
+  /** Test method. */
   @Test public void check() {
     query(_USER_CHECK.args(UserText.ADMIN, UserText.ADMIN));
     error(_USER_CHECK.args("", "x"), USER_NAME_X);

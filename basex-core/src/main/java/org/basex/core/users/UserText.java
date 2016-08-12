@@ -30,4 +30,6 @@ public interface UserText {
   byte[] PATTERN = token("pattern");
   /** Permission. */
   byte[] PERMISSION = token("permission");
+  /** Info. */
+  byte[] INFO = token("info");
 }

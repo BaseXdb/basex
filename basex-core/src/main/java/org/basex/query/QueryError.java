@@ -338,6 +338,8 @@ public enum QueryError {
   USER_SAMEPERM_X_X(USER, "update", "User '%' can only be % once."),
   /** User error. */
   USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
+  /** User error. */
+  USER_INFO_X(USER, "info", "Info can only be % once."),
 
   // EXPath modules
 
@@ -1028,6 +1030,8 @@ public enum QueryError {
   ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
   /** XPTY0004. */
   ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
+  /** XPTY0004. */
+  ELM_X_X(XPTY, 4, "element(%) expected: %."),
   /** XPTY0004. */
   STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
   /** XPTY0004. */

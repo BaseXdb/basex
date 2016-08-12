@@ -1244,6 +1244,11 @@ public enum Function {
   /** XQuery function. */
   _USER_PASSWORD(UserPassword.class, "password(name,password)",
       arg(STR, STR), EMP, flag(UPD), USER_URI),
+  /** XQuery function. */
+  _USER_INFO(UserInfo.class, "info()", arg(), ELM, USER_URI),
+  /** XQuery function. */
+  _USER_UPDATE_INFO(UserUpdateInfo.class, "update-info(element)",
+      arg(ELM), EMP, flag(UPD), USER_URI),
 
   /* Utility Module. */
 

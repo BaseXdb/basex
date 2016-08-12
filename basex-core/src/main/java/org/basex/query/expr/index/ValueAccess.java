@@ -99,9 +99,9 @@ public final class ValueAccess extends IndexAccess {
     final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term);
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
-    return new BasicNodeIter() {
+    return new DBNodeIter(data) {
       @Override
-      public ANode next() {
+      public DBNode next() {
         while(ii.more()) {
           if(test == null) {
             tmp.pre(ii.pre());
@@ -156,8 +156,7 @@ public final class ValueAccess extends IndexAccess {
    * @return node iterator
    */
   private BasicNodeIter scanEmpty() {
-    return new BasicNodeIter() {
-      final Data data = ictx.data;
+    return new DBNodeIter(ictx.data) {
       final DBNode tmp = new DBNode(data, 0, Data.ELEM);
       final int sz = data.meta.size;
       int pre = -1;

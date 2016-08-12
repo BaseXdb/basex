@@ -181,20 +181,6 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter parentIter() {
-    return new BasicNodeIter() {
-      private boolean all;
-
-      @Override
-      public ANode next() {
-        if(all) return null;
-        all = true;
-        return parent;
-      }
-    };
-  }
-
-  @Override
   public final BasicNodeIter followingSibling() {
     return new BasicNodeIter() {
       private BasicNodeIter iter;

@@ -29,11 +29,6 @@ public abstract class BasicNodeIter extends NodeIter implements Iterable<ANode> 
   public abstract ANode next();
 
   @Override
-  public ANode get(final long i) {
-    return null;
-  }
-
-  @Override
   public final Iterator<ANode> iterator() {
     return new Iterator<ANode>() {
       private ANode node;
