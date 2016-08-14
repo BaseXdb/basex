@@ -45,13 +45,13 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("8.5.3 beta");
+  public static final String VERSION = version("8.5.3 RC1");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
-  public static final String TEAM1 = "Alexander Holupirek, Michael Seiferle";
+  public static final String TEAM1 = "Michael Seiferle, Alexander Holupirek";
   /** Co-authors (2). */
-  public static final String TEAM2 = "Lukas Kircher, Leo W\u00F6rteler";
+  public static final String TEAM2 = "Leo W\u00F6rteler, Lukas Kircher";
   /** Entity. */
   public static final String ENTITY = NAME + " Team";
   /** Project namespace. */
