@@ -110,7 +110,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "qm:xyz()", JAVAWHICH_X_X_X);
     error("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
-        "qm:fast()", JAVAARITY_X_X_X_X_X);
+        "qm:fast()", JAVAARITY_X_X_X_X);
 
     query("declare namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "try{qm:error(qm:new())} catch * {local-name-from-QName($err:code)}", "BASX0000");

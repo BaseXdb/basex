@@ -82,8 +82,8 @@ public final class DynFuncCall extends FuncCall {
     final int nargs = exprs.length - 1;
     if(tp instanceof FuncType) {
       final FuncType ft = (FuncType) tp;
-      if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X_X.get(
-          info, nargs, nargs == 1 ? "" : "s", ft.argTypes.length, f.toErrorString());
+      if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X.get(
+          info, arguments(nargs), ft.argTypes.length, f.toErrorString());
       if(ft.type != null) {
         SeqType rt = ft.type;
         if(tp instanceof MapType && !rt.mayBeZero())
@@ -184,8 +184,8 @@ public final class DynFuncCall extends FuncCall {
 
     final FItem f = (FItem) it;
     final int nargs = exprs.length - 1;
-    if(f.arity() != nargs) throw INVARITY_X_X_X_X.get(
-        info, nargs, nargs == 1 ? "" : "s", f.arity(), f.toErrorString());
+    if(f.arity() != nargs) throw INVARITY_X_X_X.get(
+        info, arguments(nargs), f.arity(), f.toErrorString());
     checkUpdating(f);
     return f;
   }

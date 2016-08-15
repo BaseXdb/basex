@@ -241,8 +241,8 @@ public abstract class JavaFunction extends Arr {
     }
 
     if(meth == null) {
-      if(methArity != -1) throw JAVAARITY_X_X_X_X_X.get(ii,
-          clazz.getName(), name, methArity, arity, arity == 1 ? "" : "s");
+      if(methArity != -1) throw JAVAARITY_X_X_X_X.get(
+          ii, clazz.getName(), name, methArity, arguments(arity));
       throw JAVAWHICH_X_X_X.get(ii, clazz.getName(), name, arity);
     }
 

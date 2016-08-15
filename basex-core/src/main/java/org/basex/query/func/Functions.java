@@ -7,14 +7,15 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Flag;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 import org.basex.util.similarity.*;
 
 /**
@@ -68,7 +69,7 @@ public final class Functions extends TokenSet {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      throw FUNCTYPES_X_X_X_X.get(info, name.string(), arity, "s", 1);
+      throw FUNCTYPES_X_X_X.get(info, name.string(), arguments(arity), 1);
     }
 
     // include similar function name in error message
@@ -84,23 +85,73 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Tries to resolve the specified function as a built-in one.
+   * Returns a built-in function with the specified name.
+   * @param name function name
+   * @return function if found, {@code null} otherwise
+   */
+  public Function getBuiltIn(final QNm name) {
+    final int id = id(name.id());
+    if(id == 0) return null;
+    final Function fn = funcs[id];
+    return eq(fn.uri(), name.uri()) ? fn : null;
+  }
+
+  /**
+   * Returns a built-in function with the specified name and arity.
+   * Raises an error if the function is found, but has a different arity.
    * @param name function name
    * @param arity number of arguments
    * @param info input info
-   * @return function spec if found, {@code null} otherwise
+   * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
   private Function getBuiltIn(final QNm name, final long arity, final InputInfo info)
       throws QueryException {
 
-    final int id = id(name.id());
-    if(id == 0) return null;
-    final Function fl = funcs[id];
-    if(!eq(fl.uri(), name.uri())) return null;
-    // check number of arguments
-    if(arity >= fl.minMax[0] && arity <= fl.minMax[1]) return fl;
-    throw FUNCARGNUM_X_X_X.get(info, fl, arity, arity == 1 ? "" : "s");
+    final Function fn = getBuiltIn(name);
+    if(fn == null) return null;
+
+    final int min = fn.minMax[0], max = fn.minMax[1];
+    if(arity >= min && arity <= max) return fn;
+
+    final IntList arities = new IntList();
+    if(max != Integer.MAX_VALUE) {
+      for(int m = min; m <= max; m++) arities.add(m);
+    }
+    throw wrongArity(fn, arity, arities, info);
+  }
+
+  /**
+   * Raises an error for the wrong number of function arguments.
+   * @param func function
+   * @param arity number of arguments
+   * @param arities expected arities
+   * @param info input info
+   * @return error
+   */
+  public static QueryException wrongArity(final Object func, final long arity,
+      final IntList arities, final InputInfo info) {
+
+    final int as = arities.size();
+    if(as == 0) return FUNCARGNUM_X_X.get(info, func, arguments(arity));
+
+    int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+    for(int a = 0; a < as; a++) {
+      final int m = arities.get(a);
+      if(m < min) min = m;
+      if(m > max) max = m;
+    }
+
+    final StringBuilder ext = new StringBuilder();
+    if(as > 2 && max - min + 1 == as) {
+      ext.append(min).append('-').append(max);
+    } else {
+      for(int a = 0; a < as; a++) {
+        if(a != 0) ext.append(a + 1 < as ? ", " : " or ");
+        ext.append(arities.get(a));
+      }
+    }
+    return FUNCTYPES_X_X_X.get(info, func, arguments(arity), ext);
   }
 
   /**
@@ -114,8 +165,8 @@ public final class Functions extends TokenSet {
    */
   public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo info) throws QueryException {
-    final Function fl = getBuiltIn(name, args.length, info);
-    return fl == null ? null : fl.get(sc, info, args);
+    final Function fn = getBuiltIn(name, args.length, info);
+    return fn == null ? null : fn.get(sc, info, args);
   }
 
   /**

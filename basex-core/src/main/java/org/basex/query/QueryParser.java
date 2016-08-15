@@ -454,7 +454,7 @@ public class QueryParser extends InputParser {
 
           final long arity = items.size();
           if(arity < sig.minMax[0] || arity > sig.minMax[1])
-            throw BASX_ANNNUM_X_X_X.get(ii, sig, arity, arity == 1 ? "" : "s");
+            throw BASX_ANNNUM_X_X.get(ii, sig, arguments(arity));
           final int al = sig.args.length;
           for(int a = 0; a < arity; a++) {
             final SeqType st = sig.args[Math.min(al - 1, a)];

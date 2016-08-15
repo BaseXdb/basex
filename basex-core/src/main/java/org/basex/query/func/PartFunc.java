@@ -63,7 +63,7 @@ public final class PartFunc extends Arr {
       final FuncType ft = (FuncType) t.type;
       final int nargs = exprs.length + holes.length - 1;
       if(ft.argTypes.length != nargs)
-        throw INVARITY_X_X_X_X.get(info, nargs, nargs == 1 ? "" : "s", ft.argTypes.length, f);
+        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, f);
       final SeqType[] args = new SeqType[holes.length];
       final int hl = holes.length;
       for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
@@ -79,8 +79,7 @@ public final class PartFunc extends Arr {
 
     final int hl = holes.length;
     final int nargs = exprs.length + hl - 1;
-    if(f.arity() != nargs)
-      throw INVARITY_X_X_X_X.get(info, nargs, nargs == 1 ? "" : "s", f.arity(), f);
+    if(f.arity() != nargs) throw INVARITY_X_X_X.get(info, arguments(nargs), f.arity(), f);
 
     final FuncType ft = f.funcType();
     final Expr[] args = new Expr[nargs];

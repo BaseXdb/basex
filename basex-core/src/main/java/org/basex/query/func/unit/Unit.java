@@ -125,7 +125,7 @@ final class Unit {
         if(vs == 2 && eq(EXPECTED, args[0].string(null))) {
           code = QNm.resolve(args[1].string(null), QueryText.ERROR_URI, sf.sc, sf.info);
         } else if(vs != 0) {
-          throw BASX_ANNNUM_X_X_X.get(ann.info, ann, vs, vs == 1 ? "" : "s");
+          throw BASX_ANNNUM_X_X.get(ann.info, ann, arguments(vs));
         }
 
         final FElem testcase = new FElem(TESTCASE).add(NAME, sf.name.local());

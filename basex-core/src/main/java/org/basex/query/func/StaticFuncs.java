@@ -58,7 +58,8 @@ public final class StaticFuncs extends ExprInfo {
 
     final byte[] uri = nm.uri();
     if(uri.length == 0) throw FUNNONS_X.get(ii, nm.string());
-    if(NSGlobal.reserved(uri)) throw NAMERES_X.get(ii, nm.string());
+    if(NSGlobal.reserved(uri) || Functions.get().getBuiltIn(nm) != null)
+      throw FNRESERVED_X.get(ii, nm.string());
 
     final StaticFunc sf = new StaticFunc(anns, nm, args, type, expr, doc, vs, ii);
     final byte[] sig = sf.id();
@@ -136,27 +137,9 @@ public final class StaticFuncs extends ExprInfo {
           if(fc != ofc && ofc.func != null && call.name.eq(ofc.name()))
             arities.add(ofc.func.arity());
         }
-        if(!arities.isEmpty()) {
-          // include arities in error message if another function with same name exists:
-          final StringBuilder ext = new StringBuilder();
-          final int as = arities.size();
-          int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-          for(int a = 0; a < as; a++) {
-            final int m = arities.get(a);
-            if(m < min) min = m;
-            if(m > max) max = m;
-          }
-          if(as > 1 && max - min + 1 == as) {
-            ext.append(min).append('-').append(max);
-          } else {
-            for(int a = 0; a < as; a++) {
-              if(a != 0) ext.append(a + 1 < as ? ", " : " or ");
-              ext.append(arities.get(a));
-            }
-          }
-          final int ar = call.exprs.length;
-          throw FUNCTYPES_X_X_X_X.get(call.info, call.name.string(), ar, ar == 1 ? "" : "s", ext);
-        }
+        // known function, wrong number of arguments
+        if(!arities.isEmpty())
+          throw Functions.wrongArity(call.name, call.exprs.length, arities, call.info);
 
         // if not, indicate that function is unknown
         final QueryException qe = similarError(call.name, call.info);
@@ -164,7 +147,7 @@ public final class StaticFuncs extends ExprInfo {
       }
 
       if(call != null) {
-        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info, call.name.string());
+        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info, call.name.prefixId());
         // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }

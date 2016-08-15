@@ -138,7 +138,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.string()).add(toString(SEP)).toString();
+    return new TokenBuilder(name.prefixId()).add(toString(SEP)).toString();
   }
 
   @Override

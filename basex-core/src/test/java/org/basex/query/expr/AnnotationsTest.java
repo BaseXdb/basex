@@ -57,7 +57,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
     error("declare %rest:xx function local:x() { 1 }; 1", BASX_ANNOT_X_X);
     // check output annotations
     error("declare %output:xx function local:x() { 1 }; 1", BASX_ANNOT_X_X);
-    error("declare %output:method function local:x() { 1 }; 1", BASX_ANNNUM_X_X_X);
+    error("declare %output:method function local:x() { 1 }; 1", BASX_ANNNUM_X_X);
     error("declare %output:method(1) function local:x() { 1 }; 1", BASX_ANNTYPE_X_X_X);
   }
 }
