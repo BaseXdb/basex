@@ -43,9 +43,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query(_JOBS_EVAL.args(".", " map { '': <a/> }"));
     query(_JOBS_EVAL.args("declare variable $a external;$a", " map { 'a': <a/> }"));
     query(_JOBS_EVAL.args("\"static-base-uri()\"", " map { 'base-uri': 'abc.xq' }"));
-    // some errors will only be detected at runtime
-    query(_JOBS_EVAL.args("\"db:open('db')\""));
-    query(_JOBS_EVAL.args("1+<a/>"));
+    query(_JOBS_EVAL.args("1", "()", " map{ 'id':'123' }"));
 
     // database creation
     error(_DB_OPEN.args("db"), BXDB_OPEN_X);
@@ -53,12 +51,18 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query(_JOBS_EVAL.args("\"db:drop('db')\"") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
     query(_JOBS_EVAL.args("delete node <a/>"));
 
-    // errors
+    // errors (will not be raised before runtime)
+    query(_JOBS_EVAL.args("\"db:open('db')\""));
     query(_JOBS_EVAL.args("1+"));
     query(_JOBS_EVAL.args("1, delete node <a/>"));
-    error(_JOBS_EVAL.args("1+<a/>", "()", " map{ 'start':'12345' }"), DATEFORMAT_X_X_X);
-    error(_JOBS_EVAL.args("1+<a/>", "()", " map{ 'interval':'12345' }"), DATEFORMAT_X_X_X);
-    error(_JOBS_EVAL.args("1+<a/>", "()", " map{ 'interval':'-PT1S' }"), JOBS_RANGE);
+
+    // errors
+    error(_JOBS_EVAL.args("1", "()", " map{ 'start':'12345' }"), DATEFORMAT_X_X_X);
+    error(_JOBS_EVAL.args("1", "()", " map{ 'interval':'12345' }"), DATEFORMAT_X_X_X);
+    error(_JOBS_EVAL.args("1", "()", " map{ 'interval':'-PT1S' }"), JOBS_RANGE_X);
+    error(_JOBS_EVAL.args("1", "()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
+    error(_JOBS_EVAL.args("1", "()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
+    error("(1,2)!" + _JOBS_EVAL.args("1", "()", " map{ 'id':'abc' }"), JOBS_ID_EXISTS_X);
   }
 
   /** Test method. */
@@ -114,7 +118,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
 
     // error
     error(_JOBS_EVAL.args("1", "()",
-        " map{ 'start': 'PT2S', 'interval': 'PT1S', 'end': 'PT1S' }"), JOBS_RANGE);
+        " map{ 'start': 'PT2S', 'interval': 'PT1S', 'end': 'PT1S' }"), JOBS_RANGE_X);
   }
 
   /** Test method. */

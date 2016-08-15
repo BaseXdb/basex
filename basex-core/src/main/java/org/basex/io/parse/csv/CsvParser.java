@@ -28,8 +28,6 @@ final class CsvParser {
 
   /** First entry of a line. */
   private boolean first = true;
-  /** Quoted state.  */
-  private boolean quoted;
   /** Data mode. */
   private boolean data;
 
@@ -67,34 +65,33 @@ final class CsvParser {
    */
   private void parse() throws IOException {
     final TokenBuilder entry = new TokenBuilder();
+    boolean quoted = false;
     data = !header;
 
     int ch = input.read();
     while(ch != -1) {
       if(quoted) {
         // quoted state
-        if(backslashes) {
-          if(ch == '\\') {
-            ch = bs();
-            if(ch == -1) break;
-          } else if(ch == '"') {
+        if(ch == '"') {
+          ch = input.read();
+          if(ch != '"') {
             quoted = false;
-            ch = input.read();
             continue;
           }
-        } else {
-          if(ch == '"') {
-            ch = input.read();
-            if(ch != '"') {
-              quoted = false;
-              continue;
-            }
-          }
+          if(backslashes) add(entry, '"');
+        } else if(ch == '\\' && backslashes) {
+          ch = bs();
         }
         add(entry, ch);
-      } else if(quotes && ch == '"') {
-        // parse quote
-        quoted = true;
+      } else if(ch == '"') {
+        if(quotes && entry.isEmpty()) {
+          // parse quote
+          quoted = true;
+        } else {
+          ch = input.read();
+          if(ch != '"' || backslashes) add(entry, '"');
+          continue;
+        }
       } else if(ch == separator) {
         // parse separator
         record(entry, true);
@@ -105,11 +102,7 @@ final class CsvParser {
         first = true;
         data = true;
       } else {
-        if(backslashes) {
-          if(ch == '\\') ch = bs();
-          if(ch == -1) break;
-        }
-        // parse any other character
+        if(ch == '\\' && backslashes) ch = bs();
         add(entry, ch);
       }
       ch = input.read();
@@ -136,7 +129,7 @@ final class CsvParser {
    * @param ch character
    */
   private static void add(final TokenBuilder entry, final int ch) {
-    entry.add(XMLToken.valid(ch) ? ch : Token.REPLACEMENT);
+    if(ch != -1) entry.add(XMLToken.valid(ch) ? ch : Token.REPLACEMENT);
   }
 
   /**

@@ -134,7 +134,7 @@ public final class CsvParserTest extends SandboxTest {
     copts.set(CsvOptions.BACKSLASHES, true);
     execute(new CreateDB(NAME, FILE));
     // H \nU,a
-    assertEquals("H U\"", query("replace(normalize-space((//Props)[1]), ',.*', '')"));
+    assertEquals("H \"\"U\"", query("replace(normalize-space((//Props)[1]), ',.*', '')"));
   }
 
   /**

@@ -40,12 +40,11 @@ public final class RangeAccess extends IndexAccess {
   @Override
   public BasicNodeIter iter(final QueryContext qc) {
     final byte kind = index.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-
-    return new BasicNodeIter() {
-      final IndexIterator it = ictx.data.iter(index);
+    return new DBNodeIter(ictx.data) {
+      final IndexIterator it = data.iter(index);
       @Override
-      public ANode next() {
-        return it.more() ? new DBNode(ictx.data, it.pre(), kind) : null;
+      public DBNode next() {
+        return it.more() ? new DBNode(data, it.pre(), kind) : null;
       }
     };
   }

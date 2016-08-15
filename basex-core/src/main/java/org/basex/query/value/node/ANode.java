@@ -315,7 +315,8 @@ public abstract class ANode extends Item {
   public abstract BasicNodeIter ancestorOrSelf();
 
   /**
-   * Returns a lightweight, low-level attribute axis iterator.
+   * Returns a lightweight, low-level attribute axis iterator with {@link Iter#size} and
+   * {@link Iter#get} implemented.
    * If nodes returned are to be further used, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
@@ -361,7 +362,25 @@ public abstract class ANode extends Item {
    * If nodes returned are to be further used, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
-  public abstract BasicNodeIter parentIter();
+  public final BasicNodeIter parentIter() {
+    return new BasicNodeIter() {
+      private boolean all;
+      @Override
+      public ANode next() {
+        if(all) return null;
+        all = true;
+        return parent();
+      }
+      @Override
+      public ANode get(final long i) {
+        return parent();
+      }
+      @Override
+      public ANode value() {
+        return parent();
+      }
+    };
+  }
 
   /**
    * Returns a lightweight, low-level preceding axis iterator.

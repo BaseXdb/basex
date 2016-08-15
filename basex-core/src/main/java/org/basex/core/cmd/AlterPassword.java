@@ -34,7 +34,7 @@ public final class AlterPassword extends AUser {
     if(user == null) return error(UNKNOWN_USER_X, name);
 
     user.password(pass);
-    users.write();
+    users.write(context);
     return info(PW_CHANGED_X, name);
   }
 

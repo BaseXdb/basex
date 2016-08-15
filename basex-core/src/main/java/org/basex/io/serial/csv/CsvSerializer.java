@@ -54,17 +54,31 @@ abstract class CsvSerializer extends StandardSerializer {
       if(i != 0) out.print(separator);
 
       byte[] txt = v == null ? EMPTY : v;
-      if(contains(txt, separator) || (quotes || backslashes) &&
-          (contains(txt, '\n') || contains(txt, '"'))) {
+      final boolean delim = contains(txt, separator) || contains(txt, '\n');
+      final boolean special = contains(txt, '\r') || contains(txt, '\t') || contains(txt, '"');
+      if(delim || special || backslashes && contains(txt, '\\')) {
         final TokenBuilder tb = new TokenBuilder();
-        if(quotes) tb.add('"');
+        if(delim && !backslashes && !quotes) throw BXCS_SERIAL_X.getIO(
+            Util.info("Output must be put into quotes: %", chop(txt, null)));
+
+        if(quotes && (delim || special)) tb.add('"');
         final int len = txt.length;
         for(int c = 0; c < len; c += cl(txt, c)) {
-          final int cp = cp(txt, c);
-          if(cp == '"') tb.add(backslashes ? '\\' : '"');
-          tb.add(cp);
+          int cp = cp(txt, c);
+          if(backslashes) {
+            if(cp == '\n') tb.add("\\n");
+            else if(cp == '\r') tb.add("\\r");
+            else if(cp == '\t') tb.add("\\t");
+            else if(cp == '"') tb.add("\\\"");
+            else if(cp == '\\') tb.add("\\\\");
+            else if(cp == separator && !quotes) tb.add('\\').add(cp);
+            else tb.add(cp);
+          } else {
+            if(cp == '"') tb.add('"');
+            tb.add(cp);
+          }
         }
-        if(quotes) tb.add('"');
+        if(quotes && (delim || special)) tb.add('"');
         txt = tb.finish();
       }
       out.print(txt);

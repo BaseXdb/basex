@@ -18,7 +18,6 @@ import org.basex.util.list.*;
 public final class UserDrop extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
     final User user = toSafeUser(0, qc);
     final StringList patterns = toPatterns(1, qc);
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);

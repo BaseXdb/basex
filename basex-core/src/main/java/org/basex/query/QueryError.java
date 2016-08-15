@@ -171,9 +171,13 @@ public enum QueryError {
   /** Jobs error. */
   JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
   /** Jobs error. */
-  JOBS_RANGE(JOBS, "range", "Value out of range: %."),
+  JOBS_RANGE_X(JOBS, "range", "Value out of range: %."),
   /** Jobs error. */
   JOBS_CONFLICT(JOBS, "conflict", "Either 'cache' or 'interval' option is allowed."),
+  /** Jobs error. */
+  JOBS_ID_EXISTS_X(JOBS, "id", "Job id already exists: %."),
+  /** Jobs error. */
+  JOBS_ID_INVALID_X(JOBS, "id", "Invalid job name: %."),
 
   // JSON Module
 
@@ -317,6 +321,8 @@ public enum QueryError {
   /** User error. */
   USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),
   /** User error. */
+  USER_PASSWORD_X(USER, "password", "Wrong password supplied for user '%'."),
+  /** User error. */
   USER_ADMIN(USER, "admin", "User 'admin' cannot be modified."),
   /** User error. */
   USER_EQUAL_X(USER, "equal", "Name of old and new user is equal: %."),
@@ -332,6 +338,8 @@ public enum QueryError {
   USER_SAMEPERM_X_X(USER, "update", "User '%' can only be % once."),
   /** User error. */
   USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
+  /** User error. */
+  USER_INFO_X(USER, "info", "Info can only be % once."),
 
   // EXPath modules
 
@@ -1022,6 +1030,8 @@ public enum QueryError {
   ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
   /** XPTY0004. */
   ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
+  /** XPTY0004. */
+  ELM_X_X(XPTY, 4, "element(%) expected: %."),
   /** XPTY0004. */
   STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
   /** XPTY0004. */

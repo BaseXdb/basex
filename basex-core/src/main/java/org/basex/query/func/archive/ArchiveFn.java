@@ -2,7 +2,6 @@ package org.basex.query.func.archive;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.archive.ArchiveText.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -30,7 +29,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final Item checkElemToken(final Item it) throws QueryException {
     if(it instanceof AStr || ENTRY.eq(it)) return it;
-    throw ELMSTR_X_X_X.get(info, Q_ENTRY.prefixId(XML), it.type, it);
+    throw ELMSTR_X_X_X.get(info, Q_ENTRY.prefixId(), it.type, it);
   }
 
   /**

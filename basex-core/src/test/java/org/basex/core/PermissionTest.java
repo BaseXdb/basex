@@ -128,7 +128,7 @@ public final class PermissionTest extends SandboxTest {
     no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Kill("dada"), testSession);
-    no(new ShowUsers("Users"), testSession);
+    ok(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
     no(new AlterPassword(NAME, NAME), testSession);
@@ -175,7 +175,7 @@ public final class PermissionTest extends SandboxTest {
     no(new DropUser(NAME), testSession);
     no(new Export(Prop.TMP + NAME + "-export"), testSession);
     no(new Kill("dada"), testSession);
-    no(new ShowUsers("Users"), testSession);
+    ok(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
     no(new AlterPassword(NAME, NAME), testSession);
@@ -229,7 +229,7 @@ public final class PermissionTest extends SandboxTest {
     no(new DropUser(NAME), testSession);
     no(new Export(Prop.TMP + NAME + "-export"), testSession);
     no(new Kill("dada"), testSession);
-    no(new ShowUsers("Users"), testSession);
+    ok(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
     no(new AlterPassword(NAME, NAME), testSession);
@@ -260,7 +260,7 @@ public final class PermissionTest extends SandboxTest {
     no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Kill("dada"), testSession);
-    no(new ShowUsers("Users"), testSession);
+    ok(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
     no(new AlterPassword(NAME, NAME), testSession);

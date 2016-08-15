@@ -46,9 +46,9 @@ public final class StringRangeAccess extends IndexAccess {
     final IndexIterator ii = index.min.length <= ml && index.max.length <= ml &&
         (text ? data.meta.textindex : data.meta.attrindex) ? data.iter(index) : scan();
 
-    return new BasicNodeIter() {
+    return new DBNodeIter(data) {
       @Override
-      public ANode next() {
+      public DBNode next() {
         return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
       }
     };

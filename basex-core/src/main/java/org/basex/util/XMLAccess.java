@@ -19,8 +19,17 @@ public final class XMLAccess {
 
   /**
    * Returns child elements.
-   * @param node node
-   * @param name name
+   * @param node root node
+   * @return iterator
+   */
+  public static BasicNodeIter children(final ANode node) {
+    return children(node, null);
+  }
+
+  /**
+   * Returns child elements.
+   * @param node root node
+   * @param name element name (can be {@code null})
    * @return iterator
    */
   public static BasicNodeIter children(final ANode node, final byte[] name) {

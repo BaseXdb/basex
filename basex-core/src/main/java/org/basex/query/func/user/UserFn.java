@@ -69,6 +69,7 @@ abstract class UserFn extends StandardFunc {
   protected final User toUser(final int i, final QueryContext qc) throws QueryException {
     final String name = toName(i, qc);
     final User user = qc.context.users.get(name);
+    if(user != qc.context.user()) checkAdmin(qc);
     if(user == null) throw USER_UNKNOWN_X.get(info, name);
     return user;
   }

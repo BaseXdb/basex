@@ -160,14 +160,13 @@ public final class DeepEqual {
             if(!eq(s1.string(), s2.string())) return false;
           } else if(t1 == NodeType.ELM) {
             // compare attributes
-            if(s1.attributes().value().size() != s2.attributes().value().size()) return false;
+            BasicNodeIter ir1 = s1.attributes(), ir2 = s2.attributes();
+            if(ir1.size() != ir2.size()) return false;
 
             // compare names, values and prefixes
-            final BasicNodeIter ir1 = s1.attributes();
             LOOP:
             for(ANode a1; (a1 = ir1.next()) != null;) {
               n1 = a1.qname();
-              final BasicNodeIter ir2 = s2.attributes();
               for(ANode a2; (a2 = ir2.next()) != null;) {
                 n2 = a2.qname();
                 if(!n1.eq(n2)) continue;
@@ -175,6 +174,7 @@ public final class DeepEqual {
                     !eq(a1.string(), a2.string())) {
                   return false;
                 }
+                ir2 = s2.attributes();
                 continue LOOP;
               }
               return false;

@@ -14,4 +14,6 @@ public final class EvalOptions extends Options {
   public static final StringOption END = new StringOption("end", "");
   /** Interval after which query will be repeated. */
   public static final StringOption INTERVAL = new StringOption("interval", "");
+  /** Custom id string. */
+  public static final StringOption ID = new StringOption("id");
 }

@@ -23,8 +23,7 @@ public class UserList extends UserFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
-    final ArrayList<User> users = qc.context.users.users(null);
+    final ArrayList<User> users = qc.context.users.users(null, qc.context);
     final TokenList tl = new TokenList(users.size());
     for(final User user : users) tl.add(user.name());
     return StrSeq.get(tl);

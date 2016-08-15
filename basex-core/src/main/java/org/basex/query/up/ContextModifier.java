@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
@@ -114,8 +115,9 @@ public abstract class ContextModifier {
    * @throws QueryException query exception
    */
   final void apply(final QueryContext qc) throws QueryException {
+    final Context ctx = qc.context;
     for(final UserUpdates up : userUpdates.values()) up.apply();
-    if(!userUpdates.isEmpty()) qc.context.users.write();
+    if(!userUpdates.isEmpty()) ctx.users.write(ctx);
 
     // apply initial updates based on database names
     for(final NameUpdates up : nameUpdates.values()) up.apply(true);
@@ -126,7 +128,7 @@ public abstract class ContextModifier {
     final Set<Data> datas = new HashSet<>();
     try {
       for(final Data data : dbUpdates.keySet()) {
-        data.startUpdate(qc.context.options);
+        data.startUpdate(ctx.options);
         datas.add(data);
       }
       // apply node and database update
@@ -138,7 +140,7 @@ public abstract class ContextModifier {
     } finally {
       // remove locks: in case of a crash, remove only already acquired write locks
       for(final Data data : datas) {
-        data.finishUpdate(qc.context.options);
+        data.finishUpdate(ctx.options);
       }
     }
 

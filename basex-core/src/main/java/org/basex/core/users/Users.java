@@ -27,6 +27,8 @@ public final class Users {
   private final LinkedHashMap<String, User> users = new LinkedHashMap<>();
   /** Filename. */
   private final IOFile file;
+  /** Info node. */
+  private ANode info;
 
   /**
    * Constructor for global users.
@@ -44,7 +46,6 @@ public final class Users {
    */
   private synchronized void read() {
     if(!file.exists()) return;
-
     try {
       final byte[] io = file.read();
       final IOContent content = new IOContent(io, file.path());
@@ -53,20 +54,28 @@ public final class Users {
       final ANode doc = new DBNode(Parser.singleParser(content, options, ""));
       final ANode root = children(doc, USERS).next();
       if(root == null) {
-        Util.errln(file.name() + ": No 'users' root element.");
+        Util.errln(file.name() + ": No '%' root element.", USERS);
       } else {
-        for(final ANode child : children(root, USER)) {
-          try {
-            final User user = new User(child);
-            final String name = user.name();
-            if(users.get(name) != null) {
-              Util.errln(file.name() + ": User \"" + name + "\" supplied more than once.");
-            } else {
-              users.put(name, user);
+        for(final ANode child : children(root)) {
+          final byte[] qname = child.qname().id();
+          if(eq(qname, USER)) {
+            try {
+              final User user = new User(child);
+              final String name = user.name();
+              if(users.get(name) != null) {
+                Util.errln(file.name() + ": User '%' supplied more than once.", name);
+              } else {
+                users.put(name, user);
+              }
+            } catch(final BaseXException ex) {
+              // reject users with faulty data
+              Util.errln(file.name() + ": " + ex.getLocalizedMessage());
             }
-          } catch(final BaseXException ex) {
-            // reject users with faulty data
-            Util.errln(file.name() + ": " + ex.getLocalizedMessage());
+          } else if(eq(qname, INFO)) {
+            if(info != null) Util.errln(file.name() + ": occurs more than once: %.", qname);
+            else info = child.finish();
+          } else {
+            Util.errln(file.name() + ": invalid element: %.", qname);
           }
         }
       }
@@ -77,20 +86,29 @@ public final class Users {
 
   /**
    * Writes permissions to disk.
+   * @param ctx database context
    */
-  public synchronized void write() {
+  public synchronized void write(final Context ctx) {
     if(store()) {
       try {
-        final XMLBuilder xml = new XMLBuilder().indent().open(USERS);
-        for(final User user : users.values()) user.write(xml);
-        file.parent().md();
-        file.write(xml.finish());
+        file.write(toXML(ctx).serialize().finish());
       } catch(final IOException ex) {
         Util.errln(ex);
       }
     } else if(file.exists()) {
       file.delete();
     }
+  }
+
+  /**
+   * Writes permissions to the specified XML builder.
+   * @param ctx database context
+   * @return root element
+   */
+  private synchronized FElem toXML(final Context ctx) {
+    final FElem root = new FElem(USERS);
+    for(final User user : users.values()) user.toXML(root);
+    return root.add(info().deepCopy(ctx.options));
   }
 
   /**
@@ -144,40 +162,61 @@ public final class Users {
   }
 
   /**
-   * Returns table with all users, or users from a specified database.
+   * Returns table with all users, or users from a specific database.
+   * The list will only contain the current user if no admin permissions are available.
    * @param db database (can be {@code null})
+   * @param ctx database context
    * @return user information
    */
-  public synchronized Table info(final String db) {
+  public synchronized Table info(final String db, final Context ctx) {
     final Table table = new Table();
     table.description = Text.USERS_X;
 
-    for(final String info : S_USERINFO) table.header.add(info);
-    for(final User user : users(db)) {
-      final TokenList tl = new TokenList();
-      tl.add(user.name());
-      tl.add(user.perm(db).toString());
-      table.contents.add(tl);
+    for(final String user : S_USERINFO) table.header.add(user);
+    for(final User user : users(db, ctx)) {
+      table.contents.add(new TokenList().add(user.name()).add(user.perm(db).toString()));
     }
     return table.sort().toTop(token(ADMIN));
   }
 
   /**
-   * Returns all users, or users from a specified database.
+   * Returns all users, or users that have permissions for a specific database.
+   * The list will only contain the current user if no admin permissions are available.
    * @param db database (can be {@code null})
+   * @param ctx database context
    * @return user information
    */
-  public synchronized ArrayList<User> users(final String db) {
-    final ArrayList<User> tmp = new ArrayList<>();
+  public synchronized ArrayList<User> users(final String db, final Context ctx) {
+    final User curr = ctx.user();
+    final boolean admin = curr.has(Perm.ADMIN);
+    final ArrayList<User> list = new ArrayList<>();
     for(final User user : users.values()) {
-      if(db == null) {
-        tmp.add(user);
-      } else {
-        final Entry<String, Perm> entry = user.find(db);
-        if(entry != null) tmp.add(user);
+      if(admin || curr == user) {
+        if(db == null) {
+          list.add(user);
+        } else {
+          final Entry<String, Perm> entry = user.find(db);
+          if(entry != null) list.add(user);
+        }
       }
     }
-    return tmp;
+    return list;
+  }
+
+  /**
+   * Returns the info element.
+   * @return info element
+   */
+  public ANode info() {
+    return info == null ? new FElem(INFO) : info;
+  }
+
+  /**
+   * Sets the info element.
+   * @param elem info element
+   */
+  public void info(final ANode elem) {
+    info = elem.hasChildren() || elem.attributes().size() != 0 ? elem : null;
   }
 
   /**
@@ -185,16 +224,10 @@ public final class Users {
    * @return result of check
    */
   private synchronized boolean store() {
+    if(info != null) return true;
     if(users.size() != 1) return !users.isEmpty();
     final User user = users.values().iterator().next();
     return !user.name().equals(ADMIN) ||
            !user.code(Algorithm.DIGEST, Code.HASH).equals(User.digest(ADMIN, ADMIN));
-  }
-
-  @Override
-  public String toString() {
-    final XMLBuilder xml = new XMLBuilder().indent().open(USERS);
-    for(final User user : users.values()) user.write(xml);
-    return xml.close().toString();
   }
 }

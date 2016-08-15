@@ -1225,6 +1225,8 @@ public enum Function {
   /** XQuery function. */
   _USER_EXISTS(UserExists.class, "exists(name)", arg(STR), BLN, flag(NDT), USER_URI),
   /** XQuery function. */
+  _USER_CHECK(UserCheck.class, "check(name,password)", arg(STR, STR), EMP, flag(NDT), USER_URI),
+  /** XQuery function. */
   _USER_LIST(UserList.class, "list()", arg(), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
   _USER_LIST_DETAILS(UserListDetails.class, "list-details([name])",
@@ -1242,6 +1244,11 @@ public enum Function {
   /** XQuery function. */
   _USER_PASSWORD(UserPassword.class, "password(name,password)",
       arg(STR, STR), EMP, flag(UPD), USER_URI),
+  /** XQuery function. */
+  _USER_INFO(UserInfo.class, "info()", arg(), ELM, USER_URI),
+  /** XQuery function. */
+  _USER_UPDATE_INFO(UserUpdateInfo.class, "update-info(element)",
+      arg(ELM), EMP, flag(UPD), USER_URI),
 
   /* Utility Module. */
 
