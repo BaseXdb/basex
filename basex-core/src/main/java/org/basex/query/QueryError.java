@@ -39,7 +39,7 @@ public enum QueryError {
   /** BASX0006. */
   BASX_ANNOT_X_X(BASX, 6, "Annotation %% is unknown."),
   /** BASX0006. */
-  BASX_ANNNUM_X_X_X(BASX, 6, "%: % argument% supplied."),
+  BASX_ANNNUM_X_X(BASX, 6, "%: % supplied."),
   /** BASX0006. */
   BASX_ANNTYPE_X_X_X(BASX, 6, "%: % expected, % found."),
   /** BASX0007. */
@@ -932,9 +932,9 @@ public enum QueryError {
   /** XPST0017. */
   FUNCSIMILAR_X_X(XPST, 17, "Unknown function: % (similar: %)."),
   /** XPST0017. */
-  FUNCARGNUM_X_X_X(XPST, 17, "%: % argument% supplied."),
+  FUNCARGNUM_X_X(XPST, 17, "%: % supplied."),
   /** XPST0017. */
-  FUNCTYPES_X_X_X_X(XPST, 17, "%: % argument% supplied (% expected)."),
+  FUNCTYPES_X_X_X(XPST, 17, "%: % supplied, % expected."),
   /** XPST0017. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** XPST0017. */
@@ -944,7 +944,7 @@ public enum QueryError {
   /** XPST0017. */
   JAVACONSAMB_X(XPST, 17, "Java constructor % is ambiguous."),
   /** XPST0017. */
-  FUNCNOIMPL_X(XPST, 17, "Function not implemented: %."),
+  FUNCNOIMPL_X(XPST, 17, "External function % not implemented."),
   /** XPST0017. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
 
@@ -967,7 +967,7 @@ public enum QueryError {
   JAVAERROR_X_X_X(XPTY, 4, "%(%): %."),
 
   /** XPTY0004. */
-  JAVAARITY_X_X_X_X_X(XPTY, 4, "Java function %:%#%: % argument% supplied."),
+  JAVAARITY_X_X_X_X(XPTY, 4, "Java function %:%#%: % supplied."),
   /** XPTY0004. */
   ZEROFUNCS_X_X(XPTY, 4, "Zero-arity functions expected, % found: %."),
   /** XPTY0004. */
@@ -1009,9 +1009,9 @@ public enum QueryError {
   /** XPTY0004. */
   DOCNS_X(XPTY, 4, "Cannot add namespaces to a document node: %."),
   /** XPTY0004. */
-  INVARITY_X_X_X_X(XPTY, 4, "% argument% supplied (% expected): %."),
+  INVARITY_X_X_X(XPTY, 4, "% supplied, % expected: %."),
   /** XPTY0004. */
-  FUNARITY_X_X_X(XPTY, 4, "Function with % argument% supplied (% expected)."),
+  FUNARITY_X_X(XPTY, 4, "Function with % supplied, % expected."),
   /** XPTY0004. */
   INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** XPTY0004. */
@@ -1112,9 +1112,9 @@ public enum QueryError {
   /** XQST0040. */
   ATTDUPL_X(XQST, 40, "Duplicate attribute '%'."),
   /** XQST0045. */
-  NAMERES_X(XQST, 45, "Function '%' is in reserved namespace."),
+  FNRESERVED_X(XQST, 45, "Function '%' is in reserved namespace."),
   /** XQST0045. */
-  ANNWHICH_X_X(XQST, 45, "Annotation %% is unknown."),
+  ANNWHICH_X_X(XQST, 45, "Annotation %% is in reserved namespace."),
   /** XQST0046. */
   INVURI_X(XQST, 46, "URI '%' is invalid."),
   /** XQST0047. */
@@ -1619,6 +1619,17 @@ public enum QueryError {
    */
   public static byte[] chop(final String string, final InputInfo info) {
     return info != null && info.internal() ? Token.EMPTY : chop(Token.token(string), info);
+  }
+
+  /**
+   * Returns a plural suffix or an empty string.
+   * @param number long number
+   * @return suffix
+   */
+  public static String arguments(final long number) {
+    final StringBuilder sb = new StringBuilder().append(number).append(" argument");
+    if(number != 1) sb.append('s');
+    return sb.toString();
   }
 
   /**

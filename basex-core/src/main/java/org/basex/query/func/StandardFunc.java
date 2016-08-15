@@ -366,7 +366,7 @@ public abstract class StandardFunc extends Arr {
 
     if(fun.arity() == nargs) return fun;
     final int fargs = fun.arity();
-    throw FUNARITY_X_X_X.get(info, fargs, fargs == 1 ? "" : "s", nargs);
+    throw FUNARITY_X_X.get(info, arguments(fargs), nargs);
   }
 
   /**
