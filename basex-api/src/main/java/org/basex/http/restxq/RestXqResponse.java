@@ -101,7 +101,7 @@ final class RestXqResponse {
       } else if(forward != null) {
         http.forward(forward);
       } else if(response != null) {
-        if(response.status != 0) http.status(response.status, response.message, response.error);
+        if(response.status != 0) http.status(response.status, response.message);
         final byte[] out = response.cache.finish();
         if(out.length != 0) http.res.getOutputStream().write(out);
       }

@@ -57,7 +57,7 @@ public final class RestXqFilterTest extends RestXqTest {
     get("declare %R:path('') function m:f() {" +
         "<R:response><http:response status='200'/></R:response> };", "", "");
     get("declare %R:path('') function m:f() {" +
-        "<R:response><http:response status='200' message='OK'/></R:response>, 'OK'};", "", "OKOK");
+        "<R:response><http:response status='200' message='OK'/></R:response>, 'OK'};", "", "OK");
 
     // wrong syntax
     getE("declare %R:path('') function m:f() {" +

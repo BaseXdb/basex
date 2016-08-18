@@ -14,16 +14,15 @@ import javax.servlet.http.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.core.StaticOptions.AuthMethod;
+import org.basex.core.StaticOptions.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.server.Log.LogType;
 import org.basex.server.*;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.basex.util.http.HttpText.Request;
 
 /**
  * Bundles context-based information on a single HTTP operation.
@@ -228,15 +227,36 @@ public final class HTTPContext {
   }
 
   /**
-   * Sets a status and sends an info message.
+   * Sends an error with an info message.
    * @param code status code
-   * @param info info message (can be {@code null})
-   * @param error treat as error (use web server standard output)
+   * @param info info, sent as body
    * @throws IOException I/O exception
    */
-  public void status(final int code, final String info, final boolean error) throws IOException {
+  public void error(final int code, final String info) throws IOException {
+    status(code, null, info);
+  }
+
+  /**
+   * Sets the HTTP status code and message.
+   * @param code status code
+   * @param message status message
+   * @throws IOException I/O exception
+   */
+  public void status(final int code, final String message) throws IOException {
+    status(code, message, null);
+  }
+
+  /**
+   * Sets a status and sends an info message.
+   * @param code status code
+   * @param message status message (can be {@code null})
+   * @param info info, sent as body (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("deprecation")
+  private void status(final int code, final String message, final String info) throws IOException {
     try {
-      log(code, info);
+      log(code, message != null ? message : info != null ? info : "");
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
         final TokenBuilder header = new TokenBuilder(auth.toString());
@@ -250,20 +270,22 @@ public final class HTTPContext {
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }
 
-      if(error && code >= SC_BAD_REQUEST) {
-        res.sendError(code, info);
+      final int c = code < 0 || code > 999 ? 500 : code;
+      if(message == null) {
+        res.setStatus(c);
       } else {
-        res.setStatus(code);
-        if(info != null) {
-          res.setContentType(MediaType.TEXT_PLAIN.toString());
-          try(final ArrayOutput ao = new ArrayOutput()) {
-            ao.write(token(info));
-            res.getOutputStream().write(ao.normalize().finish());
-          }
+        // do not allow Jetty to create a custom error html page
+        res.setStatus(c, message);
+      }
+      if(info != null) {
+        res.setContentType(MediaType.TEXT_PLAIN.toString());
+        try(final ArrayOutput ao = new ArrayOutput()) {
+          ao.write(token(info));
+          res.getOutputStream().write(ao.normalize().finish());
         }
       }
-    } catch(final IllegalStateException ex) {
-      log(SC_INTERNAL_SERVER_ERROR, Util.message(ex));
+    } catch(final IllegalStateException | IllegalArgumentException ex) {
+      log(SC_INTERNAL_SERVER_ERROR, code + ", Message: " + message + ": " + Util.message(ex));
     }
   }
 

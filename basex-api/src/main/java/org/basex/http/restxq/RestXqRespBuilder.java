@@ -21,8 +21,6 @@ import org.basex.util.http.*;
 final class RestXqRespBuilder {
   /** Output cache. */
   final ArrayOutput cache = new ArrayOutput();
-  /** Show error. */
-  boolean error;
   /** Status code. */
   int status;
   /** Status message. */
@@ -92,11 +90,8 @@ final class RestXqRespBuilder {
 
     // check next item
     Item item = iter.next();
-    if(item == null) {
-      error = true;
-    } else if(func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name())) {
+    if(item != null && func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name()))
       throw func.error(HEAD_METHOD);
-    }
 
     // cache result
     http.sopts(sp);

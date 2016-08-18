@@ -12,7 +12,6 @@ import javax.servlet.http.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
-import org.basex.http.restxq.*;
 import org.basex.query.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -59,23 +58,22 @@ public abstract class BaseXServlet extends HttpServlet {
       throws IOException {
 
     final HTTPContext http = new HTTPContext(req, res, this);
-    final boolean restxq = this instanceof RestXqServlet;
     try {
       http.authorize();
       run(http);
       http.log(SC_OK, "");
     } catch(final HTTPException ex) {
-      http.status(ex.getStatus(), Util.message(ex), restxq);
+      http.error(ex.getStatus(), Util.message(ex));
     } catch(final LoginException ex) {
-      http.status(SC_UNAUTHORIZED, Util.message(ex), restxq);
+      http.error(SC_UNAUTHORIZED, Util.message(ex));
     } catch(final IOException | QueryException ex) {
-      http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
+      http.error(SC_BAD_REQUEST, Util.message(ex));
     } catch(final JobException ex) {
-      http.status(SC_GONE, Text.INTERRUPTED, restxq);
+      http.error(SC_GONE, Text.INTERRUPTED);
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);
       Util.errln(msg);
-      http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, msg), restxq);
+      http.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, msg));
     } finally {
       if(Prop.debug) {
         Util.outln("_ REQUEST _________________________________" + Prop.NL + req);
