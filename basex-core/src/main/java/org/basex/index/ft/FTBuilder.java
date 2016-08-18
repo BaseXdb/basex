@@ -57,35 +57,42 @@ public final class FTBuilder extends IndexBuilder {
   public FTIndex build() throws IOException {
     Util.debug(detailedInfo());
 
-    for(pre = 0; pre < size; ++pre) {
-      if((pre & 0x0FFF) == 0) check();
-      if(!indexEntry()) continue;
+    try {
+      for(pre = 0; pre < size; ++pre) {
+        if((pre & 0x0FFF) == 0) check();
+        if(!indexEntry()) continue;
 
-      // current lexer position
-      final StopWords sw = lexer.ftOpt().sw;
-      lexer.init(data.text(pre, true));
-      int pos = -1;
-      while(lexer.hasNext()) {
-        final byte[] tok = lexer.nextToken();
-        ++pos;
-        // skip too long and stopword tokens
-        if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
-          // check if main memory is exhausted
-          if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
-            writeIndex(true);
-            clean();
+        // current lexer position
+        final StopWords sw = lexer.ftOpt().sw;
+        lexer.init(data.text(pre, true));
+        int pos = -1;
+        while(lexer.hasNext()) {
+          final byte[] tok = lexer.nextToken();
+          ++pos;
+          // skip too long and stopword tokens
+          if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
+            // check if main memory is exhausted
+            if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
+              writeIndex(true);
+              clean();
+            }
+            tree.index(tok, pre, pos, splits);
+            count++;
           }
-          tree.index(tok, pre, pos, splits);
-          count++;
         }
       }
+
+      // finalize partial or all index structures
+      write(splits > 0);
+
+      finishIndex();
+      return new FTIndex(data);
+
+    } catch(final Throwable th) {
+      // drop index files
+      data.meta.drop(DATAFTX + ".*");
+      throw th;
     }
-
-    // finalize partial or all index structures
-    write(splits > 0);
-
-    finishIndex();
-    return new FTIndex(data);
   }
 
   /**
@@ -274,11 +281,5 @@ public final class FTBuilder extends IndexBuilder {
   private static boolean check(final FTList[] lists) {
     for(final FTList l : lists) if(l.tok.length > 0) return true;
     return false;
-  }
-
-  @Override
-  protected void abort() {
-    // drop index files
-    data.meta.drop(DATAFTX + ".*");
   }
 }

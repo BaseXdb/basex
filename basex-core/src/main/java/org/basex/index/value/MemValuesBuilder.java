@@ -48,8 +48,4 @@ public class MemValuesBuilder extends ValuesBuilder {
     finishIndex();
     return index;
   }
-
-  @Override
-  protected void abort() {
-  }
 }

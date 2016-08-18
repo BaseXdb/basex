@@ -131,13 +131,6 @@ public abstract class Job {
   }
 
   /**
-   * Aborts a failed or interrupted job.
-   */
-  protected void abort() {
-    for(final Job job : children) job.abort();
-  }
-
-  /**
    * Adds the names of the databases that may be touched by the job.
    * @param lr container for lock result to pass around
    */

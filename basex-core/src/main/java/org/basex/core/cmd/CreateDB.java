@@ -96,8 +96,9 @@ public final class CreateDB extends ACreate {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 
         // create disk-based instance
+        final DiskBuilder builder = pushJob(new DiskBuilder(name, parser, soptions, options));
         try {
-          pushJob(new DiskBuilder(name, parser, soptions, options)).build().close();
+          builder.build().close();
         } finally {
           popJob();
         }
@@ -122,13 +123,11 @@ public final class CreateDB extends ACreate {
     } catch(final JobException ex) {
       throw ex;
     } catch(final IOException ex) {
-      abort();
       return error(Util.message(ex));
     } catch(final Exception ex) {
       // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
       Util.stack(ex);
-      abort();
       return error(NOT_PARSED_X, parser.source);
     }
   }

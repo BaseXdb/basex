@@ -27,11 +27,6 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public final class OptimizeAll extends ACreate {
-  /** Current pre value. */
-  private int pre;
-  /** Data size. */
-  private int size;
-
   /**
    * Default constructor.
    */
@@ -70,18 +65,9 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
-  public double progressInfo() {
-    return (double) pre / size;
-  }
-
-  @Override
   public boolean stoppable() {
+    // database will be closed after optimize call
     return false;
-  }
-
-  @Override
-  public String detailedInfo() {
-    return CREATE_STATS_D;
   }
 
   @Override
@@ -131,35 +117,46 @@ public final class OptimizeAll extends ACreate {
     options.set(MainOptions.MAXCATS, ometa.maxcats);
 
     // build database and index structures
-    if(cmd != null) cmd.size = ometa.size;
     final StaticOptions sopts = context.soptions;
     final String tmpName = sopts.randomDbName(name);
-    final DBParser parser = new DBParser(odata, options, cmd);
-    try(final DiskBuilder builder = new DiskBuilder(tmpName, parser, sopts, options)) {
-      final DiskData ndata = builder.build();
-      final MetaData nmeta = ndata.meta;
-      try {
-        // adopt original meta data, create new index structures
-        nmeta.createtext = ometa.createtext;
-        nmeta.createattr = ometa.createattr;
-        nmeta.createtoken = ometa.createtoken;
-        nmeta.createft = ometa.createft;
-        nmeta.original = ometa.original;
-        nmeta.filesize = ometa.filesize;
-        nmeta.time = ometa.time;
-        nmeta.dirty = true;
-        CreateIndex.create(ndata, cmd);
+    final DBParser parser = new DBParser(odata, options);
+    final DiskBuilder builder = new DiskBuilder(tmpName, parser, sopts, options);
+    if(cmd != null) cmd.pushJob(builder);
 
-        // move binary files
-        final IOFile bin = ometa.binaries();
-        if(bin.exists()) bin.rename(nmeta.binaries());
-      } finally {
-        ndata.close();
-      }
+    // create new database with identical contents
+    final DiskData ndata;
+    try {
+      ndata = builder.build();
+    } finally {
+      if(cmd != null) cmd.popJob();
+    }
+    Close.close(odata, context);
+
+    // adopt original meta data, create new index structures
+    final MetaData nmeta = ndata.meta;
+    nmeta.createtext = ometa.createtext;
+    nmeta.createattr = ometa.createattr;
+    nmeta.createtoken = ometa.createtoken;
+    nmeta.createft = ometa.createft;
+    nmeta.original = ometa.original;
+    nmeta.filesize = ometa.filesize;
+    nmeta.time = ometa.time;
+    nmeta.dirty = true;
+    try {
+      CreateIndex.create(ndata, cmd);
+    } catch(final Throwable th) {
+      // index creation failed: delete temporary database
+      DropDB.drop(tmpName, sopts);
+      throw th;
+    } finally {
+      ndata.close();
     }
 
-    // close old database instance, drop it and rename temporary database
-    Close.close(odata, context);
+    // move binary files
+    final IOFile bin = ometa.binaries();
+    if(bin.exists()) bin.rename(nmeta.binaries());
+
+    // drop old database, rename temporary database
     if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);
     if(!AlterDB.alter(tmpName, name, sopts)) throw new BaseXException(DB_NOT_RENAMED_X, tmpName);
   }
@@ -173,19 +170,20 @@ public final class OptimizeAll extends ACreate {
   private static final class DBParser extends Parser {
     /** Disk data. */
     private final DiskData data;
-    /** Calling command (may be {@code null}). */
-    final OptimizeAll cmd;
+    /** Data size. */
+    private final int size;
+    /** Current pre value. */
+    private int pre;
 
     /**
      * Constructor.
      * @param data disk data
      * @param options main options
-     * @param cmd calling command (may be {@code null})
      */
-    DBParser(final DiskData data, final MainOptions options, final OptimizeAll cmd) {
+    DBParser(final DiskData data, final MainOptions options) {
       super(data.meta.original.isEmpty() ? null : IO.get(data.meta.original), options);
       this.data = data;
-      this.cmd = cmd;
+      this.size = data.meta.size;
     }
 
     @Override
@@ -194,19 +192,29 @@ public final class OptimizeAll extends ACreate {
         @Override
         protected void startOpen(final QNm name) throws IOException {
           super.startOpen(name);
-          if(cmd != null) cmd.pre++;
+          pre++;
         }
 
         @Override
         protected void openDoc(final byte[] name) throws IOException {
           super.openDoc(name);
-          if(cmd != null) cmd.pre++;
+          pre++;
         }
       };
 
       final IntList il = data.resources.docs();
       final int is = il.size();
       for(int i = 0; i < is; i++) ser.serialize(new DBNode(data, il.get(i)));
+    }
+
+    @Override
+    public double progressInfo() {
+      return (double) pre / size;
+    }
+
+    @Override
+    public String detailedInfo() {
+      return CREATE_STATS_D;
     }
   }
 }
