@@ -328,7 +328,7 @@ public class TextPanel extends BaseXPanel {
    * Selects the whole text.
    */
   private void selectAll() {
-    editor.select(0, editor.size());
+    editor.selectAll();
     rend.repaint();
   }
 
@@ -653,8 +653,8 @@ public class TextPanel extends BaseXPanel {
       if(p < m || p > y) {
         final int align = (Integer) algn;
         scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
-        rend.repaint();
       }
+      rend.repaint();
     }
   };
 

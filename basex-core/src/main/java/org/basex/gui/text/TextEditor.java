@@ -579,6 +579,7 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   boolean sort() {
+    if(!selected()) selectAll();
     if(!extend()) return false;
 
     // count lines
@@ -1050,6 +1051,13 @@ public final class TextEditor {
     pos = p;
     if(select) startSelect();
     else end = pos;
+  }
+
+  /**
+   * Selects the whole text.
+   */
+  void selectAll() {
+    select(0, size());
   }
 
   /**
