@@ -250,10 +250,11 @@ public final class HTTPContext {
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }
 
+      final int c = code < 0 || code > 999 ? 500 : code;
       if(error && code >= SC_BAD_REQUEST) {
-        res.sendError(code, info);
+        res.sendError(c, info);
       } else {
-        res.setStatus(code);
+        res.setStatus(c);
         if(info != null) {
           res.setContentType(MediaType.TEXT_PLAIN.toString());
           try(final ArrayOutput ao = new ArrayOutput()) {
