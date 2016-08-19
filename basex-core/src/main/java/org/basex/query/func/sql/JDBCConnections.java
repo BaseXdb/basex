@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
-final class JDBCConnections implements QueryResource {
+public final class JDBCConnections implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique ids. */
