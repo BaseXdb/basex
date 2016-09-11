@@ -110,7 +110,7 @@ Using Git
 
 The code base of BaseX can be accessed via [GitHub].
 
-[GitHub]: https://www.github.com
+[GitHub]: https://github.com/BaseXdb/basex
 
 Feedback
 --------
