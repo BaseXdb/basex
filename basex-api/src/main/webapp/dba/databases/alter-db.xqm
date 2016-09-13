@@ -79,11 +79,11 @@ function _:alter(
 ) {
   cons:check(),
   try {
-    util:update("if(db:exists($newname)) then (
+    if(util:eval('db:exists($newname)', map { 'newname': $newname })) then (
       error((), 'Database already exists: ' || $newname || '.')
     ) else (
-      db:alter($name, $newname)
-    )", map { 'name': $name, 'newname': $newname }),
+      util:update("db:alter($name, $newname)", map { 'name': $name, 'newname': $newname })
+    ),
     db:output(web:redirect($_:SUB, map {
       'info': 'Database was renamed.',
       'name': $newname

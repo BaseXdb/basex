@@ -26,7 +26,7 @@ function _:drop(
 ) {
   cons:check(),
   try {
-    util:update("$n ! user:drop(.)", map { 'n': $names }),
+    util:update("$names ! user:drop(.)", map { 'names': $names }),
     db:output(web:redirect($_:CAT, map { 'info': 'Dropped users: ' || count($names) }))
   } catch * {
     db:output(web:redirect($_:CAT, map { 'error': $err:description }))

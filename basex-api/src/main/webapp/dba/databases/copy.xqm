@@ -79,7 +79,11 @@ function _:copy(
 ) {
   cons:check(),
   try {
-    util:update("db:copy($n, $m)", map { 'n': $name, 'm': $newname }),
+    if(util:eval('db:exists($newname)', map { 'newname': $newname })) then (
+      error((), 'Database already exists: ' || $newname || '.')
+    ) else (
+      util:update("db:copy($name, $newname)", map { 'name': $name, 'newname': $newname })
+    ),
     db:output(web:redirect($_:SUB, map {
       'info': 'Database was copied.',
       'name': $newname

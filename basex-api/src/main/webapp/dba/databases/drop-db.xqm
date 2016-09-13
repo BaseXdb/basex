@@ -26,7 +26,7 @@ function _:drop(
 ) {
   cons:check(),
   try {
-    util:update("$n ! db:drop(.)", map { 'n': $names }),
+    util:update("$names ! db:drop(.)", map { 'names': $names }),
     db:output(web:redirect($_:CAT, map { 'info': 'Dropped databases: ' || count($names) }))
   } catch * {
     db:output(web:redirect($_:CAT, map { 'error': $err:description }))

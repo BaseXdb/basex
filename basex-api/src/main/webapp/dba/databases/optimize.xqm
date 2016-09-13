@@ -116,11 +116,10 @@ function _:optimize(
   try {
     cons:check(),
     util:update("db:optimize($name, boolean($all), map:merge((
-  (('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics') !
-    map:entry(., $opts = .)),
-    $lang ! map:entry('language', .)
-  )
-))", map { 'name': $name, 'all': $all, 'lang': $lang, 'opts': $opts }
+      ('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics') !
+        map:entry(., $opts = .),
+      $lang ! map:entry('language', .)
+    )))", map { 'name': $name, 'all': $all, 'lang': $lang, 'opts': $opts }
     ),
     db:output(web:redirect($_:SUB, map {
       'name': $name,
@@ -151,7 +150,7 @@ function _:drop(
 ) {
   cons:check(),
   try {
-    util:update("$n ! db:optimize(.)", map { 'n': $names }),
+    util:update("$names ! db:optimize(.)", map { 'names': $names }),
     db:output(web:redirect($_:CAT, map { 'info': 'Optimized databases: ' || count($names) }))
   } catch * {
     db:output(web:redirect($_:CAT, map { 'error': $err:description }))

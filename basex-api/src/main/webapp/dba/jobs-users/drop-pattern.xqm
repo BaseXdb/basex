@@ -29,7 +29,7 @@ function _:drop-pattern(
 ) {
   cons:check(),
   try {
-    util:update("user:drop($n, $p)", map { 'n': $name, 'p': $pattern }),
+    util:update("user:drop($name, $pattern)", map { 'name': $name, 'pattern': $pattern }),
     db:output(web:redirect($_:SUB, map { 'name': $name, 'info': 'Pattern dropped: ' || $pattern }))
   } catch * {
     db:output(web:redirect($_:SUB, map { 'error': $err:description }))

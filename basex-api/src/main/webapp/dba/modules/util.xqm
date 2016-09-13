@@ -1,5 +1,5 @@
 (:~
- : Web functions.
+ : Utility functions.
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
@@ -132,4 +132,28 @@ declare %private function util:remote-query(
     client:query($id, $query, $vars),
     client:close($id)
   )
+};
+
+(:~
+ : Converts the specified binary input to an XML string, or raises an error.
+ : @param  $input  input
+ : @return XML string
+ :)
+declare function util:to-xml-string(
+  $input  as xs:base64Binary
+) as xs:string {
+  let $string :=
+    try {
+      convert:binary-to-string($input)
+    } catch * {
+      error((), "Input is no valid UTF8 string.")
+    }
+  return
+    try {
+      (: tries to convert the input to XML, but discards the results :)
+      prof:void(parse-xml($string)),
+      $string
+    } catch * {
+      error((), "Input is no well-formed XML.")
+    }
 };

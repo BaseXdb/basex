@@ -118,21 +118,20 @@ function _:add-post(
   try {
     let $key := map:keys($file)
     let $path := if(not($path) or ends-with($path, '/')) then ($path || $key) else $path
-    let $content := $file($key)
-    return if(not($key)) then (
+    return if($key = '') then (
       error((), "No input specified.")
-    ) else if(util:eval('db:exists($n, $p)', map { 'n': $name, 'p': $path })) then (
+    ) else if(util:eval('db:exists($name, $path)', map { 'name': $name, 'path': $path })) then (
       error((), 'Resource already exists: ' || $path || '.')
     ) else (
-      if($binary) then (
-        util:update('db:store($n, $p, $c)', map { 'n': $name, 'p': $path, 'c': $content })
+      let $input := $file($key)
+      return if($binary) then (
+        util:update('db:store($name, $path, $input)',
+          map { 'name': $name, 'path': $path, 'input': $input })
       ) else (
-        let $xml := try {
-          convert:binary-to-string($content)
-        } catch * {
-          error($err:code, replace($err:description, '^.*\): ', ''))
-        }
-        return util:update('db:add($n, $x, $p)', map { 'n': $name, 'x': $xml, 'p': $path })
+        util:update("db:add($name, $input, $path, map:merge(" ||
+          "('intparse','dtd','stripns','chop','xinclude') ! map:entry(., $opts = .)))",
+          map { 'name': $name, 'input': util:to-xml-string($input), 'path': $path, 'opts': $opts }
+        )
       ),
       db:output(web:redirect($_:SUB,
         map { 'name': $name, 'path': $path, 'info': 'Added resource: ' || $name }))

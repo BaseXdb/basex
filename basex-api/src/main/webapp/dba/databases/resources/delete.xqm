@@ -29,7 +29,7 @@ function _:delete(
 ) {
   cons:check(),
   try {
-    util:update("$r ! db:delete($n, .)", map { 'n': $name, 'r': $resources }),
+    util:update("$resources ! db:delete($name, .)", map { 'name': $name, 'resources': $resources }),
     db:output(web:redirect($_:SUB,
       map { 'name': $name, 'info': 'Deleted resources: ' || count($resources) })
     )
