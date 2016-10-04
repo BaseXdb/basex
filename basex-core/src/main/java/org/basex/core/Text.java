@@ -1248,6 +1248,8 @@ public interface Text {
   String REPOSITORY_PATH = lang("repository_path");
   /** Interactions. */
   String GUI_INTERACTIONS = lang("gui_interactions");
+  /** Limits. */
+  String LIMITS = lang("limits");
   /** Look and feel. */
   String JAVA_LF = "Look & Feel (" + lang("requires_restart") + ')';
   /** Focus. */
@@ -1256,8 +1258,10 @@ public interface Text {
   String SIMPLE_FILE_CHOOSER = lang("simple_file_chooser");
   /** Name display flag. */
   String SHOW_NAME_ATTS = lang("show_name_atts");
-  /** Maximum number of hits. */
+  /** Maximum number of results. */
   String MAX_NO_OF_HITS = lang("max_nr_of_hits");
+  /** Size of text result. */
+  String SIZE_TEXT_RESULTS = lang("size_text_results");
   /** Language preference. */
   String LANGUAGE_RESTART = lang("language") + " (" + lang("requires_restart") + ')';
 

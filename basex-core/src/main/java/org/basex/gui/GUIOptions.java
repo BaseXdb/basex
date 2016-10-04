@@ -189,10 +189,10 @@ public final class GUIOptions extends Options {
   /** Logarithmic plot. */
   public static final BooleanOption PLOTYLOG = new BooleanOption("PLOTYLOG", false);
 
-  /** Maximum text size to be displayed. */
-  public static final NumberOption MAXTEXT = new NumberOption("MAXTEXT", 1 << 21);
-  /** Maximum number of hits to be displayed (-1: return all hits; default: 250K). */
-  public static final NumberOption MAXRESULTS = new NumberOption("MAXHITS", 250000);
+  /** Maximum number of bytes to be cached in textual result. */
+  public static final NumberOption MAXTEXT = new NumberOption("MAXTEXT", 1 << 23);
+  /** Maximum number of items to be displayed. */
+  public static final NumberOption MAXRESULTS = new NumberOption("MAXRESULTS", 500000);
 
   /** Comment: written to options file. */
   public static final Comment C_SEARCH = new Comment("Search");

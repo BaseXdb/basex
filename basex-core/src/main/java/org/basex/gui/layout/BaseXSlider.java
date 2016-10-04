@@ -136,7 +136,10 @@ public final class BaseXSlider extends BaseXPanel {
     final double w = getWidth() - SLIDERW;
     final double r = max - min;
     final double x = (value - min) * w / r;
-    if(mouseX < x || mouseX >= x + SLIDERW) value = (int) (mouseX * r / w + min);
+    if(mouseX < x || mouseX >= x + SLIDERW) {
+      value = (int) (mouseX * r / w + min);
+      notifyListeners();
+    }
     oldValue = value;
     repaint();
   }
@@ -154,14 +157,8 @@ public final class BaseXSlider extends BaseXPanel {
 
     final int old = value;
     value = Math.max(min, Math.min(max, (int) (oldValue - prop)));
-
-    if(value != old) {
-      if(dialog != null) dialog.action(null);
-      for(final ActionListener al : listenerList.getListeners(ActionListener.class)) {
-        al.actionPerformed(null);
-      }
-      repaint();
-    }
+    if(value != old) notifyListeners();
+    repaint();
   }
 
   @Override
@@ -180,12 +177,17 @@ public final class BaseXSlider extends BaseXPanel {
     } else if(LINEEND.is(e)) {
       value = max;
     }
-    if(value != old) {
-      if(dialog != null) dialog.action(null);
-      for(final ActionListener al : listenerList.getListeners(ActionListener.class)) {
-        al.actionPerformed(null);
-      }
-      repaint();
+    if(value != old) notifyListeners();
+    repaint();
+  }
+
+  /**
+   * Notifies all listeners.
+   */
+  private void notifyListeners() {
+    if(dialog != null) dialog.action(null);
+    for(final ActionListener al : listenerList.getListeners(ActionListener.class)) {
+      al.actionPerformed(null);
     }
   }
 

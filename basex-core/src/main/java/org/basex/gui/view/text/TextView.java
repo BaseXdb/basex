@@ -42,10 +42,10 @@ public final class TextView extends View {
   /** Text Area. */
   private final TextPanel text;
 
-  /** Result command. */
-  private Command cmd;
-  /** Result nodes. */
-  private DBNodes ns;
+  /** Cached command. */
+  private Command cachedCmd;
+  /** Cached nodes. */
+  private DBNodes cachedNodes;
 
   /**
    * Default constructor.
@@ -146,8 +146,8 @@ public final class TextView extends View {
         ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
         if(nodes != null) nodes.serialize(Serializer.get(ao));
         setText(ao);
-        cmd = null;
-        ns = ao.finished() ? nodes : null;
+        cachedCmd = null;
+        cachedNodes = ao.finished() ? nodes : null;
       } catch(final IOException ex) {
         Util.debug(ex);
       }
@@ -157,29 +157,34 @@ public final class TextView extends View {
   }
 
   /**
-   * Caches the output.
+   * Caches the output, or indicates that the query must be executed again in order to retrieve
+   * the full result.
    * @param out cached output
    * @param command command
-   * @param result result
+   * @param result result (can be {@code null})
    * @throws QueryException query exception
    */
   public void cache(final ArrayOutput out, final Command command, final Value result)
       throws QueryException {
 
     // cache command or node set
-    cmd = null;
-    ns = null;
+    cachedCmd = null;
+    cachedNodes = null;
 
-    final int mh = gui.gopts.get(GUIOptions.MAXRESULTS);
-    boolean parse = false;
-    if(mh >= 0 && result != null && result.size() >= mh) {
-      parse = true;
+    final int max = gui.gopts.get(GUIOptions.MAXRESULTS);
+    boolean cacheCmd = false;
+    if(result != null && result.size() >= max) {
+      // result was larger than number of retrieved result items: create new command instance
+      cacheCmd = true;
     } else if(out.finished()) {
-      if(result instanceof DBNodes) ns = (DBNodes) result;
-      else parse = true;
+      // cache is exhausted... cache node set, or create new command instance
+      if(result instanceof DBNodes) cachedNodes = (DBNodes) result;
+      else cacheCmd = true;
     }
+    // otherwise, the displayed text and the cached result are equal
+
     // create new command instance
-    if(parse) cmd = new CommandParser(command.toString(), gui.context).parseSingle();
+    if(cacheCmd) cachedCmd = new CommandParser(command.toString(), gui.context).parseSingle();
   }
 
   /**
@@ -211,10 +216,10 @@ public final class TextView extends View {
 
     gui.cursor(CURSORWAIT, true);
     try(final PrintOutput out = new PrintOutput(file.toString())) {
-      if(cmd != null) {
-        cmd.execute(gui.context, out);
-      } else if(ns != null) {
-        ns.serialize(Serializer.get(out));
+      if(cachedCmd != null) {
+        cachedCmd.execute(gui.context, out);
+      } else if(cachedNodes != null) {
+        cachedNodes.serialize(Serializer.get(out));
       } else {
         out.write(text.getText());
       }
