@@ -168,7 +168,11 @@ public final class HttpClient {
       conn.setDoOutput(true);
 
       final String timeout = request.attribute(TIMEOUT);
-      if(timeout != null) conn.setConnectTimeout(Strings.toInt(timeout) * 1000);
+      if(timeout != null) {
+        // timeouts may occur while waiting for the connection or the response
+        conn.setConnectTimeout(Strings.toInt(timeout) * 1000);
+        conn.setReadTimeout(Strings.toInt(timeout) * 1000);
+      }
       final String redirect = request.attribute(FOLLOW_REDIRECT);
       if(redirect != null) setFollowRedirects(Strings.yes(redirect));
 
@@ -259,7 +263,7 @@ public final class HttpClient {
         if(base64) {
           writeHeader(CONTENT_TRANSFER_ENCODING, BASE64, out);
           out.write(CRLF);
-          contents = Base64.encode(contents);
+          contents = org.basex.util.Base64.encode(contents);
           final int bl = contents.length;
           for(int b = 0; b < bl; b += 76) {
             out.write(contents, b, Math.min(76, bl - b));

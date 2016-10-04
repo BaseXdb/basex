@@ -181,7 +181,7 @@ public final class HttpPayload {
 
     byte[] payload = extractPart(sep, end, type.parameters().get(CHARSET));
     if(payloads != null) {
-      if(base64) payload = Base64.decode(payload);
+      if(base64) payload = org.basex.util.Base64.decode(payload);
       payloads.add(parse(payload, type));
     }
     return true;
