@@ -81,14 +81,6 @@ public abstract class Command extends Job {
    * @throws BaseXException command exception
    */
   public final void execute(final Context ctx, final OutputStream os) throws BaseXException {
-    // check if data reference is available
-    final Data data = ctx.data();
-    if(data == null && openDB) throw new BaseXException(NO_DB_OPENED);
-
-    // check permissions
-    if(!ctx.perm(perm, data != null && !data.inMemory() ? data.meta.name : null))
-      throw new BaseXException(PERM_REQUIRED_X, perm);
-
     // checks if the command performs updates
     updating = updating(ctx);
 
@@ -248,6 +240,14 @@ public abstract class Command extends Job {
    * @return result of check
    */
   public final boolean run(final Context ctx, final OutputStream os) {
+    // check if database is opened
+    final Data data = ctx.data();
+    if(data == null && openDB) return error(NO_DB_OPENED);
+
+    // check permissions
+    if(!ctx.perm(perm, data != null && !data.inMemory() ? data.meta.name : null))
+      return error(PERM_REQUIRED_X, perm);
+
     init(ctx, os);
     try {
       return run();
