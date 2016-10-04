@@ -114,14 +114,16 @@ public final class QueryResources {
   @SuppressWarnings("unchecked")
   public synchronized <R extends QueryResource> R index(final Class<? extends R> resource) {
     if(external == null) external = new HashMap<>();
-    if(!external.containsKey(resource)) {
+    QueryResource value = external.get(resource);
+    if(value == null) {
       try {
-        external.put(resource, resource.newInstance());
+        value = resource.newInstance();
+        external.put(resource, value);
       } catch(final Throwable ex) {
         throw Util.notExpected(ex);
       }
     }
-    return (R) external.get(resource);
+    return (R) value;
   }
 
   /**

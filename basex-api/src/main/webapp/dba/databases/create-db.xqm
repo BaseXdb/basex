@@ -108,19 +108,19 @@ function _:create(
 ) {
   cons:check(),
   try {
-    util:update("if(db:exists($name)) then (
-  error((), 'Database already exists: ' || $name || '.')
-) else (
-  db:create($name, (), (), map:merge((
-  (('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics','updindex') !
-    map:entry(., $opts = .)),
-    $lang ! map:entry('language', .))
-  ))
-)", map { 'name': $name, 'lang': $lang, 'opts': $opts }),
-    db:output(web:redirect($_:SUB, map {
-      'info': 'Created Database: ' || $name,
-      'name': $name
-    }))
+    if(util:eval('db:exists($name)', map { 'name': $name })) then (
+      error((), 'Database already exists: ' || $name || '.')
+    ) else (
+      util:update("db:create($name, (), (), map:merge((" ||
+        "('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics'," ||
+        "'updindex') ! map:entry(., $opts = .), $lang ! map:entry('language', .))))",
+        map { 'name': $name, 'lang': $lang, 'opts': $opts }
+      ),
+      db:output(web:redirect($_:SUB, map {
+        'info': 'Created Database: ' || $name,
+        'name': $name
+      }))
+    )
   } catch * {
     db:output(web:redirect("create-db", map {
       'error': $err:description,

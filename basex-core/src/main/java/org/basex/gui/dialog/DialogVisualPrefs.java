@@ -77,8 +77,8 @@ final class DialogVisualPrefs extends BaseXBack {
 
     scale = new BaseXCheckBox(SCALE_GUI, GUIOptions.SCALE, gopts, d);
 
-    BaseXBack pp = new BaseXBack().layout(new TableLayout(3, 1, 0, 8));
-    BaseXBack p = new BaseXBack(new TableLayout(2, 1));
+    BaseXBack pp = new BaseXBack().layout(new TableLayout(3, 1, 0, 8)), p;
+    p = new BaseXBack(new TableLayout(2, 1));
     p.add(new BaseXLabel(GENERAL + COL, true, true));
     p.add(showNames);
     pp.add(p);

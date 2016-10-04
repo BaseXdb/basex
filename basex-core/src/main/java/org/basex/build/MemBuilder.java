@@ -1,7 +1,5 @@
 package org.basex.build;
 
-import static org.basex.core.Text.*;
-
 import java.io.*;
 
 import org.basex.data.*;
@@ -72,16 +70,10 @@ public final class MemBuilder extends Builder {
     init();
     meta.assign(parser);
     try {
-      final Performance perf = Prop.debug ? new Performance() : null;
-      Util.debug(shortInfo() + DOTS);
       parse();
-      if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
-
-    } catch(final IOException ex) {
-      try { close(); } catch(final IOException ignore) { }
-      throw ex;
+    } finally {
+      if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
     }
-    close();
     return new DataClip(data);
   }
 
@@ -103,12 +95,6 @@ public final class MemBuilder extends Builder {
    */
   public Data data() {
     return data;
-  }
-
-  @Override
-  public void close() throws IOException {
-    parser.close();
-    if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
   }
 
   @Override

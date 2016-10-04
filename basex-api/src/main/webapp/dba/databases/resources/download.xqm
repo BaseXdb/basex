@@ -26,12 +26,14 @@ function _:download(
 ) as item()+ {
   cons:check(),
   try {
-    let $options := map { 'n': $name, 'r': $resource }
-    let $raw := util:eval("db:is-raw($n, $r)", $options)
-    let $ct := util:eval("db:content-type($n, $r)", $options)
+    let $options := map { 'name': $name, 'resource': $resource }
+    let $raw := util:eval("db:is-raw($name, $resource)", $options)
+    let $ct := util:eval("db:content-type($name, $resource)", $options)
     return (
       web:response-header(map { 'media-type': $ct }),
-      util:eval(if($raw) then "db:retrieve($n, $r)" else "db:open($n, $r)", $options)
+      util:eval(
+        if($raw) then "db:retrieve($name, $resource)" else "db:open($name, $resource)", $options
+      )
     )
   } catch * {
     <rest:response>
@@ -52,7 +54,7 @@ function _:download(
   $backup  as xs:string
 ) {
   cons:check(),
-  util:eval("file:read-binary(db:system()/globaloptions/dbpath || '/' || $b)",
-    map { 'b': $backup }
+  util:eval("file:read-binary(db:system()/globaloptions/dbpath || '/' || $backup)",
+    map { 'backup': $backup }
   )
 };

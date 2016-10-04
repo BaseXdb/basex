@@ -69,9 +69,17 @@ public abstract class Builder extends Job {
    * @throws IOException I/O exception
    */
   final void parse() throws IOException {
-    // add document node and parse document
-    parser.parse(this);
+    final Performance perf = Prop.debug ? new Performance() : null;
+    Util.debug(shortInfo() + DOTS);
+    try {
+      // add document node and parse document
+      parser.parse(this);
+    } finally {
+      parser.close();
+    }
     meta.lastid = meta.size - 1;
+
+    if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
   }
 
   /**
@@ -195,12 +203,6 @@ public abstract class Builder extends Job {
    * @throws IOException I/O exception
    */
   public abstract DataClip dataClip() throws IOException;
-
-  /**
-   * Closes open references.
-   * @throws IOException I/O exception
-   */
-  public abstract void close() throws IOException;
 
   /**
    * Adds a document node to the database.

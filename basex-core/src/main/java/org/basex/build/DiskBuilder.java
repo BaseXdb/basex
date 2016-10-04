@@ -1,6 +1,5 @@
 package org.basex.build;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.*;
@@ -23,7 +22,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class DiskBuilder extends Builder implements Closeable {
+public final class DiskBuilder extends Builder {
   /** Database table. */
   private DataOutput tout;
   /** Database texts. */
@@ -35,8 +34,6 @@ public final class DiskBuilder extends Builder implements Closeable {
 
   /** Static options. */
   private final StaticOptions sopts;
-  /** Closed flag. */
-  private boolean closed;
   /** Debug counter. */
   private int c;
 
@@ -72,65 +69,42 @@ public final class DiskBuilder extends Builder implements Closeable {
     elemNames = new Names(meta);
     attrNames = new Names(meta);
     try {
-      tout = new DataOutput(new TableOutput(meta, DATATBL));
-      xout = new DataOutput(meta.dbfile(DATATXT), bs);
-      vout = new DataOutput(meta.dbfile(DATAATV), bs);
-      sout = new DataOutput(meta.dbfile(DATATMP), bs);
-
-      final Performance perf = Prop.debug ? new Performance() : null;
-      Util.debug(shortInfo() + DOTS);
-      parse();
-      if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
-
-    } catch(final IOException ex) {
-      try { close(); } catch(final IOException ignore) { }
-      throw ex;
-    }
-    close();
-
-    // copy temporary values into database table
-    try(final DataInput in = new DataInput(meta.dbfile(DATATMP))) {
-      final TableAccess ta = new TableDiskAccess(meta, true);
       try {
-        for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
+        tout = new DataOutput(new TableOutput(meta, DATATBL));
+        xout = new DataOutput(meta.dbfile(DATATXT), bs);
+        vout = new DataOutput(meta.dbfile(DATAATV), bs);
+        sout = new DataOutput(meta.dbfile(DATATMP), bs);
+        parse();
       } finally {
-        ta.close();
+        if(tout != null) tout.close();
+        if(xout != null) xout.close();
+        if(vout != null) vout.close();
+        if(sout != null) sout.close();
       }
-    }
-    meta.dbfile(DATATMP).delete();
 
-    // return database instance
-    return new DiskData(meta, elemNames, attrNames, path, nspaces);
-  }
+      // copy temporary values into database table
+      try(final DataInput in = new DataInput(meta.dbfile(DATATMP))) {
+        final TableAccess ta = new TableDiskAccess(meta, true);
+        try {
+          for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
+        } finally {
+          ta.close();
+        }
+      }
+      meta.dbfile(DATATMP).delete();
 
-  @Override
-  public void abort() {
-    try {
-      close();
-    } catch(final IOException ex) {
-      Util.debug(ex);
+      // return database instance
+      return new DiskData(meta, elemNames, attrNames, path, nspaces);
+
+    } catch(final Throwable th) {
+      DropDB.drop(meta.name, sopts);
+      throw th;
     }
-    if(meta != null) DropDB.drop(meta.name, sopts);
   }
 
   @Override
   public DataClip dataClip() throws IOException {
     return new DataClip(build());
-  }
-
-  @Override
-  public void close() throws IOException {
-    if(closed) return;
-    closed = true;
-    if(tout != null) tout.close();
-    if(xout != null) xout.close();
-    if(vout != null) vout.close();
-    if(sout != null) sout.close();
-    parser.close();
-    tout = null;
-    xout = null;
-    vout = null;
-    sout = null;
   }
 
   @Override

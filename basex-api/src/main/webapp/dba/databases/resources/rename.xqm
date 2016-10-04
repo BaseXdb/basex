@@ -19,7 +19,7 @@ declare variable $_:SUB := 'database';
  : Form for renaming a resource.
  : @param  $name      database
  : @param  $resource  resource
- : @param  $newname   new name of resource
+ : @param  $target    target path
  : @param  $error     error string
  : @return page
  :)
@@ -28,13 +28,13 @@ declare
   %rest:path("/dba/rename")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
-  %rest:query-param("newname",  "{$newname}")
+  %rest:query-param("target",   "{$target}")
   %rest:query-param("error",    "{$error}")
   %output:method("html")
 function _:rename(
   $name      as xs:string,
   $resource  as xs:string,
-  $newname   as xs:string?,
+  $target    as xs:string?,
   $error     as xs:string?
 ) as element(html) {
   cons:check(),
@@ -52,11 +52,11 @@ function _:rename(
           </h2>
           <table>
             <tr>
-              <td>New name:</td>
+              <td>New path:</td>
               <td>
-                <input type="text" name="newname"
-                  value="{ ($newname, $resource)[1] }" id="newname"/>
-                { html:focus('newname') }
+                <input type="text" name="target"
+                  value="{ ($target, $resource)[1] }" id="target"/>
+                { html:focus('target') }
                 <div class='small'/>
               </td>
             </tr>
@@ -71,7 +71,7 @@ function _:rename(
  : Renames a database resource.
  : @param  $name      database
  : @param  $resource  resource
- : @param  $newname   new name of resource
+ : @param  $target    new name of resource
  :)
 declare
   %updating
@@ -79,24 +79,24 @@ declare
   %rest:path("/dba/rename")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
-  %rest:query-param("newname",  "{$newname}")
+  %rest:query-param("target",   "{$target}")
 function _:rename(
   $name      as xs:string,
   $resource  as xs:string,
-  $newname   as xs:string
+  $target    as xs:string
 ) {
   cons:check(),
   try {
-    if(util:eval('db:exists($n, $m)', map { 'n' : $name, 'm': $newname })) then (
-      error((), 'Resource already exists: ' || $newname || '.')
+    if(util:eval('db:exists($name, $target)', map { 'name' : $name, 'target': $target })) then (
+      error((), 'Resource already exists: ' || $target || '.')
     ) else (
-      util:update("db:rename($n, $r, $m)",
-        map { 'n': $name, 'r': $resource, 'm': $newname }
+      util:update("db:rename($name, $resource, $target)",
+        map { 'name': $name, 'resource': $resource, 'target': $target }
       ),
       db:output(web:redirect($_:SUB, map {
         'info': 'Resource was renamed.',
         'name': $name,
-        'resource': $newname
+        'resource': $target
       }))
     )
   } catch * {
@@ -104,7 +104,7 @@ function _:rename(
       'error': $err:description,
       'name': $name,
       'resource': $resource,
-      'newname': $newname
+      'target': $target
     }))
   }
 };

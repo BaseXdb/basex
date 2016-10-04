@@ -150,7 +150,7 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Checks if stream can output more characters.
+   * Checks if the output stream is exhausted.
    * @return {@code true} if stream is exhausted
    */
   public boolean finished() {

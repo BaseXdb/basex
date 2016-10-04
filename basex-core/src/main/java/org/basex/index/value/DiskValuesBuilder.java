@@ -49,33 +49,40 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   public DiskValues build() throws IOException {
     Util.debug(detailedInfo());
 
-    final boolean updindex = data.meta.updindex;
-    for(pre = 0; pre < size; ++pre) {
-      if((pre & 0x0FFF) == 0) check();
-      if(indexEntry()) {
-        final int id = updindex ? data.id(pre) : pre;
-        if(tokenize) {
-          int pos = 0;
-          for(final byte[] token : distinctTokens(data.text(pre, text))) {
-            index.add(token, id, pos++);
+    try {
+      final boolean updindex = data.meta.updindex;
+      for(pre = 0; pre < size; ++pre) {
+        if((pre & 0x0FFF) == 0) check();
+        if(indexEntry()) {
+          final int id = updindex ? data.id(pre) : pre;
+          if(tokenize) {
+            int pos = 0;
+            for(final byte[] token : distinctTokens(data.text(pre, text))) {
+              index.add(token, id, pos++);
+              count++;
+            }
+          } else if(data.textLen(pre, text) <= data.meta.maxlen) {
+            index.add(data.text(pre, text), id, 0);
             count++;
           }
-        } else if(data.textLen(pre, text) <= data.meta.maxlen) {
-          index.add(data.text(pre, text), id, 0);
-          count++;
         }
       }
-    }
 
-    writeIndex(splits > 0);
-    if(splits > 1) {
-      index = null;
-      clean();
-      merge();
-    }
+      writeIndex(splits > 0);
+      if(splits > 1) {
+        index = null;
+        clean();
+        merge();
+      }
 
-    finishIndex();
-    return updindex ? new UpdatableDiskValues(data, type) : new DiskValues(data, type);
+      finishIndex();
+      return updindex ? new UpdatableDiskValues(data, type) : new DiskValues(data, type);
+
+    } catch(final Throwable th) {
+      // drop index files
+      data.meta.drop(DiskValues.fileSuffix(type) + ".+");
+      throw th;
+    }
   }
 
   @Override
@@ -235,11 +242,5 @@ public final class DiskValuesBuilder extends ValuesBuilder {
     }
     id.reset();
     if(pos != null) pos.reset();
-  }
-
-  @Override
-  protected void abort() {
-    // drop index files
-    data.meta.drop(DiskValues.fileSuffix(type) + ".+");
   }
 }

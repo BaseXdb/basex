@@ -50,8 +50,8 @@ function _:replace(
           <table>
             <tr>
               <td>
-                <input type="file" name="input"/>
-                { html:focus('input') }
+                <input type="file" name="file"/>
+                { html:focus('file') }
                 <div class='small'/>
               </td>
             </tr>
@@ -66,7 +66,7 @@ function _:replace(
  : Replaces a database resource.
  : @param  $name      database
  : @param  $resource  resource
- : @param  $input     file input
+ : @param  $file      file input
  :)
 declare
   %updating
@@ -74,43 +74,33 @@ declare
   %rest:path("/dba/replace")
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resource}")
-  %rest:form-param("input",    "{$input}")
+  %rest:form-param("file",     "{$file}")
 function _:replace-upload(
   $name      as xs:string,
   $resource  as xs:string,
-  $input     as map(*)?
+  $file      as map(*)?
 ) {
   cons:check(),
   try {
-    let $content := $input(map:keys($input))
-    let $file := map:keys($input)
-    let $content := $input($file)
-    let $raw := util:eval("db:is-raw($n, $r)", map { 'n': $name, 'r': $resource })
-    return if($file) then (
-      try {
-        let $i := if($raw) then (
-          $content
-        ) else (
-          convert:binary-to-string($content)
-        )
-        return util:update("db:replace($n, $r, $i)",
-          map { 'n': $name, 'r': $resource, 'i': $i }
-        ),
-        db:output(web:redirect($_:SUB, map {
-          'redirect': $_:SUB,
-          'name': $name,
-          'resource': $resource,
-          'info': 'Replaced resource: ' || $resource
-        }))
-      } catch * {
-        error($err:code, replace($err:description, '^.*\): ', ''))
-      }
+    let $key := map:keys($file)
+    let $raw := util:eval("db:is-raw($name, $resource)",
+      map { 'name': $name, 'resource': $resource })
+    return if($key = '') then (
+      error((), "No input specified.")
     ) else (
-      db:output(web:redirect("replace", map {
+      let $input := if($raw) then (
+        $file($key)
+      ) else (
+        util:to-xml-string($file($key))
+      )
+      return util:update("db:replace($name, $resource, $input)",
+        map { 'name': $name, 'resource': $resource, 'input': $input }
+      ),
+      db:output(web:redirect($_:SUB, map {
         'redirect': $_:SUB,
         'name': $name,
         'resource': $resource,
-        'error': 'Please select a file to upload.'
+        'info': 'Replaced resource: ' || $resource
       }))
     )
   } catch * {

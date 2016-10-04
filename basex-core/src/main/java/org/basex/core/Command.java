@@ -255,17 +255,14 @@ public abstract class Command extends Job {
       return run();
     } catch(final JobException ex) {
       // job was interrupted by the user or server
-      abort();
       return error(INTERRUPTED);
     } catch(final OutOfMemoryError ex) {
       // out of memory
       Performance.gc(2);
-      abort();
       Util.debug(ex);
       return error(OUT_OF_MEM + (perm == Perm.CREATE ? H_OUT_OF_MEM : ""));
     } catch(final Throwable ex) {
       // any other unexpected error
-      abort();
       return error(Util.bug(ex) + Prop.NL + info);
     } finally {
       // flushes the output

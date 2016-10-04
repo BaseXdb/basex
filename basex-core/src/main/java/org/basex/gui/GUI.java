@@ -5,6 +5,7 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.*;
 import java.util.regex.*;
 
 import javax.swing.*;
@@ -683,12 +684,12 @@ public final class GUI extends JFrame {
 
   /**
    * Sets results information.
-   * @param n number of results
+   * @param count number of results
    */
-  private void setResults(final long n) {
-    int mh = gopts.get(GUIOptions.MAXRESULTS);
-    if(mh < 0) mh = Integer.MAX_VALUE;
-    hits.setText(Util.info(RESULTS_X, (n >= mh ? "\u2265" : "") + n));
+  private void setResults(final long count) {
+    final int max = gopts.get(GUIOptions.MAXRESULTS);
+    final String num = new DecimalFormat("#,###,###").format(count);
+    hits.setText(Util.info(RESULTS_X, (count >= max ? "\u2265" : "") + num));
   }
 
   /**

@@ -62,7 +62,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     error(_JOBS_EVAL.args("1", "()", " map{ 'interval':'-PT1S' }"), JOBS_RANGE_X);
     error(_JOBS_EVAL.args("1", "()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
     error(_JOBS_EVAL.args("1", "()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
-    error("(1,2)!" + _JOBS_EVAL.args("1", "()", " map{ 'id':'abc' }"), JOBS_ID_EXISTS_X);
+    error("(1,2)!" + _JOBS_EVAL.args(SLOW_QUERY, "()", " map{ 'id':'abc' }"), JOBS_ID_EXISTS_X);
   }
 
   /** Test method. */

@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.event.*;
+import java.text.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -10,6 +11,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * General preferences.
@@ -21,9 +23,13 @@ final class DialogGeneralPrefs extends BaseXBack {
   /** Main window reference. */
   private final GUI gui;
 
-  /** Information on available languages. */
-  private static final int[] HITS = {
-    10, 25, 100, 250, 1000, 2500, 10000, 25000, 100000, 250000, 1000000, -1
+  /** Value of {@link GUIOptions#MAXRESULTS}. */
+  private static final int[] MAXRESULTS = {
+    50000, 100000, 250000, 500000, 1000000, 2500000, Integer.MAX_VALUE
+  };
+  /** Value of {@link GUIOptions#MAXTEXT}. */
+  private static final int[] MAXTEXT = {
+    1 << 20, 1 << 21, 1 << 22, 1 << 23, 1 << 24, 1 << 25, Integer.MAX_VALUE
   };
 
   /** Information on available languages. */
@@ -34,9 +40,13 @@ final class DialogGeneralPrefs extends BaseXBack {
   /** Repository path. */
   private final BaseXTextField repoPath;
   /** Number of hits. */
-  private final BaseXSlider limit;
+  private final BaseXSlider maxResults;
+  /** Result cache. */
+  private final BaseXSlider maxText;
   /** Label for number of hits. */
-  private final BaseXLabel label;
+  private final BaseXLabel labelResults;
+  /** Label for text size. */
+  private final BaseXLabel labelText;
 
   /** Language label. */
   private final BaseXLabel creds;
@@ -86,19 +96,29 @@ final class DialogGeneralPrefs extends BaseXBack {
 
     mousefocus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, d);
     simplefd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, GUIOptions.SIMPLEFD, gopts, d);
-    final int val = hitsForSlider();
-    limit = new BaseXSlider(0, HITS.length - 1, val, d);
-    limit.addActionListener(new ActionListener() {
+
+    int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
+    maxResults = new BaseXSlider(0, MAXRESULTS.length - 1, val, d);
+    maxResults.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent e) { action(limit); }
+      public void actionPerformed(final ActionEvent e) { action(maxResults); }
     });
-    label = new BaseXLabel(" ");
+    labelResults = new BaseXLabel(" ");
+
+    val = sliderIndex(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
+    maxText = new BaseXSlider(0, MAXTEXT.length - 1, val, d);
+    maxText.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) { action(maxText); }
+    });
+    labelText = new BaseXLabel(" ");
+
     lang = new BaseXCombo(d, LANGS[0]);
     lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 
     add(new BaseXLabel(DATABASE_PATH + COL, true, true));
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0)), pp, ppp;
     p.add(dbPath);
     p.add(dbButton);
     add(p);
@@ -109,16 +129,27 @@ final class DialogGeneralPrefs extends BaseXBack {
     p.add(repoButton);
     add(p);
 
-    add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(8, 0, 8, 0));
+    p = new BaseXBack(new TableLayout(2, 2, 24, 0)).border(0);
+    p.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(8, 0, 8, 0));
+    p.add(new BaseXLabel(LIMITS + COL, true, true).border(8, 0, 8, 0));
 
-    p = new BaseXBack(new TableLayout(2, 2, 40, 0));
-    p.add(mousefocus);
-    p.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
-    p.add(simplefd);
-    final BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 12, 0)).border(0);
-    pp.add(limit);
-    pp.add(label);
+    pp = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(0);
+    pp.add(mousefocus);
+    pp.add(simplefd);
     p.add(pp);
+    pp = new BaseXBack(new TableLayout(4, 1, 0, 0)).border(0);
+    ppp = new BaseXBack(new TableLayout(1, 2, 12, 0)).border(0);
+    ppp.add(maxResults);
+    ppp.add(labelResults);
+    pp.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
+    pp.add(ppp);
+    ppp = new BaseXBack(new TableLayout(1, 2, 12, 0)).border(0);
+    ppp.add(maxText);
+    ppp.add(labelText);
+    pp.add(new BaseXLabel(SIZE_TEXT_RESULTS + COL));
+    pp.add(ppp);
+    p.add(pp);
+
     add(p);
 
     // checkbox for simple file dialog
@@ -131,15 +162,15 @@ final class DialogGeneralPrefs extends BaseXBack {
 
   /**
    * Returns the selected maximum number of hits as slider value.
-   * @return maximum number of hits
+   * @param value value to be found
+   * @param values allowed values
+   * @return index
    */
-  private int hitsForSlider() {
-    int mh = gui.gopts.get(GUIOptions.MAXRESULTS);
-    if(mh == -1) mh = Integer.MAX_VALUE;
-    final int hl = HITS.length - 1;
-    int h = -1;
-    while(++h < hl && HITS[h] < mh);
-    return h;
+  private int sliderIndex(final int value, final int[] values) {
+    final int hl = values.length - 1;
+    int i = -1;
+    while(++i < hl && values[i] < value);
+    return i;
   }
 
   /**
@@ -179,12 +210,14 @@ final class DialogGeneralPrefs extends BaseXBack {
     }
     opts.set(StaticOptions.LANG, lang.getSelectedItem());
 
-    gui.gopts.set(GUIOptions.MAXRESULTS, HITS[limit.getValue()]);
+    gui.gopts.set(GUIOptions.MAXTEXT, MAXTEXT[maxText.getValue()]);
+    gui.gopts.set(GUIOptions.MAXRESULTS, MAXRESULTS[maxResults.getValue()]);
 
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem()));
-    final int mh = HITS[limit.getValue()];
-    label.setText(mh == -1 ? ALL : Integer.toString(mh));
-
+    final int mr = MAXRESULTS[maxResults.getValue()];
+    labelResults.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
+    final int mt = MAXTEXT[maxText.getValue()];
+    labelText.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt, true));
     return true;
   }
 }
