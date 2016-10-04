@@ -23,8 +23,8 @@ public final class FileReadBinary extends FileFn {
     final long off = exprs.length > 1 ? toLong(exprs[1], qc) : 0;
     long len = exprs.length > 2 ? toLong(exprs[2], qc) : 0;
 
-    if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path);
-    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path);
+    if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
+    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
     // read full file
     if(exprs.length == 1) return new B64Stream(new IOFile(path.toFile()), FILE_IO_ERROR_X);
