@@ -112,7 +112,6 @@ public final class Export extends Command {
       if(export != null) {
         export.checkStop();
         export.progFile = fl;
-        export.progPos++;
       }
       // create dir if necessary
       fl.parent().md();
@@ -123,6 +122,8 @@ public final class Export extends Command {
           ser.serialize(new DBNode(data, pre));
         }
       }
+
+      if(export != null) export.progPos++;
     }
 
     // export raw files
@@ -131,10 +132,11 @@ public final class Export extends Command {
       if(export != null) {
         export.checkStop();
         export.progFile = fl;
-        export.progPos++;
       }
       final String u = unique(exported, fl.path());
       new IOFile(bin, s).copyTo(new IOFile(u));
+
+      if(export != null) export.progPos++;
     }
   }
 
@@ -154,8 +156,13 @@ public final class Export extends Command {
   }
 
   @Override
+  public String shortInfo() {
+    return EXPORT + DOTS;
+  }
+
+  @Override
   public String detailedInfo() {
-    return progFile == null ? EXPORT : progFile.path();
+    return progFile == null ? EXPORT : "(" + progPos + "/" + progSize + "): " + progFile;
   }
 
   /**
