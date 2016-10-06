@@ -71,7 +71,7 @@ public abstract class ConvertFn extends StandardFunc {
    * @throws CharacterCodingException character coding exception
    */
   public static byte[] toBinary(final byte[] in, final String enc) throws CharacterCodingException {
-    if(enc == Strings.UTF8) return in;
+    if(Strings.UTF8.equals(enc)) return in;
     final ByteBuffer bb = Charset.forName(enc).newEncoder().encode(CharBuffer.wrap(string(in)));
     final int il = bb.limit();
     final byte[] tmp = bb.array();

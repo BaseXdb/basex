@@ -208,7 +208,7 @@ public final class Token {
    */
   public static byte[] utf8(final byte[] token, final String encoding) {
     // UTF8 (comparison by ref.) or no special characters: return input
-    if(encoding == Strings.UTF8 || ascii(token)) return token;
+    if(Strings.UTF8.equals(encoding) || ascii(token)) return token;
 
     // convert to utf8. if errors occur while converting, an empty is returned.
     try {
