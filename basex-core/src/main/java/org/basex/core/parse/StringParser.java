@@ -38,16 +38,17 @@ final class StringParser extends CmdParser {
 
   @Override
   protected void parse(final ArrayList<Command> cmds) throws QueryException {
-    final Scanner sc = new Scanner(input).useDelimiter(single ? "\0" : "\r\n?|\n");
-    while(sc.hasNext()) {
-      final String line = sc.next().trim();
-      if(line.isEmpty() || line.startsWith("#")) continue;
-      parser = new InputParser(line);
-      parser.file = ctx.options.get(MainOptions.QUERYPATH);
-      while(parser.more()) {
-        final Cmd cmd = consume(Cmd.class, null);
-        if(cmd != null) cmds.add(parse(cmd));
-        if(parser.more() && !parser.consume(';')) throw help(null, cmd);
+    try(final Scanner sc = new Scanner(input).useDelimiter(single ? "\0" : "\r\n?|\n")){
+      while(sc.hasNext()) {
+        final String line = sc.next().trim();
+        if(line.isEmpty() || line.startsWith("#")) continue;
+        parser = new InputParser(line);
+        parser.file = ctx.options.get(MainOptions.QUERYPATH);
+        while(parser.more()) {
+          final Cmd cmd = consume(Cmd.class, null);
+          if(cmd != null) cmds.add(parse(cmd));
+          if(parser.more() && !parser.consume(';')) throw help(null, cmd);
+        }
       }
     }
   }
