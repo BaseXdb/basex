@@ -86,7 +86,7 @@ public final class HttpResponse {
         // error: adopt original type as content type
         final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
           new MediaType(ctype) : new MediaType(mtype);
-        response.add(hp.parse(type));
+        response.add(hp.parse(type, error));
         if(body) res.add(hp.payloads());
       } finally {
         is.close();

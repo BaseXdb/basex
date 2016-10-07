@@ -62,17 +62,16 @@ public final class HttpPayload {
   /**
    * Parses the HTTP payload and returns a result body element.
    * @param type media type
+   * @param error error flag
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FElem parse(final MediaType type) throws IOException, QueryException {
+  FElem parse(final MediaType type, final boolean error) throws IOException, QueryException {
     final FElem body;
     if(type.isMultipart()) {
       // multipart response
       final byte[] boundary = boundary(type);
-      if(boundary == null) throw HC_REQ_X.get(info, "No separation boundary specified");
-
       body = new FElem(Q_MULTIPART).add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
@@ -85,7 +84,15 @@ public final class HttpPayload {
           ? new NewlineInput(input).encoding(type.parameters().get(CHARSET))
           : new BufferInput(input)
         ).content();
-        payloads.add(parse(pl, type));
+        Value value = Empty.SEQ;
+        try {
+          value = parse(pl, type);
+        } catch(final QueryException ex) {
+          // ignore errors if response was triggered by an error anyway
+          if(!error) throw ex;
+          Util.debug(ex);
+        }
+        payloads.add(value);
       }
     }
     return body.add(SerializerOptions.MEDIA_TYPE.name(), type.type());
