@@ -132,6 +132,9 @@ public final class DirParser extends Parser {
             source.length(ze.getSize());
             parseResource(builder);
           }
+        } catch(final IllegalArgumentException ex) {
+          // GH-1351: catch invalid archive encodings
+          throw new IOException(ex);
         }
       }
     } else {
