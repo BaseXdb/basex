@@ -45,7 +45,7 @@ public final class LocalConcurrencyTest extends SandboxTest {
         }.start();
       }
     } finally {
-      while(counter.get() < runs && error[0] == null) Thread.yield();
+      while(counter.get() < runs) Thread.yield();
       execute(new DropDB("store"));
       execute(new DropUser("user"));
 
