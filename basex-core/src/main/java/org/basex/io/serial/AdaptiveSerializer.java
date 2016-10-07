@@ -33,11 +33,23 @@ public class AdaptiveSerializer extends OutputSerializer {
    */
   protected AdaptiveSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
+    this(os, sopts, true);
+  }
+
+  /**
+   * Constructor, specifying serialization options.
+   * @param os output stream
+   * @param sopts serialization parameters
+   * @param omit omit xml declaration
+   * @throws IOException I/O exception
+   */
+  protected AdaptiveSerializer(final OutputStream os, final SerializerOptions sopts,
+      final boolean omit) throws IOException {
 
     super(os, sopts);
     this.os = os;
 
-    sopts.set(OMIT_XML_DECLARATION, YesNo.YES);
+    if(omit) sopts.set(OMIT_XML_DECLARATION, YesNo.YES);
     indent = sopts.yes(INDENT);
     itemsep("\n");
   }

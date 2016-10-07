@@ -55,9 +55,10 @@ abstract class FileFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Path checkParentDir(final Path path) throws QueryException {
-    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path);
+    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
     final Path parent = path.getParent();
-    if(parent != null && !Files.exists(parent)) throw FILE_NO_DIR_X.get(info, parent);
+    if(parent != null && !Files.exists(parent))
+      throw FILE_NO_DIR_X.get(info, parent.toAbsolutePath());
     return path;
   }
 

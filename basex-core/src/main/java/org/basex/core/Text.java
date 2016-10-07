@@ -339,8 +339,8 @@ public interface Text {
     lang("c_info1"),
     lang("c_info21") + NL +
     LI + lang("c_info22") + NL +
-    LI + CmdInfo.DATABASE + ": " + lang("c_info23") + NL +
-    LI + CmdInfo.INDEX + ": " + lang("c_info24") + NL +
+    LI + CmdInfo.DATABASE + COLS + lang("c_info23") + NL +
+    LI + CmdInfo.INDEX + COLS + lang("c_info24") + NL +
     LI + CmdInfo.STORAGE + " [start end] | [" + S_QUERY + "]: " + lang("c_info25")
   };
   /** Command help. */
@@ -426,9 +426,9 @@ public interface Text {
     "[" + CmdShow.BACKUPS + '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS + ']',
     lang("c_show1"),
     lang("c_show21") + NL +
-    LI + CmdShow.SESSIONS + ": " + lang("c_show23") + NL +
+    LI + CmdShow.SESSIONS + COLS + lang("c_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("c_show24") + NL +
-    LI + CmdShow.BACKUPS + ": " + lang("c_show25")
+    LI + CmdShow.BACKUPS + COLS + lang("c_show25")
   };
   /** Command help. */
   String[] HELPGRANT = {
@@ -490,7 +490,7 @@ public interface Text {
   // COMMAND INFOS ============================================================
 
   /** Command timing information. */
-  String TIME_NEEDED_X = lang("time_needed") + ": %";
+  String TIME_REQUIRED = lang("time_required");
   /** Command syntax information. */
   String SYNTAX_X = lang("syntax") + ": %";
   /** Command execution error. */
@@ -1352,9 +1352,9 @@ public interface Text {
   /** License info. */
   String LICENSE = lang("license");
   /** Developer info. */
-  String CHIEF_ARCHITECT = lang("chief_architect") + ": " + Prop.AUTHOR;
+  String CHIEF_ARCHITECT = lang("chief_architect") + COLS + Prop.AUTHOR;
   /** Contributors info. */
-  String TEAM1 = lang("team") + ": " + Prop.TEAM1 + ',';
+  String TEAM1 = lang("team") + COLS + Prop.TEAM1 + ',';
   /** Developer names. */
   String TEAM2 = Prop.TEAM2;
   /** Developer names. */

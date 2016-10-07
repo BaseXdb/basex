@@ -366,7 +366,7 @@ public class TextPanel extends BaseXPanel {
   final void search(final SearchContext sc, final boolean jump) {
     try {
       rend.search(sc);
-      gui.status.setText(sc.search.isEmpty() ? Text.OK : Util.info(Text.STRINGS_FOUND_X,  sc.nr()));
+      if(!sc.search.isEmpty()) gui.status.setText(Util.info(Text.STRINGS_FOUND_X,  sc.nr()));
       if(jump) jump(SearchDir.CURRENT, false);
     } catch(final Exception ex) {
       final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
@@ -387,7 +387,7 @@ public class TextPanel extends BaseXPanel {
         editor.select(select[0], select[sel ? 1 : 0]);
         release(Action.CHECK);
       }
-      gui.status.setText(Util.info(Text.STRINGS_REPLACED));
+      gui.status.setText(Text.STRINGS_REPLACED);
     } catch(final Exception ex) {
       final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
       gui.status.setError(Text.REGULAR_EXPR + Text.COLS + msg);

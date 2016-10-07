@@ -515,7 +515,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
-   * Returns an error.
+   * Creates an error function.
    * @param ann annotation
    * @throws QueryException HTTP exception
    */

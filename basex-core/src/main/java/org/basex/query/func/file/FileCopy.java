@@ -32,20 +32,20 @@ public class FileCopy extends FileFn {
       throws QueryException, IOException {
 
     final Path source = toPath(0, qc);
-    if(!Files.exists(source)) throw FILE_NOT_FOUND_X.get(info, source);
+    if(!Files.exists(source)) throw FILE_NOT_FOUND_X.get(info, source.toAbsolutePath());
     final Path src = absolute(source);
     Path trg = absolute(toPath(1, qc));
 
     if(Files.isDirectory(trg)) {
       // target is a directory: attach file name
       trg = trg.resolve(src.getFileName());
-      if(Files.isDirectory(trg)) throw FILE_IS_DIR_X.get(info, trg);
+      if(Files.isDirectory(trg)) throw FILE_IS_DIR_X.get(info, trg.toAbsolutePath());
     } else if(!Files.exists(trg)) {
       // target does not exist: ensure that parent exists
-      if(!Files.isDirectory(trg.getParent())) throw FILE_NO_DIR_X.get(info, trg);
+      if(!Files.isDirectory(trg.getParent())) throw FILE_NO_DIR_X.get(info, trg.toAbsolutePath());
     } else if(Files.isDirectory(src)) {
       // if target is file, source cannot be a directory
-      throw FILE_IS_DIR_X.get(info, src);
+      throw FILE_IS_DIR_X.get(info, src.toAbsolutePath());
     }
 
     // ignore operations on identical, canonical source and target path

@@ -27,7 +27,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
    */
   protected BaseXSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
-    super(os, sopts);
+    super(os, sopts, false);
     binary = sopts.yes(SerializerOptions.BINARY);
   }
 

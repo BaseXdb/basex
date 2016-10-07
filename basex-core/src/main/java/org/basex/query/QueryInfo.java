@@ -29,13 +29,13 @@ public final class QueryInfo {
   public StringList readLocked;
   /** Write locked databases. */
   public StringList writeLocked;
-  /** Parsing time. */
+  /** Parsing time (nano seconds). */
   public long parsing;
-  /** Compilation time. */
+  /** Compilation time (nano seconds). */
   public long compiling;
-  /** Evaluation time. */
+  /** Evaluation time (nano seconds). */
   public long evaluating;
-  /** Serialization time. */
+  /** Serialization time (nano seconds). */
   public long serializing;
 
   /** Query. */

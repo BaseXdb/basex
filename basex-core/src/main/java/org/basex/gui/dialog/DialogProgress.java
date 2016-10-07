@@ -26,6 +26,8 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   private final Timer timer = new Timer(100, this);
    /** Information label. */
   private BaseXLabel info;
+  /** Cancel button. */
+  private BaseXButton cancel;
   /** Memory usage. */
   private BaseXMem mem;
   /** Executed command. */
@@ -77,8 +79,9 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     m.add(mem);
     s.add(m, BorderLayout.WEST);
 
+
     if(cmd.stoppable()) {
-      final BaseXButton cancel = new BaseXButton(B_CANCEL, this);
+      cancel = new BaseXButton(B_CANCEL, this);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);
@@ -91,8 +94,8 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
   @Override
   public void cancel() {
+    if(cancel != null) cancel.setEnabled(false);
     command.stop();
-    close();
   }
 
   @Override
@@ -189,7 +192,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
           // return status information
           final String time = perf.toString();
           gui.info.setInfo(info, cmd, time, ok, true);
-          gui.status.setText(Util.info(TIME_NEEDED_X, time));
+          gui.status.setText(cmd + ": " + time);
 
           // close progress window and show error if command failed
           wait.dispose();

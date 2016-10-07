@@ -732,7 +732,7 @@ public enum QueryError {
   /** SERE0008. */
   SERENC_X_X(SERE, 8, "Character '#x%;' cannot be mapped to '%'."),
   /** SEPM0009. */
-  SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
+  SERSTAND(SEPM, 9, "Invalid combination of omit-xml-declaration and other parameters."),
   /** SEPM0010. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
   /** SESU0011. */
