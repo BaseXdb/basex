@@ -18,9 +18,8 @@ import org.basex.gui.layout.*;
 import org.basex.gui.layout.TreeNode;
 
 /**
- * Combination of a JTree and a text field. The tree visualizes the database
- * content including raw files and documents. The search field allows to
- * quickly access specific files/documents.
+ * Combination of a JTree and a text field. The tree visualizes the database content including raw
+ * files and documents. The search field allows to quickly access specific files/documents.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher

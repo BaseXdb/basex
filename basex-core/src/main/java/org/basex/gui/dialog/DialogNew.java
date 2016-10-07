@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DialogNew extends BaseXDialog {
-  /** General dialog. */
+  /** Dialog for importing new resources. */
   private final DialogImport general;
   /** Options dialog. */
   private final DialogOptions options;

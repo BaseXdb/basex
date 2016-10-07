@@ -148,6 +148,7 @@ public final class EditorArea extends TextPanel {
     } else if(UNIT.is(e)) {
       release(Action.TEST);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
+      System.out.println("?");
       release(Action.CHECK);
     }
   }
