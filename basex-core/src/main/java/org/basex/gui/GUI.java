@@ -66,6 +66,11 @@ public final class GUI extends JFrame {
   /** Updating flag; if activated, operations accessing the data are skipped. */
   public boolean updating;
 
+  /** Currently executed command ({@code null} otherwise). */
+  public Command command;
+  /** ID of currently executed command. */
+  public int commandID;
+
   /** Fullscreen flag. */
   boolean fullscreen;
   /** Button panel. */
@@ -97,14 +102,10 @@ public final class GUI extends JFrame {
   /** Buttons. */
   private final GUIToolBar toolbar;
 
-  /** Current command. */
-  private Command command;
   /** Menu panel height. */
   private int menuHeight;
   /** Fullscreen Window. */
   private JFrame fullscr;
-  /** Thread counter. */
-  private int execID;
 
   /** Password reader. */
   private static PasswordReader pwReader;
@@ -367,58 +368,58 @@ public final class GUI extends JFrame {
           }
         };
         cp.pwReader(pwReader);
-        execute(false, cp.parse());
+        execute(cp.parse());
       } catch(final QueryException ex) {
         if(!info.visible()) GUIMenuCmd.C_SHOWINFO.execute(this);
         info.setInfo(Util.message(ex), null, false, true);
       }
     } else if(gopts.get(GUIOptions.SEARCHMODE) == 1 || in.startsWith("/")) {
-      xquery(in, false);
+      simpleQuery(in);
     } else {
-      execute(false, new Find(in, gopts.get(GUIOptions.FILTERRT)));
+      execute(new Find(in, gopts.get(GUIOptions.FILTERRT)));
     }
   }
 
   /**
-   * Launches a query. Adds the default namespace if available. The command is ignored if an update
-   * operation takes place.
-   * @param qu query to be run
-   * @param edit editor panel
+   * Launches a simple single-line query. Adds the default namespace if available.
+   * @param query expression to be run
    */
-  public void xquery(final String qu, final boolean edit) {
+  public void simpleQuery(final String query) {
     // check and add default namespace
+    String q = query.trim().isEmpty() ? "()" : query;
     final Data data = context.data();
     final Namespaces ns = data.nspaces;
-    String q = qu.trim().isEmpty() ? "()" : qu;
     final int uriId = ns.uriIdForPrefix(Token.EMPTY, 0, data);
     if(uriId != 0) q = Util.info("declare default element namespace \"%\"; %", ns.uri(uriId), q);
-    execute(edit, new XQuery(q));
+    execute(new XQuery(q));
   }
 
   /**
-   * Launches the specified command in a separate thread. The command is ignored if an update
-   * operation takes place.
-   * @param cmd command to be launched
+   * Launches the specified commands in a separate thread.
+   * Commands are ignored if an update operation takes place.
+   * @param cmd commands to be executed
    */
-  public void execute(final Command cmd) {
+  public void execute(final Command... cmd) {
     execute(false, cmd);
   }
 
   /**
-   * Launches the specified commands in a separate thread. The command is ignored if an update
-   * operation takes place.
+   * Launches the specified commands in a separate thread.
+   * Commands are ignored if an update operation takes place.
    * @param edit call from editor view
-   * @param cmd command to be launched
+   * @param cmd commands to be executed
    */
   public void execute(final boolean edit, final Command... cmd) {
     // ignore command if updates take place
     if(updating) return;
+
     new Thread() {
       @Override
       public void run() {
         if(cmd.length == 0) info.setInfo("", null, true, true);
-        for(final Command c : cmd)
+        for(final Command c : cmd) {
           if(!exec(c, edit)) break;
+        }
       }
     }.start();
   }
@@ -426,46 +427,45 @@ public final class GUI extends JFrame {
   /**
    * Executes the specified command.
    * @param cmd command to be executed
-   * @param edit called from editor panel
+   * @param edit called from editor view
    * @return success flag
    */
   private boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
-    final int thread = ++execID;
+    final int thread = ++commandID;
     while(true) {
       final Command c = command;
       if(c == null) break;
       c.stop();
       Thread.yield();
-      if(execID != thread) return true;
+      if(commandID != thread) return true;
     }
+
+    // indicates that the command will be executed
     cursor(CURSORWAIT);
     input.setCursor(CURSORWAIT);
     stop.setEnabled(true);
+    if(edit) editor.pleaseWait(thread);
 
+    final Data data = context.data();
+    // reset current context if realtime filter is activated
+    if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.invalidate();
+
+    // remember current command and context nodes
+    final DBNodes current = context.current();
+    command = cmd;
+
+    // execute command and cache result
+    final ArrayOutput ao = new ArrayOutput();
+    ao.setLimit(gopts.get(GUIOptions.MAXTEXT));
+    // sets the maximum number of hits
+    cmd.maxResults(gopts.get(GUIOptions.MAXRESULTS));
+
+    final Performance perf = new Performance();
     boolean ok = true;
     try {
-      final Performance perf = new Performance();
-
-      final Data data = context.data();
-      // reset current context if realtime filter is activated
-      if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.invalidate();
-
-      // remember current command and context nodes
-      final DBNodes current = context.current();
-      command = cmd;
-
-      // execute command and cache result
-      final ArrayOutput ao = new ArrayOutput();
-      ao.setLimit(gopts.get(GUIOptions.MAXTEXT));
-      // sets the maximum number of hits
-      cmd.maxResults(gopts.get(GUIOptions.MAXRESULTS));
-
       // checks if the command is updating
       updating = cmd.updating(context);
-
-      // updates the query editor
-      if(edit) editor.pleaseWait();
 
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
@@ -487,11 +487,8 @@ public final class GUI extends JFrame {
         updating = false;
       }
 
-      // show query info
-      final String time = perf.getTime();
-      info.setInfo(inf, cmd, time, ok, true);
-
-      // sends feedback to the query editor
+      // show query info, send feedback to query editor
+      final String time = info.setInfo(inf, cmd, perf.getTime(), ok, true);
       final boolean stopped = inf.endsWith(INTERRUPTED);
       if(edit) editor.info(cause, stopped, true);
 
@@ -543,9 +540,9 @@ public final class GUI extends JFrame {
           }
         }
 
-        if(thread == execID && !stopped) {
+        if(thread == commandID && !stopped) {
           // show status info
-          status.setText(Util.info(TIME_NEEDED_X, time));
+          status.setText(TIME_REQUIRED + COLS + time);
           // show number of hits
           if(result != null) setResults(result.size());
           // assign textual output if no node result was created

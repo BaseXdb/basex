@@ -12,14 +12,14 @@ public final class Performance {
 
   /**
    * Returns the start time.
-   * @return execution time
+   * @return start time
    */
   public long start() {
     return time;
   }
 
   /**
-   * Returns the measured execution time in nanoseconds.
+   * Returns the measured execution time in nanoseconds and resets the timer.
    * @return execution time
    */
   public long time() {
@@ -30,8 +30,7 @@ public final class Performance {
   }
 
   /**
-   * Returns the measured execution time in milliseconds and reinitializes
-   * the timer.
+   * Returns the measured execution time in milliseconds and resets the timer.
    * @return execution time
    */
   public String getTime() {
@@ -39,8 +38,8 @@ public final class Performance {
   }
 
   /**
-   * Returns the measured execution time in milliseconds, divided by the
-   * number of runs, and reinitializes the timer.
+   * Returns the measured execution time in milliseconds, divided by the number of runs,
+   * and resets the timer.
    * @param runs number of runs
    * @return execution time
    */

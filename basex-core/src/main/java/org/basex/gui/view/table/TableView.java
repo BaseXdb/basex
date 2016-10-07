@@ -272,7 +272,7 @@ public final class TableView extends View {
    */
   void query() {
     final String query = tdata.find();
-    if(query != null) gui.xquery(query, false);
+    if(query != null) gui.simpleQuery(query);
   }
 
   @Override

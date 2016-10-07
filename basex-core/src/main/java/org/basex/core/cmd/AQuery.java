@@ -57,7 +57,7 @@ public abstract class AQuery extends Command {
    * @return success flag
    */
   final boolean query(final String query) {
-    final Performance p = new Performance();
+    final Performance perf = new Performance();
     String error;
     if(exception != null) {
       error = Util.message(exception);
@@ -74,11 +74,11 @@ public abstract class AQuery extends Command {
             popJob();
           }
           qp(query, context);
-          parse(p);
+          parse(perf);
           if(r == 0) plan(false);
 
           qp.compile();
-          info.compiling += p.time();
+          info.compiling += perf.time();
           if(r == 0) plan(true);
           if(!run) continue;
 
@@ -86,13 +86,13 @@ public abstract class AQuery extends Command {
           try(final Serializer ser = qp.getSerializer(po)) {
             if(maxResults >= 0) {
               result = qp.cache(maxResults);
-              info.evaluating += p.time();
+              info.evaluating += perf.time();
               result.serialize(ser);
               hits = result.size();
             } else {
               hits = 0;
               final Iter ir = qp.iter();
-              info.evaluating += p.time();
+              info.evaluating += perf.time();
               for(Item it; (it = ir.next()) != null;) {
                 ser.serialize(it);
                 ++hits;
@@ -101,7 +101,7 @@ public abstract class AQuery extends Command {
             }
           }
           qp.close();
-          info.serializing += p.time();
+          info.serializing += perf.time();
         }
         // remove string list if global locking is used and if query is updating
         if(soptions.get(StaticOptions.GLOBALLOCK) && qp.updating) {
@@ -132,10 +132,10 @@ public abstract class AQuery extends Command {
 
   /**
    * Parses the query.
-   * @param p performance
+   * @param perf performance
    * @throws QueryException query exception
    */
-  private void parse(final Performance p) throws QueryException {
+  private void parse(final Performance perf) throws QueryException {
     qp.http(http);
     for(final Entry<String, String[]> entry : vars.entrySet()) {
       final String name = entry.getKey();
@@ -144,7 +144,7 @@ public abstract class AQuery extends Command {
       else qp.bind(name, value[0], value[1]);
     }
     qp.parse();
-    if(p != null) info.parsing += p.time();
+    if(perf != null) info.parsing += perf.time();
   }
 
   /**
@@ -155,9 +155,9 @@ public abstract class AQuery extends Command {
    */
   final boolean updates(final Context ctx, final String query) {
     try {
-      final Performance p = new Performance();
+      final Performance perf = new Performance();
       qp(query, ctx);
-      parse(p);
+      parse(perf);
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);

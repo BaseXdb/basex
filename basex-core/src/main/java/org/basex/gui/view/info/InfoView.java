@@ -148,8 +148,9 @@ public final class InfoView extends View implements LinkListener {
    * @param time time required for running the command
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time
+   * @return total time (passed on, or updated, argument)
    */
-  public void setInfo(final String info, final Command cmd, final String time, final boolean ok,
+  public String setInfo(final String info, final Command cmd, final String time, final boolean ok,
       final boolean reset) {
 
     final TokenBuilder tb = new TokenBuilder(text);
@@ -272,6 +273,7 @@ public final class InfoView extends View implements LinkListener {
     if(total != null) timer.setText(TOTAL_TIME_CC + total);
     text = tb.finish();
     repaint();
+    return total;
   }
 
   /**

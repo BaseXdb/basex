@@ -286,7 +286,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     if(!force && last.equals(qu)) return;
     last = qu;
-    gui.xquery(qu, false);
+    gui.simpleQuery(qu);
   }
 
   /**

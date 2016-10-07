@@ -43,8 +43,10 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class EditorView extends View {
+  /** Delay for showing the please wait info. */
+  private static final int WAIT_DELAY = 250;
   /** Delay for highlighting an error. */
-  private static final int SEARCH_DELAY = 250;
+  private static final int SEARCH_DELAY = 100;
   /** Link pattern. */
   private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
   /** Number of files in the history. */
@@ -78,10 +80,10 @@ public final class EditorView extends View {
 
   /** Query file that has last been evaluated. */
   private IOFile execFile;
+
   /** Evaluation counter. */
-  private int evalID;
-  /** Parse counter. */
-  private int parseID;
+  private int statusID;
+
   /** Parse query context. */
   private QueryContext parseQC;
   /** Input info. */
@@ -603,12 +605,13 @@ public final class EditorView extends View {
    * @return editor
    */
   private EditorArea execEditor() {
-    if(execFile != null) {
+    final IOFile file = execFile;
+    if(file != null) {
       for(final EditorArea edit : editors()) {
-        if(edit.file().path().equals(execFile.path())) return edit;
+        if(edit.file().path().equals(file.path())) return edit;
       }
+      execFile = null;
     }
-    execFile = null;
     return null;
   }
 
@@ -706,17 +709,17 @@ public final class EditorView extends View {
 
   /**
    * Starts a thread, which shows a waiting info after a short timeout.
+   * @param id thread id
    */
-  public void pleaseWait() {
-    final int id = evalID;
+  public void pleaseWait(final int id) {
     new Timer(true).schedule(new TimerTask() {
       @Override
       public void run() {
-        if(id != evalID) return;
+        if(id != gui.commandID || gui.command == null) return;
         info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
         stop.setEnabled(true);
       }
-    }, SEARCH_DELAY);
+    }, WAIT_DELAY);
   }
 
   /**
@@ -725,21 +728,21 @@ public final class EditorView extends View {
    * @param lib library flag
    */
   private void parse(final String input, final boolean lib) {
-    final int id = ++parseID;
+    final int id = ++statusID;
     new Timer(true).schedule(new TimerTask() {
       @Override
       public void run() {
         // let current parser finish; check if thread is obsolete
         while(parseQC != null) Thread.yield();
-        if(id != parseID) return;
+        if(id != statusID) return;
 
         // parse query
         try(final QueryContext qc = new QueryContext(gui.context)) {
           parseQC = qc;
           qc.parse(input, lib, null, null);
-          if(id == parseID) info(null);
+          if(id == statusID) info(null);
         } catch(final QueryException ex) {
-          if(id == parseID) info(ex);
+          if(id == statusID) info(ex);
         } finally {
           parseQC = null;
         }
@@ -757,7 +760,7 @@ public final class EditorView extends View {
     // do not refresh view when query is running
     if(!refresh && stop.isEnabled()) return;
 
-    ++evalID;
+    ++statusID;
     getEditor().resetError();
 
     if(refresh) {
