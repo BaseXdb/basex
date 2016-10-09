@@ -181,22 +181,16 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           final Names names = att ? data.attrNames : data.elemNames;
           final byte[] key = Token.token(att ? item.substring(1) : item);
           final Stats stats = names.stats(names.id(key));
-          switch(stats.type) {
-            case INTEGER:
-              addSlider(stats.min, stats.max, cp + 1, true);
-              break;
-            case DOUBLE:
-              addSlider(stats.min, stats.max, cp + 1, false);
-              break;
-            case CATEGORY:
-              addCombo(entries(new TokenList(stats.values)), cp + 1);
-              break;
-            case STRING:
-              addInput(cp + 1);
-              break;
-            case NONE:
-              panel.add(new BaseXLabel(""), cp + 1);
-              break;
+          if(StatsType.isInteger(stats.type)) {
+            addSlider(stats.min, stats.max, cp + 1, true);
+          } else if(StatsType.isDouble(stats.type)) {
+            addSlider(stats.min, stats.max, cp + 1, false);
+          } else if(StatsType.isCategory(stats.type)) {
+            addCombo(entries(new TokenList(stats.values)), cp + 1);
+          } else if(StatsType.isString(stats.type)) {
+            addInput(cp + 1);
+          } else {
+            panel.add(new BaseXLabel(""), cp + 1);
           }
         } else {
           panel.add(new BaseXLabel(""), cp + 1);

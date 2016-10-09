@@ -23,7 +23,7 @@ final class PlotAxis {
   /** Number of different categories for x attribute. */
   int nrCats;
   /** Data type. */
-  StatsType type;
+  int type;
   /** Coordinates of items. */
   double[] co = {};
   /** First label to be drawn after minimum label. */
@@ -97,18 +97,13 @@ final class PlotAxis {
   }
 
   /**
-   * Refreshes item list and coordinates if the selection has changed. So far
-   * only numerical data is considered for plotting. If the selected attribute
-   * is of kind TEXT, it is treated as INT.
+   * Refreshes item list and coordinates if the selection has changed.
    */
   void refreshAxis() {
     final Data data = plotData.context.data();
     final Stats stats = elem ? data.elemNames.stats(attrID) : data.attrNames.stats(attrID);
     if(stats == null) return;
     type = stats.type;
-    if(type == null) return;
-    if(type == StatsType.CATEGORY)
-      type = StatsType.STRING;
 
     final int[] items = plotData.pres;
     final int il = items.length;
@@ -117,13 +112,13 @@ final class PlotAxis {
     final byte[][] vals = new byte[il][];
     for(int i = 0; i < il; ++i) {
       byte[] value = getValue(items[i]);
-      if(type == StatsType.STRING && value.length > TEXTLENGTH) {
+      if(StatsType.isString(type) && value.length > TEXTLENGTH) {
         value = substring(value, 0, TEXTLENGTH);
       }
       vals[i] = lc(value);
     }
 
-    if(type == StatsType.STRING) {
+    if(StatsType.isString(type)) {
       textToNum(vals);
     } else {
       minMax(vals);
@@ -319,7 +314,7 @@ final class PlotAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    if(type == StatsType.DOUBLE || type == StatsType.INTEGER) {
+    if(StatsType.isNumeric(type)) {
       final double range = Math.abs(max - min);
       if(range == 0) {
         nrCaptions = 1;
@@ -334,7 +329,7 @@ final class PlotAxis {
       }
 
       // labeling for linear scale
-      final boolean dbl = type == StatsType.DOUBLE;
+      final boolean dbl = StatsType.isDouble(type);
       actlCaptionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / actlCaptionStep) + 1;
       while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 3 < space &&

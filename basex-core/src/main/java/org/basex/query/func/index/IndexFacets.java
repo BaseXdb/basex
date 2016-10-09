@@ -1,5 +1,6 @@
 package org.basex.query.func.index;
 
+import static org.basex.index.stats.StatsType.*;
 import static org.basex.util.Token.*;
 
 import org.basex.data.*;
@@ -90,21 +91,18 @@ public final class IndexFacets extends IndexFn {
    * @param elem element
    */
   private static void stats(final Stats stats, final FElem elem) {
-    elem.add(TYPE, stats.type.toString());
+    final int type = stats.type;
+    if(!StatsType.isNone(type)) elem.add(TYPE, StatsType.toString(type));
     elem.add(COUNT, token(stats.count));
-    switch(stats.type) {
-      case CATEGORY:
-        for(final byte[] c : stats.values) {
-          elem.add(new FElem(ENTRY).add(COUNT, token(stats.values.get(c))).add(c));
-        }
-        break;
-      case DOUBLE:
-      case INTEGER:
-        elem.add(MIN, token(stats.min));
-        elem.add(MAX, token(stats.max));
-        break;
-      default:
-        break;
+    if(isInteger(type) || isDouble(type)) {
+      final int mn = (int) stats.min, mx = (int) stats.max;
+      elem.add(MIN, mn == stats.min ? token(mn) : token(stats.min));
+      elem.add(MAX, mx == stats.max ? token(mx) : token(stats.max));
+    }
+    if(isCategory(type)) {
+      for(final byte[] value : stats.values) {
+        elem.add(new FElem(ENTRY).add(COUNT, token(stats.values.get(value))).add(value));
+      }
     }
   }
 }

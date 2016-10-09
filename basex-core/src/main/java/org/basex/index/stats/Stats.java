@@ -1,5 +1,6 @@
 package org.basex.index.stats;
 
+import static org.basex.index.stats.StatsType.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -18,14 +19,14 @@ import org.basex.util.hash.*;
 public final class Stats {
   /** Distinct values (value, number of occurrence). */
   public TokenIntMap values;
-  /** Data type. */
-  public StatsType type;
   /** Minimum value. */
   public double min;
   /** Maximum value. */
   public double max;
   /** Number of occurrences. */
   public int count;
+  /** Data type. */
+  public byte type;
 
   /** Leaf node flag. Indicates if all nodes only have a text node as child. */
   private boolean leaf;
@@ -35,7 +36,7 @@ public final class Stats {
    */
   public Stats() {
     values = new TokenIntMap();
-    type = StatsType.NONE;
+    type = NONE;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
     leaf = true;
@@ -55,7 +56,6 @@ public final class Stats {
    */
   public void setLeaf(final boolean l) {
     leaf = l;
-    if(!l) type = StatsType.STRING;
   }
 
   /**
@@ -65,20 +65,15 @@ public final class Stats {
    */
   public Stats(final DataInput in) throws IOException {
     // 0x10 indicates format introduced with Version 7.1
-    final int k = in.readNum();
-    type = StatsType.values()[k & 0xF];
+    final int t = in.readNum() & 0xF;
+    type = (byte) t;
 
-    if(type == StatsType.INTEGER || type == StatsType.DOUBLE) {
+    if(isInteger(t) || isDouble(t)) {
       min = in.readDouble();
       max = in.readDouble();
-    } else if(type == StatsType.CATEGORY) {
-      if(k > 0xF) {
-        values = new TokenIntMap(in);
-      } else {
-        values = new TokenIntMap();
-        final int cl = in.readNum();
-        for(int i = 0; i < cl; ++i) values.add(in.readToken());
-      }
+    }
+    if(isCategory(t)) {
+      values = new TokenIntMap(in);
     }
     count = in.readNum();
     leaf = in.readBool();
@@ -93,18 +88,25 @@ public final class Stats {
    */
   public void write(final DataOutput out) throws IOException {
     // finalize statistics: switch to category type if map with distinct values exists
-    StatsType t = type;
-    if((t == StatsType.NONE || t == StatsType.STRING) && values != null && !values.isEmpty())
-      t = StatsType.CATEGORY;
+    if(values != null) {
+      if(values.isEmpty()) {
+        values = null;
+      } else if(!isCategory(type)) {
+        type = type == INTEGER ? INTEGER_CATEGORY :
+               type == DOUBLE ? DOUBLE_CATEGORY : STRING_CATEGORY;
+      }
+    }
 
     // 0x10 indicates format introduced with Version 7.1
-    out.writeNum(t.ordinal() | 0x10);
-    if(t == StatsType.INTEGER || t == StatsType.DOUBLE) {
+    out.writeNum(type | 0x10);
+    if(isNumeric(type)) {
       out.writeDouble(min);
       out.writeDouble(max);
-    } else if(t == StatsType.CATEGORY) {
+    }
+    if(isCategory(type)) {
       values.write(out);
     }
+
     out.writeNum(count);
     out.writeBool(leaf);
     // legacy since version 7.1
@@ -120,29 +122,29 @@ public final class Stats {
    * @param meta meta data
    */
   public void add(final byte[] value, final MetaData meta) {
-    StatsType t = type;
+    byte t = type;
     final int vl = value.length;
     // only analyze non-empty values
     if(vl > 0) {
       // start with integer type
-      if(t == StatsType.NONE) {
-        t = StatsType.INTEGER;
+      if(t == NONE) {
+        t = INTEGER;
       }
       // try to save new value as integer
-      if(t == StatsType.INTEGER) {
+      if(t == INTEGER) {
         final long d = toLong(value);
         if(d == Long.MIN_VALUE) {
-          t = StatsType.DOUBLE;
+          t = DOUBLE;
         } else {
           if(min > d) min = d;
           if(max < d) max = d;
         }
       }
       // try to save new value as double
-      if(t == StatsType.DOUBLE) {
+      if(t == DOUBLE) {
         final double d = toDouble(value);
         if(Double.isNaN(d)) {
-          t = StatsType.STRING;
+          t = STRING;
         } else {
           if(min > d) min = d;
           if(max < d) max = d;
@@ -167,28 +169,21 @@ public final class Stats {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(count + "x");
-    String typ = "", ext = "";
-    switch(type) {
-      case CATEGORY:
-        typ = "distinct values";
-        ext = "(" + values.size() + ")";
-        break;
-      case DOUBLE:
-        typ = "doubles";
-        ext = "[" + min + ", " + max + "]";
-        break;
-      case INTEGER:
-        typ = "integers";
-        ext = "[" + (int) min + ", " + (int) max + "]";
-        break;
-      case STRING:
-        typ = "strings";
-        break;
-      default:
-        break;
+    if(!isNone(type)) {
+      sb.append(", ");
+      final int size = values != null ? values.size() : 0;
+      if(size > 1) sb.append(size + " distinct ");
+      sb.append(StatsType.toString(type));
+      if(size != 1) sb.append("s");
+      if(isNumeric(type)) {
+        sb.append(" [");
+        final int mn = (int) min, mx = (int) max;
+        if(mn == min) sb.append(mn); else sb.append(min);
+        sb.append(", ");
+        if(mx == max) sb.append(mx); else sb.append(max);
+        sb.append(']');
+      }
     }
-    if(!typ.isEmpty()) sb.append(", ").append(typ);
-    if(!ext.isEmpty()) sb.append(' ').append(ext);
     if(leaf) sb.append(", leaf");
     return sb.toString();
   }

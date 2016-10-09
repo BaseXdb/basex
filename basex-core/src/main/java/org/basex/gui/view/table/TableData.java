@@ -243,8 +243,7 @@ final class TableData {
 
     final Data data = ctx.data();
     final Names index = e ? data.elemNames : data.attrNames;
-    final StatsType type = index.stats(c).type;
-    final boolean num = type == StatsType.INTEGER || type == StatsType.DOUBLE;
+    final boolean num = StatsType.isNumeric(index.stats(c).type);
 
     final byte[][] tokens = new byte[rows.size()][];
     final int rs = rows.size();

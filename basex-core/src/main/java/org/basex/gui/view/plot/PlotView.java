@@ -473,17 +473,15 @@ public final class PlotView extends View {
     if(drawX) {
       if(plotChanged) {
         if(plotData.pres.length > 0) axis.calcCaption(pWidth);
-        final StatsType type = plotData.xAxis.type;
-        xLog.setEnabled((type == StatsType.DOUBLE ||
-            type == StatsType.INTEGER) && Math.abs(axis.min - axis.max) >= 1);
+        xLog.setEnabled(StatsType.isNumeric(plotData.xAxis.type) &&
+            Math.abs(axis.min - axis.max) >= 1);
       }
     } else {
       // drawing vertical axis line
       if(plotChanged) {
         if(plotData.pres.length > 0) axis.calcCaption(pHeight);
-        final StatsType type = plotData.yAxis.type;
-        yLog.setEnabled((type == StatsType.DOUBLE ||
-            type == StatsType.INTEGER) && Math.abs(axis.min - axis.max) >= 1);
+        yLog.setEnabled(StatsType.isNumeric(plotData.yAxis.type) &&
+            Math.abs(axis.min - axis.max) >= 1);
       }
     }
     if(plotData.pres.length < 1) {
@@ -493,14 +491,13 @@ public final class PlotView extends View {
     }
 
     // getting some axis specific data
-    final StatsType type = axis.type;
     final int nrCaptions = axis.nrCaptions;
     final double step = axis.actlCaptionStep;
     final double capRange = 1.0d / (nrCaptions - 1);
     g.setFont(font);
 
     // draw axis and assignment for TEXT data
-    if(type == StatsType.STRING) {
+    if(StatsType.isString(axis.type)) {
       final int nrCats = axis.nrCats;
       final double[] coSorted = Arrays.copyOf(axis.co, axis.co.length);
       // draw min / max caption
@@ -960,8 +957,7 @@ public final class PlotView extends View {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
-    return axis.type == StatsType.STRING || axis.type == StatsType.CATEGORY ?
-        string(val) : BaseXLayout.value(toDouble(val));
+    return StatsType.isString(axis.type) ? string(val) : BaseXLayout.value(toDouble(val));
   }
 
   @Override

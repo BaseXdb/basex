@@ -91,7 +91,7 @@ public final class FnDistinctValues extends StandardFunc {
       // skip nodes others than texts and attributes
       if(pn.kind != Data.TEXT && pn.kind != Data.ATTR) return this;
       // check if distinct values are available
-      if(pn.stats.type != StatsType.CATEGORY) return this;
+      if(!StatsType.isCategory(pn.stats.type)) return this;
       // if yes, add them to the item set
       for(final byte[] c : pn.stats.values) is.put(new Atm(c), info);
     }

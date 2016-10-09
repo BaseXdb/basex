@@ -38,12 +38,16 @@ public final class IndexModuleTest extends AdvancedQueryTest {
   public void facets() {
     final String tree = _INDEX_FACETS.args(NAME);
     query(tree + "//element[@name='head']/@count/data()", 1);
-    query(tree + "//element[@name='title']/text/@type/data()", "category");
+    query(tree + "//element[@name='title']/text/@type/data()", "string");
+    query(tree + "//element[@name='title']/text/entry/data()", "XML");
+    query(tree + "//element[@name='title']/text/entry/@count/data()", "1");
     query(tree + "//element[@name='li']/text/@count/data()", 2);
 
     final String flat = _INDEX_FACETS.args(NAME, "flat");
     query(flat + "//element[@name='title']/@count/data()", 1);
-    query(flat + "//element[@name='title']/@type/data()", "category");
+    query(flat + "//element[@name='title']/@type/data()", "string");
+    query(tree + "//element[@name='title']/text/entry/data()", "XML");
+    query(tree + "//element[@name='title']/text/entry/@count/data()", "1");
     query(flat + "//element[@name='li']/@count/data()", 2);
   }
 
