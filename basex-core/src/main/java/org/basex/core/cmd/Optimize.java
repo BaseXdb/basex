@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -107,61 +108,64 @@ public final class Optimize extends ACreate {
    * @throws IOException I/O Exception during index rebuild
    */
   public static void optimize(final Data data, final boolean enforceText, final boolean enforceAttr,
-      final boolean enforceToken, final boolean enforceFt, final Optimize cmd)
-      throws IOException {
+      final boolean enforceToken, final boolean enforceFt, final Optimize cmd) throws IOException {
 
     // initialize structural indexes
-    final MetaData md = data.meta;
-    if(!md.uptodate) {
+    final MetaData meta = data.meta;
+    if(!meta.uptodate) {
       data.paths.init();
       data.elemNames.init();
       data.attrNames.init();
-      md.dirty = true;
+      meta.dirty = true;
 
-      final IntList pars = new IntList(), elms = new IntList();
+      final IntList pars = new IntList(), elemStack = new IntList();
       int n = 0;
 
-      for(int pre = 0; pre < md.size; ++pre) {
+      for(int pre = 0; pre < meta.size; ++pre) {
         final byte kind = (byte) data.kind(pre);
         final int par = data.parent(pre, kind);
         while(!pars.isEmpty() && pars.peek() > par) {
           pars.pop();
-          elms.pop();
+          elemStack.pop();
         }
 
         final int level = pars.size();
         if(kind == Data.DOC) {
-          data.paths.put(0, Data.DOC, level);
+          data.paths.index(0, Data.DOC, level);
           pars.push(pre);
-          elms.push(0);
+          elemStack.push(0);
           ++n;
         } else if(kind == Data.ELEM) {
           final int id = data.nameId(pre);
-          data.elemNames.index(data.elemNames.key(id), null, true);
-          data.paths.put(id, Data.ELEM, level);
+          data.elemNames.index(data.elemNames.key(id));
+          data.paths.index(id, Data.ELEM, level);
           pars.push(pre);
-          elms.push(id);
+          elemStack.push(id);
         } else if(kind == Data.ATTR) {
           final int id = data.nameId(pre);
-          final byte[] val = data.text(pre, false);
-          data.attrNames.index(data.attrNames.key(id), val, true);
-          data.paths.put(id, Data.ATTR, level, val, md);
+          final byte[] value = data.text(pre, false);
+          data.attrNames.index(data.attrNames.key(id), value);
+          data.paths.index(id, Data.ATTR, level, value, meta);
         } else {
-          final byte[] val = data.text(pre, true);
-          if(kind == Data.TEXT && level > 1) data.elemNames.index(elms.peek(), val);
-          data.paths.put(0, kind, level, val, md);
+          final byte[] value = data.text(pre, true);
+          if(level > 1) {
+            final Stats stats = data.elemNames.stats(elemStack.peek());
+            if(kind == Data.TEXT) stats.add(value, meta);
+            else stats.setLeaf(false);
+          }
+          data.paths.index(0, kind, level, value, meta);
         }
         if(cmd != null) cmd.pre = pre;
       }
-      md.ndocs = n;
-      md.uptodate = true;
+      meta.ndocs = n;
+      meta.uptodate = true;
     }
 
     // rebuild value indexes
-    optimize(IndexType.TEXT, data, md.createtext, enforceText, cmd);
-    optimize(IndexType.ATTRIBUTE, data, md.createattr, enforceAttr, cmd);
-    optimize(IndexType.TOKEN, data, md.createtoken, enforceToken, cmd);
-    optimize(IndexType.FULLTEXT, data, md.createft, enforceFt, cmd);
+    optimize(IndexType.TEXT, data, meta.createtext, enforceText, cmd);
+    optimize(IndexType.ATTRIBUTE, data, meta.createattr, enforceAttr, cmd);
+    optimize(IndexType.TOKEN, data, meta.createtoken, enforceToken, cmd);
+    optimize(IndexType.FULLTEXT, data, meta.createft, enforceFt, cmd);
   }
 
   /**

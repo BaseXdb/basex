@@ -217,7 +217,7 @@ public final class UpdateTestTags extends DataUpdateTest {
     }
 
     final MemData md = new MemData(context.options);
-    md.elem(1, md.elemNames.index(name, null, false), 1, 1, 0, false);
+    md.elem(1, md.elemNames.put(name), 1, 1, 0, false);
     md.insert(0);
     data.startUpdate(context.options);
     data.insert(root, par, new DataClip(md));

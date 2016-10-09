@@ -37,13 +37,13 @@ public final class DataBuilder {
 
   /**
    * Attaches full-text position data.
-   * @param nm name of marker element
+   * @param name name of marker element
    * @param pos full-text position data
    * @param len length of extract
    * @return self reference
    */
-  public DataBuilder ftpos(final byte[] nm, final FTPosData pos, final int len) {
-    ftbuilder = new DataFTBuilder(pos, len, data.elemNames.index(nm, null, false));
+  public DataBuilder ftpos(final byte[] name, final FTPosData pos, final int len) {
+    ftbuilder = new DataFTBuilder(pos, len, data.elemNames.put(name));
     return this;
   }
 
@@ -116,7 +116,7 @@ public final class DataBuilder {
     final int uriId = uri.length == 0 || eq(prefix, XML) ? 0 :
       par != -1 ? data.nspaces.uriId(uri) : data.nspaces.add(last, prefix, uri, data);
 
-    final int nameId = data.attrNames.index(qname.string(), null, false);
+    final int nameId = data.attrNames.put(qname.string());
     data.attr(pre - par, nameId, node.string(), uriId);
     data.insert(last);
     return pre + 1;
@@ -208,7 +208,7 @@ public final class DataBuilder {
     // collect node name properties
     final QNm qname = node.qname();
     final int size = size(node, false), asize = size(node, true);
-    final int nameId = data.elemNames.index(qname.string(), null, false);
+    final int nameId = data.elemNames.put(qname.string());
     final int uriId = data.nspaces.uriId(qname.uri());
 
     // add element node

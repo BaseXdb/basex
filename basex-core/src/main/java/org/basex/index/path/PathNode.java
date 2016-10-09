@@ -30,37 +30,31 @@ public final class PathNode {
   /** Node kind. */
   public final Stats stats;
 
+  /** Empty element flag,assigned during index construction.
+   *  0: no empty elements;
+   *  1: test flag;
+   *  2: element can be empty. */
+  private byte empty;
+
   /**
    * Empty constructor.
    */
   PathNode() {
-    this(0, Data.DOC, null, 0);
+    this(0, Data.DOC, null);
   }
 
   /**
    * Default constructor.
-   * @param name node name
+   * @param name id of node name
    * @param kind node kind
    * @param parent parent node
    */
   private PathNode(final int name, final byte kind, final PathNode parent) {
-    this(name, kind, parent, 1);
-  }
-
-  /**
-   * Default constructor.
-   * @param name node name
-   * @param kind node kind
-   * @param parent parent node
-   * @param count counter
-   */
-  private PathNode(final int name, final byte kind, final PathNode parent, final int count) {
     children = new PathNode[0];
     this.name = (short) name;
     this.kind = kind;
     this.parent = parent;
     stats = new Stats();
-    stats.count = count;
   }
 
   /**
@@ -89,38 +83,60 @@ public final class PathNode {
 
   /**
    * Indexes the specified name and its kind.
-   * @param nm name id
+   * @param id name id
    * @param knd node kind
-   * @param value value
+   * @param value value (can be {@code null})
    * @param meta meta data
    * @return node reference
    */
-  PathNode index(final int nm, final byte knd, final byte[] value, final MetaData meta) {
-    for(final PathNode c : children) {
-      if(c.kind == knd && c.name == nm) {
-        if(value != null) c.stats.add(value, meta);
-        c.stats.count++;
-        return c;
+  PathNode index(final int id, final byte knd, final byte[] value, final MetaData meta) {
+    for(final PathNode child : children) {
+      if(child.kind == knd && child.name == id) {
+        child.index(value, meta);
+        return child;
       }
     }
 
-    final PathNode node = new PathNode(nm, knd, this);
-    if(value != null) node.stats.add(value, meta);
+    final PathNode child = new PathNode(id, knd, this);
+    child.index(value, meta);
 
-    final int cs = children.length;
-    final PathNode[] nodes = new PathNode[cs + 1];
-    System.arraycopy(children, 0, nodes, 0, cs);
-    nodes[cs] = node;
+    final int cl = children.length;
+    final PathNode[] nodes = new PathNode[cl + 1];
+    System.arraycopy(children, 0, nodes, 0, cl);
+    nodes[cl] = child;
     children = nodes;
-    return node;
+    return child;
   }
 
   /**
-   * Writes the node to the specified output stream.
+   * Indexes a value.
+   * @param value value (can be {@code null})
+   * @param meta meta data
+   */
+  private void index(final byte[] value, final MetaData meta) {
+    if(value == null) {
+      // opening element
+      if(kind == Data.ELEM) {
+        // check if this is an empty element: set test flag
+        if(empty == 0) empty = 1;
+        // confirm that this element can be empty
+        else if(empty == 1) empty = 2;
+      }
+    } else {
+      stats.add(value, meta);
+      // text node: invalidate test flag of parent node
+      if(kind == Data.TEXT && parent.empty == 1) parent.empty = 0;
+    }
+    stats.count++;
+  }
+
+  /**
+   * Finalizes the index and writes the node to the specified output stream.
    * @param out output stream
+   * @param meta meta data
    * @throws IOException I/O exception
    */
-  void write(final DataOutput out) throws IOException {
+  void write(final DataOutput out, final MetaData meta) throws IOException {
     out.writeNum(name);
     out.write1(kind);
     out.writeNum(0);
@@ -130,11 +146,16 @@ public final class PathNode {
     // update leaf flag
     boolean leaf = stats.isLeaf();
     for(final PathNode child : children) {
-      leaf &= child.kind == Data.TEXT || child.kind == Data.ATTR;
+      if(child.kind == Data.TEXT) {
+        if(empty != 0) child.stats.add(Token.EMPTY, meta);
+      } else if(child.kind != Data.ATTR) {
+        leaf = false;
+      }
     }
+
     stats.setLeaf(leaf);
     stats.write(out);
-    for(final PathNode child : children) child.write(out);
+    for(final PathNode child : children) child.write(out, meta);
   }
 
   /**

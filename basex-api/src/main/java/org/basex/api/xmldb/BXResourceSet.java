@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
 import org.xmldb.api.base.*;
-import org.xmldb.api.base.Collection;
 
 /**
  * Implementation of the ResourceSet Interface for the XMLDB:API.
@@ -17,14 +16,14 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
   /** Resources. */
   private final ArrayList<Resource> list;
   /** Collection reference. */
-  private final Collection coll;
+  private final BXCollection coll;
 
   /**
    * Default constructor with result.
    * @param result result
    * @param coll collection
    */
-  BXResourceSet(final Value result, final Collection coll) {
+  BXResourceSet(final Value result, final BXCollection coll) {
     // convert result into resource instances
     final int rs = (int) result.size();
     list = new ArrayList<>(rs);

@@ -103,13 +103,12 @@ final class PlotAxis {
    */
   void refreshAxis() {
     final Data data = plotData.context.data();
-    final Stats key = elem ? data.elemNames.stat(attrID) :
-      data.attrNames.stat(attrID);
-    if(key == null) return;
-    type = key.type;
+    final Stats stats = elem ? data.elemNames.stats(attrID) : data.attrNames.stats(attrID);
+    if(stats == null) return;
+    type = stats.type;
     if(type == null) return;
     if(type == StatsType.CATEGORY)
-      type = StatsType.TEXT;
+      type = StatsType.STRING;
 
     final int[] items = plotData.pres;
     final int il = items.length;
@@ -118,13 +117,13 @@ final class PlotAxis {
     final byte[][] vals = new byte[il][];
     for(int i = 0; i < il; ++i) {
       byte[] value = getValue(items[i]);
-      if(type == StatsType.TEXT && value.length > TEXTLENGTH) {
+      if(type == StatsType.STRING && value.length > TEXTLENGTH) {
         value = substring(value, 0, TEXTLENGTH);
       }
       vals[i] = lc(value);
     }
 
-    if(type == StatsType.TEXT) {
+    if(type == StatsType.STRING) {
       textToNum(vals);
     } else {
       minMax(vals);

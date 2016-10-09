@@ -91,8 +91,8 @@ final class TableData {
     for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
       int c = 0;
       for(final byte[] kk : data.paths.desc(k, true, false)) {
-        final Names nm = startsWith(kk, '@') ? data.attrNames : data.elemNames;
-        if(nm.stat(nm.id(delete(kk, '@'))).isLeaf()) ++c;
+        final Names names = startsWith(kk, '@') ? data.attrNames : data.elemNames;
+        if(names.stats(names.id(delete(kk, '@'))).isLeaf()) ++c;
       }
       // add keys with a minimum of three columns
       if(c > 2) roots.add(k);
@@ -117,8 +117,8 @@ final class TableData {
     for(final byte[] k : dt.paths.desc(dt.elemNames.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
-      final Names index = elem ? dt.elemNames : dt.attrNames;
-      if(index.stat(index.id(key)).isLeaf()) addCol(key, elem);
+      final Names names = elem ? dt.elemNames : dt.attrNames;
+      if(names.stats(names.id(key)).isLeaf()) addCol(key, elem);
     }
 
     context(true);
@@ -243,7 +243,7 @@ final class TableData {
 
     final Data data = ctx.data();
     final Names index = e ? data.elemNames : data.attrNames;
-    final StatsType type = index.stat(c).type;
+    final StatsType type = index.stats(c).type;
     final boolean num = type == StatsType.INTEGER || type == StatsType.DOUBLE;
 
     final byte[][] tokens = new byte[rows.size()][];

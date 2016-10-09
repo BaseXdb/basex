@@ -213,9 +213,9 @@ public final class CmpR extends Single {
     }
 
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;
-    final Stats key = names.stat(names.id(test.name.local()));
-    return key == null || key.type == StatsType.INTEGER ||
-        key.type == StatsType.DOUBLE ? key : null;
+    final Stats stats = names.stats(names.id(test.name.local()));
+    return stats == null || stats.type == StatsType.INTEGER ||
+        stats.type == StatsType.DOUBLE ? stats : null;
   }
 
   @Override

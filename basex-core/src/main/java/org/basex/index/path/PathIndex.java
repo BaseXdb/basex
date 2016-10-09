@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
@@ -64,7 +65,7 @@ public final class PathIndex implements Index {
    */
   public void write(final DataOutput out) throws IOException {
     out.writeBool(root != null);
-    if(root != null) root.write(out);
+    if(root != null) root.write(out, data.meta);
   }
 
   /**
@@ -90,29 +91,30 @@ public final class PathIndex implements Index {
   // Build Index ==============================================================
 
   /**
-   * Adds an entry.
-   * @param name name reference (0 for nodes other than element and attributes)
+   * Adds an element or document node.
+   * @param name name id ({@code 0} for nodes other than elements and attributes)
    * @param kind node kind
    * @param level current level
    */
-  public void put(final int name, final byte kind, final int level) {
-    put(name, kind, level, null, null);
+  public void index(final int name, final byte kind, final int level) {
+    index(name, kind, level, null, null);
   }
 
   /**
    * Adds an entry, including its value.
-   * @param name name reference (0 for nodes other than element and attributes)
+   * @param name name id ({@code 0} for nodes other than elements and attributes)
    * @param kind node kind
    * @param level current level
-   * @param value value
-   * @param meta meta data
+   * @param value value ({@code null} for element or document nodes)
+   * @param meta meta data (ignored if value is {@code null})
    */
-  public void put(final int name, final byte kind, final int level, final byte[] value,
+  public void index(final int name, final byte kind, final int level, final byte[] value,
       final MetaData meta) {
 
     if(level == 0) {
-      if(value != null) root.stats.add(value, meta);
-      root.stats.count++;
+      final Stats stats = root.stats;
+      if(value != null) stats.add(value, meta);
+      stats.count++;
     } else {
       while(level >= stack.size()) stack.add(null);
       stack.set(level, stack.get(level - 1).index(name, kind, value, meta));

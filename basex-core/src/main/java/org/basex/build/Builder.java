@@ -10,6 +10,7 @@ import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
+import org.basex.index.stats.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -88,7 +89,7 @@ public abstract class Builder extends Job {
    * @throws IOException I/O exception
    */
   public final void openDoc(final byte[] value) throws IOException {
-    path.put(0, Data.DOC, level);
+    path.index(0, Data.DOC, level);
     parStack.set(level++, meta.size);
     addDoc(value);
     nspaces.open();
@@ -263,8 +264,8 @@ public abstract class Builder extends Job {
    */
   private void addElem(final byte[] name, final Atts atts, final Atts nsp) throws IOException {
     // get reference of element name
-    int nameId = elemNames.index(name, null, true);
-    path.put(nameId, Data.ELEM, level);
+    int nameId = elemNames.index(name);
+    path.index(nameId, Data.ELEM, level);
 
     // cache pre value
     final int pre = meta.size;
@@ -286,19 +287,18 @@ public abstract class Builder extends Job {
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
-      final byte[] an = atts.name(a), av = atts.value(a);
-      final byte[] ap = prefix(an);
-      nameId = attrNames.index(an, av, true);
+      final byte[] an = atts.name(a), av = atts.value(a), ap = prefix(an);
+      nameId = attrNames.index(an, av);
       uriId = nspaces.uriIdForPrefix(ap, false);
       if(uriId == 0 && ap.length != 0 && !eq(ap, XML))
         throw new BuildException(WHICHNS, parser.detailedInfo(), an);
 
-      path.put(nameId, Data.ATTR, level + 1, av, meta);
+      path.index(nameId, Data.ATTR, level + 1, av, meta);
       addAttr(nameId, av, Math.min(IO.MAXATTS, a + 1), uriId);
     }
 
     // set leaf node information in index
-    if(level > 1) elemNames.stat(elemStack.get(level - 1)).setLeaf(false);
+    if(level > 1) elemNames.stats(elemStack.get(level - 1)).setLeaf(false);
 
     // check if data ranges exceed database limits, based on the storage details in {@link Data}
     limit(elemNames.size(), 0x8000, LIMITELEMS);
@@ -311,11 +311,11 @@ public abstract class Builder extends Job {
    * Checks a value limit and optionally throws an exception.
    * @param value value
    * @param limit limit
-   * @param msg message
+   * @param message error message
    * @throws IOException I/O exception
    */
-  private void limit(final int value, final int limit, final String msg) throws IOException {
-    if(value >= limit) throw new BuildException(msg, parser.detailedInfo(), limit);
+  private void limit(final int value, final int limit, final String message) throws IOException {
+    if(value >= limit) throw new BuildException(message, parser.detailedInfo(), limit);
   }
 
   /**
@@ -327,14 +327,13 @@ public abstract class Builder extends Job {
   private void addText(final byte[] value, final byte kind) throws IOException {
     final int l = level;
     if(l > 1) {
-      final int i = elemStack.get(l - 1);
-      // text node processing for statistics
-      if(kind == Data.TEXT) elemNames.index(i, value);
-      // set leaf node information in index
-      else elemNames.stat(i).setLeaf(false);
+      // add text node to statistics, or set leaf flag
+      final Stats stats = elemNames.stats(elemStack.get(l - 1));
+      if(kind == Data.TEXT) stats.add(value, meta);
+      else stats.setLeaf(false);
     }
 
-    path.put(0, kind, l, value, meta);
+    path.index(0, kind, l, value, meta);
     addText(value, l == 0 ? 1 : meta.size - parStack.get(l - 1), kind);
   }
 }

@@ -93,7 +93,7 @@ public final class FnDistinctValues extends StandardFunc {
       // check if distinct values are available
       if(pn.stats.type != StatsType.CATEGORY) return this;
       // if yes, add them to the item set
-      for(final byte[] c : pn.stats.cats) is.put(new Atm(c), info);
+      for(final byte[] c : pn.stats.values) is.put(new Atm(c), info);
     }
     // return resulting sequence
     final ValueBuilder vb = new ValueBuilder();

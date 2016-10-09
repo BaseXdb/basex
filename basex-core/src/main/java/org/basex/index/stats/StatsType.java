@@ -3,23 +3,23 @@ package org.basex.index.stats;
 import java.util.*;
 
 /**
- * Content types, used for index statistics.
+ * Value types, used for index statistics and query optimizations.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum StatsType {
-  // Don't change order (new items can be attached, however)
+  // Don't change order (new items can be attached, though)
 
-  /** Text.     */
-  TEXT,
-  /** Category. */
+  /** Values are arbitrary strings. */
+  STRING,
+  /** A limited number of distinct strings exists. */
   CATEGORY,
-  /** Numeric.  */
+  /** All values are of type integer.  */
   INTEGER,
-  /** Numeric.  */
+  /** All values are of type double. */
   DOUBLE,
-  /** No values. */
+  /** No values exist. */
   NONE;
 
   @Override

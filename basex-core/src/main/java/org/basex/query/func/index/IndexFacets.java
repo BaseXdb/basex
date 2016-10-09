@@ -79,7 +79,7 @@ public final class IndexFacets extends IndexFn {
     final int ns = names.size();
     for(int n = 1; n <= ns; n++) {
       final FElem sub = new FElem(name).add(NAME, names.key(n));
-      stats(names.stat(n), sub);
+      stats(names.stats(n), sub);
       root.add(sub);
     }
   }
@@ -94,8 +94,8 @@ public final class IndexFacets extends IndexFn {
     elem.add(COUNT, token(stats.count));
     switch(stats.type) {
       case CATEGORY:
-        for(final byte[] c : stats.cats) {
-          elem.add(new FElem(ENTRY).add(COUNT, token(stats.cats.get(c))).add(c));
+        for(final byte[] c : stats.values) {
+          elem.add(new FElem(ENTRY).add(COUNT, token(stats.values.get(c))).add(c));
         }
         break;
       case DOUBLE:

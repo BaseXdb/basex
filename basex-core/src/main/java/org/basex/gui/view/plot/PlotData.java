@@ -63,8 +63,8 @@ final class PlotData {
     final Data data = context.data();
     final TokenList tl = new TokenList();
     for(final byte[] k : data.paths.desc(it, true, false)) {
-      final Names nm = startsWith(k, '@') ? data.attrNames : data.elemNames;
-      if(nm.stat(nm.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
+      final Names names = startsWith(k, '@') ? data.attrNames : data.elemNames;
+      if(names.stats(names.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
     }
     return tl;
   }

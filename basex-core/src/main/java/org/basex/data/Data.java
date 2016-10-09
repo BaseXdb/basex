@@ -512,7 +512,7 @@ public abstract class Data {
           if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, IndexType.TOKEN, this));
         }
         table.write1(pre, 11, uriId);
-        table.write2(pre, 1, attrNames.index(name, null, false));
+        table.write2(pre, 1, attrNames.put(name));
         if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
         // add new values to attribute indexes
         if(meta.updindex) {
@@ -532,7 +532,7 @@ public abstract class Data {
           textIndex.delete(new ValueCache(pres, IndexType.TEXT, this));
         }
         table.write1(pre, 3, uriId);
-        final int nameId = elemNames.index(name, null, false);
+        final int nameId = elemNames.put(name);
         table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId);
         if(!pres.isEmpty()) textIndex.add(new ValueCache(pres, IndexType.TEXT, this));
       }
@@ -600,7 +600,7 @@ public abstract class Data {
         case ELEM:
           // add element
           final byte[] en = sData.name(sPre, sKind);
-          elem(cDist, elemNames.index(en, null, false), sData.attSize(sPre, sKind), sSize,
+          elem(cDist, elemNames.put(en), sData.attSize(sPre, sKind), sSize,
               nspaces.uriIdForPrefix(prefix(en), true), false);
           break;
         case TEXT:
@@ -612,7 +612,7 @@ public abstract class Data {
         case ATTR:
           // add attribute
           final byte[] an = sData.name(sPre, sKind);
-          attr(cDist, attrNames.index(an, null, false), sData.text(sPre, false),
+          attr(cDist, attrNames.put(an), sData.text(sPre, false),
               nspaces.uriIdForPrefix(prefix(an), false));
           break;
       }
@@ -769,7 +769,7 @@ public abstract class Data {
           // add element.
           final boolean nsFlag = nsScope.open(nPre, sdata.namespaces(sPre));
           final byte[] name = sdata.name(sPre, sKind);
-          elem(nDist, elemNames.index(name, null, false), sdata.attSize(sPre, sKind), sSize,
+          elem(nDist, elemNames.put(name), sdata.attSize(sPre, sKind), sSize,
               nspaces.uriIdForPrefix(prefix(name), true), nsFlag);
           break;
         }
@@ -792,7 +792,7 @@ public abstract class Data {
               table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
             }
           }
-          attr(nDist, attrNames.index(name, null, false), sdata.text(sPre, false), uriId);
+          attr(nDist, attrNames.put(name), sdata.text(sPre, false), uriId);
         }
       }
       nsScope.shift(1);

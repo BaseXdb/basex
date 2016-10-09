@@ -27,7 +27,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   /** Database context. */
   final BXDatabase db;
   /** Database context. */
-  Context ctx;
+  public Context ctx;
 
   /**
    * Constructor to create/open a collection.
@@ -42,9 +42,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
     db = (BXDatabase) database;
     ctx = db.ctx;
     try {
-      final MainOptions opts = ctx.options;
-      ctx.openDB(open ? Open.open(name, ctx, opts) :
-        CreateDB.create(name, Parser.emptyParser(opts), ctx, opts));
+      final MainOptions mopts = ctx.options;
+      ctx.openDB(open ? Open.open(name, ctx, mopts) :
+        CreateDB.create(name, Parser.emptyParser(mopts), ctx, mopts));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

@@ -16,8 +16,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Stats {
-  /** Categories. */
-  public TokenIntMap cats;
+  /** Distinct values (value, number of occurrence). */
+  public TokenIntMap values;
   /** Data type. */
   public StatsType type;
   /** Minimum value. */
@@ -26,15 +26,15 @@ public final class Stats {
   public double max;
   /** Number of occurrences. */
   public int count;
-  /** Leaf node flag. This flag indicates if a node has children other than
-   * texts and attributes. */
+
+  /** Leaf node flag. Indicates if all nodes only have a text node as child. */
   private boolean leaf;
 
   /**
    * Default constructor.
    */
   public Stats() {
-    cats = new TokenIntMap();
+    values = new TokenIntMap();
     type = StatsType.NONE;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
@@ -42,20 +42,20 @@ public final class Stats {
   }
 
   /**
-   * Getter for leaf.
-   * @return leaf
+   * Getter for leaf flag.
+   * @return leaf flag
    */
   public boolean isLeaf() {
     return leaf;
   }
 
   /**
-   * Setter for leaf.
+   * Setter for leaf flag.
    * @param l leaf or not
    */
   public void setLeaf(final boolean l) {
     leaf = l;
-    if(!l) type = StatsType.TEXT;
+    if(!l) type = StatsType.STRING;
   }
 
   /**
@@ -73,15 +73,16 @@ public final class Stats {
       max = in.readDouble();
     } else if(type == StatsType.CATEGORY) {
       if(k > 0xF) {
-        cats = new TokenIntMap(in);
+        values = new TokenIntMap(in);
       } else {
-        cats = new TokenIntMap();
+        values = new TokenIntMap();
         final int cl = in.readNum();
-        for(int i = 0; i < cl; ++i) cats.add(in.readToken());
+        for(int i = 0; i < cl; ++i) values.add(in.readToken());
       }
     }
     count = in.readNum();
     leaf = in.readBool();
+    // legacy since version 7.1
     in.readDouble();
   }
 
@@ -91,13 +92,18 @@ public final class Stats {
    * @throws IOException I/O exception
    */
   public void write(final DataOutput out) throws IOException {
+    // finalize statistics: switch to category type if map with distinct values exists
+    StatsType t = type;
+    if((t == StatsType.NONE || t == StatsType.STRING) && values != null && !values.isEmpty())
+      t = StatsType.CATEGORY;
+
     // 0x10 indicates format introduced with Version 7.1
-    out.writeNum(type.ordinal() | 0x10);
-    if(type == StatsType.INTEGER || type == StatsType.DOUBLE) {
+    out.writeNum(t.ordinal() | 0x10);
+    if(t == StatsType.INTEGER || t == StatsType.DOUBLE) {
       out.writeDouble(min);
       out.writeDouble(max);
-    } else if(type == StatsType.CATEGORY) {
-      cats.write(out);
+    } else if(t == StatsType.CATEGORY) {
+      values.write(out);
     }
     out.writeNum(count);
     out.writeBool(leaf);
@@ -106,75 +112,83 @@ public final class Stats {
   }
 
   /**
-   * Adds a value. All values are first treated as integer values. If a value
-   * can't be converted to an integer, it is treated as double value. If
-   * conversion fails again, it is handled as string category. Next, all values
-   * are cached. As soon as their number exceeds a maximum, the cached
-   * values are skipped, and contents are treated as arbitrary strings.
+   * Adds a value. All values are first treated as integer values. If a value cannot be converted
+   * to an integer, it is treated as double value. If conversion fails again, it is handled as
+   * string category. Next, all values are cached. As soon as their number exceeds a maximum,
+   * the cached values are skipped, and contents are treated as arbitrary strings.
    * @param value value to be added
    * @param meta meta data
    */
   public void add(final byte[] value, final MetaData meta) {
-    final int vl = value.length;
-    if(vl == 0 || type == StatsType.TEXT || ws(value)) return;
-
     StatsType t = type;
-    if(t == StatsType.NONE) t = StatsType.INTEGER;
-
-    if(cats != null && cats.size() <= meta.maxcats) {
-      if(value.length > meta.maxlen) {
-        t = StatsType.TEXT;
-        cats = null;
-      } else {
-        cats.put(value, Math.max(1, cats.get(value) + 1));
+    final int vl = value.length;
+    // only analyze non-empty values
+    if(vl > 0) {
+      // start with integer type
+      if(t == StatsType.NONE) {
+        t = StatsType.INTEGER;
       }
-    }
-    if(t == StatsType.INTEGER) {
-      final long d = toLong(value);
-      if(d == Long.MIN_VALUE) {
-        t = StatsType.DOUBLE;
-      } else {
-        if(min > d) min = d;
-        if(max < d) max = d;
+      // try to save new value as integer
+      if(t == StatsType.INTEGER) {
+        final long d = toLong(value);
+        if(d == Long.MIN_VALUE) {
+          t = StatsType.DOUBLE;
+        } else {
+          if(min > d) min = d;
+          if(max < d) max = d;
+        }
       }
-    }
-    if(t == StatsType.DOUBLE) {
-      final double d = toDouble(value);
-      if(Double.isNaN(d)) {
-        t = cats.size() <= meta.maxcats ? StatsType.CATEGORY : StatsType.TEXT;
-      } else {
-        if(min > d) min = d;
-        if(max < d) max = d;
-      }
-    } else if(t == StatsType.CATEGORY) {
-      if(cats.size() > meta.maxcats) {
-        t = StatsType.TEXT;
-        cats = null;
+      // try to save new value as double
+      if(t == StatsType.DOUBLE) {
+        final double d = toDouble(value);
+        if(Double.isNaN(d)) {
+          t = StatsType.STRING;
+        } else {
+          if(min > d) min = d;
+          if(max < d) max = d;
+        }
       }
     }
     type = t;
+
+    // save distinct values
+    if(values != null) {
+      if(vl > meta.maxlen || vl > 0 && ws(value)) {
+        // give up categories if string is too long or only consists of whitespaces
+        values = null;
+      } else {
+        values.put(value, Math.max(1, values.get(value) + 1));
+        // give up categories if number of entries exceeds limit
+        if(values.size() > meta.maxcats) values = null;
+      }
+    }
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(count + "x");
+    String typ = "", ext = "";
     switch(type) {
       case CATEGORY:
-        sb.append(", ").append(cats.size()).append(" values");
+        typ = "distinct values";
+        ext = "(" + values.size() + ")";
         break;
       case DOUBLE:
-        sb.append(", numeric(").append(min).append(" - ").append(max).append(')');
+        typ = "doubles";
+        ext = "[" + min + ", " + max + "]";
         break;
       case INTEGER:
-        sb.append(", numeric(").append((int) min).append(" - ").append((int) max).
-          append(')');
+        typ = "integers";
+        ext = "[" + (int) min + ", " + (int) max + "]";
         break;
-      case TEXT:
-        sb.append(", strings");
+      case STRING:
+        typ = "strings";
         break;
       default:
         break;
     }
+    if(!typ.isEmpty()) sb.append(", ").append(typ);
+    if(!ext.isEmpty()) sb.append(' ').append(ext);
     if(leaf) sb.append(", leaf");
     return sb.toString();
   }

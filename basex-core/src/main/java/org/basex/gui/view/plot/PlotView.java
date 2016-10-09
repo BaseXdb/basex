@@ -500,7 +500,7 @@ public final class PlotView extends View {
     g.setFont(font);
 
     // draw axis and assignment for TEXT data
-    if(type == StatsType.TEXT) {
+    if(type == StatsType.STRING) {
       final int nrCats = axis.nrCats;
       final double[] coSorted = Arrays.copyOf(axis.co, axis.co.length);
       // draw min / max caption
@@ -960,7 +960,7 @@ public final class PlotView extends View {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
-    return axis.type == StatsType.TEXT || axis.type == StatsType.CATEGORY ?
+    return axis.type == StatsType.STRING || axis.type == StatsType.CATEGORY ?
         string(val) : BaseXLayout.value(toDouble(val));
   }
 

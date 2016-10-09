@@ -88,7 +88,7 @@ public final class IndexInfo {
         return null;
 
       test = (NameTest) last.test;
-      final Stats stats = data.elemNames.stat(data.elemNames.id(test.name.local()));
+      final Stats stats = data.elemNames.stats(data.elemNames.id(test.name.local()));
       if(stats == null || !stats.isLeaf()) return null;
     }
     text = elem || last.test.type == NodeType.TXT;

@@ -16,14 +16,12 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class LocalConcurrencyTest extends SandboxTest {
-  /**
-   * Test for concurrently accessing and modifying users.
-   */
+  /** Test for concurrently accessing and modifying users. */
   @Test
   public void userTest() {
     final AtomicInteger counter = new AtomicInteger();
     final Exception[] error = new Exception[1];
-    final int runs = 250;
+    final int runs = 500;
 
     try {
       execute(new CreateDB("store"));
@@ -37,22 +35,21 @@ public final class LocalConcurrencyTest extends SandboxTest {
           public void run() {
             try(Session session = new LocalSession(context, "user", "")) {
               session.execute(new Open("store"));
-              counter.incrementAndGet();
             } catch(final Exception ex) {
               error[0] = ex;
             }
+            counter.incrementAndGet();
           }
         }.start();
       }
     } finally {
       while(counter.get() < runs) Thread.yield();
-      execute(new DropDB("store"));
-      execute(new DropUser("user"));
-
       if(error[0] != null) {
         error[0].printStackTrace();
         fail(error[0].toString());
       }
+      execute(new DropDB("store"));
+      execute(new DropUser("user"));
     }
   }
 }

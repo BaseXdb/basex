@@ -7,13 +7,13 @@ import org.basex.data.*;
 import org.basex.util.*;
 
 /**
- * This class organizes pins of currently opened databases.
+ * This class organizes currently opened databases.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Datas {
-  /** List of data references. */
+  /** Pinned databases (data instance, number of pins). */
   private final IdentityHashMap<Data, Integer> list = new IdentityHashMap<>();
 
   /**

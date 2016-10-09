@@ -44,59 +44,62 @@ public final class Names extends TokenSet implements Index {
     super(in);
     this.meta = meta;
     stats = new Stats[keys.length];
-    for(int s = 1; s < size; ++s) stats[s] = new Stats(in);
+    for(int id = 1; id < size; id++) stats[id] = new Stats(in);
   }
 
   /**
    * Initializes the index.
    */
   public void init() {
-    for(int s = 1; s < size; ++s) stats[s] = new Stats();
+    for(int id = 1; id < size; id++) stats[id] = new Stats();
   }
 
   /**
-   * Indexes a name and returns its unique id.
+   * Indexes a name, updates the statistics, and returns the name id.
    * @param name name to be added
-   * @param value value, added to statistics (can be {@code null})
-   * @param stat statistics flag
    * @return name id
    */
-  public int index(final byte[] name, final byte[] value, final boolean stat) {
-    final int id = put(name);
-    if(stat) {
-      if(stats[id] == null) stats[id] = new Stats();
-      final Stats s = stats[id];
-      if(value != null) s.add(value, meta);
-      s.count++;
-    }
-    return id;
+  public int index(final byte[] name) {
+    return index(name, null);
   }
 
   /**
-   * Adds a value to the statistics of the specified key.
-   * Evaluates the value for the specified key id.
-   * @param name name id
-   * @param value value, added to statistics
+   * Indexes a name, updates the statistics, and returns the name id.
+   * @param name name to be added
+   * @param value value, added to statistics (can be {@code null})
+   * @return name id
    */
-  public void index(final int name, final byte[] value) {
-    stats[name].add(value, meta);
+  public int index(final byte[] name, final byte[] value) {
+    final int id = put(name);
+    Stats s = stats[id];
+    if(s == null) {
+      s = new Stats();
+      stats[id] = s;
+    }
+    if(value != null) s.add(value, meta);
+    s.count++;
+    return id;
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     super.write(out);
-    for(int s = 1; s < size; ++s) {
-      if(stats[s] == null) stats[s] = new Stats();
-      stats[s].write(out);
+    for(int id = 1; id < size; id++) {
+      Stats s = stats[id];
+      if(s == null) {
+        s = new Stats();
+        stats[id] = s;
+      }
+      s.write(out);
     }
   }
 
   /**
    * Returns the statistics for the specified key id.
-   * @param id id
-   * @return statistics
+   * @param id name id
+   * @return statistics (can be {@code null})
    */
-  public Stats stat(final int id) {
+  public Stats stats(final int id) {
     return stats[id];
   }
 
@@ -105,10 +108,10 @@ public final class Names extends TokenSet implements Index {
     final int[] tl = new int[size];
     tl[0] = 0;
     int len = 0;
-    for(int i = 1; i < size; ++i) {
-      if(len < keys[i].length) len = keys[i].length;
-      if(stats[i] == null) continue;
-      tl[i] = stats[i].count;
+    for(int id = 1; id < size; id++) {
+      if(len < keys[id].length) len = keys[id].length;
+      if(stats[id] == null) continue;
+      tl[id] = stats[id].count;
     }
     len += 2;
 
@@ -118,14 +121,14 @@ public final class Names extends TokenSet implements Index {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(Text.LI_STRUCTURE + Text.HASH + Text.NL);
     tb.add(Text.LI_ENTRIES + (size - 1) + Text.NL);
-    for(int i = 0; i < size - 1; ++i) {
-      final int s = ids[i];
-      if(stats[s] == null) continue;
-      final byte[] key = keys[s];
+    for(int i = 0; i < size - 1; i++) {
+      final int id = ids[i];
+      if(stats[id] == null) continue;
+      final byte[] key = keys[id];
       tb.add("  ").add(key);
       final int kl = len - key.length;
       for(int k = 0; k < kl; ++k) tb.add(' ');
-      tb.add(stats[s] + Text.NL);
+      tb.add(stats[id] + Text.NL);
     }
     return tb.finish();
   }

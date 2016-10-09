@@ -31,7 +31,7 @@ import org.xmldb.api.modules.*;
  */
 final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** Collection reference. */
-  private final Collection coll;
+  private final BXCollection coll;
   /** String id. */
   private String id;
   /** Query result. */
@@ -48,7 +48,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
    * @param content content data
    * @param coll Collection
    */
-  BXXMLResource(final byte[] content, final Collection coll) {
+  BXXMLResource(final byte[] content, final BXCollection coll) {
     this.content = content;
     this.coll = coll;
   }
@@ -58,7 +58,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
    * @param item query result
    * @param coll Collection
    */
-  BXXMLResource(final Item item, final Collection coll) {
+  BXXMLResource(final Item item, final BXCollection coll) {
     this.item = item;
     this.coll = coll;
   }
@@ -70,7 +70,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
    * @param id id
    * @param coll collection
    */
-  BXXMLResource(final Data data, final int pre, final String id, final Collection coll) {
+  BXXMLResource(final Data data, final int pre, final String id, final BXCollection coll) {
     this.id = id;
     this.coll = coll;
     this.data = data;
@@ -179,7 +179,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   @Override
   public ContentHandler setContentAsSAX() {
     // ..might be replaced by a custom SAX content handler in future
-    final MemBuilder mb = new MemBuilder("", Parser.emptyParser(new MainOptions()));
+    final MemBuilder mb = new MemBuilder("", Parser.emptyParser(coll.ctx.options));
     mb.init();
     return new BXSAXContentHandler(this, mb);
   }

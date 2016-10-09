@@ -62,7 +62,7 @@ public final class UpdateTestAttributes extends DataUpdateTest {
     final long nextid = data.meta.lastid;
 
     final MemData md = new MemData(context.options);
-    md.attr(1, md.attrNames.index(T_FOO, null, false), T_JUNIT, 0);
+    md.attr(1, md.attrNames.put(T_FOO), T_JUNIT, 0);
     md.insert(0);
     data.startUpdate(context.options);
     data.insertAttr(9, 6, new DataClip(md));
