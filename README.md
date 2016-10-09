@@ -69,7 +69,7 @@ server container:
 If you want to add your own application, create an image
 `FROM basex/basexhttp:[tag]` with `[tag]` being the BaseX version you're
 developing against. Usually, you will add your application code to
-`/srv/BaseXWeb` and modules to `/srv/BaseXModule`. `BaseXData` is persisted as
+`/srv/BaseXWeb` and modules to `/srv/BaseXRepo`. `BaseXData` is persisted as
 a volume, which means it cannot be preinitialized in the application image.
 
 For further information on using the Docker image, refer to the
