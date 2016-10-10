@@ -17,23 +17,23 @@ import org.basex.query.value.node.*;
 public abstract class DbFn extends StandardFunc {
   /**
    * Converts the specified info key to an element name.
-   * @param str string to be converted
+   * @param string string to be converted
    * @return resulting name
    */
-  public static String toName(final String str) {
-    return str.replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
+  public static String toName(final String string) {
+    return string.replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
   }
 
   /**
    * Converts the specified info string to a node fragment.
    * @param root name of the root node
-   * @param str string to be converted
+   * @param string string to be converted
    * @return node
    */
-  static ANode toNode(final String str, final String root) {
+  static ANode toNode(final String string, final String root) {
     final FElem top = new FElem(root);
     FElem node = null;
-    for(final String l : str.split("\r\n?|\n")) {
+    for(final String l : string.split("\r\n?|\n")) {
       final String[] cols = l.split(": ", 2);
       if(cols[0].isEmpty()) continue;
 

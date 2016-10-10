@@ -30,7 +30,7 @@ abstract class AInfo extends Command {
    * @param val value
    */
   static void info(final TokenBuilder tb, final Object key, final Object val) {
-    tb.add(' ').add(key.toString()).add(COLS).add(val.toString()).add(NL);
+    tb.add(' ').addExt(key).add(COLS).add(val.toString().replaceAll("\r\n?|\n", " ")).add(NL);
   }
 
   /**
