@@ -62,7 +62,6 @@ public final class UCAOptions extends CollationOptions {
     }
 
     final Method m = method(COLLATOR, "getInstance", Locale.class);
-    /* Rule-based collator. */
     final Object coll = invoke(m, null, locale);
 
     if(!coll.getClass().equals(RBC)) throw new IllegalArgumentException(

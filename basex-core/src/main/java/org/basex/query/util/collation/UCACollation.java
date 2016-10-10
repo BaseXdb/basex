@@ -3,7 +3,6 @@ package org.basex.query.util.collation;
 import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
-import java.text.*;
 import java.util.*;
 
 import org.basex.util.*;
@@ -27,7 +26,6 @@ final class UCACollation extends Collation {
   /** Method. */
   private static final Method CEI_NEXT = Reflect.method(CEI, "next");
 
-
   /** Collator. */
   private final Comparator<Object> collator;
 
@@ -48,9 +46,8 @@ final class UCACollation extends Collation {
   protected int indexOf(final String string, final String contains, final Mode mode,
       final InputInfo info) {
 
-    final RuleBasedCollator rbc = (RuleBasedCollator) collator;
-    final Object iterS = Reflect.invoke(RBC_GCEI, rbc, string);
-    final Object iterC = Reflect.invoke(RBC_GCEI, rbc, contains);
+    final Object iterS = Reflect.invoke(RBC_GCEI, collator, string);
+    final Object iterC = Reflect.invoke(RBC_GCEI, collator, contains);
 
     final int elemC = next(iterC);
     if(elemC == -1) return 0;

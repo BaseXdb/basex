@@ -141,10 +141,10 @@ public final class HttpRequestParser {
     if(atts.get(SRC) == null) {
       // no linked resource for setting request content
       if(contItem == null) {
-        // content is set from <http:body/> children
+        // content is taken from children of <http:body/> element
         for(final ANode n : body.children()) payload.add(n);
       } else {
-        // content is set from $bodies parameter
+        // content is taken from $bodies parameter
         payload.add(contItem);
       }
     }

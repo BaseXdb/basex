@@ -50,7 +50,7 @@ public final class FNSpace extends FNode {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(' ').add(Token.XMLNS);
+    final TokenBuilder tb = new TokenBuilder(Token.XMLNS);
     if(name.length != 0) tb.add(':').add(name);
     return tb.add('=').add(Atm.toString(value)).toString();
   }
