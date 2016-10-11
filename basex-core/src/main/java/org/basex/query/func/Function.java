@@ -359,8 +359,8 @@ public enum Function {
   /** XQuery function. */
   SERIALIZE(FnSerialize.class, "serialize(items[,params])", arg(ITEM_ZM, ITEM_ZO), STR),
   /** XQuery function. */
-  SORT(FnSort.class, "sort(items[,key-func])",
-      arg(ITEM_ZM, FuncType.arity(1).seqType()), ITEM_ZM, flag(HOF)),
+  SORT(FnSort.class, "sort(items[,collation[,function]])",
+      arg(ITEM_ZM, STR_ZO, FuncType.arity(1).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith.class, "starts-with(string,sub[,collation])",
       arg(STR_ZO, STR_ZO, STR), BLN),
@@ -501,8 +501,8 @@ public enum Function {
       arg(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O,
       flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_SORT(ArraySort.class, "sort(array[,key-func])",
-      arg(ARRAY_O, FuncType.arity(1).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
+  _ARRAY_SORT(ArraySort.class, "sort(array[,collation[,function]])",
+      arg(ARRAY_O, STR_ZO, FuncType.arity(1).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
 
   /* Math Module. */
 

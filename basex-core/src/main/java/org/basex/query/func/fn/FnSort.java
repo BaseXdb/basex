@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,17 +22,22 @@ public final class FnSort extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc);
-
-    final int sz = (int) value.size();
-    final ValueList vl = new ValueList(sz);
+    Collation coll = sc.collation;
     if(exprs.length > 1) {
-      final FItem key = checkArity(exprs[1], 1, qc);
-      for(final Item it : value) vl.add(key.invokeValue(qc, info, it));
-    } else {
-      for(final Item it : value) vl.add(it.atomValue(qc, info));
+      final byte[] token = toEmptyToken(exprs[1], qc);
+      if(token.length > 0) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
     }
 
-    final Integer[] order = sort(vl, this);
+    final long sz = value.size();
+    final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
+    if(exprs.length > 1) {
+      final FItem key = checkArity(exprs[2], 1, qc);
+      for(final Item it : value) vl.add(key.invokeValue(qc, info, it));
+    } else {
+      for(final Item it : value) vl.add(it.atomValue(info));
+    }
+
+    final Integer[] order = sort(vl, this, coll);
     return new ValueIter() {
       int c;
       @Override
@@ -58,10 +64,13 @@ public final class FnSort extends StandardFunc {
    * Sort the input data.
    * @param vl value list.
    * @param sf calling function
+   * @param coll collation
    * @return item order
    * @throws QueryException query exception
    */
-  public static Integer[] sort(final ValueList vl, final StandardFunc sf) throws QueryException {
+  public static Integer[] sort(final ValueList vl, final StandardFunc sf, final Collation coll)
+      throws QueryException {
+
     final int al = vl.size();
     final Integer[] order = new Integer[al];
     for(int o = 0; o < al; o++) order[o] = o;
@@ -82,7 +91,7 @@ public final class FnSort extends StandardFunc {
                       diffError(m, n, sf.info);
               }
               final int d = m == null ? n == null ? 0 : -1 : n == null ? 1 :
-                m.diff(n, sf.sc.collation, sf.info);
+                m.diff(n, coll, sf.info);
               if(d != 0 && d != Item.UNDEF) return d;
             }
             return (int) (s1 - s2);
