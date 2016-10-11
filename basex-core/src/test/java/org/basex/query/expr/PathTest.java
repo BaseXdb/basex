@@ -51,6 +51,15 @@ public final class PathTest extends AdvancedQueryTest {
   }
 
   /**
+   * Following axis with multiple documents.
+   */
+  @Test public void following() {
+    execute(new Add(NAME, FILE));
+    query("(//ul)[1]/following::ul", "");
+    query("(//ul)[last()]/preceding::ul", "");
+  }
+
+  /**
    * Filter expressions with two predicates (the last being a positional one).
    */
   @Test public void posAsLastPredicate() {

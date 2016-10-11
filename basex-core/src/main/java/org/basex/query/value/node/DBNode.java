@@ -382,13 +382,18 @@ public class DBNode extends ANode {
   public final DBNodeIter following() {
     return new DBNodeIter(data) {
       private final DBNode node = finish();
-      final int sz = data.meta.size;
-      int kind = data.kind(pre);
-      int curr = pre + data.size(pre, kind);
+      int kind = data.kind(pre), curr = pre + data.size(pre, kind), size = -1;
 
       @Override
       public DBNode next() {
-        if(curr == sz) return null;
+        // initialize iterator: find last node that needs to be scanned
+        if(size == -1) {
+          if(data.meta.ndocs > 1) {
+            for(final ANode anc : ancestor()) size = ((DBNode) anc).pre;
+          }
+          size = size == -1 ? data.meta.size : data.size(size, data.kind(size));
+        }
+        if(curr == size) return null;
         kind = data.kind(curr);
         node.set(curr, kind);
         curr += data.attSize(curr, kind);
