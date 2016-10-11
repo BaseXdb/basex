@@ -28,6 +28,14 @@ public final class MapModuleTest extends AdvancedQueryTest {
     count(_MAP_MERGE.args(" map{ 'a':'b','b':'c' }"), 2);
 
     query(_MAP_MERGE.args("(map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
+
+    // duplicates option
+    query(_MAP_MERGE.args("(map{1:2},map {1:3})") + "(1)", "2");
+    query(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'use-first'}") + "(1)", "2");
+    query(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'use-last'}") + "(1)", "3");
+    query(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'combine'}") + "(1)", "2\n3");
+    error(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'reject'}") + "(1)",
+        MERGE_DUPLICATE_X);
   }
 
   /** Test method. */

@@ -29,13 +29,17 @@ abstract class TrieNode {
     @Override
     boolean contains(final int h, final Item k, final int l, final InputInfo ii) { return false; }
     @Override
-    TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) { return o; }
+    TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge,
+        final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge,
+        final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final TrieList o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieList o, final int l, final MergeDuplicates merge,
+        final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final TrieBranch o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge,
+        final InputInfo ii) { return o; }
     @Override
     boolean verify() { return true; }
     @Override
@@ -126,44 +130,50 @@ abstract class TrieNode {
    *     should be implemented as {@code return o.add(this, lvl, ii);}.
    * @param o other node
    * @param lvl level
+   * @param merge merge duplicates
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode addAll(final TrieNode o, final int lvl, final InputInfo ii)
-      throws QueryException;
+  abstract TrieNode addAll(final TrieNode o, final int lvl, final MergeDuplicates merge,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Add a leaf to this node if the key isn't already used.
    * @param o leaf to insert
    * @param lvl level
    * @param ii input info
+   * @param merge merge duplicates
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final TrieLeaf o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieLeaf o, final int lvl, final MergeDuplicates merge,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Add an overflow list to this node if the key isn't already used.
    * @param o leaf to insert
    * @param lvl level
+   * @param merge merge duplicates
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final TrieList o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieList o, final int lvl, final MergeDuplicates merge,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Add all bindings of the given branch to this node for which the key isn't
    * already used.
    * @param o leaf to insert
    * @param lvl level
+   * @param merge merge duplicates
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final TrieBranch o, final int lvl, final InputInfo ii)
-      throws QueryException;
+  abstract TrieNode add(final TrieBranch o, final int lvl, final MergeDuplicates merge,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Verifies the tree.

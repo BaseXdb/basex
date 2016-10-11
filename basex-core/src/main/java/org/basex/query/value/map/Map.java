@@ -127,12 +127,15 @@ public final class Map extends FItem {
    * Adds all bindings from the given map into {@code this}.
    * @param map map to add
    * @param ii input info
+   * @param merge merge duplicate keys
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map addAll(final Map map, final InputInfo ii) throws QueryException {
+  public Map addAll(final Map map, final MergeDuplicates merge, final InputInfo ii)
+      throws QueryException {
+
     if(map == EMPTY) return this;
-    final TrieNode upd = root.addAll(map.root, 0, ii);
+    final TrieNode upd = root.addAll(map.root, 0, merge, ii);
     return upd == map.root ? map : new Map(upd);
   }
 

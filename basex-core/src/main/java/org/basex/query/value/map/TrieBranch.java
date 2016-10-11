@@ -108,16 +108,19 @@ final class TrieBranch extends TrieNode {
   private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) throws QueryException {
-    return o.add(this, l, ii);
+  TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge, final InputInfo ii)
+      throws QueryException {
+    return o.add(this, l, merge, ii);
   }
 
   @Override
-  TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge, final InputInfo ii)
+      throws QueryException {
+
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     if(ch != null) {
-      final TrieNode ins = ch.add(o, l + 1, ii);
+      final TrieNode ins = ch.add(o, l + 1, merge, ii);
       if(ins == ch) return this;
       nw = ins;
     } else nw = o;
@@ -130,12 +133,13 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieList o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieList o, final int l, final MergeDuplicates merge, final InputInfo ii)
+      throws QueryException {
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     int n = o.size;
     if(ch != null) {
-      final TrieNode ins = ch.add(o, l + 1, ii);
+      final TrieNode ins = ch.add(o, l + 1, merge, ii);
       if(ins == ch) return this;
       n = ins.size - ch.size;
       nw = ins;
@@ -149,14 +153,16 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieBranch o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge, final InputInfo ii)
+      throws QueryException {
+
     TrieNode[] ch = null;
     int nu = used, ns = size;
     final int kl = kids.length;
     for(int k = 0; k < kl; k++) {
       final TrieNode n = kids[k], ok = o.kids[k];
       if(ok != null) {
-        final TrieNode nw = n == null ? ok : ok.addAll(n, l + 1, ii);
+        final TrieNode nw = n == null ? ok : ok.addAll(n, l + 1, merge, ii);
         if(nw != n) {
           if(ch == null) ch = copyKids();
           ch[k] = nw;

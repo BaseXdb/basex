@@ -432,7 +432,7 @@ public enum Function {
   /* Map Module. */
 
   /** XQuery function. */
-  _MAP_MERGE(MapMerge.class, "merge(maps)", arg(MAP_ZM), MAP_O, MAP_URI),
+  _MAP_MERGE(MapMerge.class, "merge(maps[,options)", arg(MAP_ZM, MAP_O), MAP_O, MAP_URI),
   /** XQuery function. */
   _MAP_PUT(MapPut.class, "put(map,key,value)", arg(MAP_O, AAT, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */

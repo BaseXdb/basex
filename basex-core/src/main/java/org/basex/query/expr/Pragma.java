@@ -47,7 +47,7 @@ public abstract class Pragma extends ExprInfo {
   /**
    * Finalizes the pragma expression.
    * @param qc query context
-   * @param cache TODO
+   * @param cache cached information
    */
   abstract void finish(final QueryContext qc, Object cache);
 
