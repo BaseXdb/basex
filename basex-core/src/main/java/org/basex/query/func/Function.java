@@ -450,6 +450,8 @@ public enum Function {
   /** XQuery function. */
   _MAP_FOR_EACH(MapForEach.class, "for-each(map,function)",
       arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF), MAP_URI),
+  /** XQuery function. */
+  _MAP_FIND(MapFind.class, "find(input,key)", arg(ITEM_ZM, AAT), ARRAY_O, MAP_URI),
 
   /* Array Module. */
 

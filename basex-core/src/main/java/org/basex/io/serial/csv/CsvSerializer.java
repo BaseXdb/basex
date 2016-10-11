@@ -64,7 +64,7 @@ abstract class CsvSerializer extends StandardSerializer {
         if(quotes && (delim || special)) tb.add('"');
         final int len = txt.length;
         for(int c = 0; c < len; c += cl(txt, c)) {
-          int cp = cp(txt, c);
+          final int cp = cp(txt, c);
           if(backslashes) {
             if(cp == '\n') tb.add("\\n");
             else if(cp == '\r') tb.add("\\r");
