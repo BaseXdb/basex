@@ -21,7 +21,7 @@ final class TrieLeaf extends TrieNode {
   /** Key of this binding. */
   final Item key;
   /** Value of this binding. */
-  Value value;
+  final Value value;
 
   /**
    * Constructor.

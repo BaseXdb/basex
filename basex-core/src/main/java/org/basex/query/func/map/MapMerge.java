@@ -23,8 +23,7 @@ public final class MapMerge extends StandardFunc {
     final MergeDuplicates merge = opts.get(MergeOptions.DUPLICATES);
     Map map = Map.EMPTY;
     for(Item it; (it = maps.next()) != null;) {
-      final Map m = toMap(it);
-      map = map == Map.EMPTY ? m : map.addAll(m, merge, info);
+      map = map.addAll(toMap(it), merge, info);
     }
     return map;
   }
