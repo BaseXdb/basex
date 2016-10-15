@@ -62,7 +62,7 @@ server container:
 
     docker run -d \
         --name basex-dba \
-        --publix 18984:8984 \
+        --publish 18984:8984 \
         --link basexhttp:basexhttp \
         basex/dba
 
