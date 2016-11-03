@@ -157,13 +157,20 @@ public final class HttpClient {
     final String method = request.attribute(METHOD);
     if(method != null) {
       try {
-        // set field via reflection to circumvent string check
-        final Field f = conn.getClass().getSuperclass().getDeclaredField("method");
-        f.setAccessible(true);
-        f.set(conn, method);
-      } catch(final Throwable th) {
-        Util.debug(th);
         conn.setRequestMethod(method);
+      } catch(final ProtocolException ex) {
+        try {
+          // set field via reflection to circumvent string check
+          Class<?> c = conn.getClass();
+          while(c != HttpURLConnection.class) c = c.getSuperclass();
+          final Field f = c.getDeclaredField("method");
+          f.setAccessible(true);
+          f.set(conn, method);
+        } catch(final Throwable th) {
+          // dump new exception, return original exception
+          Util.debug(th);
+          throw ex;
+        }
       }
       conn.setDoOutput(true);
 
