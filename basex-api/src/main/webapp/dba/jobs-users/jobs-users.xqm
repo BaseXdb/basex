@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/jobs-users';
+module namespace dba = 'dba/jobs-users';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace Session = 'http://basex.org/modules/session';
@@ -13,7 +13,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'jobs-users';
+declare variable $dba:CAT := 'jobs-users';
 
 (:~
  : Jobs and users page.
@@ -29,7 +29,7 @@ declare
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
   %output:method("html")
-function _:jobs-users(
+function dba:jobs-users(
   $sort   as xs:string,
   $error  as xs:string?,
   $info   as xs:string?
@@ -49,10 +49,10 @@ function _:jobs-users(
   }
   let $error := ($data/self::error/string(), $error)[1]
 
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='69%'>
-        <form action="{ $_:CAT }" method="post" class="update">
+        <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Jobs</h2>
         {
           let $entries :=
@@ -82,7 +82,7 @@ function _:jobs-users(
           return html:table($entries, $headers, $buttons, map {}, $sort)
         }
         </form>
-        <form action="{ $_:CAT }" method="post" class="update">
+        <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Server Sessions</h2>
         {
           let $entries :=
@@ -129,7 +129,7 @@ function _:jobs-users(
       </td>
       <td class='vertical'/>
       <td width='29%'>
-        <form action="{ $_:CAT }" method="post" class="update">
+        <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Users</h2>
         {
           let $entries :=
@@ -168,7 +168,7 @@ declare
   %rest:query-param("name",   "{$names}")
   %rest:query-param("id",     "{$ids}")
   %output:method("html")
-function _:action(
+function dba:action(
   $action  as xs:string,
   $names   as xs:string*,
   $ids     as xs:string*
@@ -177,6 +177,6 @@ function _:action(
     if($action = 'create-user') then map { }
     else if($action = 'kill-session') then map { 'id': $ids }
     else if($action = 'stop-job') then map { 'id': $ids }
-    else map { 'name': $names, 'redirect': $_:CAT }
+    else map { 'name': $names, 'redirect': $dba:CAT }
   )
 };

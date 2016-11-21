@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/jobs-users';
+module namespace dba = 'dba/jobs-users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'jobs-users';
+declare variable $dba:CAT := 'jobs-users';
 (:~ Sub category :)
-declare variable $_:SUB := 'user';
+declare variable $dba:SUB := 'user';
 
 (:~
  : Form for adding a new pattern.
@@ -30,20 +30,20 @@ declare
   %rest:query-param("perm",    "{$perm}", "write")
   %rest:query-param("error",   "{$error}")
   %output:method("html")
-function _:create(
+function dba:create(
   $name     as xs:string,
   $pattern  as xs:string?,
   $perm     as xs:string,
   $error    as xs:string?
 ) as element() {
   cons:check(),
-  tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
+  tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form action="add-pattern" method="post" autocomplete="off">
           <h2>
-            <a href="{ $_:CAT }">Users</a> »
-            { html:link($name, $_:SUB, map { 'name': $name } ) } »
+            <a href="{ $dba:CAT }">Users</a> »
+            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
             { html:button('create', 'Add Pattern') }
           </h2>
           <input type="hidden" name="name" value="{ $name }"/>
@@ -87,7 +87,7 @@ declare
   %rest:query-param("name",    "{$name}")
   %rest:query-param("perm",    "{$perm}")
   %rest:query-param("pattern", "{$pattern}")
-function _:create(
+function dba:create(
   $name     as xs:string,
   $perm     as xs:string,
   $pattern  as xs:string
@@ -99,7 +99,7 @@ function _:create(
       'perm':    $perm,
       'pattern': $pattern
     }),
-    db:output(web:redirect($_:SUB, map {
+    db:output(web:redirect($dba:SUB, map {
       'info': 'Created Pattern: ' || $pattern,
       'name': $name
     }))

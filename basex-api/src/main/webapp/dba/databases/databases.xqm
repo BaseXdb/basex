@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,7 +11,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 
 (:~
  : Main page.
@@ -27,7 +27,7 @@ declare
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
   %output:method("html")
-function _:databases(
+function dba:databases(
   $sort   as xs:string,
   $error  as xs:string?,
   $info   as xs:string?
@@ -46,10 +46,10 @@ function _:databases(
   }
   let $error := ($data/self::error/string(), $error)[1]
 
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='49%'>
-        <form action="{ $_:CAT }" method="post" class="update">
+        <form action="{ $dba:CAT }" method="post" class="update">
           <h2>Databases</h2>
           {
             let $entries := $data/databases/database/
@@ -114,12 +114,12 @@ declare
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %output:method("html")
-function _:action(
+function dba:action(
   $action  as xs:string,
   $names   as xs:string*
 ) {
   web:redirect($action,
     if($action = 'create-db') then map { }
-    else map { 'name': $names, 'redirect': $_:CAT }
+    else map { 'name': $names, 'redirect': $dba:CAT }
   )
 };

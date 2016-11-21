@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/jobs-users';
+module namespace dba = 'dba/jobs-users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,7 +11,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'jobs-users';
+declare variable $dba:CAT := 'jobs-users';
 
 (:~
  : Form for creating a new user.
@@ -28,14 +28,14 @@ declare
   %rest:query-param("perm",  "{$perm}", "none")
   %rest:query-param("error", "{$error}")
   %output:method("html")
-function _:create(
+function dba:create(
   $name   as xs:string?,
   $pw     as xs:string?,
   $perm   as xs:string,
   $error  as xs:string?
 ) as element() {
   cons:check(),
-  tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
+  tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form action="create-user" method="post" autocomplete="off">
@@ -43,7 +43,7 @@ function _:create(
           <input style="display:none" type="text" name="fake1"/>
           <input style="display:none" type="password" name="fake2"/>
           <h2>
-            <a href="{ $_:CAT }">Users</a> »
+            <a href="{ $dba:CAT }">Users</a> »
             { html:button('create', 'Create') }
           </h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
@@ -95,7 +95,7 @@ declare
   %rest:query-param("name", "{$name}")
   %rest:query-param("pw",   "{$pw}")
   %rest:query-param("perm", "{$perm}")
-function _:create(
+function dba:create(
   $name  as xs:string,
   $pw    as xs:string,
   $perm  as xs:string
@@ -111,7 +111,7 @@ function _:create(
       'pw':   $pw,
       'perm': $perm
     }),
-    db:output(web:redirect($_:CAT, map {
+    db:output(web:redirect($dba:CAT, map {
       'info': 'Created User: ' || $name,
       'name': $name
     }))

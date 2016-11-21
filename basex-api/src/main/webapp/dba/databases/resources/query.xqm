@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../../modules/util.xqm';
@@ -22,7 +22,7 @@ declare
   %rest:query-param("resource", "{$resource}")
   %rest:single
   %output:method("text")
-function _:query-resource(
+function dba:query-resource(
   $name      as xs:string,
   $resource  as xs:string,
   $query     as xs:string

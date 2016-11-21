@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/queries';
+module namespace dba = 'dba/queries';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category. :)
-declare variable $_:CAT := 'queries';
+declare variable $dba:CAT := 'queries';
 (:~ Query file suffix. :)
-declare variable $_:SUFFIX := '.xq';
+declare variable $dba:SUFFIX := '.xq';
 
 (:~
  : Queries page.
@@ -27,7 +27,7 @@ declare
   %rest:query-param("error",  "{$error}")
   %rest:query-param("info",   "{$info}")
   %output:method("html")
-function _:queries(
+function dba:queries(
   $error   as xs:string?,
   $info    as xs:string?
 ) as element() {
@@ -35,7 +35,7 @@ function _:queries(
 
   tmpl:wrap(
     map {
-      'top': $_:CAT, 'info': $info, 'error': $error,
+      'top': $dba:CAT, 'info': $info, 'error': $error,
       'css': 'codemirror/lib/codemirror.css',
       'scripts': ('editor.js', 'codemirror/lib/codemirror.js',
                   'codemirror/mode/xquery/xquery.js','codemirror/mode/xml/xml.js')
@@ -64,7 +64,7 @@ function _:queries(
                 <form autocomplete='off' action='javascript:void(0);'>
                   <input id='file' name='file' placeholder='Name of query'
                          list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
-                  <datalist id='files'>{ _:files() ! element option { . } }</datalist>
+                  <datalist id='files'>{ dba:files() ! element option { . } }</datalist>
                   <button type='submit' name='open' id='open' disabled='true'
                           onclick='openQuery()'>Open</button>
                   <button type='save' name='save' id='save' disabled='true'
@@ -103,7 +103,7 @@ declare
   %rest:path("/dba/eval-query")
   %rest:single
   %output:method("text")
-function _:eval-query(
+function dba:eval-query(
   $query  as xs:string?
 ) as xs:string {
   cons:check(),
@@ -119,11 +119,11 @@ declare
   %rest:path("/dba/open-query")
   %rest:query-param("name", "{$name}")
   %output:method("text")
-function _:open-query(
+function dba:open-query(
   $name  as xs:string
 ) as xs:string {
   cons:check(),
-  file:read-text(_:to-path($name))
+  file:read-text(dba:to-path($name))
 };
 
 (:~
@@ -135,12 +135,12 @@ declare
   %rest:path("/dba/delete-query")
   %rest:query-param("name", "{$name}")
   %output:method("text")
-function _:delete-query(
+function dba:delete-query(
   $name  as xs:string
 ) as xs:string {
   cons:check(),
-  file:delete(_:to-path($name)),
-  string-join(_:files(), '/')
+  file:delete(dba:to-path($name)),
+  string-join(dba:files(), '/')
 };
 
 (:~
@@ -154,13 +154,13 @@ declare
   %rest:path("/dba/save-query")
   %rest:query-param("name", "{$name}")
   %output:method("text")
-function _:save-query(
+function dba:save-query(
   $name   as xs:string,
   $query  as xs:string
 ) as xs:string {
   cons:check(),
-  file:write-text(_:to-path($name), $query),
-  string-join(_:files(), '/')
+  file:write-text(dba:to-path($name), $query),
+  string-join(dba:files(), '/')
 };
 
 (:~
@@ -172,7 +172,7 @@ declare
   %rest:POST("{$query}")
   %rest:path("/dba/update-query")
   %output:method("text")
-function _:update-query(
+function dba:update-query(
   $query  as xs:string?
 ) {
   cons:check(),
@@ -183,7 +183,7 @@ function _:update-query(
  : Returns the options for evaluating a query.
  : @return options
  :)
-declare %private function _:query-options() as xs:string {
+declare %private function dba:query-options() as xs:string {
   "map { 'timeout':" || $cons:OPTION($cons:K-TIMEOUT) ||
        ",'memory':" || $cons:OPTION($cons:K-MEMORY) ||
        ",'permission':'" || $cons:OPTION($cons:K-PERMISSION) || "' }"
@@ -194,17 +194,17 @@ declare %private function _:query-options() as xs:string {
  : @param  $name  file name
  : @return file path
  :)
-declare %private function _:to-path(
+declare %private function dba:to-path(
   $name  as xs:string
 ) as xs:string {
-  $cons:DBA-DIR || translate($name, '\/:*?"<>|', '---------') || $_:SUFFIX
+  $cons:DBA-DIR || translate($name, '\/:*?"<>|', '---------') || $dba:SUFFIX
 };
 
 (:~
  : Returns the names of all files.
  : @return list of files
  :)
-declare %private function _:files() as xs:string* {
-  for $file in file:list($cons:DBA-DIR, false(), '*' || $_:SUFFIX)
-  return replace($file, $_:SUFFIX || '$', '')
+declare %private function dba:files() as xs:string* {
+  for $file in file:list($cons:DBA-DIR, false(), '*' || $dba:SUFFIX)
+  return replace($file, $dba:SUFFIX || '$', '')
 };

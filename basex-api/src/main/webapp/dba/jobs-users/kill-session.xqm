@@ -3,13 +3,13 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/jobs-users';
+module namespace dba = 'dba/jobs-users';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'jobs-users';
+declare variable $dba:CAT := 'jobs-users';
 
 (:~
  : Kills DBA sessions.
@@ -20,15 +20,15 @@ declare
   %rest:path("/dba/kill-session")
   %rest:query-param("id", "{$ids}")
   %output:method("html")
-function _:drop(
+function dba:drop(
   $ids as xs:string*
 ) {
   cons:check(),
   try {
     for $id in $ids
     return Sessions:delete(substring-before($id, '|'), substring-after($id, '|')),
-    web:redirect($_:CAT, map { 'info': 'Killed sessions: ' || count($ids) })
+    web:redirect($dba:CAT, map { 'info': 'Killed sessions: ' || count($ids) })
   } catch * {
-    web:redirect($_:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

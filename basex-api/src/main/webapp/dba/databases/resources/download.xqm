@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../../modules/util.xqm';
@@ -19,7 +19,7 @@ declare
   %rest:path("/dba/download/{$file}")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
-function _:download(
+function dba:download(
   $name      as xs:string,
   $resource  as xs:string,
   $file      as xs:string
@@ -50,7 +50,7 @@ function _:download(
 declare
   %rest:path("/dba/backup/{$backup}")
   %output:media-type("application/octet-stream")
-function _:download(
+function dba:download(
   $backup  as xs:string
 ) {
   cons:check(),

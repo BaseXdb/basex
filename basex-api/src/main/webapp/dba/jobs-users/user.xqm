@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/jobs-users';
+module namespace dba = 'dba/jobs-users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'jobs-users';
+declare variable $dba:CAT := 'jobs-users';
 (:~ Sub category :)
-declare variable $_:SUB := 'user';
+declare variable $dba:SUB := 'user';
 
 (:~
  : Manage a single user.
@@ -35,7 +35,7 @@ declare
   %rest:query-param("error",    "{$error}")
   %rest:query-param("info",     "{$info}")
   %output:method("html")
-function _:user(
+function dba:user(
   $name     as xs:string,
   $newname  as xs:string?,
   $pw       as xs:string?,
@@ -56,7 +56,7 @@ function _:user(
   let $found := exists($data/user)
   let $admin := $name eq 'admin'
 
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='49%'>
         <form action="edit-user" method="post" autocomplete="off">
@@ -64,7 +64,7 @@ function _:user(
           <input style="display:none" type="text" name="fake1"/>
           <input style="display:none" type="password" name="fake2"/>
           <h2>
-            <a href="{ $_:CAT }">Users</a> » { $name } »
+            <a href="{ $dba:CAT }">Users</a> » { $name } »
             { html:button('save', 'Save') }
           </h2>
           <input type="hidden" name="name" value="{ $name }"/>
@@ -111,7 +111,7 @@ function _:user(
         if($admin) then () else <_>
           <hr/>
           <h3>Local Permissions</h3>
-          <form action="{ $_:SUB }" method="post" id="{ $_:SUB }" class="update">
+          <form action="{ $dba:SUB }" method="post" id="{ $dba:SUB }" class="update">
             <input type="hidden" name="name" value="{ $name }" id="name"/>
             <div class='small'/>
             {
@@ -153,7 +153,7 @@ declare
   %rest:form-param("action",  "{$action}")
   %rest:form-param("name",    "{$name}")
   %rest:form-param("pattern", "{$pattern}")
-function _:action(
+function dba:action(
   $action   as xs:string,
   $name     as xs:string,
   $pattern  as xs:string?
@@ -177,7 +177,7 @@ declare
   %rest:query-param("newname", "{$newname}")
   %rest:query-param("pw",      "{$pw}")
   %rest:query-param("perm",    "{$perm}")
-function _:create(
+function dba:create(
   $name     as xs:string,
   $newname  as xs:string,
   $pw       as xs:string,
@@ -197,12 +197,12 @@ function _:create(
       )",
       map { 'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm }
     ),
-    db:output(web:redirect($_:SUB, map {
+    db:output(web:redirect($dba:SUB, map {
       'info': 'Changes saved.',
       'name': $newname
     }))
   } catch * {
-    db:output(web:redirect($_:SUB, map {
+    db:output(web:redirect($dba:SUB, map {
       'error': $err:description,
       'name': $name,
       'newname': $newname,

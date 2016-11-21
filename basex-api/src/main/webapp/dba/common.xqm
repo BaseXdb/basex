@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/common';
+module namespace dba = 'dba/common';
 
 import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
@@ -14,7 +14,7 @@ import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
  :)
 declare
   %rest:path("/dba")
-function _:redirect(
+function dba:redirect(
 ) {
   web:redirect("/dba/databases")
 };
@@ -26,7 +26,7 @@ function _:redirect(
  :)
 declare
   %rest:path("/dba/static/{$file=.+}")
-function _:file(
+function dba:file(
   $file as xs:string
 ) as item()+ {
   let $path := file:base-dir() || 'static/' || $file
@@ -44,7 +44,7 @@ function _:file(
 declare
   %rest:path("/dba/{$unknown}")
   %output:method("html")
-function _:any(
+function dba:any(
   $unknown  as xs:string
 ) as element(html) {
   cons:check(),
@@ -63,10 +63,13 @@ function _:any(
 
 (:~
  : Login error: redirects to the login page.
+ : @param  $page page to redirect to
  :)
 declare
   %rest:error("basex:login")
-function _:error-login(
+  %rest:error-param("value", "{$path}")
+function dba:error-login(
+  $path  as xs:string?
 ) {
-  web:redirect("login")
+  web:redirect("login", map { 'path': $path })
 };

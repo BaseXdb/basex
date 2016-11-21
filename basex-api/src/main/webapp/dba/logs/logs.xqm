@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/logs';
+module namespace dba = 'dba/logs';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,7 +11,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'logs';
+declare variable $dba:CAT := 'logs';
 
 (:~
  : Logging page.
@@ -33,7 +33,7 @@ declare
   %rest:query-param("error",   "{$error}")
   %rest:query-param("info",    "{$info}")
   %output:method("html")
-function _:logs(
+function dba:logs(
   $sort     as xs:string,
   $name     as xs:string?,
   $loglist  as xs:string?,
@@ -43,19 +43,19 @@ function _:logs(
 ) as element(html) {
   cons:check(),
 
-  let $loglists := _:loglist($sort, $loglist)
+  let $loglists := dba:loglist($sort, $loglist)
   let $error := if($loglists) then $error else $cons:DATA-ERROR
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='230'>
         <form action="javascript:void(0);">
-          <h2>{ if($name) then <a href="{ $_:CAT }">Logs</a> else 'Logs' }:
+          <h2>{ if($name) then <a href="{ $dba:CAT }">Logs</a> else 'Logs' }:
             <input size="14" name="loglist" id="loglist" value="{ $loglist }"
               placeholder="regular expression"
               onkeyup="logList();"/>
           </h2>
         </form>
-        <form action="{ $_:CAT }" method="post" class="update" autocomplete="off">
+        <form action="{ $dba:CAT }" method="post" class="update" autocomplete="off">
           <input type='hidden' name='name' id='name' value='{ $name }'/>
           <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
           <div id='list'>{ $loglists }</div>
@@ -95,7 +95,7 @@ declare
   %rest:query-param("loglist", "{$loglist}")
   %output:method("html")
   %rest:single
-function _:log(
+function dba:log(
   $name     as xs:string,
   $sort     as xs:string?,
   $query    as xs:string?,
@@ -136,7 +136,7 @@ declare
   %rest:query-param("sort",  "{$sort}")
   %output:method("html")
   %rest:single
-function _:loglist(
+function dba:loglist(
   $sort   as xs:string?,
   $query  as xs:string?
 ) as element()* {
@@ -162,7 +162,7 @@ function _:loglist(
     <size type='bytes'>Size</size>
   )
   let $buttons := html:button('delete-logs', 'Delete', true())
-  let $link := function($value) { $_:CAT }
+  let $link := function($value) { $dba:CAT }
   return html:table($entries, $headers, $buttons,
     map { 'sort': $sort, 'loglist': $query }, (), $link)
 };
@@ -178,9 +178,9 @@ declare
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %output:method("html")
-function _:action(
+function dba:action(
   $action  as xs:string,
   $names   as xs:string*
 ) {
-  web:redirect($action, map { 'name': $names[.], 'redirect': $_:CAT })
+  web:redirect($action, map { 'name': $names[.], 'redirect': $dba:CAT })
 };

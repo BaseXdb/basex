@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Form for replacing a resource.
@@ -29,22 +29,22 @@ declare
   %rest:query-param("resource", "{$resource}")
   %rest:query-param("error",    "{$error}")
   %output:method("html")
-function _:replace(
+function dba:replace(
   $name      as xs:string,
   $resource  as xs:string,
   $error     as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $_:SUB, 'error': $error },
+  tmpl:wrap(map { 'top': $dba:SUB, 'error': $error },
     <tr>
       <td>
         <form action="replace" method="post" enctype="multipart/form-data">
           <input type="hidden" name="name" value="{ $name }"/>
           <input type="hidden" name="resource" value="{ $resource }"/>
           <h2>
-            <a href="{ $_:CAT }">Databases</a> »
-            { html:link($name, $_:SUB, map { 'name': $name } ) } »
-            { html:link($resource, $_:SUB, map { 'name': $name, 'resource': $resource }) } »
+            <a href="{ $dba:CAT }">Databases</a> »
+            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
+            { html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }) } »
             { html:button('replace', 'Replace') }
           </h2>
           <table>
@@ -75,7 +75,7 @@ declare
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resource}")
   %rest:form-param("file",     "{$file}")
-function _:replace-upload(
+function dba:replace-upload(
   $name      as xs:string,
   $resource  as xs:string,
   $file      as map(*)?
@@ -96,8 +96,8 @@ function _:replace-upload(
       return util:update("db:replace($name, $resource, $input)",
         map { 'name': $name, 'resource': $resource, 'input': $input }
       ),
-      db:output(web:redirect($_:SUB, map {
-        'redirect': $_:SUB,
+      db:output(web:redirect($dba:SUB, map {
+        'redirect': $dba:SUB,
         'name': $name,
         'resource': $resource,
         'info': 'Replaced resource: ' || $resource

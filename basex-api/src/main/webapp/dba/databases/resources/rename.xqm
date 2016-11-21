@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Form for renaming a resource.
@@ -31,23 +31,23 @@ declare
   %rest:query-param("target",   "{$target}")
   %rest:query-param("error",    "{$error}")
   %output:method("html")
-function _:rename(
+function dba:rename(
   $name      as xs:string,
   $resource  as xs:string,
   $target    as xs:string?,
   $error     as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $_:SUB, 'error': $error },
+  tmpl:wrap(map { 'top': $dba:SUB, 'error': $error },
     <tr>
       <td>
         <form action="rename" method="post" autocomplete="off">
           <input type="hidden" name="name" value="{ $name }"/>
           <input type="hidden" name="resource" value="{ $resource }"/>
           <h2>
-            <a href="{ $_:CAT }">Databases</a> »
-            { html:link($name, $_:SUB, map { 'name': $name } ) } »
-            { html:link($resource, $_:SUB, map { 'name': $name, 'resource': $resource }) } »
+            <a href="{ $dba:CAT }">Databases</a> »
+            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
+            { html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }) } »
             { html:button('rename', 'Rename') }
           </h2>
           <table>
@@ -80,7 +80,7 @@ declare
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
   %rest:query-param("target",   "{$target}")
-function _:rename(
+function dba:rename(
   $name      as xs:string,
   $resource  as xs:string,
   $target    as xs:string
@@ -93,7 +93,7 @@ function _:rename(
       util:update("db:rename($name, $resource, $target)",
         map { 'name': $name, 'resource': $resource, 'target': $target }
       ),
-      db:output(web:redirect($_:SUB, map {
+      db:output(web:redirect($dba:SUB, map {
         'info': 'Resource was renamed.',
         'name': $name,
         'resource': $target

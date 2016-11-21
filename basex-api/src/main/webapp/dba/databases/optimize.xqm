@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Form for optimizing a database.
@@ -33,7 +33,7 @@ declare
   %rest:query-param("lang",  "{$lang}", "en")
   %rest:query-param("error", "{$error}")
   %output:method("html")
-function _:create(
+function dba:create(
   $name   as xs:string,
   $all    as xs:string?,
   $opts   as xs:string*,
@@ -51,12 +51,12 @@ function _:create(
   let $opts := if($opts = 'x') then $opts else $data//*[text() = 'true']/name()
   let $lang := if($opts = 'x') then $lang else 'en'
 
-  return tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form action="optimize" method="post">
           <h2>
-            <a href="{ $_:CAT }">Databases</a> »
+            <a href="{ $dba:CAT }">Databases</a> »
             { html:link($name, 'database', map { 'name': $name }) } »
             { html:button('optimize', 'Optimize') }
           </h2>
@@ -107,7 +107,7 @@ declare
   %rest:form-param("all",  "{$all}")
   %rest:form-param("opts", "{$opts}")
   %rest:form-param("lang", "{$lang}")
-function _:optimize(
+function dba:optimize(
   $name  as xs:string,
   $all   as xs:string?,
   $opts  as xs:string*,
@@ -121,12 +121,12 @@ function _:optimize(
       $lang ! map:entry('language', .)
     )))", map { 'name': $name, 'all': $all, 'lang': $lang, 'opts': $opts }
     ),
-    db:output(web:redirect($_:SUB, map {
+    db:output(web:redirect($dba:SUB, map {
       'name': $name,
       'info': 'Database was optimized.'
     }))
   } catch * {
-    db:output(web:redirect($_:SUB, map {
+    db:output(web:redirect($dba:SUB, map {
       'error': $err:description,
       'name': $name,
       'opts': $opts,
@@ -145,14 +145,14 @@ declare
   %rest:path("/dba/optimize-all")
   %rest:query-param("name", "{$names}")
   %output:method("html")
-function _:drop(
+function dba:drop(
   $names  as xs:string*
 ) {
   cons:check(),
   try {
     util:update("$names ! db:optimize(.)", map { 'names': $names }),
-    db:output(web:redirect($_:CAT, map { 'info': 'Optimized databases: ' || count($names) }))
+    db:output(web:redirect($dba:CAT, map { 'info': 'Optimized databases: ' || count($names) }))
   } catch * {
-    db:output(web:redirect($_:CAT, map { 'error': $err:description }))
+    db:output(web:redirect($dba:CAT, map { 'error': $err:description }))
   }
 };

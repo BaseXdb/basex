@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/login';
+module namespace dba = 'dba/login';
 
 import module namespace Session = 'http://basex.org/modules/session';
 import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
@@ -14,7 +14,8 @@ import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
  : Login page.
  : @param  $name   user name
  : @param  $url    url
- : @param  $error  error string 
+ : @param  $error  error string
+ : @param  $path   path to redirect to
  : @return page
  :)
 declare
@@ -22,16 +23,19 @@ declare
   %rest:query-param("name" , "{$name}")
   %rest:query-param("url",   "{$url}")
   %rest:query-param("error", "{$error}")
+  %rest:query-param("path",  "{$path}")
   %output:method("html")
-function _:welcome(
+function dba:welcome(
   $name   as xs:string?,
   $url    as xs:string?,
-  $error  as xs:string?
+  $error  as xs:string?,
+  $path   as xs:string?
 ) as element(html) {
   tmpl:wrap(map { 'error': $error },
     <tr>
       <td>
         <form action="login-check" method="post">
+          <input type="hidden" name="path" value="{ $path }"/>
           <div class='note'>
             Enter your admin credentials:
           </div>
@@ -79,6 +83,7 @@ function _:welcome(
  : @param  $name  user name
  : @param  $pass  password
  : @param  $url   url
+ : @param  $path  path to redirect to
  : @return redirect
  :)
 declare
@@ -86,10 +91,12 @@ declare
   %rest:query-param("name", "{$name}")
   %rest:query-param("pass", "{$pass}")
   %rest:query-param("url",  "{$url}")
-function _:login(
+  %rest:query-param("path",  "{$path}")
+function dba:login(
   $name  as xs:string,
   $pass  as xs:string,
-  $url   as xs:string
+  $url   as xs:string,
+  $path  as xs:string?
 ) as element(rest:response) {
   if($url) then (
     if(matches($url, '^.+:\d+/?$')) then (
@@ -101,17 +108,17 @@ function _:login(
           try {
             (: check if user can perform admin operations :)
             prof:void(client:query($id, 'admin:sessions()')),
-            _:accept($name, $pass, $host, $port)
+            dba:accept($name, $pass, $host, $port, $path)
           } catch bxerr:BASX0001 {
-            _:reject($name, $url, 'Admin credentials required.')
+            dba:reject($name, $url, 'Admin credentials required.', $path)
           },
           client:close($id)
         )
       } catch * {
-        _:reject($name, $url, $err:description)
+        dba:reject($name, $url, $err:description, $path)
       }
     ) else (
-      _:reject($name, $url, 'Please check the syntax of your URL.')
+      dba:reject($name, $url, 'Please check the syntax of your URL.', $path)
     )
   ) else (
     let $user := user:list-details()[@name = $name]
@@ -121,12 +128,12 @@ function _:login(
     let $user-hash := lower-case(xs:string(xs:hexBinary(hash:sha256($salt || $pass))))
     return if($hash = $user-hash) then (
       if($user/@permission eq 'admin') then (
-        _:accept($name, $pass, '', '')
+        dba:accept($name, $pass, '', '', $path)
       ) else (
-        _:reject($name, $url, 'Admin credentials required.')
+        dba:reject($name, $url, 'Admin credentials required.', $path)
       )
     ) else (
-      _:reject($name, $url, 'Please check your login data.')
+      dba:reject($name, $url, 'Please check your login data.', $path)
     )
   )
 };
@@ -135,7 +142,7 @@ function _:login(
  : Ends a session and redirects to the login page.
  : @return redirect
  :)
-declare %rest:path("/dba/logout") function _:logout(
+declare %rest:path("/dba/logout") function dba:logout(
 ) as element(rest:response) {
   let $name := $cons:SESSION/name
   let $url := string-join($cons:SESSION/(host, port), ':')
@@ -149,13 +156,15 @@ declare %rest:path("/dba/logout") function _:logout(
 (:~
  : Accepts a user and redirects to the main page.
  : @param  $name  entered user name
+ : @param  $path  path to redirect to
  : @return redirect
  :)
-declare %private function _:accept(
+declare %private function dba:accept(
   $name  as xs:string,
   $pass  as xs:string,
   $host  as xs:string,
-  $port  as xs:string
+  $port  as xs:string,
+  $path  as xs:string?
 ) {
   Session:set($cons:SESSION-KEY,
     element dba-session {
@@ -166,7 +175,7 @@ declare %private function _:accept(
     }
   ),
   admin:write-log('DBA user was logged in: ' || $name),
-  web:redirect("databases")
+  web:redirect(if($path) then $path else "databases")
 };
 
 (:~
@@ -174,13 +183,15 @@ declare %private function _:accept(
  : @param  $name     entered user name
  : @param  $url      entered url
  : @param  $message  error message
+ : @param  $path     path to redirect to
  : @return redirect
  :)
-declare %private function _:reject(
+declare %private function dba:reject(
   $name     as xs:string,
   $url      as xs:string,
-  $message  as xs:string
+  $message  as xs:string,
+  $path     as xs:string?
 ) as element(rest:response) {
   admin:write-log('DBA login was denied: ' || $name),
-  web:redirect("login", map { 'name': $name, 'url': $url, 'error': $message })
+  web:redirect("login", map { 'name': $name, 'url': $url, 'error': $message, 'path': $path })
 };

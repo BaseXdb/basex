@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util'  at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Form for renaming a database.
@@ -29,20 +29,20 @@ declare
   %rest:query-param("newname", "{$newname}")
   %rest:query-param("error",   "{$error}")
   %output:method("html")
-function _:alter(
+function dba:alter(
   $name     as xs:string,
   $newname  as xs:string?,
   $error    as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $_:SUB, 'error': $error },
+  tmpl:wrap(map { 'top': $dba:SUB, 'error': $error },
     <tr>
       <td>
         <form action="alter-db" method="post" autocomplete="off">
           <input type="hidden" name="name" value="{ $name }"/>
           <h2>
-            <a href="{ $_:CAT }">Databases</a> »
-            { html:link($name, $_:SUB, map { 'name': $name } ) } »
+            <a href="{ $dba:CAT }">Databases</a> »
+            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
             { html:button('alter', 'Rename') }
           </h2>
           <table>
@@ -73,7 +73,7 @@ declare
   %rest:path("/dba/alter-db")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("newname", "{$newname}")
-function _:alter(
+function dba:alter(
   $name     as xs:string,
   $newname  as xs:string
 ) {
@@ -84,7 +84,7 @@ function _:alter(
     ) else (
       util:update("db:alter($name, $newname)", map { 'name': $name, 'newname': $newname })
     ),
-    db:output(web:redirect($_:SUB, map {
+    db:output(web:redirect($dba:SUB, map {
       'info': 'Database was renamed.',
       'name': $newname
     }))

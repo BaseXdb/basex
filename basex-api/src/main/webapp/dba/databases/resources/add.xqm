@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Form for adding a new resource.
@@ -33,7 +33,7 @@ declare
   %rest:query-param("binary", "{$binary}")
   %rest:query-param("error",  "{$error}")
   %output:method("html")
-function _:add(
+function dba:add(
   $name    as xs:string,
   $opts    as xs:string*,
   $path    as xs:string?,
@@ -43,13 +43,13 @@ function _:add(
   cons:check(),
 
   let $opts := if($opts = 'x') then $opts else 'chop'
-  return tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form action="add" method="post" enctype="multipart/form-data" autocomplete="off">
           <h2>
-            <a href="{ $_:CAT }">Databases</a> »
-              { html:link($name, $_:SUB, map { 'name': $name }) } »
+            <a href="{ $dba:CAT }">Databases</a> »
+              { html:link($name, $dba:SUB, map { 'name': $name }) } »
               { html:button('add', 'Add') }
           </h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
@@ -107,7 +107,7 @@ declare
   %rest:form-param("path",   "{$path}")
   %rest:form-param("file",   "{$file}")
   %rest:form-param("binary", "{$binary}")
-function _:add-post(
+function dba:add-post(
   $name    as xs:string,
   $opts    as xs:string*,
   $path    as xs:string,
@@ -133,7 +133,7 @@ function _:add-post(
           map { 'name': $name, 'input': util:to-xml-string($input), 'path': $path, 'opts': $opts }
         )
       ),
-      db:output(web:redirect($_:SUB,
+      db:output(web:redirect($dba:SUB,
         map { 'name': $name, 'path': $path, 'info': 'Added resource: ' || $name }))
     )
   } catch * {

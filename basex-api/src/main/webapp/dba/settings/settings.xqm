@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/settings';
+module namespace dba = 'dba/settings';
 
 import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
@@ -12,7 +12,7 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 declare option query:write-lock 'settings';
 
 (:~ Top category :)
-declare variable $_:CAT := 'settings';
+declare variable $dba:CAT := 'settings';
 
 (:~
  : Settings page.
@@ -21,11 +21,11 @@ declare
   %rest:GET
   %rest:path("/dba/settings")
   %output:method("html")
-function _:settings(
+function dba:settings(
 ) as element() {
   cons:check(),
 
-  tmpl:wrap(map { 'top': $_:CAT },
+  tmpl:wrap(map { 'top': $dba:CAT },
     <tr>
       <td>
         <form action="settings" method="post">
@@ -74,7 +74,7 @@ declare
   %rest:POST
   %rest:path("/dba/settings")
   %output:method("html")
-function _:settings-save(
+function dba:settings-save(
 ) {
   cons:check(),
 

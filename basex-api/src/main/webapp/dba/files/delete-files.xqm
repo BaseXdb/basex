@@ -3,12 +3,12 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/files';
+module namespace dba = 'dba/files';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'files';
+declare variable $dba:CAT := 'files';
 
 (:~
  : Deletes files.
@@ -19,14 +19,14 @@ declare
   %rest:path("/dba/delete-files")
   %rest:query-param("name", "{$names}")
   %output:method("html")
-function _:drop(
+function dba:drop(
   $names  as xs:string*
 ) {
   cons:check(),
   try {
     $names ! file:delete($cons:DBA-DIR || .),
-    web:redirect($_:CAT, map { 'info': 'Deleted files: ' || count($names) })
+    web:redirect($dba:CAT, map { 'info': 'Deleted files: ' || count($names) })
   } catch * {
-    web:redirect($_:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/files';
+module namespace dba = 'dba/files';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace Session = 'http://basex.org/modules/session';
@@ -12,7 +12,7 @@ import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'files';
+declare variable $dba:CAT := 'files';
 
 (:~
  : Files page.
@@ -28,7 +28,7 @@ declare
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
   %output:method("html")
-function _:files(
+function dba:files(
   $sort   as xs:string,
   $error  as xs:string?,
   $info   as xs:string?
@@ -38,10 +38,10 @@ function _:files(
   (: request data in a single step :)
   let $files := file:children($cons:DBA-DIR)[file:is-file(.)]
 
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
-        <form action="{ $_:CAT }" method="post" class="update">
+        <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Files</h2>
         {
           let $entries :=
@@ -84,11 +84,11 @@ declare
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %output:method("html")
-function _:action(
+function dba:action(
   $action  as xs:string,
   $names   as xs:string*
 ) {
-  web:redirect($action, map { 'name': $names, 'redirect': $_:CAT })
+  web:redirect($action, map { 'name': $names, 'redirect': $dba:CAT })
 };
 
 (:~
@@ -99,7 +99,7 @@ function _:action(
 declare
   %rest:GET
   %rest:path("/dba/file/{$name}")
-function _:files(
+function dba:files(
   $name  as xs:string
 ) as item()+ {
   web:response-header(),

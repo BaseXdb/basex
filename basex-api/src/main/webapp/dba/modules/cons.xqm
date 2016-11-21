@@ -5,6 +5,7 @@
  :)
 module namespace cons = 'dba/cons';
 
+import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace Session = 'http://basex.org/modules/session';
 
 (:~ An error occured while retrieving data. :)
@@ -63,5 +64,6 @@ declare variable $cons:OPTION :=
  :)
 declare function cons:check(
 ) as empty-sequence() {
-  if($cons:SESSION) then () else error(xs:QName("basex:login"), 'Please log in again.')
+  if($cons:SESSION) then () else
+    error(xs:QName("basex:login"), 'Please log in again.', Request:path())
 };

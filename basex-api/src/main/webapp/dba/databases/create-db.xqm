@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Form for creating a new database.
@@ -31,7 +31,7 @@ declare
   %rest:query-param("lang",  "{$lang}", "en")
   %rest:query-param("error", "{$error}")
   %output:method("html")
-function _:create(
+function dba:create(
   $name   as xs:string?,
   $opts   as xs:string*,
   $lang   as xs:string?,
@@ -40,12 +40,12 @@ function _:create(
   cons:check(),
 
   let $opts := if($opts = 'x') then $opts else ('textindex', 'attrindex')
-  return tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
+  return tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form action="create-db" method="post" autocomplete="off">
           <h2>
-            <a href="{ $_:CAT }">Databases</a> »
+            <a href="{ $dba:CAT }">Databases</a> »
             { html:button('create', 'Create') }
           </h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
@@ -101,7 +101,7 @@ declare
   %rest:query-param("name", "{$name}")
   %rest:query-param("opts", "{$opts}")
   %rest:query-param("lang", "{$lang}")
-function _:create(
+function dba:create(
   $name  as xs:string,
   $opts  as xs:string*,
   $lang  as xs:string?
@@ -116,7 +116,7 @@ function _:create(
         "'updindex') ! map:entry(., $opts = .), $lang ! map:entry('language', .))))",
         map { 'name': $name, 'lang': $lang, 'opts': $opts }
       ),
-      db:output(web:redirect($_:SUB, map {
+      db:output(web:redirect($dba:SUB, map {
         'info': 'Created Database: ' || $name,
         'name': $name
       }))

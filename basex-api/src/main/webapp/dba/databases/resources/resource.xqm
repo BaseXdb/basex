@@ -3,14 +3,14 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Redirects to the specified action.
@@ -24,7 +24,7 @@ declare
   %rest:form-param("action",   "{$action}")
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resource}")
-function _:resource(
+function dba:resource(
   $action    as xs:string,
   $name      as xs:string,
   $resource  as xs:string*

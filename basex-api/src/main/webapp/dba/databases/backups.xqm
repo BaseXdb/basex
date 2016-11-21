@@ -3,13 +3,13 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Creates a database backup.
@@ -20,10 +20,10 @@ declare
   %rest:GET
   %rest:path("/dba/create-backup")
   %rest:query-param("name", "{$name}")
-function _:create-backup(
+function dba:create-backup(
   $name  as xs:string
 ) {
-  _:action($name, 'Backup was created.', "db:create-backup($n)", map { 'n': $name })
+  dba:action($name, 'Backup was created.', "db:create-backup($n)", map { 'n': $name })
 };
 
 (:~
@@ -37,13 +37,13 @@ declare
   %rest:path("/dba/drop-backup")
   %rest:query-param("name",   "{$name}")
   %rest:query-param("backup", "{$backups}")
-function _:drop-backup(
+function dba:drop-backup(
   $name     as xs:string,
   $backups  as xs:string*
 ) {
   let $n := count($backups)
   let $info := if($n = 1) then 'Backup was dropped.' else $n || ' backups were dropped.'
-  return _:action($name, $info, "$b ! db:drop-backup(.)", map { 'b': $backups })
+  return dba:action($name, $info, "$b ! db:drop-backup(.)", map { 'b': $backups })
 };
 
 (:~
@@ -57,11 +57,11 @@ declare
   %rest:path("/dba/restore")
   %rest:query-param("name",   "{$name}")
   %rest:query-param("backup", "{$backup}")
-function _:restore(
+function dba:restore(
   $name    as xs:string,
   $backup  as xs:string
 ) {
-  _:action($name, 'Database was restored.', "db:restore($b)", map { 'b': $backup })
+  dba:action($name, 'Database was restored.', "db:restore($b)", map { 'b': $backup })
 };
 
 (:~
@@ -71,7 +71,7 @@ function _:restore(
  : @param  $query  query to execute 
  : @param  $args   query arguments
  :)
-declare %updating function _:action(
+declare %updating function dba:action(
   $name   as xs:string,
   $info   as xs:string,
   $query  as xs:string,
@@ -80,8 +80,8 @@ declare %updating function _:action(
   cons:check(),
   try {
     util:update($query, $args),
-    db:output(web:redirect($_:SUB, map { 'name': $name, 'info': $info }))
+    db:output(web:redirect($dba:SUB, map { 'name': $name, 'info': $info }))
   } catch * {
-    db:output(web:redirect($_:SUB, map { 'name': $name, 'error': $err:description }))
+    db:output(web:redirect($dba:SUB, map { 'name': $name, 'error': $err:description }))
   }
 };

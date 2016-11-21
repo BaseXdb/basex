@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)
-module namespace _ = 'dba/databases';
+module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
@@ -11,9 +11,9 @@ import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $_:CAT := 'databases';
+declare variable $dba:CAT := 'databases';
 (:~ Sub category :)
-declare variable $_:SUB := 'database';
+declare variable $dba:SUB := 'database';
 
 (:~
  : Manages a single database.
@@ -31,7 +31,7 @@ declare
   %rest:query-param("error",    "{$error}")
   %rest:query-param("info",     "{$info}")
   %output:method("html")
-function _:database(
+function dba:database(
   $name      as xs:string,
   $resource  as xs:string?,
   $error     as xs:string?,
@@ -60,16 +60,16 @@ function _:database(
 
   return tmpl:wrap(
     map {
-      'top': $_:CAT, 'info': $info, 'error': $error,
+      'top': $dba:CAT, 'info': $info, 'error': $error,
       'css': 'codemirror/lib/codemirror.css',
       'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
     },
     <tr>
       <td width='49%'>
-        <form action="{ $_:SUB }" method="post" id="{ $_:SUB }" class="update">
+        <form action="{ $dba:SUB }" method="post" id="{ $dba:SUB }" class="update">
           <input type="hidden" name="name" value="{ $name }" id="name"/>
-          <h2><a href="{ $_:CAT }">Databases</a> » {
-            $name ! (if(empty($resource)) then . else html:link(., $_:SUB, map { 'name': $name } ))
+          <h2><a href="{ $dba:CAT }">Databases</a> » {
+            $name ! (if(empty($resource)) then . else html:link(., $dba:SUB, map { 'name': $name } ))
           }</h2>
           {
             if(not($found)) then () else (
@@ -91,12 +91,12 @@ function _:database(
                 html:button('optimize', 'Optimize…', false(), 'global')
               )
               let $map := map { 'name': $name }
-              let $link := function($value) { $_:SUB }
+              let $link := function($value) { $dba:SUB }
               return html:table($entries, $headers, $buttons, $map, (), $link)
             )
           }
         </form>
-        <form action="{ $_:SUB }" method="post" class="update">
+        <form action="{ $dba:SUB }" method="post" class="update">
           <input type="hidden" name="name" value="{ $name }"/>
           <h3>Backups</h3>
           {
@@ -162,7 +162,7 @@ declare
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resources}")
   %rest:form-param("backup",   "{$backups}")
-function _:action(
+function dba:action(
   $action     as xs:string,
   $name       as xs:string,
   $resources  as xs:string*,
