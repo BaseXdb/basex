@@ -19,6 +19,8 @@ import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
@@ -83,7 +85,7 @@ public final class HTTPContext {
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    context.log.write(address(), context.user(), LogType.REQUEST, '[' + method + "] " + uri, null);
+    context.log.write(address(), user(), LogType.REQUEST, '[' + method + "] " + uri, null);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(Strings.UTF8);
@@ -396,7 +398,7 @@ public final class HTTPContext {
    * @param info info string (can be {@code null})
    */
   void log(final int type, final String info) {
-    context.log.write(address(), context.user(), type, info, perf);
+    context.log.write(address(), user(), type, info, perf);
   }
 
   /**
@@ -553,10 +555,34 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns a string with the remote user address.
+   * Returns the remote user address and port.
    * @return user address
    */
   private String address() {
     return req.getRemoteAddr() + ':' + req.getRemotePort();
+  }
+
+  /**
+   * Returns a user hidden in a session attribute (id, ID, name, or NAME), or the current user.
+   * @return user name
+   */
+  public String user() {
+    final HttpSession session = req.getSession(false);
+    if(session != null) {
+      Object value = null;
+      final String[] keys = { "id", "ID", "name", "NAME" };
+      for(final String key : keys) {
+        value = session.getAttribute(key);
+        if(value != null) {
+          try {
+            if(value instanceof Value) value = ((Value) value).toJava();
+          } catch(final QueryException ex) {
+            Util.debug(ex);
+          }
+          return value.toString();
+        }
+      }
+    }
+    return context.user().name();
   }
 }

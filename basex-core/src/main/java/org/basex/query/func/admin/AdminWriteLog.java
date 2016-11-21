@@ -28,7 +28,7 @@ public final class AdminWriteLog extends AdminFn {
     final ClientListener cl = qc.context.listener;
     final String addr = cl == null ? Log.SERVER : cl.address();
     final User user = (cl == null ? qc.context : cl.context()).user();
-    qc.context.log.write(addr, user, type, msg, null);
+    qc.context.log.write(addr, user.name(), type, msg, null);
     return null;
   }
 }

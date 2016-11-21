@@ -71,7 +71,7 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  public synchronized void write(final String address, final User user, final int type,
+  public synchronized void write(final String address, final String user, final int type,
       final String info, final Performance perf) {
     write(address, user, Integer.toString(type), info, perf);
   }
@@ -84,7 +84,7 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  public synchronized void write(final String address, final User user, final LogType type,
+  public synchronized void write(final String address, final String user, final LogType type,
       final String info, final Performance perf) {
     write(address, user, type.toString(), info, perf);
   }
@@ -97,7 +97,7 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  public synchronized void write(final String address, final User user, final String type,
+  public synchronized void write(final String address, final String user, final String type,
       final String info, final Performance perf) {
 
     if(!sopts.get(StaticOptions.LOG)) {
@@ -125,7 +125,7 @@ public final class Log {
       final TokenBuilder tb = new TokenBuilder();
       tb.add(DateTime.format(date, DateTime.TIME));
       tb.add('\t').add(address);
-      tb.add('\t').add(user == null ? UserText.ADMIN : user.name());
+      tb.add('\t').add(user == null ? UserText.ADMIN : user);
       tb.add('\t').add(type);
       tb.add('\t').add(info == null ? EMPTY : chop(normalize(token(info)), ml));
       if(perf != null) tb.add('\t').add(perf.toString());

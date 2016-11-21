@@ -450,6 +450,6 @@ public final class ClientListener extends Thread {
    * @param info message info
    */
   private void log(final LogType type, final String info) {
-    context.log.write(address(), context.user(), type, info, perf);
+    context.log.write(address(), context.user().name(), type, info, perf);
   }
 }
