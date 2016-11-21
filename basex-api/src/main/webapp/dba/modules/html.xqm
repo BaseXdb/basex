@@ -137,7 +137,7 @@ declare function html:properties(
       return <tr>
         <td><b>{ upper-case($option/name()) }</b></td>
         <td>{
-          if($value = 'true') then '✓'
+          if($value = 'true') then '&#x2713;'
           else if($value = 'false') then '–'
           else $value
         }</td>
@@ -147,128 +147,123 @@ declare function html:properties(
 };
 
 (:~
- : Creates a sorted table for the specified entries.
- : @param  $entries  table entries
- : @param  $headers  headers
- : @param  $buttons  buttons
- : @return table
- :)
-declare function html:table(
-  $entries  as element(e)*,
-  $headers  as element()*,
-  $buttons  as element(button)*
-) as element()+ {
-  html:table($entries, $headers, $buttons, map {})
-};
-
-(:~
- : Creates a sorted table for the specified entries.
- : @param  $entries  table entries
- : @param  $headers  headers
- : @param  $buttons  buttons
- : @param  $param    additional query parameters
- : @return table
- :)
-declare function html:table(
-  $entries  as element(e)*,
-  $headers  as element()*,
-  $buttons  as element(button)*,
-  $param    as map(*)
-) as element()+ {
-  html:table($entries, $headers, $buttons, $param, ())
-};
-
-(:~
- : Creates a sorted table for the specified entries.
- : @param  $entries  table entries
- : @param  $headers  headers
+ : Creates a sorted table for the specified entries:
+ : * The table format is specified by the table headers:
+ :   * The element names serve as column keys.
+ :   * The string values are the header labels.
+ :   * The 'type' attribute defines how the values are formatted and sorted:
+ :     * 'number': sorted as numbers
+ :     * 'decimal': sorted as numbers, output with two decimal digits
+ :     * 'bytes': sorted as numbers, output in a human-readable format
+ :     * 'date', 'dateTime': sorted and output as dates
+ :     * 'id': suppressed (only used for creating checkboxes)
+ :     * otherwise, sorted and output as strings
+ :   * The 'order' attribute defines how sorted values will be ordered:
+ :     * 'desc': descending order
+ :     * otherwise, ascending order
+ :   * The 'main' attribute indicates which column is the main column
+ : * The supplied table rows are supplied as elements. Values are contained in attributes; their
+ :   names represents the column key.
+ : * Supplied buttons will placed on top of the table.
+ : * Query parameters will be included in table links.
+ : * The optional sort argument contains the key of the ordered column.
+ : * The optional link argument contains a function for generating a link reference.
+ : * The optional page argument indicates which result page is currently displayed
+ :
+ : @param  $entries  table entries: values are represented via attributes
+ : @param  $headers  table headers:
  : @param  $buttons  buttons
  : @param  $param    additional query parameters
  : @param  $sort     sort key
+ : @param  $link     function for generating link reference
+ : @param  $page     current page
  : @return table
  :)
 declare function html:table(
-  $entries  as element(e)*,
   $headers  as element()*,
-  $buttons  as element(button)*,
-  $param    as map(*),
-  $sort     as xs:string?
-) as element()+ {
-  html:table($entries, $headers, $buttons, $param, $sort, ())
-};
-
-(:~
- : Creates a sorted table for the specified entries.
- : @param  $entries  table entries
- : @param  $headers  headers
- : @param  $buttons  buttons
- : @param  $param    additional query parameters
- : @param  $sort     sort key
- : @param  $link     link main entry
- : @return table
- :)
-declare function html:table(
-  $entries  as element(e)*,
-  $headers  as element()*,
+  $rows     as element(row)*,
   $buttons  as element(button)*,
   $param    as map(*),
   $sort     as xs:string?,
-  $link     as function(*)?
+  $link     as function(*)?,
+  $page     as xs:integer?
 ) as element()+ {
   if($buttons) then ($buttons, <br/>, <div class='small'/>) else (),
-  if($entries) then (
-    let $sort := if($sort = '') then $headers[1]/name() else $sort
-    return <table>
-      <tr>{
-        for $header in $headers
-        let $name := $header/name()
-        let $value := upper-case($header/text())
-        return element th {
-          attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
-          if(empty($sort) or $name = $sort) then (
-            $value
-          ) else (
-            html:link($value, "", map:merge(($param, map { 'sort': $name })))
-          )
-        }
-      }
-      </tr>
-      {
-        let $entries := if(empty($sort)) then $entries else (
-          let $sort := if($sort) then $sort else $headers[1]/name()
-          let $header := $headers[name() eq $sort]
-          let $desc := $header/@order = 'desc'
-          let $order :=
-            if($header/@type = $html:NUMBER) then (
-              if($desc)
-              then function($a) { 0 - number($a) }
-              else function($a) { number($a) }
-            ) else if($header/@type = 'time') then (
-              if($desc)
-              then function($a) { xs:time('00:00:00') - xs:time($a) }
-              else function($a) { $a }
-            ) else if($header/@type = 'date') then (
-              if($desc)
-              then function($a) { xs:date('0001-01-01') - xs:date($a) }
-              else function($a) { $a }
-            ) else if($header/@type = 'dateTime') then (
-              if($desc)
-              then function($a) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($a) }
-              else function($a) { $a }
-            ) else (
-              function($a) { $a }
-            )
-          return
-            for $entry in $entries
-            order by string($entry/@*[name() = $sort])[.] ! $order(.)
-              empty greatest collation '?lang=en'
-            return $entry
-        )
 
-        let $max := $cons:OPTION($cons:K-MAX-ROWS)
+  let $sort := if($sort = '') then $headers[1]/name() else $sort
+  let $all-entries := if(empty($sort)) then $rows else (
+    let $sort := if($sort) then $sort else $headers[1]/name()
+    let $header := $headers[name() eq $sort]
+    let $desc := $header/@order = 'desc'
+    let $order :=
+      if($header/@type = $html:NUMBER) then (
+        if($desc)
+        then function($a) { 0 - number($a) }
+        else function($a) { number($a) }
+      ) else if($header/@type = 'time') then (
+        if($desc)
+        then function($a) { xs:time('00:00:00') - xs:time($a) }
+        else function($a) { $a }
+      ) else if($header/@type = 'date') then (
+        if($desc)
+        then function($a) { xs:date('0001-01-01') - xs:date($a) }
+        else function($a) { $a }
+      ) else if($header/@type = 'dateTime') then (
+        if($desc)
+        then function($a) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($a) }
+        else function($a) { $a }
+      ) else (
+        function($a) { $a }
+      )
+    return
+      for $entry in $rows
+      order by string($entry/@*[name() = $sort])[.] ! $order(.)
+        empty greatest collation '?lang=en'
+      return $entry
+  )
+  let $max := $cons:OPTION($cons:K-MAX-ROWS)
+  let $start := if($page) then (($page - 1) * $max) + 1 else 1
+  let $entries := $all-entries[position() >= $start][position() <= $max + 1]
+
+  let $last-page := count($entries) <= $max
+  let $single-page := not($page) or ($page = 1 and $last-page)
+  let $count := count($rows)
+  return (
+    element h4 {
+      'Results: ',
+      if($single-page) then () else
+        $start || '-' || min(($count, $start + $max - 1)) || ' of ',
+      $count,
+      if($single-page) then () else (
+        '   ',
+        let $arrow := '«'
+        return if($page = 1) then ' ' || $arrow || ' ' else
+          html:link($arrow, "", map:merge(($param, map { 'page': $page - 1, 'sort': $sort }))),
+        ' ',
+        let $arrow := '»'
+        return if($last-page) then ' ' || $arrow || ' ' else
+          html:link($arrow, "", map:merge(($param, map { 'page': $page + 1, 'sort': $sort })))
+      )
+    },
+    if(empty($rows)) then () else (
+      element table {
+        element tr {
+          for $header in $headers
+          let $name := $header/name()
+          let $value := upper-case($header/text())
+          return element th {
+            attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
+            if(empty($sort) or $name = $sort) then (
+              $value
+            ) else (
+              html:link($value, "", map:merge(($param, map { 'sort': $name })))
+            )
+          }
+        },
+  
         for $entry at $c in $entries
         return if($c <= $max) then (
-          <tr>{
+          element tr {
             for $header at $pos in $headers
             let $name := $header/name()
             let $type := $header/@type
@@ -283,7 +278,7 @@ declare function html:table(
               )
               else .
             )
-
+  
             return element td {
               attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
               if($pos = 1 and $buttons) then (
@@ -295,36 +290,17 @@ declare function html:table(
                 $value
               )
             }
-          }</tr>
+          }
         ) else if($c = $max + 1) then (
-          <tr>
-            <td>{
-              if($buttons) then <input type="checkbox" disabled=""/> else ()
-            }…</td>
-          </tr>
+          element tr {
+            element td {
+              if($buttons) then <input type="checkbox" disabled=""/> else (),
+              '…'
+            }
+          }
         ) else ()
       }
-    </table>
-    (: , if($buttons) then (<div class='small'/>, $buttons, <br/>) else () :)
-  ) else (
-    <b>{ upper-case($headers[1]) }</b>
-  )
-};
-
-(:~
- : Creates a singular/plural label.
- : @param  $items   items
- : @param  $labels  singular/plural label
- : @return label
- :)
-declare function html:label(
-  $items   as item()*,
-  $labels  as xs:string+
-) as xs:string {
-  let $size := count($items)
-  return (
-    $size || ' ' || $labels[if(count($items) = 1) then 1 else 2] ||
-    (if($size = 0) then '.' else ':')
+    )
   )
 };
 
@@ -343,33 +319,33 @@ declare function html:focus(
 
 (:~
  : Creates a link to the specified target.
- : @param  $text    link text
- : @param  $target  target
+ : @param  $text  link text
+ : @param  $href  link reference
  : @return link
  :)
 declare function html:link(
-  $text    as xs:string,
-  $target  as xs:string
+  $text  as xs:string,
+  $href  as xs:string
 ) as element(a) {
-  <a href="{ $target }">{ $text }</a>
+  <a href="{ $href }">{ $text }</a>
 };
 
 (:~
  : Creates a link to the specified target.
  : @param  $text    link text
- : @param  $target  target
+ : @param  $href    link reference
  : @param  $params  map with query parameters
  : @return link
  :)
 declare function html:link(
   $text    as xs:string,
-  $target  as xs:string,
+  $href    as xs:string,
   $params  as map(*)
 ) as element(a) {
-  html:link($text, web:create-url($target, $params))
+  html:link($text, web:create-url($href, $params))
 };
 
-(:~ 
+(:~
  : Formats a date.
  : @param  $date  date
  : @return string

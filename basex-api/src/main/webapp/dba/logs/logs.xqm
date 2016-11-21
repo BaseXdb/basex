@@ -21,6 +21,7 @@ declare variable $dba:CAT := 'logs';
  : @param  $logs     search term for logs
  : @param  $error    error string
  : @param  $info     info string
+ : @param  $page     current page
  : @return page
  :)
 declare
@@ -32,6 +33,7 @@ declare
   %rest:query-param("logs",    "{$logs}")
   %rest:query-param("error",   "{$error}")
   %rest:query-param("info",    "{$info}")
+  %rest:query-param("page",    "{$page}", 1)
   %output:method("html")
 function dba:logs(
   $sort     as xs:string,
@@ -39,7 +41,8 @@ function dba:logs(
   $loglist  as xs:string?,
   $logs     as xs:string?,
   $error    as xs:string?,
-  $info     as xs:string?
+  $info     as xs:string?,
+  $page     as xs:integer
 ) as element(html) {
   cons:check(),
 
@@ -51,13 +54,14 @@ function dba:logs(
         <form action="javascript:void(0);">
           <h2>{ if($name) then <a href="{ $dba:CAT }">Logs</a> else 'Logs' }:
             <input size="14" name="loglist" id="loglist" value="{ $loglist }"
-              placeholder="regular expression"
-              onkeyup="logList();"/>
+                   placeholder="regular expression"
+                   onkeyup="logList();"/>
           </h2>
         </form>
         <form action="{ $dba:CAT }" method="post" class="update" autocomplete="off">
           <input type='hidden' name='name' id='name' value='{ $name }'/>
           <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
+          <input type='hidden' name='page' id='page' value='{ $page }'/>
           <div id='list'>{ $loglists }</div>
         </form>
       </td>
@@ -85,6 +89,7 @@ function dba:logs(
  : @param  $names    name of selected log files
  : @param  $sort     table sort key
  : @param  $loglist  loglist
+ : @param  $page     current page
  : @return html elements
  :)
 declare
@@ -93,13 +98,16 @@ declare
   %rest:query-param("name",    "{$name}")
   %rest:query-param("sort",    "{$sort}")
   %rest:query-param("loglist", "{$loglist}")
+  %rest:query-param("page",    "{$page}", 1)
   %output:method("html")
+  %output:indent("no")
   %rest:single
 function dba:log(
   $name     as xs:string,
   $sort     as xs:string?,
   $query    as xs:string?,
-  $loglist  as xs:string?
+  $loglist  as xs:string?,
+  $page     as xs:integer
 ) as element()* {
   cons:check(),
 
@@ -110,18 +118,20 @@ function dba:log(
   } catch * { () }
 
   where $logs
-  let $entries := $logs !
-    <e t='{ @time }' a='{ @address }' u='{ @user}' p='{ @type }' m='{ @ms }' d='{ . }'/>
+  let $rows :=
+    for $log in $logs
+    return <row time='{ $log/@time }' address='{ $log/@address }' user='{ $log/@user}'
+                type='{ $log/@type }' ms='{ $log/@ms }' value='{ $log }'/>
   let $headers := (
-    <t type='time' order='desc'>Time</t>,
-    <a>Address</a>,
-    <u>User</u>,
-    <p>Type</p>,
-    <m type='decimal' order='desc'>ms</m>,
-    <d>{ html:label($entries, ('Log Entry', 'Log Entries')) }</d>
+    <time type='time' order='desc'>Time</time>,
+    <address>Address</address>,
+    <user>User</user>,
+    <type>Type</type>,
+    <ms type='decimal' order='desc'>ms</ms>,
+    <value>Value</value>
   )
-  return html:table($entries, $headers, (),
-    map { 'name': $name, 'loglist': $loglist, 'logs': $query }, $sort)
+  return html:table($headers, $rows, (), map { 'name': $name, 'loglist': $loglist, 'logs': $query },
+    $sort, (), $page)
 };
 
 (:~
@@ -151,20 +161,20 @@ function dba:loglist(
     )
   } catch * { () }
   where $logs
-  let $entries :=
+  let $rows :=
     (: legacy (7.8.1): $a/@date :)
     for $a in $logs
     order by $a descending
     (: legacy (7.8.1): $a/@date :)
-    return <e name='{ ($a/(@date,text())) }' size='{ $a/@size }'/>
+    return <row name='{ ($a/(@date,text())) }' size='{ $a/@size }'/>
   let $headers := (
-    <name>{ html:label($entries, ('Log', 'Logs')) }</name>,
+    <name>Name</name>,
     <size type='bytes'>Size</size>
   )
   let $buttons := html:button('delete-logs', 'Delete', true())
   let $link := function($value) { $dba:CAT }
-  return html:table($entries, $headers, $buttons,
-    map { 'sort': $sort, 'loglist': $query }, (), $link)
+  return html:table($headers, $rows, $buttons,
+    map { 'sort': $sort, 'loglist': $query }, (), $link, ())
 };
 
 (:~

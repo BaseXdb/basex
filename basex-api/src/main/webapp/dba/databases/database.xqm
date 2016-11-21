@@ -21,6 +21,7 @@ declare variable $dba:SUB := 'database';
  : @param  $resource  resource
  : @param  $error     error string
  : @param  $info      info string
+ : @param  $page   current page
  : @return page
  :)
 declare
@@ -30,28 +31,32 @@ declare
   %rest:query-param("resource", "{$resource}")
   %rest:query-param("error",    "{$error}")
   %rest:query-param("info",     "{$info}")
+  %rest:query-param("page",     "{$page}", 1)
   %output:method("html")
 function dba:database(
   $name      as xs:string,
   $resource  as xs:string?,
   $error     as xs:string?,
-  $info      as xs:string?
+  $info      as xs:string?,
+  $page      as xs:integer?
 ) as element(html) {
   cons:check(),
 
   (: request data in a single step :)
   let $data := try {
-    util:eval('element result {
+    let $max := $cons:OPTION($cons:K-MAX-ROWS)
+    let $start := if($page) then (($page - 1) * $max) + 1 else 1
+    return util:eval('element result {
       let $found := db:exists($name)
       return (
         element found { $found },
         if($found) then (
-          element databases { db:list-details($name)[position() = 1 to $max] },
+          element databases { db:list-details($name) },
           element info { db:info($name) }
         ) else (),
         element backups { db:backups($name) }
       )
-    }', map { 'name': $name, 'max': $cons:OPTION($cons:K-MAX-ROWS) + 1 })
+    }', map { 'name': $name, 'max': $start + $max })
   } catch * {
     element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
@@ -73,15 +78,16 @@ function dba:database(
           }</h2>
           {
             if(not($found)) then () else (
-              let $entries := $data/databases/* !
-                <e resource='{ . }' ct='{ @content-type }' raw='{
-                  if(@raw = 'true') then '✓' else '–'
-                }' size='{ @size }'/>
+              let $rows :=
+                for $res in $data/databases/resource
+                return <row name='{ $res }' type='{ $res/@content-type }'
+                            raw='{ if($res/@raw = 'true') then '&#x2713;' else '–' }'
+                            size='{ $res/@size }'/>
               let $headers := (
-                <resource>{ html:label($entries, ('Resource', 'Resources')) }</resource>,
-                <ct>Content type</ct>,
+                <name>Name</name>,
+                <type>Content type</type>,
                 <raw>Raw</raw>,
-                <size type='number' order='desc'>Size (factor)</size>
+                <size type='number' order='desc'>Size</size>
               )
               let $buttons := (
                 html:button('add', 'Add…'),
@@ -92,7 +98,7 @@ function dba:database(
               )
               let $map := map { 'name': $name }
               let $link := function($value) { $dba:SUB }
-              return html:table($entries, $headers, $buttons, $map, (), $link)
+              return html:table($headers, $rows, $buttons, $map, (), $link, $page)
             )
           }
         </form>
@@ -100,12 +106,12 @@ function dba:database(
           <input type="hidden" name="name" value="{ $name }"/>
           <h3>Backups</h3>
           {
-            let $entries :=
+            let $rows :=
               for $backup in $data/backups/*
               order by $backup descending
-              return <e backup='{ $backup }' size='{ $backup/@size }'/>
+              return <row backup='{ $backup }' size='{ $backup/@size }'/>
             let $headers := (
-              <backup order='desc'>{ html:label($entries, ('Backup', 'Backups')) }</backup>,
+              <backup order='desc'>Name</backup>,
               <size type='bytes'>Size</size>
             )
             let $buttons := (
@@ -117,7 +123,7 @@ function dba:database(
             )
             let $map := map { 'name': $name }
             let $link := function($value) { 'backup/' || $value || '.zip' }
-            return html:table($entries, $headers, $buttons, $map, (), $link)
+            return html:table($headers, $rows, $buttons, $map, (), $link, ())
           }
         </form>
       </td>

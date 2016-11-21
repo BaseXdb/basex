@@ -18,6 +18,7 @@ declare variable $dba:CAT := 'databases';
  : @param  $sort   table sort key
  : @param  $error  error string
  : @param  $info   info string
+ : @param  $page   current page
  : @return page
  :)
 declare
@@ -26,11 +27,13 @@ declare
   %rest:query-param("sort",  "{$sort}", "")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
+  %rest:query-param("page",  "{$page}", 1)
   %output:method("html")
 function dba:databases(
   $sort   as xs:string,
   $error  as xs:string?,
-  $info   as xs:string?
+  $info   as xs:string?,
+  $page   as xs:integer?
 ) as element(html) {
   cons:check(),
 
@@ -52,20 +55,24 @@ function dba:databases(
         <form action="{ $dba:CAT }" method="post" class="update">
           <h2>Databases</h2>
           {
-            let $entries := $data/databases/database/
-              <e name='{ . }' resources='{ @resources }' size='{ @size }' date='{ @modified-date }'/>
+            let $entries :=
+              for $db in $data/databases/database
+              return <row name='{ $db }' resources='{ $db/@resources }' size='{ $db/@size }'
+                          date='{ $db/@modified-date }'/>
             (: integrate backups in list :)
-            let $entries := ($entries,
+            let $rows := (
+              $entries,
               for $backup in $data/backups/backup
               let $file := $backup/text()
               order by $file descending
-              group by $name := replace($file, '-\d\d\d\d-\d\d-\d\d-\d\d-\d\d-\d\d$', '')
+              group by $name := replace($file, '-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}$', '')
               where not($entries/@name = $name)
-              let $date := replace($file[1], '^.*(\d\d\d\d-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$', '$1T$2:$3:$4Z')
-              return <e name='{ $name }' resources='' size='(backup)' date='{ $date }'/>
+              let $date := replace($file[1], '^.*(\d{4}-\d{2}-\d{2})-(\d{2})-(\d{2})-(\d{2})$',
+                '$1T$2:$3:$4Z')
+              return <row name='{ $name }' resources='' size='(backup)' date='{ $date }'/>
             )
             let $headers := (
-              <name>{ html:label($entries, ('Database', 'Databases')) }</name>,
+              <name>Name</name>,
               <resources type='number' order='desc'>Resources</resources>,
               <size type='bytes' order='desc'>Size</size>,
               <date type='dateTime' order='desc'>Modification Date</date>
@@ -76,7 +83,7 @@ function dba:databases(
               html:button('drop-db', 'Drop', true())
             )
             let $link := function($value) { 'database' }
-            return html:table($entries, $headers, $buttons, map { }, $sort, $link)
+            return html:table($headers, $rows, $buttons, map { }, $sort, $link, $page)
           }
         </form>
       </td>

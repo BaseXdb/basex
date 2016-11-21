@@ -40,22 +40,28 @@ declare variable $cons:K-PERMISSION := 'permission';
 declare variable $cons:OPTION :=
   let $defaults := map {
     'maxchars': 100000,
-    'maxrows': 500,
+    'maxrows': 1000,
     'timeout': 10,
-    'memory': 300,
+    'memory': 500,
     'permission': 'admin'
   }
   return try {
-    (: merge defaults with options in settings file :)
-    map:merge((
-      $defaults,
-      for $opt in doc($cons:DBA-SETTINGS-FILE)/config/*
-      let $key := $opt/name()
-      let $val := if($defaults($key) instance of xs:integer) then xs:integer($opt) else string($opt)
-      return map { $key: $val }
-    ))
+    (: merge defaults with options from settings file :)
+    let $configs := doc($cons:DBA-SETTINGS-FILE)/config
+    return map:merge(
+      map:for-each($defaults, function($key, $value) {
+        map:entry($key,
+          let $config := $configs/*[name() = $key]
+          return if($config) then (
+            if($value instance of xs:numeric) then xs:integer($config) else xs:string($config)
+          ) else (
+            $value
+          )
+        )
+      })
+    )
   } catch * {
-    (: settings file does not exist or is not well-formed... use defaults :)
+    (: use defaults if an error occurs while parsing the configuration file :)
     $defaults
   };
 

@@ -55,19 +55,18 @@ function dba:jobs-users(
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Jobs</h2>
         {
-          let $entries :=
+          let $rows :=
             let $curr := $data/current-job
             for $job in $data/jobs/job
             let $id := $job/@id
             let $ms := xs:dayTimeDuration($job/@duration) div xs:dayTimeDuration('PT0.001S')
-            let $you := if($id = $curr) then '✓' else '–'
+            let $you := if($id = $curr) then '&#x2713;' else '–'
             order by $ms descending
-            return <e id='{ $id }' type='{ $job/@type }' state='{ $job/@state }'
-              user='{ $job/@user }' sec='{ $ms div 1000 }' start='{ $job/@start}'
-              end='{ $job/@end }' you='{ $you }'/>
-            
+            return <row id='{ $id }' type='{ $job/@type }' state='{ $job/@state }'
+                        user='{ $job/@user }' sec='{ $ms div 1000 }' start='{ $job/@start}'
+                        end='{ $job/@end }' you='{ $you }'/>
           let $headers := (
-            <id>{ html:label($entries, ('ID', 'IDs')) }</id>,
+            <id>ID</id>,
             <type>Type</type>,
             <state>State</state>,
             <user>User</user>,
@@ -79,18 +78,19 @@ function dba:jobs-users(
           let $buttons := (
             html:button('stop-job', 'Stop', true())
           )
-          return html:table($entries, $headers, $buttons, map {}, $sort)
+          return html:table($headers, $rows, $buttons, map {}, $sort, (), ())
         }
         </form>
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Server Sessions</h2>
         {
-          let $entries :=
+          let $rows :=
             for $id in Sessions:ids()
             let $access := Sessions:accessed($id)
-            let $you := if(Session:id() = $id) then '✓' else '–'
+            let $you := if(Session:id() = $id) then '&#x2713;' else '–'
             for $name in Sessions:names($id)
             for $value in try {
+              (: try to find possible sessions :)
               let $attr := Sessions:get($id, $name)
               return if($attr instance of element()) then (
                 $attr/name
@@ -100,12 +100,12 @@ function dba:jobs-users(
                 '...'
               )
             } catch bxerr:BXSE0002 {
-              (: ignore non-XQuery session values :)
+              (: skip non-XQuery session values :)
             }
-            return <e id='{ $id || '|' || $name }' name='{ $name }' value='{ $value }'
-             access='{ $access }' you='{ $you }'/>
+            return <row id='{ $id || '|' || $name }' name='{ $name }' value='{ $value }'
+                        access='{ $access }' you='{ $you }'/>
           let $headers := (
-            <id type='id'>{  html:label($entries, ('ID', 'IDs')) }</id>,
+            <id type='id'>ID</id>,
             <name>Name</name>,
             <value>Value</value>,
             <access type='dateTime' order='desc'>Last Access</access>,
@@ -114,17 +114,19 @@ function dba:jobs-users(
           let $buttons := (
             html:button('kill-session', 'Kill', true())
           )
-          return html:table($entries, $headers, $buttons)
+          return html:table($headers, $rows, $buttons, map {}, (), (), ())
         }
         </form>
         <h2>Database Clients</h2>
         {
-          let $entries := $data/sessions/session/<e addr='{ @address }' user='{ @user }'/>
+          let $rows :=
+            for $session in $data/sessions/session
+            return <row address='{ $session/@address }' user='{ $session/@user }'/>
           let $headers := (
-            <addr>{ html:label($entries, ('Session', 'Sessions')) }</addr>,
-            <user>Address</user>
+            <address>Address</address>,
+            <user>User</user>
           )
-          return html:table($entries, $headers, ())
+          return html:table($headers, $rows, (), map {}, (), (), ())
         }
       </td>
       <td class='vertical'/>
@@ -132,12 +134,13 @@ function dba:jobs-users(
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Users</h2>
         {
-          let $entries :=
-            for $entry in $data/users/user
-            let $you := if($cons:SESSION/name = $entry/@name) then '✓' else '–'
-            return <e name='{ $entry/@name }' perm='{ $entry/@permission }' you='{ $you }'/>
+          let $rows :=
+            for $user in $data/users/user
+            let $name := $user/@name
+            let $you := if($cons:SESSION/name = $name) then '&#x2713;' else '–'
+            return <row name='{ $name }' perm='{ $user/@permission }' you='{ $you }'/>
           let $headers := (
-            <name>{ html:label($entries, ('User', 'Users')) }</name>,
+            <name>Name</name>,
             <perm>Permission</perm>,
             <you>You</you>
           )
@@ -146,7 +149,7 @@ function dba:jobs-users(
             html:button('drop-user', 'Drop', true())
           )
           let $link := function($value) { 'user' }
-          return html:table($entries, $headers, $buttons, map {}, (), $link)
+          return html:table($headers, $rows, $buttons, map {}, (), $link, ())
         }
         </form>
         <div>&#xa0;</div>

@@ -9,8 +9,6 @@ import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
-declare option query:write-lock 'settings';
-
 (:~ Top category :)
 declare variable $dba:CAT := 'settings';
 

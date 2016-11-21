@@ -40,7 +40,7 @@ declare function tmpl:wrap(
       <title>Database Administration</title>
       <meta name="description" content="Database Administration"/>
       <meta name="author" content="BaseX Team, 2014-16"/>
-      <link rel="stylesheet" type="text/css" href="static/style.css"/> 
+      <link rel="stylesheet" type="text/css" href="static/style.css"/>
       { $options('css') ! <link rel="stylesheet" type="text/css" href="static/{.}"/> }
       <script type="text/javascript" src="static/js.js"/>
       { $options('scripts') ! <script type="text/javascript" src="static/{.}"/> }
@@ -58,7 +58,7 @@ declare function tmpl:wrap(
         })}</span>
         return try {
           cons:check(),
-          let $cats := 
+          let $cats :=
             let $top := $options('top')
             for $cat in ('Databases', 'Queries', 'Logs', 'Jobs &amp; Users', 'Files',
               'Settings', 'Logout')

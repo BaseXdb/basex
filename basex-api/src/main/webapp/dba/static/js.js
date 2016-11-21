@@ -55,11 +55,13 @@ function query(key, query, enforce, target) {
   var resource = document.getElementById("resource");
   var sort = document.getElementById("sort");
   var loglist = document.getElementById("loglist");
+  var page = document.getElementById("page");
   var url = key +
     "?name=" + encodeURIComponent(name ? name.value : "") +
     "&resource=" + encodeURIComponent(resource ? resource.value : "") +
     "&sort=" + encodeURIComponent(sort ? sort.value : "") +
-    "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
+    "&loglist=" + encodeURIComponent(loglist ? loglist.value : "") +
+    "&page=" + encodeURIComponent(page ? page.value : "");
   request("POST", url, query,
     function(req) {
       _running--;

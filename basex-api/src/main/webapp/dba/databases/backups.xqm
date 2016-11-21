@@ -68,7 +68,7 @@ function dba:restore(
  : Performs a backup operation.
  : @param  $name   database
  : @param  $info   info string
- : @param  $query  query to execute 
+ : @param  $query  query to execute
  : @param  $args   query arguments
  :)
 declare %updating function dba:action(

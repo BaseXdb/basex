@@ -44,18 +44,18 @@ function dba:files(
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Files</h2>
         {
-          let $entries :=
+          let $rows :=
             for $file in $files
             let $date := file:last-modified($file)
-            return <e name='{ file:name($file) }' date='{ $date }' size='{ file:size($file) }'/>
+            return <row name='{ file:name($file) }' date='{ $date }' size='{ file:size($file) }'/>
           let $headers := (
-            <name>{ html:label($entries, ('File', 'Files')) }</name>,
+            <name>Name</name>,
             <date type='dateTime' order='desc'>Date</date>,
             <size type='bytes' order='desc'>Size</size>
           )
           let $buttons := html:button('delete-files', 'Delete', true())
           let $link := function($value) { 'file/' || $value }
-          return html:table($entries, $headers, $buttons, map {}, $sort, $link)
+          return html:table($headers, $rows, $buttons, map {}, $sort, $link, ())
         }
         </form>
         <h3>Upload Files</h3>

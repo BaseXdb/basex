@@ -23,7 +23,7 @@ function dba:drop(
   $files  as map(*)
 ) {
   cons:check(),
-  
+
   map:for-each($files, function($name, $content) {
     file:write-binary($cons:DBA-DIR || file:name($name), $content)
   }),
