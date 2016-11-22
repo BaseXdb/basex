@@ -1,3 +1,7 @@
+VERSION 8.5.4 (November 22, 2016) ----------------------------------------
+
+ Add Read-Timeout to EXPath-HTTP
+
 VERSION 8.5.3 (August 15, 2016) ----------------------------------------
 
  Minor bug fixes, improved thread-safety.
