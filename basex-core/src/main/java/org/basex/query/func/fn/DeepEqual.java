@@ -160,7 +160,8 @@ public final class DeepEqual {
             if(!eq(s1.string(), s2.string())) return false;
           } else if(t1 == NodeType.ELM) {
             // compare attributes
-            BasicNodeIter ir1 = s1.attributes(), ir2 = s2.attributes();
+            final BasicNodeIter ir1 = s1.attributes();
+            BasicNodeIter ir2 = s2.attributes();
             if(ir1.size() != ir2.size()) return false;
 
             // compare names, values and prefixes

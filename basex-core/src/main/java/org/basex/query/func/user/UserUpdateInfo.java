@@ -35,7 +35,7 @@ public final class UserUpdateInfo extends UserFn {
   /** Update primitive. */
   private static final class UpdateInfo extends UserPermUpdate {
     /** Node to be updated. */
-    private ANode node;
+    private final ANode node;
 
     /**
      * Constructor.
