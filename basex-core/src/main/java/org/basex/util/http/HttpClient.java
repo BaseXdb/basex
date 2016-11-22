@@ -264,7 +264,7 @@ public final class HttpClient {
         if(base64) {
           writeHeader(CONTENT_TRANSFER_ENCODING, BASE64, out);
           out.write(CRLF);
-          contents = Base64.encode(contents);
+          contents = org.basex.util.Base64.encode(contents);
           final int bl = contents.length;
           for(int b = 0; b < bl; b += 76) {
             out.write(contents, b, Math.min(76, bl - b));
