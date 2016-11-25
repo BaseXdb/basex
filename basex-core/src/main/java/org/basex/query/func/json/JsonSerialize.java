@@ -21,6 +21,7 @@ public final class JsonSerialize extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = qc.iter(exprs[0]);
     final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
+    System.out.println("? " + jopts);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);

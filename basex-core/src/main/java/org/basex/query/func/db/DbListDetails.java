@@ -1,6 +1,5 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -78,7 +77,7 @@ public final class DbListDetails extends DbList {
   }
 
   /**
-   * Performs the list-details for databases function.
+   * Lists details for all databases.
    * @param qc query context
    * @return iterator
    */
@@ -90,21 +89,21 @@ public final class DbListDetails extends DbList {
       @Override
       public ANode get(final long i) throws QueryException {
         final String name = dbs.get((int) i);
-        final FElem res = new FElem(DATABASE);
+        final FElem database = new FElem(DATABASE);
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
           // count number of raw files
           final int bin = new IOFile(ctx.soptions.dbPath(name), IO.RAW).descendants().size();
-          res.add(RESOURCES, token(meta.ndocs + bin));
-          res.add(MDATE, DateTime.format(new Date(meta.dbtime())));
-          res.add(SIZE, token(meta.dbsize()));
-          if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);
+          database.add(RESOURCES, token(meta.ndocs + bin));
+          database.add(MDATE, DateTime.format(new Date(meta.dbtime())));
+          database.add(SIZE, token(meta.dbsize()));
+          if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
         } catch(final IOException ignore) {
           // invalid database will be ignored
         }
-        res.add(name);
-        return res;
+        database.add(name);
+        return database;
       }
       @Override
       public ANode next() throws QueryException { return pos < size() ? get(pos++) : null; }
@@ -114,13 +113,13 @@ public final class DbListDetails extends DbList {
   }
 
   /**
-   * Create a {@code &lt;resource/&gt;} node.
+   * Creates a resource node.
    * @param path path
    * @param raw is the resource a raw file
    * @param size size
    * @param type media type
    * @param mdate modified date
-   * @return {@code &lt;resource/&gt;} node
+   * @return resource  node
    */
   private static FNode resource(final byte[] path, final boolean raw, final long size,
       final MediaType type, final long mdate) {
