@@ -90,21 +90,21 @@ public final class DbListDetails extends DbList {
       @Override
       public ANode get(final long i) throws QueryException {
         final String name = dbs.get((int) i);
+        final FElem res = new FElem(DATABASE);
+        final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
-          final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
           meta.read();
           // count number of raw files
           final int bin = new IOFile(ctx.soptions.dbPath(name), IO.RAW).descendants().size();
-          final FElem res = new FElem(DATABASE);
           res.add(RESOURCES, token(meta.ndocs + bin));
           res.add(MDATE, DateTime.format(new Date(meta.dbtime())));
           res.add(SIZE, token(meta.dbsize()));
           if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);
-          res.add(name);
-          return res;
-        } catch(final IOException ex) {
-          throw BXDB_OPEN_X.get(info, ex);
+        } catch(final IOException ignore) {
+          // invalid database will be ignored
         }
+        res.add(name);
+        return res;
       }
       @Override
       public ANode next() throws QueryException { return pos < size() ? get(pos++) : null; }
