@@ -3751,7 +3751,10 @@ public class QueryParser extends InputParser {
   private byte[] ncName(final QueryError err) throws QueryException {
     tok.reset();
     if(ncName()) return tok.toArray();
-    if(err != null) throw error(err, consume());
+    if(err != null) {
+      final char ch = consume();
+      throw ch == 0 ? error(err, "") : error(err, ch);
+    }
     return EMPTY;
   }
 
@@ -3809,7 +3812,10 @@ public class QueryParser extends InputParser {
   private byte[] qName(final QueryError err) throws QueryException {
     tok.reset();
     if(!ncName()) {
-      if(err != null) throw error(err, consume());
+      if(err != null) {
+        final char ch = consume();
+        throw ch == 0 ? error(err, "") : error(err, ch);
+      }
     } else if(consume(':')) {
       if(XMLToken.isNCStartChar(curr())) {
         tok.add(':');
