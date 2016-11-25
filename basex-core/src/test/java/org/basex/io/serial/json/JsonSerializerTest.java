@@ -189,9 +189,7 @@ public final class JsonSerializerTest extends SandboxTest {
    * @return result
    * @throws Exception exception
    */
-  private static String serialize(final String qu, final JsonFormat format)
-      throws Exception {
-
+  private static String serialize(final String qu, final JsonFormat format) throws Exception {
     final ArrayOutput ao = new ArrayOutput();
     try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
       final JsonSerialOptions jopts = new JsonSerialOptions();

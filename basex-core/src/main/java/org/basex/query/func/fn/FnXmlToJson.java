@@ -4,12 +4,11 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.func.json.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.options.Options.*;
 
 /**
  * Function implementation.
@@ -21,16 +20,9 @@ public class FnXmlToJson extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(exprs[0], qc);
-    final JsonSerialOptions opts = toOptions(1, new JsonSerialOptions(), qc);
-    if(node == null) return null;
-
-    final JsonSerialOptions jopts = new JsonSerialOptions();
+    final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
     jopts.set(JsonOptions.FORMAT, JsonFormat.BASIC);
-
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
-    sopts.set(SerializerOptions.JSON, jopts);
-    sopts.set(SerializerOptions.INDENT, opts.get(JsonSerialOptions.INDENT) ? YesNo.YES : YesNo.NO);
-    return Str.get(serialize(node.iter(), sopts, INVALIDOPT_X));
+    return node == null ? null :
+      Str.get(serialize(node.iter(), JsonSerialize.options(jopts), INVALIDOPT_X));
   }
 }

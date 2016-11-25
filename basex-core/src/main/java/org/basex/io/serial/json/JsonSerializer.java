@@ -43,6 +43,8 @@ public abstract class JsonSerializer extends StandardSerializer {
     jopts = opts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
     nodups = opts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
+    final Boolean ji = jopts.get(JsonSerialOptions.INDENT);
+    if(ji != null) indent = ji;
   }
 
   @Override

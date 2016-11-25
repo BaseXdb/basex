@@ -9,6 +9,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.options.Options.*;
 
 /**
  * Function implementation.
@@ -21,11 +22,20 @@ public final class JsonSerialize extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = qc.iter(exprs[0]);
     final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
-    System.out.println("? " + jopts);
+    return Str.get(serialize(iter, options(jopts), INVALIDOPT_X));
+  }
 
+  /**
+   * Creates parameters for options.
+   * @param jopts json options
+   * @return options
+   */
+  public static SerializerOptions options(final JsonSerialOptions jopts) {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
     sopts.set(SerializerOptions.JSON, jopts);
-    return Str.get(serialize(iter, sopts, INVALIDOPT_X));
+    final Boolean indent = jopts.get(JsonSerialOptions.INDENT);
+    if(indent != null) sopts.set(SerializerOptions.INDENT, indent ? YesNo.YES : YesNo.NO);
+    return sopts;
   }
 }
