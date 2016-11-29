@@ -7,10 +7,10 @@ while [ -h "$FILE" ] ; do
   FILE="$( cd -P "$(dirname "$FILE")" && \
            cd -P "$(dirname "$SRC")" && pwd )/$(basename "$SRC")"
 done
-BX="$( cd -P "$(dirname "$FILE")/.." && pwd )"
+MAIN="$( cd -P "$(dirname "$FILE")/.." && pwd )"
 
 # Core and library classes
-CP="$BX/target/classes$(printf ":%s" "$BX/lib/"*.jar)"
+CP=$MAIN/target/classes:$MAIN/lib/*:$CLASSPATH
 
 # Run code
 java -cp "$CP" $BASEX_JVM org.basex.BaseXClient "$@"
