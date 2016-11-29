@@ -7,14 +7,14 @@ while [ -h "$FILE" ] ; do
   FILE="$( cd -P "$(dirname "$FILE")" && \
            cd -P "$(dirname "$SRC")" && pwd )/$(basename "$SRC")"
 done
-BX="$( cd -P "$(dirname "$FILE")/.." && pwd )"
-BXCORE="$( cd -P "$BX/../basex-core" && pwd )"
+MAIN="$( cd -P "$(dirname "$FILE")/.." && pwd )"
+CORE="$( cd -P "$MAIN/../basex-core" && pwd )"
 
 # API, core, and library classes
-CP="$BX/target/classes$(printf ":%s" "$BX/lib/"*.jar "$BXCORE/lib/"*.jar):$CLASSPATH"
+CP=$MAIN/target/classes:$MAIN/lib/*:$CORE/lib/*:$CLASSPATH
 
 # Options for virtual machine (can be extended by global options)
-BASEX_JVM="-Xmx512m $BASEX_JVM"
+BASEX_JVM="-Xmx2g $BASEX_JVM"
 
 # Run code
 java -cp "$CP" $BASEX_JVM org.basex.BaseXHTTP "$@"
