@@ -1103,11 +1103,11 @@ public enum Function {
   /* Process Module. */
 
   /** XQuery function. */
-  _PROC_SYSTEM(ProcSystem.class, "system(command[,args[,encoding]])",
-      arg(STR, STR_ZM, STR), STR, flag(NDT), PROC_URI),
+  _PROC_SYSTEM(ProcSystem.class, "system(command[,args[,options]])",
+      arg(STR, STR_ZM, AAT), STR, flag(NDT), PROC_URI),
   /** XQuery function. */
-  _PROC_EXECUTE(ProcExecute.class, "execute(command[,args[,encoding]]])",
-      arg(STR, STR_ZM, STR), ELM, flag(NDT), PROC_URI),
+  _PROC_EXECUTE(ProcExecute.class, "execute(command[,args[,options]])",
+      arg(STR, STR_ZM, AAT), ELM, flag(NDT), PROC_URI),
   /** XQuery function. */
   _PROC_PROPERTY_NAMES(ProcPropertyNames.class, "property-names()",
       arg(), STR_ZO, flag(NDT), PROC_URI),

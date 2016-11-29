@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.charset.*;
 
+import org.basex.core.jobs.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -40,18 +41,34 @@ abstract class ProcFn extends StandardFunc {
     final String[] args = tl.toStringArray();
 
     // encoding
-    final String c = exprs.length > 2 ? string(toToken(exprs[2], qc)) : Prop.ENCODING;
+    final ProcOptions opts = new ProcOptions();
+    if(exprs.length > 2) {
+      // backward compatibility...
+      final Item item = exprs[2].item(qc, info);
+      if(item != null && item.type.isStringOrUntyped()) {
+        opts.set(ProcOptions.ENCODING, string(toEmptyToken(exprs[2], qc)));
+      } else {
+        toOptions(2, opts, qc);
+      }
+    }
+    final String encoding = opts.get(ProcOptions.ENCODING);
     final Charset cs;
     try {
-      cs = Charset.forName(c);
+      cs = Charset.forName(encoding);
     } catch(final Exception ex) {
-      throw BXPR_ENC_X.get(info, c);
+      throw BXPR_ENC_X.get(info, encoding);
     }
+
+    // options
+    final long sec = opts.get(ProcOptions.TIMEOUT);
 
     final Result result = new Result();
     final Process proc;
     try {
-      proc = new ProcessBuilder(args).start();
+      final ProcessBuilder pb = new ProcessBuilder(args);
+      final String dir = opts.get(ProcOptions.DIR);
+      if(dir != null) pb.directory(toPath(token(dir)).toFile());
+      proc = pb.start();
     } catch(final IOException ex) {
       try {
         result.error.write(token(Util.message(ex)));
@@ -60,21 +77,44 @@ abstract class ProcFn extends StandardFunc {
       return result;
     }
 
+    final Thread outt = reader(proc.getInputStream(), result.output, cs);
+    final Thread errt = reader(proc.getErrorStream(), result.error, cs);
+    outt.start();
+    errt.start();
+
+    final Thread thread = new Thread() {
+      @Override
+      public void run() {
+        try {
+          proc.waitFor();
+          outt.join();
+          errt.join();
+        } catch(final InterruptedException ex) {
+          try {
+            result.error.write(token(Util.message(ex)));
+          } catch(final IOException ignored) { }
+        }
+      }
+    };
+    thread.start();
+
+    final Performance perf = new Performance();
     try {
-      final Thread outt = reader(proc.getInputStream(), result.output, cs);
-      final Thread errt = reader(proc.getErrorStream(), result.error, cs);
-      outt.start();
-      errt.start();
-      proc.waitFor();
-      outt.join();
-      errt.join();
-    } catch(final InterruptedException ex) {
-      try {
-        result.error.write(token(Util.message(ex)));
-      } catch(final IOException ignored) { }
+      while(thread.isAlive()) {
+        qc.checkStop();
+        if(sec > 0 && (System.nanoTime() - perf.start()) / 1000000000 >= sec) {
+          thread.interrupt();
+          throw BXPR_TIMEOUT.get(info);
+        }
+        Performance.sleep(10);
+      }
+      result.code = proc.exitValue();
+      return result;
+    } catch(final JobException ex) {
+      Util.debug(ex);
+      thread.interrupt();
+      throw ex;
     }
-    result.code = proc.exitValue();
-    return result;
   }
 
   /**

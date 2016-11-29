@@ -199,6 +199,8 @@ public enum QueryError {
 
   // Process Module
 
+  /** BXPR9998. */
+  BXPR_TIMEOUT(BXPR, 9998, "The timeout was exceeded."),
   /** BXPR9999. */
   BXPR_ENC_X(BXPR, 9999, "Unknown encoding '%'."),
 

@@ -48,7 +48,7 @@ public abstract class Job {
     state(JobState.RUNNING);
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
-    if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
+    if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT));
   }
 
   /**
@@ -179,15 +179,15 @@ public abstract class Job {
 
   /**
    * Starts a timeout thread.
-   * @param ms milliseconds to wait; deactivated if set to 0
+   * @param sec seconds wait; deactivated if set to 0
    */
-  private void startTimeout(final long ms) {
-    if(ms == 0) return;
+  private void startTimeout(final long sec) {
+    if(sec == 0) return;
     timer = new Timer(true);
     timer.schedule(new TimerTask() {
       @Override
       public void run() { timeout(); }
-    }, ms);
+    }, sec * 1000L);
   }
 
   /**
