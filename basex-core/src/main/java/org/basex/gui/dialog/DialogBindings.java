@@ -16,42 +16,37 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 public final class DialogBindings extends BaseXDialog {
-  /** Dialog. */
-  private static Dialog dialog;
-
-  /** Variables. */
-  private final BaseXTextField[] context = new BaseXTextField[16];
+  /** Maximum number of supported bindings. */
+  private static final int MAX = 8;
+  /** Names. */
+  private final BaseXTextField[] names = new BaseXTextField[MAX];
+  /** Values. */
+  private final BaseXTextField[] values = new BaseXTextField[MAX];
 
   /**
    * Default constructor.
    * @param main reference to the main window
    */
-  private DialogBindings(final GUI main) {
-    super(main, EXTERNAL_VARIABLES, false);
+  public DialogBindings(final GUI main) {
+    super(main, EXTERNAL_VARIABLES);
 
-    final int cl = context.length;
-    for(int c = 0; c < cl; c++) {
-      context[c] = new BaseXTextField(this);
-      BaseXLayout.setWidth(context[c], c % 2 == 0 ? 80 : 200);
-    }
-
-    final BaseXBack table = new BaseXBack(new TableLayout((2 + cl) / 2, 2, 8, 4));
+    final BaseXBack table = new BaseXBack(new TableLayout(MAX + 1, 2, 8, 4));
     table.add(new BaseXLabel(NAME + COLS, false, true));
     table.add(new BaseXLabel(VALUE + COLS, false, true));
-    for(final BaseXTextField ctx : context) table.add(ctx);
+    for(int c = 0; c < MAX; c++) {
+      names[c] = new BaseXTextField(this);
+      BaseXLayout.setWidth(names[c], 80);
+      table.add(names[c]);
+      values[c] = new BaseXTextField(this);
+      BaseXLayout.setWidth(values[c], 200);
+      table.add(values[c]);
+    }
     set(table, BorderLayout.CENTER);
+    set(okCancel(), BorderLayout.SOUTH);
 
     fill();
+    ok = true;
     finish();
-  }
-
-  /**
-   * Activates the dialog window.
-   * @param main reference to the main window
-   */
-  public static void show(final GUI main) {
-    if(dialog == null) dialog = new DialogBindings(main);
-    dialog.setVisible(true);
   }
 
   /**
@@ -59,27 +54,44 @@ public final class DialogBindings extends BaseXDialog {
    */
   private void fill() {
     final MainOptions opts = gui.context.options;
-    final int cl = context.length;
     int c = 0;
+    boolean empty = false;
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
-      context[c++].setText('$' + entry.getKey());
-      context[c++].setText(entry.getValue());
-      if(c == cl) break;
+      String name = entry.getKey();
+      if(name.isEmpty()) {
+        empty = true;
+        name = ".";
+      } else {
+        name = '$' + name;
+      }
+      names[c].setText(name);
+      values[c].setText(entry.getValue());
+      if(++c == MAX) break;
     }
-    for(; c < cl; c += 2) context[c].setText("$");
+    for(; c < MAX; c++) {
+      names[c].setText(empty || c < MAX - 1 ? "$" : ".");
+      values[c].setText("");
+    }
   }
 
   @Override
-  public void action(final Object cmp) {
+  public void close() {
+    if(!ok) return;
+
+    super.close();
     final StringBuilder bind = new StringBuilder();
-    final int cl = context.length;
-    for(int c = 0; c < cl; c += 2) {
-      final String key = context[c].getText().replaceAll("^\\$", "");
-      if(key.isEmpty()) continue;
+    for(int c = 0; c < MAX; c++) {
+      String name = names[c].getText().trim();
+      if(name.isEmpty() || name.equals("$")) continue;
+      if(name.startsWith("$")) {
+        name = name.substring(1);
+      } else if(name.equals(".")) {
+        name = "";
+      }
+      String value = values[c].getText();
       if(bind.length() != 0) bind.append(',');
-      bind.append(key.replaceAll(",", ",,")).append('=');
-      bind.append(context[c + 1].getText().replaceAll(",", ",,"));
+      bind.append((name + '=' + value).replaceAll(",", ",,"));
     }
-    gui.context.options.set(MainOptions.BINDINGS, bind.toString());
+    gui.set(MainOptions.BINDINGS, bind.toString());
   }
 }

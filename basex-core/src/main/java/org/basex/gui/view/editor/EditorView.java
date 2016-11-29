@@ -251,7 +251,7 @@ public final class EditorView extends View {
     vars.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        DialogBindings.show(gui);
+        new DialogBindings(gui);
       }
     });
     test.addActionListener(new ActionListener() {
