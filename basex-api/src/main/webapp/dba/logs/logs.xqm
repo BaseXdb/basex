@@ -102,7 +102,7 @@ declare
   %rest:path("/dba/log")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("loglist", "{$loglist}")
-  %rest:query-param("sort",    "{$sort}", "time")
+  %rest:query-param("sort",    "{$sort}", "")
   %rest:query-param("page",    "{$page}", 1)
   %output:method("html")
   %output:indent("no")
@@ -137,7 +137,7 @@ function dba:log(
   )
   return html:table($headers, $rows, (),
     map { 'name': $name, 'loglist': $loglist, 'logs': $query },
-    map { 'sort': $sort, 'page': $page }
+    map { 'sort': head(($sort[.], 'time')), 'page': $page }
   )
 };
 
