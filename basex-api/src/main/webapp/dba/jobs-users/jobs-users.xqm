@@ -47,7 +47,7 @@ function dba:jobs-users(
   } catch * {
     element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
-  let $error := ($data/self::error/string(), $error)[1]
+  let $error := head(($data/self::error/string(), $error))
 
   return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -78,7 +78,7 @@ function dba:jobs-users(
           let $buttons := (
             html:button('stop-job', 'Stop', true())
           )
-          return html:table($headers, $rows, $buttons, map {}, $sort, (), ())
+          return html:table($headers, $rows, $buttons, map {}, map { 'sort': $sort })
         }
         </form>
         <form action="{ $dba:CAT }" method="post" class="update">
@@ -114,7 +114,7 @@ function dba:jobs-users(
           let $buttons := (
             html:button('kill-session', 'Kill', true())
           )
-          return html:table($headers, $rows, $buttons, map {}, (), (), ())
+          return html:table($headers, $rows, $buttons, map {}, map {})
         }
         </form>
         <h2>Database Clients</h2>
@@ -126,7 +126,7 @@ function dba:jobs-users(
             <address>Address</address>,
             <user>User</user>
           )
-          return html:table($headers, $rows, (), map {}, (), (), ())
+          return html:table($headers, $rows, (), map {}, map {})
         }
       </td>
       <td class='vertical'/>
@@ -149,7 +149,7 @@ function dba:jobs-users(
             html:button('drop-user', 'Drop', true())
           )
           let $link := function($value) { 'user' }
-          return html:table($headers, $rows, $buttons, map {}, (), $link, ())
+          return html:table($headers, $rows, $buttons, map {}, map { 'link': $link })
         }
         </form>
         <div>&#xa0;</div>

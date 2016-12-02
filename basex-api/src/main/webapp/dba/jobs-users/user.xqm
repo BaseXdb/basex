@@ -52,7 +52,7 @@ function dba:user(
   } catch * {
     element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
-  let $error := ($data/self::error/string(), $error)[1]
+  let $error := head(($data/self::error/string(), $error))
   let $found := exists($data/user)
   let $admin := $name eq 'admin'
 
@@ -63,10 +63,11 @@ function dba:user(
           <!--  force chrome not to autocomplete form -->
           <input style="display:none" type="text" name="fake1"/>
           <input style="display:none" type="password" name="fake2"/>
-          <h2>
-            <a href="{ $dba:CAT }">Users</a> » { $name } »
-            { html:button('save', 'Save') }
-          </h2>
+          <h2>{
+            html:link('Users', $dba:CAT), ' » ',
+            $name, ' » ',
+            html:button('save', 'Save')
+          }</h2>
           <input type="hidden" name="name" value="{ $name }"/>
           <table>{
             let $admin := $name eq 'admin' return (
@@ -75,7 +76,7 @@ function dba:user(
                   <td>Name:</td>
                   <td>
                     <input type="text" name="newname"
-                      value="{ ($newname, $name)[1] }" id="newname"/>
+                      value="{ head(($newname, $name)) }" id="newname"/>
                     { html:focus('newname') }
                     <div class='small'/>
                   </td>
@@ -96,7 +97,7 @@ function dba:user(
                   <td>Permission:</td>
                   <td>
                     <select name="perm" size="5">{
-                      let $perm := ($perm, $data/user/@permission)[1]
+                      let $perm := head(($perm, $data/user/@permission))
                       for $p in $cons:PERMISSIONS
                       return element option { attribute selected { }[$p = $perm], $p }
                     }</select>
@@ -127,15 +128,15 @@ function dba:user(
                   html:button('add-pattern', 'Add…'),
                   html:button('drop-pattern', 'Drop', true())
                 )
-                return html:table($headers, $rows, $buttons, map {}, (), (), ())
+                return html:table($headers, $rows, $buttons, map {}, map {})
               )
             }
           </form>
           <div class='note'>
             A global permission can be overwritten by a local permission.<br/>
             Local permissions are applied to those databases that match<br/>
-            a specified pattern. The pattern uses the
-            <a target='_blank' href='http://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.<br/>
+            a specified pattern. The pattern uses the <a target='_blank'
+              href='http://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.<br/>
           </div>
         </_>/node()
       }</td>

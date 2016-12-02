@@ -41,12 +41,12 @@ function dba:replace(
         <form action="replace" method="post" enctype="multipart/form-data">
           <input type="hidden" name="name" value="{ $name }"/>
           <input type="hidden" name="resource" value="{ $resource }"/>
-          <h2>
-            <a href="{ $dba:CAT }">Databases</a> »
-            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
-            { html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }) } »
-            { html:button('replace', 'Replace') }
-          </h2>
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }), ' » ',
+            html:button('replace', 'Replace')
+          }</h2>
           <table>
             <tr>
               <td>

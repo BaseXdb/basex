@@ -41,11 +41,11 @@ function dba:create(
     <tr>
       <td>
         <form action="add-pattern" method="post" autocomplete="off">
-          <h2>
-            <a href="{ $dba:CAT }">Users</a> »
-            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
-            { html:button('create', 'Add Pattern') }
-          </h2>
+          <h2>{
+            html:link('Users', $dba:CAT), ' » ',
+            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:button('create', 'Add Pattern')
+          }</h2>
           <input type="hidden" name="name" value="{ $name }"/>
           <table>
             <tr>
@@ -53,7 +53,8 @@ function dba:create(
               <td>
                 <input type="text" name="pattern" value="{ $pattern }" id="pattern"/>
                 { html:focus('pattern') } &#xa0;
-                <span class='note'>…support for <a target='_blank' href='http://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.</span>
+                <span class='note'>…support for <a target='_blank'
+                  href='http://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.</span>
                 <div class='small'/>
               </td>
             </tr>

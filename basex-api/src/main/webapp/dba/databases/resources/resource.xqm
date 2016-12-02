@@ -30,10 +30,5 @@ function dba:resource(
   $resource  as xs:string*
 ) {
   cons:check(),
-  if($action = ('rename', 'replace')) then (
-    web:redirect($action, map { 'name': $name, 'resource': $resource })
-  ) else (
-    (: download :)
-    web:redirect($action || '/' || file:name($resource), map { 'name': $name, 'resource': $resource})
-  )
+  web:redirect($action, map { 'name': $name, 'resource': $resource })
 };

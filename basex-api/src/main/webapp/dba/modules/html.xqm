@@ -147,7 +147,7 @@ declare function html:properties(
 };
 
 (:~
- : Creates a sorted table for the specified entries:
+ : Creates a table for the specified entries.
  : * The table format is specified by the table headers:
  :   * The element names serve as column keys.
  :   * The string values are the header labels.
@@ -166,17 +166,17 @@ declare function html:properties(
  :   names represents the column key.
  : * Supplied buttons will placed on top of the table.
  : * Query parameters will be included in table links.
- : * The optional sort argument contains the key of the ordered column.
- : * The optional link argument contains a function for generating a link reference.
- : * The optional page argument indicates which result page is currently displayed
+ : * The options argument can have the following keys:
+ :   * 'sort': argument contains the key of the ordered column.
+ :   * 'link': argument contains a function for generating a link reference.
+ :   * 'page': currently displayed page
+ :   * 'count': maximum number of results (if not set, )
  :
  : @param  $entries  table entries: values are represented via attributes
  : @param  $headers  table headers:
  : @param  $buttons  buttons
  : @param  $param    additional query parameters
- : @param  $sort     sort key
- : @param  $link     function for generating link reference
- : @param  $page     current page
+ : @param  $options  additional options
  : @return table
  :)
 declare function html:table(
@@ -184,16 +184,18 @@ declare function html:table(
   $rows     as element(row)*,
   $buttons  as element(button)*,
   $param    as map(*),
-  $sort     as xs:string?,
-  $link     as function(*)?,
-  $page     as xs:integer?
+  $options  as map(*)
 ) as element()+ {
   if($buttons) then ($buttons, <br/>, <div class='small'/>) else (),
 
-  let $sort := if($sort = '') then $headers[1]/name() else $sort
-  let $all-entries := if(empty($sort)) then $rows else (
-    let $sort := if($sort) then $sort else $headers[1]/name()
-    let $header := $headers[name() eq $sort]
+  let $sort := $options?sort
+  let $page := $options?page
+  let $link := $options?link
+  let $count := if($sort) then () else $options?count
+
+  let $sort-key := head(($sort[.], $headers[1]/name()))
+  let $all-entries := if(not($sort)) then $rows else (
+    let $header := $headers[name() eq $sort-key]
     let $desc := $header/@order = 'desc'
     let $order :=
       if($header/@type = $html:NUMBER) then (
@@ -216,89 +218,90 @@ declare function html:table(
         function($a) { $a }
       )
     return
-      for $entry in $rows
-      order by string($entry/@*[name() = $sort])[.] ! $order(.)
+      for $row in $rows
+      order by string($row/@*[name() = $sort-key])[.] ! $order(.)
         empty greatest collation '?lang=en'
-      return $entry
+      return $row
   )
-  let $max := $cons:OPTION($cons:K-MAX-ROWS)
-  let $start := if($page) then (($page - 1) * $max) + 1 else 1
-  let $entries := $all-entries[position() >= $start][position() <= $max + 1]
 
-  let $last-page := count($entries) <= $max
+  let $max := $cons:OPTION($cons:K-MAXROWS)
+  let $start := head((($page - 1) * $max + 1, 1))
+
+  let $entries := if($count) then (
+    $all-entries
+  ) else (
+    $all-entries[position() >= $start][position() <= $max + 1]
+  )
+  let $count := head(($count, count($all-entries)))
+
+  let $last-page := $count < $start + $max
   let $single-page := not($page) or ($page = 1 and $last-page)
-  let $count := count($rows)
   return (
     element h4 {
-      'Results: ',
       if($single-page) then () else
         $start || '-' || min(($count, $start + $max - 1)) || ' of ',
-      $count,
+      $count || ' Entries',
       if($single-page) then () else (
-        '   ',
-        let $arrow := '«'
-        return if($page = 1) then ' ' || $arrow || ' ' else
-          html:link($arrow, "", map:merge(($param, map { 'page': $page - 1, 'sort': $sort }))),
+        ' &#xa0; ',
+        let $first := '«', $prev := '‹'
+        return if($page = 1) then ($first, $prev) else (
+          html:link($first, "", ($param, map { 'page': 1, 'sort': $sort })), ' ',
+          html:link($prev, "", ($param, map { 'page': $page - 1, 'sort': $sort }))
+        ),
         ' ',
-        let $arrow := '»'
-        return if($last-page) then ' ' || $arrow || ' ' else
-          html:link($arrow, "", map:merge(($param, map { 'page': $page + 1, 'sort': $sort })))
+        let $last := '»', $next := '›'
+        return if($last-page) then ($next, $last) else (
+          html:link($next, "", ($param, map { 'page': $page + 1, 'sort': $sort })), ' ',
+          html:link($last, "", ($param, map { 'page': ($count - 1) idiv $max + 1, 'sort': $sort }))
+        )
       )
     },
     if(empty($rows)) then () else (
       element table {
         element tr {
-          for $header in $headers
+          for $header at $pos in $headers
           let $name := $header/name()
           let $value := upper-case($header/text())
           return element th {
             attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
-            if(empty($sort) or $name = $sort) then (
+            if(empty($sort) or $name = $sort-key) then (
               $value
             ) else (
-              html:link($value, "", map:merge(($param, map { 'sort': $name })))
+              html:link($value, "", ($param,
+                map { 'sort': if($pos = 1) then '' else $name, 'page': $page })
+              )
             )
           }
         },
   
-        for $entry at $c in $entries
-        return if($c <= $max) then (
-          element tr {
-            for $header at $pos in $headers
-            let $name := $header/name()
-            let $type := $header/@type
-            let $col := $entry/@*[name() = $name]
-            let $value := $col/string()[.] ! (
-              if($header/@type = 'bytes') then (
-                try { prof:human(xs:integer(.)) } catch * { . }
-              ) else if($header/@type = 'decimal') then (
-                try { format-number(number(.), '0.00') } catch * { . }
-              ) else if($header/@type = 'dateTime') then (
-                html:date(xs:dateTime(.))
-              )
-              else .
+        for $entry in $entries[position() <= $max]
+        return element tr {
+          for $header at $pos in $headers
+          let $name := $header/name()
+          let $type := $header/@type
+          let $col := $entry/@*[name() = $name]
+          let $value := $col/string()[.] ! (
+            if($header/@type = 'bytes') then (
+              try { prof:human(xs:integer(.)) } catch * { . }
+            ) else if($header/@type = 'decimal') then (
+              try { format-number(number(.), '0.00') } catch * { . }
+            ) else if($header/@type = 'dateTime') then (
+              html:date(xs:dateTime(.))
             )
-  
-            return element td {
-              attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
-              if($pos = 1 and $buttons) then (
-                <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>
-              ) else (),
-              if($pos = 1 and exists($link)) then (
-                html:link($value, $link($value), map:merge(($param, map { $name: $value })))
-              ) else if($header/@type = 'id') then () else (
-                $value
-              )
-            }
+            else .
+          )
+          return element td {
+            attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
+            if($pos = 1 and $buttons) then (
+              <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>
+            ) else (),
+            if($pos = 1 and exists($link)) then (
+              html:link($value, $link($value), ($param, map { $name: $value }))
+            ) else if($header/@type = 'id') then () else (
+              $value
+            )
           }
-        ) else if($c = $max + 1) then (
-          element tr {
-            element td {
-              if($buttons) then <input type="checkbox" disabled=""/> else (),
-              '…'
-            }
-          }
-        ) else ()
+        }
       }
     )
   )
@@ -334,15 +337,15 @@ declare function html:link(
  : Creates a link to the specified target.
  : @param  $text    link text
  : @param  $href    link reference
- : @param  $params  map with query parameters
+ : @param  $params  maps with query parameters.
  : @return link
  :)
 declare function html:link(
   $text    as xs:string,
   $href    as xs:string,
-  $params  as map(*)
+  $params  as map(*)*
 ) as element(a) {
-  html:link($text, web:create-url($href, $params))
+  html:link($text, web:create-url($href, map:merge($params)))
 };
 
 (:~

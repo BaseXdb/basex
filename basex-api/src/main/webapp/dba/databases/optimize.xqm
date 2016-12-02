@@ -47,7 +47,7 @@ function dba:create(
   } catch * {
     element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
-  let $error := ($data/self::error/string(), $error)[1]
+  let $error := head(($data/self::error/string(), $error))
   let $opts := if($opts = 'x') then $opts else $data//*[text() = 'true']/name()
   let $lang := if($opts = 'x') then $lang else 'en'
 
@@ -55,12 +55,12 @@ function dba:create(
     <tr>
       <td>
         <form action="optimize" method="post">
-          <h2>
-            <a href="{ $dba:CAT }">Databases</a> »
-            { html:link($name, 'database', map { 'name': $name }) } »
-            { html:button('optimize', 'Optimize') }
-          </h2>
-          <!-- dummy value; prevents reset of options when nothing is selected -->
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            html:link($name, 'database', map { 'name': $name }), ' » ',
+            html:button('optimize', 'Optimize')
+          }</h2>
+          <!-- dummy value; prevents reset of options if nothing is selected -->
           <input type="hidden" name="opts" value="x"/>
           <input type="hidden" name="name" value="{ $name }"/>
           <table>

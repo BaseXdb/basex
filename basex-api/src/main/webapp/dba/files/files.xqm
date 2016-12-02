@@ -55,7 +55,7 @@ function dba:files(
           )
           let $buttons := html:button('delete-files', 'Delete', true())
           let $link := function($value) { 'file/' || $value }
-          return html:table($headers, $rows, $buttons, map {}, $sort, $link, ())
+          return html:table($headers, $rows, $buttons, map {}, map { 'sort': $sort, 'link': $link })
         }
         </form>
         <h3>Upload Files</h3>

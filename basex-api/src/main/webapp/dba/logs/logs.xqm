@@ -18,7 +18,7 @@ declare variable $dba:CAT := 'logs';
  : @param  $sort     table sort key
  : @param  $name     name (date) of log file
  : @param  $loglist  search term for log list
- : @param  $logs     search term for logs
+ : @param  $logs     search term for log entries
  : @param  $error    error string
  : @param  $info     info string
  : @param  $page     current page
@@ -52,11 +52,11 @@ function dba:logs(
     <tr>
       <td width='230'>
         <form action="javascript:void(0);">
-          <h2>{ if($name) then <a href="{ $dba:CAT }">Logs</a> else 'Logs' }:
+          <h2>{
+            if($name) then html:link('Logs:', $dba:CAT) else 'Logs:', ' ',
             <input size="14" name="loglist" id="loglist" value="{ $loglist }"
-                   placeholder="regular expression"
-                   onkeyup="logList();"/>
-          </h2>
+                   placeholder="regular expression" onkeyup="logList();"/>
+          }</h2>
         </form>
         <form action="{ $dba:CAT }" method="post" class="update" autocomplete="off">
           <input type='hidden' name='name' id='name' value='{ $name }'/>
@@ -68,12 +68,17 @@ function dba:logs(
       <td class='vertical'/>
       <td>{
         if($name) then (
-          <h3>
-            { $name }:
-            <input size="40" id="logs" value="{ ($loglist, $logs)[1] }"
-              placeholder="regular expression"
-              onkeyup="logEntries();"/>
-          </h3>,
+          <form action="download-logs" method="post" id="resources">
+            <h3>
+              { $name }:&#xa0;
+              <input type="hidden" name="name" value="{ $name }"/>
+              <input type="hidden" name="loglist" value="{ $loglist }"/>
+              <input size="40" id="logs" name="logs" value="{ head(($loglist, $logs)) }"
+                placeholder="regular expression"
+                onkeyup="logEntries();"/>
+              { html:button('download', 'Download') }
+            </h3>
+          </form>,
           <div id='output'/>,
           <script type="text/javascript">(function(){{ logEntries(); }})();</script>
         ) else (),
@@ -84,11 +89,11 @@ function dba:logs(
 };
 
 (:~
- : Returns log entries of a specific log file.
- : @param  $query    query
+ : Returns entries of a specific log file.
+ : @param  $query    search term
  : @param  $names    name of selected log files
  : @param  $sort     table sort key
- : @param  $loglist  loglist
+ : @param  $loglist  search term for log list
  : @param  $page     current page
  : @return html elements
  :)
@@ -96,24 +101,24 @@ declare
   %rest:POST("{$query}")
   %rest:path("/dba/log")
   %rest:query-param("name",    "{$name}")
-  %rest:query-param("sort",    "{$sort}")
   %rest:query-param("loglist", "{$loglist}")
+  %rest:query-param("sort",    "{$sort}", "")
   %rest:query-param("page",    "{$page}", 1)
   %output:method("html")
   %output:indent("no")
   %rest:single
 function dba:log(
   $name     as xs:string,
-  $sort     as xs:string?,
   $query    as xs:string?,
   $loglist  as xs:string?,
+  $sort     as xs:string,
   $page     as xs:integer
 ) as element()* {
   cons:check(),
 
   let $logs := try {
-    util:eval("admin:logs($n, true())[matches(., $q, 'i')]",
-      map { 'n': $name, 'q': $query }
+    util:eval("admin:logs($name, true())[matches(., $query, 'i')]",
+      map { 'name': $name, 'query': $query }
     )
   } catch * { () }
 
@@ -121,29 +126,31 @@ function dba:log(
   let $rows :=
     for $log in $logs
     return <row time='{ $log/@time }' address='{ $log/@address }' user='{ $log/@user}'
-                type='{ $log/@type }' ms='{ $log/@ms }' value='{ $log }'/>
+                type='{ $log/@type }' ms='{ $log/@ms }' message='{ $log }'/>
   let $headers := (
     <time type='time' order='desc'>Time</time>,
     <address>Address</address>,
     <user>User</user>,
     <type>Type</type>,
     <ms type='decimal' order='desc'>ms</ms>,
-    <value>Value</value>
+    <message>Message</message>
   )
-  return html:table($headers, $rows, (), map { 'name': $name, 'loglist': $loglist, 'logs': $query },
-    $sort, (), $page)
+  return html:table($headers, $rows, (),
+    map { 'name': $name, 'loglist': $loglist, 'logs': $query },
+    map { 'sort': $sort, 'page': $page }
+  )
 };
 
 (:~
- : Returns log data.
+ : Returns log files matching the specified query.
  : @param  $sort   table sort key
- : @param  $query  query
+ : @param  $query  search term
  : @return html elements
  :)
 declare
   %rest:POST("{$query}")
   %rest:path("/dba/loglist")
-  %rest:query-param("sort",  "{$sort}")
+  %rest:query-param("sort", "{$sort}")
   %output:method("html")
   %rest:single
 function dba:loglist(
@@ -153,11 +160,11 @@ function dba:loglist(
   cons:check(),
 
   let $logs := try {
-    util:eval("for $a in admin:logs()
-      let $n := $a/(@date,text())/string()
-      where not($query) or (some $a in admin:logs($n) satisfies matches($a, $query, 'i'))
-      order by $n descending
-      return $a", map { 'query': $query }
+    util:eval("for $log in admin:logs()
+      let $date := $log/(@date,text())/string()
+      where not($query) or (some $entry in admin:logs($date) satisfies matches($entry, $query, 'i'))
+      order by $date descending
+      return $log", map { 'query': $query }
     )
   } catch * { () }
   where $logs
@@ -173,14 +180,14 @@ function dba:loglist(
   )
   let $buttons := html:button('delete-logs', 'Delete', true())
   let $link := function($value) { $dba:CAT }
-  return html:table($headers, $rows, $buttons,
-    map { 'sort': $sort, 'loglist': $query }, (), $link, ())
+  return html:table($headers, $rows, $buttons, map { 'sort': $sort, 'loglist': $query },
+    map { 'link': $link })
 };
 
 (:~
  : Redirects to the specified action.
  : @param  $action  action to perform
- : @param  $names   names of selected databases
+ : @param  $names   names of selected log files
  :)
 declare
   %rest:POST

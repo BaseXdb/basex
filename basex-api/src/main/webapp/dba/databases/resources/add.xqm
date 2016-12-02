@@ -47,11 +47,11 @@ function dba:add(
     <tr>
       <td>
         <form action="add" method="post" enctype="multipart/form-data" autocomplete="off">
-          <h2>
-            <a href="{ $dba:CAT }">Databases</a> »
-              { html:link($name, $dba:SUB, map { 'name': $name }) } »
-              { html:button('add', 'Add') }
-          </h2>
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:button('add', 'Add')
+          }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
           <input type="hidden" name="opts" value="x"/>
           <input type="hidden" name="name" value="{ $name }"/>

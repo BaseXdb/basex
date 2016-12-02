@@ -40,17 +40,17 @@ function dba:copy(
       <td>
         <form action="copy" method="post" autocomplete="off">
           <input type="hidden" name="name" value="{ $name }"/>
-          <h2>
-            <a href="{ $dba:CAT }">Databases</a> »
-            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
-            { html:button('copy', 'Copy') }
-          </h2>
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:button('copy', 'Copy')
+          }</h2>
           <table>
             <tr>
               <td>New name:</td>
               <td>
                 <input type="text" name="newname"
-                  value="{ ($newname, $name)[1] }" id="newname"/>
+                  value="{ head(($newname, $name)) }" id="newname"/>
                 { html:focus('newname') }
                 <div class='small'/>
               </td>

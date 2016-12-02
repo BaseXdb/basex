@@ -1,3 +1,4 @@
+
 (:~
  : Global constants and functions.
  :
@@ -26,9 +27,9 @@ declare variable $cons:DBA-SETTINGS-FILE := $cons:DBA-DIR || 'dba-settings.xml';
 declare variable $cons:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
 
 (:~ Maximum length of XML characters. :)
-declare variable $cons:K-MAX-CHARS := 'maxchars';
+declare variable $cons:K-MAXCHARS := 'maxchars';
 (:~ Maximum number of table entries. :)
-declare variable $cons:K-MAX-ROWS := 'maxrows';
+declare variable $cons:K-MAXROWS := 'maxrows';
 (:~ Query timeout. :)
 declare variable $cons:K-TIMEOUT := 'timeout';
 (:~ Maximal memory consumption. :)
@@ -40,7 +41,7 @@ declare variable $cons:K-PERMISSION := 'permission';
 declare variable $cons:OPTION :=
   let $defaults := map {
     'maxchars': 100000,
-    'maxrows': 1000,
+    'maxrows': 100,
     'timeout': 10,
     'memory': 500,
     'permission': 'admin'

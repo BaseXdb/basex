@@ -75,11 +75,14 @@ function query(key, query, enforce, target) {
   )
 };
 
-// Jetty and Tomcat support (both return error messages differently)
 function setErrorFromResponse(req) {
+  // normalize error message
   var msg = req.statusText.match(/\[\w+\]/g) ? req.statusText : req.responseText;
-  var s = msg.indexOf('['), e1 = msg.indexOf('\n', s), e2 = msg.indexOf('<', s);
-  if(s > -1) msg = msg.substring(s, e1 > e2 ? e2 : e1 > s ? e1 : msg.length);
+  var s = msg.indexOf('['), e1 = msg.indexOf('\n', s);
+  if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
+  msg = msg.replace(/\s+/g, ' ');
+  if(msg.length > 100) msg = msg.substring(0, 100) + "…";
+  // display correctly escaped feedback
   var html = document.createElement('div');
   html.innerHTML = msg;
   setError(html.innerText || html.textContent);
@@ -182,6 +185,6 @@ function setDisplayHeight() {
   var c = elems[0].offsetHeight;
   var s = window.innerHeight;
   Array.prototype.forEach.call(elems,function(cm) {
-    cm.CodeMirror.setSize("100%",Math.max(200,s-(p-c)));
+    cm.CodeMirror.setSize("100%",Math.max(800,s-(p-c)));
   });
 }

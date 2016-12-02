@@ -16,23 +16,24 @@ import module namespace util = 'dba/util' at '../../modules/util.xqm';
  : @return rest response and file content
  :)
 declare
-  %rest:path("/dba/download/{$file}")
+  %rest:path("/dba/download")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
 function dba:download(
   $name      as xs:string,
-  $resource  as xs:string,
-  $file      as xs:string
+  $resource  as xs:string
 ) as item()+ {
   cons:check(),
   try {
     let $options := map { 'name': $name, 'resource': $resource }
-    let $raw := util:eval("db:is-raw($name, $resource)", $options)
-    let $ct := util:eval("db:content-type($name, $resource)", $options)
+    let $ct := util:eval("db:content-type($name, $resource), db:is-raw($name, $resource)", $options)
     return (
-      web:response-header(map { 'media-type': $ct }),
+      web:response-header(
+        map { 'media-type': $ct[1] },
+        map { 'Content-Disposition': 'attachment; filename=' || $resource }
+      ),
       util:eval(
-        if($raw) then "db:retrieve($name, $resource)" else "db:open($name, $resource)", $options
+        if($ct[2]) then "db:retrieve($name, $resource)" else "db:open($name, $resource)", $options
       )
     )
   } catch * {

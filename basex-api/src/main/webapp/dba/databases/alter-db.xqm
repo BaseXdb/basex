@@ -40,17 +40,16 @@ function dba:alter(
       <td>
         <form action="alter-db" method="post" autocomplete="off">
           <input type="hidden" name="name" value="{ $name }"/>
-          <h2>
-            <a href="{ $dba:CAT }">Databases</a> »
-            { html:link($name, $dba:SUB, map { 'name': $name } ) } »
-            { html:button('alter', 'Rename') }
-          </h2>
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:button('alter', 'Rename')
+          }</h2>
           <table>
             <tr>
               <td>Name:</td>
               <td>
-                <input type="text" name="newname"
-                  value="{ ($newname, $name)[1] }" id="newname"/>
+                <input type="text" name="newname" value="{ head(($newname, $name)) }" id="newname"/>
                 { html:focus('newname') }
                 <div class='small'/>
               </td>

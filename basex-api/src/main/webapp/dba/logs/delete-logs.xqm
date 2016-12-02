@@ -1,5 +1,5 @@
 (:~
- : Drop databases.
+ : Delete log files.
  :
  : @author Christian Grün, BaseX Team, 2014-16
  :)

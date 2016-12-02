@@ -54,7 +54,7 @@ declare function tmpl:wrap(
           attribute id { 'info' },
           $options('error')[.] ! (attribute class { 'error' }, .),
           $options('info')[.] ! (attribute class { 'info' }, .),
-          ' '
+          '&#xa0;'
         })}</span>
         return try {
           cons:check(),

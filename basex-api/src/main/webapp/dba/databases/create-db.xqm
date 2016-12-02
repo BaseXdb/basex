@@ -44,10 +44,10 @@ function dba:create(
     <tr>
       <td>
         <form action="create-db" method="post" autocomplete="off">
-          <h2>
-            <a href="{ $dba:CAT }">Databases</a> »
-            { html:button('create', 'Create') }
-          </h2>
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            html:button('create', 'Create')
+          }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
           <input type="hidden" name="opts" value="x"/>
           <table>

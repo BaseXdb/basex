@@ -31,7 +31,7 @@ declare function util:query(
   $map    as xs:string,
   $vars   as map(*)
 ) as xs:string {
-  let $limit := $cons:OPTION($cons:K-MAX-CHARS)
+  let $limit := $cons:OPTION($cons:K-MAXCHARS)
   let $query := if($query) then $query else '()'
   let $q := "xquery:eval($query, map {" || $map || "}, " || util:query-options() || ")"
   let $s := "serialize(" || $q || ", map{ 'limit': $limit*2, 'method': 'basex' })"
@@ -156,4 +156,38 @@ declare function util:to-xml-string(
     } catch * {
       error((), "Input is no well-formed XML.")
     }
+};
+
+(:~
+ : Returns the index of the first result to generate.
+ : @param  $page  current page
+ : @param  $sort  sort key
+ : @return last result
+ :)
+declare function util:start(
+  $page  as xs:integer,
+  $sort  as xs:string
+) as xs:integer {
+  if($page and not($sort)) then (
+    ($page - 1) * $cons:OPTION($cons:K-MAXROWS) + 1
+  ) else (
+    1
+  )
+};
+
+(:~
+ : Returns the index of the last result to generate.
+ : @param  $page  current page
+ : @param  $sort  sort key
+ : @return last result
+ :)
+declare function util:end(
+  $page  as xs:integer,
+  $sort  as xs:string
+) as xs:integer {
+  if($page and not($sort)) then (
+    $page * $cons:OPTION($cons:K-MAXROWS)
+  ) else (
+    999999999
+  )
 };

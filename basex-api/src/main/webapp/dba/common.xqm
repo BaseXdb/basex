@@ -51,7 +51,7 @@ function dba:any(
   tmpl:wrap(
     <tr>
       <td>
-        <h3>Page not found!</h3>
+        <h2>Page not found:</h2>
         <ul>
           <li>Page: <code>dba/{ $unknown }</code></li>
           <li>Method: <code>{ Request:method() }</code></li>
@@ -71,5 +71,5 @@ declare
 function dba:error-login(
   $path  as xs:string?
 ) {
-  web:redirect("login", map { 'path': $path })
+  web:redirect("login", map { 'path': replace($path, '.*/', '') })
 };

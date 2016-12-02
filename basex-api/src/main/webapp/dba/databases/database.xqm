@@ -29,39 +29,42 @@ declare
   %rest:path("/dba/database")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
-  %rest:query-param("error",    "{$error}")
-  %rest:query-param("info",     "{$info}")
+  %rest:query-param("sort",     "{$sort}", "")
   %rest:query-param("page",     "{$page}", 1)
+  %rest:query-param("info",     "{$info}")
+  %rest:query-param("error",    "{$error}")
   %output:method("html")
 function dba:database(
   $name      as xs:string,
   $resource  as xs:string?,
-  $error     as xs:string?,
+  $sort      as xs:string,
+  $page      as xs:integer,
   $info      as xs:string?,
-  $page      as xs:integer?
+  $error     as xs:string?
 ) as element(html) {
   cons:check(),
 
   (: request data in a single step :)
   let $data := try {
-    let $max := $cons:OPTION($cons:K-MAX-ROWS)
-    let $start := if($page) then (($page - 1) * $max) + 1 else 1
-    return util:eval('element result {
+    util:eval('element result {
       let $found := db:exists($name)
       return (
         element found { $found },
         if($found) then (
-          element databases { db:list-details($name) },
+          element databases {
+            attribute count { count(db:list($name)) },
+            db:list-details($name)[position() = $start to $end]
+          },
           element info { db:info($name) }
         ) else (),
         element backups { db:backups($name) }
       )
-    }', map { 'name': $name, 'max': $start + $max })
+    }', map { 'name': $name, 'start': util:start($page, $sort), 'end': util:end($page, $sort) })
   } catch * {
     element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
   let $found := $data/found = 'true'
-  let $error := ($data/self::error/string(), $error)[1]
+  let $error := head(($data/self::error/string(), $error))
 
   return tmpl:wrap(
     map {
@@ -73,18 +76,20 @@ function dba:database(
       <td width='49%'>
         <form action="{ $dba:SUB }" method="post" id="{ $dba:SUB }" class="update">
           <input type="hidden" name="name" value="{ $name }" id="name"/>
-          <h2><a href="{ $dba:CAT }">Databases</a> » {
-            $name ! (if(empty($resource)) then . else html:link(., $dba:SUB, map { 'name': $name } ))
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            $name ! (if(empty($resource)) then . else html:link(., $dba:SUB, map { 'name': . } ))
           }</h2>
           {
             if(not($found)) then () else (
+              let $count := xs:integer($data/databases/@count)
               let $rows :=
                 for $res in $data/databases/resource
-                return <row name='{ $res }' type='{ $res/@content-type }'
+                return <row resource='{ $res }' type='{ $res/@content-type }'
                             raw='{ if($res/@raw = 'true') then '&#x2713;' else '–' }'
                             size='{ $res/@size }'/>
               let $headers := (
-                <name>Name</name>,
+                <resource>Name</resource>,
                 <type>Content type</type>,
                 <raw>Raw</raw>,
                 <size type='number' order='desc'>Size</size>
@@ -98,7 +103,8 @@ function dba:database(
               )
               let $map := map { 'name': $name }
               let $link := function($value) { $dba:SUB }
-              return html:table($headers, $rows, $buttons, $map, (), $link, $page)
+              return html:table($headers, $rows, $buttons, $map,
+                map { 'sort': $sort, 'link': $link, 'page': $page, 'count': $count })
             )
           }
         </form>
@@ -123,7 +129,7 @@ function dba:database(
             )
             let $map := map { 'name': $name }
             let $link := function($value) { 'backup/' || $value || '.zip' }
-            return html:table($headers, $rows, $buttons, $map, (), $link, ())
+            return html:table($headers, $rows, $buttons, $map, map { 'link': $link })
           }
         </form>
       </td>
@@ -138,8 +144,9 @@ function dba:database(
             { html:button('download', 'Download') }
             { html:button('replace', 'Replace…') }
           </form>
-          <b>XQuery:</b>
+          <h4>Enter your query…</h4>
           <input style="width:100%" name="input" id="input" onkeyup='queryResource()'/>
+          <div class='small'/>
           { html:focus('input') }
           <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
           <script type="text/javascript">

@@ -36,8 +36,8 @@ function dba:settings(
               for $option in element options {
                 element { $cons:K-TIMEOUT } { '…query timeout (seconds)' },
                 element { $cons:K-MEMORY } { '…memory limit (mb) during query execution' },
-                element { $cons:K-MAX-CHARS } { '…maximum number of characters in query results' },
-                element { $cons:K-MAX-ROWS } { '…maximum number of displayed table rows' }
+                element { $cons:K-MAXCHARS } { '…maximum number of characters in query results' },
+                element { $cons:K-MAXROWS } { '…maximum number of displayed table rows' }
               }/*
               let $key := name($option)
               return <tr>
