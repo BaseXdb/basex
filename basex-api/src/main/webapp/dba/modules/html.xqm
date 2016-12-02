@@ -267,8 +267,7 @@ declare function html:table(
             if(empty($sort) or $name = $sort-key) then (
               $value
             ) else (
-              html:link($value, "", ($param,
-                map { 'sort': if($pos = 1) then '' else $name, 'page': $page })
+              html:link($value, "", ($param, map { 'sort': $name, 'page': $page })
               )
             )
           }

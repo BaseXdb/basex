@@ -50,12 +50,18 @@ declare function tmpl:wrap(
         src="static/basex.svg"/></div>
       <h1>Database Administration</h1>
       <div>{
-        let $emph := <span>{(element b {
-          attribute id { 'info' },
-          $options('error')[.] ! (attribute class { 'error' }, .),
-          $options('info')[.] ! (attribute class { 'info' }, .),
-          '&#xa0;'
-        })}</span>
+        let $emph := <span>{
+          element b {
+            attribute id { 'info' },
+            let $error := $options?error[.], $info := $options?info[.]
+            return if($error) then (
+              attribute class { 'error' }, $error
+            ) else if($info) then (
+              attribute class { 'info' }, $info
+            ) else (),
+            '&#xa0;'
+          }
+        }</span>
         return try {
           cons:check(),
           let $cats :=

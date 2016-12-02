@@ -45,12 +45,13 @@ function dba:databases(
         for $db in db:list-details()[position() = $start to $end]
         return <row name='{ $db }' resources='{ $db/@resources }' size='{ $db/@size }'
                     date='{ $db/@modified-date }'/>
+      let $regex := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$'
       let $backups :=
-        let $regex := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$'
         for $backup in db:backups()
+        where matches($backup, $regex)
         group by $name := replace($backup, $regex, '$1')
         where not($names($name))
-        let $date := replace(sort($backup), $regex, '$2T$3:$4:$5Z')
+        let $date := replace(sort($backup)[last()], $regex, '$2T$3:$4:$5Z')
         return <row name='{ $name }' resources='' size='(backup)' date='{ $date }'/>
       return element databases {
         attribute count { map:size($names) + count($backups) },
