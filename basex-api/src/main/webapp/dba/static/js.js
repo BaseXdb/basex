@@ -89,9 +89,9 @@ function setErrorFromResponse(req) {
 };
 
 var _list;
-function logList() {
+function logList(force) {
   var list = document.getElementById('loglist').value.trim();
-  if(_list == list) return false;
+  if(!force && _list == list) return false;
   _list = list;
   query('loglist', list, false, function(text) {
     document.getElementById("list").innerHTML = text;
@@ -99,9 +99,9 @@ function logList() {
 };
 
 var _logs;
-function logEntries() {
+function logEntries(force) {
   var logs = document.getElementById('logs').value.trim();
-  if(_logs == logs) return false;
+  if(!force && _logs == logs) return false;
   _logs = logs;
   query('log', logs, false, function(text) {
     document.getElementById("output").innerHTML = text;
@@ -109,9 +109,9 @@ function logEntries() {
 };
 
 var _input;
-function queryResource() {
+function queryResource(force) {
   var input = document.getElementById('input').value.trim();
-  if(_input == input) return false;
+  if(!force && _input == input) return false;
   _input = input;
   query('query-resource', input, false, function(text) {
     _outputMirror.setValue(text);

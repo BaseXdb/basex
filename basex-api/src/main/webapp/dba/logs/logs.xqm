@@ -47,6 +47,7 @@ function dba:logs(
   cons:check(),
 
   let $loglists := dba:loglist($sort, $loglist)
+  let $logs := head(($loglist, $logs)[.])
   let $error := if($loglists) then $error else $cons:DATA-ERROR
   return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -55,7 +56,7 @@ function dba:logs(
           <h2>{
             if($name) then html:link('Logs:', $dba:CAT) else 'Logs:', ' ',
             <input size="14" name="loglist" id="loglist" value="{ $loglist }"
-                   placeholder="regular expression" onkeyup="logList();"/>
+                   placeholder="regular expression" onkeyup="logList(false);"/>
           }</h2>
         </form>
         <form action="{ $dba:CAT }" method="post" class="update" autocomplete="off">
@@ -73,14 +74,14 @@ function dba:logs(
               { $name }:&#xa0;
               <input type="hidden" name="name" value="{ $name }"/>
               <input type="hidden" name="loglist" value="{ $loglist }"/>
-              <input size="40" id="logs" name="logs" value="{ head(($loglist, $logs)) }"
+              <input size="40" id="logs" name="logs" value="{ $logs }"
                 placeholder="regular expression"
-                onkeyup="logEntries();"/>
+                onkeyup="javascript:void(0);logEntries(false);"/>
               { html:button('download', 'Download') }
             </h3>
           </form>,
           <div id='output'/>,
-          <script type="text/javascript">(function(){{ logEntries(); }})();</script>
+          <script type="text/javascript">(function(){{ logEntries(true); }})();</script>
         ) else (),
         html:focus(if($name) then 'logs' else 'loglist')
       }</td>

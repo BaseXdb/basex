@@ -32,7 +32,7 @@ function dba:drop(
     )
     return (
       web:response-header(
-        map { },
+        map { 'media-type': 'text/xml' },
         map { 'Content-Disposition': 'attachment; filename=logs-' || $name ||
           (if($logs) then ('-' || web:encode-url($logs)) else ()) || '.xml'
         }

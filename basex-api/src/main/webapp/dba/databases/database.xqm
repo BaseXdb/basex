@@ -145,13 +145,13 @@ function dba:database(
             { html:button('replace', 'Replace…') }
           </form>
           <h4>Enter your query…</h4>
-          <input style="width:100%" name="input" id="input" onkeyup='queryResource()'/>
+          <input style="width:100%" name="input" id="input" onkeyup='queryResource(false)'/>
           <div class='small'/>
           { html:focus('input') }
           <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
           <script type="text/javascript">
             loadCodeMirror();
-            queryResource();
+            queryResource(true);
           </script>
         </_>/node() else (
           $data/info/*/html:properties(.)
