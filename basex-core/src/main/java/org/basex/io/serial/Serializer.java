@@ -209,22 +209,22 @@ public abstract class Serializer implements Closeable {
   /**
    * Serializes a namespace.
    * @param prefix prefix
-   * @param uri uri
+   * @param uri namespace URI
    * @param standalone standalone flag
    * @throws IOException I/O exception
    */
   protected void namespace(final byte[] prefix, final byte[] uri, final boolean standalone)
       throws IOException {
 
-    final byte[] u = nsUri(prefix);
-    if(u == null || !eq(u, uri)) {
+    final byte[] ancUri = nsUri(prefix);
+    if(ancUri == null || !eq(ancUri, uri)) {
       attribute(prefix.length == 0 ? XMLNS : concat(XMLNSC, prefix), uri, standalone);
       nspaces.add(prefix, uri);
     }
   }
 
   /**
-   * Gets the namespace URI currently bound by the given prefix.
+   * Returns the namespace URI currently bound by the given prefix.
    * @param prefix namespace prefix
    * @return URI if found, {@code null} otherwise
    */
@@ -349,20 +349,21 @@ public abstract class Serializer implements Closeable {
       return;
     }
 
-    final TokenSet nsp = data.nspaces.isEmpty() ? null : new TokenSet();
-    final IntList pars = new IntList();
-    final BoolList indt = new BoolList();
+    final boolean nsExist = !data.nspaces.isEmpty();
+    final TokenSet nsSet = nsExist ? new TokenSet() : null;
+    final IntList parentStack = new IntList();
+    final BoolList indentStack = new BoolList();
 
     // loop through all table entries
     while(pre < size && !finished()) {
       kind = data.kind(pre);
-      final int r = data.parent(pre, kind);
+      final int par = data.parent(pre, kind);
 
       // close opened elements...
-      while(!pars.isEmpty() && pars.peek() >= r) {
+      while(!parentStack.isEmpty() && parentStack.peek() >= par) {
         closeElement();
-        indent = indt.pop();
-        pars.pop();
+        indent = indentStack.pop();
+        parentStack.pop();
       }
 
       if(kind == Data.TEXT) {
@@ -373,36 +374,41 @@ public abstract class Serializer implements Closeable {
       } else if(kind == Data.PI) {
         preparePi(data.name(pre, Data.PI), data.atom(pre++));
       } else {
-        // add element node
+        // element node:
         final byte[] name = data.name(pre, kind);
-        final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
-        openElement(new QNm(name, uri));
+        byte[] nsPrefix = EMPTY, nsUri = null;
+        if(nsExist) {
+          nsPrefix = prefix(name);
+          nsUri = data.nspaces.uri(data.uriId(pre, kind));
+        }
+        // open element, serialize namespace declaration if it's new
+        openElement(new QNm(name, nsUri));
+        if(nsUri == null) nsUri = EMPTY;
+        namespace(nsPrefix, nsUri, false);
 
-        // add namespace definitions
-        if(nsp != null) {
-          // add namespaces from database
-          nsp.clear();
-          int pp = pre;
-
-          // check namespace of current element
-          namespace(prefix(name), uri == null ? EMPTY : uri, false);
-
+        // database contains namespaces: add declarations
+        if(nsExist) {
+          nsSet.add(nsUri);
+          int p = pre;
           do {
-            final Atts ns = data.namespaces(pp);
+            final Atts ns = data.namespaces(p);
             final int nl = ns.size();
             for(int n = 0; n < nl; n++) {
-              final byte[] pref = ns.name(n);
-              if(nsp.add(pref)) namespace(pref, ns.value(n), false);
+              nsPrefix = ns.name(n);
+              if(nsSet.add(nsPrefix)) namespace(nsPrefix, ns.value(n), false);
             }
             // check ancestors only on top level
             if(level != 0) break;
 
-            pp = data.parent(pp, data.kind(pp));
-          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
+            p = data.parent(p, data.kind(p));
+          } while(p >= 0 && data.kind(p) == Data.ELEM);
+
+          // reset namespace cache
+          nsSet.clear();
         }
 
         // serialize attributes
-        indt.push(indent);
+        indentStack.push(indent);
         final int as = pre + data.attSize(pre, kind);
         while(++pre != as) {
           final byte[] n = data.name(pre, Data.ATTR);
@@ -410,15 +416,15 @@ public abstract class Serializer implements Closeable {
           attribute(n, v, false);
           if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
         }
-        pars.push(r);
+        parentStack.push(par);
       }
     }
 
     // process remaining elements...
-    while(!pars.isEmpty()) {
+    while(!parentStack.isEmpty()) {
       closeElement();
-      indent = indt.pop();
-      pars.pop();
+      indent = indentStack.pop();
+      parentStack.pop();
     }
   }
 

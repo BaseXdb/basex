@@ -89,7 +89,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns a prefix for the specified id.
+   * Returns a prefix for the name with the specified id.
    * @param id id of prefix
    * @return prefix
    */
@@ -98,9 +98,9 @@ public final class Namespaces {
   }
 
   /**
-   * Returns a namespace uri for the specified id.
-   * @param id id of namespace uri
-   * @return namespace uri
+   * Returns a namespace URI for the name with the specified id.
+   * @param id id of namespace URI ({@Code 0}: no namespace)
+   * @return namespace URI, or {@code null}
    */
   public byte[] uri(final int id) {
     return uris.key(id);
@@ -125,7 +125,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the default namespace uri for all documents of the database.
+   * Returns the default namespace URI for all documents of the database.
    * @return global default namespace, or {@code null} if there is more than one such namespace
    */
   public byte[] globalUri() {
@@ -147,7 +147,7 @@ public final class Namespaces {
   // Requesting Namespaces Based on Context =======================================================
 
   /**
-   * Returns the id of a namespace uri for the specified prefix.
+   * Returns the id of a namespace URI for the specified prefix.
    * @param prefix prefix
    * @param element indicates if the prefix belongs to an element or attribute name
    * @return id of namespace uri, or {@code 0} if no entry is found
@@ -158,7 +158,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the id of a namespace uri for the specified prefix and pre value.
+   * Returns the id of a namespace URI for the specified prefix and pre value.
    * @param prefix prefix
    * @param pre pre value
    * @param data data reference
@@ -169,7 +169,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the id of a namespace uri for the specified prefix and node.
+   * Returns the id of a namespace URI for the specified prefix and node.
    * @param prefix prefix
    * @param node node to start with
    * @return id of the namespace uri, or {@code 0} if namespace is not found.

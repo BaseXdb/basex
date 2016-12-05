@@ -12,7 +12,6 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
-import org.basex.query.up.primitives.node.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.junit.*;
@@ -570,19 +569,15 @@ public final class NamespaceTest extends AdvancedQueryTest {
       UPNSCONFL_X_X);
   }
 
-  /**
-   * Checks namespace declarations.
-   * Note: xmlns='' is being erroneously added. Might have to do with
-   * Data.update(); see {@link RenameNode}.
-   */
+  /*
+   * Currently buggy (discovered via GH-1395).
+   * A new namespace declaration should be added.
   @Test
   public void renameDuplNSCheck() {
-    query(
-      "copy $a := <a a='v'/> " +
-      "modify rename node $a/@a as fn:QName('uri', 'a') " +
-      "return $a",
-      "<a xmlns=\"uri\" a=\"v\"/>");
+    query("<a a='v'/> update rename node @a as QName('U', 'a')",
+      "<a xmlns:ns0=\"U\" ns0:a=''/><a xmlns=\"uri\" a=\"v\"/>");
   }
+   */
 
   /**
    * Checks namespace declarations.

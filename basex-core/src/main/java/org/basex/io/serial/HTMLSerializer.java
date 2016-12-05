@@ -125,8 +125,8 @@ final class HTMLSerializer extends MarkupSerializer {
       if(EMPTIES5.contains(lc)) return;
     } else {
       if(EMPTIES.contains(lc)) {
-        final byte[] u = nsUri(EMPTY);
-        if(u == null || u.length == 0) return;
+        final byte[] uri = nsUri(EMPTY);
+        if(uri == null || uri.length == 0) return;
       }
     }
     sep = false;
