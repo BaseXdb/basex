@@ -5,17 +5,16 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.math.*;
-import java.util.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
-import org.basex.server.Log.LogEntry;
-import org.basex.server.Log.LogType;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 
 /**
@@ -48,22 +47,24 @@ public final class AdminLogs extends AdminFn {
       final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
       final IOFile file = new IOFile(qc.context.log.dir(), name);
       if(!file.exists()) throw WHICHRES_X.get(info, file);
-      final ArrayList<LogEntry> logs = logs(file);
-      for(int s = 0; s < logs.size(); s++) {
-        final LogEntry l1 = logs.get(s);
+
+      final ElementNodes<LogEntry>.NodeIterator iter = logs(file, qc).iterator();
+      while(iter.hasNext()) {
+        final LogEntry l1 = iter.next();
         final FElem elem = new FElem(ENTRY);
         if(l1.address != null) {
           if(merge && l1.ms.compareTo(BigDecimal.ZERO) == 0 &&
               !Strings.eq(l1.address, Log.SERVER, Log.STANDALONE)) {
-            for(int l = s + 1; l < logs.size(); l++) {
-              final LogEntry l2 = logs.get(l);
+            final ElementNodes<LogEntry>.NodeIterator iter2 = iter.copy();
+            while(iter2.hasNext()) {
+              final LogEntry l2 = iter2.next();
               if(l2 != null && l1.address.equals(l2.address)) {
                 if(l2.type.equals(request)) continue;
                 if(l1.type.equals(request)) l1.type = "";
                 l1.type = merge(l1.type, l2.type);
                 l1.message = merge(l1.message, l2.message);
                 l1.ms = l1.ms.add(l2.ms);
-                logs.remove(l--);
+                iter2.remove();
                 if(!l2.message.equals(request)) break;
               }
             }
@@ -76,6 +77,7 @@ public final class AdminLogs extends AdminFn {
           elem.add(l1.message);
         }
         vb.add(elem);
+        qc.checkStop();
       }
     }
     return vb.value();
@@ -94,13 +96,17 @@ public final class AdminLogs extends AdminFn {
   /**
    * Returns all log entries.
    * @param file log file
+   * @param qc query context
    * @return list
    * @throws QueryException query exception
    */
-  private ArrayList<LogEntry> logs(final IOFile file) throws QueryException {
+  private ElementNodes<LogEntry> logs(final IOFile file, final QueryContext qc)
+      throws QueryException {
+
     try(final NewlineInput nli = new NewlineInput(file)) {
-      final ArrayList<LogEntry> logs = new ArrayList<>();
+      final ElementNodes<LogEntry> logs = new ElementNodes<>();
       for(String line; (line = nli.readLine()) != null;) {
+        qc.checkStop();
         final LogEntry log = new LogEntry();
         final String[] cols = line.split("\t");
         if(cols.length > 2) {
