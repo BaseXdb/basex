@@ -99,12 +99,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Processes the HTTP request.
    * Parses new modules and discards obsolete ones.
    * @param http HTTP context
-   * @param exc optional query exception
+   * @param qe query exception (optional)
    * @throws Exception exception
    */
-  void process(final HTTPContext http, final QueryException exc) throws Exception {
+  void process(final HTTPContext http, final QueryException qe) throws Exception {
     try {
-      module.process(http, this, exc);
+      module.process(http, this, qe);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;
@@ -156,7 +156,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         final Item body = args.length > 1 ? args[1] : null;
         addMethod(mth, body, declared, ann.info);
       } else if(sig == _REST_SINGLE) {
-        key = "\u0000" + (args.length > 0 ? toString(args[0]) :
+        key = "\u0001" + (args.length > 0 ? toString(args[0]) :
           (function.info.path() + ':' + function.info.line()));
       } else if(eq(sig.uri, QueryText.REST_URI)) {
         final Item body = args.length == 0 ? null : args[0];

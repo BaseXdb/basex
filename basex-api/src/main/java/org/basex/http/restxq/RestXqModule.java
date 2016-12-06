@@ -87,10 +87,10 @@ final class RestXqModule {
    * Processes the HTTP request.
    * @param http HTTP context
    * @param func function to be processed
-   * @param error optional error reference
+   * @param qe query exception (optional)
    * @throws Exception exception
    */
-  void process(final HTTPContext http, final RestXqFunction func, final QueryException error)
+  void process(final HTTPContext http, final RestXqFunction func, final QueryException qe)
       throws Exception {
 
     // create new XQuery instance
@@ -102,7 +102,7 @@ final class RestXqModule {
 
       final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
       rxf.parse(ctx);
-      RestXqResponse.create(rxf, qc, http, error);
+      new RestXqResponse(rxf, qc, http).create(qe);
     }
   }
 

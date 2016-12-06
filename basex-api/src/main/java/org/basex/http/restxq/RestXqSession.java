@@ -14,7 +14,7 @@ import org.basex.query.*;
 final class RestXqSession {
   /** HTTP session. */
   private final HttpSession session;
-  /** Function id. */
+  /** Function id; required for single function instances. */
   private final String key;
   /** Query context. */
   private final QueryContext qc;
@@ -33,8 +33,11 @@ final class RestXqSession {
     if(key != null) {
       final Object oldQc = session.getAttribute(key);
       if(oldQc instanceof QueryContext) {
+        // stop evaluation of existing function, wait until it has been finished
         ((QueryContext) oldQc).stop();
-        do Thread.yield(); while(session.getAttribute(key) == oldQc);
+        do {
+          Thread.yield();
+        } while(session.getAttribute(key) == oldQc);
       }
       session.setAttribute(key, qc);
     }

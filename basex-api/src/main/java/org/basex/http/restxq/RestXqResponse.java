@@ -3,7 +3,10 @@ package org.basex.http.restxq;
 import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
+
 import org.basex.http.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -22,24 +25,42 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 final class RestXqResponse {
-  /** Private constructor. */
-  private RestXqResponse() { }
+  /** Function. */
+  final RestXqFunction func;
+  /** Query context. */
+  final QueryContext qc;
+  /** HTTP context. */
+  final HTTPContext http;
+
+  /** Output stream. */
+  private OutputStream out;
+  /** Status message. */
+  private String message;
+  /** Status code. */
+  private int status;
 
   /**
-   * Evaluates the specified function and creates a response.
-   * @param function function to be evaluated
+   * Constructor.
+   * @param func function
    * @param qc query context
    * @param http HTTP context
-   * @param error optional query error
+   */
+  RestXqResponse(final RestXqFunction func, final QueryContext qc, final HTTPContext http) {
+    this.http = http;
+    this.qc = qc;
+    this.func = func;
+  }
+
+  /**
+   * Evaluates the specified function and serializes the result.
+   * @param qe query exception (optional)
    * @throws Exception exception (including unexpected ones)
    */
-  static void create(final RestXqFunction function, final QueryContext qc,
-      final HTTPContext http, final QueryException error) throws Exception {
-
+  void create(final QueryException qe) throws Exception {
     // bind variables
-    final StaticFunc sf = function.function;
+    final StaticFunc sf = func.function;
     final Expr[] args = new Expr[sf.args.length];
-    function.bind(http, args, error, qc);
+    func.bind(http, args, qe, qc);
 
     // assign function call and http context and register process
     qc.mainModule(MainModule.get(sf, args));
@@ -47,50 +68,40 @@ final class RestXqResponse {
     qc.job().type(RESTXQ);
     qc.register(qc.context);
 
-    final RestXqSession session = new RestXqSession(http, function.key, qc);
+    final String key = func.key;
+    final RestXqSession session = new RestXqSession(http, key, qc);
     String redirect = null, forward = null;
-    RestXqRespBuilder response = null;
     try {
       // evaluate query
       final Iter iter = qc.iter();
-      Item item = iter.next();
-
       // handle response element
-      if(item instanceof ANode) {
-        final ANode node = (ANode) item;
-        // send redirect to browser
+      final Item first = iter.next();
+      if(first instanceof ANode) {
+        final ANode node = (ANode) first;
         if(REST_REDIRECT.eq(node)) {
+          // send redirect to browser
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) throw function.error(NO_VALUE, node.name());
+          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE, node.name());
           redirect = string(ch.string()).trim();
-          return;
-        }
-        // server-side forwarding
-        if(REST_FORWARD.eq(node)) {
+        } else if(REST_FORWARD.eq(node)) {
+          // server-side forwarding
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) throw function.error(NO_VALUE, node.name());
+          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE, node.name());
           forward = string(ch.string()).trim();
-          return;
+        } else if(REST_RESPONSE.eq(node)) {
+          // custom response
+          build(node, iter);
+        } else {
+          // standard serialization
+          serialize(first, iter, false);
         }
-        if(REST_RESPONSE.eq(node)) {
-          response = new RestXqRespBuilder();
-          response.build(node, function, iter, http);
-          return;
-        }
+      } else if(key != null) {
+        // cached serialization
+        serialize(first, iter, true);
+      } else {
+        // standard serialization
+        serialize(first, iter, false);
       }
-
-      // HEAD method must return a single response element
-      if(function.methods.size() == 1 && function.methods.contains(HttpMethod.HEAD.name()))
-        throw function.error(HEAD_METHOD);
-
-      // serialize result
-      final SerializerOptions sp = function.output;
-      http.sopts(sp);
-      http.initResponse();
-      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), sp)) {
-        for(; item != null; item = iter.next()) ser.serialize(item);
-      }
-
     } finally {
       qc.close();
       qc.unregister(qc.context);
@@ -100,11 +111,124 @@ final class RestXqResponse {
         http.redirect(redirect);
       } else if(forward != null) {
         http.forward(forward);
-      } else if(response != null) {
-        if(response.status != 0) http.status(response.status, response.message);
-        final byte[] out = response.cache.finish();
-        if(out.length != 0) http.res.getOutputStream().write(out);
+      } else {
+        finish();
       }
+    }
+  }
+
+  /**
+   * Builds a response element and creates the serialization parameters.
+   * @param response response element
+   * @param iter result iterator
+   * @throws Exception exception (including unexpected ones)
+   */
+  private void build(final ANode response, final Iter iter) throws Exception {
+    // don't allow attributes
+    for(final ANode a : response.attributes()) throw func.error(UNEXP_NODE, a);
+
+    // parse response and serialization parameters
+    SerializerOptions sp = func.output;
+    String cType = null;
+    for(final ANode n : response.children()) {
+      // process http:response element
+      if(HTTP_RESPONSE.eq(n)) {
+        // check status and reason
+        byte[] sta = null, msg = null;
+        for(final ANode a : n.attributes()) {
+          final QNm qnm = a.qname();
+          if(qnm.eq(Q_STATUS)) sta = a.string();
+          else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)) msg = a.string();
+          else throw func.error(UNEXP_NODE, a);
+        }
+        if(sta != null) {
+          status = toInt(sta);
+          message = msg != null ? string(msg) : null;
+        }
+
+        for(final ANode c : n.children()) {
+          // process http:header elements
+          if(HTTP_HEADER.eq(c)) {
+            final byte[] nam = c.attribute(Q_NAME);
+            final byte[] val = c.attribute(Q_VALUE);
+            if(nam != null && val != null) {
+              final String key = string(nam), value = string(val);
+              if(key.equalsIgnoreCase(HttpText.CONTENT_TYPE)) {
+                cType = value;
+              } else {
+                http.res.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
+                  http.resolve(value) : value);
+              }
+            }
+          } else {
+            throw func.error(UNEXP_NODE, c);
+          }
+        }
+      } else if(OUTPUT_SERIAL.eq(n)) {
+        // parse output:serialization-parameters
+        sp = FuncOptions.serializer(n, func.output, func.function.info);
+      } else {
+        throw func.error(UNEXP_NODE, n);
+      }
+    }
+    // set content type and serialize data
+    if(cType != null) sp.set(SerializerOptions.MEDIA_TYPE, cType);
+
+    final Item first = iter.next();
+    if(first != null) checkHead();
+    serialize(first, iter, sp, true);
+  }
+
+  /**
+   * Serializes the first and all remaining items.
+   * @param first first item
+   * @param iter iterator
+   * @param cache cache result
+   * @throws Exception exception (including unexpected ones)
+   */
+  private void serialize(final Item first, final Iter iter, final boolean cache) throws Exception {
+    checkHead();
+    serialize(first, iter, func.output, cache);
+  }
+
+  /**
+   * Serializes the first and all remaining items.
+   * @param first first item
+   * @param iter iterator
+   * @param sp serialization parameters
+   * @param cache cache result
+   * @throws Exception exception (including unexpected ones)
+   */
+  private void serialize(final Item first, final Iter iter, final SerializerOptions sp,
+      final boolean cache) throws Exception {
+    http.sopts(sp);
+    http.initResponse();
+    out = cache ? new ArrayOutput() : http.res.getOutputStream();
+    Item item = first;
+    try(final Serializer ser = Serializer.get(out, sp)) {
+      for(; item != null; item = iter.next()) ser.serialize(item);
+      qc.checkStop();
+    }
+  }
+
+  /**
+   * Checks if the HEAD method was specified.
+   * @throws QueryException query exception
+   */
+  private void checkHead() throws QueryException {
+    if(func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name()))
+      throw func.error(HEAD_METHOD);
+  }
+
+  /**
+   * Finalizes result generation.
+   * @throws IOException I/O exception
+   */
+  private void finish() throws IOException {
+    if(status != 0) http.status(status, message);
+    if(out instanceof ArrayOutput) {
+      final ArrayOutput ao = (ArrayOutput) out;
+      if(ao.size() > 0) http.res.getOutputStream().write(ao.finish());
     }
   }
 }
