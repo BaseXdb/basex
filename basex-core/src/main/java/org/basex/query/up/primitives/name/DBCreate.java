@@ -41,7 +41,7 @@ public final class DBCreate extends NameUpdate {
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBCREATE, name, info, qc);
-    final ArrayList<Option<?>> supported = new ArrayList<>();
+    final List<Option<?>> supported = new ArrayList<>();
     Collections.addAll(supported, DBOptions.INDEXING);
     Collections.addAll(supported, DBOptions.PARSING);
     options = new DBOptions(opts, supported, info);
@@ -55,18 +55,20 @@ public final class DBCreate extends NameUpdate {
 
   @Override
   public void apply() throws QueryException {
-    close();
-
-    final MainOptions mopts = options.assignTo(new MainOptions(qc.context.options, true));
-    final boolean add = newDocs.data != null;
     try {
+      // close existing database instance; raise error if it is still pinned or locked
+      close();
+
+      // create new database
+      final MainOptions mopts = options.assignTo(new MainOptions(qc.context.options, true));
       final Data data = CreateDB.create(name, Parser.emptyParser(mopts), qc.context, mopts);
 
       // add initial documents and optimize database
-      if(add) {
+      final Data newData = newDocs.data;
+      if(newData != null) {
         data.startUpdate(mopts);
         try {
-          data.insert(data.meta.size, -1, new DataClip(newDocs.data));
+          data.insert(data.meta.size, -1, new DataClip(newData));
           Optimize.optimize(data, null);
         } finally {
           data.finishUpdate(mopts);
@@ -77,7 +79,8 @@ public final class DBCreate extends NameUpdate {
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
     } finally {
-      if(add) newDocs.finish();
+      // drop temporary database instance
+      newDocs.finish();
     }
   }
 

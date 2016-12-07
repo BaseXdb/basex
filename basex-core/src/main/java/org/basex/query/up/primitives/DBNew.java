@@ -24,7 +24,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DBNew {
-  /** Inputs to add. */
+  /** Inputs to be added. */
   public final List<NewInput> inputs;
   /** Insertion sequence. */
   public Data data;
@@ -33,7 +33,7 @@ public final class DBNew {
   private final QueryContext qc;
   /** Input info. */
   private final InputInfo info;
-  /** Main options. */
+  /** Main options for all inputs to be added. */
   private final List<DBOptions> dboptions = new ArrayList<>();
 
   /**
@@ -110,10 +110,10 @@ public final class DBNew {
   }
 
   /**
-   * Finalizes the operation.
+   * Drops a temporary database instance (on disk or in main-memory).
    */
   public void finish() {
-    DropDB.drop(data, qc.context.soptions);
+    if(data != null) DropDB.drop(data, qc.context.soptions);
   }
 
   /**

@@ -43,7 +43,7 @@ public final class DBAdd extends DBUpdate {
     options = new DBOptions(opts, DBOptions.PARSING, info);
     this.replace = replace;
 
-    final ArrayList<NewInput> docs = new ArrayList<>();
+    final List<NewInput> docs = new ArrayList<>();
     docs.add(input);
     newDocs = new DBNew(qc, docs, options, info);
   }
