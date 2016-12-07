@@ -198,14 +198,40 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Returns the children of the path that match the specified filter.
+   * @param filter file filter
+   * @return children
+   */
+  public IOFile[] children(final FileFilter filter) {
+    final File[] ch = filter == null ? file.listFiles() : file.listFiles(filter);
+    if(ch == null) return new IOFile[0];
+
+    final ArrayList<IOFile> io = new ArrayList<>(ch.length);
+    for(final File f : ch) {
+      io.add(new IOFile(f));
+    }
+    return io.toArray(new IOFile[io.size()]);
+  }
+
+  /**
    * Returns the relative paths of all descendant files (excluding directories).
    * @return relative paths
    */
   public synchronized StringList descendants() {
+    return descendants(null);
+  }
+
+  /**
+   * Returns the relative paths of all descendant non-filtered files (excluding
+   * directories).
+   * @param filter file filter
+   * @return relative paths
+   */
+  public synchronized StringList descendants(final FileFilter filter) {
     final StringList files = new StringList();
-    final File[] ch = file.listFiles();
+    final File[] ch = filter == null ? file.listFiles() : file.listFiles(filter);
     if(ch == null) return files;
-    if(exists()) addDescendants(this, files, path().length() + 1);
+    if(exists()) addDescendants(this, files, filter, path().length() + 1);
     return files;
   }
 
@@ -343,13 +369,18 @@ public final class IOFile extends IO {
    * Adds the relative paths of all descendant files to the specified list.
    * @param io current file
    * @param files file list
+   * @param filter file filter
    * @param offset string length of root path
    */
-  private static void addDescendants(final IOFile io, final StringList files, final int offset) {
+  private static void addDescendants(final IOFile io, final StringList files, final FileFilter filter,
+          final int offset)
+  {
     if(io.isDir()) {
-      for(final IOFile f : io.children()) addDescendants(f, files, offset);
+      for(final IOFile f : io.children(filter)) addDescendants(f, files, filter, offset);
     } else {
-      files.add(io.path().substring(offset));
+      if(filter == null || filter.accept(io.file)) {
+        files.add(io.path().substring(offset));
+      }
     }
   }
 
