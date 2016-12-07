@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.jar.JarFile;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -25,6 +26,11 @@ import org.basex.util.list.*;
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
+  /** Ignore files starting with a dot */
+  private static final FileFilter DOT_FILE_FILTER = new FileFilter() {
+    @Override public boolean accept(final File file) {
+      return !file.getName().startsWith(".");
+  }};
   /** Context. */
   private final Context context;
   /** Input info. */
@@ -125,7 +131,11 @@ public final class RepoManager {
           // delete files in main-memory repository
           repo.delete(pkg);
         }
-        if(!repo.path(dir).delete()) throw BXRE_DELETE_X.get(info, dir);
+        final IOFile pkgf = repo.path(dir);
+        if(!pkgf.delete()) throw BXRE_DELETE_X.get(info, dir);
+        final IOFile exjsdir = pkgf.parent().resolve(
+                EXT_JAR_DIR_PREFIX + pkg.name() + EXT_JAR_DIR_SUFFIX);
+        if(!exjsdir.delete()) throw BXRE_DELETE_X.get(info, dir);
         deleted = true;
       }
     }
@@ -145,14 +155,13 @@ public final class RepoManager {
       cache.add(pkg.dir());
     }
     // ignore files and directories starting with dot (#1122)
-    for(final IOFile ch : repo.path().children("^[^.].*")) {
+    for(final IOFile ch : repo.path().children(DOT_FILE_FILTER)) {
       final String dir = ch.name();
       if(!ch.isDir()) {
         add(dir.replaceAll("\\..*", "").replace('/', '.'), dir, map);
       } else if(!cache.contains(dir)) {
-        for(final String s : ch.descendants()) {
-          if(new IOFile(s).name().startsWith(".")) continue;
-          add(dir + '.' + s.replaceAll("\\..*", "").replace('/', '.'), dir + '/' + s, map);
+        for(final String s : ch.descendants(DOT_FILE_FILTER)) {
+          add(dir + '.' + s.replaceAll("\\..*", "").replace('/', '.'),dir + '/' + s, map);
         }
       }
     }
