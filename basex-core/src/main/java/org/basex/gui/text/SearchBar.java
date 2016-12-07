@@ -4,14 +4,16 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.util.options.*;
+import org.basex.gui.layout.BaseXLayout.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This panel provides search and replace facilities.
@@ -20,6 +22,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class SearchBar extends BaseXBack {
+  /** History values for buttons. */
+  private final HashMap<String, boolean[]> modeHistory = new HashMap<>();
+
   /** Search direction. */
   public enum SearchDir {
     /** Current hit. */
@@ -37,7 +42,18 @@ public final class SearchBar extends BaseXBack {
       if(ESCAPE.is(e)) deactivate(true);
     }
   };
+  /** Action listener for button clicks. */
+  private final ActionListener action = new ActionListener() {
+    @Override
+    public void actionPerformed(final ActionEvent e) {
+      store();
+      refreshButtons();
+      search();
+    }
+  };
 
+  /** Mode buttons. */
+  final AbstractButton[] modeButtons;
   /** Mode: regular expression. */
   final AbstractButton regex;
   /** Mode: match case. */
@@ -74,22 +90,22 @@ public final class SearchBar extends BaseXBack {
 
     gui = main;
     search = new BaseXTextField(main);
-    search.history(GUIOptions.SEARCHED, gui).hint(Text.FIND + Text.DOTS);
+    search.history(GUIOptions.SEARCHED, main).hint(Text.FIND + Text.DOTS);
     search.setPreferredSize(null);
 
     replace = new BaseXTextField(main);
-    replace.history(GUIOptions.REPLACED, gui).hint(Text.REPLACE_WITH + Text.DOTS);
+    replace.history(GUIOptions.REPLACED, main).hint(Text.REPLACE_WITH + Text.DOTS);
     replace.setPreferredSize(null);
 
-    regex = onOffButton("f_regex", Text.REGULAR_EXPR, GUIOptions.SR_REGEX);
-    mcase = onOffButton("f_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
-    word = onOffButton("f_word", Text.WHOLE_WORD, GUIOptions.SR_WORD);
-    multi = onOffButton("f_multi", Text.MULTI_LINE, GUIOptions.SR_MULTI);
+    mcase = button("f_case", Text.MATCH_CASE);
+    word = button("f_word", Text.WHOLE_WORD);
+    regex = button("f_regex", Text.REGULAR_EXPR);
+    multi = button("f_multi", Text.MULTI_LINE);
+    modeButtons = new AbstractButton[] { mcase, word, regex, multi };
+
     rplc  = BaseXButton.get("f_replace", Text.REPLACE_ALL, false, main);
     cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
         false, main);
-    multi.setEnabled(regex.isSelected());
-    word.setEnabled(!regex.isSelected());
 
     // add interaction to search field
     search.addKeyListener(new KeyAdapter() {
@@ -101,14 +117,18 @@ public final class SearchBar extends BaseXBack {
         } else if(ESCAPE.is(e)) {
           deactivate(search.getText().isEmpty());
         } else if(ENTER.is(e)) {
+          store();
           editor.jump(SearchDir.FORWARD, true);
         } else if(SHIFT_ENTER.is(e)) {
           editor.jump(SearchDir.BACKWARD, true);
+        } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
+          setModes(modeHistory.get(search.getText()));
         }
       }
       @Override
       public void keyReleased(final KeyEvent e) {
-        main.gopts.set(GUIOptions.SR_SEARCH, search.getText());
+        if(regex.isEnabled() && search.getText().matches("^.*(?<!\\\\)\\\\n.*"))
+          multi.setSelected(true);
         search();
       }
     });
@@ -117,17 +137,12 @@ public final class SearchBar extends BaseXBack {
       @Override
       public void drop(final Object object) {
         search.setText(object.toString());
+        store();
         search();
       }
     });
 
     replace.addKeyListener(escape);
-    replace.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        main.gopts.set(GUIOptions.SR_REPLACE, replace.getText());
-      }
-    });
 
     cls.addKeyListener(escape);
     cls.addActionListener(new ActionListener() {
@@ -141,13 +156,21 @@ public final class SearchBar extends BaseXBack {
     rplc.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        search.store();
+        store();
         replace.store();
         final String in = replace.getText();
         editor.replace(new ReplaceContext(regex.isSelected() ? decode(in) : in));
         deactivate(true);
       }
     });
+
+    // set initial values
+    final String[] searched = main.gopts.get(GUIOptions.SEARCHED);
+    if(searched.length > 0) search.setText(searched[0]);
+    final String[] replaced = main.gopts.get(GUIOptions.REPLACED);
+    if(replaced.length > 0) replace.setText(replaced[0]);
+    initModes();
+    setModes(modeHistory.get(search.getText()));
   }
 
   /**
@@ -191,8 +214,7 @@ public final class SearchBar extends BaseXBack {
    * @return button
    */
   public AbstractButton button(final String help) {
-    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()),
-        true, gui);
+    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()), true, gui);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -215,12 +237,14 @@ public final class SearchBar extends BaseXBack {
 
   /**
    * Resets the search options.
+   * @param values array with four booleans (ignored if {@code null})
    */
-  public void reset() {
-    regex.setSelected(false);
-    mcase.setSelected(false);
-    word.setSelected(false);
-    multi.setSelected(false);
+  public void setModes(final boolean[] values) {
+    if(values != null) {
+      final int ml = modeButtons.length;
+      for(int m = 0; m < ml; m++) modeButtons[m].setSelected(values[m]);
+    }
+    refreshButtons();
   }
 
   /**
@@ -230,8 +254,8 @@ public final class SearchBar extends BaseXBack {
    * @param focus indicates if the search field should be focused
    */
   public void activate(final String string, final boolean focus) {
-    boolean action = !isVisible();
-    if(action) {
+    boolean invisible = !isVisible();
+    if(invisible) {
       setVisible(true);
       if(button != null) button.setSelected(true);
     }
@@ -239,13 +263,13 @@ public final class SearchBar extends BaseXBack {
 
     // set new, different search string
     if(!string.isEmpty() && !new SearchContext(this, search.getText()).matches(string)) {
-      search.setText(string);
-      search.store();
       regex.setSelected(false);
-      action = true;
+      search.setText(string);
+      store();
+      invisible = true;
     }
     // search if string has changed, or if panel was hidden
-    if(action) search();
+    if(invisible) search();
   }
 
   /**
@@ -254,13 +278,75 @@ public final class SearchBar extends BaseXBack {
    * @return {@code true} if panel was closed
    */
   public boolean deactivate(final boolean close) {
-    search.store();
+    store();
     editor.requestFocusInWindow();
     if(!close || !isVisible()) return false;
     setVisible(false);
     if(button != null) button.setSelected(false);
     search();
     return true;
+  }
+
+  /**
+   * Refreshes the panel for the specified context.
+   * @param sc search context
+   */
+  void refresh(final SearchContext sc) {
+    final boolean nohits = sc.nr == 0;
+    final boolean empty = sc.search.isEmpty();
+    rplc.setEnabled(!nohits && !empty);
+    search.setBackground(nohits && !empty ? GUIConstants.LRED : GUIConstants.BACK);
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
+   * Initializes the mode history map.
+   */
+  private void initModes() {
+    final String[] searchModes = Strings.split(gui.gopts.get(GUIOptions.SEARCHMODES), ',');
+    final String[] searches = gui.gopts.get(GUIOptions.SEARCHED);
+    final int ml = Math.min(searchModes.length, searches.length);
+    for(int m = 0; m < ml; m++) {
+      final int bl = modeButtons.length;
+      final BoolList list = new BoolList(bl);
+      for(final char ch : searchModes[m].toCharArray()) list.add(ch == '!');
+      modeHistory.put(searches[m], list.size() == bl ? list.finish() : new boolean[bl]);
+    }
+  }
+
+  /**
+   * Stores the search text.
+   */
+  private void store() {
+    search.store();
+
+    final String text = search.getText();
+    final HashMap<String, boolean[]> map = new HashMap<>();
+    final StringBuilder sb = new StringBuilder();
+    for(final String t : gui.gopts.get(GUIOptions.SEARCHED)) {
+      boolean[] modes = modeHistory.get(t);
+      if(modes == null || t.equals(text)) {
+        final BoolList list = new BoolList(modeButtons.length);
+        for(final AbstractButton mode : modeButtons) list.add(mode.isSelected());
+        modes = list.finish();
+      }
+      if(sb.length() > 0) sb.append(',');
+      for(final boolean mode : modes) sb.append(mode ? '!' : '.');
+      map.put(t, modes);
+    }
+    gui.gopts.set(GUIOptions.SEARCHMODES, sb.toString());
+    modeHistory.clear();
+    modeHistory.putAll(map);
+  }
+
+  /**
+   * Refreshes the button states.
+   */
+  private void refreshButtons() {
+    final boolean sel = regex.isSelected();
+    multi.setEnabled(sel);
+    word.setEnabled(!sel);
   }
 
   /**
@@ -280,43 +366,15 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Refreshes the panel for the specified context.
-   * @param sc search context
-   */
-  void refresh(final SearchContext sc) {
-    final boolean nohits = sc.nr == 0;
-    final boolean empty = sc.search.isEmpty();
-    rplc.setEnabled(!nohits && !empty);
-    search.setBackground(nohits && !empty ? GUIConstants.LRED : GUIConstants.BACK);
-  }
-
-  // PRIVATE METHODS ====================================================================
-
-  /**
    * Returns a button that can be switched on and off.
    * @param icon name of icon
    * @param tooltip tooltip text
-   * @param option GUI option
    * @return button
    */
-  private AbstractButton onOffButton(final String icon, final String tooltip,
-      final BooleanOption option) {
-
+  private AbstractButton button(final String icon, final String tooltip) {
     final AbstractButton b = BaseXButton.get(icon, tooltip, true, gui);
-    b.setSelected(gui.gopts.get(option));
     b.addKeyListener(escape);
-    b.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final boolean sel = b.isSelected();
-        gui.gopts.set(option, sel);
-        if(b == regex) {
-          multi.setEnabled(sel);
-          word.setEnabled(!sel);
-        }
-        search();
-      }
-    });
+    b.addActionListener(action);
     return b;
   }
 

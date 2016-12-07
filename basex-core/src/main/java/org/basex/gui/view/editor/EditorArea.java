@@ -215,7 +215,7 @@ public final class EditorArea extends TextPanel {
     if(string.isEmpty()) {
       search.deactivate(true);
     } else {
-      search.reset();
+      search.setModes(new boolean[] { false, false, false, false });
       search.activate(string, false);
       jump(SearchDir.CURRENT, true);
     }

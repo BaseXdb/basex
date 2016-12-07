@@ -172,7 +172,9 @@ public class BaseXTextField extends JTextField {
    */
   public void store() {
     if(history == null) return;
-    history.store(getText());
+    final String text = getText();
+    if(text.isEmpty()) return;
+    history.store(text);
     hist = 0;
   }
 

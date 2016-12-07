@@ -36,7 +36,7 @@ public final class BaseXHistory {
     if(input == null) return;
     final StringList sl = new StringList(MAX).add(input);
     for(final String s : gui.gopts.get(history)) {
-      if(sl.size() < MAX &&  !input.equals(s)) sl.add(s);
+      if(sl.size() < MAX && !input.equals(s)) sl.add(s);
     }
     gui.gopts.set(history, sl.finish());
   }
