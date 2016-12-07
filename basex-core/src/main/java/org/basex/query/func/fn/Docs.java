@@ -20,7 +20,7 @@ import org.basex.query.value.node.*;
  */
 public abstract class Docs extends StandardFunc {
   /** Special lock identifier for collection available via current context; will be substituted. */
-  public static final String COLL = DBLocking.PREFIX + "COLL";
+  public static final String COLL = Locking.PREFIX + "COLL";
 
   /**
    * Returns a collection.

@@ -118,7 +118,7 @@ public final class Context {
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(soptions);
-    locks = soptions.get(StaticOptions.GLOBALLOCK) ? new JobLocking() : new DBLocking();
+    locks = new Locking(soptions);
     users = new Users(soptions);
     repo = new EXPathRepo(soptions);
     log = new Log(soptions);

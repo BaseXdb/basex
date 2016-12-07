@@ -26,7 +26,7 @@ public class LockResult {
   public void union(final LockResult lr) {
     // if command writes to currently opened database, it may affect any database that has been
     // opened before. hence, assign write locks to all opened databases
-    if(lr.write.contains(DBLocking.CONTEXT)) write.add(read);
+    if(lr.write.contains(Locking.CONTEXT)) write.add(read);
     // merge local locks with global lock lists
     read.add(lr.read);
     write.add(lr.write);

@@ -22,6 +22,6 @@ public final class FnPosition extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.CONTEXT) && super.accept(visitor);
+    return visitor.lock(Locking.CONTEXT) && super.accept(visitor);
   }
 }

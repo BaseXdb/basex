@@ -61,7 +61,7 @@ public final class OptimizeAll extends ACreate {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.write.add(DBLocking.CONTEXT);
+    lr.write.add(Locking.CONTEXT);
   }
 
   @Override

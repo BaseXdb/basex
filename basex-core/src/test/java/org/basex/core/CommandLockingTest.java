@@ -36,20 +36,20 @@ public final class CommandLockingTest extends SandboxTest {
   /** StringList containing name. */
   private static final StringList NAME_LIST = new StringList(NAME);
   /** StringList containing context. */
-  private static final StringList CTX_LIST = new StringList(DBLocking.CONTEXT);
+  private static final StringList CTX_LIST = new StringList(Locking.CONTEXT);
   /** StringList containing name and context. */
-  private static final StringList NAME_CTX = new StringList(NAME, DBLocking.CONTEXT);
+  private static final StringList NAME_CTX = new StringList(NAME, Locking.CONTEXT);
   /** StringList containing ADMIN lock string. */
-  private static final StringList ADMIN_LIST = new StringList(DBLocking.ADMIN);
+  private static final StringList ADMIN_LIST = new StringList(Locking.ADMIN);
   /** StringList containing REPO lock string. */
-  private static final StringList REPO_LIST = new StringList(DBLocking.REPO);
+  private static final StringList REPO_LIST = new StringList(Locking.REPO);
   /** StringList containing BACKUP lock string. */
-  private static final StringList BACKUP_LIST = new StringList(DBLocking.BACKUP);
+  private static final StringList BACKUP_LIST = new StringList(Locking.BACKUP);
   /** StringList containing BACKUP lock string and name. */
-  private static final StringList BACKUP_NAME = new StringList(DBLocking.BACKUP, NAME);
+  private static final StringList BACKUP_NAME = new StringList(Locking.BACKUP, NAME);
   /** StringList containing java module test lock strings. */
-  private static final StringList MODULE_LIST = new StringList(DBLocking.MODULE_PREFIX
-      + QueryModuleTest.LOCK1, DBLocking.MODULE_PREFIX + QueryModuleTest.LOCK2);
+  private static final StringList MODULE_LIST = new StringList(Locking.MODULE_PREFIX
+      + QueryModuleTest.LOCK1, Locking.MODULE_PREFIX + QueryModuleTest.LOCK2);
 
   /**
    * Test commands affecting databases.

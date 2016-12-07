@@ -79,6 +79,6 @@ abstract class AUser extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.write.add(DBLocking.ADMIN); // Admin operations are exclusive
+    lr.write.add(Locking.ADMIN); // Admin operations are exclusive
   }
 }

@@ -57,7 +57,7 @@ public abstract class Job {
    */
   public final void unregister(final Context ctx) {
     stopTimeout();
-    ctx.locks.release(this);
+    ctx.locks.release();
     ctx.jobs.unregister(this);
   }
 

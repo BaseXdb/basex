@@ -434,8 +434,8 @@ public final class QueryContext extends Job implements Closeable {
       else lr.readAll = true;
     }
     // replace collection lock with context lock
-    if(lr.read.delete(Docs.COLL)) lr.read.add(DBLocking.CONTEXT);
-    if(lr.write.delete(Docs.COLL)) lr.write.add(DBLocking.CONTEXT);
+    if(lr.read.delete(Docs.COLL)) lr.read.add(Locking.CONTEXT);
+    if(lr.write.delete(Docs.COLL)) lr.write.add(Locking.CONTEXT);
   }
 
   /**

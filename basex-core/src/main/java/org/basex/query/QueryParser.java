@@ -565,11 +565,11 @@ public class QueryParser extends InputParser {
       switch(name) {
         case READ_LOCK:
           for(final byte[] lock : split(val, ','))
-            qc.readLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+            qc.readLocks.add(Locking.USER_PREFIX + string(lock).trim());
           break;
         case WRITE_LOCK:
           for(final byte[] lock : split(val, ','))
-            qc.writeLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+            qc.writeLocks.add(Locking.USER_PREFIX + string(lock).trim());
           break;
         default:
           throw error(BASX_OPTIONS_X, name);

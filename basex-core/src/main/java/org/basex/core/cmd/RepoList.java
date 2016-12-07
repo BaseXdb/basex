@@ -30,7 +30,7 @@ public final class RepoList extends ARepo {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.REPO);
+    lr.read.add(Locking.REPO);
   }
 
   @Override

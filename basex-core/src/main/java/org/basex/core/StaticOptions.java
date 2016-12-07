@@ -34,8 +34,8 @@ public final class StaticOptions extends Options {
   public static final StringOption LANG = new StringOption("LANG", Prop.language);
   /** Flag to include key names in the language strings. */
   public static final BooleanOption LANGKEYS = new BooleanOption("LANGKEYS", false);
-  /** Applied locking algorithm: local (database) vs. global (job) locking. */
-  public static final BooleanOption GLOBALLOCK = new BooleanOption("GLOBALLOCK", false);
+  /** Locking strategy: fair, prefer readers. */
+  public static final BooleanOption FAIRLOCK = new BooleanOption("FAIRLOCK", true);
   /** Timeout (seconds) for remembering result of asynchronous queries. */
   public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
 

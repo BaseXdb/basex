@@ -62,7 +62,7 @@ public final class InfoIndex extends AInfo {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CONTEXT);
+    lr.read.add(Locking.CONTEXT);
   }
 
   /**

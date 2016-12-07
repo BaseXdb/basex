@@ -26,7 +26,7 @@ public final class Kill extends AUser {
   @Override
   protected boolean run() {
     if(!run(0, false) || count == 0) {
-      error(DBLocking.CONTEXT);
+      error(Locking.CONTEXT);
 
       // kill all sessions with the specified IP (and optional port)
       final Sessions ss = context.sessions;

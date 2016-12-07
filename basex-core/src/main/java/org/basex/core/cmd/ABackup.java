@@ -21,6 +21,6 @@ abstract class ABackup extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.write.add(DBLocking.BACKUP); // No parallel backup operations
+    lr.write.add(Locking.BACKUP); // No parallel backup operations
   }
 }

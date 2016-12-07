@@ -8,7 +8,6 @@ import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.core.users.*;
 import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.runner.*;
@@ -16,7 +15,7 @@ import org.junit.runners.*;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests for {@link DBLocking}.
+ * Locking tests.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
@@ -48,7 +47,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /** Locking instance used for testing. */
-  private final DBLocking locks = new DBLocking();
+  private final Locking locks = new Locking(context.soptions);
   /** Objects used for locking. */
   private final String[] objects = new String[5];
   /** Empty string array for convenience. */
@@ -569,8 +568,6 @@ public final class LockingTest extends SandboxTest {
     private final CountDownLatch await;
     /** Latch to count down after locking. */
     private final CountDownLatch countDown;
-    /** Shall we fetch write locks? */
-    private final boolean writing;
     /** Array of objects to put read locks onto. */
     private final String[] readObjects;
     /** Array of objects to put write locks onto. */
@@ -587,7 +584,6 @@ public final class LockingTest extends SandboxTest {
      */
     LockTester(final CountDownLatch a, final String[] r, final String[] w, final CountDownLatch c) {
       await = a;
-      writing = w != null && w.length != 0;
       readObjects = r;
       writeObjects = w;
       countDown = c;
@@ -605,11 +601,9 @@ public final class LockingTest extends SandboxTest {
       }
 
       // Fetch lock if objects are set
-      final Command cmd = new Cmd(writing);
       locks.acquire(
         readObjects != null ? new StringList().add(readObjects) : null,
-        writeObjects != null ? new StringList().add(writeObjects) : null,
-        context);
+        writeObjects != null ? new StringList().add(writeObjects) : null);
 
       // We hold the lock, count down
       if(countDown != null) countDown.countDown();
@@ -622,7 +616,7 @@ public final class LockingTest extends SandboxTest {
           throw new RuntimeException("Unexpectedly interrupted.");
         }
       }
-      locks.release(cmd);
+      locks.release();
     }
 
     /**
@@ -633,23 +627,6 @@ public final class LockingTest extends SandboxTest {
     public synchronized void release() {
       requestRelease = true;
       notifyAll();
-    }
-  }
-
-  /** Dummy command. */
-  private static class Cmd extends Command {
-    /**
-     * Constructor.
-     * @param w write flag
-     */
-    Cmd(final boolean w) {
-      super(Perm.NONE);
-      updating = w;
-    }
-
-    @Override
-    protected boolean run() {
-      return true;
     }
   }
 }

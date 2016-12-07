@@ -248,8 +248,8 @@ public abstract class JavaFunction extends Arr {
     // Add module locks to QueryContext.
     final Lock lock = meth.getAnnotation(Lock.class);
     if(lock != null) {
-      for(final String read : lock.read()) qc.readLocks.add(DBLocking.MODULE_PREFIX + read);
-      for(final String write : lock.write()) qc.writeLocks.add(DBLocking.MODULE_PREFIX + write);
+      for(final String read : lock.read()) qc.readLocks.add(Locking.MODULE_PREFIX + read);
+      for(final String write : lock.write()) qc.writeLocks.add(Locking.MODULE_PREFIX + write);
     }
     return meth;
   }

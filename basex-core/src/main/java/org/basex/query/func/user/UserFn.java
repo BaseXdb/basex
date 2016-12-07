@@ -153,6 +153,6 @@ abstract class UserFn extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
+    return visitor.lock(Locking.ADMIN) && super.accept(visitor);
   }
 }

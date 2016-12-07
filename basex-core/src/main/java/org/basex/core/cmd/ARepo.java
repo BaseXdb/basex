@@ -22,6 +22,6 @@ abstract class ARepo extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.write.add(DBLocking.REPO); // Repository commands are exclusive
+    lr.write.add(Locking.REPO); // Repository commands are exclusive
   }
 }

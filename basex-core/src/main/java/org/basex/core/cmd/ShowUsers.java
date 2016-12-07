@@ -43,7 +43,7 @@ public final class ShowUsers extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.ADMIN);
+    lr.read.add(Locking.ADMIN);
   }
 
   @Override

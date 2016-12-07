@@ -46,6 +46,6 @@ public final class FnData extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return (exprs.length != 0 || visitor.lock(DBLocking.CONTEXT)) && super.accept(visitor);
+    return (exprs.length != 0 || visitor.lock(Locking.CONTEXT)) && super.accept(visitor);
   }
 }
