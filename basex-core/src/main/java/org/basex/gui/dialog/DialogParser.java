@@ -34,7 +34,7 @@ abstract class DialogParser extends BaseXBack {
    * @param active indicates if this panel is currently active
    * @return result of check
    */
-  abstract boolean action(final boolean active);
+  abstract boolean action(boolean active);
 
   /**
    * Updates the chosen parser options.
@@ -45,7 +45,7 @@ abstract class DialogParser extends BaseXBack {
    * Sets the global parser options.
    * @param gui gui reference
    */
-  abstract void setOptions(final GUI gui);
+  abstract void setOptions(GUI gui);
 
   /**
    * Builds a parsing example string.

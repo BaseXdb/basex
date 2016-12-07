@@ -35,7 +35,7 @@ public final class Zip extends Job {
    * @throws IOException I/O exception
    */
   private int size() throws IOException {
-    try(final ZipInputStream in = new ZipInputStream(file.inputStream())) {
+    try(ZipInputStream in = new ZipInputStream(file.inputStream())) {
       int c = 0;
       while(in.getNextEntry() != null) c++;
       return c;
@@ -49,7 +49,7 @@ public final class Zip extends Job {
    * @throws IOException I/O exception
    */
   public byte[] read(final String path) throws IOException {
-    try(final ZipInputStream in = new ZipInputStream(file.inputStream())) {
+    try(ZipInputStream in = new ZipInputStream(file.inputStream())) {
       final byte[] cont = getEntry(in, path);
       if(cont == null) throw new FileNotFoundException(path);
       return cont;
@@ -64,7 +64,7 @@ public final class Zip extends Job {
   public void unzip(final IOFile target) throws IOException {
     total = size();
     curr = 0;
-    try(final ZipInputStream in = new ZipInputStream(file.inputStream())) {
+    try(ZipInputStream in = new ZipInputStream(file.inputStream())) {
       final byte[] data = new byte[IO.BLOCKSIZE];
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
@@ -73,7 +73,7 @@ public final class Zip extends Job {
           trg.md();
         } else {
           trg.parent().md();
-          try(final OutputStream out = new FileOutputStream(trg.path())) {
+          try(OutputStream out = new FileOutputStream(trg.path())) {
             for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           }
         }
@@ -91,7 +91,7 @@ public final class Zip extends Job {
     if(!(file instanceof IOFile)) throw new FileNotFoundException(file.path());
 
     curr = 0;
-    try(final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
+    try(ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
         new FileOutputStream(file.path())))) {
       // use simple, fast compression
       out.setLevel(1);
@@ -100,7 +100,7 @@ public final class Zip extends Job {
       final byte[] data = new byte[IO.BLOCKSIZE];
       for(final String f : files) {
         curr++;
-        try(final FileInputStream in = new FileInputStream(new File(root.file(), f))) {
+        try(FileInputStream in = new FileInputStream(new File(root.file(), f))) {
           final String fl = Prop.WIN ? f.replace('\\', '/') : f;
           out.putNextEntry(new ZipEntry(root.name() + '/' + fl));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);

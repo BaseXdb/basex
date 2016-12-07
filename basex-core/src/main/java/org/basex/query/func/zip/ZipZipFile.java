@@ -45,8 +45,8 @@ public class ZipZipFile extends ZipFn {
 
     // write zip file
     boolean ok = true;
-    try(final FileOutputStream fos = new FileOutputStream(file);
-        final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
+    try(FileOutputStream fos = new FileOutputStream(file);
+        ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
       create(zos, elm.children(), "", null, qc);
     } catch(final IOException ex) {
       ok = false;
@@ -101,7 +101,7 @@ public class ZipZipFile extends ZipFn {
         if(src != null) {
           // write file to zip archive
           if(!new IOFile(src).exists()) throw ZIP_NOTFOUND_X.get(info, src);
-          try(final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(src))) {
+          try(BufferedInputStream bis = new BufferedInputStream(new FileInputStream(src))) {
             for(int c; (c = bis.read(data)) != -1;) zos.write(data, 0, c);
           }
         } else {
@@ -131,7 +131,7 @@ public class ZipZipFile extends ZipFn {
             } else {
               // serialize new nodes
               final ArrayOutput ao = new ArrayOutput();
-              try(final Serializer ser = Serializer.get(ao, sopts(node))) {
+              try(Serializer ser = Serializer.get(ao, sopts(node))) {
                 do {
                   ser.serialize(DataBuilder.stripNS(n, ZIP_URI, qc.context));
                 } while((n = ch.next()) != null);

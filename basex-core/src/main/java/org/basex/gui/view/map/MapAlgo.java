@@ -38,5 +38,5 @@ abstract class MapAlgo {
    * @param ne end array position
    * @return rectangles
    */
-  abstract MapRects calcMap(final MapRect r, final MapList l, final int ns, final int ne);
+  abstract MapRects calcMap(MapRect r, MapList l, int ns, int ne);
 }

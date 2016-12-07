@@ -223,7 +223,7 @@ public final class BaseXLayout {
      * Drops a file.
      * @param obj object to be dropped
      */
-    void drop(final Object obj);
+    void drop(Object obj);
   }
 
   /**

@@ -43,7 +43,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
     final TokenSet hs = entries(1, qc);
 
     final TokenList tl = new TokenList();
-    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(!ze.isDirectory() && (hs == null || hs.delete(token(ze.getName())) != 0))

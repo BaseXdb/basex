@@ -23,7 +23,7 @@ public final class Part3 extends Main {
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     init("3: Querying Data from XML Files or Java XML APIs");
 
     // Create a connection

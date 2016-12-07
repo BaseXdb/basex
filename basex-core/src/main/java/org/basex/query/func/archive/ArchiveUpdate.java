@@ -44,8 +44,8 @@ public final class ArchiveUpdate extends ArchiveCreate {
     if(en != null) do e++; while(entr.next() != null);
     if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
 
-    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-        final ArchiveOut out = ArchiveOut.get(in.format(), info)) {
+    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+        ArchiveOut out = ArchiveOut.get(in.format(), info)) {
       if(in instanceof GZIPIn)
         throw ARCH_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       // delete entries to be updated

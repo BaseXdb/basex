@@ -84,14 +84,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @param len number of items
    * @return the sub-sequence
    */
-  public abstract Value subSeq(final long start, final long len);
+  public abstract Value subSeq(long start, long len);
 
   /**
    * Materializes streamable values.
    * @param ii input info
    * @throws QueryException query exception
    */
-  public abstract void materialize(final InputInfo ii) throws QueryException;
+  public abstract void materialize(InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns the atomized items.
@@ -99,7 +99,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return materialized item
    * @throws QueryException query exception
    */
-  public abstract Value atomValue(final InputInfo ii) throws QueryException;
+  public abstract Value atomValue(InputInfo ii) throws QueryException;
 
   @Override
   public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -162,7 +162,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return hash code
    * @throws QueryException if atomization can't be applied (e.g. function item)
    */
-  public abstract int hash(final InputInfo ii) throws QueryException;
+  public abstract int hash(InputInfo ii) throws QueryException;
 
   /**
    * Writes this value's items out to the given array.
@@ -170,7 +170,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @param index start position
    * @return number of written items
    */
-  public abstract int writeTo(final Item[] arr, final int index);
+  public abstract int writeTo(Item[] arr, int index);
 
   /**
    * Creates an array containing all items of this value.
@@ -229,7 +229,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @param pos position
    * @return item
    */
-  public abstract Item itemAt(final long pos);
+  public abstract Item itemAt(long pos);
 
   /**
    * Checks if all items of this value share the same type.

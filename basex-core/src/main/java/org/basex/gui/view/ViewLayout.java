@@ -19,7 +19,7 @@ interface ViewLayout {
    * Sets the visibility of the view layout.
    * @param db database flag
    */
-  void setVisibility(final boolean db);
+  void setVisibility(boolean db);
 
   /**
    * Removes the specified panel.

@@ -621,7 +621,7 @@ public final class EditorView extends View {
   private byte[] read(final IOFile file) throws IOException {
     // check content
     final TokenBuilder text = new TokenBuilder((int) Math.min(Integer.MAX_VALUE, file.length()));
-    try(final TextInput ti = new NewlineInput(file).validate(true)) {
+    try(TextInput ti = new NewlineInput(file).validate(true)) {
       boolean valid = true;
       while(true) {
         try {
@@ -735,7 +735,7 @@ public final class EditorView extends View {
         if(id != statusID) return;
 
         // parse query
-        try(final QueryContext qc = new QueryContext(gui.context)) {
+        try(QueryContext qc = new QueryContext(gui.context)) {
           parseQC = qc;
           qc.parse(input, lib, file.path(), null);
           if(id == statusID) info(null);

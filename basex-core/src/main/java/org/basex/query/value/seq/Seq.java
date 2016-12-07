@@ -94,7 +94,7 @@ public abstract class Seq extends Value {
    * @param val value to insert
    * @return resulting value
    */
-  public abstract Value insert(final long pos, final Item val);
+  public abstract Value insert(long pos, Item val);
 
   /**
    * Helper for {@link #insertBefore(long, Value)} that copies all items into a {@link TreeSeq}.
@@ -116,7 +116,7 @@ public abstract class Seq extends Value {
    * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
    * @return resulting sequence
    */
-  public abstract Value remove(final long pos);
+  public abstract Value remove(long pos);
 
   /**
    * Helper for {@link #remove(long)} that copies all items into a {@link TreeSeq}.

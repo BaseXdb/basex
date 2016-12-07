@@ -88,7 +88,7 @@ public final class DialogBindings extends BaseXDialog {
       } else if(name.equals(".")) {
         name = "";
       }
-      String value = values[c].getText();
+      final String value = values[c].getText();
       if(bind.length() != 0) bind.append(',');
       bind.append((name + '=' + value).replaceAll(",", ",,"));
     }

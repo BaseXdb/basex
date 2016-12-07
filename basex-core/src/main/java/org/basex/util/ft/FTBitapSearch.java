@@ -138,6 +138,6 @@ public final class FTBitapSearch {
      * @return {@code true} if the two are equal
      * @throws QueryException if an error occurs during comparison
      */
-    boolean equal(final byte[] token1, final byte[] token2) throws QueryException;
+    boolean equal(byte[] token1, byte[] token2) throws QueryException;
   }
 }

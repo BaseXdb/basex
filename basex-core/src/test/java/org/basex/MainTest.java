@@ -23,7 +23,7 @@ abstract class MainTest extends SandboxTest {
    * @return result
    * @throws IOException I/O exception
    */
-  protected abstract String run(final String... args) throws IOException;
+  protected abstract String run(String... args) throws IOException;
 
   /**
    * Runs a request and compares the result with the expected result.

@@ -80,7 +80,7 @@ public abstract class AxisPath extends Path {
    * @return iterator
    * @throws QueryException query exception
    */
-  protected abstract NodeIter nodeIter(final QueryContext qc) throws QueryException;
+  protected abstract NodeIter nodeIter(QueryContext qc) throws QueryException;
 
   /**
    * Inverts a location path.

@@ -65,14 +65,14 @@ public abstract class Stemmer extends LanguageImpl {
    * @param fti full-text iterator
    * @return stemmer
    */
-  abstract Stemmer get(final Language lang, final FTIterator fti);
+  abstract Stemmer get(Language lang, FTIterator fti);
 
   /**
    * Stems a word.
    * @param word input word to stem
    * @return the stem of the word
    */
-  protected abstract byte[] stem(final byte[] word);
+  protected abstract byte[] stem(byte[] word);
 
   @Override
   public final Stemmer init(final byte[] txt) {

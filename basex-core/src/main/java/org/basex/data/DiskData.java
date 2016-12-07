@@ -43,7 +43,7 @@ public final class DiskData extends Data {
   public DiskData(final MetaData meta) throws IOException {
     super(meta);
 
-    try(final DataInput in = new DataInput(meta.dbfile(DATAINF))) {
+    try(DataInput in = new DataInput(meta.dbfile(DATAINF))) {
       meta.read(in);
       while(true) {
         final String k = string(in.readToken());
@@ -112,7 +112,7 @@ public final class DiskData extends Data {
   private void write() throws IOException {
     if(!meta.dirty) return;
 
-    try(final DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
+    try(DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
       meta.write(out);
       out.writeToken(token(DBTAGS));
       elemNames.write(out);

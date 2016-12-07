@@ -76,7 +76,7 @@ public abstract class View extends BaseXPanel {
    * Sets a flag denoting the visibility of the view.
    * @param v visibility flag
    */
-  public abstract void visible(final boolean v);
+  public abstract void visible(boolean v);
 
   /**
    * Tests if this view relies on a database instance.

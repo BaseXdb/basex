@@ -16,21 +16,21 @@ public interface GUICommand {
    * Executes the command.
    * @param gui reference to the main window
    */
-  void execute(final GUI gui);
+  void execute(GUI gui);
 
   /**
    * Checks if the command is currently enabled.
    * @param gui reference to the main window
    * @return result of check
    */
-  boolean enabled(final GUI gui);
+  boolean enabled(GUI gui);
 
   /**
    * Checks if the command is currently selected.
    * @param gui reference to the main window
    * @return result of check
    */
-  boolean selected(final GUI gui);
+  boolean selected(GUI gui);
 
   /**
    * Indicates if this is a command that can be turned on and off.

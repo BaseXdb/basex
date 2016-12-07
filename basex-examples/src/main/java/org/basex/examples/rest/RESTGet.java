@@ -39,7 +39,7 @@ public final class RESTGet {
       System.out.println("\n* Result:");
 
       // Get and cache input as UTF-8 encoded stream
-      try(final BufferedReader br = new BufferedReader(
+      try(BufferedReader br = new BufferedReader(
           new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
 
         // Print all lines of the result

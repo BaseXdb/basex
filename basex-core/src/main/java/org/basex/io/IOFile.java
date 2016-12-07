@@ -224,7 +224,7 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final InputStream in) throws IOException {
-    try(final BufferOutput out = new BufferOutput(pth)) {
+    try(BufferOutput out = new BufferOutput(pth)) {
       for(int i; (i = in.read()) != -1;) out.write(i);
     }
   }

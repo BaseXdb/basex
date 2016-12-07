@@ -92,7 +92,7 @@ public final class QT3TS extends Main {
    * @param args command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     try {
       new QT3TS(args).run();
     } catch(final IOException ex) {
@@ -149,7 +149,7 @@ public final class QT3TS extends Main {
 
     // save log data
     Util.outln(NL + "Writing log file '" + testid + ".log'...");
-    try(final PrintOutput po = new PrintOutput(testid + ".log")) {
+    try(PrintOutput po = new PrintOutput(testid + ".log")) {
       po.println("QT3TS RESULTS __________________________" + NL);
       po.println(result.toString());
       po.println("WRONG __________________________________" + NL);
@@ -785,7 +785,7 @@ public final class QT3TS extends Main {
   private static String serialize(final QT3Result result) throws QueryException, IOException {
     try {
       final ArrayOutput ao = new ArrayOutput();
-      try(final Serializer ser = result.query.qp().getSerializer(ao)) {
+      try(Serializer ser = result.query.qp().getSerializer(ao)) {
         for(final Item it : result.value.internal()) ser.serialize(it);
       }
       return ao.toString();

@@ -35,13 +35,13 @@ public abstract class ValueIndex implements Index {
    * Deletes entries from the index.
    * @param vc value cache with [key, id-list] pairs
    */
-  public abstract void delete(final ValueCache vc);
+  public abstract void delete(ValueCache vc);
 
   /**
    * Add entries to the index.
    * @param vc value cache with [key, id-list] pairs
    */
-  public abstract void add(final ValueCache vc);
+  public abstract void add(ValueCache vc);
 
   /**
    * Flushes the buffered data.

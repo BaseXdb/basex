@@ -47,9 +47,9 @@ public final class Put extends DBUpdate {
       final int pre = data.pre(id);
       if(pre == -1) return;
       final DBNode node = new DBNode(data, pre);
-      try(final PrintOutput po = new PrintOutput(u)) {
+      try(PrintOutput po = new PrintOutput(u)) {
         final SerializerOptions sopts = SerializerMode.DEFAULT.get();
-        try(final Serializer ser = Serializer.get(po, sopts)) {
+        try(Serializer ser = Serializer.get(po, sopts)) {
           ser.serialize(node);
         }
       } catch(final IOException ex) {

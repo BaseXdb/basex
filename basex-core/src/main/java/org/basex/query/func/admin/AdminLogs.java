@@ -103,7 +103,7 @@ public final class AdminLogs extends AdminFn {
   private ElementNodes<LogEntry> logs(final IOFile file, final QueryContext qc)
       throws QueryException {
 
-    try(final NewlineInput nli = new NewlineInput(file)) {
+    try(NewlineInput nli = new NewlineInput(file)) {
       final ElementNodes<LogEntry> logs = new ElementNodes<>();
       for(String line; (line = nli.readLine()) != null;) {
         qc.checkStop();

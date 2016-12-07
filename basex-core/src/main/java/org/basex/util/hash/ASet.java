@@ -87,11 +87,11 @@ public abstract class ASet {
    * @param id id of the element
    * @return hash value
    */
-  protected abstract int hash(final int id);
+  protected abstract int hash(int id);
 
   /**
    * Rehashes all entries.
    * @param newSize new hash size
    */
-  protected abstract void rehash(final int newSize);
+  protected abstract void rehash(int newSize);
 }

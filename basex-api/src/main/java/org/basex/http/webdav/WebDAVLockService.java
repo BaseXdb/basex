@@ -151,7 +151,7 @@ final class WebDAVLockService {
       module = string(new IOStream(is).read());
     }
 
-    try(final QueryProcessor qp = new QueryProcessor(query.toString(), http.context(true))) {
+    try(QueryProcessor qp = new QueryProcessor(query.toString(), http.context(true))) {
       for(final Entry<String, String> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }

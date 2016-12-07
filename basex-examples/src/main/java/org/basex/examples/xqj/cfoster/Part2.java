@@ -19,7 +19,7 @@ public final class Part2 extends Main {
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     init("2: Executing XQuery in Java");
 
     // Create the connection

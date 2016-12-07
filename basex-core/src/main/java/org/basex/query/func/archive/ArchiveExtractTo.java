@@ -27,7 +27,7 @@ public class ArchiveExtractTo extends ArchiveFn {
     final B64 archive = toB64(exprs[1], qc, false);
     final TokenSet hs = entries(2, qc);
 
-    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         final String name = ze.getName();

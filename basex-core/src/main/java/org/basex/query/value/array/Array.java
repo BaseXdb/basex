@@ -78,7 +78,7 @@ public abstract class Array extends FItem {
    * @param elem element to prepend
    * @return resulting array
    */
-  public abstract Array cons(final Value elem);
+  public abstract Array cons(Value elem);
 
   /**
    * Appends an element to the back of this array.
@@ -86,7 +86,7 @@ public abstract class Array extends FItem {
    * @param elem element to append
    * @return resulting array
    */
-  public abstract Array snoc(final Value elem);
+  public abstract Array snoc(Value elem);
 
   /**
    * Gets the element at the given position in this array.
@@ -106,7 +106,7 @@ public abstract class Array extends FItem {
    * @return resulting array
    * @throws IndexOutOfBoundsException if {@code pos < 0} or {@code pos >= this.arraySize()}
    */
-  public abstract Array put(final long pos, final Value val);
+  public abstract Array put(long pos, Value val);
 
   /**
    * Returns the number of elements in this array.
@@ -162,7 +162,7 @@ public abstract class Array extends FItem {
    * @return the sub-array
    * @throws IndexOutOfBoundsException if {@code pos < 0} or {@code pos + len > this.arraySize()}
    */
-  public abstract Array subArray(final long pos, final long len);
+  public abstract Array subArray(long pos, long len);
 
   /**
    * Returns an array with the same elements as this one, but their order reversed.
@@ -186,7 +186,7 @@ public abstract class Array extends FItem {
    * @return resulting array
    * @throws IndexOutOfBoundsException if {@code pos < 0 || pos > this.arraySize()} holds
    */
-  public abstract Array insertBefore(final long pos, final Value val);
+  public abstract Array insertBefore(long pos, Value val);
 
   /**
    * Removes the element at the given position in this array.
@@ -195,7 +195,7 @@ public abstract class Array extends FItem {
    * @return resulting array
    * @throws IndexOutOfBoundsException if {@code pos < 0 || pos >= this.arraySize()} holds
    */
-  public abstract Array remove(final long pos);
+  public abstract Array remove(long pos);
 
   @Override
   public final void materialize(final InputInfo ii) throws QueryException {
@@ -208,7 +208,7 @@ public abstract class Array extends FItem {
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array members
    */
-  public abstract ListIterator<Value> iterator(final long start);
+  public abstract ListIterator<Value> iterator(long start);
 
   /** Iterable over the elements of this array. */
   private Iterable<Value> iterable;
@@ -234,7 +234,7 @@ public abstract class Array extends FItem {
    * @param vals values, with length at most {@link Array#MAX_SMALL}
    * @return resulting array
    */
-  abstract Array consSmall(final Value[] vals);
+  abstract Array consSmall(Value[] vals);
 
   /**
    * Returns an array containing the values at the indices {@code from} to {@code to - 1} in

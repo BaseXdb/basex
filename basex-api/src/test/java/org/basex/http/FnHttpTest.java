@@ -67,7 +67,7 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test
   public void put() throws Exception {
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
@@ -82,7 +82,7 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void putPost() throws Exception {
     // PUT - query
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
@@ -90,7 +90,7 @@ public class FnHttpTest extends HTTPTest {
     }
 
     // POST - query
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='post'>"
         + "<http:body media-type='application/xml'>"
         + "<query xmlns='" + Prop.URL + "/rest'>"
@@ -102,7 +102,7 @@ public class FnHttpTest extends HTTPTest {
     }
 
     // Execute the same query but with content set from $bodies
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
        "<http:request method='post'>"
         + "<http:body media-type='application/xml'/>"
         + "</http:request>",
@@ -121,7 +121,7 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void postGet() throws Exception {
     // GET1 - just send a GET request
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
       final Value v = qp.value();
       checkResponse(v, 2, HttpURLConnection.HTTP_OK);
@@ -130,7 +130,7 @@ public class FnHttpTest extends HTTPTest {
     }
 
     // GET2 - with override-media-type='text/plain'
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' override-media-type='text/plain'/>", REST_ROOT), ctx)) {
       final Value v = qp.value();
       checkResponse(v, 2, HttpURLConnection.HTTP_OK);
@@ -139,7 +139,7 @@ public class FnHttpTest extends HTTPTest {
     }
 
     // Get3 - with status-only='true'
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' status-only='true'/>", REST_ROOT), ctx)) {
       checkResponse(qp.value(), 1, HttpURLConnection.HTTP_OK);
     }
@@ -152,7 +152,7 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void postDelete() throws Exception {
     // add document to be deleted
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='put'>"
         + "<http:body media-type='text/xml'><ToBeDeleted/></http:body>"
         + "</http:request>", RESTURL), ctx)) {
@@ -160,7 +160,7 @@ public class FnHttpTest extends HTTPTest {
     }
 
     // DELETE
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='delete' status-only='true'/>", RESTURL), ctx)) {
       checkResponse(qp.value(), 1, HttpURLConnection.HTTP_OK);
     }
@@ -198,7 +198,7 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test
   public void error() throws Exception {
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get'/>", RESTURL + "unknown") + "[1]/@status/data()", ctx)) {
       assertEquals("404", qp.value().serialize().toString());
     }
@@ -339,14 +339,14 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void basic() throws Exception {
     // correct credentials
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
         + "auth-method='Basic' username='admin' password='admin'/>"), ctx)) {
       checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
     }
     // wrong credentials
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request xmlns:http='http://expath.org/ns/http-client' " +
         "method='GET' href='" + REST_ROOT + "' send-authorization='true' " +
         "auth-method='Basic' username='unknown' password='wrong'/>") +
@@ -362,14 +362,14 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void digest() throws Exception {
     // correct credentials
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "send-authorization='true' auth-method='Digest' username='admin' password='admin' " +
         "href='" + REST_ROOT + "'/>"), ctx)) {
       checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
     }
     // wrong credentials
-    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "send-authorization='true' auth-method='Digest' username='unknown' password='wrong' " +
         "href='" + REST_ROOT + "?query=()'/>") +

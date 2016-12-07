@@ -87,7 +87,7 @@ public abstract class FTFilter extends FTExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected abstract boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer)
+  protected abstract boolean filter(QueryContext qc, FTMatch match, FTLexer lexer)
       throws QueryException;
 
   /**

@@ -16,5 +16,5 @@ public interface NodeLike<N, E> {
    * @param pos number of nodes in the buffer
    * @return new number of nodes
    */
-  int append(final NodeLike<N, E>[] nodes, final int pos);
+  int append(NodeLike<N, E>[] nodes, int pos);
 }

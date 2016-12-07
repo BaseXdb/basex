@@ -104,7 +104,7 @@ public abstract class StandardSerializer extends OutputSerializer {
     if(sep && atomic) out.print(' ');
     try {
       if(item instanceof StrStream && form == null) {
-        try(final InputStream is = item.input(null)) {
+        try(InputStream is = item.input(null)) {
           for(int cp; (cp = is.read()) != -1;) printChar(cp);
         }
       } else {

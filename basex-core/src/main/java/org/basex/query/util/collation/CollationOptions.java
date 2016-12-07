@@ -18,7 +18,7 @@ abstract class CollationOptions extends Options {
    * @param args arguments
    * @return error message
    */
-  abstract Collation get(final String args);
+  abstract Collation get(String args);
 
   /**
    * Parses the specified options and returns the faulty key.

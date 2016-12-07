@@ -42,12 +42,12 @@ final class XMLParser extends CommandParser {
         query = COMMANDS + query;
         // ensure that the root contains no text nodes as children
         final String ws = COMMANDS + "/text()[normalize-space()]";
-        try(final QueryProcessor qp = new QueryProcessor(ws, ctx).context(node)) {
+        try(QueryProcessor qp = new QueryProcessor(ws, ctx).context(node)) {
           if(!qp.value().isEmpty())
             throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
         }
       }
-      try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
+      try(QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
         for(final Item ia : qp.value()) cmds.add(command(ia).baseURI(uri));
       }
     } catch(final IOException ex) {
@@ -215,7 +215,7 @@ final class XMLParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String xml(final Item root) throws IOException, QueryException {
-    try(final QueryProcessor qp = new QueryProcessor("node()", ctx)) {
+    try(QueryProcessor qp = new QueryProcessor("node()", ctx)) {
       return qp.context(root).value().serialize().toString().trim();
     }
   }
@@ -228,7 +228,7 @@ final class XMLParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String execute(final String query, final Item context) throws QueryException {
-    try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(context)) {
+    try(QueryProcessor qp = new QueryProcessor(query, ctx).context(context)) {
       final Iter ir = qp.iter();
       final Item it = ir.next();
       return it == null ? "" : it.toJava().toString().trim();
@@ -296,7 +296,7 @@ final class XMLParser extends CommandParser {
 
     // run query
     final Value mv = ma.value(), ov = oa.value();
-    try(final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
+    try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
       qp.bind("A", mv).bind("O", ov);
       if(qp.value().size() != 0) return true;
     }

@@ -30,7 +30,7 @@ public final class FileReadBinary extends FileFn {
     if(exprs.length == 1) return new B64Stream(new IOFile(path.toFile()), FILE_IO_ERROR_X);
 
     // read file chunk
-    try(final DataAccess da = new DataAccess(new IOFile(path.toFile()))) {
+    try(DataAccess da = new DataAccess(new IOFile(path.toFile()))) {
       final long dlen = da.length();
       if(exprs.length == 2) len = dlen - off;
       if(off < 0 || off > dlen || len < 0 || off + len > dlen)

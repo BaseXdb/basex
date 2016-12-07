@@ -28,7 +28,7 @@ abstract class TextDecoder {
    * @return next character
    * @throws IOException I/O exception
    */
-  abstract int read(final TextInput ti) throws IOException;
+  abstract int read(TextInput ti) throws IOException;
 
   /**
    * Returns a decoder for the specified encoding.

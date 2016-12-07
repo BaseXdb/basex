@@ -58,7 +58,7 @@ public abstract class CsvConverter extends Job {
    * @throws IOException I/O exception
    */
   public final Item convert(final IO input) throws IOException {
-    try(final NewlineInput in = new NewlineInput(input)) {
+    try(NewlineInput in = new NewlineInput(input)) {
       nli = in;
       CsvParser.parse(in.encoding(copts.get(CsvParserOptions.ENCODING)), copts, this);
     }
@@ -81,7 +81,7 @@ public abstract class CsvConverter extends Job {
    * Adds a new header.
    * @param string string
    */
-  protected abstract void header(final byte[] string);
+  protected abstract void header(byte[] string);
 
   /**
    * Adds a new record.
@@ -94,7 +94,7 @@ public abstract class CsvConverter extends Job {
    * @param value string
    * @throws IOException I/O exception
    */
-  protected abstract void entry(final byte[] value) throws IOException;
+  protected abstract void entry(byte[] value) throws IOException;
 
   /**
    * Returns the resulting byte array.

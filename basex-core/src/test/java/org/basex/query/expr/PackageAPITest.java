@@ -210,7 +210,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void importTwoModulesFromPkg() throws Exception {
-    try(final QueryProcessor qp = new QueryProcessor(
+    try(QueryProcessor qp = new QueryProcessor(
       "import module namespace ns1='ns1';" +
       "import module namespace ns3='ns3';" +
       "(ns1:test2() eq 'pkg2mod1') and (ns3:test() eq 'pkg2mod2')",
@@ -266,7 +266,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(isFile(dir + "/jar/wrapper.xq"));
 
     // use package
-    try(final QueryProcessor qp = new QueryProcessor(
+    try(QueryProcessor qp = new QueryProcessor(
         "import module namespace j='jar'; j:print('test')", context)) {
       assertEquals(qp.value().serialize().toString(), "test");
     }
@@ -282,12 +282,12 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void importPkg() throws Exception {
     // try with a package without dependencies
-    try(final QueryProcessor qp = new QueryProcessor(
+    try(QueryProcessor qp = new QueryProcessor(
         "import module namespace ns3='ns3'; ns3:test()", context)) {
       assertEquals(qp.value().serialize().toString(), "pkg2mod2");
     }
     // try with a package with dependencies
-    try(final QueryProcessor qp = new QueryProcessor(
+    try(QueryProcessor qp = new QueryProcessor(
         "import module namespace ns2='ns2'; ns2:test()", context)) {
       assertEquals(qp.value().serialize().toString(), "pkg2mod2");
     }

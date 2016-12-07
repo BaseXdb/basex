@@ -82,7 +82,7 @@ public abstract class Item extends Value {
    * @return string value
    * @throws QueryException if the item cannot be atomized (caused by function or streaming items)
    */
-  public abstract byte[] string(final InputInfo ii) throws QueryException;
+  public abstract byte[] string(InputInfo ii) throws QueryException;
 
   /**
    * Returns a boolean representation of the value.
@@ -165,8 +165,8 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException;
+  public abstract boolean eq(Item it, Collation coll, StaticContext sc, InputInfo ii)
+      throws QueryException;
 
   /**
    * Checks the items for equivalence.

@@ -47,7 +47,7 @@ public final class BaseXServer extends CLI implements Runnable {
    * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
-  public static void main(final String[] args) {
+  public static void main(final String... args) {
     try {
       new BaseXServer(args);
     } catch(final IOException ex) {
@@ -291,7 +291,7 @@ public final class BaseXServer extends CLI implements Runnable {
   public static boolean ping(final String host, final int port) {
     try {
       // connect server with invalid login data
-      try(final ClientSession cs = new ClientSession(host, port, "", "")) { }
+      try(ClientSession cs = new ClientSession(host, port, "", "")) { }
       return false;
     } catch(final LoginException ex) {
       // if login was checked, server is running
@@ -311,7 +311,7 @@ public final class BaseXServer extends CLI implements Runnable {
     final IOFile stopFile = stopFile(port);
     try {
       stopFile.touch();
-      try(final Socket s = new Socket(host, port)) { }
+      try(Socket s = new Socket(host, port)) { }
       // wait and check if server was really stopped
       do Performance.sleep(100); while(ping(S_LOCALHOST, port));
     } catch(final ConnectException ex) {

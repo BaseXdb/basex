@@ -75,7 +75,7 @@ public final class ServerQueryTest extends SandboxTest {
     // run server instance
     server = createServer();
     // create test database
-    try(final ClientSession cs = createClient()) {
+    try(ClientSession cs = createClient()) {
       cs.execute("create db test " + INPUT);
       // run clients
       final Client[] cl = new Client[clients];

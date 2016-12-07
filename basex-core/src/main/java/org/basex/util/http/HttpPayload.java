@@ -343,7 +343,7 @@ public final class HttpPayload {
     } else if(type.isText()) {
       value = Str.get(new NewlineInput(input).content());
     } else if(type.isMultipart()) {
-      try(final InputStream is = input.inputStream()) {
+      try(InputStream is = input.inputStream()) {
         final HttpPayload hp = new HttpPayload(is, true, null, options);
         hp.extractParts(concat(DASHES, hp.boundary(type)), null);
         value = hp.payloads();

@@ -30,7 +30,7 @@ final class JarManifest {
         while(list.hasMoreElements()) {
           final URL url = list.nextElement();
           if(!url.getFile().contains(jar)) continue;
-          try(final InputStream in = url.openStream()) {
+          try(InputStream in = url.openStream()) {
             m = new Manifest(in).getMainAttributes();
             break;
           }

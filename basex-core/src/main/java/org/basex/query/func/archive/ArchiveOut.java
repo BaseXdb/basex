@@ -44,14 +44,14 @@ abstract class ArchiveOut implements Closeable {
    * Sets the compression level.
    * @param l level
    */
-  public abstract void level(final int l);
+  public abstract void level(int l);
 
   /**
    * Writes data from the specified archive.
    * @param in input archive
    * @throws IOException I/O exception
    */
-  public abstract void write(final ArchiveIn in) throws IOException;
+  public abstract void write(ArchiveIn in) throws IOException;
 
   /**
    * Writes the specified entry.
@@ -59,7 +59,7 @@ abstract class ArchiveOut implements Closeable {
    * @param value value to be written
    * @throws IOException I/O exception
    */
-  public abstract void write(final ZipEntry entry, final byte[] value) throws IOException;
+  public abstract void write(ZipEntry entry, byte[] value) throws IOException;
 
   @Override
   public abstract void close();

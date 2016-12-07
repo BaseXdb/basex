@@ -630,7 +630,7 @@ public class Options implements Iterable<Option<?>> {
     final StringList errs = new StringList();
     final boolean exists = file.exists();
     if(exists) {
-      try(final NewlineInput nli = new NewlineInput(opts)) {
+      try(NewlineInput nli = new NewlineInput(opts)) {
         boolean local = false;
         for(String line; (line = nli.readLine()) != null;) {
           line = line.trim();
@@ -711,7 +711,7 @@ public class Options implements Iterable<Option<?>> {
 
     int l = 0;
     final int ls = lines.size();
-    try(final NewlineInput nli = new NewlineInput(file)) {
+    try(NewlineInput nli = new NewlineInput(file)) {
       for(String line; (line = nli.readLine()) != null;) {
         if(l == ls || !lines.get(l++).equals(line)) return true;
       }

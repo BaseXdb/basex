@@ -195,7 +195,7 @@ public abstract class Collation {
    * @param compare string to be compared
    * @return result of check
    */
-  public abstract int compare(final byte[] string, final byte[] compare);
+  public abstract int compare(byte[] string, byte[] compare);
 
   /**
    * Returns the start or end position of the specified substring.
@@ -206,6 +206,6 @@ public abstract class Collation {
    * @return string index
    * @throws QueryException query exception
    */
-  protected abstract int indexOf(final String string, final String sub, final Mode mode,
-      final InputInfo info) throws QueryException;
+  protected abstract int indexOf(String string, String sub, Mode mode, InputInfo info)
+      throws QueryException;
 }

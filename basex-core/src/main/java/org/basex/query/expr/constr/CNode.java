@@ -30,7 +30,7 @@ public abstract class CNode extends Arr {
   }
 
   @Override
-  public abstract ANode item(final QueryContext qc, final InputInfo ii) throws QueryException;
+  public abstract ANode item(QueryContext qc, InputInfo ii) throws QueryException;
 
   @Override
   public boolean has(final Flag flag) {

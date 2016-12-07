@@ -11,5 +11,5 @@ public interface LinkListener {
    * Invoked when a link is pressed.
    * @param link pressed link
    */
-  void linkClicked(final String link);
+  void linkClicked(String link);
 }

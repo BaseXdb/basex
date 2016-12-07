@@ -37,7 +37,7 @@ public abstract class BasicUpdate {
    * Applies the update to the given data instance.
    * @param data data instance on which to execute the update
    */
-  abstract void apply(final Data data);
+  abstract void apply(Data data);
 
   /**
    * Returns the data to be inserted (for inserts,...).

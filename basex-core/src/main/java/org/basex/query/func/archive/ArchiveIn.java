@@ -65,7 +65,7 @@ abstract class ArchiveIn implements Closeable {
    * @return number of read bytes
    * @throws IOException I/O exception
    */
-  public abstract int read(final byte[] d) throws IOException;
+  public abstract int read(byte[] d) throws IOException;
 
   /**
    * Reads the next entry.

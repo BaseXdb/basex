@@ -348,7 +348,7 @@ public final class HttpClient {
     if(src != null) {
       out.write(IO.get(src).read());
     } else {
-      try(final Serializer ser = Serializer.get(out, sopts)) {
+      try(Serializer ser = Serializer.get(out, sopts)) {
         for(final Item it : payload) ser.serialize(it);
       }
     }

@@ -39,10 +39,10 @@ public final class ZipUpdateEntries extends ZipZipFile {
     // open zip file
     if(!new IOFile(in).exists()) throw ZIP_NOTFOUND_X.get(info, in);
     boolean ok = true;
-    try(final ZipFile zf = new ZipFile(in)) {
+    try(ZipFile zf = new ZipFile(in)) {
       // write zip file
-      try(final FileOutputStream fos = new FileOutputStream(out.path());
-          final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
+      try(FileOutputStream fos = new FileOutputStream(out.path());
+          ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
         // fill new zip file with entries from old file and description
         create(zos, elm.children(), "", zf, qc);
       } catch(final IOException ex) {

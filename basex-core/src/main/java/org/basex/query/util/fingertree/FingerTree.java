@@ -121,7 +121,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @return resulting tree
    * @throws IndexOutOfBoundsException if the position is out of bounds
    */
-  public abstract FingerTree<N, E> set(final long pos, final E val);
+  public abstract FingerTree<N, E> set(long pos, E val);
 
   /**
    * The size of this tree.
@@ -134,14 +134,14 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param fst new first element
    * @return updated tree
    */
-  public abstract FingerTree<N, E> cons(final Node<N, E> fst);
+  public abstract FingerTree<N, E> cons(Node<N, E> fst);
 
   /**
    * Adds an element to the end of this tree.
    * @param lst new last element
    * @return updated tree
    */
-  public abstract FingerTree<N, E> snoc(final Node<N, E> lst);
+  public abstract FingerTree<N, E> snoc(Node<N, E> lst);
 
   /**
    * Returns the first element of this tree.
@@ -176,8 +176,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param other the other tree
    * @return concatenation of both trees
    */
-  public abstract FingerTree<N, E> concat(final Node<N, E>[] mid, final long sz,
-      final FingerTree<N, E> other);
+  public abstract FingerTree<N, E> concat(Node<N, E>[] mid, long sz, FingerTree<N, E> other);
 
   /**
    * Creates a reversed version of this tree.
@@ -191,7 +190,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param val value to insert
    * @return resulting tree
    */
-  public abstract FingerTree<N, E> insert(final long pos, final E val);
+  public abstract FingerTree<N, E> insert(long pos, E val);
 
   /**
    * Removes an element from this tree.
@@ -199,7 +198,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @return resulting (potentially partial) tree
    * @throws AssertionError if this tree is empty
    */
-  public abstract TreeSlice<N, E> remove(final long pos);
+  public abstract TreeSlice<N, E> remove(long pos);
 
   /**
    * Extracts a slice from this tree containing the {@code len} elements starting with that at
@@ -208,21 +207,21 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param len number of elements
    * @return resulting slice
    */
-  public abstract TreeSlice<N, E> slice(final long pos, final long len);
+  public abstract TreeSlice<N, E> slice(long pos, long len);
 
   /**
    * Replaces the first node in this tree.
    * @param head new first node
    * @return resulting tree
    */
-  public abstract FingerTree<N, E> replaceHead(final Node<N, E> head);
+  public abstract FingerTree<N, E> replaceHead(Node<N, E> head);
 
   /**
    * Replaces the last node in this tree.
    * @param last new last node
    * @return resulting tree
    */
-  public abstract FingerTree<N, E> replaceLast(final Node<N, E> last);
+  public abstract FingerTree<N, E> replaceLast(Node<N, E> last);
 
   /**
    * Recursively constructs a finger tree from an array of nodes.
@@ -277,7 +276,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param left insertion direction, {@code true} adds to the left, {@code false} to the right
    * @return resulting tree
    */
-  abstract FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean left);
+  abstract FingerTree<N, E> addAll(Node<N, E>[] nodes, long sz, boolean left);
 
   @Override
   public final String toString() {
@@ -291,7 +290,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param sb string builder
    * @param indent indentation depth
    */
-  abstract void toString(final StringBuilder sb, final int indent);
+  abstract void toString(StringBuilder sb, int indent);
 
   /**
    * Checks that this tree does not violate any invariants.

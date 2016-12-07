@@ -50,7 +50,7 @@ public abstract class Inspect implements InspectText {
    * @return inspection element
    * @throws QueryException query exception
    */
-  public abstract FElem parse(final IO io) throws QueryException;
+  public abstract FElem parse(IO io) throws QueryException;
 
   /**
    * Parses a module.
@@ -59,7 +59,7 @@ public abstract class Inspect implements InspectText {
    * @throws QueryException query exception
    */
   final QueryParser parseQuery(final IO io) throws QueryException {
-    try(final QueryContext qctx = new QueryContext(qc.context)) {
+    try(QueryContext qctx = new QueryContext(qc.context)) {
       final String input = string(io.read());
       // parse query
       final QueryParser qp = new QueryParser(input, io.path(), qctx, null);
@@ -109,7 +109,7 @@ public abstract class Inspect implements InspectText {
    * @param parent parent element
    * @return element
    */
-  protected abstract FElem elem(final byte[] name, final FElem parent);
+  protected abstract FElem elem(byte[] name, FElem parent);
 
   /**
    * Creates an element.
@@ -117,7 +117,7 @@ public abstract class Inspect implements InspectText {
    * @param parent parent element
    * @return element node
    */
-  protected abstract FElem elem(final String name, final FElem parent);
+  protected abstract FElem elem(String name, FElem parent);
 
   /**
    * Parses a string as XML and adds the resulting nodes to the specified parent.

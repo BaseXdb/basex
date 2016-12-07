@@ -36,7 +36,7 @@ public final class Retrieve extends ACreate {
     final IOFile bin = data.meta.binary(path);
     if(bin == null || !bin.exists() || bin.isDir()) return error(RES_NOT_FOUND_X, path);
 
-    try(final BufferInput bi = new BufferInput(bin)) {
+    try(BufferInput bi = new BufferInput(bin)) {
       for(int b; (b = bi.read()) != -1;) out.write(b);
       return info(QUERY_EXECUTED_X_X, "", job().performance);
     } catch(final IOException ex) {

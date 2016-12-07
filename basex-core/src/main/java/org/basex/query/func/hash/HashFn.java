@@ -30,7 +30,7 @@ abstract class HashFn extends StandardFunc {
     try {
       final MessageDigest md = MessageDigest.getInstance(algo);
       if(item instanceof B64Stream) {
-        try(final BufferInput bi = item.input(info)) {
+        try(BufferInput bi = item.input(info)) {
           final byte[] tmp = new byte[IO.BLOCKSIZE];
           do {
             final int n = bi.read(tmp);

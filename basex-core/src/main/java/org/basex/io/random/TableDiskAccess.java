@@ -58,7 +58,7 @@ public final class TableDiskAccess extends TableAccess {
     super(md);
 
     // read meta and index data
-    try(final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'))) {
+    try(DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'))) {
       final int s = in.readNum();
       size = s;
 
@@ -96,7 +96,7 @@ public final class TableDiskAccess extends TableAccess {
     final IOFile table = MetaData.file(ctx.soptions.dbPath(db), DATATBL);
     if(!table.exists()) return false;
 
-    try(final FileChannel fc = new RandomAccessFile(table.file(), "rw").getChannel()) {
+    try(FileChannel fc = new RandomAccessFile(table.file(), "rw").getChannel()) {
       return fc.tryLock() == null;
     } catch(final IOException ex) {
       return true;
@@ -108,7 +108,7 @@ public final class TableDiskAccess extends TableAccess {
     for(final Buffer b : bm.all()) if(b.dirty) write(b);
     if(!dirty || !all) return;
 
-    try(final DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {
+    try(DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {
       final int sz = size;
       out.writeNum(sz);
       out.writeNum(used);

@@ -28,7 +28,7 @@ public final class BaseXStandaloneTest extends BaseXTest {
 
   @Override
   protected String run(final String... args) throws IOException {
-    try(final ArrayOutput ao = new ArrayOutput()) {
+    try(ArrayOutput ao = new ArrayOutput()) {
       System.setOut(new PrintStream(ao));
       new BaseX(args);
       return ao.toString();

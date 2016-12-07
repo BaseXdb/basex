@@ -90,8 +90,8 @@ public final class SAXWrapper extends SingleParser {
       throw new IOException(msg, ex);
     } finally {
       if(is != null) {
-        try(final Reader r = is.getCharacterStream()) { }
-        try(final InputStream ist = is.getByteStream()) { }
+        try(Reader r = is.getCharacterStream()) { }
+        try(InputStream ist = is.getByteStream()) { }
       }
     }
   }

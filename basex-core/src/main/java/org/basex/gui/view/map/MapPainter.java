@@ -57,7 +57,7 @@ abstract class MapPainter {
    * @param r rectangle array
    * @param scale scale boarders using this factor
    */
-  abstract void drawRectangles(final Graphics g, final MapRects r, final float scale);
+  abstract void drawRectangles(Graphics g, MapRects r, float scale);
 
   /**
    * Returns the content for the specified pre value.

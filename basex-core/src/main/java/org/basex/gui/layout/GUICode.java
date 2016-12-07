@@ -17,7 +17,7 @@ public abstract class GUICode {
    * Code to be run.
    * @param arg argument (may be {@code null})
    */
-  public abstract void execute(final Object arg);
+  public abstract void execute(Object arg);
 
   /**
    * Invokes the specified thread after all other threads.

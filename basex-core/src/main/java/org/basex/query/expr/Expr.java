@@ -106,7 +106,7 @@ public abstract class Expr extends ExprInfo {
    * @return iterator
    * @throws QueryException query exception
    */
-  public abstract Value value(final QueryContext qc) throws QueryException;
+  public abstract Value value(QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.
@@ -407,7 +407,7 @@ public abstract class Expr extends ExprInfo {
    * @param visitor visitor
    * @return if the walk should be continued
    */
-  public abstract boolean accept(final ASTVisitor visitor);
+  public abstract boolean accept(ASTVisitor visitor);
 
   /**
    * Visit all given expressions with the given visitor.

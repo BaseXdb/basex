@@ -14,7 +14,7 @@ public final class ServerQueries {
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     System.out.println("=== ServerQueries ===");
 
     // Start server

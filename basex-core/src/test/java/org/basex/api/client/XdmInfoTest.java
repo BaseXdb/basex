@@ -54,7 +54,7 @@ public final class XdmInfoTest extends SandboxTest {
   public void testIter() throws IOException {
     for(final Object[] exp : TYPES) {
       if(exp.length < 2) continue;
-      try(final TestQuery tq = session.query(exp[1].toString())) {
+      try(TestQuery tq = session.query(exp[1].toString())) {
         final TestResult tr = tq.iter();
         final Object[] type = TYPES[tr.type];
         assertSame("Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0], exp, type);
@@ -71,7 +71,7 @@ public final class XdmInfoTest extends SandboxTest {
   public void testFull() throws IOException {
     for(final Object[] exp : TYPES) {
       if(exp.length < 2) continue;
-      try(final TestQuery tq = session.query(exp[1].toString())) {
+      try(TestQuery tq = session.query(exp[1].toString())) {
         final TestResult tr = tq.full();
         final Object[] type = TYPES[tr.type];
         assertSame("Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0], exp, type);

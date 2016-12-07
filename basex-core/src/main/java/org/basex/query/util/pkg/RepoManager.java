@@ -186,7 +186,7 @@ public final class RepoManager {
       throws QueryException, IOException {
 
     // parse module to find namespace uri
-    try(final QueryContext qc = new QueryContext(context)) {
+    try(QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
       // copy file to rewritten URI file path
       return write(Strings.uri2path(string(uri)) + IO.XQMSUFFIX, content);

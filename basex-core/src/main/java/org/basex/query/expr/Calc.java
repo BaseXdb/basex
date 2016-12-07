@@ -250,7 +250,7 @@ public enum Calc {
    * @return result type
    * @throws QueryException query exception
    */
-  public abstract Item ev(final Item it1, final Item it2, final InputInfo ii) throws QueryException;
+  public abstract Item ev(Item it1, Item it2, InputInfo ii) throws QueryException;
 
   /**
    * Returns the numeric type with the highest precedence.

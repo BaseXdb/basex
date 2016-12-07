@@ -30,7 +30,7 @@ public abstract class Update {
    * @param update operation to merge with
    * @throws QueryException exception
    */
-  public abstract void merge(final Update update) throws QueryException;
+  public abstract void merge(Update update) throws QueryException;
 
   /**
    * Returns the number of update operations.

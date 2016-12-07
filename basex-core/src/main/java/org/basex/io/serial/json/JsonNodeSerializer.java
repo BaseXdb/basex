@@ -75,7 +75,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
       super.node(node);
       custom = c;
     } else {
-      try(final Serializer ser = nodeSerializer()) {
+      try(Serializer ser = nodeSerializer()) {
         ser.serialize(node);
         ser.reset();
       }

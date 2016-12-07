@@ -30,7 +30,7 @@ public final class ModuleTest extends SandboxTest {
    */
   @Test
   public void module() {
-    try(final QueryContext qc = new QueryContext(context)) {
+    try(QueryContext qc = new QueryContext(context)) {
       qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
@@ -45,7 +45,7 @@ public final class ModuleTest extends SandboxTest {
   @Test
   public void module2() throws Exception {
     final IOFile a = new IOFile("src/test/resources/recmod/a.xqm");
-    try(final QueryContext qc = new QueryContext(context)) {
+    try(QueryContext qc = new QueryContext(context)) {
       qc.parseLibrary(Token.string(a.read()), a.path(), null);
     }
   }
@@ -61,7 +61,7 @@ public final class ModuleTest extends SandboxTest {
     repo.md();
     write(new IOFile(repo, "a.xqm"), "module namespace a='a'; declare function a:a(){()};");
 
-    try(final QueryContext qc = new QueryContext(context)) {
+    try(QueryContext qc = new QueryContext(context)) {
       qc.parseMain("import module namespace a='a'; a:a()", null, null);
     }
   }
@@ -90,7 +90,7 @@ public final class ModuleTest extends SandboxTest {
     write(new IOFile(repo, "b.xqm"), "module namespace b='b';"
         + "import module namespace a='a'; declare function b:b(){a:a()};");
 
-    try(final QueryContext qc = new QueryContext(context)) {
+    try(QueryContext qc = new QueryContext(context)) {
       qc.parseMain("import module namespace a='a'; ()", null, null);
     }
   }
@@ -102,7 +102,7 @@ public final class ModuleTest extends SandboxTest {
   @Test
   public void uriResolver() throws Exception {
     final String query = "import module namespace m='uri' at 'x.xq'; m:f()";
-    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.uriResolver(new UriResolver() {
         @Override
         public IO resolve(final String path, final String uri, final Uri base) {

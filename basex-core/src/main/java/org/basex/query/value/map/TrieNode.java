@@ -86,8 +86,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode put(final int hash, final Item key, final Value val,
-      final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode put(int hash, Item key, Value val, int lvl, InputInfo ii) throws QueryException;
 
   /**
    * Deletes a key from this map.
@@ -98,8 +97,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code null} if deleted, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode delete(int hash, Item key, int lvl, final InputInfo ii)
-      throws QueryException;
+  abstract TrieNode delete(int hash, Item key, int lvl, InputInfo ii) throws QueryException;
 
   /**
    * Looks up the value associated with the given key.
@@ -110,7 +108,7 @@ abstract class TrieNode {
    * @return bound value if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  abstract Value get(int hash, Item key, int lvl, final InputInfo ii) throws QueryException;
+  abstract Value get(int hash, Item key, int lvl, InputInfo ii) throws QueryException;
 
   /**
    * Checks if the given key exists in the map.
@@ -121,8 +119,7 @@ abstract class TrieNode {
    * @return {@code true} if the key exists, {@code false} otherwise
    * @throws QueryException query exception
    */
-  abstract boolean contains(int hash, Item key, int lvl, final InputInfo ii)
-      throws QueryException;
+  abstract boolean contains(int hash, Item key, int lvl, InputInfo ii) throws QueryException;
 
   /**
    * <p> Inserts all bindings from the given node into this one.
@@ -135,8 +132,8 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode addAll(final TrieNode o, final int lvl, final MergeDuplicates merge,
-      final InputInfo ii) throws QueryException;
+  abstract TrieNode addAll(TrieNode o, int lvl, MergeDuplicates merge, InputInfo ii)
+      throws QueryException;
 
   /**
    * Add a leaf to this node if the key isn't already used.
@@ -147,8 +144,8 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final TrieLeaf o, final int lvl, final MergeDuplicates merge,
-      final InputInfo ii) throws QueryException;
+  abstract TrieNode add(TrieLeaf o, int lvl, MergeDuplicates merge, InputInfo ii)
+      throws QueryException;
 
   /**
    * Add an overflow list to this node if the key isn't already used.
@@ -159,8 +156,8 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final TrieList o, final int lvl, final MergeDuplicates merge,
-      final InputInfo ii) throws QueryException;
+  abstract TrieNode add(TrieList o, int lvl, MergeDuplicates merge, InputInfo ii)
+      throws QueryException;
 
   /**
    * Add all bindings of the given branch to this node for which the key isn't
@@ -172,8 +169,8 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final TrieBranch o, final int lvl, final MergeDuplicates merge,
-      final InputInfo ii) throws QueryException;
+  abstract TrieNode add(TrieBranch o, int lvl, MergeDuplicates merge, InputInfo ii)
+      throws QueryException;
 
   /**
    * Verifies the tree.
@@ -185,20 +182,20 @@ abstract class TrieNode {
    * Collects all keys in this subtree.
    * @param ks key cache
    */
-  abstract void keys(final ValueBuilder ks);
+  abstract void keys(ValueBuilder ks);
 
   /**
    * Collects all values in this subtree.
    * @param vs value cache
    */
-  abstract void values(final ValueBuilder vs);
+  abstract void values(ValueBuilder vs);
 
   /**
    * Materializes all keys and values.
    * @param ii input info
    * @throws QueryException query exception
    */
-  abstract void materialize(final InputInfo ii) throws QueryException;
+  abstract void materialize(InputInfo ii) throws QueryException;
 
   /**
    * Applies a function on all entries.
@@ -208,7 +205,7 @@ abstract class TrieNode {
    * @param ii input info
    * @throws QueryException query exception
    */
-  abstract void forEach(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
+  abstract void forEach(ValueBuilder vb, FItem func, QueryContext qc, InputInfo ii)
       throws QueryException;
 
   /**
@@ -227,7 +224,7 @@ abstract class TrieNode {
    * @param vt value type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  abstract boolean instanceOf(final AtomType kt, final SeqType vt);
+  abstract boolean instanceOf(AtomType kt, SeqType vt);
 
   /**
    * Compares two values.
@@ -259,8 +256,7 @@ abstract class TrieNode {
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean deep(final InputInfo ii, final TrieNode o, final Collation coll)
-      throws QueryException;
+  abstract boolean deep(InputInfo ii, TrieNode o, Collation coll) throws QueryException;
 
   /**
    * Recursive {@link #toString()} helper.
@@ -269,14 +265,14 @@ abstract class TrieNode {
    * @param ind indentation string
    * @return string builder for convenience
    */
-  abstract StringBuilder toString(final StringBuilder sb, final String ind);
+  abstract StringBuilder toString(StringBuilder sb, String ind);
 
   /**
    * Recursive helper for {@link Map#toString()}.
    * @param sb string builder
    * @return reference to {@code sb}
    */
-  abstract StringBuilder toString(final StringBuilder sb);
+  abstract StringBuilder toString(StringBuilder sb);
 
   @Override
   public String toString() {

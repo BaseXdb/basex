@@ -57,7 +57,7 @@ public final class ServerCommandTest extends CommandTest {
     ok(new Kill(UserText.ADMIN + '2'));
     ok(new Kill(Prop.NAME + '*'));
     ok(new CreateUser(NAME2, NAME2));
-    try(final ClientSession cs = createClient(NAME2, NAME2)) {
+    try(ClientSession cs = createClient(NAME2, NAME2)) {
       ok(new Kill(NAME2));
       ok(new Kill(NAME2 + '?'));
     }

@@ -710,7 +710,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void stripNS() throws Exception {
     final IO io = IO.get("<a xmlns:a='a'><b><c/><c/><c/></b></a>");
-    try(final QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(new DBNode(io))) {
+    try(QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(new DBNode(io))) {
       final ANode sub = (ANode) qp.iter().next();
       DataBuilder.stripNS(sub, token("a"), context);
     }
@@ -730,7 +730,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "  )," +
         "  $target := $input-context/works[1]/employee[1]" +
         "return insert nodes $source into $target";
-    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.value();
     } catch(final QueryException ex) {
       assertEquals("XUTY0004", ex.error().code);

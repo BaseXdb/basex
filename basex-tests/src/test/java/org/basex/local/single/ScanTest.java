@@ -36,7 +36,7 @@ public final class ScanTest extends SandboxTest {
      * </XML>
      */
     final IOFile dbfile = new IOFile(sandbox(), NAME);
-    try(final BufferOutput bo = new BufferOutput(dbfile.path())) {
+    try(BufferOutput bo = new BufferOutput(dbfile.path())) {
       final int max = 16;
       final byte[] cache = new byte[max];
       // use constant seed to create same test document every time

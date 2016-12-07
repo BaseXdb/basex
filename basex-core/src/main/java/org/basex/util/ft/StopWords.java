@@ -33,7 +33,7 @@ public final class StopWords extends TokenSet {
    */
   public StopWords(final Data data, final String file) throws IOException {
     if(!file.isEmpty()) read(IO.get(file), false);
-    try(final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL))) {
+    try(DataOutput out = new DataOutput(data.meta.dbfile(DATASWL))) {
       write(out);
     }
   }
@@ -48,7 +48,7 @@ public final class StopWords extends TokenSet {
       // try to parse the stop words file of the current database
       final IOFile file = data.meta.dbfile(DATASWL);
       if(!file.exists()) return;
-      try(final DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
+      try(DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
         read(in);
       } catch(final Exception ex) {
         Util.debug(ex);

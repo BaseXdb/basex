@@ -161,7 +161,7 @@ public final class Thesaurus {
    * @throws QueryException query exception
    */
   private Value nodes(final String query, final Value value) throws QueryException {
-    try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
+    try(QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
       return qp.value();
     }
   }
@@ -174,7 +174,7 @@ public final class Thesaurus {
    * @throws QueryException query exception
    */
   private byte[] text(final String query, final Value value) throws QueryException {
-    try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
+    try(QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
       return qp.iter().next().string(null);
     }
   }

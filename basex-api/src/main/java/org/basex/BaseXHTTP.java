@@ -249,7 +249,7 @@ public final class BaseXHTTP extends Main {
       }
     } else if(create) {
       // try to locate file from resource path
-      try(final InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file)) {
+      try(InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file)) {
         if(is == null) throw new BaseXException(in + " not found.");
         data = new IOStream(is).read();
       }
@@ -368,7 +368,7 @@ public final class BaseXHTTP extends Main {
     final IOFile stopFile = stopFile(port);
     try {
       stopFile.touch();
-      try(final Socket s = new Socket(host, port)) { }
+      try(Socket s = new Socket(host, port)) { }
       // give the notified process some time to quit
       Performance.sleep(100);
     } catch(final ConnectException ex) {
@@ -386,7 +386,7 @@ public final class BaseXHTTP extends Main {
    * @return boolean success
    */
   private static boolean ping(final String host, final int port, final boolean ssl) {
-    try(final InputStream is = new IOUrl((ssl ? "https://" : "http://") + host + ':' + port).
+    try(InputStream is = new IOUrl((ssl ? "https://" : "http://") + host + ':' + port).
       connection().getInputStream()) {
       // create connection
       return true;
@@ -435,7 +435,7 @@ public final class BaseXHTTP extends Main {
     public void run() {
       try {
         while(true) {
-          try(final Socket s = socket.accept()) { }
+          try(Socket s = socket.accept()) { }
           if(stopFile.exists()) {
             socket.close();
             stopFile.delete();

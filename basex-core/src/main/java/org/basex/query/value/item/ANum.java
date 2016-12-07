@@ -104,7 +104,7 @@ public abstract class ANum extends Item {
    * @param even half-to-even flag
    * @return rounded value
    */
-  public abstract ANum round(final int scale, final boolean even);
+  public abstract ANum round(int scale, boolean even);
 
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) {

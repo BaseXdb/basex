@@ -88,7 +88,7 @@ public abstract class ANode extends Item {
    * @param opts main options
    * @return node copy
    */
-  public abstract ANode deepCopy(final MainOptions opts);
+  public abstract ANode deepCopy(MainOptions opts);
 
   /**
    * Returns a final node representation. This method is called when iterating through node
@@ -195,7 +195,7 @@ public abstract class ANode extends Item {
    * @param node node to be compared
    * @return result of check
    */
-  public abstract boolean is(final ANode node);
+  public abstract boolean is(ANode node);
 
   /**
    * Checks the document order of two nodes.
@@ -203,7 +203,7 @@ public abstract class ANode extends Item {
    * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
    * if the node appears after/before the argument
    */
-  public abstract int diff(final ANode node);
+  public abstract int diff(ANode node);
 
   /**
    * Compares two nodes for their unique order.
@@ -260,7 +260,7 @@ public abstract class ANode extends Item {
    * @param par parent node
    * @return self reference
    */
-  protected abstract ANode parent(final ANode par);
+  protected abstract ANode parent(ANode par);
 
   /**
    * Returns true if the node has children.

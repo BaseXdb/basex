@@ -259,7 +259,7 @@ final class DialogImport extends BaseXBack {
   private static MainParser guess(final IO in) {
     if(!in.exists() || in instanceof IOUrl) return null;
 
-    try(final BufferInput ti = new BufferInput(in)) {
+    try(BufferInput ti = new BufferInput(in)) {
       int b = ti.read();
       // input starts with opening bracket: may be xml
       if(b == '<') return MainParser.XML;
