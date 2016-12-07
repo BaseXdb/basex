@@ -1049,7 +1049,7 @@ public class TextPanel extends BaseXPanel {
       if(is == null) {
         Util.errln(file + " not found.");
       } else {
-        try(final NewlineInput nli = new NewlineInput(is)) {
+        try(NewlineInput nli = new NewlineInput(is)) {
           for(String line; (line = nli.readLine()) != null;) {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;

@@ -36,7 +36,7 @@ public final class SAXSerializerTest extends SandboxTest {
     execute(new CreateDB(NAME, marshalled.toString()));
 
     // get object from DB
-    try(final QueryProcessor queryProcessor = new QueryProcessor(
+    try(QueryProcessor queryProcessor = new QueryProcessor(
         "//domain-object[@name='Object1']", context)) {
       final Item item = queryProcessor.iter().next();
 
@@ -55,7 +55,7 @@ public final class SAXSerializerTest extends SandboxTest {
    */
   @Test
   public void namespaces() throws Exception {
-    try(final QueryProcessor queryProcessor = new QueryProcessor("<a xmlns='x'/>", context)) {
+    try(QueryProcessor queryProcessor = new QueryProcessor("<a xmlns='x'/>", context)) {
       final Item item = queryProcessor.iter().next();
 
       final SAXSerializer saxSerializer = new SAXSerializer(item);

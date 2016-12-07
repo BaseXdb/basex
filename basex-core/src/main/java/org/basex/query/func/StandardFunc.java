@@ -108,7 +108,7 @@ public abstract class StandardFunc extends Arr {
 
     try {
       final ArrayOutput ao = new ArrayOutput();
-      try(final Serializer ser = Serializer.get(ao, opts)) {
+      try(Serializer ser = Serializer.get(ao, opts)) {
         for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       }
       return ao.normalize().finish();

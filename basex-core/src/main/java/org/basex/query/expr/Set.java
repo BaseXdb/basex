@@ -58,14 +58,14 @@ abstract class Set extends Arr {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  protected abstract ANodeList eval(final Iter[] iter) throws QueryException;
+  protected abstract ANodeList eval(Iter[] iter) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.
    * @param iter iterators
    * @return resulting iterator
    */
-  protected abstract NodeIter iter(final Iter[] iter);
+  protected abstract NodeIter iter(Iter[] iter);
 
   @Override
   public final boolean iterable() {

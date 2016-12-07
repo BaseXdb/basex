@@ -66,7 +66,7 @@ public abstract class Parse extends StandardFunc {
         if(rp.length > 1) enc = rp[1];
       }
 
-      try(final InputStream is = io.inputStream()) {
+      try(InputStream is = io.inputStream()) {
         final TextInput ti = new TextInput(io).encoding(enc).validate(true);
         if(!check) return Str.get(ti.content());
         while(ti.read() != -1);

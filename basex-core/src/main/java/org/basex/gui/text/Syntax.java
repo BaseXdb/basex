@@ -45,7 +45,7 @@ abstract class Syntax {
    * @param iter iterator
    * @return color
    */
-  public abstract Color getColor(final TextIterator iter);
+  public abstract Color getColor(TextIterator iter);
 
   /**
    * Returns the start of a comment.

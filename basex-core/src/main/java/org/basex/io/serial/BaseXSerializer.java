@@ -36,7 +36,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
     if(count == 0) {
       try {
         if(binary && item instanceof Bin) {
-          try(final InputStream is = item.input(null)) {
+          try(InputStream is = item.input(null)) {
             for(int b; (b = is.read()) != -1;) out.write(b);
           }
         } else {

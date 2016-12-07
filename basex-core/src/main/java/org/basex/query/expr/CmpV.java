@@ -128,8 +128,8 @@ public final class CmpV extends Cmp {
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean eval(final Item it1, final Item it2, final Collation coll,
-        final StaticContext sc, final InputInfo ii) throws QueryException;
+    public abstract boolean eval(Item it1, Item it2, Collation coll, StaticContext sc,
+        InputInfo ii) throws QueryException;
 
     /**
      * Swaps the comparator.

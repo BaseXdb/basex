@@ -27,7 +27,7 @@ public final class RunQueries {
    * @throws QueryException if an error occurs while evaluating the query
    * @throws BaseXException if a database command fails
    */
-  public static void main(final String[] args) throws IOException, QueryException {
+  public static void main(final String... args) throws IOException, QueryException {
     System.out.println("=== RunQueries ===");
 
     // Evaluate the specified XQuery

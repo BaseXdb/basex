@@ -18,7 +18,7 @@ public final class XQUTS extends W3CTS {
    * @param args command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     new XQUTS(args).run();
   }
 

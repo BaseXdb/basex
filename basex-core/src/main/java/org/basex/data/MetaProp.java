@@ -174,7 +174,7 @@ public enum MetaProp {
    * @param meta meta data
    * @return value
    */
-  public abstract Object value(final MetaData meta);
+  public abstract Object value(MetaData meta);
 
   /**
    * Returns a property matching the specified string.

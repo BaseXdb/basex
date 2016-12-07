@@ -830,7 +830,7 @@ public final class GFLWOR extends ParseExpr {
      * @return {@code true} if step was made, {@code false} if no more results exist
      * @throws QueryException evaluation exception
      */
-    abstract boolean next(final QueryContext qc) throws QueryException;
+    abstract boolean next(QueryContext qc) throws QueryException;
   }
 
   /** Start evaluator, doing nothing, once. */
@@ -881,14 +881,13 @@ public final class GFLWOR extends ParseExpr {
      * @param sub wrapped evaluator
      * @return evaluator
      */
-    abstract Eval eval(final Eval sub);
+    abstract Eval eval(Eval sub);
 
     @Override
     public abstract Clause compile(CompileContext cc) throws QueryException;
 
     @Override
-    public abstract Clause optimize(final CompileContext cc)
-        throws QueryException;
+    public abstract Clause optimize(CompileContext cc) throws QueryException;
 
     @Override
     public abstract Clause inline(Var var, Expr ex, CompileContext cc) throws QueryException;

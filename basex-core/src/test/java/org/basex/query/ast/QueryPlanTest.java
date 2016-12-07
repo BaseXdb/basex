@@ -21,7 +21,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    * @param pr queries on the query plan
    */
   protected static void check(final String qu, final String res, final String... pr) {
-    try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
+    try(QueryProcessor qp = new QueryProcessor(qu, context)) {
       // compile query
       qp.compile();
       // retrieve compiled query plan

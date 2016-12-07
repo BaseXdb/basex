@@ -191,7 +191,7 @@ public final class JsonSerializerTest extends SandboxTest {
    */
   private static String serialize(final String qu, final JsonFormat format) throws Exception {
     final ArrayOutput ao = new ArrayOutput();
-    try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
+    try(QueryProcessor qp = new QueryProcessor(qu, context)) {
       final JsonSerialOptions jopts = new JsonSerialOptions();
       jopts.set(JsonOptions.FORMAT, format);
 
@@ -200,7 +200,7 @@ public final class JsonSerializerTest extends SandboxTest {
       sopts.set(SerializerOptions.INDENT, YesNo.NO);
       sopts.set(SerializerOptions.JSON, jopts);
 
-      try(final Serializer ser = Serializer.get(ao, sopts)) {
+      try(Serializer ser = Serializer.get(ao, sopts)) {
         for(final Item it : qp.value()) ser.serialize(it);
       }
     }

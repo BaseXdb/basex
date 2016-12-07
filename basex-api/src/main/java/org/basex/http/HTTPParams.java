@@ -120,7 +120,7 @@ public final class HTTPParams {
   private void addMultipart(final MediaType type, final MainOptions options)
       throws QueryException, IOException {
 
-    try(final InputStream is = body().inputStream()) {
+    try(InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, options);
       for(final Entry<String, Value> entry : hp.multiForm(type).entrySet()) {
         form.put(entry.getKey(), entry.getValue());

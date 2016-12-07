@@ -12,5 +12,5 @@ public interface JsonFallback {
    * @param string input string
    * @return converted token
    */
-  String convert(final String string);
+  String convert(String string);
 }

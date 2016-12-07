@@ -24,7 +24,7 @@ public final class Part8 extends Main {
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     init("8: Binding External Variables");
 
     // Create a connection

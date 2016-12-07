@@ -56,7 +56,7 @@ public abstract class Session implements Closeable {
    * @return query
    * @throws IOException I/O exception
    */
-  public abstract Query query(final String query) throws IOException;
+  public abstract Query query(String query) throws IOException;
 
   /**
    * Creates a database.
@@ -64,7 +64,7 @@ public abstract class Session implements Closeable {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public abstract void create(final String name, final InputStream input) throws IOException;
+  public abstract void create(String name, InputStream input) throws IOException;
 
   /**
    * Adds a document to the opened database.
@@ -72,7 +72,7 @@ public abstract class Session implements Closeable {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public abstract void add(final String path, final InputStream input) throws IOException;
+  public abstract void add(String path, InputStream input) throws IOException;
 
   /**
    * Replaces a document in an open database.
@@ -80,7 +80,7 @@ public abstract class Session implements Closeable {
    * @param input new content
    * @throws IOException I/O exception
    */
-  public abstract void replace(final String path, final InputStream input) throws IOException;
+  public abstract void replace(String path, InputStream input) throws IOException;
 
   /**
    * Stores raw data in an open database.
@@ -88,7 +88,7 @@ public abstract class Session implements Closeable {
    * @param input binary input
    * @throws IOException I/O exception
    */
-  public abstract void store(final String path, final InputStream input) throws IOException;
+  public abstract void store(String path, InputStream input) throws IOException;
 
   /**
    * Returns command info as a string, regardless of whether an output stream
@@ -133,8 +133,7 @@ public abstract class Session implements Closeable {
    * @param output output stream
    * @throws IOException I/O exception
    */
-  protected abstract void execute(final String command, final OutputStream output)
-      throws IOException;
+  protected abstract void execute(String command, OutputStream output) throws IOException;
 
   /**
    * Executes a command and prints the result to the specified output stream.
@@ -142,6 +141,5 @@ public abstract class Session implements Closeable {
    * @param output output stream
    * @throws IOException I/O exception
    */
-  protected abstract void execute(final Command command, final OutputStream output)
-      throws IOException;
+  protected abstract void execute(Command command, OutputStream output) throws IOException;
 }

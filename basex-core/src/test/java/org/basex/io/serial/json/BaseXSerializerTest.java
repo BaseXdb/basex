@@ -66,7 +66,7 @@ public final class BaseXSerializerTest extends SandboxTest {
    * @param expected expected result
    */
   private static void serialize(final String query, final String expected) {
-    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
       final SerializerOptions sopts = new SerializerOptions();
       sopts.set(SerializerOptions.INDENT, YesNo.NO);
 

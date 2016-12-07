@@ -38,8 +38,8 @@ public class FileWrite extends FileFn {
     final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : null;
     final SerializerOptions sopts = FuncOptions.serializer(so, info);
 
-    try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
-      try(final Serializer ser = Serializer.get(out, sopts)) {
+    try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
+      try(Serializer ser = Serializer.get(out, sopts)) {
         for(final Item it : value) ser.serialize(it);
       }
     } catch(final QueryIOException ex) {

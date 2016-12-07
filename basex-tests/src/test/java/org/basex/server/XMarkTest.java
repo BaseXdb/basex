@@ -125,7 +125,7 @@ public final class XMarkTest {
     if(!BaseXServer.ping(StaticOptions.HOST.value(), StaticOptions.PORT.value()))
       server = new BaseXServer();
 
-    try(final ClientSession cs = createClient(true)) {
+    try(ClientSession cs = createClient(true)) {
       cs.execute("create user xmark xmark");
       cs.execute("grant read on " + DB + " to xmark");
     }
@@ -151,14 +151,14 @@ public final class XMarkTest {
     final IntList exclude = new IntList(new int[] { 11, 12 });
     final TokenBuilder tb = new TokenBuilder().add(DB).add(Prop.NL);
 
-    try(final ClientSession cs = createClient(false)) {
+    try(ClientSession cs = createClient(false)) {
       cs.execute(new Open(DB));
 
       // ignore first run
       System.out.println("Warming up...");
       for(int i = 1; i <= 20; i++) {
         if(!exclude.contains(i)) {
-          try(final ClientQuery cq = cs.query(QUERIES[i - 1])) {
+          try(ClientQuery cq = cs.query(QUERIES[i - 1])) {
             final Performance p = new Performance();
             cq.execute();
             System.out.println(i + ": " + p);
@@ -174,7 +174,7 @@ public final class XMarkTest {
       for(int i = 1; i <= 20; i++) {
         tb.add(String.format("%02d", i)).add("  ");
         final BigDecimal max = BigDecimal.valueOf(MAX);
-        try(final ClientQuery cq = cs.query(QUERIES[i - 1])) {
+        try(ClientQuery cq = cs.query(QUERIES[i - 1])) {
           if(exclude.contains(i)) {
             tb.add("1000000");
           } else {

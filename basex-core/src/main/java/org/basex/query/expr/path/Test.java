@@ -92,7 +92,7 @@ public abstract class Test {
    * @param node node to be checked
    * @return result of check
    */
-  public abstract boolean eq(final ANode node);
+  public abstract boolean eq(ANode node);
 
   /**
    * Tests if the test yields true.
@@ -131,5 +131,5 @@ public abstract class Test {
    * @param other other test
    * @return intersection if it exists, {@code null} otherwise
    */
-  public abstract Test intersect(final Test other);
+  public abstract Test intersect(Test other);
 }

@@ -29,8 +29,8 @@ public final class ArchiveDelete extends ArchiveFn {
     final Iter names = qc.iter(exprs[1]);
     for(Item en; (en = names.next()) != null;) hm.put(checkElemToken(en).string(info), null);
 
-    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-        final ArchiveOut out = ArchiveOut.get(in.format(), info)) {
+    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+        ArchiveOut out = ArchiveOut.get(in.format(), info)) {
       if(in instanceof GZIPIn)
         throw ARCH_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);

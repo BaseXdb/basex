@@ -33,7 +33,7 @@ public abstract class FuncCall extends Arr {
    * @return the function
    * @throws QueryException query exception
    */
-  abstract XQFunction evalFunc(final QueryContext qc) throws QueryException;
+  abstract XQFunction evalFunc(QueryContext qc) throws QueryException;
 
   /**
    * Evaluates and returns the arguments for this call.
@@ -41,7 +41,7 @@ public abstract class FuncCall extends Arr {
    * @return the function
    * @throws QueryException query exception
    */
-  abstract Value[] evalArgs(final QueryContext qc) throws QueryException;
+  abstract Value[] evalArgs(QueryContext qc) throws QueryException;
 
   @Override
   public final void markTailCalls(final CompileContext cc) {

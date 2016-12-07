@@ -40,7 +40,7 @@ public class FileWriteText extends FileFn {
     final String enc = toEncoding(2, FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = enc == null || enc == Strings.UTF8 ? null : Charset.forName(enc);
 
-    try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
+    try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       out.write(cs == null ? s : string(s).getBytes(cs));
     }
     return null;

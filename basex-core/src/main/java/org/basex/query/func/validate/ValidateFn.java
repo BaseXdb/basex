@@ -106,7 +106,7 @@ abstract class ValidateFn extends StandardFunc {
    * @return errors
    * @throws QueryException query exception
    */
-  public abstract ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException;
+  public abstract ArrayList<ErrorInfo> errors(QueryContext qc) throws QueryException;
 
   /**
    * Runs the specified validator.

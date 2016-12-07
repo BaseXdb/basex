@@ -109,7 +109,7 @@ public final class DirParser extends Parser {
           name.endsWith(IO.TARGZSUFFIX)) {
         // process TAR files
         if(!name.endsWith(IO.TARSUFFIX)) in = new GZIPInputStream(in);
-        try(final TarInputStream is = new TarInputStream(in)) {
+        try(TarInputStream is = new TarInputStream(in)) {
           for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
             source = newStream(is, ze.getName(), input);
@@ -119,13 +119,13 @@ public final class DirParser extends Parser {
         }
       } else if(name.endsWith(IO.GZSUFFIX)) {
         // process GZIP archive
-        try(final GZIPInputStream is = new GZIPInputStream(in)) {
+        try(GZIPInputStream is = new GZIPInputStream(in)) {
           source = newStream(is, input.name().replaceAll("\\..*", IO.XMLSUFFIX), input);
           parseResource(builder);
         }
       } else {
         // process ZIP archive
-        try(final ZipInputStream is = new ZipInputStream(in)) {
+        try(ZipInputStream is = new ZipInputStream(in)) {
           for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
             source = newStream(is, ze.getName(), input);

@@ -30,7 +30,7 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
   }
 
   @Override
-  public abstract void merge(final Update update) throws QueryException;
+  public abstract void merge(Update update) throws QueryException;
 
   /**
    * Applies this operation.

@@ -16,7 +16,7 @@ public final class ServerCommands {
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     System.out.println("=== ServerCommands ===");
 
     // Start server on default port 1984

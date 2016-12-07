@@ -29,7 +29,7 @@ public final class ZipEntries extends ZipFn {
     final IOFile path = new IOFile(file);
     if(!path.exists()) throw ZIP_NOTFOUND_X.get(info, file);
     // loop through file
-    try(final ZipFile zf = new ZipFile(file)) {
+    try(ZipFile zf = new ZipFile(file)) {
       // create result node
       final FElem root = new FElem(Q_FILE).declareNS().add(HREF, path.path());
       createEntries(paths(zf).iterator(), root, "");

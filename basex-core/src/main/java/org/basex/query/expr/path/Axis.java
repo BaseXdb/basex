@@ -132,7 +132,7 @@ public enum Axis {
    * @param n input node
    * @return node iterator
    */
-  abstract BasicNodeIter iter(final ANode n);
+  abstract BasicNodeIter iter(ANode n);
 
   @Override
   public String toString() {

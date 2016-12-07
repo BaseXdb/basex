@@ -16,9 +16,9 @@ public final class Example {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  public static void main(final String[] args) throws IOException {
+  public static void main(final String... args) throws IOException {
     // create session
-    try(final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
+    try(BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
       // initialize timer
       final long time = System.nanoTime();
 

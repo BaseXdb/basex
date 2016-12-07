@@ -55,7 +55,7 @@ public abstract class FTExpr extends ParseExpr {
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException;
+  public abstract FTNode item(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * This method is called by the index-based full-text evaluation.
@@ -64,7 +64,7 @@ public abstract class FTExpr extends ParseExpr {
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTIter iter(final QueryContext qc) throws QueryException;
+  public abstract FTIter iter(QueryContext qc) throws QueryException;
 
   @Override
   public boolean has(final Flag flag) {

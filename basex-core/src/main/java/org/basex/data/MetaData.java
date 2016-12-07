@@ -276,7 +276,7 @@ public final class MetaData {
    * @throws IOException exception
    */
   public void read() throws IOException {
-    try(final DataInput di = new DataInput(dbfile(DATAINF))) {
+    try(DataInput di = new DataInput(dbfile(DATAINF))) {
       read(di);
     }
   }

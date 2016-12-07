@@ -79,7 +79,7 @@ final class Unit {
     final ArrayList<StaticFunc> test = new ArrayList<>(0);
     final Performance perf = new Performance();
 
-    try(final QueryContext qc = new QueryContext(ctx)) {
+    try(QueryContext qc = new QueryContext(ctx)) {
       input = string(file.read());
       qc.parse(input, file.path(), null);
 
@@ -285,7 +285,7 @@ final class Unit {
   private void eval(final StaticFunc func) throws QueryException {
     current = func;
 
-    try(final QueryContext qctx = job.pushJob(new QueryContext(ctx))) {
+    try(QueryContext qctx = job.pushJob(new QueryContext(ctx))) {
       qctx.parse(input, file.path(), null);
       qctx.mainModule(MainModule.get(find(qctx, func), new Expr[0]));
       // ignore results

@@ -55,7 +55,7 @@ public abstract class Parser extends Job {
    * @param build database builder
    * @throws IOException I/O exception
    */
-  public abstract void parse(final Builder build) throws IOException;
+  public abstract void parse(Builder build) throws IOException;
 
   /**
    * Closes the parser.

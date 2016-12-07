@@ -89,7 +89,7 @@ public final class CompressTest extends SandboxTest {
 
     final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
-    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
       final Iter ir = qp.iter();
       for(Item it; (it = ir.next()) != null;) {
         final byte[] token = it.string(null);

@@ -191,7 +191,7 @@ public final class ZipModuleTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   private static void checkEntry(final String file, final byte[] data) throws IOException {
-    try(final ZipFile zf = new ZipFile(TMPZIP)) {
+    try(ZipFile zf = new ZipFile(TMPZIP)) {
       final ZipEntry ze = zf.getEntry(file);
       assertNotNull("File not found: " + file, ze);
       final byte[] dt = new IOStream(zf.getInputStream(ze)).read();

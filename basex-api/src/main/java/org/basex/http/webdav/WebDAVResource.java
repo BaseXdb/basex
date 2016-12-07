@@ -222,7 +222,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
    * @param n new name of the folder (database)
    * @throws IOException I/O exception
    */
-  protected abstract void copyToRoot(final String n) throws IOException;
+  protected abstract void copyToRoot(String n) throws IOException;
 
   /**
    * Copy folder to another folder.
@@ -230,7 +230,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  protected abstract void copyTo(final WebDAVFolder f, final String n) throws IOException;
+  protected abstract void copyTo(WebDAVFolder f, String n) throws IOException;
 
   /**
    * Move folder to the root, creating a new database.

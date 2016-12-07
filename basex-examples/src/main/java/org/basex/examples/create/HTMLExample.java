@@ -17,7 +17,7 @@ public final class HTMLExample {
    * @param args command-line arguments
    * @throws BaseXException if a database command fails
    */
-  public static void main(final String[] args) throws BaseXException {
+  public static void main(final String... args) throws BaseXException {
     System.out.println("=== HTMLExample ===");
 
     // Create database context

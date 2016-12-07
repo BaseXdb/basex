@@ -47,8 +47,7 @@ public abstract class Query implements Closeable {
    * @param type value type (may be {@code null})
    * @throws IOException I/O exception
    */
-  public abstract void bind(final String name, final Object value, final String type)
-      throws IOException;
+  public abstract void bind(String name, Object value, String type) throws IOException;
 
   /**
    * Binds a value to the context value.
@@ -65,7 +64,7 @@ public abstract class Query implements Closeable {
    * @param type value type (may be {@code null})
    * @throws IOException I/O exception
    */
-  public abstract void context(final Object value, final String type) throws IOException;
+  public abstract void context(Object value, String type) throws IOException;
 
   /**
    * Returns {@code true} if more items are available.
@@ -85,7 +84,7 @@ public abstract class Query implements Closeable {
    * @param full retrieve full type information
    * @throws IOException I/O exception
    */
-  public abstract void cache(final boolean full) throws IOException;
+  public abstract void cache(boolean full) throws IOException;
 
   /**
    * Returns the next item of the query.

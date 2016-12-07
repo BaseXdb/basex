@@ -52,7 +52,7 @@ final class RESTRetrieve extends RESTCmd {
       list(table, el, RESTText.Q_RESOURCE, 0);
 
       http.initResponse();
-      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), sopts)) {
+      try(Serializer ser = Serializer.get(http.res.getOutputStream(), sopts)) {
         ser.serialize(el);
       }
     }

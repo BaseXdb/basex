@@ -173,7 +173,7 @@ public class BaseX extends CLI {
     verbose = true;
 
     // create console reader
-    try(final ConsoleReader cr = ConsoleReader.get()) {
+    try(ConsoleReader cr = ConsoleReader.get()) {
       // loop until console is set to false (may happen in server mode)
       while(console) {
         // get next line

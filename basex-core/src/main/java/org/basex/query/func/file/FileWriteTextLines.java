@@ -45,7 +45,7 @@ public class FileWriteTextLines extends FileFn {
     final String enc = toEncoding(2, FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = enc == null || enc == Strings.UTF8 ? null : Charset.forName(enc);
 
-    try(final PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
+    try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       for(final Item it : value) {
         if(!it.type.isStringOrUntyped()) throw castError(it, AtomType.STR, info);
         final byte[] s = it.string(info);

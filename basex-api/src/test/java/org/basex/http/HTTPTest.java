@@ -155,7 +155,7 @@ public abstract class HTTPTest extends SandboxTest {
     final String encoded = org.basex.util.Base64.encode(ADMIN + ':' + ADMIN);
     conn.setRequestProperty(HttpText.AUTHORIZATION, AuthMethod.BASIC + " " + encoded);
     // send query
-    try(final OutputStream out = conn.getOutputStream()) {
+    try(OutputStream out = conn.getOutputStream()) {
       out.write(token(request));
     }
 
@@ -216,10 +216,10 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
     if(type != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, type.toString());
-    try(final OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
+    try(OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
       if(is != null) {
         // send input stream if it not empty
-        try(final BufferedInputStream bis = new BufferedInputStream(is)) {
+        try(BufferedInputStream bis = new BufferedInputStream(is)) {
           for(int i; (i = bis.read()) != -1;) bos.write(i);
         }
       }

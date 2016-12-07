@@ -38,14 +38,14 @@ public class FileWriteBinary extends FileFn {
 
     // write full file
     if(exprs.length == 2) {
-      try(final BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append));
-          final BufferInput in = bin.input(info)) {
+      try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append));
+          BufferInput in = bin.input(info)) {
         for(int b; (b = in.read()) != -1;) out.write(b);
       }
     } else {
       // write file chunk
       final long off = toLong(exprs[2], qc);
-      try(final RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
+      try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
         final long dlen = raf.length();
         if(off < 0 || off > dlen) throw FILE_OUT_OF_RANGE_X_X.get(info, off, dlen);
         raf.seek(off);

@@ -42,14 +42,14 @@ public abstract class Pragma extends ExprInfo {
    * @return cached information
    * @throws QueryException query exception
    */
-  abstract Object init(final QueryContext qc, final InputInfo info) throws QueryException;
+  abstract Object init(QueryContext qc, InputInfo info) throws QueryException;
 
   /**
    * Finalizes the pragma expression.
    * @param qc query context
    * @param cache cached information
    */
-  abstract void finish(final QueryContext qc, Object cache);
+  abstract void finish(QueryContext qc, Object cache);
 
   /**
    * Indicates if an expression has the specified compiler property.
@@ -57,7 +57,7 @@ public abstract class Pragma extends ExprInfo {
    * @return result of check
    * @see Expr#has
    */
-  public abstract boolean has(final Flag flag);
+  public abstract boolean has(Flag flag);
 
   @Override
   public final String toString() {

@@ -31,7 +31,7 @@ public class ArchiveCreate extends ArchiveFn {
     final String format = opts.get(ArchOptions.FORMAT);
     final int level = level(opts);
 
-    try(final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
+    try(ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
       out.level(level);
       try {
         int e = 0, c = 0;

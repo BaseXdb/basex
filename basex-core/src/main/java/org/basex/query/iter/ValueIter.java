@@ -21,7 +21,7 @@ public abstract class ValueIter extends Iter implements Iterable<Item> {
   public abstract Item next();
 
   @Override
-  public abstract Item get(final long i);
+  public abstract Item get(long i);
 
   @Override
   public abstract long size();

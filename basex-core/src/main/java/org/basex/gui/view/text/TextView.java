@@ -215,7 +215,7 @@ public final class TextView extends View {
     gui.gopts.set(GUIOptions.WORKPATH, file.path());
 
     gui.cursor(CURSORWAIT, true);
-    try(final PrintOutput out = new PrintOutput(file.toString())) {
+    try(PrintOutput out = new PrintOutput(file.toString())) {
       if(cachedCmd != null) {
         cachedCmd.execute(gui.context, out);
       } else if(cachedNodes != null) {

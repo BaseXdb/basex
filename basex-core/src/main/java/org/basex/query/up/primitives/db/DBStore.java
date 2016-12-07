@@ -50,7 +50,7 @@ public final class DBStore extends DBUpdate {
         final IOFile file = data.meta.binary(string(path));
         if(file.isDir()) file.delete();
         file.parent().md();
-        try(final BufferInput bi = map.get(path).input(info)) {
+        try(BufferInput bi = map.get(path).input(info)) {
           file.write(bi);
         }
       } catch(final IOException ex) {

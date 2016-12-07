@@ -46,7 +46,7 @@ final class RestXqModule {
 
     // loop through all functions
     final Context ctx = http.context(false);
-    try(final QueryContext qc = qc(ctx)) {
+    try(QueryContext qc = qc(ctx)) {
       // loop through all functions
       final String name = file.name();
       for(final StaticFunc sf : qc.funcs.funcs()) {
@@ -95,7 +95,7 @@ final class RestXqModule {
 
     // create new XQuery instance
     final Context ctx = http.context(false);
-    try(final QueryContext qc = qc(ctx)) {
+    try(QueryContext qc = qc(ctx)) {
       final StaticFunc sf = find(qc, func.function);
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();

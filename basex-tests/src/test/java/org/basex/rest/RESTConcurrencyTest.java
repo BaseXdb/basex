@@ -46,7 +46,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
     sl.add("-U" + ADMIN, "-P" + ADMIN);
 
     http = new BaseXHTTP(sl.toArray());
-    try(final ClientSession cs = createClient()) {
+    try(ClientSession cs = createClient()) {
       cs.execute(new CreateDB(NAME));
     }
   }
@@ -57,7 +57,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    */
   @AfterClass
   public static void tearDown() throws Exception {
-    try(final ClientSession cs = createClient()) {
+    try(ClientSession cs = createClient()) {
       cs.execute(new DropDB(NAME));
     }
     http.stop();

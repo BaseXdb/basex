@@ -238,7 +238,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public abstract void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
+  public abstract void timeZone(DTDur zone, boolean spec, InputInfo ii)
       throws QueryException;
 
   /**

@@ -31,7 +31,7 @@ public abstract class TableAccess {
    * @param all flush all contents or only buffers
    * @throws IOException I/O exception
    */
-  public abstract void flush(final boolean all) throws IOException;
+  public abstract void flush(boolean all) throws IOException;
 
   /**
    * Closes the table access.
@@ -44,7 +44,7 @@ public abstract class TableAccess {
    * @param write write/read lock
    * @return success flag
    */
-  public abstract boolean lock(final boolean write);
+  public abstract boolean lock(boolean write);
 
   /**
    * Reads a byte value and returns it as an integer value.
@@ -157,7 +157,7 @@ public abstract class TableAccess {
    * @param pre first target pre value
    * @param last last pre value
    */
-  protected abstract void copy(final byte[] entries, final int pre, final int last);
+  protected abstract void copy(byte[] entries, int pre, int last);
 
   /**
    * Deletes the specified number of entries from the database.

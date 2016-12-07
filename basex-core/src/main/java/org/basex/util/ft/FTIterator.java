@@ -16,7 +16,7 @@ public abstract class FTIterator implements Iterator<FTSpan> {
    * @param text text
    * @return self reference
    */
-  public abstract FTIterator init(final byte[] text);
+  public abstract FTIterator init(byte[] text);
 
   /**
    * Returns the next token. May be called as an alternative to {@link #next}

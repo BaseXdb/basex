@@ -44,7 +44,7 @@ public enum SerializerMode {
    * Initializes serialization parameters.
    * @param sopts options
    */
-  abstract void init(final SerializerOptions sopts);
+  abstract void init(SerializerOptions sopts);
 
   /**
    * Returns serialization parameters.

@@ -30,7 +30,7 @@ public final class ArchiveEntries extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final B64 archive = toB64(exprs[0], qc, false);
     final ValueBuilder vb = new ValueBuilder();
-    try(final ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;

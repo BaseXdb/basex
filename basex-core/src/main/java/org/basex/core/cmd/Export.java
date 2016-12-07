@@ -117,8 +117,8 @@ public final class Export extends Command {
       fl.parent().md();
 
       // serialize file
-      try(final PrintOutput po = new PrintOutput(unique(exported, fl.path()))) {
-        try(final Serializer ser = Serializer.get(po, sopts)) {
+      try(PrintOutput po = new PrintOutput(unique(exported, fl.path()))) {
+        try(Serializer ser = Serializer.get(po, sopts)) {
           ser.serialize(new DBNode(data, pre));
         }
       }

@@ -61,7 +61,7 @@ public class XQueryParse extends StandardFunc {
       pass = opts.get(XQueryOptions.PASS);
     }
 
-    try(final QueryContext qctx = new QueryContext(qc.context)) {
+    try(QueryContext qctx = new QueryContext(qc.context)) {
       final Module mod = qctx.parse(string(query), path, null);
       final boolean library = mod instanceof LibraryModule;
 

@@ -19,7 +19,7 @@ public final class SimpleFSExample {
    * @param args command-line arguments
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
+  public static void main(final String... args) throws Exception {
     System.out.println("=== SimpleFSExample ===");
 
     // create database context

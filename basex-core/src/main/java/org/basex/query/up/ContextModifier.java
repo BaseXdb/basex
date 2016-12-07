@@ -35,7 +35,7 @@ public abstract class ContextModifier {
    * within a transform expression.
    * @param data reference
    */
-  abstract void addData(final Data data);
+  abstract void addData(Data data);
 
   /**
    * Adds an update primitive to this context modifier.

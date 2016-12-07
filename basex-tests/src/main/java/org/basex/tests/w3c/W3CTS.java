@@ -203,7 +203,7 @@ public abstract class W3CTS extends Main {
 
     final String time = perf.getTime();
     Util.outln("Writing log file..." + NL);
-    try(final PrintOutput po = new PrintOutput(path + pathlog)) {
+    try(PrintOutput po = new PrintOutput(path + pathlog)) {
       po.println("TEST RESULTS ________________________________________________");
       po.println(NL + "Total #Queries: " + total);
       po.println("Correct / Empty Results: " + ok + " / " + ok2);
@@ -222,7 +222,7 @@ public abstract class W3CTS extends Main {
     }
 
     if(reporting) {
-      try(final PrintOutput po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX)) {
+      try(PrintOutput po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX)) {
         print(po, report + Prop.NAME + "Pre" + IO.XMLSUFFIX);
         po.print(logReport.toString());
         print(po, report + Prop.NAME + "Pos" + IO.XMLSUFFIX);
@@ -286,7 +286,7 @@ public abstract class W3CTS extends Main {
       }
 
       context.options.set(MainOptions.QUERYINFO, compile);
-      try(final QueryProcessor qp = new QueryProcessor(in, query.path(), context)) {
+      try(QueryProcessor qp = new QueryProcessor(in, query.path(), context)) {
         if(curr != null) qp.context(curr);
         context.options.set(MainOptions.QUERYINFO, false);
 
@@ -314,7 +314,7 @@ public abstract class W3CTS extends Main {
 
           // serialize query
           final SerializerOptions sopts = context.options.get(MainOptions.SERIALIZER);
-          try(final Serializer ser = Serializer.get(ao, sopts)) {
+          try(Serializer ser = Serializer.get(ao, sopts)) {
             for(final Item it : value) ser.serialize(it);
           }
 
@@ -607,7 +607,7 @@ public abstract class W3CTS extends Main {
     for(int n = 0; n < ns; ++n) {
       final String file = pth + string(nodes.itemAt(n).string(null)) + IO.XQSUFFIX;
       final IO io = new IOFile(queries, file);
-      try(final QueryProcessor xq = new QueryProcessor(io.string(), io.path(), context)) {
+      try(QueryProcessor xq = new QueryProcessor(io.string(), io.path(), context)) {
         qp.bind(string(vars.itemAt(n).string(null)), xq.value());
       }
     }
@@ -624,7 +624,7 @@ public abstract class W3CTS extends Main {
     if(reporting) {
       final File file = new File(results + pth);
       if(!file.exists()) file.mkdirs();
-      try(final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+      try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
           new FileOutputStream(results + pth + name), Strings.UTF8))) {
         bw.write(msg);
       }
@@ -670,7 +670,7 @@ public abstract class W3CTS extends Main {
    * @throws QueryException query exception
    */
   protected Value nodes(final String qu, final Value root) throws QueryException {
-    try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
+    try(QueryProcessor qp = new QueryProcessor(qu, context)) {
       return qp.context(root).value();
     }
   }
@@ -682,7 +682,7 @@ public abstract class W3CTS extends Main {
    * @throws IOException I/O exception
    */
   private static void print(final PrintOutput po, final String f) throws IOException {
-    try(final BufferedReader br = new BufferedReader(new FileReader(f))) {
+    try(BufferedReader br = new BufferedReader(new FileReader(f))) {
       for(String line; (line = br.readLine()) != null;) po.println(line);
     }
   }

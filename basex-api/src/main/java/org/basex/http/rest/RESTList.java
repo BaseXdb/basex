@@ -37,7 +37,7 @@ final class RESTList extends RESTCmd {
 
     final HTTPContext http = session.http;
     http.initResponse();
-    try(final Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts())) {
+    try(Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts())) {
       ser.serialize(el);
     }
   }

@@ -26,7 +26,7 @@ abstract class DialogIndex extends BaseXBack {
    * Reacts on user input.
    * @param enabled enabled flag
    */
-  abstract void action(final boolean enabled);
+  abstract void action(boolean enabled);
 
   /**
    * Sets the chosen options.

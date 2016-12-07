@@ -15,11 +15,11 @@ public interface Locking {
    * @param job job to be queued
    * @param ctx database context of client
    */
-  void acquire(final Job job, final Context ctx);
+  void acquire(Job job, Context ctx);
 
   /**
    * Removes locks for the specified job.
    * @param job job to be released
    */
-  void release(final Job job);
+  void release(Job job);
 }

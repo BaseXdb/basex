@@ -113,9 +113,9 @@ final class ProjectFiles {
       if(parsed.contains(path)) continue;
 
       final IOFile file = new IOFile(path);
-      try(final TextInput ti = new TextInput(file)) {
+      try(TextInput ti = new TextInput(file)) {
         // parse query
-        try(final QueryContext qc = new QueryContext(ctx)) {
+        try(QueryContext qc = new QueryContext(ctx)) {
           final String input = ti.cache().toString();
           final boolean lib = QueryProcessor.isLibrary(input);
           qc.parse(input, lib, path, null);
@@ -232,7 +232,7 @@ final class ProjectFiles {
     final int cl = search.length;
     if(cl == 0) return true;
 
-    try(final TextInput ti = new TextInput(new IOFile(path))) {
+    try(TextInput ti = new TextInput(new IOFile(path))) {
       final IntList il = new IntList(cl - 1);
       int c = 0;
       while(true) {

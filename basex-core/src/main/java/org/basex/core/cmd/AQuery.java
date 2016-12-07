@@ -82,7 +82,7 @@ public abstract class AQuery extends Command {
           if(!run) continue;
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
-          try(final Serializer ser = qp.getSerializer(po)) {
+          try(Serializer ser = qp.getSerializer(po)) {
             if(maxResults >= 0) {
               result = qp.cache(maxResults);
               info.evaluating += perf.time();
@@ -232,8 +232,8 @@ public abstract class AQuery extends Command {
     // show dot plan
     try {
       if(options.get(MainOptions.DOTPLAN)) {
-        try(final BufferOutput bo = new BufferOutput("plan.dot")) {
-          try(final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
+        try(BufferOutput bo = new BufferOutput("plan.dot")) {
+          try(DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
             d.serialize(qp.plan());
           }
         }

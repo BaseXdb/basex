@@ -163,7 +163,7 @@ final class DigitalSignature {
           throw CX_KSNULL_X.get(info, ex);
         }
 
-        try(final FileInputStream fis = new FileInputStream(ksURI)) {
+        try(FileInputStream fis = new FileInputStream(ksURI)) {
           ks.load(fis, ksPW.toCharArray());
         }
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
@@ -297,7 +297,7 @@ final class DigitalSignature {
    */
   private static byte[] nodeToBytes(final ANode node) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    try(final Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
+    try(Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
       ser.serialize(node);
     }
     return ao.finish();

@@ -18,5 +18,5 @@ public interface ItemSet extends Iterable<Item> {
    * @return {@code true} if the key did not exist yet and was stored
    * @throws QueryException query exception
    */
-  boolean add(final Item key, final InputInfo ii) throws QueryException;
+  boolean add(Item key, InputInfo ii) throws QueryException;
 }

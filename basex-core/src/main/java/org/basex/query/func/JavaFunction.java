@@ -78,8 +78,7 @@ public abstract class JavaFunction extends Arr {
    * @return arguments
    * @throws QueryException query exception
    */
-  protected abstract Object eval(final Value[] args, final QueryContext qc)
-      throws QueryException;
+  protected abstract Object eval(Value[] args, QueryContext qc) throws QueryException;
 
   @Override
   public boolean has(final Flag flag) {

@@ -16,21 +16,21 @@ public interface Index {
    * @param options main options
    * @return info
    */
-  byte[] info(final MainOptions options);
+  byte[] info(MainOptions options);
 
   /**
    * Returns all entries that match the specified token.
    * @param entries index entries
    * @return entries
    */
-  EntryIterator entries(final IndexEntries entries);
+  EntryIterator entries(IndexEntries entries);
 
   /**
    * Returns an iterator for the index results.
    * @param token token to be found
    * @return sorted pre values for the token
    */
-  IndexIterator iter(final IndexToken token);
+  IndexIterator iter(IndexToken token);
 
   /**
    * Computes costs for accessing the specified token. An integer is returned:
@@ -43,7 +43,7 @@ public interface Index {
    * @param token token to be found
    * @return cost estimation
    */
-  int costs(final IndexToken token);
+  int costs(IndexToken token);
 
   /**
    * Drops the index. Also returns true if the index does not exist.

@@ -33,7 +33,7 @@ public abstract class FTIndexIterator implements IndexIterator {
    * Sets the position of the token in the query.
    * @param p query position
    */
-  public abstract void pos(final int p);
+  public abstract void pos(int p);
 
   /**
    * Merges two index array iterators.

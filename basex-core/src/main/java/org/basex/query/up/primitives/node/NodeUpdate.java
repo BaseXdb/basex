@@ -44,7 +44,7 @@ public abstract class NodeUpdate extends DataUpdate {
    * @param tmp temporary database
    * @throws QueryException query exception
    */
-  public abstract void prepare(final MemData tmp) throws QueryException;
+  public abstract void prepare(MemData tmp) throws QueryException;
 
   /**
    * Merges two update primitives, as they have the same target node.
@@ -52,20 +52,20 @@ public abstract class NodeUpdate extends DataUpdate {
    * @throws QueryException exception
    */
   @Override
-  public abstract void merge(final Update update) throws QueryException;
+  public abstract void merge(Update update) throws QueryException;
 
   /**
    * Updates the name pool, which is used to find duplicate attributes
    * and namespace conflicts.
    * @param pool name pool
    */
-  public abstract void update(final NamePool pool);
+  public abstract void update(NamePool pool);
 
   /**
    * Adds the atomic update operations for this update primitive to the given list.
    * @param auc list of atomic updates
    */
-  public abstract void addAtomics(final AtomicUpdateCache auc);
+  public abstract void addAtomics(AtomicUpdateCache auc);
 
   /**
    * Substitutes the update primitive if necessary. For instance a 'Replace Value

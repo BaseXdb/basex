@@ -66,7 +66,7 @@ final class FTList {
     final int tl = tp.length;
     for(int t = 0; t < tl; t++) tp[t] = -1;
     sizes = data.meta.dbfile(DATAFTX + prefix + 'x');
-    try(final DataAccess li = new DataAccess(sizes)) {
+    try(DataAccess li = new DataAccess(sizes)) {
       int is = li.readNum();
       while(--is >= 0) {
         final int p = li.readNum();

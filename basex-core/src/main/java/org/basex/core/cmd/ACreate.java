@@ -54,7 +54,7 @@ public abstract class ACreate extends Command {
     } else if(in != null) {
       if(in.getCharacterStream() != null) {
         final StringBuilder sb = new StringBuilder();
-        try(final Reader r = in.getCharacterStream()) {
+        try(Reader r = in.getCharacterStream()) {
           for(int c; (c = r.read()) != -1;) sb.append((char) c);
         }
         io = new IOContent(sb.toString());

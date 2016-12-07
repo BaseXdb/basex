@@ -36,7 +36,7 @@ public abstract class QueryTest extends SandboxTest {
       final String query = qu[correct ? 2 : 1].toString();
       final Value cmp = correct ? (Value) qu[1] : null;
 
-      try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      try(QueryProcessor qp = new QueryProcessor(query, context)) {
         final Value val = qp.value();
         if(!correct || !new DeepEqual().equal(val, cmp)) {
           sb.append("[" + qu[0] + "] " + query);

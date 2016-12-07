@@ -98,7 +98,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         // serialize and cache content
         final ArrayOutput ao = new ArrayOutput();
-        try(final Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
+        try(Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
           if(data != null) {
             ser.serialize(new DBNode(data, pre));
           } else if(item != null) {

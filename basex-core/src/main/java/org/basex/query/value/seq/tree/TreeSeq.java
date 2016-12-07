@@ -78,7 +78,7 @@ public abstract class TreeSeq extends Seq {
    * @param other array to append to the end of this array
    * @return resulting array
    */
-  public abstract TreeSeq concat(final TreeSeq other);
+  public abstract TreeSeq concat(TreeSeq other);
 
   /**
    * Iterator over the members of this sequence.
@@ -86,7 +86,7 @@ public abstract class TreeSeq extends Seq {
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array members
    */
-  public abstract ListIterator<Item> iterator(final long start);
+  public abstract ListIterator<Item> iterator(long start);
 
   @Override
   public final Iterator<Item> iterator() {
@@ -164,7 +164,7 @@ public abstract class TreeSeq extends Seq {
    * @param vals values, with length at most {@link TreeSeq#MAX_SMALL}
    * @return resulting sequence
    */
-  abstract TreeSeq consSmall(final Item[] vals);
+  abstract TreeSeq consSmall(Item[] vals);
 
   /**
    * Returns items containing the values at the indices {@code from} to {@code to - 1} in

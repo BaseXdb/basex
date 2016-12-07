@@ -254,7 +254,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryNoResult() throws IOException {
-    try(final Query query = session.query("()")) {
+    try(Query query = session.query("()")) {
       assertFalse("No result was expected.", query.more());
     }
   }
@@ -263,7 +263,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryClose() throws IOException {
-    try(final Query query = session.query("()")) {
+    try(Query query = session.query("()")) {
       query.close();
     }
   }
@@ -280,7 +280,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryMore() throws IOException {
-    try(final Query query = session.query("1 to 3")) {
+    try(Query query = session.query("1 to 3")) {
       int c = 0;
       while(query.more()) assertEqual(Integer.toString(++c), query.next());
     }
@@ -357,7 +357,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryNoMore() throws IOException {
-    try(final Query query = session.query("1 to 2")) {
+    try(Query query = session.query("1 to 2")) {
       assertEqual("1", query.next());
       assertEqual("2", query.next());
       assertNull(query.next());
@@ -368,7 +368,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBind() throws IOException {
-    try(final Query query = session.query("declare variable $a external; $a")) {
+    try(Query query = session.query("declare variable $a external; $a")) {
       query.bind("$a", "4");
       assertEqual("4", query.execute());
       query.bind("$a", "5");
@@ -390,7 +390,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindURI() throws IOException {
-    try(final Query query = session.query("declare variable $a external; $a")) {
+    try(Query query = session.query("declare variable $a external; $a")) {
       query.bind("$a", "X", "xs:anyURI");
       assertEqual("X", query.next());
     }
@@ -400,7 +400,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindEmptySequence() throws IOException {
-    try(final Query query = session.query("declare variable $a external; $a")) {
+    try(Query query = session.query("declare variable $a external; $a")) {
       query.bind("a", "()", "empty-sequence()");
       assertNull(query.next());
     }
@@ -460,7 +460,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindDynamic() throws IOException {
-    try(final Query query = session.query("declare variable $a as xs:integer external; $a")) {
+    try(Query query = session.query("declare variable $a as xs:integer external; $a")) {
       query.bind("a", "1");
       assertEqual("1", query.execute());
     }
@@ -470,7 +470,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindDoc() throws IOException {
-    try(final Query query = session.query("declare variable $a external; $a//text()")) {
+    try(Query query = session.query("declare variable $a external; $a//text()")) {
       query.bind("$a", "<a>XML</a>", "document-node()");
       assertEqual("XML", query.execute());
     }
@@ -516,7 +516,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryContext() throws IOException {
-    try(final Query query = session.query(".")) {
+    try(Query query = session.query(".")) {
       query.context("5");
       assertEqual("5", query.next());
     }
@@ -526,7 +526,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryContextInt() throws IOException {
-    try(final Query query = session.query(". * 2")) {
+    try(Query query = session.query(". * 2")) {
       query.context("6", "xs:integer");
       assertEqual("12", query.next());
     }
@@ -536,7 +536,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryContextVar() throws IOException {
-    try(final Query query = session.query("declare variable $a := .; $a")) {
+    try(Query query = session.query("declare variable $a := .; $a")) {
       query.context("<a/>", "element()");
       assertEqual("<a/>", query.next());
     }
@@ -546,7 +546,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryInfo() throws IOException {
-    try(final Query query = session.query("1 to 2")) {
+    try(Query query = session.query("1 to 2")) {
       query.execute();
     }
   }
@@ -555,7 +555,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryOptions() throws IOException {
-    try(final Query query = session.query(SerializerOptions.ENCODING.arg("US-ASCII") + "()")) {
+    try(Query query = session.query(SerializerOptions.ENCODING.arg("US-ASCII") + "()")) {
       query.execute();
       final SerializerOptions sp = new SerializerOptions();
       sp.assign(query.options());
@@ -609,8 +609,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryParallel() throws IOException {
-    try(final Query query1 = session.query("1 to 2");
-        final Query query2 = session.query("reverse(3 to 4)")) {
+    try(Query query1 = session.query("1 to 2"); Query query2 = session.query("reverse(3 to 4)")) {
       assertEqual("1", query1.next());
       assertEqual("4", query2.next());
       assertEqual("2", query1.next());
@@ -643,7 +642,7 @@ public abstract class SessionTest extends SandboxTest {
         {"empty($x('bar')('a')) and not($x('bar')(''))", "true"},
     };
     for(final String[] test : tests) {
-      try(final Query qu = session.query(var + test[0])) {
+      try(Query qu = session.query(var + test[0])) {
         qu.bind("$x", map, "json");
         assertEqual(test[1], qu.execute());
       }

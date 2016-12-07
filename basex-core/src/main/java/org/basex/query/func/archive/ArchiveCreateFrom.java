@@ -40,7 +40,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
     final int level = level(opts);
     if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
 
-    try(final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
+    try(ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
       out.level(level);
       try {
         while(true) {

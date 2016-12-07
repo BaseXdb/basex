@@ -128,7 +128,7 @@ public final class ServerQuery extends Job {
       int c = 0;
       final PrintOutput po = PrintOutput.get(encode ? new ServerOutput(out) : out);
       final SerializerOptions sopts = full ? SerializerMode.API.get() : qp.qc.serParams();
-      try(final Serializer ser = Serializer.get(po, sopts)) {
+      try(Serializer ser = Serializer.get(po, sopts)) {
         for(Item it; (it = ir.next()) != null;) {
           if(iter) {
             if(full) po.write(it.xdmInfo());

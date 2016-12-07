@@ -39,7 +39,7 @@ public abstract class Tokenizer extends LanguageImpl {
    * @param f full-text options
    * @return tokenizer
    */
-  abstract Tokenizer get(final FTOpt f);
+  abstract Tokenizer get(FTOpt f);
 
   /**
    * Gets full-text info for the specified token.

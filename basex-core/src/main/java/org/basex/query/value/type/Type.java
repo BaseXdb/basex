@@ -162,8 +162,7 @@ public interface Type {
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(final Item item, final QueryContext qc, final StaticContext sc, final InputInfo ii)
-      throws QueryException;
+  Value cast(Item item, QueryContext qc, StaticContext sc, InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified Java value to this type.
@@ -174,8 +173,7 @@ public interface Type {
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(final Object value, QueryContext qc, final StaticContext sc, final InputInfo ii)
-      throws QueryException;
+  Value cast(Object value, QueryContext qc, StaticContext sc, InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified string to this type.
@@ -186,7 +184,7 @@ public interface Type {
    * @return cast value
    * @throws QueryException query exception
    */
-  Value castString(final String value, QueryContext qc, final StaticContext sc, final InputInfo ii)
+  Value castString(String value, QueryContext qc, StaticContext sc, InputInfo ii)
       throws QueryException;
 
   /**
@@ -202,14 +200,14 @@ public interface Type {
    * @param type other type
    * @return {@code true} if both types are equal, {@code false} otherwise
    */
-  boolean eq(final Type type);
+  boolean eq(Type type);
 
   /**
    * Checks if the current type is an instance of the specified type.
    * @param type type to be checked
    * @return result of check
    */
-  boolean instanceOf(final Type type);
+  boolean instanceOf(Type type);
 
   /**
    * Computes the union between this type and the given one, i.e. the least common
@@ -217,7 +215,7 @@ public interface Type {
    * @param type other type
    * @return union type
    */
-  Type union(final Type type);
+  Type union(Type type);
 
   /**
    * Computes the intersection between this type and the given one, i.e. the least
@@ -226,7 +224,7 @@ public interface Type {
    * @param type other type
    * @return intersection type or {@code null}
    */
-  Type intersect(final Type type);
+  Type intersect(Type type);
 
   /**
    * Checks if the type refers to a number.

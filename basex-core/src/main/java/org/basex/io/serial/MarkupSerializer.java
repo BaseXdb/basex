@@ -277,7 +277,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @param type document type or {@code null} for html type
    * @throws IOException I/O exception
    */
-  protected abstract void doctype(final QNm type) throws IOException;
+  protected abstract void doctype(QNm type) throws IOException;
 
   @Override
   protected boolean ignore(final ANode node) {

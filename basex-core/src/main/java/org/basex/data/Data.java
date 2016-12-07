@@ -155,19 +155,19 @@ public abstract class Data {
    * @param opts main options
    * @throws IOException I/O exception
    */
-  public abstract void startUpdate(final MainOptions opts) throws IOException;
+  public abstract void startUpdate(MainOptions opts) throws IOException;
 
   /**
    * Finishes an update operation: removes the update file and the exclusive lock.
    * @param opts main options
    */
-  public abstract void finishUpdate(final MainOptions opts);
+  public abstract void finishUpdate(MainOptions opts);
 
   /**
    * Flushes updated data.
    * @param all flush all data
    */
-  public abstract void flush(final boolean all);
+  public abstract void flush(boolean all);
 
   /**
    * Returns an index iterator for the specified token.
@@ -871,7 +871,7 @@ public abstract class Data {
    * @param value content
    * @param kind node kind
    */
-  protected abstract void updateText(final int pre, final byte[] value, final int kind);
+  protected abstract void updateText(int pre, byte[] value, int kind);
 
   /**
    * Sets the distance.
@@ -918,7 +918,7 @@ public abstract class Data {
    * @param pre pre value
    * @param text text (text, comment or pi) or attribute flag
    */
-  protected abstract void delete(final int pre, final boolean text);
+  protected abstract void delete(int pre, boolean text);
 
   // INSERTS WITHOUT TABLE UPDATES ============================================
 
@@ -1046,7 +1046,7 @@ public abstract class Data {
    * @param text text/attribute flag
    * @return reference
    */
-  protected abstract long textRef(final byte[] value, final boolean text);
+  protected abstract long textRef(byte[] value, boolean text);
 
   /**
    * Deletes entries from the index structures.

@@ -19,7 +19,7 @@ public final class SqlClose extends SqlFn {
 
     final int id = (int) toLong(exprs[0], qc);
     final JDBCConnections jdbc = jdbc(qc);
-    try(final AutoCloseable sql = jdbc.get(id)) {
+    try(AutoCloseable sql = jdbc.get(id)) {
       // try-with-resources: resource will automatically be closed
       jdbc.remove(id);
     } catch(final Exception ex) {

@@ -87,7 +87,7 @@ public class XQueryEval extends StandardFunc {
     if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
     user.perm(perm);
 
-    try(final QueryContext qctx = new QueryContext(qc)) {
+    try(QueryContext qctx = new QueryContext(qc)) {
       // limit memory consumption: enforce garbage collection and calculate usage
       final long mb = opts.get(XQueryOptions.MEMORY);
       if(mb != 0) {

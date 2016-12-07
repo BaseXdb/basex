@@ -27,7 +27,7 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @param pos index of the sub-node, must be between 0 and {@link #arity()} - 1
    * @return the sub-node
    */
-  N getSub(final int pos);
+  N getSub(int pos);
 
   /**
    * Creates a reversed version of this node.
@@ -55,7 +55,7 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @param val value to insert
    * @return {@code true} if the node was split, {@code false} otherwise
    */
-  boolean insert(final Node<N, E>[] siblings, final long pos, final E val);
+  boolean insert(Node<N, E>[] siblings, long pos, E val);
 
   /**
    * Replaces the element at the given position in this node with the given element.
@@ -64,7 +64,7 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @return resulting node
    * @throws IndexOutOfBoundsException if {@code pos} is out of bounds
    */
-  Node<N, E> set(final long pos, final E val);
+  Node<N, E> set(long pos, E val);
 
   /**
    * Removes the element at the given position in this node.
@@ -75,7 +75,7 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @param pos position of the element to delete
    * @return three-element array with the new left neighbor, node and right neighbor
    */
-  NodeLike<N, E>[] remove(final Node<N, E> l, final Node<N, E> r, final long pos);
+  NodeLike<N, E>[] remove(Node<N, E> l, Node<N, E> r, long pos);
 
   /**
    * Extracts a sub-tree containing the elements at positions {@code off .. off + len - 1}
@@ -85,7 +85,7 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @param len number of elements
    * @return the sub-tree, possibly under-full
    */
-  NodeLike<N, E> slice(final long off, final long len);
+  NodeLike<N, E> slice(long off, long len);
 
   /**
    * Checks that this node does not violate any invariants.

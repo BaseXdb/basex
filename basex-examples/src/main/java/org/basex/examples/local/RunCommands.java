@@ -16,7 +16,7 @@ public final class RunCommands {
    * @param args (ignored) command-line arguments
    * @throws BaseXException if a database command fails
    */
-  public static void main(final String[] args) throws BaseXException {
+  public static void main(final String... args) throws BaseXException {
     // Database context.
     Context context = new Context();
 

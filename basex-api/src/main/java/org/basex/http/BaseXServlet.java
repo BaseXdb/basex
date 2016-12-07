@@ -92,5 +92,5 @@ public abstract class BaseXServlet extends HttpServlet {
    * @param http HTTP context
    * @throws Exception any exception
    */
-  protected abstract void run(final HTTPContext http) throws Exception;
+  protected abstract void run(HTTPContext http) throws Exception;
 }

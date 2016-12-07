@@ -281,7 +281,7 @@ public final class HTTPContext {
       }
       if(info != null) {
         res.setContentType(MediaType.TEXT_PLAIN.toString());
-        try(final ArrayOutput ao = new ArrayOutput()) {
+        try(ArrayOutput ao = new ArrayOutput()) {
           ao.write(token(info));
           res.getOutputStream().write(ao.normalize().finish());
         }

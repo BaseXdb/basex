@@ -32,7 +32,7 @@ public abstract class ConsoleReader implements AutoCloseable {
    * @param prompt prompt
    * @return next line or {@code null} if EOF is reached
    */
-  public abstract String readLine(final String prompt);
+  public abstract String readLine(String prompt);
 
   /**
    * Reads a password.
