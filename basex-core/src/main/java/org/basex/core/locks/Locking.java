@@ -34,8 +34,8 @@ public final class Locking {
   public static final String PREFIX = "%";
   /** Special lock identifier for database opened in current context; will be substituted. */
   public static final String CONTEXT = PREFIX + "CONTEXT";
-  /** Special lock identifier for administrative commands. */
-  public static final String ADMIN = PREFIX + "ADMIN";
+  /** Special lock identifier for user commands. */
+  public static final String USER = PREFIX + "USER";
   /** Special lock identifier for backup commands. */
   public static final String BACKUP = PREFIX + "BACKUP";
   /** Special lock identifier for repository commands. */

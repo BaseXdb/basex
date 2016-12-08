@@ -39,8 +39,8 @@ public final class CommandLockingTest extends SandboxTest {
   private static final StringList CTX_LIST = new StringList(Locking.CONTEXT);
   /** StringList containing name and context. */
   private static final StringList NAME_CTX = new StringList(NAME, Locking.CONTEXT);
-  /** StringList containing ADMIN lock string. */
-  private static final StringList ADMIN_LIST = new StringList(Locking.ADMIN);
+  /** StringList containing USER lock string. */
+  private static final StringList USER_LIST = new StringList(Locking.USER);
   /** StringList containing REPO lock string. */
   private static final StringList REPO_LIST = new StringList(Locking.REPO);
   /** StringList containing BACKUP lock string. */
@@ -58,29 +58,29 @@ public final class CommandLockingTest extends SandboxTest {
   public void databaseCommands() {
     ckDBs(new Add(FILE, FILE), true, CTX_LIST);
     ckDBs(new AlterDB(NAME, NAME2), true, new StringList(NAME, NAME2));
-    ckDBs(new AlterPassword(NAME, NAME), true, ADMIN_LIST);
-    ckDBs(new AlterUser(NAME, NAME), true, ADMIN_LIST);
+    ckDBs(new AlterPassword(NAME, NAME), true, USER_LIST);
+    ckDBs(new AlterUser(NAME, NAME), true, USER_LIST);
     ckDBs(new Check(NAME), false, NAME_CTX);
     ckDBs(new Close(), false, CTX_LIST);
     ckDBs(new Copy(NAME2, NAME), new StringList(NAME2), NAME_LIST);
     ckDBs(new CreateBackup(NAME), NAME_LIST, BACKUP_LIST);
     ckDBs(new CreateDB(NAME), CTX_LIST, NAME_LIST);
     ckDBs(new CreateIndex(IndexType.TEXT), true, CTX_LIST);
-    ckDBs(new CreateUser(NAME, NAME), true, ADMIN_LIST);
+    ckDBs(new CreateUser(NAME, NAME), true, USER_LIST);
     ckDBs(new Delete(FILE), true, CTX_LIST);
     ckDBs(new DropBackup(NAME), true, BACKUP_LIST);
     ckDBs(new DropDB(NAME + '*'), true, null); // Drop using globbing
     ckDBs(new DropDB(NAME), true, NAME_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
-    ckDBs(new DropUser(NAME), true, ADMIN_LIST);
+    ckDBs(new DropUser(NAME), true, USER_LIST);
     ckDBs(new Execute("RUN " + FILE), false, null);
     ckDBs(new Export(FILE), false, CTX_LIST);
     ckDBs(new Find("token"), false, CTX_LIST);
     ckDBs(new Flush(), true, CTX_LIST);
     ckDBs(new Get("DBPATH"), false, NONE);
-    ckDBs(new Grant("all", NAME), true, ADMIN_LIST);
-    ckDBs(new Grant("all", NAME, NAME), true, ADMIN_LIST);
-    ckDBs(new Grant("all", NAME, NAME + '*'), true, ADMIN_LIST);
+    ckDBs(new Grant("all", NAME), true, USER_LIST);
+    ckDBs(new Grant("all", NAME, NAME), true, USER_LIST);
+    ckDBs(new Grant("all", NAME, NAME + '*'), true, USER_LIST);
     ckDBs(new Help("HELP"), false, NONE);
     ckDBs(new Info(), false, NONE);
     ckDBs(new InfoDB(), false, CTX_LIST);
@@ -90,13 +90,13 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new JobsList(), false, NONE);
     ckDBs(new JobsResult("job0"), false, NONE);
     ckDBs(new JobsStop("job0"), false, NONE);
-    ckDBs(new Kill(NAME), true, ADMIN_LIST);
+    ckDBs(new Kill(NAME), true, USER_LIST);
     ckDBs(new List(), false, null);
     ckDBs(new List(NAME), false, NAME_LIST);
     ckDBs(new Open(NAME), false, NAME_CTX);
     ckDBs(new Optimize(), true, CTX_LIST);
     ckDBs(new OptimizeAll(), true, CTX_LIST);
-    ckDBs(new Password(NAME), true, ADMIN_LIST);
+    ckDBs(new Password(NAME), true, USER_LIST);
     ckDBs(new Rename(FILE, FILE), true, CTX_LIST);
     ckDBs(new Replace(FILE, FILE), true, CTX_LIST);
     ckDBs(new RepoInstall(REPO + "/pkg3.xar", null), true, REPO_LIST);
@@ -108,8 +108,8 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Set(NAME, NAME), false, NONE);
     ckDBs(new ShowBackups(), false, BACKUP_LIST);
     ckDBs(new ShowSessions(), false, NONE);
-    ckDBs(new ShowUsers(), false, ADMIN_LIST);
-    ckDBs(new ShowUsers(NAME), false, ADMIN_LIST);
+    ckDBs(new ShowUsers(), false, NONE);
+    ckDBs(new ShowUsers(NAME), false, NONE);
     ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
@@ -194,15 +194,15 @@ public final class CommandLockingTest extends SandboxTest {
   /** Test admin module. */
   @Test
   public void admin() {
-    ckDBs(new XQuery(_ADMIN_SESSIONS.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_ADMIN_LOGS.args()), false, ADMIN_LIST);
+    ckDBs(new XQuery(_ADMIN_SESSIONS.args()), false, NONE);
+    ckDBs(new XQuery(_ADMIN_LOGS.args()), false, NONE);
   }
 
   /** Test user module. */
   @Test
   public void user() {
-    ckDBs(new XQuery(_USER_LIST.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, ADMIN_LIST);
+    ckDBs(new XQuery(_USER_LIST.args()), false, NONE);
+    ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, NONE);
   }
 
   /** Test database module. */

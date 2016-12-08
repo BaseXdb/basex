@@ -3,11 +3,8 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
-
 import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.basex.server.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -53,7 +50,6 @@ public final class AdminModuleTest extends AdvancedQueryTest {
   @Test
   public void deleteLogs() {
     // no logging data exists in the sandbox
-    error(_ADMIN_DELETE_LOGS.args(Log.name(new Date())), BXAD_TODAY);
     error(_ADMIN_DELETE_LOGS.args("2001-01-01"), WHICHRES_X);
   }
 }

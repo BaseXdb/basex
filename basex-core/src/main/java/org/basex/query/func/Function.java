@@ -1506,7 +1506,7 @@ public enum Function {
    * @return result of check
    * @see Expr#has(Flag)
     */
-  boolean has(final Flag flag) {
+  public boolean has(final Flag flag) {
     return flags.contains(flag);
   }
 

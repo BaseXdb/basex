@@ -1,8 +1,6 @@
 package org.basex.query.func.admin;
 
-import org.basex.core.locks.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 
 /**
  * Admin function.
@@ -29,9 +27,4 @@ abstract class AdminFn extends StandardFunc {
   static final String TYPE = "type";
   /** QName: ms. */
   static final String MS = "ms";
-
-  @Override
-  public final boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(Locking.ADMIN) && super.accept(visitor);
-  }
 }

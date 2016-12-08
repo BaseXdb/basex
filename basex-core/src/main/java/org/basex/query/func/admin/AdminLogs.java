@@ -7,7 +7,6 @@ import java.io.*;
 import java.math.*;
 
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -43,12 +42,10 @@ public final class AdminLogs extends AdminFn {
     } else {
       // return content of single log file
       final String request = LogType.REQUEST.name();
-      final String name = Token.string(toToken(exprs[0], qc)) + IO.LOGSUFFIX;
+      final String name = Token.string(toToken(exprs[0], qc));
       final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
-      final IOFile file = new IOFile(qc.context.log.dir(), name);
-      if(!file.exists()) throw WHICHRES_X.get(info, file);
 
-      final ElementNodes<LogEntry>.NodeIterator iter = logs(file, qc).iterator();
+      final ElementNodes<LogEntry>.NodeIterator iter = logs(name, qc).iterator();
       while(iter.hasNext()) {
         final LogEntry l1 = iter.next();
         final FElem elem = new FElem(ENTRY);
@@ -95,32 +92,36 @@ public final class AdminLogs extends AdminFn {
 
   /**
    * Returns all log entries.
-   * @param file log file
+   * @param name name of log file
    * @param qc query context
    * @return list
    * @throws QueryException query exception
    */
-  private ElementNodes<LogEntry> logs(final IOFile file, final QueryContext qc)
+  private ElementNodes<LogEntry> logs(final String name, final QueryContext qc)
       throws QueryException {
 
-    try(NewlineInput nli = new NewlineInput(file)) {
+    final Log log = qc.context.log;
+    final LogFile file = log.file(name);
+    if(file == null) throw WHICHRES_X.get(info, name);
+
+    try {
       final ElementNodes<LogEntry> logs = new ElementNodes<>();
-      for(String line; (line = nli.readLine()) != null;) {
+      for(final String line : file.read()) {
         qc.checkStop();
-        final LogEntry log = new LogEntry();
+        final LogEntry entry = new LogEntry();
         final String[] cols = line.split("\t");
         if(cols.length > 2) {
-          log.time = cols[0];
-          log.address = cols[1];
-          log.user = cols[2];
-          log.type = cols.length > 3 ? cols[3] : "";
-          log.message = cols.length > 4 ? cols[4] : "";
-          log.ms = cols.length > 5 ? new BigDecimal(cols[5].replace(" ms", "")) : BigDecimal.ZERO;
+          entry.time = cols[0];
+          entry.address = cols[1];
+          entry.user = cols[2];
+          entry.type = cols.length > 3 ? cols[3] : "";
+          entry.message = cols.length > 4 ? cols[4] : "";
+          entry.ms = cols.length > 5 ? new BigDecimal(cols[5].replace(" ms", "")) : BigDecimal.ZERO;
         } else {
           // legacy format
-          log.message = line;
+          entry.message = line;
         }
-        logs.add(log);
+        logs.add(entry);
       }
       return logs;
     } catch(final IOException ex) {

@@ -44,7 +44,7 @@ public final class Users {
   /**
    * Reads user permissions.
    */
-  private synchronized void read() {
+  private void read() {
     if(!file.exists()) return;
     try {
       final byte[] io = file.read();
@@ -88,15 +88,17 @@ public final class Users {
    * Writes permissions to disk.
    * @param ctx database context
    */
-  public synchronized void write(final Context ctx) {
-    if(store()) {
-      try {
-        file.write(toXML(ctx).serialize().finish());
-      } catch(final IOException ex) {
-        Util.errln(ex);
+  public void write(final Context ctx) {
+    synchronized(users) {
+      if(store()) {
+        try {
+          file.write(toXML(ctx).serialize().finish());
+        } catch(final IOException ex) {
+          Util.errln(ex);
+        }
+      } else if(file.exists()) {
+        file.delete();
       }
-    } else if(file.exists()) {
-      file.delete();
     }
   }
 
@@ -105,9 +107,11 @@ public final class Users {
    * @param ctx database context
    * @return root element
    */
-  private synchronized FElem toXML(final Context ctx) {
+  private FElem toXML(final Context ctx) {
     final FElem root = new FElem(USERS);
-    for(final User user : users.values()) user.toXML(root);
+    synchronized(users) {
+      for(final User user : users.values()) user.toXML(root);
+    }
     return root.add(info().deepCopy(ctx.options));
   }
 
@@ -115,8 +119,10 @@ public final class Users {
    * Adds a user.
    * @param user user to be added
    */
-  public synchronized void add(final User user) {
-    users.put(user.name(), user);
+  public void add(final User user) {
+    synchronized(users) {
+      users.put(user.name(), user);
+    }
   }
 
   /**
@@ -124,10 +130,12 @@ public final class Users {
    * @param user user reference
    * @param name new name
    */
-  public synchronized void alter(final User user, final String name) {
-    users.remove(user.name());
-    user.name(name);
-    users.put(name, user);
+  public void alter(final User user, final String name) {
+    synchronized(users) {
+      users.remove(user.name());
+      user.name(name);
+      users.put(name, user);
+    }
   }
 
   /**
@@ -135,8 +143,10 @@ public final class Users {
    * @param user user reference
    * @return success flag
    */
-  public synchronized boolean drop(final User user) {
-    return users.remove(user.name()) != null;
+  public boolean drop(final User user) {
+    synchronized(users) {
+      return users.remove(user.name()) != null;
+    }
   }
 
   /**
@@ -144,8 +154,10 @@ public final class Users {
    * @param name user name
    * @return user name, or {@code null}
    */
-  public synchronized User get(final String name) {
-    return users.get(name);
+  public User get(final String name) {
+    synchronized(users) {
+      return users.get(name);
+    }
   }
 
   /**
@@ -153,10 +165,12 @@ public final class Users {
    * @param pattern glob pattern
    * @return user list
    */
-  public synchronized String[] find(final Pattern pattern) {
+  public String[] find(final Pattern pattern) {
     final StringList sl = new StringList();
-    for(final String name : users.keySet()) {
-      if(pattern.matcher(name).matches()) sl.add(name);
+    synchronized(users) {
+      for(final String name : users.keySet()) {
+        if(pattern.matcher(name).matches()) sl.add(name);
+      }
     }
     return sl.finish();
   }
@@ -168,7 +182,7 @@ public final class Users {
    * @param ctx database context
    * @return user information
    */
-  public synchronized Table info(final String db, final Context ctx) {
+  public Table info(final String db, final Context ctx) {
     final Table table = new Table();
     table.description = Text.USERS_X;
 
@@ -186,17 +200,19 @@ public final class Users {
    * @param ctx database context
    * @return user information
    */
-  public synchronized ArrayList<User> users(final String db, final Context ctx) {
+  public ArrayList<User> users(final String db, final Context ctx) {
     final User curr = ctx.user();
     final boolean admin = curr.has(Perm.ADMIN);
     final ArrayList<User> list = new ArrayList<>();
-    for(final User user : users.values()) {
-      if(admin || curr == user) {
-        if(db == null) {
-          list.add(user);
-        } else {
-          final Entry<String, Perm> entry = user.find(db);
-          if(entry != null) list.add(user);
+    synchronized(users) {
+      for(final User user : users.values()) {
+        if(admin || curr == user) {
+          if(db == null) {
+            list.add(user);
+          } else {
+            final Entry<String, Perm> entry = user.find(db);
+            if(entry != null) list.add(user);
+          }
         }
       }
     }
@@ -223,7 +239,7 @@ public final class Users {
    * Checks if permissions need to be stored.
    * @return result of check
    */
-  private synchronized boolean store() {
+  private boolean store() {
     if(info != null) return true;
     if(users.size() != 1) return !users.isEmpty();
     final User user = users.values().iterator().next();

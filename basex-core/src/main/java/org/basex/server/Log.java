@@ -3,7 +3,6 @@ package org.basex.server;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.math.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -41,10 +40,9 @@ public final class Log {
 
   /** Static options. */
   private final StaticOptions sopts;
-  /** Start date of log. */
-  private String start;
-  /** Output stream. */
-  private FileOutputStream fos;
+
+  /** Current log file. */
+  private LogFile file;
 
   /**
    * Constructor.
@@ -55,11 +53,22 @@ public final class Log {
   }
 
   /**
+   * Returns a log file for the specified name (current or new instance).
+   * @param name name of log file
+   * @return log file, or {@code null} if it does not exist
+   */
+  public LogFile file(final String name) {
+    LogFile lf = file;
+    if(lf == null || !lf.sameAs(name)) lf = new LogFile(name, dir());
+    return lf.exists() ? lf : null;
+  }
+
+  /**
    * Writes a server entry to the log file.
    * @param type log type
    * @param info info string (can be {@code null})
    */
-  public synchronized void writeServer(final LogType type, final String info) {
+  public void writeServer(final LogType type, final String info) {
     write(SERVER, null, type, info, null);
   }
 
@@ -71,7 +80,7 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  public synchronized void write(final String address, final String user, final int type,
+  public void write(final String address, final String user, final int type,
       final String info, final Performance perf) {
     write(address, user, Integer.toString(type), info, perf);
   }
@@ -84,8 +93,8 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  public synchronized void write(final String address, final String user, final LogType type,
-      final String info, final Performance perf) {
+  public void write(final String address, final String user, final LogType type, final String info,
+      final Performance perf) {
     write(address, user, type.toString(), info, perf);
   }
 
@@ -97,43 +106,33 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  public synchronized void write(final String address, final String user, final String type,
-      final String info, final Performance perf) {
+  public void write(final String address, final String user, final String type, final String info,
+      final Performance perf) {
 
-    if(!sopts.get(StaticOptions.LOG)) {
-      close();
-      return;
-    }
+    // check if logging is disabled
+    if(!sopts.get(StaticOptions.LOG)) return;
 
-    // initializes the output stream and returns the current date
+    // construct log text
     final Date date = new Date();
+    final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(DateTime.format(date, DateTime.TIME));
+    tb.add('\t').add(address);
+    tb.add('\t').add(user == null ? UserText.ADMIN : user);
+    tb.add('\t').add(type);
+    tb.add('\t').add(info == null ? EMPTY : chop(normalize(token(info)), ml));
+    if(perf != null) tb.add('\t').add(perf.toString());
+    tb.add(Prop.NL);
+
     try {
-      // check if day has changed
-      final String nstart = name(date);
-      if(fos != null && !start.equals(nstart)) close();
-
-      // create new log file
-      if(fos == null) {
-        final IOFile dir = dir();
-        dir.md();
-        fos = new FileOutputStream(new IOFile(dir, nstart + IO.LOGSUFFIX).file(), true);
-        start = nstart;
+      synchronized(sopts) {
+        // create new log file and write log entry
+        final String name = DateTime.format(date, DateTime.DATE);
+        if(file != null && !file.sameAs(name)) close();
+        if(file == null) file = LogFile.create(name, dir());
+        // write log entry
+        file.write(tb.finish());
       }
-
-      // construct log text
-      final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
-      final TokenBuilder tb = new TokenBuilder();
-      tb.add(DateTime.format(date, DateTime.TIME));
-      tb.add('\t').add(address);
-      tb.add('\t').add(user == null ? UserText.ADMIN : user);
-      tb.add('\t').add(type);
-      tb.add('\t').add(info == null ? EMPTY : chop(normalize(token(info)), ml));
-      if(perf != null) tb.add('\t').add(perf.toString());
-      tb.add(Prop.NL);
-
-      // write and flush text
-      fos.write(tb.finish());
-      fos.flush();
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -142,56 +141,32 @@ public final class Log {
   /**
    * Closes the log file.
    */
-  public synchronized void close() {
-    if(fos == null) return;
+  public void close() {
     try {
-      fos.close();
-      fos = null;
+      synchronized(sopts) {
+        if(file != null) {
+          file.close();
+          file = null;
+        }
+      }
     } catch(final IOException ex) {
       Util.stack(ex);
     }
   }
 
   /**
-   * Returns a reference to the log directory.
-   * @return log directory
-   */
-  public synchronized IOFile dir() {
-    return sopts.dbPath(".").resolve(sopts.get(StaticOptions.LOGPATH));
-  }
-
-  /**
    * Returns all log files.
    * @return log directory
    */
-  public synchronized IOFile[] files() {
+  public IOFile[] files() {
     return dir().children(".*\\" + IO.LOGSUFFIX);
   }
 
   /**
-   * Returns the name of a log file (excluding the suffix) for the specified date.
-   * @param date date
-   * @return name of log file
+   * Returns a reference to the log directory.
+   * @return log directory
    */
-  public static String name(final Date date) {
-    return DateTime.format(date, DateTime.DATE);
-  }
-
-  /**
-   * Log entry.
-   */
-  public static class LogEntry {
-    /** Time. */
-    public String time;
-    /** Address. */
-    public String address;
-    /** User. */
-    public String user;
-    /** Type. */
-    public String type;
-    /** Milliseconds. */
-    public BigDecimal ms;
-    /** Message. */
-    public String message;
+  private IOFile dir() {
+    return sopts.dbPath(".").resolve(sopts.get(StaticOptions.LOGPATH));
   }
 }
