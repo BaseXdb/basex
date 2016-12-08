@@ -15,7 +15,7 @@ import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
 declare
   %rest:path("/dba")
 function dba:redirect(
-) {
+) as element(rest:response) {
   web:redirect("/dba/databases")
 };
 
@@ -70,6 +70,6 @@ declare
   %rest:error-param("value", "{$path}")
 function dba:error-login(
   $path  as xs:string?
-) {
+) as element(rest:response) {
   web:redirect("login", map { 'path': replace($path, '.*/', '') })
 };

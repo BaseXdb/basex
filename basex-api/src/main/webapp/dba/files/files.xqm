@@ -36,7 +36,9 @@ function dba:files(
   cons:check(),
 
   (: request data in a single step :)
-  let $files := file:children($cons:DBA-DIR)[file:is-file(.)]
+  let $dir := $cons:DBA-DIR
+  let $files := if(not(file:exists($dir))) then () else
+    file:children($dir)[file:is-file(.)]
 
   return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -65,7 +67,7 @@ function dba:files(
         </form>
         <div class='note'>
           The files are located on the DBA system in the temporary directory
-          <code>{ $cons:DBA-DIR }</code>.
+          <code>{ $dir }</code>.
         </div>
         <div>&#xa0;</div>
       </td>
@@ -84,10 +86,10 @@ declare
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %output:method("html")
-function dba:action(
+function dba:files-redirect(
   $action  as xs:string,
   $names   as xs:string*
-) {
+) as element(rest:response) {
   web:redirect($action, map { 'name': $names, 'redirect': $dba:CAT })
 };
 

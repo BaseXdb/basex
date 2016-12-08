@@ -6,7 +6,6 @@
 module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~
  : Downloads a resource.
@@ -25,16 +24,14 @@ function dba:download(
 ) as item()+ {
   cons:check(),
   try {
-    let $options := map { 'name': $name, 'resource': $resource }
-    let $ct := util:eval("db:content-type($name, $resource), db:is-raw($name, $resource)", $options)
-    return (
-      web:response-header(
-        map { 'media-type': $ct[1] },
-        map { 'Content-Disposition': 'attachment; filename=' || $resource }
-      ),
-      util:eval(
-        if($ct[2]) then "db:retrieve($name, $resource)" else "db:open($name, $resource)", $options
-      )
+    web:response-header(
+      map { 'media-type': db:content-type($name, $resource) },
+      map { 'Content-Disposition': 'attachment; filename=' || $resource }
+    ),
+    if(db:is-raw($name, $resource)) then (
+      db:retrieve($name, $resource)
+    ) else (
+      db:open($name, $resource)
     )
   } catch * {
     <rest:response>
@@ -55,7 +52,5 @@ function dba:download(
   $backup  as xs:string
 ) {
   cons:check(),
-  util:eval("file:read-binary(db:system()/globaloptions/dbpath || '/' || $backup)",
-    map { 'backup': $backup }
-  )
+  file:read-binary(db:system()/globaloptions/dbpath || '/' || $backup)
 };

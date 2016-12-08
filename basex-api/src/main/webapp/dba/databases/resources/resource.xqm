@@ -24,11 +24,10 @@ declare
   %rest:form-param("action",   "{$action}")
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resource}")
-function dba:resource(
+function dba:resource-redirect(
   $action    as xs:string,
   $name      as xs:string,
   $resource  as xs:string*
-) {
-  cons:check(),
+) as element(rest:response) {
   web:redirect($action, map { 'name': $name, 'resource': $resource })
 };

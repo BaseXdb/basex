@@ -15,7 +15,7 @@ import module namespace cons = 'dba/cons' at 'cons.xqm';
 declare function tmpl:wrap(
   $tr  as element(tr)+
 ) as element(html) {
-  tmpl:wrap(map{ }, $tr)
+  tmpl:wrap(map { }, $tr)
 };
 
 (:~

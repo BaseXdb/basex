@@ -107,7 +107,7 @@ function dba:eval-query(
   $query  as xs:string?
 ) as xs:string {
   cons:check(),
-  util:query($query)
+  util:query($query, ())
 };
 
 (:~
@@ -205,6 +205,8 @@ declare %private function dba:to-path(
  : @return list of files
  :)
 declare %private function dba:files() as xs:string* {
-  for $file in file:list($cons:DBA-DIR, false(), '*' || $dba:SUFFIX)
+  let $dir := $cons:DBA-DIR
+  where file:exists($dir)
+  for $file in file:list($dir, false(), '*' || $dba:SUFFIX)
   return replace($file, $dba:SUFFIX || '$', '')
 };

@@ -21,11 +21,15 @@ declare
   %output:method("html")
 function dba:drop(
   $files  as map(*)
-) {
+) as element(rest:response) {
   cons:check(),
 
-  map:for-each($files, function($name, $content) {
-    file:write-binary($cons:DBA-DIR || file:name($name), $content)
-  }),
+  let $dir := $cons:DBA-DIR
+  return (
+    file:create-dir($dir),
+    map:for-each($files, function($name, $content) {
+      file:write-binary($dir || file:name($name), $content)
+    })
+  ),
   web:redirect($dba:CAT, map { 'info': 'Uploaded files: ' || map:size($files) })
 };

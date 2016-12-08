@@ -8,7 +8,6 @@ module namespace dba = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -108,25 +107,17 @@ function dba:create(
 ) {
   cons:check(),
   try {
-    if(util:eval('db:exists($name)', map { 'name': $name })) then (
+    if(db:exists($name)) then (
       error((), 'Database already exists: ' || $name || '.')
     ) else (
-      util:update("db:create($name, (), (), map:merge((" ||
-        "('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics'," ||
-        "'updindex') ! map:entry(., $opts = .), $lang ! map:entry('language', .))))",
-        map { 'name': $name, 'lang': $lang, 'opts': $opts }
-      ),
-      db:output(web:redirect($dba:SUB, map {
-        'info': 'Created Database: ' || $name,
-        'name': $name
-      }))
+      db:create($name, (), (), map:merge((
+        ('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics',
+         'updindex') ! map:entry(., $opts = .), $lang ! map:entry('language', .)))),
+      cons:redirect($dba:SUB, map { 'info': 'Created Database: ' || $name, 'name': $name })
     )
   } catch * {
-    db:output(web:redirect("create-db", map {
-      'error': $err:description,
-      'name': $name,
-      'opts': $opts,
-      'lang': $lang
-    }))
+    cons:redirect("create-db", map {
+      'error': $err:description, 'name': $name, 'opts': $opts, 'lang': $lang
+    })
   }
 };

@@ -8,7 +8,6 @@ module namespace dba = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -87,24 +86,17 @@ function dba:rename(
 ) {
   cons:check(),
   try {
-    if(util:eval('db:exists($name, $target)', map { 'name' : $name, 'target': $target })) then (
+    if(db:exists($name, $target)) then (
       error((), 'Resource already exists: ' || $target || '.')
     ) else (
-      util:update("db:rename($name, $resource, $target)",
-        map { 'name': $name, 'resource': $resource, 'target': $target }
-      ),
-      db:output(web:redirect($dba:SUB, map {
-        'info': 'Resource was renamed.',
-        'name': $name,
-        'resource': $target
-      }))
+      db:rename($name, $resource, $target),
+      cons:redirect($dba:SUB, map {
+        'info': 'Resource was renamed.', 'name': $name, 'resource': $target
+      })
     )
   } catch * {
-    db:output(web:redirect("rename", map {
-      'error': $err:description,
-      'name': $name,
-      'resource': $resource,
-      'target': $target
-    }))
+    cons:redirect("rename", map {
+      'error': $err:description, 'name': $name, 'resource': $resource, 'target': $target
+    })
   }
 };

@@ -240,7 +240,8 @@ declare function html:table(
     element h4 {
       if($single-page) then () else
         $start || '-' || min(($count, $start + $max - 1)) || ' of ',
-      $count || ' Entries',
+      $count, ' ',
+      if($count = 1) then 'Entry' else ' Entries',
       if($single-page) then () else (
         ' &#xa0; ',
         let $first := '«', $prev := '‹'

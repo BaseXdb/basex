@@ -8,7 +8,6 @@ module namespace dba = 'dba/jobs-users';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs-users';
@@ -95,21 +94,11 @@ function dba:create(
 ) {
   cons:check(),
   try {
-    util:update("user:grant($name, $perm, $pattern)", map {
-      'name':    $name,
-      'perm':    $perm,
-      'pattern': $pattern
-    }),
-    db:output(web:redirect($dba:SUB, map {
-      'info': 'Created Pattern: ' || $pattern,
-      'name': $name
-    }))
+    user:grant($name, $perm, $pattern),
+    cons:redirect($dba:SUB, map { 'info': 'Created Pattern: ' || $pattern, 'name': $name })
   } catch * {
-    db:output(web:redirect("add-pattern", map {
-      'error': $err:description,
-      'name': $name,
-      'perm': $perm,
-      'pattern': $pattern
-    }))
+    cons:redirect("add-pattern", map {
+      'error': $err:description, 'name': $name, 'perm': $perm, 'pattern': $pattern
+    })
   }
 };

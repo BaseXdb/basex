@@ -44,27 +44,24 @@ function dba:database(
 ) as element(html) {
   cons:check(),
 
-  (: request data in a single step :)
   let $data := try {
-    util:eval('element result {
-      let $found := db:exists($name)
-      return (
-        element found { $found },
-        if($found) then (
-          element databases {
-            attribute count { count(db:list($name)) },
-            db:list-details($name)[position() = $start to $end]
-          },
-          element info { db:info($name) }
-        ) else (),
-        element backups { db:backups($name) }
-      )
-    }', map { 'name': $name, 'start': util:start($page, $sort), 'end': util:end($page, $sort) })
+    let $found := db:exists($name)
+    return (
+      element found { $found },
+      element count { count(db:list($name)) },
+      if($found) then (
+        db:info($name),
+        let $start := util:start($page, $sort)
+        let $end := util:end($page, $sort)
+        return db:list-details($name)[position() = $start to $end]
+      ) else (),
+      db:backups($name)
+    )
   } catch * {
-    element error { $cons:DATA-ERROR || ': ' || $err:description }
+    element error { $err:description }
   }
-  let $found := $data/found = 'true'
-  let $error := head(($data/self::error/string(), $error))
+  let $error := head(($data/self::error, $error))
+  let $only-backups := $data/self::found = 'false'
 
   return tmpl:wrap(
     map {
@@ -81,10 +78,10 @@ function dba:database(
             $name ! (if(empty($resource)) then . else html:link(., $dba:SUB, map { 'name': . } ))
           }</h2>
           {
-            if(not($found)) then () else (
-              let $count := xs:integer($data/databases/@count)
+            if($only-backups) then () else (
+              let $count := xs:integer($data/self::count)
               let $rows :=
-                for $res in $data/databases/resource
+                for $res in $data/self::resource
                 return <row resource='{ $res }' type='{ $res/@content-type }'
                             raw='{ if($res/@raw = 'true') then '&#x2713;' else '–' }'
                             size='{ $res/@size }'/>
@@ -113,7 +110,7 @@ function dba:database(
           <h3>Backups</h3>
           {
             let $rows :=
-              for $backup in $data/backups/*
+              for $backup in $data/self::backup
               order by $backup descending
               return <row backup='{ $backup }' size='{ $backup/@size }'/>
             let $headers := (
@@ -122,7 +119,7 @@ function dba:database(
             )
             let $buttons := (
               html:button('create-backup', 'Create', false(), 'global') update (
-                if($found) then () else insert node attribute disabled { '' } into .
+                if($only-backups) then insert node attribute disabled { '' } into . else ()
               ),
               html:button('restore', 'Restore', true()),
               html:button('drop-backup', 'Drop', true())
@@ -154,7 +151,7 @@ function dba:database(
             queryResource(true);
           </script>
         </_>/node() else (
-          $data/info/*/html:properties(.)
+          $data/self::database ! html:properties(.)
         )
       }</td>
     </tr>
@@ -175,13 +172,11 @@ declare
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resources}")
   %rest:form-param("backup",   "{$backups}")
-function dba:action(
+function dba:database-redirect(
   $action     as xs:string,
   $name       as xs:string,
   $resources  as xs:string*,
   $backups    as xs:string*
-) {
-  web:redirect(
-    web:create-url($action, map { 'name': $name, 'resource': $resources, 'backup': $backups })
-  )
+) as element(rest:response) {
+  web:redirect($action, map { 'name': $name, 'resource': $resources, 'backup': $backups })
 };

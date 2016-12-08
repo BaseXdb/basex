@@ -6,7 +6,6 @@
 module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -27,9 +26,7 @@ function dba:drop(
 ) as item()+ {
   cons:check(),
   try {
-    let $entries := util:eval("admin:logs($name, true())[matches(., $query, 'i')]",
-      map { 'name': $name, 'query': $logs }
-    )
+    let $entries := admin:logs($name, true())[matches(., $logs, 'i')]
     return (
       web:response-header(
         map { 'media-type': 'text/xml' },

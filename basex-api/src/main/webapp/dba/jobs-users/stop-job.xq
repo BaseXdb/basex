@@ -7,7 +7,6 @@ module namespace dba = 'dba/jobs-users';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs-users';
@@ -23,10 +22,10 @@ declare
   %output:method("html")
 function dba:drop(
   $ids  as xs:string*
-) {
+) as element(rest:response) {
   cons:check(),
   try {
-    util:eval("$i ! jobs:stop(.)", map { 'i': $ids }),
+    $ids ! jobs:stop(.),
     web:redirect($dba:CAT, map { 'info': 'Stopped jobs: ' || count($ids) })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })

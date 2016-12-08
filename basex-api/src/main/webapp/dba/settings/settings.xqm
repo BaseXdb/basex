@@ -73,7 +73,7 @@ declare
   %rest:path("/dba/settings")
   %output:method("html")
 function dba:settings-save(
-) {
+) as element(rest:response) {
   cons:check(),
 
   let $config := element config {
@@ -81,6 +81,7 @@ function dba:settings-save(
     return element { $key } { Request:parameter($key) }
   }
   return (
+    file:create-dir($cons:DBA-DIR),
     file:write($cons:DBA-SETTINGS-FILE, $config),
     web:redirect("settings")
   )

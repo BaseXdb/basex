@@ -8,7 +8,6 @@ module namespace dba = 'dba/jobs-users';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs-users';
@@ -46,14 +45,11 @@ function dba:user(
   cons:check(),
 
   let $data := try {
-    util:eval('element result {
-      user:list-details($n)
-    }', map { 'n': $name })
+    user:list-details($name)
   } catch * {
-    element error { $cons:DATA-ERROR || ': ' || $err:description }
+    element error { $err:description }
   }
-  let $error := head(($data/self::error/string(), $error))
-  let $found := exists($data/user)
+  let $error := head(($data/self::error, $error))
   let $admin := $name eq 'admin'
 
   return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
@@ -97,7 +93,7 @@ function dba:user(
                   <td>Permission:</td>
                   <td>
                     <select name="perm" size="5">{
-                      let $perm := head(($perm, $data/user/@permission))
+                      let $perm := head(($perm, $data/self::user/@permission))
                       for $p in $cons:PERMISSIONS
                       return element option { attribute selected { }[$p = $perm], $p }
                     }</select>
@@ -116,20 +112,18 @@ function dba:user(
             <input type="hidden" name="name" value="{ $name }" id="name"/>
             <div class='small'/>
             {
-              if(not($found)) then () else (
-                let $rows :=
-                  for $db in $data/user/database
-                  return <row pattern='{ $db/@pattern }' perm='{ $db/@permission }'/>
-                let $headers := (
-                  <pattern>Pattern</pattern>,
-                  <perm>Local Permission</perm>
-                )
-                let $buttons := if($admin) then () else (
-                  html:button('add-pattern', 'Add…'),
-                  html:button('drop-pattern', 'Drop', true())
-                )
-                return html:table($headers, $rows, $buttons, map {}, map {})
+              let $rows :=
+                for $db in $data/self::user/database
+                return <row pattern='{ $db/@pattern }' perm='{ $db/@permission }'/>
+              let $headers := (
+                <pattern>Pattern</pattern>,
+                <perm>Local Permission</perm>
               )
+              let $buttons := if($admin) then () else (
+                html:button('add-pattern', 'Add…'),
+                html:button('drop-pattern', 'Drop', true())
+              )
+              return html:table($headers, $rows, $buttons, map {}, map {})
             }
           </form>
           <div class='note'>
@@ -156,11 +150,11 @@ declare
   %rest:form-param("action",  "{$action}")
   %rest:form-param("name",    "{$name}")
   %rest:form-param("pattern", "{$pattern}")
-function dba:action(
+function dba:user-redirect(
   $action   as xs:string,
   $name     as xs:string,
   $pattern  as xs:string?
-) {
+) as element(rest:response) {
   web:redirect($action, map { 'name': $name, 'pattern': $pattern })
 };
 
@@ -188,29 +182,19 @@ function dba:create(
 ) {
   cons:check(),
   try {
-    util:update("
-      let $old := user:list-details($name) return (
-        if($name = $newname) then () else if(user:exists($newname)) then (
-           error((), 'User already exists: ' || $newname || '.')
-         ) else (
-           user:alter($name, $newname)
-        ),
-        if($pw = '') then () else user:password($name, $pw),
-        if($perm = $old/@permission) then () else user:grant($name, $perm)
-      )",
-      map { 'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm }
+    let $old := user:list-details($name) return (
+      if($name = $newname) then () else if(user:exists($newname)) then (
+         error((), 'User already exists: ' || $newname || '.')
+       ) else (
+         user:alter($name, $newname)
+      ),
+      if($pw = '') then () else user:password($name, $pw),
+      if($perm = $old/@permission) then () else user:grant($name, $perm)
     ),
-    db:output(web:redirect($dba:SUB, map {
-      'info': 'Changes saved.',
-      'name': $newname
-    }))
+    cons:redirect($dba:SUB, map { 'info': 'Changes saved.', 'name': $newname })
   } catch * {
-    db:output(web:redirect($dba:SUB, map {
-      'error': $err:description,
-      'name': $name,
-      'newname': $newname,
-      'pw':   $pw,
-      'perm': $perm
-    }))
+    cons:redirect($dba:SUB, map {
+      'error': $err:description, 'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm
+    })
   }
 };

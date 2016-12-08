@@ -6,7 +6,6 @@
 module namespace dba = 'dba/jobs-users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs-users';
@@ -26,9 +25,9 @@ function dba:drop(
 ) {
   cons:check(),
   try {
-    util:update("$names ! user:drop(.)", map { 'names': $names }),
-    db:output(web:redirect($dba:CAT, map { 'info': 'Dropped users: ' || count($names) }))
+    $names ! user:drop(.),
+    cons:redirect($dba:CAT, map { 'info': 'Dropped users: ' || count($names) })
   } catch * {
-    db:output(web:redirect($dba:CAT, map { 'error': $err:description }))
+    cons:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

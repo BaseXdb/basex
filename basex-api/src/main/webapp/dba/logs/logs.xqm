@@ -8,7 +8,6 @@ module namespace dba = 'dba/logs';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -48,7 +47,7 @@ function dba:logs(
 
   let $loglists := dba:loglist($sort, $loglist)
   let $logs := head(($loglist, $logs)[.])
-  let $error := if($loglists) then $error else $cons:DATA-ERROR
+  let $error := if($loglists) then $error else "No log files found."
   return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='230'>
@@ -117,15 +116,12 @@ function dba:log(
 ) as element()* {
   cons:check(),
 
-  let $logs := try {
-    util:eval("admin:logs($name, true())[matches(., $query, 'i')]",
-      map { 'name': $name, 'query': $query }
-    )
-  } catch * { () }
+  let $data := try {
+    admin:logs($name, true())[matches(., $query, 'i')]
+  } catch * { (: ignored :) }
 
-  where $logs
   let $rows :=
-    for $log in $logs
+    for $log in $data
     return <row time='{ $log/@time }' address='{ $log/@address }' user='{ $log/@user}'
                 type='{ $log/@type }' ms='{ $log/@ms }' message='{ $log }'/>
   let $headers := (
@@ -160,21 +156,19 @@ function dba:loglist(
 ) as element()* {
   cons:check(),
 
-  let $logs := try {
-    util:eval("for $log in admin:logs()
-      let $date := $log/(@date,text())/string()
-      where not($query) or (some $entry in admin:logs($date) satisfies matches($entry, $query, 'i'))
-      order by $date descending
-      return $log", map { 'query': $query }
+  let $data := try {
+    for $log in admin:logs()
+    let $date := string($log)
+    where not($query) or (
+      some $entry in admin:logs($date) satisfies matches($entry, $query, 'i')
     )
-  } catch * { () }
-  where $logs
+    order by $date descending
+    return $log
+  } catch * { (: ignored :) }
   let $rows :=
-    (: legacy (7.8.1): $a/@date :)
-    for $a in $logs
+    for $a in $data
     order by $a descending
-    (: legacy (7.8.1): $a/@date :)
-    return <row name='{ ($a/(@date,text())) }' size='{ $a/@size }'/>
+    return <row name='{ $a }' size='{ $a/@size }'/>
   let $headers := (
     <name>Name</name>,
     <size type='bytes'>Size</size>
@@ -196,9 +190,9 @@ declare
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %output:method("html")
-function dba:action(
+function dba:logs-redirect(
   $action  as xs:string,
   $names   as xs:string*
-) {
+) as element(rest:response) {
   web:redirect($action, map { 'name': $names[.], 'redirect': $dba:CAT })
 };

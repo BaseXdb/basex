@@ -6,7 +6,6 @@
 module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -26,9 +25,9 @@ function dba:drop(
 ) {
   cons:check(),
   try {
-    util:update("$names ! db:drop(.)", map { 'names': $names }),
-    db:output(web:redirect($dba:CAT, map { 'info': 'Dropped databases: ' || count($names) }))
+    $names ! db:drop(.),
+    cons:redirect($dba:CAT, map { 'info': 'Dropped databases: ' || count($names) })
   } catch * {
-    db:output(web:redirect($dba:CAT, map { 'error': $err:description }))
+    cons:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

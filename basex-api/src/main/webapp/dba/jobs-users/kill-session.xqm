@@ -22,7 +22,7 @@ declare
   %output:method("html")
 function dba:drop(
   $ids as xs:string*
-) {
+) as element(rest:response) {
   cons:check(),
   try {
     for $id in $ids

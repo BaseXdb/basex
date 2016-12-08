@@ -6,7 +6,6 @@
 module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -22,10 +21,10 @@ declare
   %output:method("html")
 function dba:drop(
   $names  as xs:string*
-) {
+) as element(rest:response) {
   cons:check(),
   try {
-    util:eval("$n ! admin:delete-logs(.)", map { 'n': $names }),
+    $names ! admin:delete-logs(.),
     web:redirect($dba:CAT, map { 'info': 'Deleted logs: ' || count($names) })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })

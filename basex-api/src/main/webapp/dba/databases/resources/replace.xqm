@@ -83,31 +83,22 @@ function dba:replace-upload(
   cons:check(),
   try {
     let $key := map:keys($file)
-    let $raw := util:eval("db:is-raw($name, $resource)",
-      map { 'name': $name, 'resource': $resource })
     return if($key = '') then (
       error((), "No input specified.")
     ) else (
-      let $input := if($raw) then (
+      let $input := if(db:is-raw($name, $resource)) then (
         $file($key)
       ) else (
         util:to-xml-string($file($key))
       )
-      return util:update("db:replace($name, $resource, $input)",
-        map { 'name': $name, 'resource': $resource, 'input': $input }
-      ),
-      db:output(web:redirect($dba:SUB, map {
-        'redirect': $dba:SUB,
-        'name': $name,
-        'resource': $resource,
-        'info': 'Replaced resource: ' || $resource
-      }))
+      return db:replace($name, $resource, $input),
+      cons:redirect($dba:SUB, map {
+        'name': $name, 'resource': $resource, 'info': 'Replaced resource: ' || $resource
+      })
     )
   } catch * {
-    db:output(web:redirect("replace", map {
-      'error': $err:description,
-      'name': $name,
-      'resource': $resource
-    }))
+    cons:redirect("replace", map {
+      'error': $err:description, 'name': $name, 'resource': $resource
+    })
   }
 };

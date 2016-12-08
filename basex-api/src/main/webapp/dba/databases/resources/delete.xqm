@@ -6,7 +6,6 @@
 module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Sub category :)
 declare variable $dba:SUB := 'database';
@@ -29,13 +28,11 @@ function dba:delete(
 ) {
   cons:check(),
   try {
-    util:update("$resources ! db:delete($name, .)", map { 'name': $name, 'resources': $resources }),
-    db:output(web:redirect($dba:SUB,
-      map { 'name': $name, 'info': 'Deleted resources: ' || count($resources) })
+    $resources ! db:delete($name, .),
+    cons:redirect($dba:SUB,
+      map { 'name': $name, 'info': 'Deleted resources: ' || count($resources) }
     )
   } catch * {
-    db:output(
-      web:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
-    )
+    cons:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
   }
 };

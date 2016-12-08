@@ -28,8 +28,5 @@ function dba:query-resource(
   $query     as xs:string
 ) as xs:string {
   cons:check(),
-  let $query := if($query) then $query else '.'
-  return util:query($query, "'': db:open($name, $resource)", map {
-    'name': $name, 'resource': $resource
-  })
+  util:query(if($query) then $query else '.', db:open($name, $resource))
 };

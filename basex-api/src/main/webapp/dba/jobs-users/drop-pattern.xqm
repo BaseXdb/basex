@@ -1,3 +1,4 @@
+
 (:~
  : Drop patterns.
  :
@@ -6,7 +7,6 @@
 module namespace dba = 'dba/jobs-users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:SUB := 'user';
@@ -29,9 +29,9 @@ function dba:drop-pattern(
 ) {
   cons:check(),
   try {
-    util:update("user:drop($name, $pattern)", map { 'name': $name, 'pattern': $pattern }),
-    db:output(web:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern dropped: ' || $pattern }))
+    user:drop($name, $pattern),
+    cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern dropped: ' || $pattern })
   } catch * {
-    db:output(web:redirect($dba:SUB, map { 'error': $err:description }))
+    cons:redirect($dba:SUB, map { 'error': $err:description })
   }
 };

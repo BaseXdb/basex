@@ -8,7 +8,6 @@ module namespace dba = 'dba/jobs-users';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs-users';
@@ -102,25 +101,15 @@ function dba:create(
 ) {
   cons:check(),
   try {
-    util:update("if(user:exists($name)) then (
+    if(user:exists($name)) then (
       error((), 'User already exists: ' || $name || '.')
     ) else (
       user:create($name, $pw, $perm)
-    )", map {
-      'name': $name,
-      'pw':   $pw,
-      'perm': $perm
-    }),
-    db:output(web:redirect($dba:CAT, map {
-      'info': 'Created User: ' || $name,
-      'name': $name
-    }))
+    ),
+    cons:redirect($dba:CAT, map { 'info': 'Created User: ' || $name, 'name': $name })
   } catch * {
-    db:output(web:redirect("create-user", map {
-      'error': $err:description,
-      'name': $name,
-      'pw':   $pw,
-      'perm': $perm
-    }))
+    cons:redirect("create-user", map {
+      'error': $err:description, 'name': $name, 'pw': $pw, 'perm': $perm
+    })
   }
 };

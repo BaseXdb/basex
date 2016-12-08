@@ -10,7 +10,6 @@ import module namespace Session = 'http://basex.org/modules/session';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs-users';
@@ -38,16 +37,16 @@ function dba:jobs-users(
 
   (: request data in a single step :)
   let $data := try {
-    util:eval('element result {
+    element result {
       element users { user:list-details() },
       element sessions { admin:sessions() },
       element jobs { jobs:list-details() },
       element current-job { jobs:current() }
-    }')
+    }
   } catch * {
-    element error { $cons:DATA-ERROR || ': ' || $err:description }
+    element error { $err:description }
   }
-  let $error := head(($data/self::error/string(), $error))
+  let $error := head(($data/self::error, $error))
 
   return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -171,15 +170,14 @@ declare
   %rest:query-param("name",   "{$names}")
   %rest:query-param("id",     "{$ids}")
   %output:method("html")
-function dba:action(
+function dba:jobs-users-redirect(
   $action  as xs:string,
   $names   as xs:string*,
   $ids     as xs:string*
-) {
+) as element(rest:response) {
   web:redirect($action,
     if($action = 'create-user') then map { }
-    else if($action = 'kill-session') then map { 'id': $ids }
-    else if($action = 'stop-job') then map { 'id': $ids }
+    else if($action = ('kill-session', 'stop-job')) then map { 'id': $ids }
     else map { 'name': $names, 'redirect': $dba:CAT }
   )
 };

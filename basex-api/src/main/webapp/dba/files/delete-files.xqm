@@ -21,7 +21,7 @@ declare
   %output:method("html")
 function dba:drop(
   $names  as xs:string*
-) {
+) as element(rest:response) {
   cons:check(),
   try {
     $names ! file:delete($cons:DBA-DIR || .),

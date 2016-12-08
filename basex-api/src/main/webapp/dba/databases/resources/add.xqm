@@ -120,29 +120,24 @@ function dba:add-post(
     let $path := if(not($path) or ends-with($path, '/')) then ($path || $key) else $path
     return if($key = '') then (
       error((), "No input specified.")
-    ) else if(util:eval('db:exists($name, $path)', map { 'name': $name, 'path': $path })) then (
+    ) else if(db:exists($name, $path)) then (
       error((), 'Resource already exists: ' || $path || '.')
     ) else (
       let $input := $file($key)
       return if($binary) then (
-        util:update('db:store($name, $path, $input)',
-          map { 'name': $name, 'path': $path, 'input': $input })
+        db:store($name, $path, $input)
       ) else (
-        util:update("db:add($name, $input, $path, map:merge(" ||
-          "('intparse','dtd','stripns','chop','xinclude') ! map:entry(., $opts = .)))",
-          map { 'name': $name, 'input': util:to-xml-string($input), 'path': $path, 'opts': $opts }
+        db:add($name, util:to-xml-string($input), $path, map:merge(
+          ('intparse','dtd','stripns','chop','xinclude') ! map:entry(., $opts = .))
         )
       ),
-      db:output(web:redirect($dba:SUB,
-        map { 'name': $name, 'path': $path, 'info': 'Added resource: ' || $name }))
+      cons:redirect($dba:SUB,
+        map { 'name': $name, 'path': $path, 'info': 'Added resource: ' || $name }
+      )
     )
   } catch * {
-    db:output(web:redirect("add", map {
-      'error': $err:description,
-      'name': $name,
-      'opts': $opts,
-      'path': $path,
-      'binary': $binary
-    }))
+    cons:redirect("add", map {
+      'error': $err:description, 'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary
+    })
   }
 };

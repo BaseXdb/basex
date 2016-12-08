@@ -1,3 +1,5 @@
+
+
 (:~
  : Optimize databases.
  :
@@ -8,7 +10,6 @@ module namespace dba = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -43,11 +44,11 @@ function dba:create(
   cons:check(),
 
   let $data := try {
-    util:eval('db:info($n)', map { 'n': $name })
+    db:info($name)
   } catch * {
-    element error { $cons:DATA-ERROR || ': ' || $err:description }
+    element error { $err:description }
   }
-  let $error := head(($data/self::error/string(), $error))
+  let $error := head(($data/self::error, $error))
   let $opts := if($opts = 'x') then $opts else $data//*[text() = 'true']/name()
   let $lang := if($opts = 'x') then $lang else 'en'
 
@@ -115,23 +116,16 @@ function dba:optimize(
 ) {
   try {
     cons:check(),
-    util:update("db:optimize($name, boolean($all), map:merge((
+    db:optimize($name, boolean($all), map:merge((
       ('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics') !
         map:entry(., $opts = .),
       $lang ! map:entry('language', .)
-    )))", map { 'name': $name, 'all': $all, 'lang': $lang, 'opts': $opts }
-    ),
-    db:output(web:redirect($dba:SUB, map {
-      'name': $name,
-      'info': 'Database was optimized.'
-    }))
+    ))),
+    cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was optimized.' })
   } catch * {
-    db:output(web:redirect($dba:SUB, map {
-      'error': $err:description,
-      'name': $name,
-      'opts': $opts,
-      'lang': $lang
-    }))
+    cons:redirect($dba:SUB, map {
+      'error': $err:description, 'name': $name, 'opts': $opts, 'lang': $lang
+    })
   }
 };
 
@@ -150,9 +144,9 @@ function dba:drop(
 ) {
   cons:check(),
   try {
-    util:update("$names ! db:optimize(.)", map { 'names': $names }),
-    db:output(web:redirect($dba:CAT, map { 'info': 'Optimized databases: ' || count($names) }))
+    $names ! db:optimize(.),
+    cons:redirect($dba:CAT, map { 'info': 'Optimized databases: ' || count($names) })
   } catch * {
-    db:output(web:redirect($dba:CAT, map { 'error': $err:description }))
+    cons:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

@@ -8,7 +8,6 @@ module namespace dba = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -79,20 +78,13 @@ function dba:copy(
 ) {
   cons:check(),
   try {
-    if(util:eval('db:exists($newname)', map { 'newname': $newname })) then (
+    if(db:exists($newname)) then (
       error((), 'Database already exists: ' || $newname || '.')
     ) else (
-      util:update("db:copy($name, $newname)", map { 'name': $name, 'newname': $newname })
+      db:copy($name, $newname)
     ),
-    db:output(web:redirect($dba:SUB, map {
-      'info': 'Database was copied.',
-      'name': $newname
-    }))
+    cons:redirect($dba:SUB, map { 'info': 'Database was copied.', 'name': $newname })
   } catch * {
-    db:output(web:redirect("copy", map {
-      'error': $err:description,
-      'name': $name,
-      'newname': $newname
-    }))
+    cons:redirect("copy", map { 'error': $err:description, 'name': $name, 'newname': $newname })
   }
 };
