@@ -74,11 +74,16 @@ public final class FnTrace extends StandardFunc {
     if(label != null) tb.add(label);
     final String info = tb.add(value).toString();
 
-    // if GUI is used or client is calling, cache trace info
-    final InfoListener il = qc.job().listener;
-    if(il != null || qc.context.listener != null) {
+    // if GUI is used, or if client is calling, cache trace info
+    final TraceListener trace = qc.job().trace;
+    boolean cache = qc.context.client != null;
+    if(trace != null) {
+      trace.info(info);
+      cache = true;
+    }
+
+    if(cache) {
       qc.evalInfo(info);
-      if(il != null) il.info(info);
     } else {
       Util.errln(info);
     }

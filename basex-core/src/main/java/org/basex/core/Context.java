@@ -21,8 +21,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Context {
-  /** Client listener. Set to {@code null} in standalone/server mode. */
-  public final ClientListener listener;
+  /** Client info. Set to {@code null} in standalone/server mode. */
+  public final ClientInfo client;
   /** Blocked clients. */
   public final ClientBlocker blocker;
   /** Job pool. */
@@ -90,10 +90,10 @@ public final class Context {
    * Constructor, called by clients, and adopting the variables of the main context.
    * The {@link #user} reference must be set after calling this method.
    * @param ctx main context
-   * @param listener client listener
+   * @param client client info
    */
-  public Context(final Context ctx, final ClientListener listener) {
-    this.listener = listener;
+  public Context(final Context ctx, final ClientInfo client) {
+    this.client = client;
     soptions = ctx.soptions;
     options = new MainOptions(ctx.options);
     datas = ctx.datas;
@@ -123,8 +123,8 @@ public final class Context {
     repo = new EXPathRepo(soptions);
     log = new Log(soptions);
     user = users.get(UserText.ADMIN);
-    listener = null;
     jobs = new JobPool(soptions);
+    client = null;
   }
 
   /**
@@ -151,7 +151,7 @@ public final class Context {
   public synchronized void close() {
     jobs.close();
     // stop sessions, close data references
-    while(!sessions.isEmpty()) sessions.get(0).quit();
+    while(!sessions.isEmpty()) sessions.get(0).close();
     datas.close();
     log.close();
   }

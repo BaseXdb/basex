@@ -25,8 +25,6 @@ import org.basex.util.*;
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
   String username = "";
-  /** Servlet-specific password. */
-  String password = "";
   /** Servlet-specific authentication method. */
   AuthMethod auth;
 
@@ -42,8 +40,6 @@ public abstract class BaseXServlet extends HttpServlet {
         if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
         if(key.equalsIgnoreCase(StaticOptions.USER.name())) {
           username = val;
-        } else if(key.equalsIgnoreCase(StaticOptions.PASSWORD.name())) {
-          password = val;
         } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
           auth = AuthMethod.valueOf(val);
         }
@@ -59,7 +55,6 @@ public abstract class BaseXServlet extends HttpServlet {
 
     final HTTPContext http = new HTTPContext(req, res, this);
     try {
-      http.authorize();
       run(http);
       http.log(SC_OK, "");
     } catch(final HTTPException ex) {
@@ -73,7 +68,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);
       Util.errln(msg);
-      http.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, msg));
+      http.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, msg));
     } finally {
       if(Prop.debug) {
         Util.outln("_ REQUEST _________________________________" + Prop.NL + req);

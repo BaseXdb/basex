@@ -110,17 +110,6 @@ public final class BaseXHTTP extends Main {
       return;
     }
 
-    // request password on command line if only the user was specified
-    final String user = Prop.get(StaticOptions.USER);
-    String pw = Prop.get(StaticOptions.PASSWORD);
-    if(user != null && !user.isEmpty()) {
-      while(pw == null || pw.isEmpty()) {
-        Util.out(PASSWORD + COLS);
-        pw = Util.password();
-        Prop.put(StaticOptions.PASSWORD, pw);
-      }
-    }
-
     // start web server
     if(!quiet) Util.outln(header());
     try {
@@ -301,9 +290,6 @@ public final class BaseXHTTP extends Main {
             Prop.put(StaticOptions.PORT, Integer.toString(p));
             Prop.put(StaticOptions.SERVERPORT, Integer.toString(p));
             break;
-          case 'P': // specify password
-            Prop.put(StaticOptions.PASSWORD, arg.string());
-            break;
           case 'q': // quiet flag (hidden)
             quiet = true;
             break;
@@ -312,9 +298,6 @@ public final class BaseXHTTP extends Main {
             break;
           case 'S': // set service flag
             service = serve;
-            break;
-          case 'U': // specify user name
-            Prop.put(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
             Prop.put(StaticOptions.LOG, Boolean.toString(false));

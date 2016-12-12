@@ -16,11 +16,11 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.core.users.*;
+import org.basex.http.restxq.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.*;
-import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
@@ -32,9 +32,9 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class HTTPContext {
+public final class HTTPContext implements ClientInfo {
   /** Global static database context. */
-  private static Context context;
+  private static Context ctx;
   /** Initialization flag. */
   private static boolean init;
   /** Initialized failed. */
@@ -46,27 +46,28 @@ public final class HTTPContext {
   public final HttpServletRequest req;
   /** Servlet response. */
   public final HttpServletResponse res;
+  /** Servlet instance. */
+  public final BaseXServlet servlet;
+
   /** Request method. */
   public final String method;
   /** Request method. */
   public final HTTPParams params;
+
   /** Authentication method. */
   public final AuthMethod auth;
-
   /** User name. */
   public String username;
-  /** Password (plain text). */
-  public String password;
 
   /** Performance. */
   private final Performance perf = new Performance();
   /** Path, starting with a slash. */
   private final String path;
+  /** Context of current request. */
+  private final Context context;
 
-  /** Client database context. */
-  private Context ctx;
   /** Serialization parameters. */
-  private SerializerOptions sopts;
+  private SerializerOptions serializer;
 
   /**
    * Constructor.
@@ -79,60 +80,58 @@ public final class HTTPContext {
 
     this.req = req;
     this.res = res;
+    this.servlet = servlet;
+
     params = new HTTPParams(this);
     method = req.getMethod();
-
-    final StringBuilder uri = new StringBuilder(req.getRequestURL());
-    final String qs = req.getQueryString();
-    if(qs != null) uri.append('?').append(qs);
-    context.log.write(address(), user(), LogType.REQUEST, '[' + method + "] " + uri, null);
+    context = new Context(ctx, this);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(Strings.UTF8);
     path = decode(normalize(req.getPathInfo()));
 
-    final StaticOptions mprop = context.soptions;
-    if(servlet.username.isEmpty()) {
-      // adopt existing servlet-specific credentials
-      username = mprop.get(StaticOptions.USER);
-      password = mprop.get(StaticOptions.PASSWORD);
-    } else {
-      // otherwise, adopt global credentials
-      username = servlet.username;
-      password = servlet.password;
+    // authentication method
+    final StaticOptions sopts = ctx.soptions;
+    auth = servlet.auth != null ? servlet.auth : sopts.get(StaticOptions.AUTHMETHOD);
+
+    // default user
+    String user = servlet.username;
+    if(user.isEmpty()) user = sopts.get(StaticOptions.USER);
+
+    // RESTXQ: admin is fallback user; additionally look for user name in session id
+    String sessionUser = user;
+    if(servlet instanceof RestXqServlet) {
+      if(user.isEmpty()) user = UserText.ADMIN;
+
+      final HttpSession session = req.getSession(false);
+      if(session != null) {
+        final String[] keys = { "id", "name", "dba" };
+        for(final String key : keys) {
+          final Object value = session.getAttribute(key);
+          if(value instanceof Str) {
+            sessionUser = ((Str) value).toJava();
+            break;
+          }
+        }
+      }
     }
 
-    // prefer safest authorization method
-    final String value = req.getHeader(AUTHORIZATION);
-    final String am = value == null ? AuthMethod.BASIC.toString() : Strings.split(value, ' ', 2)[0];
-    auth = StaticOptions.AUTHMETHOD.get(am) == AuthMethod.DIGEST ? AuthMethod.DIGEST :
-      servlet.auth != null ? servlet.auth : mprop.get(StaticOptions.AUTHMETHOD);
+    // assign existing user
+    final User u = ctx.users.get(user);
+    if(u != null) {
+      context.user(u);
+      setUser(sessionUser != null ? sessionUser : user);
+    }
   }
 
   /**
-   * Authorizes a request.
-   * @throws BaseXException database exception
+   * Returns the database context. Initializes the user if it is called for the first time.
+   * @return database context
+   * @throws IOException I/O exception
    */
-  void authorize() throws BaseXException {
-    final String value = req.getHeader(AUTHORIZATION);
-    if(value == null) return;
-
-    // overwrite credentials with client data (basic or digest)
-    final String[] ams = Strings.split(value, ' ', 2);
-    final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
-    if(am == AuthMethod.BASIC) {
-      final String details = ams.length > 1 ? ams[1] : "";
-      final String[] cred = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
-      if(cred.length != 2) throw new BaseXException(NOUSERNAME);
-      username = cred[0];
-      password = cred[1];
-    } else if(am == AuthMethod.DIGEST) {
-      final EnumMap<Request, String> map = HttpClient.digestHeaders(value);
-      username = map.get(Request.USERNAME);
-      password = map.get(Request.RESPONSE);
-    } else {
-      // custom authorization
-    }
+  public Context context() throws IOException {
+    if(username == null) context.user(authenticate());
+    return context;
   }
 
   /**
@@ -292,82 +291,6 @@ public final class HTTPContext {
   }
 
   /**
-   * Updates the credentials.
-   * @param user user
-   * @param pass password
-   */
-  public void credentials(final String user, final String pass) {
-    username = user;
-    password = pass;
-  }
-
-  /**
-   * Returns the client database context. Authenticates the user if necessary.
-   * @param authenticate authenticate user
-   * @return client database context
-   * @throws IOException I/O exception
-   */
-  public Context context(final boolean authenticate) throws IOException {
-    if(ctx == null) {
-      ctx = new Context(context);
-      ctx.user(authenticate ? authenticate() : context.users.get(UserText.ADMIN));
-    }
-    return ctx;
-  }
-
-  /**
-   * Authenticates the user and returns a new client {@link Context} instance.
-   * @return user
-   * @throws IOException I/O exception
-   */
-  private User authenticate() throws IOException {
-    final byte[] address = token(req.getRemoteAddr());
-    try {
-      if(username == null || username.isEmpty()) throw new LoginException(NOUSERNAME);
-
-      final User us = context.users.get(username);
-      if(us == null) throw new LoginException();
-
-      if(auth == AuthMethod.BASIC) {
-        if(password == null || !us.matches(password)) throw new LoginException();
-      } else if(auth == AuthMethod.DIGEST) {
-        final EnumMap<Request, String> map = HttpClient.digestHeaders(req.getHeader(AUTHORIZATION));
-        final String am = map.get(Request.AUTH_METHOD);
-        if(!AuthMethod.DIGEST.toString().equals(am)) throw new LoginException(DIGESTAUTH);
-
-        final String nonce = map.get(Request.NONCE), cnonce = map.get(Request.CNONCE);
-        String ha1 = us.code(Algorithm.DIGEST, Code.HASH);
-        if(Strings.eq(map.get(Request.ALGORITHM), MD5_SESS))
-          ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
-
-        String h2 = method + ':' + map.get(Request.URI);
-        final String qop = map.get(Request.QOP);
-        if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
-        final String ha2 = Strings.md5(h2);
-
-        final StringBuilder rsp = new StringBuilder(ha1).append(':').append(nonce);
-        if(Strings.eq(qop, AUTH, AUTH_INT)) {
-          rsp.append(':').append(map.get(Request.NC));
-          rsp.append(':').append(cnonce);
-          rsp.append(':').append(qop);
-        }
-        rsp.append(':').append(ha2);
-
-        if(!Strings.md5(rsp.toString()).equals(password)) throw new LoginException();
-      } else {
-        // custom authorization
-      }
-      context.blocker.remove(address);
-      return us;
-
-    } catch(final LoginException ex) {
-      // delay users with wrong passwords
-      context.blocker.delay(address);
-      throw ex;
-    }
-  }
-
-  /**
    * Returns an exception that may have been caught by the initialization of the database server.
    * @return exception
    */
@@ -380,7 +303,7 @@ public final class HTTPContext {
    * @param opts serialization parameters.
    */
   public void sopts(final SerializerOptions opts) {
-    sopts = opts;
+    serializer = opts;
   }
 
   /**
@@ -388,8 +311,8 @@ public final class HTTPContext {
    * @return serialization parameters.
    */
   public SerializerOptions sopts() {
-    if(sopts == null) sopts = new SerializerOptions();
-    return sopts;
+    if(serializer == null) serializer = new SerializerOptions();
+    return serializer;
   }
 
   /**
@@ -398,16 +321,7 @@ public final class HTTPContext {
    * @param info info string (can be {@code null})
    */
   void log(final int type, final String info) {
-    context.log.write(address(), user(), type, info, perf);
-  }
-
-  /**
-   * Sends a redirect.
-   * @param location location
-   * @throws IOException I/O exception
-   */
-  public void redirect(final String location) throws IOException {
-    res.sendRedirect(resolve(location));
+    ctx.log.write(address(), user(), type, info, perf);
   }
 
   /**
@@ -429,6 +343,15 @@ public final class HTTPContext {
   }
 
   /**
+   * Sends a redirect.
+   * @param location location
+   * @throws IOException I/O exception
+   */
+  public void redirect(final String location) throws IOException {
+    res.sendRedirect(resolve(location));
+  }
+
+  /**
    * Sends a forward.
    * @param location location
    * @throws IOException I/O exception
@@ -438,6 +361,16 @@ public final class HTTPContext {
     req.getRequestDispatcher(resolve(location)).forward(req, res);
   }
 
+  @Override
+  public String address() {
+    return req.getRemoteAddr() + ':' + req.getRemotePort();
+  }
+
+  @Override
+  public String user() {
+    return username;
+  }
+
   // STATIC METHODS =====================================================================
 
   /**
@@ -445,8 +378,8 @@ public final class HTTPContext {
    * @return context;
    */
   public static synchronized Context init() {
-    if(context == null) context = new Context();
-    return context;
+    if(ctx == null) ctx = new Context();
+    return ctx;
   }
 
   /**
@@ -480,17 +413,17 @@ public final class HTTPContext {
     }
 
     // create context, update options
-    if(context == null) {
-      context = new Context(false);
+    if(ctx == null) {
+      ctx = new Context(false);
     } else {
-      context.soptions.setSystem();
-      context.options.setSystem();
+      ctx.soptions.setSystem();
+      ctx.options.setSystem();
     }
 
     // start server instance
-    if(!context.soptions.get(StaticOptions.HTTPLOCAL)) {
+    if(!ctx.soptions.get(StaticOptions.HTTPLOCAL)) {
       try {
-        server = new BaseXServer(context, "-D");
+        server = new BaseXServer(ctx, "-D");
       } catch(final IOException ex) {
         exception = ex;
         throw ex;
@@ -510,7 +443,7 @@ public final class HTTPContext {
       }
       server = null;
     }
-    context.close();
+    ctx.close();
   }
 
   /**
@@ -555,34 +488,92 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the remote user address and port.
-   * @return user address
+   * Authenticates the user and returns a {@link User} instance or an exception.
+   * @return user
+   * @throws IOException I/O exception
    */
-  private String address() {
-    return req.getRemoteAddr() + ':' + req.getRemotePort();
+  private User authenticate() throws IOException {
+    final byte[] address = token(req.getRemoteAddr());
+    try {
+      final User user;
+      if(auth == AuthMethod.CUSTOM) {
+        // custom authentication
+        user = user(UserText.ADMIN);
+      } else {
+        // request authorization header, check authentication method
+        final String header = req.getHeader(AUTHORIZATION);
+        final String[] am = header != null ? Strings.split(header, ' ', 2) : new String[] { "" };
+        final AuthMethod meth = StaticOptions.AUTHMETHOD.get(am[0]);
+        if(auth != meth) throw new LoginException(WRONGAUTH_X, auth);
+
+        if(auth == AuthMethod.BASIC) {
+          final String details = am.length > 1 ? am[1] : "";
+          final String[] creds = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
+          user = user(creds[0]);
+          if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException();
+
+        } else {
+          final EnumMap<Request, String> map = HttpClient.digestHeaders(header);
+          user = user(map.get(Request.USERNAME));
+
+          final String nonce = map.get(Request.NONCE), cnonce = map.get(Request.CNONCE);
+          String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
+          if(Strings.eq(map.get(Request.ALGORITHM), MD5_SESS))
+            ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
+
+          String h2 = method + ':' + map.get(Request.URI);
+          final String qop = map.get(Request.QOP);
+          if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
+          final String ha2 = Strings.md5(h2);
+
+          final StringBuilder response = new StringBuilder(ha1).append(':').append(nonce);
+          if(Strings.eq(qop, AUTH, AUTH_INT)) {
+            response.append(':').append(map.get(Request.NC));
+            response.append(':').append(cnonce).append(':').append(qop);
+          }
+          response.append(':').append(ha2);
+
+          if(!Strings.md5(response.toString()).equals(map.get(Request.RESPONSE)))
+            throw new LoginException();
+        }
+      }
+
+      // accept and return user
+      setUser(user.name());
+      ctx.blocker.remove(address);
+      return user;
+
+    } catch(final LoginException ex) {
+      // delay users with wrong passwords
+      ctx.blocker.delay(address);
+      throw ex;
+    }
   }
 
   /**
-   * Returns a user hidden in a session attribute (id, ID, name, or NAME), or the current user.
-   * @return user name
+   * Returns a user for the specified string, or an error.
+   * @param user user name (can be {@code null})
+   * @return user reference
+   * @throws LoginException login exception
    */
-  public String user() {
-    final HttpSession session = req.getSession(false);
-    if(session != null) {
-      Object value = null;
-      final String[] keys = { "id", "ID", "name", "NAME" };
-      for(final String key : keys) {
-        value = session.getAttribute(key);
-        if(value != null) {
-          try {
-            if(value instanceof Value) value = ((Value) value).toJava();
-          } catch(final QueryException ex) {
-            Util.debug(ex);
-          }
-          return value.toString();
-        }
-      }
-    }
-    return context.user().name();
+  private User user(final String user) throws LoginException {
+    final User u = ctx.users.get(user);
+    if(u == null) throw new LoginException();
+    return u;
+  }
+
+
+  /**
+   * Sets the user name and creates a log entry.
+   * @param user user name
+   */
+  private void setUser(final String user) {
+    username = user;
+
+    // generate log entry
+    final StringBuilder uri = new StringBuilder(req.getRequestURL());
+    final String qs = req.getQueryString();
+    if(qs != null) uri.append('?').append(qs);
+    ctx.log.write(address(), user, LogType.REQUEST, '[' + method + "] " + uri, null);
   }
 }

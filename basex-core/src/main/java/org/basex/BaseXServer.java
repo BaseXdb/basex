@@ -141,26 +141,26 @@ public final class BaseXServer extends CLI implements Runnable {
           if(!stopFile.delete()) {
             context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
           }
-          quit();
+          close();
         } else {
           // drop inactive connections
           final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
             for(final ClientListener cs : context.sessions) {
-              if(ms - cs.last > ka) cs.quit();
+              if(ms - cs.last > ka) cs.close();
             }
           }
+          // create client listener, stop authentication after timeout
           final ClientListener cl = new ClientListener(s, context, this);
-          // start authentication timeout
-          final long to = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
-          if(to > 0) {
-            cl.auth.schedule(new TimerTask() {
+          final long ms = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
+          if(ms > 0) {
+            cl.timeout.schedule(new TimerTask() {
               @Override
               public void run() {
-                cl.quitAuth();
+                cl.close();
               }
-            }, to);
+            }, ms);
             auth.add(cl);
           }
           cl.start();
@@ -188,16 +188,16 @@ public final class BaseXServer extends CLI implements Runnable {
   /**
    * Shuts down the server.
    */
-  private synchronized void quit() {
+  private synchronized void close() {
     if(!running) return;
     running = false;
 
-    for(final ClientListener cs : auth) {
-      remove(cs);
-      cs.quitAuth();
+    for(final ClientListener cl : auth) {
+      remove(cl);
+      cl.close();
     }
-    for(final ClientListener cs : context.sessions) {
-      cs.quit();
+    for(final ClientListener cl : context.sessions) {
+      cl.close();
     }
 
     try {
@@ -322,13 +322,13 @@ public final class BaseXServer extends CLI implements Runnable {
   }
 
   /**
-   * Removes an authenticated session.
+   * Removes a client listener that is waiting for authentication.
    * @param client client to be removed
    */
   public void remove(final ClientListener client) {
+    client.timeout.cancel();
     synchronized(auth) {
       auth.remove(client);
-      client.auth.cancel();
     }
   }
 

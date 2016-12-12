@@ -51,7 +51,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     return new WebDAVCode<Object>(this) {
       @Override
       public String get() throws IOException {
-        service.authenticate(user, pass);
+        service.authenticate();
         return user;
       }
     }.evalNoEx();
@@ -61,7 +61,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   public boolean authorise(final Request request, final Method method, final Auth auth) {
     // use WebDAV authorization if no default user exists or if digest authentication is specified
     final HTTPContext http = service.http;
-    if(http.username.isEmpty() || http.auth == AuthMethod.DIGEST) {
+    if(http.username == null || http.username.isEmpty() || http.auth == AuthMethod.DIGEST) {
       if(auth == null || auth.getTag() == null) return false;
     }
     return WebDAVService.authorize(meta.db);

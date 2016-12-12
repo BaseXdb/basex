@@ -2,6 +2,7 @@ package org.basex.query.func.admin;
 
 import static org.basex.core.users.UserText.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -27,9 +28,10 @@ public final class AdminSessions extends AdminFn {
 
     final ValueBuilder vb = new ValueBuilder();
     for(final ClientListener sp : qc.context.sessions) {
-      final String user = sp.context().user().name();
+      final Context ctx = sp.context();
+      final String user = ctx.user().name();
       final String addr = sp.address();
-      final Data data = sp.context().data();
+      final Data data = ctx.data();
       final FElem elem = new FElem(SESSION).add(USER, user).add(ADDRESS, addr);
       if(data != null) elem.add(DATABASE, data.meta.name);
       vb.add(elem);

@@ -76,8 +76,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /** Path. */
   RestXqPath path;
-  /** Function key for single instances. */
-  String key;
+  /** Singleton id (can be {@code null}). */
+  String singleton;
   /** Error. */
   private RestXqError error;
   /** Post/Put variable. */
@@ -156,7 +156,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         final Item body = args.length > 1 ? args[1] : null;
         addMethod(mth, body, declared, ann.info);
       } else if(sig == _REST_SINGLE) {
-        key = "\u0001" + (args.length > 0 ? toString(args[0]) :
+        singleton = "\u0001" + (args.length > 0 ? toString(args[0]) :
           (function.info.path() + ':' + function.info.line()));
       } else if(eq(sig.uri, QueryText.REST_URI)) {
         final Item body = args.length == 0 ? null : args[0];
@@ -265,7 +265,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind request body in the correct format
-    final MainOptions mo = http.context(false).options;
+    final MainOptions mo = http.context().options;
     if(requestBody != null) {
       try {
         bind(requestBody, arg, HttpPayload.value(http.params.body(), mo, http.contentType()), qc);

@@ -14,32 +14,32 @@ import org.basex.query.*;
 final class RestXqSession {
   /** HTTP session. */
   private final HttpSession session;
-  /** Function id; required for single function instances. */
-  private final String key;
+  /** Id of singleton function ({@code null} if function is no singleton). */
+  private final String singleton;
   /** Query context. */
   private final QueryContext qc;
 
   /**
    * Returns a query context stored in the current session.
    * @param http HTTP session
-   * @param key function key
+   * @param singleton id of singleton function
    * @param qc query context
    */
-  RestXqSession(final HTTPContext http, final String key, final QueryContext qc) {
+  RestXqSession(final HTTPContext http, final String singleton, final QueryContext qc) {
     this.qc = qc;
-    this.key = key;
+    this.singleton = singleton;
     session = http.req.getSession();
 
-    if(key != null) {
-      final Object oldQc = session.getAttribute(key);
+    // singleton function: stop evaluation of existing function, wait until it has been finished
+    if(singleton != null) {
+      final Object oldQc = session.getAttribute(singleton);
       if(oldQc instanceof QueryContext) {
-        // stop evaluation of existing function, wait until it has been finished
         ((QueryContext) oldQc).stop();
         do {
           Thread.yield();
-        } while(session.getAttribute(key) == oldQc);
+        } while(session.getAttribute(singleton) == oldQc);
       }
-      session.setAttribute(key, qc);
+      session.setAttribute(singleton, qc);
     }
   }
 
@@ -47,9 +47,9 @@ final class RestXqSession {
    * Closes a session. Drops a previously cached query context.
    */
   void close() {
-    if(key != null) {
-      final Object oldQc = session.getAttribute(key);
-      if(oldQc == qc) session.removeAttribute(key);
+    if(singleton != null) {
+      final Object oldQc = session.getAttribute(singleton);
+      if(oldQc == qc) session.removeAttribute(singleton);
     }
   }
 }

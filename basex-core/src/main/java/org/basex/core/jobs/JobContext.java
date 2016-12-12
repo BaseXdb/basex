@@ -17,8 +17,8 @@ public final class JobContext {
 
   /** Performance measurements. */
   public Performance performance;
-  /** Listener, watching for information. */
-  public InfoListener listener;
+  /** Trace listener. */
+  public TraceListener trace;
   /** Database context. */
   public Context context;
 

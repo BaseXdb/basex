@@ -13,11 +13,11 @@ import org.basex.util.http.*;
  * @author Dimitar Popov
  */
 final class WebDAVMetaData {
-  /** Database owning the resource. */
+  /** Database owning the resource (can be {@code null}). */
   final String db;
   /** Resource path. */
   final String path;
-  /** Resource last modification date. */
+  /** Last modification date of resource. */
   final Date mdate;
   /** Raw binary file flag. */
   final boolean raw;
@@ -33,7 +33,7 @@ final class WebDAVMetaData {
 
   /**
    * Constructor.
-   * @param db database owning the resource
+   * @param db database owning the resource (can be {@code null})
    * @param ms resource last modification date in milliseconds
    */
   WebDAVMetaData(final String db, final long ms) {
@@ -42,22 +42,22 @@ final class WebDAVMetaData {
 
   /**
    * Constructor.
-   * @param db database owning the resource
+   * @param db database owning the resource (can be {@code null})
    * @param path resource path
    * @param ms resource last modification date in milliseconds
    */
   WebDAVMetaData(final String db, final String path, final long ms) {
-    this(db, path, ms, false, null,  null);
+    this(db, path, ms, false, null, null);
   }
 
   /**
    * Constructor.
-   * @param db database owning the resource
+   * @param db database owning the resource (can be {@code null})
    * @param path resource path
    * @param ms resource last modification date in milliseconds
    * @param raw raw binary file flag
-   * @param type resource media type
-   * @param size resource size in bytes
+   * @param type resource media type (can be {@code null})
+   * @param size resource size in bytes (can be {@code null})
    */
   WebDAVMetaData(final String db, final String path, final long ms, final boolean raw,
       final MediaType type, final Long size) {

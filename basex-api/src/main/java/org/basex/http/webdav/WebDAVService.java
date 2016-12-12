@@ -56,13 +56,10 @@ final class WebDAVService {
 
   /**
    * Authenticates the user with the given password.
-   * @param user user name
-   * @param pass password
    * @throws IOException I/O exception
    */
-  void authenticate(final String user, final String pass) throws IOException {
-    http.credentials(user, pass);
-    session();
+  void authenticate() throws IOException {
+    http.context();
   }
 
   /**
@@ -104,7 +101,7 @@ final class WebDAVService {
   /**
    * Retrieves the last modified timestamp of a database.
    * @param db database
-   * @return timestamp in milliseconds.
+   * @return timestamp in milliseconds
    * @throws IOException I/O exception
    */
   long timestamp(final String db) throws IOException {
@@ -575,7 +572,7 @@ final class WebDAVService {
    * @throws IOException I/O exception
    */
   private LocalSession session() throws IOException {
-    if(ls == null) ls = new LocalSession(http.context(true));
+   if(ls == null) ls = new LocalSession(http.context());
     return ls;
   }
 }

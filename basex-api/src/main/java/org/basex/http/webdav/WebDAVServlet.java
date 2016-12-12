@@ -1,5 +1,7 @@
 package org.basex.http.webdav;
 
+import java.io.*;
+
 import javax.servlet.*;
 
 import org.basex.http.*;
@@ -23,16 +25,12 @@ public final class WebDAVServlet extends BaseXServlet {
   }
 
   @Override
-  protected void run(final HTTPContext http) {
-    // authorize request
-    final WebDAVRequest request = new WebDAVRequest(http.req);
-    final Auth a = request.getAuthorization();
-    if(a != null) http.credentials(a.getUser(), a.getPassword());
-
+  protected void run(final HTTPContext http) throws IOException {
     // initialize resource factory
     WebDAVFactory.init(http);
 
     // create response
+    final WebDAVRequest request = new WebDAVRequest(http.req);
     final WebDAVResponse response = new WebDAVResponse(http.res);
     try {
       manager.process(request, response);

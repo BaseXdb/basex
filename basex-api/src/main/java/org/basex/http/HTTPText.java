@@ -16,10 +16,10 @@ public interface HTTPText {
   /** Path to web configuration file. */
   String WEBCONF = WEB_INF + "web.xml";
 
-  /** Error: credentials missing. */
-  String NOUSERNAME = "No username specified.";
-  /** Error: digest authorization. */
-  String DIGESTAUTH = "Digest authentication expected.";
+  /** Error: unknown user. */
+  String WHICHUSER_X = "User does not exist: %.";
+  /** Error: wrong authorization. */
+  String WRONGAUTH_X = "% authentication expected.";
   /** Error message. */
-  String UNEXPECTED = "Unexpected error: %";
+  String UNEXPECTED_X = "Unexpected error: %";
 }

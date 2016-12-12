@@ -134,10 +134,8 @@ public interface Text {
     "  -l        Start in local mode" + NL +
     "  -n<name>  Set host name of database server" + NL +
     "  -p<port>  Set port of database server" + NL +
-    "  -P<pass>  Specify user password" + NL +
     "  -s<port>  Specify port to stop HTTP server" + NL +
     "  -S        Start as service" + NL +
-    "  -U<name>  Specify user name" + NL +
     "  -z        Suppress logging";
 
   /** Bug info. */

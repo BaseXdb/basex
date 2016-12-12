@@ -72,7 +72,7 @@ public class LocalSession extends Session {
    */
   private LocalSession(final Context context, final OutputStream output, final User user) {
     super(output);
-    ctx = new Context(context, null);
+    ctx = new Context(context);
     ctx.user(user);
   }
 

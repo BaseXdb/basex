@@ -25,9 +25,9 @@ import org.basex.util.list.*;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class ClientListener extends Thread {
+public final class ClientListener extends Thread implements ClientInfo {
   /** Timer for authentication time out. */
-  public final Timer auth = new Timer();
+  public final Timer timeout = new Timer();
   /** Timestamp of last interaction. */
   public long last;
 
@@ -51,7 +51,9 @@ public final class ClientListener extends Thread {
   /** Query id counter. */
   private int id;
   /** Indicates if the server thread is running. */
-  private boolean running;
+  private boolean authenticated;
+  /** Indicates if the server has been closed. */
+  private boolean closed;
 
   /**
    * Constructor.
@@ -72,7 +74,7 @@ public final class ClientListener extends Thread {
     if(!authenticate()) return;
 
     try {
-      while(running) {
+      while(authenticated) {
         command = null;
         String cmd;
         final ServerCmd sc;
@@ -80,7 +82,7 @@ public final class ClientListener extends Thread {
           final int b = in.read();
           if(b == -1) {
             // end of stream: exit session
-            quit();
+            close();
             break;
           }
 
@@ -104,7 +106,7 @@ public final class ClientListener extends Thread {
           }
         } catch(final IOException ex) {
           // this exception may be thrown if a session is stopped
-          quit();
+          close();
           break;
         }
         if(sc != ServerCmd.COMMAND) continue;
@@ -148,13 +150,13 @@ public final class ClientListener extends Thread {
         // stop console
         if(command instanceof Exit) {
           command = null;
-          quit();
+          close();
         }
       }
     } catch(final IOException ex) {
       log(LogType.ERROR, Util.message(ex));
       command = null;
-      quit();
+      close();
     }
     command = null;
   }
@@ -164,6 +166,7 @@ public final class ClientListener extends Thread {
    * @return success flag
    */
   private boolean authenticate() {
+    boolean auth = false;
     try {
       final String nonce = Long.toString(System.nanoTime());
       final byte[] address = socket.getInetAddress().getAddress();
@@ -176,60 +179,49 @@ public final class ClientListener extends Thread {
       // evaluate login data
       in = new BufferInput(socket.getInputStream());
       // receive {USER}0{DIGEST-HASH}0
-      final String us = in.readString(), hash = in.readString();
-      final User user = context.users.get(us);
-      running = user != null &&
+      final String name = in.readString(), hash = in.readString();
+      final User user = context.users.get(name);
+      auth = user != null &&
           Strings.md5(user.code(Algorithm.DIGEST, Code.HASH) + nonce).equals(hash);
 
       // write log information
-      if(running) {
+      if(auth) {
         context.user(user);
         // send {OK}
         send(true);
         context.blocker.remove(address);
         context.sessions.add(this);
       } else {
-        if(!us.isEmpty()) log(LogType.ERROR, ACCESS_DENIED);
+        if(!name.isEmpty()) log(LogType.ERROR, ACCESS_DENIED);
         // delay users with wrong passwords
         context.blocker.delay(address);
         send(false);
       }
     } catch(final IOException ex) {
-      if(running) {
+      if(auth) {
         Util.stack(ex);
         log(LogType.ERROR, Util.message(ex));
-        running = false;
+        authenticated = false;
       }
     }
 
     server.remove(this);
-    return running;
+    authenticated = auth;
+    return auth;
   }
 
   /**
-   * Quits the authentication.
+   * Closes the session.
    */
-  public synchronized void quitAuth() {
-    try {
-      socket.close();
-      log(LogType.ERROR, TIMEOUT_EXCEEDED);
-    } catch(final Throwable ex) {
-      log(LogType.ERROR, Util.message(ex));
-    }
-  }
+  public synchronized void close() {
+    if(!closed) return;
+    closed = true;
 
-  /**
-   * Exits the session.
-   */
-  public synchronized void quit() {
-    if(!running) return;
-    running = false;
-
-    // wait until running command was stopped
+    // stop running command, wait until reference has been invalidated
     final Command c = command;
     if(c != null) {
       c.stop();
-      do Performance.sleep(50); while(command != null);
+      do Thread.yield(); while(command != null);
     }
     context.sessions.remove(this);
 
@@ -250,10 +242,12 @@ public final class ClientListener extends Thread {
     return context;
   }
 
-  /**
-   * Returns the host and port of a client.
-   * @return string representation
-   */
+  @Override
+  public String user() {
+    return context.user().name();
+  }
+
+  @Override
   public String address() {
     return socket.getInetAddress().getHostAddress() + ':' + socket.getPort();
   }

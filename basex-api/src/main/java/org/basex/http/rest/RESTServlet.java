@@ -17,7 +17,7 @@ public final class RESTServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws IOException {
     // open database if name was specified
-    final RESTSession session = new RESTSession(http, http.context(true));
+    final RESTSession session = new RESTSession(http, http.context());
     final String db = http.db(), path = http.dbpath();
     if(!db.isEmpty()) session.add(new Open(db, path));
 

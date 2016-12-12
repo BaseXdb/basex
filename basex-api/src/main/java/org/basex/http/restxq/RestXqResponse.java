@@ -68,8 +68,8 @@ final class RestXqResponse {
     qc.job().type(RESTXQ);
     qc.register(qc.context);
 
-    final String key = func.key;
-    final RestXqSession session = new RestXqSession(http, key, qc);
+    final String singleton = func.singleton;
+    final RestXqSession session = new RestXqSession(http, singleton, qc);
     String redirect = null, forward = null;
     try {
       // evaluate query
@@ -95,7 +95,7 @@ final class RestXqResponse {
           // standard serialization
           serialize(first, iter, false);
         }
-      } else if(key != null) {
+      } else if(singleton != null) {
         // cached serialization
         serialize(first, iter, true);
       } else {

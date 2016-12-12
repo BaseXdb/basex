@@ -110,8 +110,8 @@ public final class GUI extends JFrame {
   /** Password reader. */
   private static PasswordReader pwReader;
 
-  /** Info listener. */
-  private final InfoListener infoListener = new InfoListener() {
+  /** Trace listener. */
+  private final TraceListener traceListener = new TraceListener() {
     @Override
     public void info(final String inf) {
       info.setInfo(inf, null, true, false);
@@ -470,7 +470,7 @@ public final class GUI extends JFrame {
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
       // attaches the info listener to the command
-      cmd.job().listener = infoListener;
+      cmd.job().trace = traceListener;
 
       // evaluate command
       String inf = null;

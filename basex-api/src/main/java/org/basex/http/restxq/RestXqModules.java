@@ -62,7 +62,7 @@ public final class RestXqModules {
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqModule mod : cache(http).values()) {
+    for(final RestXqModule mod : cache(http.context()).values()) {
       for(final RestXqFunction rxf : mod.functions()) {
         if(rxf.matches(http, error)) list.add(rxf);
       }
@@ -130,14 +130,12 @@ public final class RestXqModules {
 
   /**
    * Updates the module cache. Parses new modules and discards obsolete ones.
-   * @param http http context
+   * @param ctx database context
    * @return module cache
    * @throws Exception exception (including unexpected ones)
    */
-  private synchronized HashMap<String, RestXqModule> cache(final HTTPContext http)
-      throws Exception {
-
-    final StaticOptions sopts = http.context(false).soptions;
+  private synchronized HashMap<String, RestXqModule> cache(final Context ctx) throws Exception {
+    final StaticOptions sopts = ctx.soptions;
     HashMap<String, RestXqModule> cache = modules;
 
     // create new cache if it is empty, or if cache is to be recreated every time
@@ -148,7 +146,7 @@ public final class RestXqModules {
       final IOFile restxq = new IOFile(webpath).resolve(rxqpath);
       if(!restxq.exists()) throw HTTPCode.NO_RESTXQ.get();
 
-      cache(http, restxq, cache, modules);
+      cache(ctx, restxq, cache, modules);
       modules = cache;
     }
     return cache;
@@ -157,12 +155,12 @@ public final class RestXqModules {
   /**
    * Parses the specified path for RESTXQ modules and caches new entries.
    * @param root root path
-   * @param http http context
+   * @param ctx database context
    * @param cache cached modules
    * @param old old cache
    * @throws Exception exception (including unexpected ones)
    */
-  private static synchronized void cache(final HTTPContext http, final IOFile root,
+  private static synchronized void cache(final Context ctx, final IOFile root,
       final HashMap<String, RestXqModule> cache, final HashMap<String, RestXqModule> old)
       throws Exception {
 
@@ -172,7 +170,7 @@ public final class RestXqModules {
 
     for(final IOFile file : files) {
       if(file.isDir()) {
-        cache(http, file, cache, old);
+        cache(ctx, file, cache, old);
       } else {
         final String path = file.path();
         if(file.hasSuffix(IO.XQSUFFIXES)) {
@@ -186,7 +184,7 @@ public final class RestXqModules {
             module = new RestXqModule(file);
           }
           // add module if it has been parsed, and if it contains annotations
-          if(parsed || module.parse(http)) {
+          if(parsed || module.parse(ctx)) {
             module.touch();
             cache.put(path, module);
           }

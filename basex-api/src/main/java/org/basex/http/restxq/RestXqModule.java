@@ -37,15 +37,14 @@ final class RestXqModule {
 
   /**
    * Checks the module for RESTXQ annotations.
-   * @param http HTTP context
+   * @param ctx database context
    * @return {@code true} if module contains relevant annotations
    * @throws Exception exception (including unexpected ones)
    */
-  boolean parse(final HTTPContext http) throws Exception {
+  boolean parse(final Context ctx) throws Exception {
     functions.clear();
 
     // loop through all functions
-    final Context ctx = http.context(false);
     try(QueryContext qc = qc(ctx)) {
       // loop through all functions
       final String name = file.name();
@@ -94,7 +93,7 @@ final class RestXqModule {
       throws Exception {
 
     // create new XQuery instance
-    final Context ctx = http.context(false);
+    final Context ctx = http.context();
     try(QueryContext qc = qc(ctx)) {
       final StaticFunc sf = find(qc, func.function);
       // will only happen if file has been swapped between caching and parsing
@@ -127,12 +126,12 @@ final class RestXqModule {
 
   /**
    * Returns the specified function from the given query context.
-   * @param qctx query context.
+   * @param qc query context.
    * @param func function to be found
    * @return function
    */
-  private static StaticFunc find(final QueryContext qctx, final StaticFunc func) {
-    for(final StaticFunc sf : qctx.funcs.funcs()) {
+  private static StaticFunc find(final QueryContext qc, final StaticFunc func) {
+    for(final StaticFunc sf : qc.funcs.funcs()) {
       if(func.info.equals(sf.info)) return sf;
     }
     return null;

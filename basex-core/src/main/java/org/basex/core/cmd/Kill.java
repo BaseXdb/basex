@@ -39,7 +39,7 @@ public final class Kill extends AUser {
           if(cs.equals(arg)) return error(KILL_SELF_X, arg);
         } else if(cs.startsWith(arg)) {
           info(LI + cs);
-          cl.quit();
+          cl.close();
           count++;
         }
       }
@@ -55,7 +55,7 @@ public final class Kill extends AUser {
       final ClientListener cl = ss.get(s);
       // don't kill own sessions
       if(cl.context() != context && user.equals(cl.context().user().name())) {
-        cl.quit();
+        cl.close();
         count++;
       }
     }

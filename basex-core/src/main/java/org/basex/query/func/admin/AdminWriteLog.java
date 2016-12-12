@@ -3,7 +3,6 @@ package org.basex.query.func.admin;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.server.*;
@@ -25,10 +24,10 @@ public final class AdminWriteLog extends AdminFn {
     final String type = exprs.length > 1 ? string(toToken(exprs[1], qc)) : LogType.INFO.toString();
     if(!type.matches("^[A-Z]+$")) throw BXAD_TYPE_X.get(info, type);
 
-    final ClientListener cl = qc.context.listener;
-    final String addr = cl == null ? Log.SERVER : cl.address();
-    final User user = (cl == null ? qc.context : cl.context()).user();
-    qc.context.log.write(addr, user.name(), type, msg, null);
+    final ClientInfo ci = qc.context.client;
+    final String addr = ci == null ? Log.SERVER : ci.address();
+    final String user = ci == null ? qc.context.user().name() : ci.user();
+    qc.context.log.write(addr, user, type, msg, null);
     return null;
   }
 }
