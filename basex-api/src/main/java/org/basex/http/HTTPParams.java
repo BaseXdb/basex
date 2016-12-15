@@ -21,8 +21,8 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class HTTPParams {
-  /** HTTP Context. */
-  private final HTTPContext http;
+  /** HTTP Connection. */
+  private final HTTPConnection conn;
   /** Parameter map. */
   private Map<String, String[]> map;
   /** Query parameters. */
@@ -34,10 +34,10 @@ public final class HTTPParams {
 
   /**
    * Returns an immutable map with all query parameters.
-   * @param http HTTP context
+   * @param conn HTTP connection
    */
-  HTTPParams(final HTTPContext http) {
-    this.http = http;
+  HTTPParams(final HTTPConnection conn) {
+    this.conn = conn;
   }
 
   /**
@@ -47,7 +47,7 @@ public final class HTTPParams {
    */
   public Map<String, String[]> map() throws IOException {
     try {
-      if(map == null) map = http.req.getParameterMap();
+      if(map == null) map = conn.req.getParameterMap();
       return map;
     } catch(final IllegalStateException ex) {
       // may be caused by too large input (#884)
@@ -65,7 +65,7 @@ public final class HTTPParams {
   public Map<String, Value> form(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
       form = new HashMap<>();
-      final MediaType mt = http.contentType();
+      final MediaType mt = conn.contentType();
       if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         addMultipart(mt, options);
@@ -103,7 +103,7 @@ public final class HTTPParams {
    */
   public IOContent body() throws IOException {
     if(content == null) {
-      content = new IOContent(new BufferInput(http.req.getInputStream()).content());
+      content = new IOContent(new BufferInput(conn.req.getInputStream()).content());
     }
     return content;
   }

@@ -84,16 +84,16 @@ final class RestXqModule {
 
   /**
    * Processes the HTTP request.
-   * @param http HTTP context
+   * @param conn HTTP connection
    * @param func function to be processed
    * @param qe query exception (optional)
    * @throws Exception exception
    */
-  void process(final HTTPContext http, final RestXqFunction func, final QueryException qe)
+  void process(final HTTPConnection conn, final RestXqFunction func, final QueryException qe)
       throws Exception {
 
     // create new XQuery instance
-    final Context ctx = http.context();
+    final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
       final StaticFunc sf = find(qc, func.function);
       // will only happen if file has been swapped between caching and parsing
@@ -101,7 +101,7 @@ final class RestXqModule {
 
       final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
       rxf.parse(ctx);
-      new RestXqResponse(rxf, qc, http).create(qe);
+      new RestXqResponse(rxf, qc, conn).create(qe);
     }
   }
 

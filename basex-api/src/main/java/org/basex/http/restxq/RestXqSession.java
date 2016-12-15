@@ -21,14 +21,14 @@ final class RestXqSession {
 
   /**
    * Returns a query context stored in the current session.
-   * @param http HTTP session
+   * @param conn HTTP connection
    * @param singleton id of singleton function
    * @param qc query context
    */
-  RestXqSession(final HTTPContext http, final String singleton, final QueryContext qc) {
+  RestXqSession(final HTTPConnection conn, final String singleton, final QueryContext qc) {
     this.qc = qc;
     this.singleton = singleton;
-    session = http.req.getSession();
+    session = conn.req.getSession();
 
     // singleton function: stop evaluation of existing function, wait until it has been finished
     if(singleton != null) {

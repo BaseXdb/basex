@@ -126,7 +126,7 @@ public interface Text {
   String S_HTTP_SERVER = "HTTP Server";
   /** HTTP information. */
   String S_HTTPINFO =
-    " [-dhlnpPsSUz] [stop]" + NL +
+    " [-dhlnpsSUz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -c        Start in client mode" + NL +
     "  -d        Activate debugging mode" + NL +
@@ -136,6 +136,7 @@ public interface Text {
     "  -p<port>  Set port of database server" + NL +
     "  -s<port>  Specify port to stop HTTP server" + NL +
     "  -S        Start as service" + NL +
+    "  -U<name>  Specify user name" + NL +
     "  -z        Suppress logging";
 
   /** Bug info. */

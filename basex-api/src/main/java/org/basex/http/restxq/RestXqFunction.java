@@ -98,13 +98,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /**
    * Processes the HTTP request.
    * Parses new modules and discards obsolete ones.
-   * @param http HTTP context
+   * @param conn HTTP connection
    * @param qe query exception (optional)
    * @throws Exception exception
    */
-  void process(final HTTPContext http, final QueryException qe) throws Exception {
+  void process(final HTTPConnection conn, final QueryException qe) throws Exception {
     try {
-      module.process(http, this, qe);
+      module.process(conn, this, qe);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;
@@ -232,32 +232,32 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Checks if an HTTP request matches this function and its constraints.
-   * @param http http context
+   * @param conn HTTP connection
    * @param err error code
    * @return result of check
    */
-  boolean matches(final HTTPContext http, final QNm err) {
+  boolean matches(final HTTPConnection conn, final QNm err) {
     // check method, consumed and produced media type, and path or error
-    return (methods.isEmpty() || methods.contains(http.method)) && consumes(http) &&
-        produces(http) && (err == null ? path != null && path.matches(http) :
+    return (methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
+        produces(conn) && (err == null ? path != null && path.matches(conn) :
           error != null && error.matches(err));
   }
 
   /**
    * Binds the annotated variables.
-   * @param http http context
+   * @param conn HTTP connection
    * @param arg argument array
    * @param err optional query error
    * @param qc query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void bind(final HTTPContext http, final Expr[] arg, final QueryException err,
+  void bind(final HTTPConnection conn, final Expr[] arg, final QueryException err,
       final QueryContext qc) throws QueryException, IOException {
 
     // bind variables from segments
     if(path != null) {
-      for(final Entry<QNm, String> entry : path.values(http).entrySet()) {
+      for(final Entry<QNm, String> entry : path.values(conn).entrySet()) {
         final QNm qnm = new QNm(entry.getKey().string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
         bind(qnm, arg, new Atm(entry.getValue()), qc);
@@ -265,23 +265,23 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind request body in the correct format
-    final MainOptions mo = http.context().options;
+    final MainOptions mo = conn.context.options;
     if(requestBody != null) {
       try {
-        bind(requestBody, arg, HttpPayload.value(http.params.body(), mo, http.contentType()), qc);
+        bind(requestBody, arg, HttpPayload.value(conn.params.body(), mo, conn.contentType()), qc);
       } catch(final IOException ex) {
         throw error(INPUT_CONV, ex);
       }
     }
 
     // bind query and form parameters
-    for(final RestXqParam rxp : queryParams) bind(rxp, arg, http.params.query().get(rxp.name), qc);
-    for(final RestXqParam rxp : formParams) bind(rxp, arg, http.params.form(mo).get(rxp.name), qc);
+    for(final RestXqParam rxp : queryParams) bind(rxp, arg, conn.params.query().get(rxp.name), qc);
+    for(final RestXqParam rxp : formParams) bind(rxp, arg, conn.params.form(mo).get(rxp.name), qc);
 
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      final Enumeration<?> en =  http.req.getHeaders(rxp.name);
+      final Enumeration<?> en =  conn.req.getHeaders(rxp.name);
       while(en.hasMoreElements()) {
         for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
       }
@@ -289,7 +289,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind cookie parameters
-    final Cookie[] ck = http.req.getCookies();
+    final Cookie[] ck = conn.req.getCookies();
     for(final RestXqParam rxp : cookieParams) {
       Value val = Empty.SEQ;
       if(ck != null) {
@@ -399,14 +399,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Checks if the consumed content type matches.
-   * @param http http context
+   * @param conn HTTP connection
    * @return result of check
    */
-  private boolean consumes(final HTTPContext http) {
+  private boolean consumes(final HTTPConnection conn) {
     // return true if no type is given
     if(consumes.isEmpty()) return true;
     // return true if no content type is specified by the user
-    final MediaType type = http.contentType();
+    final MediaType type = conn.contentType();
     if(type.type().isEmpty()) return true;
 
     // check if any combination matches
@@ -418,14 +418,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Checks if the produced media type matches.
-   * @param http http context
+   * @param conn HTTP connection
    * @return result of check
    */
-  private boolean produces(final HTTPContext http) {
+  private boolean produces(final HTTPConnection conn) {
     // return true if no type is given
     if(produces.isEmpty()) return true;
     // check if any combination matches
-    for(final MediaType accept : http.accepts()) {
+    for(final MediaType accept : conn.accepts()) {
       for(final MediaType produce : produces) {
         if(produce.matches(accept)) return true;
       }

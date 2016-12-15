@@ -15,19 +15,18 @@ import org.basex.http.*;
 final class RESTSession {
   /** Commands to be executed. */
   final ArrayList<Command> commands = new ArrayList<>();
-  /** HTTP context. */
-  final HTTPContext http;
+  /** HTTP connection. */
+  final HTTPConnection conn;
   /** Client context. */
   final Context context;
 
   /**
    * Constructor, specifying login data and an output stream.
-   * @param http HTTP context
-   * @param context client context
+   * @param conn HTTP connection
    */
-  RESTSession(final HTTPContext http, final Context context) {
-    this.http = http;
-    this.context = context;
+  RESTSession(final HTTPConnection conn) {
+    this.conn = conn;
+    context = conn.context;
   }
 
   /**

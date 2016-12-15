@@ -38,11 +38,11 @@ final class SessionErrors {
   }
 
   /**
-   * BXSE0003: servlet context required.
+   * BXSE0003: HTTP connection required.
    * @return query exception
    */
   static QueryException noContext() {
-    return thrw(3, "Servlet context required.");
+    return thrw(3, "HTTP connection required.");
   }
 
   /**

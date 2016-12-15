@@ -19,7 +19,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public FElem wadl() throws QueryException {
-    return RestXqModules.get().wadl(http());
+    return RestXqModules.get().wadl(connection());
   }
 
   /**
@@ -28,8 +28,8 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public Uri baseUri() throws QueryException {
-    final HTTPContext http = http();
-    return Uri.uri(http.req.getRequestURI().replace(http.req.getPathInfo(), ""));
+    final HTTPConnection conn = connection();
+    return Uri.uri(conn.req.getRequestURI().replace(conn.req.getPathInfo(), ""));
   }
 
   /**
@@ -38,7 +38,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public Uri uri() throws QueryException {
-    return Uri.uri(http().req.getRequestURI());
+    return Uri.uri(connection().req.getRequestURI());
   }
 
   /**
@@ -49,12 +49,12 @@ public final class Restxq extends QueryModule {
   }
 
   /**
-   * Returns the servlet request instance.
-   * @return request
+   * Returns the current HTTP connection.
+   * @return HTTP connection
    * @throws QueryException query exception
    */
-  private HTTPContext http() throws QueryException {
-    if(queryContext.http != null) return (HTTPContext) queryContext.http;
-    throw new QueryException("Servlet context required.");
+  private HTTPConnection connection() throws QueryException {
+    if(queryContext.http != null) return (HTTPConnection) queryContext.http;
+    throw new QueryException("HTTP connection required.");
   }
 }

@@ -22,15 +22,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class RestXqWadl {
-  /** HTTP context. */
-  private final HTTPContext http;
+  /** HTTP connection. */
+  private final HTTPConnection conn;
 
   /**
    * Constructor.
-   * @param http HTTP context
+   * @param conn HTTP connection
    */
-  RestXqWadl(final HTTPContext http) {
-    this.http = http;
+  RestXqWadl(final HTTPConnection conn) {
+    this.conn = conn;
   }
 
   /**
@@ -41,7 +41,7 @@ final class RestXqWadl {
   synchronized FElem create(final HashMap<String, RestXqModule> modules) {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
-    final String base = http.req.getRequestURL().toString();
+    final String base = conn.req.getRequestURL().toString();
     final FElem resources = elem("resources", application).add("base", base);
 
     // create children
@@ -81,7 +81,7 @@ final class RestXqWadl {
         // create response
         final FElem response = elem("response", method);
         final FElem representation = elem("representation", response);
-        representation.add("mediaType", HTTPContext.mediaType(func.output).toString());
+        representation.add("mediaType", HTTPConnection.mediaType(func.output).toString());
       }
     }
     // add resources in sorted order

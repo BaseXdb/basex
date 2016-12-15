@@ -112,6 +112,6 @@ public final class Session extends QueryModule {
    */
   private ASession session() throws QueryException {
     if(queryContext.http == null) throw SessionErrors.noContext();
-    return new ASession(((HTTPContext) queryContext.http).req.getSession(), queryContext);
+    return new ASession(((HTTPConnection) queryContext.http).req.getSession(), queryContext);
   }
 }

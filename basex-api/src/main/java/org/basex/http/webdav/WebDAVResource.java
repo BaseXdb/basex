@@ -11,8 +11,6 @@ import com.bradmcevoy.http.LockInfo.LockScope;
 import com.bradmcevoy.http.LockInfo.LockType;
 import com.bradmcevoy.http.Request.Method;
 
-import org.basex.core.StaticOptions.AuthMethod;
-import org.basex.http.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -47,23 +45,11 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   @Override
   public Object authenticate(final String user, final String pass) {
-    if(user == null) return null;
-    return new WebDAVCode<Object>(this) {
-      @Override
-      public String get() throws IOException {
-        service.authenticate();
-        return user;
-      }
-    }.evalNoEx();
+    return user;
   }
 
   @Override
   public boolean authorise(final Request request, final Method method, final Auth auth) {
-    // use WebDAV authorization if no default user exists or if digest authentication is specified
-    final HTTPContext http = service.http;
-    if(http.username == null || http.username.isEmpty() || http.auth == AuthMethod.DIGEST) {
-      if(auth == null || auth.getTag() == null) return false;
-    }
     return WebDAVService.authorize(meta.db);
   }
 

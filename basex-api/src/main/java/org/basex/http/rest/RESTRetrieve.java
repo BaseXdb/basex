@@ -33,26 +33,26 @@ final class RESTRetrieve extends RESTCmd {
     // open addressed database
     for(final Command cmd : session.commands) run(cmd);
 
-    final HTTPContext http = session.http;
-    final SerializerOptions sopts = http.sopts();
+    final HTTPConnection conn = session.conn;
+    final SerializerOptions sopts = conn.sopts();
     if(run(query(_DB_EXISTS)).equals(Text.TRUE)) {
       // return database resource
       final boolean raw = run(query(_DB_IS_RAW)).equals(Text.TRUE);
       if(raw) sopts.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
-      http.initResponse();
+      conn.initResponse();
 
       context.options.set(MainOptions.SERIALIZER, sopts);
-      run(query(raw ? _DB_RETRIEVE : _DB_OPEN), http.res.getOutputStream());
+      run(query(raw ? _DB_RETRIEVE : _DB_OPEN), conn.res.getOutputStream());
 
     } else {
       // list database resources
-      final Table table = new Table(run(new List(http.db(), http.dbpath())));
+      final Table table = new Table(run(new List(conn.db(), conn.dbpath())));
       final FElem el = new FElem(RESTText.Q_DATABASE).declareNS();
-      el.add(RESTText.NAME, http.db()).add(RESTText.RESOURCES, token(table.contents.size()));
+      el.add(RESTText.NAME, conn.db()).add(RESTText.RESOURCES, token(table.contents.size()));
       list(table, el, RESTText.Q_RESOURCE, 0);
 
-      http.initResponse();
-      try(Serializer ser = Serializer.get(http.res.getOutputStream(), sopts)) {
+      conn.initResponse();
+      try(Serializer ser = Serializer.get(conn.res.getOutputStream(), sopts)) {
         ser.serialize(el);
       }
     }
@@ -64,10 +64,10 @@ final class RESTRetrieve extends RESTCmd {
    * @return query
    */
   private XQuery query(final Function f) {
-    final HTTPContext http = session.http;
+    final HTTPConnection conn = session.conn;
     final String query = "declare variable $d external;" +
         "declare variable $p external;" + f.args("$d", "$p");
-    return new XQuery(query).bind("d", http.db()).bind("p", http.dbpath());
+    return new XQuery(query).bind("d", conn.db()).bind("p", conn.dbpath());
   }
 
   /**
@@ -76,7 +76,7 @@ final class RESTRetrieve extends RESTCmd {
    * @return command
    */
   static RESTCmd get(final RESTSession session) {
-    final String db = session.http.db();
+    final String db = session.conn.db();
     return db.isEmpty() ? new RESTList(session.add(new List())) : new RESTRetrieve(session);
   }
 }

@@ -29,8 +29,8 @@ final class RestXqResponse {
   final RestXqFunction func;
   /** Query context. */
   final QueryContext qc;
-  /** HTTP context. */
-  final HTTPContext http;
+  /** HTTP connection. */
+  final HTTPConnection conn;
 
   /** Output stream. */
   private OutputStream out;
@@ -43,12 +43,12 @@ final class RestXqResponse {
    * Constructor.
    * @param func function
    * @param qc query context
-   * @param http HTTP context
+   * @param conn HTTP connection
    */
-  RestXqResponse(final RestXqFunction func, final QueryContext qc, final HTTPContext http) {
-    this.http = http;
-    this.qc = qc;
+  RestXqResponse(final RestXqFunction func, final QueryContext qc, final HTTPConnection conn) {
     this.func = func;
+    this.qc = qc;
+    this.conn = conn;
   }
 
   /**
@@ -60,16 +60,16 @@ final class RestXqResponse {
     // bind variables
     final StaticFunc sf = func.function;
     final Expr[] args = new Expr[sf.args.length];
-    func.bind(http, args, qe, qc);
+    func.bind(conn, args, qe, qc);
 
     // assign function call and http context and register process
     qc.mainModule(MainModule.get(sf, args));
-    qc.http(http);
+    qc.http(conn);
     qc.job().type(RESTXQ);
     qc.register(qc.context);
 
     final String singleton = func.singleton;
-    final RestXqSession session = new RestXqSession(http, singleton, qc);
+    final RestXqSession session = new RestXqSession(conn, singleton, qc);
     String redirect = null, forward = null;
     try {
       // evaluate query
@@ -108,9 +108,9 @@ final class RestXqResponse {
       session.close();
 
       if(redirect != null) {
-        http.redirect(redirect);
+        conn.redirect(redirect);
       } else if(forward != null) {
-        http.forward(forward);
+        conn.forward(forward);
       } else {
         finish();
       }
@@ -156,8 +156,8 @@ final class RestXqResponse {
               if(key.equalsIgnoreCase(HttpText.CONTENT_TYPE)) {
                 cType = value;
               } else {
-                http.res.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
-                  http.resolve(value) : value);
+                conn.res.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
+                  conn.resolve(value) : value);
               }
             }
           } else {
@@ -201,9 +201,9 @@ final class RestXqResponse {
    */
   private void serialize(final Item first, final Iter iter, final SerializerOptions sp,
       final boolean cache) throws Exception {
-    http.sopts(sp);
-    http.initResponse();
-    out = cache ? new ArrayOutput() : http.res.getOutputStream();
+    conn.sopts(sp);
+    conn.initResponse();
+    out = cache ? new ArrayOutput() : conn.res.getOutputStream();
     Item item = first;
     try(Serializer ser = Serializer.get(out, sp)) {
       for(; item != null; item = iter.next()) ser.serialize(item);
@@ -225,10 +225,10 @@ final class RestXqResponse {
    * @throws IOException I/O exception
    */
   private void finish() throws IOException {
-    if(status != 0) http.status(status, message);
+    if(status != 0) conn.status(status, message);
     if(out instanceof ArrayOutput) {
       final ArrayOutput ao = (ArrayOutput) out;
-      if(ao.size() > 0) http.res.getOutputStream().write(ao.finish());
+      if(ao.size() > 0) conn.res.getOutputStream().write(ao.finish());
     }
   }
 }

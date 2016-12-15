@@ -35,9 +35,12 @@ public final class ProcModuleTest extends AdvancedQueryTest {
     query(_PROC_PROPERTY.args("path.separator"), File.pathSeparator);
 
     Prop.put("A", "B");
-    query(_PROC_PROPERTY.args("A"), "B");
-    query(_PROC_PROPERTY.args("XYZ"), "");
-    Prop.remove("A");
+    try {
+      query(_PROC_PROPERTY.args("A"), "B");
+      query(_PROC_PROPERTY.args("XYZ"), "");
+    } finally {
+      Prop.clear();
+    }
   }
 
   /** Test method. */
@@ -47,8 +50,11 @@ public final class ProcModuleTest extends AdvancedQueryTest {
     query(_PROC_PROPERTY_NAMES.args() + '[' + EMPTY.args(_PROC_PROPERTY.args(" .")) + ']', "");
 
     Prop.put("A", "B");
-    query(_PROC_PROPERTY_NAMES.args() + "[. = 'A']", "A");
-    query(_PROC_PROPERTY_NAMES.args() + "[. = 'XYZ']", "");
-    Prop.remove("A");
+    try {
+      query(_PROC_PROPERTY_NAMES.args() + "[. = 'A']", "A");
+      query(_PROC_PROPERTY_NAMES.args() + "[. = 'XYZ']", "");
+    } finally {
+      Prop.clear();
+    }
   }
 }

@@ -146,7 +146,7 @@ abstract class RESTCmd extends Command {
    * @throws IOException I/O exception
    */
   static void parseOptions(final RESTSession session) throws IOException {
-    for(final Entry<String, String[]> param : session.http.params.map().entrySet())
+    for(final Entry<String, String[]> param : session.conn.params.map().entrySet())
       parseOption(session, param, true);
   }
 

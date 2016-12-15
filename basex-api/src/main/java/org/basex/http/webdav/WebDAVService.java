@@ -30,8 +30,8 @@ final class WebDAVService {
   /** Name of the database with the WebDAV locks. */
   private static final String WEBDAV_DB = "~webdav";
 
-  /** HTTP context. */
-  final HTTPContext http;
+  /** HTTP connection. */
+  final HTTPConnection conn;
   /** Locking service. */
   final WebDAVLockService locking;
 
@@ -40,11 +40,11 @@ final class WebDAVService {
 
   /**
    * Constructor.
-   * @param http http context
+   * @param conn HTTP connection
    */
-  WebDAVService(final HTTPContext http) {
-    this.http = http;
-    locking = new WebDAVLockService(http);
+  WebDAVService(final HTTPConnection conn) {
+    this.conn = conn;
+    locking = new WebDAVLockService(conn);
   }
 
   /**
@@ -52,14 +52,6 @@ final class WebDAVService {
    */
   void close() {
     if(ls != null) ls.close();
-  }
-
-  /**
-   * Authenticates the user with the given password.
-   * @throws IOException I/O exception
-   */
-  void authenticate() throws IOException {
-    http.context();
   }
 
   /**
@@ -569,10 +561,9 @@ final class WebDAVService {
   /**
    * Constructor.
    * @return local session
-   * @throws IOException I/O exception
    */
-  private LocalSession session() throws IOException {
-   if(ls == null) ls = new LocalSession(http.context());
+  private LocalSession session() {
+   if(ls == null) ls = new LocalSession(conn.context);
     return ls;
   }
 }

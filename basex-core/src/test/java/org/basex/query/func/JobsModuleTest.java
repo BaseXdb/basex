@@ -60,15 +60,15 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     error(_JOBS_EVAL.args("1", "()", " map{ 'interval':'-PT1S' }"), JOBS_RANGE_X);
     error(_JOBS_EVAL.args("1", "()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
     error(_JOBS_EVAL.args("1", "()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
-    error("(1,2)!" + _JOBS_EVAL.args(SLOW_QUERY, "()", " map{ 'id':'abc' }"), JOBS_ID_EXISTS_X);
+    error("(1,2)!" + _JOBS_EVAL.args(SLOW_QUERY, "()", " map{ 'id':'abc','cache':true() }"),
+        JOBS_ID_EXISTS_X);
   }
 
   /** Test method. */
   @Test
   public void evalStart() {
     // delayed execution
-    final String id = query(_JOBS_EVAL.args(" 'prof:sleep(200)'", "()",
-        " map{ 'start': 'PT0.2S' }"));
+    final String id = query(_JOBS_EVAL.args(" 'prof:sleep(200)'", "()", " map{'start':'PT0.2S'}"));
     // ensure that query is not run again
     Performance.sleep(100);
     query(_JOBS_FINISHED.args(id), "true");
@@ -82,8 +82,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void evalInterval() {
     // scheduled execution
-    final String id = query(_JOBS_EVAL.args(" 'prof:sleep(400)'", "()",
-        " map{ 'interval': 'PT1S' }"));
+    final String id = query(_JOBS_EVAL.args(" 'prof:sleep(400)'", "()", " map{'interval':'PT1S'}"));
     // ensure that query is running
     Performance.sleep(200);
     query(_JOBS_FINISHED.args(id), "false");
@@ -106,8 +105,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void evalEnd() {
     // scheduled execution
-    final String id = query(_JOBS_EVAL.args("123", "()",
-        " map{ 'interval': 'PT1S', 'end': 'PT1.5S' }"));
+    final String id = query(_JOBS_EVAL.args("123", "()", " map{'interval':'PT1S','end':'PT1.5S'}"));
     // ensure that query is running
     Performance.sleep(500);
     query(_JOBS_LIST.args() + "='" + id + "'", "true");
@@ -115,8 +113,8 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query(_JOBS_LIST.args() + "='" + id + "'", "false");
 
     // error
-    error(_JOBS_EVAL.args("1", "()",
-        " map{ 'start': 'PT2S', 'interval': 'PT1S', 'end': 'PT1S' }"), JOBS_RANGE_X);
+    error(_JOBS_EVAL.args("1", "()", " map{'start':'PT2S','interval':'PT1S','end':'PT1S'}"),
+        JOBS_RANGE_X);
   }
 
   /** Test method. */

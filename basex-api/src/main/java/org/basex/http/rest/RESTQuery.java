@@ -45,9 +45,9 @@ class RESTQuery extends RESTCmd {
    */
   final void query() throws IOException {
     // set base path and serialization parameters
-    final HTTPContext http = session.http;
-    context.options.set(MainOptions.SERIALIZER, http.sopts());
-    http.initResponse();
+    final HTTPConnection conn = session.conn;
+    context.options.set(MainOptions.SERIALIZER, conn.sopts());
+    conn.initResponse();
 
     for(final Command cmd : session.commands) {
       if(cmd instanceof XQuery) {
@@ -56,7 +56,7 @@ class RESTQuery extends RESTCmd {
         if(value != null) xq.bind(null, value, NodeType.DOC.toString());
 
         // bind HTTP context and external variables
-        xq.http(http);
+        xq.http(conn);
         for(final Entry<String, String[]> e : vars.entrySet()) {
           final String key = e.getKey();
           final String[] val = e.getValue();
@@ -65,11 +65,11 @@ class RESTQuery extends RESTCmd {
         }
 
         // initializes the response with query serialization options
-        http.sopts().assign(xq.parameters(context));
-        http.initResponse();
+        conn.sopts().assign(xq.parameters(context));
+        conn.initResponse();
       }
       // run command
-      run(cmd, http.res.getOutputStream());
+      run(cmd, conn.res.getOutputStream());
     }
   }
 

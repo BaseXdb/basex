@@ -67,7 +67,7 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Query resources. */
   public QueryResources resources;
-  /** HTTP context. */
+  /** HTTP connection. */
   public Object http;
   /** Update container. */
   public Updates updates;
@@ -439,8 +439,8 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds the HTTP context.
-   * @param val HTTP context
+   * Binds the HTTP connection.
+   * @param val HTTP connection
    */
   public void http(final Object val) {
     http = val;

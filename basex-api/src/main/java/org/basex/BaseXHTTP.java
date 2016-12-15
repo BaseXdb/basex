@@ -34,7 +34,7 @@ public final class BaseXHTTP extends Main {
   /** HTTP server. */
   private final Server jetty;
   /** HTTP port. */
-  private int httpPort;
+  private int port;
   /** Start as daemon. */
   private boolean service;
   /** Quiet flag. */
@@ -66,7 +66,7 @@ public final class BaseXHTTP extends Main {
     parseArgs();
 
     // context must be initialized after parsing of arguments
-    context = HTTPContext.init();
+    context = HTTPContext.context();
 
     // create jetty instance and set default context to HTTP path
     final StaticOptions sopts = context.soptions;
@@ -79,10 +79,10 @@ public final class BaseXHTTP extends Main {
     if(conns == null || conns.length == 0)
       throw new BaseXException("No Jetty connector defined in " + JETTYCONF + ".");
 
-    if(httpPort != 0) {
+    if(port != 0) {
       for(final Connector conn : conns) {
         if(conn instanceof SelectChannelConnector) {
-          conn.setPort(httpPort);
+          conn.setPort(port);
           break;
         }
       }
@@ -132,8 +132,8 @@ public final class BaseXHTTP extends Main {
     HTTPContext.init(wac.getServletContext());
 
     // start daemon for stopping web server
-    final int port = sopts.get(StaticOptions.STOPPORT);
-    if(port >= 0) new StopServer(sopts.get(StaticOptions.SERVERHOST), port).start();
+    final int sport = sopts.get(StaticOptions.STOPPORT);
+    if(sport >= 0) new StopServer(sopts.get(StaticOptions.SERVERHOST), sport).start();
 
     // show info when HTTP server is aborted. needs to be called in constructor:
     // otherwise, it may only be called if the JVM process is already shut down
@@ -143,10 +143,10 @@ public final class BaseXHTTP extends Main {
         if(!quiet) {
           for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
         }
-        final Log l = context.log;
-        if(l != null) {
+        final Log log = context.log;
+        if(log != null) {
           for(final Connector conn : conns) {
-            l.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
+            log.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
           }
         }
         context.close();
@@ -166,14 +166,9 @@ public final class BaseXHTTP extends Main {
   public void stop() throws Exception {
     // notify the jetty monitor to stop
     final StaticOptions sopts = context.soptions;
-    final int port = num(StaticOptions.STOPPORT, sopts);
+    final int sport = num(StaticOptions.STOPPORT, sopts);
     final String host = sopts.get(StaticOptions.SERVERHOST);
-    if(port >= 0) stop(host.isEmpty() ? S_LOCALHOST : host, port);
-
-    // server has been started in a separate process and needs to be stopped
-    if(!bool(StaticOptions.HTTPLOCAL, sopts)) {
-      BaseXServer.stop(host, num(StaticOptions.SERVERPORT, sopts));
-    }
+    if(sport >= 0) stop(host.isEmpty() ? S_LOCALHOST : host, sport);
   }
 
   /**
@@ -185,17 +180,6 @@ public final class BaseXHTTP extends Main {
   private static int num(final NumberOption option, final StaticOptions sopts) {
     final String val = Prop.get(option);
     return val == null || val.isEmpty() ? sopts.get(option) : Strings.toInt(val);
-  }
-
-  /**
-   * Returns a boolean value for the specified option.
-   * @param option option to be retrieved
-   * @param sopts static options
-   * @return boolean value
-   */
-  private static boolean bool(final BooleanOption option, final StaticOptions sopts) {
-    final String val = Prop.get(option);
-    return val == null || val.isEmpty() ? sopts.get(option) : Boolean.parseBoolean(val);
   }
 
   /**
@@ -275,7 +259,7 @@ public final class BaseXHTTP extends Main {
             serve = false;
             break;
           case 'h': // parse HTTP port
-            httpPort = arg.number();
+            port = arg.number();
             break;
           case 'l': // use local mode
             Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(true));
@@ -299,6 +283,9 @@ public final class BaseXHTTP extends Main {
           case 'S': // set service flag
             service = serve;
             break;
+          case 'U': // specify user name
+            Prop.put(StaticOptions.USER, arg.string());
+            break;
           case 'z': // suppress logging
             Prop.put(StaticOptions.LOG, Boolean.toString(false));
             break;
@@ -306,7 +293,7 @@ public final class BaseXHTTP extends Main {
             throw arg.usage();
         }
       } else {
-        if(!"stop".equalsIgnoreCase(arg.string())) throw arg.usage();
+        if(!S_STOP.equalsIgnoreCase(arg.string())) throw arg.usage();
         stop = true;
       }
     }
@@ -321,7 +308,7 @@ public final class BaseXHTTP extends Main {
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  private static void start(final int port, final boolean ssl, final String... args)
+  public static void start(final int port, final boolean ssl, final String... args)
       throws BaseXException {
 
     // start server and check if it caused an error message
@@ -333,32 +320,19 @@ public final class BaseXHTTP extends Main {
   }
 
   /**
-   * Generates a stop file for the specified port.
-   * @param port server port
-   * @return stop file
-   */
-  private static IOFile stopFile(final int port) {
-    return new IOFile(Prop.TMP, Util.className(BaseXHTTP.class) + port);
-  }
-
-  /**
    * Stops the server.
    * @param host server host
    * @param port server port
    * @throws IOException I/O exception
    */
-  private static void stop(final String host, final int port) throws IOException {
+  public static void stop(final String host, final int port) throws IOException {
     final IOFile stopFile = stopFile(port);
-    try {
-      stopFile.touch();
-      try(Socket s = new Socket(host, port)) { }
-      // give the notified process some time to quit
-      Performance.sleep(100);
+    stopFile.touch();
+    try(Socket s = new Socket(host, port)) {
     } catch(final ConnectException ex) {
       throw new IOException(Util.info(CONNECTION_ERROR_X, port));
-    } finally {
-      stopFile.delete();
     }
+    do Performance.sleep(10); while(stopFile.exists());
   }
 
   /**
@@ -368,7 +342,7 @@ public final class BaseXHTTP extends Main {
    * @param ssl encryption via HTTPS
    * @return boolean success
    */
-  private static boolean ping(final String host, final int port, final boolean ssl) {
+  public static boolean ping(final String host, final int port, final boolean ssl) {
     try(InputStream is = new IOUrl((ssl ? "https://" : "http://") + host + ':' + port).
       connection().getInputStream()) {
       // create connection
@@ -380,6 +354,15 @@ public final class BaseXHTTP extends Main {
     } catch(final IOException ex) {
       return false;
     }
+  }
+
+  /**
+   * Generates a stop file for the specified port.
+   * @param port server port
+   * @return stop file
+   */
+  private static IOFile stopFile(final int port) {
+    return new IOFile(Prop.TMP, Util.className(BaseXHTTP.class) + port);
   }
 
   @Override
@@ -421,13 +404,17 @@ public final class BaseXHTTP extends Main {
           try(Socket s = socket.accept()) { }
           if(stopFile.exists()) {
             socket.close();
-            stopFile.delete();
             jetty.stop();
+            HTTPContext.close();
+            Prop.clear();
+            if(!stopFile.delete()) {
+              context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
+            }
             break;
           }
         }
       } catch(final Exception ex) {
-        Util.errln(ex);
+        Util.stack(ex);
       }
     }
   }

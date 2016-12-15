@@ -179,7 +179,7 @@ public final class QueryProcessor extends Job implements Closeable {
 
   /**
    * Binds the HTTP context to the query processor.
-   * @param value HTTP context
+   * @param value HTTP connection
    * @return self reference
    */
   public QueryProcessor http(final Object value) {

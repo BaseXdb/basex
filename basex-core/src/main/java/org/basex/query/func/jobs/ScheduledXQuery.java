@@ -19,7 +19,7 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
- * Scheduled XQuery.
+ * Scheduled XQuery job.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen

@@ -25,13 +25,13 @@ public final class WebDAVServlet extends BaseXServlet {
   }
 
   @Override
-  protected void run(final HTTPContext http) throws IOException {
+  protected void run(final HTTPConnection conn) throws IOException {
     // initialize resource factory
-    WebDAVFactory.init(http);
+    WebDAVFactory.init(conn);
 
     // create response
-    final WebDAVRequest request = new WebDAVRequest(http.req);
-    final WebDAVResponse response = new WebDAVResponse(http.res);
+    final WebDAVRequest request = new WebDAVRequest(conn.req);
+    final WebDAVResponse response = new WebDAVResponse(conn.res);
     try {
       manager.process(request, response);
     } finally {

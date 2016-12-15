@@ -205,19 +205,10 @@ public final class Prop {
   }
 
   /**
-   * Removes a global option.
-   * @param option option
+   * Removes all global options.
    */
-  public static void remove(final Option<?> option) {
-    remove(key(option));
-  }
-
-  /**
-   * Removes a global option.
-   * @param name name of the option
-   */
-  public static void remove(final String name) {
-    OPTIONS.remove(name);
+  public static void clear() {
+    OPTIONS.clear();
   }
 
   /**

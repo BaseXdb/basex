@@ -201,7 +201,7 @@ public final class ClientListener extends Thread implements ClientInfo {
       if(auth) {
         Util.stack(ex);
         log(LogType.ERROR, Util.message(ex));
-        authenticated = false;
+        auth = false;
       }
     }
 
@@ -214,7 +214,7 @@ public final class ClientListener extends Thread implements ClientInfo {
    * Closes the session.
    */
   public synchronized void close() {
-    if(!closed) return;
+    if(closed) return;
     closed = true;
 
     // stop running command, wait until reference has been invalidated

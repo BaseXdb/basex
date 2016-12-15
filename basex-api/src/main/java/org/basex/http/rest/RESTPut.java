@@ -30,15 +30,15 @@ final class RESTPut {
    */
   public static RESTExec get(final RESTSession session) throws IOException {
     // create new database or update resource
-    final HTTPContext http = session.http;
-    final String db = http.db();
+    final HTTPConnection conn = session.conn;
+    final String db = conn.db();
     if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
     RESTCmd.parseOptions(session);
 
     final MainOptions options = session.context.options;
-    final InputStream is = http.req.getInputStream();
-    final MediaType mt = http.contentType();
+    final InputStream is = conn.req.getInputStream();
+    final MediaType mt = conn.contentType();
 
     // choose correct importer
     boolean xml = true;
@@ -68,7 +68,7 @@ final class RESTPut {
     }
 
     // store data as XML or raw file, depending on content type
-    final String path = http.dbpath();
+    final String path = conn.dbpath();
     if(path.isEmpty()) {
       // do not OPEN database
       session.commands.clear();

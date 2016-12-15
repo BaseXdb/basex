@@ -333,52 +333,6 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests basic authentication.
-   * @throws Exception Exception
-   */
-  @Test
-  public void basic() throws Exception {
-    // correct credentials
-    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
-        + "auth-method='Basic' username='admin' password='admin'/>"), ctx)) {
-      checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
-    }
-    // wrong credentials
-    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request xmlns:http='http://expath.org/ns/http-client' " +
-        "method='GET' href='" + REST_ROOT + "' send-authorization='true' " +
-        "auth-method='Basic' username='unknown' password='wrong'/>") +
-        "[. instance of node()][@status = '401']", ctx)) {
-      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
-    }
-  }
-
-  /**
-   * Test digest authentication.
-   * @throws Exception exception
-   */
-  @Test
-  public void digest() throws Exception {
-    // correct credentials
-    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
-        "send-authorization='true' auth-method='Digest' username='admin' password='admin' " +
-        "href='" + REST_ROOT + "'/>"), ctx)) {
-      checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
-    }
-    // wrong credentials
-    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
-        "send-authorization='true' auth-method='Digest' username='unknown' password='wrong' " +
-        "href='" + REST_ROOT + "?query=()'/>") +
-        "[. instance of node()][@status = '401']", ctx)) {
-      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
-    }
-  }
-
-  /**
    * Tests if errors are thrown when some mandatory attributes are missing in a
    * <http:request/>, <http:body/> or <http:multipart/>.
    * @throws IOException I/O Exception
@@ -861,7 +815,6 @@ public class FnHttpTest extends HTTPTest {
 
     new HttpResponse(null, ctx.options).getResponse(conn, true, null);
   }
-
 
   /**
    * Checks the response to an HTTP request.

@@ -27,11 +27,11 @@ import org.junit.*;
  */
 public abstract class HTTPTest extends SandboxTest {
   /** Database context. */
-  private static final Context CONTEXT = HTTPContext.init();
+  private static final Context CONTEXT = HTTPContext.context();
   /** HTTP server. */
   private static BaseXHTTP http;
   /** Root path. */
-  private static String root;
+  private static String rootUrl;
 
   // INITIALIZATION =====================================================================
 
@@ -42,13 +42,26 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws Exception exception
    */
   protected static void init(final String rt, final boolean local) throws Exception {
+    init(rt, local, false);
+  }
+
+  /**
+   * Initializes the test.
+   * @param url root path
+   * @param local local flag
+   * @param auth enforce authentication
+   * @throws Exception exception
+   */
+  protected static void init(final String url, final boolean local, final boolean auth)
+      throws Exception {
+
     assertTrue(new IOFile(CONTEXT.soptions.get(StaticOptions.WEBPATH)).md());
-    root = rt;
+    rootUrl = url;
 
     final StringList sl = new StringList();
+    sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z", "-q");
     if(local) sl.add("-l");
-    sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z");
-    sl.add("-U" + ADMIN, "-P" + ADMIN, "-q");
+    if(!auth) sl.add("-U" + ADMIN);
     http = new BaseXHTTP(sl.toArray());
   }
 
@@ -61,13 +74,13 @@ public abstract class HTTPTest extends SandboxTest {
     http.stop();
 
     // cleanup: remove project specific system properties
-    final StringList sl = new StringList();
-    final Properties pr = System.getProperties();
-    for(final Object s : pr.keySet()) {
-      final String st = s.toString();
-      if(st.startsWith(Prop.DBPREFIX)) sl.add(st);
+    final StringList keys = new StringList();
+    final Properties props = System.getProperties();
+    for(final Object key : props.keySet()) {
+      final String path = key.toString();
+      if(path.startsWith(Prop.DBPREFIX)) keys.add(path);
     }
-    for(final String s : sl) pr.remove(s);
+    for(final String key : keys) props.remove(key);
   }
 
   // PROTECTED METHODS ==================================================================
@@ -122,6 +135,20 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   protected static String request(final String query, final String method) throws IOException {
+    return request(rootUrl, query, method);
+  }
+
+  /**
+   * Executes the specified HTTP request and returns the result.
+   * @param root root URL
+   * @param query request
+   * @param method HTTP method
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  protected static String request(final String root, final String query, final String method)
+      throws IOException {
+
     final IOUrl url = new IOUrl(root + query);
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     try {
@@ -146,7 +173,7 @@ public abstract class HTTPTest extends SandboxTest {
       throws IOException {
 
     // create connection
-    final IOUrl url = new IOUrl(root + query);
+    final IOUrl url = new IOUrl(rootUrl + query);
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     conn.setDoOutput(true);
     conn.setRequestMethod(POST.name());
@@ -211,7 +238,7 @@ public abstract class HTTPTest extends SandboxTest {
   protected static void put(final String u, final InputStream is, final MediaType type)
       throws IOException {
 
-    final IOUrl url = new IOUrl(root + u);
+    final IOUrl url = new IOUrl(rootUrl + u);
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());

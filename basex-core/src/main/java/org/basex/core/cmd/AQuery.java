@@ -31,7 +31,7 @@ public abstract class AQuery extends Command {
   /** Variables. */
   protected final HashMap<String, String[]> vars = new HashMap<>();
 
-  /** HTTP context. */
+  /** HTTP connection. */
   private Object http;
   /** Query processor. */
   private QueryProcessor qp;

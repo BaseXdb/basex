@@ -149,7 +149,7 @@ public final class Request extends QueryModule {
   @Deterministic @Requires(Permission.NONE)
   public Value parameterNames() throws QueryException {
     try {
-      final HTTPParams params = context().params;
+      final HTTPParams params = connection().params;
       final TokenSet cache = new TokenSet();
       for(final String name : params.query().keySet()) cache.add(name);
       for(final String name : params.form(queryContext.context.options).keySet()) cache.add(name);
@@ -183,7 +183,7 @@ public final class Request extends QueryModule {
   public Value parameter(final Str key, final Value def) throws QueryException {
     try {
       final String name = key.toJava();
-      final HTTPParams params = context().params;
+      final HTTPParams params = connection().params;
       final Value query = params.query().get(name);
       final Value form = params.form(queryContext.context.options).get(name);
       if(query == null && form == null) return def;
@@ -291,16 +291,16 @@ public final class Request extends QueryModule {
    * @throws QueryException query exception
    */
   private HttpServletRequest request() throws QueryException {
-    return context().req;
+    return connection().req;
   }
 
   /**
-   * Returns the servlet HTTP context.
-   * @return context
+   * Returns the current HTTP connection.
+   * @return HTTP connection
    * @throws QueryException query exception
    */
-  private HTTPContext context() throws QueryException {
-    if(queryContext.http != null) return (HTTPContext) queryContext.http;
-    throw new QueryException("Servlet context required.");
+  private HTTPConnection connection() throws QueryException {
+    if(queryContext.http != null) return (HTTPConnection) queryContext.http;
+    throw new QueryException("required.");
   }
 }

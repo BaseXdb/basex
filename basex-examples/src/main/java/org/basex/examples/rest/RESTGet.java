@@ -59,8 +59,8 @@ public final class RESTGet {
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    // Start servers
-    final BaseXHTTP http = new BaseXHTTP();
+    // Start server, set admin as default user
+    final BaseXHTTP http = new BaseXHTTP("-U", "admin");
     // Run example
     run();
     // Stop servers

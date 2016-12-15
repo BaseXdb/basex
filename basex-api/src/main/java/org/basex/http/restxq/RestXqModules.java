@@ -44,27 +44,27 @@ public final class RestXqModules {
 
   /**
    * Returns a WADL description for all available URIs.
-   * @param http HTTP context
+   * @param conn HTTP connection
    * @return WADL description
    */
-  public FElem wadl(final HTTPContext http) {
-    return new RestXqWadl(http).create(modules);
+  public FElem wadl(final HTTPConnection conn) {
+    return new RestXqWadl(conn).create(modules);
   }
 
   /**
    * Returns the function that matches the current request or the specified error code.
    * Returns {@code null} if no function matches.
-   * @param http HTTP context
+   * @param conn HTTP connection
    * @param error error code (optional)
    * @return function
    * @throws Exception exception (including unexpected ones)
    */
-  RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
+  RestXqFunction find(final HTTPConnection conn, final QNm error) throws Exception {
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqModule mod : cache(http.context()).values()) {
+    for(final RestXqModule mod : cache(conn.context).values()) {
       for(final RestXqFunction rxf : mod.functions()) {
-        if(rxf.matches(http, error)) list.add(rxf);
+        if(rxf.matches(conn, error)) list.add(rxf);
       }
     }
     // no path matches
@@ -77,7 +77,7 @@ public final class RestXqModules {
     final RestXqFunction best = list.get(0);
     if(list.size() == 1 || best.compareTo(list.get(1)) != 0) return best;
 
-    final RestXqFunction bestQf = bestQf(list, http);
+    final RestXqFunction bestQf = bestQf(list, conn);
     if(bestQf != null) return bestQf;
 
     // show error if more than one path with the same specifity exists
@@ -94,14 +94,14 @@ public final class RestXqModules {
   /**
    * Returns the function that has a media type whose quality factor matches the HTTP request best.
    * @param list list of functions
-   * @param http http context
+   * @param conn HTTP connection
    * @return best function, or {@code null} if more than one function exists
    */
   private static RestXqFunction bestQf(final ArrayList<RestXqFunction> list,
-      final HTTPContext http) {
+      final HTTPConnection conn) {
 
     // media types accepted by the client
-    final MediaType[] accepts = http.accepts();
+    final MediaType[] accepts = conn.accepts();
 
     double bestQf = 0;
     RestXqFunction best = list.get(0);

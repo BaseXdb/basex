@@ -150,11 +150,7 @@ public abstract class Sandbox {
    */
   public static void finishSandbox() {
     context.close();
-    Prop.remove(StaticOptions.DBPATH);
-    Prop.remove(StaticOptions.WEBPATH);
-    Prop.remove(StaticOptions.RESTXQPATH);
-    Prop.remove(StaticOptions.REPOPATH);
-    Prop.remove(StaticOptions.SERVERPORT);
+    Prop.clear();
     if(!sandbox().delete()) throw Util.notExpected("Sandbox could not be created.");
   }
 

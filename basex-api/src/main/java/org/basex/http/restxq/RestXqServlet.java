@@ -2,8 +2,11 @@ package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
 
+import javax.servlet.http.*;
+
 import org.basex.http.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 
 /**
  * <p>This servlet receives and processes REST requests.
@@ -19,10 +22,10 @@ import org.basex.query.*;
  */
 public final class RestXqServlet extends BaseXServlet {
   @Override
-  protected void run(final HTTPContext http) throws Exception {
+  protected void run(final HTTPConnection conn) throws Exception {
     // no trailing slash: send redirect
-    if(http.req.getPathInfo() == null) {
-      http.redirect("/");
+    if(conn.req.getPathInfo() == null) {
+      conn.redirect("/");
       return;
     }
 
@@ -30,23 +33,36 @@ public final class RestXqServlet extends BaseXServlet {
     final RestXqModules rxm = RestXqModules.get();
 
     // initialize RESTXQ
-    if(http.path().equals("/" + INIT)) {
+    if(conn.path().equals("/" + INIT)) {
       rxm.init();
       return;
     }
 
     // select function that closest matches the request
-    RestXqFunction func = rxm.find(http, null);
+    RestXqFunction func = rxm.find(conn, null);
     if(func == null) throw HTTPCode.NO_XQUERY.get();
 
     try {
       // process function
-      func.process(http, null);
+      func.process(conn, null);
     } catch(final QueryException ex) {
       // run optional error function
-      func = rxm.find(http, ex.qname());
+      func = rxm.find(conn, ex.qname());
       if(func == null) throw ex;
-      func.process(http, ex);
+      func.process(conn, ex);
     }
+  }
+
+  @Override
+  public String username(final HTTPConnection http) {
+    final HttpSession session = http.req.getSession(false);
+    if(session != null) {
+      final String[] keys = { "id", "name", "dba" };
+      for(final String key : keys) {
+        final Object value = session.getAttribute(key);
+        if(value instanceof Str) return ((Str) value).toJava();
+      }
+    }
+    return super.username(http);
   }
 }

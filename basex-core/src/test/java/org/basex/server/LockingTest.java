@@ -16,9 +16,8 @@ import org.junit.runners.*;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * This class tests database locking inside BaseX. For this purpose, two queries are
- * forced to be executed in parallel. If this fails, locking prevents these queries to
- * run in parallel.
+ * This class tests database locking inside BaseX. For this purpose, two queries are forced to be
+ * executed in parallel. If this fails, locking prevents these queries to run in parallel.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
@@ -113,8 +112,9 @@ public final class LockingTest extends SandboxTest {
    * @param parallel Should queries be executed in parallel?
    * @throws Exception None expected
    */
-  private static void testQueries(final Command c1, final Command c2,
-      final boolean parallel) throws Exception {
+  private static void testQueries(final Command c1, final Command c2, final boolean parallel)
+      throws Exception {
+
     sync = new CountDownLatch(2);
     test = new CountDownLatch(2);
     final Client cl1 = new Client(c1, null, null);

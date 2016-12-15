@@ -36,12 +36,12 @@ final class RESTPost {
    * @throws IOException I/O exception
    */
   public static RESTCmd get(final RESTSession session) throws IOException {
-    final HTTPContext http = session.http;
-    String enc = http.req.getCharacterEncoding();
+    final HTTPConnection conn = session.conn;
+    String enc = conn.req.getCharacterEncoding();
     if(enc == null) enc = Strings.UTF8;
 
     // perform queries
-    final byte[] input = new NewlineInput(http.req.getInputStream()).encoding(enc).content();
+    final byte[] input = new NewlineInput(conn.req.getInputStream()).encoding(enc).content();
     validate(input);
 
     final Context ctx = session.context;
@@ -54,7 +54,7 @@ final class RESTPost {
 
     try {
       // handle serialization parameters
-      final SerializerOptions sopts = http.sopts();
+      final SerializerOptions sopts = conn.sopts();
       try(QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
         for(final Item param : qp.value()) {
           final String name = value("@name", param, ctx);

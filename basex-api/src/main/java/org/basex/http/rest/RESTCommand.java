@@ -26,11 +26,11 @@ final class RESTCommand extends RESTCmd {
   @Override
   protected void run0() throws IOException {
     // set content type to text
-    final HTTPContext http = session.http;
-    http.sopts().set(SerializerOptions.METHOD, SerialMethod.TEXT);
-    http.initResponse();
+    final HTTPConnection conn = session.conn;
+    conn.sopts().set(SerializerOptions.METHOD, SerialMethod.TEXT);
+    conn.initResponse();
 
-    for(final Command cmd : session.commands) run(cmd, http.res.getOutputStream());
+    for(final Command cmd : session.commands) run(cmd, conn.res.getOutputStream());
   }
 
   /**

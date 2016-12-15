@@ -28,15 +28,15 @@ final class WebDAVLockService {
   private static final String FILE = "xquery/webdav.xqm";
   /** Module contents. */
   private static String module;
-  /** HTTP context. */
-  private final HTTPContext http;
+  /** HTTP connection. */
+  private final HTTPConnection conn;
 
   /**
    * Constructor.
-   * @param http HTTP context
+   * @param conn HTTP connection
    */
-  WebDAVLockService(final HTTPContext http) {
-    this.http = http;
+  WebDAVLockService(final HTTPConnection conn) {
+    this.conn = conn;
   }
 
   /**
@@ -126,7 +126,8 @@ final class WebDAVLockService {
         "<w:scope>exclusive</w:scope>" +
         "<w:depth>infinity</w:depth>" +
         "<w:owner>{ $owner }</w:owner>" +
-        "</w:lockinfo>)").bind("path", db + SEP + p).bind("owner", http.username)).isEmpty();
+        "</w:lockinfo>)").bind("path", db + SEP + p).
+        bind("owner", conn.context.user().name())).isEmpty();
   }
 
   /**
@@ -151,7 +152,7 @@ final class WebDAVLockService {
       module = string(new IOStream(is).read());
     }
 
-    try(QueryProcessor qp = new QueryProcessor(query.toString(), http.context())) {
+    try(QueryProcessor qp = new QueryProcessor(query.toString(), conn.context)) {
       for(final Entry<String, String> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }

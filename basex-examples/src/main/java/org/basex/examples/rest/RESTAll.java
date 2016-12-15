@@ -16,8 +16,8 @@ public final class RESTAll {
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    // Start servers
-    final BaseXHTTP http = new BaseXHTTP();
+    // Start server, set admin as default user
+    final BaseXHTTP http = new BaseXHTTP("-U", "admin");
 
     // Create a database
     // Run all REST examples

@@ -180,7 +180,7 @@ final class RestXqPathMatcher {
    */
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result) {
     if(literals.length() > 0) {
-      final String decoded = HTTPContext.decode(literals.toString());
+      final String decoded = HTTPConnection.decode(literals.toString());
       final int n = decoded.length();
       for(int i = 0; i < n; ++i) {
         final char c = decoded.charAt(i);

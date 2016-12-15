@@ -138,10 +138,10 @@ public final class BaseXServer extends CLI implements Runnable {
       try {
         final Socket s = socket.accept();
         if(stopFile.exists()) {
+          close();
           if(!stopFile.delete()) {
             context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
           }
-          close();
         } else {
           // drop inactive connections
           final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
@@ -153,14 +153,13 @@ public final class BaseXServer extends CLI implements Runnable {
           }
           // create client listener, stop authentication after timeout
           final ClientListener cl = new ClientListener(s, context, this);
-          final long ms = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
-          if(ms > 0) {
+          if(ka > 0) {
             cl.timeout.schedule(new TimerTask() {
               @Override
               public void run() {
                 cl.close();
               }
-            }, ms);
+            }, ka);
             auth.add(cl);
           }
           cl.start();
@@ -245,7 +244,7 @@ public final class BaseXServer extends CLI implements Runnable {
             throw arg.usage();
         }
       } else {
-        if("stop".equalsIgnoreCase(arg.string())) {
+        if(S_STOP.equalsIgnoreCase(arg.string())) {
           stop = true;
         } else {
           throw arg.usage();
@@ -255,7 +254,7 @@ public final class BaseXServer extends CLI implements Runnable {
   }
 
   /**
-   * Stops the server of this instance.
+   * Stops the server.
    * @throws IOException I/O exception
    */
   public void stop() throws IOException {
@@ -309,16 +308,13 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   public static void stop(final String host, final int port) throws IOException {
     final IOFile stopFile = stopFile(port);
-    try {
-      stopFile.touch();
-      try(Socket s = new Socket(host, port)) { }
-      // wait and check if server was really stopped
-      do Performance.sleep(100); while(ping(S_LOCALHOST, port));
+    stopFile.touch();
+    try(Socket s = new Socket(host, port)) {
     } catch(final ConnectException ex) {
       throw new IOException(Util.info(CONNECTION_ERROR_X, port));
-    } finally {
-      stopFile.delete();
     }
+    // wait and check if server was really stopped
+    do Performance.sleep(10); while(stopFile.exists());
   }
 
   /**

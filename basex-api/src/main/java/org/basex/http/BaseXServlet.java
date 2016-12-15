@@ -24,7 +24,7 @@ import org.basex.util.*;
  */
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
-  String username = "";
+  String user = "";
   /** Servlet-specific authentication method. */
   AuthMethod auth;
 
@@ -39,7 +39,7 @@ public abstract class BaseXServlet extends HttpServlet {
         final String val = config.getInitParameter(key);
         if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
         if(key.equalsIgnoreCase(StaticOptions.USER.name())) {
-          username = val;
+          user = val;
         } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
           auth = AuthMethod.valueOf(val);
         }
@@ -53,22 +53,23 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest req, final HttpServletResponse res)
       throws IOException {
 
-    final HTTPContext http = new HTTPContext(req, res, this);
+    final HTTPConnection conn = new HTTPConnection(req, res, this);
     try {
-      run(http);
-      http.log(SC_OK, "");
+      conn.authenticate();
+      run(conn);
+      conn.log(SC_OK, "");
     } catch(final HTTPException ex) {
-      http.error(ex.getStatus(), Util.message(ex));
+      conn.error(ex.getStatus(), Util.message(ex));
     } catch(final LoginException ex) {
-      http.error(SC_UNAUTHORIZED, Util.message(ex));
+      conn.error(SC_UNAUTHORIZED, Util.message(ex));
     } catch(final IOException | QueryException ex) {
-      http.error(SC_BAD_REQUEST, Util.message(ex));
+      conn.error(SC_BAD_REQUEST, Util.message(ex));
     } catch(final JobException ex) {
-      http.error(SC_GONE, Text.INTERRUPTED);
+      conn.error(SC_GONE, Text.INTERRUPTED);
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);
       Util.errln(msg);
-      http.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, msg));
+      conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, msg));
     } finally {
       if(Prop.debug) {
         Util.outln("_ REQUEST _________________________________" + Prop.NL + req);
@@ -84,8 +85,17 @@ public abstract class BaseXServlet extends HttpServlet {
 
   /**
    * Runs the code.
-   * @param http HTTP context
+   * @param conn HTTP connection
    * @throws Exception any exception
    */
-  protected abstract void run(HTTPContext http) throws Exception;
+  protected abstract void run(HTTPConnection conn) throws Exception;
+
+  /**
+   * Returns a servlet-specific user name.
+   * @param http HTTP connection
+   * @return user name, or {@code null}
+   */
+  public String username(final HTTPConnection http) {
+    return http.context.user().name();
+  }
 }

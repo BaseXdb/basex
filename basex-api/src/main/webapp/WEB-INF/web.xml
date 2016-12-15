@@ -8,11 +8,10 @@
   <display-name>BaseX: The XML Database and XQuery Processor</display-name>
   <description>HTTP Services</description>
 
-  <!-- All BaseX options can be overwritten  prefixing the key with "org.basex."
-       and specifying them in <context-param/> elements, as shown below. Please
-       check out http://docs.basex.org/wiki/Options for a list of all options. -->
+  <!-- A BaseX option can be overwritten by prefixing the key with "org.basex."
+       and specifying it in <context-param/> elements, as shown below. Please
+       check out http://docs.basex.org/wiki/Options for a list of all options.
 
-  <!--
   <context-param>
     <param-name>org.basex.restxqpath</param-name>
     <param-value>.</param-value>
@@ -28,10 +27,6 @@
 
   <context-param>
     <param-name>org.basex.user</param-name>
-    <param-value>admin</param-value>
-  </context-param>
-  <context-param>
-    <param-name>org.basex.password</param-name>
     <param-value>admin</param-value>
   </context-param>
   <context-param>
@@ -64,6 +59,10 @@
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value>admin</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>
@@ -74,16 +73,6 @@
   <servlet>
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
-    <!-- service-specific credentials
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value/>
-    </init-param>
-    <init-param>
-      <param-name>org.basex.password</param-name>
-      <param-value/>
-    </init-param>
-    -->
   </servlet>
   <servlet-mapping>
     <servlet-name>REST</servlet-name>
@@ -94,16 +83,6 @@
   <servlet>
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
-    <!-- service-specific credentials
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value/>
-    </init-param>
-    <init-param>
-      <param-name>org.basex.password</param-name>
-      <param-value/>
-    </init-param>
-    -->
   </servlet>
   <servlet-mapping>
     <servlet-name>WebDAV</servlet-name>

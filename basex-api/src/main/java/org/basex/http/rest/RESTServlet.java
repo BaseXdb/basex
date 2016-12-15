@@ -15,10 +15,10 @@ import org.basex.util.http.*;
  */
 public final class RESTServlet extends BaseXServlet {
   @Override
-  protected void run(final HTTPContext http) throws IOException {
+  protected void run(final HTTPConnection conn) throws IOException {
     // open database if name was specified
-    final RESTSession session = new RESTSession(http, http.context());
-    final String db = http.db(), path = http.dbpath();
+    final RESTSession session = new RESTSession(conn);
+    final String db = conn.db(), path = conn.dbpath();
     if(!db.isEmpty()) session.add(new Open(db, path));
 
     // generate and run commands
@@ -41,11 +41,11 @@ public final class RESTServlet extends BaseXServlet {
    * @throws IOException I/O exception
    */
   private static RESTCmd command(final RESTSession session) throws IOException {
-    final String mth = session.http.method;
+    final String mth = session.conn.method;
     if(mth.equals(HttpMethod.GET.name()))    return RESTGet.get(session);
     if(mth.equals(HttpMethod.POST.name()))   return RESTPost.get(session);
     if(mth.equals(HttpMethod.PUT.name()))    return RESTPut.get(session);
     if(mth.equals(HttpMethod.DELETE.name())) return RESTDelete.get(session);
-    throw HTTPCode.NOT_IMPLEMENTED_X.get(session.http.req.getMethod());
+    throw HTTPCode.NOT_IMPLEMENTED_X.get(session.conn.req.getMethod());
   }
 }

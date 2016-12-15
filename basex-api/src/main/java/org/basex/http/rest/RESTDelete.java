@@ -24,12 +24,12 @@ final class RESTDelete {
   static RESTExec get(final RESTSession session) throws IOException {
     RESTCmd.parseOptions(session);
 
-    final HTTPContext http = session.http;
-    final String db = http.db();
+    final HTTPConnection conn = session.conn;
+    final String db = conn.db();
     if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
     // open database to ensure it exists
-    final String path = http.dbpath();
+    final String path = conn.dbpath();
     session.add(path.isEmpty() ? new DropDB(db) : new Delete(path));
     return new RESTExec(session, false);
   }

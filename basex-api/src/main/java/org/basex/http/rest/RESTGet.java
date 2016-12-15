@@ -31,9 +31,9 @@ final class RESTGet {
 
     // parse query string
     String op = null, input = null, value = null;
-    final HTTPContext http = session.http;
-    final SerializerOptions sopts = http.sopts();
-    for(final Entry<String, String[]> param : http.params.map().entrySet()) {
+    final HTTPConnection conn = session.conn;
+    final SerializerOptions sopts = conn.sopts();
+    for(final Entry<String, String[]> param : conn.params.map().entrySet()) {
       final String key = param.getKey();
       final String[] vals = param.getValue();
       final String val = vals[0];

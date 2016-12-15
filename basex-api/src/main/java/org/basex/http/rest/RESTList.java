@@ -35,9 +35,9 @@ final class RESTList extends RESTCmd {
     el.add(RESTText.RESOURCES, token(table.contents.size()));
     list(table, el, RESTText.Q_DATABASE, 1);
 
-    final HTTPContext http = session.http;
-    http.initResponse();
-    try(Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts())) {
+    final HTTPConnection conn = session.conn;
+    conn.initResponse();
+    try(Serializer ser = Serializer.get(conn.res.getOutputStream(), conn.sopts())) {
       ser.serialize(el);
     }
   }

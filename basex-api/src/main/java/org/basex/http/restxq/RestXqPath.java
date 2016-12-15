@@ -33,11 +33,11 @@ final class RestXqPath implements Comparable<RestXqPath> {
 
   /**
    * Checks if the path matches the HTTP request.
-   * @param http http context
+   * @param conn HTTP connection
    * @return result of check
    */
-  boolean matches(final HTTPContext http) {
-    return matcher.matches(http.path());
+  boolean matches(final HTTPConnection conn) {
+    return matcher.matches(conn.path());
   }
 
   /**
@@ -50,11 +50,11 @@ final class RestXqPath implements Comparable<RestXqPath> {
 
   /**
    * Gets the variable values for the given HTTP context path.
-   * @param http HTTP context
+   * @param conn HTTP connection
    * @return map with variable values
    */
-  Map<QNm, String> values(final HTTPContext http) {
-    return matcher.values(http.path());
+  Map<QNm, String> values(final HTTPConnection conn) {
+    return matcher.values(conn.path());
   }
 
   /**

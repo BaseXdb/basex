@@ -20,7 +20,7 @@ public final class RESTPut {
     System.out.println("=== PUT: create a new database ===");
 
     // The java URL connection to the resource
-    URL url = new URL("http://localhost:8984/rest/factbook");
+    URL url = new URL("http://admin:admin@localhost:8984/rest/factbook");
     System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL
@@ -53,8 +53,8 @@ public final class RESTPut {
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    // Start servers
-    final BaseXHTTP http = new BaseXHTTP();
+    // Start server, set admin as default user
+    final BaseXHTTP http = new BaseXHTTP("-U", "admin");
     // Run example
     run();
     // Stop servers

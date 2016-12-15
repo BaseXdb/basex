@@ -22,10 +22,10 @@ final class WebDAVFactory implements ResourceFactory {
 
   /**
    * Creates a new service.
-   * @param http http context
+   * @param conn HTTP connection
    */
-  static void init(final HTTPContext http) {
-    SERVICES.set(new WebDAVService(http));
+  static void init(final HTTPConnection conn) {
+    SERVICES.set(new WebDAVService(conn));
   }
 
   /**
@@ -40,7 +40,7 @@ final class WebDAVFactory implements ResourceFactory {
   public Resource getResource(final String host, final String dbpath) {
     try {
       final WebDAVService service = SERVICES.get();
-      final HttpServletRequest r = service.http.req;
+      final HttpServletRequest r = service.conn.req;
       Path p = Path.path(dbpath);
       if(!r.getContextPath().isEmpty()) p = p.getStripFirst();
       if(!r.getServletPath().isEmpty()) p = p.getStripFirst();

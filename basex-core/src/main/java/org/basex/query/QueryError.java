@@ -178,6 +178,8 @@ public enum QueryError {
   JOBS_ID_EXISTS_X(JOBS, "id", "Job id already exists: %."),
   /** Jobs error. */
   JOBS_ID_INVALID_X(JOBS, "id", "Invalid job name: %."),
+  /** Jobs error. */
+  JOBS_SELF_X(JOBS, "self", "Cannot wait for own job: %"),
 
   // JSON Module
 
