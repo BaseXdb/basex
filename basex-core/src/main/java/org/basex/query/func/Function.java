@@ -1081,6 +1081,8 @@ public enum Function {
   _JOBS_LIST_DETAILS(JobsListDetails.class, "list-details([id])",
       arg(STR), ELM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
+  _JOBS_WAIT(JobsWait.class, "wait(id)", arg(STR), EMP, flag(NDT), JOBS_URI),
+  /** XQuery function. */
   _JOBS_CURRENT(JobsCurrent.class, "current()", arg(), STR, flag(NDT), JOBS_URI),
 
   /* JSON Module. */

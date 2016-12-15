@@ -27,9 +27,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @After
   public void clean() {
     // wait for running jobs
-    while(!query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "]").isEmpty()) {
-      Performance.sleep(1);
-    }
+    query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "] ! " + _JOBS_WAIT.args(" ."));
     // consume cached results
     query("for $id in " + _JOBS_LIST_DETAILS.args() + "[@cached = 'true'] " +
         " return try { " + _JOBS_RESULT.args(" $id") + " } catch * { }");
@@ -124,20 +122,20 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void finished() {
-    final String id = wait(query(_JOBS_EVAL.args(VERY_SLOW_QUERY)));
+    final String id = verySlowQuery();
     try {
       query(_JOBS_FINISHED.args(id), "false");
     } finally {
       query(_JOBS_STOP.args(id));
     }
-    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(1);
+    query(_JOBS_WAIT.args(id));
     query(_JOBS_FINISHED.args("12345"), "true");
   }
 
   /** Test method. */
   @Test
   public void list() {
-    final String id = wait(query(_JOBS_EVAL.args(VERY_SLOW_QUERY)));
+    final String id = verySlowQuery();
     try {
       query(_JOBS_LIST.args() + " = '" + id + "'", "true");
     } finally {
@@ -148,7 +146,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void listDetails() {
-    final String id = wait(query(_JOBS_EVAL.args(VERY_SLOW_QUERY)));
+    final String id = verySlowQuery();
     try {
       final String list = query(_JOBS_LIST_DETAILS.args() + "[@id = '" + id + "']");
       query(list + "/@user/string()", UserText.ADMIN);
@@ -164,7 +162,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
    * @throws IOException I/O exception */
   @Test
   public void stop() throws IOException {
-    final String id = wait(query(_JOBS_EVAL.args(VERY_SLOW_QUERY)));
+    final String id = verySlowQuery();
     query(_JOBS_STOP.args(id));
 
     // check if query was interrupted
@@ -178,6 +176,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
         // query is still running: check error code
         assertSame(JOBS_RUNNING_X, ex.error());
       }
+      Performance.sleep(1);
     }
   }
 
@@ -223,19 +222,24 @@ public final class JobsModuleTest extends AdvancedQueryTest {
 
     // receive cached error
     id = query(_JOBS_EVAL.args("\"db:open('db')\"", "()", " map{'cache':true()}"));
-    while(query(_JOBS_FINISHED.args(id)).equals("false")) Performance.sleep(1);
+    query(_JOBS_WAIT.args(id));
     error(_JOBS_RESULT.args(id), BXDB_OPEN_X);
   }
 
+  /** Test method. */
+  @Test
+  public void waitFor() {
+    query(_JOBS_WAIT.args(_JOBS_EVAL.args("1",  "()", " map { 'start':'PT0.1S' }")));
+    error(_JOBS_WAIT.args(_JOBS_CURRENT.args()), JOBS_SELF_X);
+  }
+
   /**
-   * Waits until the query with the specified id has been started.
-   * @param id job id
-   * @return id
+   * Waits until a very slow query has been started.
+   * @return query id
    */
-  private String wait(final String id) {
-    while(context.jobs.active.get(id) == null) {
-      Performance.sleep(1);
-    }
+  private String verySlowQuery() {
+    final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
+    while(context.jobs.active.get(id) == null) Performance.sleep(1);
     return id;
   }
 }
