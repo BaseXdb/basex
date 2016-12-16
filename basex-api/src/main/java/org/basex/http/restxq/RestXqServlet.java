@@ -1,5 +1,6 @@
 package org.basex.http.restxq;
 
+import static org.basex.http.HTTPText.*;
 import static org.basex.http.restxq.RestXqText.*;
 
 import javax.servlet.http.*;
@@ -55,14 +56,13 @@ public final class RestXqServlet extends BaseXServlet {
 
   @Override
   public String username(final HTTPConnection http) {
+    // try to retrieve session id (DBA, global one)
     final HttpSession session = http.req.getSession(false);
+    Object value = null;
     if(session != null) {
-      final String[] keys = { "id", "name", "dba" };
-      for(final String key : keys) {
-        final Object value = session.getAttribute(key);
-        if(value instanceof Str) return ((Str) value).toJava();
-      }
+      if((http.path() + '/').contains("/" + DBA + "/")) value = session.getAttribute(DBA);
+      if(!(value instanceof Str)) value = session.getAttribute("id");
     }
-    return super.username(http);
+    return value instanceof Str ? ((Str) value).toJava() : super.username(http);
   }
 }

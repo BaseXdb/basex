@@ -16,6 +16,9 @@ public interface HTTPText {
   /** Path to web configuration file. */
   String WEBCONF = WEB_INF + "web.xml";
 
+  /** DBA String. */
+  String DBA = "dba";
+
   /** Error: unknown user. */
   String WHICHUSER_X = "User does not exist: %.";
   /** Error: wrong authorization. */

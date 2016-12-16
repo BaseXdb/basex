@@ -41,7 +41,6 @@ public final class AdminLogs extends AdminFn {
       }
     } else {
       // return content of single log file
-      final String request = LogType.REQUEST.name();
       final String name = Token.string(toToken(exprs[0], qc));
       final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
 
@@ -50,19 +49,17 @@ public final class AdminLogs extends AdminFn {
         final LogEntry l1 = iter.next();
         final FElem elem = new FElem(ENTRY);
         if(l1.address != null) {
-          if(merge && l1.ms.compareTo(BigDecimal.ZERO) == 0 &&
-              !Strings.eq(l1.address, Log.SERVER, Log.STANDALONE)) {
+          if(merge && l1.type.equals(LogType.REQUEST.name())) {
+            // merge REQUEST entry: find next OK, ERROR or status code entry from same address
             final ElementNodes<LogEntry>.NodeIterator iter2 = iter.copy();
             while(iter2.hasNext()) {
               final LogEntry l2 = iter2.next();
-              if(l2 != null && l1.address.equals(l2.address)) {
-                if(l2.type.equals(request)) continue;
-                if(l1.type.equals(request)) l1.type = "";
-                l1.type = merge(l1.type, l2.type);
-                l1.message = merge(l1.message, l2.message);
+              if(l1.address.equals(l2.address) && (l2.type.matches("^\\d+$")) ||
+                  Strings.eq(l2.type, LogType.OK.name(), LogType.ERROR.name())) {
+                l1.type = l2.type;
                 l1.ms = l1.ms.add(l2.ms);
                 iter2.remove();
-                if(!l2.message.equals(request)) break;
+                break;
               }
             }
           }
@@ -78,16 +75,6 @@ public final class AdminLogs extends AdminFn {
       }
     }
     return vb.value();
-  }
-
-  /**
-   * Merges two strings.
-   * @param s1 first string
-   * @param s2 second string
-   * @return merged string
-   */
-  private static String merge(final String s1, final String s2) {
-    return s2.isEmpty() ? s1 : s1.isEmpty() ? s2 : s1 + "; " + s2;
   }
 
   /**
