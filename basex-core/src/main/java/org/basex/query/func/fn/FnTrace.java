@@ -2,7 +2,6 @@ package org.basex.query.func.fn;
 
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -72,20 +71,7 @@ public final class FnTrace extends StandardFunc {
   public static void trace(final byte[] value, final byte[] label, final QueryContext qc) {
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
-    final String info = tb.add(value).toString();
-
-    // if GUI is used, or if client is calling, cache trace info
-    final TraceListener trace = qc.job().trace;
-    boolean cache = qc.context.client != null;
-    if(trace != null) {
-      trace.info(info);
-      cache = true;
-    }
-
-    if(cache) {
-      qc.evalInfo(info);
-    } else {
-      Util.errln(info);
-    }
+    tb.add(value);
+    qc.job().tracer.print(tb.toString(), qc);
   }
 }

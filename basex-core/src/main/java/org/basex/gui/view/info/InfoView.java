@@ -14,6 +14,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.gui.view.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -23,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class InfoView extends View implements LinkListener {
+public final class InfoView extends View implements LinkListener, QueryTracer {
   /** Searchable editor. */
   private final SearchEditor editor;
 
@@ -353,5 +354,11 @@ public final class InfoView extends View implements LinkListener {
       g.setColor(GUIConstants.color(8));
       g.drawRect(bx, by + bh - p, bs, p - 1);
     }
+  }
+
+  @Override
+  public void print(final String string, final QueryContext qc) {
+    setInfo(string, null, true, false);
+    qc.evalInfo(string);
   }
 }

@@ -1,6 +1,7 @@
 package org.basex.core.jobs;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -17,8 +18,8 @@ public final class JobContext {
 
   /** Performance measurements. */
   public Performance performance;
-  /** Trace listener. */
-  public TraceListener trace;
+  /** Query tracer. */
+  public QueryTracer tracer = QueryTracer.ERRLN;
   /** Database context. */
   public Context context;
 
