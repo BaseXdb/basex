@@ -19,13 +19,8 @@ declare function util:query(
 ) as xs:string {
   let $limit := $cons:OPTION($cons:K-MAXCHARS)
   let $result := xquery:eval($query, map { '': $context }, util:query-options())
-  (: serialize result, reduce it to requested length :)
-  let $string := serialize($result, map { 'limit': $limit * 2 + 1, 'method': 'basex' })
-  return if(string-length($string) > $limit) then (
-    substring($string, 1, $limit) || '...'
-  ) else (
-    $string
-  )
+  (: serialize more characters than requested, because limit represents number of bytes :)
+  return util:chop(serialize($result, map { 'limit': $limit * 2 + 1, 'method': 'basex' }), $limit)
 };
 
 (:~
@@ -106,5 +101,22 @@ declare function util:end(
     $page * $cons:OPTION($cons:K-MAXROWS)
   ) else (
     999999999
+  )
+};
+
+(:~
+ : Chops a string result to the maximum number of allowed characters.
+ : @param  $string  string
+ : @param  $max     maximum number of characters
+ : @return string
+ :)
+declare function util:chop(
+  $string  as xs:string,
+  $max     as xs:integer
+) {
+  if(string-length($string) > $max) then (
+    substring($string, 1, $max) || '...'
+  ) else (
+    $string
   )
 };

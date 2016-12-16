@@ -1,5 +1,3 @@
-
-
 (:~
  : Optimize databases.
  :

@@ -66,7 +66,7 @@ function query(key, query, enforce, target) {
     function(req) {
       _running--;
       target(req.responseText);
-      setInfo("Query was successful.");
+      if(!_running) setInfo("Query was successful.");
     },
     function(req) {
       _running--;

@@ -80,9 +80,7 @@ declare function tmpl:wrap(
         } catch basex:login {
           $emph
         },
-        <span style='float:right'>User: <b>{
-          $cons:SESSION/name/text()
-        }</b></span>[$cons:SESSION]
+        $cons:SESSION-VALUE ! <span style='float:right'>User: <b>{ . }</b></span>
       }</div>
       <hr/>
       <div class='small'/>

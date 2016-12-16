@@ -1,4 +1,3 @@
-
 (:~
  : Drop patterns.
  :

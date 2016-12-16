@@ -96,12 +96,9 @@ declare
   %rest:path("/dba/logout")
 function dba:logout(
 ) as element(rest:response) {
-  let $name := $cons:SESSION/name
-  return (
-    admin:write-log('DBA user was logged out: ' || $name),
-    Session:delete($cons:SESSION-KEY),
-    web:redirect("/dba/login", map { 'name': $name })
-  )
+  admin:write-log('DBA user was logged out: ' || $cons:SESSION-VALUE),
+  web:redirect("/dba/login", map { 'name': $cons:SESSION-VALUE }),
+  Session:delete($cons:SESSION-KEY)
 };
 
 (:~
@@ -115,12 +112,7 @@ declare %private function dba:accept(
   $pass  as xs:string,
   $path  as xs:string?
 ) {
-  Session:set($cons:SESSION-KEY,
-    element dba-session {
-      element name { $name },
-      element pass { $pass }
-    }
-  ),
+  Session:set($cons:SESSION-KEY, $name),
   admin:write-log('DBA user was logged in: ' || $name),
   web:redirect(if($path) then $path else "databases")
 };

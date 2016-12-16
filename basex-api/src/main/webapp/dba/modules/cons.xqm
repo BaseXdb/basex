@@ -9,9 +9,9 @@ import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace Session = 'http://basex.org/modules/session';
 
 (:~ Session key. :)
-declare variable $cons:SESSION-KEY := "dba-session";
+declare variable $cons:SESSION-KEY := "dba";
 (:~ Current session. :)
-declare variable $cons:SESSION := Session:get($cons:SESSION-KEY);
+declare variable $cons:SESSION-VALUE := Session:get($cons:SESSION-KEY);
 
 (:~ Directory for DBA files. :)
 declare variable $cons:DBA-DIR := file:temp-dir() || 'dba/';
@@ -66,7 +66,7 @@ declare variable $cons:OPTION :=
  :)
 declare function cons:check(
 ) as empty-sequence() {
-  if($cons:SESSION) then () else
+  if($cons:SESSION-VALUE) then () else
     error(xs:QName('basex:login'), 'Please log in again.', Request:path())
 };
 

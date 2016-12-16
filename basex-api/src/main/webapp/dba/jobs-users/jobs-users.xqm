@@ -10,6 +10,7 @@ import module namespace Session = 'http://basex.org/modules/session';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs-users';
@@ -88,20 +89,9 @@ function dba:jobs-users(
             let $access := Sessions:accessed($id)
             let $you := if(Session:id() = $id) then '&#x2713;' else '–'
             for $name in Sessions:names($id)
-            for $value in try {
-              (: try to find possible sessions :)
-              let $attr := Sessions:get($id, $name)
-              return if($attr instance of element()) then (
-                $attr/name
-              ) else if($attr instance of xs:string) then (
-                $attr
-              ) else (
-                '...'
-              )
-            } catch bxerr:BXSE0002 {
-              (: skip non-XQuery session values :)
-            }
-            return <row id='{ $id || '|' || $name }' name='{ $name }' value='{ $value }'
+            let $value := Sessions:get($id, $name)
+            let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
+            return <row id='{ $id || '|' || $name }' name='{ $name }' value='{ $string }'
                         access='{ $access }' you='{ $you }'/>
           let $headers := (
             <id type='id'>ID</id>,
@@ -135,8 +125,8 @@ function dba:jobs-users(
         {
           let $rows :=
             for $user in $data/users/user
-            let $name := $user/@name
-            let $you := if($cons:SESSION/name = $name) then '&#x2713;' else '–'
+            let $name := string($user/@name)
+            let $you := if($cons:SESSION-VALUE = $name) then '&#x2713;' else '–'
             return <row name='{ $name }' perm='{ $user/@permission }' you='{ $you }'/>
           let $headers := (
             <name>Name</name>,

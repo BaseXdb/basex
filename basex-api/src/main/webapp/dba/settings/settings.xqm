@@ -34,10 +34,10 @@ function dba:settings(
             </tr>
             {
               for $option in element options {
-                element { $cons:K-TIMEOUT } { '…query timeout (seconds)' },
-                element { $cons:K-MEMORY } { '…memory limit (mb) during query execution' },
+                element { $cons:K-TIMEOUT  } { '…timeout for queries, in seconds (0: disabled)' },
+                element { $cons:K-MEMORY   } { '…memory limit for queries, in MB (0: disabled)' },
                 element { $cons:K-MAXCHARS } { '…maximum number of characters in query results' },
-                element { $cons:K-MAXROWS } { '…maximum number of displayed table rows' }
+                element { $cons:K-MAXROWS  } { '…maximum number of displayed table rows'        }
               }/*
               let $key := name($option)
               return <tr>
@@ -55,7 +55,7 @@ function dba:settings(
                   for $p in $cons:PERMISSIONS
                   return element option { attribute selected { }[$p = $pm], $p }
                 }</select>
-                <span class='note'> &#xa0; …for running queries</span>
+                <span class='note'> &#xa0; …for query evaluation</span>
               </td>
             </tr>
           </table>
