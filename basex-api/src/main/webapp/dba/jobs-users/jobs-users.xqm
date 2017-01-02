@@ -89,7 +89,11 @@ function dba:jobs-users(
             let $access := Sessions:accessed($id)
             let $you := if(Session:id() = $id) then '&#x2713;' else '–'
             for $name in Sessions:names($id)
-            let $value := Sessions:get($id, $name)
+            let $value := try {
+              Sessions:get($id, $name)
+            } catch bxerr:BXSE0002 {
+              (: non-XQuery session value :)
+            }
             let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
             return <row id='{ $id || '|' || $name }' name='{ $name }' value='{ $string }'
                         access='{ $access }' you='{ $you }'/>
