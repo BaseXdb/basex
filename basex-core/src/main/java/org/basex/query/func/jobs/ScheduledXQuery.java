@@ -42,6 +42,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
 
   /** Query processor. */
   private QueryProcessor qp;
+  /** Remove flag. */
+  private boolean remove;
 
   /**
    * Constructor.
@@ -53,9 +55,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @param sc static context
    * @throws QueryException query exception
    */
-  ScheduledXQuery(final String query, final HashMap<String, Value> bindings,
-      final EvalOptions opts, final InputInfo info, final QueryContext qc,
-      final StaticContext sc) throws QueryException {
+  ScheduledXQuery(final String query, final HashMap<String, Value> bindings, final EvalOptions opts,
+      final InputInfo info, final QueryContext qc, final StaticContext sc) throws QueryException {
 
     this.query = query;
     this.bindings = bindings;
@@ -141,18 +142,42 @@ public final class ScheduledXQuery extends Job implements Runnable {
     return date.sec.multiply(BigDecimal.valueOf(1000)).longValue();
   }
 
+  /**
+   * Removes the job from the task list as soon as it has been activated.
+   */
+  public void remove() {
+    remove = true;
+  }
+
   @Override
   public void run() {
-    final Context ctx = job().context;
+    final JobContext jc = job();
+    final Context ctx = jc.context;
+
+    qp = new QueryProcessor(query, uri, ctx);
     try {
       // parse, push and register query. order is important!
-      qp = parse();
+      final Performance perf = new Performance();
+      for(final Entry<String, Value> binding : bindings.entrySet()) {
+        final String key = binding.getKey();
+        final Value value = binding.getValue();
+        if(key.isEmpty()) qp.context(value);
+        else qp.bind(key, value);
+      }
+      qp.parse();
+      updating = qp.updating;
+      result.time = perf.time();
+
+      // register job
       pushJob(qp);
       register(ctx);
+      if(remove) ctx.jobs.tasks.remove(jc.id());
+
+      // retrieve result
       result.value = copy(qp.iter(), ctx, qp.qc);
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
-      ctx.jobs.results.remove(job().id());
+      ctx.jobs.results.remove(jc.id());
     } catch(final QueryException ex) {
       result.exception = ex;
     } catch(final Throwable ex) {
@@ -166,37 +191,21 @@ public final class ScheduledXQuery extends Job implements Runnable {
         state(JobState.SCHEDULED);
       }
 
-      if(qp != null) {
-        result.time = job().performance.time();
+      if(ctx.jobs.active.containsKey(jc.id())) {
         qp.close();
         unregister(ctx);
         popJob();
         qp = null;
-        job().performance = null;
+        result.time += jc.performance.time();
       }
+
+      if(remove) ctx.jobs.tasks.remove(jc.id());
     }
   }
 
   @Override
   public void databases(final LockResult lr) {
     qp.databases(lr);
-  }
-
-  /**
-   * Returns a query processor. Creates a new instance if none exists.
-   * @return query processor
-   * @throws QueryException query exception
-   */
-  private QueryProcessor parse() throws QueryException {
-    final QueryProcessor proc = new QueryProcessor(query, uri, job().context);
-    for(final Entry<String, Value> binding : bindings.entrySet()) {
-      final String key = binding.getKey();
-      final Value value = binding.getValue();
-      if(key.isEmpty()) proc.context(value);
-      else proc.bind(key, value);
-    }
-    updating = proc.updating;
-    return proc;
   }
 
   /**

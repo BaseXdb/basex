@@ -54,14 +54,13 @@ public final class JobTask extends TimerTask {
 
   @Override
   public void run() {
-    // skip execution if same job is still running
-    final String id = job.job().id();
-    if(jobs.active.get(id) == null) new Thread(job).start();
-
+    // check if job needs to be evaluated repeatedly
     start += interval;
-    if(start >= end || interval == 0) {
-      jobs.tasks.remove(id);
+    if(interval == 0 || start >= end) {
+      job.remove();
       cancel();
     }
+    // skip execution if same job is still running
+    if(!jobs.active.containsKey(job.job().id())) new Thread(job).start();
   }
 }
