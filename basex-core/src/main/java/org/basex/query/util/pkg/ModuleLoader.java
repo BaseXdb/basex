@@ -167,13 +167,16 @@ public final class ModuleLoader {
             if (entry.getName().startsWith("lib/") && entry.getName().endsWith(".jar")) {
               if(!exjsdir.md()) Util.errln("Could not create directory: '%'", exjsdir.path());
               final IOFile libFile = new IOFile(exjsdir, entry.getName().substring(4));
-              // basic check file size and skip extraction if lib already exists
-              if(!libFile.exists() || libFile.file().length() != entry.getSize()) {
+              // basic check file size / timestamp and skip extraction if library already exists
+              if(!libFile.exists() || libFile.length() != entry.getSize() ||
+                  libFile.timeStamp() != entry.getTime()) {
+                libFile.delete();
                 try(InputStream inputStream = jarFile.getInputStream(entry)) {
                   libFile.write(inputStream);
                 } catch (IOException e) {
                   Util.errln(EXTFAILED, jar.path(), e);
                 }
+                libFile.file().setLastModified(entry.getTime());
               }
               jars.add(libFile);
             }
