@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.jar.JarFile;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -26,7 +25,7 @@ import org.basex.util.list.*;
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
-  /** Ignore files starting with a dot */
+  /** Ignore files starting with a dot. */
   private static final FileFilter DOT_FILE_FILTER = new FileFilter() {
     @Override public boolean accept(final File file) {
       return !file.getName().startsWith(".");
@@ -133,8 +132,11 @@ public final class RepoManager {
         }
         final IOFile pkgf = repo.path(dir);
         if(!pkgf.delete()) throw BXRE_DELETE_X.get(info, dir);
+        // delete directory with extracted jars
+        final int lastDot = pkg.name().lastIndexOf(".");
+        final String exjsDirName = lastDot == -1 ? pkg.name() : pkg.name().substring(lastDot + 1);
         final IOFile exjsdir = pkgf.parent().resolve(
-                EXT_JAR_DIR_PREFIX + pkg.name() + EXT_JAR_DIR_SUFFIX);
+                EXT_JAR_DIR_PREFIX + exjsDirName + EXT_JAR_DIR_SUFFIX);
         if(!exjsdir.delete()) throw BXRE_DELETE_X.get(info, dir);
         deleted = true;
       }
@@ -161,7 +163,7 @@ public final class RepoManager {
         add(dir.replaceAll("\\..*", "").replace('/', '.'), dir, map);
       } else if(!cache.contains(dir)) {
         for(final String s : ch.descendants(DOT_FILE_FILTER)) {
-          add(dir + '.' + s.replaceAll("\\..*", "").replace('/', '.'),dir + '/' + s, map);
+          add(dir + '.' + s.replaceAll("\\..*", "").replace('/', '.'), dir + '/' + s, map);
         }
       }
     }
@@ -195,7 +197,7 @@ public final class RepoManager {
       throws QueryException, IOException {
 
     // parse module to find namespace uri
-    try(final QueryContext qc = new QueryContext(context)) {
+    try(QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
       // copy file to rewritten URI file path
       return write(Strings.uri2path(string(uri)) + IO.XQMSUFFIX, content);
@@ -211,7 +213,7 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private boolean installJAR(final byte[] content, final String path)
-      throws QueryException, IOException {
+          throws QueryException, IOException {
 
     final Zip zip = new Zip(new IOContent(content));
     final IOContent mf = new IOContent(zip.read(MANIFEST_MF));

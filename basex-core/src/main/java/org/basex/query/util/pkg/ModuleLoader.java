@@ -159,8 +159,7 @@ public final class ModuleLoader {
           continue;
         }
 
-        try {
-          final JarFile jarFile = new JarFile(jar.file());
+        try(JarFile jarFile = new JarFile(jar.file())) {
           final Enumeration<JarEntry> entries = jarFile.entries();
           while (entries.hasMoreElements()) {
             final JarEntry entry = entries.nextElement();

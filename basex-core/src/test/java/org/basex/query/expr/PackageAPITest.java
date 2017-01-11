@@ -298,9 +298,11 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // dependency installed
     assertTrue(isFile(dir + "/.GreeterCallerLib/Greeter.jar"));
 
-    // delete package
+    new RepoManager(context).delete("test.GreeterCaller");
+    final boolean existAfterDelete = isFile(dir + "/.GreeterCallerLib/Greeter.jar") ||
+            isFile(dir + "/GreeterCaller.jar");
     assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
-    assertFalse(new IOFile(REPO, dir).exists());
+    assertFalse("Package could not be deleted.", existAfterDelete);
   }
 
   /**
