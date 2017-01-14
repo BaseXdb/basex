@@ -87,7 +87,7 @@ public final class HTTPConnection implements ClientInfo {
   public void authenticate() throws IOException {
     // default user
     String name = servlet.user;
-    if(name.isEmpty()) name = context.soptions.get(StaticOptions.USER);
+    if(name == null) name = context.soptions.get(StaticOptions.USER);
 
     // look for existing user. if it does not exist, try to authenticate
     User user = context.users.get(name);
