@@ -202,7 +202,7 @@ declare %updating function w:create-lock(
   $type     as xs:string,
   $depth    as xs:string,
   $owner    as xs:string,
-  $timeout  as xs:integer
+  $timeout  as xs:string
 ) {
   (: limit timeout to one year (avoid overflow) :)
   let $timeout := min((xs:integer($timeout), 31700000))

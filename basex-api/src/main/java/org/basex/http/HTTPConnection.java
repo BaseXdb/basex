@@ -85,8 +85,8 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   public void authenticate() throws IOException {
-    // default user
-    String name = servlet.user;
+    // choose admin user for OPTIONS requests, servlet-specific user, or global user (can be empty)
+    String name = method.equals(HttpMethod.OPTIONS.name()) ? UserText.ADMIN : servlet.user;
     if(name == null) name = context.soptions.get(StaticOptions.USER);
 
     // look for existing user. if it does not exist, try to authenticate
@@ -419,12 +419,11 @@ public final class HTTPConnection implements ClientInfo {
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
         final TokenBuilder header = new TokenBuilder(auth.toString());
-        final String nonce = Strings.md5(Long.toString(System.nanoTime()));
+        header.add(' ').addExt(Request.REALM).add("=\"").add(Prop.NAME).add('"');
         if(auth == AuthMethod.DIGEST) {
-          header.add(" ");
-          header.addExt(Request.REALM).add("=\"").add(Prop.NAME).add("\",");
-          header.addExt(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT).add("\",");
-          header.addExt(Request.NONCE).add("=\"").add(nonce).add('"');
+          final String nonce = Strings.md5(Long.toString(System.nanoTime()));
+          header.add(",").addExt(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT).add('"');
+          header.add(',').addExt(Request.NONCE).add("=\"").add(nonce).add('"');
         }
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }

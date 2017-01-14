@@ -24,7 +24,7 @@ import org.basex.util.*;
  */
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
-  String user = "";
+  String user;
   /** Servlet-specific authentication method. */
   AuthMethod auth;
 
@@ -91,7 +91,7 @@ public abstract class BaseXServlet extends HttpServlet {
   protected abstract void run(HTTPConnection conn) throws Exception;
 
   /**
-   * Returns a servlet-specific user name.
+   * Returns a servlet-specific user name. By default, it returns the name of the database user.
    * @param http HTTP connection
    * @return user name, or {@code null}
    */
