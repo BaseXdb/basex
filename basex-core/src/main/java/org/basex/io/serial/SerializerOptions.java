@@ -114,9 +114,6 @@ public final class SerializerOptions extends Options {
   public static final EnumOption<YesNo> BINARY =
       new EnumOption<>("binary", YesNo.YES);
 
-  /** Static WebDAV character map. */
-  public static final String WEBDAV = "\u00a0=&#xA0;";
-
   /** Newlines. */
   public enum Newline {
     /** NL.   */ NL("\\n", "\n"),
@@ -187,8 +184,6 @@ public final class SerializerOptions extends Options {
       final InputInfo ii) throws QueryException {
 
     try {
-      if(name.equals(USE_CHARACTER_MAPS.name()) && !eq(value, token(WEBDAV)))
-        throw OUTMAP_X.get(ii, value);
       assign(name, string(value));
     } catch(final BaseXException ex) {
       for(final Option<?> o : this) if(o.name().equals(name)) throw SER_X.get(ii, ex);

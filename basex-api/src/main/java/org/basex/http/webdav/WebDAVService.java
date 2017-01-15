@@ -29,6 +29,18 @@ import org.basex.util.list.*;
 final class WebDAVService {
   /** Name of the database with the WebDAV locks. */
   private static final String WEBDAV_DB = "~webdav";
+  /** Static WebDAV character map. */
+  private static final String WEBDAV;
+
+  static {
+    final StringBuilder sb = new StringBuilder();
+    add(160, sb);
+    for(int cp = 8192; cp <= 8207; cp++) add(cp, sb);
+    for(int cp = 8232; cp <= 8239; cp++) add(cp, sb);
+    for(int cp = 8287; cp <= 8303; cp++) add(cp, sb);
+    WEBDAV = sb.toString();
+  }
+
 
   /** HTTP connection. */
   final HTTPConnection conn;
@@ -222,7 +234,7 @@ final class WebDAVService {
       throws IOException {
 
     session().setOutputStream(out);
-    final String string = SerializerOptions.USE_CHARACTER_MAPS.arg("&#xA0;=&amp;#xA0;") +
+    final String string = SerializerOptions.USE_CHARACTER_MAPS.arg(WEBDAV) +
         (raw ? _DB_RETRIEVE : _DB_OPEN).args("$db", "$path") + "[1]";
     final WebDAVQuery query = new WebDAVQuery(string);
     query.bind("db", db);
@@ -565,5 +577,15 @@ final class WebDAVService {
   private LocalSession session() {
    if(ls == null) ls = new LocalSession(conn.context);
     return ls;
+  }
+
+  /**
+   * Adds a character mapping to the specified string builder.
+   * @param ch character to be added
+   * @param sb string builder
+   */
+  private static void add(final int ch, final StringBuilder sb) {
+    if(sb.length() > 0) sb.append(',');
+    sb.append((char) ch).append("=&amp;#").append(ch).append(";");
   }
 }

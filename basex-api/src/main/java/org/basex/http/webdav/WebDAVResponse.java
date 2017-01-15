@@ -123,8 +123,7 @@ final class WebDAVResponse extends AbstractResponse {
 
   @Override
   public Cookie setCookie(final String name, final String value) {
-    final javax.servlet.http.Cookie c =
-        new javax.servlet.http.Cookie(name, value);
+    final javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(name, value);
     res.addCookie(c);
     return new WebDAVCookie(c);
   }
