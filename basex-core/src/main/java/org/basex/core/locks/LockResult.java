@@ -1,45 +1,51 @@
 package org.basex.core.locks;
 
+import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
- * Result object for databases function.
+ * Read and write locks.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
  */
 public class LockResult {
   /** Read locks. */
-  public final StringList read = new StringList(1);
+  public final LockList reads = new LockList();
   /** Write locks. */
-  public final StringList write = new StringList(1);
-  /** Flag if global read lock is required. */
-  public boolean readAll;
-  /** Flag if global write lock is required. */
-  public boolean writeAll;
+  public final LockList writes = new LockList();
 
   /**
-   * Merge lock instances.
+   * Sequentially adds lock results to the given instance.
    * @param lr lock instance
    */
-  public void union(final LockResult lr) {
+  public void add(final LockResult lr) {
     // if command writes to currently opened database, it may affect any database that has been
     // opened before. hence, assign write locks to all opened databases
-    if(lr.write.contains(Locking.CONTEXT)) write.add(read);
+    if(lr.writes.contains(Locking.CONTEXT)) writes.add(reads);
+
     // merge local locks with global lock lists
-    read.add(lr.read);
-    write.add(lr.write);
-    readAll |= lr.readAll;
-    writeAll |= lr.writeAll;
+    reads.add(lr.reads);
+    writes.add(lr.writes);
+  }
+
+  /**
+   * Finalizes locks. Replaces context references with current database, sorts entries,
+   * removes duplicates, assigns global read lock if global write lock exists.
+   * @param ctx database context
+   */
+  public void finish(final Context ctx) {
+    // global write lock leads to global read locks
+    if(writes.global()) reads.addGlobal();
+    final Data data = ctx.data();
+    writes.finish(data);
+    reads.finish(data);
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(getClass())).append(": Read ");
-    if(readAll) sb.append(" readall");
-    sb.append(read).append(", Write ");
-    if(writeAll) sb.append(" writeall");
-    return sb.append(write).append(']').toString();
+    return new StringBuilder(Util.className(getClass())).append(": Read ").
+        append(reads).append(", Write ").append(writes).append(']').toString();
   }
 }

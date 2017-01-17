@@ -11,9 +11,8 @@ import org.basex.util.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the EXPath Cryptographic module. The tests
- * in basex-test package are only executable after a java keystore has been
- * created.
+ * This class tests the functions of the EXPath Cryptographic module. The tests in basex-test
+ * package are only executable after a java keystore has been created.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher

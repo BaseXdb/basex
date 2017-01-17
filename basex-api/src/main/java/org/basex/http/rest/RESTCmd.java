@@ -46,7 +46,7 @@ abstract class RESTCmd extends Command {
       // collect local locks and merge it with global lock list
       final LockResult tmp = new LockResult();
       cmd.databases(tmp);
-      lr.union(tmp);
+      lr.add(tmp);
     }
   }
 

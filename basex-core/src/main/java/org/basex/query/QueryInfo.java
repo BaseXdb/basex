@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
@@ -26,9 +27,9 @@ public final class QueryInfo {
   private final boolean verbose;
 
   /** Read locked databases. */
-  public StringList readLocked;
+  public LockList readLock;
   /** Write locked databases. */
-  public StringList writeLocked;
+  public LockList writeLock;
   /** Parsing time (nano seconds). */
   public long parsing;
   /** Compilation time (nano seconds). */
@@ -108,15 +109,8 @@ public final class QueryInfo {
       tb.add(HITS_X_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
       tb.add(PRINTED_CC).add(Performance.format(printed)).add(NL);
-      tb.add(READ_LOCKING_CC);
-      if(readLocked == null) tb.add(GLOBAL);
-      else if(readLocked.isEmpty()) tb.add(NONE);
-      else tb.add(LOCAL).add(' ').add(Arrays.toString(readLocked.toArray()));
-      tb.add(NL).add(WRITE_LOCKING_CC);
-      if(writeLocked == null) tb.add(GLOBAL);
-      else if(writeLocked.isEmpty()) tb.add(NONE);
-      else tb.add(LOCAL).add(' ').add(Arrays.toString(writeLocked.toArray()));
-      tb.add(NL);
+      tb.add(READ_LOCKING_CC).addExt(readLock).add(NL);
+      tb.add(WRITE_LOCKING_CC).addExt(writeLock).add(NL);
     }
     final IO baseIO = qp.sc.baseIO();
     final String name = baseIO == null ? "" : " \"" + baseIO.name() + '"';

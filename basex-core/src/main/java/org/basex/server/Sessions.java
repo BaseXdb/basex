@@ -29,4 +29,11 @@ public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
     for(final String sp : sl.sort()) tb.add(NL).add(LI).add(sp);
     return tb.toString();
   }
+
+  /**
+   * Closes all sessions.
+   */
+  public synchronized void close() {
+    while(!isEmpty()) get(size() - 1).close();
+  }
 }

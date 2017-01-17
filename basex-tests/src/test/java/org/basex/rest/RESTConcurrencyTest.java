@@ -42,8 +42,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   @BeforeClass
   public static void setUp() throws Exception {
     final StringList sl = new StringList();
-    sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z");
-    sl.add("-U" + ADMIN, "-P" + ADMIN);
+    sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z").add("-U" + ADMIN);
 
     http = new BaseXHTTP(sl.toArray());
     try(ClientSession cs = createClient()) {

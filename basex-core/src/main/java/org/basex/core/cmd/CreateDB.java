@@ -134,8 +134,8 @@ public final class CreateDB extends ACreate {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(Locking.CONTEXT);
-    lr.write.add(args[0]);
+    lr.reads.add(Locking.CONTEXT);
+    lr.writes.add(args[0]);
   }
 
   /**

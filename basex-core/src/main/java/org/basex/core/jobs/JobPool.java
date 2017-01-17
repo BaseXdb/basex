@@ -54,7 +54,7 @@ public final class JobPool {
   /**
    * Stops all jobs before closing the application.
    */
-  public void close() {
+  public synchronized void close() {
     // stop running tasks and queries
     timer.cancel();
     for(final Job job : active.values()) job.stop();

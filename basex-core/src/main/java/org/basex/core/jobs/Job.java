@@ -136,7 +136,7 @@ public abstract class Job {
    */
   public void databases(final LockResult lr) {
     // default (worst case): lock all databases
-    lr.writeAll = true;
+    lr.writes.addGlobal();
   }
 
   /**

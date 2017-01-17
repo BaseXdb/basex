@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  */
 public final class BaseXServer extends CLI implements Runnable {
   /** New sessions. */
-  private final HashSet<ClientListener> auth = new HashSet<>();
+  private final HashSet<ClientListener> authorizing = new HashSet<>();
   /** Indicates if server is running. */
   private volatile boolean running;
   /** Indicates if server is to be stopped. */
@@ -67,13 +67,14 @@ public final class BaseXServer extends CLI implements Runnable {
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param ctx database context (can be {@code null})
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
 
+    System.out.println("START SERVER");
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
     final String host = sopts.get(StaticOptions.SERVERHOST);
@@ -124,9 +125,7 @@ public final class BaseXServer extends CLI implements Runnable {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        final String stopX = Util.info(SRV_STOPPED_PORT_X, port);
-        if(!quiet) Util.outln(stopX);
-        context.log.writeServer(LogType.OK, stopX);
+        close();
       }
     });
   }
@@ -139,9 +138,6 @@ public final class BaseXServer extends CLI implements Runnable {
         final Socket s = socket.accept();
         if(stopFile.exists()) {
           close();
-          if(!stopFile.delete()) {
-            context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
-          }
         } else {
           // drop inactive connections
           final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
@@ -160,7 +156,7 @@ public final class BaseXServer extends CLI implements Runnable {
                 cl.close();
               }
             }, ka);
-            auth.add(cl);
+            authorizing.add(cl);
           }
           cl.start();
         }
@@ -189,15 +185,12 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   private synchronized void close() {
     if(!running) return;
-    running = false;
 
-    for(final ClientListener cl : auth) {
+    for(final ClientListener cl : authorizing) {
       remove(cl);
       cl.close();
     }
-    for(final ClientListener cl : context.sessions) {
-      cl.close();
-    }
+    context.sessions.close();
 
     try {
       // close interactive input if server was stopped by another process
@@ -206,6 +199,19 @@ public final class BaseXServer extends CLI implements Runnable {
       Util.errln(ex);
       context.log.writeServer(LogType.ERROR, Util.message(ex));
     }
+
+    final int port = context.soptions.get(StaticOptions.SERVERPORT);
+    final String stopX = Util.info(SRV_STOPPED_PORT_X, port);
+    if(!quiet) Util.outln(stopX);
+    context.log.writeServer(LogType.OK, stopX);
+
+    // close database context
+    context.close();
+
+    if(!stopFile.delete()) {
+      context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
+    }
+    running = false;
   }
 
   @Override
@@ -322,9 +328,9 @@ public final class BaseXServer extends CLI implements Runnable {
    * @param client client to be removed
    */
   public void remove(final ClientListener client) {
-    client.timeout.cancel();
-    synchronized(auth) {
-      auth.remove(client);
+    synchronized(authorizing) {
+      client.timeout.cancel();
+      authorizing.remove(client);
     }
   }
 

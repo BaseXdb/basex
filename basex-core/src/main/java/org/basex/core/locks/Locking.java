@@ -5,26 +5,25 @@ import static org.basex.util.Prop.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
-import org.basex.data.*;
-import org.basex.util.list.*;
 
 /**
- * Manage read and write locks on arbitrary strings. Maximum of
- * {@link StaticOptions#PARALLEL} concurrent transactions are allowed,
- * further will be queued.
+ * Read and write locks on arbitrary strings.
  *
- * This class prevents locking deadlocks by sorting all all strings
+ * A maximum of {@link StaticOptions#PARALLEL} concurrent locking jobs is allowed.
+ *
+ * (Non-)fair locking can be adjusted via the {@link StaticOptions#FAIRLOCK} option.
+ *
+ * This class prevents locking deadlocks by sorting all strings.
  *
  * Locks can only be released by the same thread which acquired it.
  *
- * Locking methods are not synchronized to each other. The user must make sure not to call
- * them in parallel by the same thread (it is fine to call arbitrary locking methods by
- * different threads at the same time).
+ * Locking methods are not synchronized to each other. The user must make sure not to call them in
+ * parallel by the same thread (it is fine to call arbitrary locking methods by different threads at
+ * the same time).
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
@@ -32,8 +31,15 @@ import org.basex.util.list.*;
 public final class Locking {
   /** Prefix for internal special locks. */
   public static final String PREFIX = "%";
+  /** Prefix for user defined locks. */
+  public static final String USER_PREFIX = "+";
+  /** Prefix for locks in Java modules. */
+  public static final String MODULE_PREFIX = "&";
+
   /** Special lock identifier for database opened in current context; will be substituted. */
   public static final String CONTEXT = PREFIX + "CONTEXT";
+  /** Special lock identifier for collection available via current context; will be substituted. */
+  public static final String COLLECTION = PREFIX + "COLLECTION";
   /** Special lock identifier for user commands. */
   public static final String USER = PREFIX + "USER";
   /** Special lock identifier for backup commands. */
@@ -41,52 +47,28 @@ public final class Locking {
   /** Special lock identifier for repository commands. */
   public static final String REPO = PREFIX + "REPO";
 
-  /** Prefix for user defined locks. */
-  public static final String USER_PREFIX = "+";
-  /** Prefix for locks in Java modules. */
-  public static final String MODULE_PREFIX = "&";
-
-  /** Lock for running thread counters. */
-  private final Object globalLock = new Object();
-  /** Number of running local writers. Guarded by {@code globalLock}. */
-  private int localWriters;
-  /** Number of running local writers. Guarded by {@code globalLock}. */
-  private int globalReaders;
-  /**
-   * Lock for global write locking.
-   * Exclusive lock - if globally writing,
-   * Shared lock    - else
-   */
-  private final ReentrantReadWriteLock writeAll = new ReentrantReadWriteLock();
-  /** Stores one lock for each object used for locking. */
-  private final Map<String, ReentrantReadWriteLock> locks = new HashMap<>();
-  /** Stores lock usage counters for each object used for locking. */
-  private final Map<String, AtomicInteger> lockUsage = new HashMap<>();
-  /**
-   * Currently running transactions.
-   * Used as monitor for atomizing access to {@link #queue}.
-   */
-  private int transactions;
-  /**
-   * Queue for transactions waiting.
-   * Used as monitor for waiting threads in queue.
-   */
-  private final Queue<Long> queue = new LinkedList<>();
-  /**
-   * Stores a list of objects each transaction has write-locked.
-   * Null means lock everything, an empty array lock nothing.
-   */
-  private final ConcurrentMap<Long, StringList> writeLocked = new ConcurrentHashMap<>();
-  /**
-   * Stores a list of objects each transaction has read-locked. Null means lock
-   * everything, an empty array lock nothing.
-   */
-  private final ConcurrentMap<Long, StringList> readLocked = new ConcurrentHashMap<>();
-
-  /** Fair scheduling; prevents starvation, but reduces parallelism. */
+  /** Fair ordering policy; prevents starvation, but reduces parallelism. */
   private final boolean fair;
   /** Maximum number of parallel locks. */
   private final int parallel;
+
+  /** Write locks assigned to threads. */
+  private final ConcurrentMap<Long, LockList> writeLocked = new ConcurrentHashMap<>();
+  /** Read locks assigned to threads. */
+  private final ConcurrentMap<Long, LockList> readLocked = new ConcurrentHashMap<>();
+  /** Queued jobs. */
+  private final Queue<Long> queued = new LinkedList<>();
+  /** Global lock: exclusive lock for global writes, shared lock otherwise. */
+  private final ReentrantReadWriteLock globalLock;
+  /** Stores one lock for each lock string. */
+  private final Map<String, LocalLock> localLocks = new HashMap<>();
+
+  /** Number of running local writers. Guarded by {@link #globalLock}. */
+  private int localWriters;
+  /** Number of running global readers. Guarded by {@link #globalLock}. */
+  private int globalReaders;
+  /** Number of currently running jobs. */
+  private int jobs;
 
   /**
    * Constructor.
@@ -95,6 +77,7 @@ public final class Locking {
   public Locking(final StaticOptions soptions) {
     fair = soptions.get(StaticOptions.FAIRLOCK);
     parallel = Math.max(soptions.get(StaticOptions.PARALLEL), 1);
+    globalLock = new ReentrantReadWriteLock(fair);
   }
 
   /**
@@ -103,69 +86,51 @@ public final class Locking {
    * @param ctx database context of client
    */
   public void acquire(final Job job, final Context ctx) {
-    // get touched databases
+    // collect lock strings
     final LockResult lr = new LockResult();
     job.databases(lr);
-    final Data data = ctx.data();
-    final StringList write = prepareLock(lr.write, lr.writeAll, data);
-    final StringList read = write == null ? null : prepareLock(lr.read, lr.readAll, data);
-    acquire(read, write);
+    lr.finish(ctx);
+    acquire(lr.reads, lr.writes);
   }
 
   /**
-   * Prepares the string list for locking.
-   * @param sl string list
-   * @param all lock all databases
-   * @param data data reference
-   * @return string list, or {@code null} if all databases need to be locked
+   * Puts read and write locks for the specified lock lists.
+   * The lists must have been prepared for locking (see {@link LockResult#finish(Context)}).
+   * @param reads read locks
+   * @param writes write locks
    */
-  private StringList prepareLock(final StringList sl, final boolean all, final Data data) {
-    if(all) return null;
-    for(int d = 0; d < sl.size(); d++) {
-      // replace context reference with real database name, or remove it if no database is open
-      if(sl.get(d).equals(Locking.CONTEXT)) {
-        if(data == null) sl.remove(d--);
-        else sl.set(d, data.meta.name);
-      }
-    }
-    return sl.sort().unique();
-  }
+  void acquire(final LockList reads, final LockList writes) {
+    final Long id = Thread.currentThread().getId();
+    final boolean locking = reads.global() || reads.local() || writes.global() || writes.local();
 
-  /**
-   * Puts read and write locks on the specified databases.
-   * @param read names of databases to put read locks on.
-   * Global locking is performed if the passed on reference is {@code null}
-   * @param write names of databases to put write locks on.
-   * Global locking is performed if the passed on reference is {@code null}
-   */
-  void acquire(final StringList read, final StringList write) {
-    final long threadId = Thread.currentThread().getId();
-    if(writeLocked.containsKey(threadId) || readLocked.containsKey(threadId))
-      throw new IllegalMonitorStateException("Thread already holds one or more locks.");
+    // one thread can only hold a single lock
+    if(writeLocked.containsKey(id) || readLocked.containsKey(id))
+      throw new IllegalMonitorStateException("Thread already holds locks.");
+    writeLocked.put(id, writes);
+    readLocked.put(id, reads);
 
-    // Wait in queue if locking strategy is fair, or if at least one database needs to be locked
-    if(fair || write == null || read == null || !write.isEmpty() || !read.isEmpty()) {
-      synchronized(queue) { // Guard queue and transaction, monitor for waiting in queue
-        queue.add(threadId);
-        while(transactions >= parallel || queue.peek() != threadId) {
+    // limit number of parallel jobs if fair locking is enabled, or if any locks need to be set
+    synchronized(queued) {
+      if(fair || locking) {
+        queued.add(id);
+        while(wait(id, writes.global() || writes.local())) {
           try {
-            queue.wait();
+            queued.wait();
           } catch(final InterruptedException ex) {
             Thread.currentThread().interrupt();
           }
         }
-        final int t = transactions++;
-        assert t <= parallel;
-        queue.remove(threadId);
+        queued.remove(id);
       }
+      jobs++;
     }
 
-    // Global write lock if write StringList is not set
-    (write == null ? writeAll.writeLock() : writeAll.readLock()).lock();
+    // apply exclusive lock (global write), or shared lock otherwise
+    if(locking) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).lock();
 
     synchronized(globalLock) {
-      // local write locking
-      if(write != null && !write.isEmpty()) {
+      // local write locks: wait for completion of global readers
+      if(writes.local()) {
         while(globalReaders > 0) {
           try {
             globalLock.wait();
@@ -175,14 +140,9 @@ public final class Locking {
         }
         localWriters++;
       }
-      // global read locking
-      if(read == null) {
-
-        //while(localWriters > 0 && (localWriters > 1 || write == null || write.isEmpty())) {
-
-        while(localWriters > 0 &&
-            // We're the only writer, allow global read lock anyway
-            !(1 == localWriters && !(null == write || write.isEmpty()))) {
+      // global read lock: wait for completion of local writers (excluding the current job)
+      if(reads.global()) {
+        while(localWriters > 1 || localWriters == 1 && !writes.local()) {
           try {
             globalLock.wait();
           } catch(final InterruptedException ex) {
@@ -193,129 +153,107 @@ public final class Locking {
       }
     }
 
-    // Local locking
-    final StringList writeObjects;
-    if(write != null) {
-      writeObjects = write.sort().unique();
-      writeLocked.put(threadId, writeObjects);
-    } else {
-      writeObjects = new StringList(0);
-    }
-    final StringList readObjects;
-    if(read != null) {
-      readObjects = read.sort().unique();
-      readLocked.put(threadId, readObjects);
-    } else {
-      readObjects = new StringList(0);
-    }
-
-    // Use pattern similar to merge sort
+    // assign locks in sorted order (to ensure that write locks will be assigned first)
     int w = 0, r = 0;
-    final int rs = readObjects.size(), ws = writeObjects.size();
+    final int rs = reads.size(), ws = writes.size();
     while(r < rs || w < ws) {
-      // Look what token comes earlier in alphabet, prefer writing against reading
-      if(w < ws && (r >= rs || writeObjects.get(w).compareTo(readObjects.get(r)) <= 0)) {
-        final String writeObject = writeObjects.get(w++);
-        setLockUsed(writeObject);
-        getOrCreateLock(writeObject).writeLock().lock();
-      } else
-      // Read lock only if not global write locking; otherwise no lock downgrading from
-      // global write lock is possible
-      if(write != null) {
-        final String readObject = readObjects.get(r++);
-        setLockUsed(readObject);
-        getOrCreateLock(readObject).readLock().lock();
+      if(w < ws && (r == rs || writes.get(w).compareTo(reads.get(r)) <= 0)) {
+        pin(writes.get(w++)).writeLock().lock();
+      } else {
+        pin(reads.get(r++)).readLock().lock();
       }
     }
   }
 
   /**
-   * Gets or creates lock on object.
-   * @param object to fetch lock for
-   * @return lock on object
-   */
-  private ReentrantReadWriteLock getOrCreateLock(final String object) {
-    ReentrantReadWriteLock lock;
-    synchronized(locks) { // Make sure each object lock is a singleton
-      lock = locks.get(object);
-      if(lock == null) { // Create lock if needed
-        lock = new ReentrantReadWriteLock(fair);
-        locks.put(object, lock);
-      }
-    }
-    return lock;
-  }
-
-  /**
-   * Removes locks for the specified job.
+   * Removes locks for the specified job, all in reverse order.
    */
   public void release() {
-    // Release all write locks
-    final Long thread = Thread.currentThread().getId();
-    final StringList writeObjects = writeLocked.remove(thread);
-    if(writeObjects != null) for(final String object : writeObjects) {
-      final ReentrantReadWriteLock lock = getOrCreateLock(object);
-      assert lock.getWriteHoldCount() == 1 : "Unexpected write lock count: "
-          + lock.getWriteHoldCount();
-      lock.writeLock().unlock();
-      unsetLockIfUnused(object);
-    }
+    final Long id = Thread.currentThread().getId();
+    final LockList writes = writeLocked.remove(id);
+    final LockList reads = readLocked.remove(id);
+    final boolean locking = reads.global() || reads.local() || writes.global() || writes.local();
 
-    // Release all read locks
-    final StringList readObjects = readLocked.remove(thread);
-    if(!writeAll.isWriteLocked() && readObjects != null)
-      for(final String object : readObjects) {
-        getOrCreateLock(object).readLock().unlock();
-        unsetLockIfUnused(object);
-      }
+    // release all local locks
+    for(final String read : reads) unpin(read).readLock().unlock();
+    for(final String write : writes) unpin(write).writeLock().unlock();
 
-    // Release global locks
-    (writeAll.isWriteLocked() ? writeAll.writeLock() : writeAll.readLock()).unlock();
-    if(writeObjects != null && !writeObjects.isEmpty()) {
-      synchronized(globalLock) {
-        localWriters--;
-        globalLock.notifyAll();
-      }
-    }
-    if(readObjects == null) {
-      synchronized(globalLock) {
+    // allow next global reader to resume
+    synchronized(globalLock) {
+      if(reads.global()) {
         globalReaders--;
         globalLock.notifyAll();
       }
     }
-    // Allow another transaction to run
-    synchronized(queue) {
-      transactions--;
-      queue.notifyAll();
+
+    // allow next local writer to resume
+    synchronized(globalLock) {
+      if(writes.local()) {
+        localWriters--;
+        globalLock.notifyAll();
+      }
+    }
+
+    // release exclusive lock (global write), or shared lock otherwise
+    if(locking) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).unlock();
+
+    // allow next queued job to resume
+    synchronized(queued) {
+      jobs--;
+      queued.notifyAll();
     }
   }
 
   /**
-   * Marks a lock as used.
-   * @param lock Lock to set used
+   * Checks if the current job should be kept in the queue.
+   * @param id thread id
+   * @param updating updating job
+   * @return result of check
    */
-  private void setLockUsed(final String lock) {
-    synchronized(locks) {
-      final AtomicInteger usage = lockUsage.get(lock);
-      if(usage == null) {
-        lockUsage.put(lock, new AtomicInteger(1));
-      } else {
-        usage.incrementAndGet();
+  private boolean wait(final Long id, final boolean updating) {
+    // limit is still exceeded
+    if(jobs >= parallel) return true;
+
+    // non-fair locking, job is updating: return false if there is at least one queued reading job
+    if(!fair && updating) {
+      for(final Long queue : queued) {
+        final LockList writing = writeLocked.get(queue);
+        if(!writing.global() && !writing.local()) return true;
       }
+    }
+    // otherwise, check if job is not the oldest one
+    return id != queued.peek();
+  }
+
+  /**
+   * Pins a lock string. Creates a new lock if necessary.
+   * @param string lock string
+   * @return lock
+   */
+  private LocalLock pin(final String string) {
+    synchronized(localLocks) {
+      LocalLock lock = localLocks.get(string);
+      if(lock == null) {
+        lock = new LocalLock(fair);
+        localLocks.put(string, lock);
+      }
+      lock.pin();
+      return lock;
     }
   }
 
   /**
-   * Unsets lock if unused.
-   * @param object Object to test
+   * Unpins a lock string. Removes a lock if pin count is zero.
+   * @param string lock string
+   * @return lock
    */
-  private void unsetLockIfUnused(final String object) {
-    synchronized(locks) {
-      final AtomicInteger usage = lockUsage.get(object);
-      if(usage.decrementAndGet() == 0) {
-        locks.remove(object);
-        lockUsage.remove(object);
+  private LocalLock unpin(final String string) {
+    synchronized(localLocks) {
+      final LocalLock lock = localLocks.get(string);
+      if(lock.unpin() == 0) {
+        localLocks.remove(lock);
       }
+      return lock;
     }
   }
 
@@ -328,20 +266,19 @@ public final class Locking {
     final StringBuilder sb = new StringBuilder(NL);
     sb.append("Locking" + NL);
     final String ind = "| ";
-    sb.append(ind + "Transactions running: " + transactions + NL);
-    sb.append(ind + "Transaction queue: " + queue + NL);
+    sb.append(ind + "Transactions running: " + jobs + NL);
+    sb.append(ind + "Transaction queued: " + queued + NL);
     sb.append(ind + "Held locks by object:" + NL);
-    synchronized(locks) {
-      for(final Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
+    synchronized(localLocks) {
+      for(final Entry<String, LocalLock> e : localLocks.entrySet())
         sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
     }
-    sb.append(ind + "Held write locks by transaction:" + NL);
-    for(final Entry<Long, StringList> entry : writeLocked.entrySet())
+    sb.append(ind + "Held write locks by job:" + NL);
+    for(final Entry<Long, LockList> entry : writeLocked.entrySet())
       sb.append(ind + ind + entry.getKey() + " -> " + entry.getValue() + NL);
-    sb.append(ind + "Held read locks by transaction:" + NL);
-    for(final Entry<Long, StringList> entry : readLocked.entrySet())
+    sb.append(ind + "Held read locks by job:" + NL);
+    for(final Entry<Long, LockList> entry : readLocked.entrySet())
       sb.append(ind + ind + entry.getKey() + " -> " + entry.getValue() + NL);
     return sb.toString();
   }
-
 }

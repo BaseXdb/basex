@@ -8,12 +8,10 @@ import org.basex.core.cmd.*;
 import org.basex.core.locks.*;
 import org.basex.index.*;
 import org.basex.query.func.*;
-import org.basex.util.list.*;
 import org.junit.Test;
 
 /**
- * This class tests commands and XQueries for correct identification of databases
- * to lock.
+ * This class tests commands and XQueries for correct identification of databases to lock.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
@@ -32,24 +30,25 @@ public final class CommandLockingTest extends SandboxTest {
   /** Test repository. **/
   private static final String REPO = "src/test/resources/repo/";
   /** Empty StringList. */
-  private static final StringList NONE = new StringList(0);
+  private static final LockList NONE = new LockList();
   /** StringList containing name. */
-  private static final StringList NAME_LIST = new StringList(NAME);
+  private static final LockList NAME_LIST = new LockList().add(NAME);
   /** StringList containing context. */
-  private static final StringList CTX_LIST = new StringList(Locking.CONTEXT);
+  private static final LockList CTX_LIST = new LockList().add(Locking.CONTEXT);
   /** StringList containing name and context. */
-  private static final StringList NAME_CTX = new StringList(NAME, Locking.CONTEXT);
+  private static final LockList NAME_CTX = new LockList().add(NAME).add(Locking.CONTEXT);
   /** StringList containing USER lock string. */
-  private static final StringList USER_LIST = new StringList(Locking.USER);
+  private static final LockList USER_LIST = new LockList().add(Locking.USER);
   /** StringList containing REPO lock string. */
-  private static final StringList REPO_LIST = new StringList(Locking.REPO);
+  private static final LockList REPO_LIST = new LockList().add(Locking.REPO);
   /** StringList containing BACKUP lock string. */
-  private static final StringList BACKUP_LIST = new StringList(Locking.BACKUP);
+  private static final LockList BACKUP_LIST = new LockList().add(Locking.BACKUP);
   /** StringList containing BACKUP lock string and name. */
-  private static final StringList BACKUP_NAME = new StringList(Locking.BACKUP, NAME);
+  private static final LockList BACKUP_NAME =
+      new LockList().add(Locking.BACKUP).add(NAME);
   /** StringList containing java module test lock strings. */
-  private static final StringList MODULE_LIST = new StringList(Locking.MODULE_PREFIX
-      + QueryModuleTest.LOCK1, Locking.MODULE_PREFIX + QueryModuleTest.LOCK2);
+  private static final LockList MODULE_LIST = new LockList().add(Locking.MODULE_PREFIX
+      + QueryModuleTest.LOCK1).add(Locking.MODULE_PREFIX + QueryModuleTest.LOCK2);
 
   /**
    * Test commands affecting databases.
@@ -57,12 +56,12 @@ public final class CommandLockingTest extends SandboxTest {
   @Test
   public void databaseCommands() {
     ckDBs(new Add(FILE, FILE), true, CTX_LIST);
-    ckDBs(new AlterDB(NAME, NAME2), true, new StringList(NAME, NAME2));
+    ckDBs(new AlterDB(NAME, NAME2), true, new LockList().add(NAME).add(NAME2));
     ckDBs(new AlterPassword(NAME, NAME), true, USER_LIST);
     ckDBs(new AlterUser(NAME, NAME), true, USER_LIST);
     ckDBs(new Check(NAME), false, NAME_CTX);
     ckDBs(new Close(), false, CTX_LIST);
-    ckDBs(new Copy(NAME2, NAME), new StringList(NAME2), NAME_LIST);
+    ckDBs(new Copy(NAME2, NAME), new LockList().add(NAME2), NAME_LIST);
     ckDBs(new CreateBackup(NAME), NAME_LIST, BACKUP_LIST);
     ckDBs(new CreateDB(NAME), CTX_LIST, NAME_LIST);
     ckDBs(new CreateIndex(IndexType.TEXT), true, CTX_LIST);
@@ -296,9 +295,9 @@ public final class CommandLockingTest extends SandboxTest {
    * Pass empty string for currently opened database, {@code null} for all.
    * @param cmd command to test
    * @param up updating command?
-   * @param dbs required and allowed databases
+   * @param dbs required and allowed databases (can be {@code null})
    */
-  private static void ckDBs(final Command cmd, final boolean up, final StringList dbs) {
+  private static void ckDBs(final Command cmd, final boolean up, final LockList dbs) {
     ckDBs(cmd, up, dbs, dbs);
   }
 
@@ -307,10 +306,10 @@ public final class CommandLockingTest extends SandboxTest {
    * no additional ones allowed.
    * Pass empty string for currently opened database, {@code null} for all.
    * @param cmd command to test
-   * @param read required and allowed databases for read lock
-   * @param write required and allowed databases for write lock
+   * @param read required and allowed databases for read lock (can be {@code null})
+   * @param write required and allowed databases for write lock (can be {@code null})
    */
-  private static void ckDBs(final Command cmd, final StringList read, final StringList write) {
+  private static void ckDBs(final Command cmd, final LockList read, final LockList write) {
     ckDBs(cmd, read, read, write, write);
   }
 
@@ -319,11 +318,11 @@ public final class CommandLockingTest extends SandboxTest {
    * Pass empty string for currently opened database, {@code null} for all.
    * @param cmd command to test
    * @param up updating command?
-   * @param req required databases
-   * @param allow allowed databases
+   * @param req required databases (can be {@code null})
+   * @param allow allowed databases (can be {@code null})
    */
-  private static void ckDBs(final Command cmd, final boolean up, final StringList req,
-      final StringList allow) {
+  private static void ckDBs(final Command cmd, final boolean up, final LockList req,
+      final LockList allow) {
     ckDBs(cmd, up ? NONE : req, up ? NONE : allow, up ? req : NONE, up ? allow : NONE);
   }
 
@@ -331,35 +330,51 @@ public final class CommandLockingTest extends SandboxTest {
    * Test if the right databases are identified for locking.
    * Pass empty string for currently opened database, {@code null} for all.
    * @param cmd command to test
-   * @param reqRd required databases for read locks
-   * @param allowRd allowed databases for read locks
-   * @param reqWt required databases for write locks
-   * @param allowWt allowed databases for write locks
+   * @param reqRd required databases for read locks (can be {@code null})
+   * @param allowRd allowed databases for read locks (can be {@code null})
+   * @param reqWt required databases for write locks (can be {@code null})
+   * @param allowWt allowed databases for write locks (can be {@code null})
    */
-  private static void ckDBs(final Command cmd, final StringList reqRd, final StringList allowRd,
-                            final StringList reqWt, final StringList allowWt) {
+  private static void ckDBs(final Command cmd, final LockList reqRd, final LockList allowRd,
+      final LockList reqWt, final LockList allowWt) {
+
     // Fetch databases BaseX thinks it needs to lock
     final LockResult lr = new LockResult();
     cmd.updating(DUMMY_CONTEXT);
     cmd.databases(lr);
     // Need sorted lists for compareAll
-    for(final StringList list : new StringList[]
-        {reqRd, allowRd, reqWt, allowWt, lr.read, lr.write})
-      if(list != null) list.sort(false).unique();
+    final LockList[] lists = { reqRd, allowRd, reqWt, allowWt, lr.reads, lr.writes };
+    for(final LockList list : lists) {
+      if(list != null) list.finish(null);
+    }
 
     // Test if read locking too much or less databases
-    if(reqRd == null && !lr.readAll) fail("Should read lock all databases, didn't.");
-    if(reqRd != null && allowRd != null && !lr.read.containsAll(reqRd))
+    if(reqRd == null && !lr.reads.global()) fail("Should read lock all databases, didn't.");
+    if(reqRd != null && allowRd != null && !containsAll(lr.reads, reqRd))
       fail("Didn't read lock all necessary databases.");
-    if(allowRd != null && lr.readAll) fail("Read locked all databases, may not.");
-    if(allowRd != null && !allowRd.containsAll(lr.read))
+    if(allowRd != null && lr.reads.global()) fail("Read locked all databases, may not.");
+    if(allowRd != null && !containsAll(allowRd, lr.reads))
       fail("Read locked more databases than I should.");
     // Test if write locking too much or less databases
-    if(reqWt == null && !lr.writeAll) fail("Should write lock all databases, didn't.");
-    if(reqWt != null && allowWt != null && !lr.write.containsAll(reqWt))
+    if(reqWt == null && !lr.writes.global()) fail("Should write lock all databases, didn't.");
+    if(reqWt != null && allowWt != null && !containsAll(lr.writes, reqWt))
       fail("Didn't write lock all necessary databases.");
-    if(allowWt != null && lr.writeAll) fail("Write locked all databases, may not.");
-    if(allowWt != null && !allowWt.containsAll(lr.write))
+    if(allowWt != null && lr.writes.global()) fail("Write locked all databases, may not.");
+    if(allowWt != null && !containsAll(allowWt, lr.writes))
       fail("Write locked more databases than I should.");
   }
+
+  /**
+   * Check if all elements of the second list are contained in the first.
+   * @param list1 first list
+   * @param list2 second list
+   * @return result of check
+   */
+  private static boolean containsAll(final LockList list1, final LockList list2) {
+    for(final String lock : list2) {
+      if(!list1.contains(lock)) return false;
+    }
+    return true;
+  }
+
 }

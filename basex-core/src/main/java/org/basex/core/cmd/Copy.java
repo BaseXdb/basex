@@ -92,8 +92,8 @@ public final class Copy extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(args[0]);
-    lr.write.add(args[1]);
+    lr.reads.add(args[0]);
+    lr.writes.add(args[1]);
   }
 
   @Override

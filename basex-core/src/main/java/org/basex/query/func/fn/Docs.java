@@ -19,9 +19,6 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public abstract class Docs extends StandardFunc {
-  /** Special lock identifier for collection available via current context; will be substituted. */
-  public static final String COLL = Locking.PREFIX + "COLL";
-
   /**
    * Returns a collection.
    * @param qc query context
@@ -58,7 +55,7 @@ public abstract class Docs extends StandardFunc {
   public final boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
       // only applies to collections
-      if(!visitor.lock(COLL)) return false;
+      if(!visitor.lock(Locking.COLLECTION)) return false;
     } else {
       final Expr expr = exprs[0];
       if(expr instanceof Str) {

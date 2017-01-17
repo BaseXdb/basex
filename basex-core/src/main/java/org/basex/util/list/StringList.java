@@ -109,23 +109,6 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Check if all elements of the specified list are contained in the list.
-   * Both lists must be sorted.
-   * @param elements sorted list
-   * @return result of check
-   */
-  public final boolean containsAll(final StringList elements) {
-    int i = 0;
-    final int s = size;
-    for(final String e : elements) {
-      for(int d; (d = list[i].compareTo(e)) != 0;) {
-        if(++i >= s || d > 0) return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Deletes the element at the specified position.
    * @param index index of the element to delete
    * @return deleted element

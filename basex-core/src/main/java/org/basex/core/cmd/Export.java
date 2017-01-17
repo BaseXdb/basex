@@ -52,7 +52,7 @@ public final class Export extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(Locking.CONTEXT);
+    lr.reads.add(Locking.CONTEXT);
   }
 
   /**

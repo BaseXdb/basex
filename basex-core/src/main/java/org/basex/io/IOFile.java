@@ -230,7 +230,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Deletes the file or directory.
+   * Deletes the file, or the directory and its children.
    * @return {@code true} if the file does not exist or has been deleted.
    */
   public boolean delete() {

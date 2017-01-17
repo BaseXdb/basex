@@ -103,9 +103,7 @@ public final class ServerAddTest extends SandboxTest {
         session.execute("set " + MainOptions.AUTOFLUSH.name() + " false");
         session.execute("set " + MainOptions.INTPARSE.name() + " true");
         session.execute("open " + NAME);
-        for(int i = 0; i < runs; ++i) {
-          session.execute("add " + INPUT);
-        }
+        for(int i = 0; i < runs; ++i) session.execute("add " + INPUT);
         session.close();
       } catch(final Exception ex) {
         ex.printStackTrace();

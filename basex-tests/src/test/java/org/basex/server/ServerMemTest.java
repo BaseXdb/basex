@@ -5,8 +5,8 @@ import org.basex.api.client.*;
 import org.junit.*;
 
 /**
- * This class performs a client/server memory stress tests with a specified
- * number of threads and queries.
+ * This class performs a client/server memory stress tests with a specified number of threads and
+ * queries.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen

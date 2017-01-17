@@ -39,8 +39,7 @@ public class Execute extends Command {
 
   @Override
   public final void databases(final LockResult lr) {
-    if(updating) lr.writeAll = true;
-    else lr.readAll = true;
+    (updating ? lr.writes : lr.reads).addGlobal();
   }
 
   @Override

@@ -8,7 +8,6 @@ import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runners.*;
@@ -364,7 +363,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Lock downgrading, the other thread is reader.
+   * Locks downgrading, the other thread is reader.
    * @throws InterruptedException Got interrupted.
    */
   @Test
@@ -386,7 +385,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Lock downgrading, the other thread is writer.
+   * Locks downgrading, the other thread is writer.
    * @throws InterruptedException Got interrupted.
    */
   @Test
@@ -410,7 +409,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Downgrade from global write lock, other fetches local writes locks.
+   * Downgrades from global write lock, other fetches local writes locks.
    * @throws InterruptedException Got interrupted.
    */
   @Test
@@ -431,7 +430,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Downgrade from global write lock, other fetches local writes locks.
+   * Downgrades from global write lock, other fetches local writes locks.
    * @throws InterruptedException Got interrupted.
    */
   @Test
@@ -450,7 +449,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Lock downgrading holding read locks.
+   * Locks downgrading holding read locks.
    * @throws InterruptedException Got interrupted.
    */
   @Test
@@ -475,7 +474,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Force deadlock.
+   * Forces a deadlock.
    * @throws InterruptedException Got interrupted.
    */
   @Test
@@ -483,11 +482,11 @@ public final class LockingTest extends SandboxTest {
     final CountDownLatch sync = new CountDownLatch(1), test2 = new CountDownLatch(1),
         test3 = new CountDownLatch(1);
 
-    final LockTester th1 = new LockTester(null, NONE, new String[] {"3"}, sync);
-    final LockTester th2 = new LockTester(sync, new String[] {"2"},
-        new String[] {"1", "3"}, test2);
-    final LockTester th3 = new LockTester(sync, new String[] {"1"},
-        new String[] {"2", "3"}, test3);
+    final LockTester th1 = new LockTester(null, NONE, new String[] { "3" }, sync);
+    final LockTester th2 = new LockTester(
+        sync, new String[] { "2" }, new String[] { "1", "3" }, test2);
+    final LockTester th3 = new LockTester(
+        sync, new String[] { "1" }, new String[] { "2", "3" }, test3);
 
     th1.start();
     // Make sure thread 1 has wl(3)
@@ -568,30 +567,40 @@ public final class LockingTest extends SandboxTest {
     private final CountDownLatch await;
     /** Latch to count down after locking. */
     private final CountDownLatch countDown;
-    /** Array of objects to put read locks onto. */
-    private final String[] readObjects;
-    /** Array of objects to put write locks onto. */
-    private final String[] writeObjects;
+    /** Array of objects to put read locks onto (can be {@code null}). */
+    private final LockList readObjects = new LockList();
+    /** Array of objects to put write locks onto (can be {@code null}). */
+    private final LockList writeObjects = new LockList();
     /** Flag indicating to release locks after being notified. */
     private volatile boolean requestRelease;
 
     /**
      * Setup locking thread. Call {@code start} to lock, notify the thread to unlock.
-     * @param a Latch to await
-     * @param r Strings to put read lock on
-     * @param w Strings to put write lock on
-     * @param c Latch to count down after receiving locks
+     * @param await latch to await
+     * @param reads strings to put read lock on (can be {@code null})
+     * @param writes strings to put write lock on (can be {@code null})
+     * @param countDown latch to count down after receiving locks
      */
-    LockTester(final CountDownLatch a, final String[] r, final String[] w, final CountDownLatch c) {
-      await = a;
-      readObjects = r;
-      writeObjects = w;
-      countDown = c;
+    LockTester(final CountDownLatch await, final String[] reads, final String[] writes,
+        final CountDownLatch countDown) {
+
+      this.await = await;
+      this.countDown = countDown;
+      if(reads == null) {
+        readObjects.addGlobal();
+      } else {
+        for(final String read : reads) readObjects.add(read);
+      }
+      if(writes == null) {
+        writeObjects.addGlobal();
+      } else {
+        for(final String write : writes) writeObjects.add(write);
+      }
     }
 
     @Override
     public void run() {
-      // Await latch if set
+      // await latch if set
       if(await != null) {
         try {
           if(!await.await(WAIT, TimeUnit.MILLISECONDS)) fail("Latch timed out.");
@@ -600,15 +609,13 @@ public final class LockingTest extends SandboxTest {
         }
       }
 
-      // Fetch lock if objects are set
-      locks.acquire(
-        readObjects != null ? new StringList().add(readObjects) : null,
-        writeObjects != null ? new StringList().add(writeObjects) : null);
+      // fetch lock if objects are set
+      locks.acquire(readObjects, writeObjects);
 
-      // We hold the lock, count down
+      // we hold the lock, count down
       if(countDown != null) countDown.countDown();
 
-      // Wait until we're asked to release the lock
+      // wait until we're asked to release the lock
       synchronized(this) {
         try {
           while(!requestRelease) wait();
@@ -620,7 +627,7 @@ public final class LockingTest extends SandboxTest {
     }
 
     /**
-     * Release all locks tester owns. {@code release} gets called by other threads, so it
+     * Releases all locks tester owns. {@code release} gets called by other threads, so it
      * cannot release locks directly (the thread holding the lock must do this). Set flag
      * in object that lock should be released and wake up all threads.
      */

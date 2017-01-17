@@ -53,8 +53,8 @@ public final class List extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    if(args[0].isEmpty()) lr.readAll = true;
-    else lr.read.add(args[0]);
+    if(args[0].isEmpty()) lr.reads.addGlobal();
+    else lr.reads.add(args[0]);
   }
 
   /**

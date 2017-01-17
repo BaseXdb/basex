@@ -52,7 +52,7 @@ public final class AlterDB extends ACreate {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.write.add(args);
+    lr.writes.add(args[0]).add(args[1]);
   }
 
   /**

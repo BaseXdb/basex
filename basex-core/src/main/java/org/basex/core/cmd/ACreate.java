@@ -113,7 +113,7 @@ public abstract class ACreate extends Command {
   @Override
   public void databases(final LockResult lr) {
     // default implementation for commands accessing (exclusively) the opened database
-    lr.write.add(Locking.CONTEXT);
+    lr.writes.add(Locking.CONTEXT);
   }
 
   @Override

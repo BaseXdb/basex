@@ -7,13 +7,13 @@ import java.util.*;
 
 import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 import org.xml.sax.*;
 
 /**
@@ -352,17 +352,17 @@ public abstract class Command extends Job {
   }
 
   /**
-   * Adds the names of the database that has been addressed by the argument index. No databases will
-   * be added if the argument uses glob syntax.
-   * @param db databases
+   * Adds the name of the database that has been addressed by the argument index.
+   * No databases will be added if the argument uses glob syntax.
+   * @param list lock list
    * @param index argument index
    * @return {@code false} if database cannot be determined due to glob syntax
    */
-  protected final boolean databases(final StringList db, final int index) {
+  protected final boolean databases(final LockList list, final int index) {
     // return true if the addressed database argument does not exists
     if(args.length <= index || args[index] == null) return true;
     final boolean noglob = !args[index].matches(".*[\\?\\*,].*");
-    if(noglob) db.add(args[index]);
+    if(noglob) list.add(args[index]);
     return noglob;
   }
 

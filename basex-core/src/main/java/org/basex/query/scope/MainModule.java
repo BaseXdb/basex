@@ -15,7 +15,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * An XQuery main module.
@@ -169,7 +168,7 @@ public final class MainModule extends Module {
     /** Already visited scopes. */
     private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
     /** Reference to process list of locked databases. */
-    private final StringList sl;
+    private final LockList locks;
     /** Focus level. */
     private int level;
 
@@ -179,7 +178,7 @@ public final class MainModule extends Module {
      * @param qc query context
      */
     private LockVisitor(final LockResult lr, final QueryContext qc) {
-      sl = qc.updating ? lr.write : lr.read;
+      locks = qc.updating ? lr.writes : lr.reads;
       level = qc.ctxItem == null ? 0 : 1;
     }
 
@@ -188,7 +187,7 @@ public final class MainModule extends Module {
       // name is unknown at compile time: return false
       if(db == null) return false;
       // if context item is found on top level, it will refer to currently opened database
-      if(level == 0 || db != Locking.CONTEXT) sl.add(db);
+      if(level == 0 || db != Locking.CONTEXT) locks.add(db);
       return true;
     }
 

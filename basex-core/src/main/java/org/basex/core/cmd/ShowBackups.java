@@ -50,6 +50,6 @@ public final class ShowBackups extends ABackup {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(Locking.BACKUP);
+    lr.reads.add(Locking.BACKUP);
   }
 }

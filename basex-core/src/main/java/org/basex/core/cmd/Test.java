@@ -69,6 +69,6 @@ public final class Test extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.writeAll = true;
+    lr.writes.addGlobal();
   }
 }

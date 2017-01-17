@@ -61,7 +61,7 @@ public final class Restore extends ABackup {
     super.databases(lr);
     // Not sure whether database or name of backup file is provided: lock both
     final String backup = args[0];
-    lr.write.add(backup).add(Databases.name(backup));
+    lr.writes.add(backup).add(Databases.name(backup));
   }
 
   /**

@@ -79,6 +79,6 @@ abstract class AUser extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.write.add(Locking.USER);
+    lr.writes.add(Locking.USER);
   }
 }

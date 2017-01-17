@@ -150,8 +150,7 @@ public final class Context {
    */
   public synchronized void close() {
     jobs.close();
-    // stop sessions, close data references
-    while(!sessions.isEmpty()) sessions.get(0).close();
+    sessions.close();
     datas.close();
     log.close();
   }

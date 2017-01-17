@@ -58,7 +58,7 @@ public final class Find extends AQuery {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(Locking.CONTEXT);
+    lr.reads.add(Locking.CONTEXT);
   }
 
   /**

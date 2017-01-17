@@ -39,8 +39,8 @@ public final class ReadWriteTest extends SandboxTest {
       execute(new XQuery(_DB_ADD.args(NAME, "<a/>", "a.xml")));
 
       // global locking: add document in parallel; see GH-1400
-      //execute(new XQuery("let $db := <a>" + NAME + "</a> return " +
-      //  _DB_ADD.args("$db", "<a/>", "a.xml")));
+      execute(new XQuery("let $db := <a>" + NAME + "</a> return " +
+        _DB_ADD.args("$db", "<a/>", "a.xml")));
 
       // stop sleeping process, wait for its completion
       execute(new XQuery(_JOBS_STOP.args(id)));

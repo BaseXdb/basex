@@ -151,7 +151,7 @@ public abstract class Sandbox {
   public static void finishSandbox() {
     context.close();
     Prop.clear();
-    if(!sandbox().delete()) throw Util.notExpected("Sandbox could not be created.");
+    if(!sandbox().delete()) throw Util.notExpected("Sandbox could not be deleted.");
   }
 
   /**

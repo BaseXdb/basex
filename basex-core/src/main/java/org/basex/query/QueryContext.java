@@ -21,7 +21,6 @@ import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.*;
@@ -106,9 +105,9 @@ public final class QueryContext extends Job implements Closeable {
   public TokenObjMap<Collation> collations;
 
   /** Strings to lock defined by read-lock option. */
-  public final StringList readLocks = new StringList(0);
+  public final LockList readLocks = new LockList();
   /** Strings to lock defined by write-lock option. */
-  public final StringList writeLocks = new StringList(0);
+  public final LockList writeLocks = new LockList();
 
   /** Number of successive tail calls. */
   public int tailCalls;
@@ -425,17 +424,14 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(readLocks);
-    lr.write.add(writeLocks);
+    final LockList read = lr.reads, write = lr.writes;
+    read.add(readLocks);
+    write.add(writeLocks);
     // use global locking if referenced databases cannot be statically determined
     if(root == null || !root.databases(lr, this) ||
        ctxItem != null && !ctxItem.databases(lr, this)) {
-      if(updating) lr.writeAll = true;
-      else lr.readAll = true;
+      (updating ? write : read).addGlobal();
     }
-    // replace collection lock with context lock
-    if(lr.read.delete(Docs.COLL)) lr.read.add(Locking.CONTEXT);
-    if(lr.write.delete(Docs.COLL)) lr.write.add(Locking.CONTEXT);
   }
 
   /**
