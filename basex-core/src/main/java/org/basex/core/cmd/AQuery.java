@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
@@ -255,13 +255,13 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
+    final Locks locks = job().locks;
     if(qp == null) {
-      lr.writes.addGlobal();
+      locks.writes.addGlobal();
     } else {
-      qp.addLocks(lr);
-      info.readLock = lr.reads;
-      info.writeLock = lr.writes;
+      qp.addLocks();
+      info.locks = locks;
     }
   }
 

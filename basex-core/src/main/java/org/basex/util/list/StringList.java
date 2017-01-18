@@ -120,6 +120,19 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
+   * Removes all elements from the specified list.
+   * @param elements elements
+   */
+  public void remove(final StringList elements) {
+    for(int l1 = elements.size(); --l1 >= 0;) {
+      final String lock1 = elements.get(l1);
+      for(int l2 = size(); --l2 >= 0;) {
+        if(get(l2).equals(lock1)) remove(l2);
+      }
+    }
+  }
+
+  /**
    * Removes all occurrences of the specified element from the list.
    * @param element element to be removed
    * @return flag, indicating if any element was removed

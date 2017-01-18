@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
@@ -60,7 +59,7 @@ public final class JobsResult extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
     // no locks needed
   }
 

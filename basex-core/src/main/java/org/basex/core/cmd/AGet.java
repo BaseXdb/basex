@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 
 /**
@@ -20,7 +19,7 @@ abstract class AGet extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
     // no locks needed
   }
 }

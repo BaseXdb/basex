@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -31,7 +30,7 @@ public final class Info extends AInfo {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
     // no locks needed
   }
 

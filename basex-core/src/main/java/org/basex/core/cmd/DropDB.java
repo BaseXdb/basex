@@ -95,8 +95,9 @@ public final class DropDB extends ACreate {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    if(!addLocks(lr.writes, 0)) lr.writes.addGlobal();
+  public void addLocks() {
+    final Locks locks = job().locks;
+    if(!addLocks(locks.writes, 0)) locks.writes.addGlobal();
   }
 
   @Override

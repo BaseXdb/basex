@@ -60,8 +60,8 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    lr.writes.add(Locking.CONTEXT);
+  public void addLocks() {
+    job().locks.writes.add(Locking.CONTEXT);
   }
 
   @Override

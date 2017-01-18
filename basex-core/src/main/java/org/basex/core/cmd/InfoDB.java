@@ -32,8 +32,8 @@ public final class InfoDB extends AInfo {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    lr.reads.add(Locking.CONTEXT);
+  public void addLocks() {
+    job().locks.reads.add(Locking.CONTEXT);
   }
 
   /**

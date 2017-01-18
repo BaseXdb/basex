@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdShow;
@@ -30,7 +29,7 @@ public final class ShowSessions extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
     // no locks needed
   }
 

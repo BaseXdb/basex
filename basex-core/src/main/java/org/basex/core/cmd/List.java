@@ -52,9 +52,10 @@ public final class List extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    if(args[0].isEmpty()) lr.reads.addGlobal();
-    else lr.reads.add(args[0]);
+  public void addLocks() {
+    final Locks locks = job().locks;
+    if(args[0].isEmpty()) locks.reads.addGlobal();
+    else locks.reads.add(args[0]);
   }
 
   /**

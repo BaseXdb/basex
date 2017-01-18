@@ -9,7 +9,6 @@ import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
-import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -204,8 +203,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    qp.addLocks(lr);
+  public void addLocks() {
+    qp.addLocks();
   }
 
   /**

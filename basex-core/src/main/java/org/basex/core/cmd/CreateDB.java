@@ -133,9 +133,10 @@ public final class CreateDB extends ACreate {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    lr.reads.add(Locking.CONTEXT);
-    lr.writes.add(args[0]);
+  public void addLocks() {
+    final Locks locks = job().locks;
+    locks.reads.add(Locking.CONTEXT);
+    locks.writes.add(args[0]);
   }
 
   /**

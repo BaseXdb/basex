@@ -17,30 +17,21 @@ public class Locks {
   public final LockList writes = new LockList();
 
   /**
-   * Sequentially adds lock results to the given instance.
-   * @param lr lock instance
-   */
-  public void add(final Locks lr) {
-    // if command writes to currently opened database, it may affect any database that has been
-    // opened before. hence, assign write locks to all opened databases
-    if(lr.writes.contains(Locking.CONTEXT)) writes.add(reads);
-
-    // merge local locks with global lock lists
-    reads.add(lr.reads);
-    writes.add(lr.writes);
-  }
-
-  /**
    * Finalizes locks. Replaces context references with current database, sorts entries,
    * removes duplicates, assigns global read lock if global write lock exists.
    * @param ctx database context
    */
   public void finish(final Context ctx) {
-    // global write lock leads to global read locks
-    if(writes.global()) reads.addGlobal();
+    // global write lock: no read locks required
+    if(writes.global()) reads.reset();
+
+    // resolve context references, sort, remove duplicates
     final Data data = ctx.data();
     writes.finish(data);
     reads.finish(data);
+
+    // remove read locks that are also defined as write locks
+    reads.remove(writes);
   }
 
   @Override

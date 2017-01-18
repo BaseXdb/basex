@@ -47,6 +47,14 @@ public final class LockList implements Iterable<String> {
   }
 
   /**
+   * Resets the lock list.
+   */
+  public void reset() {
+    global = false;
+    list.reset();
+  }
+
+  /**
    * Indicates if a global lock exists.
    * @return result of check
    */
@@ -76,6 +84,14 @@ public final class LockList implements Iterable<String> {
       }
     }
     return this;
+  }
+
+  /**
+   * Removes all locks from the specified list.
+   * @param locks lock list
+   */
+  public void remove(final LockList locks) {
+    list.remove(locks.list);
   }
 
   /**

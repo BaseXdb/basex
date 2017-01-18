@@ -111,9 +111,9 @@ public abstract class ACreate extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
     // default implementation for commands accessing (exclusively) the opened database
-    lr.writes.add(Locking.CONTEXT);
+    job().locks.writes.add(Locking.CONTEXT);
   }
 
   @Override

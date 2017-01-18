@@ -41,12 +41,19 @@ abstract class RESTCmd extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
+    final Locks locks = job().locks;
+    final LockList reads = locks.reads, writes = locks.writes;
+
     for(final Command cmd : session.commands) {
-      // collect local locks and merge it with global lock list
-      final Locks tmp = new Locks();
-      cmd.addLocks(tmp);
-      lr.add(tmp);
+      cmd.addLocks();
+      // if command updates the context, it may affect any database that has been opened before.
+      // hence, all read locks will be added to list of write locks
+      final Locks cmdLocks = cmd.job().locks;
+      if(cmdLocks.writes.contains(Locking.CONTEXT)) writes.add(reads);
+      // merge lock lists
+      reads.add(cmdLocks.reads);
+      writes.add(cmdLocks.writes);
     }
   }
 

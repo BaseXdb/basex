@@ -43,8 +43,8 @@ public final class Context {
   public final Databases databases;
   /** Log. */
   public final Log log;
-  /** Locked jobs. */
-  public final Locking locks;
+  /** Locking. */
+  public final Locking locking;
 
   /** Current node context. Set if it does not contain all documents of the current database. */
   private DBNodes current;
@@ -100,7 +100,7 @@ public final class Context {
     sessions = ctx.sessions;
     databases = ctx.databases;
     blocker = ctx.blocker;
-    locks = ctx.locks;
+    locking = ctx.locking;
     users = ctx.users;
     repo = ctx.repo;
     log = ctx.log;
@@ -118,7 +118,7 @@ public final class Context {
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(soptions);
-    locks = new Locking(soptions);
+    locking = new Locking(soptions);
     users = new Users(soptions);
     repo = new EXPathRepo(soptions);
     log = new Log(soptions);

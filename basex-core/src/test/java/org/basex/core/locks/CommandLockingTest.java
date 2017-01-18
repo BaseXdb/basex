@@ -339,28 +339,29 @@ public final class CommandLockingTest extends SandboxTest {
       final LockList reqWt, final LockList allowWt) {
 
     // Fetch databases BaseX thinks it needs to lock
-    final Locks lr = new Locks();
     cmd.updating(DUMMY_CONTEXT);
-    cmd.addLocks(lr);
-    // Need sorted lists for compareAll
-    final LockList[] lists = { reqRd, allowRd, reqWt, allowWt, lr.reads, lr.writes };
-    for(final LockList list : lists) {
+    cmd.addLocks();
+
+    final Locks locks = cmd.job().locks;
+    cmd.job().locks.finish(context);
+
+    for(final LockList list : new LockList[] { reqRd, allowRd, reqWt, allowWt }) {
       if(list != null) list.finish(null);
     }
 
     // Test if read locking too much or less databases
-    if(reqRd == null && !lr.reads.global()) fail("Should read lock all databases, didn't.");
-    if(reqRd != null && allowRd != null && !containsAll(lr.reads, reqRd))
+    if(reqRd == null && !locks.reads.global()) fail("Should read lock all databases, didn't.");
+    if(reqRd != null && allowRd != null && !containsAll(locks.reads, reqRd))
       fail("Didn't read lock all necessary databases.");
-    if(allowRd != null && lr.reads.global()) fail("Read locked all databases, may not.");
-    if(allowRd != null && !containsAll(allowRd, lr.reads))
+    if(allowRd != null && locks.reads.global()) fail("Read locked all databases, may not.");
+    if(allowRd != null && !containsAll(allowRd, locks.reads))
       fail("Read locked more databases than I should.");
     // Test if write locking too much or less databases
-    if(reqWt == null && !lr.writes.global()) fail("Should write lock all databases, didn't.");
-    if(reqWt != null && allowWt != null && !containsAll(lr.writes, reqWt))
+    if(reqWt == null && !locks.writes.global()) fail("Should write lock all databases, didn't.");
+    if(reqWt != null && allowWt != null && !containsAll(locks.writes, reqWt))
       fail("Didn't write lock all necessary databases.");
-    if(allowWt != null && lr.writes.global()) fail("Write locked all databases, may not.");
-    if(allowWt != null && !containsAll(allowWt, lr.writes))
+    if(allowWt != null && locks.writes.global()) fail("Write locked all databases, may not.");
+    if(allowWt != null && !containsAll(allowWt, locks.writes))
       fail("Write locked more databases than I should.");
   }
 

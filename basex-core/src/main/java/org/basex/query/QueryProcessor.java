@@ -7,7 +7,6 @@ import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
-import org.basex.core.locks.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
@@ -265,8 +264,8 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    qc.addLocks(lr);
+  public void addLocks() {
+    qc.addLocks();
   }
 
   /**

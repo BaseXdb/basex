@@ -67,6 +67,8 @@ public final class Locking {
   private int localWriters;
   /** Number of running global readers. Guarded by {@link #globalLock}. */
   private int globalReaders;
+  /* Number of current readers.
+  private int readers; */
   /** Number of currently running jobs. */
   private int jobs;
 
@@ -87,10 +89,11 @@ public final class Locking {
    */
   public void acquire(final Job job, final Context ctx) {
     // collect lock strings
-    final Locks lr = new Locks();
-    job.addLocks(lr);
-    lr.finish(ctx);
-    acquire(lr.reads, lr.writes);
+    job.addLocks();
+
+    final Locks locks = job.job().locks;
+    locks.finish(ctx);
+    acquire(locks.reads, locks.writes);
   }
 
   /**
@@ -101,7 +104,7 @@ public final class Locking {
    */
   void acquire(final LockList reads, final LockList writes) {
     final Long id = Thread.currentThread().getId();
-    final boolean locking = reads.locking() || writes.locking();
+    final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
 
     // one thread can only hold a single lock
     if(writeLocked.containsKey(id) || readLocked.containsKey(id))
@@ -109,11 +112,16 @@ public final class Locking {
     writeLocked.put(id, writes);
     readLocked.put(id, reads);
 
-    // limit number of parallel jobs if fair locking is enabled, or if any locks need to be set
+    // limit number of parallel jobs if any locks need to be set, or if fair locking is enabled
     synchronized(queued) {
-      if(fair || locking) {
+      if(lock || fair) {
         queued.add(id);
-        //while(wait(id, writes.locking())) {
+        //if(!write) readers++;
+        /* wait...
+         * if limit is exceeded,
+         * if fair locking is disabled, job is updating, and other readers exist, or
+         * if last head of the queue is not the current job */
+        // !fair && write && readers > 0 ||
         while(jobs >= parallel || id != queued.peek()) {
           try {
             queued.wait();
@@ -121,13 +129,14 @@ public final class Locking {
             Thread.currentThread().interrupt();
           }
         }
+        //if(!write) readers--;
         queued.remove(id);
       }
       jobs++;
     }
 
     // apply exclusive lock (global write), or shared lock otherwise
-    if(locking) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).lock();
+    if(lock) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).lock();
 
     synchronized(globalLock) {
       // local write locks: wait for completion of global readers
@@ -172,7 +181,7 @@ public final class Locking {
   public void release() {
     final Long id = Thread.currentThread().getId();
     final LockList reads = readLocked.remove(id), writes = writeLocked.remove(id);
-    final boolean locking = reads.locking() || writes.locking();
+    final boolean lock = reads.locking() || writes.locking();
 
     // release all local locks
     for(final String read : reads) unpin(read).readLock().unlock();
@@ -195,7 +204,7 @@ public final class Locking {
     }
 
     // release exclusive lock (global write), or shared lock otherwise
-    if(locking) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).unlock();
+    if(lock) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).unlock();
 
     // allow next queued job to resume
     synchronized(queued) {
@@ -203,28 +212,6 @@ public final class Locking {
       queued.notifyAll();
     }
   }
-
-  /*
-   * Checks if the current job should be kept in the queue.
-   * @param id thread id
-   * @param updating indicates if job is updating
-   * @return result of check
-  private boolean wait(final Long id, final boolean updating) {
-    // limit is still exceeded
-    if(jobs >= parallel) return true;
-
-    // non-fair locking, job is updating: return true if there is at least one queued reading job
-    if(!fair && updating) {
-      for(final Long queue : queued) {
-        if(!writeLocked.get(queue).locking()) {
-          return true;
-        }
-      }
-    }
-    // otherwise, check if job is not the oldest one
-    return id != queued.peek();
-  }
-   */
 
   /**
    * Pins a lock string. Creates a new lock if necessary.

@@ -3,7 +3,6 @@ package org.basex.core.jobs;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.util.*;
 
@@ -44,7 +43,7 @@ public abstract class Job {
     jc.context = ctx;
     ctx.jobs.register(this);
     state(JobState.QUEUED);
-    ctx.locks.acquire(this, ctx);
+    ctx.locking.acquire(this, ctx);
     state(JobState.RUNNING);
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
@@ -57,7 +56,7 @@ public abstract class Job {
    */
   public final void unregister(final Context ctx) {
     stopTimeout();
-    ctx.locks.release();
+    ctx.locking.release();
     ctx.jobs.unregister(this);
   }
 
@@ -131,12 +130,11 @@ public abstract class Job {
   }
 
   /**
-   * Adds the names of the databases that may be touched by the job.
-   * @param lr container for lock result to pass around
+   * Adds the strings (databases, special identifiers) for which locks need to be acquired.
    */
-  public void addLocks(final Locks lr) {
+  public void addLocks() {
     // default (worst case): lock all databases
-    lr.writes.addGlobal();
+    jc.locks.writes.addGlobal();
   }
 
   /**

@@ -91,9 +91,10 @@ public final class Copy extends Command {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    lr.reads.add(args[0]);
-    lr.writes.add(args[1]);
+  public void addLocks() {
+    final Locks locks = job().locks;
+    locks.reads.add(args[0]);
+    locks.writes.add(args[1]);
   }
 
   @Override

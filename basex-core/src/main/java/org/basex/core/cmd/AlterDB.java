@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdAlter;
@@ -51,8 +50,8 @@ public final class AlterDB extends ACreate {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    lr.writes.add(args[0]).add(args[1]);
+  public void addLocks() {
+    job().locks.writes.add(args[0]).add(args[1]);
   }
 
   /**

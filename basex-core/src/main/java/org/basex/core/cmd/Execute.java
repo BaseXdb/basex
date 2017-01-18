@@ -38,8 +38,9 @@ public class Execute extends Command {
   }
 
   @Override
-  public final void addLocks(final Locks lr) {
-    (updating ? lr.writes : lr.reads).addGlobal();
+  public final void addLocks() {
+    final Locks locks = job().locks;
+    (updating ? locks.writes : locks.reads).addGlobal();
   }
 
   @Override

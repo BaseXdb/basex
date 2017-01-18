@@ -29,8 +29,8 @@ public final class RepoList extends ARepo {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    lr.reads.add(Locking.REPO);
+  public void addLocks() {
+    job().locks.reads.add(Locking.REPO);
   }
 
   @Override

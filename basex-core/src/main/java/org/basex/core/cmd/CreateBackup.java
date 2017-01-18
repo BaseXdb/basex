@@ -7,7 +7,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
@@ -90,9 +89,9 @@ public final class CreateBackup extends ABackup {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    super.addLocks(lr);
-    addLocks(lr.reads, 0);
+  public void addLocks() {
+    super.addLocks();
+    addLocks(job().locks.reads, 0);
   }
 
   @Override

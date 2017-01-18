@@ -1,6 +1,7 @@
 package org.basex.core.jobs;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -22,6 +23,8 @@ public final class JobContext {
   public QueryTracer tracer = QueryTracer.ERRLN;
   /** Database context. */
   public Context context;
+  /** Registered locks. */
+  public Locks locks = new Locks();
 
   /** Root job. */
   private final Job root;

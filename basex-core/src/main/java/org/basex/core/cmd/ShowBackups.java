@@ -49,7 +49,7 @@ public final class ShowBackups extends ABackup {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    lr.reads.add(Locking.BACKUP);
+  public void addLocks() {
+    job().locks.reads.add(Locking.BACKUP);
   }
 }

@@ -423,13 +423,14 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    final LockList read = lr.reads, write = lr.writes;
+  public void addLocks() {
+    final Locks locks = job().locks;
+    final LockList read = locks.reads, write = locks.writes;
     read.add(readLocks);
     write.add(writeLocks);
     // use global locking if referenced databases cannot be statically determined
-    if(root == null || !root.databases(lr, this) ||
-       ctxItem != null && !ctxItem.databases(lr, this)) {
+    if(root == null || !root.databases(locks, this) ||
+       ctxItem != null && !ctxItem.databases(locks, this)) {
       (updating ? write : read).addGlobal();
     }
   }

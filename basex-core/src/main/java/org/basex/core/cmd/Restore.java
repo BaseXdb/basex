@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -57,11 +56,11 @@ public final class Restore extends ABackup {
   }
 
   @Override
-  public void addLocks(final Locks lr) {
-    super.addLocks(lr);
+  public void addLocks() {
+    super.addLocks();
     // Not sure whether database or name of backup file is provided: lock both
     final String backup = args[0];
-    lr.writes.add(backup).add(Databases.name(backup));
+    job().locks.writes.add(backup).add(Databases.name(backup));
   }
 
   /**
