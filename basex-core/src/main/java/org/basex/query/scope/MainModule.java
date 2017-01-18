@@ -156,7 +156,7 @@ public final class MainModule extends Module {
    * @param qc query context
    * @return result of check
    */
-  public boolean databases(final LockResult lr, final QueryContext qc) {
+  public boolean databases(final Locks lr, final QueryContext qc) {
     return expr.accept(new LockVisitor(lr, qc));
   }
 
@@ -177,7 +177,7 @@ public final class MainModule extends Module {
      * @param lr lock result
      * @param qc query context
      */
-    private LockVisitor(final LockResult lr, final QueryContext qc) {
+    private LockVisitor(final Locks lr, final QueryContext qc) {
       locks = qc.updating ? lr.writes : lr.reads;
       level = qc.ctxItem == null ? 0 : 1;
     }

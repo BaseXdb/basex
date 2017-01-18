@@ -41,11 +41,11 @@ abstract class RESTCmd extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     for(final Command cmd : session.commands) {
       // collect local locks and merge it with global lock list
-      final LockResult tmp = new LockResult();
-      cmd.databases(tmp);
+      final Locks tmp = new Locks();
+      cmd.addLocks(tmp);
       lr.add(tmp);
     }
   }

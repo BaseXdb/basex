@@ -55,6 +55,14 @@ public final class LockList implements Iterable<String> {
   }
 
   /**
+   * Indicates if any lock exists.
+   * @return result of check
+   */
+  public boolean locking() {
+    return global() || local();
+  }
+
+  /**
    * Adds another lock list. A global lock will be adopted.
    * @param locks lock list
    * @return self reference

@@ -52,7 +52,7 @@ public final class JobsStop extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     // no locks needed
   }
 

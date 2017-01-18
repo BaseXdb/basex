@@ -265,8 +265,8 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   @Override
-  public void databases(final LockResult lr) {
-    qc.databases(lr);
+  public void addLocks(final Locks lr) {
+    qc.addLocks(lr);
   }
 
   /**

@@ -90,9 +90,9 @@ public final class CreateBackup extends ABackup {
   }
 
   @Override
-  public void databases(final LockResult lr) {
-    super.databases(lr);
-    databases(lr.reads, 0);
+  public void addLocks(final Locks lr) {
+    super.addLocks(lr);
+    addLocks(lr.reads, 0);
   }
 
   @Override

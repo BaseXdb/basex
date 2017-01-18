@@ -134,7 +134,7 @@ public abstract class Job {
    * Adds the names of the databases that may be touched by the job.
    * @param lr container for lock result to pass around
    */
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     // default (worst case): lock all databases
     lr.writes.addGlobal();
   }

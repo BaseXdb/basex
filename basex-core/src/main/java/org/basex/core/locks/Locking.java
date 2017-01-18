@@ -87,21 +87,21 @@ public final class Locking {
    */
   public void acquire(final Job job, final Context ctx) {
     // collect lock strings
-    final LockResult lr = new LockResult();
-    job.databases(lr);
+    final Locks lr = new Locks();
+    job.addLocks(lr);
     lr.finish(ctx);
     acquire(lr.reads, lr.writes);
   }
 
   /**
    * Puts read and write locks for the specified lock lists.
-   * The lists must have been prepared for locking (see {@link LockResult#finish(Context)}).
+   * The lists must have been prepared for locking (see {@link Locks#finish(Context)}).
    * @param reads read locks
    * @param writes write locks
    */
   void acquire(final LockList reads, final LockList writes) {
     final Long id = Thread.currentThread().getId();
-    final boolean locking = reads.global() || reads.local() || writes.global() || writes.local();
+    final boolean locking = reads.locking() || writes.locking();
 
     // one thread can only hold a single lock
     if(writeLocked.containsKey(id) || readLocked.containsKey(id))
@@ -113,7 +113,8 @@ public final class Locking {
     synchronized(queued) {
       if(fair || locking) {
         queued.add(id);
-        while(wait(id, writes.global() || writes.local())) {
+        //while(wait(id, writes.locking())) {
+        while(jobs >= parallel || id != queued.peek()) {
           try {
             queued.wait();
           } catch(final InterruptedException ex) {
@@ -170,9 +171,8 @@ public final class Locking {
    */
   public void release() {
     final Long id = Thread.currentThread().getId();
-    final LockList writes = writeLocked.remove(id);
-    final LockList reads = readLocked.remove(id);
-    final boolean locking = reads.global() || reads.local() || writes.global() || writes.local();
+    final LockList reads = readLocked.remove(id), writes = writeLocked.remove(id);
+    final boolean locking = reads.locking() || writes.locking();
 
     // release all local locks
     for(final String read : reads) unpin(read).readLock().unlock();
@@ -204,26 +204,27 @@ public final class Locking {
     }
   }
 
-  /**
+  /*
    * Checks if the current job should be kept in the queue.
    * @param id thread id
-   * @param updating updating job
+   * @param updating indicates if job is updating
    * @return result of check
-   */
   private boolean wait(final Long id, final boolean updating) {
     // limit is still exceeded
     if(jobs >= parallel) return true;
 
-    // non-fair locking, job is updating: return false if there is at least one queued reading job
+    // non-fair locking, job is updating: return true if there is at least one queued reading job
     if(!fair && updating) {
       for(final Long queue : queued) {
-        final LockList writing = writeLocked.get(queue);
-        if(!writing.global() && !writing.local()) return true;
+        if(!writeLocked.get(queue).locking()) {
+          return true;
+        }
       }
     }
     // otherwise, check if job is not the oldest one
     return id != queued.peek();
   }
+   */
 
   /**
    * Pins a lock string. Creates a new lock if necessary.

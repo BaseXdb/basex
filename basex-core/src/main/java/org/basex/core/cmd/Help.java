@@ -39,7 +39,7 @@ public final class Help extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     // no locks needed
   }
 }

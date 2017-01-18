@@ -61,7 +61,7 @@ public final class InfoIndex extends AInfo {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     lr.reads.add(Locking.CONTEXT);
   }
 

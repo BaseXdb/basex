@@ -1,11 +1,11 @@
-package org.basex.core;
+package org.basex.core.locks;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.locks.*;
 import org.basex.index.*;
 import org.basex.query.func.*;
 import org.junit.Test;
@@ -339,9 +339,9 @@ public final class CommandLockingTest extends SandboxTest {
       final LockList reqWt, final LockList allowWt) {
 
     // Fetch databases BaseX thinks it needs to lock
-    final LockResult lr = new LockResult();
+    final Locks lr = new Locks();
     cmd.updating(DUMMY_CONTEXT);
-    cmd.databases(lr);
+    cmd.addLocks(lr);
     // Need sorted lists for compareAll
     final LockList[] lists = { reqRd, allowRd, reqWt, allowWt, lr.reads, lr.writes };
     for(final LockList list : lists) {

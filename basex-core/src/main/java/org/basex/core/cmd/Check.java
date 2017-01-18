@@ -88,7 +88,7 @@ public final class Check extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     lr.reads.add(Locking.CONTEXT).add(IO.get(args[0]).dbName());
   }
 

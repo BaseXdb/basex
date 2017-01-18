@@ -74,7 +74,6 @@ public final class BaseXServer extends CLI implements Runnable {
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
 
-    System.out.println("START SERVER");
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
     final String host = sopts.get(StaticOptions.SERVERHOST);

@@ -62,7 +62,7 @@ public final class Open extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     lr.reads.add(Locking.CONTEXT).add(args[0]);
   }
 

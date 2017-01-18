@@ -255,11 +255,11 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     if(qp == null) {
       lr.writes.addGlobal();
     } else {
-      qp.databases(lr);
+      qp.addLocks(lr);
       info.readLock = lr.reads;
       info.writeLock = lr.writes;
     }

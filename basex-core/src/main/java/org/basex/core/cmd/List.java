@@ -52,7 +52,7 @@ public final class List extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     if(args[0].isEmpty()) lr.reads.addGlobal();
     else lr.reads.add(args[0]);
   }

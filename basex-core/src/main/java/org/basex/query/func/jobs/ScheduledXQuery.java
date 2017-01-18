@@ -204,8 +204,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
   }
 
   @Override
-  public void databases(final LockResult lr) {
-    qp.databases(lr);
+  public void addLocks(final Locks lr) {
+    qp.addLocks(lr);
   }
 
   /**

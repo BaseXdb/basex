@@ -45,7 +45,7 @@ public final class Retrieve extends ACreate {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     lr.reads.add(Locking.CONTEXT);
   }
 }

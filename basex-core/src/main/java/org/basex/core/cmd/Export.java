@@ -51,7 +51,7 @@ public final class Export extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     lr.reads.add(Locking.CONTEXT);
   }
 

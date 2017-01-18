@@ -20,7 +20,7 @@ abstract class ABackup extends Command {
   }
 
   @Override
-  public void databases(final LockResult lr) {
+  public void addLocks(final Locks lr) {
     lr.writes.add(Locking.BACKUP); // No parallel backup operations
   }
 }

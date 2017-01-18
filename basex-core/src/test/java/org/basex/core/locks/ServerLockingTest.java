@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.core.locks;
 
 import static org.junit.Assert.*;
 import java.io.*;
@@ -23,7 +23,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)
-public final class LockingTest extends SandboxTest {
+public final class ServerLockingTest extends SandboxTest {
   /** How often should tests be repeated? */
   private static final int REPEAT = 1;
 
@@ -34,15 +34,9 @@ public final class LockingTest extends SandboxTest {
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";
-  /** XQuery code for handling latches. */
-  private static final String Q
-    = "Q{java:org.basex.server.LockingTest}countDownAndWait()";
   /** How often to run each query in load test. */
   private static final int RUN_COUNT = 100;
-  /**
-   * Queries to run in load test, %1$s will get substituted by DB name, %2$s by code for
-   * sleeping {@code SLEEP_LOAD} milliseconds.
-   */
+  /** Queries to run in load test. */
   private static final String[] QUERIES = {
     "%2$s",
     "(db:open('%1$s'), %2$s)",
@@ -50,6 +44,12 @@ public final class LockingTest extends SandboxTest {
     "for $i in ('%1$s') return insert node %2$s into db:open($i)",
     "for $i in ('%1$s') return (db:open($i), %2$s)"
   };
+  /** XQuery code for handling latches. */
+  private static final String Q;
+
+  static {
+    Q = "Q{" + ServerLockingTest.class.getName() + "}countDownAndWait()";
+  }
 
   /** Server reference. */
   private static BaseXServer server;
@@ -205,23 +205,15 @@ public final class LockingTest extends SandboxTest {
     final ArrayList<Client> clients = new ArrayList<>(totalQueries);
     final CountDownLatch allDone = new CountDownLatch(totalQueries);
 
-    for(int i = 0; i < RUN_COUNT; i++)
-      for(final String query : QUERIES)
+    for(int i = 0; i < RUN_COUNT; i++) {
+      for(final String query : QUERIES) {
         clients.add(new Client(new XQuery(f(query, NAME, "1")), null, allDone));
+      }
+    }
 
     allDone.await(totalQueries * SLEEP, TimeUnit.MILLISECONDS);
-    for(final Client client : clients)
-        assertTrue(client.error, client.error == null);
-  }
-
-  /**
-   * Test for concurrent writes.
-   */
-  @Test
-  public void downgradeTest() {
-    // hangs if QueryContext.downgrade call is activated..
-    execute(new CreateDB(NAME, "<x/>"));
-    query("delete node /y");
-    query("let $d := '" + NAME + "' return db:open($d)");
+    for(final Client client : clients) {
+      assertTrue(client.error, client.error == null);
+    }
   }
 }

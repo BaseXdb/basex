@@ -5,12 +5,12 @@ import org.basex.data.*;
 import org.basex.util.*;
 
 /**
- * Read and write locks.
+ * Read and write locks of a single job.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
  */
-public class LockResult {
+public class Locks {
   /** Read locks. */
   public final LockList reads = new LockList();
   /** Write locks. */
@@ -20,7 +20,7 @@ public class LockResult {
    * Sequentially adds lock results to the given instance.
    * @param lr lock instance
    */
-  public void add(final LockResult lr) {
+  public void add(final Locks lr) {
     // if command writes to currently opened database, it may affect any database that has been
     // opened before. hence, assign write locks to all opened databases
     if(lr.writes.contains(Locking.CONTEXT)) writes.add(reads);

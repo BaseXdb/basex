@@ -57,8 +57,8 @@ public final class Restore extends ABackup {
   }
 
   @Override
-  public void databases(final LockResult lr) {
-    super.databases(lr);
+  public void addLocks(final Locks lr) {
+    super.addLocks(lr);
     // Not sure whether database or name of backup file is provided: lock both
     final String backup = args[0];
     lr.writes.add(backup).add(Databases.name(backup));
