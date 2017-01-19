@@ -2,7 +2,6 @@ package org.basex.core.locks;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -11,7 +10,7 @@ import org.basex.core.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runners.*;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized.*;
 
 /**
  * Locking tests.
@@ -48,18 +47,9 @@ public final class LockingTest extends SandboxTest {
   /** Locking instance used for testing. */
   private final Locking locks = new Locking(context.soptions);
   /** Objects used for locking. */
-  private final String[] objects = new String[5];
+  private final String[] objects = { "0", "1", "2", "3", "4" };
   /** Empty string array for convenience. */
-  private static final String[] NONE = new String[0];
-
-  /**
-   * Test preparations: create objects for locking.
-   */
-  @Before
-  public void before() {
-    final int ol = objects.length;
-    for(int o = 0; o < ol; o++) objects[o] = Integer.toString(o);
-  }
+  private static final String[] NONE = { };
 
   /**
    * Single thread acquires both global read lock and a single write lock.
@@ -163,11 +153,10 @@ public final class LockingTest extends SandboxTest {
     final CountDownLatch latch =
         new CountDownLatch(Math.max(context.soptions.get(StaticOptions.PARALLEL), 1));
     // Container for(maximum number allowed transactions) + 1 testers
-    final LockTester[] testers = (LockTester[]) Array.newInstance(
-        LockTester.class, (int) (latch.getCount() + 1));
+    final int tl = (int) latch.getCount() + 1;
+    final LockTester[] testers = new LockTester[tl];
 
     // Start maximum number of allowed transactions
-    final int tl = testers.length;
     for(int t = 0; t < tl - 1; t++) {
       testers[t] = new LockTester(null, objects, NONE, latch);
       testers[t].start();
@@ -576,7 +565,7 @@ public final class LockingTest extends SandboxTest {
 
     /**
      * Setup locking thread. Call {@code start} to lock, notify the thread to unlock.
-     * @param await latch to await
+     * @param await latch to await (can be {@code null})
      * @param reads strings to put read lock on (can be {@code null})
      * @param writes strings to put write lock on (can be {@code null})
      * @param countDown latch to count down after receiving locks
@@ -610,20 +599,21 @@ public final class LockingTest extends SandboxTest {
       }
 
       // fetch lock if objects are set
-      locks.acquire(readObjects, writeObjects);
+      try {
+        locks.acquire(readObjects, writeObjects);
 
-      // we hold the lock, count down
-      if(countDown != null) countDown.countDown();
+        // we hold the lock, count down
+        if(countDown != null) countDown.countDown();
 
-      // wait until we're asked to release the lock
-      synchronized(this) {
-        try {
+        // wait until we're asked to release the lock
+        synchronized(this) {
           while(!requestRelease) wait();
-        } catch(final InterruptedException e) {
-          throw new RuntimeException("Unexpectedly interrupted.");
         }
+
+        locks.release();
+      } catch(InterruptedException ex) {
+        throw new RuntimeException("Unexpectedly interrupted.");
       }
-      locks.release();
     }
 
     /**

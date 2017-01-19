@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
  */
-public class Locks {
+public final class Locks {
   /** Read locks. */
   public final LockList reads = new LockList();
   /** Write locks. */

@@ -35,7 +35,7 @@ public final class ServerLockingTest extends SandboxTest {
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";
   /** How often to run each query in load test. */
-  private static final int RUN_COUNT = 100;
+  private static final int RUN_COUNT = 10;
   /** Queries to run in load test. */
   private static final String[] QUERIES = {
     "%2$s",

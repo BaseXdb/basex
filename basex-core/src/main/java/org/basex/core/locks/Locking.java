@@ -49,15 +49,16 @@ public final class Locking {
 
   /** Fair ordering policy; prevents starvation, but reduces parallelism. */
   private final boolean fair;
-  /** Maximum number of parallel locks. */
+  /** Maximum number of parallel jobs. */
   private final int parallel;
 
   /** Write locks assigned to threads. */
   private final ConcurrentMap<Long, LockList> writeLocked = new ConcurrentHashMap<>();
   /** Read locks assigned to threads. */
   private final ConcurrentMap<Long, LockList> readLocked = new ConcurrentHashMap<>();
-  /** Queued jobs. */
-  private final Queue<Long> queued = new LinkedList<>();
+  /** Lock queue. */
+  private final LockQueue queue;
+
   /** Global lock: exclusive lock for global writes, shared lock otherwise. */
   private final ReentrantReadWriteLock globalLock;
   /** Stores one lock for each lock string. */
@@ -67,8 +68,6 @@ public final class Locking {
   private int localWriters;
   /** Number of running global readers. Guarded by {@link #globalLock}. */
   private int globalReaders;
-  /* Number of current readers.
-  private int readers; */
   /** Number of currently running jobs. */
   private int jobs;
 
@@ -80,6 +79,7 @@ public final class Locking {
     fair = soptions.get(StaticOptions.FAIRLOCK);
     parallel = Math.max(soptions.get(StaticOptions.PARALLEL), 1);
     globalLock = new ReentrantReadWriteLock(fair);
+    queue = fair ? new FairLockQueue() : new NonfairLockQueue();
   }
 
   /**
@@ -91,9 +91,19 @@ public final class Locking {
     // collect lock strings
     job.addLocks();
 
+    // prepare lock strings and acquire locks
     final Locks locks = job.job().locks;
     locks.finish(ctx);
-    acquire(locks.reads, locks.writes);
+
+    try {
+      acquire(locks.reads, locks.writes);
+    } catch(final InterruptedException ex) {
+      Thread.currentThread().interrupt();
+      job.stop();
+    }
+
+    // before running the job, check if it has been stopped
+    job.checkStop();
   }
 
   /**
@@ -101,8 +111,9 @@ public final class Locking {
    * The lists must have been prepared for locking (see {@link Locks#finish(Context)}).
    * @param reads read locks
    * @param writes write locks
+   * @throws InterruptedException interrupted exception
    */
-  void acquire(final LockList reads, final LockList writes) {
+  void acquire(final LockList reads, final LockList writes) throws InterruptedException {
     final Long id = Thread.currentThread().getId();
     final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
 
@@ -112,26 +123,9 @@ public final class Locking {
     writeLocked.put(id, writes);
     readLocked.put(id, reads);
 
-    // limit number of parallel jobs if any locks need to be set, or if fair locking is enabled
-    synchronized(queued) {
-      if(lock || fair) {
-        queued.add(id);
-        //if(!write) readers++;
-        /* wait...
-         * if limit is exceeded,
-         * if fair locking is disabled, job is updating, and other readers exist, or
-         * if last head of the queue is not the current job */
-        // !fair && write && readers > 0 ||
-        while(jobs >= parallel || id != queued.peek()) {
-          try {
-            queued.wait();
-          } catch(final InterruptedException ex) {
-            Thread.currentThread().interrupt();
-          }
-        }
-        //if(!write) readers--;
-        queued.remove(id);
-      }
+    // queue job if the job limit has been reached
+    synchronized(queue) {
+      if(jobs >= parallel) queue.wait(id, read, write);
       jobs++;
     }
 
@@ -141,24 +135,12 @@ public final class Locking {
     synchronized(globalLock) {
       // local write locks: wait for completion of global readers
       if(writes.local()) {
-        while(globalReaders > 0) {
-          try {
-            globalLock.wait();
-          } catch(final InterruptedException ex) {
-            Thread.currentThread().interrupt();
-          }
-        }
+        while(globalReaders > 0) globalLock.wait();
         localWriters++;
       }
       // global read lock: wait for completion of local writers (excluding the current job)
       if(reads.global()) {
-        while(localWriters > 1 || localWriters == 1 && !writes.local()) {
-          try {
-            globalLock.wait();
-          } catch(final InterruptedException ex) {
-            Thread.currentThread().interrupt();
-          }
-        }
+        while(localWriters > 1 || localWriters == 1 && !writes.local()) globalLock.wait();
         globalReaders++;
       }
     }
@@ -207,9 +189,9 @@ public final class Locking {
     if(lock) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).unlock();
 
     // allow next queued job to resume
-    synchronized(queued) {
+    synchronized(queue) {
       jobs--;
-      queued.notifyAll();
+      queue.notifyAll();
     }
   }
 
@@ -245,17 +227,13 @@ public final class Locking {
     }
   }
 
-  /**
-   * Present current locking status. Not to be seen as a programming API but only for
-   * debugging purposes.
-   */
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(NL);
     sb.append("Locking" + NL);
     final String ind = "| ";
-    sb.append(ind + "Transactions running: " + jobs + NL);
-    sb.append(ind + "Transaction queued: " + queued + NL);
+    sb.append(ind + "Running jobs: " + jobs + NL);
+    sb.append(ind + queue + NL);
     sb.append(ind + "Held locks by object:" + NL);
     synchronized(localLocks) {
       for(final Entry<String, LocalLock> e : localLocks.entrySet())
