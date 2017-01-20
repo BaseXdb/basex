@@ -34,7 +34,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.DateTime;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -591,16 +590,6 @@ public final class QueryContext extends Job implements Closeable {
   @Override
   public String shortInfo() {
     return SAVE;
-  }
-
-  @Override
-  public String detailedInfo() {
-    return PLEASE_WAIT_D;
-  }
-
-  @Override
-  public double progressInfo() {
-    return 0;
   }
 
   // CLASS METHODS ======================================================================

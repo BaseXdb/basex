@@ -9,8 +9,9 @@ import java.net.*;
 
 import javax.swing.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.dialog.*;
 import org.basex.util.*;
 
@@ -199,7 +200,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param gui parent reference
    * @param text text
    * @param buttons additional buttons
-   * @return chosen action (button text): {@link #B_YES}, {@link #B_NO}, {@link #B_CANCEL}
+   * @return chosen action ({@link Text#B_YES}, {@link Text#B_NO}, {@link Text#B_CANCEL})
    */
   public static String yesNoCancel(final GUI gui, final String text, final String... buttons) {
     return new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL, buttons).action();

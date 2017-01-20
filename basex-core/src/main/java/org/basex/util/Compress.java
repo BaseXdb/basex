@@ -46,7 +46,7 @@ public final class Compress {
     }
 
     // loop through and compress all characters
-    int in = 0, off = 2;
+    int in, off = 2;
     for(final byte t : text) {
       final int b = t >= 0 ? map[t] : t, s;
       if(b >= 0x00 && b < 0x08) { // 1 xxx

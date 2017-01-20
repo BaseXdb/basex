@@ -19,8 +19,6 @@ public interface HTTPText {
   /** DBA String. */
   String DBA = "dba";
 
-  /** Error: unknown user. */
-  String WHICHUSER_X = "User does not exist: %.";
   /** Error: wrong authorization. */
   String WRONGAUTH_X = "% authentication expected.";
   /** Error message. */

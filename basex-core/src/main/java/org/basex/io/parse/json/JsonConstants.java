@@ -46,8 +46,6 @@ public interface JsonConstants {
 
   /** Supported data types. */
   byte[][] TYPES = { OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, NULL };
-  /** Escape characters. */
-  byte[] ESCAPES = token("\"\\/bfnrtu");
   /** Plural. */
   byte[] S = { 's' };
   /** Global data type attributes. */

@@ -41,12 +41,12 @@ final class InvDocTest extends Test {
   static Test get(final Value rt) {
     // use simple test if database contains only one document
     final Data data = rt.data();
-    if(data.meta.ndocs == 1) return Test.DOC;
+    if(data.meta.ndocs == 1) return KindTest.DOC;
 
     // adopt nodes from existing sequence
     if(rt instanceof DBNodeSeq) {
       final DBNodeSeq seq = (DBNodeSeq) rt;
-      return seq.all() ? Test.DOC : new InvDocTest(new IntList(seq.pres()), data);
+      return seq.all() ? KindTest.DOC : new InvDocTest(new IntList(seq.pres()), data);
     }
 
     // loop through all documents and add pre values of documents

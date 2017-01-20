@@ -188,8 +188,8 @@ public abstract class W3CTS extends Main {
     if(verbose) Util.outln();
     final Value nodes = minimum ?
       nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
-      group != null ? nodes("//*:test-group[@name eq '" + group +
-          "']//*:test-case", root) : nodes("//*:test-case", root);
+      nodes(group != null ? "//*:test-group[@name eq '" + group +
+        "']//*:test-case" : "//*:test-case", root);
 
     long total = nodes.size();
     Util.out("Parsing " + total + " Queries");
@@ -369,7 +369,7 @@ public abstract class W3CTS extends Main {
         final boolean print = currTime || !logStr.contains("current-");
 
         boolean correctError = false;
-        if(er != null && (expOut.size() == 0 || !expError.isEmpty())) {
+        if(er != null && (expOut.isEmpty() || !expError.isEmpty())) {
           expError = error(pth + outname, expError);
           final String code = er.substring(0, Math.min(8, er.length()));
           for(final String e : SLASH.split(expError)) {
@@ -414,7 +414,7 @@ public abstract class W3CTS extends Main {
           }
           if((rs > 0 || !expError.isEmpty()) && r == rs && !inspect) {
             if(print) {
-              if(expOut.size() == 0) result.add(error(pth + outname, expError));
+              if(expOut.isEmpty()) result.add(error(pth + outname, expError));
               logErr.append(logStr);
               logErr.append('[' + testid + " ] ");
               logErr.append(norm(string(result.get(0))));
@@ -439,7 +439,7 @@ public abstract class W3CTS extends Main {
             ++ok;
           }
         } else {
-          if(expOut.size() == 0 || !expError.isEmpty()) {
+          if(expOut.isEmpty() || !expError.isEmpty()) {
             if(print) {
               logOK2.append(logStr);
               logOK2.append('[' + testid + " ] ");

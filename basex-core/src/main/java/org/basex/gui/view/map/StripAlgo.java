@@ -37,8 +37,7 @@ final class StripAlgo extends MapAlgo {
 
       double y = yy;
       for(int i = start; i <= ni; ++i) {
-        int h = i == ni ? (int) (yy + hh - y) :
-          (int) (ml.weight[i] / weight * hh);
+        int h = (int) (i == ni ? yy + hh - y : ml.weight[i] / weight * hh);
         h = h > 0 ? h : 1;
 
         if(yy <= yy + hh)

@@ -78,7 +78,7 @@ public final class DBNew {
     boolean cache = false;
     for(final DBOptions dbopts : dboptions) {
       final Object obj = dbopts.get(MainOptions.ADDCACHE);
-      if(obj instanceof Boolean && ((Boolean) obj).booleanValue()) {
+      if(obj instanceof Boolean && (Boolean) obj) {
         cache = true;
         break;
       }

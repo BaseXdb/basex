@@ -13,16 +13,16 @@ import org.junit.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestTags extends DataUpdateTest {
+public final class UpdateElementTest extends DataUpdateTest {
   /**
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly1() throws IOException {
+  public void insertElementAsOnly1() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(3, 0, T_JUNIT, Data.ELEM);
+    insertElement(3, 0, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
@@ -46,10 +46,10 @@ public final class UpdateTestTags extends DataUpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly2() throws IOException {
+  public void insertElementAsOnly2() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(3, 1, T_JUNIT, Data.ELEM);
+    insertElement(3, 1, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
@@ -73,10 +73,10 @@ public final class UpdateTestTags extends DataUpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly3() throws IOException {
+  public void insertElementAsOnly3() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(3, 2, T_JUNIT, Data.ELEM);
+    insertElement(3, 2, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
@@ -100,10 +100,10 @@ public final class UpdateTestTags extends DataUpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsFirst() throws IOException {
+  public void insertElementAfterAttsAsFirst() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(6, 1, T_JUNIT, Data.ELEM);
+    insertElement(6, 1, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
@@ -126,10 +126,10 @@ public final class UpdateTestTags extends DataUpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsSecond() throws IOException {
+  public void insertElementAfterAttsAsSecond() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(6, 2, T_JUNIT, Data.ELEM);
+    insertElement(6, 2, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
     assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
@@ -152,10 +152,10 @@ public final class UpdateTestTags extends DataUpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsLast() throws IOException {
+  public void insertElementAfterAttsAsLast() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(6, 0, T_JUNIT, Data.ELEM);
+    insertElement(6, 0, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
     assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
@@ -178,7 +178,7 @@ public final class UpdateTestTags extends DataUpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void updateTagName() throws IOException {
+  public void updateElementName() throws IOException {
     final Data data = context.data();
     data.startUpdate(context.options);
     data.update(6, Data.ELEM, T_JUNIT, Token.EMPTY);
@@ -198,7 +198,7 @@ public final class UpdateTestTags extends DataUpdateTest {
    * @param kind node kind
    * @throws IOException I/O exception
    */
-  private static void insertTag(final int par, final int pos, final byte[] name, final int kind)
+  private static void insertElement(final int par, final int pos, final byte[] name, final int kind)
       throws IOException {
 
     int root;

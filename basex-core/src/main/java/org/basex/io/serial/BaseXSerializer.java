@@ -25,7 +25,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  protected BaseXSerializer(final OutputStream os, final SerializerOptions sopts)
+  BaseXSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
     super(os, sopts, false);
     binary = sopts.yes(SerializerOptions.BINARY);

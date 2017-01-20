@@ -10,7 +10,6 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
-import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
@@ -20,9 +19,6 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class Store extends ACreate {
-  /** Indicates if database should be locked. */
-  boolean lock = true;
-
   /**
    * Constructor, specifying a target path.
    * The input needs to be set via {@link #setInput(InputStream)}.
@@ -63,19 +59,13 @@ public final class Store extends ACreate {
     if(path.isEmpty() || path.endsWith(".") || file == null)
       return error(PATH_INVALID_X, create ? path : args[0]);
 
-    // start update
-    if(lock && !startUpdate(data)) return false;
-    boolean ok = true;
-    try {
-      store(in, file);
-      ok = info(QUERY_EXECUTED_X_X, "", job().performance);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      ok = error(FILE_NOT_SAVED_X, file);
-    } finally {
-      if(lock) ok &= finishUpdate(data);
-    }
-    return ok;
+    return update(data, new Code() {
+      @Override
+      boolean run() throws IOException {
+        store(in, file);
+        return info(QUERY_EXECUTED_X_X, "", job().performance);
+      }
+    });
   }
 
   /**

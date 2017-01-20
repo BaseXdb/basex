@@ -15,6 +15,6 @@ public final class StartGUI {
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    new org.basex.BaseXGUI(args);
+    new BaseXGUI(args);
   }
 }

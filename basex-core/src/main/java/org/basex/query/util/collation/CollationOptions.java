@@ -48,7 +48,7 @@ abstract class CollationOptions extends Options {
   }
 
   /** Initialization of locales. */
-  protected static class Locales {
+  protected static final class Locales {
     /** Available locales, indexed by language code. */
     static final HashMap<String, Locale> MAP = new HashMap<>();
     static {

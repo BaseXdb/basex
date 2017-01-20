@@ -83,7 +83,7 @@ public final class QT3TS extends Main {
   private boolean all;
 
   /** Database context. */
-  protected final Context ctx = new Context();
+  final Context ctx = new Context();
   /** Global environments. */
   private final ArrayList<QT3Env> genvs = new ArrayList<>();
 
@@ -105,7 +105,7 @@ public final class QT3TS extends Main {
    * Constructor.
    * @param args command-line arguments
    */
-  protected QT3TS(final String[] args) {
+  QT3TS(final String[] args) {
     super(args);
   }
 
@@ -364,7 +364,7 @@ public final class QT3TS extends Main {
       // unexpected error (potential bug)
       returned.error = ex;
       Util.errln("Query: " + name);
-      ex.printStackTrace();
+      Util.stack(ex);
     }
 
     if(slow != null) {
@@ -528,7 +528,7 @@ public final class QT3TS extends Main {
       }
       return msg;
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       return "Exception: " + ex.getMessage();
     }
   }

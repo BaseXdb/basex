@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import static org.basex.api.xmldb.BXXMLDBText.*;
 import static org.basex.core.Text.*;
 
 import java.io.*;
@@ -23,7 +24,7 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class BXCollection implements Collection, BXXMLDBText {
+public final class BXCollection implements Collection {
   /** Database context. */
   final BXDatabase db;
   /** Database context. */
@@ -149,7 +150,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       data.delete(getResource(del.getId()).pre);
       ctx.invalidate();
       data.finishUpdate(ctx.options);
-    } catch(final IOException ex) {
+    } catch(final BaseXException ex) {
       Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
     }
@@ -192,7 +193,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       data.insert(data.meta.size, -1, new DataClip(md));
       ctx.invalidate();
       data.finishUpdate(ctx.options);
-    } catch(final IOException ex) {
+    } catch(final BaseXException ex) {
       Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
     }

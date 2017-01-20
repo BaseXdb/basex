@@ -87,7 +87,7 @@ public final class DbListDetails extends DbList {
     return new Iter() {
       int pos;
       @Override
-      public ANode get(final long i) throws QueryException {
+      public ANode get(final long i) {
         final String name = dbs.get((int) i);
         final FElem database = new FElem(DATABASE);
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);

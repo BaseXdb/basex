@@ -110,16 +110,17 @@ public final class CreateDB extends ACreate {
         data = context.data();
       }
 
-      if(!startUpdate(data)) return false;
-      try {
-        CreateIndex.create(data, this);
-      } finally {
-        if(!finishUpdate(data)) return false;
-      }
+      if(!update(data, new Code() {
+        @Override
+        boolean run() throws IOException {
+          CreateIndex.create(data, CreateDB.this);
+          return info(parser.info() + DB_CREATED_X_X, name, job().performance);
+        }
+      })) return false;
 
       if(options.get(MainOptions.CREATEONLY)) close(context);
+      return true;
 
-      return info(parser.info() + DB_CREATED_X_X, name, job().performance);
     } catch(final JobException ex) {
       throw ex;
     } catch(final IOException ex) {

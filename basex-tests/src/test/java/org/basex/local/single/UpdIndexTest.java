@@ -156,7 +156,7 @@ public final class UpdIndexTest extends SandboxTest {
    * @param query query to be run
    * @param result query result
    */
-  protected static void query(final String query, final Object result) {
+  static void query(final String query, final Object result) {
     assertEquals(result.toString(), query(query));
   }
 }

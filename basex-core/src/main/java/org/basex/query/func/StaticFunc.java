@@ -302,7 +302,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final Ann ann = anns.get(Annotation._BASEX_INLINE);
     final long limit;
     if(ann == null) {
-      limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);;
+      limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
     } else {
       final Item[] args = ann.args();
       limit = args.length > 0 ? ((ANum) args[0]).itr() : Long.MAX_VALUE;

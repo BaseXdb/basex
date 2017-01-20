@@ -33,9 +33,22 @@ public final class Rename extends ACreate {
     final String trg = MetaData.normPath(args[1]);
     if(trg == null) return error(NAME_INVALID_X, args[1]);
 
-    // start update
-    if(!startUpdate(data)) return false;
+    return update(data, new Code() {
+      @Override
+      boolean run() {
+        return rename(data, src, trg);
+      }
+    });
+  }
 
+  /**
+   * Renames files.
+   * @param data database
+   * @param src source path
+   * @param trg target path
+   * @return success flag
+   */
+  private boolean rename(final Data data, final String src, final String trg) {
     boolean ok = true;
     int c = 0;
     final IntList docs = data.resources.docs(src);
@@ -58,10 +71,6 @@ public final class Rename extends ACreate {
       if(!trgdir.md() || !file.rename(target)) ok = !info(NAME_INVALID_X, trg);
       c++;
     }
-
-    // finish update
-    if(!finishUpdate(data)) return false;
-
     // return info message
     return info(RES_RENAMED_X_X, c, job().performance) && ok;
   }

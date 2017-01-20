@@ -2,16 +2,13 @@ package org.basex.tests.bxapi;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import javax.xml.namespace.*;
 
-import org.basex.core.Context;
+import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -193,22 +190,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XQuery baseURI(final String base) {
     qp.sc.baseURI(base.equals("#UNDEFINED") ? null : base);
     return this;
-  }
-
-  /**
-   * Creates a function call to the function with the given name with the given arguments.
-   * @param fName function name
-   * @param args function arguments
-   * @return the function call
-   */
-  public StandardFunc funcCall(final String fName, final Expr... args) {
-    final QNm qName = new QNm(fName);
-    qName.uri(qName.hasPrefix() ? NSGlobal.uri(qName.prefix()) : qp.sc.funcNS);
-    try {
-      return Functions.get().get(qName, args, qp.sc, null);
-    } catch(final QueryException ex) {
-      throw new XQueryException(ex);
-    }
   }
 
   /**

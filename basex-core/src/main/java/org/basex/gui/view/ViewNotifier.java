@@ -106,7 +106,7 @@ public final class ViewNotifier {
     final Context ctx = gui.context;
     ctx.marked = mark;
     for(final View v : view) if(v != vw && v.visible()) v.refreshMark();
-    gui.filter.setEnabled(mark.size() != 0);
+    gui.filter.setEnabled(!mark.isEmpty());
     gui.refreshControls();
   }
 

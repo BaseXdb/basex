@@ -129,12 +129,4 @@ public final class FuncLit extends Single implements Scope {
   public String toString() {
     return new TokenBuilder(name.string()).add('#').addExt(args.length).toString();
   }
-
-  /**
-   * Returns annotations.
-   * @return annotations
-   */
-  public AnnList annotations() {
-    return anns;
-  }
 }

@@ -546,14 +546,6 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  void checkInvariants() {
-    final int l = left.length, r = right.length;
-    if(l < MIN_DIGIT || l > MAX_DIGIT) throw new AssertionError("Left digit: " + l);
-    if(r < MIN_DIGIT || r > MAX_DIGIT) throw new AssertionError("Right digit: " + r);
-    middle.checkInvariants();
-  }
-
-  @Override
   TreeSeq consSmall(final Item[] vals) {
     final int a = vals.length, b = left.length, n = a + b;
     if(n <= MAX_DIGIT) {

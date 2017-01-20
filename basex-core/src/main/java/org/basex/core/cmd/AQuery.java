@@ -72,7 +72,7 @@ public abstract class AQuery extends Command {
             qp = null;
             popJob();
           }
-          qp(query, context);
+          init(query, context);
           parse(perf);
           if(r == 0) plan(false);
 
@@ -150,7 +150,7 @@ public abstract class AQuery extends Command {
   final boolean updates(final Context ctx, final String query) {
     try {
       final Performance perf = new Performance();
-      qp(query, ctx);
+      init(query, ctx);
       parse(perf);
       return qp.updating;
     } catch(final QueryException ex) {
@@ -162,17 +162,15 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Returns a query processor instance.
+   * Initializes the query processor.
    * @param query query string
    * @param ctx database context
-   * @return query processor
    */
-  private QueryProcessor qp(final String query, final Context ctx) {
+  private void init(final String query, final Context ctx) {
     if(qp == null) {
       qp = pushJob(new QueryProcessor(query, uri, ctx));
       if(info == null) info = qp.qc.info;
     }
-    return qp;
   }
 
   /**
@@ -182,7 +180,7 @@ public abstract class AQuery extends Command {
    */
   public final String parameters(final Context ctx) {
     try {
-      qp(args[0], ctx);
+      init(args[0], ctx);
       parse(null);
       return qp.qc.serParams().toString();
     } catch(final QueryException ex) {

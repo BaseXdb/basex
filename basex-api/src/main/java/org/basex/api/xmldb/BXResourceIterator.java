@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import static org.basex.api.xmldb.BXXMLDBText.*;
 import java.util.*;
 
 import org.xmldb.api.base.*;
@@ -10,7 +11,7 @@ import org.xmldb.api.base.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class BXResourceIterator implements ResourceIterator, BXXMLDBText, Iterable<Resource> {
+final class BXResourceIterator implements ResourceIterator, Iterable<Resource> {
   /** Resources. */
   private final Iterator<Resource> iter;
 

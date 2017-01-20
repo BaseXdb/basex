@@ -75,7 +75,7 @@ public class Soundex extends QueryModule {
     final int c = mapping[cps[index] - 'A'];
     if(index > 1 && c != '0') {
       final int pc = cps[index - 1];
-      if('H' == pc || 'W' == pc) {
+      if(pc == 'H' || pc == 'W') {
         final int ppc = cps[index - 2];
         if(ppc == 'H' || ppc == 'W' || mapping[ppc - 'A'] == c) return 0;
       }

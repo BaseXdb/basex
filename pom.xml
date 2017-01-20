@@ -283,7 +283,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.6</version>
+            <version>3.0.0</version>
             <inherited>true</inherited>
             <executions>
               <execution>
@@ -332,7 +332,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.5.1</version>
+          <version>3.6.0</version>
           <inherited>true</inherited>
           <configuration>
             <source>${compileSource}</source>
@@ -385,7 +385,9 @@
           <inherited>true</inherited>
           <configuration>
             <!-- <skipTests>true</skipTests> -->
-            <forkMode>always</forkMode>
+            <!--<forkMode>always</forkMode>-->
+            <forkCount>1</forkCount>
+            <reuseForks>false</reuseForks>-->
           </configuration>
         </plugin>
 
@@ -422,7 +424,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.10</version>
+          <version>3.0.0</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>

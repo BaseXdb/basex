@@ -210,12 +210,12 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  StringBuilder toString(final StringBuilder sb, final String ind) {
+  StringBuilder append(final StringBuilder sb, final String ind) {
     return sb.append(ind).append("`-- ").append(key).append(" => ").append(value).append('\n');
   }
 
   @Override
-  StringBuilder toString(final StringBuilder sb) {
+  StringBuilder append(final StringBuilder sb) {
     return sb.append(key).append(": ").append(value).append(", ");
   }
 }

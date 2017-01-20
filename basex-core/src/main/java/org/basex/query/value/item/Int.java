@@ -146,7 +146,7 @@ public final class Int extends ANum {
   @Override
   public boolean eq(final Item it, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return it instanceof Int ? value == ((Int) it).value : value == it.dbl(ii);
+    return value == (it instanceof Int ? ((Int) it).value : it.dbl(ii));
   }
 
   @Override

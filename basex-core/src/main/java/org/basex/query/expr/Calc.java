@@ -45,10 +45,10 @@ public enum Calc {
         if(t1 == YMD) return new YMDur((YMDur) it1, (YMDur) it2, true, ii);
         if(t1 == DTD) return new DTDur((DTDur) it1, (DTDur) it2, true, ii);
       }
-      if(t1 == DTM) return new Dtm((Dtm) it1, checkDur(ii, it2), true, ii);
-      if(t2 == DTM) return new Dtm((Dtm) it2, checkDur(ii, it1), true, ii);
-      if(t1 == DAT) return new Dat((Dat) it1, checkDur(ii, it2), true, ii);
-      if(t2 == DAT) return new Dat((Dat) it2, checkDur(ii, it1), true, ii);
+      if(t1 == DTM) return new Dtm((Dtm) it1, dur(ii, it2), true, ii);
+      if(t2 == DTM) return new Dtm((Dtm) it2, dur(ii, it1), true, ii);
+      if(t1 == DAT) return new Dat((Dat) it1, dur(ii, it2), true, ii);
+      if(t2 == DAT) return new Dat((Dat) it2, dur(ii, it1), true, ii);
       if(t1 == TIM && t2 == DTD) return new Tim((Tim) it1, (DTDur) it2, true);
       if(t2 == TIM && t1 == DTD) return new Tim((Tim) it2, (DTDur) it1, true);
       throw typeError(ii, t1, t2);
@@ -84,8 +84,8 @@ public enum Calc {
         if(t1 == DTD) return new DTDur((DTDur) it1, (DTDur) it2, false, ii);
         throw numberError(it1, ii);
       }
-      if(t1 == DTM) return new Dtm((Dtm) it1, checkDur(ii, it2), false, ii);
-      if(t1 == DAT) return new Dat((Dat) it1, checkDur(ii, it2), false, ii);
+      if(t1 == DTM) return new Dtm((Dtm) it1, dur(ii, it2), false, ii);
+      if(t1 == DAT) return new Dat((Dat) it1, dur(ii, it2), false, ii);
       if(t1 == TIM && t2 == DTD) return new Tim((Tim) it1, (DTDur) it2, false);
       throw typeError(ii, t1, t2);
     }
@@ -143,13 +143,12 @@ public enum Calc {
         if(t1 == YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) it2).ymd());
           if(bd.doubleValue() == .0) throw zeroError(ii, it1);
-          return Dec.get(BigDecimal.valueOf(((YMDur) it1).ymd()).divide(
-              bd, 20, RoundingMode.HALF_EVEN));
+          return Dec.get(BigDecimal.valueOf(((YMDur) it1).ymd()).divide(bd, MathContext.DECIMAL64));
         }
         if(t1 == DTD) {
           final BigDecimal bd = ((DTDur) it2).dtd();
           if(bd.doubleValue() == .0) throw zeroError(ii, it1);
-          return Dec.get(((DTDur) it1).dtd().divide(bd, 20, RoundingMode.HALF_EVEN));
+          return Dec.get(((DTDur) it1).dtd().divide(bd, MathContext.DECIMAL64));
         }
       }
       if(t1 == YMD) {
@@ -293,11 +292,12 @@ public enum Calc {
    * @return duration
    * @throws QueryException query exception
    */
-  static Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
-    final Type ip = it.type;
-    if(!(it instanceof Dur)) throw NODUR_X_X.get(ii, ip, it);
-    if(ip == DUR) throw NOSUBDUR_X.get(ii, it);
-    return (Dur) it;
+  static Dur dur(final InputInfo ii, final Item it) throws QueryException {
+    if(it instanceof Dur) {
+      if(it.type == DUR) throw NOSUBDUR_X.get(ii, it);
+      return (Dur) it;
+    }
+    throw NODUR_X_X.get(ii, it.type, it);
   }
 
   /**

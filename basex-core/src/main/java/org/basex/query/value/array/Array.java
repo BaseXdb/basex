@@ -375,19 +375,6 @@ public abstract class Array extends FItem {
   /**
    * Returns a string representation of the array.
    * @param indent indent output
-   * @param ii input info
-   * @return string
-   * @throws QueryException query exception
-   */
-  public byte[] serialize(final boolean indent, final InputInfo ii) throws QueryException {
-    final TokenBuilder tb = new TokenBuilder();
-    string(indent, tb, 0, ii);
-    return tb.finish();
-  }
-
-  /**
-   * Returns a string representation of the array.
-   * @param indent indent output
    * @param tb token builder
    * @param level current level
    * @param ii input info

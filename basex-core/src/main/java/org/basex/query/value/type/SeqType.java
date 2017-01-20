@@ -195,8 +195,6 @@ public final class SeqType {
   public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZERO_MORE);
   /** One attribute node. */
   public static final SeqType ATT = NodeType.ATT.seqType();
-  /** Zero or one attribute. */
-  public static final SeqType ATT_ZO = new SeqType(NodeType.ATT, Occ.ZERO_ONE);
   /** Zero or more attributes. */
   public static final SeqType ATT_ZM = new SeqType(NodeType.ATT, Occ.ZERO_MORE);
   /** One comment node. */
@@ -420,7 +418,7 @@ public final class SeqType {
     if(value.seqType().instanceOf(this)) return;
 
     final int size = (int) value.size();
-    if(!occ.check(size)) throw QueryError.typeError(value, this, name, ii);
+    if(!occ.check(size)) throw typeError(value, this, name, ii);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -430,7 +428,7 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!value.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(value.itemAt(i));
-    if(!ins) throw QueryError.typeError(value, this, name, ii);
+    if(!ins) throw typeError(value, this, name, ii);
   }
 
   /**
@@ -448,7 +446,7 @@ public final class SeqType {
       final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     final int n = (int) value.size();
-    if(!occ.check(n)) throw QueryError.typeError(value, this, name, ii);
+    if(!occ.check(n)) throw typeError(value, this, name, ii);
     if(n == 0) return Empty.SEQ;
 
     ItemList cache = null;
@@ -497,13 +495,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && atom instanceof Uri) {
           cache.add(Str.get(atom.string(ii)));
         } else {
-          throw QueryError.typeError(item, withOcc(Occ.ONE), name, ii);
+          throw typeError(item, withOcc(Occ.ONE), name, ii);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       cache.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw QueryError.typeError(item, withOcc(Occ.ONE), name, ii);
+      throw typeError(item, withOcc(Occ.ONE), name, ii);
     }
   }
 

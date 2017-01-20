@@ -37,7 +37,7 @@ public final class User {
    */
   public User(final String name, final String password) {
     this.name = name;
-    this.perm = Perm.NONE;
+    perm = Perm.NONE;
     for(final Algorithm algo : Algorithm.values()) {
       passwords.put(algo, new EnumMap<Code, String>(Code.class));
     }

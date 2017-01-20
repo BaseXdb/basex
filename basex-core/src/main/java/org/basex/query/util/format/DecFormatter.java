@@ -414,7 +414,8 @@ public final class DecFormatter extends FormatUtil {
         exp = scl - pic.scaling;
         if(exp != 0) {
           final BigDecimal n = BigDecimal.TEN.pow(Math.abs(exp));
-          num = (ANum) Calc.MULT.ev(num, Dec.get(exp > 0 ? BigDecimal.ONE.divide(n) : n), ii);
+          num = (ANum) Calc.MULT.ev(num, Dec.get(
+              exp > 0 ? BigDecimal.ONE.divide(n, MathContext.DECIMAL64) : n), ii);
         }
       }
       num = num.round(pic.maxFrac, true).abs();

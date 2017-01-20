@@ -311,7 +311,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  StringBuilder toString(final StringBuilder sb, final String ind) {
+  StringBuilder append(final StringBuilder sb, final String ind) {
     sb.append(ind).append("`-- Collision (").append(Integer.toHexString(hash)).append("):\n");
     final int kl = keys.length;
     for(int k = 0; k < kl; k++) {
@@ -321,7 +321,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  StringBuilder toString(final StringBuilder sb) {
+  StringBuilder append(final StringBuilder sb) {
     for(int i = size; --i >= 0;)
       sb.append(keys[i]).append(ASSIGN).append(values[i]).append(", ");
     return sb;

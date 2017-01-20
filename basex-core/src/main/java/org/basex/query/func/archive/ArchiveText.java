@@ -32,8 +32,6 @@ interface ArchiveText {
   String COMP_SIZE = "compressed-size";
   /** Uncompressed size. */
   String SIZE = "size";
-  /** Value. */
-  String VALUE = "value";
 
   /** Option: algorithm: deflate. */
   String DEFLATE = "deflate";

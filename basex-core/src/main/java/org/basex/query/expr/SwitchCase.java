@@ -72,10 +72,9 @@ public final class SwitchCase extends Arr {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     final int es = exprs.length;
-    for(int e = 1; e < es; ++e) sb.append(' ' + CASE + ' ' + exprs[e]);
-    if(es == 1) sb.append(' ' + DEFAULT);
-    sb.append(' ' + RETURN + ' ' + exprs[0]);
-    return sb.toString();
+    for(int e = 1; e < es; ++e) sb.append(' ').append(CASE).append(' ').append(exprs[e]);
+    if(es == 1) sb.append(' ').append(DEFAULT);
+    return sb.append(' ').append(RETURN).append(' ').append(exprs[0]).toString();
   }
 
   /**

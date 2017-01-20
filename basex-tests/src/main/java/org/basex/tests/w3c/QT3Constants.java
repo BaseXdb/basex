@@ -23,8 +23,6 @@ interface QT3Constants {
   /** QT3TS String. */
   String SCHEMA = "schema";
   /** QT3TS String. */
-  String COLLECTION = "collection";
-  /** QT3TS String. */
   String COLLATION = "collation";
   /** QT3TS String. */
   String STATIC_BASE_URI = "static-base-uri";
@@ -45,9 +43,4 @@ interface QT3Constants {
   String PREFIX = "prefix";
   /** QT3TS String. */
   String ENCODING = "encoding";
-
-  /** QT3TS String. */
-  String SCHEMA_IMPORT = "schemaImport";
-  /** QT3TS String. */
-  String SCHEMA_VALIDATION = "schemaValidation";
 }

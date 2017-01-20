@@ -12,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestText extends DataUpdateTest {
+public final class UpdateTextTest extends DataUpdateTest {
   /**
    * Tests insert as last child.
    * @throws IOException I/O exception

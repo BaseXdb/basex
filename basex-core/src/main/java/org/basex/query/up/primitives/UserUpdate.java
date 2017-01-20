@@ -25,8 +25,8 @@ public abstract class UserUpdate extends Update {
    * @param qc query context
    * @param info input info
    */
-  public UserUpdate(final UpdateType type, final User user, final QueryContext qc,
-      final InputInfo info) {
+  protected UserUpdate(final UpdateType type, final User user, final QueryContext qc,
+                       final InputInfo info) {
     super(type, info);
     this.user = user;
     users = qc.context.users;

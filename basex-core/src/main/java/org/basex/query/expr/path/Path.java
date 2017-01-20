@@ -83,12 +83,12 @@ public abstract class Path extends ParseExpr {
         // remove redundant context references
         if(sl > 1) continue;
         // single step: rewrite to axis step (required to sort results of path)
-        step = Step.get(((ContextValue) step).info, SELF, Test.NOD);
+        step = Step.get(((ContextValue) step).info, SELF, KindTest.NOD);
       } else if(step instanceof Filter) {
         // rewrite filter to axis step
         final Filter f = (Filter) step;
         if(f.root instanceof ContextValue) {
-          step = Step.get(f.info, SELF, Test.NOD, f.preds);
+          step = Step.get(f.info, SELF, KindTest.NOD, f.preds);
         }
       } else if(step instanceof Path) {
         // rewrite path to axis steps
@@ -238,7 +238,7 @@ public abstract class Path extends ParseExpr {
   @Override
   public final boolean has(final Flag flag) {
     // context dependency. no root exists, or if it depends on context. Example: text(); ./abc
-    if(flag == Flag.CTX) return root == null || root.has(flag);
+    if(flag == Flag.CTX) return root == null || root.has(Flag.CTX);
     // positional test. may only occur in root node, not in first step. Example: position()/a
     if(flag != Flag.POS) {
       for(final Expr step : steps) if(step.has(flag)) return true;
@@ -499,11 +499,11 @@ public abstract class Path extends ParseExpr {
       } else if(root instanceof Root || root instanceof CDoc ||
           rt != null && rt.type == NodeType.DOC) {
         if(axis == SELF || axis == ANCORSELF) {
-          if(step.test != Test.NOD && step.test != Test.DOC) return true;
+          if(step.test != KindTest.NOD && step.test != KindTest.DOC) return true;
         } else if(axis == CHILD || axis == DESC) {
-          if(step.test == Test.DOC || step.test == Test.ATT) return true;
+          if(step.test == KindTest.DOC || step.test == KindTest.ATT) return true;
         } else if(axis == DESCORSELF) {
-          if(step.test == Test.ATT) return true;
+          if(step.test == KindTest.ATT) return true;
         } else {
           return true;
         }
@@ -515,10 +515,10 @@ public abstract class Path extends ParseExpr {
 
       // .../self:: / .../descendant-or-self::
       if(axis == SELF || axis == DESCORSELF) {
-        if(step.test == Test.NOD) return false;
+        if(step.test == KindTest.NOD) return false;
         // @.../..., text()/...
         if(last.axis == ATTR && step.test.type != NodeType.ATT ||
-           last.test == Test.TXT && step.test != Test.TXT) return true;
+           last.test == KindTest.TXT && step.test != KindTest.TXT) return true;
         if(axis == DESCORSELF) return false;
 
         // .../self::
@@ -532,10 +532,10 @@ public abstract class Path extends ParseExpr {
       if(axis == FOLLSIBL || axis == PRECSIBL) return last.axis == ATTR;
       // .../descendant:: / .../child:: / .../attribute::
       if(axis == DESC || axis == CHILD || axis == ATTR)
-        return last.axis == ATTR || last.test == Test.TXT || last.test == Test.COM ||
-           last.test == Test.PI || axis == ATTR && step.test == Test.NSP;
+        return last.axis == ATTR || last.test == KindTest.TXT || last.test == KindTest.COM ||
+           last.test == KindTest.PI || axis == ATTR && step.test == KindTest.NSP;
       // .../parent:: / .../ancestor::
-      if(axis == PARENT || axis == ANC) return last.test == Test.DOC;
+      if(axis == PARENT || axis == ANC) return last.test == KindTest.DOC;
     }
     return false;
   }
@@ -686,12 +686,12 @@ public abstract class Path extends ParseExpr {
     final ExprList newPreds = new ExprList();
     final Test test = InvDocTest.get(rt);
     final ExprList invSteps = new ExprList();
-    if(test != Test.DOC || !data.meta.uptodate || predSteps(data, iStep)) {
+    if(test != KindTest.DOC || !data.meta.uptodate || predSteps(data, iStep)) {
       for(int s = iStep; s >= 0; s--) {
         final Axis ax = axisStep(s).axis.invert();
         if(s == 0) {
           // add document test for collections and axes other than ancestors
-          if(test != Test.DOC || ax != ANC && ax != ANCORSELF)
+          if(test != KindTest.DOC || ax != ANC && ax != ANCORSELF)
             invSteps.add(Step.get(info, ax, test));
         } else {
           final Step prev = axisStep(s - 1);
@@ -731,7 +731,7 @@ public abstract class Path extends ParseExpr {
       final Step step;
       if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
         // add at least one self axis step
-        step = Step.get(info, SELF, Test.NOD);
+        step = Step.get(info, SELF, KindTest.NOD);
         ls++;
       } else {
         step = (Step) resultSteps.get(ls);
@@ -880,7 +880,7 @@ public abstract class Path extends ParseExpr {
       throws QueryException {
 
     // #1202: during inlining, expressions will be optimized, which are based on the context value
-    boolean changed = false;
+    boolean changed;
     final QueryFocus focus = cc.qc.focus;
     final Value init = focus.value;
     focus.value = null;

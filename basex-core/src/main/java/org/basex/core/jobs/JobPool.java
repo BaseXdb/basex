@@ -39,7 +39,7 @@ public final class JobPool {
    * @param job job
    */
   public void register(final Job job) {
-    while(active.size() >= JobPool.MAXQUERIES) Thread.yield();
+    while(active.size() >= MAXQUERIES) Thread.yield();
     active.put(job.job().id(), job);
   }
 

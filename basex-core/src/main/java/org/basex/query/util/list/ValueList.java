@@ -30,15 +30,6 @@ public final class ValueList extends ElementList {
   }
 
   /**
-   * Constructor, specifying an initial entry.
-   * @param element array capacity
-   */
-  public ValueList(final Value element) {
-    list = new Value[] { element };
-    size = 1;
-  }
-
-  /**
    * Returns the specified element.
    * @param p position
    * @return value

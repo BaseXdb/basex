@@ -218,7 +218,7 @@ public abstract class ADate extends ADateDur {
    * @return result
    */
   private static long mod(final long value, final int mod) {
-    return value > 0 ? value % mod : (Long.MAX_VALUE / mod * mod + value) % mod;
+    return (value > 0 ? value : Long.MAX_VALUE / mod * mod + value) % mod;
   }
 
   /**

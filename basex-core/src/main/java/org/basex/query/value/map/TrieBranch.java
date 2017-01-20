@@ -135,6 +135,7 @@ final class TrieBranch extends TrieNode {
   @Override
   TrieNode add(final TrieList o, final int l, final MergeDuplicates merge, final InputInfo ii)
       throws QueryException {
+
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     int n = o.size;
@@ -246,20 +247,20 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  StringBuilder toString(final StringBuilder sb, final String ind) {
+  StringBuilder append(final StringBuilder sb, final String ind) {
     final int s = Integer.bitCount(used);
     for(int i = 0, j = 0; i < s; i++, j++) {
       while((used & 1 << j) == 0) j++;
       final int e = i == s - 1 ? 2 : 0;
       sb.append(ind).append(ENDS[e]).append(String.format("%x", j)).append('\n');
-      kids[j].toString(sb, ind + ENDS[e + 1]);
+      kids[j].append(sb, ind + ENDS[e + 1]);
     }
     return sb;
   }
 
   @Override
-  StringBuilder toString(final StringBuilder sb) {
-    for(int i = 0; i < KIDS; i++) if(kids[i] != null) kids[i].toString(sb);
+  StringBuilder append(final StringBuilder sb) {
+    for(int i = 0; i < KIDS; i++) if(kids[i] != null) kids[i].append(sb);
     return sb;
   }
 }

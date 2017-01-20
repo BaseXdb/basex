@@ -654,8 +654,8 @@ public enum AtomType implements Type {
     @Override
     public Bln cast(final Object value, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) {
-      return value instanceof Boolean ? Bln.get((Boolean) value) :
-        Bln.get(Boolean.parseBoolean(value.toString()));
+      return Bln.get(value instanceof Boolean ? (Boolean) value :
+        Boolean.parseBoolean(value.toString()));
     }
   },
 

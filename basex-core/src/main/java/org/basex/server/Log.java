@@ -28,8 +28,6 @@ import org.basex.util.*;
 public final class Log {
   /** Server string. */
   public static final String SERVER = "SERVER";
-  /** Standalone string. */
-  public static final String STANDALONE = "STANDALONE";
   /** Log types. */
   public enum LogType {
     /** Request. */ REQUEST,

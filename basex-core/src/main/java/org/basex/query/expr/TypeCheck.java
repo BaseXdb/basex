@@ -55,13 +55,13 @@ public final class TypeCheck extends Single {
 
     // return type is already correct
     if(argType.instanceOf(seqType)) {
-      cc.info(QueryText.OPTTYPE_X, seqType);
+      cc.info(OPTTYPE_X, seqType);
       return expr;
     }
 
     // function item coercion
     if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
-      if(!seqType.occ.check(1)) throw QueryError.typeError(expr, seqType, null, info);
+      if(!seqType.occ.check(1)) throw typeError(expr, seqType, null, info);
       final FuncItem fi = (FuncItem) expr;
       return optPre(fi.coerceTo((FuncType) seqType.type, cc.qc, info, true), cc);
     }
@@ -74,7 +74,7 @@ public final class TypeCheck extends Single {
     // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final Occ occ = argType.occ.intersect(seqType.occ);
-      if(occ == null) throw QueryError.typeError(expr, seqType, null, info);
+      if(occ == null) throw typeError(expr, seqType, null, info);
     }
 
     final Expr opt = expr.typeCheck(this, cc);
@@ -118,7 +118,7 @@ public final class TypeCheck extends Single {
         cache.set(c++, null);
 
         if(it == null && i < st.occ.min || i > st.occ.max)
-          throw QueryError.typeError(TypeCheck.this, st, null, info);
+          throw typeError(TypeCheck.this, st, null, info);
 
         i++;
         return it;
@@ -141,8 +141,8 @@ public final class TypeCheck extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(QueryText.TYP, seqType);
-    if(promote) elem.add(planAttr(QueryText.FUNCTION, Token.TRUE));
+    final FElem elem = planElem(TYP, seqType);
+    if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
     addPlan(plan, elem, expr);
   }
 

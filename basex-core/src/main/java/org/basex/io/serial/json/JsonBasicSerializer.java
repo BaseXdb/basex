@@ -99,7 +99,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
         if(value == null) throw error("Element '%' has no value.", type);
         final Boolean b = Bln.parse(value);
         if(b == null) throw error("Element '%' has invalid value: '%'.", type, value);
-        out.print(norm(token(b.booleanValue())));
+        out.print(norm(token(b)));
       } else if(eq(type, STRING)) {
         final byte[] value = value(iter, type);
         out.print('"');

@@ -65,7 +65,7 @@ abstract class RESTCmd extends Command {
   }
 
   @Override
-  protected final boolean run() throws IOException {
+  protected final boolean run() {
     try {
       run0();
       return true;

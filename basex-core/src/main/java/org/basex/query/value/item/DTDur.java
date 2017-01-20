@@ -82,12 +82,12 @@ public final class DTDur extends Dur {
     } else {
       BigDecimal d = BigDecimal.valueOf(factor);
       try {
-        sec = mult ? sec.multiply(d) : sec.divide(d);
+        sec = mult ? sec.multiply(d) : sec.divide(d, MathContext.DECIMAL64);
       } catch(final ArithmeticException ex) {
-        // catching cases in which a computation yields no exact result; eg:
+        // catch cases in which a computation yields no exact result; eg:
         // xs:dayTimeDuration("P1D") div xs:double("-1.7976931348623157E308")
         d = BigDecimal.valueOf(1 / factor);
-        sec = mult ? sec.divide(d) : sec.multiply(d);
+        sec = mult ? sec.divide(d, MathContext.DECIMAL64) : sec.multiply(d);
       }
     }
     if(Math.abs(sec.doubleValue()) < 1E-13) sec = BigDecimal.ZERO;
@@ -155,6 +155,6 @@ public final class DTDur extends Dur {
    * @return dateTime instance
    */
   public static DTDur get(final long ms) {
-    return new DTDur(BigDecimal.valueOf(ms).divide(BD1000));
+    return new DTDur(BigDecimal.valueOf(ms).divide(BD1000, MathContext.DECIMAL64));
   }
 }

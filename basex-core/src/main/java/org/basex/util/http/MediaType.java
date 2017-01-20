@@ -217,7 +217,7 @@ public final class MediaType {
     } catch(final IOException ex) {
       Util.errln(ex);
     } catch(final Throwable ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 }

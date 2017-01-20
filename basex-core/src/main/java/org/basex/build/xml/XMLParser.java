@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.build.BuildText.Type;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;

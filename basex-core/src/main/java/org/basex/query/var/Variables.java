@@ -138,7 +138,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     /** The static variable. */
     StaticVar var;
     /** Variable references. */
-    ArrayList<StaticVarRef> refs = new ArrayList<>(1);
+    final ArrayList<StaticVarRef> refs = new ArrayList<>(1);
 
     /**
      * Constructor.

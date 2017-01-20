@@ -114,7 +114,7 @@ public final class FolderView extends View {
     scroll.pos(0);
 
     final DBNodes curr = gui.context.current();
-    if(more && curr.size() != 0) jumpTo(curr.pre(0), true);
+    if(more && !curr.isEmpty()) jumpTo(curr.pre(0), true);
     refreshHeight();
     repaint();
   }
@@ -142,7 +142,7 @@ public final class FolderView extends View {
     scroll.pos(0);
 
     final DBNodes marked = gui.context.marked;
-    if(marked.size() != 0) jumpTo(marked.pre(0), true);
+    if(!marked.isEmpty()) jumpTo(marked.pre(0), true);
     refreshHeight();
     repaint();
   }

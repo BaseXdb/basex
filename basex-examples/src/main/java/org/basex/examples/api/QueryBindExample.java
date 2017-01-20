@@ -1,5 +1,7 @@
 package org.basex.examples.api;
 
+import org.basex.examples.api.BaseXClient.Query;
+
 import java.io.*;
 
 /**
@@ -23,7 +25,7 @@ public final class QueryBindExample {
       final String input = "declare variable $name external; " +
           "for $i in 1 to 10 return element { $name } { $i }";
 
-      try(BaseXClient.Query query = session.query(input)) {
+      try(Query query = session.query(input)) {
         // bind variable
         query.bind("$name", "number", "");
 

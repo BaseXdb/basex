@@ -418,13 +418,13 @@ public final class MapView extends View {
       final int tw = getWidth();
       final int th = getHeight();
       if(zs > 0) {
-        final long s = zoomIn ? ZS[zs] : ZS[ZOOMSIZE - zs];
+        final long s = ZS[zoomIn ? zs : ZOOMSIZE - zs];
         xs = (int) ((zr.x + xs * zr.w / tw - xs) * s / MAXZS);
         ys = (int) ((zr.y + ys * zr.h / th - ys) * s / MAXZS);
         xe += (int) ((zr.x + xe * zr.w / tw - xe) * s / MAXZS);
         ye += (int) ((zr.y + ye * zr.h / th - ye) * s / MAXZS);
       } else {
-        final long s = 10000 - (zoomIn ? ZS[-zs] : ZS[ZOOMSIZE + zs]);
+        final long s = 10000 - (ZS[zoomIn ? -zs : ZOOMSIZE + zs]);
         if(zr.w == 0) zr.w = 1;
         if(zr.h == 0) zr.h = 1;
         xs = (int) (-xe * zr.x / zr.w * s / MAXZS);

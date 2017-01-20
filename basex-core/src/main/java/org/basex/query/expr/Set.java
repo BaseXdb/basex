@@ -94,9 +94,6 @@ abstract class Set extends Arr {
       this.iter = iter;
     }
 
-    @Override
-    public abstract ANode next() throws QueryException;
-
     /**
      * Sets the next iterator item.
      * @param i index

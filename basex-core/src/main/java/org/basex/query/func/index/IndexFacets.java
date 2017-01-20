@@ -92,7 +92,7 @@ public final class IndexFacets extends IndexFn {
    */
   private static void stats(final Stats stats, final FElem elem) {
     final int type = stats.type;
-    if(!StatsType.isNone(type)) elem.add(TYPE, StatsType.toString(type));
+    if(!isNone(type)) elem.add(TYPE, StatsType.toString(type));
     elem.add(COUNT, token(stats.count));
     if(isInteger(type) || isDouble(type)) {
       final int mn = (int) stats.min, mx = (int) stats.max;

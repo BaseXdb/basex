@@ -172,7 +172,7 @@ final class DigitalSignature {
         final PublicKey puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
         final KeyValue keyValue = kifactory.newKeyValue(puk);
-        final Vector<XMLStructure> kiCont = new Vector<>();
+        final ArrayList<XMLStructure> kiCont = new ArrayList<>();
         kiCont.add(keyValue);
         final List<Object> x509Content = new ArrayList<>();
         final X509IssuerSerial issuer = kifactory.newX509IssuerSerial(x509ce.

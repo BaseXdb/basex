@@ -169,9 +169,9 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
       try {
         final XQConnection2 xqc2 = (XQConnection2) xqc;
         xqc2.insertItem(uri, item, INSERT_STRATEGY);
-      } catch(final Throwable th) {
+      } catch(final XQException ex) {
         // a JUnit assertion WILL fail later because of this happening.
-        th.printStackTrace();
+        ex.printStackTrace();
       }
     }
   }

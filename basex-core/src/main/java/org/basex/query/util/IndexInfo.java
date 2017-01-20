@@ -219,7 +219,7 @@ public final class IndexInfo {
         final AxisPath path = (AxisPath) pred;
         final int pl = path.steps.length;
         s = path.step(pl - 1);
-        if(s.axis == Axis.CHILD && s.test == Test.TXT) {
+        if(s.axis == Axis.CHILD && s.test == KindTest.TXT) {
           s = pl > 1 ? path.step(pl - 2) : step;
         }
       }

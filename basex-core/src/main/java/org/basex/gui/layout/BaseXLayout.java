@@ -196,7 +196,9 @@ public final class BaseXLayout {
         list.add(tr.getTransferData(DataFlavor.stringFlavor));
       } else {
         final StringBuilder sb = new StringBuilder("Data flavors not supported:\n");
-        for(final DataFlavor df : tr.getTransferDataFlavors()) sb.append("- " + df + '\n');
+        for(final DataFlavor df : tr.getTransferDataFlavors()) {
+          sb.append("- ").append(df).append('\n');
+        }
         Util.debug(sb);
       }
     } catch(final Exception ex) {

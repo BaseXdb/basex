@@ -1,5 +1,7 @@
 package org.basex.examples.api;
 
+import org.basex.examples.api.BaseXClient.Query;
+
 import java.io.*;
 
 /**
@@ -23,7 +25,7 @@ public final class QueryExample {
       // create query instance
       final String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
 
-      try(BaseXClient.Query query = session.query(input)) {
+      try(Query query = session.query(input)) {
         // loop through all results
         while(query.more()) {
           System.out.println(query.next());

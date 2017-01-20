@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * A small sequence that is represented as a single Java array.
@@ -175,14 +174,6 @@ final class SmallSeq extends TreeSeq {
         return SmallSeq.this;
       }
     };
-  }
-
-  @Override
-  void checkInvariants() {
-    final int n = elems.length;
-    if(n == 0) throw new AssertionError("Empty array in " + Util.className(this));
-    if(n == 1) throw new AssertionError("Singleton array in " + Util.className(this));
-    if(n > MAX_SMALL) throw new AssertionError("Array too big: " + n);
   }
 
   @Override

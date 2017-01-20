@@ -234,7 +234,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
             val1 = val1.replaceAll("\"", "");
             pattern = PATEX;
           } else {
-            pattern = attr && data.meta.attrindex || !attr && data.meta.textindex ? PATSUB : PATEX;
+            pattern = (attr ? data.meta.attrindex : data.meta.textindex) ? PATSUB : PATEX;
           }
         }
       } else if(comp instanceof BaseXCombo) {

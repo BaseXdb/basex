@@ -20,5 +20,5 @@ public enum JobState {
   /** Memory. */
   MEMORY,
   /** Cached. */
-  CACHED;
+  CACHED
 }

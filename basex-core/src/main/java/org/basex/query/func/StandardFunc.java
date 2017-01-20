@@ -392,17 +392,6 @@ public abstract class StandardFunc extends Arr {
     return visitor.lock(exprs[i] instanceof Str ? string(((Str) exprs[i]).string()) : null);
   }
 
-  /**
-   * Compares several signatures for equality.
-   * @param sig signature to be found
-   * @param sigs signatures to be compared
-   * @return result of check
-   */
-  protected static boolean oneOf(final Function sig, final Function... sigs) {
-    for(final Function s : sigs) if(sig == s) return true;
-    return false;
-  }
-
   @Override
   public final boolean sameAs(final Expr cmp) {
     if(cmp instanceof StandardFunc) {

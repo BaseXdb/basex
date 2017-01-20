@@ -32,15 +32,6 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
   }
 
   /**
-   * Returns the annotation at the specified position.
-   * @param index annotation index
-   * @return annotation
-   */
-  public Ann get(final int index) {
-    return anns[index];
-  }
-
-  /**
    * Checks if the specified annotation is found in the list.
    * @param ann annotation to be found
    * @return result of check

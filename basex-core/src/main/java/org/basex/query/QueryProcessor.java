@@ -1,7 +1,5 @@
 package org.basex.query;
 
-import static org.basex.core.Text.*;
-
 import java.io.*;
 import java.util.regex.*;
 
@@ -334,16 +332,6 @@ public final class QueryProcessor extends Job implements Closeable {
    */
   public FDoc plan() {
     return new FDoc().add(qc.plan());
-  }
-
-  @Override
-  public String shortInfo() {
-    return PLEASE_WAIT_D;
-  }
-
-  @Override
-  public String detailedInfo() {
-    return PLEASE_WAIT_D;
   }
 
   @Override

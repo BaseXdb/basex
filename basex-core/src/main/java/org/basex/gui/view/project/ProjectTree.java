@@ -184,7 +184,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public void execute() {
       ProjectNode parent = selectedNode();
-      if(parent instanceof ProjectFile) parent = (ProjectDir) parent.getParent();
+      if(parent instanceof ProjectFile) parent = (ProjectNode) parent.getParent();
 
       // choose free name
       String name = '(' + NEW_DIR + ')';

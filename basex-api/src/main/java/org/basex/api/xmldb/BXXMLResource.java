@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import static org.basex.api.xmldb.BXXMLDBText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -29,7 +30,7 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class BXXMLResource implements XMLResource, BXXMLDBText {
+final class BXXMLResource implements XMLResource {
   /** Collection reference. */
   private final BXCollection coll;
   /** String id. */

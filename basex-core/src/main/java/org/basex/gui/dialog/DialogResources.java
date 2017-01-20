@@ -228,7 +228,7 @@ final class DialogResources extends BaseXBack {
       }
     }
 
-    refreshFolder(n instanceof TreeFolder ? (TreeFolder) n : (TreeFolder) n.getParent());
+    refreshFolder((TreeFolder) (n instanceof TreeFolder ? n : n.getParent()));
   }
 
   /**

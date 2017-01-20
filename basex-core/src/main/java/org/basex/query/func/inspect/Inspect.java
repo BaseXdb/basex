@@ -25,7 +25,17 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Inspect implements InspectText {
+public abstract class Inspect {
+  /** Supported documentation tags. */
+  public static final byte[][] DOC_TAGS = tokens("description", "author", "version", "param",
+      "return", "error", "deprecated", "see", "since");
+  /** Documentation: description tag. */
+  public static final byte[] DOC_DESCRIPTION = token("description");
+  /** Documentation: param tag. */
+  public static final byte[] DOC_PARAM = token("param");
+  /** Documentation: return tag. */
+  public static final byte[] DOC_RETURN = token("return");
+
   /** Query context. */
   final QueryContext qc;
   /** Input info. */

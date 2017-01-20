@@ -198,10 +198,4 @@ public abstract class TreeSeq extends Seq {
     System.arraycopy(bs, 0, out, l, r);
     return out;
   }
-
-  /**
-   * Checks that this array's implementation does not violate any invariants.
-   * @throws AssertionError if an invariant was violated
-   */
-  abstract void checkInvariants();
 }

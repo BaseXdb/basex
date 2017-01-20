@@ -1,5 +1,6 @@
 package org.basex.gui.view.tree;
 
+import static org.basex.gui.view.tree.TreeConstants.*;
 import java.awt.*;
 
 import org.basex.gui.layout.*;
@@ -12,7 +13,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Wolfgang Miller
  */
-final class TreeRects implements TreeConstants {
+final class TreeRects {
   /** Saved rectangles. */
   private TreeRect[][][] rects;
   /** View. */
@@ -204,6 +205,6 @@ final class TreeRects implements TreeConstants {
    */
   TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv, final int pre) {
     final int i = sub.searchPreArrayPos(rn, lv, pre);
-    return i < 0 ? null : bigRect(sub, rn, lv) ? rects[rn][lv][0] : rects[rn][lv][i];
+    return i < 0 ? null : rects[rn][lv][bigRect(sub, rn, lv) ? 0 : i];
   }
 }

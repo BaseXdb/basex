@@ -28,8 +28,6 @@ final class FTTokenizer {
   private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<>();
   /** Token cache. */
   private final TokenObjMap<FTTokens> cache = new TokenObjMap<>();
-  /** Levenshtein reference. */
-  private final Levenshtein ls;
   /** Input info. */
   private final InputInfo info;
   /** Full-text options. */
@@ -60,7 +58,6 @@ final class FTTokenizer {
    */
   private FTTokenizer(final FTOpt opt, final Levenshtein ls, final InputInfo info) {
     this.opt = opt;
-    this.ls = ls;
     this.info = info;
 
     cmp = new TokenComparator() {
@@ -123,13 +120,5 @@ final class FTTokenizer {
       }
     }
     return tokens;
-  }
-
-  /**
-   * Copies this FTTokenizer.
-   * @return copy
-   */
-  FTTokenizer copy() {
-    return new FTTokenizer(opt, ls, info);
   }
 }

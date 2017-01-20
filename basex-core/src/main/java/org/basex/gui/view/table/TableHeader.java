@@ -377,7 +377,7 @@ final class TableHeader extends BaseXPanel {
       box.stop();
       inputCol = -1;
       final DBNodes marked = view.gui.context.marked;
-      if(marked.size() != 0) view.gui.notify.context(marked, false, null);
+      if(!marked.isEmpty()) view.gui.notify.context(marked, false, null);
     } else if(TAB.is(e)) {
       tdata.cols[inputCol].filter = box.text();
       box.stop();

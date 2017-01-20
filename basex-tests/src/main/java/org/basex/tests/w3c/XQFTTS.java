@@ -1,5 +1,6 @@
 package org.basex.tests.w3c;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.io.*;
@@ -74,7 +75,11 @@ public final class XQFTTS extends W3CTS {
       final IO fn = stop2.get(s);
       if(fn != null) {
         if(opt.sw == null) opt.sw = new StopWords();
-        opt.sw.read(fn, false);
+        try {
+          opt.sw.read(fn, false);
+        } catch(final IOException ex) {
+          throw new QueryException(ex);
+        }
       }
     }
 

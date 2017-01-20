@@ -99,7 +99,7 @@ public final class Namespaces {
 
   /**
    * Returns a namespace URI for the name with the specified id.
-   * @param id id of namespace URI ({@Code 0}: no namespace)
+   * @param id id of namespace URI ({@code 0}: no namespace)
    * @return namespace URI, or {@code null}
    */
   public byte[] uri(final int id) {

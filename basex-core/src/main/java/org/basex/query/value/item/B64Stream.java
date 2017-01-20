@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class B64Stream extends B64 implements Streamable {
+public final class B64Stream extends B64 {
   /** File reference. */
   private final IO input;
   /** Error message. */

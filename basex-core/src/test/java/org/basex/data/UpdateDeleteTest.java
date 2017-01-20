@@ -12,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestDeletes extends DataUpdateTest {
+public final class UpdateDeleteTest extends DataUpdateTest {
   /**
    * Tests deletion of a simple node.
    * @throws IOException I/O exception

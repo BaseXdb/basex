@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import static org.basex.api.xmldb.BXXMLDBText.*;
 import java.util.*;
 
 import org.basex.query.value.*;
@@ -12,7 +13,7 @@ import org.xmldb.api.base.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class BXResourceSet implements ResourceSet, BXXMLDBText {
+final class BXResourceSet implements ResourceSet {
   /** Resources. */
   private final ArrayList<Resource> list;
   /** Collection reference. */

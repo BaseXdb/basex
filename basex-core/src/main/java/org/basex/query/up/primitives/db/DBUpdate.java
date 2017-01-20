@@ -29,9 +29,6 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
     return type.ordinal() - o.type.ordinal();
   }
 
-  @Override
-  public abstract void merge(Update update) throws QueryException;
-
   /**
    * Applies this operation.
    * @throws QueryException exception

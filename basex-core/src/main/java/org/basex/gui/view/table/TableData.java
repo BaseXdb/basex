@@ -252,7 +252,7 @@ final class TableData {
       final int s = p + data.size(p, data.kind(p));
       while(p != s) {
         final int k = data.kind(p);
-        if((e && k == Data.ELEM || !e && k == Data.ATTR) && data.nameId(p) == c) {
+        if((e ? k == Data.ELEM : k == Data.ATTR) && data.nameId(p) == c) {
           tokens[r] = data.atom(p);
           break;
         }

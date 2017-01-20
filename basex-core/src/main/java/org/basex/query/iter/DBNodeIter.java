@@ -21,7 +21,7 @@ public abstract class DBNodeIter extends BasicNodeIter {
    * Constructor.
    * @param data data reference
    */
-  public DBNodeIter(final Data data) {
+  protected DBNodeIter(final Data data) {
     this.data = data;
   }
 

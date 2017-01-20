@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import static org.basex.api.xmldb.BXXMLDBText.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.xmldb.api.base.*;
@@ -14,9 +15,7 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class BXCollectionManagementService implements
-    CollectionManagementService, BXXMLDBText {
-
+final class BXCollectionManagementService implements CollectionManagementService {
   /** Service constant. */
   static final String MANAGEMENT = "CollectionManagementService";
   /** Service constant. */

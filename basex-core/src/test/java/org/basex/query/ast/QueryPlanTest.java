@@ -36,9 +36,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
         }
       }
     } catch(final Exception ex) {
-      final AssertionError err = new AssertionError(qu);
-      err.initCause(ex);
-      throw err;
+      throw new AssertionError(qu, ex);
     }
   }
 }

@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import static org.basex.api.xmldb.BXXMLDBText.*;
 import static org.basex.core.Text.*;
 
 import java.util.*;
@@ -17,7 +18,7 @@ import org.xmldb.api.base.Collection;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class BXDatabase implements Database, BXXMLDBText {
+final class BXDatabase implements Database {
   /** Database context. */
   final Context ctx = new Context();
 

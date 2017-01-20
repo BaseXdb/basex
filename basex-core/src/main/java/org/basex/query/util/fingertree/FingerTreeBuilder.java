@@ -196,13 +196,13 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
       final DeepTree<N, E> deep = (DeepTree<N, E>) tree;
       final Node<N, E>[] ls = deep.left, rs = deep.right;
-      final int ll = ls.length, rl = rs.length;
+      final int ll = ls.length;
       final FingerTree<Node<N, E>, E> mid = deep.middle;
 
       if(mid.isEmpty()) {
         // add digits
-        for(int i = 0; i < ll; i++) append(ls[i]);
-        for(int i = 0; i < rl; i++) append(rs[i]);
+        for(final Node<N, E> l : ls) append(l);
+        for(final Node<N, E> r : rs) append(r);
       } else if(middle == null) {
         // cache previous contents and re-add them afterwards
         final int n = inLeft + inRight;
@@ -212,7 +212,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
         inLeft = inRight = 0;
         middle = mid;
         for(int i = buff.length; --i >= 0;) prepend(buff[i]);
-        for(int i = 0; i < rl; i++) append(rs[i]);
+        for(final Node<N, E> r : rs) append(r);
       } else {
         // inner digits have to be merged
         final int n = inRight + ll;
@@ -231,7 +231,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
         }
         if(middle == null) middle = mid;
         else midBuffer().append(mid);
-        for(int i = 0; i < rl; i++) append(rs[i]);
+        for(final Node<N, E> r : rs) append(r);
       }
     }
 

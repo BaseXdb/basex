@@ -1,5 +1,6 @@
 package org.basex.gui.view.tree;
 
+import static org.basex.gui.view.tree.TreeConstants.*;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
@@ -25,7 +26,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Wolfgang Miller
  */
-public final class TreeView extends View implements TreeConstants {
+public final class TreeView extends View {
   /** TreeBorders Object, contains cached pre values and borders. */
   private TreeSubtree sub;
   /** TreeRects Object, contains cached rectangles. */
@@ -200,7 +201,7 @@ public final class TreeView extends View implements TreeConstants {
           markedImage = null;
           setLevelDistance();
           createMainImage();
-          if(gui.context.marked.size() > 0) markNodes();
+          if(!gui.context.marked.isEmpty()) markNodes();
         }
       }
 
@@ -472,7 +473,7 @@ public final class TreeView extends View implements TreeConstants {
    */
   private static Color getColorPerLevel(final int l, final boolean fill) {
     final int till = l < CHANGE_COLOR_TILL ? l : CHANGE_COLOR_TILL;
-    return fill ? color(till) : color(till + 2);
+    return color(fill ? till : till + 2);
   }
 
   /**

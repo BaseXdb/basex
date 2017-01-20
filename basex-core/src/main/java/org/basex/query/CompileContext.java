@@ -20,7 +20,7 @@ public final class CompileContext {
   /** Query context. */
   public final QueryContext qc;
   /** Variable scopes. */
-  public ArrayList<VarScope> scopes = new ArrayList<>();
+  public final ArrayList<VarScope> scopes = new ArrayList<>();
 
   /**
    * Constructor.

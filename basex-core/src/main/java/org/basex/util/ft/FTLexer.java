@@ -68,7 +68,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
     iter = tok;
 
     // wrap original iterator
-    if(ftOpt != null && ftOpt.is(FTFlag.ST)) {
+    if(ftOpt != null && ftOpt.is(ST)) {
       if(ftOpt.sd == null) {
         // use default stemmer if specific stemmer is not available.
         Stemmer st = Stemmer.IMPL.get(0);

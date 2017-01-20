@@ -7,7 +7,6 @@ import java.security.*;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
-import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -17,7 +16,6 @@ import org.junit.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
-@SuppressWarnings("unused")
 public final class FNCryptoTest extends SandboxTest{
   /** User home directory. */
   private static final String KEYSTORE_DIR = System.getProperty("user.home");

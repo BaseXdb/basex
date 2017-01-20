@@ -254,7 +254,7 @@ public final class FnParseIetfDate extends StandardFunc {
         if(!digit(curr())) throw error("digit");
         BigDecimal f = BigDecimal.TEN;
         while(digit(curr())) {
-          bd = bd.add(BigDecimal.valueOf(number()).divide(f));
+          bd = bd.add(BigDecimal.valueOf(number()).divide(f, MathContext.DECIMAL64));
           f = f.multiply(BigDecimal.TEN);
         }
       }

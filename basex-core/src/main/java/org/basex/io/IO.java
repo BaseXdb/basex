@@ -248,8 +248,8 @@ public abstract class IO {
    */
   public final IO merge(final String path) {
     if(path.isEmpty()) return this;
-    final IO io = IO.get(path);
-    return io.isAbsolute() ? io : IO.get((pth.endsWith("/") ? pth : dir()) + path);
+    final IO io = get(path);
+    return io.isAbsolute() ? io : get((pth.endsWith("/") ? pth : dir()) + path);
   }
 
   /**

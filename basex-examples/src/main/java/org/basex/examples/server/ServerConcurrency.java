@@ -108,7 +108,7 @@ public final class ServerConcurrency {
     /** Set to false to stop the Client from running.*/
     boolean running = true;
     /** Random sleep time generator.*/
-    Random r = new Random();
+    final Random r = new Random();
 
     /**
      * Constructor.

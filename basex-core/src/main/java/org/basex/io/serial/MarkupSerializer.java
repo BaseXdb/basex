@@ -17,7 +17,6 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.http.*;
 import org.basex.util.options.*;
-import org.basex.util.options.Options.YesNoOmit;
 
 /**
  * This class serializes items to in a markup language.

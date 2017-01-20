@@ -204,16 +204,6 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Returns an array with all elements and resets the array size.
-   * @return array
-   */
-  public final int[] next() {
-    final int[] lst = Arrays.copyOf(list, size);
-    reset();
-    return lst;
-  }
-
-  /**
    * Returns an array with all elements and invalidates the internal array.
    * Warning: the function must only be called if the list is discarded afterwards.
    * @return array (internal representation!)

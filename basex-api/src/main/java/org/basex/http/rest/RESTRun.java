@@ -30,11 +30,6 @@ final class RESTRun extends RESTQuery {
     super(session, vars, val);
   }
 
-  @Override
-  protected void run0() throws IOException {
-    query();
-  }
-
   /**
    * Creates a new instance of this command.
    * @param session REST session

@@ -175,11 +175,11 @@ public final class Lookup extends Arr {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     if(exprs.length > 1) sb.append('(').append(exprs[1]).append(')');
-    final Expr key = exprs[0];
 
-    if(key == Str.WC) {
-      return sb.append("?*").toString();
-    } else if(key instanceof Str) {
+    final Expr key = exprs[0];
+    if(key == Str.WC) return sb.append("?*").toString();
+
+    if(key instanceof Str) {
       final Str str = (Str) key;
       if(XMLToken.isNCName(str.string())) return sb.append('?').append(str.toJava()).toString();
     } else if(key instanceof Int) {

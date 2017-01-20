@@ -298,7 +298,7 @@ final class XMLParser extends CommandParser {
     final Value mv = ma.value(), ov = oa.value();
     try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
       qp.bind("A", mv).bind("O", ov);
-      if(qp.value().size() != 0) return true;
+      if(!qp.value().isEmpty()) return true;
     }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();

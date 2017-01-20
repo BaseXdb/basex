@@ -21,8 +21,6 @@ import org.basex.util.options.*;
 public final class ReplaceDoc extends NodeUpdate {
   /** Container for new database documents. */
   private final DBNew newDocs;
-  /** Database update options. */
-  private final DBOptions options;
 
   /**
    * Constructor.
@@ -38,7 +36,7 @@ public final class ReplaceDoc extends NodeUpdate {
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.REPLACENODE, pre, data, info);
-    options = new DBOptions(opts, DBOptions.PARSING, info);
+    final DBOptions options = new DBOptions(opts, DBOptions.PARSING, info);
     newDocs = new DBNew(qc, Arrays.asList(input), options, info);
   }
 

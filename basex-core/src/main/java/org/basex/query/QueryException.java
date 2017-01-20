@@ -49,6 +49,7 @@ public class QueryException extends Exception {
    */
   public QueryException(final Throwable cause) {
     this(Util.message(cause));
+    initCause(cause);
   }
 
   /**

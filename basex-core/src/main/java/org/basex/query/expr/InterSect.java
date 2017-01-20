@@ -39,7 +39,7 @@ public final class InterSect extends Set {
     final boolean db = list.dbnodes();
 
     final int el = exprs.length;
-    for(int e = 1; e < el && list.size() != 0; ++e) {
+    for(int e = 1; e < el && !list.isEmpty(); ++e) {
       final ANodeList nt = new ANodeList().check();
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {

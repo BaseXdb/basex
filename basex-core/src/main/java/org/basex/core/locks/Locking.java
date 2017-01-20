@@ -221,7 +221,7 @@ public final class Locking {
     synchronized(localLocks) {
       final LocalLock lock = localLocks.get(string);
       if(lock.unpin() == 0) {
-        localLocks.remove(lock);
+        localLocks.remove(string);
       }
       return lock;
     }
@@ -230,21 +230,27 @@ public final class Locking {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(NL);
-    sb.append("Locking" + NL);
+    sb.append("Locking").append(NL);
     final String ind = "| ";
-    sb.append(ind + "Running jobs: " + jobs + NL);
-    sb.append(ind + queue + NL);
-    sb.append(ind + "Held locks by object:" + NL);
+    sb.append(ind).append("Running jobs: ").append(jobs).append(NL);
+    sb.append(ind).append(queue).append(NL);
+    sb.append(ind).append("Held locks by object:").append(NL);
     synchronized(localLocks) {
-      for(final Entry<String, LocalLock> e : localLocks.entrySet())
-        sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
+      for(final Entry<String, LocalLock> e : localLocks.entrySet()) {
+        sb.append(ind).append(ind).append(e.getKey()).append(" -> ").append(e.getValue()).
+          append(NL);
+      }
     }
-    sb.append(ind + "Held write locks by job:" + NL);
-    for(final Entry<Long, LockList> entry : writeLocked.entrySet())
-      sb.append(ind + ind + entry.getKey() + " -> " + entry.getValue() + NL);
-    sb.append(ind + "Held read locks by job:" + NL);
-    for(final Entry<Long, LockList> entry : readLocked.entrySet())
-      sb.append(ind + ind + entry.getKey() + " -> " + entry.getValue() + NL);
+    sb.append(ind).append("Held write locks by job:").append(NL);
+    for(final Entry<Long, LockList> entry : writeLocked.entrySet()) {
+      sb.append(ind).append(ind).append(entry.getKey()).append(" -> ").append(entry.getValue()).
+        append(NL);
+    }
+    sb.append(ind).append("Held read locks by job:").append(NL);
+    for(final Entry<Long, LockList> entry : readLocked.entrySet()) {
+      sb.append(ind).append(ind).append(entry.getKey()).append(" -> ").
+        append(entry.getValue()).append(NL);
+    }
     return sb.toString();
   }
 }

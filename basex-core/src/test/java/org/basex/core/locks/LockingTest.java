@@ -611,7 +611,7 @@ public final class LockingTest extends SandboxTest {
         }
 
         locks.release();
-      } catch(InterruptedException ex) {
+      } catch(final InterruptedException ex) {
         throw new RuntimeException("Unexpectedly interrupted.");
       }
     }

@@ -509,7 +509,8 @@ public final class FTWords extends FTExpr {
         break;
       default:
     }
-    if(occ != null) sb.append(OCCURS + ' ' + occ[0] + ' ' + TO + ' ' + occ[1] + ' ' + TIMES);
+    if(occ != null) sb.append(OCCURS + ' ').append(occ[0]).append(' ').append(TO).append(' ').
+      append(occ[1]).append(' ').append(TIMES);
     if(ftOpt != null) sb.append(ftOpt);
     return sb.toString();
   }

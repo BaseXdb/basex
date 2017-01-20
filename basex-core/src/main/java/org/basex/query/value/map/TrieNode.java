@@ -61,9 +61,9 @@ abstract class TrieNode {
     void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc,
         final InputInfo ii) { }
     @Override
-    StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
+    StringBuilder append(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
     @Override
-    StringBuilder toString(final StringBuilder sb) { return sb; }
+    StringBuilder append(final StringBuilder sb) { return sb; }
   };
 
   /** Size of this node. */
@@ -260,22 +260,21 @@ abstract class TrieNode {
 
   /**
    * Recursive {@link #toString()} helper.
-   *
    * @param sb string builder
    * @param ind indentation string
    * @return string builder for convenience
    */
-  abstract StringBuilder toString(StringBuilder sb, String ind);
+  abstract StringBuilder append(StringBuilder sb, String ind);
 
   /**
    * Recursive helper for {@link Map#toString()}.
    * @param sb string builder
    * @return reference to {@code sb}
    */
-  abstract StringBuilder toString(StringBuilder sb);
+  abstract StringBuilder append(StringBuilder sb);
 
   @Override
   public String toString() {
-    return toString(new StringBuilder(), "").toString();
+    return append(new StringBuilder(), "").toString();
   }
 }

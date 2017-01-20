@@ -16,7 +16,6 @@ import org.basex.query.util.collation.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.junit.*;
-import org.junit.Test;
 
 /**
  * Tests on options.

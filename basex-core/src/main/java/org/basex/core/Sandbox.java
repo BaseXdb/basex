@@ -61,9 +61,7 @@ public abstract class Sandbox {
       return cmd.execute(context);
     } catch(final BaseXException ex) {
       Util.stack(ex);
-      final AssertionError err = new AssertionError(ex.getMessage());
-      err.initCause(ex);
-      throw err;
+      throw new AssertionError(ex.getMessage(), ex);
     }
   }
 
@@ -122,9 +120,7 @@ public abstract class Sandbox {
       file.write(token(data));
     } catch(final IOException ex) {
       Util.stack(ex);
-      final AssertionError err = new AssertionError(ex.getMessage());
-      err.initCause(ex);
-      throw err;
+      throw new AssertionError(ex.getMessage(), ex);
     }
   }
 

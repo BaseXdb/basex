@@ -206,7 +206,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
             for(int i; (i = input.read()) != -1;) bl.add(i);
 
             return new HTTPResponse(code, bl.toString());
-          } catch(final SocketTimeoutException e) { }
+          } catch(final SocketTimeoutException ignore) { }
         }
         return null;
       } finally {
@@ -222,7 +222,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
     /** Content to send to the server. */
     private final byte[] data;
     /** HTTP method. */
-    protected HttpMethod method;
+    protected final HttpMethod method;
     /** Stop signal. */
     public volatile boolean stop;
 
@@ -261,7 +261,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
         while(!stop) {
           try {
             return new HTTPResponse(hc.getResponseCode());
-          } catch(final SocketTimeoutException e) { }
+          } catch(final SocketTimeoutException ignore) { }
         }
         return null;
       } finally {
@@ -347,7 +347,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @return {@code true} if the current code is a "Success" code
      */
     public boolean isSuccess() {
-      return 200 <= code && code < 300;
+      return code >= 200 && code < 300;
     }
 
     @Override

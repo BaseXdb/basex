@@ -1,8 +1,10 @@
 package org.basex.api.xmldb;
 
+import static org.basex.api.xmldb.BXXMLDBText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -19,7 +21,7 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class BXQueryService implements XPathQueryService, BXXMLDBText {
+final class BXQueryService implements XPathQueryService {
   /** XPath service constant. */
   static final String XPATH = "XPathQueryService";
   /** XQuery service constant. */
@@ -124,7 +126,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
       try {
         qp.register(coll.ctx);
         // add default namespaces
-        for(final Map.Entry<String, String> entry : ns.entrySet()) {
+        for(final Entry<String, String> entry : ns.entrySet()) {
           qp.sc.ns.add(token(entry.getKey()), token(entry.getValue()), null);
         }
         // perform query and return result

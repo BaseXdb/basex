@@ -17,8 +17,6 @@ import org.basex.util.options.*;
  * @author Dimitar Popov
  */
 public final class DBAdd extends DBUpdate {
-  /** Database update options. */
-  private final DBOptions options;
   /** Container for new database documents. */
   private final DBNew newDocs;
   /** Replace flag. */
@@ -40,9 +38,9 @@ public final class DBAdd extends DBUpdate {
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBADD, data, info);
-    options = new DBOptions(opts, DBOptions.PARSING, info);
     this.replace = replace;
 
+    final DBOptions options = new DBOptions(opts, DBOptions.PARSING, info);
     final List<NewInput> docs = new ArrayList<>();
     docs.add(input);
     newDocs = new DBNew(qc, docs, options, info);

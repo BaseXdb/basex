@@ -15,8 +15,6 @@ public final class JobTask extends TimerTask {
   public final ScheduledXQuery job;
   /** Job pool. */
   public final JobPool jobs;
-  /** Delay. */
-  public final long delay;
   /** Interval. */
   public final long interval;
   /** End time (@link {@link Long#MAX_VALUE}: no end). */
@@ -38,7 +36,6 @@ public final class JobTask extends TimerTask {
 
     this.job = job;
     this.jobs = jobs;
-    this.delay = delay;
     this.interval = interval;
     final long time = System.currentTimeMillis();
     start = time + delay;

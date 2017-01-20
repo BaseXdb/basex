@@ -6,7 +6,6 @@ import static org.basex.query.func.Function.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.junit.*;
-import org.junit.Test;
 
 /**
  * This class tests the functions of the User Module.

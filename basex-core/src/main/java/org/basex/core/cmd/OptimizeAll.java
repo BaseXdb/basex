@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
@@ -15,7 +14,6 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -37,17 +35,17 @@ public final class OptimizeAll extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(!startUpdate(data)) return false;
-    boolean ok = true;
-    try {
-      optimizeAll(data, context, options, this);
-    } catch(final IOException ex) {
-      ok = error(Util.message(ex));
-    } finally {
-      context.closeDB();
-      ok &= finishUpdate(data);
-    }
-    if(!ok) return false;
+    if(!update(data, new Code() {
+      @Override
+      boolean run() throws IOException {
+        try {
+          optimizeAll(data, context, options, OptimizeAll.this);
+          return true;
+        } finally {
+          context.closeDB();
+        }
+      }
+    })) return false;
 
     final Open open = new Open(data.meta.name);
     return open.run(context) ? info(DB_OPTIMIZED_X, data.meta.name, job().performance) :
@@ -57,11 +55,6 @@ public final class OptimizeAll extends ACreate {
   @Override
   public boolean newData(final Context ctx) {
     return true;
-  }
-
-  @Override
-  public void addLocks() {
-    job().locks.writes.add(Locking.CONTEXT);
   }
 
   @Override
@@ -183,7 +176,7 @@ public final class OptimizeAll extends ACreate {
     DBParser(final DiskData data, final MainOptions options) {
       super(data.meta.original.isEmpty() ? null : IO.get(data.meta.original), options);
       this.data = data;
-      this.size = data.meta.size;
+      size = data.meta.size;
     }
 
     @Override

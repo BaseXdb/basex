@@ -10,7 +10,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.build.*;
-import org.basex.build.BuildText.Type;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
@@ -86,7 +85,7 @@ final class XMLScanner extends Job {
       for(int e = 0; e < el; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
       dtd = opts.get(MainOptions.DTD);
 
-      String enc = null;
+      String enc;
       // process document declaration...
       if(consume(DOCDECL)) {
         if(s()) {

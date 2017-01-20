@@ -47,14 +47,6 @@ public abstract class NodeUpdate extends DataUpdate {
   public abstract void prepare(MemData tmp) throws QueryException;
 
   /**
-   * Merges two update primitives, as they have the same target node.
-   * @param update primitive to merge with
-   * @throws QueryException exception
-   */
-  @Override
-  public abstract void merge(Update update) throws QueryException;
-
-  /**
    * Updates the name pool, which is used to find duplicate attributes
    * and namespace conflicts.
    * @param pool name pool

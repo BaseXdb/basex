@@ -102,11 +102,6 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), exprs);
-  }
-
-  @Override
   public String toString() {
     return toString(' ' + QueryText.UPDATE + ' ');
   }

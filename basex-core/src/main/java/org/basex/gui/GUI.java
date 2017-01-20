@@ -465,7 +465,7 @@ public final class GUI extends JFrame {
       cmd.job().tracer = info;
 
       // evaluate command
-      String inf = null;
+      String inf;
       Throwable cause = null;
       try {
         cmd.execute(context, ao);
@@ -523,7 +523,7 @@ public final class GUI extends JFrame {
             if(nodes != null) {
               // use query result
               m = nodes;
-            } else if(m.size() != 0) {
+            } else if(!m.isEmpty()) {
               // remove old highlighting
               m = new DBNodes(data);
             }
@@ -643,7 +643,7 @@ public final class GUI extends JFrame {
     final DBNodes marked = context.marked;
     if(marked != null) setResults(marked.size());
 
-    filter.setEnabled(marked != null && marked.size() != 0);
+    filter.setEnabled(marked != null && !marked.isEmpty());
 
     final boolean inf = gopts.get(GUIOptions.SHOWINFO);
     context.options.set(MainOptions.QUERYINFO, inf);

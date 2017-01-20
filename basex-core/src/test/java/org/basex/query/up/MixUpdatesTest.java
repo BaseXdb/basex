@@ -6,7 +6,6 @@ import static org.basex.query.func.Function.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.junit.*;
-import org.junit.Test;
 
 /**
  * Tests for the {@link MainOptions#MIXUPDATES} flag.

@@ -203,7 +203,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void startUpdate(final MainOptions opts) throws IOException {
+  public void startUpdate(final MainOptions opts) throws BaseXException {
     if(!table.lock(true)) throw new BaseXException(DB_PINNED_X, meta.name);
     if(opts.get(MainOptions.AUTOFLUSH)) {
       final IOFile upd = meta.updateFile();

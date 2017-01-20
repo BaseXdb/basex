@@ -10,7 +10,6 @@ import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.util.*;
 import org.basex.util.ft.*;
 
 /**
@@ -58,17 +57,13 @@ public final class CreateIndex extends ACreate {
     data.meta.names(type, options);
     data.meta.splitsize = options.get(MainOptions.SPLITSIZE);
 
-    if(!startUpdate(data)) return false;
-    boolean ok = true;
-    try {
-      create(type, data, this);
-      ok = info(INDEX_CREATED_X_X, type, job().performance);
-    } catch(final IOException ex) {
-      ok = error(Util.message(ex));
-    } finally {
-      ok &= finishUpdate(data);
-    }
-    return ok;
+    return update(data, new Code() {
+      @Override
+      boolean run() throws IOException {
+        create(type, data, CreateIndex.this);
+        return info(INDEX_CREATED_X_X, type, job().performance);
+      }
+    });
   }
 
   @Override

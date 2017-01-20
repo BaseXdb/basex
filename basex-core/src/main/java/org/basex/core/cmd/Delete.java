@@ -27,26 +27,24 @@ public final class Delete extends ACreate {
   protected boolean run() {
     final Data data = context.data();
     final String target = args[0];
+    return update(data, new Code() {
+      @Override
+      boolean run() {
+        // delete XML documents
+        final IntList docs = data.resources.docs(target);
+        final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+        final int ds = docs.size();
+        for(int d = 0; d < ds; d++) auc.addDelete(docs.get(d));
+        auc.execute(false);
+        context.invalidate();
 
-    if(!startUpdate(data)) return false;
+        // delete binaries
+        final TokenList bins = data.resources.binaries(target);
+        delete(data, target);
 
-    // delete all documents
-    final IntList docs = data.resources.docs(target);
-    final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-    final int ds = docs.size();
-    for(int d = 0; d < ds; d++) auc.addDelete(docs.get(d));
-    auc.execute(false);
-    context.invalidate();
-
-    // delete binaries
-    final TokenList bins = data.resources.binaries(target);
-    delete(data, target);
-
-    // finish update
-    if(!finishUpdate(data)) return false;
-
-    // return info message
-    return info(RES_DELETED_X_X, docs.size() + bins.size(), job().performance);
+        return info(RES_DELETED_X_X, docs.size() + bins.size(), job().performance);
+      }
+    });
   }
 
   /**

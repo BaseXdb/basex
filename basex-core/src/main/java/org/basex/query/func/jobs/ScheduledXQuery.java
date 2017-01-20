@@ -36,8 +36,6 @@ public final class ScheduledXQuery extends Job implements Runnable {
   private final String query;
   /** Base URI. */
   private final String uri;
-  /** Repeat flag. */
-  private final boolean repeat;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -60,8 +58,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
     this.query = query;
     this.bindings = bindings;
     this.info = info;
-    this.cache = opts.get(EvalOptions.CACHE);
-    this.job().context = qc.context;
+    cache = opts.get(EvalOptions.CACHE);
+    job().context = qc.context;
 
     final String bu = opts.get(EvalOptions.BASE_URI);
     uri = bu != null ? bu : string(sc.baseURI().string());
@@ -73,9 +71,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
     // check when job is to be repeated
     long interval = 0;
     final String inter = opts.get(EvalOptions.INTERVAL);
-    if(!inter.isEmpty()) interval = ms(new DTDur(Token.token(inter), info));
+    if(!inter.isEmpty()) interval = ms(new DTDur(token(inter), info));
     if(interval < 1000 && interval != 0) throw JOBS_RANGE_X.get(info, inter);
-    repeat = interval > 0;
 
     // check when job is to be stopped
     final String dur = opts.get(EvalOptions.END);
@@ -95,7 +92,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
       }
 
       if(cache) {
-        if(repeat) throw JOBS_CONFLICT.get(info);
+        if(interval > 0) throw JOBS_CONFLICT.get(info);
         pool.results.put(id, result);
       }
 
@@ -116,17 +113,17 @@ public final class ScheduledXQuery extends Job implements Runnable {
       throws QueryException {
 
     qc.initDateTime();
-    long ms = 0;
+    long ms;
     if(Dur.DTD.matcher(string).matches()) {
       // dayTimeDuration
-      ms = ms(new DTDur(Token.token(string), info));
+      ms = ms(new DTDur(token(string), info));
     } else if(ADate.TIME.matcher(string).matches()) {
       // time
-      ms = ms(new DTDur(new Tim(Token.token(string), info), qc.time, info));
+      ms = ms(new DTDur(new Tim(token(string), info), qc.time, info));
       while(ms <= min) ms += 86400000;
     } else {
       // dateTime
-      ms = ms(new DTDur(new Dtm(Token.token(string), info), qc.datm, info));
+      ms = ms(new DTDur(new Dtm(token(string), info), qc.datm, info));
     }
     if(ms <= min) throw JOBS_RANGE_X.get(info, string);
     return ms;

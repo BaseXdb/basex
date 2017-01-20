@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Abstract node test.
@@ -13,26 +12,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Test {
-  /** Static text node test. */
-  public static final KindTest TXT = new KindTest(NodeType.TXT);
-  /** Static PI node test. */
-  public static final KindTest PI = new KindTest(NodeType.PI);
-  /** Static element node test. */
-  public static final KindTest ELM = new KindTest(NodeType.ELM);
-  /** Static document node test. */
-  public static final KindTest DOC = new KindTest(NodeType.DOC);
-  /** Static attribute node test. */
-  public static final KindTest ATT = new KindTest(NodeType.ATT);
-  /** Static comment node test. */
-  public static final KindTest COM = new KindTest(NodeType.COM);
-  /** Static comment node test. */
-  public static final KindTest NSP = new KindTest(NodeType.NSP);
-  /** Static node test. */
-  public static final Test NOD = new KindTest(NodeType.NOD) {
-    @Override
-    public boolean eq(final ANode it) { return true; }
-  };
-
   /** Kind of name test. */
   public enum Kind {
     /** Accept all nodes (*).            */ WILDCARD,
@@ -49,25 +28,6 @@ public abstract class Test {
   public QNm name;
   /** Indicates if test will match exactly one node (e.g.: @id). */
   public boolean unique;
-
-  /**
-   * Returns a test instance.
-   * @param t node type
-   * @return kind test
-   */
-  public static Test get(final NodeType t) {
-    switch(t) {
-      case TXT: return TXT;
-      case PI:  return PI;
-      case ELM: return ELM;
-      case DOC: return DOC;
-      case ATT: return ATT;
-      case COM: return COM;
-      case NOD: return NOD;
-      case NSP: return NSP;
-      default: throw Util.notExpected();
-    }
-  }
 
   /**
    * Constructor.

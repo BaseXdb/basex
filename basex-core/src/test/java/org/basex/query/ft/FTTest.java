@@ -40,11 +40,10 @@ public final class FTTest extends FTData {
   @Override
   protected String details() {
     final MainOptions opts = context.options;
-    final String sb = toString(opts, MainOptions.FTINDEX) + ';' +
+    return toString(opts, MainOptions.FTINDEX) + ';' +
       toString(opts, MainOptions.STEMMING) + ';' +
       toString(opts, MainOptions.DIACRITICS) + ';' +
       toString(opts, MainOptions.CASESENS);
-    return sb;
   }
 
   /**

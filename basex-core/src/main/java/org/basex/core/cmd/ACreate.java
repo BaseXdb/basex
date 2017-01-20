@@ -12,7 +12,7 @@ import org.basex.io.*;
 import org.basex.util.*;
 
 /**
- * Abstract class for database creation commands.
+ * Abstract class for database updates.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -20,6 +20,8 @@ import org.basex.util.*;
 public abstract class ACreate extends Command {
   /** Flag for closing a data instances before executing the command. */
   private boolean newData;
+  /** Indicates if database should be locked. */
+  protected boolean lock = true;
 
   /**
    * Protected constructor, specifying command arguments.
@@ -74,34 +76,32 @@ public abstract class ACreate extends Command {
   }
 
   /**
-   * Starts an update operation.
+   * Runs an update operation.
    * @param data data reference
+   * @param update update operation
    * @return success flag
    */
-  final boolean startUpdate(final Data data) {
+  final boolean update(final Data data, final Code update) {
+    IOException exc = null;
     try {
-      data.startUpdate(options);
-      return true;
+      // prepare update, set locks
+      if(lock) data.startUpdate(options);
+      // perform update, return success flag
+      return update.run();
     } catch(final IOException ex) {
-      info(Util.message(ex));
-      return false;
+      exc = ex;
+    } finally {
+      try {
+        // finish update, remove locks
+        Optimize.finish(data);
+        if(lock) data.finishUpdate(options);
+      } catch(final IOException ex) {
+        // do not overwrite existing error if something goes wrong
+        if(exc == null) exc = ex;
+        else Util.debug(ex);
+      }
     }
-  }
-
-  /**
-   * Finalizes an update operation.
-   * @param data data reference
-   * @return success flag
-   */
-  final boolean finishUpdate(final Data data) {
-    try {
-      Optimize.finish(data);
-      data.finishUpdate(options);
-      return true;
-    } catch(final IOException ex) {
-      info(Util.message(ex));
-      return false;
-    }
+    return error(Util.message(exc));
   }
 
   @Override
@@ -124,5 +124,20 @@ public abstract class ACreate extends Command {
   @Override
   public boolean stoppable() {
     return true;
+  }
+
+  /**
+   * Update code.
+   *
+   * @author BaseX Team 2005-16, BSD License
+   * @author Christian Gruen
+   */
+  abstract static class Code {
+    /**
+     * Runs the update.
+     * @return success flag
+     * @throws IOException I/O exception
+     */
+    abstract boolean run() throws IOException;
   }
 }

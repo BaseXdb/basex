@@ -30,9 +30,9 @@ public final class QNm extends Item {
   /** Namespace URI. */
   private byte[] uri;
   /** Name with optional prefix. */
-  private byte[] name;
+  private final byte[] name;
   /** Prefix index. */
-  private int pref;
+  private final int pref;
 
   /**
    * Empty constructor.
@@ -40,6 +40,7 @@ public final class QNm extends Item {
   public QNm() {
     super(AtomType.QNM);
     name = EMPTY;
+    pref = 0;
   }
 
   /**
@@ -270,18 +271,6 @@ public final class QNm extends Item {
    */
   public byte[] local() {
     return pref == -1 ? name : substring(name, pref + 1);
-  }
-
-  /**
-   * Updates the values of this QName. This method is only called
-   * to speed up internal operations.
-   * @param n name
-   * @param u URI
-   */
-  public void set(final byte[] n, final byte[] u) {
-    name = n;
-    pref = indexOf(name, ':');
-    uri = u;
   }
 
   /**

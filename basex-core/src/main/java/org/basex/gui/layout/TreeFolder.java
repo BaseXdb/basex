@@ -99,8 +99,7 @@ public class TreeFolder extends TreeNode {
    * @return sub folder path
    */
   byte[] subfolder() {
-    return path.length > 1 ? concat(concat(path, SLASH), name) :
-      concat(path, name);
+    return concat(path.length > 1 ? concat(path, SLASH) : path, name);
   }
 
   /**

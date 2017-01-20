@@ -385,7 +385,7 @@ public final class PlotView extends View {
     final Graphics gi = BaseXLayout.antiAlias(markedImg.getGraphics());
 
     final DBNodes marked = gui.context.marked;
-    if(marked.size() == 0) return;
+    if(marked.isEmpty()) return;
     final int[] pres = marked.pres();
     final int[] m = Arrays.copyOf(pres, pres.length);
     int i = 0;
@@ -519,7 +519,7 @@ public final class PlotView extends View {
         if(coSorted[i] > op) {
           final double distL = Math.abs(coSorted[i - 1] - op);
           final double distG = Math.abs(coSorted[i] - op);
-          op = distL < distG ? coSorted[i - 1] : coSorted[i];
+          op = coSorted[distL < distG ? i - 1 : i];
 
           int j = 0;
           // find value for given plot position

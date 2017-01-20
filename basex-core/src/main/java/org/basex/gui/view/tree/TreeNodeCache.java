@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Wolfgang Miller
  */
-final class TreeNodeCache implements TreeConstants {
+final class TreeNodeCache {
   /** Document depth. */
   private final int maxLevel;
   /** All nodes document nodes per level. */

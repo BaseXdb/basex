@@ -8,7 +8,7 @@ import org.basex.util.*;
  * Read and write locks of a single job.
  *
  * @author BaseX Team 2005-16, BSD License
- * @author Jens Erat
+ * @author Christian Gruen
  */
 public final class Locks {
   /** Read locks. */
@@ -36,7 +36,6 @@ public final class Locks {
 
   @Override
   public String toString() {
-    return new StringBuilder(Util.className(getClass())).append(": Read ").
-        append(reads).append(", Write ").append(writes).append(']').toString();
+    return Util.className(getClass()) + ": Read " + reads + ", Write " + writes + ']';
   }
 }

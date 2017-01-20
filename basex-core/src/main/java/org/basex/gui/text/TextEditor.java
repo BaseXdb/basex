@@ -22,7 +22,7 @@ public final class TextEditor {
     /** Lower case. */ LOWER,
     /** Upper case. */ UPPER,
     /** Title case. */ TITLE
-  };
+  }
 
   /** Opening brackets. */
   private static final String OPENING = "{([";

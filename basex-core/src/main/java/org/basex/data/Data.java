@@ -145,17 +145,17 @@ public abstract class Data {
   /**
    * Drops the specified index.
    * @param type index to be dropped
-   * @throws IOException I/O exceptions
+   * @throws BaseXException database exception
    */
-  public abstract void dropIndex(IndexType type) throws IOException;
+  public abstract void dropIndex(IndexType type) throws BaseXException;
 
   /**
-   * Starts an update operation: writes a file to disk to indicate that an update is
-   * going on, and exclusively locks the table file.
+   * Starts an update operation: writes a file to disk to indicate that an update is going on,
+   * and exclusively locks the table file.
    * @param opts main options
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  public abstract void startUpdate(MainOptions opts) throws IOException;
+  public abstract void startUpdate(MainOptions opts) throws BaseXException;
 
   /**
    * Finishes an update operation: removes the update file and the exclusive lock.
@@ -779,7 +779,7 @@ public abstract class Data {
           // add text, comment or processing instruction
           text(nDist, sdata.text(sPre, true), sKind);
           break;
-        case ATTR: {
+        case ATTR:
           // add attribute
           final byte[] name = sdata.name(sPre, sKind);
           int uriId = sdata.uriId(sPre, sKind);
@@ -793,7 +793,6 @@ public abstract class Data {
             }
           }
           attr(nDist, attrNames.put(name), sdata.text(sPre, false), uriId);
-        }
       }
       nsScope.shift(1);
     }

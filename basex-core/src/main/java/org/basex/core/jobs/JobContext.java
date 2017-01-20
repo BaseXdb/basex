@@ -24,10 +24,10 @@ public final class JobContext {
   /** Database context. */
   public Context context;
   /** Registered locks. */
-  public Locks locks = new Locks();
+  public final Locks locks = new Locks();
 
   /** Root job. */
-  private final Job root;
+  private final Job job;
 
   /** Job id. Will be set via if job is being registered. */
   private String id;
@@ -39,7 +39,7 @@ public final class JobContext {
    * @param job job
    */
   JobContext(final Job job) {
-    this.root = job;
+    this.job = job;
   }
 
   /**
@@ -75,11 +75,11 @@ public final class JobContext {
    * @return name
    */
   public String type() {
-    return tp != null ? tp : Util.className(root);
+    return tp != null ? tp : Util.className(job);
   }
 
   @Override
   public String toString() {
-    return root.toString();
+    return job.toString();
   }
 }

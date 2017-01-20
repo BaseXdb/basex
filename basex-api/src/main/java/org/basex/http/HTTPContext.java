@@ -26,13 +26,8 @@ public final class HTTPContext {
   /** Server instance. */
   private static BaseXServer server;
 
-  /**
-   * Private constructor.
-   * @param file retrieve options from disk
-   */
-  private HTTPContext(final boolean file) {
-    context = new Context(file);
-  }
+  /** Private constructor. */
+  private HTTPContext() { }
 
   // STATIC METHODS ===============================================================================
 

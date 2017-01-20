@@ -166,8 +166,7 @@ public final class GUIMacOSX {
      * @return always false
      */
     public boolean handleQuit() {
-      // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUIMenuCmd.C_EXIT).execute(main);
+      GUIMenuCmd.C_EXIT.execute(main);
       return false;
     }
 

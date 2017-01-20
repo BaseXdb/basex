@@ -9,7 +9,6 @@ import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.util.*;
 
 /**
  * Evaluates the 'drop index' command and deletes indexes in the currently
@@ -49,17 +48,13 @@ public final class DropIndex extends ACreate {
     }
     data.meta.names(type, options);
 
-    if(!startUpdate(data)) return false;
-    boolean ok = true;
-    try {
-      drop(type, data);
-      ok = info(INDEX_DROPPED_X_X, type, job().performance);
-    } catch(final IOException ex) {
-      ok = error(Util.message(ex));
-    } finally {
-      ok &= finishUpdate(data);
-    }
-    return ok;
+    return update(data, new Code() {
+      @Override
+      boolean run() throws IOException {
+        drop(type, data);
+        return info(INDEX_DROPPED_X_X, type, job().performance);
+      }
+    });
   }
 
   @Override

@@ -136,7 +136,7 @@ public final class Util {
     while(true) {
       final Throwable ca = th.getCause();
       if(ca == null || th instanceof QueryException && !(ca instanceof QueryException)) return th;
-      Util.debug(th);
+      debug(th);
       th = ca;
     }
   }

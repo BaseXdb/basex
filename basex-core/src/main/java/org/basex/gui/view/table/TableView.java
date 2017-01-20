@@ -109,7 +109,7 @@ public final class TableView extends View {
 
     final Context context = gui.context;
     final DBNodes marked = context.marked;
-    if(marked.size() != 0) {
+    if(!marked.isEmpty()) {
       final int p = tdata.getRoot(context.data(), marked.pre(0));
       if(p != -1) setPos(p);
     }

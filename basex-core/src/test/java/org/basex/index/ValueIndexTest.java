@@ -141,7 +141,7 @@ public final class ValueIndexTest extends SandboxTest {
     execute(new CreateDB(NAME, FILE));
 
     // fetch index reference to be tested
-    final boolean text = IndexType.TEXT == indexType;
+    final boolean text = indexType == IndexType.TEXT;
     final ValueIndex index = (ValueIndex) context.data().index(indexType);
 
     // receive, verify and count results for passed tokens
@@ -152,7 +152,7 @@ public final class ValueIndexTest extends SandboxTest {
       while(it.more()) {
         final int pre = it.pre();
         final byte[] result = context.data().text(pre, text);
-        if(IndexType.TOKEN == indexType)
+        if(indexType == IndexType.TOKEN)
           assertTrue("Token '" + entry.getKey() + "' not found in match '" + string(result) + "'!",
               new TokenSet(distinctTokens(result)).contains(token(entry.getKey())));
         else

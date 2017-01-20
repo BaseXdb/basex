@@ -289,7 +289,7 @@ public enum GUIMenuCmd implements GUICommand {
     public boolean enabled(final GUI gui) {
       // disallow copy of empty node set or root node
       final DBNodes marked = gui.context.marked;
-      return marked != null && marked.size() != 0;
+      return marked != null && !marked.isEmpty();
     }
   },
 
@@ -422,7 +422,7 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
       DBNodes marked = ctx.marked;
-      if(marked.size() == 0) {
+      if(marked.isEmpty()) {
         final int pre = gui.context.focused;
         if(pre == -1) return;
         marked = new DBNodes(ctx.data(), pre);
@@ -433,7 +433,7 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public boolean enabled(final GUI gui) {
       final DBNodes marked = gui.context.marked;
-      return marked != null && marked.size() != 0;
+      return marked != null && !marked.isEmpty();
     }
   },
 

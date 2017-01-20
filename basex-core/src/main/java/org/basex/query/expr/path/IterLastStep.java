@@ -38,10 +38,9 @@ final class IterLastStep extends Step {
 
         // return last items
         ANode litem = null;
-        final Test tst = test;
         for(final ANode node : axis.iter(checkNode(qc))) {
           qc.checkStop();
-          if(tst.eq(node)) litem = node.finish();
+          if(test.eq(node)) litem = node.finish();
         }
         return litem == null ? null : litem;
       }

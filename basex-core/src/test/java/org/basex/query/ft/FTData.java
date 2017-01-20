@@ -530,5 +530,4 @@ abstract class FTData extends QueryTest {
       { "FTUnaryNot 15", nodes(25, 27, 29, 31, 33),
         "//fti[text() contains text 'adf' ftor ftnot 'adf']" },
     };
-
 }

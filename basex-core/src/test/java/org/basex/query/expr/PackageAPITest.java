@@ -11,7 +11,6 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.pkg.*;
-import org.basex.query.util.pkg.Pkg;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;

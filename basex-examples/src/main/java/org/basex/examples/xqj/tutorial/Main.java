@@ -68,7 +68,7 @@ abstract class Main {
     try {
       xqp.executeQuery().writeSequence(System.out, null);
     } catch(final XQException ex) {
-      System.out.println(ex);
+      ex.printStackTrace();
     }
     System.out.println();
   }

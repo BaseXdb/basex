@@ -36,8 +36,6 @@ public final class HtmlOptions extends Options {
   public static final BooleanOption NOCDATA = new BooleanOption("nocdata", false);
   /** TagSoup option: lexical. */
   public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
-  /** TagSoup option: charset. */
-  public static final StringOption CHARSET = new StringOption("charset");
 
   /** TagSoup option: method (html). */
   public static final StringOption METHOD = new StringOption("method", "xml");

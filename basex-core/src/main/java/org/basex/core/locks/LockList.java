@@ -73,9 +73,8 @@ public final class LockList implements Iterable<String> {
   /**
    * Adds another lock list. A global lock will be adopted.
    * @param locks lock list
-   * @return self reference
    */
-  public LockList add(final LockList locks) {
+  public void add(final LockList locks) {
     if(!global) {
       if(locks.global) {
         addGlobal();
@@ -83,7 +82,6 @@ public final class LockList implements Iterable<String> {
         list.add(locks.list);
       }
     }
-    return this;
   }
 
   /**

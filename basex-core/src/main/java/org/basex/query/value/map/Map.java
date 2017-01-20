@@ -243,19 +243,6 @@ public final class Map extends FItem {
     return item instanceof FItem && !(item instanceof Array) && super.deep(item, ii, coll);
   }
 
-  /**
-   * Returns a string representation of the map.
-   * @param indent indent output
-   * @param ii input info
-   * @return string
-   * @throws QueryException query exception
-   */
-  public byte[] serialize(final boolean indent, final InputInfo ii) throws QueryException {
-    final TokenBuilder tb = new TokenBuilder();
-    string(indent, tb, 0, ii);
-    return tb.finish();
-  }
-
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<>();
@@ -348,14 +335,13 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
-      final InputInfo ii) {
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii) {
     return null;
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = root.toString(new StringBuilder(MAP).append(" { "));
+    final StringBuilder sb = root.append(new StringBuilder(MAP).append(" { "));
     // remove superfluous comma
     if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
     return sb.append('}').toString();

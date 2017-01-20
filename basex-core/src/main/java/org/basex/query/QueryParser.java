@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryError.chop;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
@@ -8,7 +9,7 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -16,20 +17,19 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.OpG;
-import org.basex.query.expr.CmpN.OpN;
-import org.basex.query.expr.CmpV.OpV;
-import org.basex.query.expr.Expr.Flag;
-import org.basex.query.expr.ContextValue;
+import org.basex.query.expr.CmpG.*;
+import org.basex.query.expr.CmpN.*;
+import org.basex.query.expr.CmpV.*;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.expr.gflwor.GroupBy.Spec;
-import org.basex.query.expr.gflwor.OrderBy.Key;
+import org.basex.query.expr.gflwor.GFLWOR.*;
+import org.basex.query.expr.gflwor.GroupBy.*;
+import org.basex.query.expr.gflwor.OrderBy.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
@@ -43,7 +43,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -797,6 +797,7 @@ public class QueryParser extends InputParser {
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
+      Util.debug(ex);
       throw error(WHICHMODFILE_X, io);
     }
 
@@ -1846,7 +1847,7 @@ public class QueryParser extends InputParser {
       if(consume('/')) {
         // two slashes: absolute descendant path
         checkAxis(Axis.DESC);
-        add(el, Step.get(info(), Axis.DESCORSELF, Test.NOD));
+        add(el, Step.get(info(), Axis.DESCORSELF, KindTest.NOD));
         mark();
         ex = step(true);
       } else {
@@ -1883,7 +1884,7 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, Step.get(info(), Axis.DESCORSELF, Test.NOD));
+          add(el, Step.get(info(), Axis.DESCORSELF, KindTest.NOD));
           checkAxis(Axis.DESC);
         } else {
           checkAxis(Axis.CHILD);
@@ -1947,7 +1948,7 @@ public class QueryParser extends InputParser {
     Test test = null;
     if(wsConsume(DOT2)) {
       axis = Axis.PARENT;
-      test = Test.NOD;
+      test = KindTest.NOD;
       checkTest(test, false);
     } else if(consume('@')) {
       axis = Axis.ATTR;
@@ -1976,7 +1977,7 @@ public class QueryParser extends InputParser {
       if(axis == null) {
         axis = Axis.CHILD;
         test = nodeTest(false, true);
-        if(test == Test.NSP) throw error(NSAXIS);
+        if(test == KindTest.NSP) throw error(NSAXIS);
         if(test != null && test.type == NodeType.ATT) axis = Axis.ATTR;
         checkTest(test, axis == Axis.ATTR);
       }
@@ -3091,7 +3092,7 @@ public class QueryParser extends InputParser {
       default:  break;
     }
     wsCheck(PAREN2);
-    return tp == null ? Test.get(t) : tp;
+    return tp == null ? KindTest.get(t) : tp;
   }
 
   /**
@@ -3107,7 +3108,7 @@ public class QueryParser extends InputParser {
     skipWs();
     final NodeTest t = elem ? elementTest() : schemaTest();
     wsCheck(PAREN2);
-    return new DocTest(t != null ? t : Test.ELM);
+    return new DocTest(t != null ? t : KindTest.ELM);
   }
 
   /**
@@ -3539,7 +3540,12 @@ public class QueryParser extends InputParser {
               final String fn = string(stringLiteral());
               // optional: resolve URI reference
               final IO fl = qc.resources.stopWords(fn, sc);
-              if(!opt.sw.read(fl, except)) throw error(NOSTOPFILE_X, fl);
+              try {
+                opt.sw.read(fl, except);
+              } catch(final IOException ex) {
+                Util.debug(ex);
+                throw error(NOSTOPFILE_X, fl);
+              }
             } else if(!union && !except) {
               throw error(FTSTOP);
             }
@@ -3753,7 +3759,7 @@ public class QueryParser extends InputParser {
     if(ncName()) return tok.toArray();
     if(err != null) {
       final char ch = consume();
-      throw ch == 0 ? error(err, "") : error(err, ch);
+      throw error(err, ch == 0 ? "" : ch);
     }
     return EMPTY;
   }
@@ -3814,7 +3820,7 @@ public class QueryParser extends InputParser {
     if(!ncName()) {
       if(err != null) {
         final char ch = consume();
-        throw ch == 0 ? error(err, "") : error(err, ch);
+        throw error(err, ch == 0 ? "" : ch);
       }
     } else if(consume(':')) {
       if(XMLToken.isNCStartChar(curr())) {

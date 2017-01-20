@@ -113,7 +113,8 @@ public abstract class Step extends Preds {
    * @return result of check
    */
   public final boolean simple(final Axis ax, final boolean name) {
-    return axis == ax && preds.length == 0 && (name ? test.kind == Kind.NAME : test == Test.NOD);
+    return axis == ax && preds.length == 0 &&
+        (name ? test.kind == Kind.NAME : test == KindTest.NOD);
   }
 
   /**
@@ -238,7 +239,7 @@ public abstract class Step extends Preds {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(test == Test.NOD) {
+    if(test == KindTest.NOD) {
       if(axis == Axis.PARENT) sb.append("..");
       if(axis == Axis.SELF) sb.append('.');
     }

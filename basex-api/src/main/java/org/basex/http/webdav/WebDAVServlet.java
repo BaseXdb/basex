@@ -1,7 +1,5 @@
 package org.basex.http.webdav;
 
-import java.io.*;
-
 import javax.servlet.*;
 
 import org.basex.http.*;
@@ -25,7 +23,7 @@ public final class WebDAVServlet extends BaseXServlet {
   }
 
   @Override
-  protected void run(final HTTPConnection conn) throws IOException {
+  protected void run(final HTTPConnection conn) {
     // initialize resource factory
     WebDAVFactory.init(conn);
 

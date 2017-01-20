@@ -13,7 +13,7 @@ import org.junit.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestAttributes extends DataUpdateTest {
+public final class UpdateAttributesTest extends DataUpdateTest {
   /**
    * Tests the update of an existing attribute.
    * @throws IOException I/O exception

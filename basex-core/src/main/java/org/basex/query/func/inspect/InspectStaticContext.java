@@ -57,7 +57,7 @@ public final class InspectStaticContext extends StandardFunc {
       case FUNCTION_NAMESPACE:
         return sctx.funcNS == null ? Empty.SEQ : Uri.uri(sctx.funcNS);
       case COLLATION:
-        return Uri.uri(sctx.collation == null ? QueryText.COLLATION_URI : sctx.collation.uri());
+        return Uri.uri(sctx.collation == null ? COLLATION_URI : sctx.collation.uri());
       case ORDERING:
         return Str.get(sctx.ordered ? ORDERED : UNORDERED);
       case CONSTRUCTION:

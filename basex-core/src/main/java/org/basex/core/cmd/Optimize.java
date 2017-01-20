@@ -9,7 +9,6 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.stats.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -39,23 +38,19 @@ public final class Optimize extends ACreate {
     final MetaData meta = data.meta;
     size = meta.size;
 
-    if(!startUpdate(data)) return false;
-    boolean ok = true;
-    try {
-      // reassign autooptimize flag
-      final boolean autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
-      if(autooptimize != data.meta.autooptimize) {
-        data.meta.autooptimize = autooptimize;
-        data.meta.dirty = true;
+    return update(data, new Code() {
+      @Override
+      boolean run() throws IOException {
+        // reassign autooptimize flag
+        final boolean autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
+        if(autooptimize != data.meta.autooptimize) {
+          data.meta.autooptimize = autooptimize;
+          data.meta.dirty = true;
+        }
+        optimize(data, Optimize.this);
+        return info(DB_OPTIMIZED_X, meta.name, job().performance);
       }
-      optimize(data, this);
-      ok = info(DB_OPTIMIZED_X, meta.name, job().performance);
-    } catch(final IOException ex) {
-      ok = error(Util.message(ex));
-    } finally {
-      ok &= finishUpdate(data);
-    }
-    return ok;
+    });
   }
 
   @Override

@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class StrStream extends AStr implements Streamable {
+public final class StrStream extends AStr {
   /** Input reference. */
   private final IO input;
   /** Encoding (optional). */
