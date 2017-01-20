@@ -66,23 +66,18 @@ public class BaseX extends CLI {
       final int os = ops.size();
       for(int o = 0; o < os; o++) {
         final int c = ops.get(o);
-        String val = vals.get(o);
+        String value = vals.get(o);
 
         if(c == 'b') {
           // set/add variable binding
           if(bind.length() != 0) bind.append(',');
           // commas are escaped by a second comma
-          val = bind.append(val.replaceAll(",", ",,")).toString();
-          execute(new Set(MainOptions.BINDINGS, val), false);
+          value = bind.append(value.replaceAll(",", ",,")).toString();
+          execute(new Set(MainOptions.BINDINGS, value), false);
         } else if(c == 'c') {
           // evaluate commands
-          final IO io = IO.get(val);
-          String base = ".";
-          if(io.exists() && !io.isDir()) {
-            val = io.string();
-            base = io.path();
-          }
-          execute(val, base);
+          final Pair<String, String> input = input(value);
+          execute(input.value(), input.name());
           console = false;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
@@ -90,48 +85,43 @@ public class BaseX extends CLI {
         } else if(c == 'i') {
           // open database or create main memory representation
           execute(new Set(MainOptions.MAINMEM, true), false);
-          execute(new Check(val), verbose);
+          execute(new Check(value), verbose);
           execute(new Set(MainOptions.MAINMEM, false), false);
         } else if(c == 'I') {
           // set/add variable binding
           if(bind.length() != 0) bind.append(',');
           // commas are escaped by a second comma
-          val = bind.append("=").append(val.replaceAll(",", ",,")).toString();
-          execute(new Set(MainOptions.BINDINGS, val), false);
+          value = bind.append("=").append(value.replaceAll(",", ",,")).toString();
+          execute(new Set(MainOptions.BINDINGS, value), false);
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
-          out = new PrintOutput(val);
+          out = new PrintOutput(value);
           session().setOutputStream(out);
         } else if(c == 'q') {
           // evaluate query
-          execute(new XQuery(val), verbose);
+          execute(new XQuery(value), verbose);
           console = false;
         } else if(c == 'Q') {
           // evaluate file contents or string as query
-          final IO io = IO.get(val);
-          String base = ".";
-          if(io.exists() && !io.isDir()) {
-            val = io.string();
-            base = io.path();
-          }
-          execute(new XQuery(val).baseURI(base), verbose);
+          final Pair<String, String> input = input(value);
+          execute(new XQuery(input.value()).baseURI(input.name()), verbose);
           console = false;
         } else if(c == 'r') {
           // parse number of runs
-          execute(new Set(MainOptions.RUNS, Strings.toInt(val)), false);
+          execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
         } else if(c == 'R') {
           // toggle query evaluation
           execute(new Set(MainOptions.RUNQUERY, null), false);
         } else if(c == 's') {
           // set/add serialization parameter
           if(sopts == null) sopts = new SerializerOptions();
-          final String[] kv = val.split("=", 2);
+          final String[] kv = value.split("=", 2);
           sopts.assign(kv[0], kv.length > 1  ? kv[1] : "");
           execute(new Set(MainOptions.SERIALIZER, sopts), false);
         } else if(c == 't') {
           // evaluate query
-          execute(new Test(val), verbose);
+          execute(new Test(value), verbose);
           console = false;
         } else if(c == 'u') {
           // (de)activate write-back for updates
@@ -207,10 +197,24 @@ public class BaseX extends CLI {
   }
 
   /**
+   * Returns the base URI and the query string for the specified input.
+   * @param input input
+   * @return return base URI and query string
+   * @throws IOException I/O exception
+   */
+  private Pair<String, String> input(final String input) throws IOException {
+    final IO io = IO.get(input);
+    return new Pair<>(
+      io instanceof IOContent ? "." : io.path(),
+      io.exists() && !io.isDir() ? io.string() : input
+    );
+  }
+
+  /**
    * Tests if this is a local client.
    * @return local mode
    */
-  boolean local() {
+  protected boolean local() {
     return true;
   }
 
