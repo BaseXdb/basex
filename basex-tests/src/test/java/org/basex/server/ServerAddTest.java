@@ -68,7 +68,7 @@ public final class ServerAddTest extends SandboxTest {
     server = createServer();
     // create test database
     try(ClientSession cs = createClient()) {
-      cs.execute("create db " + NAME + " " + INPUT);
+      cs.execute("create db " + NAME + ' ' + INPUT);
       // run clients
       final Client[] cl = new Client[clients];
       for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);

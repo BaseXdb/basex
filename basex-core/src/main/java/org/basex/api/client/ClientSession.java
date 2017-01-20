@@ -258,4 +258,9 @@ public class ClientSession extends Session {
     if(!ok(bi)) throw new BaseXException(bi.readString());
     return o.toString();
   }
+
+  @Override
+  public String toString() {
+    return Prop.PROJECT_NAME + ":/" + socket.getLocalAddress() + ":" + socket.getPort();
+  }
 }

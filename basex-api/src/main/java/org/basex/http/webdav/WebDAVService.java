@@ -575,7 +575,7 @@ final class WebDAVService {
    * @return local session
    */
   private LocalSession session() {
-   if(ls == null) ls = new LocalSession(conn.context);
+    if(ls == null) ls = new LocalSession(conn.context);
     return ls;
   }
 
@@ -586,6 +586,6 @@ final class WebDAVService {
    */
   private static void add(final int ch, final StringBuilder sb) {
     if(sb.length() > 0) sb.append(',');
-    sb.append((char) ch).append("=&amp;#").append(ch).append(";");
+    sb.append((char) ch).append("=&amp;#").append(ch).append(';');
   }
 }

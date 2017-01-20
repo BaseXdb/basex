@@ -99,7 +99,7 @@ public class Dur extends ADateDur {
     final long y = mt.group(2) != null ? toLong(mt.group(3), true, ii) : 0;
     final long m = mt.group(4) != null ? toLong(mt.group(5), true, ii) : 0;
     mon = y * 12 + m;
-    double v = y * 12d + m;
+    double v = y * 12.0d + m;
     if(!mt.group(1).isEmpty()) {
       mon = -mon;
       v = -v;

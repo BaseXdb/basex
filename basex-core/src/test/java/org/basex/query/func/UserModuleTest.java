@@ -56,7 +56,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void listDetails() {
     // check if the admin user exists
-    query(_USER_LIST_DETAILS.args() + "/@name = '" + UserText.ADMIN + "'", "true");
+    query(_USER_LIST_DETAILS.args() + "/@name = '" + UserText.ADMIN + '\'', "true");
     // check if the temporarily created user is found
     query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "true");
     // check if local permission is found

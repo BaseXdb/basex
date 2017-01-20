@@ -137,7 +137,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       "  $files ! file:exists(.),\n" +
       "  $files ! file:delete(?)(.),\n" +
       "  $files ! file:exists(.)\n" +
-      ")",
+        ')',
       "true\ntrue\nfalse\nfalse"
     );
   }

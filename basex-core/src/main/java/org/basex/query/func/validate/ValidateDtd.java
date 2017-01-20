@@ -29,7 +29,7 @@ public class ValidateDtd extends ValidateFn {
     checkCreate(qc);
     return process(new Validation() {
       @Override
-      void process(final ErrorHandler handler)
+      void process(final ValidationHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
         final Item input = toNodeOrAtomItem(exprs[0], qc);

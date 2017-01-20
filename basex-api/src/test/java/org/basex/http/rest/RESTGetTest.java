@@ -60,7 +60,7 @@ public final class RESTGetTest extends RESTTest {
         + "query=declare+variable+$x+as+xs:integer+external;$x&$x=123"));
     assertEquals("124", get("?$x=123&"
         + "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
-    assertEquals("6", get("?"
+    assertEquals("6", get('?'
         + "query=declare+variable+$a++as+xs:integer+external;"
         + "declare+variable+$b+as+xs:integer+external;"
         + "declare+variable+$c+as+xs:integer+external;" + "$a*$b*$c&"

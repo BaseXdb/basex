@@ -152,7 +152,7 @@ final class TextRenderer extends BaseXBack {
     if(edit && showLines) {
       g.setColor(GUIConstants.gray);
       final String s = Integer.toString(line);
-      g.drawString(s, offset - fontWidth(g, s) - OFFSET * 2, y);
+      g.drawString(s, offset - fontWidth(g, s) - (OFFSET << 1), y);
     }
   }
 
@@ -293,11 +293,11 @@ final class TextRenderer extends BaseXBack {
     offset = OFFSET;
     if(g != null) {
       g.setFont(font);
-      if(edit && showLines) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
+      if(edit && showLines) offset += fontWidth(g, Integer.toString(text.lines())) + (OFFSET << 1);
     }
     x = offset;
     y = fontHeight - (start ? 0 : scroll.pos()) - 2;
-    lineY = y - fontHeight * 4 / 5;
+    lineY = y - (fontHeight << 2) / 5;
     line = 1;
     link = false;
 
@@ -463,7 +463,7 @@ final class TextRenderer extends BaseXBack {
         final int yy = y - fontHeight * 3 / 10;
         final int s = 1 + fontHeight / 12;
         final int xe = x + fontWidth(g, '\t') - s;
-        final int as = s * 2 - 1;
+        final int as = (s << 1) - 1;
         g.setColor(GUIConstants.gray);
         g.drawLine(x + s, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
@@ -517,7 +517,7 @@ final class TextRenderer extends BaseXBack {
         final int xx = pars.pop();
         if(cc == cp || cc == cr) {
          g.setColor(GUIConstants.color4);
-          g.drawRect(xx, yy - fontHeight * 4 / 5, fontWidth(g, open), fontHeight);
+          g.drawRect(xx, yy - (fontHeight << 2) / 5, fontWidth(g, open), fontHeight);
           g.drawRect(x, lineY, fontWidth(g, ch), fontHeight);
         }
       }

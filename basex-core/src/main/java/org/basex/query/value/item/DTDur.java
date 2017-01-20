@@ -90,7 +90,7 @@ public final class DTDur extends Dur {
         sec = mult ? sec.divide(d, MathContext.DECIMAL64) : sec.multiply(d);
       }
     }
-    if(Math.abs(sec.doubleValue()) < 1E-13) sec = BigDecimal.ZERO;
+    if(Math.abs(sec.doubleValue()) < 1.0E-13) sec = BigDecimal.ZERO;
   }
 
   /**

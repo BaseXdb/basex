@@ -80,7 +80,7 @@ public final class BaseXCollationOptions extends CollationOptions {
    */
   public Collator collator(final String args) throws IllegalArgumentException {
     final String error = check(args);
-    if(error != null) throw new IllegalArgumentException("Invalid option \"" + error + "\"");
+    if(error != null) throw new IllegalArgumentException("Invalid option \"" + error + '"');
 
     Locale locale = Locale.US;
     if(contains(LANG)) {

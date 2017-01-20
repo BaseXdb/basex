@@ -660,10 +660,10 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // check if options specified in map are adopted
     final StringBuilder options = new StringBuilder();
-    for(final String option : indexes) options.append("'").append(option).append("':true(),");
-    for(final String option : includes) options.append("'").append(option).append("':'a',");
-    options.append("'").append(lc(MainOptions.UPDINDEX)).append("':true()");
-    query(_DB_OPTIMIZE.args(NAME, true, " map { " + options + "}"));
+    for(final String option : indexes) options.append('\'').append(option).append("':true(),");
+    for(final String option : includes) options.append('\'').append(option).append("':'a',");
+    options.append('\'').append(lc(MainOptions.UPDINDEX)).append("':true()");
+    query(_DB_OPTIMIZE.args(NAME, true, " map { " + options + '}'));
 
     for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "true");
     for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");

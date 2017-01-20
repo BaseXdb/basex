@@ -156,7 +156,7 @@ final class DataFTBuilder {
 
     @Override
     public String toString() {
-      return string(token) + " (" + mark + ")";
+      return string(token) + " (" + mark + ')';
     }
   }
 }

@@ -164,27 +164,27 @@ public final class RewritingsTest extends QueryPlanTest {
     final String string = Util.className(FnString.class);
     final String stringLength = Util.className(FnStringLength.class);
 
-    check("<a/>[" + STRING_LENGTH.args() + " >  -1]", "<a/>", "empty(//" + filter + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " != -1]", "<a/>", "empty(//" + filter + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " ge  0]", "<a/>", "empty(//" + filter + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " ne 1.1]", "<a/>", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " >  -1]", "<a/>", "empty(//" + filter + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " != -1]", "<a/>", "empty(//" + filter + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " ge  0]", "<a/>", "empty(//" + filter + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " ne 1.1]", "<a/>", "empty(//" + filter + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " <   0]", "", "empty(//" + filter + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " <= -1]", "", "empty(//" + filter + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " eq -1]", "", "empty(//" + filter + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " eq 1.1]", "", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " <   0]", "", "empty(//" + filter + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " <= -1]", "", "empty(//" + filter + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " eq -1]", "", "empty(//" + filter + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " eq 1.1]", "", "empty(//" + filter + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " >  0]", "", "exists(//" + string + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " >= 0.5]", "", "exists(//" + string + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " ne 0]", "", "exists(//" + string + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " >  0]", "", "exists(//" + string + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " >= 0.5]", "", "exists(//" + string + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " ne 0]", "", "exists(//" + string + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " <  0.5]", "<a/>", "exists(//" + string + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " <= 0.5]", "<a/>", "exists(//" + string + ")");
-    check("<a/>[" + STRING_LENGTH.args() + " eq 0]", "<a/>", "exists(//" + string + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " <  0.5]", "<a/>", "exists(//" + string + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " <= 0.5]", "<a/>", "exists(//" + string + ')');
+    check("<a/>[" + STRING_LENGTH.args() + " eq 0]", "<a/>", "exists(//" + string + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " gt 1]", "", "exists(//" + stringLength + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " gt 1]", "", "exists(//" + stringLength + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " = <a>1</a>]", "", "exists(//" + stringLength + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " = <a>1</a>]", "", "exists(//" + stringLength + ')');
   }
 
   /**

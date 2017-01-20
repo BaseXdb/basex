@@ -61,8 +61,8 @@ public final class RESTParallelGetTest extends HTTPTest {
       try {
         for(int i = 0; i < RUNS && failed == null; i++) {
           final double rnd = Math.random();
-          final boolean query = rnd < 1 / 3d;
-          final boolean delete = rnd > 2 / 3d;
+          final boolean query = rnd < 1 / 3.0d;
+          final boolean delete = rnd > 2 / 3.0d;
           if(query) get('/' + REST + "?query=count(.)");
           else if(delete) get('/' + REST + "?query=db:delete('rest','/')");
           else get('/' + REST + "?query=db:add('rest',<a/>,'x')");

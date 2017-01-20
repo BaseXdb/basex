@@ -151,7 +151,7 @@ public final class GUI extends JFrame {
     buttons.add(toolbar, BorderLayout.WEST);
 
     hits = new BaseXLabel(" ");
-    hits.setFont(hits.getFont().deriveFont(18f));
+    hits.setFont(hits.getFont().deriveFont(18.0f));
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
 
     BaseXBack b = new BaseXBack();
@@ -429,7 +429,7 @@ public final class GUI extends JFrame {
       final Command c = command;
       if(c == null) break;
       c.stop();
-      Thread.yield();
+      Performance.sleep(1);
       if(commandID != thread) return true;
     }
 

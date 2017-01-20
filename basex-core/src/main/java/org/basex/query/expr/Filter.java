@@ -246,6 +246,6 @@ public abstract class Filter extends Preds {
 
   @Override
   public final String toString() {
-    return "(" + root + ")" + super.toString();
+    return "(" + root + ')' + super.toString();
   }
 }

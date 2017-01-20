@@ -156,7 +156,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         final Item body = args.length > 1 ? args[1] : null;
         addMethod(mth, body, declared, ann.info);
       } else if(sig == _REST_SINGLE) {
-        singleton = "\u0001" + (args.length > 0 ? toString(args[0]) :
+        singleton = '\u0001' + (args.length > 0 ? toString(args[0]) :
           (function.info.path() + ':' + function.info.line()));
       } else if(eq(sig.uri, QueryText.REST_URI)) {
         final Item body = args.length == 0 ? null : args[0];

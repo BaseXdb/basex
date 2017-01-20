@@ -77,7 +77,7 @@ public final class BaseXHTTP extends Main {
 
     final Connector[] conns = jetty.getConnectors();
     if(conns == null || conns.length == 0)
-      throw new BaseXException("No Jetty connector defined in " + JETTYCONF + ".");
+      throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
 
     if(port != 0) {
       for(final Connector conn : conns) {

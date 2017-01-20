@@ -234,7 +234,7 @@ public final class UpdatableDiskValues extends DiskValues {
    */
   private static int[] prepare(final IntList ids, final IntList pos) {
     final int is = ids.size();
-    final IntList result = new IntList(pos == null ? is : is * 2);
+    final IntList result = new IntList(pos == null ? is : is << 1);
     int[] order = null;
     if(pos == null) {
       // no token index: simple sort

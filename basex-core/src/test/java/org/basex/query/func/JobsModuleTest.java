@@ -108,9 +108,9 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     final String id = query(_JOBS_EVAL.args("123", "()", " map{'interval':'PT1S','end':'PT1.5S'}"));
     // ensure that query is running
     Performance.sleep(500);
-    query(_JOBS_LIST.args() + "='" + id + "'", "true");
+    query(_JOBS_LIST.args() + "='" + id + '\'', "true");
     Performance.sleep(1200);
-    query(_JOBS_LIST.args() + "='" + id + "'", "false");
+    query(_JOBS_LIST.args() + "='" + id + '\'', "false");
 
     // error
     error(_JOBS_EVAL.args("1", "()", " map{'start':'PT2S','interval':'PT1S','end':'PT1S'}"),
@@ -135,7 +135,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   public void list() {
     final String id = verySlowQuery();
     try {
-      query(_JOBS_LIST.args() + " = '" + id + "'", "true");
+      query(_JOBS_LIST.args() + " = '" + id + '\'', "true");
     } finally {
       query(_JOBS_STOP.args(id));
     }
@@ -187,7 +187,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, "()", " map{'cache':true()}") +
         " return ("
         + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args("$q") + " },"
-            + "function($c) { prof:sleep(1) }, ()") + ","
+            + "function($c) { prof:sleep(1) }, ()") + ','
         + _JOBS_RESULT.args("$q") + ')', "1");
 
     // ensure that the result will not be cached

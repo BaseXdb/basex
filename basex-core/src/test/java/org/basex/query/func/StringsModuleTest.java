@@ -166,8 +166,8 @@ public final class StringsModuleTest extends AdvancedQueryTest {
       final int diff) {
 
     query(SUM.args(FOR_EACH_PAIR.args(
-      STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string1)) + "," +
-      STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string2)) + "," +
+      STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string1)) + ',' +
+      STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string2)) + ',' +
       "function($cp1, $cp2) { if($cp1 = $cp2) then 1 else 0 }")), diff);
   }
 

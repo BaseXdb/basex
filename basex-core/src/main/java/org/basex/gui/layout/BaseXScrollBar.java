@@ -117,7 +117,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     if(hh >= height) return;
 
     // calculate bar size
-    final int barH = hh - ww * 2 + 4;
+    final int barH = hh - (ww << 1) + 4;
     final double factor = (barH - barOffset) / (double) height;
     int size = (int) (hh * factor);
     // define minimum size for scrollbar mover
@@ -224,7 +224,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     // no dragging...
     if(!sliding) return;
 
-    pos = (int) ((long) (e.getY() + dragPos) * height / (hh - ww * 2));
+    pos = (int) ((long) (e.getY() + dragPos) * height / (hh - (ww << 1)));
     pos = Math.max(0, Math.min(height - hh, pos));
     comp.repaint();
   }

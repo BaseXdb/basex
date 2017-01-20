@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
-public class TreeFolder extends TreeNode {
+public class ResourceFolder extends ResourceNode {
   /** Children of node have been loaded. */
   private boolean loaded;
   /** Maximum number of displayed/processed children for a node. */
@@ -30,7 +30,7 @@ public class TreeFolder extends TreeNode {
    * @param tree tree reference
    * @param context database context
    */
-  public TreeFolder(final byte[] name, final byte[] path, final BaseXTree tree,
+  public ResourceFolder(final byte[] name, final byte[] path, final BaseXTree tree,
       final Context context) {
     super(name, path, tree, context);
   }
@@ -45,14 +45,14 @@ public class TreeFolder extends TreeNode {
     final byte[] sub = subfolder();
     final TokenSet set = context.data().resources.children(subfolder(), true);
     for(final byte[] f : new TokenList(set).sort(Prop.CASE)) {
-      add(new TreeFolder(f, sub, tree, context));
+      add(new ResourceFolder(f, sub, tree, context));
       if(--cmax == 0) break;
     }
     // add leaves
     cmax = addLeaves(EMPTY, cmax, this);
     // add dummy node if not all nodes are displayed
     if(cmax <= 0)
-      add(new TreeLeaf(token(Text.DOTS), sub, false, true, tree, context));
+      add(new ResourceLeaf(token(Text.DOTS), sub, false, true, tree, context));
 
     loaded = true;
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(this);
@@ -67,7 +67,7 @@ public class TreeFolder extends TreeNode {
    * @param target node to append filtered nodes
    * @return number of remaining nodes that can be added
    */
-  public final int addLeaves(final byte[] filter, final int cmax, final TreeFolder target) {
+  public final int addLeaves(final byte[] filter, final int cmax, final ResourceFolder target) {
     final TokenBoolMap tbm = context.data().resources.children(subfolder(), false);
     final List<byte[]> keys = new ArrayList<>(tbm.size());
 
@@ -88,7 +88,7 @@ public class TreeFolder extends TreeNode {
     final int ks = keys.size();
     while(k < ks && m-- > 0) {
       final byte[] nm = keys.get(k++);
-      target.add(new TreeLeaf(nm, sub, tbm.get(nm), false, tree, context));
+      target.add(new ResourceLeaf(nm, sub, tbm.get(nm), false, tree, context));
     }
 
     return m;

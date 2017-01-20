@@ -28,7 +28,7 @@ public final class GUIInput extends BaseXTextField {
   /** JComboBox. */
   private final BaseXCombo box;
   /** BasicComboPopup Menu. */
-  private ComboPopup pop;
+  private GUIInputPopup pop;
 
   /** String for temporary input. */
   private String pre = "";
@@ -54,7 +54,7 @@ public final class GUIInput extends BaseXTextField {
         if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
       }
     });
-    pop = new ComboPopup(box);
+    pop = new GUIInputPopup(box);
 
     addKeyListener(new KeyAdapter() {
       @Override
@@ -222,7 +222,7 @@ public final class GUIInput extends BaseXTextField {
     if(comboChanged(sl)) {
       box.setModel(new DefaultComboBoxModel<>(sl.toArray()));
       box.setSelectedIndex(-1);
-      pop = new ComboPopup(box);
+      pop = new GUIInputPopup(box);
     }
 
     final int w = getFontMetrics(getFont()).stringWidth(pre);
@@ -244,12 +244,12 @@ public final class GUIInput extends BaseXTextField {
   }
 
   /** Combo popup menu class, overriding the default constructor. */
-  private static final class ComboPopup extends BasicComboPopup {
+  private static final class GUIInputPopup extends BasicComboPopup {
     /**
      * Constructor.
      * @param combo combobox reference
      */
-    ComboPopup(final JComboBox<String> combo) {
+    GUIInputPopup(final JComboBox<String> combo) {
       super(combo);
       final int h = combo.getMaximumRowCount();
       setPreferredSize(new Dimension(getPreferredSize().width, getPopupHeightForRowCount(h) + 2));

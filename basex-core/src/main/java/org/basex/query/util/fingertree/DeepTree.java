@@ -826,13 +826,13 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     sb.append("Right[\n");
     for(final Node<N, E> e : right) {
       toString(e, sb, indent + 2);
-      sb.append("\n");
+      sb.append('\n');
     }
     for(int i = 0; i < indent + 1; i++) sb.append("  ");
     sb.append("]\n");
 
     for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("]");
+    sb.append(']');
   }
 
   @Override

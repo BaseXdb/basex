@@ -153,7 +153,7 @@ final class ProjectFiles {
     } else {
       // wait until file cache is initialized
       while(!pc.valid()) {
-        Thread.yield();
+        Performance.sleep(1);
         // file cache was replaced with newer version
         if(pc != cache) throw new InterruptedException();
       }

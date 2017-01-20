@@ -112,7 +112,7 @@ public final class BaseXSlider extends BaseXPanel {
     final int s = (int) (3 * GUIConstants.scale);
 
     g.setColor(hasFocus() ? GUIConstants.BACK : GUIConstants.lgray);
-    g.fillRect(0, hh - s, w, s * 2 - 1);
+    g.fillRect(0, hh - s, w, (s << 1) - 1);
     g.setColor(GUIConstants.TEXT);
     g.drawLine(0, hh - s, w, hh - s);
     g.drawLine(0, hh - s, 0, hh + s - 1);
@@ -121,7 +121,8 @@ public final class BaseXSlider extends BaseXPanel {
     g.drawLine(0, hh + s - 1, w, hh + s - 1);
 
     final double x = (value - min) * (w - SLIDERW) / (max - min);
-    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - s * 2, hh + s * 2, oldValue != -1);
+    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - (s << 1), hh + (s << 1),
+        oldValue != -1);
   }
 
   @Override

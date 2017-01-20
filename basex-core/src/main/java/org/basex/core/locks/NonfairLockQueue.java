@@ -26,14 +26,14 @@ public class NonfairLockQueue extends LockQueue {
     queue.add(id);
 
     // loop until job is placed first (prefer readers)
-    do wait(); while(write && !readers.isEmpty() || id != queue.peek());
+    do wait(); while(write && !readers.isEmpty() || !id.equals(queue.peek()));
 
     // remove job from queue
     queue.remove(id);
   }
 
   @Override
-  public synchronized String toString() {
+  public String toString() {
     return "Queued readers: " + readers + ", queued writers: " + writers;
   }
 }

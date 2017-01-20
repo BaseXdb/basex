@@ -340,7 +340,7 @@ public final class FTToken {
     NORM_0000 = norm;
 
     norm = new char[0x200];
-    for(int n = 0; n < 0x200; n++) norm[n] = (char) (n + 1E00);
+    for(int n = 0; n < 0x200; n++) norm[n] = (char) (n + 1.0E00);
     for(final char[] aNC : NC1E00) norm[aNC[0] - 0x1E00] = aNC[1];
     NORM_1E00 = norm;
 

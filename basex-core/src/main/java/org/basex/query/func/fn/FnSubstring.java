@@ -46,10 +46,9 @@ public final class FnSubstring extends StandardFunc {
     if(s >= e) return Str.ZERO;
     if(ascii) return Str.get(substring(str, s, e));
 
-    int ss = s;
-    int ee = e;
-    int p = 0;
-    for(l = 0; l < str.length; l += cl(str, l), ++p) {
+    int ss = s, ee = e, p = 0;
+    final int sl = str.length;
+    for(l = 0; l < sl; l += cl(str, l), ++p) {
       if(p == s) ss = l;
       if(p == e) ee = l;
     }
@@ -64,6 +63,6 @@ public final class FnSubstring extends StandardFunc {
    */
   private static int subPos(final double d) {
     final int i = (int) d;
-    return d == i ? i - 1 : (int) StrictMath.floor(d - .5);
+    return d == i ? i - 1 : (int) StrictMath.floor(d - 0.5);
   }
 }

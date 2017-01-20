@@ -30,7 +30,7 @@ public class BaseX extends CLI {
   /** Command arguments. */
   private StringList vals;
   /** Console mode. May be set to {@code false} during execution. */
-  private boolean console;
+  private volatile boolean console;
 
   /**
    * Main method, launching the standalone mode.
@@ -91,7 +91,7 @@ public class BaseX extends CLI {
           // set/add variable binding
           if(bind.length() != 0) bind.append(',');
           // commas are escaped by a second comma
-          value = bind.append("=").append(value.replaceAll(",", ",,")).toString();
+          value = bind.append('=').append(value.replaceAll(",", ",,")).toString();
           execute(new Set(MainOptions.BINDINGS, value), false);
         } else if(c == 'o') {
           // change output stream

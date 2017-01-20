@@ -30,7 +30,7 @@ public class ValidateRng extends ValidateFn {
     checkCreate(qc);
     return process(new Validation() {
       @Override
-      void process(final ErrorHandler handler) throws IOException, QueryException {
+      void process(final ValidationHandler handler) throws IOException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), null);
         final Item sch = toNodeOrAtomItem(exprs[1], qc);
         final boolean compact = exprs.length > 2 && toBoolean(exprs[2], qc);

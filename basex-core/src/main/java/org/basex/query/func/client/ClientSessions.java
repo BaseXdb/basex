@@ -26,7 +26,8 @@ public final class ClientSessions implements QueryResource {
    * @return session id
    */
   synchronized Uri add(final ClientSession cs) {
-    final byte[] uri = Token.token(Prop.PROJECT_NAME + "://" + cs + '/' + ++lastId);
+    System.out.println("? " + cs);
+    final byte[] uri = Token.token(cs + "/" + ++lastId);
     conns.put(uri, cs);
     return Uri.uri(uri);
   }

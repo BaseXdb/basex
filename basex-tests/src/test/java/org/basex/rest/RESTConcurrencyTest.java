@@ -126,7 +126,6 @@ public final class RESTConcurrencyTest extends SandboxTest {
 
     try {
       final HTTPResponse result = writer.get(TIMEOUT, TimeUnit.MILLISECONDS);
-
       if(result.status.isSuccess()) fail("Database modified while a reader is running");
       throw new Exception(result.toString());
     } catch(final TimeoutException e) {

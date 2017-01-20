@@ -34,7 +34,7 @@ public final class RestXqServlet extends BaseXServlet {
     final RestXqModules rxm = RestXqModules.get();
 
     // initialize RESTXQ
-    if(conn.path().equals("/" + INIT)) {
+    if(conn.path().equals('/' + INIT)) {
       rxm.init();
       return;
     }
@@ -60,7 +60,7 @@ public final class RestXqServlet extends BaseXServlet {
     final HttpSession session = http.req.getSession(false);
     Object value = null;
     if(session != null) {
-      if((http.path() + '/').contains("/" + DBA + "/")) value = session.getAttribute(DBA);
+      if((http.path() + '/').contains('/' + DBA + '/')) value = session.getAttribute(DBA);
       if(!(value instanceof Str)) value = session.getAttribute("id");
     }
     return value instanceof Str ? ((Str) value).toJava() : super.username(http);

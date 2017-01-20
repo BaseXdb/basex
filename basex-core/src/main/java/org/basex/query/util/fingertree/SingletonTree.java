@@ -135,9 +135,9 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
     for(int i = 0; i < indent; i++) sb.append("  ");
     sb.append("Single[\n");
     toString(elem, sb, indent + 1);
-    sb.append("\n");
+    sb.append('\n');
     for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("]");
+    sb.append(']');
   }
 
   @Override

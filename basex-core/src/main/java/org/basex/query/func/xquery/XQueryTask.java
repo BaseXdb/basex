@@ -12,7 +12,7 @@ import org.basex.util.*;
  *
  * @author James Wright
  */
-final class ForkJoinTask extends RecursiveTask<Value> {
+final class XQueryTask extends RecursiveTask<Value> {
   /** Functions to evaluate in parallel. */
   private final Value funcs;
   /** Query context. */
@@ -30,7 +30,7 @@ final class ForkJoinTask extends RecursiveTask<Value> {
    * @param qc query context
    * @param ii input info
    */
-  ForkJoinTask(final Value funcs, final QueryContext qc, final InputInfo ii) {
+  XQueryTask(final Value funcs, final QueryContext qc, final InputInfo ii) {
     this(funcs, qc, ii, 0, (int) funcs.size());
   }
 
@@ -42,7 +42,7 @@ final class ForkJoinTask extends RecursiveTask<Value> {
    * @param start first function to evaluate
    * @param end last function to evaluate
    */
-  private ForkJoinTask(final Value funcs, final QueryContext qc, final InputInfo ii,
+  private XQueryTask(final Value funcs, final QueryContext qc, final InputInfo ii,
       final int start, final int end) {
     this.funcs = funcs;
     this.qc = new QueryContext(qc);
@@ -68,9 +68,9 @@ final class ForkJoinTask extends RecursiveTask<Value> {
     } else if(l > 1) {
       // split the work and join the results in the correct order
       final int m = s + l / 2;
-      final ForkJoinTask task2 = new ForkJoinTask(funcs, qc, ii, m, e);
+      final XQueryTask task2 = new XQueryTask(funcs, qc, ii, m, e);
       task2.fork();
-      final ForkJoinTask task1  = new ForkJoinTask(funcs, qc, ii, s, m);
+      final XQueryTask task1  = new XQueryTask(funcs, qc, ii, s, m);
       vb.add(task1.invoke()).add(task2.join());
     }
     return vb.value();

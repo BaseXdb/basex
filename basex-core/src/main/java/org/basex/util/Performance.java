@@ -57,7 +57,7 @@ public final class Performance {
    * @return execution time
    */
   public static String getTime(final long time, final int runs) {
-    return Math.round(time / 10000d / runs) / 100d + " ms" + (runs > 1 ? " (avg)" : "");
+    return Math.round(time / 10000.0d / runs) / 100.0d + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
   /**

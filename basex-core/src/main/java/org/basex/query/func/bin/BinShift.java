@@ -52,7 +52,7 @@ public final class BinShift extends StandardFunc {
       if(bi.signum() >= 0) {
         bi = bi.shiftRight((int) by);
       } else {
-        final BigInteger o = BigInteger.ONE.shiftLeft(bl * 8 + 1);
+        final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
         final BigInteger m = o.subtract(BigInteger.ONE).shiftRight((int) by + 1);
         bi = bi.subtract(o).shiftRight((int) by).and(m);
       }

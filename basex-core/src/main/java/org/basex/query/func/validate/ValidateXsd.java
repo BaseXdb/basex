@@ -54,7 +54,9 @@ public class ValidateXsd extends ValidateFn {
 
     return process(new Validation() {
       @Override
-      void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
+      void process(final ValidationHandler handler) throws IOException, SAXException,
+          QueryException {
+
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), null);
         final Item schema = exprs.length > 1 ? toNodeOrAtomItem(exprs[1].item(qc, info)) : null;
         final String version = exprs.length > 2 ? Token.string(toToken(exprs[2], qc)) : null;

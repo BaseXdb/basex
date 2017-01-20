@@ -171,7 +171,7 @@ final class ProjectList extends JList<String> {
           final StringBuilder sb = new StringBuilder(" \u00b7 ");
           for(int n = names.length - 1; n >= 0; n--) {
             sb.append(names[n]);
-            if(n > 0) sb.append("/");
+            if(n > 0) sb.append('/');
           }
           g.setColor(GUIConstants.dgray);
           g.drawString(sb.toString(), x, y);

@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  */
 public final class AnnList extends ElementList implements Iterable<Ann> {
   /** Annotations. */
-  private Ann[] anns = new Ann[0];
+  private Ann[] anns = {};
 
   /**
    * Adds a QName/value pair.

@@ -419,7 +419,7 @@ public abstract class ADate extends ADateDur {
       z = Calendar.getInstance().getTimeZone().getOffset(n) / 60000;
     }
     return (sec == null ? BigDecimal.ZERO : sec).add(
-        BigDecimal.valueOf(Math.max(0, hou) * 3600 + Math.max(0, min) * 60 - z * 60));
+        BigDecimal.valueOf(Math.max(0, hou) * 3600L + Math.max(0, min) * 60L - z * 60L));
   }
 
   /**
@@ -442,9 +442,7 @@ public abstract class ADate extends ADateDur {
    * @return days
    */
   private static BigDecimal days(final long year, final int month, final int day) {
-    final long y = year - (month < 2 ? 1 : 0);
-    final int m = month + (month < 2 ? 13 : 1);
-    final int d = day + 1;
+    final long y = year - (month < 2 ? 1 : 0), m = month + (month < 2 ? 13 : 1), d = day + 1;
     return BD365.multiply(BigDecimal.valueOf(y)).add(
         BigDecimal.valueOf(y / 4 - y / 100 + y / 400 - 92 + d + (153 * m - 2) / 5));
   }

@@ -51,7 +51,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   /** Query id counter. */
   private int id;
   /** Indicates if the server thread is running. */
-  private boolean authenticated;
+  private volatile boolean authenticated;
   /** Indicates if the server has been closed. */
   private boolean closed;
 
@@ -222,7 +222,7 @@ public final class ClientListener extends Thread implements ClientInfo {
     final Command c = command;
     if(c != null) {
       c.stop();
-      do Thread.yield(); while(command != null);
+      do Performance.sleep(1); while(command != null);
     }
     context.sessions.remove(this);
 

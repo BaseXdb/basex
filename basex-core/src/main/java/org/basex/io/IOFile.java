@@ -152,7 +152,7 @@ public final class IOFile extends IO {
    */
   public IOFile resolve(final String path) {
     final IOFile f = new IOFile(path);
-    return f.isAbsolute() ? f : new IOFile(isDir() ? pth : dir(), path);
+    return f.absolute ? f : new IOFile(isDir() ? pth : dir(), path);
   }
 
   /**

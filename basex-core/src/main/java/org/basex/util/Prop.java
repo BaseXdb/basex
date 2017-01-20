@@ -237,8 +237,7 @@ public final class Prop {
    */
   public static Set<Entry<String, String>> entries() {
     // properties from starter classes and web.xml context parameters
-    final HashMap<String, String> entries = new HashMap<>();
-    entries.putAll(OPTIONS);
+    final HashMap<String, String> entries = new HashMap<>(OPTIONS);
     // override with system properties
     for(final Entry<Object, Object> entry : System.getProperties().entrySet()) {
       entries.put(entry.getKey().toString(), entry.getValue().toString());

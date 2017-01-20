@@ -84,7 +84,7 @@ public final class EditorView extends View {
   private int statusID;
 
   /** Parse query context. */
-  private QueryContext parseQC;
+  private volatile QueryContext parseQC;
   /** Input info. */
   private InputInfo inputInfo;
 
@@ -731,7 +731,7 @@ public final class EditorView extends View {
       @Override
       public void run() {
         // let current parser finish; check if thread is obsolete
-        while(parseQC != null) Thread.yield();
+        while(parseQC != null) Performance.sleep(1);
         if(id != statusID) return;
 
         // parse query

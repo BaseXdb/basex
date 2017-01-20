@@ -461,8 +461,8 @@ public final class TreeView extends View {
         s = s.substring(0, (s.length() - 2) / 2) + "..";
       }
     }
-    final double yy = y + (nodeHeight + fontHeight * .5) / 2;
-    g.drawString(s, (int) (rm - tw / 2d + BORDER_PADDING), (int) yy);
+    final double yy = y + (nodeHeight + fontHeight * 0.5) / 2;
+    g.drawString(s, (int) (rm - tw / 2.0d + BORDER_PADDING), (int) yy);
   }
 
   /**
@@ -1005,7 +1005,7 @@ public final class TreeView extends View {
     int nh = (int) (fontSize * 1.4);
     final int dist = nh <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE : BEST_LEVEL_DISTANCE;
     while(true) {
-      final double ld = (h - lvs * nh) / (lvs - 1d);
+      final double ld = (h - lvs * nh) / (lvs - 1.0d);
       if(ld >= dist || nh < MIN_NODE_HEIGHT) {
         levelDistance = Math.max(MIN_LEVEL_DISTANCE, Math.min(MAX_LEVEL_DISTANCE, (int) ld));
         break;

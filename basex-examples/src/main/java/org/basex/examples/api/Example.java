@@ -30,7 +30,7 @@ public final class Example {
       session.execute("xquery 1 to 10", out);
 
       // print time needed
-      final double ms = (System.nanoTime() - time) / 1000000d;
+      final double ms = (System.nanoTime() - time) / 1000000.0d;
       System.out.println("\n\n" + ms + " ms");
     }
   }

@@ -806,11 +806,11 @@ public class FnHttpTest extends HTTPTest {
     final Map<String, List<String>> hdrs = new HashMap<>();
     final List<String> contTypeVal = new ArrayList<>();
     contTypeVal.add("multipart/mixed");
-    contTypeVal.add("boundary=\"" + boundary + "\"");
+    contTypeVal.add("boundary=\"" + boundary + '"');
     hdrs.put("Content-Type", contTypeVal);
 
     conn.headers = hdrs;
-    conn.contentType = "multipart/alternative; boundary=\"" + boundary + "\"";
+    conn.contentType = "multipart/alternative; boundary=\"" + boundary + '"';
     conn.content = new IOFile("src/test/resources/response.txt").read();
 
     new HttpResponse(null, ctx.options).getResponse(conn, true, null);

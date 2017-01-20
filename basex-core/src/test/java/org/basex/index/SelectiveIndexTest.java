@@ -113,7 +113,7 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
           query("id('A', .)", file);
           query("idref('B', .)", idref);
         } catch(final AssertionError ae) {
-          throw new AssertionError(ae.getMessage() + "\nInclude: '" + include + "'");
+          throw new AssertionError(ae.getMessage() + "\nInclude: '" + include + '\'');
         }
       }
     } finally {

@@ -55,10 +55,10 @@ public final class Part10 extends Main {
     // Build an XMLFilter for the XSLT transformation
     SAXTransformerFactory stf = (SAXTransformerFactory)
       TransformerFactory.newInstance();
-    XMLFilter xmlf = stf.newXMLFilter(new StreamSource("" + path + "/orders.xsl"));
+    XMLFilter xmlf = stf.newXMLFilter(new StreamSource(path + "/orders.xsl"));
 
     // Create a SAX source, the input for the XSLT transformation
-    SAXSource saxSource = new SAXSource(xmlf, new InputSource("" + path + "/orders.xml"));
+    SAXSource saxSource = new SAXSource(xmlf, new InputSource(path + "/orders.xml"));
 
     // Create an XQuery expression
     XQPreparedExpression xqp = xqc.prepareExpression(

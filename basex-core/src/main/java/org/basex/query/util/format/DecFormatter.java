@@ -362,7 +362,8 @@ public final class DecFormatter extends FormatUtil {
    * @return result of check
    */
   private boolean containsActive(final byte[] pt, final int i) {
-    for(int p = i; p < pt.length; p += cl(pt, p)) {
+    final int pl = pt.length;
+    for(int p = i; p < pl; p += cl(pt, p)) {
       if(contains(actives, ch(pt, p))) return true;
     }
     return false;

@@ -97,7 +97,7 @@ public final class DOMWrapper extends Parser {
 
   @Override
   public double progressInfo() {
-    return nodes / 1000000d % 1;
+    return nodes / 1000000.0d % 1;
   }
 
   /** Node iterator. */

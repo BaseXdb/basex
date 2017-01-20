@@ -444,7 +444,7 @@ public interface Text {
     lang("c_alter2") + NL  +
     LI + CmdAlter.DATABASE + " [" + S_NAME + "] [newname]" + NL +
     "  " + lang("c_alterdb") + NL +
-    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + "]" + NL +
+    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + ']' + NL +
     "  " + lang("c_alterpw") + NL +
     LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
     "  " + lang("c_alteruser")

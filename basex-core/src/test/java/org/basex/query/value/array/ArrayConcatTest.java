@@ -1,4 +1,4 @@
-package org.basex.query.value.array;
+  package org.basex.query.value.array;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +20,7 @@ public final class ArrayConcatTest {
     final Random rng = new Random();
     for(int n = 0; n < 1_000; n++) {
       for(int k = 0; k < 10; k++) {
-        rng.setSeed(10 * n + k);
+        rng.setSeed(10L * n + k);
         final int l = rng.nextInt(n + 1), r = n - l;
 
         Array a1 = Array.empty(), b1 = Array.empty();

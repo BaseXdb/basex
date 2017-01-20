@@ -4,6 +4,7 @@ import javax.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Information on a RESTXQ session.
@@ -36,7 +37,7 @@ final class RestXqSession {
       if(oldQc instanceof QueryContext) {
         ((QueryContext) oldQc).stop();
         do {
-          Thread.yield();
+          Performance.sleep(1);
         } while(session.getAttribute(singleton) == oldQc);
       }
       session.setAttribute(singleton, qc);

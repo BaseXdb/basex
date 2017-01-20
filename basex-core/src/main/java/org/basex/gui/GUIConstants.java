@@ -309,7 +309,7 @@ public final class GUIConstants {
       // initialize scaling only once
       final int h = FONTSIZE + 3;
       height = opts.get(GUIOptions.SCALE) ? LABEL.getFontMetrics(LABEL.getFont()).getHeight() : h;
-      scale = Math.max(1, (height - h) / 10d + 1);
+      scale = Math.max(1, (height - h) / 10.0d + 1);
       ascale = 1 + (scale - 1) / 2;
     }
 

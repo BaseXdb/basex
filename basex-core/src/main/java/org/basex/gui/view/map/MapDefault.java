@@ -87,7 +87,7 @@ final class MapDefault extends MapPainter {
         g.setFont(GUIConstants.font);
         BaseXLayout.chopString(g, ViewData.name(gopts, data, pre), r.x, r.y, r.w, fsz);
       } else {
-        g.setColor(GUIConstants.color(r.level * 2 + 8));
+        g.setColor(GUIConstants.color((r.level << 1) + 8));
         g.setFont(GUIConstants.mfont);
         final byte[] text = ViewData.content(data, pre, false);
 

@@ -130,7 +130,7 @@ public final class MapView extends View {
 
   @Override
   public void refreshMark() {
-    drawMap(mainMap, mainRects, 1f);
+    drawMap(mainMap, mainRects, 1.0f);
     repaint();
   }
 
@@ -208,8 +208,8 @@ public final class MapView extends View {
 
     // calculate zooming speed (slower for large zooming scales)
     if(mainRect.w > 0 && mainRect.h > 0) {
-      zoomSpeed = (int) (StrictMath.log(64d * getWidth() / mainRect.w) +
-        StrictMath.log(64d * getHeight() / mainRect.h));
+      zoomSpeed = (int) (StrictMath.log(64.0d * getWidth() / mainRect.w) +
+        StrictMath.log(64.0d * getHeight() / mainRect.h));
     }
 
     if(quick) {
@@ -286,7 +286,7 @@ public final class MapView extends View {
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 
-    drawMap(map, mainRects, 1f);
+    drawMap(map, mainRects, 1.0f);
     focus();
     gui.cursor(CURSORARROW, true);
   }
@@ -406,37 +406,33 @@ public final class MapView extends View {
    * @param zs zooming step
    */
   private void zoom(final MapRect r, final int zs) {
-    int xs = r.x;
-    int ys = r.y;
-    int xe = xs + r.w;
-    int ye = ys + r.h;
-
     // calculate zooming rectangle
     // get window size
+    long xs = r.x, ys = r.y, xe = xs + r.w, ye = ys + r.h;
     if(zs != 0) {
       final MapRect zr = mainRect;
       final int tw = getWidth();
       final int th = getHeight();
       if(zs > 0) {
         final long s = ZS[zoomIn ? zs : ZOOMSIZE - zs];
-        xs = (int) ((zr.x + xs * zr.w / tw - xs) * s / MAXZS);
-        ys = (int) ((zr.y + ys * zr.h / th - ys) * s / MAXZS);
-        xe += (int) ((zr.x + xe * zr.w / tw - xe) * s / MAXZS);
-        ye += (int) ((zr.y + ye * zr.h / th - ye) * s / MAXZS);
+        xs = (zr.x + xs * zr.w / tw - xs) * s / MAXZS;
+        ys = (zr.y + ys * zr.h / th - ys) * s / MAXZS;
+        xe += (zr.x + xe * zr.w / tw - xe) * s / MAXZS;
+        ye += (zr.y + ye * zr.h / th - ye) * s / MAXZS;
       } else {
         final long s = 10000 - (ZS[zoomIn ? -zs : ZOOMSIZE + zs]);
         if(zr.w == 0) zr.w = 1;
         if(zr.h == 0) zr.h = 1;
-        xs = (int) (-xe * zr.x / zr.w * s / MAXZS);
-        xe = (int) (xs + xe + xe * (xe - zr.w) / zr.w * s / MAXZS);
-        ys = (int) (-ye * zr.y / zr.h * s / MAXZS);
-        ye = (int) (ys + ye + ye * (ye - zr.h) / zr.h * s / MAXZS);
+        xs = -xe * zr.x / zr.w * s / MAXZS;
+        xe = xs + xe + xe * (xe - zr.w) / zr.w * s / MAXZS;
+        ys = -ye * zr.y / zr.h * s / MAXZS;
+        ye = ys + ye + ye * (ye - zr.h) / zr.h * s / MAXZS;
       }
     }
-    r.x = xs;
-    r.y = ys;
-    r.w = xe - xs;
-    r.h = ye - ys;
+    r.x = (int) xs;
+    r.y = (int) ys;
+    r.w = (int) (xe - xs);
+    r.h = (int) (ye - ys);
   }
 
   /**

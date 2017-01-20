@@ -532,7 +532,7 @@ public final class PlotView extends View {
         ++i;
       }
       if(nrCats == 1) {
-        op = .5d;
+        op = 0.5d;
         int j = 0;
         // find value for given plot position
         final int al = axis.co.length;
@@ -551,7 +551,7 @@ public final class PlotView extends View {
 
       // if min equal max, draw min in plot middle
       if(noRange) {
-        drawCaptionAndGrid(g, drawX, BaseXLayout.value(axis.min), .5d);
+        drawCaptionAndGrid(g, drawX, BaseXLayout.value(axis.min), 0.5d);
         return;
       }
 
@@ -623,7 +623,7 @@ public final class PlotView extends View {
         double d = axis.calcPosition(axis.startvalue);
         double f = axis.startvalue;
         int c = 0;
-        while(d < 1.0d - .25d / nrCaptions) {
+        while(d < 1.0d - 0.25d / nrCaptions) {
           ++c;
           drawCaptionAndGrid(g, drawX, BaseXLayout.value(f), d);
           f += step;
@@ -765,7 +765,7 @@ public final class PlotView extends View {
     final int sz = sizeFactor();
     if(drawX) {
       // items with value -1 lack a value for the specific attribute
-      if(d == -1) return (int) (MARGIN[1] + sz * .35d);
+      if(d == -1) return (int) (MARGIN[1] + sz * 0.35d);
       final int width = getWidth();
       final int xSpace = width - (MARGIN[1] + MARGIN[3]) - sz;
       return (int) (d * xSpace) + MARGIN[1] + sz;

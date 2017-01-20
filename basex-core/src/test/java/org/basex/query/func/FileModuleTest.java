@@ -102,7 +102,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void exists() {
-    final String url = IO.FILEPREF + "/" + (Prop.WIN ? "/" + PATH1.replace("\\", "/") : PATH1);
+    final String url = IO.FILEPREF + '/' + (Prop.WIN ? '/' + PATH1.replace("\\", "/") : PATH1);
     query(_FILE_WRITE.args(PATH1, "()"));
     query(_FILE_EXISTS.args(PATH1), true);
     query(_FILE_EXISTS.args(url), true);
@@ -440,7 +440,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
 
     query(CONTAINS.args(_FILE_RESOLVE_PATH.args(can1, can2), can1), "true");
     query(CONTAINS.args(_FILE_RESOLVE_PATH.args("X", can1 + File.separator),
-        can1 + File.separator + "X"), "true");
+        can1 + File.separator + 'X'), "true");
     error(_FILE_RESOLVE_PATH.args(can1, "b"), FILE_IS_RELATIVE_X);
     error(_FILE_RESOLVE_PATH.args("X", "b"), FILE_IS_RELATIVE_X);
   }

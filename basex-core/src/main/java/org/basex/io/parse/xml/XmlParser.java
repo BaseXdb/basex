@@ -46,12 +46,12 @@ public final class XmlParser {
    * @throws SAXException SAX exception
    */
   public void parse(final InputStream stream) throws IOException, SAXException {
-    reader.setErrorHandler(new ErrorHandler());
+    reader.setErrorHandler(new XmlHandler());
     reader.parse(new InputSource(stream));
   }
 
   /** Error handler (causing no STDERR output). */
-  private static class ErrorHandler extends DefaultHandler {
+  private static class XmlHandler extends DefaultHandler {
     @Override
     public void fatalError(final SAXParseException ex) throws SAXParseException { throw ex; }
     @Override

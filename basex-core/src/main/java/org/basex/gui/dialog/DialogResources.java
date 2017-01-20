@@ -15,7 +15,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.TreeNode;
+import org.basex.gui.layout.ResourceNode;
 
 /**
  * Combination of a JTree and a text field. The tree visualizes the database content including raw
@@ -28,7 +28,7 @@ final class DialogResources extends BaseXBack {
   /** Search text field. */
   private final BaseXTextField filterText;
   /** Database/root node. */
-  private final TreeFolder root;
+  private final ResourceFolder root;
   /** Dialog reference. */
   private final BaseXDialog dialog;
   /** Resource tree. */
@@ -60,12 +60,12 @@ final class DialogResources extends BaseXBack {
     tree.addTreeSelectionListener(new TreeSelectionListener() {
       @Override
       public void valueChanged(final TreeSelectionEvent e) {
-        TreeNode n = (TreeNode) e.getPath().getLastPathComponent();
+        ResourceNode n = (ResourceNode) e.getPath().getLastPathComponent();
         String filt = n.equals(root) ? "" : n.path();
         String trgt = filt + '/';
 
         if(n.isLeaf()) {
-          n = (TreeNode) n.getParent();
+          n = (ResourceNode) n.getParent();
           trgt = (n == null || n.equals(root) ? "" : n.path()) + '/';
         } else {
           filt = trgt;
@@ -80,7 +80,7 @@ final class DialogResources extends BaseXBack {
     final Context context = dp.gui.context;
     final Data data = context.data();
     final String label = data.meta.name + " (/)";
-    root = new TreeRootFolder(token(label), token("/"), tree, context);
+    root = new ResourceRootFolder(token(label), token("/"), tree, context);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
 
     filter = new BaseXButton(FILTER, dp);
@@ -130,9 +130,9 @@ final class DialogResources extends BaseXBack {
    * Returns the current tree node selection.
    * @return selected node
    */
-  private TreeNode selection() {
+  private ResourceNode selection() {
     final TreePath t = tree.getSelectionPath();
-    return t == null ? null : (TreeNode) t.getLastPathComponent();
+    return t == null ? null : (ResourceNode) t.getLastPathComponent();
   }
 
   /**
@@ -140,7 +140,7 @@ final class DialogResources extends BaseXBack {
    * it afterwards.
    * @param n folder
    */
-  private void refreshFolder(final TreeFolder n) {
+  private void refreshFolder(final ResourceFolder n) {
     if(n == null) return;
     n.removeChildren();
     final TreePath path = new TreePath(n.getPath());
@@ -170,7 +170,7 @@ final class DialogResources extends BaseXBack {
    * Searches the tree for nodes that match the given search text.
    */
   private void filter() {
-    final byte[] filterPath = TreeNode.preparePath(token(filterText.getText()));
+    final byte[] filterPath = ResourceNode.preparePath(token(filterText.getText()));
     if(eq(filterPath, SLASH)) {
       refreshFolder(root);
       return;
@@ -181,23 +181,23 @@ final class DialogResources extends BaseXBack {
     // clear tree to append filtered nodes
     root.removeAllChildren();
 
-    int cmax = TreeFolder.MAXC;
+    int cmax = ResourceFolder.MAXC;
     // check if there's a directory
     // create a folder if there's either a raw or document folder
     if(data.resources.isDir(filterPath)) {
-      root.add(new TreeFolder(TreeFolder.name(filterPath), TreeFolder.path(filterPath),
+      root.add(new ResourceFolder(ResourceFolder.name(filterPath), ResourceFolder.path(filterPath),
           tree, context));
       cmax--;
     }
 
     // now add the actual files (if there are any)
-    final byte[] name = TreeFolder.name(filterPath);
-    final byte[] sub = TreeFolder.path(filterPath);
-    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, context);
-    cmax = f.addLeaves(name, cmax, root);
+    final byte[] name = ResourceFolder.name(filterPath);
+    final byte[] sub = ResourceFolder.path(filterPath);
+    cmax = new ResourceFolder(ResourceFolder.name(sub), ResourceFolder.path(sub), tree, context).
+        addLeaves(name, cmax, root);
 
     // add dummy node if maximum number of nodes is exceeded
-    if(cmax <= 0) root.add(new TreeLeaf(token(DOTS), sub, false, true, tree, context));
+    if(cmax <= 0) root.add(new ResourceLeaf(token(DOTS), sub, false, true, tree, context));
 
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
   }
@@ -211,15 +211,15 @@ final class DialogResources extends BaseXBack {
   void refreshNewFolder(final String p) {
     final byte[][] pathComp = split(token(p), '/');
 
-    TreeNode n = root;
+    ResourceNode n = root;
     for(final byte[] c : pathComp) {
       // make sure folder is reloaded
-      if(n instanceof TreeFolder)
-        ((TreeFolder) n).reload();
+      if(n instanceof ResourceFolder)
+        ((ResourceFolder) n).reload();
 
       // find next child to continue with
       for(int i = 0; i < n.getChildCount(); i++) {
-        final TreeNode ch = (TreeNode) n.getChildAt(i);
+        final ResourceNode ch = (ResourceNode) n.getChildAt(i);
         if(eq(ch.name, c)) {
           // continue with the child if path component matches
           n = ch;
@@ -228,7 +228,7 @@ final class DialogResources extends BaseXBack {
       }
     }
 
-    refreshFolder((TreeFolder) (n instanceof TreeFolder ? n : n.getParent()));
+    refreshFolder((ResourceFolder) (n instanceof ResourceFolder ? n : n.getParent()));
   }
 
   /**
@@ -243,7 +243,7 @@ final class DialogResources extends BaseXBack {
         final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
-      if(leaf) setIcon(BaseXImages.text(((TreeLeaf) val).raw));
+      if(leaf) setIcon(BaseXImages.text(((ResourceLeaf) val).raw));
       return this;
     }
   }
@@ -255,7 +255,7 @@ final class DialogResources extends BaseXBack {
 
     @Override
     public void execute() {
-      final TreeNode n = selection();
+      final ResourceNode n = selection();
       if(n == null || !BaseXDialog.confirm(dialog.gui, DELETE_NODES)) return;
 
       final Runnable run = new Runnable() {
@@ -269,8 +269,8 @@ final class DialogResources extends BaseXBack {
 
     @Override
     public boolean enabled(final GUI main) {
-      final TreeNode n = selection();
-      return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
+      final ResourceNode n = selection();
+      return n instanceof ResourceLeaf ? !((ResourceLeaf) n).abbr : n != null && !n.equals(root);
     }
   }
 
@@ -281,13 +281,13 @@ final class DialogResources extends BaseXBack {
 
     @Override
     public void execute() {
-      final TreeNode n = selection();
+      final ResourceNode n = selection();
       if(n == null) return;
 
       final DialogInput d = new DialogInput(n.path(), RENAME, dialog, 0);
       if(!d.ok()) return;
 
-      final String p = string(TreeNode.preparePath(token(d.input())));
+      final String p = string(ResourceNode.preparePath(token(d.input())));
       final Runnable run = new Runnable() {
         @Override
         public void run() {
@@ -299,8 +299,8 @@ final class DialogResources extends BaseXBack {
 
     @Override
     public boolean enabled(final GUI main) {
-      final TreeNode n = selection();
-      return n instanceof TreeLeaf ? !((TreeLeaf) n).abbr : n != null && !n.equals(root);
+      final ResourceNode n = selection();
+      return n instanceof ResourceLeaf ? !((ResourceLeaf) n).abbr : n != null && !n.equals(root);
     }
   }
 }

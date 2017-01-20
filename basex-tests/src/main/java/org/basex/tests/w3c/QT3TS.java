@@ -39,7 +39,7 @@ public final class QT3TS extends Main {
   private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
 
   /** Test suite id. */
-  private final String testid = "qt3ts";
+  private static final String TESTID = "qt3ts";
   /** Path to the test suite (ignored if {@code null}). */
   private String basePath;
 
@@ -148,8 +148,8 @@ public final class QT3TS extends Main {
     result.append(" Ignored : ").append(ignored).append(NL);
 
     // save log data
-    Util.outln(NL + "Writing log file '" + testid + ".log'...");
-    try(PrintOutput po = new PrintOutput(testid + ".log")) {
+    Util.outln(NL + "Writing log file '" + TESTID + ".log'...");
+    try(PrintOutput po = new PrintOutput(TESTID + ".log")) {
       po.println("QT3TS RESULTS __________________________" + NL);
       po.println(result.toString());
       po.println("WRONG __________________________________" + NL);
@@ -167,7 +167,7 @@ public final class QT3TS extends Main {
     // save report
     if(report != null) {
       sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
-      final String file = "ReportingResults/results_" + NAME + "_" + VERSION + IO.XMLSUFFIX;
+      final String file = "ReportingResults/results_" + NAME + '_' + VERSION + IO.XMLSUFFIX;
       new IOFile(file).write(report.create(ctx).toArray());
       Util.outln("Creating report '" + file + "'...");
     }
@@ -461,7 +461,7 @@ public final class QT3TS extends Main {
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|31)'))" +
-      "]", ctx).context(test).value().size() == 0;
+        ']', ctx).context(test).value().size() == 0;
   }
 
   /**
@@ -496,32 +496,46 @@ public final class QT3TS extends Main {
       } else if(type.equals("any-of")) {
         msg = anyOf(result, expected);
       } else if(result.value != null) {
-        if(type.equals("assert")) {
-          msg = assertQuery(result, expected);
-        } else if(type.equals("assert-count")) {
-          msg = assertCount(result, expected);
-        } else if(type.equals("assert-deep-eq")) {
-          msg = assertDeepEq(result, expected);
-        } else if(type.equals("assert-empty")) {
-          msg = assertEmpty(result);
-        } else if(type.equals("assert-eq")) {
-          msg = assertEq(result, expected);
-        } else if(type.equals("assert-false")) {
-          msg = assertBoolean(result, false);
-        } else if(type.equals("assert-permutation")) {
-          msg = assertPermutation(result, expected);
-        } else if(type.equals("assert-xml")) {
-          msg = assertXML(result, expected);
-        } else if(type.equals("serialization-matches")) {
-          msg = serializationMatches(result, expected);
-        } else if(type.equals("assert-string-value")) {
-          msg = assertStringValue(result, expected);
-        } else if(type.equals("assert-true")) {
-          msg = assertBoolean(result, true);
-        } else if(type.equals("assert-type")) {
-          msg = assertType(result, expected);
-        } else {
-          msg = "Test type not supported: " + type;
+        switch(type) {
+          case "assert":
+            msg = assertQuery(result, expected);
+            break;
+          case "assert-count":
+            msg = assertCount(result, expected);
+            break;
+          case "assert-deep-eq":
+            msg = assertDeepEq(result, expected);
+            break;
+          case "assert-empty":
+            msg = assertEmpty(result);
+            break;
+          case "assert-eq":
+            msg = assertEq(result, expected);
+            break;
+          case "assert-false":
+            msg = assertBoolean(result, false);
+            break;
+          case "assert-permutation":
+            msg = assertPermutation(result, expected);
+            break;
+          case "assert-xml":
+            msg = assertXML(result, expected);
+            break;
+          case "serialization-matches":
+            msg = serializationMatches(result, expected);
+            break;
+          case "assert-string-value":
+            msg = assertStringValue(result, expected);
+            break;
+          case "assert-true":
+            msg = assertBoolean(result, true);
+            break;
+          case "assert-type":
+            msg = assertType(result, expected);
+            break;
+          default:
+            msg = "Test type not supported: " + type;
+            break;
         }
       } else {
         msg = expected.toString();
@@ -717,10 +731,10 @@ public final class QT3TS extends Main {
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
-      String flags = "'" + Mode.ALLNODES + "'";
-      if(!pref) flags += ",'" + Mode.NAMESPACES + "'";
+      String flags = "'" + Mode.ALLNODES + '\'';
+      if(!pref) flags += ",'" + Mode.NAMESPACES + '\'';
       final String query = Function._UTIL_DEEP_EQUAL.args("<X>" + exp + "</X>",
-          "<X>" + res + "</X>" , "(" + flags + ")");
+          "<X>" + res + "</X>" , '(' + flags + ')');
       return asBoolean(query, expected) ? null : exp;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", exp, ex);
@@ -898,7 +912,7 @@ public final class QT3TS extends Main {
    * @return percentage
    */
   private static String pc(final int v, final long t) {
-    return (t == 0 ? 100 : v * 10000 / t / 100d) + "%";
+    return (t == 0 ? 100 : v * 10000 / t / 100.0d) + "%";
   }
 
   /**
@@ -1000,7 +1014,7 @@ public final class QT3TS extends Main {
    * @return database path
    */
   private IOFile sandbox() {
-    return new IOFile(TMP, testid);
+    return new IOFile(TMP, TESTID);
   }
 
   @Override

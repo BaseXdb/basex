@@ -133,7 +133,7 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
       "return $report update (" +
       "  delete node .//message/text()," +
       "  for $a in .//@* return replace value of node $a with ''" +
-      ")",
+        ')',
       "<report>\n<status>invalid</status>\n" +
       "<message level=\"\" line=\"\" column=\"\"/>\n" +
       "</report>");
@@ -236,7 +236,7 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
       "return $report update (" +
       "  delete node .//message/text()," +
       "  for $a in .//@* return replace value of node $a with ''" +
-      ")",
+        ')',
       "<report>\n<status>invalid</status>\n" +
       "<message level=\"\" line=\"\" column=\"\"/>\n" +
       "</report>");

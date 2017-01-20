@@ -80,7 +80,7 @@ public final class NonLockingTest extends SandboxTest {
       }.start();
     }
     // wait until all threads have been started
-    while(ai.get() < count) Thread.yield();
+    while(ai.get() < count) Thread.sleep(1);
 
     // check if this query is run before the sleeping queries are finished
     assertEquals("1", new XQuery("1").execute(context));

@@ -83,7 +83,7 @@ public final class Uri extends AStr {
       final URI base = new URI(Token.string(value)), res = new URI(Token.string(add.value));
       String uri = base.resolve(res).toString();
       if(uri.startsWith(IO.FILEPREF))
-        uri = uri.replaceAll("^" + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
+        uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
       return uri(Token.token(uri), false);
     } catch(final URISyntaxException ex) {
       throw URIARG_X.get(info, ex.getMessage());

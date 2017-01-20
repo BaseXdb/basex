@@ -161,7 +161,7 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public double progressInfo() {
-    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000d % 1 :
+    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000.0d % 1 :
       (double) counter / length;
   }
 }

@@ -557,7 +557,7 @@ final class MapRenderer {
         // go some tokens backwards form current token
         final int bpsl = data1[psl] == sl ? psl + 1 : psl;
         final int bsl = data1[psl] == sl ? 0 : sl;
-        ll = sd * 2 + sp;
+        ll = (sd << 1) + sp;
         int l;
         int p = cc >= data0[i] ? cc - data0[i] : 0;
         boolean apm;
@@ -584,7 +584,7 @@ final class MapRenderer {
           l = 0;
           for(int n = 0; n < ts; n += cl(tok, n))
             l += BaseXLayout.width(g, cw, cp(tok, n));
-          if(si > i && ll + l + sp >= w / 2d) break;
+          if(si > i && ll + l + sp >= w / 2.0d) break;
           ll += l + sp;
 
           tl.add(tok);
@@ -635,7 +635,7 @@ final class MapRenderer {
 
           for(int n = 0; n < ts; n += cl(tok, n))
             l += BaseXLayout.width(g, cw, cp(tok, n));
-          if(ll + l + sp + 2 * sd >= w / 2d) break;
+          if(ll + l + sp + 2 * sd >= w / 2.0d) break;
           ll += l + sp;
 
           tl.add(tok);

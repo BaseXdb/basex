@@ -1008,7 +1008,7 @@ public class TextPanel extends BaseXPanel {
       };
 
       for(final Entry<String, String> entry : tmp.entrySet()) {
-        final JMenuItem mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
+        final JMenuItem mi = new JMenuItem('[' + entry.getKey() + "] " + entry.getValue());
         pm.add(mi);
         mi.addActionListener(al);
       }

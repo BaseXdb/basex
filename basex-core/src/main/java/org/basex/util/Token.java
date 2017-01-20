@@ -381,7 +381,7 @@ public final class Token {
 
     final double a = Math.abs(dbl);
     final String s;
-    if(a >= 1e-6 && a < 1e6) {
+    if(a >= 1.0e-6 && a < 1.0e6) {
       synchronized(DD) { s = DD.format(dbl); }
     } else {
       synchronized(SD) { s = SD.format(dbl); }
@@ -403,7 +403,7 @@ public final class Token {
     final int fl = FLT.length;
     for(int i = 0; i < fl; ++i) if(flt == FLT[i]) return FLTSTR[i];
     final float a = Math.abs(flt);
-    final boolean small = a >= 1e-6f && a < 1e6f;
+    final boolean small = a >= 1.0e-6f && a < 1.0e6f;
     String s1;
     if(small) {
       synchronized(DF) { s1 = DF.format(flt); }
@@ -426,7 +426,7 @@ public final class Token {
     if(dbl == 0) return 1 / dbl > 0 ? ZERO : MZERO;
     if(Double.isNaN(dbl)) return NAN;
     final double a = Math.abs(dbl);
-    if(a < 1e6) {
+    if(a < 1.0e6) {
       final int i = (int) dbl;
       if(i == dbl) return token(i);
     }

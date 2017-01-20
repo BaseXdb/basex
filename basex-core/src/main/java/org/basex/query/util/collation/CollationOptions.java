@@ -44,7 +44,7 @@ abstract class CollationOptions extends Options {
    * @return error
    */
   protected IllegalArgumentException error(final Option<?> option) {
-    return new IllegalArgumentException("Invalid \"" + option + "\" value \"" + get(option) + "\"");
+    return new IllegalArgumentException("Invalid \"" + option + "\" value \"" + get(option) + '"');
   }
 
   /** Initialization of locales. */

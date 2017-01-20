@@ -326,8 +326,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     final int fs = GUIConstants.fontSize;
     h = header.getHeight() + 4;
-    w = (int) (getWidth() * .98 - fs / 2d - header.getWidth());
-    bw = fs * 2 + w / 10;
+    w = (int) (getWidth() * 0.98 - fs / 2.0d - header.getWidth());
+    bw = (fs << 1) + w / 10;
     bs = bw / (l - 1);
 
     // find maximum value
@@ -348,7 +348,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     // draw all bars
     for(int i = 0; i < l - 1; ++i) {
       final int bx = w - bw + bs * i;
-      g.setColor(GUIConstants.color((i == focus ? 3 : 2) + i * 2));
+      g.setColor(GUIConstants.color((i == focus ? 3 : 2) + (i << 1)));
       final int p = Math.max(1, stat.get(i) * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
       g.setColor(GUIConstants.color(8));

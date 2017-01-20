@@ -113,12 +113,12 @@ final class TreeRects {
 
     for(int i = 0; i < subSi; ++i) {
       if(slim) {
-        final double boxMiddle = xx + ww / 2f;
+        final double boxMiddle = xx + ww / 2.0f;
         final byte[] b = getText(sub.prePerIndex(rn, lv, i));
         int o = calcOptimalRectWidth(g, b) + 10;
         if(o < MIN_TXT_SPACE) o = MIN_TXT_SPACE;
         if(w > o) {
-          xx = boxMiddle - o / 2d;
+          xx = boxMiddle - o / 2.0d;
           ww = o;
         }
       }

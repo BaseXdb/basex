@@ -417,10 +417,10 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     sb.append("Node(").append(size()).append(")[\n");
     for(final Node<N, E> sub : children) {
       FingerTree.toString(sub, sb, indent + 1);
-      sb.append("\n");
+      sb.append('\n');
     }
     for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("]");
+    sb.append(']');
   }
 
   @Override

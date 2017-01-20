@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
+import org.basex.util.*;
 import org.junit.Test;
 
 /**
@@ -43,7 +44,7 @@ public final class LocalConcurrencyTest extends SandboxTest {
         }.start();
       }
     } finally {
-      while(counter.get() < runs) Thread.yield();
+      while(counter.get() < runs) Performance.sleep(1);
       if(error[0] != null) {
         error[0].printStackTrace();
         fail(error[0].toString());

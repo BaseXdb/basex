@@ -20,14 +20,14 @@ public class FairLockQueue extends LockQueue {
     queue.add(id);
 
     // loop until job is placed first
-    do wait(); while(id != queue.peek());
+    do wait(); while(!id.equals(queue.peek()));
 
     // remove job from queue
     queue.remove(id);
   }
 
   @Override
-  public synchronized String toString() {
+  public String toString() {
     return "Queue: " + queue;
   }
 }

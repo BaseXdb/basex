@@ -12,7 +12,7 @@ import org.xml.sax.helpers.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class ErrorHandler extends DefaultHandler {
+public final class ValidationHandler extends DefaultHandler {
   /** Fatal error. */
   static final String FATAL = "Fatal";
   /** Error. */

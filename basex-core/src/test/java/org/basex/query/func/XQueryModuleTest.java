@@ -44,11 +44,11 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_XQUERY_EVAL.args(" 'static-base-uri()'", " map { }",
         " map { 'base-uri': 'http://x.x/' }"), "http://x.x/");
 
-    error(_XQUERY_EVAL.args(" '" + DOC.args(NAME) + "'", " map { }",
+    error(_XQUERY_EVAL.args(" '" + DOC.args(NAME) + '\'', " map { }",
         " map { 'permission': 'none' }"), BXXQ_PERM_X);
-    error(_XQUERY_EVAL.args(" '" + _DB_OPEN.args(NAME) + "'", " map { }",
+    error(_XQUERY_EVAL.args(" '" + _DB_OPEN.args(NAME) + '\'', " map { }",
         " map { 'permission': 'none' }"), BXDB_OPEN_X);
-    error(_XQUERY_EVAL.args(" '" + _FILE_EXISTS.args("x") + "'", " map { }",
+    error(_XQUERY_EVAL.args(" '" + _FILE_EXISTS.args("x") + '\'', " map { }",
         " map { 'permission': 'none' }"), BXXQ_PERM_X);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[. = 0]\"", " map { }",
         " map { 'timeout': 1 }"), BXXQ_TIMEOUT);
@@ -60,7 +60,7 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
   @Test
   public void update() {
     query(_XQUERY_UPDATE.args("delete node <a/>"));
-    query(_XQUERY_UPDATE.args(" '" + _DB_OUTPUT.args(1) + "'"), "1");
+    query(_XQUERY_UPDATE.args(" '" + _DB_OUTPUT.args(1) + '\''), "1");
     query(_XQUERY_UPDATE.args(" '()'"));
     error(_XQUERY_UPDATE.args("1"), BXXQ_NOUPDATE);
   }
@@ -79,7 +79,7 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_XQUERY_FORK_JOIN.args(" true#0"), "true");
     query(_XQUERY_FORK_JOIN.args("(false#0,true#0)"), "false\ntrue");
     query(_XQUERY_FORK_JOIN.args(" function() { 123 }"), "123");
-    query("count(" + _XQUERY_FORK_JOIN.args(" (1 to 100) ! false#0") + ")", "100");
+    query("count(" + _XQUERY_FORK_JOIN.args(" (1 to 100) ! false#0") + ')', "100");
 
     // run slow and fast query and check that results are returned in the correct order
     query(_XQUERY_FORK_JOIN.args("(function() { (1 to 10000000)[.=1] }, true#0)"), "1\ntrue");

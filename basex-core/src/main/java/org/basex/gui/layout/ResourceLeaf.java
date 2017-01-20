@@ -9,7 +9,7 @@ import org.basex.core.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
-public final class TreeLeaf extends TreeNode {
+public final class ResourceLeaf extends ResourceNode {
   /** Represents raw file (true) or document (false). */
   public final boolean raw;
   /** This leaf is a dummy node displaying that node listing is abbreviated. */
@@ -24,7 +24,7 @@ public final class TreeLeaf extends TreeNode {
    * @param tree tree reference
    * @param context database context
    */
-  public TreeLeaf(final byte[] name, final byte[] path, final boolean raw, final boolean abbr,
+  public ResourceLeaf(final byte[] name, final byte[] path, final boolean raw, final boolean abbr,
       final BaseXTree tree, final Context context) {
     super(name, path, tree, context);
     this.raw = raw;

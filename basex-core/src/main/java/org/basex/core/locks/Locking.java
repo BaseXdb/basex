@@ -64,9 +64,11 @@ public final class Locking {
   /** Stores one lock for each lock string. */
   private final Map<String, LocalLock> localLocks = new HashMap<>();
 
-  /** Number of running local writers. Guarded by {@link #globalLock}. */
+  /** Local/global lock. */
+  private final Object localGlobal = new Object();
+  /** Number of running local writers. */
   private int localWriters;
-  /** Number of running global readers. Guarded by {@link #globalLock}. */
+  /** Number of running global readers. */
   private int globalReaders;
   /** Number of currently running jobs. */
   private int jobs;
@@ -132,15 +134,15 @@ public final class Locking {
     // apply exclusive lock (global write), or shared lock otherwise
     if(lock) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).lock();
 
-    synchronized(globalLock) {
+    synchronized(localGlobal) {
       // local write locks: wait for completion of global readers
       if(writes.local()) {
-        while(globalReaders > 0) globalLock.wait();
+        while(globalReaders > 0) localGlobal.wait();
         localWriters++;
       }
       // global read lock: wait for completion of local writers (excluding the current job)
       if(reads.global()) {
-        while(localWriters > 1 || localWriters == 1 && !writes.local()) globalLock.wait();
+        while(localWriters > 1 || localWriters == 1 && !writes.local()) localGlobal.wait();
         globalReaders++;
       }
     }
@@ -170,18 +172,18 @@ public final class Locking {
     for(final String write : writes) unpin(write).writeLock().unlock();
 
     // allow next global reader to resume
-    synchronized(globalLock) {
+    synchronized(localGlobal) {
       if(reads.global()) {
         globalReaders--;
-        globalLock.notifyAll();
+        localGlobal.notifyAll();
       }
     }
 
     // allow next local writer to resume
-    synchronized(globalLock) {
+    synchronized(localGlobal) {
       if(writes.local()) {
         localWriters--;
-        globalLock.notifyAll();
+        localGlobal.notifyAll();
       }
     }
 
@@ -232,8 +234,10 @@ public final class Locking {
     final StringBuilder sb = new StringBuilder(NL);
     sb.append("Locking").append(NL);
     final String ind = "| ";
-    sb.append(ind).append("Running jobs: ").append(jobs).append(NL);
-    sb.append(ind).append(queue).append(NL);
+    synchronized(queue) {
+      sb.append(ind).append("Running jobs: ").append(jobs).append(NL);
+      sb.append(ind).append(queue).append(NL);
+    }
     sb.append(ind).append("Held locks by object:").append(NL);
     synchronized(localLocks) {
       for(final Entry<String, LocalLock> e : localLocks.entrySet()) {

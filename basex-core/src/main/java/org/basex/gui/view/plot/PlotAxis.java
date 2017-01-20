@@ -169,7 +169,7 @@ final class PlotAxis {
       // calculating positions for all items with value b in current category
       while(i < l) {
         // centering items if only a single category exists (.5d)
-        final double d = nrCats == 1 ? .5d : 1.0d / (nrCats - 1) * p;
+        final double d = nrCats == 1 ? 0.5d : 1.0d / (nrCats - 1) * p;
         co[tmpI[i++]] = d;
       }
       ++p;
@@ -292,20 +292,20 @@ final class PlotAxis {
     // small ranges between min and max value
     if(range < 1) {
       final double dec = 1.0d / range;
-      double pow = (int) (Math.floor(StrictMath.log10(dec) + .5d) + 1) * 2;
+      double pow = (int) (Math.floor(StrictMath.log10(dec) + 0.5d) + 1) << 1;
       final double fac = (int) StrictMath.pow(10, pow);
       final double tmin = min * fac;
       final double tmax = max * fac;
       range = Math.abs(tmax - tmin);
 
-      pow = range < 10 ? 0 : (int) Math.floor(StrictMath.log10(range) + .5d) - 1;
+      pow = range < 10 ? 0 : (int) Math.floor(StrictMath.log10(range) + 0.5d) - 1;
       calculatedCaptionStep = (int) StrictMath.pow(10, pow);
       calculatedCaptionStep /= fac;
       return;
     }
 
     final int pow = range < 10 ? 0 :
-      (int) Math.floor(StrictMath.log10(range) + .5d) - 1;
+      (int) Math.floor(StrictMath.log10(range) + 0.5d) - 1;
     calculatedCaptionStep = (int) StrictMath.pow(10, pow);
   }
 

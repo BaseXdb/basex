@@ -50,8 +50,8 @@ public final class UCAOptions extends CollationOptions {
   @SuppressWarnings("unchecked")
   Collation get(final String args) {
     final String error = check(args);
-    if(error != null && (error.startsWith(FALLBACK.name() + "=") || get(FALLBACK) == YesNo.NO))
-      throw new IllegalArgumentException("Invalid option \"" + error + "\"");
+    if(error != null && (error.startsWith(FALLBACK.name() + '=') || get(FALLBACK) == YesNo.NO))
+      throw new IllegalArgumentException("Invalid option \"" + error + '"');
 
     final boolean nomercy = get(FALLBACK) == YesNo.NO;
 
@@ -65,7 +65,7 @@ public final class UCAOptions extends CollationOptions {
     final Object coll = invoke(m, null, locale);
 
     if(!coll.getClass().equals(RBC)) throw new IllegalArgumentException(
-        "Invalid collator \"" + coll.getClass().getName() + "\"");
+        "Invalid collator \"" + coll.getClass().getName() + '"');
 
     if(contains(VERSION)) {
       final String v = get(VERSION);
@@ -77,7 +77,7 @@ public final class UCAOptions extends CollationOptions {
           throw error(VERSION);
       } catch(final IllegalArgumentException ex) {
         if(get(FALLBACK) == YesNo.NO)
-          throw new IllegalArgumentException("Version not supported: \"" + v + "\"");
+          throw new IllegalArgumentException("Version not supported: \"" + v + '"');
       }
     }
 

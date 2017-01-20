@@ -280,7 +280,7 @@ public final class Util {
 
     for(final Entry<Object, Object> o : System.getProperties().entrySet()) {
       final String k = o.getKey().toString();
-      if(k.startsWith(Prop.DBPREFIX)) sl.add("-D" + k + "=" + o.getValue());
+      if(k.startsWith(Prop.DBPREFIX)) sl.add("-D" + k + '=' + o.getValue());
     }
     sl.add(clazz.getName()).add("-D").add(args);
 

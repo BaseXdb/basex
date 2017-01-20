@@ -174,7 +174,7 @@ public final class Stats {
       final int size = values != null ? values.size() : 0;
       if(size > 1) sb.append(size).append(" distinct ");
       sb.append(StatsType.toString(type));
-      if(size != 1) sb.append("s");
+      if(size != 1) sb.append('s');
       if(isNumeric(type)) {
         sb.append(" [");
         final int mn = (int) min, mx = (int) max;

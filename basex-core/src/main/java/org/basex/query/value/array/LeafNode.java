@@ -246,6 +246,6 @@ final class LeafNode implements Node<Value, Value> {
 
   @Override
   public String toString() {
-    return Util.className(this) + "(" + size() + ")" + Arrays.toString(values);
+    return Util.className(this) + '(' + size() + ')' + Arrays.toString(values);
   }
 }

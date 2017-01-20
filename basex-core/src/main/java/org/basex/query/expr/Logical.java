@@ -29,13 +29,14 @@ abstract class Logical extends Arr {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
-    for(int i = 0; i < exprs.length; i++) {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
       try {
-        exprs[i] = exprs[i].compile(cc);
+        exprs[e] = exprs[e].compile(cc);
       } catch(final QueryException qe) {
         // first expression is evaluated eagerly
-        if(i == 0) throw qe;
-        exprs[i] = cc.error(qe, exprs[i]);
+        if(e == 0) throw qe;
+        exprs[e] = cc.error(qe, exprs[e]);
       }
     }
     return optimize(cc);
@@ -79,21 +80,22 @@ abstract class Logical extends Arr {
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     final Expr[] arr = exprs;
     boolean change = false;
-    for(int i = 0; i < arr.length; i++) {
+    final int al = arr.length;
+    for(int a = 0; a < al; a++) {
       try {
-        final Expr e = arr[i].inline(var, ex, cc);
+        final Expr e = arr[a].inline(var, ex, cc);
         if(e != null) {
-          arr[i] = e;
+          arr[a] = e;
           change = true;
         }
       } catch(final QueryException qe) {
         // first expression is evaluated eagerly
-        if(i == 0) throw qe;
+        if(a == 0) throw qe;
 
         // everything behind the error is dead anyway
-        final Expr[] nw = new Expr[i + 1];
-        System.arraycopy(arr, 0, nw, 0, i);
-        nw[i] = cc.error(qe, this);
+        final Expr[] nw = new Expr[a + 1];
+        System.arraycopy(arr, 0, nw, 0, a);
+        nw[a] = cc.error(qe, this);
         exprs = nw;
         change = true;
         break;

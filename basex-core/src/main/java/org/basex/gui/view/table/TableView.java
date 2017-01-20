@@ -26,7 +26,7 @@ import org.basex.util.list.*;
 public final class TableView extends View {
   /** Zoom table. */
   private static final double[] ZOOM = {
-    1, .99, .98, .97, 1, 1.03, 1.05, .9, .8, .6, .35, .18, .13, .09, .05, .03
+    1, 0.99, 0.98, 0.97, 1, 1.03, 1.05, 0.9, 0.8, 0.6, 0.35, 0.18, 0.13, 0.09, 0.05, 0.03
   };
   /** Table data. */
   final TableData tdata;

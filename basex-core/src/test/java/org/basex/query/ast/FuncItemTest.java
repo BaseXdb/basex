@@ -287,7 +287,7 @@ public final class FuncItemTest extends QueryPlanTest {
         + "declare function local:c() { local:b#0() };"
         + "local:c() ",
         "",
-        "exists(//" + Util.className(Empty.class) + ")");
+        "exists(//" + Util.className(Empty.class) + ')');
   }
 
   /** Tests inlining of a function literal. */

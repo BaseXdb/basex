@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
+import org.basex.util.Performance;
 
 /**
  * Job pool.
@@ -39,7 +40,7 @@ public final class JobPool {
    * @param job job
    */
   public void register(final Job job) {
-    while(active.size() >= MAXQUERIES) Thread.yield();
+    while(active.size() >= MAXQUERIES) Performance.sleep(1);
     active.put(job.job().id(), job);
   }
 
@@ -58,7 +59,7 @@ public final class JobPool {
     // stop running tasks and queries
     timer.cancel();
     for(final Job job : active.values()) job.stop();
-    while(!active.isEmpty()) Thread.yield();
+    while(!active.isEmpty()) Performance.sleep(1);
   }
 
   /**

@@ -117,7 +117,7 @@ public final class ValueIndexTest extends QueryPlanTest {
       execute(new CreateDB(NAME, FILE));
       check("count(//" + key + "[text() contains text { " + value + " }])",
           Integer.toString(value.split(",").length),
-          "exists(//" + Util.className(FTIndexAccess.class) + ")");
+          "exists(//" + Util.className(FTIndexAccess.class) + ')');
       if(!key.equals("*")) check("//X[text() contains text 'unknown']", "", "exists(//DBNode)");
     }
   }

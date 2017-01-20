@@ -55,7 +55,7 @@ final class MapList extends IntList {
     }
 
     // summarize sizes
-    final double sizeP = w / 100d;
+    final double sizeP = w / 100.0d;
     long sum = 0;
     for(int i = 0; i < size; ++i) sum += weight(textLen, data, i);
 

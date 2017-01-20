@@ -128,7 +128,7 @@ public final class HttpClient {
                 + CNONCE + "=\"" + cnonce + "\","
                 + RESPONSE + "=\"" + rsp + "\","
                 + ALGORITHM + '=' + MD5 + ','
-                + OPAQUE + "=\"" + map.get(OPAQUE) + "\"";
+                + OPAQUE + "=\"" + map.get(OPAQUE) + '"';
 
         conn.disconnect();
         conn = connection(url, request);

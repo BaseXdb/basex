@@ -78,7 +78,7 @@ public final class Flt extends ANum {
 
   @Override
   public Flt abs() {
-    return value > 0d || 1 / value > 0 ? this : get(-value);
+    return value > 0.0d || 1 / value > 0 ? this : get(-value);
   }
 
   @Override

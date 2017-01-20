@@ -21,13 +21,13 @@ abstract class Validation {
 
   /**
    * Starts the validation.
-   * @param h error handler
+   * @param handler error handler
    * @throws IOException I/O exception
    * @throws ParserConfigurationException parser configuration exception
    * @throws SAXException SAX exception
    * @throws QueryException query exception
    */
-  abstract void process(ErrorHandler h)
+  abstract void process(ValidationHandler handler)
       throws IOException, ParserConfigurationException, SAXException, QueryException;
 
   /**
@@ -38,7 +38,7 @@ abstract class Validation {
    * @return resulting file
    * @throws IOException I/O exception
    */
-  protected IO prepare(final IO in, final ErrorHandler handler) throws IOException {
+  protected IO prepare(final IO in, final ValidationHandler handler) throws IOException {
     if(in instanceof IOContent || in instanceof IOStream) {
       // cache main-memory content or stream to file
       schema = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));

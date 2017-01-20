@@ -32,7 +32,7 @@ public final class XQueryForkJoin extends StandardFunc {
     if(funcs.size() == 1) return ((FItem) funcs.itemAt(0)).invokeValue(qc, info);
 
     final ForkJoinPool pool = new ForkJoinPool();
-    final ForkJoinTask task = new ForkJoinTask(funcs, qc, info);
+    final XQueryTask task = new XQueryTask(funcs, qc, info);
     try {
       return pool.invoke(task);
     } catch(final Exception ex) {

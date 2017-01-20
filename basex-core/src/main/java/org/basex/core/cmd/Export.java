@@ -162,7 +162,7 @@ public final class Export extends Command {
 
   @Override
   public String detailedInfo() {
-    return progFile == null ? EXPORT : "(" + progPos + "/" + progSize + "): " + progFile;
+    return progFile == null ? EXPORT : "(" + progPos + '/' + progSize + "): " + progFile;
   }
 
   /**

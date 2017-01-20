@@ -110,7 +110,7 @@ public final class BaseXServer extends CLI implements Runnable {
     }
 
     new Thread(this).start();
-    do Thread.yield(); while(!running);
+    do Performance.sleep(1); while(!running);
 
     // show info that server has been started
     final String startX = Util.info(SRV_STARTED_PORT_X, port);

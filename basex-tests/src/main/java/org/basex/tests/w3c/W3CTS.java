@@ -246,7 +246,7 @@ public abstract class W3CTS extends Main {
    * @return percentage
    */
   private static String pc(final int v, final long t) {
-    return (t == 0 ? 100 : v * 10000 / t / 100d) + "%";
+    return (t == 0 ? 100 : v * 10000 / t / 100.0d) + "%";
   }
 
   /**
@@ -416,7 +416,7 @@ public abstract class W3CTS extends Main {
             if(print) {
               if(expOut.isEmpty()) result.add(error(pth + outname, expError));
               logErr.append(logStr);
-              logErr.append('[' + testid + " ] ");
+              logErr.append('[').append(testid).append(" ] ");
               logErr.append(norm(string(result.get(0))));
               logErr.append(NL);
               logErr.append("[Wrong] ");
@@ -442,7 +442,7 @@ public abstract class W3CTS extends Main {
           if(expOut.isEmpty() || !expError.isEmpty()) {
             if(print) {
               logOK2.append(logStr);
-              logOK2.append('[' + testid + " ] ");
+              logOK2.append('[').append(testid).append(" ] ");
               logOK2.append(norm(expError));
               logOK2.append(NL);
               logOK2.append("[Rght?] ");
@@ -455,7 +455,7 @@ public abstract class W3CTS extends Main {
           } else {
             if(print) {
               logErr2.append(logStr);
-              logErr2.append('[' + testid + " ] ");
+              logErr2.append('[').append(testid).append(" ] ");
               logErr2.append(norm(string(result.get(0))));
               logErr2.append(NL);
               logErr2.append("[Wrong] ");

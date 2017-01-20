@@ -42,7 +42,8 @@ final class GUIToolBar extends JToolBar {
    * Refreshes the buttons.
    */
   void refresh() {
-    for(int c = 0; c < commands.length; ++c) {
+    final int cl = commands.length;
+    for(int c = 0; c < cl; ++c) {
       final GUICommand cmd = commands[c];
       if(cmd != null) {
         final AbstractButton button = (AbstractButton) getComponent(c);

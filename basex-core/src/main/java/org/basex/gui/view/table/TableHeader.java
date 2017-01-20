@@ -159,7 +159,7 @@ final class TableHeader extends BaseXPanel {
 
     o = !header && clicked ? 1 : 0;
     final byte[] reset = { 'x' };
-    x += (bs - BaseXLayout.width(g, reset)) / 2d;
+    x += (bs - BaseXLayout.width(g, reset)) / 2.0d;
     BaseXLayout.chopString(g, reset, (int) x + o, hh + o + 1, w, fsz);
   }
 

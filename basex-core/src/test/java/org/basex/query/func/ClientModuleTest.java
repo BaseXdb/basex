@@ -94,9 +94,9 @@ public final class ClientModuleTest extends AdvancedQueryTest {
     query(_CLIENT_QUERY.args(conn(), "\"xs:base64Binary('QQ==')\""), "A");
     // serialization parameters (should be ignored)
     query(_CLIENT_QUERY.args(conn(),
-        "\"" + SerializerOptions.METHOD.arg("text") + "<xml/>\""), "<xml/>");
+      '"' + SerializerOptions.METHOD.arg("text") + "<xml/>\""), "<xml/>");
     query(_CLIENT_QUERY.args(conn(),
-        "\"" + SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'\""), "\u00e4");
+      '"' + SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'\""), "\u00e4");
     query(_CLIENT_QUERY.args(conn(), "\"xs:base64Binary('QQ==')\""), "A");
     // query errors: returning function items
     error(_CLIENT_QUERY.args(conn(), "\"function(){}\""), BXCL_FITEM_X);

@@ -90,7 +90,7 @@ public final class Dbl extends ANum {
 
   @Override
   public Dbl abs() {
-    return value > 0d || 1 / value > 0 ? this : get(-value);
+    return value > 0.0d || 1 / value > 0 ? this : get(-value);
   }
 
   @Override
@@ -122,7 +122,7 @@ public final class Dbl extends ANum {
     if(v == 0 || Double.isNaN(v) || Double.isInfinite(v) || s > 322) return v;
     if(s < -308) return 0;
     if(!e && s == 0) {
-      if(v >= -.5 && v < .0) return -.0;
+      if(v >= -0.5 && v < 0.0) return -0.0;
       if(v > Long.MIN_VALUE && v < Long.MAX_VALUE) return Math.round(v);
     }
 

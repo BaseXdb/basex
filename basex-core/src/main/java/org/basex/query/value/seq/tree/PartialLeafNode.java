@@ -64,6 +64,6 @@ final class PartialLeafNode implements NodeLike<Item, Item> {
 
   @Override
   public String toString() {
-    return Util.className(this) + "(" + elems.length + ")" + Arrays.toString(elems);
+    return Util.className(this) + '(' + elems.length + ')' + Arrays.toString(elems);
   }
 }
