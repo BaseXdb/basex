@@ -3,10 +3,10 @@ package org.basex.core.locks;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.util.concurrent.atomic.*;
-
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.util.*;
 import org.junit.Test;
 
 /**
@@ -19,7 +19,7 @@ public final class NonLockingTest extends SandboxTest {
   /** Query for returning all jobs except for the current one. */
   private static final String LIST_JOBS = _JOBS_LIST.args() + '[' + _JOBS_CURRENT.args() + "!= .]";
   /** Very slow query. */
-  private static final String VERY_SLOW_QUERY = _PROF_SLEEP.args(1000000);
+  private static final String VERY_SLOW_QUERY = _PROF_SLEEP.args(2000);
 
   /**
    * Test.
@@ -66,24 +66,26 @@ public final class NonLockingTest extends SandboxTest {
   @Test
   public void noLimitForNonLocking() throws Exception {
     // start a bunch of small queries
-    final AtomicInteger ai = new AtomicInteger();
-    final int count = 10;
+    final Performance p = new Performance();
+    final int count = context.soptions.get(StaticOptions.PARALLEL);
     for(int c = 0; c < count; c++) {
       new Thread() {
         @Override
         public void run() {
           try {
-            ai.incrementAndGet();
             new XQuery(VERY_SLOW_QUERY).execute(context);
           } catch(final Exception ignored) { }
         }
       }.start();
     }
     // wait until all threads have been started
-    while(ai.get() < count) Thread.sleep(1);
+    Performance.sleep(500);
 
     // check if this query is run before the sleeping queries are finished
     assertEquals("1", new XQuery("1").execute(context));
+
+    // more than five seconds... jobs did not run in parallel
+    if(p.time() > 1000000000d) fail("Queries did not run in parallel.");
 
     // stop sleeping jobs
     execute(new XQuery(LIST_JOBS + '!' + _JOBS_STOP.args(" .")));
