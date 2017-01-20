@@ -204,7 +204,9 @@ public final class Request extends QueryModule {
   public Value headerNames() throws QueryException {
     final TokenList tl = new TokenList();
     final Enumeration<String> en = request().getHeaderNames();
-    while(en.hasMoreElements()) tl.add(en.nextElement());
+    while(en.hasMoreElements()) {
+      tl.add(en.nextElement());
+    }
     return StrSeq.get(tl);
   }
 

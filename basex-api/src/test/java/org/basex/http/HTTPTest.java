@@ -122,8 +122,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private static String request(final String query, final HttpMethod method)
-      throws IOException {
+  private static String request(final String query, final HttpMethod method)throws IOException {
     return request(query, method.name());
   }
 

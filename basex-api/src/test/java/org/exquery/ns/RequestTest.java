@@ -131,7 +131,7 @@ public final class RequestTest extends HTTPTest {
   @Test
   public void header() throws Exception {
     assertEquals("localhost:" + HTTP_PORT, get("?query=" + request("R:header('Host')")));
-    assertEquals("def",                     get("?query=" + request("R:header('ABC', 'def')")));
+    assertEquals("def",                    get("?query=" + request("R:header('ABC', 'def')")));
   }
 
   /**

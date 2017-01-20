@@ -19,7 +19,7 @@ public final class NonLockingTest extends SandboxTest {
   /** Query for returning all jobs except for the current one. */
   private static final String LIST_JOBS = _JOBS_LIST.args() + '[' + _JOBS_CURRENT.args() + "!= .]";
   /** Very slow query. */
-  private static final String VERY_SLOW_QUERY = _PROF_SLEEP.args(2000);
+  private static final String SLEEPING_QUERY = _PROF_SLEEP.args(5000);
 
   /**
    * Test.
@@ -34,7 +34,7 @@ public final class NonLockingTest extends SandboxTest {
         @Override
         public void run() {
           try {
-            new XQuery(VERY_SLOW_QUERY).execute(context);
+            new XQuery(SLEEPING_QUERY).execute(context);
           } catch(final Exception ignored) { }
         }
       }.start();
@@ -61,31 +61,27 @@ public final class NonLockingTest extends SandboxTest {
 
   /**
    * Test.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
   @Test
-  public void noLimitForNonLocking() throws Exception {
-    // start a bunch of small queries
-    final Performance p = new Performance();
-    final int count = context.soptions.get(StaticOptions.PARALLEL);
+  public void noLimitForNonLocking() throws BaseXException {
+    // start more than maximum number of queries
+    final int count = context.soptions.get(StaticOptions.PARALLEL) + 1;
     for(int c = 0; c < count; c++) {
       new Thread() {
         @Override
         public void run() {
           try {
-            new XQuery(VERY_SLOW_QUERY).execute(context);
+            new XQuery(SLEEPING_QUERY).execute(context);
           } catch(final Exception ignored) { }
         }
       }.start();
     }
-    // wait until all threads have been started
-    Performance.sleep(500);
 
-    // check if this query is run before the sleeping queries are finished
-    assertEquals("1", new XQuery("1").execute(context));
-
-    // more than five seconds... jobs did not run in parallel
-    if(p.time() > 1000000000d) fail("Queries did not run in parallel.");
+    // ensure that all jobs are running
+    Performance.sleep(1000);
+    assertEquals("", new XQuery(
+        _JOBS_LIST_DETAILS.args() + "[@state != 'running']").execute(context));
 
     // stop sleeping jobs
     execute(new XQuery(LIST_JOBS + '!' + _JOBS_STOP.args(" .")));
@@ -121,7 +117,7 @@ public final class NonLockingTest extends SandboxTest {
         @Override
         public void run() {
           try {
-            new XQuery(VERY_SLOW_QUERY + ',' + query).execute(context);
+            new XQuery(SLEEPING_QUERY + ',' + query).execute(context);
           } catch(final Exception ignored) { }
         }
       }.start();
