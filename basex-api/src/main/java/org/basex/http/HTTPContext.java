@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class HTTPContext {
   /** Database context. */
-  private static Context context;
+  private volatile static Context context;
   /** Initialized failed. */
   private static IOException exception;
   /** Initialization flag. */

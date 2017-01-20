@@ -211,7 +211,7 @@ public final class ServerLockingTest extends SandboxTest {
       }
     }
 
-    allDone.await(totalQueries * SLEEP, TimeUnit.MILLISECONDS);
+    assertTrue(allDone.await(totalQueries * SLEEP, TimeUnit.MILLISECONDS));
     for(final Client client : clients) {
       assertTrue(client.error, client.error == null);
     }

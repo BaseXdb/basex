@@ -178,7 +178,7 @@ public final class User {
    * @param db database (can be {@code null})
    * @return permission
    */
-  public Perm perm(final String db) {
+  public synchronized Perm perm(final String db) {
     if(db != null) {
       final Entry<String, Perm> entry = find(db);
       if(entry != null) return entry.getValue();

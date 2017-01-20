@@ -20,6 +20,8 @@ public final class DateTime {
   public static final SimpleDateFormat TIME = new SimpleDateFormat("HH:mm:ss.SSS");
   /** Time zone. */
   public static final SimpleDateFormat ZONE = new SimpleDateFormat("Z");
+  /** Formatting mutex. */
+  private static final Object FORMAT = new Object();
 
   static { FULL.setTimeZone(TimeZone.getTimeZone("UTC")); }
 
@@ -32,12 +34,14 @@ public final class DateTime {
    * @param date string representing a date
    * @return parsed date
    */
-  public static synchronized Date parse(final String date) {
-    try {
-      return (date.contains(":") ? FULL : DATETIME).parse(date);
-    } catch(final ParseException ex) {
-      Util.errln(ex);
-      return new Date(0);
+  public static Date parse(final String date) {
+    synchronized(FORMAT) {
+      try {
+        return (date.contains(":") ? FULL : DATETIME).parse(date);
+      } catch(final ParseException ex) {
+        Util.errln(ex);
+        return new Date(0);
+      }
     }
   }
 
@@ -47,7 +51,7 @@ public final class DateTime {
    * @return string with the formatted date
    */
   public static String format(final Date date) {
-    return FULL.format(date);
+    return format(date, FULL);
   }
 
   /**
@@ -56,7 +60,9 @@ public final class DateTime {
    * @param date date
    * @return string with the formatted date
    */
-  public static synchronized String format(final Date date, final DateFormat format) {
-    return format.format(date);
+  public static String format(final Date date, final DateFormat format) {
+    synchronized(FORMAT) {
+      return format.format(date);
+    }
   }
 }

@@ -63,9 +63,9 @@ public final class Locking {
   private final ReentrantReadWriteLock globalLock;
   /** Stores one lock for each lock string. */
   private final Map<String, LocalLock> localLocks = new HashMap<>();
+  /** Mutex. */
+  private final Object mutex = new Object();
 
-  /** Local/global lock. */
-  private final Object localGlobal = new Object();
   /** Number of running local writers. */
   private int localWriters;
   /** Number of running global readers. */
@@ -134,15 +134,15 @@ public final class Locking {
     // apply exclusive lock (global write), or shared lock otherwise
     if(lock) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).lock();
 
-    synchronized(localGlobal) {
+    synchronized(mutex) {
       // local write locks: wait for completion of global readers
       if(writes.local()) {
-        while(globalReaders > 0) localGlobal.wait();
+        while(globalReaders > 0) mutex.wait();
         localWriters++;
       }
       // global read lock: wait for completion of local writers (excluding the current job)
       if(reads.global()) {
-        while(localWriters > 1 || localWriters == 1 && !writes.local()) localGlobal.wait();
+        while(localWriters > 1 || localWriters == 1 && !writes.local()) mutex.wait();
         globalReaders++;
       }
     }
@@ -172,18 +172,18 @@ public final class Locking {
     for(final String write : writes) unpin(write).writeLock().unlock();
 
     // allow next global reader to resume
-    synchronized(localGlobal) {
+    synchronized(mutex) {
       if(reads.global()) {
         globalReaders--;
-        localGlobal.notifyAll();
+        mutex.notifyAll();
       }
     }
 
     // allow next local writer to resume
-    synchronized(localGlobal) {
+    synchronized(mutex) {
       if(writes.local()) {
         localWriters--;
-        localGlobal.notifyAll();
+        mutex.notifyAll();
       }
     }
 
