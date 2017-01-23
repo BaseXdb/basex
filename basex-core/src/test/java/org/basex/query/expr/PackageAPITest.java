@@ -41,7 +41,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   private static final String PKG2ID = PKG2 + "-10.0";
   /** Pkg3 identifier. */
   private static final String PKG3ID = PKG3 + "-10.0";
-  /** Pkg1 identifier. */
+  /** Pkg4 identifier. */
   private static final String PKG4ID = PKG4 + "-2.0";
 
   /** Prepare test. */
@@ -272,6 +272,36 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // delete package
     assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
+    assertFalse(new IOFile(REPO, dir).exists());
+  }
+
+  /**
+   * Tests installing of a package containing a jar file with packaged dependencies
+   * @throws Exception exception
+   */
+  @Test
+  public void installJarWithDependencies() throws Exception {
+    // install package
+    execute(new RepoInstall(REPO + "testJarInJar.jar", null));
+
+    // ensure package was properly installed
+    final String dir = normalize("test");
+    assertTrue(isDir(dir));
+    assertTrue(isFile(dir + "/GreeterCaller.jar"));
+
+    // use package
+    try(final QueryProcessor qp = new QueryProcessor(
+            "import module namespace j='test.GreeterCaller'; j:call('Unit Test')", context)) {
+      assertEquals(qp.value().serialize().toString(), "Hello Unit Test");
+    }
+    // dependency installed
+    assertTrue(isFile(dir + "/.GreeterCallerLib/Greeter.jar"));
+
+    new RepoManager(context).delete("test.GreeterCaller");
+    final boolean existAfterDelete = isFile(dir + "/.GreeterCallerLib/Greeter.jar") ||
+            isFile(dir + "/GreeterCaller.jar");
+    assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
+    assertFalse("Package could not be deleted.", existAfterDelete);
   }
 
   /**

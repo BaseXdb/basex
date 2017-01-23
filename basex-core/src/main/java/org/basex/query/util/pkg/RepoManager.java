@@ -25,6 +25,11 @@ import org.basex.util.list.*;
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
+  /** Ignore files starting with a dot. */
+  private static final FileFilter DOT_FILE_FILTER = new FileFilter() {
+    @Override public boolean accept(final File file) {
+      return !file.getName().startsWith(".");
+  }};
   /** Context. */
   private final Context context;
   /** Input info. */
@@ -125,7 +130,14 @@ public final class RepoManager {
           // delete files in main-memory repository
           repo.delete(pkg);
         }
-        if(!repo.path(dir).delete()) throw BXRE_DELETE_X.get(info, dir);
+        final IOFile pkgf = repo.path(dir);
+        if(!pkgf.delete()) throw BXRE_DELETE_X.get(info, dir);
+        // delete directory with extracted jars
+        final int lastDot = pkg.name().lastIndexOf(".");
+        final String exjsDirName = lastDot == -1 ? pkg.name() : pkg.name().substring(lastDot + 1);
+        final IOFile exjsdir = pkgf.parent().resolve(
+                EXT_JAR_DIR_PREFIX + exjsDirName + EXT_JAR_DIR_SUFFIX);
+        if(!exjsdir.delete()) throw BXRE_DELETE_X.get(info, dir);
         deleted = true;
       }
     }
@@ -145,13 +157,12 @@ public final class RepoManager {
       cache.add(pkg.dir());
     }
     // ignore files and directories starting with dot (#1122)
-    for(final IOFile ch : repo.path().children("^[^.].*")) {
+    for(final IOFile ch : repo.path().children(DOT_FILE_FILTER)) {
       final String dir = ch.name();
       if(!ch.isDir()) {
         add(dir.replaceAll("\\..*", "").replace('/', '.'), dir, map);
       } else if(!cache.contains(dir)) {
-        for(final String s : ch.descendants()) {
-          if(new IOFile(s).name().startsWith(".")) continue;
+        for(final String s : ch.descendants(DOT_FILE_FILTER)) {
           add(dir + '.' + s.replaceAll("\\..*", "").replace('/', '.'), dir + '/' + s, map);
         }
       }
@@ -202,7 +213,7 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private boolean installJAR(final byte[] content, final String path)
-      throws QueryException, IOException {
+          throws QueryException, IOException {
 
     final Zip zip = new Zip(new IOContent(content));
     final IOContent mf = new IOContent(zip.read(MANIFEST_MF));
