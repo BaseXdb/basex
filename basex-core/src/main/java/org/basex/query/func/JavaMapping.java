@@ -16,7 +16,7 @@ import org.w3c.dom.*;
 /**
  * Pre-defined Java/XQuery type mappings.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * access is needed, it is advisable to directly work on the {@link Data}
  * class.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class ViewData {

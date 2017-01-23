@@ -14,7 +14,7 @@ import org.junit.*;
 /**
  * This class contains RESTXQ tests.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {
@@ -88,6 +88,8 @@ public abstract class RestXqTest extends HTTPTest {
     for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());
     // create new module
     module().write(new TokenBuilder(HEADER).add(function).finish());
+    // invalidate module cache
+    RestXqModules.get(context).init();
   }
 
   /**

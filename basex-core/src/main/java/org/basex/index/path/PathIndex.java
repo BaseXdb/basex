@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * This class stores the path summary of a database.
  * It contains all unique location paths.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class PathIndex implements Index {

@@ -2,7 +2,7 @@ package org.basex.query.up.atomic;
 
 /**
  * Base class for structural updates that add to/remove from the table and introduce shifts.
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Lukas Kircher
  */
 abstract class StructuralUpdate extends BasicUpdate {

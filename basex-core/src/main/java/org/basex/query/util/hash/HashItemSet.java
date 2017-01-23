@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
  * This is an efficient and memory-saving hash map for storing items.
  * It is related to the {@link TokenSet} class.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public class HashItemSet extends ASet implements ItemSet {

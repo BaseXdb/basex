@@ -24,7 +24,7 @@ import org.basex.util.hash.*;
  * Abstract class for representing XQuery expressions.
  * Expression are divided into {@link ParseExpr} and {@link Value} classes.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {

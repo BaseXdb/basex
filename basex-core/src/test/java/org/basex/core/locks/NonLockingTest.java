@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * This class checks the execution order of non-locking queries.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class NonLockingTest extends SandboxTest {

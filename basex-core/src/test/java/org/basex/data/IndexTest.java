@@ -17,7 +17,7 @@ import org.junit.runners.Parameterized.*;
 /**
  * This class tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOOPTIMIZE} options.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 @RunWith(Parameterized.class)

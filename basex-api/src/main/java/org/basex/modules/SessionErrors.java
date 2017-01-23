@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This module contains static error functions for the Session module.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 final class SessionErrors {

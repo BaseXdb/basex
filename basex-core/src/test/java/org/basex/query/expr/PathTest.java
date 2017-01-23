@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * Tests for optimizations of the path expression (similar to {@link FilterTest}).
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class PathTest extends AdvancedQueryTest {

@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * This index class retrieves ranges from a value index.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class StringRangeAccess extends IndexAccess {

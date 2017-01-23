@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * Token set tests.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public class TokenSetTest {

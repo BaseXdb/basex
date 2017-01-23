@@ -23,7 +23,7 @@ import org.basex.util.options.*;
 /**
  * Functions for performing XSLT transformations.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public class XsltTransform extends XsltFn {

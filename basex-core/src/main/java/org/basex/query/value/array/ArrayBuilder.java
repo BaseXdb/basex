@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * A builder for creating an {@link Array} by prepending and appending elements.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 public final class ArrayBuilder {

@@ -5,7 +5,7 @@ import java.util.regex.*;
 /**
  * A parser for RFC 3986 URIs.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Dimitar Popov
  */
 public final class UriParser {
@@ -210,7 +210,7 @@ public final class UriParser {
 
   /**
    * URI builder.
-   * @author BaseX Team 2005-16, BSD License
+   * @author BaseX Team 2005-17, BSD License
    * @author Dimitar Popov
    */
   public static final class ParsedUri {

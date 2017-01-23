@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code order by}-expression.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 public final class OrderBy extends Clause {
@@ -234,7 +234,7 @@ public final class OrderBy extends Clause {
   /**
    * Sort key.
    *
-   * @author BaseX Team 2005-16, BSD License
+   * @author BaseX Team 2005-17, BSD License
    * @author Leo Woerteler
    */
   public static final class Key extends Single {

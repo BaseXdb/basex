@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Filter expression, caching all results.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public class CachedFilter extends Filter {

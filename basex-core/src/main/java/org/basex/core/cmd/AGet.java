@@ -6,7 +6,7 @@ import org.basex.core.users.*;
 /**
  * Abstract class for option commands.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 abstract class AGet extends Command {

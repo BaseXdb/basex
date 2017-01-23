@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * This class performs a client/server stress test with concurrent read and write operations.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class ServerReadWriteTest extends SandboxTest {

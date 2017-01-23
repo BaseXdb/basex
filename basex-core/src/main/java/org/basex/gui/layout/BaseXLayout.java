@@ -23,7 +23,7 @@ import org.basex.util.*;
  * This class provides static layout and paint helper methods which are used all over
  * the GUI.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
@@ -217,7 +217,7 @@ public final class BaseXLayout {
 
   /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-16, BSD License
+   * @author BaseX Team 2005-17, BSD License
    * @author Christian Gruen
    */
   public interface DropHandler {

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * This class analyzes the current path and gives suggestions for code
  * completions.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class QuerySuggest extends QueryParser {

@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * This class sends parallel PUT requests to the REST API.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class RESTParallelPutTest extends HTTPTest {

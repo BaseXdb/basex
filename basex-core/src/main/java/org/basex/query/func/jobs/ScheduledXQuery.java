@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * Scheduled XQuery job.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class ScheduledXQuery extends Job implements Runnable {

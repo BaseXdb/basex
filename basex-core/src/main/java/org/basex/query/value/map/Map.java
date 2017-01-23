@@ -21,7 +21,7 @@ import org.basex.util.*;
 /**
  * The map item.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 public final class Map extends FItem {

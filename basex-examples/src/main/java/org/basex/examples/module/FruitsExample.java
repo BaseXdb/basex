@@ -7,7 +7,7 @@ import org.basex.query.value.*;
 /**
  * This example demonstrates how Java classes can be imported as XQuery modules.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  */
 public final class FruitsExample {
   /**

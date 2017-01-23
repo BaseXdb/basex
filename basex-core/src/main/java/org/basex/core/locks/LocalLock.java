@@ -6,7 +6,7 @@ import java.util.concurrent.locks.*;
 /**
  * Local locks.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 final class LocalLock extends ReentrantReadWriteLock {

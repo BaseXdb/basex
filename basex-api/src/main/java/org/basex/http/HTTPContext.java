@@ -13,12 +13,12 @@ import org.basex.util.*;
 /**
  * HTTP context information.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class HTTPContext {
   /** Database context. */
-  private volatile static Context context;
+  private static volatile Context context;
   /** Initialized failed. */
   private static IOException exception;
   /** Initialization flag. */

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for strings.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public class StringList extends ElementList implements Iterable<String> {

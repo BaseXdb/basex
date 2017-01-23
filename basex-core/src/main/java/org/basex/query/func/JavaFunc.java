@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Java function binding.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 final class JavaFunc extends JavaFunction {

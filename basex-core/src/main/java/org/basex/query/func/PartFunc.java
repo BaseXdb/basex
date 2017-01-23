@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Partial function application.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 public final class PartFunc extends Arr {

@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Option containing an integer array value.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class NumbersOption extends Option<int[]> {

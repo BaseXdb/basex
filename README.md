@@ -9,7 +9,7 @@ notes:
 Compiling BaseX
 ---------------
 
-JDK 1.7 and JUnit is currently required to compile the complete sources of the
+JDK 1.7 and JUnit are currently required to compile the complete sources of the
 main project. If you are using another environment than Eclipse or don't have
 JUnit installed, just delete the `test` packages inside the project and rebuild
 the project.
@@ -29,6 +29,40 @@ Moreover, try `-h` to list the available command line options. For example, you
 can use BaseX to process XQuery expressions without entering the console.
 
 [Maven documentation]: https://docs.basex.org/wiki/Maven
+
+Using Eclipse
+-------------
+
+BaseX is being developed with the Eclipse environment. Some style guidelines
+are integrated in the sources of BaseX; they are being embedded as soon as you
+open the project.
+
+### Running BaseX
+
+The following steps can be performed to start BaseX with Eclipse:
+
+ - Press `Run` -> `Run...`
+ - Create a new `Java Application` launch configuration
+ - Select `basex` as Project
+ - Choose a `Main class` (e.g., org.basex.BaseXGUI)
+ - Launch the project via `Run`
+
+### Adding Checkstyle
+
+Some additional Checkstyle guidelines are defined in the project:
+
+ - Open Eclipse
+ - Press `Help` -> `Install new Software...`
+ - Press `Search for new features to install`
+ - Enter the URL: `http://eclipse-cs.sourceforge.net/update`
+ - Follow the installation procedure and restart Eclipse
+
+Using Git
+---------
+
+The code base of BaseX can be accessed via [GitHub].
+
+[GitHub]: https://github.com/BaseXdb/basex
 
 Docker Image
 ------------
@@ -78,40 +112,6 @@ For further information on using the Docker image, refer to the
 [`basex/basexhttp`]: https://hub.docker.com/r/basex/basexhttp/
 [BaseX Docker documentation]: http://docs.basex.org/wiki/Docker
 
-Using Eclipse
--------------
-
-BaseX is being developed with the Eclipse environment. Some style guidelines
-are integrated in the sources of BaseX; they are being embedded as soon as you
-open the project.
-
-### Running BaseX
-
-The following steps can be performed to start BaseX with Eclipse:
-
- - Press `Run` -> `Run...`
- - Create a new `Java Application` launch configuration
- - Select `basex` as Project
- - Choose a `Main class` (e.g., org.basex.BaseXGUI)
- - Launch the project via `Run`
-
-### Adding Checkstyle
-
-Some additional Checkstyle guidelines are defined in the project:
-
- - Open Eclipse
- - Press `Help` -> `Install new Software...`
- - Press `Search for new features to install`
- - Enter the URL: `http://eclipse-cs.sourceforge.net/update`
- - Follow the installation procedure and restart Eclipse
-
-Using Git
----------
-
-The code base of BaseX can be accessed via [GitHub].
-
-[GitHub]: https://github.com/BaseXdb/basex
-
 Feedback
 --------
 
@@ -124,7 +124,7 @@ Tell us if you run into any troubles installing BaseX:
 You are as well invited to contribute to our [bug tracker].
 
 All the best,  
-BaseX Team, 2016
+BaseX Team
 
 [documentation]: (https://docs.basex.org)
 [bug tracker]: (https://github.com/BaseXdb/BaseX/issues)

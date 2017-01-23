@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * FTExtensionSelection expression.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 public final class FTExtensionSelection extends FTExpr {

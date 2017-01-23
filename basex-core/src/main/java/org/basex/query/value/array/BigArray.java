@@ -8,7 +8,7 @@ import org.basex.query.value.*;
 /**
  * An array containing more elements than fit into a {@link SmallArray}.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 final class BigArray extends Array {

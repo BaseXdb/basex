@@ -31,7 +31,7 @@ import org.xml.sax.*;
 /**
  * This class generates and validates digital signatures for XML data.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Lukas Kircher
  */
 final class DigitalSignature {

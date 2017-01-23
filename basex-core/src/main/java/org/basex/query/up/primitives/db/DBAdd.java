@@ -13,7 +13,7 @@ import org.basex.util.options.*;
 /**
  * Add primitive.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Dimitar Popov
  */
 public final class DBAdd extends DBUpdate {

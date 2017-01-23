@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * The scope of variables, either the query, a user-defined or an inline function.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 public final class VarScope {

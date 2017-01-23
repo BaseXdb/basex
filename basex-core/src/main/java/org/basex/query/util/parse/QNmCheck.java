@@ -8,7 +8,7 @@ import org.basex.query.value.item.*;
 /**
  * Cache for checking QNames after their construction.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 final class QNmCheck {

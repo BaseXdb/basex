@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * A sequence containing more elements than fit into a {@link SmallSeq}.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 final class BigSeq extends TreeSeq {

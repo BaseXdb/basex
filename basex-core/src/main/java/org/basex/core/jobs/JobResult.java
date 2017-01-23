@@ -6,7 +6,7 @@ import org.basex.query.value.*;
 /**
  * Cached job result.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class JobResult {

@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Abstract class for database updates.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public abstract class ACreate extends Command {
@@ -129,7 +129,7 @@ public abstract class ACreate extends Command {
   /**
    * Update code.
    *
-   * @author BaseX Team 2005-16, BSD License
+   * @author BaseX Team 2005-17, BSD License
    * @author Christian Gruen
    */
   abstract static class Code {

@@ -6,7 +6,7 @@ import org.basex.query.util.*;
 /**
  * Interface for all expressions defining a new variable scope.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
 public interface Scope {

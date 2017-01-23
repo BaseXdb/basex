@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Full-text content types.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public enum FTContents {

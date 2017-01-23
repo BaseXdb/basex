@@ -5,7 +5,7 @@ import java.io.*;
 /**
  * This is an interface for classes with main methods and command-line arguments.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public abstract class Main {

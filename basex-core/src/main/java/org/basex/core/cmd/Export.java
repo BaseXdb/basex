@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * Evaluates the 'export' command and saves the currently opened database
  * to disk.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class Export extends Command {

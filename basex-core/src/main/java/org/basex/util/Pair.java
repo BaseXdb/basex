@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * A pair consisting of two elements.
  *
- * @author BaseX Team 2005-16, BSD License
+ * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  * @param <N> name
  * @param <V> value
