@@ -70,7 +70,7 @@ function query(key, query, enforce, target) {
     },
     function(req) {
       _running--;
-      if(req.status != 410) setErrorFromResponse(req);
+      if(req.status != 410 || !_running) setErrorFromResponse(req);
     }
   )
 };

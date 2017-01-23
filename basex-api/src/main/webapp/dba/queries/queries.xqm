@@ -171,6 +171,7 @@ declare
   %updating
   %rest:POST("{$query}")
   %rest:path("/dba/update-query")
+  %rest:single
   %output:method("text")
 function dba:update-query(
   $query  as xs:string?

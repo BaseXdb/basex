@@ -35,14 +35,15 @@ declare
   %rest:query-param("error",    "{$error}")
   %output:method("html")
 function dba:database(
-  $name      as xs:string,
+  $name      as xs:string?,
   $resource  as xs:string?,
   $sort      as xs:string,
   $page      as xs:integer,
   $info      as xs:string?,
   $error     as xs:string?
-) as element(html) {
+) as element() {
   cons:check(),
+  if(not($name)) then web:redirect("databases") else
 
   let $data := try {
     let $found := db:exists($name)
