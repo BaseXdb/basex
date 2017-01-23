@@ -370,8 +370,7 @@ public final class Token {
   private static final DecimalFormat DF = new DecimalFormat("#####0.0######", LOC);
 
   /**
-   * Creates a byte array representation from the specified double value;
-   * inspired by Xavier Franc's Qizx/open processor.
+   * Creates a byte array representation from the specified double value.
    * @param dbl double value to be converted
    * @return byte array
    */
@@ -398,8 +397,6 @@ public final class Token {
     final byte[] b = tok(flt);
     if(b != null) return b;
 
-    // not that brilliant here.. no chance for elegant code either
-    // due to the nifty differences between Java and XQuery
     final int fl = FLT.length;
     for(int i = 0; i < fl; ++i) if(flt == FLT[i]) return FLTSTR[i];
     final float a = Math.abs(flt);
@@ -416,19 +413,19 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified value equals a constant token.
-   * @param dbl value to be converted
-   * @return byte array or zero or {@code null}
+   * Tries to create a byte array representation from a floating point.
+   * @param value value to be converted
+   * @return byte array, or {@code null}
    */
-  private static byte[] tok(final double dbl) {
-    if(dbl == Double.POSITIVE_INFINITY) return INF;
-    if(dbl == Double.NEGATIVE_INFINITY) return NINF;
-    if(dbl == 0) return 1 / dbl > 0 ? ZERO : MZERO;
-    if(Double.isNaN(dbl)) return NAN;
-    final double a = Math.abs(dbl);
+  private static byte[] tok(final double value) {
+    if(value == Double.POSITIVE_INFINITY) return INF;
+    if(value == Double.NEGATIVE_INFINITY) return NINF;
+    if(value == 0) return 1 / value > 0 ? ZERO : MZERO;
+    if(Double.isNaN(value)) return NAN;
+    final double a = Math.abs(value);
     if(a < 1.0e6) {
-      final int i = (int) dbl;
-      if(i == dbl) return token(i);
+      final int i = (int) value;
+      if(i == value) return token(i);
     }
     return null;
   }

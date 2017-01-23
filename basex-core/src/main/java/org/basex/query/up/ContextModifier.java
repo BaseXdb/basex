@@ -28,7 +28,7 @@ public abstract class ContextModifier {
   /** Update primitives, aggregated separately for each user name [SINGLE]. */
   private final Map<String, UserUpdates> userUpdates = new HashMap<>();
   /** Temporary data reference, containing all XML fragments to be inserted [SINGLE]. */
-  private MemData tmp;
+  private MemData memData;
 
   /**
    * Adds a data reference to list which keeps track of the nodes copied
@@ -53,8 +53,8 @@ public abstract class ContextModifier {
         dbUpdates.put(data, ups);
       }
       // create temporary mem data instance if not available yet
-      if(tmp == null) tmp = new MemData(qc.context.options);
-      ups.add(dataUp, tmp);
+      if(memData == null) memData = new MemData(qc.context.options);
+      ups.add(dataUp, memData);
     } else if(update instanceof NameUpdate) {
       final NameUpdate nameUp = (NameUpdate) update;
       final String name = nameUp.name();
@@ -83,7 +83,7 @@ public abstract class ContextModifier {
    * Called by a single thread after query evaluation.
    * @param db databases
    */
-  void databases(final StringList db) {
+  synchronized void databases(final StringList db) {
     for(final Data data : dbUpdates.keySet()) {
       if(!data.inMemory()) db.add(data.meta.name);
     }
@@ -99,11 +99,13 @@ public abstract class ContextModifier {
    * @param datas updated data references
    * @throws QueryException query exception
    */
-  final void prepare(final HashSet<Data> datas, final QueryContext qc) throws QueryException {
+  final synchronized void prepare(final HashSet<Data> datas, final QueryContext qc)
+      throws QueryException {
+
     for(final DataUpdates up : dbUpdates.values()) {
       // create temporary mem data instance if not available yet
-      if(tmp == null) tmp = new MemData(qc.context.options);
-      up.prepare(tmp);
+      if(memData == null) memData = new MemData(qc.context.options);
+      up.prepare(memData);
       datas.add(up.data());
     }
     for(final NameUpdates up : nameUpdates.values()) up.prepare();
@@ -114,7 +116,7 @@ public abstract class ContextModifier {
    * @param qc query context
    * @throws QueryException query exception
    */
-  final void apply(final QueryContext qc) throws QueryException {
+  final synchronized void apply(final QueryContext qc) throws QueryException {
     final Context ctx = qc.context;
     for(final UserUpdates up : userUpdates.values()) up.apply();
     if(!userUpdates.isEmpty()) ctx.users.write(ctx);
@@ -152,7 +154,7 @@ public abstract class ContextModifier {
    * Returns the total number of update operations.
    * @return number of updates
    */
-  final int size() {
+  final synchronized int size() {
     int s = 0;
     for(final DataUpdates up : dbUpdates.values()) s += up.size();
     for(final NameUpdates up : nameUpdates.values()) s += up.size();

@@ -95,7 +95,7 @@ public class FnSubsequence extends StandardFunc {
   /**
    * Returns the start position and length of the requested sub sequence.
    * @param qc query context
-   * @return range
+   * @return range or {@code null}
    * @throws QueryException query exception
    */
   private long[] range(final QueryContext qc) throws QueryException {

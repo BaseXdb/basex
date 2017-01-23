@@ -110,9 +110,8 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the name of the node, composed of an optional prefix and the local name.
-   * This function must only be called for elements, attributes and pi's.
    * It is more efficient than calling {@link #qname}, as no {@link QNm} instance must be created.
-   * @return name
+   * @return name, or {@code null} if node has no name
    */
   public byte[] name() {
     return null;
@@ -120,8 +119,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the QName of the node.
-   * This function must only be called for elements, attributes and pi's.
-   * @return name
+   * @return name, or {@code null} if node has no name
    */
   public QNm qname() {
     return null;
@@ -169,7 +167,7 @@ public abstract class ANode extends Item {
   /**
    * Recursively finds the uri for the specified prefix.
    * @param pref prefix
-   * @return uri
+   * @return uri, or {@code null}
    */
   public final byte[] uri(final byte[] pref) {
     final Atts at = namespaces();

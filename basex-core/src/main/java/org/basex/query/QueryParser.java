@@ -3415,7 +3415,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "FTRange" rule.
    * @param i accept only integers ("FTLiteralRange")
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {

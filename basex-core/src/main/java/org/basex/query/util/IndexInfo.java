@@ -199,7 +199,7 @@ public final class IndexInfo {
 
   /**
    * Returns the local name and namespace uri of the last name test.
-   * If the returned name or uri is null, it represents a wildcard.
+   * If the returned name or uri is {@code null}, it represents a wildcard.
    * <ul>
    *   <li> //*[x = 'TEXT']         -> x </li>
    *   <li> //*[x /text() = 'TEXT'] -> x </li>
@@ -209,7 +209,8 @@ public final class IndexInfo {
    *   <li> //*[@x = 'TEXT']        -> x </li>
    *   <li> //@x[. = 'TEXT']        -> x </lI>
    * </ul>
-   * @return local name and namespace uri (either result, name, and uri can be {@code null})
+   * @return local name and namespace uri. Either result, name, and uri can be {@code null}.
+   *         {@code null} will be returned if the test is not a name test
    */
   private byte[][] qname() {
     Step s = step;

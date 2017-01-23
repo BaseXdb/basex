@@ -250,8 +250,7 @@ final class IndonesianStemmer extends InternalStemmer {
         tb.set(3, setS);
         numSyllables--;
         tb.delete(0, 3);
-      } else if(c1 == 'p' && c2 == 'e' && c3 == 'n' && tl > 4
-          && isVowel(tb.get(3))) {
+      } else if(c1 == 'p' && c2 == 'e' && c3 == 'n' && isVowel(tb.get(3))) {
         flags |= REMOVED_PENG;
         final byte setT = 't';
         tb.set(2, setT);
@@ -261,8 +260,7 @@ final class IndonesianStemmer extends InternalStemmer {
         flags |= REMOVED_PENG;
         numSyllables--;
         tb.delete(0, 3);
-      } else if(c1 == 'p' && c2 == 'e' && c3 == 'm' && tl > 4
-          && isVowel(tb.get(3))) {
+      } else if(c1 == 'p' && c2 == 'e' && c3 == 'm' && isVowel(tb.get(3))) {
         flags |= REMOVED_PENG;
         final byte setP = 'p';
         tb.set(2, setP);

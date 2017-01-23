@@ -3,6 +3,7 @@ package org.basex.http.restxq;
 import static org.basex.http.restxq.RestXqText.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -19,27 +20,63 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class RestXqModules {
-  /** Class instance. */
-  private static final RestXqModules INSTANCE = new RestXqModules();
+  /** Singleton instance. */
+  private static RestXqModules instance;
+
+  /** Parsing mutex. */
+  private final AtomicBoolean parsed = new AtomicBoolean();
+  /** RESTXQ path. */
+  private final IOFile path;
+  /** Indicates if modules should be parsed with every call. */
+  private final boolean cached;
 
   /** Module cache. */
   private HashMap<String, RestXqModule> modules = new HashMap<>();
-  /** Private constructor. */
-  private RestXqModules() { }
+  /** Last access. */
+  private long last;
+
+  /**
+   * Private constructor.
+   * @param ctx database context
+   */
+  private RestXqModules(final Context ctx) {
+    final StaticOptions sopts = ctx.soptions;
+    final String webpath = sopts.get(StaticOptions.WEBPATH);
+    final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
+    path = new IOFile(webpath).resolve(rxqpath);
+
+    // RESTXQ parsing
+    final int ms = sopts.get(StaticOptions.PARSERESTXQ) * 1000;
+    // = 0: parse every time
+    cached = ms != 0;
+    // >= 0: activate timer
+    if(ms >= 0) {
+      new Timer(true).scheduleAtFixedRate(new TimerTask() {
+        @Override
+        public void run() {
+          synchronized(parsed) {
+            if(parsed.get() && System.currentTimeMillis() - last >= ms) parsed.set(false);
+          }
+        }
+      }, 0, 500);
+    }
+  }
 
   /**
    * Returns the singleton instance.
+   * @param ctx database context
    * @return instance
    */
-  public static RestXqModules get() {
-    return INSTANCE;
+  public static RestXqModules get(final Context ctx) {
+    if(instance == null) instance = new RestXqModules(ctx);
+    return instance;
   }
 
   /**
    * Initializes the module cache.
    */
   public void init() {
-    modules = new HashMap<>();
+    parsed.set(false);
   }
 
   /**
@@ -134,22 +171,19 @@ public final class RestXqModules {
    * @return module cache
    * @throws Exception exception (including unexpected ones)
    */
-  private synchronized HashMap<String, RestXqModule> cache(final Context ctx) throws Exception {
-    final StaticOptions sopts = ctx.soptions;
-    HashMap<String, RestXqModule> cache = modules;
+  private HashMap<String, RestXqModule> cache(final Context ctx) throws Exception {
+    synchronized(parsed) {
+      if(!parsed.get()) {
+        if(!path.exists()) throw HTTPCode.NO_RESTXQ.get();
 
-    // create new cache if it is empty, or if cache is to be recreated every time
-    if(cache.isEmpty() || !sopts.get(StaticOptions.CACHERESTXQ)) {
-      cache = new HashMap<>();
-      final String webpath = sopts.get(StaticOptions.WEBPATH);
-      final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
-      final IOFile restxq = new IOFile(webpath).resolve(rxqpath);
-      if(!restxq.exists()) throw HTTPCode.NO_RESTXQ.get();
-
-      cache(ctx, restxq, cache, modules);
-      modules = cache;
+        final HashMap<String, RestXqModule> map = new HashMap<>();
+        cache(ctx, path, map, modules);
+        modules = map;
+        parsed.set(cached);
+      }
+      last = System.currentTimeMillis();
+      return modules;
     }
-    return cache;
   }
 
   /**
@@ -160,7 +194,7 @@ public final class RestXqModules {
    * @param old old cache
    * @throws Exception exception (including unexpected ones)
    */
-  private static synchronized void cache(final Context ctx, final IOFile root,
+  private static void cache(final Context ctx, final IOFile root,
       final HashMap<String, RestXqModule> cache, final HashMap<String, RestXqModule> old)
       throws Exception {
 

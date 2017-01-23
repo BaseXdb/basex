@@ -216,7 +216,7 @@ public final class XMLToken {
    * Decodes an NCName to a string.
    * @param name name
    * @param lax lax decoding
-   * @return cached QName
+   * @return cached QName, or {@code null} if not successful
    */
   public static byte[] decode(final byte[] name, final boolean lax) {
     if(lax) return name;

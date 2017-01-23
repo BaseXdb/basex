@@ -108,7 +108,7 @@ public final class GUI extends JFrame {
   private JFrame fullscr;
 
   /** Password reader. */
-  private static PasswordReader pwReader;
+  private static volatile PasswordReader pwReader;
 
   /**
    * Default constructor.

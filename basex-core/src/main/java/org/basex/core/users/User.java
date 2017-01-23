@@ -113,7 +113,7 @@ public final class User {
    * Sets the user name.
    * @param nm name
    */
-  void name(final String nm) {
+  synchronized void name(final String nm) {
     name = nm;
   }
 
@@ -129,7 +129,7 @@ public final class User {
    * Returns the local permissions.
    * @return local permissions
    */
-  public Map<String, Perm> locals() {
+  public synchronized Map<String, Perm> locals() {
     return locals;
   }
 
@@ -137,7 +137,7 @@ public final class User {
    * Returns the user name.
    * @return name
    */
-  public String name() {
+  public synchronized String name() {
     return name;
   }
 
@@ -161,7 +161,7 @@ public final class User {
    * @param code code to be returned
    * @return code, or {@code null} if code does not exist
    */
-  public String code(final Algorithm alg, final Code code) {
+  public synchronized String code(final Algorithm alg, final Code code) {
     return passwords.get(alg).get(code);
   }
 
@@ -169,7 +169,7 @@ public final class User {
    * Returns algorithms.
    * @return algorithms
    */
-  public EnumMap<Algorithm, EnumMap<Code, String>> alg() {
+  public synchronized EnumMap<Algorithm, EnumMap<Code, String>> alg() {
     return passwords;
   }
 
@@ -229,7 +229,7 @@ public final class User {
    * @param prm permission to be checked
    * @return result of check
    */
-  public boolean has(final Perm prm) {
+  public synchronized boolean has(final Perm prm) {
     return has(prm, null);
   }
 
@@ -239,7 +239,7 @@ public final class User {
    * @param db database (can be {@code null})
    * @return result of check
    */
-  public boolean has(final Perm prm, final String db) {
+  public synchronized boolean has(final Perm prm, final String db) {
     return perm(db).ordinal() >= prm.ordinal();
   }
 
@@ -248,7 +248,7 @@ public final class User {
    * @param password (plain text)
    * @return name
    */
-  public boolean matches(final String password) {
+  public synchronized boolean matches(final String password) {
     final EnumMap<Code, String> alg = passwords.get(Algorithm.SALTED_SHA256);
     return sha256(alg.get(Code.SALT) + password).equals(alg.get(Code.HASH));
   }

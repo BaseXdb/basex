@@ -31,7 +31,7 @@ public final class RestXqServlet extends BaseXServlet {
     }
 
     // analyze input path
-    final RestXqModules rxm = RestXqModules.get();
+    final RestXqModules rxm = RestXqModules.get(conn.context);
 
     // initialize RESTXQ
     if(conn.path().equals('/' + INIT)) {

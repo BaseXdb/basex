@@ -268,7 +268,9 @@ public abstract class Command extends Job {
       // flushes the output
       try {
         if(out != null) out.flush();
-      } catch(final IOException ignore) { }
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
     }
   }
 

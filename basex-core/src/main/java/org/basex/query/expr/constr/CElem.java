@@ -143,12 +143,11 @@ public final class CElem extends CName {
 
   /**
    * Adds the specified namespace to the namespace array.
-   * If the prefix is already used for another URI, a new
-   * name is generated.
+   * If the prefix is already used for another URI, a new name is generated.
    * @param pref prefix
    * @param uri uri
    * @param ns namespaces
-   * @return resulting prefix
+   * @return resulting prefix or {@code null}
    */
   private static byte[] addNS(final byte[] pref, final byte[] uri, final Atts ns) {
     final byte[] u = ns.value(pref);

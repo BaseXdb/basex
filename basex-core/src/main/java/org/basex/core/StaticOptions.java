@@ -84,8 +84,8 @@ public final class StaticOptions extends Options {
   public static final StringOption RESTPATH = new StringOption("RESTPATH", "");
   /** RESTXQ path (relative to web path). */
   public static final StringOption RESTXQPATH = new StringOption("RESTXQPATH", "");
-  /** Cache RESTXQ paths. */
-  public static final BooleanOption CACHERESTXQ = new BooleanOption("CACHERESTXQ", false);
+  /** Minimum timeout for parsing RESTXQ files. */
+  public static final NumberOption PARSERESTXQ = new NumberOption("PARSERESTXQ", 3);
   /** Local (embedded) mode. */
   public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", false);
   /** Port for stopping the web server. */
