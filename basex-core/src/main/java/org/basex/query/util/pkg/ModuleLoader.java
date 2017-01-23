@@ -223,6 +223,11 @@ public final class ModuleLoader {
   private void addURL(final IOFile jar) {
     try {
       urls.add(new URL(jar.url()));
+      // parse files of extracted sub directory
+      final IOFile extDir = new IOFile(jar.parent(), '.' + jar.dbName());
+      if(extDir.exists()) {
+        for(final IOFile file : extDir.children()) urls.add(new URL(file.url()));
+      }
     } catch(final MalformedURLException ex) {
       Util.errln(ex);
     }

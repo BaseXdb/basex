@@ -89,4 +89,6 @@ public interface PkgText {
   String NOJARS = "No jars specified";
   /** No public classes registered. */
   String NOCLASSES = "No public classes specified";
+  /** Not expected error during extraction of packaged dependency jars. */
+  String EXTFAILED = "%: could not extract packaged dependency from jar: %";
 }

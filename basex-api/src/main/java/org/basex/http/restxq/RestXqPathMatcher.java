@@ -71,7 +71,7 @@ final class RestXqPathMatcher {
           result.put(var, m.group(group));
           // skip nested groups
           final int end = m.end(group);
-          while (++group <= groupCount && m.start(group) < end);
+          while(++group <= groupCount && m.start(group) < end);
         }
       }
     }

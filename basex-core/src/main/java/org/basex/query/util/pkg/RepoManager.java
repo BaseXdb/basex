@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.jar.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -25,6 +26,11 @@ import org.basex.util.list.*;
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
+  /** Ignore files starting with a dot. */
+  private static final FileFilter DOT_FILE_FILTER = new FileFilter() {
+    @Override public boolean accept(final File file) {
+      return !file.getName().startsWith(".");
+  }};
   /** Context. */
   private final Context context;
   /** Input info. */
@@ -125,7 +131,13 @@ public final class RepoManager {
           // delete files in main-memory repository
           repo.delete(pkg);
         }
-        if(!repo.path(dir).delete()) throw BXRE_DELETE_X.get(info, dir);
+        final IOFile pkgf = repo.path(dir);
+        if(!pkgf.delete()) throw BXRE_DELETE_X.get(info, dir);
+
+        // delete directory with extracted jars
+        final String extName = pkg.name().replaceAll("^.*\\.", "");
+        final IOFile extDir = pkgf.parent().resolve('.' + extName);
+        if(!extDir.delete()) throw BXRE_DELETE_X.get(info, extDir);
         deleted = true;
       }
     }
@@ -145,13 +157,12 @@ public final class RepoManager {
       cache.add(pkg.dir());
     }
     // ignore files and directories starting with dot (#1122)
-    for(final IOFile ch : repo.path().children("^[^.].*")) {
+    for(final IOFile ch : repo.path().children(DOT_FILE_FILTER)) {
       final String dir = ch.name();
       if(!ch.isDir()) {
         add(dir.replaceAll("\\..*", "").replace('/', '.'), dir, map);
       } else if(!cache.contains(dir)) {
-        for(final String s : ch.descendants()) {
-          if(new IOFile(s).name().startsWith(".")) continue;
+        for(final String s : ch.descendants(DOT_FILE_FILTER)) {
           add(dir + '.' + s.replaceAll("\\..*", "").replace('/', '.'), dir + '/' + s, map);
         }
       }
@@ -204,8 +215,7 @@ public final class RepoManager {
   private boolean installJAR(final byte[] content, final String path)
       throws QueryException, IOException {
 
-    final Zip zip = new Zip(new IOContent(content));
-    final IOContent mf = new IOContent(zip.read(MANIFEST_MF));
+    final IOContent mf = new IOContent(new Zip(new IOContent(content)).read(MANIFEST_MF));
     final NewlineInput nli = new NewlineInput(mf);
     for(String s; (s = nli.readLine()) != null;) {
       // write file to rewritten file path
@@ -228,6 +238,26 @@ public final class RepoManager {
     final boolean exists = target.exists();
     target.parent().md();
     target.write(content);
+
+    // extract JARs in zipped .lib directory
+    if(target.hasSuffix(IO.JARSUFFIX)) {
+      final IOFile extDir = target.parent().resolve('.' + target.name().
+          replaceAll(IO.JARSUFFIX + '$', ""));
+      try(JarFile jarFile = new JarFile(target.file())) {
+        final Enumeration<JarEntry> entries = jarFile.entries();
+        while(entries.hasMoreElements()) {
+          final JarEntry entry = entries.nextElement();
+          final String name = entry.getName();
+          if(name.matches("^lib/[^/]+\\.jar")) {
+            if(!extDir.md()) throw new BaseXException("Could not create %.", extDir.path());
+            final IOFile file = new IOFile(extDir, name.replaceAll("^.*?/", ""));
+            try(InputStream is = jarFile.getInputStream(entry)) {
+              file.write(is);
+            }
+          }
+        }
+      }
+    }
     return exists;
   }
 
