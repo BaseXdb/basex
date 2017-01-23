@@ -94,7 +94,7 @@ public final class MainModule extends Module {
   public ItemList cache(final QueryContext qc) throws QueryException {
     final int fp = vs.enter(qc);
     try {
-      final Iter iter = expr.iter(qc);
+      final Iter iter = qc.iter(expr);
       final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
       for(Item it; (it = iter.next()) != null;) cache.add(it);
       if(declType != null) declType.treat(cache.value(), null, info);
@@ -114,7 +114,7 @@ public final class MainModule extends Module {
     if(declType != null) return cache(qc).iter();
 
     final int fp = vs.enter(qc);
-    final Iter iter = expr.iter(qc);
+    final Iter iter = qc.iter(expr);
     return new Iter() {
       @Override
       public Item next() throws QueryException {

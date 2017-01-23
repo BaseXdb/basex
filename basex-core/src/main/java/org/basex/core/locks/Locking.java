@@ -9,6 +9,7 @@ import java.util.concurrent.locks.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.util.*;
 
 /**
  * Read and write locks on arbitrary strings.
@@ -100,12 +101,9 @@ public final class Locking {
     try {
       acquire(locks.reads, locks.writes);
     } catch(final InterruptedException ex) {
-      Thread.currentThread().interrupt();
-      job.stop();
+      Util.stack(ex);
+      throw Util.notExpected("Thread was interrupted: %");
     }
-
-    // before running the job, check if it has been stopped
-    job.checkStop();
   }
 
   /**

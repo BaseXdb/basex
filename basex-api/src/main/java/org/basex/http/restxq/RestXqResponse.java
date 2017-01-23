@@ -66,11 +66,12 @@ final class RestXqResponse {
     qc.mainModule(MainModule.get(sf, args));
     qc.http(conn);
     qc.jc().type(RESTXQ);
-    qc.register(qc.context);
 
     final String singleton = func.singleton;
     final RestXqSession session = new RestXqSession(conn, singleton, qc);
     String redirect = null, forward = null;
+
+    qc.register(qc.context);
     try {
       // evaluate query
       final Iter iter = qc.iter();

@@ -254,6 +254,7 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
+    checkStop();
     if(compiled) return;
 
     final CompileContext cc = new CompileContext(this);
@@ -574,14 +575,14 @@ public final class QueryContext extends Job implements Closeable {
     if(closed) return;
     closed = true;
     if(parent == null) {
-      // topmost query: close resources
+      // topmost query: close resources (opened by compile step)
       resources.close();
     } else {
       // otherwise, adopt update reference (may have been initialized by sub query)
       parent.updates = updates;
       parent.popJob();
     }
-    // reassign original database options
+    // reassign original database options (changed by compile step)
     for(final Entry<Option<?>, Object> e : staticOpts.entrySet()) {
       context.options.put(e.getKey(), e.getValue());
     }
