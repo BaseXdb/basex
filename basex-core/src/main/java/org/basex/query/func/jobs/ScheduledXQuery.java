@@ -3,6 +3,7 @@ package org.basex.query.func.jobs;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.math.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -134,7 +135,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @return milliseconds
    */
   private long ms(final ADateDur date) {
-    return date.sec.longValue() * 1000;
+    return date.sec.multiply(BigDecimal.valueOf(1000)).longValue();
   }
 
   /**
