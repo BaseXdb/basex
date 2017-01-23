@@ -6,6 +6,7 @@ import static org.basex.util.Strings.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -48,12 +49,8 @@ public final class UCAOptions extends CollationOptions {
 
   @Override
   @SuppressWarnings("unchecked")
-  Collation get(final String args) {
-    final String error = check(args);
-    if(error != null && (error.startsWith(FALLBACK.name() + '=') || get(FALLBACK) == YesNo.NO))
-      throw new IllegalArgumentException("Invalid option \"" + error + '"');
-
-    final boolean nomercy = get(FALLBACK) == YesNo.NO;
+  Collation get(final HashMap<String, String> args) throws BaseXException {
+    assign(args);
 
     Locale locale = Locale.US;
     if(contains(LANG)) {
@@ -64,8 +61,8 @@ public final class UCAOptions extends CollationOptions {
     final Method m = method(COLLATOR, "getInstance", Locale.class);
     final Object coll = invoke(m, null, locale);
 
-    if(!coll.getClass().equals(RBC)) throw new IllegalArgumentException(
-        "Invalid collator \"" + coll.getClass().getName() + '"');
+    if(!coll.getClass().equals(RBC)) throw new BaseXException(
+        "Invalid collator: %.", coll.getClass().getName());
 
     if(contains(VERSION)) {
       final String v = get(VERSION);
@@ -76,60 +73,54 @@ public final class UCAOptions extends CollationOptions {
         if(vi == null || vic == null || ((Comparable<Object>) vi).compareTo(vic) > 0)
           throw error(VERSION);
       } catch(final IllegalArgumentException ex) {
-        if(get(FALLBACK) == YesNo.NO)
-          throw new IllegalArgumentException("Version not supported: \"" + v + '"');
+        throw new BaseXException("Version not supported: %.", v);
       }
     }
 
     if(contains(STRENGTH)) {
       final String v = get(STRENGTH);
-      Integer s = null;
+      Integer s;
       if(eq(v, "primary", "1")) s = 0;         // Collator.PRIMARY
       else if(eq(v, "secondary", "2")) s = 1;  // Collator.SECONDARY
       else if(eq(v, "tertiary", "3")) s = 2;   // Collator.TERTIARY
       else if(eq(v, "quaternary", "4")) s = 3; // Collator.QUATERNARY
       else if(eq(v, "identical", "5")) s = 15; // Collator.IDENTICAL
-      else if(nomercy) throw error(STRENGTH);
-      if(s != null) invoke(method(RBC, "setStrength", int.class), coll, s);
+      else throw error(STRENGTH);
+      invoke(method(RBC, "setStrength", int.class), coll, s);
     }
 
     if(contains(ALTERNATE)) {
       final String v = get(ALTERNATE);
-      Boolean b = null;
+      boolean b;
       if(eq(v, "non-ignorable")) b = false;
       else if(eq(v, "shifted", "blanked")) b = true;
-      else if(nomercy) throw error(ALTERNATE);
-      if(b != null) invoke(method(RBC, "setAlternateHandlingShifted", boolean.class), coll, b);
+      else throw error(ALTERNATE);
+      invoke(method(RBC, "setAlternateHandlingShifted", boolean.class), coll, b);
     }
 
     if(contains(BACKWARDS)) {
-      final Boolean b = yesNo(BACKWARDS, nomercy);
-      if(b != null) invoke(method(RBC, "setFrenchCollation", boolean.class), coll, b);
+      invoke(method(RBC, "setFrenchCollation", boolean.class), coll, yesNo(BACKWARDS));
     }
 
     if(contains(NORMALIZATION)) {
-      final Boolean b = yesNo(NORMALIZATION, nomercy);
-      // Collator.CANONICAL_DECOMPOSITION, Collator.NO_DECOMPOSITION
-      if(b != null) invoke(method(RBC, "setDecomposition", int.class), coll, b ? 17 : 16);
+      invoke(method(RBC, "setDecomposition", int.class), coll, yesNo(NORMALIZATION) ? 17 : 16);
     }
 
     if(contains(CASELEVEL)) {
-      final Boolean b = yesNo(CASELEVEL, nomercy);
-      if(b != null) invoke(method(RBC, "setCaseLevel", boolean.class), coll, b);
+      invoke(method(RBC, "setCaseLevel", boolean.class), coll, yesNo(CASELEVEL));
     }
 
     if(contains(CASEFIRST)) {
       final String v = get(CASEFIRST);
-      String f = null;
+      String f;
       if(v.equals("upper")) f = "setUpperCaseFirst";
       else if(v.equals("lower")) f = "setLowerCaseFirst";
-      else if(nomercy) throw error(CASEFIRST);
-      if(f != null) invoke(method(RBC, f, boolean.class), coll, true);
+      else throw error(CASEFIRST);
+      invoke(method(RBC, f, boolean.class), coll, true);
     }
 
     if(contains(NUMERIC)) {
-      final Boolean b = yesNo(NUMERIC, nomercy);
-      if(b != null) invoke(method(RBC, "setNumericCollation", boolean.class), coll, b);
+      invoke(method(RBC, "setNumericCollation", boolean.class), coll, yesNo(NUMERIC));
     }
 
     if(contains(REORDER)) {
@@ -146,7 +137,7 @@ public final class UCAOptions extends CollationOptions {
           default:
             final int[] c = code.length() == 4 ? (int[]) invoke(uscript, null, code) : null;
             if(c != null) list.add(c[0]);
-            else if(nomercy) throw error(REORDER);
+            else throw error(REORDER);
             break;
         }
       }
@@ -157,18 +148,15 @@ public final class UCAOptions extends CollationOptions {
   }
 
   /**
-   * Returns the value of a yes/no option.
+   * Returns the boolean value of a yes/no option.
    * @param option option
-   * @param nomercy flag for showing errors
    * @return result
+   * @throws BaseXException database exception
    */
-  private Boolean yesNo(final StringOption option, final boolean nomercy) {
+  private boolean yesNo(final StringOption option) throws BaseXException {
     final String v = get(option);
-    Boolean b = null;
-    if(v.equals(YesNo.YES.toString())) b = true;
-    else if(v.equals(YesNo.NO.toString())) b = false;
-    else if(nomercy) throw error(option);
-    return b;
+    if(v.equals(Text.YES)) return true;
+    if(v.equals(Text.NO)) return false;
+    throw error(option);
   }
-
 }

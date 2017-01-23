@@ -3,7 +3,6 @@ package org.basex.query.util.collation;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -17,25 +16,19 @@ abstract class CollationOptions extends Options {
    * Parses the specified options and returns the faulty key.
    * @param args arguments
    * @return error message
+   * @throws BaseXException database exception
    */
-  abstract Collation get(String args);
+  abstract Collation get(HashMap<String, String> args) throws BaseXException;
 
   /**
-   * Parses the specified options and returns the faulty key.
+   * Assigns the specified options.
    * @param args arguments
-   * @return error message
+   * @throws BaseXException database exception
    */
-  String check(final String args) {
-    String error = null;
-    for(final String option : Strings.split(args, ';')) {
-      final String[] kv = Strings.split(option, '=', 2);
-      try {
-        assign(kv[0], kv.length == 2 ? kv[1] : "");
-      } catch(final BaseXException ex) {
-        error = option;
-      }
+  void assign(final HashMap<String, String> args) throws BaseXException {
+    for(final Map.Entry<String, String> entry : args.entrySet()) {
+      assign(entry.getKey(), entry.getValue());
     }
-    return error;
   }
 
   /**
@@ -43,8 +36,8 @@ abstract class CollationOptions extends Options {
    * @param option option
    * @return error
    */
-  protected IllegalArgumentException error(final Option<?> option) {
-    return new IllegalArgumentException("Invalid \"" + option + "\" value \"" + get(option) + '"');
+  protected BaseXException error(final Option<?> option) {
+    return new BaseXException("Invalid \"%\" value: \"%\".", option, get(option));
   }
 
   /** Initialization of locales. */

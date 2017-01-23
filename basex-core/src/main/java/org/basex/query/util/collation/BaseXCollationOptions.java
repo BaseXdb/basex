@@ -1,8 +1,11 @@
 package org.basex.query.util.collation;
 
+import static org.basex.util.Strings.*;
+
 import java.text.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -67,8 +70,19 @@ public final class BaseXCollationOptions extends CollationOptions {
     }
   }
 
+  /** Fallback parsing. */
+  private final boolean fallback;
+
+  /**
+   * Constructor.
+   * @param fallback fallback option
+   */
+  public BaseXCollationOptions(final boolean fallback) {
+    this.fallback = fallback;
+  }
+
   @Override
-  public Collation get(final String args) {
+  public Collation get(final HashMap<String, String> args) throws BaseXException {
     return new BaseXCollation(collator(args));
   }
 
@@ -76,11 +90,24 @@ public final class BaseXCollationOptions extends CollationOptions {
    * Returns a collator for the specified arguments.
    * @param args argument to be parsed
    * @return collator collator
-   * @throws IllegalArgumentException illegal arguments
+   * @throws BaseXException database exception
    */
-  public Collator collator(final String args) throws IllegalArgumentException {
-    final String error = check(args);
-    if(error != null) throw new IllegalArgumentException("Invalid option \"" + error + '"');
+  public Collator collator(final HashMap<String, String> args) throws BaseXException {
+    if(fallback) {
+      for(final Map.Entry<String, String> entry : args.entrySet()) {
+        final String name = entry.getKey();
+        String value = entry.getValue();
+        if(name.equals(STRENGTH.name())) {
+          if(eq(value, "1")) value = Strength.PRIMARY.toString();
+          else if(eq(value, "2")) value = Strength.SECONDARY.toString();
+          else if(eq(value, "3")) value = Strength.TERTIARY.toString();
+          else if(eq(value, "quaternary", "4", "5")) value = Strength.IDENTICAL.toString();
+          assign(name, value);
+        }
+      }
+    } else {
+      assign(args);
+    }
 
     Locale locale = Locale.US;
     if(contains(LANG)) {

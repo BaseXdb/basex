@@ -4,10 +4,14 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.Options.*;
 
 /**
  * This class organizes collations.
@@ -90,24 +94,42 @@ public abstract class Collation {
 
     final int q = Token.indexOf(uri, '?');
     final byte[] base = q == -1 ? uri : substring(uri, 0, q);
-    final String args = q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';'));
+    final HashMap<String, String> args = args(
+        q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';')));
 
-    final CollationOptions opts;
-    if(eq(UCA, base) && UCAOptions.ACTIVE) {
-      opts = new UCAOptions();
-    } else if(eq(URL, base)) {
-      opts = new BaseXCollationOptions();
-    } else {
-      throw err.get(info, Util.inf("Unknown collation '%'", uri));
+    CollationOptions opts = null;
+    if(eq(URL, base)) {
+      opts = new BaseXCollationOptions(false);
+    } else if(eq(UCA, base)) {
+      if(UCAOptions.ACTIVE) {
+        opts = new UCAOptions();
+      } else if(!YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()))) {
+        opts = new BaseXCollationOptions(true);
+      }
     }
+    if(opts == null) throw err.get(info, Util.inf("Unknown collation '%'", uri));
 
     try {
       final Collation coll = opts.get(args);
       coll.uri = uri;
       return coll;
-    } catch(final IllegalArgumentException ex) {
+    } catch(final IllegalArgumentException | BaseXException ex) {
       throw err.get(info, ex.getMessage());
     }
+  }
+
+  /**
+   * Returns a map with all arguments.
+   * @param args arguments
+   * @return error message
+   */
+  private static HashMap<String, String> args(final String args) {
+    final HashMap<String, String> map = new HashMap<>();
+    for(final String option : Strings.split(args, ';')) {
+      final String[] kv = Strings.split(option, '=', 2);
+      map.put(kv[0], kv.length == 2 ? kv[1] : "");
+    }
+    return map;
   }
 
   /**
