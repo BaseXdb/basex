@@ -42,7 +42,7 @@ public final class Delete extends ACreate {
         final TokenList bins = data.resources.binaries(target);
         delete(data, target);
 
-        return info(RES_DELETED_X_X, docs.size() + bins.size(), job().performance);
+        return info(RES_DELETED_X_X, docs.size() + bins.size(), jc().performance);
       }
     });
   }

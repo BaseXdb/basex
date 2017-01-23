@@ -114,7 +114,7 @@ public final class CreateDB extends ACreate {
         @Override
         boolean run() throws IOException {
           CreateIndex.create(data, CreateDB.this);
-          return info(parser.info() + DB_CREATED_X_X, name, job().performance);
+          return info(parser.info() + DB_CREATED_X_X, name, jc().performance);
         }
       })) return false;
 
@@ -135,7 +135,7 @@ public final class CreateDB extends ACreate {
 
   @Override
   public void addLocks() {
-    final Locks locks = job().locks;
+    final Locks locks = jc().locks;
     locks.reads.add(Locking.CONTEXT);
     locks.writes.add(args[0]);
   }

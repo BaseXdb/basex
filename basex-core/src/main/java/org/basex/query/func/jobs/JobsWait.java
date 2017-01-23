@@ -20,7 +20,7 @@ public final class JobsWait extends StandardFunc {
     checkAdmin(qc);
 
     final String id = Token.string(toToken(exprs[0], qc));
-    if(qc.job().id().equals(id)) throw JOBS_SELF_X.get(info, id);
+    if(qc.jc().id().equals(id)) throw JOBS_SELF_X.get(info, id);
 
     final JobPool pool = qc.context.jobs;
     while(pool.tasks.containsKey(id) || pool.active.containsKey(id)) {

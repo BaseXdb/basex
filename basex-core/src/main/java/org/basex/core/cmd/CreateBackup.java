@@ -52,7 +52,7 @@ public final class CreateBackup extends ABackup {
         try {
           backup(db, soptions, this);
           // backup was successful
-          info(DB_BACKUP_X, db, job().performance);
+          info(DB_BACKUP_X, db, jc().performance);
         } catch(final IOException ex) {
           info(DB_NOT_BACKUP_X, db);
           ok = false;
@@ -91,7 +91,7 @@ public final class CreateBackup extends ABackup {
   @Override
   public void addLocks() {
     super.addLocks();
-    addLocks(job().locks.reads, 0);
+    addLocks(jc().locks.reads, 0);
   }
 
   @Override

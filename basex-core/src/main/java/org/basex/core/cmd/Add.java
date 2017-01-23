@@ -63,7 +63,7 @@ public final class Add extends ACreate {
             auc.addInsert(data.meta.size, -1, clip);
             auc.execute(false);
           }
-          return info(RES_ADDED_X, job().performance);
+          return info(RES_ADDED_X, jc().performance);
         }
       });
     } finally {

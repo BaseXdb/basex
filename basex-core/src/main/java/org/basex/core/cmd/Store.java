@@ -63,7 +63,7 @@ public final class Store extends ACreate {
       @Override
       boolean run() throws IOException {
         store(in, file);
-        return info(QUERY_EXECUTED_X_X, "", job().performance);
+        return info(QUERY_EXECUTED_X_X, "", jc().performance);
       }
     });
   }

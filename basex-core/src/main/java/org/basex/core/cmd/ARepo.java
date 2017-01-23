@@ -22,6 +22,6 @@ abstract class ARepo extends Command {
 
   @Override
   public void addLocks() {
-    job().locks.writes.add(Locking.REPO); // Repository commands are exclusive
+    jc().locks.writes.add(Locking.REPO); // Repository commands are exclusive
   }
 }

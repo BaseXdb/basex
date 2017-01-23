@@ -89,7 +89,7 @@ public final class Check extends Command {
 
   @Override
   public void addLocks() {
-    job().locks.reads.add(Locking.CONTEXT).add(IO.get(args[0]).dbName());
+    jc().locks.reads.add(Locking.CONTEXT).add(IO.get(args[0]).dbName());
   }
 
   @Override

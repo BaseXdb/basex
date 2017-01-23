@@ -53,7 +53,7 @@ public final class List extends Command {
 
   @Override
   public void addLocks() {
-    final Locks locks = job().locks;
+    final Locks locks = jc().locks;
     if(args[0].isEmpty()) locks.reads.addGlobal();
     else locks.reads.add(args[0]);
   }

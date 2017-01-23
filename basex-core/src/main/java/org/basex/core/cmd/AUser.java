@@ -79,6 +79,6 @@ abstract class AUser extends Command {
 
   @Override
   public void addLocks() {
-    job().locks.writes.add(Locking.USER);
+    jc().locks.writes.add(Locking.USER);
   }
 }

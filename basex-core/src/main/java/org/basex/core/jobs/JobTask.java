@@ -41,7 +41,7 @@ public final class JobTask extends TimerTask {
     start = time + delay;
     end = duration == Long.MAX_VALUE ? duration : time + duration;
 
-    jobs.tasks.put(job.job().id(), this);
+    jobs.tasks.put(job.jc().id(), this);
     if(interval > 0) {
       jobs.timer.scheduleAtFixedRate(this, delay, interval);
     } else {
@@ -58,6 +58,6 @@ public final class JobTask extends TimerTask {
       cancel();
     }
     // skip execution if same job is still running
-    if(!jobs.active.containsKey(job.job().id())) new Thread(job).start();
+    if(!jobs.active.containsKey(job.jc().id())) new Thread(job).start();
   }
 }

@@ -58,12 +58,12 @@ public final class Open extends Command {
         return error(Util.message(ex));
       }
     }
-    return info(DB_OPENED_X, db, job().performance);
+    return info(DB_OPENED_X, db, jc().performance);
   }
 
   @Override
   public void addLocks() {
-    job().locks.reads.add(Locking.CONTEXT).add(args[0]);
+    jc().locks.reads.add(Locking.CONTEXT).add(args[0]);
   }
 
   @Override

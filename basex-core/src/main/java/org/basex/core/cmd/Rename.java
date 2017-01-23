@@ -72,7 +72,7 @@ public final class Rename extends ACreate {
       c++;
     }
     // return info message
-    return info(RES_RENAMED_X_X, c, job().performance) && ok;
+    return info(RES_RENAMED_X_X, c, jc().performance) && ok;
   }
 
   /**

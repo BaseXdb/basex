@@ -27,12 +27,12 @@ public final class Inspect extends Command {
   protected boolean run() throws IOException {
     final Data data = context.data();
     out.print(inspect(data));
-    return info("'%' inspected in %.", data.meta.name, job().performance);
+    return info("'%' inspected in %.", data.meta.name, jc().performance);
   }
 
   @Override
   public void addLocks() {
-    job().locks.reads.add(Locking.CONTEXT);
+    jc().locks.reads.add(Locking.CONTEXT);
   }
 
   /**

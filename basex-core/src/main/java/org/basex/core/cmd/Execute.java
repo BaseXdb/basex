@@ -39,7 +39,7 @@ public class Execute extends Command {
 
   @Override
   public final void addLocks() {
-    final Locks locks = job().locks;
+    final Locks locks = jc().locks;
     (updating ? locks.writes : locks.reads).addGlobal();
   }
 

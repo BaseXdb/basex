@@ -423,7 +423,7 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public void addLocks() {
-    final Locks locks = job().locks;
+    final Locks locks = jc().locks;
     final LockList read = locks.reads, write = locks.writes;
     read.add(readLocks);
     write.add(writeLocks);

@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class JobsCurrent extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) {
-    return Str.get(qc.job().id());
+    return Str.get(qc.jc().id());
   }
 }

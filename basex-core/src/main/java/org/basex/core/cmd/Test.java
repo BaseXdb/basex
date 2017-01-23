@@ -68,6 +68,6 @@ public final class Test extends Command {
 
   @Override
   public void addLocks() {
-    job().locks.writes.addGlobal();
+    jc().locks.writes.addGlobal();
   }
 }

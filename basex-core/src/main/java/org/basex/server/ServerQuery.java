@@ -117,7 +117,7 @@ public final class ServerQuery extends Job {
       parse();
       qp.register(ctx);
       // create serializer
-      final Performance perf = job().performance;
+      final Performance perf = jc().performance;
       qp.compile();
       final QueryInfo qi = qp.qc.info;
       qi.compiling = perf.time();

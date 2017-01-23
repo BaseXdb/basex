@@ -33,7 +33,7 @@ public final class Close extends Command {
 
   @Override
   public void addLocks() {
-    job().locks.reads.add(Locking.CONTEXT);
+    jc().locks.reads.add(Locking.CONTEXT);
   }
 
   /**

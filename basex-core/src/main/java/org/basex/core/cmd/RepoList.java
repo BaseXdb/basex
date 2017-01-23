@@ -30,7 +30,7 @@ public final class RepoList extends ARepo {
 
   @Override
   public void addLocks() {
-    job().locks.reads.add(Locking.REPO);
+    jc().locks.reads.add(Locking.REPO);
   }
 
   @Override

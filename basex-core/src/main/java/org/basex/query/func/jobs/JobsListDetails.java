@@ -38,6 +38,10 @@ public final class JobsListDetails extends StandardFunc {
   private static final byte[] END = token("end");
   /** User. */
   private static final byte[] USER = token("user");
+  /** Read locks. */
+  private static final byte[] READS = token("reads");
+  /** Write locks. */
+  private static final byte[] WRITES = token("writes");
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
@@ -59,7 +63,7 @@ public final class JobsListDetails extends StandardFunc {
       if(job == null && jt != null) job = jt.job;
       if(job == null) continue;
 
-      final JobContext jc = job.job();
+      final JobContext jc = job.jc();
       final long ms = jc.performance != null
           ? (System.nanoTime() - jc.performance.start()) / 1000000 : jr != null
           ? jr.time / 1000000 : -1;
@@ -69,6 +73,8 @@ public final class JobsListDetails extends StandardFunc {
       elem.add(TYPE, jc.type());
       elem.add(STATE, job.state.toString().toLowerCase(Locale.ENGLISH));
       elem.add(USER, jc.context.user().name());
+      elem.add(READS, jc.locks.reads.toString());
+      elem.add(WRITES, jc.locks.writes.toString());
       if(ms >= 0) elem.add(DURATION, DTDur.get(ms).string(info));
       if(jt != null) {
         elem.add(START, Dtm.get(jt.start).string(info));

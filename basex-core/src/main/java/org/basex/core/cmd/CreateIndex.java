@@ -61,7 +61,7 @@ public final class CreateIndex extends ACreate {
       @Override
       boolean run() throws IOException {
         create(type, data, CreateIndex.this);
-        return info(INDEX_CREATED_X_X, type, job().performance);
+        return info(INDEX_CREATED_X_X, type, jc().performance);
       }
     });
   }

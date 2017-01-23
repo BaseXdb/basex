@@ -254,7 +254,7 @@ public abstract class AQuery extends Command {
 
   @Override
   public void addLocks() {
-    final Locks locks = job().locks;
+    final Locks locks = jc().locks;
     if(qp == null) {
       locks.writes.addGlobal();
     } else {

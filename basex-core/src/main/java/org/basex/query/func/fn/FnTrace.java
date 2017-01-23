@@ -72,6 +72,6 @@ public final class FnTrace extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
     tb.add(value);
-    qc.job().tracer.print(tb.toString(), qc);
+    qc.jc().tracer.print(tb.toString(), qc);
   }
 }

@@ -42,6 +42,6 @@ public final class JobsEval extends StandardFunc {
     if(ctx.jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
     final ScheduledXQuery job = new ScheduledXQuery(query, bindings, opts, info, qc, sc);
-    return Str.get(job.job().id());
+    return Str.get(job.jc().id());
   }
 }

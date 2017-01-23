@@ -65,7 +65,7 @@ final class RestXqResponse {
     // assign function call and http context and register process
     qc.mainModule(MainModule.get(sf, args));
     qc.http(conn);
-    qc.job().type(RESTXQ);
+    qc.jc().type(RESTXQ);
     qc.register(qc.context);
 
     final String singleton = func.singleton;

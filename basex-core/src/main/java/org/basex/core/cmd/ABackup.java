@@ -21,6 +21,6 @@ abstract class ABackup extends Command {
 
   @Override
   public void addLocks() {
-    job().locks.writes.add(Locking.BACKUP); // No parallel backup operations
+    jc().locks.writes.add(Locking.BACKUP); // No parallel backup operations
   }
 }

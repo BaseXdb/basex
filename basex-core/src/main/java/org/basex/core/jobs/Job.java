@@ -31,7 +31,7 @@ public abstract class Job {
    * Returns the job context.
    * @return info
    */
-  public final JobContext job() {
+  public final JobContext jc() {
     return jc;
   }
 

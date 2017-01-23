@@ -51,7 +51,7 @@ public final class Copy extends Command {
     // try to copy database
     try {
       copy(src, trg, soptions, this);
-      return info(DB_COPIED_X, src, job().performance);
+      return info(DB_COPIED_X, src, jc().performance);
     } catch(final IOException ex) {
       return error(DB_NOT_COPIED_X, src);
     }
@@ -92,7 +92,7 @@ public final class Copy extends Command {
 
   @Override
   public void addLocks() {
-    final Locks locks = job().locks;
+    final Locks locks = jc().locks;
     locks.reads.add(args[0]);
     locks.writes.add(args[1]);
   }

@@ -59,7 +59,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
     this.bindings = bindings;
     this.info = info;
     cache = opts.get(EvalOptions.CACHE);
-    job().context = qc.context;
+    jc().context = qc.context;
 
     final String bu = opts.get(EvalOptions.BASE_URI);
     uri = bu != null ? bu : string(sc.baseURI().string());
@@ -85,10 +85,10 @@ public final class ScheduledXQuery extends Job implements Runnable {
       if(id != null) {
         if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(info, id);
         if(pool.tasks.containsKey(id) || pool.active.containsKey(id) ||
-            pool.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
-        job().id(id);
+           pool.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
+        jc().id(id);
       } else {
-        id = job().id();
+        id = jc().id();
       }
 
       if(cache) {
@@ -147,7 +147,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
 
   @Override
   public void run() {
-    final JobContext jc = job();
+    final JobContext jc = jc();
     final Context ctx = jc.context;
 
     qp = new QueryProcessor(query, uri, ctx);

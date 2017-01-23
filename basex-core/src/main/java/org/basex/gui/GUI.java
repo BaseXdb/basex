@@ -462,7 +462,7 @@ public final class GUI extends JFrame {
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
       // attaches the info listener to the command
-      cmd.job().tracer = info;
+      cmd.jc().tracer = info;
 
       // evaluate command
       String inf;

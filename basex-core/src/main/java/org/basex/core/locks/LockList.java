@@ -139,8 +139,8 @@ public final class LockList implements Iterable<String> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(global) sb.append(GLOBAL);
-    else if(list.isEmpty()) sb.append(NONE);
+    if(global) sb.append('(').append(GLOBAL).append(')');
+    else if(list.isEmpty()) sb.append('(').append(NONE).append(')');
     else sb.append(LOCAL).append(' ').append(Arrays.toString(list.toArray()));
     return sb.toString();
   }

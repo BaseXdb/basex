@@ -25,11 +25,11 @@ public final class Flush extends Command {
   protected boolean run() {
     final Data data = context.data();
     if(!options.get(MainOptions.AUTOFLUSH)) data.flush(true);
-    return info(DB_FLUSHED_X, data.meta.name, job().performance);
+    return info(DB_FLUSHED_X, data.meta.name, jc().performance);
   }
 
   @Override
   public void addLocks() {
-    job().locks.writes.add(Locking.CONTEXT);
+    jc().locks.writes.add(Locking.CONTEXT);
   }
 }

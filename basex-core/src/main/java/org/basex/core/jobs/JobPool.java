@@ -41,7 +41,7 @@ public final class JobPool {
    */
   public void register(final Job job) {
     while(active.size() >= MAXQUERIES) Performance.sleep(1);
-    active.put(job.job().id(), job);
+    active.put(job.jc().id(), job);
   }
 
   /**
@@ -49,7 +49,7 @@ public final class JobPool {
    * @param job job
    */
   public void unregister(final Job job) {
-    active.remove(job.job().id());
+    active.remove(job.jc().id());
   }
 
   /**
@@ -70,7 +70,7 @@ public final class JobPool {
     timer.schedule(new TimerTask() {
       @Override
       public void run() {
-        results.remove(job.job().id());
+        results.remove(job.jc().id());
       }
     }, timeout);
   }

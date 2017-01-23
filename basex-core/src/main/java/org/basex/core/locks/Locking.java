@@ -94,7 +94,7 @@ public final class Locking {
     job.addLocks();
 
     // prepare lock strings and acquire locks
-    final Locks locks = job.job().locks;
+    final Locks locks = job.jc().locks;
     locks.finish(ctx);
 
     try {
@@ -117,15 +117,16 @@ public final class Locking {
    */
   void acquire(final LockList reads, final LockList writes) throws InterruptedException {
     final Long id = Thread.currentThread().getId();
-    final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
 
     // one thread can only hold a single lock
-    if(writeLocked.containsKey(id) || readLocked.containsKey(id))
-      throw new IllegalMonitorStateException("Thread already holds locks.");
+    if(writeLocked.containsKey(id) || readLocked.containsKey(id)) {
+      throw new IllegalMonitorStateException("Thread already holds locks: " + id);
+    }
     writeLocked.put(id, writes);
     readLocked.put(id, reads);
 
     // queue job if the job limit has been reached
+    final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
     synchronized(queue) {
       if(jobs >= parallel) queue.wait(id, read, write);
       jobs++;

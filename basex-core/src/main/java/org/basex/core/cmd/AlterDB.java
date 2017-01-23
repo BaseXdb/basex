@@ -51,7 +51,7 @@ public final class AlterDB extends ACreate {
 
   @Override
   public void addLocks() {
-    job().locks.writes.add(args[0]).add(args[1]);
+    jc().locks.writes.add(args[0]).add(args[1]);
   }
 
   /**

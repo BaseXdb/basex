@@ -48,7 +48,7 @@ public final class Optimize extends ACreate {
           data.meta.dirty = true;
         }
         optimize(data, Optimize.this);
-        return info(DB_OPTIMIZED_X, meta.name, job().performance);
+        return info(DB_OPTIMIZED_X, meta.name, jc().performance);
       }
     });
   }

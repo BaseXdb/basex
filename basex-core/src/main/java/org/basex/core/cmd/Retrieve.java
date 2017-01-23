@@ -38,7 +38,7 @@ public final class Retrieve extends ACreate {
 
     try(BufferInput bi = new BufferInput(bin)) {
       for(int b; (b = bi.read()) != -1;) out.write(b);
-      return info(QUERY_EXECUTED_X_X, "", job().performance);
+      return info(QUERY_EXECUTED_X_X, "", jc().performance);
     } catch(final IOException ex) {
       return error(ex.toString());
     }
@@ -46,6 +46,6 @@ public final class Retrieve extends ACreate {
 
   @Override
   public void addLocks() {
-    job().locks.reads.add(Locking.CONTEXT);
+    jc().locks.reads.add(Locking.CONTEXT);
   }
 }
