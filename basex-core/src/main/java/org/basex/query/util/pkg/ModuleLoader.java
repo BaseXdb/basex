@@ -2,16 +2,11 @@ package org.basex.query.util.pkg;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -32,8 +27,8 @@ public final class ModuleLoader {
 
   /** Database context. */
   private final Context context;
-  /** Cached JARs to be added to the class loader. */
-  private final ArrayList<IOFile> jars = new ArrayList<>(0);
+  /** Cached URLs to be added to the class loader. */
+  private final ArrayList<URL> urls = new ArrayList<>(0);
   /** Java modules. */
   private final HashSet<Object> javaModules = new HashSet<>();
   /** Current class loader. */
@@ -110,7 +105,7 @@ public final class ModuleLoader {
 
     // load Java module
     final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
-    if(jar.exists()) jars.add(jar);
+    if(jar.exists()) addURL(jar);
 
     // create Java class instance
     final Class<?> clz;
@@ -141,61 +136,11 @@ public final class ModuleLoader {
    *   {@link NoClassDefFoundError}, {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
   public Class<?> findClass(final String name) throws Throwable {
-    // add cached JARs to class loader
-    if(jars.size() != 0) {
-
-      // extract packaged Jar dependency
-      final List<IOFile> jarsCopy = new ArrayList<>(jars);
-      for (final IOFile jar : jarsCopy) {
-        final IOFile pDir  = jar.parent();
-        if(pDir == null) {
-          Util.errln("Path with parent directory expected: '%'", jar.path());
-          continue;
-        }
-        // create a directory starting with a dot so that the package repository ignores it
-        final IOFile exjsdir = pDir.resolve(EXT_JAR_DIR_PREFIX + jar.dbName() + EXT_JAR_DIR_SUFFIX);
-        if(exjsdir.exists() && !exjsdir.isDir()) {
-          Util.errln("Directory expected: '%'", exjsdir.path());
-          continue;
-        }
-
-        try(JarFile jarFile = new JarFile(jar.file())) {
-          final Enumeration<JarEntry> entries = jarFile.entries();
-          while (entries.hasMoreElements()) {
-            final JarEntry entry = entries.nextElement();
-            if (entry.getName().startsWith("lib/") && entry.getName().endsWith(".jar")) {
-              if(!exjsdir.md()) Util.errln("Could not create directory: '%'", exjsdir.path());
-              final IOFile libFile = new IOFile(exjsdir, entry.getName().substring(4));
-              // basic check file size / timestamp and skip extraction if library already exists
-              if(!libFile.exists() || libFile.length() != entry.getSize() ||
-                  libFile.timeStamp() != entry.getTime()) {
-                libFile.delete();
-                try(InputStream inputStream = jarFile.getInputStream(entry)) {
-                  libFile.write(inputStream);
-                } catch (IOException e) {
-                  Util.errln(EXTFAILED, jar.path(), e);
-                }
-                libFile.file().setLastModified(entry.getTime());
-              }
-              jars.add(libFile);
-            }
-          }
-        } catch (IOException e) {
-          Util.errln(EXTFAILED, jar.path(), e);
-        }
-      }
-
-      final int js = jars.size();
-      final URL[] urls = new URL[js];
-      try {
-        for (int i = 0; i < js; i++) {
-          urls[i] = new URL(jars.get(i).url());
-        }
-      } catch(final MalformedURLException ex) {
-        Util.errln(ex);
-      }
-      loader = new JarLoader(urls, loader);
-      jars.clear();
+    // add cached URLs to class loader
+    final int us = urls.size();
+    if(us != 0) {
+      loader = new JarLoader(urls.toArray(new URL[us]), loader);
+      urls.clear();
     }
     // no external classes added: use default class loader
     return loader == LOADER ? Reflect.forName(name) : Class.forName(name, true, loader);
@@ -249,7 +194,7 @@ public final class ModuleLoader {
     // add jars to classpath
     if(jarDesc.exists()) {
       final JarDesc desc = new JarParser(ii).parse(jarDesc);
-      for(final byte[] u : desc.jars) jars.add(new IOFile(modDir, string(u)));
+      for(final byte[] u : desc.jars) addURL(new IOFile(modDir, string(u)));
     }
 
     // package has dependencies -> they have to be loaded first => put package
@@ -269,5 +214,22 @@ public final class ModuleLoader {
     }
     if(toLoad.contains(id)) toLoad.remove(id);
     loaded.add(id);
+  }
+
+  /**
+   * Adds a URL to the cache.
+   * @param jar jar file to be added
+   */
+  private void addURL(final IOFile jar) {
+    try {
+      urls.add(new URL(jar.url()));
+      // parse files of extracted sub directory
+      final IOFile extDir = new IOFile(jar.parent(), '.' + jar.dbName());
+      if(extDir.exists()) {
+        for(final IOFile file : extDir.children()) urls.add(new URL(file.url()));
+      }
+    } catch(final MalformedURLException ex) {
+      Util.errln(ex);
+    }
   }
 }

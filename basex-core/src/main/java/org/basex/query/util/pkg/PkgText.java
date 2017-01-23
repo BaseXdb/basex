@@ -27,11 +27,6 @@ public interface PkgText {
   /** Content directory. */
   String CONTENT = "content";
 
-  /** Name prefix for the directory used for extracted jars. */
-  String EXT_JAR_DIR_PREFIX = ".";
-  /** Name suffix for the directory used for extracted jars. */
-  String EXT_JAR_DIR_SUFFIX = "Lib";
-
   /** <package/> root element. */
   /** Element package. */
   byte[] PACKAGE = token("package");

@@ -217,17 +217,16 @@ public final class IOFile extends IO {
    * Returns the relative paths of all descendant files (excluding directories).
    * @return relative paths
    */
-  public synchronized StringList descendants() {
+  public StringList descendants() {
     return descendants(null);
   }
 
   /**
-   * Returns the relative paths of all descendant non-filtered files (excluding
-   * directories).
+   * Returns the relative paths of all descendant non-filtered files (excluding directories).
    * @param filter file filter
    * @return relative paths
    */
-  public synchronized StringList descendants(final FileFilter filter) {
+  public StringList descendants(final FileFilter filter) {
     final StringList files = new StringList();
     final File[] ch = filter == null ? file.listFiles() : file.listFiles(filter);
     if(ch == null) return files;
@@ -372,11 +371,11 @@ public final class IOFile extends IO {
    * @param filter file filter
    * @param offset string length of root path
    */
-  private static void addDescendants(final IOFile io, final StringList files, final FileFilter filter,
-          final int offset)
-  {
+  private static void addDescendants(final IOFile io, final StringList files,
+      final FileFilter filter, final int offset) {
     if(io.isDir()) {
-      for(final IOFile f : io.children(filter)) addDescendants(f, files, filter, offset);
+      for(final IOFile f : io.children(filter))
+        addDescendants(f, files, filter, offset);
     } else {
       if(filter == null || filter.accept(io.file)) {
         files.add(io.path().substring(offset));

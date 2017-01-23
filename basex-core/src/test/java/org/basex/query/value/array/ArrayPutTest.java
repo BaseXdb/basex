@@ -19,13 +19,13 @@ public final class ArrayPutTest {
   public void setAllTest() {
     final int n = 5000;
     final ArrayBuilder builder = new ArrayBuilder();
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       builder.append(Int.get(i));
     }
     final Array array = builder.freeze();
-    for (int i = 0; i < n; i++) {
+    for(int i = 0; i < n; i++) {
       final Array arr = array.put(i, Int.get(-i));
-      for (int j = 0; j < n; j++) {
+      for(int j = 0; j < n; j++) {
         assertEquals(i == j ? -j : j, ((Int) arr.get(j)).itr());
       }
     }

@@ -276,7 +276,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests installing of a package containing a jar file with packaged dependencies
+   * Tests installing of a package containing a jar file with packaged dependencies.
    * @throws Exception exception
    */
   @Test
@@ -286,20 +286,21 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // ensure package was properly installed
     final String dir = normalize("test");
+    final String jar = "GreeterCaller";
     assertTrue(isDir(dir));
-    assertTrue(isFile(dir + "/GreeterCaller.jar"));
+    assertTrue(isFile(dir + '/' + jar + IO.JARSUFFIX));
 
     // use package
-    try(final QueryProcessor qp = new QueryProcessor(
-            "import module namespace j='test.GreeterCaller'; j:call('Unit Test')", context)) {
+    try(QueryProcessor qp = new QueryProcessor(
+            "import module namespace j='test." + jar + "'; j:call('Unit Test')", context)) {
       assertEquals(qp.value().serialize().toString(), "Hello Unit Test");
     }
     // dependency installed
-    assertTrue(isFile(dir + "/.GreeterCallerLib/Greeter.jar"));
+    assertTrue(isFile(dir + "/." + jar + "/Greeter.jar"));
 
-    new RepoManager(context).delete("test.GreeterCaller");
-    final boolean existAfterDelete = isFile(dir + "/.GreeterCallerLib/Greeter.jar") ||
-            isFile(dir + "/GreeterCaller.jar");
+    new RepoManager(context).delete("test." + jar);
+    final boolean existAfterDelete = isFile(dir + "/." +
+        jar + "/Greeter.jar") || isFile(dir + '/' + jar + IO.JARSUFFIX);
     assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
     assertFalse("Package could not be deleted.", existAfterDelete);
   }

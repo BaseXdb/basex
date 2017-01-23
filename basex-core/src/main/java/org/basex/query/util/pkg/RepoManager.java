@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.jar.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -132,12 +133,11 @@ public final class RepoManager {
         }
         final IOFile pkgf = repo.path(dir);
         if(!pkgf.delete()) throw BXRE_DELETE_X.get(info, dir);
+
         // delete directory with extracted jars
-        final int lastDot = pkg.name().lastIndexOf(".");
-        final String exjsDirName = lastDot == -1 ? pkg.name() : pkg.name().substring(lastDot + 1);
-        final IOFile exjsdir = pkgf.parent().resolve(
-                EXT_JAR_DIR_PREFIX + exjsDirName + EXT_JAR_DIR_SUFFIX);
-        if(!exjsdir.delete()) throw BXRE_DELETE_X.get(info, dir);
+        final String extName = pkg.name().replaceAll("^.*\\.", "");
+        final IOFile extDir = pkgf.parent().resolve('.' + extName);
+        if(!extDir.delete()) throw BXRE_DELETE_X.get(info, extDir);
         deleted = true;
       }
     }
@@ -213,10 +213,9 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private boolean installJAR(final byte[] content, final String path)
-          throws QueryException, IOException {
+      throws QueryException, IOException {
 
-    final Zip zip = new Zip(new IOContent(content));
-    final IOContent mf = new IOContent(zip.read(MANIFEST_MF));
+    final IOContent mf = new IOContent(new Zip(new IOContent(content)).read(MANIFEST_MF));
     final NewlineInput nli = new NewlineInput(mf);
     for(String s; (s = nli.readLine()) != null;) {
       // write file to rewritten file path
@@ -239,6 +238,26 @@ public final class RepoManager {
     final boolean exists = target.exists();
     target.parent().md();
     target.write(content);
+
+    // extract JARs in zipped .lib directory
+    if(target.hasSuffix(IO.JARSUFFIX)) {
+      final IOFile extDir = target.parent().resolve('.' + target.name().
+          replaceAll(IO.JARSUFFIX + '$', ""));
+      try(JarFile jarFile = new JarFile(target.file())) {
+        final Enumeration<JarEntry> entries = jarFile.entries();
+        while(entries.hasMoreElements()) {
+          final JarEntry entry = entries.nextElement();
+          final String name = entry.getName();
+          if(name.matches("^lib/[^/]+\\.jar")) {
+            if(!extDir.md()) throw new BaseXException("Could not create %.", extDir.path());
+            final IOFile file = new IOFile(extDir, name.replaceAll("^.*?/", ""));
+            try(InputStream is = jarFile.getInputStream(entry)) {
+              file.write(is);
+            }
+          }
+        }
+      }
+    }
     return exists;
   }
 
