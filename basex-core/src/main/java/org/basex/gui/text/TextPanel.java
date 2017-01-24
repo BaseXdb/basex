@@ -9,7 +9,6 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -988,15 +987,14 @@ public class TextPanel extends BaseXPanel {
     if(prefix.isEmpty()) return;
 
     // find insertion candidates
-    final TreeMap<String, String> tmp = new TreeMap<>();
-    for(final Entry<String, String> entry : REPLACE.entrySet()) {
-      final String key = entry.getKey();
-      if(key.startsWith(prefix)) tmp.put(key, entry.getValue());
+    final ArrayList<Pair<String, String>> tmp = new ArrayList<>();
+    for(final Pair<String, String> pair : REPLACE) {
+      if(pair.name().startsWith(prefix)) tmp.add(pair);
     }
 
     if(tmp.size() == 1) {
       // insert single candidate
-      complete(tmp.values().iterator().next(), startPos);
+      complete(tmp.get(0).value(), startPos);
     } else if(!tmp.isEmpty()) {
       // show popup menu
       final JPopupMenu pm = new JPopupMenu();
@@ -1007,8 +1005,8 @@ public class TextPanel extends BaseXPanel {
         }
       };
 
-      for(final Entry<String, String> entry : tmp.entrySet()) {
-        final JMenuItem mi = new JMenuItem('[' + entry.getKey() + "] " + entry.getValue());
+      for(final Pair<String, String> entry : tmp) {
+        final JMenuItem mi = new JMenuItem('[' + entry.name() + "] " + entry.value());
         pm.add(mi);
         mi.addActionListener(al);
       }
@@ -1039,7 +1037,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Index for all replacements. */
-  private static final HashMap<String, String> REPLACE = new HashMap<>();
+  private static final ArrayList<Pair<String, String>> REPLACE = new ArrayList<>();
 
   /** Reads in the property file. */
   static {
@@ -1054,9 +1052,7 @@ public class TextPanel extends BaseXPanel {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
             final String key = line.substring(0, i), value = line.substring(i + 1);
-            if(REPLACE.put(key, value.replace("\\n", "\n")) != null) {
-              Util.errln(file + ": " + key + " was assigned twice");
-            }
+            REPLACE.add(new Pair<>(key, value.replace("\\n", "\n")));
           }
         }
       }
