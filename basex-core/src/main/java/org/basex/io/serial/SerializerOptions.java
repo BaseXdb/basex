@@ -59,7 +59,7 @@ public final class SerializerOptions extends Options {
       new EnumOption<>("method", SerialMethod.BASEX);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final StringOption NORMALIZATION_FORM =
-      new StringOption("normalization-form", Text.NONE);
+      new StringOption("normalization-form", "none");
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> OMIT_XML_DECLARATION =
       new EnumOption<>("omit-xml-declaration", YesNo.YES);

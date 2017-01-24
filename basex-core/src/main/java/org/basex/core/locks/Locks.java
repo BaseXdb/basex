@@ -21,14 +21,15 @@ public final class Locks {
    * removes duplicates, assigns global read lock if global write lock exists.
    * @param ctx database context
    */
-  public void finish(final Context ctx) {
+  void finish(final Context ctx) {
     // global write lock: no read locks required
     if(writes.global()) reads.reset();
 
     // resolve context references, sort, remove duplicates
     final Data data = ctx.data();
-    writes.finish(data);
-    reads.finish(data);
+    final String name = data == null ? null : data.meta.name;
+    writes.finish(name);
+    reads.finish(name);
 
     // remove read locks that are also defined as write locks
     reads.remove(writes);

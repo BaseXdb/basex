@@ -1,23 +1,22 @@
 package org.basex.core.locks;
 
-import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 /**
- * Local locks.
+ * Local read/write locks.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class LocalLock extends ReentrantReadWriteLock {
+final class LocalReadWriteLock extends ReentrantReadWriteLock {
   /** Pins. */
-  private final AtomicInteger pins = new AtomicInteger(0);
+  private int pins;
 
   /**
    * Constructor.
    * @param fair fair locking
    */
-  LocalLock(final boolean fair) {
+  LocalReadWriteLock(final boolean fair) {
     super(fair);
   }
 
@@ -26,7 +25,7 @@ final class LocalLock extends ReentrantReadWriteLock {
    * @return pin count
    */
   int pin() {
-    return pins.incrementAndGet();
+    return ++pins;
   }
 
   /**
@@ -34,6 +33,6 @@ final class LocalLock extends ReentrantReadWriteLock {
    * @return pin count
    */
   int unpin() {
-    return pins.decrementAndGet();
+    return --pins;
   }
 }

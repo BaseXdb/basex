@@ -8,7 +8,6 @@ import java.io.*;
 import java.text.*;
 import java.text.Normalizer.Form;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -47,7 +46,7 @@ public abstract class StandardSerializer extends OutputSerializer {
 
     // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
-    if(norm.equals(Text.NONE)) {
+    if(norm.equals(SerializerOptions.NORMALIZATION_FORM.value())) {
       form = null;
     } else {
       try {

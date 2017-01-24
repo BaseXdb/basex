@@ -53,19 +53,17 @@ public final class Locking {
   /** Maximum number of parallel jobs. */
   private final int parallel;
 
-  /** Write locks assigned to threads. */
-  private final ConcurrentMap<Long, LockList> writeLocked = new ConcurrentHashMap<>();
-  /** Read locks assigned to threads. */
-  private final ConcurrentMap<Long, LockList> readLocked = new ConcurrentHashMap<>();
+  /** Locks assigned to threads. */
+  private final ConcurrentMap<Long, Locks> locked = new ConcurrentHashMap<>();
   /** Lock queue. */
   private final LockQueue queue;
 
   /** Global lock: exclusive lock for global writes, shared lock otherwise. */
-  private final ReentrantReadWriteLock globalLock;
+  private final ReentrantReadWriteLock globalLocks;
   /** Stores one lock for each lock string. */
-  private final Map<String, LocalLock> localLocks = new HashMap<>();
-  /** Mutex. */
-  private final Object mutex = new Object();
+  private final Map<String, LocalReadWriteLock> localLocks = new HashMap<>();
+  /** Lock object for queuing local writes and global reads. */
+  private final Object globalLock = new Object();
 
   /** Number of running local writers. */
   private int localWriters;
@@ -81,7 +79,7 @@ public final class Locking {
   public Locking(final StaticOptions soptions) {
     fair = soptions.get(StaticOptions.FAIRLOCK);
     parallel = Math.max(soptions.get(StaticOptions.PARALLEL), 1);
-    globalLock = new ReentrantReadWriteLock(fair);
+    globalLocks = new ReentrantReadWriteLock(fair);
     queue = fair ? new FairLockQueue() : new NonfairLockQueue();
   }
 
@@ -97,33 +95,27 @@ public final class Locking {
     // prepare lock strings and acquire locks
     final Locks locks = job.jc().locks;
     locks.finish(ctx);
-
     try {
-      acquire(locks.reads, locks.writes);
+      acquire(locks);
     } catch(final InterruptedException ex) {
-      Util.stack(ex);
-      throw Util.notExpected("Thread was interrupted: %");
+      throw Util.notExpected("Thread was interrupted: %", ex);
     }
   }
 
   /**
    * Puts read and write locks for the specified lock lists.
    * The lists must have been prepared for locking (see {@link Locks#finish(Context)}).
-   * @param reads read locks
-   * @param writes write locks
+   * @param locks locks
    * @throws InterruptedException interrupted exception
    */
-  void acquire(final LockList reads, final LockList writes) throws InterruptedException {
-    final Long id = Thread.currentThread().getId();
-
+  void acquire(final Locks locks) throws InterruptedException {
     // one thread can only hold a single lock
-    if(writeLocked.containsKey(id) || readLocked.containsKey(id)) {
-      throw new IllegalMonitorStateException("Thread already holds locks: " + id);
-    }
-    writeLocked.put(id, writes);
-    readLocked.put(id, reads);
+    final Long id = Thread.currentThread().getId();
+    if(locked.containsKey(id)) throw new IllegalMonitorStateException("Thread holds locks: " + id);
+    locked.put(id, locks);
 
     // queue job if the job limit has been reached
+    final LockList reads = locks.reads, writes = locks.writes;
     final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
     synchronized(queue) {
       if(jobs >= parallel) queue.wait(id, read, write);
@@ -131,17 +123,17 @@ public final class Locking {
     }
 
     // apply exclusive lock (global write), or shared lock otherwise
-    if(lock) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).lock();
+    if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
 
-    synchronized(mutex) {
+    synchronized(globalLock) {
       // local write locks: wait for completion of global readers
       if(writes.local()) {
-        while(globalReaders > 0) mutex.wait();
+        while(globalReaders > 0) globalLock.wait();
         localWriters++;
       }
       // global read lock: wait for completion of local writers (excluding the current job)
       if(reads.global()) {
-        while(localWriters > 1 || localWriters == 1 && !writes.local()) mutex.wait();
+        while(localWriters > 1 || localWriters == 1 && !writes.local()) globalLock.wait();
         globalReaders++;
       }
     }
@@ -163,7 +155,8 @@ public final class Locking {
    */
   public void release() {
     final Long id = Thread.currentThread().getId();
-    final LockList reads = readLocked.remove(id), writes = writeLocked.remove(id);
+    final Locks locks = locked.remove(id);
+    final LockList reads = locks.reads, writes = locks.writes;
     final boolean lock = reads.locking() || writes.locking();
 
     // release all local locks
@@ -171,23 +164,23 @@ public final class Locking {
     for(final String write : writes) unpin(write).writeLock().unlock();
 
     // allow next global reader to resume
-    synchronized(mutex) {
+    synchronized(globalLock) {
       if(reads.global()) {
         globalReaders--;
-        mutex.notifyAll();
+        globalLock.notifyAll();
       }
     }
 
     // allow next local writer to resume
-    synchronized(mutex) {
+    synchronized(globalLock) {
       if(writes.local()) {
         localWriters--;
-        mutex.notifyAll();
+        globalLock.notifyAll();
       }
     }
 
     // release exclusive lock (global write), or shared lock otherwise
-    if(lock) (writes.global() ? globalLock.writeLock() : globalLock.readLock()).unlock();
+    if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).unlock();
 
     // allow next queued job to resume
     synchronized(queue) {
@@ -201,11 +194,11 @@ public final class Locking {
    * @param string lock string
    * @return lock
    */
-  private LocalLock pin(final String string) {
+  private LocalReadWriteLock pin(final String string) {
     synchronized(localLocks) {
-      LocalLock lock = localLocks.get(string);
+      LocalReadWriteLock lock = localLocks.get(string);
       if(lock == null) {
-        lock = new LocalLock(fair);
+        lock = new LocalReadWriteLock(fair);
         localLocks.put(string, lock);
       }
       lock.pin();
@@ -218,9 +211,9 @@ public final class Locking {
    * @param string lock string
    * @return lock
    */
-  private LocalLock unpin(final String string) {
+  private LocalReadWriteLock unpin(final String string) {
     synchronized(localLocks) {
-      final LocalLock lock = localLocks.get(string);
+      final LocalReadWriteLock lock = localLocks.get(string);
       if(lock.unpin() == 0) {
         localLocks.remove(string);
       }
@@ -230,29 +223,20 @@ public final class Locking {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(NL);
-    sb.append("Locking").append(NL);
-    final String ind = "| ";
+    final StringBuilder sb = new StringBuilder(NL).append("Locking").append(NL);
+    final String in = "| ";
     synchronized(queue) {
-      sb.append(ind).append("Running jobs: ").append(jobs).append(NL);
-      sb.append(ind).append(queue).append(NL);
+      sb.append(in).append("Jobs: ").append(jobs).append(NL).append(in).append(queue).append(NL);
     }
-    sb.append(ind).append("Held locks by object:").append(NL);
+    sb.append(in).append("Held locks by object:").append(NL);
     synchronized(localLocks) {
-      for(final Entry<String, LocalLock> e : localLocks.entrySet()) {
-        sb.append(ind).append(ind).append(e.getKey()).append(" -> ").append(e.getValue()).
-          append(NL);
+      for(final Entry<String, LocalReadWriteLock> e : localLocks.entrySet()) {
+        sb.append(in).append(in).append(e.getKey()).append(" -> ").append(e.getValue()).append(NL);
       }
     }
-    sb.append(ind).append("Held write locks by job:").append(NL);
-    for(final Entry<Long, LockList> entry : writeLocked.entrySet()) {
-      sb.append(ind).append(ind).append(entry.getKey()).append(" -> ").append(entry.getValue()).
-        append(NL);
-    }
-    sb.append(ind).append("Held read locks by job:").append(NL);
-    for(final Entry<Long, LockList> entry : readLocked.entrySet()) {
-      sb.append(ind).append(ind).append(entry.getKey()).append(" -> ").
-        append(entry.getValue()).append(NL);
+    sb.append(in).append("Held locks by job:").append(NL);
+    for(final Entry<Long, Locks> e : locked.entrySet()) {
+      sb.append(in).append(in).append(e.getKey()).append(" -> ").append(e.getValue()).append(NL);
     }
     return sb.toString();
   }

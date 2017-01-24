@@ -45,7 +45,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /** Locking instance used for testing. */
-  private final Locking locks = new Locking(context.soptions);
+  private final Locking locking = new Locking(context.soptions);
   /** Objects used for locking. */
   private final String[] objects = { "0", "1", "2", "3", "4" };
   /** Empty string array for convenience. */
@@ -557,9 +557,7 @@ public final class LockingTest extends SandboxTest {
     /** Latch to count down after locking. */
     private final CountDownLatch countDown;
     /** Array of objects to put read locks onto (can be {@code null}). */
-    private final LockList readObjects = new LockList();
-    /** Array of objects to put write locks onto (can be {@code null}). */
-    private final LockList writeObjects = new LockList();
+    private final Locks locks = new Locks();
     /** Flag indicating to release locks after being notified. */
     private volatile boolean requestRelease;
 
@@ -576,15 +574,16 @@ public final class LockingTest extends SandboxTest {
       this.await = await;
       this.countDown = countDown;
       if(reads == null) {
-        readObjects.addGlobal();
+        locks.reads.addGlobal();
       } else {
-        for(final String read : reads) readObjects.add(read);
+        for(final String read : reads) locks.reads.add(read);
       }
       if(writes == null) {
-        writeObjects.addGlobal();
+        locks.writes.addGlobal();
       } else {
-        for(final String write : writes) writeObjects.add(write);
+        for(final String write : writes) locks.writes.add(write);
       }
+      locks.finish(context);
     }
 
     @Override
@@ -600,7 +599,7 @@ public final class LockingTest extends SandboxTest {
 
       // fetch lock if objects are set
       try {
-        locks.acquire(readObjects, writeObjects);
+        locking.acquire(locks);
 
         // we hold the lock, count down
         if(countDown != null) countDown.countDown();
@@ -610,7 +609,7 @@ public final class LockingTest extends SandboxTest {
           while(!requestRelease) wait();
         }
 
-        locks.release();
+        locking.release();
       } catch(final InterruptedException ex) {
         throw new RuntimeException("Unexpectedly interrupted.");
       }

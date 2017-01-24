@@ -1,10 +1,7 @@
 package org.basex.core.locks;
 
-import static org.basex.core.Text.*;
-
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -123,14 +120,14 @@ public final class LockList implements Iterable<String> {
    * Locks of type {@link Locking#COLLECTION} and {@link Locking#CONTEXT} will be replaced with the
    * name of the current database, if it exists, or deleted otherwise.
    * The resulting list will be sorted, and duplicates will be removed.
-   * @param data data reference
+   * @param name name of currently opened database
    */
-  public void finish(final Data data) {
+  public void finish(final String name) {
     for(int s = 0; s < list.size(); s++) {
       final String lock = list.get(s);
       if(Strings.eq(lock, Locking.COLLECTION, Locking.CONTEXT)) {
-        if(data == null) list.remove(s--);
-        else list.set(s, data.meta.name);
+        if(name == null) list.remove(s--);
+        else list.set(s, name);
       }
     }
     list.sort().unique();
@@ -139,9 +136,9 @@ public final class LockList implements Iterable<String> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(global) sb.append('(').append(GLOBAL).append(')');
-    else if(list.isEmpty()) sb.append('(').append(NONE).append(')');
-    else sb.append(LOCAL).append(' ').append(Arrays.toString(list.toArray()));
+    if(global) sb.append("(global)");
+    else if(list.isEmpty()) sb.append("(none)");
+    else sb.append(Arrays.toString(list.toArray()));
     return sb.toString();
   }
 

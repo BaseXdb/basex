@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
+import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -82,6 +83,8 @@ public abstract class Sandbox {
   protected static String query(final String query) {
     try {
       return eval(query);
+    } catch(final JobException ex) {
+      return "";
     } catch(final QueryException | IOException ex) {
       Util.stack(ex);
       final AssertionError err = new AssertionError("Query failed:\n" + query);
@@ -100,6 +103,8 @@ public abstract class Sandbox {
   protected static String eval(final String query) throws QueryException, IOException {
     final ArrayOutput ao = new ArrayOutput();
     try(QueryProcessor qp = new QueryProcessor(query, BASEURI, context)) {
+      // update flag will be set in parsing step
+      qp.parse();
       qp.register(context);
       try(Serializer ser = qp.getSerializer(ao)) {
         qp.value().serialize(ser);

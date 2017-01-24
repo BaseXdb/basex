@@ -174,6 +174,7 @@ public class FnHttpTest extends HTTPTest {
   public void sendEmptyReq() {
     try {
       new XQuery(_HTTP_SEND_REQUEST.args("<http:request/>")).execute(ctx);
+      fail("Error expected");
     } catch(final BaseXException ex) {
       assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
     }
@@ -187,6 +188,7 @@ public class FnHttpTest extends HTTPTest {
     final Command cmd = new XQuery(_HTTP_SEND_REQUEST.args("()"));
     try {
       cmd.execute(ctx);
+      fail("Error expected");
     } catch(final BaseXException ex) {
       assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
     }

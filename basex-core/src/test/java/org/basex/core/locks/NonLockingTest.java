@@ -19,117 +19,92 @@ public final class NonLockingTest extends SandboxTest {
   /** Query for returning all jobs except for the current one. */
   private static final String LIST_JOBS = _JOBS_LIST.args() + '[' + _JOBS_CURRENT.args() + "!= .]";
   /** Very slow query. */
-  private static final String SLEEPING_QUERY = _PROF_SLEEP.args(5000);
+  private static final String SLEEPING_QUERY = _PROF_SLEEP.args(10000);
 
-  /**
-   * Test.
-   * @throws Exception exception
-   */
-  @Test
-  public void nonLockingBeforeWrite() throws Exception {
+  /** Test. */
+  @Test public void nonLockingBeforeWrite() {
     execute(new CreateDB(NAME));
     try {
       // start slow query
       new Thread() {
         @Override
         public void run() {
-          try {
-            new XQuery(SLEEPING_QUERY).execute(context);
-          } catch(final Exception ignored) { }
+          query(SLEEPING_QUERY);
         }
       }.start();
 
       // start sleeping query
       String id;
-      do id = new XQuery(LIST_JOBS).execute(context); while(id.isEmpty());
+      do id = query(LIST_JOBS); while(id.isEmpty());
 
       // local locking: add document in parallel
-      new XQuery(_DB_ADD.args(NAME, "<a/>", "a.xml")).execute(context);
+      query(_DB_ADD.args(NAME, "<a/>", "a.xml"));
 
       // global locking: add document in parallel; see GH-1400
-      new XQuery("let $db := <a>" + NAME + "</a> return " + _DB_ADD.args("$db", "<a/>", "a.xml")).
-        execute(context);
+      query("let $db := <a>" + NAME + "</a> return " + _DB_ADD.args("$db", "<a/>", "a.xml"));
 
       // stop sleeping process, wait for its completion
-      new XQuery(_JOBS_STOP.args(id)).execute(context);
-      new XQuery(_JOBS_WAIT.args(id)).execute(context);
+      query(_JOBS_STOP.args(id));
+      query(_JOBS_WAIT.args(id));
 
     } finally {
-      new DropDB(NAME).execute(context);
+      execute(new DropDB(NAME));
     }
   }
 
-  /**
-   * Test.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void noLimitForNonLocking() throws BaseXException {
+  /** Test. */
+  @Test public void noLimitForNonLocking() {
     // start more than maximum number of queries
     final int count = context.soptions.get(StaticOptions.PARALLEL) + 1;
     for(int c = 0; c < count; c++) {
       new Thread() {
         @Override
         public void run() {
-          try {
-            new XQuery(SLEEPING_QUERY).execute(context);
-          } catch(final Exception ignored) { }
+          query(SLEEPING_QUERY);
         }
       }.start();
     }
 
     // ensure that all jobs are running
     Performance.sleep(1000);
-    assertEquals("", new XQuery(
-        _JOBS_LIST_DETAILS.args() + "[@state != 'running']").execute(context));
+    assertEquals("", query(_JOBS_LIST_DETAILS.args() + "[@state != 'running']"));
 
     // stop sleeping jobs
-    execute(new XQuery(LIST_JOBS + '!' + _JOBS_STOP.args(" .")));
+    query(LIST_JOBS + '!' + _JOBS_STOP.args(" ."));
   }
 
-  /**
-   * Test.
-   * @throws Exception exception
-   */
-  @Test
-  public void nonLockingAfterLocalWrite() throws Exception {
+  /** Test. */
+  @Test public void nonLockingAfterLocalWrite() {
     nonLockingAfterWrite(_DB_CREATE.args(NAME));
   }
 
-  /**
-   * Test.
-   * @throws Exception exception
-   */
-  @Test
-  public void nonLockingAfterGlobalWrite() throws Exception {
+  /** Test. */
+  @Test public void nonLockingAfterGlobalWrite() {
     nonLockingAfterWrite(_DB_CREATE.args("<_>" + NAME + "</_>"));
   }
 
   /**
    * Test.
    * @param query locking query to run
-   * @throws Exception exception
    */
-  private static void nonLockingAfterWrite(final String query) throws Exception {
+  private static void nonLockingAfterWrite(final String query) {
     try {
       // start slow query, global write lock
       new Thread() {
         @Override
         public void run() {
-          try {
-            new XQuery(SLEEPING_QUERY + ',' + query).execute(context);
-          } catch(final Exception ignored) { }
+          query(SLEEPING_QUERY + ',' + query);
         }
       }.start();
 
-      // check if this query is run before the sleeping queries are finished
-      assertEquals("1", new XQuery("1").execute(context));
+      // check if query execution causes a longer delay.
+      assertEquals("1", query("1"));
 
       // stop sleeping jobs
-      execute(new XQuery(LIST_JOBS + '!' + _JOBS_STOP.args(" .")));
+      query(LIST_JOBS + '!' + _JOBS_STOP.args(" ."));
 
     } finally {
-      new DropDB(NAME).execute(context);
+      execute(new DropDB(NAME));
     }
   }
 }
