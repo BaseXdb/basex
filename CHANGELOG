@@ -1,3 +1,29 @@
+VERSION 8.6 (January 24, 2017) -----------------------------------------
+
+ LOCKING
+ - jobs without database access will never be locked
+ - read transactions are now favored (adjustable via FAIRLOCK)
+
+ RESTXQ
+ - file monitoring was improved (adjustable via PARSERESTXQ)
+ - authentication was reintroduced (no passwords anymore in web.xml)
+ - id session attributes will show up in log data
+
+ DBA
+ - always accessible, even if job queue is full
+ - pagination of table results
+
+ INDEXING
+ - path index improved: distinct values storage for numeric types
+
+ XQUERY
+ - aligned with latest version of XQuery 3.1
+ - updated functions: map:find, map:merge, fn:sort, array:sort, ...
+ - enhancements in User, Process, Jobs, REST and Database Module
+
+ CSV DATA
+ - improved import/export compatibility with Excel data 
+
 VERSION 8.5.3 (August 15, 2016) ----------------------------------------
 
  Minor bug fixes, improved thread-safety.
