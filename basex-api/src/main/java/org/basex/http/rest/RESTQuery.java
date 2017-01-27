@@ -49,7 +49,7 @@ class RESTQuery extends RESTCmd {
     context.options.set(MainOptions.SERIALIZER, conn.sopts());
     conn.initResponse();
 
-    for(final Command cmd : session.commands) {
+    for(final Command cmd : session) {
       if(cmd instanceof XQuery) {
         final XQuery xq = (XQuery) cmd;
         // create query instance
@@ -86,7 +86,8 @@ class RESTQuery extends RESTCmd {
   static RESTQuery get(final RESTSession session, final String query,
       final Map<String, String[]> vars, final String val) throws IOException {
 
-    session.add(new XQuery(query).baseURI(session.context.soptions.get(StaticOptions.WEBPATH)));
+    final String uri = session.conn.context.soptions.get(StaticOptions.WEBPATH);
+    session.add(new XQuery(query).baseURI(uri));
     return new RESTQuery(session, vars, val);
   }
 }

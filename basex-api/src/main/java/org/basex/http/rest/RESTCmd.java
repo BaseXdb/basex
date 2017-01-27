@@ -35,7 +35,7 @@ abstract class RESTCmd extends Command {
    * @param session REST session
    */
   RESTCmd(final RESTSession session) {
-    super(max(session.commands));
+    super(max(session));
     this.session = session;
     jc().type(RESTText.REST);
   }
@@ -45,7 +45,7 @@ abstract class RESTCmd extends Command {
     final Locks locks = jc().locks;
     final LockList reads = locks.reads, writes = locks.writes;
 
-    for(final Command cmd : session.commands) {
+    for(final Command cmd : session) {
       cmd.addLocks();
       // if command updates the context, it may affect any database that has been opened before.
       // hence, all read locks will be added to list of write locks
@@ -59,9 +59,8 @@ abstract class RESTCmd extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    boolean up = false;
-    for(final Command cmd : session.commands) up |= cmd.updating(ctx);
-    return up;
+    for(final Command cmd : session) updating |= cmd.updating(ctx);
+    return updating;
   }
 
   @Override
@@ -136,13 +135,13 @@ abstract class RESTCmd extends Command {
   }
 
   /**
-   * Returns the maximum permission from the specified commands.
-   * @param cmds commands to be checked
+   * Returns the strictest permission required for the specified commands.
+   * @param session commands to be checked
    * @return permission
    */
-  private static Perm max(final ArrayList<Command> cmds) {
+  private static Perm max(final RESTSession session) {
     Perm p = Perm.NONE;
-    for(final Command cmd : cmds) p = p.max(cmd.perm);
+    for(final Command cmd : session) p = p.max(cmd.perm);
     return p;
   }
 
@@ -169,7 +168,7 @@ abstract class RESTCmd extends Command {
       final boolean force) throws BaseXException {
 
     final String key = param.getKey().toUpperCase(Locale.ENGLISH);
-    final MainOptions options = session.context.options;
+    final MainOptions options = session.conn.context.options;
     final boolean found = options.option(key) != null;
     if(found || force) options.assign(key, param.getValue()[0]);
     return found;

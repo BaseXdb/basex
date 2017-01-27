@@ -107,8 +107,10 @@ public final class QueryInfo {
       tb.add(HITS_X_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
       tb.add(PRINTED_CC).add(Performance.format(printed)).add(NL);
-      tb.add(READ_LOCKING_CC).addExt(locks.reads).add(NL);
-      tb.add(WRITE_LOCKING_CC).addExt(locks.writes).add(NL);
+      if(locks != null) {
+        tb.add(READ_LOCKING_CC).addExt(locks.reads).add(NL);
+        tb.add(WRITE_LOCKING_CC).addExt(locks.writes).add(NL);
+      }
     }
     final IO baseIO = qp.sc.baseIO();
     final String name = baseIO == null ? "" : " \"" + baseIO.name() + '"';

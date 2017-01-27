@@ -43,7 +43,7 @@ final class RESTRun extends RESTQuery {
       final Map<String, String[]> vars, final String val) throws IOException {
 
     // get root directory for files
-    final Context context = session.context;
+    final Context context = session.conn.context;
     final String webpath = context.soptions.get(StaticOptions.WEBPATH);
     final String rpath = context.soptions.get(StaticOptions.RESTPATH);
     final IOFile root = new IOFile(webpath).resolve(rpath);

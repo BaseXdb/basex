@@ -31,7 +31,7 @@ final class RESTRetrieve extends RESTCmd {
   @Override
   protected void run0() throws IOException {
     // open addressed database
-    for(final Command cmd : session.commands) run(cmd);
+    for(final Command cmd : session) run(cmd);
 
     final HTTPConnection conn = session.conn;
     final SerializerOptions sopts = conn.sopts();

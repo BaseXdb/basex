@@ -9,7 +9,6 @@ import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.io.out.*;
@@ -56,7 +55,6 @@ public abstract class AQuery extends Command {
    * @return success flag
    */
   final boolean query(final String query) {
-    final Performance perf = new Performance();
     String error;
     if(exception != null) {
       error = Util.message(exception);
@@ -73,9 +71,10 @@ public abstract class AQuery extends Command {
             popJob();
           }
           init(query, context);
-          parse(perf);
+
           if(r == 0) plan(false);
 
+          final Performance perf = new Performance();
           qp.compile();
           info.compiling += perf.time();
           if(r == 0) plan(true);
@@ -125,33 +124,14 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Parses the query.
-   * @param perf performance
-   * @throws QueryException query exception
-   */
-  private void parse(final Performance perf) throws QueryException {
-    qp.http(http);
-    for(final Entry<String, String[]> entry : vars.entrySet()) {
-      final String name = entry.getKey();
-      final String[] value = entry.getValue();
-      if(name == null) qp.context(value[0], value[1]);
-      else qp.bind(name, value[0], value[1]);
-    }
-    qp.parse();
-    if(perf != null) info.parsing += perf.time();
-  }
-
-  /**
-   * Checks if the query possibly performs updates.
+   * Checks if the query is updating.
    * @param ctx database context
    * @param query query string
    * @return result of check
    */
   final boolean updates(final Context ctx, final String query) {
     try {
-      final Performance perf = new Performance();
       init(query, ctx);
-      parse(perf);
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -162,15 +142,28 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Initializes the query processor.
+   * Initializes the query processor, .
    * @param query query string
    * @param ctx database context
+   * @throws QueryException query exception
    */
-  private void init(final String query, final Context ctx) {
-    if(qp == null) {
-      qp = pushJob(new QueryProcessor(query, uri, ctx));
-      if(info == null) info = qp.qc.info;
+  private void init(final String query, final Context ctx) throws QueryException {
+    final Performance perf = new Performance();
+    if(qp == null) qp = pushJob(new QueryProcessor(query, uri, ctx));
+    if(info == null) {
+      info = qp.qc.info;
+      info.locks = jc().locks;
     }
+
+    qp.http(http);
+    for(final Entry<String, String[]> entry : vars.entrySet()) {
+      final String name = entry.getKey();
+      final String[] value = entry.getValue();
+      if(name == null) qp.context(value[0], value[1]);
+      else qp.bind(name, value[0], value[1]);
+    }
+    qp.parse();
+    qp.qc.info.parsing += perf.time();
   }
 
   /**
@@ -181,7 +174,6 @@ public abstract class AQuery extends Command {
   public final String parameters(final Context ctx) {
     try {
       init(args[0], ctx);
-      parse(null);
       return qp.qc.serParams().toString();
     } catch(final QueryException ex) {
       error(Util.message(ex));
@@ -254,12 +246,10 @@ public abstract class AQuery extends Command {
 
   @Override
   public void addLocks() {
-    final Locks locks = jc().locks;
     if(qp == null) {
-      locks.writes.addGlobal();
+      jc().locks.writes.addGlobal();
     } else {
       qp.addLocks();
-      info.locks = locks;
     }
   }
 

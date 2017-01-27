@@ -24,7 +24,7 @@ public final class RESTServlet extends BaseXServlet {
     // generate and run commands
     final RESTCmd cmd = command(session);
     try {
-      cmd.execute(session.context);
+      cmd.execute(conn.context);
     } catch(final BaseXException ex) {
       // ignore error if code was assigned (same error message)
       if(cmd.code == null) throw ex;

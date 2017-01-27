@@ -40,6 +40,10 @@ public class Execute extends Command {
   @Override
   public final void addLocks() {
     final Locks locks = jc().locks;
+    for(final Command cmd : commands) {
+      final Locks cmdLocks = cmd.jc().locks;
+      (cmd.updating ? cmdLocks.writes : cmdLocks.reads).addGlobal();
+    }
     (updating ? locks.writes : locks.reads).addGlobal();
   }
 

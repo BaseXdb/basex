@@ -12,13 +12,11 @@ import org.basex.http.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class RESTSession {
-  /** Commands to be executed. */
-  final ArrayList<Command> commands = new ArrayList<>();
+final class RESTSession implements Iterable<Command> {
   /** HTTP connection. */
   final HTTPConnection conn;
-  /** Client context. */
-  final Context context;
+  /** Commands to be executed. */
+  private final ArrayList<Command> commands = new ArrayList<>();
 
   /**
    * Constructor, specifying login data and an output stream.
@@ -26,7 +24,6 @@ final class RESTSession {
    */
   RESTSession(final HTTPConnection conn) {
     this.conn = conn;
-    context = conn.context;
   }
 
   /**
@@ -49,5 +46,17 @@ final class RESTSession {
     commands.add(cmd);
     cmd.setInput(is);
     return this;
+  }
+
+  /**
+   * Clears the command list.
+   */
+  void clear() {
+    commands.clear();
+  }
+
+  @Override
+  public Iterator<Command> iterator() {
+    return commands.iterator();
   }
 }

@@ -2,7 +2,6 @@ package org.basex.core.locks;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.util.*;
 
 /**
  * Read and write locks of a single job.
@@ -21,7 +20,7 @@ public final class Locks {
    * removes duplicates, assigns global read lock if global write lock exists.
    * @param ctx database context
    */
-  void finish(final Context ctx) {
+  public void finish(final Context ctx) {
     // global write lock: no read locks required
     if(writes.global()) reads.reset();
 
@@ -37,6 +36,6 @@ public final class Locks {
 
   @Override
   public String toString() {
-    return Util.className(getClass()) + ": Read " + reads + ", Write " + writes + ']';
+    return "Reads: " + reads + ", Writes: " + writes;
   }
 }

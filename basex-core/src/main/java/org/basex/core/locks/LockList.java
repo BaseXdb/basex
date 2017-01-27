@@ -134,16 +134,12 @@ public final class LockList implements Iterable<String> {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    if(global) sb.append("(global)");
-    else if(list.isEmpty()) sb.append("(none)");
-    else sb.append(Arrays.toString(list.toArray()));
-    return sb.toString();
+  public Iterator<String> iterator() {
+    return list.iterator();
   }
 
   @Override
-  public Iterator<String> iterator() {
-    return list.iterator();
+  public String toString() {
+    return global ? "(global)" : list.isEmpty() ? "(none)" : Strings.join(list.toArray(), ",");
   }
 }

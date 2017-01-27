@@ -36,7 +36,7 @@ final class RESTPut {
 
     RESTCmd.parseOptions(session);
 
-    final MainOptions options = session.context.options;
+    final MainOptions options = conn.context.options;
     final InputStream is = conn.req.getInputStream();
     final MediaType mt = conn.contentType();
 
@@ -71,7 +71,7 @@ final class RESTPut {
     final String path = conn.dbpath();
     if(path.isEmpty()) {
       // do not OPEN database
-      session.commands.clear();
+      session.clear();
       if(xml) {
         session.add(new CreateDB(db), is);
       } else {

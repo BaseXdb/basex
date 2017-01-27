@@ -28,7 +28,7 @@ final class RESTList extends RESTCmd {
   @Override
   protected void run0() throws IOException {
     String result = "";
-    for(final Command cmd : session.commands) result = run(cmd);
+    for(final Command cmd : session) result = run(cmd);
 
     final Table table = new Table(result);
     final FElem el = new FElem(RESTText.Q_DATABASES).declareNS();

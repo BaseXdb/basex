@@ -30,7 +30,7 @@ final class RESTCommand extends RESTCmd {
     conn.sopts().set(SerializerOptions.METHOD, SerialMethod.TEXT);
     conn.initResponse();
 
-    for(final Command cmd : session.commands) run(cmd, conn.res.getOutputStream());
+    for(final Command cmd : session) run(cmd, conn.res.getOutputStream());
   }
 
   /**
@@ -42,7 +42,7 @@ final class RESTCommand extends RESTCmd {
    */
   static RESTCommand get(final RESTSession session, final String input) throws BaseXException {
     try {
-      session.add(CommandParser.get(input, session.context).parseSingle());
+      session.add(CommandParser.get(input, session.conn.context).parseSingle());
       return new RESTCommand(session);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);

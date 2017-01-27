@@ -44,7 +44,7 @@ final class RESTPost {
     final byte[] input = new NewlineInput(conn.req.getInputStream()).encoding(enc).content();
     validate(input);
 
-    final Context ctx = session.context;
+    final Context ctx = conn.context;
     final DBNode doc;
     try {
       doc = new DBNode(new IOContent(input));
