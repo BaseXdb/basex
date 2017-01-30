@@ -2,8 +2,6 @@ package org.basex.query.func.jobs;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.core.cmd.JobsList;
 import org.basex.core.jobs.*;
@@ -11,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.list.*;
 
@@ -51,36 +48,20 @@ public final class JobsListDetails extends StandardFunc {
     final TokenList ids = exprs.length == 0 ? JobsList.ids(ctx) :
       new TokenList(1).add(toToken(exprs[0], qc));
 
+    final int max = ctx.soptions.get(StaticOptions.LOGMSGMAXLEN);
     final JobPool jobs = ctx.jobs;
-    final int ml = ctx.soptions.get(StaticOptions.LOGMSGMAXLEN);
     final ValueBuilder vb = new ValueBuilder();
+
+    final byte[][] atts = { ID, TYPE, STATE, USER, DURATION, START, END, READS, WRITES };
     for(final byte[] key : ids) {
-      final String id = string(key);
-      Job job = jobs.active.get(id);
-      final JobTask jt = jobs.tasks.get(id);
-      final JobResult jr = jobs.results.get(id);
-      if(job == null && jr != null) job = jr.job;
-      if(job == null && jt != null) job = jt.job;
-      if(job == null) continue;
-
-      final JobContext jc = job.jc();
-      final long ms = jc.performance != null
-          ? (System.nanoTime() - jc.performance.start()) / 1000000 : jr != null
-          ? jr.time / 1000000 : -1;
-
+      final TokenList entry = JobsList.entry(key, jobs, max);
       final FElem elem = new FElem(JOB);
-      elem.add(ID, id);
-      elem.add(TYPE, jc.type());
-      elem.add(STATE, job.state.toString().toLowerCase(Locale.ENGLISH));
-      elem.add(USER, jc.context.user().name());
-      elem.add(READS, jc.locks.reads.toString());
-      elem.add(WRITES, jc.locks.writes.toString());
-      if(ms >= 0) elem.add(DURATION, DTDur.get(ms).string(info));
-      if(jt != null) {
-        elem.add(START, Dtm.get(jt.start).string(info));
-        if(jt.end != Long.MAX_VALUE) elem.add(END, Dtm.get(jt.end).string(info));
+      final int al = atts.length;
+      for(int a = 0; a < al; a++) {
+        final byte[] value = entry.get(a);
+        if(value.length != 0) elem.add(atts[a], value);
       }
-      elem.add(chop(normalize(token(jc.toString())), ml));
+      elem.add(entry.get(entry.size() - 1));
       vb.add(elem);
     }
     return vb.value();

@@ -193,6 +193,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
         popJob();
         qp = null;
         result.time += jc.performance.time();
+        // invalidates the performance measurements
+        jc.performance = null;
       }
 
       if(remove) ctx.jobs.tasks.remove(jc.id());

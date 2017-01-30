@@ -788,6 +788,10 @@ public interface Text {
   String END = lang("end");
   /** "User". */
   String USER = lang("user");
+  /** "Reads". */
+  String READS = lang("reads");
+  /** "Writes". */
+  String WRITES = lang("writes");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
 
