@@ -24,4 +24,5 @@ VOLUME ["/srv/.m2", "/srv/BaseXData"]
 WORKDIR /srv
 
 # Run BaseX HTTP server by default, logging to STDOUT
-CMD ["/usr/local/bin/basexhttp", "-d"]
+ENTRYPOINT ["/usr/local/bin/basexhttp"]
+CMD ["-d"]
