@@ -1,5 +1,7 @@
 package org.basex.query.value.map;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
@@ -260,7 +262,14 @@ final class TrieBranch extends TrieNode {
 
   @Override
   StringBuilder append(final StringBuilder sb) {
-    for(int i = 0; i < KIDS; i++) if(kids[i] != null) kids[i].append(sb);
+    for(int i = 0; i < KIDS; i++) {
+      if(kids[i] != null) kids[i].append(sb);
+      if(sb.length() > 32 && i + 1 < KIDS) {
+        // output is chopped to prevent too long error strings
+        sb.append(SEP).append(DOTS);
+        break;
+      }
+    }
     return sb;
   }
 }
