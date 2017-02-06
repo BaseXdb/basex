@@ -297,6 +297,14 @@ public abstract class Command extends Job {
     return this;
   }
 
+  /**
+   * Returns the base URI.
+   * @return base URI
+   */
+  public String baseURI() {
+    return uri;
+  }
+
   @Override
   public final String toString() {
     return toString(false);

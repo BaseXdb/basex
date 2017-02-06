@@ -184,7 +184,10 @@ public final class TextView extends View {
     // otherwise, the displayed text and the cached result are equal
 
     // create new command instance
-    if(cacheCmd) cachedCmd = CommandParser.get(command.toString(), gui.context).parseSingle();
+    if(cacheCmd) {
+      cachedCmd = CommandParser.get(command.toString(), gui.context).parseSingle();
+      cachedCmd.baseURI(command.baseURI());
+    }
   }
 
   /**
