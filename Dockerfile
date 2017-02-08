@@ -5,7 +5,7 @@ MAINTAINER BaseX Team <basex-talk@mailman.uni-konstanz.de>
 COPY . /usr/src/basex/
 RUN cd /usr/src/basex && \
     mvn clean install -DskipTests && \
-    ln -s /usr/src/basex/basex-*/etc/* /usr/local/bin
+    ln -s /usr/src/basex/basex-*/etc/* /usr/local/bin && \
     cp -r /usr/src/basex/basex-api/src/main/webapp/WEB-INF /srv
 
 # Run as non-privileged user with fixed UID
