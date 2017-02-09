@@ -23,5 +23,5 @@ EXPOSE 1984 8984 8985
 VOLUME ["/srv/.m2", "/srv/BaseXData"]
 WORKDIR /srv
 
-# Run BaseX HTTP server by default, logging to STDOUT
-CMD ["/usr/local/bin/basexhttp", "-d"]
+# Run BaseX HTTP server by default
+CMD ["/usr/local/bin/basexhttp"]
