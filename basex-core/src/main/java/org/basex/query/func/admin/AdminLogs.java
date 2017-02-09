@@ -58,6 +58,7 @@ public final class AdminLogs extends AdminFn {
                   Strings.eq(l2.type, LogType.OK.name(), LogType.ERROR.name())) {
                 l1.type = l2.type;
                 l1.ms = l1.ms.add(l2.ms);
+                l1.message = Strings.join(new String[] { l1.message, l2.message }, "; ");
                 iter2.remove();
                 break;
               }

@@ -415,7 +415,7 @@ public final class ClientListener extends Thread implements ClientInfo {
 
     } catch(final Throwable ex) {
       // log exception (static or runtime)
-      error = Util.message(ex);
+      error = Util.bug(ex);
       log(LogType.REQUEST, sc + "[" + arg + ']');
       log(LogType.ERROR, error);
       queries.remove(arg);

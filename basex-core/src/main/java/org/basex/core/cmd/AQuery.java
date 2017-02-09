@@ -113,7 +113,6 @@ public abstract class AQuery extends Command {
         error = BASX_STACKOVERFLOW.desc;
       } catch(final RuntimeException ex) {
         extError("");
-        Util.debug(info());
         throw ex;
       } finally {
         // close processor after exceptions
@@ -194,16 +193,16 @@ public abstract class AQuery extends Command {
 
   /**
    * Returns an extended error message.
-   * @param err error message
+   * @param message error message
    * @return result of check
    */
-  private boolean extError(final String err) {
+  private boolean extError(final String message) {
     // will only be evaluated when an error has occurred
     final StringBuilder sb = new StringBuilder();
     if(options.get(MainOptions.QUERYINFO)) {
       sb.append(info()).append(qp.info()).append(NL).append(ERROR).append(COL).append(NL);
     }
-    sb.append(err);
+    sb.append(message);
     return error(sb.toString());
   }
 
