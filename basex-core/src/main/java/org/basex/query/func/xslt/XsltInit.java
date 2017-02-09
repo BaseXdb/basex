@@ -10,9 +10,10 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class XsltVersion extends XsltFn {
+public final class XsltInit extends XsltFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return Str.get(IMPL[OFFSET + 2]);
+    CACHE.clear();
+    return null;
   }
 }

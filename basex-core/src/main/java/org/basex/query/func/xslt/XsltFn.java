@@ -2,17 +2,22 @@ package org.basex.query.func.xslt;
 
 import static org.basex.util.Reflect.*;
 
+import java.util.concurrent.*;
+
 import javax.xml.transform.*;
 
 import org.basex.query.func.*;
 
 /**
- * Functions for performing XSLT transformations.
+ * Function implementation.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 abstract class XsltFn extends StandardFunc {
+  /** Transformer cache. */
+  static final ConcurrentHashMap<String, Transformer> CACHE = new ConcurrentHashMap<>();
+
   /** XSLT implementations. */
   static final String[] IMPL = {
     "", "Java", "1.0",

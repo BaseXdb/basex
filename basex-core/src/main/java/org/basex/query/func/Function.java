@@ -1337,15 +1337,17 @@ public enum Function {
   /* XSLT Module. */
 
   /** XQuery function. */
+  _XSLT_INIT(XsltInit.class, "init()", arg(), NOD, flag(NDT), XSLT_URI),
+  /** XQuery function. */
   _XSLT_PROCESSOR(XsltProcessor.class, "processor()", arg(), STR, XSLT_URI),
   /** XQuery function. */
   _XSLT_VERSION(XsltVersion.class, "version()", arg(), STR, XSLT_URI),
   /** XQuery function. */
-  _XSLT_TRANSFORM(XsltTransform.class, "transform(input,stylesheet[,params])",
-      arg(ITEM, ITEM, MAP_O), NOD, flag(NDT), XSLT_URI),
+  _XSLT_TRANSFORM(XsltTransform.class, "transform(input,stylesheet[,params[,options]])",
+      arg(ITEM, ITEM, MAP_ZO, MAP_O), NOD, flag(NDT), XSLT_URI),
   /** XQuery function. */
   _XSLT_TRANSFORM_TEXT(XsltTransformText.class, "transform-text(input,stylesheet[,params])",
-      arg(ITEM, ITEM, MAP_O), STR, flag(NDT), XSLT_URI),
+      arg(ITEM, ITEM, MAP_ZO), STR, flag(NDT), XSLT_URI),
 
   /* ZIP Module. */
 

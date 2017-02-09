@@ -67,7 +67,7 @@ public final class FuncOptions {
 
   /**
    * Assign options to the specified options.
-   * @param item item to be converted
+   * @param item item to be converted (can be {@code null})
    * @param options options
    * @param <T> option type
    * @return specified options
@@ -79,7 +79,7 @@ public final class FuncOptions {
 
   /**
    * Assigns options to the specified options.
-   * @param item item to be parsed
+   * @param item item to be parsed (can be {@code null})
    * @param options options
    * @param <T> option type
    * @param error raise error code
