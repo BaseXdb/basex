@@ -80,7 +80,7 @@ public final class CreateDB extends ACreate {
       }
 
       // close open database
-      close(context);
+      Close.close(context);
 
       final Data data;
       if(options.get(MainOptions.MAINMEM)) {
@@ -118,7 +118,7 @@ public final class CreateDB extends ACreate {
         }
       })) return false;
 
-      if(options.get(MainOptions.CREATEONLY)) close(context);
+      if(options.get(MainOptions.CREATEONLY)) Close.close(context);
       return true;
 
     } catch(final JobException ex) {

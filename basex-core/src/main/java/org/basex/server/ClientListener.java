@@ -139,6 +139,7 @@ public final class ClientListener extends Thread implements ClientInfo {
           command.execute(context, new ServerOutput(out));
           info = command.info();
         } catch(final BaseXException ex) {
+          Util.debug(ex);
           ok = false;
           info = ex.getMessage();
         }
@@ -227,7 +228,7 @@ public final class ClientListener extends Thread implements ClientInfo {
     context.sessions.remove(this);
 
     try {
-      new Close().run(context);
+      Close.close(context);
       socket.close();
     } catch(final Throwable ex) {
       log(LogType.ERROR, Util.message(ex));
@@ -415,7 +416,7 @@ public final class ClientListener extends Thread implements ClientInfo {
 
     } catch(final Throwable ex) {
       // log exception (static or runtime)
-      error = Util.bug(ex);
+      error = ex instanceof RuntimeException ? Util.bug(ex) : Util.message(ex);
       log(LogType.REQUEST, sc + "[" + arg + ']');
       log(LogType.ERROR, error);
       queries.remove(arg);

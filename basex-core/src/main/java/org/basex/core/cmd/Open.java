@@ -43,7 +43,7 @@ public final class Open extends Command {
     // check if database is already opened
     Data data = context.data();
     if(data == null || !data.meta.name.equals(db)) {
-      close(context);
+      Close.close(context);
       try {
         data = open(db, context, options);
         context.openDB(data);
@@ -68,7 +68,7 @@ public final class Open extends Command {
 
   @Override
   public boolean newData(final Context ctx) {
-    return close(ctx);
+    return Close.close(ctx);
   }
 
   /**

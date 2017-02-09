@@ -401,15 +401,6 @@ public abstract class Command extends Job {
    */
   protected static boolean close(final Context ctx, final String db) {
     final Data data = ctx.data();
-    return data != null && db.equals(data.meta.name) && ctx.datas.pins(db) == 1 && close(ctx);
-  }
-
-  /**
-   * Closes the current database.
-   * @param ctx database context
-   * @return {@code true} if no database was opened, or if database was closed
-   */
-  protected static boolean close(final Context ctx) {
-    return new Close().run(ctx);
+    return data != null && db.equals(data.meta.name) && ctx.datas.pins(db) == 1 && Close.close(ctx);
   }
 }

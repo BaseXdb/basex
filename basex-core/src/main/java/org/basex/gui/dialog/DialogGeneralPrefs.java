@@ -200,7 +200,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     if(source == dbPath || source == dbButton) {
       final String dbpath = dbPath.getText();
       if(!opts.get(StaticOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
-        new Close().run(gui.context);
+        Close.close(gui.context);
         gui.notify.init();
       }
       opts.set(StaticOptions.DBPATH, dbpath);

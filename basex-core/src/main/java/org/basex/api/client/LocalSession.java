@@ -115,7 +115,7 @@ public class LocalSession extends Session {
 
   @Override
   public synchronized void close() {
-    new Close().run(ctx);
+    Close.close(ctx);
   }
 
   @Override

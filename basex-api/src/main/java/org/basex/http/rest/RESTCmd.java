@@ -71,7 +71,7 @@ abstract class RESTCmd extends Command {
     } catch(final IOException ex) {
       return error(ex.getMessage());
     } finally {
-      new Close().run(context);
+      Close.close(context);
     }
   }
 
