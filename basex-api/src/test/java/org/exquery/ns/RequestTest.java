@@ -8,6 +8,8 @@ import org.basex.http.*;
 import org.basex.util.*;
 import org.junit.*;
 
+import org.basex.TestUtil;
+
 /**
  * This class tests the Request Module.
  *
@@ -120,8 +122,8 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void headerNames() throws Exception {
-    assertEquals("Host,Accept,Connection,User-Agent",
-        get("?query=" + request("string-join(R:header-names(), ',')")));
+    assertTrue(TestUtil.stringPartsMatch("Host,Accept,Connection,User-Agent",
+        get("?query=" + request("string-join(R:header-names(), ',')"))));
   }
 
   /**

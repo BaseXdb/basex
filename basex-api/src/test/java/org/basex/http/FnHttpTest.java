@@ -29,6 +29,8 @@ import org.basex.util.http.HttpRequest.Part;
 import org.junit.*;
 import org.junit.Test;
 
+import org.basex.TestUtil;
+
 /**
  * This class tests the server-based HTTP Client.
  *
@@ -692,7 +694,11 @@ public class FnHttpTest extends HTTPTest {
     expected.add(Str.get("...plain text....\n"));
     expected.add(Str.get(".... richtext..."));
     expected.add(Str.get(".... fanciest formatted version  \n..."));
-    compare(expected.value(), returned);
+
+    String expectedAsStr = TestUtil.serializeValue(expected.value());
+    String returnedAsStr = TestUtil.serializeValue(returned);
+
+    assertTrue(TestUtil.expectedAndReturnedLinesMatch(expectedAsStr, returnedAsStr, "xmlns:http='http://expath.org/ns/http-client'"));
   }
 
   /**
@@ -771,28 +777,10 @@ public class FnHttpTest extends HTTPTest {
     expected.add(Str.get("This is explicitly typed plain ASCII text.\n"
         + "It DOES end with a linebreak.\n"));
 
-    compare(expected.value(), returned);
-  }
+    String expectedAsStr = TestUtil.serializeValue(expected.value());
+    String returnedAsStr = TestUtil.serializeValue(returned);
 
-  /**
-   * Compares results.
-   * @param expected expected result
-   * @param returned returned result
-   * @throws Exception exception
-   */
-  private static void compare(final Value expected, final Value returned) throws Exception {
-    // Compare response with expected result
-    assertEquals("Different number of results", expected.size(), returned.size());
-
-    final long es = expected.size();
-    for(int e = 0; e < es; e++) {
-      final Item exp = expected.itemAt(e), ret = returned.itemAt(e);
-      if(!new DeepEqual().equal(exp, ret)) {
-        final TokenBuilder tb = new TokenBuilder("Result ").addLong(e).add(" differs:\nReturned: ");
-        tb.addExt(ret.serialize()).add("\nExpected: ").addExt(exp.serialize());
-        fail(tb.toString());
-      }
-    }
+    assertTrue(TestUtil.expectedAndReturnedLinesMatch(expectedAsStr, returnedAsStr, "xmlns:http='http://expath.org/ns/http-client'"));
   }
 
   /**
