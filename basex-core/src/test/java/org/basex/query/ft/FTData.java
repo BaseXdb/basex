@@ -407,7 +407,7 @@ abstract class FTData extends QueryTest {
         "//w[. contains text 'fifth' ftand 'third' " +
         "ftand 'second' window 7 words ordered]" },
 
-      { "FTScope 1", nodes(25, 27, 29, 31, 33),
+      { "FTScope 1", nodes(27, 29, 33),
         "//fti[. contains text 'wordt ook' same sentence]" },
       { "FTScope 2", nodes(27, 29, 33),
         "//fti[text() contains text 'wordt' ftand 'ook' same sentence]" },

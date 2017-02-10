@@ -35,6 +35,7 @@ public final class FTScope extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
+    // same unit
     if(same) {
       int s = -1;
       for(final FTStringMatch sm : match) {
@@ -42,16 +43,17 @@ public final class FTScope extends FTFilter {
         final int p = pos(sm.start, lexer);
         if(s == -1) s = p;
         else if(s != p) return false;
+        if(sm.start != sm.end && s != pos(sm.end, lexer)) return false;
       }
       return true;
     }
+    // different unit
     int c = 0;
     final BoolList bl = new BoolList();
     for(final FTStringMatch sm : match) {
       if(sm.exclude) continue;
       c++;
-      final int p = pos(sm.start, lexer);
-      final int s = bl.size();
+      final int p = pos(sm.start, lexer), s = bl.size();
       if(p < s && bl.get(p) && p == pos(sm.end, lexer)) return false;
       bl.set(p, true);
     }
