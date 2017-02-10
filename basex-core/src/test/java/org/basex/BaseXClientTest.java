@@ -15,7 +15,6 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@Ignore
 public final class BaseXClientTest extends BaseXTest {
   @Override
   protected String run(final String... args) throws IOException {
