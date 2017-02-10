@@ -786,12 +786,34 @@ public class FnHttpTest extends HTTPTest {
 
     final long es = expected.size();
     for(int e = 0; e < es; e++) {
-      final Item exp = expected.itemAt(e), ret = returned.itemAt(e);
+      Item exp = expected.itemAt(e), ret = returned.itemAt(e);
+      // reorder response headers
+      if(exp.type == NodeType.ELM) exp = reorderHeaders(exp);
+      if(ret.type == NodeType.ELM) ret = reorderHeaders(ret);
+      // compare items
       if(!new DeepEqual().equal(exp, ret)) {
         final TokenBuilder tb = new TokenBuilder("Result ").addLong(e).add(" differs:\nReturned: ");
         tb.addExt(ret.serialize()).add("\nExpected: ").addExt(exp.serialize());
         fail(tb.toString());
       }
+    }
+  }
+
+  /**
+   * Sorts HTTP headers.
+   * @param xml original element
+   * @return element with reordered headers
+   * @throws QueryException query exception
+   */
+  private static Item reorderHeaders(final Item xml) throws QueryException {
+    final String query = ". update {"
+      + " delete nodes http:header,"
+      + " for $h in http:header"
+      + " order by $h/@name"
+      + " return insert node $h as first into ."
+      + "}";
+    try(QueryProcessor qp = new QueryProcessor(query, ctx).context(xml)) {
+      return qp.iter().next();
     }
   }
 

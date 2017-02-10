@@ -120,8 +120,9 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void headerNames() throws Exception {
-    assertEquals("Host,Accept,Connection,User-Agent",
-        get("?query=" + request("string-join(R:header-names(), ',')")));
+    final String result = get("?query=" + request("string-join(R:header-names(), ',')"));
+    assertEquals("Accept,Connection,Host,User-Agent",
+        query("``[" + result + "]`` => tokenize(',') => sort() => string-join(',')"));
   }
 
   /**
