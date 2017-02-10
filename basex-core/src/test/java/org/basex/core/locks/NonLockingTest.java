@@ -3,9 +3,15 @@ package org.basex.core.locks;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
+import java.io.*;
+
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.jobs.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.Test;
 
@@ -68,7 +74,31 @@ public final class NonLockingTest extends SandboxTest {
     Performance.sleep(2000);
 
     final String q = _JOBS_LIST_DETAILS.args() + "[@state != 'running']";
-    final String r = query(q);
+
+    String r = null;
+    try {
+      final ArrayOutput ao = new ArrayOutput();
+      try(QueryProcessor qp = new QueryProcessor(q,
+          new File(".").getAbsolutePath(), context)) {
+        // update flag will be set in parsing step
+        qp.parse();
+        qp.register(context);
+        try(Serializer ser = qp.getSerializer(ao)) {
+          qp.value().serialize(ser);
+        } finally {
+          qp.unregister(context);
+        }
+      }
+      r = ao.toString();
+
+    } catch(final JobException ex) {
+      r = "";
+    } catch(final QueryException | IOException ex) {
+      Util.stack(ex);
+      final AssertionError err = new AssertionError("Query failed:\n" + q);
+      err.initCause(ex);
+      throw err;
+    }
     assertEquals("", r);
 
     // stop sleeping jobs
