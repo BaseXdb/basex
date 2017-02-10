@@ -12,6 +12,7 @@ import org.basex.core.jobs.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 import org.junit.Test;
 
@@ -84,7 +85,8 @@ public final class NonLockingTest extends SandboxTest {
         qp.parse();
         qp.register(context);
         try(Serializer ser = qp.getSerializer(ao)) {
-          qp.value().serialize(ser);
+          final Value v = qp.value();
+          v.serialize(ser);
         } finally {
           qp.unregister(context);
         }
