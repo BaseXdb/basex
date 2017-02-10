@@ -19,7 +19,7 @@ public final class NonLockingTest extends SandboxTest {
   /** Query for returning all jobs except for the current one. */
   private static final String LIST_JOBS = _JOBS_LIST.args() + '[' + _JOBS_CURRENT.args() + "!= .]";
   /** Very slow query. */
-  private static final String SLEEPING_QUERY = _PROF_SLEEP.args(10000);
+  private static final String SLEEP_10_SECONDS = _PROF_SLEEP.args(10000);
 
   /** Test. */
   @Test public void nonLockingBeforeWrite() {
@@ -29,7 +29,7 @@ public final class NonLockingTest extends SandboxTest {
       new Thread() {
         @Override
         public void run() {
-          query(SLEEPING_QUERY);
+          query(SLEEP_10_SECONDS);
         }
       }.start();
 
@@ -60,14 +60,16 @@ public final class NonLockingTest extends SandboxTest {
       new Thread() {
         @Override
         public void run() {
-          query(SLEEPING_QUERY);
+          query(SLEEP_10_SECONDS);
         }
       }.start();
     }
-
     // ensure that all jobs are running
-    Performance.sleep(1000);
-    assertEquals("", query(_JOBS_LIST_DETAILS.args() + "[@state != 'running']"));
+    Performance.sleep(2000);
+
+    final String q = _JOBS_LIST_DETAILS.args() + "[@state != 'running']";
+    final String r = query(q);
+    assertEquals("", r);
 
     // stop sleeping jobs
     query(LIST_JOBS + '!' + _JOBS_STOP.args(" ."));
@@ -93,7 +95,7 @@ public final class NonLockingTest extends SandboxTest {
       new Thread() {
         @Override
         public void run() {
-          query(SLEEPING_QUERY + ',' + query);
+          query(SLEEP_10_SECONDS + ',' + query);
         }
       }.start();
 
