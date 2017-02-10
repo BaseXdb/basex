@@ -348,14 +348,12 @@ public final class IOFile extends IO {
     }
   }
 
-  // STATIC METHODS ===============================================================================
-
   /**
    * Returns a {@link Path} instance of this file.
    * @return path
    * @throws IOException I/O exception
    */
-  private Path toPath() throws IOException {
+  public Path toPath() throws IOException {
     try {
       return Paths.get(pth);
     } catch(final InvalidPathException ex) {
@@ -363,6 +361,8 @@ public final class IOFile extends IO {
       throw new IOException(ex);
     }
   }
+
+  // STATIC METHODS ===============================================================================
 
   /**
    * Adds the relative paths of all descendant files to the specified list.

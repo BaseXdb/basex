@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -32,6 +33,8 @@ public final class ProjectView extends BaseXPanel {
   /** Filter list. */
   final ProjectList list;
 
+  /** Paths that are queued to be refreshed. */
+  private final Map<String, Boolean> refreshQueue = new ConcurrentHashMap<>();
   /** Filter field. */
   private final ProjectFilter filter;
   /** Root path. */
@@ -39,6 +42,8 @@ public final class ProjectView extends BaseXPanel {
   /** Splitter. */
   private final BaseXSplit split;
 
+  /** File watcher. */
+  private ProjectWatcher watcher;
   /** Last focused component. */
   private Component last;
   /** Indicates if the current project files have been parsed. */
@@ -74,7 +79,6 @@ public final class ProjectView extends BaseXPanel {
         BaseXLayout.border(3, 1, 3, 2)));
 
     rootPath = new BaseXTextField(gui);
-    rootPath.setText(root.file.path());
     rootPath.setEnabled(false);
 
     final BaseXButton browse = new BaseXButton(DOTS, gui);
@@ -119,6 +123,7 @@ public final class ProjectView extends BaseXPanel {
         refresh(false, false);
       }
     });
+    setRoot(root.file);
   }
 
   /**
@@ -127,22 +132,6 @@ public final class ProjectView extends BaseXPanel {
    */
   void showList(final boolean vis) {
     split.visible(vis);
-  }
-
-  /**
-   * Refreshes the view after a file has been saved.
-   * @param file file to be opened
-   * @param rename file has been renamed
-   */
-  public void save(final IOFile file, final boolean rename) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        final IOFile path = file.normalize();
-        if(path.path().startsWith(root.file.path())) refreshTree(path);
-        refresh(rename, file.hasSuffix(IO.XQSUFFIXES));
-      }
-    });
   }
 
   /**
@@ -190,8 +179,8 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Refreshes the project view.
-   * @param reset invalidate the file cache
-   * @param parse parse
+   * @param reset invalidate file cache
+   * @param parse parse query modules
    */
   private void refresh(final boolean reset, final boolean parse) {
     if(reset) files.reset();
@@ -233,25 +222,61 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Refreshes the rendering of the specified file, or its parent, in the tree.
+   * Updates file names and file sizes.
+   * It may possibly be hidden in the current tree.
+   * @param file file to be refreshed
+   * @param reset reset flag
+   */
+  void refreshTree(final IOFile file, final boolean reset) {
+    final String path = file.path();
+    if(refreshQueue.containsKey(path)) return;
+
+    refreshQueue.put(path, Boolean.TRUE);
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        refreshTree(file);
+        refresh(reset, file.isDir() || file.hasSuffix(IO.XQSUFFIXES));
+        refreshQueue.remove(path);
+      }
+    });
+  }
+
+  /**
+   * Refreshes the rendering of the specified file, or its parent, in the tree.
+   * Updates file names and file sizes.
    * It may possibly be hidden in the current tree.
    * @param file file to be refreshed
    */
   private void refreshTree(final IOFile file) {
-    final ProjectNode node = find(file.path());
+    final ProjectNode node = find(file);
     if(node != null) {
+      // node found: move child selection to this node
+      final ProjectNode selected = tree.selectedNode();
+      if(selected != null && selected != node) {
+        final Enumeration<?> en = node.depthFirstEnumeration();
+        while(en.hasMoreElements()) {
+          if(selected == en.nextElement()) {
+            tree.jump(node);
+            break;
+          }
+        }
+      }
       node.refresh();
     } else {
+      // node not found: check ancestors
       final IOFile parent = file.parent();
       if(parent != null) refreshTree(parent);
     }
   }
 
   /**
-   * Returns the node for the specified file.
-   * @param path path of file to be found
+   * Returns the node for the specified file path.
+   * @param file file to be refreshed
    * @return node or {@code null}
    */
-  private ProjectNode find(final String path) {
+  private ProjectNode find(final IOFile file) {
+    final String path = file.path().replaceAll("/$", "");
     final Enumeration<?> en = root.depthFirstEnumeration();
     while(en.hasMoreElements()) {
       final ProjectNode node = (ProjectNode) en.nextElement();
@@ -340,13 +365,24 @@ public final class ProjectView extends BaseXPanel {
   public void changeRoot(final IOFile io, final boolean force) {
     final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
     if(!force && !project.isEmpty()) return;
+
+    if(watcher != null) watcher.close();
     root.file = io;
     root.refresh();
     refresh();
-    rootPath.setText(io.path());
     if(force) {
       gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
       gui.gopts.write();
     }
+    setRoot(io);
+  }
+
+  /**
+   * Changes the root directory.
+   * @param io root directory
+   */
+  public void setRoot(final IOFile io) {
+    rootPath.setText(io.path());
+    watcher = new ProjectWatcher(io, this);
   }
 }
