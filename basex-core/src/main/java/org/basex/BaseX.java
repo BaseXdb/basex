@@ -204,10 +204,8 @@ public class BaseX extends CLI {
    */
   private Pair<String, String> input(final String input) throws IOException {
     final IO io = IO.get(input);
-    return new Pair<>(
-      io instanceof IOContent ? "." : io.path(),
-      io.exists() && !io.isDir() ? io.string() : input
-    );
+    final boolean file = !(io instanceof IOContent) && io.exists() && !io.isDir();
+    return new Pair<>(file ? io.path() : ".", file ? io.string() : input);
   }
 
   /**
