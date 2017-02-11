@@ -250,7 +250,7 @@ public class QueryParser extends InputParser {
       if(hs) cp = input.codePointAt(i);
       if(!XMLToken.valid(cp)) {
         pos = i;
-        throw error(QUERYINV_X, cp);
+        throw error(MODLEINV_X, cp);
       }
       i += hs ? Character.charCount(cp) : 1;
     }

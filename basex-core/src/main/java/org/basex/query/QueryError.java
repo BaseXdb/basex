@@ -780,7 +780,7 @@ public enum QueryError {
   /** XPST0003. */
   QUERYEMPTY(XPST, 3, "Empty query."),
   /** XPST0003. */
-  QUERYINV_X(XPST, 3, "Query contains an illegal character (#%)."),
+  MODLEINV_X(XPST, 3, "Module contains illegal character: #%."),
   /** XPST0003. */
   NOQUOTE_X(XPST, 3, "Expecting quote%."),
   /** XPST0003. */
