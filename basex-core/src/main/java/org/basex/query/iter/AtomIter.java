@@ -27,14 +27,13 @@ public final class AtomIter extends Iter {
    * @param iter input iterator
    * @param qc query context
    * @param info input info
-   * @param array may be array
+   * @param size iterator size (can be {@code -1})
    */
-  public AtomIter(final Iter iter, final QueryContext qc, final InputInfo info,
-      final boolean array) {
+  public AtomIter(final Iter iter, final QueryContext qc, final InputInfo info, final long size) {
     this.iter = iter;
     this.info = info;
     this.qc = qc;
-    size = array ? -1 : iter.size();
+    this.size = size;
   }
 
   @Override
