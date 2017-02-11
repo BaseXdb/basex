@@ -27,7 +27,6 @@ final class TrieList extends TrieNode {
 
   /**
    * Constructor.
-   *
    * @param hash hash value
    * @param keys key array
    * @param values value array
@@ -322,8 +321,9 @@ final class TrieList extends TrieNode {
 
   @Override
   StringBuilder append(final StringBuilder sb) {
-    for(int i = size; --i >= 0;)
-      sb.append(keys[i]).append(ASSIGN).append(values[i]).append(", ");
+    for(int i = size; --i >= 0 && more(sb);) {
+      sb.append(keys[i]).append(MAPASG).append(values[i]).append(SEP);
+    }
     return sb;
   }
 }

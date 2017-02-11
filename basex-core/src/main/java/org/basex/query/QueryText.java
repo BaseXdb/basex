@@ -359,6 +359,7 @@ public interface QueryText {
 
   // QUERY PLAN ===================================================================================
 
+  /** Query Info. */ String MAPASG = ": ";
   /** Query Info. */ String SEP = ", ";
   /** Query Info. */ String DOTS = "...";
   /** Query Info. */ String ARG = "arg";

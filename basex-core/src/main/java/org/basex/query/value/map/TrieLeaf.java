@@ -1,6 +1,7 @@
 package org.basex.query.value.map;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
@@ -216,6 +217,7 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   StringBuilder append(final StringBuilder sb) {
-    return sb.append(key).append(": ").append(value).append(", ");
+    if(more(sb)) sb.append(key).append(MAPASG).append(value).append(SEP);
+    return sb;
   }
 }

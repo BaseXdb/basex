@@ -341,11 +341,6 @@ public final class Map extends FItem {
 
   @Override
   public String toString() {
-    final StringBuilder sb = root.append(new StringBuilder(MAP).append(" { "));
-    // remove superfluous comma
-    if(root.size > 0 && sb.substring(sb.length() - 2).equals(", ")) {
-      sb.deleteCharAt(sb.length() - 2);
-    }
-    return sb.append('}').toString();
+    return MAP + " { " + root.append(new StringBuilder()).toString().replaceAll(", $", "") + " }";
   }
 }

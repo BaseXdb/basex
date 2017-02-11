@@ -1,5 +1,7 @@
 package org.basex.query.value.map;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
@@ -276,5 +278,16 @@ abstract class TrieNode {
   @Override
   public String toString() {
     return append(new StringBuilder(), "").toString();
+  }
+
+  /**
+   * Checks if string building should be continued.
+   * @param sb string builder
+   * @return result of check
+   */
+  boolean more(final StringBuilder sb) {
+    if(sb.length() <= 32) return true;
+    if(!sb.substring(sb.length() - DOTS.length()).equals(DOTS)) sb.append(DOTS);
+    return false;
   }
 }
