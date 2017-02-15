@@ -22,6 +22,8 @@ public final class DialogBindings extends BaseXDialog {
   private final BaseXTextField[] names = new BaseXTextField[MAX];
   /** Values. */
   private final BaseXTextField[] values = new BaseXTextField[MAX];
+  /** Context item. */
+  private final BaseXTextField ctxitem;
 
   /**
    * Default constructor.
@@ -30,7 +32,7 @@ public final class DialogBindings extends BaseXDialog {
   public DialogBindings(final GUI main) {
     super(main, EXTERNAL_VARIABLES);
 
-    final BaseXBack table = new BaseXBack(new TableLayout(MAX + 1, 2, 8, 4));
+    final BaseXBack table = new BaseXBack(new TableLayout(MAX + 2, 2, 8, 4));
     table.add(new BaseXLabel(NAME + COLS, false, true));
     table.add(new BaseXLabel(VALUE + COLS, false, true));
     for(int c = 0; c < MAX; c++) {
@@ -41,6 +43,11 @@ public final class DialogBindings extends BaseXDialog {
       BaseXLayout.setWidth(values[c], 200);
       table.add(values[c]);
     }
+    table.add(new BaseXLabel("Context item" + COLS));
+    ctxitem = new BaseXTextField(this);
+    BaseXLayout.setWidth(ctxitem, 200);
+    table.add(ctxitem);
+
     set(table, BorderLayout.CENTER);
     set(okCancel(), BorderLayout.SOUTH);
 
@@ -55,21 +62,18 @@ public final class DialogBindings extends BaseXDialog {
   private void fill() {
     final MainOptions opts = gui.context.options;
     int c = 0;
-    boolean empty = false;
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
-      String name = entry.getKey();
+      final String name = entry.getKey(), value = entry.getValue();
       if(name.isEmpty()) {
-        empty = true;
-        name = ".";
-      } else {
-        name = '$' + name;
+        ctxitem.setText(value);
+      } else if(c < MAX) {
+        names[c].setText('$' + name.replaceAll("^\\$", ""));
+        values[c].setText(value);
+        c++;
       }
-      names[c].setText(name);
-      values[c].setText(entry.getValue());
-      if(++c == MAX) break;
     }
     for(; c < MAX; c++) {
-      names[c].setText(empty || c < MAX - 1 ? "$" : ".");
+      names[c].setText("$");
       values[c].setText("");
     }
   }
@@ -81,17 +85,13 @@ public final class DialogBindings extends BaseXDialog {
     super.close();
     final StringBuilder bind = new StringBuilder();
     for(int c = 0; c < MAX; c++) {
-      String name = names[c].getText().trim();
-      if(name.isEmpty() || name.equals("$")) continue;
-      if(name.startsWith("$")) {
-        name = name.substring(1);
-      } else if(name.equals(".")) {
-        name = "";
-      }
-      final String value = values[c].getText();
-      if(bind.length() != 0) bind.append(',');
-      bind.append((name + '=' + value).replaceAll(",", ",,"));
+      final String name = names[c].getText().replaceAll("^\\s*\\$|\\s+$", "");
+      if(!name.isEmpty())
+        bind.append((name + '=' + values[c].getText()).replaceAll(",", ",,")).append(',');
     }
-    gui.set(MainOptions.BINDINGS, bind.toString());
+    final String value = ctxitem.getText();
+    if(!value.isEmpty()) bind.append('=').append(value.replaceAll(",", ",,")).append(',');
+
+    gui.set(MainOptions.BINDINGS, bind.toString().replaceAll(",$", ""));
   }
 }
