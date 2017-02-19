@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -32,6 +33,8 @@ public final class ProjectView extends BaseXPanel {
   /** Filter list. */
   final ProjectList list;
 
+  /** Paths that are queued to be refreshed. */
+  private final Map<String, Boolean> refreshQueue = new ConcurrentHashMap<>();
   /** Filter field. */
   private final ProjectFilter filter;
   /** Root path. */
@@ -225,8 +228,18 @@ public final class ProjectView extends BaseXPanel {
    * @param reset reset flag
    */
   void refreshTree(final IOFile file, final boolean reset) {
-    refreshTree(file);
-    refresh(reset, file.isDir() || file.hasSuffix(IO.XQSUFFIXES));
+    final String path = file.path();
+    if(refreshQueue.containsKey(path)) return;
+
+    refreshQueue.put(path, Boolean.TRUE);
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        refreshTree(file);
+        refresh(reset, file.isDir() || file.hasSuffix(IO.XQSUFFIXES));
+        refreshQueue.remove(path);
+      }
+    });
   }
 
   /**

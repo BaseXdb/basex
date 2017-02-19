@@ -5,9 +5,6 @@ import static java.nio.file.StandardWatchEventKinds.*;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.WatchEvent.*;
-import java.util.*;
-import java.util.Map.*;
-import java.util.Timer;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -19,16 +16,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class ProjectWatcher extends Thread {
-  /** Paths to be refreshed (with reset flag). */
-  private final Map<String, Boolean> queue = new HashMap<>();
   /** Project view. */
   private final ProjectView view;
-  /** Timer. */
-  private final Timer timer = new Timer(true);
   /** Watch service. */
   private WatchService watcher;
-  /** Timer. */
-  private TimerTask task;
 
   /**
    * Constructor.
@@ -59,7 +50,7 @@ final class ProjectWatcher extends Thread {
             final IOFile child = new IOFile(((Path) dir).resolve((Path) context).toFile());
             final Kind<?> kind = event.kind();
             if(kind == ENTRY_CREATE) register(child);
-            schedule(child, kind != ENTRY_MODIFY);
+            view.refreshTree(child, kind != ENTRY_MODIFY);
           }
         }
         key.reset();
@@ -68,20 +59,6 @@ final class ProjectWatcher extends Thread {
       // watcher has been closed
       Util.debug(ex);
     } catch(final Exception ex) {
-      Util.errln(ex);
-    }
-  }
-
-  /**
-   * Closes the watcher.
-   */
-  void close() {
-    if(watcher == null) return;
-    try {
-      timer.cancel();
-      watcher.close();
-      watcher = null;
-    } catch(final IOException ex) {
       Util.errln(ex);
     }
   }
@@ -99,43 +76,15 @@ final class ProjectWatcher extends Thread {
   }
 
   /**
-   * Creates a new timer task.
-   * @param file file to be refreshed
-   * @param reset reset flag
+   * Closes the watcher.
    */
-  private void schedule(final IOFile file, final boolean reset) {
-    if(task != null) task.cancel();
-
-    // register new path: create new map without redundant child paths
-    final HashMap<String, Boolean> map = new HashMap<>();
-    // append slash to avoid that prefix path check does not confuse files and directories
-    final String path = file.path() + (file.isDir() ? "/" : "");
-    synchronized(queue) {
-      map.put(path, reset);
-      for(final Entry<String, Boolean> entry : queue.entrySet()) {
-        final String key = entry.getKey();
-        final boolean value = entry.getValue();
-        if(key.startsWith(path)) {
-          map.put(path, reset || value || (map.containsKey(path) && map.get(path)));
-        } else {
-          map.put(key, value);
-        }
-      }
-      queue.clear();
-      queue.putAll(map);
+  void close() {
+    if(watcher == null) return;
+    try {
+      watcher.close();
+      watcher = null;
+    } catch(final IOException ex) {
+      Util.errln(ex);
     }
-
-    task = new TimerTask() {
-      @Override
-      public void run() {
-        for(final Entry<String, Boolean> entry : map.entrySet()) {
-          view.refreshTree(new IOFile(entry.getKey()), entry.getValue());
-          synchronized(queue) {
-            queue.remove(entry.getKey());
-          }
-        }
-      }
-    };
-    timer.schedule(task, 50);
   }
 }
