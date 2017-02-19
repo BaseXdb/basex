@@ -89,23 +89,15 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
       final String np = ch.file.path();
       // path found
       if(path.equals(np)) {
-        jump(ch);
+        final TreePath cp = ch.path();
+        setSelectionPath(cp);
+        scrollPathToVisible(cp);
         return true;
       }
       // expand child path
       if(path.startsWith(np)) return expand(ch, path);
     }
     return false;
-  }
-
-  /**
-   * Jumps to the specified node.
-   * @param node target node
-   */
-  void jump(final ProjectNode node) {
-    final TreePath cp = node.path();
-    setSelectionPath(cp);
-    scrollPathToVisible(cp);
   }
 
   @Override
@@ -236,6 +228,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         if(gui.editor.delete(node.file)) {
           parent.refresh();
           setSelectionPath(parent.path());
+          view.refresh();
         } else {
           BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
         }
@@ -255,6 +248,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public void execute() {
       startEditingAtPath(selectedNode().path());
+      view.refresh();
     }
 
     @Override public boolean enabled(final GUI main) {
