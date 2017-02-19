@@ -292,7 +292,7 @@ query_info           = Lekérdezési információk
 query_plan           = Lekérdezésterv
 ratio                = Arány
 read_locking         = Olvasási zárolás
-reads                = Reads
+reads                = Olvasások
 recently_opened      = Utoljára megnyitott fájlok
 red                  = Piros
 redo                 = Ismétlés
@@ -410,7 +410,7 @@ view                 = Nézet
 visualization        = Megjelenítés
 whole_word           = Egész szó
 write_locking        = Írási zárolása
-writes               = Writes
+writes               = Írások
 yes                  = Igen
 
 # Help texts
