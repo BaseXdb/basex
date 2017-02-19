@@ -13,20 +13,20 @@ import org.basex.io.*;
 abstract class ProjectNode extends DefaultMutableTreeNode {
   /** Project view. */
   final ProjectView project;
-  /** Path. */
+  /** File reference ({@code null} for invisible dummy). */
   IOFile file;
   /** Error flag. */
   boolean error;
 
   /**
    * Constructor.
-   * @param io file reference
-   * @param proj project view
+   * @param file file reference ({@code null} for dummy)
+   * @param project project view
    */
-  ProjectNode(final IOFile io, final ProjectView proj) {
-    super(io == null ? null : io.name());
-    file = io;
-    project = proj;
+  ProjectNode(final IOFile file, final ProjectView project) {
+    super(file == null ? null : file.name());
+    this.file = file;
+    this.project = project;
   }
 
   @Override
@@ -51,18 +51,13 @@ abstract class ProjectNode extends DefaultMutableTreeNode {
   /**
    * Refreshes the current node.
    */
-  final void refresh() {
-    collapse();
-    expand();
-    updateTree();
-  }
+  abstract void refresh();
 
   /**
    * Updates the tree structure.
    */
   final void updateTree() {
-    final DefaultTreeModel model = (DefaultTreeModel) project.tree.getModel();
-    model.nodeStructureChanged(this);
+    ((DefaultTreeModel) project.tree.getModel()).nodeStructureChanged(this);
     project.repaint();
   }
 

@@ -155,14 +155,15 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Finds nodes to be highlighted as erroneous and refreshes the tree.
+   * @param node node to start from
    */
-  void refreshTree() {
+  void refreshTree(final ProjectNode node) {
     // loop through all tree nodes
-    final Set<String> errPaths = files.errors().keySet();
-    final Enumeration<?> en = root.depthFirstEnumeration();
+    final Set<String> errPaths = errors().keySet();
+    final Enumeration<?> en = node.depthFirstEnumeration();
     while(en.hasMoreElements()) {
-      final ProjectNode node = (ProjectNode) en.nextElement();
-      final IOFile file = node.file;
+      final ProjectNode child = (ProjectNode) en.nextElement();
+      final IOFile file = child.file;
       if(file == null) continue;
 
       final String path = file.path(), dirPath = path + '/';
@@ -176,7 +177,7 @@ public final class ProjectView extends BaseXPanel {
           break;
         }
       }
-      node.error = found;
+      child.error = found;
     }
     repaint();
   }
@@ -214,7 +215,7 @@ public final class ProjectView extends BaseXPanel {
         }
         @Override
         protected void done(final Boolean refresh) {
-          if(refresh) refreshTree();
+          if(refresh) refreshTree(root);
         }
       }.execute();
     }

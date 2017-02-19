@@ -12,11 +12,11 @@ import org.basex.util.*;
 final class ProjectFile extends ProjectNode {
   /**
    * Constructor.
-   * @param io file
-   * @param proj project view
+   * @param file file ({@code null} for dummy)
+   * @param project project view
    */
-  ProjectFile(final IOFile io, final ProjectView proj) {
-    super(io, proj);
+  ProjectFile(final IOFile file, final ProjectView project) {
+    super(file, project);
   }
 
   @Override
@@ -24,6 +24,11 @@ final class ProjectFile extends ProjectNode {
 
   @Override
   void collapse() { }
+
+  @Override
+  void refresh() {
+    project.refreshTree(this);
+  }
 
   @Override
   public String toString() {

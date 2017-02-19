@@ -22,11 +22,11 @@ final class ProjectDir extends ProjectNode {
 
   /**
    * Constructor.
-   * @param io file
-   * @param proj project view
+   * @param file file
+   * @param project project view
    */
-  ProjectDir(final IOFile io, final ProjectView proj) {
-    super(io, proj);
+  ProjectDir(final IOFile file, final ProjectView project) {
+    super(file, project);
     addDummy();
   }
 
@@ -44,14 +44,21 @@ final class ProjectDir extends ProjectNode {
     // create child nodes
     for(final IOFile f : dirs) add(new ProjectDir(f, project));
     for(final IOFile f : files) add(new ProjectFile(f, project));
-    project.refreshTree();
+    project.refreshTree(this);
   }
 
   @Override
   void collapse() {
     removeAllChildren();
     addDummy();
-    project.refreshTree();
+    project.refreshTree(this);
+  }
+
+  @Override
+  void refresh() {
+    collapse();
+    expand();
+    updateTree();
   }
 
   /**
