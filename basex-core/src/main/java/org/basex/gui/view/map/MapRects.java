@@ -67,13 +67,12 @@ final class MapRects implements Iterable<MapRect> {
   }
 
   /**
-   * Returns the position of the specified value or -1 if it has not been found.
-   * @param r rectangle (pre value) to be found
-   * @return rectangle position of -1
+   * Returns the rectangle index with the specified pre value, or -1 if it has not been found.
+   * @param p pre value of the rectangle to be found
+   * @return rectangle position, or {@code -1}
    */
-  int find(final MapRect r) {
+  int find(final int p) {
     if(sorted == null) sort();
-    final int p = r.pre;
     int l = 0;
     int h = size - 1;
     while(l <= h) {

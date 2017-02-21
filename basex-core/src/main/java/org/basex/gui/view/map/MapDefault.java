@@ -53,8 +53,7 @@ final class MapDefault extends MapPainter {
       r.pos = ftpos != null ? ftpos.get(data, pre) : null;
       g.setColor(mark ? col : GUIConstants.color(lvl));
 
-      if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
-          ViewData.leaf(gopts, data, pre)) {
+      if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 || ViewData.leaf(gopts, data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {
         // painting only border for non-leaf nodes..

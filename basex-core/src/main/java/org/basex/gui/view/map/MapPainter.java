@@ -30,8 +30,8 @@ abstract class MapPainter {
   }
 
   /**
-   * Returns next color mark.
-   * @param rects rectangle array
+   * Returns color mark.
+   * @param rects rectangles to be drawn
    * @param ri current position
    * @return next color mark
    */
@@ -39,12 +39,13 @@ abstract class MapPainter {
     // find marked node
     final DBNodes marked = view.gui.context.marked;
     if(marked != null) {
-      final int p = -marked.find(rects.get(ri).pre) - 1;
-      if(p >= 0) {
-        // mark ancestor of invisible node;
-        final int i = rects.find(rects.get(ri));
-        return p < marked.size() && i + 1 < rects.size && marked.sorted(p) <
-          rects.sorted[i + 1].pre ? GUIConstants.colormark2 : null;
+      final int pre = rects.get(ri).pre;
+      final int m = -marked.find(pre) - 1;
+      if(m >= 0) {
+        // mark ancestor of invisible node
+        final int r = rects.find(pre);
+        return m < marked.size() && r + 1 < rects.size && marked.sorted(m) <
+          rects.sorted[r + 1].pre ? GUIConstants.colormark2 : null;
       }
     }
     // no mark found
@@ -54,7 +55,7 @@ abstract class MapPainter {
   /**
    * Draws the specified rectangles.
    * @param g graphics reference
-   * @param r rectangle array
+   * @param r rectangles to be drawn
    * @param scale scale boarders using this factor
    */
   abstract void drawRectangles(Graphics g, MapRects r, float scale);

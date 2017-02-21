@@ -437,8 +437,8 @@ public final class MapView extends View {
 
   /**
    * Creates a buffered image for the treemap.
-   * @param map Image to draw the map on
-   * @param rects calculated rectangles
+   * @param map image to draw the map on
+   * @param rects rectangles to be drawn
    * @param sc scale the rectangles
    */
   private void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
