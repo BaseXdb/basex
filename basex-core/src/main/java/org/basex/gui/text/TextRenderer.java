@@ -452,14 +452,14 @@ final class TextRenderer extends BaseXBack {
       if(iter.erroneous()) drawError(g);
 
       // don't write whitespaces
-      if(ch == '\n' && showNL) {
+      if(showNL && ch == '\n') {
         g.setColor(GUIConstants.gray);
         g.drawString("\u00b6", x, y);
-      } else if((ch == '\u00a0' || ch >= 0x2000 && ch <= 0x200A) && showInvisible) {
+      } else if(showInvisible && (ch == '\u00a0' || ch >= 0x2000 && ch <= 0x202F)) {
         final int s = fontHeight / 12 + 1;
         g.setColor(GUIConstants.gray);
         g.fillRect(x + (wordWidth >> 1), y - fontHeight * 3 / 10, s, s);
-      } else if(ch == '\t' && showInvisible) {
+      } else if(showInvisible && ch == '\t') {
         final int yy = y - fontHeight * 3 / 10;
         final int s = 1 + fontHeight / 12;
         final int xe = x + fontWidth(g, '\t') - s;
@@ -552,7 +552,7 @@ final class TextRenderer extends BaseXBack {
   /**
    * Returns the width of the specified codepoint.
    * @param g graphics reference
-   * @param cp character
+   * @param cp codepoint
    * @return width
    */
   private int fontWidth(final Graphics g, final int cp) {
