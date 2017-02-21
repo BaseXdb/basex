@@ -40,7 +40,7 @@ final class ProjectList extends JList<String> {
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }, null,
     new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
-      @Override public void execute() { project.refresh(); }
+      @Override public void execute() { view.refresh(); }
     }, null,
     new GUIPopupCmd(COPY_PATH, BaseXKeys.COPYPATH) {
       @Override public void execute() {
@@ -51,16 +51,16 @@ final class ProjectList extends JList<String> {
   };
 
   /** Project view. */
-  private final ProjectView project;
+  private final ProjectView view;
   /** Content search string. */
   private String search = "";
 
   /**
    * Constructor.
-   * @param project project view
+   * @param view project view
    */
-  ProjectList(final ProjectView project) {
-    this.project = project;
+  ProjectList(final ProjectView view) {
+    this.view = view;
     setBorder(BaseXLayout.border(4, 4, 4, 4));
     setCellRenderer(new CellRenderer());
     addMouseListener(new MouseAdapter() {
@@ -69,7 +69,7 @@ final class ProjectList extends JList<String> {
         if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
       }
     });
-    new BaseXPopup(this, project.gui, commands);
+    new BaseXPopup(this, view.gui, commands);
   }
 
   /**
@@ -116,7 +116,7 @@ final class ProjectList extends JList<String> {
    * Open all selected files.
    */
   private void open() {
-    for(final IOFile file : selectedValues()) project.open(file, search);
+    for(final IOFile file : selectedValues()) view.open(file, search);
   }
 
   /**
@@ -127,7 +127,7 @@ final class ProjectList extends JList<String> {
       try {
         file.open();
       } catch(final IOException ex) {
-        BaseXDialog.error(project.gui, Util.info(FILE_NOT_OPENED_X, file));
+        BaseXDialog.error(view.gui, Util.info(FILE_NOT_OPENED_X, file));
       }
     }
   }
@@ -137,7 +137,7 @@ final class ProjectList extends JList<String> {
    */
   private void test() {
     for(final IOFile file : selectedValues())  {
-      project.gui.execute(new Test(file.path()));
+      view.gui.execute(new Test(file.path()));
     }
   }
 

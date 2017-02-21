@@ -106,7 +106,6 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;
       node.expand();
-      node.updateTree();
     }
   }
 
@@ -116,7 +115,6 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;
       node.collapse();
-      node.updateTree();
     }
   }
 
@@ -183,30 +181,37 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     NewDirCmd() { super(NEW_DIR, BaseXKeys.NEWDIR); }
 
     @Override public void execute() {
-      ProjectNode parent = selectedNode();
-      if(parent instanceof ProjectFile) parent = (ProjectNode) parent.getParent();
+      final ProjectNode node = selectedNode();
+      final ProjectNode dir = node instanceof ProjectDir ? node : (ProjectNode) node.getParent();
 
       // choose free name
       String name = '(' + NEW_DIR + ')';
-      IOFile file = new IOFile(parent.file, name);
+      IOFile file = new IOFile(dir.file, name);
       int c = 1;
       while(file.exists()) {
         name = '(' + NEW_DIR + ' ' + ++c + ')';
-        file = new IOFile(parent.file, name);
+        file = new IOFile(dir.file, name);
       }
       if(file.md()) {
-        setSelectionPaths(null);
-        parent.refresh();
-        final int cl = parent.getChildCount();
-        for(int i = 0; i < cl; i++) {
-          final ProjectNode node = (ProjectNode) parent.getChildAt(i);
-          if(node.file.name().equals(name)) {
-            final TreePath tp = node.path();
-            setSelectionPath(tp);
-            startEditingAtPath(tp);
-            break;
+        System.out.println("EXPAND!");
+        dir.expand();
+
+        final String fn = name;
+        new Thread() {
+          @Override
+          public void run() {
+            final Enumeration<?> children = dir.children();
+            while(children.hasMoreElements()) {
+              final ProjectNode child = (ProjectNode) children.nextElement();
+              if(child.file != null && child.file.name().equals(fn)) {
+                final TreePath tp = child.path();
+                setSelectionPath(tp);
+                startEditingAtPath(tp);
+                break;
+              }
+            }
           }
-        }
+        }.start();
       }
     }
     @Override public boolean enabled(final GUI main) {

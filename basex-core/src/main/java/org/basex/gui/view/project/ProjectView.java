@@ -154,10 +154,10 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Finds nodes to be highlighted as erroneous and refreshes the tree.
+   * Finds nodes to be highlighted and refreshes the tree.
    * @param node node to start from
    */
-  void refreshTree(final ProjectNode node) {
+  void refreshHighlight(final ProjectNode node) {
     // loop through all tree nodes
     final Set<String> errPaths = errors().keySet();
     final Enumeration<?> en = node.depthFirstEnumeration();
@@ -215,7 +215,7 @@ public final class ProjectView extends BaseXPanel {
         }
         @Override
         protected void done(final Boolean refresh) {
-          if(refresh) refreshTree(root);
+          if(refresh) refreshHighlight(root);
         }
       }.execute();
     }

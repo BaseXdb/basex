@@ -24,7 +24,7 @@ final class ProjectFilter extends BaseXBack {
   /** Contents. */
   private final BaseXTextField contentsFilter;
   /** Project view. */
-  private final ProjectView project;
+  private final ProjectView view;
 
   /** Last file search. */
   private String fileFilter = "";
@@ -33,18 +33,18 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Constructor.
-   * @param project project view
+   * @param view project view
    */
-  ProjectFilter(final ProjectView project) {
-    this.project = project;
+  ProjectFilter(final ProjectView view) {
+    this.view = view;
 
     layout(new BorderLayout(0, 2));
-    filesFilter = new BaseXTextField(project.gui);
-    filesFilter.addFocusListener(project.lastfocus);
+    filesFilter = new BaseXTextField(view.gui);
+    filesFilter.addFocusListener(view.lastfocus);
 
-    contentsFilter = new BaseXTextField(project.gui);
+    contentsFilter = new BaseXTextField(view.gui);
     contentsFilter.hint(Text.FIND_CONTENTS + Text.DOTS);
-    contentsFilter.addFocusListener(project.lastfocus);
+    contentsFilter.addFocusListener(view.lastfocus);
 
     add(filesFilter, BorderLayout.NORTH);
     add(contentsFilter, BorderLayout.CENTER);
@@ -54,13 +54,13 @@ final class ProjectFilter extends BaseXBack {
       public void keyPressed(final KeyEvent e) {
         if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
            BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
-          project.list.dispatchEvent(e);
+          view.list.dispatchEvent(e);
         } else {
-          for(final GUIPopupCmd cmd : project.list.commands) {
+          for(final GUIPopupCmd cmd : view.list.commands) {
             if(cmd == null) continue;
             for(final BaseXKeys sc : cmd.shortcuts()) {
               if(sc.is(e)) {
-                cmd.execute(project.gui);
+                cmd.execute(view.gui);
                 e.consume();
                 return;
               }
@@ -91,7 +91,7 @@ final class ProjectFilter extends BaseXBack {
 
     final boolean filter = !file.isEmpty() || !content.isEmpty();
     if(filter) filter(file, content);
-    project.showList(filter);
+    view.showList(filter);
   }
 
   /**
@@ -106,7 +106,7 @@ final class ProjectFilter extends BaseXBack {
         final String name = ea.file().name();
         final int i = name.lastIndexOf('.');
         final String file = filesFilter.getText();
-        final String pattern = file.isEmpty() ? project.gui.gopts.get(GUIOptions.FILES) : file;
+        final String pattern = file.isEmpty() ? view.gui.gopts.get(GUIOptions.FILES) : file;
         if(i != -1 && !pattern.contains("*") && !pattern.contains("?") ||
             !Pattern.compile(IOFile.regex(pattern)).matcher(name).matches()) {
           filesFilter.setText('*' + name.substring(i));
@@ -121,7 +121,7 @@ final class ProjectFilter extends BaseXBack {
    * Called when the GUI design has changed.
    */
   void refreshLayout() {
-    final String filter = project.gui.gopts.get(GUIOptions.FILES).trim();
+    final String filter = view.gui.gopts.get(GUIOptions.FILES).trim();
     filesFilter.hint(filter.isEmpty() ? Text.FIND_FILES + Text.DOTS : filter);
   }
 
@@ -133,20 +133,20 @@ final class ProjectFilter extends BaseXBack {
   private void filter(final String file, final String content) {
     filesFilter.setCursor(CURSORWAIT);
     contentsFilter.setCursor(CURSORWAIT);
-    project.list.setCursor(CURSORWAIT);
+    view.list.setCursor(CURSORWAIT);
 
     new GUIWorker<String[]>() {
       @Override
       protected String[] doInBackground() throws Exception {
-        final String pattern = file.isEmpty() ? project.gui.gopts.get(GUIOptions.FILES) : file;
-        return project.files.filter(pattern, content, project.root.file);
+        final String pattern = file.isEmpty() ? view.gui.gopts.get(GUIOptions.FILES) : file;
+        return view.files.filter(pattern, content, view.root.file);
       }
       @Override
       protected void done(final String[] files) {
-        project.list.setElements(files, content);
+        view.list.setElements(files, content);
         filesFilter.setCursor(CURSORTEXT);
         contentsFilter.setCursor(CURSORTEXT);
-        project.list.setCursor(CURSORARROW);
+        view.list.setCursor(CURSORARROW);
       }
     }.execute();
   }

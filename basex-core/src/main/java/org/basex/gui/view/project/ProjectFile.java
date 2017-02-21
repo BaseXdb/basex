@@ -13,10 +13,10 @@ final class ProjectFile extends ProjectNode {
   /**
    * Constructor.
    * @param file file ({@code null} for dummy)
-   * @param project project view
+   * @param view project view
    */
-  ProjectFile(final IOFile file, final ProjectView project) {
-    super(file, project);
+  ProjectFile(final IOFile file, final ProjectView view) {
+    super(file, view);
   }
 
   @Override
@@ -27,7 +27,7 @@ final class ProjectFile extends ProjectNode {
 
   @Override
   void refresh() {
-    project.refreshTree(this);
+    view.refreshHighlight(this);
   }
 
   @Override

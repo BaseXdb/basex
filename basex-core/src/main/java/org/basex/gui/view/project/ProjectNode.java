@@ -12,7 +12,7 @@ import org.basex.io.*;
  */
 abstract class ProjectNode extends DefaultMutableTreeNode {
   /** Project view. */
-  final ProjectView project;
+  final ProjectView view;
   /** File reference ({@code null} for invisible dummy). */
   IOFile file;
   /** Error flag. */
@@ -21,17 +21,17 @@ abstract class ProjectNode extends DefaultMutableTreeNode {
   /**
    * Constructor.
    * @param file file reference ({@code null} for dummy)
-   * @param project project view
+   * @param view project view
    */
-  ProjectNode(final IOFile file, final ProjectView project) {
+  ProjectNode(final IOFile file, final ProjectView view) {
     super(file == null ? null : file.name());
     this.file = file;
-    this.project = project;
+    this.view = view;
   }
 
   @Override
   public void setUserObject(final Object uo) {
-    final IOFile renamed = project.rename(this, uo.toString());
+    final IOFile renamed = view.rename(this, uo.toString());
     if(renamed != null) {
       file = renamed;
       refresh();
@@ -49,24 +49,16 @@ abstract class ProjectNode extends DefaultMutableTreeNode {
   abstract void collapse();
 
   /**
-   * Refreshes the current node.
+   * Refreshes the current node and its children.
    */
   abstract void refresh();
-
-  /**
-   * Updates the tree structure.
-   */
-  final void updateTree() {
-    ((DefaultTreeModel) project.tree.getModel()).nodeStructureChanged(this);
-    project.repaint();
-  }
 
   /**
    * Returns the node path.
    * @return path
    */
   final TreePath path() {
-    final DefaultTreeModel model = (DefaultTreeModel) project.tree.getModel();
+    final DefaultTreeModel model = (DefaultTreeModel) view.tree.getModel();
     return new TreePath(model.getPathToRoot(this));
   }
 

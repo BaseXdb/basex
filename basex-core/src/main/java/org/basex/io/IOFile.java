@@ -301,6 +301,11 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public boolean equals(final Object o) {
+    return o instanceof IOFile && ((IOFile) o).pth.equals(pth);
+  }
+
+  @Override
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
     String path = pth;
