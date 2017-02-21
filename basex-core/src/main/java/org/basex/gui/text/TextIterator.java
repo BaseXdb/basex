@@ -120,6 +120,14 @@ final class TextIterator {
   }
 
   /**
+   * Sets the iterator end position.
+   * @param p iterator position
+   */
+  void posEnd(final int p) {
+    posEnd = p;
+  }
+
+  /**
    * Checks if the character position equals the word end.
    * @return result of check
    */
@@ -128,7 +136,7 @@ final class TextIterator {
   }
 
   /**
-   * Moves one character forward.
+   * Returns the current character and moves one character forward.
    * @return current character
    */
   int next() {

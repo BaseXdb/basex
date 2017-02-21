@@ -38,10 +38,12 @@ final class TextRenderer extends BaseXBack {
   private Font boldFont;
   /** Font height. */
   private int fontHeight;
+  /** Font metrics. */
+  private FontMetrics fontMetrics;
   /** Character widths. */
   private int[] charWidths;
-  /** Width of current word. */
-  private int wordWidth;
+  /** Width of current string. */
+  private int stringWidth;
   /** Show invisible characters. */
   private boolean showInvisible;
   /** Show newlines. */
@@ -136,7 +138,7 @@ final class TextRenderer extends BaseXBack {
     if(x == offset) markLine(g);
     if(line != oldL) drawLineNumber(g);
 
-    wordWidth = 0;
+    stringWidth = 0;
     final int s = iter.pos();
     if(caret && s == iter.caret()) drawCaret(g, x);
     if(s == iter.error()) drawError(g);
@@ -152,7 +154,7 @@ final class TextRenderer extends BaseXBack {
     if(edit && showLines) {
       g.setColor(GUIConstants.gray);
       final String s = Integer.toString(line);
-      g.drawString(s, offset - fontWidth(g, s) - (OFFSET << 1), y);
+      g.drawString(s, offset - stringWidth(s) - (OFFSET << 1), y);
     }
   }
 
@@ -178,7 +180,7 @@ final class TextRenderer extends BaseXBack {
       }
       if(margin != -1) {
         // line margin
-        final int lx = offset + fontWidth(g, ' ') * margin;
+        final int lx = offset + charWidth(' ') * margin;
         g.setColor(GUIConstants.lgray);
         g.drawLine(lx, 0, lx, height);
       }
@@ -263,6 +265,7 @@ final class TextRenderer extends BaseXBack {
     font = f;
     fontHeight = f.getSize() * 5 / 4;
     charWidths = GUIConstants.fontWidths(f);
+    fontMetrics = getFontMetrics(f);
   }
 
   @Override
@@ -293,7 +296,7 @@ final class TextRenderer extends BaseXBack {
     offset = OFFSET;
     if(g != null) {
       g.setFont(font);
-      if(edit && showLines) offset += fontWidth(g, Integer.toString(text.lines())) + (OFFSET << 1);
+      if(edit && showLines) offset += stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
     }
     x = offset;
     y = fontHeight - (start ? 0 : scroll.pos()) - 2;
@@ -344,7 +347,7 @@ final class TextRenderer extends BaseXBack {
     if(g == null || !iter.moreTokens()) return false;
 
     // calculate word width
-    int ww = 0;
+    int sw = 0;
     final int p = iter.pos();
     while(iter.more()) {
       final int ch = iter.next();
@@ -356,13 +359,18 @@ final class TextRenderer extends BaseXBack {
       } else if(ch == TokenBuilder.ULINE) {
         link ^= true;
       } else {
-        ww += fontWidth(g, ch);
+        sw += charWidth(ch);
+        if(x + sw > width) {
+          if(offset + sw > width) {
+            iter.posEnd(iter.pos());
+            break;
+          }
+          newline(fontHeight);
+        }
       }
     }
     iter.pos(p);
-
-    if(x + ww > width) newline(fontHeight);
-    wordWidth = ww;
+    stringWidth = sw;
 
     // check if word has been found, and word is still visible
     return y < height;
@@ -402,7 +410,7 @@ final class TextRenderer extends BaseXBack {
       lineC = edit && iter.caretLine(false);
       return true;
     }
-    x += wordWidth;
+    x += stringWidth;
     return false;
   }
 
@@ -428,9 +436,9 @@ final class TextRenderer extends BaseXBack {
       // mark selected text
       if(iter.selectStart()) {
         int xx = x;
-        while(!iter.inSelect() && iter.more()) xx += fontWidth(g, iter.next());
+        while(!iter.inSelect() && iter.more()) xx += charWidth(iter.next());
         int cw = 0;
-        while(iter.inSelect() && iter.more()) cw += fontWidth(g, iter.next());
+        while(iter.inSelect() && iter.more()) cw += charWidth(iter.next());
         g.setColor(GUIConstants.color2A);
         g.fillRect(xx, lineY, cw, fontHeight);
         iter.pos(cp);
@@ -439,9 +447,9 @@ final class TextRenderer extends BaseXBack {
       // mark found text
       int xx = x;
       while(iter.more() && iter.searchStart()) {
-        while(!iter.inSearch() && iter.more()) xx += fontWidth(g, iter.next());
+        while(!iter.inSearch() && iter.more()) xx += charWidth(iter.next());
         int cw = 0;
-        while(iter.inSearch() && iter.more()) cw += fontWidth(g, iter.next());
+        while(iter.inSearch() && iter.more()) cw += charWidth(iter.next());
         g.setColor(GUIConstants.color2A);
         g.fillRect(xx, lineY, cw, fontHeight);
         xx += cw;
@@ -458,11 +466,11 @@ final class TextRenderer extends BaseXBack {
       } else if(showInvisible && (ch == '\u00a0' || ch >= 0x2000 && ch <= 0x202F)) {
         final int s = fontHeight / 12 + 1;
         g.setColor(GUIConstants.gray);
-        g.fillRect(x + (wordWidth >> 1), y - fontHeight * 3 / 10, s, s);
+        g.fillRect(x + (stringWidth >> 1), y - fontHeight * 3 / 10, s, s);
       } else if(showInvisible && ch == '\t') {
         final int yy = y - fontHeight * 3 / 10;
         final int s = 1 + fontHeight / 12;
-        final int xe = x + fontWidth(g, '\t') - s;
+        final int xe = x + charWidth('\t') - s;
         final int as = (s << 1) - 1;
         g.setColor(GUIConstants.gray);
         g.drawLine(x + s, yy, xe, yy);
@@ -472,21 +480,21 @@ final class TextRenderer extends BaseXBack {
         g.setFont(font);
       } else if(ch > ' ') {
         g.setColor(color);
-        String n = iter.nextString();
+        String string = iter.nextString();
         int ww = width - x;
-        if(x + wordWidth > ww) {
+        if(x + stringWidth > ww) {
           // shorten string if it cannot be completely shown (saves memory)
           int c = 0;
-          for(final int nl = n.length(); c < nl && ww > 0; c++) {
-            ww -= fontWidth(g, n.charAt(c));
+          for(final int nl = string.length(); c < nl && ww > 0; c++) {
+            ww -= charWidth(string.charAt(c));
           }
-          n = n.substring(0, c);
+          string = string.substring(0, c);
         }
-        g.drawString(n, x, y);
+        g.drawString(string, x, y);
       }
 
       // underline linked text
-      if(link) g.drawLine(x, y + 1, x + wordWidth, y + 1);
+      if(link) g.drawLine(x, y + 1, x + stringWidth, y + 1);
 
       // show cursor
       if(caret && iter.edited()) {
@@ -496,7 +504,7 @@ final class TextRenderer extends BaseXBack {
             drawCaret(g, xx);
             break;
           }
-          xx += fontWidth(g, iter.next());
+          xx += charWidth(iter.next());
         }
         iter.pos(cp);
       }
@@ -517,8 +525,8 @@ final class TextRenderer extends BaseXBack {
         final int xx = pars.pop();
         if(cc == cp || cc == cr) {
          g.setColor(GUIConstants.color4);
-          g.drawRect(xx, yy - (fontHeight << 2) / 5, fontWidth(g, open), fontHeight);
-          g.drawRect(x, lineY, fontWidth(g, ch), fontHeight);
+          g.drawRect(xx, yy - (fontHeight << 2) / 5, charWidth(open), fontHeight);
+          g.drawRect(x, lineY, charWidth(ch), fontHeight);
         }
       }
     }
@@ -542,7 +550,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawError(final Graphics g) {
-    final int ww = wordWidth == 0 ? fontWidth(g, ' ') : wordWidth;
+    final int ww = stringWidth == 0 ? charWidth(' ') : stringWidth;
     final int s = Math.max(2, fontHeight / 6);
     g.setColor(GUIConstants.RED);
     for(int xp = x; xp < x + ww; xp += 2) g.drawLine(xp - 1, y + 2, xp, y + s + 1);
@@ -551,26 +559,24 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Returns the width of the specified codepoint.
-   * @param g graphics reference
    * @param cp codepoint
    * @return width
    */
-  private int fontWidth(final Graphics g, final int cp) {
+  private int charWidth(final int cp) {
     return cp == '\t' ? charWidths[' '] * indent : cp < 256 ? charWidths[cp] :
       cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END ||
-      cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
+      cp >= 0xD800 && cp <= 0xDC00 ? 0 : fontMetrics.charWidth(cp);
   }
 
   /**
    * Returns the width of the specified string.
-   * @param g graphics reference
    * @param string string
    * @return width
    */
-  private int fontWidth(final Graphics g, final String string) {
+  private int stringWidth(final String string) {
     final int cl = string.length();
     int w = 0;
-    for(int c = 0; c < cl; c++) w += fontWidth(g, string.charAt(c));
+    for(int c = 0; c < cl; c++) w += charWidth(string.charAt(c));
     return w;
   }
 
@@ -601,9 +607,9 @@ final class TextRenderer extends BaseXBack {
         // beginning of line
         if(xx <= x && yy < y) break;
         // middle of line
-        if(xx > x && xx <= x + wordWidth && yy > y - fontHeight && yy <= y) {
+        if(xx > x && xx <= x + stringWidth && yy > y - fontHeight && yy <= y) {
           while(iter.more()) {
-            final int ww = fontWidth(g, iter.curr());
+            final int ww = charWidth(iter.curr());
             if(xx < x + ww) break;
             x += ww;
             iter.next();
