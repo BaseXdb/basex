@@ -31,7 +31,7 @@ final class MapDefault extends MapPainter {
     l.x = (int) scale * l.x; l.y = (int) scale * l.y;
     l.w = (int) scale * l.w; l.h = (int) scale * l.h;
     final int ww = view.getWidth();
-    final int hh = view.getWidth();
+    final int hh = view.getHeight();
 
     final Data data = view.gui.context.data();
     final FTPosData ftpos = view.gui.context.marked.ftpos();
@@ -47,7 +47,7 @@ final class MapDefault extends MapPainter {
       // level 1: next context node, set marker pointer to 0
       final int lvl = r.level;
       final boolean full = r.w == ww && r.h == hh;
-      Color col = color(rects, ri);
+      Color col = color(rects, ri, data);
       final boolean mark = col != null;
 
       r.pos = ftpos != null ? ftpos.get(data, pre) : null;

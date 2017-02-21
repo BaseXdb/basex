@@ -33,9 +33,10 @@ abstract class MapPainter {
    * Returns color mark.
    * @param rects rectangles to be drawn
    * @param ri current position
+   * @param data data reference
    * @return next color mark
    */
-  final Color color(final MapRects rects, final int ri) {
+  final Color color(final MapRects rects, final int ri, final Data data) {
     // find marked node
     final DBNodes marked = view.gui.context.marked;
     if(marked != null) {
@@ -44,8 +45,20 @@ abstract class MapPainter {
       if(m >= 0) {
         // mark ancestor of invisible node
         final int r = rects.find(pre);
-        return m < marked.size() && r + 1 < rects.size && marked.sorted(m) <
-          rects.sorted[r + 1].pre ? GUIConstants.colormark2 : null;
+        if(m < marked.size()) {
+          // find pre value of next rectangle
+          final int e;
+          if(r + 1 < rects.size) {
+            e = rects.sorted[r + 1].pre;
+          } else {
+            // rectangle is last one: get rectangle size via database
+            final int spre = rects.sorted[r].pre;
+            e = data.size(spre, data.kind(spre));
+          }
+          // mark rectangle if pre value is its descendant
+          return marked.sorted(m) < e ? GUIConstants.colormark2 : null;
+        }
+        return null;
       }
     }
     // no mark found
