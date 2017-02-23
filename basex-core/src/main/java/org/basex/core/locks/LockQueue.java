@@ -7,6 +7,19 @@ package org.basex.core.locks;
  * @author Christian Gruen
  */
 public abstract class LockQueue {
+  /** Maximum number of parallel jobs. */
+  protected final int parallel;
+  /** Number of currently running jobs. */
+  protected int jobs;
+
+  /**
+   * Constructor.
+   * @param parallel parallel jobs
+   */
+  public LockQueue(final int parallel) {
+    this.parallel = parallel;
+  }
+
   /**
    * Queues the job until it can be started.
    * @param id job id
@@ -14,5 +27,13 @@ public abstract class LockQueue {
    * @param write write flag
    * @throws InterruptedException interrupted exception
    */
-  public abstract void wait(Long id, boolean read, boolean write) throws InterruptedException;
+  public abstract void acquire(Long id, boolean read, boolean write) throws InterruptedException;
+
+  /**
+   * Notifies other jobs that a job has been completed.
+   */
+  public synchronized void release() {
+    notifyAll();
+    jobs--;
+  }
 }

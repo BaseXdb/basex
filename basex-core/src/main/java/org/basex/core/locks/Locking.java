@@ -50,8 +50,6 @@ public final class Locking {
 
   /** Fair ordering policy; prevents starvation, but reduces parallelism. */
   private final boolean fair;
-  /** Maximum number of parallel jobs. */
-  private final int parallel;
 
   /** Locks assigned to threads. */
   private final ConcurrentMap<Long, Locks> locked = new ConcurrentHashMap<>();
@@ -69,8 +67,6 @@ public final class Locking {
   private int localWriters;
   /** Number of running global readers. */
   private int globalReaders;
-  /** Number of currently running jobs. */
-  private int jobs;
 
   /**
    * Constructor.
@@ -78,9 +74,9 @@ public final class Locking {
    */
   public Locking(final StaticOptions soptions) {
     fair = soptions.get(StaticOptions.FAIRLOCK);
-    parallel = Math.max(soptions.get(StaticOptions.PARALLEL), 1);
     globalLocks = new ReentrantReadWriteLock(fair);
-    queue = fair ? new FairLockQueue() : new NonfairLockQueue();
+    final int parallel = Math.max(soptions.get(StaticOptions.PARALLEL), 1);
+    queue = fair ? new FairLockQueue(parallel) : new NonfairLockQueue(parallel);
   }
 
   /**
@@ -117,10 +113,7 @@ public final class Locking {
     // queue job if the job limit has been reached
     final LockList reads = locks.reads, writes = locks.writes;
     final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
-    synchronized(queue) {
-      if(jobs >= parallel) queue.wait(id, read, write);
-      jobs++;
-    }
+    queue.acquire(id, read, write);
 
     // apply exclusive lock (global write), or shared lock otherwise
     if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
@@ -160,8 +153,8 @@ public final class Locking {
     final boolean lock = reads.locking() || writes.locking();
 
     // release all local locks
-    for(final String read : reads) unpin(read).readLock().unlock();
-    for(final String write : writes) unpin(write).writeLock().unlock();
+    for(final String string : reads) unpin(string).readLock().unlock();
+    for(final String string : writes) unpin(string).writeLock().unlock();
 
     // allow next global reader to resume
     synchronized(globalLock) {
@@ -183,10 +176,7 @@ public final class Locking {
     if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).unlock();
 
     // allow next queued job to resume
-    synchronized(queue) {
-      jobs--;
-      queue.notifyAll();
-    }
+    queue.release();
   }
 
   /**
@@ -225,9 +215,7 @@ public final class Locking {
   public String toString() {
     final StringBuilder sb = new StringBuilder(NL).append("Locking").append(NL);
     final String in = "| ";
-    synchronized(queue) {
-      sb.append(in).append("Jobs: ").append(jobs).append(NL).append(in).append(queue).append(NL);
-    }
+    sb.append(in).append(queue).append(NL);
     sb.append(in).append("Held locks by object:").append(NL);
     synchronized(localLocks) {
       for(final Entry<String, LocalReadWriteLock> e : localLocks.entrySet()) {

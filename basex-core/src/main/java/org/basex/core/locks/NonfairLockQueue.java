@@ -14,26 +14,37 @@ public class NonfairLockQueue extends LockQueue {
   /** Queued writers. */
   private final Queue<Long> writers = new LinkedList<>();
 
-  @Override
-  public void wait(final Long id, final boolean read, final boolean write)
-      throws InterruptedException {
-
-    // no locks: don't wait
-    if(!read && !write) return;
-
-    // add job id to queue and wait
-    final Queue<Long> queue = write ? writers : readers;
-    queue.add(id);
-
-    // loop until job is placed first (prefer readers)
-    do wait(); while(write && !readers.isEmpty() || !id.equals(queue.peek()));
-
-    // remove job from queue
-    queue.remove(id);
+  /**
+   * Constructor.
+   * @param parallel parallel jobs
+   */
+  public NonfairLockQueue(final int parallel) {
+    super(parallel);
   }
 
   @Override
-  public String toString() {
-    return "Queued readers: " + readers + ", queued writers: " + writers;
+  public synchronized void acquire(final Long id, final boolean read, final boolean write)
+      throws InterruptedException {
+
+    // only wait if job is locking
+    if(jobs >= parallel && (read || write)) {
+      // add job id to queue and wait
+      final Queue<Long> queue = write ? writers : readers;
+      queue.add(id);
+
+      // loop until job is placed first (prefer readers)
+      do {
+        wait();
+      } while(jobs >= parallel || write && !readers.isEmpty() || !id.equals(queue.peek()));
+
+      // remove job from queue
+      queue.remove(id);
+    }
+    jobs++;
+  }
+
+  @Override
+  public synchronized String toString() {
+    return "Jobs: " + jobs + ", queued readers: " + readers + ", queued writers: " + writers;
   }
 }

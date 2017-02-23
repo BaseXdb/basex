@@ -41,25 +41,29 @@ declare variable $cons:OPTION :=
     'memory': 500,
     'permission': 'admin'
   }
-  return try {
-    (: merge defaults with options from settings file :)
-    let $configs := fetch:xml($cons:DBA-SETTINGS-FILE)/config
-    return map:merge(
-      map:for-each($defaults, function($key, $value) {
-        map:entry($key,
-          let $config := $configs/*[name() = $key]
-          return if($config) then (
-            if($value instance of xs:numeric) then xs:integer($config) else xs:string($config)
-          ) else (
-            $value
+  return if(file:exists($cons:DBA-SETTINGS-FILE)) then (
+    try {
+      (: merge defaults with options from settings file :)
+      let $configs := fetch:xml($cons:DBA-SETTINGS-FILE)/config
+      return map:merge(
+        map:for-each($defaults, function($key, $value) {
+          map:entry($key,
+            let $config := $configs/*[name() = $key]
+            return if($config) then (
+              if($value instance of xs:numeric) then xs:integer($config) else xs:string($config)
+            ) else (
+              $value
+            )
           )
-        )
-      })
-    )
-  } catch * {
-    (: use defaults if an error occurs while parsing the configuration file :)
+        })
+      )
+    } catch * {
+      (: use defaults if an error occurs while parsing the configuration file :)
+      $defaults
+    }
+  ) else (
     $defaults
-  };
+  );
 
 (:~
  : Checks if the current client is logged in. If not, raises an error.
