@@ -59,12 +59,12 @@ public final class CreateDB extends ACreate {
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
 
     // choose parser and input
-    IO io;
+    IO source;
     try {
-      io = sourceToIO(name);
+      source = sourceToIO(name);
       if(in != null) {
-        final LookupInput li = new LookupInput(io.inputStream());
-        io = li.lookup() == -1 ? null : new IOStream(li, io.name());
+        final LookupInput li = new LookupInput(source.inputStream());
+        source = li.lookup() == -1 ? null : new IOStream(li, source.name());
       }
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -72,9 +72,9 @@ public final class CreateDB extends ACreate {
 
     try {
       // create parser instance
-      if(io != null) {
-        if(!io.exists()) return error(RES_NOT_FOUND_X, io);
-        parser = new DirParser(io, options, soptions.dbPath(name));
+      if(source != null) {
+        if(!source.exists()) return error(RES_NOT_FOUND_X, source);
+        parser = new DirParser(source, options, soptions.dbPath(name));
       } else if(parser == null) {
         parser = Parser.emptyParser(options);
       }

@@ -80,19 +80,19 @@ public final class Add extends ACreate {
     if(name == null) return error(PATH_INVALID_X, args[0]);
 
     // retrieve input
-    final IO io;
+    final IO source;
     try {
-      io = sourceToIO(name);
+      source = sourceToIO(name);
     } catch(final IOException ex) {
       return error(Util.message(ex));
     }
 
     // check if resource exists
-    if(io == null) return error(RES_NOT_FOUND);
-    if(!io.exists()) return in != null ? error(RES_NOT_FOUND) :
-        error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? io : args[1]);
+    if(source == null) return error(RES_NOT_FOUND);
+    if(!source.exists()) return in != null ? error(RES_NOT_FOUND) :
+        error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? source : args[1]);
 
-    if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
+    if(!name.endsWith("/") && (source.isDir() || source.isArchive())) name += '/';
 
     String target = "";
     final int s = name.lastIndexOf('/');
@@ -102,15 +102,15 @@ public final class Add extends ACreate {
     }
 
     // get name from io reference
-    if(name.isEmpty()) name = io.name();
-    else io.name(name);
+    if(name.isEmpty()) name = source.name();
+    else source.name(name);
 
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
 
     try {
       final Data data = context.data();
-      final Parser parser = new DirParser(io, options, data.meta.path);
+      final Parser parser = new DirParser(source, options, data.meta.path);
       parser.target(target);
 
       // create random database name for disk-based creation
