@@ -29,8 +29,10 @@ public final class DirParser extends Parser {
   private final StringList skipped = new StringList();
   /** File pattern. */
   private final Pattern filter;
-  /** Initial file path. */
-  private final String root;
+  /** Root directory. */
+  private final String dir;
+  /** Original path. */
+  private final String original;
 
   /** Parse archives in directories. */
   private final boolean archives;
@@ -63,8 +65,9 @@ public final class DirParser extends Parser {
     super(source, options);
 
     final boolean isDir = source.isDir();
-    final String dir = isDir ? source.path() : source.dir();
-    root = dir.endsWith("/") ? dir : dir + '/';
+    final String path = isDir ? source.path() : source.dir();
+    dir = path.endsWith("/") ? path : path + '/';
+    original = isDir ? dir : path;
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);
     archiveName = options.get(MainOptions.ARCHIVENAME);
@@ -89,7 +92,7 @@ public final class DirParser extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     build.meta.filesize = 0;
-    build.meta.original = source.path();
+    build.meta.original = original;
     parse(build, source);
   }
 
@@ -175,7 +178,7 @@ public final class DirParser extends Parser {
     String path = source.path();
     if(path.endsWith('/' + name)) {
       path = path.substring(0, path.length() - name.length());
-      if(path.startsWith(root)) path = path.substring(root.length());
+      if(path.startsWith(dir)) path = path.substring(dir.length());
       targ = (targ + path).replace("//", "/");
     }
 
