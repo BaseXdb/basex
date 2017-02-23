@@ -89,8 +89,6 @@ public abstract class Command extends Job {
     // register job
     register(ctx);
     try {
-      // first, check if job has been stopped in the meanwhile
-      checkStop();
       // run command and return success flag
       if(!run(ctx, os)) {
         final BaseXException ex = new BaseXException(info());
@@ -254,6 +252,8 @@ public abstract class Command extends Job {
 
     init(ctx, os);
     try {
+      // check if job was stopped before it was started
+      checkStop();
       return run();
     } catch(final JobException ex) {
       // job was interrupted by the user or server
