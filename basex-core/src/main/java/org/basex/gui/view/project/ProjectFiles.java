@@ -50,41 +50,34 @@ final class ProjectFiles {
 
   /**
    * Chooses files that match the specified pattern.
-   * @param file file filter
-   * @param content content filter
+   * @param files files filter
+   * @param contents contents filter
    * @param root root directory
    * @return sorted file paths
    * @throws InterruptedException interruption
    */
-  String[] filter(final String file, final String content, final IOFile root)
+  String[] filter(final String files, final String contents, final IOFile root)
       throws InterruptedException {
 
     final long id = ++filterId;
-    final TreeSet<String> results = new TreeSet<>();
-    final int[] search = new TokenParser(Token.lc(Token.token(content))).toArray();
+    final StringList results = new StringList();
+    final int[] search = new TokenParser(Token.lc(Token.token(contents))).toArray();
 
     // glob pattern
     final ProjectCache pc = cache(root);
-    if(file.contains("*") || file.contains("?")) {
-      final Pattern pt = Pattern.compile(IOFile.regex(file));
+    if(files.contains("*") || files.contains("?")) {
+      final Pattern pt = Pattern.compile(IOFile.regex(files));
       for(final String path : pc) {
-        final int offset = offset(path, true);
-        if(pt.matcher(path.substring(offset)).matches() && filterContent(path, search)) {
+        if(pt.matcher(path).matches() && filterContent(path, search)) {
           results.add(path);
           if(results.size() >= MAXHITS) break;
         }
         if(id != filterId) throw new InterruptedException();
       }
     } else {
-      // starts-with, contains, camel case
-      final String pttrn = file.toLowerCase(Locale.ENGLISH).replace('\\', '/');
-      final HashSet<String> exclude = new HashSet<>();
-      final boolean pathSearch = pttrn.indexOf('/') != -1;
-      for(int i = 0; i < (pathSearch ? 2 : 3); i++) {
-        filter(pttrn, search, i, results, exclude, pathSearch, pc, id);
-      }
+      filter(files, search, id, results, pc);
     }
-    return results.toArray(new String[results.size()]);
+    return results.finish();
   }
 
   /**
@@ -187,38 +180,40 @@ final class ProjectFiles {
 
   /**
    * Chooses tokens from the file cache that match the specified pattern.
-   * @param pattern file pattern
-   * @param search search string
-   * @param mode search mode (0-2)
-   * @param results search result
-   * @param exclude exclude file from content search
-   * @param pathSearch path flag
-   * @param pc file cache
+   * @param files files filter
+   * @param search codepoints of search string
    * @param id search id
+   * @param results search result
+   * @param cache file cache
    * @throws InterruptedException interruption
    */
-  private static void filter(final String pattern, final int[] search, final int mode,
-      final TreeSet<String> results, final HashSet<String> exclude, final boolean pathSearch,
-      final ProjectCache pc, final long id) throws InterruptedException {
+  private static void filter(final String files, final int[] search, final long id,
+      final StringList results, final ProjectCache cache) throws InterruptedException {
 
-    if(results.size() >= MAXHITS) return;
+    final String query = files.replace('\\', '/');
+    final HashSet<String> exclude = new HashSet<>();
+    for(final boolean onlyName : new boolean[] { true, false }) {
+      for(int mode = 0; mode < 5; mode++) {
+        for(final String path : cache) {
+          // check if file has already been added, or it its contents have been scanned
+          if(exclude.contains(path)) continue;
+          // check if current file matches the pattern
+          String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
+          if(mode == 0 ? startsWith(file, query) :
+             mode == 1 ? contains(file, query) :
+             matches(file, query)) {
 
-    for(final String path : pc) {
-      // check if current file matches the pattern
-      final String lc = path.toLowerCase(Locale.ENGLISH).replace('\\', '/');
-      final int offset = offset(lc, pathSearch);
-      if(mode == 0 ? lc.startsWith(pattern, offset) :
-         mode == 1 ? (lc.indexOf(pattern, offset) != -1) :
-         matches(lc, pattern, offset)) {
-        if(!exclude.contains(path)) {
-          exclude.add(path);
-          if(filterContent(path, search)) {
-            results.add(path);
-            if(results.size() >= MAXHITS) return;
+            // check file contents
+            if(filterContent(path, search)) {
+              // add path, skip remaining files if limit has been reached
+              results.add(path);
+              if(results.size() >= MAXHITS) return;
+            }
+            exclude.add(path);
           }
+          if(id != filterId) throw new InterruptedException();
         }
       }
-      if(id != filterId) throw new InterruptedException();
     }
   }
 
@@ -261,30 +256,61 @@ final class ProjectFiles {
   }
 
   /**
-   * Returns the offset after the last slash, or {@code 0} if full paths are to be processed.
+   * Checks if a filename starts with the specified pattern.
    * @param input input string
-   * @param path full path processing
-   * @return resulting offset
+   * @param query query string
+   * @return result of check
    */
-  private static int offset(final String input, final boolean path) {
-    if(path) return 0;
-    final int a = input.lastIndexOf('\\'), b = input.lastIndexOf('/');
-    return (a > b ? a : b) + 1;
+  private static boolean startsWith(final String input, final String query) {
+    final int il = input.length(), ql = query.length();
+    if(ql > il) return false;
+    for(int q = 0; q < ql; q++) {
+      if(!equals(input.charAt(q), query.charAt(q))) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if a filename contains the specified pattern.
+   * @param input input string
+   * @param query query string
+   * @return result of check
+   */
+  private static boolean contains(final String input, final String query) {
+    final int ql = query.length();
+    if(ql == 0) return true;
+    final int il = input.length() - ql;
+    for(int i = 0; i <= il; i++) {
+      int q = 0;
+      while(equals(input.charAt(i + q), query.charAt(q))) {
+        if(++q == ql) return true;
+      }
+    }
+    return false;
   }
 
   /**
    * Checks if the all characters of the pattern occur in the input in the given order.
    * @param input input string
-   * @param pattern pattern
-   * @param off offset
+   * @param query query string
    * @return result of check
    */
-  private static boolean matches(final String input, final String pattern, final int off) {
-    final int il = input.length(), pl = pattern.length();
-    int p = 0;
-    for(int i = off; i < il && p < pl; i++) {
-      if(pattern.charAt(p) == input.charAt(i)) p++;
+  private static boolean matches(final String input, final String query) {
+    final int il = input.length(), ql = query.length();
+    int q = 0;
+    for(int i = 0; i < il && q < ql; i++) {
+      if(equals(input.charAt(i), query.charAt(q))) q++;
     }
-    return p == pl;
+    return q == ql;
+  }
+
+  /**
+   * Compares two characters. If the query character is lower case, search case insensitive.
+   * @param input input character
+   * @param query query character
+   * @return result of check
+   */
+  private static boolean equals(final char input, final char query) {
+    return query == (Character.isUpperCase(query) ? input : Character.toLowerCase(input));
   }
 }

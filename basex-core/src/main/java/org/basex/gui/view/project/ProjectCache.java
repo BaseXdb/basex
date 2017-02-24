@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class ProjectCache implements Iterable<String> {
-  /** Cached file paths. */
+  /** Cached file paths (all with forward slashes). */
   private final StringList files = new StringList();
   /** Valid flag. */
   private boolean valid;

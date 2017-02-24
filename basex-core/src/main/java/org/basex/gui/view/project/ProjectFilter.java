@@ -83,14 +83,14 @@ final class ProjectFilter extends BaseXBack {
    * @param force force refresh
    */
   void refresh(final boolean force) {
-    final String file = filesFilter.getText();
-    final String content = contentsFilter.getText();
-    if(!force && fileFilter.equals(file) && contentFilter.equals(content)) return;
-    fileFilter = file;
-    contentFilter = content;
+    final String files = filesFilter.getText();
+    final String contents = contentsFilter.getText();
+    if(!force && fileFilter.equals(files) && contentFilter.equals(contents)) return;
+    fileFilter = files;
+    contentFilter = contents;
 
-    final boolean filter = !file.isEmpty() || !content.isEmpty();
-    if(filter) filter(file, content);
+    final boolean filter = !files.isEmpty() || !contents.isEmpty();
+    if(filter) filter(files, contents);
     view.showList(filter);
   }
 
@@ -127,10 +127,10 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Filters the entries.
-   * @param file file search string
-   * @param content content search string
+   * @param files files search string
+   * @param contents contents search string
    */
-  private void filter(final String file, final String content) {
+  private void filter(final String files, final String contents) {
     filesFilter.setCursor(CURSORWAIT);
     contentsFilter.setCursor(CURSORWAIT);
     view.list.setCursor(CURSORWAIT);
@@ -138,12 +138,12 @@ final class ProjectFilter extends BaseXBack {
     new GUIWorker<String[]>() {
       @Override
       protected String[] doInBackground() throws Exception {
-        final String pattern = file.isEmpty() ? view.gui.gopts.get(GUIOptions.FILES) : file;
-        return view.files.filter(pattern, content, view.root.file);
+        final String pattern = files.isEmpty() ? view.gui.gopts.get(GUIOptions.FILES) : files;
+        return view.files.filter(pattern, contents, view.root.file);
       }
       @Override
-      protected void done(final String[] files) {
-        view.list.setElements(files, content);
+      protected void done(final String[] list) {
+        view.list.setElements(list, contents);
         filesFilter.setCursor(CURSORTEXT);
         contentsFilter.setCursor(CURSORTEXT);
         view.list.setCursor(CURSORARROW);

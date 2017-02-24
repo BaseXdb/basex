@@ -193,7 +193,6 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         file = new IOFile(dir.file, name);
       }
       if(file.md()) {
-        System.out.println("EXPAND!");
         dir.expand();
 
         final String fn = name;
