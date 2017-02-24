@@ -235,7 +235,7 @@ public interface Text {
   /** "Stack Trace". */
   String STACK_TRACE = "Stack Trace";
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-16 " + Prop.ENTITY;
+  String COPYRIGHT = "\u00A9 2005-17 " + Prop.ENTITY;
 
   // SERVER ===================================================================
 

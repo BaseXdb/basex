@@ -1,3 +1,14 @@
+VERSION 8.6.1 (February 24, 2017) --------------------------------------
+
+ Minor bug fixes and improvements:
+ - Core, locking: revised locking of jobs exceeding PARALLEL limit
+ - Client/Server: improved logging of unexpected exceptions
+ - XQuery optimization: faster iteration of atomized values
+ - GUI, Project View: only repaint relevant sub tree after updates
+ - GUI, Project View: improved file search
+ - GUI, Editor: revised rendering of whitespaces and long strings
+ - GUI, Info View: limit size of evaluation cache
+
 VERSION 8.6 (January 24, 2017) -----------------------------------------
 
  LOCKING
