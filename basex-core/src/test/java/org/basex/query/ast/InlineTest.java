@@ -143,4 +143,19 @@ public final class InlineTest extends QueryPlanTest {
         "count(//Window) eq 1",
         "//Let << //Window");
   }
+
+  /** Checks that inlining a nested closure works properly. */
+  @Test public void gh1424() {
+    check("declare function local:f() {"
+        + "  let $func := function($key) { map { $key: 'ok' }($key) }"
+        + "  let $input := <ok/>"
+        + "  let $call := $func(name($input))"
+        + "  return function() { $call }"
+        + "};"
+        + "local:f()()",
+        "ok",
+        "exists(/*/DynFuncCall)",
+        "empty(//StaticFunc)",
+        "exists(/*/DynFuncCall/GFLWOR/Closure)");
+  }
 }

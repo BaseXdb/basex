@@ -227,18 +227,28 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    cc.pushScope(new VarScope(vs.sc));
+    final VarScope innerScope = new VarScope(vs.sc);
+
+    final HashMap<Var, Expr> outer = new HashMap<>();
+    for(final Entry<Var, Expr> e : global.entrySet()) {
+      outer.put(e.getKey(), e.getValue().copy(cc, vm));
+    }
+
+    cc.pushScope(innerScope);
     try {
-      vs.copy(cc, vm);
+      final IntObjMap<Var> innerVars = new IntObjMap<>();
+      vs.copy(cc, innerVars);
+
       final HashMap<Var, Expr> nl = new HashMap<>();
-      for(final Entry<Var, Expr> e : global.entrySet()) {
-        nl.put(vm.get(e.getKey().id), e.getValue().copy(cc, vm));
+      for(final Entry<Var, Expr> e : outer.entrySet()) {
+        nl.put(innerVars.get(e.getKey().id), e.getValue());
       }
+
       final Var[] vars = args.clone();
       final int vl = vars.length;
-      for(int v = 0; v < vl; v++) vars[v] = vm.get(vars[v].id);
+      for(int v = 0; v < vl; v++) vars[v] = innerVars.get(vars[v].id);
 
-      final Expr e = expr.copy(cc, vm);
+      final Expr e = expr.copy(cc, innerVars);
       e.markTailCalls(null);
       return copyType(new Closure(info, name, type, vars, e, anns, nl, cc.vs()));
     } finally {
