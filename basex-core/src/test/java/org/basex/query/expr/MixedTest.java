@@ -106,4 +106,21 @@ public final class MixedTest extends AdvancedQueryTest {
     execute(new CreateDB(NAME, "<x/>"));
     query("declare function local:a($a) { contains($a, 'a') }; //x[local:a(.)]", "");
   }
+
+  /** Type intersections. */
+  @Test
+  public void gh1427() {
+    query("let $a := function($f) as element(*) { $f() }"
+        + "let $b := $a(function() as element(xml)* { <xml/> })"
+        + "return $b", "<xml/>");
+    query("let $a := function($f) as element(xml)* { $f() }"
+        + "let $b := $a(function() as element(*) { <xml/> })"
+        + "return $b", "<xml/>");
+    query("let $a := function($f) as element(xml) { $f() }"
+        + "let $b := $a(function() as element() { <xml/> })"
+        + "return $b", "<xml/>");
+    query("let $a := function($f) as element(xml) { $f() }"
+        + "let $b := $a(function() as element(*)* { <xml/> })"
+        + "return $b", "<xml/>");
+  }
 }
