@@ -463,10 +463,6 @@ final class TextRenderer extends BaseXBack {
       if(showNL && ch == '\n') {
         g.setColor(GUIConstants.gray);
         g.drawString("\u00b6", x, y);
-      } else if(showInvisible && (ch == '\u00a0' || ch >= 0x2000 && ch <= 0x202F)) {
-        final int s = fontHeight / 12 + 1;
-        g.setColor(GUIConstants.gray);
-        g.fillRect(x + (stringWidth >> 1), y - fontHeight * 3 / 10, s, s);
       } else if(showInvisible && ch == '\t') {
         final int yy = y - fontHeight * 3 / 10;
         final int s = 1 + fontHeight / 12;
@@ -479,18 +475,14 @@ final class TextRenderer extends BaseXBack {
       } else if(ch >= TokenBuilder.PRIVATE_START && ch <= TokenBuilder.PRIVATE_END) {
         g.setFont(font);
       } else if(ch > ' ') {
-        g.setColor(color);
-        String string = iter.nextString();
-        int ww = width - x;
-        if(x + stringWidth > ww) {
-          // shorten string if it cannot be completely shown (saves memory)
-          int c = 0;
-          for(final int nl = string.length(); c < nl && ww > 0; c++) {
-            ww -= charWidth(string.charAt(c));
-          }
-          string = string.substring(0, c);
+        if(showInvisible && Character.isSpaceChar(ch)) {
+          final int s = fontHeight / 12 + 1;
+          g.setColor(GUIConstants.gray);
+          g.fillRect(x + (stringWidth >> 1), y - fontHeight * 3 / 10, s, s);
+        } else {
+          g.setColor(color);
+          g.drawString(iter.nextString(), x, y);
         }
-        g.drawString(string, x, y);
       }
 
       // underline linked text
