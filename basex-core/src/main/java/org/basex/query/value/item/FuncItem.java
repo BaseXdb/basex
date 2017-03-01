@@ -153,12 +153,12 @@ public final class FuncItem extends FItem implements Scope {
       refs[p] = new VarRef(ii, vars[p]);
     }
 
-    final Expr e = new DynFuncCall(ii, sc, this, refs);
+    final Expr ex = new DynFuncCall(ii, sc, expr.has(Flag.UPD), false, this, refs);
 
     final CompileContext cc = new CompileContext(qc);
     cc.pushScope(scp);
 
-    final Expr optimized = opt ? e.optimize(cc) : e, checked;
+    final Expr optimized = opt ? ex.optimize(cc) : ex, checked;
     if(ft.type == null || tp.type != null && tp.type.instanceOf(ft.type)) {
       checked = optimized;
     } else {
@@ -227,6 +227,12 @@ public final class FuncItem extends FItem implements Scope {
       }
     });
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(cc);
+  }
+
+  @Override
+  public boolean isVacuousBody() {
+    final SeqType st = expr.seqType();
+    return st != null && st.eq(SeqType.EMP) && !expr.has(Flag.UPD);
   }
 
   @Override

@@ -391,6 +391,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
+  public boolean isVacuousBody() {
+    return isVacuous();
+  }
+
+  @Override
   public boolean accept(final ASTVisitor visitor) {
     for(final Entry<Var, Expr> e : global.entrySet())
       if(!e.getValue().accept(visitor)) return false;
@@ -432,12 +437,16 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   /**
    * Assigns the updating flag.
+   * @throws QueryException query exception
    */
-  private void checkUpdating() {
+  private void checkUpdating() throws QueryException {
     // derive updating flag from function body
     updating = expr.has(Flag.UPD);
-    if(!updating) anns.delete(Annotation.UPDATING);
-    else if(!anns.contains(Annotation.UPDATING)) anns.add(new Ann(info, Annotation.UPDATING));
+    final boolean updAnn = anns.contains(Annotation.UPDATING);
+    if(updating != updAnn) {
+      if(!updAnn) anns.add(new Ann(info, Annotation.UPDATING));
+      else if(!expr.isVacuous()) throw UPEXPECTF.get(info);
+    }
   }
 
   /**

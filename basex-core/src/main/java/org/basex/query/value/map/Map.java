@@ -340,6 +340,11 @@ public final class Map extends FItem {
   }
 
   @Override
+  public boolean isVacuousBody() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     return MAP + " { " + root.append(new StringBuilder()).toString().replaceAll(", $", "") + " }";
   }

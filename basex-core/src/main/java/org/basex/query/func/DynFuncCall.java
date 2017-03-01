@@ -30,7 +30,7 @@ public final class DynFuncCall extends FuncCall {
   /** Static context. */
   private final StaticContext sc;
   /** Updating flag. */
-  private final boolean upd;
+  private final boolean updating;
 
   /** Non-deterministic flag. */
   private boolean ndt;
@@ -53,17 +53,17 @@ public final class DynFuncCall extends FuncCall {
    * Function constructor.
    * @param info input info
    * @param sc static context
-   * @param upd updating flag
+   * @param updating updating flag
    * @param ndt non-deterministic flag
    * @param expr function expression
    * @param arg arguments
    */
-  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean upd,
+  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
       final boolean ndt, final Expr expr, final Expr... arg) {
 
     super(info, ExprList.concat(arg, expr));
     this.sc = sc;
-    this.upd = upd;
+    this.updating = updating;
     this.ndt = ndt;
     sc.dynFuncCall = true;
   }
@@ -154,7 +154,7 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(cc, vm, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = new DynFuncCall(info, sc, upd, ndt, copy[last], args);
+    final DynFuncCall call = new DynFuncCall(info, sc, updating, ndt, copy[last], args);
     if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
     return copyType(call);
   }
@@ -192,12 +192,18 @@ public final class DynFuncCall extends FuncCall {
 
   /**
    * Checks if the function is updating or not.
-   * @param item function expression
+   * @param expr function expression
    * @throws QueryException query exception
    */
-  private void checkUpdating(final XQFunctionExpr item) throws QueryException {
-    if(!sc.mixUpdates && upd != item.annotations().contains(Annotation.UPDATING))
-      throw (upd ? FUNCNOTUP : FUNCUP).get(info);
+  private void checkUpdating(final XQFunctionExpr expr) throws QueryException {
+    // mix updates, correct annotation: all fine
+    if(sc.mixUpdates || updating == expr.annotations().contains(Annotation.UPDATING)) return;
+
+    if(!updating) {
+      throw FUNCUP_X.get(info, expr);
+    } else if(!expr.isVacuousBody()) {
+      throw FUNCNOTUP_X.get(info, expr);
+    }
   }
 
   @Override
@@ -210,7 +216,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.UPD ? upd : flag == Flag.NDT ? ndt : super.has(flag);
+    return flag == Flag.UPD ? updating : flag == Flag.NDT ? ndt : super.has(flag);
   }
 
   @Override

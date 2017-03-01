@@ -1182,32 +1182,43 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("db:output#1", "db:output#1");
     query("db:output#1, db:output#1", "db:output#1\ndb:output#1");
 
+    query("function() { () }()", "");
     query("declare updating function local:a() { () }; local:a#0", "local:a#0");
     query("declare function local:a() { local:a#0 };"
         + "declare updating function local:b() { db:output('1') }; local:a()", "local:a#0");
     query("updating function() { delete node <a/> }()");
-    // updating annotation is ignored
-    query("%updating function() { 1 }()", "1");
 
-    error("function() { delete node <a/> }()", FUNCUP);
-    error("updating %updating function() { 1 }()", FUNCNOTUP);
+    query("let $f := %updating function() {} return updating $f()", "");
+    query("updating %updating function() {}()", "");
+    query("declare function local:a() { () }; updating local:a#0()", "");
 
-    error("db:output(?)(<a/>)", FUNCUP);
-    error("db:output#1(<a/>)", FUNCUP);
-    error("%updating function($a) { db:output($a) }(1)", FUNCUP);
-    error("declare updating function local:a() { () }; local:a#0()", FUNCUP);
+    error("function() { delete node <a/> }()", FUNCUP_X);
+    error("updating %updating function() { 1 }()", UPEXPECTF);
+    error("%updating function() { 1 }()", UPEXPECTF);
+
+    error("db:output(?)(<a/>)", FUNCUP_X);
+    error("db:output#1(<a/>)", FUNCUP_X);
+    error("%updating function($a) { db:output($a) }(1)", FUNCUP_X);
+    error("declare updating function local:a() { () }; local:a#0()", FUNCUP_X);
 
     query("declare function local:a() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; updating local:a()()", "1");
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()()", FUNCUP);
+        + "declare updating function local:b() { db:output('1') }; local:a()()", FUNCUP_X);
 
-    error("updating count(?)(1)", FUNCNOTUP);
-    error("updating count#1(1)", FUNCNOTUP);
-    error("updating function($a) { count($a) }(1)", FUNCNOTUP);
-    error("declare function local:a() { () }; updating local:a#0()", FUNCNOTUP);
+    error("updating count(?)(1)", FUNCNOTUP_X);
+    error("updating count#1(1)", FUNCNOTUP_X);
+    error("updating function($a) { count($a) }(1)", FUNCNOTUP_X);
     error("declare function local:a() { local:b#0 };"
-        + "declare function local:b() { count('1') }; updating local:a()()", FUNCNOTUP);
+        + "declare function local:b() { count('1') }; updating local:a()()", FUNCNOTUP_X);
+  }
+
+  /** Coercion of updating functions. GH-1430. */
+  @Test
+  public void coerceUpdating() {
+    query("let $f := "
+        + "function($arg as %updating function(item()*) as empty-sequence()) { $arg } "
+        + "return prof:void($f(function($e) { $e ! (delete node .) }))", "");
   }
 
   /** Test method. */

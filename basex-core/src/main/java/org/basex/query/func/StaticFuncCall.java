@@ -113,7 +113,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean isVacuous() {
-    return func.isVacuous();
+    return func.isVacuousBody();
   }
 
   @Override

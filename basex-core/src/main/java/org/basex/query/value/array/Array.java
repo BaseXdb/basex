@@ -337,6 +337,11 @@ public abstract class Array extends FItem {
   }
 
   @Override
+  public final boolean isVacuousBody() {
+    return false;
+  }
+
+  @Override
   public Value atomValue(final InputInfo ii) throws QueryException {
     return atm(ii, false);
   }
