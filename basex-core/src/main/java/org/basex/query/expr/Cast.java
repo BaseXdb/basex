@@ -46,7 +46,7 @@ public final class Cast extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    if(st.one() && !st.mayBeArray()) seqType = SeqType.get(seqType.type, Occ.ONE);
+    if(st.one() && !st.mayBeArray()) seqType = seqType.withOcc(Occ.ONE);
 
     // pre-evaluate value
     if(expr.isValue()) return optPre(value(cc.qc), cc);

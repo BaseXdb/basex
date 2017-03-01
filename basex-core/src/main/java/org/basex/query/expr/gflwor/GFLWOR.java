@@ -12,7 +12,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -248,7 +247,7 @@ public final class GFLWOR extends ParseExpr {
       return Empty.SEQ;
     }
 
-    seqType = SeqType.get(ret.seqType().type, size);
+    seqType = ret.seqType().withSize(size);
 
     if(clauses.getFirst() instanceof Where) {
       // where A <...> return B  ===>  if(A) then <...> return B else ()

@@ -35,6 +35,7 @@ public final class XQuery30Test extends QueryTest {
         "for $a in (1,1) let $b := $a group by $b order by $a return 1" },
       { "FLWOR Err 4",
         "for $a in (1,1) let $b := $a group by $b order by $a return 1" },
+
       { "FLWOR 6", integers(2),
         "for $a in 1 for $a in 2 group by $a return $a" },
       { "FLWOR 7", integers(2, 3),

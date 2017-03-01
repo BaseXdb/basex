@@ -622,11 +622,11 @@ public enum QueryError {
   BASEURIARG_X(FORG, 2, "Invalid base URI: %."),
 
   /** FORG0003. */
-  ZEROORONE(FORG, 3, "Zero or one value expected."),
+  ZEROORONE(FORG, 3, "Zero or one item expected."),
   /** FORG0004. */
-  ONEORMORE(FORG, 4, "One or more values expected."),
+  ONEORMORE(FORG, 4, "One or more item expected."),
   /** FORG0005. */
-  EXACTLYONE(FORG, 5, "Exactly one value expected."),
+  EXACTLYONE(FORG, 5, "Exactly one item expected."),
 
   /** FORG0006. */
   MINMAX_X_X_X(FORG, 6, "% expected, % found: %."),
@@ -1045,9 +1045,7 @@ public enum QueryError {
   /** XPTY0004. */
   FUNCUP_X(XPTY, 4, "Function must not be updating: %."),
   /** XPTY0004. */
-  FUNCUP(XPTY, 4, "Function must not be updating."),
-  /** XPTY0004. */
-  FUNCNOTUP(XPTY, 4, "Function is not updating."),
+  FUNCNOTUP_X(XPTY, 4, "Function is not updating: %."),
 
   /** XPTY0018. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),

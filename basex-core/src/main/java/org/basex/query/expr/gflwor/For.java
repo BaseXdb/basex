@@ -118,7 +118,7 @@ public final class For extends ForLet {
   public For optimize(final CompileContext cc) throws QueryException {
     final SeqType tp = expr.seqType();
     final boolean emp = empty && tp.mayBeZero();
-    seqType = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
+    seqType = tp.withOcc(emp ? Occ.ZERO_ONE : Occ.ONE);
     var.refineType(seqType, cc);
     if(pos != null) pos.refineType(SeqType.ITR, cc);
     if(score != null) score.refineType(SeqType.DBL, cc);

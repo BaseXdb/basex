@@ -3,8 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -67,7 +66,7 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    seqType = SeqType.get(exprs[exprs.length - 1].seqType().type, Occ.ZERO_MORE);
+    seqType = exprs[exprs.length - 1].seqType().withOcc(Occ.ZERO_MORE);
 
     // rewrite path with empty steps
     for(final Expr expr : exprs) if(expr.isEmpty()) return optPre(cc);

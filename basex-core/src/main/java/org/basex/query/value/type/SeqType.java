@@ -46,8 +46,8 @@ public final class SeqType {
     }
 
     /**
-     * Checks if the specified occurrence indicator is an instance of the
-     * current occurrence indicator.
+     * Checks if the specified occurrence indicator is an instance of the current occurrence
+     * indicator.
      * @param occ occurrence indicator to check
      * @return result of check
      */
@@ -57,8 +57,7 @@ public final class SeqType {
 
     /**
      * Computes the intersection between this occurrence indicator and the given one.
-     * If none exists (e.g. between {@link #ZERO} and {@link #ONE}), {@code null} is
-     * returned.
+     * If none exists (e.g. between {@link #ZERO} and {@link #ONE}), {@code null} is returned.
      * @param other other occurrence indicator
      * @return intersection or {@code null}
      */
@@ -263,7 +262,7 @@ public final class SeqType {
    * unique sequence type instances.
    * @param type type
    */
-  SeqType(final Type type) {
+  protected SeqType(final Type type) {
     this(type, Occ.ONE);
   }
 
@@ -292,17 +291,6 @@ public final class SeqType {
   /**
    * Returns a sequence type.
    * @param type type
-   * @param occ number of occurrences
-   * @return sequence type
-   */
-  public static SeqType get(final Type type, final long occ) {
-    return get(type, occ == 0 ? Occ.ZERO : occ == 1 ? Occ.ONE : occ > 1 ? Occ.ONE_MORE :
-      Occ.ZERO_MORE);
-  }
-
-  /**
-   * Returns a sequence type.
-   * @param type type
    * @param occ occurrences
    * @param kind kind test
    * @return sequence type
@@ -317,7 +305,8 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType withOcc(final Occ o) {
-    return o == occ ? this : get(type, o, kind);
+    // return original type if occurrence is identical, or if occurrence will always be 0
+    return o == occ || occ.max == 0 && o.min == 0 ? this : get(type, o, kind);
   }
 
   /**
@@ -573,6 +562,14 @@ public final class SeqType {
    */
   public boolean zeroOrOne() {
     return occ.max <= 1;
+  }
+
+  /**
+   * Tests if the type yields zero items.
+   * @return result of check
+   */
+  public boolean zero() {
+    return occ.max == 0;
   }
 
   /**

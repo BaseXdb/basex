@@ -26,11 +26,12 @@ public final class FnZeroOrOne extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr e = exprs[0];
     final SeqType st = e.seqType();
     if(st.zeroOrOne()) return e;
-    seqType = SeqType.get(st.type, seqType.occ);
+    if(st.occ.min > 1) throw ZEROORONE.get(info);
+    seqType = st;
     return this;
   }
 }

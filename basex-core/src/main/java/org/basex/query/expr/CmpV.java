@@ -9,7 +9,6 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -178,8 +177,8 @@ public final class CmpV extends Cmp {
 
     final Expr e1 = exprs[0], e2 = exprs[1];
     final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    seqType = SeqType.get(AtomType.BLN, st1.one() && !st1.mayBeArray() &&
-        st2.one() && !st2.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
+    seqType = st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray()
+        ? SeqType.BLN : SeqType.BLN_ZO;
 
     Expr e = this;
     if(oneIsEmpty()) {

@@ -115,7 +115,7 @@ public final class List extends Arr {
         final SeqType et = expr.seqType();
         if(et.occ != Occ.ZERO) st = st == null ? et : st.union(et);
       }
-      seqType = SeqType.get(st == null ? AtomType.ITEM : st.type, o);
+      seqType = st != null ? st.withOcc(o) : SeqType.get(AtomType.ITEM, o);
     }
 
     return this;

@@ -187,7 +187,7 @@ public abstract class Path extends ParseExpr {
 
     // try to compute result size and derive result type from last step
     path.size = path.size(cc);
-    path.seqType = SeqType.get(lastExpr.seqType().type, path.size);
+    path.seqType = lastExpr.seqType().withSize(path.size);
 
     // single attribute with exact name test will return at most one result
     if(path.root == null && sl == 1 && lastExpr instanceof Step) {

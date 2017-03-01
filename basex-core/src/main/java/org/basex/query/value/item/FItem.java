@@ -14,7 +14,7 @@ import org.basex.util.*;
 
 /**
  * Abstract super class for function items.
- * This class is inherited by either {@link Map}, {@link Array}, or {@link FuncItem}.
+ * This class is inherited by {@link Map}, {@link Array}, and {@link FuncItem}.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler

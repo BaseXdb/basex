@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 
 /**
@@ -39,7 +38,7 @@ public final class FnIndexOf extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    if(exprs[0].seqType().zeroOrOne()) seqType = SeqType.get(seqType().type, Occ.ZERO_ONE);
+    if(exprs[0].seqType().zeroOrOne()) seqType = seqType.withOcc(Occ.ZERO_ONE);
     return this;
   }
 }

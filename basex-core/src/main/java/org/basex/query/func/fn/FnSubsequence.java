@@ -137,7 +137,7 @@ public class FnSubsequence extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
-    seqType = SeqType.get(st.type, st.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+    seqType = st.withOcc(st.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     return this;
   }
 }
