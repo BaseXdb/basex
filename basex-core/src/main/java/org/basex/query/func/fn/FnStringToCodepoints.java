@@ -19,27 +19,33 @@ import org.basex.query.value.type.*;
 public final class FnStringToCodepoints extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] s = toEmptyToken(exprs[0], qc);
-    if(s == null) return Empty.ITER;
-
-    return new Iter() {
-      int l;
+    final int[] cps = cps(toEmptyToken(exprs[0], qc));
+    return new BasicIter<Int>(cps.length) {
       @Override
-      public Item next() {
-        if(l >= s.length) return null;
-        final int i = cp(s, l);
-        l += cl(s, l);
-        return Int.get(i);
+      public Int get(final long i) {
+        return Int.get(cps[(int) i]);
+      }
+      @Override
+      public Value value() {
+        return FnStringToCodepoints.value(cps);
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int[] tmp = cps(toEmptyToken(exprs[0], qc));
-    final int tl = tmp.length;
+    return value(cps(toEmptyToken(exprs[0], qc)));
+  }
+
+  /**
+   * Returns the specified codepoints as value.
+   * @param cps codepoints
+   * @return value
+   */
+  private static Value value(final int[] cps) {
+    final int tl = cps.length;
     final long[] vals = new long[tl];
-    for(int t = 0; t < tl; t++) vals[t] = tmp[t];
+    for(int t = 0; t < tl; t++) vals[t] = cps[t];
     return IntSeq.get(vals, AtomType.ITR);
   }
 }

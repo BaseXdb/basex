@@ -38,19 +38,10 @@ public final class FnSort extends StandardFunc {
     }
 
     final Integer[] order = sort(vl, this, coll);
-    return new ValueIter() {
-      int c;
+    return new BasicIter<Item>(sz) {
       @Override
-      public Item get(final long i) { return value.itemAt(order[(int) i]); }
-      @Override
-      public Item next() { return c < sz ? get(c++) : null; }
-      @Override
-      public long size() { return sz; }
-      @Override
-      public Value value() {
-        final ValueBuilder vb = new ValueBuilder();
-        for(int r = 0; r < sz; r++) vb.add(get(r));
-        return vb.value();
+      public Item get(final long i) {
+        return value.itemAt(order[(int) i]);
       }
     };
   }

@@ -35,9 +35,11 @@ public final class Range extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     Expr e = this;
     if(oneIsEmpty()) {
-      e = Empty.SEQ;
+      e = null;
     } else if(allAreValues()) {
       e = value(cc.qc);
+      // range sequence: skip optimization info
+      if(e instanceof RangeSeq) return e;
     }
     return optPre(e, cc);
   }

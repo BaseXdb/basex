@@ -30,7 +30,9 @@ public class FnSubsequence extends StandardFunc {
 
     // optimization: return subsequence
     final Iter iter = qc.iter(exprs[0]);
-    if(iter instanceof ValueIter) return eval(((ValueIter) iter).value(), start, len).iter();
+    if(iter instanceof BasicIter) {
+      return eval(((BasicIter<?>) iter).value(), start, len).iter();
+    }
 
     // fast route if the size is known
     final long max = iter.size();
@@ -70,7 +72,9 @@ public class FnSubsequence extends StandardFunc {
 
     // optimization: return subsequence
     final Iter iter = qc.iter(exprs[0]);
-    if(iter instanceof ValueIter) return eval(((ValueIter) iter).value(), start, len);
+    if(iter instanceof BasicIter) {
+      return eval(((BasicIter<?>) iter).value(), start, len);
+    }
 
     // fast route if the size is known
     final long max = iter.size();

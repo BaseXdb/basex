@@ -20,11 +20,21 @@ public final class Empty extends Value {
   /** Single instance. */
   public static final Empty SEQ = new Empty();
   /** Empty iterator. */
-  public static final ValueIter ITER = new ValueIter() {
-    @Override public Item next() { return null; }
-    @Override public Item get(final long i) { return null; }
-    @Override public Value value() { return SEQ; }
-    @Override public long size() { return 0; }
+  public static final BasicIter<Item> ITER = new BasicIter<Item>(0) {
+    @Override
+    public Item next() {
+      return null;
+    }
+
+    @Override
+    public Item get(final long i) {
+      return null;
+    }
+
+    @Override
+    public Value value() {
+      return SEQ;
+    }
   };
 
   /**
@@ -55,7 +65,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public ValueIter iter() {
+  public BasicIter<Item> iter() {
     return ITER;
   }
 

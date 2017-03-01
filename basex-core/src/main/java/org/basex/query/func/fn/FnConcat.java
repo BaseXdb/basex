@@ -16,8 +16,8 @@ public final class FnConcat extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    for(final Expr a : exprs) {
-      final Item it = a.atomItem(qc, info);
+    for(final Expr expr : exprs) {
+      final Item it = expr.atomItem(qc, info);
       if(it != null) tb.add(it.string(info));
     }
     return Str.get(tb.finish());

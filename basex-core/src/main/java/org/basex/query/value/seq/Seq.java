@@ -55,17 +55,16 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public ValueIter iter() {
-    return new ValueIter() {
-      int c;
+  public BasicIter<Item> iter() {
+    return new BasicIter<Item>(size) {
       @Override
-      public Item get(final long i) { return itemAt(i); }
+      public Item get(final long i) {
+        return itemAt(i);
+      }
       @Override
-      public Item next() { return c < size ? itemAt(c++) : null; }
-      @Override
-      public long size() { return size; }
-      @Override
-      public Value value() { return Seq.this; }
+      public Value value() {
+        return Seq.this;
+      }
     };
   }
 

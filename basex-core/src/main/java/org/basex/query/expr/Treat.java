@@ -10,7 +10,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -53,7 +52,7 @@ public final class Treat extends Single {
       throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
     }
     // treat as empty sequence
-    if(seqType.occ == Occ.ZERO) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
+    if(seqType.zero()) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
 
     if(seqType.zeroOrOne()) {
       final Item n = iter.next();
@@ -91,7 +90,7 @@ public final class Treat extends Single {
       throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
     }
     // treat as empty sequence
-    if(seqType.occ == Occ.ZERO) throw NOTREAT_X_X_X.get(info, val.type, seqType, val);
+    if(seqType.zero()) throw NOTREAT_X_X_X.get(info, val.type, seqType, val);
 
     if(seqType.zeroOrOne()) {
       if(len > 1) throw NOTREAT_X_X_X.get(info, val.seqType(), seqType, val);

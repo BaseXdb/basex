@@ -54,7 +54,7 @@ public class FtMark extends StandardFunc {
     return new Iter() {
       final FTPosData ftd = new FTPosData();
       Iter ir;
-      ValueIter vi;
+      BasicIter<Item> vi;
 
       @Override
       public Item next() throws QueryException {

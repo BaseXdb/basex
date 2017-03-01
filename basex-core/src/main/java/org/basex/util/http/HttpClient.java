@@ -57,7 +57,7 @@ public final class HttpClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public ValueIter sendRequest(final byte[] href, final ANode request, final Iter bodies)
+  public BasicIter<Item> sendRequest(final byte[] href, final ANode request, final Iter bodies)
       throws QueryException {
 
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);

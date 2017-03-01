@@ -18,13 +18,10 @@ import org.basex.util.*;
 public final class UtilLastFrom extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr e = exprs[0];
-    if(e.seqType().zeroOrOne()) return e.item(qc, info);
-
     // fast route if the size is known
-    final Iter iter = qc.iter(e);
-    final long max = iter.size();
-    if(max >= 0) return max == 0 ? null : iter.get(max - 1);
+    final Iter iter = qc.iter(exprs[0]);
+    final long sz = iter.size();
+    if(sz >= 0) return sz == 0 ? null : iter.get(sz - 1);
 
     // loop through all items
     Item litem = null;

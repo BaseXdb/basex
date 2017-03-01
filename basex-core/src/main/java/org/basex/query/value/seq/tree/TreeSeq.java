@@ -108,7 +108,7 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public abstract ValueIter iter();
+  public abstract BasicIter<Item> iter();
 
   @Override
   public final void materialize(final InputInfo ii) throws QueryException {

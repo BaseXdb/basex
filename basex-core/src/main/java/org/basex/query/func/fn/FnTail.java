@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
@@ -19,34 +18,23 @@ import org.basex.query.value.type.SeqType.Occ;
 public final class FnTail extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Expr e = exprs[0];
-    if(e.seqType().zeroOrOne()) return Empty.ITER;
-
-    final Iter ir = e.iter(qc);
-    if(ir instanceof ValueIter) {
-      final Value val = ir.value();
-      return val.size() < 2 ? Empty.ITER : val.subSeq(1, val.size() - 1).iter();
-    }
-    if(ir.next() == null) return Empty.ITER;
-
-    return new Iter() {
-      @Override
-      public Item next() throws QueryException {
-        return ir.next();
-      }
-    };
+    final Iter ir = qc.iter(exprs[0]);
+    return ir.size() == 1 || ir.next() == null ? Empty.ITER : ir;
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = qc.value(exprs[0]);
-    return val.size() < 2 ? Empty.SEQ : val.subSeq(1, val.size() - 1);
+    final long vs = val.size();
+    return vs < 2 ? Empty.SEQ : val.subSeq(1, vs - 1);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType st = exprs[0].seqType();
-    seqType = st.withOcc(st.zeroOrOne() ? Occ.ZERO : Occ.ZERO_MORE);
+    final Expr e = exprs[0];
+    final SeqType st = e.seqType();
+    if(st.zeroOrOne()) return e;
+    seqType = st.withOcc(Occ.ZERO_MORE);
     return this;
   }
 }

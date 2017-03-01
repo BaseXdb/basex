@@ -19,9 +19,10 @@ public final class RandomGaussian extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final long num = toLong(exprs[0], qc);
     return new Iter() {
-      final int num = (int) toLong(exprs[0], qc);
       int count;
+
       @Override
       public Item next() {
         return ++count <= num ? Dbl.get(RND.nextGaussian()) : null;

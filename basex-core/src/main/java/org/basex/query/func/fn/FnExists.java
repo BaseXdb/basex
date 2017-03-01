@@ -23,7 +23,8 @@ public final class FnExists extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     // ignore non-deterministic expressions (e.g.: error())
     final Expr e = exprs[0];
-    return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.UPD) ? this : Bln.get(e.size() != 0);
+    final long es = e.size();
+    return es == -1 || e.has(Flag.NDT) || e.has(Flag.UPD) ? this : Bln.get(es != 0);
   }
 
   @Override

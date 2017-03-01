@@ -37,17 +37,16 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final ValueIter iter() {
-    return new ValueIter() {
-      private boolean req;
+  public final BasicIter<Item> iter() {
+    return new BasicIter<Item>(1) {
       @Override
-      public Item next() { if(req) return null; req = true; return Item.this; }
+      public Item get(final long i) {
+        return Item.this;
+      }
       @Override
-      public long size() { return 1; }
-      @Override
-      public Item get(final long i) { return Item.this; }
-      @Override
-      public Value value() { return Item.this; }
+      public Value value() {
+        return Item.this;
+      }
     };
   }
 

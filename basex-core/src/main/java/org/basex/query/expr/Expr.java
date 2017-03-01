@@ -124,7 +124,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting, atomized item,
-   * or a {@code null} reference if the expression yields an empty sequence.
+   * or {@code null} if the expression yields an empty sequence.
    * @param qc query context
    * @param ii input info (required for {@link Seq} instances, which have no input info)
    * @return item or {@code null}

@@ -135,28 +135,15 @@ public final class ItemList extends ElementList implements Iterable<Item> {
    * The list must not be modified after the iterator has been requested.
    * @return the iterator
    */
-  public Iter iter() {
-    return new Iter() {
-      int pos;
-
-      @Override
-      public Value value() {
-        return ItemList.this.value();
-      }
-
-      @Override
-      public long size() {
-        return size;
-      }
-
-      @Override
-      public Item next() {
-        return pos < size ? list[pos++] : null;
-      }
-
+  public BasicIter<Item> iter() {
+    return new BasicIter<Item>(size) {
       @Override
       public Item get(final long i) {
         return list[(int) i];
+      }
+      @Override
+      public Value value() {
+        return ItemList.this.value();
       }
     };
   }

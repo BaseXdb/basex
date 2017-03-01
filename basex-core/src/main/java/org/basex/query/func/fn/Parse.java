@@ -116,7 +116,6 @@ public abstract class Parse extends StandardFunc {
    * @return result
    */
   public static Iter textIter(final byte[] str) {
-    // no I/O exception expected, as input is a main-memory array
     try {
       final NewlineInput nli = new NewlineInput(new ArrayInput(str));
       final TokenBuilder tb = new TokenBuilder();
@@ -126,6 +125,7 @@ public abstract class Parse extends StandardFunc {
           try {
             return nli.readLine(tb) ? Str.get(tb.toArray()) : null;
           } catch(final IOException ex) {
+            // no I/O exception expected, as input is a main-memory array
             throw Util.notExpected(ex);
           }
         }

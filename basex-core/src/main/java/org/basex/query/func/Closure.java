@@ -332,7 +332,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public ValueIter iter(final QueryContext qc) throws QueryException {
+  public BasicIter<?> iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
   }
 

@@ -42,7 +42,7 @@ public final class DbBackups extends StandardFunc {
       int up = -1;
 
       @Override
-      public Item next() throws QueryException {
+      public FElem next() throws QueryException {
         if(++up >= backups.size()) return null;
         final String backup = backups.get(up);
         final long length = new IOFile(dbpath, backup + IO.ZIPSUFFIX).length();

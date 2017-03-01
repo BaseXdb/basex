@@ -246,9 +246,9 @@ public final class Map extends FItem {
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<>();
-    final ValueIter vi = keys().iter();
-    for(Item k; (k = vi.next()) != null;) {
-      map.put(k.toJava(), get(k, null).toJava());
+    final BasicIter<?> iter = keys().iter();
+    for(Item key; (key = iter.next()) != null;) {
+      map.put(key.toJava(), get(key, null).toJava());
     }
     return map;
   }

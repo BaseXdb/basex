@@ -113,7 +113,7 @@ public final class List extends Arr {
       SeqType st = null;
       for(final Expr expr : exprs) {
         final SeqType et = expr.seqType();
-        if(et.occ != Occ.ZERO) st = st == null ? et : st.union(et);
+        if(!et.zero()) st = st == null ? et : st.union(et);
       }
       seqType = st != null ? st.withOcc(o) : SeqType.get(AtomType.ITEM, o);
     }

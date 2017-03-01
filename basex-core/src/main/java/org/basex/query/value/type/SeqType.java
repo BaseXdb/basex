@@ -553,7 +553,7 @@ public final class SeqType {
    * @return result of check
    */
   public long occ() {
-    return occ == Occ.ZERO ? 0 : occ == Occ.ONE ? 1 : -1;
+    return zero() ? 0 : one() ? 1 : -1;
   }
 
   /**
@@ -569,7 +569,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean zero() {
-    return occ.max == 0;
+    return occ == Occ.ZERO;
   }
 
   /**
@@ -640,7 +640,7 @@ public final class SeqType {
    */
   public String typeString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(occ == Occ.ZERO ? EMPTY_SEQUENCE + "()" : type);
+    sb.append(zero() ? EMPTY_SEQUENCE + "()" : type);
     if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
     return sb.toString();
   }
@@ -648,7 +648,7 @@ public final class SeqType {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(occ != Occ.ONE && type instanceof FuncType) {
+    if(!one() && type instanceof FuncType) {
       sb.append('(').append(typeString()).append(')');
     } else {
       sb.append(typeString());

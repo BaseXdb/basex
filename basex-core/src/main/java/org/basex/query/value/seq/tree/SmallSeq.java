@@ -150,23 +150,11 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public ValueIter iter() {
-    return new ValueIter() {
-      private int pos;
-
-      @Override
-      public Item next() {
-        return pos < size ? elems[pos++] : null;
-      }
-
+  public BasicIter<Item> iter() {
+    return new BasicIter<Item>(size) {
       @Override
       public Item get(final long i) {
         return elems[(int) i];
-      }
-
-      @Override
-      public long size() {
-        return size;
       }
 
       @Override

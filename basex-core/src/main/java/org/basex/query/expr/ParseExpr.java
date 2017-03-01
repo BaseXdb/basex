@@ -75,8 +75,8 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = item(qc, info);
-    return it1 == null ? null : it1.atomItem(info);
+    final Item it = item(qc, info);
+    return it == null ? null : it.atomItem(info);
   }
 
   /**
@@ -124,7 +124,8 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final long size() {
-    return size == -1 ? seqType().occ() : size;
+    final long s = size;
+    return s == -1 ? seqType().occ() : s;
   }
 
   // OPTIMIZATIONS ================================================================================
@@ -255,8 +256,7 @@ public abstract class ParseExpr extends Expr {
    * @return token (empty string if result is an empty sequence)
    * @throws QueryException query exception
    */
-  protected final byte[] toEmptyToken(final Expr ex, final QueryContext qc)
-      throws QueryException {
+  protected final byte[] toEmptyToken(final Expr ex, final QueryContext qc) throws QueryException {
     final Item it = ex.atomItem(qc, info);
     return it == null ? EMPTY : toToken(it);
   }

@@ -8,6 +8,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
@@ -32,22 +33,31 @@ public class DbList extends DbFn {
 
     final Data data = checkData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
-    final IntList il = data.resources.docs(path);
-    final TokenList tl = data.resources.binaries(path);
-    return new Iter() {
-      final int is = il.size(), ts = tl.size();
-      int ip, tp;
+    final IntList docs = data.resources.docs(path);
+    final TokenList bins = data.resources.binaries(path);
+    final int ds = docs.size(), sz = ds + bins.size();
+
+    return new BasicIter<Str>(sz) {
       @Override
       public Str get(final long i) {
-        return i < is ? Str.get(data.text(il.get((int) i), true)) :
-          i < is + ts ? Str.get(tl.get((int) i - is)) : null;
+        return i < sz ? Str.get(tokenAt((int) i)) : null;
       }
+
       @Override
-      public Str next() {
-        return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
+      public Value value() {
+        final TokenList tl = new TokenList(sz);
+        for(int i = 0; i < sz; i++) tl.add(tokenAt(i));
+        return StrSeq.get(tl);
       }
-      @Override
-      public long size() { return is + ts; }
+
+      /**
+       * Returns the specified token.
+       * @param i token index
+       * @return token
+       */
+      private byte[] tokenAt(final int i) {
+        return i < ds ? data.text(docs.get(i), true) : bins.get(i - ds);
+      }
     };
   }
 

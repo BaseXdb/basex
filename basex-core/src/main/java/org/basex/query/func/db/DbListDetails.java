@@ -46,33 +46,26 @@ public final class DbListDetails extends DbList {
 
     final Data data = checkData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
-    final IntList il = data.resources.docs(path);
-    final TokenList tl = data.resources.binaries(path);
+    final IntList docs = data.resources.docs(path);
+    final TokenList bins = data.resources.binaries(path);
+    final int ds = docs.size(), sz = ds + bins.size();
 
-    return new Iter() {
-      final int is = il.size(), ts = tl.size();
-      int ip, tp;
+    return new BasicIter<FNode>(sz) {
       @Override
-      public ANode get(final long i) {
-        if(i < is) {
-          final int pre = il.get((int) i);
+      public FNode get(final long i) {
+        if(i < ds) {
+          final int pre = docs.get((int) i);
           final byte[] pt = data.text(pre, true);
           return resource(pt, false, data.size(pre, Data.DOC), MediaType.APPLICATION_XML,
               data.meta.time);
         }
-        if(i < is + ts) {
-          final byte[] pt = tl.get((int) i - is);
+        if(i < sz) {
+          final byte[] pt = bins.get((int) i - ds);
           final IOFile io = data.meta.binary(string(pt));
           return resource(pt, true, io.length(), MediaType.get(io.path()), io.timeStamp());
         }
         return null;
       }
-      @Override
-      public ANode next() {
-        return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
-      }
-      @Override
-      public long size() { return is + ts; }
     };
   }
 
@@ -84,10 +77,9 @@ public final class DbListDetails extends DbList {
   private Iter listDBs(final QueryContext qc) {
     final Context ctx = qc.context;
     final StringList dbs = ctx.filter(Perm.READ, ctx.databases.listDBs());
-    return new Iter() {
-      int pos;
+    return new BasicIter<FNode>(dbs.size()) {
       @Override
-      public ANode get(final long i) {
+      public FElem get(final long i) {
         final String name = dbs.get((int) i);
         final FElem database = new FElem(DATABASE);
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
@@ -102,13 +94,8 @@ public final class DbListDetails extends DbList {
         } catch(final IOException ignore) {
           // invalid database will be ignored
         }
-        database.add(name);
-        return database;
+        return database.add(name);
       }
-      @Override
-      public ANode next() throws QueryException { return pos < size() ? get(pos++) : null; }
-      @Override
-      public long size() { return dbs.size(); }
     };
   }
 

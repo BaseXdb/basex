@@ -91,11 +91,13 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Returns true if at least one argument is empty or will yield 0 results.
+   * Returns true if at least one argument returns the empty sequence.
    * @return result of check
    */
   protected final boolean oneIsEmpty() {
-    for(final Expr expr : exprs) if(expr.isEmpty()) return true;
+    for(final Expr expr : exprs) {
+      if(expr.isEmpty()) return true;
+    }
     return false;
   }
 

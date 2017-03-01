@@ -52,7 +52,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final ValueIter iter(final QueryContext qc) {
+  public final BasicIter<Item> iter(final QueryContext qc) {
     return iter();
   }
 
@@ -65,7 +65,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Returns an iterator.
    * @return iterator
    */
-  public abstract ValueIter iter();
+  public abstract BasicIter<Item> iter();
 
   @Override
   public final Value value(final QueryContext qc) {
@@ -224,7 +224,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Gets the item at the given position in the value.
+   * Returns the item at the given position in the value.
    * The specified value must be lie within the valid bounds.
    * @param pos position
    * @return item
@@ -238,8 +238,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract boolean homogeneous();
 
   /**
-   * Returns a sequence in reverse order.
-   * @return sequence
+   * Returns all items of this value in reverse order.
+   * @return items in reverse order
    */
   public abstract Value reverse();
 

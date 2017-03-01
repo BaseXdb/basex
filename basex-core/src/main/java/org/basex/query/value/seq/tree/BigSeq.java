@@ -512,9 +512,8 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public ValueIter iter() {
-    return new ValueIter() {
-      private long pos;
+  public BasicIter<Item> iter() {
+    return new BasicIter<Item>(size) {
       private Iterator<Item> sub;
 
       @Override
@@ -531,11 +530,6 @@ final class BigSeq extends TreeSeq {
       @Override
       public Item get(final long i) {
         return itemAt(i);
-      }
-
-      @Override
-      public long size() {
-        return size;
       }
 
       @Override

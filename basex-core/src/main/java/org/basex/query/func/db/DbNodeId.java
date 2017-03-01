@@ -15,9 +15,8 @@ import org.basex.query.value.node.*;
 public final class DbNodeId extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter ir = qc.iter(exprs[0]);
     return new Iter() {
-      final Iter ir = qc.iter(exprs[0]);
-
       @Override
       public Int next() throws QueryException {
         final Item it = ir.next();
