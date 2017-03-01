@@ -88,7 +88,7 @@ final class MapDefault extends MapPainter {
       } else {
         g.setColor(GUIConstants.color((r.level << 1) + 8));
         g.setFont(GUIConstants.mfont);
-        final byte[] text = ViewData.content(data, pre, false);
+        final byte[] text = ViewData.text(data, pre, false);
 
         r.thumb = MapRenderer.calcHeight(g, r, text, fsz) >= r.h;
         if(r.thumb) {

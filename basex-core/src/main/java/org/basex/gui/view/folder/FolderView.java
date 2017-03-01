@@ -222,7 +222,7 @@ public final class FolderView extends View {
     g.setColor(color1);
     g.drawLine(2, y + boxMargin - 1, totalW - 5, y + boxMargin - 1);
 
-    final byte[] name = ViewData.content(data, pre, false);
+    final byte[] name = ViewData.text(data, pre, false);
 
     int p = gui.context.focused;
     while(p > pre) p = ViewData.parent(data, p);

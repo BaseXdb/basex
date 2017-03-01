@@ -29,14 +29,14 @@ final class MapLayout {
 
   /**
    * Constructor.
-   * @param d data reference to use in this layout
-   * @param tl text lengths array
-   * @param opts gui options
+   * @param data data reference to use in this layout
+   * @param textLen text lengths array
+   * @param gopts gui options
    */
-  MapLayout(final Data d, final int[] tl, final GUIOptions opts) {
-    data = d;
-    textLen = tl;
-    gopts = opts;
+  MapLayout(final Data data, final int[] textLen, final GUIOptions gopts) {
+    this.data = data;
+    this.textLen = textLen;
+    this.gopts = gopts;
     off = GUIConstants.fontSize + 4;
 
     switch(gopts.get(GUIOptions.MAPOFFSETS)) {

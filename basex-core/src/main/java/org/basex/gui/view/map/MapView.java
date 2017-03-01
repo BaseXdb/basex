@@ -373,7 +373,7 @@ public final class MapView extends View {
         f.x += 3;
         f.w -= 3;
         // read content from disk
-        final byte[] text = MapPainter.content(data, f);
+        final byte[] text = MapPainter.text(data, f);
         // calculate tooltip
         final int[][] info = new FTLexer().init(text).info();
         final TokenList tl = MapRenderer.calculateToolTip(f, info, mouseX, mouseY, getWidth(), g);

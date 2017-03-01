@@ -74,12 +74,12 @@ abstract class MapPainter {
   abstract void drawRectangles(Graphics g, MapRects r, float scale);
 
   /**
-   * Returns the content for the specified pre value.
+   * Returns textual contents for a rectangle.
    * @param data data reference
    * @param mr map rectangle
    * @return byte[] content
    */
-  static byte[] content(final Data data, final MapRect mr) {
-    return ViewData.content(data, mr.pre, false);
+  static byte[] text(final Data data, final MapRect mr) {
+    return ViewData.text(data, mr.pre, false);
   }
 }

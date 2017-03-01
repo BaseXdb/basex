@@ -24,18 +24,18 @@ public final class ViewData {
   /**
    * Checks if the specified node is a text node.
    * @param opts gui options
-   * @param d data reference
+   * @param data data reference
    * @param pre pre value
    * @return result of check
    */
-  public static boolean leaf(final GUIOptions opts, final Data d, final int pre) {
-    final int kind = d.kind(pre);
+  public static boolean leaf(final GUIOptions opts, final Data data, final int pre) {
+    final int kind = data.kind(pre);
     if(kind == Data.ATTR) return true;
 
     final boolean atts = opts.get(GUIOptions.MAPATTS);
-    final int last = pre + (atts ? 1 : d.attSize(pre, kind));
-    return last == d.meta.size || d.parent(pre, kind) >=
-      d.parent(last, d.kind(last));
+    final int last = pre + (atts ? 1 : data.attSize(pre, kind));
+    return last == data.meta.size || data.parent(pre, kind) >=
+      data.parent(last, data.kind(last));
   }
 
   /**
@@ -56,39 +56,38 @@ public final class ViewData {
       k = data.kind(p);
     }
 
-    final byte[] doc = content(data, p, true);
+    final byte[] doc = text(data, p, true);
     final TokenBuilder tb = new TokenBuilder();
     tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(doc)));
     for(int i = il.size() - 1; i >= 0; i--) {
-      tb.add('/').add(content(data, il.get(i), true));
+      tb.add('/').add(text(data, il.get(i), true));
     }
     return tb.finish();
   }
 
   /**
-   * Returns the contents of the specified node.
+   * Returns textual contents for the specified node.
    * @param data data reference
-   * @param p pre value
-   * @param s if specified, a short representation is returned
-   * (no full-text nodes, only attribute names)
-   * @return name
+   * @param pre pre value
+   * @param compact if specified, a compact representation is returned
+   * @return text
    */
-  public static byte[] content(final Data data, final int p, final boolean s) {
-    final int k = data.kind(p);
-    switch(k) {
-      case Data.ELEM: return data.name(p, k);
-      case Data.DOC:  return data.text(p, true);
-      case Data.TEXT: return s ? TEXT : data.text(p, true);
-      case Data.COMM: return s ? COMMENT : data.text(p, true);
-      case Data.PI:   return s ? PI : data.text(p, true);
+  public static byte[] text(final Data data, final int pre, final boolean compact) {
+    final int kind = data.kind(pre);
+    switch(kind) {
+      case Data.ELEM: return data.name(pre, kind);
+      case Data.DOC:  return data.text(pre, true);
+      case Data.TEXT: return compact ? TEXT : data.text(pre, true);
+      case Data.COMM: return compact ? COMMENT : data.text(pre, true);
+      case Data.PI:   return compact ? PI : data.text(pre, true);
     }
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(ATT);
-    tb.add(data.name(p, k));
-    if(!s) {
+    tb.add(data.name(pre, kind));
+    if(!compact) {
       tb.add(ATT1);
-      tb.add(data.text(p, false));
+      tb.add(data.text(pre, false));
       tb.add(ATT2);
     }
     return tb.finish();
@@ -110,7 +109,7 @@ public final class ViewData {
         if(att != null) return att;
       }
     }
-    return content(data, pre, true);
+    return text(data, pre, true);
   }
 
   /**
