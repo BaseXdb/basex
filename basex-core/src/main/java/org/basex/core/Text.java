@@ -1029,7 +1029,7 @@ public interface Text {
 
   /** Button text for creating things. */
   String CREATE = lang("create");
-  /** Button for starting the server. */
+  /** Button for stopping the server. */
   String STOP = lang("stop");
   /** Button for deleting all. */
   String DELETE_ALL = lang("delete_all");

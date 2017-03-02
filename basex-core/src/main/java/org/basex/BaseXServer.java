@@ -101,11 +101,16 @@ public final class BaseXServer extends CLI implements Runnable {
       socket = new ServerSocket();
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port));
-      stopFile = stopFile(port);
+      stopFile = stopFile(getClass(), port);
+    } catch(final BindException ex) {
+      context.log.writeServer(LogType.ERROR, Util.message(ex));
+      Util.debug(ex);
+      throw new BaseXException(SRV_RUNNING_X, port);
+    } catch(final IOException ex) {
+      throw ex;
     } catch(final Exception ex) {
       context.log.writeServer(LogType.ERROR, Util.message(ex));
-      if(ex instanceof BindException) throw new BaseXException(SRV_RUNNING_X, port);
-      if(ex instanceof IOException) throw ex;
+      Util.debug(ex);
       throw new BaseXException(ex.getLocalizedMessage());
     }
 
@@ -159,6 +164,7 @@ public final class BaseXServer extends CLI implements Runnable {
           cl.start();
         }
       } catch(final SocketException ex) {
+        Util.debug(ex);
         break;
       } catch(final Throwable ex) {
         // socket may have been unexpectedly closed
@@ -167,15 +173,6 @@ public final class BaseXServer extends CLI implements Runnable {
         break;
       }
     }
-  }
-
-  /**
-   * Generates a stop file for the specified port.
-   * @param port server port
-   * @return stop file
-   */
-  private static IOFile stopFile(final int port) {
-    return new IOFile(Prop.TMP, Util.className(BaseXServer.class) + port);
   }
 
   /**
@@ -298,8 +295,10 @@ public final class BaseXServer extends CLI implements Runnable {
       return false;
     } catch(final LoginException ex) {
       // if login was checked, server is running
+      Util.debug(ex);
       return true;
     } catch(final IOException ex) {
+      Util.debug(ex);
       return false;
     }
   }
@@ -311,13 +310,18 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws IOException I/O exception
    */
   public static void stop(final String host, final int port) throws IOException {
-    final IOFile stopFile = stopFile(port);
+    // create stop file
+    final IOFile stopFile = stopFile(BaseXServer.class, port);
     stopFile.touch();
+
+    // try to connect the server
     try(Socket s = new Socket(host, port)) {
     } catch(final ConnectException ex) {
+      Util.debug(ex);
+      stopFile.delete();
       throw new IOException(Util.info(CONNECTION_ERROR_X, port));
     }
-    // wait and check if server was really stopped
+    // wait until server was stopped
     do Performance.sleep(10); while(stopFile.exists());
   }
 

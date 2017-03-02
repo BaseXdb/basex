@@ -52,6 +52,8 @@ public final class Context {
   private User user;
   /** Data reference. */
   private Data data;
+  /** Indicates if the context has been closed. */
+  private boolean closed;
 
   // GUI references
 
@@ -149,6 +151,8 @@ public final class Context {
    * and not on client instances.
    */
   public synchronized void close() {
+    if(closed) return;
+    closed = true;
     jobs.close();
     sessions.close();
     datas.close();

@@ -250,7 +250,7 @@ public final class Strings {
   }
 
   /**
-   * Capitalizes a string.
+   * Capitalizes the first letter of a string.
    * @param string input string
    * @return capitalized string
    */
