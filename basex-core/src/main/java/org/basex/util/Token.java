@@ -1136,21 +1136,12 @@ public final class Token {
    */
   public static byte[] tc(final byte[] token) {
     final int tl = token.length;
-    boolean title = true;
-    if(ascii(token)) {
-      final byte[] tok = new byte[tl];
-      for(int t = 0; t < tl; t++) {
-        final byte cp = token[t];
-        tok[t] = (byte) (title ? uc(cp) : lc(cp));
-        title = cp > 0 && cp <= ' ';
-      }
-      return tok;
-    }
-    final TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder(tl);
+    boolean del = false;
     for(int t = 0; t < tl; t += cl(token, t)) {
       final int cp = cp(token, t);
-      tb.add(title ? uc(cp) : lc(cp));
-      title = cp > 0 && cp <= ' ';
+      tb.add(del ? lc(cp) : uc(cp));
+      del = Character.isLetterOrDigit(cp);
     }
     return tb.finish();
   }
