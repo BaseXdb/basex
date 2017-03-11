@@ -4,13 +4,14 @@ import static org.basex.api.xmldb.BXXMLDBText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
+import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.modules.*;
@@ -71,9 +72,8 @@ final class BXQueryService implements XPathQueryService {
 
   @Override
   public BXResourceSet query(final String query) throws XMLDBException {
-    final DBNodes nodes = coll.ctx.current();
-    final boolean all = nodes.all();
-    return query(query, DBNodeSeq.get(new IntList(nodes.pres()), nodes.data(), all, all));
+    final Data data = coll.data;
+    return query(query, DBNodeSeq.get(data.resources.docs(), data, true, true));
   }
 
   @Override
@@ -120,11 +120,12 @@ final class BXQueryService implements XPathQueryService {
    */
   private BXResourceSet query(final String query, final Value nodes) throws XMLDBException {
     // creates a query instance
-    try(QueryProcessor qp = new QueryProcessor(query, coll.ctx)) {
+    final Context ctx = coll.ctx;
+    try(QueryProcessor qp = new QueryProcessor(query, ctx)) {
       qp.context(nodes);
       qp.parse();
       try {
-        qp.register(coll.ctx);
+        qp.register(ctx);
         // add default namespaces
         for(final Entry<String, String> entry : ns.entrySet()) {
           qp.sc.ns.add(token(entry.getKey()), token(entry.getValue()), null);
@@ -133,7 +134,7 @@ final class BXQueryService implements XPathQueryService {
         return new BXResourceSet(qp.value(), coll);
       } finally {
         qp.close();
-        qp.unregister(coll.ctx);
+        qp.unregister(ctx);
       }
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());

@@ -157,6 +157,7 @@ public final class Context {
     sessions.close();
     datas.close();
     log.close();
+    closeDB();
   }
 
   /**

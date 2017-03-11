@@ -126,19 +126,7 @@ public class DBNodeSeq extends NativeSeq {
    */
   public static Value get(final IntList pres, final Data data, final boolean docs,
       final boolean all) {
-    return get(pres.toArray(), data, docs ? NodeType.DOC : NodeType.NOD, all);
-  }
-
-  /**
-   * Creates a node sequence with the given data reference and pre values.
-   * @param pres pre values
-   * @param data data reference
-   * @param type node type
-   * @param all pre values reference all documents of the database
-   * @return resulting item or sequence
-   */
-  private static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
-    return pres.length == 0 ? Empty.SEQ : pres.length == 1 ? new DBNode(data, pres[0]) :
-      new DBNodeSeq(pres, data, type, all);
+    return pres.isEmpty() ? Empty.SEQ : pres.size() == 1 ? new DBNode(data, pres.get(0)) :
+      new DBNodeSeq(pres.toArray(), data, docs ? NodeType.DOC : NodeType.NOD, all);
   }
 }

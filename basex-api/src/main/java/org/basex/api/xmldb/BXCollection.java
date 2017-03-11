@@ -29,6 +29,8 @@ public final class BXCollection implements Collection {
   final BXDatabase db;
   /** Database context. */
   public Context ctx;
+  /** Database. */
+  public Data data;
 
   /**
    * Constructor to create/open a collection.
@@ -44,8 +46,8 @@ public final class BXCollection implements Collection {
     ctx = db.ctx;
     try {
       final MainOptions mopts = ctx.options;
-      ctx.openDB(open ? Open.open(name, ctx, mopts) :
-        CreateDB.create(name, Parser.emptyParser(mopts), ctx, mopts));
+      data = open ? Open.open(name, ctx, mopts) :
+        CreateDB.create(name, Parser.emptyParser(mopts), ctx, mopts);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
@@ -53,16 +55,17 @@ public final class BXCollection implements Collection {
 
   @Override
   public String getName() {
-    return ctx.data().meta.name;
+    return data.meta.name;
   }
 
   @Override
   public Service[] getServices() throws XMLDBException {
     check();
     return new Service[] {
-        getService(BXQueryService.XPATH, "1.0"),
-        getService(BXQueryService.XQUERY, "1.0"),
-        getService(BXCollectionManagementService.MANAGEMENT, "1.0") };
+      getService(BXQueryService.XPATH, "1.0"),
+      getService(BXQueryService.XQUERY, "1.0"),
+      getService(BXCollectionManagementService.MANAGEMENT, "1.0")
+    };
   }
 
   @Override
@@ -104,13 +107,12 @@ public final class BXCollection implements Collection {
   @Override
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data().meta.ndocs;
+    return data.meta.ndocs;
   }
 
   @Override
   public String[] listResources() throws XMLDBException {
     check();
-    final Data data = ctx.data();
     final IntList docs = data.resources.docs();
     final int ds = docs.size();
     final StringList sl = new StringList(ds);
@@ -139,17 +141,16 @@ public final class BXCollection implements Collection {
 
     // check if the resource is an xml resource
     final BXXMLResource del = checkXML(res);
-    final Data data = ctx.data();
 
     // check if data instance refers to another database
     if(del.data != data && del.data != null) throw new XMLDBException(
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
+    final MainOptions mopts = ctx.options;
     try {
-      data.startUpdate(ctx.options);
+      data.startUpdate(mopts);
       data.delete(getResource(del.getId()).pre);
-      ctx.invalidate();
-      data.finishUpdate(ctx.options);
+      data.finishUpdate(mopts);
     } catch(final BaseXException ex) {
       Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
@@ -177,22 +178,21 @@ public final class BXCollection implements Collection {
     final Object cont = xml.content;
 
     // insert document
+    final MainOptions mopts = ctx.options;
     final Data md;
     try {
       final Parser p = cont instanceof Document ?
-        new DOMWrapper((Document) cont, id, ctx.options) :
-        Parser.singleParser(new IOContent((byte[]) cont, id), ctx.options, "");
+        new DOMWrapper((Document) cont, id, mopts) :
+        Parser.singleParser(new IOContent((byte[]) cont, id), mopts, "");
       md = MemBuilder.build(id, p);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());
     }
 
-    final Data data = ctx.data();
     try {
-      data.startUpdate(ctx.options);
+      data.startUpdate(mopts);
       data.insert(data.meta.size, -1, new DataClip(md));
-      ctx.invalidate();
-      data.finishUpdate(ctx.options);
+      data.finishUpdate(mopts);
     } catch(final BaseXException ex) {
       Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
@@ -203,7 +203,6 @@ public final class BXCollection implements Collection {
   public BXXMLResource getResource(final String id) throws XMLDBException {
     check();
     if(id == null) return null;
-    final Data data = ctx.data();
     final int pre = data.resources.doc(id);
     return pre == -1 ? null : new BXXMLResource(data, pre, id, this);
   }
@@ -220,20 +219,22 @@ public final class BXCollection implements Collection {
 
   @Override
   public boolean isOpen() {
-    return ctx != null;
+    return data != null;
   }
 
   @Override
   public void close() {
-    if(ctx != null) ctx.close();
-    ctx = null;
+    if(data != null) {
+      data.close();
+      data = null;
+    }
   }
 
   @Override
   public String getProperty(final String name) throws XMLDBException {
     check();
     try {
-      return MetaData.class.getField(name).get(ctx.data().meta).toString();
+      return MetaData.class.getField(name).get(data.meta).toString();
     } catch(final Exception ex) {
       return null;
     }
@@ -243,7 +244,7 @@ public final class BXCollection implements Collection {
   public void setProperty(final String name, final String val) throws XMLDBException {
     check();
     try {
-      final MetaData md = ctx.data().meta;
+      final MetaData md = data.meta;
       final Field f = MetaData.class.getField(name);
       final Object k = f.get(md);
 
@@ -276,7 +277,7 @@ public final class BXCollection implements Collection {
    * @throws XMLDBException exception
    */
   private void check() throws XMLDBException {
-    if(ctx == null) throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    if(data == null) throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
   /**

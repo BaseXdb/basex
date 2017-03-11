@@ -14,7 +14,7 @@ import org.xmldb.api.base.*;
  */
 public final class DatabaseTest extends XMLDBBaseTest {
   /** Database. */
-  private Database database;
+  private BXDatabase database;
 
   /**
    * Initializes a test.
@@ -23,7 +23,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
   @Before
   public void setUp() throws Exception {
     createDB();
-    database = (Database) Class.forName(DRIVER).newInstance();
+    database = (BXDatabase) Class.forName(DRIVER).newInstance();
   }
 
   /**
@@ -73,28 +73,25 @@ public final class DatabaseTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
    */
   @Test
-  public void testGetConformanceLevel() throws Exception {
+  public void testGetConformanceLevel() {
     assertEquals(database.getConformanceLevel(), "0");
   }
 
   /**
    * Test.
-   * @throws Exception any exception
    */
   @Test
-  public void testGetName() throws Exception {
+  public void testGetName() {
     assertNotNull(database.getName());
   }
 
   /**
    * Test.
-   * @throws Exception any exception
    */
   @Test
-  public void testGetProperty() throws Exception {
+  public void testGetProperty() {
     assertNull(database.getProperty("ProbablyUnknown"));
 
     // the following tests are database specific...
