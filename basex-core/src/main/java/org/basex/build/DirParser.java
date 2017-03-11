@@ -65,9 +65,13 @@ public final class DirParser extends Parser {
     super(source, options);
 
     final boolean isDir = source.isDir();
-    final String path = isDir ? source.path() : source.dir();
-    dir = path.endsWith("/") ? path : path + '/';
-    original = isDir ? dir : path;
+    if(isDir) {
+      dir = source.path().replaceAll("/$", "") + '/';
+      original = dir;
+    } else {
+      dir = source.dir();
+      original = source.path();
+    }
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);
     archiveName = options.get(MainOptions.ARCHIVENAME);
