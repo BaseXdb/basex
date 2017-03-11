@@ -19,11 +19,14 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class CollectionTest extends XMLDBBaseTest {
   /** Collection. */
   Collection coll;
 
+  /**
+   * Initializes a test.
+   * @throws Exception any exception
+   */
   @Before
   public void setUp() throws Exception {
     createDB();
@@ -32,17 +35,29 @@ public final class CollectionTest extends XMLDBBaseTest {
     coll = database.getCollection(PATH, LOGIN, PW);
   }
 
+  /**
+   * Finalizes a test.
+   * @throws Exception any exception
+   */
   @After
   public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetName() throws Exception {
     assertEquals(COLL, coll.getName());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetServices() throws Exception {
     // get all services
@@ -60,6 +75,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetService() throws Exception {
     // assume existence of XPath service
@@ -80,6 +99,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetParentCollection() throws Exception {
     // assume there's no parent collection
@@ -91,6 +114,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetChildCollectionCount() throws Exception {
     // assume there's no child collection
@@ -104,6 +131,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testListChildCollections() throws Exception {
     // assume there's no child collection
@@ -115,6 +146,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetChildCollection() throws Exception {
     // assume there's no child collection
@@ -128,6 +163,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetResourceCount() throws Exception {
     // tests could be added for here multiple documents
@@ -139,6 +178,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testListResources() throws Exception {
     final Code code = new Code() {
@@ -151,6 +194,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testCreateResource() throws Exception {
     // test unknown resource type
@@ -186,6 +233,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testStoreResource() throws Exception {
     Resource res = coll.createResource("NoContent", XMLResource.RESOURCE_TYPE);
@@ -247,6 +298,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     });
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testRemoveResource() throws Exception {
     final Resource res =
@@ -280,6 +335,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     });
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testCreateId() throws Exception {
     final Code code = new Code() {
@@ -296,6 +355,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(code);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testIsOpen() throws Exception {
     assertTrue(coll.isOpen());
@@ -303,6 +366,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     assertFalse(coll.isOpen());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testClose() throws Exception {
     coll.close();
@@ -310,6 +377,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     assertFalse(coll.isOpen());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetProperty() throws Exception {
     assertNull(coll.getProperty("ProbablyUnknown"));
@@ -319,6 +390,10 @@ public final class CollectionTest extends XMLDBBaseTest {
     assertEquals("false", coll.getProperty("casesens"));
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testSetProperty() throws Exception {
     try {

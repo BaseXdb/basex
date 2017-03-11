@@ -12,13 +12,16 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class ResourceIteratorTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */
   private XPathQueryService serv;
 
+  /**
+   * Initializes a test.
+   * @throws Exception any exception
+   */
   @Before
   public void setUp() throws Exception {
     createDB();
@@ -28,12 +31,20 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
     serv = (XPathQueryService) coll.getService("XPathQueryService", "1.0");
   }
 
+  /**
+   * Finalizes a test.
+   * @throws Exception any exception
+   */
   @After
   public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testHasMoreResources() throws Exception {
     // test result
@@ -45,6 +56,10 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
     assertFalse("Result expected.", iter.hasMoreResources());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testNextResource() throws Exception {
     // count down number of results

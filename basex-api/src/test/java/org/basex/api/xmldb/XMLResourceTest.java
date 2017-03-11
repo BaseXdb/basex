@@ -21,13 +21,16 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class XMLResourceTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */
   private XMLResource res;
 
+  /**
+   * Initializes a test.
+   * @throws Exception any exception
+   */
   @Before
   public void setUp() throws Exception {
     createDB();
@@ -37,39 +40,67 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     res = (XMLResource) coll.getResource(DOC1);
   }
 
+  /**
+   * Finalizes a test.
+   * @throws Exception any exception
+   */
   @After
   public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testParentCollection() throws Exception {
     assertEquals("Wrong collection name.", res.getParentCollection(), coll);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetID() throws Exception {
     assertEquals("Wrong ID.", res.getId(), DOC1);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetResourceType() throws Exception {
     assertEquals("Wrong resource type.", res.getResourceType(),
         XMLResource.RESOURCE_TYPE);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetContent() throws Exception {
     compare(DOCPATH + DOC1, res);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetDocumentID() throws Exception {
     // id and document id should be identical
     assertEquals("ID and DocumentID differ.", res.getId(), res.getDocumentId());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetContentAsDOM() throws Exception {
     final Node node = res.getContentAsDOM();
@@ -78,6 +109,10 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     assertEquals("Wrong root tag.", root, "first");
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testSetContentAsDOM() throws Exception {
     // store small document
@@ -98,6 +133,10 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     assertTrue("Document expected.", xml.getContent() instanceof Document);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetContentAsSAX() throws Exception {
     final DefaultHandler ch = new DefaultHandler() {
@@ -115,6 +154,10 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     ((XMLResource) coll.getResource(DOC1)).getContentAsSAX(ch);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testSetContentAsSAX() throws Exception {
     // store small document

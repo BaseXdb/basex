@@ -12,7 +12,6 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class CollectionManagementServiceTest extends XMLDBBaseTest {
   /** CollectionManagementService string. */
   private static final String CMS = "CollectionManagementService";
@@ -27,6 +26,10 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
   /** Resource. */
   private CollectionManagementService serv;
 
+  /**
+   * Initializes a test.
+   * @throws Exception any exception
+   */
   @Before
   public void setUp() throws Exception {
     createDB();
@@ -36,12 +39,20 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
     serv = (CollectionManagementService) coll.getService(CMS, "1.0");
   }
 
+  /**
+   * Finalizes a test.
+   * @throws Exception any exception
+   */
   @After
   public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testCreateCollection() throws Exception {
     // create a collection
@@ -55,24 +66,31 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
     coll1.close();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testRemoveCollection() throws Exception {
     serv.removeCollection(TEMP);
     assertNull("Collection was not removed.", db.getCollection(URL + TEMP, null, null));
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetName() throws Exception {
     assertEquals(CMS, serv.getName());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetVersion() throws Exception {
     assertEquals("1.0", serv.getVersion());
-  }
-
-  @Test
-  public void testSetCollection() {
-    // nothing serious to test...
   }
 }

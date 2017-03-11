@@ -12,22 +12,32 @@ import org.xmldb.api.base.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class DatabaseTest extends XMLDBBaseTest {
   /** Database. */
   private Database database;
 
+  /**
+   * Initializes a test.
+   * @throws Exception any exception
+   */
   @Before
   public void setUp() throws Exception {
     createDB();
     database = (Database) Class.forName(DRIVER).newInstance();
   }
 
+  /**
+   * Finalizes a test.
+   */
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     dropDB();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testAcceptsURI() throws Exception {
     database.acceptsURI(PATH);
@@ -40,6 +50,10 @@ public final class DatabaseTest extends XMLDBBaseTest {
     }
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetCollection() throws Exception {
     // directly call and close database instance
@@ -57,16 +71,28 @@ public final class DatabaseTest extends XMLDBBaseTest {
     coll.close();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetConformanceLevel() throws Exception {
     assertEquals(database.getConformanceLevel(), "0");
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetName() throws Exception {
     assertNotNull(database.getName());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetProperty() throws Exception {
     assertNull(database.getProperty("ProbablyUnknown"));
@@ -76,6 +102,10 @@ public final class DatabaseTest extends XMLDBBaseTest {
     assertEquals("1", database.getProperty("runs"));
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testSetProperty() throws Exception {
     try {
@@ -102,7 +132,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * @param exp expected error code
    * @param ex exception
    */
-  static void checkCode(final int exp, final XMLDBException ex) {
+  private static void checkCode(final int exp, final XMLDBException ex) {
     assertEquals("Wrong error code.", exp, ex.errorCode);
   }
 }

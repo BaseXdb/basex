@@ -12,13 +12,16 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class ResourceSetTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */
   private XPathQueryService serv;
 
+  /**
+   * Initializes a test.
+   * @throws Exception any exception
+   */
   @Before
   public void setUp() throws Exception {
     createDB();
@@ -28,12 +31,20 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     serv = (XPathQueryService) coll.getService("XPathQueryService", "1.0");
   }
 
+  /**
+   * Finalizes a test.
+   * @throws Exception any exception
+   */
   @After
   public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetResource() throws Exception {
     // request resource
@@ -50,6 +61,10 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     }
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testAddResource() throws Exception {
     // perform two queries
@@ -62,6 +77,10 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     assertEquals("Wrong size of result set.", size + 1, set1.getSize());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testRemoveResource() throws Exception {
     // perform query and remove result
@@ -70,6 +89,10 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     assertEquals("Wrong size of result set.", 0, set.getSize());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetIterator() throws Exception {
     // test if iterator yields results
@@ -79,6 +102,10 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     assertFalse("No results expected.", iter.hasMoreResources());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetMembersAsResource() throws Exception {
     // test created resource
@@ -89,6 +116,10 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     assertSame("Wrong collection reference.", res.getParentCollection(), coll);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetSize() throws Exception {
     // test created resource
@@ -98,6 +129,10 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     assertEquals("Wrong result size.", 0, set.getSize());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testClear() throws Exception {
     // test created resource

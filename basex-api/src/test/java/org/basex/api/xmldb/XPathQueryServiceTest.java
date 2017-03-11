@@ -13,13 +13,16 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class XPathQueryServiceTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */
   private XPathQueryService serv;
 
+  /**
+   * Initializes a test.
+   * @throws Exception any exception
+   */
   @Before
   public void setUp() throws Exception {
     createDB();
@@ -29,12 +32,20 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     serv = (XPathQueryService) coll.getService("XPathQueryService", "1.0");
   }
 
+  /**
+   * Finalizes a test.
+   * @throws Exception any exception
+   */
   @After
   public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testSetNamespace() throws Exception {
     // overwriting namespaces
@@ -54,6 +65,10 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     } catch(final XMLDBException ex) { }
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetNamespace() throws Exception {
     // testing former namespace
@@ -65,6 +80,10 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     assertEquals("No default Namespace.", "def", serv.getNamespace(""));
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testRemoveNamespace() throws Exception {
     // set and remove namespace
@@ -78,6 +97,10 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     assertNull("Namespace was not removed.", serv.getNamespace(null));
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testClearNamespace() throws Exception {
     // set and clear namespace
@@ -86,6 +109,10 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     assertNull("Namespace was not removed.", serv.getNamespace("hell"));
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testQuery() throws Exception {
     // catch query errors
@@ -106,6 +133,10 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     coll.removeResource(res);
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testQueryResource() throws Exception {
      assertEquals("Wrong result size", 3, serv.queryResource(DOC1, "//node()").getSize());
@@ -117,19 +148,22 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     } catch(final XMLDBException ignore) { }
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetName() throws Exception {
     assertEquals("XPathQueryService", serv.getName());
   }
 
+  /**
+   * Test.
+   * @throws Exception any exception
+   */
   @Test
   public void testGetVersion() throws Exception {
     assertEquals("1.0", serv.getVersion());
-  }
-
-  @Test
-  public void testSetCollection() throws Exception {
-    // nothing serious to test...
   }
 }
 
