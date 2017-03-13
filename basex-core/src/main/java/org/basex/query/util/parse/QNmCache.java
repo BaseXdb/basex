@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * QName cache.
@@ -18,18 +19,20 @@ public final class QNmCache {
   /**
    * Adds a QName to the cache.
    * @param name QName
+   * @param info input info
    */
-  public void add(final QNm name) {
-    names.add(new QNmCheck(name));
+  public void add(final QNm name, final InputInfo info) {
+    add(name, true, info);
   }
 
   /**
    * Constructor.
    * @param name qname
    * @param nsElem default check
+   * @param info input info
    */
-  public void add(final QNm name, final boolean nsElem) {
-    names.add(new QNmCheck(name, nsElem));
+  public void add(final QNm name, final boolean nsElem, final InputInfo info) {
+    names.add(new QNmCheck(name, nsElem, info));
   }
 
   /**

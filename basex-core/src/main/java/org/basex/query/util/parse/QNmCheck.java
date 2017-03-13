@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Cache for checking QNames after their construction.
@@ -16,23 +17,19 @@ final class QNmCheck {
   private final QNm name;
   /** Flag for assigning default element namespace. */
   private final boolean nsElem;
-
-  /**
-   * Constructor.
-   * @param nm qname
-   */
-  QNmCheck(final QNm nm) {
-    this(nm, true);
-  }
+  /** Input info. */
+  private final InputInfo info;
 
   /**
    * Constructor.
    * @param name qname
    * @param nsElem default check
+   * @param info input info
    */
-  QNmCheck(final QNm name, final boolean nsElem) {
+  QNmCheck(final QNm name, final boolean nsElem, final InputInfo info) {
     this.name = name;
     this.nsElem = nsElem;
+    this.info = info;
   }
 
   /**
@@ -47,7 +44,7 @@ final class QNmCheck {
 
     if(name.hasPrefix()) {
       name.uri(parser.sc.ns.uri(name.prefix()));
-      if(check && !name.hasURI()) throw parser.error(NOURI_X, name.string());
+      if(check && !name.hasURI()) throw parser.error(NOURI_X, info, name.string());
     } else if(nsElem) {
       name.uri(parser.sc.elemNS);
     }

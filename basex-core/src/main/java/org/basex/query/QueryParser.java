@@ -1754,7 +1754,10 @@ public class QueryParser extends InputParser {
     final int i = pos;
     if(!wsConsumeWs(VALIDATE)) return;
 
-    if(consume(TYPE)) qnames.add(eQName(QNAME_X, SKIPCHECK));
+    if(consume(TYPE)) {
+      final InputInfo info = info();
+      qnames.add(eQName(QNAME_X, SKIPCHECK), info);
+    }
     consume(STRICT);
     consume(LAX);
     skipWs();
@@ -2029,6 +2032,7 @@ public class QueryParser extends InputParser {
     }
     pos = p;
 
+    final InputInfo info = info();
     QNm name = eQName(null, SKIPCHECK);
     if(name != null) {
       p = pos;
@@ -2040,11 +2044,11 @@ public class QueryParser extends InputParser {
         if(!name.hasPrefix() && consume(":*")) {
           // name test: prefix:*
           name = new QNm(concat(name.string(), COLON));
-          qnames.add(name, !att);
+          qnames.add(name, !att, info);
           return new NameTest(name, Kind.URI, att, sc.elemNS);
         }
         // name test: prefix:name, name, Q{uri}name
-        qnames.add(name, !att);
+        qnames.add(name, !att, info);
         return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
       }
     }
@@ -2546,8 +2550,9 @@ public class QueryParser extends InputParser {
     final byte[] nse = sc.elemNS;
     final int npos = qnames.size();
 
+    final InputInfo info = info();
     final QNm name = new QNm(qName(ELEMNAME_X));
-    qnames.add(name);
+    qnames.add(name, info);
     consumeWS();
 
     final Atts ns = new Atts();
@@ -2635,7 +2640,7 @@ public class QueryParser extends InputParser {
         final QNm attn = new QNm(atn);
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
-        qnames.add(attn, false);
+        qnames.add(attn, false, info());
         add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
       }
       if(!consumeWS()) break;
@@ -2829,10 +2834,11 @@ public class QueryParser extends InputParser {
     skipWs();
 
     final Expr name;
+    final InputInfo info = info();
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
-      qnames.add(qn);
+      qnames.add(qn, info);
     } else {
       if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOELEMNAME);
@@ -2852,10 +2858,11 @@ public class QueryParser extends InputParser {
     skipWs();
 
     final Expr name;
+    final InputInfo info = info();
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
-      qnames.add(qn, false);
+      qnames.add(qn, false, info);
     } else {
       if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOATTNAME);
@@ -4126,7 +4133,18 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @return error
    */
-  public QueryException error(final QueryError err, final Object... arg) {
-    return err.get(info(), arg);
+  private QueryException error(final QueryError err, final Object... arg) {
+    return error(err, info(), arg);
+  }
+
+  /**
+   * Creates the specified error.
+   * @param err error to be thrown
+   * @param info input info
+   * @param arg error arguments
+   * @return error
+   */
+  public QueryException error(final QueryError err, final InputInfo info, final Object... arg) {
+    return err.get(info, arg);
   }
 }

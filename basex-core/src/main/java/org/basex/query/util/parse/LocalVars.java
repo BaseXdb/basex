@@ -96,7 +96,7 @@ public final class LocalVars {
     if(qp.module == null || eq(qp.module.uri(), uri) || qp.modules.contains(uri))
       return qp.qc.vars.newRef(name, qp.sc, ii);
 
-    throw qp.error(VARUNDEF_X, '$' + string(name.string()));
+    throw qp.error(VARUNDEF_X, ii, '$' + string(name.string()));
   }
 
   /**
