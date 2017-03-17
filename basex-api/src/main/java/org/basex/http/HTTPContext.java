@@ -109,7 +109,9 @@ public final class HTTPContext {
       }
       server = null;
     }
-    context.close();
-    context = null;
+    if(context != null) {
+      context.close();
+      context = null;
+    }
   }
 }
