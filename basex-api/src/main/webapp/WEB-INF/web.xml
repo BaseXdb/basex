@@ -51,6 +51,8 @@
   <!-- Global session and servlet listener -->
   <listener>
     <listener-class>org.basex.http.SessionListener</listener-class>
+  </listener>
+  <listener>
     <listener-class>org.basex.http.ServletListener</listener-class>
   </listener>
 
