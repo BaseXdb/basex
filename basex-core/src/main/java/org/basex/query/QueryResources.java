@@ -134,15 +134,19 @@ public final class QueryResources {
    * @throws QueryException query exception
    */
   public synchronized Data database(final String name, final InputInfo info) throws QueryException {
+    final Context ctx = qc.context;
+    final boolean mainmem = ctx.options.get(MainOptions.MAINMEM);
+
     // check if a database with the same name has already been opened
     for(final Data data : datas) {
-      if(data.inMemory()) continue;
+      // default mode: skip main-memory database instances (which may result from fn:doc calls)
+      if(data.inMemory() && !mainmem) continue;
       final String n = data.meta.name;
       if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data;
     }
+
+    // open and register database
     try {
-      // open and add new data reference
-      final Context ctx = qc.context;
       return addData(Open.open(name, ctx, ctx.options));
     } catch(final IOException ex) {
       throw BXDB_OPEN_X.get(info, ex);
