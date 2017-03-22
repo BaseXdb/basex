@@ -70,6 +70,8 @@ public final class XQuery30Test extends QueryTest {
       { "Concat 3", strings("abc"), "'a' || 'b' || 'c'" },
       { "Concat 4", strings("1true3"), "1 || true() || '3'" },
 
+      { "Sort 1", integers(1, 2), "sort((1,2), ())" },
+
       { "Try/catch 1", strings("X"), "try { 1+'a' } catch * { 'X' }" },
       { "Try/catch 2", strings("X"), "try { for $i in (42,0)" +
           "return 1 idiv $i } catch * {'X'}" },

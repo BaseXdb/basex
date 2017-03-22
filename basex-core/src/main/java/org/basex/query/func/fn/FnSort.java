@@ -30,7 +30,7 @@ public final class FnSort extends StandardFunc {
 
     final long sz = value.size();
     final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
-    if(exprs.length > 1) {
+    if(exprs.length > 2) {
       final FItem key = checkArity(exprs[2], 1, qc);
       for(final Item it : value) vl.add(key.invokeValue(qc, info, it));
     } else {
