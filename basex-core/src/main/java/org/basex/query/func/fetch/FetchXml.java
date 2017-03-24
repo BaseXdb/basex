@@ -22,21 +22,31 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class FetchXml extends StandardFunc {
+public class FetchXml extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] in = toToken(exprs[0], qc);
-    final Options opts = toOptions(1, new Options(), qc);
     if(!Uri.uri(in).isValid()) throw INVDOC_X.get(info, in);
+    return fetch(IO.get(string(in)), qc);
+  }
 
-    final IO input = IO.get(string(in));
+  /**
+   * Parses the input and creates an XML document.
+   * @param io input data
+   * @param qc query context
+   * @return node
+   * @throws QueryException query exception
+   */
+  protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
+    final Options opts = toOptions(1, new Options(), qc);
+
     final MainOptions mo = MainOptions.get();
     new DBOptions(opts, DBOptions.PARSING, info).assignTo(mo);
-
     try {
-      return new DBNode(Parser.singleParser(input, mo, ""));
+      return new DBNode(Parser.singleParser(io, mo, ""));
     } catch(final IOException ex) {
       throw BXFE_IO_X.get(info, ex);
     }
   }
+
 }
