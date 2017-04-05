@@ -21,13 +21,13 @@ import org.basex.util.list.*;
  * @author Lukas Kircher
  */
 public abstract class ContextModifier {
-  /** Update primitives, aggregated separately for each database [SINGLE]. */
+  /** Update primitives, aggregated separately for each database. */
   private final Map<Data, DataUpdates> dbUpdates = new HashMap<>();
-  /** Update primitives, aggregated separately for each database name [SINGLE]. */
+  /** Update primitives, aggregated separately for each database name. */
   private final Map<String, NameUpdates> nameUpdates = new HashMap<>();
-  /** Update primitives, aggregated separately for each user name [SINGLE]. */
+  /** Update primitives, aggregated separately for each user name. */
   private final Map<String, UserUpdates> userUpdates = new HashMap<>();
-  /** Temporary data reference, containing all XML fragments to be inserted [SINGLE]. */
+  /** Temporary data reference, containing all XML fragments to be inserted. */
   private MemData memData;
 
   /**

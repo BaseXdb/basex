@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Opened database client sessions [SINGLE].
+ * Opened database client sessions.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
@@ -49,7 +49,7 @@ public final class ClientSessions implements QueryResource {
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     for(final ClientSession cs : conns.values()) {
       try {
         if(cs != null) cs.close();
@@ -57,5 +57,6 @@ public final class ClientSessions implements QueryResource {
         Util.debug(ex);
       }
     }
+    conns.clear();
   }
 }

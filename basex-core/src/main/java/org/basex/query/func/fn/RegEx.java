@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 abstract class RegEx extends StandardFunc {
-  /** Pattern cache [SINGLE]. */
+  /** Pattern cache. */
   private final TokenObjMap<Pattern> patterns = new TokenObjMap<>();
 
   /**

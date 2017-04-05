@@ -14,7 +14,7 @@ import org.basex.query.up.primitives.*;
  * @author Christian Gruen
  */
 final class UserUpdates {
-  /** List of update operations [SINGLE]. */
+  /** List of update operations. */
   private final List<UserUpdate> userUpdates = new LinkedList<>();
 
   /**

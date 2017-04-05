@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class NameUpdates {
-  /** List of update operations [SINGLE]. */
+  /** List of update operations. */
   private final List<NameUpdate> nameUpdates = new LinkedList<>();
 
   /**
