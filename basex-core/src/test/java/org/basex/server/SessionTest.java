@@ -337,19 +337,16 @@ public abstract class SessionTest extends SandboxTest {
     final String retr = _DB_RETRIEVE.args(NAME, "X");
     // check command
     session.execute("xquery " + retr + ',' + retr);
-    assertArrayEquals(concat(tmp, token(Prop.NL), tmp), out.toArray());
-    out.reset();
+    assertArrayEquals(concat(tmp, token(Prop.NL), tmp), out.next());
     // check query execution
     session.query(retr + ',' + retr).execute();
-    assertArrayEquals(concat(tmp, token(Prop.NL), tmp), out.toArray());
-    out.reset();
+    assertArrayEquals(concat(tmp, token(Prop.NL), tmp), out.next());
     // check iterator
     final Query q = session.query(retr + ',' + retr);
     q.next();
-    assertArrayEquals(tmp, out.toArray());
-    out.reset();
+    assertArrayEquals(tmp, out.next());
     q.next();
-    assertArrayEquals(tmp, out.toArray());
+    assertArrayEquals(tmp, out.next());
     assertNull(q.next());
   }
 

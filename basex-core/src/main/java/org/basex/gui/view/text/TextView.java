@@ -196,6 +196,7 @@ public final class TextView extends View {
    */
   public void setText(final ArrayOutput out) {
     final byte[] buf = out.buffer();
+    // will never exceed integer range as the underlying array is limited to 2^31 bytes
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
     if(out.finished() && size >= chop.length) {

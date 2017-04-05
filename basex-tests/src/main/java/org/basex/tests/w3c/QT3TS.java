@@ -168,7 +168,7 @@ public final class QT3TS extends Main {
     if(report != null) {
       sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
       final String file = "ReportingResults/results_" + NAME + '_' + VERSION + IO.XMLSUFFIX;
-      new IOFile(file).write(report.create(ctx).toArray());
+      new IOFile(file).write(report.create(ctx));
       Util.outln("Creating report '" + file + "'...");
     }
 

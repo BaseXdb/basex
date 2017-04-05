@@ -108,7 +108,7 @@ final class BXXMLResource implements XMLResource {
             return null;
           }
         }
-        content = ao.toArray();
+        content = ao.finish();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
       }
@@ -204,7 +204,7 @@ final class BXXMLResource implements XMLResource {
     public void endDocument() throws SAXException {
       try {
         resource.content = new DBNode(((MemBuilder) builder).data()).serialize(
-            SerializerMode.NOINDENT.get()).toArray();
+            SerializerMode.NOINDENT.get()).finish();
       } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }

@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.io.out.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -96,7 +95,7 @@ public final class QT3TSReport {
    * @return report stream
    * @throws Exception exception
    */
-  public ArrayOutput create(final Context ctx) throws Exception {
+  public byte[] create(final Context ctx) throws Exception {
     final String dquery = "replace(string(current-date()),'\\+.*','')";
     final String date = new XQuery(dquery).execute(ctx);
 
@@ -147,7 +146,7 @@ public final class QT3TSReport {
         tc.add("result", test[1]);
       }
     }
-    return root.serialize();
+    return root.serialize().finish();
   }
 
   /**

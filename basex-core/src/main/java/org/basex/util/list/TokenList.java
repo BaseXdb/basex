@@ -204,7 +204,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @return array
    */
   public byte[][] next() {
-    final byte[][] lst = Array.copyOf(list, size);
+    final byte[][] lst = toArray();
     reset();
     return lst;
   }

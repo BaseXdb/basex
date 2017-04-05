@@ -119,7 +119,7 @@ public final class XdmInfoTest extends SandboxTest {
       final BufferInput bi = new BufferInput(sin);
       ClientSession.receive(bi, ao);
       if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
-      return ao.toArray();
+      return ao.finish();
     }
   }
 

@@ -14,9 +14,9 @@ public class PrintOutput extends OutputStream {
   /** Output stream reference. */
   protected final OutputStream os;
   /** Maximum numbers of bytes to write. */
-  long max = Long.MAX_VALUE;
+  protected long max = Long.MAX_VALUE;
   /** Number of bytes written. */
-  long size;
+  protected long size;
 
   /** Protected default constructor. */
   PrintOutput() {
@@ -54,7 +54,7 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Sets the maximum number of bytes to be written.
-   * Note that a specified limit might break unicode characters.
+   * Note that the limit might break unicode characters.
    * @param limit maximum
    */
   public final void setLimit(final int limit) {
