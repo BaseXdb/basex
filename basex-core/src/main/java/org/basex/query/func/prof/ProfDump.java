@@ -16,10 +16,11 @@ import org.basex.util.*;
 public final class ProfDump extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
     boolean empty = true;
-    for(Item it; (it = ir.next()) != null;) {
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       FnTrace.trace(it, label, info, qc);
       empty = false;
     }

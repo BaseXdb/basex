@@ -24,9 +24,15 @@ public final class FnFoldRight extends StandardFunc {
     final FItem fun = checkArity(exprs[2], 2, qc);
     if(v instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) v).iterator(v.size());
-      while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
+      while(iter.hasPrevious()) {
+        qc.checkStop();
+        res = fun.invokeValue(qc, info, iter.previous(), res);
+      }
     } else {
-      for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);
+      for(long i = v.size(); --i >= 0;) {
+        qc.checkStop();
+        res = fun.invokeValue(qc, info, v.itemAt(i), res);
+      }
     }
     return res;
   }
@@ -37,14 +43,20 @@ public final class FnFoldRight extends StandardFunc {
     final FItem fun = checkArity(exprs[2], 2, qc);
 
     // evaluate start value lazily if it's passed straight through
-    if(v.isEmpty()) return exprs[1].iter(qc);
+    if(v.isEmpty()) return qc.iter(exprs[1]);
 
     Value res = qc.value(exprs[1]);
     if(v instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) v).iterator(v.size());
-      while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
+      while(iter.hasPrevious()) {
+        qc.checkStop();
+        res = fun.invokeValue(qc, info, iter.previous(), res);
+      }
     } else {
-      for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);
+      for(long i = v.size(); --i >= 0;) {
+        qc.checkStop();
+        res = fun.invokeValue(qc, info, v.itemAt(i), res);
+      }
     }
     return res.iter();
   }

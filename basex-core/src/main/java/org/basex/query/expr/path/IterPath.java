@@ -46,7 +46,7 @@ final class IterPath extends AxisPath {
         qc.focus = focus;
 
         try {
-          while(true) {
+          do {
             final Item it = iter[pos].next();
             if(it == null) {
               if(--pos == -1) return null;
@@ -64,7 +64,8 @@ final class IterPath extends AxisPath {
                 return n;
               }
             }
-          }
+            qc.checkStop();
+          } while(true);
         } finally {
           qc.focus = qf;
         }

@@ -16,25 +16,30 @@ import org.basex.query.value.item.*;
 public final class FnFoldLeft extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter ir = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     final FItem fun = checkArity(exprs[2], 2, qc);
     Value res = qc.value(exprs[1]);
-    for(Item it; (it = ir.next()) != null;) res = fun.invokeValue(qc, info, res, it);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      res = fun.invokeValue(qc, info, res, it);
+    }
     return res;
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter ir = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
     // don't convert to a value if not necessary
-    Item it = ir.next();
-    if(it == null) return exprs[1].iter(qc);
+    Item it = iter.next();
+    if(it == null) return qc.iter(exprs[1]);
 
     Value res = qc.value(exprs[1]);
-    do res = fun.invokeValue(qc, info, res, it);
-    while((it = ir.next()) != null);
+    do {
+      qc.checkStop();
+      res = fun.invokeValue(qc, info, res, it);
+    } while((it = iter.next()) != null);
     return res.iter();
   }
 

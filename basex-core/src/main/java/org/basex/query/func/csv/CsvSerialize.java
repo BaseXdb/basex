@@ -25,6 +25,6 @@ public final class CsvSerialize extends StandardFunc {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.CSV);
     sopts.set(SerializerOptions.CSV, copts);
-    return Str.get(serialize(iter, sopts, INVALIDOPT_X));
+    return Str.get(serialize(iter, sopts, INVALIDOPT_X, qc));
   }
 }

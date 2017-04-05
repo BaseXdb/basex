@@ -15,9 +15,12 @@ import org.basex.util.*;
 public final class ProfVoid extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     // materialize values to ensure that streams are consumed
-    for(Item it; (it = ir.next()) != null;) it.materialize(info);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      it.materialize(info);
+    }
     return null;
   }
 }

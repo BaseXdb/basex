@@ -43,10 +43,11 @@ public abstract class Iter {
   /**
    * Returns a value with all iterated items.
    * Must only be called if {@link #next} has not been called before.
+   * @param qc query context
    * @return sequence
    * @throws QueryException query exception
    */
-  public Value value() throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     // check if sequence is empty
     final Item i1 = next();
     if(i1 == null) return Empty.SEQ;
@@ -55,7 +56,10 @@ public abstract class Iter {
     if(i2 == null) return i1;
 
     final ValueBuilder vb = new ValueBuilder().add(i1).add(i2);
-    for(Item i; (i = next()) != null;) vb.add(i);
+    for(Item it; (it = next()) != null;) {
+      qc.checkStop();
+      vb.add(it);
+    }
     return vb.value();
   }
 }

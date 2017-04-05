@@ -113,8 +113,8 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode anc = target;
-    final BasicNodeIter it = target.ancestor();
-    for(ANode p; (p = it.next()) != null;) anc = p;
+    final BasicNodeIter iter = target.ancestor();
+    for(ANode n; (n = iter.next()) != null;) anc = n;
 
     /* See if this ancestor has already been added to the pending update list.
      * In this case a database has already been created.

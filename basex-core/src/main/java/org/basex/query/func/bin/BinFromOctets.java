@@ -18,9 +18,10 @@ import org.basex.util.list.*;
 public final class BinFromOctets extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = exprs[0].atomIter(qc, info);
-    final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) ir.size()));
-    for(Item it; (it = ir.next()) != null;) {
+    final Iter iter = exprs[0].atomIter(qc, info);
+    final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) iter.size()));
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       final long l = toLong(it);
       if(l < 0 || l > 255) throw BIN_OOR_X.get(info, l);
       bl.add((int) l);

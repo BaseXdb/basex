@@ -20,7 +20,8 @@ public final class FnCompare extends StandardFunc {
     final Item it1 = exprs[0].atomItem(qc, info), it2 = exprs[1].atomItem(qc, info);
     final Collation coll = toCollation(2, qc);
     if(it1 == null || it2 == null) return null;
-    return Int.get(Math.max(-1, Math.min(1, coll == null ? diff(toToken(it1), toToken(it2)) :
-      coll.compare(toToken(it1), toToken(it2)))));
+    final byte[] t1 = toToken(it1), t2 = toToken(it2);
+    final long d = coll == null ? diff(t1, t2) : coll.compare(t1, t2);
+    return Int.get(d < 0 ? -1 : d > 0 ? 1 : 0);
   }
 }

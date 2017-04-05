@@ -21,7 +21,7 @@ public final class FnUnparsedTextLines extends Parse {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value();
+    return iter(qc).value(qc);
   }
 
   @Override

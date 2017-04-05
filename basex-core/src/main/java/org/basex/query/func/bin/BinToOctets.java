@@ -24,7 +24,7 @@ public final class BinToOctets extends StandardFunc {
         return Int.get(bytes[(int) i] & 0xFF);
       }
       @Override
-      public Value value() {
+      public Value value(final QueryContext q) {
         return toValue(bytes);
       }
     };

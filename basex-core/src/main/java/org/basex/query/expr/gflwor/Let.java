@@ -69,13 +69,16 @@ public final class Let extends ForLet {
   /**
    * Calculates the score of the given iterator.
    * @param iter iterator
+   * @param qc query context
    * @return score
    * @throws QueryException evaluation exception
    */
-  private static Dbl score(final Iter iter) throws QueryException {
+  private static Dbl score(final Iter iter, final QueryContext qc) throws QueryException {
     double s = 0;
     int c = 0;
-    for(Item it; (it = iter.next()) != null; s += it.score(), c++);
+    for(Item it; (it = iter.next()) != null; s += it.score(), c++) {
+      qc.checkStop();
+    }
     return Dbl.get(Scoring.avg(s, c));
   }
 
@@ -174,7 +177,7 @@ public final class Let extends ForLet {
           final boolean s = qc.scoring;
           try {
             qc.scoring = true;
-            vl = score(let.expr.iter(qc));
+            vl = score(qc.iter(let.expr), qc);
           } finally {
             qc.scoring = s;
           }

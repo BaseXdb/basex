@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.api.dom.*;
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -132,7 +133,7 @@ public abstract class FNode extends ANode {
       @Override
       public long size() { return iter.size(); }
       @Override
-      public Value value() { return iter.value(); }
+      public Value value(final QueryContext qc) { return iter.value(); }
     };
   }
 

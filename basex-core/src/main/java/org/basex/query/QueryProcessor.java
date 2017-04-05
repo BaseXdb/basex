@@ -96,8 +96,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public Value value() throws QueryException {
-    parse();
-    return qc.iter().value();
+    return iter().value(qc);
   }
 
   /**

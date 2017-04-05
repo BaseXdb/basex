@@ -44,6 +44,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
       out.level(level);
       try {
         while(true) {
+          qc.checkStop();
           Item en = entries.next();
           if(en == null) break;
           en = checkElemToken(en);

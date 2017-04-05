@@ -20,25 +20,24 @@ public final class ArrayFlatten extends ArrayFn {
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     final Iter iter = qc.iter(exprs[0]);
-    for(Item it; (it = iter.next()) != null;) {
-      if(it instanceof Array) addFlattened(vb, (Array) it);
-      else vb.add(it);
-    }
+    for(Item it; (it = iter.next()) != null;) add(vb, it, qc);
     return vb.value();
   }
 
   /**
    * Recursive helper method for flattening nested arrays.
    * @param vb sequence builder
-   * @param arr current array
+   * @param item item to be added
+   * @param qc query context
    */
-  private static void addFlattened(final ValueBuilder vb, final Array arr) {
-    for(final Value val : arr.members()) {
-      for(final Item it : val) {
-        if(it instanceof Array) addFlattened(vb, (Array) it);
-        else vb.add(it);
+  private static void add(final ValueBuilder vb, final Item item, final QueryContext qc) {
+    qc.checkStop();
+    if(item instanceof Array) {
+      for(final Value val : ((Array) item).members()) {
+        for(final Item it : val) add(vb, it, qc);
       }
     }
+    else vb.add(item);
   }
 
   @Override

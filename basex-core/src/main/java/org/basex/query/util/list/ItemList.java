@@ -2,6 +2,7 @@ package org.basex.query.util.list;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -142,7 +143,7 @@ public final class ItemList extends ElementList implements Iterable<Item> {
         return list[(int) i];
       }
       @Override
-      public Value value() {
+      public Value value(final QueryContext qc) {
         return ItemList.this.value();
       }
     };

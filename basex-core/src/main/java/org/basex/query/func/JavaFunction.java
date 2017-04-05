@@ -100,7 +100,7 @@ public abstract class JavaFunction extends Arr {
 
     if(obj == null) return Empty.SEQ;
     if(obj instanceof Value) return (Value) obj;
-    if(obj instanceof Iter) return ((Iter) obj).value();
+    if(obj instanceof Iter) return ((Iter) obj).value(qc);
     // find XQuery mapping for specified type
     final Type type = type(obj);
     if(type != null) return type.cast(obj, qc, sc, null);

@@ -49,23 +49,24 @@ abstract class Set extends Arr {
     final int el = exprs.length;
     final Iter[] iter = new Iter[el];
     for(int e = 0; e < el; e++) iter[e] = qc.iter(exprs[e]);
-    return iterable ? iter(iter) : eval(iter).iter();
+    return iterable ? iter(iter) : eval(iter, qc).iter();
   }
 
   /**
    * Evaluates the specified iterators.
-   * @param iter iterators
+   * @param iters iterators
+   * @param qc query context
    * @return resulting node list
    * @throws QueryException query exception
    */
-  protected abstract ANodeList eval(Iter[] iter) throws QueryException;
+  protected abstract ANodeList eval(Iter[] iters, QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.
-   * @param iter iterators
+   * @param iters iterators
    * @return resulting iterator
    */
-  protected abstract NodeIter iter(Iter[] iter);
+  protected abstract NodeIter iter(Iter[] iters);
 
   @Override
   public final boolean iterable() {

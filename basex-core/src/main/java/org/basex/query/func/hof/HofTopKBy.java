@@ -29,7 +29,7 @@ public final class HofTopKBy extends StandardFunc {
     final long k = Math.min(toLong(exprs[2], qc), Integer.MAX_VALUE);
     if(k < 1) return Empty.SEQ;
 
-    final Iter iter = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     final MinHeap<Item, Item> heap = new MinHeap<>(new Comparator<Item>() {
       @Override
       public int compare(final Item it1, final Item it2) {
@@ -43,6 +43,7 @@ public final class HofTopKBy extends StandardFunc {
 
     try {
       for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         heap.insert(checkNoEmpty(getKey.invokeItem(qc, info, it)), it);
         if(heap.size() > k) heap.removeMin();
       }

@@ -27,11 +27,11 @@ public final class HofTopKWith extends HofFn {
     final long k = Math.min(toLong(exprs[2], qc), Integer.MAX_VALUE);
     if(k < 1) return Empty.SEQ;
 
-    final Iter iter = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     final MinHeap<Item, Item> heap = new MinHeap<>(cmp);
-
     try {
       for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         heap.insert(it, it);
         if(heap.size() > k) heap.removeMin();
       }

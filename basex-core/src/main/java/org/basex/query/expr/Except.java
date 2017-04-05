@@ -56,16 +56,20 @@ public final class Except extends Set {
   }
 
   @Override
-  protected ANodeList eval(final Iter[] iter) throws QueryException {
+  protected ANodeList eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     final ANodeList list = new ANodeList().check();
 
-    for(Item it; (it = iter[0].next()) != null;) list.add(toNode(it));
+    for(Item it; (it = iters[0].next()) != null;) {
+      qc.checkStop();
+      list.add(toNode(it));
+    }
     final boolean db = list.dbnodes();
 
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); e++) {
-      final Iter ir = iter[e];
-      for(Item it; (it = ir.next()) != null;) {
+      final Iter iter = iters[e];
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         final int i = list.indexOf(toNode(it), db);
         if(i != -1) list.delete(i);
       }
@@ -74,8 +78,8 @@ public final class Except extends Set {
   }
 
   @Override
-  protected NodeIter iter(final Iter[] iter) {
-    return new SetIter(iter) {
+  protected NodeIter iter(final Iter[] iters) {
+    return new SetIter(iters) {
       @Override
       public ANode next() throws QueryException {
         if(item == null) {

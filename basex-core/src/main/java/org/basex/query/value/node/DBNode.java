@@ -445,9 +445,9 @@ public class DBNode extends ANode {
     // check if a document has a single element as child
     ID t = type.id();
     if(type == NodeType.DOC) {
-      final DBNodeIter ir = children();
-      final ANode n = ir.next();
-      if(n != null && n.type == NodeType.ELM && ir.next() == null) t = NodeType.DEL.id();
+      final DBNodeIter iter = children();
+      final ANode n = iter.next();
+      if(n != null && n.type == NodeType.ELM && iter.next() == null) t = NodeType.DEL.id();
     }
     return t;
   }

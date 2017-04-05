@@ -60,11 +60,11 @@ abstract class DbAccess extends DbFn {
 
     // wrap iterator with name test
     return new NodeIter() {
-      final NodeIter ir = ia.iter(qc);
+      final NodeIter iter = ia.iter(qc);
       @Override
       public ANode next() throws QueryException {
         ANode n;
-        while((n = ir.next()) != null && !nt.eq(n));
+        while((n = iter.next()) != null && !nt.eq(n));
         return n;
       }
     };

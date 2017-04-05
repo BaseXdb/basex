@@ -66,17 +66,18 @@ public final class Transform extends Arr {
 
     try {
       for(final Let copy : copies) {
-        final Iter ir = qc.iter(copy.expr);
-        Item i = ir.next();
-        if(!(i instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, i);
-        final Item i2 = ir.next();
-        if(i2 != null) throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(i, i2));
+        final Iter iter = qc.iter(copy.expr);
+        Item it = iter.next();
+        if(!(it instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, it);
+        final Item i2 = iter.next();
+        if(i2 != null)
+          throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(it, i2));
 
         // copy node to main memory data instance
-        i = ((ANode) i).dbNodeCopy(qc.context.options);
+        it = ((ANode) it).dbNodeCopy(qc.context.options);
         // add resulting node to variable
-        qc.set(copy.var, i);
-        updates.addData(i.data());
+        qc.set(copy.var, it);
+        updates.addData(it.data());
       }
       final Value v = qc.value(exprs[0]);
       if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);

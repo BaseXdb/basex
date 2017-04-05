@@ -49,15 +49,15 @@ public final class Replace extends Update {
     if(c.errAtt != null) throw UPNOATTRPER_X.get(info, c.errAtt);
     if(c.duplAtt != null) throw UPATTDUPL_X.get(info, c.duplAtt);
 
-    final Iter t = qc.iter(exprs[0]);
-    final Item i = t.next();
+    final Iter iter = qc.iter(exprs[0]);
+    final Item it = iter.next();
     // check target constraints
-    if(i == null) throw UPSEQEMP_X.get(info, Util.className(this));
-    final Type tp = i.type;
-    if(!(i instanceof ANode) || tp == NodeType.DOC) throw UPTRGNODE_X.get(info, i);
-    final Item i2 = t.next();
-    if(i2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(i, i2));
-    final ANode targ = (ANode) i;
+    if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
+    final Type tp = it.type;
+    if(!(it instanceof ANode) || tp == NodeType.DOC) throw UPTRGNODE_X.get(info, it);
+    final Item i2 = iter.next();
+    if(i2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(it, i2));
+    final ANode targ = (ANode) it;
     final Updates updates = qc.updates();
     final DBNode dbn = updates.determineDataRef(targ, qc);
 

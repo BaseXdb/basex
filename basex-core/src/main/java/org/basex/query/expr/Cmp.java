@@ -37,7 +37,7 @@ public abstract class Cmp extends Arr {
    * @return resulting expression
    */
   final boolean swap() {
-    // move value or path without root to second position
+    // move value, or path without root, to second position
     final boolean swap = exprs[0].isValue() && !exprs[1].isValue() ||
         exprs[1] instanceof Path && ((Path) exprs[1]).root == null &&
         (!(exprs[0] instanceof Path) || ((Path) exprs[0]).root != null) ||

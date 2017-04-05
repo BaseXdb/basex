@@ -80,10 +80,10 @@ public final class SqlExecutePrepared extends SqlExecute {
    * @return number of parameters
    */
   private static long countParams(final ANode params) {
-    final BasicNodeIter ch = params.children();
-    long n = ch.size();
+    final BasicNodeIter iter = params.children();
+    long n = iter.size();
     if(n == -1) do ++n;
-    while(ch.next() != null);
+    while(iter.next() != null);
     return n;
   }
 

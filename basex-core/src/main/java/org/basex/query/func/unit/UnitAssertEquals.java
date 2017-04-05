@@ -29,6 +29,7 @@ public final class UnitAssertEquals extends UnitFn {
       if(empty1 && empty2) return null;
       if(empty1 || empty2 || !comp.equal(it1.iter(), it2.iter())) break;
       c++;
+      qc.checkStop();
     }
     throw new UnitException(info, UNIT_ASSERT_EQUALS_X_X_X, it1, it2, c).value(it);
   }

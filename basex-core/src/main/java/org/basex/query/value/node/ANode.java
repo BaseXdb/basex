@@ -374,7 +374,7 @@ public abstract class ANode extends Item {
         return parent();
       }
       @Override
-      public ANode value() {
+      public ANode value(final QueryContext qc) {
         return parent();
       }
     };

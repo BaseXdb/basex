@@ -130,6 +130,7 @@ public final class ServerQuery extends Job {
       final SerializerOptions sopts = full ? SerializerMode.API.get() : qp.qc.serParams();
       try(Serializer ser = Serializer.get(po, sopts)) {
         for(Item it; (it = ir.next()) != null;) {
+          qp.qc.checkStop();
           if(iter) {
             if(full) po.write(it.xdmInfo());
             else po.write(it.typeId().asByte());

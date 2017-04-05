@@ -44,8 +44,8 @@ public final class JobsResult extends Command {
       if(result.value == null) throw result.exception;
 
       final Serializer ser = Serializer.get(out);
-      final Iter ir = result.value.iter();
-      for(Item it; (it = ir.next()) != null;) {
+      final Iter iter = result.value.iter();
+      for(Item it; (it = iter.next()) != null;) {
         ser.serialize(it);
         checkStop();
       }

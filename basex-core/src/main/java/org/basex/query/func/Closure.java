@@ -294,8 +294,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } else {
       // collect closure
       final LinkedList<Clause> cls = new LinkedList<>();
-      for(final Entry<Var, Expr> e : global.entrySet())
-        cls.add(new Let(e.getKey(), e.getValue().value(qc), false));
+      for(final Entry<Var, Expr> e : global.entrySet()) {
+        cls.add(new Let(e.getKey(), qc.value(e.getValue()), false));
+      }
       body = new GFLWOR(info, cls, expr);
     }
 

@@ -64,15 +64,16 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
-    final ArrayList<BasicNodeIter> iter = new ArrayList<>();
-    final Iter ir = qc.iter(expr);
-    for(Item it; (it = ir.next()) != null;) {
+    final ArrayList<BasicNodeIter> iters = new ArrayList<>();
+    final Iter iter = qc.iter(expr);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       final byte[] term = it.string(info);
-      iter.add(iter(trim ? Token.trim(term) : term));
+      iters.add(iter(trim ? Token.trim(term) : term));
     }
-    final int is = iter.size();
-    return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iter.get(0) :
-      new Union(info, expr).eval(iter.toArray(new NodeIter[is])).iter();
+    final int is = iters.size();
+    return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iters.get(0) :
+      new Union(info, expr).eval(iters.toArray(new NodeIter[is]), qc).iter();
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.query.util.list;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -137,7 +138,7 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
       int pos;
 
       @Override
-      public Value value() {
+      public Value value(final QueryContext qc) {
         return ANodeList.this.value();
       }
 

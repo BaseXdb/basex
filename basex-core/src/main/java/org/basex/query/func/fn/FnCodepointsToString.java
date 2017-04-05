@@ -26,13 +26,16 @@ public final class FnCodepointsToString extends StandardFunc {
     if(singleInt) return toStr(exprs[0].item(qc, ii).itr(ii), info);
 
     // current input is single item
-    final Iter ir = exprs[0].atomIter(qc, info);
-    final long is = ir.size();
-    if(is == 1) return toStr(toLong(ir.next()), info);
+    final Iter iter = exprs[0].atomIter(qc, info);
+    final long is = iter.size();
+    if(is == 1) return toStr(toLong(iter.next()), info);
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Math.max(8, (int) is));
-    for(Item it; (it = ir.next()) != null;) tb.add(check(toLong(it), info));
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      tb.add(check(toLong(it), info));
+    }
     return Str.get(tb.finish());
   }
 
@@ -64,8 +67,8 @@ public final class FnCodepointsToString extends StandardFunc {
    */
   private static int check(final long value, final InputInfo info) throws QueryException {
     if(value >= 0 && value <= Integer.MAX_VALUE) {
-      final int i = (int) value;
-      if(XMLToken.valid(i)) return i;
+      final int cp = (int) value;
+      if(XMLToken.valid(cp)) return cp;
     }
     throw INVCODE_X.get(info, Long.toHexString(value));
   }

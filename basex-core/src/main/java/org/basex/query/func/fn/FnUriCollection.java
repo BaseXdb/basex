@@ -28,6 +28,6 @@ public final class FnUriCollection extends Docs {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value();
+    return iter(qc).value(qc);
   }
 }

@@ -37,6 +37,7 @@ public final class FnPath extends StandardFunc {
         final QNm qnm = node.qname();
         final BasicNodeIter iter = node.precedingSibling();
         for(ANode fs; (fs = iter.next()) != null;) {
+          qc.checkStop();
           final QNm q = fs.qname();
           if(q != null && q.eq(qnm)) i++;
         }
@@ -44,12 +45,16 @@ public final class FnPath extends StandardFunc {
         tb.add('[').add(Integer.toString(i)).add(']');
       } else if(node.type == NodeType.COM || node.type == NodeType.TXT) {
         final BasicNodeIter iter = node.precedingSibling();
-        for(ANode fs; (fs = iter.next()) != null;) if(fs.type == node.type) i++;
+        for(ANode fs; (fs = iter.next()) != null;) {
+          qc.checkStop();
+          if(fs.type == node.type) i++;
+        }
         tb.addExt(node.seqType() + "[%]", i);
       } else if(node.type == NodeType.PI) {
         final QNm qnm = node.qname();
         final BasicNodeIter iter = node.precedingSibling();
         for(ANode fs; (fs = iter.next()) != null;) {
+          qc.checkStop();
           if(fs.type == node.type && fs.qname().eq(qnm)) i++;
         }
         tb.add(node.type.string()).add('(').add(qnm.local());

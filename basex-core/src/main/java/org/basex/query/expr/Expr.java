@@ -102,6 +102,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the resulting value.
    * The implementation of this method is optional.
+   * This function should only be called by {@link QueryContext#value(Expr)}.
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception
@@ -116,10 +117,10 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public final Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = iter(qc);
+    final Iter iter = qc.iter(this);
     final SeqType st = seqType();
-    return st.type.instanceOf(AtomType.AAT) ? ir :
-      new AtomIter(ir, qc, ii, st.mayBeArray() ? -1 : ir.size());
+    return st.type.instanceOf(AtomType.AAT) ? iter :
+      new AtomIter(iter, qc, ii, st.mayBeArray() ? -1 : iter.size());
   }
 
   /**

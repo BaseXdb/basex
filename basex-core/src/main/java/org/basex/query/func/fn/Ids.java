@@ -36,12 +36,12 @@ abstract class Ids extends StandardFunc {
   /**
    * Returns referenced nodes.
    * @param qc query context
-   * @param idref follow idref
+   * @param idref resolve id reference
    * @return referenced nodes
    * @throws QueryException query exception
    */
   protected BasicNodeIter ids(final QueryContext qc, final boolean idref) throws QueryException {
-    final TokenSet idSet = ids(exprs[0].atomIter(qc, info));
+    final TokenSet idSet = ids(exprs[0].atomIter(qc, info), qc);
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
     if(index(root, idref)) {
@@ -132,12 +132,14 @@ abstract class Ids extends StandardFunc {
   /**
    * Extracts and returns all unique ids from the iterated strings.
    * @param iter iterator
+   * @param qc query context
    * @return id set
    * @throws QueryException query exception
    */
-  private TokenSet ids(final Iter iter) throws QueryException {
+  private TokenSet ids(final Iter iter, final QueryContext qc) throws QueryException {
     final TokenSet ts = new TokenSet();
     for(Item ids; (ids = iter.next()) != null;) {
+      qc.checkStop();
       for(final byte[] id : distinctTokens(toToken(ids))) ts.put(id);
     }
     return ts;

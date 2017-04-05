@@ -59,8 +59,8 @@ public final class Extension extends Single {
   }
 
   @Override
-  public BasicIter<?> iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter(qc);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return qc.iter(value(qc));
   }
 
   @Override

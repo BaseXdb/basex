@@ -38,8 +38,8 @@ final class CachedPath extends AxisPath {
     final ANodeList list = new ANodeList().check();
     try {
       if(r != null) {
-        final Iter ir = qc.iter(r);
-        for(Item it; (it = ir.next()) != null;) {
+        final Iter iter = qc.iter(r);
+        for(Item it; (it = iter.next()) != null;) {
           // ensure that root only returns nodes
           if(root != null && !(it instanceof ANode))
             throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);

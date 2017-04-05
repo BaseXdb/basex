@@ -16,10 +16,11 @@ import org.basex.query.value.seq.*;
 public final class FnInsertBefore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter iter = qc.iter(exprs[0]);
+    final long pos = Math.max(1, toLong(exprs[1], qc));
+    final Iter ins = qc.iter(exprs[2]);
+
     return new Iter() {
-      final Iter iter = exprs[0].iter(qc);
-      final long pos = Math.max(1, toLong(exprs[1], qc));
-      final Iter ins = exprs[2].iter(qc);
       long p = pos;
       boolean last;
 
@@ -39,9 +40,9 @@ public final class FnInsertBefore extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = exprs[0].value(qc);
+    final Value val = qc.value(exprs[0]);
     final long pos = toLong(exprs[1], qc);
-    final Value sub = exprs[2].value(qc);
+    final Value sub = qc.value(exprs[2]);
 
     final long vs = val.size();
     final long p = Math.min(Math.max(0, pos - 1), vs);

@@ -40,12 +40,11 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
-    final FTIter ir = ftexpr.iter(qc);
-
+    final FTIter iter = ftexpr.iter(qc);
     return new NodeIter() {
       @Override
       public ANode next() throws QueryException {
-        final FTNode it = ir.next();
+        final FTNode it = iter.next();
         if(it != null) {
           // assign scoring
           if(qc.scoring) it.score();

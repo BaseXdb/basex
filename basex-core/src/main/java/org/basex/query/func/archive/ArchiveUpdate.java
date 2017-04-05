@@ -32,6 +32,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
     int e = 0, c = 0;
     Item en, cn;
     while(true) {
+      qc.checkStop();
       en = entr.next();
       cn = cont.next();
       if(en == null || cn == null) break;

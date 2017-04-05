@@ -63,8 +63,9 @@ public final class TransformWith extends Arr {
 
     final ValueBuilder vb = new ValueBuilder();
     try {
-      final Iter ir = qc.iter(exprs[0]);
-      for(Item it; (it = ir.next()) != null;) {
+      final Iter iter = qc.iter(exprs[0]);
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         if(!(it instanceof ANode)) throw UPSOURCE_X.get(info, it);
 
         // copy node to main memory data instance

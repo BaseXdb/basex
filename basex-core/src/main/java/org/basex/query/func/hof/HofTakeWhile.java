@@ -17,12 +17,12 @@ import org.basex.query.value.seq.*;
 public final class HofTakeWhile extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter in = qc.iter(exprs[0]);
+    final Iter iter = qc.iter(exprs[0]);
     final FItem pred = checkArity(exprs[1], 1, qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Item it = in.next();
+        final Item it = iter.next();
         if(it != null && toBoolean(pred.invokeValue(qc, info, it), qc)) return it;
         return null;
       }
@@ -35,6 +35,7 @@ public final class HofTakeWhile extends StandardFunc {
     final FItem pred = checkArity(exprs[1], 1, qc);
     final Iter iter = qc.iter(exprs[0]);
     for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       if(!pred.invokeValue(qc, info, it).ebv(qc, info).bool(info)) break;
       vb.add(it);
     }

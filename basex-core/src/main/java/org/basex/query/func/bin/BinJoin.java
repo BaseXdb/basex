@@ -17,8 +17,11 @@ public final class BinJoin extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ByteList bl = new ByteList();
-    final Iter ir = exprs[0].atomIter(qc, info);
-    for(Item it; (it = ir.next()) != null;) bl.add(toB64(it, true).binary(info));
+    final Iter iter = exprs[0].atomIter(qc, info);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      bl.add(toB64(it, true).binary(info));
+    }
     return new B64(bl.finish());
   }
 }

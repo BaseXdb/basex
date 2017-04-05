@@ -52,7 +52,7 @@ public abstract class AxisPath extends Path {
       case READY:
         // third invocation, ready for caching: cache result if context has not changed
         if(cache.sameContext(qc.focus.value, root)) {
-          cache.result = nodeIter(qc).value();
+          cache.result = nodeIter(qc).value(qc);
           cache.state = State.CACHED;
         } else {
           // disable caching if context has changed

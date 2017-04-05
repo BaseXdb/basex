@@ -71,9 +71,18 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // skip context-based or non-deterministic functions, and non-values
-    return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
-        !allAreValues() ? opt(cc) : sig.type.zeroOrOne() ? item(cc.qc, info) : value(cc.qc), cc);
+    final Expr expr;
+    if(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) || !allAreValues()) {
+      // context-based, non-deterministic, arguments are no values: call custom optimization
+      expr = opt(cc);
+    } else if(sig.type.zeroOrOne()) {
+      // pre-evaluate function, which yields an item
+      expr = item(cc.qc, info);
+    } else {
+      // pre-evaluate function, which yields a value
+      expr = cc.qc.value(this);
+    }
+    return optPre(expr, cc);
   }
 
   /**
@@ -100,16 +109,20 @@ public abstract class StandardFunc extends Arr {
    * @param ir data to serialize
    * @param opts serialization parameters
    * @param err error code
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
   protected final byte[] serialize(final Iter ir, final SerializerOptions opts,
-      final QueryError err) throws QueryException {
+      final QueryError err, final QueryContext qc) throws QueryException {
 
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = Serializer.get(ao, opts)) {
-        for(Item it; (it = ir.next()) != null;) ser.serialize(it);
+        for(Item it; (it = ir.next()) != null;) {
+          qc.checkStop();
+          ser.serialize(it);
+        }
       }
       return ao.normalize().finish();
     } catch(final QueryIOException ex) {

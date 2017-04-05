@@ -79,6 +79,7 @@ public final class DeepEqual {
     return equal(value1.iter(), value2.iter());
   }
 
+
   /**
    * Checks values for deep equality.
    * @param iter1 first iterator
@@ -87,7 +88,23 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Iter iter1, final Iter iter2) throws QueryException {
+    return equal(iter1, iter2, null);
+  }
+
+  /**
+   * Checks values for deep equality.
+   * @param iter1 first iterator
+   * @param iter2 second iterator
+   * @param qc query context (allows interruption of process, can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean equal(final Iter iter1, final Iter iter2, final QueryContext qc)
+      throws QueryException {
+
     while(true) {
+      if(qc != null) qc.checkStop();
+
       // check if one or both iterators are exhausted
       final Item it1 = iter1.next(), it2 = iter2.next();
       if(it1 == null || it2 == null) return it1 == null && it2 == null;

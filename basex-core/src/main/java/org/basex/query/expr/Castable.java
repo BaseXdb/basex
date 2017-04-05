@@ -50,7 +50,7 @@ public final class Castable extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Value v = expr.value(qc);
+    final Value v = qc.value(expr);
     return Bln.get(type.occ.check(v.size()) &&
         (v.isEmpty() || type.cast((Item) v, qc, sc, info, false) != null));
   }

@@ -14,11 +14,11 @@ import org.basex.query.value.item.*;
 public final class DbNodePre extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter ir = qc.iter(exprs[0]);
+    final Iter iter = qc.iter(exprs[0]);
     return new Iter() {
       @Override
       public Int next() throws QueryException {
-        final Item it = ir.next();
+        final Item it = iter.next();
         return it == null ? null : Int.get(toDBNode(it).pre());
       }
     };

@@ -47,13 +47,13 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = iter(qc);
-    final Item it = ir.next();
-    if(it == null || ir.size() == 1) return it;
-    final Item n = ir.next();
-    if(n != null) {
-      final ValueBuilder vb = new ValueBuilder().add(it).add(n);
-      if(ir.next() != null) vb.add(Str.get(DOTS));
+    final Iter iter = iter(qc);
+    final Item it = iter.next();
+    if(it == null || iter.size() == 1) return it;
+    final Item nx = iter.next();
+    if(nx != null) {
+      final ValueBuilder vb = new ValueBuilder().add(it).add(nx);
+      if(iter.next() != null) vb.add(Str.get(DOTS));
       throw SEQFOUND_X.get(info, vb.value());
     }
     return it;
@@ -65,12 +65,12 @@ public abstract class ParseExpr extends Expr {
       final Value v = item(qc, info);
       return v == null ? Empty.SEQ : v;
     }
-    return qc.iter(this).value();
+    return qc.iter(this).value(qc);
   }
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value(qc).atomValue(info);
+    return qc.value(this).atomValue(info);
   }
 
   @Override
@@ -97,13 +97,13 @@ public abstract class ParseExpr extends Expr {
     if(seqType().zeroOrOne()) {
       it = item(qc, info);
     } else {
-      final Iter ir = iter(qc);
-      it = ir.next();
+      final Iter iter = iter(qc);
+      it = iter.next();
       if(it != null && !(it instanceof ANode)) {
-        final Item n = ir.next();
+        final Item n = iter.next();
         if(n != null) {
           final ValueBuilder vb = new ValueBuilder().add(it).add(n);
-          if(ir.next() != null) vb.add(Str.get(DOTS));
+          if(iter.next() != null) vb.add(Str.get(DOTS));
           throw EBV_X.get(info, vb.value());
         }
       }
@@ -142,7 +142,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Adds an optimization info for pre-evaluating the specified expression.
+   * Adds an optimization info for pre-evaluating the specified expression to an empty sequence.
    * @param cc compilation context
    * @return optimized expression
    */
@@ -152,7 +152,7 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Adds an optimization info for pre-evaluating the specified expression.
-   * @param ex original or optimized expression (can be {@code null})
+   * @param ex original or optimized expression ({@code null} indicates an empty sequence)
    * @param cc compilation context
    * @return optimized expression
    */

@@ -27,9 +27,12 @@ public final class HttpSendRequest extends StandardFunc {
     // get parameter $bodies
     Iter iter = null;
     if(exprs.length == 3) {
-      final Iter bodies = exprs[2].iter(qc);
+      final Iter bodies = qc.iter(exprs[2]);
       final ValueBuilder cache = new ValueBuilder();
-      for(Item body; (body = bodies.next()) != null;) cache.add(body);
+      for(Item body; (body = bodies.next()) != null;) {
+        qc.checkStop();
+        cache.add(body);
+      }
       iter = cache.value().iter();
     }
     // send HTTP request

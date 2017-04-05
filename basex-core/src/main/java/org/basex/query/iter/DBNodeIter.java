@@ -29,9 +29,12 @@ public abstract class DBNodeIter extends BasicNodeIter {
   public abstract DBNode next();
 
   @Override
-  public Value value() throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final IntList il = new IntList();
-    for(DBNode n; (n = next()) != null;) il.add(n.pre());
+    for(DBNode n; (n = next()) != null;) {
+      qc.checkStop();
+      il.add(n.pre());
+    }
     return DBNodeSeq.get(il, data, false, false);
   }
 }

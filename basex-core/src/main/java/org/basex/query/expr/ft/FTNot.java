@@ -43,11 +43,10 @@ public final class FTNot extends FTExpr {
   @Override
   public FTIter iter(final QueryContext qc) throws QueryException {
     return new FTIter() {
-      final FTIter ir = exprs[0].iter(qc);
-
+      final FTIter iter = exprs[0].iter(qc);
       @Override
       public FTNode next() throws QueryException {
-        return not(ir.next());
+        return not(iter.next());
       }
     };
   }

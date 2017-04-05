@@ -37,6 +37,7 @@ public final class CComm extends CNode {
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
     for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       if(more) tb.add(' ');
       tb.add(it.string(info));
       more = true;

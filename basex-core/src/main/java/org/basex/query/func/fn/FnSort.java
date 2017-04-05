@@ -21,7 +21,7 @@ import org.basex.query.value.item.*;
 public final class FnSort extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc);
+    final Value value = qc.value(exprs[0]);
     Collation coll = sc.collation;
     if(exprs.length > 1) {
       final byte[] token = toEmptyToken(exprs[1], qc);
@@ -48,7 +48,7 @@ public final class FnSort extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value();
+    return iter(qc).value(qc);
   }
 
   /**

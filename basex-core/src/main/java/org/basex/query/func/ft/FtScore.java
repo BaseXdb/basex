@@ -25,9 +25,12 @@ public final class FtScore extends StandardFunc {
     final boolean s = qc.scoring;
     try {
       qc.scoring = true;
-      final Iter iter = exprs[0].iter(qc);
+      final Iter iter = qc.iter(exprs[0]);
       final ValueList vl = new ValueList(Math.max(1, (int) iter.size()));
-      for(Item it; (it = iter.next()) != null;) vl.add(Dbl.get(it.score()));
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
+        vl.add(Dbl.get(it.score()));
+      }
       return DblSeq.get(vl.finish(), vl.size());
     } finally {
       qc.scoring = s;

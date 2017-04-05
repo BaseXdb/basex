@@ -46,7 +46,7 @@ public final class MixedPath extends Path {
         iter = rt;
         sz = s;
       } else {
-        final Value val = rt.value();
+        final Value val = rt.value(qc);
         iter = val.iter();
         sz = val.size();
       }
@@ -77,6 +77,7 @@ public final class MixedPath extends Path {
           // loop through all resulting items
           final Iter ir = qc.iter(step);
           for(Item i; (i = ir.next()) != null;) {
+            qc.checkStop();
             if(i instanceof ANode) nodes.add((ANode) i);
             else items.add(i);
           }

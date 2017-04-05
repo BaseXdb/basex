@@ -80,7 +80,7 @@ public final class List extends Arr {
         final Value[] vs = new Value[exprs.length];
         int c = 0;
         for(final Expr expr : exprs) {
-          final Value v = expr.value(cc.qc);
+          final Value v = cc.qc.value(expr);
           if(c == 0) all = v.type;
           else if(all != v.type) all = null;
           vs[c++] = v;

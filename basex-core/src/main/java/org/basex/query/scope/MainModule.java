@@ -9,6 +9,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -96,7 +97,10 @@ public final class MainModule extends Module {
     try {
       final Iter iter = qc.iter(expr);
       final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
-      for(Item it; (it = iter.next()) != null;) cache.add(it);
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
+        cache.add(it);
+      }
       if(declType != null) declType.treat(cache.value(), null, info);
       return cache;
     } finally {
@@ -122,15 +126,17 @@ public final class MainModule extends Module {
         if(it == null) VarScope.exit(fp, qc);
         return it;
       }
-
       @Override
       public long size() {
         return iter.size();
       }
-
       @Override
       public Item get(final long i) throws QueryException {
         return iter.get(i);
+      }
+      @Override
+      public Value value(final QueryContext q) throws QueryException {
+        return iter.value(qc);
       }
     };
   }

@@ -35,6 +35,7 @@ abstract class UserFn extends StandardFunc {
     if(exprs.length > i) {
       final Iter iter = qc.iter(exprs[i]);
       for(Item item; (item = iter.next()) != null;) {
+        qc.checkStop();
         final String pattern = Token.string(toToken(item));
         if(!pattern.isEmpty() && !Databases.validName(pattern, true))
           throw USER_PATTERN_X.get(info, pattern);
@@ -88,6 +89,7 @@ abstract class UserFn extends StandardFunc {
     if(exprs.length > i) {
       final Iter iter = qc.iter(exprs[i]);
       for(Item item; (item = iter.next()) != null;) {
+        qc.checkStop();
         final String perm = Token.string(toToken(item));
         final Perm p = Perm.get(perm);
         if(p == null) throw USER_PERMISSION_X.get(info, perm);

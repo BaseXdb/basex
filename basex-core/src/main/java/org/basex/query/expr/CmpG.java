@@ -230,50 +230,56 @@ public final class CmpG extends Cmp {
     }
 
     // retrieve iterators
-    Iter ir1 = exprs[0].atomIter(qc, info);
-    final long is1 = ir1.size();
+    Iter iter1 = exprs[0].atomIter(qc, info);
+    final long is1 = iter1.size();
     if(is1 == 0) return Bln.FALSE;
     final boolean s1 = is1 == 1;
 
-    Iter ir2 = exprs[1].atomIter(qc, info);
-    final long is2 = ir2.size();
+    Iter iter2 = exprs[1].atomIter(qc, info);
+    final long is2 = iter2.size();
     if(is2 == 0) return Bln.FALSE;
 
     // evaluate single items
     final boolean s2 = is2 == 1;
-    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
+    if(s1 && s2) return Bln.get(eval(iter1.next(), iter2.next()));
 
     if(s1) {
       // first iterator yields single result
-      final Item it1 = ir1.next();
-      for(Item it2; (it2 = ir2.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
+      final Item it1 = iter1.next();
+      for(Item it2; (it2 = iter2.next()) != null;) {
+        qc.checkStop();
+        if(eval(it1, it2)) return Bln.TRUE;
+      }
       return Bln.FALSE;
     }
 
     if(s2) {
       // second iterator yields single result
-      final Item it2 = ir2.next();
-      for(Item it1; (it1 = ir1.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
+      final Item it2 = iter2.next();
+      for(Item it1; (it1 = iter1.next()) != null;) {
+        qc.checkStop();
+        if(eval(it1, it2)) return Bln.TRUE;
+      }
       return Bln.FALSE;
     }
 
     // swap iterators if first iterator returns more results than second
     final boolean swap = is1 > is2;
     if(swap) {
-      final Iter ir = ir1;
-      ir1 = ir2;
-      ir2 = ir;
+      final Iter iter = iter1;
+      iter1 = iter2;
+      iter2 = iter;
     }
 
     // loop through all items of first and second iterator
-    for(Item it1; (it1 = ir1.next()) != null;) {
-      if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
-      for(Item it2; (it2 = ir2.next()) != null;) {
+    for(Item it1; (it1 = iter1.next()) != null;) {
+      if(iter2 == null) iter2 = exprs[swap ? 0 : 1].atomIter(qc, info);
+      for(Item it2; (it2 = iter2.next()) != null;) {
+        qc.checkStop();
         if(swap ? eval(it2, it1) : eval(it1, it2)) return Bln.TRUE;
       }
-      ir2 = null;
+      iter2 = null;
     }
-    // give up
     return Bln.FALSE;
   }
 

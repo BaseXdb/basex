@@ -119,8 +119,9 @@ public final class CmpR extends Single {
     }
 
     // iterative evaluation
-    final Iter ir = expr.atomIter(qc, info);
-    for(Item it; (it = ir.next()) != null;) {
+    final Iter iter = expr.atomIter(qc, info);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       final double d = it.dbl(info);
       if((mni ? d >= min : d > min) && (mxi ? d <= max : d < max)) return Bln.TRUE;
     }

@@ -27,19 +27,19 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
-    if(exprs[0] instanceof RangeSeq) return exprs[0].iter(qc);
+    if(exprs[0] instanceof RangeSeq) return qc.iter(exprs[0]);
 
+    final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
+    final Iter iter = exprs[0].atomIter(qc, info);
     return new Iter() {
-      final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
-      final Iter ir = exprs[0].atomIter(qc, info);
-
       @Override
       public Item next() throws QueryException {
-        while(true) {
-          final Item it = ir.next();
+        do {
+          final Item it = iter.next();
           if(it == null) return null;
           if(set.add(it, info)) return it;
-        }
+          qc.checkStop();
+        } while(true);
       }
     };
   }
@@ -51,8 +51,11 @@ public final class FnDistinctValues extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder();
     final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
-    final Iter ir = exprs[0].atomIter(qc, info);
-    for(Item it; (it = ir.next()) != null;) if(set.add(it, info)) vb.add(it);
+    final Iter iter = exprs[0].atomIter(qc, info);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      if(set.add(it, info)) vb.add(it);
+    }
     return vb.value();
   }
 

@@ -19,15 +19,15 @@ import org.basex.query.value.type.*;
 public final class FnOneOrMore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter ir = exprs[0].iter(qc);
-    final long len = ir.size();
+    final Iter iter = qc.iter(exprs[0]);
+    final long len = iter.size();
     if(len == 0) throw ONEORMORE.get(info);
-    if(len > 0) return ir;
+    if(len > 0) return iter;
     return new Iter() {
       private boolean first = true;
       @Override
       public Item next() throws QueryException {
-        final Item it = ir.next();
+        final Item it = iter.next();
         if(first) {
           if(it == null) throw ONEORMORE.get(info);
           first = false;

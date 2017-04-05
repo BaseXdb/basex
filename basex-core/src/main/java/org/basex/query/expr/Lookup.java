@@ -98,9 +98,12 @@ public final class Lookup extends Arr {
     final ValueBuilder vb = new ValueBuilder();
     final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : qc.iter(exprs[1]);
     for(Item ctx; (ctx = iter.next()) != null;) {
-      final Iter keys = exprs[0].iter(qc);
+      qc.checkStop();
+      final Iter keys = qc.iter(exprs[0]);
       final FItem f = mapOrArray(ctx);
-      for(Item k; (k = keys.next()) != null;) vb.add(f.invokeValue(qc, info, k));
+      for(Item k; (k = keys.next()) != null;) {
+        vb.add(f.invokeValue(qc, info, k));
+      }
     }
     return vb.value();
   }
@@ -156,6 +159,7 @@ public final class Lookup extends Arr {
 
     final ValueBuilder vb = new ValueBuilder().add(fstVal);
     do {
+      qc.checkStop();
       vb.add(mapOrArray(it).invokeValue(qc, info, key));
     } while((it = iter.next()) != null);
     return vb.value();

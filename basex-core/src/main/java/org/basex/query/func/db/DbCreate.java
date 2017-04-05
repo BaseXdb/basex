@@ -31,8 +31,9 @@ public final class DbCreate extends DbNew {
 
     final TokenList paths = new TokenList();
     if(exprs.length > 2) {
-      final Iter ir = qc.iter(exprs[2]);
-      for(Item it; (it = ir.next()) != null;) {
+      final Iter iter = qc.iter(exprs[2]);
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         final String path = string(toToken(it));
         final String norm = MetaData.normPath(path);
         if(norm == null) throw RESINV_X.get(info, path);

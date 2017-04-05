@@ -62,16 +62,16 @@ public final class Insert extends Update {
     if(c.duplAtt != null) throw UPATTDUPL_X.get(info, c.duplAtt);
 
     // check target constraints
-    final Iter t = qc.iter(exprs[0]);
-    final Item i = t.next();
-    if(i == null) throw UPSEQEMP_X.get(info, Util.className(this));
+    final Iter iter = qc.iter(exprs[0]);
+    final Item it = iter.next();
+    if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
 
     final boolean loc = before || after;
-    if(!(i instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, i);
-    final Item i2 = t.next();
-    if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info, ValueBuilder.concat(i, i2));
+    if(!(it instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, it);
+    final Item i2 = iter.next();
+    if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info, ValueBuilder.concat(it, i2));
 
-    final ANode n = (ANode) i;
+    final ANode n = (ANode) it;
     final ANode par = n.parent();
     if(loc) {
       if(n.type == NodeType.ATT || n.type == NodeType.DOC) throw UPTRGTYP2_X.get(info, n);

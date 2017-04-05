@@ -18,7 +18,7 @@ public final class FnHead extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr e = exprs[0];
-    return e.seqType().zeroOrOne() ? e.item(qc, info) : e.iter(qc).next();
+    return e.seqType().zeroOrOne() ? e.item(qc, info) : qc.iter(e).next();
   }
 
   @Override

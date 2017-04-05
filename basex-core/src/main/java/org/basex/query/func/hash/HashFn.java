@@ -36,6 +36,7 @@ abstract class HashFn extends StandardFunc {
             final int n = bi.read(tmp);
             if(n == -1) return new B64(md.digest());
             md.update(tmp, 0, n);
+            qc.checkStop();
           } while(true);
         } catch(final IOException ex) {
           throw FILE_IO_ERROR_X.get(info, ex);

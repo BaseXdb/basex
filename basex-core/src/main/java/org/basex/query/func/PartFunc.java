@@ -87,13 +87,13 @@ public final class PartFunc extends Arr {
     final Var[] vars = new Var[hl];
     int a = -1;
     for(int h = 0; h < hl; h++) {
-      while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
+      while(++a < holes[h]) args[a] = qc.value(exprs[a - h]);
       vars[h] = scp.addNew(f.argName(holes[h]), null, false, qc, info);
       args[a] = new VarRef(info, vars[h]);
       vars[h].refineType(ft.argTypes[a], null);
     }
     final int al = args.length;
-    while(++a < al) args[a] = exprs[a - hl].value(qc);
+    while(++a < al) args[a] = qc.value(exprs[a - hl]);
 
     final AnnList anns = f.annotations();
     final FuncType tp = FuncType.get(anns, ft.type, vars);

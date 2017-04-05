@@ -229,8 +229,8 @@ final class XMLParser extends CommandParser {
    */
   private String execute(final String query, final Item context) throws QueryException {
     try(QueryProcessor qp = new QueryProcessor(query, ctx).context(context)) {
-      final Iter ir = qp.iter();
-      final Item it = ir.next();
+      final Iter iter = qp.iter();
+      final Item it = iter.next();
       return it == null ? "" : it.toJava().toString().trim();
     }
   }

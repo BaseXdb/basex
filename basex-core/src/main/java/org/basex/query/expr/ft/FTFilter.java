@@ -47,12 +47,13 @@ public abstract class FTFilter extends FTExpr {
 
   @Override
   public final FTIter iter(final QueryContext qc) throws QueryException {
-    final FTIter ir = exprs[0].iter(qc);
+    final FTIter iter = exprs[0].iter(qc);
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
         FTNode it;
-        while((it = ir.next()) != null) {
+        while((it = iter.next()) != null) {
+          qc.checkStop();
           // only create lexer if content needs to be parsed
           if(filter(qc, it, content() ? new FTLexer().init(it.string(info)) : null)) break;
         }

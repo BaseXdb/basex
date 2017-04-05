@@ -73,6 +73,7 @@ public class ZipZipFile extends ZipFn {
 
     final byte[] data = new byte[IO.BLOCKSIZE];
     for(ANode node; (node = iter.next()) != null;) {
+      qc.checkStop();
       // get entry type
       final QNm mode = node.qname();
       final boolean dir = mode.eq(Q_DIR);

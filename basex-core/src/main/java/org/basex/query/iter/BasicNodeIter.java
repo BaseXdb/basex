@@ -2,6 +2,7 @@ package org.basex.query.iter;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -22,7 +23,7 @@ public abstract class BasicNodeIter extends NodeIter implements Iterable<ANode> 
   public static final BasicNodeIter EMPTY = new BasicNodeIter() {
     @Override public ANode next() { return null; }
     @Override public long size() { return 0; }
-    @Override public Value value() { return Empty.SEQ; }
+    @Override public Value value(final QueryContext qc) { return Empty.SEQ; }
   };
 
   @Override

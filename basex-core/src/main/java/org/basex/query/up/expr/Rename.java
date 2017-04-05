@@ -39,27 +39,27 @@ public final class Rename extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter t = qc.iter(exprs[0]);
-    final Item i = t.next();
+    final Iter iter = qc.iter(exprs[0]);
+    final Item it = iter.next();
 
     // check target constraints
-    if(i == null) throw UPSEQEMP_X.get(info, Util.className(this));
-    final Item i2 = t.next();
-    if(i2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(i, i2));
+    if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
+    final Item i2 = iter.next();
+    if(i2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(it, i2));
 
     final CNode ex;
-    if(i.type == NodeType.ELM) {
+    if(it.type == NodeType.ELM) {
       ex = new CElem(sc, info, exprs[1], null);
-    } else if(i.type == NodeType.ATT) {
+    } else if(it.type == NodeType.ATT) {
       ex = new CAttr(sc, info, false, exprs[1], Empty.SEQ);
-    } else if(i.type == NodeType.PI) {
+    } else if(it.type == NodeType.PI) {
       ex = new CPI(sc, info, exprs[1], Empty.SEQ);
     } else {
-      throw UPWRTRGTYP_X.get(info, i);
+      throw UPWRTRGTYP_X.get(info, it);
     }
 
     final QNm rename = ex.item(qc, info).qname();
-    final ANode targ = (ANode) i;
+    final ANode targ = (ANode) it;
 
     // check namespace conflicts...
     if(targ.type == NodeType.ELM || targ.type == NodeType.ATT) {

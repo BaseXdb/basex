@@ -22,7 +22,7 @@ public final class HofSortWith extends HofFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = exprs[0].value(qc);
+    final Value v = qc.value(exprs[0]);
     final Comparator<Item> cmp = getComp(1, qc);
     if(v.size() < 2) return v;
     final ItemList items = v.cache();

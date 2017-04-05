@@ -606,7 +606,7 @@ public final class QueryContext extends Job implements Closeable {
     final int mx = max >= 0 ? max : Integer.MAX_VALUE;
 
     // evaluates the query
-    final Iter ir = iter();
+    final Iter iter = iter();
     final ItemList cache;
     Item it;
 
@@ -614,7 +614,7 @@ public final class QueryContext extends Job implements Closeable {
     final Data data = resources.globalData();
     if(defaultOutput && data != null) {
       final IntList pres = new IntList();
-      while((it = ir.next()) != null && it.data() == data && pres.size() < mx) {
+      while((it = iter.next()) != null && it.data() == data && pres.size() < mx) {
         checkStop();
         pres.add(((DBNode) it).pre());
       }
@@ -632,7 +632,7 @@ public final class QueryContext extends Job implements Closeable {
     }
 
     // use standard iterator
-    while((it = ir.next()) != null && cache.size() < mx) {
+    while((it = iter.next()) != null && cache.size() < mx) {
       checkStop();
       it.materialize(null);
       cache.add(it);

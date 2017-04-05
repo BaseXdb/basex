@@ -47,6 +47,7 @@ public final class Root extends Simple {
     final Iter iter = ctxValue(qc).iter();
     final ANodeList list = new ANodeList().check();
     for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       final ANode n = it instanceof ANode ? ((ANode) it).root() : null;
       if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
       list.add(n);

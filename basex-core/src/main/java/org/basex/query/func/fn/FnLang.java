@@ -23,6 +23,7 @@ public final class FnLang extends Ids {
     for(ANode n = node; n != null; n = n.parent()) {
       final BasicNodeIter atts = n.attributes();
       for(ANode at; (at = atts.next()) != null;) {
+        qc.checkStop();
         if(eq(at.qname().string(), LANG)) {
           final byte[] ln = lc(normalize(at.string()));
           return Bln.get(startsWith(ln, lang) &&

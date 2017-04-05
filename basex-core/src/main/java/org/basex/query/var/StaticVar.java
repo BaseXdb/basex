@@ -93,7 +93,7 @@ public final class StaticVar extends StaticDecl {
 
     final int fp = vs.enter(qc);
     try {
-      return bind(expr.value(qc));
+      return bind(qc.value(expr));
     } catch(final QueryException qe) {
       if(lazy) qe.notCatchable();
       throw qe;

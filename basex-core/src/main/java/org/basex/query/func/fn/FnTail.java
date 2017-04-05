@@ -18,8 +18,8 @@ import org.basex.query.value.type.SeqType.Occ;
 public final class FnTail extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter ir = qc.iter(exprs[0]);
-    return ir.size() == 1 || ir.next() == null ? Empty.ITER : ir;
+    final Iter iter = qc.iter(exprs[0]);
+    return iter.size() == 1 || iter.next() == null ? Empty.ITER : iter;
   }
 
   @Override

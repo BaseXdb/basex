@@ -40,7 +40,7 @@ public final class FnSum extends Aggr {
 
     final Iter iter = exprs[0].atomIter(qc, info);
     final Item it = iter.next();
-    if(it != null) return sum(iter, it, false);
+    if(it != null) return sum(iter, it, false, qc);
 
     // return default item
     return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.get(0);

@@ -101,12 +101,12 @@ public final class For extends ForLet {
             final boolean s = qc.scoring;
             try {
               qc.scoring = true;
-              iter = expr.iter(qc);
+              iter = qc.iter(expr);
             } finally {
               qc.scoring = s;
             }
           } else {
-            iter = expr.iter(qc);
+            iter = qc.iter(expr);
           }
           p = 0;
         }

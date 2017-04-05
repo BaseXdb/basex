@@ -97,8 +97,9 @@ final class CmpSR extends Single {
     }
 
     // iterative evaluation
-    final Iter ir = expr.atomIter(qc, info);
-    for(Item it; (it = ir.next()) != null;) {
+    final Iter iter = expr.atomIter(qc, info);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       if(eval(it)) return Bln.TRUE;
     }
     return Bln.FALSE;

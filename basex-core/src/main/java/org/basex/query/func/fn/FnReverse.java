@@ -23,27 +23,51 @@ public final class FnReverse extends StandardFunc {
     // materialize value if number of results is unknown
     final Iter iter = qc.iter(exprs[0]);
     final long s = iter.size();
-    if(s == -1) {
-      final ValueBuilder vb = new ValueBuilder();
-      for(Item it; (it = iter.next()) != null;) vb.addFront(it);
-      return vb.value().iter();
+    // no result: empty iterator
+    if(s == 0) return Empty.ITER;
+    // single result: iterator
+    if(s == 1) return iter;
+
+    // basic iterator
+    if(iter instanceof BasicIter) {
+      final BasicIter<?> basic = (BasicIter<?>) iter;
+      return new BasicIter<Item>(basic.size()) {
+        @Override
+        public Item get(final long i) {
+          return basic.get(s - i - 1);
+        }
+      };
     }
 
-    // return iterator if items can be directly accessed
-    return s == 0 ? Empty.ITER : s == 1 ? iter : new Iter() {
+    // fast route if the size is known
+    if(s > -1) return new Iter() {
       long c = s;
       @Override
-      public Item next() throws QueryException { return --c >= 0 ? iter.get(c) : null; }
+      public Item next() throws QueryException {
+        return --c >= 0 ? iter.get(c) : null;
+      }
       @Override
-      public Item get(final long i) throws QueryException { return iter.get(s - i - 1); }
+      public Item get(final long i) throws QueryException {
+        return iter.get(s - i - 1);
+      }
       @Override
-      public long size() { return s; }
+      public long size() {
+        return s;
+      }
     };
+
+    // standard iterator
+    final ValueBuilder vb = new ValueBuilder();
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      vb.addFront(it);
+    }
+    return vb.value().iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return exprs[0].value(qc).reverse();
+    return qc.value(exprs[0]).reverse();
   }
 
   @Override

@@ -38,9 +38,10 @@ public abstract class ConvertFn extends StandardFunc {
     if(v instanceof BytSeq) return ((BytSeq) v).toJava();
 
     // check if all arguments are bytes
-    final Iter ir = v.iter();
+    final Iter iter = v.iter();
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) v.size()));
-    for(Item it; (it = ir.next()) != null;) {
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       bl.add((int) ((ANum) checkType(it, AtomType.BYT)).itr());
     }
     return bl.finish();

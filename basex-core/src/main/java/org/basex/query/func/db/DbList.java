@@ -42,14 +42,12 @@ public class DbList extends DbFn {
       public Str get(final long i) {
         return i < sz ? Str.get(tokenAt((int) i)) : null;
       }
-
       @Override
-      public Value value() {
+      public Value value(final QueryContext q) {
         final TokenList tl = new TokenList(sz);
         for(int i = 0; i < sz; i++) tl.add(tokenAt(i));
         return StrSeq.get(tl);
       }
-
       /**
        * Returns the specified token.
        * @param i token index

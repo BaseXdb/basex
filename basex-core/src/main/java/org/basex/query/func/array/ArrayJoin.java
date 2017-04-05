@@ -16,20 +16,21 @@ import org.basex.util.*;
 public final class ArrayJoin extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = qc.iter(exprs[0]);
-    Item it = ir.next();
+    final Iter iter = qc.iter(exprs[0]);
+    Item it = iter.next();
     if(it == null) return Array.empty();
     final Array fst = toArray(it);
-    it = ir.next();
+    it = iter.next();
     if(it == null) return fst;
     final Array snd = toArray(it);
-    it = ir.next();
+    it = iter.next();
     if(it == null) return fst.concat(snd);
 
     final ArrayBuilder builder = new ArrayBuilder().append(fst).append(snd);
     do {
+      qc.checkStop();
       builder.append(toArray(it));
-    } while((it = ir.next()) != null);
+    } while((it = iter.next()) != null);
     return builder.freeze();
   }
 }

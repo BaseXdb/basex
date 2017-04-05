@@ -69,9 +69,11 @@ public abstract class SimpleMap extends Arr {
     seqType = exprs[exprs.length - 1].seqType().withOcc(Occ.ZERO_MORE);
 
     // rewrite path with empty steps
-    for(final Expr expr : exprs) if(expr.isEmpty()) return optPre(cc);
-
-    return allAreValues() ? optPre(value(cc.qc), cc) : this;
+    for(final Expr expr : exprs) {
+      if(expr.isEmpty()) return optPre(cc);
+    }
+    // pre-evaluate map with statically known values
+    return allAreValues() ? optPre(cc.qc.value(this), cc) : this;
   }
 
   @Override

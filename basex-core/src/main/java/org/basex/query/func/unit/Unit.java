@@ -290,7 +290,9 @@ final class Unit {
       qctx.mainModule(MainModule.get(find(qctx, func), new Expr[0]));
       // ignore results
       final Iter iter = qctx.iter();
-      while(iter.next() != null);
+      while(iter.next() != null) {
+        qctx.checkStop();
+      }
     } finally {
       job.popJob();
     }

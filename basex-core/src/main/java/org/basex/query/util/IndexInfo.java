@@ -100,11 +100,11 @@ public final class IndexInfo {
 
   /**
    * Tries to rewrite the specified input for index access.
-   * @param type index type (can be {@code null})
    * @param value value to find (can be {@code null})
-   * @return success flag
-   * @param info input info
+   * @param type index type (can be {@code null})
+   * @param info input info (can be {@code null})
    * @param trim normalize second string
+   * @return success flag
    * @throws QueryException query exception
    */
   public boolean create(final Expr value, final IndexType type, final InputInfo info,
@@ -118,10 +118,10 @@ public final class IndexInfo {
     if(value.isValue()) {
       // loop through all items
       costs = 0;
-      final Iter ir = value.iter(qc);
+      final Iter iter = qc.iter(value);
       final ArrayList<ValueAccess> tmp = new ArrayList<>();
       final TokenSet strings = new TokenSet();
-      for(Item it; (it = ir.next()) != null;) {
+      for(Item it; (it = iter.next()) != null;) {
         // only strings and untyped items are supported
         if(!it.type.isStringOrUntyped()) return false;
         // do not use text/attribute index if string is empty or too long

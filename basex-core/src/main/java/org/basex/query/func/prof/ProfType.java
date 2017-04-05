@@ -24,7 +24,7 @@ public final class ProfType extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return type(qc).value(qc);
+    return qc.value(type(qc));
   }
 
   @Override

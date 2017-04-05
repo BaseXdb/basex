@@ -19,9 +19,9 @@ import org.basex.util.*;
 public final class FnZeroOrOne extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = exprs[0].iter(qc);
-    final Item it = ir.next();
-    if(it != null && ir.next() != null) throw ZEROORONE.get(info);
+    final Iter iter = qc.iter(exprs[0]);
+    final Item it = iter.next();
+    if(it != null && iter.next() != null) throw ZEROORONE.get(info);
     return it;
   }
 

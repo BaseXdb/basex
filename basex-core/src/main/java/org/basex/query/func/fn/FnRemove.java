@@ -20,13 +20,13 @@ public final class FnRemove extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final long p = toLong(exprs[1], qc) - 1;
-    final Iter ir = exprs[0].iter(qc);
-    final long is = ir.size();
-    return p < 0 || is != -1 && p > is ? ir : new Iter() {
+    final Iter iter = qc.iter(exprs[0]);
+    final long is = iter.size();
+    return p < 0 || is != -1 && p > is ? iter : new Iter() {
       long c;
       @Override
       public Item next() throws QueryException {
-        return c++ != p || ir.next() != null ? ir.next() : null;
+        return c++ != p || iter.next() != null ? iter.next() : null;
       }
     };
   }

@@ -836,8 +836,7 @@ public final class Token {
 
   /**
    * Returns a substring of the specified token.
-   * Note that this method ignores Unicode codepoints.
-   * use {@link #subtoken} instead.
+   * Note that this method ignores Unicode codepoints; use {@link #subtoken} instead.
    * @param token input token
    * @param start start position
    * @return substring
@@ -848,8 +847,7 @@ public final class Token {
 
   /**
    * Returns a substring of the specified token.
-   * Note that this method ignores Unicode codepoints.
-   * use {@link #subtoken} instead.
+   * Note that this method ignores Unicode codepoints; use {@link #subtoken} instead.
    * @param token input token
    * @param start start position
    * @param end end position

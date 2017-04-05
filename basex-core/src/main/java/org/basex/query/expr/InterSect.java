@@ -32,17 +32,21 @@ public final class InterSect extends Set {
   }
 
   @Override
-  protected ANodeList eval(final Iter[] iter) throws QueryException {
+  protected ANodeList eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     ANodeList list = new ANodeList();
 
-    for(Item it; (it = iter[0].next()) != null;) list.add(toNode(it));
+    for(Item it; (it = iters[0].next()) != null;) {
+      qc.checkStop();
+      list.add(toNode(it));
+    }
     final boolean db = list.dbnodes();
 
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); ++e) {
       final ANodeList nt = new ANodeList().check();
-      final Iter ir = iter[e];
-      for(Item it; (it = ir.next()) != null;) {
+      final Iter iter = iters[e];
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         final ANode n = toNode(it);
         final int i = list.indexOf(n, db);
         if(i != -1) nt.add(n);
@@ -60,8 +64,8 @@ public final class InterSect extends Set {
   }
 
   @Override
-  protected NodeIter iter(final Iter[] iter) {
-    return new SetIter(iter) {
+  protected NodeIter iter(final Iter[] iters) {
+    return new SetIter(iters) {
       @Override
       public ANode next() throws QueryException {
         final int irl = iter.length;

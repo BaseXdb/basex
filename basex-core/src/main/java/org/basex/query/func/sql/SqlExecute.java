@@ -56,7 +56,7 @@ public class SqlExecute extends SqlFn {
     try {
       final ResultSet rs = stmt.getResultSet();
       final ResultSetMetaData md = rs.getMetaData();
-      final int cc = md.getColumnCount();
+      final int cols = md.getColumnCount();
       return new Iter() {
         @Override
         public Item next() throws QueryException {
@@ -68,10 +68,10 @@ public class SqlExecute extends SqlFn {
             }
 
             final FElem row = new FElem(Q_ROW);
-            for(int k = 1; k <= cc; k++) {
+            for(int c = 1; c <= cols; c++) {
               // for each row add column values as children
-              final String name = md.getColumnLabel(k);
-              final Object value = rs.getObject(k);
+              final String name = md.getColumnLabel(c);
+              final Object value = rs.getObject(c);
               // null values are ignored
               if(value == null) continue;
 

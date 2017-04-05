@@ -35,12 +35,14 @@ public final class FnCount extends StandardFunc {
     final Expr e = exprs[0];
     if(e.has(Flag.NDT) || e.has(Flag.UPD) || e instanceof VarRef) return this;
 
+    // return size known at compile time
     final long c = e.size();
     if(c >= 0) return Int.get(c);
 
-    if(e instanceof MapKeys) {
-      return cc.function(Function._MAP_SIZE, info, ((MapKeys) e).exprs);
-    }
+    // rewrite count(map:keys(...)) to map:size(...)
+    if(e instanceof MapKeys) return cc.function(Function._MAP_SIZE, info, ((MapKeys) e).exprs);
+
+    // no optimization possible
     return this;
   }
 }

@@ -124,7 +124,7 @@ public final class Window extends Clause {
 
             while(readNext()) {
               if(start.matches(qc, curr, p, prev, next)) {
-                vals = new Item[]{ curr, prev, next };
+                vals = new Item[] { curr, prev, next };
                 spos = p;
                 break;
               }
@@ -387,7 +387,7 @@ public final class Window extends Clause {
      */
     boolean prepareNext(final QueryContext qc, final Eval sub) throws QueryException {
       if(!sub.next(qc)) return false;
-      iter = expr.iter(qc);
+      iter = qc.iter(expr);
       prev = null;
       p = 0;
       return true;

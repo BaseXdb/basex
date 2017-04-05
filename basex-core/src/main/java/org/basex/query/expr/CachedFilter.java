@@ -34,7 +34,7 @@ public class CachedFilter extends Filter {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    Value val = root.value(qc);
+    Value val = qc.value(root);
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
     qc.focus = focus;
     try {

@@ -43,7 +43,7 @@ final class IterMap extends SimpleMap {
         qf.value = values[pos];
 
         try {
-          while(true) {
+          do {
             final Item it = iter[pos].next();
             if(it == null) {
               if(--pos == -1) return null;
@@ -54,7 +54,8 @@ final class IterMap extends SimpleMap {
             } else {
               return it;
             }
-          }
+            qc.checkStop();
+          } while(true);
         } finally {
           qf.value = cv;
         }

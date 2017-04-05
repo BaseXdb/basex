@@ -25,14 +25,12 @@ public final class Empty extends Value {
     public Item next() {
       return null;
     }
-
     @Override
     public Item get(final long i) {
       return null;
     }
-
     @Override
-    public Value value() {
+    public Value value(final QueryContext qc) {
       return SEQ;
     }
   };

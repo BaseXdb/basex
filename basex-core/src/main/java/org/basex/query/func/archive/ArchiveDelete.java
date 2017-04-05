@@ -27,7 +27,10 @@ public final class ArchiveDelete extends ArchiveFn {
     // entries to be deleted
     final TokenObjMap<Item[]> hm = new TokenObjMap<>();
     final Iter names = qc.iter(exprs[1]);
-    for(Item en; (en = names.next()) != null;) hm.put(checkElemToken(en).string(info), null);
+    for(Item en; (en = names.next()) != null;) {
+      qc.checkStop();
+      hm.put(checkElemToken(en).string(info), null);
+    }
 
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info);
         ArchiveOut out = ArchiveOut.get(in.format(), info)) {

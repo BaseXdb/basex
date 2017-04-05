@@ -16,13 +16,14 @@ import org.basex.util.*;
 public final class MapMerge extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter maps = exprs[0].iter(qc);
+    final Iter maps = qc.iter(exprs[0]);
     final MergeOptions opts = new MergeOptions();
     if(exprs.length > 1) new FuncOptions(info).acceptUnknown().assign(toMap(exprs[1], qc), opts);
 
     final MergeDuplicates merge = opts.get(MergeOptions.DUPLICATES);
     Map map = Map.EMPTY;
     for(Item it; (it = maps.next()) != null;) {
+      qc.checkStop();
       map = map.addAll(toMap(it), merge, info);
     }
     return map;

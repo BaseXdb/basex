@@ -14,7 +14,7 @@ import org.basex.query.iter.*;
 public final class FnUnordered extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return exprs[0].iter(qc);
+    return qc.iter(exprs[0]);
   }
 
   @Override

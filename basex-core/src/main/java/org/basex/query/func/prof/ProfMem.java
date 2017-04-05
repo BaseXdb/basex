@@ -34,10 +34,10 @@ public final class ProfMem extends StandardFunc {
     }
 
     return new Iter() {
-      final Iter ir = exprs[0].iter(qc);
+      final Iter iter = qc.iter(exprs[0]);
       @Override
       public Item next() throws QueryException {
-        final Item it = ir.next();
+        final Item it = iter.next();
         if(it == null) dump(min, msg, qc);
         return it;
       }

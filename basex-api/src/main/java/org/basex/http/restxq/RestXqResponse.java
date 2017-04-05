@@ -207,8 +207,10 @@ final class RestXqResponse {
     out = cache ? new ArrayOutput() : conn.res.getOutputStream();
     Item item = first;
     try(Serializer ser = Serializer.get(out, sp)) {
-      for(; item != null; item = iter.next()) ser.serialize(item);
-      qc.checkStop();
+      for(; item != null; item = iter.next()) {
+        ser.serialize(item);
+        qc.checkStop();
+      }
     }
   }
 

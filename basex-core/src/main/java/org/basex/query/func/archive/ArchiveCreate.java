@@ -36,6 +36,7 @@ public class ArchiveCreate extends ArchiveFn {
       try {
         int e = 0, c = 0;
         while(true) {
+          qc.checkStop();
           final Item en = entries.next(), cn = contents.next();
           if(en == null || cn == null) {
             // count remaining entries

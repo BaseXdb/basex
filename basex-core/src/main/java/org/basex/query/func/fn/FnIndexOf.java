@@ -21,16 +21,17 @@ public final class FnIndexOf extends StandardFunc {
     return new Iter() {
       final Item srch = checkNoEmpty(exprs[1].atomItem(qc, info));
       final Collation coll = toCollation(2, qc);
-      final Iter ir = exprs[0].atomIter(qc, info);
+      final Iter iter = exprs[0].atomIter(qc, info);
       int c;
 
       @Override
       public Int next() throws QueryException {
         while(true) {
-          final Item it = ir.next();
+          final Item it = iter.next();
           if(it == null) return null;
           ++c;
           if(it.comparable(srch) && OpV.EQ.eval(it, srch, coll, sc, info)) return Int.get(c);
+          qc.checkStop();
         }
       }
     };

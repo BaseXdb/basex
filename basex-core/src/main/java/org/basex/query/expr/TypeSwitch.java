@@ -49,7 +49,7 @@ public final class TypeSwitch extends ParseExpr {
     ts = ts.compile(cc);
     // static condition: return branch in question
     if(ts.isValue()) {
-      final Value val = ts.value(cc.qc);
+      final Value val = cc.qc.value(ts);
       for(final TypeCase tc : cases) {
         if(tc.matches(val)) return optPre(tc.compile(cc, (Value) ts).expr, cc);
       }

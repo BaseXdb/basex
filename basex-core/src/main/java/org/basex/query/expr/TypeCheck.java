@@ -88,7 +88,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = expr.iter(qc);
+    final Iter iter = qc.iter(expr);
 
     return new Iter() {
       /** Item cache. */
@@ -128,7 +128,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = expr.value(qc);
+    final Value val = qc.value(expr);
     if(seqType.instance(val)) return val;
     if(promote) return seqType.promote(val, null, qc, sc, info, false);
     throw INVCAST_X_X_X.get(info, val.seqType(), seqType, val);

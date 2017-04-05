@@ -21,7 +21,7 @@ public final class FnForEach extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final FItem f = checkArity(exprs[1], 1, qc);
-    final Iter ir = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     return new Iter() {
       Iter ir2 = Empty.ITER;
 
@@ -30,9 +30,10 @@ public final class FnForEach extends StandardFunc {
         do {
           final Item it = ir2.next();
           if(it != null) return it;
-          final Item it2 = ir.next();
+          final Item it2 = iter.next();
           if(it2 == null) return null;
           ir2 = f.invokeValue(qc, info, it2).iter();
+          qc.checkStop();
         } while(true);
       }
     };
@@ -41,7 +42,7 @@ public final class FnForEach extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem f = checkArity(exprs[1], 1, qc);
-    final Iter iter = exprs[0].iter(qc);
+    final Iter iter = qc.iter(exprs[0]);
     Item it = iter.next();
     if(it == null) return Empty.SEQ;
     final Value v1 = f.invokeValue(qc, info, it);
@@ -50,6 +51,7 @@ public final class FnForEach extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder().add(v1);
     do {
+      qc.checkStop();
       vb.add(f.invokeValue(qc, info, it));
     } while((it = iter.next()) != null);
     return vb.value();
@@ -62,8 +64,6 @@ public final class FnForEach extends StandardFunc {
       cc.info(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       final int len = (int) seq.size();
-
-      // fn:for-each(...)
       final Expr[] results = new Expr[len];
       for(int i = 0; i < len; i++) {
         results[i] = new DynFuncCall(info, sc, exprs[1], seq.itemAt(i)).optimize(cc);

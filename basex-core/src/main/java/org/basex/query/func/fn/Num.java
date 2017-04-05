@@ -51,6 +51,7 @@ abstract class Num extends StandardFunc {
     // strings
     if(curr instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         if(!(it instanceof AStr)) throw MINMAX_X_X_X.get(info, curr.type, it.type, it);
         final Type rt = curr.type, ri = it.type;
         if(cmp.eval(curr, it, coll, sc, info)) curr = it;
@@ -61,6 +62,7 @@ abstract class Num extends StandardFunc {
     // dates, durations, booleans, binary values
     if(curr instanceof ADate || curr instanceof Dur || curr instanceof Bin || curr.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
         if(curr.type != it.type) throw MINMAX_X_X_X.get(info, curr.type, it.type, it);
         if(cmp.eval(curr, it, coll, sc, info)) curr = it;
       }
@@ -69,6 +71,7 @@ abstract class Num extends StandardFunc {
     // numbers
     if(curr.type.isUntyped()) curr = DBL.cast(curr, qc, sc, info);
     for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
       final Type type = numType(curr, it);
       if(cmp.eval(curr, it, coll, sc, info) || Double.isNaN(it.dbl(info))) curr = it;
       if(type != null) curr = (Item) type.cast(curr, qc, sc, info);
