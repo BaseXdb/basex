@@ -5,8 +5,6 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
-
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
 (:~ Sub category :)

@@ -5,8 +5,6 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace Sessions = 'http://basex.org/modules/sessions';
-import module namespace Session = 'http://basex.org/modules/session';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';

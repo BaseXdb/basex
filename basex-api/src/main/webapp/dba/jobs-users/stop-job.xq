@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/jobs-users';
 
-import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (:~ Top category :)

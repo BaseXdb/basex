@@ -47,30 +47,6 @@ declare %private function util:query-options() as map(*) {
 };
 
 (:~
- : Checks if the specified binary input can be converted to an XML string.
- : @param  $input  input
- : @return XML string
- :)
-declare function util:to-xml-string(
-  $input  as xs:base64Binary
-) as xs:string {
-  let $string :=
-    try {
-      convert:binary-to-string($input)
-    } catch * {
-      error((), "Input is no valid UTF8 string.")
-    }
-  return
-    try {
-      (: tries to convert the input to XML, but discards the results :)
-      prof:void(parse-xml($string)),
-      $string
-    } catch * {
-      error((), "Input is no well-formed XML.")
-    }
-};
-
-(:~
  : Returns the index of the first result to generate.
  : @param  $page  current page
  : @param  $sort  sort key

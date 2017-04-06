@@ -89,7 +89,7 @@ function dba:replace-upload(
       let $input := if(db:is-raw($name, $resource)) then (
         $file($key)
       ) else (
-        util:to-xml-string($file($key))
+        fetch:xml-binary($file($key))
       )
       return db:replace($name, $resource, $input),
       cons:redirect($dba:SUB, map {
