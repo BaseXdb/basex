@@ -1093,6 +1093,6 @@ public abstract class Data {
     final int max = 20;
     final DataPrinter dp = new DataPrinter(this);
     dp.add(0, max);
-    return meta.size > max ? dp + "..." : dp.toString();
+    return meta.size > max ? dp + Text.DOTS : dp.toString();
   }
 }

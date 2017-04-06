@@ -3920,7 +3920,7 @@ public class QueryParser extends InputParser {
   private void entityError(final int start, final QueryError code) throws QueryException {
     final String sub = input.substring(start, Math.min(start + 20, length));
     final int semi = sub.indexOf(';');
-    final String ent = semi == -1 ? sub + "..." : sub.substring(0, semi + 1);
+    final String ent = semi == -1 ? sub + DOTS : sub.substring(0, semi + 1);
     throw error(code, ent);
   }
 

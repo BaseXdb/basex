@@ -478,7 +478,7 @@ public class DBNode extends ANode {
         break;
       case ELM:
         tb.add(name()).add(" {");
-        if(hasChildren() || attributes().size() != 0) tb.add("...");
+        if(hasChildren() || attributes().size() != 0) tb.add(Text.DOTS);
         tb.add('}');
         break;
       case DOC:

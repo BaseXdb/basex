@@ -321,7 +321,7 @@ public final class QueryProcessor extends Job implements Closeable {
         s = ch <= ' ';
       }
     }
-    if(sb.length() >= max) sb.append("...");
+    if(sb.length() >= max) sb.append(Text.DOTS);
     return sb.toString().trim();
   }
 

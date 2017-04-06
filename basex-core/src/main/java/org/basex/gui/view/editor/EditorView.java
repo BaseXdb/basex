@@ -220,7 +220,7 @@ public final class EditorView extends View {
           }
         };
         if(e != null && pm.getComponentCount() == HISTCOMP) {
-          pm.add(new JMenuItem("...")).addActionListener(al);
+          pm.add(new JMenuItem(DOTS)).addActionListener(al);
         }
 
         pm.show(hist, 0, hist.getHeight());
