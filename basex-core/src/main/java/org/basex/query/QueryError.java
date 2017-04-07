@@ -1604,28 +1604,6 @@ public enum QueryError {
   }
 
   /**
-   * Chops the specified value to a maximum size.
-   * @param value value
-   * @param info input info
-   * @return exception or null
-   */
-  public static byte[] chop(final Object value, final InputInfo info) {
-    return info != null && info.internal() ? Token.EMPTY :
-           value instanceof byte[] ? chop((byte[]) value, info) :
-           chop(value.toString(), info);
-  }
-
-  /**
-   * Chops the specified string to a maximum size.
-   * @param string string
-   * @param info input info
-   * @return exception or null
-   */
-  public static byte[] chop(final String string, final InputInfo info) {
-    return info != null && info.internal() ? Token.EMPTY : chop(Token.token(string), info);
-  }
-
-  /**
    * Returns a plural suffix or an empty string.
    * @param number long number
    * @return suffix
@@ -1637,10 +1615,35 @@ public enum QueryError {
   }
 
   /**
+   * Chops the specified value to a maximum size.
+   * @param value value
+   * @param info input info (can be {@code null}; an empty string will be returned if
+   * {@link InputInfo#internal()} returns null)
+   * @return chopped or empty string
+   */
+  public static byte[] chop(final Object value, final InputInfo info) {
+    return info != null && info.internal() ? Token.EMPTY :
+           value instanceof byte[] ? chop((byte[]) value, info) :
+           chop(value.toString(), info);
+  }
+
+  /**
+   * Chops the specified string to a maximum size.
+   * @param string string
+   * @param info input info (can be {@code null}; an empty string will be returned if
+   * {@link InputInfo#internal()} returns null)
+   * @return chopped or empty string
+   */
+  public static byte[] chop(final String string, final InputInfo info) {
+    return info != null && info.internal() ? Token.EMPTY : chop(Token.token(string), info);
+  }
+
+  /**
    * Chops the specified token to a maximum size.
    * @param token token
-   * @param info input info
-   * @return exception or null
+   * @param info input info (can be {@code null}; an empty string will be returned if
+   * {@link InputInfo#internal()} returns null)
+   * @return chopped or empty string
    */
   public static byte[] chop(final byte[] token, final InputInfo info) {
     if(info != null && info.internal()) return Token.EMPTY;
