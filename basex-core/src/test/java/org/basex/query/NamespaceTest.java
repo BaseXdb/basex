@@ -377,8 +377,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   }
 
   /**
-   * Detects duplicate prefix declaration at pre=0 in MemData instance after
-   * insert.
+   * Detects duplicate prefix declaration at pre=0 in MemData instance after insert.
    * Though result correct, prefix
    * a is declared twice. -> Solution?
    */
@@ -569,9 +568,20 @@ public final class NamespaceTest extends AdvancedQueryTest {
       UPNSCONFL_X_X);
   }
 
+  /**
+   * Checks if duplicate attributes are detected if a default namespace is declared.
+   */
+  @Test
+  public void duplAttribute1() {
+    error(
+      "<e xmlns='URI' a=''/> update { insert node attribute a { } into . }",
+      UPATTDUPL_X);
+  }
+
   /*
    * Currently buggy (discovered via GH-1395).
    * A new namespace declaration should be added.
+   *
   @Test
   public void renameDuplNSCheck() {
     query("<a a='v'/> update rename node @a as QName('U', 'a')",

@@ -47,7 +47,8 @@ public final class NamePool {
   QNm duplicate() {
     // if node has been deleted, overall count for duplicates must be bigger 2
     for(int i = 0; i < size; ++i) {
-      if(cache[i].attr && cache[i].add > (cache[i].del ? 2 : 1)) return cache[i].name;
+      final NameCache nc = cache[i];
+      if(nc.attr && nc.add > (nc.del ? 2 : 1)) return nc.name;
     }
     return null;
   }
@@ -59,12 +60,13 @@ public final class NamePool {
   byte[][] nsOK() {
     final Atts at = new Atts();
     for(int i = 0; i < size; ++i) {
-      if(cache[i].add <= (cache[i].del ? 1 : 0)) continue;
-      final QNm nm = cache[i].name;
+      final NameCache nc = cache[i];
+      if(nc.add <= (nc.del ? 1 : 0)) continue;
+      final QNm nm = nc.name;
       final byte[] pref = nm.prefix();
       final byte[] uri = nm.uri();
       // attributes with empty URI don't conflict with anything
-      if(cache[i].attr && uri.length == 0) continue;
+      if(nc.attr && uri.length == 0) continue;
       final byte[] u = at.value(pref);
       if(u == null) at.add(pref, uri);
       // check if only one uri is assigned to a prefix

@@ -259,41 +259,49 @@ final class DataUpdates {
    */
   private void checkNames(final int... pres) throws QueryException {
     // check for namespace conflicts
-    final NamePool pool = new NamePool();
+    final NamePool names = new NamePool();
     for(final int pre : pres) {
       final NodeUpdates ups = nodeUpdates.get(pre);
       // add changes introduced by updates to check namespaces and duplicate attributes
-      if(ups != null) for(final NodeUpdate up : ups.updates) up.update(pool);
+      if(ups != null) {
+        for(final NodeUpdate up : ups.updates) up.update(names);
+      }
     }
     // check namespaces
-    final byte[][] ns = pool.nsOK();
+    final byte[][] ns = names.nsOK();
     if(ns != null) throw UPNSCONFL2_X_X.get(null, ns[0], ns[1]);
 
-    // add the already existing attributes to the name pool
-    final IntSet il = new IntSet();
+    // pre values of attributes that have already been added to the name pool
+    final IntSet set = new IntSet();
     for(final int pre : pres) {
       // pre values consist exclusively of element and attribute nodes
       if(data.kind(pre) == Data.ATTR) {
-        final byte[] nm = data.name(pre, Data.ATTR);
-        final QNm name = new QNm(nm);
-        final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), pre, data);
-        if(uriId != 0) name.uri(data.nspaces.uri(uriId));
-        pool.add(name, NodeType.ATT);
-        il.add(pre);
+        addToPool(pre, names);
+        set.add(pre);
       } else {
         final int ps = pre + data.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; ++p) {
-          final byte[] nm = data.name(p, Data.ATTR);
-          if(!il.contains(p)) {
-            final QNm name = new QNm(nm);
-            final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), p, data);
-            if(uriId != 0) name.uri(data.nspaces.uri(uriId));
-            pool.add(name, NodeType.ATT);
-          }
+          if(!set.contains(p)) addToPool(p, names);
         }
       }
     }
-    final QNm dup = pool.duplicate();
+    final QNm dup = names.duplicate();
     if(dup != null) throw UPATTDUPL_X.get(null, dup);
   }
+
+  /**
+   * Adds an attribute to the pool.
+   * @param pre pre value
+   * @param names name pool
+   */
+  private void addToPool(final int pre, final NamePool names) {
+    final byte[] nm = data.name(pre, Data.ATTR);
+    final QNm name = new QNm(nm);
+    if(name.hasPrefix()) {
+      final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), pre, data);
+      if(uriId != 0) name.uri(data.nspaces.uri(uriId));
+    }
+    names.add(name, NodeType.ATT);
+  }
+
 }
