@@ -126,5 +126,5 @@ You are as well invited to contribute to our [bug tracker].
 All the best,  
 BaseX Team
 
-[documentation]: (https://docs.basex.org)
-[bug tracker]: (https://github.com/BaseXdb/BaseX/issues)
+[documentation]: https://docs.basex.org
+[bug tracker]: https://github.com/BaseXdb/BaseX/issues
