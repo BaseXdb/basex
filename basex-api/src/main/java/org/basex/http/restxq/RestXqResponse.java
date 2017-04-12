@@ -37,7 +37,7 @@ final class RestXqResponse {
   /** Status message. */
   private String message;
   /** Status code. */
-  private int status;
+  private Integer status;
 
   /**
    * Constructor.
@@ -113,6 +113,7 @@ final class RestXqResponse {
       } else if(forward != null) {
         conn.forward(forward);
       } else {
+        qc.checkStop();
         finish();
       }
     }
@@ -208,8 +209,8 @@ final class RestXqResponse {
     Item item = first;
     try(Serializer ser = Serializer.get(out, sp)) {
       for(; item != null; item = iter.next()) {
-        ser.serialize(item);
         qc.checkStop();
+        ser.serialize(item);
       }
     }
   }
@@ -228,7 +229,7 @@ final class RestXqResponse {
    * @throws IOException I/O exception
    */
   private void finish() throws IOException {
-    if(status != 0) conn.status(status, message);
+    if(status != null) conn.status(status, message);
     if(out instanceof ArrayOutput) {
       final ArrayOutput ao = (ArrayOutput) out;
       if(ao.size() > 0) conn.res.getOutputStream().write(ao.finish());
