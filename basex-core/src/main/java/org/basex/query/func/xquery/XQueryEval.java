@@ -35,6 +35,8 @@ public class XQueryEval extends StandardFunc {
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
     /** Query base-uri. */
     public static final StringOption BASE_URI = new StringOption("base-uri");
+    /** Pass on error info. */
+    public static final BooleanOption PASS = new BooleanOption("pass", false);
   }
 
   @Override
@@ -147,8 +149,9 @@ public class XQueryEval extends StandardFunc {
         if(qctx.state == JobState.MEMORY)  throw BXXQ_MEMORY.get(info);
         throw ex;
       } catch(final QueryException ex) {
-        throw ex.error() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) :
-          ex.info(info);
+        if(ex.error() == BASX_PERM_X) throw BXXQ_PERM_X.get(info, ex.getLocalizedMessage());
+        if(!opts.get(XQueryOptions.PASS)) ex.info(info);
+        throw ex;
       }
     } finally {
       if(to != null) to.cancel();
