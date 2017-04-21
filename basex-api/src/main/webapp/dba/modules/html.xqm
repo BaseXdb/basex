@@ -1,7 +1,7 @@
 (:~
  : Provides HTML components.
  :
- : @author Christian Grün, BaseX Team, 2014-16
+ : @author Christian Grün, BaseX Team, 2014-17
  :)
 module namespace html = 'dba/html';
 

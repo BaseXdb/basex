@@ -1,7 +1,7 @@
 (:~
  : Delete log files.
  :
- : @author Christian Grün, BaseX Team, 2014-16
+ : @author Christian Grün, BaseX Team, 2014-17
  :)
 module namespace dba = 'dba/databases';
 
