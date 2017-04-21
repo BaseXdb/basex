@@ -88,7 +88,8 @@ function dba:jobs-users(
             for $id in Sessions:ids()
             let $access := Sessions:accessed($id)
             let $you := if(Session:id() = $id) then '&#x2713;' else '–'
-            for $name in Sessions:names($id)
+            (: supported session ids (application-specific, can be extended :)
+            for $name in Sessions:names($id)[. = ('dba', 'id')]
             let $value := try {
               Sessions:get($id, $name)
             } catch bxerr:BXSE0002 {
