@@ -25,10 +25,11 @@ abstract class ProcFn extends StandardFunc {
   /**
    * Returns the result of a command.
    * @param qc query context
+   * @param fork fork process
    * @return result
    * @throws QueryException query exception
    */
-  final Result exec(final QueryContext qc) throws QueryException {
+  final Result exec(final QueryContext qc, final boolean fork) throws QueryException {
     checkAdmin(qc);
 
     // arguments
@@ -81,6 +82,7 @@ abstract class ProcFn extends StandardFunc {
       result.code = 9999;
       return result;
     }
+    if(fork) return null;
 
     final Thread outt = reader(proc.getInputStream(), result.output, cs);
     final Thread errt = reader(proc.getErrorStream(), result.error, cs);

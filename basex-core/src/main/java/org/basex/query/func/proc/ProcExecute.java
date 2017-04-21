@@ -25,7 +25,7 @@ public final class ProcExecute extends ProcFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Result result = exec(qc);
+    final Result result = exec(qc, false);
 
     final FElem root = new FElem(RESULT);
     root.add(new FElem(OUTPUT).add(result.output.normalize().finish()));

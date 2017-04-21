@@ -21,12 +21,21 @@ public final class ProcModuleTest extends AdvancedQueryTest {
   public void system() {
     query(_PROC_SYSTEM.args("java", "-version"), "");
     error(_PROC_SYSTEM.args("java", "-version", "xx"), BXPR_ENC_X);
+    query("try { " + _PROC_SYSTEM.args("a b c") + "} catch BXPR9999 {}", "");
   }
 
   /** Test method. */
   @Test
   public void execute() {
     query("count(" + _PROC_EXECUTE.args("java", "-version") + "/*)", "3");
+    query(_PROC_EXECUTE.args("a b c") + "/code/text()", "9999");
+  }
+
+  /** Test method. */
+  @Test
+  public void fork() {
+    query(_PROC_FORK.args("java", "-version"), "");
+    query(_PROC_FORK.args("a b c"), "");
   }
 
   /** Test method. */

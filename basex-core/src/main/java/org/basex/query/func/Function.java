@@ -1114,6 +1114,9 @@ public enum Function {
   _PROC_EXECUTE(ProcExecute.class, "execute(command[,args[,options]])",
       arg(STR, STR_ZM, AAT), ELM, flag(NDT), PROC_URI),
   /** XQuery function. */
+  _PROC_FORK(ProcFork.class, "fork(command[,args[,options]])",
+      arg(STR, STR_ZM, AAT), EMP, flag(NDT), PROC_URI),
+  /** XQuery function. */
   _PROC_PROPERTY_NAMES(ProcPropertyNames.class, "property-names()",
       arg(), STR_ZO, flag(NDT), PROC_URI),
   /** XQuery function. */

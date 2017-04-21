@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class ProcSystem extends ProcFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Result result = exec(qc);
+    final Result result = exec(qc, false);
     if(result.code == 0) {
       return Str.get(result.output.normalize().finish());
     }
