@@ -8,7 +8,6 @@ module namespace dba = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
