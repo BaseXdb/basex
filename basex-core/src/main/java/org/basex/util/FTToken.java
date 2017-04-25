@@ -13,7 +13,7 @@ public final class FTToken {
   private FTToken() { }
 
   /**
-   * Returns true if the specified character is a valid full-text letter or digit.
+   * Returns true if the specified character is whitespace.
    * @param ch character to be tested
    * @return result of check
    */
