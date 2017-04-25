@@ -164,6 +164,22 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Construct context for use in a parallel query. Creates shallow clone
+   * of resources in order to mitigate multi threading array syncronization issues.
+   * @param qcParent parent context
+   * @param async If true the resources will be shallow copied. If false,
+   * operates the same as if calling the standard constructor: QueryContext(final QueryContext qc) 
+   */
+  public QueryContext(final QueryContext qcParent, boolean async ) {
+    this(qcParent.context, qcParent);
+    listen = qcParent.listen;
+    if(async) {
+      resources = new QueryResources(this, qcParent.resources);
+    } else {
+      resources = qcParent.resources;
+    }
+  }
+  /**
    * Constructor.
    * @param context database context
    * @param parent parent context (can be {@code null})
