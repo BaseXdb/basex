@@ -12,7 +12,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -39,7 +38,7 @@ public class SqlExecute extends SqlFn {
     if(!(obj instanceof Connection)) throw BXSQ_CONN_X.get(info, id);
     try {
       final Statement stmt = ((Connection) obj).createStatement();
-      return stmt.execute(query) ? iter(stmt, true) : Empty.ITER;
+      return stmt.execute(query) ? iter(stmt, true) : Int.get(stmt.getUpdateCount()).iter();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
