@@ -166,7 +166,7 @@ public final class SqlExecutePrepared extends SqlExecute {
         if(isNull) stmt.setNull(index, Types.TIMESTAMP);
         else stmt.setTimestamp(index, Timestamp.valueOf(value));
       } else if(eq(SQLXML, paramType)) {
-        if(isNull) stmt.setNull(index, Types.VARCHAR);
+        if(isNull) stmt.setNull(index, Types.SQLXML);
         else {
           SQLXML xml = stmt.getConnection().createSQLXML();
           xml.setString(value);
