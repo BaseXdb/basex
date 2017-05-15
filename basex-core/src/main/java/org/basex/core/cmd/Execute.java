@@ -81,19 +81,20 @@ public class Execute extends Command {
    * @return success flag
    */
   boolean init(final Context ctx) {
-    return init(args[0], ctx);
+    return init(args[0], uri, ctx);
   }
 
   /**
    * Initializes the specified input.
    * @param input command input
+   * @param base base URI
    * @param ctx database context
    * @return success flag
    */
-  final boolean init(final String input, final Context ctx) {
+  final boolean init(final String input, final String base, final Context ctx) {
     if(commands.isEmpty() && error == null) {
       try {
-        Collections.addAll(commands, CommandParser.get(input, ctx).baseURI(uri).parse());
+        Collections.addAll(commands, CommandParser.get(input, ctx).baseURI(base).parse());
       } catch(final QueryException ex) {
         error = Util.message(ex);
         return false;

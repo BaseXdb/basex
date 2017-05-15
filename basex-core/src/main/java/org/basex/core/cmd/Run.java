@@ -36,17 +36,15 @@ public final class Run extends Execute {
   protected boolean init(final Context ctx) {
     if(file == null) {
       // check file reference
-      file = IO.get(args[0]);
+      file = uri == null ? IO.get(args[0]) : IO.get(uri).merge(args[0]);
       if(!file.exists() || file.isDir()) {
         error = Util.info(RES_NOT_FOUND_X, ctx.user().has(Perm.CREATE) ? file : args[0]);
       } else {
         try {
-          // retrieve file contents
-          final String input = file.string();
           // interpret as commands if input ends with command script suffix
-          if(file.hasSuffix(IO.BXSSUFFIX)) return init(input, ctx);
+          if(file.hasSuffix(IO.BXSSUFFIX)) return init(file.string(), file.path(), ctx);
           // otherwise, interpret input as xquery
-          commands.add(new XQuery(input).baseURI(file.path()));
+          commands.add(new XQuery(file.string()).baseURI(file.path()));
         } catch(final IOException ex) {
           error = Util.message(ex);
         }
