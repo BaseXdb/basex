@@ -113,7 +113,7 @@ public abstract class Job {
    * Checks if the job was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
-    if(stopped) throw new JobException();
+    if(stopped) throw new JobException(Text.INTERRUPTED);
   }
 
   /**

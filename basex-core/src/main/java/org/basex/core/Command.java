@@ -257,7 +257,7 @@ public abstract class Command extends Job {
       return run();
     } catch(final JobException ex) {
       // job was interrupted by the user or server
-      return error(INTERRUPTED);
+      return error(ex.getMessage());
     } catch(final OutOfMemoryError ex) {
       // out of memory
       Performance.gc(2);

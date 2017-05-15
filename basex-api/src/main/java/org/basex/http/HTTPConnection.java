@@ -14,6 +14,7 @@ import javax.servlet.http.*;
 
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
+import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -406,6 +407,30 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
+   * Sets 460 a proprietary status code and sends the exception message as info.
+   * @param ex job exception
+   * @throws IOException I/O exception
+   */
+  public void stop(final JobException ex) throws IOException {
+    final int code = 460;
+    final String info = ex.getMessage();
+    log(code, info);
+    try {
+      res.resetBuffer();
+      res.setStatus(code);
+      res.setContentType(MediaType.TEXT_PLAIN.toString());
+      // client directive: do not cache result (HTTP 1.1, old clients)
+      res.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+      res.setHeader(PRAGMA, "no-cache");
+      res.setHeader(EXPIRES, "0");
+      res.getOutputStream().write(token(info));
+    } catch(final IllegalStateException e) {
+      // too late (response has already been committed)
+      logError(code, null, info, e);
+    }
+  }
+
+  /**
    * Sets a status and sends an info message.
    * @param code status code
    * @param message status message (can be {@code null})
@@ -414,8 +439,8 @@ public final class HTTPConnection implements ClientInfo {
    */
   @SuppressWarnings("deprecation")
   private void status(final int code, final String message, final String info) throws IOException {
+    log(code, message != null ? message : info != null ? info : "");
     try {
-      log(code, message != null ? message : info != null ? info : "");
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
         final TokenBuilder header = new TokenBuilder(auth.toString());
@@ -443,7 +468,25 @@ public final class HTTPConnection implements ClientInfo {
         }
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {
-      log(SC_INTERNAL_SERVER_ERROR, code + ", Message: " + message + ": " + Util.message(ex));
+      logError(code, message, info, ex);
     }
+  }
+
+  /**
+   * Sets a status and sends an info message.
+   * @param code status code
+   * @param message status message (can be {@code null})
+   * @param info info, sent as body (can be {@code null})
+   * @param ex exception
+   */
+  private void logError(final int code, final String message, final String info,
+      final Exception ex) {
+
+    final StringBuilder sb = new StringBuilder();
+    sb.append("Code: ").append(code);
+    if(info != null) sb.append(", Info: ").append(info);
+    if(message != null) sb.append(", Message: ").append(message);
+    sb.append(", Error: ").append(Util.message(ex));
+    log(SC_INTERNAL_SERVER_ERROR, sb.toString());
   }
 }

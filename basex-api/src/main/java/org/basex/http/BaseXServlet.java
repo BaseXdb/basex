@@ -65,7 +65,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final IOException | QueryException ex) {
       conn.error(SC_BAD_REQUEST, Util.message(ex));
     } catch(final JobException ex) {
-      conn.error(SC_GONE, Text.INTERRUPTED);
+      conn.stop(ex);
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);
       Util.errln(msg);

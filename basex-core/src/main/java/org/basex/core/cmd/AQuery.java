@@ -107,7 +107,7 @@ public abstract class AQuery extends Command {
         exception = ex;
         error = Util.message(ex);
       } catch(final JobException ex) {
-        error = INTERRUPTED;
+        error = ex.getMessage();
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         error = BASX_STACKOVERFLOW.desc;

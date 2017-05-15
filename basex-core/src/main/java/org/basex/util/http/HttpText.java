@@ -14,17 +14,23 @@ import org.basex.query.value.item.*;
  * @author Rositsa Shadura
  */
 public interface HttpText {
-  /** HTTP header: WWW-Authentication string. */
+  /** HTTP header string. */
   String WWW_AUTHENTICATE = "WWW-Authenticate";
-  /** HTTP header: Authorization. */
+  /** HTTP header string. */
   String AUTHORIZATION = "Authorization";
-  /** HTTP header: Content-Type. */
+  /** HTTP header string. */
   String CONTENT_TYPE = "Content-Type";
-  /** HTTP header: Content-Transfer-Encoding. */
+  /** HTTP header string. */
   String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
-  /** HTTP header: Location. */
+  /** HTTP header string. */
+  String CACHE_CONTROL = "Cache-Control";
+  /** HTTP header string. */
+  String PRAGMA = "Pragma";
+  /** HTTP header string. */
+  String EXPIRES = "Expires";
+  /** HTTP header string. */
   String LOCATION = "Location";
-  /** HTTP header: Accept. */
+  /** HTTP header string. */
   String ACCEPT = "Accept";
 
   /** HTTP basic authentication. */
