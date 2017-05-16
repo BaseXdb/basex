@@ -10,7 +10,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -43,6 +42,8 @@ public final class SqlExecutePrepared extends SqlExecute {
   private static final byte[] TIME = AtomType.TIM.string();
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
+  /** Type xml. */
+  private static final byte[] SQLXML = token("sqlxml");
 
   /** Attribute "type" of <sql:parameter/>. */
   private static final byte[] TYPE = token("type");
@@ -65,10 +66,17 @@ public final class SqlExecutePrepared extends SqlExecute {
     if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE_X.get(info, id);
     try {
       final PreparedStatement stmt = (PreparedStatement) obj;
-      // Check if number of parameters equals number of place holders
-      if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
+      try {
+        // Check if number of parameters equals number of place holders
+        if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
+      }
+      catch (SQLSyntaxErrorException ex) {
+        // Oracle will fail receiving ParameterMetaData on update statement ()
+        // see http://stackoverflow.com/questions/30666622/apache-dbutils-changing-column-name-in-update-sql
+        if (!ex.getMessage().startsWith("ORA-00904")) throw ex;
+      }
       if(params != null) setParameters(params.children(), stmt);
-      return stmt.execute() ? iter(stmt, false) : Empty.ITER;
+      return stmt.execute() ? iter(stmt, false) : Int.get(stmt.getUpdateCount()).iter();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
@@ -157,6 +165,13 @@ public final class SqlExecutePrepared extends SqlExecute {
       } else if(eq(TIMESTAMP, paramType)) {
         if(isNull) stmt.setNull(index, Types.TIMESTAMP);
         else stmt.setTimestamp(index, Timestamp.valueOf(value));
+      } else if(eq(SQLXML, paramType)) {
+        if(isNull) stmt.setNull(index, Types.SQLXML);
+        else {
+          SQLXML xml = stmt.getConnection().createSQLXML();
+          xml.setString(value);
+          stmt.setSQLXML(index, xml);
+        }
       } else {
         throw BXSQ_ERROR_X.get(info, "unsupported type: " + string(paramType));
       }
