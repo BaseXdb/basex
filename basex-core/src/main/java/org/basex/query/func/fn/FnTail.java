@@ -5,9 +5,10 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 
 /**
  * Function implementation.
@@ -18,8 +19,27 @@ import org.basex.query.value.type.SeqType.Occ;
 public final class FnTail extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    // check if iterator only returns single result
     final Iter iter = qc.iter(exprs[0]);
-    return iter.size() == 1 || iter.next() == null ? Empty.ITER : iter;
+    final long is = iter.size();
+    if(is == 0 || is == 1 || iter.next() == null) return Empty.ITER;
+
+    // create new iterator, based on original iterator
+    return new Iter() {
+      @Override
+      public Item get(final long i) throws QueryException {
+        return iter.get(i + 1);
+      }
+      @Override
+      public Item next() throws QueryException {
+        return iter.next();
+      }
+      @Override
+      public long size() {
+        // return -1, or decreased count of original iterator
+        return is == -1 ? -1 : is - 1;
+      }
+    };
   }
 
   @Override

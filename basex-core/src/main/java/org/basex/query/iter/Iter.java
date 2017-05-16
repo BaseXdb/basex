@@ -52,9 +52,11 @@ public abstract class Iter {
     final Item i1 = next();
     if(i1 == null) return Empty.SEQ;
 
+    // check for single result
     final Item i2 = next();
     if(i2 == null) return i1;
 
+    // more results: build sequence
     final ValueBuilder vb = new ValueBuilder().add(i1).add(i2);
     for(Item it; (it = next()) != null;) {
       qc.checkStop();
