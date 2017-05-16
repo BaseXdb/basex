@@ -1186,10 +1186,10 @@ public enum Function {
   /** XQuery function. */
   _SQL_PREPARE(SqlPrepare.class, "prepare(id,statement)", arg(ITR, STR), ITR, flag(NDT), SQL_URI),
   /** XQuery function. */
-  _SQL_EXECUTE(SqlExecute.class, "execute(id,query)", arg(ITR, STR), ELM_ZM, flag(NDT), SQL_URI),
+  _SQL_EXECUTE(SqlExecute.class, "execute(id,query)", arg(ITR, STR), ITEM_ZM, flag(NDT), SQL_URI),
   /** XQuery function. */
   _SQL_EXECUTE_PREPARED(SqlExecutePrepared.class, "execute-prepared(id[,params])",
-      arg(ITR, ELM), ELM_ZM, flag(NDT), SQL_URI),
+      arg(ITR, ELM), ITEM_ZM, flag(NDT), SQL_URI),
   /** XQuery function. */
   _SQL_CLOSE(SqlClose.class, "close(id)", arg(ITR), EMP, flag(NDT), SQL_URI),
   /** XQuery function. */

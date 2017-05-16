@@ -38,21 +38,28 @@ public class SqlExecute extends SqlFn {
     if(!(obj instanceof Connection)) throw BXSQ_CONN_X.get(info, id);
     try {
       final Statement stmt = ((Connection) obj).createStatement();
-      return stmt.execute(query) ? iter(stmt, true) : Int.get(stmt.getUpdateCount()).iter();
+      return iter(stmt, true, stmt.execute(query));
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
   }
 
   /**
-   * Returns a result iterator.
+   * Returns a result iterator, or the number of updated rows.
    * @param stmt SQL statement
    * @param close close statement after last result
+   * @param result result set flag ({@code false}: statement was updating)
    * @return iterator
    * @throws QueryException query exception
    */
-  final Iter iter(final Statement stmt, final boolean close) throws QueryException {
+  final Iter iter(final Statement stmt, final boolean close, final boolean result)
+      throws QueryException {
+
     try {
+      // updating statement: return number of updated rows
+      if(!result) return Int.get(stmt.getUpdateCount()).iter();
+
+      // create result set iterator
       final ResultSet rs = stmt.getResultSet();
       final ResultSetMetaData md = rs.getMetaData();
       final int cols = md.getColumnCount();

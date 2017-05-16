@@ -69,14 +69,14 @@ public final class SqlExecutePrepared extends SqlExecute {
       try {
         // Check if number of parameters equals number of place holders
         if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
-      }
-      catch (SQLSyntaxErrorException ex) {
+      } catch(final SQLSyntaxErrorException ex) {
         // Oracle will fail receiving ParameterMetaData on update statement ()
-        // see http://stackoverflow.com/questions/30666622/apache-dbutils-changing-column-name-in-update-sql
-        if (!ex.getMessage().startsWith("ORA-00904")) throw ex;
+        // stackoverflow.com/questions/30666622/apache-dbutils-changing-column-name-in-update-sql
+        if(!ex.getMessage().startsWith("ORA-00904")) throw ex;
       }
       if(params != null) setParameters(params.children(), stmt);
-      return stmt.execute() ? iter(stmt, false) : Int.get(stmt.getUpdateCount()).iter();
+      // If execute returns false, statement was updating: return number of updated rows
+      return iter(stmt, false, stmt.execute());
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
@@ -168,7 +168,7 @@ public final class SqlExecutePrepared extends SqlExecute {
       } else if(eq(SQLXML, paramType)) {
         if(isNull) stmt.setNull(index, Types.SQLXML);
         else {
-          SQLXML xml = stmt.getConnection().createSQLXML();
+          final SQLXML xml = stmt.getConnection().createSQLXML();
           xml.setString(value);
           stmt.setSQLXML(index, xml);
         }
