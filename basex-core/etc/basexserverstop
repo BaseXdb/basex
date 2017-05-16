@@ -10,7 +10,7 @@ done
 MAIN="$( cd -P "$(dirname "$FILE")/.." && pwd )"
 
 # Core classes
-CP=$MAIN/target/classes:$MAIN/lib/*:$CLASSPATH
+CP=$MAIN/target/classes:$MAIN/lib/*:$MAIN/lib/custom/*:$CLASSPATH
 
 # Run code
 java -cp "$CP" $BASEX_JVM org.basex.BaseXServer "$@" stop
