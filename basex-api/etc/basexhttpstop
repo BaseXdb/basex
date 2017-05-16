@@ -11,7 +11,7 @@ MAIN="$( cd -P "$(dirname "$FILE")/.." && pwd )"
 CORE="$( cd -P "$MAIN/../basex-core" && pwd )"
 
 # API, core, and library classes
-CP=$MAIN/target/classes:$MAIN/lib/*:$CORE/lib/*:$CLASSPATH
+CP=$MAIN/target/classes:$MAIN/lib/*:$CORE/lib/*:$MAIN/lib/custom/*:$CLASSPATH
 
 # Run code
 java -cp "$CP" $BASEX_JVM org.basex.BaseXHTTP "$@" stop
