@@ -92,6 +92,7 @@ public final class Users {
     synchronized(users) {
       if(store()) {
         try {
+          file.parent().md();
           file.write(toXML(ctx).serialize().finish());
         } catch(final IOException ex) {
           Util.errln(ex);
