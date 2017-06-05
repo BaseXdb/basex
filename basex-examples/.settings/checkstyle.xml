@@ -89,10 +89,6 @@
       <property name="illegalPattern" value="true"/>
     </module>
     <module name="OuterTypeFilename"/>
-    <module name="StrictDuplicateCode">
-      <property name="severity" value="ignore"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-    </module>
     <module name="AnnotationUseStyle"/>
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
