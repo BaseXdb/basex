@@ -31,28 +31,34 @@ public final class DialogBindings extends BaseXDialog {
    */
   public DialogBindings(final GUI main) {
     super(main, EXTERNAL_VARIABLES);
+    ((BorderLayout) panel.getLayout()).setHgap(4);
 
-    final BaseXBack table = new BaseXBack(new TableLayout(MAX + 2, 2, 8, 4));
-    table.add(new BaseXLabel(NAME + COLS, false, true));
-    table.add(new BaseXLabel(VALUE + COLS, false, true));
+    final BaseXBack west = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));
+    west.add(new BaseXLabel(NAME + COLS, false, true));
     for(int c = 0; c < MAX; c++) {
       names[c] = new BaseXTextField(this);
-      BaseXLayout.setWidth(names[c], 80);
-      table.add(names[c]);
-      values[c] = new BaseXTextField(this);
-      BaseXLayout.setWidth(values[c], 200);
-      table.add(values[c]);
+      BaseXLayout.setWidth(names[c], 100);
+      west.add(names[c]);
     }
-    table.add(new BaseXLabel("Context item" + COLS));
-    ctxitem = new BaseXTextField(this);
-    BaseXLayout.setWidth(ctxitem, 200);
-    table.add(ctxitem);
+    west.add(new BaseXLabel("Context item" + COLS));
+    set(west, BorderLayout.WEST);
 
-    set(table, BorderLayout.CENTER);
+    final BaseXBack center = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));
+    center.add(new BaseXLabel(VALUE + COLS, false, true));
+    for(int c = 0; c < MAX; c++) {
+      values[c] = new BaseXTextField(this);
+      BaseXLayout.setWidth(values[c], 250);
+      center.add(values[c]);
+    }
+    ctxitem = new BaseXTextField(this);
+    center.add(ctxitem);
+    set(center, BorderLayout.CENTER);
+
     set(okCancel(), BorderLayout.SOUTH);
 
     fill();
     ok = true;
+    setResizable(true);
     finish();
   }
 

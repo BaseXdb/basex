@@ -176,6 +176,19 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Edits external variables. */
+  C_VARS(EXTERNAL_VARIABLES, "% shift E", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      new DialogBindings(gui);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Jumps to the next error. */
   C_NEXTERROR(NEXT_ERROR, "% PERIOD", false, false) {
     @Override

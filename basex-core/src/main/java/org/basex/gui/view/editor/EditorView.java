@@ -18,7 +18,6 @@ import org.basex.build.json.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.gui.*;
-import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.gui.layout.BaseXLayout.*;
@@ -110,7 +109,7 @@ public final class EditorView extends View {
     final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDITOPEN, gui);
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
-    final AbstractButton vars = BaseXButton.get("c_vars", EXTERNAL_VARIABLES, false, gui);
+    final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_VARS, gui);
 
     hist = BaseXButton.get("c_hist", RECENTLY_OPENED, false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
@@ -246,12 +245,6 @@ public final class EditorView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         run(getEditor(), Action.EXECUTE);
-      }
-    });
-    vars.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        new DialogBindings(gui);
       }
     });
     test.addActionListener(new ActionListener() {
