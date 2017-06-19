@@ -6,7 +6,7 @@ set MAIN=%~dp0/..
 set CP=%MAIN%/target/classes;%MAIN%/lib/*;%MAIN%/lib/custom/*
 
 REM Options for virtual machine
-set BASEX_JVM=-Xmx1400m %BASEX_JVM%
+set BASEX_JVM=-Xmx1200m %BASEX_JVM%
 
 REM Run code
 start javaw -cp "%CP%" %BASEX_JVM% org.basex.BaseXGUI %*
