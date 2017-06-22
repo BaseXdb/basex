@@ -16,7 +16,7 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Lukas Kircher
  */
-public final class FNCryptoTest extends SandboxTest{
+public final class FNCryptoTest extends SandboxTest {
   /** User home directory. */
   private static final String KEYSTORE_DIR = System.getProperty("user.home");
   /** Java home directory. */
