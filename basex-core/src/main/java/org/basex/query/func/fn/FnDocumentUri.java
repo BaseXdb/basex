@@ -31,7 +31,7 @@ public final class FnDocumentUri extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return exprs.length == 0 && flag == Flag.CTX || super.has(flag);
+    return flag == Flag.CTX && exprs.length == 0 || super.has(flag);
   }
 
   @Override

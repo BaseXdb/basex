@@ -398,8 +398,8 @@ public abstract class StandardFunc extends Arr {
   /**
    * Tries to mark the specified argument for locking.
    * @param visitor visitor
-   * @param i index of argument
-   * @return success flag
+   * @param i index of database argument
+   * @return result of check
    */
   protected final boolean dataLock(final ASTVisitor visitor, final int i) {
     return visitor.lock(exprs[i] instanceof Str ? string(((Str) exprs[i]).string()) : null);
