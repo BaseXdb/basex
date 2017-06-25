@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.locks.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -78,6 +79,19 @@ public abstract class Docs extends StandardFunc {
       }
     }
     return super.accept(visitor);
+  }
+
+  @Override
+  public boolean has(final Flag flag) {
+    if(flag == Flag.NDT && exprs.length > 0) {
+      final Expr expr = exprs[0];
+      if(expr instanceof Str) {
+        queryInput = queryInput(((Str) expr).string());
+        // do not pre-evaluate URL input
+        if(queryInput != null && queryInput.io instanceof IOUrl) return true;
+      }
+    }
+    return super.has(flag);
   }
 
   /**
