@@ -4,21 +4,21 @@ import org.basex.core.*;
 import org.basex.io.*;
 
 /**
- * This class references input passed on in a query. It can be a file path or a database name.
+ * This class references input passed on in a query. It can be a URI or a database path.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public final class QueryInput {
+  /** Original input string (resource URI, database path or XML string). */
+  public final String original;
   /** Input reference. */
   public final IO io;
-  /** Database name ({@code null} indicates that no name can be extracted from original path). */
-  public String dbName;
-  /** Original input string (resource URI, database path or XML string). */
-  final String original;
-  /** Database path (empty string indicates root). */
-  String dbPath = "";
 
+  /** Database name (if {@code null}, no name could be extracted from original path). */
+  public String dbName;
+  /** Database path (empty string indicates root). */
+  public String dbPath = "";
 
   /**
    * Constructor.
