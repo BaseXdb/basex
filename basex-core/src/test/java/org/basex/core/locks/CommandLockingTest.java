@@ -121,6 +121,7 @@ public final class CommandLockingTest extends SandboxTest {
     // fn:collection() always accesses the global context, no matter what local context is
     ckDBs(new XQuery("<a/>/" + COUNT.args(COLLECTION.args())), false, CTX_LIST);
     ckDBs(new XQuery(DOC.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(DOC.args("http://abc.de/")), false, NONE);
     ckDBs(new XQuery(ID.args(NAME)), false, CTX_LIST);
     ckDBs(new XQuery(IDREF.args(NAME)), false, CTX_LIST);
     ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME)), false, CTX_LIST);

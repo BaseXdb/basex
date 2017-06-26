@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.junit.Test;
 
@@ -17,6 +18,9 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class RewritingsTest extends QueryPlanTest {
+  /** Input file. */
+  private static final String FILE = "src/test/resources/input.xml";
+
   /**
    * Checks if the count function is pre-compiled.
    */
@@ -201,5 +205,20 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test
   public void nonDeterministic() {
     check("count((# basex:non-deterministic #) { <x/> })", "1", "exists(//FnCount)");
+  }
+
+  /**
+   * Ensures that fn:doc with URLs will not be rewritten.
+   */
+  @Test
+  public void doc() {
+    check("<a>{ doc('" + FILE + "') }</a>//x", "",
+        "exists(//" + Util.className(DBNode.class) + ')');
+    check("if(<x>1</x> = 1) then 2 else doc('" + FILE + "')", "2",
+        "exists(//" + Util.className(DBNode.class) + ')');
+    check("if(<x>1</x> = 1) then 2 else doc('http://abc.de/')", "2",
+        "exists(//" + Util.className(FnDoc.class) + ')');
+    check("if(<x>1</x> = 1) then 2 else collection('http://abc.de/')", "2",
+        "exists(//" + Util.className(FnCollection.class) + ')');
   }
 }
