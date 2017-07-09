@@ -74,7 +74,7 @@ public final class JobsList extends Command {
    * @param key job id
    * @param jobs job pool
    * @param max maximum length of text entry
-   * @return table entry
+   * @return table entry, or {@code null} if the job does not exist
    */
   public static TokenList entry(final byte[] key, final JobPool jobs, final int max) {
     final String id = string(key);
