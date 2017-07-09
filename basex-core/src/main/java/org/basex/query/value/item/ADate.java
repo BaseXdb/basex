@@ -199,8 +199,10 @@ public abstract class ADate extends ADateDur {
     sec = sc.signum() >= 0 ? sc.remainder(BD60) :
       sc.negate().add(sc.remainder(BD60)).add(BD60).add(sc).remainder(BD60);
 
-    final long mn = Math.max(minute(), 0) + div(sc.longValue(), 60);
+    final long mn = Math.max(minute(), 0) + div(
+        sc.setScale(0, RoundingMode.FLOOR).longValue(), 60);
     min = (byte) mod(mn, 60);
+
     final long ho = Math.max(hou, 0) + div(mn, 60);
     hou = (byte) mod(ho, 24);
     final long da = div(ho, 24);

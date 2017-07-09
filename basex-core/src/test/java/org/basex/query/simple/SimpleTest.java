@@ -135,8 +135,12 @@ public final class SimpleTest extends QueryTest {
           + "};"
           + "local:shortcircuit('foo')" },
 
-      { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
-      { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
+      { "Calc 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
+      { "Calc 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
+      { "Calc 3", strings("2017-07-07T18:29:59.1"),
+        "string(xs:dateTime('2017-07-07T18:30:00.1') - xs:dayTimeDuration('PT1S'))" },
+      { "Calc 4", strings("2017-07-07T17:59:59.1"),
+        "string(xs:dateTime('2017-07-07T18:00:59.1') - xs:dayTimeDuration('PT1M'))" },
 
       { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." },
 
