@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -40,8 +40,8 @@ public final class Lookup extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(exprs.length != 2) return this;
 
-    final Expr ks = exprs[0], fs = exprs[1];
-    if(ks.isValue() && (fs instanceof Map || fs instanceof Array)) {
+    final Expr key = exprs[0], fs = exprs[1];
+    if(key.isValue() && (fs instanceof Map || fs instanceof Array)) {
       // guaranteed to be fully evaluated
       return optPre(value(cc.qc), cc);
     }
@@ -56,26 +56,26 @@ public final class Lookup extends Arr {
       // map lookup may result in empty sequence
       if(map && !rt.mayBeZero()) rt = rt.withOcc(rt.one() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
       // wildcard or more than one input
-      if(ks == Str.WC || !oneInput) rt = rt.withOcc(rt.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE);
+      if(key == Str.WC || !oneInput) rt = rt.withOcc(rt.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE);
       seqType = rt;
     }
 
-    if(ks != Str.WC) {
+    if(key != Str.WC) {
       if(oneInput) {
         // one function, rewrite to for-each or function call
-        final Expr opt = ks.size() == 1 || ks.seqType().one()
-            ? new DynFuncCall(info, cc.sc(), fs, ks).optimize(cc)
+        final Expr opt = key.size() == 1 || key.seqType().one()
+            ? new DynFuncCall(info, cc.sc(), fs, key).optimize(cc)
             : cc.function(Function.FOR_EACH, info, exprs);
         return optPre(opt, cc);
       }
 
-      if(ks.isValue()) {
+      if(key.isValue()) {
         // keys are constant, so we do not duplicate work in the inner loop
         final LinkedList<Clause> clauses = new LinkedList<>();
         final Var f = cc.vs().addNew(new QNm("f"), null, false, cc.qc, info);
         clauses.add(new For(f, null, null, fs, false));
         final Var k = cc.vs().addNew(new QNm("k"), null, false, cc.qc, info);
-        clauses.add(new For(k, null, null, ks, false));
+        clauses.add(new For(k, null, null, key, false));
         final VarRef rf = new VarRef(info, f), rk = new VarRef(info, k);
         final DynFuncCall ret = new DynFuncCall(info, cc.sc(), rf, rk);
         return optPre(new GFLWOR(info, clauses, ret), cc).optimize(cc);
@@ -92,14 +92,15 @@ public final class Lookup extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    if(exprs[0] == Str.WC) return wildCard(qc);
-    if(exprs[0] instanceof Item) return lookup((Item) exprs[0], qc);
+    final Expr key = exprs[0];
+    if(key == Str.WC) return wildCard(qc);
+    if(key instanceof Item) return lookup((Item) key, qc);
 
     final ValueBuilder vb = new ValueBuilder();
     final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : qc.iter(exprs[1]);
     for(Item ctx; (ctx = iter.next()) != null;) {
       qc.checkStop();
-      final Iter keys = qc.iter(exprs[0]);
+      final Iter keys = qc.iter(key);
       final FItem f = mapOrArray(ctx);
       for(Item k; (k = keys.next()) != null;) {
         vb.add(f.invokeValue(qc, info, k));
@@ -115,9 +116,8 @@ public final class Lookup extends Arr {
    * @throws QueryException if the item is neither a map nor an array
    */
   private FItem mapOrArray(final Item it) throws QueryException {
-    final boolean map = it instanceof Map, array = it instanceof Array;
-    if(!map && !array) throw LOOKUP_X.get(info, it);
-    return (FItem) it;
+    if(it instanceof Map || it instanceof Array) return (FItem) it;
+    throw LOOKUP_X.get(info, it);
   }
 
   /**
@@ -128,13 +128,13 @@ public final class Lookup extends Arr {
    */
   private Value wildCard(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final Item ctx : exprs.length == 1 ? ctxValue(qc) : qc.value(exprs[1])) {
-      if(ctx instanceof Map) {
-        for(final Value v : ((Map) ctx).values()) vb.add(v);
-      } else if(ctx instanceof Array) {
-        for(final Value val : ((Array) ctx).members()) vb.add(val);
+    for(final Item it : exprs.length == 1 ? ctxValue(qc) : qc.value(exprs[1])) {
+      if(it instanceof Map) {
+        ((Map) it).values(vb);
+      } else if(it instanceof Array) {
+        for(final Value val : ((Array) it).members()) vb.add(val);
       } else {
-        throw LOOKUP_X.get(info, ctx);
+        throw LOOKUP_X.get(info, it);
       }
     }
     return vb.value();

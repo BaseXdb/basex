@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -211,13 +210,11 @@ public final class Map extends FItem {
   }
 
   /**
-   * All values defined in this map.
-   * @return list of keys
+   * Adds all values defined in this map to the specified value builder.
+   * @param vb value builder
    */
-  public Value values() {
-    final ValueBuilder res = new ValueBuilder();
-    root.values(res);
-    return res.value();
+  public void values(final ValueBuilder vb) {
+    root.values(vb);
   }
 
   /**
@@ -246,8 +243,7 @@ public final class Map extends FItem {
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<>();
-    final BasicIter<?> iter = keys().iter();
-    for(Item key; (key = iter.next()) != null;) {
+    for(final Item key : keys()) {
       map.put(key.toJava(), get(key, null).toJava());
     }
     return map;
