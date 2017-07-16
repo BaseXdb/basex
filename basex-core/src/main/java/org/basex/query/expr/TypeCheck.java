@@ -118,7 +118,7 @@ public final class TypeCheck extends Single {
         cache.set(c++, null);
 
         if(it == null && i < st.occ.min || i > st.occ.max)
-          throw typeError(TypeCheck.this, st, null, info);
+          throw typeError(expr, st, null, info);
 
         i++;
         return it;
