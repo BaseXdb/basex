@@ -6,6 +6,7 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
+import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
 import javax.swing.*;
@@ -63,13 +64,15 @@ public final class GUI extends JFrame {
 
   /** Painting flag; if activated, interactive operations are skipped. */
   public boolean painting;
-  /** Updating flag; if activated, operations accessing the data are skipped. */
+  /** Indicates if a running command or operation is updating. */
   public boolean updating;
+  /** Indicates if a command is running. */
+  public boolean running;
 
   /** Currently executed command ({@code null} otherwise). */
-  public Command command;
+  public volatile Command command;
   /** ID of currently executed command. */
-  public int commandID;
+  public AtomicInteger commandID = new AtomicInteger(0);
 
   /** Fullscreen flag. */
   boolean fullscreen;
@@ -424,20 +427,20 @@ public final class GUI extends JFrame {
    */
   private boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
-    final int thread = ++commandID;
+    final int id = commandID.incrementAndGet();
     while(true) {
       final Command c = command;
       if(c == null) break;
       c.stop();
       Performance.sleep(1);
-      if(commandID != thread) return true;
+      if(commandID.get() != id) return true;
     }
 
-    // indicates that the command will be executed
+    // indicate to the user that the command will be executed
     cursor(CURSORWAIT);
     input.setCursor(CURSORWAIT);
     stop.setEnabled(true);
-    if(edit) editor.pleaseWait(thread);
+    if(edit) editor.pleaseWait(id);
 
     final Data data = context.data();
     // reset current context if realtime filter is activated
@@ -452,17 +455,17 @@ public final class GUI extends JFrame {
     ao.setLimit(gopts.get(GUIOptions.MAXTEXT));
     // sets the maximum number of hits
     cmd.maxResults(gopts.get(GUIOptions.MAXRESULTS));
+    // attaches the info listener to the command
+    cmd.jc().tracer = info;
 
     final Performance perf = new Performance();
     boolean ok = true;
     try {
-      // checks if the command is updating
+      running = true;
       updating = cmd.updating(context);
 
-      // reset visualizations if data reference will be changed
+      // reset visualizations if data reference may be changed by command
       if(cmd.newData(context)) notify.init();
-      // attaches the info listener to the command
-      cmd.jc().tracer = info;
 
       // evaluate command
       String inf;
@@ -477,6 +480,7 @@ public final class GUI extends JFrame {
         inf = Util.message(ex);
       } finally {
         updating = false;
+        running = false;
       }
 
       // show query info, send feedback to query editor
@@ -532,7 +536,7 @@ public final class GUI extends JFrame {
           }
         }
 
-        if(thread == commandID && !stopped) {
+        if(id == commandID.get() && !stopped) {
           // show status info
           status.setText(TIME_REQUIRED + COLS + time);
           // show number of hits

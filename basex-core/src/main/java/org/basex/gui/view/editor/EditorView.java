@@ -705,9 +705,10 @@ public final class EditorView extends View {
     new Timer(true).schedule(new TimerTask() {
       @Override
       public void run() {
-        if(id != gui.commandID || gui.command == null) return;
-        info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
-        stop.setEnabled(true);
+        if(id == gui.commandID.get() && gui.running) {
+          info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
+          stop.setEnabled(true);
+        }
       }
     }, WAIT_DELAY);
   }
