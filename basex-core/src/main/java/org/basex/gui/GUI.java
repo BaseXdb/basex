@@ -69,11 +69,6 @@ public final class GUI extends JFrame {
   /** Indicates if a command is running. */
   public boolean running;
 
-  /** Currently executed command ({@code null} otherwise). */
-  public volatile Command command;
-  /** ID of currently executed command. */
-  public AtomicInteger commandID = new AtomicInteger(0);
-
   /** Fullscreen flag. */
   boolean fullscreen;
   /** Button panel. */
@@ -104,6 +99,11 @@ public final class GUI extends JFrame {
   private final BaseXLabel hits;
   /** Buttons. */
   private final GUIToolBar toolbar;
+
+  /** Currently executed command ({@code null} otherwise). */
+  private volatile Command command;
+  /** ID of currently executed command. */
+  private AtomicInteger commandID = new AtomicInteger(0);
 
   /** Menu panel height. */
   private int menuHeight;
@@ -565,6 +565,15 @@ public final class GUI extends JFrame {
     input.setCursor(CURSORTEXT);
     stop.setEnabled(false);
     command = null;
+  }
+
+  /**
+   * Checks if a command with the specified id is still running.
+   * @param id command id
+   * @return result of check
+   */
+  public boolean running(final int id) {
+    return id == commandID.get() && running;
   }
 
   /**
