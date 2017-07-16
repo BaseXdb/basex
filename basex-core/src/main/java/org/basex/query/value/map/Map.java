@@ -31,8 +31,6 @@ public final class Map extends FItem {
 
   /** Wrapped immutable map. */
   private final TrieNode root;
-  /** Key sequence. */
-  private Value keys;
 
   /**
    * Constructor.
@@ -201,12 +199,9 @@ public final class Map extends FItem {
    * @return list of keys
    */
   public Value keys() {
-    if(keys == null) {
-      final ValueBuilder res = new ValueBuilder();
-      root.keys(res);
-      keys = res.value();
-    }
-    return keys;
+    final ValueBuilder res = new ValueBuilder();
+    root.keys(res);
+    return res.value();
   }
 
   /**
