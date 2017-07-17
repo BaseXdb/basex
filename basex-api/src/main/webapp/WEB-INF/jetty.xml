@@ -2,41 +2,13 @@
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-  <!-- Default connector. The Jetty stop port can be specified 
-       in the .basex or pom.xml configuration file.  -->
-  <Call name="addConnector">
-    <Arg>
-      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
-        <Set name="host">0.0.0.0</Set>
-        <Set name="port">8984</Set>
-        <Set name="maxIdleTime">60000</Set>
-        <Set name="reuseAddress">true</Set>
-        <Set name="Acceptors">2</Set>
-        <!-- Support for SSL connections .
-        <Set name="confidentialPort">8986</Set>
-        -->
-      </New>
-    </Arg>
-  </Call>
-
-  <!-- Support for SSL connections.
-  <Call name="addConnector">
-    <Arg>
-      <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
-        <Set name="Port">8986</Set>
-        <Set name="maxIdleTime">60000</Set>
-        <Set name="keystore"><SystemProperty name="jetty.home" default="."/>/etc/keystore</Set>
-        <Set name="password">jetty</Set>
-        <Set name="keyPassword">jetty</Set>
-        <Set name="truststore"><SystemProperty name="jetty.home" default="."/>/etc/keystore</Set>
-        <Set name="trustPassword">jetty</Set>
-      </New>
-    </Arg>
-  </Call>-->
-
-  <!-- Debugging
-  <Get class="org.eclipse.jetty.util.log.Log" name="log">
-    <Set name="debugEnabled">true</Set>
-  </Get> -->
-
+    <New id="httpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+        <Set name="securePort"><Property name="jetty.secure.port" default="8984" /></Set>
+        <Set name="outputBufferSize">32768</Set>
+        <Set name="requestHeaderSize">8192</Set>
+        <Set name="responseHeaderSize">8192</Set>
+        <Set name="sendServerVersion">true</Set>
+        <Set name="sendDateHeader">false</Set>
+        <Set name="headerCacheSize">512</Set>
+    </New>
 </Configure>

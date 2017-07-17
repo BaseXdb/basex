@@ -1,24 +1,26 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
-import static org.basex.http.HTTPText.*;
+
 
 import java.io.*;
 import java.net.*;
 
 import javax.net.ssl.*;
-
-import org.basex.core.*;
 import org.basex.http.*;
+import static org.basex.http.HTTPText.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.server.*;
-import org.basex.server.Log.LogType;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.nio.*;
-import org.eclipse.jetty.server.ssl.*;
 import org.eclipse.jetty.webapp.*;
 import org.eclipse.jetty.xml.*;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.ServerConnector;
+
+
 
 /**
  * This is the main class for the starting the database HTTP services.
@@ -75,9 +77,10 @@ public final class BaseXHTTP extends Main {
     final StaticOptions sopts = context.soptions;
     final String webapp = sopts.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
+    Util.outln(webapp);
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
-    jetty.setHandler(wac);
 
+    jetty.setHandler(wac);
     final Connector[] conns = jetty.getConnectors();
     if(conns == null || conns.length == 0)
       throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
@@ -85,13 +88,14 @@ public final class BaseXHTTP extends Main {
     stopPort = sopts.get(StaticOptions.STOPPORT);
     host = sopts.get(StaticOptions.SERVERHOST);
     if(port != 0) {
-      for(final Connector conn : conns) {
-        if(conn instanceof SelectChannelConnector) {
-          conn.setPort(port);
+      for (final Connector conn : conns) {
+        if (conn instanceof ServerConnector) {
+          ((ServerConnector) conn).setPort(port);
           break;
         }
       }
     }
+
 
     // info strings
     final String startX = HTTP + ' ' + SRV_STARTED_PORT_X;
@@ -99,7 +103,7 @@ public final class BaseXHTTP extends Main {
 
     if(stop) {
       stop();
-      if(!quiet) for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
+      if(!quiet) for(final Connector conn : conns) Util.outln(stopX, ((ServerConnector) conn).getLocalPort());
       // keep message visible for a while
       Performance.sleep(1000);
       return;
@@ -108,8 +112,8 @@ public final class BaseXHTTP extends Main {
     // start web server in a new process
     final Connector conn1 = conns[0];
     if(service) {
-      start(conn1.getPort(), conn1 instanceof SslSelectChannelConnector, args);
-      if(!quiet) for(final Connector conn : conns) Util.outln(startX, conn.getPort());
+      start(((ServerConnector) conn1).getLocalPort(), conn1 instanceof SslConnectionFactory, args);
+      if(!quiet) for(final Connector conn : conns) Util.outln(startX, ((ServerConnector) conn).getLocalPort());
       // keep message visible for a while
       Performance.sleep(1000);
       return;
@@ -121,7 +125,7 @@ public final class BaseXHTTP extends Main {
       jetty.start();
     } catch(final BindException ex) {
       Util.debug(ex);
-      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, conn1.getPort());
+      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, ((ServerConnector) conn1).getLocalPort());
     }
     // throw cached exception that did not break the servlet architecture
     final IOException ex = HTTPContext.exception();
@@ -129,7 +133,7 @@ public final class BaseXHTTP extends Main {
 
     // show start message
     if(!quiet) {
-      for(final Connector conn : conns) Util.outln(startX, conn.getPort());
+      for(final Connector conn : conns) Util.outln(startX, ((ServerConnector) conn).getLocalPort());
     }
 
     // initialize web.xml settings, assign system properties and run database server.
@@ -145,12 +149,12 @@ public final class BaseXHTTP extends Main {
       @Override
       public void run() {
         if(!quiet) {
-          for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
+          for(final Connector conn : conns) Util.outln(stopX, ((ServerConnector) conn).getLocalPort());
         }
         final Log log = context.log;
         if(log != null) {
           for(final Connector conn : conns) {
-            log.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
+            log.writeServer(LogType.OK, Util.info(stopX, ((ServerConnector) conn).getLocalPort()));
           }
         }
         context.close();
@@ -159,7 +163,7 @@ public final class BaseXHTTP extends Main {
 
     // log server start at very end (logging flag could have been updated by web.xml)
     for(final Connector conn : conns) {
-      context.log.writeServer(LogType.OK, Util.info(startX, conn.getPort()));
+      context.log.writeServer(LogType.OK, Util.info(startX, ((ServerConnector) conn).getLocalPort()));
     }
   }
 

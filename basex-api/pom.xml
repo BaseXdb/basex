@@ -17,7 +17,6 @@
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>net.xqj</groupId>
@@ -44,12 +43,36 @@
       <artifactId>jetty-webapp</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-alpn-server</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.jetty.alpn</groupId>
+        <artifactId>alpn-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-hpack</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.ettrema</groupId>
       <artifactId>milton-api</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -73,6 +96,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <useIncrementalCompilation>false</useIncrementalCompilation>
+          <jvmArgs>
+            <jvmArg>-Xbootclasspath/p:${basedir}/alpn-boot-8.1.11.v20170118.jar</jvmArg>
+          </jvmArgs> 
         </configuration>
       </plugin>
       <plugin>
@@ -100,11 +126,16 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.mortbay.jetty</groupId>
+        <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>8.1.16.v20140903</version>
+        <version>9.4.6.v20170531</version>
         <configuration>
-          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
+          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml,
+          			${basedir}/src/main/webapp/WEB-INF/jetty-http.xml,
+					${basedir}/src/main/webapp/WEB-INF/jetty-ssl-context.xml,
+          			${basedir}/src/main/webapp/WEB-INF/jetty-ssl.xml,
+					${basedir}/src/main/webapp/WEB-INF/jetty-https.xml
+          </jettyXml>
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8985</stopPort>
         </configuration>
@@ -120,4 +151,13 @@
       </plugin> -->
     </plugins>
   </build>
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>org.basex</groupId>
+  			<artifactId>basex</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
 </project>

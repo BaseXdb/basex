@@ -242,7 +242,9 @@ public final class Request extends QueryModule {
   @Deterministic @Requires(Permission.NONE)
   public Value cookieNames() throws QueryException {
     final TokenList tl = new TokenList();
-    for(final Cookie c : request().getCookies()) tl.add(c.getName());
+    if(request().getCookies() != null) {
+      for(final Cookie c : request().getCookies()) tl.add(c.getName());
+    }
     return StrSeq.get(tl);
   }
 
@@ -254,6 +256,7 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Str cookie(final Str key) throws QueryException {
+
     return cookie(key, null);
   }
 
@@ -267,8 +270,10 @@ public final class Request extends QueryModule {
   @Deterministic @Requires(Permission.NONE)
   public Str cookie(final Str key, final Str def) throws QueryException {
     final String k = key.toJava();
-    for(final Cookie c : request().getCookies()) {
-      if(c.getName().equals(k)) return Str.get(c.getValue());
+    if(request().getCookies() != null) {
+      for(final Cookie c : request().getCookies()) {
+        if(c.getName().equals(k)) return Str.get(c.getValue());
+      }
     }
     return def;
   }
