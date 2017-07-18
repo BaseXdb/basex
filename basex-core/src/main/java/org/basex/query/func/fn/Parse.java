@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.*;
 import org.basex.build.xml.*;
@@ -13,9 +14,12 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Parse functions.
@@ -111,27 +115,64 @@ public abstract class Parse extends StandardFunc {
   }
 
   /**
-   * Returns the specified text as lines.
-   * @param str text input
-   * @return result
+   * Returns a line iterator for the specified text.
+   * @param string text string
+   * @return iterator
    */
-  public static Iter textIter(final byte[] str) {
+  public static Iter lineIter(final byte[] string) {
+    return new Iter() {
+      final Iterator<byte[]> iter = iter(string);
+      @Override
+      public Str next() {
+        return iter.hasNext() ? Str.get(iter.next()) : null;
+      }
+    };
+  }
+
+  /**
+   * Returns all line of the specified text.
+   * @param string text string
+   * @return text lines
+   */
+  public static Value lines(final byte[] string) {
+    final TokenList tl = new TokenList();
+    final Iterator<byte[]> iter = iter(string);
+    while(iter.hasNext()) tl.add(iter.next());
+    return StrSeq.get(tl);
+  }
+
+
+  /**
+   * Returns an iterator for the lines of the specified text.
+   * @param string text string
+   * @return line iterator
+   */
+  private static Iterator<byte[]> iter(final byte[] string) {
+    final TokenBuilder tb = new TokenBuilder();
+    final ArrayInput ai = new ArrayInput(string);
     try {
-      final NewlineInput nli = new NewlineInput(new ArrayInput(str));
-      final TokenBuilder tb = new TokenBuilder();
-      return new Iter() {
+      final NewlineInput nli = new NewlineInput(ai);
+      return new Iterator<byte[]>() {
         @Override
-        public Item next() {
+        public boolean hasNext() {
           try {
-            return nli.readLine(tb) ? Str.get(tb.toArray()) : null;
+            return nli.readLine(tb);
           } catch(final IOException ex) {
-            // no I/O exception expected, as input is a main-memory array
             throw Util.notExpected(ex);
           }
+        }
+        @Override
+        public byte[] next() {
+          return tb.toArray();
+        }
+        @Override
+        public void remove() {
+          throw Util.notExpected();
         }
       };
     } catch(final IOException ex) {
       throw Util.notExpected(ex);
     }
   }
+
 }
