@@ -35,7 +35,8 @@ abstract class RESTCmd extends Command {
    * @param session REST session
    */
   RESTCmd(final RESTSession session) {
-    super(max(session));
+    // permissions will be tested if single commands are run
+    super(Perm.NONE);
     this.session = session;
     jc().type(RESTText.REST);
   }
@@ -132,17 +133,6 @@ abstract class RESTCmd extends Command {
       el.add(list.get(0));
       root.add(el);
     }
-  }
-
-  /**
-   * Returns the strictest permission required for the specified commands.
-   * @param session commands to be checked
-   * @return permission
-   */
-  private static Perm max(final RESTSession session) {
-    Perm p = Perm.NONE;
-    for(final Command cmd : session) p = p.max(cmd.perm);
-    return p;
   }
 
   /**
