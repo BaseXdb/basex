@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
-import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -129,19 +128,32 @@ public final class CompileContext {
     if(res != expr) {
       if(res == Empty.SEQ) {
         info(OPTEMPTY_X, expr);
-      } else if(res instanceof Value) {
-        info(OPTPRE_X, expr);
-        if(res.size() > 1) {
-          final Seq seq = (Seq) res;
-          final SeqType st = expr.seqType();
-          // refine sequence type: indicate that types may not be homogeneous
-          if(!st.type.eq(seq.type) && st.type.instanceOf(seq.type)) {
-            seq.type = st.type;
-            seq.homo = false;
+      } else if(res instanceof ParseExpr) {
+        info(OPTREWRITE_X_X, expr, result.description());
+        // Refine type. Required mostly due to {@link Filter} rewritings and Expr#optimizeEbv calls
+        final ParseExpr re = (ParseExpr) res;
+        final SeqType et = expr.seqType(), rt  = re.seqType();
+        if(!et.eq(rt) && et.instanceOf(rt)) {
+          final SeqType it = et.intersect(rt);
+          if(it != null) {
+            re.seqType = it;
           }
         }
       } else {
-        info(OPTREWRITE_X, expr);
+        info(OPTPRE_X_X, expr, result.description());
+        // Refine type. Required because original type might get lost in newly created sequences
+        if(res.size() > 1) {
+          final Seq seq = (Seq) res;
+          final Type et = expr.seqType().type, rt = seq.type;
+          if(!et.eq(rt) && et.instanceOf(rt)) {
+            final Type it = et.intersect(rt);
+            if(it != null) {
+              seq.type = it;
+              // Indicate that types may not be homogeneous
+              seq.homo = false;
+            }
+          }
+        }
       }
     }
     return res;

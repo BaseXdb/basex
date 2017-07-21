@@ -308,6 +308,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
+  public String description() {
+    return "Function declaration";
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
     tb.add(FUNCTION).add(' ').add(name.string());

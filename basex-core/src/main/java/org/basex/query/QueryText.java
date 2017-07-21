@@ -387,28 +387,29 @@ public interface QueryText {
 
   // OPTIMIZATIONS ================================================================================
 
-  /** Optimization info. */ String OPTDESC = "rewriting descendant-or-self step(s)";
+  /** Optimization info. */ String OPTDESC = "rewrite descendant-or-self step(s)";
   /** Optimization info. */ String OPTATOMIC_X = "atomic evaluation of %";
   /** Optimization info. */ String OPTTYPE_X = "type check removed: %";
-  /** Optimization info. */ String OPTPRE_X = "pre-evaluating %";
+  /** Optimization info. */ String OPTPRE_X_X = "pre-evaluate % to %";
   /** Optimization info. */ String OPTEMPTY_X = "empty sequence: %";
-  /** Optimization info. */ String OPTREWRITE_X = "rewriting %";
-  /** Optimization info. */ String OPTFLAT_X_X = "flattening nested %: %";
-  /** Optimization info. */ String OPTREMOVE_X_X = "%: removing %";
-  /** Optimization info. */ String OPTTCE_X = "marking as tail call: %";
-  /** Optimization info. */ String OPTFORLET = "moving for/let clauses";
-  /** Optimization info. */ String OPTFORTOLET = "rewriting singleton for to let";
-  /** Optimization info. */ String OPTSWAP_X = "swapping operands: %";
-  /** Optimization info. */ String OPTINLINE_X = "inlining %";
-  /** Optimization info. */ String OPTWHERE = "rewriting where clause(s)";
-  /** Optimization info. */ String OPTPRED_X = "rewriting % to predicate(s)";
-  /** Optimization info. */ String OPTVAR_X = "removing variable %";
-  /** Optimization info. */ String OPTNAME_X = "removing unknown element/attribute %";
-  /** Optimization info. */ String OPTPATH_X = "removing non-existing path %";
-  /** Optimization info. */ String OPTINDEX_X_X = "applying % index for %";
-  /** Optimization info. */ String OPTNOINDEX = "removing path with no index results";
-  /** Optimization info. */ String OPTCHILD_X = "converting % to child steps";
-  /** Optimization info. */ String OPTUNROLL_X = "unrolling %";
+  /** Optimization info. */ String OPTREWRITE_X_X = "rewrite % to %";
+  /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";
+  /** Optimization info. */ String OPTREMOVE_X_X = "%: remove %";
+  /** Optimization info. */ String OPTTCE_X = "mark as tail call: %";
+  /** Optimization info. */ String OPTLET_X = "hoist let clause: %";
+  /** Optimization info. */ String OPTFORTOLET_X = "rewrite for to let: %";
+  /** Optimization info. */ String OPTSWAP_X = "swap operands: %";
+  /** Optimization info. */ String OPTSIMPLE_X = "simplify %";
+  /** Optimization info. */ String OPTINLINE_X = "inline %";
+  /** Optimization info. */ String OPTWHERE = "rewrite where clause(s)";
+  /** Optimization info. */ String OPTPRED_X = "rewrite % to predicate(s)";
+  /** Optimization info. */ String OPTVAR_X = "remove variable %";
+  /** Optimization info. */ String OPTNAME_X = "remove unknown element/attribute %";
+  /** Optimization info. */ String OPTPATH_X = "remove non-existing path %";
+  /** Optimization info. */ String OPTINDEX_X_X = "apply % index for %";
+  /** Optimization info. */ String OPTNORESULTS_X = "no index results: %";
+  /** Optimization info. */ String OPTCHILD_X = "convert to child steps: %";
+  /** Optimization info. */ String OPTUNROLL_X = "unroll: %";
 
   // MISCELLANEOUS ================================================================================
 

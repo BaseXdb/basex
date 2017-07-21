@@ -53,7 +53,7 @@ public final class List extends Arr {
     }
 
     if(p != exprs.length) {
-      cc.info(OPTREMOVE_X_X, this, Empty.SEQ);
+      cc.info(OPTREMOVE_X_X, description(), Empty.SEQ);
       if(p < 2) return p == 0 ? Empty.SEQ : exprs[0];
       final Expr[] es = new Expr[p];
       System.arraycopy(exprs, 0, es, 0, p);
@@ -156,6 +156,11 @@ public final class List extends Arr {
   public boolean isVacuous() {
     for(final Expr expr : exprs) if(!expr.isVacuous()) return false;
     return true;
+  }
+
+  @Override
+  public String description() {
+    return "expression list";
   }
 
   @Override

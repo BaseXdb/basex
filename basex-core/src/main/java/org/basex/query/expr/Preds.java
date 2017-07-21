@@ -85,7 +85,7 @@ public abstract class Preds extends ParseExpr {
           if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              cc.info(OPTREWRITE_X, pred);
+              cc.info(OPTSIMPLE_X, pred);
               preds[p] = e2;
             }
           }
@@ -117,7 +117,7 @@ public abstract class Preds extends ParseExpr {
       } else if(pred.isValue()) {
         if(pred.ebv(cc.qc, info).bool(info)) {
           // example: ....[true()]
-          cc.info(OPTREMOVE_X_X, this, pred);
+          cc.info(OPTREMOVE_X_X, description(), pred);
           preds = Array.delete(preds, p--);
         } else {
           // example: ....[false()]

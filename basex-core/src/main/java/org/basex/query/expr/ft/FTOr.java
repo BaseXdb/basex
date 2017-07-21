@@ -39,7 +39,7 @@ public final class FTOr extends FTExpr {
       // convert (!A or !B or ...) to !(A and B and ...)
       final int es = exprs.length;
       for(int e = 0; e < es; e++) exprs[e] = exprs[e].exprs[0];
-      return new FTNot(info, new FTAnd(info, exprs));
+      return (FTExpr) cc.replaceWith(this, new FTNot(info, new FTAnd(info, exprs)));
     }
     return this;
   }

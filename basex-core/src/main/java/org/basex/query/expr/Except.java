@@ -36,7 +36,7 @@ public final class Except extends Set {
       if(ex.isEmpty()) {
         // remove empty operands (return empty sequence if first value is empty)
         if(el.isEmpty()) return cc.emptySeq(this);
-        cc.info(OPTREMOVE_X_X, this, ex);
+        cc.info(OPTREMOVE_X_X, description(), ex);
       } else {
         el.add(ex);
       }

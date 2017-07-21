@@ -58,6 +58,6 @@ public final class FnSum extends Aggr {
       if(e2 == Empty.SEQ) expr = Int.get(0);
       else if(e2 instanceof ANum || e2 instanceof Dur) expr = e2;
     }
-    return cc.replaceWith(this, expr);
+    return expr;
   }
 }

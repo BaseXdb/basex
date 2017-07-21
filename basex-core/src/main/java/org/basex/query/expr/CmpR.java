@@ -229,6 +229,11 @@ public final class CmpR extends Single {
   }
 
   @Override
+  public String description() {
+    return "range comparison";
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     if(min == max) {

@@ -28,8 +28,7 @@ public final class FnString extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     // string('x') -> 'x'
-    return exprs.length != 0 && exprs[0].seqType().eq(SeqType.STR) ?
-      cc.replaceWith(this, exprs[0]) : this;
+    return exprs.length != 0 && exprs[0].seqType().eq(SeqType.STR) ? exprs[0] : this;
   }
 
   @Override

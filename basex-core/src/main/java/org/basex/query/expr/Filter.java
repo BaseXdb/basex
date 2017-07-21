@@ -106,7 +106,7 @@ public abstract class Filter extends Preds {
    * @param p predicate to be added
    * @return new filter
    */
-  public final Expr addPred(final Expr p) {
+  public final CachedFilter addPred(final Expr p) {
     preds = new ExprList(preds.length + 1).add(preds).add(p).finish();
     return new CachedFilter(info, root, preds);
   }

@@ -51,7 +51,7 @@ abstract class Logical extends Arr {
       final Expr ex = expr.optimizeEbv(cc);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
-        cc.info(OPTREMOVE_X_X, this, expr);
+        cc.info(OPTREMOVE_X_X, description(), expr);
         if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);

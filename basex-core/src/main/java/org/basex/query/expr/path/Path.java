@@ -663,7 +663,7 @@ public abstract class Path extends ParseExpr {
 
         if(ii.costs == 0) {
           // no results...
-          cc.info(OPTNOINDEX, this);
+          cc.info(OPTNORESULTS_X, ii.step);
           return Empty.SEQ;
         }
 

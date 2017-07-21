@@ -155,7 +155,10 @@ public final class GFLWOR extends ParseExpr {
       changed |= optimizePos(cc);
 
       // remove FLWOR expressions when all clauses were removed
-      if(clauses.isEmpty()) return cc.replaceWith(this, ret);
+      if(clauses.isEmpty()) {
+        cc.info(QueryText.OPTSIMPLE_X, description());
+        return ret;
+      }
 
       if(clauses.getLast() instanceof For && ret instanceof VarRef) {
         final For last = (For) clauses.getLast();
@@ -241,14 +244,13 @@ public final class GFLWOR extends ParseExpr {
     size = calcSize();
     if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return cc.emptySeq(this);
 
-    seqType = ret.seqType().withSize(size);
-
     if(clauses.getFirst() instanceof Where) {
-      // where A <...> return B  ===>  if(A) then <...> return B else ()
-      final Where wh = (Where) clauses.removeFirst();
-      return new If(info, wh.expr, clauses.isEmpty() ? ret : this, Empty.SEQ);
+      final Where where = (Where) clauses.removeFirst();
+      final Expr branch = clauses.isEmpty() ? ret : this;
+      return cc.replaceWith(where, new If(info, where.expr, branch, Empty.SEQ));
     }
 
+    seqType = ret.seqType().withSize(size);
     return this;
   }
 
@@ -278,7 +280,7 @@ public final class GFLWOR extends ParseExpr {
     for(int i = clauses.size(); --i >= 0;) {
       final Clause clause = clauses.get(i);
       if(clause instanceof For && ((For) clause).asLet(clauses, i)) {
-        cc.info(QueryText.OPTFORTOLET);
+        cc.info(QueryText.OPTFORTOLET_X, clause);
         changed = true;
       }
     }
@@ -480,8 +482,8 @@ public final class GFLWOR extends ParseExpr {
       }
 
       if(insert >= 0) {
+        cc.info(QueryText.OPTLET_X, let);
         clauses.add(insert, clauses.remove(i));
-        if(!changed) cc.info(QueryText.OPTFORLET);
         changed = true;
         // it's safe to go on because clauses below the current one are never touched
       }

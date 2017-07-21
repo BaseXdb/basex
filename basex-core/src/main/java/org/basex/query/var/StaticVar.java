@@ -148,6 +148,11 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
+  public String description() {
+    return "Variable declaration";
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
     tb.add(VARIABLE).add(' ').add(name());

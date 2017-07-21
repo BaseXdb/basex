@@ -24,21 +24,21 @@ public final class FnNot extends StandardFunc {
     // simplify: not(empty(A)) -> exists(A)
     if(e0.isFunction(Function.EMPTY)) {
       exprs = ((Arr) e0).exprs;
-      return cc.replaceWith(this, cc.function(Function.EXISTS, info, exprs));
+      return cc.function(Function.EXISTS, info, exprs);
     }
     // simplify: not(exists(A)) -> empty(A)
     if(e0.isFunction(Function.EXISTS)) {
       exprs = ((Arr) e0).exprs;
-      return cc.replaceWith(this, cc.function(Function.EMPTY, info, exprs));
+      return cc.function(Function.EMPTY, info, exprs);
     }
     // simplify: not('a' = 'b') -> 'a' != 'b'
     if(e0 instanceof CmpV || e0 instanceof CmpG) {
       final Cmp c = ((Cmp) e0).invert();
-      return c == e0 ? this : cc.replaceWith(this, c);
+      return c == e0 ? this : c.optimize(cc);
     }
     // simplify: not(not(A)) -> boolean(A)
     if(e0.isFunction(Function.NOT)) {
-      return cc.replaceWith(this, compBln(((Arr) e0).exprs[0], info, cc.sc()));
+      return compBln(((Arr) e0).exprs[0], info, cc.sc());
     }
     // simplify, e.g.: not(boolean(A)) -> not(A)
     exprs[0] = e0.optimizeEbv(cc);

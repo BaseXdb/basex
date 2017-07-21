@@ -59,7 +59,7 @@ public final class Or extends Logical {
     if(list.isEmpty()) return cc.replaceWith(this, Bln.FALSE);
 
     if(es != list.size()) {
-      cc.info(OPTREWRITE_X, this);
+      cc.info(OPTSIMPLE_X, this);
       exprs = list.finish();
     }
     compFlatten(cc);
@@ -81,7 +81,7 @@ public final class Or extends Logical {
     }
 
     // return single expression if it yields a boolean
-    return exprs.length == 1 ? compBln(exprs[0], info, cc.sc()) : this;
+    return exprs.length == 1 ? cc.replaceWith(this, compBln(exprs[0], info, cc.sc())) : this;
   }
 
   @Override

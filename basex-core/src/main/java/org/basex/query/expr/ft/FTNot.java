@@ -32,7 +32,7 @@ public final class FTNot extends FTExpr {
   @Override
   public FTExpr compile(final CompileContext cc) throws QueryException {
     super.compile(cc);
-    return exprs[0] instanceof FTNot ? exprs[0].exprs[0] : this;
+    return exprs[0] instanceof FTNot ? (FTExpr) cc.replaceWith(this, exprs[0].exprs[0]) : this;
   }
 
   @Override

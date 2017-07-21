@@ -176,6 +176,11 @@ final class CmpSR extends Single {
   }
 
   @Override
+  public String description() {
+    return "string range comparison";
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(MIN, min != null ? min : "", MAX, max != null ? max : ""), expr);
   }

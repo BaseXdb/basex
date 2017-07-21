@@ -41,7 +41,7 @@ public final class ValueAccess extends IndexAccess {
    * @param info input info
    * @param expr search expression
    * @param type index type
-   * @param test test test
+   * @param test test test (can be {@code null})
    * @param ictx index context
    */
   public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,

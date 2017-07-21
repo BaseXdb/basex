@@ -36,7 +36,7 @@ public final class Union extends Set {
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands
-        cc.info(OPTREMOVE_X_X, this, ex);
+        cc.info(OPTREMOVE_X_X, description(), ex);
       } else {
         el.add(ex);
       }

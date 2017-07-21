@@ -184,7 +184,7 @@ public abstract class ParseExpr extends Expr {
       expr.checkUp();
       if(expr.isVacuous()) continue;
       final boolean u = expr.has(Flag.UPD);
-      if(u ? s == -1 : s == 1) throw UPALL.get(info, description());
+      if(u ? s == -1 : s == 1) throw UPALL.get(info);
       s = u ? 1 : -1;
     }
   }
