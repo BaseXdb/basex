@@ -70,10 +70,10 @@ public abstract class SimpleMap extends Arr {
 
     // rewrite path with empty steps
     for(final Expr expr : exprs) {
-      if(expr.isEmpty()) return optPre(cc);
+      if(expr.isEmpty()) return cc.emptySeq(this);
     }
     // pre-evaluate map with statically known values
-    return allAreValues() ? optPre(cc.qc.value(this), cc) : this;
+    return allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override

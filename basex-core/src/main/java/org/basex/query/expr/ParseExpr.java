@@ -130,37 +130,6 @@ public abstract class ParseExpr extends Expr {
 
   // OPTIMIZATIONS ================================================================================
 
-
-  /**
-   * Pre-evaluates the specified expression.
-   * @param cc compilation context
-   * @return optimized expression
-   * @throws QueryException query exception
-   */
-  protected final Expr preEval(final CompileContext cc) throws QueryException {
-    return optPre(item(cc.qc, info), cc);
-  }
-
-  /**
-   * Adds an optimization info for pre-evaluating the specified expression to an empty sequence.
-   * @param cc compilation context
-   * @return optimized expression
-   */
-  protected final Expr optPre(final CompileContext cc) {
-    return optPre(null, cc);
-  }
-
-  /**
-   * Adds an optimization info for pre-evaluating the specified expression.
-   * @param ex original or optimized expression ({@code null} indicates an empty sequence)
-   * @param cc compilation context
-   * @return optimized expression
-   */
-  protected final Expr optPre(final Expr ex, final CompileContext cc) {
-    if(ex != this) cc.info(OPTPRE_X, this);
-    return ex == null ? Empty.SEQ : ex;
-  }
-
   /**
    * Returns a boolean equivalent for the specified expression.
    * If the specified expression yields a boolean value anyway, it will be

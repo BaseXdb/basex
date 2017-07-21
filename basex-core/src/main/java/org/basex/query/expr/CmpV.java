@@ -181,26 +181,22 @@ public final class CmpV extends Cmp {
         ? SeqType.BLN : SeqType.BLN_ZO;
 
     Expr e = this;
-    if(oneIsEmpty()) {
-      e = optPre(cc);
-    } else if(allAreValues()) {
-      e = preEval(cc);
-    } else if(e1.isFunction(Function.COUNT)) {
+    if(oneIsEmpty()) return cc.emptySeq(this);
+    if(allAreValues()) return cc.preEval(this);
+
+    if(e1.isFunction(Function.COUNT)) {
       e = compCount(op, cc);
-      if(e != this) cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
       e = compStringLength(op, cc);
-      if(e != this) cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
-      e = Pos.get(op, e2, e, info);
-      if(e != this) cc.info(OPTREWRITE_X, this);
+      e = Pos.get(op, e2, this, info);
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
       e = cc.function(Function.NOT, info, e1);
     }
-    return e;
+    return cc.replaceWith(this, e);
   }
 
   @Override

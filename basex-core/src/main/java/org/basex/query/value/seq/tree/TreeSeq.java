@@ -139,7 +139,7 @@ public abstract class TreeSeq extends Seq {
 
   @Override
   public final boolean homogeneous() {
-    return type != AtomType.ITEM;
+    return homo;
   }
 
   @Override

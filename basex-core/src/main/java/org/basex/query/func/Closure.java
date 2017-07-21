@@ -199,7 +199,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // only evaluate if the closure is empty, so we don't lose variables
-    return global.isEmpty() ? preEval(cc) : this;
+    return global.isEmpty() ? cc.preEval(this) : this;
   }
 
   @Override

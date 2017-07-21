@@ -54,7 +54,7 @@ public final class Pos extends Simple {
    * @param info input info
    * @return expression
    */
-  public static Expr get(final long min, final long max, final InputInfo info) {
+  private static Expr get(final long min, final long max, final InputInfo info) {
     // suppose that positions always fit in long values..
     return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == Long.MAX_VALUE ? Bln.TRUE :
       new Pos(Math.max(1, min), Math.max(1, max), info);
@@ -75,18 +75,17 @@ public final class Pos extends Simple {
   /**
    * Returns an instance of this class if possible, and the input expression otherwise.
    * @param cmp comparator
-   * @param expr argument
-   * @param fallback fallback expression (optional, may be {@code null})
+   * @param arg argument
+   * @param expr original expression
    * @param ii input info
-   * @return resulting or fallback expression
+   * @return resulting or original expression
    */
-  public static Expr get(final OpV cmp, final Expr expr, final Expr fallback, final InputInfo ii) {
-    if(expr instanceof RangeSeq && cmp == OpV.EQ) {
-      final RangeSeq rs = (RangeSeq) expr;
+  public static Expr get(final OpV cmp, final Expr arg, final Expr expr, final InputInfo ii) {
+    if(arg instanceof RangeSeq && cmp == OpV.EQ) {
+      final RangeSeq rs = (RangeSeq) arg;
       return get(rs.start(), rs.end(), ii);
-    }
-    if(expr instanceof ANum) {
-      final ANum it = (ANum) expr;
+    } else if(arg instanceof ANum) {
+      final ANum it = (ANum) arg;
       final long p = it.itr();
       final boolean ex = p == it.dbl();
       switch(cmp) {
@@ -98,7 +97,7 @@ public final class Pos extends Simple {
         default:
       }
     }
-    return fallback;
+    return expr;
   }
 
   @Override

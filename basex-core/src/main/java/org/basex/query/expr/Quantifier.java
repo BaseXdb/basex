@@ -60,15 +60,14 @@ public final class Quantifier extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // return pre-evaluated result
-    if(expr.isValue()) return optPre(item(cc.qc, info), cc);
+    if(expr.isValue()) return cc.preEval(this);
 
     // pre-evaluate satisfy clause if it is a value
     if(expr instanceof GFLWOR && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
-        cc.info(OPTPRE_X, value);
-        return Bln.get(value.ebv(cc.qc, info).bool(info));
+        return cc.replaceWith(value, Bln.get(value.ebv(cc.qc, info).bool(info)));
       }
     }
     return this;

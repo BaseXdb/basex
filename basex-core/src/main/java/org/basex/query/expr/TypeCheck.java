@@ -63,13 +63,11 @@ public final class TypeCheck extends Single {
     if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
       if(!seqType.occ.check(1)) throw typeError(expr, seqType, null, info);
       final FuncItem fi = (FuncItem) expr;
-      return optPre(fi.coerceTo((FuncType) seqType.type, cc.qc, info, true), cc);
+      return cc.replaceWith(this, fi.coerceTo((FuncType) seqType.type, cc.qc, info, true));
     }
 
     // we can type check immediately
-    if(expr.isValue()) {
-      return optPre(value(cc.qc), cc);
-    }
+    if(expr.isValue()) return cc.preEval(this);
 
     // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {

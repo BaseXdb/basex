@@ -74,38 +74,6 @@ public final class List extends Arr {
       }
     }
 
-    if(size >= 0) {
-      if(allAreValues() && size <= MAX_MAT_SIZE) {
-        Type all = null;
-        final Value[] vs = new Value[exprs.length];
-        int c = 0;
-        for(final Expr expr : exprs) {
-          final Value v = cc.qc.value(expr);
-          if(c == 0) all = v.type;
-          else if(all != v.type) all = null;
-          vs[c++] = v;
-        }
-
-        final Value val;
-        final int s = (int) size;
-        if(all == AtomType.STR)      val = StrSeq.get(vs, s);
-        else if(all == AtomType.BLN) val = BlnSeq.get(vs, s);
-        else if(all == AtomType.FLT) val = FltSeq.get(vs, s);
-        else if(all == AtomType.DBL) val = DblSeq.get(vs, s);
-        else if(all == AtomType.DEC) val = DecSeq.get(vs, s);
-        else if(all == AtomType.BYT) val = BytSeq.get(vs, s);
-        else if(all != null && all.instanceOf(AtomType.ITR)) {
-          val = IntSeq.get(vs, s, all);
-        } else {
-          final ValueBuilder vb = new ValueBuilder();
-          for(int i = 0; i < c; i++) vb.add(vs[i]);
-          val = vb.value();
-        }
-        cc.info(OPTREWRITE_X, val);
-        return val;
-      }
-    }
-
     if(size == 0) {
       seqType = SeqType.EMP;
     } else {
@@ -118,6 +86,34 @@ public final class List extends Arr {
       seqType = st != null ? st.withOcc(o) : SeqType.get(AtomType.ITEM, o);
     }
 
+    if(allAreValues() && size >= 0 && size <= MAX_MAT_SIZE) {
+      Type all = null;
+      final Value[] vs = new Value[exprs.length];
+      int c = 0;
+      for(final Expr expr : exprs) {
+        final Value v = cc.qc.value(expr);
+        if(c == 0) all = v.type;
+        else if(all != v.type) all = null;
+        vs[c++] = v;
+      }
+
+      final Value val;
+      final int s = (int) size;
+      if(all == AtomType.STR)      val = StrSeq.get(vs, s);
+      else if(all == AtomType.BLN) val = BlnSeq.get(vs, s);
+      else if(all == AtomType.FLT) val = FltSeq.get(vs, s);
+      else if(all == AtomType.DBL) val = DblSeq.get(vs, s);
+      else if(all == AtomType.DEC) val = DecSeq.get(vs, s);
+      else if(all == AtomType.BYT) val = BytSeq.get(vs, s);
+      else if(all != null && all.instanceOf(AtomType.ITR)) {
+        val = IntSeq.get(vs, s, all);
+      } else {
+        final ValueBuilder vb = new ValueBuilder();
+        for(int i = 0; i < c; i++) vb.add(vs[i]);
+        val = vb.value();
+      }
+      return cc.replaceWith(this, val);
+    }
     return this;
   }
 

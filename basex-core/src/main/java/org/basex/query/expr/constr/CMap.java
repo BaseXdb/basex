@@ -31,7 +31,7 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return allAreValues() ? preEval(cc) : this;
+    return allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override

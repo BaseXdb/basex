@@ -92,7 +92,7 @@ public abstract class Step extends Preds {
 
     // compute result size
     seqType(seqType, Long.MAX_VALUE);
-    if(size == 0) return optPre(cc);
+    if(size == 0) return cc.emptySeq(this);
 
     // choose best implementation
     return copyType(get(info, axis, test, preds));

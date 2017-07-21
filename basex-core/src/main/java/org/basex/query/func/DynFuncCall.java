@@ -94,7 +94,7 @@ public final class DynFuncCall extends FuncCall {
 
     // maps and arrays can only contain fully evaluated values, so this is safe
     if((f instanceof Map || f instanceof org.basex.query.value.array.Array) && allAreValues())
-      return optPre(value(cc.qc), cc);
+      return cc.preEval(this);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function

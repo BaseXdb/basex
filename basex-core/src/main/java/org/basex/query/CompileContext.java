@@ -1,11 +1,16 @@
 package org.basex.query;
 
+import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
+import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -92,6 +97,54 @@ public final class CompileContext {
     final Var v = vs.add(new Var(var, qc, vs.sc));
     if(vm != null) vm.put(var.id, v);
     return v;
+  }
+
+  /**
+   * Pre-evaluates the specified expression.
+   * @param expr expression
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  public Expr preEval(final Expr expr) throws QueryException {
+    return replaceWith(expr, qc.value(expr));
+  }
+
+  /**
+   * Adds an optimization info for pre-evaluating the specified expression to an empty sequence.
+   * @param result resulting expression
+   * @return optimized expression
+   */
+  public Expr emptySeq(final Expr result) {
+    return replaceWith(result, null);
+  }
+
+  /**
+   * Replaces an expression with the specified one.
+   * @param expr expression
+   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @return optimized expression
+   */
+  public Expr replaceWith(final Expr expr, final Expr result) {
+    final Expr res = result == null ? Empty.SEQ : result;
+    if(res != expr) {
+      if(res == Empty.SEQ) {
+        info(OPTEMPTY_X, expr);
+      } else if(res instanceof Value) {
+        info(OPTPRE_X, expr);
+        if(res.size() > 1) {
+          final Seq seq = (Seq) res;
+          final SeqType st = expr.seqType();
+          // refine sequence type: indicate that types may not be homogeneous
+          if(!st.type.eq(seq.type) && st.type.instanceOf(seq.type)) {
+            seq.type = st.type;
+            seq.homo = false;
+          }
+        }
+      } else {
+        info(OPTREWRITE_X, expr);
+      }
+    }
+    return res;
   }
 
   /**

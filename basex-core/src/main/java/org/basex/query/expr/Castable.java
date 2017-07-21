@@ -45,7 +45,7 @@ public final class Castable extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? preEval(cc) : this;
+    return expr.isValue() ? cc.preEval(this) : this;
   }
 
   @Override

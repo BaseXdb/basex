@@ -155,10 +155,7 @@ public final class GFLWOR extends ParseExpr {
       changed |= optimizePos(cc);
 
       // remove FLWOR expressions when all clauses were removed
-      if(clauses.isEmpty()) {
-        cc.info(QueryText.OPTFLWOR, this);
-        return ret;
-      }
+      if(clauses.isEmpty()) return cc.replaceWith(this, ret);
 
       if(clauses.getLast() instanceof For && ret instanceof VarRef) {
         final For last = (For) clauses.getLast();
@@ -242,10 +239,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     size = calcSize();
-    if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      return Empty.SEQ;
-    }
+    if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return cc.emptySeq(this);
 
     seqType = ret.seqType().withSize(size);
 

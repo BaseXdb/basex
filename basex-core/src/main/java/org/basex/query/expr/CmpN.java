@@ -89,7 +89,7 @@ public final class CmpN extends Cmp {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     seqType = exprs[0].size() == 1 && exprs[1].size() == 1 ? SeqType.BLN : SeqType.BLN_ZO;
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(cc.qc, info) : this, cc);
+    return oneIsEmpty() ? cc.emptySeq(this) : allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override

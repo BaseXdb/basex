@@ -76,7 +76,7 @@ public final class FTContains extends Single {
   public Expr compile(final CompileContext cc) throws QueryException {
     super.compile(cc);
     ftexpr = ftexpr.compile(cc);
-    return expr.isEmpty() ? optPre(Bln.FALSE, cc) : this;
+    return expr.isEmpty() ? cc.replaceWith(this, Bln.FALSE) : this;
   }
 
   @Override

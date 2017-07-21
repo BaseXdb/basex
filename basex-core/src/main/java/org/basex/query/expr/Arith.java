@@ -47,7 +47,7 @@ public final class Arith extends Arr {
     } else if(o1 && o2) {
       seqType = SeqType.ITEM;
     }
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(cc.qc, info) : this, cc);
+    return oneIsEmpty() ? cc.emptySeq(this) : allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override

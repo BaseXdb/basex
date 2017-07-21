@@ -97,11 +97,7 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
     final Expr e = merge(root, cc);
-    if(e != this) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      return e;
-    }
-    return super.optimizeEbv(cc);
+    return e == this ? super.optimizeEbv(cc) : cc.replaceWith(this, e);
   }
 
   /**
@@ -118,7 +114,7 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // return empty root
-    if(root.isEmpty()) return optPre(cc);
+    if(root.isEmpty()) return cc.emptySeq(this);
 
     // remember current context value (will be temporarily overwritten)
     final QueryFocus focus = cc.qc.focus;
@@ -133,7 +129,7 @@ public abstract class Filter extends Preds {
 
     // check result size
     seqType(root.seqType(), root.size());
-    if(size == 0) return optPre(cc);
+    if(size == 0) return cc.emptySeq(this);
 
     // if possible, convert filter to root or path expression
     final Expr ex = simplify(root, preds);
@@ -190,13 +186,8 @@ public abstract class Filter extends Preds {
       }
     }
 
-    if(opt) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      return e;
-    }
-
-    // standard iterator
-    return get(info, root, preds);
+    // return optimized expression or standard iterator
+    return opt ? cc.replaceWith(this, e) : get(info, root, preds);
   }
 
   @Override

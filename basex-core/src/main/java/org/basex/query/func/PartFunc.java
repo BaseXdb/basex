@@ -55,7 +55,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(allAreValues()) return preEval(cc);
+    if(allAreValues()) return cc.preEval(this);
 
     final Expr f = body();
     final SeqType t = f.seqType();

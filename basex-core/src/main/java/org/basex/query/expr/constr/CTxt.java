@@ -33,7 +33,7 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    return optPre(oneIsEmpty() ? null : this, cc);
+    return oneIsEmpty() ? cc.emptySeq(this) : this;
   }
 
   @Override

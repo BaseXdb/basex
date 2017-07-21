@@ -51,7 +51,7 @@ public final class TypeSwitch extends ParseExpr {
     if(ts.isValue()) {
       final Value val = cc.qc.value(ts);
       for(final TypeCase tc : cases) {
-        if(tc.matches(val)) return optPre(tc.compile(cc, (Value) ts).expr, cc);
+        if(tc.matches(val)) return cc.replaceWith(this, tc.compile(cc, (Value) ts).expr);
       }
     }
     // compile branches
@@ -67,7 +67,7 @@ public final class TypeSwitch extends ParseExpr {
     boolean eq = tc.var == null;
     final int cl = cases.length;
     for(int c = 1; eq && c < cl; c++) eq = tc.expr.sameAs(cases[c].expr);
-    if(eq) return optPre(tc.expr, cc);
+    if(eq) return cc.replaceWith(this, tc.expr);
 
     // combine return types
     seqType = cases[0].seqType();

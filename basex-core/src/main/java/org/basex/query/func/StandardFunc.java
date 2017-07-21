@@ -82,7 +82,7 @@ public abstract class StandardFunc extends Arr {
       // pre-evaluate function, which yields a value
       expr = cc.qc.value(this);
     }
-    return optPre(expr, cc);
+    return cc.replaceWith(this, expr);
   }
 
   /**

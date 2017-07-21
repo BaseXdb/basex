@@ -50,13 +50,13 @@ public final class Or extends Logical {
         }
       }
       // expression will always return true
-      if(e == Bln.TRUE) return optPre(Bln.TRUE, cc);
+      if(e == Bln.TRUE) return cc.replaceWith(this, Bln.TRUE);
       // skip expression yielding false
       if(e != Bln.FALSE) list.add(e);
     }
 
     // all arguments return false
-    if(list.isEmpty()) return optPre(Bln.FALSE, cc);
+    if(list.isEmpty()) return cc.replaceWith(this, Bln.FALSE);
 
     if(es != list.size()) {
       cc.info(OPTREWRITE_X, this);
@@ -73,12 +73,11 @@ public final class Or extends Logical {
     }
 
     if(not) {
-      cc.info(OPTREWRITE_X, this);
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
       final Expr ex = new And(info, inner).optimize(cc);
-      return cc.function(Function.NOT, info, ex);
+      return cc.replaceWith(this, cc.function(Function.NOT, info, ex));
     }
 
     // return single expression if it yields a boolean

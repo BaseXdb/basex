@@ -145,50 +145,35 @@ public final class CmpG extends Cmp {
     final SeqType st1 = e1.seqType();
 
     // one value is empty (e.g.: () = local:expensive() )
-    if(oneIsEmpty()) return optPre(Bln.FALSE, cc);
+    if(oneIsEmpty()) return cc.replaceWith(this, Bln.FALSE);
 
     // rewrite count() function
     if(e1.isFunction(Function.COUNT)) {
       final Expr e = compCount(op.op, cc);
-      if(e != this) {
-        cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
-        return e;
-      }
+      if(e != this) return cc.replaceWith(this, e);
     }
 
     // rewrite string-length() function
     if(e1.isFunction(Function.STRING_LENGTH)) {
       final Expr e = compStringLength(op.op, cc);
-      if(e != this) {
-        cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
-        return e;
-      }
+      if(e != this) return cc.replaceWith(this, e);
     }
 
     // position() CMP expr
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
-      if(e != this) {
-        cc.info(OPTREWRITE_X, this);
-        return e;
-      }
+      if(e != this) return cc.replaceWith(this, e);
     }
 
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
-      cc.info(OPTREWRITE_X, this);
-      return cc.function(Function.NOT, info, e1);
+      return cc.replaceWith(this, cc.function(Function.NOT, info, e1));
     }
 
-    // rewrite expr CMP (range expression or number)
+    // rewrite equality comparisons (range expression or number)
     ParseExpr e = CmpR.get(this);
-    // rewrite expr CMP string)
     if(e == this) e = CmpSR.get(this);
-    if(e != this) {
-      // pre-evaluate optimized expression
-      cc.info(OPTREWRITE_X, this);
-      return allAreValues() ? e.preEval(cc) : e;
-    }
+    if(e != this) return allAreValues() ? cc.preEval(e) : cc.replaceWith(this, e);
 
     // choose evaluation strategy
     final SeqType st2 = e2.seqType();
@@ -198,14 +183,14 @@ public final class CmpG extends Cmp {
     }
 
     // pre-evaluate values
-    if(allAreValues()) return preEval(cc);
+    if(allAreValues()) return cc.preEval(this);
 
     // pre-evaluate equality test if operands are equal, deterministic, and can be compared
     if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       // currently limited to strings (function items are invalid, numbers may be NaN)
       final SeqType st = e1.seqType();
-      if(st.oneOrMore() && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, cc);
+      if(st.oneOrMore() && st.type.isStringOrUntyped()) return cc.replaceWith(this, Bln.TRUE);
     }
     return this;
   }

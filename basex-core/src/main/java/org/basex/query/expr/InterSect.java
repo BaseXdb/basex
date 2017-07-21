@@ -28,7 +28,7 @@ public final class InterSect extends Set {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     super.optimize(cc);
-    return oneIsEmpty() ? optPre(cc) : this;
+    return oneIsEmpty() ? cc.emptySeq(this) : this;
   }
 
   @Override

@@ -33,15 +33,7 @@ public final class Range extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    Expr e = this;
-    if(oneIsEmpty()) {
-      e = null;
-    } else if(allAreValues()) {
-      e = value(cc.qc);
-      // range sequence: skip optimization info
-      if(e instanceof RangeSeq) return e;
-    }
-    return optPre(e, cc);
+    return oneIsEmpty() ? cc.emptySeq(this) : allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override

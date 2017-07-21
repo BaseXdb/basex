@@ -31,10 +31,6 @@ public final class FnBoolean extends StandardFunc {
   public Expr optimizeEbv(final CompileContext cc) {
     // if A is not numeric: expr[boolean(A)] -> expr[A]
     final Expr e = exprs[0];
-    if(!e.seqType().mayBeNumber()) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      return e;
-    }
-    return this;
+    return e.seqType().mayBeNumber() ? this : cc.replaceWith(this, e);
   }
 }

@@ -107,12 +107,12 @@ public abstract class Preds extends ParseExpr {
         }
       } else if(pred instanceof ANum) {
         final ANum it = (ANum) pred;
-        final long i = it.itr();
+        final long l = it.itr();
         // example: ....[position() = 1.2]
-        if(i != it.dbl()) return optPre(cc);
-        pred = Pos.get(i, info);
+        if(l != it.dbl()) return cc.emptySeq(this);
+        pred = Pos.get(l, info);
         // example: ....[position() = 0]
-        if(!(pred instanceof Pos)) return optPre(cc);
+        if(!(pred instanceof Pos)) return cc.emptySeq(this);
         preds[p] = pred;
       } else if(pred.isValue()) {
         if(pred.ebv(cc.qc, info).bool(info)) {
@@ -121,7 +121,7 @@ public abstract class Preds extends ParseExpr {
           preds = Array.delete(preds, p--);
         } else {
           // example: ....[false()]
-          return optPre(cc);
+          return cc.emptySeq(this);
         }
       }
     }

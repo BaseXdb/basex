@@ -40,7 +40,7 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(expr.isValue()) return preEval(cc);
+    if(expr.isValue()) return cc.preEval(this);
 
     final SeqType st = expr.seqType();
     final Type t = st.type;

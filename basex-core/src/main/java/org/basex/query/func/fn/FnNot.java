@@ -20,30 +20,28 @@ public final class FnNot extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr e = exprs[0];
+    final Expr e0 = exprs[0];
     // simplify: not(empty(A)) -> exists(A)
-    if(e.isFunction(Function.EMPTY)) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      exprs = ((Arr) e).exprs;
-      return cc.function(Function.EXISTS, info, exprs);
+    if(e0.isFunction(Function.EMPTY)) {
+      exprs = ((Arr) e0).exprs;
+      return cc.replaceWith(this, cc.function(Function.EXISTS, info, exprs));
     }
     // simplify: not(exists(A)) -> empty(A)
-    if(e.isFunction(Function.EXISTS)) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      exprs = ((Arr) e).exprs;
-      return cc.function(Function.EMPTY, info, exprs);
+    if(e0.isFunction(Function.EXISTS)) {
+      exprs = ((Arr) e0).exprs;
+      return cc.replaceWith(this, cc.function(Function.EMPTY, info, exprs));
     }
     // simplify: not('a' = 'b') -> 'a' != 'b'
-    if(e instanceof CmpV || e instanceof CmpG) {
-      final Cmp c = ((Cmp) e).invert();
-      return c == e ? this : c;
+    if(e0 instanceof CmpV || e0 instanceof CmpG) {
+      final Cmp c = ((Cmp) e0).invert();
+      return c == e0 ? this : cc.replaceWith(this, c);
     }
     // simplify: not(not(A)) -> boolean(A)
-    if(e.isFunction(Function.NOT)) {
-      return compBln(((Arr) e).exprs[0], info, cc.sc());
+    if(e0.isFunction(Function.NOT)) {
+      return cc.replaceWith(this, compBln(((Arr) e0).exprs[0], info, cc.sc()));
     }
     // simplify, e.g.: not(boolean(A)) -> not(A)
-    exprs[0] = e.optimizeEbv(cc);
+    exprs[0] = e0.optimizeEbv(cc);
     return this;
   }
 }

@@ -69,12 +69,12 @@ public final class StaticVar extends StaticDecl {
       }
 
       compiled = true;
-      if(!lazy || expr.isValue()) bind(value(cc.qc));
+      if(!lazy || expr.isValue()) cc.replaceWith(expr, value(cc.qc));
     }
   }
 
   /**
-   * Evaluates this variable lazily.
+   * Evaluates this variable.
    * @param qc query context
    * @return value of this variable
    * @throws QueryException query exception

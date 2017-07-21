@@ -67,13 +67,13 @@ public final class And extends Logical {
       }
 
       // expression will always return false
-      if(e == Bln.FALSE) return optPre(Bln.FALSE, cc);
+      if(e == Bln.FALSE) return cc.replaceWith(this, Bln.FALSE);
       // skip expression yielding true
       if(e != Bln.TRUE) list.add(e);
     }
 
     // all arguments return true
-    if(list.isEmpty()) return optPre(Bln.TRUE, cc);
+    if(list.isEmpty()) return cc.replaceWith(this, Bln.TRUE);
 
     if(es != list.size()) {
       cc.info(OPTREWRITE_X, this);
@@ -90,11 +90,11 @@ public final class And extends Logical {
     }
 
     if(not) {
-      cc.info(OPTREWRITE_X, this);
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
-      return cc.function(Function.NOT, info, new Or(info, inner).optimize(cc));
+      final Expr expr = cc.function(Function.NOT, info, new Or(info, inner).optimize(cc));
+      return cc.replaceWith(this, expr);
     }
 
     // return single expression if it yields a boolean

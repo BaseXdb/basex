@@ -60,14 +60,14 @@ public final class Switch extends ParseExpr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // check if expression can be pre-evaluated
-    final Expr ex = opt(cc);
-    if(ex != this) return optPre(ex, cc);
+    final Expr expr = opt(cc);
+    if(expr != this) return cc.replaceWith(this, expr);
 
     // expression could not be pre-evaluated
     seqType = cases[0].exprs[0].seqType();
     final int cl = cases.length;
     for(int c = 1; c < cl; c++) seqType = seqType.union(cases[c].exprs[0].seqType());
-    return ex;
+    return this;
   }
 
   /**

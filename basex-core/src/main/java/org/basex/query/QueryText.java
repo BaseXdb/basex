@@ -389,8 +389,9 @@ public interface QueryText {
 
   /** Optimization info. */ String OPTDESC = "rewriting descendant-or-self step(s)";
   /** Optimization info. */ String OPTATOMIC_X = "atomic evaluation of %";
-  /** Optimization info. */ String OPTPRE_X = "pre-evaluating %";
   /** Optimization info. */ String OPTTYPE_X = "type check removed: %";
+  /** Optimization info. */ String OPTPRE_X = "pre-evaluating %";
+  /** Optimization info. */ String OPTEMPTY_X = "empty sequence: %";
   /** Optimization info. */ String OPTREWRITE_X = "rewriting %";
   /** Optimization info. */ String OPTFLAT_X_X = "flattening nested %: %";
   /** Optimization info. */ String OPTREMOVE_X_X = "%: removing %";
@@ -398,7 +399,6 @@ public interface QueryText {
   /** Optimization info. */ String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */ String OPTFORTOLET = "rewriting singleton for to let";
   /** Optimization info. */ String OPTSWAP_X = "swapping operands: %";
-  /** Optimization info. */ String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */ String OPTINLINE_X = "inlining %";
   /** Optimization info. */ String OPTWHERE = "rewriting where clause(s)";
   /** Optimization info. */ String OPTPRED_X = "rewriting % to predicate(s)";

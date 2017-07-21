@@ -19,6 +19,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
+  /** Indicates if all items have exactly the same type. */
+  public boolean homo;
   /** Length. */
   protected long size;
 
@@ -30,6 +32,7 @@ public abstract class Seq extends Value {
   protected Seq(final long size, final Type type) {
     super(type);
     this.size = size;
+    this.homo = type != AtomType.ITEM;
   }
 
   @Override

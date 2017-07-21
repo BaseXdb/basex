@@ -155,11 +155,9 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
+    // simplify path with empty root expression or empty step
     final Value v = initial(cc);
-    if(v != null && v.isEmpty() || emptyPath(v)) return optPre(cc);
-
-    // rewrite path with empty steps
-    for(final Expr step : steps) if(step.isEmpty()) return optPre(cc);
+    if(v != null && v.isEmpty() || emptyPath(v)) return cc.emptySeq(this);
 
     // merge descendant steps
     Expr e = mergeSteps(cc);
@@ -210,9 +208,8 @@ public abstract class Path extends ParseExpr {
         // merge nested predicates. example: if(a[b]) ->  if(a/b)
         final Expr s = step.merge(this, cc);
         if(s != step) {
-          cc.info(OPTREWRITE_X, this);
           step.preds = new Expr[0];
-          return s;
+          return cc.replaceWith(this, s);
         }
       }
     }
@@ -476,7 +473,7 @@ public abstract class Path extends ParseExpr {
    */
   private boolean emptyPath(final Value rt) {
     final int sl = steps.length;
-    for(int s = 0; s < sl; s++) if(emptyPath(rt, s)) return true;
+    for(int s = 0; s < sl; s++) if(emptyStep(rt, s)) return true;
     return false;
   }
 
@@ -486,7 +483,9 @@ public abstract class Path extends ParseExpr {
    * @param s index of step
    * @return {@code true} if steps will never yield results
    */
-  private boolean emptyPath(final Value rt, final int s) {
+  private boolean emptyStep(final Value rt, final int s) {
+    if(steps[s].isEmpty()) return true;
+
     final Step step = axisStep(s);
     if(step == null) return false;
 

@@ -40,10 +40,8 @@ public final class Lookup extends Arr {
     if(exprs.length != 2) return this;
 
     final Expr keys = exprs[0], expr = exprs[1];
-    if(keys.isValue() && (expr instanceof Map || expr instanceof Array)) {
-      // guaranteed to be fully evaluated
-      return optPre(value(cc.qc), cc);
-    }
+    // guaranteed to be fully evaluated
+    if(keys.isValue() && (expr instanceof Map || expr instanceof Array)) return cc.preEval(this);
 
     final Type tp = expr.seqType().type;
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
@@ -66,7 +64,7 @@ public final class Lookup extends Arr {
         final Expr opt = keys.size() == 1 || keys.seqType().one()
             ? new DynFuncCall(info, cc.sc(), expr, keys).optimize(cc)
             : cc.function(Function.FOR_EACH, info, exprs);
-        return optPre(opt, cc);
+        return cc.replaceWith(this, opt);
       }
 
       if(keys.isValue()) {
@@ -78,7 +76,7 @@ public final class Lookup extends Arr {
         clauses.add(new For(k, null, null, keys, false));
         final VarRef rf = new VarRef(info, f), rk = new VarRef(info, k);
         final DynFuncCall ret = new DynFuncCall(info, cc.sc(), rf, rk);
-        return optPre(new GFLWOR(info, clauses, ret), cc).optimize(cc);
+        return cc.replaceWith(this, new GFLWOR(info, clauses, ret)).optimize(cc);
       }
     }
 

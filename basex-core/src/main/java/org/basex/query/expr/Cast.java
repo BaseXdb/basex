@@ -49,15 +49,14 @@ public final class Cast extends Single {
     if(st.one() && !st.mayBeArray()) seqType = seqType.withOcc(Occ.ONE);
 
     // pre-evaluate value
-    if(expr.isValue()) return optPre(value(cc.qc), cc);
+    if(expr.isValue()) return cc.preEval(this);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
     final Type t = seqType.type;
     if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
         t == AtomType.QNM || t == AtomType.URI) && seqType.eq(expr.seqType())) {
-      optPre(expr, cc);
-      return expr;
+      return cc.replaceWith(this, expr);
     }
     size = seqType.occ();
     return this;
