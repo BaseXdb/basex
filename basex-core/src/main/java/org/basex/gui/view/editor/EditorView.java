@@ -753,7 +753,12 @@ public final class EditorView extends View {
     if(!refresh && stop.isEnabled()) return;
 
     ++statusID;
-    getEditor().resetError();
+    final EditorArea editor = getEditor();
+    String path = "";
+    if(editor != null) {
+      path = editor.file().path();
+      editor.resetError();
+    }
 
     if(refresh) {
       stop.setEnabled(false);
@@ -778,10 +783,9 @@ public final class EditorView extends View {
         inputInfo = ((QueryException) th).info();
       } else if(th instanceof SAXParseException) {
         final SAXParseException ex = (SAXParseException) th;
-        final String path = getEditor().file().path();
         inputInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
       } else {
-        inputInfo = new InputInfo(getEditor().file().path(), 1, 1);
+        inputInfo = new InputInfo(path, 1, 1);
       }
       markError(false);
     }
