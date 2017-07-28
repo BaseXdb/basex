@@ -75,7 +75,8 @@ function dba:logs(
               <input type="hidden" name="loglist" value="{ $loglist }"/>
               <input size="40" id="logs" name="logs" value="{ $logs }"
                 placeholder="regular expression"
-                onkeyup="javascript:void(0);logEntries(false);"/>
+                onkeydown='if(event.keyCode == 13) event.preventDefault();'
+                onkeyup="logEntries(false);"/>
               { html:button('download', 'Download') }
             </h3>
           </form>,
