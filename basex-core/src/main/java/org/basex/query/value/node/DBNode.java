@@ -400,7 +400,6 @@ public class DBNode extends ANode {
         if(curr == size) return null;
         kind = data.kind(curr);
         node.set(curr, kind);
-        System.out.println(curr + " => " + node);
         curr += data.attSize(curr, kind);
         return node;
       }
