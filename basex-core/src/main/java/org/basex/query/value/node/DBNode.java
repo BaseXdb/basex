@@ -389,13 +389,18 @@ public class DBNode extends ANode {
         // initialize iterator: find last node that needs to be scanned
         if(size == -1) {
           if(data.meta.ndocs > 1) {
-            for(final ANode anc : ancestor()) size = ((DBNode) anc).pre;
+            int p = pre;
+            for(final ANode n : ancestor()) p = ((DBNode) n).pre;
+            size = p + data.size(p, data.kind(p));
+          } else {
+            size = data.meta.size;
           }
-          size = size == -1 ? data.meta.size : data.size(size, data.kind(size));
         }
+
         if(curr == size) return null;
         kind = data.kind(curr);
         node.set(curr, kind);
+        System.out.println(curr + " => " + node);
         curr += data.attSize(curr, kind);
         return node;
       }

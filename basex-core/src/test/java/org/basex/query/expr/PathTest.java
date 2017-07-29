@@ -56,7 +56,18 @@ public final class PathTest extends AdvancedQueryTest {
   @Test public void following() {
     execute(new Add(NAME, FILE));
     query("(//ul)[1]/following::ul", "");
+    query("//li/following::li", LI2 + '\n' + LI2);
+  }
+
+  /**
+   * Preceding axis with multiple documents.
+   */
+  @Test public void preceding() {
+    execute(new Add(NAME, FILE));
     query("(//ul)[last()]/preceding::ul", "");
+    query("(//ul)[1]/preceding::ul", "");
+    query("//ul/preceding::ul", "");
+    query("//li/preceding::li", LI1 + '\n' + LI1);
   }
 
   /**
