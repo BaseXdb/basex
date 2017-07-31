@@ -251,7 +251,7 @@ public final class Map extends FItem {
 
   @Override
   public String description() {
-    return CURLY1 + DOTS + CURLY2;
+    return MAP;
   }
 
   @Override

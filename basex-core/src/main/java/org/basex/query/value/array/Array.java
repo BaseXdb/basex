@@ -472,7 +472,7 @@ public abstract class Array extends FItem {
 
   @Override
   public String description() {
-    return SQUARE1 + DOTS + SQUARE2;
+    return ARRAY;
   }
 
   @Override

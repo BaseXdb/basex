@@ -62,12 +62,12 @@ public final class CArray extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder("[");
+    final TokenBuilder tb = new TokenBuilder("[ ");
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       if(e != 0) tb.add(", ");
-      tb.add('(').addExt(exprs[e]).add(')');
+      tb.addExt(exprs[e]);
     }
-    return tb.add("]").toString();
+    return tb.add(" ]").toString();
   }
 }

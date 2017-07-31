@@ -37,8 +37,8 @@ public final class CMap extends Arr {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Map map = Map.EMPTY;
-    final int es = exprs.length;
-    for(int e = 0; e < es; e += 2) {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e += 2) {
       final Value key = exprs[e].atomValue(qc, info);
       if(!(key instanceof Item)) throw SEQFOUND_X.get(info, key);
       final Item k = (Item) key;
@@ -61,11 +61,11 @@ public final class CMap extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder("{ ");
-    boolean key = true;
-    for(final Expr expr : exprs) {
-      tb.add(key ? tb.size() > 2 ? ", " : "" : ":").add(expr.toString());
-      key ^= true;
+    final TokenBuilder tb = new TokenBuilder("map { ");
+    final int el = exprs.length;
+    for(int e = 0; e < el; e += 2) {
+      if(e != 0) tb.add(", ");
+      tb.addExt(exprs[e]).add(':').addExt(exprs[e + 1]);
     }
     return tb.add(" }").toString();
   }
