@@ -30,7 +30,7 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class BXXMLResource implements XMLResource {
+public final class BXXMLResource implements XMLResource {
   /** Collection reference. */
   private final BXCollection coll;
   /** String id. */
