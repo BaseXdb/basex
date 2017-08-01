@@ -1,3 +1,6 @@
+Introduction
+------------
+
 Welcome to the BaseX open source project! We are interested in your feedback:
 
 * Our issue tracker is used for discussing confirmed bugs and features requests.
