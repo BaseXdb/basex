@@ -1,10 +1,4 @@
-BaseX
-===============================================================================
-
-Feedback
---------
-
-Any kind of feedback is welcome:
+Welcome to the BaseX open source project! We are interested in your feedback:
 
 * Our issue tracker is used for discussing confirmed bugs and features requests.
 * Please send new suggestions and bug reports to our
@@ -12,13 +6,8 @@ Any kind of feedback is welcome:
 * We invite you to contribute to our
   [Documentation](http://docs.basex.org/wiki/Main_Page).
 
-To get the project running as smooth as possible, please consider the following
-notes:
-
 Compiling BaseX
 ---------------
-
-Welcome to the source code of BaseX.
 
 JDK 1.7 and JUnit are currently required to compile the complete sources of the
 main project. If you are using another environment than Eclipse or don't have
