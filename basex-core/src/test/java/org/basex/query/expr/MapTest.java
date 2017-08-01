@@ -79,6 +79,18 @@ public final class MapTest extends AdvancedQueryTest {
         + "return (map:remove($m, 'A_')('A_'), map:remove($m, 'C!')('C!'))", "");
   }
 
+  /** GitHub bug (#1480). */
+  @Test public void gh1480() {
+    query("map:merge(( map { 'AQ': 'A' }, map { 'B2': 'C' }, map { 'B2': 'X' }),"
+        + "map { 'duplicates': 'use-last' })?B2", "X");
+    query("map:merge(( map { 'AQ': 'A' }, map { 'B2': 'C' }, map { 'B2': 'X' }),"
+        + "map { 'duplicates': 'use-first' })?B2", "C");
+    query("map:merge(( map { 'AQ': 'A' }, map { 'B2': 'C' }, map { 'B2': 'X' }),"
+        + "map { 'duplicates': 'combine' })?B2", "C\nX");
+    error("map:merge(( map { 'AQ': 'A' }, map { 'B2': 'C' }, map { 'B2': 'X' }),"
+        + "map { 'duplicates': 'reject' })?B2", MERGE_DUPLICATE_X);
+  }
+
   /** Atomize key. */
   @Test public void atomKey() {
     query("map {'x':42}(['x'])", 42);
