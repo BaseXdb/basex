@@ -1,13 +1,24 @@
 BaseX
 ===============================================================================
 
-Welcome to the source code of BaseX.
+Feedback
+--------
+
+Any kind of feedback is welcome:
+
+* Our issue tracker is used for discussing confirmed bugs and features requests.
+* Please send new suggestions and bug reports to our
+  [basex-talk](http://basex.org/open-source/) mailing list.
+* We invite you to contribute to our
+  [Documentation](http://docs.basex.org/wiki/Main_Page).
 
 To get the project running as smooth as possible, please consider the following
 notes:
 
 Compiling BaseX
 ---------------
+
+Welcome to the source code of BaseX.
 
 JDK 1.7 and JUnit are currently required to compile the complete sources of the
 main project. If you are using another environment than Eclipse or don't have
@@ -67,8 +78,7 @@ The code base of BaseX can be accessed via [GitHub].
 Docker Image
 ------------
 
-The BaseX server is also available as automated build
-[`basex/basexhttp`]
+The BaseX server is also available as automated build [`basex/basexhttp`]
 on the Docker Hub, providing both release and nightly builds. All images are
 automatically rebuild if Docker provides updated base images.
 
@@ -111,17 +121,6 @@ For further information on using the Docker image, refer to the
 
 [`basex/basexhttp`]: https://hub.docker.com/r/basex/basexhttp/
 [BaseX Docker documentation]: http://docs.basex.org/wiki/Docker
-
-Feedback
---------
-
-Any kind of feedback is welcome; please check out the [documentation].
-
-Tell us if you run into any troubles installing BaseX:
-
-<basex-talk@mailman.uni-konstanz.de>
-
-You are as well invited to contribute to our [bug tracker].
 
 All the best,  
 BaseX Team
