@@ -249,15 +249,6 @@ public final class SeqType {
   private final Test kind;
 
   /**
-   * Private constructor.
-   * @param type type
-   * @param occ occurrence
-   */
-  private SeqType(final Type type, final Occ occ) {
-    this(type, occ, null);
-  }
-
-  /**
    * Constructor. This one is called by {@link Type#seqType()} to create
    * unique sequence type instances.
    * @param type type
@@ -269,8 +260,17 @@ public final class SeqType {
   /**
    * Private constructor.
    * @param type type
+   * @param occ occurrence
+   */
+  private SeqType(final Type type, final Occ occ) {
+    this(type, occ, null);
+  }
+
+  /**
+   * Private constructor.
+   * @param type type
    * @param occ occurrences
-   * @param kind kind test
+   * @param kind kind test (can be {@code null})
    */
   private SeqType(final Type type, final Occ occ, final Test kind) {
     this.type = type;
@@ -292,7 +292,7 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrences
-   * @param kind kind test
+   * @param kind kind test (can be {@code null})
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test kind) {
