@@ -1,5 +1,7 @@
 package org.basex.util.options;
 
+import org.basex.util.list.*;
+
 /**
  * Option containing an enumeration value.
  *
@@ -57,5 +59,16 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
    */
   public V[] values() {
     return clazz.getEnumConstants();
+  }
+
+  /**
+   * Returns all enumeration values as strings.
+   * @return enumeration
+   */
+  public String[] strings() {
+    final V[] values = values();
+    final StringList sl = new StringList(values.length);
+    for(final V v : values) sl.add(v.toString());
+    return sl.finish();
   }
 }

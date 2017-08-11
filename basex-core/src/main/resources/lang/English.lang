@@ -330,6 +330,7 @@ save_before_execute  = Save before executing file
 scale_gui            = Scale GUI
 select_all           = Select All
 separator            = Separator
+serialization        = Serialization Parameters
 sessions_%           = % session(s)
 sessions_killed_%    = % sessions killed.
 show_atts            = Show attributes

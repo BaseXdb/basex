@@ -56,9 +56,9 @@ final class DialogGeneralPrefs extends BaseXBack {
   private final BaseXCheckBox mousefocus;
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox simplefd;
-  /** Browse button. */
+  /** Browse database path. */
   private final BaseXButton dbButton;
-  /** Browse button. */
+  /** Browse repository path. */
   private final BaseXButton repoButton;
 
   /**
@@ -113,7 +113,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     });
     labelText = new BaseXLabel(" ");
 
-    lang = new BaseXCombo(d, LANGS[0]);
+    lang = new BaseXCombo(LANGS[0], d);
     lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 
@@ -149,7 +149,6 @@ final class DialogGeneralPrefs extends BaseXBack {
     pp.add(new BaseXLabel(SIZE_TEXT_RESULTS + COL));
     pp.add(ppp);
     p.add(pp);
-
     add(p);
 
     // checkbox for simple file dialog

@@ -550,6 +550,16 @@ public class Options implements Iterable<Option<?>> {
     }
   }
 
+  /**
+   * Returns the names of all options.
+   * @return names
+   */
+  public final synchronized String[] names() {
+    final StringList sl = new StringList(options.size());
+    for(final Option<?> option : this) sl.add(option.name());
+    return sl.finish();
+  }
+
   @Override
   public final synchronized Iterator<Option<?>> iterator() {
     return options.values().iterator();

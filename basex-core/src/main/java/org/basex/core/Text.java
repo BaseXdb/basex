@@ -823,6 +823,9 @@ public interface Text {
   /** "Strings were replaced.". */
   String STRINGS_REPLACED = lang("strings_replaced");
 
+  /** Serialization parameters. */
+  String SERIALIZATION = lang("serialization");
+
   /** Info on text index. */
   String TEXT_INDEX = lang("text_index");
   /** Info on attribute index. */

@@ -59,13 +59,13 @@ final class DialogJsonParser extends DialogParser {
     super(d);
     jopts = new JsonParserOptions(opts.get(MainOptions.JSONPARSER));
 
-    encoding = DialogExport.encoding(d, jopts.get(JsonParserOptions.ENCODING));
+    encoding = encoding(d, jopts.get(JsonParserOptions.ENCODING));
 
     final JsonFormat[] formats = JsonFormat.values();
     final int fl = formats.length - 1;
     final StringList frmts = new StringList(fl);
     for(int f = 0; f < fl; f++) frmts.add(formats[f].toString());
-    format = new BaseXCombo(d, frmts.finish());
+    format = new BaseXCombo(frmts.finish(), d);
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
 
     liberal = new BaseXCheckBox(LIBERAL_PARSING, JsonParserOptions.LIBERAL, jopts, d);

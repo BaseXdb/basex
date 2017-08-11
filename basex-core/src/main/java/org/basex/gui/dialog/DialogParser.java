@@ -1,9 +1,11 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
@@ -68,5 +70,25 @@ abstract class DialogParser extends BaseXBack {
   static String error(final IOException ex) {
     final TokenBuilder text = new TokenBuilder().bold().add(Text.ERROR).add(COL).norm().nline();
     return text.add(ex.getLocalizedMessage()).toString();
+  }
+
+  /**
+   * Creates an encoding combo box and selects the specified encoding.
+   * @param dialog dialog reference
+   * @param encoding original encoding
+   * @return combo box
+   */
+  static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {
+    final BaseXCombo cb = new BaseXCombo(ENCODINGS, dialog);
+    boolean f = false;
+    String enc = encoding == null ? Strings.UTF8 : encoding;
+    for(final String s : ENCODINGS) f |= s.equals(enc);
+    if(!f) {
+      enc = enc.toUpperCase(Locale.ENGLISH);
+      for(final String s : ENCODINGS) f |= s.equals(enc);
+    }
+    if(!f) enc = Strings.UTF8;
+    cb.setSelectedItem(enc);
+    return cb;
   }
 }

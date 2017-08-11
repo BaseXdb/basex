@@ -93,7 +93,7 @@ final class DialogImport extends BaseXBack {
     final MainOptions opts = gui.context.options;
     final StringList ps = new StringList();
     for(final MainParser mp : MainParser.values()) ps.add(mp.name());
-    parsers = new BaseXCombo(dial, ps.finish());
+    parsers = new BaseXCombo(ps.finish(), dial);
     parsers.setSelectedItem(opts.get(MainOptions.PARSER).name());
 
     createFilter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);

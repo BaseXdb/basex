@@ -81,7 +81,7 @@ final class DialogFT extends DialogIndex {
     final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(12, 0, 0, 0);
     b1.add(check[F_LANG]);
     final String[] langs = FTLexer.languages().finish();
-    language = new BaseXCombo(dialog, langs);
+    language = new BaseXCombo(langs, dialog);
     final Language ln = Language.get(opts);
     for(final String l : langs) {
       final String s = l.replaceFirst(" \\(.*", "");

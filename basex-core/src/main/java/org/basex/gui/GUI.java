@@ -103,7 +103,7 @@ public final class GUI extends JFrame {
   /** Currently executed command ({@code null} otherwise). */
   private volatile Command command;
   /** ID of currently executed command. */
-  private AtomicInteger commandID = new AtomicInteger(0);
+  private final AtomicInteger commandID = new AtomicInteger(0);
 
   /** Menu panel height. */
   private int menuHeight;
@@ -165,7 +165,7 @@ public final class GUI extends JFrame {
 
     nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
 
-    mode = new BaseXCombo(this, FIND, XQUERY, COMMAND);
+    mode = new BaseXCombo(new String[] { FIND, XQUERY, COMMAND }, this);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {

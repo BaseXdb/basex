@@ -3,6 +3,8 @@ package org.basex.gui;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
+import java.nio.charset.*;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -283,6 +285,15 @@ public final class GUIConstants {
   private static int[] lwidth;
   /** Default monospace font widths. */
   private static int[] dmwidth;
+
+  /** Available encodings. */
+  public static final String[] ENCODINGS;
+
+  // initialize encodings
+  static {
+    final SortedMap<String, Charset> cs = Charset.availableCharsets();
+    ENCODINGS = cs.keySet().toArray(new String[cs.size()]);
+  }
 
   // KEYS =====================================================================
 

@@ -15,7 +15,7 @@ import org.basex.gui.layout.*;
  */
 public final class DialogPrefs extends BaseXDialog {
   /** Dialog. */
-  private static Dialog dialog;
+  private static DialogPrefs dialog;
 
   /** General preferences. */
   private final DialogGeneralPrefs general;
@@ -54,6 +54,7 @@ public final class DialogPrefs extends BaseXDialog {
    */
   public static void show(final GUI main) {
     if(dialog == null) dialog = new DialogPrefs(main);
+    dialog.visual.update();
     dialog.setVisible(true);
   }
 
@@ -71,6 +72,7 @@ public final class DialogPrefs extends BaseXDialog {
 
   @Override
   public void cancel() {
+    visual.cancel();
     gui.gopts.set(GUIOptions.PREFTAB, tabs.getSelectedIndex());
     gui.saveOptions();
     super.close();

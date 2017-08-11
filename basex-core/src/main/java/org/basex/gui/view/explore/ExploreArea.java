@@ -122,7 +122,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     }
 
     final String[] entries = entries(data.paths.desc(tl, true, false));
-    final BaseXCombo cm = new BaseXCombo(gui, entries);
+    final BaseXCombo cm = new BaseXCombo(entries, gui);
     cm.addActionListener(this);
     cm.addKeyListener(main);
     if(entries.length == 1) cm.setEnabled(false);
@@ -136,7 +136,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param pos position
    */
   private void addCombo(final String[] values, final int pos) {
-    final BaseXCombo cm = new BaseXCombo(gui, values);
+    final BaseXCombo cm = new BaseXCombo(values, gui);
     BaseXLayout.setWidth(cm, COMPW);
     cm.addActionListener(this);
     cm.addKeyListener(main);
