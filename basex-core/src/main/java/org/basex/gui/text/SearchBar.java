@@ -134,8 +134,8 @@ public final class SearchBar extends BaseXBack {
           if(regex.isEnabled() && search.getText().matches("^.*(?<!\\\\)\\\\n.*")) {
             multi.setSelected(true);
           }
+          oldSearch = srch;
           search();
-          setSearch(srch);
         }
       }
     });
