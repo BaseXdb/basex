@@ -96,6 +96,7 @@ function dba:jobs-users(
               (: non-XQuery session value :)
             }
             let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
+            order by $access descending
             return <row id='{ $id || '|' || $name }' name='{ $name }' value='{ $string }'
                         access='{ $access }' you='{ $you }'/>
           let $headers := (
