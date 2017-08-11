@@ -330,6 +330,7 @@ save_before_execute  = Opslaan voor uitvoeren van bestand
 scale_gui            = Scale GUI
 select_all           = Selecteer alles
 separator            = Scheidingsteken
+serialization        = Serialization Parameters
 sessions_%           = % sessie(s)
 sessions_killed_%    = % sessies gestopt.
 show_atts            = Toon attributen

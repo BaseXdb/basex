@@ -330,6 +330,7 @@ save_before_execute  = Сохранять перед выполнением
 scale_gui            = Пропорционально увеличивать интерфейс
 select_all           = Найти все
 separator            = Разделитель
+serialization        = Serialization Parameters
 sessions_%           = Сессий: %
 sessions_killed_%    = Сессии в количестве % были убиты
 show_atts            = Показывать атрибуты

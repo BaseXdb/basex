@@ -330,6 +330,7 @@ save_before_execute  = Speichere vor Ausführung
 scale_gui            = GUI skalieren
 select_all           = Alles markieren
 separator            = Trennzeichen
+serialization        = Serialization Parameters
 sessions_%           = % Verbindung(en)
 sessions_killed_%    = % Verbindungen beendet.
 show_atts            = Zeige Attribute

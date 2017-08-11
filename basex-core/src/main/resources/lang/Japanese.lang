@@ -330,6 +330,7 @@ save_before_execute  = ファイルを実行する前に保存する
 scale_gui            = スケール GUI
 select_all           = 全選択
 separator            = セパレータ
+serialization        = Serialization Parameters
 sessions_%           = % セッション
 sessions_killed_%    = % セッションが切断されました。
 show_atts            = 属性の表示

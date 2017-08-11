@@ -330,6 +330,7 @@ save_before_execute  = Save before executing file
 scale_gui            = Scale GUI
 select_all           = Бүгдийг сонгох
 separator            = Тусгаарлагч
+serialization        = Serialization Parameters
 sessions_%           = % суулт (session)
 sessions_killed_%    = % суулт (session) устгагдсан.
 show_atts            = Атрибутуудыг харах
