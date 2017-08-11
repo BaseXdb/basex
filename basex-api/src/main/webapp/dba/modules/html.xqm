@@ -22,7 +22,7 @@ declare function html:option(
   $label  as xs:string,
   $opts   as xs:string*
 ) as node()+ {
-  html:checkbox("opts", $value, $opts = $value, $label)
+  html:checkbox('opts', $value, $opts = $value, $label)
 };
 
 (:~
@@ -57,7 +57,7 @@ declare function html:checkbox(
   $map     as map(*)
 ) as node()+ {
   element input {
-    attribute type { "checkbox" },
+    attribute type { 'checkbox' },
     map:for-each($map, function($key, $value) { attribute { $key } { $value } })
   },
   text { $label },
@@ -110,7 +110,7 @@ declare function html:button(
     attribute type { 'submit' },
     attribute name { 'action' },
     attribute value { $value },
-    $confirm[.] ! attribute onclick { "return confirm('Are you sure?');" },
+    $confirm[.] ! attribute onclick { 'return confirm("Are you sure?");' },
     $class ! attribute class { . },
     $label
   }
@@ -241,19 +241,19 @@ declare function html:table(
       if($single-page) then () else
         $start || '-' || min(($count, $start + $max - 1)) || ' of ',
       $count, ' ',
-      if($count = 1) then 'Entry' else ' Entries',
+      if($count = 1) then 'Entry:' else ' Entries:',
       if($single-page) then () else (
         ' &#xa0; ',
         let $first := '«', $prev := '‹'
         return if($page = 1) then ($first, $prev) else (
-          html:link($first, "", ($param, map { 'page': 1, 'sort': $sort })), ' ',
-          html:link($prev, "", ($param, map { 'page': $page - 1, 'sort': $sort }))
+          html:link($first, '', ($param, map { 'page': 1, 'sort': $sort })), ' ',
+          html:link($prev, '', ($param, map { 'page': $page - 1, 'sort': $sort }))
         ),
         ' ',
         let $last := '»', $next := '›'
         return if($last-page) then ($next, $last) else (
-          html:link($next, "", ($param, map { 'page': $page + 1, 'sort': $sort })), ' ',
-          html:link($last, "", ($param, map { 'page': ($count - 1) idiv $max + 1, 'sort': $sort }))
+          html:link($next, '', ($param, map { 'page': $page + 1, 'sort': $sort })), ' ',
+          html:link($last, '', ($param, map { 'page': ($count - 1) idiv $max + 1, 'sort': $sort }))
         )
       )
     },
@@ -264,12 +264,19 @@ declare function html:table(
           let $name := $header/name()
           let $value := upper-case($header/text())
           return element th {
-            attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
-            if(empty($sort) or $name = $sort-key) then (
+            attribute align {
+              if($header/@type = $html:NUMBER) then 'right' else 'left'
+            },
+
+            if($pos = 1 and $buttons) then (
+              <input type='checkbox' onClick='toggle(this)'/>, ''
+            ) else (),
+
+            if($header/@type = 'id') then (
+            ) else if(empty($sort) or $name = $sort-key) then (
               $value
             ) else (
-              html:link($value, "", ($param, map { 'sort': $name, 'page': $page })
-              )
+              html:link($value, '', ($param, map { 'sort': $name, 'page': $page }))
             )
           }
         },
@@ -293,7 +300,7 @@ declare function html:table(
           return element td {
             attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
             if($pos = 1 and $buttons) then (
-              <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>
+              <input type='checkbox' name='{ $name }' value='{ $col }' onClick='buttons(this)'/>, ''
             ) else (),
             if($pos = 1 and exists($link)) then (
               html:link($value, $link($value), ($param, map { $name: $value }))
@@ -315,7 +322,7 @@ declare function html:table(
 declare function html:focus(
   $element  as xs:string
 ) as element(script) {
-  <script type="text/javascript">
+  <script type='text/javascript'>
     (function(){{ var u = document.getElementById('{ $element }'); u.focus(); u.select(); }})();
   </script>
 };
@@ -330,7 +337,7 @@ declare function html:link(
   $text  as xs:string,
   $href  as xs:string
 ) as element(a) {
-  <a href="{ $href }">{ $text }</a>
+  <a href='{ $href }'>{ $text }</a>
 };
 
 (:~

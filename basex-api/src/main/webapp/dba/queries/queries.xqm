@@ -58,23 +58,23 @@ function dba:queries(
         </table>
         <textarea id='editor' name='editor' rows='20' spellcheck='false'/>
         <table width='100%'>
-          <tr>
-            <td>
-              <div align='right'>
-                <form autocomplete='off' action='javascript:void(0);'>
-                  <input id='file' name='file' placeholder='Name of query'
-                         list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
-                  <datalist id='files'>{ dba:files() ! element option { . } }</datalist>
-                  <button type='submit' name='open' id='open' disabled='true'
-                          onclick='openQuery()'>Open</button>
-                  <button type='save' name='save' id='save' disabled='true'
-                          onclick='saveQuery()'>Save</button>
-                  <button type='delete' name='delete' id='delete' disabled='true'
-                          onclick='deleteQuery()'>Delete</button>
-                </form>
-              </div>
-            </td>
-          </tr>
+          <form autocomplete='off' action='javascript:void(0);'>
+            <tr>
+              <td>
+                <div align='right'>
+                    <input id='file' name='file' placeholder='Name of query'
+                           list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
+                    <datalist id='files'>{ dba:files() ! element option { . } }</datalist>
+                    <button type='submit' name='open' id='open' disabled='true'
+                            onclick='openQuery()'>Open</button>
+                    <button type='save' name='save' id='save' disabled='true'
+                            onclick='saveQuery()'>Save</button>
+                    <button type='delete' name='delete' id='delete' disabled='true'
+                            onclick='deleteQuery()'>Delete</button>
+                </div>
+              </td>
+            </tr>
+          </form>
         </table>
         { html:focus('editor') }
       </td>
@@ -87,7 +87,7 @@ function dba:queries(
           </tr>
         </table>
         <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
-        <script type="text/javascript">loadCodeMirror();</script>
+        <script type="text/javascript">loadCodeMirror(true);</script>
       </td>
     </tr>
   )

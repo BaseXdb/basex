@@ -148,7 +148,7 @@ function dba:database(
           { html:focus('input') }
           <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
           <script type="text/javascript">
-            loadCodeMirror();
+            loadCodeMirror(false);
             queryResource(true);
           </script>
         </_>/node() else (

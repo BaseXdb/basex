@@ -83,7 +83,6 @@ declare function tmpl:wrap(
         $cons:SESSION-VALUE ! <span style='float:right'>User: <b>{ . }</b></span>
       }</div>
       <hr/>
-      <div class='small'/>
       <table width='100%'>{ $tr }</table>
       <hr/>
       <div class='right'><sup>BaseX Team, 2014-17</sup></div>
