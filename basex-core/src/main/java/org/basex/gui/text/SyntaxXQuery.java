@@ -7,6 +7,8 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -37,6 +39,13 @@ final class SyntaxXQuery extends Syntax {
       for(final Field f : QueryText.class.getFields()) {
         if("IGNORE".equals(f.getName())) break;
         Collections.addAll(KEYWORDS, ((String) f.get(null)).split("-"));
+      }
+      for(final Function f : Function.VALUES) {
+        Collections.addAll(KEYWORDS, Token.string(f.local()).split("-"));
+      }
+      final Atts ns = NSGlobal.NS;
+      for(int n = 0; n < ns.size(); n++) {
+        Collections.addAll(KEYWORDS, Token.string(ns.name(n)));
       }
     } catch(final Exception ex) {
       Util.stack(ex);
