@@ -17,9 +17,7 @@ final class SyntaxJSON extends Syntax {
 
   // initialize keywords
   static {
-    KEYWORDS.add("false");
-    KEYWORDS.add("true");
-    KEYWORDS.add("null");
+    Collections.addAll(KEYWORDS, "false", "true", "null");
   }
 
   /** Quoted flag. */
@@ -39,12 +37,12 @@ final class SyntaxJSON extends Syntax {
     final int ch = iter.curr();
     final boolean quote = !back && ch == '"';
 
-    if(!quoted) {
+    if(quoted) {
+      back = !back && ch == '\\';
+    } else {
       if("-+0123456789".indexOf(ch) != -1) return DIGIT;
       if("{}[]:,".indexOf(ch) != -1) return COMMENT;
       if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
-    } else {
-      back = !back && ch == '\\';
     }
 
     if(quote) quoted ^= true;

@@ -8,6 +8,10 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.expr.CmpN.*;
+import org.basex.query.expr.CmpV.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
@@ -46,10 +50,11 @@ final class SyntaxXQuery extends Syntax {
       for(final Function f : Function.VALUES) {
         Collections.addAll(KEYWORDS, Token.string(f.local()).split("-"));
       }
+      for(final Axis a : Axis.VALUES) Collections.addAll(KEYWORDS, a.name);
+      for(final OpV o : CmpV.OpV.VALUES) Collections.addAll(KEYWORDS, o.name);
+      for(final OpN o : CmpN.OpN.VALUES) Collections.addAll(KEYWORDS, o.name);
       final Atts ns = NSGlobal.NS;
-      for(int n = 0; n < ns.size(); n++) {
-        Collections.addAll(KEYWORDS, Token.string(ns.name(n)));
-      }
+      for(int n = 0; n < ns.size(); n++) KEYWORDS.add(Token.string(ns.name(n)));
     } catch(final Exception ex) {
       Util.stack(ex);
     }
