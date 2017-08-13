@@ -5,8 +5,6 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.util.*;
 
-import org.basex.util.*;
-
 /**
  * This class defines syntax highlighting for JSON files.
  *
@@ -26,24 +24,29 @@ final class SyntaxJSON extends Syntax {
 
   /** Quoted flag. */
   private boolean quoted;
+  /** Backslash. */
+  private boolean back;
 
   @Override
   public void init(final Color color) {
     super.init(color);
     quoted = false;
+    back = false;
   }
 
   @Override
   public Color getColor(final TextIterator iter) {
     final int ch = iter.curr();
+    final boolean quote = !back && ch == '"';
+
     if(!quoted) {
-      if(Token.digit(ch)) return DIGIT;
-      if("{}[]".indexOf(ch) != -1) return COMMENT;
-      if(":,".indexOf(ch) != -1) return VALUE;
+      if("-+0123456789".indexOf(ch) != -1) return DIGIT;
+      if("{}[]:,".indexOf(ch) != -1) return COMMENT;
       if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
+    } else {
+      back = !back && ch == '\\';
     }
 
-    final boolean quote = ch == '"';
     if(quote) quoted ^= true;
     return quote || quoted ? VALUE : RED;
   }

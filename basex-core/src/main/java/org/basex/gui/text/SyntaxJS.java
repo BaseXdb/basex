@@ -32,13 +32,13 @@ final class SyntaxJS extends Syntax {
   // initialize xquery keys
   static {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
-    for(final String key : new String[] {
+    Collections.addAll(KEYWORDS,
       "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default",
       "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if",
       "implements", "import", "in", "instanceof", "interface", "let", "new", "package", "private",
       "protected", "public", "return", "static", "super", "switch", "this", "throw", "try",
       "typeof", "var", "void", "while", "with", "yield"
-    }) Collections.addAll(KEYWORDS, key);
+    );
   }
 
   @Override
