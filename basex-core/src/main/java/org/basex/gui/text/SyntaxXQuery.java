@@ -1,11 +1,12 @@
 package org.basex.gui.text;
 
-import static org.basex.data.DataText.*;
+import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
@@ -31,8 +32,10 @@ final class SyntaxXQuery extends Syntax {
   private int quote;
   /** Variable flag. */
   private boolean var;
+  /** Element flag. */
+  private boolean elem;
 
-  // initialize xquery keys
+  // initialize keywords
   static {
     try {
       // add query tokens
@@ -57,6 +60,7 @@ final class SyntaxXQuery extends Syntax {
     super.init(color);
     quote = 0;
     var = false;
+    elem = false;
     comment = 0;
   }
 
@@ -67,7 +71,7 @@ final class SyntaxXQuery extends Syntax {
     // opened quote
     if(quote != 0) {
       if(ch == quote) quote = 0;
-      return STRING;
+      return VALUE;
     }
 
     // comment
@@ -88,7 +92,7 @@ final class SyntaxXQuery extends Syntax {
     // quotes
     if(ch == '"' || ch == '\'') {
       quote = ch;
-      return STRING;
+      return VALUE;
     }
 
     // variables
@@ -102,24 +106,28 @@ final class SyntaxXQuery extends Syntax {
     }
 
     // digits
-    if(Token.digit(ch)) return FUNCTION;
+    if(Token.digit(ch)) return DIGIT;
     // special characters
-    if(!XMLToken.isNCChar(ch)) return COMMENT;
+    if(!XMLToken.isNCChar(ch)) {
+      elem = ch == '<' || ch == '%';
+      return COMMENT;
+    }
     // check for keywords
-    if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
+    if(!elem && KEYWORDS.contains(iter.nextString())) return KEYWORD;
 
     // standard text
+    elem = false;
     return plain;
   }
 
   @Override
   public byte[] commentOpen() {
-    return XQCOMM_O;
+    return DataText.XQCOMM_O;
   }
 
   @Override
   public byte[] commentEnd() {
-    return XQCOMM_C;
+    return DataText.XQCOMM_C;
   }
 
   @Override

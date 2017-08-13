@@ -1,8 +1,10 @@
 package org.basex.gui.text;
 
-import static org.basex.data.DataText.*;
+import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
+
+import org.basex.data.*;
 
 /**
  * This class defines syntax highlighting for XML files.
@@ -42,11 +44,11 @@ public final class SyntaxXML extends Syntax {
     if(name) {
       if(quote != 0) {
         if(quote == ch) quote = 0;
-        return STRING;
+        return VALUE;
       }
       if(ch == '"' || ch == '\'') {
         quote = ch;
-        return STRING;
+        return VALUE;
       }
       if(ch == '>') {
         name = false;
@@ -63,14 +65,14 @@ public final class SyntaxXML extends Syntax {
       if(ch == '?') {
         pi = 1;
         name = false;
-        return FUNCTION;
+        return VARIABLE;
       }
 
       if(elem) {
         if(ch <= ' ') elem = false;
         return KEYWORD;
       }
-      return FUNCTION;
+      return VARIABLE;
     }
 
     // start of a new element, comment or processing instruction
@@ -116,16 +118,16 @@ public final class SyntaxXML extends Syntax {
       // "<!? ... ?"
       case 2: pi = ch == '>' ? 0 : 1; break;
     }
-    return pi > 0 ? FUNCTION : KEYWORD;
+    return pi > 0 ? VARIABLE : KEYWORD;
   }
 
   @Override
   public byte[] commentOpen() {
-    return COMM_O;
+    return DataText.COMM_O;
   }
 
   @Override
   public byte[] commentEnd() {
-    return COMM_C;
+    return DataText.COMM_C;
   }
 }

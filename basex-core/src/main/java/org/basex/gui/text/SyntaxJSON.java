@@ -1,6 +1,11 @@
 package org.basex.gui.text;
 
+import static org.basex.gui.GUIConstants.*;
+
 import java.awt.*;
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * This class defines syntax highlighting for JSON files.
@@ -9,6 +14,16 @@ import java.awt.*;
  * @author Christian Gruen
  */
 final class SyntaxJSON extends Syntax {
+  /** Keywords. */
+  private static final HashSet<String> KEYWORDS = new HashSet<>();
+
+  // initialize keywords
+  static {
+    KEYWORDS.add("false");
+    KEYWORDS.add("true");
+    KEYWORDS.add("null");
+  }
+
   /** Quoted flag. */
   private boolean quoted;
 
@@ -21,13 +36,15 @@ final class SyntaxJSON extends Syntax {
   @Override
   public Color getColor(final TextIterator iter) {
     final int ch = iter.curr();
-    final boolean quote = ch == '"';
-    Color color = quoted || quote ? KEYWORD : plain;
     if(!quoted) {
-      if("{}[]".indexOf(ch) != -1) color = STRING;
-      if(":,".indexOf(ch) != -1) color = FUNCTION;
+      if(Token.digit(ch)) return DIGIT;
+      if("{}[]".indexOf(ch) != -1) return COMMENT;
+      if(":,".indexOf(ch) != -1) return VALUE;
+      if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
     }
+
+    final boolean quote = ch == '"';
     if(quote) quoted ^= true;
-    return color;
+    return quote || quoted ? VALUE : RED;
   }
 }
