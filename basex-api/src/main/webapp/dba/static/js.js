@@ -107,13 +107,11 @@ function query(path, query, func) {
   var name = document.getElementById("name");
   var resource = document.getElementById("resource");
   var sort = document.getElementById("sort");
-  var loglist = document.getElementById("loglist");
   var page = document.getElementById("page");
   var url = path +
     "?name=" + encodeURIComponent(name ? name.value : "") +
     "&resource=" + encodeURIComponent(resource ? resource.value : "") +
     "&sort=" + encodeURIComponent(sort ? sort.value : "") +
-    "&loglist=" + encodeURIComponent(loglist ? loglist.value : "") +
     "&page=" + encodeURIComponent(page ? page.value : "");
   request("POST", url, query,
     function(request) {
@@ -145,40 +143,27 @@ function setErrorFromResponse(request) {
   setError(html.innerText || html.textContent);
 };
 
-/** Most recent log file search string. */
-var _list;
-
-/**
- * Queries all log files.
- * @param {boolean} enforce  enforce query execution
- */
-function logList(enforce) {
-  var list = document.getElementById("loglist").value.trim();
-  if(!enforce && _list == list) return false;
-  _list = list;
-  query("loglist", list, function(text) {
-    document.getElementById("list").innerHTML = text;
-  })
-};
-
 /** Most recent log entry search string. */
-var _logs;
+var _logInput;
 
 /**
  * Queries all log entries of a log file.
  * @param {boolean} enforce  enforce query execution
  */
 function logEntries(enforce) {
-  var logs = document.getElementById("logs").value.trim();
-  if(!enforce && _logs == logs) return false;
-  _logs = logs;
-  query("log", logs, function(text) {
+  var input = document.getElementById("input").value.trim();
+  if(!enforce && _logInput == input) return false;
+  _logInput = input;
+  query("log", input, function(text) {
     document.getElementById("output").innerHTML = text;
   });
+
+  // refresh browser history
+  window.history.replaceState(null, "", replaceParam(window.location.href, "input", input));
 };
 
 /** Most recent query search string. */
-var _input;
+var _dbInput;
 
 /**
  * Queries a database resource.
@@ -186,8 +171,8 @@ var _input;
  */
 function queryResource(enforce) {
   var input = document.getElementById("input").value.trim();
-  if(!enforce && _input == input) return false;
-  _input = input;
+  if(!enforce && _dbInput == input) return false;
+  _dbInput = input;
   query("query-resource", input, function(text) {
     _outputMirror.setValue(text);
   });
@@ -294,16 +279,30 @@ function setDisplayHeight() {
   };
 }
 
-/*
-function setDisplayHeight() {
-  var elem = document.createElement("div");
-  document.body.appendChild(elem);
-  p = elem.offsetTop + 24;
-  var elems = document.getElementsByClassName("CodeMirror");
-  var c = elems[0].offsetHeight;
-  var s = window.innerHeight;
-  Array.prototype.forEach.call(elems,function(cm) {
-    cm.CodeMirror.setSize("100%",Math.max(800,s-(p-c)));
-  });
+/**
+ * Adds the input string to the link target.
+ * @param {link} source  clicked link
+ */
+function addInput(source) {
+  source.href = replaceParam(source.href, "input", document.getElementById("input").value.trim());
+};
+
+/**
+ * Replace a query parameter.
+ * @param {string} url    url
+ * @param {string} name   name
+ * @param {string} value  value
+ * @returns {string} new url
+ */
+function replaceParam(url, name, value) {
+  var key = name + "=";
+  var qm = url.indexOf("?");
+  var href = (qm < 0 ? url : url.substr(0, qm)) + "?" + key + encodeURIComponent(value);
+  if(qm >= 0) {
+    var params = url.substr(qm + 1).split('&');
+    for(var p = 0; p < params.length; p++) {
+      if(params[p].indexOf(key) < 0) href += "&" + params[p];
+    }
+  }
+  return href;
 }
-*/
