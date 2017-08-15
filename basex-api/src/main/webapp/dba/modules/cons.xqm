@@ -18,6 +18,9 @@ declare variable $cons:DBA-DIR := file:temp-dir() || 'dba/';
 (:~ Configuration file. :)
 declare variable $cons:DBA-SETTINGS-FILE := $cons:DBA-DIR || 'dba-settings.xml';
 
+(:~ Query file suffix. :)
+declare variable $cons:SUFFIX := '.xq';
+
 (:~ Permissions. :)
 declare variable $cons:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
 

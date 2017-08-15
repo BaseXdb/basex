@@ -269,7 +269,7 @@ declare function html:table(
             },
 
             if($pos = 1 and $buttons) then (
-              <input type='checkbox' onClick='toggle(this)'/>, ''
+              <input type='checkbox' onclick='toggle(this)'/>, ''
             ) else (),
 
             if($header/@type = 'id') then (
@@ -294,13 +294,15 @@ declare function html:table(
               try { format-number(number(.), '0.00') } catch * { . }
             ) else if($header/@type = 'dateTime') then (
               html:date(xs:dateTime(.))
+            ) else if($header/@type = 'xml') then (
+              parse-xml-fragment(.)
             )
             else .
           )
           return element td {
             attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
             if($pos = 1 and $buttons) then (
-              <input type='checkbox' name='{ $name }' value='{ $col }' onClick='buttons(this)'/>, ''
+              <input type='checkbox' name='{ $name }' value='{ $col }' onclick='buttons(this)'/>, ''
             ) else (),
             if($pos = 1 and exists($link)) then (
               html:link($value, $link($value), ($param, map { $name: $value }))

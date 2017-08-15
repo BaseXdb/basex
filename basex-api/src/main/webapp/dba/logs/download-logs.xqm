@@ -12,7 +12,7 @@ declare variable $dba:CAT := 'logs';
 
 (:~
  : Downloads database logs.
- : @param  $name   name of log files
+ : @param  $name   name (date) of log file
  : @param  $input  search input
  :)
 declare
@@ -26,10 +26,12 @@ function dba:drop(
   $input as xs:string
 ) as element()+ {
   cons:check(),
-  web:response-header(
+
+  let $ext := if($input) then ('-' || web:encode-url($input)) else ()
+  return web:response-header(
     map { 'media-type': 'text/xml' },
-    map { 'Content-Disposition': 'attachment; filename=logs' || $name ||
-      (if($input) then ('-' || web:encode-url($input)) else ()) || '.xml'
+    map { 'Cache-Control': '',
+          'Content-Disposition': 'attachment; filename=logs' || $name || $ext || '.xml'
     }
   ),
   element entries {

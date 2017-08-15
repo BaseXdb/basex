@@ -96,3 +96,17 @@ declare function util:chop(
     $string
   )
 };
+
+(:~
+ : Joins sequence entries.
+ : @param  $items  items
+ : @param  $sep    separator
+ : @return result
+ :)
+declare function util:item-join(
+  $items  as item()*,
+  $sep    as item()
+) {
+  for $item at $pos in $items
+  return ($sep[$pos > 1], $item)
+};

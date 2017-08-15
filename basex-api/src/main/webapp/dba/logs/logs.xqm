@@ -75,7 +75,7 @@ function dba:logs(
             ) update {
               (: enrich link targets with current search string :)
               for $a in .//a
-              return insert node attribute onClick { 'addInput(this); ' } into $a
+              return insert node attribute onclick { 'addInput(this); ' } into $a
             }
           }</div>
         </form>

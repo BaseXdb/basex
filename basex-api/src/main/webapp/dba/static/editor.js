@@ -1,17 +1,26 @@
 /**
  * Opens a query file.
+ * @param {string} file  optional file name
  */
-function openQuery() {
+function openQuery(file) {
   if(_editorMirror.getValue() != "" && !confirm("Replace editor contents?")) return;
 
-  var file = document.getElementById("file");
-  request("POST", "open-query?name=" + encodeURIComponent(file.value.trim()),
+  var name;
+  if(file) {
+    name = file;
+    document.getElementById("file").value = name;
+    checkButtons();
+  } else {
+    name = document.getElementById("file").value.trim();
+  }
+  request("POST", "open-query?name=" + encodeURIComponent(name),
     null,
     function(req) {
       _editorMirror.setValue(req.responseText);
+      setInfo("File was opened.");
     },
     function(req) {
-      setError("Query could not be opened.");
+      setError("File could not be opened: " + name);
     }
   )
 };

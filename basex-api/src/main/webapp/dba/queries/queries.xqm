@@ -12,24 +12,25 @@ import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category. :)
 declare variable $dba:CAT := 'queries';
-(:~ Query file suffix. :)
-declare variable $dba:SUFFIX := '.xq';
 
 (:~
  : Queries page.
- : @param  $error   error string
- : @param  $info    info string
+ : @param  $error  error string
+ : @param  $info   info string
+ : @param  $file   file to be opened
  : @return HTML page
  :)
 declare
   %rest:GET
   %rest:path("/dba/queries")
-  %rest:query-param("error",  "{$error}")
-  %rest:query-param("info",   "{$info}")
+  %rest:query-param("error", "{$error}")
+  %rest:query-param("info",  "{$info}")
+  %rest:query-param("file",  "{$file}")
   %output:method("html")
 function dba:queries(
-  $error   as xs:string?,
-  $info    as xs:string?
+  $error  as xs:string?,
+  $info   as xs:string?,
+  $file   as xs:string?
 ) as element() {
   cons:check(),
 
@@ -88,6 +89,9 @@ function dba:queries(
         </table>
         <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
         <script type="text/javascript">loadCodeMirror(true);</script>
+        {
+          if($file) then <script type="text/javascript">openQuery("{ $file }");</script> else ()
+        }
       </td>
     </tr>
   )
@@ -198,7 +202,7 @@ declare %private function dba:query-options() as xs:string {
 declare %private function dba:to-path(
   $name  as xs:string
 ) as xs:string {
-  $cons:DBA-DIR || translate($name, '\/:*?"<>|', '---------') || $dba:SUFFIX
+  $cons:DBA-DIR || translate($name, '\/:*?"<>|', '---------') || $cons:SUFFIX
 };
 
 (:~
@@ -208,6 +212,6 @@ declare %private function dba:to-path(
 declare %private function dba:files() as xs:string* {
   let $dir := $cons:DBA-DIR
   where file:exists($dir)
-  for $file in file:list($dir, false(), '*' || $dba:SUFFIX)
-  return replace($file, $dba:SUFFIX || '$', '')
+  for $file in file:list($dir, false(), '*' || $cons:SUFFIX)
+  return replace($file, $cons:SUFFIX || '$', '')
 };
