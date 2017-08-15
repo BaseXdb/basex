@@ -1,5 +1,7 @@
 package org.basex.query.func.xquery;
 
+import static org.basex.util.Token.*;
+
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 
@@ -12,6 +14,6 @@ import org.basex.query.util.list.*;
 public final class XQueryUpdate extends XQueryEval {
   @Override
   protected ItemList eval(final QueryContext qc) throws QueryException {
-    return eval(qc, toToken(exprs[0], qc), null, true);
+    return eval(qc, string(toToken(exprs[0], qc)), null, true);
   }
 }

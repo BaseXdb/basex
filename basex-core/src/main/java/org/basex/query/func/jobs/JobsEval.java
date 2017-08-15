@@ -20,14 +20,25 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class JobsEval extends StandardFunc {
+public class JobsEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return eval(qc, string(toToken(exprs[0], qc)), null);
+  }
+
+  /**
+   * Evaluates a job.
+   * @param qc query context
+   * @param query query
+   * @param path path
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  final Str eval(final QueryContext qc, final String query, final String path)
+      throws QueryException {
+
     checkAdmin(qc);
-
-    final String query = string(toToken(exprs[0], qc));
     final HashMap<String, Value> bindings = toBindings(1, qc);
-
     final EvalOptions opts = new EvalOptions();
     if(exprs.length > 2) toOptions(2, opts, qc);
 
@@ -41,7 +52,7 @@ public final class JobsEval extends StandardFunc {
     // check if number of maximum queries has been reached
     if(ctx.jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
-    final ScheduledXQuery job = new ScheduledXQuery(query, bindings, opts, info, qc, sc);
+    final ScheduledXQuery job = new ScheduledXQuery(query, path, bindings, opts, info, qc, sc);
     return Str.get(job.jc().id());
   }
 }

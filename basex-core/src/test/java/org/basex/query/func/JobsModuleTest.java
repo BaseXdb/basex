@@ -131,6 +131,13 @@ public final class JobsModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void invoke() {
+    query("starts-with(" + _JOBS_INVOKE.args("src/test/resources/input.xq") + ", 'job')", "true");
+    error(_JOBS_INVOKE.args("src/test/resources/xxx.xq"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test
   public void finished() {
     final String id = verySlowQuery();
     try {

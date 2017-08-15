@@ -34,6 +34,8 @@ public final class ScheduledXQuery extends Job implements Runnable {
   private final boolean cache;
   /** Query string. */
   private final String query;
+  /** Query path (can be {@code null}). */
+  private final String path;
   /** Base URI. */
   private final String uri;
 
@@ -45,6 +47,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
   /**
    * Constructor.
    * @param query query string
+   * @param path (can be {@code null})
    * @param bindings variable bindings
    * @param opts options
    * @param info input info
@@ -52,10 +55,12 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @param sc static context
    * @throws QueryException query exception
    */
-  ScheduledXQuery(final String query, final HashMap<String, Value> bindings, final EvalOptions opts,
-      final InputInfo info, final QueryContext qc, final StaticContext sc) throws QueryException {
+  ScheduledXQuery(final String query, final String path, final HashMap<String, Value> bindings,
+    final EvalOptions opts, final InputInfo info, final QueryContext qc, final StaticContext sc)
+    throws QueryException {
 
     this.query = query;
+    this.path = path;
     this.bindings = bindings;
     this.info = info;
     cache = opts.get(EvalOptions.CACHE);
@@ -230,6 +235,6 @@ public final class ScheduledXQuery extends Job implements Runnable {
 
   @Override
   public String toString() {
-    return query;
+    return path != null ? path : query;
   }
 }

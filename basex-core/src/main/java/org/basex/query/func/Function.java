@@ -1073,6 +1073,9 @@ public enum Function {
   _JOBS_EVAL(JobsEval.class, "eval(string[,bindings[,options]])",
       arg(STR, MAP_ZO, MAP_O), STR, flag(NDT), JOBS_URI),
   /** XQuery function. */
+  _JOBS_INVOKE(JobsInvoke.class, "invoke(uri[,bindings[,options]])",
+      arg(STR, MAP_ZO, MAP_O), STR, flag(NDT), JOBS_URI),
+  /** XQuery function. */
   _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_FINISHED(JobsFinished.class, "finished(id)", arg(STR), BLN, flag(NDT), JOBS_URI),

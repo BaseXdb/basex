@@ -1,4 +1,4 @@
-package org.basex.query.func.xquery;
+package org.basex.query.func.jobs;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
@@ -7,7 +7,8 @@ import java.io.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.list.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,13 +16,13 @@ import org.basex.query.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class XQueryInvoke extends XQueryEval {
+public final class JobsInvoke extends JobsEval {
   @Override
-  protected ItemList eval(final QueryContext qc) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
     final IO io = checkPath(0, qc);
     try {
-      return eval(qc, string(io.read()), io.path(), false);
+      return eval(qc, string(io.read()), io.path());
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }
