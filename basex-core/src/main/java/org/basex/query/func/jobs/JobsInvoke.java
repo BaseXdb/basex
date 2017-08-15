@@ -22,7 +22,7 @@ public final class JobsInvoke extends JobsEval {
     checkCreate(qc);
     final IO io = checkPath(0, qc);
     try {
-      return eval(qc, string(io.read()), io.path());
+      return eval(qc, string(io.read()), io.url());
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }
