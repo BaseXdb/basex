@@ -67,7 +67,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
     jc().context = qc.context;
 
     final String bu = opts.get(EvalOptions.BASE_URI);
-    uri = bu != null ? bu : string(sc.baseURI().string());
+    uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
 
     // check when job is to be started
     final String del = opts.get(EvalOptions.START);
