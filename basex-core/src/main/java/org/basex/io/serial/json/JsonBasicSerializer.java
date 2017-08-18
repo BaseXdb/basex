@@ -84,8 +84,6 @@ public final class JsonBasicSerializer extends JsonSerializer {
         out.print('"');
         out.print(norm(key));
         out.print("\":");
-      } else {
-        if(key != null) throw error("Element '%' must have no key.", type);
       }
 
       if(eq(type, NULL)) {

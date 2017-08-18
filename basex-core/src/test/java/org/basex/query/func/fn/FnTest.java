@@ -50,6 +50,7 @@ public final class FnTest extends AdvancedQueryTest {
   public void xmlToJson() {
     query(XML_TO_JSON.args("<map xmlns='http://www.w3.org/2005/xpath-functions'>"
         + "<string key=''>í</string></map>", " map{'indent':'no'}"), "{\"\":\"\u00ed\"}");
+    query(XML_TO_JSON.args("<fn:string key='root'>X</fn:string>"), "\"X\"");
   }
 
 
