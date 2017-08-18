@@ -133,26 +133,28 @@ function dba:database(
       </td>
       <td class='vertical'/>
       <td width='49%'>{
-        if($resource) then <_>
-          <h3>{ $resource }</h3>
-          <form action="resource" method="post" id="resources" enctype="multipart/form-data">
-            <input type="hidden" name="name" value="{ $name }"/>
-            <input type="hidden" name="resource" value="{ $resource }" id="resource"/>
-            { html:button('rename', 'Rename…') }
-            { html:button('download', 'Download') }
-            { html:button('replace', 'Replace…') }
-          </form>
-          <h4>Enter your query…</h4>
-          <input style="width:100%" name="input" id="input" onkeyup='queryResource(false)'/>
-          <div class='small'/>
-          { html:focus('input') }
-          <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
-          <script type="text/javascript">
-            loadCodeMirror(false);
-            queryResource(true);
-          </script>
-        </_>/node() else (
-          $data/self::database ! html:properties(.)
+        if($resource) then (
+          <_>
+            <h3>{ $resource }</h3>
+            <form action="resource" method="post" id="resources" enctype="multipart/form-data">
+              <input type="hidden" name="name" value="{ $name }"/>
+              <input type="hidden" name="resource" value="{ $resource }" id="resource"/>
+              { html:button('rename', 'Rename…') }
+              { html:button('download', 'Download') }
+              { html:button('replace', 'Replace…') }
+            </form>
+            <h4>Enter your query…</h4>
+            <input style="width:100%" name="input" id="input" onkeyup='queryResource(false)'/>
+            <div class='small'/>
+            { html:focus('input') }
+            <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
+            <script type="text/javascript">
+              loadCodeMirror(false);
+              queryResource(true);
+            </script>
+          </_>/node()
+        ) else (
+          html:properties($data/self::database)
         )
       }</td>
     </tr>

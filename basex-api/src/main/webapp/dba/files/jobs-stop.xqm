@@ -8,7 +8,7 @@ module namespace dba = 'dba/jobs-users';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (:~ Top category :)
-declare variable $dba:CAT := 'jobs-users';
+declare variable $dba:CAT := 'files';
 
 (:~
  : Stops jobs.
@@ -16,10 +16,10 @@ declare variable $dba:CAT := 'jobs-users';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/stop-job")
+  %rest:path("/dba/jobs-stop")
   %rest:query-param("id", "{$ids}")
   %output:method("html")
-function dba:drop(
+function dba:jobs-stop(
   $ids  as xs:string*
 ) as element(rest:response) {
   cons:check(),

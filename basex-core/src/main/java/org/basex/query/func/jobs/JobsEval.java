@@ -46,13 +46,13 @@ public class JobsEval extends StandardFunc {
     final Context ctx = qc.context;
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
-      bindings.put(key, ScheduledXQuery.copy(it.getValue().iter(), ctx, qc));
+      bindings.put(key, Scheduled.copy(it.getValue().iter(), ctx, qc));
     }
 
     // check if number of maximum queries has been reached
     if(ctx.jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
-    final ScheduledXQuery job = new ScheduledXQuery(query, path, bindings, opts, info, qc, sc);
+    final Scheduled job = new Scheduled(query, path, bindings, opts, info, qc, sc);
     return Str.get(job.jc().id());
   }
 }

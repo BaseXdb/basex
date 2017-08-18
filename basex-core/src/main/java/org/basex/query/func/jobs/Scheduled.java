@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class ScheduledXQuery extends Job implements Runnable {
+public final class Scheduled extends Job implements Runnable {
   /** Result. */
   private final JobResult result = new JobResult(this);
   /** Variable bindings. */
@@ -55,7 +55,7 @@ public final class ScheduledXQuery extends Job implements Runnable {
    * @param sc static context
    * @throws QueryException query exception
    */
-  ScheduledXQuery(final String query, final String path, final HashMap<String, Value> bindings,
+  Scheduled(final String query, final String path, final HashMap<String, Value> bindings,
     final EvalOptions opts, final InputInfo info, final QueryContext qc, final StaticContext sc)
     throws QueryException {
 

@@ -3,14 +3,14 @@
  :
  : @author Christian Grün, BaseX Team, 2014-17
  :)
-module namespace dba = 'dba/jobs-users';
+module namespace dba = 'dba/users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
 (:~ Top category :)
-declare variable $dba:CAT := 'jobs-users';
+declare variable $dba:CAT := 'users';
 
 (:~
  : Form for creating a new user.

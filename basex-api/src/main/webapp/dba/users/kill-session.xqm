@@ -1,19 +1,19 @@
 (:~
- : Kill sessions.
+ : Kill web sessions.
  :
  : @author Christian Grün, BaseX Team, 2014-17
  :)
-module namespace dba = 'dba/jobs-users';
+module namespace dba = 'dba/users';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (:~ Top category :)
-declare variable $dba:CAT := 'jobs-users';
+declare variable $dba:CAT := 'users';
 
 (:~
- : Kills DBA sessions.
- : @param  $id session ids (including names)
+ : Kills web sessions.
+ : @param  $id  session ids (including names)
  :)
 declare
   %rest:GET

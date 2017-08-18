@@ -57,8 +57,7 @@ function dba:databases(
       attribute count { map:size($names) + count($backups) },
       $databases,
       $backups
-    },
-    db:system()
+    }
   } catch * {
     element error { $err:description }
   }
@@ -88,25 +87,6 @@ function dba:databases(
               map { 'sort': $sort, 'link': $link, 'page': $page, 'count': $count })
           }
         </form>
-      </td>
-      <td class='vertical'/>
-      <td width='49%'>
-        <table>
-          <tr>{
-            for $table in $data/self::system ! html:properties(.)
-            let $th := $table/tr[th][3]
-            return (
-              <td>
-                <h2>System</h2>
-                <table>{ $th/preceding-sibling::*/. }</table>
-              </td>,
-              <td>
-                <h2>&#xa0;</h2>
-                <table>{ $th, $th/following-sibling::* }</table>
-              </td>
-            )
-          }</tr>
-        </table>
       </td>
     </tr>
   )

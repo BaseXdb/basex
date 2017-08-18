@@ -3,12 +3,12 @@
  :
  : @author Christian Grün, BaseX Team, 2014-17
  :)
-module namespace dba = 'dba/jobs-users';
+module namespace dba = 'dba/users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (:~ Top category :)
-declare variable $dba:CAT := 'jobs-users';
+declare variable $dba:CAT := 'users';
 
 (:~
  : Drops users.

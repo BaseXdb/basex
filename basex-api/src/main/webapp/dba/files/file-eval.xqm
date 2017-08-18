@@ -26,8 +26,8 @@ function dba:file-eval(
 
   let $name := replace($file, '\.\.+|/|\\', '')
   let $params := try {
-    let $id := jobs:invoke($cons:DBA-DIR || $name, (), map { 'cache': 'true' })
-    return map { 'info': 'Job "' || $id || '" started for ' || $name || '.' }
+    let $id := jobs:invoke($cons:DBA-DIR || $name, (), map { 'cache': 'true', 'id': $file })
+    return map { 'info': 'Job "' || $id || '" started.' }
   } catch * {
     map { 'error': 'Could not start ' || $name || '.' }
   }

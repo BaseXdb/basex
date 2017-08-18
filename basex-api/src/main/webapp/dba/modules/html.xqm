@@ -125,14 +125,14 @@ declare function html:properties(
   $props  as element()
 ) as element(table) {
   <table>{
-    for $info in $props/*
+    for $header in $props/*
     return (
       <tr>
         <th colspan='2' align='left'>
-          <h3>{ upper-case($info/name()) }</h3>
+          <h3>{ upper-case(name($header)) }</h3>
         </th>
       </tr>,
-      for $option in $info/*
+      for $option in $header/*
       let $value := $option/data()
       return <tr>
         <td><b>{ upper-case($option/name()) }</b></td>
@@ -241,7 +241,7 @@ declare function html:table(
       if($single-page) then () else
         $start || '-' || min(($count, $start + $max - 1)) || ' of ',
       $count, ' ',
-      if($count = 1) then 'Entry:' else ' Entries:',
+      if($count = 0) then 'Entries.' else if($count = 1) then 'Entry:' else ' Entries:',
       if($single-page) then () else (
         ' &#xa0; ',
         let $first := '«', $prev := '‹'

@@ -89,10 +89,57 @@ function dba:files(
           <input type="submit" value='Send'/>
         </form>
         <div class='note'>
-          The files are located on the DBA system in the temporary directory
-          <code>{ $dir }</code>.
+          DBA directory: <code>{ file:path-to-native($dir) }</code>
         </div>
         <div>&#xa0;</div>
+      </td>
+      <td class='vertical'/>
+      <td>
+        <form action="{ $dba:CAT }" method="post" class="update">
+        <h2>Jobs</h2>
+        {
+          let $buttons := (
+            html:button('jobs-stop', 'Stop', true())
+          )
+          let $headers := (
+            <id>ID</id>,
+            <type>Type</type>,
+            <state>State</state>,
+            <sec type='number' order='desc'>Seconds</sec>,
+            <user>User</user>,
+            <you>You</you>
+          )
+          let $rows :=
+            let $curr := jobs:current()
+            for $job in jobs:list-details()
+            let $id := $job/@id
+            let $ms := xs:dayTimeDuration($job/@duration) div xs:dayTimeDuration('PT0.001S')
+            let $you := if($id = $curr) then '&#x2713;' else '–'
+            let $start := string($job/@start)
+            let $end := string($job/@end)
+            order by $ms descending, $start descending
+            return <row id='{ $id }' type='{ $job/@type }' state='{ $job/@state }'
+                        sec='{ $ms div 1000 }' user='{ $job/@user }' you='{ $you }'
+                        reads='{ $job/@reads }' writes='{ $job/@writes }'
+                        start='{ $start}' end='{ $end }'/>
+          let $table := html:table($headers, $rows, $buttons, map {}, map {})
+          return $table update {
+            let $keys := map {
+              'reads': 'Read locks',
+              'writes': 'Write locks',
+              'start': 'Start time',
+              'end': 'End time'
+            }
+            for $tr at $p in tr[not(th)]
+            let $label := string-join(
+              for $value in $rows[$p]/@*[string()]
+              for $key in $keys(name($value))
+              return $key || ': ' || $value
+            , out:nl())
+            return insert node attribute title { $label } into $tr
+          }
+        }
+        </form>
       </td>
     </tr>
   )
@@ -102,19 +149,25 @@ function dba:files(
  : Redirects to the specified action.
  : @param  $action  action to perform
  : @param  $names   names of files
+ : @param  $ids     ids
  :)
 declare
   %rest:POST
   %rest:path("/dba/files")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
+  %rest:query-param("id",     "{$ids}")
   %output:method("html")
 function dba:files-redirect(
   $action  as xs:string,
-  $names   as xs:string*
+  $names   as xs:string*,
+  $ids     as xs:string*
 ) as element(rest:response) {
   cons:check(),
-  web:redirect($action, map { 'name': $names, 'redirect': $dba:CAT })
+  web:redirect($action,
+    if($action = ('jobs-stop')) then map { 'id': $ids }
+    else map { 'name': $names, 'redirect': $dba:CAT }
+  )
 };
 
 (:~

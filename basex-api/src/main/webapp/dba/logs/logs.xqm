@@ -50,7 +50,7 @@ function dba:logs(
   let $name := if($name) then $name else string(head($files))
   return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
-      <td width='230'>
+      <td width='190'>
         <form action="javascript:void(0);">
           <h2>{ html:link('Logs', $dba:CAT) }</h2>
         </form>

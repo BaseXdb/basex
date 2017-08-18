@@ -34,7 +34,7 @@ function buttons(source) {
 
       var values = [
         "backup", "optimize", "drop-backup", "optimize-all", "delete", "drop-user", "drop-db",
-        "drop-pattern", "kill-session", "restore", "stop-job", "delete-files", "delete-logs"
+        "drop-pattern", "kill-session", "restore", "jobs-stop", "delete-files", "delete-logs"
       ];
       for(var v = 0; v < values.length; v++) {
         if(button.value == values[v]) button.disabled = !checked;
