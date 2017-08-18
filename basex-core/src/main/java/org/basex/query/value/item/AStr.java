@@ -55,14 +55,4 @@ public abstract class AStr extends Item {
     return coll == null ? Token.diff(string(ii), it.string(ii)) :
       coll.compare(string(ii), it.string(ii));
   }
-
-  @Override
-  public String toString() {
-    try {
-      return Atm.toString(string(null));
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      return "";
-    }
-  }
 }

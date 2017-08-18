@@ -77,7 +77,7 @@ public final class StrStream extends AStr {
   @Override
   public String toString() {
     try {
-      return toJava();
+      return toString(string(null));
     } catch(final QueryException ex) {
       return Util.info(Function._FILE_READ_TEXT.args(input));
     }

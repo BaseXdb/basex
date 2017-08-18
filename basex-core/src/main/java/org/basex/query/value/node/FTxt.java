@@ -3,7 +3,6 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 
 import org.basex.core.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.w3c.dom.Text;
@@ -53,6 +52,6 @@ public final class FTxt extends FNode {
 
   @Override
   public String toString() {
-    return Atm.toString(value);
+    return toString(value);
   }
 }

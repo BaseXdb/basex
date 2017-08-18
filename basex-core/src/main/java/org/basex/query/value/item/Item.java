@@ -1,5 +1,6 @@
 package org.basex.query.value.item;
 
+import static org.basex.data.DataText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
@@ -293,7 +294,7 @@ public abstract class Item extends Value {
   @Override
   public void plan(final FElem plan) {
     try {
-      addPlan(plan, planElem(VAL, string(null), TYP, type));
+      addPlan(plan, planElem(VAL, string(string(null), false, true), TYP, type));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
@@ -333,5 +334,50 @@ public abstract class Item extends Value {
    */
   public ID typeId() {
     return type.id();
+  }
+
+  /**
+   * Returns a string representation of the specified value.
+   * @param value value
+   * @return string
+   */
+  public static String toString(final byte[] value) {
+    return toString(value, true, true);
+  }
+
+  /**
+   * Returns a string representation of the specified value.
+   * @param value value
+   * @param quotes wrap with quotes
+   * @param limit limit output
+   * @return string
+   */
+  public static String toString(final byte[] value, final boolean quotes, final boolean limit) {
+    return Token.string(string(value, quotes, limit));
+  }
+
+  /**
+   * Returns a string representation of the specified value.
+   * @param value value
+   * @param quotes wrap with quotes
+   * @param limit limit output
+   * @return string
+   */
+  public static byte[] string(final byte[] value, final boolean quotes, final boolean limit) {
+    final TokenBuilder tb = new TokenBuilder();
+    if(quotes) tb.add('"');
+    for(final byte v : value) {
+      if(limit && tb.size() > 255) {
+        tb.add(DOTS);
+        break;
+      }
+      if(v == '&') tb.add(E_AMP);
+      else if(v == '\r') tb.add(E_CR);
+      else if(v == '\n') tb.add(E_NL);
+      else if(v == '"' && quotes) tb.add('"').add('"');
+      else tb.addByte(v);
+    }
+    if(quotes) tb.add('"');
+    return tb.finish();
   }
 }

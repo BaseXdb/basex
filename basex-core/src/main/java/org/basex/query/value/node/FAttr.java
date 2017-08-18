@@ -87,6 +87,6 @@ public final class FAttr extends FNode {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.string()).add('=').add(Atm.toString(value)).toString();
+    return new TokenBuilder(name.string()).add('=').add(toString(value)).toString();
   }
 }

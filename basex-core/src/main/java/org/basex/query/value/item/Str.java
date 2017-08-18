@@ -109,4 +109,9 @@ public final class Str extends AStr {
   public String toJava() {
     return Token.string(value);
   }
+
+  @Override
+  public String toString() {
+    return toString(value);
+  }
 }

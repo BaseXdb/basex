@@ -136,4 +136,9 @@ public final class Uri extends AStr {
       throw new QueryException(ex);
     }
   }
+
+  @Override
+  public String toString() {
+    return toString(value);
+  }
 }
