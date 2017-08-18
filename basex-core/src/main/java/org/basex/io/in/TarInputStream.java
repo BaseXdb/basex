@@ -19,8 +19,8 @@ public final class TarInputStream extends FilterInputStream {
   private final byte[] buf = new byte[1];
   /** Current entry. */
   private TarEntry entry;
-  /** File size. */
-  private long size;
+  /** Number of read bytes. */
+  private long offset;
 
   /**
    * Constructor.
@@ -38,16 +38,17 @@ public final class TarInputStream extends FilterInputStream {
 
   @Override
   public int read(final byte[] bytes, final int off, final int len) throws IOException {
-    int l = len;
-    if(entry != null) {
-      final long ln = entry.getSize() - size;
-      if(ln == 0) return -1;
-      if(ln < len) l = (int) ln;
-    }
+    // no entry (header)
+    if(entry == null) return super.read(bytes, off, len);
 
-    final int br = super.read(bytes, off, l);
-    if(br != -1 && entry != null) size += br;
-    return br;
+    // tar entry: bytes to read
+    final long remain = entry.getSize() - offset;
+    // stop if all bytes have been reached
+    if(remain == 0) return -1;
+    // stop reading at end of entry
+    final int read = super.read(bytes, off, remain < len ? (int) remain : len);
+    if(read != -1) offset += read;
+    return read;
   }
 
   @Override
@@ -73,18 +74,19 @@ public final class TarInputStream extends FilterInputStream {
   public TarEntry getNextEntry() throws IOException {
     // close entry
     if(entry != null) {
-      long ln = entry.getSize() - size + BLOCK - (size & BLOCK - 1);
-      while(ln != BLOCK && ln > 0) ln -= skip(ln);
+      // skip bytes: count number of entry blocks, subtract number of read bytes
+      long skip = (entry.getSize() + BLOCK - 1) / BLOCK * BLOCK - offset;
+      offset = 0;
       entry = null;
-      size = 0;
+      while(skip > 0) skip -= skip(skip);
     }
     // read header
     final byte[] header = new byte[BLOCK];
-    int tr = 0;
-    while(tr < BLOCK) {
-      final int res = read(header, tr, BLOCK - tr);
+    int read = 0;
+    while(read < BLOCK) {
+      final int res = read(header, read, BLOCK - read);
       if(res < 0) break;
-      tr += res;
+      read += res;
     }
     if(eof(header)) return null;
 
