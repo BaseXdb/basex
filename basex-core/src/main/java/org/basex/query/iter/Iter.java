@@ -21,7 +21,7 @@ public abstract class Iter {
 
   /**
    * Returns the specified item, or an arbitrary item if the index is invalid.
-   * If this method is implemented by an iterator, {@link #size} needs to be implemented as well.
+   * If this method is implemented by an iterator, {@link #size()} needs to be implemented as well.
    * @param i value offset
    * @return specified item
    * @throws QueryException query exception
@@ -32,8 +32,8 @@ public abstract class Iter {
   }
 
   /**
-   * Returns the iterator size. Note: {@code -1} is returned if the result size is unknown.
-   * If this method is implemented by an iterator, {@link #get} needs to be implemented as well.
+   * Returns the iterator size. Note: {@code -1} is returned if the result size is unknown. If this
+   * method is implemented by an iterator, {@link #get(long)} needs to be implemented as well.
    * @return number of entries
    */
   public long size() {
@@ -42,7 +42,7 @@ public abstract class Iter {
 
   /**
    * Returns a value with all iterated items.
-   * Must only be called if {@link #next} has not been called before.
+   * Must only be called if {@link #next()} has not been called before.
    * @param qc query context
    * @return sequence
    * @throws QueryException query exception
