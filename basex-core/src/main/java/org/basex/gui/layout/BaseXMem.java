@@ -72,7 +72,7 @@ public final class BaseXMem extends BaseXPanel {
 
     // print current memory usage
     final FontMetrics fm = g.getFontMetrics();
-    final String sz = Performance.format(used, true);
+    final String sz = Performance.format(used);
     final int fw = (ww - fm.stringWidth(sz)) / 2;
     final int h = fm.getHeight() - 3;
     g.setColor(full ? colormark3 : dgray);

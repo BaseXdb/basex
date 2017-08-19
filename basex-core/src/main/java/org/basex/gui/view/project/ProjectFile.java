@@ -45,7 +45,7 @@ final class ProjectFile extends ProjectNode {
     final StringBuilder sb = new StringBuilder();
     if(file != null) {
       sb.append(full ? file.path() : file.name());
-      if(file.exists()) sb.append(" (").append(Performance.format(file.length(), true)).append(')');
+      if(file.exists()) sb.append(" (").append(Performance.format(file.length())).append(')');
     }
     return sb.toString();
   }

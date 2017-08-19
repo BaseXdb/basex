@@ -216,7 +216,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     final int mr = MAXRESULTS[maxResults.getValue()];
     labelResults.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
     final int mt = MAXTEXT[maxText.getValue()];
-    labelText.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt, true));
+    labelText.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt));
     return true;
   }
 }

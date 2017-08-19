@@ -83,9 +83,9 @@ public final class DialogMem extends BaseXDialog {
     final long max = rt.maxMemory();
     final long total = rt.totalMemory();
     final long used = total - rt.freeMemory();
-    return TOTAL_MEM_C + Performance.format(max, true) + NL
-        + RESERVED_MEM_C + Performance.format(total, true) + NL + MEMUSED_C
-        + Performance.format(used, true) + NL + NL + H_USED_MEM;
+    return TOTAL_MEM_C + Performance.format(max) + NL
+        + RESERVED_MEM_C + Performance.format(total) + NL + MEMUSED_C
+        + Performance.format(used) + NL + NL + H_USED_MEM;
   }
 
 
