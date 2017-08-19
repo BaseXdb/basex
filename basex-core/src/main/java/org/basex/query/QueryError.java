@@ -595,7 +595,7 @@ public enum QueryError {
   /** FOJS0003. */
   JSON_DUPLICATE_X(FOJS, 3, "%"),
   /** FOJS0003. */
-  MERGE_DUPLICATE_X(FOJS, 3, "Key '%' occurs more than once."),
+  MERGE_DUPLICATE_X(FOJS, 3, "Key % occurs more than once."),
   /** FOJS0005. */
   JSON_OPT_X(FOJS, 5, "%"),
   /** FOJS0005. */
