@@ -14,16 +14,17 @@ declare variable $dba:CAT := 'logs';
  : Downloads database logs.
  : @param  $name   name (date) of log file
  : @param  $input  search input
+ : @return binary data
  :)
 declare
   %rest:POST
-  %rest:path("/dba/download-logs")
+  %rest:path("/dba/log-download")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("input", "{$input}")
   %output:method("html")
 function dba:drop(
   $name   as xs:string,
-  $input as xs:string
+  $input  as xs:string
 ) as element()+ {
   cons:check(),
 

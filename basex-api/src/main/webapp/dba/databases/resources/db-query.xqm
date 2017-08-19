@@ -17,12 +17,12 @@ import module namespace util = 'dba/util' at '../../modules/util.xqm';
  :)
 declare
   %rest:POST("{$query}")
-  %rest:path("/dba/query-resource")
+  %rest:path("/dba/db-query")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
   %rest:single
   %output:method("text")
-function dba:query-resource(
+function dba:db-query(
   $name      as xs:string,
   $resource  as xs:string,
   $query     as xs:string

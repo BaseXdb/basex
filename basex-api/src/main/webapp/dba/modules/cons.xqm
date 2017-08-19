@@ -74,7 +74,7 @@ declare variable $cons:OPTION :=
 declare function cons:check(
 ) as empty-sequence() {
   if($cons:SESSION-VALUE) then () else
-    error(xs:QName('basex:login'), 'Please log in again.', Request:path())
+    error(xs:QName('basex:login'), 'Please log in again', Request:path())
 };
 
 (:~

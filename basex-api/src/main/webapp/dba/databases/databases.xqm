@@ -63,7 +63,7 @@ function dba:databases(
   }
   let $error := head(($data/self::error, $error))
 
-  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='49%'>
         <form action="{ $dba:CAT }" method="post" class="update">
@@ -73,14 +73,14 @@ function dba:databases(
             let $rows := $data/self::databases/row
             let $headers := (
               <name>Name</name>,
-              <resources type='number' order='desc'>Resources</resources>,
-              <size type='bytes' order='desc'>Size</size>,
-              <date type='dateTime' order='desc'>Modification Date</date>
+              <resources type='number' order='desc'>Count</resources>,
+              <size type='bytes' order='desc'>Bytes</size>,
+              <date type='dateTime' order='desc'>Last Modified</date>
             )
             let $buttons := (
-              html:button('create-db', 'Create…'),
-              html:button('optimize-all', 'Optimize'),
-              html:button('drop-db', 'Drop', true())
+              html:button('db-create', 'Create…'),
+              html:button('db-optimize-all', 'Optimize'),
+              html:button('db-drop', 'Drop', true())
             )
             let $link := function($value) { 'database' }
             return html:table($headers, $rows, $buttons, map { },
@@ -96,6 +96,7 @@ function dba:databases(
  : Redirects to the specified action.
  : @param  $action  action to perform
  : @param  $names   names of selected databases
+ : @return redirection
  :)
 declare
   %rest:POST

@@ -15,17 +15,24 @@ declare variable $dba:CAT := 'settings';
 
 (:~
  : Settings page.
+ : @param  $error  error string
+ : @param  $info   info string
+ : @return page
  :)
 declare
   %rest:GET
   %rest:path("/dba/settings")
+  %rest:query-param("error", "{$error}")
+  %rest:query-param("info",  "{$info}")
   %output:method("html")
 function dba:settings(
-) as element() {
+  $error  as xs:string?,
+  $info   as xs:string?
+) as element(html) {
   cons:check(),
 
   let $system := html:properties(db:system())
-  return tmpl:wrap(map { 'top': $dba:CAT },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='32%'>
         <form action="settings" method="post">
@@ -78,14 +85,14 @@ function dba:settings(
  : Returns a text input component.
  : @param  $key    key
  : @param  $label  label
+ : @return table row
  :)
 declare %private function dba:input(
   $key    as xs:string,
   $value  as xs:string
 ) as element(tr)* {
   <tr>
-    <td>
-      { $value }:<br/>
+    <td>{ $value }:<br/>
       <input name="{ $key }" type="number" value="{ $cons:OPTION($key) }"/>
     </td>
   </tr>
@@ -93,6 +100,7 @@ declare %private function dba:input(
 
 (:~
  : Saves the settings.
+ : @return redirection
  :)
 declare
   %rest:POST
@@ -101,7 +109,6 @@ declare
 function dba:settings-save(
 ) as element(rest:response) {
   cons:check(),
-
   let $config := element config {
     for $key in Request:parameter-names()
     return element { $key } { Request:parameter($key) }
@@ -109,6 +116,6 @@ function dba:settings-save(
   return (
     file:create-dir($cons:DBA-DIR),
     file:write($cons:DBA-SETTINGS-FILE, $config),
-    web:redirect("settings")
+    web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
   )
 };

@@ -6,16 +6,17 @@
 module namespace tmpl = 'dba/tmpl';
 
 import module namespace cons = 'dba/cons' at 'cons.xqm';
+import module namespace util = 'dba/util' at 'util.xqm';
 
 (:~
  : Extends the specified table rows with the page template.
- : @param  $tr  tr elements
+ : @param  $rows  tr elements
  : @return HTML page
  :)
 declare function tmpl:wrap(
-  $tr  as element(tr)+
+  $rows  as element(tr)+
 ) as element(html) {
-  tmpl:wrap(map { }, $tr)
+  tmpl:wrap(map { }, $rows)
 };
 
 (:~
@@ -27,17 +28,18 @@ declare function tmpl:wrap(
  :   <li><b>info</b>: info string</li>
  : </ul>
  : @param  $options  options
- : @param  $tr       tr elements
+ : @param  $rows     tr elements
  : @return page
  :)
 declare function tmpl:wrap(
   $options  as map(*),
-  $tr       as element(tr)+
+  $rows     as element(tr)+
 ) as element(html) {
-  <html>
+  let $top := $options('cat') ! util:capitalize(.)
+  return <html>
     <head>
       <meta charset="utf-8"/>
-      <title>Database Administration</title>
+      <title>DBA{ $top ! (' • ' || .) }</title>
       <meta name="description" content="Database Administration"/>
       <meta name="author" content="BaseX Team, 2014-17"/>
       <link rel="stylesheet" type="text/css" href="static/style.css"/>
@@ -65,7 +67,6 @@ declare function tmpl:wrap(
         return try {
           cons:check(),
           let $cats :=
-            let $top := $options('top')
             for $cat in ('Databases', 'Queries', 'Files', 'Logs',  'Users',
               'Settings', 'Logout')
             let $link := <a href="{ lower-case(replace($cat, ' &amp; ', '-')) }">{ $cat }</a>
@@ -75,7 +76,7 @@ declare function tmpl:wrap(
               $link
             )
           return (head($cats), tail($cats) ! (' | ', .)),
-          (1 to 4) ! '&#x2000;',
+          (1 to 3) ! '&#x2000;',
           $emph
         } catch basex:login {
           $emph
@@ -83,7 +84,7 @@ declare function tmpl:wrap(
         $cons:SESSION-VALUE ! <span style='float:right'>User: <b>{ . }</b></span>
       }</div>
       <hr/>
-      <table width='100%'>{ $tr }</table>
+      <table width='100%'>{ $rows }</table>
       <hr/>
       <div class='right'><sup>BaseX Team, 2014-17</sup></div>
       <div class='small'/>

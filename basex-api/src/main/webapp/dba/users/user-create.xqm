@@ -14,30 +14,31 @@ declare variable $dba:CAT := 'users';
 
 (:~
  : Form for creating a new user.
- : @param  $name   entered name
+ : @param  $name   entered user name
  : @param  $pw     entered password
  : @param  $perm   chosen permission
  : @param  $error  error string
+ : @return page
  :)
 declare
   %rest:GET
-  %rest:path("/dba/create-user")
+  %rest:path("/dba/user-create")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("pw",    "{$pw}")
   %rest:query-param("perm",  "{$perm}", "none")
   %rest:query-param("error", "{$error}")
   %output:method("html")
-function dba:create(
+function dba:user-create(
   $name   as xs:string?,
   $pw     as xs:string?,
   $perm   as xs:string,
   $error  as xs:string?
-) as element() {
+) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
+  tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="create-user" method="post" autocomplete="off">
+        <form action="user-create" method="post" autocomplete="off">
           <!--  force chrome not to autocomplete form -->
           <input style="display:none" type="text" name="fake1"/>
           <input style="display:none" type="password" name="fake2"/>
@@ -82,34 +83,34 @@ function dba:create(
 
 (:~
  : Creates a user.
- : @param  $name  user
+ : @param  $name  user name
  : @param  $pw    password
  : @param  $perm  permission
- : @param  $lang  language
+ : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/create-user")
+  %rest:path("/dba/user-create")
   %rest:query-param("name", "{$name}")
   %rest:query-param("pw",   "{$pw}")
   %rest:query-param("perm", "{$perm}")
-function dba:create(
+function dba:user-create(
   $name  as xs:string,
   $pw    as xs:string,
   $perm  as xs:string
-) {
+) as empty-sequence() {
   cons:check(),
   try {
     if(user:exists($name)) then (
-      error((), 'User already exists: ' || $name || '.')
+      error((), 'User already exists.')
     ) else (
       user:create($name, $pw, $perm)
     ),
-    cons:redirect($dba:CAT, map { 'info': 'Created User: ' || $name, 'name': $name })
+    cons:redirect($dba:CAT, map { 'info': 'User was created.' })
   } catch * {
-    cons:redirect("create-user", map {
-      'error': $err:description, 'name': $name, 'pw': $pw, 'perm': $perm
+    cons:redirect('user-create', map {
+      'name': $name, 'pw': $pw, 'perm': $perm, 'error': $err:description
     })
   }
 };

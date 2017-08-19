@@ -15,10 +15,10 @@ import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
  : @return rest response and file content
  :)
 declare
-  %rest:path("/dba/download")
+  %rest:path("/dba/db-download")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
-function dba:download(
+function dba:db-download(
   $name      as xs:string,
   $resource  as xs:string
 ) as item()+ {
@@ -39,19 +39,4 @@ function dba:download(
       <http:response status="400" message="{ $err:description }"/>
     </rest:response>
   }
-};
-
-(:~
- : Downloads a database backup.
- : @param  $backup  name of backup file (ignored)
- : @return zip file
- :)
-declare
-  %rest:path("/dba/backup/{$backup}")
-  %output:media-type("application/octet-stream")
-function dba:download(
-  $backup  as xs:string
-) {
-  cons:check(),
-  file:read-binary(db:system()/globaloptions/dbpath || '/' || $backup)
 };

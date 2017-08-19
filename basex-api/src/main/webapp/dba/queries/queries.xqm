@@ -18,7 +18,7 @@ declare variable $dba:CAT := 'queries';
  : @param  $error  error string
  : @param  $info   info string
  : @param  $file   file to be opened
- : @return HTML page
+ : @return page
  :)
 declare
   %rest:GET
@@ -31,12 +31,12 @@ function dba:queries(
   $error  as xs:string?,
   $info   as xs:string?,
   $file   as xs:string?
-) as element() {
+) as element(html) {
   cons:check(),
 
   tmpl:wrap(
     map {
-      'top': $dba:CAT, 'info': $info, 'error': $error,
+      'cat': $dba:CAT, 'info': $info, 'error': $error,
       'css': 'codemirror/lib/codemirror.css',
       'scripts': ('editor.js', 'codemirror/lib/codemirror.js',
                   'codemirror/mode/xquery/xquery.js','codemirror/mode/xml/xml.js')
@@ -179,7 +179,7 @@ declare
   %output:method("text")
 function dba:update-query(
   $query  as xs:string?
-) {
+) as empty-sequence() {
   cons:check(),
   util:update-query($query)
 };

@@ -6,6 +6,7 @@
 module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -13,10 +14,11 @@ declare variable $dba:CAT := 'logs';
 (:~
  : Deletes database logs.
  : @param  $names  names of log files
+ : @return redirection
  :)
 declare
   %rest:GET
-  %rest:path("/dba/delete-logs")
+  %rest:path("/dba/log-delete")
   %rest:query-param("name", "{$names}")
   %output:method("html")
 function dba:drop(
@@ -25,7 +27,7 @@ function dba:drop(
   cons:check(),
   try {
     $names ! admin:delete-logs(.),
-    web:redirect($dba:CAT, map { 'info': 'Deleted logs: ' || count($names) })
+    web:redirect($dba:CAT, map { 'info': util:info($names, 'log', 'deleted') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })
   }

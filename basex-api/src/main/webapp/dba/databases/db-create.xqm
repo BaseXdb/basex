@@ -24,13 +24,13 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/create-db")
+  %rest:path("/dba/db-create")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("opts",  "{$opts}")
   %rest:query-param("lang",  "{$lang}", "en")
   %rest:query-param("error", "{$error}")
   %output:method("html")
-function dba:create(
+function dba:db-create(
   $name   as xs:string?,
   $opts   as xs:string*,
   $lang   as xs:string?,
@@ -39,10 +39,10 @@ function dba:create(
   cons:check(),
 
   let $opts := if($opts = 'x') then $opts else ('textindex', 'attrindex')
-  return tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="create-db" method="post" autocomplete="off">
+        <form action="db-create" method="post" autocomplete="off">
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:button('create', 'Create')
@@ -92,11 +92,12 @@ function dba:create(
  : @param  $name  database
  : @param  $opts  database options
  : @param  $lang  language
+ : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/create-db")
+  %rest:path("/dba/db-create")
   %rest:query-param("name", "{$name}")
   %rest:query-param("opts", "{$opts}")
   %rest:query-param("lang", "{$lang}")
@@ -104,20 +105,23 @@ function dba:create(
   $name  as xs:string,
   $opts  as xs:string*,
   $lang  as xs:string?
-) {
+) as empty-sequence() {
   cons:check(),
   try {
     if(db:exists($name)) then (
-      error((), 'Database already exists: ' || $name || '.')
+      error((), 'Database already exists.')
     ) else (
       db:create($name, (), (), map:merge((
-        ('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics',
-         'updindex') ! map:entry(., $opts = .), $lang ! map:entry('language', .)))),
-      cons:redirect($dba:SUB, map { 'info': 'Created Database: ' || $name, 'name': $name })
+        for $option in ('textindex', 'attrindex', 'tokenindex', 'ftindex',
+          'stemming', 'casesens', 'diacritics', 'updindex')
+        return map:entry($option, $opts = $option),
+        $lang ! map:entry('language', .)))
+      ),
+      cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was created.' })
     )
   } catch * {
-    cons:redirect("create-db", map {
-      'error': $err:description, 'name': $name, 'opts': $opts, 'lang': $lang
+    cons:redirect('db-create', map {
+      'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }
 };

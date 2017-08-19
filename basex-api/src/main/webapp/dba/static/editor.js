@@ -17,10 +17,10 @@ function openQuery(file) {
     null,
     function(req) {
       _editorMirror.setValue(req.responseText);
-      setInfo("File was opened.");
+      setInfo("Query was opened.");
     },
     function(req) {
-      setError("File could not be opened: " + name);
+      setError("Query could not be opened: " + name);
     }
   )
 };

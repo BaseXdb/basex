@@ -6,6 +6,7 @@
 module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Sub category :)
 declare variable $dba:SUB := 'database';
@@ -13,53 +14,58 @@ declare variable $dba:SUB := 'database';
 (:~
  : Creates a database backup.
  : @param  $name  name of database
+ : @return redirection
  :)
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/create-backup")
+  %rest:path("/dba/backup-create")
   %rest:query-param("name", "{$name}")
-function dba:create-backup(
+function dba:backup-create(
   $name  as xs:string
-) {
-  dba:action($name, 'Backup was created.', function() { db:create-backup($name) })
+) as empty-sequence() {
+  dba:action($name, 'Backup was created.', function() {
+    db:create-backup($name)
+  })
 };
 
 (:~
  : Drops a database backup.
  : @param  $name     name of database
  : @param  $backups  backup files
+ : @return redirection
  :)
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/drop-backup")
+  %rest:path("/dba/backup-drop")
   %rest:query-param("name",   "{$name}")
   %rest:query-param("backup", "{$backups}")
-function dba:drop-backup(
+function dba:backup-drop(
   $name     as xs:string,
   $backups  as xs:string*
-) {
-  let $n := count($backups)
-  let $info := if($n = 1) then 'Backup was dropped.' else $n || ' backups were dropped.'
-  return dba:action($name, $info, function() { $backups ! db:drop-backup(.) })
+) as empty-sequence() {
+  dba:action($name, util:info($backups, 'backup', 'dropped'), function() {
+    $backups ! db:drop-backup(.)
+  })
 };
 
 (:~
  : Restores a database backup.
  : @param  $name    database
  : @param  $backup  backup file
+ : @return redirection
  :)
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/restore")
+  %rest:path("/dba/backup-restore")
   %rest:query-param("name",   "{$name}")
   %rest:query-param("backup", "{$backup}")
-function dba:restore(
+function dba:backup-restore(
   $name    as xs:string,
   $backup  as xs:string
-) {
+) as empty-sequence() {
   dba:action($name, 'Database was restored.', function() { db:restore($backup) })
 };
 
@@ -68,12 +74,13 @@ function dba:restore(
  : @param  $name    database
  : @param  $info    info string
  : @param  $action  updating function
+ : @return redirection
  :)
 declare %updating function dba:action(
   $name    as xs:string,
   $info    as xs:string,
   $action  as %updating function(*)
-) {
+) as empty-sequence() {
   cons:check(),
   try {
     updating $action(),

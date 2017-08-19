@@ -1,4 +1,3 @@
-
 (:~
  : Common RESTXQ access points.
  :
@@ -12,6 +11,7 @@ import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
 
 (:~
  : Redirects to the start page.
+ : @return redirection
  :)
 declare
   %rest:path("/dba")
@@ -23,7 +23,7 @@ function dba:redirect(
 (:~
  : Returns a file.
  : @param  $file  file or unknown path
- : @return rest response and binary file
+ : @return rest binary data
  :)
 declare
   %rest:path("/dba/static/{$file=.+}")
@@ -65,6 +65,7 @@ function dba:any(
 (:~
  : Login error: redirects to the login page.
  : @param  $page page to redirect to
+ : @return redirection
  :)
 declare
   %rest:error("basex:login")

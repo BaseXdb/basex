@@ -6,20 +6,22 @@
 module namespace dba = 'dba/files';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
 
 (:~
- : Deletes files.
+ : Upploads files.
  : @param  $files  map with uploaded files
+ : @return redirection
  :)
 declare
   %rest:POST
-  %rest:path("/dba/upload-files")
+  %rest:path("/dba/file-upload")
   %rest:form-param("files", "{$files}")
   %output:method("html")
-function dba:drop(
+function dba:file-upload(
   $files  as map(*)
 ) as element(rest:response) {
   cons:check(),
@@ -31,5 +33,5 @@ function dba:drop(
       file:write-binary($dir || file:name($name), $content)
     })
   ),
-  web:redirect($dba:CAT, map { 'info': 'Uploaded files: ' || map:size($files) })
+  web:redirect($dba:CAT, map { 'info': util:info(map:keys($files), 'file', 'uploaded') })
 };

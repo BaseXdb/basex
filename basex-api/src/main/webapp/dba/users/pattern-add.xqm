@@ -20,6 +20,7 @@ declare variable $dba:SUB := 'user';
  : @param  $pattern  entered pattern
  : @param  $perm     chosen permission
  : @param  $error    error string
+ : @return page
  :)
 declare
   %rest:GET
@@ -29,17 +30,17 @@ declare
   %rest:query-param("perm",    "{$perm}", "write")
   %rest:query-param("error",   "{$error}")
   %output:method("html")
-function dba:create(
+function dba:pattern-add(
   $name     as xs:string,
   $pattern  as xs:string?,
   $perm     as xs:string,
   $error    as xs:string?
-) as element() {
+) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
+  tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="add-pattern" method="post" autocomplete="off">
+        <form action="pattern-add" method="post" autocomplete="off">
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
@@ -76,14 +77,15 @@ function dba:create(
 
 (:~
  : Creates a pattern.
- : @param  $name     user
- : @param  $pattern  pattern
+ : @param  $name     user name
  : @param  $perm     permission
+ : @param  $pattern  pattern
+ : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/add-pattern")
+  %rest:path("/dba/pattern-add")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("perm",    "{$perm}")
   %rest:query-param("pattern", "{$pattern}")
@@ -91,14 +93,14 @@ function dba:create(
   $name     as xs:string,
   $perm     as xs:string,
   $pattern  as xs:string
-) {
+) as empty-sequence() {
   cons:check(),
   try {
     user:grant($name, $perm, $pattern),
-    cons:redirect($dba:SUB, map { 'info': 'Created Pattern: ' || $pattern, 'name': $name })
+    cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern was created.' })
   } catch * {
-    cons:redirect("add-pattern", map {
-      'error': $err:description, 'name': $name, 'perm': $perm, 'pattern': $pattern
+    cons:redirect('pattern-add', map {
+      'name': $name, 'perm': $perm, 'pattern': $pattern, 'error': $err:description
     })
   }
 };

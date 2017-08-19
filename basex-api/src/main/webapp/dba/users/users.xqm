@@ -33,10 +33,9 @@ function dba:users(
   $sort   as xs:string,
   $error  as xs:string?,
   $info   as xs:string?
-) as element() {
+) as element(html) {
   cons:check(),
-
-  tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
+  tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <form action="{ $dba:CAT }" method="post" class="update">
@@ -45,7 +44,8 @@ function dba:users(
           let $rows :=
             for $user in user:list-details()
             let $name := string($user/@name)
-            let $you := if($cons:SESSION-VALUE = $name) then '&#x2713;' else '–'
+            let $you := if($cons:SESSION-VALUE = $name) then '
+            ' else '–'
             return <row name='{ $name }' perm='{ $user/@permission }' you='{ $you }'/>
           let $headers := (
             <name>Name</name>,
@@ -53,8 +53,8 @@ function dba:users(
             <you>You</you>
           )
           let $buttons := (
-            html:button('create-user', 'Create…'),
-            html:button('drop-user', 'Drop', true())
+            html:button('user-create', 'Create…'),
+            html:button('user-drop', 'Drop', true())
           )
           let $link := function($value) { 'user' }
           return html:table($headers, $rows, $buttons, map {}, map { 'link': $link })
@@ -70,7 +70,7 @@ function dba:users(
           let $rows :=
             for $id in Sessions:ids()
             let $access := Sessions:accessed($id)
-            let $you := if(Session:id() = $id) then '&#x2713;' else '–'
+            let $you := if(Session:id() = $id) then '✓' else '–'
             (: supported session ids (application-specific, can be extended :)
             for $name in Sessions:names($id)[. = ('dba', 'id')]
             let $value := try {
@@ -90,7 +90,7 @@ function dba:users(
             <you>You</you>
           )
           let $buttons := (
-            html:button('kill-session', 'Kill', true())
+            html:button('session-kill', 'Kill', true())
           )
           return html:table($headers, $rows, $buttons, map {}, map {})
         }
@@ -116,6 +116,7 @@ function dba:users(
  : @param  $action  action to perform
  : @param  $names   names of users
  : @param  $ids     ids
+ : @return redirection
  :)
 declare
   %rest:POST
@@ -130,7 +131,7 @@ function dba:users-redirect(
   $ids     as xs:string*
 ) as element(rest:response) {
   web:redirect($action,
-    if($action = 'create-user') then map { }
+    if($action = 'user-create') then map { }
     else if($action = 'kill-session') then map { 'id': $ids }
     else map { 'name': $names, 'redirect': $dba:CAT }
   )

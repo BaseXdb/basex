@@ -8,6 +8,7 @@ module namespace dba = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -25,7 +26,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/optimize")
+  %rest:path("/dba/db-optimize")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("all",   "{$all}")
   %rest:query-param("opts",  "{$opts}")
@@ -50,14 +51,14 @@ function dba:create(
   let $opts := if($opts = 'x') then $opts else $data//*[text() = 'true']/name()
   let $lang := if($opts = 'x') then $lang else 'en'
 
-  return tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="optimize" method="post">
+        <form action="db-optimize" method="post">
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, 'database', map { 'name': $name }), ' » ',
-            html:button('optimize', 'Optimize')
+            html:button('db-optimize', 'Optimize')
           }</h2>
           <!-- dummy value; prevents reset of options if nothing is selected -->
           <input type="hidden" name="opts" value="x"/>
@@ -97,21 +98,22 @@ function dba:create(
  : @param  $all   optimize all
  : @param  $opts  database options
  : @param  $lang  language
+ : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/optimize")
+  %rest:path("/dba/db-optimize")
   %rest:form-param("name", "{$name}")
   %rest:form-param("all",  "{$all}")
   %rest:form-param("opts", "{$opts}")
   %rest:form-param("lang", "{$lang}")
-function dba:optimize(
+function dba:db-optimize(
   $name  as xs:string,
   $all   as xs:string?,
   $opts  as xs:string*,
   $lang  as xs:string?
-) {
+) as empty-sequence() {
   try {
     cons:check(),
     db:optimize($name, boolean($all), map:merge((
@@ -122,7 +124,7 @@ function dba:optimize(
     cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was optimized.' })
   } catch * {
     cons:redirect($dba:SUB, map {
-      'error': $err:description, 'name': $name, 'opts': $opts, 'lang': $lang
+      'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }
 };
@@ -130,20 +132,21 @@ function dba:optimize(
 (:~
  : Optimizes databases with the current settings.
  : @param  $names  names of databases
+ : @return redirection
  :)
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/optimize-all")
+  %rest:path("/dba/db-optimize-all")
   %rest:query-param("name", "{$names}")
   %output:method("html")
 function dba:drop(
   $names  as xs:string*
-) {
+) as empty-sequence() {
   cons:check(),
   try {
     $names ! db:optimize(.),
-    cons:redirect($dba:CAT, map { 'info': 'Optimized databases: ' || count($names) })
+    cons:redirect($dba:CAT, map { 'info': util:info($names, 'database', 'optimized') })
   } catch * {
     cons:redirect($dba:CAT, map { 'error': $err:description })
   }

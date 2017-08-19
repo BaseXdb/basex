@@ -137,7 +137,7 @@ declare function html:properties(
       return <tr>
         <td><b>{ upper-case($option/name()) }</b></td>
         <td>{
-          if($value = 'true') then '&#x2713;'
+          if($value = 'true') then '✓'
           else if($value = 'false') then '–'
           else $value
         }</td>
@@ -287,18 +287,23 @@ declare function html:table(
           let $name := $header/name()
           let $type := $header/@type
           let $col := $entry/@*[name() = $name]
-          let $value := $col/string()[.] ! (
-            if($header/@type = 'bytes') then (
-              try { prof:human(xs:integer(.)) } catch * { . }
-            ) else if($header/@type = 'decimal') then (
-              try { format-number(number(.), '0.00') } catch * { . }
-            ) else if($header/@type = 'dateTime') then (
-              html:date(xs:dateTime(.))
-            ) else if($header/@type = 'xml') then (
-              parse-xml-fragment(.)
-            )
-            else .
-          )
+          let $value := 
+            for $v in string($col)[.]
+            return try {
+              if($header/@type = 'bytes') then (
+                prof:human(xs:integer($v))
+              ) else if($header/@type = 'decimal') then (
+                format-number(number($v), '0.00')
+              ) else if($header/@type = 'dateTime') then (
+                html:date(xs:dateTime($v))
+              ) else if($header/@type = 'xml') then (
+                parse-xml-fragment($v)
+              )
+              else .
+            } catch * {
+              (: error: show original value :)
+              $v
+            }
           return element td {
             attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
             if($pos = 1 and $buttons) then (
@@ -346,7 +351,7 @@ declare function html:link(
  : Creates a link to the specified target.
  : @param  $text    link text
  : @param  $href    link reference
- : @param  $params  maps with query parameters.
+ : @param  $params  query parameters
  : @return link
  :)
 declare function html:link(
@@ -364,8 +369,8 @@ declare function html:link(
  :)
 declare function html:date(
   $date as xs:dateTime
-) {
+) as xs:string {
   let $zone := timezone-from-dateTime(current-dateTime())
   let $dt := fn:adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
-  return format-dateTime($dt, '[Y0000]-[M00]-[D00], [H00]:[m00]:[s00]')
+  return format-dateTime($dt, '[Y00]/[M00]/[D00], [H00]:[m00]:[s00]')
 };

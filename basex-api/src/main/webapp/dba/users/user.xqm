@@ -1,3 +1,5 @@
+
+
 (:~
  : User main page.
  :
@@ -16,7 +18,7 @@ declare variable $dba:SUB := 'user';
 
 (:~
  : Manage a single user.
- : @param  $name     user
+ : @param  $name     user name
  : @param  $newname  new name
  : @param  $pw       password
  : @param  $perm     permission
@@ -41,9 +43,8 @@ function dba:user(
   $perm     as xs:string?,
   $error    as xs:string?,
   $info     as xs:string?
-) as element() {
+) as element(html) {
   cons:check(),
-
   let $data := try {
     user:list-details($name)
   } catch * {
@@ -52,10 +53,10 @@ function dba:user(
   let $error := head(($data/self::error, $error))
   let $admin := $name eq 'admin'
 
-  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='49%'>
-        <form action="edit-user" method="post" autocomplete="off">
+        <form action="user-edit" method="post" autocomplete="off">
           <!--  force chrome not to autocomplete form -->
           <input style="display:none" type="text" name="fake1"/>
           <input style="display:none" type="password" name="fake2"/>
@@ -120,8 +121,8 @@ function dba:user(
                 <perm>Local Permission</perm>
               )
               let $buttons := if($admin) then () else (
-                html:button('add-pattern', 'Add…'),
-                html:button('drop-pattern', 'Drop', true())
+                html:button('pattern-add', 'Add…'),
+                html:button('pattern-drop', 'Drop', true())
               )
               return html:table($headers, $rows, $buttons, map {}, map {})
             }
@@ -129,7 +130,7 @@ function dba:user(
           <div class='note'>
             A global permission can be overwritten by a local permission.<br/>
             Local permissions are applied to those databases that match<br/>
-            a specified pattern. The pattern uses the <a target='_blank'
+            a specified pattern. The pattern is based on the <a target='_blank'
               href='http://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.<br/>
           </div>
         </_>/node()
@@ -140,61 +141,22 @@ function dba:user(
 
 (:~
  : Redirects to the specified action.
- : @param  $action   action to perform
- : @param  $name     user
- : @param  $pattern  pattern
+ : @param  $action    action to perform
+ : @param  $name      user name
+ : @param  $patterns  patterns
+ : @return redirection
  :)
 declare
   %rest:POST
   %rest:path("/dba/user")
   %rest:form-param("action",  "{$action}")
   %rest:form-param("name",    "{$name}")
-  %rest:form-param("pattern", "{$pattern}")
+  %rest:form-param("pattern", "{$patterns}")
 function dba:user-redirect(
-  $action   as xs:string,
-  $name     as xs:string,
-  $pattern  as xs:string?
+  $action    as xs:string,
+  $name      as xs:string,
+  $patterns  as xs:string*
 ) as element(rest:response) {
-  web:redirect($action, map { 'name': $name, 'pattern': $pattern })
+  web:redirect($action, map { 'name': $name, 'pattern': $patterns })
 };
 
-(:~
- : Edits a user.
- : @param  $name     user
- : @param  $newname  new name
- : @param  $pw       password
- : @param  $perm     permission
- : @param  $lang     language
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path("/dba/edit-user")
-  %rest:query-param("name",    "{$name}")
-  %rest:query-param("newname", "{$newname}")
-  %rest:query-param("pw",      "{$pw}")
-  %rest:query-param("perm",    "{$perm}")
-function dba:create(
-  $name     as xs:string,
-  $newname  as xs:string,
-  $pw       as xs:string,
-  $perm     as xs:string
-) {
-  cons:check(),
-  try {
-    let $old := user:list-details($name) return (
-      if($name = $newname) then () else if(user:exists($newname)) then (
-         error((), 'User already exists: ' || $newname || '.')
-       ) else (
-         user:alter($name, $newname)
-      ),
-      if($pw = '') then () else user:password($name, $pw),
-      if($perm = $old/@permission) then () else user:grant($name, $perm)
-    ),
-    cons:redirect($dba:SUB, map { 'info': 'Changes saved.', 'name': $newname })
-  } catch * {
-    cons:redirect($dba:SUB, map {
-      'error': $err:description, 'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm
-    })
-  }
-};

@@ -11,21 +11,22 @@ import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 declare variable $dba:CAT := 'files';
 
 (:~
- : Stops a running job.
- : @param  $id  job id
+ : Evaluates a file.
+ : @param  $file  file name
  : @return redirection
  :)
 declare
   %rest:GET
-  %rest:path("/dba/file-stop")
-  %rest:query-param("id", "{$id}", "")
-function dba:file-stop(
-  $id  as xs:string
-) as item()+ {
+  %rest:path("/dba/job-start")
+  %rest:query-param("file", "{$file}", "")
+function dba:job-start(
+  $file  as xs:string
+) as element(rest:response) {
   cons:check(),
+  let $name := replace($file, '\.\.+|/|\\', '')
   let $params := try {
-    jobs:stop($id),
-    map { 'info': 'Job "' || $id || '" stopped.' }
+    prof:void(jobs:invoke($cons:DBA-DIR || $name, (), map { 'cache': 'true', 'id': $file })),
+    map { 'info': 'Job was started.' }
   } catch * {
     map { 'error': $err:description }
   }

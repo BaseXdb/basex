@@ -1,3 +1,4 @@
+
 /**
  * Toggles the selection of all check boxes in the corresponding form.
  * @param {checkbox} clicked header checkbox
@@ -33,8 +34,10 @@ function buttons(source) {
       if(button.className == "global") continue;
 
       var values = [
-        "backup", "optimize", "drop-backup", "optimize-all", "delete", "drop-user", "drop-db",
-        "drop-pattern", "kill-session", "restore", "jobs-stop", "delete-files", "delete-logs"
+        "backup", "backup-drop", "backup-restore",
+        "db-drop", "db-optimize", "db-optimize-all", "delete",
+        "file-delete", "job-stop", "log-delete", "session-kill",
+        "pattern-drop", "user-drop"
       ];
       for(var v = 0; v < values.length; v++) {
         if(button.value == values[v]) button.disabled = !checked;
@@ -173,7 +176,7 @@ function queryResource(enforce) {
   var input = document.getElementById("input").value.trim();
   if(!enforce && _dbInput == input) return false;
   _dbInput = input;
-  query("query-resource", input, function(text) {
+  query("db-query", input, function(text) {
     _outputMirror.setValue(text);
   });
 };

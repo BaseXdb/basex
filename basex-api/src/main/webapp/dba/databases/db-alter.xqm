@@ -23,7 +23,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/alter-db")
+  %rest:path("/dba/db-alter")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("newname", "{$newname}")
   %rest:query-param("error",   "{$error}")
@@ -34,10 +34,10 @@ function dba:alter(
   $error    as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $dba:SUB, 'error': $error },
+  tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="alter-db" method="post" autocomplete="off">
+        <form action="db-alter" method="post" autocomplete="off">
           <input type="hidden" name="name" value="{ $name }"/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
@@ -64,11 +64,12 @@ function dba:alter(
  : Renames a database.
  : @param  $name     name of database
  : @param  $newname  new name
+ : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/alter-db")
+  %rest:path("/dba/db-alter")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("newname", "{$newname}")
 function dba:alter(
@@ -78,12 +79,12 @@ function dba:alter(
   cons:check(),
   try {
     if(db:exists($newname)) then (
-      error((), 'Database already exists: ' || $newname || '.')
+      error((), 'Database already exists.')
     ) else (
       db:alter($name, $newname)
     ),
-    cons:redirect($dba:SUB, map { 'info': 'Database was renamed.', 'name': $newname })
+    cons:redirect($dba:SUB, map { 'name': $newname, 'info': 'Database was renamed.' })
   } catch * {
-    cons:redirect("alter-db", map { 'error': $err:description, 'name': $name, 'newname': $newname })
+    cons:redirect('db-alter', map { 'name': $name, 'newname': $newname, 'error': $err:description })
   }
 };

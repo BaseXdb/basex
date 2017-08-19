@@ -19,9 +19,10 @@ declare variable $dba:SUB := 'database';
  : Manages a single database.
  : @param  $name      database
  : @param  $resource  resource
- : @param  $error     error string
+ : @param  $sort      table sort key
+ : @param  $page      current page
  : @param  $info      info string
- : @param  $page   current page
+ : @param  $error     error string
  : @return page
  :)
 declare
@@ -41,7 +42,7 @@ function dba:database(
   $page      as xs:integer,
   $info      as xs:string?,
   $error     as xs:string?
-) as element() {
+) as element(html) {
   cons:check(),
   if(not($name)) then web:redirect("databases") else
 
@@ -66,7 +67,7 @@ function dba:database(
 
   return tmpl:wrap(
     map {
-      'top': $dba:CAT, 'info': $info, 'error': $error,
+      'cat': $dba:CAT, 'info': $info, 'error': $error,
       'css': 'codemirror/lib/codemirror.css',
       'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
     },
@@ -81,23 +82,23 @@ function dba:database(
           {
             if($only-backups) then () else (
               let $count := xs:integer($data/self::count)
-              let $rows :=
-                for $res in $data/self::resource
-                return <row resource='{ $res }' type='{ $res/@content-type }'
-                            raw='{ if($res/@raw = 'true') then '&#x2713;' else '–' }'
-                            size='{ $res/@size }'/>
               let $headers := (
                 <resource>Name</resource>,
                 <type>Content type</type>,
                 <raw>Raw</raw>,
                 <size type='number' order='desc'>Size</size>
               )
+              let $rows :=
+                for $res in $data/self::resource
+                return <row resource='{ $res }' type='{ $res/@content-type }'
+                            raw='{ if($res/@raw = 'true') then '✓' else '–' }'
+                            size='{ $res/@size }'/>
               let $buttons := (
-                html:button('add', 'Add…'),
-                html:button('delete', 'Delete', true()),
-                html:button('copy', 'Copy…', false()),
-                html:button('alter-db', 'Rename…', false()),
-                html:button('optimize', 'Optimize…', false(), 'global')
+                html:button('db-add', 'Add…'),
+                html:button('db-delete', 'Delete', true()),
+                html:button('db-copy', 'Copy…', false()),
+                html:button('db-alter', 'Rename…', false()),
+                html:button('db-optimize', 'Optimize…', false(), 'global')
               )
               let $map := map { 'name': $name }
               let $link := function($value) { $dba:SUB }
@@ -119,11 +120,11 @@ function dba:database(
               <size type='bytes'>Size</size>
             )
             let $buttons := (
-              html:button('create-backup', 'Create', false(), 'global') update (
+              html:button('backup-create', 'Create', false(), 'global') update (
                 if($only-backups) then insert node attribute disabled { '' } into . else ()
               ),
-              html:button('restore', 'Restore', true()),
-              html:button('drop-backup', 'Drop', true())
+              html:button('backup-restore', 'Restore', true()),
+              html:button('backup-drop', 'Drop', true())
             )
             let $map := map { 'name': $name }
             let $link := function($value) { 'backup/' || $value || '.zip' }
@@ -139,9 +140,9 @@ function dba:database(
             <form action="resource" method="post" id="resources" enctype="multipart/form-data">
               <input type="hidden" name="name" value="{ $name }"/>
               <input type="hidden" name="resource" value="{ $resource }" id="resource"/>
-              { html:button('rename', 'Rename…') }
-              { html:button('download', 'Download') }
-              { html:button('replace', 'Replace…') }
+              { html:button('db-rename', 'Rename…') }
+              { html:button('db-download', 'Download') }
+              { html:button('db-replace', 'Replace…') }
             </form>
             <h4>Enter your query…</h4>
             <input style="width:100%" name="input" id="input" onkeyup='queryResource(false)'/>
@@ -167,6 +168,7 @@ function dba:database(
  : @param  $name       database
  : @param  $resources  resources
  : @param  $backups    backups
+ : @return redirection
  :)
 declare
   %rest:POST

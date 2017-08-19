@@ -24,30 +24,30 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/rename")
+  %rest:path("/dba/db-rename")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
   %rest:query-param("target",   "{$target}")
   %rest:query-param("error",    "{$error}")
   %output:method("html")
-function dba:rename(
+function dba:db-rename(
   $name      as xs:string,
   $resource  as xs:string,
   $target    as xs:string?,
   $error     as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $dba:SUB, 'error': $error },
+  tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="rename" method="post" autocomplete="off">
+        <form action="db-rename" method="post" autocomplete="off">
           <input type="hidden" name="name" value="{ $name }"/>
           <input type="hidden" name="resource" value="{ $resource }"/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
             html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }), ' » ',
-            html:button('rename', 'Rename')
+            html:button('db-rename', 'Rename')
           }</h2>
           <table>
             <tr>
@@ -71,32 +71,33 @@ function dba:rename(
  : @param  $name      database
  : @param  $resource  resource
  : @param  $target    new name of resource
+ : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/rename")
+  %rest:path("/dba/db-rename")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
   %rest:query-param("target",   "{$target}")
-function dba:rename(
+function dba:db-rename(
   $name      as xs:string,
   $resource  as xs:string,
   $target    as xs:string
-) {
+) as empty-sequence() {
   cons:check(),
   try {
     if(db:exists($name, $target)) then (
-      error((), 'Resource already exists: ' || $target || '.')
+      error((), 'Resource already exists.')
     ) else (
       db:rename($name, $resource, $target),
       cons:redirect($dba:SUB, map {
-        'info': 'Resource was renamed.', 'name': $name, 'resource': $target
+        'name': $name, 'resource': $target, 'info': 'Resource was renamed.'
       })
     )
   } catch * {
-    cons:redirect("rename", map {
-      'error': $err:description, 'name': $name, 'resource': $resource, 'target': $target
+    cons:redirect('db-rename', map {
+      'name': $name, 'resource': $resource, 'target': $target, 'error': $err:description
     })
   }
 };

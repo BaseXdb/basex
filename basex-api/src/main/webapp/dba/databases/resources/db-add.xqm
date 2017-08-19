@@ -25,14 +25,14 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/add")
+  %rest:path("/dba/db-add")
   %rest:query-param("name",   "{$name}")
   %rest:query-param("opts",   "{$opts}")
   %rest:query-param("path",   "{$path}")
   %rest:query-param("binary", "{$binary}")
   %rest:query-param("error",  "{$error}")
   %output:method("html")
-function dba:add(
+function dba:db-add(
   $name    as xs:string,
   $opts    as xs:string*,
   $path    as xs:string?,
@@ -40,16 +40,15 @@ function dba:add(
   $error   as xs:string?
 ) as element(html) {
   cons:check(),
-
   let $opts := if($opts = 'x') then $opts else 'chop'
-  return tmpl:wrap(map { 'top': $dba:CAT, 'error': $error },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="add" method="post" enctype="multipart/form-data" autocomplete="off">
+        <form action="db-add" method="post" enctype="multipart/form-data" autocomplete="off">
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:button('add', 'Add')
+            html:button('db-add', 'Add')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
           <input type="hidden" name="opts" value="x"/>
@@ -96,47 +95,48 @@ function dba:add(
  : @param  $path    database path
  : @param  $file    uploaded file
  : @param  $binary  store as binary file
+ : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/add")
+  %rest:path("/dba/db-add")
   %rest:form-param("name",   "{$name}")
   %rest:form-param("opts",   "{$opts}")
   %rest:form-param("path",   "{$path}")
   %rest:form-param("file",   "{$file}")
   %rest:form-param("binary", "{$binary}")
-function dba:add-post(
+function dba:db-add-post(
   $name    as xs:string,
   $opts    as xs:string*,
   $path    as xs:string,
   $file    as map(*),
   $binary  as xs:string?
-) {
+) as empty-sequence() {
   cons:check(),
   try {
     let $key := map:keys($file)
     let $path := if(not($path) or ends-with($path, '/')) then ($path || $key) else $path
     return if($key = '') then (
-      error((), "No input specified.")
+      error((), 'No input specified')
     ) else if(db:exists($name, $path)) then (
-      error((), 'Resource already exists: ' || $path || '.')
+      error((), 'Resource already exists: ' || $path)
     ) else (
       let $input := $file($key)
       return if($binary) then (
         db:store($name, $path, $input)
       ) else (
         db:add($name, fetch:xml-binary($input), $path, map:merge(
-          ('intparse','dtd','stripns','chop','xinclude') ! map:entry(., $opts = .))
+          ('intparse', 'dtd', 'stripns', 'chop', 'xinclude') ! map:entry(., $opts = .))
         )
       ),
       cons:redirect($dba:SUB,
-        map { 'name': $name, 'path': $path, 'info': 'Added resource: ' || $name }
+        map { 'name': $name, 'path': $path, 'info': 'Resource was added.' }
       )
     )
   } catch * {
-    cons:redirect("add", map {
-      'error': $err:description, 'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary
+    cons:redirect('db-add', map {
+      'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary, 'error': $err:description
     })
   }
 };

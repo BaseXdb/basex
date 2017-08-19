@@ -16,6 +16,7 @@ declare variable $dba:CAT := 'files';
 (:~
  : Files page.
  : @param  $sort   table sort key
+ : @param  $job    highlighted job
  : @param  $error  error message
  : @param  $info   info message
  : @return page
@@ -24,32 +25,34 @@ declare
   %rest:GET
   %rest:path("/dba/files")
   %rest:query-param("sort",  "{$sort}", "")
+  %rest:query-param("job",   "{$job}")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
   %output:method("html")
 function dba:files(
   $sort   as xs:string,
+  $job    as xs:string?,
   $error  as xs:string?,
   $info   as xs:string?
-) as element() {
+) as element(html) {
   cons:check(),
 
   let $dir := $cons:DBA-DIR ! (file:create-dir(.), .)
-  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
-      <td>
+      <td width='54%'>
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Files</h2>
         {
-          let $files := file:children($dir)[file:is-file(.)]
-          let $jobs := jobs:list-details()
           let $headers := (
             <name>Name</name>,
             <date type='dateTime' order='desc'>Date</date>,
-            <size type='bytes' order='desc'>Size</size>,
+            <bytes type='bytes' order='desc'>Bytes</bytes>,
             <action type='xml'>Action</action>
           )
           let $rows := (
+            let $files := file:children($dir)[file:is-file(.)]
+            let $jobs := jobs:list-details()
             for $file in $files
             let $name := file:name($file)
             let $date := file:last-modified($file)
@@ -63,28 +66,23 @@ function dba:files(
                 return $jobs[. = $uri]
               )
               let $id := string($job/@id)
-              return if($job/@state = 'cached') then (
-                html:link('Result', 'file-result/' || web:encode-url($name || '.txt'),
-                  map { 'id': $id }
-                )
-              ) else if($job) then (
-                html:link('Stop', 'file-stop', map { 'id': $id })
+              return if($job) then (
+                html:link('Stop', 'job-stop', map { 'id': $id })
               ) else (
-                html:link('Start', 'file-eval', map { 'file': $name })
+                html:link('Start', 'job-start', map { 'file': $name })
               )
             ) else (), ' | ')
-            return <row name='{ $name }' date='{ $date }' size='{ file:size($file) }'
+            return <row name='{ $name }' date='{ $date }' bytes='{ file:size($file) }'
               action='{ serialize($actions) }'/>
           )
-          let $buttons := html:button('delete-files', 'Delete', true())
+          let $buttons := html:button('file-delete', 'Delete', true())
           let $link := function($value) { 'file/' || $value }
-          return html:table($headers, $rows, $buttons, map {},
-            map { 'sort': $sort, 'link': $link }
-          )
+          return html:table($headers, $rows, $buttons, map { }, map { 'sort': $sort,
+            'link': $link })
         }
         </form>
         <h3>Upload Files</h3>
-        <form action="upload-files" method="post" enctype="multipart/form-data">
+        <form action="file-upload" method="post" enctype="multipart/form-data">
           <input type="file" name="files" multiple="multiple"/>
           <input type="submit" value='Send'/>
         </form>
@@ -94,50 +92,71 @@ function dba:files(
         <div>&#xa0;</div>
       </td>
       <td class='vertical'/>
-      <td>
+      <td width='44%'>
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Jobs</h2>
         {
-          let $buttons := (
-            html:button('jobs-stop', 'Stop', true())
-          )
           let $headers := (
             <id>ID</id>,
             <type>Type</type>,
             <state>State</state>,
-            <sec type='number' order='desc'>Seconds</sec>,
-            <user>User</user>,
+            <dur type='number' order='desc'>Dur.</dur>,
             <you>You</you>
           )
           let $rows :=
             let $curr := jobs:current()
-            for $job in jobs:list-details()
-            let $id := $job/@id
-            let $ms := xs:dayTimeDuration($job/@duration) div xs:dayTimeDuration('PT0.001S')
-            let $you := if($id = $curr) then '&#x2713;' else '–'
-            let $start := string($job/@start)
-            let $end := string($job/@end)
+            for $details in jobs:list-details()
+            let $id := $details/@id
+            let $ms := xs:dayTimeDuration($details/@duration) div xs:dayTimeDuration('PT0.001S')
+            let $you := if($id = $curr) then '✓' else '–'
+            let $start := string($details/@start)
+            let $end := string($details/@end)
             order by $ms descending, $start descending
-            return <row id='{ $id }' type='{ $job/@type }' state='{ $job/@state }'
-                        sec='{ $ms div 1000 }' user='{ $job/@user }' you='{ $you }'
-                        reads='{ $job/@reads }' writes='{ $job/@writes }'
+            return <row id='{ $id }' type='{ $details/@type }' state='{ $details/@state }'
+                        dur='{ $ms div 1000 }' you='{ $you }' user='{ $details/@user }'
+                        reads='{ $details/@reads }' writes='{ $details/@writes }'
                         start='{ $start}' end='{ $end }'/>
-          let $table := html:table($headers, $rows, $buttons, map {}, map {})
+          let $buttons := (
+            html:button('job-stop', 'Stop', true())
+          )
+          let $table := html:table($headers, $rows, $buttons, map { }, map { })
           return $table update {
-            let $keys := map {
-              'reads': 'Read locks',
-              'writes': 'Write locks',
-              'start': 'Start time',
-              'end': 'End time'
-            }
             for $tr at $p in tr[not(th)]
-            let $label := string-join(
-              for $value in $rows[$p]/@*[string()]
-              for $key in $keys(name($value))
-              return $key || ': ' || $value
-            , out:nl())
-            return insert node attribute title { $label } into $tr
-          }
+            for $row in $rows[$p][@you = '–']
+            let $text := $tr/td[1]/text()
+            return replace node $text with <a href='?job={ $row/@id }'>{ $text }</a>
+          },
+          if($job) then (
+            <div class='small'/>,
+            <h3>{ $job }</h3>,
+            let $details := jobs:list-details($job)
+            return if($details) then (
+              <table>{
+                <tr>
+                  <td><b>Result</b></td>
+                  <td>{
+                    if($details/@state = 'cached') then (
+                      html:link($job || '.txt', 'job-result/' || web:encode-url($job || '.txt'),
+                        map { 'id': $job }
+                      )
+                    ) else 'not available yet'
+                  }</td>
+                </tr>,
+                for $value in $details/@*
+                for $name in name($value)[. != 'id']
+                return <tr>
+                  <td><b>{ util:capitalize($name) }</b></td>
+                  <td>{ string($value) }</td>
+                </tr>,
+                <tr>
+                  <td><b>Description</b></td>
+                  <td>{ util:chop($details, 500) }</td>
+                </tr>
+              }</table>
+            ) else (
+              'Job is defunct.'
+            )
+          ) else()
         }
         </form>
       </td>
@@ -150,6 +169,7 @@ function dba:files(
  : @param  $action  action to perform
  : @param  $names   names of files
  : @param  $ids     ids
+ : @return redirection
  :)
 declare
   %rest:POST
@@ -165,23 +185,7 @@ function dba:files-redirect(
 ) as element(rest:response) {
   cons:check(),
   web:redirect($action,
-    if($action = ('jobs-stop')) then map { 'id': $ids }
+    if($action = ('job-stop')) then map { 'id': $ids }
     else map { 'name': $names, 'redirect': $dba:CAT }
   )
-};
-
-(:~
- : Downloads a file.
- : @param  $name  name of file
- : @return file
- :)
-declare
-  %rest:GET
-  %rest:path("/dba/file/{$name}")
-function dba:files(
-  $name  as xs:string
-) as item()+ {
-  cons:check(),
-  web:response-header(map { }, map { 'Cache-Control': '' }),
-  file:read-binary($cons:DBA-DIR || $name)
 };

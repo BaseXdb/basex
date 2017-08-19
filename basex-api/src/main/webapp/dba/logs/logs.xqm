@@ -48,7 +48,7 @@ function dba:logs(
     return $file
   )
   let $name := if($name) then $name else string(head($files))
-  return tmpl:wrap(map { 'top': $dba:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='190'>
         <form action="javascript:void(0);">
@@ -68,7 +68,7 @@ function dba:logs(
               order by $file descending
               return <row name='{ $file }' size='{ $file/@size }'/>
             )
-            let $buttons := html:button('delete-logs', 'Delete', true())
+            let $buttons := html:button('log-delete', 'Delete', true())
             let $link := function($value) { $dba:CAT }
             return html:table($headers, $rows, $buttons,
               map { 'sort': $sort }, map { 'link': $link }
@@ -83,7 +83,7 @@ function dba:logs(
       <td class='vertical'/>
       <td>{
         if($name) then (
-          <form action="download-logs" method="post" id="resources">
+          <form action="log-download" method="post" id="resources">
             <h3>
               { $name }:&#xa0;
               <input type="hidden" name="name" value="{ $name }"/>
@@ -151,6 +151,7 @@ function dba:log(
  : Redirects to the specified action.
  : @param  $action  action to perform
  : @param  $names   names of selected log files
+ : @return redirection
  :)
 declare
   %rest:POST
