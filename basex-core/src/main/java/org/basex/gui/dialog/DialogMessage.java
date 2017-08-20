@@ -38,7 +38,8 @@ public final class DialogMessage extends BaseXDialog {
     label.setIcon(ic.large);
     back.add(label);
 
-    final TextPanel text = new TextPanel(txt, false, this);
+    // break longer texts
+    final TextPanel text = new TextPanel(txt.replaceAll("(.{1,160})", "$1\n"), false, this);
     text.setFont(label.getFont());
     back.add(text);
 

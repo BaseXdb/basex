@@ -157,7 +157,10 @@ public final class BaseXFileChooser {
       new File[] { fc.getSelectedFile() };
     final int fl = fls.length;
     final IOFile[] files = new IOFile[fl];
-    for(int f = 0; f < fl; f++) files[f] = new IOFile(fls[f].getPath());
+    for(int f = 0; f < fl; f++) {
+      // chop too long paths (usually result of copy'n'paste)
+      files[f] = new IOFile(fls[f].getPath().substring(0, 1024));
+    }
 
     if(mode == Mode.FSAVE) {
       // add file suffix to files
