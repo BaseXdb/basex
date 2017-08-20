@@ -7,7 +7,6 @@ module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -41,17 +40,9 @@ function dba:create(
   $error  as xs:string?
 ) as element(html) {
   cons:check(),
-
-  let $data := try {
-    db:info($name)
-  } catch * {
-    element error { $err:description }
-  }
-  let $error := head(($data/self::error, $error))
-  let $opts := if($opts = 'x') then $opts else $data//*[text() = 'true']/name()
+  let $opts := if($opts = 'x') then $opts else db:info($name)//*[text() = 'true']/name()
   let $lang := if($opts = 'x') then $lang else 'en'
-
-  return tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
+  return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form action="db-optimize" method="post">

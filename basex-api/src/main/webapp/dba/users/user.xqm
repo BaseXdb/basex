@@ -1,5 +1,4 @@
 
-
 (:~
  : User main page.
  :
@@ -9,7 +8,6 @@ module namespace dba = 'dba/users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -45,15 +43,9 @@ function dba:user(
   $info     as xs:string?
 ) as element(html) {
   cons:check(),
-  let $data := try {
-    user:list-details($name)
-  } catch * {
-    element error { $err:description }
-  }
-  let $error := head(($data/self::error, $error))
+  let $user := user:list-details($name)
   let $admin := $name eq 'admin'
-
-  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap(map { 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
     <tr>
       <td width='49%'>
         <form action="user-edit" method="post" autocomplete="off">
@@ -94,7 +86,7 @@ function dba:user(
                   <td>Permission:</td>
                   <td>
                     <select name="perm" size="5">{
-                      let $perm := head(($perm, $data/self::user/@permission))
+                      let $perm := head(($perm, $user/@permission))
                       for $p in $cons:PERMISSIONS
                       return element option { attribute selected { }[$p = $perm], $p }
                     }</select>
@@ -113,18 +105,18 @@ function dba:user(
             <input type="hidden" name="name" value="{ $name }" id="name"/>
             <div class='small'/>
             {
-              let $rows :=
-                for $db in $data/self::user/database
-                return <row pattern='{ $db/@pattern }' perm='{ $db/@permission }'/>
               let $headers := (
                 <pattern>Pattern</pattern>,
                 <perm>Local Permission</perm>
               )
+              let $rows :=
+                for $db in $user/database
+                return <row pattern='{ $db/@pattern }' perm='{ $db/@permission }'/>
               let $buttons := if($admin) then () else (
                 html:button('pattern-add', 'Add…'),
                 html:button('pattern-drop', 'Drop', true())
               )
-              return html:table($headers, $rows, $buttons, map {}, map {})
+              return html:table($headers, $rows, $buttons, map { }, map { })
             }
           </form>
           <div class='note'>
@@ -159,4 +151,3 @@ function dba:user-redirect(
 ) as element(rest:response) {
   web:redirect($action, map { 'name': $name, 'pattern': $patterns })
 };
-

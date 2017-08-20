@@ -7,7 +7,6 @@ module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -34,7 +33,7 @@ function dba:db-replace(
   $error     as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
+  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form action="db-replace" method="post" enctype="multipart/form-data">
@@ -84,7 +83,7 @@ function dba:db-replace-post(
   try {
     let $key := map:keys($file)
     return if($key = '') then (
-      error((), 'No input specified')
+      error((), 'No input specified.')
     ) else (
       let $input := if(db:is-raw($name, $resource)) then (
         $file($key)

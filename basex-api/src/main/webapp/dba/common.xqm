@@ -7,7 +7,7 @@ module namespace dba = 'dba/common';
 
 import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
-import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
+import module namespace html = 'dba/html' at 'modules/html.xqm';
 
 (:~
  : Redirects to the start page.
@@ -49,7 +49,7 @@ function dba:any(
   $unknown  as xs:string
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(
+  html:wrap(
     <tr>
       <td>
         <h2>Page not found:</h2>

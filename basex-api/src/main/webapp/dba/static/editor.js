@@ -1,9 +1,10 @@
+
 /**
  * Opens a query file.
  * @param {string} file  optional file name
  */
 function openQuery(file) {
-  if(_editorMirror.getValue() != "" && !confirm("Replace editor contents?")) return;
+  if(_editorMirror.getValue().trim() && !confirm("Replace editor contents?")) return;
 
   var name;
   if(file) {
@@ -11,16 +12,17 @@ function openQuery(file) {
     document.getElementById("file").value = name;
     checkButtons();
   } else {
-    name = document.getElementById("file").value.trim();
+    name = fileName();
   }
   request("POST", "open-query?name=" + encodeURIComponent(name),
     null,
     function(req) {
       _editorMirror.setValue(req.responseText);
       setInfo("Query was opened.");
+      _editorMirror.focus();
     },
     function(req) {
-      setError("Query could not be opened: " + name);
+      setError("Query could not be opened.");
     }
   )
 };
@@ -31,8 +33,7 @@ function openQuery(file) {
 function saveQuery() {
   if(queryExists() && !confirm("Overwrite existing query?")) return;
 
-  var file = document.getElementById("file");
-  request("POST", "save-query?name=" + encodeURIComponent(file.value.trim()),
+  request("POST", "save-query?name=" + encodeURIComponent(fileName()),
     document.getElementById("editor").value,
     function(req) {
       refreshDataList(req);
@@ -40,26 +41,6 @@ function saveQuery() {
     },
     function(req) {
       setError("Query could not be saved.");
-    }
-  )
-};
-
-/**
- * Deletes a query file.
- */
-function deleteQuery() {
-  if(!confirm("Are you sure?")) return;
-
-  var file = document.getElementById("file");
-  request("POST", "delete-query?name=" + encodeURIComponent(file.value.trim()),
-    null,
-    function(req) {
-      refreshDataList(req);
-      setInfo("Query was deleted");
-      file.value = "";
-    },
-    function(req) {
-      setError("Query could not be deleted.");
     }
   )
 };
@@ -86,11 +67,8 @@ function refreshDataList(req) {
  * Refreshes the editor buttons.
  */
 function checkButtons() {
-  var file = document.getElementById("file").value.trim();
-  document.getElementById("save").disabled = file.length == 0;
-  var disable = !queryExists();
-  document.getElementById("open").disabled = disable;
-  document.getElementById("delete").disabled = disable;
+  document.getElementById("open").disabled = !queryExists();
+  document.getElementById("save").disabled = fileName().length == 0;
 };
 
 /**
@@ -98,10 +76,18 @@ function checkButtons() {
  * @returns {boolean} result of check
  */
 function queryExists() {
-  var file = document.getElementById("file").value.trim();
+  var file = fileName();
   var files = document.getElementById("files").children;
   for (var f = 0; f < files.length; f++) {
     if(files[f].value == file) return true;
   }
   return false;
+};
+
+/**
+ * Returns the current file name without file suffix
+ * @returns {string} file name
+ */
+function fileName() {
+  return document.getElementById("file").value.trim().replace(/\.xq$/, '');
 };

@@ -9,7 +9,6 @@ import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace Session = 'http://basex.org/modules/session';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -35,29 +34,28 @@ function dba:users(
   $info   as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
+  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Users</h2>
         {
-          let $rows :=
-            for $user in user:list-details()
-            let $name := string($user/@name)
-            let $you := if($cons:SESSION-VALUE = $name) then '
-            ' else '–'
-            return <row name='{ $name }' perm='{ $user/@permission }' you='{ $you }'/>
           let $headers := (
             <name>Name</name>,
             <perm>Permission</perm>,
             <you>You</you>
           )
+          let $rows :=
+            for $user in user:list-details()
+            let $name := string($user/@name)
+            let $you := if($cons:SESSION-VALUE = $name) then '✓' else '–'
+            return <row name='{ $name }' perm='{ $user/@permission }' you='{ $you }'/>
           let $buttons := (
             html:button('user-create', 'Create…'),
             html:button('user-drop', 'Drop', true())
           )
           let $link := function($value) { 'user' }
-          return html:table($headers, $rows, $buttons, map {}, map { 'link': $link })
+          return html:table($headers, $rows, $buttons, map { }, map { 'link': $link })
         }
         </form>
         <div>&#xa0;</div>
@@ -67,6 +65,13 @@ function dba:users(
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Web Sessions</h2>
         {
+          let $headers := (
+            <id type='id'>ID</id>,
+            <name>Name</name>,
+            <value>Value</value>,
+            <access type='dateTime' order='desc'>Last Access</access>,
+            <you>You</you>
+          )
           let $rows :=
             for $id in Sessions:ids()
             let $access := Sessions:accessed($id)
@@ -82,29 +87,22 @@ function dba:users(
             order by $access descending
             return <row id='{ $id || '|' || $name }' name='{ $name }' value='{ $string }'
                         access='{ $access }' you='{ $you }'/>
-          let $headers := (
-            <id type='id'>ID</id>,
-            <name>Name</name>,
-            <value>Value</value>,
-            <access type='dateTime' order='desc'>Last Access</access>,
-            <you>You</you>
-          )
           let $buttons := (
             html:button('session-kill', 'Kill', true())
           )
-          return html:table($headers, $rows, $buttons, map {}, map {})
+          return html:table($headers, $rows, $buttons, map { }, map { })
         }
         </form>
         <h2>Database Sessions</h2>
         {
-          let $rows :=
-            for $session in admin:sessions()
-            return <row address='{ $session/@address }' user='{ $session/@user }'/>
           let $headers := (
             <address>Address</address>,
             <user>User</user>
           )
-          return html:table($headers, $rows, (), map {}, map {})
+          let $rows :=
+            for $session in admin:sessions()
+            return <row address='{ $session/@address }' user='{ $session/@user }'/>
+          return html:table($headers, $rows, (), map { }, map { })
         }
       </td>
     </tr>

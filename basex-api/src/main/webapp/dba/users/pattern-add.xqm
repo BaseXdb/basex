@@ -7,7 +7,6 @@ module namespace dba = 'dba/users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -37,7 +36,7 @@ function dba:pattern-add(
   $error    as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
+  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form action="pattern-add" method="post" autocomplete="off">

@@ -7,7 +7,6 @@ module namespace dba = 'dba/queries';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category. :)
@@ -33,10 +32,9 @@ function dba:queries(
   $file   as xs:string?
 ) as element(html) {
   cons:check(),
-
-  tmpl:wrap(
+  html:wrap(
     map {
-      'cat': $dba:CAT, 'info': $info, 'error': $error,
+      'header': $dba:CAT, 'info': $info, 'error': $error,
       'css': 'codemirror/lib/codemirror.css',
       'scripts': ('editor.js', 'codemirror/lib/codemirror.js',
                   'codemirror/mode/xquery/xquery.js','codemirror/mode/xml/xml.js')
@@ -49,8 +47,8 @@ function dba:queries(
               <select id='mode'>{
                 ('Read-Only', 'Updating') ! element option { . }
               }</select>
-              <button id='run' onclick="evalQuery()"
-                title='Ctrl-Enter'>Run</button>
+              <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>
+              <button id='stop' onclick='stopQuery()' disabled='true'>Stop</button>
             </td>
             <td width='20%' align='right'>
               <h2>Editor</h2>
@@ -61,17 +59,15 @@ function dba:queries(
         <table width='100%'>
           <form autocomplete='off' action='javascript:void(0);'>
             <tr>
-              <td>
+              <td style='padding-right:0;'>
                 <div align='right'>
-                    <input id='file' name='file' placeholder='Name of query'
+                    <input id='file' name='file' placeholder='Name of query' size='30'
                            list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
                     <datalist id='files'>{ dba:files() ! element option { . } }</datalist>
                     <button type='submit' name='open' id='open' disabled='true'
                             onclick='openQuery()'>Open</button>
                     <button type='save' name='save' id='save' disabled='true'
                             onclick='saveQuery()'>Save</button>
-                    <button type='delete' name='delete' id='delete' disabled='true'
-                            onclick='deleteQuery()'>Delete</button>
                 </div>
               </td>
             </tr>
@@ -88,9 +84,9 @@ function dba:queries(
           </tr>
         </table>
         <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
-        <script type="text/javascript">loadCodeMirror(true);</script>
         {
-          if($file) then <script type="text/javascript">openQuery("{ $file }");</script> else ()
+          html:js('loadCodeMirror(true);'),
+          if($file) then html:js('openQuery("' || replace($file, '"', '') || '");') else ()
         }
       </td>
     </tr>

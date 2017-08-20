@@ -7,7 +7,6 @@ module namespace dba = 'dba/files';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -38,7 +37,7 @@ function dba:files(
   cons:check(),
 
   let $dir := $cons:DBA-DIR ! (file:create-dir(.), .)
-  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='54%'>
         <form action="{ $dba:CAT }" method="post" class="update">
@@ -119,8 +118,8 @@ function dba:files(
           let $buttons := (
             html:button('job-stop', 'Stop', true())
           )
-          let $table := html:table($headers, $rows, $buttons, map { }, map { })
-          return $table update {
+          return html:table($headers, $rows, $buttons, map { }, map { }) update {
+            (: replace job ids with links :)
             for $tr at $p in tr[not(th)]
             for $row in $rows[$p][@you = '–']
             let $text := $tr/td[1]/text()

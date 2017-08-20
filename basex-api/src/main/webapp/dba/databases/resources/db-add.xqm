@@ -7,7 +7,6 @@ module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -41,7 +40,7 @@ function dba:db-add(
 ) as element(html) {
   cons:check(),
   let $opts := if($opts = 'x') then $opts else 'chop'
-  return tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
+  return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form action="db-add" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -118,7 +117,7 @@ function dba:db-add-post(
     let $key := map:keys($file)
     let $path := if(not($path) or ends-with($path, '/')) then ($path || $key) else $path
     return if($key = '') then (
-      error((), 'No input specified')
+      error((), 'No input specified.')
     ) else if(db:exists($name, $path)) then (
       error((), 'Resource already exists: ' || $path)
     ) else (

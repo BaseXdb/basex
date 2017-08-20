@@ -7,7 +7,6 @@ module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -37,52 +36,42 @@ function dba:databases(
 ) as element(html) {
   cons:check(),
 
-  let $data := try {
-    let $names := map:merge(db:list() ! map:entry(., true()))
-    let $databases :=
-      let $start := util:start($page, $sort)
-      let $end := util:end($page, $sort)
-      for $db in db:list-details()[position() = $start to $end]
-      return <row name='{ $db }' resources='{ $db/@resources }' size='{ $db/@size }'
-                  date='{ $db/@modified-date }'/>
+  let $names := map:merge(db:list() ! map:entry(., true()))
+  let $databases :=
+    let $start := util:start($page, $sort)
+    let $end := util:end($page, $sort)
+    for $db in db:list-details()[position() = $start to $end]
+    return <row name='{ $db }' resources='{ $db/@resources }' size='{ $db/@size }'
+                date='{ $db/@modified-date }'/>
+  let $backups :=
     let $regex := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$'
-    let $backups :=
-      for $backup in db:backups()
-      where matches($backup, $regex)
-      group by $name := replace($backup, $regex, '$1')
-      where not($names($name))
-      let $date := replace(sort($backup)[last()], $regex, '$2T$3:$4:$5Z')
-      return <row name='{ $name }' resources='' size='(backup)' date='{ $date }'/>
-    return element databases {
-      attribute count { map:size($names) + count($backups) },
-      $databases,
-      $backups
-    }
-  } catch * {
-    element error { $err:description }
-  }
-  let $error := head(($data/self::error, $error))
+    for $backup in db:backups()
+    where matches($backup, $regex)
+    group by $name := replace($backup, $regex, '$1')
+    where not($names($name))
+    let $date := replace(sort($backup)[last()], $regex, '$2T$3:$4:$5Z')
+    return <row name='{ $name }' resources='' size='(backup)' date='{ $date }'/>
 
-  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='49%'>
         <form action="{ $dba:CAT }" method="post" class="update">
           <h2>Databases</h2>
           {
-            let $count := xs:integer($data/self::databases/@count)
-            let $rows := $data/self::databases/row
             let $headers := (
               <name>Name</name>,
               <resources type='number' order='desc'>Count</resources>,
               <size type='bytes' order='desc'>Bytes</size>,
               <date type='dateTime' order='desc'>Last Modified</date>
             )
+            let $rows := ($databases, $backups)
             let $buttons := (
               html:button('db-create', 'Create…'),
               html:button('db-optimize-all', 'Optimize'),
               html:button('db-drop', 'Drop', true())
             )
             let $link := function($value) { 'database' }
+            let $count := map:size($names) + count($backups)
             return html:table($headers, $rows, $buttons, map { },
               map { 'sort': $sort, 'link': $link, 'page': $page, 'count': $count })
           }

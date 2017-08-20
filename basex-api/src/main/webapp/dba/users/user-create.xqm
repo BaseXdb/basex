@@ -1,3 +1,4 @@
+
 (:~
  : Create new user.
  :
@@ -7,7 +8,6 @@ module namespace dba = 'dba/users';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -35,24 +35,24 @@ function dba:user-create(
   $error  as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
+  html:wrap(map { 'header': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="user-create" method="post" autocomplete="off">
+        <form action='user-create' method='post' autocomplete='off'>
           <!--  force chrome not to autocomplete form -->
-          <input style="display:none" type="text" name="fake1"/>
-          <input style="display:none" type="password" name="fake2"/>
+          <input style='display:none' type='text' name='fake1'/>
+          <input style='display:none' type='password' name='fake2'/>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             html:button('create', 'Create')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
-          <input type="hidden" name="opts" value="x"/>
+          <input type='hidden' name='opts' value='x'/>
           <table>
             <tr>
               <td>Name:</td>
               <td>
-                <input type="text" name="name" value="{ $name }" id="name"/>
+                <input type='text' name='name' value='{ $name }' id='name'/>
                 { html:focus('name') }
                 <div class='small'/>
               </td>
@@ -60,14 +60,15 @@ function dba:user-create(
             <tr>
               <td>Passsword:</td>
               <td>
-                <input type="password" name="pw" value="{ $pw }" id="pw"/>
+                <input type='password' name='pw' value='{ $pw }' id='pw'
+                  autocomplete='new-password'/>
                 <div class='small'/>
               </td>
             </tr>
             <tr>
               <td>Permission:</td>
               <td>
-                <select name="perm" size="5">{
+                <select name='perm' size='5'>{
                   for $p in $cons:PERMISSIONS
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>

@@ -8,7 +8,6 @@ module namespace dba = 'dba/login';
 import module namespace Session = 'http://basex.org/modules/session';
 import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
 import module namespace html = 'dba/html' at 'modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
 
 (:~
  : Login page.
@@ -28,7 +27,7 @@ function dba:welcome(
   $error  as xs:string?,
   $path   as xs:string?
 ) as element(html) {
-  tmpl:wrap(map { 'error': $error },
+  html:wrap(map { 'error': $error },
     <tr>
       <td>
         <form action="login-check" method="post">

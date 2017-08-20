@@ -8,7 +8,6 @@ module namespace dba = 'dba/settings';
 import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'settings';
@@ -30,9 +29,8 @@ function dba:settings(
   $info   as xs:string?
 ) as element(html) {
   cons:check(),
-
   let $system := html:properties(db:system())
-  return tmpl:wrap(map { 'cat': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='32%'>
         <form action="settings" method="post">

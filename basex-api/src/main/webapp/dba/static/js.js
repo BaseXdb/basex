@@ -101,10 +101,15 @@ var _running = 0;
  * @param {func}   func   function that processes the result
  */
 function query(path, query, func) {
-  setInfo("");
   _running++;
+  setInfo("");
+  document.getElementById("stop").disabled = true;
+
   setTimeout(function() {
-    if(_running) setWarning("Please wait…");
+    if(_running) {
+      setWarning("Please wait…");
+      document.getElementById("stop").disabled = false;
+    }
   }, 500);
 
   var name = document.getElementById("name");
@@ -119,8 +124,11 @@ function query(path, query, func) {
   request("POST", url, query,
     function(request) {
       _running--;
+      if(!_running) {
+        setInfo("Query was successful.");
+        document.getElementById("stop").disabled = true;
+      }
       func(request.responseText);
-      if(!_running) setInfo("Query was successful.");
     },
     function(request) {
       _running--;
@@ -181,17 +189,42 @@ function queryResource(enforce) {
   });
 };
 
+/** Indicates if current query is updating. */
+var _updating;
+
 /**
  * Evaluates a query.
  * @param {boolean} reverse  reverse query execution mode (eval, update)
  */
-function evalQuery(reverse) {
-  var mode = document.getElementById("mode").selectedIndex;
-  var editor = document.getElementById("editor").value;
-  var update = (mode == 1) ^ reverse;
-  var path = update ? "update-query" : "eval-query";
-  query(path, editor, function(text) {
+function runQuery(reverse) {
+  // decide if query is read-only or updating
+  var updating = (document.getElementById("mode").selectedIndex == 1) ^ reverse;
+  var path = updating ? "update-query" : "eval-query";
+
+  // stop old query if mode was changed (each has its own %rest:single function)
+  if(_updating != updating) stopQuery();
+  _updating = updating;
+
+  // run query
+  evalQuery(path, document.getElementById("editor").value, reverse);
+};
+
+/**
+ * Stops a query.
+ */
+function stopQuery() {
+  // stop query by sending empty sequence
+  evalQuery(_updating ? "update-query" : "eval-query", "()");
+};
+
+/**
+ * Evaluates a query.
+ * @param {boolean} reverse  reverse query execution mode (eval, update)
+ */
+function evalQuery(path, input, reverse) {
+  query(path, input, function(text) {
     _outputMirror.setValue(text);
+    setInfo("Query was stopped.");
   });
 };
 
@@ -241,10 +274,10 @@ function loadCodeMirror(edit) {
         mode: "xquery",
         lineNumbers: true,
         extraKeys: {
-          "Ctrl-Enter"      : function(cm) { evalQuery(); },
-          "Cmd-Enter"       : function(cm) { evalQuery(); },
-          "Shift-Ctrl-Enter": function(cm) { evalQuery(true); },
-          "Shift-Cmd-Enter" : function(cm) { evalQuery(true); }
+          "Ctrl-Enter"      : function(cm) { runQuery(); },
+          "Cmd-Enter"       : function(cm) { runQuery(); },
+          "Shift-Ctrl-Enter": function(cm) { runQuery(true); },
+          "Shift-Cmd-Enter" : function(cm) { runQuery(true); }
         }
       });
       _editorMirror.on("change", function(cm, cmo) { cm.save(); });

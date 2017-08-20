@@ -1,4 +1,3 @@
-
 (:~
  : Utility functions.
  :

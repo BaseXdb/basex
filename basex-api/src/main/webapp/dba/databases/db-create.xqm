@@ -7,7 +7,6 @@ module namespace dba = 'dba/databases';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -39,7 +38,7 @@ function dba:db-create(
   cons:check(),
 
   let $opts := if($opts = 'x') then $opts else ('textindex', 'attrindex')
-  return tmpl:wrap(map { 'cat': $dba:CAT, 'error': $error },
+  return html:wrap(map { 'header': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form action="db-create" method="post" autocomplete="off">
