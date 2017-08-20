@@ -103,12 +103,13 @@ var _running = 0;
 function query(path, query, func) {
   _running++;
   setInfo("");
-  document.getElementById("stop").disabled = true;
+  var stop = document.getElementById("stop");
+  if(stop) stop.disabled = true;
 
   setTimeout(function() {
     if(_running) {
       setWarning("Please wait…");
-      document.getElementById("stop").disabled = false;
+      if(stop) stop.disabled = false;
     }
   }, 500);
 
@@ -126,7 +127,7 @@ function query(path, query, func) {
       _running--;
       if(!_running) {
         setInfo("Query was successful.");
-        document.getElementById("stop").disabled = true;
+        if(stop) stop.disabled = true;
       }
       func(request.responseText);
     },
@@ -202,11 +203,13 @@ function runQuery(reverse) {
   var path = updating ? "update-query" : "eval-query";
 
   // stop old query if mode was changed (each has its own %rest:single function)
-  if(_updating != updating) stopQuery();
+  if(_running && _updating != updating) stopQuery();
   _updating = updating;
 
   // run query
-  evalQuery(path, document.getElementById("editor").value, reverse);
+  query(path, document.getElementById("editor").value, function(text) {
+    _outputMirror.setValue(text);
+  });
 };
 
 /**
@@ -214,16 +217,7 @@ function runQuery(reverse) {
  */
 function stopQuery() {
   // stop query by sending empty sequence
-  evalQuery(_updating ? "update-query" : "eval-query", "()");
-};
-
-/**
- * Evaluates a query.
- * @param {boolean} reverse  reverse query execution mode (eval, update)
- */
-function evalQuery(path, input, reverse) {
-  query(path, input, function(text) {
-    _outputMirror.setValue(text);
+  query(_updating ? "update-query" : "eval-query", "()", function(text) {
     setInfo("Query was stopped.");
   });
 };
