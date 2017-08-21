@@ -218,7 +218,7 @@ public interface Text {
   /** File description: HTML Documents. */
   String HTML_DOCUMENTS = "HTML Documents";
   /** File description: Comma-Separated Values. */
-  String CSV_DOCUMENTS = "Comma-Separated Values";
+  String CSV_DOCUMENTS = "CSV Documents";
   /** File description: Plain Text. */
   String PLAIN_TEXT = "Plain Text";
   /** File description: ZIP Archives. */

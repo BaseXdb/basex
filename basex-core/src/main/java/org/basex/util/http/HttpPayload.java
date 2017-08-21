@@ -327,7 +327,7 @@ public final class HttpPayload {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
       opts.assign(type);
       value = JsonConverter.get(opts).convert(input);
-    } else if(type.is(MediaType.TEXT_CSV)) {
+    } else if(type.isCSV()) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
       opts.assign(type);
       value = CsvConverter.get(opts).convert(input);

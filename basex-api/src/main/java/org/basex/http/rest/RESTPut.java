@@ -48,7 +48,7 @@ final class RESTPut {
       opts.assign(mt);
       options.set(MainOptions.JSONPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.JSON);
-    } else if(mt.is(MediaType.TEXT_CSV)) {
+    } else if(mt.isCSV()) {
       final CsvParserOptions opts = new CsvParserOptions();
       opts.assign(mt);
       options.set(MainOptions.CSVPARSER, opts);

@@ -2,7 +2,7 @@ package org.basex.util.http;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -20,6 +20,10 @@ public final class MediaType {
   private static final String TEXT = "text";
   /** XQuery sub type. */
   private static final String XQUERY = "xquery";
+  /** CSV sub type. */
+  private static final String CSV = "csv";
+  /** CSV sub type. */
+  private static final String COMMA_SEPARATED_VALUES = "comma-separated-values";
   /** XML media types' suffix. */
   private static final String XML_SUFFIX = "+xml";
 
@@ -46,7 +50,7 @@ public final class MediaType {
   public static final MediaType MULTIPART_FORM_DATA = new MediaType("multipart/form-data");
 
   /** Media type: text/comma-separated-values. */
-  public static final MediaType TEXT_CSV = new MediaType("text/comma-separated-values");
+  public static final MediaType TEXT_CSV = new MediaType("text/csv");
   /** Media type: text/html. */
   public static final MediaType TEXT_HTML = new MediaType("text/html");
   /** Media type: text/plain. */
@@ -137,6 +141,14 @@ public final class MediaType {
    */
   public boolean isXQuery() {
     return sub.equals(XQUERY);
+  }
+
+  /**
+   * Checks if this is a CSV type.
+   * @return result of check
+   */
+  public boolean isCSV() {
+    return sub.equals(CSV) || sub.equals(COMMA_SEPARATED_VALUES);
   }
 
   /**
