@@ -163,7 +163,7 @@ public final class PlotView extends View {
           plotChanged = true;
           markingChanged = true;
 
-          final String[] keys = plotData.getCategories(token(item)).toStringArray();
+          final Object[] keys = plotData.getCategories(token(item)).toStringArray();
           xCombo.setModel(new DefaultComboBoxModel<>(keys));
           yCombo.setModel(new DefaultComboBoxModel<>(keys));
           if(keys.length > 0) {
@@ -809,7 +809,7 @@ public final class PlotView extends View {
 
     plotData = new PlotData(gui.context);
 
-    final String[] items = plotData.getItems().toStringArray();
+    final Object[] items = plotData.getItems().toStringArray();
     itemCombo.setModel(new DefaultComboBoxModel<>(items));
 
     // set first item and trigger assignment of axis assignments
