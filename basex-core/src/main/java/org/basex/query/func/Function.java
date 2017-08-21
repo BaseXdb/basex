@@ -1509,7 +1509,7 @@ public enum Function {
    * Returns the namespace URI of this function.
    * @return function
    */
-  final byte[] uri() {
+  public final byte[] uri() {
     return uri;
   }
 

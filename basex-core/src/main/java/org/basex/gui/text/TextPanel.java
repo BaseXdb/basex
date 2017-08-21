@@ -21,6 +21,8 @@ import org.basex.gui.text.SearchBar.*;
 import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
@@ -982,38 +984,46 @@ public class TextPanel extends BaseXPanel {
     if(selected()) return;
 
     // find first character
-    final int caret = editor.pos(), startPos = editor.completionStart();
-    final String prefix = string(substring(editor.text(), startPos, caret));
-    if(prefix.isEmpty()) return;
+    final int caret = editor.pos(), start = editor.completionStart();
+    final String input = string(substring(editor.text(), start, caret)).toLowerCase(Locale.ENGLISH);
+    if(input.isEmpty()) return;
 
     // find insertion candidates
-    final ArrayList<Pair<String, String>> tmp = new ArrayList<>();
-    for(final Pair<String, String> pair : REPLACE) {
-      if(pair.name().startsWith(prefix)) tmp.add(pair);
-    }
+    final ArrayList<Pair<String, String>> list = new ArrayList<>();
+    add(list, input, REPLACE1);
+    list.add(null);
+    add(list, input, REPLACE2);
+    list.add(null);
+    add(list, input, REPLACE3);
 
-    if(tmp.size() == 1) {
+    if(list.size() == 3) {
       // insert single candidate
-      complete(tmp.get(0).value(), startPos);
-    } else if(!tmp.isEmpty()) {
+      for(final Pair<String, String> pair : list) {
+        if(pair != null) complete(pair.value(), start);
+      }
+    } else if(list.size() > 2) {
       // show popup menu
       final JPopupMenu pm = new JPopupMenu();
       final ActionListener al = new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent ae) {
-          complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), startPos);
+          complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), start);
         }
       };
 
-      for(final Pair<String, String> entry : tmp) {
-        final JMenuItem mi = new JMenuItem('[' + entry.name() + "] " + entry.value());
-        pm.add(mi);
-        mi.addActionListener(al);
+      final int el = list.size();
+      for(int e = 0, s = 0; e < el; e++) {
+        final Pair<String, String> entry = list.get(e);
+        if(entry == null) {
+          final int sc = pm.getComponentCount();
+          if(s != sc && e < el - 1) pm.addSeparator();
+          s = sc;
+        } else {
+          final JMenuItem mi = new JMenuItem('[' + entry.name() + "] " + entry.value());
+          pm.add(mi);
+          mi.addActionListener(al);
+        }
       }
-      pm.addSeparator();
-      final JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
-      mi.setEnabled(false);
-      pm.add(mi);
 
       final int[] cursor = rend.cursor();
       pm.show(this, cursor[0], cursor[1]);
@@ -1021,6 +1031,21 @@ public class TextPanel extends BaseXPanel {
       // highlight first entry
       final MenuElement[] me = { pm, (JMenuItem) pm.getComponent(0) };
       MenuSelectionManager.defaultManager().setSelectedPath(me);
+    }
+  }
+
+  /**
+   * Adds a relevant match.
+   * @param list list of relevant completions
+   * @param input user input
+   * @param replace code completions
+   */
+  private static void add(final ArrayList<Pair<String, String>> list, final String input,
+      final ArrayList<Pair<String, String>> replace) {
+
+    for(final Pair<String, String> pair : replace) {
+      final String name = pair.name();
+      if(name.startsWith(input) || name.replace(":", "").startsWith(input)) list.add(pair);
     }
   }
 
@@ -1036,28 +1061,46 @@ public class TextPanel extends BaseXPanel {
     scrollCode.invokeLater(true);
   }
 
-  /** Index for all replacements. */
-  private static final ArrayList<Pair<String, String>> REPLACE = new ArrayList<>();
+  /** Replacement list (1). */
+  private static final ArrayList<Pair<String, String>> REPLACE1 = new ArrayList<>();
+  /** Replacement list (2). */
+  private static final ArrayList<Pair<String, String>> REPLACE2 = new ArrayList<>();
+  /** Replacement list (3). */
+  private static final ArrayList<Pair<String, String>> REPLACE3 = new ArrayList<>();
 
   /** Reads in the property file. */
   static {
-    try {
-      final String file = "/completions.properties";
-      final InputStream is = TextPanel.class.getResourceAsStream(file);
-      if(is == null) {
-        Util.errln(file + " not found.");
-      } else {
-        try(NewlineInput nli = new NewlineInput(is)) {
-          for(String line; (line = nli.readLine()) != null;) {
-            final int i = line.indexOf('=');
-            if(i == -1 || line.startsWith("#")) continue;
-            final String key = line.substring(0, i), value = line.substring(i + 1);
-            REPLACE.add(new Pair<>(key, value.replace("\\n", "\n")));
-          }
+    final String file = "/completions.properties";
+    final InputStream is = TextPanel.class.getResourceAsStream(file);
+    if(is == null) {
+      Util.errln(file + " not found.");
+    } else {
+      // add custom completions
+      try(NewlineInput nli = new NewlineInput(is)) {
+        for(String line; (line = nli.readLine()) != null;) {
+          final int i = line.indexOf('=');
+          if(i == -1 || line.startsWith("#")) continue;
+          final String key = line.substring(0, i);
+          REPLACE1.add(new Pair<>(key, line.substring(i + 1).replace("\\n", "\n")));
         }
+      } catch(final IOException ex) {
+        Util.errln(ex);
       }
-    } catch(final IOException ex) {
-      Util.errln(ex);
+    }
+    // add functions (default functions first)
+    for(final Function f : Function.VALUES) {
+      if(f.uri() != QueryText.FN_URI) continue;
+      final String name = f.toString().replaceAll("^fn:|\\(.*", "");
+      final String key = (name.contains("-") ?
+        name.replaceAll("(.)[^-A-Z]*-?", "$1") :
+        name.substring(0, Math.min(name.length(), 4))).toLowerCase(Locale.ENGLISH);
+      REPLACE2.add(new Pair<>(key, name + "(_)"));
+    }
+    for(final Function f : Function.VALUES) {
+      if(f.uri() == QueryText.FN_URI) continue;
+      final String name = f.toString().replaceAll("\\(.*", "");
+      final String key = name.replaceAll("(:?.)[^-:A-Z]*-?", "$1").toLowerCase(Locale.ENGLISH);
+      REPLACE3.add(new Pair<>(key, name + "(_)"));
     }
   }
 }

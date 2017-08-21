@@ -24,6 +24,8 @@ public final class TextEditor {
     /** Title case. */ TITLE
   }
 
+  /** Completion characters. */
+  private static final char[] ALLOWED = { '@', '.', '/', ':', '&', '<', '>' };
   /** Opening brackets. */
   private static final String OPENING = "{([";
   /** Closing brackets. */
@@ -207,8 +209,21 @@ public final class TextEditor {
    */
   int completionStart() {
     int p = pos;
-    while(p > 0 && !ws(text[p - 1])) --p;
+    while(p > 0 && completeMore(text[p - 1])) --p;
     return p;
+  }
+
+  /**
+   * Checks if the specified character is a completion character.
+   * @param ch character
+   * @return result of check
+   */
+  private static boolean completeMore(final byte ch) {
+    if(letterOrDigit(ch)) return true;
+    for(final char a : ALLOWED) {
+      if(ch == a) return true;
+    }
+    return false;
   }
 
   /**
