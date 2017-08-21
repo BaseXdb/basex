@@ -989,19 +989,25 @@ public class TextPanel extends BaseXPanel {
     if(input.isEmpty()) return;
 
     // find insertion candidates
-    final ArrayList<Pair<String, String>> list = new ArrayList<>();
-    add(list, input, REPLACE1);
-    list.add(null);
-    add(list, input, REPLACE2);
-    list.add(null);
-    add(list, input, REPLACE3);
-
-    if(list.size() == 3) {
-      // insert single candidate
-      for(final Pair<String, String> pair : list) {
-        if(pair != null) complete(pair.value(), start);
+    final ArrayList<Pair<String, String>> pairs = new ArrayList<>();
+    add(pairs, input, REPLACE1);
+    pairs.add(null);
+    add(pairs, input, REPLACE2);
+    pairs.add(null);
+    add(pairs, input, REPLACE3);
+    // remove duplicate and trailing separators
+    for(int l = 0; l < pairs.size();) {
+      if(pairs.get(l) == null && (l == 0 || l + 1 == pairs.size() || pairs.get(l + 1) == null)) {
+        pairs.remove(l);
+      } else {
+        l++;
       }
-    } else if(list.size() > 2) {
+    }
+
+    if(pairs.size() == 1) {
+      // insert single candidate
+      complete(pairs.get(0).value(), start);
+    } else if(!pairs.isEmpty()) {
       // show popup menu
       final JPopupMenu pm = new JPopupMenu();
       final ActionListener al = new ActionListener() {
@@ -1010,18 +1016,19 @@ public class TextPanel extends BaseXPanel {
           complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), start);
         }
       };
-
-      final int el = list.size();
-      for(int e = 0, s = 0; e < el; e++) {
-        final Pair<String, String> entry = list.get(e);
+      for(final Pair<String, String> entry : pairs) {
         if(entry == null) {
-          final int sc = pm.getComponentCount();
-          if(s != sc && e < el - 1) pm.addSeparator();
-          s = sc;
+          pm.addSeparator();
         } else {
           final JMenuItem mi = new JMenuItem('[' + entry.name() + "] " + entry.value());
           pm.add(mi);
           mi.addActionListener(al);
+        }
+        if(pm.getComponentCount() >= 20) {
+          final JMenuItem mi = new JMenuItem("... " + Util.info(Text.RESULTS_X, pairs.size()));
+          mi.setEnabled(false);
+          pm.add(mi);
+          break;
         }
       }
 
