@@ -36,7 +36,7 @@ public abstract class Step extends Preds {
   public final Test test;
 
   /**
-   * This method returns the most appropriate step implementation.
+   * This method returns the most efficient step implementation.
    * @param info input info
    * @param axis axis
    * @param test node test
@@ -60,8 +60,7 @@ public abstract class Step extends Preds {
         return new CachedStep(info, axis, test, preds);
       }
     }
-    return pos ? new IterPosStep(info, axis, test, preds) :
-                 new IterStep(info, axis, test, preds);
+    return pos ? new IterPosStep(info, axis, test, preds) : new IterStep(info, axis, test, preds);
   }
 
   /**

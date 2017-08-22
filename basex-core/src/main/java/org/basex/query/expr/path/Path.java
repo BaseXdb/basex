@@ -627,21 +627,21 @@ public abstract class Path extends ParseExpr {
    * Queries of type 1, 3, 5 will not yield any results if the string to be compared is empty.
    *
    * @param cc compilation context
-   * @param rt root value (can be {@code null})
+   * @param rootValue root value (can be {@code null})
    * @return original or new expression
    * @throws QueryException query exception
    */
-  public Expr index(final CompileContext cc, final Value rt) throws QueryException {
+  public Expr index(final CompileContext cc, final Value rootValue) throws QueryException {
     // only rewrite on document level
-    if(rt == null || rt.type != NodeType.DOC) return this;
+    if(rootValue == null || rootValue.type != NodeType.DOC) return this;
     // only rewrite paths with data reference
-    final Data data = rt.data();
+    final Data data = rootValue.data();
     if(data == null) return this;
 
     // cache index access costs
     IndexInfo index = null;
     // cheapest predicate and step
-    int iPred = 0, iStep = 0;
+    int indexPred = 0, indexStep = 0;
 
     // check if path can be converted to an index access
     final int sl = steps.length;
@@ -669,8 +669,8 @@ public abstract class Path extends ParseExpr {
 
         if(index == null || index.costs > ii.costs) {
           index = ii;
-          iPred = p;
-          iStep = s;
+          indexPred = p;
+          indexStep = s;
         }
       }
     }
@@ -683,28 +683,29 @@ public abstract class Path extends ParseExpr {
 
     // invert steps that occur before index step and add them as predicate
     final ExprList newPreds = new ExprList();
-    final Test test = InvDocTest.get(rt);
+    final Test rootTest = InvDocTest.get(rootValue);
     final ExprList invSteps = new ExprList();
-    if(test != KindTest.DOC || !data.meta.uptodate || predSteps(data, iStep)) {
-      for(int s = iStep; s >= 0; s--) {
-        final Axis ax = axisStep(s).axis.invert();
+    if(rootTest != KindTest.DOC || !data.meta.uptodate || predSteps(data, indexStep)) {
+      for(int s = indexStep; s >= 0; s--) {
+        final Axis invAxis = axisStep(s).axis.invert();
         if(s == 0) {
           // add document test for collections and axes other than ancestors
-          if(test != KindTest.DOC || ax != ANC && ax != ANCORSELF)
-            invSteps.add(Step.get(info, ax, test));
+          if(rootTest != KindTest.DOC || invAxis != ANC && invAxis != ANCORSELF)
+            invSteps.add(Step.get(info, invAxis, rootTest));
         } else {
-          final Step prev = axisStep(s - 1);
-          invSteps.add(Step.get(info, ax, prev.test, prev.preds));
+          final Step prevStep = axisStep(s - 1);
+          final Axis newAxis = prevStep.axis == Axis.ATTR ? Axis.ATTR : invAxis;
+          invSteps.add(Step.get(info, newAxis, prevStep.test, prevStep.preds));
         }
       }
     }
     if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
 
     // add remaining predicates
-    final Step indexStep = index.step;
-    final int pl = indexStep.preds.length;
+    final Expr[] preds = index.step.preds;
+    final int pl = preds.length;
     for(int p = 0; p < pl; p++) {
-      if(p != iPred) newPreds.add(indexStep.preds[p]);
+      if(p != indexPred) newPreds.add(preds[p]);
     }
 
     // create resulting expression
@@ -740,7 +741,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // add remaining steps
-    for(int s = iStep + 1; s < sl; s++) resultSteps.add(steps[s]);
+    for(int s = indexStep + 1; s < sl; s++) resultSteps.add(steps[s]);
     return resultSteps.isEmpty() ? resultRoot : get(info, resultRoot, resultSteps.finish());
   }
 
