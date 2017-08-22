@@ -653,11 +653,12 @@ public final class EditorView extends View {
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
     final String[] old = gui.gopts.get(GUIOptions.EDITOR);
-    final int ps = paths.size(), ol = old.length;
-    for(int p = 0; ps < HISTORY && p < ol; p++) {
+    final int ol = old.length;
+    for(int p = 0; paths.size() < HISTORY && p < ol; p++) {
       final IO fl = IO.get(old[p]);
       if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }
+
     // store sorted history
     gui.gopts.set(GUIOptions.EDITOR, paths.finish());
     hist.setEnabled(!paths.isEmpty());
