@@ -14,7 +14,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class BaseXCombo extends JComboBox<String> {
+public final class BaseXCombo extends JComboBox<Object> {
   /** Options. */
   private Options options;
   /** Option. */
@@ -105,7 +105,7 @@ public final class BaseXCombo extends JComboBox<String> {
   public void setSelectedItem(final Object object) {
     if(object == null) return;
     final String value = object.toString();
-    final ComboBoxModel<String> m = getModel();
+    final ComboBoxModel<Object> m = getModel();
     final int s = m.getSize();
     for(int i = 0; i < s; i++) {
       if(m.getElementAt(i).equals(value)) {

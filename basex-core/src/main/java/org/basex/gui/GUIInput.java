@@ -220,7 +220,8 @@ public final class GUIInput extends BaseXTextField {
       return;
     }
     if(comboChanged(sl)) {
-      box.setModel(new DefaultComboBoxModel<>(sl.toArray()));
+      final Object[] strings = sl.toArray();
+      box.setModel(new DefaultComboBoxModel<>(strings));
       box.setSelectedIndex(-1);
       pop = new GUIInputPopup(box);
     }
@@ -249,7 +250,7 @@ public final class GUIInput extends BaseXTextField {
      * Constructor.
      * @param combo combobox reference
      */
-    GUIInputPopup(final JComboBox<String> combo) {
+    GUIInputPopup(final JComboBox<Object> combo) {
       super(combo);
       final int h = combo.getMaximumRowCount();
       setPreferredSize(new Dimension(getPreferredSize().width, getPopupHeightForRowCount(h) + 2));
