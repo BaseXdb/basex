@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
@@ -34,6 +33,7 @@ final class ProjectList extends JList<String> {
     },
     new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER) {
       @Override public void execute() { openExternal(); }
+      @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }, null,
     new GUIPopupCmd(RUN_TESTS, BaseXKeys.UNIT) {
       @Override public void execute() { test(); }
@@ -116,19 +116,20 @@ final class ProjectList extends JList<String> {
    * Open all selected files.
    */
   private void open() {
-    for(final IOFile file : selectedValues()) view.open(file, search);
+    for(final String file : selectedValues()) view.open(new IOFile(file), search);
   }
 
   /**
    * Open all selected files externally.
    */
   private void openExternal() {
-    for(final IOFile file : selectedValues())  {
-      try {
-        file.open();
-      } catch(final IOException ex) {
-        BaseXDialog.error(view.gui, Util.info(FILE_NOT_OPENED_X, file));
-      }
+    final StringList files = selectedValues();
+    if(files.isEmpty()) return;
+    final IOFile file = new IOFile(files.get(0));
+    try {
+      file.open();
+    } catch(final IOException ex) {
+      BaseXDialog.error(view.gui, Util.info(FILE_NOT_OPENED_X, file));
     }
   }
 
@@ -136,8 +137,8 @@ final class ProjectList extends JList<String> {
    * Tests all files.
    */
   private void test() {
-    for(final IOFile file : selectedValues())  {
-      view.gui.execute(new Test(file.path()));
+    for(final String file : selectedValues())  {
+      view.gui.execute(new Test(file));
     }
   }
 
@@ -201,8 +202,8 @@ final class ProjectList extends JList<String> {
   }
 
   /**
-   * Returns a single selected node or {@code null} if zero or more than node is selected.
-   * @return selected node
+   * Returns the selected value, or {@code null} if zero or more than one value is selected.
+   * @return selected value
    */
   private String selectedValue() {
     final List<String> vals = getSelectedValuesList();
@@ -210,14 +211,14 @@ final class ProjectList extends JList<String> {
   }
 
   /**
-   * Returns a single selected node or {@code null} if zero or more than node is selected.
-   * @return selected node
+   * Returns all selected values.
+   * @return selected values
    */
-  private IOFile[] selectedValues() {
+  private StringList selectedValues() {
     // nothing selected: select first entry
     if(isSelectionEmpty() && getModel().getSize() != 0) setSelectedIndex(0);
-    final ArrayList<IOFile> list = new ArrayList<>();
-    for(final String val : getSelectedValuesList()) list.add(new IOFile(val));
-    return list.toArray(new IOFile[list.size()]);
+    final StringList sl = new StringList();
+    for(final String val : getSelectedValuesList()) sl.add(val);
+    return sl;
   }
 }

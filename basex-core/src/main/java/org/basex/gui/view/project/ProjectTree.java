@@ -121,7 +121,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   // PRIVATE METHOS ===============================================================================
 
   /**
-   * Returns a single selected node or {@code null} if zero or more than node is selected.
+   * Returns a single selected node, or {@code null} if zero or more than node is selected.
    * @return selected node
    */
   ProjectNode selectedNode() {
@@ -134,8 +134,8 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /**
-   * Returns the selected nodes.
-   * @return selected node
+   * Returns all selected nodes.
+   * @return selected nodes
    */
   private ArrayList<ProjectNode> selectedNodes() {
     final ArrayList<ProjectNode> nodes = new ArrayList<>();
@@ -292,6 +292,10 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         }
       }
     }
+
+    @Override public boolean enabled(final GUI main) {
+      return selectedNode() != null;
+    }
   }
 
   /** Test command. */
@@ -303,6 +307,10 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
       for(final ProjectNode node : selectedNodes()) {
         view.gui.execute(new Test(node.file.path()));
       }
+    }
+
+    @Override public boolean enabled(final GUI main) {
+      return selectedNode() != null;
     }
   }
 
