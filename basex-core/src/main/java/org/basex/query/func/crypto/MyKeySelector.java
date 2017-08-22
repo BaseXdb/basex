@@ -47,7 +47,6 @@ final class MyKeySelector extends KeySelector {
     if(ki == null) throw new KeySelectorException("KeyInfo is null");
 
     final SignatureMethod sm = (SignatureMethod) m;
-    @SuppressWarnings("unchecked")
     final List<?> list = ki.getContent();
 
     for(final Object l : list) {
