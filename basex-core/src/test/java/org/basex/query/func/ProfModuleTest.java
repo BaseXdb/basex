@@ -42,11 +42,11 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void human() {
-    query(_PROF_HUMAN.args(" 1"), "1 Byte");
-    query(_PROF_HUMAN.args(" 2"), "2 Bytes");
-    query(_PROF_HUMAN.args(" 512"), "512 Bytes");
-    query(_PROF_HUMAN.args(" 32768"), "32 KB");
-    query(_PROF_HUMAN.args(" 1048576"), "1 MB");
+    query(_PROF_HUMAN.args(" 1"), "1 b");
+    query(_PROF_HUMAN.args(" 2"), "2 b");
+    query(_PROF_HUMAN.args(" 512"), "512 b");
+    query(_PROF_HUMAN.args(" 32768"), "32 kB");
+    query(_PROF_HUMAN.args(" 1048576"), "1024 kB");
   }
 
   /** Test method. */
