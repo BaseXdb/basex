@@ -23,6 +23,7 @@ import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
+import org.basex.query.scope.Module;
 import org.basex.query.up.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;

@@ -48,7 +48,7 @@ final class MyKeySelector extends KeySelector {
 
     final SignatureMethod sm = (SignatureMethod) m;
     @SuppressWarnings("unchecked")
-    final List<Object> list = ki.getContent();
+    final List<?> list = ki.getContent();
 
     for(final Object l : list) {
       final XMLStructure s = (XMLStructure) l;
