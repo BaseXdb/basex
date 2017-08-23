@@ -17,6 +17,6 @@ public final class BinPackFloat extends BinFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final float f = toFloat(exprs[0], qc);
     final ByteOrder bo = order(1, qc);
-    return new B64(ByteBuffer.wrap(new byte[4]).order(bo).putFloat(f).array());
+    return B64.get(ByteBuffer.wrap(new byte[4]).order(bo).putFloat(f).array());
   }
 }

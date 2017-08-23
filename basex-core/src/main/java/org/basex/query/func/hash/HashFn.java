@@ -34,7 +34,7 @@ abstract class HashFn extends StandardFunc {
           final byte[] tmp = new byte[IO.BLOCKSIZE];
           do {
             final int n = bi.read(tmp);
-            if(n == -1) return new B64(md.digest());
+            if(n == -1) return B64.get(md.digest());
             md.update(tmp, 0, n);
             qc.checkStop();
           } while(true);
@@ -43,7 +43,7 @@ abstract class HashFn extends StandardFunc {
         }
       }
       // non-streaming item, string
-      return new B64(md.digest(toBytes(item)));
+      return B64.get(md.digest(toBytes(item)));
     } catch(final NoSuchAlgorithmException ex) {
       throw HASH_ALG_X.get(info, algo);
     }

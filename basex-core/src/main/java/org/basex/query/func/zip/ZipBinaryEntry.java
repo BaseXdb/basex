@@ -19,7 +19,7 @@ import org.basex.util.*;
 public class ZipBinaryEntry extends ZipFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new B64(entry(qc));
+    return B64.get(entry(qc));
   }
 
   /**

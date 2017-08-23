@@ -24,6 +24,6 @@ public final class BinPart extends BinFn {
 
     final byte[] tmp = new byte[bounds[1]];
     System.arraycopy(bytes, bounds[0], tmp, 0, bounds[1]);
-    return new B64(tmp);
+    return B64.get(tmp);
   }
 }

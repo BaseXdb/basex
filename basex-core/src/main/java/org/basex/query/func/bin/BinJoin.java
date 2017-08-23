@@ -22,6 +22,6 @@ public final class BinJoin extends StandardFunc {
       qc.checkStop();
       bl.add(toB64(it, true).binary(info));
     }
-    return new B64(bl.finish());
+    return B64.get(bl.finish());
   }
 }

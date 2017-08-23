@@ -54,7 +54,7 @@ public class ArchiveCreate extends ArchiveFn {
       } catch(final IOException ex) {
         throw ARCH_FAIL_X.get(info, ex);
       }
-      return new B64(out.finish());
+      return B64.get(out.finish());
     }
   }
 

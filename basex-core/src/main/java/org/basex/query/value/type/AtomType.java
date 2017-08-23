@@ -667,14 +667,15 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(item instanceof Bin) return new B64((Bin) item, ii);
-      if(str(item)) return new B64(item.string(ii), ii);
+      if(item instanceof Bin) return org.basex.query.value.item.B64.get((Bin) item, ii);
+      if(str(item)) return org.basex.query.value.item.B64.get(item.string(ii), ii);
       throw castError(item, this, ii);
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return new B64(value instanceof byte[] ? (byte[]) value : token(value.toString()), ii);
+      return value instanceof byte[] ? org.basex.query.value.item.B64.get((byte[]) value) :
+        org.basex.query.value.item.B64.get(token(value.toString()), ii);
     }
   },
 

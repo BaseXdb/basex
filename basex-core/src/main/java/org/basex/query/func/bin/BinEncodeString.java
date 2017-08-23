@@ -22,7 +22,7 @@ public final class BinEncodeString extends BinFn {
     final String enc = toEncoding(1, BIN_UE_X, qc);
     if(str == null) return null;
     try {
-      return new B64(enc == null || enc == Strings.UTF8 ? str : ConvertFn.toBinary(str, enc));
+      return B64.get(enc == null || enc == Strings.UTF8 ? str : ConvertFn.toBinary(str, enc));
     } catch(final CharacterCodingException ex) {
       throw BIN_CE_X.get(info, ex);
     }

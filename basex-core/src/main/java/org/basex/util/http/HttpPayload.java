@@ -278,7 +278,7 @@ public final class HttpPayload {
             // assign file and contents, join multiple files
             final Map map = val instanceof Map ? (Map) val : Map.EMPTY;
             final Str file = Str.get(filename);
-            final B64 contents = new B64(cont.next());
+            final B64 contents = B64.get(cont.next());
             final Value files = new ValueBuilder().add(map.get(file, info)).add(contents).value();
             val = map.put(file, files, info);
           } else {
@@ -349,6 +349,6 @@ public final class HttpPayload {
         value = hp.payloads();
       }
     }
-    return value == null ? new B64(input.read()) : value;
+    return value == null ? B64.get(input.read()) : value;
   }
 }

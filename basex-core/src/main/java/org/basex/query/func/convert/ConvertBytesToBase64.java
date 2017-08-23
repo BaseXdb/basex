@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class ConvertBytesToBase64 extends ConvertFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new B64(bytesToBinary(qc));
+    return B64.get(bytesToBinary(qc));
   }
 }

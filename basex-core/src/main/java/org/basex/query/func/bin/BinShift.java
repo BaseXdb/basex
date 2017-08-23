@@ -23,6 +23,10 @@ public final class BinShift extends StandardFunc {
 
     byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
+    if(bl == 1 && by < 8) {
+      if(by > 0)  return B64.get((byte) (bytes[0] << by));
+      if(by > -8) return B64.get((byte) (bytes[0] >>> -by));
+    }
 
     byte[] tmp = new byte[bl];
     int r = 0;
@@ -64,6 +68,6 @@ public final class BinShift extends StandardFunc {
         System.arraycopy(bytes, 0, tmp, bl - tl, tl);
       }
     }
-    return new B64(tmp);
+    return B64.get(tmp);
   }
 }

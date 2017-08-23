@@ -35,6 +35,6 @@ public final class BinPackInteger extends BinFn {
         b >>= 8;
       }
     }
-    return new B64(tmp);
+    return B64.get(tmp);
   }
 }

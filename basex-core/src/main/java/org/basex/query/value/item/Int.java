@@ -18,15 +18,15 @@ import org.basex.util.*;
  */
 public final class Int extends ANum {
   /** Constant values. */
-  private static final Int[] NUMS;
+  private static final Int[] INTSS;
   /** Integer value. */
   private final long value;
 
   // caches the first 128 integers
   static {
     final int nl = 128;
-    NUMS = new Int[nl];
-    for(int n = 0; n < nl; n++) NUMS[n] = new Int(n);
+    INTSS = new Int[nl];
+    for(int n = 0; n < nl; n++) INTSS[n] = new Int(n);
   }
 
   /**
@@ -53,7 +53,7 @@ public final class Int extends ANum {
    * @return instance
    */
   public static Int get(final long value) {
-    return value >= 0 && value < NUMS.length ? NUMS[(int) value] : new Int(value);
+    return value >= 0 && value < INTSS.length ? INTSS[(int) value] : new Int(value);
   }
 
   /**
