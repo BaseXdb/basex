@@ -118,31 +118,54 @@ public final class CompileContext {
   }
 
   /**
+   * Replaces an EBV expression.
+   * @param expr expression
+   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @return optimized expression
+   */
+  public Expr replaceEbv(final Expr expr, final Expr result) {
+    return replaceWith(expr, result, false);
+  }
+
+  /**
    * Replaces an expression with the specified one.
    * @param expr expression
    * @param result resulting expression ({@code null} indicates empty sequence)
    * @return optimized expression
    */
   public Expr replaceWith(final Expr expr, final Expr result) {
+    return replaceWith(expr, result, true);
+  }
+
+  /**
+   * Replaces an expression with the specified one.
+   * @param expr expression
+   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @param refine refine type
+   * @return optimized expression
+   */
+  private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
     final Expr res = result == null ? Empty.SEQ : result;
     if(res != expr) {
       if(res == Empty.SEQ) {
         info(OPTEMPTY_X, expr);
       } else if(res instanceof ParseExpr) {
-        info(OPTREWRITE_X_X, expr, result.description());
-        // Refine type. Required mostly due to {@link Filter} rewritings and Expr#optimizeEbv calls
-        final ParseExpr re = (ParseExpr) res;
-        final SeqType et = expr.seqType(), rt  = re.seqType();
-        if(!et.eq(rt) && et.instanceOf(rt)) {
-          final SeqType it = et.intersect(rt);
-          if(it != null) {
-            re.seqType = it;
+        info(OPTREWRITE_X_X, expr, res.description());
+        // Refine type. Required mostly for {@link Filter} rewritings
+        if(refine) {
+          final ParseExpr re = (ParseExpr) res;
+          final SeqType et = expr.seqType(), rt  = re.seqType();
+          if(!et.eq(rt) && et.instanceOf(rt)) {
+            final SeqType it = et.intersect(rt);
+            if(it != null) {
+              re.seqType = it;
+            }
           }
         }
       } else {
         info(OPTPRE_X_X, expr, result.description());
         // Refine type. Required because original type might get lost in newly created sequences
-        if(res.size() > 1) {
+        if(refine && res.size() > 1) {
           final Seq seq = (Seq) res;
           final Type et = expr.seqType().type, rt = seq.type;
           if(!et.eq(rt) && et.instanceOf(rt)) {

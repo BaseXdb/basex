@@ -31,6 +31,6 @@ public final class FnExists extends StandardFunc {
   public Expr optimizeEbv(final CompileContext cc) {
     // if(exists(node*)) -> if(node*)
     final Expr e = exprs[0];
-    return e.seqType().type instanceof NodeType ? cc.replaceWith(this, e) : this;
+    return e.seqType().type instanceof NodeType ? cc.replaceEbv(this, e) : this;
   }
 }

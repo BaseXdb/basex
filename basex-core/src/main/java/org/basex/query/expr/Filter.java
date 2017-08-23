@@ -97,7 +97,7 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
     final Expr e = merge(root, cc);
-    return e == this ? super.optimizeEbv(cc) : cc.replaceWith(this, e);
+    return e == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, e);
   }
 
   /**

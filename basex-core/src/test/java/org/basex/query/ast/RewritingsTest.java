@@ -79,6 +79,8 @@ public final class RewritingsTest extends QueryPlanTest {
     query("empty(<a/>[b = 'c'])", "true");
     query("exists(<a/>[b = 'c'])", "false");
 
+    query("let $n := <n/> where $n[<a><b/><b/></a>/*] return $n", "<n/>");
+
     check("empty(<a>X</a>[text()])", null, "//@axis = 'child'");
     check("exists(<a>X</a>[text()])", null, "//@axis = 'child'");
     check("boolean(<a>X</a>[text()])", null, "//@axis = 'child'");

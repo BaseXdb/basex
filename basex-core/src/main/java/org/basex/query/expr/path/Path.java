@@ -209,7 +209,7 @@ public abstract class Path extends ParseExpr {
         final Expr s = step.merge(this, cc);
         if(s != step) {
           step.preds = new Expr[0];
-          return cc.replaceWith(this, s);
+          return cc.replaceEbv(this, s);
         }
       }
     }

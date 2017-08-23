@@ -321,7 +321,7 @@ public abstract class Expr extends ExprInfo {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
     return st.type instanceof NodeType && st.oneOrMore() && !has(Flag.UPD) && !has(Flag.NDT) ?
-      cc.replaceWith(this, Bln.TRUE) : this;
+      cc.replaceEbv(this, Bln.TRUE) : this;
   }
 
   /**
