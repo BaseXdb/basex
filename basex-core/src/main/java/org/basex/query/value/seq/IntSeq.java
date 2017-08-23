@@ -54,12 +54,20 @@ public final class IntSeq extends NativeSeq {
         return t2;
       case INT:
       case USH:
-        final short[] t3 = new short[(int) size];
-        for(int s = 0; s < size; s++) t3[s] = (short) values[s];
+        final int[] t3 = new int[(int) size];
+        for(int s = 0; s < size; s++) t3[s] = (int) values[s];
         return t3;
       default:
         return values;
     }
+  }
+
+  /**
+   * Returns the internal values.
+   * @return values
+   */
+  public long[] values() {
+    return values;
   }
 
   // STATIC METHODS =====================================================================

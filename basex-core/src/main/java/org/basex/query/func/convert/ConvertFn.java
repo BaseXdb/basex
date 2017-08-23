@@ -15,7 +15,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -34,15 +33,20 @@ public abstract class ConvertFn extends StandardFunc {
    */
   final byte[] bytesToBinary(final QueryContext qc) throws QueryException {
     final Value v = exprs[0].atomValue(qc, info);
-    // directly pass on byte array
+    // return internal byte array
     if(v instanceof BytSeq) return ((BytSeq) v).toJava();
 
-    // check if all arguments are bytes
-    final Iter iter = v.iter();
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) v.size()));
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      bl.add((int) ((ANum) checkType(it, AtomType.BYT)).itr());
+    if(v instanceof IntSeq) {
+      // integer sequence
+      for(final long l : ((IntSeq) v).values()) bl.add((byte) l);
+    } else {
+      // other types
+      final Iter iter = v.iter();
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
+        bl.add((int) toLong(it));
+      }
     }
     return bl.finish();
   }

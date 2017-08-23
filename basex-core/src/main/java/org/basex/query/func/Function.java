@@ -689,10 +689,10 @@ public enum Function {
   _CONVERT_BINARY_TO_STRING(ConvertBinaryToString.class,
       "binary-to-string(binary[,encoding[,fallback]])", arg(ITEM, STR, BLN), STR, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BYTES_TO_HEX(ConvertBytesToHex.class, "bytes-to-hex(bytes)", arg(BYT_ZM), HEX,
+  _CONVERT_BYTES_TO_HEX(ConvertBytesToHex.class, "bytes-to-hex(bytes)", arg(ITR_ZM), HEX,
       CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BYTES_TO_BASE64(ConvertBytesToBase64.class, "bytes-to-base64(bytes)", arg(BYT_ZM), B64,
+  _CONVERT_BYTES_TO_BASE64(ConvertBytesToBase64.class, "bytes-to-base64(bytes)", arg(ITR_ZM), B64,
       CONVERT_URI),
   /** XQuery function. */
   _CONVERT_STRING_TO_BASE64(ConvertStringToBase64.class, "string-to-base64(string[,encoding])",

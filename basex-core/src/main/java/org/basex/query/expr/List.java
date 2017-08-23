@@ -87,32 +87,32 @@ public final class List extends Arr {
     }
 
     if(allAreValues() && size >= 0 && size <= MAX_MAT_SIZE) {
-      Type all = null;
-      final Value[] vs = new Value[exprs.length];
-      int c = 0;
+      Type type = null;
+      final Value[] values = new Value[exprs.length];
+      int vl = 0;
       for(final Expr expr : exprs) {
-        final Value v = cc.qc.value(expr);
-        if(c == 0) all = v.type;
-        else if(all != v.type) all = null;
-        vs[c++] = v;
+        final Value val = cc.qc.value(expr);
+        if(vl == 0) type = val.type;
+        else if(type != val.type) type = null;
+        values[vl++] = val;
       }
 
-      final Value val;
+      final Value value;
       final int s = (int) size;
-      if(all == AtomType.STR)      val = StrSeq.get(vs, s);
-      else if(all == AtomType.BLN) val = BlnSeq.get(vs, s);
-      else if(all == AtomType.FLT) val = FltSeq.get(vs, s);
-      else if(all == AtomType.DBL) val = DblSeq.get(vs, s);
-      else if(all == AtomType.DEC) val = DecSeq.get(vs, s);
-      else if(all == AtomType.BYT) val = BytSeq.get(vs, s);
-      else if(all != null && all.instanceOf(AtomType.ITR)) {
-        val = IntSeq.get(vs, s, all);
+      if(type == AtomType.STR)      value = StrSeq.get(values, s);
+      else if(type == AtomType.BLN) value = BlnSeq.get(values, s);
+      else if(type == AtomType.FLT) value = FltSeq.get(values, s);
+      else if(type == AtomType.DBL) value = DblSeq.get(values, s);
+      else if(type == AtomType.DEC) value = DecSeq.get(values, s);
+      else if(type == AtomType.BYT) value = BytSeq.get(values, s);
+      else if(type != null && type.instanceOf(AtomType.ITR)) {
+        value = IntSeq.get(values, s, type);
       } else {
         final ValueBuilder vb = new ValueBuilder();
-        for(int i = 0; i < c; i++) vb.add(vs[i]);
-        val = vb.value();
+        for(int v = 0; v < vl; v++) vb.add(values[v]);
+        value = vb.value();
       }
-      return cc.replaceWith(this, val);
+      return cc.replaceWith(this, value);
     }
     return this;
   }

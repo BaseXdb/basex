@@ -77,6 +77,8 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
   @Test
   public void bytesToHex() {
     query(_CONVERT_BYTES_TO_HEX.args("xs:byte(65)"), "A");
+    query(_CONVERT_BYTES_TO_HEX.args(" 65"), "A");
+    query("xs:hexBinary('ff') = " + _CONVERT_BYTES_TO_HEX.args(" 255"), "true");
     query(_CONVERT_BYTES_TO_HEX.args(" for $i in 48 to 50 return xs:byte($i)"), "012");
   }
 
@@ -84,6 +86,7 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
   @Test
   public void bytesToBase64() {
     query(_CONVERT_BYTES_TO_BASE64.args("xs:byte(97)"), "a");
+    query(_CONVERT_BYTES_TO_BASE64.args(" 97"), "a");
     query(_CONVERT_BYTES_TO_BASE64.args("()"), "");
   }
 
