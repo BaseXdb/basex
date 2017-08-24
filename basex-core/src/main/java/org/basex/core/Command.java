@@ -27,8 +27,6 @@ import org.xml.sax.*;
 public abstract class Command extends Job {
   /** Command arguments. */
   public final String[] args;
-  /** Permission required to execute this command. */
-  public final Perm perm;
   /** Indicates if the command requires an opened database. */
   public final boolean openDB;
 
@@ -53,6 +51,8 @@ public abstract class Command extends Job {
 
   /** Container for query information. */
   private final TokenBuilder info = new TokenBuilder();
+  /** Permission required to execute this command. */
+  private final Perm perm;
 
   /**
    * Constructor for commands requiring no opened database.

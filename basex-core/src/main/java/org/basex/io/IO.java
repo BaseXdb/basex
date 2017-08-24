@@ -103,7 +103,7 @@ public abstract class IO {
   /** File size (in bytes). */
   protected long len = -1;
   /** File name. */
-  protected String nm;
+  private String nm;
 
   /**
    * Protected constructor.

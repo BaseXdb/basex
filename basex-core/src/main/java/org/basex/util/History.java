@@ -78,7 +78,7 @@ public final class History {
 
   /**
    * Returns the previous string and decreases the pointer, or returns {@code null}.
-   * @return previous string
+   * @return previous string or {@code null}
    */
   public byte[] prev() {
     return pos > 0 ? hist[--pos] : null;
@@ -86,7 +86,7 @@ public final class History {
 
   /**
    * Returns the next string and increases the pointer, or returns {@code null}.
-   * @return previous string
+   * @return previous string or {@code null}
    */
   public byte[] next() {
     return pos < max ?  hist[++pos] : null;

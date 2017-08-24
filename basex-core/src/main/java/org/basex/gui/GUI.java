@@ -66,8 +66,6 @@ public final class GUI extends JFrame {
   public boolean painting;
   /** Indicates if a running command or operation is updating. */
   public boolean updating;
-  /** Indicates if a command is running. */
-  public boolean running;
 
   /** Fullscreen flag. */
   boolean fullscreen;
@@ -104,6 +102,8 @@ public final class GUI extends JFrame {
   private volatile Command command;
   /** ID of currently executed command. */
   private final AtomicInteger commandID = new AtomicInteger(0);
+  /** Indicates if a command is running. */
+  private boolean running;
 
   /** Menu panel height. */
   private int menuHeight;

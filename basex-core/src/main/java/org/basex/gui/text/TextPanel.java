@@ -710,7 +710,7 @@ public class TextPanel extends BaseXPanel {
    * Pastes a string.
    * @param string string to be pasted
    */
-  public final void paste(final String string) {
+  private void paste(final String string) {
     final int pos = editor.pos();
     if(editor.selected()) editor.delete();
     editor.add(string);

@@ -287,7 +287,7 @@ public abstract class ANode extends Item {
   /**
    * Returns the value of the specified attribute or {@code null}.
    * @param name attribute to be found
-   * @return attribute value
+   * @return attribute value or {@code null}
    */
   public byte[] attribute(final QNm name) {
     final BasicNodeIter iter = attributes();

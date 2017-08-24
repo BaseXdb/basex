@@ -79,20 +79,10 @@ public class QueryParser extends InputParser {
     for(final byte[] key : keys) KEYWORDS.add(key);
   }
 
-  /** Imported modules. */
-  final TokenSet imports = new TokenSet();
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
-  /** List of modules to be parsed. */
-  public final ArrayList<ModInfo> mods = new ArrayList<>();
   /** Name of current module. */
   public QNm module;
-
-  /** Parsed variables. */
-  public final TokenObjMap<StaticVar> vars = new TokenObjMap<>();
-  /** Parsed functions. */
-  public final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
-
   /** Namespaces. */
   public final TokenMap namespaces = new TokenMap();
 
@@ -100,6 +90,16 @@ public class QueryParser extends InputParser {
   public final QueryContext qc;
   /** Static context. */
   public final StaticContext sc;
+
+  /** Imported modules. */
+  private TokenSet imports = new TokenSet();
+  /** List of modules to be parsed. */
+  private final ArrayList<ModInfo> mods = new ArrayList<>();
+
+  /** Parsed variables. */
+  private final TokenObjMap<StaticVar> vars = new TokenObjMap<>();
+  /** Parsed functions. */
+  private final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
 
   /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();

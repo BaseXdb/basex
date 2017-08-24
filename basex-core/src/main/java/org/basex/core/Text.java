@@ -768,14 +768,10 @@ public interface Text {
   String RESOURCES = lang("resources");
   /** "Encoding". */
   String ENCODING = lang("encoding");
-  /** "Method". */
-  String METHOD = lang("method");
   /** "Parameters". */
   String PARAMETERS = lang("parameters");
   /** "Path". */
   String PATH = lang("path");
-  /** Input. */
-  String INPUT = lang("input");
   /** "Jobs". */
   String JOBS = lang("jobs");
   /** "Duration". */

@@ -149,7 +149,7 @@ public abstract class Inspect {
    * Returns a value for the specified parameter or {@code null}.
    * @param doc documentation
    * @param name parameter name
-   * @return documentation of specified variable
+   * @return documentation of specified variable or {@code null}
    */
   public static byte[] doc(final TokenObjMap<TokenList> doc, final byte[] name) {
     final TokenList params = doc != null ? doc.get(DOC_PARAM) : null;

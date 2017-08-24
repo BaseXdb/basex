@@ -21,11 +21,11 @@ import org.basex.util.list.*;
  */
 public final class ANodeList extends ElementList implements Iterable<ANode> {
   /** Element container. */
-  private ANode[] list;
+  ANode[] list;
   /** Sort flags: nodes need to be sorted before they can be returned. */
-  private boolean sort;
+  boolean sort;
   /** Check incoming nodes for potential duplicates and unsorted entries. */
-  private boolean check;
+  boolean check;
 
   /**
    * Constructor.

@@ -93,7 +93,7 @@ public final class Namespaces {
    * @param id id of prefix
    * @return prefix
    */
-  public byte[] prefix(final int id) {
+  byte[] prefix(final int id) {
     return prefixes.key(id);
   }
 
@@ -113,15 +113,6 @@ public final class Namespaces {
    */
   public int uriId(final byte[] uri) {
     return uris.id(uri);
-  }
-
-  /**
-   * Returns the id of the specified prefix.
-   * @param prefix prefix
-   * @return id, or {@code 0} if no entry is found
-   */
-  public int prefixId(final byte[] prefix) {
-    return prefixes.id(prefix);
   }
 
   /**
@@ -194,7 +185,7 @@ public final class Namespaces {
    * @param data data reference
    * @return key and value ids
    */
-  public Atts values(final int pre, final Data data) {
+  Atts values(final int pre, final Data data) {
     final Atts as = new Atts();
     final int[] values = cursor.find(pre, data).values();
     final int nl = values.length;
@@ -389,7 +380,7 @@ public final class Namespaces {
    * @param end last pre value
    * @return namespaces
    */
-  public byte[] table(final int start, final int end) {
+  byte[] table(final int start, final int end) {
     if(root.children() == 0) return Token.EMPTY;
 
     final Table t = new Table();
@@ -435,7 +426,7 @@ public final class Namespaces {
    * @param end end pre value
    * @return string
    */
-  public String toString(final int start, final int end) {
+  String toString(final int start, final int end) {
     return root.toString(this, start, end);
   }
 
