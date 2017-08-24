@@ -2,8 +2,13 @@ package org.basex.query.func.jobs;
 
 import org.basex.util.options.*;
 
-/** Scheduling options. */
-public final class EvalOptions extends Options {
+/**
+ * Jobs options.
+ *
+ * @author BaseX Team 2005-17, BSD License
+ * @author Christian Gruen
+ */
+public final class JobsOptions extends Options {
   /** Query base-uri. */
   public static final StringOption BASE_URI = new StringOption("base-uri");
   /** Cache result. */

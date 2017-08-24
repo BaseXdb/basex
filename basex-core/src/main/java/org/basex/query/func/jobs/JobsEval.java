@@ -39,7 +39,7 @@ public class JobsEval extends StandardFunc {
 
     checkAdmin(qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final EvalOptions opts = new EvalOptions();
+    final JobsOptions opts = new JobsOptions();
     if(exprs.length > 2) toOptions(2, opts, qc);
 
     // copy variable values

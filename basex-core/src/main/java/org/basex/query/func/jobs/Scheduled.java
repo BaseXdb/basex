@@ -56,37 +56,37 @@ public final class Scheduled extends Job implements Runnable {
    * @throws QueryException query exception
    */
   Scheduled(final String query, final String path, final HashMap<String, Value> bindings,
-    final EvalOptions opts, final InputInfo info, final QueryContext qc, final StaticContext sc)
+    final JobsOptions opts, final InputInfo info, final QueryContext qc, final StaticContext sc)
     throws QueryException {
 
     this.query = query;
     this.path = path;
     this.bindings = bindings;
     this.info = info;
-    cache = opts.get(EvalOptions.CACHE);
+    cache = opts.get(JobsOptions.CACHE);
     jc().context = qc.context;
 
-    final String bu = opts.get(EvalOptions.BASE_URI);
+    final String bu = opts.get(JobsOptions.BASE_URI);
     uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
 
     // check when job is to be started
-    final String del = opts.get(EvalOptions.START);
+    final String del = opts.get(JobsOptions.START);
     final long delay = del.isEmpty() ? 0 : ms(del, 0, qc);
 
     // check when job is to be repeated
     long interval = 0;
-    final String inter = opts.get(EvalOptions.INTERVAL);
+    final String inter = opts.get(JobsOptions.INTERVAL);
     if(!inter.isEmpty()) interval = ms(new DTDur(token(inter), info));
     if(interval < 1000 && interval != 0) throw JOBS_RANGE_X.get(info, inter);
 
     // check when job is to be stopped
-    final String dur = opts.get(EvalOptions.END);
+    final String dur = opts.get(JobsOptions.END);
     final long duration = dur.isEmpty() ? Long.MAX_VALUE : ms(dur, delay, qc);
 
     final JobPool pool = qc.context.jobs;
     synchronized(pool.tasks) {
       // custom job id: check if it is invalid or has already been assigned
-      String id = opts.get(EvalOptions.ID);
+      String id = opts.get(JobsOptions.ID);
       if(id != null) {
         if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(info, id);
         if(pool.tasks.containsKey(id) || pool.active.containsKey(id) ||
