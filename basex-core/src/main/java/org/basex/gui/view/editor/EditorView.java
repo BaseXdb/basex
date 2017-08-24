@@ -426,8 +426,10 @@ public final class EditorView extends View {
     final IOFile file = fc.select(Mode.FSAVE);
     if(file == null) return false;
 
-    // success: display new file in project view
-    return edit.save(file);
+    // success: save file, parse contents
+    if(!edit.save(file)) return false;
+    run(edit, Action.PARSE);
+    return true;
   }
 
   /**
