@@ -1,6 +1,7 @@
 package org.basex.query.func.convert;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryError.chop;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -11,12 +12,7 @@ import java.util.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
-import org.basex.query.value.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Functions for converting data to other formats.
@@ -25,32 +21,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class ConvertFn extends StandardFunc {
-  /**
-   * Converts the first argument from a byte sequence to a byte array.
-   * @param qc query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  final byte[] bytesToBinary(final QueryContext qc) throws QueryException {
-    final Value v = exprs[0].atomValue(qc, info);
-    // return internal byte array
-    if(v instanceof BytSeq) return ((BytSeq) v).toJava();
-
-    final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) v.size()));
-    if(v instanceof IntSeq) {
-      // integer sequence
-      for(final long l : ((IntSeq) v).values()) bl.add((byte) l);
-    } else {
-      // other types
-      final Iter iter = v.iter();
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
-        bl.add((int) toLong(it));
-      }
-    }
-    return bl.finish();
-  }
-
   /**
    * Converts the first argument from a string to a byte array.
    * @param qc query context

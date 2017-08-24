@@ -52,6 +52,8 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void binaryToBytes() {
+    query(_CONVERT_BINARY_TO_BYTES.args("xs:hexBinary('ff')"), "-1");
+    query(_CONVERT_BINARY_TO_BYTES.args("xs:hexBinary('007f8081ff')"), "0\n127\n-128\n-127\n-1");
     query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary('QmFzZVggaXMgY29vbA==')"),
         "66\n97\n115\n101\n88\n32\n105\n115\n32\n99\n111\n111\n108");
     query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary(xs:hexBinary('4261736558'))"),
@@ -60,6 +62,13 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_BINARY_TO_BYTES.args(_CONVERT_STRING_TO_BASE64.args("a")), 97);
     query(COUNT.args(_CONVERT_BINARY_TO_BYTES.args(_CONVERT_STRING_TO_BASE64.args("\u00e4"))), 2);
     query(COUNT.args(_CONVERT_BINARY_TO_BYTES.args(_CONVERT_STRING_TO_BASE64.args("123"))), 3);
+  }
+
+  /** Test method. */
+  @Test
+  public void binaryToInteger() {
+    query(_CONVERT_BINARY_TO_INTEGER.args("xs:hexBinary('ff')"), "255");
+    query(_CONVERT_BINARY_TO_INTEGER.args("xs:hexBinary('007f8081ff')"), "0\n127\n128\n129\n255");
   }
 
   /** Test method. */

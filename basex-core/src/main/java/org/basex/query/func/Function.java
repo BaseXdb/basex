@@ -686,6 +686,9 @@ public enum Function {
   _CONVERT_BINARY_TO_BYTES(ConvertBinaryToBytes.class, "binary-to-bytes(binary)",
       arg(AAT), BYT_ZM, CONVERT_URI),
   /** XQuery function. */
+  _CONVERT_BINARY_TO_INTEGER(ConvertBinaryToInteger.class, "binary-to-integer(binary)",
+      arg(AAT), ITR_ZM, CONVERT_URI),
+  /** XQuery function. */
   _CONVERT_BINARY_TO_STRING(ConvertBinaryToString.class,
       "binary-to-string(binary[,encoding[,fallback]])", arg(ITEM, STR, BLN), STR, CONVERT_URI),
   /** XQuery function. */
