@@ -72,7 +72,8 @@ public final class SqlExecutePrepared extends SqlExecute {
       } catch(final SQLSyntaxErrorException ex) {
         // Oracle will fail receiving ParameterMetaData on update statement ()
         // stackoverflow.com/questions/30666622/apache-dbutils-changing-column-name-in-update-sql
-        if(!ex.getMessage().startsWith("ORA-00904")) throw ex;
+        // disable all oracle exceptions (found beside ORA-00904 ORA-00936 also)
+        if(!ex.getMessage().startsWith("ORA-")) throw ex;
       }
       if(params != null) setParameters(params.children(), stmt);
       // If execute returns false, statement was updating: return number of updated rows
