@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 
 /**
@@ -52,9 +51,9 @@ public final class FnTail extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr e = exprs[0];
-    final SeqType st = e.seqType();
-    if(st.zeroOrOne()) return e;
-    seqType = st.withOcc(Occ.ZERO_MORE);
+    final long s = e.size();
+    if(s == 0 || s == 1) return Empty.SEQ;
+    seqType = e.seqType().withOcc(s == 2 ? Occ.ONE : Occ.ZERO_MORE);
     return this;
   }
 }

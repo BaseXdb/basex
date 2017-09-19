@@ -203,7 +203,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the sequence size or 1.
+   * Returns the result size, or {@code -1} if the size is unknown.
    * @return result of check
    */
   public abstract long size();
