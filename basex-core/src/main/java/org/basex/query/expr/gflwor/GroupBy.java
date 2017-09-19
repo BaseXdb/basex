@@ -211,7 +211,7 @@ public final class GroupBy extends Clause {
   @Override
   public GroupBy compile(final CompileContext cc) throws QueryException {
     for(final Expr e : preExpr) e.compile(cc);
-    for(final Spec b : specs) b.compile(cc);
+    for(final Spec s : specs) s.compile(cc);
     return optimize(cc);
   }
 
@@ -298,7 +298,7 @@ public final class GroupBy extends Clause {
   public int exprSize() {
     int sz = 0;
     for(final Expr e : preExpr) sz += e.exprSize();
-    for(final Expr e : specs) sz += e.exprSize();
+    for(final Expr s : specs) sz += s.exprSize();
     return sz;
   }
 
@@ -364,6 +364,20 @@ public final class GroupBy extends Clause {
     }
 
     @Override
+    public Expr compile(final CompileContext cc) throws QueryException {
+      return super.compile(cc).optimize(cc);
+    }
+
+    @Override
+    public Spec optimize(final CompileContext cc) throws QueryException {
+      final SeqType st = expr.seqType();
+      seqType = (st.type instanceof NodeType ? AtomType.ATM :
+        st.mayBeArray() ? AtomType.ITEM : st.type).seqType();
+      var.refineType(seqType, cc);
+      return this;
+    }
+
+    @Override
     public boolean accept(final ASTVisitor visitor) {
       return expr.accept(visitor) && visitor.declared(var);
     }
@@ -383,8 +397,8 @@ public final class GroupBy extends Clause {
 
     @Override
     public String toString() {
-      final TokenBuilder tb = new TokenBuilder().add(var.toString()).add(' ').add(ASSIGN);
-      tb.add(' ').add(expr.toString());
+      final TokenBuilder tb = new TokenBuilder();
+      tb.addExt(var).add(' ').add(ASSIGN).add(' ').addExt(expr);
       if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
       return tb.toString();
     }
