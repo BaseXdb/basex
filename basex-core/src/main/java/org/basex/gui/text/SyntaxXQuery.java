@@ -1,6 +1,7 @@
 package org.basex.gui.text;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.lang.reflect.*;
@@ -110,15 +111,17 @@ final class SyntaxXQuery extends Syntax {
       return VARIABLE;
     }
 
-    // digits
-    if(Token.digit(ch)) return DIGIT;
+    // integers
+    if(digit(ch) && toLong(token(iter.currString())) != Long.MIN_VALUE) return DIGIT;
+
     // special characters
     if(!XMLToken.isNCChar(ch)) {
       elem = ch == '<' || ch == '%';
       return COMMENT;
     }
+
     // check for keywords
-    if(!elem && KEYWORDS.contains(iter.nextString())) return KEYWORD;
+    if(!elem && KEYWORDS.contains(iter.currString())) return KEYWORD;
 
     // standard text
     elem = false;
@@ -176,7 +179,7 @@ final class SyntaxXQuery extends Syntax {
     for(int t = text.size() - 1; t >= 0; t--) {
       final byte c = text.get(t);
       if(c == '\n') break;
-      if(!Token.ws(c)) return false;
+      if(!ws(c)) return false;
     }
     return true;
   }

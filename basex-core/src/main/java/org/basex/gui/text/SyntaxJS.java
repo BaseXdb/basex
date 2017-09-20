@@ -115,7 +115,7 @@ final class SyntaxJS extends Syntax {
     // special characters
     if(!XMLToken.isNCStartChar(ch)) return COMMENT;
     // check for keywords
-    if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
+    if(KEYWORDS.contains(iter.currString())) return KEYWORD;
 
     // standard text
     return plain;

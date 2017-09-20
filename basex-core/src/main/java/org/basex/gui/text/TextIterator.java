@@ -52,10 +52,10 @@ final class TextIterator {
   }
 
   /**
-   * Checks if the text contains more words.
+   * Checks if the text contains more strings.
    * @return result of check
    */
-  boolean moreTokens() {
+  boolean moreStrings() {
     int p = posEnd;
     pos = p;
     if(p >= length) return false;
@@ -75,10 +75,10 @@ final class TextIterator {
   }
 
   /**
-   * Returns the token as string.
+   * Returns the current string.
    * @return string
    */
-  String nextString() {
+  String currString() {
     return posEnd <= length ? string(text, pos, posEnd - pos) : "";
   }
 

@@ -344,7 +344,7 @@ final class TextRenderer extends BaseXBack {
    */
   private boolean more(final TextIterator iter, final Graphics g) {
     // no valid graphics reference, no more words found: quit
-    if(g == null || !iter.moreTokens()) return false;
+    if(g == null || !iter.moreStrings()) return false;
 
     // calculate word width
     int sw = 0;
@@ -481,7 +481,7 @@ final class TextRenderer extends BaseXBack {
           g.fillRect(x + (stringWidth >> 1), y - fontHeight * 3 / 10, s, s);
         } else {
           g.setColor(color);
-          g.drawString(iter.nextString(), x, y);
+          g.drawString(iter.currString(), x, y);
         }
       }
 

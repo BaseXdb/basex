@@ -42,7 +42,7 @@ final class SyntaxJSON extends Syntax {
     } else {
       if("-+0123456789".indexOf(ch) != -1) return DIGIT;
       if("{}[]:,".indexOf(ch) != -1) return COMMENT;
-      if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
+      if(KEYWORDS.contains(iter.currString())) return KEYWORD;
     }
 
     if(quote) quoted ^= true;
