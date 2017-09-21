@@ -2513,7 +2513,7 @@ public class QueryParser extends InputParser {
       final int p = pos;
       if(consume(']') && consume('`') && consume('`')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
-        return Function.CONCAT.get(sc, info(), el.finish());
+        return el.size() == 1 ? el.get(0) : Function.CONCAT.get(sc, info(), el.finish());
       }
       pos = p;
       if(consume('`') && consume('{')) {
