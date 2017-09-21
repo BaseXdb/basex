@@ -391,7 +391,7 @@ public interface QueryText {
   /** Optimization info. */ String OPTATOMIC_X = "atomic evaluation of %";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
   /** Optimization info. */ String OPTPRE_X_X = "pre-evaluate % to %";
-  /** Optimization info. */ String OPTEMPTY_X = "empty sequence: %";
+  /** Optimization info. */ String OPTEMPTY_X = "pre-evaluate % to empty sequence";
   /** Optimization info. */ String OPTREWRITE_X_X = "rewrite % to %";
   /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";
   /** Optimization info. */ String OPTREMOVE_X_X = "%: remove %";
