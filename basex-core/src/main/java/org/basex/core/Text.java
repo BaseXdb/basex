@@ -106,13 +106,13 @@ public interface Text {
   /** Server start information. */
   String S_SERVERINFO =
     " [-cdinpSz] [stop]" + NL +
-    "  stop      Stop running server" + NL +
-    "  -c<cmds>  Execute initial database commands" + NL +
-    "  -d        Activate debugging mode" + NL +
-    "  -n<name>  Set host the server is bound to" + NL +
-    "  -p<port>  Set server port" + NL +
-    "  -S        Start as service" + NL +
-    "  -z        Suppress logging";
+    "  stop       Stop running server" + NL +
+    "  -c<input>  Execute commands from file or string" + NL +
+    "  -d         Activate debugging mode" + NL +
+    "  -n<name>   Set host the server is bound to" + NL +
+    "  -p<port>   Set server port" + NL +
+    "  -S         Start as service" + NL +
+    "  -z         Suppress logging";
 
   /** GUI mode. */
   String S_GUI = "GUI";
@@ -127,17 +127,17 @@ public interface Text {
   /** HTTP information. */
   String S_HTTPINFO =
     " [-dhlnpsSUz] [stop]" + NL +
-    "  stop      Stop running server" + NL +
-    "  -c        Start in client mode" + NL +
-    "  -d        Activate debugging mode" + NL +
-    "  -h<port>  Set port of HTTP server" + NL +
-    "  -l        Start in local mode" + NL +
-    "  -n<name>  Set host name of database server" + NL +
-    "  -p<port>  Set port of database server" + NL +
-    "  -s<port>  Specify port to stop HTTP server" + NL +
-    "  -S        Start as service" + NL +
-    "  -U<name>  Specify user name" + NL +
-    "  -z        Suppress logging";
+    "  stop       Stop running server" + NL +
+    "  -c<input>  Execute commands from file or string" + NL +
+    "  -d         Activate debugging mode" + NL +
+    "  -h<port>   Set port of HTTP server" + NL +
+    "  -l         Start in local mode" + NL +
+    "  -n<name>   Set host name of database server" + NL +
+    "  -p<port>   Set port of database server" + NL +
+    "  -s<port>   Specify port to stop HTTP server" + NL +
+    "  -S         Start as service" + NL +
+    "  -U<name>   Specify user name" + NL +
+    "  -z         Suppress logging";
 
   /** Bug info. */
   String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";

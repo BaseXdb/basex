@@ -10,9 +10,8 @@ import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.server.*;
-import org.basex.server.Log.LogType;
+import org.basex.server.Log.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This is the starter class for running the database server. It handles
@@ -29,8 +28,6 @@ public final class BaseXServer extends CLI implements Runnable {
   private volatile boolean running;
   /** Indicates if server is to be stopped. */
   private volatile boolean stop;
-  /** Initial commands. */
-  private StringList commands;
   /** Server socket. */
   private ServerSocket socket;
   /** Start as service. */
@@ -62,17 +59,21 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws IOException I/O exception
    */
   public BaseXServer(final String... args) throws IOException {
-    this(null, args);
+    this(new Context(), args);
   }
 
   /**
    * Constructor.
-   * @param ctx database context (can be {@code null})
+   * @param ctx database context
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
   public BaseXServer(final Context ctx, final String... args) throws IOException {
-    super(args, ctx);
+    super(ctx, args);
+    // execute initial command-line arguments
+    for(final Pair<String, String> cmd : commands) {
+      if(!execute(cmd)) return;
+    }
 
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
@@ -95,9 +96,6 @@ public final class BaseXServer extends CLI implements Runnable {
     }
 
     try {
-      // execute initial command-line arguments
-      for(final String cmd : commands) execute(cmd, null);
-
       socket = new ServerSocket();
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port));
@@ -176,6 +174,17 @@ public final class BaseXServer extends CLI implements Runnable {
   }
 
   /**
+   * Stops the server.
+   * @throws IOException I/O exception
+   */
+  public void stop() throws IOException {
+    final StaticOptions sopts = context.soptions;
+    final int port = sopts.get(StaticOptions.SERVERPORT);
+    final String host = sopts.get(StaticOptions.SERVERHOST);
+    stop(host.isEmpty() ? S_LOCALHOST : host, port);
+  }
+
+  /**
    * Shuts down the server.
    */
   private synchronized void close() {
@@ -212,13 +221,12 @@ public final class BaseXServer extends CLI implements Runnable {
   @Override
   protected void parseArgs() throws IOException {
     final MainParser arg = new MainParser(this);
-    commands = new StringList();
-
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // send database commands
-            commands.add(arg.string());
+          case 'c': // gather up database commands
+            // evaluate commands
+            commands.add(input(arg.string()));
             break;
           case 'd': // activate debug mode
             Prop.debug = true;
@@ -234,6 +242,9 @@ public final class BaseXServer extends CLI implements Runnable {
             break;
           case 'q': // quiet flag (hidden)
             quiet = true;
+            break;
+          case 'v': // verbose flag
+            verbose = true;
             break;
           case 'S': // set service flag
             service = !daemon;
@@ -254,15 +265,14 @@ public final class BaseXServer extends CLI implements Runnable {
     }
   }
 
-  /**
-   * Stops the server.
-   * @throws IOException I/O exception
-   */
-  public void stop() throws IOException {
-    final StaticOptions sopts = context.soptions;
-    final int port = sopts.get(StaticOptions.SERVERPORT);
-    final String host = sopts.get(StaticOptions.SERVERHOST);
-    stop(host.isEmpty() ? S_LOCALHOST : host, port);
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE_X, S_SERVER);
+  }
+
+  @Override
+  public String usage() {
+    return S_SERVERINFO;
   }
 
   // STATIC METHODS ===========================================================
@@ -334,15 +344,5 @@ public final class BaseXServer extends CLI implements Runnable {
       client.timeout.cancel();
       authorizing.remove(client);
     }
-  }
-
-  @Override
-  public String header() {
-    return Util.info(S_CONSOLE_X, S_SERVER);
-  }
-
-  @Override
-  public String usage() {
-    return S_SERVERINFO;
   }
 }

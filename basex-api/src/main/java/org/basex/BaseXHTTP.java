@@ -12,7 +12,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.server.*;
-import org.basex.server.Log.LogType;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.nio.*;
@@ -27,11 +27,9 @@ import org.eclipse.jetty.xml.*;
  * @author Christian Gruen
  * @author Dirk Kirsten
  */
-public final class BaseXHTTP extends Main {
-  /** Database context. */
-  private final Context context;
+public final class BaseXHTTP extends CLI {
   /** HTTP server. */
-  private final Server jetty;
+  private Server jetty;
   /** HTTP port. */
   private int port;
   /** HTTP host. */
@@ -65,11 +63,13 @@ public final class BaseXHTTP extends Main {
    * @throws Exception exception
    */
   public BaseXHTTP(final String... args) throws Exception {
-    super(args);
-    parseArgs();
-
+    super(null, args);
     // context must be initialized after parsing of arguments
     context = HTTPContext.context();
+    // execute initial command-line arguments
+    for(final Pair<String, String> cmd : commands) {
+      if(!execute(cmd)) return;
+    }
 
     // create jetty instance and set default context to HTTP path
     final StaticOptions sopts = context.soptions;
@@ -233,19 +233,20 @@ public final class BaseXHTTP extends Main {
     /* command-line properties will be stored in system properties;
      * this way, they will not be overwritten by the settings specified in web.xml. */
     final MainParser arg = new MainParser(this);
-    boolean serve = true;
+    boolean daemon = true;
+
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // use client mode
-            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(false));
+          case 'c': // gather up database commands
+            commands.add(input(arg.string()));
             break;
           case 'd': // activate debug mode
             Prop.put(StaticOptions.DEBUG, Boolean.toString(true));
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
-            serve = false;
+            daemon = false;
             break;
           case 'h': // parse HTTP port
             port = arg.number();
@@ -270,7 +271,7 @@ public final class BaseXHTTP extends Main {
             Prop.put(StaticOptions.STOPPORT, Integer.toString(arg.number()));
             break;
           case 'S': // set service flag
-            service = serve;
+            service = daemon;
             break;
           case 'U': // specify user name
             Prop.put(StaticOptions.USER, arg.string());

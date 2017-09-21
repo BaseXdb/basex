@@ -52,7 +52,7 @@ public class BaseX extends CLI {
    * @throws IOException I/O exception
    */
   public BaseX(final String... args) throws IOException {
-    super(args);
+    super(new Context(), args);
 
     // create session to show optional login request
     session();
@@ -76,9 +76,8 @@ public class BaseX extends CLI {
           execute(new Set(MainOptions.BINDINGS, value), false);
         } else if(c == 'c') {
           // evaluate commands
-          final Pair<String, String> input = input(value);
-          execute(input.value(), input.name());
           console = false;
+          if(!execute(input(value))) return;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
           execute(new Set(MainOptions.DOTPLAN, null), false);
@@ -100,13 +99,13 @@ public class BaseX extends CLI {
           session().setOutputStream(out);
         } else if(c == 'q') {
           // evaluate query
-          execute(new XQuery(value), verbose);
           console = false;
+          execute(new XQuery(value), verbose);
         } else if(c == 'Q') {
+          console = false;
           // evaluate file contents or string as query
           final Pair<String, String> input = input(value);
           execute(new XQuery(input.value()).baseURI(input.name()), verbose);
-          console = false;
         } else if(c == 'r') {
           // parse number of runs
           execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
@@ -121,8 +120,8 @@ public class BaseX extends CLI {
           execute(new Set(MainOptions.SERIALIZER, sopts), false);
         } else if(c == 't') {
           // evaluate query
-          execute(new Test(value), verbose);
           console = false;
+          execute(new Test(value), verbose);
         } else if(c == 'u') {
           // (de)activate write-back for updates
           execute(new Set(MainOptions.WRITEBACK, null), false);
@@ -194,26 +193,6 @@ public class BaseX extends CLI {
   private void quit() throws IOException {
     if(out == System.out || out == System.err) out.flush();
     else out.close();
-  }
-
-  /**
-   * Returns the base URI and the query string for the specified input.
-   * @param input input
-   * @return return base URI and query string
-   * @throws IOException I/O exception
-   */
-  private Pair<String, String> input(final String input) throws IOException {
-    final IO io = IO.get(input);
-    final boolean file = !(io instanceof IOContent) && io.exists() && !io.isDir();
-    return new Pair<>(file ? io.path() : "./", file ? io.string() : input);
-  }
-
-  /**
-   * Tests if this is a local client.
-   * @return local mode
-   */
-  protected boolean local() {
-    return true;
   }
 
   @Override
