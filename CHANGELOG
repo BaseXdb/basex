@@ -1,3 +1,7 @@
+VERSION 8.6.7 (September 21, 2017) -------------------------------------
+
+ Bug fixes, performance (fn:tail, static typing in group by clauses).
+
 VERSION 8.6.6 (August 24, 2017) ----------------------------------------
 
  Bug fixes (map:merge, where clauses), performance tweaks.
