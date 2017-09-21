@@ -147,31 +147,25 @@ public final class CmpG extends Cmp {
     // one value is empty (e.g.: () = local:expensive() )
     if(oneIsEmpty()) return cc.replaceWith(this, Bln.FALSE);
 
-    // rewrite count() function
+    Expr e = this;
     if(e1.isFunction(Function.COUNT)) {
-      final Expr e = compCount(op.op, cc);
-      if(e != this) return cc.replaceWith(this, e);
+      // rewrite count() function
+      e = compCount(op.op, cc);
+    } else if(e1.isFunction(Function.STRING_LENGTH)) {
+      // rewrite string-length() function
+      e = compStringLength(op.op, cc);
+    } else if(e1.isFunction(Function.POSITION)) {
+      // position() CMP number(s)
+      e = Pos.get(op.op, e2, this, info);
+    } else if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
+        op == OpG.NE && e2 == Bln.TRUE)) {
+      // (A = false()) -> not(A)
+      e = cc.function(Function.NOT, info, e1);
     }
-
-    // rewrite string-length() function
-    if(e1.isFunction(Function.STRING_LENGTH)) {
-      final Expr e = compStringLength(op.op, cc);
-      if(e != this) return cc.replaceWith(this, e);
-    }
-
-    // position() CMP expr
-    if(e1.isFunction(Function.POSITION)) {
-      final Expr e = Pos.get(op.op, e2, this, info);
-      if(e != this) return cc.replaceWith(this, e);
-    }
-
-    // (A = false()) -> not(A)
-    if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
-      return cc.replaceWith(this, cc.function(Function.NOT, info, e1));
-    }
+    if(e != this) return cc.replaceWith(this, e);
 
     // rewrite equality comparisons (range expression or number)
-    ParseExpr e = CmpR.get(this);
+    e = CmpR.get(this);
     if(e == this) e = CmpSR.get(this);
     if(e != this) return allAreValues() ? cc.preEval(e) : cc.replaceWith(this, e);
 
@@ -185,12 +179,18 @@ public final class CmpG extends Cmp {
     // pre-evaluate values
     if(allAreValues()) return cc.preEval(this);
 
-    // pre-evaluate equality test if operands are equal, deterministic, and can be compared
+    /* pre-evaluate equality test if:
+     * - equality operator is specified,
+     * - operands are equal,
+     * - operands are deterministic, non-updating,
+     * - operands do not depend on context, or if context value exists
+     */
     if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
-      // currently limited to strings (function items are invalid, numbers may be NaN)
-      final SeqType st = e1.seqType();
-      if(st.oneOrMore() && st.type.isStringOrUntyped()) return cc.replaceWith(this, Bln.TRUE);
+      // currently limited to strings, integers and booleans
+      final Type t1 = st1.type;
+      if(st1.oneOrMore() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
+          t1 == AtomType.BLN)) return cc.replaceWith(this, Bln.TRUE);
     }
     return this;
   }
@@ -322,6 +322,21 @@ public final class CmpG extends Cmp {
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new CmpG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(cmp instanceof CmpG) {
+      final CmpG c = (CmpG) cmp;
+      if(op == c.op) {
+        final int el = exprs.length;
+        for(int e = 0; e < el; e++) {
+          if(!exprs[e].sameAs(c.exprs[e])) return false;
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

@@ -50,8 +50,6 @@ public abstract class Preds extends ParseExpr {
   public Expr compile(final CompileContext cc) throws QueryException {
     final QueryFocus focus = cc.qc.focus;
     final Value init = focus.value;
-    // never compile predicates with empty sequence as context value (#1016)
-    if(init != null && init.isEmpty()) focus.value = null;
     try {
       final int pl = preds.length;
       for(int p = 0; p < pl; ++p) {
@@ -82,7 +80,7 @@ public abstract class Preds extends ParseExpr {
           final SeqType st2 = e2.seqType();
           // position() = last() -> last()
           // position() = $n (xs:numeric) -> $n
-          if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
+          if(st2.one() && st2.type.isNumber()) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
               cc.info(OPTSIMPLE_X, pred);

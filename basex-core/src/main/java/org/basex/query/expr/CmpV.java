@@ -185,10 +185,12 @@ public final class CmpV extends Cmp {
     if(allAreValues()) return cc.preEval(this);
 
     if(e1.isFunction(Function.COUNT)) {
+      // rewrite count() function
       e = compCount(op, cc);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
+      // rewrite string-length() function
       e = compStringLength(op, cc);
-    } else if(e1.isFunction(Function.POSITION)) {
+    } else if(e1.isFunction(Function.POSITION) && e2.seqType().one()) {
       // position() CMP number
       e = Pos.get(op, e2, this, info);
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
@@ -196,7 +198,23 @@ public final class CmpV extends Cmp {
       // (A eq false()) -> not(A)
       e = cc.function(Function.NOT, info, e1);
     }
-    return cc.replaceWith(this, e);
+    if(e != this) return cc.replaceWith(this, e);
+
+    /* pre-evaluate equality test if:
+     * - equality operator is specified,
+     * - operands are equal,
+     * - operands are deterministic, non-updating,
+     * - operands do not depend on context, or if context value exists
+     */
+    if(op == OpV.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+        (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
+      // currently limited to strings, integers and booleans
+      final Type t1 = st1.type;
+      if(st1.one() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
+          t1 == AtomType.BLN)) return cc.replaceWith(this, Bln.TRUE);
+    }
+
+    return this;
   }
 
   @Override
