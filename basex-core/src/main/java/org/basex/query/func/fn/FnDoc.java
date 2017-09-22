@@ -15,4 +15,10 @@ public final class FnDoc extends Docs {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return doc(qc);
   }
+
+  @Override
+  protected FnDoc opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

@@ -573,7 +573,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type exactly one item.
+   * Tests if the type yields exactly one item.
    * @return result of check
    */
   public boolean one() {
@@ -581,7 +581,15 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type exactly one or more items.
+   * Tests if the type yields exactly one item and is no array.
+   * @return result of check
+   */
+  public boolean oneNoArray() {
+    return one() && !mayBeArray();
+  }
+
+  /**
+   * Tests if the type yields exactly one or more items.
    * @return result of check
    */
   public boolean oneOrMore() {

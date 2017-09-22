@@ -1,12 +1,12 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Function implementation.).
+ * Function implementation.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen

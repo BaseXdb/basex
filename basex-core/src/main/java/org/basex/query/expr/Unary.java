@@ -45,7 +45,7 @@ public final class Unary extends Single {
     final SeqType st = expr.seqType();
     final Type t = st.type;
     seqType = SeqType.get(t.isUntyped() ? AtomType.DBL : t.isNumber() ? t : AtomType.ITR,
-      st.one() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
+      st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
     return this;
   }
 

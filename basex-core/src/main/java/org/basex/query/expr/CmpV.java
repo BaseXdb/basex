@@ -177,8 +177,7 @@ public final class CmpV extends Cmp {
 
     final Expr e1 = exprs[0], e2 = exprs[1];
     final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    seqType = st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray()
-        ? SeqType.BLN : SeqType.BLN_ZO;
+    seqType = st1.oneNoArray() && st2.oneNoArray() ? SeqType.BLN : SeqType.BLN_ZO;
 
     Expr e = this;
     if(oneIsEmpty()) return cc.emptySeq(this);
@@ -190,7 +189,7 @@ public final class CmpV extends Cmp {
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
       // rewrite string-length() function
       e = compStringLength(op, cc);
-    } else if(e1.isFunction(Function.POSITION) && e2.seqType().one()) {
+    } else if(e1.isFunction(Function.POSITION) && st2.oneNoArray()) {
       // position() CMP number
       e = ItrPos.get(op, e2, this, info);
       if(e == this) e = Pos.get(op, e2, this, info, cc);
@@ -211,8 +210,8 @@ public final class CmpV extends Cmp {
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       // currently limited to strings, integers and booleans
       final Type t1 = st1.type;
-      if(st1.one() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
-          t1 == AtomType.BLN)) return cc.replaceWith(this, Bln.TRUE);
+      if(st1.one() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) || t1 == AtomType.BLN))
+        return cc.replaceWith(this, Bln.TRUE);
     }
 
     return this;
@@ -242,8 +241,9 @@ public final class CmpV extends Cmp {
   @Override
   public CmpV invert() {
     final Expr e1 = exprs[0], e2 = exprs[1];
-    return e1.size() != 1 || e1.seqType().mayBeArray() || e2.size() != 1 ||
-        e2.seqType().mayBeArray() ? this : new CmpV(e1, e2, op.invert(), coll, sc, info);
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    return st1.oneNoArray() && st2.oneNoArray() ? new CmpV(e1, e2, op.invert(), coll, sc, info) :
+      this;
   }
 
   @Override

@@ -36,11 +36,9 @@ public final class Arith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType st1 = exprs[0].seqType();
-    final SeqType st2 = exprs[1].seqType();
+    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    final boolean o1 = st1.oneNoArray(), o2 = st2.oneNoArray();
     final Type t1 = st1.type, t2 = st2.type;
-    final boolean o1 = st1.one() && !st1.mayBeArray();
-    final boolean o2 = st2.one() && !st2.mayBeArray();
     if(t1.isNumberOrUntyped() && t2.isNumberOrUntyped()) {
       final Occ occ = o1 && o2 ? Occ.ONE : Occ.ZERO_ONE;
       seqType = SeqType.get(Calc.type(t1, t2), occ);

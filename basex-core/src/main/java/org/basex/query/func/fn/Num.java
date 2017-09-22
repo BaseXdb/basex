@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
@@ -95,5 +95,11 @@ abstract class Num extends StandardFunc {
            tc == DBL || ti == DBL ? DBL :
            tc == FLT || ti == FLT ? FLT :
            null;
+  }
+
+  @Override
+  protected final Num opt(final CompileContext cc) {
+    singleOcc();
+    return this;
   }
 }

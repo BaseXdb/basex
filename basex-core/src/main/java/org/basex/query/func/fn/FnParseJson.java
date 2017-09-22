@@ -28,6 +28,12 @@ public class FnParseJson extends Parse {
     return parse(toToken(it), false, qc, info);
   }
 
+  @Override
+  protected final FnParseJson opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
+
   /**
    * Parses the specified JSON string.
    * @param json json string

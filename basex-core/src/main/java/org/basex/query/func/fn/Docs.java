@@ -46,13 +46,13 @@ public abstract class Docs extends StandardFunc {
   /**
    * Performs the doc function.
    * @param qc query context
-   * @return result
+   * @return document
    * @throws QueryException query exception
    */
   ANode doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item it = exprs[0].item(qc, info);
+      final Item it = exprs[0].atomItem(qc, info);
       if(it == null) return null;
       final byte[] uri = toToken(it);
       qi = queryInput(uri);

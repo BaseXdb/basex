@@ -9,7 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -46,7 +46,7 @@ public final class Cast extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    if(st.one() && !st.mayBeArray()) seqType = seqType.withOcc(Occ.ONE);
+    if(st.oneNoArray()) seqType = seqType.withOcc(Occ.ONE);
 
     // pre-evaluate value
     if(expr.isValue()) return cc.preEval(this);

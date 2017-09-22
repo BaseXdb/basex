@@ -29,4 +29,10 @@ public final class FnNamespaceUriFromQName extends StandardFunc {
   public boolean accept(final ASTVisitor visitor) {
     return (exprs.length != 0 || visitor.lock(Locking.CONTEXT)) && super.accept(visitor);
   }
+
+  @Override
+  protected FnNamespaceUriFromQName opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

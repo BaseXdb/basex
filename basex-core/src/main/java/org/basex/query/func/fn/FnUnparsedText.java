@@ -15,4 +15,10 @@ public final class FnUnparsedText extends Parse {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return unparsedText(qc, false, true);
   }
+
+  @Override
+  protected FnUnparsedText opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

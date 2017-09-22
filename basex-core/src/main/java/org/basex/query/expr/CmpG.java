@@ -288,8 +288,9 @@ public final class CmpG extends Cmp {
   @Override
   public CmpG invert() {
     final Expr e1 = exprs[0], e2 = exprs[1];
-    return e1.size() != 1 || e1.seqType().mayBeArray() || e2.size() != 1 ||
-        e2.seqType().mayBeArray() ? this : new CmpG(e1, e2, op.invert(), coll, sc, info);
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    return st1.oneNoArray() && st2.oneNoArray() ? new CmpG(e1, e2, op.invert(), coll, sc, info) :
+      this;
   }
 
   /**

@@ -97,7 +97,7 @@ public abstract class Parse extends StandardFunc {
    * @throws QueryException query exception
    */
   ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
-    final Item it = exprs[0].item(qc, info);
+    final Item it = exprs[0].atomItem(qc, info);
     if(it == null) return null;
 
     final IO io = new IOContent(toToken(it), string(sc.baseURI().string()));

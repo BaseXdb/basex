@@ -47,22 +47,27 @@ public final class Pos extends Arr {
       if(arg instanceof Range && cmp == OpV.EQ) {
         final Range r = (Range) arg;
         final Expr e1 = r.exprs[0], e2 = r.exprs[1];
-        if(e1.seqType().instanceOf(SeqType.ITR) && e2.seqType().instanceOf(SeqType.ITR))
+        if(e1.seqType().type.instanceOf(AtomType.ITR) && e2.seqType().type.instanceOf(AtomType.ITR))
           return new Pos(ii, e1, e1.sameAs(e2) ? e1 : e2);
       }
-      if(arg.seqType().one()) {
+      final SeqType st = arg.seqType();
+      if(st.oneNoArray()) {
         switch(cmp) {
           case EQ:
             return new Pos(ii, arg, arg);
           case GE:
             return new Pos(ii, arg, Int.MAX);
           case GT:
-            Expr e = new Arith(ii, cc.function(Function.FLOOR, ii, arg), Int.ONE, Calc.PLUS);
+            Expr e = new Arith(ii,
+                arg.seqType().type.instanceOf(AtomType.ITR) ? arg :
+                cc.function(Function.FLOOR, ii, arg), Int.ONE, Calc.PLUS);
             return new Pos(ii, e, Int.MAX);
           case LE:
             return new Pos(ii, Int.ONE, arg);
           case LT:
-            e = new Arith(ii, cc.function(Function.CEILING, ii, arg), Int.ONE, Calc.MINUS);
+            e = new Arith(ii,
+                arg.seqType().type.instanceOf(AtomType.ITR) ? arg :
+                cc.function(Function.CEILING, ii, arg), Int.ONE, Calc.MINUS);
             return new Pos(ii, Int.ONE, e);
           default:
         }
@@ -88,7 +93,7 @@ public final class Pos extends Arr {
 
   @Override
   public Pos copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Pos(info, exprs[0], exprs[1]);
+    return new Pos(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
   }
 
   @Override
@@ -109,7 +114,7 @@ public final class Pos extends Arr {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, exprs[0], MAX, exprs[1]));
+    addPlan(plan, planElem(), exprs);
   }
 
   @Override

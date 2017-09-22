@@ -34,4 +34,10 @@ public final class FnResolveUri extends StandardFunc {
 
     return base.resolve(rel, info);
   }
+
+  @Override
+  protected FnResolveUri opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

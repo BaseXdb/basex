@@ -15,4 +15,10 @@ public final class FnParseXmlFragment extends Parse {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return parseXml(qc, true);
   }
+
+  @Override
+  protected FnParseXmlFragment opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

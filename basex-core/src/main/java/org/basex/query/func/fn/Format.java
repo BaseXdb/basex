@@ -38,4 +38,10 @@ abstract class Format extends StandardFunc {
     final Formatter form = Formatter.get(lng);
     return Str.get(form.formatDate(date, lng, pic, cal, plc, info, sc));
   }
+
+  @Override
+  protected Format opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

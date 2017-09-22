@@ -20,7 +20,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Unary lookup expression.
+ * Lookup expression.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
@@ -47,7 +47,7 @@ public final class Lookup extends Arr {
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!map && !array) return this;
 
-    final boolean oneInput = expr.size() == 1 || expr.seqType().one();
+    final boolean oneInput = expr.size() == 1;
     SeqType rt = ((FuncType) tp).type;
     if(rt != null) {
       // map lookup may result in empty sequence
@@ -61,7 +61,7 @@ public final class Lookup extends Arr {
     if(keys != Str.WC) {
       if(oneInput) {
         // one function, rewrite to for-each or function call
-        final Expr opt = keys.size() == 1 || keys.seqType().one()
+        final Expr opt = keys.size() == 1
             ? new DynFuncCall(info, cc.sc(), expr, keys).optimize(cc)
             : cc.function(Function.FOR_EACH, info, exprs);
         return cc.replaceWith(this, opt);
