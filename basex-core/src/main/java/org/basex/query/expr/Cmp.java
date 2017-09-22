@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Cmp extends Arr {
-  /** Collation used for comparisons. */
+  /** Collation (can be {@code null}). */
   final Collation coll;
 
   /**
@@ -24,7 +24,7 @@ public abstract class Cmp extends Arr {
    * @param info input info
    * @param expr1 first expression
    * @param expr2 second expression
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    */
   Cmp(final InputInfo info, final Expr expr1, final Expr expr2, final Collation coll) {
     super(info, expr1, expr2);

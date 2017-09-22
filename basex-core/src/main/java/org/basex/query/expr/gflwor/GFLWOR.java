@@ -588,7 +588,7 @@ public final class GFLWOR extends ParseExpr {
         // remove clause and ensure that the positional variable is only used once
         clauses.remove(i);
         if(count(pos.pos, c) == VarUsage.NEVER) {
-          pos.addPredicate(Pos.get(cmp));
+          pos.addPredicate(ItrPos.get(cmp));
           pos.expr = pos.expr.optimize(cc);
           cc.info(QueryText.OPTPRED_X, cmp);
           changed = true;

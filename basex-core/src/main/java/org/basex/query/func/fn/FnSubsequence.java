@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.util.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -123,7 +122,7 @@ public class FnSubsequence extends StandardFunc {
     final double ds = toDouble(exprs[1], qc);
     if(Double.isNaN(ds)) return null;
 
-    final long start = StrictMath.round(ds);
+    final long start = start(ds);
     final boolean min = start == Long.MIN_VALUE;
     long len = Long.MAX_VALUE;
 
@@ -132,13 +131,11 @@ public class FnSubsequence extends StandardFunc {
       final double dl = toDouble(exprs[2], qc);
       if(Double.isNaN(dl)) return null;
       if(min && dl == Double.POSITIVE_INFINITY) return null;
-      len = StrictMath.round(dl);
+      len = length(dl);
     }
-    if(min) return len == Long.MAX_VALUE ? ALL : null;
 
-    // end flag: compute length
-    if(this instanceof UtilItemRange && len != Long.MAX_VALUE) len -= start - 1;
-    return new long[] { start, len };
+    // return all values, no values, or the specified range
+    return min ? len == Long.MAX_VALUE ? ALL : null : new long[] { start, length(start, len) };
   }
 
   /**
@@ -152,6 +149,34 @@ public class FnSubsequence extends StandardFunc {
     final long s = Math.max(0, start - 1);
     final long l = Math.min(val.size() - s, len + Math.min(0, start - 1));
     return l <= 0 ? Empty.SEQ : val.subSeq(s, l);
+  }
+
+  /**
+   * Returns the start position.
+   * @param v double value
+   * @return long value
+   */
+  public long start(final double v) {
+    return StrictMath.round(v);
+  }
+
+  /**
+   * Returns the length.
+   * @param v double value
+   * @return long value
+   */
+  public long length(final double v) {
+    return StrictMath.round(v);
+  }
+
+  /**
+   * Computes the count of items to be returned.
+   * @param start start
+   * @param len length
+   * @return length
+   */
+  public long length(@SuppressWarnings("unused") final long start, final long len) {
+    return len;
   }
 
   @Override

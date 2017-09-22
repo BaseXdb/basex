@@ -157,10 +157,10 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Checks the items for equality.
+   * Compares the items for equality.
    * @param it item to be compared
-   * @param coll collation
-   * @param sc static context
+   * @param coll collation (can be {@code null})
+   * @param sc static context; required for comparing items of type xs:QName
    * @param ii input info
    * @return result of check
    * @throws QueryException query exception
@@ -169,22 +169,25 @@ public abstract class Item extends Value {
       throws QueryException;
 
   /**
-   * Checks the items for equivalence.
+   * Compares the items for equivalence. As item is equivalent to another if:
+   * <ul>
+   *   <li>both numeric values are NaN, or</li>
+   *   <li>if the items have comparable types and are equal</li>
+   * </ul>
    * @param it item to be compared
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
   public final boolean equiv(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    // check if both values are NaN, or if values are equal..
-    return it instanceof ANum && (this == Dbl.NAN || this == Flt.NAN) && Double.isNaN(it.dbl(ii)) ||
+    return (this == Dbl.NAN || this == Flt.NAN) && (it == Dbl.NAN || it == Flt.NAN) ||
         comparable(it) && eq(it, coll, null, ii);
   }
 
   /**
-   * Checks the items as keys.
+   * Compares the items for equality.
    * @param it item to be compared
    * @param ii input info
    * @return result of check
@@ -197,7 +200,7 @@ public abstract class Item extends Value {
   /**
    * Returns the difference between the current and the specified item.
    * @param it item to be compared
-   * @param coll query context
+   * @param coll collation (can be {@code null})
    * @param ii input info
    * @return difference
    * @throws QueryException query exception

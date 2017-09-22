@@ -121,7 +121,7 @@ public final class CmpV extends Cmp {
      * Evaluates the expression.
      * @param it1 first item
      * @param it2 second item
-     * @param coll query context
+     * @param coll collation (can be {@code null})
      * @param sc static context
      * @param ii input info
      * @return result
@@ -156,7 +156,7 @@ public final class CmpV extends Cmp {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param sc static context
    * @param info input info
    */
@@ -192,7 +192,8 @@ public final class CmpV extends Cmp {
       e = compStringLength(op, cc);
     } else if(e1.isFunction(Function.POSITION) && e2.seqType().one()) {
       // position() CMP number
-      e = Pos.get(op, e2, this, info);
+      e = ItrPos.get(op, e2, this, info);
+      if(e == this) e = Pos.get(op, e2, this, info, cc);
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)

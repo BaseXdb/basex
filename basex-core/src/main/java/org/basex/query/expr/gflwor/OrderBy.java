@@ -242,7 +242,7 @@ public final class OrderBy extends Clause {
     private final boolean desc;
     /** Position of empty sort keys. */
     private final boolean least;
-    /** Collation. */
+    /** Collation (can be {@code null}). */
     private final Collation coll;
 
     /**
@@ -251,7 +251,7 @@ public final class OrderBy extends Clause {
      * @param key sort key expression
      * @param desc descending order
      * @param least empty least
-     * @param coll collation
+     * @param coll collation (can be {@code null})
      */
     public Key(final InputInfo info, final Expr key, final boolean desc, final boolean least,
         final Collation coll) {

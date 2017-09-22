@@ -32,7 +32,7 @@ final class IterPosStep extends Step {
   @Override
   public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
-      final Pos[] posExpr = new Pos[preds.length];
+      final ItrPos[] posExpr = new ItrPos[preds.length];
       final long[] cPos = new long[preds.length];
       boolean skip;
       BasicNodeIter iter;
@@ -45,8 +45,8 @@ final class IterPosStep extends Step {
           final int pl = preds.length;
           for(int p = 0; p < pl; p++) {
             final Expr pred = preds[p];
-            if(pred instanceof Pos) {
-              posExpr[p] = (Pos) pred;
+            if(pred instanceof ItrPos) {
+              posExpr[p] = (ItrPos) pred;
             } else if(num(pred)) {
               // pre-evaluate numeric position
               final Item it = pred.atomItem(qc, info);
@@ -54,8 +54,8 @@ final class IterPosStep extends Step {
               final double dbl = toDouble(it);
               final long lng = (long) dbl;
               if(dbl != lng) return null;
-              final Expr e = Pos.get(lng, info);
-              if(e instanceof Pos) posExpr[p] = (Pos) e;
+              final Expr e = ItrPos.get(lng, info);
+              if(e instanceof ItrPos) posExpr[p] = (ItrPos) e;
               else return null;
             }
           }
@@ -83,7 +83,7 @@ final class IterPosStep extends Step {
           final int pl = preds.length;
           for(int p = 0; p < pl; p++) {
             final Expr pred = preds[p];
-            final Pos pos = posExpr[p];
+            final ItrPos pos = posExpr[p];
             if(pos == null) {
               final Item tst = pred.test(qc, info);
               if(tst == null) return false;

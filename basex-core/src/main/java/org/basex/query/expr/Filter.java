@@ -48,8 +48,7 @@ public abstract class Filter extends Preds {
 
     // use simple filter for single deterministic predicate
     final Expr pred = preds[0];
-    if(preds.length == 1 && !(pred.has(Flag.CTX) || pred.has(Flag.NDT) || pred.has(Flag.HOF) ||
-        pred.has(Flag.UPD) || pred.has(Flag.POS))) return new SimpleFilter(info, root, preds);
+    if(preds.length == 1 && pred.isSimple()) return new SimpleFilter(info, root, preds);
 
     return new CachedFilter(info, root, preds);
   }
@@ -146,48 +145,60 @@ public abstract class Filter extends Preds {
     if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, preds));
 
     // evaluate positional predicates
-    Expr e = root;
+    Expr expr = root;
     boolean opt = false;
     for(final Expr pred : preds) {
-      final Pos pos = pred instanceof Pos ? (Pos) pred : null;
-      final boolean last = pred.isFunction(Function.LAST);
-
-      if(last) {
-        if(e.isValue()) {
+      Expr e = null;
+      if(pred.isFunction(Function.LAST)) {
+        if(expr.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) e, e.size(), 1);
+          e = FnSubsequence.eval((Value) expr, expr.size(), 1);
         } else {
-          // rewrite positional predicate to basex:last-from
-          e = cc.function(Function._UTIL_LAST_FROM, info, e);
+          // rewrite positional predicate to util:last-from
+          e = cc.function(Function._UTIL_LAST_FROM, info, expr);
         }
-        opt = true;
-      } else if(pos != null) {
-        if(e.isValue()) {
+      } else if(pred instanceof ItrPos) {
+        final ItrPos pos = (ItrPos) pred;
+        if(expr.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) e, pos.min, pos.max - pos.min + 1);
+          e = FnSubsequence.eval((Value) expr, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
-          // example: expr[pos] -> basex:item-at(expr, pos.min)
-          e = cc.function(Function._UTIL_ITEM_AT, info, e, Int.get(pos.min));
+          // example: expr[pos] -> util:item-at(expr, pos.min)
+          e = cc.function(Function._UTIL_ITEM_AT, info, expr, Int.get(pos.min));
         } else {
-          // example: expr[pos] -> basex:item-range(expr, pos.min, pos.max)
-          e = cc.function(Function._UTIL_ITEM_RANGE, info, e, Int.get(pos.min), Int.get(pos.max));
+          // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
+          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, Int.get(pos.min),
+              Int.get(pos.max));
         }
-        opt = true;
+      } else if(pred instanceof Pos) {
+        final Pos pos = (Pos) pred;
+        if(pos.exprs[0] == pos.exprs[1]) {
+          // example: expr[pos] -> util:item-at(expr, pos.min)
+          e = cc.function(Function._UTIL_ITEM_AT, info, expr, pos.exprs[0]);
+        } else {
+          // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
+          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, pos.exprs[0],
+              pos.exprs[1]);
+        }
       } else if(num(pred)) {
-        /* - rewrite positional predicate to basex:item-at
-         *   example: expr[pos] -> basex:item-at(expr, pos)
-         * - only choose deterministic and context-independent offsets.
-         *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = cc.function(Function._UTIL_ITEM_AT, info, e, pred);
+        /* - rewrite positional predicate to util:item-at
+         *   example: expr[pos] -> util:item-at(expr, pos)
+         * - only choose deterministic and context-independent offsets
+         *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
+        e = cc.function(Function._UTIL_ITEM_AT, info, expr, pred);
+      }
+
+      if(e != null) {
+        expr = e;
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
-        e = e instanceof Filter ? ((Filter) e).addPred(pred) : get(info, e, pred);
+        expr = expr instanceof Filter ? ((Filter) expr).addPred(pred) : get(info, expr, pred);
       }
     }
 
     // return optimized expression or standard iterator
-    return opt ? cc.replaceWith(this, e) : get(info, root, preds);
+    return opt ? cc.replaceWith(this, expr) : get(info, root, preds);
   }
 
   @Override

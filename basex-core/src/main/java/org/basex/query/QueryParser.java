@@ -1325,7 +1325,7 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     wsCheck(PAREN1);
     final Expr cond = check(expr(), NOSWITCH);
-    SwitchCase[] cases = { };
+    final ArrayList<SwitchGroups> groups = new ArrayList<>();
     wsCheck(PAREN2);
 
     // collect all cases
@@ -1335,15 +1335,15 @@ public class QueryParser extends InputParser {
       while(wsConsumeWs(CASE)) add(exprs, single());
       if(exprs.size() == 1) {
         // add default case
-        if(cases.length == 0) throw error(WRONGCHAR_X_X, CASE, found());
+        if(groups.isEmpty()) throw error(WRONGCHAR_X_X, CASE, found());
         wsCheck(DEFAULT);
       }
       wsCheck(RETURN);
       exprs.set(0, check(single(), NOSWITCH));
-      cases = Array.add(cases, new SwitchCase(info(), exprs.finish()));
+      groups.add(new SwitchGroups(info(), exprs.finish()));
     } while(exprs.size() != 1);
 
-    return new Switch(ii, cond, cases);
+    return new Switch(ii, cond, groups.toArray(new SwitchGroups[groups.size()]));
   }
 
   /**
@@ -3433,7 +3433,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Int.get(0), Int.get(Long.MAX_VALUE) };
+    final Expr[] occ = { Int.ZERO, Int.MAX };
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];

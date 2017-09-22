@@ -26,7 +26,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CmpSR extends Single {
-  /** Collation. */
+  /** Collation (can be {@code null}). */
   private final Collation coll;
   /** Minimum. */
   private final byte[] min;
@@ -46,7 +46,7 @@ final class CmpSR extends Single {
    * @param mni include minimum value
    * @param max maximum value
    * @param mxi include maximum value
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param info input info
    */
   private CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,

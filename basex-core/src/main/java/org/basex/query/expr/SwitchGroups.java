@@ -8,18 +8,18 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Single case of a switch expression.
+ * Switch case group (case ... case ... return ...).
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class SwitchCase extends Arr {
+public final class SwitchGroups extends Arr {
   /**
    * Constructor.
    * @param info input info
    * @param exprs return expression (placed first) and cases (default branch has 0 cases)
    */
-  public SwitchCase(final InputInfo info, final Expr... exprs) {
+  public SwitchGroups(final InputInfo info, final Expr... exprs) {
     super(info, exprs);
   }
 
@@ -46,7 +46,7 @@ public final class SwitchCase extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new SwitchCase(info, copyAll(cc, vm, exprs));
+    return new SwitchGroups(info, copyAll(cc, vm, exprs));
   }
 
   @Override

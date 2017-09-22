@@ -68,7 +68,7 @@ final class DOTData {
     { "CC6699", OrderBy.class },
     // red
     { "FF3333", Arith.class, CmpG.class, CmpN.class, CmpV.class, CmpR.class,
-                Pos.class, FTContains.class },
+                ItrPos.class, FTContains.class },
     { "FF6666", FTExpr.class, Try.class, Catch.class },
     // orange
     { "AA9988", StaticFunc.class },

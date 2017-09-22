@@ -37,10 +37,10 @@ public final class And extends Logical {
     final ExprList list = new ExprList(es);
     for(int i = 0; i < es; i++) {
       Expr e = exprs[i];
-      if(e instanceof Pos) {
+      if(e instanceof ItrPos) {
         // merge adjacent numeric predicates
-        while(i + 1 < es && exprs[i + 1] instanceof Pos) {
-          e = ((Pos) e).intersect((Pos) exprs[++i], info);
+        while(i + 1 < es && exprs[i + 1] instanceof ItrPos) {
+          e = ((ItrPos) e).intersect((ItrPos) exprs[++i], info);
         }
       } else if(e instanceof CmpR) {
         // merge adjacent range comparisons

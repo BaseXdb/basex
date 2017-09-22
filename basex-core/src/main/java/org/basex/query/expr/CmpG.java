@@ -120,7 +120,7 @@ public final class CmpG extends Cmp {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param sc static context
    * @param info input info
    */
@@ -156,7 +156,8 @@ public final class CmpG extends Cmp {
       e = compStringLength(op.op, cc);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number(s)
-      e = Pos.get(op.op, e2, this, info);
+      e = ItrPos.get(op.op, e2, this, info);
+      if(e == this) e = Pos.get(op.op, e2, this, info, cc);
     } else if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)

@@ -217,7 +217,10 @@ public final class SimpleTest extends QueryTest {
       // #1140
       { "Pred 1", empty(), "declare function local:test() {" +
           "for $n in (1, 1) return <_><c/><w/></_>/*[$n[1]] }; local:test()/self::w" },
-      { "Pred 2", empty(), "for $n in (2,2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" }
+      { "Pred 2", empty(), "for $n in (2,2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" },
+      { "Pred 3", strings("XML"), "(('XML')[1])[1]" },
+      { "Pred 4", integers(1), "1[position() = 1 to 2]" },
+      { "Pred 5", integers(1), "1[position() = (1,2)]" },
     };
   }
 }

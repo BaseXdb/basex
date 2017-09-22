@@ -248,7 +248,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks how often a variable is used in this expression.
-   * This function is e.g. called by {@link SwitchCase#countCases} or (indirectly)
+   * This function is e.g. called by {@link SwitchGroups#countCases} or (indirectly)
    * {@link GFLWOR#inlineLets}.
    * @param var variable to look for
    * @return how often the variable is used, see {@link VarUsage}
@@ -372,6 +372,14 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public boolean isFunction(final Function func) {
     return false;
+  }
+
+  /**
+   * Checks if this is a simple expression.
+   * @return result of check
+   */
+  public boolean isSimple() {
+    return !(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) || has(Flag.POS));
   }
 
   /**

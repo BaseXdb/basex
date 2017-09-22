@@ -295,7 +295,7 @@ public abstract class Path extends ParseExpr {
       final Step s = axisStep(i);
       if(s == null || i < 2 && EXPENSIVE.contains(s.axis)) return false;
       final Expr[] ps = s.preds;
-      if(!(ps.length == 0 || ps.length == 1 && ps[0] instanceof Pos)) return false;
+      if(!(ps.length == 0 || ps.length == 1 && ps[0] instanceof ItrPos)) return false;
     }
     return true;
   }

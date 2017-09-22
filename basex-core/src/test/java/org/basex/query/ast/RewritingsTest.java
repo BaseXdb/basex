@@ -223,4 +223,38 @@ public final class RewritingsTest extends QueryPlanTest {
     check("if(<x>1</x> = 1) then 2 else collection('http://abc.de/')", "2",
         "exists(//" + Util.className(FnCollection.class) + ')');
   }
+
+  /**
+   * Positional predicates.
+   */
+  @Test
+  public void pos() {
+    check("'a'[1]", "a", "exists(//Str)");
+    check("'a'[position() = 1]", "a", "exists(QueryPlan/Str)");
+    check("'a'[position() = 1 to 2]", "a", "exists(QueryPlan/Str)");
+    check("'a'[position() > 0]", "a", "exists(QueryPlan/Str)");
+    check("'a'[position() < 2]", "a", "exists(QueryPlan/Str)");
+    check("'a'[position() >= 1]", "a", "exists(QueryPlan/Str)");
+    check("'a'[position() <= 1]", "a", "exists(QueryPlan/Str)");
+
+    check("for $i in (1,2) return ('a')[position() = $i]", "a", "exists(//UtilItemAt)");
+    check("for $i in (1,2) return ('a')[position() = $i to $i]", "a", "exists(//UtilItemAt)");
+    check("for $i in (1,2) return ('a')[position() = $i to $i+1]", "a", "exists(//UtilItemRange)");
+    check("for $i in (1,2) return ('a')[position() = $i to 1]", "a", "exists(//UtilItemRange)");
+    check("for $i in (1,2) return ('a')[position() >= $i]", "a", "exists(//UtilItemRange)");
+    check("for $i in (1,2) return ('a')[position() > $i]", "", "exists(//UtilItemRange)");
+    check("for $i in (1,2) return ('a')[position() <= $i]", "a\na", "exists(//UtilItemRange)");
+    check("for $i in (1,2) return ('a')[position() < $i]", "a", "exists(//UtilItemRange)");
+
+    final String seq = " (1, 1.1, 1.9, 2) ";
+    check("for $i in" + seq + "return ('a','b')[position() = $i]", "a\nb", "exists(//UtilItemAt)");
+    check("for $i in" + seq + "return ('a','b')[position() >= $i]", "a\nb\nb\nb\nb",
+        "exists(//UtilItemRange)");
+    check("for $i in" + seq + "return ('a','b')[position() > $i]", "b\nb\nb",
+        "exists(//UtilItemRange)");
+    check("for $i in" + seq + "return ('a','b')[position() <= $i]", "a\na\na\na\nb",
+        "exists(//UtilItemRange)");
+    check("for $i in" + seq + "return ('a','b')[position() < $i]", "a\na\na",
+        "exists(//UtilItemRange)");
+  }
 }

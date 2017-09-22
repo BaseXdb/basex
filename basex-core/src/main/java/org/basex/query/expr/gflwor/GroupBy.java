@@ -334,7 +334,7 @@ public final class GroupBy extends Clause {
     public final Var var;
     /** Occlusion flag, {@code true} if another grouping variable shadows this one. */
     public boolean occluded;
-    /** Collation. */
+    /** Collation (can be {@code null}). */
     private final Collation coll;
 
     /**
@@ -343,7 +343,7 @@ public final class GroupBy extends Clause {
      * @param info input info
      * @param var grouping variable
      * @param expr grouping expression
-     * @param coll collation
+     * @param coll collation (can be {@code null})
      */
     public Spec(final InputInfo info, final Var var, final Expr expr, final Collation coll) {
       super(info, expr);

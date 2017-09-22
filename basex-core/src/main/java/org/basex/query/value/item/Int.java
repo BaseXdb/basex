@@ -17,6 +17,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Int extends ANum {
+  /** Maximum values. */
+  public static final Int MAX;
+  /** Value 0. */
+  public static final Int ZERO;
+  /** Value 1. */
+  public static final Int ONE;
+
   /** Constant values. */
   private static final Int[] INTSS;
   /** Integer value. */
@@ -27,6 +34,9 @@ public final class Int extends ANum {
     final int nl = 128;
     INTSS = new Int[nl];
     for(int n = 0; n < nl; n++) INTSS[n] = new Int(n);
+    MAX = Int.get(Long.MAX_VALUE);
+    ZERO = INTSS[0];
+    ONE = INTSS[1];
   }
 
   /**

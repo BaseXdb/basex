@@ -43,7 +43,7 @@ public final class FnSum extends Aggr {
     if(it != null) return sum(iter, it, false, qc);
 
     // return default item
-    return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.get(0);
+    return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.ZERO;
   }
 
   @Override
@@ -55,7 +55,7 @@ public final class FnSum extends Aggr {
     // pre-evaluate 0 results (skip non-deterministic and variable expressions)
     Expr expr = this;
     if(e1.size() == 0 && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) && !(e1 instanceof VarRef)) {
-      if(e2 == Empty.SEQ) expr = Int.get(0);
+      if(e2 == Empty.SEQ) expr = Int.ZERO;
       else if(e2 instanceof ANum || e2 instanceof Dur) expr = e2;
     }
     return expr;

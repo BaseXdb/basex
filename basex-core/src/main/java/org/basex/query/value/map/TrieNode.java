@@ -232,7 +232,7 @@ abstract class TrieNode {
    * Compares two values.
    * @param a first value
    * @param b second value
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param ii input info
    * @return {@code true} if both values are deep equal, {@code false} otherwise
    * @throws QueryException query exception

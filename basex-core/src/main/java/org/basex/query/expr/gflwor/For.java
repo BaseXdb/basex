@@ -163,7 +163,7 @@ public final class For extends ForLet {
     if(expr.size() != 1 && !expr.seqType().one()) return false;
     clauses.set(p, Let.fromFor(this));
     if(score != null) clauses.add(p + 1, Let.fromForScore(this));
-    if(pos != null) clauses.add(p + 1, new Let(pos, Int.get(1), false));
+    if(pos != null) clauses.add(p + 1, new Let(pos, Int.ONE, false));
     return true;
   }
 

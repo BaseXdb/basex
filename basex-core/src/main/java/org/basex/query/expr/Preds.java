@@ -77,10 +77,9 @@ public abstract class Preds extends ParseExpr {
         final Cmp cmp = (Cmp) pred;
         final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
         if(e1.isFunction(Function.POSITION)) {
-          final SeqType st2 = e2.seqType();
           // position() = last() -> last()
           // position() = $n (xs:numeric) -> $n
-          if(st2.one() && st2.type.isNumber()) {
+          if(num(e2)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
               cc.info(OPTSIMPLE_X, pred);
@@ -106,21 +105,18 @@ public abstract class Preds extends ParseExpr {
       } else if(pred instanceof ANum) {
         final ANum it = (ANum) pred;
         final long l = it.itr();
-        // example: ....[position() = 1.2]
+        // example: ....[1.2]
         if(l != it.dbl()) return cc.emptySeq(this);
-        pred = Pos.get(l, info);
-        // example: ....[position() = 0]
-        if(!(pred instanceof Pos)) return cc.emptySeq(this);
+        pred = ItrPos.get(l, info);
+        // example: ....[0]
+        if(!(pred instanceof ItrPos)) return cc.emptySeq(this);
         preds[p] = pred;
       } else if(pred.isValue()) {
-        if(pred.ebv(cc.qc, info).bool(info)) {
-          // example: ....[true()]
-          cc.info(OPTREMOVE_X_X, description(), pred);
-          preds = Array.delete(preds, p--);
-        } else {
-          // example: ....[false()]
-          return cc.emptySeq(this);
-        }
+        // always false: ....[false()]
+        if(!pred.ebv(cc.qc, info).bool(info)) return cc.emptySeq(this);
+        // always true: ....[true()]
+        cc.info(OPTREMOVE_X_X, description(), pred);
+        preds = Array.delete(preds, p--);
       }
     }
     return this;
@@ -140,8 +136,8 @@ public abstract class Preds extends ParseExpr {
       if(pred.isFunction(Function.LAST)) {
         // use minimum of old value and 1
         max = Math.min(max, 1);
-      } else if(pred instanceof Pos) {
-        final Pos pos = (Pos) pred;
+      } else if(pred instanceof ItrPos) {
+        final ItrPos pos = (ItrPos) pred;
         // subtract start position. example: ...[1 to 2][2] -> (2 ->) 1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
         // use minimum of old value and range. example: ...[1 to 5] -> 5
@@ -248,8 +244,7 @@ public abstract class Preds extends ParseExpr {
    */
   protected static boolean num(final Expr expr) {
     final SeqType st = expr.seqType();
-    return st.type.isNumber() && st.zeroOrOne() &&
-        !expr.has(Flag.CTX) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD);
+    return st.type.isNumber() && st.zeroOrOne() && expr.isSimple();
   }
 
   @Override

@@ -60,7 +60,7 @@ abstract class BinFn extends StandardFunc {
     final int bl = bytes.length;
     final int[] bounds = bounds(off, sz, bl);
     final int o = bounds[0], l = Math.min(8, bounds[1]);
-    if(l == 0) return Int.get(0);
+    if(l == 0) return Int.ZERO;
 
     // place input data in long byte array, consider sign
     final byte[] tmp = new byte[8];

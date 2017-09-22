@@ -87,7 +87,7 @@ public final class ExprList extends ElementList {
    * @return result of check
    */
   public boolean contains(final Expr element) {
-    for(int i = 0; i < size; ++i) if(list[i].sameAs(element)) return true;
+    for(int i = 0; i < size; ++i) if(list[i] == element) return true;
     return false;
   }
 
