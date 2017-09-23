@@ -35,24 +35,28 @@ public final class Or extends Logical {
 
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
-    for(int i = 0; i < es; i++) {
-      Expr e = exprs[i];
-      if(e instanceof CmpG) {
+    for(int e = 0; e < es; e++) {
+      // skip identical expressions
+      Expr expr = exprs[e];
+      while(!(has(Flag.NDT) || has(Flag.UPD)) && e + 1 < es && exprs[e + 1].sameAs(exprs[e]))
+        expr = exprs[++e];
+
+      if(expr instanceof CmpG) {
         // merge adjacent comparisons
-        while(i + 1 < es && exprs[i + 1] instanceof CmpG) {
-          final Expr tmp = ((CmpG) e).union((CmpG) exprs[i + 1], cc);
+        while(e + 1 < es && exprs[e + 1] instanceof CmpG) {
+          final Expr tmp = ((CmpG) expr).union((CmpG) exprs[e + 1], cc);
           if(tmp != null) {
-            e = tmp;
-            i++;
+            expr = tmp;
+            e++;
           } else {
             break;
           }
         }
       }
       // expression will always return true
-      if(e == Bln.TRUE) return cc.replaceWith(this, Bln.TRUE);
+      if(expr == Bln.TRUE) return cc.replaceWith(this, Bln.TRUE);
       // skip expression yielding false
-      if(e != Bln.FALSE) list.add(e);
+      if(expr != Bln.FALSE) list.add(expr);
     }
 
     // all arguments return false

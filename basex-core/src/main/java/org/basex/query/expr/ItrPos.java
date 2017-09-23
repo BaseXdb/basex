@@ -130,8 +130,7 @@ public final class ItrPos extends Simple {
   }
 
   /**
-   * Creates an intersection of the existing and the specified position
-   * expressions.
+   * Creates an intersection of the existing and the specified position expressions.
    * @param pos second position expression
    * @param ii input info
    * @return resulting expression

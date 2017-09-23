@@ -35,31 +35,47 @@ public final class And extends Logical {
 
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
-    for(int i = 0; i < es; i++) {
-      Expr e = exprs[i];
-      if(e instanceof ItrPos) {
-        // merge adjacent numeric predicates
-        while(i + 1 < es && exprs[i + 1] instanceof ItrPos) {
-          e = ((ItrPos) e).intersect((ItrPos) exprs[++i], info);
+    for(int e = 0; e < es; e++) {
+      // skip identical expressions
+      Expr expr = exprs[e];
+      while(!(has(Flag.NDT) || has(Flag.UPD)) && e + 1 < es && exprs[e + 1].sameAs(exprs[e]))
+        expr = exprs[++e];
+
+      if(expr instanceof ItrPos) {
+        // merge adjacent positional predicates
+        while(e + 1 < es && exprs[e + 1] instanceof ItrPos) {
+          expr = ((ItrPos) expr).intersect((ItrPos) exprs[e + 1], info);
+          e++;
         }
-      } else if(e instanceof CmpR) {
-        // merge adjacent range comparisons
-        while(i + 1 < es && exprs[i + 1] instanceof CmpR) {
-          final Expr tmp = ((CmpR) e).intersect((CmpR) exprs[i + 1]);
+      } else if(expr instanceof Pos) {
+        // merge adjacent positional predicates
+        while(e + 1 < es && exprs[e + 1] instanceof Pos) {
+          final Expr tmp = ((Pos) expr).intersect((Pos) exprs[e + 1], info);
           if(tmp != null) {
-            e = tmp;
-            i++;
+            expr = tmp;
+            e++;
           } else {
             break;
           }
         }
-      } else if(e instanceof CmpSR) {
-        // merge adjacent string range comparisons
-        while(i + 1 < es && exprs[i + 1] instanceof CmpSR) {
-          final Expr tmp = ((CmpSR) e).intersect((CmpSR) exprs[i + 1]);
+      } else if(expr instanceof CmpR) {
+        // merge adjacent range comparisons
+        while(e + 1 < es && exprs[e + 1] instanceof CmpR) {
+          final Expr tmp = ((CmpR) expr).intersect((CmpR) exprs[e + 1]);
           if(tmp != null) {
-            e = tmp;
-            i++;
+            expr = tmp;
+            e++;
+          } else {
+            break;
+          }
+        }
+      } else if(expr instanceof CmpSR) {
+        // merge adjacent string range comparisons
+        while(e + 1 < es && exprs[e + 1] instanceof CmpSR) {
+          final Expr tmp = ((CmpSR) expr).intersect((CmpSR) exprs[e + 1]);
+          if(tmp != null) {
+            expr = tmp;
+            e++;
           } else {
             break;
           }
@@ -67,9 +83,9 @@ public final class And extends Logical {
       }
 
       // expression will always return false
-      if(e == Bln.FALSE) return cc.replaceWith(this, Bln.FALSE);
+      if(expr == Bln.FALSE) return cc.replaceWith(this, Bln.FALSE);
       // skip expression yielding true
-      if(e != Bln.TRUE) list.add(e);
+      if(expr != Bln.TRUE) list.add(expr);
     }
 
     // all arguments return true

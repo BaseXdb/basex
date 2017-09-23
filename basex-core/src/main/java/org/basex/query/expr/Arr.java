@@ -91,6 +91,19 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
+   * Checks if the specified expression has the same expressions.
+   * @param arr expression to be checked
+   * @return result of check
+   */
+  protected final boolean sameAs(final Arr arr) {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      if(!exprs[e].sameAs(arr.exprs[e])) return false;
+    }
+    return true;
+  }
+
+  /**
    * Returns true if at least one argument returns the empty sequence.
    * @return result of check
    */
