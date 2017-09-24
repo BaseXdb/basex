@@ -39,18 +39,6 @@
             <artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>http2-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-alpn-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>http2-server</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.ettrema</groupId>
             <artifactId>milton-api</artifactId>
         </dependency>
@@ -114,9 +102,6 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.4.6.v20170531</version>
                 <configuration>
-                    <jvmArgs>
-                        -Xbootclasspath/p:${basedir}/alpn-boot-8.1.11.v20170118.jar
-                    </jvmArgs>
                     <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml
                     </jettyXml>
                     <stopKey>keyToStopJetty</stopKey>
@@ -137,12 +122,6 @@
                 <artifactId>javax.servlet-api</artifactId>
                 <version>3.1.0</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty.alpn</groupId>
-                <artifactId>alpn-boot</artifactId>
-                <version>${alpn-version}</version>
-                <scope>runtime</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

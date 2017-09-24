@@ -245,55 +245,10 @@
                 <Set name="acceptQueueSize">
                     <Property name="jetty.ssl.acceptQueueSize" deprecated="ssl.acceptQueueSize" default="0" />
                 </Set>
-                <!-- alpn-connector -->
-                <Call name="addConnectionFactory">
-                    <Arg>
-                        <New class="org.eclipse.jetty.server.SslConnectionFactory">
-                            <Arg name="next">alpn</Arg>
-                            <Arg name="sslContextFactory">
-                                <Ref refid="sslContextFactory" />
-                            </Arg>
-                        </New>
-                    </Arg>
-                </Call>
-                <Call name="addConnectionFactory">
-                    <Arg>
-                        <New id="alpn" class="org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory">
-                            <Arg type="String">
-                                <Property name="jetty.alpn.protocols" deprecated="alpn.protocols" default="" />
-                            </Arg>
-                            <Set name="defaultProtocol">
-                                <Property name="h2" deprecated="alpn.defaultProtocol" />
-                            </Set>
-                        </New>
-                    </Arg>
-                </Call>
-                <Call name="addConnectionFactory">
-                    <Arg>
-                        <New class="org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory">
-                            <Arg name="config">
-                                <Ref refid="sslHttpConfig" />
-                            </Arg>
-                            <Set name="maxConcurrentStreams">
-                                <Property name="jetty.http2.maxConcurrentStreams" deprecated="http2.maxConcurrentStreams" default="1024" />
-                            </Set>
-                            <Set name="initialStreamRecvWindow">
-                                <Property name="jetty.http2.initialStreamRecvWindow" deprecated="jetty.http2.initialStreamSendWindow" default="65535" />
-                            </Set>
-                        </New>
-                    </Arg>
-                </Call>
-                <Ref refid="sslContextFactory">
-                    <Set name="CipherComparator">
-                        <Get class="org.eclipse.jetty.http2.HTTP2Cipher" name="COMPARATOR" />
-                    </Set>
-                    <Set name="useCipherSuitesOrder">true</Set>
-                </Ref>
-
                 <Call name="addIfAbsentConnectionFactory">
                     <Arg>
                         <New class="org.eclipse.jetty.server.SslConnectionFactory">
-                            <Arg name="next">http1.1</Arg>
+                            <Arg name="next">http/1.1</Arg>
                             <Arg name="sslContextFactory">
                                 <Ref refid="sslContextFactory" />
                             </Arg>
