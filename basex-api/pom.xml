@@ -122,48 +122,6 @@
                     <stopKey>keyToStopJetty</stopKey>
                     <stopPort>8985</stopPort>
                 </configuration>
-                <dependencies>
-                	<dependency>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-server</artifactId>
-                        <version>9.4.6.v20170531</version>
-                    </dependency>
-                 	<dependency>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-servlet</artifactId>
-                        <version>9.4.6.v20170531</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-servlets</artifactId>
-                        <version>9.4.6.v20170531</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-webapp</artifactId>
-                        <version>9.4.6.v20170531</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.jetty.http2</groupId>
-                        <artifactId>http2-common</artifactId>
-                        <version>9.4.6.v20170531</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-alpn-server</artifactId>
-                        <version>9.4.6.v20170531</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.eclipse.jetty.http2</groupId>
-                        <artifactId>http2-server</artifactId>
-                        <version>9.4.6.v20170531</version>
-                    </dependency>
-                    <dependency>
-			            <groupId>org.basex</groupId>
-			            <artifactId>basex</artifactId>
-			            <version>8.6.5-SNAPSHOT</version>
-			        </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
