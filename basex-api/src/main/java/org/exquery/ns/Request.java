@@ -256,7 +256,6 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Str cookie(final Str key) throws QueryException {
-
     return cookie(key, null);
   }
 
