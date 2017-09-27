@@ -22,39 +22,7 @@
 <!-- configuration that may be set here.                             -->
 <!-- =============================================================== -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-    <!-- =========================================================== -->
-    <!-- Configure the Server Thread Pool.                           -->
-    <!-- The server holds a common thread pool which is used by      -->
-    <!-- default as the executor used by all connectors and servlet  -->
-    <!-- dispatches.                                                 -->
-    <!--                                                             -->
-    <!-- Configuring a fixed thread pool is vital to controlling the -->
-    <!-- maximal memory footprint of the server and is a key tuning  -->
-    <!-- parameter for tuning.  In an application that rarely blocks -->
-    <!-- then maximal threads may be close to the number of 5*CPUs.  -->
-    <!-- In an application that frequently blocks, then maximal      -->
-    <!-- threads should be set as high as possible given the memory  -->
-    <!-- available.                                                  -->
-    <!--                                                             -->
-    <!-- Consult the javadoc of o.e.j.util.thread.QueuedThreadPool   -->
-    <!-- for all configuration that may be set here.                 -->
-    <!-- =========================================================== -->
-    <!--Arg name="threadpool">
-        <New id="threadpool" class="org.eclipse.jetty.util.thread.QueuedThreadPool">
-            <Arg name="minThreads" type="int">10</Arg>
-            <Arg name="maxThreads" type="int">200</Arg>
-            <Arg name="idleTimeout" type="int">60000</Arg>
-            <Set name="detailedDump">false</Set>
-        </New>
-    </Arg-->
-    <!-- =========================================================== -->
-    <!-- Add shared Scheduler instance                               -->
-    <!-- =========================================================== -->
-    <Call name="addBean">
-        <Arg>
-            <New class="org.eclipse.jetty.util.thread.ScheduledExecutorScheduler" />
-        </Arg>
-    </Call>
+
     <!-- =========================================================== -->
     <!-- Http Configuration.                                         -->
     <!-- This is a common configuration instance used by all         -->
@@ -81,11 +49,6 @@
         <Set name="sendServerVersion">true</Set>
         <Set name="sendDateHeader">false</Set>
         <Set name="headerCacheSize">512</Set>
-        <!-- Uncomment to enable handling of X-Forwarded- style headers
-      <Call name="addCustomizer">
-        <Arg><New class="org.eclipse.jetty.server.ForwardedRequestCustomizer"/></Arg>
-      </Call>
-      -->
     </New>
     <!-- =========================================================== -->
     <!-- Set the default handler structure for the Server            -->
@@ -146,14 +109,15 @@
             </New>
         </Arg>
     </Call>
+    <!-- 
     <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
         <Set name="KeyStorePath">
             <Property name="jetty.home" default="." />/src/main/webapp/WEB-INF/keystore</Set>
-        <Set name="KeyStorePassword" type="String">123456</Set>
-        <Set name="KeyManagerPassword" type="String">123456</Set>
+        <Set name="KeyStorePassword" type="String">?????</Set>
+        <Set name="KeyManagerPassword" type="String">?????</Set>
         <Set name="TrustStorePath">
             <Property name="jetty.home" default="." />/src/main/webapp/WEB-INF/keystore</Set>
-        <Set name="TrustStorePassword">123456</Set>
+        <Set name="TrustStorePassword">?????</Set>
         <Set name="IncludeCipherSuites">
             <Array type="String">
                 <Item>TLS_DHE_RSA.*</Item>
@@ -177,13 +141,14 @@
                 <Item>SSLv2HelloItem</Item>
             </Array>
         </Set>
-    </New>
+    </New>  -->
     <!-- =========================================================== -->
     <!-- Create a TLS specific HttpConfiguration based on the        -->
     <!-- common HttpConfiguration defined in jetty.xml               -->
     <!-- Add a SecureRequestCustomizer to extract certificate and    -->
     <!-- session information                                         -->
     <!-- =========================================================== -->
+    <!--
     <New id="sslHttpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
         <Arg>
             <Ref refid="httpConfig" />
@@ -203,10 +168,11 @@
                 </New>
             </Arg>
         </Call>
-    </New>
+    </New> -->
     <!-- =========================================================== -->
     <!-- Add SSL Connector with protocol factories              -->
     <!-- =========================================================== -->
+    <!--
     <Call name="addConnector">
         <Arg>
             <New id="sslConnector" class="org.eclipse.jetty.server.ServerConnector">
@@ -218,14 +184,6 @@
                 </Arg>
                 <Arg name="selectors" type="int">
                     <Property name="jetty.ssl.selectors" deprecated="ssl.selectors" default="-1" />
-                </Arg>
-                <Arg name="factories">
-                    <Array type="org.eclipse.jetty.server.ConnectionFactory">
-                        <!-- uncomment to support proxy protocol
-                                <Item>
-                                  <New class="org.eclipse.jetty.server.ProxyConnectionFactory"/>
-                                </Item>-->
-                    </Array>
                 </Arg>
                 <Set name="host">
                     <Property name="jetty.ssl.host" deprecated="jetty.host" />
@@ -274,4 +232,5 @@
             </New>
         </Arg>
     </Call>
+    -->
 </Configure>
