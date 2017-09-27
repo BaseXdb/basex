@@ -202,7 +202,7 @@ public final class FuncItem extends FItem implements Scope {
     cc.info(OPTINLINE_X, this);
 
     // create let bindings for all variables
-    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
+    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {

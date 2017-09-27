@@ -265,7 +265,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     cc.info(OPTINLINE_X, this);
     // create let bindings for all variables
     final LinkedList<Clause> cls =
-        exprs.length == 0 && global.isEmpty() ? null : new LinkedList<Clause>();
+        exprs.length == 0 && global.isEmpty() ? null : new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {

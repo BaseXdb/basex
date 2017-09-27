@@ -255,7 +255,7 @@ public class Options implements Iterable<Option<?>> {
    * @param <O> options
    * @return value
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "cast"})
   public final synchronized <O extends Options> O get(final OptionsOption<O> option) {
     return (O) get((Option<?>) option);
   }
@@ -266,7 +266,7 @@ public class Options implements Iterable<Option<?>> {
    * @param <V> enumeration value
    * @return value
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "cast"})
   public final synchronized <V extends Enum<V>> V get(final EnumOption<V> option) {
     return (V) get((Option<?>) option);
   }

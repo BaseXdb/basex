@@ -276,7 +276,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     cc.info(OPTINLINE_X, id());
 
     // create let bindings for all variables
-    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
+    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<>();
     final IntObjMap<Var> vars = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
