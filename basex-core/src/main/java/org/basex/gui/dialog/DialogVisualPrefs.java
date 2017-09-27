@@ -135,6 +135,7 @@ final class DialogVisualPrefs extends BaseXBack {
     mapWeight.assign();
     mapAlgo.assign();
     mapOffsets.assign();
+    scale.assign();
     gui.gopts.set(GUIOptions.LOOKANDFEEL, classes.get(lookfeel.getSelectedIndex()));
     return true;
   }
