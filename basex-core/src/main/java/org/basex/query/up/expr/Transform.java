@@ -120,6 +120,25 @@ public final class Transform extends Arr {
   }
 
   @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, copies) && super.accept(visitor);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Let copy : copies) sz += copy.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
+    return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Transform && Array.equals(copies, ((Transform) obj).copies)
+        && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), copies, exprs);
   }
@@ -131,18 +150,5 @@ public final class Transform extends Arr {
       sb.append(copy.var).append(' ').append(ASSIGN).append(' ').append(copy.expr).append(' ');
     return sb.append(MODIFY + ' ').append(exprs[0]).append(' ').append(RETURN).append(' ').
       append(exprs[1]).toString();
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, copies) && super.accept(visitor);
-  }
-
-  @Override
-  public int exprSize() {
-    int sz = 1;
-    for(final Let copy : copies) sz += copy.exprSize();
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
   }
 }

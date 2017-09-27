@@ -51,6 +51,11 @@ public final class CComm extends CNode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CComm && super.equals(obj);
+  }
+
+  @Override
   public String description() {
     return info(COMMENT);
   }

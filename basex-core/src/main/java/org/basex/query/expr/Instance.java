@@ -53,6 +53,12 @@ public final class Instance extends Single {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Instance && type.eq(((Instance) obj).type) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(TYP, type), expr);
   }

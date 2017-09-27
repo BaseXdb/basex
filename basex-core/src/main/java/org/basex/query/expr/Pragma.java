@@ -59,16 +59,27 @@ public abstract class Pragma extends ExprInfo {
    */
   public abstract boolean has(Flag flag);
 
+  /**
+   * Creates a copy of this pragma.
+   * @return copy
+   */
+  public abstract Pragma copy();
+
+  /**
+   * {@inheritDoc}
+   * Must be overwritten by implementing class.
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof Pragma)) return false;
+    final Pragma p = (Pragma) obj;
+    return name.eq(p.name) && Token.eq(value, p.value);
+  }
+
   @Override
   public final String toString() {
     final TokenBuilder tb = new TokenBuilder(PRAGMA + ' ' + name + ' ');
     if(value.length != 0) tb.add(value).add(' ');
     return tb.add(PRAGMA2).toString();
   }
-
-  /**
-   * Creates a copy of this pragma.
-   * @return copy
-   */
-  public abstract Pragma copy();
 }

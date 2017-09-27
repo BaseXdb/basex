@@ -137,20 +137,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr, catches);
-  }
-
-  @Override
   public void markTailCalls(final CompileContext cc) {
     for(final Catch c : catches) c.markTailCalls(cc);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("try { " + expr + " }");
-    for(final Catch c : catches) sb.append(' ').append(c);
-    return sb.toString();
   }
 
   @Override
@@ -163,5 +151,23 @@ public final class Try extends Single {
     int sz = 1;
     for(final Expr e : catches) sz += e.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Try && Array.equals(catches, ((Try) obj).catches) &&
+        super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), expr, catches);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("try { " + expr + " }");
+    for(final Catch c : catches) sb.append(' ').append(c);
+    return sb.toString();
   }
 }

@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -114,7 +113,7 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Uln && value.compareTo(((Uln) cmp).value) == 0;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Uln && value.compareTo(((Uln) obj).value) == 0;
   }
 }

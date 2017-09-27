@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {
-  /** String data. */
+  /** String data (can be {@code null}). */
   byte[] value;
 
   /**
@@ -54,5 +54,13 @@ public abstract class AStr extends Item {
       throws QueryException {
     return coll == null ? Token.diff(string(ii), it.string(ii)) :
       coll.compare(string(ii), it.string(ii));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof AStr)) return false;
+    final AStr a = (AStr) obj;
+    return type == a.type && Token.eq(value, a.value);
   }
 }

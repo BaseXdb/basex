@@ -130,21 +130,6 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    for(final Key key : keys) key.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(ORDER).append(' ').append(BY);
-    final int kl = keys.length;
-    for(int k = 0; k < kl; k++) sb.append(k == 0 ? " " : SEP).append(keys[k]);
-    return sb.toString();
-  }
-
-  @Override
   public boolean has(final Flag flag) {
     for(final Key key : keys) if(key.has(flag)) return true;
     return false;
@@ -205,7 +190,6 @@ public final class OrderBy extends Clause {
       for(final VarRef ref : refs) if(ref.var.id == id) continue outer;
       refs = Array.add(refs, new VarRef(info, decl.get(id)));
     }
-
     return true;
   }
 
@@ -229,6 +213,29 @@ public final class OrderBy extends Clause {
     for(final Expr e : refs) sz += e.exprSize();
     for(final Expr e : keys) sz += e.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof OrderBy)) return false;
+    final OrderBy o = (OrderBy) obj;
+    return Array.equals(refs, o.refs) && Array.equals(keys, o.keys);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    for(final Key key : keys) key.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(ORDER).append(' ').append(BY);
+    final int kl = keys.length;
+    for(int k = 0; k < kl; k++) sb.append(k == 0 ? " " : SEP).append(keys[k]);
+    return sb.toString();
   }
 
   /**
@@ -267,6 +274,19 @@ public final class OrderBy extends Clause {
     }
 
     @Override
+    public int exprSize() {
+      return expr.exprSize();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if(this == obj) return true;
+      if(!(obj instanceof Key)) return false;
+      final Key k = (Key) obj;
+      return desc == k.desc && least == k.least && Array.equals(coll, k.coll) && super.equals(obj);
+    }
+
+    @Override
     public void plan(final FElem plan) {
       final FElem e = planElem(DIR, Token.token(desc ? DESCENDING : ASCENDING),
           Token.token(EMPTYORD), Token.token(least ? LEAST : GREATEST));
@@ -281,11 +301,6 @@ public final class OrderBy extends Clause {
       tb.add(' ').add(EMPTYORD).add(' ').add(least ? LEAST : GREATEST);
       if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
       return tb.toString();
-    }
-
-    @Override
-    public int exprSize() {
-      return expr.exprSize();
     }
   }
 }

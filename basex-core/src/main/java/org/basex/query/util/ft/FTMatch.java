@@ -2,7 +2,6 @@ package org.basex.query.util.ft;
 
 import java.util.*;
 
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -11,10 +10,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class FTMatch extends ElementList implements Iterable<FTStringMatch> {
-  /** String matches. */
-  FTStringMatch[] match;
-
+public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
   /**
    * Constructor.
    */
@@ -27,28 +23,7 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
    * @param capacity initial array capacity
    */
   public FTMatch(final int capacity) {
-    match = new FTStringMatch[capacity];
-  }
-
-  /**
-   * Adds all matches of a full-text match.
-   * @param ftm match to be added
-   * @return self reference
-   */
-  public FTMatch add(final FTMatch ftm) {
-    for(final FTStringMatch sm : ftm) add(sm);
-    return this;
-  }
-
-  /**
-   * Adds a single string match.
-   * @param ftm match to be added
-   * @return self reference
-   */
-  public FTMatch add(final FTStringMatch ftm) {
-    if(size == match.length) match = Array.copy(match, new FTStringMatch[newSize()]);
-    match[size++] = ftm;
-    return this;
+    super(new FTStringMatch[capacity]);
   }
 
   /**
@@ -76,20 +51,11 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
    * Sorts the matches by their start and end positions.
    */
   public void sort() {
-    Arrays.sort(match, 0, size, null);
+    Arrays.sort(list, 0, size, null);
   }
 
   @Override
-  public Iterator<FTStringMatch> iterator() {
-    return new ArrayIterator<>(match, size);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final FTStringMatch s : this) {
-      sb.append(sb.length() == 0 ? "" : ", ").append(s);
-    }
-    return Util.className(this) + ' ' + sb;
+  protected FTStringMatch[] newList(final int s) {
+    return new FTStringMatch[s];
   }
 }

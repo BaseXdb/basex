@@ -75,8 +75,8 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof ContextValue;
+  public boolean equals(final Object obj) {
+    return obj instanceof ContextValue;
   }
 
   @Override

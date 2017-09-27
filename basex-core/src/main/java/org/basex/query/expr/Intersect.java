@@ -15,13 +15,13 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class InterSect extends Set {
+public final class Intersect extends Set {
   /**
    * Constructor.
    * @param info input info
    * @param exprs expressions
    */
-  public InterSect(final InputInfo info, final Expr[] exprs) {
+  public Intersect(final InputInfo info, final Expr[] exprs) {
     super(info, exprs);
   }
 
@@ -32,24 +32,22 @@ public final class InterSect extends Set {
   }
 
   @Override
-  protected ANodeList eval(final Iter[] iters, final QueryContext qc) throws QueryException {
-    ANodeList list = new ANodeList();
-
+  protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
+    ANodeBuilder list = new ANodeBuilder();
     for(Item it; (it = iters[0].next()) != null;) {
       qc.checkStop();
       list.add(toNode(it));
     }
-    final boolean db = list.dbnodes();
 
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); ++e) {
-      final ANodeList nt = new ANodeList().check();
+      list.check();
+      final ANodeBuilder nt = new ANodeBuilder();
       final Iter iter = iters[e];
       for(Item it; (it = iter.next()) != null;) {
         qc.checkStop();
         final ANode n = toNode(it);
-        final int i = list.indexOf(n, db);
-        if(i != -1) nt.add(n);
+        if(list.contains(n)) nt.add(n);
       }
       list = nt;
     }
@@ -58,7 +56,7 @@ public final class InterSect extends Set {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final InterSect is = new InterSect(info, copyAll(cc, vm, exprs));
+    final Intersect is = new Intersect(info, copyAll(cc, vm, exprs));
     is.iterable = iterable;
     return copyType(is);
   }
@@ -88,5 +86,10 @@ public final class InterSect extends Set {
         return item[0];
       }
     };
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Intersect && super.equals(obj);
   }
 }

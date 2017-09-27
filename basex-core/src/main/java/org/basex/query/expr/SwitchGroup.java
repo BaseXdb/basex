@@ -8,18 +8,18 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Switch case group (case ... case ... return ...).
+ * Group of switch cases (case ... case ... return ...).
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class SwitchGroups extends Arr {
+public final class SwitchGroup extends Arr {
   /**
    * Constructor.
    * @param info input info
    * @param exprs return expression (placed first) and cases (default branch has 0 cases)
    */
-  public SwitchGroups(final InputInfo info, final Expr... exprs) {
+  public SwitchGroup(final InputInfo info, final Expr... exprs) {
     super(info, exprs);
   }
 
@@ -30,7 +30,7 @@ public final class SwitchGroups extends Arr {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) {
+  public Expr compile(final CompileContext cc) throws QueryException {
     // compile and simplify branches
     final int es = exprs.length;
     for(int e = 0; e < es; e++) {
@@ -46,7 +46,7 @@ public final class SwitchGroups extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new SwitchGroups(info, copyAll(cc, vm, exprs));
+    return new SwitchGroup(info, copyAll(cc, vm, exprs));
   }
 
   @Override
@@ -68,15 +68,6 @@ public final class SwitchGroups extends Arr {
     return change ? optimize(cc) : null;
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    final int es = exprs.length;
-    for(int e = 1; e < es; ++e) sb.append(' ').append(CASE).append(' ').append(exprs[e]);
-    if(es == 1) sb.append(' ').append(DEFAULT);
-    return sb.append(' ').append(RETURN).append(' ').append(exprs[0]).toString();
-  }
-
   /**
    * {@inheritDoc}
    * This method counts only the occurrences in the return expression.
@@ -95,8 +86,9 @@ public final class SwitchGroups extends Arr {
   VarUsage countCases(final Var var) {
     VarUsage all = VarUsage.NEVER;
     final int es = exprs.length;
-    for(int i = 1; i < es; i++)
-      if((all = all.plus(exprs[i].count(var))) == VarUsage.MORE_THAN_ONCE) break;
+    for(int e = 1; e < es; e++) {
+      if((all = all.plus(exprs[e].count(var))) == VarUsage.MORE_THAN_ONCE) break;
+    }
     return all;
   }
 
@@ -105,5 +97,19 @@ public final class SwitchGroups extends Arr {
     int sz = 0;
     for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof SwitchGroup && super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    final int es = exprs.length;
+    for(int e = 1; e < es; ++e) sb.append(' ').append(CASE).append(' ').append(exprs[e]);
+    if(es == 1) sb.append(' ').append(DEFAULT);
+    return sb.append(' ').append(RETURN).append(' ').append(exprs[0]).toString();
   }
 }

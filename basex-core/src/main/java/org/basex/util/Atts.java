@@ -115,16 +115,6 @@ public final class Atts extends ElementList {
     return this;
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
-    for(int i = 0; i < size; ++i) {
-      if(i > 0) tb.add(", ");
-      tb.add(nm[i]).add("=\"").add(vl[i]).add("\"");
-    }
-    return tb.add("]").toString();
-  }
-
   /**
    * Creates a shallow copy which shares all keys and values.
    * @return shallow copy
@@ -135,5 +125,27 @@ public final class Atts extends ElementList {
     copy.vl = vl.clone();
     copy.size = size;
     return copy;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(obj == this) return true;
+    if(!(obj instanceof Atts)) return false;
+    final Atts a = (Atts) obj;
+    if(size != a.size) return false;
+    for(int i = 0; i < size; ++i) {
+      if(!Token.eq(nm[i], a.nm[i]) || !Token.eq(vl[i], a.vl[i])) return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
+    for(int i = 0; i < size; ++i) {
+      if(i > 0) tb.add(", ");
+      tb.add(nm[i]).add("=\"").add(vl[i]).add("\"");
+    }
+    return tb.add("]").toString();
   }
 }

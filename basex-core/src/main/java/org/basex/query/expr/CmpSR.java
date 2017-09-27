@@ -128,7 +128,7 @@ final class CmpSR extends Single {
    */
   Expr intersect(final CmpSR c) {
     // skip intersection if expressions to be compared are different
-    if(!(coll == null && c.expr.sameAs(expr))) return null;
+    if(!(coll == null && c.expr.equals(expr))) return null;
 
     // find common minimum and maximum value
     final byte[] mn = min == null ? c.min : c.min == null ? min : Token.max(min, c.min);
@@ -176,13 +176,22 @@ final class CmpSR extends Single {
   }
 
   @Override
-  public String description() {
-    return "string range comparison";
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof CmpSR)) return false;
+    final CmpSR c = (CmpSR) obj;
+    return Token.eq(min, c.min) && mni == c.mni && Token.eq(max, c.max) && mxi && c.mxi &&
+        Array.equals(coll, c.coll) && super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(MIN, min != null ? min : "", MAX, max != null ? max : ""), expr);
+  }
+
+  @Override
+  public String description() {
+    return "string range comparison";
   }
 
   @Override

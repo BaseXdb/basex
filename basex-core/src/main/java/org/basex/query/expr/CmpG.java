@@ -184,9 +184,9 @@ public final class CmpG extends Cmp {
      * - equality operator is specified,
      * - operands are equal,
      * - operands are deterministic, non-updating,
-     * - operands do not depend on context, or if context value exists
+     * - operands do not depend on context (unless context value exists)
      */
-    if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+    if(op == OpG.EQ && e1.equals(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       // currently limited to strings, integers and booleans
       final Type t1 = st1.type;
@@ -301,7 +301,7 @@ public final class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   CmpG union(final CmpG g, final CompileContext cc) throws QueryException {
-    if(op != g.op || coll != g.coll || !exprs[0].sameAs(g.exprs[0])) return null;
+    if(op != g.op || coll != g.coll || !exprs[0].equals(g.exprs[0])) return null;
 
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(cc);
     final CmpG cmp = new CmpG(exprs[0], list, op, coll, sc, info);
@@ -327,18 +327,8 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(cmp instanceof CmpG) {
-      final CmpG c = (CmpG) cmp;
-      if(op == c.op) {
-        final int el = exprs.length;
-        for(int e = 0; e < el; e++) {
-          if(!exprs[e].sameAs(c.exprs[e])) return false;
-        }
-        return true;
-      }
-    }
-    return false;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CmpG && op == ((CmpG) obj).op && super.equals(obj);
   }
 
   @Override

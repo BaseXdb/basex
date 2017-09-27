@@ -119,6 +119,12 @@ public final class PartFunc extends Arr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof PartFunc && Arrays.equals(holes, ((PartFunc) obj).holes) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     final int es = exprs.length, hs = holes.length;

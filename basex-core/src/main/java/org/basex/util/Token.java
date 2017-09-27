@@ -608,21 +608,18 @@ public final class Token {
 
   /**
    * Compares two tokens for equality.
-   * @param token1 first token
-   * @param token2 token to be compared
-   * @return true if the arrays are equal
+   * @param token1 first token (can be {@code null})
+   * @param token2 token to be compared (can be {@code null})
+   * @return true if the tokens are equal
    */
   public static boolean eq(final byte[] token1, final byte[] token2) {
-    final int tl = token2.length;
-    if(tl != token1.length) return false;
-    for(int t = 0; t != tl; ++t) if(token2[t] != token1[t]) return false;
-    return true;
+    return Arrays.equals(token1, token2);
   }
 
   /**
    * Compares several tokens for equality.
-   * @param token token
-   * @param tokens tokens to be compared
+   * @param token token (can be {@code null})
+   * @param tokens tokens to be compared (single tokens can be {@code null})
    * @return true if one test is successful
    */
   public static boolean eq(final byte[] token, final byte[]... tokens) {

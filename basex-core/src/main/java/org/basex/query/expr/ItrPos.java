@@ -145,9 +145,10 @@ public final class ItrPos extends Simple {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof ItrPos)) return false;
-    final ItrPos p = (ItrPos) cmp;
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof ItrPos)) return false;
+    final ItrPos p = (ItrPos) obj;
     return min == p.min && max == p.max;
   }
 

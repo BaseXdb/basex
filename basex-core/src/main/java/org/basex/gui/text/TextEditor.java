@@ -81,7 +81,7 @@ public final class TextEditor {
    */
   void search(final SearchContext sc) {
     // skip search if criteria have not changed
-    if(sc.sameAs(search)) {
+    if(sc.equals(search)) {
       sc.nr = search.nr;
       sc.bar.refresh(sc);
     } else {

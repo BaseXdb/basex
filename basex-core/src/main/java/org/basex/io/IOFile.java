@@ -301,8 +301,8 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public boolean equals(final Object o) {
-    return o instanceof IOFile && ((IOFile) o).pth.equals(pth);
+  public boolean equals(final Object obj) {
+    return obj instanceof IOFile && ((IOFile) obj).pth.equals(pth);
   }
 
   @Override

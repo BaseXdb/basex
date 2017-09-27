@@ -36,7 +36,7 @@ public abstract class Path extends ParseExpr {
   private static final EnumSet<Axis> EXPENSIVE =
       EnumSet.of(DESC, DESCORSELF, PREC, PRECSIBL, FOLL, FOLLSIBL);
 
-  /** Root expression. */
+  /** Root expression (can be {@code null}). */
   public Expr root;
   /** Path steps. */
   public final Expr[] steps;
@@ -44,7 +44,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Constructor.
    * @param info input info
-   * @param root root expression; can be a {@code null} reference
+   * @param root root expression (can be {@code null})
    * @param steps steps
    */
   protected Path(final InputInfo info, final Expr root, final Expr[] steps) {
@@ -88,7 +88,7 @@ public abstract class Path extends ParseExpr {
         // rewrite filter to axis step
         final Filter f = (Filter) step;
         if(f.root instanceof ContextValue) {
-          step = Step.get(f.info, SELF, KindTest.NOD, f.preds);
+          step = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
         }
       } else if(step instanceof Path) {
         // rewrite path to axis steps
@@ -190,7 +190,7 @@ public abstract class Path extends ParseExpr {
     // single attribute with exact name test will return at most one result
     if(path.root == null && sl == 1 && lastExpr instanceof Step) {
       final Step lastStep = (Step) lastExpr;
-      if(lastStep.axis == ATTR && lastStep.test.unique) {
+      if(lastStep.axis == ATTR && lastStep.test.one) {
         lastStep.seqType = lastStep.seqType.withOcc(Occ.ZERO_ONE);
         path.seqType = lastStep.seqType;
       }
@@ -203,12 +203,12 @@ public abstract class Path extends ParseExpr {
     final int sl = steps.length;
     if(steps[sl - 1] instanceof Step) {
       final Step step = (Step) steps[sl - 1];
-      if(step.preds.length == 1 && step.seqType().type instanceof NodeType &&
-          !step.preds[0].seqType().mayBeNumber()) {
+      if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
+          !step.exprs[0].seqType().mayBeNumber()) {
         // merge nested predicates. example: if(a[b]) ->  if(a/b)
         final Expr s = step.merge(this, cc);
         if(s != step) {
-          step.preds = new Expr[0];
+          step.exprs = new Expr[0];
           return cc.replaceEbv(this, s);
         }
       }
@@ -294,7 +294,7 @@ public abstract class Path extends ParseExpr {
     for(int i = 0; i < sl; i++) {
       final Step s = axisStep(i);
       if(s == null || i < 2 && EXPENSIVE.contains(s.axis)) return false;
-      final Expr[] ps = s.preds;
+      final Expr[] ps = s.exprs;
       if(!(ps.length == 0 || ps.length == 1 && ps[0] instanceof ItrPos)) return false;
     }
     return true;
@@ -558,7 +558,7 @@ public abstract class Path extends ParseExpr {
     for(int s = 0; s < sl; s++) {
       // don't allow predicates in preceding location steps
       final Step prev = s > 0 ? axisStep(s - 1) : null;
-      if(prev != null && prev.preds.length != 0) break;
+      if(prev != null && prev.exprs.length != 0) break;
 
       // ignore axes other than descendant, or numeric predicates
       final Step curr = axisStep(s);
@@ -586,7 +586,7 @@ public abstract class Path extends ParseExpr {
       int ts = qnm.size();
       final Expr[] stps = new Expr[ts + sl - s - 1];
       for(int t = 0; t < ts; t++) {
-        final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).preds : new Expr[0];
+        final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
           new NameTest(nm, Kind.NAME, false, null);
@@ -656,10 +656,10 @@ public abstract class Path extends ParseExpr {
       final IndexContext ictx = new IndexContext(data, iter);
 
       // choose cheapest index access
-      final int pl = step.preds.length;
+      final int pl = step.exprs.length;
       for(int p = 0; p < pl; p++) {
         final IndexInfo ii = new IndexInfo(ictx, cc.qc, step);
-        if(!step.preds[p].indexAccessible(ii)) continue;
+        if(!step.exprs[p].indexAccessible(ii)) continue;
 
         if(ii.costs == 0) {
           // no results...
@@ -695,14 +695,14 @@ public abstract class Path extends ParseExpr {
         } else {
           final Step prevStep = axisStep(s - 1);
           final Axis newAxis = prevStep.axis == Axis.ATTR ? Axis.ATTR : invAxis;
-          invSteps.add(Step.get(info, newAxis, prevStep.test, prevStep.preds));
+          invSteps.add(Step.get(info, newAxis, prevStep.test, prevStep.exprs));
         }
       }
     }
     if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
 
     // add remaining predicates
-    final Expr[] preds = index.step.preds;
+    final Expr[] preds = index.step.exprs;
     final int pl = preds.length;
     for(int p = 0; p < pl; p++) {
       if(p != indexPred) newPreds.add(preds[p]);
@@ -758,7 +758,7 @@ public abstract class Path extends ParseExpr {
       if(step.test.kind == Kind.WILDCARD && s != iStep) continue;
       // consider child steps with name test and without predicates
       if(step.test.kind != Kind.NAME || step.axis != CHILD ||
-          s != iStep && step.preds.length > 0) return true;
+          s != iStep && step.exprs.length > 0) return true;
 
       // support only unique paths with nodes on the correct level
       final ArrayList<PathNode> pn = data.paths.desc(step.test.name.local());
@@ -918,6 +918,13 @@ public abstract class Path extends ParseExpr {
     int sz = 1;
     for(final Expr e : steps) sz += e.exprSize();
     return root == null ? sz : sz + root.exprSize();
+  }
+
+  @Override
+  public final boolean equals(final Object obj) {
+    if(!(obj instanceof Path)) return false;
+    final Path p = (Path) obj;
+    return Array.equals(root, p.root) && Array.equals(steps, p.steps);
   }
 
   @Override

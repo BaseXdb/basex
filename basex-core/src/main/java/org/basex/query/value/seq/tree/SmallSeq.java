@@ -181,4 +181,10 @@ final class SmallSeq extends TreeSeq {
     final int mid = n / 2;
     return new BigSeq(slice(out, 0, mid), FingerTree.<Item>empty(), slice(out, mid, n), null);
   }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof SmallSeq ? Arrays.equals(elems, ((SmallSeq) obj).elems) :
+      super.equals(obj));
+  }
 }

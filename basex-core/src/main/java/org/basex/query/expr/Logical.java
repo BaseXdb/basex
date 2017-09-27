@@ -70,13 +70,6 @@ abstract class Logical extends Arr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem el = planElem();
-    plan.add(el);
-    for(final ExprInfo expr : exprs) if(expr != null) expr.plan(el);
-  }
-
-  @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     final Expr[] arr = exprs;
     boolean change = false;
@@ -122,5 +115,12 @@ abstract class Logical extends Arr {
       }
     }
     exprs = tmp.finish();
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    plan.add(el);
+    for(final ExprInfo expr : exprs) expr.plan(el);
   }
 }

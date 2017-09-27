@@ -123,6 +123,11 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTOr && super.equals(obj);
+  }
+
+  @Override
   public String toString() {
     return PAREN1 + toString(' ' + FTOR + ' ') + PAREN2;
   }

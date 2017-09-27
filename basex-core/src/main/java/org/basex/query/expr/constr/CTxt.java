@@ -57,6 +57,11 @@ public final class CTxt extends CNode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CTxt && super.equals(obj);
+  }
+
+  @Override
   public String description() {
     return info(TEXT);
   }

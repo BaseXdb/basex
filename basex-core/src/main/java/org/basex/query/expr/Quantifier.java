@@ -84,8 +84,19 @@ public final class Quantifier extends Single {
   }
 
   @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new Quantifier(info, expr.copy(cc, vm), every);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Quantifier && every == ((Quantifier) obj).every &&
+        super.equals(obj);
   }
 
   @Override
@@ -96,10 +107,5 @@ public final class Quantifier extends Single {
   @Override
   public String toString() {
     return (every ? EVERY : SOME) + '(' + expr + ')';
-  }
-
-  @Override
-  public int exprSize() {
-    return expr.exprSize();
   }
 }

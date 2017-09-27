@@ -15,7 +15,7 @@ import org.basex.util.ft.*;
  * @author Christian Gruen
  */
 public abstract class FTFilter extends FTExpr {
-  /** Optional unit. */
+  /** Unit. */
   final FTUnit unit;
 
   /**
@@ -75,7 +75,7 @@ public abstract class FTFilter extends FTExpr {
 
     final FTMatches all = item.matches();
     for(int a = 0; a < all.size(); a++) {
-      if(!filter(qc, all.match[a], lexer)) all.delete(a--);
+      if(!filter(qc, all.list[a], lexer)) all.remove(a--);
     }
     return !all.isEmpty();
   }
@@ -113,6 +113,11 @@ public abstract class FTFilter extends FTExpr {
   @Override
   public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
     return exprs[0].indexAccessible(ii);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof FTFilter && unit == ((FTFilter) obj).unit && super.equals(obj);
   }
 
   @Override

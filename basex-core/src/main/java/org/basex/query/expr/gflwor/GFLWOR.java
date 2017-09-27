@@ -797,6 +797,14 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof GFLWOR)) return false;
+    final GFLWOR g = (GFLWOR) obj;
+    return clauses.equals(g.clauses) && ret.equals(g.ret);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     for(final Clause clause : clauses) clause.plan(e);

@@ -31,7 +31,7 @@ public final class ValueAccess extends IndexAccess {
   private Expr expr;
   /** Index type. */
   private final IndexType type;
-  /** Parent name test. */
+  /** Parent name test (can be {@code null}). */
   private final NameTest test;
   /** Trim search terms. */
   private boolean trim;
@@ -211,6 +211,14 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public int exprSize() {
     return expr.exprSize() + 1;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof ValueAccess)) return false;
+    final ValueAccess v = (ValueAccess) obj;
+    return expr.equals(obj) && type == v.type && Array.equals(test, v.test) && trim == v.trim &&
+        super.equals(obj);
   }
 
   @Override

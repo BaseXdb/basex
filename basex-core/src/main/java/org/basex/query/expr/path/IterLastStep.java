@@ -49,6 +49,6 @@ final class IterLastStep extends Step {
 
   @Override
   public IterLastStep copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new IterLastStep(info, axis, test.copy(), Arr.copyAll(cc, vm, preds)));
+    return copyType(new IterLastStep(info, axis, test.copy(), Arr.copyAll(cc, vm, exprs)));
   }
 }

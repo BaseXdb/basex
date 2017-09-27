@@ -336,6 +336,12 @@ public final class Map extends FItem {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    // [CG] could be enhanced
+    return this == obj;
+  }
+
+  @Override
   public String toString() {
     return MAP + " { " + root.append(new StringBuilder()).toString().replaceAll(", $", "") + " }";
   }

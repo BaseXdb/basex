@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 public final class FTIndexAccess extends Simple {
   /** Full-text expression. */
   private final FTExpr ftexpr;
-  /** Database name. */
+  /** Index context. */
   private final IndexContext ictx;
 
   /**
@@ -89,11 +89,6 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name), ftexpr);
-  }
-
-  @Override
   public boolean iterable() {
     return ictx.iterable;
   }
@@ -101,6 +96,19 @@ public final class FTIndexAccess extends Simple {
   @Override
   public int exprSize() {
     return ftexpr.exprSize() + 1;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FTIndexAccess)) return false;
+    final FTIndexAccess f = (FTIndexAccess) obj;
+    return ftexpr.equals(f.ftexpr) && ictx.equals(f.ictx);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(DATA, ictx.data.meta.name), ftexpr);
   }
 
   @Override

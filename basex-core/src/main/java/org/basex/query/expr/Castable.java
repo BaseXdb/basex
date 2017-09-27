@@ -61,6 +61,12 @@ public final class Castable extends Single {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Castable && type.eq(((Castable) obj).type) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(TYP, type), expr);
   }

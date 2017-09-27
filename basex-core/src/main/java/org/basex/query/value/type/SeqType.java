@@ -245,7 +245,7 @@ public final class SeqType {
   public final Type type;
   /** Number of occurrences. */
   public final Occ occ;
-  /** Optional kind test. */
+  /** Kind test (can be {@code null}). */
   private final Test kind;
 
   /**
@@ -496,55 +496,55 @@ public final class SeqType {
 
   /**
    * Checks if this type could be converted to the given one by function conversion.
-   * @param t type to convert to
+   * @param st type to convert to
    * @return result of check
    */
-  public boolean promotable(final SeqType t) {
-    if(intersect(t) != null) return true;
-    if(occ.intersect(t.occ) == null) return false;
-    final Type to = t.type;
+  public boolean promotable(final SeqType st) {
+    if(intersect(st) != null) return true;
+    if(occ.intersect(st.occ) == null) return false;
+    final Type to = st.type;
     if(to instanceof AtomType) {
       if(type.isUntyped()) return !to.nsSensitive();
       return to == AtomType.DBL && (couldBe(AtomType.FLT) || couldBe(AtomType.DEC))
           || to == AtomType.FLT && couldBe(AtomType.DEC)
           || to == AtomType.STR && couldBe(AtomType.URI);
     }
-    return t.type instanceof FuncType && type instanceof FuncType;
+    return st.type instanceof FuncType && type instanceof FuncType;
   }
 
   /**
    * Checks if this type's item type could be instance of the given one.
-   * @param o other type
+   * @param t other type
    * @return result of check
    */
-  private boolean couldBe(final Type o) {
-    return type.intersect(o) != null;
+  private boolean couldBe(final Type t) {
+    return type.intersect(t) != null;
   }
 
   /**
    * Computes the union of two sequence types, i.e. the lowest common ancestor of both
    * types.
-   * @param t second type
+   * @param st second type
    * @return resulting type
    */
-  public SeqType union(final SeqType t) {
-    return get(type == t.type ? type : type.union(t.type), occ.union(t.occ));
+  public SeqType union(final SeqType st) {
+    return get(type == st.type ? type : type.union(st.type), occ.union(st.occ));
   }
 
   /**
    * Computes the intersection of two sequence types, i.e. the most general type that is
    * sub-type of both types. If no such type exists, {@code null} is returned
-   * @param t second type
+   * @param st second type
    * @return resulting type or {@code null}
    */
-  public SeqType intersect(final SeqType t) {
-    final Occ o = occ.intersect(t.occ);
+  public SeqType intersect(final SeqType st) {
+    final Occ o = occ.intersect(st.occ);
     if(o == null) return null;
-    final Type tp = type.intersect(t.type);
+    final Type tp = type.intersect(st.type);
     if(tp == null) return null;
-    if(kind == null || t.kind == null || kind.sameAs(t.kind))
-      return get(tp, o, kind != null ? kind : t.kind);
-    final Test k = kind.intersect(t.kind);
+    if(kind == null || st.kind == null || kind.equals(st.kind))
+      return get(tp, o, kind != null ? kind : st.kind);
+    final Test k = kind.intersect(st.kind);
     return k == null ? null : get(tp, o, k);
   }
 
@@ -623,23 +623,27 @@ public final class SeqType {
 
   /**
    * Checks the types for equality.
-   * @param t type
+   * @param st type
    * @return result of check
    */
-  public boolean eq(final SeqType t) {
-    return type.eq(t.type) && occ == t.occ &&
-      (kind == null ? t.kind == null : t.kind != null && kind.sameAs(t.kind));
+  public boolean eq(final SeqType st) {
+    return type.eq(st.type) && occ == st.occ && Array.equals(kind, st.kind);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof SeqType && eq((SeqType) obj);
   }
 
   /**
    * Checks if this sequence type is an instance of the specified sequence type.
-   * @param t sequence type to check
+   * @param st sequence type to check
    * @return result of check
    */
-  public boolean instanceOf(final SeqType t) {
-    return (t.type == AtomType.ITEM || type.instanceOf(t.type)) && occ.instanceOf(t.occ) &&
+  public boolean instanceOf(final SeqType st) {
+    return (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
       // [LW] complete kind check
-      (t.kind == null || kind != null && kind.intersect(t.kind) != null);
+      (st.kind == null || kind != null && kind.intersect(st.kind) != null);
   }
 
   /**

@@ -34,6 +34,7 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.expr.*;
+import org.basex.query.up.expr.Insert.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
@@ -1325,7 +1326,7 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     wsCheck(PAREN1);
     final Expr cond = check(expr(), NOSWITCH);
-    final ArrayList<SwitchGroups> groups = new ArrayList<>();
+    final ArrayList<SwitchGroup> groups = new ArrayList<>();
     wsCheck(PAREN2);
 
     // collect all cases
@@ -1340,10 +1341,10 @@ public class QueryParser extends InputParser {
       }
       wsCheck(RETURN);
       exprs.set(0, check(single(), NOSWITCH));
-      groups.add(new SwitchGroups(info(), exprs.finish()));
+      groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
 
-    return new Switch(ii, cond, groups.toArray(new SwitchGroups[groups.size()]));
+    return new Switch(ii, cond, groups.toArray(new SwitchGroup[groups.size()]));
   }
 
   /**
@@ -1358,12 +1359,11 @@ public class QueryParser extends InputParser {
     final Expr ts = check(expr(), NOTYPESWITCH);
     wsCheck(PAREN2);
 
-    TypeCase[] cases = { };
+    TypeswitchGroup[] cases = { };
     final ArrayList<SeqType> types = new ArrayList<>();
     final int s = localVars.openScope();
     boolean cs;
     do {
-      types.clear();
       cs = wsConsumeWs(CASE);
       if(!cs) {
         wsCheck(DEFAULT);
@@ -1375,17 +1375,19 @@ public class QueryParser extends InputParser {
         if(cs) wsCheck(AS);
       }
       if(cs) {
-        do types.add(sequenceType());
-        while(wsConsume(PIPE));
+        do {
+          types.add(sequenceType());
+        } while(wsConsume(PIPE));
       }
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      final TypeCase tc = new TypeCase(info(), var, types.toArray(new SeqType[types.size()]), ret);
-      cases = Array.add(cases, tc);
+      final SeqType[] st = types.toArray(new SeqType[types.size()]);
+      cases = Array.add(cases, new TypeswitchGroup(info(), var, st, ret));
       localVars.closeScope(s);
+      types.clear();
     } while(cs);
     if(cases.length == 1) throw error(NOTYPESWITCH);
-    return new TypeSwitch(ii, ts, cases);
+    return new Typeswitch(ii, ts, cases);
   }
 
   /**
@@ -1605,7 +1607,7 @@ public class QueryParser extends InputParser {
    * @return expression
    */
   private Expr intersectExcept(final boolean intersect, final ExprList el) {
-    return intersect ? new InterSect(info(), el.finish()) : new Except(info(), el.finish());
+    return intersect ? new Intersect(info(), el.finish()) : new Except(info(), el.finish());
   }
 
   /**
@@ -3387,7 +3389,7 @@ public class QueryParser extends InputParser {
       wsCheck(CURLY1);
       final FTExpr e = ftSelection(true);
       wsCheck(CURLY2);
-      return new FTExtensionSelection(info(), pragmas, e);
+      return new FTExtension(info(), pragmas, e);
     }
 
     if(wsConsumeWs(PAREN1)) {
@@ -3621,25 +3623,27 @@ public class QueryParser extends InputParser {
     }
 
     final Expr s = check(single(), INCOMPLETE);
-    boolean first = false;
-    boolean last = false;
-    boolean before = false;
-    boolean after = false;
+    Mode mode = Mode.INTO;;
     if(wsConsumeWs(AS)) {
-      first = wsConsumeWs(FIRST);
-      if(!first) {
+      if(wsConsumeWs(FIRST)) {
+        mode = Mode.FIRST;
+      } else {
         wsCheck(LAST);
-        last = true;
+        mode = Mode.LAST;
       }
       wsCheck(INTO);
     } else if(!wsConsumeWs(INTO)) {
-      after = wsConsumeWs(AFTER);
-      before = !after && wsConsumeWs(BEFORE);
-      if(!after && !before) throw error(INCOMPLETE);
+      if(wsConsumeWs(AFTER)) {
+        mode = Mode.AFTER;
+      } else if(wsConsumeWs(BEFORE)) {
+        mode = Mode.BEFORE;
+      } else {
+        throw error(INCOMPLETE);
+      }
     }
     final Expr trg = check(single(), INCOMPLETE);
     qc.updating();
-    return new Insert(sc, info(), s, first, last, before, after, trg);
+    return new Insert(sc, info(), s, mode, trg);
   }
 
   /**

@@ -39,7 +39,7 @@ final class CachedStep extends Step {
     // evaluate predicates
     final QueryFocus qf = qc.focus;
     final boolean scoring = qc.scoring;
-    for(final Expr pred : preds) {
+    for(final Expr pred : exprs) {
       final long nl = list.size();
       qf.size = nl;
       qf.pos = 1;
@@ -62,9 +62,9 @@ final class CachedStep extends Step {
 
   @Override
   public Step copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final int pl = preds.length;
+    final int pl = exprs.length;
     final Expr[] pred = new Expr[pl];
-    for(int p = 0; p < pl; p++) pred[p] = preds[p].copy(cc, vm);
+    for(int p = 0; p < pl; p++) pred[p] = exprs[p].copy(cc, vm);
     return copyType(new CachedStep(info, axis, test.copy(), pred));
   }
 }

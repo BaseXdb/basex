@@ -32,7 +32,7 @@ public abstract class ANode extends Item {
 
   /** Cached string value. */
   byte[] value;
-  /** Parent node. */
+  /** Parent node (can be {@code null}). */
   ANode parent;
 
   /**

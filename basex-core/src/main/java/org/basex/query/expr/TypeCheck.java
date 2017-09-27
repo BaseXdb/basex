@@ -22,10 +22,10 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class TypeCheck extends Single {
-  /** Flag for function conversion. */
-  public final boolean promote;
   /** Static context. */
   private final StaticContext sc;
+  /** Flag for function conversion. */
+  public final boolean promote;
 
   /**
    * Constructor.
@@ -132,23 +132,6 @@ public final class TypeCheck extends Single {
     throw INVCAST_X_X_X.get(info, val.seqType(), seqType, val);
   }
 
-  @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType, promote);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem(TYP, seqType);
-    if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
-    addPlan(plan, elem, expr);
-  }
-
-  @Override
-  public String toString() {
-    return "((: " + seqType + ", " + promote + " :) " + expr + ')';
-  }
-
   /**
    * Checks if this type check is redundant if the result is bound to the given variable.
    * @param var variable
@@ -167,5 +150,30 @@ public final class TypeCheck extends Single {
    */
   public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
     return new TypeCheck(sc, info, ex, seqType, promote).optimize(cc);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof TypeCheck)) return false;
+    final TypeCheck t = (TypeCheck) obj;
+    return seqType.eq(t.seqType) && promote == t.promote && super.equals(obj);
+  }
+
+  @Override
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType, promote);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem elem = planElem(TYP, seqType);
+    if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
+    addPlan(plan, elem, expr);
+  }
+
+  @Override
+  public String toString() {
+    return "((: " + seqType + ", " + promote + " :) " + expr + ')';
   }
 }

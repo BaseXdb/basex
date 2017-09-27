@@ -58,6 +58,11 @@ public final class CPI extends CName {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CPI && super.equals(obj);
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new CPI(sc, info, name.copy(cc, vm), exprs[0].copy(cc, vm));
   }

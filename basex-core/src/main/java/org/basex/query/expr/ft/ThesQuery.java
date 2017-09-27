@@ -31,7 +31,7 @@ public final class ThesQuery {
   public void merge(final ThesQuery th) {
     for(final Thesaurus t : th.thes) {
       boolean f = false;
-      for(final Thesaurus tt : thes) f |= tt.sameAs(t);
+      for(final Thesaurus tt : thes) f |= tt.equals(t);
       if(!f) thes.add(t);
     }
   }

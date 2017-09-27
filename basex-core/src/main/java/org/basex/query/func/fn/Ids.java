@@ -64,7 +64,7 @@ abstract class Ids extends StandardFunc {
     }
 
     // otherwise, do sequential scan: parse node and its descendants
-    final ANodeList list = new ANodeList().check();
+    final ANodeBuilder list = new ANodeBuilder();
     add(idSet, list, root, idref);
     return list.iter();
   }
@@ -99,7 +99,7 @@ abstract class Ids extends StandardFunc {
    * @param node current node
    * @param idref idref flag
    */
-  private static void add(final TokenSet idSet, final ANodeList results, final ANode node,
+  private static void add(final TokenSet idSet, final ANodeBuilder results, final ANode node,
       final boolean idref) {
 
     for(final ANode attr : node.attributes()) {

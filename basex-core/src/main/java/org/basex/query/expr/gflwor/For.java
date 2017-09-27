@@ -29,9 +29,9 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class For extends ForLet {
-  /** Position variable. */
+  /** Position variable (can be {@code null}). */
   Var pos;
-  /** Score variable. */
+  /** Score variable (can be {@code null}). */
   Var score;
   /** {@code allowing empty} flag. */
   final boolean empty;
@@ -223,6 +223,14 @@ public final class For extends ForLet {
     minMax[0] *= factor;
     final long max = minMax[1];
     minMax[1] = sz < 0 ? -1 : max > 0 ? max * factor : max;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof For)) return false;
+    final For f = (For) obj;
+    return Array.equals(pos, f.pos) && Array.equals(score, f.score) && empty == f.empty &&
+        super.equals(obj);
   }
 
   @Override

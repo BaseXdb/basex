@@ -48,26 +48,11 @@ public final class Ann {
   }
 
   /**
-   * Compares two annotations.
-   * @param ann annotation to be compared
-   * @return result of check
-   */
-  public boolean eq(final Ann ann) {
-    final long as = args.length;
-    if(sig != null ? (sig != ann.sig) : (ann.name == null || !name.eq(ann.name))) return false;
-    if(as != ann.args.length) return false;
-    for(int a = 0; a < as; a++) {
-      if(!args[a].sameAs(ann.args[a])) return false;
-    }
-    return true;
-  }
-
-  /**
    * Returns the name of the annotation.
    * @return name
    */
   public QNm name() {
-    return name != null ? name : sig.qname();
+    return sig != null ? sig.qname() : name;
   }
 
   /**
@@ -76,6 +61,15 @@ public final class Ann {
    */
   public Item[] args() {
     return args;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Ann)) return false;
+    final Ann ann = (Ann) obj;
+    return (sig != null ? sig == ann.sig : ann.name != null && name.eq(ann.name)) &&
+        Array.equals(args, ann.args);
   }
 
   @Override

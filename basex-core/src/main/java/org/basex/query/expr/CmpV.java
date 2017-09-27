@@ -206,14 +206,13 @@ public final class CmpV extends Cmp {
      * - operands are deterministic, non-updating,
      * - operands do not depend on context, or if context value exists
      */
-    if(op == OpV.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+    if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       // currently limited to strings, integers and booleans
       final Type t1 = st1.type;
       if(st1.one() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) || t1 == AtomType.BLN))
-        return cc.replaceWith(this, Bln.TRUE);
+        return cc.replaceWith(this, Bln.get(op == OpV.EQ));
     }
-
     return this;
   }
 
@@ -249,6 +248,11 @@ public final class CmpV extends Cmp {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CmpV && op == ((CmpV) obj).op && super.equals(obj);
   }
 
   @Override

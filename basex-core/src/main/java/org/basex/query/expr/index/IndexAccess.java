@@ -42,4 +42,9 @@ public abstract class IndexAccess extends Simple {
   public final boolean iterable() {
     return ictx.iterable || seqType().zeroOrOne();
   }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof IndexAccess && ictx.equals(((IndexAccess) obj).ictx);
+  }
 }

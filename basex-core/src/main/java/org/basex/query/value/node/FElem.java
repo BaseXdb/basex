@@ -3,7 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.MainOptions;
+import org.basex.core.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -11,6 +11,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.w3c.dom.*;
+import org.w3c.dom.Text;
 
 /**
  * Element node fragment.
@@ -111,16 +112,15 @@ public final class FElem extends FNode {
    * Constructor for creating an element from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param elem DOM node
-   * @param par parent reference
+   * @param parent parent reference (can be {@code null})
    * @param nss namespaces in scope
    */
-  public FElem(final Element elem, final ANode par, final TokenMap nss) {
+  public FElem(final Element elem, final ANode parent, final TokenMap nss) {
     super(NodeType.ELM);
 
-    // general stuff
+    this.parent = parent;
     final String nu = elem.getNamespaceURI();
     name = new QNm(elem.getNodeName(), nu == null ? EMPTY : token(nu));
-    parent = par;
     ns = new Atts();
 
     // attributes and namespaces
@@ -144,7 +144,7 @@ public final class FElem extends FNode {
     for(int n = 0; n < nl; n++) nss.put(ns.name(n), ns.value(n));
 
     // no parent, so we have to add all namespaces in scope
-    if(par == null) {
+    if(parent == null) {
       nsScope(elem.getParentNode(), nss);
       for(final byte[] pref : nss) {
         if(!ns.contains(pref)) ns.add(pref, nss.get(pref));
@@ -400,6 +400,15 @@ public final class FElem extends FNode {
     }
     node.parent(parent);
     return node.optimize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FElem)) return false;
+    final FElem f = (FElem) obj;
+    return Array.equals(children, f.children) && Array.equals(atts, f.atts) &&
+        Array.equals(ns, f.ns) && super.equals(obj);
   }
 
   @Override

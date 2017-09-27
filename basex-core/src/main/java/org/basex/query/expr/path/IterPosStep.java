@@ -32,8 +32,8 @@ final class IterPosStep extends Step {
   @Override
   public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
-      final ItrPos[] posExpr = new ItrPos[preds.length];
-      final long[] cPos = new long[preds.length];
+      final ItrPos[] posExpr = new ItrPos[exprs.length];
+      final long[] cPos = new long[exprs.length];
       boolean skip;
       BasicNodeIter iter;
 
@@ -42,9 +42,9 @@ final class IterPosStep extends Step {
         if(skip) return null;
         if(iter == null) {
           iter = axis.iter(checkNode(qc));
-          final int pl = preds.length;
+          final int pl = exprs.length;
           for(int p = 0; p < pl; p++) {
-            final Expr pred = preds[p];
+            final Expr pred = exprs[p];
             if(pred instanceof ItrPos) {
               posExpr[p] = (ItrPos) pred;
             } else if(num(pred)) {
@@ -80,9 +80,9 @@ final class IterPosStep extends Step {
         qf.value = node;
         try {
           double s = qc.scoring ? 0 : -1;
-          final int pl = preds.length;
+          final int pl = exprs.length;
           for(int p = 0; p < pl; p++) {
-            final Expr pred = preds[p];
+            final Expr pred = exprs[p];
             final ItrPos pos = posExpr[p];
             if(pos == null) {
               final Item tst = pred.test(qc, info);
@@ -94,7 +94,7 @@ final class IterPosStep extends Step {
               if(pos.skip(ps)) skip = true;
             }
           }
-          if(s > 0) node.score(Scoring.avg(s, preds.length));
+          if(s > 0) node.score(Scoring.avg(s, exprs.length));
         } finally {
           qf.value = cv;
         }
@@ -105,6 +105,6 @@ final class IterPosStep extends Step {
 
   @Override
   public Step copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new IterPosStep(info, axis, test.copy(), Arr.copyAll(cc, vm, preds)));
+    return copyType(new IterPosStep(info, axis, test.copy(), Arr.copyAll(cc, vm, exprs)));
   }
 }

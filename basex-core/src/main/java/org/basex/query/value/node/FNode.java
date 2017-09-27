@@ -231,6 +231,14 @@ public abstract class FNode extends ANode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FNode)) return false;
+    final FNode a = (FNode) obj;
+    return type.eq(a.type) && Token.eq(value, a.value) && Array.equals(parent, a.parent);
+  }
+
+  @Override
   public final BXNode toJava() {
     return BXNode.get(this);
   }

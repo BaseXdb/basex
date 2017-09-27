@@ -58,7 +58,6 @@ public final class Cast extends Single {
         t == AtomType.QNM || t == AtomType.URI) && seqType.eq(expr.seqType())) {
       return cc.replaceWith(this, expr);
     }
-    size = seqType.occ();
     return this;
   }
 
@@ -77,6 +76,12 @@ public final class Cast extends Single {
   @Override
   public Cast copy(final CompileContext cc, final IntObjMap<Var> vs) {
     return new Cast(sc, info, expr.copy(cc, vs), seqType);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Cast && seqType.eq(((Cast) obj).seqType) &&
+        super.equals(obj);
   }
 
   @Override

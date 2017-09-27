@@ -130,6 +130,12 @@ public final class FTContains extends Single {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTContains && ftexpr.equals(((FTContains) obj).expr) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), expr, ftexpr);
   }

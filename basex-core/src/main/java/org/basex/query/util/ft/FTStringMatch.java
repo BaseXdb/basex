@@ -40,9 +40,10 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   }
 
   @Override
-  public boolean equals(final Object ftm) {
-    if(!(ftm instanceof FTStringMatch)) return false;
-    final FTStringMatch sm = (FTStringMatch) ftm;
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FTStringMatch)) return false;
+    final FTStringMatch sm = (FTStringMatch) obj;
     return start == sm.start && end == sm.end;
   }
 

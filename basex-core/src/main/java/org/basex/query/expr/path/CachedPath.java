@@ -35,7 +35,7 @@ final class CachedPath extends AxisPath {
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
     final Value r = root != null ? qc.value(root) : qf.value;
     qc.focus = focus;
-    final ANodeList list = new ANodeList().check();
+    final ANodeBuilder list = new ANodeBuilder();
     try {
       if(r != null) {
         final Iter iter = qc.iter(r);
@@ -63,7 +63,7 @@ final class CachedPath extends AxisPath {
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void iter(final int step, final ANodeList list, final QueryContext qc)
+  private void iter(final int step, final ANodeBuilder list, final QueryContext qc)
       throws QueryException {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)

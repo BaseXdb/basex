@@ -94,6 +94,12 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof StringRangeAccess && index.equals(((StringRangeAccess) obj).index) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(DATA, ictx.data.meta.name,
         MIN, index.min, MAX, index.max, TYP, index.type()));

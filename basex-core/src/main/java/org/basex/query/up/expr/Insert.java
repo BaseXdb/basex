@@ -1,7 +1,6 @@
 package org.basex.query.up.expr;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -25,33 +24,30 @@ import org.basex.util.hash.*;
  * @author Lukas Kircher
  */
 public final class Insert extends Update {
-  /** First flag. */
-  private final boolean first;
-  /** Last flag. */
-  private final boolean last;
-  /** Before flag. */
-  private final boolean before;
-  /** After flag. */
-  private final boolean after;
+  /** Insertion type. */
+  public enum Mode {
+    /** Into.   */ INTO,
+    /** First.  */ FIRST,
+    /** Last.   */ LAST,
+    /** Before. */ BEFORE,
+    /** After.  */ AFTER
+  };
+
+  /** Insertion mode. */
+  private final Mode mode;
 
   /**
    * Constructor.
    * @param sc static context
    * @param info input info
    * @param src source expression
-   * @param first first flag
-   * @param last last
-   * @param before before
-   * @param after after
+   * @param mode insertion mode
    * @param trg target expression
    */
-  public Insert(final StaticContext sc, final InputInfo info, final Expr src, final boolean first,
-      final boolean last, final boolean before, final boolean after, final Expr trg) {
+  public Insert(final StaticContext sc, final InputInfo info, final Expr src, final Mode mode,
+      final Expr trg) {
     super(sc, info, trg, src);
-    this.first = first;
-    this.last = last;
-    this.before = before;
-    this.after = after;
+    this.mode = mode;
   }
 
   @Override
@@ -66,7 +62,7 @@ public final class Insert extends Update {
     final Item it = iter.next();
     if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
 
-    final boolean loc = before || after;
+    final boolean loc = mode == Mode.BEFORE || mode == Mode.AFTER;
     if(!(it instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, it);
     final Item i2 = iter.next();
     if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info, ValueBuilder.concat(it, i2));
@@ -96,11 +92,13 @@ public final class Insert extends Update {
     // no update primitive is created if node list is empty
     if(!cList.isEmpty()) {
       dbn = updates.determineDataRef(n, qc);
-      if(before) up = new InsertBefore(dbn.pre(), dbn.data(), info, cList);
-      else if(after) up = new InsertAfter(dbn.pre(), dbn.data(), info, cList);
-      else if(first) up = new InsertIntoAsFirst(dbn.pre(), dbn.data(), info, cList);
-      else if(last) up = new InsertIntoAsLast(dbn.pre(), dbn.data(), info, cList);
-      else up = new InsertInto(dbn.pre(), dbn.data(), info, cList);
+      switch(mode) {
+        case BEFORE: up = new InsertBefore(dbn.pre(), dbn.data(), info, cList); break;
+        case AFTER : up = new InsertAfter(dbn.pre(), dbn.data(), info, cList); break;
+        case FIRST : up = new InsertIntoAsFirst(dbn.pre(), dbn.data(), info, cList); break;
+        case LAST  : up = new InsertIntoAsLast(dbn.pre(), dbn.data(), info, cList); break;
+        default    : up = new InsertInto(dbn.pre(), dbn.data(), info, cList);
+      }
       updates.add(up, qc);
     }
     return null;
@@ -108,12 +106,17 @@ public final class Insert extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Insert(sc, info, exprs[1].copy(cc, vm), first, last, before, after,
-        exprs[0].copy(cc, vm));
+    return new Insert(sc, info, exprs[1].copy(cc, vm), mode, exprs[0].copy(cc, vm));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Insert && mode == ((Insert) obj).mode && super.equals(obj);
   }
 
   @Override
   public String toString() {
-    return INSERT + ' ' + NODE + ' ' + exprs[1] + ' ' + INTO + ' ' + exprs[0];
+    return QueryText.INSERT + ' ' + QueryText.NODE + ' ' + exprs[1] + ' ' +
+        QueryText.INTO + ' ' + exprs[0];
   }
 }

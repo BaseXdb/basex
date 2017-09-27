@@ -45,16 +45,6 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), opt, exprs[0]);
-  }
-
-  @Override
-  public String toString() {
-    return exprs[0].toString() + opt;
-  }
-
-  @Override
   public FTNode item(final QueryContext qc, final InputInfo ii) {
     // shouldn't be called, as compile returns argument
     throw Util.notExpected();
@@ -69,5 +59,21 @@ public final class FTOptions extends FTExpr {
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new FTOptions(info, exprs[0].copy(cc, vm), new FTOpt().assign(opt));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTOptions && opt.equals(((FTOptions) obj).opt) &&
+        super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), opt, exprs[0]);
+  }
+
+  @Override
+  public String toString() {
+    return exprs[0].toString() + opt;
   }
 }

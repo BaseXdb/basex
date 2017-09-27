@@ -79,16 +79,14 @@ public final class FTPosData {
     return c;
   }
 
-  /**
-   * Compares full-text position data.
-   * @param ft data to be compared
-   * @return result of check
-   */
-  public boolean sameAs(final FTPosData ft) {
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FTPosData)) return false;
+    final FTPosData ft = (FTPosData) obj;
     if(size != ft.size) return false;
-    for(int i = 0; i < size; ++i) {
-      if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(
-          pos[i].list.toArray(), ft.pos[i].list.toArray())) return false;
+    for(int p = 0; p < size; p++) {
+      if(pos[p].pre != ft.pos[p].pre || !pos[p].equals(ft.pos[p])) return false;
     }
     return true;
   }

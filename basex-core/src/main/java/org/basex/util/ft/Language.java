@@ -85,8 +85,8 @@ public final class Language implements Comparable<Language> {
   }
 
   @Override
-  public boolean equals(final Object o) {
-    return o instanceof Language && code().equals(((Language) o).code());
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Language && code().equals(((Language) obj).code());
   }
 
   @Override

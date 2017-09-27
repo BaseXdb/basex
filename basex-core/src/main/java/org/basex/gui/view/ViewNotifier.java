@@ -173,7 +173,7 @@ public final class ViewNotifier {
     final DBNodes empty = new DBNodes(ctx.data()).ftpos(ctx.marked.ftpos());
     final DBNodes curr = quick ? ctx.current() : null;
     final DBNodes cmp = quick ? curr : ctx.marked;
-    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].sameAs(cmp)) {
+    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].equals(cmp)) {
       checkHist();
       if(quick) {
         // store history entry

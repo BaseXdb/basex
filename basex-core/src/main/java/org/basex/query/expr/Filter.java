@@ -28,10 +28,10 @@ public abstract class Filter extends Preds {
    * Constructor.
    * @param info input info
    * @param root root expression
-   * @param preds predicates
+   * @param exprs predicates
    */
-  protected Filter(final InputInfo info, final Expr root, final Expr... preds) {
-    super(info, preds);
+  protected Filter(final InputInfo info, final Expr root, final Expr... exprs) {
+    super(info, exprs);
     this.root = root;
   }
 
@@ -74,7 +74,7 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public void checkUp() throws QueryException {
+  public final void checkUp() throws QueryException {
     checkNoUp(root);
     super.checkUp();
   }
@@ -106,8 +106,8 @@ public abstract class Filter extends Preds {
    * @return new filter
    */
   public final CachedFilter addPred(final Expr p) {
-    preds = new ExprList(preds.length + 1).add(preds).add(p).finish();
-    return new CachedFilter(info, root, preds);
+    exprs = new ExprList(exprs.length + 1).add(exprs).add(p).finish();
+    return new CachedFilter(info, root, exprs);
   }
 
   @Override
@@ -131,23 +131,23 @@ public abstract class Filter extends Preds {
     if(size == 0) return cc.emptySeq(this);
 
     // if possible, convert filter to root or path expression
-    final Expr ex = simplify(root, preds);
+    final Expr ex = simplify(root, exprs);
     if(ex != null) return ex.optimize(cc);
 
     // try to rewrite filter to index access
     if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
-      final Path ip = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, preds));
+      final Path ip = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
       final Expr ie = ip.index(cc, Path.initial(cc, root));
       if(ie != ip) return ie;
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, preds));
+    if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, exprs));
 
     // evaluate positional predicates
     Expr expr = root;
     boolean opt = false;
-    for(final Expr pred : preds) {
+    for(final Expr pred : exprs) {
       Expr e = null;
       if(pred.isFunction(Function.LAST)) {
         if(expr.isValue()) {
@@ -198,7 +198,7 @@ public abstract class Filter extends Preds {
     }
 
     // return optimized expression or standard iterator
-    return opt ? cc.replaceWith(this, expr) : get(info, root, preds);
+    return opt ? cc.replaceWith(this, expr) : get(info, root, exprs);
   }
 
   @Override
@@ -212,7 +212,7 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public VarUsage count(final Var var) {
+  public final VarUsage count(final Var var) {
     final VarUsage inPreds = super.count(var), inRoot = root.count(var);
     if(inPreds == VarUsage.NEVER) return inRoot;
     final long sz = root.size();
@@ -221,17 +221,18 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+      throws QueryException {
+
     final Expr rt = root == null ? null : root.inline(var, ex, cc);
     if(rt != null) root = rt;
-
-    final boolean pr = inlineAll(preds, var, ex, cc);
+    final boolean pr = inlineAll(exprs, var, ex, cc);
     return pr || rt != null ? optimize(cc) : null;
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
-    for(final Expr e : preds) {
+  public final boolean accept(final ASTVisitor visitor) {
+    for(final Expr e : exprs) {
       visitor.enterFocus();
       if(!e.accept(visitor)) return false;
       visitor.exitFocus();
@@ -242,8 +243,14 @@ public abstract class Filter extends Preds {
   @Override
   public final int exprSize() {
     int sz = 1;
-    for(final Expr e : preds) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz + root.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Filter && root.equals(((Filter) obj).root) &&
+        super.equals(obj);
   }
 
   @Override

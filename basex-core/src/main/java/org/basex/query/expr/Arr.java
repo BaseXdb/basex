@@ -91,19 +91,6 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Checks if the specified expression has the same expressions.
-   * @param arr expression to be checked
-   * @return result of check
-   */
-  protected final boolean sameAs(final Arr arr) {
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      if(!exprs[e].sameAs(arr.exprs[e])) return false;
-    }
-    return true;
-  }
-
-  /**
    * Returns true if at least one argument returns the empty sequence.
    * @return result of check
    */
@@ -112,6 +99,27 @@ public abstract class Arr extends ParseExpr {
       if(expr.isEmpty()) return true;
     }
     return false;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, exprs);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr expr : exprs) sz += expr.exprSize();
+    return sz;
+  }
+
+  /**
+   * {@inheritDoc}
+   * Must be overwritten by implementing class.
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof Arr && Array.equals(exprs, ((Arr) obj).exprs);
   }
 
   @Override
@@ -126,17 +134,5 @@ public abstract class Arr extends ParseExpr {
    */
   protected String toString(final String sep) {
     return new TokenBuilder(PAREN1).addSep(exprs, sep).add(PAREN2).toString();
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, exprs);
-  }
-
-  @Override
-  public int exprSize() {
-    int sz = 1;
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
   }
 }

@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -49,6 +50,31 @@ public abstract class Expr extends ExprInfo {
      * functions arguments. Example: fold-left. */
     HOF,
   }
+
+  /**
+   * {@inheritDoc}
+   * <div>
+   * This function is e.g. called by:
+   * <ul>
+   *   <li>{@link If#optimize(CompileContext)}, {@link Switch#optimize(CompileContext)},
+   *     {@link Typeswitch#optimize(CompileContext)}, in order to discard identical expressions.
+   *   </li>
+   *   <li>{@link CmpR#intersect(CmpR)} or {@link CmpSR#intersect(CmpSR)},
+   *     in order to merge expressions with identical input.
+   *   </li>
+   *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},
+   *     in order to pre-evaluate equality tests.
+   *   </li>
+   *   <li>{@link CmpG#optimize(CompileContext)} or {@link Pos#get(OpV, Expr, Expr, InputInfo,
+   *     CompileContext)}, in order to compare the start and end value.
+   *   </li>
+   *   <li>{@link PathCache}, in order to find identical root values at runtime.
+   *   </li>
+   * </ul>
+   * </div>
+   */
+  @Override
+  public abstract boolean equals(Object obj);
 
   /**
    * Checks if the updating semantics are satisfied.
@@ -248,7 +274,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks how often a variable is used in this expression.
-   * This function is e.g. called by {@link SwitchGroups#countCases} or (indirectly)
+   * This function is e.g. called by {@link SwitchGroup#countCases} or (indirectly)
    * {@link GFLWOR#inlineLets}.
    * @param var variable to look for
    * @return how often the variable is used, see {@link VarUsage}
@@ -352,16 +378,6 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     return false;
-  }
-
-  /**
-   * Compares the current and specified expression for equality. {@code false} may be returned,
-   * even if the expressions are equal.
-   * @param cmp expression to be compared (can be {@code null})
-   * @return result of check
-   */
-  public boolean sameAs(final Expr cmp) {
-    return this == cmp;
   }
 
   /**

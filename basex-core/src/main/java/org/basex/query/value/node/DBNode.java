@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -427,8 +426,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
-    return cmp instanceof DBNode && data == ((DBNode) cmp).data && pre == ((DBNode) cmp).pre;
+  public final boolean equals(final Object obj) {
+    return obj instanceof DBNode && is((DBNode) obj);
   }
 
   @Override

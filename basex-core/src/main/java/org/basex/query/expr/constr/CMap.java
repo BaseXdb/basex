@@ -55,6 +55,11 @@ public final class CMap extends Arr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CMap && super.equals(obj);
+  }
+
+  @Override
   public String description() {
     return QueryText.MAP;
   }

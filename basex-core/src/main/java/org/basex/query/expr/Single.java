@@ -61,11 +61,6 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return expr.accept(visitor);
   }
@@ -73,5 +68,19 @@ public abstract class Single extends ParseExpr {
   @Override
   public int exprSize() {
     return expr.exprSize() + 1;
+  }
+
+  /**
+   * {@inheritDoc}
+   * Must be overwritten by implementing class.
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof Single && expr.equals(((Single) obj).expr);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), expr);
   }
 }

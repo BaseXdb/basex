@@ -8,53 +8,16 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class RegExpList extends ElementList {
-  /** Element container. */
-  private RegExp[] list = new RegExp[1];
-
+public final class RegExpList extends ObjectList<RegExp, RegExpList> {
   /**
-   * Adds an element to the array.
-   * @param element element to be added
-   * @return self reference
+   * Constructor.
    */
-  public RegExpList add(final RegExp element) {
-    if(size == list.length) resize(newSize());
-    list[size++] = element;
-    return this;
+  public RegExpList() {
+    super(new RegExp[1]);
   }
 
-  /**
-   * Returns the specified element.
-   * @param p position
-   * @return value
-   */
-  public RegExp get(final int p) {
-    return list[p];
-  }
-
-  /**
-   * Resizes the array.
-   * @param sz new size
-   */
-  private void resize(final int sz) {
-    final RegExp[] tmp = new RegExp[sz];
-    System.arraycopy(list, 0, tmp, 0, size);
-    list = tmp;
-  }
-
-  /**
-   * Returns an array with all elements and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
-   * @return array (internal representation!)
-   */
-  public RegExp[] finish() {
-    RegExp[] lst = list;
-    final int s = size;
-    if(s != lst.length) {
-      lst = new RegExp[s];
-      System.arraycopy(list, 0, lst, 0, s);
-    }
-    list = null;
-    return lst;
+  @Override
+  protected RegExp[] newList(final int s) {
+    return new RegExp[s];
   }
 }

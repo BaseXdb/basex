@@ -1,6 +1,5 @@
 package org.basex.query.expr.ft;
 
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -9,33 +8,24 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class FTTokens extends ElementList {
-  /** Element container. */
-  private TokenList[] list = new TokenList[1];
-
+public final class FTTokens extends ObjectList<TokenList, FTTokens> {
   /**
-   * Adds an element.
-   * @param e element to be added
+   * Constructor.
    */
-  public void add(final TokenList e) {
-    if(size == list.length) list = Array.copy(list, new TokenList[newSize()]);
-    list[size++] = e;
-  }
-
-  /**
-   * Returns the element at the specified index.
-   * @param i index
-   * @return element
-   */
-  public TokenList get(final int i) {
-    return list[i];
+  public FTTokens() {
+    super(new TokenList[1]);
   }
 
   /**
    * Returns the number of tokens of the first entry.
    * @return number of tokens
    */
-  int length() {
+  int firstSize() {
     return list[0].size();
+  }
+
+  @Override
+  protected TokenList[] newList(final int s) {
+    return new TokenList[s];
   }
 }

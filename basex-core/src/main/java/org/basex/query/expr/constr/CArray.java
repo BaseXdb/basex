@@ -56,6 +56,11 @@ public final class CArray extends Arr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof CArray && create == ((CArray) obj).create && super.equals(obj);
+  }
+
+  @Override
   public String description() {
     return QueryText.ARRAY;
   }

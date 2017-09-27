@@ -37,7 +37,7 @@ public final class CmpR extends Single {
   final double max;
   /** Include maximum value. */
   final boolean mxi;
-  /** Flag for atomic evaluation. */
+  /** Evaluation flag: atomic evaluation. */
   private final boolean atomic;
 
   /**
@@ -135,14 +135,12 @@ public final class CmpR extends Single {
    */
   Expr intersect(final CmpR c) {
     // skip intersection if expressions to be compared are different
-    if(!c.expr.sameAs(expr)) return null;
-
-    // find common minimum and maximum value
-    final double mn = Math.max(min, c.min);
-    final double mx = Math.min(max, c.max);
+    if(!c.expr.equals(expr)) return null;
 
     // remove comparisons that will never yield results
+    final double mn = Math.max(min, c.min), mx = Math.min(max, c.max);
     if(mn > mx) return Bln.FALSE;
+
     // do not rewrite checks for identical values (will be evaluated faster by index)
     return new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);
   }
@@ -221,6 +219,14 @@ public final class CmpR extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new CmpR(expr.copy(cc, vm), min, mni, max, mxi, info);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof CmpR)) return false;
+    final CmpR c = (CmpR) obj;
+    return min == c.min && mni == c.mni && max == c.max && mxi && c.mxi && super.equals(obj);
   }
 
   @Override

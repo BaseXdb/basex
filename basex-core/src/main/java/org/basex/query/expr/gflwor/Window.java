@@ -311,6 +311,34 @@ public final class Window extends Clause {
   }
 
   @Override
+  public void checkUp() throws QueryException {
+    checkNoUp(expr);
+    checkNoUp(start);
+    checkNoUp(end);
+  }
+
+  @Override
+  void calcSize(final long[] minMax) {
+    // number of results cannot be anticipated
+    minMax[0] = 0;
+    minMax[1] = expr.isEmpty() ? 0 : -1;
+  }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize() + start.exprSize() + (end == null ? 0 : end.exprSize());
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Window)) return false;
+    final Window w = (Window) obj;
+    return sliding == w.sliding && var.equals(w.var) && expr.equals(w.expr) &&
+        start.equals(w.start) && only == w.only && Array.equals(end, w.end);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem(token(SLIDING), token(sliding));
     var.plan(e);
@@ -330,25 +358,6 @@ public final class Window extends Clause {
       sb.append(' ').append(end);
     }
     return sb.toString();
-  }
-
-  @Override
-  public void checkUp() throws QueryException {
-    checkNoUp(expr);
-    checkNoUp(start);
-    checkNoUp(end);
-  }
-
-  @Override
-  void calcSize(final long[] minMax) {
-    // number of results cannot be anticipated
-    minMax[0] = 0;
-    minMax[1] = expr.isEmpty() ? 0 : -1;
-  }
-
-  @Override
-  public int exprSize() {
-    return expr.exprSize() + start.exprSize() + (end == null ? 0 : end.exprSize());
   }
 
   /**

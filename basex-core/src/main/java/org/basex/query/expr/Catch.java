@@ -149,11 +149,6 @@ public final class Catch extends Single {
     return false;
   }
 
-  @Override
-  public String toString() {
-    return "catch * { " + expr + " }";
-  }
-
   /**
    * Creates an error QName with the specified name.
    * @param n name
@@ -172,5 +167,18 @@ public final class Catch extends Single {
   @Override
   public int exprSize() {
     return expr.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Catch)) return false;
+    final Catch c = (Catch) obj;
+    return Array.equals(vars, c.vars) && Array.equals(codes, c.codes) && super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return "catch * { " + expr + " }";
   }
 }

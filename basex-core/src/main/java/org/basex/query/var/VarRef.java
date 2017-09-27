@@ -89,8 +89,8 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof VarRef && var.is(((VarRef) cmp).var);
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof VarRef && var.is(((VarRef) obj).var);
   }
 
   @Override

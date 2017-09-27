@@ -416,17 +416,8 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
-    if(cmp instanceof StandardFunc) {
-      final StandardFunc sf = (StandardFunc) cmp;
-      final int el = exprs.length;
-      if(sig == sf.sig && el == sf.exprs.length) {
-        for(int e = 0; e < el; e++) {
-          if(!exprs[e].sameAs(sf.exprs[e])) return false;
-        }
-        return true;
-      }
-    }
-    return false;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof StandardFunc && sig == ((StandardFunc) obj).sig &&
+        super.equals(obj);
   }
 }

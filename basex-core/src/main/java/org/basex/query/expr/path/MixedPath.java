@@ -67,7 +67,7 @@ public final class MixedPath extends Path {
         focus.pos = 1;
 
         // loop through all input items; cache nodes and items
-        final ANodeList nodes = new ANodeList().check();
+        final ANodeBuilder nodes = new ANodeBuilder();
         final ItemList items = new ItemList();
         final Expr step = steps[s];
         for(Item it; (it = iter.next()) != null;) {

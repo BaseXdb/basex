@@ -43,18 +43,6 @@ public final class Where extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    expr.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    return QueryText.WHERE + ' ' + expr;
-  }
-
-  @Override
   public boolean has(final Flag flag) {
     return expr.has(flag);
   }
@@ -121,5 +109,22 @@ public final class Where extends Clause {
   @Override
   public int exprSize() {
     return expr.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof Where && expr.equals(((Where) obj).expr);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    expr.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    return QueryText.WHERE + ' ' + expr;
   }
 }

@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class FTExtensionSelection extends FTExpr {
+public final class FTExtension extends FTExpr {
   /** Pragmas. */
   private final Pragma[] pragmas;
 
@@ -26,7 +26,7 @@ public final class FTExtensionSelection extends FTExpr {
    * @param pragmas pragmas
    * @param expr enclosed FTSelection
    */
-  public FTExtensionSelection(final InputInfo info, final Pragma[] pragmas, final FTExpr expr) {
+  public FTExtension(final InputInfo info, final Pragma[] pragmas, final FTExpr expr) {
     super(info, expr);
     this.pragmas = pragmas;
   }
@@ -46,7 +46,13 @@ public final class FTExtensionSelection extends FTExpr {
     final Pragma[] prag = pragmas.clone();
     final int pl = prag.length;
     for(int i = 0; i < pl; i++) prag[i] = prag[i].copy();
-    return copyType(new FTExtensionSelection(info, prag, exprs[0].copy(cc, vm)));
+    return copyType(new FTExtension(info, prag, exprs[0].copy(cc, vm)));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTExtension &&
+        Array.equals(pragmas, ((FTExtension) obj).pragmas) && super.equals(obj);
   }
 
   @Override

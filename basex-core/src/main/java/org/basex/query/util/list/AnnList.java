@@ -2,11 +2,8 @@ package org.basex.query.util.list;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -15,30 +12,12 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class AnnList extends ElementList implements Iterable<Ann> {
-  /** Annotations. */
-  private Ann[] anns = {};
-
+public final class AnnList extends ObjectList<Ann, AnnList> {
   /**
-   * Adds a QName/value pair.
-   * @param ann annotation
+   * Constructor.
    */
-  public void add(final Ann ann) {
-    // create new entry
-    final int s = size;
-    if(s == anns.length) anns = Array.copy(anns, new Ann[newSize()]);
-    anns[s] = ann;
-    size = s + 1;
-  }
-
-  /**
-   * Checks if the specified annotation is found in the list.
-   * @param ann annotation to be found
-   * @return result of check
-   */
-  public boolean contains(final Ann ann) {
-    for(final Ann a : anns) if(a.eq(ann)) return true;
-    return false;
+  public AnnList() {
+    super(new Ann[0]);
   }
 
   /**
@@ -46,7 +25,7 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
    * @param sig signature to be found
    */
   public void delete(final Annotation sig) {
-    final Ann[] lst = anns;
+    final Ann[] lst = list;
     final int sz = size;
     int s = 0;
     for(int i = 0; i < sz; ++i) {
@@ -114,8 +93,8 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
   public AnnList intersect(final AnnList al) {
     final AnnList tmp = new AnnList();
     for(final Ann ann : this) {
-      for(final Ann ann2 : al.anns) {
-        if(ann.eq(ann2)) tmp.add(ann);
+      for(final Ann ann2 : al.list) {
+        if(ann.equals(ann2)) tmp.add(ann);
       }
     }
     return tmp;
@@ -144,8 +123,8 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
   }
 
   @Override
-  public Iterator<Ann> iterator() {
-    return new ArrayIterator<>(anns, size);
+  protected Ann[] newList(final int s) {
+    return new Ann[s];
   }
 
   @Override

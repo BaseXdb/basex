@@ -138,6 +138,11 @@ abstract class CName extends CNode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof CName && name.equals(((CName) obj).name) && super.equals(obj);
+  }
+
+  @Override
   public final String toString() {
     return toString(desc + (name.seqType().eq(SeqType.QNM) ? " " + name : " { " + name + " }"));
   }

@@ -126,6 +126,12 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    // [CG] could be enhanced
+    return this == obj;
+  }
+
+  @Override
   public String toString() {
     return new TokenBuilder(name.string()).add('#').addExt(args.length).toString();
   }

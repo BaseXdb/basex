@@ -62,7 +62,7 @@ final class DOTData {
     // violet
     { "9933FF", CAttr.class, CComm.class, CDoc.class, CElem.class,
                 CNSpace.class, CPI.class, CTxt.class },
-    { "9933CC", And.class, Or.class, Union.class, InterSect.class, Except.class },
+    { "9933CC", And.class, Or.class, Union.class, Intersect.class, Except.class },
     // pink
     { "CC3399", If.class, Quantifier.class },
     { "CC6699", OrderBy.class },

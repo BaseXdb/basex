@@ -83,6 +83,11 @@ public class KindTest extends Test {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof KindTest && type == ((KindTest) obj).type;
+  }
+
+  @Override
   public String toString() {
     return String.valueOf(type);
   }

@@ -136,6 +136,11 @@ public final class Let extends ForLet {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Let && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     if(scoring) e.add(planAttr(Token.token(SCORE), Token.TRUE));

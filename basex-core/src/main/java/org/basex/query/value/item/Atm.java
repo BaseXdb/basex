@@ -1,7 +1,6 @@
 package org.basex.query.value.item;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -62,8 +61,8 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Atm && Token.eq(value, ((Atm) cmp).value);
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Atm && Token.eq(value, ((Atm) obj).value);
   }
 
   @Override

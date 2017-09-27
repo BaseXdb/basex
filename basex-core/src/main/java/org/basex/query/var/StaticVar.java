@@ -136,30 +136,8 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem(NAM, name.string());
-    if(expr != null) expr.plan(e);
-    plan.add(e);
-  }
-
-  @Override
   public boolean visit(final ASTVisitor visitor) {
     return expr == null || expr.accept(visitor);
-  }
-
-  @Override
-  public String description() {
-    return "Variable declaration";
-  }
-
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
-    tb.add(VARIABLE).add(' ').add(name());
-    if(type != null) tb.add(' ').add(AS).add(' ').addExt(type);
-    if(external) tb.add(' ').add(EXTERNAL);
-    if(expr != null) tb.add(' ').add(ASSIGN).add(' ').addExt(expr);
-    return tb.add(';').toString();
   }
 
   @Override
@@ -186,5 +164,27 @@ public final class StaticVar extends StaticDecl {
     final boolean res = expr.has(flag);
     dontEnter = false;
     return res;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem(NAM, name.string());
+    if(expr != null) expr.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String description() {
+    return "Variable declaration";
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
+    tb.add(VARIABLE).add(' ').add(name());
+    if(type != null) tb.add(' ').add(AS).add(' ').addExt(type);
+    if(external) tb.add(' ').add(EXTERNAL);
+    if(expr != null) tb.add(' ').add(ASSIGN).add(' ').addExt(expr);
+    return tb.add(';').toString();
   }
 }

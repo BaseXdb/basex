@@ -155,8 +155,7 @@ public final class Var extends ExprInfo {
    * @return checked expression
    * @throws QueryException query exception
    */
-  public Expr checked(final Expr ex, final CompileContext cc)
-      throws QueryException {
+  public Expr checked(final Expr ex, final CompileContext cc) throws QueryException {
     return checksType() ? new TypeCheck(sc, info, ex, type, promote).optimize(cc) : ex;
   }
 

@@ -484,6 +484,16 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
+  public final boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof ADate)) return false;
+    final ADate a = (ADate) obj;
+    return type.eq(a.type) && yea == a.yea && mon == a.mon && day == a.day &&
+        hou == a.hou && min == a.min && sec == a.sec && tz == a.tz &&
+        (sec == null ? a.sec == null : sec.compareTo(a.sec) == 0);
+  }
+
+  @Override
   public final String toString() {
     return Util.info("\"%\"", string(null));
   }

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -96,13 +95,6 @@ public final class Str extends AStr {
    */
   public byte[] string() {
     return value;
-  }
-
-  @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Str)) return false;
-    final Str i = (Str) cmp;
-    return type == i.type && Token.eq(value, i.value);
   }
 
   @Override

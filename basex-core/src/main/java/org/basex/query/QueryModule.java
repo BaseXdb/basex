@@ -2,6 +2,8 @@ package org.basex.query;
 
 import java.lang.annotation.*;
 
+import org.basex.query.expr.*;
+
 /**
  * <p>The XQuery {@code import module} statement can be used to import XQuery modules
  * as well as Java instances, which will be treated as modules. Any class with a public,
@@ -9,7 +11,7 @@ import java.lang.annotation.*;
  *
  * <p>If a class extends the {@link QueryModule} class, it inherits the {@link #queryContext}
  * and {@link #staticContext} variables, which provide access to all properties of the
- * current query. E.g., they provide access to the current {@link QueryContext#value
+ * current query. E.g., they provide access to the current {@link QueryContext#value(Expr)
  * context value} or the {@link StaticContext#ns declared namespaces} of a query.</p>
  *
  * <p>The default properties of functions can be overwritten via annotations:</p>

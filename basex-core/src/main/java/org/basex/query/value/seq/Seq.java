@@ -149,6 +149,19 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Seq)) return false;
+    final Seq s = (Seq) obj;
+    if(size != s.size) return false;
+    final BasicIter<Item> i1 = iter(), i2 = s.iter();
+    for(Item it1; (it1 = i1.next()) != null;) {
+      if(!it1.equals(i2.next())) return false;
+    }
+    return true;
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(SIZE, size);
     addPlan(plan, el);

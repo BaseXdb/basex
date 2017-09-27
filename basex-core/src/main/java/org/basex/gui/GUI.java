@@ -518,7 +518,7 @@ public final class GUI extends JFrame {
           // check if result has changed
           final boolean flt = gopts.get(GUIOptions.FILTERRT);
           final DBNodes curr = context.current();
-          if(flt || curr != null && !curr.sameAs(current)) {
+          if(flt || curr != null && !curr.equals(current)) {
             // refresh context if at least one node was found
             if(nodes != null) notify.context(nodes, flt, null);
           } else if(context.marked != null) {

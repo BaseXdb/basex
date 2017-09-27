@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -14,16 +16,16 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Case expression for typeswitch.
+ * Group of type switch cases.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class TypeCase extends Single {
+public final class TypeswitchGroup extends Single {
   /** Variable. */
   final Var var;
-  /** Matched sequence types. */
-  private final SeqType[] types;
+  /** Matched sequence types (default switch if array is empty). */
+  private SeqType[] types;
 
   /**
    * Constructor.
@@ -32,32 +34,17 @@ public final class TypeCase extends Single {
    * @param types sequence types this case matches, the empty array means {@code default}
    * @param expr return expression
    */
-  public TypeCase(final InputInfo info, final Var var, final SeqType[] types, final Expr expr) {
+  public TypeswitchGroup(final InputInfo info, final Var var, final SeqType[] types,
+      final Expr expr) {
     super(info, expr);
     this.var = var;
     this.types = types;
   }
 
   @Override
-  public TypeCase compile(final CompileContext cc) throws QueryException {
-    return compile(cc, null);
-  }
-
-  /**
-   * Compiles the expression.
-   * @param cc compilation context
-   * @param v value to be bound
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  TypeCase compile(final CompileContext cc, final Value v) throws QueryException {
-    final Value val = var != null && v != null ? var.checkType(v, cc.qc, true) : null;
+  public TypeswitchGroup compile(final CompileContext cc) throws QueryException {
     try {
       super.compile(cc);
-      if(val != null) {
-        final Expr inlined = expr.inline(var, val, cc);
-        if(inlined != null) expr = inlined;
-      }
     } catch(final QueryException ex) {
       // replace original expression with error
       expr = cc.error(ex, expr);
@@ -66,9 +53,44 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase optimize(final CompileContext cc) {
+  public TypeswitchGroup optimize(final CompileContext cc) throws QueryException {
     seqType = expr.seqType();
     return this;
+  }
+
+  /**
+   * Optimizes the expression.
+   * @param cc compilation context
+   * @param value value to be bound
+   * @throws QueryException query exception
+   */
+  void opt(final CompileContext cc, final Value value) throws QueryException {
+    if(var == null) return;
+    final Expr e = expr.inline(var, var.checkType(value, cc.qc, true), cc);
+    if(e != null) expr = e;
+  }
+
+  /**
+   * Removes redundant types.
+   * @param cc compilation context
+   * @param cache cached types
+   * @return {@code true} if the group is here to stay
+   */
+  boolean removeTypes(final CompileContext cc, final ArrayList<SeqType> cache) {
+    // default branch must be preserved
+    if(types.length == 0) return true;
+    // remove redundant types
+    final ArrayList<SeqType> tmp = new ArrayList<>();
+    for(final SeqType st : types) {
+      if(cache.contains(st)) {
+        cc.info(OPTREMOVE_X_X, description(), st);
+      } else {
+        tmp.add(st);
+        cache.add(st);
+      }
+    }
+    if(types.length != tmp.size()) types = tmp.toArray(new SeqType[tmp.size()]);
+    return types.length != 0;
   }
 
   @Override
@@ -82,8 +104,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeCase(info, cc.copy(var, vm), types.clone(), expr.copy(cc, vm));
+  public TypeswitchGroup copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new TypeswitchGroup(info, cc.copy(var, vm), types.clone(), expr.copy(cc, vm));
   }
 
   /**
@@ -93,7 +115,7 @@ public final class TypeCase extends Single {
    */
   boolean matches(final Value val) {
     if(types.length == 0) return true;
-    for(final SeqType t : types) if(t.instance(val)) return true;
+    for(final SeqType st : types) if(st.instance(val)) return true;
     return false;
   }
 
@@ -113,6 +135,29 @@ public final class TypeCase extends Single {
   }
 
   @Override
+  public void markTailCalls(final CompileContext cc) {
+    expr.markTailCalls(cc);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return super.accept(visitor) && (var == null || visitor.declared(var));
+  }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof TypeswitchGroup)) return false;
+    final TypeswitchGroup t = (TypeswitchGroup) obj;
+    return Array.equals(types, t.types) && var.equals(t.var) && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     if(types.length == 0) {
@@ -120,9 +165,9 @@ public final class TypeCase extends Single {
     } else {
       final byte[] or = { ' ', '|', ' ' };
       final ByteList bl = new ByteList();
-      for(final SeqType t : types) {
+      for(final SeqType st : types) {
         if(!bl.isEmpty()) bl.add(or);
-        bl.add(Token.token(t.toString()));
+        bl.add(Token.token(st.toString()));
       }
       e.add(planAttr(Token.token(TYPE), bl.finish()));
     }
@@ -146,20 +191,5 @@ public final class TypeCase extends Single {
       }
     }
     return tb.add(' ' + RETURN + ' ' + expr).toString();
-  }
-
-  @Override
-  public void markTailCalls(final CompileContext cc) {
-    expr.markTailCalls(cc);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return super.accept(visitor) && (var == null || visitor.declared(var));
-  }
-
-  @Override
-  public int exprSize() {
-    return expr.exprSize();
   }
 }

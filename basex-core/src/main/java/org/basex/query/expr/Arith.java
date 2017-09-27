@@ -63,18 +63,8 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(cmp instanceof Arith) {
-      final Arith a = (Arith) cmp;
-      if(calc == a.calc) {
-        final int el = exprs.length;
-        for(int e = 0; e < el; e++) {
-          if(!exprs[e].sameAs(a.exprs[e])) return false;
-        }
-        return true;
-      }
-    }
-    return false;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Arith && calc == ((Arith) obj).calc && super.equals(obj);
   }
 
   @Override

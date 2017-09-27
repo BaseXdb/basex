@@ -90,7 +90,7 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public VarUsage count(final Var var) {
+  public final VarUsage count(final Var var) {
     VarUsage all = VarUsage.NEVER;
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
@@ -101,11 +101,16 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public final boolean removable(final Var var) {
     if(!exprs[0].removable(var)) return false;
     final int el = exprs.length;
     for(int e = 1; e < el; e++) if(exprs[e].uses(var)) return false;
     return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof SimpleMap && super.equals(obj);
   }
 
   @Override

@@ -101,7 +101,7 @@ public final class Array {
    * @return object
    */
   public static <T> T[] copy(final T[] source, final T[] target) {
-    System.arraycopy(source, 0, target, 0, source.length);
+    System.arraycopy(source, 0, target, 0, Math.min(source.length, target.length));
     return target;
   }
 
@@ -233,5 +233,98 @@ public final class Array {
    */
   public static int newSize(final int old, final double factor) {
     return (int) (old * factor) + 1;
+  }
+
+  /**
+   * Compares two objects for equality.
+   * @param object1 first object (can be {@code null})
+   * @param object2 second object (can be {@code null})
+   * @return result of check
+   */
+  public static boolean equals(final Object object1, final Object object2) {
+    return object1 == null ? object2 == null : object1.equals(object2);
+  }
+
+  /**
+   * Compares two token arrays for equality.
+   * @param tokens1 first tokens (can be {@code null})
+   * @param tokens2 second tokens (can be {@code null})
+   * @return result of check
+   */
+  public static boolean equals(final byte[][] tokens1, final byte[][] tokens2) {
+    if(tokens1 == tokens2) return true;
+    if(tokens1 == null || tokens2 == null) return false;
+    final int al = tokens1.length;
+    return al == tokens2.length && eq(tokens1, tokens2, al);
+  }
+
+  /**
+   * Compares two objects for equality.
+   * @param tokens1 first tokens (can be {@code null})
+   * @param tokens2 second tokens (can be {@code null})
+   * @param size1 number of entries of first tokens
+   * @param size2 number of entries of first tokens
+   * @return result of check
+   */
+  public static boolean equals(final byte[][] tokens1, final byte[][] tokens2, final int size1,
+      final int size2) {
+    return size1 == size2 && (tokens1 == tokens2 || tokens1 != null && tokens2 != null &&
+        eq(tokens1, tokens2, size1));
+  }
+
+  /**
+   * Compares two objects for equality.
+   * @param tokens1 first tokens (entries can be {@code null})
+   * @param tokens2 second tokens (entries can be {@code null})
+   * @param size size to be checked
+   * @return result of check
+   */
+  private static boolean eq(final byte[][] tokens1, final byte[][] tokens2, final int size) {
+    for(int a = 0; a < size; a++) {
+      if(!Token.eq(tokens1[a], tokens2[a])) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Compares two arrays for equality.
+   * @param arr1 first array (can be {@code null})
+   * @param arr2 second array (can be {@code null})
+   * @return result of check
+   */
+  public static boolean equals(final Object[] arr1, final Object[] arr2) {
+    if(arr1 == arr2) return true;
+    if(arr1 == null || arr2 == null) return false;
+    final int al = arr1.length;
+    return al == arr2.length && eq(arr1, arr2, al);
+  }
+
+  /**
+   * Compares two objects for equality.
+   * @param arr1 first array (can be {@code null})
+   * @param arr2 second array (can be {@code null})
+   * @param size1 number of entries of first array
+   * @param size2 number of entries of second array
+   * @return result of check
+   */
+  public static boolean equals(final Object[] arr1, final Object[] arr2, final int size1,
+      final int size2) {
+    return size1 == size2 && (arr1 == arr2 || arr1 != null && arr2 != null &&
+        eq(arr1, arr2, size1));
+  }
+
+  /**
+   * Compares two objects for equality.
+   * @param arr1 first object (entries can be {@code null})
+   * @param arr2 second object (entries can be {@code null})
+   * @param size size to be checked
+   * @return result of check
+   */
+  private static boolean eq(final Object[] arr1, final Object[] arr2, final int size) {
+    for(int a = 0; a < size; a++) {
+      final Object o1 = arr1[a], o2 = arr2[a];
+      if(!(o1 == null ? o2 == null : o1.equals(o2))) return false;
+    }
+    return true;
   }
 }

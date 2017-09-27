@@ -65,7 +65,7 @@ public final class If extends Arr {
     if(cond.isValue()) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(exprs[0].sameAs(exprs[1])) return cc.replaceWith(this, exprs[0]);
+    if(exprs[0].equals(exprs[1])) return cc.replaceWith(this, exprs[0]);
 
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
@@ -187,16 +187,6 @@ public final class If extends Arr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), cond, exprs);
-  }
-
-  @Override
-  public String toString() {
-    return IF + '(' + cond + ") " + THEN + ' ' + exprs[0] + ' ' + ELSE + ' ' + exprs[1];
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return cond.accept(visitor) && super.accept(visitor);
   }
@@ -219,5 +209,20 @@ public final class If extends Arr {
       }
     }
     return optimize(cc);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof If && cond.equals(((If) obj).cond) && super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), cond, exprs);
+  }
+
+  @Override
+  public String toString() {
+    return IF + '(' + cond + ") " + THEN + ' ' + exprs[0] + ' ' + ELSE + ' ' + exprs[1];
   }
 }

@@ -133,6 +133,11 @@ public final class Lookup extends Arr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Lookup && super.equals(obj);
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     if(exprs.length > 1) sb.append('(').append(exprs[1]).append(')');

@@ -96,6 +96,12 @@ public final class Replace extends Update {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Replace && value == ((Replace) obj).value &&
+        super.equals(obj);
+  }
+
+  @Override
   public String toString() {
     return REPLACE + (value ? ' ' + VALUEE + ' ' + OF : "") +
       ' ' + NODE + ' ' + exprs[0] + ' ' + WITH + ' ' + exprs[1];

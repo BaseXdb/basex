@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -117,8 +116,9 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Flt && value == ((Flt) cmp).value || this == NAN && cmp == NAN;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Flt && value == ((Flt) obj).value ||
+        this == NAN && obj == NAN;
   }
 
   /**

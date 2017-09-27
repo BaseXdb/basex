@@ -1,13 +1,12 @@
 package org.basex.query.value.seq;
 
 import java.math.*;
-import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Sequence of items of type {@link Int xs:decimal}, containing at least two of them.
@@ -34,8 +33,9 @@ public final class DecSeq extends NativeSeq {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof DecSeq && Arrays.equals(values, ((DecSeq) cmp).values);
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof DecSeq ? Array.equals(values, ((DecSeq) obj).values) :
+      super.equals(obj));
   }
 
   @Override

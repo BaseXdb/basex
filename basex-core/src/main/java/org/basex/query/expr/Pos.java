@@ -51,7 +51,7 @@ public final class Pos extends Arr {
         if(e1.seqType().type.instanceOf(AtomType.ITR) &&
            e2.seqType().type.instanceOf(AtomType.ITR)) {
           min = e1;
-          max = e1.sameAs(e2) ? e1 : e2;
+          max = e1.equals(e2) ? e1 : e2;
         }
       } else {
         final SeqType st = arg.seqType();
@@ -139,8 +139,8 @@ public final class Pos extends Arr {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Pos && sameAs((Pos) cmp);
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Pos && super.equals(obj);
   }
 
   @Override

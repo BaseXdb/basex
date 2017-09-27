@@ -77,4 +77,11 @@ abstract class ForLet extends Clause {
   public final int exprSize() {
     return expr.exprSize();
   }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof ForLet)) return false;
+    final ForLet fl = (ForLet) obj;
+    return expr.equals(fl.expr) && var.equals(fl.var) && scoring == fl.scoring;
+  }
 }

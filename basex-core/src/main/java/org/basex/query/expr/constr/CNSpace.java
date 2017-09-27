@@ -45,6 +45,11 @@ public final class CNSpace extends CName {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CNSpace && super.equals(obj);
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new CNSpace(sc, info, name.copy(cc, vm), exprs[0].copy(cc, vm));
   }

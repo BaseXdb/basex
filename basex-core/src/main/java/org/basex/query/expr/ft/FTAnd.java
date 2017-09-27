@@ -2,6 +2,8 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -144,6 +146,12 @@ public final class FTAnd extends FTExpr {
     final FTAnd copy = new FTAnd(info, Arr.copyAll(cc, vm, exprs));
     if(negated != null) copy.negated = negated.clone();
     return copy;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTAnd && Arrays.equals(negated, ((FTAnd) obj).negated) &&
+        super.equals(obj);
   }
 
   @Override

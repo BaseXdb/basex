@@ -112,6 +112,11 @@ public final class CmpN extends Cmp {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CmpN && op == ((CmpN) obj).op && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(OP, op.name), exprs);
   }

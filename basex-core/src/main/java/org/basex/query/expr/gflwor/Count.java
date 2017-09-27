@@ -110,6 +110,11 @@ public final class Count extends Clause {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Count && var.equals(((Count) obj).var);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     var.plan(e);

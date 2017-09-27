@@ -139,6 +139,18 @@ public class LongList extends ElementList {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(obj == this) return true;
+    if(!(obj instanceof LongList)) return false;
+    final LongList ll = (LongList) obj;
+    if(size != ll.size) return false;
+    for(int l = 0; l < size; ++l) {
+      if(list[l] != ll.list[l]) return false;
+    }
+    return true;
+  }
+
+  @Override
   public String toString() {
     return list == null ? "" : Arrays.toString(toArray());
   }

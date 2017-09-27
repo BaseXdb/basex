@@ -22,10 +22,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Switch extends ParseExpr {
-  /** Case groups. */
-  private SwitchGroups[] groups;
   /** Condition. */
   private Expr cond;
+  /** Case groups. */
+  private SwitchGroup[] groups;
 
   /**
    * Constructor.
@@ -33,27 +33,27 @@ public final class Switch extends ParseExpr {
    * @param cond condition
    * @param groups case groups (last one is default case)
    */
-  public Switch(final InputInfo info, final Expr cond, final SwitchGroups[] groups) {
+  public Switch(final InputInfo info, final Expr cond, final SwitchGroup[] groups) {
     super(info);
-    this.groups = groups;
     this.cond = cond;
+    this.groups = groups;
   }
 
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
-    for(final SwitchGroups group : groups) group.checkUp();
+    for(final SwitchGroup group : groups) group.checkUp();
     // check if none or all return expressions are updating
-    final int cl = groups.length;
-    final Expr[] tmp = new Expr[cl];
-    for(int c = 0; c < cl; c++) tmp[c] = groups[c].exprs[0];
+    final int gl = groups.length;
+    final Expr[] tmp = new Expr[gl];
+    for(int g = 0; g < gl; g++) tmp[g] = groups[g].exprs[0];
     checkAllUp(tmp);
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     cond = cond.compile(cc);
-    for(final SwitchGroups group : groups) group.compile(cc);
+    for(final SwitchGroup group : groups) group.compile(cc);
     return optimize(cc);
   }
 
@@ -63,10 +63,10 @@ public final class Switch extends ParseExpr {
     final Expr expr = opt(cc);
     if(expr != this) return cc.replaceWith(this, expr);
 
-    // expression could not be pre-evaluated
+    // combine types of return expressions
     seqType = groups[0].exprs[0].seqType();
-    final int cl = groups.length;
-    for(int c = 1; c < cl; c++) seqType = seqType.union(groups[c].exprs[0].seqType());
+    final int gl = groups.length;
+    for(int g = 1; g < gl; g++) seqType = seqType.union(groups[g].exprs[0].seqType());
     return this;
   }
 
@@ -80,8 +80,8 @@ public final class Switch extends ParseExpr {
     // cached switch cases
     final ExprList cases = new ExprList();
     final Item it = cond.isValue() ? cond.atomItem(cc.qc, info) : null;
-    final ArrayList<SwitchGroups> tmpGroups = new ArrayList<>();
-    for(final SwitchGroups group : groups) {
+    final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
+    for(final SwitchGroup group : groups) {
       final int el = group.exprs.length;
       final Expr ret = group.exprs[0];
       final ExprList list = new ExprList(el).add(ret);
@@ -110,17 +110,16 @@ public final class Switch extends ParseExpr {
     if(tmpGroups.size() != groups.length) {
       // branches have changed
       cc.info(OPTSIMPLE_X, this);
-      groups = tmpGroups.toArray(new SwitchGroups[tmpGroups.size()]);
+      groups = tmpGroups.toArray(new SwitchGroup[tmpGroups.size()]);
     }
 
-    // return default branch (last one) if all others were discarded
-    if(groups.length == 1) return groups[0].exprs[0];
-
-    if(groups.length == 2 && groups[0].exprs.length == 2) {
-      //return new If(info, new CmpV(cond, groups[0].exprs[1], null, info)));
+    // return first expression if all return expressions are equal, or if only one branch is left
+    final Expr expr = groups[0].exprs[0];
+    final int gl = groups.length;
+    for(int g = 1; g < gl; g++) {
+      if(!expr.equals(groups[g].exprs[0])) return this;
     }
-
-    return this;
+    return expr;
   }
 
   @Override
@@ -140,7 +139,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public boolean isVacuous() {
-    for(final SwitchGroups group : groups) {
+    for(final SwitchGroup group : groups) {
       if(!group.exprs[0].isVacuous()) return false;
     }
     return true;
@@ -148,7 +147,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public boolean has(final Flag flag) {
-    for(final SwitchGroups group : groups) {
+    for(final SwitchGroup group : groups) {
       if(group.has(flag)) return true;
     }
     return cond.has(flag);
@@ -156,7 +155,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public boolean removable(final Var var) {
-    for(final SwitchGroups group : groups) {
+    for(final SwitchGroup group : groups) {
       if(!group.removable(var)) return false;
     }
     return cond.removable(var);
@@ -165,7 +164,7 @@ public final class Switch extends ParseExpr {
   @Override
   public VarUsage count(final Var var) {
     VarUsage max = VarUsage.NEVER, curr = VarUsage.NEVER;
-    for(final SwitchGroups cs : groups) {
+    for(final SwitchGroup cs : groups) {
       curr = curr.plus(cs.countCases(var));
       max = max.max(curr.plus(cs.count(var)));
     }
@@ -191,7 +190,7 @@ public final class Switch extends ParseExpr {
    */
   private Expr getCase(final QueryContext qc) throws QueryException {
     final Item it = cond.atomItem(qc, info);
-    for(final SwitchGroups group : groups) {
+    for(final SwitchGroup group : groups) {
       final int gl = group.exprs.length;
       for(int e = 1; e < gl; e++) {
         // includes check for empty sequence (null reference)
@@ -211,20 +210,8 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), cond, groups);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(SWITCH + PAREN1 + cond + PAREN2);
-    for(final SwitchGroups group : groups) sb.append(group);
-    return sb.toString();
-  }
-
-  @Override
   public void markTailCalls(final CompileContext cc) {
-    for(final SwitchGroups group : groups) group.markTailCalls(cc);
+    for(final SwitchGroup group : groups) group.markTailCalls(cc);
   }
 
   @Override
@@ -237,5 +224,25 @@ public final class Switch extends ParseExpr {
     int sz = 1;
     for(final Expr e : groups) sz += e.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Switch)) return false;
+    final Switch s = (Switch) obj;
+    return cond.equals(s.cond) && Array.equals(groups, s.groups);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), cond, groups);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(SWITCH + PAREN1 + cond + PAREN2);
+    for(final SwitchGroup group : groups) sb.append(group);
+    return sb.toString();
   }
 }

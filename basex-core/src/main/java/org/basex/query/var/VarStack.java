@@ -11,10 +11,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class VarStack extends ElementList {
-  /** Variable expressions. */
-  private Var[] vars;
-
+public final class VarStack extends ObjectList<Var, VarStack> {
   /**
    * Default constructor.
    */
@@ -27,16 +24,7 @@ public final class VarStack extends ElementList {
    * @param c initial capacity
    */
   public VarStack(final int c) {
-    vars = new Var[c];
-  }
-
-  /**
-   * Adds the specified variable.
-   * @param var variable
-   */
-  public void push(final Var var) {
-    if(size == vars.length) vars = Array.copy(vars, new Var[newSize()]);
-    vars[size++] = var;
+    super(new Var[c]);
   }
 
   /**
@@ -46,7 +34,12 @@ public final class VarStack extends ElementList {
    * @return variable
    */
   public Var get(final QNm name) {
-    for(int i = size; i-- > 0;) if(name.eq(vars[i].name)) return vars[i];
+    for(int i = size; i-- > 0;) if(name.eq(list[i].name)) return list[i];
     return null;
+  }
+
+  @Override
+  protected Var[] newList(final int s) {
+    return new Var[s];
   }
 }

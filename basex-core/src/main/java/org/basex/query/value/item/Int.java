@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -184,9 +183,10 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Int)) return false;
-    final Int i = (Int) cmp;
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Int)) return false;
+    final Int i = (Int) obj;
     return type == i.type && value == i.value;
   }
 

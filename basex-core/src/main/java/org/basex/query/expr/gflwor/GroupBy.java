@@ -47,8 +47,7 @@ public final class GroupBy extends Clause {
     super(info, vars(specs, post));
     this.specs = specs;
     this.post = post;
-    preExpr = new Expr[pre.length];
-    System.arraycopy(pre, 0, preExpr, 0, pre.length);
+    preExpr = Array.copy(pre, new Expr[pre.length]);
     int n = 0;
     for(final Spec spec : specs) if(!spec.occluded) n++;
     nonOcc = n;
@@ -303,6 +302,15 @@ public final class GroupBy extends Clause {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof GroupBy)) return false;
+    final GroupBy g = (GroupBy) obj;
+    return Array.equals(specs, g.specs) && Array.equals(preExpr, g.preExpr) &&
+        Array.equals(post, g.post);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     for(final Spec spec : specs) spec.plan(e);
@@ -385,6 +393,15 @@ public final class GroupBy extends Clause {
     @Override
     public int exprSize() {
       return expr.exprSize();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if(this == obj) return true;
+      if(!(obj instanceof Spec)) return false;
+      final Spec s = (Spec) obj;
+      return var.equals(s.var) && occluded == s.occluded && Array.equals(coll, s.coll) &&
+          super.equals(obj);
     }
 
     @Override

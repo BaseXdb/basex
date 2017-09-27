@@ -27,7 +27,7 @@ public abstract class StaticDecl extends StaticScope {
    * Constructor.
    * @param anns annotations
    * @param name name
-   * @param type declared return type
+   * @param type declared return type (can be {@code null})
    * @param vs variable scope
    * @param doc xqdoc documentation
    * @param info input info

@@ -3,9 +3,10 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -57,10 +58,11 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof DBNodeSeq)) return false;
-    final DBNodeSeq seq = (DBNodeSeq) cmp;
-    return pres == seq.pres && size == seq.size;
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof DBNodeSeq)) return super.equals(obj);
+    final DBNodeSeq ds = (DBNodeSeq) obj;
+    return size == ds.size && Arrays.equals(pres, ds.pres);
   }
 
   @Override

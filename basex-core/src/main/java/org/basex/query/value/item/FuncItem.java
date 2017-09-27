@@ -35,10 +35,8 @@ public final class FuncItem extends FItem implements Scope {
   private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
-
   /** Query focus. */
   private final QueryFocus focus;
-
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
 
@@ -233,6 +231,11 @@ public final class FuncItem extends FItem implements Scope {
   public boolean isVacuousBody() {
     final SeqType st = expr.seqType();
     return st != null && st.eq(SeqType.EMP) && !expr.has(Flag.UPD);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj;
   }
 
   @Override

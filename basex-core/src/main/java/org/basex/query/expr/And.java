@@ -38,9 +38,6 @@ public final class And extends Logical {
     for(int e = 0; e < es; e++) {
       // skip identical expressions
       Expr expr = exprs[e];
-      while(!(has(Flag.NDT) || has(Flag.UPD)) && e + 1 < es && exprs[e + 1].sameAs(exprs[e]))
-        expr = exprs[++e];
-
       if(expr instanceof ItrPos) {
         // merge adjacent positional predicates
         while(e + 1 < es && exprs[e + 1] instanceof ItrPos) {
@@ -85,7 +82,7 @@ public final class And extends Logical {
       // expression will always return false
       if(expr == Bln.FALSE) return cc.replaceWith(this, Bln.FALSE);
       // skip expression yielding true
-      if(expr != Bln.TRUE) list.add(expr);
+      if(expr != Bln.TRUE && !list.contains(expr)) list.add(expr);
     }
 
     // all arguments return true
@@ -162,10 +159,15 @@ public final class And extends Logical {
     final int[] ord = Array.createOrder(ics, true);
     final Expr[] ex = new Expr[es];
     for(int e = 0; e < es; ++e) ex[e] = tmp[ord[e]];
-    ii.expr = new InterSect(info, ex);
+    ii.expr = new Intersect(info, ex);
     // use worst costs for estimation, as all index results may need to be scanned
     ii.costs = ics[ord[es - 1]];
     return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof And && super.equals(obj);
   }
 
   @Override

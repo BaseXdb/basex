@@ -77,6 +77,11 @@ public final class Unary extends Single {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Unary && minus == ((Unary) obj).minus && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(VAL, minus), expr);
   }

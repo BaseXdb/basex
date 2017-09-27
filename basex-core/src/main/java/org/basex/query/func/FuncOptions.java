@@ -29,7 +29,7 @@ public final class FuncOptions {
 
   /** Root element. */
   private final QNm root;
-  /** Root node test. */
+  /** Root node test ( can be {@code null}). */
   private final NodeTest test;
   /** Input info. */
   private final InputInfo info;

@@ -30,10 +30,10 @@ public final class StaticFuncCall extends FuncCall {
 
   /**
    * Function call constructor.
-   * @param info input info
    * @param name function name
    * @param args arguments
    * @param sc static context
+   * @param info input info
    */
   public StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo info) {
@@ -42,11 +42,11 @@ public final class StaticFuncCall extends FuncCall {
 
   /**
    * Copy constructor.
-   * @param info input info
    * @param name function name
    * @param args arguments
    * @param sc static context
-   * @param func referenced function
+   * @param func referenced function (can be {@code null})
+   * @param info input info
    */
   private StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
       final StaticFunc func, final InputInfo info) {
@@ -83,11 +83,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public StaticFuncCall copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Expr[] args = Arr.copyAll(cc, vm, exprs);
-    final StaticFuncCall call = new StaticFuncCall(name, args, sc, func, info);
-    call.seqType = seqType;
-    call.size = size;
-    return call;
+    return copyType(new StaticFuncCall(name, Arr.copyAll(cc, vm, exprs), sc, func, info));
   }
 
   /**
@@ -127,21 +123,6 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name.string(), TCL, tailCall), exprs);
-  }
-
-  @Override
-  public String description() {
-    return FUNC;
-  }
-
-  @Override
-  public String toString() {
-    return new TokenBuilder(name.prefixId()).add(toString(SEP)).toString();
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.staticFuncCall(this) && super.accept(visitor);
   }
@@ -157,5 +138,28 @@ public final class StaticFuncCall extends FuncCall {
     final Value[] args = new Value[al];
     for(int a = 0; a < al; ++a) args[a] = qc.value(exprs[a]);
     return args;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof StaticFuncCall)) return false;
+    final StaticFuncCall s = (StaticFuncCall) obj;
+    return name.eq(s.name) && func == s.func && super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, name.string(), TCL, tailCall), exprs);
+  }
+
+  @Override
+  public String description() {
+    return FUNC;
+  }
+
+  @Override
+  public String toString() {
+    return new TokenBuilder(name.prefixId()).add(toString(SEP)).toString();
   }
 }

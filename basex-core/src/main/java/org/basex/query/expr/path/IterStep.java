@@ -46,6 +46,6 @@ final class IterStep extends Step {
 
   @Override
   public IterStep copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new IterStep(info, axis, test.copy(), Arr.copyAll(cc, vm, preds)));
+    return copyType(new IterStep(info, axis, test.copy(), Arr.copyAll(cc, vm, exprs)));
   }
 }

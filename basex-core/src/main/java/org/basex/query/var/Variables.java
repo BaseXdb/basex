@@ -64,35 +64,20 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     }
   }
 
-  @Override
-  public void plan(final FElem plan) {
-    if(vars.isEmpty()) return;
-    final FElem e = planElem();
-    for(final VarEntry v : vars.values()) v.var.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final VarEntry v : vars.values()) sb.append(v.var);
-    return sb.toString();
-  }
-
   /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
    * @param ii input info
-   * @param nm variable name
+   * @param name variable name
    * @param sc static context
    * @return reference
    * @throws QueryException if the variable is not visible
    */
-  public StaticVarRef newRef(final QNm nm, final StaticContext sc, final InputInfo ii)
+  public StaticVarRef newRef(final QNm name, final StaticContext sc, final InputInfo ii)
       throws QueryException {
 
-    final StaticVarRef ref = new StaticVarRef(ii, nm, sc);
-    final VarEntry e = vars.get(nm), entry = e != null ? e : new VarEntry(null);
-    if(e == null) vars.put(nm, entry);
+    final StaticVarRef ref = new StaticVarRef(ii, name, sc);
+    final VarEntry e = vars.get(name), entry = e != null ? e : new VarEntry(null);
+    if(e == null) vars.put(name, entry);
     entry.addRef(ref);
     return ref;
   }
@@ -131,6 +116,21 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
         throw Util.notExpected();
       }
     };
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    if(vars.isEmpty()) return;
+    final FElem e = planElem();
+    for(final VarEntry v : vars.values()) v.var.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for(final VarEntry v : vars.values()) sb.append(v.var);
+    return sb.toString();
   }
 
   /** Entry for static variables and their references. */

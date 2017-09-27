@@ -38,9 +38,6 @@ public final class Or extends Logical {
     for(int e = 0; e < es; e++) {
       // skip identical expressions
       Expr expr = exprs[e];
-      while(!(has(Flag.NDT) || has(Flag.UPD)) && e + 1 < es && exprs[e + 1].sameAs(exprs[e]))
-        expr = exprs[++e];
-
       if(expr instanceof CmpG) {
         // merge adjacent comparisons
         while(e + 1 < es && exprs[e + 1] instanceof CmpG) {
@@ -56,7 +53,7 @@ public final class Or extends Logical {
       // expression will always return true
       if(expr == Bln.TRUE) return cc.replaceWith(this, Bln.TRUE);
       // skip expression yielding false
-      if(expr != Bln.FALSE) list.add(expr);
+      if(expr != Bln.FALSE && !list.contains(expr)) list.add(expr);
     }
 
     // all arguments return false
@@ -131,6 +128,11 @@ public final class Or extends Logical {
     // no expressions means no costs: expression will later be ignored
     ii.expr = el.size() == 1 ? el.get(0) : new Union(info, el.finish());
     return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Or && super.equals(obj);
   }
 
   @Override

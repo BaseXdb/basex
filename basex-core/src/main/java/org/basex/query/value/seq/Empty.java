@@ -141,6 +141,11 @@ public final class Empty extends Value {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj == SEQ;
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(SIZE, 0));
   }
