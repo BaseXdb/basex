@@ -1,4 +1,4 @@
-FROM maven:3-jdk-7
+FROM maven:3-jdk-8
 MAINTAINER BaseX Team <basex-talk@mailman.uni-konstanz.de>
 
 # Compile BaseX, install
