@@ -139,7 +139,7 @@ final class DialogImport extends BaseXBack {
    */
   private IOFile inputFile() {
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
-    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui, this);
     fc.textFilters();
     fc.filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);

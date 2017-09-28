@@ -31,12 +31,15 @@ public final class BaseXFileChooser {
 
   /** Reference to main window. */
   private GUI gui;
+  /** Reference to the parent window. */
+  private Component parent;
   /** Swing file chooser. */
   private JFileChooser fc;
   /** Simple file dialog. */
   private FileDialog fd;
   /** File suffix. */
   private String suffix;
+
 
   /**
    * Default constructor.
@@ -45,6 +48,18 @@ public final class BaseXFileChooser {
    * @param main reference to main window
    */
   public BaseXFileChooser(final String title, final String path, final GUI main) {
+    this(title, path, main, null);
+  }
+
+  /**
+   * Default constructor.
+   * @param title dialog title
+   * @param path initial path
+   * @param main reference to main window
+   * @param parent parent for this file choose dialog
+   */
+  public BaseXFileChooser(final String title, final String path, final GUI main, final Component parent) {
+    this.parent = parent == null ? main : parent;
     final IOFile file = new IOFile(path);
     if(main.gopts.get(GUIOptions.SIMPLEFD)) {
       fd = new FileDialog(main, title);
@@ -136,19 +151,19 @@ public final class BaseXFileChooser {
     int state = 0;
     switch(mode) {
       case FOPEN:
-        state = fc.showOpenDialog(gui);
+        state = fc.showOpenDialog(parent);
         break;
       case FDOPEN:
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        state = fc.showOpenDialog(gui);
+        state = fc.showOpenDialog(parent);
         break;
       case FSAVE:
-        state = fc.showSaveDialog(gui);
+        state = fc.showSaveDialog(parent);
         break;
       case DOPEN:
       case DSAVE:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        state = fc.showDialog(gui, null);
+        state = fc.showDialog(parent, null);
         break;
     }
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
