@@ -140,6 +140,6 @@ public final class LockList implements Iterable<String> {
 
   @Override
   public String toString() {
-    return global ? "(global)" : list.isEmpty() ? "(none)" : Strings.join(list.toArray(), ",");
+    return global ? "(global)" : list.isEmpty() ? "(none)" : String.join(",", list.toArray());
   }
 }

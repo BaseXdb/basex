@@ -127,21 +127,6 @@ public final class Strings {
   }
 
   /**
-   * Joins strings.
-   * @param strings string to be joined
-   * @param sep separation string
-   * @return resulting string
-   */
-  public static String join(final String[] strings, final String sep) {
-    final StringBuilder sb = new StringBuilder();
-    for(final String string : strings) {
-      if(sb.length() != 0) sb.append(sep);
-      sb.append(string);
-    }
-    return sb.toString();
-  }
-
-  /**
    * Deletes a character from the strings.
    * @param string string
    * @param ch character to be removed

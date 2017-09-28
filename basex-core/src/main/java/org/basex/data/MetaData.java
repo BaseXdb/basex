@@ -168,7 +168,7 @@ public final class MetaData {
       }
     }
     if(!addToPath(sb, list)) return null;
-    sb.append(join(list.finish(), "/"));
+    sb.append(String.join("/", list.finish()));
 
     // add trailing slash
     if(pl > 0 && sb.length() > 0) {
