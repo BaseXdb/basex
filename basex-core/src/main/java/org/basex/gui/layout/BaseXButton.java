@@ -32,14 +32,11 @@ public final class BaseXButton extends JButton {
     if(!(win instanceof BaseXDialog)) return;
 
     final BaseXDialog d = (BaseXDialog) win;
-    addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final String text = getText();
-        if(text.equals(B_CANCEL)) d.cancel();
-        else if(text.equals(B_OK)) d.close();
-        else d.action(e.getSource());
-      }
+    addActionListener(e -> {
+      final String text = getText();
+      if(text.equals(B_CANCEL)) d.cancel();
+      else if(text.equals(B_OK)) d.close();
+      else d.action(e.getSource());
     });
     addKeyListener(new KeyAdapter() {
       @Override
@@ -117,12 +114,7 @@ public final class BaseXButton extends JButton {
   public static AbstractButton command(final GUICommand cmd, final GUI gui) {
     final String name = cmd.toString().toLowerCase(Locale.ENGLISH);
     final AbstractButton button = get(name, cmd.shortCut(), cmd.toggle(), gui);
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        cmd.execute(gui);
-      }
-    });
+    button.addActionListener(e -> cmd.execute(gui));
     return button;
   }
 

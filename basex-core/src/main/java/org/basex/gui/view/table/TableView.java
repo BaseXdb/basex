@@ -80,20 +80,17 @@ public final class TableView extends View {
     } else {
       if(!more) tdata.resetFilter();
       gui.updating = true;
-      new Thread() {
-        @Override
-        public void run() {
-          // current zoom step
-          int zoomstep = ZOOM.length;
-          while(--zoomstep >= 0) {
-            scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
-            repaint();
-            Performance.sleep(25);
-          }
-          gui.updating = false;
-          focus();
+      new Thread(() -> {
+        // current zoom step
+        int zoomstep = ZOOM.length;
+        while(--zoomstep >= 0) {
+          scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
+          repaint();
+          Performance.sleep(25);
         }
-      }.start();
+        gui.updating = false;
+        focus();
+      }).start();
     }
   }
 

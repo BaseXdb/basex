@@ -17,12 +17,7 @@ import org.basex.util.*;
  */
 public abstract class AxisPath extends Path {
   /** Thread-safe path caching. */
-  private final ThreadLocal<PathCache> caches = new ThreadLocal<PathCache>() {
-    @Override
-    public PathCache initialValue() {
-      return new PathCache();
-    }
-  };
+  private final ThreadLocal<PathCache> caches = ThreadLocal.withInitial(PathCache::new);
 
   /**
    * Constructor.

@@ -18,14 +18,8 @@ import org.basex.io.*;
 public abstract class ConsoleReader implements AutoCloseable {
   /** Password prompt. */
   private static final String PW_PROMPT = PASSWORD + COLS;
-
   /** Password reader. */
-  private final PasswordReader pwReader = new PasswordReader() {
-    @Override
-    public String password() {
-      return readPassword();
-    }
-  };
+  private final PasswordReader pwReader = this::readPassword;
 
   /**
    * Reads next line. If no input, then the method blocks the thread.

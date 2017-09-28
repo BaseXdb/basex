@@ -217,11 +217,7 @@ public final class MediaType {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
             final String suffix = line.substring(0, i), type = line.substring(i + 1);
-            MediaType mt = cache.get(type);
-            if(mt == null) {
-              mt = new MediaType(type);
-              cache.put(type, mt);
-            }
+            final MediaType mt = cache.computeIfAbsent(type, MediaType::new);
             TYPES.put(suffix, mt);
           }
         }

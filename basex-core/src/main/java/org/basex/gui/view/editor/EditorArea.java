@@ -58,12 +58,7 @@ public final class EditorArea extends TextPanel {
         gui.gopts.set(GUIOptions.WORKPATH, EditorArea.this.file.dir());
 
         // reload file if it has been changed
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            reopen(false);
-          }
-        });
+        SwingUtilities.invokeLater(() -> reopen(false));
       }
     });
   }

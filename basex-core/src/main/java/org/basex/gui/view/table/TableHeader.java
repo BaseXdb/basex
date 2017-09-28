@@ -300,12 +300,9 @@ final class TableHeader extends BaseXPanel {
     for(final byte[] en : tdata.roots) {
       final int id = data.elemNames.id(en);
       final JMenuItem mi = new JRadioButtonMenuItem(string(en), eq(root, en));
-      mi.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent ac) {
-          tdata.init(data, id);
-          view.refreshContext(true, false);
-        }
+      mi.addActionListener(ac -> {
+        tdata.init(data, id);
+        view.refreshContext(true, false);
       });
       popup.add(mi);
     }
@@ -321,25 +318,22 @@ final class TableHeader extends BaseXPanel {
     for(final TableCol col : tdata.cols) {
       final String item = (col.elem ? "" : "@") + string(col.name);
       final JMenuItem mi = new JCheckBoxMenuItem(item, col.width != 0);
-      mi.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent ac) {
-          final boolean sel = mi.isSelected();
-          boolean vis = sel;
-          // disallow removal of last visible column
-          for(final TableCol c : tdata.cols) vis |= c != col && c.width != 0;
+      mi.addActionListener(ac -> {
+        final boolean sel = mi.isSelected();
+        boolean vis = sel;
+        // disallow removal of last visible column
+        for(final TableCol c : tdata.cols) vis |= c != col && c.width != 0;
 
-          if(vis) {
-            col.hwidth = sel ? 0 : col.width;
-            col.width = sel ? col.hwidth : 0;
-          } else {
-            mi.setSelected(true);
-          }
-
-          popup.setVisible(true);
-          tdata.setWidths(true);
-          view.refreshContext(true, true);
+        if(vis) {
+          col.hwidth = sel ? 0 : col.width;
+          col.width = sel ? col.hwidth : 0;
+        } else {
+          mi.setSelected(true);
         }
+
+        popup.setVisible(true);
+        tdata.setWidths(true);
+        view.refreshContext(true, true);
       });
       popup.add(mi);
     }

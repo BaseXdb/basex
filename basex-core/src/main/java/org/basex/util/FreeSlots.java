@@ -61,12 +61,7 @@ public final class FreeSlots {
    * @param opt optimize
    */
   private void add(final int size, final long offset, final boolean opt) {
-    LongList ll = free.get(size);
-    if(ll == null) {
-      ll = new LongList();
-      free.put(size, ll);
-    }
-    ll.add(offset);
+    free.computeIfAbsent(size, k -> new LongList()).add(offset);
     slots++;
     if(opt) optimize();
   }

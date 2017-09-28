@@ -151,12 +151,7 @@ public final class EXPathRepo {
     for(final PkgComponent comp : pkg.comps) {
       // add component's namespace to namespace dictionary
       if(comp.uri != null) {
-        HashSet<String> ids = nsDict.get(comp.uri);
-        if(ids == null) {
-          ids = new HashSet<>();
-          nsDict.put(comp.uri, ids);
-        }
-        ids.add(id);
+        nsDict.computeIfAbsent(comp.uri, k -> new HashSet<>()).add(id);
       }
     }
     pkgDict.put(id, pkg);

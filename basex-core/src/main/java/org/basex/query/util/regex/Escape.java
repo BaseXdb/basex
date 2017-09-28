@@ -11,13 +11,7 @@ import java.util.Map.Entry;
  */
 public final class Escape extends RegExp {
   /**  Comparator for int ranges. */
-  private static final Comparator<int[]> CMP = new Comparator<int[]>() {
-    @Override
-    public int compare(final int[] o1, final int[] o2) {
-      return o1[0] - o2[0];
-    }
-  };
-
+  private static final Comparator<int[]> CMP = Comparator.comparingInt(o -> o[0]);
   /** Character classes. */
   private static final Map<String, CharRange[]> MAP = new HashMap<>();
 
@@ -145,7 +139,7 @@ public final class Escape extends RegExp {
   private static int[][] merge(final int[][]... rss) {
     final ArrayList<int[]> ranges = new ArrayList<>();
     for(final int[][] rs : rss) Collections.addAll(ranges, rs);
-    Collections.sort(ranges, CMP);
+    ranges.sort(CMP);
     for(int i = 0; i < ranges.size(); i++) {
       final int[] rng = ranges.get(i);
       while(i + 1 < ranges.size()) {

@@ -60,32 +60,29 @@ final class FTTokenizer {
     this.opt = opt;
     this.info = info;
 
-    cmp = new TokenComparator() {
-      @Override
-      public boolean equal(final byte[] in, final byte[] qu) throws QueryException {
-        FTWildcard ftw = null;
-        if(opt.is(WC)) {
-          ftw = wcCache.get(qu);
-          if(ftw == null) {
-            ftw = new FTWildcard(qu);
-            if(!ftw.parse()) throw FTWILDCARD_X.get(info, qu);
-            wcCache.put(qu, ftw);
-          }
-          // simple characters
-          if(ftw.simple()) ftw = null;
+    cmp = (in, qu) -> {
+      FTWildcard ftw = null;
+      if(opt.is(WC)) {
+        ftw = wcCache.get(qu);
+        if(ftw == null) {
+          ftw = new FTWildcard(qu);
+          if(!ftw.parse()) throw FTWILDCARD_X.get(info, qu);
+          wcCache.put(qu, ftw);
         }
-
-        return
-          // skip stop words, i. e. if the current query token is a stop word,
-          // it is always equal to the corresponding input token:
-          opt.sw != null && opt.sw.contains(qu) ||
-          // fuzzy search:
-          (opt.is(FZ) ? ls.similar(in, qu) :
-          // wild-card search:
-          ftw != null ? ftw.match(in) :
-          // simple search:
-          eq(in, qu));
+        // simple characters
+        if(ftw.simple()) ftw = null;
       }
+
+      return
+        // skip stop words, i. e. if the current query token is a stop word,
+        // it is always equal to the corresponding input token:
+        opt.sw != null && opt.sw.contains(qu) ||
+        // fuzzy search:
+        (opt.is(FZ) ? ls.similar(in, qu) :
+        // wild-card search:
+        ftw != null ? ftw.match(in) :
+        // simple search:
+        eq(in, qu));
     };
   }
 

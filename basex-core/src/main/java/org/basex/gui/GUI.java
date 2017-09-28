@@ -185,28 +185,25 @@ public final class GUI extends JFrame {
     input.mode(mode.getSelectedItem());
 
     hist = BaseXButton.get("c_hist", INPUT_HISTORY, false, this);
-    hist.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu pop = new JPopupMenu();
-        final ActionListener al = new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent ac) {
-            input.setText(ac.getActionCommand());
-            input.requestFocusInWindow();
-            pop.setVisible(false);
-          }
-        };
-        final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-        final String[] hs = gopts.get(
-          i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS);
-        for(final String en : hs) {
-          final JMenuItem jmi = new JMenuItem(en);
-          jmi.addActionListener(al);
-          pop.add(jmi);
+    hist.addActionListener(e -> {
+      final JPopupMenu pop = new JPopupMenu();
+      final ActionListener al = new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent ac) {
+          input.setText(ac.getActionCommand());
+          input.requestFocusInWindow();
+          pop.setVisible(false);
         }
-        pop.show(hist, 0, hist.getHeight());
+      };
+      final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
+      final String[] hs = gopts.get(
+        i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS);
+      for(final String en : hs) {
+        final JMenuItem jmi = new JMenuItem(en);
+        jmi.addActionListener(al);
+        pop.add(jmi);
       }
+      pop.show(hist, 0, hist.getHeight());
     });
 
     b = new BaseXBack(new BorderLayout(5, 0));
@@ -216,23 +213,17 @@ public final class GUI extends JFrame {
 
     stop = BaseXButton.get("c_stop", STOP, false, this);
     stop.setEnabled(false);
-    stop.addActionListener(new ActionListener() {
-      @Override
-     public void actionPerformed(final ActionEvent e) {
-        if(command != null) {
-          command.stop();
-          stop.setEnabled(false);
-        }
+    stop.addActionListener(e -> {
+      if(command != null) {
+        command.stop();
+        stop.setEnabled(false);
       }
     });
 
     go = BaseXButton.get("c_go", RUN_QUERY, false, this);
-    go.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        input.store();
-        execute();
-      }
+    go.addActionListener(e -> {
+      input.store();
+      execute();
     });
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, this);
@@ -355,12 +346,9 @@ public final class GUI extends JFrame {
       try {
         // parse and execute all commands
         final CommandParser cp = CommandParser.get(in.substring(exc ? 1 : 0), context);
-        if(pwReader == null) pwReader = new PasswordReader() {
-          @Override
-          public String password() {
-            final DialogPass dp = new DialogPass(GUI.this);
-            return dp.ok() ? dp.password() : "";
-          }
+        if(pwReader == null) pwReader = () -> {
+          final DialogPass dp = new DialogPass(GUI.this);
+          return dp.ok() ? dp.password() : "";
         };
         cp.pwReader(pwReader);
         execute(cp.parse());
@@ -408,15 +396,12 @@ public final class GUI extends JFrame {
     // ignore command if updates take place
     if(updating) return;
 
-    new Thread() {
-      @Override
-      public void run() {
-        if(cmd.length == 0) info.setInfo("", null, true, true);
-        for(final Command c : cmd) {
-          if(!exec(c, edit)) break;
-        }
+    new Thread(() -> {
+      if(cmd.length == 0) info.setInfo("", null, true, true);
+      for(final Command c : cmd) {
+        if(!exec(c, edit)) break;
       }
-    }.start();
+    }).start();
   }
 
   /**

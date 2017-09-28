@@ -218,14 +218,7 @@ public abstract class Array extends FItem {
    * @return array over the array members
    */
   public final Iterable<Value> members() {
-    if(iterable == null) {
-      iterable = new Iterable<Value>() {
-        @Override
-        public Iterator<Value> iterator() {
-          return Array.this.iterator(0);
-        }
-      };
-    }
+    if(iterable == null) iterable = () -> iterator(0);
     return iterable;
   }
 

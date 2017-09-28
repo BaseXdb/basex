@@ -186,11 +186,8 @@ public final class Locking {
    */
   private LocalReadWriteLock pin(final String string) {
     synchronized(localLocks) {
-      LocalReadWriteLock lock = localLocks.get(string);
-      if(lock == null) {
-        lock = new LocalReadWriteLock(fair);
-        localLocks.put(string, lock);
-      }
+      final LocalReadWriteLock lock = localLocks.computeIfAbsent(string,
+          k -> new LocalReadWriteLock(fair));
       lock.pin();
       return lock;
     }

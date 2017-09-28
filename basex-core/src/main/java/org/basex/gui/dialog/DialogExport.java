@@ -3,8 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.awt.event.*;
-
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.*;
@@ -47,10 +45,7 @@ public final class DialogExport extends BaseXDialog {
     pp.add(path);
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);
-    browse.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) { choose(); }
-    });
+    browse.addActionListener(e -> choose());
     pp.add(browse);
     p.add(pp);
 

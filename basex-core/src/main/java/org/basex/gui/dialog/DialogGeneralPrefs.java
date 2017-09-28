@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.awt.event.*;
 import java.text.*;
 
 import org.basex.core.*;
@@ -75,23 +74,17 @@ final class DialogGeneralPrefs extends BaseXBack {
     repoPath = new BaseXTextField(opts.get(StaticOptions.REPOPATH), d);
 
     dbButton = new BaseXButton(BROWSE_D, d);
-    dbButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final String path = dbPath.getText();
-        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
-        if(dir != null) dbPath.setText(dir.path());
-      }
+    dbButton.addActionListener(e -> {
+      final String path = dbPath.getText();
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      if(dir != null) dbPath.setText(dir.path());
     });
 
     repoButton = new BaseXButton(BROWSE_D, d);
-    repoButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final String path = repoPath.getText();
-        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
-        if(dir != null) repoPath.setText(dir.path());
-      }
+    repoButton.addActionListener(e -> {
+      final String path = repoPath.getText();
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      if(dir != null) repoPath.setText(dir.path());
     });
 
     mousefocus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, d);
@@ -99,18 +92,12 @@ final class DialogGeneralPrefs extends BaseXBack {
 
     int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
     maxResults = new BaseXSlider(0, MAXRESULTS.length - 1, val, d);
-    maxResults.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) { action(maxResults); }
-    });
+    maxResults.addActionListener(e -> action(maxResults));
     labelResults = new BaseXLabel(" ");
 
     val = sliderIndex(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
     maxText = new BaseXSlider(0, MAXTEXT.length - 1, val, d);
-    maxText.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) { action(maxText); }
-    });
+    maxText.addActionListener(e -> action(maxText));
     labelText = new BaseXLabel(" ");
 
     lang = new BaseXCombo(LANGS[0], d);

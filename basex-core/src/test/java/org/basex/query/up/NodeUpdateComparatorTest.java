@@ -507,8 +507,8 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
 
     // primitives are sorted ASCENDING
     final NodeUpdateComparator c = new NodeUpdateComparator();
-    Collections.sort(l, c);
-    Collections.sort(l2, c);
+    l.sort(c);
+    l2.sort(c);
 
     final int s = order.length;
     // check if primitives are ordered as expected

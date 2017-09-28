@@ -97,29 +97,26 @@ public final class OrderBy extends Clause {
         // be nice to the garbage collector
         tuples = null;
         try {
-          Arrays.sort(perm, new Comparator<Integer>() {
-            @Override
-            public int compare(final Integer x, final Integer y) {
-              try {
-                final Item[] a = ks[x], b = ks[y];
-                final int kl = keys.length;
-                for(int k = 0; k < kl; k++) {
-                  final Key key = keys[k];
-                  Item m = a[k], n = b[k];
-                  if(m == Dbl.NAN || m == Flt.NAN) m = null;
-                  if(n == Dbl.NAN || n == Flt.NAN) n = null;
-                  if(m != null && n != null && !m.comparable(n))
-                    throw castError(n, m.type, key.info);
+          Arrays.sort(perm, (x, y) -> {
+            try {
+              final Item[] a = ks[x], b = ks[y];
+              final int kl = keys.length;
+              for(int k = 0; k < kl; k++) {
+                final Key key = keys[k];
+                Item m = a[k], n = b[k];
+                if(m == Dbl.NAN || m == Flt.NAN) m = null;
+                if(n == Dbl.NAN || n == Flt.NAN) n = null;
+                if(m != null && n != null && !m.comparable(n))
+                  throw castError(n, m.type, key.info);
 
-                  final int c = m == null
-                      ? n == null ? 0                 : key.least ? -1 : 1
-                      : n == null ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info);
-                  if(c != 0) return key.desc ? -c : c;
-                }
-                return 0;
-              } catch(final QueryException ex) {
-                throw new QueryRTException(ex);
+                final int c = m == null
+                    ? n == null ? 0                 : key.least ? -1 : 1
+                    : n == null ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info);
+                if(c != 0) return key.desc ? -c : c;
               }
+              return 0;
+            } catch(final QueryException ex) {
+              throw new QueryRTException(ex);
             }
           });
         } catch(final QueryRTException ex) {

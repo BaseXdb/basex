@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import static org.basex.util.Strings.*;
 
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
@@ -77,10 +76,7 @@ final class DialogImport extends BaseXBack {
     if(io instanceof IOFile && !path.isEmpty()) dbName = io.dbName();
 
     browse = new BaseXButton(BROWSE_D, dial);
-    browse.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) { choose(); }
-    });
+    browse.addActionListener(e -> choose());
     final BaseXBack b = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b.add(input);
     b.add(browse);
@@ -120,12 +116,9 @@ final class DialogImport extends BaseXBack {
     info = new BaseXLabel(" ").border(20, 0, 6, 0);
     add(info);
 
-    final DropHandler dh = new DropHandler() {
-      @Override
-      public void drop(final Object object) {
-        input.setText(object.toString());
-        action(input, dial instanceof DialogNew);
-      }
+    final DropHandler dh = object -> {
+      input.setText(object.toString());
+      action(input, dial instanceof DialogNew);
     };
 
     BaseXLayout.addDrop(this, dh);

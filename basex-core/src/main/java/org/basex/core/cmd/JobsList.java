@@ -110,13 +110,10 @@ public final class JobsList extends Command {
    * @return sorted list
    */
   private static TokenList sort(final TokenList list) {
-    return list.sort(new Comparator<byte[]>() {
-      @Override
-      public int compare(final byte[] token1, final byte[] token2) {
-        final byte[] t1 = substring(token1, 3), t2 = substring(token2, 3);
-        final long diff = toLong(t1) - toLong(t2);
-        return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-      }
+    return list.sort((token1, token2) -> {
+      final byte[] t1 = substring(token1, 3), t2 = substring(token2, 3);
+      final long diff = toLong(t1) - toLong(t2);
+      return diff < 0 ? -1 : diff > 0 ? 1 : 0;
     }, true);
   }
 

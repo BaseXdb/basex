@@ -71,19 +71,9 @@ public final class Token {
   private static final byte[] RES = token("-._~");
 
   /** Comparator for byte arrays. */
-  public static final Comparator<byte[]> COMP = new Comparator<byte[]>() {
-    @Override
-    public int compare(final byte[] o1, final byte[] o2) {
-      return diff(o1, o2);
-    }
-  };
+  public static final Comparator<byte[]> COMP = Token::diff;
   /** Case-insensitive comparator for byte arrays. */
-  public static final Comparator<byte[]> LC_COMP = new Comparator<byte[]>() {
-    @Override
-    public int compare(final byte[] o1, final byte[] o2) {
-      return diff(lc(o1), lc(o2));
-    }
-  };
+  public static final Comparator<byte[]> LC_COMP = (o1, o2) -> diff(lc(o1), lc(o2));
 
   /** Hidden constructor. */
   private Token() { }

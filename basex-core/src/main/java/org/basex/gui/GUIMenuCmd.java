@@ -497,7 +497,7 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPROJECT);
-      gui.editor.project();
+      gui.editor.toggleProject();
     }
 
     @Override

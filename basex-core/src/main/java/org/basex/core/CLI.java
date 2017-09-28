@@ -31,12 +31,9 @@ public abstract class CLI extends Main {
   protected boolean verbose;
 
   /** Password reader. */
-  private static final PasswordReader PWREADER = new PasswordReader() {
-    @Override
-    public String password() {
-      Util.out(PASSWORD + COLS);
-      return Util.password();
-    }
+  private static final PasswordReader PWREADER = () -> {
+    Util.out(PASSWORD + COLS);
+    return Util.password();
   };
   /** Session. */
   private Session session;

@@ -58,12 +58,8 @@ public final class DialogMessage extends BaseXDialog {
     final BaseXBack bttns = newButtons(list.toArray(new Object[list.size()]));
     set(bttns, BorderLayout.SOUTH);
 
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        ((Container) bttns.getComponent(0)).getComponent(0).requestFocusInWindow();
-      }
-    });
+    SwingUtilities.invokeLater(((Container) bttns.getComponent(0)).getComponent(0)::
+      requestFocusInWindow);
     finish();
   }
 

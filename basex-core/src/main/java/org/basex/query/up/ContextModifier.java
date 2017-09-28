@@ -45,34 +45,16 @@ public abstract class ContextModifier {
    */
   synchronized void add(final Update update, final QueryContext qc) throws QueryException {
     if(update instanceof DataUpdate) {
-      final DataUpdate dataUp = (DataUpdate) update;
-      final Data data = dataUp.data();
-      DataUpdates ups = dbUpdates.get(data);
-      if(ups == null) {
-        ups = new DataUpdates(data, qc);
-        dbUpdates.put(data, ups);
-      }
       // create temporary mem data instance if not available yet
       if(memData == null) memData = new MemData(qc.context.options);
-      ups.add(dataUp, memData);
+      final DataUpdate dataUp = (DataUpdate) update;
+      dbUpdates.computeIfAbsent(dataUp.data(), d -> new DataUpdates(d, qc)).add(dataUp, memData);
     } else if(update instanceof NameUpdate) {
       final NameUpdate nameUp = (NameUpdate) update;
-      final String name = nameUp.name();
-      NameUpdates ups = nameUpdates.get(name);
-      if(ups == null) {
-        ups = new NameUpdates();
-        nameUpdates.put(name, ups);
-      }
-      ups.add(nameUp);
+      nameUpdates.computeIfAbsent(nameUp.name(), n -> new NameUpdates()).add(nameUp);
     } else if(update instanceof UserUpdate) {
       final UserUpdate userUp = (UserUpdate) update;
-      final String name = userUp.name();
-      UserUpdates ups = userUpdates.get(name);
-      if(ups == null) {
-        ups = new UserUpdates();
-        userUpdates.put(name, ups);
-      }
-      ups.add(userUp);
+      userUpdates.computeIfAbsent(userUp.name(), k -> new UserUpdates()).add(userUp);
     } else {
       throw Util.notExpected("Unknown update type: " + update);
     }

@@ -141,21 +141,18 @@ public final class BaseXHTTP extends CLI {
 
     // show info when HTTP server is aborted. needs to be called in constructor:
     // otherwise, it may only be called if the JVM process is already shut down
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        if(!quiet) {
-          for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
-        }
-        final Log log = context.log;
-        if(log != null) {
-          for(final Connector conn : conns) {
-            log.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
-          }
-        }
-        context.close();
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      if(!quiet) {
+        for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
       }
-    });
+      final Log log = context.log;
+      if(log != null) {
+        for(final Connector conn : conns) {
+          log.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
+        }
+      }
+      context.close();
+    }));
 
     // log server start at very end (logging flag could have been updated by web.xml)
     for(final Connector conn : conns) {

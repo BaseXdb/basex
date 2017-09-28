@@ -11,7 +11,6 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXLayout.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -43,13 +42,10 @@ public final class SearchBar extends BaseXBack {
     }
   };
   /** Action listener for button clicks. */
-  private final ActionListener action = new ActionListener() {
-    @Override
-    public void actionPerformed(final ActionEvent e) {
-      store();
-      refreshButtons();
-      search();
-    }
+  private final ActionListener action = e -> {
+    store();
+    refreshButtons();
+    search();
   };
 
   /** Mode buttons. */
@@ -140,35 +136,24 @@ public final class SearchBar extends BaseXBack {
       }
     });
 
-    BaseXLayout.addDrop(search, new DropHandler() {
-      @Override
-      public void drop(final Object object) {
-        setSearch(object.toString());
-        store();
-        search();
-      }
+    BaseXLayout.addDrop(search, object -> {
+      setSearch(object.toString());
+      store();
+      search();
     });
 
     replace.addKeyListener(escape);
 
     cls.addKeyListener(escape);
-    cls.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        deactivate(true);
-      }
-    });
+    cls.addActionListener(e -> deactivate(true));
 
     rplc.addKeyListener(escape);
-    rplc.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        store();
-        replace.store();
-        final String in = replace.getText();
-        editor.replace(new ReplaceContext(regex.isSelected() ? decode(in) : in));
-        deactivate(true);
-      }
+    rplc.addActionListener(e -> {
+      store();
+      replace.store();
+      final String in = replace.getText();
+      editor.replace(new ReplaceContext(regex.isSelected() ? decode(in) : in));
+      deactivate(true);
     });
 
     // set initial values
@@ -222,12 +207,9 @@ public final class SearchBar extends BaseXBack {
    */
   public AbstractButton button(final String help) {
     button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()), true, gui);
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        if(isVisible()) deactivate(true);
-        else activate("", true);
-      }
+    button.addActionListener(e -> {
+      if(isVisible()) deactivate(true);
+      else activate("", true);
     });
     return button;
   }

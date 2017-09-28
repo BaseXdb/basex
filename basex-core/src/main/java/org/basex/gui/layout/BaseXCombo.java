@@ -87,11 +87,8 @@ public final class BaseXCombo extends JComboBox<Object> {
     if(!(win instanceof BaseXDialog)) return;
 
     final BaseXDialog d = (BaseXDialog) win;
-    addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(final ItemEvent ie) {
-        if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) d.action(ie.getSource());
-      }
+    addItemListener(ie -> {
+      if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) d.action(ie.getSource());
     });
   }
 

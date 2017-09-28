@@ -93,12 +93,9 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
     if(option == SerializerOptions.ENCODING) {
       final BaseXCombo combo = new BaseXCombo(GUIConstants.ENCODINGS, dialog);
       combo.setSelectedItem(options.get(option));
-      combo.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-          options.set((StringOption) option, combo.getSelectedItem());
-          update();
-        }
+      combo.addActionListener(e -> {
+        options.set((StringOption) option, combo.getSelectedItem());
+        update();
       });
       comp = combo;
     } else if(option instanceof StringOption) {
@@ -143,12 +140,9 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
    * @return combo box
    */
   private Component addCombo(final BaseXCombo combo) {
-    combo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        combo.assign();
-        update();
-      }
+    combo.addActionListener(e -> {
+      combo.assign();
+      update();
     });
     panel.add(combo);
     return combo;
@@ -165,12 +159,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
     final Options opts = options.get(option);
     options.put(option, opts);
     final BaseXCombo combo = new BaseXCombo(opts.names(), dialog);
-    combo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        update(opts.option(combo.getSelectedItem()), opts, p);
-      }
-    });
+    combo.addActionListener(e -> update(opts.option(combo.getSelectedItem()), opts, p));
     p.add(combo);
     return p;
   }

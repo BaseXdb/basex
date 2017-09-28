@@ -14,18 +14,13 @@ import org.basex.io.*;
  * @author Christian Gruen
  */
 final class ProjectDir extends ProjectNode {
+  /** Comparator. */
+  private static final Comparator<IOFile> COMP = (a, b) -> a.path().compareToIgnoreCase(b.path());
+
   /** Expanded directories. */
   private final ArrayList<IOFile> dirs = new ArrayList<>();
   /** Expanded files. */
   private final ArrayList<IOFile> files = new ArrayList<>();
-
-  /** Comparator. */
-  private static final Comparator<IOFile> COMP = new Comparator<IOFile>() {
-    @Override
-    public int compare(final IOFile a, final IOFile b) {
-      return a.path().compareToIgnoreCase(b.path());
-    }
-  };
 
   /**
    * Constructor.
@@ -44,8 +39,8 @@ final class ProjectDir extends ProjectNode {
     for(final IOFile child : file.children()) {
       if(hidden || !child.file().isHidden()) (child.isDir() ? newDirs : newFiles).add(child);
     }
-    Collections.sort(newDirs, COMP);
-    Collections.sort(newFiles, COMP);
+    newDirs.sort(COMP);
+    newFiles.sort(COMP);
 
     if(!newDirs.equals(dirs) || !newFiles.equals(files)) {
       removeChildren();

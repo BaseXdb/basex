@@ -183,31 +183,28 @@ public final class BaseXScrollBar extends BaseXPanel {
     // start dragging
     if(sliding || animated) return;
 
-    new Thread() {
-      @Override
-      public void run() {
-        // scroll up/down/move slider
-        animated = moving;
-        while(animated) {
-          if(moving) step = Math.max(0, Math.min(STEPS.length - 1, step + (down ? 1 : -1)));
-          else step += step < STEPS.length / 2 ? 1 : -1;
-          int offset = STEPS[step];
+    new Thread(() -> {
+      // scroll up/down/move slider
+      animated = moving;
+      while(animated) {
+        if(moving) step = Math.max(0, Math.min(STEPS.length - 1, step + (down ? 1 : -1)));
+        else step += step < STEPS.length / 2 ? 1 : -1;
+        int offset = STEPS[step];
 
-          if(!button) offset = offset * hh / MAXSTEP / 4;
-          pos = Math.max(0, Math.min(height - hh, pos + offset));
-          comp.repaint();
-          Performance.sleep(25);
-          animated = step != STEPS.length / 2;
+        if(!button) offset = offset * hh / MAXSTEP / 4;
+        pos = Math.max(0, Math.min(height - hh, pos + offset));
+        comp.repaint();
+        Performance.sleep(25);
+        animated = step != STEPS.length / 2;
 
-          if(y > ww + barPos && y < ww + barPos + barSize) {
-            dragPos = barPos - y;
-            animated = false;
-            sliding = true;
-            step = STEPS.length / 2;
-          }
+        if(y > ww + barPos && y < ww + barPos + barSize) {
+          dragPos = barPos - y;
+          animated = false;
+          sliding = true;
+          step = STEPS.length / 2;
         }
       }
-    }.start();
+    }).start();
   }
 
   @Override

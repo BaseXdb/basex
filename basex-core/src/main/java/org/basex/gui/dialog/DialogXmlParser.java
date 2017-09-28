@@ -3,8 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.awt.event.*;
-
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.gui.*;
@@ -78,16 +76,13 @@ final class DialogXmlParser extends DialogParser {
     cr.add(cfile);
 
     browsec = new BaseXButton(BROWSE_D, d);
-    browsec.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final GUIOptions gopts = dialog.gui.gopts;
-        final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-          gopts.get(GUIOptions.INPUTPATH), dialog.gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
+    browsec.addActionListener(e -> {
+      final GUIOptions gopts = dialog.gui.gopts;
+      final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
+        gopts.get(GUIOptions.INPUTPATH), dialog.gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
-        final IO file = fc.select(Mode.FDOPEN);
-        if(file != null) cfile.setText(file.path());
-      }
+      final IO file = fc.select(Mode.FDOPEN);
+      if(file != null) cfile.setText(file.path());
     });
     browsec.setEnabled(rsen);
     cr.add(browsec);

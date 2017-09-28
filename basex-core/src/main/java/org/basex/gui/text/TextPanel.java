@@ -1010,12 +1010,8 @@ public class TextPanel extends BaseXPanel {
     } else if(!pairs.isEmpty()) {
       // show popup menu
       final JPopupMenu pm = new JPopupMenu();
-      final ActionListener al = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent ae) {
-          complete(ae.getActionCommand().replaceAll("^.*?] ", ""), start);
-        }
-      };
+      final ActionListener al = ae -> complete(
+        ae.getActionCommand().replaceAll("^.*?] ", ""), start);
       for(final Pair<String, String> entry : pairs) {
         if(entry == null) {
           pm.addSeparator();

@@ -18,6 +18,10 @@ import org.basex.util.list.*;
  * @author Lukas Kircher
  */
 public class ResourceFolder extends ResourceNode {
+  /** Comparator. */
+  private static final Comparator<byte[]> CMP =
+      (o1, o2) -> Prop.CASE ? diff(o1, o2) : diff(lc(o1), lc(o2));
+
   /** Children of node have been loaded. */
   private boolean loaded;
   /** Maximum number of displayed/processed children for a node. */
@@ -75,12 +79,7 @@ public class ResourceFolder extends ResourceNode {
     for(final byte[] b : tbm) {
       if(filter.length == 0 || eq(b, filter)) keys.add(b);
     }
-    Collections.sort(keys, new Comparator<byte[]>() {
-      @Override
-      public int compare(final byte[] o1, final byte[] o2) {
-        return Prop.CASE ? diff(o1, o2) : diff(lc(o1), lc(o2));
-      }
-    });
+    keys.sort(CMP);
 
     // finally add the necessary leaves
     final byte[] sub = subfolder();

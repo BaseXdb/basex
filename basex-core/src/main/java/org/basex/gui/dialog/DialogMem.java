@@ -59,13 +59,8 @@ public final class DialogMem extends BaseXDialog {
   @Override
   public void setVisible(final boolean v) {
     super.setVisible(v);
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // focus GC button
-        gc.requestFocusInWindow();
-      }
-    });
+    // focus GC button
+    SwingUtilities.invokeLater(gc::requestFocusInWindow);
   }
 
   @Override

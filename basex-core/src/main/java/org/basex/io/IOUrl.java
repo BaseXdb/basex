@@ -141,10 +141,7 @@ public final class IOUrl extends IO {
    */
   public static void ignoreCert() {
     // http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
-    HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-      @Override
-      public boolean verify(final String hostname, final SSLSession session) { return true; }
-    });
+    HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
     final TrustManager[] tm = { new X509TrustManager() {
       @Override

@@ -123,12 +123,7 @@ public final class BaseXServer extends CLI implements Runnable {
     context.log.writeServer(LogType.OK, startX);
 
     // show info when server is aborted
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        close();
-      }
-    });
+    Runtime.getRuntime().addShutdownHook(new Thread(this::close));
   }
 
   @Override

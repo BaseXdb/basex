@@ -5,8 +5,6 @@ import static org.junit.Assert.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.util.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.Test;
 
@@ -103,12 +101,8 @@ public final class ModuleTest extends SandboxTest {
   public void uriResolver() throws Exception {
     final String query = "import module namespace m='uri' at 'x.xq'; m:f()";
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
-      qp.uriResolver(new UriResolver() {
-        @Override
-        public IO resolve(final String path, final String uri, final Uri base) {
-          return new IOContent("module namespace m='uri'; declare function m:f() { 'OK' };");
-        }
-      });
+      qp.uriResolver((path, uri, base) ->
+        new IOContent("module namespace m='uri'; declare function m:f() { 'OK' };"));
       assertEquals(qp.value().serialize().toString(), "OK");
     }
   }

@@ -74,12 +74,7 @@ public final class Table {
    * @return self reference
    */
   public Table sort() {
-    Collections.sort(contents, new Comparator<TokenList>() {
-      @Override
-      public int compare(final TokenList tl1, final TokenList tl2) {
-        return diff(lc(tl1.get(0)), lc(tl2.get(0)));
-      }
-    });
+    contents.sort((tl1, tl2) -> diff(lc(tl1.get(0)), lc(tl2.get(0))));
     return this;
   }
 

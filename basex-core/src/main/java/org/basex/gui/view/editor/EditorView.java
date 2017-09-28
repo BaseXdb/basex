@@ -12,15 +12,12 @@ import java.util.Timer;
 import java.util.regex.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
-
 import org.basex.build.json.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
-import org.basex.gui.layout.BaseXLayout.*;
 import org.basex.gui.text.*;
 import org.basex.gui.text.TextPanel.Action;
 import org.basex.gui.view.*;
@@ -160,70 +157,61 @@ public final class EditorView extends View {
     split.add(project);
     split.add(main);
     split.init(new double[] { 0.3, 0.7 }, new double[] { 0, 1 });
-    project();
+    toggleProject();
     add(split, BorderLayout.CENTER);
 
     refreshLayout();
 
     // add listeners
-    saveB.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu pop = new JPopupMenu();
-        final StringBuilder mnem = new StringBuilder();
-        final JMenuItem sa = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVE, gui, mnem);
-        final JMenuItem sas = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVEAS, gui, mnem);
-        sa.setEnabled(GUIMenuCmd.C_EDITSAVE.enabled(gui));
-        sas.setEnabled(GUIMenuCmd.C_EDITSAVEAS.enabled(gui));
-        pop.add(sa);
-        pop.add(sas);
-        pop.show(saveB, 0, saveB.getHeight());
-      }
+    saveB.addActionListener(e -> {
+      final JPopupMenu pop = new JPopupMenu();
+      final StringBuilder mnem = new StringBuilder();
+      final JMenuItem sa = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVE, gui, mnem);
+      final JMenuItem sas = GUIMenu.newItem(GUIMenuCmd.C_EDITSAVEAS, gui, mnem);
+      sa.setEnabled(GUIMenuCmd.C_EDITSAVE.enabled(gui));
+      sas.setEnabled(GUIMenuCmd.C_EDITSAVEAS.enabled(gui));
+      pop.add(sa);
+      pop.add(sas);
+      pop.show(saveB, 0, saveB.getHeight());
     });
-    hist.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu pm = new JPopupMenu();
-        ActionListener al = new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent ac) {
-            // rewrite and open chosen file
-            open(new IOFile(ac.getActionCommand().replaceAll("(.*) \\[(.*)]", "$2/$1")));
-          }
-        };
+    hist.addActionListener(e -> {
+      final JPopupMenu pm = new JPopupMenu();
+      ActionListener al = ac -> {
+        // rewrite and open chosen file
+        open(new IOFile(ac.getActionCommand().replaceAll("(.*) \\[(.*)]", "$2/$1")));
+      };
 
-        // create popup menu with of recently opened files
-        final StringList opened = new StringList();
-        for(final EditorArea ea : editors()) opened.add(ea.file().path());
+      // create popup menu with of recently opened files
+      final StringList opened = new StringList();
+      for(final EditorArea ea : editors()) opened.add(ea.file().path());
 
-        final StringList hst = new StringList(HISTORY);
-        final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
-        final int fl = Math.min(all.size(), e == null ? HISTORY : HISTCOMP);
-        for(int f = 0; f < fl; f++) hst.add(all.get(f));
+      final StringList hst = new StringList(HISTORY);
+      final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
+      final int fl = Math.min(all.size(), e == null ? HISTORY : HISTCOMP);
+      for(int f = 0; f < fl; f++) hst.add(all.get(f));
 
-        Font f = null;
-        for(final String en : hst.sort(Prop.CASE)) {
-          // disable opened files
-          final JMenuItem it = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
-          if(opened.contains(en)) {
-            if(f == null) f = it.getFont().deriveFont(Font.BOLD);
-            it.setFont(f);
-          }
-          pm.add(it).addActionListener(al);
+      Font f = null;
+      for(final String en : hst.sort(Prop.CASE)) {
+        // disable opened files
+        final JMenuItem it = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
+        if(opened.contains(en)) {
+          if(f == null) f = it.getFont().deriveFont(Font.BOLD);
+          it.setFont(f);
         }
-
-        al = new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent ac) {
-            hist.getActionListeners()[0].actionPerformed(null);
-          }
-        };
-        if(e != null && pm.getComponentCount() == HISTCOMP) {
-          pm.add(new JMenuItem(DOTS)).addActionListener(al);
-        }
-
-        pm.show(hist, 0, hist.getHeight());
+        pm.add(it).addActionListener(al);
       }
+
+      al = new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent ac) {
+          hist.getActionListeners()[0].actionPerformed(null);
+        }
+      };
+      if(e != null && pm.getComponentCount() == HISTCOMP) {
+        pm.add(new JMenuItem(DOTS)).addActionListener(al);
+      }
+
+      pm.show(hist, 0, hist.getHeight());
     });
     refreshHistory(null);
     info.addMouseListener(new MouseAdapter() {
@@ -232,46 +220,27 @@ public final class EditorView extends View {
         markError(true);
       }
     });
-    stop.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        stop.setEnabled(false);
-        go.setEnabled(false);
-        test.setEnabled(false);
-        gui.stop();
-      }
+    stop.addActionListener(e -> {
+      stop.setEnabled(false);
+      go.setEnabled(false);
+      test.setEnabled(false);
+      gui.stop();
     });
-    go.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        run(getEditor(), Action.EXECUTE);
-      }
-    });
-    test.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        run(getEditor(), Action.TEST);
-      }
-    });
-    tabs.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(final ChangeEvent e) {
-        final EditorArea ea = getEditor();
-        if(ea == null) return;
-        search.editor(ea, true);
-        gui.refreshControls();
-        posCode.invokeLater();
-        refreshMark();
-        run(ea, Action.PARSE);
-        gui.setTitle();
-      }
+    go.addActionListener(e -> run(getEditor(), Action.EXECUTE));
+    test.addActionListener(e -> run(getEditor(), Action.TEST));
+    tabs.addChangeListener(e -> {
+      final EditorArea ea = getEditor();
+      if(ea == null) return;
+      search.editor(ea, true);
+      gui.refreshControls();
+      posCode.invokeLater();
+      refreshMark();
+      run(ea, Action.PARSE);
+      gui.setTitle();
     });
 
-    BaseXLayout.addDrop(this, new DropHandler() {
-      @Override
-      public void drop(final Object file) {
-        if(file instanceof File) open(new IOFile((File) file));
-      }
+    BaseXLayout.addDrop(this, file -> {
+      if(file instanceof File) open(new IOFile((File) file));
     });
   }
 
@@ -321,7 +290,7 @@ public final class EditorView extends View {
   }
 
   /**
-   * Shows or hides the project view.
+   * Shows the project view.
    */
   public void showProject() {
     if(!gui.gopts.get(GUIOptions.SHOWPROJECT)) {
@@ -333,7 +302,7 @@ public final class EditorView extends View {
   /**
    * Toggles the project view.
    */
-  public void project() {
+  public void toggleProject() {
     final boolean show = gui.gopts.get(GUIOptions.SHOWPROJECT);
     split.visible(show);
     if(show) {
@@ -684,17 +653,11 @@ public final class EditorView extends View {
       search.deactivate(true);
       // reopen single tab and focus project listener
       addTab();
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() { project(); }
-      });
+      SwingUtilities.invokeLater(this::toggleProject);
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() { getEditor().requestFocusInWindow(); }
-      });
+      SwingUtilities.invokeLater(getEditor()::requestFocusInWindow);
     }
   }
 
@@ -1008,12 +971,7 @@ public final class EditorView extends View {
     tab.add(edit.label, BorderLayout.CENTER);
 
     final AbstractButton close = tabButton("e_close", "e_close2");
-    close.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        close(edit);
-      }
-    });
+    close.addActionListener(e -> close(edit));
     tab.add(close, BorderLayout.EAST);
 
     tabs.add(edit, tab, tabs.getComponentCount() - 2);
@@ -1025,12 +983,7 @@ public final class EditorView extends View {
    */
   private void addCreateTab() {
     final AbstractButton add = tabButton("e_new", "e_new2");
-    add.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        refreshControls(addTab(), true);
-      }
-    });
+    add.addActionListener(e -> refreshControls(addTab(), true));
     tabs.add(new BaseXBack(), add, 0);
     tabs.setEnabledAt(0, false);
   }

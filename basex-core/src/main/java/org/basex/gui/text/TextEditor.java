@@ -642,13 +642,10 @@ public final class TextEditor {
 
     // stable sort: before custom sort, use default sort
     if(coll != null || column > 0) tokens.sort(true, true);
-    final Comparator<byte[]> cc = new Comparator<byte[]>() {
-      @Override
-      public int compare(final byte[] token1, final byte[] token2) {
-        final byte[] t1 = sub(token1, column), t2 = sub(token2, column);
-        return coll != null ? coll.compare(string(t1), string(t2)) :
-         diff(cs ? lc(t1) : t1, cs ? lc(t2) : t2);
-      }
+    final Comparator<byte[]> cc = (token1, token2) -> {
+      final byte[] t1 = sub(token1, column), t2 = sub(token2, column);
+      return coll != null ? coll.compare(string(t1), string(t2)) :
+       diff(cs ? lc(t1) : t1, cs ? lc(t2) : t2);
     };
     tokens.sort(cc, asc);
     if(gopts.get(GUIOptions.MERGEDUPL)) tokens.unique();

@@ -50,11 +50,8 @@ public final class GUIInput extends BaseXTextField {
     setPreferredSize(new Dimension(ps.width, ps.height + (int) fs2 - fs));
 
     box = new BaseXCombo(main);
-    box.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
-      }
+    box.addActionListener(e -> {
+      if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
     });
     pop = new GUIInputPopup(box);
 

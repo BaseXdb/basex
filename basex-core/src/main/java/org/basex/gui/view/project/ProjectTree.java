@@ -196,21 +196,18 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         dir.expand();
 
         final String fn = name;
-        new Thread() {
-          @Override
-          public void run() {
-            final Enumeration<?> children = dir.children();
-            while(children.hasMoreElements()) {
-              final ProjectNode child = (ProjectNode) children.nextElement();
-              if(child.file != null && child.file.name().equals(fn)) {
-                final TreePath tp = child.path();
-                setSelectionPath(tp);
-                startEditingAtPath(tp);
-                break;
-              }
+        new Thread(() -> {
+          final Enumeration<?> children = dir.children();
+          while(children.hasMoreElements()) {
+            final ProjectNode child = (ProjectNode) children.nextElement();
+            if(child.file != null && child.file.name().equals(fn)) {
+              final TreePath tp = child.path();
+              setSelectionPath(tp);
+              startEditingAtPath(tp);
+              break;
             }
           }
-        }.start();
+        }).start();
       }
     }
     @Override public boolean enabled(final GUI main) {

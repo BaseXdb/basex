@@ -32,11 +32,8 @@ public abstract class GUICode {
    */
   public final void invokeLater(final Object arg) {
     final int c = ++counter;
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        if(c == counter) execute(arg);
-      }
+    SwingUtilities.invokeLater(() -> {
+      if(c == counter) execute(arg);
     });
   }
 }
