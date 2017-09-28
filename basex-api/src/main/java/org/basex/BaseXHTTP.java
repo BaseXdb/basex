@@ -103,7 +103,9 @@ public final class BaseXHTTP extends CLI {
 
     if(stop) {
       stop();
-      if(!quiet) for(final Connector conn : conns) Util.outln(stopX, ((ServerConnector) conn).getLocalPort());
+      if(!quiet)
+        for(final Connector conn : conns)
+          Util.outln(stopX, ((ServerConnector) conn).getLocalPort());
       // keep message visible for a while
       Performance.sleep(1000);
       return;
@@ -113,7 +115,9 @@ public final class BaseXHTTP extends CLI {
     final Connector conn1 = conns[0];
     if(service) {
       start(((ServerConnector) conn1).getLocalPort(), conn1 instanceof SslConnectionFactory, args);
-      if(!quiet) for(final Connector conn : conns) Util.outln(startX, ((ServerConnector) conn).getLocalPort());
+      if(!quiet)
+        for(final Connector conn : conns)
+          Util.outln(startX, ((ServerConnector) conn).getLocalPort());
       // keep message visible for a while
       Performance.sleep(1000);
       return;
@@ -125,7 +129,10 @@ public final class BaseXHTTP extends CLI {
       jetty.start();
     } catch(final BindException ex) {
       Util.debug(ex);
-      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, ((ServerConnector) conn1).getLocalPort());
+      throw new BaseXException(
+          HTTP + ' ' + SRV_RUNNING_X,
+          ((ServerConnector) conn1).getLocalPort()
+      );
     }
     // throw cached exception that did not break the servlet architecture
     final IOException ex = HTTPContext.exception();
@@ -160,7 +167,10 @@ public final class BaseXHTTP extends CLI {
 
     // log server start at very end (logging flag could have been updated by web.xml)
     for(final Connector conn : conns) {
-      context.log.writeServer(LogType.OK, Util.info(startX, ((ServerConnector) conn).getLocalPort()));
+      context.log.writeServer(
+          LogType.OK, Util.info(startX,
+          ((ServerConnector) conn).getLocalPort())
+      );
     }
   }
 
