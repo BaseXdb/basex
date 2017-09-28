@@ -178,6 +178,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         try {
           output.assign(string(sig.local()), toString(args[0]));
         } catch(final BaseXException ex) {
+          Util.debug(ex);
           throw error(ann.info, UNKNOWN_SER, sig.local());
         }
       }

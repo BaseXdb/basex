@@ -7,6 +7,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.util.Util;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -73,13 +74,14 @@ public final class UCAOptions extends CollationOptions {
         if(vi == null || vic == null || ((Comparable<Object>) vi).compareTo(vic) > 0)
           throw error(VERSION);
       } catch(final IllegalArgumentException ex) {
+        Util.debug(ex);
         throw new BaseXException("Version not supported: %.", v);
       }
     }
 
     if(contains(STRENGTH)) {
       final String v = get(STRENGTH);
-      Integer s;
+      final Integer s;
       if(eq(v, "primary", "1")) s = 0;         // Collator.PRIMARY
       else if(eq(v, "secondary", "2")) s = 1;  // Collator.SECONDARY
       else if(eq(v, "tertiary", "3")) s = 2;   // Collator.TERTIARY
@@ -91,7 +93,7 @@ public final class UCAOptions extends CollationOptions {
 
     if(contains(ALTERNATE)) {
       final String v = get(ALTERNATE);
-      boolean b;
+      final boolean b;
       if(eq(v, "non-ignorable")) b = false;
       else if(eq(v, "shifted", "blanked")) b = true;
       else throw error(ALTERNATE);

@@ -114,6 +114,7 @@ public final class GUIMacOSX {
       try {
         result = GUIMacOSX.invoke(this, method.getName(), Object.class, obj);
       } catch(final NoSuchMethodException ex) {
+        Util.debug(ex);
         result = GUIMacOSX.invoke(this, method.getName());
       }
       // mark the current event as 'handled' if handler doesn't return a false boolean
@@ -187,7 +188,8 @@ public final class GUIMacOSX {
     try {
       Class.forName("com.apple.eawt.FullScreenUtilities");
       return true;
-    } catch(final ClassNotFoundException e) {
+    } catch(final ClassNotFoundException ex) {
+      Util.debug(ex);
       return false;
     }
   }

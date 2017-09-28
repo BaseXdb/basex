@@ -90,14 +90,8 @@ public final class BaseXGUI extends Main {
       }
       gui.editor.init(xqfiles);
     });
-
     // guarantee correct shutdown of database context
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public synchronized void run() {
-        context.close();
-      }
-    });
+    Runtime.getRuntime().addShutdownHook(new Thread(context::close));
   }
 
   /**

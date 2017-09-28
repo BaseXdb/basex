@@ -222,7 +222,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Returns the data reference bound to this expression. This method is currently overwritten
    * by {@link DBNode}, {@link DBNodeSeq}, {@link Path} and {@link VarRef}.
-   * @return data reference
+   * @return data reference (can be {@code null})
    */
   public Data data() {
     return null;

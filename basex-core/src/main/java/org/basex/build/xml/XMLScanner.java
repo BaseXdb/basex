@@ -85,7 +85,7 @@ final class XMLScanner extends Job {
       for(int e = 0; e < el; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
       dtd = opts.get(MainOptions.DTD);
 
-      String enc;
+      final String enc;
       // process document declaration...
       if(consume(DOCDECL)) {
         if(s()) {

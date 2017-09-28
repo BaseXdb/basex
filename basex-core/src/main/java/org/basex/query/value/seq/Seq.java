@@ -32,7 +32,7 @@ public abstract class Seq extends Value {
   protected Seq(final long size, final Type type) {
     super(type);
     this.size = size;
-    this.homo = type != AtomType.ITEM;
+    homo = type != AtomType.ITEM;
   }
 
   @Override

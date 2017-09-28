@@ -54,6 +54,7 @@ public final class CreateBackup extends ABackup {
           // backup was successful
           info(DB_BACKUP_X, db, jc().performance);
         } catch(final IOException ex) {
+          Util.debug(ex);
           info(DB_NOT_BACKUP_X, db);
           ok = false;
         }

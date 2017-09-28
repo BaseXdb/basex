@@ -60,7 +60,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param exprs expressions
    */
-  protected static final void addPlan(final FElem plan, final FElem el, final Object... exprs) {
+  protected static void addPlan(final FElem plan, final FElem el, final Object... exprs) {
     plan.add(el);
     for(final Object expr : exprs) {
       if(expr instanceof ExprInfo) {
@@ -83,7 +83,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param expr expressions
    */
-  protected static final void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
+  protected static void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
     addPlan(plan, el, (Object) expr);
   }
 

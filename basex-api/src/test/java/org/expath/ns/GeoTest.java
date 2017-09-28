@@ -901,7 +901,7 @@ public final class GeoTest extends SandboxTest {
         "declare namespace gml='http://www.opengis.net/gml';" + query;
 
     try(QueryProcessor qp = new QueryProcessor(q, context)) {
-      final ArrayOutput ao = qp.value().serialize();;
+      final ArrayOutput ao = qp.value().serialize();
       fail("Query did not fail:\n" + query + "\n[E] " + error + "...\n[F] " + ao);
     } catch(final QueryException ex) {
       final QueryError qerr = ex.error();

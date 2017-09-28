@@ -37,6 +37,7 @@ public final class DBPragma extends Pragma {
     try {
       qc.context.options.assign(option.name(), string(value));
     } catch(final BaseXException ex) {
+      Util.debug(ex);
       throw BASX_VALUE_X_X.get(info, option.name(), value);
     }
     return old;

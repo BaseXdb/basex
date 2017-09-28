@@ -56,6 +56,7 @@ public abstract class OutputSerializer extends Serializer {
       try {
         po = new EncoderOutput(os, Charset.forName(encoding));
       } catch(final Exception ex) {
+        Util.debug(ex);
         throw SERENCODING_X.getIO(encoding);
       }
     }

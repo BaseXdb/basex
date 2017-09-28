@@ -55,16 +55,11 @@ public abstract class Collation {
     // return default collation
     if(uri == null) return sc.collation;
 
-    byte[] url = uri;
-    final Uri u = Uri.uri(url);
-    if(!u.isValid()) throw INVURI_X.get(info, url);
-    if(!u.isAbsolute()) {
-      if(Token.startsWith(url, '?')) {
-        url = concat(URL, url);
-      } else {
-        url = sc.baseURI().resolve(u, info).string();
-      }
-    }
+    final Uri u = Uri.uri(uri);
+    if(!u.isValid()) throw INVURI_X.get(info, uri);
+    byte[] url = u.isAbsolute() ? uri :
+      Token.startsWith(uri, '?') ? concat(URL, uri) : sc.baseURI().resolve(u, info).string();
+
     // return unicode point collation
     if(eq(COLLATION_URI, url)) return null;
 

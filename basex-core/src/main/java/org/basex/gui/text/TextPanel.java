@@ -150,7 +150,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final String searchString() {
     final String string = editor.copy();
-    return string.indexOf('\n') != -1 ? "" : string;
+    return string.indexOf('\n') == -1 ? string : "";
   }
 
   /**

@@ -114,7 +114,7 @@ public final class DataBuilder {
     final byte[] prefix = qname.prefix(), uri = qname.uri();
     // create new namespace entry if this is a prefixed and standalone attribute
     final int uriId = uri.length == 0 || eq(prefix, XML) ? 0 :
-      par != -1 ? data.nspaces.uriId(uri) : data.nspaces.add(last, prefix, uri, data);
+      par == -1 ? data.nspaces.add(last, prefix, uri, data) : data.nspaces.uriId(uri);
 
     final int nameId = data.attrNames.put(qname.string());
     data.attr(pre - par, nameId, node.string(), uriId);

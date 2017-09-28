@@ -32,6 +32,7 @@ public final class Reflect {
       forName(Util.info(pattern, ext));
       return true;
     } catch(final Throwable ex) {
+      Util.debug(ex);
       return false;
     }
   }
@@ -45,6 +46,7 @@ public final class Reflect {
     try {
       return forName(name);
     } catch(final Throwable ex) {
+      Util.debug(ex);
       return null;
     }
   }
@@ -112,7 +114,7 @@ public final class Reflect {
    * @param clazz class to search for the constructor
    * @param types constructor parameters
    * @param <O> class type
-   * @return {@code null} if the constructor is not found
+   * @return constructor, or {@code null} if the constructor is not found
    */
   public static <O> Constructor<O> find(final Class<O> clazz, final Class<?>... types) {
     if(clazz == null) return null;
@@ -128,6 +130,7 @@ public final class Reflect {
         try {
           m = clazz.getConstructor(types);
         } catch(final Throwable ex) {
+          Util.debug(ex);
           m = clazz.getDeclaredConstructor(types);
           m.setAccessible(true);
         }
@@ -144,7 +147,7 @@ public final class Reflect {
    * @param clazz class to search for the method
    * @param name method name
    * @param types method parameters
-   * @return reference or {@code null} if the method is not found
+   * @return method, or {@code null} if the method is not found
    */
   public static Method method(final Class<?> clazz, final String name, final Class<?>... types) {
     if(clazz == null) return null;
@@ -153,6 +156,7 @@ public final class Reflect {
       try {
         m = clazz.getMethod(name, types);
       } catch(final Throwable ex) {
+        Util.debug(ex);
         m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
       }

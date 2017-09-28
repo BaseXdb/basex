@@ -183,8 +183,8 @@ public final class OrderBy extends Clause {
     if(refs.length == used.cardinality()) return refs.length != len;
 
     // add new variables, possible when an expression is inlined below this clause
-    outer: for(int id = used.nextSet(0); id >= 0; id = used.nextSet(id + 1)) {
-      for(final VarRef ref : refs) if(ref.var.id == id) continue outer;
+    OUTER: for(int id = used.nextSet(0); id >= 0; id = used.nextSet(id + 1)) {
+      for(final VarRef ref : refs) if(ref.var.id == id) continue OUTER;
       refs = Array.add(refs, new VarRef(info, decl.get(id)));
     }
     return true;

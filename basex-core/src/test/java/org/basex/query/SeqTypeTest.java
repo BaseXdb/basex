@@ -222,7 +222,7 @@ public final class SeqTypeTest {
       // function(xs:boolean) as xs:boolean
       f6 = FuncType.get(BLN, BLN).seqType();
 
-    intersect(get(AtomType.ITEM, Occ.ZERO), ITEM, null);
+    intersect(get(AtomType.ITEM, ZERO), ITEM, null);
     intersect(ATT, ATT, ATT);
     intersect(ATT, NOD, ATT);
     intersect(ATT, ELM, null);

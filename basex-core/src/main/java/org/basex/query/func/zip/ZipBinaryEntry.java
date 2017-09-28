@@ -37,6 +37,7 @@ public class ZipBinaryEntry extends ZipFn {
     try {
       return new Zip(file).read(path);
     } catch(final FileNotFoundException ex) {
+      Util.debug(ex);
       throw ZIP_NOTFOUND_X.get(info, file + "/" + path);
     } catch(final IOException ex) {
       throw ZIP_FAIL_X.get(info, ex);

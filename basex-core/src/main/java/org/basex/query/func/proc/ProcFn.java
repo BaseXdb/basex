@@ -60,6 +60,7 @@ abstract class ProcFn extends StandardFunc {
     try {
       cs = Charset.forName(encoding);
     } catch(final Exception ex) {
+      Util.debug(ex);
       throw BXPR_ENC_X.get(info, encoding);
     }
 
@@ -76,8 +77,8 @@ abstract class ProcFn extends StandardFunc {
     } catch(final IOException ex) {
       try {
         result.error.write(token(Util.message(ex)));
-      } catch(final IOException ignore) {
-        Util.debug(ignore);
+      } catch(final IOException e) {
+        Util.debug(e);
       }
       result.code = 9999;
       return result;

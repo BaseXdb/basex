@@ -69,6 +69,7 @@ public final class DialogLine extends BaseXDialog {
     try {
       return Integer.parseInt(line.getText());
     } catch(final NumberFormatException ex) {
+      Util.debug(ex);
       return -1;
     }
   }

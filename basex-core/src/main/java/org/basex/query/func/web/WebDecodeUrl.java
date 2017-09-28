@@ -28,8 +28,8 @@ public final class WebDecodeUrl extends WebFn {
       }
       return Str.get(token);
     } catch(final UnsupportedEncodingException ex) {
-      /* UTF8 is always supported */
-      throw Util.notExpected();
+      // UTF8 is always supported
+      throw Util.notExpected(ex);
     } catch(final IllegalArgumentException ex) {
       throw BXWE_INVALID_X.get(info, ex.getLocalizedMessage());
     }

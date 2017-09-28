@@ -268,6 +268,7 @@ public final class QueryContext extends Job implements Closeable {
         try {
           context.options.assign(key.toUpperCase(Locale.ENGLISH), val);
         } catch(final BaseXException ex) {
+          Util.debug(ex);
           throw BASX_VALUE_X_X.get(null, key, val);
         }
       }
@@ -706,8 +707,7 @@ public final class QueryContext extends Job implements Closeable {
 
     Type tp;
     if(type.endsWith(")")) {
-      if(nm.eq(AtomType.ITEM.name)) tp = AtomType.ITEM;
-      else tp = NodeType.find(nm);
+      tp = nm.eq(AtomType.ITEM.name) ? AtomType.ITEM : NodeType.find(nm);
       if(tp == null) tp = FuncType.find(nm);
     } else {
       tp = ListType.find(nm);
@@ -794,10 +794,10 @@ public final class QueryContext extends Job implements Closeable {
    */
   public QueryContext initDateTime() throws QueryException {
     if(time == null) {
-      final Date dt = Calendar.getInstance().getTime();
-      final String ymd = DateTime.format(dt, DateTime.DATE);
-      final String hms = DateTime.format(dt, DateTime.TIME);
-      final String zon = DateTime.format(dt, DateTime.ZONE);
+      final Date d = new Date();
+      final String ymd = DateTime.format(d, DateTime.DATE);
+      final String hms = DateTime.format(d, DateTime.TIME);
+      final String zon = DateTime.format(d, DateTime.ZONE);
       final String znm = zon.substring(0, 3), zns = zon.substring(3);
       time = new Tim(token(hms + znm + ':' + zns), null);
       date = new Dat(token(ymd + znm + ':' + zns), null);

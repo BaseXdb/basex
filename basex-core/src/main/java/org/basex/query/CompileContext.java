@@ -88,7 +88,7 @@ public final class CompileContext {
    * Creates a new copy of the given variable in this scope.
    * @param var variable to copy (can be {@code null})
    * @param vm variable mapping (can be {@code null})
-   * @return new variable
+   * @return new variable, or {@code null} if the supplied variable is {@code null}
    */
   public Var copy(final Var var, final IntObjMap<Var> vm) {
     if(var == null) return null;
@@ -147,7 +147,7 @@ public final class CompileContext {
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
     final Expr res = result == null ? Empty.SEQ : result;
     if(res != expr) {
-      if(res == Empty.SEQ) {
+      if(res.isEmpty()) {
         info(OPTEMPTY_X, expr);
       } else if(res instanceof ParseExpr) {
         info(OPTREWRITE_X_X, expr, res.description());

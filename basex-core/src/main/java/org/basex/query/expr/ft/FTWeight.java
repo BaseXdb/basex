@@ -65,7 +65,7 @@ public final class FTWeight extends FTExpr {
    * Returns the item with weight calculation.
    * @param item input item
    * @param qc query context
-   * @return item
+   * @return item, or {@code null} if the specified item is {@code null}
    * @throws QueryException query exception
    */
   private FTNode weight(final FTNode item, final QueryContext qc) throws QueryException {

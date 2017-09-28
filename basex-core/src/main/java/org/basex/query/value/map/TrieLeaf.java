@@ -181,6 +181,7 @@ final class TrieLeaf extends TrieNode {
     try {
       return key.hash(null) == hash;
     } catch(final QueryException ex) {
+      Util.debug(ex);
       return false;
     }
   }

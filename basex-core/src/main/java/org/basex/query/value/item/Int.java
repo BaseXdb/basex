@@ -33,7 +33,7 @@ public final class Int extends ANum {
     final int nl = 128;
     INTSS = new Int[nl];
     for(int n = 0; n < nl; n++) INTSS[n] = new Int(n);
-    MAX = Int.get(Long.MAX_VALUE);
+    MAX = get(Long.MAX_VALUE);
     ZERO = INTSS[0];
     ONE = INTSS[1];
   }

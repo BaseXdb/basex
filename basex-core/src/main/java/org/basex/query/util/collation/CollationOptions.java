@@ -1,6 +1,7 @@
 package org.basex.query.util.collation;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.util.options.*;
@@ -26,7 +27,7 @@ abstract class CollationOptions extends Options {
    * @throws BaseXException database exception
    */
   void assign(final HashMap<String, String> args) throws BaseXException {
-    for(final Map.Entry<String, String> entry : args.entrySet()) {
+    for(final Entry<String, String> entry : args.entrySet()) {
       assign(entry.getKey(), entry.getValue());
     }
   }
@@ -42,6 +43,9 @@ abstract class CollationOptions extends Options {
 
   /** Initialization of locales. */
   protected static final class Locales {
+    /** Private constructor. */
+    private Locales() { }
+
     /** Available locales, indexed by language code. */
     static final HashMap<String, Locale> MAP = new HashMap<>();
     static {

@@ -1043,9 +1043,9 @@ public class QueryParser extends InputParser {
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<>();
         for(final Spec spec : specs) curr.put(spec.var.name.id(), spec.var);
-        vars:
+        VARS:
         for(final Var v : curr.values()) {
-          for(final Spec spec : specs) if(spec.var.is(v)) continue vars;
+          for(final Spec spec : specs) if(spec.var.is(v)) continue VARS;
           ng.add(new VarRef(specs[0].info, v));
         }
 
@@ -1704,11 +1704,8 @@ public class QueryParser extends InputParser {
           final ExprList argList = new ExprList(e);
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          if(holes == null) {
-            e = new DynFuncCall(ii, sc, ex, args);
-          } else {
-            e = new PartFunc(sc, ii, ex, args, holes);
-          }
+          e = holes == null ? new DynFuncCall(ii, sc, ex, args) :
+            new PartFunc(sc, ii, ex, args, holes);
         }
       }
     }
@@ -2086,11 +2083,8 @@ public class QueryParser extends InputParser {
           final ExprList argList = new ExprList();
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          if(holes == null) {
-            e = new DynFuncCall(ii, sc, e, args);
-          } else {
-            e = new PartFunc(sc, ii, e, args, holes);
-          }
+          e = holes == null ? new DynFuncCall(ii, sc, e, args) :
+            new PartFunc(sc, ii, e, args, holes);
         } else if(consume(QUESTION)) {
           // parses the "Lookup" rule
           e = new Lookup(info(), keySpecifier(), e);
@@ -3542,9 +3536,9 @@ public class QueryParser extends InputParser {
         opt.sw = new StopWords();
         if(wsConsumeWs(DEFAULT)) {
           if(!using) throw error(FTSTOP);
-        } else {
+        } else if(using) {
           boolean union = false, except = false;
-          while(using) {
+          do {
             if(wsConsume(PAREN1)) {
               do {
                 final byte[] sl = stringLiteral();
@@ -3567,8 +3561,7 @@ public class QueryParser extends InputParser {
             }
             union = wsConsumeWs(UNION);
             except = !union && wsConsumeWs(EXCEPT);
-            if(!union && !except) break;
-          }
+          } while(union || except);
         }
       } else if(wsConsumeWs(WILDCARDS)) {
         if(opt.isSet(WC)) throw error(FTDUP_X, WILDCARDS);

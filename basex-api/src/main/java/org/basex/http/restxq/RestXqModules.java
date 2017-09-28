@@ -76,7 +76,9 @@ public final class RestXqModules {
    * Initializes the module cache.
    */
   public void init() {
-    parsed.set(false);
+    synchronized(parsed) {
+      parsed.set(false);
+    }
   }
 
   /**

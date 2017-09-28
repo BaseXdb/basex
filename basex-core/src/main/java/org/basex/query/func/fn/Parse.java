@@ -33,7 +33,7 @@ public abstract class Parse extends StandardFunc {
    * @param qc query context
    * @param check only check if text is available
    * @param encoding parse encoding
-   * @return content string or boolean success flag
+   * @return content string, {@code null}, or boolean success flag
    * @throws QueryException query exception
    */
   Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
@@ -93,7 +93,7 @@ public abstract class Parse extends StandardFunc {
    * Returns a document node for the parsed XML input.
    * @param qc query context
    * @param frag parse fragments
-   * @return result
+   * @return result or {@code null}
    * @throws QueryException query exception
    */
   ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
@@ -102,13 +102,7 @@ public abstract class Parse extends StandardFunc {
 
     final IO io = new IOContent(toToken(it), string(sc.baseURI().string()));
     try {
-      final Parser parser;
-      if(frag) {
-        parser = new XMLParser(io, MainOptions.get(), true);
-      } else {
-        parser = Parser.xmlParser(io);
-      }
-      return new DBNode(parser);
+      return new DBNode(frag ? new XMLParser(io, MainOptions.get(), true) : Parser.xmlParser(io));
     } catch(final IOException ex) {
       throw SAXERR_X.get(info, ex);
     }

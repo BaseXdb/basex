@@ -34,6 +34,7 @@ public abstract class ConvertFn extends StandardFunc {
     try {
       return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
+      Util.debug(ex);
       throw BXCO_BASE64_X_X.get(info, chop(in, info), enc);
     }
   }

@@ -113,6 +113,7 @@ public final class Thesaurus {
       final Value entries = nodes("//*:entry", new DBNode(file));
       for(final Item entry : entries) build(entry);
     } catch(final IOException ex) {
+      Util.debug(ex);
       throw NOTHES_X.get(ii, file);
     }
   }

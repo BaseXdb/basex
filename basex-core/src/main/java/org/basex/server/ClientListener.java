@@ -106,6 +106,7 @@ public final class ClientListener extends Thread implements ClientInfo {
           }
         } catch(final IOException ex) {
           // this exception may be thrown if a session is stopped
+          Util.debug(ex);
           close();
           break;
         }

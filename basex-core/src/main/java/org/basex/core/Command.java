@@ -389,6 +389,7 @@ public abstract class Command extends Job {
     try {
       return Enum.valueOf(type, string.toUpperCase(Locale.ENGLISH));
     } catch(final Exception ex) {
+      Util.debug(ex);
       return null;
     }
   }

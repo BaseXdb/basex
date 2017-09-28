@@ -129,6 +129,7 @@ final class ProjectList extends JList<String> {
     try {
       file.open();
     } catch(final IOException ex) {
+      Util.debug(ex);
       BaseXDialog.error(view.gui, Util.info(FILE_NOT_OPENED_X, file));
     }
   }

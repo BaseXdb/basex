@@ -431,7 +431,7 @@ public final class DecFormatter extends FormatUtil {
 
       // create integer part
       final int sl = s.length();
-      final int il = fracSep != -1 ? fracSep : sl;
+      final int il = fracSep == -1 ? sl : fracSep;
       for(int i = il; i < pic.minInt; ++i) intgr.add(zero);
       for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
 

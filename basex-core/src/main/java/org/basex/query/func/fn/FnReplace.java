@@ -22,21 +22,21 @@ public final class FnReplace extends RegEx {
     final Pattern pat = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);
     final byte[] rep = toToken(exprs[2], qc);
     String replace = string(rep);
-    if((pat.flags() & Pattern.LITERAL) != 0) {
-      // literal parsing: add backslashes
-      replace = replace.replace("\\", "\\\\").replace("$", "\\$");
-    } else {
+    if((pat.flags() & Pattern.LITERAL) == 0) {
       // standard parsing: raise errors for some special cases
       final int rl = rep.length;
-      for(int r = 0; r < rl; ++r) {
+      for (int r = 0; r < rl; ++r) {
         final int n = r + 1 == rl ? 0 : rep[r + 1];
-        if(rep[r] == '\\') {
-          if(n != '\\' && n != '$') throw FUNREPBS_X.get(info, rep);
+        if (rep[r] == '\\') {
+          if (n != '\\' && n != '$') throw FUNREPBS_X.get(info, rep);
           ++r;
-        } else if(rep[r] == '$' && (r == 0 || rep[r - 1] != '\\') && !digit(n)) {
+        } else if (rep[r] == '$' && (r == 0 || rep[r - 1] != '\\') && !digit(n)) {
           throw FUNREPDOL_X.get(info, rep);
         }
       }
+    } else {
+      // literal parsing: add backslashes
+      replace = replace.replace("\\", "\\\\").replace("$", "\\$");
     }
 
     try {

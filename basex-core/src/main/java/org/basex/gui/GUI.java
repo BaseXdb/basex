@@ -347,7 +347,7 @@ public final class GUI extends JFrame {
         // parse and execute all commands
         final CommandParser cp = CommandParser.get(in.substring(exc ? 1 : 0), context);
         if(pwReader == null) pwReader = () -> {
-          final DialogPass dp = new DialogPass(GUI.this);
+          final DialogPass dp = new DialogPass(this);
           return dp.ok() ? dp.password() : "";
         };
         cp.pwReader(pwReader);

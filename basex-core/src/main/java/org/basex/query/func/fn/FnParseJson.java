@@ -51,12 +51,7 @@ public class FnParseJson extends Parse {
 
     final boolean esc = opts.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);
-    final FItem fallback;
-    if(fb == null) {
-      fallback = null;
-    } else {
-      fallback = STRFUNC.cast(fb, qc, sc, ii);
-    }
+    final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, ii);
     if(esc && fallback != null) throw JSON_OPT_X.get(ii,
         "Escaping cannot be combined with a fallback function.");
 

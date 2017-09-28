@@ -86,6 +86,7 @@ public final class List extends Command {
         // add number of raw files
         count = meta.ndocs + new IOFile(soptions.dbPath(name), IO.RAW).descendants().size();
       } catch(final IOException ex) {
+        Util.debug(ex);
         file = ERROR;
       }
 

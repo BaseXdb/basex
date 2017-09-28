@@ -222,6 +222,7 @@ public final class TextView extends View {
         out.write(text.getText());
       }
     } catch(final IOException ex) {
+      Util.debug(ex);
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
     } finally {
       gui.cursor(CURSORARROW, true);

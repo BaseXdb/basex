@@ -509,6 +509,7 @@ final class WebDAVService {
           try {
             bi.reset();
           } catch(final IOException e) {
+            Util.debug(ex);
             // throw original exception if input cannot be reset
             throw ex;
           }

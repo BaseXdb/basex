@@ -265,6 +265,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
       );
       return success(new LockToken(tokenId, lockInfo, timeout));
     } catch(final IOException ex) {
+      Util.debug(ex);
       return failed(FailureReason.ALREADY_LOCKED);
     }
   }

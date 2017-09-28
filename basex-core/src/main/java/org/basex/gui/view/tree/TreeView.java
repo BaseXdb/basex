@@ -946,11 +946,8 @@ public final class TreeView extends View {
           final int pre;
 
           // if multiple pre values, then approximate pre value
-          if(tr.bigRect(sub, rn, lv)) {
-            pre = tr.getPrePerXPos(sub, rn, lv, mx);
-          } else {
-            pre = sub.prePerIndex(rn, lv, l);
-          }
+          pre = tr.bigRect(sub, rn, lv) ? tr.getPrePerXPos(sub, rn, lv, mx) :
+            sub.prePerIndex(rn, lv, l);
           fpre = pre;
           gui.notify.focus(pre, this);
           refreshedFocus = false;

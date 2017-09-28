@@ -349,6 +349,7 @@ public final class IOFile extends IO {
     try {
       return new IOFile(toPath().toRealPath().toFile());
     } catch(final IOException ex) {
+      Util.debug(ex);
       return this;
     }
   }

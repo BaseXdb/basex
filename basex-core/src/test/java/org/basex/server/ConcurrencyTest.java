@@ -121,9 +121,7 @@ public final class ConcurrencyTest extends SandboxTest {
     public void run() {
       try {
         final int i = RANDOM.nextInt(2);
-        final Command cmd;
-        if(i == 0) cmd = new CreateDB(NAME);
-        else cmd = new DropDB(NAME);
+        final Command cmd = i == 0 ? new CreateDB(NAME) : new DropDB(NAME);
         cmd.execute(context);
       } catch(final IOException ex) {
         fail(Util.message(ex));

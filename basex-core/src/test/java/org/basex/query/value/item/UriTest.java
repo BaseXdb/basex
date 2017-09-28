@@ -74,7 +74,7 @@ public class UriTest {
   }
 
   /** Current test URI. */
-  @Parameter(0) public String uri;
+  @Parameter public String uri;
   /** Current valid flag. */
   @Parameter(1) public boolean valid;
   /** Current absolute flag. */

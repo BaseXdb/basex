@@ -46,7 +46,7 @@ public abstract class Docs extends StandardFunc {
   /**
    * Performs the doc function.
    * @param qc query context
-   * @return document
+   * @return document or {@code null}
    * @throws QueryException query exception
    */
   ANode doc(final QueryContext qc) throws QueryException {

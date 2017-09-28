@@ -305,6 +305,7 @@ public final class Util {
         if(exit == 1) return Token.string(new IOStream(process.getErrorStream()).read());
         break;
       } catch(final IllegalThreadStateException ex) {
+        Util.debug(ex);
         // process is still running
         Performance.sleep(wait);
       } catch(final IOException ex) {

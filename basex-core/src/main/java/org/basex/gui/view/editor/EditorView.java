@@ -593,6 +593,7 @@ public final class EditorView extends View {
           if(cp == -1) return text.finish();
           text.add(cp);
         } catch(final InputException ex) {
+          Util.debug(ex);
           if(valid) {
             valid = false;
             final String button = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
@@ -601,6 +602,7 @@ public final class EditorView extends View {
               try {
                 file.open();
               } catch(final IOException ioex) {
+                Util.debug(ioex);
                 Desktop.getDesktop().open(file.file());
               }
               return null;

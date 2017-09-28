@@ -167,6 +167,7 @@ final class SearchContext {
         final Pattern pattern = Pattern.compile(search, flags);
         return pattern.matcher(string).matches();
       } catch(final Exception ex) {
+        Util.debug(ex);
         return false;
       }
     }

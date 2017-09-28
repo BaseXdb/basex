@@ -7,6 +7,7 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'check' command: opens an existing database or
@@ -36,12 +37,8 @@ public final class Check extends Command {
     final String dbName = io.dbName();
 
     // choose OPEN if user has no create permissions, or if database exists
-    final Command cmd;
-    if(open(io, dbName)) {
-      cmd = new Open(dbName);
-    } else {
-      cmd = new CreateDB(dbName, io.exists() ? input : null);
-    }
+    final Command cmd = open(io, dbName) ? new Open(dbName) :
+      new CreateDB(dbName, io.exists() ? input : null);
 
     // execute command
     try {
@@ -72,6 +69,7 @@ public final class Check extends Command {
     try {
       meta.read();
     } catch(final IOException ex) {
+      Util.debug(ex);
       return false;
     }
     return meta.time == input.timeStamp();

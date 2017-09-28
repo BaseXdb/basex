@@ -285,6 +285,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         try {
           node.file.open();
         } catch(final IOException ex) {
+          Util.debug(ex);
           BaseXDialog.error(view.gui, Util.info(FILE_NOT_OPENED_X, node.file));
         }
       }

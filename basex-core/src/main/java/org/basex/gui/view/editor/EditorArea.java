@@ -193,6 +193,7 @@ public final class EditorArea extends TextPanel {
         view.project.save(io, rename);
         return true;
       } catch(final Exception ex) {
+        Util.debug(ex);
         BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
       }
     }

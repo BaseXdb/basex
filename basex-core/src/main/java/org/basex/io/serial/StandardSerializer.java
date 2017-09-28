@@ -46,12 +46,13 @@ public abstract class StandardSerializer extends OutputSerializer {
 
     // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
-    if(norm.equals(SerializerOptions.NORMALIZATION_FORM.value())) {
+    if(norm.equals(NORMALIZATION_FORM.value())) {
       form = null;
     } else {
       try {
         form = Form.valueOf(norm);
       } catch(final IllegalArgumentException ex) {
+        Util.debug(ex);
         throw SERNORM_X.getIO(norm);
       }
     }

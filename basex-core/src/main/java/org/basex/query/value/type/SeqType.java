@@ -255,7 +255,7 @@ public final class SeqType {
    * unique sequence type instances.
    * @param type type
    */
-  protected SeqType(final Type type) {
+  SeqType(final Type type) {
     this(type, Occ.ONE);
   }
 

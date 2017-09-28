@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -30,6 +31,7 @@ public final class StemDir extends TokenMap {
       }
       return true;
     } catch(final IOException ex) {
+      Util.debug(ex);
       return false;
     }
   }

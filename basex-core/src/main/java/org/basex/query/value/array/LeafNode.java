@@ -187,7 +187,7 @@ final class LeafNode implements Node<Value, Value> {
   @Override
   public int append(final NodeLike<Value, Value>[] nodes, final int pos) {
     if(pos == 0) {
-      nodes[pos] = this;
+      nodes[0] = this;
       return 1;
     }
 

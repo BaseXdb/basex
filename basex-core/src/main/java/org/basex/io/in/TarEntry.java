@@ -97,6 +97,7 @@ public final class TarEntry {
       return new String(result.toArray());
     } catch(final Exception ex) {
       // fallback: UTF8
+      Util.debug(ex);
       return result.toString();
     }
   }

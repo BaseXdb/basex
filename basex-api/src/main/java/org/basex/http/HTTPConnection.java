@@ -234,11 +234,7 @@ public final class HTTPConnection implements ClientInfo {
     String loc = location;
     if(location.startsWith("/")) {
       final String uri = req.getRequestURI(), info = req.getPathInfo();
-      if(info == null) {
-        loc = uri + location;
-      } else {
-        loc = uri.substring(0, uri.length() - info.length()) + location;
-      }
+      loc = (info == null ? uri : uri.substring(0, uri.length() - info.length())) + location;
     }
     return loc;
   }
@@ -281,6 +277,7 @@ public final class HTTPConnection implements ClientInfo {
     try {
       return URLDecoder.decode(path, Prop.ENCODING);
     } catch(final UnsupportedEncodingException | IllegalArgumentException ex) {
+      Util.debug(ex);
       return path;
     }
   }

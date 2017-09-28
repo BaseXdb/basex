@@ -148,12 +148,12 @@ public final class XdmInfoTest extends SandboxTest {
       final TestResult tr = new TestResult();
       tr.type = result[0];
       final int rl = result.length, b = Token.indexOf(result, 0);
-      if(b != -1) {
+      if(b == -1) {
+        tr.result = Arrays.copyOfRange(result, 1, rl);
+      } else {
         // result includes URI
         tr.uri = Arrays.copyOfRange(result, 1, b);
         tr.result = Arrays.copyOfRange(result, b + 1, rl);
-      } else {
-        tr.result = Arrays.copyOfRange(result, 1, rl);
       }
 
       final boolean expected = exp.length > 3;

@@ -108,6 +108,7 @@ public final class FnParseIetfDate extends StandardFunc {
       try {
         return new Dtm(tb.finish(), info);
       } catch(final QueryException ex) {
+        Util.debug(ex);
         throw QueryError.IETF_INV_X.get(info, original);
       }
     }

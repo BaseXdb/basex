@@ -53,6 +53,7 @@ final class WebDAVFactory implements ResourceFactory {
           new WebDAVDatabase(new WebDAVMetaData(db, service.timestamp(db)), service) :
           null;
     } catch(final LoginException ex) {
+      Util.debug(ex);
       return WebDAVNotAuthorized.NOAUTH;
     } catch(final Exception ex) {
       Util.errln(ex);

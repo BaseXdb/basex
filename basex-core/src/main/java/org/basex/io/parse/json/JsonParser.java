@@ -204,7 +204,9 @@ final class JsonParser extends InputParser {
     final boolean zero = ch == '0';
     ch = curr();
     if(zero && ch >= '0' && ch <= '9') throw error("No digit allowed after '0'");
-    loop: while(true) {
+
+    LOOP:
+    while(true) {
       switch(ch) {
         case '0':
         case '1':
@@ -223,7 +225,7 @@ final class JsonParser extends InputParser {
         case '.':
         case 'e':
         case 'E':
-          break loop;
+          break LOOP;
         default:
           skipWs();
           return tb.toArray();

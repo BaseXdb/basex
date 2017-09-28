@@ -43,6 +43,7 @@ public final class EncoderOutput extends PrintOutput {
       final ByteBuffer bb = encoder.encode(CharBuffer.wrap(encbuffer.add(ch).toString()));
       write(bb.array(), 0, bb.limit());
     } catch(final UnmappableCharacterException ex) {
+      Util.debug(ex);
       throw SERENC_X_X.getIO(Integer.toHexString(ch), encoding);
     }
   }

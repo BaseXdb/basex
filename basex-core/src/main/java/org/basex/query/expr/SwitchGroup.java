@@ -30,7 +30,7 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
+  public Expr compile(final CompileContext cc) {
     // compile and simplify branches
     final int es = exprs.length;
     for(int e = 0; e < es; e++) {

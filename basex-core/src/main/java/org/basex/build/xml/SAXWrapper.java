@@ -99,7 +99,7 @@ public final class SAXWrapper extends SingleParser {
    * Wraps the input source with a stream which counts the number of read bytes
    * and parsed lines.
    * @param is input source
-   * @return resulting stream
+   * @return resulting stream, or {@code null} if specified source is {@code null} as well
    * @throws IOException I/O exception
    */
   @SuppressWarnings("resource")

@@ -145,7 +145,7 @@ public final class Namespaces {
    */
   public int uriIdForPrefix(final byte[] prefix, final boolean element) {
     if(isEmpty()) return 0;
-    return prefix.length != 0 ? uriId(prefix, cursor) : element ? defaults.get(level) : 0;
+    return prefix.length == 0 ? element ? defaults.get(level) : 0 : uriId(prefix, cursor);
   }
 
   /**

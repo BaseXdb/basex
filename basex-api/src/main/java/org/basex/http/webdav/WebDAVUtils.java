@@ -59,8 +59,8 @@ final class WebDAVUtils {
       try {
         final String ud = URLDecoder.decode(url, Strings.UTF8);
         return ud.contains("\uFFFD") ? URLDecoder.decode(url, Strings.ISO88591) : ud;
-      } catch(final Exception ignore) {
-        Util.errln(ignore);
+      } catch(final Exception ex) {
+        Util.errln(ex);
       }
     }
     return url;

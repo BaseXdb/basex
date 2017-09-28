@@ -40,9 +40,10 @@ public abstract class QueryTest extends SandboxTest {
         final Value val = qp.value();
         if(!correct || !new DeepEqual().equal(val, cmp)) {
           sb.append('[').append(qu[0]).append("] ").append(query);
-          sb.append("\n[E] ").append(cmp.size()).append(" result(s): ");
+          sb.append("\n[E] ");
           if(correct) {
-            for(final Item it : cmp) sb.append(it.serialize()).append(", ");
+            sb.append(cmp.size()).append(" result(s): ");
+            for(final Item it : cmp) sb.append(it.serialize()).append("; ");
           } else {
             sb.append("error");
           }

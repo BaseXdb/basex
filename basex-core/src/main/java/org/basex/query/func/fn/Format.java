@@ -20,7 +20,7 @@ abstract class Format extends StandardFunc {
    * Returns a formatted number.
    * @param qc query context
    * @param tp input type
-   * @return string
+   * @return string or {@code null}
    * @throws QueryException query exception
    */
   Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {

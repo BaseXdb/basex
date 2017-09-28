@@ -84,6 +84,7 @@ public final class DTDur extends Dur {
       try {
         sec = mult ? sec.multiply(d) : sec.divide(d, MathContext.DECIMAL64);
       } catch(final ArithmeticException ex) {
+        Util.debug(ex);
         // catch cases in which a computation yields no exact result; eg:
         // xs:dayTimeDuration("P1D") div xs:double("-1.7976931348623157E308")
         d = BigDecimal.valueOf(1 / factor);

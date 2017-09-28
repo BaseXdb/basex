@@ -684,7 +684,7 @@ public abstract class Path extends ParseExpr {
             invSteps.add(Step.get(info, invAxis, rootTest));
         } else {
           final Step prevStep = axisStep(s - 1);
-          final Axis newAxis = prevStep.axis == Axis.ATTR ? Axis.ATTR : invAxis;
+          final Axis newAxis = prevStep.axis == ATTR ? ATTR : invAxis;
           invSteps.add(Step.get(info, newAxis, prevStep.test, prevStep.exprs));
         }
       }

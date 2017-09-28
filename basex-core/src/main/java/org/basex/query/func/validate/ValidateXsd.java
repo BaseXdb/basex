@@ -85,14 +85,9 @@ public class ValidateXsd extends ValidateFn {
         final SchemaFactory sf = SchemaFactory.newInstance(uri);
         if(SAXON_CP.equals(cp)) sf.setProperty(SAXON_VERSION_URI, xsd11 ? VERSION_11 : VERSION_10);
 
-        final Schema s;
-        if(schema == null) {
-          // schema declaration is included in document
-          s = sf.newSchema();
-        } else {
-          // schema is specified as string
-          s = sf.newSchema(new URL(prepare(read(schema, null), handler).url()));
-        }
+        // schema declaration is included in document, or specified as string
+        final Schema s = schema == null ? sf.newSchema() :
+          sf.newSchema(new URL(prepare(read(schema, null), handler).url()));
 
         final Validator v = s.newValidator();
         v.setErrorHandler(handler);

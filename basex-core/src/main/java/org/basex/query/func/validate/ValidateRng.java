@@ -71,6 +71,7 @@ public class ValidateRng extends ValidateFn {
             vdV.invoke(vdInstance, in.inputSource());
           }
         } catch(final ClassNotFoundException ex) {
+          Util.debug(ex);
           throw BXVA_RELAXNG_X.get(info);
         } catch(final Exception ex) {
           throw BXVA_FAIL_X.get(info, Util.rootException(ex));

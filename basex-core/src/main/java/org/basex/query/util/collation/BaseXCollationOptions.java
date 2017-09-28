@@ -4,6 +4,7 @@ import static org.basex.util.Strings.*;
 
 import java.text.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.util.options.*;
@@ -94,7 +95,7 @@ public final class BaseXCollationOptions extends CollationOptions {
    */
   public Collator collator(final HashMap<String, String> args) throws BaseXException {
     if(fallback) {
-      for(final Map.Entry<String, String> entry : args.entrySet()) {
+      for(final Entry<String, String> entry : args.entrySet()) {
         final String name = entry.getKey();
         String value = entry.getValue();
         if(name.equals(STRENGTH.name())) {

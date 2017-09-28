@@ -191,10 +191,11 @@ final class TrieList extends TrieNode {
       Item[] ks = keys;
       Value[] vs = values;
 
-      outer: for(int i = 0; i < size; i++) {
+      OUTER:
+      for(int i = 0; i < size; i++) {
         final Item ok = o.keys[i];
         // skip all entries that are overridden
-        for(final Item k : keys) if(k.sameKey(ok, ii)) continue outer;
+        for(final Item k : keys) if(k.sameKey(ok, ii)) continue OUTER;
         // key is not in this list, add it
         ks = Array.add(ks, ok);
         vs = Array.add(vs, o.values[i]);
@@ -238,6 +239,7 @@ final class TrieList extends TrieNode {
         }
       }
     } catch(final QueryException ex) {
+      Util.debug(ex);
       return false;
     }
     return true;
@@ -292,14 +294,15 @@ final class TrieList extends TrieNode {
     final TrieList ol = (TrieList) o;
 
     // do the evil nested-loop thing
-    outer: for(int i = 0; i < size; i++) {
+    OUTER:
+    for(int i = 0; i < size; i++) {
       final Item k = keys[i];
       for(int j = 0; j < size; j++) {
         if(k.sameKey(ol.keys[i], ii)) {
           // check bound value, too
           if(!deep(values[i], ol.values[j], coll, ii)) return false;
           // value matched, continue with next key
-          continue outer;
+          continue OUTER;
         }
       }
       // all keys of the other list were checked, none matched

@@ -10,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -49,15 +48,9 @@ public final class FnSum extends Aggr {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr e1 = exprs[0], e2 = exprs.length == 2 ? exprs[1] : Empty.SEQ;
-    final Type st1 = e1.seqType().type, st2 = e2 != Empty.SEQ ? e2.seqType().type : st1;
+    final Type st1 = e1.seqType().type, st2 = e2 == Empty.SEQ ? st1 : e2.seqType().type;
     if(st1.isNumberOrUntyped() && st2.isNumberOrUntyped()) seqType = Calc.type(st1, st2).seqType();
-
-    // pre-evaluate 0 results (skip non-deterministic and variable expressions)
-    Expr expr = this;
-    if(e1.size() == 0 && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) && !(e1 instanceof VarRef)) {
-      if(e2 == Empty.SEQ) expr = Int.ZERO;
-      else if(e2 instanceof ANum || e2 instanceof Dur) expr = e2;
-    }
-    return expr;
+    // replace empty sequence with default item
+    return e1.isEmpty() && e2.seqType().instanceOf(SeqType.ITR) ? e2 : this;
   }
 }

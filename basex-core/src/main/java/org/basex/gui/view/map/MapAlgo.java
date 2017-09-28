@@ -20,11 +20,7 @@ abstract class MapAlgo {
     for(final MapRect rect : r) {
       if(rect.w != 0 && rect.h != 0) {
         ++dev;
-        if(rect.w > rect.h) {
-          ar += (double) rect.w / rect.h;
-        } else {
-          ar += (double) rect.h / rect.w;
-        }
+        ar += rect.w > rect.h ? (double) rect.w / rect.h : (double) rect.h / rect.w;
       }
     }
     return ar / dev;

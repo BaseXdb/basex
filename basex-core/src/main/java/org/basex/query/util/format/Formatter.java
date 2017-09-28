@@ -134,6 +134,7 @@ public abstract class Formatter extends FormatUtil {
       try {
         qnm = QNm.resolve(cal, sc);
       } catch(final QueryException ex) {
+        Util.debug(ex);
         throw CALQNAME_X.get(ii, cal);
       }
       if(qnm.uri().length == 0) {

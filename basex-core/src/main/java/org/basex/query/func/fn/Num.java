@@ -22,7 +22,7 @@ abstract class Num extends StandardFunc {
    * Rounds values.
    * @param qc query context
    * @param even half-to-even flag
-   * @return number
+   * @return number or {@code null}
    * @throws QueryException query exception
    */
   ANum round(final QueryContext qc, final boolean even) throws QueryException {
@@ -35,7 +35,7 @@ abstract class Num extends StandardFunc {
    * Returns a minimum or maximum item.
    * @param cmp comparator
    * @param qc query context
-   * @return resulting item
+   * @return resulting item or {@code null}
    * @throws QueryException query exception
    */
   Item minmax(final OpV cmp, final QueryContext qc) throws QueryException {

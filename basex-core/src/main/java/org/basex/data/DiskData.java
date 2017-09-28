@@ -329,12 +329,7 @@ public final class DiskData extends Data {
 
     // check if new entry is numeric and can be inlined
     final long v = toSimpleInt(value);
-    if(v != Integer.MIN_VALUE) {
-      // invalidate old entry if it was not inlined
-      if(!number(oldRef)) store.free(oldRef & IO.OFFCOMP - 1, 0);
-      // inline integer value
-      textRef(pre, v | IO.OFFNUM);
-    } else {
+    if(v == Integer.MIN_VALUE) {
       // otherwise, try to compress new value
       final byte[] val = Compress.pack(value);
 
@@ -351,6 +346,11 @@ public final class DiskData extends Data {
 
       store.writeToken(off, val);
       textRef(pre, val == value ? off : off | IO.OFFCOMP);
+    } else {
+      // invalidate old entry if it was not inlined
+      if(!number(oldRef)) store.free(oldRef & IO.OFFCOMP - 1, 0);
+      // inline integer value
+      textRef(pre, v | IO.OFFNUM);
     }
 
     // insert new entries

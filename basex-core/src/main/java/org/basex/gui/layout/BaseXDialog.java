@@ -162,13 +162,8 @@ public abstract class BaseXDialog extends JDialog {
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
     for(final Object obj : buttons) {
-      final BaseXButton b;
-      if(obj instanceof BaseXButton) {
-        b = (BaseXButton) obj;
-      } else {
-        b = new BaseXButton(obj.toString(), this);
-      }
-      pnl.add(b);
+      pnl.add(obj instanceof BaseXButton ? (BaseXButton) obj :
+        new BaseXButton(obj.toString(), this));
     }
 
     final BaseXBack but = new BaseXBack(false).layout(new BorderLayout());
@@ -234,6 +229,7 @@ public abstract class BaseXDialog extends JDialog {
     try {
       Desktop.getDesktop().browse(new URI(url));
     } catch(final Exception ex) {
+      Util.debug(ex);
       error(gui, Util.info(H_BROWSER_ERROR_X, Prop.URL));
     }
   }

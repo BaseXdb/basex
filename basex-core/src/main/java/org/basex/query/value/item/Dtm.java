@@ -99,7 +99,7 @@ public final class Dtm extends ADate {
     try {
       return new Dtm(Token.token(DateTime.format(new Date(ms))), null);
     } catch(final QueryException ex) {
-      throw Util.notExpected();
+      throw Util.notExpected(ex);
     }
   }
 }

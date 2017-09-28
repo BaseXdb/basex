@@ -113,7 +113,7 @@ public final class Databases {
    * Returns a regular expression for the specified name pattern.
    * @param pattern pattern (can be {@code null})
    * @param suffix regular expression suffix
-   * @return regular expression
+   * @return regular expression or {@code null}
    */
   public static Pattern regex(final String pattern, final String suffix) {
     if(pattern == null) return null;

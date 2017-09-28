@@ -24,6 +24,7 @@ public final class BinHex extends BinFn {
     try {
       return B64.get(Hex.decode(bytes, info));
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw BIN_NNC.get(info);
     }
   }

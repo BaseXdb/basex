@@ -136,7 +136,7 @@ public abstract class ANode extends Item {
   /**
    * Returns all namespaces defined for the nodes.
    * Overwritten by {@link FElem} and {@link DBNode}.
-   * @return namespace array
+   * @return namespace array or {@code null}
    */
   public Atts namespaces() {
     return null;

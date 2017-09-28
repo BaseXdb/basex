@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.Util;
 
 /**
  * Functions on relational databases.
@@ -179,6 +180,7 @@ public final class SqlExecutePrepared extends SqlExecute {
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
       throw BXSQ_FORMAT_X.get(info, string(paramType));
     }
   }

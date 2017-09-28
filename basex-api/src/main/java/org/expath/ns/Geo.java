@@ -16,6 +16,7 @@ import org.basex.query.value.type.*;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.*;
 import com.vividsolutions.jts.io.gml2.*;
+import org.basex.util.Util;
 
 /**
  * This module contains geo spatial functions for the Geo module.
@@ -284,6 +285,7 @@ public final class Geo extends QueryModule {
     try {
       return Bln.get(geo1.relate(geo2, intersectionMatrix.toJava()));
     } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
       throw GeoErrors.illegalArg(intersectionMatrix);
     }
   }

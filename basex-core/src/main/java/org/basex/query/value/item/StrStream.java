@@ -92,6 +92,7 @@ public final class StrStream extends AStr {
     try {
       return toString(string(null));
     } catch(final QueryException ex) {
+      Util.debug(ex);
       return Util.info(Function._FILE_READ_TEXT.args(input));
     }
   }

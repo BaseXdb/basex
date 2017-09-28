@@ -10,6 +10,7 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.util.Util;
 
 /**
  * Hashing function.
@@ -45,6 +46,7 @@ abstract class HashFn extends StandardFunc {
       // non-streaming item, string
       return B64.get(md.digest(toBytes(item)));
     } catch(final NoSuchAlgorithmException ex) {
+      Util.debug(ex);
       throw HASH_ALG_X.get(info, algo);
     }
   }

@@ -37,6 +37,7 @@ public final class BinOctal extends BinFn {
       }
       return B64.get(binary2bytes(bin));
     } catch(final NumberFormatException ex) {
+      Util.debug(ex);
       throw BIN_NNC.get(info);
     }
   }

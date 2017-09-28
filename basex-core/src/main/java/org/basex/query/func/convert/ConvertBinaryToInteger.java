@@ -25,7 +25,7 @@ public final class ConvertBinaryToInteger extends StandardFunc {
       }
       @Override
       public Value value(final QueryContext q) {
-        return ConvertBinaryToInteger.toValue(bytes);
+        return toValue(bytes);
       }
     };
   }

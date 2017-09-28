@@ -53,7 +53,7 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public TypeswitchGroup optimize(final CompileContext cc) throws QueryException {
+  public TypeswitchGroup optimize(final CompileContext cc) {
     seqType = expr.seqType();
     return this;
   }

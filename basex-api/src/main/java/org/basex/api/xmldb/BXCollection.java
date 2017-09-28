@@ -236,6 +236,7 @@ public final class BXCollection implements Collection {
     try {
       return MetaData.class.getField(name).get(data.meta).toString();
     } catch(final Exception ex) {
+      Util.debug(ex);
       return null;
     }
   }
@@ -257,6 +258,7 @@ public final class BXCollection implements Collection {
         f.set(md, val);
       }
     } catch(final Exception ex) {
+      Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
     }
   }

@@ -48,16 +48,8 @@ public abstract class CLI extends Main {
     super(args);
     context = ctx;
     parseArgs();
-
     // guarantee correct shutdown of database context
-    if(context != null) {
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public synchronized void run() {
-          context.close();
-        }
-      });
-    }
+    if(context != null) Runtime.getRuntime().addShutdownHook(new Thread(context::close));
   }
 
   /**
@@ -137,6 +129,7 @@ public abstract class CLI extends Main {
     try {
       return new ClientSession(host, port, user, pass, out);
     } catch(final ConnectException ex) {
+      Util.debug(ex);
       throw new BaseXException(CONNECTION_ERROR_X, port);
     }
   }

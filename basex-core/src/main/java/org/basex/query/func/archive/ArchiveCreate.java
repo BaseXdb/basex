@@ -112,6 +112,7 @@ public class ArchiveCreate extends ArchiveFn {
         try {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), qc));
         } catch(final QueryException qe) {
+          Util.debug(qe);
           throw ARCH_DATETIME_X.get(info, mod);
         }
       }
@@ -131,6 +132,7 @@ public class ArchiveCreate extends ArchiveFn {
     try {
       out.level(lvl == null ? level : toInt(lvl));
     } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
       throw ARCH_LEVEL_X.get(info, lvl);
     }
     out.write(ze, val);

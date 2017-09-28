@@ -53,6 +53,7 @@ public final class Copy extends Command {
       copy(src, trg, soptions, this);
       return info(DB_COPIED_X, src, jc().performance);
     } catch(final IOException ex) {
+      Util.debug(ex);
       return error(DB_NOT_COPIED_X, src);
     }
   }

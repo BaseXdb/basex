@@ -52,6 +52,7 @@ public final class BXDatabase implements Database {
     try {
       return Get.get(name.toUpperCase(Locale.ENGLISH), ctx);
     } catch(final BaseXException ex) {
+      Util.debug(ex);
       return null;
     }
   }
@@ -61,6 +62,7 @@ public final class BXDatabase implements Database {
     try {
       new Set(name, value).execute(ctx);
     } catch(final BaseXException ex) {
+      Util.debug(ex);
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
     }
   }
