@@ -31,14 +31,14 @@ public final class FTWords extends FTExpr {
   final FTMode mode;
   /** Query expression. */
   Expr query;
-  /** Minimum and maximum occurrences. */
+  /** Minimum and maximum occurrences (can be {@code null}). */
   Expr[] occ;
 
   /** Simple evaluation. */
   boolean simple;
   /** Compilation flag. */
   private boolean compiled;
-  /** Data reference. */
+  /** Data reference (can be {@code null}). */
   private Data data;
   /** Pre-evaluated query tokens. */
   private TokenList tokens;
@@ -272,7 +272,7 @@ public final class FTWords extends FTExpr {
     if(simple) {
       for(final byte[] t : tokens) {
         final FTTokens qtok = ftt.cache(t);
-        num = Math.max(num, contains(qtok, lexer, ftt) * qtok.length());
+        num = Math.max(num, contains(qtok, lexer, ftt) * qtok.firstSize());
       }
       return num;
     }
@@ -284,7 +284,7 @@ public final class FTWords extends FTExpr {
       final FTTokens qtok = ftt.cache(w);
       final int o = contains(qtok, lexer, ftt);
       if(all && o == 0) return 0;
-      num = Math.max(num, o * qtok.length());
+      num = Math.max(num, o * qtok.firstSize());
       oc += o;
     }
 
@@ -311,7 +311,7 @@ public final class FTWords extends FTExpr {
     final boolean and = !ftt.first && (mode == FTMode.ALL || mode == FTMode.ALL_WORDS);
     final FTBitapSearch bs = new FTBitapSearch(input.init(), tok, ftt.cmp);
     while(bs.hasNext()) {
-      final int s = bs.next(), e = s + tok.length() - 1;
+      final int s = bs.next(), e = s + tok.firstSize() - 1;
       if(and) matches.and(s, e);
       else matches.or(s, e);
       count++;
@@ -470,11 +470,6 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), occ, query);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return super.accept(visitor) && query.accept(visitor) &&
         (occ == null || visitAll(visitor, occ));
@@ -486,6 +481,20 @@ public final class FTWords extends FTExpr {
     if(occ != null) for(final Expr o : occ) sz += o.exprSize();
     for(final Expr expr : exprs) sz += expr.exprSize();
     return sz + query.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FTWords)) return false;
+    final FTWords f = (FTWords) obj;
+    return query.equals(f.query) && mode == f.mode && data == f.data && Array.equals(occ, f.occ) &&
+        super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), occ, query);
   }
 
   @Override

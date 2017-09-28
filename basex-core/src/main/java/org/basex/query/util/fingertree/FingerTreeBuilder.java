@@ -68,7 +68,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
    * @return the resulting finger tree
    */
   public FingerTree<E, E> freeze() {
-    return root == null ? FingerTree.<E>empty() : root.freeze();
+    return root == null ? FingerTree.empty() : root.freeze();
   }
 
   @Override

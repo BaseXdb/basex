@@ -27,22 +27,6 @@ public final class Scoring {
   }
 
   /**
-   * <p>Combines two scoring values. Both values will be inverted, multiplied with each other,
-   * and the inverted result will be returned. This has the following effects:</p>
-   * <ul>
-   *   <li> The returned value will always be the same as, or higher than the maximum value.</li>
-   *   <li> If one value is {@code 1}, {@code 1} will be returned.</li>
-   *   <li> If one value is {@code 0}, the other value will be returned.</li>
-   * </ul>
-   * @param value1 old value
-   * @param value2 new value
-   * @return score
-  public static double merge(final double value1, final double value2) {
-    return 1 - (1 - value1) * (1 - value2);
-  }
-   */
-
-  /**
    * Inverses the scoring value for FTNot.
    * @param value scoring value
    * @return score

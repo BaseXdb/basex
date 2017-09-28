@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class Extension extends Single {
-  /** Pragmas of the ExtensionExpression. */
+  /** Pragmas of the extension expression. */
   private final Pragma[] pragmas;
 
   /**
@@ -84,14 +84,20 @@ public final class Extension extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), pragmas, expr);
-  }
-
-  @Override
   public boolean has(final Flag flag) {
     for(final Pragma p : pragmas) if(p.has(flag)) return true;
     return super.has(flag);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Extension &&
+        Array.equals(pragmas, ((Extension) obj).pragmas) && super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), pragmas, expr);
   }
 
   @Override

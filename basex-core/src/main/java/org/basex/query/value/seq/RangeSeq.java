@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -81,9 +80,10 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof RangeSeq)) return false;
-    final RangeSeq rs = (RangeSeq) cmp;
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof RangeSeq)) return super.equals(obj);
+    final RangeSeq rs = (RangeSeq) obj;
     return start == rs.start && size == rs.size && asc == rs.asc;
   }
 

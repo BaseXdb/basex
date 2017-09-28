@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -36,7 +35,7 @@ public final class Quantifier extends Single {
    */
   public Quantifier(final InputInfo info, final For[] inputs, final Expr expr,
       final boolean every, final StaticContext sc) {
-    this(info, new GFLWOR(info, new LinkedList<Clause>(Arrays.asList(inputs)),
+    this(info, new GFLWOR(info, new LinkedList<>(Arrays.asList(inputs)),
         compBln(expr, info, sc)), every);
   }
 
@@ -60,15 +59,14 @@ public final class Quantifier extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // return pre-evaluated result
-    if(expr.isValue()) return optPre(item(cc.qc, info), cc);
+    if(expr.isValue()) return cc.preEval(this);
 
     // pre-evaluate satisfy clause if it is a value
     if(expr instanceof GFLWOR && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
-        cc.info(OPTPRE_X, value);
-        return Bln.get(value.ebv(cc.qc, info).bool(info));
+        return cc.replaceWith(value, Bln.get(value.ebv(cc.qc, info).bool(info)));
       }
     }
     return this;
@@ -85,8 +83,19 @@ public final class Quantifier extends Single {
   }
 
   @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new Quantifier(info, expr.copy(cc, vm), every);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Quantifier && every == ((Quantifier) obj).every &&
+        super.equals(obj);
   }
 
   @Override
@@ -97,10 +106,5 @@ public final class Quantifier extends Single {
   @Override
   public String toString() {
     return (every ? EVERY : SOME) + '(' + expr + ')';
-  }
-
-  @Override
-  public int exprSize() {
-    return expr.exprSize();
   }
 }

@@ -44,9 +44,9 @@ import org.basex.util.options.*;
  */
 final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Single template pattern. */
-  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
+  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
   /** EQName pattern. */
-  private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)\\}(.*)$");
+  private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
   /** Query parameters. */
   final ArrayList<RestXqParam> queryParams = new ArrayList<>();

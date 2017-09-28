@@ -65,12 +65,12 @@ public final class FnFoldRight extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
-      cc.info(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       Expr e = exprs[1];
       for(int i = (int) seq.size(); --i >= 0;) {
         e = new DynFuncCall(info, sc, exprs[2], seq.itemAt(i), e).optimize(cc);
       }
+      cc.info(QueryText.OPTUNROLL_X, this);
       return e;
     }
     return this;

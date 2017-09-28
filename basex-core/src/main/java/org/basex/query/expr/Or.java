@@ -35,31 +35,32 @@ public final class Or extends Logical {
 
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
-    for(int i = 0; i < es; i++) {
-      Expr e = exprs[i];
-      if(e instanceof CmpG) {
+    for(int e = 0; e < es; e++) {
+      // skip identical expressions
+      Expr expr = exprs[e];
+      if(expr instanceof CmpG) {
         // merge adjacent comparisons
-        while(i + 1 < es && exprs[i + 1] instanceof CmpG) {
-          final Expr tmp = ((CmpG) e).union((CmpG) exprs[i + 1], cc);
+        while(e + 1 < es && exprs[e + 1] instanceof CmpG) {
+          final Expr tmp = ((CmpG) expr).union((CmpG) exprs[e + 1], cc);
           if(tmp != null) {
-            e = tmp;
-            i++;
+            expr = tmp;
+            e++;
           } else {
             break;
           }
         }
       }
       // expression will always return true
-      if(e == Bln.TRUE) return optPre(Bln.TRUE, cc);
+      if(expr == Bln.TRUE) return cc.replaceWith(this, Bln.TRUE);
       // skip expression yielding false
-      if(e != Bln.FALSE) list.add(e);
+      if(expr != Bln.FALSE && !list.contains(expr)) list.add(expr);
     }
 
     // all arguments return false
-    if(list.isEmpty()) return optPre(Bln.FALSE, cc);
+    if(list.isEmpty()) return cc.replaceWith(this, Bln.FALSE);
 
     if(es != list.size()) {
-      cc.info(OPTREWRITE_X, this);
+      cc.info(OPTSIMPLE_X, this);
       exprs = list.finish();
     }
     compFlatten(cc);
@@ -73,16 +74,15 @@ public final class Or extends Logical {
     }
 
     if(not) {
-      cc.info(OPTREWRITE_X, this);
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
       final Expr ex = new And(info, inner).optimize(cc);
-      return cc.function(Function.NOT, info, ex);
+      return cc.replaceWith(this, cc.function(Function.NOT, info, ex));
     }
 
     // return single expression if it yields a boolean
-    return exprs.length == 1 ? compBln(exprs[0], info, cc.sc()) : this;
+    return exprs.length == 1 ? cc.replaceWith(this, compBln(exprs[0], info, cc.sc())) : this;
   }
 
   @Override
@@ -128,6 +128,11 @@ public final class Or extends Logical {
     // no expressions means no costs: expression will later be ignored
     ii.expr = el.size() == 1 ? el.get(0) : new Union(info, el.finish());
     return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Or && super.equals(obj);
   }
 
   @Override

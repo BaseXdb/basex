@@ -2,7 +2,7 @@ package org.basex.util.http;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -20,6 +20,10 @@ public final class MediaType {
   private static final String TEXT = "text";
   /** XQuery sub type. */
   private static final String XQUERY = "xquery";
+  /** CSV sub type. */
+  private static final String CSV = "csv";
+  /** CSV sub type. */
+  private static final String COMMA_SEPARATED_VALUES = "comma-separated-values";
   /** XML media types' suffix. */
   private static final String XML_SUFFIX = "+xml";
 
@@ -46,7 +50,7 @@ public final class MediaType {
   public static final MediaType MULTIPART_FORM_DATA = new MediaType("multipart/form-data");
 
   /** Media type: text/comma-separated-values. */
-  public static final MediaType TEXT_CSV = new MediaType("text/comma-separated-values");
+  public static final MediaType TEXT_CSV = new MediaType("text/csv");
   /** Media type: text/html. */
   public static final MediaType TEXT_HTML = new MediaType("text/html");
   /** Media type: text/plain. */
@@ -140,6 +144,14 @@ public final class MediaType {
   }
 
   /**
+   * Checks if this is a CSV type.
+   * @return result of check
+   */
+  public boolean isCSV() {
+    return sub.equals(CSV) || sub.equals(COMMA_SEPARATED_VALUES);
+  }
+
+  /**
    * Checks if this is an XML type.
    * @return result of check
    */
@@ -191,7 +203,7 @@ public final class MediaType {
   /** Hash map containing all assignments. */
   private static final HashMap<String, MediaType> TYPES = new HashMap<>();
 
-  /** Reads in the media-types. */
+  /* Reads in the media-types. */
   static {
     final HashMap<String, MediaType> cache = new HashMap<>();
     try {
@@ -205,11 +217,7 @@ public final class MediaType {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
             final String suffix = line.substring(0, i), type = line.substring(i + 1);
-            MediaType mt = cache.get(type);
-            if(mt == null) {
-              mt = new MediaType(type);
-              cache.put(type, mt);
-            }
+            final MediaType mt = cache.computeIfAbsent(type, MediaType::new);
             TYPES.put(suffix, mt);
           }
         }

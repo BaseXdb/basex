@@ -10,10 +10,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class ValueList extends ElementList {
-  /** Element container. */
-  private Value[] list;
-
+public final class ValueList extends ObjectList<Value, ValueList> {
   /**
    * Default constructor.
    */
@@ -26,62 +23,21 @@ public final class ValueList extends ElementList {
    * @param capacity array capacity
    */
   public ValueList(final int capacity) {
-    list = new Value[capacity];
+    super(new Value[capacity]);
   }
 
   /**
-   * Returns the specified element.
-   * @param p position
-   * @return value
-   */
-  public Value get(final int p) {
-    return list[p];
-  }
-
-  /**
-   * Adds an element to the array.
-   * @param element element to be added
-   * @return self reference
-   */
-  public ValueList add(final Value element) {
-    if(size == list.length) resize(newSize());
-    list[size++] = element;
-    return this;
-  }
-
-  /**
-   * Resizes the array.
-   * @param sz new size
-   */
-  private void resize(final int sz) {
-    final Value[] tmp = new Value[sz];
-    System.arraycopy(list, 0, tmp, 0, size);
-    list = tmp;
-  }
-
-  /**
-   * Returns an array with all elements and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
-   * @return array (internal representation!)
-   */
-  public Value[] finish() {
-    Value[] lst = list;
-    final int s = size;
-    if(s != lst.length) {
-      lst = new Value[s];
-      System.arraycopy(list, 0, lst, 0, s);
-    }
-    list = null;
-    return lst;
-  }
-
-  /**
-   * Creates an array from the contents of this list.
+   * Creates an XQuery array from the contents of this list.
    * @return the array
    */
   public Array array() {
     final ArrayBuilder builder = new ArrayBuilder();
     for(int i = 0; i < size; i++) builder.append(list[i]);
     return builder.freeze();
+  }
+
+  @Override
+  protected Value[] newList(final int s) {
+    return new Value[s];
   }
 }

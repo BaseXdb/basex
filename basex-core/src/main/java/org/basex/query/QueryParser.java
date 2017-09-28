@@ -34,6 +34,7 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.expr.*;
+import org.basex.query.up.expr.Insert.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
@@ -79,20 +80,10 @@ public class QueryParser extends InputParser {
     for(final byte[] key : keys) KEYWORDS.add(key);
   }
 
-  /** Imported modules. */
-  final TokenSet imports = new TokenSet();
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
-  /** List of modules to be parsed. */
-  public final ArrayList<ModInfo> mods = new ArrayList<>();
   /** Name of current module. */
   public QNm module;
-
-  /** Parsed variables. */
-  public final TokenObjMap<StaticVar> vars = new TokenObjMap<>();
-  /** Parsed functions. */
-  public final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
-
   /** Namespaces. */
   public final TokenMap namespaces = new TokenMap();
 
@@ -100,6 +91,16 @@ public class QueryParser extends InputParser {
   public final QueryContext qc;
   /** Static context. */
   public final StaticContext sc;
+
+  /** Imported modules. */
+  private final TokenSet imports = new TokenSet();
+  /** List of modules to be parsed. */
+  private final ArrayList<ModInfo> mods = new ArrayList<>();
+
+  /** Parsed variables. */
+  private final TokenObjMap<StaticVar> vars = new TokenObjMap<>();
+  /** Parsed functions. */
+  private final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
 
   /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();
@@ -1325,7 +1326,7 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     wsCheck(PAREN1);
     final Expr cond = check(expr(), NOSWITCH);
-    SwitchCase[] cases = { };
+    final ArrayList<SwitchGroup> groups = new ArrayList<>();
     wsCheck(PAREN2);
 
     // collect all cases
@@ -1335,15 +1336,15 @@ public class QueryParser extends InputParser {
       while(wsConsumeWs(CASE)) add(exprs, single());
       if(exprs.size() == 1) {
         // add default case
-        if(cases.length == 0) throw error(WRONGCHAR_X_X, CASE, found());
+        if(groups.isEmpty()) throw error(WRONGCHAR_X_X, CASE, found());
         wsCheck(DEFAULT);
       }
       wsCheck(RETURN);
       exprs.set(0, check(single(), NOSWITCH));
-      cases = Array.add(cases, new SwitchCase(info(), exprs.finish()));
+      groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
 
-    return new Switch(ii, cond, cases);
+    return new Switch(ii, cond, groups.toArray(new SwitchGroup[groups.size()]));
   }
 
   /**
@@ -1358,12 +1359,11 @@ public class QueryParser extends InputParser {
     final Expr ts = check(expr(), NOTYPESWITCH);
     wsCheck(PAREN2);
 
-    TypeCase[] cases = { };
+    TypeswitchGroup[] cases = { };
     final ArrayList<SeqType> types = new ArrayList<>();
     final int s = localVars.openScope();
     boolean cs;
     do {
-      types.clear();
       cs = wsConsumeWs(CASE);
       if(!cs) {
         wsCheck(DEFAULT);
@@ -1375,17 +1375,19 @@ public class QueryParser extends InputParser {
         if(cs) wsCheck(AS);
       }
       if(cs) {
-        do types.add(sequenceType());
-        while(wsConsume(PIPE));
+        do {
+          types.add(sequenceType());
+        } while(wsConsume(PIPE));
       }
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      final TypeCase tc = new TypeCase(info(), var, types.toArray(new SeqType[types.size()]), ret);
-      cases = Array.add(cases, tc);
+      final SeqType[] st = types.toArray(new SeqType[types.size()]);
+      cases = Array.add(cases, new TypeswitchGroup(info(), var, st, ret));
       localVars.closeScope(s);
+      types.clear();
     } while(cs);
     if(cases.length == 1) throw error(NOTYPESWITCH);
-    return new TypeSwitch(ii, ts, cases);
+    return new Typeswitch(ii, ts, cases);
   }
 
   /**
@@ -1605,7 +1607,7 @@ public class QueryParser extends InputParser {
    * @return expression
    */
   private Expr intersectExcept(final boolean intersect, final ExprList el) {
-    return intersect ? new InterSect(info(), el.finish()) : new Except(info(), el.finish());
+    return intersect ? new Intersect(info(), el.finish()) : new Except(info(), el.finish());
   }
 
   /**
@@ -2038,7 +2040,10 @@ public class QueryParser extends InputParser {
       p = pos;
       if(all && wsConsumeWs(PAREN1)) {
         final NodeType type = NodeType.find(name);
-        if(type != null) return kindTest(type);
+        if(type != null) {
+          final Test test = kindTest(type);
+          return test == null ? KindTest.get(type) : test;
+        }
       } else {
         pos = p;
         if(!name.hasPrefix() && consume(":*")) {
@@ -2510,7 +2515,7 @@ public class QueryParser extends InputParser {
       final int p = pos;
       if(consume(']') && consume('`') && consume('`')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
-        return Function.CONCAT.get(sc, info(), el.finish());
+        return el.size() == 1 ? el.get(0) : Function.CONCAT.get(sc, info(), el.finish());
       }
       pos = p;
       if(consume('`') && consume('{')) {
@@ -2725,8 +2730,8 @@ public class QueryParser extends InputParser {
    * @return string item or {@code null}
    */
   private Str text(final TokenBuilder tb, final boolean strip) {
-    final byte[] t = tb.toArray();
-    return t.length == 0 || strip && !sc.spaces && ws(t) ? null : Str.get(t);
+    final byte[] text = tb.toArray();
+    return text.length == 0 || strip && !sc.spaces && ws(text) ? null : Str.get(text);
   }
 
   /**
@@ -2941,19 +2946,19 @@ public class QueryParser extends InputParser {
   private SeqType simpleType() throws QueryException {
     skipWs();
     final QNm name = eQName(TYPEINVALID, sc.elemNS);
-    Type t = ListType.find(name);
-    if(t == null) {
-      t = AtomType.find(name, false);
-      if(t == null) {
+    Type tp = ListType.find(name);
+    if(tp == null) {
+      tp = AtomType.find(name, false);
+      if(tp == null) {
         if(wsConsume(PAREN1)) throw error(SIMPLETYPE_X, name);
         if(!AtomType.AST.name.eq(name)) throw error(TYPE30_X, name.prefixId(XML));
-        t = AtomType.AST;
+        tp = AtomType.AST;
       }
-      if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
+      if(tp == AtomType.AST || tp == AtomType.AAT || tp == AtomType.NOT)
         throw error(CASTUNKNOWN_X, name.prefixId(XML));
     }
     skipWs();
-    return SeqType.get(t, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
+    return SeqType.get(tp, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
   }
 
   /**
@@ -3004,58 +3009,58 @@ public class QueryParser extends InputParser {
     final boolean func = curr('(');
 
     // item type
-    Type t = null;
+    Type tp = null;
     if(func) {
       consume(PAREN1);
       // item type
-      if(name.eq(AtomType.ITEM.name)) t = AtomType.ITEM;
+      if(name.eq(AtomType.ITEM.name)) tp = AtomType.ITEM;
       // node types
-      if(t == null) t = NodeType.find(name);
+      if(tp == null) tp = NodeType.find(name);
       // function types
-      if(t == null) {
-        t = FuncType.find(name);
-        if(t != null) return functionTest(anns, t).seqType();
+      if(tp == null) {
+        tp = FuncType.find(name);
+        if(tp != null) return functionTest(anns, tp).seqType();
       }
       // no type found
-      if(t == null) throw error(WHICHTYPE_X, name.prefixId(XML));
+      if(tp == null) throw error(WHICHTYPE_X, name.prefixId(XML));
     } else {
       // attach default element namespace
       if(!name.hasURI()) name.uri(sc.elemNS);
       // atomic types
-      t = AtomType.find(name, false);
+      tp = AtomType.find(name, false);
       // no type found
-      if(t == null) throw error(TYPEUNKNOWN_X, name.prefixId(XML));
+      if(tp == null) throw error(TYPEUNKNOWN_X, name.prefixId(XML));
     }
 
     // annotations are not allowed for remaining types
     if(!anns.isEmpty()) throw error(NOANN);
 
     // atomic value, or closing parenthesis
-    if(!func || wsConsume(PAREN2)) return t.seqType();
+    if(!func || wsConsume(PAREN2)) return tp.seqType();
 
     // raise error if type different to node is not finalized by a parenthesis
-    if(!(t instanceof NodeType)) wsCheck(PAREN2);
+    if(!(tp instanceof NodeType)) wsCheck(PAREN2);
 
     // return type with an optional kind test for node types
-    return SeqType.get(t, Occ.ONE, kindTest((NodeType) t));
+    return SeqType.get(tp, Occ.ONE, kindTest((NodeType) tp));
   }
 
   /**
    * Parses the "FunctionTest" rule.
    * @param anns annotations
-   * @param t function type
+   * @param type function type
    * @return resulting type
    * @throws QueryException query exception
    */
-  private Type functionTest(final AnnList anns, final Type t) throws QueryException {
+  private Type functionTest(final AnnList anns, final Type type) throws QueryException {
     // wildcard
     if(wsConsume(ASTERISK)) {
       wsCheck(PAREN2);
-      return t;
+      return type;
     }
 
     // map
-    if(t instanceof MapType) {
+    if(type instanceof MapType) {
       final Type key = itemType().type;
       if(!key.instanceOf(AtomType.AAT)) throw error(MAPTAAT_X, key);
       wsCheck(COMMA);
@@ -3064,7 +3069,7 @@ public class QueryParser extends InputParser {
       return tp;
     }
     // array
-    if(t instanceof ArrayType) {
+    if(type instanceof ArrayType) {
       final ArrayType tp = ArrayType.get(sequenceType());
       wsCheck(PAREN2);
       return tp;
@@ -3083,28 +3088,28 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ElementTest" rule without the type name and the opening bracket.
-   * @param t type
-   * @return arguments
+   * @param type type
+   * @return test, or {@code null}
    * @throws QueryException query exception
    */
-  private Test kindTest(final NodeType t) throws QueryException {
-    Test tp = null;
-    switch(t) {
+  private Test kindTest(final NodeType type) throws QueryException {
+    final Test tp;
+    switch(type) {
       case DOC: tp = documentTest(); break;
       case ELM: tp = elementTest(); break;
       case ATT: tp = attributeTest(); break;
       case PI:  tp = piTest(); break;
       case SCE:
       case SCA: tp = schemaTest(); break;
-      default:  break;
+      default:  tp = null; break;
     }
     wsCheck(PAREN2);
-    return tp == null ? KindTest.get(t) : tp;
+    return tp;
   }
 
   /**
    * Parses the "DocumentTest" rule without the leading keyword and its brackets.
-   * @return arguments
+   * @return test
    * @throws QueryException query exception
    */
   private Test documentTest() throws QueryException {
@@ -3113,36 +3118,38 @@ public class QueryParser extends InputParser {
 
     wsCheck(PAREN1);
     skipWs();
-    final NodeTest t = elem ? elementTest() : schemaTest();
+    final NodeTest nt = elem ? elementTest() : schemaTest();
     wsCheck(PAREN2);
-    return new DocTest(t != null ? t : KindTest.ELM);
+    return new DocTest(nt != null ? nt : KindTest.ELM);
   }
 
   /**
    * Parses the "ElementTest" rule without the leading keyword and its brackets.
-   * @return arguments
+   * @return test, or {@code null}
    * @throws QueryException query exception
    */
   private NodeTest elementTest() throws QueryException {
     final QNm name = eQName(null, sc.elemNS);
-    if(name == null && !consume(ASTERISK)) return null;
-
-    Type type = null;
-    if(wsConsumeWs(COMMA)) {
-      // parse type name
-      final QNm tn = eQName(QNAME_X, sc.elemNS);
-      type = ListType.find(tn);
-      if(type == null) type = AtomType.find(tn, true);
-      if(type == null) throw error(TYPEUNDEF_X, tn);
-      // parse optional question mark
-      wsConsume(QUESTION);
+    final boolean wc = name == null && consume(ASTERISK);
+    if(name != null || wc) {
+      Type ext = null;
+      if(wsConsumeWs(COMMA)) {
+        // parse type name
+        final QNm tn = eQName(QNAME_X, sc.elemNS);
+        ext = ListType.find(tn);
+        if(ext == null) ext = AtomType.find(tn, true);
+        if(ext == null) throw error(TYPEUNDEF_X, tn);
+        // parse optional question mark
+        wsConsume(QUESTION);
+      }
+      if(ext != null || !wc) return new NodeTest(NodeType.ELM, name, ext);
     }
-    return new NodeTest(NodeType.ELM, name, type);
+    return null;
   }
 
   /**
    * Parses the "ElementTest" rule without the leading keyword and its brackets.
-   * @return arguments
+   * @return error (not supported)
    * @throws QueryException query exception
    */
   private NodeTest schemaTest() throws QueryException {
@@ -3152,27 +3159,29 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "AttributeTest" rule without the leading keyword and its brackets.
-   * @return arguments
+   * @return test, or {@code null}
    * @throws QueryException query exception
    */
   private Test attributeTest() throws QueryException {
     final QNm name = eQName(null, null);
-    if(name == null && !consume(ASTERISK)) return null;
-
-    Type type = null;
-    if(wsConsumeWs(COMMA)) {
-      // parse type name
-      final QNm tn = eQName(QNAME_X, sc.elemNS);
-      type = ListType.find(tn);
-      if(type == null) type = AtomType.find(tn, true);
-      if(type == null) throw error(TYPEUNDEF_X, tn);
+    final boolean wc = name == null && consume(ASTERISK);
+    if(name != null || wc) {
+      Type ext = null;
+      if(wsConsumeWs(COMMA)) {
+        // parse type name
+        final QNm tn = eQName(QNAME_X, sc.elemNS);
+        ext = ListType.find(tn);
+        if(ext == null) ext = AtomType.find(tn, true);
+        if(ext == null) throw error(TYPEUNDEF_X, tn);
+      }
+      if(ext != null || !wc) return new NodeTest(NodeType.ATT, name, ext);
     }
-    return new NodeTest(NodeType.ATT, name, type);
+    return null;
   }
 
   /**
    * Parses the "PITest" rule without the leading keyword and its brackets.
-   * @return arguments
+   * @return test, or {@code null}
    * @throws QueryException query exception
    */
   private Test piTest() throws QueryException {
@@ -3380,7 +3389,7 @@ public class QueryParser extends InputParser {
       wsCheck(CURLY1);
       final FTExpr e = ftSelection(true);
       wsCheck(CURLY2);
-      return new FTExtensionSelection(info(), pragmas, e);
+      return new FTExtension(info(), pragmas, e);
     }
 
     if(wsConsumeWs(PAREN1)) {
@@ -3426,7 +3435,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Int.get(0), Int.get(Long.MAX_VALUE) };
+    final Expr[] occ = { Int.ZERO, Int.MAX };
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];
@@ -3614,25 +3623,27 @@ public class QueryParser extends InputParser {
     }
 
     final Expr s = check(single(), INCOMPLETE);
-    boolean first = false;
-    boolean last = false;
-    boolean before = false;
-    boolean after = false;
+    Mode mode = Mode.INTO;
     if(wsConsumeWs(AS)) {
-      first = wsConsumeWs(FIRST);
-      if(!first) {
+      if(wsConsumeWs(FIRST)) {
+        mode = Mode.FIRST;
+      } else {
         wsCheck(LAST);
-        last = true;
+        mode = Mode.LAST;
       }
       wsCheck(INTO);
     } else if(!wsConsumeWs(INTO)) {
-      after = wsConsumeWs(AFTER);
-      before = !after && wsConsumeWs(BEFORE);
-      if(!after && !before) throw error(INCOMPLETE);
+      if(wsConsumeWs(AFTER)) {
+        mode = Mode.AFTER;
+      } else if(wsConsumeWs(BEFORE)) {
+        mode = Mode.BEFORE;
+      } else {
+        throw error(INCOMPLETE);
+      }
     }
     final Expr trg = check(single(), INCOMPLETE);
     qc.updating();
-    return new Insert(sc, info(), s, first, last, before, after, trg);
+    return new Insert(sc, info(), s, mode, trg);
   }
 
   /**
@@ -3675,23 +3686,23 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr replace() throws QueryException {
-    final int i = pos;
+    final int p = pos;
     if(!wsConsumeWs(REPLACE)) return null;
 
-    final boolean v = wsConsumeWs(VALUEE);
-    if(v) {
+    final boolean value = wsConsumeWs(VALUEE);
+    if(value) {
       wsCheck(OF);
       wsCheck(NODE);
     } else if(!wsConsumeWs(NODE)) {
-      pos = i;
+      pos = p;
       return null;
     }
 
-    final Expr t = check(single(), INCOMPLETE);
+    final Expr trg = check(single(), INCOMPLETE);
     wsCheck(WITH);
-    final Expr r = check(single(), INCOMPLETE);
+    final Expr src = check(single(), INCOMPLETE);
     qc.updating();
-    return new Replace(sc, info(), t, r, v);
+    return new Replace(sc, info(), trg, src, value);
   }
 
   /**

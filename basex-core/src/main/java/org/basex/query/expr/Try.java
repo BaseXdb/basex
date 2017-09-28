@@ -45,14 +45,12 @@ public final class Try extends Single {
   public Expr compile(final CompileContext cc) throws QueryException {
     try {
       super.compile(cc);
-      if(expr.isValue()) return optPre(expr, cc);
+      if(expr.isValue()) return cc.replaceWith(this, expr);
     } catch(final QueryException ex) {
       if(!ex.isCatchable()) throw ex;
       for(final Catch c : catches) {
-        if(c.matches(ex)) {
-          // found a matching clause, compile and inline error message
-          return optPre(c.compile(cc).asExpr(ex, cc), cc);
-        }
+        // found a matching clause: compile and inline error message
+        if(c.matches(ex)) return cc.replaceWith(this, c.compile(cc).asExpr(ex, cc));
       }
       throw ex;
     }
@@ -101,7 +99,7 @@ public final class Try extends Single {
     try {
       final Expr sub = expr.inline(var, ex, cc);
       if(sub != null) {
-        if(sub.isValue()) return optPre(sub, cc);
+        if(sub.isValue()) return cc.replaceWith(this, sub);
         expr = sub;
         change = true;
       }
@@ -111,7 +109,7 @@ public final class Try extends Single {
         if(c.matches(qe)) {
           // found a matching clause, inline variable and error message
           final Catch nw = c.inline(var, ex, cc);
-          return optPre((nw == null ? c : nw).asExpr(qe, cc), cc);
+          return cc.replaceWith(this, (nw == null ? c : nw).asExpr(qe, cc));
         }
       }
       throw qe;
@@ -139,20 +137,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr, catches);
-  }
-
-  @Override
   public void markTailCalls(final CompileContext cc) {
     for(final Catch c : catches) c.markTailCalls(cc);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("try { " + expr + " }");
-    for(final Catch c : catches) sb.append(' ').append(c);
-    return sb.toString();
   }
 
   @Override
@@ -165,5 +151,23 @@ public final class Try extends Single {
     int sz = 1;
     for(final Expr e : catches) sz += e.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Try && Array.equals(catches, ((Try) obj).catches) &&
+        super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), expr, catches);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("try { " + expr + " }");
+    for(final Catch c : catches) sb.append(' ').append(c);
+    return sb.toString();
   }
 }

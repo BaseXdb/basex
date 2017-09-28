@@ -65,8 +65,7 @@ public abstract class Job {
    * @return job
    */
   public final Job active() {
-    for(final Job job : children) return job.active();
-    return this;
+    return children.isEmpty() ? this : children.get(0);
   }
 
   /**

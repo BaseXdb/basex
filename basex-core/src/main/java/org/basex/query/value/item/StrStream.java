@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -17,7 +18,7 @@ import org.basex.util.*;
 public final class StrStream extends AStr {
   /** Input reference. */
   private final IO input;
-  /** Encoding (optional). */
+  /** Encoding (can be {@code null}). */
   private final String encoding;
   /** Error message. */
   private final QueryError error;
@@ -27,9 +28,9 @@ public final class StrStream extends AStr {
   /**
    * Constructor.
    * @param input input
-   * @param encoding encoding (may be null)
-   * @param validate validate flag
+   * @param encoding encoding (can be {@code null})
    * @param error error message to be thrown
+   * @param validate validate flag
    */
   public StrStream(final IO input, final String encoding, final QueryError error,
       final boolean validate) {
@@ -75,9 +76,21 @@ public final class StrStream extends AStr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(obj instanceof StrStream) {
+      final StrStream s = (StrStream) obj;
+      if(input.eq(s.input) && Objects.equals(encoding, s.encoding) && error == s.error &&
+          validate == s.validate) return true;
+    }
+    // items may be different, but result may be equal...
+    return super.equals(obj);
+  }
+
+  @Override
   public String toString() {
     try {
-      return toJava();
+      return toString(string(null));
     } catch(final QueryException ex) {
       return Util.info(Function._FILE_READ_TEXT.args(input));
     }

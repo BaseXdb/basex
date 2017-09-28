@@ -99,8 +99,7 @@ public final class ColognePhonetic {
         code = cp;
       }
 
-      if(code != '-' && (lastCode != code && (code != '0' || lastCode == '/') ||
-         code < '0' || code > '8')) {
+      if(code != '-' && (lastCode != code && (code != '0' || lastCode == '/') || code > '8')) {
         out.add(code);
       }
 

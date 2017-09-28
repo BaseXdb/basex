@@ -38,9 +38,6 @@ public final class IndexTest extends AdvancedQueryTest {
     return params;
   }
 
-  /** Test file. */
-  public static final String FILE = "src/test/resources/selective.xml";
-
   /**
    * Initializes a test.
    */

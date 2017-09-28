@@ -106,13 +106,13 @@ public interface Text {
   /** Server start information. */
   String S_SERVERINFO =
     " [-cdinpSz] [stop]" + NL +
-    "  stop      Stop running server" + NL +
-    "  -c<cmds>  Execute initial database commands" + NL +
-    "  -d        Activate debugging mode" + NL +
-    "  -n<name>  Set host the server is bound to" + NL +
-    "  -p<port>  Set server port" + NL +
-    "  -S        Start as service" + NL +
-    "  -z        Suppress logging";
+    "  stop       Stop running server" + NL +
+    "  -c<input>  Execute commands from file or string" + NL +
+    "  -d         Activate debugging mode" + NL +
+    "  -n<name>   Set host the server is bound to" + NL +
+    "  -p<port>   Set server port" + NL +
+    "  -S         Start as service" + NL +
+    "  -z         Suppress logging";
 
   /** GUI mode. */
   String S_GUI = "GUI";
@@ -127,17 +127,17 @@ public interface Text {
   /** HTTP information. */
   String S_HTTPINFO =
     " [-dhlnpsSUz] [stop]" + NL +
-    "  stop      Stop running server" + NL +
-    "  -c        Start in client mode" + NL +
-    "  -d        Activate debugging mode" + NL +
-    "  -h<port>  Set port of HTTP server" + NL +
-    "  -l        Start in local mode" + NL +
-    "  -n<name>  Set host name of database server" + NL +
-    "  -p<port>  Set port of database server" + NL +
-    "  -s<port>  Specify port to stop HTTP server" + NL +
-    "  -S        Start as service" + NL +
-    "  -U<name>  Specify user name" + NL +
-    "  -z        Suppress logging";
+    "  stop       Stop running server" + NL +
+    "  -c<input>  Execute commands from file or string" + NL +
+    "  -d         Activate debugging mode" + NL +
+    "  -h<port>   Set port of HTTP server" + NL +
+    "  -l         Start in local mode" + NL +
+    "  -n<name>   Set host name of database server" + NL +
+    "  -p<port>   Set port of database server" + NL +
+    "  -s<port>   Specify port to stop HTTP server" + NL +
+    "  -S         Start as service" + NL +
+    "  -U<name>   Specify user name" + NL +
+    "  -z         Suppress logging";
 
   /** Bug info. */
   String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
@@ -218,7 +218,7 @@ public interface Text {
   /** File description: HTML Documents. */
   String HTML_DOCUMENTS = "HTML Documents";
   /** File description: Comma-Separated Values. */
-  String CSV_DOCUMENTS = "Comma-Separated Values";
+  String CSV_DOCUMENTS = "CSV Documents";
   /** File description: Plain Text. */
   String PLAIN_TEXT = "Plain Text";
   /** File description: ZIP Archives. */
@@ -254,7 +254,7 @@ public interface Text {
   /** Connection error. */
   String CONNECTION_ERROR_X = lang("connection_error") + PORT_X;
   /** Unknown host. */
-  String UNKNOWN_HOST_X = lang("unknown_host_x");
+  String UNKNOWN_HOST_X = lang("unknown_host_%");
   /** Timeout exceeded. */
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
   /** Access denied. */
@@ -697,6 +697,10 @@ public interface Text {
   String SESSIONS_X = lang("sessions_%");
   /** Show packages. */
   String PACKAGES_X = lang("packages_%");
+  /** Show jobs. */
+  String JOBS_X = lang("jobs_%");
+  /** Show packages. */
+  String RESOURCES_X = lang("resources_%");
   /** Permission required. */
   String PERM_REQUIRED_X = lang("perm_required_%");
   /** Invalid permissions. */
@@ -768,14 +772,10 @@ public interface Text {
   String RESOURCES = lang("resources");
   /** "Encoding". */
   String ENCODING = lang("encoding");
-  /** "Method". */
-  String METHOD = lang("method");
   /** "Parameters". */
   String PARAMETERS = lang("parameters");
   /** "Path". */
   String PATH = lang("path");
-  /** Input. */
-  String INPUT = lang("input");
   /** "Jobs". */
   String JOBS = lang("jobs");
   /** "Duration". */
@@ -822,6 +822,9 @@ public interface Text {
   String STRINGS_FOUND_X = lang("strings_found_%");
   /** "Strings were replaced.". */
   String STRINGS_REPLACED = lang("strings_replaced");
+
+  /** Serialization parameters. */
+  String SERIALIZATION = lang("serialization");
 
   /** Info on text index. */
   String TEXT_INDEX = lang("text_index");

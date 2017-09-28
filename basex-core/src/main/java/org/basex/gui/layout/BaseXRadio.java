@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
-import java.awt.event.*;
 
 import javax.swing.*;
 
@@ -23,13 +22,7 @@ public final class BaseXRadio extends JRadioButton {
     setOpaque(false);
     setBorder(BaseXLayout.border(0, 0, 0, 16));
     BaseXLayout.addInteraction(this, win);
-
-    if(!(win instanceof BaseXDialog)) return;
-    addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        ((BaseXDialog) win).action(e.getSource());
-      }
-    });
+    if(win instanceof BaseXDialog)
+      addActionListener(e -> ((BaseXDialog) win).action(e.getSource()));
   }
 }

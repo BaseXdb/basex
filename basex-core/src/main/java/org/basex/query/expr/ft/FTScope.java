@@ -66,6 +66,12 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTScope && same == ((FTScope) obj).same &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(same ? SAME : DIFFERENT, unit), exprs);
   }

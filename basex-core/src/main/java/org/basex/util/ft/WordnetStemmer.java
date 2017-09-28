@@ -31,8 +31,8 @@ final class WordnetStemmer extends Stemmer {
   static {
     // don't try to find the other classes if Dictionary is not found:
     if(Reflect.available(PATTERN, "Dictionary")) {
-      FIND_STEMS = null;
       CTR = null;
+      FIND_STEMS = null;
       DICT = null;
     } else {
       final Class<?> dict = Reflect.find(PATTERN, "Dictionary");

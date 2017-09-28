@@ -19,9 +19,10 @@ public final class BinNot extends StandardFunc {
 
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
+    if(bl == 1) return B64.get((byte) ~bytes[0]);
 
     final byte[] tmp = new byte[bl];
     for(int b = 0; b < bl; b++) tmp[b] = (byte) ~bytes[b];
-    return new B64(tmp);
+    return B64.get(tmp);
   }
 }

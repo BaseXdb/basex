@@ -86,7 +86,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.args = args;
     this.type = type;
     this.anns = anns;
-    this.global = global == null ? Collections.<Var, Expr>emptyMap() : global;
+    this.global = global == null ? Collections.emptyMap() : global;
     this.vs = vs;
   }
 
@@ -199,7 +199,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // only evaluate if the closure is empty, so we don't lose variables
-    return global.isEmpty() ? preEval(cc) : this;
+    return global.isEmpty() ? cc.preEval(this) : this;
   }
 
   @Override
@@ -265,7 +265,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     cc.info(OPTINLINE_X, this);
     // create let bindings for all variables
     final LinkedList<Clause> cls =
-        exprs.length == 0 && global.isEmpty() ? null : new LinkedList<Clause>();
+        exprs.length == 0 && global.isEmpty() ? null : new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
@@ -355,18 +355,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> e : global.entrySet())
       if(!e.getValue().removable(var)) return false;
     return true;
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem el = planElem();
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      e.getKey().plan(el);
-      e.getValue().plan(el);
-    }
-    addPlan(plan, el, expr);
-    final int al = args.length;
-    for(int a = 0; a < al; a++) el.add(planAttr(ARG + a, args[a].name.string()));
   }
 
   @Override
@@ -472,6 +460,24 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
     final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, info);
     return new Closure(info, name, SeqType.ITEM_ZM, arg, call.fun, new AnnList(), null, scp);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    // [CG] could be enhanced
+    return this == obj;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    for(final Entry<Var, Expr> e : global.entrySet()) {
+      e.getKey().plan(el);
+      e.getValue().plan(el);
+    }
+    addPlan(plan, el, expr);
+    final int al = args.length;
+    for(int a = 0; a < al; a++) el.add(planAttr(ARG + a, args[a].name.string()));
   }
 
   @Override

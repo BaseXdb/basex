@@ -129,7 +129,20 @@ final class TrieLeaf extends TrieNode {
           final Item[] ks = o.keys.clone();
           final Value[] vs = o.values.clone();
           ks[i] = key;
-          vs[i] = value;
+
+          switch(merge) {
+            case USE_FIRST:
+            case UNSPECIFIED:
+              break;
+            case USE_LAST:
+              vs[i] = value;
+              break;
+            case COMBINE:
+              vs[i] = ValueBuilder.concat(o.values[i], value);
+              break;
+            default:
+              throw MERGE_DUPLICATE_X.get(ii, key);
+          }
           return new TrieList(hash, ks, vs);
         }
       }

@@ -31,17 +31,14 @@ public final class LocalConcurrencyTest extends SandboxTest {
 
       for(int d = 0; d < runs; d++) {
         execute(new Grant("write", "user", "doc" + d));
-        new Thread() {
-          @Override
-          public void run() {
-            try(Session session = new LocalSession(context, "user", "")) {
-              session.execute(new Open("store"));
-            } catch(final Exception ex) {
-              error[0] = ex;
-            }
-            counter.incrementAndGet();
+        new Thread(() -> {
+          try(Session session = new LocalSession(context, "user", "")) {
+            session.execute(new Open("store"));
+          } catch(final Exception ex) {
+            error[0] = ex;
           }
-        }.start();
+          counter.incrementAndGet();
+        }).start();
       }
     } finally {
       while(counter.get() < runs) Performance.sleep(1);

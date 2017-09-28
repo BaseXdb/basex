@@ -60,7 +60,7 @@ public final class FTDistance extends FTFilter {
     match.sort();
 
     final FTMatch ftm = new FTMatch();
-    FTStringMatch last = null, first = null;
+    FTStringMatch first = null, last = null;
     for(final FTStringMatch sm : match) {
       if(sm.exclude) {
         ftm.add(sm);
@@ -74,6 +74,8 @@ public final class FTDistance extends FTFilter {
         last = sm;
       }
     }
+    if(first == null) return false;
+
     first.end = last.end;
     match.reset();
     match.add(first);

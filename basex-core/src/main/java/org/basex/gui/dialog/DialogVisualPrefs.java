@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -39,6 +40,8 @@ final class DialogVisualPrefs extends BaseXBack {
   private final BaseXCombo lookfeel;
   /** Scale UI components. */
   private final BaseXCheckBox scale;
+  /** Serialization parameters. */
+  private final BaseXSerial serial;
 
   /** Look and feels. */
   private final StringList classes = new StringList();
@@ -48,15 +51,15 @@ final class DialogVisualPrefs extends BaseXBack {
    * @param d dialog reference
    */
   DialogVisualPrefs(final BaseXDialog d) {
-    border(8).setLayout(new TableLayout(1, 2, 40, 0));
+    border(8).setLayout(new TableLayout(2, 1, 0, 8));
     gui = d.gui;
 
     final GUIOptions gopts = d.gui.gopts;
     showNames = new BaseXCheckBox(SHOW_NAME_ATTS, GUIOptions.SHOWNAME, gopts, d);
     treeSlims = new BaseXCheckBox(ADJUST_NODES, GUIOptions.TREESLIMS, gopts, d);
     treeAtts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.TREEATTS, gopts, d);
-    mapAlgo = new BaseXCombo(d, GUIOptions.MAPALGO, gopts, MAP_LAYOUTS);
-    mapOffsets = new BaseXCombo(d, GUIOptions.MAPOFFSETS, gopts, MAP_CHOICES);
+    mapAlgo = new BaseXCombo(GUIOptions.MAPALGO, gopts, MAP_LAYOUTS, d);
+    mapOffsets = new BaseXCombo(GUIOptions.MAPOFFSETS, gopts, MAP_CHOICES, d);
     mapWeight = new BaseXSlider(0, 100, GUIOptions.MAPWEIGHT, gopts, d);
     mapAtts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.MAPATTS, gopts, d);
     mapAlgo.setSize((int) (GUIConstants.scale * 200), (int) (GUIConstants.scale * 100));
@@ -72,48 +75,52 @@ final class DialogVisualPrefs extends BaseXBack {
       c++;
       if(clzz.equals(laf)) i = c;
     }
-    lookfeel = new BaseXCombo(d, lafs.finish());
+    lookfeel = new BaseXCombo(lafs.finish(), d);
     lookfeel.setSelectedIndex(i);
 
     scale = new BaseXCheckBox(SCALE_GUI, GUIOptions.SCALE, gopts, d);
+    serial = new BaseXSerial(d, gui.context.options.get(MainOptions.SERIALIZER));
 
-    BaseXBack pp = new BaseXBack().layout(new TableLayout(3, 1, 0, 8)), p;
-    p = new BaseXBack(new TableLayout(2, 1));
-    p.add(new BaseXLabel(GENERAL + COL, true, true));
-    p.add(showNames);
-    pp.add(p);
+    BaseXBack pp = new BaseXBack().layout(new TableLayout(3, 1, 0, 8)), ppp;
+    ppp = new BaseXBack(new TableLayout(3, 1));
+    ppp.add(new BaseXLabel(JAVA_LF + COL, true, true));
+    ppp.add(lookfeel);
+    ppp.add(scale);
+    pp.add(ppp);
 
-    p = new BaseXBack(new TableLayout(3, 1));
-    p.add(new BaseXLabel(TREE + COL, true, true));
-    p.add(treeSlims);
-    p.add(treeAtts);
-    pp.add(p);
+    ppp = new BaseXBack(new TableLayout(2, 1));
+    ppp.add(new BaseXLabel(GENERAL + COL, true, true));
+    ppp.add(showNames);
+    pp.add(ppp);
 
-    p = new BaseXBack(new TableLayout(3, 1));
-    p.add(new BaseXLabel(JAVA_LF + COL, true, true));
-    p.add(lookfeel);
-    p.add(scale);
-    pp.add(p);
+    ppp = new BaseXBack(new TableLayout(3, 1));
+    ppp.add(new BaseXLabel(TREE + COL, true, true));
+    ppp.add(treeSlims);
+    ppp.add(treeAtts);
+    pp.add(ppp);
 
-    add(pp);
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 40, 0));
+    p.add(pp);
 
     pp = new BaseXBack(new TableLayout(3, 1));
     pp.add(new BaseXLabel(MAP + COL, true, true));
 
-    p = new BaseXBack(new TableLayout(2, 2, 8, 8));
-    p.add(new BaseXLabel(ALGORITHM + COL));
-    p.add(mapAlgo);
-    p.add(new BaseXLabel(OFFSETS + COL));
-    p.add(mapOffsets);
-    pp.add(p);
+    ppp = new BaseXBack(new TableLayout(2, 2, 8, 8));
+    ppp.add(new BaseXLabel(ALGORITHM + COL));
+    ppp.add(mapAlgo);
+    ppp.add(new BaseXLabel(OFFSETS + COL));
+    ppp.add(mapOffsets);
+    pp.add(ppp);
 
-    p = new BaseXBack(new TableLayout(3, 1, 0, 8));
-    p.add(new BaseXLabel(RATIO + COLS));
-    p.add(mapWeight);
-    p.add(mapAtts);
-    pp.add(p);
+    ppp = new BaseXBack(new TableLayout(3, 1, 0, 8));
+    ppp.add(new BaseXLabel(RATIO + COLS));
+    ppp.add(mapWeight);
+    ppp.add(mapAtts);
+    pp.add(ppp);
+    p.add(pp);
+    add(p);
 
-    add(pp);
+    add(serial);
   }
 
   /**
@@ -164,5 +171,19 @@ final class DialogVisualPrefs extends BaseXBack {
       if(Reflect.find(laf) != null) sl.add(laf);
     }
     return sl;
+  }
+
+  /**
+   * Updates the panel.
+   */
+  void update() {
+    serial.init(gui.context.options.get(MainOptions.SERIALIZER));
+  }
+
+  /**
+   * Closes the panel.
+   */
+  void cancel() {
+    gui.set(MainOptions.SERIALIZER, serial.options());
   }
 }

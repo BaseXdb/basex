@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -139,7 +139,7 @@ public abstract class TreeSeq extends Seq {
 
   @Override
   public final boolean homogeneous() {
-    return type != AtomType.ITEM;
+    return homo;
   }
 
   @Override

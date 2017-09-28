@@ -25,7 +25,7 @@ public final class QNm extends Item {
   /** QName: xml:base. */
   public static final QNm XML_BASE = new QNm(BASE, XML_URI);
   /** URL pattern (matching Clark and EQName notation). */
-  public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)\\}(.+)$");
+  public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)}(.+)$");
 
   /** Namespace URI. */
   private byte[] uri;
@@ -236,12 +236,12 @@ public final class QNm extends Item {
   }
 
   /**
-   * Compares the specified item.
-   * @param n name to be compared
+   * Compares the specified name.
+   * @param qnm name to be compared
    * @return result of check
    */
-  public boolean eq(final QNm n) {
-    return n == this || Token.eq(uri(), n.uri()) && Token.eq(local(), n.local());
+  public boolean eq(final QNm qnm) {
+    return qnm == this || Token.eq(uri(), qnm.uri()) && Token.eq(local(), qnm.local());
   }
 
   @Override

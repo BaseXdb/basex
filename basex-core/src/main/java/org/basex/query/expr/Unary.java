@@ -40,12 +40,12 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(expr.isValue()) return preEval(cc);
+    if(expr.isValue()) return cc.preEval(this);
 
     final SeqType st = expr.seqType();
     final Type t = st.type;
     seqType = SeqType.get(t.isUntyped() ? AtomType.DBL : t.isNumber() ? t : AtomType.ITR,
-      st.one() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
+      st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
     return this;
   }
 
@@ -74,6 +74,11 @@ public final class Unary extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new Unary(info, expr.copy(cc, vm), minus));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Unary && minus == ((Unary) obj).minus && super.equals(obj);
   }
 
   @Override

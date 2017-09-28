@@ -22,17 +22,16 @@ final class LocalReadWriteLock extends ReentrantReadWriteLock {
 
   /**
    * Pins a lock.
-   * @return pin count
    */
-  int pin() {
-    return ++pins;
+  void pin() {
+    ++pins;
   }
 
   /**
    * Unpins a lock.
-   * @return pin count
+   * @return if no pins are left
    */
-  int unpin() {
-    return --pins;
+  boolean unpin() {
+    return --pins == 0;
   }
 }

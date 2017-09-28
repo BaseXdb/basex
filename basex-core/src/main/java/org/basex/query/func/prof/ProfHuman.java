@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class ProfHuman extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(Performance.format(toLong(exprs[0], qc), true));
+    return Str.get(Performance.format(toLong(exprs[0], qc)));
   }
 }

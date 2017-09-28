@@ -86,7 +86,7 @@ public final class LockList implements Iterable<String> {
    * @param locks lock list
    */
   public void remove(final LockList locks) {
-    list.remove(locks.list);
+    list.delete(locks.list);
   }
 
   /**

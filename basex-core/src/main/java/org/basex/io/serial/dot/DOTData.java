@@ -62,13 +62,13 @@ final class DOTData {
     // violet
     { "9933FF", CAttr.class, CComm.class, CDoc.class, CElem.class,
                 CNSpace.class, CPI.class, CTxt.class },
-    { "9933CC", And.class, Or.class, Union.class, InterSect.class, Except.class },
+    { "9933CC", And.class, Or.class, Union.class, Intersect.class, Except.class },
     // pink
     { "CC3399", If.class, Quantifier.class },
     { "CC6699", OrderBy.class },
     // red
     { "FF3333", Arith.class, CmpG.class, CmpN.class, CmpV.class, CmpR.class,
-                Pos.class, FTContains.class },
+                ItrPos.class, FTContains.class },
     { "FF6666", FTExpr.class, Try.class, Catch.class },
     // orange
     { "AA9988", StaticFunc.class },

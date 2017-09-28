@@ -235,6 +235,15 @@ public class Dur extends ADateDur {
   }
 
   @Override
+  public final boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Dur)) return false;
+    final Dur d = (Dur) obj;
+    return type.eq(d.type) && mon == d.mon &&
+        (sec == null ? d.sec == null : sec.compareTo(d.sec) == 0);
+  }
+
+  @Override
   public final String toString() {
     return Util.info("\"%\"", string(null));
   }

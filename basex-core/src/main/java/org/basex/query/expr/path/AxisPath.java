@@ -17,12 +17,7 @@ import org.basex.util.*;
  */
 public abstract class AxisPath extends Path {
   /** Thread-safe path caching. */
-  private final ThreadLocal<PathCache> caches = new ThreadLocal<PathCache>() {
-    @Override
-    public PathCache initialValue() {
-      return new PathCache();
-    }
-  };
+  private final ThreadLocal<PathCache> caches = ThreadLocal.withInitial(PathCache::new);
 
   /**
    * Constructor.
@@ -91,12 +86,12 @@ public abstract class AxisPath extends Path {
   public final Path invertPath(final Expr rt, final Step curr) {
     // add predicates of last step to new root node
     int s = steps.length - 1;
-    final Expr r = step(s).preds.length == 0 ? rt : Filter.get(info, rt, step(s).preds);
+    final Expr r = step(s).exprs.length == 0 ? rt : Filter.get(info, rt, step(s).exprs);
 
     // add inverted steps in a backward manner
     final ExprList stps = new ExprList();
     while(--s >= 0) {
-      stps.add(Step.get(info, step(s + 1).axis.invert(), step(s).test, step(s).preds));
+      stps.add(Step.get(info, step(s + 1).axis.invert(), step(s).test, step(s).exprs));
     }
     stps.add(Step.get(info, step(s + 1).axis.invert(), curr.test));
     return Path.get(info, r, stps.finish());
@@ -111,22 +106,18 @@ public abstract class AxisPath extends Path {
     return (Step) steps[i];
   }
 
-  @Override
-  public final boolean iterable() {
-    return true;
+  /**
+   * Adds predicates to the last step.
+   * @param preds predicate to be added
+   * @return resulting path instance
+   */
+  public final Path addPreds(final Expr... preds) {
+    steps[steps.length - 1] = step(steps.length - 1).addPreds(preds);
+    return get(info, root, steps);
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof AxisPath)) return false;
-    final AxisPath ap = (AxisPath) cmp;
-    if(root == null ? ap.root != null : !root.sameAs(ap.root)) return false;
-
-    final int sl = steps.length;
-    if(sl != ap.steps.length) return false;
-    for(int s = 0; s < sl; s++) {
-      if(!steps[s].sameAs(ap.steps[s])) return false;
-    }
+  public final boolean iterable() {
     return true;
   }
 }

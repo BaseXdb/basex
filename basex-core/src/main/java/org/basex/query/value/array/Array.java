@@ -218,14 +218,7 @@ public abstract class Array extends FItem {
    * @return array over the array members
    */
   public final Iterable<Value> members() {
-    if(iterable == null) {
-      iterable = new Iterable<Value>() {
-        @Override
-        public Iterator<Value> iterator() {
-          return Array.this.iterator(0);
-        }
-      };
-    }
+    if(iterable == null) iterable = () -> iterator(0);
     return iterable;
   }
 
@@ -276,7 +269,7 @@ public abstract class Array extends FItem {
   abstract void checkInvariants();
 
   @Override
-  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
+  public final Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
     final Item key = args[0].atomItem(qc, ii);
     if(key == null) throw EMPTYFOUND_X.get(ii, AtomType.ITR);
@@ -284,7 +277,7 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
+  public final Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
     return invValue(qc, ii, args).item(qc, ii);
   }
@@ -306,32 +299,32 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public int stackFrameSize() {
+  public final int stackFrameSize() {
     return 0;
   }
 
   @Override
-  public int arity() {
+  public final int arity() {
     return 1;
   }
 
   @Override
-  public QNm funcName() {
+  public final QNm funcName() {
     return null;
   }
 
   @Override
-  public QNm argName(final int pos) {
+  public final QNm argName(final int pos) {
     return new QNm("pos", "");
   }
 
   @Override
-  public FuncType funcType() {
+  public final FuncType funcType() {
     return ArrayType.get(SeqType.ITEM_ZM);
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
+  public final Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
       final InputInfo ii) {
     return null;
   }
@@ -342,18 +335,18 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
+  public final Value atomValue(final InputInfo ii) throws QueryException {
     return atm(ii, false);
   }
 
   @Override
-  public Item atomItem(final InputInfo ii) throws QueryException {
+  public final Item atomItem(final InputInfo ii) throws QueryException {
     final Value v = atm(ii, true);
     return v.isEmpty() ? null : (Item) v;
   }
 
   @Override
-  public long atomSize() {
+  public final long atomSize() {
     long s = 0;
     for(final Value val : members()) {
       for(final Item it : val) s += it.atomSize();
@@ -385,7 +378,7 @@ public abstract class Array extends FItem {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void string(final boolean indent, final TokenBuilder tb, final int level,
+  public final void string(final boolean indent, final TokenBuilder tb, final int level,
       final InputInfo ii) throws QueryException {
 
     tb.add('[');
@@ -414,12 +407,12 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public boolean instanceOf(final Type tp) {
+  public final boolean instanceOf(final Type tp) {
     return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
   }
 
   @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
+  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
     if(instOf(ft, true)) return this;
@@ -453,7 +446,7 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+  public final boolean deep(final Item item, final InputInfo ii, final Collation coll)
       throws QueryException {
 
     if(item instanceof Array) {
@@ -471,12 +464,18 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public String description() {
-    return SQUARE1 + DOTS + SQUARE2;
+  public final String description() {
+    return ARRAY;
   }
 
   @Override
-  public void plan(final FElem plan) {
+  public boolean equals(final Object obj) {
+    // [CG] could be enhanced
+    return this == obj;
+  }
+
+  @Override
+  public final void plan(final FElem plan) {
     final long size = arraySize();
     final FElem el = planElem(SIZE, size);
     final int max = (int) Math.min(size, 5);
@@ -485,7 +484,7 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public Object[] toJava() throws QueryException {
+  public final Object[] toJava() throws QueryException {
     final long size = arraySize();
     final Object[] tmp = new Object[(int) size];
     final Iterator<Value> iter = iterator(0);
@@ -494,7 +493,7 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder tb = new StringBuilder().append('[');
     final Iterator<Value> iter = iterator(0);
     for(boolean fst = true; iter.hasNext(); fst = false) {

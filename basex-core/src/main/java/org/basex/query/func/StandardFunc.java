@@ -27,6 +27,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -82,7 +83,7 @@ public abstract class StandardFunc extends Arr {
       // pre-evaluate function, which yields a value
       expr = cc.qc.value(this);
     }
-    return optPre(expr, cc);
+    return cc.replaceWith(this, expr);
   }
 
   /**
@@ -102,6 +103,15 @@ public abstract class StandardFunc extends Arr {
     final Expr[] arg = new Expr[es];
     for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(cc, vm);
     return copyType(sig.get(sc, info, arg));
+  }
+
+  /**
+   * Sets occurrence indicator to 1 if the first expression returns at least one non-array item,
+   * or if it refers to the context item.
+   */
+  protected void singleOcc() {
+    final SeqType st = exprs.length > 0 ? exprs[0].seqType() : null;
+    if(st == null || st.oneOrMore() && !st.mayBeArray()) seqType = seqType.withOcc(Occ.ONE);
   }
 
   /**
@@ -406,17 +416,8 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
-    if(cmp instanceof StandardFunc) {
-      final StandardFunc sf = (StandardFunc) cmp;
-      final int el = exprs.length;
-      if(sig == sf.sig && el == sf.exprs.length) {
-        for(int e = 0; e < el; e++) {
-          if(!exprs[e].sameAs(sf.exprs[e])) return false;
-        }
-        return true;
-      }
-    }
-    return false;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof StandardFunc && sig == ((StandardFunc) obj).sig &&
+        super.equals(obj);
   }
 }

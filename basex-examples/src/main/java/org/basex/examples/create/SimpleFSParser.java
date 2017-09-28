@@ -42,7 +42,9 @@ public final class SimpleFSParser extends Parser {
   @Override
   public void parse(final Builder b) throws IOException {
     b.openDoc(token(source.name()));
-    b.openElem(FSML, atts.clear(), nsp.clear());
+    atts.reset();
+    nsp.reset();
+    b.openElem(FSML, atts, nsp);
     parse(new File(source.path()), b);
     b.closeElem();
     b.closeDoc();
@@ -55,7 +57,7 @@ public final class SimpleFSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void parse(final File dir, final Builder b) throws IOException {
-    atts.clear();
+    atts.reset();
     atts.add(NAME, token(dir.getName()));
     atts.add(MTIME, token(dir.lastModified()));
     b.openElem(DIR, atts, nsp);
@@ -63,7 +65,7 @@ public final class SimpleFSParser extends Parser {
       if(f.isDirectory()) {
         parse(f, b);
       } else {
-        atts.clear();
+        atts.reset();
         final String name = f.getName();
         atts.add(NAME, token(name));
         atts.add(SIZE, token(f.length()));

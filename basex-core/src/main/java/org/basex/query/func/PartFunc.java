@@ -55,7 +55,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(allAreValues()) return preEval(cc);
+    if(allAreValues()) return cc.preEval(this);
 
     final Expr f = body();
     final SeqType t = f.seqType();
@@ -116,6 +116,12 @@ public final class PartFunc extends Arr {
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new PartFunc(sc, info, body().copy(cc, vm),
         copyAll(cc, vm, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof PartFunc && Arrays.equals(holes, ((PartFunc) obj).holes) &&
+        super.equals(obj);
   }
 
   @Override

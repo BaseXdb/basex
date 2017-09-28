@@ -17,25 +17,25 @@ public final class NodeTest extends Test {
 
   /**
    * Convenience constructor for element tests.
-   * @param nm node name
+   * @param name node name
    */
-  public NodeTest(final QNm nm) {
-    this(NodeType.ELM, nm);
-  }
-
-  /**
-   * Constructor.
-   * @param nt node type
-   * @param nm optional node name
-   */
-  public NodeTest(final NodeType nt, final QNm nm) {
-    this(nt, nm, null);
+  public NodeTest(final QNm name) {
+    this(NodeType.ELM, name);
   }
 
   /**
    * Constructor.
    * @param type node type
-   * @param name optional node name
+   * @param name node name
+   */
+  public NodeTest(final NodeType type, final QNm name) {
+    this(type, name, null);
+  }
+
+  /**
+   * Constructor.
+   * @param type node type
+   * @param name node name (can be {@code null} if extended node type is specified)
    * @param ext extended node type (can be {@code null})
    */
   public NodeTest(final NodeType type, final QNm name, final Type ext) {
@@ -51,10 +51,19 @@ public final class NodeTest extends Test {
 
   @Override
   public boolean eq(final ANode node) {
-    return node.type == type &&
+    return type == node.type &&
       (name == null || node.qname().eq(name)) &&
       (ext == null || ext == AtomType.ATY || ext == AtomType.UTY ||
       type == NodeType.ATT && (ext == AtomType.AST || ext == AtomType.AAT || ext == AtomType.ATM));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof NodeTest)) return false;
+    final NodeTest nt = (NodeTest) obj;
+    return type == nt.type &&
+        (name == null ? nt.name == null : (nt.name != null && name.eq(nt.name))) &&
+        (ext == null ? nt.ext == null : (nt.ext != null && ext.eq(nt.ext)));
   }
 
   @Override

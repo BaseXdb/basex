@@ -22,52 +22,52 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Switch extends ParseExpr {
-  /** Cases. */
-  private SwitchCase[] cases;
   /** Condition. */
   private Expr cond;
+  /** Case groups. */
+  private SwitchGroup[] groups;
 
   /**
    * Constructor.
    * @param info input info
    * @param cond condition
-   * @param cases cases (last one is default case)
+   * @param groups case groups (last one is default case)
    */
-  public Switch(final InputInfo info, final Expr cond, final SwitchCase[] cases) {
+  public Switch(final InputInfo info, final Expr cond, final SwitchGroup[] groups) {
     super(info);
-    this.cases = cases;
     this.cond = cond;
+    this.groups = groups;
   }
 
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
-    for(final SwitchCase sc : cases) sc.checkUp();
+    for(final SwitchGroup group : groups) group.checkUp();
     // check if none or all return expressions are updating
-    final int cl = cases.length;
-    final Expr[] tmp = new Expr[cl];
-    for(int c = 0; c < cl; c++) tmp[c] = cases[c].exprs[0];
+    final int gl = groups.length;
+    final Expr[] tmp = new Expr[gl];
+    for(int g = 0; g < gl; g++) tmp[g] = groups[g].exprs[0];
     checkAllUp(tmp);
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     cond = cond.compile(cc);
-    for(final SwitchCase sc : cases) sc.compile(cc);
+    for(final SwitchGroup group : groups) group.compile(cc);
     return optimize(cc);
   }
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // check if expression can be pre-evaluated
-    final Expr ex = opt(cc);
-    if(ex != this) return optPre(ex, cc);
+    final Expr expr = opt(cc);
+    if(expr != this) return cc.replaceWith(this, expr);
 
-    // expression could not be pre-evaluated
-    seqType = cases[0].exprs[0].seqType();
-    final int cl = cases.length;
-    for(int c = 1; c < cl; c++) seqType = seqType.union(cases[c].exprs[0].seqType());
-    return ex;
+    // combine types of return expressions
+    seqType = groups[0].exprs[0].seqType();
+    final int gl = groups.length;
+    for(int g = 1; g < gl; g++) seqType = seqType.union(groups[g].exprs[0].seqType());
+    return this;
   }
 
   /**
@@ -77,47 +77,49 @@ public final class Switch extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr opt(final CompileContext cc) throws QueryException {
-    // pre-evaluate cases
-    final boolean pre = cond.isValue();
-    // cache expressions
-    final ExprList cache = new ExprList();
-
-    final Item it = pre ? cond.atomItem(cc.qc, info) : null;
-    final ArrayList<SwitchCase> tmp = new ArrayList<>();
-    for(final SwitchCase sc : cases) {
-      final int sl = sc.exprs.length;
-      final Expr ret = sc.exprs[0];
-      final ExprList el = new ExprList(sl).add(ret);
-      for(int e = 1; e < sl; e++) {
-        final Expr ex = sc.exprs[e];
-        if(pre && ex.isValue()) {
+    // cached switch cases
+    final ExprList cases = new ExprList();
+    final Item it = cond.isValue() ? cond.atomItem(cc.qc, info) : null;
+    final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
+    for(final SwitchGroup group : groups) {
+      final int el = group.exprs.length;
+      final Expr ret = group.exprs[0];
+      final ExprList list = new ExprList(el).add(ret);
+      for(int e = 1; e < el; e++) {
+        final Expr ex = group.exprs[e];
+        if(cond.isValue() && ex.isValue()) {
           // includes check for empty sequence (null reference)
-          final Item cs = ex.item(cc.qc, info);
+          final Item cs = ex.atomItem(cc.qc, info);
           if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) return ret;
           cc.info(OPTREMOVE_X_X, description(), ex);
-        } else if(cache.contains(ex)) {
+        } else if(cases.contains(ex)) {
           // case has already been checked before
           cc.info(OPTREMOVE_X_X, description(), ex);
         } else {
-          cache.add(ex);
-          el.add(ex);
+          cases.add(ex);
+          list.add(ex);
         }
       }
-      // return default branch (last one) if all others were discarded
-      if(sl == 1 && tmp.isEmpty()) return ret;
-      // build list of branches (add default branch and those that could not be pre-evaluated)
-      if(sl == 1 || el.size() > 1) {
-        sc.exprs = el.finish();
-        tmp.add(sc);
+      // build list of branches (add those with case left, or the default branch)
+      if(list.size() > 1 || el == 1) {
+        group.exprs = list.finish();
+        tmpGroups.add(group);
       }
     }
 
-    if(tmp.size() != cases.length) {
+    if(tmpGroups.size() != groups.length) {
       // branches have changed
-      cc.info(OPTREWRITE_X, this);
-      cases = tmp.toArray(new SwitchCase[tmp.size()]);
+      cc.info(OPTSIMPLE_X, this);
+      groups = tmpGroups.toArray(new SwitchGroup[tmpGroups.size()]);
     }
-    return this;
+
+    // return first expression if all return expressions are equal, or if only one branch is left
+    final Expr expr = groups[0].exprs[0];
+    final int gl = groups.length;
+    for(int g = 1; g < gl; g++) {
+      if(!expr.equals(groups[g].exprs[0])) return this;
+    }
+    return expr;
   }
 
   @Override
@@ -137,26 +139,32 @@ public final class Switch extends ParseExpr {
 
   @Override
   public boolean isVacuous() {
-    for(final SwitchCase sc : cases) if(!sc.exprs[0].isVacuous()) return false;
+    for(final SwitchGroup group : groups) {
+      if(!group.exprs[0].isVacuous()) return false;
+    }
     return true;
   }
 
   @Override
   public boolean has(final Flag flag) {
-    for(final SwitchCase sc : cases) if(sc.has(flag)) return true;
+    for(final SwitchGroup group : groups) {
+      if(group.has(flag)) return true;
+    }
     return cond.has(flag);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final SwitchCase sc : cases) if(!sc.removable(var)) return false;
+    for(final SwitchGroup group : groups) {
+      if(!group.removable(var)) return false;
+    }
     return cond.removable(var);
   }
 
   @Override
   public VarUsage count(final Var var) {
     VarUsage max = VarUsage.NEVER, curr = VarUsage.NEVER;
-    for(final SwitchCase cs : cases) {
+    for(final SwitchGroup cs : groups) {
       curr = curr.plus(cs.countCases(var));
       max = max.max(curr.plus(cs.count(var)));
     }
@@ -165,7 +173,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean change = inlineAll(cases, var, ex, cc);
+    boolean change = inlineAll(groups, var, ex, cc);
     final Expr cn = cond.inline(var, ex, cc);
     if(cn != null) {
       change = true;
@@ -182,51 +190,59 @@ public final class Switch extends ParseExpr {
    */
   private Expr getCase(final QueryContext qc) throws QueryException {
     final Item it = cond.atomItem(qc, info);
-    for(final SwitchCase sc : cases) {
-      final int sl = sc.exprs.length;
-      for(int e = 1; e < sl; e++) {
+    for(final SwitchGroup group : groups) {
+      final int gl = group.exprs.length;
+      for(int e = 1; e < gl; e++) {
         // includes check for empty sequence (null reference)
-        final Item cs = sc.exprs[e].item(qc, info);
+        final Item cs = group.exprs[e].atomItem(qc, info);
         if(it == cs || it != null && cs != null && it.equiv(cs, null, info))
-          return sc.exprs[0];
+          return group.exprs[0];
       }
-      if(sl == 1) return sc.exprs[0];
+      if(gl == 1) return group.exprs[0];
     }
     // will never be evaluated
-    return null;
+    throw Util.notExpected();
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Switch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, cases));
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), cond, cases);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(SWITCH + PAREN1 + cond + PAREN2);
-    for(final SwitchCase sc : cases) sb.append(sc);
-    return sb.toString();
+    return new Switch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups));
   }
 
   @Override
   public void markTailCalls(final CompileContext cc) {
-    for(final SwitchCase sc : cases) sc.markTailCalls(cc);
+    for(final SwitchGroup group : groups) group.markTailCalls(cc);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return cond.accept(visitor) && visitAll(visitor, cases);
+    return cond.accept(visitor) && visitAll(visitor, groups);
   }
 
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : cases) sz += e.exprSize();
+    for(final Expr e : groups) sz += e.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Switch)) return false;
+    final Switch s = (Switch) obj;
+    return cond.equals(s.cond) && Array.equals(groups, s.groups);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), cond, groups);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(SWITCH + PAREN1 + cond + PAREN2);
+    for(final SwitchGroup group : groups) sb.append(group);
+    return sb.toString();
   }
 }

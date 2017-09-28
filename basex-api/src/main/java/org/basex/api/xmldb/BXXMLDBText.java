@@ -8,7 +8,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-interface BXXMLDBText {
+public interface BXXMLDBText {
   /** DB URI. */
   String DBURI = Prop.PROJECT_NAME + "://";
   /** XMLDB Prefix. */

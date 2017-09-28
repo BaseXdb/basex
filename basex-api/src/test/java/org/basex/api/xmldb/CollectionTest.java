@@ -204,7 +204,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     try {
       coll.createResource("hans", "UnknownResource");
       fail("Resource Type is expected to be unknown.");
-    } catch(final XMLDBException ex) { }
+    } catch(final XMLDBException ignored) { }
 
     // test xml resource and ID creation
     Resource res = coll.createResource(null, XMLResource.RESOURCE_TYPE);

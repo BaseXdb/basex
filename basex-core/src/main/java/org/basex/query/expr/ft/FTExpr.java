@@ -102,11 +102,6 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), exprs);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, exprs);
   }
@@ -116,6 +111,16 @@ public abstract class FTExpr extends ParseExpr {
     int sz = 1;
     for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof FTExpr && Array.equals(exprs, ((FTExpr) obj).exprs);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), exprs);
   }
 
   /**

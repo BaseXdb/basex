@@ -230,7 +230,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void info() {
     query("count(" + _DB_INFO.args(NAME) + "//" +
-        SIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ')', 1);
+        SIZE.replaceAll("[- ]", "").toLowerCase(Locale.ENGLISH) + ')', 1);
   }
 
   /** Test method. */
@@ -873,7 +873,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
    * @param options options
    * @return string
    */
-  private String[] lc(final Option<?>... options) {
+  private static String[] lc(final Option<?>... options) {
     final StringList sl = new StringList();
     for(final Option<?> option : options) sl.add(lc(option));
     return sl.finish();
@@ -884,7 +884,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
    * @param option option
    * @return string
    */
-  private String lc(final Option<?> option) {
+  private static String lc(final Option<?> option) {
     return option.name().toLowerCase(Locale.ENGLISH);
   }
 }

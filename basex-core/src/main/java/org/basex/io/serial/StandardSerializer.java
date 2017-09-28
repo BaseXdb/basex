@@ -67,6 +67,18 @@ public abstract class StandardSerializer extends OutputSerializer {
         map.put(kv[0].charAt(0), token(kv[1]));
       }
     }
+
+    final boolean bom  = sopts.yes(BYTE_ORDER_MARK);
+    if(bom) {
+      // comparison by reference
+      if(encoding == Strings.UTF8) {
+        out.write(0xEF); out.write(0xBB); out.write(0xBF);
+      } else if(encoding == Strings.UTF16LE) {
+        out.write(0xFF); out.write(0xFE);
+      } else if(encoding == Strings.UTF16BE) {
+        out.write(0xFE); out.write(0xFF);
+      }
+    }
   }
 
   @Override

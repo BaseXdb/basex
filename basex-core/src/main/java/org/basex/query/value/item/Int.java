@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -17,16 +16,26 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Int extends ANum {
+  /** Maximum values. */
+  public static final Int MAX;
+  /** Value 0. */
+  public static final Int ZERO;
+  /** Value 1. */
+  public static final Int ONE;
+
   /** Constant values. */
-  private static final Int[] NUMS;
+  private static final Int[] INTSS;
   /** Integer value. */
   private final long value;
 
   // caches the first 128 integers
   static {
     final int nl = 128;
-    NUMS = new Int[nl];
-    for(int n = 0; n < nl; n++) NUMS[n] = new Int(n);
+    INTSS = new Int[nl];
+    for(int n = 0; n < nl; n++) INTSS[n] = new Int(n);
+    MAX = Int.get(Long.MAX_VALUE);
+    ZERO = INTSS[0];
+    ONE = INTSS[1];
   }
 
   /**
@@ -53,7 +62,7 @@ public final class Int extends ANum {
    * @return instance
    */
   public static Int get(final long value) {
-    return value >= 0 && value < NUMS.length ? NUMS[(int) value] : new Int(value);
+    return value >= 0 && value < INTSS.length ? INTSS[(int) value] : new Int(value);
   }
 
   /**
@@ -153,7 +162,7 @@ public final class Int extends ANum {
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it instanceof Int) {
       final long i = ((Int) it).value;
-      return value < i ? -1 : value > i ? 1 : 0;
+      return Long.compare(value, i);
     }
     final double n = it.dbl(ii);
     return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
@@ -174,9 +183,10 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Int)) return false;
-    final Int i = (Int) cmp;
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Int)) return false;
+    final Int i = (Int) obj;
     return type == i.type && value == i.value;
   }
 

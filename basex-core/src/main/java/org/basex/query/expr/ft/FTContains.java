@@ -76,7 +76,7 @@ public final class FTContains extends Single {
   public Expr compile(final CompileContext cc) throws QueryException {
     super.compile(cc);
     ftexpr = ftexpr.compile(cc);
-    return expr.isEmpty() ? optPre(Bln.FALSE, cc) : this;
+    return expr.isEmpty() ? cc.replaceWith(this, Bln.FALSE) : this;
   }
 
   @Override
@@ -127,6 +127,12 @@ public final class FTContains extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new FTContains(expr.copy(cc, vm), ftexpr.copy(cc, vm), info);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTContains && ftexpr.equals(((FTContains) obj).expr) &&
+        super.equals(obj);
   }
 
   @Override

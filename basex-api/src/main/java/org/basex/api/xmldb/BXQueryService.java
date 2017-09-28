@@ -22,7 +22,7 @@ import org.xmldb.api.modules.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class BXQueryService implements XPathQueryService {
+public final class BXQueryService implements XPathQueryService {
   /** XPath service constant. */
   static final String XPATH = "XPathQueryService";
   /** XQuery service constant. */

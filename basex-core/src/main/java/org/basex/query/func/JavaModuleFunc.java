@@ -10,10 +10,11 @@ import org.basex.query.*;
 import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.type.Type;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.Type;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.Array;
 import org.basex.util.hash.*;
 
 /**
@@ -108,6 +109,15 @@ final class JavaModuleFunc extends JavaFunction {
    */
   private String name() {
     return Util.className(module) + ':' + method.getName();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof JavaModuleFunc)) return false;
+    final JavaModuleFunc j = (JavaModuleFunc) obj;
+    return module.equals(j.module) && method.equals(j.method) && Array.equals(params, j.params) &&
+        super.equals(obj);
   }
 
   @Override

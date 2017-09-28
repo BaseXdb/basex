@@ -39,7 +39,7 @@ public final class User {
     this.name = name;
     perm = Perm.NONE;
     for(final Algorithm algo : Algorithm.values()) {
-      passwords.put(algo, new EnumMap<Code, String>(Code.class));
+      passwords.put(algo, new EnumMap<>(Code.class));
     }
     password(password);
   }

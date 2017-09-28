@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -73,5 +74,11 @@ abstract class DateTime extends StandardFunc {
     final Item zon = spec ? exprs[1].atomItem(qc, info) : null;
     ad.timeZone(zon == null ? null : (DTDur) checkType(zon, AtomType.DTD), spec, info);
     return ad;
+  }
+
+  @Override
+  protected final Expr opt(final CompileContext cc) {
+    singleOcc();
+    return this;
   }
 }

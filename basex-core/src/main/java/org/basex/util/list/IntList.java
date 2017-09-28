@@ -106,7 +106,9 @@ public class IntList extends ElementList {
   public final boolean contains(final int element) {
     final int s = size;
     final int[] lst = list;
-    for(int i = 0; i < s; ++i) if(lst[i] == element) return true;
+    for(int i = 0; i < s; ++i) {
+      if(lst[i] == element) return true;
+    }
     return false;
   }
 
@@ -678,6 +680,18 @@ public class IntList extends ElementList {
     return list[a] < list[b] ?
       list[b] < list[c] ? b : list[a] < list[c] ? c : a :
       list[b] > list[c] ? b : list[a] > list[c] ? c : a;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(obj == this) return true;
+    if(!(obj instanceof IntList)) return false;
+    final IntList il = (IntList) obj;
+    if(size != il.size) return false;
+    for(int l = 0; l < size; ++l) {
+      if(list[l] != il.list[l]) return false;
+    }
+    return true;
   }
 
   @Override

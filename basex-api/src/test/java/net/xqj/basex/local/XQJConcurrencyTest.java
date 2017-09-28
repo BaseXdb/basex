@@ -66,8 +66,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
       final ThreadPoolExecutor tpe =
         new ThreadPoolExecutor(
           CONCURRENT_WRITE_THREADS, CONCURRENT_WRITE_THREADS, 4L,
-          TimeUnit.SECONDS,
-          new ArrayBlockingQueue<Runnable>(CONCURRENT_READ_THREADS),
+          TimeUnit.SECONDS, new ArrayBlockingQueue<>(CONCURRENT_READ_THREADS),
           new CallerRunsPolicy());
 
       final ArrayList<Future<?>> futures = new ArrayList<>();

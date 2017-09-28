@@ -15,6 +15,7 @@ declare variable $dba:SUB := 'database';
  : @param  $action    action to perform
  : @param  $name      name of resource
  : @param  $resource  resource
+ : @return redirection
  :)
 declare
   %rest:POST

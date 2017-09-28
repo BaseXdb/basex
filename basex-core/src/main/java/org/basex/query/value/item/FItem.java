@@ -87,7 +87,7 @@ public abstract class FItem extends Item implements XQFunction {
    * Performs a deep comparison of two items.
    * @param item item to be compared
    * @param ii input info
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */

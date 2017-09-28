@@ -41,18 +41,17 @@ public final class GUIInput extends BaseXTextField {
     super(main);
     gui = main;
 
+    // use larger font for input bar
     final Font f = getFont();
-    final int fs = f.getSize(), ns = (int) (fs * 1.2d);
-    setFont(f.deriveFont(ns));
+    final int fs = f.getSize();
+    final float fs2 = fs * 1.2f;
+    setFont(f.deriveFont(fs2));
     final Dimension ps = getPreferredSize();
-    setPreferredSize(new Dimension(ps.width, ps.height + ns - fs));
+    setPreferredSize(new Dimension(ps.width, ps.height + (int) fs2 - fs));
 
     box = new BaseXCombo(main);
-    box.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
-      }
+    box.addActionListener(e -> {
+      if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
     });
     pop = new GUIInputPopup(box);
 
@@ -220,7 +219,8 @@ public final class GUIInput extends BaseXTextField {
       return;
     }
     if(comboChanged(sl)) {
-      box.setModel(new DefaultComboBoxModel<>(sl.toArray()));
+      final Object[] strings = sl.toArray();
+      box.setModel(new DefaultComboBoxModel<>(strings));
       box.setSelectedIndex(-1);
       pop = new GUIInputPopup(box);
     }
@@ -249,7 +249,7 @@ public final class GUIInput extends BaseXTextField {
      * Constructor.
      * @param combo combobox reference
      */
-    GUIInputPopup(final JComboBox<String> combo) {
+    GUIInputPopup(final JComboBox<Object> combo) {
       super(combo);
       final int h = combo.getMaximumRowCount();
       setPreferredSize(new Dimension(getPreferredSize().width, getPopupHeightForRowCount(h) + 2));

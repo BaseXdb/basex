@@ -7,10 +7,11 @@ module namespace dba = 'dba/common';
 
 import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
-import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
+import module namespace html = 'dba/html' at 'modules/html.xqm';
 
 (:~
  : Redirects to the start page.
+ : @return redirection
  :)
 declare
   %rest:path("/dba")
@@ -22,7 +23,7 @@ function dba:redirect(
 (:~
  : Returns a file.
  : @param  $file  file or unknown path
- : @return rest response and binary file
+ : @return rest binary data
  :)
 declare
   %rest:path("/dba/static/{$file=.+}")
@@ -31,7 +32,7 @@ function dba:file(
 ) as item()+ {
   let $path := file:base-dir() || 'static/' || $file
   return (
-    web:response-header(map { 'media-type': web:content-type($path) }),
+    web:response-header(map { 'media-type': web:content-type($path) }, map{'Cache-Control': ''}),
     file:read-binary($path)
   )
 };
@@ -48,7 +49,7 @@ function dba:any(
   $unknown  as xs:string
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(
+  html:wrap(
     <tr>
       <td>
         <h2>Page not found:</h2>
@@ -64,6 +65,7 @@ function dba:any(
 (:~
  : Login error: redirects to the login page.
  : @param  $page page to redirect to
+ : @return redirection
  :)
 declare
   %rest:error("basex:login")

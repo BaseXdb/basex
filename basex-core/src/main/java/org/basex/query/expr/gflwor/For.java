@@ -2,6 +2,7 @@ package org.basex.query.expr.gflwor;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
 import java.util.List;
 
 import org.basex.query.*;
@@ -29,9 +30,9 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class For extends ForLet {
-  /** Position variable. */
+  /** Position variable (can be {@code null}). */
   Var pos;
-  /** Score variable. */
+  /** Score variable (can be {@code null}). */
   Var score;
   /** {@code allowing empty} flag. */
   final boolean empty;
@@ -163,7 +164,7 @@ public final class For extends ForLet {
     if(expr.size() != 1 && !expr.seqType().one()) return false;
     clauses.set(p, Let.fromFor(this));
     if(score != null) clauses.add(p + 1, Let.fromForScore(this));
-    if(pos != null) clauses.add(p + 1, new Let(pos, Int.get(1), false));
+    if(pos != null) clauses.add(p + 1, new Let(pos, Int.ONE, false));
     return true;
   }
 
@@ -223,6 +224,14 @@ public final class For extends ForLet {
     minMax[0] *= factor;
     final long max = minMax[1];
     minMax[1] = sz < 0 ? -1 : max > 0 ? max * factor : max;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof For)) return false;
+    final For f = (For) obj;
+    return Objects.equals(pos, f.pos) && Objects.equals(score, f.score) && empty == f.empty &&
+        super.equals(obj);
   }
 
   @Override

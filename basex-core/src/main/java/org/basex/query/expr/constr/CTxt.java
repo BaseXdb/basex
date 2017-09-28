@@ -33,7 +33,7 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    return optPre(oneIsEmpty() ? null : this, cc);
+    return oneIsEmpty() ? cc.emptySeq(this) : this;
   }
 
   @Override
@@ -54,6 +54,11 @@ public final class CTxt extends CNode {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new CTxt(sc, info, exprs[0].copy(cc, vm));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CTxt && super.equals(obj);
   }
 
   @Override

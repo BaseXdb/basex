@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.Array;
 import org.basex.util.hash.*;
 
 /**
@@ -158,6 +159,15 @@ final class JavaFunc extends JavaFunction {
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(NAM, clazz.getName() + '.' + method), exprs);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof JavaFunc)) return false;
+    final JavaFunc j = (JavaFunc) obj;
+    return clazz.equals(j.clazz) && method.equals(j.method) && Array.equals(types, j.types) &&
+        super.equals(obj);
   }
 
   @Override

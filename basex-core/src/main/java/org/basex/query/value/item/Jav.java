@@ -60,6 +60,11 @@ public final class Jav extends Item {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj == this || obj instanceof Jav && value.equals(((Jav) obj).value);
+  }
+
+  @Override
   public String toString() {
     return Util.info("\"%\"", value);
   }

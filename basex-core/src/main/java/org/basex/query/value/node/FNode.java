@@ -50,8 +50,7 @@ public abstract class FNode extends ANode {
     // compare fragment with database node
     if(node instanceof DBNode) return diff(this, node);
     // compare fragments. due to subtraction, node id can overflow
-    final int d = id - node.id;
-    return d > 0 ? 1 : d < 0 ? -1 : 0;
+    return Integer.compare(id - node.id, 0);
   }
 
   @Override
@@ -228,6 +227,14 @@ public abstract class FNode extends ANode {
         return iter.next();
       }
     };
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FNode)) return false;
+    final FNode a = (FNode) obj;
+    return type.eq(a.type) && Token.eq(value, a.value) && Objects.equals(parent, a.parent);
   }
 
   @Override

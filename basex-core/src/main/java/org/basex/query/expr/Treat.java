@@ -39,7 +39,7 @@ public final class Treat extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? optPre(value(cc.qc), cc) : this;
+    return expr.isValue() ? cc.preEval(this) : this;
   }
 
   @Override
@@ -109,6 +109,12 @@ public final class Treat extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new Treat(info, expr.copy(cc, vm), seqType);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Treat && seqType.eq(((Treat) obj).seqType) &&
+        super.equals(obj);
   }
 
   @Override

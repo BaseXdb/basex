@@ -398,25 +398,27 @@ final class StringParser extends CommandParser {
 
   /**
    * Returns the found command or throws an exception.
-   * @param cmp possible completions
-   * @param par parent command
+   * @param complete possible completions
+   * @param parent parent command
    * @param <E> token type
-   * @return index
+   * @return command, or {@code null} if no nothing can be consumed and if no parent was specified
    * @throws QueryException query exception
    */
-  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par) throws QueryException {
+  private <E extends Enum<E>> E consume(final Class<E> complete, final Cmd parent)
+      throws QueryException {
+
     final String token = command();
     if(!suggest || token == null || !token.isEmpty()) {
       try {
         // return command reference; allow empty strings as input ("NULL")
-        return Enum.valueOf(cmp, token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH));
+        return Enum.valueOf(complete, token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH));
       } catch(final IllegalArgumentException ignore) { }
     }
 
-    final Enum<?>[] alt = startWith(cmp, token);
+    final Enum<?>[] alt = startWith(complete, token);
     // handle empty input
     if(token == null) {
-      if(par != null) throw help(alt, par);
+      if(parent != null) throw help(alt, parent);
       if(suggest) throw error(alt, EXPECTING_CMD);
       return null;
     }
@@ -424,7 +426,7 @@ final class StringParser extends CommandParser {
     // output error for similar commands
     final byte[] name = uc(token(token));
     final Levenshtein ls = new Levenshtein();
-    for(final Enum<?> s : startWith(cmp, null)) {
+    for(final Enum<?> s : startWith(complete, null)) {
       final byte[] sm = uc(token(s.name()));
       if(ls.similar(name, sm) && Cmd.class.isInstance(s)) {
         throw error(alt, UNKNOWN_SIMILAR_X_X, name, sm);
@@ -432,7 +434,7 @@ final class StringParser extends CommandParser {
     }
 
     // show unknown command error or available command extensions
-    throw par == null ? error(alt, UNKNOWN_TRY_X, token) : help(alt, par);
+    throw parent == null ? error(alt, UNKNOWN_TRY_X, token) : help(alt, parent);
   }
 
   /**
@@ -476,24 +478,24 @@ final class StringParser extends CommandParser {
 
   /**
    * Returns a query exception instance.
-   * @param comp input completions
+   * @param complete input completions
    * @param msg message
    * @param ext extension
    * @return query exception
    */
-  private QueryException error(final Enum<?>[] comp, final String msg, final Object... ext) {
-    return new QueryException(parser.info(), new QNm(), msg, ext).suggest(parser, list(comp));
+  private QueryException error(final Enum<?>[] complete, final String msg, final Object... ext) {
+    return new QueryException(parser.info(), new QNm(), msg, ext).suggest(parser, list(complete));
   }
 
   /**
    * Converts the specified commands into a string list.
-   * @param comp input completions
+   * @param complete input completions
    * @return string list
    */
-  private static StringList list(final Enum<?>[] comp) {
+  private static StringList list(final Enum<?>[] complete) {
     final StringList list = new StringList();
-    if(comp != null) {
-      for(final Enum<?> c : comp) list.add(c.name().toLowerCase(Locale.ENGLISH));
+    if(complete != null) {
+      for(final Enum<?> c : complete) list.add(c.name().toLowerCase(Locale.ENGLISH));
     }
     return list;
   }

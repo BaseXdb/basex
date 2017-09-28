@@ -181,13 +181,12 @@ final class SearchContext {
     return nr;
   }
 
-  /**
-   * Compares a search context with another.
-   * @param sc search context
-   * @return result of check
-   */
-  public boolean sameAs(final SearchContext sc) {
-    return sc != null && mcase == sc.mcase && word == sc.word && regex == sc.regex &&
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof SearchContext)) return false;
+    final SearchContext sc = (SearchContext) obj;
+    return mcase == sc.mcase && word == sc.word && regex == sc.regex &&
         multi == sc.multi && Strings.eq(search, sc.search);
   }
 }

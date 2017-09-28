@@ -44,6 +44,12 @@ public final class FNSpace extends FNode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FNSpace && Token.eq(name, ((FNSpace) obj).name) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(NAM, name, VAL, value));
   }
@@ -52,6 +58,6 @@ public final class FNSpace extends FNode {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(Token.XMLNS);
     if(name.length != 0) tb.add(':').add(name);
-    return tb.add('=').add(Atm.toString(value)).toString();
+    return tb.add('=').add(toString(value)).toString();
   }
 }

@@ -57,6 +57,7 @@ abstract class FTData extends QueryTest {
       { "Simple 9", booleans(true), "true() contains text 'true'" },
       { "Simple 10", booleans(true), "false() contains text 'false'" },
       { "Simple 11", booleans(false), "'text' contains text ''" },
+      { "Simple 12", booleans(false), "'t' contains text ftnot { 't' } distance at most 0 words" },
 
       { "FT 1", nodes(14), "//w[text() contains text 'HELLO']" },
       { "FT 2", nodes(14), "//w[text() contains text 'hello']" },

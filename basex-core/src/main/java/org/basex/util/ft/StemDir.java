@@ -17,7 +17,7 @@ public final class StemDir extends TokenMap {
   /**
    * Reads a stop words file.
    * @param fl file reference
-   * @return true if everything went alright
+   * @return success flag
    */
   public boolean read(final IO fl) {
     try {

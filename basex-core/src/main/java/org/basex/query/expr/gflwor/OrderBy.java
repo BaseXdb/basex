@@ -97,29 +97,26 @@ public final class OrderBy extends Clause {
         // be nice to the garbage collector
         tuples = null;
         try {
-          Arrays.sort(perm, new Comparator<Integer>() {
-            @Override
-            public int compare(final Integer x, final Integer y) {
-              try {
-                final Item[] a = ks[x], b = ks[y];
-                final int kl = keys.length;
-                for(int k = 0; k < kl; k++) {
-                  final Key key = keys[k];
-                  Item m = a[k], n = b[k];
-                  if(m == Dbl.NAN || m == Flt.NAN) m = null;
-                  if(n == Dbl.NAN || n == Flt.NAN) n = null;
-                  if(m != null && n != null && !m.comparable(n))
-                    throw castError(n, m.type, key.info);
+          Arrays.sort(perm, (x, y) -> {
+            try {
+              final Item[] a = ks[x], b = ks[y];
+              final int kl = keys.length;
+              for(int k = 0; k < kl; k++) {
+                final Key key = keys[k];
+                Item m = a[k], n = b[k];
+                if(m == Dbl.NAN || m == Flt.NAN) m = null;
+                if(n == Dbl.NAN || n == Flt.NAN) n = null;
+                if(m != null && n != null && !m.comparable(n))
+                  throw castError(n, m.type, key.info);
 
-                  final int c = m == null
-                      ? n == null ? 0                 : key.least ? -1 : 1
-                      : n == null ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info);
-                  if(c != 0) return key.desc ? -c : c;
-                }
-                return 0;
-              } catch(final QueryException ex) {
-                throw new QueryRTException(ex);
+                final int c = m == null
+                    ? n == null ? 0                 : key.least ? -1 : 1
+                    : n == null ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info);
+                if(c != 0) return key.desc ? -c : c;
               }
+              return 0;
+            } catch(final QueryException ex) {
+              throw new QueryRTException(ex);
             }
           });
         } catch(final QueryRTException ex) {
@@ -127,21 +124,6 @@ public final class OrderBy extends Clause {
         }
       }
     };
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem e = planElem();
-    for(final Key key : keys) key.plan(e);
-    plan.add(e);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(ORDER).append(' ').append(BY);
-    final int kl = keys.length;
-    for(int k = 0; k < kl; k++) sb.append(k == 0 ? " " : SEP).append(keys[k]);
-    return sb.toString();
   }
 
   @Override
@@ -205,7 +187,6 @@ public final class OrderBy extends Clause {
       for(final VarRef ref : refs) if(ref.var.id == id) continue outer;
       refs = Array.add(refs, new VarRef(info, decl.get(id)));
     }
-
     return true;
   }
 
@@ -231,6 +212,29 @@ public final class OrderBy extends Clause {
     return sz;
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof OrderBy)) return false;
+    final OrderBy o = (OrderBy) obj;
+    return Array.equals(refs, o.refs) && Array.equals(keys, o.keys);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    for(final Key key : keys) key.plan(e);
+    plan.add(e);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(ORDER).append(' ').append(BY);
+    final int kl = keys.length;
+    for(int k = 0; k < kl; k++) sb.append(k == 0 ? " " : SEP).append(keys[k]);
+    return sb.toString();
+  }
+
   /**
    * Sort key.
    *
@@ -242,7 +246,7 @@ public final class OrderBy extends Clause {
     private final boolean desc;
     /** Position of empty sort keys. */
     private final boolean least;
-    /** Collation. */
+    /** Collation (can be {@code null}). */
     private final Collation coll;
 
     /**
@@ -251,7 +255,7 @@ public final class OrderBy extends Clause {
      * @param key sort key expression
      * @param desc descending order
      * @param least empty least
-     * @param coll collation
+     * @param coll collation (can be {@code null})
      */
     public Key(final InputInfo info, final Expr key, final boolean desc, final boolean least,
         final Collation coll) {
@@ -264,6 +268,20 @@ public final class OrderBy extends Clause {
     @Override
     public Key copy(final CompileContext cc, final IntObjMap<Var> vm) {
       return new Key(info, expr.copy(cc, vm), desc, least, coll);
+    }
+
+    @Override
+    public int exprSize() {
+      return expr.exprSize();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if(this == obj) return true;
+      if(!(obj instanceof Key)) return false;
+      final Key k = (Key) obj;
+      return desc == k.desc && least == k.least && Objects.equals(coll, k.coll) &&
+          super.equals(obj);
     }
 
     @Override
@@ -281,11 +299,6 @@ public final class OrderBy extends Clause {
       tb.add(' ').add(EMPTYORD).add(' ').add(least ? LEAST : GREATEST);
       if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
       return tb.toString();
-    }
-
-    @Override
-    public int exprSize() {
-      return expr.exprSize();
     }
   }
 }

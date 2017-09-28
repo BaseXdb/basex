@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.core.Context;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -64,14 +63,12 @@ public final class DBNodes extends DBNodeSeq {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof DBNodes)) return false;
-    final DBNodes n = (DBNodes) cmp;
-    final int[] ps = pres, ps2 = n.pres;
-    final int pl = ps.length;
-    if(pl != ps2.length || data != n.data) return false;
-    for(int p = 0; p < pl; ++p) if(ps2[p] != ps[p]) return false;
-    return ftpos == null ? n.ftpos == null : ftpos.sameAs(n.ftpos);
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof DBNodes)) return false;
+    final DBNodes n = (DBNodes) obj;
+    return data == n.data && Arrays.equals(pres, n.pres) &&
+        (ftpos == null ? n.ftpos == null : ftpos.equals(n.ftpos));
   }
 
   @Override

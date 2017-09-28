@@ -5,6 +5,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -13,7 +14,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class BaseXCombo extends JComboBox<String> {
+public final class BaseXCombo extends JComboBox<Object> {
   /** Options. */
   private Options options;
   /** Option. */
@@ -21,47 +22,73 @@ public final class BaseXCombo extends JComboBox<String> {
 
   /**
    * Constructor.
-   * @param ch combobox choices
-   * @param opt option
-   * @param opts options
+   * @param option option
+   * @param options options
+   * @param values combobox values
    * @param win parent window
    */
-  public BaseXCombo(final Window win, final NumberOption opt, final Options opts,
-      final String... ch) {
-    this(win, (Option<?>) opt, opts, ch);
-    setSelectedIndex(opts.get(opt));
+  public BaseXCombo(final NumberOption option, final Options options, final String[] values,
+      final Window win) {
+    this(option, options, values, values[options.get(option)], win);
   }
 
   /**
    * Constructor.
-   * @param ch combobox choices
-   * @param opt option
-   * @param opts options
+   * @param option option
+   * @param options options
    * @param win parent window
    */
-  private BaseXCombo(final Window win, final Option<?> opt, final Options opts,
-      final String... ch) {
-    this(win, ch);
-    options = opts;
-    option = opt;
+  public BaseXCombo(final BooleanOption option, final Options options, final Window win) {
+    this(option, options, new String[] { "true", "false" }, options.get(option), win);
   }
 
   /**
    * Constructor.
-   * @param ch combobox choices
+   * @param option option
+   * @param options options
    * @param win parent window
    */
-  public BaseXCombo(final Window win, final String... ch) {
-    super(ch);
+  public BaseXCombo(final EnumOption<?> option, final Options options, final Window win) {
+    this(option, options, option.strings(), options.get(option), win);
+  }
+
+  /**
+   * Constructor.
+   * @param option option
+   * @param options options
+   * @param values values
+   * @param selected selected value
+   * @param win parent window
+   */
+  private BaseXCombo(final Option<?> option, final Options options, final String[] values,
+      final Object selected, final Window win) {
+    this(values, win);
+    this.options = options;
+    this.option = option;
+    setSelectedItem(selected.toString());
+  }
+
+  /**
+   * Constructor.
+   * @param win parent window
+   */
+  public BaseXCombo(final Window win) {
+    this(new String[] {}, win);
+  }
+
+  /**
+   * Constructor.
+   * @param values combobox values
+   * @param win parent window
+   */
+  public BaseXCombo(final String[] values, final Window win) {
+    super(values);
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof BaseXDialog)) return;
 
     final BaseXDialog d = (BaseXDialog) win;
-    addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(final ItemEvent ie) {
-        if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) d.action(ie.getSource());
-      }
+    addItemListener(ie -> {
+      if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) d.action(ie.getSource());
     });
   }
 
@@ -75,7 +102,7 @@ public final class BaseXCombo extends JComboBox<String> {
   public void setSelectedItem(final Object object) {
     if(object == null) return;
     final String value = object.toString();
-    final ComboBoxModel<String> m = getModel();
+    final ComboBoxModel<Object> m = getModel();
     final int s = m.getSize();
     for(int i = 0; i < s; i++) {
       if(m.getElementAt(i).equals(value)) {
@@ -91,8 +118,14 @@ public final class BaseXCombo extends JComboBox<String> {
   public void assign() {
     if(option instanceof NumberOption) {
       options.set((NumberOption) option, getSelectedIndex());
-    } else {
+    } else if(option instanceof EnumOption) {
+      options.set((EnumOption<?>) option, getSelectedItem());
+    } else if(option instanceof StringOption) {
       options.set((StringOption) option, getSelectedItem());
+    } else if(option instanceof BooleanOption) {
+      options.set((BooleanOption) option, Boolean.parseBoolean(getSelectedItem()));
+    } else {
+      throw Util.notExpected("Option type not supported: " + option);
     }
   }
 }

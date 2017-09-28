@@ -111,7 +111,7 @@ public final class List extends Command {
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     final Table table = new Table();
-    table.description = RESOURCES;
+    table.description = RESOURCES_X;
     table.header.add(INPUT_PATH);
     table.header.add(TYPE);
     table.header.add(DataText.CONTENT_TYPE);

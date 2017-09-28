@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -26,7 +28,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CmpSR extends Single {
-  /** Collation. */
+  /** Collation (can be {@code null}). */
   private final Collation coll;
   /** Minimum. */
   private final byte[] min;
@@ -46,7 +48,7 @@ final class CmpSR extends Single {
    * @param mni include minimum value
    * @param max maximum value
    * @param mxi include maximum value
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param info input info
    */
   private CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
@@ -65,7 +67,7 @@ final class CmpSR extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? optPre(item(cc.qc, info), cc) : this;
+    return expr.isValue() ? cc.preEval(this) : this;
   }
 
   /**
@@ -128,7 +130,7 @@ final class CmpSR extends Single {
    */
   Expr intersect(final CmpSR c) {
     // skip intersection if expressions to be compared are different
-    if(!(coll == null && c.expr.sameAs(expr))) return null;
+    if(!(coll == null && c.expr.equals(expr))) return null;
 
     // find common minimum and maximum value
     final byte[] mn = min == null ? c.min : c.min == null ? min : Token.max(min, c.min);
@@ -176,8 +178,22 @@ final class CmpSR extends Single {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof CmpSR)) return false;
+    final CmpSR c = (CmpSR) obj;
+    return Token.eq(min, c.min) && mni == c.mni && Token.eq(max, c.max) && mxi && c.mxi &&
+        Objects.equals(coll, c.coll) && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(MIN, min != null ? min : "", MAX, max != null ? max : ""), expr);
+  }
+
+  @Override
+  public String description() {
+    return "string range comparison";
   }
 
   @Override

@@ -7,7 +7,6 @@ import java.math.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -89,15 +88,6 @@ public final class Dtm extends ADate {
   public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
     tz(zone, spec, ii);
-  }
-
-  @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Dtm)) return false;
-    final Dtm dtm = (Dtm) cmp;
-    return type == dtm.type && yea == dtm.yea && mon == dtm.mon && day == dtm.day &&
-        hou == dtm.hou && min == dtm.min && tz == dtm.tz &&
-        sec == null ? dtm.sec == null : sec.compareTo(dtm.sec) == 0;
   }
 
   /**

@@ -45,8 +45,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param anns annotations
    * @param name function name
    * @param args arguments
-   * @param type declared return type
-   * @param expr function body
+   * @param type declared return type (can be {@code null})
+   * @param expr function body (can be {@code null})
    * @param doc xqdoc string
    * @param vs variable scope
    * @param info input info
@@ -276,7 +276,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     cc.info(OPTINLINE_X, id());
 
     // create let bindings for all variables
-    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
+    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<>();
     final IntObjMap<Var> vars = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
@@ -305,6 +305,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       limit = args.length > 0 ? ((ANum) args[0]).itr() : Long.MAX_VALUE;
     }
     return expr.isValue() || expr.exprSize() < limit;
+  }
+
+  @Override
+  public String description() {
+    return "Function declaration";
   }
 
   @Override

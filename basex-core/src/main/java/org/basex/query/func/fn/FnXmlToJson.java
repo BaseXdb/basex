@@ -23,14 +23,14 @@ public class FnXmlToJson extends FnParseJson {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(exprs[0], qc);
     final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
-    jopts.set(JsonOptions.FORMAT, JsonFormat.BASIC);
+    if(node == null) return null;
 
-    // no indentation specified: adopt module indentation
+    jopts.set(JsonOptions.FORMAT, JsonFormat.BASIC);
     final Boolean indent = jopts.get(JsonSerialOptions.INDENT);
+    // no indentation specified: adopt module indentation
     if(indent == null) jopts.set(JsonSerialOptions.INDENT,
         qc.serParams().get(SerializerOptions.INDENT) == YesNo.YES);
 
-    return node == null ? null :
-      Str.get(serialize(node.iter(), JsonSerialize.options(jopts), INVALIDOPT_X, qc));
+    return Str.get(serialize(node.iter(), JsonSerialize.options(jopts), INVALIDOPT_X, qc));
   }
 }

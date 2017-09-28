@@ -54,8 +54,8 @@ public final class Version implements Comparable<Version> {
   }
 
   @Override
-  public boolean equals(final Object o) {
-    return o instanceof Version && compareTo((Version) o) == 0;
+  public boolean equals(final Object obj) {
+    return obj instanceof Version && compareTo((Version) obj) == 0;
   }
 
   @Override

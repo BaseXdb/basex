@@ -59,7 +59,7 @@ abstract class Set extends Arr {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  protected abstract ANodeList eval(Iter[] iters, QueryContext qc) throws QueryException;
+  protected abstract ANodeBuilder eval(Iter[] iters, QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.

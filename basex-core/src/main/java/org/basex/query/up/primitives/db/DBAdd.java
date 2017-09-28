@@ -2,8 +2,6 @@ package org.basex.query.up.primitives.db;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
@@ -41,9 +39,7 @@ public final class DBAdd extends DBUpdate {
     this.replace = replace;
 
     final DBOptions options = new DBOptions(opts, DBOptions.PARSING, info);
-    final List<NewInput> docs = new ArrayList<>();
-    docs.add(input);
-    newDocs = new DBNew(qc, docs, options, info);
+    newDocs = new DBNew(qc, options, info, input);
   }
 
   @Override

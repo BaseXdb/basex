@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class DocTest extends QueryTest {
-  /** Constructor. */
   static {
     create(
       "<?xml version='1.0' encoding='iso-8859-1'?>\n" +
@@ -105,10 +104,8 @@ public final class DocTest extends QueryTest {
       { "PosPred 8", empty(), "//*[1.1]" },
       { "PosPred 9", nodes(8, 15, 19, 22), "//*[position() > 1.1]" },
       { "PosPred A", empty(), "//*[position() <= 0.9]" },
-      { "PosPred B", strings("XML"), "(('XML')[1])[1]" },
-      { "PosPred C", integers(1), "1[position() = 1 to 2]" },
-      { "PosPred D", empty(), "//li[last()][contains(text(), '1')]" },
-      { "PosPred D", nodes(22), "//li[last()][contains(text(), '2')]" },
+      { "PosPred B", empty(), "//li[last()][contains(text(), '1')]" },
+      { "PosPred C", nodes(22), "//li[last()][contains(text(), '2')]" },
 
       { "Prec 1", nodes(3, 5), "//body/preceding::*" },
       { "Prec 2", nodes(3, 5), "//@id/preceding::*" },

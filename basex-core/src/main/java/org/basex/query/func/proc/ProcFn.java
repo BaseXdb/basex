@@ -26,7 +26,7 @@ abstract class ProcFn extends StandardFunc {
    * Returns the result of a command.
    * @param qc query context
    * @param fork fork process
-   * @return result
+   * @return result, or {@code null} if process is forked
    * @throws QueryException query exception
    */
   final Result exec(final QueryContext qc, final boolean fork) throws QueryException {
@@ -89,20 +89,17 @@ abstract class ProcFn extends StandardFunc {
     outt.start();
     errt.start();
 
-    final Thread thread = new Thread() {
-      @Override
-      public void run() {
+    final Thread thread = new Thread(() -> {
+      try {
+        proc.waitFor();
+        outt.join();
+        errt.join();
+      } catch(final InterruptedException ex) {
         try {
-          proc.waitFor();
-          outt.join();
-          errt.join();
-        } catch(final InterruptedException ex) {
-          try {
-            result.error.write(token(Util.message(ex)));
-          } catch(final IOException ignored) { }
-        }
+          result.error.write(token(Util.message(ex)));
+        } catch(final IOException ignored) { }
       }
-    };
+    });
     thread.start();
 
     final Performance perf = new Performance();
@@ -134,16 +131,13 @@ abstract class ProcFn extends StandardFunc {
   private static Thread reader(final InputStream in, final ArrayOutput ao, final Charset cs) {
     final InputStreamReader isr = new InputStreamReader(in, cs);
     final BufferedReader br = new BufferedReader(isr);
-    return new Thread() {
-      @Override
-      public void run() {
-        try {
-          for(int b; (b = br.read()) != -1;) ao.write(b);
-        } catch(final IOException ex) {
-          Util.stack(ex);
-        }
+    return new Thread(() -> {
+      try {
+        for(int b; (b = br.read()) != -1;) ao.write(b);
+      } catch(final IOException ex) {
+        Util.stack(ex);
       }
-    };
+    });
   }
 
   /**

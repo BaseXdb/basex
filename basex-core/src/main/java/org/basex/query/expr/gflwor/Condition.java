@@ -3,6 +3,8 @@ package org.basex.query.expr.gflwor;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -22,23 +24,23 @@ import org.basex.util.hash.*;
 public final class Condition extends Single {
   /** Start condition flag. */
   private final boolean start;
-  /** Item variable. */
+  /** Item variable (can be {@code null}). */
   private final Var item;
-  /** Position variable. */
+  /** Position variable (can be {@code null}). */
   private final Var pos;
-  /** Previous item. */
+  /** Previous item (can be {@code null}). */
   private final Var prev;
-  /** Next item. */
+  /** Next item (can be {@code null}). */
   private final Var next;
 
   /**
    * Constructor.
    * @param start start condition flag
-   * @param item item variable
-   * @param pos position variable
-   * @param prev previous variable
-   * @param next next variable
-   * @param cond condition expression
+   * @param item item variable (can be {@code null})
+   * @param pos position variable (can be {@code null})
+   * @param prev previous variable (can be {@code null})
+   * @param next next variable (can be {@code null})
+   * @param cond condition
    * @param info input info
    */
   public Condition(final boolean start, final Var item, final Var pos, final Var prev,
@@ -146,6 +148,29 @@ public final class Condition extends Single {
   }
 
   @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return (item == null || visitor.declared(item))
+        && (pos  == null || visitor.declared(pos))
+        && (prev == null || visitor.declared(prev))
+        && (next == null || visitor.declared(next))
+        && expr.accept(visitor);
+  }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Condition)) return false;
+    final Condition c = (Condition) obj;
+    return Objects.equals(item, c.item) && Objects.equals(pos, c.pos) &&
+           Objects.equals(prev, c.prev) && Objects.equals(next, c.next) && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = new FElem(start ? START : END);
 
@@ -163,20 +188,6 @@ public final class Condition extends Single {
 
     expr.plan(e);
     plan.add(e);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return (item == null || visitor.declared(item))
-        && (pos  == null || visitor.declared(pos))
-        && (prev == null || visitor.declared(prev))
-        && (next == null || visitor.declared(next))
-        && expr.accept(visitor);
-  }
-
-  @Override
-  public int exprSize() {
-    return expr.exprSize();
   }
 
   @Override

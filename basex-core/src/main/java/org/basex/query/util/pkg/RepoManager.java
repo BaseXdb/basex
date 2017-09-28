@@ -27,10 +27,7 @@ public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
   /** Ignore files starting with a dot. */
-  private static final FileFilter DOT_FILE_FILTER = new FileFilter() {
-    @Override public boolean accept(final File file) {
-      return !file.getName().startsWith(".");
-  }};
+  private static final FileFilter DOT_FILE_FILTER = file -> !file.getName().startsWith(".");
   /** Context. */
   private final Context context;
   /** Input info. */

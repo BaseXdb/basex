@@ -57,12 +57,12 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     try {
       serv.setNamespace("hell", null);
       fail("Null URIs are not allowed.");
-    } catch(final XMLDBException ex) { }
+    } catch(final XMLDBException ignored) { }
 
     try {
       coll.createResource("hans", "");
       fail("Empty URIs are not allowed.");
-    } catch(final XMLDBException ex) { }
+    } catch(final XMLDBException ignored) { }
   }
 
   /**
@@ -119,7 +119,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     try {
       serv.query("1+");
       fail("Buggy query was accepted.");
-    } catch(final XMLDBException ex) { }
+    } catch(final XMLDBException ignored) { }
 
     assertEquals("Wrong result size.", 1, serv.query("/").getSize());
 

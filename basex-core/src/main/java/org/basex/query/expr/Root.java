@@ -39,13 +39,13 @@ public final class Root extends Simple {
   @Override
   public Expr optimize(final CompileContext cc) {
     final Value v = cc.qc.focus.value;
-    return v != null && v.type == NodeType.DOC && v.size() == 1 ? v : this;
+    return v != null && v.type == NodeType.DOC && v.size() == 1 ? cc.replaceWith(this, v) : this;
   }
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final Iter iter = ctxValue(qc).iter();
-    final ANodeList list = new ANodeList().check();
+    final ANodeBuilder list = new ANodeBuilder();
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
       final ANode n = it instanceof ANode ? ((ANode) it).root() : null;
@@ -76,8 +76,8 @@ public final class Root extends Simple {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Root;
+  public boolean equals(final Object obj) {
+    return obj instanceof Root;
   }
 
   @Override

@@ -12,7 +12,7 @@ import org.basex.query.func.jobs.*;
  */
 public final class JobTask extends TimerTask {
   /** Job. */
-  public final ScheduledXQuery job;
+  public final Scheduled job;
   /** Job pool. */
   public final JobPool jobs;
   /** Interval. */
@@ -31,7 +31,7 @@ public final class JobTask extends TimerTask {
    * @param interval interval (ms)
    * @param duration total duration (ms)
    */
-  public JobTask(final ScheduledXQuery job, final JobPool jobs, final long delay,
+  public JobTask(final Scheduled job, final JobPool jobs, final long delay,
       final long interval, final long duration) {
 
     this.job = job;

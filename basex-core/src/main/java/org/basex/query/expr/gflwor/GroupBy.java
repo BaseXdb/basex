@@ -47,8 +47,7 @@ public final class GroupBy extends Clause {
     super(info, vars(specs, post));
     this.specs = specs;
     this.post = post;
-    preExpr = new Expr[pre.length];
-    System.arraycopy(pre, 0, preExpr, 0, pre.length);
+    preExpr = Array.copy(pre, new Expr[pre.length]);
     int n = 0;
     for(final Spec spec : specs) if(!spec.occluded) n++;
     nonOcc = n;
@@ -211,7 +210,7 @@ public final class GroupBy extends Clause {
   @Override
   public GroupBy compile(final CompileContext cc) throws QueryException {
     for(final Expr e : preExpr) e.compile(cc);
-    for(final Spec b : specs) b.compile(cc);
+    for(final Spec s : specs) s.compile(cc);
     return optimize(cc);
   }
 
@@ -298,8 +297,17 @@ public final class GroupBy extends Clause {
   public int exprSize() {
     int sz = 0;
     for(final Expr e : preExpr) sz += e.exprSize();
-    for(final Expr e : specs) sz += e.exprSize();
+    for(final Expr s : specs) sz += s.exprSize();
     return sz;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof GroupBy)) return false;
+    final GroupBy g = (GroupBy) obj;
+    return Array.equals(specs, g.specs) && Array.equals(preExpr, g.preExpr) &&
+        Array.equals(post, g.post);
   }
 
   @Override
@@ -334,7 +342,7 @@ public final class GroupBy extends Clause {
     public final Var var;
     /** Occlusion flag, {@code true} if another grouping variable shadows this one. */
     public boolean occluded;
-    /** Collation. */
+    /** Collation (can be {@code null}). */
     private final Collation coll;
 
     /**
@@ -343,7 +351,7 @@ public final class GroupBy extends Clause {
      * @param info input info
      * @param var grouping variable
      * @param expr grouping expression
-     * @param coll collation
+     * @param coll collation (can be {@code null})
      */
     public Spec(final InputInfo info, final Var var, final Expr expr, final Collation coll) {
       super(info, expr);
@@ -364,6 +372,20 @@ public final class GroupBy extends Clause {
     }
 
     @Override
+    public Expr compile(final CompileContext cc) throws QueryException {
+      return super.compile(cc).optimize(cc);
+    }
+
+    @Override
+    public Spec optimize(final CompileContext cc) throws QueryException {
+      final SeqType st = expr.seqType();
+      seqType = (st.type instanceof NodeType ? AtomType.ATM :
+        st.mayBeArray() ? AtomType.ITEM : st.type).seqType();
+      var.refineType(seqType, cc);
+      return this;
+    }
+
+    @Override
     public boolean accept(final ASTVisitor visitor) {
       return expr.accept(visitor) && visitor.declared(var);
     }
@@ -371,6 +393,15 @@ public final class GroupBy extends Clause {
     @Override
     public int exprSize() {
       return expr.exprSize();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if(this == obj) return true;
+      if(!(obj instanceof Spec)) return false;
+      final Spec s = (Spec) obj;
+      return var.equals(s.var) && occluded == s.occluded && Objects.equals(coll, s.coll) &&
+          super.equals(obj);
     }
 
     @Override
@@ -383,8 +414,8 @@ public final class GroupBy extends Clause {
 
     @Override
     public String toString() {
-      final TokenBuilder tb = new TokenBuilder().add(var.toString()).add(' ').add(ASSIGN);
-      tb.add(' ').add(expr.toString());
+      final TokenBuilder tb = new TokenBuilder();
+      tb.addExt(var).add(' ').add(ASSIGN).add(' ').addExt(expr);
       if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
       return tb.toString();
     }

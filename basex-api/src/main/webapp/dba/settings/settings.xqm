@@ -7,66 +7,98 @@ module namespace dba = 'dba/settings';
 
 import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
+import module namespace html = 'dba/html' at '../modules/html.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'settings';
 
 (:~
  : Settings page.
+ : @param  $error  error string
+ : @param  $info   info string
+ : @return page
  :)
 declare
   %rest:GET
   %rest:path("/dba/settings")
+  %rest:query-param("error", "{$error}")
+  %rest:query-param("info",  "{$info}")
   %output:method("html")
 function dba:settings(
-) as element() {
+  $error  as xs:string?,
+  $info   as xs:string?
+) as element(html) {
   cons:check(),
-
-  tmpl:wrap(map { 'top': $dba:CAT },
+  let $system := html:properties(db:system())
+  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
-      <td>
+      <td width='32%'>
         <form action="settings" method="post">
           <h2>Settings » <button>Save</button></h2>
+          <h3>Querying</h3>
           <table>
-            <tr>
-              <td colspan='2'><h3>Querying</h3></td>
-            </tr>
             {
-              for $option in element options {
-                element { $cons:K-TIMEOUT  } { '…timeout for queries, in seconds (0: disabled)' },
-                element { $cons:K-MEMORY   } { '…memory limit for queries, in MB (0: disabled)' },
-                element { $cons:K-MAXCHARS } { '…maximum number of characters in query results' },
-                element { $cons:K-MAXROWS  } { '…maximum number of displayed table rows'        }
-              }/*
-              let $key := name($option)
-              return <tr>
-                <td><b>{ upper-case($key) }:</b></td>
-                <td><input name="{ $key }" type="number" value="{ $cons:OPTION($key) }"/>
-                  <span class='note'> &#xa0; { $option/text() }</span>
-                </td>
-              </tr>
+              dba:input($cons:K-TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
+              dba:input($cons:K-MEMORY, 'Memory limit, in MB (0 = disabled)'),
+              dba:input($cons:K-MAXCHARS, 'Maximum output size')
             }
             <tr>
-              <td><b>PERMISSION:</b></td>
+              <td colspan='2'>Permission:</td>
+            </tr>
+            <tr>
               <td>
                 <select name="permission">{
                   let $pm := $cons:OPTION($cons:K-PERMISSION)
                   for $p in $cons:PERMISSIONS
                   return element option { attribute selected { }[$p = $pm], $p }
                 }</select>
-                <span class='note'> &#xa0; …for query evaluation</span>
               </td>
             </tr>
           </table>
+          <h3>Tables</h3>
+          <table>
+            { dba:input($cons:K-MAXROWS,  'Displayed table rows') }
+          </table>
         </form>
+      </td>
+      <td class='vertical'/>
+      <td width='32%'>
+        <h2>Global Options</h2>
+        <table>{
+          $system/tr[th][3]/preceding-sibling::tr[not(th)]
+        }</table>
+      </td>
+      <td class='vertical'/>
+      <td width='32%'>
+        <h2>Local Options</h2>
+        <table>{
+          $system/tr[th][3]/following-sibling::tr
+        }</table>
       </td>
     </tr>
   )
 };
 
 (:~
+ : Returns a text input component.
+ : @param  $key    key
+ : @param  $label  label
+ : @return table row
+ :)
+declare %private function dba:input(
+  $key    as xs:string,
+  $value  as xs:string
+) as element(tr)* {
+  <tr>
+    <td>{ $value }:<br/>
+      <input name="{ $key }" type="number" value="{ $cons:OPTION($key) }"/>
+    </td>
+  </tr>
+};
+
+(:~
  : Saves the settings.
+ : @return redirection
  :)
 declare
   %rest:POST
@@ -75,7 +107,6 @@ declare
 function dba:settings-save(
 ) as element(rest:response) {
   cons:check(),
-
   let $config := element config {
     for $key in Request:parameter-names()
     return element { $key } { Request:parameter($key) }
@@ -83,6 +114,6 @@ function dba:settings-save(
   return (
     file:create-dir($cons:DBA-DIR),
     file:write($cons:DBA-SETTINGS-FILE, $config),
-    web:redirect("settings")
+    web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
   )
 };

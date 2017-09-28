@@ -8,7 +8,6 @@ module namespace dba = 'dba/login';
 import module namespace Session = 'http://basex.org/modules/session';
 import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
 import module namespace html = 'dba/html' at 'modules/html.xqm';
-import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
 
 (:~
  : Login page.
@@ -28,7 +27,7 @@ function dba:welcome(
   $error  as xs:string?,
   $path   as xs:string?
 ) as element(html) {
-  tmpl:wrap(map { 'error': $error },
+  html:wrap(map { 'error': $error },
     <tr>
       <td>
         <form action="login-check" method="post">
@@ -64,7 +63,7 @@ function dba:welcome(
  : @param  $name  user name
  : @param  $pass  password
  : @param  $path  path to redirect to (optional)
- : @return redirect
+ : @return redirection
  :)
 declare
   %rest:path("/dba/login-check")
@@ -79,18 +78,18 @@ function dba:login(
   try {
     user:check($name, $pass),
     if(user:list-details($name)/@permission != 'admin') then (
-      dba:reject($name, 'Admin credentials required.', $path)
+      dba:reject($name, 'Admin credentials required', $path)
     ) else (
       dba:accept($name, $pass, $path)
     )
   } catch user:* {
-    dba:reject($name, 'Please check your login data.', $path)
+    dba:reject($name, 'Please check your login data', $path)
   }
 };
 
 (:~
  : Ends a session and redirects to the login page.
- : @return redirect
+ : @return redirection
  :)
 declare
   %rest:path("/dba/logout")
@@ -105,13 +104,13 @@ function dba:logout(
  : Accepts a user and redirects to the main page.
  : @param  $name  entered user name
  : @param  $path  path to redirect to
- : @return redirect
+ : @return redirection
  :)
 declare %private function dba:accept(
   $name  as xs:string,
   $pass  as xs:string,
   $path  as xs:string?
-) {
+) as element(rest:response) {
   Session:set($cons:SESSION-KEY, $name),
   admin:write-log('DBA user was logged in: ' || $name),
   web:redirect(if($path) then $path else "databases")
@@ -122,7 +121,7 @@ declare %private function dba:accept(
  : @param  $name     entered user name
  : @param  $message  error message
  : @param  $path     path to redirect to
- : @return redirect
+ : @return redirection
  :)
 declare %private function dba:reject(
   $name     as xs:string,

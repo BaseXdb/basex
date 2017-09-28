@@ -39,7 +39,7 @@ public final class Instance extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? preEval(cc) : this;
+    return expr.isValue() ? cc.preEval(this) : this;
   }
 
   @Override
@@ -50,6 +50,12 @@ public final class Instance extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new Instance(info, expr.copy(cc, vm), type);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Instance && type.eq(((Instance) obj).type) &&
+        super.equals(obj);
   }
 
   @Override

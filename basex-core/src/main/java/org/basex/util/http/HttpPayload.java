@@ -278,7 +278,7 @@ public final class HttpPayload {
             // assign file and contents, join multiple files
             final Map map = val instanceof Map ? (Map) val : Map.EMPTY;
             final Str file = Str.get(filename);
-            final B64 contents = new B64(cont.next());
+            final B64 contents = B64.get(cont.next());
             final Value files = new ValueBuilder().add(map.get(file, info)).add(contents).value();
             val = map.put(file, files, info);
           } else {
@@ -297,7 +297,7 @@ public final class HttpPayload {
       } else if(startsWith(line, CONTENT_DISPOSITION)) {
         // get key and file name
         name = contains(line, token(NAME + '=')) ?
-          string(line).replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[\\]", "") : null;
+          string(line).replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[]", "") : null;
         filename = contains(line, token(FILENAME + '=')) ?
           string(line).replaceAll("^.*" + FILENAME + "=\"|\"$", "") : null;
       } else if(line.length == 0) {
@@ -327,7 +327,7 @@ public final class HttpPayload {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
       opts.assign(type);
       value = JsonConverter.get(opts).convert(input);
-    } else if(type.is(MediaType.TEXT_CSV)) {
+    } else if(type.isCSV()) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
       opts.assign(type);
       value = CsvConverter.get(opts).convert(input);
@@ -349,6 +349,6 @@ public final class HttpPayload {
         value = hp.payloads();
       }
     }
-    return value == null ? new B64(input.read()) : value;
+    return value == null ? B64.get(input.read()) : value;
   }
 }

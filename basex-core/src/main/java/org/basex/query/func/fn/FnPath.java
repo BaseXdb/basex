@@ -81,4 +81,10 @@ public final class FnPath extends StandardFunc {
   public boolean accept(final ASTVisitor visitor) {
     return (exprs.length != 0 || visitor.lock(Locking.CONTEXT)) && super.accept(visitor);
   }
+
+  @Override
+  protected FnPath opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

@@ -255,7 +255,7 @@ public class Options implements Iterable<Option<?>> {
    * @param <O> options
    * @return value
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "cast"})
   public final synchronized <O extends Options> O get(final OptionsOption<O> option) {
     return (O) get((Option<?>) option);
   }
@@ -266,7 +266,7 @@ public class Options implements Iterable<Option<?>> {
    * @param <V> enumeration value
    * @return value
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "cast"})
   public final synchronized <V extends Enum<V>> V get(final EnumOption<V> option) {
     return (V) get((Option<?>) option);
   }
@@ -550,6 +550,16 @@ public class Options implements Iterable<Option<?>> {
     }
   }
 
+  /**
+   * Returns the names of all options.
+   * @return names
+   */
+  public final synchronized String[] names() {
+    final StringList sl = new StringList(options.size());
+    for(final Option<?> option : this) sl.add(option.name());
+    return sl.finish();
+  }
+
   @Override
   public final synchronized Iterator<Option<?>> iterator() {
     return options.values().iterator();
@@ -725,17 +735,16 @@ public class Options implements Iterable<Option<?>> {
    * @param item value of option
    * @param error raise error if option is unknown
    * @param ii input info
-   * @return success flag
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private synchronized boolean assign(final String name, final Item item, final boolean error,
+  private synchronized void assign(final String name, final Item item, final boolean error,
       final InputInfo ii) throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
       if(error) throw new BaseXException(error(name));
-      return false;
+      return;
     }
 
     if(option instanceof BooleanOption) {
@@ -791,7 +800,6 @@ public class Options implements Iterable<Option<?>> {
     } else {
       throw Util.notExpected("Unsupported option: " + option);
     }
-    return true;
   }
 
   /**

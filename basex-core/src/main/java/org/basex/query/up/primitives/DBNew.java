@@ -34,24 +34,28 @@ public final class DBNew {
   /** Input info. */
   private final InputInfo info;
   /** Main options for all inputs to be added. */
-  private final List<DBOptions> dboptions = new ArrayList<>();
+  private final List<DBOptions> dboptions;
 
   /**
    * Constructor.
    * @param qc query context
-   * @param inputs input
    * @param options database options
    * @param info input info
+   * @param list list of inputs
    */
-  public DBNew(final QueryContext qc, final List<NewInput> inputs, final DBOptions options,
-      final InputInfo info) {
+  public DBNew(final QueryContext qc, final DBOptions options, final InputInfo info,
+      final NewInput... list) {
 
     this.qc = qc;
-    this.inputs = inputs;
     this.info = info;
 
-    final int is = inputs.size();
-    for(int i = 0; i < is; i++) dboptions.add(options);
+    final int is = list.length;
+    inputs = new ArrayList<>(is);
+    dboptions = new ArrayList<>(is);
+    for(int i = 0; i < is; i++) {
+      inputs.add(list[i]);
+      dboptions.add(options);
+    }
   }
 
   /**
@@ -59,11 +63,8 @@ public final class DBNew {
    * @param add inputs to be added
    */
   public void merge(final DBNew add) {
-    final int is = add.inputs.size();
-    for(int i = 0; i < is; i++) {
-      inputs.add(add.inputs.get(i));
-      dboptions.add(add.dboptions.get(i));
-    }
+    inputs.addAll(add.inputs);
+    dboptions.addAll(add.dboptions);
   }
 
   /**
@@ -92,8 +93,8 @@ public final class DBNew {
       data = cache ? CreateDB.create(sopts.randomDbName(name),
           Parser.emptyParser(mopts), ctx, mopts) : new MemData(mopts);
       data.startUpdate(mopts);
-      final long ds = inputs.size();
-      for(int i = 0; i < ds; i++) {
+      final long is = inputs.size();
+      for(int i = 0; i < is; i++) {
         final DataClip clip = data(name, i);
         // clear list to recover memory
         inputs.set(i, null);

@@ -32,7 +32,7 @@ public final class FTNot extends FTExpr {
   @Override
   public FTExpr compile(final CompileContext cc) throws QueryException {
     super.compile(cc);
-    return exprs[0] instanceof FTNot ? exprs[0].exprs[0] : this;
+    return exprs[0] instanceof FTNot ? (FTExpr) cc.replaceWith(this, exprs[0].exprs[0]) : this;
   }
 
   @Override
@@ -84,7 +84,7 @@ public final class FTNot extends FTExpr {
     if(i == m.size()) {
       all.add(new FTMatch());
     } else {
-      for(final FTStringMatch s : m.match[i]) {
+      for(final FTStringMatch s : m.list[i]) {
         s.exclude ^= true;
         for(final FTMatch tmp : not(m, i + 1)) {
           all.add(new FTMatch(1 + tmp.size()).add(s).add(tmp));
@@ -107,6 +107,11 @@ public final class FTNot extends FTExpr {
   @Override
   public boolean usesExclude() {
     return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTNot && super.equals(obj);
   }
 
   @Override

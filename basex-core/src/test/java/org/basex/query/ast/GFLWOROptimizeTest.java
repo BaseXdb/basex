@@ -261,7 +261,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
     );
   }
 
-  /** Tests if {@link And} expressions inside {@code where} are split. */
+  /** Ensures that non-deterministic expressions are not inlined. */
   @Test public void dontInlineNDTTest() {
     check("let $rnd := random:double() return (1 to 10) ! $rnd",
         null,
@@ -271,12 +271,14 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
 
   /** Checks that clauses can be removed during inlining. */
   @Test public void gh1150() {
-    check("for $i in 1 to xs:integer(random:double()) let $x := 'does-not-exist.xml' "
-        + "for $x in doc($x) let $x := count($x) return $x",
+    check("for $i in 1 to xs:integer(random:double()) "
+        + "let $x := 'does-not-exist.xml' "
+        + "for $x in try { doc($x) } catch * { 1 }"
+        + "let $x := count($x) "
+        + "return $x",
         "",
         "count(//For) eq 1",
-        "count(//GFLWOR/*) eq 2",
-        "starts-with(//GFLWOR/*[last()]/@name, 'error(')");
+        "count(//GFLWOR/*) eq 2");
   }
 
   /** Tests flattening. */

@@ -36,7 +36,7 @@ public final class Union extends Set {
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands
-        cc.info(OPTREMOVE_X_X, this, ex);
+        cc.info(OPTREMOVE_X_X, description(), ex);
       } else {
         el.add(ex);
       }
@@ -58,8 +58,8 @@ public final class Union extends Set {
   }
 
   @Override
-  public ANodeList eval(final Iter[] iters, final QueryContext qc) throws QueryException {
-    final ANodeList list = new ANodeList().check();
+  public ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
+    final ANodeBuilder list = new ANodeBuilder();
     for(final Iter ir : iters) {
       for(Item it; (it = ir.next()) != null;) {
         qc.checkStop();
@@ -98,5 +98,10 @@ public final class Union extends Set {
         return it;
       }
     };
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Union && super.equals(obj);
   }
 }

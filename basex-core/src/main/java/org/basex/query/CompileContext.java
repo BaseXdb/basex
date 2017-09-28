@@ -1,11 +1,15 @@
 package org.basex.query;
 
+import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -20,7 +24,7 @@ public final class CompileContext {
   /** Query context. */
   public final QueryContext qc;
   /** Variable scopes. */
-  public final ArrayList<VarScope> scopes = new ArrayList<>();
+  private final ArrayList<VarScope> scopes = new ArrayList<>();
 
   /**
    * Constructor.
@@ -92,6 +96,90 @@ public final class CompileContext {
     final Var v = vs.add(new Var(var, qc, vs.sc));
     if(vm != null) vm.put(var.id, v);
     return v;
+  }
+
+  /**
+   * Pre-evaluates the specified expression.
+   * @param expr expression
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  public Expr preEval(final Expr expr) throws QueryException {
+    return replaceWith(expr, qc.value(expr));
+  }
+
+  /**
+   * Adds an optimization info for pre-evaluating the specified expression to an empty sequence.
+   * @param result resulting expression
+   * @return optimized expression
+   */
+  public Expr emptySeq(final Expr result) {
+    return replaceWith(result, null);
+  }
+
+  /**
+   * Replaces an EBV expression.
+   * @param expr expression
+   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @return optimized expression
+   */
+  public Expr replaceEbv(final Expr expr, final Expr result) {
+    return replaceWith(expr, result, false);
+  }
+
+  /**
+   * Replaces an expression with the specified one.
+   * @param expr expression
+   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @return optimized expression
+   */
+  public Expr replaceWith(final Expr expr, final Expr result) {
+    return replaceWith(expr, result, true);
+  }
+
+  /**
+   * Replaces an expression with the specified one.
+   * @param expr expression
+   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @param refine refine type
+   * @return optimized expression
+   */
+  private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
+    final Expr res = result == null ? Empty.SEQ : result;
+    if(res != expr) {
+      if(res == Empty.SEQ) {
+        info(OPTEMPTY_X, expr);
+      } else if(res instanceof ParseExpr) {
+        info(OPTREWRITE_X_X, expr, res.description());
+        // Refine type. Required mostly for {@link Filter} rewritings
+        if(refine) {
+          final ParseExpr re = (ParseExpr) res;
+          final SeqType et = expr.seqType(), rt  = re.seqType();
+          if(!et.eq(rt) && et.instanceOf(rt)) {
+            final SeqType it = et.intersect(rt);
+            if(it != null) {
+              re.seqType = it;
+            }
+          }
+        }
+      } else {
+        info(OPTPRE_X_X, expr, res.description());
+        // Refine type. Required because original type might get lost in newly created sequences
+        if(refine && res instanceof Seq) {
+          final Seq seq = (Seq) res;
+          final Type et = expr.seqType().type, rt = seq.type;
+          if(!et.eq(rt) && et.instanceOf(rt)) {
+            final Type it = et.intersect(rt);
+            if(it != null) {
+              seq.type = it;
+              // Indicate that types may not be homogeneous
+              seq.homo = false;
+            }
+          }
+        }
+      }
+    }
+    return res;
   }
 
   /**

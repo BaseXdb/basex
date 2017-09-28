@@ -27,7 +27,7 @@ public final class HofSortWith extends HofFn {
     if(v.size() < 2) return v;
     final ItemList items = v.cache();
     try {
-      Arrays.sort(items.internal(), 0, items.size(), cmp);
+      Arrays.sort(items.list, 0, items.size(), cmp);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }

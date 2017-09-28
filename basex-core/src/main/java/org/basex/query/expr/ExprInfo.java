@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import java.util.*;
+
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -17,15 +19,7 @@ public abstract class ExprInfo {
    * @return result of check
    */
   public String description() {
-    return Token.string(info()) + " expression";
-  }
-
-  /**
-   * Returns the simplified class name.
-   * @return class name
-   */
-  private byte[] info() {
-    return Token.token(Util.className(this));
+    return Util.className(this).toLowerCase(Locale.ENGLISH);
   }
 
   /**
@@ -52,7 +46,7 @@ public abstract class ExprInfo {
    * @return tree node
    */
   protected final FElem planElem(final Object... atts) {
-    final FElem el = new FElem(info());
+    final FElem el = new FElem(Util.className(this));
     final int al = atts.length;
     for(int a = 0; a < al - 1; a += 2) {
       if(atts[a + 1] != null) el.add(planAttr(atts[a], atts[a + 1]));
@@ -66,7 +60,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param exprs expressions
    */
-  protected final void addPlan(final FElem plan, final FElem el, final Object... exprs) {
+  protected static final void addPlan(final FElem plan, final FElem el, final Object... exprs) {
     plan.add(el);
     for(final Object expr : exprs) {
       if(expr instanceof ExprInfo) {
@@ -89,7 +83,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param expr expressions
    */
-  protected final void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
+  protected static final void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
     addPlan(plan, el, (Object) expr);
   }
 
@@ -99,7 +93,7 @@ public abstract class ExprInfo {
    * @param value value of attribute
    * @return tree node
    */
-  protected FAttr planAttr(final Object name, final Object value) {
+  protected static FAttr planAttr(final Object name, final Object value) {
     return new FAttr(Util.inf(name), Util.inf(value));
   }
 }

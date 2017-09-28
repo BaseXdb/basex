@@ -32,7 +32,7 @@ public abstract class ANode extends Item {
 
   /** Cached string value. */
   byte[] value;
-  /** Parent node. */
+  /** Parent node (can be {@code null}). */
   ANode parent;
 
   /**
@@ -287,7 +287,7 @@ public abstract class ANode extends Item {
   /**
    * Returns the value of the specified attribute or {@code null}.
    * @param name attribute to be found
-   * @return attribute value
+   * @return attribute value or {@code null}
    */
   public byte[] attribute(final QNm name) {
     final BasicNodeIter iter = attributes();
@@ -313,8 +313,8 @@ public abstract class ANode extends Item {
   public abstract BasicNodeIter ancestorOrSelf();
 
   /**
-   * Returns a lightweight, low-level attribute axis iterator with {@link Iter#size} and
-   * {@link Iter#get} implemented.
+   * Returns a lightweight, low-level attribute axis iterator with {@link Iter#size()} and
+   * {@link Iter#get(long)} implemented.
    * If nodes returned are to be further used, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */

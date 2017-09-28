@@ -156,7 +156,7 @@ public final class GFLWOR extends ParseExpr {
 
       // remove FLWOR expressions when all clauses were removed
       if(clauses.isEmpty()) {
-        cc.info(QueryText.OPTFLWOR, this);
+        cc.info(QueryText.OPTSIMPLE_X, description());
         return ret;
       }
 
@@ -242,19 +242,15 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     size = calcSize();
-    if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      return Empty.SEQ;
+    if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return cc.emptySeq(this);
+
+    if(clauses.getFirst() instanceof Where) {
+      final Where where = (Where) clauses.removeFirst();
+      final Expr branch = clauses.isEmpty() ? ret : this;
+      return cc.replaceWith(where, new If(info, where.expr, branch, Empty.SEQ));
     }
 
     seqType = ret.seqType().withSize(size);
-
-    if(clauses.getFirst() instanceof Where) {
-      // where A <...> return B  ===>  if(A) then <...> return B else ()
-      final Where wh = (Where) clauses.removeFirst();
-      return new If(info, wh.expr, clauses.isEmpty() ? ret : this, Empty.SEQ);
-    }
-
     return this;
   }
 
@@ -284,7 +280,7 @@ public final class GFLWOR extends ParseExpr {
     for(int i = clauses.size(); --i >= 0;) {
       final Clause clause = clauses.get(i);
       if(clause instanceof For && ((For) clause).asLet(clauses, i)) {
-        cc.info(QueryText.OPTFORTOLET);
+        cc.info(QueryText.OPTFORTOLET_X, clause);
         changed = true;
       }
     }
@@ -486,8 +482,8 @@ public final class GFLWOR extends ParseExpr {
       }
 
       if(insert >= 0) {
+        cc.info(QueryText.OPTLET_X, let);
         clauses.add(insert, clauses.remove(i));
-        if(!changed) cc.info(QueryText.OPTFORLET);
         changed = true;
         // it's safe to go on because clauses below the current one are never touched
       }
@@ -592,7 +588,7 @@ public final class GFLWOR extends ParseExpr {
         // remove clause and ensure that the positional variable is only used once
         clauses.remove(i);
         if(count(pos.pos, c) == VarUsage.NEVER) {
-          pos.addPredicate(Pos.get(cmp));
+          pos.addPredicate(ItrPos.get(cmp));
           pos.expr = pos.expr.optimize(cc);
           cc.info(QueryText.OPTPRED_X, cmp);
           changed = true;
@@ -798,6 +794,14 @@ public final class GFLWOR extends ParseExpr {
     if(tc.seqType().occ != Occ.ZERO_MORE) return null;
     ret = tc.check(ret, cc);
     return optimize(cc);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof GFLWOR)) return false;
+    final GFLWOR g = (GFLWOR) obj;
+    return clauses.equals(g.clauses) && ret.equals(g.ret);
   }
 
   @Override

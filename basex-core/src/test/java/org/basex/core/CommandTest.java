@@ -411,6 +411,8 @@ public class CommandTest extends SandboxTest {
     no(new Rename(FILE, "xxx"));
     ok(new CreateDB(NAME, FILE));
     // target path must not be empty
+    no(new Rename(FN, "."));
+    no(new Rename(FN, ".."));
     no(new Rename(FN, "/"));
     no(new Rename(FN, ""));
     ok(new Rename(FILE, FILE));
@@ -451,6 +453,10 @@ public class CommandTest extends SandboxTest {
     // invalid content
     no(new Replace(FN, ""));
     assertEquals("1", ok(new XQuery(count)));
+    // invalid paths
+    no(new Replace(".", "<a/>"));
+    no(new Replace("..", "<a/>"));
+    no(new Replace("/", "<a/>"));
     // create and replace binary file
     ok(new XQuery(_DB_STORE.args(NAME, "a", "a")));
     ok(new Replace("a", "<b/>"));

@@ -79,7 +79,7 @@ public class BaseXTextField extends JTextField {
    * @param dialog dialog window
    */
   private BaseXTextField(final Option<?> opt, final Options opts, final BaseXDialog dialog) {
-    this(opts.get(opt).toString(), dialog, dialog);
+    this(opts.get(opt) == null ? null : opts.get(opt).toString(), dialog, dialog);
     options = opts;
     option = opt;
   }

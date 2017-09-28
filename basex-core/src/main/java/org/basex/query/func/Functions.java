@@ -132,7 +132,7 @@ public final class Functions extends TokenSet {
   public static QueryException wrongArity(final Object func, final long arity,
       final IntList arities, final InputInfo info) {
 
-    final int as = arities.size();
+    final int as = arities.sort().size();
     if(as == 0) return FUNCARGNUM_X_X.get(info, func, arguments(arity));
 
     int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;

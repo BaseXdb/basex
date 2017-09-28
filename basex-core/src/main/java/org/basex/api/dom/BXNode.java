@@ -92,8 +92,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final short compareDocumentPosition(final Node node) {
-    final int d = nd.diff(((BXNode) node).nd);
-    return (short) (d < 0 ? -1 : d > 0 ? 1 : 0);
+    return (short) Integer.compare(nd.diff(((BXNode) node).nd), 0);
   }
 
   @Override

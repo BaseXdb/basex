@@ -69,39 +69,29 @@ public final class Performance {
   }
 
   /**
-   * Formats a number according to the binary size orders (KB, MB, ...).
+   * Returns a human-readable representation for the specified size value (b, kB, MB, ...).
    * @param size value to be formatted
    * @return formatted size value
    */
   public static String format(final long size) {
-    return format(size, true, 5);
+    final String num = Long.toString(size);
+    final int nl = num.length();
+    if(nl > 16) return units(size, 1L << 40) + " PB";
+    if(nl > 13) return units(size, 1L << 40) + " TB";
+    if(nl > 10) return units(size, 1L << 30) + " GB";
+    if(nl >  7) return units(size, 1L << 20) + " MB";
+    if(nl >  4) return units(size, 1L << 10) + " kB";
+    return num + " b";
   }
 
   /**
-   * Formats a file size according to the binary size orders (KB, MB, ...).
-   * @param size file size
-   * @param det detailed suffix
-   * @return formatted size value
+   * Returns the rounded up number of units.
+   * @param num number
+   * @param size size of unit
+   * @return units
    */
-  public static String format(final long size, final boolean det) {
-    return format(size, det, 0);
-  }
-
-  /**
-   * Formats a file size according to the binary size orders (KB, MB, ...),
-   * adding the specified offset to the orders of magnitude.
-   * @param size file size
-   * @param det detailed suffix
-   * @param off offset: higher values will result in more digits
-   * @return formatted size value
-   */
-  private static String format(final long size, final boolean det, final int off) {
-    if(size >= 1L << 50 + off) return (size + (1L << 49) >> 50) + " PB";
-    if(size >= 1L << 40 + off) return (size + (1L << 39) >> 40) + " TB";
-    if(size >= 1L << 30 + off) return (size + (1L << 29) >> 30) + " GB";
-    if(size >= 1L << 20 + off) return (size + (1L << 19) >> 20) + " MB";
-    if(size >= 1L << 10 + off) return (size + (1L <<  9) >> 10) + " KB";
-    return size + (det ? " Byte"  + (size == 1 ? "" : "s") : " B");
+  private static long units(final long num, final long size) {
+    return (num + size - 1) / size;
   }
 
   /**

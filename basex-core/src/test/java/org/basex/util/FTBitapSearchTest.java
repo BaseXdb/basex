@@ -19,14 +19,6 @@ import org.junit.*;
  * @author Dimitar Popov
  */
 public final class FTBitapSearchTest {
-  /** Simple comparator. */
-  private static final TokenComparator CMP = new TokenComparator() {
-    @Override
-    public boolean equal(final byte[] o1, final byte[] o2) {
-      return eq(o1, o2);
-    }
-  };
-
   /**
    * Test data.
    * @author Dimitar Popov
@@ -144,10 +136,11 @@ public final class FTBitapSearchTest {
   /** Set up method. */
   @Before
   public void setUp() {
+    final TokenComparator cmp = Token::eq;
     final int tl = TESTS.length;
     searches = new FTBitapSearch[tl];
     for(int t = 0; t < tl; t++) {
-      searches[t] = new FTBitapSearch(TESTS[t].haystack, TESTS[t].needles, CMP);
+      searches[t] = new FTBitapSearch(TESTS[t].haystack, TESTS[t].needles, cmp);
     }
   }
 

@@ -46,20 +46,20 @@ public final class Context {
   /** Locking. */
   public final Locking locking;
 
-  /** Current node context. Set if it does not contain all documents of the current database. */
+  /** Current node context. {@code null} if all documents of the current database are referenced. */
   private DBNodes current;
   /** User reference. */
   private User user;
-  /** Data reference. */
+  /** Currently opened database. */
   private Data data;
-  /** Indicates if the context has been closed. */
+  /** Indicates if the class has been closed/finalized. */
   private boolean closed;
 
   // GUI references
 
-  /** Marked nodes. */
+  /** Marked nodes. {@code null} if database is closed. */
   public DBNodes marked;
-  /** Copied nodes. */
+  /** Copied nodes {@code null} if database is closed.. */
   public DBNodes copied;
   /** Focused node. */
   public int focused = -1;
@@ -179,7 +179,7 @@ public final class Context {
 
   /**
    * Returns the current node context.
-   * @return node set
+   * @return node set, or {@code null} if no database is opened
    */
   public DBNodes current() {
     if(data == null) return null;

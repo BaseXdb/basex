@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class XQuery30Test extends QueryTest {
-  /** Constructor. */
   static {
     queries = new Object[][] {
       { "FLWOR 1", integers(1), "for $i in (1,1) group by $i return $i" },

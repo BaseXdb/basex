@@ -14,7 +14,7 @@ public abstract class Stemmer extends LanguageImpl {
   /** List of available stemmers. */
   static final ArrayList<Stemmer> IMPL = new ArrayList<>();
 
-  /** Load stemmers and order them by precedence. */
+  /* Load stemmers and order them by precedence. */
   static {
     // built-in stemmers
     IMPL.add(new EnglishStemmer(null));

@@ -61,13 +61,13 @@ public final class FnForEach extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     if(allAreValues() && exprs[0].size() < UNROLL_LIMIT) {
       // unroll the loop
-      cc.info(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       final int len = (int) seq.size();
       final Expr[] results = new Expr[len];
       for(int i = 0; i < len; i++) {
         results[i] = new DynFuncCall(info, sc, exprs[1], seq.itemAt(i)).optimize(cc);
       }
+      cc.info(QueryText.OPTUNROLL_X, this);
       return new List(info, results).optimize(cc);
     }
     return this;

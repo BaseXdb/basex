@@ -73,6 +73,12 @@ final class UCACollation extends Collation {
     } while(true);
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof UCACollation &&
+        collator.equals(((UCACollation) obj).collator);
+  }
+
   /**
    * Determines whether one string starts with another.
    * @param string string iterator (of type CollationElementIterator)

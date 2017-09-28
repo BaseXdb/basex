@@ -29,9 +29,9 @@ import org.basex.util.hash.*;
 public final class DynFuncCall extends FuncCall {
   /** Static context. */
   private final StaticContext sc;
+
   /** Updating flag. */
   private final boolean updating;
-
   /** Non-deterministic flag. */
   private boolean ndt;
   /** Hash values of all function items that this call was copied from, possibly {@code null}. */
@@ -94,7 +94,7 @@ public final class DynFuncCall extends FuncCall {
 
     // maps and arrays can only contain fully evaluated values, so this is safe
     if((f instanceof Map || f instanceof org.basex.query.value.array.Array) && allAreValues())
-      return optPre(value(cc.qc), cc);
+      return cc.preEval(this);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function
@@ -212,6 +212,12 @@ public final class DynFuncCall extends FuncCall {
     final Value[] args = new Value[last];
     for(int a = 0; a < last; a++) args[a] = qc.value(exprs[a]);
     return args;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof DynFuncCall && updating == ((DynFuncCall) obj).updating &&
+        super.equals(obj);
   }
 
   @Override

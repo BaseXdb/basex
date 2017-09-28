@@ -1,5 +1,6 @@
 package org.basex.io.in;
 
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -98,5 +99,10 @@ public final class TarEntry {
       // fallback: UTF8
       return result.toString();
     }
+  }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '[' + name + ", " + size + " bytes]";
   }
 }

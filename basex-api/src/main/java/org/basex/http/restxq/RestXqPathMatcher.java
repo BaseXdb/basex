@@ -21,7 +21,7 @@ import org.basex.util.*;
 final class RestXqPathMatcher {
   /** Default matcher for empty path templates. */
   private static final RestXqPathMatcher EMPTY =
-      new RestXqPathMatcher("/", Collections.<QNm>emptyList(), 0, ZERO);
+      new RestXqPathMatcher("/", Collections.emptyList(), 0, ZERO);
   /** Variable names defined in the path template. */
   final List<QNm> vars;
   /** Compiled regular expression which matches paths defined by the path annotation. */

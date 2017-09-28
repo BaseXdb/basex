@@ -69,12 +69,7 @@ final class DialogAdd extends BaseXBack {
 
     if(comp == add) {
       general.setOptions();
-      final Runnable run = new Runnable() {
-        @Override
-        public void run() {
-          dialog.resources.refreshNewFolder(trg);
-        }
-      };
+      final Runnable run = () -> dialog.resources.refreshNewFolder(trg);
       DialogProgress.execute(dialog, run, new Add(trg, src));
 
     } else {

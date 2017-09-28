@@ -79,33 +79,32 @@ public final class Find extends AQuery {
     final String qu = query.replaceAll(" \\+", " ");
     final String[] terms = split(qu);
 
-    String pre = "";
-    String preds = "";
+    final StringBuilder pre = new StringBuilder(), preds = new StringBuilder();
     for(String term : terms) {
       if(term.startsWith("@=")) {
-        preds += "[@* = \"" + term.substring(2) + "\"]";
+        preds.append("[@* = \"").append(term.substring(2)).append("\"]");
       } else if(term.startsWith("=")) {
-        preds += "[text() = \"" + term.substring(1) + "\"]";
+        preds.append("[text() = \"").append(term.substring(1)).append("\"]");
       } else if(term.startsWith("~")) {
-        preds += "[text() contains text \"" + term.substring(1) +
-          "\" using fuzzy]";
+        preds.append("[text() contains text \"").append(term.substring(1));
+        preds.append("\" using fuzzy]");
       } else if(term.startsWith("@")) {
         if(term.length() == 1) continue;
-        preds += "[@* contains text \"" + term.substring(1) + "\"]";
+        preds.append("[@* contains text \"").append(term.substring(1)).append("\"]");
         term = term.substring(1);
         // add valid name tests
         if(XMLToken.isName(token(term))) {
-          pre += (r ? "" : ".") + "//@" + term + " | ";
+          pre.append(r ? "" : ".").append("//@").append(term).append(" | ");
         }
       } else {
-        preds += "[text() contains text \"" + term + "\"]";
+        preds.append("[text() contains text \"").append(term).append("\"]");
         // add valid name tests
         if(XMLToken.isName(token(term))) {
-          pre += (r ? "/" : "") + Axis.DESC + "::*:" + term + " | ";
+          pre.append(r ? "/" : "").append(Axis.DESC).append("::*:").append(term).append(" | ");
         }
       }
     }
-    if(pre.isEmpty() && preds.isEmpty()) return root ? "/" : ".";
+    if((pre.length() == 0) && (preds.length() == 0)) return root ? "/" : ".";
 
     // create final string
     final TokenBuilder tb = new TokenBuilder();

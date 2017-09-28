@@ -18,6 +18,9 @@ public enum SerialMethod {
   /** Adaptive. */ ADAPTIVE,
   /** BaseX.    */ BASEX;
 
+  /** Cached enums (faster). */
+  public static final SerialMethod[] VALUES = values();
+
   @Override
   public String toString() {
     return name().toLowerCase(Locale.ENGLISH);

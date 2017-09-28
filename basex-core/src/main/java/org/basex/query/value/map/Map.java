@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -32,8 +31,6 @@ public final class Map extends FItem {
 
   /** Wrapped immutable map. */
   private final TrieNode root;
-  /** Key sequence. */
-  private Value keys;
 
   /**
    * Constructor.
@@ -202,22 +199,17 @@ public final class Map extends FItem {
    * @return list of keys
    */
   public Value keys() {
-    if(keys == null) {
-      final ValueBuilder res = new ValueBuilder();
-      root.keys(res);
-      keys = res.value();
-    }
-    return keys;
+    final ValueBuilder res = new ValueBuilder();
+    root.keys(res);
+    return res.value();
   }
 
   /**
-   * All values defined in this map.
-   * @return list of keys
+   * Adds all values defined in this map to the specified value builder.
+   * @param vb value builder
    */
-  public Value values() {
-    final ValueBuilder res = new ValueBuilder();
-    root.values(res);
-    return res.value();
+  public void values(final ValueBuilder vb) {
+    root.values(vb);
   }
 
   /**
@@ -246,8 +238,7 @@ public final class Map extends FItem {
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<>();
-    final BasicIter<?> iter = keys().iter();
-    for(Item key; (key = iter.next()) != null;) {
+    for(final Item key : keys()) {
       map.put(key.toJava(), get(key, null).toJava());
     }
     return map;
@@ -260,7 +251,7 @@ public final class Map extends FItem {
 
   @Override
   public String description() {
-    return CURLY1 + DOTS + CURLY2;
+    return MAP;
   }
 
   @Override
@@ -342,6 +333,12 @@ public final class Map extends FItem {
   @Override
   public boolean isVacuousBody() {
     return false;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    // [CG] could be enhanced
+    return this == obj;
   }
 
   @Override

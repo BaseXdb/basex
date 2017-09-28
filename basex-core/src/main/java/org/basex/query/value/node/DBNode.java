@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -207,14 +206,11 @@ public class DBNode extends ANode {
   @Override
   public final int diff(final ANode node) {
     // compare fragment with database node; specify fragment first to save time
-    if(node instanceof FNode) return -diff(node, this);
-    // same database instance: compare pre values
-    if(data == node.data()) {
-      final int p = ((DBNode) node).pre;
-      return pre > p ? 1 : pre < p ? -1 : 0;
-    }
-    // check order via lowest common ancestor
-    return diff(this, node);
+    return node instanceof FNode ? -diff(node, this) :
+      // same database instance: compare pre values
+      data == node.data() ? Integer.compare(pre, ((DBNode) node).pre) :
+      // check order via lowest common ancestor
+      diff(this, node);
   }
 
   @Override
@@ -389,10 +385,14 @@ public class DBNode extends ANode {
         // initialize iterator: find last node that needs to be scanned
         if(size == -1) {
           if(data.meta.ndocs > 1) {
-            for(final ANode anc : ancestor()) size = ((DBNode) anc).pre;
+            int p = pre;
+            for(final ANode n : ancestor()) p = ((DBNode) n).pre;
+            size = p + data.size(p, data.kind(p));
+          } else {
+            size = data.meta.size;
           }
-          size = size == -1 ? data.meta.size : data.size(size, data.kind(size));
         }
+
         if(curr == size) return null;
         kind = data.kind(curr);
         node.set(curr, kind);
@@ -423,8 +423,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
-    return cmp instanceof DBNode && data == ((DBNode) cmp).data && pre == ((DBNode) cmp).pre;
+  public final boolean equals(final Object obj) {
+    return obj instanceof DBNode && is((DBNode) obj);
   }
 
   @Override

@@ -10,19 +10,9 @@ import org.basex.util.*;
  */
 public interface QueryTracer {
   /** Prints trace output to the standard error. */
-  QueryTracer ERRLN = new QueryTracer() {
-    @Override
-    public void print(final String string, final QueryContext qc) {
-      Util.errln(string);
-    }
-  };
+  QueryTracer ERRLN = Util::errln;
   /** Prints trace output to the evaluation info. */
-  QueryTracer EVALINFO = new QueryTracer() {
-    @Override
-    public void print(final String string, final QueryContext qc) {
-      qc.evalInfo(string);
-    }
-  };
+  QueryTracer EVALINFO = (string, qc) -> qc.evalInfo(string);
 
   /**
    * Prints trace output.

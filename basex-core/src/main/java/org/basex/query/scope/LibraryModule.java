@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class LibraryModule extends Module {
-  /** Library name. */
+  /** Name of library. */
   public final QNm name;
 
   /**

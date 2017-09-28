@@ -22,7 +22,7 @@ public final class BinOctal extends BinFn {
     final byte[] bytes = str(0, qc);
     if(bytes == null) return null;
     final int bl = bytes.length;
-    if(bl == 0) return new B64(EMPTY);
+    if(bl == 0) return B64.EMPTY;
 
     try {
       byte[] bin = token(new BigInteger(string(bytes), 8).toString(2));
@@ -35,7 +35,7 @@ public final class BinOctal extends BinFn {
         System.arraycopy(bin, 0, tmp, expl - binl, binl);
         bin = tmp;
       }
-      return new B64(binary2bytes(bin));
+      return B64.get(binary2bytes(bin));
     } catch(final NumberFormatException ex) {
       throw BIN_NNC.get(info);
     }

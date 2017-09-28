@@ -86,11 +86,11 @@ public final class SAXWrapper extends SingleParser {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
       // wrap and return original message
-      throw new IOException("\"" + source.path() + '"' + Util.message(ex), ex);
+      throw new IOException('"' + source.path() + '"' + Util.message(ex), ex);
     } finally {
       if(is != null) {
-        try(Reader r = is.getCharacterStream()) { }
-        try(InputStream ist = is.getByteStream()) { }
+        try(Reader r = is.getCharacterStream()) { /* no action */ }
+        try(InputStream ist = is.getByteStream()) { /* no action */ }
       }
     }
   }

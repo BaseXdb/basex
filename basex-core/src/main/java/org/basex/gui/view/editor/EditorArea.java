@@ -58,12 +58,7 @@ public final class EditorArea extends TextPanel {
         gui.gopts.set(GUIOptions.WORKPATH, EditorArea.this.file.dir());
 
         // reload file if it has been changed
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            reopen(false);
-          }
-        });
+        SwingUtilities.invokeLater(() -> reopen(false));
       }
     });
   }
@@ -157,9 +152,8 @@ public final class EditorArea extends TextPanel {
   /**
    * Reverts the contents of the currently opened editor.
    * @param enforce enforce reload
-   * @return {@code true} if file was opened
    */
-  public boolean reopen(final boolean enforce) {
+  public void reopen(final boolean enforce) {
     if(opened()) {
       final long ts = file.timeStamp();
       if((tstamp != ts || enforce) && (!modified ||
@@ -168,7 +162,6 @@ public final class EditorArea extends TextPanel {
           setText(file.read());
           file(file);
           release(Action.PARSE);
-          return true;
         } catch(final IOException ex) {
           Util.debug(ex);
           BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
@@ -176,7 +169,6 @@ public final class EditorArea extends TextPanel {
       }
       tstamp = ts;
     }
-    return false;
   }
 
   /**

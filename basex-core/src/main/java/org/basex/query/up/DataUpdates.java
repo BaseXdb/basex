@@ -223,7 +223,7 @@ final class DataUpdates {
     }
     nodeUpdates = null;
     nodes = null;
-    Collections.sort(upd, new NodeUpdateComparator());
+    upd.sort(new NodeUpdateComparator());
     return upd;
   }
 

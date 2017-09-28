@@ -121,7 +121,7 @@ public final class CmpV extends Cmp {
      * Evaluates the expression.
      * @param it1 first item
      * @param it2 second item
-     * @param coll query context
+     * @param coll collation (can be {@code null})
      * @param sc static context
      * @param ii input info
      * @return result
@@ -156,7 +156,7 @@ public final class CmpV extends Cmp {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param sc static context
    * @param info input info
    */
@@ -177,30 +177,43 @@ public final class CmpV extends Cmp {
 
     final Expr e1 = exprs[0], e2 = exprs[1];
     final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    seqType = st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray()
-        ? SeqType.BLN : SeqType.BLN_ZO;
+    seqType = st1.oneNoArray() && st2.oneNoArray() ? SeqType.BLN : SeqType.BLN_ZO;
 
     Expr e = this;
-    if(oneIsEmpty()) {
-      e = optPre(cc);
-    } else if(allAreValues()) {
-      e = preEval(cc);
-    } else if(e1.isFunction(Function.COUNT)) {
+    if(oneIsEmpty()) return cc.emptySeq(this);
+    if(allAreValues()) return cc.preEval(this);
+
+    if(e1.isFunction(Function.COUNT)) {
+      // rewrite count() function
       e = compCount(op, cc);
-      if(e != this) cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
+      // rewrite string-length() function
       e = compStringLength(op, cc);
-      if(e != this) cc.info(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
-    } else if(e1.isFunction(Function.POSITION)) {
+    } else if(e1.isFunction(Function.POSITION) && st2.oneNoArray()) {
       // position() CMP number
-      e = Pos.get(op, e2, e, info);
-      if(e != this) cc.info(OPTREWRITE_X, this);
+      e = ItrPos.get(op, e2, this, info);
+      if(e == this) e = Pos.get(op, e2, this, info, cc);
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
       e = cc.function(Function.NOT, info, e1);
     }
-    return e;
+    if(e != this) return cc.replaceWith(this, e);
+
+    /* pre-evaluate equality test if:
+     * - equality operator is specified,
+     * - operands are equal,
+     * - operands are deterministic, non-updating,
+     * - operands do not depend on context, or if context value exists
+     */
+    if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+        (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
+      // currently limited to strings, integers and booleans
+      final Type t1 = st1.type;
+      if(st1.one() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) || t1 == AtomType.BLN))
+        return cc.replaceWith(this, Bln.get(op == OpV.EQ));
+    }
+    return this;
   }
 
   @Override
@@ -208,7 +221,7 @@ public final class CmpV extends Cmp {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpV.EQ && exprs[1] == Bln.TRUE || op == OpV.NE && exprs[1] == Bln.FALSE) &&
-      exprs[0].seqType().eq(SeqType.BLN) ? exprs[0] : this;
+      exprs[0].seqType().eq(SeqType.BLN) ? cc.replaceEbv(this, exprs[0]) : this;
   }
 
   @Override
@@ -227,13 +240,19 @@ public final class CmpV extends Cmp {
   @Override
   public CmpV invert() {
     final Expr e1 = exprs[0], e2 = exprs[1];
-    return e1.size() != 1 || e1.seqType().mayBeArray() || e2.size() != 1 ||
-        e2.seqType().mayBeArray() ? this : new CmpV(e1, e2, op.invert(), coll, sc, info);
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    return st1.oneNoArray() && st2.oneNoArray() ? new CmpV(e1, e2, op.invert(), coll, sc, info) :
+      this;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CmpV && op == ((CmpV) obj).op && super.equals(obj);
   }
 
   @Override

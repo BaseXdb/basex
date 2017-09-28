@@ -86,8 +86,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       }
       chops.push(c);
 
-      atts.clear();
-      nsp.clear();
+      atts.reset();
+      nsp.reset();
       ++nodes;
     } catch(final IOException ex) {
       error(ex);

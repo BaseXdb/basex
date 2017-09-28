@@ -38,9 +38,8 @@ public final class FTOpt extends ExprInfo {
    * @return self reference
    */
   public FTOpt assign(final FTOpt opt) {
-    for(final Entry<FTFlag, Boolean> f : opt.map.entrySet()) {
-      final FTFlag fl = f.getKey();
-      if(map.get(fl) == null) map.put(fl, f.getValue());
+    for(final Entry<FTFlag, Boolean> e : opt.map.entrySet()) {
+      map.computeIfAbsent(e.getKey(), k -> e.getValue());
     }
     if(cs == null) cs = opt.cs;
     if(sw == null) sw = opt.sw;

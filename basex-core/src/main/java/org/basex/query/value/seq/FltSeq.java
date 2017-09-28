@@ -3,7 +3,6 @@ package org.basex.query.value.seq;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -33,8 +32,9 @@ public final class FltSeq extends NativeSeq {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof FltSeq && Arrays.equals(values, ((FltSeq) cmp).values);
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof FltSeq ? Arrays.equals(values, ((FltSeq) obj).values) :
+      super.equals(obj));
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.basex.util.hash.*;
 public final class CAttr extends CName {
   /** Generated namespace. */
   private static final byte[] NS0 = token("ns0:");
+
   /** Computed constructor. */
   private final boolean comp;
 
@@ -61,6 +62,11 @@ public final class CAttr extends CName {
     if(eq(cp, XML) && eq(nm.local(), ID)) val = normalize(val);
 
     return new FAttr(nm, val);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CAttr && comp == ((CAttr) obj).comp && super.equals(obj);
   }
 
   @Override

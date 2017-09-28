@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class SimpleTest extends QueryTest {
-  /** Constructor. */
   static {
     create("<x>X</x>");
 
@@ -135,8 +134,12 @@ public final class SimpleTest extends QueryTest {
           + "};"
           + "local:shortcircuit('foo')" },
 
-      { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
-      { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
+      { "Calc 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
+      { "Calc 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
+      { "Calc 3", strings("2017-07-07T18:29:59.1"),
+        "string(xs:dateTime('2017-07-07T18:30:00.1') - xs:dayTimeDuration('PT1S'))" },
+      { "Calc 4", strings("2017-07-07T17:59:59.1"),
+        "string(xs:dateTime('2017-07-07T18:00:59.1') - xs:dayTimeDuration('PT1M'))" },
 
       { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." },
 
@@ -213,7 +216,10 @@ public final class SimpleTest extends QueryTest {
       // #1140
       { "Pred 1", empty(), "declare function local:test() {" +
           "for $n in (1, 1) return <_><c/><w/></_>/*[$n[1]] }; local:test()/self::w" },
-      { "Pred 2", empty(), "for $n in (2,2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" }
+      { "Pred 2", empty(), "for $n in (2,2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" },
+      { "Pred 3", strings("XML"), "(('XML')[1])[1]" },
+      { "Pred 4", integers(1), "1[position() = 1 to 2]" },
+      { "Pred 5", integers(1), "1[position() = (1,2)]" },
     };
   }
 }

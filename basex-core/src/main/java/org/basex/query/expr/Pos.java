@@ -3,142 +3,134 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpV.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Pos expression.
+ * Position check expression.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class Pos extends Simple {
-  /** Minimum position. */
-  final long min;
-  /** Maximum position. */
-  final long max;
-
+public final class Pos extends Arr {
   /**
    * Constructor.
-   * @param min minimum value (1 or larger)
-   * @param max minimum value (1 or larger)
    * @param info input info
+   * @param min min expression
+   * @param max max expression
    */
-  private Pos(final long min, final long max, final InputInfo info) {
-    super(info);
-    this.min = min;
-    this.max = max;
+  private Pos(final InputInfo info, final Expr min, final Expr max) {
+    super(info, min, max);
     seqType = SeqType.BLN;
   }
 
   /**
-   * Returns a position expression for the specified index, or an optimized boolean item.
-   * @param index index position
-   * @param info input info
-   * @return expression
-   */
-  public static Expr get(final long index, final InputInfo info) {
-    return get(index, index, info);
-  }
-
-  /**
-   * Returns a position expression for the specified range, or an optimized boolean item.
-   * @param min minimum value
-   * @param max minimum value
-   * @param info input info
-   * @return expression
-   */
-  public static Expr get(final long min, final long max, final InputInfo info) {
-    // suppose that positions always fit in long values..
-    return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == Long.MAX_VALUE ? Bln.TRUE :
-      new Pos(Math.max(1, min), Math.max(1, max), info);
-  }
-
-  /**
-   * Returns a position expression for the specified range comparison.
-   * @param expr range comparison
-   * @return expression
-   */
-  public static Expr get(final CmpR expr) {
-    final double min = expr.min, max = expr.max;
-    final long mn = (long) (expr.mni ? (long) Math.ceil(min) : Math.floor(min + 1));
-    final long mx = (long) (expr.mxi ? (long) Math.floor(max) : Math.ceil(max - 1));
-    return get(mn, mx, expr.info);
-  }
-
-  /**
-   * Returns an instance of this class if possible, and the input expression otherwise.
+   * Returns an instance of this class, the original expression, or an optimized expression.
    * @param cmp comparator
-   * @param expr argument
-   * @param fallback fallback expression (optional, may be {@code null})
+   * @param arg argument
+   * @param orig original expression
+   * @param cc compilation context
    * @param ii input info
-   * @return resulting or fallback expression
+   * @return resulting or original expression
+   * @throws QueryException query exception
    */
-  public static Expr get(final OpV cmp, final Expr expr, final Expr fallback, final InputInfo ii) {
-    if(expr instanceof RangeSeq && cmp == OpV.EQ) {
-      final RangeSeq rs = (RangeSeq) expr;
-      return get(rs.start(), rs.end(), ii);
-    }
-    if(expr instanceof ANum) {
-      final ANum it = (ANum) expr;
-      final long p = it.itr();
-      final boolean ex = p == it.dbl();
-      switch(cmp) {
-        case EQ: return ex ? get(p, ii) : Bln.FALSE;
-        case GE: return get(ex ? p : p + 1, Long.MAX_VALUE, ii);
-        case GT: return get(p + 1, Long.MAX_VALUE, ii);
-        case LE: return get(1, p, ii);
-        case LT: return get(1, ex ? p - 1 : p, ii);
-        default:
+  public static Expr get(final OpV cmp, final Expr arg, final Expr orig, final InputInfo ii,
+      final CompileContext cc) throws QueryException {
+
+    Expr min = null, max = null;
+    if(arg.isSimple()) {
+      if(arg instanceof Range && cmp == OpV.EQ) {
+        final Range r = (Range) arg;
+        final Expr e1 = r.exprs[0], e2 = r.exprs[1];
+        if(e1.seqType().type.instanceOf(AtomType.ITR) &&
+           e2.seqType().type.instanceOf(AtomType.ITR)) {
+          min = e1;
+          max = e1.equals(e2) ? e1 : e2;
+        }
+      } else {
+        final SeqType st = arg.seqType();
+        if(st.oneNoArray()) {
+          switch(cmp) {
+            case EQ:
+              min = arg;
+              max = arg;
+              break;
+            case GE:
+              min = arg;
+              max = Int.MAX;
+              break;
+            case GT:
+              min = new Arith(ii, st.type.instanceOf(AtomType.ITR) ? arg :
+                cc.function(Function.FLOOR, ii, arg), Int.ONE, Calc.PLUS);
+              max = Int.MAX;
+              break;
+            case LE:
+              min = Int.ONE;
+              max = arg;
+              break;
+            case LT:
+              min = Int.ONE;
+              max = new Arith(ii, st.type.instanceOf(AtomType.ITR) ? arg :
+                cc.function(Function.CEILING, ii, arg), Int.ONE, Calc.MINUS);
+              break;
+            default:
+          }
+        }
       }
     }
-    return fallback;
+    return min == null ? orig : new Pos(ii, min, max);
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Bln.get(matches(qc.focus.pos));
+
+    final Item it1 = exprs[0].atomItem(qc, info);
+    if(it1 == null) return Bln.FALSE;
+    final long pos = qc.focus.pos;
+    final double s = toDouble(it1);
+    if(eq()) return Bln.get(pos == s);
+
+    final Item it2 = exprs[1].atomItem(qc, info);
+    if(it2 == null) return Bln.FALSE;
+    final double e = toDouble(it2);
+    return Bln.get(pos >= s && pos <= e);
   }
 
   @Override
   public Pos copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Pos(min, max, info);
+    return new Pos(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
   }
 
   /**
-   * Returns false if no more results can be expected.
-   * @param pos current position
-   * @return result of check
-   */
-  public boolean skip(final long pos) {
-    return pos >= max;
-  }
-
-  /**
-   * Checks if the current position lies within the given position.
-   * @param pos current position
-   * @return result of check
-   */
-  public boolean matches(final long pos) {
-    return pos >= min && pos <= max;
-  }
-
-  /**
-   * Creates an intersection of the existing and the specified position
-   * expressions.
+   * Creates an intersection of the existing and the specified position expressions.
    * @param pos second position expression
    * @param ii input info
-   * @return resulting expression
+   * @return resulting expression, or {@code null} if intersection is not possible
    */
   Expr intersect(final Pos pos, final InputInfo ii) {
-    return get(Math.max(min, pos.min), Math.min(max, pos.max), ii);
+    final Expr[] r1 = exprs, r2 = pos.exprs;
+    if(!eq() && !pos.eq()) {
+      final Expr min = r1[0] == Int.ONE ? r2[0] : r2[0] == Int.ONE ? r1[0] : null;
+      final Expr max = r1[1] == Int.MAX ? r2[1] : r2[1] == Int.MAX ? r1[1] : null;
+      if(min != null && max != null) return new Pos(ii, min, max);
+    }
+    return null;
+  }
+
+  /**
+   * Checks if minimum and maximum expressions are identical.
+   * @return result of check
+   */
+  private boolean eq() {
+    final Expr[] ex = exprs;
+    return ex[0] == ex[1];
   }
 
   @Override
@@ -147,27 +139,19 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Pos)) return false;
-    final Pos p = (Pos) cmp;
-    return min == p.min && max == p.max;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Pos && super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, min, MAX, max == Long.MAX_VALUE ? INF : max));
+    addPlan(plan, planElem(), exprs);
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("position() ");
-    if(min == max) {
-      sb.append("= ").append(min);
-    } else {
-      if(max == Long.MAX_VALUE) sb.append('>');
-      sb.append("= ").append(min);
-      if(max != Long.MAX_VALUE) sb.append(" to ").append(max);
-    }
+    final StringBuilder sb = new StringBuilder("position() = ").append(exprs[0]);
+    if(!eq()) sb.append(' ' + TO + ' ').append(exprs[1]);
     return sb.toString();
   }
 }

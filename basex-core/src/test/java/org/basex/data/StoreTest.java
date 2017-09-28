@@ -84,8 +84,8 @@ public final class StoreTest extends SandboxTest {
   @Test
   public void updIndexFlush() {
     try {
-      for(int a = 0; a < 1; a++) {
-        for(int b = 0; b < 1; b++) {
+      for(int a = 0; a < 2; a++) {
+        for(int b = 0; b < 2; b++) {
           set(MainOptions.TEXTINDEX, a == 0);
           set(MainOptions.UPDINDEX, b == 0);
           execute(new CreateDB(NAME));

@@ -3,8 +3,6 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
@@ -41,18 +39,19 @@ public final class DbCreate extends DbNew {
       }
     }
 
-    final int ps = paths.size();
-    final List<NewInput> inputs = new ArrayList<>(ps);
+    final NewInput[] inputs;
     if(exprs.length > 1) {
       final Value val = qc.value(exprs[1]);
-      // number of specified inputs and paths must be identical
-      final long is = val.size();
+      final long is = val.size(), ps = paths.size();
+      // if paths are supplied, number of specified inputs and paths must be identical
       if(ps != 0 && is != ps) throw BXDB_CREATEARGS_X_X.get(info, is, ps);
 
+      inputs = new NewInput[(int) is];
       for(int i = 0; i < is; i++) {
-        final byte[] path = i < ps ? paths.get(i) : EMPTY;
-        inputs.add(checkInput(val.itemAt(i), path));
+        inputs[i] = checkInput(val.itemAt(i), i < ps ? paths.get(i) : EMPTY);
       }
+    } else {
+      inputs = new NewInput[0];
     }
 
     final Options opts = toOptions(3, new Options(), qc);

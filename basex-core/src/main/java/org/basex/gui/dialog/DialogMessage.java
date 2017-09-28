@@ -38,7 +38,8 @@ public final class DialogMessage extends BaseXDialog {
     label.setIcon(ic.large);
     back.add(label);
 
-    final TextPanel text = new TextPanel(txt, false, this);
+    // break longer texts
+    final TextPanel text = new TextPanel(txt.replaceAll("(.{1,160})", "$1\n").trim(), false, this);
     text.setFont(label.getFont());
     back.add(text);
 
@@ -57,12 +58,8 @@ public final class DialogMessage extends BaseXDialog {
     final BaseXBack bttns = newButtons(list.toArray(new Object[list.size()]));
     set(bttns, BorderLayout.SOUTH);
 
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        ((Container) bttns.getComponent(0)).getComponent(0).requestFocusInWindow();
-      }
-    });
+    SwingUtilities.invokeLater(((Container) bttns.getComponent(0)).getComponent(0)::
+      requestFocusInWindow);
     finish();
   }
 

@@ -24,7 +24,7 @@ public final class FnStringLength extends StandardFunc {
       if(it instanceof FItem) throw FISTRING_X.get(info, it.type);
       s = it == null ? Token.EMPTY : it.string(info);
     } else {
-      s = toEmptyToken(ctxArg(0, qc), qc);
+      s = toEmptyToken(exprs[0], qc);
     }
     return Int.get(Token.length(s));
   }

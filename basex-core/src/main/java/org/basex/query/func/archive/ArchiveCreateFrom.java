@@ -51,12 +51,12 @@ public class ArchiveCreateFrom extends ArchiveCreate {
           final IOFile file = new IOFile(root, string(en.string(info)));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);
-          add(en, new B64(file.read()), out, level, qc);
+          add(en, B64.get(file.read()), out, level, qc);
         }
       } catch(final IOException ex) {
         throw ARCH_FAIL_X.get(info, ex);
       }
-      return new B64(out.finish());
+      return B64.get(out.finish());
     }
   }
 }

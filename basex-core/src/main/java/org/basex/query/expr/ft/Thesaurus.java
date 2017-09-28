@@ -211,12 +211,11 @@ public final class Thesaurus {
     }
   }
 
-  /**
-   * Compares two thesaurus instances.
-   * @param th instance to be compared
-   * @return result of check
-   */
-  boolean sameAs(final Thesaurus th) {
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Thesaurus)) return false;
+    final Thesaurus th = (Thesaurus) obj;
     return file.eq(th.file) && min == th.min && max == th.max && eq(rel, th.rel);
   }
 }

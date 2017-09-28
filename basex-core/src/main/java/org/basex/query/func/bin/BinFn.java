@@ -60,7 +60,7 @@ abstract class BinFn extends StandardFunc {
     final int bl = bytes.length;
     final int[] bounds = bounds(off, sz, bl);
     final int o = bounds[0], l = Math.min(8, bounds[1]);
-    if(l == 0) return Int.get(0);
+    if(l == 0) return Int.ZERO;
 
     // place input data in long byte array, consider sign
     final byte[] tmp = new byte[8];
@@ -94,12 +94,12 @@ abstract class BinFn extends StandardFunc {
     final int bl2 = bytes2.length;
     if(bl1 != bl2) throw BIN_DLA_X_X.get(info, bl1, bl2);
 
+    // single byte
+    if(bl1 == 1) return B64.get(op.eval(bytes1[0], bytes2[0]));
+    // byte array
     final byte[] tmp = new byte[bl1];
-    for(int b = 0; b < bl1; b++) {
-      tmp[b] = (byte) (op == Bit.OR ? bytes1[b] | bytes2[b] :
-        op == Bit.XOR ? bytes1[b] ^ bytes2[b] : bytes1[b] & bytes2[b]);
-    }
-    return new B64(tmp);
+    for(int b = 0; b < bl1; b++) tmp[b] = op.eval(bytes1[b], bytes2[b]);
+    return B64.get(tmp);
   }
 
   /**
@@ -129,7 +129,7 @@ abstract class BinFn extends StandardFunc {
       System.arraycopy(bytes, 0, tmp, 0, bl);
       Arrays.fill(tmp, bl, tmp.length, (byte) octet);
     }
-    return new B64(tmp);
+    return B64.get(tmp);
   }
 
   /**

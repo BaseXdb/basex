@@ -28,10 +28,10 @@ public abstract class Filter extends Preds {
    * Constructor.
    * @param info input info
    * @param root root expression
-   * @param preds predicates
+   * @param exprs predicates
    */
-  protected Filter(final InputInfo info, final Expr root, final Expr... preds) {
-    super(info, preds);
+  protected Filter(final InputInfo info, final Expr root, final Expr... exprs) {
+    super(info, exprs);
     this.root = root;
   }
 
@@ -48,8 +48,7 @@ public abstract class Filter extends Preds {
 
     // use simple filter for single deterministic predicate
     final Expr pred = preds[0];
-    if(preds.length == 1 && !(pred.has(Flag.CTX) || pred.has(Flag.NDT) || pred.has(Flag.HOF) ||
-        pred.has(Flag.UPD) || pred.has(Flag.POS))) return new SimpleFilter(info, root, preds);
+    if(preds.length == 1 && pred.isSimple()) return new SimpleFilter(info, root, preds);
 
     return new CachedFilter(info, root, preds);
   }
@@ -75,7 +74,7 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public void checkUp() throws QueryException {
+  public final void checkUp() throws QueryException {
     checkNoUp(root);
     super.checkUp();
   }
@@ -97,11 +96,7 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
     final Expr e = merge(root, cc);
-    if(e != this) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      return e;
-    }
-    return super.optimizeEbv(cc);
+    return e == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, e);
   }
 
   /**
@@ -110,15 +105,15 @@ public abstract class Filter extends Preds {
    * @param p predicate to be added
    * @return new filter
    */
-  public final Expr addPred(final Expr p) {
-    preds = new ExprList(preds.length + 1).add(preds).add(p).finish();
-    return new CachedFilter(info, root, preds);
+  public final CachedFilter addPred(final Expr p) {
+    exprs = new ExprList(exprs.length + 1).add(exprs).add(p).finish();
+    return new CachedFilter(info, root, exprs);
   }
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // return empty root
-    if(root.isEmpty()) return optPre(cc);
+    if(root.isEmpty()) return cc.emptySeq(this);
 
     // remember current context value (will be temporarily overwritten)
     final QueryFocus focus = cc.qc.focus;
@@ -133,70 +128,77 @@ public abstract class Filter extends Preds {
 
     // check result size
     seqType(root.seqType(), root.size());
-    if(size == 0) return optPre(cc);
+    if(size == 0) return cc.emptySeq(this);
 
     // if possible, convert filter to root or path expression
-    final Expr ex = simplify(root, preds);
+    final Expr ex = simplify(root, exprs);
     if(ex != null) return ex.optimize(cc);
 
     // try to rewrite filter to index access
     if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
-      final Path ip = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, preds));
+      final Path ip = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
       final Expr ie = ip.index(cc, Path.initial(cc, root));
       if(ie != ip) return ie;
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, preds));
+    if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, exprs));
 
     // evaluate positional predicates
-    Expr e = root;
+    Expr expr = root;
     boolean opt = false;
-    for(final Expr pred : preds) {
-      final Pos pos = pred instanceof Pos ? (Pos) pred : null;
-      final boolean last = pred.isFunction(Function.LAST);
-
-      if(last) {
-        if(e.isValue()) {
+    for(final Expr pred : exprs) {
+      Expr e = null;
+      if(pred.isFunction(Function.LAST)) {
+        if(expr.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) e, e.size(), 1);
+          e = FnSubsequence.eval((Value) expr, expr.size(), 1);
         } else {
-          // rewrite positional predicate to basex:last-from
-          e = cc.function(Function._UTIL_LAST_FROM, info, e);
+          // rewrite positional predicate to util:last-from
+          e = cc.function(Function._UTIL_LAST_FROM, info, expr);
         }
-        opt = true;
-      } else if(pos != null) {
-        if(e.isValue()) {
+      } else if(pred instanceof ItrPos) {
+        final ItrPos pos = (ItrPos) pred;
+        if(expr.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) e, pos.min, pos.max - pos.min + 1);
+          e = FnSubsequence.eval((Value) expr, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
-          // example: expr[pos] -> basex:item-at(expr, pos.min)
-          e = cc.function(Function._UTIL_ITEM_AT, info, e, Int.get(pos.min));
+          // example: expr[pos] -> util:item-at(expr, pos.min)
+          e = cc.function(Function._UTIL_ITEM_AT, info, expr, Int.get(pos.min));
         } else {
-          // example: expr[pos] -> basex:item-range(expr, pos.min, pos.max)
-          e = cc.function(Function._UTIL_ITEM_RANGE, info, e, Int.get(pos.min), Int.get(pos.max));
+          // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
+          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, Int.get(pos.min),
+              Int.get(pos.max));
         }
-        opt = true;
+      } else if(pred instanceof Pos) {
+        final Pos pos = (Pos) pred;
+        if(pos.exprs[0] == pos.exprs[1]) {
+          // example: expr[pos] -> util:item-at(expr, pos.min)
+          e = cc.function(Function._UTIL_ITEM_AT, info, expr, pos.exprs[0]);
+        } else {
+          // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
+          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, pos.exprs[0],
+              pos.exprs[1]);
+        }
       } else if(num(pred)) {
-        /* - rewrite positional predicate to basex:item-at
-         *   example: expr[pos] -> basex:item-at(expr, pos)
-         * - only choose deterministic and context-independent offsets.
-         *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = cc.function(Function._UTIL_ITEM_AT, info, e, pred);
+        /* - rewrite positional predicate to util:item-at
+         *   example: expr[pos] -> util:item-at(expr, pos)
+         * - only choose deterministic and context-independent offsets
+         *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
+        e = cc.function(Function._UTIL_ITEM_AT, info, expr, pred);
+      }
+
+      if(e != null) {
+        expr = e;
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
-        e = e instanceof Filter ? ((Filter) e).addPred(pred) : get(info, e, pred);
+        expr = expr instanceof Filter ? ((Filter) expr).addPred(pred) : get(info, expr, pred);
       }
     }
 
-    if(opt) {
-      cc.info(QueryText.OPTREWRITE_X, this);
-      return e;
-    }
-
-    // standard iterator
-    return get(info, root, preds);
+    // return optimized expression or standard iterator
+    return opt ? cc.replaceWith(this, expr) : get(info, root, exprs);
   }
 
   @Override
@@ -210,7 +212,7 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public VarUsage count(final Var var) {
+  public final VarUsage count(final Var var) {
     final VarUsage inPreds = super.count(var), inRoot = root.count(var);
     if(inPreds == VarUsage.NEVER) return inRoot;
     final long sz = root.size();
@@ -219,17 +221,18 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+      throws QueryException {
+
     final Expr rt = root == null ? null : root.inline(var, ex, cc);
     if(rt != null) root = rt;
-
-    final boolean pr = inlineAll(preds, var, ex, cc);
+    final boolean pr = inlineAll(exprs, var, ex, cc);
     return pr || rt != null ? optimize(cc) : null;
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
-    for(final Expr e : preds) {
+  public final boolean accept(final ASTVisitor visitor) {
+    for(final Expr e : exprs) {
       visitor.enterFocus();
       if(!e.accept(visitor)) return false;
       visitor.exitFocus();
@@ -240,8 +243,14 @@ public abstract class Filter extends Preds {
   @Override
   public final int exprSize() {
     int sz = 1;
-    for(final Expr e : preds) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz + root.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Filter && root.equals(((Filter) obj).root) &&
+        super.equals(obj);
   }
 
   @Override

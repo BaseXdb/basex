@@ -1,13 +1,9 @@
 package org.basex.query.value.item;
 
-import static org.basex.data.DataText.*;
-
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Untyped atomic item ({@code xs:untypedAtomic}).
@@ -65,8 +61,8 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Atm && Token.eq(value, ((Atm) cmp).value);
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Atm && Token.eq(value, ((Atm) obj).value);
   }
 
   @Override
@@ -77,34 +73,5 @@ public final class Atm extends Item {
   @Override
   public String toString() {
     return toString(value);
-  }
-
-  /**
-   * Returns a string representation of the specified value.
-   * @param value value
-   * @return string
-   */
-  public static String toString(final byte[] value) {
-    return toString(value, true);
-  }
-
-  /**
-   * Returns a string representation of the specified value.
-   * @param value value
-   * @param quotes wrap with quotes
-   * @return string
-   */
-  public static String toString(final byte[] value, final boolean quotes) {
-    final ByteList tb = new ByteList();
-    if(quotes) tb.add('"');
-    for(final byte v : value) {
-      if(v == '&') tb.add(E_AMP);
-      else if(v == '\r') tb.add(E_CR);
-      else if(v == '\n') tb.add(E_NL);
-      else if(v == '"' && quotes) tb.add('"').add('"');
-      else tb.add(v);
-    }
-    if(quotes) tb.add('"');
-    return tb.toString();
   }
 }

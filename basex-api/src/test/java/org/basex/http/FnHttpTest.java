@@ -474,7 +474,7 @@ public class FnHttpTest extends HTTPTest {
     final Part p1 = new Part();
     p1.headers.put("Content-Type", "application/octet-stream");
     p1.bodyAtts.put("media-type", "application/octet-stream");
-    p1.bodyContents.add(new B64(new byte[] { -1 }));
+    p1.bodyContents.add(B64.get((byte) -1));
 
     req.parts.add(p1);
 
@@ -545,7 +545,7 @@ public class FnHttpTest extends HTTPTest {
     // Case 1: content is xs:base64Binary
     final HttpRequest req1 = new HttpRequest();
     req1.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    req1.payload.add(new B64(token("test")));
+    req1.payload.add(B64.get(token("test")));
     final OutputStream out1 = fakeOutput();
     HttpClient.writePayload(out1, req1);
     assertEquals("test", out1.toString());
@@ -811,7 +811,7 @@ public class FnHttpTest extends HTTPTest {
       + " for $h in http:header"
       + " order by $h/@name"
       + " return insert node $h as first into ."
-      + "}";
+      + '}';
     try(QueryProcessor qp = new QueryProcessor(query, ctx).context(xml)) {
       return qp.iter().next();
     }

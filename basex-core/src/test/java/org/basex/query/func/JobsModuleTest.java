@@ -131,6 +131,13 @@ public final class JobsModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void invoke() {
+    query("starts-with(" + _JOBS_INVOKE.args("src/test/resources/input.xq") + ", 'job')", "true");
+    error(_JOBS_INVOKE.args("src/test/resources/xxx.xq"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test
   public void finished() {
     final String id = verySlowQuery();
     try {
@@ -247,7 +254,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
    * Waits until a very slow query has been started.
    * @return query id
    */
-  private String verySlowQuery() {
+  private static String verySlowQuery() {
     final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
     while(context.jobs.active.get(id) == null) Performance.sleep(1);
     return id;

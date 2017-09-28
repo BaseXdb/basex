@@ -142,7 +142,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void startOpen(final QNm name) {
     namespaces = new NSDecl(namespaces);
-    attributes.clear();
+    attributes.reset();
   }
 
   @Override

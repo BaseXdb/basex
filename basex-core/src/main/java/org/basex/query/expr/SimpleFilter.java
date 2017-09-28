@@ -27,7 +27,7 @@ final class SimpleFilter extends CachedFilter {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item pred = preds[0].ebv(qc, info);
+    final Item pred = exprs[0].ebv(qc, info);
     if(pred != null) {
       final Value val = qc.value(root);
       if(pred instanceof ANum) {
@@ -43,6 +43,6 @@ final class SimpleFilter extends CachedFilter {
   @Override
   public Filter copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new SimpleFilter(info, root.copy(cc, vm),
-        Arr.copyAll(cc, vm, preds)));
+        Arr.copyAll(cc, vm, exprs)));
   }
 }

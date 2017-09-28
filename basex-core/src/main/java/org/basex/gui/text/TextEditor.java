@@ -24,6 +24,8 @@ public final class TextEditor {
     /** Title case. */ TITLE
   }
 
+  /** Completion characters. */
+  private static final char[] ALLOWED = { '@', '.', '/', ':', '&', '<', '>' };
   /** Opening brackets. */
   private static final String OPENING = "{([";
   /** Closing brackets. */
@@ -79,7 +81,7 @@ public final class TextEditor {
    */
   void search(final SearchContext sc) {
     // skip search if criteria have not changed
-    if(sc.sameAs(search)) {
+    if(sc.equals(search)) {
       sc.nr = search.nr;
       sc.bar.refresh(sc);
     } else {
@@ -207,8 +209,21 @@ public final class TextEditor {
    */
   int completionStart() {
     int p = pos;
-    while(p > 0 && !ws(text[p - 1])) --p;
+    while(p > 0 && completeMore(text[p - 1])) --p;
     return p;
+  }
+
+  /**
+   * Checks if the specified character is a completion character.
+   * @param ch character
+   * @return result of check
+   */
+  private static boolean completeMore(final byte ch) {
+    if(letterOrDigit(ch)) return true;
+    for(final char a : ALLOWED) {
+      if(ch == a) return true;
+    }
+    return false;
   }
 
   /**
@@ -627,13 +642,10 @@ public final class TextEditor {
 
     // stable sort: before custom sort, use default sort
     if(coll != null || column > 0) tokens.sort(true, true);
-    final Comparator<byte[]> cc = new Comparator<byte[]>() {
-      @Override
-      public int compare(final byte[] token1, final byte[] token2) {
-        final byte[] t1 = sub(token1, column), t2 = sub(token2, column);
-        return coll != null ? coll.compare(string(t1), string(t2)) :
-         diff(cs ? lc(t1) : t1, cs ? lc(t2) : t2);
-      }
+    final Comparator<byte[]> cc = (token1, token2) -> {
+      final byte[] t1 = sub(token1, column), t2 = sub(token2, column);
+      return coll != null ? coll.compare(string(t1), string(t2)) :
+       diff(cs ? lc(t1) : t1, cs ? lc(t2) : t2);
     };
     tokens.sort(cc, asc);
     if(gopts.get(GUIOptions.MERGEDUPL)) tokens.unique();

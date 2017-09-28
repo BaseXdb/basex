@@ -18,4 +18,10 @@ public final class FnLocalNameFromQName extends StandardFunc {
     final QNm nm = toQNm(exprs[0], qc, true);
     return nm == null ? null : AtomType.NCN.cast(Str.get(nm.local()), qc, sc, info);
   }
+
+  @Override
+  protected FnLocalNameFromQName opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

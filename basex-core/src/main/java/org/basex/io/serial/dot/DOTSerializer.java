@@ -119,7 +119,7 @@ public final class DOTSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   private void print(final byte[] value, final String col) throws IOException {
-    String txt = string(chop(value, 60)).replaceAll("\"|\\r|\\n", "'");
+    String txt = string(chop(value, 60)).replaceAll("[\"\r\n]", "'");
     if(compact) txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
     indent();
     out.print(Util.info(DOTNODE, count, txt, col));

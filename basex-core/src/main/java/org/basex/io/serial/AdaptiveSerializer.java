@@ -80,13 +80,13 @@ public class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected void atomic(final Item item) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    final Type it = item.type;
-    if(it == AtomType.BLN || it == AtomType.STR || it == AtomType.ATM || it == AtomType.ITR ||
-       it == AtomType.DEC || it == AtomType.DBL || it == AtomType.QNM) {
+    final Type tp = item.type;
+    if(tp == AtomType.BLN || tp == AtomType.STR || tp == AtomType.ATM || tp == AtomType.ITR ||
+       tp == AtomType.DEC || tp == AtomType.DBL || tp == AtomType.QNM) {
       tb.add(item.toString());
     } else {
       try {
-        tb.add(it.toString()).add('(').add(Atm.toString(item.string(null))).add(')');
+        tb.add(tp.toString()).add('(').add(Item.toString(item.string(null), true, false)).add(')');
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }

@@ -270,26 +270,26 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a byte array to the token.
-   * @param value the byte array to be added
+   * Adds another token to the token.
+   * @param token the token to be added
    * @return self reference
    */
-  public TokenBuilder add(final byte[] value) {
-    return add(value, 0, value.length);
+  public TokenBuilder add(final byte[] token) {
+    return add(token, 0, token.length);
   }
 
   /**
-   * Adds part of a byte array to the token.
-   * @param value the byte array to be added
+   * Adds part of another token to the token.
+   * @param token the token
    * @param start start position
    * @param end end position
    * @return self reference
    */
-  public TokenBuilder add(final byte[] value, final int start, final int end) {
+  public TokenBuilder add(final byte[] token, final int start, final int end) {
     byte[] chrs = chars;
     final int cl = chrs.length, l = end - start, s = size, ns = s + l;
     if(ns > cl) chrs = Arrays.copyOf(chrs, Array.newSize(ns));
-    System.arraycopy(value, start, chrs, s, l);
+    System.arraycopy(token, start, chrs, s, l);
     chars = chrs;
     size = ns;
     return this;

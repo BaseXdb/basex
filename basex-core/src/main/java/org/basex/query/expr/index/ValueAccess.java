@@ -31,7 +31,7 @@ public final class ValueAccess extends IndexAccess {
   private Expr expr;
   /** Index type. */
   private final IndexType type;
-  /** Parent name test. */
+  /** Parent name test (can be {@code null}). */
   private final NameTest test;
   /** Trim search terms. */
   private boolean trim;
@@ -41,7 +41,7 @@ public final class ValueAccess extends IndexAccess {
    * @param info input info
    * @param expr search expression
    * @param type index type
-   * @param test test test
+   * @param test test test (can be {@code null})
    * @param ictx index context
    */
   public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
@@ -211,6 +211,14 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public int exprSize() {
     return expr.exprSize() + 1;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof ValueAccess)) return false;
+    final ValueAccess v = (ValueAccess) obj;
+    return expr.equals(obj) && type == v.type && Objects.equals(test, v.test) && trim == v.trim &&
+        super.equals(obj);
   }
 
   @Override

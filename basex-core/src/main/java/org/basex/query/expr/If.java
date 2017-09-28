@@ -62,14 +62,14 @@ public final class If extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     // static condition: return branch in question
     cond = cond.optimizeEbv(cc);
-    if(cond.isValue()) return optPre(exprs[branch(cc.qc)], cc);
+    if(cond.isValue()) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(exprs[0].sameAs(exprs[1])) return optPre(exprs[0], cc);
+    if(exprs[0].equals(exprs[1])) return cc.replaceWith(this, exprs[0]);
 
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
-      cc.info(OPTREWRITE_X, this);
+      cc.info(OPTSWAP_X, this);
       cond = ((Arr) cond).exprs[0];
       final Expr tmp = exprs[0];
       exprs[0] = exprs[1];
@@ -80,38 +80,28 @@ public final class If extends Arr {
     if(exprs[0].seqType().eq(SeqType.BLN) && exprs[1].seqType().eq(SeqType.BLN)) {
       final Expr a = cond, b = exprs[0], c = exprs[1];
       if(b == Bln.TRUE) {
-        if(c == Bln.FALSE) {
-          // if(A) then true() else false() -> xs:boolean(A)
-          cc.info(OPTPRE_X, this);
-          return compBln(a, info, cc.sc());
-        }
+        // if(A) then true() else false() -> xs:boolean(A)
+        if(c == Bln.FALSE) return cc.replaceWith(this, compBln(a, info, cc.sc()));
         // if(A) then true() else C -> A or C
-        cc.info(OPTREWRITE_X, this);
-        return new Or(info, a, c).optimize(cc);
+        return cc.replaceWith(this, new Or(info, a, c).optimize(cc));
       }
 
       if(c == Bln.TRUE) {
-        if(b == Bln.FALSE) {
-          // if(A) then false() else true() -> not(A)
-          cc.info(OPTPRE_X, this);
-          return cc.function(Function.NOT, info, a);
-        }
+        // if(A) then false() else true() -> not(A)
+        if(b == Bln.FALSE) return cc.replaceWith(this, cc.function(Function.NOT, info, a));
         // if(A) then B else true() -> not(A) or B
-        cc.info(OPTREWRITE_X, this);
-        return new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
+        final Expr e = new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
+        return cc.replaceWith(this, e);
       }
 
+      // if(A) then false() else C -> not(A) and C
       if(b == Bln.FALSE) {
-        // if(A) then false() else C -> not(A) and C
-        cc.info(OPTREWRITE_X, this);
-        return new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
+        final Expr e = new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
+        return cc.replaceWith(this, e);
       }
 
-      if(c == Bln.FALSE) {
-        // if(A) then B else false() -> A and B
-        cc.info(OPTREWRITE_X, this);
-        return new And(info, a, b).optimize(cc);
-      }
+      // if(A) then B else false() -> A and B
+      if(c == Bln.FALSE) return cc.replaceWith(this, new And(info, a, b).optimize(cc));
     }
 
     seqType = exprs[0].seqType().union(exprs[1].seqType());
@@ -197,16 +187,6 @@ public final class If extends Arr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), cond, exprs);
-  }
-
-  @Override
-  public String toString() {
-    return IF + '(' + cond + ") " + THEN + ' ' + exprs[0] + ' ' + ELSE + ' ' + exprs[1];
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return cond.accept(visitor) && super.accept(visitor);
   }
@@ -229,5 +209,20 @@ public final class If extends Arr {
       }
     }
     return optimize(cc);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof If && cond.equals(((If) obj).cond) && super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), cond, exprs);
+  }
+
+  @Override
+  public String toString() {
+    return IF + '(' + cond + ") " + THEN + ' ' + exprs[0] + ' ' + ELSE + ' ' + exprs[1];
   }
 }

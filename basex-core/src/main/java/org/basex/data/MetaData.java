@@ -15,6 +15,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides meta information on a database.
@@ -147,28 +148,54 @@ public final class MetaData {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Normalizes a database path. Converts backslashes and
-   * removes duplicate and leading slashes.
+   * Normalizes a database path. Converts backslashes and removes duplicate and leading slashes.
    * Returns {@code null} if the path contains invalid characters.
    * @param path input path
    * @return normalized path or {@code null}
    */
   public static String normPath(final String path) {
+    // scan path segments
+    final StringList list = new StringList();
     final StringBuilder sb = new StringBuilder();
-    boolean slash = false;
     final int pl = path.length();
     for(int p = 0; p < pl; p++) {
-      final char c = path.charAt(p);
-      if(c == '\\' || c == '/') {
-        if(!slash && p != 0) sb.append('/');
-        slash = true;
+      final char ch = path.charAt(p);
+      if(ch == '\\' || ch == '/') {
+        if(!addToPath(sb, list)) return null;
       } else {
-        if(Prop.WIN && ":*?\"<>\\|".indexOf(c) != -1) return null;
-        if(slash) slash = false;
-        sb.append(c);
+        if(Prop.WIN && ":*?\"<>\\|".indexOf(ch) != -1) return null;
+        sb.append(ch);
       }
     }
+    if(!addToPath(sb, list)) return null;
+    sb.append(Strings.join(list.finish(), "/"));
+
+    // add trailing slash
+    if(pl > 0 && sb.length() > 0) {
+      final char ch = path.charAt(pl - 1);
+      if(ch == '\\' || ch == '/') sb.append('/');
+    }
     return sb.toString();
+  }
+
+  /**
+   * Adds a path segment.
+   * @param sb string builder
+   * @param list list of segments
+   * @return result flag
+   */
+  private static boolean addToPath(final StringBuilder sb, final StringList list) {
+    if(sb.length() != 0) {
+      final String seg = sb.toString();
+      if(seg.equals("..")) {
+        if(list.isEmpty()) return false;
+        list.remove(list.size() - 1);
+      } else if(!seg.equals(".")) {
+        list.add(seg);
+      }
+      sb.setLength(0);
+    }
+    return true;
   }
 
   /**

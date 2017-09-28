@@ -3,9 +3,11 @@ package org.basex.query.func.fn;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -23,5 +25,12 @@ public final class FnCompare extends StandardFunc {
     final byte[] t1 = toToken(it1), t2 = toToken(it2);
     final long d = coll == null ? diff(t1, t2) : coll.compare(t1, t2);
     return Int.get(d < 0 ? -1 : d > 0 ? 1 : 0);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    if(exprs[0].seqType().oneNoArray() && exprs[1].seqType().oneNoArray())
+      seqType = seqType.withOcc(Occ.ONE);
+    return this;
   }
 }

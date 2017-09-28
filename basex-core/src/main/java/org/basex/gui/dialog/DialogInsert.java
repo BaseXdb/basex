@@ -65,12 +65,7 @@ public final class DialogInsert extends BaseXDialog {
     final BaseXBack knd = new BaseXBack(new TableLayout(1, 5));
     final ButtonGroup group = new ButtonGroup();
 
-    final ActionListener al = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        change(e.getSource());
-      }
-    };
+    final ActionListener al = e -> change(e.getSource());
 
     final int lkind = gui.gopts.get(GUIOptions.LASTINSERT);
     final int nl = NODE_KINDS.length;

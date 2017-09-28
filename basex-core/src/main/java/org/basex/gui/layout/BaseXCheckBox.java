@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
-import java.awt.event.*;
 
 import javax.swing.*;
 
@@ -49,12 +48,7 @@ public final class BaseXCheckBox extends JCheckBox {
 
     final BaseXDialog dialog = (BaseXDialog) win;
     BaseXLayout.setMnemonic(this, dialog.mnem);
-    addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        dialog.action(e.getSource());
-      }
-    });
+    addActionListener(e -> dialog.action(e.getSource()));
   }
 
   /**

@@ -114,7 +114,7 @@ public final class LogFile {
    * @param name name of log file
    * @return result of check
    */
-  boolean sameAs(final String name) {
+  boolean valid(final String name) {
     return file.name().equals(name + IO.LOGSUFFIX);
   }
 }

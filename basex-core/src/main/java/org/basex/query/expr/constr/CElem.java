@@ -141,6 +141,14 @@ public final class CElem extends CName {
         copyAll(cc, vm, exprs));
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof CElem)) return false;
+    final CElem c = (CElem) obj;
+    return comp == c.comp && nspaces.equals(c.nspaces) && super.equals(obj);
+  }
+
   /**
    * Adds the specified namespace to the namespace array.
    * If the prefix is already used for another URI, a new name is generated.

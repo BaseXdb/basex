@@ -6,9 +6,96 @@
 module namespace html = 'dba/html';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at 'util.xqm';
 
 (: Number formats. :)
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
+
+(:~
+ : Extends the specified table rows with the page template.
+ : @param  $rows  tr elements
+ : @return HTML page
+ :)
+declare function html:wrap(
+  $rows  as element(tr)+
+) as element(html) {
+  html:wrap(map { }, $rows)
+};
+
+(:~
+ : Extends the specified table rows with the page template.
+ : The following options can be specified:
+ : <ul>
+ :   <li><b>header</b>: page headers</li>
+ :   <li><b>error</b>: error string</li>
+ :   <li><b>css</b>: CSS files</li>
+ :   <li><b>scripts</b>: JavaScript files</li>
+ : </ul>
+ : @param  $options  options
+ : @param  $rows     tr elements
+ : @return page
+ :)
+declare function html:wrap(
+  $options  as map(*),
+  $rows     as element(tr)+
+) as element(html) {
+  let $header := head($options?header) ! util:capitalize(.)
+  return <html>
+    <head>
+      <meta charset="utf-8"/>
+      <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
+      <meta name="description" content="Database Administration"/>
+      <meta name="author" content="BaseX Team, 2014-17"/>
+      <link rel="stylesheet" type="text/css" href="static/style.css"/>
+      { $options?css ! <link rel="stylesheet" type="text/css" href="static/{.}"/> }
+      <script type="text/javascript" src="static/js.js"/>
+      { $options?scripts ! <script type="text/javascript" src="static/{.}"/> }
+    </head>
+    <body>
+      <div class="right"><img style='padding-left:10px;padding-bottom:10px;'
+        src="static/basex.svg"/></div>
+      <h1>Database Administration</h1>
+      <div>{
+        let $emph := <span>{
+          element b {
+            attribute id { 'info' },
+            let $error := $options?error[.], $info := $options?info[.]
+            return if($error) then (
+              attribute class { 'error' }, $error
+            ) else if($info) then (
+              attribute class { 'info' }, $info
+            ) else (),
+            '&#xa0;'
+          }
+        }</span>
+        return try {
+          cons:check(),
+          let $cats :=
+            for $cat in ('Databases', 'Queries', 'Files', 'Logs',  'Users',
+              'Settings', 'Logout')
+            let $link := <a href="{ lower-case(replace($cat, ' &amp; ', '-')) }">{ $cat }</a>
+            return if($link = $header) then (
+              <b>{ $link }</b>
+            ) else (
+              $link
+            )
+          return (head($cats), tail($cats) ! (' | ', .)),
+          (1 to 3) ! '&#x2000;',
+          $emph
+        } catch basex:login {
+          $emph
+        },
+        $cons:SESSION-VALUE ! <span style='float:right'>User: <b>{ . }</b></span>
+      }</div>
+      <hr/>
+      <table width='100%'>{ $rows }</table>
+      <hr/>
+      <div class='right'><sup>BaseX Team, 2014-17</sup></div>
+      <div class='small'/>
+      { html:js('buttons();') }
+    </body>
+  </html>
+};
 
 (:~
  : Creates an option checkbox.
@@ -22,7 +109,7 @@ declare function html:option(
   $label  as xs:string,
   $opts   as xs:string*
 ) as node()+ {
-  html:checkbox("opts", $value, $opts = $value, $label)
+  html:checkbox('opts', $value, $opts = $value, $label)
 };
 
 (:~
@@ -57,7 +144,7 @@ declare function html:checkbox(
   $map     as map(*)
 ) as node()+ {
   element input {
-    attribute type { "checkbox" },
+    attribute type { 'checkbox' },
     map:for-each($map, function($key, $value) { attribute { $key } { $value } })
   },
   text { $label },
@@ -107,10 +194,9 @@ declare function html:button(
   $class    as xs:string?
 ) as element(button) {
   element button {
-    attribute type { 'submit' },
     attribute name { 'action' },
     attribute value { $value },
-    $confirm[.] ! attribute onclick { "return confirm('Are you sure?');" },
+    $confirm[.] ! attribute onclick { 'return confirm("Are you sure?");' },
     $class ! attribute class { . },
     $label
   }
@@ -125,19 +211,19 @@ declare function html:properties(
   $props  as element()
 ) as element(table) {
   <table>{
-    for $info in $props/*
+    for $header in $props/*
     return (
       <tr>
         <th colspan='2' align='left'>
-          <h3>{ upper-case($info/name()) }</h3>
+          <h3>{ upper-case(name($header)) }</h3>
         </th>
       </tr>,
-      for $option in $info/*
+      for $option in $header/*
       let $value := $option/data()
       return <tr>
         <td><b>{ upper-case($option/name()) }</b></td>
         <td>{
-          if($value = 'true') then '&#x2713;'
+          if($value = 'true') then '✓'
           else if($value = 'false') then '–'
           else $value
         }</td>
@@ -241,19 +327,19 @@ declare function html:table(
       if($single-page) then () else
         $start || '-' || min(($count, $start + $max - 1)) || ' of ',
       $count, ' ',
-      if($count = 1) then 'Entry' else ' Entries',
+      if($count = 0) then 'Entries.' else if($count = 1) then 'Entry:' else ' Entries:',
       if($single-page) then () else (
         ' &#xa0; ',
         let $first := '«', $prev := '‹'
         return if($page = 1) then ($first, $prev) else (
-          html:link($first, "", ($param, map { 'page': 1, 'sort': $sort })), ' ',
-          html:link($prev, "", ($param, map { 'page': $page - 1, 'sort': $sort }))
+          html:link($first, '', ($param, map { 'page': 1, 'sort': $sort })), ' ',
+          html:link($prev, '', ($param, map { 'page': $page - 1, 'sort': $sort }))
         ),
         ' ',
         let $last := '»', $next := '›'
         return if($last-page) then ($next, $last) else (
-          html:link($next, "", ($param, map { 'page': $page + 1, 'sort': $sort })), ' ',
-          html:link($last, "", ($param, map { 'page': ($count - 1) idiv $max + 1, 'sort': $sort }))
+          html:link($next, '', ($param, map { 'page': $page + 1, 'sort': $sort })), ' ',
+          html:link($last, '', ($param, map { 'page': ($count - 1) idiv $max + 1, 'sort': $sort }))
         )
       )
     },
@@ -264,12 +350,19 @@ declare function html:table(
           let $name := $header/name()
           let $value := upper-case($header/text())
           return element th {
-            attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
-            if(empty($sort) or $name = $sort-key) then (
+            attribute align {
+              if($header/@type = $html:NUMBER) then 'right' else 'left'
+            },
+
+            if($pos = 1 and $buttons) then (
+              <input type='checkbox' onclick='toggle(this)'/>, ''
+            ) else (),
+
+            if($header/@type = 'id') then (
+            ) else if(empty($sort) or $name = $sort-key) then (
               $value
             ) else (
-              html:link($value, "", ($param, map { 'sort': $name, 'page': $page })
-              )
+              html:link($value, '', ($param, map { 'sort': $name, 'page': $page }))
             )
           }
         },
@@ -280,20 +373,27 @@ declare function html:table(
           let $name := $header/name()
           let $type := $header/@type
           let $col := $entry/@*[name() = $name]
-          let $value := $col/string()[.] ! (
-            if($header/@type = 'bytes') then (
-              try { prof:human(xs:integer(.)) } catch * { . }
-            ) else if($header/@type = 'decimal') then (
-              try { format-number(number(.), '0.00') } catch * { . }
-            ) else if($header/@type = 'dateTime') then (
-              html:date(xs:dateTime(.))
-            )
-            else .
-          )
+          let $value := 
+            for $v in string($col)[.]
+            return try {
+              if($header/@type = 'bytes') then (
+                prof:human(xs:integer($v))
+              ) else if($header/@type = 'decimal') then (
+                format-number(number($v), '0.00')
+              ) else if($header/@type = 'dateTime') then (
+                html:date(xs:dateTime($v))
+              ) else if($header/@type = 'xml') then (
+                parse-xml-fragment($v)
+              )
+              else .
+            } catch * {
+              (: error: show original value :)
+              $v
+            }
           return element td {
             attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
             if($pos = 1 and $buttons) then (
-              <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>
+              <input type='checkbox' name='{ $name }' value='{ $col }' onclick='buttons(this)'/>, ''
             ) else (),
             if($pos = 1 and exists($link)) then (
               html:link($value, $link($value), ($param, map { $name: $value }))
@@ -315,9 +415,8 @@ declare function html:table(
 declare function html:focus(
   $element  as xs:string
 ) as element(script) {
-  <script type="text/javascript">
-    (function(){{ var u = document.getElementById('{ $element }'); u.focus(); u.select(); }})();
-  </script>
+  html:js('var u = document.getElementById("' || replace($element, '"', '') || '"); ' ||
+    'u.focus(); u.select();')
 };
 
 (:~
@@ -330,14 +429,14 @@ declare function html:link(
   $text  as xs:string,
   $href  as xs:string
 ) as element(a) {
-  <a href="{ $href }">{ $text }</a>
+  <a href='{ $href }'>{ $text }</a>
 };
 
 (:~
  : Creates a link to the specified target.
  : @param  $text    link text
  : @param  $href    link reference
- : @param  $params  maps with query parameters.
+ : @param  $params  query parameters
  : @return link
  :)
 declare function html:link(
@@ -355,8 +454,21 @@ declare function html:link(
  :)
 declare function html:date(
   $date as xs:dateTime
-) {
+) as xs:string {
   let $zone := timezone-from-dateTime(current-dateTime())
   let $dt := fn:adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
-  return format-dateTime($dt, '[Y0000]-[M00]-[D00], [H00]:[m00]:[s00]')
+  return format-dateTime($dt, '[Y00]/[M00]/[D00], [H00]:[m00]:[s00]')
+};
+
+(:~
+ : Creates an embedded JavaScript snippet.
+ : @param  $js  JavaScript string
+ : @return script element
+ :)
+declare function html:js(
+  $js  as xs:string
+) as element(script) {
+  <script type='text/javascript'>{
+    '(function() { ' || $js || ' })();'
+  }</script>
 };

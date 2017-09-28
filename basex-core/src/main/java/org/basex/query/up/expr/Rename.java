@@ -85,6 +85,11 @@ public final class Rename extends Update {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Rename && super.equals(obj);
+  }
+
+  @Override
   public String toString() {
     return RENAME + ' ' + NODE + ' ' + exprs[0] + ' ' + AS + ' ' + exprs[1];
   }

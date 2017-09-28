@@ -101,7 +101,7 @@ public final class Array {
    * @return object
    */
   public static <T> T[] copy(final T[] source, final T[] target) {
-    System.arraycopy(source, 0, target, 0, source.length);
+    System.arraycopy(source, 0, target, 0, Math.min(source.length, target.length));
     return target;
   }
 
@@ -233,5 +233,39 @@ public final class Array {
    */
   public static int newSize(final int old, final double factor) {
     return (int) (old * factor) + 1;
+  }
+
+  /**
+   * Compares two token arrays for equality.
+   * @param tokens1 first tokens (can be {@code null})
+   * @param tokens2 second tokens (can be {@code null})
+   * @return result of check
+   */
+  public static boolean equals(final byte[][] tokens1, final byte[][] tokens2) {
+    if(tokens1 == tokens2) return true;
+    if(tokens1 == null || tokens2 == null) return false;
+    final int al = tokens1.length;
+    if(al != tokens2.length) return false;
+    for(int a = 0; a < al; a++) {
+      if(!Token.eq(tokens1[a], tokens2[a])) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Compares two arrays for equality.
+   * @param arr1 first array (can be {@code null})
+   * @param arr2 second array (can be {@code null})
+   * @return result of check
+   */
+  public static boolean equals(final Object[] arr1, final Object[] arr2) {
+    if(arr1 == arr2) return true;
+    if(arr1 == null || arr2 == null) return false;
+    final int al = arr1.length;
+    if(al != arr2.length) return false;
+    for(int a = 0; a < al; a++) {
+      if(!Objects.equals(arr1[a], arr2[a])) return false;
+    }
+    return true;
   }
 }

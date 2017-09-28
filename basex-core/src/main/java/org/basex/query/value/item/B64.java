@@ -14,6 +14,18 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class B64 extends Bin {
+  /** Empty value. */
+  public static final B64 EMPTY = new B64(new byte[0]);
+ /** Constant values. */
+  private static final B64[] B64S;
+
+  // caches the first 128 integers
+  static {
+    final int nl = 256;
+    B64S = new B64[nl];
+    for(int n = 0; n < nl; n++) B64S[n] = new B64(new byte[] { (byte) n });
+  }
+
   /**
    * Empty constructor.
    */
@@ -22,31 +34,51 @@ public class B64 extends Bin {
   }
 
   /**
+   * Returns an instance of this class for single bytes.
+   * @param value value
+   * @return instance
+   */
+  public static B64 get(final byte value) {
+    return B64S[value & 0xFF];
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param value value
+   * @return instance
+   */
+  public static B64 get(final byte[] value) {
+    return value.length == 1 ? get(value[0]) : new B64(value);
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param bin binary input
+   * @param ii input info
+   * @return instance
+   * @throws QueryException query exception
+   */
+  public static B64 get(final Bin bin, final InputInfo ii) throws QueryException {
+    return get(bin.binary(ii));
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param value textual representation
+   * @param ii input info
+   * @return instance
+   * @throws QueryException query exception
+   */
+  public static B64 get(final byte[] value, final InputInfo ii) throws QueryException {
+    return get(decode(value, ii));
+  }
+
+  /**
    * Constructor.
    * @param data binary data
    */
-  public B64(final byte[] data) {
+  private B64(final byte[] data) {
     super(data, AtomType.B64);
-  }
-
-  /**
-   * Constructor.
-   * @param value textual representation
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public B64(final byte[] value, final InputInfo ii) throws QueryException {
-    super(decode(value, ii), AtomType.B64);
-  }
-
-  /**
-   * Constructor.
-   * @param bin base64 input
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public B64(final Bin bin, final InputInfo ii) throws QueryException {
-    this(bin.binary(ii));
   }
 
   @Override

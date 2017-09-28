@@ -15,7 +15,6 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.ResourceNode;
 
 /**
  * Combination of a JTree and a text field. The tree visualizes the database content including raw
@@ -112,18 +111,15 @@ final class DialogResources extends BaseXBack {
     add(sp, BorderLayout.CENTER);
     add(panel, BorderLayout.SOUTH);
 
-    new Thread() {
-      @Override
-      public void run() {
-        tree.setCursor(CURSORWAIT);
-        tree.expandPath(new TreePath(root.getPath()));
-        filterText.setText("/");
-        filterText.setEnabled(true);
-        tree.setCursor(CURSORARROW);
-        filter.setEnabled(true);
-        clear.setEnabled(true);
-      }
-    }.start();
+    new Thread(() -> {
+      tree.setCursor(CURSORWAIT);
+      tree.expandPath(new TreePath(root.getPath()));
+      filterText.setText("/");
+      filterText.setEnabled(true);
+      tree.setCursor(CURSORARROW);
+      filter.setEnabled(true);
+      clear.setEnabled(true);
+    }).start();
   }
 
   /**
@@ -258,12 +254,7 @@ final class DialogResources extends BaseXBack {
       final ResourceNode n = selection();
       if(n == null || !BaseXDialog.confirm(dialog.gui, DELETE_NODES)) return;
 
-      final Runnable run = new Runnable() {
-        @Override
-        public void run() {
-          refreshNewFolder(n.path());
-        }
-      };
+      final Runnable run = () -> refreshNewFolder(n.path());
       DialogProgress.execute(dialog, run, new Delete(n.path()));
     }
 
@@ -288,12 +279,7 @@ final class DialogResources extends BaseXBack {
       if(!d.ok()) return;
 
       final String p = string(ResourceNode.preparePath(token(d.input())));
-      final Runnable run = new Runnable() {
-        @Override
-        public void run() {
-          refreshNewFolder(p);
-        }
-      };
+      final Runnable run = () -> refreshNewFolder(p);
       DialogProgress.execute(dialog, run, new Rename(n.path(), p));
     }
 

@@ -19,6 +19,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
+  /** Indicates if all items have exactly the same type. */
+  public boolean homo;
   /** Length. */
   protected long size;
 
@@ -30,6 +32,7 @@ public abstract class Seq extends Value {
   protected Seq(final long size, final Type type) {
     super(type);
     this.size = size;
+    this.homo = type != AtomType.ITEM;
   }
 
   @Override
@@ -143,6 +146,19 @@ public abstract class Seq extends Value {
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw SEQFOUND_X.get(ii, this);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Seq)) return false;
+    final Seq s = (Seq) obj;
+    if(size != s.size) return false;
+    final BasicIter<Item> i1 = iter(), i2 = s.iter();
+    for(Item it1; (it1 = i1.next()) != null;) {
+      if(!it1.equals(i2.next())) return false;
+    }
+    return true;
   }
 
   @Override

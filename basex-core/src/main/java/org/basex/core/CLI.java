@@ -3,10 +3,13 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -18,61 +21,54 @@ import org.basex.util.*;
  */
 public abstract class CLI extends Main {
   /** Database context. */
-  public final Context context;
+  public Context context;
 
+  /** Cached initial commands. */
+  protected final ArrayList<Pair<String, String>> commands = new ArrayList<>();
   /** Output file for queries. */
   protected OutputStream out = System.out;
   /** Verbose mode. */
   protected boolean verbose;
 
   /** Password reader. */
-  private static final PasswordReader PWREADER = new PasswordReader() {
-    @Override
-    public String password() {
-      Util.out(PASSWORD + COLS);
-      return Util.password();
-    }
+  private static final PasswordReader PWREADER = () -> {
+    Util.out(PASSWORD + COLS);
+    return Util.password();
   };
   /** Session. */
   private Session session;
 
   /**
-   * Constructor.
+   * Constructor, assigning the specified context.
    * @param args command-line arguments
+   * @param ctx database context (if {@code null}, must be assigned later on)
    * @throws IOException I/O exception
    */
-  protected CLI(final String[] args) throws IOException {
-    this(args, null);
-  }
-
-  /**
-   * Constructor.
-   * @param args command-line arguments
-   * @param ctx database context or {@code null}
-   * @throws IOException I/O exception
-   */
-  protected CLI(final String[] args, final Context ctx) throws IOException {
+  protected CLI(final Context ctx, final String... args) throws IOException {
     super(args);
-    context = ctx != null ? ctx : new Context();
+    context = ctx;
     parseArgs();
 
     // guarantee correct shutdown of database context
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public synchronized void run() {
-        context.close();
-      }
-    });
+    if(context != null) {
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        @Override
+        public synchronized void run() {
+          context.close();
+        }
+      });
+    }
   }
 
   /**
    * Parses and executes the input string.
-   * @param in input commands
-   * @param uri base uri (can be {@code null})
+   * @param command base uri (name) and command string (value)
+   * @return {@code false} if the exit command was sent
    * @throws IOException database exception
    */
-  protected final void execute(final String in, final String uri) throws IOException {
-    execute(CommandParser.get(in, context).pwReader(PWREADER).baseURI(uri));
+  protected final boolean execute(final Pair<String, String> command) throws IOException {
+    final CommandParser cp = CommandParser.get(command.value(), context);
+    return execute(cp.baseURI(command.name()).pwReader(PWREADER));
   }
 
   /**
@@ -121,8 +117,47 @@ public abstract class CLI extends Main {
    * @return session instance
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
-  protected Session init() throws IOException {
-    return new LocalSession(context, out);
+  protected final Session init() throws IOException {
+    if(local()) return new LocalSession(context, out);
+
+    // user/password input
+    String user = context.soptions.get(StaticOptions.USER);
+    String pass = context.soptions.get(StaticOptions.PASSWORD);
+    while(user.isEmpty()) {
+      Util.out(USERNAME + COLS);
+      user = Util.input();
+    }
+    while(pass.isEmpty()) {
+      Util.out(PASSWORD + COLS);
+      pass = Util.password();
+    }
+
+    final String host = context.soptions.get(StaticOptions.HOST);
+    final int port = context.soptions.get(StaticOptions.PORT);
+    try {
+      return new ClientSession(host, port, user, pass, out);
+    } catch(final ConnectException ex) {
+      throw new BaseXException(CONNECTION_ERROR_X, port);
+    }
+  }
+
+  /**
+   * Returns the base URI and the query string for the specified input.
+   * @param input input
+   * @return return base URI and query string
+   * @throws IOException I/O exception
+   */
+  protected static Pair<String, String> input(final String input) throws IOException {
+    final IO io = IO.get(input);
+    final boolean file = !(io instanceof IOContent) && io.exists() && !io.isDir();
+    return new Pair<>(file ? io.path() : "./", file ? io.string() : input);
+  }
+
+  /**
+   * Indicates if this is a local client.
+   * @return local mode
+   */
+  protected boolean local() {
+    return true;
   }
 }

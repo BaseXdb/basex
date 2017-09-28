@@ -24,12 +24,7 @@ public final class NonLockingTest extends SandboxTest {
     execute(new CreateDB(NAME));
     try {
       // start slow query
-      new Thread() {
-        @Override
-        public void run() {
-          query(SLEEP_10_SECONDS);
-        }
-      }.start();
+      new Thread(() -> query(SLEEP_10_SECONDS)).start();
 
       // start sleeping query
       String id;
@@ -67,12 +62,7 @@ public final class NonLockingTest extends SandboxTest {
   private static void nonLockingAfterWrite(final String query) {
     try {
       // start slow query, global write lock
-      new Thread() {
-        @Override
-        public void run() {
-          query(SLEEP_10_SECONDS + ',' + query);
-        }
-      }.start();
+      new Thread(() -> query(SLEEP_10_SECONDS + ',' + query)).start();
 
       // check if query execution causes a longer delay.
       assertEquals("1", query("1"));

@@ -102,6 +102,27 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, exprs);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr expr : exprs) sz += expr.exprSize();
+    return sz;
+  }
+
+  /**
+   * {@inheritDoc}
+   * Must be overwritten by implementing class.
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof Arr && Array.equals(exprs, ((Arr) obj).exprs);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), exprs);
   }
@@ -113,17 +134,5 @@ public abstract class Arr extends ParseExpr {
    */
   protected String toString(final String sep) {
     return new TokenBuilder(PAREN1).addSep(exprs, sep).add(PAREN2).toString();
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, exprs);
-  }
-
-  @Override
-  public int exprSize() {
-    int sz = 1;
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
   }
 }

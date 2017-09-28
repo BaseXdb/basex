@@ -81,11 +81,8 @@ public final class BaseXPopup extends JPopupMenu {
       } else {
         final String desc = cmd.label();
         final JMenuItem jmi = add(cmd.toggle() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc));
-        jmi.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e) {
-            if(!gui.updating) cmd.execute(gui);
-          }
+        jmi.addActionListener(e -> {
+          if(!gui.updating) cmd.execute(gui);
         });
         BaseXLayout.setMnemonic(jmi, mnemCache);
         jmi.setAccelerator(BaseXLayout.keyStroke(cmd));

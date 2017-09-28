@@ -261,6 +261,6 @@ public class ClientSession extends Session {
 
   @Override
   public String toString() {
-    return Prop.PROJECT_NAME + ":/" + socket.getLocalAddress() + ":" + socket.getPort();
+    return Prop.PROJECT_NAME + ":/" + socket.getLocalAddress() + ':' + socket.getPort();
   }
 }

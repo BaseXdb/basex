@@ -36,7 +36,7 @@ public abstract class Step extends Preds {
   public final Test test;
 
   /**
-   * This method returns the most appropriate step implementation.
+   * This method returns the most efficient step implementation.
    * @param info input info
    * @param axis axis
    * @param test node test
@@ -53,15 +53,14 @@ public abstract class Step extends Preds {
     // check for simple positional predicates
     boolean pos = false;
     for(final Expr pred : preds) {
-      if(pred instanceof Pos || num(pred)) {
+      if(pred instanceof ItrPos || num(pred)) {
         pos = true;
       } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
         // positional checks may be nested or non-deterministic: choose full evaluation
         return new CachedStep(info, axis, test, preds);
       }
     }
-    return pos ? new IterPosStep(info, axis, test, preds) :
-                 new IterStep(info, axis, test, preds);
+    return pos ? new IterPosStep(info, axis, test, preds) : new IterStep(info, axis, test, preds);
   }
 
   /**
@@ -69,10 +68,10 @@ public abstract class Step extends Preds {
    * @param info input info
    * @param axis axis
    * @param test node test
-   * @param preds predicates
+   * @param exprs predicates
    */
-  Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
-    super(info, preds);
+  Step(final InputInfo info, final Axis axis, final Test test, final Expr... exprs) {
+    super(info, exprs);
     this.axis = axis;
     this.test = test;
     seqType = SeqType.get(test.type, Occ.ZERO_MORE);
@@ -92,15 +91,15 @@ public abstract class Step extends Preds {
 
     // compute result size
     seqType(seqType, Long.MAX_VALUE);
-    if(size == 0) return optPre(cc);
+    if(size == 0) return cc.emptySeq(this);
 
     // choose best implementation
-    return copyType(get(info, axis, test, preds));
+    return copyType(get(info, axis, test, exprs));
   }
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    return inlineAll(preds, var, ex, cc) ? optimize(cc) : null;
+    return inlineAll(exprs, var, ex, cc) ? optimize(cc) : null;
   }
 
   @Override
@@ -113,7 +112,7 @@ public abstract class Step extends Preds {
    * @return result of check
    */
   public final boolean simple(final Axis ax, final boolean name) {
-    return axis == ax && preds.length == 0 &&
+    return axis == ax && exprs.length == 0 &&
         (name ? test.kind == Kind.NAME : test == KindTest.NOD);
   }
 
@@ -125,7 +124,7 @@ public abstract class Step extends Preds {
    */
   final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data) {
     // skip steps with predicates or different namespaces
-    if(preds.length != 0 || data.nspaces.globalUri() == null) return null;
+    if(exprs.length != 0 || data.nspaces.globalUri() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;
@@ -187,7 +186,7 @@ public abstract class Step extends Preds {
    * @return resulting step instance
    */
   final Step addPreds(final Expr... add) {
-    return get(info, axis, test, ExprList.concat(preds, add));
+    return get(info, axis, test, ExprList.concat(exprs, add));
   }
 
   /**
@@ -203,18 +202,16 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Step)) return false;
-    final Step st = (Step) cmp;
-    final int pl = preds.length;
-    if(pl != st.preds.length || axis != st.axis || !test.sameAs(st.test)) return false;
-    for(int p = 0; p < pl; p++) if(!preds[p].sameAs(st.preds[p])) return false;
-    return true;
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Step)) return false;
+    final Step s = (Step) obj;
+    return axis == s.axis && test.equals(s.test) && super.equals(obj);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Expr pred : preds) {
+    for(final Expr pred : exprs) {
       visitor.enterFocus();
       if(!pred.accept(visitor)) return false;
       visitor.exitFocus();
@@ -225,7 +222,7 @@ public abstract class Step extends Preds {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr pred : preds) sz += pred.exprSize();
+    for(final Expr pred : exprs) sz += pred.exprSize();
     return sz;
   }
 

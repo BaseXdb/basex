@@ -39,7 +39,7 @@ public final class FTOr extends FTExpr {
       // convert (!A or !B or ...) to !(A and B and ...)
       final int es = exprs.length;
       for(int e = 0; e < es; e++) exprs[e] = exprs[e].exprs[0];
-      return new FTNot(info, new FTAnd(info, exprs));
+      return (FTExpr) cc.replaceWith(this, new FTNot(info, new FTAnd(info, exprs)));
     }
     return this;
   }
@@ -120,6 +120,11 @@ public final class FTOr extends FTExpr {
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new FTOr(info, Arr.copyAll(cc, vm, exprs));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTOr && super.equals(obj);
   }
 
   @Override

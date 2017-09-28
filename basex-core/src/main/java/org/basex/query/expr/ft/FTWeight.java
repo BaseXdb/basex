@@ -117,11 +117,6 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), weight, exprs[0]);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return super.accept(visitor) && weight.accept(visitor);
   }
@@ -131,6 +126,17 @@ public final class FTWeight extends FTExpr {
     int sz = 1;
     for(final FTExpr expr : exprs) sz += expr.exprSize();
     return sz + weight.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTWeight && weight.equals(((FTWeight) obj).weight) &&
+        super.equals(obj);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), weight, exprs[0]);
   }
 
   @Override

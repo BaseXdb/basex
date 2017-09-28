@@ -76,6 +76,13 @@ final class InvDocTest extends Test {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof InvDocTest)) return false;
+    final InvDocTest it = (InvDocTest) obj;
+    return data == it.data && pres.equals(it.pres);
+  }
+
+  @Override
   public String toString() {
     return new TokenBuilder(NodeType.DOC.string()).add("(...)").toString();
   }

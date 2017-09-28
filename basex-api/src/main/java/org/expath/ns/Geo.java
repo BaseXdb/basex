@@ -114,7 +114,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public B64 asBinary(final ANode node) throws QueryException {
-    return new B64(new WKBWriter().write(checkGeo(node)));
+    return B64.get(new WKBWriter().write(checkGeo(node)));
   }
 
   /**

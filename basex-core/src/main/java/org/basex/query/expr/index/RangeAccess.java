@@ -55,6 +55,12 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof RangeAccess && index.equals(((RangeAccess) obj).index) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(DATA, ictx.data.meta.name, MIN, index.min, MAX, index.max,
         TYPE, index.type()));

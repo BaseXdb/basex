@@ -51,26 +51,26 @@ public final class FTWindow extends FTFilter {
     final int n = (int) toLong(win, qc) - 1;
     match.sort();
 
-    FTStringMatch f = null;
-    for(final FTStringMatch m : match) {
-      if(m.exclude) continue;
-      if(f == null) f = m;
-      f.gaps |= m.end - f.end > 1;
-      f.end = m.end;
-      if(pos(f.end, lexer) - pos(f.start, lexer) > n) return false;
+    FTStringMatch first = null;
+    for(final FTStringMatch sm : match) {
+      if(sm.exclude) continue;
+      if(first == null) first = sm;
+      first.gaps |= sm.end - first.end > 1;
+      first.end = sm.end;
+      if(pos(first.end, lexer) - pos(first.start, lexer) > n) return false;
     }
-    if(f == null) return false;
+    if(first == null) return false;
 
-    final int w = n - pos(f.end, lexer) + pos(f.start, lexer);
-    for(int s = pos(f.start, lexer) - w; s <= pos(f.start, lexer); ++s) {
+    final int w = n - pos(first.end, lexer) + pos(first.start, lexer);
+    for(int s = pos(first.start, lexer) - w; s <= pos(first.start, lexer); ++s) {
       boolean h = false;
-      for(final FTStringMatch m : match) {
-        h = m.exclude && pos(m.start, lexer) >= s && pos(m.end, lexer) <= s + w;
+      for(final FTStringMatch sm : match) {
+        h = sm.exclude && pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + w;
         if(h) break;
       }
       if(!h) {
         match.reset();
-        match.add(f);
+        match.add(first);
         return true;
       }
     }

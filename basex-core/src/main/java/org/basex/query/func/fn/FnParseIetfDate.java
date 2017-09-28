@@ -22,6 +22,12 @@ public final class FnParseIetfDate extends StandardFunc {
     return it == null ? null : new DateParser(toToken(it), info).parse();
   }
 
+  @Override
+  protected FnParseIetfDate opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
+
   /** Date parser. */
   private static final class DateParser extends InputParser {
     /** Days. */

@@ -89,7 +89,7 @@ public final class DialogEdit extends BaseXDialog {
       input3 = new TextPanel(old3, true, this);
       input3.addKeyListener(keys);
       BaseXLayout.setWidth(input3, BaseXTextField.DWIDTH);
-      BaseXLayout.setHeight(input3, 350);
+      BaseXLayout.setHeight(input3, BaseXTextField.DWIDTH);
       b.add(new SearchEditor(main, input3), BorderLayout.CENTER);
       setResizable(true);
     }

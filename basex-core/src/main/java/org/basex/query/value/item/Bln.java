@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -110,8 +109,8 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Bln && value == ((Bln) cmp).value;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Bln && value == ((Bln) obj).value;
   }
 
   @Override

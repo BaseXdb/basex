@@ -53,6 +53,11 @@ public final class Delete extends Update {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Delete && super.equals(obj);
+  }
+
+  @Override
   public String toString() {
     return DELETE + ' ' + NODES + ' ' + exprs[0];
   }

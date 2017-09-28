@@ -33,4 +33,10 @@ public final class FnResolveQName extends StandardFunc {
     nm.uri(uri);
     return nm;
   }
+
+  @Override
+  protected FnResolveQName opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
 }

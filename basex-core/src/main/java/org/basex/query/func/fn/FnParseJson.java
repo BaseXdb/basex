@@ -28,6 +28,12 @@ public class FnParseJson extends Parse {
     return parse(toToken(it), false, qc, info);
   }
 
+  @Override
+  protected final FnParseJson opt(final CompileContext cc) {
+    singleOcc();
+    return this;
+  }
+
   /**
    * Parses the specified JSON string.
    * @param json json string
@@ -57,14 +63,11 @@ public class FnParseJson extends Parse {
     try {
       opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.MAP);
       final JsonConverter conv = JsonConverter.get(opts);
-      if(!esc && fallback != null) conv.fallback(new JsonFallback() {
-        @Override
-        public String convert(final String string) {
-          try {
-            return Token.string(fallback.invokeItem(qc, ii, Str.get(string)).string(ii));
-          } catch(final QueryException ex) {
-            throw new QueryRTException(ex);
-          }
+      if(!esc && fallback != null) conv.fallback(string -> {
+        try {
+          return Token.string(fallback.invokeItem(qc, ii, Str.get(string)).string(ii));
+        } catch(final QueryException ex) {
+          throw new QueryRTException(ex);
         }
       });
       return conv.convert(json, null);

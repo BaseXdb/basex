@@ -111,11 +111,12 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(CASEFIRST)) {
-      final String v = get(CASEFIRST);
-      String f;
-      if(v.equals("upper")) f = "setUpperCaseFirst";
-      else if(v.equals("lower")) f = "setLowerCaseFirst";
-      else throw error(CASEFIRST);
+      final String v = get(CASEFIRST), f;
+      switch(v) {
+        case "upper": f = "setUpperCaseFirst"; break;
+        case "lower": f = "setLowerCaseFirst"; break;
+        default: throw error(CASEFIRST);
+      }
       invoke(method(RBC, f, boolean.class), coll, true);
     }
 

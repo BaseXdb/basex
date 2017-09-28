@@ -29,11 +29,9 @@ import org.eclipse.jetty.server.ServerConnector;
  * @author Christian Gruen
  * @author Dirk Kirsten
  */
-public final class BaseXHTTP extends Main {
-  /** Database context. */
-  private final Context context;
+public final class BaseXHTTP extends CLI {
   /** HTTP server. */
-  private final Server jetty;
+  private Server jetty;
   /** HTTP port. */
   private int port;
   /** HTTP host. */
@@ -67,11 +65,13 @@ public final class BaseXHTTP extends Main {
    * @throws Exception exception
    */
   public BaseXHTTP(final String... args) throws Exception {
-    super(args);
-    parseArgs();
-
+    super(null, args);
     // context must be initialized after parsing of arguments
     context = HTTPContext.context();
+    // execute initial command-line arguments
+    for(final Pair<String, String> cmd : commands) {
+      if(!execute(cmd)) return;
+    }
 
     // create jetty instance and set default context to HTTP path
     final StaticOptions sopts = context.soptions;
@@ -145,21 +145,18 @@ public final class BaseXHTTP extends Main {
 
     // show info when HTTP server is aborted. needs to be called in constructor:
     // otherwise, it may only be called if the JVM process is already shut down
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        if(!quiet) {
-          for(final Connector conn : conns) Util.outln(stopX, ((ServerConnector) conn).getLocalPort());
-        }
-        final Log log = context.log;
-        if(log != null) {
-          for(final Connector conn : conns) {
-            log.writeServer(LogType.OK, Util.info(stopX, ((ServerConnector) conn).getLocalPort()));
-          }
-        }
-        context.close();
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      if(!quiet) {
+        for(final Connector conn : conns) Util.outln(stopX, ((ServerConnector) conn).getPort());
       }
-    });
+      final Log log = context.log;
+      if(log != null) {
+        for(final Connector conn : conns) {
+          log.writeServer(LogType.OK, Util.info(stopX, ((ServerConnector) conn).getPort()));
+        }
+      }
+      context.close();
+    }));
 
     // log server start at very end (logging flag could have been updated by web.xml)
     for(final Connector conn : conns) {
@@ -237,19 +234,20 @@ public final class BaseXHTTP extends Main {
     /* command-line properties will be stored in system properties;
      * this way, they will not be overwritten by the settings specified in web.xml. */
     final MainParser arg = new MainParser(this);
-    boolean serve = true;
+    boolean daemon = true;
+
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // use client mode
-            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(false));
+          case 'c': // gather up database commands
+            commands.add(input(arg.string()));
             break;
           case 'd': // activate debug mode
             Prop.put(StaticOptions.DEBUG, Boolean.toString(true));
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
-            serve = false;
+            daemon = false;
             break;
           case 'h': // parse HTTP port
             port = arg.number();
@@ -274,7 +272,7 @@ public final class BaseXHTTP extends Main {
             Prop.put(StaticOptions.STOPPORT, Integer.toString(arg.number()));
             break;
           case 'S': // set service flag
-            service = serve;
+            service = daemon;
             break;
           case 'U': // specify user name
             Prop.put(StaticOptions.USER, arg.string());
@@ -325,6 +323,7 @@ public final class BaseXHTTP extends Main {
 
     // try to connect the server
     try(Socket s = new Socket(host, port)) {
+      // no action
     } catch(final ConnectException ex) {
       Util.debug(ex);
       stopFile.delete();
@@ -391,7 +390,7 @@ public final class BaseXHTTP extends Main {
       try {
         while(true) {
           Util.outln(HTTP + ' ' + STOP + ' ' + SRV_STARTED_PORT_X, stopPort);
-          try(Socket s = socket.accept()) { }
+          try(Socket s = socket.accept()) { /* no action */ }
           if(stopFile.exists()) {
             socket.close();
             Util.outln(HTTP + ' ' + STOP + ' ' + SRV_STOPPED_PORT_X, stopPort);

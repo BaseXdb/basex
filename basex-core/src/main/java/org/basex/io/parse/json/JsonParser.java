@@ -134,7 +134,7 @@ final class JsonParser extends InputParser {
         final byte[] key = !liberal || curr() == '"' ? string() : unquoted();
         final boolean dupl = set.contains(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
-          throw error(BXJS_DUPLICATE_X, "Key '%' occurs more than once.", key);
+          throw error(BXJS_DUPLICATE_X, "Key \"%\" occurs more than once.", key);
 
         final boolean add = !(dupl && duplicates == JsonDuplicates.USE_FIRST);
         conv.openPair(key, add);

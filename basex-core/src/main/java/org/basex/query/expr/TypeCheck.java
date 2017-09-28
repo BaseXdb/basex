@@ -22,10 +22,10 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class TypeCheck extends Single {
-  /** Flag for function conversion. */
-  public final boolean promote;
   /** Static context. */
   private final StaticContext sc;
+  /** Flag for function conversion. */
+  public final boolean promote;
 
   /**
    * Constructor.
@@ -63,13 +63,11 @@ public final class TypeCheck extends Single {
     if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
       if(!seqType.occ.check(1)) throw typeError(expr, seqType, null, info);
       final FuncItem fi = (FuncItem) expr;
-      return optPre(fi.coerceTo((FuncType) seqType.type, cc.qc, info, true), cc);
+      return cc.replaceWith(this, fi.coerceTo((FuncType) seqType.type, cc.qc, info, true));
     }
 
     // we can type check immediately
-    if(expr.isValue()) {
-      return optPre(value(cc.qc), cc);
-    }
+    if(expr.isValue()) return cc.preEval(this);
 
     // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
@@ -118,7 +116,7 @@ public final class TypeCheck extends Single {
         cache.set(c++, null);
 
         if(it == null && i < st.occ.min || i > st.occ.max)
-          throw typeError(TypeCheck.this, st, null, info);
+          throw typeError(expr, st, null, info);
 
         i++;
         return it;
@@ -132,23 +130,6 @@ public final class TypeCheck extends Single {
     if(seqType.instance(val)) return val;
     if(promote) return seqType.promote(val, null, qc, sc, info, false);
     throw INVCAST_X_X_X.get(info, val.seqType(), seqType, val);
-  }
-
-  @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType, promote);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem(TYP, seqType);
-    if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
-    addPlan(plan, elem, expr);
-  }
-
-  @Override
-  public String toString() {
-    return "((: " + seqType + ", " + promote + " :) " + expr + ')';
   }
 
   /**
@@ -169,5 +150,30 @@ public final class TypeCheck extends Single {
    */
   public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
     return new TypeCheck(sc, info, ex, seqType, promote).optimize(cc);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof TypeCheck)) return false;
+    final TypeCheck t = (TypeCheck) obj;
+    return seqType.eq(t.seqType) && promote == t.promote && super.equals(obj);
+  }
+
+  @Override
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType, promote);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem elem = planElem(TYP, seqType);
+    if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
+    addPlan(plan, elem, expr);
+  }
+
+  @Override
+  public String toString() {
+    return "((: " + seqType + ", " + promote + " :) " + expr + ')';
   }
 }

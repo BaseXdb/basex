@@ -27,7 +27,6 @@ public final class PathCache {
   /** Initial context value. */
   Value initial;
 
-
   /**
    * Checks if the specified context value is different to the cached one.
    * @param value current context value
@@ -35,10 +34,8 @@ public final class PathCache {
    * @return result of check
    */
   boolean sameContext(final Value value, final Expr root) {
-    // context value has not changed...
-    if(value == initial && (value == null || value.sameAs(initial))) return true;
-    // otherwise, if path starts with root node, compare roots of cached and new context value
-    return root instanceof Root && value instanceof ANode && initial instanceof ANode &&
-        ((ANode) initial).root().sameAs(((ANode) value).root());
+    // check if context value has changed, or if roots of cached and new context value are equal
+    return value == initial || root instanceof Root && value instanceof ANode &&
+        initial instanceof ANode && ((ANode) initial).root().equals(((ANode) value).root());
   }
 }

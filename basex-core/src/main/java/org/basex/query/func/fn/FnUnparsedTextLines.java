@@ -16,12 +16,13 @@ public final class FnUnparsedTextLines extends Parse {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Item it = unparsedText(qc, false, true);
-    return it == null ? Empty.ITER : textIter(it.string(info));
+    return it == null ? Empty.ITER : lineIter(it.string(info));
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc);
+    final Item it = unparsedText(qc, false, true);
+    return it == null ? Empty.SEQ : lines(it.string(info));
   }
 
   @Override

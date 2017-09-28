@@ -122,7 +122,8 @@ public final class Strings {
         c++;
       }
     }
-    return sl.add(string.substring(s, tl)).finish();
+    sl.add(string.substring(s, tl));
+    return sl.finish();
   }
 
   /**

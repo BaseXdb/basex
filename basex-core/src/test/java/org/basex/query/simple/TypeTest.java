@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class TypeTest extends QueryTest {
-  /** Constructor. */
   static {
     queries = new Object[][] {
         { "Simple 1", booleans(true), "1 castable as xs:integer" },

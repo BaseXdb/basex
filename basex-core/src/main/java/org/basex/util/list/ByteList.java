@@ -112,6 +112,18 @@ public class ByteList extends ElementList {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(obj == this) return true;
+    if(!(obj instanceof ByteList)) return false;
+    final ByteList bl = (ByteList) obj;
+    if(size != bl.size) return false;
+    for(int l = 0; l < size; ++l) {
+      if(list[l] != bl.list[l]) return false;
+    }
+    return true;
+  }
+
+  @Override
   public String toString() {
     return list == null ? "" : string(list, 0, size);
   }

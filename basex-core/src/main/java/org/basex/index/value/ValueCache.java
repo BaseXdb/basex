@@ -51,7 +51,7 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param data data reference
    */
   public ValueCache(final IntList pres, final IndexType type, final Data data) {
-    pos = type == IndexType.TOKEN ? new ArrayList<IntList>() : null;
+    pos = type == IndexType.TOKEN ? new ArrayList<>() : null;
 
     final IndexNames in = new IndexNames(type, data);
     final boolean text = type == IndexType.TEXT;

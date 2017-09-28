@@ -1,10 +1,11 @@
 package org.basex.gui.text;
 
-import static org.basex.data.DataText.*;
+import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.util.*;
 
 /**
@@ -31,13 +32,13 @@ final class SyntaxJS extends Syntax {
   // initialize xquery keys
   static {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
-    for(final String key : new String[] {
+    Collections.addAll(KEYWORDS,
       "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default",
       "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if",
       "implements", "import", "in", "instanceof", "interface", "let", "new", "package", "private",
       "protected", "public", "return", "static", "super", "switch", "this", "throw", "try",
       "typeof", "var", "void", "while", "with", "yield"
-    }) Collections.addAll(KEYWORDS, key);
+    );
   }
 
   @Override
@@ -63,7 +64,7 @@ final class SyntaxJS extends Syntax {
       } else {
         back = ch == '\\';
       }
-      return STRING;
+      return VALUE;
     }
 
     // comment
@@ -96,7 +97,7 @@ final class SyntaxJS extends Syntax {
       back = true;
     } else if(ch == '"' || ch == '\'') {
       quote = ch;
-      return STRING;
+      return VALUE;
     }
 
     // variables
@@ -110,11 +111,11 @@ final class SyntaxJS extends Syntax {
     }
 
     // digits
-    if(Token.digit(ch)) return FUNCTION;
+    if(Token.digit(ch)) return DIGIT;
     // special characters
     if(!XMLToken.isNCStartChar(ch)) return COMMENT;
     // check for keywords
-    if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
+    if(KEYWORDS.contains(iter.currString())) return KEYWORD;
 
     // standard text
     return plain;
@@ -122,11 +123,11 @@ final class SyntaxJS extends Syntax {
 
   @Override
   public byte[] commentOpen() {
-    return JSCOMM_O;
+    return DataText.JSCOMM_O;
   }
 
   @Override
   public byte[] commentEnd() {
-    return JSCOMM_C;
+    return DataText.JSCOMM_C;
   }
 }

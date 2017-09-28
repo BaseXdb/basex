@@ -33,15 +33,16 @@ public final class Range extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    Expr e = this;
-    if(oneIsEmpty()) {
-      e = null;
-    } else if(allAreValues()) {
-      e = value(cc.qc);
-      // range sequence: skip optimization info
-      if(e instanceof RangeSeq) return e;
+    if(oneIsEmpty()) return cc.emptySeq(this);
+    if(allAreValues()) return cc.preEval(this);
+
+    final Expr e1 = exprs[0], e2 = exprs[1];
+    if(e1.equals(e2)) {
+      if(e1.seqType().instanceOf(SeqType.ITR) && e2.seqType().instanceOf(SeqType.ITR))
+        return cc.replaceWith(this, e1);
+      seqType = SeqType.ITR;
     }
-    return optPre(e, cc);
+    return this;
   }
 
   @Override
@@ -65,6 +66,11 @@ public final class Range extends Arr {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new Range(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Range && super.equals(obj);
   }
 
   @Override

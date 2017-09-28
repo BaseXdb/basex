@@ -53,7 +53,7 @@ public final class List extends Arr {
     }
 
     if(p != exprs.length) {
-      cc.info(OPTREMOVE_X_X, this, Empty.SEQ);
+      cc.info(OPTREMOVE_X_X, description(), Empty.SEQ);
       if(p < 2) return p == 0 ? Empty.SEQ : exprs[0];
       final Expr[] es = new Expr[p];
       System.arraycopy(exprs, 0, es, 0, p);
@@ -74,38 +74,6 @@ public final class List extends Arr {
       }
     }
 
-    if(size >= 0) {
-      if(allAreValues() && size <= MAX_MAT_SIZE) {
-        Type all = null;
-        final Value[] vs = new Value[exprs.length];
-        int c = 0;
-        for(final Expr expr : exprs) {
-          final Value v = cc.qc.value(expr);
-          if(c == 0) all = v.type;
-          else if(all != v.type) all = null;
-          vs[c++] = v;
-        }
-
-        final Value val;
-        final int s = (int) size;
-        if(all == AtomType.STR)      val = StrSeq.get(vs, s);
-        else if(all == AtomType.BLN) val = BlnSeq.get(vs, s);
-        else if(all == AtomType.FLT) val = FltSeq.get(vs, s);
-        else if(all == AtomType.DBL) val = DblSeq.get(vs, s);
-        else if(all == AtomType.DEC) val = DecSeq.get(vs, s);
-        else if(all == AtomType.BYT) val = BytSeq.get(vs, s);
-        else if(all != null && all.instanceOf(AtomType.ITR)) {
-          val = IntSeq.get(vs, s, all);
-        } else {
-          final ValueBuilder vb = new ValueBuilder();
-          for(int i = 0; i < c; i++) vb.add(vs[i]);
-          val = vb.value();
-        }
-        cc.info(OPTREWRITE_X, val);
-        return val;
-      }
-    }
-
     if(size == 0) {
       seqType = SeqType.EMP;
     } else {
@@ -118,6 +86,34 @@ public final class List extends Arr {
       seqType = st != null ? st.withOcc(o) : SeqType.get(AtomType.ITEM, o);
     }
 
+    if(allAreValues() && size >= 0 && size <= MAX_MAT_SIZE) {
+      Type type = null;
+      final Value[] values = new Value[exprs.length];
+      int vl = 0;
+      for(final Expr expr : exprs) {
+        final Value val = cc.qc.value(expr);
+        if(vl == 0) type = val.type;
+        else if(type != val.type) type = null;
+        values[vl++] = val;
+      }
+
+      final Value value;
+      final int s = (int) size;
+      if(type == AtomType.STR)      value = StrSeq.get(values, s);
+      else if(type == AtomType.BLN) value = BlnSeq.get(values, s);
+      else if(type == AtomType.FLT) value = FltSeq.get(values, s);
+      else if(type == AtomType.DBL) value = DblSeq.get(values, s);
+      else if(type == AtomType.DEC) value = DecSeq.get(values, s);
+      else if(type == AtomType.BYT) value = BytSeq.get(values, s);
+      else if(type != null && type.instanceOf(AtomType.ITR)) {
+        value = IntSeq.get(values, s, type);
+      } else {
+        final ValueBuilder vb = new ValueBuilder();
+        for(int v = 0; v < vl; v++) vb.add(values[v]);
+        value = vb.value();
+      }
+      return cc.replaceWith(this, value);
+    }
     return this;
   }
 
@@ -157,9 +153,19 @@ public final class List extends Arr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof List && super.equals(obj);
+  }
+
+  @Override
   public boolean isVacuous() {
     for(final Expr expr : exprs) if(!expr.isVacuous()) return false;
     return true;
+  }
+
+  @Override
+  public String description() {
+    return "expression list";
   }
 
   @Override

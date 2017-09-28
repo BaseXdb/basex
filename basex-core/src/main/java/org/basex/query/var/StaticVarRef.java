@@ -84,11 +84,6 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public String toString() {
-    return '$' + Token.string(name.string());
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return true;
   }
@@ -103,11 +98,6 @@ final class StaticVarRef extends ParseExpr {
     return null;
   }
 
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.VAR, name));
-  }
-
   /**
    * Initializes this reference with the given variable.
    * @param vr variable
@@ -117,5 +107,23 @@ final class StaticVarRef extends ParseExpr {
     if(vr.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(vr.sc.baseURI()))
       throw VARPRIVATE_X.get(info, vr);
     var = vr;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof StaticVarRef)) return false;
+    final StaticVarRef s = (StaticVarRef) obj;
+    return name.eq(s.name) && var == s.var;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(QueryText.VAR, name));
+  }
+
+  @Override
+  public String toString() {
+    return '$' + Token.string(name.string());
   }
 }

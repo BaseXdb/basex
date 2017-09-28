@@ -73,7 +73,7 @@ public class DiskValues extends ValueIndex {
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     synchronized(monitor) {
       final long l = idxl.length() + idxr.length();
-      tb.add(LI_SIZE).add(Performance.format(l, true)).add(NL);
+      tb.add(LI_SIZE).add(Performance.format(l)).add(NL);
       final int entries = size();
       for(int index = 0; index < entries; index++) {
         final long pos = idxr.read5(index * 5L);

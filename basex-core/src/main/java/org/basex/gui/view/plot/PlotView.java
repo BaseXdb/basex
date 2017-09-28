@@ -105,30 +105,21 @@ public final class PlotView extends View {
     Box box = new Box(BoxLayout.X_AXIS);
     xLog = new BaseXCheckBox(PLOTLOG, false, gui);
     xLog.setSelected(gui.gopts.get(GUIOptions.PLOTXLOG));
-    xLog.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        gui.gopts.invert(GUIOptions.PLOTXLOG);
-        refreshUpdate();
-      }
+    xLog.addActionListener(e -> {
+      gui.gopts.invert(GUIOptions.PLOTXLOG);
+      refreshUpdate();
     });
     dots = new BaseXSlider(-6, 6, GUIOptions.PLOTDOTS, gui.gopts, gui);
-    dots.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        dots.assign();
-        refreshLayout();
-      }
+    dots.addActionListener(e -> {
+      dots.assign();
+      refreshLayout();
     });
     BaseXLayout.setWidth(dots, 40);
     yLog = new BaseXCheckBox(PLOTLOG, false, gui);
     yLog.setSelected(gui.gopts.get(GUIOptions.PLOTYLOG));
-    yLog.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        gui.gopts.invert(GUIOptions.PLOTYLOG);
-        refreshUpdate();
-      }
+    yLog.addActionListener(e -> {
+      gui.gopts.invert(GUIOptions.PLOTYLOG);
+      refreshUpdate();
     });
     box.add(yLog);
     box.add(Box.createHorizontalGlue());
@@ -139,43 +130,30 @@ public final class PlotView extends View {
 
     box = new Box(BoxLayout.X_AXIS);
     xCombo = new BaseXCombo(gui);
-    xCombo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        setAxis(plotData.xAxis, xCombo);
-      }
-    });
+    xCombo.addActionListener(e -> setAxis(plotData.xAxis, xCombo));
     yCombo = new BaseXCombo(gui);
-    yCombo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        setAxis(plotData.yAxis, yCombo);
-      }
-    });
+    yCombo.addActionListener(e -> setAxis(plotData.yAxis, yCombo));
     itemCombo = new BaseXCombo(gui);
-    itemCombo.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final String item = itemCombo.getSelectedItem();
-        plotData.xAxis.log = gui.gopts.get(GUIOptions.PLOTXLOG);
-        plotData.yAxis.log = gui.gopts.get(GUIOptions.PLOTYLOG);
-        if(plotData.setItem(item)) {
-          plotChanged = true;
-          markingChanged = true;
-
-          final String[] keys = plotData.getCategories(token(item)).toStringArray();
-          xCombo.setModel(new DefaultComboBoxModel<>(keys));
-          yCombo.setModel(new DefaultComboBoxModel<>(keys));
-          if(keys.length > 0) {
-            // choose name category as default for horizontal axis
-            xCombo.setSelectedIndex(Math.min(1, keys.length));
-            yCombo.setSelectedIndex(0);
-          }
-        }
-        drawSubNodes = true;
+    itemCombo.addActionListener(e -> {
+      final String item = itemCombo.getSelectedItem();
+      plotData.xAxis.log = gui.gopts.get(GUIOptions.PLOTXLOG);
+      plotData.yAxis.log = gui.gopts.get(GUIOptions.PLOTYLOG);
+      if(plotData.setItem(item)) {
+        plotChanged = true;
         markingChanged = true;
-        repaint();
+
+        final Object[] keys = plotData.getCategories(token(item)).toStringArray();
+        xCombo.setModel(new DefaultComboBoxModel<>(keys));
+        yCombo.setModel(new DefaultComboBoxModel<>(keys));
+        if(keys.length > 0) {
+          // choose name category as default for horizontal axis
+          xCombo.setSelectedIndex(Math.min(1, keys.length));
+          yCombo.setSelectedIndex(0);
+        }
       }
+      drawSubNodes = true;
+      markingChanged = true;
+      repaint();
     });
     box.add(yCombo);
     box.add(Box.createHorizontalStrut(3));
@@ -809,7 +787,7 @@ public final class PlotView extends View {
 
     plotData = new PlotData(gui.context);
 
-    final String[] items = plotData.getItems().toStringArray();
+    final Object[] items = plotData.getItems().toStringArray();
     itemCombo.setModel(new DefaultComboBoxModel<>(items));
 
     // set first item and trigger assignment of axis assignments

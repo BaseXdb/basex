@@ -215,13 +215,10 @@ public final class DialogProps extends BaseXDialog {
       if(updated.contains(idx)) continue;
       updated.add(idx);
 
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :
-            Token.token(HELP[idx]));
-          updated.delete(idx);
-        }
+      SwingUtilities.invokeLater(() -> {
+        infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :
+          Token.token(HELP[idx]));
+        updated.delete(idx);
       });
     }
   }

@@ -6,8 +6,7 @@ import java.awt.*;
 import java.io.*;
 
 import org.basex.build.csv.*;
-import org.basex.build.csv.CsvOptions.CsvFormat;
-import org.basex.build.csv.CsvOptions.CsvSep;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
@@ -62,14 +61,14 @@ final class DialogCsvParser extends DialogParser {
     BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
 
     p.add(new BaseXLabel(ENCODING + COL, true, true));
-    encoding = DialogExport.encoding(d, copts.get(CsvParserOptions.ENCODING));
+    encoding = encoding(d, copts.get(CsvParserOptions.ENCODING));
     p.add(encoding);
 
     final BaseXBack sep = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
     final StringList csv = new StringList();
     for(final CsvSep cs : CsvSep.values()) csv.add(cs.toString());
     final String[] sa = csv.toArray();
-    seps = new BaseXCombo(d, csv.add("").finish());
+    seps = new BaseXCombo(csv.add("").finish(), d);
     sep.add(seps);
 
     final String s = copts.get(CsvOptions.SEPARATOR);
@@ -90,7 +89,7 @@ final class DialogCsvParser extends DialogParser {
     final int fl = formats.length - 1;
     final StringList frmts = new StringList(fl);
     for(int f = 0; f < fl; f++) frmts.add(formats[f].toString());
-    format = new BaseXCombo(d, frmts.finish());
+    format = new BaseXCombo(frmts.finish(), d);
     format.setSelectedItem(copts.get(CsvOptions.FORMAT));
     p.add(format);
     pp.add(p);

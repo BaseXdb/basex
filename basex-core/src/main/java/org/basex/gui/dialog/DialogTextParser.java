@@ -35,7 +35,7 @@ final class DialogTextParser extends DialogParser {
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
 
-    encoding = DialogExport.encoding(d, topts.get(TextOptions.ENCODING));
+    encoding = encoding(d, topts.get(TextOptions.ENCODING));
     lines = new BaseXCheckBox(SPLIT_INPUT_LINES, TextOptions.LINES, topts, d);
 
     final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 4));

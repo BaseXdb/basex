@@ -28,7 +28,7 @@ public final class Lang {
   /** Private constructor. */
   private Lang() { }
 
-  /** Reads the language file. */
+  /* Reads the language file. */
   static { read(Prop.language); }
 
   /**
@@ -76,7 +76,7 @@ public final class Lang {
       for(final String s : CHECK.keySet()) {
         Util.errln("%." + SUFFIX + ": '%' can be removed", Prop.language, s);
       }
-      return null;
+      return "---";
     }
 
     final String val = TEXTS.get(key);
@@ -150,18 +150,18 @@ public final class Lang {
    * Checks the existing language files for correctness and completeness.
    */
   static void check() {
-    read("English");
+    read(Prop.language);
     final StringBuilder sb = new StringBuilder();
-    final HashSet<String> set = new HashSet<>();
-    for(final String s : TEXTS.keySet()) set.add(s);
+    final HashSet<String> set = new HashSet<>(TEXTS.keySet());
 
     final IOFile[] files = new IOFile("src/main/resources/lang").children();
-    for(final IOFile f : files) {
-      final String lang = f.name().replace('.' + SUFFIX, "");
-      if("English".equals(lang)) continue;
+    for(final IOFile file : files) {
+      final String lang = file.name().replace('.' + SUFFIX, "");
+      if(lang.equals(Prop.language)) continue;
+
       read(lang);
-      for(final String o : set.toArray(new String[set.size()])) {
-        if(TEXTS.remove(o) == null) sb.append("- ").append(o).append('\n');
+      for(final String text : set.toArray(new String[set.size()])) {
+        if(TEXTS.remove(text) == null) sb.append("- ").append(text).append('\n');
       }
       if(sb.length() != 0) {
         Util.err("Missing in %.lang:\n%", lang, sb);

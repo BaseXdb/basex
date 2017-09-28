@@ -130,7 +130,7 @@ public final class MapView extends View {
 
   @Override
   public void refreshMark() {
-    drawMap(mainMap, mainRects, 1.0f);
+    drawMap(mainMap, mainRects);
     repaint();
   }
 
@@ -218,27 +218,24 @@ public final class MapView extends View {
       repaint();
     } else {
       zoomStep = ZOOMSIZE;
-      new Thread() {
-        @Override
-        public void run() {
-          focused = null;
+      new Thread(() -> {
+        focused = null;
 
-          // run zooming
-          while(zoomStep > 1) {
-            Performance.sleep(zoomSpeed);
-            --zoomStep;
-            repaint();
-          }
-          // wait until current painting is finished
-          while(gui.painting) Performance.sleep(zoomSpeed);
-
-          // remove old rectangle and repaint map
-          zoomStep = 0;
-          gui.updating = false;
-          focus();
+        // run zooming
+        while(zoomStep > 1) {
+          Performance.sleep(zoomSpeed);
+          --zoomStep;
           repaint();
         }
-      }.start();
+        // wait until current painting is finished
+        while(gui.painting) Performance.sleep(zoomSpeed);
+
+        // remove old rectangle and repaint map
+        zoomStep = 0;
+        gui.updating = false;
+        focus();
+        repaint();
+      }).start();
     }
   }
 
@@ -286,7 +283,7 @@ public final class MapView extends View {
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 
-    drawMap(map, mainRects, 1.0f);
+    drawMap(map, mainRects);
     focus();
     gui.cursor(CURSORARROW, true);
   }
@@ -439,12 +436,11 @@ public final class MapView extends View {
    * Creates a buffered image for the treemap.
    * @param map image to draw the map on
    * @param rects rectangles to be drawn
-   * @param sc scale the rectangles
    */
-  private void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
+  private void drawMap(final BufferedImage map, final MapRects rects) {
     final Graphics g = map.getGraphics();
     BaseXLayout.antiAlias(g);
-    painter.drawRectangles(g, rects, sc);
+    painter.drawRectangles(g, rects);
   }
 
   @Override

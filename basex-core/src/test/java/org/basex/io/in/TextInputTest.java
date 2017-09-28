@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.junit.*;
 
 /**
- * Test class for the BufferInput method.
+ * Test class for the {@link TextInput} method.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen

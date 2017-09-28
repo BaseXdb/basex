@@ -11,7 +11,6 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXLayout.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -43,13 +42,10 @@ public final class SearchBar extends BaseXBack {
     }
   };
   /** Action listener for button clicks. */
-  private final ActionListener action = new ActionListener() {
-    @Override
-    public void actionPerformed(final ActionEvent e) {
-      store();
-      refreshButtons();
-      search();
-    }
+  private final ActionListener action = e -> {
+    store();
+    refreshButtons();
+    search();
   };
 
   /** Mode buttons. */
@@ -78,6 +74,8 @@ public final class SearchBar extends BaseXBack {
   private AbstractButton button;
   /** Current editor reference. */
   private TextPanel editor;
+  /** Old search text. */
+  private String oldSearch = "";
 
   /**
    * Constructor.
@@ -127,46 +125,40 @@ public final class SearchBar extends BaseXBack {
       }
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(regex.isEnabled() && search.getText().matches("^.*(?<!\\\\)\\\\n.*"))
-          multi.setSelected(true);
-        search();
+        final String srch = search.getText();
+        if(!oldSearch.equals(srch)) {
+          if(regex.isEnabled() && search.getText().matches("^.*(?<!\\\\)\\\\n.*")) {
+            multi.setSelected(true);
+          }
+          oldSearch = srch;
+          search();
+        }
       }
     });
 
-    BaseXLayout.addDrop(search, new DropHandler() {
-      @Override
-      public void drop(final Object object) {
-        search.setText(object.toString());
-        store();
-        search();
-      }
+    BaseXLayout.addDrop(search, object -> {
+      setSearch(object.toString());
+      store();
+      search();
     });
 
     replace.addKeyListener(escape);
 
     cls.addKeyListener(escape);
-    cls.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        deactivate(true);
-      }
-    });
+    cls.addActionListener(e -> deactivate(true));
 
     rplc.addKeyListener(escape);
-    rplc.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        store();
-        replace.store();
-        final String in = replace.getText();
-        editor.replace(new ReplaceContext(regex.isSelected() ? decode(in) : in));
-        deactivate(true);
-      }
+    rplc.addActionListener(e -> {
+      store();
+      replace.store();
+      final String in = replace.getText();
+      editor.replace(new ReplaceContext(regex.isSelected() ? decode(in) : in));
+      deactivate(true);
     });
 
     // set initial values
     final String[] searched = main.gopts.get(GUIOptions.SEARCHED);
-    if(searched.length > 0) search.setText(searched[0]);
+    if(searched.length > 0) setSearch(searched[0]);
     final String[] replaced = main.gopts.get(GUIOptions.REPLACED);
     if(replaced.length > 0) replace.setText(replaced[0]);
     initModes();
@@ -215,12 +207,9 @@ public final class SearchBar extends BaseXBack {
    */
   public AbstractButton button(final String help) {
     button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()), true, gui);
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        if(isVisible()) deactivate(true);
-        else activate("", true);
-      }
+    button.addActionListener(e -> {
+      if(isVisible()) deactivate(true);
+      else activate("", true);
     });
     return button;
   }
@@ -264,7 +253,7 @@ public final class SearchBar extends BaseXBack {
     // set new, different search string
     if(!string.isEmpty() && !new SearchContext(this, search.getText()).matches(string)) {
       regex.setSelected(false);
-      search.setText(string);
+      setSearch(string);
       store();
       invisible = true;
     }
@@ -338,6 +327,15 @@ public final class SearchBar extends BaseXBack {
     gui.gopts.set(GUIOptions.SEARCHMODES, sb.toString());
     modeHistory.clear();
     modeHistory.putAll(map);
+  }
+
+  /**
+   * Sets a new search text.
+   * @param text text
+   */
+  private void setSearch(final String text) {
+    oldSearch = search.getText();
+    search.setText(text);
   }
 
   /**

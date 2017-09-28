@@ -64,7 +64,7 @@ abstract class Ids extends StandardFunc {
     }
 
     // otherwise, do sequential scan: parse node and its descendants
-    final ANodeList list = new ANodeList().check();
+    final ANodeBuilder list = new ANodeBuilder();
     add(idSet, list, root, idref);
     return list.iter();
   }
@@ -81,15 +81,10 @@ abstract class Ids extends StandardFunc {
     if(data == null || !(idref ? data.meta.tokenindex : data.meta.attrindex)) return false;
     // check if index names contain id attributes
 
-    Boolean index;
     synchronized(indexed) {
-      index = indexed.get(data);
-      if(index == null) {
-        index = new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref);
-        indexed.put(data, index);
-      }
+      return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
+          containsIds(idref));
     }
-    return index;
   }
 
   /**
@@ -99,7 +94,7 @@ abstract class Ids extends StandardFunc {
    * @param node current node
    * @param idref idref flag
    */
-  private static void add(final TokenSet idSet, final ANodeList results, final ANode node,
+  private static void add(final TokenSet idSet, final ANodeBuilder results, final ANode node,
       final boolean idref) {
 
     for(final ANode attr : node.attributes()) {

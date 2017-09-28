@@ -43,18 +43,21 @@ public final class FnSum extends Aggr {
     if(it != null) return sum(iter, it, false, qc);
 
     // return default item
-    return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.get(0);
+    return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.ZERO;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr e1 = exprs[0], e2 = exprs.length == 2 ? exprs[1] : null;
-    final Type st1 = e1.seqType().type, st2 = e2 != null ? e2.seqType().type : st1;
+    final Expr e1 = exprs[0], e2 = exprs.length == 2 ? exprs[1] : Empty.SEQ;
+    final Type st1 = e1.seqType().type, st2 = e2 != Empty.SEQ ? e2.seqType().type : st1;
     if(st1.isNumberOrUntyped() && st2.isNumberOrUntyped()) seqType = Calc.type(st1, st2).seqType();
 
     // pre-evaluate 0 results (skip non-deterministic and variable expressions)
-    final long c = e1.size();
-    return c != 0 || e1.has(Flag.NDT) || e1.has(Flag.UPD) || e1 instanceof VarRef ? this :
-      e2 instanceof ANum || e2 instanceof Dur ? e2 : e2 != null ? this : Int.get(0);
+    Expr expr = this;
+    if(e1.size() == 0 && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) && !(e1 instanceof VarRef)) {
+      if(e2 == Empty.SEQ) expr = Int.ZERO;
+      else if(e2 instanceof ANum || e2 instanceof Dur) expr = e2;
+    }
+    return expr;
   }
 }

@@ -1,9 +1,6 @@
 package org.basex.query.value.seq;
 
-import java.util.*;
-
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -35,15 +32,15 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof StrSeq && Arrays.equals(values, ((StrSeq) cmp).values);
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof StrSeq ? Array.equals(values, ((StrSeq) obj).values) :
+      super.equals(obj));
   }
 
   @Override
   public String[] toJava() {
-    final int vl = values.length;
-    final String[] tmp = new String[vl];
-    for(int v = 0; v < vl; v++) tmp[v] = Token.string(values[v]);
+    final String[] tmp = new String[(int) size];
+    for(int v = 0; v < size; v++) tmp[v] = Token.string(values[v]);
     return tmp;
   }
 

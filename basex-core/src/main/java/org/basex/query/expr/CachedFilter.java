@@ -40,7 +40,7 @@ public class CachedFilter extends Filter {
     try {
       // evaluate first predicate, based on incoming value
       final ItemList buffer = new ItemList();
-      Expr pred = preds[0];
+      Expr pred = exprs[0];
       long vs = val.size();
       focus.size = vs;
       focus.pos = 1;
@@ -60,10 +60,10 @@ public class CachedFilter extends Filter {
       val = null;
 
       // evaluate remaining predicates, based on value builder
-      final int pl = preds.length;
+      final int pl = exprs.length;
       for(int i = 1; i < pl; i++) {
         vs = buffer.size();
-        pred = preds[i];
+        pred = exprs[i];
         focus.size = vs;
         focus.pos = 1;
         int c = 0;
@@ -89,7 +89,7 @@ public class CachedFilter extends Filter {
 
   @Override
   public Filter copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CachedFilter(info, root.copy(cc, vm), Arr.copyAll(cc, vm, preds)));
+    return copyType(new CachedFilter(info, root.copy(cc, vm), Arr.copyAll(cc, vm, exprs)));
   }
 
   @Override

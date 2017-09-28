@@ -171,34 +171,31 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
         new DialogProgress(gui, cmd);
 
       // start command thread
-      new Thread() {
-        @Override
-        public void run() {
-          // execute command
-          final Performance perf = new Performance();
-          gui.updating = cmd.updating(gui.context);
-          boolean ok = true;
-          String info;
-          try {
-            cmd.execute(gui.context);
-            info = cmd.info();
-          } catch(final BaseXException ex) {
-            ok = false;
-            info = Util.message(ex);
-          } finally {
-            gui.updating = false;
-          }
-
-          // return status information
-          final String time = perf.toString();
-          gui.info.setInfo(info, cmd, time, ok, true);
-          gui.status.setText(cmd + ": " + time);
-
-          // close progress window and show error if command failed
-          wait.dispose();
-          if(!ok) BaseXDialog.error(gui, info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
+      new Thread(() -> {
+        // execute command
+        final Performance perf = new Performance();
+        gui.updating = cmd.updating(gui.context);
+        boolean ok = true;
+        String info;
+        try {
+          cmd.execute(gui.context);
+          info = cmd.info();
+        } catch(final BaseXException ex) {
+          ok = false;
+          info = Util.message(ex);
+        } finally {
+          gui.updating = false;
         }
-      }.start();
+
+        // return status information
+        final String time = perf.toString();
+        gui.info.setInfo(info, cmd, time, ok, true);
+        gui.status.setText(cmd + ": " + time);
+
+        // close progress window and show error if command failed
+        wait.dispose();
+        if(!ok) BaseXDialog.error(gui, info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
+      }).start();
 
       // show progress windows until being disposed
       wait.setVisible(true);

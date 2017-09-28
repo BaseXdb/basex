@@ -5,7 +5,6 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 
 import javax.swing.*;
@@ -80,12 +79,7 @@ public final class TextView extends View {
 
     add(search, BorderLayout.CENTER);
 
-    save.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        save();
-      }
-    });
+    save.addActionListener(e -> save());
     refreshLayout();
   }
 

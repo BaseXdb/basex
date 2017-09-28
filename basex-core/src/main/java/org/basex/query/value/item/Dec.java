@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -122,8 +121,8 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Dec && value.compareTo(((Dec) cmp).value) == 0;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Dec && value.compareTo(((Dec) obj).value) == 0;
   }
 
   /**

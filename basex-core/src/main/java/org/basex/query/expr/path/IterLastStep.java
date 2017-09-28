@@ -36,19 +36,19 @@ final class IterLastStep extends Step {
         if(stop) return null;
         stop = true;
 
-        // return last items
-        ANode litem = null;
+        // return last item
+        ANode last = null;
         for(final ANode node : axis.iter(checkNode(qc))) {
           qc.checkStop();
-          if(test.eq(node)) litem = node.finish();
+          if(test.eq(node)) last = node.finish();
         }
-        return litem == null ? null : litem;
+        return last;
       }
     };
   }
 
   @Override
   public IterLastStep copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new IterLastStep(info, axis, test.copy(), Arr.copyAll(cc, vm, preds)));
+    return copyType(new IterLastStep(info, axis, test.copy(), Arr.copyAll(cc, vm, exprs)));
   }
 }

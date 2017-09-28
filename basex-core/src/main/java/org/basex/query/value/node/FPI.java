@@ -69,6 +69,11 @@ public final class FPI extends FNode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FPI && name.eq(((FPI) obj).name) && super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(NAM, name.string(), VAL, value));
   }

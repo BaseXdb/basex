@@ -26,6 +26,6 @@ public final class BinFromOctets extends StandardFunc {
       if(l < 0 || l > 255) throw BIN_OOR_X.get(info, l);
       bl.add((int) l);
     }
-    return new B64(bl.finish());
+    return B64.get(bl.finish());
   }
 }

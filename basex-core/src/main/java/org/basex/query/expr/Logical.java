@@ -51,7 +51,7 @@ abstract class Logical extends Arr {
       final Expr ex = expr.optimizeEbv(cc);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
-        cc.info(OPTREMOVE_X_X, this, expr);
+        cc.info(OPTREMOVE_X_X, description(), expr);
         if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
@@ -67,13 +67,6 @@ abstract class Logical extends Arr {
     // if the last expression surely returns a boolean, we can jump to it
     final Expr last = exprs[exprs.length - 1];
     if(last.seqType().eq(SeqType.BLN)) last.markTailCalls(cc);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem el = planElem();
-    plan.add(el);
-    for(final ExprInfo expr : exprs) if(expr != null) expr.plan(el);
   }
 
   @Override
@@ -122,5 +115,12 @@ abstract class Logical extends Arr {
       }
     }
     exprs = tmp.finish();
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    plan.add(el);
+    for(final ExprInfo expr : exprs) expr.plan(el);
   }
 }

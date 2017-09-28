@@ -9,7 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -46,20 +46,18 @@ public final class Cast extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    if(st.one() && !st.mayBeArray()) seqType = seqType.withOcc(Occ.ONE);
+    if(st.oneNoArray()) seqType = seqType.withOcc(Occ.ONE);
 
     // pre-evaluate value
-    if(expr.isValue()) return optPre(value(cc.qc), cc);
+    if(expr.isValue()) return cc.preEval(this);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
     final Type t = seqType.type;
     if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
         t == AtomType.QNM || t == AtomType.URI) && seqType.eq(expr.seqType())) {
-      optPre(expr, cc);
-      return expr;
+      return cc.replaceWith(this, expr);
     }
-    size = seqType.occ();
     return this;
   }
 
@@ -78,6 +76,12 @@ public final class Cast extends Single {
   @Override
   public Cast copy(final CompileContext cc, final IntObjMap<Var> vs) {
     return new Cast(sc, info, expr.copy(cc, vs), seqType);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Cast && seqType.eq(((Cast) obj).seqType) &&
+        super.equals(obj);
   }
 
   @Override

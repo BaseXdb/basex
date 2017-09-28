@@ -128,7 +128,7 @@ public class ZipZipFile extends ZipFn {
               final ByteList bl = new ByteList();
               do bl.add(n.string()); while((n = ch.next()) != null);
               final byte[] bytes = bl.finish();
-              zos.write((hex ? new Hex(bytes) : new B64(bytes)).toJava());
+              zos.write((hex ? new Hex(bytes) : B64.get(bytes)).toJava());
             } else {
               // serialize new nodes
               final ArrayOutput ao = new ArrayOutput();

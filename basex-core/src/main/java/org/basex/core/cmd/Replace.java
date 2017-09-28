@@ -45,7 +45,7 @@ public final class Replace extends ACreate {
     }
 
     final String path = MetaData.normPath(args[0]);
-    if(path == null || path.isEmpty() || path.endsWith(".")) return error(PATH_INVALID_X, args[0]);
+    if(path == null) return error(PATH_INVALID_X, args[0]);
 
     final Data data = context.data();
     final IOFile bin = data.meta.binary(path);

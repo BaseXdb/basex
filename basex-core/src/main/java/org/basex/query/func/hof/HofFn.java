@@ -25,15 +25,12 @@ abstract class HofFn extends StandardFunc {
    */
   Comparator<Item> getComp(final int pos, final QueryContext qc) throws QueryException {
     final FItem lt = checkArity(exprs[pos], 2, qc);
-    return new Comparator<Item>() {
-      @Override
-      public int compare(final Item a, final Item b) {
-        try {
-          return toBoolean(lt.invokeItem(qc, info, a == null ? Empty.SEQ : a,
-              b == null ? Empty.SEQ : b)) ? -1 : 1;
-        } catch(final QueryException qe) {
-          throw new QueryRTException(qe);
-        }
+    return (a, b) -> {
+      try {
+        return toBoolean(lt.invokeItem(qc, info, a == null ? Empty.SEQ : a,
+            b == null ? Empty.SEQ : b)) ? -1 : 1;
+      } catch(final QueryException qe) {
+        throw new QueryRTException(qe);
       }
     };
   }

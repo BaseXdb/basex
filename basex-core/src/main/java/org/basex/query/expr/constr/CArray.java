@@ -34,7 +34,7 @@ public final class CArray extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return allAreValues() ? preEval(cc) : this;
+    return allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override
@@ -56,18 +56,23 @@ public final class CArray extends Arr {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof CArray && create == ((CArray) obj).create && super.equals(obj);
+  }
+
+  @Override
   public String description() {
     return QueryText.ARRAY;
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder("[");
+    final TokenBuilder tb = new TokenBuilder("[ ");
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       if(e != 0) tb.add(", ");
-      tb.add('(').addExt(exprs[e]).add(')');
+      tb.addExt(exprs[e]);
     }
-    return tb.add("]").toString();
+    return tb.add(" ]").toString();
   }
 }

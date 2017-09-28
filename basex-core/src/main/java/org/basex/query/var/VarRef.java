@@ -79,7 +79,7 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
     // [LW] Is copying always necessary?
-    return var.is(v) ? ex.isValue() ? ex : ex.copy(cc, new IntObjMap<Var>()) : null;
+    return var.is(v) ? ex.isValue() ? ex : ex.copy(cc, new IntObjMap<>()) : null;
   }
 
   @Override
@@ -89,8 +89,8 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof VarRef && var.is(((VarRef) cmp).var);
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof VarRef && var.is(((VarRef) obj).var);
   }
 
   @Override

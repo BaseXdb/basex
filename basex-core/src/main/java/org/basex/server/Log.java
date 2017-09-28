@@ -57,7 +57,7 @@ public final class Log {
    */
   public LogFile file(final String name) {
     LogFile lf = file;
-    if(lf == null || !lf.sameAs(name)) lf = new LogFile(name, dir());
+    if(lf == null || !lf.valid(name)) lf = new LogFile(name, dir());
     return lf.exists() ? lf : null;
   }
 
@@ -126,7 +126,7 @@ public final class Log {
       synchronized(sopts) {
         // create new log file and write log entry
         final String name = DateTime.format(date, DateTime.DATE);
-        if(file != null && !file.sameAs(name)) close();
+        if(file != null && !file.valid(name)) close();
         if(file == null) file = LogFile.create(name, dir());
         // write log entry
         file.write(tb.finish());

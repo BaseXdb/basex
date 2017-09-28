@@ -15,6 +15,6 @@ public final class BinBin extends BinFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] bytes = str(0, qc);
     if(bytes == null) return null;
-    return new B64(binary2bytes(bytes));
+    return B64.get(binary2bytes(bytes));
   }
 }

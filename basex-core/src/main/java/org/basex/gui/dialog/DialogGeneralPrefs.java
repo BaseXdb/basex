@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.awt.event.*;
 import java.text.*;
 
 import org.basex.core.*;
@@ -56,9 +55,9 @@ final class DialogGeneralPrefs extends BaseXBack {
   private final BaseXCheckBox mousefocus;
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox simplefd;
-  /** Browse button. */
+  /** Browse database path. */
   private final BaseXButton dbButton;
-  /** Browse button. */
+  /** Browse repository path. */
   private final BaseXButton repoButton;
 
   /**
@@ -75,23 +74,17 @@ final class DialogGeneralPrefs extends BaseXBack {
     repoPath = new BaseXTextField(opts.get(StaticOptions.REPOPATH), d);
 
     dbButton = new BaseXButton(BROWSE_D, d);
-    dbButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final String path = dbPath.getText();
-        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
-        if(dir != null) dbPath.setText(dir.path());
-      }
+    dbButton.addActionListener(e -> {
+      final String path = dbPath.getText();
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      if(dir != null) dbPath.setText(dir.path());
     });
 
     repoButton = new BaseXButton(BROWSE_D, d);
-    repoButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final String path = repoPath.getText();
-        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
-        if(dir != null) repoPath.setText(dir.path());
-      }
+    repoButton.addActionListener(e -> {
+      final String path = repoPath.getText();
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      if(dir != null) repoPath.setText(dir.path());
     });
 
     mousefocus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, d);
@@ -99,21 +92,15 @@ final class DialogGeneralPrefs extends BaseXBack {
 
     int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
     maxResults = new BaseXSlider(0, MAXRESULTS.length - 1, val, d);
-    maxResults.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) { action(maxResults); }
-    });
+    maxResults.addActionListener(e -> action(maxResults));
     labelResults = new BaseXLabel(" ");
 
     val = sliderIndex(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
     maxText = new BaseXSlider(0, MAXTEXT.length - 1, val, d);
-    maxText.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) { action(maxText); }
-    });
+    maxText.addActionListener(e -> action(maxText));
     labelText = new BaseXLabel(" ");
 
-    lang = new BaseXCombo(d, LANGS[0]);
+    lang = new BaseXCombo(LANGS[0], d);
     lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 
@@ -149,7 +136,6 @@ final class DialogGeneralPrefs extends BaseXBack {
     pp.add(new BaseXLabel(SIZE_TEXT_RESULTS + COL));
     pp.add(ppp);
     p.add(pp);
-
     add(p);
 
     // checkbox for simple file dialog
@@ -166,7 +152,7 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @param values allowed values
    * @return index
    */
-  private int sliderIndex(final int value, final int[] values) {
+  private static int sliderIndex(final int value, final int[] values) {
     final int hl = values.length - 1;
     int i = -1;
     while(++i < hl && values[i] < value);
@@ -217,7 +203,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     final int mr = MAXRESULTS[maxResults.getValue()];
     labelResults.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
     final int mt = MAXTEXT[maxText.getValue()];
-    labelText.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt, true));
+    labelText.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt));
     return true;
   }
 }

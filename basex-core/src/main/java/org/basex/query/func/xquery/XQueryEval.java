@@ -56,19 +56,19 @@ public class XQueryEval extends StandardFunc {
    * @throws QueryException query exception
    */
   protected ItemList eval(final QueryContext qc) throws QueryException {
-    return eval(qc, toToken(exprs[0], qc), null, false);
+    return eval(qc, string(toToken(exprs[0], qc)), null, false);
   }
 
   /**
    * Evaluates the specified string.
    * @param qc query context
-   * @param qu query string
+   * @param query query string
    * @param path path to query file (may be {@code null})
    * @param updating updating query
    * @return resulting value
    * @throws QueryException query exception
    */
-  final ItemList eval(final QueryContext qc, final byte[] qu, final String path,
+  final ItemList eval(final QueryContext qc, final String query, final String path,
       final boolean updating) throws QueryException {
 
     // bind variables and context value
@@ -127,7 +127,7 @@ public class XQueryEval extends StandardFunc {
           if(key.isEmpty()) qctx.context(val, sctx);
           else qctx.bind(key, val, sctx);
         }
-        qctx.parseMain(string(qu), null, sctx);
+        qctx.parseMain(query, null, sctx);
 
         if(updating) {
           if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())

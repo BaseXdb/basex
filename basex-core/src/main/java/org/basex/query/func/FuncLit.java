@@ -79,7 +79,7 @@ public final class FuncLit extends Single implements Scope {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     comp(cc);
-    return expr.isValue() ? preEval(cc) : this;
+    return expr.isValue() ? cc.preEval(this) : this;
   }
 
   @Override
@@ -123,6 +123,12 @@ public final class FuncLit extends Single implements Scope {
   @Override
   public boolean compiled() {
     return compiled;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    // [CG] could be enhanced
+    return this == obj;
   }
 
   @Override

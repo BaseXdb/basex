@@ -245,6 +245,8 @@ public enum Function {
   /** XQuery function. */
   JSON_DOC(FnJsonDoc.class, "json-doc(uri[,options])", arg(STR_ZO, MAP_O), DOC_ZO),
   /** XQuery function. */
+  JSON_TO_XML(FnJsonToXml.class, "json-to-xml(string[,options])", arg(STR_ZO, MAP_O), NOD_ZO),
+  /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */
   LAST(FnLast.class, "last()", arg(), ITR, flag(Flag.POS, CTX)),
@@ -306,10 +308,6 @@ public enum Function {
   OUTERMOST(FnOutermost.class, "outermost(nodes)", arg(NOD_ZM), NOD_ZM),
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate.class, "parse-ietf-date(string)", arg(STR_ZO), DTM_ZO),
-  /** XQuery function. */
-  JSON_TO_XML(FnJsonToXml.class, "json-to-xml(string[,options])", arg(STR_ZO, MAP_O), NOD_ZO),
-  /** XQuery function. */
-  XML_TO_JSON(FnXmlToJson.class, "xml-to-json(node[,options])", arg(NOD_ZO, MAP_O), STR_ZO),
   /** XQuery function. */
   PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, MAP_O), ITEM_ZO),
   /** XQuery function. */
@@ -419,6 +417,8 @@ public enum Function {
   UPPER_CASE(FnUpperCase.class, "upper-case(string)", arg(STR_ZO), STR),
   /** XQuery function. */
   URI_COLLECTION(FnUriCollection.class, "uri-collection([uri])", arg(STR_ZO), URI_ZM),
+  /** XQuery function. */
+  XML_TO_JSON(FnXmlToJson.class, "xml-to-json(node[,options])", arg(NOD_ZO, MAP_O), STR_ZO),
   /** XQuery function. */
   YEAR_FROM_DATE(FnYearFromDate.class, "year-from-date(date)", arg(DAT_ZO), ITR_ZO),
   /** XQuery function. */
@@ -686,13 +686,16 @@ public enum Function {
   _CONVERT_BINARY_TO_BYTES(ConvertBinaryToBytes.class, "binary-to-bytes(binary)",
       arg(AAT), BYT_ZM, CONVERT_URI),
   /** XQuery function. */
+  _CONVERT_BINARY_TO_INTEGER(ConvertBinaryToInteger.class, "binary-to-integer(binary)",
+      arg(AAT), ITR_ZM, CONVERT_URI),
+  /** XQuery function. */
   _CONVERT_BINARY_TO_STRING(ConvertBinaryToString.class,
       "binary-to-string(binary[,encoding[,fallback]])", arg(ITEM, STR, BLN), STR, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BYTES_TO_HEX(ConvertBytesToHex.class, "bytes-to-hex(bytes)", arg(BYT_ZM), HEX,
+  _CONVERT_BYTES_TO_HEX(ConvertBytesToHex.class, "bytes-to-hex(bytes)", arg(ITR_ZM), HEX,
       CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BYTES_TO_BASE64(ConvertBytesToBase64.class, "bytes-to-base64(bytes)", arg(BYT_ZM), B64,
+  _CONVERT_BYTES_TO_BASE64(ConvertBytesToBase64.class, "bytes-to-base64(bytes)", arg(ITR_ZM), B64,
       CONVERT_URI),
   /** XQuery function. */
   _CONVERT_STRING_TO_BASE64(ConvertStringToBase64.class, "string-to-base64(string[,encoding])",
@@ -1073,6 +1076,9 @@ public enum Function {
   _JOBS_EVAL(JobsEval.class, "eval(string[,bindings[,options]])",
       arg(STR, MAP_ZO, MAP_O), STR, flag(NDT), JOBS_URI),
   /** XQuery function. */
+  _JOBS_INVOKE(JobsInvoke.class, "invoke(uri[,bindings[,options]])",
+      arg(STR, MAP_ZO, MAP_O), STR, flag(NDT), JOBS_URI),
+  /** XQuery function. */
   _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_FINISHED(JobsFinished.class, "finished(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
@@ -1389,7 +1395,7 @@ public enum Function {
 
   /** Argument pattern. */
   private static final Pattern ARG = Pattern.compile(
-      "^([-\\w_:\\.]*\\(|<|\"|\\$| ).*", Pattern.DOTALL);
+      "^([-\\w_:.]*\\(|<|\"|\\$| ).*", Pattern.DOTALL);
 
   /** Cached enums (faster). */
   public static final Function[] VALUES = values();
@@ -1506,7 +1512,7 @@ public enum Function {
    * Returns the namespace URI of this function.
    * @return function
    */
-  final byte[] uri() {
+  public final byte[] uri() {
     return uri;
   }
 
@@ -1563,7 +1569,7 @@ public enum Function {
    */
   final String[] names() {
     final String names = desc.replaceFirst(".*?\\(", "").replace(",...", "").
-        replaceAll("[\\[\\]\\)\\s]", "");
+        replaceAll("[\\[\\])\\s]", "");
     return names.isEmpty() ? new String[0] : Strings.split(names, ',');
   }
 

@@ -80,12 +80,7 @@ public final class ProjectView extends BaseXPanel {
     final BaseXButton browse = new BaseXButton(DOTS, gui);
     browse.setMargin(new Insets(0, 2, 0, 2));
     browse.setToolTipText(CHOOSE_DIR + DOTS);
-    browse.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        changeRoot();
-      }
-    });
+    browse.addActionListener(e -> changeRoot());
 
     back.add(rootPath, BorderLayout.CENTER);
     back.add(browse, BorderLayout.EAST);
@@ -135,13 +130,10 @@ public final class ProjectView extends BaseXPanel {
    * @param rename file has been renamed
    */
   public void save(final IOFile file, final boolean rename) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        final IOFile path = file.normalize();
-        if(path.path().startsWith(root.file.path())) refreshTree(path);
-        refresh(rename, file.hasSuffix(IO.XQSUFFIXES));
-      }
+    SwingUtilities.invokeLater(() -> {
+      final IOFile path = file.normalize();
+      if(path.path().startsWith(root.file.path())) refreshTree(path);
+      refresh(rename, file.hasSuffix(IO.XQSUFFIXES));
     });
   }
 
@@ -313,12 +305,7 @@ public final class ProjectView extends BaseXPanel {
   void open(final IOFile file, final String search) {
     final EditorArea ea = gui.editor.open(file);
     if(ea != null) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          ea.jump(search);
-        }
-      });
+      SwingUtilities.invokeLater(() -> ea.jump(search));
     }
   }
 

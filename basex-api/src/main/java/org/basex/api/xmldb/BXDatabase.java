@@ -18,7 +18,7 @@ import org.xmldb.api.base.Collection;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class BXDatabase implements Database {
+public final class BXDatabase implements Database {
   /** Database context. */
   final Context ctx = new Context();
 

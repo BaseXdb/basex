@@ -11,7 +11,7 @@ import org.xmldb.api.base.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class BXResourceIterator implements ResourceIterator, Iterable<Resource> {
+public final class BXResourceIterator implements ResourceIterator, Iterable<Resource> {
   /** Resources. */
   private final Iterator<Resource> iter;
 

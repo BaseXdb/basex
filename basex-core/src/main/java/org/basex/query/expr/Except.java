@@ -35,8 +35,8 @@ public final class Except extends Set {
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands (return empty sequence if first value is empty)
-        if(el.isEmpty()) return optPre(cc);
-        cc.info(OPTREMOVE_X_X, this, ex);
+        if(el.isEmpty()) return cc.emptySeq(this);
+        cc.info(OPTREMOVE_X_X, description(), ex);
       } else {
         el.add(ex);
       }
@@ -56,22 +56,20 @@ public final class Except extends Set {
   }
 
   @Override
-  protected ANodeList eval(final Iter[] iters, final QueryContext qc) throws QueryException {
-    final ANodeList list = new ANodeList().check();
-
+  protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
+    final ANodeBuilder list = new ANodeBuilder();
     for(Item it; (it = iters[0].next()) != null;) {
       qc.checkStop();
       list.add(toNode(it));
     }
-    final boolean db = list.dbnodes();
+    list.check();
 
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); e++) {
       final Iter iter = iters[e];
       for(Item it; (it = iter.next()) != null;) {
         qc.checkStop();
-        final int i = list.indexOf(toNode(it), db);
-        if(i != -1) list.delete(i);
+        list.delete(toNode(it));
       }
     }
     return list;
@@ -106,5 +104,10 @@ public final class Except extends Set {
         return temp;
       }
     };
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Except && super.equals(obj);
   }
 }

@@ -44,8 +44,8 @@ public final class StaticFuncs extends ExprInfo {
    * @param anns annotations
    * @param nm function name
    * @param args formal parameters
-   * @param type declared return type
-   * @param expr function body
+   * @param type declared return type (can be {@code null})
+   * @param expr function body (can be {@code null})
    * @param doc xqdoc string
    * @param vs variable scope
    * @param ii input info

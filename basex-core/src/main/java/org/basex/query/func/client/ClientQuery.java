@@ -23,7 +23,7 @@ import org.basex.util.*;
  */
 public final class ClientQuery extends ClientFn {
   /** Query pattern. */
-  private static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
+  private static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)] (.*)", Pattern.MULTILINE);
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

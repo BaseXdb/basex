@@ -14,7 +14,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -27,39 +26,28 @@ import org.basex.util.ft.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public abstract class Preds extends ParseExpr {
-  /** Predicates. */
-  public Expr[] preds;
-
+public abstract class Preds extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param preds predicates
+   * @param exprs predicates
    */
-  protected Preds(final InputInfo info, final Expr[] preds) {
-    super(info);
-    this.preds = preds;
-  }
-
-  @Override
-  public void checkUp() throws QueryException {
-    checkNoneUp(preds);
+  protected Preds(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     final QueryFocus focus = cc.qc.focus;
     final Value init = focus.value;
-    // never compile predicates with empty sequence as context value (#1016)
-    if(init != null && init.isEmpty()) focus.value = null;
     try {
-      final int pl = preds.length;
+      final int pl = exprs.length;
       for(int p = 0; p < pl; ++p) {
         try {
-          preds[p] = preds[p].compile(cc);
+          exprs[p] = exprs[p].compile(cc);
         } catch(final QueryException ex) {
           // replace original expression with error
-          preds[p] = cc.error(ex, this);
+          exprs[p] = cc.error(ex, this);
         }
       }
     } finally {
@@ -71,22 +59,21 @@ public abstract class Preds extends ParseExpr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // number of predicates may change in loop
-    for(int p = 0; p < preds.length; p++) {
-      Expr pred = preds[p].optimizeEbv(cc);
-      preds[p] = pred;
+    for(int p = 0; p < exprs.length; p++) {
+      Expr pred = exprs[p].optimizeEbv(cc);
+      exprs[p] = pred;
 
       if(pred instanceof CmpG || pred instanceof CmpV) {
         final Cmp cmp = (Cmp) pred;
         final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
         if(e1.isFunction(Function.POSITION)) {
-          final SeqType st2 = e2.seqType();
           // position() = last() -> last()
           // position() = $n (xs:numeric) -> $n
-          if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
+          if(num(e2)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              cc.info(OPTREWRITE_X, pred);
-              preds[p] = e2;
+              cc.info(OPTSIMPLE_X, pred);
+              exprs[p] = e2;
             }
           }
         }
@@ -96,33 +83,30 @@ public abstract class Preds extends ParseExpr {
           cc.info(OPTPRED_X, pred);
           final Expr[] and = ((Arr) pred).exprs;
           final int m = and.length - 1;
-          final ExprList el = new ExprList(preds.length + m);
-          for(final Expr e : Arrays.asList(preds).subList(0, p)) el.add(e);
+          final ExprList el = new ExprList(exprs.length + m);
+          for(final Expr e : Arrays.asList(exprs).subList(0, p)) el.add(e);
           for(final Expr a : and) {
             // wrap test with boolean() if the result is numeric
             el.add(cc.function(Function.BOOLEAN, info, a).optimizeEbv(cc));
           }
-          for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) el.add(e);
-          preds = el.finish();
+          for(final Expr e : Arrays.asList(exprs).subList(p + 1, exprs.length)) el.add(e);
+          exprs = el.finish();
         }
       } else if(pred instanceof ANum) {
         final ANum it = (ANum) pred;
-        final long i = it.itr();
-        // example: ....[position() = 1.2]
-        if(i != it.dbl()) return optPre(cc);
-        pred = Pos.get(i, info);
-        // example: ....[position() = 0]
-        if(!(pred instanceof Pos)) return optPre(cc);
-        preds[p] = pred;
+        final long l = it.itr();
+        // example: ....[1.2]
+        if(l != it.dbl()) return cc.emptySeq(this);
+        pred = ItrPos.get(l, info);
+        // example: ....[0]
+        if(!(pred instanceof ItrPos)) return cc.emptySeq(this);
+        exprs[p] = pred;
       } else if(pred.isValue()) {
-        if(pred.ebv(cc.qc, info).bool(info)) {
-          // example: ....[true()]
-          cc.info(OPTREMOVE_X_X, this, pred);
-          preds = Array.delete(preds, p--);
-        } else {
-          // example: ....[false()]
-          return optPre(cc);
-        }
+        // always false: ....[false()]
+        if(!pred.ebv(cc.qc, info).bool(info)) return cc.emptySeq(this);
+        // always true: ....[true()]
+        cc.info(OPTREMOVE_X_X, description(), pred);
+        exprs = Array.delete(exprs, p--);
       }
     }
     return this;
@@ -138,12 +122,12 @@ public abstract class Preds extends ParseExpr {
     long max = exact ? s : Long.MAX_VALUE;
 
     // evaluate positional predicates
-    for(final Expr pred : preds) {
+    for(final Expr pred : exprs) {
       if(pred.isFunction(Function.LAST)) {
         // use minimum of old value and 1
         max = Math.min(max, 1);
-      } else if(pred instanceof Pos) {
-        final Pos pos = (Pos) pred;
+      } else if(pred instanceof ItrPos) {
+        final ItrPos pos = (ItrPos) pred;
         // subtract start position. example: ...[1 to 2][2] -> (2 ->) 1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
         // use minimum of old value and range. example: ...[1 to 5] -> 5
@@ -178,12 +162,12 @@ public abstract class Preds extends ParseExpr {
     qf.value = item;
     try {
       double s = qc.scoring ? 0 : -1;
-      for(final Expr pred : preds) {
+      for(final Expr pred : exprs) {
         final Item test = pred.test(qc, info);
         if(test == null) return false;
         if(s != -1) s += test.score();
       }
-      if(s > 0) item.score(Scoring.avg(s, preds.length));
+      if(s > 0) item.score(Scoring.avg(s, exprs.length));
       return true;
     } finally {
       qf.value = cv;
@@ -201,9 +185,9 @@ public abstract class Preds extends ParseExpr {
    */
   public final Expr merge(final Expr root, final CompileContext cc) throws QueryException {
     // only one predicate can be rewritten; root expression must yield nodes
-    if(preds.length != 1 || !(root.seqType().type instanceof NodeType)) return this;
+    if(exprs.length != 1 || !(root.seqType().type instanceof NodeType)) return this;
 
-    final Expr pred = preds[0];
+    final Expr pred = exprs[0];
     // a[.] -> a
     if(pred instanceof ContextValue) return root;
 
@@ -250,38 +234,27 @@ public abstract class Preds extends ParseExpr {
    */
   protected static boolean num(final Expr expr) {
     final SeqType st = expr.seqType();
-    return st.type.isNumber() && st.zeroOrOne() &&
-        !expr.has(Flag.CTX) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD);
+    return st.type.isNumber() && st.zeroOrOne() && expr.isSimple();
   }
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Expr pred : preds) {
-      if(flag == Flag.POS && pred.seqType().mayBeNumber() || pred.has(flag)) return true;
+    for(final Expr pred : exprs) {
+      if(flag == Flag.POS && pred.seqType().mayBeNumber()) return true;
     }
-    return false;
+    return super.has(flag);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Expr p : preds) if(p.uses(var)) return false;
+    for(final Expr p : exprs) if(p.uses(var)) return false;
     return true;
-  }
-
-  @Override
-  public VarUsage count(final Var var) {
-    return VarUsage.sum(var, preds);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    for(final Expr p : preds) p.plan(plan);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Expr e : preds) sb.append('[').append(e).append(']');
+    for(final Expr e : exprs) sb.append('[').append(e).append(']');
     return sb.toString();
   }
 }

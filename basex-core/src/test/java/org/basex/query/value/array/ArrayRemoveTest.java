@@ -42,13 +42,13 @@ public final class ArrayRemoveTest {
   /** Negative index on deep array. */
   @Test(expected = IndexOutOfBoundsException.class)
   public void deepRemoveNegative() {
-    Array.singleton(Int.get(0)).snoc(Int.get(1)).remove(-1);
+    Array.singleton(Int.ZERO).snoc(Int.ONE).remove(-1);
   }
 
   /** too big index on deep array. */
   @Test(expected = IndexOutOfBoundsException.class)
   public void deepRemoveTwo() {
-    Array.singleton(Int.get(0)).snoc(Int.get(1)).remove(2);
+    Array.singleton(Int.ZERO).snoc(Int.ONE).remove(2);
   }
 
   /** Remove one element from singleton array. */
@@ -121,7 +121,7 @@ public final class ArrayRemoveTest {
     arr = arr.remove(5);
     assertContains(arr, 0, 1, 2, 3, 4);
 
-    Array arr2 = from(1, 2, 3, 4, 5, 6, 7, 8, 9).cons(Int.get(0));
+    Array arr2 = from(1, 2, 3, 4, 5, 6, 7, 8, 9).cons(Int.ZERO);
     for(int i = 9; i >= 4; i--) {
       arr2 = arr2.remove(i);
     }

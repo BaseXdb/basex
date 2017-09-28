@@ -60,7 +60,7 @@ public class ClientQuery extends Query {
   public void bind(final String name, final Object value, final String type) throws IOException {
     cache = null;
 
-    final Object vl = value  instanceof BXNode ? ((BXNode) value).getNode() : value;
+    final Object vl = value instanceof BXNode ? ((BXNode) value).getNode() : value;
     String t = type == null ? "" : type;
     final String v;
     if(vl instanceof Value) {

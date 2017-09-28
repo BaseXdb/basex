@@ -76,6 +76,12 @@ public final class FAttr extends FNode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FAttr && name.eq(((FAttr) obj).name) &&
+        super.equals(obj);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(NAM, name.string(), VAL, value));
   }
@@ -87,6 +93,6 @@ public final class FAttr extends FNode {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.string()).add('=').add(Atm.toString(value)).toString();
+    return new TokenBuilder(name.string()).add('=').add(toString(value)).toString();
   }
 }

@@ -11,7 +11,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.scope.*;
+import org.basex.query.scope.Module;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -149,7 +149,7 @@ public abstract class Inspect {
    * Returns a value for the specified parameter or {@code null}.
    * @param doc documentation
    * @param name parameter name
-   * @return documentation of specified variable
+   * @return documentation of specified variable or {@code null}
    */
   public static byte[] doc(final TokenObjMap<TokenList> doc, final byte[] name) {
     final TokenList params = doc != null ? doc.get(DOC_PARAM) : null;

@@ -72,7 +72,7 @@ public final class QuerySuggest extends QueryParser {
   @Override
   void checkAxis(final Axis axis) {
     all = axis != Axis.CHILD && axis != Axis.DESC ?
-      new ArrayList<PathNode>() : PathIndex.desc(curr, axis == Axis.DESC);
+      new ArrayList<>() : PathIndex.desc(curr, axis == Axis.DESC);
     curr = all;
     show = true;
   }
@@ -112,9 +112,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      final ArrayList<PathNode> tmp = new ArrayList<>();
-      for(final PathNode p : curr) tmp.add(p);
-      stack.add(tmp);
+      stack.add(new ArrayList<>(curr));
       checkAxis(Axis.CHILD);
     } else {
       curr = stack.pop();

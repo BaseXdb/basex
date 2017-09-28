@@ -1,9 +1,11 @@
 package org.basex.query.expr.path;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Abstract node test.
@@ -11,7 +13,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public abstract class Test {
+public abstract class Test extends ExprInfo {
   /** Kind of name test. */
   public enum Kind {
     /** Accept all nodes (*).            */ WILDCARD,
@@ -27,7 +29,7 @@ public abstract class Test {
   /** Name test (can be {@code null}). */
   public QNm name;
   /** Indicates if test will match exactly one node (e.g.: @id). */
-  public boolean unique;
+  public boolean one;
 
   /**
    * Constructor.
@@ -64,20 +66,15 @@ public abstract class Test {
   }
 
   /**
-   * Checks the current and specified test for equality.
-   * @param t test to be compared
-   * @return result of check
-   */
-  public final boolean sameAs(final Test t) {
-    return kind == t.kind && type == t.type &&
-        (name == t.name || (name != null && t.name != null && name.eq(t.name)));
-  }
-
-  /**
    * Copies this test.
    * @return deep copy
    */
   public abstract Test copy();
+
+  @Override
+  public void plan(final FElem e) {
+    throw Util.notExpected();
+  }
 
   /**
    * Checks if this test is namespace-sensitive.

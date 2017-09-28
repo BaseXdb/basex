@@ -68,30 +68,27 @@ public final class BaseXGUI extends Main {
     // initialize fonts and colors
     GUIConstants.init(gopts);
 
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // open main window
-        final GUI gui = new GUI(context, gopts);
-        if(osxGUI != null) osxGUI.init(gui);
+    SwingUtilities.invokeLater(() -> {
+      // open main window
+      final GUI gui = new GUI(context, gopts);
+      if(osxGUI != null) osxGUI.init(gui);
 
-        // open specified file
-        final ArrayList<IOFile> xqfiles = new ArrayList<>();
-        for(final String file : files.finish()) {
-          if(file.contains(IO.BASEXSUFFIX)) continue;
+      // open specified file
+      final ArrayList<IOFile> xqfiles = new ArrayList<>();
+      for(final String file : files.finish()) {
+        if(file.contains(IO.BASEXSUFFIX)) continue;
 
-          final IOFile io = new IOFile(file);
-          final boolean xml = file.endsWith(IO.XMLSUFFIX);
-          if(xml && BaseXDialog.confirm(gui, Util.info(CREATE_DB_FILE, io))) {
-            gopts.set(GUIOptions.INPUTPATH, io.path());
-            gopts.set(GUIOptions.DBNAME, io.dbName());
-            DialogProgress.execute(gui, new Check(file));
-          } else {
-            xqfiles.add(io);
-          }
+        final IOFile io = new IOFile(file);
+        final boolean xml = file.endsWith(IO.XMLSUFFIX);
+        if(xml && BaseXDialog.confirm(gui, Util.info(CREATE_DB_FILE, io))) {
+          gopts.set(GUIOptions.INPUTPATH, io.path());
+          gopts.set(GUIOptions.DBNAME, io.dbName());
+          DialogProgress.execute(gui, new Check(file));
+        } else {
+          xqfiles.add(io);
         }
-        gui.editor.init(xqfiles);
       }
+      gui.editor.init(xqfiles);
     });
 
     // guarantee correct shutdown of database context

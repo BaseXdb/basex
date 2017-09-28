@@ -1,8 +1,5 @@
 package org.basex.query.util.ft;
 
-import java.util.*;
-
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -11,9 +8,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class FTMatches extends ElementList implements Iterable<FTMatch> {
-  /** Full-text matches. */
-  public FTMatch[] match = {};
+public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
   /** Position of a token in the query. */
   public int pos;
 
@@ -21,6 +16,7 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
    * Constructor.
    */
   public FTMatches() {
+    super();
   }
 
   /**
@@ -28,6 +24,7 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
    * @param pos query position
    */
   public FTMatches(final int pos) {
+    this();
     this.pos = pos;
   }
 
@@ -68,23 +65,6 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   }
 
   /**
-   * Adds a match entry.
-   * @param ftm match to be added
-   */
-  public void add(final FTMatch ftm) {
-    if(size == match.length) match = Array.copy(match, new FTMatch[Array.newSize(size)]);
-    match[size++] = ftm;
-  }
-
-  /**
-   * Removes the specified match.
-   * @param index match index
-   */
-  public void delete(final int index) {
-    Array.move(match, index + 1, -1, --size - index);
-  }
-
-  /**
    * Checks if at least one of the matches contains only includes.
    * @return result of check
    */
@@ -102,11 +82,11 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   public boolean phrase(final FTMatches all, final int distance) {
     int a = 0, b = 0, c = 0;
     while(a < size && b < all.size) {
-      final int e = all.match[b].match[0].start;
-      final int d = e - match[a].match[0].end - distance;
+      final int e = all.list[b].list[0].start;
+      final int d = e - list[a].list[0].end - distance;
       if(d == 0) {
-        match[c] = match[a];
-        match[c++].match[0].end = e;
+        list[c] = list[a];
+        list[c++].list[0].end = e;
       }
       if(d >= 0) ++a;
       if(d <= 0) ++b;
@@ -116,15 +96,13 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   }
 
   @Override
-  public Iterator<FTMatch> iterator() {
-    return new ArrayIterator<>(match, size);
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTMatches &&
+        pos == ((FTMatches) obj).pos && super.equals(obj);
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(Util.className(this)).append('[').append(pos).append(']');
-    for(final FTMatch m : this) sb.append("\n  ").append(m);
-    return sb.toString();
+  protected FTMatch[] newList(final int s) {
+    return new FTMatch[s];
   }
 }

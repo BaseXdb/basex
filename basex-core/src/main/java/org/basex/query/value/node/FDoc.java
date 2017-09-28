@@ -5,7 +5,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type.ID;
+import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -86,8 +86,7 @@ public final class FDoc extends FNode {
   public FDoc(final DocumentFragment doc, final byte[] bu) {
     this(bu);
     final Node elem = doc.getFirstChild();
-    if(elem instanceof Element)
-      children.add(new FElem((Element) elem, this, new TokenMap()));
+    if(elem instanceof Element) children.add(new FElem((Element) elem, this, new TokenMap()));
   }
 
   @Override
@@ -113,6 +112,14 @@ public final class FDoc extends FNode {
   @Override
   public FNode deepCopy(final MainOptions options) {
     return new FDoc(children, uri).optimize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FDoc)) return false;
+    final FDoc f = (FDoc) obj;
+    return children.equals(f.children) && Token.eq(uri, f.uri) && super.equals(obj);
   }
 
   @Override

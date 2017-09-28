@@ -65,6 +65,12 @@ final class BaseXCollation extends Collation {
     } while(true);
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof BaseXCollation &&
+        collator.equals(((BaseXCollation) obj).collator);
+  }
+
   /**
    * Determines whether one string starts with another.
    * @param string string iterator

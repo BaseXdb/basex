@@ -198,7 +198,7 @@ final class ProjectFiles {
           // check if file has already been added, or it its contents have been scanned
           if(exclude.contains(path)) continue;
           // check if current file matches the pattern
-          String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
+          final String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
           if(mode == 0 ? startsWith(file, query) :
              mode == 1 ? contains(file, query) :
              matches(file, query)) {

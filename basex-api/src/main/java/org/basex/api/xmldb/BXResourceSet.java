@@ -13,7 +13,7 @@ import org.xmldb.api.base.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class BXResourceSet implements ResourceSet {
+public final class BXResourceSet implements ResourceSet {
   /** Resources. */
   private final ArrayList<Resource> list;
   /** Collection reference. */

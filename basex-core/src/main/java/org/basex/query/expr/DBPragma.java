@@ -24,7 +24,7 @@ public final class DBPragma extends Pragma {
    * Constructor.
    * @param name name of pragma
    * @param option option
-   * @param value optional value
+   * @param value value
    */
   public DBPragma(final QNm name, final Option<?> option, final byte[] value) {
     super(name, value);
@@ -50,6 +50,12 @@ public final class DBPragma extends Pragma {
   @Override
   public boolean has(final Flag flag) {
     return false;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof DBPragma && option.equals(((DBPragma) obj).option) &&
+        super.equals(obj);
   }
 
   @Override

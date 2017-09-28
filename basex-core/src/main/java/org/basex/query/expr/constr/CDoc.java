@@ -48,6 +48,11 @@ public final class CDoc extends CNode {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CDoc && super.equals(obj);
+  }
+
+  @Override
   public String description() {
     return info(DOCUMENT);
   }

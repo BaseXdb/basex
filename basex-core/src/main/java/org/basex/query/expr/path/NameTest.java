@@ -17,7 +17,7 @@ public final class NameTest extends Test {
   /** Local name (can be {@code null}). */
   public final byte[] local;
   /** Default element namespace (can be {@code null}). */
-  private final byte[] defElemNS;
+  private final byte[] defNS;
 
   /**
    * Empty constructor ('*').
@@ -32,15 +32,15 @@ public final class NameTest extends Test {
    * @param name name (may be {@code null})
    * @param kind kind of name test
    * @param attr attribute flag
-   * @param elemNS default element namespace (may be {@code null})
+   * @param defNS default element namespace (may be {@code null})
    */
-  public NameTest(final QNm name, final Kind kind, final boolean attr, final byte[] elemNS) {
+  public NameTest(final QNm name, final Kind kind, final boolean attr, final byte[] defNS) {
     super(attr ? NodeType.ATT : NodeType.ELM);
     this.name = name;
     this.kind = kind;
+    this.defNS = defNS != null ? defNS : Token.EMPTY;
     local = name != null ? name.local() : null;
-    defElemNS = elemNS != null ? elemNS : Token.EMPTY;
-    unique = kind == Kind.URI_NAME;
+    one = kind == Kind.URI_NAME;
   }
 
   @Override
@@ -56,7 +56,7 @@ public final class NameTest extends Test {
     // check if test may yield results
     boolean results = true;
     if(kind == Kind.URI_NAME && !name.hasURI()) {
-      if(type == NodeType.ATT || Token.eq(dataNS, defElemNS)) {
+      if(type == NodeType.ATT || Token.eq(dataNS, defNS)) {
         // namespace is irrelevant/identical: only check local name
         kind = Kind.NAME;
       } else {
@@ -113,22 +113,20 @@ public final class NameTest extends Test {
     }
   }
 
-  /**
-   * Checks if the specified test is equals to this test.
-   * @param test test to be compared
-   * @return result of check
-   */
-  public boolean eq(final NameTest test) {
-    if(kind != test.kind) return false;
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof NameTest)) return false;
+    final NameTest nt = (NameTest) obj;
+    if(kind != nt.kind) return false;
     switch(kind) {
       // wildcard: accept all nodes
       case WILDCARD: return true;
       // namespaces wildcard: only check local name
-      case NAME: return Token.eq(local, test.local);
+      case NAME: return Token.eq(local, nt.local);
       // name wildcard: only check namespace
-      case URI: return Token.eq(name.uri(), test.name.uri());
+      case URI: return Token.eq(name.uri(), nt.name.uri());
       // check everything
-      default: return name.eq(test.name);
+      default: return name.eq(nt.name);
     }
   }
 
