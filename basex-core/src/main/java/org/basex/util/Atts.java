@@ -107,15 +107,6 @@ public final class Atts extends ElementList {
   }
 
   /**
-   * Clears the container.
-   * @return self reference
-   */
-  public Atts clear() {
-    size = 0;
-    return this;
-  }
-
-  /**
    * Creates a shallow copy which shares all keys and values.
    * @return shallow copy
    */

@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.junit.Assert.*;
 
 import org.basex.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -900,8 +901,8 @@ public final class GeoTest extends SandboxTest {
         "declare namespace gml='http://www.opengis.net/gml';" + query;
 
     try(QueryProcessor qp = new QueryProcessor(q, context)) {
-      final String res = qp.value().serialize().toString().replaceAll("(\\r|\\n) *", "");
-      fail("Query did not fail:\n" + query + "\n[E] " + error + "...\n[F] " + res);
+      final ArrayOutput ao = qp.value().serialize();;
+      fail("Query did not fail:\n" + query + "\n[E] " + error + "...\n[F] " + ao);
     } catch(final QueryException ex) {
       final QueryError qerr = ex.error();
       if(qe != null && qerr != null && qe != qerr) {

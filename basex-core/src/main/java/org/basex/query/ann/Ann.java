@@ -68,7 +68,7 @@ public final class Ann {
     if(this == obj) return true;
     if(!(obj instanceof Ann)) return false;
     final Ann ann = (Ann) obj;
-    return (sig != null ? sig == ann.sig : ann.name != null && name.eq(ann.name)) &&
+    return (name != null ? ann.name != null && name.eq(ann.name) : sig == ann.sig) &&
         Array.equals(args, ann.args);
   }
 

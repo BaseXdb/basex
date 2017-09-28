@@ -51,7 +51,8 @@ public final class FetchModuleTest extends AdvancedQueryTest {
     final String encoding = "CP1252";
     final String xml = "<x>Ä</x>";
     final String data = "<?xml version=''1.0'' encoding=''" + encoding + "''?>" + xml;
-    query(_FETCH_XML_BINARY.args(_CONVERT_STRING_TO_BASE64.args(" '" + data + "'", encoding)), xml);
+    query(_FETCH_XML_BINARY.args(_CONVERT_STRING_TO_BASE64.args(" '" + data + '\'', encoding)),
+        xml);
   }
 
   /** Test method. */

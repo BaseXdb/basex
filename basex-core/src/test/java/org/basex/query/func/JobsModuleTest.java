@@ -254,7 +254,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
    * Waits until a very slow query has been started.
    * @return query id
    */
-  private String verySlowQuery() {
+  private static String verySlowQuery() {
     final String id = query(_JOBS_EVAL.args(VERY_SLOW_QUERY));
     while(context.jobs.active.get(id) == null) Performance.sleep(1);
     return id;

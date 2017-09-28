@@ -2,6 +2,7 @@ package org.basex.query.expr.gflwor;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
 import java.util.List;
 
 import org.basex.query.*;
@@ -229,7 +230,7 @@ public final class For extends ForLet {
   public boolean equals(final Object obj) {
     if(!(obj instanceof For)) return false;
     final For f = (For) obj;
-    return Array.equals(pos, f.pos) && Array.equals(score, f.score) && empty == f.empty &&
+    return Objects.equals(pos, f.pos) && Objects.equals(score, f.score) && empty == f.empty &&
         super.equals(obj);
   }
 

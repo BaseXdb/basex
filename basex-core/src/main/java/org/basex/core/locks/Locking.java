@@ -204,9 +204,7 @@ public final class Locking {
   private LocalReadWriteLock unpin(final String string) {
     synchronized(localLocks) {
       final LocalReadWriteLock lock = localLocks.get(string);
-      if(lock.unpin() == 0) {
-        localLocks.remove(string);
-      }
+      if(lock.unpin()) localLocks.remove(string);
       return lock;
     }
   }

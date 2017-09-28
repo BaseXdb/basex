@@ -103,6 +103,6 @@ public final class TarEntry {
 
   @Override
   public String toString() {
-    return Util.className(this) + "[" + name + ", " + getSize() + " bytes]";
+    return Util.className(this) + '[' + name + ", " + size + " bytes]";
   }
 }

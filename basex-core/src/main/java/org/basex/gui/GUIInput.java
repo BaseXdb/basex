@@ -41,11 +41,13 @@ public final class GUIInput extends BaseXTextField {
     super(main);
     gui = main;
 
+    // use larger font for input bar
     final Font f = getFont();
-    final int fs = f.getSize(), ns = (int) (fs * 1.2d);
-    setFont(f.deriveFont(ns));
+    final int fs = f.getSize();
+    final float fs2 = fs * 1.2f;
+    setFont(f.deriveFont(fs2));
     final Dimension ps = getPreferredSize();
-    setPreferredSize(new Dimension(ps.width, ps.height + ns - fs));
+    setPreferredSize(new Dimension(ps.width, ps.height + (int) fs2 - fs));
 
     box = new BaseXCombo(main);
     box.addActionListener(new ActionListener() {

@@ -150,7 +150,7 @@ public abstract class CLI extends Main {
    * @return return base URI and query string
    * @throws IOException I/O exception
    */
-  protected final Pair<String, String> input(final String input) throws IOException {
+  protected static Pair<String, String> input(final String input) throws IOException {
     final IO io = IO.get(input);
     final boolean file = !(io instanceof IOContent) && io.exists() && !io.isDir();
     return new Pair<>(file ? io.path() : "./", file ? io.string() : input);

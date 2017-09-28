@@ -285,7 +285,7 @@ abstract class TrieNode {
    * @param sb string builder
    * @return result of check
    */
-  boolean more(final StringBuilder sb) {
+  static boolean more(final StringBuilder sb) {
     if(sb.length() <= 32) return true;
     if(!sb.substring(sb.length() - DOTS.length()).equals(DOTS)) sb.append(DOTS);
     return false;

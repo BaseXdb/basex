@@ -27,29 +27,34 @@ public interface PkgText {
   /** Content directory. */
   String CONTENT = "content";
 
-  /** <package/> root element. */
+  // <package/> root element
+
   /** Element package. */
   byte[] PACKAGE = token("package");
 
-  /** <package/> children. */
+  // <package/> children.
+
   /** Element dependency. */
   byte[] DEPEND = token("dependency");
   /** Element xquery. */
   byte[] XQUERY = token("xquery");
 
-  /** <xquery/> children. */
+  // <xquery/> children
+
   /** Attribute namespace. */
   byte[] A_NAMESPACE = token("namespace");
   /** Attribute file. */
   byte[] A_FILE = token("file");
 
-  /** Jar descriptor children. */
+  // Jar descriptor children
+
   /** <jar/> element. */
   byte[] JAR = token("jar");
   /** <class/> element. */
   byte[] CLASS = token("class");
 
-  /** <package/> attributes. */
+  // <package/> attributes
+
   /** Attribute name. */
   byte[] A_NAME = token("name");
   /** Attribute abbrev. */
@@ -59,7 +64,8 @@ public interface PkgText {
   /** Attribute spec. */
   byte[] A_SPEC = token("spec");
 
-  /** <dependency/> attributes. */
+  // <dependency/> attributes
+
   /** Attribute package. */
   byte[] A_PACKAGE = token("package");
   /** Attribute processor. */
@@ -89,6 +95,4 @@ public interface PkgText {
   String NOJARS = "No jars specified";
   /** No public classes registered. */
   String NOCLASSES = "No public classes specified";
-  /** Not expected error during extraction of packaged dependency jars. */
-  String EXTFAILED = "%: could not extract packaged dependency from jar: %";
 }

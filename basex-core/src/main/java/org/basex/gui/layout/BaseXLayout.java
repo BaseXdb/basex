@@ -190,8 +190,7 @@ public final class BaseXLayout {
     final ArrayList<Object> list = new ArrayList<>();
     try {
       if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-        for(final File fl : (List<File>)
-            tr.getTransferData(DataFlavor.javaFileListFlavor)) list.add(fl);
+        list.addAll((List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor));
       } else if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
         list.add(tr.getTransferData(DataFlavor.stringFlavor));
       } else {

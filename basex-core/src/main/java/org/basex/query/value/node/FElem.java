@@ -3,6 +3,8 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -407,8 +409,8 @@ public final class FElem extends FNode {
     if(this == obj) return true;
     if(!(obj instanceof FElem)) return false;
     final FElem f = (FElem) obj;
-    return Array.equals(children, f.children) && Array.equals(atts, f.atts) &&
-        Array.equals(ns, f.ns) && super.equals(obj);
+    return Objects.equals(children, f.children) && Objects.equals(atts, f.atts) &&
+        Objects.equals(ns, f.ns) && super.equals(obj);
   }
 
   @Override

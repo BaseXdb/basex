@@ -188,7 +188,7 @@ public final class EditorView extends View {
           @Override
           public void actionPerformed(final ActionEvent ac) {
             // rewrite and open chosen file
-            open(new IOFile(ac.getActionCommand().replaceAll("(.*) \\[(.*)\\]", "$2/$1")));
+            open(new IOFile(ac.getActionCommand().replaceAll("(.*) \\[(.*)]", "$2/$1")));
           }
         };
 
@@ -669,11 +669,10 @@ public final class EditorView extends View {
   /**
    * Closes an editor.
    * @param edit editor to be closed. {@code null} closes the currently opened editor.
-   * @return {@code true} if editor was closed
    */
-  public boolean close(final EditorArea edit) {
+  public void close(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();
-    if(!confirm(ea)) return false;
+    if(!confirm(ea)) return;
 
     // remove reference to last executed file
     if(execFile != null && ea.file().path().equals(execFile.path())) execFile = null;
@@ -697,7 +696,6 @@ public final class EditorView extends View {
         public void run() { getEditor().requestFocusInWindow(); }
       });
     }
-    return true;
   }
 
   /**

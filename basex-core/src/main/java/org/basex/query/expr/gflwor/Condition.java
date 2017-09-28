@@ -3,6 +3,8 @@ package org.basex.query.expr.gflwor;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -164,8 +166,8 @@ public final class Condition extends Single {
     if(this == obj) return true;
     if(!(obj instanceof Condition)) return false;
     final Condition c = (Condition) obj;
-    return Array.equals(item, c.item) && Array.equals(pos, c.pos) &&
-           Array.equals(prev, c.prev) && Array.equals(next, c.next) && super.equals(obj);
+    return Objects.equals(item, c.item) && Objects.equals(pos, c.pos) &&
+           Objects.equals(prev, c.prev) && Objects.equals(next, c.next) && super.equals(obj);
   }
 
   @Override

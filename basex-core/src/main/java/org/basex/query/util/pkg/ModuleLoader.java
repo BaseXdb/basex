@@ -86,7 +86,7 @@ public final class ModuleLoader {
           }
         }
         if(id != null) {
-          addRepo(id, new HashSet<String>(), new HashSet<String>(), ii, qp);
+          addRepo(id, new HashSet<>(), new HashSet<>(), ii, qp);
           return true;
         }
       }

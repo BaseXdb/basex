@@ -62,7 +62,7 @@ final class SmallSeq extends TreeSeq {
     System.arraycopy(elems, p, out, p + 1, n - p);
 
     if(n < MAX_SMALL) return new SmallSeq(out, null);
-    return new BigSeq(slice(out, 0, MIN_DIGIT), FingerTree.<Item>empty(),
+    return new BigSeq(slice(out, 0, MIN_DIGIT), FingerTree.empty(),
         slice(out, MIN_DIGIT, n + 1), null);
   }
 
@@ -170,7 +170,7 @@ final class SmallSeq extends TreeSeq {
     final int l = left.length, r = elems.length, n = l + r;
     if(Math.min(l, r) >= MIN_DIGIT) {
       // both arrays can be used as digits
-      return new BigSeq(left, FingerTree.<Item>empty(), elems, null);
+      return new BigSeq(left, FingerTree.empty(), elems, null);
     }
 
     final Item[] out = new Item[n];
@@ -179,7 +179,7 @@ final class SmallSeq extends TreeSeq {
     if(n <= MAX_SMALL) return new SmallSeq(out, null);
 
     final int mid = n / 2;
-    return new BigSeq(slice(out, 0, mid), FingerTree.<Item>empty(), slice(out, mid, n), null);
+    return new BigSeq(slice(out, 0, mid), FingerTree.empty(), slice(out, mid, n), null);
   }
 
   @Override

@@ -46,7 +46,7 @@ public final class RESTGetTest extends RESTTest {
       assertEquals("<a/>", get("?query=.&context=<"));
       fail("Error expected.");
     } catch(final IOException ex) {
-      /** expected. */
+      // expected
     }
   }
 

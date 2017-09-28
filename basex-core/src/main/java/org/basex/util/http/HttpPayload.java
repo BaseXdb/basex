@@ -297,7 +297,7 @@ public final class HttpPayload {
       } else if(startsWith(line, CONTENT_DISPOSITION)) {
         // get key and file name
         name = contains(line, token(NAME + '=')) ?
-          string(line).replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[\\]", "") : null;
+          string(line).replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[]", "") : null;
         filename = contains(line, token(FILENAME + '=')) ?
           string(line).replaceAll("^.*" + FILENAME + "=\"|\"$", "") : null;
       } else if(line.length == 0) {

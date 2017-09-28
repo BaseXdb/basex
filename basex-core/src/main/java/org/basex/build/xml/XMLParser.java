@@ -122,8 +122,8 @@ public class XMLParser extends SingleParser {
     }
 
     consume(Type.L_BR);
-    atts.clear();
-    nsp.clear();
+    atts.reset();
+    nsp.reset();
 
     // get element name
     byte[] en = consumeToken(Type.ELEMNAME);

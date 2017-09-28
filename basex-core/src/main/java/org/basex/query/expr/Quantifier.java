@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -36,7 +35,7 @@ public final class Quantifier extends Single {
    */
   public Quantifier(final InputInfo info, final For[] inputs, final Expr expr,
       final boolean every, final StaticContext sc) {
-    this(info, new GFLWOR(info, new LinkedList<Clause>(Arrays.asList(inputs)),
+    this(info, new GFLWOR(info, new LinkedList<>(Arrays.asList(inputs)),
         compBln(expr, info, sc)), every);
   }
 

@@ -69,9 +69,8 @@ abstract class MapPainter {
    * Draws the specified rectangles.
    * @param g graphics reference
    * @param r rectangles to be drawn
-   * @param scale scale boarders using this factor
    */
-  abstract void drawRectangles(Graphics g, MapRects r, float scale);
+  abstract void drawRectangles(Graphics g, MapRects r);
 
   /**
    * Returns textual contents for a rectangle.

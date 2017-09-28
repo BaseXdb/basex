@@ -243,7 +243,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return result of check
    */
   public boolean eq(final E element1, final E element2) {
-    return Array.equals(element1, element2);
+    return Objects.equals(element1, element2);
   }
 
   /**

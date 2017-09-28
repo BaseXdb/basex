@@ -26,7 +26,7 @@ abstract class ProcFn extends StandardFunc {
    * Returns the result of a command.
    * @param qc query context
    * @param fork fork process
-   * @return result
+   * @return result, or {@code null} if process is forked
    * @throws QueryException query exception
    */
   final Result exec(final QueryContext qc, final boolean fork) throws QueryException {

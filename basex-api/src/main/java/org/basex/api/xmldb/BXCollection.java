@@ -28,7 +28,7 @@ public final class BXCollection implements Collection {
   /** Database context. */
   final BXDatabase db;
   /** Database context. */
-  public Context ctx;
+  public final Context ctx;
   /** Database. */
   public Data data;
 

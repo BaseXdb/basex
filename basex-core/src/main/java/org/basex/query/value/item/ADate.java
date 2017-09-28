@@ -33,7 +33,7 @@ public abstract class ADate extends ADateDur {
   static final String YEAR =
       "(-?(000[1-9]|00[1-9]\\d|0[1-9]\\d{2}|[1-9]\\d{3,}))";
   /** Date pattern. */
-  static final String ZONE = "((\\+|-)" + DD + ':' + DD + "|Z)?";
+  static final String ZONE = "(([-+])" + DD + ':' + DD + "|Z)?";
   /** Day per months. */
   static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
@@ -489,7 +489,7 @@ public abstract class ADate extends ADateDur {
     if(!(obj instanceof ADate)) return false;
     final ADate a = (ADate) obj;
     return type.eq(a.type) && yea == a.yea && mon == a.mon && day == a.day &&
-        hou == a.hou && min == a.min && sec == a.sec && tz == a.tz &&
+        hou == a.hou && min == a.min && tz == a.tz &&
         (sec == null ? a.sec == null : sec.compareTo(a.sec) == 0);
   }
 

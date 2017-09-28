@@ -811,7 +811,7 @@ public class FnHttpTest extends HTTPTest {
       + " for $h in http:header"
       + " order by $h/@name"
       + " return insert node $h as first into ."
-      + "}";
+      + '}';
     try(QueryProcessor qp = new QueryProcessor(query, ctx).context(xml)) {
       return qp.iter().next();
     }

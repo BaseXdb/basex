@@ -139,7 +139,7 @@ public final class Scheduled extends Job implements Runnable {
    * @param date date or duration
    * @return milliseconds
    */
-  private long ms(final ADateDur date) {
+  private static long ms(final ADateDur date) {
     return date.sec.multiply(BigDecimal.valueOf(1000)).longValue();
   }
 

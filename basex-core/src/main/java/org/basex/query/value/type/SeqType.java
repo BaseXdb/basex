@@ -3,6 +3,8 @@ package org.basex.query.value.type;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.list.*;
@@ -627,7 +629,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType st) {
-    return type.eq(st.type) && occ == st.occ && Array.equals(kind, st.kind);
+    return type.eq(st.type) && occ == st.occ && Objects.equals(kind, st.kind);
   }
 
   @Override

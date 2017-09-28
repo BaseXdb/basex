@@ -244,22 +244,12 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Casts the specified step into an axis step, or returns a {@code null} reference.
+   * Tries to cast the specified step into an axis step.
    * @param index index
-   * @return step
+   * @return axis step, or {@code null})
    */
   private Step axisStep(final int index) {
     return steps[index] instanceof Step ? (Step) steps[index] : null;
-  }
-
-  /**
-   * Adds predicates to the last step.
-   * @param preds predicate to be added
-   * @return resulting path instance
-   */
-  public final Path addPreds(final Expr... preds) {
-    steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(preds);
-    return get(info, root, steps);
   }
 
   /**
@@ -924,7 +914,7 @@ public abstract class Path extends ParseExpr {
   public final boolean equals(final Object obj) {
     if(!(obj instanceof Path)) return false;
     final Path p = (Path) obj;
-    return Array.equals(root, p.root) && Array.equals(steps, p.steps);
+    return Objects.equals(root, p.root) && Array.equals(steps, p.steps);
   }
 
   @Override

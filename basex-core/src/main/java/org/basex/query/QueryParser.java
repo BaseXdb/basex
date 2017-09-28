@@ -93,7 +93,7 @@ public class QueryParser extends InputParser {
   public final StaticContext sc;
 
   /** Imported modules. */
-  private TokenSet imports = new TokenSet();
+  private final TokenSet imports = new TokenSet();
   /** List of modules to be parsed. */
   private final ArrayList<ModInfo> mods = new ArrayList<>();
 
@@ -3623,7 +3623,7 @@ public class QueryParser extends InputParser {
     }
 
     final Expr s = check(single(), INCOMPLETE);
-    Mode mode = Mode.INTO;;
+    Mode mode = Mode.INTO;
     if(wsConsumeWs(AS)) {
       if(wsConsumeWs(FIRST)) {
         mode = Mode.FIRST;

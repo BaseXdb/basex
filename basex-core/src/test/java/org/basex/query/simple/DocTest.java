@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class DocTest extends QueryTest {
-  /** Constructor. */
   static {
     create(
       "<?xml version='1.0' encoding='iso-8859-1'?>\n" +

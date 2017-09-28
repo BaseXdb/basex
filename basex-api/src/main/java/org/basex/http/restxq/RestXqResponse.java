@@ -127,7 +127,9 @@ final class RestXqResponse {
    */
   private void build(final ANode response, final Iter iter) throws Exception {
     // don't allow attributes
-    for(final ANode a : response.attributes()) throw func.error(UNEXP_NODE, a);
+    final BasicNodeIter atts = response.attributes();
+    final ANode attr = atts.next();
+    if(attr != null) throw func.error(UNEXP_NODE, attr);
 
     // parse response and serialization parameters
     SerializerOptions sp = func.output;

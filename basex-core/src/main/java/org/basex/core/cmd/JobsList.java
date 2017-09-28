@@ -33,7 +33,7 @@ public final class JobsList extends Command {
   @Override
   protected boolean run() throws IOException {
     final Table table = new Table();
-    table.description = JOBS;
+    table.description = JOBS_X;
     table.header.add(uc(ID));
     table.header.add(TYPE);
     table.header.add(STATE);
@@ -61,9 +61,9 @@ public final class JobsList extends Command {
   public static TokenList ids(final Context ctx) {
     final JobPool jobs = ctx.jobs;
     final Set<String> set = new HashSet<>();
-    for(final String id : jobs.results.keySet()) set.add(id);
-    for(final String id : jobs.active.keySet()) set.add(id);
-    for(final String id : jobs.tasks.keySet()) set.add(id);
+    set.addAll(jobs.results.keySet());
+    set.addAll(jobs.active.keySet());
+    set.addAll(jobs.tasks.keySet());
     final TokenList list = new TokenList(set.size());
     for(final String id : set) list.add(id);
     return sort(list);

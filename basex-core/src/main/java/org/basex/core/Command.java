@@ -373,7 +373,7 @@ public abstract class Command extends Job {
   protected final boolean addLocks(final LockList list, final int index) {
     // return true if the addressed database argument does not exists
     if(args.length <= index || args[index] == null) return true;
-    final boolean noglob = !args[index].matches(".*[\\?\\*,].*");
+    final boolean noglob = !args[index].matches(".*[?*,].*");
     if(noglob) list.add(args[index]);
     return noglob;
   }

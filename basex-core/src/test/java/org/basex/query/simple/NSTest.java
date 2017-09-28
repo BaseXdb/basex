@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class NSTest extends QueryTest {
-  /** Constructor. */
   static {
     queries = new Object[][] {
       { "NUFP 1", strings("http://www.w3.org/XML/1998/namespace"),

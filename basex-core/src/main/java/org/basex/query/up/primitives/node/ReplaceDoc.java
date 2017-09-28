@@ -2,8 +2,6 @@ package org.basex.query.up.primitives.node;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
@@ -36,8 +34,9 @@ public final class ReplaceDoc extends NodeUpdate {
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.REPLACENODE, pre, data, info);
+
     final DBOptions options = new DBOptions(opts, DBOptions.PARSING, info);
-    newDocs = new DBNew(qc, Arrays.asList(input), options, info);
+    newDocs = new DBNew(qc, options, info, input);
   }
 
   @Override

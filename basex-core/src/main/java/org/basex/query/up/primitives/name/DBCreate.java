@@ -31,13 +31,13 @@ public final class DBCreate extends NameUpdate {
   /**
    * Constructor.
    * @param name name for created database
-   * @param input input (ANode and QueryInput references)
+   * @param inputs inputs (ANode and QueryInput references)
    * @param opts database options
    * @param qc query context
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBCreate(final String name, final List<NewInput> input, final Options opts,
+  public DBCreate(final String name, final NewInput[] inputs, final Options opts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBCREATE, name, info, qc);
@@ -45,7 +45,7 @@ public final class DBCreate extends NameUpdate {
     Collections.addAll(supported, DBOptions.INDEXING);
     Collections.addAll(supported, DBOptions.PARSING);
     options = new DBOptions(opts, supported, info);
-    newDocs = new DBNew(qc, input, options, info);
+    newDocs = new DBNew(qc, options, info, inputs);
   }
 
   @Override

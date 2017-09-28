@@ -217,7 +217,7 @@ public final class ValueAccess extends IndexAccess {
   public boolean equals(final Object obj) {
     if(!(obj instanceof ValueAccess)) return false;
     final ValueAccess v = (ValueAccess) obj;
-    return expr.equals(obj) && type == v.type && Array.equals(test, v.test) && trim == v.trim &&
+    return expr.equals(obj) && type == v.type && Objects.equals(test, v.test) && trim == v.trim &&
         super.equals(obj);
   }
 

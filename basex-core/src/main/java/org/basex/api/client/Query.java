@@ -120,8 +120,11 @@ public abstract class Query implements Closeable {
     final ByteList bl = new ByteList();
     for(int t; (t = input.read()) > 0;) {
       // skip type information
-      if(full && ID.get(t).isExtended()) {
-        while(input.read() > 0);
+      if(full) {
+        final ID id = ID.get(t);
+        if(id != null && id.isExtended()) {
+          while(input.read() > 0);
+        }
       }
       // read and decode result
       final ServerInput si = new ServerInput(input);

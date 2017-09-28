@@ -17,7 +17,7 @@ public abstract class Tokenizer extends LanguageImpl {
   /** Return all tokens. */
   boolean all;
 
-  /** Load tokenizer classes and order them by precedence. */
+  /* Load tokenizer classes and order them by precedence. */
   static {
     IMPL.add(new WesternTokenizer(null));
     if(JapaneseTokenizer.available()) IMPL.add(new JapaneseTokenizer(null));

@@ -283,7 +283,8 @@ public final class OrderBy extends Clause {
       if(this == obj) return true;
       if(!(obj instanceof Key)) return false;
       final Key k = (Key) obj;
-      return desc == k.desc && least == k.least && Array.equals(coll, k.coll) && super.equals(obj);
+      return desc == k.desc && least == k.least && Objects.equals(coll, k.coll) &&
+          super.equals(obj);
     }
 
     @Override

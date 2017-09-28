@@ -16,7 +16,7 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
    * Constructor.
    */
   public FTMatches() {
-    super(new FTMatch[0]);
+    super();
   }
 
   /**

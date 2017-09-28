@@ -28,7 +28,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
       final FDoc plan = qp.plan();
       // compare results
       if(res != null) {
-        assertEquals("\nQuery: " + qu + "\n",
+        assertEquals("\nQuery: " + qu + '\n',
             res, normNL(qp.value().serialize().toString()));
       }
 

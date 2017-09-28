@@ -118,8 +118,11 @@ public final class MemValues extends ValueIndex {
   @Override
   public int size() {
     // returns the actual number of indexed entries
+    final int ll = lenList.size();
     int s = 0;
-    for(int c = 1; c < s; c++) if(lenList.get(c) > 0) s++;
+    for(int c = 1; c < ll; c++) {
+      if(lenList.get(c) > 0) s++;
+    }
     return s;
   }
 

@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class FnNotTest extends QueryTest {
-  /** Constructor. */
   static {
     queries = new Object[][] {
       { "fn-notint1args-1", booleans(false), "fn:not(xs:int('-2147483648'))" },

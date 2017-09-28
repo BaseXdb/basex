@@ -112,9 +112,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      final ArrayList<PathNode> tmp = new ArrayList<>();
-      for(final PathNode p : curr) tmp.add(p);
-      stack.add(tmp);
+      stack.add(new ArrayList<>(curr));
       checkAxis(Axis.CHILD);
     } else {
       curr = stack.pop();

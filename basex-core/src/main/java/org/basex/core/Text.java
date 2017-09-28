@@ -254,7 +254,7 @@ public interface Text {
   /** Connection error. */
   String CONNECTION_ERROR_X = lang("connection_error") + PORT_X;
   /** Unknown host. */
-  String UNKNOWN_HOST_X = lang("unknown_host_x");
+  String UNKNOWN_HOST_X = lang("unknown_host_%");
   /** Timeout exceeded. */
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
   /** Access denied. */
@@ -697,6 +697,10 @@ public interface Text {
   String SESSIONS_X = lang("sessions_%");
   /** Show packages. */
   String PACKAGES_X = lang("packages_%");
+  /** Show jobs. */
+  String JOBS_X = lang("jobs_%");
+  /** Show packages. */
+  String RESOURCES_X = lang("resources_%");
   /** Permission required. */
   String PERM_REQUIRED_X = lang("perm_required_%");
   /** Invalid permissions. */

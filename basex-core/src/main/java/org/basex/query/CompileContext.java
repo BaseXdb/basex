@@ -163,9 +163,9 @@ public final class CompileContext {
           }
         }
       } else {
-        info(OPTPRE_X_X, expr, result.description());
+        info(OPTPRE_X_X, expr, res.description());
         // Refine type. Required because original type might get lost in newly created sequences
-        if(refine && res.size() > 1) {
+        if(refine && res instanceof Seq) {
           final Seq seq = (Seq) res;
           final Type et = expr.seqType().type, rt = seq.type;
           if(!et.eq(rt) && et.instanceOf(rt)) {

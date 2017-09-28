@@ -86,7 +86,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.args = args;
     this.type = type;
     this.anns = anns;
-    this.global = global == null ? Collections.<Var, Expr>emptyMap() : global;
+    this.global = global == null ? Collections.emptyMap() : global;
     this.vs = vs;
   }
 

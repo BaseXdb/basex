@@ -71,7 +71,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final long leftSize,
       final Node<N, E>[] right, final long size) {
-    return new DeepTree<>(left, leftSize, EmptyTree.<Node<N, E>, E>getInstance(), right, size);
+    return new DeepTree<>(left, leftSize, EmptyTree.getInstance(), right, size);
   }
 
   /**
@@ -85,7 +85,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right,
       final long size) {
-    return new DeepTree<>(left, size(left), EmptyTree.<Node<N, E>, E>getInstance(), right, size);
+    return new DeepTree<>(left, size(left), EmptyTree.getInstance(), right, size);
   }
 
   /**
@@ -113,7 +113,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right) {
     final long l = size(left), r = size(right);
-    return new DeepTree<>(left, l, EmptyTree.<Node<N, E>, E>getInstance(), right, l + r);
+    return new DeepTree<>(left, l, EmptyTree.getInstance(), right, l + r);
   }
 
   @Override

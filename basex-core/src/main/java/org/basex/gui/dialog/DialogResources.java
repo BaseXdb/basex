@@ -15,7 +15,6 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.ResourceNode;
 
 /**
  * Combination of a JTree and a text field. The tree visualizes the database content including raw

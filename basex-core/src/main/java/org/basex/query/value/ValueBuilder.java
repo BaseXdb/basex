@@ -117,7 +117,7 @@ public final class ValueBuilder {
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     final Iterator<Item> iter = firstValue != null ? firstValue.iterator() :
-      builder != null ? builder.iterator() : Collections.<Item>emptyIterator();
+      builder != null ? builder.iterator() : Collections.emptyIterator();
     if(iter.hasNext()) {
       sb.append(iter.next());
       while(iter.hasNext()) sb.append(", ").append(iter.next());

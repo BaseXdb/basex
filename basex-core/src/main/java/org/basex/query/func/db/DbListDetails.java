@@ -74,7 +74,7 @@ public final class DbListDetails extends DbList {
    * @param qc query context
    * @return iterator
    */
-  private Iter listDBs(final QueryContext qc) {
+  private static Iter listDBs(final QueryContext qc) {
     final Context ctx = qc.context;
     final StringList dbs = ctx.filter(Perm.READ, ctx.databases.listDBs());
     return new BasicIter<FNode>(dbs.size()) {

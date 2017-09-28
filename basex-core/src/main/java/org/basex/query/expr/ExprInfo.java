@@ -60,7 +60,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param exprs expressions
    */
-  protected final void addPlan(final FElem plan, final FElem el, final Object... exprs) {
+  protected static final void addPlan(final FElem plan, final FElem el, final Object... exprs) {
     plan.add(el);
     for(final Object expr : exprs) {
       if(expr instanceof ExprInfo) {
@@ -83,7 +83,7 @@ public abstract class ExprInfo {
    * @param el new element
    * @param expr expressions
    */
-  protected final void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
+  protected static final void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
     addPlan(plan, el, (Object) expr);
   }
 
@@ -93,7 +93,7 @@ public abstract class ExprInfo {
    * @param value value of attribute
    * @return tree node
    */
-  protected FAttr planAttr(final Object name, final Object value) {
+  protected static FAttr planAttr(final Object name, final Object value) {
     return new FAttr(Util.inf(name), Util.inf(value));
   }
 }

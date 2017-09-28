@@ -21,7 +21,7 @@ import org.xml.sax.*;
 public final class IOFile extends IO {
   /** Pattern for valid file names. */
   private static final Pattern VALIDNAME =
-      Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>\\|" : "") + "]+$");
+      Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>|" : "") + "]+$");
   /** Absolute flag. */
   private final boolean absolute;
   /** File reference. */

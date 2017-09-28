@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class FnFormatDateTest extends QueryTest {
-  /** Constructor. */
   static {
     queries = new Object[][] {
       { "formdate  10", strings("2002-12-31"),

@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -181,7 +183,7 @@ final class CmpSR extends Single {
     if(!(obj instanceof CmpSR)) return false;
     final CmpSR c = (CmpSR) obj;
     return Token.eq(min, c.min) && mni == c.mni && Token.eq(max, c.max) && mxi && c.mxi &&
-        Array.equals(coll, c.coll) && super.equals(obj);
+        Objects.equals(coll, c.coll) && super.equals(obj);
   }
 
   @Override

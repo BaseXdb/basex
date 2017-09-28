@@ -735,17 +735,16 @@ public class Options implements Iterable<Option<?>> {
    * @param item value of option
    * @param error raise error if option is unknown
    * @param ii input info
-   * @return success flag
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private synchronized boolean assign(final String name, final Item item, final boolean error,
+  private synchronized void assign(final String name, final Item item, final boolean error,
       final InputInfo ii) throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
       if(error) throw new BaseXException(error(name));
-      return false;
+      return;
     }
 
     if(option instanceof BooleanOption) {
@@ -801,7 +800,6 @@ public class Options implements Iterable<Option<?>> {
     } else {
       throw Util.notExpected("Unsupported option: " + option);
     }
-    return true;
   }
 
   /**

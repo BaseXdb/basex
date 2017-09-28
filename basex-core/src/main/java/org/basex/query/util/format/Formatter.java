@@ -560,7 +560,7 @@ public abstract class Formatter extends FormatUtil {
    * @param first first digit
    * @return number character sequence
    */
-  private byte[] number(final byte[] num, final FormatParser fp, final int first) {
+  private static byte[] number(final byte[] num, final FormatParser fp, final int first) {
     final int zero = zeroes(first);
 
     // cache characters of presentation modifier

@@ -14,13 +14,6 @@ import org.basex.util.list.*;
  */
 public final class AnnList extends ObjectList<Ann, AnnList> {
   /**
-   * Constructor.
-   */
-  public AnnList() {
-    super(new Ann[0]);
-  }
-
-  /**
    * Removes an annotation.
    * @param sig signature to be found
    */

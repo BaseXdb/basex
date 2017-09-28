@@ -31,7 +31,7 @@ public final class Insert extends Update {
     /** Last.   */ LAST,
     /** Before. */ BEFORE,
     /** After.  */ AFTER
-  };
+  }
 
   /** Insertion mode. */
   private final Mode mode;

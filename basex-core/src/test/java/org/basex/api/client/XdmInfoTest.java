@@ -72,7 +72,7 @@ public final class XdmInfoTest extends SandboxTest {
     for(final Object[] exp : TYPES) {
       if(exp.length < 2) continue;
       try(TestQuery tq = session.query(exp[1].toString())) {
-        final TestResult tr = tq.full();
+        final TestResult tr = tq.full(exp);
         final Object[] type = TYPES[tr.type];
         assertSame("Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0], exp, type);
         assertEquals(Token.string(tr.result), type[2]);
@@ -139,10 +139,11 @@ public final class XdmInfoTest extends SandboxTest {
 
     /**
      * Returns a full result item.
+     * @param exp expected data
      * @return full string
      * @throws IOException I/O exception
      */
-    TestResult full() throws IOException {
+    TestResult full(final Object[] exp) throws IOException {
       final byte[] result = ((TestSession) cs).exec(ServerCmd.FULL, id);
       final TestResult tr = new TestResult();
       tr.type = result[0];
@@ -155,9 +156,12 @@ public final class XdmInfoTest extends SandboxTest {
         tr.result = Arrays.copyOfRange(result, 1, rl);
       }
 
-      final boolean uriResult = tr.uri != null, uriExpected = tr.uri != null;
-      if(uriResult && !uriExpected) fail("No URI expected for " + TYPES[tr.type][0]);
-      if(!uriResult && uriExpected) fail("URI expected for " + TYPES[tr.type][0]);
+      final boolean expected = exp.length > 3;
+      if(tr.uri == null) {
+        if(expected) fail("URI expected for " + TYPES[tr.type][0]);
+      } else if(!expected) {
+        fail("No URI expected for " + TYPES[tr.type][0] + ": " + Token.string(tr.result));
+      }
       return tr;
     }
 

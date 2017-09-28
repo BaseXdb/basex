@@ -111,6 +111,16 @@ public abstract class AxisPath extends Path {
     return (Step) steps[i];
   }
 
+  /**
+   * Adds predicates to the last step.
+   * @param preds predicate to be added
+   * @return resulting path instance
+   */
+  public final Path addPreds(final Expr... preds) {
+    steps[steps.length - 1] = step(steps.length - 1).addPreds(preds);
+    return get(info, root, steps);
+  }
+
   @Override
   public final boolean iterable() {
     return true;

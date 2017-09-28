@@ -335,7 +335,7 @@ public final class Window extends Clause {
     if(!(obj instanceof Window)) return false;
     final Window w = (Window) obj;
     return sliding == w.sliding && var.equals(w.var) && expr.equals(w.expr) &&
-        start.equals(w.start) && only == w.only && Array.equals(end, w.end);
+        start.equals(w.start) && only == w.only && Objects.equals(end, w.end);
   }
 
   @Override

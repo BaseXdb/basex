@@ -233,7 +233,7 @@ final class BigSeq extends TreeSeq {
     final Item[] newRight = slice(right, -mr, r);
     System.arraycopy(mid, ml, newRight, 0, mr);
     final Type rt = type;
-    return new BigSeq(newLeft, FingerTree.<Item>empty(), newRight, rt);
+    return new BigSeq(newLeft, FingerTree.empty(), newRight, rt);
   }
 
   @Override
@@ -256,7 +256,7 @@ final class BigSeq extends TreeSeq {
       if(len <= MAX_SMALL) return new SmallSeq(slice(left, p, p + n), type);
       final int mid = p + n / 2;
       final Type rt = type;
-      return new BigSeq(slice(left, p, mid), FingerTree.<Item>empty(), slice(left, mid, p + n), rt);
+      return new BigSeq(slice(left, p, mid), FingerTree.empty(), slice(left, mid, p + n), rt);
     }
 
     final long rightOffset = left.length + midSize;
@@ -266,7 +266,7 @@ final class BigSeq extends TreeSeq {
       if(len <= MAX_SMALL) return new SmallSeq(slice(right, p, p + n), type);
       final int mid = p + n / 2;
       final Type rt = type;
-      return new BigSeq(slice(right, p, mid), FingerTree.<Item>empty(),
+      return new BigSeq(slice(right, p, mid), FingerTree.empty(),
           slice(right, mid, p + n), rt);
     }
 
@@ -377,7 +377,7 @@ final class BigSeq extends TreeSeq {
   private static TreeSeq fromMerged(final Item[] merged, final Type rt) {
     if(merged.length <= MAX_SMALL) return new SmallSeq(merged, rt);
     final int mid = merged.length / 2;
-    return new BigSeq(slice(merged, 0, mid), FingerTree.<Item>empty(),
+    return new BigSeq(slice(merged, 0, mid), FingerTree.empty(),
         slice(merged, mid, merged.length), rt);
   }
 

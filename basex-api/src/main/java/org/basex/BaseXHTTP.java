@@ -322,6 +322,7 @@ public final class BaseXHTTP extends CLI {
 
     // try to connect the server
     try(Socket s = new Socket(host, port)) {
+      // no action
     } catch(final ConnectException ex) {
       Util.debug(ex);
       stopFile.delete();
@@ -388,7 +389,7 @@ public final class BaseXHTTP extends CLI {
       try {
         while(true) {
           Util.outln(HTTP + ' ' + STOP + ' ' + SRV_STARTED_PORT_X, stopPort);
-          try(Socket s = socket.accept()) { }
+          try(Socket s = socket.accept()) { /* no action */ }
           if(stopFile.exists()) {
             socket.close();
             Util.outln(HTTP + ' ' + STOP + ' ' + SRV_STOPPED_PORT_X, stopPort);

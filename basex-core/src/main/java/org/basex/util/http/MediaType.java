@@ -203,7 +203,7 @@ public final class MediaType {
   /** Hash map containing all assignments. */
   private static final HashMap<String, MediaType> TYPES = new HashMap<>();
 
-  /** Reads in the media-types. */
+  /* Reads in the media-types. */
   static {
     final HashMap<String, MediaType> cache = new HashMap<>();
     try {

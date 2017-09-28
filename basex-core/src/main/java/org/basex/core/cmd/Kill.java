@@ -33,7 +33,7 @@ public final class Kill extends AUser {
       final String arg = args[0];
       for(int s = ss.size() - 1; s >= 0; --s) {
         final ClientListener cl = ss.get(s);
-        final String cs = cl.toString().replaceAll("\\[|\\]", "");
+        final String cs = cl.toString().replaceAll("[]\\[]", "");
         if(cl.context() == context) {
           // show error if own session is addressed
           if(cs.equals(arg)) return error(KILL_SELF_X, arg);

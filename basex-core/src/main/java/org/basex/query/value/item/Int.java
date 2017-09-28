@@ -162,7 +162,7 @@ public final class Int extends ANum {
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it instanceof Int) {
       final long i = ((Int) it).value;
-      return value < i ? -1 : value > i ? 1 : 0;
+      return Long.compare(value, i);
     }
     final double n = it.dbl(ii);
     return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;

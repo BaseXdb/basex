@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -79,7 +80,7 @@ public final class StrStream extends AStr {
     if(this == obj) return true;
     if(obj instanceof StrStream) {
       final StrStream s = (StrStream) obj;
-      if(input.eq(s.input) && Array.equals(encoding, s.encoding) && error == s.error &&
+      if(input.eq(s.input) && Objects.equals(encoding, s.encoding) && error == s.error &&
           validate == s.validate) return true;
     }
     // items may be different, but result may be equal...

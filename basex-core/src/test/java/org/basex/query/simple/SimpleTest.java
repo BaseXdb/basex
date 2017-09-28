@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class SimpleTest extends QueryTest {
-  /** Constructor. */
   static {
     create("<x>X</x>");
 

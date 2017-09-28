@@ -9,7 +9,6 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 public final class FnFormatIntegerTest extends QueryTest {
-  /** Constructor. */
   static {
     queries = new Object[][] {
       { "000", strings(""), "format-integer((), 'w')" },

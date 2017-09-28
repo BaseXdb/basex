@@ -165,7 +165,7 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @param values allowed values
    * @return index
    */
-  private int sliderIndex(final int value, final int[] values) {
+  private static int sliderIndex(final int value, final int[] values) {
     final int hl = values.length - 1;
     int i = -1;
     while(++i < hl && values[i] < value);

@@ -400,7 +400,7 @@ public final class GroupBy extends Clause {
       if(this == obj) return true;
       if(!(obj instanceof Spec)) return false;
       final Spec s = (Spec) obj;
-      return var.equals(s.var) && occluded == s.occluded && Array.equals(coll, s.coll) &&
+      return var.equals(s.var) && occluded == s.occluded && Objects.equals(coll, s.coll) &&
           super.equals(obj);
     }
 

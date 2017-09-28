@@ -123,7 +123,7 @@ public final class VarScope {
     }
 
     // assign new stack slots
-    for(int i = vars.size(); --i >= 0;) vars.get(i).slot = i;
+    for(int v = vars.size(); --v >= 0;) vars.get(v).slot = v;
   }
 
   @Override

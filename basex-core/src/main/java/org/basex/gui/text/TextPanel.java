@@ -1013,7 +1013,7 @@ public class TextPanel extends BaseXPanel {
       final ActionListener al = new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent ae) {
-          complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), start);
+          complete(ae.getActionCommand().replaceAll("^.*?] ", ""), start);
         }
       };
       for(final Pair<String, String> entry : pairs) {
@@ -1075,7 +1075,7 @@ public class TextPanel extends BaseXPanel {
   /** Replacement list (3). */
   private static final ArrayList<Pair<String, String>> REPLACE3 = new ArrayList<>();
 
-  /** Reads in the property file. */
+  /* Reads in the property file. */
   static {
     final String file = "/completions.properties";
     final InputStream is = TextPanel.class.getResourceAsStream(file);

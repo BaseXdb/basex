@@ -55,8 +55,8 @@ public final class DOMWrapper extends Parser {
         if(n instanceof Element) {
           stack.push(new NodeIterator(n));
 
-          atts.clear();
-          nsp.clear();
+          atts.reset();
+          nsp.reset();
           final NamedNodeMap at = n.getAttributes();
           final int as = at.getLength();
           for(int a = 0; a < as; ++a) {

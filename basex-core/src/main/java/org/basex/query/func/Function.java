@@ -1395,7 +1395,7 @@ public enum Function {
 
   /** Argument pattern. */
   private static final Pattern ARG = Pattern.compile(
-      "^([-\\w_:\\.]*\\(|<|\"|\\$| ).*", Pattern.DOTALL);
+      "^([-\\w_:.]*\\(|<|\"|\\$| ).*", Pattern.DOTALL);
 
   /** Cached enums (faster). */
   public static final Function[] VALUES = values();
@@ -1569,7 +1569,7 @@ public enum Function {
    */
   final String[] names() {
     final String names = desc.replaceFirst(".*?\\(", "").replace(",...", "").
-        replaceAll("[\\[\\]\\)\\s]", "");
+        replaceAll("[\\[\\])\\s]", "");
     return names.isEmpty() ? new String[0] : Strings.split(names, ',');
   }
 
