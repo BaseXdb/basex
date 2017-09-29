@@ -341,7 +341,6 @@ show_line_numbers    = 显示行号
 show_name_atts       = 用 @name 属性替换标签
 show_newlines        = 显示新行
 similar_cmd_%        = 你是不是'%'的意思?
-simple_file_chooser  = 使用简单文件选择器
 single_cmd           = 需要一行指令
 size                 = 大小
 size_text_results    = 文本结果大小

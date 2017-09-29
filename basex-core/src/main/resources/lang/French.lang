@@ -341,7 +341,6 @@ show_line_numbers    = Afficher les numéros de ligne
 show_name_atts       = Afficher le noms des attributs
 show_newlines        = Afficher les nouvelles lignes
 similar_cmd_%        = Voulez-vous dire '%' ?
-simple_file_chooser  = Utiliser le sélecteur de fichiers simple
 single_cmd           = une seule commande attendue
 size                 = Taille
 size_text_results    = Taille des résultats textuels

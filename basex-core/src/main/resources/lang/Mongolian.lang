@@ -341,7 +341,6 @@ show_line_numbers    = Show line numbers
 show_name_atts       = @name тагаар атрибутуудыг солих
 show_newlines        = Show newlines
 similar_cmd_%        = '%'? ийм байх боломжтой
-simple_file_chooser  = Энгийн файл сонголтыг ашиглах
 single_cmd           = Single command expected.
 size                 = Хэмжээ
 size_text_results    = Size of text results

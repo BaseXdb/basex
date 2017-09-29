@@ -341,7 +341,6 @@ show_line_numbers    = Показывать номер строки
 show_name_atts       = Заменять в карте наполнения имя тега на значение атрибута @name
 show_newlines        = Показывать символы перевода строки
 similar_cmd_%        = Возможно, вы имели в виду '%'?
-simple_file_chooser  = Использовать упрощенный диалог выбора файла
 single_cmd           = Ожидается одиночная команда
 size                 = Размер
 size_text_results    = Size of text results

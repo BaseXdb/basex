@@ -341,7 +341,6 @@ show_line_numbers    = Mostra numeri di linea
 show_name_atts       = Sostituisci i tag con gli attributi @name
 show_newlines        = Mostra newline
 similar_cmd_%        = Intendevi '%'?
-simple_file_chooser  = Usa un selezionatore di documenti semplificato
 single_cmd           = Atteso un singolo comando.
 size                 = Dimensione
 size_text_results    = Dimensione di risultati testuali

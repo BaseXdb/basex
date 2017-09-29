@@ -341,7 +341,6 @@ show_line_numbers    = Tampilkan nomor baris
 show_name_atts       = Ganti tag dengan atribut @name
 show_newlines        = Tampilkan baris baru
 similar_cmd_%        = Apakah yang anda maksud adalah '%'?
-simple_file_chooser  = Gunakan pemilih berkas sederhana
 single_cmd           = Satu perintah diharapkan.
 size                 = Ukuran
 size_text_results    = Size of text results

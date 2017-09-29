@@ -341,7 +341,6 @@ show_line_numbers    = Afiseaza numerotarea liniilor
 show_name_atts       = Înlocuiţi etichete cu atributele @nume
 show_newlines        = Afiseaza caracterele de rand nou
 similar_cmd_%        = Ai vrut sa spui '%'?
-simple_file_chooser  = Utilizaţi selectorul simplu de fisiere
 single_cmd           = O singura comanda asteptata
 size                 = Dimensiune
 size_text_results    = Size of text results

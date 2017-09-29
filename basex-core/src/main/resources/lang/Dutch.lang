@@ -341,7 +341,6 @@ show_line_numbers    = Toon regelnummers
 show_name_atts       = Vervang tags door @name attributen
 show_newlines        = Toon nieuwe regels
 similar_cmd_%        = Bedoelde je '%'?
-simple_file_chooser  = Gebruik simpele bestandskiezer
 single_cmd           = Slechts een (1) commando verwacht
 size                 = Grootte
 size_text_results    = Size of text results

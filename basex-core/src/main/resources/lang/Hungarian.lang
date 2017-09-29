@@ -341,7 +341,6 @@ show_line_numbers    = Sorok számának megjelenítése
 show_name_atts       = Címkék helyettesítése @név attribútummal
 show_newlines        = Sortörések megjelenítése
 similar_cmd_%        = Úgy értette '%'?
-simple_file_chooser  = Egyszerű fájlválasztó használata
 single_cmd           = Egyszerű parancs az elvárt.
 size                 = Méret
 size_text_results    = Szöveges eredmények mérete
