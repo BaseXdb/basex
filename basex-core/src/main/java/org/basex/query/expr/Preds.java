@@ -5,17 +5,16 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpG.OpG;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpG.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
-import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -59,54 +58,54 @@ public abstract class Preds extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // number of predicates may change in loop
-    for(int p = 0; p < exprs.length; p++) {
-      Expr pred = exprs[p].optimizeEbv(cc);
-      exprs[p] = pred;
+    for(int e = 0; e < exprs.length; e++) {
+      Expr expr = exprs[e].optimizeEbv(cc);
+      exprs[e] = expr;
 
-      if(pred instanceof CmpG || pred instanceof CmpV) {
-        final Cmp cmp = (Cmp) pred;
+      if(expr instanceof CmpG || expr instanceof CmpV) {
+        final Cmp cmp = (Cmp) expr;
         final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
         if(e1.isFunction(Function.POSITION)) {
-          // position() = last() -> last()
-          // position() = $n (xs:numeric) -> $n
+          // position() = last()  ->  last()
+          // position() = $n (xs:numeric)  ->  $n
           if(num(e2)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              cc.info(OPTSIMPLE_X, pred);
-              exprs[p] = e2;
+              cc.info(OPTSIMPLE_X, expr);
+              exprs[e] = e2;
             }
           }
         }
-      } else if(pred instanceof And) {
-        if(!pred.has(Flag.POS)) {
+      } else if(expr instanceof And) {
+        if(!expr.has(Flag.POS)) {
           // replace AND expression with predicates (don't swap position tests)
-          cc.info(OPTPRED_X, pred);
-          final Expr[] and = ((Arr) pred).exprs;
-          final int m = and.length - 1;
+          cc.info(OPTPRED_X, expr);
+          final Expr[] ands = ((Arr) expr).exprs;
+          final int m = ands.length - 1;
           final ExprList el = new ExprList(exprs.length + m);
-          for(final Expr e : Arrays.asList(exprs).subList(0, p)) el.add(e);
-          for(final Expr a : and) {
+          for(final Expr ex : Arrays.asList(exprs).subList(0, e)) el.add(ex);
+          for(final Expr and : ands) {
             // wrap test with boolean() if the result is numeric
-            el.add(cc.function(Function.BOOLEAN, info, a).optimizeEbv(cc));
+            el.add(cc.function(Function.BOOLEAN, info, and).optimizeEbv(cc));
           }
-          for(final Expr e : Arrays.asList(exprs).subList(p + 1, exprs.length)) el.add(e);
+          for(final Expr ex : Arrays.asList(exprs).subList(e + 1, exprs.length)) el.add(ex);
           exprs = el.finish();
         }
-      } else if(pred instanceof ANum) {
-        final ANum it = (ANum) pred;
+      } else if(expr instanceof ANum) {
+        final ANum it = (ANum) expr;
         final long l = it.itr();
         // example: ....[1.2]
         if(l != it.dbl()) return cc.emptySeq(this);
-        pred = ItrPos.get(l, info);
+        expr = ItrPos.get(l, info);
         // example: ....[0]
-        if(!(pred instanceof ItrPos)) return cc.emptySeq(this);
-        exprs[p] = pred;
-      } else if(pred.isValue()) {
+        if(!(expr instanceof ItrPos)) return cc.emptySeq(this);
+        exprs[e] = expr;
+      } else if(expr.isValue()) {
         // always false: ....[false()]
-        if(!pred.ebv(cc.qc, info).bool(info)) return cc.emptySeq(this);
+        if(!expr.ebv(cc.qc, info).bool(info)) return cc.emptySeq(this);
         // always true: ....[true()]
-        cc.info(OPTREMOVE_X_X, description(), pred);
-        exprs = Array.delete(exprs, p--);
+        cc.info(OPTREMOVE_X_X, description(), expr);
+        exprs = Array.delete(exprs, e--);
       }
     }
     return this;
@@ -121,16 +120,16 @@ public abstract class Preds extends Arr {
     boolean exact = s != -1;
     long max = exact ? s : Long.MAX_VALUE;
 
-    // evaluate positional predicates
+    // check positional predicates
     for(final Expr pred : exprs) {
       if(pred.isFunction(Function.LAST)) {
         // use minimum of old value and 1
         max = Math.min(max, 1);
       } else if(pred instanceof ItrPos) {
         final ItrPos pos = (ItrPos) pred;
-        // subtract start position. example: ...[1 to 2][2] -> (2 ->) 1
+        // subtract start position. example: ...[1 to 2][2]  ->  (2 ->) 1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[1 to 5] -> 5
+        // use minimum of old value and range. example: ...[1 to 5] - >  5
         max = Math.min(max, pos.max - pos.min + 1);
       } else {
         // resulting size will be unknown for any other filter
@@ -175,53 +174,93 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Merges a single predicate with the root expression and returns the resulting expression,
-   * or returns a self reference if the expression cannot be merged.
-   * This function is e.g. called by {@link Where#optimize}.
+   * Simplifies the predicates.
+   * @param cc compilation context
+   * @param root root expression
+   */
+  public final void simplify(final CompileContext cc, final Expr root) {
+    final ExprList list = new ExprList();
+    final SeqType st = root.seqType();
+    for(final Expr expr : exprs) {
+      Expr e = expr;
+      if(expr instanceof ContextValue && st.type.isStringOrUntyped()) {
+        // E [ . ]  ->  E
+        cc.info(OPTSIMPLE_X, this);
+        continue;
+      } else if(e instanceof SimpleMap) {
+        // E [ . ! ... ]  ->  E [ ... ]
+        // E [ E ! ... ]  ->  E [ ... ]
+        final SimpleMap map = (SimpleMap) e;
+        final Expr first = map.exprs[0];
+        if(first instanceof ContextValue && !map.has(Flag.POS) ||
+            root.equals(first) && root.isSimple() && st.one()) {
+          final int ml = map.exprs.length;
+          final ExprList el = new ExprList(ml - 1);
+          for(int m = 1; m < ml; m++) el.add(map.exprs[m]);
+          e = SimpleMap.get(map.info, el.finish());
+        }
+      } else if(e instanceof Path) {
+        // E [ . / ... ]  ->  E [ ... ]
+        // E [ E / ... ]  ->  E [ ... ]
+        final Path path = (Path) e;
+        final Expr first = path.root;
+        if(st.type instanceof NodeType && (first instanceof ContextValue && !path.has(Flag.POS) ||
+            root.equals(first) && root.isSimple() && st.one())) {
+          e = Path.get(path.info, null, path.steps);
+        }
+      }
+      list.add(cc.replaceWith(expr, e));
+    }
+    exprs = list.finish();
+  }
+
+  /**
+   * Optimizes the predicates for boolean evaluation.
+   * Drops solitary context values, flattens nested predicates.
    * @param cc compilation context
    * @param root root expression
    * @return expression
    * @throws QueryException query exception
    */
-  public final Expr merge(final Expr root, final CompileContext cc) throws QueryException {
-    // only one predicate can be rewritten; root expression must yield nodes
+  public final Expr optimizeEbv(final Expr root, final CompileContext cc) throws QueryException {
+    // only single predicate can be rewritten; root expression must yield nodes
     if(exprs.length != 1 || !(root.seqType().type instanceof NodeType)) return this;
 
+    // skip positional predicates
     final Expr pred = exprs[0];
-    // a[.] -> a
-    if(pred instanceof ContextValue) return root;
+    if(pred.seqType().mayBeNumber()) return this;
 
-    if(!pred.seqType().mayBeNumber()) {
-      // a[b] -> a/b
-      if(pred instanceof Path) return Path.get(info, root, pred).optimize(cc);
+    // a[b]  ->  a/b
+    if(pred instanceof Path) return Path.get(info, root, pred).optimize(cc);
 
-      if(pred instanceof CmpG) {
-        final CmpG cmp = (CmpG) pred;
-        final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
-        // only first operand can depend on context
-        if(!expr2.has(Flag.CTX)) {
-          Expr path = null;
-          // a[. = 'x'] -> a = 'x'
-          if(expr1 instanceof ContextValue) path = root;
-          // a[text() = 'x'] -> a/text() = 'x'
-          if(expr1 instanceof Path) path = Path.get(info, root, expr1).optimize(cc);
-          if(path != null) return new CmpG(path, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
-        }
+    if(pred instanceof CmpG) {
+      // not applicable to value/node comparisons, as cardinality of expression might change
+      final CmpG cmp = (CmpG) pred;
+      final Expr expr = cmp.exprs[0], expr2 = cmp.exprs[1];
+      // right operand must not depend on context
+      if(!expr2.has(Flag.CTX)) {
+        Expr expr1 = null;
+        // a[. = 'x']  ->  a = 'x'
+        if(expr instanceof ContextValue) expr1 = root;
+        // a[text() = 'x']  ->  a/text() = 'x'
+        if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
+        if(expr1 != null) return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
       }
+    }
 
-      if(pred instanceof FTContains) {
-        final FTContains cmp = (FTContains) pred;
-        final FTExpr ftexpr = cmp.ftexpr;
-        // only first operand can depend on context
-        if(!ftexpr.has(Flag.CTX)) {
-          final Expr expr = cmp.expr;
-          Expr path = null;
-          // a[. contains text 'x'] -> a contains text 'x'
-          if(expr instanceof ContextValue) path = root;
-          // [text() contains text 'x'] -> a/text() contains text 'x'
-          if(expr instanceof Path) path = Path.get(info, root, expr).optimize(cc);
-          if(path != null) return new FTContains(path, ftexpr, cmp.info);
-        }
+    if(pred instanceof FTContains) {
+      final FTContains cmp = (FTContains) pred;
+      final FTExpr ftexpr = cmp.ftexpr;
+      // right operand must not depend on context
+      if(!ftexpr.has(Flag.CTX)) {
+        final Expr expr = cmp.expr;
+        Expr expr1 = null;
+        // a[. contains text 'x']  ->  a contains text 'x'
+        if(expr instanceof ContextValue) expr1 = root;
+        // a[text() contains text 'x']  ->  a/text() contains text 'x'
+        if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
+
+        if(expr1 != null) return new FTContains(expr1, ftexpr, cmp.info);
       }
     }
     return this;

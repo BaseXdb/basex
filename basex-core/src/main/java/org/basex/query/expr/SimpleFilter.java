@@ -19,10 +19,10 @@ final class SimpleFilter extends CachedFilter {
    * Constructor.
    * @param info input info
    * @param root root expression
-   * @param preds predicates
+   * @param exprs predicates
    */
-  SimpleFilter(final InputInfo info, final Expr root, final Expr... preds) {
-    super(info, root, preds);
+  SimpleFilter(final InputInfo info, final Expr root, final Expr... exprs) {
+    super(info, root, exprs);
   }
 
   @Override

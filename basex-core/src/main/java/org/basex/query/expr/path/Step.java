@@ -85,6 +85,9 @@ public abstract class Step extends Preds {
       return Empty.SEQ;
     }
 
+    // simplifies the predicates
+    simplify(cc, this);
+
     // optimize predicates
     final Expr e = super.optimize(cc);
     if(e != this) return e;

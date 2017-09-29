@@ -391,7 +391,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if this is a simple expression.
+   * Checks if this is a simple expression (without side effects, context references, updates).
    * @return result of check
    */
   public boolean isSimple() {

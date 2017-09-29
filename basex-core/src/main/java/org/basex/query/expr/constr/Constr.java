@@ -81,13 +81,13 @@ public final class Constr {
   /**
    * Recursively adds nodes to the element arrays.
    * @param qc query context
-   * @param it current item
+   * @param item current item
    * @return true if item was added
    * @throws QueryException query exception
    */
-  private boolean add(final QueryContext qc, final Item it) throws QueryException {
-    if(it instanceof Array) {
-      for(final Value val : ((Array) it).members()) {
+  private boolean add(final QueryContext qc, final Item item) throws QueryException {
+    if(item instanceof Array) {
+      for(final Value val : ((Array) item).members()) {
         for(final Item i : val) {
           if(!add(qc, i)) return false;
         }
@@ -95,13 +95,13 @@ public final class Constr {
       return true;
     }
 
-    if(it instanceof FItem) throw CONSFUNC_X.get(info, it);
+    if(item instanceof FItem) throw CONSFUNC_X.get(info, item);
 
-    if(it instanceof ANode) {
+    if(item instanceof ANode) {
       // type: nodes
-      ANode node = (ANode) it;
+      ANode node = (ANode) item;
 
-      final Type ip = it.type;
+      final Type ip = item.type;
       if(ip == NodeType.TXT) {
         // type: text node
         text.add(node.string());
@@ -166,7 +166,7 @@ public final class Constr {
     } else {
       // type: atomic value
       if(more) text.add(' ');
-      text.add(it.string(info));
+      text.add(item.string(info));
       more = true;
 
     }

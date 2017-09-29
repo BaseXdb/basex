@@ -71,7 +71,7 @@ public final class CmpN extends Cmp {
   }
 
   /** Comparator. */
-  private final OpN op;
+  final OpN op;
 
   /**
    * Constructor.
@@ -81,7 +81,7 @@ public final class CmpN extends Cmp {
    * @param info input info
    */
   public CmpN(final Expr expr1, final Expr expr2, final OpN op, final InputInfo info) {
-    super(info, expr1, expr2, null);
+    super(info, expr1, expr2, null, null);
     this.op = op;
     seqType = SeqType.BLN_ZO;
   }

@@ -39,38 +39,18 @@ public abstract class Filter extends Preds {
    * Creates a filter or path expression for the given root and predicates.
    * @param info input info
    * @param root root expression
-   * @param preds predicate expressions
+   * @param exprs predicate expressions
    * @return filter expression
    */
-  public static Expr get(final InputInfo info, final Expr root, final Expr... preds) {
-    final Expr expr = simplify(root, preds);
+  public static Expr get(final InputInfo info, final Expr root, final Expr... exprs) {
+    final Expr expr = simplify(root, exprs);
     if(expr != null) return expr;
 
     // use simple filter for single deterministic predicate
-    final Expr pred = preds[0];
-    if(preds.length == 1 && pred.isSimple()) return new SimpleFilter(info, root, preds);
+    final Expr pred = exprs[0];
+    if(exprs.length == 1 && pred.isSimple()) return new SimpleFilter(info, root, exprs);
 
-    return new CachedFilter(info, root, preds);
-  }
-
-  /**
-   * Checks if the specified filter input can be rewritten to the root or an axis path.
-   * @param root root expression
-   * @param preds predicate expressions
-   * @return filter expression, or {@code null}
-   */
-  private static Expr simplify(final Expr root, final Expr... preds) {
-    // no predicates: return root
-    if(preds.length == 0) return root;
-    // axis path: attach predicates to last step
-    if(root instanceof AxisPath) {
-      // predicates must not be numeric: (//x)[1] != //x[1]
-      for(final Expr pred : preds) {
-        if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) return null;
-      }
-      return ((AxisPath) root).addPreds(preds);
-    }
-    return null;
+    return new CachedFilter(info, root, exprs);
   }
 
   @Override
@@ -95,7 +75,7 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    final Expr e = merge(root, cc);
+    final Expr e = optimizeEbv(root, cc);
     return e == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, e);
   }
 
@@ -114,6 +94,9 @@ public abstract class Filter extends Preds {
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // return empty root
     if(root.isEmpty()) return cc.emptySeq(this);
+
+    // simplify predicates
+    simplify(cc, root);
 
     // remember current context value (will be temporarily overwritten)
     final QueryFocus focus = cc.qc.focus;
@@ -177,8 +160,7 @@ public abstract class Filter extends Preds {
           e = cc.function(Function._UTIL_ITEM_AT, info, expr, pos.exprs[0]);
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, pos.exprs[0],
-              pos.exprs[1]);
+          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, pos.exprs[0], pos.exprs[1]);
         }
       } else if(num(pred)) {
         /* - rewrite positional predicate to util:item-at
@@ -199,6 +181,26 @@ public abstract class Filter extends Preds {
 
     // return optimized expression or standard iterator
     return opt ? cc.replaceWith(this, expr) : get(info, root, exprs);
+  }
+
+  /**
+   * Checks if the specified filter input can be rewritten to the root or an axis path.
+   * @param root root expression
+   * @param exprs predicate expressions
+   * @return filter expression, or {@code null}
+   */
+  private static Expr simplify(final Expr root, final Expr... exprs) {
+    // no predicates: return root
+    if(exprs.length == 0) return root;
+    // axis path: attach predicates to last step
+    if(root instanceof AxisPath) {
+      // predicates must not be numeric: (//x)[1] != //x[1]
+      for(final Expr pred : exprs) {
+        if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) return null;
+      }
+      return ((AxisPath) root).addPreds(exprs);
+    }
+    return null;
   }
 
   @Override

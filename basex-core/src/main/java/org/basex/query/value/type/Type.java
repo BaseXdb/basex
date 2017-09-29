@@ -245,7 +245,7 @@ public interface Type {
   boolean isNumberOrUntyped();
 
   /**
-   * Checks if the type refers to a number or a string.
+   * Checks if the type refers to a string or an untyped item.
    * Returns if this item is untyped or a string.
    * @return result of check
    */

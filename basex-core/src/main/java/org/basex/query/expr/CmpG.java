@@ -108,8 +108,6 @@ public final class CmpG extends Cmp {
     public String toString() { return name; }
   }
 
-  /** Static context. */
-  final StaticContext sc;
   /** Comparator. */
   OpG op;
   /** Flag for atomic evaluation. */
@@ -126,9 +124,8 @@ public final class CmpG extends Cmp {
    */
   public CmpG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
       final StaticContext sc, final InputInfo info) {
-    super(info, expr1, expr2, coll);
+    super(info, expr1, expr2, coll, sc);
     this.op = op;
-    this.sc = sc;
     seqType = SeqType.BLN;
   }
 

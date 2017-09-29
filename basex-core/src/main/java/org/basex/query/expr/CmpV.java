@@ -146,8 +146,6 @@ public final class CmpV extends Cmp {
     public String toString() { return name; }
   }
 
-  /** Static context. */
-  private final StaticContext sc;
   /** Comparator. */
   OpV op;
 
@@ -162,9 +160,9 @@ public final class CmpV extends Cmp {
    */
   public CmpV(final Expr expr1, final Expr expr2, final OpV op, final Collation coll,
       final StaticContext sc, final InputInfo info) {
-    super(info, expr1, expr2, coll);
+    super(info, expr1, expr2, coll, sc);
     this.op = op;
-    this.sc = sc;
+    seqType = SeqType.BLN_ZO;
   }
 
   @Override
