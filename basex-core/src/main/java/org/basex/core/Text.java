@@ -1254,8 +1254,6 @@ public interface Text {
   String JAVA_LF = "Look & Feel (" + lang("requires_restart") + ')';
   /** Focus. */
   String RT_FOCUS = lang("rt_focus");
-  /** Simple file dialog. */
-  String SIMPLE_FILE_CHOOSER = lang("simple_file_chooser");
   /** Name display flag. */
   String SHOW_NAME_ATTS = lang("show_name_atts");
   /** Maximum number of results. */

@@ -23,9 +23,10 @@ import org.basex.util.*;
  */
 public abstract class BaseXDialog extends JDialog {
   /** Reference to main window. */
-  public GUI gui;
+  public final GUI gui;
   /** Used mnemonics. */
   final StringBuilder mnem = new StringBuilder();
+
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
   /** Reference to the root panel. */
@@ -47,7 +48,8 @@ public abstract class BaseXDialog extends JDialog {
    */
   protected BaseXDialog(final BaseXDialog dialog, final String title) {
     super(dialog, title, true);
-    init(dialog.gui);
+    gui = dialog.gui;
+    init();
   }
 
   /**
@@ -67,15 +69,14 @@ public abstract class BaseXDialog extends JDialog {
    */
   protected BaseXDialog(final GUI main, final String title, final boolean modal) {
     super(main, title, modal);
-    init(main);
+    gui = main;
+    init();
   }
 
   /**
    * Initializes the dialog.
-   * @param main reference to the main window
    */
-  private void init(final GUI main) {
-    gui = main;
+  private void init() {
     panel = new BaseXBack(new BorderLayout()).border(10, 10, 10, 10);
     add(panel, BorderLayout.CENTER);
     setResizable(false);

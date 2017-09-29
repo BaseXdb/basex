@@ -57,10 +57,10 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
   /**
    * Initializes all components.
-   * @param parent parent component
+   * @param win parent window (of type {@link BaseXDialog} or {@link GUI})
    * @param cmd progress reference
    */
-  private void init(final Component parent, final Command cmd) {
+  private void init(final Window win, final Command cmd) {
     info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
 
@@ -89,7 +89,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     command = cmd;
     timer.start();
     pack();
-    setLocationRelativeTo(parent);
+    setLocationRelativeTo(win);
   }
 
   @Override

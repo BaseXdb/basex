@@ -53,8 +53,6 @@ final class DialogGeneralPrefs extends BaseXBack {
   private final BaseXCombo lang;
   /** Focus checkbox. */
   private final BaseXCheckBox mousefocus;
-  /** Simple file dialog checkbox. */
-  private final BaseXCheckBox simplefd;
   /** Browse database path. */
   private final BaseXButton dbButton;
   /** Browse repository path. */
@@ -62,45 +60,44 @@ final class DialogGeneralPrefs extends BaseXBack {
 
   /**
    * Default constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    */
-  DialogGeneralPrefs(final BaseXDialog d) {
+  DialogGeneralPrefs(final BaseXDialog dialog) {
     border(8).setLayout(new TableLayout(10, 1));
-    gui = d.gui;
+    gui = dialog.gui;
 
     final StaticOptions opts = gui.context.soptions;
     final GUIOptions gopts = gui.gopts;
-    dbPath = new BaseXTextField(opts.get(StaticOptions.DBPATH), d);
-    repoPath = new BaseXTextField(opts.get(StaticOptions.REPOPATH), d);
+    dbPath = new BaseXTextField(opts.get(StaticOptions.DBPATH), dialog);
+    repoPath = new BaseXTextField(opts.get(StaticOptions.REPOPATH), dialog);
 
-    dbButton = new BaseXButton(BROWSE_D, d);
+    dbButton = new BaseXButton(BROWSE_D, dialog);
     dbButton.addActionListener(e -> {
       final String path = dbPath.getText();
-      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, dialog).select(Mode.DOPEN);
       if(dir != null) dbPath.setText(dir.path());
     });
 
-    repoButton = new BaseXButton(BROWSE_D, d);
+    repoButton = new BaseXButton(BROWSE_D, dialog);
     repoButton.addActionListener(e -> {
       final String path = repoPath.getText();
-      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, dialog).select(Mode.DOPEN);
       if(dir != null) repoPath.setText(dir.path());
     });
 
-    mousefocus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, d);
-    simplefd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, GUIOptions.SIMPLEFD, gopts, d);
+    mousefocus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, dialog);
 
     int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
-    maxResults = new BaseXSlider(0, MAXRESULTS.length - 1, val, d);
+    maxResults = new BaseXSlider(0, MAXRESULTS.length - 1, val, dialog);
     maxResults.addActionListener(e -> action(maxResults));
     labelResults = new BaseXLabel(" ");
 
     val = sliderIndex(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
-    maxText = new BaseXSlider(0, MAXTEXT.length - 1, val, d);
+    maxText = new BaseXSlider(0, MAXTEXT.length - 1, val, dialog);
     maxText.addActionListener(e -> action(maxText));
     labelText = new BaseXLabel(" ");
 
-    lang = new BaseXCombo(LANGS[0], d);
+    lang = new BaseXCombo(LANGS[0], dialog);
     lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 
@@ -122,7 +119,6 @@ final class DialogGeneralPrefs extends BaseXBack {
 
     pp = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(0);
     pp.add(mousefocus);
-    pp.add(simplefd);
     p.add(pp);
     pp = new BaseXBack(new TableLayout(4, 1, 0, 0)).border(0);
     ppp = new BaseXBack(new TableLayout(1, 2, 12, 0)).border(0);
@@ -179,7 +175,6 @@ final class DialogGeneralPrefs extends BaseXBack {
    */
   boolean action(final Object source) {
     mousefocus.assign();
-    simplefd.assign();
 
     // new database path: close opened database
     final StaticOptions opts = gui.context.soptions;

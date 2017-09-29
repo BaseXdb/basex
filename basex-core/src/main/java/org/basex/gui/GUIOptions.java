@@ -28,12 +28,6 @@ public final class GUIOptions extends Options {
   public static final StringOption WORKPATH = new StringOption("WORKPATH", HOME);
   /** Path to database project. */
   public static final StringOption PROJECTPATH = new StringOption("PROJECTPATH", "");
-  /** Last editor files. */
-  public static final StringsOption EDITOR = new StringsOption("EDITOR");
-  /** Input paths. */
-  public static final StringsOption INPUTS = new StringsOption("INPUTS");
-  /** Open editor files. */
-  public static final StringsOption OPEN = new StringsOption("OPEN");
 
   /** Comment: written to options file. */
   public static final Comment C_LAYOUT = new Comment("Layout");
@@ -112,8 +106,6 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWNAME = new BooleanOption("SHOWNAME", true);
   /** Focus follows mouse. */
   public static final BooleanOption MOUSEFOCUS = new BooleanOption("MOUSEFOCUS", false);
-  /** Flag for showing the simple file dialog. */
-  public static final BooleanOption SIMPLEFD = new BooleanOption("SIMPLEFD", false);
 
   /** Sort ascending. */
   public static final BooleanOption ASCSORT = new BooleanOption("ASCSORT", true);
@@ -213,6 +205,16 @@ public final class GUIOptions extends Options {
   public static final StringsOption SEARCH = new StringsOption("SEARCH");
   /** Last XQuery inputs. */
   public static final StringsOption XQUERY = new StringsOption("XQUERY");
+
+  /** Comment: files. */
+  public static final Comment C_FILES = new Comment("Files");
+
+  /** Last editor files. */
+  public static final StringsOption EDITOR = new StringsOption("EDITOR");
+  /** Input paths. */
+  public static final StringsOption INPUTS = new StringsOption("INPUTS");
+  /** Open editor files. */
+  public static final StringsOption OPEN = new StringsOption("OPEN");
 
   /**
    * Constructor.

@@ -29,12 +29,10 @@ public final class BaseXFileChooser {
     /** Save file or directory. */ DSAVE,
   }
 
-  /** Reference to main window. */
-  private GUI gui;
+  /** Reference to parent window (of type {@link BaseXDialog} or {@link GUI}). */
+  private final Window win;
   /** Swing file chooser. */
-  private JFileChooser fc;
-  /** Simple file dialog. */
-  private FileDialog fd;
+  private final JFileChooser fc;
   /** File suffix. */
   private String suffix;
 
@@ -42,19 +40,15 @@ public final class BaseXFileChooser {
    * Default constructor.
    * @param title dialog title
    * @param path initial path
-   * @param main reference to main window
+   * @param win reference to main window
    */
-  public BaseXFileChooser(final String title, final String path, final GUI main) {
+  public BaseXFileChooser(final String title, final String path, final Window win) {
+    this.win = win;
+
     final IOFile file = new IOFile(path);
-    if(main.gopts.get(GUIOptions.SIMPLEFD)) {
-      fd = new FileDialog(main, title);
-      fd.setDirectory(file.path());
-    } else {
-      fc = new JFileChooser(path);
-      if(!file.isDir()) fc.setSelectedFile(file.file());
-      fc.setDialogTitle(title);
-      gui = main;
-    }
+    fc = new JFileChooser(path);
+    if(!file.isDir()) fc.setSelectedFile(file.file());
+    fc.setDialogTitle(title);
   }
 
   /**
@@ -116,39 +110,27 @@ public final class BaseXFileChooser {
   }
 
   /**
-   * Selects a file or directory.
+   * Returns selected files or directories.
    * @param mode type defined by {@link Mode}
-   * @return resulting input reference
+   * @return input files
    */
   public IOFile[] selectAll(final Mode mode) {
-    if(fd != null) {
-      if(mode == Mode.FDOPEN) fd.setFile(" ");
-      fd.setMode(mode == Mode.FSAVE || mode == Mode.DSAVE ?
-          FileDialog.SAVE : FileDialog.LOAD);
-      fd.setVisible(true);
-      final String f = fd.getFile();
-      if(f == null) return new IOFile[0];
-      final String dir = fd.getDirectory();
-      return new IOFile[] { new IOFile(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
-        dir + '/' + fd.getFile()) };
-    }
-
     int state = 0;
     switch(mode) {
       case FOPEN:
-        state = fc.showOpenDialog(gui);
+        state = fc.showOpenDialog(win);
         break;
       case FDOPEN:
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        state = fc.showOpenDialog(gui);
+        state = fc.showOpenDialog(win);
         break;
       case FSAVE:
-        state = fc.showSaveDialog(gui);
+        state = fc.showSaveDialog(win);
         break;
       case DOPEN:
       case DSAVE:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        state = fc.showDialog(gui, null);
+        state = fc.showDialog(win, null);
         break;
     }
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
@@ -182,8 +164,9 @@ public final class BaseXFileChooser {
 
       // show replace dialog
       for(final IOFile io : files) {
-        if(io.exists() && !BaseXDialog.confirm(gui, Util.info(FILE_EXISTS_X, io))) {
-          return new IOFile[0];
+        if(io.exists()) {
+          final GUI gui = win instanceof BaseXDialog ? ((BaseXDialog) win).gui : (GUI) win;
+          if(!BaseXDialog.confirm(gui, Util.info(FILE_EXISTS_X, io))) return new IOFile[0];
         }
       }
     }

@@ -38,8 +38,10 @@ final class DialogImport extends BaseXBack {
   /** DB name. */
   String dbName;
 
-  /** Dialog reference. */
+  /** GUI reference. */
   private final GUI gui;
+  /** Dialog reference. */
+  private final BaseXDialog dialog;
   /** Parsing options. */
   private final DialogParsing parsing;
   /** Add contents of archives. */
@@ -55,13 +57,14 @@ final class DialogImport extends BaseXBack {
 
   /**
    * Constructor.
-   * @param dial dialog reference
+   * @param dialog dialog reference
    * @param panel feature panel
    * @param parsing parsing dialog
    */
-  DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parsing) {
-    gui = dial.gui;
+  DialogImport(final BaseXDialog dialog, final BaseXBack panel, final DialogParsing parsing) {
+    this.dialog = dialog;
     this.parsing = parsing;
+    gui = dialog.gui;
 
     layout(new TableLayout(11, 1));
     border(8);
@@ -70,12 +73,12 @@ final class DialogImport extends BaseXBack {
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
-    input = new BaseXTextField(path, dial).history(GUIOptions.INPUTS, dial);
+    input = new BaseXTextField(path, dialog).history(GUIOptions.INPUTS, dialog);
 
     final IO io = IO.get(path);
     if(io instanceof IOFile && !path.isEmpty()) dbName = io.dbName();
 
-    browse = new BaseXButton(BROWSE_D, dial);
+    browse = new BaseXButton(BROWSE_D, dialog);
     browse.addActionListener(e -> choose());
     final BaseXBack b = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b.add(input);
@@ -89,16 +92,16 @@ final class DialogImport extends BaseXBack {
     final MainOptions opts = gui.context.options;
     final StringList ps = new StringList();
     for(final MainParser mp : MainParser.values()) ps.add(mp.name());
-    parsers = new BaseXCombo(ps.finish(), dial);
+    parsers = new BaseXCombo(ps.finish(), dialog);
     parsers.setSelectedItem(opts.get(MainOptions.PARSER).name());
 
-    createFilter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
+    createFilter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dialog);
     createFilter.setColumns(30);
 
-    addRaw = new BaseXCheckBox(ADD_RAW_FILES, MainOptions.ADDRAW, opts, dial);
-    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts, dial);
-    addArchives = new BaseXCheckBox(PARSE_ARCHIVES, MainOptions.ADDARCHIVES, opts, dial);
-    archiveName = new BaseXCheckBox(ADD_ARCHIVE_NAME, MainOptions.ARCHIVENAME, opts, dial);
+    addRaw = new BaseXCheckBox(ADD_RAW_FILES, MainOptions.ADDRAW, opts, dialog);
+    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts, dialog);
+    addArchives = new BaseXCheckBox(PARSE_ARCHIVES, MainOptions.ADDARCHIVES, opts, dialog);
+    archiveName = new BaseXCheckBox(ADD_ARCHIVE_NAME, MainOptions.ARCHIVENAME, opts, dialog);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 20, 0));
     p.add(new BaseXLabel(INPUT_FORMAT, false, true).border(0, 0, 6, 0));
@@ -118,7 +121,7 @@ final class DialogImport extends BaseXBack {
 
     final DropHandler dh = object -> {
       input.setText(object.toString());
-      action(input, dial instanceof DialogNew);
+      action(input, dialog instanceof DialogNew);
     };
 
     BaseXLayout.addDrop(this, dh);
@@ -139,7 +142,7 @@ final class DialogImport extends BaseXBack {
    */
   private IOFile inputFile() {
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
-    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, dialog);
     fc.textFilters();
     fc.filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);
