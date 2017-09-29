@@ -25,7 +25,7 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param option option
    * @param options options
    */
-  public BaseXCheckBox(final Window win, final String label, final BooleanOption option,
+  public BaseXCheckBox(final BaseXWindow win, final String label, final BooleanOption option,
       final Options options) {
     this(win, label, options.get(option));
     this.options = options;
@@ -38,15 +38,15 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param label checkbox text
    * @param selected initial selection state
    */
-  public BaseXCheckBox(final Window win, final String label, final boolean selected) {
+  public BaseXCheckBox(final BaseXWindow win, final String label, final boolean selected) {
     super(label, selected);
     setOpaque(false);
     setMargin(new Insets(0, 0, 0, 0));
 
     BaseXLayout.addInteraction(this, win);
-    if(!(win instanceof BaseXDialog)) return;
+    final BaseXDialog dialog = win.dialog();
+    if(dialog == null) return;
 
-    final BaseXDialog dialog = (BaseXDialog) win;
     BaseXLayout.setMnemonic(this, dialog.mnem);
     addActionListener(e -> dialog.action(e.getSource()));
   }

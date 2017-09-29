@@ -25,10 +25,10 @@ public final class DialogPass extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogPass(final GUI main) {
-    super(main, ALTER_PW);
+  public DialogPass(final GUI gui) {
+    super(gui, ALTER_PW);
 
     pass = new BaseXPassword(this);
     pass.addKeyListener(keys);

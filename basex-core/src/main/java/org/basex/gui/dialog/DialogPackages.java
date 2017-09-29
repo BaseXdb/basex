@@ -47,10 +47,10 @@ public final class DialogPackages extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogPackages(final GUI main) {
-    super(main, PACKAGES);
+  public DialogPackages(final GUI gui) {
+    super(gui, PACKAGES);
     panel.setLayout(new BorderLayout(8, 0));
 
     // create package chooser
@@ -82,7 +82,7 @@ public final class DialogPackages extends BaseXDialog {
     p.add(packages, BorderLayout.CENTER);
     final BaseXBack ss = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(8, 0, 0, 0);
     ss.add(new BaseXLabel(PATH + COL, true, true), BorderLayout.NORTH);
-    ss.add(new BaseXLabel(main.context.soptions.get(StaticOptions.REPOPATH)));
+    ss.add(new BaseXLabel(gui.context.soptions.get(StaticOptions.REPOPATH)));
     p.add(ss, BorderLayout.SOUTH);
     set(p, BorderLayout.CENTER);
 

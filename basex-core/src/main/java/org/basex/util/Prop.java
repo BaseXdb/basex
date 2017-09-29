@@ -51,7 +51,7 @@ public final class Prop {
   /** Co-authors (1). */
   public static final String TEAM1 = "Michael Seiferle, Alexander Holupirek";
   /** Co-authors (2). */
-  public static final String TEAM2 = "Dirk Kirsten, Sabine Teubner, Jagrut Kosti";
+  public static final String TEAM2 = "Marc H. Scholl, Sabine Teubner, Jagrut Kosti";
   /** Entity. */
   public static final String ENTITY = NAME + " Team";
   /** Project namespace. */

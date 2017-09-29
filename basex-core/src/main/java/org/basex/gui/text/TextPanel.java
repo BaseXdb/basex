@@ -17,6 +17,7 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
@@ -63,20 +64,20 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Default constructor.
-   * @param edit editable flag
    * @param win parent window
+   * @param editable editable flag
    */
-  public TextPanel(final boolean edit, final Window win) {
-    this("", edit, win);
+  public TextPanel(final BaseXWindow win, final boolean editable) {
+    this(win, "", editable);
   }
 
   /**
    * Default constructor.
-   * @param txt initial text
-   * @param editable editable flag
    * @param win parent window
+   * @param text initial text
+   * @param editable editable flag
    */
-  public TextPanel(final String txt, final boolean editable, final Window win) {
+  public TextPanel(final BaseXWindow win, final String text, final boolean editable) {
     super(win);
     this.editable = editable;
     editor = new TextEditor(gui);
@@ -113,7 +114,7 @@ public class TextPanel extends BaseXPanel {
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
-    setText(txt);
+    setText(text);
     hist = new History(editable ? editor.text() : null);
 
     new BaseXPopup(this, editable ?

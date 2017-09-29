@@ -1,6 +1,5 @@
 package org.basex.gui.layout;
 
-import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
@@ -27,7 +26,7 @@ public final class BaseXCombo extends JComboBox<Object> {
    * @param options options
    * @param values combobox values
    */
-  public BaseXCombo(final Window win, final NumberOption option, final Options options,
+  public BaseXCombo(final BaseXWindow win, final NumberOption option, final Options options,
       final String... values) {
     this(win, option, options, values[options.get(option)], values);
   }
@@ -38,7 +37,7 @@ public final class BaseXCombo extends JComboBox<Object> {
    * @param option option
    * @param options options
    */
-  public BaseXCombo(final Window win, final BooleanOption option, final Options options) {
+  public BaseXCombo(final BaseXWindow win, final BooleanOption option, final Options options) {
     this(win, option, options, options.get(option), "true", "false");
   }
 
@@ -48,7 +47,7 @@ public final class BaseXCombo extends JComboBox<Object> {
    * @param option option
    * @param options options
    */
-  public BaseXCombo(final Window win, final EnumOption<?> option, final Options options) {
+  public BaseXCombo(final BaseXWindow win, final EnumOption<?> option, final Options options) {
     this(win, option, options, options.get(option), option.strings());
   }
 
@@ -60,7 +59,7 @@ public final class BaseXCombo extends JComboBox<Object> {
    * @param selected selected value
    * @param values values
    */
-  private BaseXCombo(final Window win, final Option<?> option, final Options options,
+  private BaseXCombo(final BaseXWindow win, final Option<?> option, final Options options,
       final Object selected, final String... values) {
     this(win, values);
     this.options = options;
@@ -73,14 +72,13 @@ public final class BaseXCombo extends JComboBox<Object> {
    * @param win parent window
    * @param values combobox values
    */
-  public BaseXCombo(final Window win, final String... values) {
+  public BaseXCombo(final BaseXWindow win, final String... values) {
     super(values);
     BaseXLayout.addInteraction(this, win);
-    if(!(win instanceof BaseXDialog)) return;
 
-    final BaseXDialog d = (BaseXDialog) win;
-    addItemListener(ie -> {
-      if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) d.action(ie.getSource());
+    final BaseXDialog dialog = win.dialog();
+    if(dialog != null) addItemListener(ie -> {
+      if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) dialog.action(ie.getSource());
     });
   }
 

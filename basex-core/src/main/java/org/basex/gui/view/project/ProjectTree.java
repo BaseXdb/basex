@@ -2,7 +2,6 @@ package org.basex.gui.view.project;
 
 import static org.basex.core.Text.*;
 
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
@@ -13,6 +12,7 @@ import javax.swing.tree.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -31,7 +31,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
    * @param pv project view
    */
   ProjectTree(final ProjectView pv) {
-    super(new DefaultMutableTreeNode(), pv.gui);
+    super(pv.gui, new DefaultMutableTreeNode());
     view = pv;
 
     border(4, 4, 4, 4);
@@ -40,11 +40,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     // choose common parent directories of project directories
     setCellRenderer(renderer);
     addTreeWillExpandListener(this);
-    addMouseListener(new MouseAdapter() {
-      @Override public void mousePressed(final MouseEvent e) {
-        if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
-          new OpenCmd().execute(pv.gui);
-      }
+    addMouseListener((MouseClickedListener) (e) -> {
+      if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
+        new OpenCmd().execute(pv.gui);
     });
 
     setCellEditor(new ProjectCellEditor(this, renderer));

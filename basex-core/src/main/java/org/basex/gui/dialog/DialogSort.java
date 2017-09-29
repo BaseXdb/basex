@@ -29,10 +29,10 @@ public final class DialogSort extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogSort(final GUI main) {
-    super(main, SORT);
+  public DialogSort(final GUI gui) {
+    super(gui, SORT);
 
     final BaseXBack p = new BaseXBack(new TableLayout(6, 1));
 

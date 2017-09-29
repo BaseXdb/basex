@@ -1,6 +1,5 @@
 package org.basex.gui.layout;
 
-import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
@@ -19,10 +18,10 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener, Mou
 
   /**
    * Constructor, setting default interactions.
-   * @param win parent reference, (of type {@link BaseXDialog} or {@link GUI})
+   * @param win window
    */
-  protected BaseXPanel(final Window win) {
-    gui = win instanceof GUI ? (GUI) win : ((BaseXDialog) win).gui;
+  protected BaseXPanel(final BaseXWindow win) {
+    gui = win.gui();
     BaseXLayout.addInteraction(this, win);
   }
 

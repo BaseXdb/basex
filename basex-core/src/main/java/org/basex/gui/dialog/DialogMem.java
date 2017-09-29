@@ -30,13 +30,13 @@ public final class DialogMem extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  private DialogMem(final GUI main) {
-    super(main, USED_MEM, false);
+  private DialogMem(final GUI gui) {
+    super(gui, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
-    text = new TextPanel(info(), false, this);
+    text = new TextPanel(this, info(), false);
     text.setFont(panel.getFont());
     set(text, BorderLayout.CENTER);
 
@@ -49,10 +49,10 @@ public final class DialogMem extends BaseXDialog {
 
   /**
    * Activates the dialog window.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public static void show(final GUI main) {
-    if(dialog == null) dialog = new DialogMem(main);
+  public static void show(final GUI gui) {
+    if(dialog == null) dialog = new DialogMem(gui);
     dialog.setVisible(true);
   }
 

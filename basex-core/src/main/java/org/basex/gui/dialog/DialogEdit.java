@@ -45,11 +45,11 @@ public final class DialogEdit extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main frame
+   * @param gui reference to the main frame
    * @param pre pre value
    */
-  public DialogEdit(final GUI main, final int pre) {
-    super(main, EDIT_DATA);
+  public DialogEdit(final GUI gui, final int pre) {
+    super(gui, EDIT_DATA);
 
     // create checkboxes
     BaseXBack pp = new BaseXBack(new BorderLayout());
@@ -86,11 +86,11 @@ public final class DialogEdit extends BaseXDialog {
       b.add(input2, BorderLayout.CENTER);
     }
     if(old3 != null) {
-      input3 = new TextPanel(old3, true, this);
+      input3 = new TextPanel(this, old3, true);
       input3.addKeyListener(keys);
       BaseXLayout.setWidth(input3, BaseXTextField.DWIDTH);
       BaseXLayout.setHeight(input3, BaseXTextField.DWIDTH);
-      b.add(new SearchEditor(main, input3), BorderLayout.CENTER);
+      b.add(new SearchEditor(gui, input3), BorderLayout.CENTER);
       setResizable(true);
     }
     pp.add(b, BorderLayout.CENTER);

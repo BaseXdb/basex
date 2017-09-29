@@ -3,12 +3,12 @@ package org.basex.gui.layout;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
 
 import org.basex.gui.*;
+import org.basex.gui.listener.*;
 
 /**
  * Project specific button implementation.
@@ -25,32 +25,29 @@ public final class BaseXButton extends JButton {
    * @param win parent window
    * @param label button label
    */
-  public BaseXButton(final Window win, final String label) {
+  public BaseXButton(final BaseXWindow win, final String label) {
     super(label);
 
     BaseXLayout.addInteraction(this, win);
-    if(!(win instanceof BaseXDialog)) return;
+    final BaseXDialog dialog = win.dialog();
+    if(dialog == null) return;
 
-    final BaseXDialog d = (BaseXDialog) win;
     addActionListener(e -> {
       final String text = getText();
-      if(text.equals(B_CANCEL)) d.cancel();
-      else if(text.equals(B_OK)) d.close();
-      else d.action(e.getSource());
+      if(text.equals(B_CANCEL)) dialog.cancel();
+      else if(text.equals(B_OK)) dialog.close();
+      else dialog.action(e.getSource());
     });
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(BaseXKeys.ESCAPE.is(e)) {
-          d.cancel();
-        } else if(BaseXKeys.NEXTCHAR.is(e) || BaseXKeys.NEXTLINE.is(e)) {
-          transferFocus();
-        } else if(BaseXKeys.PREVCHAR.is(e) || BaseXKeys.PREVLINE.is(e)) {
-          transferFocusBackward();
-        }
+    addKeyListener((KeyPressedListener) e -> {
+      if(BaseXKeys.ESCAPE.is(e)) {
+        dialog.cancel();
+      } else if(BaseXKeys.NEXTCHAR.is(e) || BaseXKeys.NEXTLINE.is(e)) {
+        transferFocus();
+      } else if(BaseXKeys.PREVCHAR.is(e) || BaseXKeys.PREVLINE.is(e)) {
+        transferFocusBackward();
       }
     });
-    BaseXLayout.setMnemonic(this, d.mnem);
+    BaseXLayout.setMnemonic(this, dialog.mnem);
   }
 
   /**

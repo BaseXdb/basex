@@ -68,6 +68,7 @@ final class ProjectFilter extends BaseXBack {
           }
         }
       }
+
       @Override
       public void keyReleased(final KeyEvent e) {
         refresh(false);

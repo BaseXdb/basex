@@ -56,7 +56,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param max max value
    * @param listener listener
    */
-  public BaseXDSlider(final Window win, final double min, final double max,
+  public BaseXDSlider(final BaseXWindow win, final double min, final double max,
       final ActionListener listener) {
 
     super(win);

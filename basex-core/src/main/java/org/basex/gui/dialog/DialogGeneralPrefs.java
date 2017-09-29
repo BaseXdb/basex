@@ -114,12 +114,9 @@ final class DialogGeneralPrefs extends BaseXBack {
     add(p);
 
     p = new BaseXBack(new TableLayout(2, 2, 24, 0)).border(0);
-    p.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(8, 0, 8, 0));
     p.add(new BaseXLabel(LIMITS + COL, true, true).border(8, 0, 8, 0));
+    p.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(8, 0, 8, 0));
 
-    pp = new BaseXBack(new TableLayout(1, 1, 0, 0)).border(0);
-    pp.add(mousefocus);
-    p.add(pp);
     pp = new BaseXBack(new TableLayout(4, 1, 0, 0)).border(0);
     ppp = new BaseXBack(new TableLayout(1, 2, 12, 0)).border(0);
     ppp.add(maxResults);
@@ -131,6 +128,10 @@ final class DialogGeneralPrefs extends BaseXBack {
     ppp.add(labelText);
     pp.add(new BaseXLabel(SIZE_TEXT_RESULTS + COL));
     pp.add(ppp);
+    p.add(pp);
+
+    pp = new BaseXBack(new TableLayout(1, 1, 0, 0)).border(0);
+    pp.add(mousefocus);
     p.add(pp);
     add(p);
 

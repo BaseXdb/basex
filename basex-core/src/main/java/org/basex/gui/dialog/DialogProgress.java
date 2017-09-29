@@ -37,12 +37,12 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
   /**
    * Default constructor.
-   * @param main main window
+   * @param gui main window
    * @param cmd progress reference
    */
-  private DialogProgress(final GUI main, final Command cmd) {
-    super(main, "");
-    init(main, cmd);
+  private DialogProgress(final GUI gui, final Command cmd) {
+    super(gui, "");
+    init(gui, cmd);
   }
 
   /**
@@ -57,10 +57,10 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
   /**
    * Initializes all components.
-   * @param win parent window (of type {@link BaseXDialog} or {@link GUI})
+   * @param win window
    * @param cmd progress reference
    */
-  private void init(final Window win, final Command cmd) {
+  private void init(final BaseXWindow win, final Command cmd) {
     info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
 
@@ -89,7 +89,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     command = cmd;
     timer.start();
     pack();
-    setLocationRelativeTo(win);
+    setLocationRelativeTo(win.component());
   }
 
   @Override

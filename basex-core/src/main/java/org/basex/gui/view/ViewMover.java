@@ -23,10 +23,10 @@ final class ViewMover extends BaseXPanel {
 
   /**
    * Constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  ViewMover(final GUI main) {
-    super(main);
+  ViewMover(final GUI gui) {
+    super(gui);
     setLayout(new BorderLayout());
     addKeyListener(this);
     addMouseListener(this);

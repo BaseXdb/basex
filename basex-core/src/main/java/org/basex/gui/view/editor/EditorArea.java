@@ -10,6 +10,7 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.io.*;
@@ -44,22 +45,18 @@ public final class EditorArea extends TextPanel {
    * @param file file reference
    */
   EditorArea(final EditorView view, final IOFile file) {
-    super(true, view.gui);
+    super(view.gui, true);
     this.view = view;
     this.file = file;
     label = new BaseXLabel(file.name());
     label.setIcon(BaseXImages.file(new IOFile(IO.XQSUFFIX)));
     setSyntax(file, false);
 
-    addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(final FocusEvent e) {
+    addFocusListener((FocusGainedListener) e -> {
         // refresh query path and working directory
         gui.gopts.set(GUIOptions.WORKPATH, EditorArea.this.file.dir());
-
         // reload file if it has been changed
         SwingUtilities.invokeLater(() -> reopen(false));
-      }
     });
   }
 

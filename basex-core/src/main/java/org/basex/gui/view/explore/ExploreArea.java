@@ -11,6 +11,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.index.name.*;
 import org.basex.index.stats.*;
 import org.basex.util.*;
@@ -55,12 +56,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     all = new BaseXTextField(gui);
     all.addKeyListener(main);
-    all.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        query(false);
-      }
-    });
+    all.addKeyListener((KeyReleasedListener) e -> query(false));
     add(all, BorderLayout.NORTH);
 
     panel = new BaseXBack(false).layout(new TableLayout(32, 2, 10, 5));
@@ -96,12 +92,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     BaseXLayout.setWidth(txt, COMPW);
     txt.setPreferredSize(new Dimension(getPreferredSize().width, txt.getFont().getSize() + 11));
     txt.setMargin(new Insets(0, 0, 0, 10));
-    txt.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        query(false);
-      }
-    });
+    txt.addKeyListener((KeyReleasedListener) e -> query(false));
     txt.addKeyListener(main);
     panel.add(txt, pos);
   }

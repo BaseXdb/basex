@@ -28,10 +28,10 @@ public final class DialogExport extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogExport(final GUI main) {
-    super(main, EXPORT);
+  public DialogExport(final GUI gui) {
+    super(gui, EXPORT);
 
     // create checkboxes
     final BaseXBack p = new BaseXBack(new TableLayout(4, 1));
@@ -40,7 +40,7 @@ public final class DialogExport extends BaseXDialog {
     // output label
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
-    path = new BaseXTextField(this, main.gopts.get(GUIOptions.INPUTPATH));
+    path = new BaseXTextField(this, gui.gopts.get(GUIOptions.INPUTPATH));
     path.history(GUIOptions.INPUTS);
     pp.add(path);
 

@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
+import org.basex.gui.listener.*;
 
 /**
  * Project specific Popup menu implementation.
@@ -53,20 +54,17 @@ public final class BaseXPopup extends JPopupMenu {
         mousePressed(e);
       }
     });
-    comp.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(!gui.updating && CONTEXT.is(e)) {
-          show(e.getComponent(), 10, 10);
-        } else {
-          for(final GUICommand cmd : commands) {
-            if(cmd instanceof GUIPopupCmd) {
-              for(final BaseXKeys sc : ((GUIPopupCmd) cmd).shortcuts()) {
-                if(sc.is(e)) {
-                  cmd.execute(gui);
-                  e.consume();
-                  return;
-                }
+    comp.addKeyListener((KeyPressedListener) e -> {
+      if(!gui.updating && CONTEXT.is(e)) {
+        show(e.getComponent(), 10, 10);
+      } else {
+        for(final GUICommand cmd : commands) {
+          if(cmd instanceof GUIPopupCmd) {
+            for(final BaseXKeys sc : ((GUIPopupCmd) cmd).shortcuts()) {
+              if(sc.is(e)) {
+                cmd.execute(gui);
+                e.consume();
+                return;
               }
             }
           }

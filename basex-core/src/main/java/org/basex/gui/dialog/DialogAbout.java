@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -11,6 +10,7 @@ import javax.swing.border.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.util.*;
 
 /**
@@ -22,10 +22,10 @@ import org.basex.util.*;
 public final class DialogAbout extends BaseXDialog {
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogAbout(final GUI main) {
-    super(main, ABOUT);
+  public DialogAbout(final GUI gui) {
+    super(gui, ABOUT);
 
     BaseXBack p = new BaseXBack(new BorderLayout(12, 0));
     p.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
@@ -43,12 +43,7 @@ public final class DialogAbout extends BaseXDialog {
     final BaseXLabel url = new BaseXLabel("<html><u>" + Prop.URL + "</u></html>");
     url.setForeground(GUIConstants.BLUE);
     url.setCursor(GUIConstants.CURSORHAND);
-    url.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(final MouseEvent e) {
-        BaseXDialog.browse(gui, Prop.URL);
-      }
-    });
+    url.addMouseListener((MouseClickedListener) (e) -> BaseXDialog.browse(gui, Prop.URL));
 
     pp.add(url);
     pp.add(Box.createVerticalStrut(7));
@@ -61,7 +56,7 @@ public final class DialogAbout extends BaseXDialog {
     pp.add(new BaseXLabel(TEAM2));
     pp.add(new BaseXLabel(AND_OTHERS));
     pp.add(Box.createVerticalStrut(7));
-    final String lang = main.context.soptions.get(StaticOptions.LANG);
+    final String lang = gui.context.soptions.get(StaticOptions.LANG);
     pp.add(new BaseXLabel(TRANSLATION + " (" + lang + "): " + DialogGeneralPrefs.creds(lang)));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);

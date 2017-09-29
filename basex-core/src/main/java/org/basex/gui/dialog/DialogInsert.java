@@ -47,10 +47,10 @@ public final class DialogInsert extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogInsert(final GUI main) {
-    super(main, INSERT_NEW_DATA);
+  public DialogInsert(final GUI gui) {
+    super(gui, INSERT_NEW_DATA);
 
     label1 = new BaseXLabel(NAME + COLS, true, true).border(0, 0, 0, 0);
     label2 = new BaseXLabel(VALUE + COLS, true, true).border(0, 0, 0, 0);
@@ -58,7 +58,7 @@ public final class DialogInsert extends BaseXDialog {
     input1 = new BaseXTextField(this);
     BaseXLayout.setWidth(input1, 500);
 
-    input2 = new TextPanel(true, this);
+    input2 = new TextPanel(this, true);
     input2.addKeyListener(keys);
     BaseXLayout.setWidth(input2, 500);
 

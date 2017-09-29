@@ -108,7 +108,7 @@ final class DialogCsvParser extends DialogParser {
 
     add(pp, BorderLayout.WEST);
 
-    example = new TextPanel(false, dialog);
+    example = new TextPanel(dialog, false);
 
     add(example, BorderLayout.CENTER);
     action(true);

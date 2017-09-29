@@ -12,6 +12,7 @@ import javax.swing.border.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.gui.listener.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -45,12 +46,7 @@ public final class ProjectView extends BaseXPanel {
   private boolean parsed;
 
   /** Remembers the last focused component. */
-  final FocusAdapter lastfocus = new FocusAdapter() {
-    @Override
-    public void focusGained(final FocusEvent ev) {
-      last = ev.getComponent();
-    }
-  };
+  final FocusGainedListener lastfocus = (FocusGainedListener) e -> last = e.getComponent();
 
   /**
    * Constructor.

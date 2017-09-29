@@ -13,6 +13,7 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.*;
 import org.basex.gui.dialog.*;
+import org.basex.gui.listener.*;
 import org.basex.util.*;
 
 /**
@@ -21,7 +22,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public abstract class BaseXDialog extends JDialog {
+public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   /** reference to the main window. */
   public final GUI gui;
   /** Used mnemonics. */
@@ -33,12 +34,9 @@ public abstract class BaseXDialog extends JDialog {
   protected BaseXBack panel;
 
   /** Key listener, triggering an action with each click. */
-  public final KeyAdapter keys = new KeyAdapter() {
-    @Override
-    public void keyReleased(final KeyEvent e) {
-      // don't trigger any action for modifier keys
-      if(!modifier(e) && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) action(e.getSource());
-    }
+  public final KeyListener keys = (KeyReleasedListener) e -> {
+    // don't trigger any action for modifier keys
+    if(!modifier(e) && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) action(e.getSource());
   };
 
   /**
@@ -233,5 +231,20 @@ public abstract class BaseXDialog extends JDialog {
       Util.debug(ex);
       error(gui, Util.info(H_BROWSER_ERROR_X, Prop.URL));
     }
+  }
+
+  @Override
+  public GUI gui() {
+    return gui;
+  }
+
+  @Override
+  public BaseXDialog dialog() {
+    return this;
+  }
+
+  @Override
+  public BaseXDialog component() {
+    return this;
   }
 }

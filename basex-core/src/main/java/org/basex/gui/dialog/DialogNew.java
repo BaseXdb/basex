@@ -40,16 +40,16 @@ public final class DialogNew extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogNew(final GUI main) {
-    super(main, CREATE_DATABASE);
+  public DialogNew(final GUI gui) {
+    super(gui, CREATE_DATABASE);
 
     // define buttons first to assign simplest mnemonics
     buttons = okCancel();
 
     final MainOptions opts = gui.context.options;
-    final GUIOptions gopts = main.gopts;
+    final GUIOptions gopts = gui.gopts;
 
     dbName = new BaseXTextField(this, gopts.get(GUIOptions.DBNAME));
 

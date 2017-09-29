@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
 import org.basex.gui.view.*;
 import org.basex.query.*;
@@ -69,7 +70,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     timer = new BaseXLabel(" ", true, false);
     timer.setForeground(GUIConstants.dgray);
 
-    area = new TextPanel(false, gui);
+    area = new TextPanel(gui, false);
     area.setLinkListener(this);
     editor = new SearchEditor(gui, area);
 

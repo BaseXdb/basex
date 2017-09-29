@@ -80,10 +80,10 @@ public final class DialogProps extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogProps(final GUI main) {
-    super(main, DB_PROPS);
+  public DialogProps(final GUI gui) {
+    super(gui, DB_PROPS);
 
     panel.setLayout(new BorderLayout(5, 0));
 
@@ -100,7 +100,7 @@ public final class DialogProps extends BaseXDialog {
       labels[l] = new BaseXLabel(LABELS[l]).large();
       panels[l] = new BaseXBack(new BorderLayout(0, 4));
       BaseXLayout.setWidth(panels[l], 600);
-      infos[l] = new TextPanel(PLEASE_WAIT_D, false, this);
+      infos[l] = new TextPanel(this, PLEASE_WAIT_D, false);
       infos[l].setFont(dmfont);
     }
     // create/drop buttons for values indexes
@@ -109,7 +109,7 @@ public final class DialogProps extends BaseXDialog {
       BaseXLayout.setHeight(panels[l], 160);
     }
     // no full-text index in main-memory mode
-    final Data data = main.context.data();
+    final Data data = gui.context.data();
     buttons[IndexType.FULLTEXT.ordinal()].setEnabled(!data.inMemory());
 
     // alternative panels
@@ -139,15 +139,15 @@ public final class DialogProps extends BaseXDialog {
     dbPanel.add(new BaseXLabel(DATABASE + COLS + data.meta.name).border(0, 0, 6, 0).large(),
         BorderLayout.NORTH);
 
-    dbInfo = new TextPanel("", false, this);
+    dbInfo = new TextPanel(this, "", false);
     dbInfo.setFont(infoPanel.getFont());
-    dbPanel.add(new SearchEditor(main, dbInfo), BorderLayout.CENTER);
+    dbPanel.add(new SearchEditor(gui, dbInfo), BorderLayout.CENTER);
 
     final BaseXBack nsPanel = new BaseXBack(new BorderLayout());
     nsPanel.add(new BaseXLabel(NAMESPACES).border(0, 0, 6, 0).large(), BorderLayout.NORTH);
 
-    nsInfo = new TextPanel("", false, this);
-    nsPanel.add(new SearchEditor(main, nsInfo), BorderLayout.CENTER);
+    nsInfo = new TextPanel(this, "", false);
+    nsPanel.add(new SearchEditor(gui, nsInfo), BorderLayout.CENTER);
 
     infoPanel.add(dbPanel);
     infoPanel.add(nsPanel);

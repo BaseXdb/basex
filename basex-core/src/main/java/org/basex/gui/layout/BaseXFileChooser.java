@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 
@@ -30,7 +29,7 @@ public final class BaseXFileChooser {
   }
 
   /** Reference to parent window (of type {@link BaseXDialog} or {@link GUI}). */
-  private final Window win;
+  private final BaseXWindow win;
   /** Swing file chooser. */
   private final JFileChooser fc;
   /** File suffix. */
@@ -42,7 +41,7 @@ public final class BaseXFileChooser {
    * @param title dialog title
    * @param path initial path
    */
-  public BaseXFileChooser(final Window win, final String title, final String path) {
+  public BaseXFileChooser(final BaseXWindow win, final String title, final String path) {
     this.win = win;
 
     final IOFile file = new IOFile(path);
@@ -118,19 +117,19 @@ public final class BaseXFileChooser {
     int state = 0;
     switch(mode) {
       case FOPEN:
-        state = fc.showOpenDialog(win);
+        state = fc.showOpenDialog(win.component());
         break;
       case FDOPEN:
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        state = fc.showOpenDialog(win);
+        state = fc.showOpenDialog(win.component());
         break;
       case FSAVE:
-        state = fc.showSaveDialog(win);
+        state = fc.showSaveDialog(win.component());
         break;
       case DOPEN:
       case DSAVE:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        state = fc.showDialog(win, null);
+        state = fc.showDialog(win.component(), null);
         break;
     }
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
@@ -165,8 +164,7 @@ public final class BaseXFileChooser {
       // show replace dialog
       for(final IOFile io : files) {
         if(io.exists()) {
-          final GUI gui = win instanceof BaseXDialog ? ((BaseXDialog) win).gui : (GUI) win;
-          if(!BaseXDialog.confirm(gui, Util.info(FILE_EXISTS_X, io))) return new IOFile[0];
+          if(!BaseXDialog.confirm(win.gui(), Util.info(FILE_EXISTS_X, io))) return new IOFile[0];
         }
       }
     }

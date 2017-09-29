@@ -29,10 +29,10 @@ public final class DialogColors extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  private DialogColors(final GUI main) {
-    super(main, COLOR_SCHEMA, false);
+  private DialogColors(final GUI gui) {
+    super(gui, COLOR_SCHEMA, false);
 
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
     p.add(new BaseXLabel(RED));
@@ -54,10 +54,10 @@ public final class DialogColors extends BaseXDialog {
 
   /**
    * Activates the dialog window.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public static void show(final GUI main) {
-    if(dialog == null) dialog = new DialogColors(main);
+  public static void show(final GUI gui) {
+    if(dialog == null) dialog = new DialogColors(gui);
     dialog.setVisible(true);
   }
 

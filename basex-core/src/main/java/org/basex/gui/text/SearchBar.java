@@ -11,6 +11,7 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -35,11 +36,8 @@ public final class SearchBar extends BaseXBack {
   }
 
   /** Escape key listener. */
-  private final KeyAdapter escape = new KeyAdapter() {
-    @Override
-    public void keyPressed(final KeyEvent e) {
-      if(ESCAPE.is(e)) deactivate(true);
-    }
+  private final KeyListener escape = (KeyPressedListener) e -> {
+    if(ESCAPE.is(e)) deactivate(true);
   };
   /** Action listener for button clicks. */
   private final ActionListener action = e -> {
@@ -124,6 +122,7 @@ public final class SearchBar extends BaseXBack {
           setModes(modeHistory.get(search.getText()));
         }
       }
+
       @Override
       public void keyReleased(final KeyEvent e) {
         final String srch = search.getText();

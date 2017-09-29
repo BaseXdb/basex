@@ -53,17 +53,17 @@ public final class DialogManage extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogManage(final GUI main) {
-    super(main, MANAGE_DB);
+  public DialogManage(final GUI gui) {
+    super(gui, MANAGE_DB);
     panel.setLayout(new BorderLayout(4, 0));
 
     // create database chooser
-    final String[] dbs = main.context.databases.list().finish();
+    final String[] dbs = gui.context.databases.list().finish();
     choice = new BaseXList(this, false, dbs);
     choice.setSize(200, 500);
-    final Data data = main.context.data();
+    final Data data = gui.context.data();
     if(data != null) {
       data.flush(true);
       choice.setValue(data.meta.name);
@@ -72,7 +72,7 @@ public final class DialogManage extends BaseXDialog {
     doc1 = new BaseXLabel(" ").large();
     doc1.setSize(420, doc1.getHeight());
 
-    detail = new TextPanel(false, this);
+    detail = new TextPanel(this, false);
     detail.setFont(panel.getFont());
 
     // database buttons
@@ -84,7 +84,7 @@ public final class DialogManage extends BaseXDialog {
     // first tab
     final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
     tab1.add(doc1, BorderLayout.NORTH);
-    tab1.add(new SearchEditor(main, detail), BorderLayout.CENTER);
+    tab1.add(new SearchEditor(gui, detail), BorderLayout.CENTER);
     tab1.add(newButtons(drop, rename, copy, open), BorderLayout.SOUTH);
 
     doc2 = new BaseXLabel(" ").border(0, 0, 6, 0);

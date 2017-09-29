@@ -1,7 +1,5 @@
 package org.basex.gui.layout;
 
-import java.awt.*;
-
 import javax.swing.*;
 
 /**
@@ -17,12 +15,13 @@ public final class BaseXRadio extends JRadioButton {
    * @param text button text
    * @param selected initial selection state
    */
-  public BaseXRadio(final Window win, final String text, final boolean selected) {
+  public BaseXRadio(final BaseXWindow win, final String text, final boolean selected) {
     super(text, selected);
     setOpaque(false);
     setBorder(BaseXLayout.border(0, 0, 0, 16));
     BaseXLayout.addInteraction(this, win);
-    if(win instanceof BaseXDialog)
-      addActionListener(e -> ((BaseXDialog) win).action(e.getSource()));
+
+    final BaseXDialog dialog = win.dialog();
+    if(dialog != null) addActionListener(e -> dialog.action(e.getSource()));
   }
 }

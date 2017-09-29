@@ -25,11 +25,11 @@ public final class DialogLine extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    * @param curr current line
    */
-  public DialogLine(final GUI main, final int curr) {
-    super(main, GO_TO_LINE);
+  public DialogLine(final GUI gui, final int curr) {
+    super(gui, GO_TO_LINE);
 
     line = new BaseXTextField(this, Integer.toString(curr));
     line.addKeyListener(keys);

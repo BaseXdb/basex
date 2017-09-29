@@ -41,16 +41,16 @@ final class DialogResources extends BaseXBack {
 
   /**
    * Constructor.
-   * @param dp dialog reference
+   * @param dialog dialog reference
    */
-  DialogResources(final DialogProps dp) {
+  DialogResources(final DialogProps dialog) {
     setLayout(new BorderLayout(0, 5));
-    dialog = dp;
+    this.dialog = dialog;
 
     // init tree - additional root node necessary to bypass
     // the egg/chicken dilemma
     final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
-    tree = new BaseXTree(rootNode, dp).border(4, 4, 4, 4);
+    tree = new BaseXTree(dialog, rootNode).border(4, 4, 4, 4);
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setRowHeight(getFontMetrics(getFont()).getHeight());
@@ -70,25 +70,25 @@ final class DialogResources extends BaseXBack {
           filt = trgt;
         }
         filterText.setText(filt);
-        dp.addPanel.target.setText(trgt);
+        dialog.addPanel.target.setText(trgt);
         filtered = false;
       }
     });
 
     // add default children to tree
-    final Context context = dp.gui.context;
+    final Context context = dialog.gui.context;
     final Data data = context.data();
     final String label = data.meta.name + " (/)";
     root = new ResourceRootFolder(token(label), token("/"), tree, context);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
 
-    filter = new BaseXButton(dp, FILTER);
-    clear = new BaseXButton(dp, CLEAR);
+    filter = new BaseXButton(dialog, FILTER);
+    clear = new BaseXButton(dialog, CLEAR);
     filter.setEnabled(false);
     clear.setEnabled(false);
 
     // popup menu for node interaction
-    new BaseXPopup(tree, dp.gui, new DeleteCmd(), new RenameCmd());
+    new BaseXPopup(tree, dialog.gui, new DeleteCmd(), new RenameCmd());
 
     // button panel
     final BaseXBack buttons = new BaseXBack();
@@ -97,7 +97,7 @@ final class DialogResources extends BaseXBack {
     final BaseXBack btn = new BaseXBack().layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
 
-    filterText = new BaseXTextField(dp, PLEASE_WAIT_D);
+    filterText = new BaseXTextField(dialog, PLEASE_WAIT_D);
     filterText.setEnabled(false);
     BaseXLayout.setWidth(filterText, 250);
 

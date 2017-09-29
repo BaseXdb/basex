@@ -3,7 +3,6 @@ package org.basex.gui.view.project;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import javax.swing.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -63,11 +63,8 @@ final class ProjectList extends JList<String> {
     this.view = view;
     setBorder(BaseXLayout.border(4, 4, 4, 4));
     setCellRenderer(new CellRenderer());
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mousePressed(final MouseEvent e) {
-        if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
-      }
+    addMouseListener((MouseClickedListener) (e) -> {
+      if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
     });
     new BaseXPopup(this, view.gui, commands);
   }

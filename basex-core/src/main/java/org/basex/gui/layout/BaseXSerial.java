@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
+import org.basex.gui.listener.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -122,12 +123,9 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
    * @return text field
    */
   private Component addInput(final BaseXTextField text) {
-    text.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        text.assign();
-        update();
-      }
+    text.addKeyListener((KeyReleasedListener) e -> {
+      text.assign();
+      update();
     });
     BaseXLayout.setWidth(text, COMPT);
     panel.add(text);

@@ -59,7 +59,7 @@ public final class TextView extends View {
     home = BaseXButton.command(GUIMenuCmd.C_HOME, gui);
     home.setEnabled(false);
 
-    text = new TextPanel(false, gui);
+    text = new TextPanel(gui, false);
     text.setSyntax(new SyntaxXML());
     search = new SearchEditor(gui, text);
 

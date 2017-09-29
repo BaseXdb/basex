@@ -23,13 +23,13 @@ public final class DialogMessage extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    * @param txt message text
    * @param ic message type
    * @param buttons additional buttons
    */
-  public DialogMessage(final GUI main, final String txt, final Msg ic, final String... buttons) {
-    super(main, ic == Msg.ERROR ? Text.ERROR : Text.INFORMATION);
+  public DialogMessage(final GUI gui, final String txt, final Msg ic, final String... buttons) {
+    super(gui, ic == Msg.ERROR ? Text.ERROR : Text.INFORMATION);
 
     panel.setLayout(new BorderLayout());
 
@@ -39,7 +39,7 @@ public final class DialogMessage extends BaseXDialog {
     back.add(label);
 
     // break longer texts
-    final TextPanel text = new TextPanel(txt.replaceAll("(.{1,160})", "$1\n").trim(), false, this);
+    final TextPanel text = new TextPanel(this, txt.replaceAll("(.{1,160})", "$1\n").trim(), false);
     text.setFont(label.getFont());
     back.add(text);
 

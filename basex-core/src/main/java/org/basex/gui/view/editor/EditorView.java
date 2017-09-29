@@ -18,6 +18,7 @@ import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
 import org.basex.gui.text.TextPanel.Action;
 import org.basex.gui.view.*;
@@ -214,12 +215,7 @@ public final class EditorView extends View {
       pm.show(hist, 0, hist.getHeight());
     });
     refreshHistory(null);
-    info.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(final MouseEvent e) {
-        markError(true);
-      }
-    });
+    info.addMouseListener((MouseClickedListener) (e) -> markError(true));
     stop.addActionListener(e -> {
       stop.setEnabled(false);
       go.setEnabled(false);

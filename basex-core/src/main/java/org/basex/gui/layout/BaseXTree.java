@@ -1,10 +1,9 @@
 package org.basex.gui.layout;
 
-import java.awt.*;
-import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.tree.*;
+
+import org.basex.gui.listener.*;
 
 /**
  * Project specific tree implementation.
@@ -15,18 +14,15 @@ import javax.swing.tree.*;
 public class BaseXTree extends JTree {
   /**
    * Constructor.
+   * @param win reference to the main window
    * @param root root node
-   * @param w window reference
    */
-  public BaseXTree(final DefaultMutableTreeNode root, final Window w) {
+  public BaseXTree(final BaseXWindow win, final DefaultMutableTreeNode root) {
     super(root);
-    BaseXLayout.addInteraction(this, w);
+    BaseXLayout.addInteraction(this, win);
     setLargeModel(true);
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mousePressed(final MouseEvent e) {
-        if(!e.isShiftDown()) setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
-      }
+    addMouseListener((MouseClickedListener) (e) -> {
+      if(!e.isShiftDown()) setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
     });
   }
 

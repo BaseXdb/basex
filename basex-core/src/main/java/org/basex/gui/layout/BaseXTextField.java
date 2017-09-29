@@ -3,11 +3,11 @@ package org.basex.gui.layout;
 import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
-import java.awt.event.*;
 
 import javax.swing.*;
 
 import org.basex.gui.*;
+import org.basex.gui.listener.*;
 import org.basex.util.options.*;
 
 /**
@@ -23,7 +23,7 @@ public class BaseXTextField extends JTextField {
   private static Color back;
 
   /** Reference to parent window (of type {@link BaseXDialog} or {@link GUI}). */
-  private final Window win;
+  private final BaseXWindow win;
 
   /** Options. */
   private Options options;
@@ -94,7 +94,7 @@ public class BaseXTextField extends JTextField {
    * @param win window (of type {@link BaseXDialog} or {@link GUI})
    * @param text input text (can be {@null})
    */
-  public BaseXTextField(final Window win, final String text) {
+  public BaseXTextField(final BaseXWindow win, final String text) {
     this.win = win;
 
     BaseXLayout.setWidth(this, DWIDTH);
@@ -103,23 +103,17 @@ public class BaseXTextField extends JTextField {
 
     if(text != null) setText(text);
 
-    addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        selectAll();
+    addFocusListener((FocusGainedListener) e -> selectAll());
+    addKeyListener((KeyPressedListener) e -> {
+      if(UNDOSTEP.is(e) || REDOSTEP.is(e)) {
+        final String t = getText();
+        setText(last);
+        last = t;
       }
     });
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(UNDOSTEP.is(e) || REDOSTEP.is(e)) {
-          final String t = getText();
-          setText(last);
-          last = t;
-        }
-      }
-    });
-    if(win instanceof BaseXDialog) addKeyListener(((BaseXDialog) win).keys);
+
+    final BaseXDialog dialog = win.dialog();
+    if(dialog != null) addKeyListener(dialog.keys);
   }
 
   @Override
@@ -134,22 +128,18 @@ public class BaseXTextField extends JTextField {
    * @return self reference
    */
   public final BaseXTextField history(final StringsOption strings) {
-    final boolean dialog = win instanceof BaseXDialog;
-    final GUI gui = dialog ? ((BaseXDialog) win).gui : (GUI) win;
-
+    final GUI gui = win.gui();
     history = new BaseXHistory(gui, strings);
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(ENTER.is(e)) {
-          store();
-        } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
-          final String[] qu = gui.gopts.get(strings);
-          if(qu.length == 0) return;
-          hist = NEXTLINE.is(e) ? Math.min(qu.length - 1, hist + 1) : Math.max(0, hist - 1);
-          setText(qu[hist]);
-          if(dialog) ((BaseXDialog) win).action(this);
-        }
+    addKeyListener((KeyPressedListener) e -> {
+      if(ENTER.is(e)) {
+        store();
+      } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
+        final String[] qu = gui.gopts.get(strings);
+        if(qu.length == 0) return;
+        hist = NEXTLINE.is(e) ? Math.min(qu.length - 1, hist + 1) : Math.max(0, hist - 1);
+        setText(qu[hist]);
+        final BaseXDialog dialog = win.dialog();
+        if(dialog != null) dialog.action(this);
       }
     });
     return this;

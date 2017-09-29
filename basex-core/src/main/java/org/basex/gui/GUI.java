@@ -42,7 +42,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class GUI extends JFrame {
+public final class GUI extends JFrame implements BaseXWindow {
   /** Database Context. */
   public final Context context;
   /** GUI options. */
@@ -775,5 +775,20 @@ public final class GUI extends JFrame {
         gopts.write();
       }
     }.execute();
+  }
+
+  @Override
+  public GUI gui() {
+    return this;
+  }
+
+  @Override
+  public BaseXDialog dialog() {
+    return null;
+  }
+
+  @Override
+  public GUI component() {
+    return this;
   }
 }

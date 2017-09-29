@@ -31,12 +31,12 @@ public final class ViewContainer extends BaseXBack {
 
   /** reference to the main window. */
   private final GUI gui;
+  /** View panels. */
+  private final ViewPanel[] views;
   /** View Layout. */
   private ViewAlignment layout;
   /** Current layout string. */
   private String layoutString;
-  /** View panels. */
-  private final ViewPanel[] views;
   /** Source View. */
   private ViewPanel source;
   /** Target View. */
@@ -52,19 +52,19 @@ public final class ViewContainer extends BaseXBack {
 
   /**
    * Constructor.
-   * @param main reference to the main window
-   * @param v view panels
+   * @param gui reference to the main window
+   * @param view view panels
    */
-  public ViewContainer(final GUI main, final View... v) {
+  public ViewContainer(final GUI gui, final View... view) {
     layout(new BorderLayout());
     setOpaque(true);
     logo = BaseXImages.get("logo_transparent");
     setBackground(BACK);
 
-    final int vl = v.length;
+    final int vl = view.length;
     views = new ViewPanel[vl];
-    for(int i = 0; i < vl; ++i) views[i] = new ViewPanel(v[i]);
-    gui = main;
+    for(int i = 0; i < vl; ++i) views[i] = new ViewPanel(view[i]);
+    this.gui = gui;
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
       Util.errln(Util.className(this) + ": could not build layout \"%\"", VIEWS);

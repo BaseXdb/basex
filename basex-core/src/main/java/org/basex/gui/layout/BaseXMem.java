@@ -21,10 +21,10 @@ public final class BaseXMem extends BaseXPanel {
 
   /**
    * Constructor.
-   * @param win parent reference
+   * @param win window
    * @param mouse mouse interaction
    */
-  public BaseXMem(final Window win, final boolean mouse) {
+  public BaseXMem(final BaseXWindow win, final boolean mouse) {
     super(win);
     BaseXLayout.setWidth(this, DWIDTH);
     setPreferredSize(new Dimension(getPreferredSize().width, getFont().getSize() + 6));
@@ -80,7 +80,7 @@ public final class BaseXMem extends BaseXPanel {
   }
 
   @Override
-  public void mousePressed(final MouseEvent e) {
+  public void mouseClicked(final MouseEvent e) {
     DialogMem.show(gui);
     repaint();
   }

@@ -28,10 +28,10 @@ public final class DialogPrefs extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  private DialogPrefs(final GUI main) {
-    super(main, PREFERENCES, false);
+  private DialogPrefs(final GUI gui) {
+    super(gui, PREFERENCES, false);
 
     tabs = new BaseXTabs(this);
     general = new DialogGeneralPrefs(this);
@@ -50,10 +50,10 @@ public final class DialogPrefs extends BaseXDialog {
 
   /**
    * Activates the dialog window.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public static void show(final GUI main) {
-    if(dialog == null) dialog = new DialogPrefs(main);
+  public static void show(final GUI gui) {
+    if(dialog == null) dialog = new DialogPrefs(gui);
     dialog.visual.update();
     dialog.setVisible(true);
   }

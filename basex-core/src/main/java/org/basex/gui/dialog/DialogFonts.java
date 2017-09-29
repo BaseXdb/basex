@@ -41,10 +41,10 @@ public final class DialogFonts extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  private DialogFonts(final GUI main) {
-    super(main, CHOOSE_FONT, false);
+  private DialogFonts(final GUI gui) {
+    super(gui, CHOOSE_FONT, false);
 
     final GUIOptions gopts = gui.gopts;
     fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
@@ -82,12 +82,12 @@ public final class DialogFonts extends BaseXDialog {
 
   /**
    * Activates the dialog window.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public static void show(final GUI main) {
-    if(dialog == null) dialog = new DialogFonts(main);
+  public static void show(final GUI gui) {
+    if(dialog == null) dialog = new DialogFonts(gui);
     dialog.setVisible(true);
-    dialog.size.setValue(Integer.toString(main.gopts.get(GUIOptions.FONTSIZE)));
+    dialog.size.setValue(Integer.toString(gui.gopts.get(GUIOptions.FONTSIZE)));
   }
 
   @Override

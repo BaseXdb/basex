@@ -3,11 +3,11 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.awt.event.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 import org.basex.util.*;
 
 /**
@@ -37,12 +37,7 @@ final class DialogInstallURL extends BaseXDialog {
     final BaseXLabel link = new BaseXLabel("<html><u>" + Prop.REPO_URL + "</u></html>");
     link.setForeground(GUIConstants.BLUE);
     link.setCursor(GUIConstants.CURSORHAND);
-    link.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(final MouseEvent e) {
-        BaseXDialog.browse(gui, Prop.REPO_URL);
-      }
-    });
+    link.addMouseListener((MouseClickedListener) (e) -> BaseXDialog.browse(gui, Prop.REPO_URL));
 
     BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
     p.add(url, BorderLayout.NORTH);

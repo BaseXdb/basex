@@ -27,10 +27,10 @@ public final class DialogBindings extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public DialogBindings(final GUI main) {
-    super(main, EXTERNAL_VARIABLES);
+  public DialogBindings(final GUI gui) {
+    super(gui, EXTERNAL_VARIABLES);
     ((BorderLayout) panel.getLayout()).setHgap(4);
 
     final BaseXBack west = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));

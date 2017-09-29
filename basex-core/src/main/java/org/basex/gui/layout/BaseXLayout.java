@@ -16,6 +16,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.gui.*;
+import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
 import org.basex.util.*;
 
@@ -37,7 +38,7 @@ public final class BaseXLayout {
   private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
       InputEvent.META_MASK ? "meta" : "ctrl";
   /** Key listener for global shortcuts. */
-  private static KeyAdapter keys;
+  private static KeyListener keys;
 
   /** Private constructor. */
   private BaseXLayout() { }
@@ -236,44 +237,33 @@ public final class BaseXLayout {
    * @param comp component
    * @param win parent window
    */
-  public static void addInteraction(final Component comp, final Window win) {
-    comp.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseEntered(final MouseEvent e) {
-        focus(comp);
-      }
-    });
+  public static void addInteraction(final Component comp, final BaseXWindow win) {
+    comp.addMouseListener((MouseEnteredListener) (e) -> focus(comp));
 
-    if(win instanceof BaseXDialog) {
-      // add default keys
-      final BaseXDialog d = (BaseXDialog) win;
-      comp.addKeyListener(new KeyAdapter() {
-        @Override
-        public void keyPressed(final KeyEvent e) {
-          final Object s = e.getSource();
-          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
+    // check if component is a dialog
+    final BaseXDialog dialog = win.dialog();
+    if(dialog == null) {
+      // no: window is main window
+      comp.addKeyListener(globalShortcuts(win.gui()));
+    } else {
+      // yes: add default keys
+      comp.addKeyListener((KeyReleasedListener) e -> {
+        final Object s = e.getSource();
+        if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
 
-          // do not key close dialog if button or editor is focused
-          if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
-            d.close();
-          } else if(ESCAPE.is(e)) {
-            // do not cancel dialog if search bar is opened
-            boolean close = true;
-            if(s instanceof TextPanel) {
-              final SearchBar bar = ((TextPanel) s).getSearch();
-              close = bar == null || !bar.deactivate(true);
-            }
-            if(close) d.cancel();
+        // do not key close dialog if button or editor is focused
+        if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
+          dialog.close();
+        } else if(ESCAPE.is(e)) {
+          // do not cancel dialog if search bar is opened
+          boolean close = true;
+          if(s instanceof TextPanel) {
+            final SearchBar bar = ((TextPanel) s).getSearch();
+            close = bar == null || !bar.deactivate(true);
           }
+          if(close) dialog.cancel();
         }
       });
-      return;
-    }
-
-    if(win instanceof GUI) {
-      comp.addKeyListener(globalShortcuts((GUI) win));
-    } else {
-      throw Util.notExpected("reference to the main window expected.");
     }
   }
 
@@ -282,44 +272,39 @@ public final class BaseXLayout {
    * @param gui gui reference
    * @return key listener
    */
-  private static KeyAdapter globalShortcuts(final GUI gui) {
-    if(keys == null) {
-      keys = new KeyAdapter() {
-        @Override
-        public void keyPressed(final KeyEvent e) {
-          // browse back/forward
-          if(gui.context.data() != null) {
-            if(GOBACK.is(e)) {
-              GUIMenuCmd.C_GOBACK.execute(gui);
-            } else if(GOFORWARD.is(e)) {
-              GUIMenuCmd.C_GOFORWARD.execute(gui);
-            } else if(GOUP.is(e)) {
-              GUIMenuCmd.C_GOUP.execute(gui);
-            } else if(GOHOME.is(e)) {
-              GUIMenuCmd.C_GOHOME.execute(gui);
-            }
-          }
-
-          // jump to input bar
-          if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
-
-          // change font size
-          final int fs = gui.gopts.get(GUIOptions.FONTSIZE);
-          int nfs = fs;
-          if(INCFONT1.is(e) || INCFONT2.is(e)) {
-            nfs = fs + 1;
-          } else if(DECFONT.is(e)) {
-            nfs = Math.max(1, fs - 1);
-          } else if(NORMFONT.is(e)) {
-            nfs = 13;
-          }
-          if(fs != nfs) {
-            gui.gopts.set(GUIOptions.FONTSIZE, nfs);
-            gui.updateLayout();
-          }
+  private static KeyListener globalShortcuts(final GUI gui) {
+    if(keys == null) keys = (KeyPressedListener) e -> {
+      // browse back/forward
+      if(gui.context.data() != null) {
+        if(GOBACK.is(e)) {
+          GUIMenuCmd.C_GOBACK.execute(gui);
+        } else if(GOFORWARD.is(e)) {
+          GUIMenuCmd.C_GOFORWARD.execute(gui);
+        } else if(GOUP.is(e)) {
+          GUIMenuCmd.C_GOUP.execute(gui);
+        } else if(GOHOME.is(e)) {
+          GUIMenuCmd.C_GOHOME.execute(gui);
         }
-      };
-    }
+      }
+
+      // jump to input bar
+      if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
+
+      // change font size
+      final int fs = gui.gopts.get(GUIOptions.FONTSIZE);
+      int nfs = fs;
+      if(INCFONT1.is(e) || INCFONT2.is(e)) {
+        nfs = fs + 1;
+      } else if(DECFONT.is(e)) {
+        nfs = Math.max(1, fs - 1);
+      } else if(NORMFONT.is(e)) {
+        nfs = 13;
+      }
+      if(fs != nfs) {
+        gui.gopts.set(GUIOptions.FONTSIZE, nfs);
+        gui.updateLayout();
+      }
+    };
     return keys;
   }
 

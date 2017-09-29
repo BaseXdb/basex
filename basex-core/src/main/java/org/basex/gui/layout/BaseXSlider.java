@@ -46,7 +46,7 @@ public final class BaseXSlider extends BaseXPanel {
    * @param option option
    * @param options options
    */
-  public BaseXSlider(final Window win, final int min, final int max, final NumberOption option,
+  public BaseXSlider(final BaseXWindow win, final int min, final int max, final NumberOption option,
       final Options options) {
     this(win, min, max, options.get(option));
     this.options = options;
@@ -55,17 +55,17 @@ public final class BaseXSlider extends BaseXPanel {
 
   /**
    * Constructor.
-   * @param win parent window (of type {@link BaseXDialog} or {@link GUI})
+   * @param win parent window
    * @param min min value
    * @param max max value
    * @param value initial value
    */
-  public BaseXSlider(final Window win, final int min, final int max, final int value) {
+  public BaseXSlider(final BaseXWindow win, final int min, final int max, final int value) {
     super(win);
     this.min = min;
     this.max = max;
     this.value = value;
-    dialog = win instanceof BaseXDialog ? (BaseXDialog) win : null;
+    dialog = win.dialog();
 
     setOpaque(false);
     setFocusable(true);

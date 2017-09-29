@@ -24,10 +24,10 @@ public final class GUIMenu extends JMenuBar {
 
   /**
    * Initializes the menu bar.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  GUIMenu(final GUI main) {
-    gui = main;
+  GUIMenu(final GUI gui) {
+    this.gui = gui;
     if(Prop.langright) setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
     // create menu for each top level menu entries
