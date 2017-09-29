@@ -100,15 +100,15 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>8.1.16.v20140903</version>
-        <configuration>
-          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
-          <stopKey>keyToStopJetty</stopKey>
-          <stopPort>8985</stopPort>
-        </configuration>
-      </plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.6.v20170531</version>
+                <configuration>
+                    <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
+                    <stopKey>keyToStopJetty</stopKey>
+                    <stopPort>8985</stopPort>
+                </configuration>
+            </plugin>
 
       <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
