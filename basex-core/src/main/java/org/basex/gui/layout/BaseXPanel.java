@@ -19,7 +19,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener, Mou
 
   /**
    * Constructor, setting default interactions.
-   * @param win parent reference, {@link BaseXDialog} or {@link GUI} instance
+   * @param win parent reference, (of type {@link BaseXDialog} or {@link GUI})
    */
   protected BaseXPanel(final Window win) {
     gui = win instanceof GUI ? (GUI) win : ((BaseXDialog) win).gui;

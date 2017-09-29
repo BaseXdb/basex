@@ -38,11 +38,11 @@ public final class BaseXFileChooser {
 
   /**
    * Default constructor.
+   * @param win reference to the main window
    * @param title dialog title
    * @param path initial path
-   * @param win reference to main window
    */
-  public BaseXFileChooser(final String title, final String path, final Window win) {
+  public BaseXFileChooser(final Window win, final String title, final String path) {
     this.win = win;
 
     final IOFile file = new IOFile(path);

@@ -5,7 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
- * Project specific RadioButton implementation.
+ * Project specific radio button implementation.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
@@ -13,12 +13,12 @@ import javax.swing.*;
 public final class BaseXRadio extends JRadioButton {
   /**
    * Default constructor.
-   * @param label button title
-   * @param sel initial selection state
    * @param win parent window
+   * @param text button text
+   * @param selected initial selection state
    */
-  public BaseXRadio(final String label, final boolean sel, final Window win) {
-    super(label, sel);
+  public BaseXRadio(final Window win, final String text, final boolean selected) {
+    super(text, selected);
     setOpaque(false);
     setBorder(BaseXLayout.border(0, 0, 0, 16));
     BaseXLayout.addInteraction(this, win);

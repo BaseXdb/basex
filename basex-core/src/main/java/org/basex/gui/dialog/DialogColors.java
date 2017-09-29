@@ -67,7 +67,7 @@ public final class DialogColors extends BaseXDialog {
    * @return slider reference
    */
   private BaseXSlider newSlider(final NumberOption option) {
-    final BaseXSlider slider = new BaseXSlider(0, MAXCOLOR, option, gui.gopts, this);
+    final BaseXSlider slider = new BaseXSlider(this, 0, MAXCOLOR, option, gui.gopts);
     BaseXLayout.setWidth(slider, 150);
     return slider;
   }

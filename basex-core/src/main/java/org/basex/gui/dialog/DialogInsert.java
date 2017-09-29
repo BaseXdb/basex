@@ -71,7 +71,7 @@ public final class DialogInsert extends BaseXDialog {
     final int nl = NODE_KINDS.length;
     radio = new BaseXRadio[nl];
     for(int i = 1; i < nl; ++i) {
-      radio[i] = new BaseXRadio(NODE_KINDS[i], false, this);
+      radio[i] = new BaseXRadio(this, NODE_KINDS[i], false);
       radio[i].addActionListener(al);
       radio[i].setSelected(i == lkind);
       radio[i].addKeyListener(keys);

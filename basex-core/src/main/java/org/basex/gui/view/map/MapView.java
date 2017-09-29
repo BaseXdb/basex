@@ -77,10 +77,10 @@ public final class MapView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public MapView(final ViewNotifier man) {
-    super(MAPVIEW, man);
+  public MapView(final ViewNotifier notifier) {
+    super(MAPVIEW, notifier);
     new BaseXPopup(this, POPUP);
   }
 

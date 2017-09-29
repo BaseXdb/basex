@@ -40,10 +40,10 @@ public final class TableView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public TableView(final ViewNotifier man) {
-    super(TABLEVIEW, man);
+  public TableView(final ViewNotifier notifier) {
+    super(TABLEVIEW, notifier);
     tdata = new TableData(gui.context, gui.gopts);
     layout(new BorderLayout());
     header = new TableHeader(this);

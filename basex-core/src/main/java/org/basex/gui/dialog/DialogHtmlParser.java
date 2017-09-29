@@ -28,18 +28,18 @@ final class DialogHtmlParser extends DialogParser {
 
   /**
    * Constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    * @param opts main options
    */
-  DialogHtmlParser(final BaseXDialog d, final MainOptions opts) {
-    super(d);
+  DialogHtmlParser(final BaseXDialog dialog, final MainOptions opts) {
+    super(dialog);
     hopts = new HtmlOptions(opts.get(MainOptions.HTMLPARSER));
 
     final boolean avl = HtmlParser.available();
     final BaseXBack pp  = new BaseXBack(new TableLayout(3, 1, 0, 8));
     pp.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
 
-    options = new BaseXTextField(hopts.toString(), d);
+    options = new BaseXTextField(dialog, hopts.toString());
     options.setToolTipText(tooltip(hopts));
 
     if(avl) {

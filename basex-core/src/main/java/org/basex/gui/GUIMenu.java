@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class GUIMenu extends JMenuBar {
   /** Referenced menu items. */
   private final JMenuItem[] items;
-  /** Reference to main window. */
+  /** reference to the main window. */
   private final GUI gui;
 
   /**

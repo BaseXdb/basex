@@ -68,36 +68,36 @@ final class DialogGeneralPrefs extends BaseXBack {
 
     final StaticOptions opts = gui.context.soptions;
     final GUIOptions gopts = gui.gopts;
-    dbPath = new BaseXTextField(opts.get(StaticOptions.DBPATH), dialog);
-    repoPath = new BaseXTextField(opts.get(StaticOptions.REPOPATH), dialog);
+    dbPath = new BaseXTextField(dialog, opts.get(StaticOptions.DBPATH));
+    repoPath = new BaseXTextField(dialog, opts.get(StaticOptions.REPOPATH));
 
-    dbButton = new BaseXButton(BROWSE_D, dialog);
+    dbButton = new BaseXButton(dialog, BROWSE_D);
     dbButton.addActionListener(e -> {
       final String path = dbPath.getText();
-      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, dialog).select(Mode.DOPEN);
+      final IOFile dir = new BaseXFileChooser(dialog, CHOOSE_DIR, path).select(Mode.DOPEN);
       if(dir != null) dbPath.setText(dir.path());
     });
 
-    repoButton = new BaseXButton(BROWSE_D, dialog);
+    repoButton = new BaseXButton(dialog, BROWSE_D);
     repoButton.addActionListener(e -> {
       final String path = repoPath.getText();
-      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, dialog).select(Mode.DOPEN);
+      final IOFile dir = new BaseXFileChooser(dialog, CHOOSE_DIR, path).select(Mode.DOPEN);
       if(dir != null) repoPath.setText(dir.path());
     });
 
-    mousefocus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, dialog);
+    mousefocus = new BaseXCheckBox(dialog, RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts);
 
     int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
-    maxResults = new BaseXSlider(0, MAXRESULTS.length - 1, val, dialog);
+    maxResults = new BaseXSlider(dialog, 0, MAXRESULTS.length - 1, val);
     maxResults.addActionListener(e -> action(maxResults));
     labelResults = new BaseXLabel(" ");
 
     val = sliderIndex(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
-    maxText = new BaseXSlider(0, MAXTEXT.length - 1, val, dialog);
+    maxText = new BaseXSlider(dialog, 0, MAXTEXT.length - 1, val);
     maxText.addActionListener(e -> action(maxText));
     labelText = new BaseXLabel(" ");
 
-    lang = new BaseXCombo(LANGS[0], dialog);
+    lang = new BaseXCombo(dialog, LANGS[0]);
     lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 

@@ -55,7 +55,7 @@ final class DialogInput extends BaseXDialog {
 
     set(new BaseXLabel(t, false, true).border(0, 0, 6, 0), BorderLayout.NORTH);
 
-    input = new BaseXTextField(old, this);
+    input = new BaseXTextField(this, old);
     info = new BaseXLabel(" ");
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));

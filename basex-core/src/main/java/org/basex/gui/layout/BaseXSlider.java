@@ -40,32 +40,33 @@ public final class BaseXSlider extends BaseXPanel {
 
   /**
    * Checkbox.
-   * @param mn min value
-   * @param mx max value
-   * @param opt option
-   * @param opts options
    * @param win parent window
+   * @param min min value
+   * @param max max value
+   * @param option option
+   * @param options options
    */
-  public BaseXSlider(final int mn, final int mx, final NumberOption opt, final Options opts,
-      final Window win) {
-    this(mn, mx, opts.get(opt), win);
-    options = opts;
-    option = opt;
+  public BaseXSlider(final Window win, final int min, final int max, final NumberOption option,
+      final Options options) {
+    this(win, min, max, options.get(option));
+    this.options = options;
+    this.option = option;
   }
 
   /**
    * Constructor.
-   * @param mn min value
-   * @param mx max value
-   * @param i initial value
-   * @param w parent window
+   * @param win parent window (of type {@link BaseXDialog} or {@link GUI})
+   * @param min min value
+   * @param max max value
+   * @param value initial value
    */
-  public BaseXSlider(final int mn, final int mx, final int i, final Window w) {
-    super(w);
-    min = mn;
-    max = mx;
-    value = i;
-    dialog = w instanceof BaseXDialog ? (BaseXDialog) w : null;
+  public BaseXSlider(final Window win, final int min, final int max, final int value) {
+    super(win);
+    this.min = min;
+    this.max = max;
+    this.value = value;
+    dialog = win instanceof BaseXDialog ? (BaseXDialog) win : null;
+
     setOpaque(false);
     setFocusable(true);
 

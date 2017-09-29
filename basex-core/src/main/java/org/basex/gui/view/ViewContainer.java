@@ -29,7 +29,7 @@ public final class ViewContainer extends BaseXBack {
     /** South orientation. */ SOUTH
   }
 
-  /** Reference to main window. */
+  /** reference to the main window. */
   private final GUI gui;
   /** View Layout. */
   private ViewAlignment layout;

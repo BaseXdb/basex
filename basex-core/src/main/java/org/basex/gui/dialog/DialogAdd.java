@@ -29,33 +29,33 @@ final class DialogAdd extends BaseXBack {
 
   /**
    * Constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    */
-  DialogAdd(final DialogProps d) {
-    dialog = d;
+  DialogAdd(final DialogProps dialog) {
+    this.dialog = dialog;
     setLayout(new BorderLayout());
 
     add(new BaseXLabel(ADD_RESOURCES).large().border(0,  0, 16, 0), BorderLayout.NORTH);
 
-    target = new BaseXTextField("/", d);
+    target = new BaseXTextField(dialog, "/");
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
     pnl.add(new BaseXLabel(TARGET_PATH + COLS, true, true).border(8, 0, 6, 0));
     pnl.add(target);
 
     // option panels
-    final BaseXTabs tabs = new BaseXTabs(d);
-    final DialogParsing parsing = new DialogParsing(d, tabs);
-    general = new DialogImport(d, pnl, parsing);
+    final BaseXTabs tabs = new BaseXTabs(dialog);
+    final DialogParsing parsing = new DialogParsing(dialog, tabs);
+    general = new DialogImport(dialog, pnl, parsing);
 
     tabs.addTab(GENERAL, general);
     tabs.addTab(PARSING, parsing);
     add(tabs, BorderLayout.CENTER);
 
     // buttons
-    add = new BaseXButton(ADD + DOTS, d);
+    add = new BaseXButton(dialog, ADD + DOTS);
 
-    add(d.newButtons(add), BorderLayout.SOUTH);
+    add(dialog.newButtons(add), BorderLayout.SOUTH);
     action(general.parsers);
   }
 

@@ -22,10 +22,10 @@ public final class BaseXButton extends JButton {
 
   /**
    * Constructor for text buttons.
-   * @param label button label
    * @param win parent window
+   * @param label button label
    */
-  public BaseXButton(final String label, final Window win) {
+  public BaseXButton(final Window win, final String label) {
     super(label);
 
     BaseXLayout.addInteraction(this, win);
@@ -58,11 +58,11 @@ public final class BaseXButton extends JButton {
    * @param icon name of image icon
    * @param toggle toggle flag
    * @param tooltip tooltip text
-   * @param gui main window
+   * @param gui reference to the main window
    * @return button
    */
   public static AbstractButton get(final String icon, final String tooltip, final boolean toggle,
-      final Window gui) {
+      final GUI gui) {
 
     final AbstractButton button = toggle ? new JToggleButton() : new JButton();
     init(button, icon, tooltip, gui);
@@ -78,10 +78,10 @@ public final class BaseXButton extends JButton {
    * @param button button reference
    * @param icon name of image icon
    * @param tooltip tooltip text
-   * @param gui main window
+   * @param gui reference to the main window
    */
   private static void init(final AbstractButton button, final String icon, final String tooltip,
-      final Window gui) {
+      final GUI gui) {
 
     button.setIcon(BaseXImages.icon(icon));
     BaseXLayout.addInteraction(button, gui);
@@ -108,7 +108,7 @@ public final class BaseXButton extends JButton {
   /**
    * Creates a new image button for the specified command.
    * @param cmd command
-   * @param gui reference to main window
+   * @param gui reference to the main window
    * @return button
    */
   public static AbstractButton command(final GUICommand cmd, final GUI gui) {

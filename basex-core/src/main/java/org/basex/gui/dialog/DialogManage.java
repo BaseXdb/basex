@@ -61,7 +61,7 @@ public final class DialogManage extends BaseXDialog {
 
     // create database chooser
     final String[] dbs = main.context.databases.list().finish();
-    choice = new BaseXList(dbs, this, false);
+    choice = new BaseXList(this, false, dbs);
     choice.setSize(200, 500);
     final Data data = main.context.data();
     if(data != null) {
@@ -76,10 +76,10 @@ public final class DialogManage extends BaseXDialog {
     detail.setFont(panel.getFont());
 
     // database buttons
-    rename = new BaseXButton(RENAME + DOTS, this);
-    copy = new BaseXButton(COPY + DOTS, this);
-    open = new BaseXButton(OPEN, this);
-    drop = new BaseXButton(DROP + DOTS, this);
+    rename = new BaseXButton(this, RENAME + DOTS);
+    copy = new BaseXButton(this, COPY + DOTS);
+    open = new BaseXButton(this, OPEN);
+    drop = new BaseXButton(this, DROP + DOTS);
 
     // first tab
     final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
@@ -90,14 +90,14 @@ public final class DialogManage extends BaseXDialog {
     doc2 = new BaseXLabel(" ").border(0, 0, 6, 0);
     doc2.setFont(doc1.getFont());
 
-    backups = new BaseXList(new String[0], this);
+    backups = new BaseXList(this);
     backups.setSize(400, 400);
 
     // backup buttons
-    backup = new BaseXButton(BACKUP, this);
-    restore = new BaseXButton(RESTORE, this);
-    delete = new BaseXButton(DELETE, this);
-    deleteAll = new BaseXButton(DELETE_ALL + DOTS, this);
+    backup = new BaseXButton(this, BACKUP);
+    restore = new BaseXButton(this, RESTORE);
+    delete = new BaseXButton(this, DELETE);
+    deleteAll = new BaseXButton(this, DELETE_ALL + DOTS);
 
     // second tab
     final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);

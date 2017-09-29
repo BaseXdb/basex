@@ -36,7 +36,7 @@ final class DialogValues extends DialogIndex {
 
     inc = type == IndexType.TOKEN ? MainOptions.TOKENINCLUDE : type == IndexType.TEXT
         ? MainOptions.TEXTINCLUDE : MainOptions.ATTRINCLUDE;
-    include = new BaseXTextField(opts.get(inc), dialog).hint(QNAME_INPUT);
+    include = new BaseXTextField(dialog, opts.get(inc)).hint(QNAME_INPUT);
     add(include);
   }
 

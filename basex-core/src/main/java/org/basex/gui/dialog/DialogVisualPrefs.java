@@ -48,20 +48,20 @@ final class DialogVisualPrefs extends BaseXBack {
 
   /**
    * Default constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    */
-  DialogVisualPrefs(final BaseXDialog d) {
+  DialogVisualPrefs(final BaseXDialog dialog) {
     border(8).setLayout(new TableLayout(2, 1, 0, 8));
-    gui = d.gui;
+    gui = dialog.gui;
 
-    final GUIOptions gopts = d.gui.gopts;
-    showNames = new BaseXCheckBox(SHOW_NAME_ATTS, GUIOptions.SHOWNAME, gopts, d);
-    treeSlims = new BaseXCheckBox(ADJUST_NODES, GUIOptions.TREESLIMS, gopts, d);
-    treeAtts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.TREEATTS, gopts, d);
-    mapAlgo = new BaseXCombo(GUIOptions.MAPALGO, gopts, MAP_LAYOUTS, d);
-    mapOffsets = new BaseXCombo(GUIOptions.MAPOFFSETS, gopts, MAP_CHOICES, d);
-    mapWeight = new BaseXSlider(0, 100, GUIOptions.MAPWEIGHT, gopts, d);
-    mapAtts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.MAPATTS, gopts, d);
+    final GUIOptions gopts = dialog.gui.gopts;
+    showNames = new BaseXCheckBox(dialog, SHOW_NAME_ATTS, GUIOptions.SHOWNAME, gopts);
+    treeSlims = new BaseXCheckBox(dialog, ADJUST_NODES, GUIOptions.TREESLIMS, gopts);
+    treeAtts = new BaseXCheckBox(dialog, SHOW_ATTS, GUIOptions.TREEATTS, gopts);
+    mapAlgo = new BaseXCombo(dialog, GUIOptions.MAPALGO, gopts, MAP_LAYOUTS);
+    mapOffsets = new BaseXCombo(dialog, GUIOptions.MAPOFFSETS, gopts, MAP_CHOICES);
+    mapWeight = new BaseXSlider(dialog, 0, 100, GUIOptions.MAPWEIGHT, gopts);
+    mapAtts = new BaseXCheckBox(dialog, SHOW_ATTS, GUIOptions.MAPATTS, gopts);
     mapAlgo.setSize((int) (GUIConstants.scale * 200), (int) (GUIConstants.scale * 100));
     BaseXLayout.setWidth(mapWeight, 150);
 
@@ -75,11 +75,11 @@ final class DialogVisualPrefs extends BaseXBack {
       c++;
       if(clzz.equals(laf)) i = c;
     }
-    lookfeel = new BaseXCombo(lafs.finish(), d);
+    lookfeel = new BaseXCombo(dialog, lafs.finish());
     lookfeel.setSelectedIndex(i);
 
-    scale = new BaseXCheckBox(SCALE_GUI, GUIOptions.SCALE, gopts, d);
-    serial = new BaseXSerial(d, gui.context.options.get(MainOptions.SERIALIZER));
+    scale = new BaseXCheckBox(dialog, SCALE_GUI, GUIOptions.SCALE, gopts);
+    serial = new BaseXSerial(dialog, gui.context.options.get(MainOptions.SERIALIZER));
 
     BaseXBack pp = new BaseXBack().layout(new TableLayout(3, 1, 0, 8)), ppp;
     ppp = new BaseXBack(new TableLayout(3, 1));

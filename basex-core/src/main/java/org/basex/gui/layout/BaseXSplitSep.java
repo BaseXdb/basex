@@ -16,15 +16,16 @@ import org.basex.gui.*;
 final class BaseXSplitSep extends BaseXBack {
   /** Size of splitter. */
   static final int SIZE = 8;
+
   /** Layout: horizontal = true, vertical = false. */
-  private final boolean l;
+  private final boolean horizontal;
 
   /**
    * Constructor.
-   * @param lay layout: horizontal = true, vertical = false
+   * @param horizontal horizontal/vertical layout
    */
-  BaseXSplitSep(final boolean lay) {
-    setCursor(lay ? GUIConstants.CURSORMOVEH : GUIConstants.CURSORMOVEV);
+  BaseXSplitSep(final boolean horizontal) {
+    setCursor(horizontal ? GUIConstants.CURSORMOVEH : GUIConstants.CURSORMOVEV);
     final MouseInputAdapter mouse = new MouseInputAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
@@ -37,7 +38,7 @@ final class BaseXSplitSep extends BaseXBack {
     };
     addMouseListener(mouse);
     addMouseMotionListener(mouse);
-    l = lay;
+    this.horizontal = horizontal;
   }
 
   @Override
@@ -49,8 +50,9 @@ final class BaseXSplitSep extends BaseXBack {
     g.setColor(GUIConstants.PANEL);
     g.fillRect(0, 0, w, h);
     g.setColor(GUIConstants.gray);
-    g.drawLine(0, 0, l ? 0 : w, l ? h : 0);
-    g.drawLine(l ? w - 1 : 0, l ? 0 : h - 1, l ? w - 1 : w, l ? h : h - 1);
+    g.drawLine(0, 0, horizontal ? 0 : w, horizontal ? h : 0);
+    g.drawLine(horizontal ? w - 1 : 0, horizontal ? 0 : h - 1,
+               horizontal ? w - 1 : w, horizontal ? h : h - 1);
   }
 
   /**
@@ -60,6 +62,6 @@ final class BaseXSplitSep extends BaseXBack {
    */
   private double pos(final MouseEvent e) {
     final Point p = getLocationOnScreen();
-    return l ? p.x + e.getX() : p.y + e.getY();
+    return horizontal ? p.x + e.getX() : p.y + e.getY();
   }
 }

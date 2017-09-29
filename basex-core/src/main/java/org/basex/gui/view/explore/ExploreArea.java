@@ -122,7 +122,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     }
 
     final String[] entries = entries(data.paths.desc(tl, true, false));
-    final BaseXCombo cm = new BaseXCombo(entries, gui);
+    final BaseXCombo cm = new BaseXCombo(gui, entries);
     cm.addActionListener(this);
     cm.addKeyListener(main);
     if(entries.length == 1) cm.setEnabled(false);
@@ -136,7 +136,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param pos position
    */
   private void addCombo(final String[] values, final int pos) {
-    final BaseXCombo cm = new BaseXCombo(values, gui);
+    final BaseXCombo cm = new BaseXCombo(gui, values);
     BaseXLayout.setWidth(cm, COMPW);
     cm.addActionListener(this);
     cm.addKeyListener(main);
@@ -151,7 +151,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param itr integer flag
    */
   private void addSlider(final double min, final double max, final int pos, final boolean itr) {
-    final BaseXDSlider sl = new BaseXDSlider(min, max, gui, this);
+    final BaseXDSlider sl = new BaseXDSlider(gui, min, max, this);
     BaseXLayout.setWidth(sl, COMPW + BaseXDSlider.LABELW);
     sl.itr = itr;
     sl.addKeyListener(main);
@@ -245,9 +245,9 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         }
       } else if(comp instanceof BaseXDSlider) {
         final BaseXDSlider slider = (BaseXDSlider) comp;
-        if(slider.min != slider.totMin || slider.max != slider.totMax) {
-          final double m = slider.min;
-          final double n = slider.max;
+        if(slider.currMin != slider.min || slider.currMax != slider.max) {
+          final double m = slider.currMin;
+          final double n = slider.currMax;
           val1 = (long) m == m ? Long.toString((long) m) : Double.toString(m);
           val2 = (long) n == n ? Long.toString((long) n) : Double.toString(n);
           pattern = PATNUM;

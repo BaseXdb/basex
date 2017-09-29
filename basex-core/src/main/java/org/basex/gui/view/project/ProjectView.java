@@ -77,7 +77,7 @@ public final class ProjectView extends BaseXPanel {
     rootPath.setText(root.file.path());
     rootPath.setEnabled(false);
 
-    final BaseXButton browse = new BaseXButton(DOTS, gui);
+    final BaseXButton browse = new BaseXButton(gui, DOTS);
     browse.setMargin(new Insets(0, 2, 0, 2));
     browse.setToolTipText(CHOOSE_DIR + DOTS);
     browse.addActionListener(e -> changeRoot());
@@ -315,7 +315,7 @@ public final class ProjectView extends BaseXPanel {
   private void changeRoot() {
     final ProjectNode child = tree.selectedNode();
     final IOFile file = (child != null ? child : root).file;
-    final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, file.path(), gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(gui, CHOOSE_DIR, file.path());
     final IOFile io = fc.select(Mode.DOPEN);
     if(io != null) changeRoot(io, true);
   }

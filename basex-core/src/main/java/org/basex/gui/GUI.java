@@ -48,7 +48,7 @@ public final class GUI extends JFrame {
   /** GUI options. */
   public final GUIOptions gopts;
 
-  /** View Manager. */
+  /** view notifier. */
   public final ViewNotifier notify;
 
   /** Status line. */
@@ -165,7 +165,7 @@ public final class GUI extends JFrame {
 
     nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
 
-    mode = new BaseXCombo(new String[] { FIND, XQUERY, COMMAND }, this);
+    mode = new BaseXCombo(this, FIND, XQUERY, COMMAND);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {

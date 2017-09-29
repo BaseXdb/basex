@@ -105,7 +105,7 @@ public final class DialogProps extends BaseXDialog {
     }
     // create/drop buttons for values indexes
     for(int l = IndexType.TEXT.ordinal(); l < ll; l++) {
-      buttons[l] = new BaseXButton(" ", this);
+      buttons[l] = new BaseXButton(this, " ");
       BaseXLayout.setHeight(panels[l], 160);
     }
     // no full-text index in main-memory mode
@@ -173,8 +173,8 @@ public final class DialogProps extends BaseXDialog {
     });
     tabsPanel.add(tabs, BorderLayout.CENTER);
 
-    optimize = new BaseXButton(OPTIMIZE, this);
-    optimizeAll = new BaseXButton(OPTIMIZE_ALL, this);
+    optimize = new BaseXButton(this, OPTIMIZE);
+    optimizeAll = new BaseXButton(this, OPTIMIZE_ALL);
     optimizeAll.setEnabled(!gui.context.data().inMemory());
     tabsPanel.add(newButtons(optimize, optimizeAll), BorderLayout.SOUTH);
 

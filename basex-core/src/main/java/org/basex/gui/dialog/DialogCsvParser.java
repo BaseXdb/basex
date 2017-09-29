@@ -50,25 +50,25 @@ final class DialogCsvParser extends DialogParser {
 
   /**
    * Constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    * @param opts main options
    */
-  DialogCsvParser(final BaseXDialog d, final MainOptions opts) {
-    super(d);
+  DialogCsvParser(final BaseXDialog dialog, final MainOptions opts) {
+    super(dialog);
     copts = new CsvParserOptions(opts.get(MainOptions.CSVPARSER));
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
 
     p.add(new BaseXLabel(ENCODING + COL, true, true));
-    encoding = encoding(d, copts.get(CsvParserOptions.ENCODING));
+    encoding = encoding(dialog, copts.get(CsvParserOptions.ENCODING));
     p.add(encoding);
 
     final BaseXBack sep = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
     final StringList csv = new StringList();
     for(final CsvSep cs : CsvSep.values()) csv.add(cs.toString());
     final String[] sa = csv.toArray();
-    seps = new BaseXCombo(csv.add("").finish(), d);
+    seps = new BaseXCombo(dialog, csv.add("").finish());
     sep.add(seps);
 
     final String s = copts.get(CsvOptions.SEPARATOR);
@@ -77,7 +77,7 @@ final class DialogCsvParser extends DialogParser {
     } else {
       seps.setSelectedIndex(sa.length);
     }
-    sepchar = new BaseXTextField(s, d);
+    sepchar = new BaseXTextField(dialog, s);
     sepchar.setColumns(2);
     sep.add(sepchar);
 
@@ -89,26 +89,26 @@ final class DialogCsvParser extends DialogParser {
     final int fl = formats.length - 1;
     final StringList frmts = new StringList(fl);
     for(int f = 0; f < fl; f++) frmts.add(formats[f].toString());
-    format = new BaseXCombo(frmts.finish(), d);
+    format = new BaseXCombo(dialog, frmts.finish());
     format.setSelectedItem(copts.get(CsvOptions.FORMAT));
     p.add(format);
     pp.add(p);
 
     p = new BaseXBack(new TableLayout(4, 1));
-    header = new BaseXCheckBox(FIRST_LINE_HEADER, CsvOptions.HEADER, copts, d);
+    header = new BaseXCheckBox(dialog, FIRST_LINE_HEADER, CsvOptions.HEADER, copts);
     p.add(header);
-    quotes = new BaseXCheckBox(PARSE_QUOTES, CsvOptions.QUOTES, copts, d);
+    quotes = new BaseXCheckBox(dialog, PARSE_QUOTES, CsvOptions.QUOTES, copts);
     p.add(quotes);
-    backslashes = new BaseXCheckBox(BACKSLASHES, CsvOptions.BACKSLASHES, copts, d);
+    backslashes = new BaseXCheckBox(dialog, BACKSLASHES, CsvOptions.BACKSLASHES, copts);
     p.add(backslashes);
-    lax = new BaseXCheckBox(LAX_NAME_CONVERSION, CsvOptions.LAX, copts, d);
+    lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, CsvOptions.LAX, copts);
     p.add(lax);
 
     pp.add(p);
 
     add(pp, BorderLayout.WEST);
 
-    example = new TextPanel(false, d);
+    example = new TextPanel(false, dialog);
 
     add(example, BorderLayout.CENTER);
     action(true);

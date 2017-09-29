@@ -86,10 +86,10 @@ public final class EditorView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public EditorView(final ViewNotifier man) {
-    super(EDITORVIEW, man);
+  public EditorView(final ViewNotifier notifier) {
+    super(EDITORVIEW, notifier);
     layout(new BorderLayout());
     setBackground(PANEL);
 
@@ -361,7 +361,7 @@ public final class EditorView extends View {
    */
   public void open() {
     // open file chooser for XML creation
-    final BaseXFileChooser fc = new BaseXFileChooser(OPEN, gui.gopts.get(GUIOptions.WORKPATH), gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(gui, OPEN, gui.gopts.get(GUIOptions.WORKPATH));
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
@@ -385,7 +385,7 @@ public final class EditorView extends View {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
     final String path = edit.opened() ? edit.file().path() : gui.gopts.get(GUIOptions.WORKPATH);
-    final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS, path, gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(gui, SAVE_AS, path);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();

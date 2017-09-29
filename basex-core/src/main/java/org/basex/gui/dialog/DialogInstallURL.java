@@ -26,7 +26,7 @@ final class DialogInstallURL extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param dialog reference to main dialog
+   * @param dialog dialog reference
    */
   DialogInstallURL(final BaseXDialog dialog) {
     super(dialog, INSTALL_FROM_URL);

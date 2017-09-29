@@ -35,18 +35,19 @@ final class DialogParsing extends BaseXBack {
 
   /**
    * Default constructor.
-   * @param d dialog reference
-   * @param t tabs
+   * @param dialog dialog reference
+   * @param tabs tabs
    */
-  DialogParsing(final BaseXDialog d, final BaseXTabs t) {
+  DialogParsing(final BaseXDialog dialog, final BaseXTabs tabs) {
     border(8);
-    gui = d.gui;
-    tabs = t;
+    gui = dialog.gui;
+    this.tabs = tabs;
     label = new BaseXLabel().border(0, 0, 8, 0).large();
 
     final MainOptions opts = gui.context.options;
-    parsers = new DialogParser[] { new DialogXmlParser(d, opts), new DialogHtmlParser(d, opts),
-      new DialogJsonParser(d, opts), new DialogCsvParser(d, opts), new DialogTextParser(d, opts)
+    parsers = new DialogParser[] { new DialogXmlParser(dialog, opts),
+        new DialogHtmlParser(dialog, opts), new DialogJsonParser(dialog, opts),
+        new DialogCsvParser(dialog, opts), new DialogTextParser(dialog, opts)
     };
 
     setLayout(new BorderLayout());

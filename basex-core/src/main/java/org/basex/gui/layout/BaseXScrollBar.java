@@ -60,11 +60,12 @@ public final class BaseXScrollBar extends BaseXPanel {
   /**
    * Default constructor. By default, the scrollbar is switched off
    * if the component is completely displayed.
-   * @param cmp reference to the scrolled component
+   * @param comp reference to the scrolled component
    */
-  public BaseXScrollBar(final BaseXPanel cmp) {
-    super(cmp.gui);
-    comp = cmp;
+  public BaseXScrollBar(final BaseXPanel comp) {
+    super(comp.gui);
+    this.comp = comp;
+
     addMouseListener(this);
     addKeyListener(this);
     addMouseMotionListener(this);

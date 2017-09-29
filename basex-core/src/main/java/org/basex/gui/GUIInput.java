@@ -23,7 +23,7 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class GUIInput extends BaseXTextField {
-  /** Reference to main window. */
+  /** reference to the main window. */
   private final GUI gui;
   /** JComboBox. */
   private final BaseXCombo box;

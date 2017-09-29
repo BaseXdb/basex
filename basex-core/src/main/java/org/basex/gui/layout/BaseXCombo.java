@@ -22,47 +22,47 @@ public final class BaseXCombo extends JComboBox<Object> {
 
   /**
    * Constructor.
+   * @param win parent window
    * @param option option
    * @param options options
    * @param values combobox values
-   * @param win parent window
    */
-  public BaseXCombo(final NumberOption option, final Options options, final String[] values,
-      final Window win) {
-    this(option, options, values, values[options.get(option)], win);
+  public BaseXCombo(final Window win, final NumberOption option, final Options options,
+      final String... values) {
+    this(win, option, options, values[options.get(option)], values);
   }
 
   /**
    * Constructor.
+   * @param win parent window
    * @param option option
    * @param options options
-   * @param win parent window
    */
-  public BaseXCombo(final BooleanOption option, final Options options, final Window win) {
-    this(option, options, new String[] { "true", "false" }, options.get(option), win);
+  public BaseXCombo(final Window win, final BooleanOption option, final Options options) {
+    this(win, option, options, options.get(option), "true", "false");
   }
 
   /**
    * Constructor.
+   * @param win parent window
    * @param option option
    * @param options options
-   * @param win parent window
    */
-  public BaseXCombo(final EnumOption<?> option, final Options options, final Window win) {
-    this(option, options, option.strings(), options.get(option), win);
+  public BaseXCombo(final Window win, final EnumOption<?> option, final Options options) {
+    this(win, option, options, options.get(option), option.strings());
   }
 
   /**
    * Constructor.
+   * @param win parent window
    * @param option option
    * @param options options
-   * @param values values
    * @param selected selected value
-   * @param win parent window
+   * @param values values
    */
-  private BaseXCombo(final Option<?> option, final Options options, final String[] values,
-      final Object selected, final Window win) {
-    this(values, win);
+  private BaseXCombo(final Window win, final Option<?> option, final Options options,
+      final Object selected, final String... values) {
+    this(win, values);
     this.options = options;
     this.option = option;
     setSelectedItem(selected.toString());
@@ -71,17 +71,9 @@ public final class BaseXCombo extends JComboBox<Object> {
   /**
    * Constructor.
    * @param win parent window
-   */
-  public BaseXCombo(final Window win) {
-    this(new String[] {}, win);
-  }
-
-  /**
-   * Constructor.
    * @param values combobox values
-   * @param win parent window
    */
-  public BaseXCombo(final String[] values, final Window win) {
+  public BaseXCombo(final Window win, final String... values) {
     super(values);
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof BaseXDialog)) return;

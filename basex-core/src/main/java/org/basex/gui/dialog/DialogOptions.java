@@ -30,25 +30,25 @@ public class DialogOptions extends BaseXBack {
 
   /**
    * Default constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    * @param data data reference (can be {@code null})
    */
-  DialogOptions(final BaseXDialog d, final Data data) {
-    gui = d.gui;
+  DialogOptions(final BaseXDialog dialog, final Data data) {
+    gui = dialog.gui;
     if(data != null) {
       final MetaData meta = data.meta;
-      maxlen = new BaseXTextField(Integer.toString(meta.maxlen), d);
-      maxcats = new BaseXTextField(Integer.toString(meta.maxcats), d);
-      splitsize = new BaseXTextField(Integer.toString(meta.splitsize), d);
-      updindex = new BaseXCheckBox(UPD_INDEX, meta.updindex, d);
-      autooptimize = new BaseXCheckBox(AUTOOPTIMIZE, meta.autooptimize, d);
+      maxlen = new BaseXTextField(dialog, Integer.toString(meta.maxlen));
+      maxcats = new BaseXTextField(dialog, Integer.toString(meta.maxcats));
+      splitsize = new BaseXTextField(dialog, Integer.toString(meta.splitsize));
+      updindex = new BaseXCheckBox(dialog, UPD_INDEX, meta.updindex);
+      autooptimize = new BaseXCheckBox(dialog, AUTOOPTIMIZE, meta.autooptimize);
     } else {
-      final MainOptions opts = d.gui.context.options;
-      maxlen = new BaseXTextField(MainOptions.MAXLEN, opts, d);
-      maxcats = new BaseXTextField(MainOptions.MAXCATS, opts, d);
-      splitsize = new BaseXTextField(MainOptions.SPLITSIZE, opts, d);
-      updindex = new BaseXCheckBox(UPD_INDEX, MainOptions.UPDINDEX, opts, d);
-      autooptimize = new BaseXCheckBox(AUTOOPTIMIZE, MainOptions.AUTOOPTIMIZE, opts, d);
+      final MainOptions opts = dialog.gui.context.options;
+      maxlen = new BaseXTextField(dialog, MainOptions.MAXLEN, opts);
+      maxcats = new BaseXTextField(dialog, MainOptions.MAXCATS, opts);
+      splitsize = new BaseXTextField(dialog, MainOptions.SPLITSIZE, opts);
+      updindex = new BaseXCheckBox(dialog, UPD_INDEX, MainOptions.UPDINDEX, opts);
+      autooptimize = new BaseXCheckBox(dialog, AUTOOPTIMIZE, MainOptions.AUTOOPTIMIZE, opts);
     }
     maxlen.setColumns(8);
     maxcats.setColumns(8);

@@ -54,10 +54,10 @@ public final class FolderView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public FolderView(final ViewNotifier man) {
-    super(FOLDERVIEW, man);
+  public FolderView(final ViewNotifier notifier) {
+    super(FOLDERVIEW, notifier);
     createBoxes();
     layout(new BorderLayout());
     scroll = new BaseXScrollBar(this);

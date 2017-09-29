@@ -51,7 +51,7 @@ public final class DialogNew extends BaseXDialog {
     final MainOptions opts = gui.context.options;
     final GUIOptions gopts = main.gopts;
 
-    dbName = new BaseXTextField(gopts.get(GUIOptions.DBNAME), this);
+    dbName = new BaseXTextField(this, gopts.get(GUIOptions.DBNAME));
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
     pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
@@ -66,11 +66,11 @@ public final class DialogNew extends BaseXDialog {
       new DialogValues(this, IndexType.TEXT), new DialogValues(this, IndexType.ATTRIBUTE),
       new DialogValues(this, IndexType.TOKEN), new DialogFT(this, true)
     };
-    textindex = new BaseXCheckBox(TEXT_INDEX, MainOptions.TEXTINDEX, opts, this).bold().large();
-    attrindex = new BaseXCheckBox(ATTRIBUTE_INDEX, MainOptions.ATTRINDEX, opts, this).bold().
+    textindex = new BaseXCheckBox(this, TEXT_INDEX, MainOptions.TEXTINDEX, opts).bold().large();
+    attrindex = new BaseXCheckBox(this, ATTRIBUTE_INDEX, MainOptions.ATTRINDEX, opts).bold().
         large();
-    tokenindex = new BaseXCheckBox(TOKEN_INDEX, MainOptions.TOKENINDEX, opts, this).bold().large();
-    ftindex = new BaseXCheckBox(FULLTEXT_INDEX, MainOptions.FTINDEX, opts, this).bold().large();
+    tokenindex = new BaseXCheckBox(this, TOKEN_INDEX, MainOptions.TOKENINDEX, opts).bold().large();
+    ftindex = new BaseXCheckBox(this, FULLTEXT_INDEX, MainOptions.FTINDEX, opts).bold().large();
 
     // index panel
     final BaseXBack indexPanel = new BaseXBack(new TableLayout(8, 1)).border(8);

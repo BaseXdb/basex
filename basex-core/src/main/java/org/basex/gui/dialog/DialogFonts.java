@@ -50,16 +50,16 @@ public final class DialogFonts extends BaseXDialog {
     fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 4, 8, 0));
-    font = new BaseXList(fonts, this);
+    font = new BaseXList(this, fonts);
     font.setWidth(200);
     p.add(font);
-    font2 = new BaseXList(fonts, this);
+    font2 = new BaseXList(this, fonts);
     font2.setWidth(200);
     p.add(font2);
-    type = new BaseXList(FONT_TYPES, this);
+    type = new BaseXList(this, FONT_TYPES);
     type.setWidth(90);
     p.add(type);
-    size = new BaseXList(SIZES, this);
+    size = new BaseXList(this, SIZES);
     size.setWidth(50);
     p.add(size);
 
@@ -70,7 +70,7 @@ public final class DialogFonts extends BaseXDialog {
     font.setValue(gopts.get(GUIOptions.FONT));
 
     p.add(new BaseXBack());
-    onlyMono = new BaseXCheckBox("Monospace", GUIOptions.ONLYMONO, gopts, this);
+    onlyMono = new BaseXCheckBox(this, "Monospace", GUIOptions.ONLYMONO, gopts);
     p.add(onlyMono);
 
     set(p, BorderLayout.CENTER);

@@ -29,10 +29,10 @@ public final class ExploreView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public ExploreView(final ViewNotifier man) {
-    super(EXPLOREVIEW, man);
+  public ExploreView(final ViewNotifier notifier) {
+    super(EXPLOREVIEW, notifier);
     border(5).layout(new BorderLayout(0, 4));
 
     header = new BaseXHeader(EXPLORER);

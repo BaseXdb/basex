@@ -84,10 +84,10 @@ public final class TreeView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public TreeView(final ViewNotifier man) {
-    super(TREEVIEW, man);
+  public TreeView(final ViewNotifier notifier) {
+    super(TREEVIEW, notifier);
     new BaseXPopup(this, POPUP);
   }
 

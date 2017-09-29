@@ -7,7 +7,7 @@ import javax.swing.*;
 import org.basex.util.options.*;
 
 /**
- * Project specific CheckBox implementation.
+ * Project specific check box implementation.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
@@ -20,26 +20,26 @@ public final class BaseXCheckBox extends JCheckBox {
 
   /**
    * Checkbox.
-   * @param label checkbox text
-   * @param opt option
-   * @param opts options
    * @param win parent window
+   * @param label checkbox text
+   * @param option option
+   * @param options options
    */
-  public BaseXCheckBox(final String label, final BooleanOption opt, final Options opts,
-      final Window win) {
-    this(label, opts.get(opt), win);
-    options = opts;
-    option = opt;
+  public BaseXCheckBox(final Window win, final String label, final BooleanOption option,
+      final Options options) {
+    this(win, label, options.get(option));
+    this.options = options;
+    this.option = option;
   }
 
   /**
    * Checkbox.
-   * @param label checkbox text
-   * @param sel initial selection state
    * @param win parent window
+   * @param label checkbox text
+   * @param selected initial selection state
    */
-  public BaseXCheckBox(final String label, final boolean sel, final Window win) {
-    super(label, sel);
+  public BaseXCheckBox(final Window win, final String label, final boolean selected) {
+    super(label, selected);
     setOpaque(false);
     setMargin(new Insets(0, 0, 0, 0));
 

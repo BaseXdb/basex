@@ -79,20 +79,21 @@ public final class SearchBar extends BaseXBack {
 
   /**
    * Constructor.
-   * @param main gui reference
+   * @param gui gui reference
    */
-  SearchBar(final GUI main) {
+  SearchBar(final GUI gui) {
+    this.gui = gui;
+
     layout(new BorderLayout(2, 0));
     setOpaque(false);
     setVisible(false);
 
-    gui = main;
-    search = new BaseXTextField(main);
-    search.history(GUIOptions.SEARCHED, main).hint(Text.FIND + Text.DOTS);
+    search = new BaseXTextField(gui);
+    search.history(GUIOptions.SEARCHED).hint(Text.FIND + Text.DOTS);
     search.setPreferredSize(null);
 
-    replace = new BaseXTextField(main);
-    replace.history(GUIOptions.REPLACED, main).hint(Text.REPLACE_WITH + Text.DOTS);
+    replace = new BaseXTextField(gui);
+    replace.history(GUIOptions.REPLACED).hint(Text.REPLACE_WITH + Text.DOTS);
     replace.setPreferredSize(null);
 
     mcase = button("f_case", Text.MATCH_CASE);
@@ -101,9 +102,9 @@ public final class SearchBar extends BaseXBack {
     multi = button("f_multi", Text.MULTI_LINE);
     modeButtons = new AbstractButton[] { mcase, word, regex, multi };
 
-    rplc  = BaseXButton.get("f_replace", Text.REPLACE_ALL, false, main);
+    rplc  = BaseXButton.get("f_replace", Text.REPLACE_ALL, false, gui);
     cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
-        false, main);
+        false, gui);
 
     // add interaction to search field
     search.addKeyListener(new KeyAdapter() {
@@ -157,9 +158,9 @@ public final class SearchBar extends BaseXBack {
     });
 
     // set initial values
-    final String[] searched = main.gopts.get(GUIOptions.SEARCHED);
+    final String[] searched = gui.gopts.get(GUIOptions.SEARCHED);
     if(searched.length > 0) setSearch(searched[0]);
-    final String[] replaced = main.gopts.get(GUIOptions.REPLACED);
+    final String[] replaced = gui.gopts.get(GUIOptions.REPLACED);
     if(replaced.length > 0) replace.setText(replaced[0]);
     initModes();
     setModes(modeHistory.get(search.getText()));

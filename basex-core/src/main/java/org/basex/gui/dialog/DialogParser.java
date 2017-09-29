@@ -24,11 +24,11 @@ abstract class DialogParser extends BaseXBack {
 
   /**
    * Constructor.
-   * @param d parent dialog
+   * @param dialog parent dialog
    */
-  DialogParser(final BaseXDialog d) {
+  DialogParser(final BaseXDialog dialog) {
+    this.dialog = dialog;
     setLayout(new BorderLayout(16, 0));
-    dialog = d;
   }
 
   /**
@@ -79,7 +79,7 @@ abstract class DialogParser extends BaseXBack {
    * @return combo box
    */
   static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {
-    final BaseXCombo cb = new BaseXCombo(ENCODINGS, dialog);
+    final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
     boolean f = false;
     String enc = encoding == null ? Strings.UTF8 : encoding;
     for(final String s : ENCODINGS) f |= s.equals(enc);

@@ -43,13 +43,13 @@ public final class BaseXLayout {
   private BaseXLayout() { }
 
   /**
-   * Sets the help text for the specified component.
-   * @param cont input container
+   * If enabled, focuses the specified component.
+   * @param comp component to be focused
    */
-  static void focus(final Component cont) {
-    final GUI gui = gui(cont);
+  static void focus(final Component comp) {
+    final GUI gui = gui(comp);
     if(gui == null) return;
-    if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && cont.isEnabled()) cont.requestFocusInWindow();
+    if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && comp.isEnabled()) comp.requestFocusInWindow();
   }
 
   /**
@@ -79,13 +79,17 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns the GUI reference of the specified container.
-   * @param cont input container
-   * @return gui
+   * Returns the ancestor GUI reference of the specified component.
+   * @param comp component
+   * @return reference to the main window or {@code null}
    */
-  private static GUI gui(final Component cont) {
-    final Container c = cont.getParent();
-    return c == null || c instanceof GUI ? (GUI) c : gui(c);
+  private static GUI gui(final Component comp) {
+    Component c = comp;
+    do {
+      if(c instanceof GUI) return (GUI) c;
+      c = c.getParent();
+    } while(c != null);
+    return null;
   }
 
   /**
@@ -269,7 +273,7 @@ public final class BaseXLayout {
     if(win instanceof GUI) {
       comp.addKeyListener(globalShortcuts((GUI) win));
     } else {
-      throw Util.notExpected("Reference to main window expected.");
+      throw Util.notExpected("reference to the main window expected.");
     }
   }
 

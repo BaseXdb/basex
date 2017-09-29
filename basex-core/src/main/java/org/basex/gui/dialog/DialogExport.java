@@ -40,11 +40,11 @@ public final class DialogExport extends BaseXDialog {
     // output label
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
-    path = new BaseXTextField(main.gopts.get(GUIOptions.INPUTPATH), this);
-    path.history(GUIOptions.INPUTS, this);
+    path = new BaseXTextField(this, main.gopts.get(GUIOptions.INPUTPATH));
+    path.history(GUIOptions.INPUTS);
     pp.add(path);
 
-    final BaseXButton browse = new BaseXButton(BROWSE_D, this);
+    final BaseXButton browse = new BaseXButton(this, BROWSE_D);
     browse.addActionListener(e -> choose());
     pp.add(browse);
     p.add(pp);
@@ -72,7 +72,7 @@ public final class DialogExport extends BaseXDialog {
    * Opens a file dialog to choose an XML document or directory.
    */
   private void choose() {
-    final IOFile io = new BaseXFileChooser(CHOOSE_DIR, path.getText(), this).select(Mode.DOPEN);
+    final IOFile io = new BaseXFileChooser(this, CHOOSE_DIR, path.getText()).select(Mode.DOPEN);
     if(io != null) path.setText(io.path());
   }
 

@@ -36,50 +36,50 @@ final class DialogXmlParser extends DialogParser {
 
   /**
    * Constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    * @param opts main options
    */
-  DialogXmlParser(final BaseXDialog d, final MainOptions opts) {
-    super(d);
+  DialogXmlParser(final BaseXDialog dialog, final MainOptions opts) {
+    super(dialog);
     final BaseXBack pp = new BaseXBack(new TableLayout(10, 1));
 
-    intparse = new BaseXCheckBox(INT_PARSER, MainOptions.INTPARSE, opts, d).bold();
+    intparse = new BaseXCheckBox(dialog, INT_PARSER, MainOptions.INTPARSE, opts).bold();
     pp.add(intparse);
     pp.add(new BaseXLabel(H_INT_PARSER, true, false));
 
-    dtd = new BaseXCheckBox(PARSE_DTDS, MainOptions.DTD, opts, d).bold();
+    dtd = new BaseXCheckBox(dialog, PARSE_DTDS, MainOptions.DTD, opts).bold();
     pp.add(dtd);
 
-    stripNS = new BaseXCheckBox(STRIP_NS, MainOptions.STRIPNS, opts, d).bold();
+    stripNS = new BaseXCheckBox(dialog, STRIP_NS, MainOptions.STRIPNS, opts).bold();
     pp.add(stripNS);
 
-    chopWS = new BaseXCheckBox(CHOP_WS, MainOptions.CHOP, opts, d).bold();
+    chopWS = new BaseXCheckBox(dialog, CHOP_WS, MainOptions.CHOP, opts).bold();
     pp.add(chopWS);
     pp.add(new BaseXLabel(H_CHOP_WS, false, false).border(0, 0, 8, 0));
     pp.add(new BaseXLabel());
 
     // XInclude
-    xinclude = new BaseXCheckBox(USE_XINCLUDE, MainOptions.XINCLUDE, opts, d).bold();
+    xinclude = new BaseXCheckBox(dialog, USE_XINCLUDE, MainOptions.XINCLUDE, opts).bold();
     pp.add(xinclude);
 
     // catalog resolver
     final boolean cat = !opts.get(MainOptions.CATFILE).isEmpty();
-    usecat = new BaseXCheckBox(USE_CATALOG_FILE, cat, d).bold();
+    usecat = new BaseXCheckBox(dialog, USE_CATALOG_FILE, cat).bold();
     final boolean rsen = CatalogWrapper.available();
     final BaseXBack cr = new BaseXBack(new TableLayout(2, 2, 8, 0));
     usecat.setEnabled(rsen);
     cr.add(usecat);
     cr.add(new BaseXLabel());
 
-    cfile = new BaseXTextField(opts.get(MainOptions.CATFILE), d);
+    cfile = new BaseXTextField(dialog, opts.get(MainOptions.CATFILE));
     cfile.setEnabled(rsen);
     cr.add(cfile);
 
-    browsec = new BaseXButton(BROWSE_D, d);
+    browsec = new BaseXButton(dialog, BROWSE_D);
     browsec.addActionListener(e -> {
       final GUIOptions gopts = dialog.gui.gopts;
-      final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gopts.get(GUIOptions.INPUTPATH), dialog).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
+      final BaseXFileChooser fc = new BaseXFileChooser(dialog,
+        FILE_OR_DIR, gopts.get(GUIOptions.INPUTPATH)).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
       final IO file = fc.select(Mode.FDOPEN);
       if(file != null) cfile.setText(file.path());

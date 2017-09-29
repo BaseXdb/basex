@@ -17,7 +17,7 @@ import org.basex.gui.*;
  * @author Lukas Kircher
  */
 public final class BaseXPopup extends JPopupMenu {
-  /** Reference to main window. */
+  /** reference to the main window. */
   private final GUI gui;
   /** Popup commands. */
   private final GUICommand[] commands;
@@ -38,8 +38,8 @@ public final class BaseXPopup extends JPopupMenu {
    * @param commands associated commands
    */
   public BaseXPopup(final JComponent comp, final GUI gui, final GUICommand... commands) {
-    this.commands = commands;
     this.gui = gui;
+    this.commands = commands;
 
     // both listeners must be implemented to support different platforms
     comp.addMouseListener(new MouseAdapter() {

@@ -58,10 +58,10 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public InfoView(final ViewNotifier man) {
-    super(GUIConstants.INFOVIEW, man);
+  public InfoView(final ViewNotifier notifier) {
+    super(GUIConstants.INFOVIEW, notifier);
     border(5).layout(new BorderLayout(0, 5));
 
     header = new BaseXHeader(QUERY_INFO);

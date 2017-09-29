@@ -54,7 +54,7 @@ final class DialogFT extends DialogIndex {
     final MainOptions opts = dialog.gui.context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
 
-    ftinc = new BaseXTextField(opts.get(MainOptions.FTINCLUDE), dialog).hint(QNAME_INPUT);
+    ftinc = new BaseXTextField(dialog, opts.get(MainOptions.FTINCLUDE)).hint(QNAME_INPUT);
     add(ftinc);
 
     final String sw = opts.get(MainOptions.STOPWORDS);
@@ -67,7 +67,7 @@ final class DialogFT extends DialogIndex {
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     final int cl = check.length;
     for(int c = 0; c < cl; ++c) {
-      check[c] = new BaseXCheckBox(cb[c], val[c], dialog);
+      check[c] = new BaseXCheckBox(dialog, cb[c], val[c]);
       if(create) {
         check[c].setToolTipText(desc[c]);
       } else {
@@ -79,7 +79,7 @@ final class DialogFT extends DialogIndex {
     final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(12, 0, 0, 0);
     b1.add(check[F_LANG]);
     final String[] langs = FTLexer.languages().finish();
-    language = new BaseXCombo(langs, dialog);
+    language = new BaseXCombo(dialog, langs);
     final Language ln = Language.get(opts);
     for(final String l : langs) {
       final String s = l.replaceFirst(" \\(.*", "");
@@ -99,10 +99,10 @@ final class DialogFT extends DialogIndex {
     add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     swpath = new BaseXTextField(
-        sw.isEmpty() ? dialog.gui.gopts.get(GUIOptions.DATAPATH) : sw, dialog);
+        dialog, sw.isEmpty() ? dialog.gui.gopts.get(GUIOptions.DATAPATH) : sw);
     b3.add(swpath);
 
-    swbrowse = new BaseXButton(BROWSE_D, dialog);
+    swbrowse = new BaseXButton(dialog, BROWSE_D);
     swbrowse.addActionListener(e -> chooseStop());
     b3.add(swbrowse);
     add(b3);
@@ -114,8 +114,8 @@ final class DialogFT extends DialogIndex {
    */
   private void chooseStop() {
     final GUIOptions gopts = dialog.gui.gopts;
-    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gopts.get(GUIOptions.DATAPATH), dialog);
+    final BaseXFileChooser fc = new BaseXFileChooser(dialog,
+        FILE_OR_DIR, gopts.get(GUIOptions.DATAPATH));
     final IO file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());

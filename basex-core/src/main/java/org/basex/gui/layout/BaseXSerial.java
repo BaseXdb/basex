@@ -44,7 +44,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
     panel = new BaseXBack(new TableLayout(1, 2, 8, 0));
     this.dialog = dialog;
 
-    params = new BaseXCombo(sopts.names(), dialog);
+    params = new BaseXCombo(dialog, sopts.names());
     panel.add(params);
     add(panel);
 
@@ -91,7 +91,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
 
     final Component comp;
     if(option == SerializerOptions.ENCODING) {
-      final BaseXCombo combo = new BaseXCombo(GUIConstants.ENCODINGS, dialog);
+      final BaseXCombo combo = new BaseXCombo(dialog, GUIConstants.ENCODINGS);
       combo.setSelectedItem(options.get(option));
       combo.addActionListener(e -> {
         options.set((StringOption) option, combo.getSelectedItem());
@@ -99,13 +99,13 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
       });
       comp = combo;
     } else if(option instanceof StringOption) {
-      comp = addInput(new BaseXTextField((StringOption) option, options, dialog));
+      comp = addInput(new BaseXTextField(dialog, (StringOption) option, options));
     } else if(option instanceof NumberOption) {
-      comp = addInput(new BaseXTextField((NumberOption) option, options, dialog));
+      comp = addInput(new BaseXTextField(dialog, (NumberOption) option, options));
     } else if(option instanceof BooleanOption) {
-      comp = addCombo(new BaseXCombo((BooleanOption) option, options, dialog));
+      comp = addCombo(new BaseXCombo(dialog, (BooleanOption) option, options));
     } else if(option instanceof EnumOption) {
-      comp = addCombo(new BaseXCombo((EnumOption<?>) option, options, dialog));
+      comp = addCombo(new BaseXCombo(dialog, (EnumOption<?>) option, options));
     } else if(option instanceof OptionsOption) {
       comp = addOption((OptionsOption<?>) option, options);
     } else {
@@ -158,7 +158,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
     final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
     final Options opts = options.get(option);
     options.put(option, opts);
-    final BaseXCombo combo = new BaseXCombo(opts.names(), dialog);
+    final BaseXCombo combo = new BaseXCombo(dialog, opts.names());
     combo.addActionListener(e -> update(opts.option(combo.getSelectedItem()), opts, p));
     p.add(combo);
     return p;

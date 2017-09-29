@@ -94,28 +94,28 @@ public final class PlotView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public PlotView(final ViewNotifier man) {
-    super(PLOTVIEW, man);
+  public PlotView(final ViewNotifier notifier) {
+    super(PLOTVIEW, notifier);
     border(5).layout(new BorderLayout());
 
     final BaseXBack panel = new BaseXBack(false).layout(new BorderLayout());
 
     Box box = new Box(BoxLayout.X_AXIS);
-    xLog = new BaseXCheckBox(PLOTLOG, false, gui);
+    xLog = new BaseXCheckBox(gui, PLOTLOG, false);
     xLog.setSelected(gui.gopts.get(GUIOptions.PLOTXLOG));
     xLog.addActionListener(e -> {
       gui.gopts.invert(GUIOptions.PLOTXLOG);
       refreshUpdate();
     });
-    dots = new BaseXSlider(-6, 6, GUIOptions.PLOTDOTS, gui.gopts, gui);
+    dots = new BaseXSlider(gui, -6, 6, GUIOptions.PLOTDOTS, gui.gopts);
     dots.addActionListener(e -> {
       dots.assign();
       refreshLayout();
     });
     BaseXLayout.setWidth(dots, 40);
-    yLog = new BaseXCheckBox(PLOTLOG, false, gui);
+    yLog = new BaseXCheckBox(gui, PLOTLOG, false);
     yLog.setSelected(gui.gopts.get(GUIOptions.PLOTYLOG));
     yLog.addActionListener(e -> {
       gui.gopts.invert(GUIOptions.PLOTYLOG);

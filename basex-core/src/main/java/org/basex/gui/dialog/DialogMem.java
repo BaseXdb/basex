@@ -40,7 +40,7 @@ public final class DialogMem extends BaseXDialog {
     text.setFont(panel.getFont());
     set(text, BorderLayout.CENTER);
 
-    gc = new BaseXButton("GC", this);
+    gc = new BaseXButton(this, "GC");
     final BaseXBack buttons = newButtons(gc);
     set(buttons, BorderLayout.SOUTH);
     addTimer();

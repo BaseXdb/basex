@@ -24,8 +24,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class BaseXList extends BaseXBack {
-  /** Single choice. */
-  private final boolean single;
   /** Text field. */
   private final BaseXTextField text;
   /** List. */
@@ -40,29 +38,28 @@ public final class BaseXList extends BaseXBack {
 
   /**
    * Default constructor.
+   * @param dialog dialog reference
    * @param choice the input values for the list
-   * @param d dialog reference
    */
-  public BaseXList(final String[] choice, final BaseXDialog d) {
-    this(choice, d, true);
+  public BaseXList(final BaseXDialog dialog, final String... choice) {
+    this(dialog, true, choice);
   }
 
   /**
    * Default constructor.
+   * @param dialog dialog reference
+   * @param single only allow single choices
    * @param choice the input values for the list
-   * @param d dialog reference
-   * @param s only allow single choices
    */
-  public BaseXList(final String[] choice, final BaseXDialog d, final boolean s) {
+  public BaseXList(final BaseXDialog dialog, final boolean single, final String... choice) {
     // cache list values
     values = choice.clone();
-    single = s;
 
     // checks if list is purely numeric
     for(final String v : values) num = num && v.matches("[0-9]+");
 
     layout(new TableLayout(2, 1));
-    text = new BaseXTextField(d);
+    text = new BaseXTextField(dialog);
     text.addKeyListener(new KeyAdapter() {
       boolean multi, typed;
       String old = "";
@@ -149,7 +146,7 @@ public final class BaseXList extends BaseXBack {
           }
           list.setSelectedIndices(il.finish());
         }
-        d.action(BaseXList.this);
+        dialog.action(BaseXList.this);
         typed = false;
         old = txt;
       }
@@ -167,7 +164,7 @@ public final class BaseXList extends BaseXBack {
         text.setText(vals.size() == 1 ? vals.get(0) : "");
         text.requestFocusInWindow();
         text.selectAll();
-        d.action(BaseXList.this);
+        dialog.action(BaseXList.this);
       }
       @Override
       public void mouseDragged(final MouseEvent e) {
@@ -175,18 +172,18 @@ public final class BaseXList extends BaseXBack {
       }
       @Override
       public void mouseClicked(final MouseEvent e) {
-        if(e.getClickCount() == 2) d.close();
+        if(e.getClickCount() == 2) dialog.close();
       }
     };
 
     list = new JList<>(choice);
     list.setFocusable(false);
-    if(s) list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    if(single) list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
     text.setPreferredSize(new Dimension(list.getWidth(), text.getPreferredSize().height));
-    BaseXLayout.addInteraction(list, d);
+    BaseXLayout.addInteraction(list, dialog);
 
     scroll = new JScrollPane(list);
     add(scroll);

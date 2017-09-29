@@ -48,10 +48,10 @@ public final class TextView extends View {
 
   /**
    * Default constructor.
-   * @param man view manager
+   * @param notifier view notifier
    */
-  public TextView(final ViewNotifier man) {
-    super(TEXTVIEW, man);
+  public TextView(final ViewNotifier notifier) {
+    super(TEXTVIEW, notifier);
     border(5).layout(new BorderLayout(0, 5));
 
     header = new BaseXHeader(RESULT);
@@ -205,8 +205,8 @@ public final class TextView extends View {
    * Saves the displayed text.
    */
   private void save() {
-    final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
-        gui.gopts.get(GUIOptions.WORKPATH), gui).suffix(IO.XMLSUFFIX);
+    final BaseXFileChooser fc = new BaseXFileChooser(gui,
+        SAVE_AS, gui.gopts.get(GUIOptions.WORKPATH)).suffix(IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;

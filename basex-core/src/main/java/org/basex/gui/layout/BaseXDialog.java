@@ -22,7 +22,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class BaseXDialog extends JDialog {
-  /** Reference to main window. */
+  /** reference to the main window. */
   public final GUI gui;
   /** Used mnemonics. */
   final StringBuilder mnem = new StringBuilder();
@@ -54,22 +54,22 @@ public abstract class BaseXDialog extends JDialog {
 
   /**
    * Constructor, called from the main window.
-   * @param main reference to main window
+   * @param gui reference to the main window
    * @param title dialog title
    */
-  protected BaseXDialog(final GUI main, final String title) {
-    this(main, title, true);
+  protected BaseXDialog(final GUI gui, final String title) {
+    this(gui, title, true);
   }
 
   /**
    * Constructor, called from the main window.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    * @param title dialog title
    * @param modal modal flag
    */
-  protected BaseXDialog(final GUI main, final String title, final boolean modal) {
-    super(main, title, modal);
-    gui = main;
+  protected BaseXDialog(final GUI gui, final String title, final boolean modal) {
+    super(gui, title, modal);
+    this.gui = gui;
     init();
   }
 
@@ -164,7 +164,7 @@ public abstract class BaseXDialog extends JDialog {
 
     for(final Object obj : buttons) {
       pnl.add(obj instanceof BaseXButton ? (BaseXButton) obj :
-        new BaseXButton(obj.toString(), this));
+        new BaseXButton(this, obj.toString()));
     }
 
     final BaseXBack but = new BaseXBack(false).layout(new BorderLayout());

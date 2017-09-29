@@ -22,21 +22,21 @@ public class BaseXLabel extends JLabel {
 
   /**
    * Constructor, specifying a label text.
-   * @param txt label text
+   * @param text label text
    */
-  public BaseXLabel(final String txt) {
-    this(txt, false, false);
+  public BaseXLabel(final String text) {
+    this(text, false, false);
   }
 
   /**
    * Constructor, specifying a label text, vertical distance to the next
    * component, and a property for printing the label in bold.
-   * @param txt label text
+   * @param text label text
    * @param dist vertical distance to next component
    * @param bold bold flag
    */
-  public BaseXLabel(final String txt, final boolean dist, final boolean bold) {
-    super(txt);
+  public BaseXLabel(final String text, final boolean dist, final boolean bold) {
+    super(text);
     final Font f = getFont();
     if(dist) border(0, 0, f.getSize() / 2, 0);
     if(bold) setFont(f.deriveFont(Font.BOLD));

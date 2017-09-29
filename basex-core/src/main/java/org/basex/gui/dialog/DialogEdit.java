@@ -45,10 +45,10 @@ public final class DialogEdit extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param main reference to main frame
-   * @param p pre value
+   * @param main reference to the main frame
+   * @param pre pre value
    */
-  public DialogEdit(final GUI main, final int p) {
+  public DialogEdit(final GUI main, final int pre) {
     super(main, EDIT_DATA);
 
     // create checkboxes
@@ -56,33 +56,33 @@ public final class DialogEdit extends BaseXDialog {
 
     final Context context = gui.context;
     final Data data = context.data();
-    kind = data.kind(p);
+    kind = data.kind(pre);
 
     final String title = Util.info(EDIT_X, NODE_KINDS[kind]);
     final BaseXLabel label = new BaseXLabel(title, true, true);
     pp.add(label, BorderLayout.NORTH);
 
     if(kind == Data.ELEM) {
-      old1 = string(data.name(p, kind));
+      old1 = string(data.name(pre, kind));
     } else if(kind == Data.DOC) {
-      old1 = string(data.text(p, true));
+      old1 = string(data.text(pre, true));
     } else if(kind == Data.TEXT || kind == Data.COMM) {
-      old3 = string(data.atom(p));
+      old3 = string(data.atom(pre));
     } else if(kind == Data.ATTR) {
-      old1 = string(data.name(p, kind));
-      old2 = string(data.atom(p));
+      old1 = string(data.name(pre, kind));
+      old2 = string(data.atom(pre));
     } else {
-      old1 = string(data.name(p, kind));
-      old3 = string(data.atom(p));
+      old1 = string(data.name(pre, kind));
+      old3 = string(data.atom(pre));
     }
     final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
     if(old1 != null) {
-      input1 = new BaseXTextField(old1, this);
+      input1 = new BaseXTextField(this, old1);
       BaseXLayout.setWidth(input1, 500);
       b.add(input1, BorderLayout.NORTH);
     }
     if(old2 != null) {
-      input2 = new BaseXTextField(old2, this);
+      input2 = new BaseXTextField(this, old2);
       b.add(input2, BorderLayout.CENTER);
     }
     if(old3 != null) {

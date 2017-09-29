@@ -82,8 +82,8 @@ final class DialogResources extends BaseXBack {
     root = new ResourceRootFolder(token(label), token("/"), tree, context);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
 
-    filter = new BaseXButton(FILTER, dp);
-    clear = new BaseXButton(CLEAR, dp);
+    filter = new BaseXButton(dp, FILTER);
+    clear = new BaseXButton(dp, CLEAR);
     filter.setEnabled(false);
     clear.setEnabled(false);
 
@@ -97,7 +97,7 @@ final class DialogResources extends BaseXBack {
     final BaseXBack btn = new BaseXBack().layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
 
-    filterText = new BaseXTextField(PLEASE_WAIT_D, dp);
+    filterText = new BaseXTextField(dp, PLEASE_WAIT_D);
     filterText.setEnabled(false);
     BaseXLayout.setWidth(filterText, 250);
 

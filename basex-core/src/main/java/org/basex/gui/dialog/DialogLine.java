@@ -31,7 +31,7 @@ public final class DialogLine extends BaseXDialog {
   public DialogLine(final GUI main, final int curr) {
     super(main, GO_TO_LINE);
 
-    line = new BaseXTextField(Integer.toString(curr), this);
+    line = new BaseXTextField(this, Integer.toString(curr));
     line.addKeyListener(keys);
     info = new BaseXLabel(" ");
 

@@ -37,11 +37,11 @@ public final class DialogSort extends BaseXDialog {
     final BaseXBack p = new BaseXBack(new TableLayout(6, 1));
 
     final GUIOptions gopts = gui.gopts;
-    asc = new BaseXCheckBox(ASCENDING_ORDER, GUIOptions.ASCSORT, gopts, this);
-    cs = new BaseXCheckBox(CASE_SENSITIVE, GUIOptions.CASESORT, gopts, this);
-    merge = new BaseXCheckBox(MERGE_DUPLICATES, GUIOptions.MERGEDUPL, gopts, this);
-    unicode = new BaseXCheckBox(UNICODE_ORDER, GUIOptions.UNICODE, gopts, this);
-    column = new BaseXTextField(GUIOptions.COLUMN, gopts, this);
+    asc = new BaseXCheckBox(this, ASCENDING_ORDER, GUIOptions.ASCSORT, gopts);
+    cs = new BaseXCheckBox(this, CASE_SENSITIVE, GUIOptions.CASESORT, gopts);
+    merge = new BaseXCheckBox(this, MERGE_DUPLICATES, GUIOptions.MERGEDUPL, gopts);
+    unicode = new BaseXCheckBox(this, UNICODE_ORDER, GUIOptions.UNICODE, gopts);
+    column = new BaseXTextField(this, GUIOptions.COLUMN, gopts);
     column.setColumns(4);
 
     final BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 4));

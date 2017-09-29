@@ -81,7 +81,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
 
     if(cmd.stoppable()) {
-      cancel = new BaseXButton(B_CANCEL, this);
+      cancel = new BaseXButton(this, B_CANCEL);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);

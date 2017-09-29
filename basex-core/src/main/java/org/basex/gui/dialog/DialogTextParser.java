@@ -26,17 +26,17 @@ final class DialogTextParser extends DialogParser {
 
   /**
    * Constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    * @param opts main options
    */
-  DialogTextParser(final BaseXDialog d, final MainOptions opts) {
-    super(d);
+  DialogTextParser(final BaseXDialog dialog, final MainOptions opts) {
+    super(dialog);
     topts = new TextOptions(opts.get(MainOptions.TEXTPARSER));
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
 
-    encoding = encoding(d, topts.get(TextOptions.ENCODING));
-    lines = new BaseXCheckBox(SPLIT_INPUT_LINES, TextOptions.LINES, topts, d);
+    encoding = encoding(dialog, topts.get(TextOptions.ENCODING));
+    lines = new BaseXCheckBox(dialog, SPLIT_INPUT_LINES, TextOptions.LINES, topts);
 
     final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
