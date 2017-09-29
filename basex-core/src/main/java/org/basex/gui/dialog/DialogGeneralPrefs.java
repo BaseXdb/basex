@@ -76,14 +76,14 @@ final class DialogGeneralPrefs extends BaseXBack {
     dbButton = new BaseXButton(BROWSE_D, d);
     dbButton.addActionListener(e -> {
       final String path = dbPath.getText();
-      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui, this).select(Mode.DOPEN);
       if(dir != null) dbPath.setText(dir.path());
     });
 
     repoButton = new BaseXButton(BROWSE_D, d);
     repoButton.addActionListener(e -> {
       final String path = repoPath.getText();
-      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+      final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui, this).select(Mode.DOPEN);
       if(dir != null) repoPath.setText(dir.path());
     });
 
