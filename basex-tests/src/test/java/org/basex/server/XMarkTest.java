@@ -133,10 +133,9 @@ public final class XMarkTest {
 
   /**
    * Initializes the tests.
-   * @throws Exception any exception
    */
   @BeforeClass
-  public static void close() throws Exception {
+  public static void close() {
     // only stop server if it has not been running before starting the tests
     if(server != null) server.stop();
   }

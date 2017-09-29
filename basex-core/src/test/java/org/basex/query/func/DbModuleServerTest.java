@@ -46,10 +46,9 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
 
   /**
    * Finishes the test.
-   * @throws IOException I/O exception
    */
   @AfterClass
-  public static void finish() throws IOException {
+  public static void finish() {
     stopServer(server);
   }
 

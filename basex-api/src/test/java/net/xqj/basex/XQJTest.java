@@ -31,10 +31,9 @@ public final class XQJTest extends SandboxTest {
 
   /**
    * Finishes the tests.
-   * @throws Exception exception
    */
   @AfterClass
-  public static void after() throws Exception {
+  public static void after() {
     stopServer(server);
   }
 
