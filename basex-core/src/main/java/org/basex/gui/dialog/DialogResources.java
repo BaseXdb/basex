@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import org.basex.core.*;
@@ -56,25 +55,6 @@ final class DialogResources extends BaseXBack {
     tree.setRowHeight(getFontMetrics(getFont()).getHeight());
 
     tree.setCellRenderer(new TreeNodeRenderer());
-    tree.addTreeSelectionListener(new TreeSelectionListener() {
-      @Override
-      public void valueChanged(final TreeSelectionEvent e) {
-        ResourceNode n = (ResourceNode) e.getPath().getLastPathComponent();
-        String filt = n.equals(root) ? "" : n.path();
-        String trgt = filt + '/';
-
-        if(n.isLeaf()) {
-          n = (ResourceNode) n.getParent();
-          trgt = (n == null || n.equals(root) ? "" : n.path()) + '/';
-        } else {
-          filt = trgt;
-        }
-        filterText.setText(filt);
-        dialog.addPanel.target.setText(trgt);
-        filtered = false;
-      }
-    });
-
     // add default children to tree
     final Context context = dialog.gui.context;
     final Data data = context.data();
@@ -110,6 +90,22 @@ final class DialogResources extends BaseXBack {
     BaseXLayout.setWidth(sp, 250);
     add(sp, BorderLayout.CENTER);
     add(panel, BorderLayout.SOUTH);
+
+    tree.addTreeSelectionListener(e -> {
+      ResourceNode n = (ResourceNode) e.getPath().getLastPathComponent();
+      String filt = n.equals(root) ? "" : n.path();
+      String trgt = filt + '/';
+
+      if(n.isLeaf()) {
+        n = (ResourceNode) n.getParent();
+        trgt = (n == null || n.equals(root) ? "" : n.path()) + '/';
+      } else {
+        filt = trgt;
+      }
+      filterText.setText(filt);
+      dialog.addPanel.target.setText(trgt);
+      filtered = false;
+    });
 
     new Thread(() -> {
       tree.setCursor(CURSORWAIT);

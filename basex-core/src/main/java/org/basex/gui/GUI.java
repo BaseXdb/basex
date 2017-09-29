@@ -163,37 +163,20 @@ public final class GUI extends JFrame implements BaseXWindow {
     buttons.add(b, BorderLayout.EAST);
     if(this.gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
-    nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
+    hist = BaseXButton.get("c_hist", INPUT_HISTORY, false, this);
 
     mode = new BaseXCombo(this, FIND, XQUERY, COMMAND);
     mode.setSelectedIndex(2);
 
-    mode.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        final int s = mode.getSelectedIndex();
-        if(s == gopts.get(GUIOptions.SEARCHMODE) || !mode.isEnabled()) return;
-
-        gopts.set(GUIOptions.SEARCHMODE, s);
-        input.mode(mode.getSelectedItem());
-        refreshControls();
-      }
-    });
-    nav.add(mode, BorderLayout.WEST);
-
     input = new GUIInput(this);
     input.mode(mode.getSelectedItem());
 
-    hist = BaseXButton.get("c_hist", INPUT_HISTORY, false, this);
     hist.addActionListener(e -> {
       final JPopupMenu pop = new JPopupMenu();
-      final ActionListener al = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent ac) {
-          input.setText(ac.getActionCommand());
-          input.requestFocusInWindow();
-          pop.setVisible(false);
-        }
+      final ActionListener al = ac -> {
+        input.setText(ac.getActionCommand());
+        input.requestFocusInWindow();
+        pop.setVisible(false);
       };
       final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
       final String[] hs = gopts.get(
@@ -206,9 +189,21 @@ public final class GUI extends JFrame implements BaseXWindow {
       pop.show(hist, 0, hist.getHeight());
     });
 
+    mode.addActionListener(e -> {
+      final int s = mode.getSelectedIndex();
+      if(s == gopts.get(GUIOptions.SEARCHMODE) || !mode.isEnabled()) return;
+
+      gopts.set(GUIOptions.SEARCHMODE, s);
+      input.mode(mode.getSelectedItem());
+      refreshControls();
+    });
+
     b = new BaseXBack(new BorderLayout(5, 0));
     b.add(hist, BorderLayout.WEST);
     b.add(input, BorderLayout.CENTER);
+
+    nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
+    nav.add(mode, BorderLayout.WEST);
     nav.add(b, BorderLayout.CENTER);
 
     stop = BaseXButton.get("c_stop", STOP, false, this);

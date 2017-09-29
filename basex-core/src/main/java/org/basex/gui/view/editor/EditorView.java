@@ -202,12 +202,7 @@ public final class EditorView extends View {
         pm.add(it).addActionListener(al);
       }
 
-      al = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent ac) {
-          hist.getActionListeners()[0].actionPerformed(null);
-        }
-      };
+      al = ac -> hist.getActionListeners()[0].actionPerformed(null);
       if(e != null && pm.getComponentCount() == HISTCOMP) {
         pm.add(new JMenuItem(DOTS)).addActionListener(al);
       }

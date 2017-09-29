@@ -33,6 +33,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
+  /** Text caret. */
+  private final Timer caretTimer;
+
   /** Editor action. */
   public enum Action {
     /** Check for changes; do nothing if input has not changed. */
@@ -126,6 +129,8 @@ public class TextPanel extends BaseXPanel {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
         new AllCmd(), new CopyCmd() }
     );
+
+    caretTimer = new Timer(500, e -> rend.caret(!rend.caret()));
   }
 
   /**
@@ -757,14 +762,6 @@ public class TextPanel extends BaseXPanel {
     scrollCode.invokeLater(true);
     release(Action.CHECK);
   }
-
-  /** Text caret. */
-  private final Timer caretTimer = new Timer(500, new ActionListener() {
-    @Override
-    public void actionPerformed(final ActionEvent e) {
-      rend.caret(!rend.caret());
-    }
-  });
 
   /**
    * Stops an old text cursor thread and, if requested, starts a new one.

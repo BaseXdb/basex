@@ -6,7 +6,6 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -165,12 +164,7 @@ public final class DialogProps extends BaseXDialog {
     tabs.addTab(OPTIONS, optionsPanel);
     tabs.addTab(INFORMATION, infoPanel);
 
-    tabs.addChangeListener(new ChangeListener() {
-      @Override
-      public synchronized void stateChanged(final ChangeEvent evt) {
-        updateInfo();
-      }
-    });
+    tabs.addChangeListener(evt -> updateInfo());
     tabsPanel.add(tabs, BorderLayout.CENTER);
 
     optimize = new BaseXButton(this, OPTIMIZE);
