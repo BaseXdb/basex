@@ -103,8 +103,16 @@ public final class BaseXHTTP extends CLI {
 
     // start web server in a new process
     if(service) {
-      // SSL CONNECTIONS ARE NOT DETECTED YET!...
-      start(conn1.getPort(), false, args);
+
+      // check each ServerConnector for SSl-support
+      boolean sslSupported = false;
+      for (int i = 0; i < conns.size(); i++) {
+        for (ConnectionFactory c : conns.get(i).getConnectionFactories()) {
+          if (c instanceof SslConnectionFactory) sslSupported = true;
+        }
+      }
+
+      start(conn1.getPort(), sslSupported, args);
       if(!quiet) for(final ServerConnector conn : conns) Util.outln(startX, conn.getPort());
       // keep message visible for a while
       Performance.sleep(1000);
