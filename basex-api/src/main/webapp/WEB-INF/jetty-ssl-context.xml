@@ -3,6 +3,7 @@
 
 <!-- ============================================================= -->
 <!-- SSL ContextFactory configuration                              -->
+<!-- you need your own keystore.                                   -->
 <!-- ============================================================= -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
     <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
@@ -11,7 +12,10 @@
         <Set name="KeyManagerPassword" type="String">?????</Set>
         <Set name="TrustStorePath"><Property name="jetty.home" default="." />/src/main/webapp/WEB-INF/keystore</Set>
         <Set name="TrustStorePassword">??????</Set>
-
+		
+		
+		<!-- edit the in- and excludes of protocols and cypher-suites as you prefer. This is just an examlpe -->
+		<!-- 
         <Set name="IncludeCipherSuites">
             <Array type="String">
                 <Item>TLS_DHE_RSA.*</Item>
@@ -37,5 +41,6 @@
                <Item>SSLv2HelloItem</Item>
             </Array>
         </Set>
+         -->
     </New>
 </Configure>

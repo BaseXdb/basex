@@ -105,16 +105,16 @@
         <version>9.4.6.v20170531</version>
         <configuration>
             <jettyXml>
-            	${basedir}/src/main/webapp/WEB-INF/jetty.xml,
        			${basedir}/src/main/webapp/WEB-INF/jetty-http.xml,
-       			<!-- uncomment this to load start SSL/HTTPS - support  -->
-       			<!-- TO ENABLE HTTPS FULLY YOU HAVE TO USE YOUR OWN    -->
-       			<!-- KEYSTORE AND CONFIGURE THE JETTY_SSL_CONTEXT.XML  -->
+       			
+       			<!-- uncomment this to load start SSL/HTTPS - support   -->
+       			<!-- use your own keystore and configure the SslContext -->
 				<!-- 
-				${basedir}/src/main/webapp/WEB-INF/jetty-ssl-context.xml,
-       			${basedir}/src/main/webapp/WEB-INF/jetty-ssl.xml,
-       			${basedir}/src/main/webapp/WEB-INF/jetty-https.xml  
+					${basedir}/src/main/webapp/WEB-INF/jetty-ssl-context.xml,
+	       			${basedir}/src/main/webapp/WEB-INF/jetty-ssl.xml,
+	       			${basedir}/src/main/webapp/WEB-INF/jetty-https.xml  
        			-->
+       			
 			</jettyXml>
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8985</stopPort>
