@@ -36,10 +36,9 @@ public final class ClientModuleTest extends AdvancedQueryTest {
 
   /**
    * Stops the server.
-   * @throws IOException I/O exception
    */
   @AfterClass
-  public static void stop() throws IOException {
+  public static void stop() {
     stopServer(server);
   }
 

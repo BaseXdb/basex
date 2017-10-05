@@ -5,8 +5,7 @@ import static org.basex.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;
-
-import javax.net.ssl.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -15,8 +14,6 @@ import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.nio.*;
-import org.eclipse.jetty.server.ssl.*;
 import org.eclipse.jetty.webapp.*;
 import org.eclipse.jetty.xml.*;
 
@@ -78,20 +75,17 @@ public final class BaseXHTTP extends CLI {
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
 
-    final Connector[] conns = jetty.getConnectors();
-    if(conns == null || conns.length == 0)
-      throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
+    final ArrayList<ServerConnector> conns = new ArrayList<>(1);
+    for(final Connector conn : jetty.getConnectors()) {
+      if(conn instanceof ServerConnector) conns.add((ServerConnector) conn);
+    }
+    if(conns.isEmpty())
+      throw new BaseXException("No Jetty connectors defined in " + JETTYCONF + '.');
 
     stopPort = sopts.get(StaticOptions.STOPPORT);
     host = sopts.get(StaticOptions.SERVERHOST);
-    if(port != 0) {
-      for(final Connector conn : conns) {
-        if(conn instanceof SelectChannelConnector) {
-          conn.setPort(port);
-          break;
-        }
-      }
-    }
+    final ServerConnector conn1 = conns.get(0);
+    if(port != 0) conn1.setPort(port);
 
     // info strings
     final String startX = HTTP + ' ' + SRV_STARTED_PORT_X;
@@ -99,17 +93,16 @@ public final class BaseXHTTP extends CLI {
 
     if(stop) {
       stop();
-      if(!quiet) for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
+      if(!quiet) for(final ServerConnector conn : conns) Util.outln(stopX, conn.getPort());
       // keep message visible for a while
       Performance.sleep(1000);
       return;
     }
 
     // start web server in a new process
-    final Connector conn1 = conns[0];
     if(service) {
-      start(conn1.getPort(), conn1 instanceof SslSelectChannelConnector, args);
-      if(!quiet) for(final Connector conn : conns) Util.outln(startX, conn.getPort());
+      start(args);
+      if(!quiet) for(final ServerConnector conn : conns) Util.outln(startX, conn.getPort());
       // keep message visible for a while
       Performance.sleep(1000);
       return;
@@ -129,7 +122,7 @@ public final class BaseXHTTP extends CLI {
 
     // show start message
     if(!quiet) {
-      for(final Connector conn : conns) Util.outln(startX, conn.getPort());
+      for(final ServerConnector conn : conns) Util.outln(startX, conn.getPort());
     }
 
     // initialize web.xml settings, assign system properties and run database server.
@@ -143,11 +136,11 @@ public final class BaseXHTTP extends CLI {
     // otherwise, it may only be called if the JVM process is already shut down
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       if(!quiet) {
-        for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
+        for(final ServerConnector conn : conns) Util.outln(stopX, conn.getPort());
       }
       final Log log = context.log;
       if(log != null) {
-        for(final Connector conn : conns) {
+        for(final ServerConnector conn : conns) {
           log.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
         }
       }
@@ -155,7 +148,7 @@ public final class BaseXHTTP extends CLI {
     }));
 
     // log server start at very end (logging flag could have been updated by web.xml)
-    for(final Connector conn : conns) {
+    for(final ServerConnector conn : conns) {
       context.log.writeServer(LogType.OK, Util.info(startX, conn.getPort()));
     }
   }
@@ -290,20 +283,13 @@ public final class BaseXHTTP extends CLI {
 
   /**
    * Starts the HTTP server in a separate process.
-   * @param port server port
-   * @param ssl encryption via HTTPS
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  public static void start(final int port, final boolean ssl, final String... args)
-      throws BaseXException {
-
+  public static void start(final String... args) throws BaseXException {
     // start server and check if it caused an error message
     final String error = Util.error(Util.start(BaseXHTTP.class, args), 2000);
     if(error != null) throw new BaseXException(error.trim());
-
-    // try to connect to the new server instance
-    if(!ping(S_LOCALHOST, port, ssl)) throw new BaseXException(CONNECTION_ERROR_X, port);
   }
 
   /**
@@ -327,29 +313,6 @@ public final class BaseXHTTP extends CLI {
     }
     // wait until server was stopped
     do Performance.sleep(10); while(stopFile.exists());
-  }
-
-  /**
-   * Checks if a server is running.
-   * @param host host
-   * @param port server port
-   * @param ssl encryption via HTTPS
-   * @return boolean success
-   */
-  public static boolean ping(final String host, final int port, final boolean ssl) {
-    try(InputStream is = new IOUrl((ssl ? "https://" : "http://") + host + ':' + port).
-      connection().getInputStream()) {
-      // create connection
-      return true;
-    } catch(final FileNotFoundException | SSLHandshakeException ex) {
-      // if page is not found, server is running
-      // if SSL handshake failed, server is running, otherwise SSLException
-      Util.debug(ex);
-      return true;
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return false;
-    }
   }
 
   @Override

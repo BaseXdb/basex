@@ -170,9 +170,8 @@ public final class BaseXServer extends CLI implements Runnable {
 
   /**
    * Stops the server.
-   * @throws IOException I/O exception
    */
-  public void stop() throws IOException {
+  public void stop() {
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
     final String host = sopts.get(StaticOptions.SERVERHOST);
@@ -312,9 +311,8 @@ public final class BaseXServer extends CLI implements Runnable {
    * Stops the server.
    * @param host server host
    * @param port server port
-   * @throws IOException I/O exception
    */
-  public static void stop(final String host, final int port) throws IOException {
+  public static void stop(final String host, final int port) {
     // create stop file
     final IOFile stopFile = stopFile(BaseXServer.class, port);
     stopFile.touch();
@@ -322,10 +320,10 @@ public final class BaseXServer extends CLI implements Runnable {
     // try to connect the server
     try(Socket s = new Socket(host, port)) {
       // no action
-    } catch(final ConnectException ex) {
+    } catch(final IOException ex) {
       Util.debug(ex);
       stopFile.delete();
-      throw new IOException(Util.info(CONNECTION_ERROR_X, port));
+      //throw new IOException(Util.info(CONNECTION_ERROR_X, port));
     }
     // wait until server was stopped
     do Performance.sleep(10); while(stopFile.exists());
