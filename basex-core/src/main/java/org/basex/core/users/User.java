@@ -94,18 +94,16 @@ public final class User {
    */
   synchronized void toXML(final FElem root) {
     final FElem user = new FElem(USER).add(NAME, name).add(PERMISSION, perm.toString());
-    for(final Entry<Algorithm, EnumMap<Code, String>> algo : passwords.entrySet()) {
-      final FElem pw = new FElem(PASSWORD).add(ALGORITHM, algo.getKey().toString());
-      for(final Entry<Code, String> code : algo.getValue().entrySet()) {
-        final String v = code.getValue();
-        if(!v.isEmpty()) pw.add(new FElem(code.getKey().toString()).add(v));
-      }
+    passwords.forEach((key, value) -> {
+      final FElem pw = new FElem(PASSWORD).add(ALGORITHM, key.toString());
+      value.forEach((k, v) -> {
+        if(!v.isEmpty()) pw.add(new FElem(k.toString()).add(v));
+      });
       user.add(pw);
-    }
-    for(final Entry<String, Perm> local : locals.entrySet()) {
-      user.add(new FElem(DATABASE).add(PATTERN, local.getKey()).
-          add(PERMISSION, local.getValue().toString()));
-    }
+    });
+    locals.forEach((key, value) -> {
+      user.add(new FElem(DATABASE).add(PATTERN, key).add(PERMISSION, value.toString()));
+    });
     root.add(user);
   }
 

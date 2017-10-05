@@ -39,18 +39,17 @@ public final class WebResponseHeader extends StandardFunc {
     final HashMap<String, String> http = toOptions(1, new Options(), qc).free();
 
     // HTTP response
-    if(!http.containsKey(CACHE_CONTROL)) http.put(CACHE_CONTROL, CACHE_CONTROL_DEFAULT);
+    http.putIfAbsent(CACHE_CONTROL, CACHE_CONTROL_DEFAULT);
 
     final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI));
-    for(final Entry<String, String> entry : http.entrySet()) {
-      final String name = entry.getKey(), value = entry.getValue();
+    http.forEach((name, value) -> {
       if(!value.isEmpty()) hresp.add(new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI)).
           add("name", name).add("value", value));
-    }
+    });
 
     // Serialization parameters
-    if(!output.containsKey(SerializerOptions.MEDIA_TYPE.name())) output.put(
-        SerializerOptions.MEDIA_TYPE.name(), MediaType.APPLICATION_OCTET_STREAM.toString());
+    output.putIfAbsent(SerializerOptions.MEDIA_TYPE.name(),
+        MediaType.APPLICATION_OCTET_STREAM.toString());
 
     final SerializerOptions so = SerializerMode.DEFAULT.get();
     final FElem oseri = new FElem(new QNm(OUTPUT_PREFIX, SERIALIZATION_PARAMETERS, OUTPUT_URI));

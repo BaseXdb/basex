@@ -221,7 +221,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         entry.setValue(e);
       }
     }
-
     return change ? optimize(cc) : null;
   }
 
@@ -230,9 +229,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final VarScope innerScope = new VarScope(vs.sc);
 
     final HashMap<Var, Expr> outer = new HashMap<>();
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      outer.put(e.getKey(), e.getValue().copy(cc, vm));
-    }
+    global.forEach((key, value) -> outer.put(key, value.copy(cc, vm)));
 
     cc.pushScope(innerScope);
     try {
@@ -240,9 +237,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       vs.copy(cc, innerVars);
 
       final HashMap<Var, Expr> nl = new HashMap<>();
-      for(final Entry<Var, Expr> e : outer.entrySet()) {
-        nl.put(innerVars.get(e.getKey().id), e.getValue());
-      }
+      outer.forEach((key, value) -> nl.put(innerVars.get(key.id), value));
 
       final Var[] vars = args.clone();
       final int vl = vars.length;
@@ -352,16 +347,20 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean removable(final Var var) {
-    for(final Entry<Var, Expr> e : global.entrySet())
+    for(final Entry<Var, Expr> e : global.entrySet()) {
       if(!e.getValue().removable(var)) return false;
+    }
     return true;
   }
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Entry<Var, Expr> v : global.entrySet())
+    for(final Entry<Var, Expr> v : global.entrySet()) {
       if(!(v.getValue().accept(visitor) && visitor.declared(v.getKey()))) return false;
-    for(final Var v : args) if(!visitor.declared(v)) return false;
+    }
+    for(final Var v : args) {
+      if(!visitor.declared(v)) return false;
+    }
     return expr.accept(visitor);
   }
 
@@ -386,16 +385,16 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Entry<Var, Expr> e : global.entrySet())
-      if(!e.getValue().accept(visitor)) return false;
+    for(final Expr e : global.values()) {
+      if(!e.accept(visitor)) return false;
+    }
     return visitor.inlineFunc(this);
   }
 
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Entry<Var, Expr> e : global.entrySet())
-      sz += e.getValue().exprSize();
+    for(final Expr e : global.values()) sz += e.exprSize();
     return sz + expr.exprSize();
   }
 
@@ -471,10 +470,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      e.getKey().plan(el);
-      e.getValue().plan(el);
-    }
+    global.forEach((key, value) -> {
+      key.plan(el);
+      value.plan(el);
+    });
     addPlan(plan, el, expr);
     final int al = args.length;
     for(int a = 0; a < al; a++) el.add(planAttr(ARG + a, args[a].name.string()));
@@ -485,9 +484,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final StringBuilder sb = new StringBuilder();
     if(!global.isEmpty()) {
       sb.append("((: inline-closure :) ");
-      for(final Entry<Var, Expr> e : global.entrySet()) {
-        sb.append("let ").append(e.getKey()).append(" := ").append(e.getValue()).append(' ');
-      }
+      global.forEach((k, v) -> sb.append("let ").append(k).append(" := ").append(v).append(' '));
       sb.append(RETURN).append(' ');
     }
     sb.append(FUNCTION).append(PAREN1);

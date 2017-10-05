@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.data.*;
 import org.basex.query.expr.*;
@@ -38,9 +37,7 @@ public final class FTOpt extends ExprInfo {
    * @return self reference
    */
   public FTOpt assign(final FTOpt opt) {
-    for(final Entry<FTFlag, Boolean> e : opt.map.entrySet()) {
-      map.computeIfAbsent(e.getKey(), k -> e.getValue());
-    }
+    opt.map.forEach((key, value) -> map.computeIfAbsent(key, k -> value));
     if(cs == null) cs = opt.cs;
     if(sw == null) sw = opt.sw;
     if(sd == null) sd = opt.sd;

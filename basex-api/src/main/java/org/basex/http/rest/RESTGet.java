@@ -33,7 +33,7 @@ final class RESTGet {
     String op = null, input = null, value = null;
     final HTTPConnection conn = session.conn;
     final SerializerOptions sopts = conn.sopts();
-    for(final Entry<String, String[]> param : conn.params.map().entrySet()) {
+    for(final Entry<String, String[]> param : conn.params.stringMap().entrySet()) {
       final String key = param.getKey();
       final String[] vals = param.getValue();
       final String val = vals[0];

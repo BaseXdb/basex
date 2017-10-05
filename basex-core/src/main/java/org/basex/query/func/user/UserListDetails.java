@@ -3,7 +3,6 @@ package org.basex.query.func.user;
 import static org.basex.core.users.UserText.*;
 
 import java.util.*;
-import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -32,17 +31,13 @@ public final class UserListDetails extends UserList {
     for(final User us : u != null ? Collections.singletonList(u) : ctx.users.users(null, ctx)) {
       final String perm = us.perm((String) null).toString();
       final FElem user = new FElem(USER).add(NAME, us.name()).add(PERMISSION, perm);
-      for(final Entry<Algorithm, EnumMap<Code, String>> codes : us.alg().entrySet()) {
-        final FElem password = new FElem(PASSWORD).add(ALGORITHM, codes.getKey().toString());
-        for(final Entry<Code, String> code : codes.getValue().entrySet()) {
-          password.add(new FElem(code.getKey().toString()).add(code.getValue()));
-        }
+      us.alg().forEach((key, value) -> {
+        final FElem password = new FElem(PASSWORD).add(ALGORITHM, key.toString());
+        value.forEach((k, v) -> password.add(new FElem(k.toString()).add(v)));
         user.add(password);
-      }
-      for(final Entry<String, Perm> local : us.locals().entrySet()) {
-        user.add(new FElem(DATABASE).add(PATTERN, local.getKey()).
-            add(PERMISSION, local.getValue().toString()));
-      }
+      });
+      us.locals().forEach((key, value) -> user.add(
+          new FElem(DATABASE).add(PATTERN, key).add(PERMISSION, value.toString())));
       vb.add(user);
     }
     return vb.value();

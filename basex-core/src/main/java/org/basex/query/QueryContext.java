@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -23,7 +22,6 @@ import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
-import org.basex.query.scope.Module;
 import org.basex.query.up.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
@@ -585,9 +583,7 @@ public final class QueryContext extends Job implements Closeable {
       parent.popJob();
     }
     // reassign original database options (changed by compile step)
-    for(final Entry<Option<?>, Object> e : staticOpts.entrySet()) {
-      context.options.put(e.getKey(), e.getValue());
-    }
+    staticOpts.forEach((key, value) -> context.options.put(key, value));
   }
 
   @Override

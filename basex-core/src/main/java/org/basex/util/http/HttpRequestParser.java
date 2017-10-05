@@ -235,8 +235,7 @@ public final class HttpRequestParser {
 
     // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present
-    if(bodyAtts.get(SRC) != null && (bodyAtts.size() > 2 || body.children().next() != null)) {
+    if(bodyAtts.get(SRC) != null && (bodyAtts.size() > 2 || body.children().next() != null))
       throw HC_ATTR.get(info);
-    }
   }
 }

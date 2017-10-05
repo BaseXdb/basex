@@ -54,7 +54,7 @@ public abstract class ContextModifier {
       nameUpdates.computeIfAbsent(nameUp.name(), n -> new NameUpdates()).add(nameUp);
     } else if(update instanceof UserUpdate) {
       final UserUpdate userUp = (UserUpdate) update;
-      userUpdates.computeIfAbsent(userUp.name(), k -> new UserUpdates()).add(userUp);
+      userUpdates.computeIfAbsent(userUp.name(), n -> new UserUpdates()).add(userUp);
     } else {
       throw Util.notExpected("Unknown update type: " + update);
     }

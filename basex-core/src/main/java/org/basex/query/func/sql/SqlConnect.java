@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.sql.*;
 import java.util.*;
-import java.util.Map.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -45,10 +44,9 @@ public final class SqlConnect extends SqlFn {
 
           // prepares connection properties
           final Properties props = new Properties();
-          for(final Entry<String, String> entry : options.entrySet()) {
-            final String key = entry.getKey(), value = entry.getValue();
+          options.forEach((key, value) -> {
             if(!key.equals(AUTOCOMMIT)) props.setProperty(key, value);
-          }
+          });
           props.setProperty(USER, user);
           props.setProperty(PASS, pass);
 

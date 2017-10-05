@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
@@ -97,22 +96,32 @@ public class XsltTransform extends XsltFn {
       final XsltOptions xopts) throws TransformerException {
 
     // retrieve new or cached transformer
-    final TransformerFactory tc = TransformerFactory.newInstance();
-    final StreamSource ss = xsl.streamSource();
-    final String key = xopts.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
-    Transformer tr = null;
-    if(key != null) tr = CACHE.get(key);
-    if(tr == null) tr = tc.newTransformer(ss);
-    if(key != null) CACHE.put(key, tr);
-
+    final Transformer tr = transformer(xsl.streamSource(), xopts.get(XsltOptions.CACHE));
     // bind parameters
-    for(final Entry<String, String> entry : par.entrySet()) {
-      tr.setParameter(entry.getKey(), entry.getValue());
-    }
+    par.forEach((key, value) -> tr.setParameter(key, value));
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();
     tr.transform(in.streamSource(), new StreamResult(ao));
     return ao.finish();
+  }
+
+  /**
+   * Returns a new or cached transformer instance.
+   * @param ss stream source
+   * @param cache caching flag
+   * @return transformer
+   * @throws TransformerException transformer exception
+   */
+  private static Transformer transformer(final StreamSource ss, final boolean cache)
+      throws TransformerException {
+
+    // system id may be null
+    final String key = cache ? ss.getSystemId() : null;
+    Transformer tr = null;
+    if(key != null) tr = CACHE.get(key);
+    if(tr == null) tr = TransformerFactory.newInstance().newTransformer(ss);
+    if(key != null) CACHE.put(key, tr);
+    return tr;
   }
 }

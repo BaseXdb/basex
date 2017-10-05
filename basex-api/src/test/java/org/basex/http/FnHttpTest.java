@@ -916,9 +916,8 @@ final class FakeHttpConnection extends HttpURLConnection {
 
   @Override
   public String getHeaderField(final String field) {
-    final List<String> values = headers.get(field);
     final StringBuilder sb = new StringBuilder();
-    for(final String v : values) sb.append(v).append(';');
+    for(final String v : headers.get(field)) sb.append(v).append(';');
     return sb.substring(0, sb.length() - 1);
   }
 

@@ -1,7 +1,6 @@
 package org.basex.query.util.regex;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Escape sequence.
@@ -633,18 +632,17 @@ public final class Escape extends RegExp {
     add(m, "SupplementaryPrivateUseArea-B", new int[] { 0x100000, 0x10FFFF });
 
     // add entries for all known character classes
-    for(final Entry<String, int[][]> e : m.entrySet()) {
-      final int[][] vals = e.getValue();
+    m.forEach((key, vals) -> {
       final int vl = vals.length;
       final CharRange[] rs = new CharRange[vl];
       for(int v = 0; v < vl; v++) rs[v] = new CharRange(vals[v][0], vals[v][1]);
-      MAP.put("\\p{Is" + e.getKey() + '}', rs);
+      MAP.put("\\p{Is" + key + '}', rs);
 
       final int[][] not = invert(vals);
       final int nl = not.length;
       final CharRange[] nrs = new CharRange[nl];
       for(int n = 0; n < nl; n++) nrs[n] = new CharRange(not[n][0], not[n][1]);
-      MAP.put("\\P{Is" + e.getKey() + '}', nrs);
-    }
+      MAP.put("\\P{Is" + key + '}', nrs);
+    });
   }
 }

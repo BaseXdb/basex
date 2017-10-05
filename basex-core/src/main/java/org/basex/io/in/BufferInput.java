@@ -165,12 +165,14 @@ public class BufferInput extends InputStream {
   }
 
   @Override
-  public final synchronized void mark(final int m) {
+  @SuppressWarnings("sync-override")
+  public final void mark(final int m) {
     bmark = bpos;
   }
 
   @Override
-  public final synchronized void reset() throws IOException {
+  @SuppressWarnings("sync-override")
+  public final void reset() throws IOException {
     if(bmark == -1) throw new IOException("Mark cannot be reset.");
     bpos = bmark;
   }

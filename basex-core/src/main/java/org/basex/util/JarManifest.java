@@ -3,7 +3,6 @@ package org.basex.util;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.jar.*;
 
 /**
@@ -49,8 +48,8 @@ final class JarManifest {
    */
   public static Object get(final String key) {
     if(MAP != null) {
-      for(final Entry<Object, Object> entry : MAP.entrySet()) {
-        if(key.equals(entry.getKey().toString())) return entry.getValue();
+      for(final Object k : MAP.keySet()) {
+        if(key.equals(k.toString())) return MAP.get(k);
       }
     }
     return null;

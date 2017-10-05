@@ -64,17 +64,17 @@ public final class DBOptimize extends DBUpdate {
     // create new options, based on global defaults, and overwrite with database options
     final MainOptions opts = new MainOptions(qc.context.options, true);
     final MetaData meta = data.meta;
-    options.assignIfEmpty(MainOptions.TEXTINDEX, meta.createtext);
-    options.assignIfEmpty(MainOptions.ATTRINDEX, meta.createattr);
-    options.assignIfEmpty(MainOptions.TOKENINDEX, meta.createtoken);
-    options.assignIfEmpty(MainOptions.FTINDEX, meta.createft);
-    options.assignIfEmpty(MainOptions.TEXTINCLUDE, meta.textinclude);
-    options.assignIfEmpty(MainOptions.ATTRINCLUDE, meta.attrinclude);
-    options.assignIfEmpty(MainOptions.TOKENINCLUDE, meta.tokeninclude);
-    options.assignIfEmpty(MainOptions.FTINCLUDE, meta.ftinclude);
-    options.assignIfEmpty(MainOptions.SPLITSIZE, meta.splitsize);
-    options.assignIfEmpty(MainOptions.UPDINDEX, meta.updindex);
-    options.assignIfEmpty(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
+    options.assignIfAbsent(MainOptions.TEXTINDEX, meta.createtext);
+    options.assignIfAbsent(MainOptions.ATTRINDEX, meta.createattr);
+    options.assignIfAbsent(MainOptions.TOKENINDEX, meta.createtoken);
+    options.assignIfAbsent(MainOptions.FTINDEX, meta.createft);
+    options.assignIfAbsent(MainOptions.TEXTINCLUDE, meta.textinclude);
+    options.assignIfAbsent(MainOptions.ATTRINCLUDE, meta.attrinclude);
+    options.assignIfAbsent(MainOptions.TOKENINCLUDE, meta.tokeninclude);
+    options.assignIfAbsent(MainOptions.FTINCLUDE, meta.ftinclude);
+    options.assignIfAbsent(MainOptions.SPLITSIZE, meta.splitsize);
+    options.assignIfAbsent(MainOptions.UPDINDEX, meta.updindex);
+    options.assignIfAbsent(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
     options.assignTo(opts);
 
     // adopt options to database meta data

@@ -52,9 +52,8 @@ public final class Language implements Comparable<Language> {
   public static Language get(final String lang) {
     final int i = lang.indexOf('-');
     final String l = i == -1 ? lang : lang.substring(0, i);
-    Language ln = ALL.get(l.toLowerCase(Locale.ENGLISH));
-    if(ln == null) ln = DISP.get(lang);
-    return ln;
+    final Language ln = ALL.get(l.toLowerCase(Locale.ENGLISH));
+    return ln == null ? DISP.get(lang) : ln;
   }
 
   /**
@@ -63,8 +62,8 @@ public final class Language implements Comparable<Language> {
    * @return language code
    */
   public static Language get(final MainOptions opts) {
-    final Language lang = get(opts.get(MainOptions.LANGUAGE));
-    return lang == null ? get("en") : lang;
+    final Language ln = get(opts.get(MainOptions.LANGUAGE));
+    return ln == null ? get("en") : ln;
   }
 
   /**
@@ -72,8 +71,8 @@ public final class Language implements Comparable<Language> {
    * @return default language
    */
   public static Language def() {
-    final Language lang = DISP.get(MainOptions.LANGUAGE.value());
-    return lang == null ? get("en") : lang;
+    final Language ln = DISP.get(MainOptions.LANGUAGE.value());
+    return ln == null ? get("en") : ln;
   }
 
   /**

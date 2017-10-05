@@ -35,8 +35,7 @@ public final class Datas {
    * @param data data reference
    */
   public synchronized void pin(final Data data) {
-    final Integer pins = list.get(data);
-    list.put(data, pins == null ? 1 : pins + 1);
+    list.compute(data, (key, pins) -> pins == null ? 1 : pins + 1);
   }
 
   /**
@@ -44,8 +43,8 @@ public final class Datas {
    * @param data data reference
    */
   public synchronized void unpin(final Data data) {
+    // can be null (for main-memory data instances)
     final Integer pins = list.get(data);
-    // main-memory instances are not pinned
     if(pins == null) return;
 
     final int p = pins;

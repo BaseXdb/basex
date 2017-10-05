@@ -4,17 +4,16 @@ import static net.xqj.basex.BaseXXQInsertOptions.*;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.*;
-import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+import java.util.concurrent.ThreadPoolExecutor.*;
 
 import javax.xml.xquery.*;
-
-import net.xqj.basex.*;
 
 import org.junit.*;
 
 import com.xqj2.*;
+
+import net.xqj.basex.*;
 
 /**
  * Test XQJ concurrency, both reads and writes.
@@ -77,8 +76,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
         docs.put(uri, item);
       }
 
-      for(final Entry<String, XQItem> doc : docs.entrySet())
-        futures.add(tpe.submit(new InsertItemThread(doc.getKey(), doc.getValue())));
+      docs.forEach((key, value) -> futures.add(tpe.submit(new InsertItemThread(key, value))));
 
       for(final Future<?> future : futures)
         future.get();

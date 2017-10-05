@@ -2,7 +2,6 @@ package org.basex.http.rest;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -57,12 +56,10 @@ class RESTQuery extends RESTCmd {
 
         // bind HTTP context and external variables
         xq.http(conn);
-        for(final Entry<String, String[]> e : vars.entrySet()) {
-          final String key = e.getKey();
-          final String[] val = e.getValue();
+        vars.forEach((key, val) -> {
           if(val.length == 2) xq.bind(key, val[0], val[1]);
           if(val.length == 1) xq.bind(key, val[0]);
-        }
+        });
 
         // initializes the response with query serialization options
         conn.sopts().assign(xq.parameters(context));

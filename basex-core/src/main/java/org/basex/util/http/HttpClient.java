@@ -183,9 +183,7 @@ public final class HttpClient {
       final String redirect = request.attribute(FOLLOW_REDIRECT);
       if(redirect != null) setFollowRedirects(Strings.yes(redirect));
 
-      for(final Entry<String, String> header : request.headers.entrySet()) {
-        conn.addRequestProperty(header.getKey(), header.getValue());
-      }
+      request.headers.forEach((key, value) -> conn.addRequestProperty(key, value));
     }
     return conn;
   }

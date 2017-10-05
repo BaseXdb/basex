@@ -1,7 +1,5 @@
 package org.basex.util.ft;
 
-import java.util.Map.Entry;
-
 import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
@@ -264,9 +262,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
       }
     }
     final StringList sl = new StringList();
-    for(final Entry<Language, Stemmer> l : langs.entrySet()) {
-      sl.add(l.getKey() + " (" + l.getValue() + ')');
-    }
+    langs.forEach((key, value) -> sl.add(key + " (" + value + ')'));
     return sl.sort();
   }
 }

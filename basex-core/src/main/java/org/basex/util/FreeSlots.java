@@ -77,15 +77,13 @@ public final class FreeSlots {
     final int size = slots;
     final LongList offList = new LongList(size);
     final IntList sizeList = new IntList(size);
-    for(final Entry<Integer, LongList> entry : free.entrySet()) {
-      final int slotSize = entry.getKey();
-      final LongList list = entry.getValue();
+    free.forEach((slotSize, list) -> {
       final int ll = list.size();
       for(int l = 0; l < ll; l++) {
         offList.add(list.get(l));
         sizeList.add(slotSize);
       }
-    }
+    });
     if(size != offList.size())
       throw Util.notExpected("Wrong slot count: % vs. %", size, offList.size());
 
@@ -115,9 +113,8 @@ public final class FreeSlots {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("FREE SLOTS: " + free.size() + '\n');
-    for(final Entry<Integer, LongList> entry : free.entrySet()) {
-      sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append('\n');
-    }
+    free.forEach((key, value) ->
+      sb.append("  ").append(key).append(": ").append(value).append('\n'));
     return sb.toString();
   }
 }

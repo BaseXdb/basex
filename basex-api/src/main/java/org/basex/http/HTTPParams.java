@@ -3,7 +3,6 @@ package org.basex.http;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -23,10 +22,10 @@ import org.basex.util.http.*;
 public final class HTTPParams {
   /** HTTP Connection. */
   private final HTTPConnection conn;
-  /** Parameter map. */
-  private Map<String, String[]> map;
-  /** Query parameters. */
-  private Map<String, Value> query;
+  /** Query parameters with string values. */
+  private Map<String, String[]> strings;
+  /** Query parameters with XQuery values. */
+  private Map<String, Value> values;
   /** Form parameters. */
   private Map<String, Value> form;
   /** Content body. */
@@ -41,14 +40,14 @@ public final class HTTPParams {
   }
 
   /**
-   * Returns the query parameters as map.
+   * Returns the query parameters as string map.
    * @return map
    * @throws IOException I/O exception
    */
-  public Map<String, String[]> map() throws IOException {
+  public Map<String, String[]> stringMap() throws IOException {
     try {
-      if(map == null) map = conn.req.getParameterMap();
-      return map;
+      if(strings == null) strings = conn.req.getParameterMap();
+      return strings;
     } catch(final IllegalStateException ex) {
       // may be caused by too large input (#884)
       throw new IOException(ex);
@@ -68,10 +67,10 @@ public final class HTTPParams {
       final MediaType mt = conn.contentType();
       if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
-        addMultipart(mt, options);
+        addMultipart(mt, options, form);
       } else if(mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
-        addURLEncoded();
+        addURLEncoded(form);
       }
     }
     return form;
@@ -82,18 +81,16 @@ public final class HTTPParams {
    * @return query parameters
    * @throws IOException I/O exception
    */
-  public Map<String, Value> query() throws IOException {
-    if(query == null) {
-      query = new HashMap<>();
-      for(final Entry<String, String[]> entry : map().entrySet()) {
-        final String key = entry.getKey();
-        final String[] values = entry.getValue();
+  public Map<String, Value> map() throws IOException {
+    if(values == null) {
+      values = new HashMap<>();
+      stringMap().forEach((key, value) -> {
         final ValueBuilder vb = new ValueBuilder();
-        for(final String v : values) vb.add(new Atm(v));
-        query.put(key, vb.value());
-      }
+        for(final String v : value) vb.add(new Atm(v));
+        values.put(key, vb.value());
+      });
     }
-    return query;
+    return values;
   }
 
   /**
@@ -114,32 +111,30 @@ public final class HTTPParams {
    * Adds multipart form-data from the passed on request body.
    * @param type media type
    * @param options main options
+   * @param map form parameters
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void addMultipart(final MediaType type, final MainOptions options)
-      throws QueryException, IOException {
+  private void addMultipart(final MediaType type, final MainOptions options,
+      final Map<String, Value> map) throws QueryException, IOException {
 
     try(InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, options);
-      for(final Entry<String, Value> entry : hp.multiForm(type).entrySet()) {
-        form.put(entry.getKey(), entry.getValue());
-      }
+      hp.multiForm(type).forEach((k, v) -> map.put(k, v));
     }
   }
 
   /**
    * Adds URL-encoded parameters from the passed on request body.
+   * @param map form parameters
    * @throws IOException I/O exception
    */
-  private void addURLEncoded() throws IOException {
-    for(final String nv : Strings.split(body().toString(), '&')) {
-      final String[] parts = Strings.split(nv, '=', 2);
+  private void addURLEncoded(final Map<String, Value> map) throws IOException {
+    for(final String param : Strings.split(body().toString(), '&')) {
+      final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
         final Atm i = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
-        final String k = parts[0];
-        final Value v = form.get(k);
-        form.put(k, v == null ? i : new ValueBuilder().add(v).add(i).value());
+        map.merge(parts[0], i, (v1, v2) -> { return new ValueBuilder().add(v1).add(v2).value(); });
       }
     }
   }

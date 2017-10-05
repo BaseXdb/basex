@@ -5,7 +5,6 @@ import static org.basex.http.webdav.WebDAVUtils.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 import javax.servlet.http.*;
 
@@ -15,8 +14,8 @@ import org.apache.commons.fileupload.servlet.*;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
-import com.bradmcevoy.http.Response.ContentType;
 import com.bradmcevoy.http.Cookie;
+import com.bradmcevoy.http.Response.*;
 
 /**
  * Wrapper around {@link HttpServletRequest}, which in addition implements {@link Request}.<br/>
@@ -50,8 +49,7 @@ final class WebDAVRequest extends AbstractRequest {
     CONTENT_TYPES.put(ContentType.HTTP, Response.HTTP);
     CONTENT_TYPES.put(ContentType.MULTIPART, Response.MULTIPART);
     CONTENT_TYPES.put(ContentType.XML, Response.XML);
-    for(final Entry<ContentType, String> entry : CONTENT_TYPES.entrySet())
-      TYPE_CONTENTS.put(entry.getValue(), entry.getKey());
+    CONTENT_TYPES.forEach((key, value) -> TYPE_CONTENTS.put(value, key));
   }
 
   /**

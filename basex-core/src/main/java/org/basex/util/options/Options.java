@@ -569,28 +569,26 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized String toString() {
     // only those options are listed whose value differs from default value
     final StringBuilder sb = new StringBuilder();
-    for(final Entry<String, Object> e : values.entrySet()) {
-      final String name = e.getKey();
-      final Object value = e.getValue();
-      if(value == null) continue;
-
-      final StringList sl = new StringList();
-      final Object value2 = options.get(name).value();
-      if(value instanceof String[]) {
-        for(final String s : (String[]) value) sl.add(s);
-      } else if(value instanceof int[]) {
-        for(final int s : (int[]) value) sl.add(Integer.toString(s));
-      } else if(value instanceof Options) {
-        final String s = value.toString();
-        if(value2 == null || !s.equals(value2.toString())) sl.add(s);
-      } else if(!value.equals(value2)) {
-        sl.add(value.toString());
+    values.forEach((name, value) -> {
+      if(value != null) {
+        final StringList sl = new StringList();
+        final Object value2 = options.get(name).value();
+        if(value instanceof String[]) {
+          for(final String s : (String[]) value) sl.add(s);
+        } else if(value instanceof int[]) {
+          for(final int s : (int[]) value) sl.add(Integer.toString(s));
+        } else if(value instanceof Options) {
+          final String s = value.toString();
+          if(value2 == null || !s.equals(value2.toString())) sl.add(s);
+        } else if(!value.equals(value2)) {
+          sl.add(value.toString());
+        }
+        for(final String s : sl) {
+          if(sb.length() != 0) sb.append(',');
+          sb.append(name).append('=').append(s.replace(",", ",,"));
+        }
       }
-      for(final String s : sl) {
-        if(sb.length() != 0) sb.append(',');
-        sb.append(name).append('=').append(s.replace(",", ",,"));
-      }
-    }
+    });
     return sb.toString();
   }
 

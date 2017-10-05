@@ -2,7 +2,6 @@ package org.basex.util.http;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -181,9 +180,7 @@ public final class MediaType {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(type());
-    for(final Entry<String, String> entry : params.entrySet()) {
-      sb.append("; ").append(entry.getKey()).append('=').append(entry.getValue());
-    }
+    params.forEach((key, value) -> sb.append("; ").append(key).append('=').append(value));
     return sb.toString();
   }
 
@@ -196,8 +193,7 @@ public final class MediaType {
   public static MediaType get(final String path) {
     final int s = path.lastIndexOf('/'), d = path.lastIndexOf('.');
     final String suffix = d <= s ? "" : path.substring(d + 1).toLowerCase(Locale.ENGLISH);
-    final MediaType type = TYPES.get(suffix);
-    return type != null ? type : APPLICATION_OCTET_STREAM;
+    return TYPES.getOrDefault(suffix, APPLICATION_OCTET_STREAM);
   }
 
   /** Hash map containing all assignments. */

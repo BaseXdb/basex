@@ -21,9 +21,9 @@ import org.basex.util.http.*;
  */
 public final class RestXqModules {
   /** Singleton instance. */
-  private static RestXqModules instance;
+  private static volatile RestXqModules instance;
 
-  /** Parsing mutex. */
+  /** Current parsing state (additionally used as mutex). */
   private final AtomicBoolean parsed = new AtomicBoolean();
   /** RESTXQ path. */
   private final IOFile path;

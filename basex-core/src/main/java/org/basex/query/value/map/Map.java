@@ -238,9 +238,7 @@ public final class Map extends FItem {
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<>();
-    for(final Item key : keys()) {
-      map.put(key.toJava(), get(key, null).toJava());
-    }
+    for(final Item key : keys()) map.put(key.toJava(), get(key, null).toJava());
     return map;
   }
 

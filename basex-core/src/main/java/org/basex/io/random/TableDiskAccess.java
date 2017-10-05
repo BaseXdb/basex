@@ -417,7 +417,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  protected synchronized void dirty() {
+  protected void dirty() {
     // initialize data structures required for performing updates
     if(fpres == null) {
       final int b = size;

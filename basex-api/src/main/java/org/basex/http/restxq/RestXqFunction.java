@@ -276,8 +276,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind query and form parameters
-    for(final RestXqParam rxp : queryParams) bind(rxp, arg, conn.params.query().get(rxp.name), qc);
-    for(final RestXqParam rxp : formParams) bind(rxp, arg, conn.params.form(mo).get(rxp.name), qc);
+    for(final RestXqParam rxp : queryParams) {
+      bind(rxp, arg, conn.params.map().get(rxp.name), qc);
+    }
+    for(final RestXqParam rxp : formParams) {
+      bind(rxp, arg, conn.params.form(mo).get(rxp.name), qc);
+    }
 
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {

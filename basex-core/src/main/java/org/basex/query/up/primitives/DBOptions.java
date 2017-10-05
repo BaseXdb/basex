@@ -109,8 +109,8 @@ public final class DBOptions {
    * @param option option
    * @param value value
    */
-  public void assignIfEmpty(final Option<?> option, final Object value) {
-    if(!map.containsKey(option)) map.put(option, value);
+  public void assignIfAbsent(final Option<?> option, final Object value) {
+    map.putIfAbsent(option, value);
   }
 
   /**
@@ -119,9 +119,7 @@ public final class DBOptions {
    * @return main options
    */
   public MainOptions assignTo(final MainOptions opts) {
-    for(final Entry<Option<?>, Object> entry : map.entrySet()) {
-      opts.put(entry.getKey(), entry.getValue());
-    }
+    map.forEach((key, value) -> opts.put(key, value));
     return opts;
   }
 }

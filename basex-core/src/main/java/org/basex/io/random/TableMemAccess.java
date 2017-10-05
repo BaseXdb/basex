@@ -112,7 +112,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  protected synchronized void dirty() {
+  protected void dirty() {
     dirty = true;
   }
 

@@ -3,7 +3,6 @@ package org.basex.core.locks;
 import static org.basex.util.Prop.*;
 
 import java.util.*;
-import java.util.Map.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.*;
 
@@ -213,14 +212,12 @@ public final class Locking {
     sb.append(in).append(queue).append(NL);
     sb.append(in).append("Held locks by object:").append(NL);
     synchronized(localLocks) {
-      for(final Entry<String, LocalReadWriteLock> e : localLocks.entrySet()) {
-        sb.append(in).append(in).append(e.getKey()).append(" -> ").append(e.getValue()).append(NL);
-      }
+      localLocks.forEach((key, value) ->
+        sb.append(in).append(in).append(key).append(" -> ").append(value).append(NL));
     }
     sb.append(in).append("Held locks by job:").append(NL);
-    for(final Entry<Long, Locks> e : locked.entrySet()) {
-      sb.append(in).append(in).append(e.getKey()).append(" -> ").append(e.getValue()).append(NL);
-    }
+    locked.forEach((key, value) ->
+      sb.append(in).append(in).append(key).append(" -> ").append(value).append(NL));
     return sb.toString();
   }
 }

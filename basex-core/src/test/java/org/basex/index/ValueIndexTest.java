@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.List;
 
 import org.basex.*;
@@ -145,23 +144,22 @@ public final class ValueIndexTest extends SandboxTest {
     final ValueIndex index = (ValueIndex) context.data().index(indexType);
 
     // receive, verify and count results for passed tokens
-    for(final Entry<String, Integer> entry : tokens.entrySet()) {
-      final byte[] token = token(entry.getKey());
+    tokens.forEach((key, value) -> {
+      final byte[] token = token(key);
       final IndexIterator it = index.iter(new IndexEntries(token, indexType));
       long count = 0;
       while(it.more()) {
         final int pre = it.pre();
         final byte[] result = context.data().text(pre, text);
         if(indexType == IndexType.TOKEN)
-          assertTrue("Token '" + entry.getKey() + "' not found in match '" + string(result) + "'!",
-              new TokenSet(distinctTokens(result)).contains(token(entry.getKey())));
+          assertTrue("Token '" + key + "' not found in match '" + string(result) + "'!",
+              new TokenSet(distinctTokens(result)).contains(token(key)));
         else
-          assertEquals("Wrong result returned!", entry.getKey(), string(result));
+          assertEquals("Wrong result returned!", key, string(result));
         count++;
       }
-      assertEquals("Wrong number of nodes returned: \"" + entry.getKey() + "\": ",
-          (long) entry.getValue(), count);
-    }
+      assertEquals("Wrong number of nodes returned: \"" + key + "\": ", (int) value, count);
+    });
   }
 
 }

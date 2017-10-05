@@ -3,7 +3,6 @@ package org.basex.index;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -25,12 +24,12 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
    */
   @Test
   public void textIndex() {
-    for(final Entry<String, Integer> entry : map().entrySet()) {
-      set(MainOptions.TEXTINCLUDE, entry.getKey());
+    map().forEach((key, value) -> {
+      set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
       final int size = context.data().textIndex.size();
-      assertEquals("TextIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
-    }
+      assertEquals("TextIndex: \"" + key + "\": ", value.intValue(), size);
+    });
   }
 
   /**
@@ -39,12 +38,12 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   @Test
   public void attrIndex() {
     try {
-      for(final Entry<String, Integer> entry : map().entrySet()) {
-        set(MainOptions.ATTRINCLUDE, entry.getKey());
+      map().forEach((key, value) -> {
+        set(MainOptions.ATTRINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
         final int size = context.data().attrIndex.size();
-        assertEquals("AttrIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
-      }
+        assertEquals("AttrIndex: \"" + key + "\": ", value.intValue(), size);
+      });
     } finally {
       set(MainOptions.ATTRINCLUDE, "");
     }
@@ -57,12 +56,12 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   public void tokenIndex() {
     set(MainOptions.TOKENINDEX, true);
     try {
-      for(final Entry<String, Integer> entry : map().entrySet()) {
-        set(MainOptions.TOKENINCLUDE, entry.getKey());
+      map().forEach((key, value) -> {
+        set(MainOptions.TOKENINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
         final int size = context.data().tokenIndex.size();
-        assertEquals("TokenIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
-      }
+        assertEquals("TokenIndex: \"" + key + "\": ", value.intValue(), size);
+      });
     } finally {
       set(MainOptions.TOKENINCLUDE, "");
       set(MainOptions.TOKENINDEX, false);
@@ -76,13 +75,11 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   public void ftIndex() {
     set(MainOptions.FTINDEX, true);
     try {
-      for(final Entry<String, Integer> entry : map().entrySet()) {
-        final String key = entry.getKey();
-        final int value = entry.getValue();
+      map().forEach((key, value) -> {
         set(MainOptions.FTINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
-        assertEquals("FTIndex: \"" + key + "\": ", value, context.data().ftIndex.size());
-      }
+        assertEquals("FTIndex: \"" + key + "\": ", (int) value, context.data().ftIndex.size());
+      });
     } finally {
       set(MainOptions.FTINCLUDE, "");
       set(MainOptions.FTINDEX, false);
