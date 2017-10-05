@@ -7,8 +7,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import javax.net.ssl.*;
-
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
@@ -103,16 +101,7 @@ public final class BaseXHTTP extends CLI {
 
     // start web server in a new process
     if(service) {
-
-      // check each ServerConnector for SSl-support
-      boolean sslSupported = false;
-      for (int i = 0; i < conns.size(); i++) {
-        for (ConnectionFactory c : conns.get(i).getConnectionFactories()) {
-          if (c instanceof SslConnectionFactory) sslSupported = true;
-        }
-      }
-
-      start(conn1.getPort(), sslSupported, args);
+      start(args);
       if(!quiet) for(final ServerConnector conn : conns) Util.outln(startX, conn.getPort());
       // keep message visible for a while
       Performance.sleep(1000);
@@ -294,20 +283,13 @@ public final class BaseXHTTP extends CLI {
 
   /**
    * Starts the HTTP server in a separate process.
-   * @param port server port
-   * @param ssl encryption via HTTPS
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  public static void start(final int port, final boolean ssl, final String... args)
-      throws BaseXException {
-
+  public static void start(final String... args) throws BaseXException {
     // start server and check if it caused an error message
     final String error = Util.error(Util.start(BaseXHTTP.class, args), 2000);
     if(error != null) throw new BaseXException(error.trim());
-
-    // try to connect to the new server instance
-    if(!ping(S_LOCALHOST, port, ssl)) throw new BaseXException(CONNECTION_ERROR_X, port);
   }
 
   /**
@@ -331,29 +313,6 @@ public final class BaseXHTTP extends CLI {
     }
     // wait until server was stopped
     do Performance.sleep(10); while(stopFile.exists());
-  }
-
-  /**
-   * Checks if a server is running.
-   * @param host host
-   * @param port server port
-   * @param ssl encryption via HTTPS
-   * @return boolean success
-   */
-  public static boolean ping(final String host, final int port, final boolean ssl) {
-    try(InputStream is = new IOUrl((ssl ? "https://" : "http://") + host + ':' + port).
-      connection().getInputStream()) {
-      // create connection
-      return true;
-    } catch(final FileNotFoundException | SSLHandshakeException ex) {
-      // if page is not found, server is running
-      // if SSL handshake failed, server is running, otherwise SSLException
-      Util.debug(ex);
-      return true;
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return false;
-    }
   }
 
   @Override
