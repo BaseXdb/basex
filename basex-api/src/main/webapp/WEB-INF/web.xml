@@ -4,13 +4,13 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/web-app_4_0.xsd" 
   version="4.0">
-
-    <display-name>BaseX: The XML Database and XQuery Processor</display-name>
-    <description>HTTP Services</description>
     
-    <!-- A BaseX option can be overwritten by prefixing the key with "org.basex."
-       and specifying it in <context-param/> elements, as shown below. Please
-       check out http://docs.basex.org/wiki/Options for a list of all options.
+  <display-name>BaseX: The XML Database and XQuery Processor</display-name>
+  <description>HTTP Services</description>
+    
+  <!-- A BaseX option can be overwritten by prefixing the key with "org.basex."
+     and specifying it in <context-param/> elements, as shown below.
+     Check out http://docs.basex.org/wiki/Options for a list of all options.
 
   <context-param>
     <param-name>org.basex.restxqpath</param-name>
@@ -86,7 +86,7 @@
   </filter-mapping>
   -->
 
-  <!-- RESTXQ Service (can be deactivated by removing this entry) -->
+  <!-- RESTXQ Service (can be disabled by removing this entry) -->
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
@@ -101,7 +101,7 @@
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
-  <!-- REST Service (can be deactivated by removing this entry) -->
+  <!-- REST Service (can be disabled by removing this entry) -->
   <servlet>
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
@@ -111,7 +111,7 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <!-- WebDAV Service (can be deactivated by removing this entry) -->
+  <!-- WebDAV Service (can be disabled by removing this entry) -->
   <servlet>
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
