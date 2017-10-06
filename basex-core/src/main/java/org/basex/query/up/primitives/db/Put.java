@@ -43,18 +43,18 @@ public final class Put extends DBUpdate {
 
   @Override
   public void apply() throws QueryException {
-    for(final String u : paths) {
+    for(final String path : paths) {
       final int pre = data.pre(id);
       if(pre == -1) return;
       final DBNode node = new DBNode(data, pre);
-      try(PrintOutput po = new PrintOutput(u)) {
+      try(PrintOutput po = new PrintOutput(path)) {
         final SerializerOptions sopts = SerializerMode.DEFAULT.get();
         try(Serializer ser = Serializer.get(po, sopts)) {
           ser.serialize(node);
         }
       } catch(final IOException ex) {
         Util.debug(ex);
-        throw UPPUTERR_X.get(info, u);
+        throw UPPUTERR_X.get(info, path);
       }
     }
   }

@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.*;
@@ -27,16 +26,16 @@ public final class FnPut extends StandardFunc {
     final ANode nd = toNode(exprs[0], qc);
     if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE_X.get(info, exprs[0]);
 
-    final Uri u = Uri.uri(file);
-    if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI_X.get(info, file);
+    final Uri uri = Uri.uri(file);
+    if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, file);
     final Updates updates = qc.updates();
     final DBNode target = updates.determineDataRef(nd, qc);
 
-    final String uri = IO.get(string(u.string())).path();
+    final String path = new QueryInput(string(uri.string()), sc).io.path();
     // check if all target paths are unique
-    if(!updates.putPaths.add(uri)) throw UPURIDUP_X.get(info, uri);
+    if(!updates.putPaths.add(path)) throw UPURIDUP_X.get(info, path);
 
-    updates.add(new Put(target.pre(), target.data(), uri, info), qc);
+    updates.add(new Put(target.pre(), target.data(), path, info), qc);
     return null;
   }
 }
