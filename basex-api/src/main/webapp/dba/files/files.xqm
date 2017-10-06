@@ -63,8 +63,8 @@ function dba:files(
                   map { 'file': replace($name, $cons:SUFFIX || '$', '') }
                 ),
                 let $job := (
-                  let $uri := file:path-to-uri($file)
-                  return $jobs[. = $uri]
+                  let $uri := replace(file:path-to-uri($file), '^file:/*', '')
+                  return $jobs[replace(., '^file:/*', '') = $uri]
                 )
                 let $id := string($job/@id)
                 return if(empty($job)) then (

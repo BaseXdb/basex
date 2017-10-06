@@ -307,14 +307,8 @@ public final class IOFile extends IO {
 
   @Override
   public String url() {
-    final TokenBuilder tb = new TokenBuilder(FILEPREF);
-    String path = pth;
-    if(path.startsWith("/")) {
-      path = path.substring(1);
-    } else {
-      // add leading slash for Windows paths
-      tb.add("//");
-    }
+    final String path = pth.startsWith("/") ? pth.substring(1) : pth;
+    final TokenBuilder tb = new TokenBuilder(FILEPREF).add("//");
     final int pl = path.length();
     for(int p = 0; p < pl; p++) {
       // replace spaces with %20

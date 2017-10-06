@@ -194,7 +194,7 @@ declare function html:button(
   $label    as xs:string,
   $confirm  as xs:boolean
 ) as element(button) {
-  html:button($value, $label, $confirm, map { })
+  html:button($value, $label, $confirm, ())
 };
 
 (:~
@@ -209,13 +209,17 @@ declare function html:button(
   $value    as xs:string,
   $label    as xs:string,
   $confirm  as xs:boolean,
-  $atts     as map(xs:string, xs:string)
+  $atts     as map(xs:string, xs:string)?
 ) as element(button) {
   element button {
     attribute name { 'action' },
     attribute value { $value },
-    $confirm[.] ! attribute onclick { 'return confirm("Are you sure?");' },
-    map:for-each($atts, function($key, $value) { attribute { $key } { $value } }),
+    if($confirm) then (
+      attribute onclick { 'return confirm("Are you sure?");' }
+    ) else (),
+    if(exists($atts)) then (
+      map:for-each($atts, function($key, $value) { attribute { $key } { $value } })
+    ) else (),
     $label
   }
 };

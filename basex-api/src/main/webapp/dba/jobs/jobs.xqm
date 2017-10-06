@@ -87,12 +87,12 @@ function dba:jobs(
               <form action="jobs" method="post" id="jobs">
                 <input type="hidden" name="id" value="{ $job }"/>
                 {
-                  html:button('job-stop', 'Stop', true()) update {
-                    if($cached) then insert node attribute disabled {} into . else ()
-                  },  ' ',
-                  html:button('job-result', 'Download') update {
-                    if(not($cached)) then insert node attribute disabled {} into . else ()
-                  }
+                  let $disabled := map { 'disabled': '' }
+                  return (
+                    html:button('job-stop', 'Stop', true(), $disabled[$cached]), ' ',
+                    html:button('job-result', 'Download', false(), $disabled[not($cached)]), ' ',
+                    html:button('job-discard', 'Discard', false(), $disabled[not($cached)]), ' '
+                  )
                 }
               </form>,
               <table>{
