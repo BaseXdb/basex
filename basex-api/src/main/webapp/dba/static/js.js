@@ -73,7 +73,7 @@ function setWarning(message) {
 };
 
 /**
- * Displays an error message. Stack trace info will be replaced.
+ * Displays an error message. Stack trace info will be removed.
  * @param {string} message  error message
  */
 function setError(message) {
@@ -88,7 +88,9 @@ function setError(message) {
 function setText(message, type) {
   var info = document.getElementById("info");
   info.className = type;
-  info.textContent = message;
+  var msg = message.replace(/^\[.*?\] /, "");
+  info.textContent = msg.length > 80 ? msg.substring(0, 80) + "…" : msg;
+  info.title = message;
 };
 
 /** Indicates how many queries are being evaluated. */
@@ -148,7 +150,6 @@ function setErrorFromResponse(request) {
   var s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
   msg = msg.replace(/\s+/g, " ");
-  if(msg.length > 100) msg = msg.substring(0, 100) + "…";
   // display correctly escaped feedback
   var html = document.createElement("div");
   html.innerHTML = msg;

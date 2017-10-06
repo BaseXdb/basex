@@ -23,7 +23,6 @@ declare
   %rest:path("/dba/pattern-drop")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("pattern", "{$patterns}")
-  %output:method("html")
 function dba:pattern-drop(
   $name      as xs:string,
   $patterns  as xs:string*

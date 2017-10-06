@@ -1,3 +1,4 @@
+
 (:~
  : Download log file.
  :
@@ -21,19 +22,15 @@ declare
   %rest:path("/dba/log-download")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("input", "{$input}")
-  %output:method("html")
 function dba:drop(
   $name   as xs:string,
   $input  as xs:string
 ) as element()+ {
   cons:check(),
-
-  let $ext := if($input) then ('-' || web:encode-url($input)) else ()
+  let $ext := if($input) then ('-' || encode-for-uri($input)) else ()
   return web:response-header(
     map { 'media-type': 'text/xml' },
-    map { 'Cache-Control': '',
-          'Content-Disposition': 'attachment; filename=logs' || $name || $ext || '.xml'
-    }
+    map { 'Content-Disposition': 'attachment; filename=logs' || $name || $ext || '.xml' }
   ),
   element entries {
     admin:logs($name, true())[matches(., $input, 'i')]

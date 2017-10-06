@@ -155,7 +155,6 @@ declare
   %rest:path("/dba/logs")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
-  %output:method("html")
 function dba:logs-redirect(
   $action  as xs:string,
   $names   as xs:string*

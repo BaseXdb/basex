@@ -36,6 +36,10 @@ td {
   border: 0;
 }
 
+.slick {
+  padding: 0 0 0 0;
+}
+
 textarea {
   font-family: "Consolas", "Ubuntu Mono", monospace;
   font-size: 90%;

@@ -3,14 +3,14 @@
  :
  : @author Christian Grün, BaseX Team, 2014-17
  :)
-module namespace dba = 'dba/users';
+module namespace dba = 'dba/sessions';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $dba:CAT := 'users';
+declare variable $dba:CAT := 'sessions';
 
 (:~
  : Kills web sessions.
@@ -19,9 +19,8 @@ declare variable $dba:CAT := 'users';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/kill-session")
+  %rest:path("/dba/session-kill")
   %rest:query-param("id", "{$ids}")
-  %output:method("html")
 function dba:drop(
   $ids  as xs:string*
 ) as element(rest:response) {

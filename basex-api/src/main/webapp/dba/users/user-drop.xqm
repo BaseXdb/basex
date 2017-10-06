@@ -21,7 +21,6 @@ declare
   %rest:GET
   %rest:path("/dba/user-drop")
   %rest:query-param("name", "{$names}")
-  %output:method("html")
 function dba:user-drop(
   $names  as xs:string*
 ) as empty-sequence() {

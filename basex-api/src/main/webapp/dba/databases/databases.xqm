@@ -92,7 +92,6 @@ declare
   %rest:path("/dba/databases")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
-  %output:method("html")
 function dba:databases-redirect(
   $action  as xs:string,
   $names   as xs:string*

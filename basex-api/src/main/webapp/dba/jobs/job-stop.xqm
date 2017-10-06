@@ -3,24 +3,23 @@
  :
  : @author Christian Grün, BaseX Team, 2014-17
  :)
-module namespace dba = 'dba/jobs-users';
+module namespace dba = 'dba/jobs';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
-declare variable $dba:CAT := 'files';
+declare variable $dba:CAT := 'jobs';
 
 (:~
  : Stops jobs.
- : @param  $ids  session ids
+ : @param  $ids  job ids
  : @return redirection
  :)
 declare
   %rest:GET
   %rest:path("/dba/job-stop")
-  %rest:query-param("id",  "{$ids}")
-  %output:method("html")
+  %rest:query-param("id", "{$ids}")
 function dba:job-stop(
   $ids  as xs:string*
 ) as element(rest:response) {

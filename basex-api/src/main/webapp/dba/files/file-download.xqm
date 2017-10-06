@@ -19,6 +19,6 @@ function dba:files(
   $name  as xs:string
 ) as item()+ {
   cons:check(),
-  web:response-header(map { }, map { 'Cache-Control': '' }),
+  web:response-header(),
   file:read-binary($cons:DBA-DIR || $name)
 };

@@ -1,32 +1,32 @@
 (:~
- : Evaluates a file.
+ : Stop jobs.
  :
  : @author Christian Grün, BaseX Team, 2014-17
  :)
 module namespace dba = 'dba/files';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
 
 (:~
- : Evaluates a file.
- : @param  $file  file name
+ : Stops jobs.
+ : @param  $ids  session ids
  : @return redirection
  :)
 declare
   %rest:GET
-  %rest:path("/dba/job-start")
-  %rest:query-param("file", "{$file}", "")
-function dba:job-start(
-  $file  as xs:string
+  %rest:path("/dba/file-stop")
+  %rest:query-param("id",  "{$id}")
+function dba:file-stop(
+  $id  as xs:string
 ) as element(rest:response) {
   cons:check(),
-  let $name := replace($file, '\.\.+|/|\\', '')
   let $params := try {
-    prof:void(jobs:invoke($cons:DBA-DIR || $name, (), map { 'cache': 'true', 'id': $file })),
-    map { 'info': 'Job was started.' }
+    jobs:stop($id),
+    map { 'info': util:info($id, 'job', 'stopped') }
   } catch * {
     map { 'error': $err:description }
   }

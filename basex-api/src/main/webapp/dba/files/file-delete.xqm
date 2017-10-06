@@ -20,7 +20,6 @@ declare
   %rest:GET
   %rest:path("/dba/file-delete")
   %rest:query-param("name", "{$names}")
-  %output:method("html")
 function dba:file-delete(
   $names  as xs:string*
 ) as element(rest:response) {

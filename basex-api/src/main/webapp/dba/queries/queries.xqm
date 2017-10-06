@@ -46,8 +46,8 @@ function dba:queries(
             <td width='80%'>
               <select id='mode'>{
                 ('Read-Only', 'Updating') ! element option { . }
-              }</select>
-              <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>
+              }</select>{ ' ' }
+              <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>{ ' ' }
               <button id='stop' onclick='stopQuery()' disabled='true'>Stop</button>
             </td>
             <td width='20%' align='right'>
@@ -63,9 +63,9 @@ function dba:queries(
                 <div align='right'>
                     <input id='file' name='file' placeholder='Name of query' size='30'
                            list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
-                    <datalist id='files'>{ dba:files() ! element option { . } }</datalist>
+                    <datalist id='files'>{ dba:files() ! element option { . } }</datalist>{ ' ' }
                     <button type='submit' name='open' id='open' disabled='true'
-                            onclick='openQuery()'>Open</button>
+                            onclick='openQuery()'>Open</button>{ ' ' }
                     <button type='save' name='save' id='save' disabled='true'
                             onclick='saveQuery()'>Save</button>
                 </div>

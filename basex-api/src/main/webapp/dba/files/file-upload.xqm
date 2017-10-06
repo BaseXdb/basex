@@ -20,7 +20,6 @@ declare
   %rest:POST
   %rest:path("/dba/file-upload")
   %rest:form-param("files", "{$files}")
-  %output:method("html")
 function dba:file-upload(
   $files  as map(*)
 ) as element(rest:response) {

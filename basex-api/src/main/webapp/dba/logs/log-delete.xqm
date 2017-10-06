@@ -20,7 +20,6 @@ declare
   %rest:GET
   %rest:path("/dba/log-delete")
   %rest:query-param("name", "{$names}")
-  %output:method("html")
 function dba:drop(
   $names  as xs:string*
 ) as element(rest:response) {

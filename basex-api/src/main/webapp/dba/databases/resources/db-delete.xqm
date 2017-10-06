@@ -23,7 +23,6 @@ declare
   %rest:path("/dba/db-delete")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resources}")
-  %output:method("html")
 function dba:db-delete(
   $name       as xs:string,
   $resources  as xs:string*

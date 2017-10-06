@@ -1,3 +1,4 @@
+
 (:~
  : Settings page.
  :
@@ -103,7 +104,6 @@ declare %private function dba:input(
 declare
   %rest:POST
   %rest:path("/dba/settings")
-  %output:method("html")
 function dba:settings-save(
 ) as element(rest:response) {
   cons:check(),

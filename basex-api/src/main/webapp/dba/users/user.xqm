@@ -1,6 +1,5 @@
-
 (:~
- : User main page.
+ : User page.
  :
  : @author Christian Grün, BaseX Team, 2014-17
  :)
@@ -15,7 +14,7 @@ declare variable $dba:CAT := 'users';
 declare variable $dba:SUB := 'user';
 
 (:~
- : Manage a single user.
+ : Returns a single user page.
  : @param  $name     user name
  : @param  $newname  new name
  : @param  $pw       password

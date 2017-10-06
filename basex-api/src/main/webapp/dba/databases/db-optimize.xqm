@@ -130,7 +130,6 @@ declare
   %rest:GET
   %rest:path("/dba/db-optimize-all")
   %rest:query-param("name", "{$names}")
-  %output:method("html")
 function dba:drop(
   $names  as xs:string*
 ) as empty-sequence() {

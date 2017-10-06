@@ -26,8 +26,7 @@ function dba:db-download(
   try {
     web:response-header(
       map { 'media-type': db:content-type($name, $resource) },
-      map { 'Cache-Control': '',
-            'Content-Disposition': 'attachment; filename=' || $resource }
+      map { 'Content-Disposition': 'attachment; filename=' || $resource }
     ),
     if(db:is-raw($name, $resource)) then (
       db:retrieve($name, $resource)
