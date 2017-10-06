@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.*;
@@ -22,8 +23,11 @@ public final class FnPut extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
-    final byte[] file = toEmptyToken(exprs[1], qc);
     final ANode nd = toNode(exprs[0], qc);
+    final byte[] file = toEmptyToken(exprs[1], qc);
+    final Item it = exprs.length > 2 ? exprs[2].item(qc, info) : null;
+    final SerializerOptions sopts = FuncOptions.serializer(it, info);
+
     if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE_X.get(info, exprs[0]);
 
     final Uri uri = Uri.uri(file);
@@ -35,7 +39,7 @@ public final class FnPut extends StandardFunc {
     // check if all target paths are unique
     if(!updates.putPaths.add(path)) throw UPURIDUP_X.get(info, path);
 
-    updates.add(new Put(target.pre(), target.data(), path, info), qc);
+    updates.add(new Put(target.pre(), target.data(), path, sopts, info), qc);
     return null;
   }
 }

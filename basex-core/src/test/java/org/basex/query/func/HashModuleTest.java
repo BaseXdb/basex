@@ -49,7 +49,7 @@ public final class HashModuleTest extends AdvancedQueryTest {
     query(STRING.args(_HASH_HASH.args("xs:base64Binary('')", "md5")), "1B2M2Y8AsgTpgAmY7PhCfg==");
     query(STRING.args(_HASH_HASH.args("xs:hexBinary('')", "md5")), "1B2M2Y8AsgTpgAmY7PhCfg==");
 
-    final String file = sandbox() + "/hash";
+    final String file = sandbox() + "hash";
     try {
       query(_FILE_WRITE.args(file, "BaseX"));
       query(STRING.args(_HASH_HASH.args(_FILE_READ_BINARY.args(file), "md5")),

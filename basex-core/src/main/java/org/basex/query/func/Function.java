@@ -322,7 +322,7 @@ public enum Function {
   /** XQuery function. */
   PREFIX_FROM_QNAME(FnPrefixFromQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */
-  PUT(FnPut.class, "put(node,uri)", arg(NOD, STR_ZO), EMP, flag(UPD)),
+  PUT(FnPut.class, "put(node,uri[,params])", arg(NOD, STR_ZO, ITEM_ZO), EMP, flag(UPD)),
   /** XQuery function. */
   QNAME(FnQName.class, "QName(uri,name)", arg(STR_ZO, STR), QNM),
   /** XQuery function. */

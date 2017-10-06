@@ -1230,9 +1230,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /** Test output URI is correctly resolved. */
   @Test
-  public void resolveUri() {
-    final String output = new IOFile(sandbox(), "test.xml").url();
-    query(PUT.args("<a/>", output));
+  public void put() {
+    query("declare base-uri \"" + sandbox() + "\"; " + PUT.args("<a/>", "test.xml"));
+    query(_FILE_EXISTS.args("\"" + sandbox() + "test.xml\""), "true");
   }
 
   /**

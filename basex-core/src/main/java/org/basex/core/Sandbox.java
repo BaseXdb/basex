@@ -194,7 +194,7 @@ public abstract class Sandbox {
    * @return database path
    */
   public static IOFile sandbox() {
-    return new IOFile(Prop.TMP, NAME);
+    return new IOFile(Prop.TMP, NAME + '/');
   }
 
   /**
