@@ -34,15 +34,18 @@ declare variable $cons:K-TIMEOUT := 'timeout';
 declare variable $cons:K-MEMORY := 'memory';
 (:~ Permission when running queries. :)
 declare variable $cons:K-PERMISSION := 'permission';
+(:~ Current directory. :)
+declare variable $cons:K-DIRECTORY := 'directory';
 
 (:~ Configuration. :)
 declare variable $cons:OPTION :=
   let $defaults := map {
-    'maxchars': 100000,
-    'maxrows': 100,
-    'timeout': 10,
-    'memory': 500,
-    'permission': 'admin'
+    $cons:K-DIRECTORY : $cons:DBA-DIR,
+    $cons:K-MAXCHARS  : 200000,
+    $cons:K-MAXROWS   : 200,
+    $cons:K-TIMEOUT   : 30,
+    $cons:K-MEMORY    : 500,
+    $cons:K-PERMISSION: 'admin'
   }
   return if(file:exists($cons:DBA-SETTINGS-FILE)) then (
     try {

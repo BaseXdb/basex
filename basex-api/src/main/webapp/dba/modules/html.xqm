@@ -57,47 +57,50 @@ declare function html:wrap(
           <td class='slick'>
             <table width='100%' cellpadding='0' cellspacing='0'>
               <tr>
-                <td>
-                  <h1>BaseX Database Administration</h1>
-                </td>
-                <td cellpadding='0' cellspacing='0' align='right'>{
-                  $cons:SESSION-VALUE ! <span style='float:right'><b>{ . }</b>
-                    (<a href='logout'>logout</a>)</span>
+                <td>{
+                  <span style='float:left'>
+                    <h1>BaseX Database Administration</h1>
+                  </span>,
+                  for $name in $cons:SESSION-VALUE
+                  return <span style='float:right'>
+                    <b>{ $name }</b> (<a href='logout'>logout</a>)
+                  </span>
                 }</td>
               </tr>
               <tr>
-                <td colspan='2'>{
-                  let $emph := <span>{
-                    element b {
-                      attribute id { 'info' },
-                      let $error := $options?error[.], $info := $options?info[.]
-                      return if($error) then (
-                        attribute class { 'error' }, $error
-                      ) else if($info) then (
-                        attribute class { 'info' }, $info
-                      ) else (),
-                      '&#xa0;'
+                <td>
+                  <div class='ellipsis'>{
+                    let $emph := <span>{
+                      element b {
+                        attribute id { 'info' },
+                        let $error := $options?error[.], $info := $options?info[.]
+                        return if($error) then (
+                          attribute class { 'error' }, $error
+                        ) else if($info) then (
+                          attribute class { 'info' }, $info
+                        ) else ()
+                      }
+                    }</span>
+                    return try {
+                      cons:check(),
+                      let $cats :=
+                        for $cat in ('Databases', 'Queries', 'Files', 'Jobs', 'Logs', 
+                          'Users', 'Sessions', 'Settings')
+                        let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
+                        return if($link = $header) then (
+                          <b>{ $link }</b>
+                        ) else (
+                          $link
+                        )
+                      return (head($cats), tail($cats) ! (' · ', .)),
+                      (1 to 3) ! '&#x2000;',
+                      $emph
+                    } catch basex:login {
+                      $emph
                     }
-                  }</span>
-                  return try {
-                    cons:check(),
-                    let $cats :=
-                      for $cat in ('Databases', 'Queries', 'Files', 'Jobs', 'Logs',  'Users', 'Sessions',
-                        'Settings')
-                      let $link := <a href="{ lower-case(replace($cat, ' &amp; ', '-')) }">{ $cat }</a>
-                      return if($link = $header) then (
-                        <b>{ $link }</b>
-                      ) else (
-                        $link
-                      )
-                    return (head($cats), tail($cats) ! (' · ', .)),
-                    (1 to 3) ! '&#x2000;',
-                    $emph
-                  } catch basex:login {
-                    $emph
-                  },
+                  }</div>
                   <hr/>
-                }</td>
+                </td>
               </tr>
             </table>
           </td>

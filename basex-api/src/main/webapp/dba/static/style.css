@@ -1,7 +1,7 @@
 body {
   font-family: Calibri, "Trebuchet MS", sans-serif;
   overflow-y: scroll;
-  margin: 1em;
+  margin: .75em;
   font-size: 16px;
 }
 
@@ -120,6 +120,12 @@ p {
 .info {
   color: #009900;
   font-weight: bold;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .warning {
