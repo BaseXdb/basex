@@ -260,7 +260,6 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Predicates. */
   @Test public void preds() {
     // context value: rewrite if root is of type string or node
-    check("'s'[.]", "s", "exists(QueryPlan/Str) and empty(//ContextValue)");
     check("<a/>[.]", "<a/>", "exists(QueryPlan/CElem) and empty(//ContextValue)");
     check("<a/>[.][.]", "<a/>", "exists(QueryPlan/CElem) and empty(//ContextValue)");
     check("<a/>/self::*[.][.]", "<a/>", "empty(//ContextValue)");

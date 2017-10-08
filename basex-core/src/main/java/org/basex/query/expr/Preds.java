@@ -183,7 +183,7 @@ public abstract class Preds extends Arr {
     final SeqType st = root.seqType();
     for(final Expr expr : exprs) {
       Expr e = expr;
-      if(expr instanceof ContextValue && st.type.isStringOrUntyped()) {
+      if(expr instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
         // E [ . ]  ->  E
         cc.info(OPTSIMPLE_X, this);
         continue;
