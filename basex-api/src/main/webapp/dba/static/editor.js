@@ -1,4 +1,3 @@
-
 /**
  * Opens a query file.
  * @param {string} file  optional file name
@@ -14,7 +13,7 @@ function openQuery(file) {
   } else {
     name = fileName();
   }
-  request("POST", "open-query?name=" + encodeURIComponent(name),
+  request("POST", "query-open?name=" + encodeURIComponent(name),
     null,
     function(req) {
       _editorMirror.setValue(req.responseText);
@@ -31,9 +30,15 @@ function openQuery(file) {
  * Saves a query file.
  */
 function saveQuery() {
+  // append file suffix
+  var value = fileName();
+  if(value.indexOf(".") === -1) {
+    value += ".xq";
+    document.getElementById("file").value = value;
+  }
   if(queryExists() && !confirm("Overwrite existing query?")) return;
 
-  request("POST", "save-query?name=" + encodeURIComponent(fileName()),
+  request("POST", "query-save?name=" + encodeURIComponent(value),
     document.getElementById("editor").value,
     function(req) {
       refreshDataList(req);
@@ -89,5 +94,5 @@ function queryExists() {
  * @returns {string} file name
  */
 function fileName() {
-  return document.getElementById("file").value.trim().replace(/\.xq$/, '');
+  return document.getElementById("file").value.trim();
 };

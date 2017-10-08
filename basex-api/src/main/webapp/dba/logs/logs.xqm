@@ -51,7 +51,7 @@ function dba:logs(
   let $name := if($name) then $name else string(head($files))
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
-      <td width='190'>
+      <td width='195'>
         <h2>{ html:link('Logs', $dba:CAT) }</h2>
         <form action="{ $dba:CAT }" method="post" class="update">
           <input type='hidden' name='name' id='name' value='{ $name }'/>

@@ -15,7 +15,6 @@ declare variable $dba:CAT := 'files';
 (:~
  : Files page.
  : @param  $sort   table sort key
- : @param  $job    highlighted job
  : @param  $error  error message
  : @param  $info   info message
  : @return page
@@ -24,61 +23,95 @@ declare
   %rest:GET
   %rest:path("/dba/files")
   %rest:query-param("sort",  "{$sort}", "")
-  %rest:query-param("job",   "{$job}")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
   %output:method("html")
 function dba:files(
   $sort   as xs:string,
-  $job    as xs:string?,
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
   cons:check(),
 
-  let $dir := $cons:DBA-DIR ! (file:create-dir(.), .)
+  let $dir := cons:dir()
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
+        <h2>Directory</h2>
+        <form action="dir-change" method="post">
+          <select name="dir" style="width: 350px;" onchange="this.form.submit();">{
+            let $system := db:system()
+            let $webapp := dba:dir($system//webpath)[.]
+            let $options := (
+              ['DBA'       , $cons:DBA-DIR],
+              ['Webapp'    , $webapp],
+              ['RESTXQ'    , dba:dir($webapp ! file:resolve-path($system//restxqpath, .))],
+              ['Repository', dba:dir($system//repopath)],
+              Q{java:java.io.File}listRoots() ! ['Root', string(.)],
+              ['Current'   , $dir]
+            )
+            let $selected := (
+              for $option at $pos in $options
+              where $option(2) = $dir
+              return $pos
+            )[1]
+            for $option at $pos in $options
+            let $name := $option(1), $path := $option(2)
+            where $path
+            return element option {
+              attribute value { $path },
+              attribute selected { }[$pos = $selected],
+              $path[.] ! (($name || ': ')[$name] || .)
+            }
+          }</select><![CDATA[ ]]>
+        </form>
         <form action="{ $dba:CAT }" method="post" class="update">
-        <h2>Files</h2>
         {
           let $headers := (
-            <name>Name</name>,
+            <name type='xml'>Name</name>,
             <date type='dateTime' order='desc'>Date</date>,
             <bytes type='bytes' order='desc'>Bytes</bytes>,
             <action type='xml'>Action</action>
           )
           let $rows := (
-            let $files := file:children($dir)[file:is-file(.)]
             let $jobs := jobs:list-details()
-            for $file in $files
+            let $parent := if(file:parent($dir)) then ($dir || '..') else ()
+            let $files := ($parent, file:children($dir))
+            for $file in ($files[file:is-dir(.)], $files[file:is-file(.)])
+            let $dir := file:is-dir($file)
             let $name := file:name($file)
-            let $date := file:last-modified($file)
-            let $xquery := ends-with($name, $cons:SUFFIX)
-            let $actions := util:item-join((
-              html:link('Download', 'file/' || encode-for-uri($name)),
-              if($xquery) then (
-                html:link('Edit', 'queries',
-                  map { 'file': replace($name, $cons:SUFFIX || '$', '') }
-                ),
-                let $job := (
-                  let $uri := replace(file:path-to-uri($file), '^file:/*', '')
-                  return $jobs[replace(., '^file:/*', '') = $uri]
-                )
-                let $id := string($job/@id)
-                return if(empty($job)) then (
-                  html:link('Start', 'file-start', map { 'file': $name })
-                ) else (
-                  html:link('Job', 'jobs', map { 'job': $id })
-                )
-              ) else ()
-            ), ' · ')
-            return <row name='{ $name }' date='{ $date }' bytes='{ file:size($file) }'
-              action='{ serialize($actions) }'/>
+            let $xquery := not($dir) and (
+              some $suffix in $cons:SUFFIXES satisfies ends-with($name, $suffix)
+            )
+            return <row name='{ serialize(
+              if($dir) then html:link($name, 'dir-change', map { 'dir': $name }) else $name
+            )}' date='{
+              file:last-modified($file)
+            }' bytes='{
+              file:size($file)
+            }' action='{ serialize(
+              util:item-join((
+                if($dir) then () else html:link('Download', 'file/' || encode-for-uri($name)),
+                if($xquery) then (
+                  html:link('Edit', 'queries',
+                    map { 'file': $name }
+                  ),
+                  let $job := (
+                    let $uri := replace(file:path-to-uri($file), '^file:/*', '')
+                    return $jobs[replace(., '^file:/*', '') = $uri]
+                  )
+                  let $id := string($job/@id)
+                  return if(empty($job)) then (
+                    html:link('Start', 'file-start', map { 'file': $name })
+                  ) else (
+                    html:link('Job', 'jobs', map { 'job': $id })
+                  )
+                ) else ()
+              ), ' · ')
+            )}'/>
           )
           let $buttons := html:button('file-delete', 'Delete', true())
-          return html:table($headers, $rows, $buttons, map { }, map { 'sort': $sort })
+          return html:table($headers, $rows, $buttons, map { }, map { })
         }
         </form>
         <h3>Upload Files</h3>
@@ -86,10 +119,11 @@ function dba:files(
           <input type="file" name="files" multiple="multiple"/>
           <input type="submit" value='Send'/>
         </form>
-        <div class='note'>
-          DBA directory: <code>{ file:path-to-native($dir) }</code>
-        </div>
-        <div>&#xa0;</div>
+        <h3>Create Directory</h3>
+        <form action="dir-create" method="post">
+          <input type="text" name="name"/><![CDATA[ ]]>
+          <input type="submit" value='Create'/>
+        </form>
       </td>
     </tr>
   )
@@ -113,4 +147,17 @@ function dba:files-redirect(
 ) as element(rest:response) {
   cons:check(),
   web:redirect($action, map { 'name': $names, 'redirect': $dba:CAT })
+};
+
+(:~
+ : Returns a native directory representation of the specified file.
+ : @param  $dir  directory
+ : @return native path (or empty sequence)
+ :)
+declare function dba:dir(
+  $dir  as xs:string
+) as xs:string? {
+  try {
+    file:path-to-native($dir)
+  } catch file:* { }
 };

@@ -107,13 +107,6 @@ declare
 function dba:settings-save(
 ) as element(rest:response) {
   cons:check(),
-  let $config := element config {
-    for $key in Request:parameter-names()
-    return element { $key } { Request:parameter($key) }
-  }
-  return (
-    file:create-dir($cons:DBA-DIR),
-    file:write($cons:DBA-SETTINGS-FILE, $config),
-    web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
-  )
+  cons:save(map:merge(Request:parameter-names() ! map:entry(., Request:parameter(.)))),
+  web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
 };

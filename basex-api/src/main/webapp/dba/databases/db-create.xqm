@@ -116,7 +116,8 @@ function dba:create(
         return map:entry($option, $opts = $option),
         $lang ! map:entry('language', .)))
       ),
-      cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was created.' })
+      cons:redirect($dba:SUB, map { 'name': $name,
+        'info': 'Database "' || $name || '"  was created.' })
     )
   } catch * {
     cons:redirect('db-create', map {

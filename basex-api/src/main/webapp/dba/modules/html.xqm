@@ -424,7 +424,8 @@ declare function html:table(
           return element td {
             attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
             if($pos = 1 and $buttons) then (
-              <input type='checkbox' name='{ $name }' value='{ $col }' onclick='buttons(this)'/>,
+              <input type='checkbox' name='{ $name }' value='{ data($value) }'
+                onclick='buttons(this)'/>,
               ' '
             ) else (),
             if($pos = 1 and exists($link)) then (

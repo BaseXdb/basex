@@ -9,15 +9,23 @@ import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace Session = 'http://basex.org/modules/session';
 
 (:~ Session key. :)
-declare variable $cons:SESSION-KEY := "dba";
+declare variable $cons:SESSION-KEY := 'dba';
 (:~ Current session. :)
 declare variable $cons:SESSION-VALUE := Session:get($cons:SESSION-KEY);
 
 (:~ Directory for DBA files. :)
-declare variable $cons:DBA-DIR := file:temp-dir() || 'dba/';
+declare variable $cons:DBA-DIR := (
+  for $dir in file:temp-dir() || 'dba'
+  return (
+    if(file:exists($dir)) then () else file:create-dir($dir),
+    file:path-to-native($dir)
+  )
+);
 (:~ Configuration file. :)
-declare variable $cons:DBA-SETTINGS-FILE := $cons:DBA-DIR || 'dba-settings.xml';
+declare %private variable $cons:DBA-SETTINGS-FILE := $cons:DBA-DIR || 'dba-settings.xml';
 
+(:~ Query file suffixes. :)
+declare variable $cons:SUFFIXES := ('.xq', '.xqm', '.xql', '.xqu', '.xquery', '.xqy');
 (:~ Query file suffix. :)
 declare variable $cons:SUFFIX := '.xq';
 
@@ -36,23 +44,28 @@ declare variable $cons:K-MEMORY := 'memory';
 declare variable $cons:K-PERMISSION := 'permission';
 (:~ Current directory. :)
 declare variable $cons:K-DIRECTORY := 'directory';
+(:~ Current query file. :)
+declare variable $cons:K-QUERY := 'query';
+
+(:~ Settings with default values. :)
+declare %private variable $cons:K-DEFAULTS := map {
+  $cons:K-DIRECTORY : $cons:DBA-DIR,
+  $cons:K-MAXCHARS  : 200000,
+  $cons:K-MAXROWS   : 200,
+  $cons:K-TIMEOUT   : 30,
+  $cons:K-MEMORY    : 500,
+  $cons:K-PERMISSION: 'admin',
+  $cons:K-QUERY     : ''
+};
 
 (:~ Configuration. :)
-declare variable $cons:OPTION :=
-  let $defaults := map {
-    $cons:K-DIRECTORY : $cons:DBA-DIR,
-    $cons:K-MAXCHARS  : 200000,
-    $cons:K-MAXROWS   : 200,
-    $cons:K-TIMEOUT   : 30,
-    $cons:K-MEMORY    : 500,
-    $cons:K-PERMISSION: 'admin'
-  }
-  return if(file:exists($cons:DBA-SETTINGS-FILE)) then (
+declare variable $cons:OPTION := (
+  if(file:exists($cons:DBA-SETTINGS-FILE)) then (
     try {
       (: merge defaults with options from settings file :)
       let $configs := fetch:xml($cons:DBA-SETTINGS-FILE)/config
       return map:merge(
-        map:for-each($defaults, function($key, $value) {
+        map:for-each($cons:K-DEFAULTS, function($key, $value) {
           map:entry($key,
             let $config := $configs/*[name() = $key]
             return if($config) then (
@@ -65,11 +78,36 @@ declare variable $cons:OPTION :=
       )
     } catch * {
       (: use defaults if an error occurs while parsing the configuration file :)
-      $defaults
+      $cons:K-DEFAULTS
     }
   ) else (
-    $defaults
-  );
+    $cons:K-DEFAULTS
+  )
+);
+
+(:~
+ : Returns the current DBA directory.
+ : @return directory
+ :)
+declare function cons:dir(
+) as xs:string {
+  let $dir := $cons:OPTION($cons:K-DIRECTORY)
+  return if(file:exists($dir)) then $dir else $cons:DBA-DIR
+};
+
+(:~
+ : Saves settings.
+ : @param  $settings  keys/values to be written
+ :)
+declare function cons:save(
+  $settings  as map(*)
+) as empty-sequence() {
+  file:write($cons:DBA-SETTINGS-FILE, element config {
+    map:for-each($cons:OPTION, function($key, $value) {
+      element { $key } { ($settings($key), $value)[1] }
+    })
+  })
+};
 
 (:~
  : Checks if the current client is logged in. If not, raises an error.
@@ -90,4 +128,18 @@ declare %updating function cons:redirect(
   $params  as map(*)
 ) as empty-sequence() {
   db:output(web:redirect($url, $params))
+};
+
+(:~
+ : Returns the names of all files.
+ : @return list of files
+ :)
+declare function cons:query-files() as xs:string* {
+  let $dir := cons:dir()
+  where file:exists($dir)
+  for $file in file:list($dir)
+  where (
+    some $suffix in $cons:SUFFIXES satisfies ends-with($file, $suffix)
+  )
+  return $file
 };

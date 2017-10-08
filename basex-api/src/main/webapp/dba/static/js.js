@@ -201,7 +201,7 @@ var _updating;
 function runQuery(reverse) {
   // decide if query is read-only or updating
   var updating = (document.getElementById("mode").selectedIndex == 1) ^ reverse;
-  var path = updating ? "update-query" : "eval-query";
+  var path = updating ? "query-update" : "query-eval";
 
   // stop old query if mode was changed (each has its own %rest:single function)
   if(_running && _updating != updating) stopQuery();
@@ -218,7 +218,7 @@ function runQuery(reverse) {
  */
 function stopQuery() {
   // stop query by sending empty sequence
-  query(_updating ? "update-query" : "eval-query", "()", function(text) {
+  query(_updating ? "query-update" : "query-eval", "()", function(text) {
     setInfo("Query was stopped.");
   });
 };

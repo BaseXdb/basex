@@ -27,7 +27,7 @@ function dba:file-start(
   let $params := try {
     (: stop running job before starting new job :)
     jobs:stop($id),
-    prof:void(jobs:invoke($cons:DBA-DIR || $id, (), map { 'cache': 'true', 'id': $file })),
+    prof:void(jobs:invoke(cons:dir() || $id, (), map { 'cache': 'true', 'id': $file })),
     map { 'info': 'Job was started.', 'job': $id }
   } catch * {
     map { 'error': $err:description }

@@ -36,8 +36,7 @@ function dba:jobs(
 ) as element(html) {
   cons:check(),
 
-  let $dir := $cons:DBA-DIR ! (file:create-dir(.), .)
-  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>{
       <td>
         <form action="{ $dba:CAT }" method="post" class="update">

@@ -20,5 +20,5 @@ function dba:files(
 ) as item()+ {
   cons:check(),
   web:response-header(),
-  file:read-binary($cons:DBA-DIR || $name)
+  file:read-binary(cons:dir() || $name)
 };
