@@ -764,7 +764,7 @@ public class QueryParser extends InputParser {
       // try to resolve module uri
       if(qc.resources.modules().addImport(string(uri), mi.info, this)) return;
       // module not found
-      throw WHICHMODULE_X.get(mi.info, uri);
+      throw WHICHMOD_X.get(mi.info, uri);
     }
     // parse supplied paths
     for(final byte[] path : mi.paths) module(string(path), string(uri), mi.info);

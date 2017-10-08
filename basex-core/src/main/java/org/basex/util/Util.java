@@ -133,9 +133,9 @@ public final class Util {
   public static Throwable rootException(final Throwable throwable) {
     Throwable th = throwable;
     while(true) {
+      debug(th);
       final Throwable ca = th.getCause();
       if(ca == null || th instanceof QueryException && !(ca instanceof QueryException)) return th;
-      debug(th);
       th = ca;
     }
   }

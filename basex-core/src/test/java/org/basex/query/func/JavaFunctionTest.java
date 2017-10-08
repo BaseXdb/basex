@@ -23,8 +23,9 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     query("declare namespace f='java:java.util.Random'; f:nextInt(f:new())");
     query("declare namespace f='java:org.basex.util.list.StringList'; f:new()");
 
-    error("declare namespace rand='java:java.util.random'; rand:new()", JAVAWHICH_X_X_X);
-    error("Q{java:java.util.random}new()", JAVAWHICH_X_X_X);
+    error("declare namespace rand='java:java.util.random'; rand:new()", WHICHCLASS_X);
+    error("Q{java:java.util.rndm}new()", WHICHCLASS_X);
+    error("Q{java:java.util.random}new()", WHICHCLASS_X);
     error("Q{java:java.lang.Integer}new\u00b7int('abc')", WHICHCONSTR_X_X);
   }
 
@@ -108,7 +109,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("declare namespace string = 'java.lang.String';" +
         "string:concat(string:new(), Q{java.awt.Point}new())", WHICHMETHOD_X_X);
     error("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
-        "qm:xyz()", JAVAWHICH_X_X_X);
+        "qm:xyz()", WHICHJAVA_X_X_X);
     error("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "qm:fast()", JAVAARITY_X_X_X_X);
 
@@ -153,7 +154,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("declare namespace n='org.basex.query.func.JavaFunctionExample';"
         + "n:x(n:new())", WHICHFUNC_X);
     error("import module namespace n='org.basex.query.func.JavaFunctionExample';"
-        + "n:x()", JAVAWHICH_X_X_X);
+        + "n:x()", WHICHJAVA_X_X_X);
   }
 
   /** Ensure that items cannot be cast to Java. */
@@ -170,7 +171,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   public void javaNameTest() {
     error("rest:XYZ()", WHICHFUNC_X);
     error("Q{java.lang.String}XYZ()", WHICHFUNC_X);
-    error("Q{java:java.lang.String}XYZ()", JAVAWHICH_X_X_X);
+    error("Q{java:java.lang.String}XYZ()", WHICHJAVA_X_X_X);
 
   }
 

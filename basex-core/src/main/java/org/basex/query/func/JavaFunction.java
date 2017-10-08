@@ -194,8 +194,10 @@ public abstract class JavaFunction extends Arr {
     }
 
     // try to find matching Java variable or method
+    boolean clz = false;
     try {
       final Class<?> clazz = modules.findClass(className);
+      clz = true;
       if(name.equals(NEW) || exists(clazz, name))
         return new JavaFunc(sc, ii, clazz, name, types, args);
     } catch(final ClassNotFoundException ex) {
@@ -205,7 +207,7 @@ public abstract class JavaFunction extends Arr {
     }
 
     // no function found: raise error only if "java:" prefix was specified
-    if(java) throw JAVAWHICH_X_X_X.get(ii, className, name, args.length);
+    if(java) throw (clz ? WHICHJAVA_X_X_X : WHICHCLASS_X).get(ii, className, name, args.length);
     return null;
   }
 
@@ -242,7 +244,7 @@ public abstract class JavaFunction extends Arr {
     if(meth == null) {
       if(methArity != -1) throw JAVAARITY_X_X_X_X.get(
           ii, clazz.getName(), name, methArity, arguments(arity));
-      throw JAVAWHICH_X_X_X.get(ii, clazz.getName(), name, arity);
+      throw WHICHJAVA_X_X_X.get(ii, clazz.getName(), name, arity);
     }
 
     // Add module locks to QueryContext.

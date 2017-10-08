@@ -944,13 +944,15 @@ public enum QueryError {
   /** XPST0017. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** XPST0017. */
-  JAVAWHICH_X_X_X(XPST, 17, "Java function %:%#% is unknown."),
+  WHICHJAVA_X_X_X(XPST, 17, "Java function is unknown: %:%#%."),
   /** XPST0017. */
-  JAVAAMB_X_X_X(XPST, 17, "Java function %:%#% is ambiguous."),
+  WHICHCLASS_X(XPST, 17, "Java class is unknown: %."),
   /** XPST0017. */
-  JAVACONSAMB_X(XPST, 17, "Java constructor % is ambiguous."),
+  JAVAAMB_X_X_X(XPST, 17, "Java function is ambiguous: %:%#%."),
   /** XPST0017. */
-  FUNCNOIMPL_X(XPST, 17, "External function % not implemented."),
+  JAVACONSAMB_X(XPST, 17, "Java constructor is ambiguous: %."),
+  /** XPST0017. */
+  FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
   /** XPST0017. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
 
@@ -1134,9 +1136,9 @@ public enum QueryError {
   /** XQST0057. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059. */
-  WHICHMODULE_X(XQST, 59, "Module not found: %."),
+  WHICHMOD_X(XQST, 59, "Module not found: %."),
   /** XQST0059. */
-  WHICHCLASS_X(XQST, 59, "Java class not found: %."),
+  WHICHMODCLASS_X(XQST, 59, "Java class not found: %."),
   /** XQST0059. */
   MODINIT_X_X_X(XQST, 59, "Could not initialize %: % (%)."),
   /** XQST0059. */

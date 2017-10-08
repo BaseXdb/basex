@@ -112,7 +112,8 @@ public final class ModuleLoader {
     try {
       clz = findClass(className);
     } catch(final ClassNotFoundException ex) {
-      if(java) throw WHICHCLASS_X.get(ii, ex.getMessage());
+      Util.debug(ex);
+      if(java) throw WHICHMODCLASS_X.get(ii, className);
       return false;
     } catch(final Throwable th) {
       final Throwable t = Util.rootException(th);
