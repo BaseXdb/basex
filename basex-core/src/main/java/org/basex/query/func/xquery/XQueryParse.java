@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
-import org.basex.query.scope.Module;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -36,6 +35,8 @@ public class XQueryParse extends StandardFunc {
     public static final BooleanOption COMPILE = new BooleanOption("compile", false);
     /** Pass on error info. */
     public static final BooleanOption PASS = new BooleanOption("pass", false);
+    /** Query base-uri. */
+    public static final StringOption BASE_URI = new StringOption("base-uri");
   }
 
   @Override
@@ -54,22 +55,19 @@ public class XQueryParse extends StandardFunc {
   protected final FElem parse(final QueryContext qc, final byte[] query, final String path)
       throws QueryException {
 
-    boolean compile = false, plan = true, pass = false;
-    if(exprs.length > 1) {
-      final Options opts = toOptions(1, new XQueryOptions(), qc);
-      compile = opts.get(XQueryOptions.COMPILE);
-      plan = opts.get(XQueryOptions.PLAN);
-      pass = opts.get(XQueryOptions.PASS);
-    }
+    XQueryOptions opts = new XQueryOptions();
+    if(exprs.length > 1) toOptions(1, opts, qc);
+
+    // base-uri: adopt specified uri, passed on uri, or uri from parent query
+    final String bu = opts.get(XQueryOptions.BASE_URI);
+    final String uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
 
     try(QueryContext qctx = new QueryContext(qc.context)) {
-      final Module mod = qctx.parse(string(query), path, null);
-      final boolean library = mod instanceof LibraryModule;
-
+      final Module mod = qctx.parse(string(query), uri, null);
       final FElem root;
-      if(library) {
-        root = new FElem(LIBRARY_MODULE);
+      if(mod instanceof LibraryModule) {
         final LibraryModule lib = (LibraryModule) mod;
+        root = new FElem(LIBRARY_MODULE);
         root.add(PREFIX, lib.name.string());
         root.add(URI, lib.name.uri());
       } else {
@@ -77,11 +75,11 @@ public class XQueryParse extends StandardFunc {
         root.add(UPDATING, token(qctx.updating));
       }
 
-      if(compile) qctx.compile();
-      if(plan) root.add(qctx.plan());
+      if(opts.get(XQueryOptions.COMPILE)) qctx.compile();
+      if(opts.get(XQueryOptions.PLAN)) root.add(qctx.plan());
       return root;
     } catch(final QueryException ex) {
-      if(!pass) ex.info(info);
+      if(!opts.get(XQueryOptions.PASS)) ex.info(info);
       throw ex;
     }
   }
