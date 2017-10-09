@@ -25,7 +25,7 @@ function dba:file-upload(
 ) as element(rest:response) {
   cons:check(),
 
-  let $dir := cons:dir()
+  let $dir := cons:current-dir()
   return (
     map:for-each($files, function($name, $content) {
       file:write-binary($dir || file:name($name), $content)

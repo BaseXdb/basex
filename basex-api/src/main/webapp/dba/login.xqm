@@ -46,10 +46,11 @@ function dba:welcome(
             </tr>
             <tr>
               <td><b>Password:</b></td>
-              <td>
-                <input size="30" type="password" name="pass"/>
-                { html:button('login', 'Login') }
-              </td>
+              <td>{
+                <input size="30" type="password" name="pass"/>,
+                ' ',
+                html:button('login', 'Login')
+              }</td>
             </tr>
           </table>
         </form>

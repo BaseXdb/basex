@@ -24,6 +24,6 @@ function dba:file-delete(
   $name  as xs:string
 ) as element(rest:response) {
   cons:check(),
-  file:create-dir(cons:dir() || $name),
+  file:create-dir(cons:current-dir() || $name),
   web:redirect($dba:CAT, map { 'info': 'Directory "' || $name || '" was created.' })
 };

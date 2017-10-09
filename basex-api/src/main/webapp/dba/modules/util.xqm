@@ -17,7 +17,7 @@ declare function util:query(
   $query    as xs:string?,
   $context  as item()*
 ) as xs:string {
-  let $limit := $cons:OPTION($cons:K-MAXCHARS)
+  let $limit := $cons:OPTIONS($cons:K-MAXCHARS)
   let $result := xquery:eval($query, map { '': $context }, util:query-options())
   (: serialize more characters than requested, because limit represents number of bytes :)
   return util:chop(serialize($result, map { 'limit': $limit * 2 + 1, 'method': 'basex' }), $limit)
@@ -40,9 +40,9 @@ declare %updating function util:update-query(
  :)
 declare %private function util:query-options() as map(*) {
   map {
-    'timeout'   : $cons:OPTION($cons:K-TIMEOUT),
-    'memory'    : $cons:OPTION($cons:K-MEMORY),
-    'permission': $cons:OPTION($cons:K-PERMISSION)
+    'timeout'   : $cons:OPTIONS($cons:K-TIMEOUT),
+    'memory'    : $cons:OPTIONS($cons:K-MEMORY),
+    'permission': $cons:OPTIONS($cons:K-PERMISSION)
   }
 };
 
@@ -57,7 +57,7 @@ declare function util:start(
   $sort  as xs:string
 ) as xs:integer {
   if($page and not($sort)) then (
-    ($page - 1) * $cons:OPTION($cons:K-MAXROWS) + 1
+    ($page - 1) * $cons:OPTIONS($cons:K-MAXROWS) + 1
   ) else (
     1
   )
@@ -74,7 +74,7 @@ declare function util:end(
   $sort  as xs:string
 ) as xs:integer {
   if($page and not($sort)) then (
-    $page * $cons:OPTION($cons:K-MAXROWS)
+    $page * $cons:OPTIONS($cons:K-MAXROWS)
   ) else (
     999999999
   )

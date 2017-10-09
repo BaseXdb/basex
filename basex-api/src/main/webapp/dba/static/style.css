@@ -1,7 +1,7 @@
 body {
-  font-family: Calibri, "Trebuchet MS", sans-serif;
+  font-family: Calibri, Helvetica, sans-serif;
   overflow-y: scroll;
-  margin: .75em;
+  margin: .5em 1em .5em 1em;
   font-size: 16px;
 }
 
@@ -41,7 +41,7 @@ td {
 }
 
 textarea {
-  font-family: "Consolas", "Ubuntu Mono", monospace;
+  font-family: "Consolas", "Ubuntu Mono", Menlo, monospace;
   font-size: 90%;
   margin: 4px 0px 4px 0px;
   width: 100%;
@@ -52,7 +52,7 @@ select {
 }
 
 code {
-  font-family: "Consolas", "Ubuntu Mono", monospace;
+  font-family: "Consolas", "Ubuntu Mono", Menlo, monospace;
   border: 1px solid #E3E3FF;
   border-radius: 3px;
   padding: 0 4px 0 4px;
@@ -61,7 +61,7 @@ code {
 }
 
 pre {
-  font-family: "Consolas", "Ubuntu Mono", monospace;
+  font-family: "Consolas", "Ubuntu Mono", Menlo, monospace;
   font-size: 90%;
 }
 

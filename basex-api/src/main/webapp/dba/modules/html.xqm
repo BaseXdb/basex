@@ -340,7 +340,7 @@ declare function html:table(
       return $row
   )
 
-  let $max := $cons:OPTION($cons:K-MAXROWS)
+  let $max := $cons:OPTIONS($cons:K-MAXROWS)
   let $start := head((($page - 1) * $max + 1, 1))
 
   let $entries := if($count) then (
@@ -490,7 +490,7 @@ declare function html:date(
 ) as xs:string {
   let $zone := timezone-from-dateTime(current-dateTime())
   let $dt := fn:adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
-  return format-dateTime($dt, '[Y00]/[M00]/[D00], [H00]:[m00]:[s00]')
+  return format-dateTime($dt, '[Y0000]-[M00]-[D00], [H00]:[m00]:[s00]')
 };
 
 (:~

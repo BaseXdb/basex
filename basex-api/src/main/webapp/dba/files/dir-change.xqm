@@ -26,7 +26,7 @@ function dba:dir-change(
   let $path := if(contains($dir, file:dir-separator())) then (
     $dir
   ) else (
-    file:path-to-native(cons:dir() || $dir || '/')    
+    file:path-to-native(cons:current-dir() || $dir || '/')    
   )
   return cons:save(map { $cons:K-DIRECTORY: $path, $cons:K-QUERY: '' }),
   web:redirect($dba:CAT)

@@ -24,6 +24,6 @@ function dba:query-save(
 ) as xs:string {
   cons:check(),
   cons:save(map { $cons:K-QUERY: $name }),
-  file:write-text(cons:dir() || $name, $query),
+  file:write-text(cons:current-dir() || $name, $query),
   string-join(cons:query-files(), '/')
 };

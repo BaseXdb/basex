@@ -26,8 +26,6 @@ declare %private variable $cons:DBA-SETTINGS-FILE := $cons:DBA-DIR || 'dba-setti
 
 (:~ Query file suffixes. :)
 declare variable $cons:SUFFIXES := ('.xq', '.xqm', '.xql', '.xqu', '.xquery', '.xqy');
-(:~ Query file suffix. :)
-declare variable $cons:SUFFIX := '.xq';
 
 (:~ Permissions. :)
 declare variable $cons:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
@@ -58,8 +56,8 @@ declare %private variable $cons:K-DEFAULTS := map {
   $cons:K-QUERY     : ''
 };
 
-(:~ Configuration. :)
-declare variable $cons:OPTION := (
+(:~ Current configuration. :)
+declare variable $cons:OPTIONS := (
   if(file:exists($cons:DBA-SETTINGS-FILE)) then (
     try {
       (: merge defaults with options from settings file :)
@@ -89,9 +87,9 @@ declare variable $cons:OPTION := (
  : Returns the current DBA directory.
  : @return directory
  :)
-declare function cons:dir(
+declare function cons:current-dir(
 ) as xs:string {
-  let $dir := $cons:OPTION($cons:K-DIRECTORY)
+  let $dir := $cons:OPTIONS($cons:K-DIRECTORY)
   return if(file:exists($dir)) then $dir else $cons:DBA-DIR
 };
 
@@ -103,7 +101,7 @@ declare function cons:save(
   $settings  as map(*)
 ) as empty-sequence() {
   file:write($cons:DBA-SETTINGS-FILE, element config {
-    map:for-each($cons:OPTION, function($key, $value) {
+    map:for-each($cons:OPTIONS, function($key, $value) {
       element { $key } { ($settings($key), $value)[1] }
     })
   })
@@ -135,7 +133,7 @@ declare %updating function cons:redirect(
  : @return list of files
  :)
 declare function cons:query-files() as xs:string* {
-  let $dir := cons:dir()
+  let $dir := cons:current-dir()
   where file:exists($dir)
   for $file in file:list($dir)
   where (

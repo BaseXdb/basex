@@ -49,7 +49,7 @@ function dba:settings(
             <tr>
               <td>
                 <select name="permission">{
-                  let $pm := $cons:OPTION($cons:K-PERMISSION)
+                  let $pm := $cons:OPTIONS($cons:K-PERMISSION)
                   for $p in $cons:PERMISSIONS
                   return element option { attribute selected { }[$p = $pm], $p }
                 }</select>
@@ -92,7 +92,7 @@ declare %private function dba:input(
 ) as element(tr)* {
   <tr>
     <td>{ $value }:<br/>
-      <input name="{ $key }" type="number" value="{ $cons:OPTION($key) }"/>
+      <input name="{ $key }" type="number" value="{ $cons:OPTIONS($key) }"/>
     </td>
   </tr>
 };

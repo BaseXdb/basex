@@ -28,7 +28,7 @@ function dba:file-delete(
     (: delete all files, ignore reference to parent directory :)
     for $name in $names
     where $name != '..'
-    return file:delete(cons:dir() || $name),
+    return file:delete(cons:current-dir() || $name),
     web:redirect($dba:CAT, map { 'info': util:info($names, 'file', 'deleted') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })

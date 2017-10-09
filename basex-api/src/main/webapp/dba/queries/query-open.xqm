@@ -21,5 +21,5 @@ function dba:query-open(
 ) as xs:string {
   cons:check(),
   cons:save(map { $cons:K-QUERY: $name }),
-  file:read-text(cons:dir() || $name)
+  file:read-text(cons:current-dir() || $name)
 };

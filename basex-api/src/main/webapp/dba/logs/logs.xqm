@@ -83,15 +83,16 @@ function dba:logs(
       <td>{
         if($name) then (
           <form action='log-download' method='post' id='resources' autocomplete='off'>
-            <h3>
-              { $name }:&#xa0;
-              <input type='hidden' name='name' value='{ $name }'/>
+            <h3>{
+              $name, ':&#xa0;',
+              <input type='hidden' name='name' value='{ $name }'/>,
               <input size='40' id='input' name='input' value='{ $input }'
                 placeholder='regular expression'
                 onkeydown='if(event.keyCode == 13) {{ logEntries(true); event.preventDefault(); }}'
-                onkeyup='logEntries(false);'/>
-              { html:button('download', 'Download') }
-            </h3>
+                onkeyup='logEntries(false);'/>,
+              ' ',
+              html:button('download', 'Download')
+            }</h3>
           </form>,
           <div id='output'/>,
           html:js('logEntries(true);')

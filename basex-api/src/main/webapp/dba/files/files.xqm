@@ -33,7 +33,7 @@ function dba:files(
 ) as element(html) {
   cons:check(),
 
-  let $dir := cons:dir()
+  let $dir := cons:current-dir()
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>

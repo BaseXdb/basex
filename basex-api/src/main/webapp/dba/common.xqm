@@ -38,15 +38,15 @@ function dba:file(
 };
 
 (:~
- : Shows a page not found error.
- : @param  $unknown  unknown page
+ : Shows a "page not found" error.
+ : @param  $path  path to unknown page
  : @return page
  :)
 declare
-  %rest:path("/dba/{$unknown}")
+  %rest:path("/dba/{$path}")
   %output:method("html")
-function dba:any(
-  $unknown  as xs:string
+function dba:unknown(
+  $path  as xs:string
 ) as element(html) {
   cons:check(),
   html:wrap(
@@ -54,8 +54,8 @@ function dba:any(
       <td>
         <h2>Page not found:</h2>
         <ul>
-          <li>Page: <code>dba/{ $unknown }</code></li>
-          <li>Method: <code>{ Request:method() }</code></li>
+          <li>Page: dba/{ $path }</li>
+          <li>Method: { Request:method() }</li>
         </ul>
       </td>
     </tr>

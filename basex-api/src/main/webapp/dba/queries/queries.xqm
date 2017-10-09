@@ -44,7 +44,8 @@ function dba:queries(
           <tr>
             <td width='80%'>
               <select id='mode'>{
-                ('Read-Only', 'Updating') ! element option { . }
+                for $mode in ('Read-Only', 'Updating')
+                return element option { $mode }
               }</select>{ ' ' }
               <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>{ ' ' }
               <button id='stop' onclick='stopQuery()' disabled='true'>Stop</button>
@@ -62,7 +63,10 @@ function dba:queries(
                 <div align='right'>
                   <input id='file' name='file' placeholder='Name of query' size='35'
                          list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
-                  <datalist id='files'>{ cons:query-files() ! element option { . } }</datalist>{ ' ' }
+                  <datalist id='files'>{
+                    for $file in cons:query-files()
+                    return element option { $file }
+                  }</datalist>{ ' ' }
                   <button type='submit' name='open' id='open' disabled='true'
                           onclick='openQuery()'>Open</button>{ ' ' }
                   <button type='save' name='save' id='save' disabled='true'
@@ -74,21 +78,19 @@ function dba:queries(
         </table>
         { html:focus('editor') }
       </td>
-      <td width='50%'>
+      <td width='50%'>{
         <table width='100%'>
           <tr>
             <td align='right'>
               <h2>Result</h2>
             </td>
           </tr>
-        </table>
-        <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
-        {
-          html:js('loadCodeMirror(true);'),
-          for $name in (($file, $cons:OPTION($cons:K-QUERY))[.])[1]
-          return html:js('openQuery("' || $name || '");')
-        }
-      </td>
+        </table>,
+        <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>,
+        html:js('loadCodeMirror(true);'),
+        for $name in (($file, $cons:OPTIONS($cons:K-QUERY))[.])[1]
+        return html:js('openQuery("' || $name || '");')
+      }</td>
     </tr>
   )
 };
