@@ -110,10 +110,10 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_XQUERY_PARSE.args("delete node <a/>") + "/@updating/string()", "true");
 
     error(_XQUERY_PARSE.args("1+"), CALCEXPR);
-    query("\n\ntry {" + _XQUERY_PARSE.args("1+",
+    query("\n\ntry {" + _XQUERY_PARSE.args("1 +",
         " map{'pass':true()}") + "} catch * { $err:line-number }", "1");
 
-    query("contains(try {" + _XQUERY_PARSE.args("1+",
+    query("contains(try {" + _XQUERY_PARSE.args("1 +",
         " map { 'base-uri': 'XXXX', 'pass': 'true' }") + "} catch * { $err:module }, 'XXXX')",
         "true");
   }
