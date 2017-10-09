@@ -24,9 +24,6 @@ declare variable $cons:DBA-DIR := (
 (:~ Configuration file. :)
 declare %private variable $cons:DBA-SETTINGS-FILE := $cons:DBA-DIR || 'dba-settings.xml';
 
-(:~ Query file suffixes. :)
-declare variable $cons:SUFFIXES := ('.xq', '.xqm', '.xql', '.xqu', '.xquery', '.xqy');
-
 (:~ Permissions. :)
 declare variable $cons:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
 
@@ -135,9 +132,5 @@ declare %updating function cons:redirect(
 declare function cons:query-files() as xs:string* {
   let $dir := cons:current-dir()
   where file:exists($dir)
-  for $file in file:list($dir)
-  where (
-    some $suffix in $cons:SUFFIXES satisfies ends-with($file, $suffix)
-  )
-  return $file
+  return file:list($dir)[matches(., '\.xqm?$')]
 };

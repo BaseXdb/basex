@@ -23,6 +23,12 @@ function dba:query-save(
   $query  as xs:string
 ) as xs:string {
   cons:check(),
+  try {
+    prof:void(xquery:parse($query, map { 'plan': false(), 'pass': true() }))
+  } catch * {
+    error($err:code, 'Query was not stored: ' || $err:description, $err:value)
+  },
+
   cons:save(map { $cons:K-QUERY: $name }),
   file:write-text(cons:current-dir() || $name, $query),
   string-join(cons:query-files(), '/')

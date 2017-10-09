@@ -48,18 +48,18 @@ function dba:queries(
                 return element option { $mode }
               }</select>{ ' ' }
               <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>{ ' ' }
-              <button id='stop' onclick='stopQuery()' disabled='true'>Stop</button>
+              <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
             </td>
             <td width='20%' align='right'>
               <h2>Editor</h2>
             </td>
           </tr>
         </table>
-        <textarea id='editor' name='editor' rows='20' spellcheck='false'/>
+        <textarea id='editor' name='editor'/>
         <table width='100%'>
           <form autocomplete='off' action='javascript:void(0);'>
             <tr>
-              <td style='padding-right:0;'>
+              <td class='slick'>
                 <div align='right'>
                   <input id='file' name='file' placeholder='Name of query' size='35'
                          list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
@@ -67,9 +67,9 @@ function dba:queries(
                     for $file in cons:query-files()
                     return element option { $file }
                   }</datalist>{ ' ' }
-                  <button type='submit' name='open' id='open' disabled='true'
+                  <button type='submit' name='open' id='open' disabled=''
                           onclick='openQuery()'>Open</button>{ ' ' }
-                  <button type='save' name='save' id='save' disabled='true'
+                  <button type='save' name='save' id='save' disabled=''
                           onclick='saveQuery()'>Save</button>
                 </div>
               </td>
@@ -86,7 +86,7 @@ function dba:queries(
             </td>
           </tr>
         </table>,
-        <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>,
+        <textarea name='output' id='output' readonly=''/>,
         html:js('loadCodeMirror(true);'),
         for $name in (($file, $cons:OPTIONS($cons:K-QUERY))[.])[1]
         return html:js('openQuery("' || $name || '");')

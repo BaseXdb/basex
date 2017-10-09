@@ -21,15 +21,27 @@ declare
   %rest:path("/dba/file-upload")
   %rest:form-param("files", "{$files}")
 function dba:file-upload(
-  $files  as map(*)
+  $files  as map(xs:string, xs:base64Binary)
 ) as element(rest:response) {
   cons:check(),
 
-  let $dir := cons:current-dir()
-  return (
-    map:for-each($files, function($name, $content) {
-      file:write-binary($dir || file:name($name), $content)
-    })
-  ),
-  web:redirect($dba:CAT, map { 'info': util:info(map:keys($files), 'file', 'uploaded') })
+  try {
+    (: parse all XQuery files; reject files that cannot be parsed :)
+    map:for-each($files, function($file, $content) {
+      if(matches($file, '\.xqm?$')) then (
+        prof:void(xquery:parse(convert:binary-to-string($content), map { 'plan': false() }))
+      ) else ()
+    }),
+
+    (: save files :)
+    let $dir := cons:current-dir()
+    return (
+      map:for-each($files, function($file, $content) {
+        file:write-binary($dir || file:name($file), $content)
+      })
+    ),
+    web:redirect($dba:CAT, map { 'info': util:info(map:keys($files), 'file', 'uploaded') })
+  } catch * {
+    web:redirect($dba:CAT, map { 'error': 'Upload failed: ' || $err:description })
+  }
 };

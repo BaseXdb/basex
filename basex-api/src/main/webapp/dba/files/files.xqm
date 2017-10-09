@@ -80,9 +80,25 @@ function dba:files(
             for $file in ($files[file:is-dir(.)], $files[file:is-file(.)])
             let $dir := file:is-dir($file)
             let $name := file:name($file)
-            let $xquery := not($dir) and (
-              some $suffix in $cons:SUFFIXES satisfies ends-with($name, $suffix)
-            )
+            let $actions := util:item-join((
+              if($dir) then () else html:link('Download', 'file/' || encode-for-uri($name)),
+              if($dir or not(ends-with($name, '.xq') or ends-with($name, '.xqm'))) then () else (
+                html:link('Edit', 'queries', map { 'file': $name })
+              ),
+              if($dir or not(ends-with($name, '.xq'))) then () else (
+                let $job := (
+                  let $uri := replace(file:path-to-uri($file), '^file:/*', '')
+                  return $jobs[replace(., '^file:/*', '') = $uri]
+                )
+                let $id := string($job/@id)
+                return if(empty($job)) then (
+                  html:link('Start', 'file-start', map { 'file': $name })
+                ) else (
+                  html:link('Job', 'jobs', map { 'job': $id })
+                )
+              )
+            ), ' · ')
+
             return <row name='{ serialize(
               if($dir) then html:link($name, 'dir-change', map { 'dir': $name }) else $name
             )}' date='{
@@ -90,24 +106,7 @@ function dba:files(
             }' bytes='{
               file:size($file)
             }' action='{ serialize(
-              util:item-join((
-                if($dir) then () else html:link('Download', 'file/' || encode-for-uri($name)),
-                if($xquery) then (
-                  html:link('Edit', 'queries',
-                    map { 'file': $name }
-                  ),
-                  let $job := (
-                    let $uri := replace(file:path-to-uri($file), '^file:/*', '')
-                    return $jobs[replace(., '^file:/*', '') = $uri]
-                  )
-                  let $id := string($job/@id)
-                  return if(empty($job)) then (
-                    html:link('Start', 'file-start', map { 'file': $name })
-                  ) else (
-                    html:link('Job', 'jobs', map { 'job': $id })
-                  )
-                ) else ()
-              ), ' · ')
+              $actions
             )}'/>
           )
           let $buttons := html:button('file-delete', 'Delete', true())

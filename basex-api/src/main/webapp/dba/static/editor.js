@@ -15,8 +15,8 @@ function openQuery(file) {
   }
   request("POST", "query-open?name=" + encodeURIComponent(name),
     null,
-    function(req) {
-      _editorMirror.setValue(req.responseText);
+    function(request) {
+      _editorMirror.setValue(request.responseText);
       setInfo("Query was opened.");
       _editorMirror.focus();
     },
@@ -45,21 +45,21 @@ function saveQuery() {
       setInfo("Query was saved.");
     },
     function(req) {
-      setError("Query could not be saved.");
+      setErrorFromResponse(req);
     }
   )
 };
 
 /**
  * Refreshes the list of available query files.
- * @param {object} req  HTTP request
+ * @param {object} request  HTTP request
  */
-function refreshDataList(req) {
+function refreshDataList(request) {
   var files = document.getElementById("files");
   while(files.firstChild) {
     files.removeChild(files.firstChild);
   }
-  var names = req.responseText.split("/");
+  var names = request.responseText.split("/");
   for (var i = 0; i < names.length; i++) {
     var opt = document.createElement("option");
     opt.value = names[i];
