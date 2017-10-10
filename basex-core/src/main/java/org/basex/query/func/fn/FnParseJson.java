@@ -6,6 +6,7 @@ import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.JsonFormat;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -29,9 +30,8 @@ public class FnParseJson extends Parse {
   }
 
   @Override
-  protected final FnParseJson opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 
   /**

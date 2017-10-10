@@ -6,6 +6,7 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -34,6 +35,14 @@ public final class CArray extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    SeqType value = null;
+    for(final Expr expr : exprs) {
+      SeqType st = expr.seqType();
+      if(create) st = st.withOcc(Occ.ONE);
+      value = value == null ? st : value.union(st);
+    }
+    if(value != null) seqType = SeqType.get(ArrayType.get(value), Occ.ONE);
+
     return allAreValues() ? cc.preEval(this) : this;
   }
 

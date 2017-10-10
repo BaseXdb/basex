@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -17,8 +18,7 @@ public final class FnParseXmlFragment extends Parse {
   }
 
   @Override
-  protected FnParseXmlFragment opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 }

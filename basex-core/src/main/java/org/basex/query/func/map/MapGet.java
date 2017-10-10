@@ -27,13 +27,11 @@ public final class MapGet extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType st = exprs[0].seqType();
-    if(st.type instanceof MapType) {
-      final SeqType rt = ((MapType) st.type).type;
-      if(rt != null) {
-        // map lookup may result in empty sequence
-        seqType = rt.mayBeZero() ? rt : rt.withOcc(rt.one() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-      }
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof MapType) {
+      // lookup may result in empty sequence
+      final SeqType vt = ((MapType) t).valueType;
+      seqType = vt.withOcc(vt.occ.union(Occ.ZERO));
     }
     return this;
   }

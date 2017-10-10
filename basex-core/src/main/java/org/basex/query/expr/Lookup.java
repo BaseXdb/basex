@@ -48,15 +48,12 @@ public final class Lookup extends Arr {
     if(!map && !array) return this;
 
     final boolean oneInput = expr.size() == 1;
-    SeqType rt = ((FuncType) tp).type;
-    if(rt != null) {
-      // map lookup may result in empty sequence
-      if(map && !rt.mayBeZero()) rt = rt.withOcc(rt.one() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-      // wildcard or more than one input
-      if(keys == Str.WC || !oneInput)
-        rt = rt.withOcc(rt.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE);
-      seqType = rt;
-    }
+    SeqType vt = ((FuncType) tp).valueType;
+    // map lookup may result in empty sequence
+    if(map) vt = vt.withOcc(vt.occ.union(Occ.ZERO));
+    // wildcard or more than one input
+    if(keys == Str.WC || !oneInput) vt = vt.withOcc(vt.occ.union(Occ.ONE_MORE));
+    seqType = vt;
 
     if(keys != Str.WC) {
       if(oneInput) {

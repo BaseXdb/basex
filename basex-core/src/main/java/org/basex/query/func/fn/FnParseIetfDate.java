@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -23,9 +24,8 @@ public final class FnParseIetfDate extends StandardFunc {
   }
 
   @Override
-  protected FnParseIetfDate opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 
   /** Date parser. */

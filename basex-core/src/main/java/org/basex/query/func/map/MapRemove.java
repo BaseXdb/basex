@@ -1,10 +1,12 @@
 package org.basex.query.func.map;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -23,5 +25,12 @@ public final class MapRemove extends StandardFunc {
       map = map.delete(toAtomItem(it, qc), info);
     }
     return map;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof MapType) seqType = t.seqType();
+    return this;
   }
 }

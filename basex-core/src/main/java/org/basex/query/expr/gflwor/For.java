@@ -118,7 +118,7 @@ public final class For extends ForLet {
   @Override
   public For optimize(final CompileContext cc) throws QueryException {
     final SeqType tp = expr.seqType();
-    final boolean emp = empty && tp.mayBeZero();
+    final boolean emp = empty && tp.mayBeEmpty();
     seqType = tp.withOcc(emp ? Occ.ZERO_ONE : Occ.ONE);
     var.refineType(seqType, cc);
     if(pos != null) pos.refineType(SeqType.ITR, cc);

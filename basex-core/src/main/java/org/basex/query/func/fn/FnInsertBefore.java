@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -44,13 +45,17 @@ public final class FnInsertBefore extends StandardFunc {
     final long pos = toLong(exprs[1], qc);
     final Value sub = qc.value(exprs[2]);
 
-    final long vs = val.size();
-    final long p = Math.min(Math.max(0, pos - 1), vs);
-
     // prepend, append or insert new value
+    final long vs = val.size(), p = Math.min(Math.max(0, pos - 1), vs);
     if(p == 0)  return ValueBuilder.concat(sub, val);
     if(p == vs) return ValueBuilder.concat(val, sub);
     return ((Seq) val).insertBefore(p, sub);
   }
-}
 
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    if(exprs[2].isEmpty()) return exprs[0];
+    seqType = exprs[0].seqType().add(exprs[2].seqType());
+    return this;
+  }
+}

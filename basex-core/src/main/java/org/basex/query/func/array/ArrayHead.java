@@ -1,9 +1,11 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -22,5 +24,12 @@ public final class ArrayHead extends ArrayFn {
     final Array array = toArray(exprs[0], qc);
     if(array.isEmptyArray()) throw QueryError.ARRAYEMPTY.get(info);
     return array.head();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof ArrayType) seqType = ((ArrayType) t).valueType;
+    return this;
   }
 }

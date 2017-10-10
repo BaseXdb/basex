@@ -468,7 +468,7 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_REMOVE(ArrayRemove.class, "remove(array,pos)", arg(ARRAY_O, ITR_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_PUT(ArrayPut.class, "put(array,pos,member)", arg(ARRAY_O, ITR, ITEM_ZM),
+  _ARRAY_PUT(ArrayPut.class, "put(array,pos,value)", arg(ARRAY_O, ITR, ITEM_ZM),
       ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore.class, "insert-before(array,pos,value)",
@@ -480,7 +480,7 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_REVERSE(ArrayReverse.class, "reverse(array)", arg(ARRAY_O), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_JOIN(ArrayJoin.class, "join(array)", arg(ARRAY_ZM), ARRAY_O, ARRAY_URI),
+  _ARRAY_JOIN(ArrayJoin.class, "join(arrays)", arg(ARRAY_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FLATTEN(ArrayFlatten.class, "flatten(item()*)", arg(ITEM_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
@@ -966,7 +966,7 @@ public enum Function {
   /** XQuery function. */
   _FT_SCORE(FtScore.class, "score(items)", arg(ITEM_ZM), DBL_ZM, FT_URI),
   /** XQuery function. */
-  _FT_TOKENS(FtTokens.class, "tokens(database[,prefix])", arg(STR, STR), ITEM_ZM, flag(NDT),
+  _FT_TOKENS(FtTokens.class, "tokens(database[,prefix])", arg(STR, STR), ELM_ZM, flag(NDT),
       FT_URI),
   /** XQuery function. */
   _FT_TOKENIZE(FtTokenize.class, "tokenize(string[,options])", arg(STR, MAP_O), STR_ZM, FT_URI),
@@ -993,7 +993,7 @@ public enum Function {
   _HOF_TAKE_WHILE(HofTakeWhile.class, "take-while(items,pred)",
       arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_SCAN_LEFT(HofScanLeft.class, "scan-left(items,start,function)",
+  _HOF_SCAN_LEFT(HofScanLeft.class, "scan-left(items,zero,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF),
       HOF_URI),
   /** XQuery function. */
@@ -1406,7 +1406,7 @@ public enum Function {
 
   /** Descriptions. */
   final String desc;
-  /** Return type. */
+  /** Value return type. */
   final SeqType type;
 
   /** Compiler flags. */

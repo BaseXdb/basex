@@ -1,9 +1,12 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 
 /**
  * Function implementation.
@@ -26,5 +29,13 @@ public final class FnFilter extends StandardFunc {
         return null;
       }
     };
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final SeqType st = exprs[0].seqType();
+    if(st.zero()) return exprs[0];
+    seqType = st.withOcc(st.occ.union(Occ.ZERO));
+    return this;
   }
 }

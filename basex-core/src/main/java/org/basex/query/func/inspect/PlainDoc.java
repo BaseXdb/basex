@@ -134,7 +134,7 @@ final class PlainDoc extends Inspect {
       }
     }
 
-    final SeqType st = sf != null ? sf.seqType() : ftype.type;
+    final SeqType st = sf != null ? sf.seqType() : ftype.valueType;
     final FElem ret = elem("return", function);
     type(st, ret);
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;

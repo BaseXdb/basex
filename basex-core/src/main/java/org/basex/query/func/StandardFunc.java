@@ -106,12 +106,16 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Sets occurrence indicator to 1 if the first expression returns at least one non-array item,
-   * or if it refers to the context item.
+   * Optimizes a function, which may return an empty sequence if the first argument yields nothing.
+   * Sets the occurrence indicator to 1 if the first expression returns at least one non-array item,
+   * or if it refers to the context item. Returns the argument if it yields no results.
+   * @return original expression, or function argument (if it yields no results)
    */
-  protected void singleOcc() {
+  protected Expr optFirst() {
     final SeqType st = exprs.length > 0 ? exprs[0].seqType() : null;
+    if(st != null && st.zero()) return exprs[0];
     if(st == null || st.oneOrMore() && !st.mayBeArray()) seqType = seqType.withOcc(Occ.ONE);
+    return this;
   }
 
   /**
@@ -159,7 +163,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean isVacuous() {
-    return !has(Flag.UPD) && seqType.eq(SeqType.EMP);
+    return !has(Flag.UPD) && seqType.zero();
   }
 
   @Override

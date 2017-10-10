@@ -3,6 +3,8 @@ package org.basex.query.func.array;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -28,5 +30,11 @@ public final class ArrayFoldRight extends ArrayFn {
     final ListIterator<Value> iter = array.iterator(array.arraySize());
     while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
     return res;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    FnFoldLeft.refineType(this);
+    return this;
   }
 }

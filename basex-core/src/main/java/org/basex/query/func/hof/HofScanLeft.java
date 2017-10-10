@@ -6,6 +6,8 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 
 /**
  * Implements the {@code hof:scan-left($seq, $start, $f)} function.
@@ -38,6 +40,9 @@ public final class HofScanLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return exprs[0].isEmpty() ? exprs[1] : this;
+    if(exprs[0].isEmpty()) return exprs[1];
+    final SeqType st = exprs[0].seqType();
+    seqType = st.withOcc(st.occ.union(Occ.ZERO));
+    return this;
   }
 }

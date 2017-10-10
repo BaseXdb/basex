@@ -1,9 +1,11 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -30,5 +32,12 @@ public final class ArrayRemove extends ArrayFn {
     // delete entries backwards
     for(int i = list.size() - 1; i >= 0; i--) array = array.remove(list.get(i));
     return array;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof ArrayType) seqType = t.seqType();
+    return this;
   }
 }

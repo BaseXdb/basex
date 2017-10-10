@@ -19,19 +19,19 @@ import org.basex.query.value.seq.tree.*;
 public final class FnFoldRight extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = qc.value(exprs[0]);
+    final Value seq = qc.value(exprs[0]);
     Value res = qc.value(exprs[1]);
     final FItem fun = checkArity(exprs[2], 2, qc);
-    if(v instanceof TreeSeq) {
-      final ListIterator<Item> iter = ((TreeSeq) v).iterator(v.size());
+    if(seq instanceof TreeSeq) {
+      final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
         res = fun.invokeValue(qc, info, iter.previous(), res);
       }
     } else {
-      for(long i = v.size(); --i >= 0;) {
+      for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        res = fun.invokeValue(qc, info, v.itemAt(i), res);
+        res = fun.invokeValue(qc, info, seq.itemAt(i), res);
       }
     }
     return res;
@@ -39,23 +39,23 @@ public final class FnFoldRight extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value v = qc.value(exprs[0]);
+    final Value seq = qc.value(exprs[0]);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
     // evaluate start value lazily if it's passed straight through
-    if(v.isEmpty()) return qc.iter(exprs[1]);
+    if(seq.isEmpty()) return qc.iter(exprs[1]);
 
     Value res = qc.value(exprs[1]);
-    if(v instanceof TreeSeq) {
-      final ListIterator<Item> iter = ((TreeSeq) v).iterator(v.size());
+    if(seq instanceof TreeSeq) {
+      final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
         res = fun.invokeValue(qc, info, iter.previous(), res);
       }
     } else {
-      for(long i = v.size(); --i >= 0;) {
+      for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        res = fun.invokeValue(qc, info, v.itemAt(i), res);
+        res = fun.invokeValue(qc, info, seq.itemAt(i), res);
       }
     }
     return res.iter();
@@ -63,16 +63,18 @@ public final class FnFoldRight extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    if(exprs[0].isEmpty()) return exprs[1];
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
       final Value seq = (Value) exprs[0];
       Expr e = exprs[1];
-      for(int i = (int) seq.size(); --i >= 0;) {
+      for(long i = seq.size(); --i >= 0;) {
         e = new DynFuncCall(info, sc, exprs[2], seq.itemAt(i), e).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
       return e;
     }
+    FnFoldLeft.refineType(this);
     return this;
   }
 }

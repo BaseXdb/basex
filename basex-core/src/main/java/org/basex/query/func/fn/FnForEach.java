@@ -7,6 +7,8 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 
 /**
  * Function implementation.
@@ -59,6 +61,8 @@ public final class FnForEach extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    if(exprs[0].seqType().zero()) return exprs[0];
+
     if(allAreValues() && exprs[0].size() < UNROLL_LIMIT) {
       // unroll the loop
       final Value seq = (Value) exprs[0];
@@ -69,6 +73,11 @@ public final class FnForEach extends StandardFunc {
       }
       cc.info(QueryText.OPTUNROLL_X, this);
       return new List(info, results).optimize(cc);
+    }
+
+    final Type t = exprs[1].seqType().type;
+    if(t instanceof FuncType) {
+      seqType = SeqType.get(((FuncType) t).valueType.type, Occ.ZERO_MORE);
     }
     return this;
   }

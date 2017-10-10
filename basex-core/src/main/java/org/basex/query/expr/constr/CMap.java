@@ -8,6 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -31,6 +32,18 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    Type key = null;
+    SeqType value = null;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e += 2) {
+      final SeqType kst = exprs[e].seqType(), st = exprs[e + 1].seqType();
+      final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
+      key = key == null ? kt : key.union(kt);
+      value = value == null ? st : value.union(st);
+    }
+    if(key instanceof AtomType && value != null) {
+      seqType = SeqType.get(MapType.get((AtomType) key, value), Occ.ONE);
+    }
     return allAreValues() ? cc.preEval(this) : this;
   }
 

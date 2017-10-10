@@ -18,10 +18,10 @@ public final class MapType extends FuncType {
   /**
    * Constructor.
    * @param type argument type
-   * @param rt return type
+   * @param valueType return type
    */
-  MapType(final AtomType type, final SeqType rt) {
-    super(rt, type.seqType());
+  MapType(final AtomType type, final SeqType valueType) {
+    super(valueType, type.seqType());
   }
 
   @Override
@@ -45,7 +45,7 @@ public final class MapType extends FuncType {
     if(this == t) return true;
     if(!(t instanceof MapType)) return false;
     final MapType mt = (MapType) t;
-    return keyType().eq(mt.keyType()) && type.eq(mt.type);
+    return keyType().eq(mt.keyType()) && valueType.eq(mt.valueType);
   }
 
   @Override
@@ -56,7 +56,7 @@ public final class MapType extends FuncType {
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
-    if(al != ft.argTypes.length || !type.instanceOf(ft.type)) return false;
+    if(al != ft.argTypes.length || !valueType.instanceOf(ft.valueType)) return false;
     if(t instanceof MapType) return keyType().instanceOf(((MapType) t).keyType());
 
     // test function arguments of function type
@@ -73,7 +73,7 @@ public final class MapType extends FuncType {
       final MapType mt = (MapType) t;
       if(mt.instanceOf(this)) return this;
       final AtomType a = (AtomType) keyType().intersect(mt.keyType());
-      return a != null ? get(a, type.union(mt.type)) : SeqType.ANY_FUN;
+      return a != null ? get(a, valueType.union(mt.valueType)) : SeqType.ANY_FUN;
     }
     return t instanceof ArrayType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
       AtomType.ITEM;
@@ -87,14 +87,14 @@ public final class MapType extends FuncType {
     if(t instanceof MapType) {
       final MapType mt = (MapType) t;
       if(mt.instanceOf(this)) return mt;
-      final SeqType rt = type.intersect(mt.type);
-      return rt == null ? null : get((AtomType) keyType().union(mt.keyType()), rt);
+      final SeqType vt = valueType.intersect(mt.valueType);
+      return vt == null ? null : get((AtomType) keyType().union(mt.keyType()), vt);
     }
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT)) {
-        final SeqType rt = type.intersect(ft.type);
-        return rt == null ? null : get((AtomType) keyType().union(ft.argTypes[0].type), rt);
+        final SeqType vt = valueType.intersect(ft.valueType);
+        return vt == null ? null : get((AtomType) keyType().union(ft.argTypes[0].type), vt);
       }
     }
     return null;
@@ -102,12 +102,13 @@ public final class MapType extends FuncType {
 
   /**
    * Creates a new map type.
-   * @param key key type
-   * @param val value type
+   * @param keyType key type
+   * @param valueType value type
    * @return map type
    */
-  public static MapType get(final AtomType key, final SeqType val) {
-    return key == AtomType.AAT && val.eq(SeqType.ITEM_ZM) ? SeqType.ANY_MAP : new MapType(key, val);
+  public static MapType get(final AtomType keyType, final SeqType valueType) {
+    return keyType == AtomType.AAT && valueType.eq(SeqType.ITEM_ZM) ? SeqType.ANY_MAP :
+      new MapType(keyType, valueType);
   }
 
   /**
@@ -121,7 +122,7 @@ public final class MapType extends FuncType {
   @Override
   public String toString() {
     final AtomType keyType = keyType();
-    return keyType == AtomType.AAT && type.eq(SeqType.ITEM_ZM) ? "map(*)"
-        : "map(" + keyType + ", " + type + ')';
+    return keyType == AtomType.AAT && valueType.eq(SeqType.ITEM_ZM) ? "map(*)"
+        : "map(" + keyType + ", " + valueType + ')';
   }
 }

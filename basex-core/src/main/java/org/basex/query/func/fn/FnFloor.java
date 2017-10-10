@@ -21,7 +21,6 @@ public final class FnFloor extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+    return optFirst();
   }
 }

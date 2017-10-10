@@ -3,6 +3,7 @@ package org.basex.query.func.array;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
@@ -11,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -40,5 +42,12 @@ public final class ArraySort extends StandardFunc {
     }
     for(final int order : FnSort.sort(vl, this, coll)) builder.append(array.get(order));
     return builder.freeze();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof ArrayType) seqType = t.seqType();
+    return this;
   }
 }

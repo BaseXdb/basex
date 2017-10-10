@@ -1,9 +1,11 @@
 package org.basex.query.func.map;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -20,5 +22,12 @@ public final class MapKeys extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return toMap(exprs[0], qc).keys();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof MapType) seqType = SeqType.get(((MapType) t).keyType(), seqType.occ);
+    return this;
   }
 }

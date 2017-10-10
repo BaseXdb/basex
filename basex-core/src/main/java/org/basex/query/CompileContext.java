@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -156,24 +157,32 @@ public final class CompileContext {
           final ParseExpr re = (ParseExpr) res;
           final SeqType et = expr.seqType(), rt  = re.seqType();
           if(!et.eq(rt) && et.instanceOf(rt)) {
-            final SeqType it = et.intersect(rt);
-            if(it != null) {
-              re.seqType = it;
-            }
+            final SeqType st = et.intersect(rt);
+            if(st != null) re.seqType = st;
           }
         }
       } else {
         info(OPTPRE_X_X, expr, res.description());
         // Refine type. Required because original type might get lost in newly created sequences
-        if(refine && res instanceof Seq) {
-          final Seq seq = (Seq) res;
-          final Type et = expr.seqType().type, rt = seq.type;
-          if(!et.eq(rt) && et.instanceOf(rt)) {
-            final Type it = et.intersect(rt);
-            if(it != null) {
-              seq.type = it;
-              // Indicate that types may not be homogeneous
-              seq.homo = false;
+        if(refine) {
+          if(res instanceof Seq) {
+            final Seq seq = (Seq) res;
+            final Type et = expr.seqType().type, rt = seq.type;
+            if(!et.eq(rt) && et.instanceOf(rt)) {
+              final Type t = et.intersect(rt);
+              if(t != null) {
+                seq.type = t;
+                // Indicate that types may not be homogeneous
+                seq.homo = false;
+              }
+            }
+          } else if(res instanceof FItem) {
+            // refine type of function items (including maps and arrays)
+            FItem fitem = (FItem) res;
+            final SeqType et = expr.seqType(), rt = res.seqType();
+            if(!et.eq(rt) && et.instanceOf(rt)) {
+              final Type t = et.type.intersect(rt.type);
+              if(t != null) fitem.type = t;
             }
           }
         }

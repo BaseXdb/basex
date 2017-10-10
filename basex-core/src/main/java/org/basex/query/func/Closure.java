@@ -36,8 +36,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private final QNm name;
   /** Arguments. */
   private final Var[] args;
-  /** Declared type, {@code null} if not specified. */
-  private SeqType type;
+  /** Value type, {@code null} if not specified. */
+  private SeqType valueType;
   /** Annotations. */
   private AnnList anns;
   /** Updating flag. */
@@ -56,35 +56,35 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /**
    * Constructor.
    * @param info input info
-   * @param type declared return type (can be {@code null})
+   * @param valueType declared return type (can be {@code null})
    * @param args arguments
    * @param expr function body
    * @param anns annotations
    * @param global bindings for non-local variables
    * @param vs scope
    */
-  public Closure(final InputInfo info, final SeqType type, final Var[] args, final Expr expr,
+  public Closure(final InputInfo info, final SeqType valueType, final Var[] args, final Expr expr,
       final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    this(info, null, type, args, expr, anns, global, vs);
+    this(info, null, valueType, args, expr, anns, global, vs);
   }
 
   /**
    * Package-private constructor allowing a name.
    * @param info input info
    * @param name name of the function
-   * @param type declared return type (can be {@code null})
+   * @param valueType declared return type (can be {@code null})
    * @param args argument variables
    * @param expr function expression
    * @param anns annotations
    * @param global bindings for non-local variables
    * @param vs variable scope
    */
-  Closure(final InputInfo info, final QNm name, final SeqType type, final Var[] args,
+  Closure(final InputInfo info, final QNm name, final SeqType valueType, final Var[] args,
       final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
     super(info, expr);
     this.name = name;
     this.args = args;
-    this.type = type;
+    this.valueType = valueType;
     this.anns = anns;
     this.global = global == null ? Collections.emptyMap() : global;
     this.vs = vs;
@@ -107,7 +107,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, type, args);
+    return FuncType.get(anns, valueType, args);
   }
 
   @Override
@@ -151,8 +151,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType r = expr.seqType(), rt = type == null || r.instanceOf(type) ? r : type;
-    seqType = FuncType.get(anns, rt, args).seqType();
+    final SeqType st = expr.seqType();
+    final SeqType vt = valueType == null || st.instanceOf(valueType) ? st : valueType;
+    seqType = FuncType.get(anns, vt, args).seqType();
     size = 1;
 
     cc.pushScope(vs);
@@ -245,7 +246,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
       final Expr e = expr.copy(cc, innerVars);
       e.markTailCalls(null);
-      return copyType(new Closure(info, name, type, vars, e, anns, nl, cc.vs()));
+      return copyType(new Closure(info, name, valueType, vars, e, anns, nl, cc.vs()));
     } finally {
       cc.removeScope();
     }
@@ -271,8 +272,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(cc, vm), rt = type == null ? cpy :
-      new TypeCheck(vs.sc, ii, cpy, type, true).optimize(cc);
+    final Expr cpy = expr.copy(cc, vm), rt = valueType == null ? cpy :
+      new TypeCheck(vs.sc, ii, cpy, valueType, true).optimize(cc);
 
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(cc);
   }
@@ -297,26 +298,27 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     final SeqType argType = body.seqType();
     final Expr checked;
-    if(type == null || argType.instanceOf(type)) {
+    if(valueType == null || argType.instanceOf(valueType)) {
       // return type is already correct
       checked = body;
-    } else if(body instanceof FuncItem && type.type instanceof FuncType) {
+    } else if(body instanceof FuncItem && valueType.type instanceof FuncType) {
       // function item coercion
-      if(!type.occ.check(1)) throw typeError(body, type, null, info);
+      if(!valueType.occ.check(1)) throw typeError(body, valueType, null, info);
       final FuncItem fi = (FuncItem) body;
-      checked = fi.coerceTo((FuncType) type.type, qc, info, true);
+      checked = fi.coerceTo((FuncType) valueType.type, qc, info, true);
     } else if(body.isValue()) {
       // we can type check immediately
       final Value val = (Value) body;
-      checked = type.instance(val) ? val : type.promote(val, null, qc, vs.sc, info, false);
+      checked = valueType.instance(val) ? val :
+        valueType.promote(val, null, qc, vs.sc, info, false);
     } else {
       // check at each call
-      if(argType.type.instanceOf(type.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
+      if(argType.type.instanceOf(valueType.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
         // reject impossible arities
-        final Occ occ = argType.occ.intersect(type.occ);
-        if(occ == null) throw typeError(body, type, null, info);
+        final Occ occ = argType.occ.intersect(valueType.occ);
+        if(occ == null) throw typeError(body, valueType, null, info);
       }
-      checked = new TypeCheck(vs.sc, info, body, type, true);
+      checked = new TypeCheck(vs.sc, info, body, valueType, true);
     }
 
     return new FuncItem(vs.sc, anns, name, args, ft, checked, vs.stackSize());
@@ -369,13 +371,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     checkUpdating();
     if(updating) {
       expr.checkUp();
-      if(type != null && !type.eq(SeqType.EMP)) throw UUPFUNCTYPE.get(info);
+      if(valueType != null && !valueType.zero()) throw UUPFUNCTYPE.get(info);
     }
   }
 
   @Override
   public boolean isVacuous() {
-    return type != null && type.eq(SeqType.EMP) && !has(Flag.UPD);
+    return valueType != null && valueType.zero() && !has(Flag.UPD);
   }
 
   @Override
@@ -420,7 +422,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     anns = ft.anns;
     final int al = args.length;
     for(int a = 0; a < al; a++) args[a].type = ft.argTypes[a];
-    if(ft.type != null && !ft.type.eq(SeqType.ITEM_ZM)) type = ft.type;
+    final SeqType vt = ft.valueType;
+    if(!vt.eq(SeqType.ITEM_ZM)) valueType = vt;
   }
 
   /**
@@ -494,7 +497,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       sb.append(args[a]);
     }
     sb.append(PAREN2).append(' ');
-    if(type != null) sb.append("as ").append(type).append(' ');
+    if(valueType != null) sb.append("as ").append(valueType).append(' ');
     sb.append("{ ").append(expr).append(" }");
     if(!global.isEmpty()) sb.append(')');
     return sb.toString();

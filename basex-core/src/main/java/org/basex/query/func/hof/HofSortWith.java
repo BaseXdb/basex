@@ -3,10 +3,12 @@ package org.basex.query.func.hof;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -32,5 +34,13 @@ public final class HofSortWith extends HofFn {
       throw ex.getCause();
     }
     return items.value();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final SeqType st = exprs[0].seqType();
+    if(st.zero()) return exprs[0];
+    seqType = st;
+    return this;
   }
 }

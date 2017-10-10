@@ -207,7 +207,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
     if(updating) {
       // updating function
-      if(type != null && !type.eq(SeqType.EMP)) throw UUPFUNCTYPE.get(info);
+      if(type != null && !type.zero()) throw UUPFUNCTYPE.get(info);
       if(!upd && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(upd) {
       // uses updates, but is not declared as such
@@ -217,7 +217,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean isVacuousBody() {
-    return type != null && type.eq(SeqType.EMP) && !has(Flag.UPD);
+    return type != null && type.zero() && !has(Flag.UPD);
   }
 
   /**

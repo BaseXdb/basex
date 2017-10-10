@@ -22,7 +22,6 @@ public final class FnAvg extends Aggr {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+    return optFirst();
   }
 }

@@ -26,11 +26,8 @@ public final class ArrayGet extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType st = exprs[0].seqType();
-    if(st.type instanceof ArrayType) {
-      final SeqType rt = ((ArrayType) st.type).type;
-      if(rt != null) seqType = rt;
-    }
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof ArrayType) seqType = ((ArrayType) t).valueType;
     return this;
   }
 }

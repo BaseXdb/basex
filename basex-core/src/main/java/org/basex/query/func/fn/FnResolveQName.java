@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -35,8 +36,7 @@ public final class FnResolveQName extends StandardFunc {
   }
 
   @Override
-  protected FnResolveQName opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 }

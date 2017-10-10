@@ -3,6 +3,7 @@ package org.basex.query.func.prof;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -42,6 +43,12 @@ public final class ProfMem extends StandardFunc {
         return it;
       }
     };
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    seqType = exprs[0].seqType();
+    return this;
   }
 
   /**

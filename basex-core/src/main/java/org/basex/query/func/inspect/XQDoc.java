@@ -101,7 +101,7 @@ final class XQDoc extends Inspect {
         if(i > 0) tb.add(SEP);
         tb.add(DOLLAR).add(v.name.string()).add(' ').add(AS).add(' ').addExt(t.argTypes[i]);
       }
-      tb.add(PAREN2).add(' ' + AS + ' ' + t.type);
+      tb.add(PAREN2).add(' ' + AS + ' ' + t.valueType);
       if(sf.expr == null) tb.add(" external");
 
       elem("signature", function).add(tb.toString());

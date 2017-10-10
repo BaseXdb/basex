@@ -408,14 +408,14 @@ public abstract class Array extends FItem {
 
   @Override
   public final boolean instanceOf(final Type tp) {
-    return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
+    return tp == AtomType.ITEM || tp instanceof FuncType && instanceOf((FuncType) tp, false);
   }
 
   @Override
   public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(instOf(ft, true)) return this;
+    if(instanceOf(ft, true)) return this;
     throw castError(this, ft, ii);
   }
 
@@ -425,16 +425,17 @@ public abstract class Array extends FItem {
    * @param coerce coerce value
    * @return result of check
    */
-  private boolean instOf(final FuncType tp, final boolean coerce) {
+  private boolean instanceOf(final FuncType tp, final boolean coerce) {
     if(tp instanceof MapType) return false;
+    if(type.instanceOf(tp)) return true;
 
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
 
-    final SeqType ret = tp.type;
+    final SeqType ret = tp.valueType;
     if(tp instanceof ArrayType) {
       // no argument and return type: no check required
-      if(ret == null || ret.eq(SeqType.ITEM_ZM)) return true;
+      if(ret.eq(SeqType.ITEM_ZM)) return true;
       // check types of members
       for(final Value val : members()) {
         if(!ret.instance(val)) return false;
@@ -442,7 +443,7 @@ public abstract class Array extends FItem {
       return true;
     }
     // allow coercion
-    return coerce || ret == null || ret.eq(SeqType.ITEM_ZM);
+    return coerce || ret.eq(SeqType.ITEM_ZM);
   }
 
   @Override

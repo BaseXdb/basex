@@ -1,6 +1,8 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -25,5 +27,11 @@ public final class ArrayFoldLeft extends ArrayFn {
     final FItem fun = checkArity(exprs[2], 2, qc);
     for(final Value val : array.members()) res = fun.invokeValue(qc, info, res, val);
     return res;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    FnFoldLeft.refineType(this);
+    return this;
   }
 }

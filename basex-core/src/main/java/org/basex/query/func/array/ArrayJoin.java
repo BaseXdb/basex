@@ -1,10 +1,12 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -32,5 +34,12 @@ public final class ArrayJoin extends ArrayFn {
       builder.append(toArray(it));
     } while((it = iter.next()) != null);
     return builder.freeze();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof ArrayType) seqType = t.seqType();
+    return this;
   }
 }

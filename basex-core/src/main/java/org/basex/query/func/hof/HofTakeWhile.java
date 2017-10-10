@@ -6,7 +6,8 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 
 /**
  * Implements the {@code hof:take-while($seq, $pred)} function.
@@ -44,6 +45,9 @@ public final class HofTakeWhile extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return exprs[0].isEmpty() ? Empty.SEQ : this;
+    final SeqType st = exprs[0].seqType();
+    if(st.zero()) return exprs[0];
+    seqType = st.withOcc(st.occ.union(Occ.ZERO));
+    return this;
   }
 }

@@ -78,7 +78,6 @@ abstract class DateTime extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+    return optFirst();
   }
 }

@@ -1,12 +1,14 @@
 package org.basex.query.func.hof;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -47,5 +49,13 @@ public final class HofTopKBy extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder();
     while(!heap.isEmpty()) vb.addFront(heap.removeMin());
     return vb.value();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final SeqType st = exprs[0].seqType();
+    if(st.zero()) return exprs[0];
+    seqType = st;
+    return this;
   }
 }

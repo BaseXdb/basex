@@ -138,14 +138,14 @@ public final class Map extends FItem {
 
   @Override
   public boolean instanceOf(final Type tp) {
-    return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
+    return tp == AtomType.ITEM || tp instanceof FuncType && instanceOf((FuncType) tp, false);
   }
 
   @Override
   public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(instOf(ft, true)) return this;
+    if(instanceOf(ft, true)) return this;
     throw castError(this, ft, ii);
   }
 
@@ -155,22 +155,23 @@ public final class Map extends FItem {
    * @param coerce coerce value
    * @return result of check
    */
-  private boolean instOf(final FuncType tp, final boolean coerce) {
+  private boolean instanceOf(final FuncType tp, final boolean coerce) {
     if(tp instanceof ArrayType) return false;
+    if(type.instanceOf(tp)) return true;
 
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].one())) return false;
 
-    SeqType ret = tp.type;
+    SeqType ret = tp.valueType;
     if(tp instanceof MapType) {
       AtomType arg = ((MapType) tp).keyType();
       if(arg == AtomType.AAT) arg = null;
-      if(ret == null || ret.eq(SeqType.ITEM_ZM)) ret = null;
+      if(ret.eq(SeqType.ITEM_ZM)) ret = null;
       // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
       return (arg == null && ret == null) || root.instanceOf(arg, ret);
     }
     // allow coercion
-    return coerce || ret == null || ret.eq(SeqType.ITEM_ZM);
+    return coerce || ret.eq(SeqType.ITEM_ZM);
   }
 
   /**

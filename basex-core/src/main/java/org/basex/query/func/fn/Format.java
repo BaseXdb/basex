@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
@@ -40,8 +41,7 @@ abstract class Format extends StandardFunc {
   }
 
   @Override
-  protected Format opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 }

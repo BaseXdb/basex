@@ -76,8 +76,17 @@ public final class SeqType {
      */
     public Occ union(final Occ other) {
       final int mn = Math.min(min, other.min), mx = Math.max(max, other.max);
-      return mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE :
-        mn == 0 ? ZERO_MORE : ONE_MORE;
+      return mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
+    }
+
+    /**
+     * Adds two occurrences.
+     * @param other other occurrence indicator
+     * @return union
+     */
+    public Occ add(final Occ other) {
+      final long mn = (long) min + other.min, mx = (long) max + other.max;
+      return mx == 0 ? ZERO : mx == 1 ? mn == 0 ? ZERO_ONE : ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
     }
 
     /**
@@ -95,7 +104,7 @@ public final class SeqType {
     }
   }
 
-  /** Zero items. */
+  /** Zero items (single instance). */
   public static final SeqType EMP = new SeqType(AtomType.ITEM, Occ.ZERO);
   /** Single item. */
   public static final SeqType ITEM = AtomType.ITEM.seqType();
@@ -287,7 +296,7 @@ public final class SeqType {
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ) {
-    return occ == Occ.ONE ? type.seqType() : occ == Occ.ZERO ? EMP : new SeqType(type, occ);
+    return occ == Occ.ZERO ? EMP : occ == Occ.ONE ? type.seqType() : new SeqType(type, occ);
   }
 
   /**
@@ -298,7 +307,7 @@ public final class SeqType {
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test kind) {
-    return kind == null ? get(type, occ) : new SeqType(type, occ, kind);
+    return occ == Occ.ZERO || kind == null ? get(type, occ) : new SeqType(type, occ, kind);
   }
 
   /**
@@ -524,18 +533,29 @@ public final class SeqType {
   }
 
   /**
-   * Computes the union of two sequence types, i.e. the lowest common ancestor of both
-   * types.
+   * Computes the union of two sequence types, i.e. the lowest common ancestor of both types.
    * @param st second type
    * @return resulting type
    */
   public SeqType union(final SeqType st) {
-    return get(type == st.type ? type : type.union(st.type), occ.union(st.occ));
+    // ignore general type of empty sequence
+    final Type t = type == st.type || st.zero() ? type : zero() ? st.type : type.union(st.type);
+    final Occ o = occ.union(st.occ);
+    return get(t, o);
+  }
+
+  /**
+   * Adds two sequence types.
+   * @param st second type
+   * @return resulting type
+   */
+  public SeqType add(final SeqType st) {
+    return zero() ? st : st.zero() ? this : SeqType.get(type.union(st.type), occ.add(st.occ));
   }
 
   /**
    * Computes the intersection of two sequence types, i.e. the most general type that is
-   * sub-type of both types. If no such type exists, {@code null} is returned
+   * sub-type of both types. If no such type exists, {@code null} is returned.
    * @param st second type
    * @return resulting type or {@code null}
    */
@@ -602,7 +622,7 @@ public final class SeqType {
    * Tests if the type may yield zero items.
    * @return result of check
    */
-  public boolean mayBeZero() {
+  public boolean mayBeEmpty() {
     return occ.min == 0;
   }
 

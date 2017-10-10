@@ -6,6 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -45,6 +46,7 @@ public final class FnFoldLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    if(exprs[0].isEmpty()) return exprs[1];
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
       final Value seq = (Value) exprs[0];
@@ -55,6 +57,24 @@ public final class FnFoldLeft extends StandardFunc {
       cc.info(QueryText.OPTUNROLL_X, this);
       return e;
     }
+    refineType(this);
     return this;
+  }
+
+  /**
+   * Refines the function type.
+   * @param func function
+   */
+  public static void refineType(final StandardFunc func) {
+    final Expr[] exprs = func.exprs;
+    final Type t = exprs[2].seqType().type;
+    if(t instanceof FuncType) {
+      final SeqType vt = ((FuncType) t).valueType;
+      if(exprs[0].seqType().mayBeEmpty()) {
+        func.seqType = vt.union(exprs[1].seqType());
+      } else {
+        func.seqType = vt;
+      }
+    }
   }
 }

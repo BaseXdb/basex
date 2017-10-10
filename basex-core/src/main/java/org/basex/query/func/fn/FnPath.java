@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.core.locks.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -83,8 +84,7 @@ public final class FnPath extends StandardFunc {
   }
 
   @Override
-  protected FnPath opt(final CompileContext cc) {
-    singleOcc();
-    return this;
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 }

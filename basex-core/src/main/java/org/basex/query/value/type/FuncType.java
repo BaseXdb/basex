@@ -22,8 +22,8 @@ import org.basex.util.*;
 public class FuncType implements Type {
   /** Annotations. */
   public final AnnList anns;
-  /** Declared type, {@code null} if not specified. */
-  public final SeqType type;
+  /** Return type of the function. */
+  public final SeqType valueType;
   /** Argument types (can be {@code null}). */
   public final SeqType[] argTypes;
 
@@ -32,22 +32,22 @@ public class FuncType implements Type {
 
   /**
    * Constructor.
-   * @param type return type (can be {@code null})
+   * @param valueType return type (can be {@code null})
    * @param argTypes argument types (can be {@code null})
    */
-  FuncType(final SeqType type, final SeqType... argTypes) {
-    this(null, type, argTypes);
+  FuncType(final SeqType valueType, final SeqType... argTypes) {
+    this(null, valueType, argTypes);
   }
 
   /**
    * Constructor.
    * @param anns annotations (can be {@code null})
-   * @param type return type (can be {@code null})
+   * @param valueType return type (can be {@code null})
    * @param argTypes argument types (can be {@code null})
    */
-  FuncType(final AnnList anns, final SeqType type, final SeqType... argTypes) {
+  FuncType(final AnnList anns, final SeqType valueType, final SeqType... argTypes) {
     this.anns = anns == null ? new AnnList() : anns;
-    this.type = type == null ? SeqType.ITEM_ZM : type;
+    this.valueType = valueType == null ? SeqType.ITEM_ZM : valueType;
     this.argTypes = argTypes;
   }
 
@@ -116,7 +116,7 @@ public class FuncType implements Type {
     for(int i = 0; i < al; i++) {
       if(!argTypes[i].eq(ft.argTypes[i])) return false;
     }
-    return type.eq(ft.type);
+    return valueType.eq(ft.valueType);
   }
 
   @Override
@@ -131,7 +131,7 @@ public class FuncType implements Type {
 
     // takes care of FunType.ANY
     if(this == SeqType.ANY_FUN || argTypes.length != ft.argTypes.length ||
-        !type.instanceOf(ft.type)) return false;
+        !valueType.instanceOf(ft.valueType)) return false;
 
     final int al = argTypes.length;
     for(int a = 0; a < al; a++) {
@@ -155,7 +155,7 @@ public class FuncType implements Type {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return SeqType.ANY_FUN;
     }
-    return get(anns.intersect(ft.anns), type.union(ft.type), arg);
+    return get(anns.intersect(ft.anns), valueType.union(ft.valueType), arg);
   }
 
   @Override
@@ -170,13 +170,13 @@ public class FuncType implements Type {
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       // ANY_FUN is excluded by the easy cases
-      final SeqType rt = type.intersect(ft.type);
+      final SeqType vt = valueType.intersect(ft.valueType);
       final int al = argTypes.length;
-      if(rt != null && al == ft.argTypes.length) {
+      if(vt != null && al == ft.argTypes.length) {
         final SeqType[] arg = new SeqType[al];
         for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
         final AnnList a = anns.union(ft.anns);
-        return a == null ? null : get(a, rt, arg);
+        return a == null ? null : get(a, vt, arg);
       }
     }
     return null;
@@ -249,18 +249,18 @@ public class FuncType implements Type {
   }
 
   @Override
+  public boolean nsSensitive() {
+    return false;
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(anns.toString()).add(FUNCTION).add('(');
     if(this == SeqType.ANY_FUN) {
       tb.add('*').add(')');
     } else {
-      tb.addSep(argTypes, ", ").add(") as ").add(type.toString());
+      tb.addSep(argTypes, ", ").add(") as ").add(valueType.toString());
     }
     return tb.toString();
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return false;
   }
 }

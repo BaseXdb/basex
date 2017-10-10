@@ -157,10 +157,10 @@ public final class FuncItem extends FItem implements Scope {
     cc.pushScope(scp);
 
     final Expr optimized = opt ? ex.optimize(cc) : ex, checked;
-    if(ft.type == null || tp.type != null && tp.type.instanceOf(ft.type)) {
+    if(tp.valueType.instanceOf(ft.valueType)) {
       checked = optimized;
     } else {
-      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.type, true);
+      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.valueType, true);
       checked = opt ? tc.optimize(cc) : tc;
     }
     checked.markTailCalls(null);
@@ -230,7 +230,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean isVacuousBody() {
     final SeqType st = expr.seqType();
-    return st != null && st.eq(SeqType.EMP) && !expr.has(Flag.UPD);
+    return st != null && st.zero() && !expr.has(Flag.UPD);
   }
 
   @Override
@@ -264,9 +264,10 @@ public final class FuncItem extends FItem implements Scope {
     if(name != null) tb.add("(: ").add(name.prefixId()).add("#").addInt(arity()).add(" :) ");
     tb.addExt(anns).add(FUNCTION).add('(');
     final int pl = params.length;
-    for(final Var v : params) {
-      tb.addExt(error ? v.toErrorString() : v.toString()).add(v == params[pl - 1] ? "" : ",");
+    for(int p = 0; p < pl; p++) {
+      if(p != 0) tb.add(",");
+      tb.addExt(error ? params[p].toErrorString() : params[p]);
     }
-    return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" {...}").toString();
+    return tb.add(')').add(" as ").addExt(ft.valueType).add(" {...}").toString();
   }
 }

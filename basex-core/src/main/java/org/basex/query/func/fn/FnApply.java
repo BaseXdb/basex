@@ -4,12 +4,14 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -36,5 +38,12 @@ public final class FnApply extends StandardFunc {
     final ValueList vl = new ValueList((int) as);
     for(final Value val : array.members()) vl.add(val);
     return fun.invokeValue(qc, info, vl.finish());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof FuncType) seqType = ((FuncType) t).valueType;
+    return this;
   }
 }

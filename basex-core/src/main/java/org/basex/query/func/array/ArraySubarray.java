@@ -3,8 +3,10 @@ package org.basex.query.func.array;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -26,5 +28,12 @@ public final class ArraySubarray extends ArrayFn {
     if(len < 0) throw ARRAYNEG_X.get(info, len);
     if(from + len > n) throw ARRAYBOUNDS_X_X.get(info, from + 1 + len, n + 1);
     return array.subArray(from, len);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof ArrayType) seqType = t.seqType();
+    return this;
   }
 }

@@ -11,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
@@ -82,19 +83,15 @@ public final class DynFuncCall extends FuncCall {
     final int nargs = exprs.length - 1;
     if(tp instanceof FuncType) {
       final FuncType ft = (FuncType) tp;
-      if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X.get(
-          info, arguments(nargs), ft.argTypes.length, f.toErrorString());
-      if(ft.type != null) {
-        SeqType rt = ft.type;
-        if(tp instanceof MapType && !rt.mayBeZero())
-          rt = rt.withOcc(rt.one() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-        seqType = rt;
-      }
+      if(ft.argTypes != null && ft.argTypes.length != nargs)
+        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, f.toErrorString());
+      SeqType vt = ft.valueType;
+      if(tp instanceof MapType) vt = vt.withOcc(vt.occ.union(Occ.ZERO));
+      seqType = vt;
     }
 
-    // maps and arrays can only contain fully evaluated values, so this is safe
-    if((f instanceof Map || f instanceof org.basex.query.value.array.Array) && allAreValues())
-      return cc.preEval(this);
+    // maps and arrays can only contain evaluated values, so this is safe
+    if((f instanceof Map || f instanceof Array) && allAreValues()) return cc.preEval(this);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function
@@ -123,7 +120,8 @@ public final class DynFuncCall extends FuncCall {
    */
   public void markInlined(final FuncItem it) {
     final int hash = it.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } : Array.add(inlinedFrom, hash);
+    inlinedFrom = inlinedFrom == null ? new int[] { hash } :
+      org.basex.util.Array.add(inlinedFrom, hash);
   }
 
   /**

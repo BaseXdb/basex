@@ -1,10 +1,12 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -23,5 +25,12 @@ public final class ArrayFilter extends ArrayFn {
       if(toBoolean(fun.invokeItem(qc, info, val))) builder.append(val);
     }
     return builder.freeze();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof ArrayType) seqType = t.seqType();
+    return this;
   }
 }

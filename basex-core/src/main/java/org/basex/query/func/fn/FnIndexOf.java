@@ -1,13 +1,14 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 
 /**
  * Function implementation.
@@ -39,7 +40,9 @@ public final class FnIndexOf extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    if(exprs[0].seqType().zeroOrOne()) seqType = seqType.withOcc(Occ.ZERO_ONE);
+    final SeqType st = exprs[0].seqType();
+    if(st.zero()) return exprs[0];
+    if(st.zeroOrOne()) seqType = seqType.withOcc(Occ.ZERO_ONE);
     return this;
   }
 }

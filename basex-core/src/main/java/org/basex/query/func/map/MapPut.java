@@ -1,10 +1,13 @@
 package org.basex.query.func.map;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -20,5 +23,18 @@ public final class MapPut extends StandardFunc {
     final Item key = toAtomItem(exprs[1], qc);
     final Value val = qc.value(exprs[2]);
     return map.put(key, val, info);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Type t = exprs[0].seqType().type;
+    if(t instanceof MapType) {
+      final MapType mt = (MapType) t;
+      final SeqType kst = exprs[1].seqType(), vt = mt.valueType.union(exprs[2].seqType());
+      final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
+      final Type key = kt instanceof AtomType ? mt.keyType().union(kt) : AtomType.AAT;
+      seqType = SeqType.get(MapType.get((AtomType) key, vt), Occ.ONE);
+    }
+    return this;
   }
 }
