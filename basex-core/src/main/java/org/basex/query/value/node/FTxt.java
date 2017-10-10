@@ -47,7 +47,7 @@ public final class FTxt extends FNode {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(VAL, value));
+    addPlan(plan, planElem(TYP, seqType()), value);
   }
 
   @Override

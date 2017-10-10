@@ -69,7 +69,8 @@ public final class Arith extends Arr {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, calc.name), exprs);
+    addPlan(plan, planElem(OP, calc.name, TYPE, seqType()), exprs);
+    addPlan(plan, planElem(OP, calc.name, TYPE, seqType()), exprs);
   }
 
   @Override

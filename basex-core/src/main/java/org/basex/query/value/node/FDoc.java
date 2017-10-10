@@ -1,5 +1,7 @@
 package org.basex.query.value.node;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -124,7 +126,7 @@ public final class FDoc extends FNode {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.BASE, uri));
+    addPlan(plan, planElem(QueryText.BASE, uri, TYP, seqType()));
   }
 
   @Override

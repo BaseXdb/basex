@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -47,12 +46,5 @@ public final class IterFilter extends Filter {
   @Override
   public IterFilter copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new IterFilter(info, root.copy(cc, vm), Arr.copyAll(cc, vm, exprs)));
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem el = planElem();
-    addPlan(plan, el, root);
-    super.plan(el);
   }
 }

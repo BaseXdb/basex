@@ -51,7 +51,7 @@ public final class FNSpace extends FNode {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name, VAL, value));
+    addPlan(plan, planElem(NAM, name, VAL, value, TYP, seqType()));
   }
 
   @Override

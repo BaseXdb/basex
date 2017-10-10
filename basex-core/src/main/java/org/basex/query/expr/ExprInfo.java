@@ -45,7 +45,7 @@ public abstract class ExprInfo {
    * @param atts optional attribute names and values
    * @return tree node
    */
-  protected final FElem planElem(final Object... atts) {
+  protected FElem planElem(final Object... atts) {
     final FElem el = new FElem(Util.className(this));
     final int al = atts.length;
     for(int a = 0; a < al - 1; a += 2) {
@@ -57,22 +57,22 @@ public abstract class ExprInfo {
   /**
    * Adds trees of the specified expressions to the root node.
    * @param plan root node
-   * @param el new element
+   * @param child new element
    * @param exprs expressions
    */
-  protected static void addPlan(final FElem plan, final FElem el, final Object... exprs) {
-    plan.add(el);
+  protected static void addPlan(final FElem plan, final FElem child, final Object... exprs) {
+    plan.add(child);
     for(final Object expr : exprs) {
       if(expr instanceof ExprInfo) {
-        ((ExprInfo) expr).plan(el);
+        ((ExprInfo) expr).plan(child);
       } else if(expr instanceof ExprInfo[]) {
         for(final ExprInfo ex : (ExprInfo[]) expr) {
-          if(ex != null) ex.plan(el);
+          if(ex != null) ex.plan(child);
         }
       } else if(expr instanceof byte[]) {
-        el.add((byte[]) expr);
+        child.add((byte[]) expr);
       } else if(expr != null) {
-        el.add(expr.toString());
+        child.add(expr.toString());
       }
     }
   }
@@ -80,11 +80,11 @@ public abstract class ExprInfo {
   /**
    * Adds trees of the specified expressions to the root node.
    * @param plan root node
-   * @param el new element
+   * @param child new element
    * @param expr expressions
    */
-  protected static void addPlan(final FElem plan, final FElem el, final ExprInfo... expr) {
-    addPlan(plan, el, (Object) expr);
+  protected static void addPlan(final FElem plan, final FElem child, final ExprInfo... expr) {
+    addPlan(plan, child, (Object) expr);
   }
 
   /**

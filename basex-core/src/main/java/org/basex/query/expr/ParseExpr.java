@@ -4,13 +4,15 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
+import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -690,5 +692,14 @@ public abstract class ParseExpr extends Expr {
   protected Item checkNoEmpty(final Item it, final Type type) throws QueryException {
     if(it != null) return it;
     throw EMPTYFOUND_X.get(info, type);
+  }
+
+  @Override
+  protected final FElem planElem(final Object... atts) {
+    final int al = atts.length + 2;
+    final Object[] tmp = Arrays.copyOf(atts, al);
+    tmp[al - 2] = TYP;
+    tmp[al - 1] = seqType();
+    return super.planElem(tmp);
   }
 }

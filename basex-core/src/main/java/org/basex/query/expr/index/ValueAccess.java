@@ -16,6 +16,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -50,6 +51,7 @@ public final class ValueAccess extends IndexAccess {
     this.expr = expr;
     this.type = type;
     this.test = test;
+    seqType = NodeType.NOD.seqType();
   }
 
   /**
@@ -223,7 +225,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP, type, NAM, test), expr);
+    addPlan(plan, planElem(DTA, ictx.data.meta.name, TYP, type, NAM, test), expr);
   }
 
   @Override

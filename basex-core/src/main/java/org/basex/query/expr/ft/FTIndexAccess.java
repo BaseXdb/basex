@@ -108,7 +108,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name), ftexpr);
+    addPlan(plan, planElem(DTA, ictx.data.meta.name), ftexpr);
   }
 
   @Override

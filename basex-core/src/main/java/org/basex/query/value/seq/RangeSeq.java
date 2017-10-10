@@ -134,7 +134,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(FROM, start(), TO, end()));
+    addPlan(plan, planElem(FROM, start(), TO, end(), TYP, seqType()));
   }
 
   @Override

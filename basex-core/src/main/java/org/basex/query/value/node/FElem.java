@@ -415,7 +415,7 @@ public final class FElem extends FNode {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name.string()));
+    addPlan(plan, planElem(NAM, name.string(), TYP, seqType()));
   }
 
   @Override

@@ -97,7 +97,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(NAM, name.string());
+    final FElem el = planElem(NAM, name.string(), TYP, seqType());
     addPlan(plan, el, expr);
     final int al = args.length;
     for(int a = 0; a < al; ++a) el.add(planAttr(ARG + a, args[a].name.string()));

@@ -98,7 +98,7 @@ public final class Var extends ExprInfo {
 
   /**
    * Sequence type of values bound to this variable.
-   * @return sequence type (not {@code null})
+   * @return sequence type
    */
   public SeqType seqType() {
     final SeqType st = type != null ? type.intersect(seqType) : null;
@@ -107,7 +107,7 @@ public final class Var extends ExprInfo {
 
   /**
    * Declared type of this variable.
-   * @return declared type (not {@code null})
+   * @return declared type
    */
   public SeqType declaredType() {
     return type == null ? SeqType.ITEM_ZM : type;
@@ -247,7 +247,7 @@ public final class Var extends ExprInfo {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem(QueryText.NAM, '$' + Token.string(name.string()),
-        Token.ID, Token.token(id));
+        Token.ID, Token.token(id), QueryText.TYP, seqType());
     if(type != null) e.add(planAttr(QueryText.AS, type.toString()));
     addPlan(plan, e);
   }

@@ -256,7 +256,7 @@ public final class Map extends FItem {
   @Override
   public void plan(final FElem plan) {
     final int s = mapSize();
-    final FElem el = planElem(SIZE, s);
+    final FElem el = planElem(SIZ, s, TYP, seqType());
     final Value ks = keys();
     try {
       final int max = Math.min(s, 5);

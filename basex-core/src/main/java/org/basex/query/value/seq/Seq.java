@@ -3,6 +3,8 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -37,9 +39,9 @@ public abstract class Seq extends Value {
 
   @Override
   public Object toJava() throws QueryException {
-    final Object[] obj = new Object[(int) size];
-    for(int s = 0; s < size; s++) obj[s] = itemAt(s).toJava();
-    return obj;
+    final ArrayList<Object> obj = new ArrayList<>((int) size);
+    for(final Item it : this) obj.add(it.toJava());
+    return obj.toArray();
   }
 
   @Override
@@ -163,7 +165,7 @@ public abstract class Seq extends Value {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(SIZE, size);
+    final FElem el = planElem(SIZ, size, TYP, seqType());
     addPlan(plan, el);
     for(int v = 0; v != Math.min(size, 5); ++v) itemAt(v).plan(el);
   }

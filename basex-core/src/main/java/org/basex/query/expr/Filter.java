@@ -11,6 +11,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -250,9 +251,16 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public final boolean equals(final Object obj) {
     return this == obj || obj instanceof Filter && root.equals(((Filter) obj).root) &&
         super.equals(obj);
+  }
+
+  @Override
+  public final void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, root);
+    super.plan(el);
   }
 
   @Override

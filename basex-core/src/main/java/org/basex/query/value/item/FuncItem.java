@@ -240,7 +240,8 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYPE, type), params, expr);
+    final byte[] nm = name == null ? null : name.prefixId();
+    addPlan(plan, planElem(NAM, nm, TYP, type), params, expr);
   }
 
   @Override

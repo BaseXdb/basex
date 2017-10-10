@@ -1,7 +1,6 @@
 package org.basex.query.value.seq.tree;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
@@ -91,20 +90,6 @@ public abstract class TreeSeq extends Seq {
   @Override
   public final Iterator<Item> iterator() {
     return iterator(0);
-  }
-
-  @Override
-  public final Object[] toJava() throws QueryException {
-    final ArrayList<Object> obj = new ArrayList<>((int) size);
-    for(final Item it : this) obj.add(it.toJava());
-    return obj.toArray();
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    final FElem el = planElem(SIZE, size);
-    addPlan(plan, el);
-    for(int v = 0; v != Math.min(size, 5); ++v) itemAt(v).plan(el);
   }
 
   @Override
