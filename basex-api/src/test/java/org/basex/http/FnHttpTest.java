@@ -26,6 +26,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.http.HttpRequest.Part;
+import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -475,20 +476,17 @@ public class FnHttpTest extends HTTPTest {
     p1.headers.put("Content-Type", "application/octet-stream");
     p1.bodyAtts.put("media-type", "application/octet-stream");
     p1.bodyContents.add(B64.get((byte) -1));
-
     req.parts.add(p1);
 
-    final OutputStream out = fakeOutput();
+    final ByteArrayOutputStream out = fakeOutput();
     HttpClient.writePayload(out, req);
-    final String expResult = "--boundary" + CRLF
-        + "Content-Type: application/octet-stream" + CRLF
-        + "Content-Transfer-Encoding: base64" + CRLF
-        + CRLF
-        + "/w==" + CRLF + CRLF
-        + "--boundary--" + CRLF;
+
+    final ByteList bl = new ByteList();
+    bl.add(token("--boundary" + CRLF + "Content-Type: application/octet-stream" + CRLF + CRLF));
+    bl.add(-1).add(token(CRLF + "--boundary--" + CRLF));
 
     // Compare results
-    assertEquals(expResult, out.toString());
+    assertArrayEquals(bl.finish(), out.toByteArray());
   }
 
   /**
@@ -861,7 +859,7 @@ public class FnHttpTest extends HTTPTest {
    * @return output stream
    * @throws MalformedURLException exception
    */
-  private OutputStream fakeOutput() throws MalformedURLException {
+  private ByteArrayOutputStream fakeOutput() throws MalformedURLException {
     return new FakeHttpConnection().getOutputStream();
   }
 }
@@ -922,7 +920,7 @@ final class FakeHttpConnection extends HttpURLConnection {
   }
 
   @Override
-  public OutputStream getOutputStream() {
+  public ByteArrayOutputStream getOutputStream() {
     return out;
   }
 

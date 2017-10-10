@@ -259,25 +259,8 @@ public final class HttpClient {
         if(!part.headers.containsKey(CONTENT_TYPE))
           writeHeader(CONTENT_TYPE, part.bodyAtts.get(SerializerOptions.MEDIA_TYPE.name()), out);
 
-        // choose Base64 if content includes non-ASCII characters
-        byte[] contents = ao.finish();
-        boolean base64 = false;
-        for(final byte b : contents) base64 |= b < 0;
-
-        // write content
-        if(base64) {
-          writeHeader(CONTENT_TRANSFER_ENCODING, BASE64, out);
-          out.write(CRLF);
-          contents = org.basex.util.Base64.encode(contents);
-          final int bl = contents.length;
-          for(int b = 0; b < bl; b += 76) {
-            out.write(contents, b, Math.min(76, bl - b));
-            out.write(CRLF);
-          }
-        } else {
-          out.write(CRLF);
-          out.write(contents);
-        }
+        out.write(CRLF);
+        out.write(ao.finish());
         out.write(CRLF);
       }
       out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
