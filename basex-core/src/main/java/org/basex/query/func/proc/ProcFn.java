@@ -7,7 +7,6 @@ import java.io.*;
 import java.nio.charset.*;
 
 import org.basex.core.jobs.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -75,11 +74,7 @@ abstract class ProcFn extends StandardFunc {
       if(dir != null) pb.directory(toPath(token(dir)).toFile());
       proc = pb.start();
     } catch(final IOException ex) {
-      try {
-        result.error.write(token(Util.message(ex)));
-      } catch(final IOException e) {
-        Util.debug(e);
-      }
+      result.error.add(token(Util.message(ex)));
       result.code = 9999;
       return result;
     }
@@ -96,9 +91,7 @@ abstract class ProcFn extends StandardFunc {
         outt.join();
         errt.join();
       } catch(final InterruptedException ex) {
-        try {
-          result.error.write(token(Util.message(ex)));
-        } catch(final IOException ignored) { }
+        result.error.add(token(Util.message(ex)));
       }
     });
     thread.start();
@@ -125,16 +118,16 @@ abstract class ProcFn extends StandardFunc {
   /**
    * Creates a reader thread.
    * @param in input stream
-   * @param ao cache
+   * @param tb token builder
    * @param cs charset
    * @return result
    */
-  private static Thread reader(final InputStream in, final ArrayOutput ao, final Charset cs) {
+  private static Thread reader(final InputStream in, final TokenBuilder tb, final Charset cs) {
     final InputStreamReader isr = new InputStreamReader(in, cs);
     final BufferedReader br = new BufferedReader(isr);
     return new Thread(() -> {
       try {
-        for(int b; (b = br.read()) != -1;) ao.write(b);
+        for(int b; (b = br.read()) != -1;) tb.add(b);
       } catch(final IOException ex) {
         Util.stack(ex);
       }
@@ -146,9 +139,9 @@ abstract class ProcFn extends StandardFunc {
    */
   static final class Result {
     /** Process output. */
-    final ArrayOutput output = new ArrayOutput();
+    final TokenBuilder output = new TokenBuilder();
     /** Process error. */
-    final ArrayOutput error = new ArrayOutput();
+    final TokenBuilder error = new TokenBuilder();
     /** Exit code. */
     int code;
   }

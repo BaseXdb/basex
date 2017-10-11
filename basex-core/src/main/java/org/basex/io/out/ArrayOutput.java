@@ -29,26 +29,6 @@ public final class ArrayOutput extends PrintOutput {
   }
 
   /**
-   * Normalizes newlines in the byte array.
-   * @return self reference
-   */
-  public ArrayOutput normalize() {
-    final byte[] bffr = buffer;
-    final int s = (int) size;
-    int n = 0;
-    for(int o = 0; o < s; o++) {
-      byte ch = bffr[o];
-      if(ch == '\r') {
-        ch = '\n';
-        if(o + 1 < s && bffr[o + 1] == '\n') o++;
-      }
-      bffr[n++] = ch;
-    }
-    size = n;
-    return this;
-  }
-
-  /**
    * Returns the output as byte array.
    * @return byte array
    */

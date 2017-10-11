@@ -138,7 +138,7 @@ public abstract class StandardFunc extends Arr {
           ser.serialize(it);
         }
       }
-      return ao.normalize().finish();
+      return new TokenBuilder(ao.finish()).finish();
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {

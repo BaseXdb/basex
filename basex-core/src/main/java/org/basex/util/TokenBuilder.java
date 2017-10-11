@@ -377,7 +377,6 @@ public final class TokenBuilder {
     return Token.token(s);
   }
 
-
   /**
    * Trims leading and trailing whitespaces.
    * @return self reference
@@ -390,6 +389,26 @@ public final class TokenBuilder {
     while(++c < s && ws(chrs[c]));
     if(c != 0 && c != s) Array.move(chrs, c, -c, s - c);
     size = s - c;
+    return this;
+  }
+
+  /**
+   * Normalizes newlines.
+   * @return self reference
+   */
+  public TokenBuilder normalize() {
+    final byte[] chrs = chars;
+    final int s = size;
+    int n = 0;
+    for(int c = 0; c < s; c++) {
+      byte ch = chrs[c];
+      if(ch == '\r') {
+        ch = '\n';
+        if(c + 1 < s && chrs[c + 1] == '\n') c++;
+      }
+      chrs[n++] = ch;
+    }
+    size = n;
     return this;
   }
 

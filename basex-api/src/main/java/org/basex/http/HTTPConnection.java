@@ -16,7 +16,6 @@ import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.core.users.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
@@ -459,10 +458,9 @@ public final class HTTPConnection implements ClientInfo {
       }
       if(info != null) {
         res.setContentType(MediaType.TEXT_PLAIN.toString());
-        try(ArrayOutput ao = new ArrayOutput()) {
-          ao.write(token(info));
-          res.getOutputStream().write(ao.normalize().finish());
-        }
+        final TokenBuilder tb = new TokenBuilder();
+        tb.add(token(info));
+        res.getOutputStream().write(tb.normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {
       logError(code, message, info, ex);
