@@ -2134,13 +2134,13 @@ public class QueryParser extends InputParser {
     // map constructor
     if(wsConsumeWs(MAP, CURLY1, INCOMPLETE)) return new CMap(info(), keyValues());
     // square array constructor
-    if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
+    if(wsConsumeWs(SQUARE1)) return new CArray(info(), true, values());
     // curly array constructor
     if(wsConsumeWs(ARRAY, CURLY1, INCOMPLETE)) {
       wsCheck(CURLY1);
       final Expr a = expr();
       wsCheck(CURLY2);
-      return a == null ? new CArray(info(), true) : new CArray(info(), true, a);
+      return a == null ? new CArray(info(), false) : new CArray(info(), false, a);
     }
     // unary lookup
     final int ip = pos;

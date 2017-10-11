@@ -86,7 +86,7 @@ public final class Cast extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, seqType), expr);
+    addPlan(plan, planElem(AS, seqType), expr);
   }
 
   @Override

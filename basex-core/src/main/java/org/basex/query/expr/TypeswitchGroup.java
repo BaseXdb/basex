@@ -163,13 +163,12 @@ public final class TypeswitchGroup extends Single {
     if(types.length == 0) {
       e.add(planAttr(Token.token(DEFAULT), Token.TRUE));
     } else {
-      final byte[] or = { ' ', '|', ' ' };
       final ByteList bl = new ByteList();
       for(final SeqType st : types) {
-        if(!bl.isEmpty()) bl.add(or);
+        if(!bl.isEmpty()) bl.add('|');
         bl.add(Token.token(st.toString()));
       }
-      e.add(planAttr(Token.token(TYPE), bl.finish()));
+      e.add(planAttr(Token.token(CASE), bl.finish()));
     }
     if(var != null) e.add(planAttr(VAR, Token.token(var.toString())));
     expr.plan(e);

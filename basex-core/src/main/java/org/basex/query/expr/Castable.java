@@ -68,7 +68,7 @@ public final class Castable extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, type), expr);
+    addPlan(plan, planElem(AS, type), expr);
   }
 
   @Override

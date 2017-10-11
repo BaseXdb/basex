@@ -33,16 +33,16 @@ public final class CMap extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     Type key = null;
-    SeqType value = null;
+    SeqType vt = null;
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       final SeqType kst = exprs[e].seqType(), st = exprs[e + 1].seqType();
       final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
       key = key == null ? kt : key.union(kt);
-      value = value == null ? st : value.union(st);
+      vt = vt == null ? st : vt.union(st);
     }
-    if(key instanceof AtomType && value != null) {
-      seqType = SeqType.get(MapType.get((AtomType) key, value), Occ.ONE);
+    if(key instanceof AtomType && vt != null) {
+      seqType = SeqType.get(MapType.get((AtomType) key, vt), Occ.ONE);
     }
     return allAreValues() ? cc.preEval(this) : this;
   }

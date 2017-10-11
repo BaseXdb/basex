@@ -67,19 +67,19 @@ public final class InlineTest extends QueryPlanTest {
         + "declare function local:b($a) { $a };"
         + "local:a()",
         "42",
-        "exists(/*/" + Util.className(Int.class) + "[@value = '42'])");
+        "exists(/*/" + Util.className(Int.class) + "[. = '42'])");
 
     check("declare function local:a() { local:b(?)(42) };"
         + "declare function local:b($a) { $a };"
         + "local:a()",
         "42",
-        "exists(/*/" + Util.className(Int.class) + "[@value = '42'])");
+        "exists(/*/" + Util.className(Int.class) + "[. = '42'])");
 
     check("declare function local:a() { local:b#1(?)(42) };"
         + "declare function local:b($a) { $a };"
         + "local:a()",
         "42",
-        "exists(/*/" + Util.className(Int.class) + "[@value = '42'])");
+        "exists(/*/" + Util.className(Int.class) + "[. = '42'])");
   }
 
   /** Checks that the simple map operator prohibits inlining a context item into its RHS. */

@@ -297,7 +297,7 @@ public abstract class Item extends Value {
   @Override
   public void plan(final FElem plan) {
     try {
-      addPlan(plan, planElem(TYP, type), string(string(null), false, true));
+      addPlan(plan, planElem(TYPE, type), string(string(null), false, true));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly

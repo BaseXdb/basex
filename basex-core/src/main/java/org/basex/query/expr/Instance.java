@@ -60,7 +60,7 @@ public final class Instance extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, type), expr);
+    addPlan(plan, planElem(OF, type), expr);
   }
 
   @Override

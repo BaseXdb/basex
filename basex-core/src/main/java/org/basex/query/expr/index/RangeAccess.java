@@ -63,7 +63,7 @@ public final class RangeAccess extends IndexAccess {
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(DTA, ictx.data.meta.name, MIN, index.min, MAX, index.max,
-        TYPE, index.type()));
+        IDX, index.type()));
   }
 
   @Override

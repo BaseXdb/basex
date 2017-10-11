@@ -83,7 +83,7 @@ public final class Unary extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(VAL, minus), expr);
+    addPlan(plan, planElem(VALUEE, minus), expr);
   }
 
   @Override

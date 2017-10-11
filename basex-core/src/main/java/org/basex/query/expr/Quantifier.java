@@ -100,7 +100,7 @@ public final class Quantifier extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, every ? EVERY : SOME), expr);
+    addPlan(plan, planElem(OPTION, every ? EVERY : SOME), expr);
   }
 
   @Override

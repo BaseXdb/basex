@@ -32,7 +32,7 @@ public abstract class Pragma extends ExprInfo {
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(VAL, value), name);
+    addPlan(plan, planElem(VALUEE, value), name);
   }
 
   /**

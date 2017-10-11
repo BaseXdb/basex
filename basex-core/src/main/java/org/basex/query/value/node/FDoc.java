@@ -126,7 +126,7 @@ public final class FDoc extends FNode {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.BASE, uri, TYP, seqType()));
+    addPlan(plan, planElem(QueryText.BASE, uri, TYPE, seqType()));
   }
 
   @Override

@@ -698,7 +698,7 @@ public abstract class ParseExpr extends Expr {
   protected final FElem planElem(final Object... atts) {
     final int al = atts.length + 2;
     final Object[] tmp = Arrays.copyOf(atts, al);
-    tmp[al - 2] = TYP;
+    tmp[al - 2] = TYPE;
     tmp[al - 1] = seqType();
     return super.planElem(tmp);
   }

@@ -52,7 +52,7 @@ public final class MapType extends FuncType {
   public boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
     if(t == AtomType.ITEM || t == SeqType.ANY_MAP || t == SeqType.ANY_FUN) return true;
-    if(!(t instanceof FuncType) || t instanceof ArrayType) return false;
+    if(!(t instanceof FuncType) || t instanceof ArrayType || this == SeqType.ANY_MAP) return false;
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
@@ -60,6 +60,7 @@ public final class MapType extends FuncType {
     if(t instanceof MapType) return keyType().instanceOf(((MapType) t).keyType());
 
     // test function arguments of function type
+    // example: map { 'x':'y' } instance of function(xs:string) as xs:string
     for(int a = 0; a < al; a++) {
       if(!argTypes[a].instanceOf(ft.argTypes[a])) return false;
     }

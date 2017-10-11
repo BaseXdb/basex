@@ -51,7 +51,7 @@ public final class ValueAccess extends IndexAccess {
     this.expr = expr;
     this.type = type;
     this.test = test;
-    seqType = NodeType.NOD.seqType();
+    seqType = SeqType.NOD_ZM;
   }
 
   /**
@@ -225,7 +225,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DTA, ictx.data.meta.name, TYP, type, NAM, test), expr);
+    addPlan(plan, planElem(DTA, ictx.data.meta.name, IDX, type, NAM, test), expr);
   }
 
   @Override

@@ -63,7 +63,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "42",
         // both outer inline functions are pre-compiled
         "empty(//" + Util.className(Closure.class) + ')',
-        "/*/" + Util.className(Int.class) + "/@value = '42'"
+        "/*/" + Util.className(Int.class) + " = '42'"
     );
   }
 
@@ -149,7 +149,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "let $id := local:foo(function($g) { $g })" +
         "return $id(42)",
         "42",
-        "/*/" + Util.className(Int.class) + "/@value = '42'"
+        "/*/" + Util.className(Int.class) + " = '42'"
     );
   }
 
@@ -201,7 +201,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "fn:count($x())",
         "1",
         // the query should be pre-evaluated
-        "QueryPlan/Int/@value = 1"
+        "QueryPlan/Int = 1"
     );
   }
 

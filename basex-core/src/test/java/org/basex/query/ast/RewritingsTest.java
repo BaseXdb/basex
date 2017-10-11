@@ -77,7 +77,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("if(<a>X</a>[text()]) then 1 else 2", null, "//@axis = 'child'");
     check("<a>X</a>[text()] and <a/>", null, "//@axis = 'child'");
-    check("<a>X</a>[text()] or <a/>", null, "//Bln/@value = 'true'");
+    check("<a>X</a>[text()] or <a/>", null, "//Bln = 'true'");
     check("<a>X</a>[text()] or <a/>[text()]", null, "//@axis = 'child'");
     check("for $a in <a>X</a> where $a[text()] return $a", null, "//@axis = 'child'");
 

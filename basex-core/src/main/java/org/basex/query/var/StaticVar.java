@@ -168,7 +168,7 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem(NAM, name.string(), TYP, seqType());
+    final FElem e = planElem(NAM, name.string(), TYPE, seqType());
     if(expr != null) expr.plan(e);
     plan.add(e);
   }

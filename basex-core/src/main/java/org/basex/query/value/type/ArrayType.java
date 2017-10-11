@@ -48,7 +48,7 @@ public final class ArrayType extends FuncType {
   public boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
     if(t == AtomType.ITEM || t == SeqType.ANY_ARRAY || t == SeqType.ANY_FUN) return true;
-    if(!(t instanceof FuncType) || t instanceof MapType) return false;
+    if(!(t instanceof FuncType) || t instanceof MapType || this == SeqType.ANY_ARRAY) return false;
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
@@ -56,6 +56,7 @@ public final class ArrayType extends FuncType {
     if(t instanceof ArrayType) return true;
 
     // test function arguments of function type
+    // example: ["A"] instance of function(xs:string) as xs:string
     for(int a = 0; a < al; a++) {
       if(!argTypes[a].instanceOf(ft.argTypes[a])) return false;
     }
