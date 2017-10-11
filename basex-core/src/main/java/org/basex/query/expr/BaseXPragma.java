@@ -41,6 +41,11 @@ public final class BaseXPragma extends Pragma {
   }
 
   @Override
+  public boolean skipEval() {
+    return true;
+  }
+
+  @Override
   public Pragma copy() {
     return new BaseXPragma(name, value);
   }

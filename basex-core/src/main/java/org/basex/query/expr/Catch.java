@@ -53,10 +53,15 @@ public final class Catch extends Single {
   public Catch compile(final CompileContext cc) {
     try {
       expr = expr.compile(cc);
-      seqType = expr.seqType();
     } catch(final QueryException qe) {
       expr = cc.error(qe, expr);
     }
+    return optimize(cc);
+  }
+
+  @Override
+  public Catch optimize(final CompileContext cc) {
+    seqType = expr.seqType();
     return this;
   }
 

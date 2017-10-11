@@ -1,13 +1,11 @@
 package org.basex.query.expr.ft;
 
-import static org.basex.query.QueryText.*;
-
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -40,6 +38,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
+    ictx.data(qc, IndexType.FULLTEXT, info);
     final FTIter iter = ftexpr.iter(qc);
     return new NodeIter() {
       @Override
@@ -85,7 +84,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(ictx.data.meta.name) && ftexpr.accept(visitor);
+    return ftexpr.accept(visitor);
   }
 
   @Override
@@ -108,7 +107,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DTA, ictx.data.meta.name), ftexpr);
+    addPlan(plan, planElem(), ictx.expr(), ftexpr);
   }
 
   @Override
@@ -118,6 +117,6 @@ public final class FTIndexAccess extends Simple {
       final FTWords ftw = (FTWords) ftexpr;
       if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) e = ftw.query;
     }
-    return Function._FT_SEARCH.toString(Str.get(ictx.data.meta.name), e);
+    return Function._FT_SEARCH.toString(ictx.expr(), e);
   }
 }

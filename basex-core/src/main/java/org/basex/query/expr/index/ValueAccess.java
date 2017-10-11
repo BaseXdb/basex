@@ -66,12 +66,13 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+    final Data data = ictx.data(qc, type, info);
     final ArrayList<BasicNodeIter> iters = new ArrayList<>();
     final Iter iter = qc.iter(expr);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
       final byte[] term = it.string(info);
-      iters.add(iter(trim ? Token.trim(term) : term));
+      iters.add(iter(trim ? Token.trim(term) : term, data));
     }
     final int is = iters.size();
     return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iters.get(0) :
@@ -81,25 +82,25 @@ public final class ValueAccess extends IndexAccess {
   /**
    * Returns an index iterator.
    * @param term term to be found
+   * @param data data reference
    * @return iterator
    */
-  private BasicNodeIter iter(final byte[] term) {
+  private BasicNodeIter iter(final byte[] term, final Data data) {
     // special case: empty text node
     // - no element name: return 0 results (empty text nodes are non-existent)
     // - otherwise, return scan-based element iterator
     final int tl = term.length;
     if(tl == 0 && type == IndexType.TEXT)
-      return test == null ? BasicNodeIter.EMPTY : scanEmpty();
+      return test == null ? BasicNodeIter.EMPTY : scanEmpty(data);
 
     // check if index is available and if it may contain the requested term
     // otherwise, use sequential scan
-    final Data data = ictx.data;
     boolean index = data.meta.index(type);
     if(type == IndexType.TEXT || type == IndexType.ATTRIBUTE) {
       index &= tl > 0 && tl <= data.meta.maxlen;
     }
 
-    final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term);
+    final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term, data);
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
     return new DBNodeIter(data) {
@@ -121,13 +122,13 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Returns a scan-based index iterator, which looks for text nodes with the specified value.
+   * @param data data reference
    * @param value value to be looked up
    * @return node iterator
    */
-  private IndexIterator scan(final byte[] value) {
+  private IndexIterator scan(final byte[] value, final Data data) {
     return new IndexIterator() {
       final boolean text = type == IndexType.TEXT;
-      final Data data = ictx.data;
       final byte kind = text ? Data.TEXT : Data.ATTR;
       final int sz = data.meta.size;
       int pre = -1;
@@ -156,10 +157,11 @@ public final class ValueAccess extends IndexAccess {
    * Returns a scan-based iterator, which returns elements
    * a) matching the name test and
    * b) having no descendants.
+   * @param data data reference
    * @return node iterator
    */
-  private BasicNodeIter scanEmpty() {
-    return new DBNodeIter(ictx.data) {
+  private BasicNodeIter scanEmpty(final Data data) {
+    return new DBNodeIter(data) {
       final DBNode tmp = new DBNode(data, 0, Data.ELEM);
       final int sz = data.meta.size;
       int pre = -1;
@@ -225,7 +227,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DTA, ictx.data.meta.name, IDX, type, NAM, test), expr);
+    addPlan(plan, planElem(IDX, type, NAM, test), ictx.expr(), expr);
   }
 
   @Override
@@ -233,7 +235,7 @@ public final class ValueAccess extends IndexAccess {
     final TokenBuilder tb = new TokenBuilder();
     final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
         ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
-    tb.add(func.toString(Str.get(ictx.data.meta.name), expr));
+    tb.add(func.toString(ictx.expr(), expr));
     if(test != null) tb.add("/parent::").addExt(test);
     return tb.toString();
   }

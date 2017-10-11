@@ -389,7 +389,7 @@ public final class FTWords extends FTExpr {
 
     // estimate costs if text is not known at compile time
     if(tokens == null) {
-      ii.costs = Math.max(2, data.meta.size / 30);
+      ii.costs = data == null ? Integer.MAX_VALUE : Math.max(2, data.meta.size / 30);
       return true;
     }
 
@@ -413,9 +413,9 @@ public final class FTWords extends FTExpr {
           }
         }
         // favor full-text index requests over exact queries
-        final int costs = data.costs(ft);
-        if(costs < 0) return false;
-        if(costs != 0) ii.costs += Math.max(2, costs / 100);
+        final int c = ii.costs(data, ft);
+        if(c < 0) return false;
+        if(c != 0) ii.costs += Math.max(2, c / 100);
       }
     }
     return true;

@@ -38,9 +38,11 @@ public final class HofSortWith extends HofFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType st = exprs[0].seqType();
-    if(st.zero()) return exprs[0];
+    final Expr e = exprs[0];
+    final SeqType st = e.seqType();
+    if(st.zero()) return e;
     seqType = st;
+    size = e.size();
     return this;
   }
 }

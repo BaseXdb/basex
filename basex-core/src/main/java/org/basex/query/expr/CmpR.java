@@ -151,7 +151,7 @@ public final class CmpR extends Single {
     final Data data = ii.ic.data;
     // sequential main memory scan is assumed to be faster than range index access;
     // no support for main-memory databases
-    if(!mni || !mxi || data.inMemory()) return false;
+    if(!mni || !mxi || data != null && data.inMemory()) return false;
     final IndexType type = ii.type(expr, null);
     if(type == null) return false;
 
@@ -167,7 +167,7 @@ public final class CmpR extends Single {
     }
 
     // estimate costs
-    ii.costs = data.costs(nr);
+    ii.costs = ii.costs(data, nr);
     if(ii.costs == -1) return false;
 
     // skip if numbers are negative, doubles, or of different string length
@@ -194,7 +194,8 @@ public final class CmpR extends Single {
   private Stats key(final IndexInfo ii, final IndexType type) {
     // statistics are not up-to-date
     final Data data = ii.ic.data;
-    if(!data.meta.uptodate || !data.nspaces.isEmpty() || !(expr instanceof AxisPath)) return null;
+    if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty() ||
+        !(expr instanceof AxisPath)) return null;
 
     NameTest test = ii.test;
     if(test == null) {

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.iter.*;
@@ -26,8 +25,6 @@ public final class FtSearch extends FtAccess {
     final FtIndexOptions opts = toOptions(2, new FtIndexOptions(), qc);
 
     final IndexContext ic = new IndexContext(data, false);
-    if(!data.meta.ftindex) throw BXDB_INDEX_X.get(info, data.meta.name, IndexType.FULLTEXT);
-
     final FTOpt opt = new FTOpt().assign(data.meta);
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));

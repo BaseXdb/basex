@@ -458,9 +458,7 @@ public final class HTTPConnection implements ClientInfo {
       }
       if(info != null) {
         res.setContentType(MediaType.TEXT_PLAIN.toString());
-        final TokenBuilder tb = new TokenBuilder();
-        tb.add(token(info));
-        res.getOutputStream().write(tb.normalize().finish());
+        res.getOutputStream().write(new TokenBuilder(token(info)).normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {
       logError(code, message, info, ex);

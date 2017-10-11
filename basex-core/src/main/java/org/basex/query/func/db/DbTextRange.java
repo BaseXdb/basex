@@ -1,7 +1,5 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -33,12 +31,7 @@ public class DbTextRange extends DbAccess {
       throws QueryException {
 
     final Data data = checkData(qc);
-    final byte[] min = toToken(exprs[1], qc);
-    final byte[] max = toToken(exprs[2], qc);
-
-    if(type == IndexType.TEXT ? !data.meta.textindex : !data.meta.attrindex)
-      throw BXDB_INDEX_X.get(info, data.meta.name, type);
-
+    final byte[] min = toToken(exprs[1], qc), max = toToken(exprs[2], qc);
     final StringRange sr = new StringRange(type, min, true, max, true);
     return new StringRangeAccess(info, sr, new IndexContext(data, false));
   }

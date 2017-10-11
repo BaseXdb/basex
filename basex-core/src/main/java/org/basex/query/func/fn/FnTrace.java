@@ -40,7 +40,9 @@ public final class FnTrace extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    seqType = exprs[0].seqType();
+    final Expr e = exprs[0];
+    seqType = e.seqType();
+    size = e.size();
     return this;
   }
 

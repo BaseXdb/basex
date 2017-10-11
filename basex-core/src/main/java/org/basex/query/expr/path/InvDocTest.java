@@ -39,6 +39,8 @@ final class InvDocTest extends Test {
    * @return document test
    */
   static Test get(final Value rt) {
+    if(rt == null) return KindTest.DOC;
+
     // use simple test if database contains only one document
     final Data data = rt.data();
     if(data.meta.ndocs == 1) return KindTest.DOC;

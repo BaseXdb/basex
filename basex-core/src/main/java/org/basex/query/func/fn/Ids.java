@@ -80,7 +80,6 @@ abstract class Ids extends StandardFunc {
     final Data data = root.data();
     if(data == null || !(idref ? data.meta.tokenindex : data.meta.attrindex)) return false;
     // check if index names contain id attributes
-
     synchronized(indexed) {
       return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
           containsIds(idref));

@@ -371,7 +371,6 @@ public interface QueryText {
   /** Query Info. */ String OP = "op";
   /** Query Info. */ String POS = "pos";
   /** Query Info. */ String VAR = "var";
-  /** Query Info. */ String DTA = "data";
   /** Query Info. */ String IDX = "index";
   /** Query Info. */ String NAM = "name";
   /** Query Info. */ String DIR = "dir";

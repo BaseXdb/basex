@@ -38,15 +38,14 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) {
-    final boolean text = index.type() == IndexType.TEXT;
-    final byte kind = text ? Data.TEXT : Data.ATTR;
-    final Data data = ictx.data;
-    final int ml = data.meta.maxlen;
-    final IndexIterator ii = index.min.length <= ml && index.max.length <= ml &&
-        (text ? data.meta.textindex : data.meta.attrindex) ? data.iter(index) : scan();
-
+  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+    final IndexType type = index.type();
+    final Data data = ictx.data(qc, type, info);
     return new DBNodeIter(data) {
+      final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
+      final IndexIterator ii = index.min.length <= data.meta.maxlen &&
+          index.max.length <= data.meta.maxlen ? data.iter(index) :
+        scan(data);
       @Override
       public DBNode next() {
         return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
@@ -56,13 +55,13 @@ public final class StringRangeAccess extends IndexAccess {
 
   /**
    * Returns scan-based iterator.
+   * @param data data reference
    * @return node iterator
    */
-  private IndexIterator scan() {
+  private IndexIterator scan(final Data data) {
     return new IndexIterator() {
       final boolean text = index.type() == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;
-      final Data data = ictx.data;
       final int sz = data.meta.size;
       int pre = -1;
 
@@ -101,14 +100,13 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DTA, ictx.data.meta.name,
-        MIN, index.min, MAX, index.max, IDX, index.type()));
+    addPlan(plan, planElem(MIN, index.min, MAX, index.max, IDX, index.type()), ictx.expr());
   }
 
   @Override
   public String toString() {
     final boolean text = index.type() == IndexType.TEXT;
     final Function func = text ? Function._DB_TEXT_RANGE : Function._DB_ATTRIBUTE_RANGE;
-    return func.toString(Str.get(ictx.data.meta.name), Str.get(index.min), Str.get(index.max));
+    return func.toString(ictx.expr(), Str.get(index.min), Str.get(index.max));
   }
 }

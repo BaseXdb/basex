@@ -38,13 +38,15 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) {
-    final byte kind = index.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-    return new DBNodeIter(ictx.data) {
-      final IndexIterator it = data.iter(index);
+  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+    final IndexType type = index.type();
+    final Data data = ictx.data(qc, type, info);
+    return new DBNodeIter(data) {
+      final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
+      final IndexIterator ii = data.iter(index);
       @Override
       public DBNode next() {
-        return it.more() ? new DBNode(data, it.pre(), kind) : null;
+        return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
       }
     };
   }
@@ -62,14 +64,13 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DTA, ictx.data.meta.name, MIN, index.min, MAX, index.max,
-        IDX, index.type()));
+    addPlan(plan, planElem(MIN, index.min, MAX, index.max, IDX, index.type()), ictx.expr());
   }
 
   @Override
   public String toString() {
     final Function func = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE;
-    return func.toString(Str.get(ictx.data.meta.name), Dbl.get(index.min), Dbl.get(index.max));
+    return func.toString(ictx.expr(), Dbl.get(index.min), Dbl.get(index.max));
   }
 }

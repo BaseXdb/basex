@@ -13,7 +13,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.expr.path.Test.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -46,7 +46,7 @@ public final class IndexInfo {
   public Expr expr;
   /** Costs of index access. 0 = no results; 1 = exactly one results;
    * all other values may be estimates (the smaller, the better). */
-  public int costs;
+  public int costs = Integer.MAX_VALUE;
 
   /** Predicate expression. */
   private Expr pred;
@@ -83,9 +83,9 @@ public final class IndexInfo {
     final Data data = ic.data;
     final boolean elem = last.test.type == NodeType.ELM;
     if(elem) {
-      // give up if database is out-dated, if namespaces occur, or if name test is not simple
-      if(!(data.meta.uptodate && data.nspaces.isEmpty() && last.test.kind == Kind.NAME))
-        return null;
+      // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
+      if(data == null || !(data.meta.uptodate && data.nspaces.isEmpty() &&
+          last.test.kind == Kind.NAME)) return null;
 
       test = (NameTest) last.test;
       final Stats stats = data.elemNames.stats(data.elemNames.id(test.name.local()));
@@ -95,7 +95,8 @@ public final class IndexInfo {
 
     // check if the index contains result for the specified elements or attributes
     final IndexType it = type != null ? type : text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    return new IndexNames(it, data).contains(qname()) && check(it, last) ? it : null;
+    return data == null ||
+        new IndexNames(it, data).contains(qname()) && check(it, last) ? it : null;
   }
 
   /**
@@ -128,12 +129,13 @@ public final class IndexInfo {
         byte[] string = it.string(info);
         if(trim) string = Token.trim(string);
         final int sl = string.length;
-        if(type != IndexType.TOKEN && (sl == 0 || sl > data.meta.maxlen)) return false;
+        if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
+          return false;
 
         // add only expressions that yield results and that have not been requested before
         if(!strings.contains(string)) {
           strings.put(string);
-          final int c = data.costs(new StringToken(type, string));
+          final int c = costs(data, new StringToken(type, string));
           if(c < 0) return false;
           if(c > 0) {
             final ValueAccess va = new ValueAccess(info, it, type, test, ic).trim(trim);
@@ -157,7 +159,7 @@ public final class IndexInfo {
         value.has(Flag.UPD)) return false;
 
       // estimate costs (tend to worst case)
-      costs = Math.max(1, data.meta.size / 10);
+      if(data != null) costs = Math.max(1, data.meta.size / 10);
       root = new ValueAccess(info, value, type, test, ic);
     }
 
@@ -178,6 +180,16 @@ public final class IndexInfo {
     expr = invert(test == null || !parent ? root :
       Path.get(ii, root, Step.get(ii, Axis.PARENT, test)));
     optInfo = opt;
+  }
+
+  /**
+   * Computes costs if the specified data reference exists.
+   * @param data data reference
+   * @param token index token
+   * @return costs costs
+   */
+  public int costs(final Data data, final IndexToken token) {
+    return data == null ? Integer.MAX_VALUE : data.costs(token);
   }
 
   // PRIVATE METHODS ==============================================================================

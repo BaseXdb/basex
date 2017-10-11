@@ -60,6 +60,12 @@ public abstract class Pragma extends ExprInfo {
   public abstract boolean has(Flag flag);
 
   /**
+   * Indicates if pragma can be skipped at evaluation time.
+   * @return result of check
+   */
+  public abstract boolean skipEval();
+
+  /**
    * Creates a copy of this pragma.
    * @return copy
    */

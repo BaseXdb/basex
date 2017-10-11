@@ -1,6 +1,12 @@
 package org.basex.index;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
+
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This enumeration lists available index types.
@@ -27,5 +33,15 @@ public enum IndexType {
   @Override
   public String toString() {
     return name().toLowerCase(Locale.ENGLISH);
+  }
+
+  /**
+   * Checks if the specified database has this index.
+   * @param data data reference
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  public void check(final Data data, final InputInfo info) throws QueryException {
+    if(!data.meta.index(this)) throw BXDB_INDEX_X.get(info, data.meta.name, this);
   }
 }

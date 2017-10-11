@@ -109,6 +109,10 @@ public enum QueryError {
   BXDB_MEM_X(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
   BXDB_INDEX_X(BXDB, 4, "Database '%' has no % index."),
+  /** BXDB0005. */
+  BXDB_NOINDEX_X(BXDB, 5, "No index access possible: %."),
+  /** BXDB0005. */
+  BXDB_DOC_X(BXDB, 5, "Root must yield document nodes: %."),
   /** BXDB0006. */
   BXDB_NODOC_X(BXDB, 6, "Database path '%' yields no documents."),
   /** BXDB0006. */

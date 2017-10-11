@@ -5,6 +5,7 @@ import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
@@ -156,27 +157,25 @@ public abstract class Path extends ParseExpr {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // simplify path with empty root expression or empty step
-    final Value v = initial(cc);
-    if(v != null && v.isEmpty() || emptyPath(v)) return cc.emptySeq(this);
+    final Value rt = initial(cc);
+    if(rt != null && rt.isEmpty() || emptyPath(rt)) return cc.emptySeq(this);
 
     // merge descendant steps
     Expr e = mergeSteps(cc);
     if(e != this) return e.optimize(cc);
 
-    if(v != null) {
-      // check index access
-      e = index(cc, v);
-      // recompile path
-      if(e != this) return e.optimize(cc);
+    // check index access
+    e = index(cc, rt);
+    // recompile path
+    if(e != this) return e.optimize(cc);
 
-      /* rewrite descendant to child steps. this optimization is located after the index rewriting,
-       * as it is cheaper to invert a descendant step. examples:
-       * - //C[. = '...']     ->  IA('...', C)
-       * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A
-       */
-      e = children(cc, v);
-      if(e != this) return e.optimize(cc);
-    }
+    /* rewrite descendant to child steps. this optimization is located after the index rewriting,
+     * as it is cheaper to invert a descendant step. examples:
+     * - //C[. = '...']     ->  IA('...', C)
+     * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A
+     */
+    e = children(cc, rt);
+    if(e != this) return e.optimize(cc);
 
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
@@ -423,13 +422,13 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns all summary path nodes for the specified location step or
    * {@code null} if nodes cannot be retrieved or are found on different levels.
-   * @param data data reference
+   * @param data data reference (can be {@code null})
    * @param last last step to be checked
    * @return path nodes
    */
   private ArrayList<PathNode> pathNodes(final Data data, final int last) {
     // skip request if no path index exists or might be out-of-date
-    if(!data.meta.uptodate) return null;
+    if(data == null || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
     for(int s = 0; s <= last; s++) {
@@ -537,7 +536,7 @@ public abstract class Path extends ParseExpr {
    */
   private Expr children(final CompileContext cc, final Value rt) {
     // only rewrite on document level
-    if(rt.type != NodeType.DOC) return this;
+    if(rt == null || rt.type != NodeType.DOC) return this;
 
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
@@ -617,16 +616,16 @@ public abstract class Path extends ParseExpr {
    * Queries of type 1, 3, 5 will not yield any results if the string to be compared is empty.
    *
    * @param cc compilation context
-   * @param rootValue root value (can be {@code null})
+   * @param rt root value (can be {@code null})
    * @return original or new expression
    * @throws QueryException query exception
    */
-  public Expr index(final CompileContext cc, final Value rootValue) throws QueryException {
-    // only rewrite on document level
-    if(rootValue == null || rootValue.type != NodeType.DOC) return this;
-    // only rewrite paths with data reference
-    final Data data = rootValue.data();
-    if(data == null) return this;
+  public Expr index(final CompileContext cc, final Value rt) throws QueryException {
+    final boolean enforce = cc.qc.context.options.get(MainOptions.ENFORCEINDEX);
+
+    // only rewrite if data reference exists and if root points to documents
+    final Data data = rt == null ? null : rt.data();
+    if(!enforce && (data == null || rt.type != NodeType.DOC)) return this;
 
     // cache index access costs
     IndexInfo index = null;
@@ -643,7 +642,8 @@ public abstract class Path extends ParseExpr {
 
       // check if path is iterable (i.e., will be duplicate-free)
       final boolean iter = pathNodes(data, s) != null;
-      final IndexContext ictx = new IndexContext(data, iter);
+      final IndexContext ictx = data != null ? new IndexContext(data, iter) :
+        new IndexContext(root == null ? new ContextValue(info) : root, iter);
 
       // choose cheapest index access
       final int pl = step.exprs.length;
@@ -666,16 +666,17 @@ public abstract class Path extends ParseExpr {
     }
 
     // skip rewriting if no index access is possible, or if it is too expensive
-    if(index == null || index.costs > data.meta.size) return this;
+    if(index == null || data != null && index.costs > data.meta.size) return this;
 
     // rewrite for index access
     cc.info(index.optInfo);
 
     // invert steps that occur before index step and add them as predicate
     final ExprList newPreds = new ExprList();
-    final Test rootTest = InvDocTest.get(rootValue);
+    final Test rootTest = InvDocTest.get(rt);
     final ExprList invSteps = new ExprList();
-    if(rootTest != KindTest.DOC || !data.meta.uptodate || predSteps(data, indexStep)) {
+    if(rootTest != KindTest.DOC || data == null || !data.meta.uptodate ||
+        predSteps(data, indexStep)) {
       for(int s = indexStep; s >= 0; s--) {
         final Axis invAxis = axisStep(s).axis.invert();
         if(s == 0) {

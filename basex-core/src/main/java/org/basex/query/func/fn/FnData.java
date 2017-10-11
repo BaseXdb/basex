@@ -30,11 +30,14 @@ public final class FnData extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Value v = cc.qc.focus.value;
     final Expr expr = exprs.length > 0 ? exprs[0] : v != null ? v : this;
-    final SeqType st = expr.seqType();
-    if(st.type instanceof NodeType) {
-      seqType = SeqType.get(AtomType.ATM, st.occ);
-    } else if(!st.mayBeArray()) {
-      seqType = st;
+    if(expr != this) {
+      final SeqType st = expr.seqType();
+      if(st.type instanceof NodeType) {
+        seqType = SeqType.get(AtomType.ATM, st.occ);
+      } else if(!st.mayBeArray()) {
+        seqType = st;
+      }
+      size = expr.size();
     }
     return this;
   }

@@ -156,13 +156,13 @@ final class CmpSR extends Single {
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
     // no support for main-memory databases
-    if(data.inMemory()) return false;
+    if(data != null && data.inMemory()) return false;
     final IndexType type = ii.type(expr, null);
     if(type == null) return false;
 
     // create range access
     final StringRange sr = new StringRange(type, min, mni, max, mxi);
-    ii.costs = data.costs(sr);
+    ii.costs = ii.costs(data, sr);
     if(ii.costs < 0) return false;
 
     final TokenBuilder tb = new TokenBuilder();

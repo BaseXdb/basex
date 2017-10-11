@@ -139,6 +139,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
   public static final NumberOption RUNS = new NumberOption("RUNS", 1);
+  /** Flag for enforcing index rewritings. */
+  public static final BooleanOption ENFORCEINDEX = new BooleanOption("ENFORCEINDEX", false);
 
   // Serialize
 
