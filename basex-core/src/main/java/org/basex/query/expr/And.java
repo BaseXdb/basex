@@ -36,7 +36,6 @@ public final class And extends Logical {
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
     for(int e = 0; e < es; e++) {
-      // skip identical expressions
       Expr expr = exprs[e];
       if(expr instanceof ItrPos) {
         // merge adjacent positional predicates
@@ -77,21 +76,25 @@ public final class And extends Logical {
             break;
           }
         }
+      } else if(expr.isValue()) {
+        expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
       }
 
       // expression will always return false
       if(expr == Bln.FALSE) return cc.replaceWith(this, Bln.FALSE);
       // skip expression yielding true
-      if(expr != Bln.TRUE && !list.contains(expr)) list.add(expr);
+      if(expr == Bln.TRUE) {
+        cc.info(OPTREMOVE_X_X, description(), expr);
+      } else {
+        if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
+        if(!list.contains(expr) || !expr.isSimple() && !expr.has(Flag.POS) && !expr.has(Flag.CTX))
+          list.add(expr);
+      }
     }
-
     // all arguments return true
     if(list.isEmpty()) return cc.replaceWith(this, Bln.TRUE);
 
-    if(es != list.size()) {
-      cc.info(OPTSIMPLE_X, this);
-      exprs = list.finish();
-    }
+    exprs = list.finish();
     compFlatten(cc);
 
     boolean not = true;

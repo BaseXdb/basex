@@ -42,7 +42,7 @@ public final class BaseXPragma extends Pragma {
 
   @Override
   public boolean skipEval() {
-    return true;
+    return false;
   }
 
   @Override

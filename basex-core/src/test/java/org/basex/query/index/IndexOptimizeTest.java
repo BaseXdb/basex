@@ -251,7 +251,6 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   public void upAndDown() {
     createDoc();
     execute(new Open(NAME));
-    check("//@x/..[@x = 'y']");
     query("name(//@x/..[@x = 'y'])", "a");
     query("name(//@*/..[@* = 'y'])", "a");
     query("name(//@*/..[@x = 'y'])", "a");

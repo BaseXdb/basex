@@ -36,7 +36,6 @@ public final class Or extends Logical {
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
     for(int e = 0; e < es; e++) {
-      // skip identical expressions
       Expr expr = exprs[e];
       if(expr instanceof CmpG) {
         // merge adjacent comparisons
@@ -52,8 +51,15 @@ public final class Or extends Logical {
       }
       // expression will always return true
       if(expr == Bln.TRUE) return cc.replaceWith(this, Bln.TRUE);
-      // skip expression yielding false
-      if(expr != Bln.FALSE && !list.contains(expr)) list.add(expr);
+      // skip expression yielding true
+      if(expr == Bln.FALSE) {
+        cc.info(OPTREMOVE_X_X, description(), expr);
+      } else {
+        if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
+        if(!list.contains(expr) || !expr.isSimple() && !expr.has(Flag.POS) && !expr.has(Flag.CTX))
+          list.add(expr);
+      }
+
     }
 
     // all arguments return false

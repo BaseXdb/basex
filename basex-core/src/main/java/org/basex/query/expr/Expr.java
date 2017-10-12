@@ -394,7 +394,7 @@ public abstract class Expr extends ExprInfo {
    * Checks if this is a simple expression (without side effects, context references, updates).
    * @return result of check
    */
-  public boolean isSimple() {
+  public final boolean isSimple() {
     return !(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) || has(Flag.POS));
   }
 

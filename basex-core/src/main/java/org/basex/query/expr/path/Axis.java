@@ -79,7 +79,7 @@ public enum Axis {
   },
 
   /** Parent axis. */
-  PARENT("parent", true) {
+  PARENT("parent", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.parentIter();

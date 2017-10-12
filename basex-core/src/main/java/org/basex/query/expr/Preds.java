@@ -2,8 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
@@ -57,11 +55,11 @@ public abstract class Preds extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // number of predicates may change in loop
-    for(int e = 0; e < exprs.length; e++) {
+    final int es = exprs.length;
+    final ExprList list = new ExprList(es);
+    boolean pos = false;
+    for(int e = 0; e < es; e++) {
       Expr expr = exprs[e].optimizeEbv(cc);
-      exprs[e] = expr;
-
       if(expr instanceof CmpG || expr instanceof CmpV) {
         final Cmp cmp = (Cmp) expr;
         final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
@@ -72,7 +70,7 @@ public abstract class Preds extends Arr {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
               cc.info(OPTSIMPLE_X, expr);
-              exprs[e] = e2;
+              expr = e2;
             }
           }
         }
@@ -81,15 +79,12 @@ public abstract class Preds extends Arr {
           // replace AND expression with predicates (don't swap position tests)
           cc.info(OPTPRED_X, expr);
           final Expr[] ands = ((Arr) expr).exprs;
-          final int m = ands.length - 1;
-          final ExprList el = new ExprList(exprs.length + m);
-          for(final Expr ex : Arrays.asList(exprs).subList(0, e)) el.add(ex);
-          for(final Expr and : ands) {
+          final int m = ands.length;
+          for(int a = 0; a < m; a++) {
             // wrap test with boolean() if the result is numeric
-            el.add(cc.function(Function.BOOLEAN, info, and).optimizeEbv(cc));
+            expr = cc.function(Function.BOOLEAN, info, ands[a]).optimizeEbv(cc);
+            if(a + 1 < m) pos = add(expr, list, pos, cc);
           }
-          for(final Expr ex : Arrays.asList(exprs).subList(e + 1, exprs.length)) el.add(ex);
-          exprs = el.finish();
         }
       } else if(expr instanceof ANum) {
         final ANum it = (ANum) expr;
@@ -99,16 +94,36 @@ public abstract class Preds extends Arr {
         expr = ItrPos.get(l, info);
         // example: ....[0]
         if(!(expr instanceof ItrPos)) return cc.emptySeq(this);
-        exprs[e] = expr;
       } else if(expr.isValue()) {
-        // always false: ....[false()]
-        if(!expr.ebv(cc.qc, info).bool(info)) return cc.emptySeq(this);
-        // always true: ....[true()]
-        cc.info(OPTREMOVE_X_X, description(), expr);
-        exprs = Array.delete(exprs, e--);
+        expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
       }
+
+      // predicate will not yield any results
+      if(expr == Bln.FALSE) return cc.emptySeq(this);
+      // skip expression yielding true
+      if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
+      pos = add(expr, list, pos, cc);
     }
+    exprs = list.finish();
     return this;
+  }
+
+  /**
+   * Adds an expression to the new expression list.
+   * @param expr expression
+   * @param list expression list
+   * @param pos positional predicate flag
+   * @param cc compilation context
+   * @return new positional predicate flag
+   */
+  private boolean add(final Expr expr, final ExprList list, final boolean pos,
+      final CompileContext cc) {
+    if(expr == Bln.TRUE) {
+      cc.info(OPTREMOVE_X_X, description(), expr);
+    } else {
+      if(pos || !list.contains(expr) || !expr.isSimple() && !expr.has(Flag.CTX)) list.add(expr);
+    }
+    return pos || expr.has(Flag.POS);
   }
 
   /**

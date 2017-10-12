@@ -32,12 +32,10 @@ public final class FnData extends StandardFunc {
     final Expr expr = exprs.length > 0 ? exprs[0] : v != null ? v : this;
     if(expr != this) {
       final SeqType st = expr.seqType();
-      if(st.type instanceof NodeType) {
-        seqType = SeqType.get(AtomType.ATM, st.occ);
-      } else if(!st.mayBeArray()) {
-        seqType = st;
+      if(!st.mayBeArray()) {
+        seqType = st.type instanceof NodeType ? SeqType.get(AtomType.ATM, st.occ) : st;
+        size = expr.size();
       }
-      size = expr.size();
     }
     return this;
   }
