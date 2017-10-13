@@ -258,6 +258,19 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   }
 
   /**
+   * Checks expressions with the pragma for enforcing index rewritings.
+   */
+  @Test
+  public void pragma() {
+    createDoc();
+    final String pragma = "(# db:enforceindex #) { ";
+    check(pragma + _DB_OPEN.args("<_>" + NAME + "</_>") + "//a[text() = '1']/text() }", "1",
+        "exists(//ValueAccess)");
+    check(pragma + _DB_OPEN.args("<x>" + NAME + "</x>") + "//a/text()[. = '1'] }", "1",
+        "exists(//ValueAccess)");
+  }
+
+  /**
    * Creates a test database.
    */
   private static void createDoc() {

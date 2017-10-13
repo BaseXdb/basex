@@ -53,14 +53,6 @@ public final class Extension extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    // skip pragmas that are not required at evaluation time
-    final ArrayList<Pragma> tmp = new ArrayList<>(pragmas.length);
-    for(final Pragma p : pragmas) {
-      if(!p.skipEval()) tmp.add(p);
-    }
-    if(tmp.isEmpty()) return expr;
-    if(tmp.size() != pragmas.length) pragmas = tmp.toArray(new Pragma[tmp.size()]);
-
     seqType = expr.seqType();
     size = expr.size();
     return this;

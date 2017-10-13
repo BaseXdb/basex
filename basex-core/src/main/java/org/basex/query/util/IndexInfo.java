@@ -36,8 +36,6 @@ public final class IndexInfo {
   /** Step with predicate that can be rewritten for index access. */
   public final Step step;
 
-  // The following variables will be overwritten for each index candidate
-
   /** Optimization info. */
   public String optInfo;
   /** Name test of parent element. */

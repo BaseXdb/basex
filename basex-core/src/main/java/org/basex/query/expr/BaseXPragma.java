@@ -12,6 +12,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class BaseXPragma extends Pragma {
+  /** Non-deterministic flag. */
+  private final boolean ndt;
+
   /**
    * Constructor.
    * @param name name of pragma
@@ -19,6 +22,7 @@ public final class BaseXPragma extends Pragma {
    */
   public BaseXPragma(final QNm name, final byte[] value) {
     super(name, value);
+    ndt = Token.eq(name.local(), Token.token(QueryText.NON_DETERMNISTIC));
   }
 
   @Override
@@ -32,17 +36,12 @@ public final class BaseXPragma extends Pragma {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.NDT && Token.eq(name.local(), Token.token(QueryText.NON_DETERMNISTIC));
+    return flag == Flag.NDT && ndt;
   }
 
   @Override
   public boolean equals(final Object obj) {
     return obj instanceof BaseXPragma && super.equals(obj);
-  }
-
-  @Override
-  public boolean skipEval() {
-    return false;
   }
 
   @Override

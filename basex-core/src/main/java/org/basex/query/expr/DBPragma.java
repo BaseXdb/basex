@@ -60,11 +60,6 @@ public final class DBPragma extends Pragma {
   }
 
   @Override
-  public boolean skipEval() {
-    return option == MainOptions.ENFORCEINDEX;
-  }
-
-  @Override
   public Pragma copy() {
     return new DBPragma(name, option, value);
   }
