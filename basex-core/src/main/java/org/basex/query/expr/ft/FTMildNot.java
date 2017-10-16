@@ -1,6 +1,5 @@
 package org.basex.query.expr.ft;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
@@ -24,12 +23,9 @@ public final class FTMildNot extends FTExpr {
    * @param info input info
    * @param expr1 first expression
    * @param expr2 second expression
-   * @throws QueryException query exception
    */
-  public FTMildNot(final InputInfo info, final FTExpr expr1, final FTExpr expr2)
-      throws QueryException {
+  public FTMildNot(final InputInfo info, final FTExpr expr1, final FTExpr expr2) {
     super(info, expr1, expr2);
-    if(usesExclude()) throw FTMILD.get(info);
   }
 
   @Override
@@ -40,10 +36,8 @@ public final class FTMildNot extends FTExpr {
   @Override
   public FTIter iter(final QueryContext qc) throws QueryException {
     return new FTIter() {
-      final FTIter i1 = exprs[0].iter(qc);
-      final FTIter i2 = exprs[1].iter(qc);
-      FTNode it1 = i1.next();
-      FTNode it2 = i2.next();
+      final FTIter i1 = exprs[0].iter(qc), i2 = exprs[1].iter(qc);
+      FTNode it1 = i1.next(), it2 = i2.next();
 
       @Override
       public FTNode next() throws QueryException {
@@ -94,24 +88,18 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    int costs = ii.costs;
+    IndexCosts costs = ii.costs;
     for(final FTExpr expr : exprs) {
       if(!expr.indexAccessible(ii)) return false;
-      costs += ii.costs;
+      costs = IndexCosts.add(costs, ii.costs);
     }
-    // use summarized costs for estimation
     ii.costs = costs;
     return true;
   }
 
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    try {
-      return new FTMildNot(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
-    } catch(final QueryException e) {
-      // checks were already done
-      throw Util.notExpected(e);
-    }
+    return new FTMildNot(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
   }
 
   @Override

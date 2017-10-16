@@ -48,9 +48,7 @@ public final class FTOr extends FTExpr {
   public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FTNode item = exprs[0].item(qc, info);
     final int es = exprs.length;
-    for(int e = 1; e < es; e++) {
-      or(item, exprs[e].item(qc, info));
-    }
+    for(int e = 1; e < es; e++) or(item, exprs[e].item(qc, info));
     return item;
   }
 
@@ -106,13 +104,11 @@ public final class FTOr extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    int costs = 0;
+    IndexCosts costs = IndexCosts.ZERO;
     for(final FTExpr expr : exprs) {
-      // no index access if negated queries is found
       if(!expr.indexAccessible(ii)) return false;
-      costs += ii.costs;
+      costs = IndexCosts.add(costs, ii.costs);
     }
-    // use summarized costs for estimation
     ii.costs = costs;
     return true;
   }

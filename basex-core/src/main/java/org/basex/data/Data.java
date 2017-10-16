@@ -183,11 +183,10 @@ public abstract class Data {
    * Returns a cost estimation for searching the specified token.
    * Smaller values are better, a value of zero indicates that no results will be returned.
    * @param token text to be found
-   * @return cost estimation
+   * @return cost estimation, or {@code null} if index access is not possible
    */
-  public final int costs(final IndexToken token) {
-    final IndexCosts ic = index(token.type()).costs(token);
-    return ic == null ? -1 : ic.results();
+  public final IndexCosts costs(final IndexToken token) {
+    return index(token.type()).costs(token);
   }
 
   /**

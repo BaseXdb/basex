@@ -2,8 +2,6 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -23,9 +21,6 @@ import org.basex.util.hash.*;
  * @author Sebastian Gath
  */
 public final class FTAnd extends FTExpr {
-  /** Flags for negated query results. */
-  private boolean[] negated;
-
   /**
    * Constructor.
    * @param info input info
@@ -43,7 +38,7 @@ public final class FTAnd extends FTExpr {
     if(not) {
       // convert (!A and !B and ...) to !(A or B or ...)
       final int es = exprs.length;
-      for(int e = 0; e < es; ++e) exprs[e] = exprs[e].exprs[0];
+      for(int e = 0; e < es; e++) exprs[e] = exprs[e].exprs[0];
       return (FTExpr) cc.replaceWith(this, new FTNot(info, new FTOr(info, exprs)));
     }
     return this;
@@ -53,7 +48,7 @@ public final class FTAnd extends FTExpr {
   public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FTNode item = exprs[0].item(qc, info);
     final int es = exprs.length;
-    for(int e = 1; e < es; ++e) and(item, exprs[e].item(qc, info));
+    for(int e = 1; e < es; e++) and(item, exprs[e].item(qc, info));
     return item;
   }
 
@@ -63,7 +58,7 @@ public final class FTAnd extends FTExpr {
     final int es = exprs.length;
     final FTIter[] ir = new FTIter[es];
     final FTNode[] it = new FTNode[es];
-    for(int e = 0; e < es; ++e) {
+    for(int e = 0; e < es; e++) {
       ir[e] = exprs[e].iter(qc);
       it[e] = ir[e].next();
     }
@@ -74,32 +69,19 @@ public final class FTAnd extends FTExpr {
         // find item with lowest pre value
         final int il = it.length;
         for(int i = 0; i < il; ++i) {
-          if(it[i] == null) {
-            if(negated[i]) continue;
-            return null;
-          }
+          if(it[i] == null) return null;
 
           final int d = it[0].pre() - it[i].pre();
-          if(negated[i]) {
-            if(d >= 0) {
-              if(d == 0) it[0] = ir[0].next();
-              it[i] = ir[i].next();
-              i = -1;
-            }
-          } else {
-            if(d != 0) {
-              if(d < 0) i = 0;
-              it[i] = ir[i].next();
-              i = -1;
-            }
+          if(d != 0) {
+            if(d < 0) i = 0;
+            it[i] = ir[i].next();
+            i = -1;
           }
         }
 
         // merge all matches
         final FTNode item = it[0];
         for(int i = 1; i < il; ++i) {
-          // [CG] XQFT: item.all = FTMatches.not(it[i].all, 0);
-          if(negated[i]) continue;
           and(item, it[i]);
           it[i] = ir[i].next();
         }
@@ -127,31 +109,23 @@ public final class FTAnd extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    final int es = exprs.length;
-    final boolean[] ng = new boolean[es];
-    int costs = 0;
+    IndexCosts costs = IndexCosts.ZERO;
     for(final FTExpr expr : exprs) {
       if(!expr.indexAccessible(ii)) return false;
-      // use worst costs for estimation, as all index results may need to be scanned
-      if(costs < ii.costs) costs = ii.costs;
+      costs = IndexCosts.add(costs, ii.costs);
     }
-
     ii.costs = costs;
-    negated = ng;
     return true;
   }
 
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final FTAnd copy = new FTAnd(info, Arr.copyAll(cc, vm, exprs));
-    if(negated != null) copy.negated = negated.clone();
-    return copy;
+    return new FTAnd(info, Arr.copyAll(cc, vm, exprs));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTAnd && Arrays.equals(negated, ((FTAnd) obj).negated) &&
-        super.equals(obj);
+    return this == obj || obj instanceof FTAnd && super.equals(obj);
   }
 
   @Override

@@ -73,7 +73,7 @@ public final class IndexCosts implements Comparable<IndexCosts> {
 
   @Override
   public int compareTo(final IndexCosts ic) {
-    return this == ENFORCE ? ic == ENFORCE ? 0 : 1 : ic == ENFORCE ? -1 : results - ic.results;
+    return this == ENFORCE ? ic == ENFORCE ? 0 : -1 : ic == ENFORCE ? 1 : results - ic.results;
   }
 
   @Override

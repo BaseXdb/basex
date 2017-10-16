@@ -77,7 +77,7 @@ public final class And extends Logical {
           }
         }
       }
-        if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
+      if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
       if(!list.contains(expr) || expr.has(Flag.NDT) || expr.has(Flag.UPD)) list.add(expr);
     }
   }
@@ -109,15 +109,15 @@ public final class And extends Logical {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    int costs = 0;
+    IndexCosts costs = IndexCosts.ZERO;
     final ExprList el = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       // check if expression can be rewritten, and if access is not sequential
       if(!expr.indexAccessible(ii)) return false;
       // skip queries with no results
-      if(ii.costs == 0) return true;
+      if(ii.costs.results() == 0) return true;
       // summarize costs
-      costs += ii.costs;
+      costs = IndexCosts.add(costs, ii.costs);
       el.add(ii.expr);
     }
     // use summarized costs for estimation

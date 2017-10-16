@@ -373,29 +373,30 @@ public final class FTWords extends FTExpr {
      * - explicitly set case, diacritics and stemming match options do not
      *   conflict with index options. */
     data = ii.ic.data;
-    final MetaData md = data.meta;
+    if(data == null && !ii.enforce() || occ != null) return false;
 
-    /* index will be applied if no explicit match options have been set
-     * that conflict with the index options. As a consequence, though, index-
-     * based querying might yield other results than sequential scanning. */
-    if(occ != null ||
-      ftOpt.cs != null && md.casesens == (ftOpt.cs == FTCase.INSENSITIVE) ||
-      ftOpt.isSet(DC) && md.diacritics != ftOpt.is(DC) ||
-      ftOpt.isSet(ST) && md.stemming != ftOpt.is(ST) ||
-      ftOpt.ln != null && !ftOpt.ln.equals(md.language)) return false;
-
-    // assign database options
-    ftOpt.assign(md);
+    if(data != null) {
+      /* index will be applied if no explicit match options have been set
+       * that conflict with the index options. As a consequence, though, index-
+       * based querying might yield other results than sequential scanning. */
+      final MetaData md = data.meta;
+      if(ftOpt.cs != null && md.casesens == (ftOpt.cs == FTCase.INSENSITIVE) ||
+          ftOpt.isSet(DC) && md.diacritics != ftOpt.is(DC) ||
+          ftOpt.isSet(ST) && md.stemming != ftOpt.is(ST) ||
+          ftOpt.ln != null && !ftOpt.ln.equals(md.language)) return false;
+      // assign database options
+      ftOpt.assign(md);
+    }
 
     // estimate costs if text is not known at compile time
     if(tokens == null) {
-      ii.costs = data == null ? Integer.MAX_VALUE : Math.max(2, data.meta.size / 30);
+      ii.costs = data == null ? null : IndexCosts.get(Math.max(2, data.meta.size / 30));
       return true;
     }
 
     // summarize number of hits; break loop if no hits are expected
     final FTLexer ft = new FTLexer(ftOpt);
-    ii.costs = 0;
+    ii.costs = IndexCosts.ZERO;
     for(byte[] t : tokens) {
       ft.init(t);
       while(ft.hasNext()) {
@@ -413,9 +414,10 @@ public final class FTWords extends FTExpr {
           }
         }
         // favor full-text index requests over exact queries
-        final int c = ii.costs(data, ft);
-        if(c < 0) return false;
-        if(c != 0) ii.costs += Math.max(2, c / 100);
+        final IndexCosts c = ii.costs(data, ft);
+        if(c == null) return false;
+        final int r = c.results();
+        if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));
       }
     }
     return true;

@@ -156,14 +156,15 @@ final class CmpSR extends Single {
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
     // sequential main memory scan is usually faster than range index access
-    if(data != null && data.inMemory()) return false;
+    if(data == null ? !ii.enforce() : data.inMemory()) return false;
+
     final IndexType type = ii.type(expr, null);
     if(type == null) return false;
 
     // create range access
     final StringRange sr = new StringRange(type, min, mni, max, mxi);
     ii.costs = ii.costs(data, sr);
-    if(ii.costs < 0) return false;
+    if(ii.costs == null) return false;
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');

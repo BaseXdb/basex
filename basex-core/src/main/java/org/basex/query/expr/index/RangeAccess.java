@@ -66,13 +66,13 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, index.min, MAX, index.max, IDX, index.type()), ictx.expr());
+    addPlan(plan, planElem(MIN, index.min, MAX, index.max, IDX, index.type()), ictx.input());
   }
 
   @Override
   public String toString() {
     final Function func = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE;
-    return func.toString(ictx.expr(), Dbl.get(index.min), Dbl.get(index.max));
+    return func.toString(ictx.input(), Dbl.get(index.min), Dbl.get(index.max));
   }
 }

@@ -181,30 +181,30 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public boolean has(final Flag flag) {
-    return expr.has(flag);
+    return expr.has(flag) && super.has(flag);
   }
 
   @Override
   public boolean removable(final Var var) {
-    return expr.removable(var);
+    return expr.removable(var) && super.removable(var);
   }
 
   @Override
   public VarUsage count(final Var var) {
-    return expr.count(var);
+    return expr.count(var).plus(super.count(var));
   }
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     final Expr sub = expr.inline(var, ex, cc);
-    if(sub == null) return null;
-    expr = sub;
-    return optimize(cc);
+    if(sub != null) expr = sub;
+    final Expr ia = super.inline(var, ex, cc);
+    return sub != null || ia != null ? optimize(cc) : null;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new ValueAccess(info, expr.copy(cc, vm), type, test, ictx));
+    return copyType(new ValueAccess(info, expr.copy(cc, vm), type, test, ictx.copy(cc, vm)));
   }
 
   @Override
@@ -214,7 +214,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public int exprSize() {
-    return expr.exprSize() + 1;
+    return expr.exprSize() + super.exprSize();
   }
 
   @Override
@@ -227,7 +227,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(IDX, type, NAM, test), ictx.expr(), expr);
+    addPlan(plan, planElem(IDX, type, NAM, test), input(), expr);
   }
 
   @Override
@@ -235,7 +235,7 @@ public final class ValueAccess extends IndexAccess {
     final TokenBuilder tb = new TokenBuilder();
     final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
         ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
-    tb.add(func.toString(ictx.expr(), expr));
+    tb.add(func.toString(input(), expr));
     if(test != null) tb.add("/parent::").addExt(test);
     return tb.toString();
   }

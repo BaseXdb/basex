@@ -5,7 +5,6 @@ import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
@@ -621,11 +620,9 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   public Expr index(final CompileContext cc, final Value rt) throws QueryException {
-    final boolean enforce = cc.qc.context.options.get(MainOptions.ENFORCEINDEX);
-
     // only rewrite if data reference exists and if root points to documents
     final Data data = rt == null ? null : rt.data();
-    if(!enforce && (data == null || rt.type != NodeType.DOC)) return this;
+    if(rt != null && rt.type != NodeType.DOC) return this;
 
     // cache index access costs
     IndexInfo index = null;
@@ -652,13 +649,13 @@ public abstract class Path extends ParseExpr {
           final IndexInfo ii = new IndexInfo(ictx, cc.qc, step);
           if(!step.exprs[e].indexAccessible(ii)) continue;
 
-          if(ii.costs == 0) {
+          if(ii.costs.results() == 0) {
             // no results...
             cc.info(OPTNORESULTS_X, ii.step);
             return Empty.SEQ;
           }
 
-          if(index == null || index.costs > ii.costs) {
+          if(index == null || index.costs.compareTo(ii.costs) > 0) {
             index = ii;
             indexPred = e;
             indexStep = s;
@@ -668,7 +665,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // skip rewriting if no index access is possible, or if it is too expensive
-    if(index == null || data != null && index.costs > data.meta.size) return this;
+    if(index == null || data != null && index.costs.tooExpensive(data)) return this;
 
     // rewrite for index access
     cc.info(index.optInfo);
@@ -713,7 +710,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // only one hit:
-    if(index.costs == 1) {
+    if(index.costs.results() == 1) {
       // set sequence type
       if(resultRoot instanceof IndexAccess) ((IndexAccess) resultRoot).size(1);
       else ((ParseExpr) resultRoot).seqType = resultRoot.seqType().withOcc(Occ.ZERO_ONE);

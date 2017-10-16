@@ -109,7 +109,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), ictx.expr(), ftexpr);
+    addPlan(plan, planElem(), ictx.input(), ftexpr);
   }
 
   @Override
@@ -119,6 +119,6 @@ public final class FTIndexAccess extends Simple {
       final FTWords ftw = (FTWords) ftexpr;
       if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) e = ftw.query;
     }
-    return Function._FT_SEARCH.toString(ictx.expr(), e);
+    return Function._FT_SEARCH.toString(ictx.input(), e);
   }
 }

@@ -96,7 +96,7 @@ public abstract class FTExpr extends ParseExpr {
    * Checks if sub expressions of a mild not operator violate the grammar.
    * @return result of check
    */
-  boolean usesExclude() {
+  public boolean usesExclude() {
     for(final FTExpr expr : exprs) if(expr.usesExclude()) return true;
     return false;
   }

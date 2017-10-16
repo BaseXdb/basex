@@ -3329,9 +3329,11 @@ public class QueryParser extends InputParser {
       wsCheck(IN);
       list = Array.add(list, ftUnaryNot(prg));
     } while(wsConsumeWs(NOT));
-    // convert "A not in B not in ..." to "A not in(B or ...)"
-    return new FTMildNot(info(), e, list.length == 1 ? list[0] : new FTOr(
-        info(), list));
+    // convert "A not in B not in ..." to "A not in (B or ...)"
+    final InputInfo info = info();
+    final FTExpr e2 = list.length == 1 ? list[0] : new FTOr(info, list);
+    if(e.usesExclude() || e2.usesExclude()) throw FTMILD.get(info);
+    return new FTMildNot(info, e, e2);
   }
 
   /**

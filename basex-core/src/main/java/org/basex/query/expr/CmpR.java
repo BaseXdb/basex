@@ -150,7 +150,9 @@ public final class CmpR extends Single {
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
     // sequential main memory scan is usually faster than range index access
-    if(!mni || !mxi || data != null && data.inMemory()) return false;
+    if(data == null ? !ii.enforce() : data.inMemory()) return false;
+
+    if(!mni || !mxi) return false;
     final IndexType type = ii.type(expr, null);
     if(type == null) return false;
 
@@ -161,13 +163,13 @@ public final class CmpR extends Single {
     final NumericRange nr = new NumericRange(type, Math.max(min, key.min), Math.min(max, key.max));
     // skip queries with no results
     if(nr.min > nr.max || nr.max < key.min || nr.min > key.max) {
-      ii.costs = 0;
+      ii.costs = IndexCosts.get(0);
       return true;
     }
 
     // estimate costs
     ii.costs = ii.costs(data, nr);
-    if(ii.costs == -1) return false;
+    if(ii.costs == null) return false;
 
     // skip if numbers are negative, doubles, or of different string length
     final int mnl = min >= 0 && (long) min == min ? token(min).length : -1;

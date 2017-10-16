@@ -43,9 +43,8 @@ public final class IndexInfo {
   public NameTest test;
   /** Index expression. */
   public Expr expr;
-  /** Costs of index access. 0 = no results; 1 = exactly one results;
-   * all other values may be estimates (the smaller, the better). */
-  public int costs = Integer.MAX_VALUE;
+  /** Costs of index access ({@code null}) if no index access is possible). */
+  public IndexCosts costs;
 
   /** Predicate expression. */
   private Expr pred;
@@ -114,10 +113,11 @@ public final class IndexInfo {
     if(type == null || value == null) return false;
 
     final Data data = ic.data;
+    if(data == null && !enforce()) return false;
+
     final ParseExpr root;
     if(value.isValue()) {
       // loop through all items
-      costs = 0;
       final Iter iter = qc.iter(value);
       final ArrayList<ValueAccess> tmp = new ArrayList<>();
       final TokenSet strings = new TokenSet();
@@ -134,14 +134,15 @@ public final class IndexInfo {
         // add only expressions that yield results and that have not been requested before
         if(!strings.contains(string)) {
           strings.put(string);
-          final int c = costs(data, new StringToken(type, string));
-          if(c < 0) return false;
-          if(c > 0) {
+          final IndexCosts c = costs(data, new StringToken(type, string));
+          if(c == null) return false;
+          final int r = c.results();
+          if(r != 0) {
             final ValueAccess va = new ValueAccess(info, it, type, test, ic).trim(trim);
             tmp.add(va);
-            if(c == 1) va.seqType = va.seqType().withOcc(Occ.ZERO_ONE);
-            costs += c;
+            if(r == 1) va.seqType = va.seqType().withOcc(Occ.ZERO_ONE);
           }
+          costs = IndexCosts.add(costs, c);
         }
       }
       // more than one string: merge index results
@@ -158,7 +159,7 @@ public final class IndexInfo {
         value.has(Flag.UPD)) return false;
 
       // estimate costs (tend to worst case)
-      if(data != null) costs = Math.max(1, data.meta.size / 10);
+      if(data != null) costs = IndexCosts.get(Math.max(1, data.meta.size / 10));
       root = new ValueAccess(info, value, type, test, ic);
     }
 
@@ -185,10 +186,10 @@ public final class IndexInfo {
    * Computes costs if the specified data reference exists.
    * @param data data reference
    * @param token index token
-   * @return costs costs
+   * @return costs costs, or {@code null} if index access is not possible
    */
-  public int costs(final Data data, final IndexToken token) {
-    return data == null ? Integer.MAX_VALUE : data.costs(token);
+  public IndexCosts costs(final Data data, final IndexToken token) {
+    return enforce() ? IndexCosts.ENFORCE : data.costs(token);
   }
 
   /**
