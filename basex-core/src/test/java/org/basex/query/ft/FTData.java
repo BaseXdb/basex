@@ -107,13 +107,16 @@ abstract class FTData extends QueryTest {
       { "AndOr 4", nodes(25, 29),
         "//fti[text() contains text 'eens' and text() contains text 'ook' or " +
         "text() contains text 'a']" },
-      { "AndOr 5", nodes(31),
-        "//fti[text() contains text 'adf s' or text() contains text 's adf']" },
+      { "AndOr 5", nodes(25, 29),
+        "//fti[text() contains text 'ook' and text() contains text 'eens' or " +
+        "text() contains text 'a']" },
       { "AndOr 6", nodes(31),
+        "//fti[text() contains text 'adf s' or text() contains text 's adf']" },
+      { "AndOr 7", nodes(31),
         "//fti[contains(text(), 'adf') and text() contains text 'adf']" },
-      { "AndOr 7", nodes(3),
+      { "AndOr 8", nodes(3),
         "//*[text() contains text 'sentence' and text() contains text 'xml']" },
-      { "AndOr 8", nodes(42, 46),
+      { "AndOr 9", nodes(42, 46),
         "//mix[text() contains text 'A'][text() contains text 'B']" },
 
       { "Phrase 1", nodes(7, 9, 11),

@@ -123,7 +123,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
   @Override
   public boolean contains(final ANode node) {
-    return dbnodes ? node instanceof DBNode && binarySearch((DBNode) node, 0, size) != -1 :
+    return dbnodes ? node instanceof DBNode && binarySearch((DBNode) node, 0, size) > -1 :
       super.contains(node);
   }
 
