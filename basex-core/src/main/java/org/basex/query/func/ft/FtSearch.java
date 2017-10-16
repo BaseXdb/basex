@@ -6,6 +6,7 @@ import static org.basex.util.ft.FTFlag.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -24,15 +25,15 @@ public final class FtSearch extends FtAccess {
     final Value terms = qc.value(exprs[1]);
     final FtIndexOptions opts = toOptions(2, new FtIndexOptions(), qc);
 
-    final IndexContext ic = new IndexContext(data, false);
+    final IndexDb db = new IndexStaticDb(info, data);
     final FTOpt opt = new FTOpt().assign(data.meta);
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
     if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
-    final FTWords ftw = new FTWords(info, data, terms, mode).init(qc, opt);
-    return new FTIndexAccess(info, options(ftw, opts), ic).iter(qc);
+    final FTWords ftw = new FTWords(info, db, terms, mode).init(qc, opt);
+    return new FTIndexAccess(info, options(ftw, opts), db).iter(qc);
   }
 
   @Override

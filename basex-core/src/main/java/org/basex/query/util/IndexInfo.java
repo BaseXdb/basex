@@ -32,8 +32,8 @@ import org.basex.util.hash.*;
 public final class IndexInfo {
   /** Query context. */
   public final QueryContext qc;
-  /** Index context. */
-  public final IndexContext ic;
+  /** Index database. */
+  public final IndexDb db;
   /** Step with predicate that can be rewritten for index access. */
   public final Step step;
 
@@ -53,13 +53,13 @@ public final class IndexInfo {
 
   /**
    * Constructor.
-   * @param ic index context
+   * @param db index database
    * @param qc query context
    * @param step step containing the rewritable predicate
    */
-  public IndexInfo(final IndexContext ic, final QueryContext qc, final Step step) {
+  public IndexInfo(final IndexDb db, final QueryContext qc, final Step step) {
     this.qc = qc;
-    this.ic = ic;
+    this.db = db;
     this.step = step;
   }
 
@@ -78,7 +78,7 @@ public final class IndexInfo {
     final Step last = lastStep();
     if(last == null) return null;
 
-    final Data data = ic.data;
+    final Data data = db.data();
     final boolean elem = last.test.type == NodeType.ELM;
     if(elem) {
       // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
@@ -112,7 +112,7 @@ public final class IndexInfo {
     // no index or no search value: no optimization
     if(type == null || value == null) return false;
 
-    final Data data = ic.data;
+    final Data data = db.data();
     if(data == null && !enforce()) return false;
 
     final ParseExpr root;
@@ -138,7 +138,7 @@ public final class IndexInfo {
           if(c == null) return false;
           final int r = c.results();
           if(r != 0) {
-            final ValueAccess va = new ValueAccess(info, it, type, test, ic).trim(trim);
+            final ValueAccess va = new ValueAccess(info, it, type, test, db).trim(trim);
             tmp.add(va);
             if(r == 1) va.seqType = va.seqType().withOcc(Occ.ZERO_ONE);
           }
@@ -160,7 +160,7 @@ public final class IndexInfo {
 
       // estimate costs (tend to worst case)
       if(data != null) costs = IndexCosts.get(Math.max(1, data.meta.size / 10));
-      root = new ValueAccess(info, value, type, test, ic);
+      root = new ValueAccess(info, value, type, test, db);
     }
 
     create(root, false, info, Util.info(OPTINDEX_X_X, type, value));
@@ -209,7 +209,7 @@ public final class IndexInfo {
    * @return type of index that can be used; {@code null} otherwise
    */
   private boolean check(final IndexType type, final Step last) {
-    return ic.data.meta.index(type) && (
+    return db.data().meta.index(type) && (
       type == IndexType.FULLTEXT ? text :
       type == IndexType.TOKEN ? !text :
       type == IndexType.TEXT ? text :

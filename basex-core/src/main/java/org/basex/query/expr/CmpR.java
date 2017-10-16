@@ -148,7 +148,7 @@ public final class CmpR extends Single {
   @Override
   public boolean indexAccessible(final IndexInfo ii) {
     // accept only location path, string and equality expressions
-    final Data data = ii.ic.data;
+    final Data data = ii.db.data();
     // sequential main memory scan is usually faster than range index access
     if(data == null ? !ii.enforce() : data.inMemory()) return false;
 
@@ -182,7 +182,7 @@ public final class CmpR extends Single {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
-    ii.create(new RangeAccess(info, nr, ii.ic), true, info, Util.info(OPTINDEX_X_X, "range", tb));
+    ii.create(new RangeAccess(info, nr, ii.db), true, info, Util.info(OPTINDEX_X_X, "range", tb));
     return true;
   }
 
@@ -194,7 +194,7 @@ public final class CmpR extends Single {
    */
   private Stats key(final IndexInfo ii, final IndexType type) {
     // statistics are not up-to-date
-    final Data data = ii.ic.data;
+    final Data data = ii.db.data();
     if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty() ||
         !(expr instanceof AxisPath)) return null;
 

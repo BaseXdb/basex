@@ -16,7 +16,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -43,15 +42,14 @@ public final class ValueAccess extends IndexAccess {
    * @param expr search expression
    * @param type index type
    * @param test test test (can be {@code null})
-   * @param ictx index context
+   * @param db index database
    */
   public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
-      final NameTest test, final IndexContext ictx) {
-    super(ictx, info);
+      final NameTest test, final IndexDb db) {
+    super(db, info);
     this.expr = expr;
     this.type = type;
     this.test = test;
-    seqType = SeqType.NOD_ZM;
   }
 
   /**
@@ -66,7 +64,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
-    final Data data = ictx.data(qc, type, info);
+    final Data data = db.data(qc, type);
     final ArrayList<BasicNodeIter> iters = new ArrayList<>();
     final Iter iter = qc.iter(expr);
     for(Item it; (it = iter.next()) != null;) {
@@ -204,7 +202,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new ValueAccess(info, expr.copy(cc, vm), type, test, ictx.copy(cc, vm)));
+    return copyType(new ValueAccess(info, expr.copy(cc, vm), type, test, db.copy(cc, vm)));
   }
 
   @Override
@@ -227,7 +225,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(IDX, type, NAM, test), input(), expr);
+    addPlan(plan, planElem(IDX, type, NAM, test), db, expr);
   }
 
   @Override
@@ -235,7 +233,7 @@ public final class ValueAccess extends IndexAccess {
     final TokenBuilder tb = new TokenBuilder();
     final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
         ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
-    tb.add(func.toString(input(), expr));
+    tb.add(func.toString(db, expr));
     if(test != null) tb.add("/parent::").addExt(test);
     return tb.toString();
   }

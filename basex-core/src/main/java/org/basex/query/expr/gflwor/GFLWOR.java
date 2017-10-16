@@ -895,24 +895,6 @@ public final class GFLWOR extends ParseExpr {
     @Override
     public abstract Clause inline(Var var, Expr ex, CompileContext cc) throws QueryException;
 
-    @Deprecated
-    @Override
-    public Iter iter(final QueryContext qc) {
-      throw Util.notExpected();
-    }
-
-    @Deprecated
-    @Override
-    public Value value(final QueryContext qc) {
-      throw Util.notExpected();
-    }
-
-    @Deprecated
-    @Override
-    public Item item(final QueryContext qc, final InputInfo ii) {
-      throw Util.notExpected();
-    }
-
     @Override
     public abstract Clause copy(CompileContext cc, IntObjMap<Var> vm);
 

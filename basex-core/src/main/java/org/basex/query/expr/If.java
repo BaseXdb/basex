@@ -171,8 +171,7 @@ public final class If extends Arr {
 
   @Override
   public If copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new If(info, cond.copy(cc, vm),
-        exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+    return copyType(new If(info, cond.copy(cc, vm), exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override
@@ -193,9 +192,9 @@ public final class If extends Arr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
+    int sz = cond.exprSize();
     for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz + cond.exprSize();
+    return sz;
   }
 
   @Override

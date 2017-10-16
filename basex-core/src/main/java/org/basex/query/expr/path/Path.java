@@ -641,12 +641,12 @@ public abstract class Path extends ParseExpr {
       if(el > 0) {
         // check if path is iterable (i.e., will be duplicate-free)
         final boolean iter = pathNodes(data, s) != null;
-        final IndexContext ictx = data != null ? new IndexContext(data, iter) :
-          new IndexContext(root == null ? new ContextValue(info) : root, iter);
+        final IndexDb db = data != null ? new IndexStaticDb(data, iter, info) :
+          new IndexDynDb(info, iter, root == null ? new ContextValue(info) : root);
 
         // choose cheapest index access
         for(int e = 0; e < el; e++) {
-          final IndexInfo ii = new IndexInfo(ictx, cc.qc, step);
+          final IndexInfo ii = new IndexInfo(db, cc.qc, step);
           if(!step.exprs[e].indexAccessible(ii)) continue;
 
           if(ii.costs.results() == 0) {

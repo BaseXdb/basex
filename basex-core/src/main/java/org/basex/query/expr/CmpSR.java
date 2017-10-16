@@ -154,7 +154,7 @@ final class CmpSR extends Single {
     if(coll != null || min == null || max == null) return false;
 
     // accept only location path, string and equality expressions
-    final Data data = ii.ic.data;
+    final Data data = ii.db.data();
     // sequential main memory scan is usually faster than range index access
     if(data == null ? !ii.enforce() : data.inMemory()) return false;
 
@@ -168,7 +168,7 @@ final class CmpSR extends Single {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
-    ii.create(new StringRangeAccess(info, sr, ii.ic), true, info,
+    ii.create(new StringRangeAccess(info, sr, ii.db), true, info,
         Util.info(OPTINDEX_X_X, type + " string range", tb));
     return true;
   }

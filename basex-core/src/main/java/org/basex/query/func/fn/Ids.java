@@ -51,7 +51,7 @@ abstract class Ids extends StandardFunc {
       final Value ids = StrSeq.get(idList);
       final Data data = root.data();
       final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN :
-        IndexType.ATTRIBUTE, null, new IndexContext(data, false));
+        IndexType.ATTRIBUTE, null, new IndexStaticDb(info, data));
 
       // collect and return index results, filtered by id/idref attributes
       final ANodeList results = new ANodeList();

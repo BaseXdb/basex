@@ -9,16 +9,14 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This index class retrieves ranges from a value index.
+ * This index class retrieves string ranges from a value index.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
@@ -30,24 +28,22 @@ public final class StringRangeAccess extends IndexAccess {
   /**
    * Constructor.
    * @param info input info
-   * @param index index reference
-   * @param ictx index context
+   * @param index index token
+   * @param db index database
    */
-  public StringRangeAccess(final InputInfo info, final StringRange index, final IndexContext ictx) {
-    super(ictx, info);
+  public StringRangeAccess(final InputInfo info, final StringRange index, final IndexDb db) {
+    super(db, info);
     this.index = index;
-    seqType = SeqType.NOD_ZM;
   }
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final IndexType type = index.type();
-    final Data data = ictx.data(qc, type, info);
+    final Data data = db.data(qc, type);
     return new DBNodeIter(data) {
       final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
       final IndexIterator ii = index.min.length <= data.meta.maxlen &&
-          index.max.length <= data.meta.maxlen ? data.iter(index) :
-        scan(data);
+          index.max.length <= data.meta.maxlen ? data.iter(index) : scan(data);
       @Override
       public DBNode next() {
         return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
@@ -76,8 +72,7 @@ public final class StringRangeAccess extends IndexAccess {
         while(++pre < sz) {
           if(data.kind(pre) != kind) continue;
           final byte[] t = data.text(pre, text);
-          final int mn = Token.diff(t, index.min);
-          final int mx = Token.diff(t, index.max);
+          final int mn = Token.diff(t, index.min), mx = Token.diff(t, index.max);
           if(mn >= (index.mni ? 0 : 1) && mx <= (index.mxi ? 0 : 1)) return true;
         }
         return false;
@@ -91,7 +86,7 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new StringRangeAccess(info, index, ictx);
+    return new StringRangeAccess(info, index, db.copy(cc, vm));
   }
 
   @Override
@@ -102,13 +97,13 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, index.min, MAX, index.max, IDX, index.type()), ictx.input());
+    addPlan(plan, planElem(IDX, index.type(), MIN, index.min, MAX, index.max), db);
   }
 
   @Override
   public String toString() {
-    final boolean text = index.type() == IndexType.TEXT;
-    final Function func = text ? Function._DB_TEXT_RANGE : Function._DB_ATTRIBUTE_RANGE;
-    return func.toString(ictx.input(), Str.get(index.min), Str.get(index.max));
+    final Function func = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
+      Function._DB_ATTRIBUTE_RANGE;
+    return func.toString(db, Str.get(index.min), Str.get(index.max));
   }
 }

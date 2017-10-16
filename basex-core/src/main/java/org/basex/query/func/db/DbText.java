@@ -5,7 +5,6 @@ import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 
 /**
  * Function implementation.
@@ -28,6 +27,6 @@ public class DbText extends DbAccess {
    */
   final ValueAccess valueAccess(final IndexType type, final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
-    return new ValueAccess(info, exprs[1], type, null, new IndexContext(data, false));
+    return new ValueAccess(info, exprs[1], type, null, new IndexStaticDb(info, data));
   }
 }

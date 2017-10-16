@@ -1,8 +1,8 @@
 package org.basex.query.expr.ft;
 
-import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -20,27 +20,26 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FTIndexAccess extends Simple {
+  /** Index database. */
+  private IndexDb db;
   /** Full-text expression. */
-  private final FTExpr ftexpr;
-  /** Index context. */
-  private final IndexContext ictx;
+  private FTExpr ftexpr;
 
   /**
    * Constructor.
    * @param info input info
    * @param ftexpr contains, select and optional ignore expression
-   * @param ictx index context
+   * @param db index database
    */
-  public FTIndexAccess(final InputInfo info, final FTExpr ftexpr, final IndexContext ictx) {
+  public FTIndexAccess(final InputInfo info, final FTExpr ftexpr, final IndexDb db) {
     super(info);
     this.ftexpr = ftexpr;
-    this.ictx = ictx;
+    this.db = db;
     seqType = SeqType.NOD_ZM;
   }
 
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
-    ictx.data(qc, IndexType.FULLTEXT, info);
     final FTIter iter = ftexpr.iter(qc);
     return new NodeIter() {
       @Override
@@ -61,42 +60,46 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public boolean has(final Flag flag) {
-    return ftexpr.has(flag);
+    return ftexpr.has(flag) || db.has(flag);
   }
 
   @Override
   public boolean removable(final Var var) {
-    return ftexpr.removable(var);
+    return ftexpr.removable(var) && db.removable(var);
   }
 
   @Override
   public VarUsage count(final Var var) {
-    return ftexpr.count(var);
+    return ftexpr.count(var).plus(db.count(var));
   }
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    return ftexpr.inline(var, ex, cc) == null ? null : optimize(cc);
+    final FTExpr fte = ftexpr.inline(var, ex, cc);
+    if(fte != null) ftexpr = fte;
+    final IndexDb sub = db.inline(var, ex, cc);
+    if(sub != null) db = sub;
+    return fte != null || sub != null ? optimize(cc) : this;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new FTIndexAccess(info, ftexpr.copy(cc, vm), ictx);
+    return new FTIndexAccess(info, ftexpr.copy(cc, vm), db.copy(cc, vm));
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return ftexpr.accept(visitor);
+    return ftexpr.accept(visitor) && db.accept(visitor);
   }
 
   @Override
   public boolean iterable() {
-    return ictx.iterable;
+    return seqType.zeroOrOne() || db.iterable();
   }
 
   @Override
   public int exprSize() {
-    return ftexpr.exprSize() + 1;
+    return ftexpr.exprSize() + db.exprSize();
   }
 
   @Override
@@ -104,12 +107,12 @@ public final class FTIndexAccess extends Simple {
     if(this == obj) return true;
     if(!(obj instanceof FTIndexAccess)) return false;
     final FTIndexAccess f = (FTIndexAccess) obj;
-    return ftexpr.equals(f.ftexpr) && ictx.equals(f.ictx);
+    return ftexpr.equals(f.ftexpr) && db.equals(f.db);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), ictx.input(), ftexpr);
+    addPlan(plan, planElem(), db, ftexpr);
   }
 
   @Override
@@ -119,6 +122,6 @@ public final class FTIndexAccess extends Simple {
       final FTWords ftw = (FTWords) ftexpr;
       if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) e = ftw.query;
     }
-    return Function._FT_SEARCH.toString(ictx.input(), e);
+    return Function._FT_SEARCH.toString(db, e);
   }
 }

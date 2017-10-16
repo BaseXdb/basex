@@ -3,11 +3,15 @@ package org.basex.query.expr.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
@@ -38,8 +42,8 @@ public final class FTWords extends FTExpr {
   boolean simple;
   /** Compilation flag. */
   private boolean compiled;
-  /** Data reference (can be {@code null}). */
-  private Data data;
+  /** Input database (can be {@code null}). */
+  private IndexDb db;
   /** Pre-evaluated query tokens. */
   private TokenList tokens;
   /** Full-text options. */
@@ -65,13 +69,13 @@ public final class FTWords extends FTExpr {
   /**
    * Constructor for index-based evaluation.
    * @param info input info
-   * @param data data reference
+   * @param db index database
    * @param query query terms
    * @param mode search mode
    */
-  public FTWords(final InputInfo info, final Data data, final Value query, final FTMode mode) {
+  public FTWords(final InputInfo info, final IndexDb db, final Value query, final FTMode mode) {
     super(info);
-    this.data = data;
+    this.db = db;
     this.query = query;
     this.mode = mode;
   }
@@ -127,7 +131,8 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTIter iter(final QueryContext qc) {
+  public FTIter iter(final QueryContext qc) throws QueryException {
+    final Data data = db.data(qc, IndexType.FULLTEXT);
     return new FTIter() {
       FTIndexIterator ftiter;
       int len;
@@ -155,7 +160,7 @@ public final class FTWords extends FTExpr {
                 ++d;
               } else {
                 final FTIndexIterator ir = lexer.get().length > data.meta.maxlen ?
-                  scan(lexer, ftt) : (FTIndexIterator) data.iter(lexer);
+                  scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
                 ir.pos(++qc.ftPos);
                 if(ii == null) {
                   ii = ir;
@@ -193,10 +198,12 @@ public final class FTWords extends FTExpr {
    * Returns a scan-based index iterator.
    * @param lexer lexer, including the queried value
    * @param ftt full-text tokenizer
+   * @param data data reference
    * @return node iterator
    * @throws QueryException query exception
    */
-  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt) throws QueryException {
+  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt,
+      final Data data) throws QueryException {
     final FTLexer input = new FTLexer(ftOpt);
     final FTTokens fttokens = ftt.cache(lexer.get());
 
@@ -372,7 +379,7 @@ public final class FTWords extends FTExpr {
      * - no FTTimes option is specified
      * - explicitly set case, diacritics and stemming match options do not
      *   conflict with index options. */
-    data = ii.ic.data;
+    final Data data = ii.db.data();
     if(data == null && !ii.enforce() || occ != null) return false;
 
     if(data != null) {
@@ -391,35 +398,35 @@ public final class FTWords extends FTExpr {
     // estimate costs if text is not known at compile time
     if(tokens == null) {
       ii.costs = data == null ? null : IndexCosts.get(Math.max(2, data.meta.size / 30));
-      return true;
-    }
+    } else {
+      // summarize number of hits; break loop if no hits are expected
+      final FTLexer ft = new FTLexer(ftOpt);
+      ii.costs = IndexCosts.ZERO;
+      for(byte[] t : tokens) {
+        ft.init(t);
+        while(ft.hasNext()) {
+          final byte[] tok = ft.nextToken();
+          if(ftOpt.sw != null && ftOpt.sw.contains(tok)) continue;
 
-    // summarize number of hits; break loop if no hits are expected
-    final FTLexer ft = new FTLexer(ftOpt);
-    ii.costs = IndexCosts.ZERO;
-    for(byte[] t : tokens) {
-      ft.init(t);
-      while(ft.hasNext()) {
-        final byte[] tok = ft.nextToken();
-        if(ftOpt.sw != null && ftOpt.sw.contains(tok)) continue;
-
-        if(ftOpt.is(WC)) {
-          // don't use index if one of the terms starts with a wildcard
-          t = ft.get();
-          if(t[0] == '.') return false;
-          // don't use index if certain characters or more than 1 dot are found
-          int d = 0;
-          for(final byte w : t) {
-            if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
+          if(ftOpt.is(WC)) {
+            // don't use index if one of the terms starts with a wildcard
+            t = ft.get();
+            if(t[0] == '.') return false;
+            // don't use index if certain characters or more than 1 dot are found
+            int d = 0;
+            for(final byte w : t) {
+              if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
+            }
           }
+          // favor full-text index requests over exact queries
+          final IndexCosts c = ii.costs(data, ft);
+          if(c == null) return false;
+          final int r = c.results();
+          if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));
         }
-        // favor full-text index requests over exact queries
-        final IndexCosts c = ii.costs(data, ft);
-        if(c == null) return false;
-        final int r = c.results();
-        if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));
       }
     }
+    db = ii.db;
     return true;
   }
 
@@ -462,12 +469,11 @@ public final class FTWords extends FTExpr {
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final FTWords ftw = new FTWords(info, query.copy(cc, vm), mode,
         occ == null ? null : Arr.copyAll(cc, vm, occ));
-
     ftw.simple = simple;
     ftw.compiled = compiled;
-    ftw.data = data;
     ftw.tokens = tokens;
     ftw.ftOpt = ftOpt;
+    if(db != null) ftw.db = db.copy(cc, vm);
     return ftw;
   }
 
@@ -490,8 +496,8 @@ public final class FTWords extends FTExpr {
     if(this == obj) return true;
     if(!(obj instanceof FTWords)) return false;
     final FTWords f = (FTWords) obj;
-    return query.equals(f.query) && mode == f.mode && data == f.data && Array.equals(occ, f.occ) &&
-        super.equals(obj);
+    return query.equals(f.query) && mode == f.mode && Objects.equals(db, f.db) &&
+        Array.equals(occ, f.occ) && super.equals(obj);
   }
 
   @Override
