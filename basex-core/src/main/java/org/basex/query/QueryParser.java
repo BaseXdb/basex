@@ -1069,16 +1069,16 @@ public class QueryParser extends InputParser {
       if(stable || wsConsumeWs(ORDER)) {
         wsCheck(BY);
         alterPos = pos;
-        Key[] ob = null;
+        Key[] keys = null;
         do {
           final Key key = orderSpec();
-          ob = ob == null ? new Key[] { key } : Array.add(ob, key);
+          keys = keys == null ? new Key[] { key } : Array.add(keys, key);
         } while(wsConsume(COMMA));
 
         final VarRef[] vs = new VarRef[curr.size()];
         int i = 0;
-        for(final Var var : curr.values()) vs[i++] = new VarRef(ob[0].info, var);
-        clauses.add(new OrderBy(vs, ob, ob[0].info));
+        for(final Var var : curr.values()) vs[i++] = new VarRef(keys[0].info, var);
+        clauses.add(new OrderBy(vs, keys, keys[0].info));
       }
 
       if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {

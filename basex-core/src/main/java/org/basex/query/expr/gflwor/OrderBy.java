@@ -271,6 +271,11 @@ public final class OrderBy extends Clause {
     }
 
     @Override
+    public Expr optimize(final CompileContext cc) throws QueryException {
+      return this;
+    }
+
+    @Override
     public int exprSize() {
       return expr.exprSize();
     }

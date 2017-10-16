@@ -49,7 +49,8 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    if(expr.isValue()) return cc.replaceWith(this, expr);
     seqType = expr.seqType();
     size = expr.size();
     return this;

@@ -45,7 +45,6 @@ public final class Try extends Single {
   public Expr compile(final CompileContext cc) throws QueryException {
     try {
       super.compile(cc);
-      if(expr.isValue()) return cc.replaceWith(this, expr);
     } catch(final QueryException ex) {
       if(!ex.isCatchable()) throw ex;
       for(final Catch c : catches) {
@@ -54,13 +53,14 @@ public final class Try extends Single {
       }
       throw ex;
     }
-
     for(final Catch c : catches) c.compile(cc);
     return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    if(expr.isValue()) return cc.replaceWith(this, expr);
+
     seqType = expr.seqType();
     for(final Catch c : catches) {
       if(!c.expr.isFunction(Function.ERROR)) seqType = seqType.union(c.seqType());

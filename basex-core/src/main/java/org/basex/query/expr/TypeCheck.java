@@ -45,8 +45,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    expr = expr.compile(cc);
-    return optimize(cc);
+    return super.compile(cc).optimize(cc);
   }
 
   @Override

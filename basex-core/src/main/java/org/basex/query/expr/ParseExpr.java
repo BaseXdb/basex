@@ -51,12 +51,14 @@ public abstract class ParseExpr extends Expr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = iter(qc);
     final Item it = iter.next();
-    if(it == null || iter.size() == 1) return it;
-    final Item nx = iter.next();
-    if(nx != null) {
-      final ValueBuilder vb = new ValueBuilder().add(it).add(nx);
-      if(iter.next() != null) vb.add(Str.get(DOTS));
-      throw SEQFOUND_X.get(info, vb.value());
+    // check next item if size of iterator is larger than one or unknown (-1)
+    if(it != null && iter.size() != 1) {
+      final Item nx = iter.next();
+      if(nx != null) {
+        final ValueBuilder vb = new ValueBuilder().add(it).add(nx);
+        if(iter.next() != null) vb.add(Str.get(DOTS));
+        throw SEQFOUND_X.get(info, vb.value());
+      }
     }
     return it;
   }

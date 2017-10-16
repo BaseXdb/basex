@@ -38,6 +38,11 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return expr.isValue() ? cc.preEval(this) : this;
+  }
+
+  @Override
   public boolean has(final Flag flag) {
     return expr.has(flag);
   }

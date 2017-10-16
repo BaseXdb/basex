@@ -26,8 +26,8 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) {
-    return this;
+  public final Expr compile(final CompileContext cc) throws QueryException {
+    return optimize(cc);
   }
 
   @Override

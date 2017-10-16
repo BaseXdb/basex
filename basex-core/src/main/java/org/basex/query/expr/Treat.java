@@ -38,11 +38,6 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? cc.preEval(this) : this;
-  }
-
-  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = qc.iter(expr);
     final Item it = iter.next();

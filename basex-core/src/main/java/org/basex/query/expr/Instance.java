@@ -38,11 +38,6 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? cc.preEval(this) : this;
-  }
-
-  @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(type.instance(qc.value(expr)));
   }

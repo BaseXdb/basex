@@ -63,8 +63,8 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? cc.preEval(this) : this;
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return super.compile(cc).optimize(cc);
   }
 
   /**

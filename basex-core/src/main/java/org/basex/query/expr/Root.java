@@ -32,11 +32,6 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) {
-    return optimize(cc);
-  }
-
-  @Override
   public Expr optimize(final CompileContext cc) {
     final Value v = cc.qc.focus.value;
     return v != null && v.type == NodeType.DOC && v.size() == 1 ? cc.replaceWith(this, v) : this;
