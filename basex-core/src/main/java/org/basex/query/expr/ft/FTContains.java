@@ -131,7 +131,7 @@ public final class FTContains extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTContains && ftexpr.equals(((FTContains) obj).expr) &&
+    return this == obj || obj instanceof FTContains && ftexpr.equals(((FTContains) obj).ftexpr) &&
         super.equals(obj);
   }
 

@@ -405,8 +405,7 @@ public final class FTIndex extends ValueIndex {
   private static FTIndexIterator iter(final long off, final int size, final DataAccess da,
       final byte[] token) {
     da.cursor(off);
-    final IntList pr = new IntList(size);
-    final IntList ps = new IntList(size);
+    final IntList pr = new IntList(size), ps = new IntList(size);
     for(int c = 0; c < size; c++) {
       pr.add(da.readNum());
       ps.add(da.readNum());

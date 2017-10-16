@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -30,11 +29,12 @@ public final class And extends Logical {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr c = super.optimize(cc);
-    if(c != this) return c;
+    return optimize(cc, true, (ex) -> new Or(info, ex));
+  }
 
+  @Override
+  void simplify(final CompileContext cc, final ExprList list) {
     final int es = exprs.length;
-    final ExprList list = new ExprList(es);
     for(int e = 0; e < es; e++) {
       Expr expr = exprs[e];
       if(expr instanceof ItrPos) {
@@ -76,45 +76,10 @@ public final class And extends Logical {
             break;
           }
         }
-      } else if(expr.isValue()) {
-        expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
       }
-
-      // expression will always return false
-      if(expr == Bln.FALSE) return cc.replaceWith(this, Bln.FALSE);
-      // skip expression yielding true
-      if(expr == Bln.TRUE) {
-        cc.info(OPTREMOVE_X_X, description(), expr);
-      } else {
         if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
-        if(!list.contains(expr) || !expr.isSimple() && !expr.has(Flag.POS) && !expr.has(Flag.CTX))
-          list.add(expr);
-      }
+      if(!list.contains(expr) || expr.has(Flag.NDT) || expr.has(Flag.UPD)) list.add(expr);
     }
-    // all arguments return true
-    if(list.isEmpty()) return cc.replaceWith(this, Bln.TRUE);
-
-    exprs = list.finish();
-    compFlatten(cc);
-
-    boolean not = true;
-    for(final Expr expr : exprs) {
-      if(!expr.isFunction(Function.NOT)) {
-        not = false;
-        break;
-      }
-    }
-
-    if(not) {
-      final int el = exprs.length;
-      final Expr[] inner = new Expr[el];
-      for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
-      final Expr expr = cc.function(Function.NOT, info, new Or(info, inner).optimize(cc));
-      return cc.replaceWith(this, expr);
-    }
-
-    // return single expression if it yields a boolean
-    return exprs.length == 1 ? cc.replaceWith(this, compBln(exprs[0], info, cc.sc())) : this;
   }
 
   @Override

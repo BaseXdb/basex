@@ -108,7 +108,7 @@ public abstract class Expr extends ExprInfo {
    * If this method is not overwritten, {@link #item(QueryContext, InputInfo)} must be implemented
    * by an expression, as it may be called by this method.
    * @param qc query context
-   * @return resulting item
+   * @return iterator
    * @throws QueryException query exception
    */
   public abstract Iter iter(QueryContext qc) throws QueryException;
@@ -130,7 +130,7 @@ public abstract class Expr extends ExprInfo {
    * The implementation of this method is optional.
    * This function should only be called by {@link QueryContext#value(Expr)}.
    * @param qc query context
-   * @return iterator
+   * @return value
    * @throws QueryException query exception
    */
   public abstract Value value(QueryContext qc) throws QueryException;

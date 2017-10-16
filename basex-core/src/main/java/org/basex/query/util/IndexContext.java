@@ -56,7 +56,7 @@ public final class IndexContext {
   }
 
   /**
-   * Returns an expression for the index source.
+   * Returns an expression for the index source for trace output.
    * @return expression
    */
   public Expr expr() {

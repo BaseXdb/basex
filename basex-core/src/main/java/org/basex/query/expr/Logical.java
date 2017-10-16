@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -42,25 +44,60 @@ abstract class Logical extends Arr {
     return optimize(cc);
   }
 
-  @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    final boolean and = this instanceof And;
-    final int es = exprs.length;
-    final ExprList el = new ExprList(es);
+  /**
+   * Optimizes the expression.
+   * @param cc compilation context
+   * @param and and/or flag
+   * @param negate negated constructor
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  public final Expr optimize(final CompileContext cc, final boolean and,
+      final java.util.function.Function<Expr[], Logical> negate) throws QueryException {
+
+    ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       final Expr ex = expr.optimizeEbv(cc);
-      if(ex.isValue()) {
-        // atomic items can be pre-evaluated
+      if(and ? ex instanceof And : ex instanceof Or) {
+        // flatten nested expressions
+        for(final Expr e : ((Logical) ex).exprs) list.add(e);
+        cc.info(OPTFLAT_X_X, description(), ex);
+      } else if(ex.isValue()) {
+        // pre-evaluate values
         cc.info(OPTREMOVE_X_X, description(), expr);
         if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
-        el.add(ex);
+        list.add(ex);
       }
     }
-    if(el.isEmpty()) return Bln.get(and);
-    exprs = el.finish();
-    return this;
+    // no operands left: return result
+    if(list.isEmpty()) return Bln.get(and);
+    exprs = list.finish();
+
+    // perform operator-specific optimizations
+    list = new ExprList(exprs.length);
+    simplify(cc, list);
+    if(list.size() == 1) return cc.replaceWith(this, compBln(list.get(0), info, cc.sc()));
+    exprs = list.finish();
+
+    // negate expressions
+    for(final Expr expr : exprs) {
+      if(!expr.isFunction(Function.NOT)) return this;
+    }
+    list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) list.add(((FnNot) expr).exprs[0]);
+    exprs = list.finish();
+    final Expr expr = negate.apply(exprs).optimize(cc);
+    return cc.replaceWith(this, cc.function(Function.NOT, info, expr));
   }
+
+  /**
+   * Simplifies the logical expression.
+   * @param cc compilation context
+   * @param list expression list
+   * @throws QueryException query exception
+   */
+  abstract void simplify(CompileContext cc, ExprList list) throws QueryException;
 
   @Override
   public final void markTailCalls(final CompileContext cc) {
@@ -95,26 +132,6 @@ abstract class Logical extends Arr {
       }
     }
     return change ? optimize(cc) : null;
-  }
-
-  /**
-   * Flattens nested logical expressions.
-   * @param cc compilation context
-   */
-  final void compFlatten(final CompileContext cc) {
-    // flatten nested expressions
-    final ExprList tmp = new ExprList(exprs.length);
-    final boolean and = this instanceof And;
-    final boolean or = this instanceof Or;
-    for(final Expr ex : exprs) {
-      if(and && ex instanceof And || or && ex instanceof Or) {
-        for(final Expr e : ((Arr) ex).exprs) tmp.add(e);
-        cc.info(OPTFLAT_X_X, description(), ex);
-      } else {
-        tmp.add(ex);
-      }
-    }
-    exprs = tmp.finish();
   }
 
   @Override

@@ -149,8 +149,7 @@ public final class CmpR extends Single {
   public boolean indexAccessible(final IndexInfo ii) {
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
-    // sequential main memory scan is assumed to be faster than range index access;
-    // no support for main-memory databases
+    // sequential main memory scan is usually faster than range index access
     if(!mni || !mxi || data != null && data.inMemory()) return false;
     final IndexType type = ii.type(expr, null);
     if(type == null) return false;

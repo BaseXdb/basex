@@ -142,8 +142,8 @@ public final class FTWords extends FTExpr {
           // number of distinct tokens
           int count = 0;
           // loop through unique tokens
-          for(final byte[] k : unique(tokens != null ? tokens : tokens(qc))) {
-            lexer.init(k);
+          for(final byte[] txt : unique(tokens != null ? tokens : tokens(qc))) {
+            lexer.init(txt);
             if(!lexer.hasNext()) return null;
 
             int d = 0;

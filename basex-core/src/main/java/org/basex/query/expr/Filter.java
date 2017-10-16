@@ -235,9 +235,9 @@ public abstract class Filter extends Preds {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    for(final Expr e : exprs) {
+    for(final Expr expr : exprs) {
       visitor.enterFocus();
-      if(!e.accept(visitor)) return false;
+      if(!expr.accept(visitor)) return false;
       visitor.exitFocus();
     }
     return root.accept(visitor);
@@ -246,7 +246,7 @@ public abstract class Filter extends Preds {
   @Override
   public final int exprSize() {
     int sz = 1;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz + root.exprSize();
   }
 

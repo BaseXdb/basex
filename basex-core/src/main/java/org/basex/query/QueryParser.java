@@ -1776,9 +1776,12 @@ public class QueryParser extends InputParser {
     final Pragma[] pragmas = pragma();
     if(pragmas == null) return null;
     wsCheck(CURLY1);
-    final Expr expr = check(expr(), NOPRAGMA);
+    Expr expr = check(expr(), NOPRAGMA);
     wsCheck(CURLY2);
-    return pragmas.length == 0 ? expr : new Extension(info(), pragmas, expr);
+    for(int p = pragmas.length - 1; p >= 0; p--) {
+      expr = new Extension(info(), pragmas[p], expr);
+    }
+    return expr;
   }
 
   /**
@@ -3381,9 +3384,12 @@ public class QueryParser extends InputParser {
     final Pragma[] pragmas = pragma();
     if(pragmas != null) {
       wsCheck(CURLY1);
-      final FTExpr e = ftSelection(true);
+      FTExpr expr = ftSelection(true);
       wsCheck(CURLY2);
-      return new FTExtension(info(), pragmas, e);
+      for(int p = pragmas.length - 1; p >= 0; p--) {
+        expr = new FTExtension(info(), pragmas[p], expr);
+      }
+      return expr;
     }
 
     if(wsConsumeWs(PAREN1)) {

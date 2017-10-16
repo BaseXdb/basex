@@ -31,7 +31,7 @@ public final class BaseXPragma extends Pragma {
   }
 
   @Override
-  void finish(final QueryContext qc, final Object cache) {
+  void finish(final QueryContext qc, final Object state) {
   }
 
   @Override

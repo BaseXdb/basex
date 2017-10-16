@@ -35,7 +35,7 @@ public interface Index {
   /**
    * Computes costs for accessing the specified token. An integer is returned:
    * <ul>
-   *   <li> A negative zero indicates that index access is not possible.</li>
+   *   <li> A negative value indicates that index access is not possible.</li>
    *   <li> A value of zero indicates that no results will be returned.</li>
    *   <li> A small value indicates that index access is fast.</li>
    * </ul>

@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -30,11 +29,12 @@ public final class Or extends Logical {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr c = super.optimize(cc);
-    if(c != this) return c;
+    return optimize(cc, false, (ex) -> new And(info, ex));
+  }
 
+  @Override
+  void simplify(final CompileContext cc, final ExprList list) throws QueryException {
     final int es = exprs.length;
-    final ExprList list = new ExprList(es);
     for(int e = 0; e < es; e++) {
       Expr expr = exprs[e];
       if(expr instanceof CmpG) {
@@ -49,46 +49,9 @@ public final class Or extends Logical {
           }
         }
       }
-      // expression will always return true
-      if(expr == Bln.TRUE) return cc.replaceWith(this, Bln.TRUE);
-      // skip expression yielding true
-      if(expr == Bln.FALSE) {
-        cc.info(OPTREMOVE_X_X, description(), expr);
-      } else {
         if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
-        if(!list.contains(expr) || !expr.isSimple() && !expr.has(Flag.POS) && !expr.has(Flag.CTX))
-          list.add(expr);
-      }
-
+      if(!list.contains(expr) || expr.has(Flag.NDT) || expr.has(Flag.UPD)) list.add(expr);
     }
-
-    // all arguments return false
-    if(list.isEmpty()) return cc.replaceWith(this, Bln.FALSE);
-
-    if(es != list.size()) {
-      cc.info(OPTSIMPLE_X, this);
-      exprs = list.finish();
-    }
-    compFlatten(cc);
-
-    boolean not = true;
-    for(final Expr expr : exprs) {
-      if(!expr.isFunction(Function.NOT)) {
-        not = false;
-        break;
-      }
-    }
-
-    if(not) {
-      final int el = exprs.length;
-      final Expr[] inner = new Expr[el];
-      for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
-      final Expr ex = new And(info, inner).optimize(cc);
-      return cc.replaceWith(this, cc.function(Function.NOT, info, ex));
-    }
-
-    // return single expression if it yields a boolean
-    return exprs.length == 1 ? cc.replaceWith(this, compBln(exprs[0], info, cc.sc())) : this;
   }
 
   @Override
@@ -131,7 +94,7 @@ public final class Or extends Logical {
     }
     // use summarized costs for estimation
     ii.costs = costs;
-    // no expressions means no costs: expression will later be ignored
+    // no expressions means no costs: expression will later be pre-evaluated
     ii.expr = el.size() == 1 ? el.get(0) : new Union(info, el.finish());
     return true;
   }

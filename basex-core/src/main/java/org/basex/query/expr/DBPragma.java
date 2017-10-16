@@ -44,8 +44,8 @@ public final class DBPragma extends Pragma {
   }
 
   @Override
-  void finish(final QueryContext qc, final Object cache) {
-    qc.context.options.put(option, cache);
+  void finish(final QueryContext qc, final Object state) {
+    qc.context.options.put(option, state);
   }
 
   @Override

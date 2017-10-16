@@ -308,7 +308,7 @@ public abstract class Preds extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Expr e : exprs) sb.append('[').append(e).append(']');
+    for(final Expr expr : exprs) sb.append('[').append(expr).append(']');
     return sb.toString();
   }
 }
