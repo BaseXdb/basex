@@ -7,6 +7,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -34,6 +35,7 @@ public final class FTIndexAccess extends Simple {
     super(info);
     this.ftexpr = ftexpr;
     this.ictx = ictx;
+    seqType = SeqType.NOD_ZM;
   }
 
   @Override

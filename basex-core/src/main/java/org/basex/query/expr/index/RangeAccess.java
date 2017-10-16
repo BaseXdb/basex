@@ -12,6 +12,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -35,6 +36,7 @@ public final class RangeAccess extends IndexAccess {
   public RangeAccess(final InputInfo info, final NumericRange index, final IndexContext ictx) {
     super(ictx, info);
     this.index = index;
+    seqType = SeqType.NOD_ZM;
   }
 
   @Override

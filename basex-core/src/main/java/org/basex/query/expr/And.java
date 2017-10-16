@@ -109,27 +109,21 @@ public final class And extends Logical {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    final int es = exprs.length;
-    final int[] ics = new int[es];
-    final Expr[] tmp = new Expr[es];
-    for(int e = 0; e < es; e++) {
-      final Expr expr = exprs[e];
+    int costs = 0;
+    final ExprList el = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
       // check if expression can be rewritten, and if access is not sequential
       if(!expr.indexAccessible(ii)) return false;
       // skip queries with no results
       if(ii.costs == 0) return true;
       // summarize costs
-      ics[e] = ii.costs;
-      tmp[e] = ii.expr;
+      costs += ii.costs;
+      el.add(ii.expr);
     }
-
-    // evaluate arguments with higher selectivity first
-    final int[] ord = Array.createOrder(ics, true);
-    final Expr[] ex = new Expr[es];
-    for(int e = 0; e < es; ++e) ex[e] = tmp[ord[e]];
-    ii.expr = new Intersect(info, ex);
-    // use worst costs for estimation, as all index results may need to be scanned
-    ii.costs = ics[ord[es - 1]];
+    // use summarized costs for estimation
+    ii.costs = costs;
+    // create intersection of all index requests
+    ii.expr = new Intersect(info, el.finish());
     return true;
   }
 
