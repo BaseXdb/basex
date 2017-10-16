@@ -10,10 +10,10 @@ import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
-import org.basex.query.expr.index.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
+import org.basex.query.expr.constr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -22,7 +22,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -640,27 +640,29 @@ public abstract class Path extends ParseExpr {
       final Step step = axisStep(s);
       if(step == null || !step.axis.down || step.has(Flag.POS)) break;
 
-      // check if path is iterable (i.e., will be duplicate-free)
-      final boolean iter = pathNodes(data, s) != null;
-      final IndexContext ictx = data != null ? new IndexContext(data, iter) :
-        new IndexContext(root == null ? new ContextValue(info) : root, iter);
+      final int el = step.exprs.length;
+      if(el > 0) {
+        // check if path is iterable (i.e., will be duplicate-free)
+        final boolean iter = pathNodes(data, s) != null;
+        final IndexContext ictx = data != null ? new IndexContext(data, iter) :
+          new IndexContext(root == null ? new ContextValue(info) : root, iter);
 
-      // choose cheapest index access
-      final int pl = step.exprs.length;
-      for(int p = 0; p < pl; p++) {
-        final IndexInfo ii = new IndexInfo(ictx, cc.qc, step);
-        if(!step.exprs[p].indexAccessible(ii)) continue;
+        // choose cheapest index access
+        for(int e = 0; e < el; e++) {
+          final IndexInfo ii = new IndexInfo(ictx, cc.qc, step);
+          if(!step.exprs[e].indexAccessible(ii)) continue;
 
-        if(ii.costs == 0) {
-          // no results...
-          cc.info(OPTNORESULTS_X, ii.step);
-          return Empty.SEQ;
-        }
+          if(ii.costs == 0) {
+            // no results...
+            cc.info(OPTNORESULTS_X, ii.step);
+            return Empty.SEQ;
+          }
 
-        if(index == null || index.costs > ii.costs) {
-          index = ii;
-          indexPred = p;
-          indexStep = s;
+          if(index == null || index.costs > ii.costs) {
+            index = ii;
+            indexPred = e;
+            indexStep = s;
+          }
         }
       }
     }

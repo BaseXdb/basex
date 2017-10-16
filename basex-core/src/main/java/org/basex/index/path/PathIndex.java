@@ -12,6 +12,7 @@ import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -255,7 +256,7 @@ public final class PathIndex implements Index {
   }
 
   @Override
-  public int costs(final IndexToken token) {
+  public IndexCosts costs(final IndexToken token) {
     throw Util.notExpected();
   }
 

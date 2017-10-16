@@ -89,6 +89,7 @@ public final class Or extends Logical {
       if(!expr.indexAccessible(ii)) return false;
       // skip expressions without results
       if(ii.costs == 0) continue;
+      // summarize costs
       costs += ii.costs;
       el.add(ii.expr);
     }

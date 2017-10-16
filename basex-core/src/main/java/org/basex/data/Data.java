@@ -14,6 +14,7 @@ import org.basex.index.resource.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -185,7 +186,8 @@ public abstract class Data {
    * @return cost estimation
    */
   public final int costs(final IndexToken token) {
-    return index(token.type()).costs(token);
+    final IndexCosts ic = index(token.type()).costs(token);
+    return ic == null ? -1 : ic.results();
   }
 
   /**

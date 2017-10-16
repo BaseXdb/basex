@@ -2,6 +2,7 @@ package org.basex.index;
 
 import org.basex.core.*;
 import org.basex.index.query.*;
+import org.basex.query.util.*;
 
 /**
  * This interface defines the methods which have to be implemented
@@ -43,7 +44,7 @@ public interface Index {
    * @param token token to be found
    * @return cost estimation
    */
-  int costs(IndexToken token);
+  IndexCosts costs(IndexToken token);
 
   /**
    * Drops the index. Also returns true if the index does not exist.

@@ -15,6 +15,7 @@ import org.basex.index.stats.*;
 import org.basex.index.value.*;
 import org.basex.io.random.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -103,15 +104,14 @@ public final class FTIndex extends ValueIndex {
   }
 
   @Override
-  public synchronized int costs(final IndexToken it) {
+  public synchronized IndexCosts costs(final IndexToken it) {
     final byte[] tok = it.get();
-    if(tok.length > data.meta.maxlen) return Integer.MAX_VALUE;
+    if(tok.length > data.meta.maxlen) return null;
 
     // estimate costs for queries which stretch over multiple index entries
     final FTOpt opt = ((FTLexer) it).ftOpt();
-    if(opt.is(FZ) || opt.is(WC)) return Math.max(1, data.meta.size >> 4);
-
-    return entry(tok).size;
+    return IndexCosts.get(opt.is(FZ) || opt.is(WC) ? Math.max(1, data.meta.size >> 4) :
+      entry(tok).size);
   }
 
   @Override

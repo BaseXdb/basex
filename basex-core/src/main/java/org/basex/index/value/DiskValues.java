@@ -13,6 +13,7 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.io.random.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -91,10 +92,11 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public final int costs(final IndexToken it) {
-    if(it instanceof StringRange) return Math.max(1, data.meta.size / 10);
-    if(it instanceof NumericRange) return Math.max(1, data.meta.size / 3);
-    return entry(it.get()).size;
+  public final IndexCosts costs(final IndexToken it) {
+    return IndexCosts.get(
+      it instanceof StringRange ? Math.max(1, data.meta.size / 10) :
+      it instanceof NumericRange ? Math.max(1, data.meta.size / 3) :
+      entry(it.get()).size);
   }
 
   @Override

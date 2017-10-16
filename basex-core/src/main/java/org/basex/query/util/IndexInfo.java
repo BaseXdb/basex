@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -188,6 +189,14 @@ public final class IndexInfo {
    */
   public int costs(final Data data, final IndexToken token) {
     return data == null ? Integer.MAX_VALUE : data.costs(token);
+  }
+
+  /**
+   * Indicates if the index rewriting should be enforced.
+   * @return result of check
+   */
+  public boolean enforce() {
+    return qc.context.options.get(MainOptions.ENFORCEINDEX);
   }
 
   // PRIVATE METHODS ==============================================================================

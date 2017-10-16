@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -73,8 +74,8 @@ public final class MemValues extends ValueIndex {
   }
 
   @Override
-  public int costs(final IndexToken it) {
-    return lenList.get(values.id(it.get()));
+  public IndexCosts costs(final IndexToken it) {
+    return IndexCosts.get(lenList.get(values.id(it.get())));
   }
 
   @Override
