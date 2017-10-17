@@ -439,8 +439,8 @@ public final class DecFormatter extends FormatUtil {
       final int gil = pic.groupInt.size();
       if(gil == 1 && pic.groupInt.get(0) > 0) {
         // regular pattern with repeating separators
-        for(int p = intgr.size() - (neg ? 2 : 1); p > 0; --p) {
-          if(p % pic.groupInt.get(0) == 0) intgr.insert(intgr.size() - p, grouping);
+        for(int i = intgr.size() - 1; i > 0; --i) {
+          if(i % pic.groupInt.get(0) == 0) intgr.insert(intgr.size() - i, grouping);
         }
       } else {
         // irregular pattern, or no separators at all
