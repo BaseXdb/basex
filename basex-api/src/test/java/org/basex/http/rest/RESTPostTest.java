@@ -22,7 +22,7 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post1() throws IOException {
     assertEquals("123",
-      post("", "<query xmlns=\"" + URI + "\"><text>123</text></query>", MediaType.APPLICATION_XML));
+      post("", "<query><text>123</text></query>", MediaType.APPLICATION_XML));
   }
 
   /**
@@ -95,7 +95,7 @@ public final class RESTPostTest extends RESTTest {
    */
   @Test
   public void postOption() throws IOException {
-    assertEquals("2", post("", "<query xmlns=\"" + URI + "\">" +
+    assertEquals("2", post("", "<query>" +
         "<text>2, delete node &lt;a/&gt;</text>" +
         "<option name='" + MainOptions.MIXUPDATES.name() + "' value='true'/></query>",
         MediaType.APPLICATION_XML));
@@ -111,6 +111,19 @@ public final class RESTPostTest extends RESTTest {
     }
   }
 
+  /**
+   * POST Test: execute a script.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void postScript() throws IOException {
+    assertEquals("1",
+      post("", "<commands><xquery>1</xquery></commands>", MediaType.APPLICATION_XML));
+    assertEquals("12",
+        post("", "<commands><xquery>1</xquery><xquery>2</xquery></commands>",
+            MediaType.APPLICATION_XML));
+  }
+
   /** POST Test: execute buggy query. */
   @Test
   public void postErr() {
@@ -120,5 +133,11 @@ public final class RESTPostTest extends RESTTest {
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }
-  }
+
+    try {
+      assertEquals("", post("", "<abcde/>", MediaType.APPLICATION_XML));
+    } catch(final IOException ex) {
+      assertContains(ex.getMessage(), "abcde");
+    }
+}
 }

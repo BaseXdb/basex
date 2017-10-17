@@ -5,9 +5,6 @@ import static org.basex.http.rest.RESTText.*;
 import java.io.*;
 import java.util.*;
 
-import javax.xml.parsers.*;
-import javax.xml.transform.dom.*;
-
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
@@ -42,8 +39,6 @@ final class RESTPost {
 
     // perform queries
     final byte[] input = new NewlineInput(conn.req.getInputStream()).encoding(enc).content();
-    validate(input);
-
     final Context ctx = conn.context;
     final DBNode doc;
     try {
@@ -53,6 +48,13 @@ final class RESTPost {
     }
 
     try {
+      // handle request
+      final String cmd = value("local-name(*)", doc, ctx);
+      if(cmd.equals(COMMANDS)) {
+        final String script = DataBuilder.stripNS(doc, REST_URI, ctx).serialize().toString();
+        return RESTScript.get(session, script);
+      }
+
       // handle serialization parameters
       final SerializerOptions sopts = conn.sopts();
       try(QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
@@ -98,13 +100,14 @@ final class RESTPost {
         }
       }
 
-      // handle request
-      final String request = value("local-name(*)", doc, ctx);
+      // command body
       final String text = value("*/*:text/text()", doc, ctx);
 
-      if(request.equals(COMMAND)) return RESTCommand.get(session, text);
-      if(request.equals(RUN)) return RESTRun.get(session, text, vars, val);
-      return RESTQuery.get(session, text, vars, val);
+      // choose evaluation
+      if(cmd.equals(COMMAND)) return RESTCommand.get(session, text);
+      if(cmd.equals(RUN)) return RESTRun.get(session, text, vars, val);
+      if(cmd.equals(QUERY)) return RESTQuery.get(session, text, vars, val);
+      throw HTTPCode.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
 
     } catch(final QueryException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);
@@ -124,25 +127,7 @@ final class RESTPost {
 
     try(QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
       final Item it = qp.iter().next();
-      return it == null ? null : Token.string(it.string(null));
-    }
-  }
-
-  /**
-   * Validates the specified XML input against the POST schema.
-   * @param input input document
-   * @throws HTTPException exception
-   */
-  private static void validate(final byte[] input) throws HTTPException {
-    try {
-      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      dbf.setNamespaceAware(true);
-      final DocumentBuilder db = dbf.newDocumentBuilder();
-      RESTSchema.newValidator().validate(new DOMSource(db.parse(new ArrayInput(input))));
-    } catch(final Exception ex) {
-      Util.debug("Error while validating \"" + Token.string(input) + '"');
-      // validation fails
-      throw HTTPCode.BAD_REQUEST_X.get(ex);
+      return it == null ? "" : Token.string(it.string(null));
     }
   }
 }

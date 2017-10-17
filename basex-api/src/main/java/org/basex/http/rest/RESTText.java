@@ -28,6 +28,8 @@ interface RESTText {
   /** Attribute. */
   String NAME = "name";
 
+  /** Commands operation. */
+  String COMMANDS = "commands";
   /** Command operation. */
   String COMMAND = "command";
   /** Run operation. */

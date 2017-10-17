@@ -260,7 +260,7 @@ public final class DataBuilder {
    * @return new node
    */
   public static ANode stripNS(final ANode node, final byte[] ns, final Context ctx) {
-    if(node.type != NodeType.ELM) return node;
+    if(node.type != NodeType.ELM && node.type != NodeType.DOC) return node;
 
     final MemData data = new MemData(ctx.options);
     final DataBuilder db = new DataBuilder(data);
