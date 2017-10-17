@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -13,7 +12,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.http.*;
 import org.basex.util.options.*;
 
 /**
@@ -23,10 +21,14 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class WebResponseHeader extends StandardFunc {
-  /** Cache-control string. */
-  private static final String CACHE_CONTROL = "Cache-Control";
-  /** Default value of cache-control string. */
-  private static final String CACHE_CONTROL_DEFAULT = "max-age=3600,public";
+  /** Response options. */
+  public static class ResponseOptions extends Options {
+    /** Status. */
+    public static final NumberOption STATUS = new NumberOption("status");
+    /** Message. */
+    public static final StringOption MESSAGE = new StringOption("message");
+  }
+
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
@@ -37,9 +39,12 @@ public final class WebResponseHeader extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final HashMap<String, String> output = toOptions(0, new Options(), qc).free();
     final HashMap<String, String> http = toOptions(1, new Options(), qc).free();
+    final ResponseOptions response = toOptions(2, new ResponseOptions(), qc);
 
-    // HTTP response
-    http.putIfAbsent(CACHE_CONTROL, CACHE_CONTROL_DEFAULT);
+    // check keys
+    final SerializerOptions so = SerializerMode.DEFAULT.get();
+    for(final String entry : output.keySet())
+      if(so.option(entry) == null) throw INVALIDOPTION_X.get(info, entry);
 
     final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI));
     http.forEach((name, value) -> {
@@ -47,23 +52,17 @@ public final class WebResponseHeader extends StandardFunc {
           add("name", name).add("value", value));
     });
 
-    // Serialization parameters
-    output.putIfAbsent(SerializerOptions.MEDIA_TYPE.name(),
-        MediaType.APPLICATION_OCTET_STREAM.toString());
-
-    final SerializerOptions so = SerializerMode.DEFAULT.get();
     final FElem oseri = new FElem(new QNm(OUTPUT_PREFIX, SERIALIZATION_PARAMETERS, OUTPUT_URI));
-    for(final Entry<String, String> entry : output.entrySet()) {
-      final String name = entry.getKey(), value = entry.getValue();
-      if(so.option(name) == null) throw INVALIDOPTION_X.get(info, name);
+    output.forEach((name, value) -> {
       if(!value.isEmpty()) oseri.add(new FElem(new QNm(OUTPUT_PREFIX, name, OUTPUT_URI)).
           add("value", value));
-    }
+    });
 
     // REST response
-    final FElem resp = new FElem(new QNm(REST_PREFIX, "response", REST_URI));
-    if(hresp.children().next() != null) resp.add(hresp);
-    if(oseri.children().next() != null) resp.add(oseri);
-    return resp;
+    final FElem rest = new FElem(new QNm(REST_PREFIX, "response", REST_URI));
+    for(final Option<?> o : response) {
+      if(response.contains(o)) rest.add(o.name(), response.get(o).toString());
+    }
+    return rest.add(hresp).add(oseri);
   }
 }

@@ -49,27 +49,26 @@ public final class WebModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void responseHeader() {
-    query(_WEB_RESPONSE_HEADER.args() +
-        "/*:response/*:header[@name = 'Cache-Control']/@value/string()", "max-age=3600,public");
-    query(_WEB_RESPONSE_HEADER.args() +
-        "/*:serialization-parameters/*:media-type/@value/string()", "application/octet-stream");
+    query(_WEB_RESPONSE_HEADER.args() + "/http:response/http:header", "");
+    query(_WEB_RESPONSE_HEADER.args() + "/output:serialization-parameters/output:media-type", "");
 
     // overwrite header
     query(_WEB_RESPONSE_HEADER.args(" map { 'media-type': 'X' }") +
-        "/*:serialization-parameters/*:media-type/@value/string()", "X");
+        "/output:serialization-parameters/output:media-type/@value/string()", "X");
     // header is not generated if value is empty
-    query(_WEB_RESPONSE_HEADER.args(" map { 'media-type': '' }") +
-        "/*:serialization-parameters/*:media-type", "");
+    query("count(" + _WEB_RESPONSE_HEADER.args(" map { 'media-type': '' }") +
+        "/output:serialization-parameters/*)", "0");
 
     // overwrite header
-    query(_WEB_RESPONSE_HEADER.args(" map { }", " map { 'Cache-Control': 'X' }") +
-        "/*:response/*:header[@name = 'Cache-Control']/@value/string()", "X");
+    query(_WEB_RESPONSE_HEADER.args(" map {}", " map { 'Cache-Control': 'X' }") +
+        "/http:response/http:header[@name = 'Cache-Control']/@value/string()", "X");
     // header is not generated if value is empty
-    query(_WEB_RESPONSE_HEADER.args(" map { }", " map { 'Cache-Control': '' }") +
-        "/*:response/*:header[@name = 'Cache-Control']", "");
-    // HTTP response is not generated if no value are specified
-    query(_WEB_RESPONSE_HEADER.args(" map { }", " map { 'Cache-Control': '' }") +
-        "/*:response/*:header", "");
+    query("count(" + _WEB_RESPONSE_HEADER.args(" map {}", " map { 'Cache-Control': '' }") +
+        "/http:response/*)", "0");
+
+    // status/message arguments
+    query(_WEB_RESPONSE_HEADER.args(" map {}", " map {}", " map {'status':200,'message':'OK'}") +
+        " ! (@status, @message) ! string()", "200\nOK");
   }
 
   /** Test method. */

@@ -32,7 +32,10 @@ function dba:file(
 ) as item()+ {
   let $path := file:base-dir() || 'static/' || $file
   return (
-    web:response-header(map { 'media-type': web:content-type($path) }),
+    web:response-header(
+      map { 'media-type': web:content-type($path) },
+      map { 'Cache-Control': 'max-age=3600,public' }
+    ),
     file:read-binary($path)
   )
 };
