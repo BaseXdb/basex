@@ -45,10 +45,6 @@ public final class EditorView extends View {
   private static final int SEARCH_DELAY = 100;
   /** Link pattern. */
   private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
-  /** Number of files in the history. */
-  private static final int HISTORY = 18;
-  /** Number of files in the compact history. */
-  private static final int HISTCOMP = 7;
 
   /** Project files. */
   final ProjectView project;
@@ -187,9 +183,9 @@ public final class EditorView extends View {
       final StringList opened = new StringList();
       for(final EditorArea ea : editors()) opened.add(ea.file().path());
 
-      final StringList hst = new StringList(HISTORY);
+      final StringList hst = new StringList(BaseXHistory.MAX);
       final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
-      final int fl = Math.min(all.size(), e == null ? HISTORY : HISTCOMP);
+      final int fl = Math.min(all.size(), e == null ? BaseXHistory.MAX : BaseXHistory.MAXCOMPACT);
       for(int f = 0; f < fl; f++) hst.add(all.get(f));
 
       Font f = null;
@@ -202,12 +198,10 @@ public final class EditorView extends View {
         }
         pm.add(it).addActionListener(al);
       }
-
       al = ac -> hist.getActionListeners()[0].actionPerformed(null);
-      if(e != null && pm.getComponentCount() == HISTCOMP) {
+      if(e != null && pm.getComponentCount() == BaseXHistory.MAXCOMPACT) {
         pm.add(new JMenuItem(DOTS)).addActionListener(al);
       }
-
       pm.show(hist, 0, hist.getHeight());
     });
     refreshHistory(null);
@@ -619,7 +613,7 @@ public final class EditorView extends View {
     }
     final String[] old = gui.gopts.get(GUIOptions.EDITOR);
     final int ol = old.length;
-    for(int p = 0; paths.size() < HISTORY && p < ol; p++) {
+    for(int p = 0; paths.size() < BaseXHistory.MAX && p < ol; p++) {
       final IO fl = IO.get(old[p]);
       if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }

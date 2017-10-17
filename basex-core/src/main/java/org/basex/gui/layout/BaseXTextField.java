@@ -36,8 +36,6 @@ public class BaseXTextField extends JTextField {
   private BaseXTextHint hint;
   /** Last input. */
   private String last = "";
-  /** History pointer. */
-  private int hist;
 
   /**
    * Constructor.
@@ -134,15 +132,23 @@ public class BaseXTextField extends JTextField {
       if(ENTER.is(e)) {
         store();
       } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
-        final String[] qu = gui.gopts.get(strings);
-        if(qu.length == 0) return;
-        hist = NEXTLINE.is(e) ? Math.min(qu.length - 1, hist + 1) : Math.max(0, hist - 1);
-        setText(qu[hist]);
-        final BaseXDialog dialog = win.dialog();
-        if(dialog != null) dialog.action(this);
+        final String value = history.get(NEXTLINE.is(e));
+        if(value != null) {
+          setText(value);
+          final BaseXDialog dialog = win.dialog();
+          if(dialog != null) dialog.action(this);
+        }
       }
     });
     return this;
+  }
+
+  /**
+   * Returns the input history.
+   * @return history
+   */
+  public final BaseXHistory history() {
+    return history;
   }
 
   /**
@@ -153,7 +159,6 @@ public class BaseXTextField extends JTextField {
     final String text = getText();
     if(text.isEmpty()) return;
     history.store(text);
-    hist = 0;
   }
 
   /**

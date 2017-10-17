@@ -12,11 +12,16 @@ import org.basex.util.options.*;
  */
 public final class BaseXHistory {
   /** Maximum number of history entries. */
-  private static final int MAX = 12;
+  public static final int MAX = 18;
+  /** Maximum number of compact history. */
+  public static final int MAXCOMPACT = 7;
+
   /** GUI reference. */
   private final GUI gui;
   /** History option. */
   private final StringsOption history;
+  /** History index. */
+  private int index;
 
   /**
    * Constructor.
@@ -34,10 +39,31 @@ public final class BaseXHistory {
    */
   public void store(final String input) {
     if(input == null) return;
-    final StringList sl = new StringList(MAX).add(input);
-    for(final String s : gui.gopts.get(history)) {
-      if(sl.size() < MAX && !input.equals(s)) sl.add(s);
+    final StringList list = new StringList(MAX).add(input);
+    for(final String value : values()) {
+      if(list.size() < MAX && !input.equals(value)) list.add(value);
     }
-    gui.gopts.set(history, sl.finish());
+    gui.gopts.set(history, list.finish());
+    index = 0;
+  }
+
+  /**
+   * Returns a history value.
+   * @param next next/previous entry
+   * @return entry, or {@code null} if history is empty
+   */
+  public String get(final boolean next) {
+    final String[] list = values();
+    if(list.length == 0) return null;
+    index = next ? Math.min(list.length - 1, index + 1) : Math.max(0, index - 1);
+    return list[index];
+  }
+
+  /**
+   * Returns all values.
+   * @return history values
+   */
+  public String[] values() {
+    return gui.gopts.get(history);
   }
 }
