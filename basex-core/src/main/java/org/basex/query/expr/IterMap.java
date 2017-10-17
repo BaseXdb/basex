@@ -37,13 +37,13 @@ final class IterMap extends SimpleMap {
         final QueryFocus qf = qc.focus;
         final Value cv = qf.value;
         if(pos == -1) {
-          iter[++pos] = qc.iter(exprs[0]);
-          values[pos] = cv;
+          values[++pos] = cv;
+          iter[pos] = qc.iter(exprs[pos]);
         }
-        qf.value = values[pos];
 
         try {
           do {
+            qf.value = values[pos];
             final Item it = iter[pos].next();
             if(it == null) {
               if(--pos == -1) return null;
