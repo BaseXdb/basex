@@ -99,6 +99,7 @@ public final class EditorView extends View {
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
     tabs.addDragDrop(false);
+    tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     addCreateTab();
 
     final SearchEditor center = new SearchEditor(gui, tabs, null);
@@ -976,7 +977,7 @@ public final class EditorView extends View {
     close.addActionListener(e -> close(edit));
     tab.add(close, BorderLayout.EAST);
 
-    tabs.add(edit, tab, tabs.getComponentCount() - 2);
+    tabs.add(edit, tab, tabs.getComponentCount() - 4);
     return edit;
   }
 
