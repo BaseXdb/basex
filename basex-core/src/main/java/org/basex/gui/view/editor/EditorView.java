@@ -964,6 +964,9 @@ public final class EditorView extends View {
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0));
     tab.setOpaque(false);
     tab.add(edit.label, BorderLayout.CENTER);
+    tab.addMouseListener((MouseClickedListener) (e) -> {
+      if(SwingUtilities.isMiddleMouseButton(e)) close(edit);
+    });
 
     final AbstractButton close = tabButton("e_close", "e_close2");
     close.addActionListener(e -> close(edit));
