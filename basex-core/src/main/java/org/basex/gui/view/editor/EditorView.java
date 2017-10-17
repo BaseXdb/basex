@@ -629,6 +629,15 @@ public final class EditorView extends View {
   }
 
   /**
+   * Closes all editors.
+   */
+  public void closeAll() {
+    for(final Component c : tabs.getComponents()) {
+      if(c instanceof EditorArea) close((EditorArea) c);
+    }
+  }
+
+  /**
    * Closes an editor.
    * @param edit editor to be closed. {@code null} closes the currently opened editor.
    */

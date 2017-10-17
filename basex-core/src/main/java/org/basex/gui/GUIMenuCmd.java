@@ -176,6 +176,19 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Closes all editor files. */
+  C_EDITCLOSEALL(CLOSE_ALL, "% shift W", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.closeAll();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Edits external variables. */
   C_VARS(EXTERNAL_VARIABLES, "% shift E", false, false) {
     @Override
