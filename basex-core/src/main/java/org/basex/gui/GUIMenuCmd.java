@@ -525,7 +525,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows info. */
-  C_SHOWINFO(QUERY_INFO, "% I", false, true) {
+  C_SHOWINFO(INFO, "% I", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWINFO);

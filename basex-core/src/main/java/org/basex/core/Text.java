@@ -756,7 +756,7 @@ public interface Text {
   /** Statistics information. */
   String CREATE_STATS_D = lang("create_stats") + DOTS;
 
-  /** "Name". */
+  /** "All". */
   String ALL = lang("all");
   /** "Name". */
   String NAME = lang("name");
@@ -948,7 +948,7 @@ public interface Text {
   /** Command info. */
   String CHECK_FOR_UPDATES = lang("check_for_updates");
   /** Command info. */
-  String QUERY_INFO = lang("query_info");
+  String INFO = lang("info");
   /** Command info. */
   String INPUT_BAR = lang("input_bar");
   /** Command info. */

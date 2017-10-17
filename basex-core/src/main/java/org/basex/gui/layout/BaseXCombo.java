@@ -82,6 +82,14 @@ public final class BaseXCombo extends JComboBox<Object> {
     });
   }
 
+  /**
+   * Sets the specified items.
+   * @param items items
+   */
+  public void setItems(final String... items) {
+    setModel(new DefaultComboBoxModel<>(items));
+  }
+
   @Override
   public String getSelectedItem() {
     final Object o = super.getSelectedItem();

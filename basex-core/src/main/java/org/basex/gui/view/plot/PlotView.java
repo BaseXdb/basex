@@ -142,9 +142,9 @@ public final class PlotView extends View {
         plotChanged = true;
         markingChanged = true;
 
-        final Object[] keys = plotData.getCategories(token(item)).toStringArray();
-        xCombo.setModel(new DefaultComboBoxModel<>(keys));
-        yCombo.setModel(new DefaultComboBoxModel<>(keys));
+        final String[] keys = plotData.getCategories(token(item)).toStringArray();
+        xCombo.setItems(keys);
+        yCombo.setItems(keys);
         if(keys.length > 0) {
           // choose name category as default for horizontal axis
           xCombo.setSelectedIndex(Math.min(1, keys.length));

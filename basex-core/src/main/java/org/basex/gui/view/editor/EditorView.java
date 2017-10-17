@@ -633,9 +633,7 @@ public final class EditorView extends View {
    * Closes all editors.
    */
   public void closeAll() {
-    for(final Component c : tabs.getComponents()) {
-      if(c instanceof EditorArea) close((EditorArea) c);
-    }
+    for(final EditorArea ea : editors()) close(ea);
   }
 
   /**
@@ -1007,9 +1005,9 @@ public final class EditorView extends View {
   }
 
   /**
-   * Shows a quit dialog for the specified editor.
+   * Shows a confirmation dialog for the specified editor, or all editors.
    * @param edit editor to be saved, or {@code null} to save all editors
-   * @return {@code false} if confirmation was canceled
+   * @return {@code true} if all editors were confirmed
    */
   public boolean confirm(final EditorArea edit) {
     final boolean all = edit == null;
