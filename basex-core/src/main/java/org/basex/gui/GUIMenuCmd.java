@@ -100,7 +100,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Closes the database. */
-  C_CLOSE(CLOSE, "% shift W", true, false) {
+  C_CLOSE(CLOSE, "% Q", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
@@ -294,7 +294,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Exits the application. */
-  C_EXIT(EXIT, "% Q", false, false) {
+  C_EXIT(EXIT, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.dispose();
