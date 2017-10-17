@@ -209,12 +209,14 @@ public final class GUIOptions extends Options {
   /** Comment: files. */
   public static final Comment C_FILES = new Comment("Files");
 
-  /** Last editor files. */
+  /** History of editor files. */
   public static final StringsOption EDITOR = new StringsOption("EDITOR");
-  /** Input paths. */
+  /** Input/output paths. */
   public static final StringsOption INPUTS = new StringsOption("INPUTS");
-  /** Open editor files. */
+  /** Files opened in the editor. */
   public static final StringsOption OPEN = new StringsOption("OPEN");
+  /** History of project directories. */
+  public static final StringsOption PROJECTS = new StringsOption("PROJECTS");
 
   /**
    * Constructor.

@@ -16,6 +16,7 @@ import org.basex.gui.listener.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Project file tree.
@@ -37,6 +38,8 @@ public final class ProjectView extends BaseXPanel {
   private final ProjectFilter filter;
   /** Root path. */
   private final BaseXTextField rootPath;
+  /** History button. */
+  private final AbstractButton history;
   /** Splitter. */
   private final BaseXSplit split;
 
@@ -57,29 +60,37 @@ public final class ProjectView extends BaseXPanel {
     setLayout(new BorderLayout());
 
     tree = new ProjectTree(this);
-    final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
-    root = new ProjectDir(new IOFile(proj.isEmpty() ? Prop.HOME : proj), this);
+    IOFile dir = dir();
+    if(dir == null) dir = new IOFile(Prop.HOME).normalize();
+    root = new ProjectDir(dir, this);
     tree.init(root);
 
     filter = new ProjectFilter(this);
     list = new ProjectList(this);
     BaseXLayout.addInteraction(list, gui);
 
-    final BaseXBack back = new BaseXBack().layout(new BorderLayout(2, 2));
+    final BaseXBack back = new BaseXBack(new BorderLayout(2, 4));
     back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.gray),
-        BaseXLayout.border(3, 1, 3, 2)));
+        BaseXLayout.border(5, 3, 3, 4)));
 
     rootPath = new BaseXTextField(gui);
-    rootPath.setText(root.file.path());
+    rootPath.history(GUIOptions.PROJECTS);
     rootPath.setEnabled(false);
 
-    final BaseXButton browse = new BaseXButton(gui, DOTS);
-    browse.setMargin(new Insets(0, 2, 0, 2));
+    final AbstractButton browse = BaseXButton.get("c_editopen", OPEN, false, gui);
     browse.setToolTipText(CHOOSE_DIR + DOTS);
     browse.addActionListener(e -> changeRoot());
 
+    history = BaseXButton.get("c_hist", RECENTLY_OPENED, false, gui);
+    history.setToolTipText(INPUT_HISTORY);
+    history.addActionListener(e -> showHistory());
+
+    final BaseXBack buttons = new BaseXBack(new TableLayout(1, 2, 1, 0));
+    buttons.add(browse);
+    buttons.add(history);
+
     back.add(rootPath, BorderLayout.CENTER);
-    back.add(browse, BorderLayout.EAST);
+    back.add(buttons, BorderLayout.EAST);
     back.add(filter, BorderLayout.SOUTH);
 
     // add scroll bars
@@ -110,6 +121,8 @@ public final class ProjectView extends BaseXPanel {
         refresh(false, false);
       }
     });
+
+    rootPath(dir.path());
   }
 
   /**
@@ -317,20 +330,55 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
+   * Shows the project history.
+   */
+  private void showHistory() {
+    final JPopupMenu popup = new JPopupMenu();
+    for(final String project : new StringList(gui.gopts.get(GUIOptions.PROJECTS))) {
+      final JMenuItem mi = new JMenuItem(project);
+      mi.addActionListener(ac -> {
+        changeRoot(new IOFile(ac.getActionCommand()), true);
+      });
+      popup.add(mi);
+    }
+    popup.show(history, 0, history.getHeight());
+  }
+
+  /**
    * Changes the root directory.
    * @param io root directory
    * @param force enforce directory and setting change
    */
   public void changeRoot(final IOFile io, final boolean force) {
-    final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
-    if(!force && !project.isEmpty()) return;
-    root.file = io;
-    root.refresh();
-    refresh();
-    rootPath.setText(io.path());
-    if(force) {
-      gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
-      gui.gopts.write();
+    final IOFile normIO = io.normalize();
+    if(force || dir() == null) {
+      root.file = normIO;
+      root.refresh();
+      refresh();
+      if(force) {
+        gui.gopts.set(GUIOptions.PROJECTPATH, normIO.path());
+        gui.gopts.write();
+      }
     }
+    rootPath(normIO.path());
+  }
+
+  /**
+   * Refreshes the root path.
+   * @param path root path
+   */
+  public void rootPath(final String path) {
+    rootPath.setText(path);
+    rootPath.store();
+    history.setEnabled(rootPath.history().values().length != 0);
+  }
+
+  /**
+   * Returns the project directory.
+   * @return project directory, or {@code null}
+   */
+  public IOFile dir() {
+    final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
+    return project.isEmpty() ? null : new IOFile(project).normalize();
   }
 }
