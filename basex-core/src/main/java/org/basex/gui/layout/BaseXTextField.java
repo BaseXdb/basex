@@ -121,17 +121,27 @@ public class BaseXTextField extends JTextField {
   }
 
   /**
-   * Attaches a history.
+   * Attaches a history and enables a listener for cursor down/up keys.
    * @param strings option
    * @return self reference
    */
   public final BaseXTextField history(final StringsOption strings) {
+    return history(strings, false);
+  }
+
+  /**
+   * Attaches a history and enables a listener for cursor down/up keys.
+   * @param strings option
+   * @param shift requires shift key
+   * @return self reference
+   */
+  public final BaseXTextField history(final StringsOption strings, final boolean shift) {
     final GUI gui = win.gui();
     history = new BaseXHistory(gui, strings);
     addKeyListener((KeyPressedListener) e -> {
       if(ENTER.is(e)) {
         store();
-      } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
+      } else if((NEXTLINE.is(e) || PREVLINE.is(e)) && (!shift || e.isShiftDown())) {
         final String value = history.get(NEXTLINE.is(e));
         if(value != null) {
           setText(value);
@@ -157,8 +167,7 @@ public class BaseXTextField extends JTextField {
   public void store() {
     if(history == null) return;
     final String text = getText();
-    if(text.isEmpty()) return;
-    history.store(text);
+    if(!text.isEmpty()) history.store(text);
   }
 
   /**

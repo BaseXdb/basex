@@ -40,21 +40,21 @@ final class ProjectFilter extends BaseXBack {
 
     layout(new BorderLayout(0, 2));
     filesFilter = new BaseXTextField(view.gui);
-    filesFilter.history(GUIOptions.PROJFILES);
+    filesFilter.history(GUIOptions.PROJFILES, true);
     filesFilter.addFocusListener(view.lastfocus);
 
     contentsFilter = new BaseXTextField(view.gui);
-    contentsFilter.history(GUIOptions.PROJCONTS);
+    contentsFilter.history(GUIOptions.PROJCONTS, true);
     contentsFilter.hint(Text.FIND_CONTENTS + Text.DOTS);
     contentsFilter.addFocusListener(view.lastfocus);
 
     add(filesFilter, BorderLayout.NORTH);
     add(contentsFilter, BorderLayout.CENTER);
 
-    final KeyAdapter refreshKeys = new KeyAdapter() {
+    final KeyAdapter keys = new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
+        if(!e.isShiftDown() && (BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e)) ||
            BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
           view.list.dispatchEvent(e);
         } else {
@@ -70,14 +70,13 @@ final class ProjectFilter extends BaseXBack {
           }
         }
       }
-
       @Override
       public void keyReleased(final KeyEvent e) {
         refresh(false);
       }
     };
-    filesFilter.addKeyListener(refreshKeys);
-    contentsFilter.addKeyListener(refreshKeys);
+    filesFilter.addKeyListener(keys);
+    contentsFilter.addKeyListener(keys);
     refreshLayout();
   }
 

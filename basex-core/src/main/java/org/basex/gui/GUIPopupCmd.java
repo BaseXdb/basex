@@ -1,5 +1,7 @@
 package org.basex.gui;
 
+import java.util.*;
+
 import org.basex.gui.layout.*;
 
 /**
@@ -62,5 +64,10 @@ public abstract class GUIPopupCmd implements GUICommand {
   @Override
   public boolean selected(final GUI main) {
     return false;
+  }
+
+  @Override
+  public String toString() {
+    return label + ' ' + Arrays.toString(shortcut);
   }
 }
