@@ -217,6 +217,10 @@ public final class GUIOptions extends Options {
   public static final StringsOption OPEN = new StringsOption("OPEN");
   /** History of project directories. */
   public static final StringsOption PROJECTS = new StringsOption("PROJECTS");
+  /** History of filtered project files. */
+  public static final StringsOption PROJFILES = new StringsOption("PROJFILES");
+  /** History of filtered project file contents. */
+  public static final StringsOption PROJCONTS = new StringsOption("PROJCONTS");
 
   /**
    * Constructor.

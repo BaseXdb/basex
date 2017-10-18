@@ -40,9 +40,11 @@ final class ProjectFilter extends BaseXBack {
 
     layout(new BorderLayout(0, 2));
     filesFilter = new BaseXTextField(view.gui);
+    filesFilter.history(GUIOptions.PROJFILES);
     filesFilter.addFocusListener(view.lastfocus);
 
     contentsFilter = new BaseXTextField(view.gui);
+    contentsFilter.history(GUIOptions.PROJCONTS);
     contentsFilter.hint(Text.FIND_CONTENTS + Text.DOTS);
     contentsFilter.addFocusListener(view.lastfocus);
 

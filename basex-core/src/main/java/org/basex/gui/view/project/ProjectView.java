@@ -71,7 +71,7 @@ public final class ProjectView extends BaseXPanel {
 
     final BaseXBack back = new BaseXBack(new BorderLayout(2, 4));
     back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.gray),
-        BaseXLayout.border(5, 3, 3, 4)));
+        BaseXLayout.border(5, 3, 5, 4)));
 
     rootPath = new BaseXTextField(gui);
     rootPath.history(GUIOptions.PROJECTS);
