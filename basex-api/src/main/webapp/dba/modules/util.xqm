@@ -42,7 +42,8 @@ declare %private function util:query-options() as map(*) {
   map {
     'timeout'   : $cons:OPTIONS($cons:K-TIMEOUT),
     'memory'    : $cons:OPTIONS($cons:K-MEMORY),
-    'permission': $cons:OPTIONS($cons:K-PERMISSION)
+    'permission': $cons:OPTIONS($cons:K-PERMISSION),
+    'base-uri'  : $cons:OPTIONS($cons:K-DIRECTORY)
   }
 };
 
