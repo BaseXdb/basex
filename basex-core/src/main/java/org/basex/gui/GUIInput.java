@@ -14,7 +14,6 @@ import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.query.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * This class offers a text field for keyword and XQuery input.
@@ -22,13 +21,13 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class GUIInput extends BaseXTextField {
-  /** reference to the main window. */
+public final class GUIInput extends BaseXCombo {
+  /** Reference to the main window. */
   private final GUI gui;
-  /** JComboBox. */
-  private final BaseXCombo box;
+  /** Input completions. */
+  private final BaseXCombo completions;
   /** BasicComboPopup Menu. */
-  private GUIInputPopup pop;
+  private GUIInputPopup popup;
 
   /** String for temporary input. */
   private String pre = "";
@@ -38,7 +37,7 @@ public final class GUIInput extends BaseXTextField {
    * @param main main window reference
    */
   GUIInput(final GUI main) {
-    super(main);
+    super(main, true);
     gui = main;
 
     // use larger font for input bar
@@ -49,53 +48,53 @@ public final class GUIInput extends BaseXTextField {
     final Dimension ps = getPreferredSize();
     setPreferredSize(new Dimension(ps.width, ps.height + (int) fs2 - fs));
 
-    box = new BaseXCombo(main);
-    box.addActionListener(e -> {
+    completions = new BaseXCombo(main);
+    completions.addActionListener(e -> {
       if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
     });
-    pop = new GUIInputPopup(box);
+    popup = new GUIInputPopup(completions);
 
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        final int count = box.getItemCount();
-        if(ENTER.is(e)) {
-          if(pop.isVisible()) {
+        if(ESCAPE.is(e)) {
+          popup.setVisible(false);
+        } else if(ENTER.is(e)) {
+          if(popup.isVisible()) {
             completeInput();
+            popup.setVisible(false);
           } else {
             store();
+            // evaluate the input
+            if(e.getModifiers() == 0) gui.execute();
           }
-          // evaluate the input
-          if(e.getModifiers() == 0) gui.execute();
         }
+
+        final int count = completions.getItemCount();
         if(count == 0) return;
 
-        int bi = box.getSelectedIndex();
+        int bi = completions.getSelectedIndex();
         if(NEXTLINE.is(e)) {
-          if(pop.isVisible()) {
+          if(popup.isVisible()) {
             if(++bi == count) bi = 0;
           } else {
-            showPopup();
+            showCompletions();
           }
         } else if(PREVLINE.is(e)) {
-          if(pop.isVisible()) {
+          if(popup.isVisible()) {
             if(--bi < 0) bi = count - 1;
           } else {
-            showPopup();
+            showCompletions();
           }
         }
-        if(bi != box.getSelectedIndex()) box.setSelectedIndex(bi);
+        if(bi != completions.getSelectedIndex()) completions.setSelectedIndex(bi);
       }
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(ESCAPE.is(e)) {
-          pop.setVisible(false);
-        } else if(ENTER.is(e)) {
-          pop.hide();
-        } else if(!NEXTLINE.is(e) && !PREVLINE.is(e)) {
+        if(!NEXTLINE.is(e) && !PREVLINE.is(e)) {
           if(modifier(e) || control(e)) return;
-          showPopup();
+          showCompletions();
           // skip commands
           if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) main.execute();
         }
@@ -106,18 +105,8 @@ public final class GUIInput extends BaseXTextField {
   @Override
   public void setText(final String txt) {
     super.setText(txt);
-    box.removeAllItems();
-    pop.setVisible(false);
-  }
-
-  @Override
-  public void store() {
-    // store current input in history
-    final Data data = gui.context.data();
-    final int i = data == null ? 2 : gui.gopts.get(GUIOptions.SEARCHMODE);
-    final StringsOption options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
-      GUIOptions.XQUERY : GUIOptions.COMMANDS;
-    new BaseXHistory(gui, options).store(getText());
+    completions.removeAllItems();
+    popup.setVisible(false);
   }
 
   /**
@@ -126,6 +115,11 @@ public final class GUIInput extends BaseXTextField {
    */
   void mode(final String mode) {
     hint(mode + Text.DOTS).setText("");
+
+    final Data data = gui.context.data();
+    final int i = data == null ? 2 : gui.gopts.get(GUIOptions.SEARCHMODE);
+    history(i == 0 ? GUIOptions.SEARCH : i == 1 ?
+        GUIOptions.XQUERY : GUIOptions.COMMANDS, gui.gopts);
   }
 
   /**
@@ -141,20 +135,20 @@ public final class GUIInput extends BaseXTextField {
    * Completes the input with the current combobox choice.
    */
   private void completeInput() {
-    final String suf = box.getSelectedItem();
-    if(suf == null) return;
+    final String suffix = completions.getSelectedItem();
+    if(suffix.isEmpty()) return;
     final int pl = pre.length();
     final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';
-    if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
-    setText(pre + suf);
-    showPopup();
+    if(Character.isLetter(ll) && Character.isLetter(suffix.charAt(0))) pre += " ";
+    setText(pre + suffix);
+    showCompletions();
     if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) gui.execute();
   }
 
   /**
    * Shows the command popup menu.
    */
-  private void showPopup() {
+  private void showCompletions() {
     final String query = getText();
     final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
     if(cmdMode()) {
@@ -162,7 +156,7 @@ public final class GUIInput extends BaseXTextField {
     } else if(mode == 1 || mode == 0 && query.startsWith("/")) {
       queryPopup(query);
     } else {
-      pop.setVisible(false);
+      popup.setVisible(false);
     }
   }
 
@@ -205,7 +199,7 @@ public final class GUIInput extends BaseXTextField {
       sl = ex.suggest();
       pre = query.substring(0, ex.column() - 1);
     }
-    if(getCaretPosition() < pre.length()) sl = null;
+    if(textComponent().getCaretPosition() < pre.length()) sl = null;
     createCombo(sl);
   }
 
@@ -215,17 +209,17 @@ public final class GUIInput extends BaseXTextField {
    */
   private void createCombo(final StringList sl) {
     if(sl == null || sl.isEmpty()) {
-      pop.setVisible(false);
+      popup.setVisible(false);
       return;
     }
-    if(comboChanged(sl)) {
-      box.setItems(sl.toArray());
-      box.setSelectedIndex(-1);
-      pop = new GUIInputPopup(box);
+    if(completionsChanged(sl)) {
+      completions.setItems(sl.toArray());
+      completions.setSelectedIndex(-1);
+      popup = new GUIInputPopup(completions);
     }
 
     final int w = getFontMetrics(getFont()).stringWidth(pre);
-    pop.show(this, Math.min(getWidth(), w), getHeight());
+    popup.show(this, Math.min(getWidth(), w), getHeight());
   }
 
   /**
@@ -233,11 +227,11 @@ public final class GUIInput extends BaseXTextField {
    * @param sl strings to be compared
    * @return result of check
    */
-  private boolean comboChanged(final StringList sl) {
-    if(sl.size() != box.getItemCount()) return true;
+  private boolean completionsChanged(final StringList sl) {
+    if(sl.size() != completions.getItemCount()) return true;
     final int is = sl.size();
     for(int i = 0; i < is; ++i) {
-      if(!sl.get(i).equals(box.getItemAt(i))) return true;
+      if(!sl.get(i).equals(completions.getItemAt(i))) return true;
     }
     return false;
   }

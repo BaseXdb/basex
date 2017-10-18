@@ -18,7 +18,7 @@ import org.basex.io.*;
  */
 public final class DialogExport extends BaseXDialog {
   /** Directory path. */
-  private final BaseXTextField path;
+  private final BaseXCombo path;
   /** Database info. */
   private final BaseXLabel info;
   /** Serialization parameters. */
@@ -40,8 +40,9 @@ public final class DialogExport extends BaseXDialog {
     // output label
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
-    path = new BaseXTextField(this, gui.gopts.get(GUIOptions.INPUTPATH));
-    path.history(GUIOptions.INPUTS);
+    path = new BaseXCombo(this, true).history(GUIOptions.INPUTS, gui.gopts);
+    BaseXLayout.setWidth(path, BaseXTextField.DWIDTH);
+    path.setText(gui.gopts.get(GUIOptions.INPUTPATH));
     pp.add(path);
 
     final BaseXButton browse = new BaseXButton(this, BROWSE_D);

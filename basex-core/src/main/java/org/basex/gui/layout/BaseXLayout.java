@@ -233,11 +233,23 @@ public final class BaseXLayout {
   }
 
   /**
-   * Adds default interactions to the specified component.
+   * Adds default listeners to the specified component.
    * @param comp component
    * @param win parent window
    */
   public static void addInteraction(final Component comp, final BaseXWindow win) {
+    addInteraction(comp, null, win);
+  }
+
+  /**
+   * Adds default listeners to the specified component.
+   * @param comp component
+   * @param parent parent component (can be {@code null})
+   * @param win parent window
+   */
+  public static void addInteraction(final Component comp, final Component parent,
+      final BaseXWindow win) {
+
     comp.addMouseListener((MouseEnteredListener) (e) -> focus(comp));
 
     // check if component is a dialog
@@ -247,18 +259,19 @@ public final class BaseXLayout {
       comp.addKeyListener(globalShortcuts(win.gui()));
     } else {
       // yes: add default keys
-      comp.addKeyListener((KeyReleasedListener) e -> {
-        final Object s = e.getSource();
-        if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
+      comp.addKeyListener((KeyPressedListener) e -> {
+        final BaseXCombo combo = comp instanceof BaseXCombo ? (BaseXCombo) comp :
+          parent instanceof BaseXCombo ? (BaseXCombo) parent : null;
+        if(combo != null && combo.isPopupVisible()) return;
 
         // do not key close dialog if button or editor is focused
-        if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
+        if(ENTER.is(e) && !(comp instanceof BaseXButton || comp instanceof TextPanel)) {
           dialog.close();
         } else if(ESCAPE.is(e)) {
           // do not cancel dialog if search bar is opened
           boolean close = true;
-          if(s instanceof TextPanel) {
-            final SearchBar bar = ((TextPanel) s).getSearch();
+          if(comp instanceof TextPanel) {
+            final SearchBar bar = ((TextPanel) comp).getSearch();
             close = bar == null || !bar.deactivate(true);
           }
           if(close) dialog.cancel();

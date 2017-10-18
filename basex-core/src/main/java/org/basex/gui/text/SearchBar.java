@@ -64,9 +64,9 @@ public final class SearchBar extends BaseXBack {
   /** GUI reference. */
   private final GUI gui;
   /** Search text. */
-  private final BaseXTextField search;
+  private final BaseXCombo search;
   /** Replace text. */
-  private final BaseXTextField replace;
+  private final BaseXCombo replace;
 
   /** Search button. */
   private AbstractButton button;
@@ -86,13 +86,10 @@ public final class SearchBar extends BaseXBack {
     setOpaque(false);
     setVisible(false);
 
-    search = new BaseXTextField(gui);
-    search.history(GUIOptions.SEARCHED).hint(Text.FIND + Text.DOTS);
-    search.setPreferredSize(null);
-
-    replace = new BaseXTextField(gui);
-    replace.history(GUIOptions.REPLACED).hint(Text.REPLACE_WITH + Text.DOTS);
-    replace.setPreferredSize(null);
+    search = new BaseXCombo(gui, true).history(GUIOptions.SEARCHED, gui.gopts);
+    search.hint(Text.FIND + Text.DOTS);
+    replace = new BaseXCombo(gui, true).history(GUIOptions.REPLACED, gui.gopts);
+    replace.hint(Text.REPLACE_WITH + Text.DOTS);
 
     mcase = button("f_case", Text.MATCH_CASE);
     word = button("f_word", Text.WHOLE_WORD);

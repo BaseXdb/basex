@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.text.*;
 import java.util.concurrent.atomic.*;
 import java.util.regex.*;
@@ -78,8 +77,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   private final GUIMenu menu;
   /** Content panel, containing all views. */
   private final ViewContainer views;
-  /** History button. */
-  private final AbstractButton hist;
   /** Execution Button. */
   private final AbstractButton go;
   /** Execution Button. */
@@ -163,31 +160,11 @@ public final class GUI extends JFrame implements BaseXWindow {
     buttons.add(b, BorderLayout.EAST);
     if(this.gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
-    hist = BaseXButton.get("c_hist", INPUT_HISTORY, false, this);
-
     mode = new BaseXCombo(this, FIND, XQUERY, COMMAND);
     mode.setSelectedIndex(2);
 
     input = new GUIInput(this);
     input.mode(mode.getSelectedItem());
-
-    hist.addActionListener(e -> {
-      final JPopupMenu pop = new JPopupMenu();
-      final ActionListener al = ac -> {
-        input.setText(ac.getActionCommand());
-        input.requestFocusInWindow();
-        pop.setVisible(false);
-      };
-      final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-      final String[] hs = gopts.get(
-        i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS);
-      for(final String en : hs) {
-        final JMenuItem jmi = new JMenuItem(en);
-        jmi.addActionListener(al);
-        pop.add(jmi);
-      }
-      pop.show(hist, 0, hist.getHeight());
-    });
 
     mode.addActionListener(e -> {
       final int s = mode.getSelectedIndex();
@@ -198,8 +175,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       refreshControls();
     });
 
-    b = new BaseXBack(new BorderLayout(5, 0));
-    b.add(hist, BorderLayout.WEST);
+    b = new BaseXBack(new BorderLayout(4, 0));
     b.add(input, BorderLayout.CENTER);
 
     nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
@@ -657,11 +633,6 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     toolbar.refresh();
     menu.refresh();
-
-    final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-    final StringsOption options =
-        i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS;
-    hist.setEnabled(gopts.get(options).length != 0);
   }
 
   /**

@@ -1,6 +1,5 @@
 package org.basex.gui.layout;
 
-import org.basex.gui.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -16,8 +15,8 @@ public final class BaseXHistory {
   /** Maximum number of compact history. */
   public static final int MAXCOMPACT = 7;
 
-  /** GUI reference. */
-  private final GUI gui;
+  /** Options. */
+  private final Options options;
   /** History option. */
   private final StringsOption history;
   /** History index. */
@@ -25,25 +24,26 @@ public final class BaseXHistory {
 
   /**
    * Constructor.
-   * @param gui reference to the main window
    * @param history history values
+   * @param options options
    */
-  public BaseXHistory(final GUI gui, final StringsOption history) {
-    this.gui = gui;
+  public BaseXHistory(final StringsOption history, final Options options) {
+    this.options = options;
     this.history = history;
   }
 
   /**
-   * Stores the current history.
+   * Adds the specified value on top of history and stores the history in the options.
+   * Empty values will be ignored.
    * @param input new input
    */
   public void store(final String input) {
-    if(input == null) return;
+    if(input.isEmpty()) return;
     final StringList list = new StringList(MAX).add(input);
     for(final String value : values()) {
       if(list.size() < MAX && !input.equals(value)) list.add(value);
     }
-    gui.gopts.set(history, list.finish());
+    options.set(history, list.finish());
     index = 0;
   }
 
@@ -64,6 +64,6 @@ public final class BaseXHistory {
    * @return history values
    */
   public String[] values() {
-    return gui.gopts.get(history);
+    return options.get(history);
   }
 }

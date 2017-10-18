@@ -336,9 +336,10 @@ public final class EditorView extends View {
     for(final IOFile file : files) open(file);
 
     // initialize project root with path of first file
-    final IOFile f = fs.length == 0 ? files.isEmpty() ? null : files.get(0) : new IOFile(fs[0]);
-    if(f != null) project.changeRoot(f.parent(), false);
-
+    if(project.dir() == null) {
+      final IOFile f = fs.length == 0 ? files.isEmpty() ? null : files.get(0) : new IOFile(fs[0]);
+      if(f != null) project.rootPath(f.parent(), false);
+    }
     gui.setTitle();
   }
 

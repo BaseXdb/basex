@@ -11,7 +11,7 @@ import org.basex.gui.*;
 import org.basex.gui.listener.*;
 
 /**
- * Project specific Popup menu implementation.
+ * Project-specific Popup menu implementation.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen

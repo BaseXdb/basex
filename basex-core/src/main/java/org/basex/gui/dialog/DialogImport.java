@@ -12,8 +12,8 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.gui.layout.BaseXLayout.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -30,7 +30,7 @@ final class DialogImport extends BaseXBack {
   /** User feedback. */
   final BaseXLabel info;
   /** Resource to add. */
-  final BaseXTextField input;
+  final BaseXCombo input;
   /** Browse button. */
   final BaseXButton browse;
   /** Chosen parser. */
@@ -73,7 +73,9 @@ final class DialogImport extends BaseXBack {
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
-    input = new BaseXTextField(dialog, path).history(GUIOptions.INPUTS);
+    input = new BaseXCombo(dialog, true).history(GUIOptions.INPUTS, gui.gopts);
+    BaseXLayout.setWidth(input, BaseXTextField.DWIDTH);
+    input.setText(path);
 
     final IO io = IO.get(path);
     if(io instanceof IOFile && !path.isEmpty()) dbName = io.dbName();
@@ -137,20 +139,6 @@ final class DialogImport extends BaseXBack {
   }
 
   /**
-   * Returns an XML file chosen by the user.
-   * @return file chooser
-   */
-  private IOFile inputFile() {
-    final String path = gui.gopts.get(GUIOptions.INPUTPATH);
-    final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR, path);
-    fc.textFilters();
-    fc.filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
-    final IOFile file = fc.select(Mode.FDOPEN);
-    if(file != null) gui.gopts.set(GUIOptions.INPUTPATH, file.path());
-    return file;
-  }
-
-  /**
    * Updates the dialog window.
    * @param comp component
    * @param empty allow empty input
@@ -204,11 +192,16 @@ final class DialogImport extends BaseXBack {
    * and updates the panel.
    */
   private void choose() {
-    // get user input (may be canceled)
-    final IOFile in = inputFile();
-    if(in == null) return;
-    input.setText(in.path());
-    setType(in.path());
+    String path = input.getText();
+    final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR, path);
+    fc.textFilters().filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
+    final IOFile file = fc.select(Mode.FDOPEN);
+    if(file == null) return;
+
+    path = file.path();
+    gui.gopts.set(GUIOptions.INPUTPATH, path);
+    input.setText(path);
+    setType(path);
   }
 
   /**

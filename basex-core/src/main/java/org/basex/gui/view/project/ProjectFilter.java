@@ -20,9 +20,9 @@ import org.basex.io.*;
  */
 final class ProjectFilter extends BaseXBack {
   /** Files. */
-  private final BaseXTextField filesFilter;
+  private final BaseXCombo filesFilter;
   /** Contents. */
-  private final BaseXTextField contentsFilter;
+  private final BaseXCombo contentsFilter;
   /** Project view. */
   private final ProjectView view;
 
@@ -39,12 +39,10 @@ final class ProjectFilter extends BaseXBack {
     this.view = view;
 
     layout(new BorderLayout(0, 2));
-    filesFilter = new BaseXTextField(view.gui);
-    filesFilter.history(GUIOptions.PROJFILES, true);
+    filesFilter = new BaseXCombo(view.gui, true).history(GUIOptions.PROJFILES, view.gui.gopts);
     filesFilter.addFocusListener(view.lastfocus);
 
-    contentsFilter = new BaseXTextField(view.gui);
-    contentsFilter.history(GUIOptions.PROJCONTS, true);
+    contentsFilter = new BaseXCombo(view.gui, true).history(GUIOptions.PROJCONTS, view.gui.gopts);
     contentsFilter.hint(Text.FIND_CONTENTS + Text.DOTS);
     contentsFilter.addFocusListener(view.lastfocus);
 

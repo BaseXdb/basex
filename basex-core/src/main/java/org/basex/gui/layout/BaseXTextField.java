@@ -22,16 +22,11 @@ public class BaseXTextField extends JTextField {
   /** Default foreground color. */
   private static Color back;
 
-  /** Reference to parent window (of type {@link BaseXDialog} or {@link GUI}). */
-  private final BaseXWindow win;
-
   /** Options. */
   private Options options;
   /** Option. */
   private Option<?> option;
 
-  /** History. */
-  private BaseXHistory history;
   /** Hint. */
   private BaseXTextHint hint;
   /** Last input. */
@@ -93,8 +88,6 @@ public class BaseXTextField extends JTextField {
    * @param text input text (can be {@null})
    */
   public BaseXTextField(final BaseXWindow win, final String text) {
-    this.win = win;
-
     BaseXLayout.setWidth(this, DWIDTH);
     BaseXLayout.addInteraction(this, win);
     if(back == null) back = getBackground();
@@ -118,56 +111,6 @@ public class BaseXTextField extends JTextField {
   public void setFont(final Font f) {
     super.setFont(f);
     if(hint != null) hint.setFont(f);
-  }
-
-  /**
-   * Attaches a history and enables a listener for cursor down/up keys.
-   * @param strings option
-   * @return self reference
-   */
-  public final BaseXTextField history(final StringsOption strings) {
-    return history(strings, false);
-  }
-
-  /**
-   * Attaches a history and enables a listener for cursor down/up keys.
-   * @param strings option
-   * @param shift requires shift key
-   * @return self reference
-   */
-  public final BaseXTextField history(final StringsOption strings, final boolean shift) {
-    final GUI gui = win.gui();
-    history = new BaseXHistory(gui, strings);
-    addKeyListener((KeyPressedListener) e -> {
-      if(ENTER.is(e)) {
-        store();
-      } else if((NEXTLINE.is(e) || PREVLINE.is(e)) && (!shift || e.isShiftDown())) {
-        final String value = history.get(NEXTLINE.is(e));
-        if(value != null) {
-          setText(value);
-          final BaseXDialog dialog = win.dialog();
-          if(dialog != null) dialog.action(this);
-        }
-      }
-    });
-    return this;
-  }
-
-  /**
-   * Returns the input history.
-   * @return history
-   */
-  public final BaseXHistory history() {
-    return history;
-  }
-
-  /**
-   * Stores the current history.
-   */
-  public void store() {
-    if(history == null) return;
-    final String text = getText();
-    if(!text.isEmpty()) history.store(text);
   }
 
   /**
