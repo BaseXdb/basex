@@ -24,18 +24,16 @@ public final class HttpSendRequest extends StandardFunc {
 
     // get HTTP URI
     final byte[] href = exprs.length >= 2 ? toEmptyToken(exprs[1], qc) : null;
-    // get parameter $bodies
-    Iter iter = null;
+    // get payload
+    final ValueBuilder bodies = new ValueBuilder();;
     if(exprs.length == 3) {
-      final Iter bodies = qc.iter(exprs[2]);
-      final ValueBuilder cache = new ValueBuilder();
-      for(Item body; (body = bodies.next()) != null;) {
+      final Iter ir = qc.iter(exprs[2]);
+      for(Item body; (body = ir.next()) != null;) {
         qc.checkStop();
-        cache.add(body);
+        bodies.add(body);
       }
-      iter = cache.value().iter();
     }
     // send HTTP request
-    return new HttpClient(info, qc.context.options).sendRequest(href, request, iter);
+    return new HttpClient(info, qc.context.options).sendRequest(href, request, bodies.value());
   }
 }

@@ -22,6 +22,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -56,8 +57,7 @@ public class FnHttpTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(RESTURL, true);
     ctx = new Context();
   }
@@ -66,8 +66,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP PUT requests.
    * @throws Exception exception
    */
-  @Test
-  public void put() throws Exception {
+  @Test public void put() throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
@@ -80,8 +79,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP POST requests.
    * @throws Exception exception
    */
-  @Test
-  public void putPost() throws Exception {
+  @Test public void putPost() throws Exception {
     // PUT - query
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='put' status-only='true'>"
@@ -119,8 +117,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP GET requests.
    * @throws Exception exception
    */
-  @Test
-  public void postGet() throws Exception {
+  @Test public void get() throws Exception {
     // GET1 - just send a GET request
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
@@ -150,8 +147,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP DELETE requests.
    * @throws Exception exception
    */
-  @Test
-  public void postDelete() throws Exception {
+  @Test public void putDelete() throws Exception {
     // add document to be deleted
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='put'>"
@@ -165,14 +161,28 @@ public class FnHttpTest extends HTTPTest {
         "<http:request method='delete' status-only='true'/>", RESTURL), ctx)) {
       checkResponse(qp.value(), 1, HttpURLConnection.HTTP_OK);
     }
+
+    // DELETE (same resource, empty sequence as body, 404 expected)
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='delete'/>", RESTURL, "()") + "[1]/@status/data()", ctx)) {
+      assertEquals("404", qp.value().serialize().toString());
+    }
+
+    // DELETE (same resource, illegal body)
+    try {
+      new XQuery(_HTTP_SEND_REQUEST.args("<http:request method='delete'/>", RESTURL, "123")).
+        execute(ctx);
+      fail("Error expected");
+    } catch(final BaseXException ex) {
+      assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
+    }
   }
 
   /**
    * Test sending of HTTP request without any attributes - error shall be thrown
    * that mandatory attributes are missing.
    */
-  @Test
-  public void sendEmptyReq() {
+  @Test public void emptyReq() {
     try {
       new XQuery(_HTTP_SEND_REQUEST.args("<http:request/>")).execute(ctx);
       fail("Error expected");
@@ -184,8 +194,7 @@ public class FnHttpTest extends HTTPTest {
   /**
    * Tests http:send-request((),()).
    */
-  @Test
-  public void sendReqNoParams() {
+  @Test public void noParams() {
     final Command cmd = new XQuery(_HTTP_SEND_REQUEST.args("()"));
     try {
       cmd.execute(ctx);
@@ -199,8 +208,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests an erroneous query.
    * @throws Exception exception
    */
-  @Test
-  public void error() throws Exception {
+  @Test public void unknown() throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get'/>", RESTURL + "unknown") + "[1]/@status/data()", ctx)) {
       assertEquals("404", qp.value().serialize().toString());
@@ -208,12 +216,11 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests RequestParser.parse() with normal (not multipart) request.
+   * Parse normal request.
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  @Test
-  public void parseRequest() throws IOException, QueryException {
+  @Test public void parseRequest() throws IOException, QueryException {
     // Simple HTTP request with no errors
     final String req = "<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
@@ -224,7 +231,7 @@ public class FnHttpTest extends HTTPTest {
         + "</http:body>" + "</http:request>";
     final DBNode dbNode = new DBNode(new IOContent(req));
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode.children().next());
+    final HttpRequest r = rp.parse(dbNode.children().next(), Empty.SEQ);
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -233,12 +240,11 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests RequestParser.parse() with multipart request.
+   * Parse multipart request.
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  @Test
-  public void parseMultipartReq() throws IOException, QueryException {
+  @Test public void parseMultipartReq() throws IOException, QueryException {
     final String multiReq = "<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
@@ -256,7 +262,7 @@ public class FnHttpTest extends HTTPTest {
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next());
+    final HttpRequest r = rp.parse(dbNode1.children().next(), Empty.SEQ);
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -282,13 +288,11 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests parsing of multipart request when the contents for each part are set
-   * from the $bodies parameter.
+   * Parse multipart request when the contents for each part are set from the $bodies parameter.
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  @Test
-  public void parseMultipartReqBodies() throws IOException, QueryException {
+  @Test public void parseMultipartReqBodies() throws IOException, QueryException {
     final String multiReq = "<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
@@ -310,7 +314,7 @@ public class FnHttpTest extends HTTPTest {
     bodies.add(Str.get("Part3"));
 
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next(), bodies.value().iter());
+    final HttpRequest r = rp.parse(dbNode1.children().next(), bodies.value());
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -340,9 +344,7 @@ public class FnHttpTest extends HTTPTest {
    * <http:request/>, <http:body/> or <http:multipart/>.
    * @throws IOException I/O Exception
    */
-  @Test
-  public void errors() throws IOException {
-
+  @Test public void errors() throws IOException {
     // Incorrect requests
     final List<byte[]> falseReqs = new ArrayList<>();
 
@@ -409,7 +411,7 @@ public class FnHttpTest extends HTTPTest {
       final DBNode dbNode = new DBNode(new IOContent(falseReq));
       try {
         final HttpRequestParser rp = new HttpRequestParser(null);
-        rp.parse(dbNode.children().next());
+        rp.parse(dbNode.children().next(), Empty.SEQ);
         fail("Exception not thrown");
       } catch (final QueryException ex) {
         assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
@@ -422,8 +424,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests method setRequestContent of HttpClient.
    * @throws IOException I/O Exception
    */
-  @Test
-  public void writeMultipartMessage() throws IOException {
+  @Test public void writeMultipartMessage() throws IOException {
     final HttpRequest req = new HttpRequest();
     req.isMultipart = true;
     req.payloadAtts.put("media-type", "multipart/alternative");
@@ -466,8 +467,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests method setRequestContent of HttpClient.
    * @throws IOException I/O Exception
    */
-  @Test
-  public void writeMultipartBinary() throws IOException {
+  @Test public void writeMultipartBinary() throws IOException {
     final HttpRequest req = new HttpRequest();
     req.isMultipart = true;
     req.payloadAtts.put("media-type", "multipart/mixed");
@@ -494,8 +494,7 @@ public class FnHttpTest extends HTTPTest {
    * attributes media-type and method.
    * @throws IOException IO exception
    */
-  @Test
-  public void writeMessage() throws IOException {
+  @Test public void writeMessage() throws IOException {
     // Case 1: No method, media-type='text/xml'
     final HttpRequest req1 = new HttpRequest();
     final OutputStream out1 = fakeOutput();
@@ -538,8 +537,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing of body content when @method is raw and output is xs:base64Binary.
    * @throws IOException I/O Exception
    */
-  @Test
-  public void writeBase64() throws IOException {
+  @Test public void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
     final HttpRequest req1 = new HttpRequest();
     req1.payloadAtts.put("method", SerialMethod.BASEX.toString());
@@ -562,8 +560,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing of body content when @method is raw and output is xs:hexBinary.
    * @throws IOException I/O Exception
    */
-  @Test
-  public void writeHex() throws IOException {
+  @Test public void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
     final HttpRequest req1 = new HttpRequest();
     req1.payloadAtts.put("method", SerialMethod.BASEX.toString());
@@ -586,8 +583,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing of request content when @src is set.
    * @throws IOException I/O Exception
    */
-  @Test
-  public void writeFromResource() throws IOException {
+  @Test public void writeFromResource() throws IOException {
     // Create a file form which will be read
     final IOFile file = new IOFile(Prop.TMP, Util.className(FnHttpTest.class));
     file.write(token("test"));
@@ -612,8 +608,7 @@ public class FnHttpTest extends HTTPTest {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  @Test
-  public void responseWithCharset() throws IOException, QueryException {
+  @Test public void responseWithCharset() throws IOException, QueryException {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection();
     // Set content type
@@ -631,8 +626,7 @@ public class FnHttpTest extends HTTPTest {
    * @throws IOException I/O Exception
    * @throws Exception exception
    */
-  @Test
-  public void multipartResponse() throws Exception {
+  @Test public void multipartResponse() throws Exception {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection();
     final Map<String, List<String>> hdrs = new HashMap<>();
@@ -698,8 +692,7 @@ public class FnHttpTest extends HTTPTest {
    * @throws IOException I/O Exception
    * @throws Exception exception
    */
-  @Test
-  public void multipartRespPreamble() throws Exception {
+  @Test public void multipartRespPreamble() throws Exception {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection();
     final Map<String, List<String>> hdrs = new HashMap<>();
@@ -819,8 +812,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests nested multipart responses.
    * @throws Exception exception
    */
-  @Test
-  public void nestedMultipart() throws Exception {
+  @Test public void nestedMultipart() throws Exception {
     // Create fake HTTP connection
     final String boundary = "batchresponse_4c4c5223-efa7-4aba-9865-fb4cb102cfd2";
 

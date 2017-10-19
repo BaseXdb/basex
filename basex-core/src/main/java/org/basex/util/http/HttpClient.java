@@ -21,6 +21,7 @@ import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -53,11 +54,11 @@ public final class HttpClient {
    * Sends an HTTP request and returns the response.
    * @param href URL to send the request to
    * @param request request data
-   * @param bodies content items
+   * @param bodies request body
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public BasicIter<Item> sendRequest(final byte[] href, final ANode request, final Iter bodies)
+  public BasicIter<Item> sendRequest(final byte[] href, final ANode request, final Value bodies)
       throws QueryException {
 
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);
@@ -289,7 +290,7 @@ public final class HttpClient {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  private static void writePayload(final ItemList payload, final HashMap<String, String> atts,
+  private static void writePayload(final ItemList payload, final Map<String, String> atts,
       final OutputStream out) throws IOException {
 
     // choose serialization parameters
