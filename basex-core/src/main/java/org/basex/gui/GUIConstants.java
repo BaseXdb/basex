@@ -282,9 +282,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   /** Current font size. */
   public static int fontSize;
 
-  /** Standard line height. */
-  private static int height = -1;
-
   /** Character widths. */
   private static int[] fwidth;
   /** Monospace character widths. */
@@ -355,7 +352,7 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
     lfont = new Font(name, type, (int) (FONTSIZE * 1.5 + fontSize / 2.0));
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, (int) (height * 0.8));
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, FONTSIZE);
 
     dmwidth  = LABEL.getFontMetrics(dmfont).getWidths();
     fwidth  = LABEL.getFontMetrics(font).getWidths();
