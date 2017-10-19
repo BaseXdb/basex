@@ -81,10 +81,6 @@ public final class ProjectView extends BaseXPanel {
       });
     });
 
-    rootPath.addItemListener((ItemListener) e -> {
-      System.out.println("???");
-    });
-
     final AbstractButton browse = BaseXButton.get("c_editopen", OPEN, false, gui);
     browse.setToolTipText(CHOOSE_DIR + DOTS);
     browse.addActionListener(e -> chooseRoot());

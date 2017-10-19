@@ -70,8 +70,6 @@ public final class EditorView extends View {
   private final BaseXHeader header;
   /** Tabs. */
   private final BaseXTabs tabs;
-  /** Create tab. */
-  private final BaseXBack create;
 
   /** Query file that has last been evaluated. */
   private IOFile execFile;
@@ -99,7 +97,14 @@ public final class EditorView extends View {
     tabs.setFocusable(Prop.MAC);
     tabs.addDragDrop(false);
     tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-    create = addCreateTab();
+    tabs.addMouseListener((MouseClickedListener) e -> {
+      final int i = tabs.indexAtLocation(e.getX(), e.getY());
+      if(i != -1 && SwingUtilities.isLeftMouseButton(e)) {
+        final Component comp = tabs.getComponentAt(i);
+        if(comp instanceof EditorArea) close((EditorArea) comp);
+      }
+    });
+    addCreateTab();
 
     final SearchEditor center = new SearchEditor(gui, tabs, null);
     search = center.bar();
@@ -849,7 +854,7 @@ public final class EditorView extends View {
 
   /**
    * Returns the current editor.
-   * @return editor
+   * @return editor or {@code null}
    */
   public EditorArea getEditor() {
     final Component c = tabs.getSelectedComponent();
@@ -965,34 +970,25 @@ public final class EditorView extends View {
     final EditorArea edit = new EditorArea(this, newTabFile());
     edit.setFont(mfont);
 
-    final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0));
-    tab.setOpaque(false);
+    final BaseXBack tab = new BaseXBack(false).layout(new BorderLayout(10, 0));
     tab.add(edit.label, BorderLayout.CENTER);
-    tab.addMouseListener((MouseClickedListener) (e) -> {
-      if(SwingUtilities.isMiddleMouseButton(e)) close(edit);
-    });
 
     final AbstractButton close = tabButton("e_close", "e_close2");
     close.addActionListener(e -> close(edit));
     tab.add(close, BorderLayout.EAST);
 
-    int c = -1;
-    while(++c < tabs.getTabCount() && tabs.getTabComponentAt(c) != create);
-    tabs.add(edit, tab, c - 1);
+    tabs.add(edit, tab, tabs.getTabCount() - 1);
     return edit;
   }
 
   /**
    * Adds a tab for creating new tabs.
-   * @return create button
    */
-  private BaseXBack addCreateTab() {
-    final AbstractButton add = tabButton("e_new", "e_new2");
-    add.addActionListener(e -> refreshControls(addTab(), true));
-    final BaseXBack back = new BaseXBack();
-    tabs.add(back, add, 0);
+  private void addCreateTab() {
+    final AbstractButton tab = tabButton("e_new", "e_new2");
+    tab.addActionListener(e -> refreshControls(addTab(), true));
+    tabs.add(new BaseXBack(), tab, 0);
     tabs.setEnabledAt(0, false);
-    return back;
   }
 
   /**

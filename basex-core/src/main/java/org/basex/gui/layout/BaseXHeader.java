@@ -24,7 +24,7 @@ public final class BaseXHeader extends BaseXLabel {
    * Called when GUI design has changed.
    */
   public void refreshLayout() {
-    setBorder(new EmptyBorder(-4, 0, -LABEL.getFontMetrics(lfont).getLeading() / 2, 2));
+    setBorder(new EmptyBorder(-4, 0, -getFontMetrics(lfont).getLeading() / 2, 2));
     setFont(lfont);
   }
 }

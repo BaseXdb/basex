@@ -50,13 +50,6 @@ import org.basex.util.*;
  */
 public final class GUIConstants {
 
-  // DUMMY OBJECTS ================================================================================
-
-  /** Dummy textfield. */
-  public static final JTextField TEXTFIELD = new JTextField();
-  /** Dummy label, used for size calculations. */
-  public static final JLabel LABEL = new JLabel();
-
   // VIEW NAMES ===================================================================================
 
   /** Internal name of the Map View. */
@@ -184,12 +177,14 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
 
   // COLORS =======================================================================================
 
+  /** UI defaults. */
+  private static final UIDefaults DEFAULTS = UIManager.getDefaults();
   /** Background color. */
-  public static final Color BACK = new Color(TEXTFIELD.getBackground().getRGB());
+  public static final Color BACK = DEFAULTS.getColor("TextPane.background");
   /** Text color. */
-  public static final Color TEXT = new Color(TEXTFIELD.getForeground().getRGB());
+  public static final Color TEXT = DEFAULTS.getColor("TextPane.foreground");
   /** Panel color. */
-  public static final Color PANEL = new Color(LABEL.getBackground().getRGB());
+  public static final Color PANEL = DEFAULTS.getColor("Label.background");
 
   /** Dark theme. */
   public static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
@@ -282,6 +277,8 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   /** Current font size. */
   public static int fontSize;
 
+  /** Dummy component. */
+  private static final JLabel LABEL = new JLabel();
   /** Character widths. */
   private static int[] fwidth;
   /** Monospace character widths. */
