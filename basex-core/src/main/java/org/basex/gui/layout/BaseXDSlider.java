@@ -17,8 +17,6 @@ public final class BaseXDSlider extends BaseXPanel {
   public static final int LABELW = 300;
   /** Slider width. */
   private static final int ARROW = 17;
-  /** Label space (scaled). */
-  private static final int SLABELW = (int) (LABELW * scale);
 
   /** Minimum slider value. */
   public final double min;
@@ -201,10 +199,10 @@ public final class BaseXDSlider extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    final int w = getWidth() - SLABELW;
+    final int w = getWidth() - LABELW;
     final int h = getHeight();
     final int hc = h / 2;
-    final int s = (int) (4 * ascale);
+    final int s = 4;
 
     final boolean focus = hasFocus();
     g.setColor(BACK);
@@ -305,7 +303,7 @@ public final class BaseXDSlider extends BaseXPanel {
      * @param s slider reference
      */
     Range(final BaseXDSlider s) {
-      w = s.getWidth() - SLABELW - (ARROW << 1);
+      w = s.getWidth() - LABELW - (ARROW << 1);
       dist = s.encode(s.max - s.min);
       xs = (int) (s.encode(s.currMin - s.min) * w / dist);
       xe = (s.min == s.max ? w : (int) (s.encode(s.currMax - s.min) * w / dist)) + ARROW;

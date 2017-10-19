@@ -327,7 +327,6 @@ run_tests            = テスト実行
 save                 = 保存
 save_as              = 別名で保存
 save_before_execute  = ファイルを実行する前に保存する
-scale_gui            = スケール GUI
 select_all           = 全選択
 separator            = セパレータ
 serialization        = Serialization Parameters

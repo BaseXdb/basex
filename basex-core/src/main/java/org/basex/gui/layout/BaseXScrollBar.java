@@ -135,7 +135,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     int bh = ww - 2 + barPos;
     BaseXLayout.drawCell(g, 0, ww, bh, bh + barSize, false);
 
-    final int d = (int) (2 * GUIConstants.scale);
+    final int d = 2;
     bh += barSize / 2;
     g.setColor(GUIConstants.dgray);
     g.drawLine(5, bh, ww - 6, bh);

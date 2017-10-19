@@ -327,7 +327,6 @@ run_tests            = Jalankan pengujian
 save                 = Simpan
 save_as              = Simpan sebagai
 save_before_execute  = Simpan sebelum mengeksekusi berkas
-scale_gui            = Scale GUI
 select_all           = Pilih Semua
 separator            = Pemisah
 serialization        = Serialization Parameters

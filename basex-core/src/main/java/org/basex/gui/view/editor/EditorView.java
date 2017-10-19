@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.regex.*;
 
 import javax.swing.*;
+
 import org.basex.build.json.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
@@ -67,8 +68,10 @@ public final class EditorView extends View {
   private final BaseXSplit split;
   /** Header string. */
   private final BaseXHeader header;
-  /** Query area. */
+  /** Tabs. */
   private final BaseXTabs tabs;
+  /** Create tab. */
+  private final BaseXBack create;
 
   /** Query file that has last been evaluated. */
   private IOFile execFile;
@@ -96,7 +99,7 @@ public final class EditorView extends View {
     tabs.setFocusable(Prop.MAC);
     tabs.addDragDrop(false);
     tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-    addCreateTab();
+    create = addCreateTab();
 
     final SearchEditor center = new SearchEditor(gui, tabs, null);
     search = center.bar();
@@ -251,7 +254,7 @@ public final class EditorView extends View {
     header.refreshLayout();
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     search.refreshLayout();
-    final Font f = font.deriveFont((float) ((FONTSIZE * scale + fontSize) / 2));
+    final Font f = font.deriveFont((float) ((FONTSIZE + fontSize) / 2));
     info.setFont(f);
     pos.setFont(f);
     project.refreshLayout();
@@ -973,18 +976,23 @@ public final class EditorView extends View {
     close.addActionListener(e -> close(edit));
     tab.add(close, BorderLayout.EAST);
 
-    tabs.add(edit, tab, tabs.getComponentCount() - 4);
+    int c = -1;
+    while(++c < tabs.getTabCount() && tabs.getTabComponentAt(c) != create);
+    tabs.add(edit, tab, c - 1);
     return edit;
   }
 
   /**
    * Adds a tab for creating new tabs.
+   * @return create button
    */
-  private void addCreateTab() {
+  private BaseXBack addCreateTab() {
     final AbstractButton add = tabButton("e_new", "e_new2");
     add.addActionListener(e -> refreshControls(addTab(), true));
-    tabs.add(new BaseXBack(), add, 0);
+    final BaseXBack back = new BaseXBack();
+    tabs.add(back, add, 0);
     tabs.setEnabledAt(0, false);
+    return back;
   }
 
   /**

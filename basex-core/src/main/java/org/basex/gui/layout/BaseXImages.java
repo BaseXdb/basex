@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
-import java.awt.image.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -10,7 +9,6 @@ import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
-import org.basex.gui.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -81,36 +79,7 @@ public final class BaseXImages {
    * @return icon
    */
   public static ImageIcon icon(final String name) {
-    ImageIcon ii = ICONS.get(name);
-    if(ii != null) return ii;
-
-    Image img;
-    if(GUIConstants.scale > 1) {
-      // choose large image or none
-      final URL url = GUIConstants.large()
-          ? BaseXImages.class.getResource("/img/" + name + "_32.png") : null;
-
-      if(url == null) {
-        // resize low-res image if no hi-res image exists
-        img = get(url(name));
-        final int w = (int) (img.getWidth(null) * GUIConstants.scale);
-        final int h = (int) (img.getHeight(null) * GUIConstants.scale);
-        final BufferedImage tmp = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        final Graphics2D g2 = tmp.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2.drawImage(img, 0, 0, w, h, null);
-        g2.dispose();
-        img = tmp;
-      } else {
-        img = get(url);
-      }
-    } else {
-      img = get(name);
-    }
-    ii = new ImageIcon(img);
-    ICONS.put(name, ii);
-    return ii;
+    return ICONS.computeIfAbsent(name, n -> new ImageIcon(get(n)));
   }
 
   /**
@@ -161,8 +130,7 @@ public final class BaseXImages {
     if(type.isXQuery()) return XQUERY;
     if(path.contains(IO.BASEXSUFFIX)) return BASEX;
 
-    // only works with standard dpi (https://bugs.openjdk.java.net/browse/JDK-6817929)
-    if(Prop.WIN && !GUIConstants.large()) {
+    if(Prop.WIN) {
       // retrieve system icons (only supported on Windows)
       final int p = path.lastIndexOf(path, '.');
       final String suffix = p == -1 ? null : path.substring(p + 1);

@@ -1315,8 +1315,6 @@ public interface Text {
   /** Color schema information. */
   String BLUE = lang("blue");
 
-  /** Scale interface. */
-  String SCALE_GUI = lang("scale_gui");
   /** Show attributes. */
   String SHOW_ATTS = lang("show_atts");
   /** Algorithm. */

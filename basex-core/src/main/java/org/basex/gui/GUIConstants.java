@@ -50,14 +50,14 @@ import org.basex.util.*;
  */
 public final class GUIConstants {
 
-  // DUMMY OBJECTS ============================================================
+  // DUMMY OBJECTS ================================================================================
 
   /** Dummy textfield. */
   public static final JTextField TEXTFIELD = new JTextField();
   /** Dummy label, used for size calculations. */
   public static final JLabel LABEL = new JLabel();
 
-  // VIEW NAMES ===============================================================
+  // VIEW NAMES ===================================================================================
 
   /** Internal name of the Map View. */
   public static final String MAPVIEW = "map";
@@ -89,17 +89,17 @@ public final class GUIConstants {
     ' ' + MAPVIEW + ' ' + PLOTVIEW + ' ' + " - H " + TEXTVIEW + ' ' + INFOVIEW +
     ' ' + TABLEVIEW + ' ' + TREEVIEW + ' ' + EXPLOREVIEW + " - -";
 
-  // TOOLBAR ==================================================================
+  // TOOLBAR ======================================================================================
 
   /** Toolbar entries, containing the button commands. */
   static final GUIMenuCmd[] TOOLBAR = {
     C_CREATE, C_OPEN_MANAGE, C_INFO, C_CLOSE, null,
     C_GOHOME, C_GOBACK, C_GOUP, C_GOFORWARD, null,
-    C_SHOWEDITOR, C_SHOWRESULT, C_SHOWINFO, null, C_SHOWMAP, C_SHOWTREE,
-    C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE
+    C_SHOWEDITOR, C_SHOWRESULT, C_SHOWINFO, null,
+    C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE
   };
 
-  // MENUBARS =================================================================
+  // MENUBARS =====================================================================================
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
@@ -111,8 +111,7 @@ public final class GUIConstants {
    * {@link GUIPopupCmd#SEPARATOR} references serve as menu separators.
    */
   static final GUICommand[][] MENUITEMS = { {
-    C_CREATE, C_OPEN_MANAGE, SEPARATOR,
-    C_INFO, C_EXPORT, C_CLOSE, SEPARATOR,
+    C_CREATE, C_OPEN_MANAGE, SEPARATOR, C_INFO, C_EXPORT, C_CLOSE, SEPARATOR,
     Prop.MAC ? null : C_EXIT
   }, {
     C_EDITNEW, C_EDITOPEN, C_EDITREOPEN, C_EDITSAVE, C_EDITSAVEAS, C_EDITCLOSE, C_EDITCLOSEALL,
@@ -120,18 +119,15 @@ public final class GUIConstants {
     SEPARATOR, C_VARS, C_NEXTERROR, C_JUMPFILE
   }, {
     C_SHOWEDITOR, C_SHOWPROJECT, C_FILESEARCH, SEPARATOR,
-    C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
+C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     GUIMacOSX.nativeFullscreen() ? null : C_FULL
   }, {
-    C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
-    C_SHOWEXPLORE,
+    C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE,
   }, {
-    C_RTEXEC, C_RTFILTER, SEPARATOR,
-    C_COLOR, C_FONTS, Prop.MAC ? null : SEPARATOR,
+    C_RTEXEC, C_RTFILTER, SEPARATOR, C_COLOR, C_FONTS, Prop.MAC ? null : SEPARATOR,
     C_PACKAGES, Prop.MAC ? null : C_PREFS
   }, {
-    C_HELP, Prop.MAC ? null : SEPARATOR,
-    C_COMMUNITY, C_UPDATES, Prop.MAC ? null : SEPARATOR,
+    C_HELP, Prop.MAC ? null : SEPARATOR, C_COMMUNITY, C_UPDATES, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : C_ABOUT
   }};
 
@@ -140,7 +136,7 @@ public final class GUIConstants {
     C_GOBACK, C_FILTER, null, C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, null, C_COPYPATH
   };
 
-  // CURSORS ==================================================================
+  // CURSORS ======================================================================================
 
   /** Arrow cursor. */
   public static final Cursor CURSORARROW = new Cursor(Cursor.DEFAULT_CURSOR);
@@ -186,7 +182,7 @@ public final class GUIConstants {
     }
   }
 
-  // COLORS ===================================================================
+  // COLORS =======================================================================================
 
   /** Background color. */
   public static final Color BACK = new Color(TEXTFIELD.getBackground().getRGB());
@@ -257,17 +253,21 @@ public final class GUIConstants {
   /** Second mark color, custom alpha value. */
   public static Color colormark2A;
 
-  // FONTS ====================================================================
+  // ENCODING =====================================================================================
+
+  /** Available encodings. */
+  public static final String[] ENCODINGS;
+
+  // initialize encodings
+  static {
+    final SortedMap<String, Charset> cs = Charset.availableCharsets();
+    ENCODINGS = cs.keySet().toArray(new String[cs.size()]);
+  }
+
+  // FONTS ========================================================================================
 
   /** Standard font size (unscaled). */
   public static final int FONTSIZE = 13;
-
-  /** Standard line height. */
-  private static int height = -1;
-  /** Standard scale factor (>= 1). */
-  public static double scale;
-  /** Adapted scale factor. */
-  public static double ascale;
 
   /** Large font. */
   public static Font lfont;
@@ -282,6 +282,9 @@ public final class GUIConstants {
   /** Current font size. */
   public static int fontSize;
 
+  /** Standard line height. */
+  private static int height = -1;
+
   /** Character widths. */
   private static int[] fwidth;
   /** Monospace character widths. */
@@ -293,16 +296,7 @@ public final class GUIConstants {
   /** Default monospace font widths. */
   private static int[] dmwidth;
 
-  /** Available encodings. */
-  public static final String[] ENCODINGS;
-
-  // initialize encodings
-  static {
-    final SortedMap<String, Charset> cs = Charset.availableCharsets();
-    ENCODINGS = cs.keySet().toArray(new String[cs.size()]);
-  }
-
-  // KEYS =====================================================================
+  // KEYS =========================================================================================
 
   /** No modifier. */
   public static final int NO_MOD = 0;
@@ -323,14 +317,6 @@ public final class GUIConstants {
    * @param opts gui options
    */
   public static synchronized void init(final GUIOptions opts) {
-    if(height < 0) {
-      // initialize scaling only once
-      final int h = FONTSIZE + 3;
-      height = opts.get(GUIOptions.SCALE) ? LABEL.getFontMetrics(LABEL.getFont()).getHeight() : h;
-      scale = Math.max(1, (height - h) / 10.0d + 1);
-      ascale = 1 + (scale - 1) / 2;
-    }
-
     lgray = color(224, 224, 224);
     gray = color(160, 160, 160);
     dgray = color(64, 64, 64);
@@ -364,11 +350,11 @@ public final class GUIConstants {
     final String name = opts.get(GUIOptions.FONT);
     final int type = opts.get(GUIOptions.FONTTYPE);
 
-    fontSize = (int) (opts.get(GUIOptions.FONTSIZE) * scale);
+    fontSize = opts.get(GUIOptions.FONTSIZE);
     font  = new Font(name, type, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    lfont = new Font(name, type, (int) (FONTSIZE * ascale * 1.5 + fontSize / 2.0));
+    lfont = new Font(name, type, (int) (FONTSIZE * 1.5 + fontSize / 2.0));
     dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, (int) (height * 0.8));
 
     dmwidth  = LABEL.getFontMetrics(dmfont).getWidths();
@@ -376,14 +362,6 @@ public final class GUIConstants {
     lwidth  = LABEL.getFontMetrics(lfont).getWidths();
     mfwidth = LABEL.getFontMetrics(mfont).getWidths();
     bwidth  = LABEL.getFontMetrics(bfont).getWidths();
-  }
-
-  /**
-   * Indicates if images are to be scaled.
-   * @return result of check
-   */
-  public static boolean large() {
-    return height > FONTSIZE + 3;
   }
 
   /**

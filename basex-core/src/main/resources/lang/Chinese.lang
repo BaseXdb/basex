@@ -327,7 +327,6 @@ run_tests            = 执行测试
 save                 = 保存
 save_as              = 保存为
 save_before_execute  = 执行文件前先保存
-scale_gui            = Scale GUI
 select_all           = 选择全部
 separator            = 分隔符
 serialization        = Serialization Parameters

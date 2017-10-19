@@ -327,7 +327,6 @@ run_tests            = Esegui test
 save                 = Salva
 save_as              = Salva come
 save_before_execute  = Salva prima di eseguire il file
-scale_gui            = Scale GUI
 select_all           = Seleziona tutto
 separator            = Separatore
 serialization        = Serialization Parameters
