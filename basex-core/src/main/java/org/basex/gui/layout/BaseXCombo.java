@@ -89,12 +89,17 @@ public class BaseXCombo extends JComboBox<Object> {
     listener = (KeyPressedListener) e -> {
       if(ENTER.is(e)) {
         store();
-      } else if(e.isShiftDown() && (NEXTLINE.is(e) || PREVLINE.is(e))) {
-        final String value = history.get(NEXTLINE.is(e));
-        if(value != null) {
-          setText(value);
-          final BaseXDialog dialog = win.dialog();
-          if(dialog != null) dialog.action(this);
+      } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
+        if(e.isShiftDown()) {
+          final String value = history.get(NEXTLINE.is(e));
+          if(value != null) {
+            setText(value);
+            final BaseXDialog dialog = win.dialog();
+            if(dialog != null) dialog.action(this);
+          }
+        } else if(!isPopupVisible()) {
+          // do not open popup menu
+          e.consume();
         }
       }
     };
