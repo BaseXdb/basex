@@ -302,14 +302,13 @@ public final class StaticFuncs extends ExprInfo {
      */
     public TypedFunc newCall(final QNm nm, final Expr[] args, final StaticContext sc,
         final InputInfo ii) throws QueryException {
+
       final StaticFuncCall call = new StaticFuncCall(nm, args, sc, ii);
       calls.add(call);
 
-      if(func == null) {
-        // [LW] should be deferred until the actual types are known (i.e. compile time)
-        return new TypedFunc(call, new AnnList());
-      }
-      return new TypedFunc(call.init(func), func.anns);
+      // [LW] should be deferred until the actual types are known (i.e. compile time)
+      return func == null ? new TypedFunc(call, new AnnList()) :
+        new TypedFunc(call.init(func), func.anns);
     }
 
     /**

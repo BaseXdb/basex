@@ -46,8 +46,8 @@ final class JarParser {
 
         final QNm name = next.qname();
         // ignore namespace to improve compatibility
-        if(eq(JAR, name.local())) desc.jars.add(next.string());
-        else if(eq(CLASS, name.local())) desc.classes.add(next.string());
+        if(eq(E_JAR, name.local())) desc.jars.add(next.string());
+        else if(eq(E_CLASS, name.local())) desc.classes.add(next.string());
         // [CG] Packaging: add warning if unknown elements are encountered
       }
       if(desc.jars.isEmpty()) throw BXRE_JARDESC_X.get(info, NOJARS);

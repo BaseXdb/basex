@@ -25,11 +25,11 @@ public final class RepoList extends RepoFn {
   @Override
   public BasicNodeIter iter(final QueryContext qc) {
     final ANodeList list = new ANodeList();
-    for(final Pkg pkg : new RepoManager(qc.context).all()) {
+    for(final Pkg pkg : new RepoManager(qc.context).packages()) {
       final FElem elem = new FElem(PACKAGE);
       elem.add(NAME, pkg.name());
       elem.add(VERSION, pkg.version());
-      elem.add(TYPE, pkg.type());
+      elem.add(TYPE, pkg.type().toString());
       list.add(elem);
     }
     return list.iter();

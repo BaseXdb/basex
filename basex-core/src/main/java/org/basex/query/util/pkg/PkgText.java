@@ -20,24 +20,20 @@ public interface PkgText {
   /** Jar descriptor. */
   String JARDESC = Prop.PROJECT_NAME + IO.XMLSUFFIX;
 
-  /** EXPath type. */
-  String EXPATH = "EXPath";
-  /** Internal type. */
-  String INTERNAL = "Internal";
-  /** Content directory. */
+  /** EXPath content directory. */
   String CONTENT = "content";
 
   // <package/> root element
 
   /** Element package. */
-  byte[] PACKAGE = token("package");
+  byte[] E_PACKAGE = token("package");
 
   // <package/> children.
 
   /** Element dependency. */
-  byte[] DEPEND = token("dependency");
+  byte[] E_DEPENDENCY = token("dependency");
   /** Element xquery. */
-  byte[] XQUERY = token("xquery");
+  byte[] E_XQUERY = token("xquery");
 
   // <xquery/> children
 
@@ -49,9 +45,9 @@ public interface PkgText {
   // Jar descriptor children
 
   /** <jar/> element. */
-  byte[] JAR = token("jar");
+  byte[] E_JAR = token("jar");
   /** <class/> element. */
-  byte[] CLASS = token("class");
+  byte[] E_CLASS = token("class");
 
   // <package/> attributes
 

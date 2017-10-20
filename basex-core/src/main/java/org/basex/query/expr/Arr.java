@@ -128,7 +128,7 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Prints the array with the specified separator.
+   * Prints array entries with the specified separator.
    * @param sep separator
    * @return string representation
    */

@@ -103,7 +103,7 @@ public final class DialogPackages extends BaseXDialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      packages.setData(new RepoManager(ctx).list().finish());
+      packages.setData(new RepoManager(ctx).ids().finish());
       packages.requestFocusInWindow();
       refresh = false;
     }
@@ -118,8 +118,8 @@ public final class DialogPackages extends BaseXDialog {
       cmds.add(new RepoInstall(dialog.url(), null));
 
     } else if(cmp == install) {
-      final String pp = gui.gopts.get(GUIOptions.WORKPATH);
-      final BaseXFileChooser fc = new BaseXFileChooser(this, FILE_OR_DIR, pp);
+      final BaseXFileChooser fc = new BaseXFileChooser(this, FILE_OR_DIR,
+          gui.gopts.get(GUIOptions.WORKPATH));
       fc.filter(XML_ARCHIVES, IO.XARSUFFIX);
       fc.filter(JAVA_ARCHIVES, IO.JARSUFFIX);
       fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
@@ -132,17 +132,17 @@ public final class DialogPackages extends BaseXDialog {
     } else if(cmp == delete) {
       if(!BaseXDialog.confirm(gui, Util.info(DELETE_PACKAGES_X, pkgs.size()))) return;
       refresh = true;
-      for(final String p : pkgs) cmds.add(new RepoDelete(p, null));
+      for(final String pkg : pkgs) cmds.add(new RepoDelete(pkg, null));
 
     } else {
       final String key = packages.getValue();
-      for(final Pkg pkg : new RepoManager(ctx).all()) {
+      for(final Pkg pkg : new RepoManager(ctx).packages()) {
         if(pkg.id().equals(key)) {
           title.setText(key);
           name.setText(pkg.name());
           version.setText(pkg.version());
-          type.setText(pkg.type());
-          path.setText(pkg.dir());
+          type.setText(pkg.type().toString());
+          path.setText(pkg.path());
           break;
         }
       }

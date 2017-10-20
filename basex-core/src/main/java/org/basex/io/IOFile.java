@@ -19,9 +19,12 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
+  /** Ignore files starting with a dot. */
+  public static final FileFilter NO_HIDDEN = file -> !file.getName().startsWith(".");
   /** Pattern for valid file names. */
   private static final Pattern VALIDNAME =
       Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>|" : "") + "]+$");
+
   /** Absolute flag. */
   private final boolean absolute;
   /** File reference. */

@@ -190,11 +190,7 @@ public abstract class IO {
    * @return result of check
    */
   public final boolean hasSuffix(final String... suffixes) {
-    final int i = pth.lastIndexOf('.');
-    if(i == -1) return false;
-    final String suf = pth.substring(i).toLowerCase(Locale.ENGLISH);
-    for(final String z : suffixes) if(suf.equals(z)) return true;
-    return false;
+    return checkSuffix(pth, suffixes);
   }
 
   /**
@@ -334,5 +330,19 @@ public abstract class IO {
   @Override
   public String toString() {
     return pth;
+  }
+
+  /**
+   * Tests if the file suffix of a path matches the specified suffixes.
+   * @param path path
+   * @param suffixes suffixes to compare with
+   * @return result of check
+   */
+  public static final boolean checkSuffix(final String path, final String... suffixes) {
+    final int i = path.lastIndexOf('.');
+    if(i == -1) return false;
+    final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
+    for(final String z : suffixes) if(suf.equals(z)) return true;
+    return false;
   }
 }

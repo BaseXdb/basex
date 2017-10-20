@@ -21,6 +21,14 @@ final class PkgDep {
   String semverMax;
 
   /**
+   * Constructor.
+   * @param name name of package dependency
+   */
+  PkgDep(final String name) {
+    this.name = name;
+  }
+
+  /**
    * Returns the unique package name, suffixed by the specified version.
    * @param version version
    * @return unique name

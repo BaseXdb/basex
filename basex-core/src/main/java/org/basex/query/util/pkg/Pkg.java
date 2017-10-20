@@ -2,6 +2,8 @@ package org.basex.query.util.pkg;
 
 import java.util.*;
 
+import org.basex.io.*;
+
 /**
  * EXPath or internal package. Internal packages have no version.
  *
@@ -14,23 +16,38 @@ public final class Pkg {
   /** Package components. */
   final ArrayList<PkgComponent> comps = new ArrayList<>();
 
-  /** Package version ({@code null} if this is not an EXPath package). */
-  String version;
+  /** Package uri. */
+  final String name;
+
+  /** Path to package. */
+  private String path;
+  /** Package type. */
+  PkgType type = PkgType.EXPATH;
   /** Package short name. */
   String abbrev;
-  /** Package uri. */
-  String name;
   /** Version of packaging specification the package conforms to. */
   String spec;
-  /** Package directory. */
-  String dir;
+  /** Package version. */
+  String version = "";
 
   /**
-   * Indicates if this is an EXPath package.
-   * @return result of check
+   * Constructor.
+   * @param name name of package
    */
-  public boolean expath() {
-    return version != null;
+  public Pkg(final String name) {
+    this.name = name;
+  }
+
+  /**
+   * Sets the package path and updates the package type.
+   * @param pth path
+   * @return self reference
+   */
+  public Pkg path(final String pth) {
+    path = pth;
+    type = IO.checkSuffix(path, IO.XQSUFFIXES) ? PkgType.XQUERY :
+      IO.checkSuffix(path, IO.JARSUFFIX) ? PkgType.JAVA : PkgType.EXPATH;
+    return this;
   }
 
   /**
@@ -38,7 +55,7 @@ public final class Pkg {
    * @return id
    */
   public String id() {
-    return expath() ? (name + '-' + version) : name;
+    return type == PkgType.EXPATH ? (name + '-' + version) : name;
   }
 
   /**
@@ -66,11 +83,11 @@ public final class Pkg {
   }
 
   /**
-   * Returns the package directory.
+   * Returns the path to the package.
    * @return directory
    */
-  public String dir() {
-    return dir;
+  public String path() {
+    return path;
   }
 
   /**
@@ -78,15 +95,30 @@ public final class Pkg {
    * @return version ("{@code -}" if this is no EXPath type)
    */
   public String version() {
-    return expath() ? version : "-";
+    return type == PkgType.EXPATH ? version : "-";
   }
 
   /**
-   * Returns the package type (EXPath/internal).
+   * Returns the package type.
    * @return package type
    */
-  public String type() {
-    return expath() ? PkgText.EXPATH : PkgText.INTERNAL;
+  public PkgType type() {
+    return type;
+  }
+
+  /**
+   * Merges information of two packages.
+   * @param pkg package to merge
+   * @return reference to package with merged information
+   */
+  public Pkg merge(final Pkg pkg) {
+    if(IO.checkSuffix(pkg.path, IO.XQSUFFIXES) && IO.checkSuffix(path, IO.JARSUFFIX)) {
+      pkg.type = PkgType.COMBINED;
+      return pkg;
+    }
+    if(IO.checkSuffix(path, IO.XQSUFFIXES) && IO.checkSuffix(pkg.path, IO.JARSUFFIX))
+      type = PkgType.COMBINED;
+    return this;
   }
 
   /**

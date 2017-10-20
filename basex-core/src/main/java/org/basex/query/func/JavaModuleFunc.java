@@ -121,15 +121,15 @@ final class JavaModuleFunc extends JavaFunction {
   }
 
   @Override
-  public String toString() {
-    return name() + PAREN1 + toString(SEP) + PAREN2;
-  }
-
-  @Override
   public boolean has(final Flag f) {
     return f == Flag.NDT && method.getAnnotation(Deterministic.class) == null ||
       (f == Flag.CTX || f == Flag.POS) &&
       method.getAnnotation(FocusDependent.class) == null ||
       super.has(f);
+  }
+
+  @Override
+  public String toString() {
+    return name() + toString(SEP);
   }
 }

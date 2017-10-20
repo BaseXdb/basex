@@ -22,8 +22,8 @@ public final class EXPathRepo {
   private final HashMap<String, Pkg> pkgDict = new HashMap<>();
   /** Static options. */
   private final StaticOptions sopts;
-  /** Repository path; will be initialized when needed. */
-  private IOFile path;
+  /** Repository path (lazy instantiation). */
+  private IOFile repo;
 
   /**
    * Constructor.
@@ -38,7 +38,7 @@ public final class EXPathRepo {
    * @return self reference
    */
   public EXPathRepo reset() {
-    path = null;
+    repo = null;
     nsDict.clear();
     pkgDict.clear();
     return this;
@@ -49,7 +49,7 @@ public final class EXPathRepo {
    * @return dictionary
    */
   public IOFile path() {
-    return init().path;
+    return init().repo;
   }
 
   /**
@@ -70,11 +70,11 @@ public final class EXPathRepo {
 
   /**
    * Returns the path to the specified repository package.
-   * @param pkg package
+   * @param path package path
    * @return file reference
    */
-  IOFile path(final String pkg) {
-    return new IOFile(path(), pkg);
+  public IOFile path(final String path) {
+    return new IOFile(path(), path);
   }
 
   /**
@@ -113,11 +113,11 @@ public final class EXPathRepo {
    * @return self reference
    */
   private synchronized EXPathRepo init() {
-    if(path == null) {
-      path = new IOFile(sopts.get(StaticOptions.REPOPATH));
+    if(repo == null) {
+      repo = new IOFile(sopts.get(StaticOptions.REPOPATH));
       // ignore directories starting with dot (#1122)
-      for(final IOFile dir : path.children("^[^.].*")) {
-        if(dir.isDir()) readPkg(dir);
+      for(final IOFile path : repo.children(IOFile.NO_HIDDEN)) {
+        if(path.isDir()) readPkg(path);
       }
     }
     return this;
@@ -131,11 +131,8 @@ public final class EXPathRepo {
   private void readPkg(final IOFile dir) {
     final IOFile desc = new IOFile(dir, DESCRIPTOR);
     if(!desc.exists()) return;
-
     try {
-      final Pkg pkg = new PkgParser(null).parse(desc);
-      pkg.dir = dir.name();
-      addPkg(pkg);
+      addPkg(new PkgParser(null).parse(desc).path(dir.name()));
     } catch(final QueryException ex) {
       Util.errln(ex);
     }

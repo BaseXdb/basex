@@ -179,18 +179,18 @@ public final class ModuleLoader {
     // find package in package dictionary
     Pkg pkg = context.repo.pkgDict().get(id);
     if(pkg == null) throw BXRE_NOTINST_X.get(ii, id);
-    final IOFile pkgDir = context.repo.path(pkg.dir());
+    final IOFile pkgPath = context.repo.path(pkg.path());
 
     // parse package descriptor
-    final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
+    final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
     if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, id);
 
     pkg = new PkgParser(ii).parse(pkgDesc);
     // check if package contains a jar descriptor
-    final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
+    final IOFile jarDesc = new IOFile(pkgPath, PkgText.JARDESC);
     // choose module directory (support for both 2010 and 2012 specs)
-    IOFile modDir = new IOFile(pkgDir, PkgText.CONTENT);
-    if(!modDir.exists()) modDir = new IOFile(pkgDir, pkg.abbrev());
+    IOFile modDir = new IOFile(pkgPath, PkgText.CONTENT);
+    if(!modDir.exists()) modDir = new IOFile(pkgPath, pkg.abbrev());
 
     // add jars to classpath
     if(jarDesc.exists()) {
@@ -201,11 +201,11 @@ public final class ModuleLoader {
     // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
     if(!pkg.dep.isEmpty()) toLoad.add(id);
-    for(final PkgDep d : pkg.dep) {
-      if(d.name != null) {
+    for(final PkgDep dep : pkg.dep) {
+      if(dep.name != null) {
         // we consider only package dependencies here
-        final String depId = new PkgValidator(context.repo, ii).depPkg(d);
-        if(depId == null) throw BXRE_NOTINST_X.get(ii, d.name);
+        final String depId = new PkgValidator(context.repo, ii).depPkg(dep);
+        if(depId == null) throw BXRE_NOTINST_X.get(ii, dep.name);
         if(toLoad.contains(depId)) throw CIRCMODULE.get(ii);
         addRepo(depId, toLoad, loaded, ii, qp);
       }

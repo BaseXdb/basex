@@ -94,13 +94,13 @@ public final class PkgValidator {
     final int i = Prop.VERSION.indexOf(' ');
     final HashSet<String> versions = new HashSet<>();
     versions.add(i == -1 ? Prop.VERSION : Prop.VERSION.substring(0, i));
-    for(final PkgDep d : procs) {
-      if(!d.processor.toLowerCase(Locale.ENGLISH).equals(Prop.PROJECT_NAME)) {
+    for(final PkgDep dep : procs) {
+      if(!dep.processor.toLowerCase(Locale.ENGLISH).equals(Prop.PROJECT_NAME)) {
         supported = false;
         break;
       }
       // check if current version is acceptable for the dependency
-      supported = availVersion(d, versions) != null;
+      supported = availVersion(dep, versions) != null;
     }
     if(!supported) throw BXRE_VERSION.get(info);
   }
@@ -176,8 +176,7 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks if an XQuery component is already installed as part of another
-   * package.
+   * Checks if an XQuery component is already installed as part of another package.
    * @param comp component
    * @param name component's package
    * @return result
@@ -191,8 +190,8 @@ public final class PkgValidator {
     for(final String id : ids) {
       if(id != null && !name(id).equals(name)) {
         // installed package is a different one, not just a different version of the current one
-        final String pkgDir = repo.pkgDict().get(id).dir();
-        final IO pkgDesc = new IOFile(repo.path(pkgDir), DESCRIPTOR);
+        final String pkgPath = repo.pkgDict().get(id).path();
+        final IO pkgDesc = new IOFile(repo.path(pkgPath), DESCRIPTOR);
         final Pkg pkg = new PkgParser(info).parse(pkgDesc);
         for(final PkgComponent nextComp : pkg.comps) {
           if(nextComp.name().equals(comp.name())) return true;
