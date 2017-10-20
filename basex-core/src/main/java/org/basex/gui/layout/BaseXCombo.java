@@ -97,9 +97,6 @@ public class BaseXCombo extends JComboBox<Object> {
             final BaseXDialog dialog = win.dialog();
             if(dialog != null) dialog.action(this);
           }
-        } else if(!isPopupVisible()) {
-          // do not open popup menu
-          e.consume();
         }
       }
     };

@@ -99,7 +99,7 @@ public final class EditorView extends View {
     tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     tabs.addMouseListener((MouseClickedListener) e -> {
       final int i = tabs.indexAtLocation(e.getX(), e.getY());
-      if(i != -1 && SwingUtilities.isLeftMouseButton(e)) {
+      if(i != -1 && SwingUtilities.isMiddleMouseButton(e)) {
         final Component comp = tabs.getComponentAt(i);
         if(comp instanceof EditorArea) close((EditorArea) comp);
       }

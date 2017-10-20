@@ -43,9 +43,7 @@ final class ProjectList extends JList<String> {
       @Override public void execute() { view.refresh(); }
     }, null,
     new GUIPopupCmd(COPY_PATH, BaseXKeys.COPYPATH) {
-      @Override public void execute() {
-        BaseXLayout.copy(selectedValue());
-      }
+      @Override public void execute() { BaseXLayout.copy(selectedValue()); }
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }
   };

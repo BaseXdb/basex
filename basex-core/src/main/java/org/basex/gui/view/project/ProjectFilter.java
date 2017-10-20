@@ -49,32 +49,8 @@ final class ProjectFilter extends BaseXBack {
     add(filesFilter, BorderLayout.NORTH);
     add(contentsFilter, BorderLayout.CENTER);
 
-    final KeyAdapter keys = new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(!e.isShiftDown() && (BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e)) ||
-           BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
-          view.list.dispatchEvent(e);
-        } else {
-          for(final GUIPopupCmd cmd : view.list.commands) {
-            if(cmd == null) continue;
-            for(final BaseXKeys sc : cmd.shortcuts()) {
-              if(sc.is(e)) {
-                cmd.execute(view.gui);
-                e.consume();
-                return;
-              }
-            }
-          }
-        }
-      }
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        refresh(false);
-      }
-    };
-    filesFilter.addKeyListener(keys);
-    contentsFilter.addKeyListener(keys);
+    addKeyListener(filesFilter);
+    addKeyListener(contentsFilter);
     refreshLayout();
   }
 
@@ -149,5 +125,37 @@ final class ProjectFilter extends BaseXBack {
         view.list.setCursor(CURSORARROW);
       }
     }.execute();
+  }
+
+  /**
+   * Adds a key listener to the specified combo box.
+   * @param combo combo box
+   */
+  private void addKeyListener(final BaseXCombo combo) {
+    combo.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        if(combo.isPopupVisible()) return;
+        if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
+           BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
+          view.list.dispatchEvent(e);
+        } else {
+          for(final GUIPopupCmd cmd : view.list.commands) {
+            if(cmd == null) continue;
+            for(final BaseXKeys sc : cmd.shortcuts()) {
+              if(sc.is(e)) {
+                cmd.execute(view.gui);
+                e.consume();
+                return;
+              }
+            }
+          }
+        }
+      }
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        refresh(false);
+      }
+    });
   }
 }
