@@ -86,10 +86,12 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     editor = new SearchEditor(gui, area);
 
     // first assign values, then assign maximal width
-    cats = new BaseXCombo(gui, CATEGORIES);
-    BaseXLayout.setWidth(cats, (int) cats.getPreferredSize().getWidth());
-    cats.setItems(ALL);
-
+    cats = new BaseXCombo(gui, ALL);
+    String maxString = "";
+    for(final String c : CATEGORIES) {
+      if(c.length() > maxString.length()) maxString = c;
+    }
+    cats.setPrototypeDisplayValue(maxString);
     cats.addActionListener(ev -> {
       while(paint) Thread.yield();
 

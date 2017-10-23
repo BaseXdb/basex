@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
@@ -84,7 +85,7 @@ public class BaseXCombo extends JComboBox<Object> {
     history = new BaseXHistory(opt, options);
     setItems(opts.get(opt));
 
-    final JTextComponent comp = textComponent();
+    final JTextComponent comp = textField();
     comp.removeKeyListener(listener);
     listener = (KeyPressedListener) e -> {
       if(ENTER.is(e)) {
@@ -139,18 +140,19 @@ public class BaseXCombo extends JComboBox<Object> {
     this.win = win;
 
     setEditable(editable);
-    final JTextComponent text = textComponent();
-    BaseXLayout.addInteraction(text != null ? text : this, this, win);
+    setEditor(new BaseXEditor(win.gui()));
+
+    BaseXLayout.addInteraction(this, win);
 
     final BaseXDialog dialog = win.dialog();
     if(dialog == null) return;
 
     SwingUtilities.invokeLater(() -> {
-      if(text == null) {
+      final BaseXTextField tf = textField();
+      if(tf == null) {
         addActionListener(e -> dialog.action(BaseXCombo.this));
       } else {
-        text.addFocusListener((FocusGainedListener) e -> text.selectAll());
-        text.getDocument().addDocumentListener(new DocumentListener() {
+        tf.getDocument().addDocumentListener(new DocumentListener() {
           @Override
           public void removeUpdate(final DocumentEvent e) {
             dialog.action(BaseXCombo.this);
@@ -174,10 +176,10 @@ public class BaseXCombo extends JComboBox<Object> {
    * @return self reference
    */
   public BaseXCombo hint(final String label) {
-    final JTextComponent comp = textComponent();
-    if(comp != null) {
+    final BaseXTextField tf = textField();
+    if(tf != null) {
       if(hint == null) {
-        hint = new BaseXTextHint(label, comp);
+        hint = new BaseXTextHint(label, tf);
       } else {
         hint.setText(label);
       }
@@ -227,12 +229,11 @@ public class BaseXCombo extends JComboBox<Object> {
   }
 
   /**
-   * Returns the editor component, or {@code null} if the combobox is not editable.
-   * @return editor component
+   * Returns the editor text field, or {@code null} if the combobox is not editable.
+   * @return text field
    */
-  public JTextComponent textComponent() {
-    final Component text = isEditable() ? getEditor().getEditorComponent() : null;
-    return text instanceof JTextComponent ? (JTextComponent) text : null;
+  public BaseXTextField textField() {
+    return isEditable() ? (BaseXTextField) getEditor().getEditorComponent() : null;
   }
 
   @Override
@@ -253,37 +254,46 @@ public class BaseXCombo extends JComboBox<Object> {
     }
   }
 
+  /**
+   * Highlights the text field.
+   * @param hits  hits
+   */
+  public synchronized void highlight(final boolean hits) {
+    final BaseXTextField tf = textField();
+    (tf != null ? tf : this).setBackground(hits ? GUIConstants.BACK : GUIConstants.LRED);
+  }
+
   @Override
   public synchronized KeyListener[] getKeyListeners() {
-    final JTextComponent comp = textComponent();
-    return comp != null ? comp.getKeyListeners() : super.getKeyListeners();
+    final BaseXTextField tf = textField();
+    return tf != null ? tf.getKeyListeners() : super.getKeyListeners();
   }
 
   @Override
   public synchronized void addKeyListener(final KeyListener l) {
-    final JTextComponent comp = textComponent();
-    if(comp != null) comp.addKeyListener(l);
+    final BaseXTextField tf = textField();
+    if(tf != null) tf.addKeyListener(l);
     else super.addKeyListener(l);
   }
 
   @Override
   public synchronized void removeKeyListener(final KeyListener l) {
-    final JTextComponent comp = textComponent();
-    if(comp != null) comp.removeKeyListener(l);
+    final BaseXTextField tf = textField();
+    if(tf != null) tf.removeKeyListener(l);
     super.removeKeyListener(l);
   }
 
   @Override
   public synchronized void addFocusListener(final FocusListener l) {
-    final JTextComponent comp = textComponent();
-    if(comp != null) comp.addFocusListener(l);
+    final BaseXTextField tf = textField();
+    if(tf != null) tf.addFocusListener(l);
     else super.addFocusListener(l);
   }
 
   @Override
   public synchronized void removeFocusListener(final FocusListener l) {
-    final JTextComponent comp = textComponent();
-    if(comp != null) comp.removeFocusListener(l);
+    final BaseXTextField tf = textField();
+    if(tf != null) tf.removeFocusListener(l);
     super.removeFocusListener(l);
   }
 
@@ -303,6 +313,50 @@ public class BaseXCombo extends JComboBox<Object> {
       store();
     } else {
       throw Util.notExpected("Option type not supported: " + option);
+    }
+  }
+
+  /**
+   * Combo box editor.
+   *
+   * @author BaseX Team 2005-17, BSD License
+   * @author Christian Gruen
+   */
+  class BaseXEditor implements ComboBoxEditor {
+    /** Text field. */
+    private BaseXTextField tf;
+
+    /**
+     * Constructor.
+     * @param gui gui
+     */
+    BaseXEditor(final GUI gui) {
+      tf = new BaseXTextField(gui);
+      tf.setBorder(new EmptyBorder(0, 4, 0, 0));
+    }
+    @Override
+    public Component getEditorComponent() {
+      return tf;
+    }
+    @Override
+    public void setItem(final Object text) {
+      if(text != null) tf.setText(text.toString());
+    }
+    @Override
+    public String getItem() {
+      return tf.getText();
+    }
+    @Override
+    public void selectAll() {
+      tf.selectAll();
+    }
+    @Override
+    public void addActionListener(final ActionListener l) {
+      tf.addActionListener(l);
+    }
+    @Override
+    public void removeActionListener(final ActionListener l) {
+      tf.removeActionListener(l);
     }
   }
 }

@@ -199,7 +199,7 @@ public final class GUIInput extends BaseXCombo {
       sl = ex.suggest();
       pre = query.substring(0, ex.column() - 1);
     }
-    if(textComponent().getCaretPosition() < pre.length()) sl = null;
+    if(textField().getCaretPosition() < pre.length()) sl = null;
     createCombo(sl);
   }
 

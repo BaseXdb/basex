@@ -237,18 +237,6 @@ public final class BaseXLayout {
    * @param win parent window
    */
   public static void addInteraction(final Component comp, final BaseXWindow win) {
-    addInteraction(comp, null, win);
-  }
-
-  /**
-   * Adds default listeners to the specified component.
-   * @param comp component
-   * @param parent parent component (can be {@code null})
-   * @param win parent window
-   */
-  public static void addInteraction(final Component comp, final Component parent,
-      final BaseXWindow win) {
-
     comp.addMouseListener((MouseEnteredListener) (e) -> focus(comp));
 
     // check if component is a dialog
@@ -259,8 +247,7 @@ public final class BaseXLayout {
     } else {
       // yes: add default keys
       comp.addKeyListener((KeyPressedListener) e -> {
-        final BaseXCombo combo = comp instanceof BaseXCombo ? (BaseXCombo) comp :
-          parent instanceof BaseXCombo ? (BaseXCombo) parent : null;
+        final BaseXCombo combo = comp instanceof BaseXCombo ? (BaseXCombo) comp : null;
         if(combo != null && combo.isPopupVisible()) return;
 
         // do not key close dialog if button or editor is focused

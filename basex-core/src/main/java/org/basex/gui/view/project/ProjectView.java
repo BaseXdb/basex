@@ -74,7 +74,7 @@ public final class ProjectView extends BaseXPanel {
     rootPath = new BaseXCombo(gui, true).history(GUIOptions.PROJECTS, gui.gopts);
     rootPath.setFocusable(false);
     SwingUtilities.invokeLater(() -> {
-      rootPath.textComponent().getDocument().addDocumentListener(new DocumentListener() {
+      rootPath.textField().getDocument().addDocumentListener(new DocumentListener() {
         @Override public void changedUpdate(final DocumentEvent e) { changeRoot(true); }
         @Override public void insertUpdate(final DocumentEvent e) { changeRoot(true); }
         @Override public void removeUpdate(final DocumentEvent e) { changeRoot(true); }
