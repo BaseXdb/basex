@@ -322,7 +322,7 @@ public class BaseXCombo extends JComboBox<Object> {
    * @author BaseX Team 2005-17, BSD License
    * @author Christian Gruen
    */
-  class BaseXEditor implements ComboBoxEditor {
+  static class BaseXEditor implements ComboBoxEditor {
     /** Text field. */
     private BaseXTextField tf;
 
