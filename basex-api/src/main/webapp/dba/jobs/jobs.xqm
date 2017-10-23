@@ -53,7 +53,10 @@ function dba:jobs(
             let $curr := jobs:current()
             for $details in jobs:list-details()
             let $id := $details/@id
-            let $sec := xs:dayTimeDuration($details/@duration) div xs:dayTimeDuration('PT1S')
+            let $sec := (
+              let $dur := xs:dayTimeDuration($details/@duration)
+              return if(exists($dur)) then $dur div xs:dayTimeDuration('PT1S') else 0
+            )
             let $you := if($id = $curr) then '✓' else '–'
             let $start := string($details/@start)
             let $end := string($details/@end)

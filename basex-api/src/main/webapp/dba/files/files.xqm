@@ -76,10 +76,10 @@ function dba:files(
           let $rows := (
             let $jobs := jobs:list-details()
             let $parent := if(file:parent($dir)) then ($dir || '..') else ()
-            let $files := ($parent, file:children($dir))
-            for $file in ($files[file:is-dir(.)], $files[file:is-file(.)])
+            for $file in ($parent, file:children($dir))
             let $dir := file:is-dir($file)
             let $name := file:name($file)
+            order by $dir descending, $name != '..', $name collation '?lang=en'
             let $actions := util:item-join((
               if($dir) then () else html:link('Download', 'file/' || encode-for-uri($name)),
               if($dir or not(ends-with($name, '.xq') or ends-with($name, '.xqm'))) then () else (

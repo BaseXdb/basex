@@ -25,21 +25,21 @@ function dba:file-upload(
 ) as element(rest:response) {
   cons:check(),
 
-  try {
-    (: parse all XQuery files; reject files that cannot be parsed :)
+  (: save files :)
+  let $dir := cons:current-dir()
+  return try {
+    (: Parse all XQuery files; reject files that cannot be parsed :)
     map:for-each($files, function($file, $content) {
       if(matches($file, '\.xqm?$')) then (
-        prof:void(xquery:parse(convert:binary-to-string($content), map { 'plan': false() }))
+        prof:void(xquery:parse(
+          convert:binary-to-string($content),
+          map { 'plan': false(), 'pass': true(), 'base-uri': $dir || $file }
+        ))
       ) else ()
     }),
-
-    (: save files :)
-    let $dir := cons:current-dir()
-    return (
-      map:for-each($files, function($file, $content) {
-        file:write-binary($dir || file:name($file), $content)
-      })
-    ),
+    map:for-each($files, function($file, $content) {
+      file:write-binary($dir || $file, $content)
+    }),
     web:redirect($dba:CAT, map { 'info': util:info(map:keys($files), 'file', 'uploaded') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': 'Upload failed: ' || $err:description })
