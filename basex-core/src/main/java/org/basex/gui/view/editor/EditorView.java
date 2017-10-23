@@ -578,13 +578,16 @@ public final class EditorView extends View {
    * @throws IOException I/O exception
    */
   private byte[] read(final IOFile file) throws IOException {
-    // open as UTF-8
     try {
+      // try to open as validated UTF-8 document
       return new NewlineInput(file).validate(true).content();
     } catch(final InputException ex) {
+      // error...
       Util.debug(ex);
       final String button = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
-      if(button == null) return null;
+      // open binary as text; do not validate
+      if(button == B_NO) return new NewlineInput(file).content();
+      // open external application
       if(button == B_YES) {
         try {
           file.open();
@@ -592,10 +595,9 @@ public final class EditorView extends View {
           Util.debug(ioex);
           Desktop.getDesktop().open(file.file());
         }
-        return null;
       }
-      // open binary as text; do not validate
-      return new NewlineInput(file).content();
+      // return nothing (also applies if dialog is canceled)
+      return null;
     }
   }
 
