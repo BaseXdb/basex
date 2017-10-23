@@ -578,33 +578,24 @@ public final class EditorView extends View {
    * @throws IOException I/O exception
    */
   private byte[] read(final IOFile file) throws IOException {
-    // check content
-    final TokenBuilder text = new TokenBuilder((int) Math.min(Integer.MAX_VALUE, file.length()));
-    try(TextInput ti = new NewlineInput(file).validate(true)) {
-      boolean valid = true;
-      while(true) {
+    // open as UTF-8
+    try {
+      return new NewlineInput(file).validate(true).content();
+    } catch(final InputException ex) {
+      Util.debug(ex);
+      final String button = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
+      if(button == null) return null;
+      if(button == B_YES) {
         try {
-          final int cp = ti.read();
-          if(cp == -1) return text.finish();
-          text.add(cp);
-        } catch(final InputException ex) {
-          Util.debug(ex);
-          if(valid) {
-            valid = false;
-            final String button = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
-            if(button == null) return null;
-            if(button == B_YES) {
-              try {
-                file.open();
-              } catch(final IOException ioex) {
-                Util.debug(ioex);
-                Desktop.getDesktop().open(file.file());
-              }
-              return null;
-            }
-          }
+          file.open();
+        } catch(final IOException ioex) {
+          Util.debug(ioex);
+          Desktop.getDesktop().open(file.file());
         }
+        return null;
       }
+      // open binary as text; do not validate
+      return new NewlineInput(file).content();
     }
   }
 
