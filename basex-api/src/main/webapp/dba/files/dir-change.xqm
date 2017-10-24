@@ -6,7 +6,6 @@
 module namespace dba = 'dba/files';
 
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
