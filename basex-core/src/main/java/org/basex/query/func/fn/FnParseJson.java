@@ -60,7 +60,7 @@ public class FnParseJson extends Parse {
       final JsonConverter conv = JsonConverter.get(opts);
       if(!esc && fallback != null) conv.fallback(string -> {
         try {
-          return Token.string(fallback.invokeItem(qc, ii, Str.get(string)).string(ii));
+          return Token.string(fallback.invokeItem(qc, info, Str.get(string)).string(ii));
         } catch(final QueryException ex) {
           throw new QueryRTException(ex);
         }

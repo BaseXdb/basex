@@ -30,9 +30,15 @@ abstract class Format extends StandardFunc {
 
     final Item it = exprs[0].atomItem(qc, info);
     final byte[] pic = toEmptyToken(exprs[1], qc);
-    final byte[] lng = el == 5 ? toEmptyToken(exprs[2], qc) : EMPTY;
-    final byte[] cal = el == 5 ? toEmptyToken(exprs[3], qc) : EMPTY;
-    final byte[] plc = el == 5 ? toEmptyToken(exprs[4], qc) : EMPTY;
+
+    final boolean ext = el == 5;
+    final byte[] lng = ext ? toEmptyToken(exprs[2], qc) : EMPTY;
+    byte[] cal = null;
+    if(ext) {
+      cal = toTokenOrNull(exprs[3], qc);
+      if(cal != null) cal = trim(cal);
+    }
+    final byte[] plc = ext ? toEmptyToken(exprs[4], qc) : EMPTY;
     if(it == null) return null;
 
     final ADate date = (ADate) checkType(it, tp);
@@ -41,7 +47,7 @@ abstract class Format extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     return optFirst();
   }
 }

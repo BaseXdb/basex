@@ -10,7 +10,6 @@ import org.basex.core.*;
 import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -86,7 +85,7 @@ final class QT3Env {
         "return QName(if($b) then namespace-uri-for-prefix($b, .) else '', $n)",
         ctx).context(it).value();
       final HashMap<String, String> hm = new HashMap<>();
-      final QNm qnm = it1.size() != 0 ? (QNm) it1.internal() : new QNm(Token.EMPTY);
+      final QNm qnm = it1.size() != 0 ? (QNm) it1.internal() : QNm.EMPTY;
       decFormats.put(qnm.toJava(), hm);
       for(final XdmItem it2 : new XQuery("@*[name() != 'name']", ctx).context(it)) {
         hm.put(it2.getName().getLocalPart(), it2.getString());

@@ -166,30 +166,15 @@ public abstract class StandardFunc extends Arr {
     return !has(Flag.UPD) && seqType.zero();
   }
 
-  @Override
-  public final String description() {
-    return sig.toString();
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, sig.desc), exprs);
-  }
-
-  @Override
-  public final String toString() {
-    return new TokenBuilder(sig.id()).add('(').addSep(exprs, SEP).add(')').toString();
-  }
-
   /**
    * Returns the specified argument, or the context value if it does not exist.
-   * @param index argument index
+   * @param i index of argument
    * @param qc query context
    * @return expression
    * @throws QueryException query exception
    */
-  protected final Expr ctxArg(final int index, final QueryContext qc) throws QueryException {
-    return exprs.length == index ? ctxValue(qc) : exprs[index];
+  protected final Expr ctxArg(final int i, final QueryContext qc) throws QueryException {
+    return exprs.length == i ? ctxValue(qc) : exprs[i];
   }
 
   /**
@@ -206,7 +191,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Checks if the specified collation is supported.
-   * @param i argument index
+   * @param i index of argument
    * @param qc query context
    * @return collator or {@code null} (default collation)
    * @throws QueryException query exception
@@ -218,7 +203,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Converts the specified argument to a file path.
-   * @param i argument index
+   * @param i index of argument
    * @param qc query context
    * @return file instance
    * @throws QueryException query exception
@@ -273,7 +258,7 @@ public abstract class StandardFunc extends Arr {
    * @param i index of encoding argument
    * @param err error for invalid encoding
    * @param qc query context
-   * @return text entry
+   * @return string or {@code null}
    * @throws QueryException query exception
    */
   protected final String toEncoding(final int i, final QueryError err, final QueryContext qc)
@@ -290,9 +275,25 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Returns the expression at the specified index as node or atomized item.
+   * Returns the item or throws an exception.
+   * @param i index of argument
+   * @param qc query context
+   * @return node, atomized item, or {@code null}
+   * @throws QueryException query exception
+   */
+  protected final Item toNodeOrAtomItem(final int i, final QueryContext qc)
+      throws QueryException {
+
+    if(i >= exprs.length) return null;
+    final Item it = toItem(exprs[i], qc);
+    return it instanceof ANode ? it : it.atomItem(info);
+  }
+
+  /**
    * Parses the options at the specified index.
    * @param <E> options type
-   * @param i index of options argument
+   * @param i index of argument
    * @param opts options
    * @param qc query context
    * @return passed on options
@@ -424,5 +425,20 @@ public abstract class StandardFunc extends Arr {
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof StandardFunc && sig == ((StandardFunc) obj).sig &&
         super.equals(obj);
+  }
+
+  @Override
+  public final String description() {
+    return sig.toString();
+  }
+
+  @Override
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, sig.desc), exprs);
+  }
+
+  @Override
+  public final String toString() {
+    return new TokenBuilder(sig.id()).add('(').addSep(exprs, SEP).add(')').toString();
   }
 }

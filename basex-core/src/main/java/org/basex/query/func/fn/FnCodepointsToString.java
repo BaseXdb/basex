@@ -23,7 +23,7 @@ public final class FnCodepointsToString extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // input is single integer
-    if(singleInt) return toStr(exprs[0].item(qc, ii).itr(ii), info);
+    if(singleInt) return toStr(exprs[0].item(qc, info).itr(ii), info);
 
     // current input is single item
     final Iter iter = exprs[0].atomIter(qc, info);

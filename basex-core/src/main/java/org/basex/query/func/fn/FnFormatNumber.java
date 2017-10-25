@@ -27,10 +27,19 @@ public final class FnFormatNumber extends StandardFunc {
     // retrieve picture
     final byte[] pic = toToken(exprs[1], qc);
     // retrieve format declaration
-    final QNm frm = exprs.length == 3 ? new QNm(trim(toEmptyToken(exprs[2], qc)), sc) :
-      new QNm(EMPTY);
-    final DecFormatter df = sc.decFormat(frm.id());
-    if(df == null) throw FORMNUM_X.get(info, frm.prefixId(XML));
+    QNm form = QNm.EMPTY;
+    if(exprs.length == 3) {
+      byte[] qnm = toTokenOrNull(exprs[2], qc);
+      if(qnm != null) {
+        try {
+          form = QNm.resolve(trim(qnm), sc);
+        } catch(final QueryException ex) {
+          throw FORMNUM_X.get(info, qnm);
+        }
+      }
+    }
+    final DecFormatter df = sc.decFormat(form.id());
+    if(df == null) throw FORMNUM_X.get(info, form.prefixId(XML));
 
     return Str.get(df.format(info, (ANum) it, pic));
   }

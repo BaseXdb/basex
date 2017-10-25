@@ -20,7 +20,7 @@ public final class ProcModuleTest extends AdvancedQueryTest {
   @Test
   public void system() {
     query(_PROC_SYSTEM.args("java", "-version"), "");
-    error(_PROC_SYSTEM.args("java", "-version", "xx"), BXPR_ENC_X);
+    error(_PROC_SYSTEM.args("java", "-version", " map {'encoding': 'xx'}"), BXPR_ENC_X);
     query("try { " + _PROC_SYSTEM.args("a b c") + "} catch BXPR9999 {}", "");
   }
 

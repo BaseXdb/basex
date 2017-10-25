@@ -162,7 +162,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     try {
       final int al = args.length;
       for(int a = 0; a < al; a++) qc.set(args[a], arg[a]);
-      return expr.item(qc, ii);
+      return expr.item(qc, info);
     } finally {
       qf.value = cv;
     }
@@ -194,7 +194,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... arg)
       throws QueryException {
-    return FuncCall.item(this, arg, qc, ii);
+    return FuncCall.item(this, arg, qc, info);
   }
 
   /**

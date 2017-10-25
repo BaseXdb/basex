@@ -26,8 +26,7 @@ public final class FnError extends StandardFunc {
     QNm name = toQNm(exprs[0], qc, true);
     if(name == null) name = FUNERR1.qname();
 
-    String msg = FUNERR1.desc;
-    if(al > 1) msg = Token.string(toEmptyToken(exprs[1], qc));
+    String msg = al > 1 ? Token.string(toToken(exprs[1], qc)) : FUNERR1.desc;
     final Value val = al > 2 ? qc.value(exprs[2]) : null;
     throw new QueryException(info, name, msg).value(val);
   }

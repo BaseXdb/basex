@@ -25,8 +25,8 @@ public final class FnPut extends StandardFunc {
     checkCreate(qc);
     final ANode nd = toNode(exprs[0], qc);
     final byte[] file = toEmptyToken(exprs[1], qc);
-    final Item it = exprs.length > 2 ? exprs[2].item(qc, info) : null;
-    final SerializerOptions sopts = FuncOptions.serializer(it, info);
+    final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : null;
+    final SerializerOptions sopts = FuncOptions.serializer(so, info);
 
     if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE_X.get(info, exprs[0]);
 

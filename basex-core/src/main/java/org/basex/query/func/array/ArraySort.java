@@ -27,19 +27,20 @@ public final class ArraySort extends StandardFunc {
     final Array array = toArray(exprs[0], qc);
     Collation coll = sc.collation;
     if(exprs.length > 1) {
-      final byte[] token = toEmptyToken(exprs[1], qc);
-      if(token.length > 0) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
+      final byte[] tok = toTokenOrNull(exprs[1], qc);
+      if(tok != null) coll = Collation.get(tok, qc, sc, info, WHICHCOLL_X);
     }
 
     final long sz = array.arraySize();
     final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
-    final ArrayBuilder builder = new ArrayBuilder();
     if(exprs.length > 2) {
       final FItem key = checkArity(exprs[2], 1, qc);
       for(final Value value : array.members()) vl.add(key.invokeValue(qc, info, value));
     } else {
       for(final Value value : array.members()) vl.add(value.atomValue(info));
     }
+
+    final ArrayBuilder builder = new ArrayBuilder();
     for(final int order : FnSort.sort(vl, this, coll)) builder.append(array.get(order));
     return builder.freeze();
   }

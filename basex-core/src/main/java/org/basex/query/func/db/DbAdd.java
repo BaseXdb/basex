@@ -21,7 +21,7 @@ public final class DbAdd extends DbNew {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
     final byte[] path = exprs.length < 3 ? EMPTY : token(path(2, qc));
-    final NewInput input = checkInput(toNodeOrAtomItem(exprs[1], qc), path);
+    final NewInput input = checkInput(toNodeOrAtomItem(1, qc), path);
     final Options opts = toOptions(3, new Options(), qc);
     qc.updates().add(new DBAdd(data, input, opts, false, qc, info), qc);
     return null;

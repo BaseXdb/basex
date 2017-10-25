@@ -21,7 +21,7 @@ public final class CryptoGenerateSignature extends StandardFunc {
     Item arg6 = null;
     boolean arg6Str = false;
     if(exprs.length > 6) {
-      arg6 = toNodeOrAtomItem(exprs[6], qc);
+      arg6 = toNodeOrAtomItem(6, qc);
       if(!(arg6 instanceof ANode)) {
         if(!arg6.type.isStringOrUntyped()) throw STRNOD_X_X.get(info, arg6.type, arg6);
         arg6Str = true;

@@ -26,8 +26,8 @@ public final class FnSort extends StandardFunc {
     final Value value = qc.value(exprs[0]);
     Collation coll = sc.collation;
     if(exprs.length > 1) {
-      final byte[] token = toEmptyToken(exprs[1], qc);
-      if(token.length > 0) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
+      final byte[] tok = toTokenOrNull(exprs[1], qc);
+      if(tok != null) coll = Collation.get(tok, qc, sc, info, WHICHCOLL_X);
     }
 
     final long sz = value.size();

@@ -13,7 +13,6 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -43,8 +42,7 @@ public class XsltTransform extends XsltFn {
    */
   final byte[] transform(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    final IO in = read(exprs[0], qc);
-    final IO xsl = read(exprs[1], qc);
+    final IO in = read(0, qc), xsl = read(1, qc);
     final Options opts = toOptions(2, new Options(), qc);
     final XsltOptions xopts = toOptions(3, new XsltOptions(), qc);
 
@@ -63,13 +61,13 @@ public class XsltTransform extends XsltFn {
 
   /**
    * Returns an input reference (possibly cached) to the specified input.
-   * @param ex expression to be evaluated
+   * @param i index of argument
    * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  private IO read(final Expr ex, final QueryContext qc) throws QueryException {
-    final Item it = toNodeOrAtomItem(ex, qc);
+  private IO read(final int i, final QueryContext qc) throws QueryException {
+    final Item it = toNodeOrAtomItem(i, qc);
     if(it instanceof ANode) {
       try {
         final IO io = new IOContent(it.serialize(SerializerMode.NOINDENT.get()).finish());

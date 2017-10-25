@@ -235,6 +235,19 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a string or an empty sequence.
+   * Returns a value as token or throws an exception.
+   * @param ex expression to be evaluated
+   * @param qc query context
+   * @return token (empty string if result is an empty sequence)
+   * @throws QueryException query exception
+   */
+  protected final byte[] toTokenOrNull(final Expr ex, final QueryContext qc) throws QueryException {
+    final Item it = ex.atomItem(qc, info);
+    return it == null ? null : toToken(it);
+  }
+
+  /**
    * Checks if the specified non-empty item is a string.
    * Returns its value as token or throws an exception.
    * @param it item to be checked
@@ -318,7 +331,7 @@ public abstract class ParseExpr extends Expr {
    * @return number
    * @throws QueryException query exception
    */
-  private ANum toNumber(final Item it) throws QueryException {
+  protected ANum toNumber(final Item it) throws QueryException {
     if(it.type.isUntyped()) return Dbl.get(it.dbl(info));
     if(it instanceof ANum) return (ANum) it;
     throw numberError(this, it);
@@ -407,32 +420,8 @@ public abstract class ParseExpr extends Expr {
    * @return node or {@code null}
    * @throws QueryException query exception
    */
-  final ANode toEmptyNode(final Item it) throws QueryException {
+  protected final ANode toEmptyNode(final Item it) throws QueryException {
     return it == null ? null : toNode(it);
-  }
-
-  /**
-   * Checks if the evaluated expression yields a node or item.
-   * Returns the item or throws an exception.
-   * @param ex expression to be evaluated
-   * @param qc query context
-   * @return node or atomized item
-   * @throws QueryException query exception
-   */
-  protected final Item toNodeOrAtomItem(final Expr ex, final QueryContext qc)
-      throws QueryException {
-    return toNodeOrAtomItem(toItem(ex, qc));
-  }
-
-  /**
-   * Checks if the specified item yields a node or item.
-   * Returns the item or throws an exception.
-   * @param it item to be checked (can be {@code null})
-   * @return node or atomized item
-   * @throws QueryException query exception
-   */
-  protected final Item toNodeOrAtomItem(final Item it) throws QueryException {
-    return it == null || it instanceof ANode ? it : it.atomItem(info);
   }
 
   /**
@@ -456,7 +445,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  private Item toItem(final Expr ex, final QueryContext qc, final Type type)
+  protected final Item toItem(final Expr ex, final QueryContext qc, final Type type)
       throws QueryException {
     return checkNoEmpty(ex.item(qc, info), type);
   }

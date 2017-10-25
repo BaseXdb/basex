@@ -108,7 +108,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * @throws XQueryException exception
    */
   public void addCollection(final String name, final String[] paths) {
-    if(name == null) System.out.println(name);
     final StringList sl = new StringList();
     for(final String p : paths) sl.add(p);
     try {

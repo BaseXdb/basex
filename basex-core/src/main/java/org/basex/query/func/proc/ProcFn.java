@@ -43,34 +43,23 @@ abstract class ProcFn extends StandardFunc {
     }
     final String[] args = tl.toStringArray();
 
-    // encoding
-    final ProcOptions opts = new ProcOptions();
-    if(exprs.length > 2) {
-      // backward compatibility...
-      final Item item = exprs[2].item(qc, info);
-      if(item != null && item.type.isStringOrUntyped()) {
-        opts.set(ProcOptions.ENCODING, string(toEmptyToken(exprs[2], qc)));
-      } else {
-        toOptions(2, opts, qc);
-      }
-    }
-    final String encoding = opts.get(ProcOptions.ENCODING);
+    // options
+    final ProcOptions opts = toOptions(2, new ProcOptions(), qc);
+    final String enc = opts.get(ProcOptions.ENCODING);
     final Charset cs;
     try {
-      cs = Charset.forName(encoding);
+      cs = Charset.forName(enc);
     } catch(final Exception ex) {
       Util.debug(ex);
-      throw BXPR_ENC_X.get(info, encoding);
+      throw BXPR_ENC_X.get(info, enc);
     }
-
-    // options
     final long sec = opts.get(ProcOptions.TIMEOUT);
+    final String dir = opts.get(ProcOptions.DIR);
 
     final Result result = new Result();
     final Process proc;
     try {
       final ProcessBuilder pb = new ProcessBuilder(args);
-      final String dir = opts.get(ProcOptions.DIR);
       if(dir != null) pb.directory(toPath(token(dir)).toFile());
       proc = pb.start();
     } catch(final IOException ex) {

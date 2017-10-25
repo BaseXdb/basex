@@ -628,7 +628,7 @@ public class QueryParser extends InputParser {
     if(def && !wsConsumeWs(DECIMAL_FORMAT)) return false;
 
     // use empty name for default declaration
-    final QNm name = def ? new QNm() : eQName(QNAME_X, null);
+    final QNm name = def ? QNm.EMPTY : eQName(QNAME_X, null);
 
     // check if format has already been declared
     if(sc.decFormats.get(name.id()) != null) throw error(DECDUPL);
@@ -2795,14 +2795,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compConstructor() throws QueryException {
-    final int i = pos;
-    if(wsConsumeWs(DOCUMENT))  return consume(compDoc(), i);
-    if(wsConsumeWs(ELEMENT))   return consume(compElement(), i);
-    if(wsConsumeWs(ATTRIBUTE)) return consume(compAttribute(), i);
-    if(wsConsumeWs(NAMESPACE))    return consume(compNamespace(), i);
-    if(wsConsumeWs(TEXT))      return consume(compText(), i);
-    if(wsConsumeWs(COMMENT))   return consume(compComment(), i);
-    if(wsConsumeWs(PI))        return consume(compPI(), i);
+    final int p = pos;
+    if(wsConsumeWs(DOCUMENT))  return consume(compDoc(), p);
+    if(wsConsumeWs(ELEMENT))   return consume(compElement(), p);
+    if(wsConsumeWs(ATTRIBUTE)) return consume(compAttribute(), p);
+    if(wsConsumeWs(NAMESPACE)) return consume(compNamespace(), p);
+    if(wsConsumeWs(TEXT))      return consume(compText(), p);
+    if(wsConsumeWs(COMMENT))   return consume(compComment(), p);
+    if(wsConsumeWs(PI))        return consume(compPI(), p);
     return null;
   }
 

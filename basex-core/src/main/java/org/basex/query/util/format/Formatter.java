@@ -116,7 +116,7 @@ public abstract class Formatter extends FormatUtil {
    * @param date date to be formatted
    * @param lng language
    * @param pic picture
-   * @param cal calendar
+   * @param cal calendar (can be {@code null})
    * @param plc place
    * @param ii input info
    * @param sc static context
@@ -129,13 +129,12 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
-    if(cal.length != 0) {
+    if(cal != null) {
       final QNm qnm;
       try {
-        qnm = QNm.resolve(cal, sc);
+        qnm = QNm.resolve(trim(cal), sc);
       } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw CALQNAME_X.get(ii, cal);
+        throw CALWHICH_X.get(ii, cal);
       }
       if(qnm.uri().length == 0) {
         int c = -1;

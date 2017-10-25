@@ -586,8 +586,6 @@ public enum QueryError {
   /** FOFD1340. */
   PICDATE_X(FOFD, 1340, "Invalid picture string: '%'."),
   /** FOFD1340. */
-  CALQNAME_X(FOFD, 1340, "Invalid EQName: '%'."),
-  /** FOFD1340. */
   CALWHICH_X(FOFD, 1340, "Unknown calendar: '%'."),
   /** FOFD1340. */
   INVFDPATTERN_X(FOFD, 1340, "%"),

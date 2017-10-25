@@ -331,6 +331,6 @@ final class XMLParser extends CommandParser {
    * @return query exception
    */
   private static QueryException error(final String msg, final Object... ext) {
-    return new QueryException(null, new QNm(), msg, ext);
+    return new QueryException(null, QNm.EMPTY, msg, ext);
   }
 }

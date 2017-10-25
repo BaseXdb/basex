@@ -9,6 +9,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -72,7 +73,7 @@ public class ClientQuery extends Query {
         final TokenBuilder tb = new TokenBuilder();
         for(final Item it : val) {
           if(!tb.isEmpty()) tb.add(1);
-          if(it.type instanceof NodeType) {
+          if(it instanceof ANode) {
             tb.add(it.serialize(SerializerMode.NOINDENT.get()).finish());
           } else {
             tb.add(it.string(null));

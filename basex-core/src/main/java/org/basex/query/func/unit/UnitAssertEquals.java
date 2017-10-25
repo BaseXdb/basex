@@ -17,7 +17,6 @@ import org.basex.util.*;
 public final class UnitAssertEquals extends UnitFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs.length < 3 ? null : toNodeOrAtomItem(exprs[2], qc);
     final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
     final DeepEqual comp = new DeepEqual(info);
     Item it1, it2;
@@ -31,6 +30,7 @@ public final class UnitAssertEquals extends UnitFn {
       c++;
       qc.checkStop();
     }
+    final Item it = toNodeOrAtomItem(2, qc);
     throw new UnitException(info, UNIT_ASSERT_EQUALS_X_X_X, it1, it2, c).value(it);
   }
 }

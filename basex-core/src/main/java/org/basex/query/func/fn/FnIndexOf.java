@@ -20,9 +20,9 @@ public final class FnIndexOf extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Item srch = checkNoEmpty(exprs[1].atomItem(qc, info));
-      final Collation coll = toCollation(2, qc);
       final Iter iter = exprs[0].atomIter(qc, info);
+      final Item srch = toAtomItem(exprs[1], qc);
+      final Collation coll = toCollation(2, qc);
       int c;
 
       @Override

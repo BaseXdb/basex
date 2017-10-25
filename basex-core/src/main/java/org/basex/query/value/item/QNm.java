@@ -22,6 +22,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QNm extends Item {
+  /** QName: empty. */
+  public static final QNm EMPTY = new QNm(Token.EMPTY);
   /** QName: xml:base. */
   public static final QNm XML_BASE = new QNm(BASE, XML_URI);
   /** URL pattern (matching Clark and EQName notation). */
@@ -33,15 +35,6 @@ public final class QNm extends Item {
   private final byte[] name;
   /** Prefix index. */
   private final int pref;
-
-  /**
-   * Empty constructor.
-   */
-  public QNm() {
-    super(AtomType.QNM);
-    name = EMPTY;
-    pref = 0;
-  }
 
   /**
    * Constructor.
@@ -195,7 +188,7 @@ public final class QNm extends Item {
    * @return uri
    */
   public byte[] uri() {
-    return uri == null ? EMPTY : uri;
+    return uri == null ? Token.EMPTY : uri;
   }
 
   /**
@@ -262,7 +255,7 @@ public final class QNm extends Item {
    * @return prefix
    */
   public byte[] prefix() {
-    return pref == -1 ? EMPTY : substring(name, 0, pref);
+    return pref == -1 ? Token.EMPTY : substring(name, 0, pref);
   }
 
   /**

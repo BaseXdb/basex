@@ -484,7 +484,7 @@ final class StringParser extends CommandParser {
    * @return query exception
    */
   private QueryException error(final Enum<?>[] complete, final String msg, final Object... ext) {
-    return new QueryException(parser.info(), new QNm(), msg, ext).suggest(parser, list(complete));
+    return new QueryException(parser.info(), QNm.EMPTY, msg, ext).suggest(parser, list(complete));
   }
 
   /**

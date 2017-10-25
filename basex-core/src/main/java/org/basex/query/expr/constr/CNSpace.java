@@ -33,10 +33,10 @@ public final class CNSpace extends CName {
 
   @Override
   public FNSpace item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] cp = toEmptyToken(name, qc);
+    final byte[] cp = trim(toEmptyToken(name, qc));
     if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME_X.get(info, cp);
 
-    final byte[] cu = trim(atomValue(qc));
+    final byte[] cu = atomValue(qc);
     if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CNXML.get(info);
     if(eq(cp, XMLNS)) throw CNINV_X.get(info, cp);
     if(eq(cu, XMLNS_URI) || cu.length == 0) throw CNINVNS_X.get(info, cu);

@@ -17,8 +17,8 @@ import org.basex.util.*;
 public final class FnSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs.length > 1 ? exprs[1].item(qc, info) : null;
-    final SerializerOptions sopts = FuncOptions.serializer(it, info);
+    final Item so = exprs.length > 1 ? exprs[1].item(qc, info) : null;
+    final SerializerOptions sopts = FuncOptions.serializer(so, info);
     return Str.get(serialize(qc.iter(exprs[0]), sopts, SER_X, qc));
   }
 }
