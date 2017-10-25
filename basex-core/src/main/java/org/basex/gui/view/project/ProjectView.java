@@ -75,9 +75,9 @@ public final class ProjectView extends BaseXPanel {
     rootPath.setFocusable(false);
     SwingUtilities.invokeLater(() -> {
       rootPath.textField().getDocument().addDocumentListener(new DocumentListener() {
-        @Override public void changedUpdate(final DocumentEvent e) { changeRoot(true); }
         @Override public void insertUpdate(final DocumentEvent e) { changeRoot(true); }
         @Override public void removeUpdate(final DocumentEvent e) { changeRoot(true); }
+        @Override public void changedUpdate(final DocumentEvent e) { }
       });
     });
 
@@ -336,7 +336,6 @@ public final class ProjectView extends BaseXPanel {
     if(save) {
       gui.gopts.set(GUIOptions.PROJECTPATH, path.path());
       gui.gopts.write();
-      rootPath.store();
     }
     root.file = path;
     root.refresh();
@@ -351,6 +350,7 @@ public final class ProjectView extends BaseXPanel {
   public void rootPath(final IOFile path, final boolean save) {
     rootPath.setText(path.normalize().path());
     changeRoot(save);
+    if(save) rootPath.store();
   }
 
   /**

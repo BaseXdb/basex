@@ -154,17 +154,11 @@ public class BaseXCombo extends JComboBox<Object> {
       } else {
         tf.getDocument().addDocumentListener(new DocumentListener() {
           @Override
-          public void removeUpdate(final DocumentEvent e) {
-            dialog.action(BaseXCombo.this);
-          }
+          public void removeUpdate(final DocumentEvent e) { dialog.action(BaseXCombo.this); }
           @Override
-          public void insertUpdate(final DocumentEvent e) {
-            dialog.action(BaseXCombo.this);
-          }
+          public void insertUpdate(final DocumentEvent e) { dialog.action(BaseXCombo.this); }
           @Override
-          public void changedUpdate(final DocumentEvent e) {
-            dialog.action(BaseXCombo.this);
-          }
+          public void changedUpdate(final DocumentEvent e) { }
         });
       }
     });
@@ -197,12 +191,12 @@ public class BaseXCombo extends JComboBox<Object> {
   }
 
   /**
-   * Stores the current history.
+   * Stores the current history and refreshes the selectable items.
    */
   public void store() {
     if(history != null) {
       history.store(getText());
-      setItems(history.values());
+      SwingUtilities.invokeLater(() -> setItems(history.values()));
     }
   }
 
