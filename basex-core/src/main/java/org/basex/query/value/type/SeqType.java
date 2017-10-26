@@ -221,8 +221,10 @@ public final class SeqType {
   public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZERO_MORE);
   /** Namespace node. */
   public static final SeqType NSP = NodeType.NSP.seqType();
-  /** Namespace node. */
+  /** Processing instruction. */
   public static final SeqType PI = NodeType.PI.seqType();
+  /** Text node. */
+  public static final SeqType TXT = NodeType.TXT.seqType();
   /** Zero or one text node. */
   public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
   /** Zero or more text nodes. */
@@ -246,7 +248,7 @@ public final class SeqType {
   /** Zero or one map. */
   public static final SeqType MAP_ZO = new SeqType(ANY_MAP, Occ.ZERO_ONE);
   /** Single map. */
-  public static final SeqType MAP_O = new SeqType(ANY_MAP);
+  public static final SeqType MAP_O = ANY_MAP.seqType();
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = new SeqType(ANY_ARRAY, Occ.ZERO_MORE);
   /** Single array. */

@@ -37,7 +37,7 @@ abstract class ForLet extends Clause {
   }
 
   @Override
-  public Clause compile(final CompileContext cc) throws QueryException {
+  public final Clause compile(final CompileContext cc) throws QueryException {
     expr = expr.compile(cc);
     return optimize(cc);
   }

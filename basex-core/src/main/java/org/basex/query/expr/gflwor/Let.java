@@ -6,8 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.expr.gflwor.GFLWOR.Eval;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -83,14 +82,8 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public Clause compile(final CompileContext cc) throws QueryException {
-    final Clause c = super.compile(cc);
-    var.refineType(scoring ? SeqType.DBL : expr.seqType(), cc);
-    return c;
-  }
-
-  @Override
   public Let optimize(final CompileContext cc) throws QueryException {
+    // skip redundant type check
     if(!scoring && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
       if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.promote)) {
@@ -98,16 +91,20 @@ public final class Let extends ForLet {
         expr = tc.expr;
       }
     }
+    // promote at compile time
+    if(expr.isValue() && var.checksType()) expr = var.checkType((Value) expr, cc.qc, true);
 
-    seqType = scoring ? SeqType.DBL : expr.seqType();
-    var.refineType(seqType, cc);
-    if(var.checksType() && expr.isValue()) {
-      expr = var.checkType((Value) expr, cc.qc, true);
-      var.refineType(expr.seqType(), cc);
+    // assign type to clause and variable
+    if(scoring) {
+      seqType = SeqType.DBL;
+      size = 1;
+    } else {
+      seqType = expr.seqType();
+      size = expr.size();
+      var.data = expr.data();
     }
-    size = scoring ? 1 : expr.size();
+    var.refineType(seqType, cc);
     var.size = size;
-    var.data = expr.data();
     return this;
   }
 

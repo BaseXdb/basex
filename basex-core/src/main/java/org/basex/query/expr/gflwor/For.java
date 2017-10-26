@@ -117,15 +117,17 @@ public final class For extends ForLet {
 
   @Override
   public For optimize(final CompileContext cc) throws QueryException {
+    // assign type to clause and variable
     final SeqType tp = expr.seqType();
     final boolean emp = empty && tp.mayBeEmpty();
     seqType = tp.withOcc(emp ? Occ.ZERO_ONE : Occ.ONE);
-    var.refineType(seqType, cc);
-    if(pos != null) pos.refineType(SeqType.ITR, cc);
-    if(score != null) score.refineType(SeqType.DBL, cc);
     size = emp ? -1 : 1;
+    var.refineType(seqType, cc);
     var.size = size;
     var.data = expr.data();
+    if(pos != null) pos.refineType(SeqType.ITR, cc);
+    if(score != null) score.refineType(SeqType.DBL, cc);
+
     return this;
   }
 

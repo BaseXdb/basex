@@ -43,6 +43,12 @@ public final class TransformWith extends Arr {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    seqType = exprs[0].seqType();
+    return this;
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(exprs[0]);
     final Expr modify = exprs[1];

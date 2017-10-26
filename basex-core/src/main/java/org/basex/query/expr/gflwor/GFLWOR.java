@@ -110,13 +110,11 @@ public final class GFLWOR extends ParseExpr {
       iter.remove();
       clauseError(qe, iter, cc);
     }
-
     try {
       ret = ret.compile(cc);
     } catch(final QueryException qe) {
       clauseError(qe, iter, cc);
     }
-
     return optimize(cc);
   }
 

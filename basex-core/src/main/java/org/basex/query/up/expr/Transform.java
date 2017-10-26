@@ -54,6 +54,13 @@ public final class Transform extends Arr {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    for(final Let copy : copies) copy.seqType = copy.expr.seqType();
+    seqType = exprs[1].seqType();
+    return this;
+  }
+
+  @Override
   public BasicIter<?> iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
   }

@@ -28,12 +28,18 @@ public final class CTxt extends CNode {
   public CTxt(final StaticContext sc, final InputInfo info, final Expr text) {
     super(sc, info, text);
     seqType = SeqType.TXT_ZO;
-    size = -1;
   }
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    return oneIsEmpty() ? cc.emptySeq(this) : this;
+    final Expr e = exprs[0];
+    if(e == Str.ZERO || e.isEmpty()) return cc.emptySeq(this);
+    // non-empty string: result cannot be empty
+    if(e instanceof Str) {
+      seqType = SeqType.TXT;
+      size = 1;
+    }
+    return this;
   }
 
   @Override
