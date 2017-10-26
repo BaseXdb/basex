@@ -14,8 +14,7 @@ import org.junit.*;
  */
 public final class CsvModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void parse() {
+  @Test public void parseXml() {
     parse("", "", "<csv/>");
     parse("X", "", "<csv>\n<record>\n<entry>X</entry>\n</record>\n</csv>");
     parse(" '\"X\"\"Y\"'", "", "...<entry>X\"Y</entry>");
@@ -36,8 +35,14 @@ public final class CsvModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void serialize() {
+  @Test public void parseXQuery() {
+    parse("X\nY", "'header':false(),'format':'xquery'", "...[\"X\"], [\"Y\"]");
+    parse("X\nY", "'header':false(),'format':'xquery'", "...\"records\": ([\"X\"], [\"Y\"])");
+    parse("X\nY", "'header':true(),'format':'xquery'", "...\"names\": [\"X\"]");
+  }
+
+  /** Test method. */
+  @Test public void serializeXml() {
     serial("<csv><record><A__>1</A__></record></csv>", "'header':true(),'lax':false()", "A_\n1\n");
     serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':false()", "\n1\n");
     serial("<csv><record><A_0020B>1</A_0020B></record></csv>",
@@ -82,6 +87,14 @@ public final class CsvModuleTest extends AdvancedQueryTest {
     serialError("<csv/>", "'x':'y'");
     serialError("<csv><record><A>1</A></record></csv>", "'separator':''");
     serialError("<csv><record><A>1</A></record></csv>", "'separator':'XX'");
+  }
+
+  /** Test method. */
+  @Test public void serializeXQuery() {
+    serial(" map{'records':['A','B']}",             "'format':'xquery'", "A,B\n");
+    serial(" map{'records':['A','B']}",             "'header':false(),'format':'xquery'", "A,B\n");
+    serial(" map{'names':['A','B'],'records':()}",  "'header':true(),'format':'xquery'", "A,B\n");
+    serial(" map{'names':['A'],'records':(['1'])}", "'header':true(),'format':'xquery'", "A\n1\n");
   }
 
   /**

@@ -22,11 +22,11 @@ public class JsonOptions extends Options {
 
   /** JSON formats. */
   public enum JsonFormat {
-    /** Direct.        */ DIRECT,
-    /** Attributes.    */ ATTRIBUTES,
-    /** JsonML.        */ JSONML,
-    /** Basic.         */ BASIC,
-    /** Map (non-XML). */ MAP;
+    /** Direct.     */ DIRECT,
+    /** Attributes. */ ATTRIBUTES,
+    /** JsonML.     */ JSONML,
+    /** Basic.      */ BASIC,
+    /** XQuery.     */ XQUERY;
 
     @Override
     public String toString() {

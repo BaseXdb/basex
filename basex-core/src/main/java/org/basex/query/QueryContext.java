@@ -469,7 +469,7 @@ public final class QueryContext extends Job implements Closeable {
    * Binds a value to a global variable. The specified type is interpreted as follows:
    * <ul>
    *   <li> If {@code "json"} is specified, the value is converted according to the rules
-   *        specified in {@link JsonMapConverter}.</li>
+   *        specified in {@link JsonXQueryConverter}.</li>
    *   <li> Otherwise, the type is cast to the specified XDM type.</li>
    * </ul>
    * If the value is an XQuery {@link Value}, it is directly assigned.
@@ -686,7 +686,7 @@ public final class QueryContext extends Job implements Closeable {
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
-        jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
+        jp.set(JsonOptions.FORMAT, JsonFormat.XQUERY);
         return JsonConverter.get(jp).convert(token(vl.toString()), null);
       } catch(final QueryIOException ex) {
         throw ex.getCause();

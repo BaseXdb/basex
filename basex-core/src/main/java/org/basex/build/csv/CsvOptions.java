@@ -33,7 +33,7 @@ public class CsvOptions extends Options {
   public enum CsvFormat {
     /** Default.    */ DIRECT,
     /** Attributes. */ ATTRIBUTES,
-    /** Map.        */ MAP;
+    /** XQuery.     */ XQUERY;
 
     @Override
     public String toString() {

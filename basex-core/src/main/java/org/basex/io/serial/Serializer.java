@@ -79,8 +79,8 @@ public abstract class Serializer implements Closeable {
       case TEXT:  return new TextSerializer(os, so);
       case CSV:
         final CsvOptions copts = so.get(SerializerOptions.CSV);
-        return copts.get(CsvOptions.FORMAT) == CsvFormat.MAP
-               ? new CsvMapSerializer(os, so)
+        return copts.get(CsvOptions.FORMAT) == CsvFormat.XQUERY
+               ? new CsvXQuerySerializer(os, so)
                : new CsvDirectSerializer(os, so);
       case JSON:
         final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);

@@ -14,8 +14,7 @@ import org.junit.*;
  */
 public final class JsonModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void parseXml() {
+  @Test public void parseXml() {
     // default output
     parse("[]", "", "<json type=\"array\"/>");
     parse("{}", "", "<json type=\"object\"/>");
@@ -73,9 +72,8 @@ public final class JsonModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void parseMap() {
-    final String map = " map { 'format':'map' }";
+  @Test public void parseXQuery() {
+    final String map = " map { 'format':'xquery' }";
     query(_JSON_PARSE.args("{}", map), "map {\n}");
     query(_JSON_PARSE.args("{\"A\":1}", map), "map {\n\"A\": 1\n}");
     query(_JSON_PARSE.args("{\"\":null}", map), "map {\n\"\": ()\n}");
@@ -91,8 +89,7 @@ public final class JsonModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void serialize() {
+  @Test public void serialize() {
     serial("<json type='object'/>", "", "{\n}");
     serial("<json objects='json'/>", "", "{\n}");
     serial("<json type='array'/>", "", "[\n]");
@@ -119,12 +116,12 @@ public final class JsonModuleTest extends AdvancedQueryTest {
   @Test public void config() {
     query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'jsonml'})",
         "<foo test=\"asdf\"/>");
-    query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'map'}))",
+    query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'xquery'}))",
         "2");
-    query("json:parse('\"\\t\\u000A\"', map {'format':'map','escape':true(),'liberal':true()})",
+    query("json:parse('\"\\t\\u000A\"', map {'format':'xquery','escape':true(),'liberal':true()})",
         "\\t\\n");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map {'format':'map','escape':false(),'liberal':true()}))", "9\n10");
+        "  map {'format':'xquery','escape':false(),'liberal':true()}))", "9\n10");
     error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
   }
 

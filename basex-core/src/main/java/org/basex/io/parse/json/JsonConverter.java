@@ -72,7 +72,7 @@ public abstract class JsonConverter {
     switch(jopts.get(JsonOptions.FORMAT)) {
       case JSONML:     return new JsonMLConverter(jopts);
       case ATTRIBUTES: return new JsonAttsConverter(jopts);
-      case MAP:        return new JsonMapConverter(jopts);
+      case XQUERY:     return new JsonXQueryConverter(jopts);
       case BASIC:      return new JsonBasicConverter(jopts);
       default:         return new JsonDirectConverter(jopts);
     }

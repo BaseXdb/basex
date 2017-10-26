@@ -28,8 +28,6 @@ public final class CsvDirectSerializer extends CsvSerializer {
   /** Lax flag. */
   private final boolean lax;
 
-  /** Header flag. */
-  private boolean header;
   /** Contents of current row. */
   private TokenMap data;
   /** Current attribute value. */
@@ -45,7 +43,6 @@ public final class CsvDirectSerializer extends CsvSerializer {
       throws IOException {
 
     super(os, opts);
-    header = copts.get(CsvOptions.HEADER);
     headers = header ? new TokenList() : null;
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
     lax = copts.get(CsvOptions.LAX) || atts;
@@ -73,22 +70,20 @@ public final class CsvDirectSerializer extends CsvSerializer {
   protected void finishClose() throws IOException {
     if(level != 1) return;
 
+    final TokenList tl = new TokenList();
     if(headers != null) {
       final int s = headers.size();
       // print header
       if(header) {
-        final TokenList tl = new TokenList();
         for(int i = 0; i < s; i++) tl.add(headers.get(i));
         record(tl);
         header = false;
       }
       // print data, sorted by headers
-      final TokenList tl = new TokenList();
       for(int i = 0; i < s; i++) tl.add(data.get(headers.get(i)));
       record(tl);
     } else {
       // no headers available: print data
-      final TokenList tl = new TokenList();
       for(final byte[] v : data.values()) tl.add(v);
       record(tl);
     }

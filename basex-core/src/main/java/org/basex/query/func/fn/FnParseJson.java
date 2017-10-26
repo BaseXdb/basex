@@ -56,7 +56,7 @@ public class FnParseJson extends Parse {
         "Escaping cannot be combined with a fallback function.");
 
     try {
-      opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.MAP);
+      opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.XQUERY);
       final JsonConverter conv = JsonConverter.get(opts);
       if(!esc && fallback != null) conv.fallback(string -> {
         try {

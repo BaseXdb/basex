@@ -102,7 +102,7 @@ public final class JsonSerializerTest extends SandboxTest {
    * Tests for the 'map' serialization format.
    */
   @Test public void map() {
-    final JsonFormat format = JsonFormat.MAP;
+    final JsonFormat format = JsonFormat.XQUERY;
 
     // objects
     serialize("map { }", "{}", format);

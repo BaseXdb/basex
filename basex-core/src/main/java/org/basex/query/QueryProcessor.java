@@ -117,7 +117,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * If the value is an {@link Expr} instance, it is directly assigned.
    * Otherwise, it is first cast to the appropriate XQuery type. If {@code "json"}
    * is specified as type, the value is interpreted according to the rules
-   * specified in {@link JsonMapConverter}.
+   * specified in {@link JsonXQueryConverter}.
    * @param name name of variable
    * @param value value to be bound
    * @param type type (may be {@code null})
