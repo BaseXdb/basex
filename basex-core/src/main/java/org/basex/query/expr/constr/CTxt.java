@@ -33,12 +33,8 @@ public final class CTxt extends CNode {
   @Override
   public Expr optimize(final CompileContext cc) {
     final Expr e = exprs[0];
-    if(e == Str.ZERO || e.isEmpty()) return cc.emptySeq(this);
-    // non-empty string: result cannot be empty
-    if(e instanceof Str) {
-      seqType = SeqType.TXT;
-      size = 1;
-    }
+    if(e.isEmpty()) return cc.emptySeq(this);
+    if(e.seqType().oneOrMore()) seqType = SeqType.TXT;
     return this;
   }
 

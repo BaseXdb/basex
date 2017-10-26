@@ -195,7 +195,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Tests if this is an empty sequence. This function is only overwritten
-   * by the {@link Empty} class, which represents the empty sequence.
+   * by {@link Empty} and {@link DBNodes}.
    * @return result of check
    */
   public boolean isEmpty() {
