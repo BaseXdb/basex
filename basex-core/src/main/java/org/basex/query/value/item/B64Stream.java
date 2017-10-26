@@ -57,12 +57,6 @@ public final class B64Stream extends B64 {
 
   @Override
   public String toString() {
-    try {
-      materialize(null);
-      return super.toString();
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      return Util.info(Function._FILE_READ_BINARY.args(input));
-    }
+    return data != null ? super.toString() : Util.info(Function._FILE_READ_BINARY.args(input));
   }
 }

@@ -34,7 +34,7 @@ public final class Union extends Set {
 
     final ExprList el = new ExprList(exprs.length);
     for(final Expr ex : exprs) {
-      if(ex.isEmpty()) {
+      if(ex == Empty.SEQ) {
         // remove empty operands
         cc.info(OPTREMOVE_X_X, description(), ex);
       } else {

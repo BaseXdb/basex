@@ -50,7 +50,7 @@ public final class List extends Arr {
     // remove empty sequences
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      if(!expr.isEmpty()) list.add(expr);
+      if(expr != Empty.SEQ) list.add(expr);
     }
     final int ls = list.size();
     if(ls != exprs.length) {

@@ -54,7 +54,7 @@ public final class FnInsertBefore extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    if(exprs[2].isEmpty()) return exprs[0];
+    if(exprs[2] == Empty.SEQ) return exprs[0];
     seqType = exprs[0].seqType().add(exprs[2].seqType());
     return this;
   }

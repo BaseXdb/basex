@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -71,7 +72,7 @@ public abstract class SimpleMap extends Arr {
 
     // rewrite path with empty steps
     for(final Expr expr : exprs) {
-      if(expr.isEmpty()) return cc.emptySeq(this);
+      if(expr == Empty.SEQ) return cc.emptySeq(this);
     }
     // pre-evaluate map with statically known values
     return allAreValues() ? cc.preEval(this) : this;

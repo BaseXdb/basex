@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -33,7 +34,7 @@ public final class Except extends Set {
 
     final ExprList el = new ExprList(exprs.length);
     for(final Expr ex : exprs) {
-      if(ex.isEmpty()) {
+      if(ex == Empty.SEQ) {
         // remove empty operands (return empty sequence if first value is empty)
         if(el.isEmpty()) return cc.emptySeq(this);
         cc.info(OPTREMOVE_X_X, description(), ex);

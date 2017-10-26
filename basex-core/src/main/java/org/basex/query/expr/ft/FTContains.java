@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -81,7 +82,7 @@ public final class FTContains extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isEmpty() ? cc.replaceWith(this, Bln.FALSE) :
+    return expr == Empty.SEQ ? cc.replaceWith(this, Bln.FALSE) :
       expr.isValue() && ftexpr.isValue() ? cc.preEval(this) : this;
   }
 

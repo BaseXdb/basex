@@ -15,6 +15,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -321,7 +322,7 @@ public final class Window extends Clause {
   void calcSize(final long[] minMax) {
     // number of results cannot be anticipated
     minMax[0] = 0;
-    minMax[1] = expr.isEmpty() ? 0 : -1;
+    minMax[1] = expr == Empty.SEQ ? 0 : -1;
   }
 
   @Override

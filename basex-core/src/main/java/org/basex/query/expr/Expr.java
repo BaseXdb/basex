@@ -194,15 +194,6 @@ public abstract class Expr extends ExprInfo {
   public abstract Item test(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
-   * Tests if this is an empty sequence. This function is only overwritten
-   * by {@link Empty} and {@link DBNodes}.
-   * @return result of check
-   */
-  public boolean isEmpty() {
-    return false;
-  }
-
-  /**
    * Tests if this is a vacuous expression (empty sequence or error function).
    * This check is needed for updating queries.
    * @return result of check

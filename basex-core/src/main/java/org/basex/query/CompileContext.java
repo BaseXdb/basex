@@ -148,7 +148,7 @@ public final class CompileContext {
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
     final Expr res = result == null ? Empty.SEQ : result;
     if(res != expr) {
-      if(res.isEmpty()) {
+      if(res == Empty.SEQ) {
         info(OPTEMPTY_X, expr);
       } else if(res instanceof ParseExpr) {
         info(OPTREWRITE_X_X, expr, res.description());

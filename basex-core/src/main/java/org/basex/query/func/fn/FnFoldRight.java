@@ -8,6 +8,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
 
 /**
@@ -63,7 +64,7 @@ public final class FnFoldRight extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs[0].isEmpty()) return exprs[1];
+    if(exprs[0] == Empty.SEQ) return exprs[1];
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
       final Value seq = (Value) exprs[0];

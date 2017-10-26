@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -33,7 +34,7 @@ public final class CTxt extends CNode {
   @Override
   public Expr optimize(final CompileContext cc) {
     final Expr e = exprs[0];
-    if(e.isEmpty()) return cc.emptySeq(this);
+    if(e == Empty.SEQ) return cc.emptySeq(this);
     if(e.seqType().oneOrMore()) seqType = SeqType.TXT;
     return this;
   }

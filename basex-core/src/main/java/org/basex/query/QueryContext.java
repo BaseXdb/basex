@@ -619,7 +619,9 @@ public final class QueryContext extends Job implements Closeable {
 
       // all results processed: return compact node sequence
       final int ps = pres.size();
-      if(it == null || ps == mx) return new DBNodes(data, pres.finish()).ftpos(ftPosData);
+      if(it == null || ps == mx) {
+        return ps == 0 ? Empty.SEQ : new DBNodes(data, pres.finish()).ftpos(ftPosData);
+      }
 
       // otherwise, add nodes to standard iterator
       cache = new ItemList();

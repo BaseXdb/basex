@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Document and collection functions.
@@ -73,7 +74,7 @@ public abstract class Docs extends StandardFunc {
         // add local lock if argument may reference a database
         queryInput = queryInput(((Str) expr).string());
         if(queryInput != null) visitor.lock(queryInput.dbName);
-      } else if(!expr.isEmpty()) {
+      } else if(expr != Empty.SEQ) {
         // otherwise, database cannot be locked statically
         if(!visitor.lock(null)) return false;
       }

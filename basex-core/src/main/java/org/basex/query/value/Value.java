@@ -73,6 +73,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
+   * Tests if this is an empty sequence.
+   * @return result of check
+   */
+  public final boolean isEmpty() {
+    return size() == 0;
+  }
+
+  /**
    * Returns a sub-sequence of this value with the given start and length.<br>
    * The following properties must hold:
    * <ul>

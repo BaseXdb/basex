@@ -472,7 +472,7 @@ public abstract class Path extends ParseExpr {
    * @return {@code true} if steps will never yield results
    */
   private boolean emptyStep(final Value rt, final int s) {
-    if(steps[s].isEmpty()) return true;
+    if(steps[s] == Empty.SEQ) return true;
 
     final Step step = axisStep(s);
     if(step == null) return false;

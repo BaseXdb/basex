@@ -51,6 +51,6 @@ public final class FnSum extends Aggr {
     final Type st1 = e1.seqType().type, st2 = e2 == Empty.SEQ ? st1 : e2.seqType().type;
     if(st1.isNumberOrUntyped() && st2.isNumberOrUntyped()) seqType = Calc.type(st1, st2).seqType();
     // replace empty sequence with default item
-    return e1.isEmpty() && e2.seqType().instanceOf(SeqType.ITR) ? e2 : this;
+    return e1 == Empty.SEQ && e2.seqType().instanceOf(SeqType.ITR) ? e2 : this;
   }
 }

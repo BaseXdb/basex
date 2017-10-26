@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -96,7 +97,7 @@ public abstract class Arr extends ParseExpr {
    */
   protected final boolean oneIsEmpty() {
     for(final Expr expr : exprs) {
-      if(expr.isEmpty()) return true;
+      if(expr == Empty.SEQ) return true;
     }
     return false;
   }

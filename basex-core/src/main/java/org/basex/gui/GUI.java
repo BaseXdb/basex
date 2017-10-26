@@ -446,7 +446,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
       // get query result and node references to currently opened database
       final Value result = cmd.result();
-      DBNodes nodes = result instanceof DBNodes && !result.isEmpty() ? (DBNodes) result : null;
+      DBNodes nodes = result instanceof DBNodes ? (DBNodes) result : null;
 
       // show text view if a non-empty result does not reference the currently opened database
       if(!text.visible() && ao.size() != 0 && nodes == null) {
