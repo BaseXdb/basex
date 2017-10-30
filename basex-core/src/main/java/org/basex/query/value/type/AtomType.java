@@ -923,10 +923,6 @@ public enum AtomType implements Type {
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE_X.get(ii, d);
       return (long) d;
     }
-    if(min == max) {
-      final double d = it.dbl(ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw castError(this, it, ii);
-    }
 
     final long l = it.itr(ii);
     if(min != max && (l < min || l > max)) throw castError(this, it, ii);
