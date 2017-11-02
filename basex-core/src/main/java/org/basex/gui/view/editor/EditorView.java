@@ -302,7 +302,7 @@ public final class EditorView extends View {
     if(show) {
       project.focus();
     } else {
-      getEditor().requestFocusInWindow();
+      focusEditor();
     }
   }
 
@@ -311,6 +311,13 @@ public final class EditorView extends View {
    */
   public void findFiles() {
     project.findFiles(getEditor());
+  }
+
+  /**
+   * Focuses the current editor.
+   */
+  public void focusEditor() {
+    SwingUtilities.invokeLater(() -> getEditor().requestFocusInWindow());
   }
 
   /**
@@ -458,7 +465,7 @@ public final class EditorView extends View {
         return null;
       }
     }
-    edit.requestFocusInWindow();
+    focusEditor();
     return edit;
   }
 
@@ -654,7 +661,7 @@ public final class EditorView extends View {
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
-      SwingUtilities.invokeLater(getEditor()::requestFocusInWindow);
+      focusEditor();
     }
   }
 
