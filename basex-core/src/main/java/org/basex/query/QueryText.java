@@ -215,6 +215,9 @@ public interface QueryText {
   /** Parser token. */ String CDATA = "<![CDATA[";
   /** Parser token. */ String COL = ":";
   /** Parser token. */ String COLS = "::";
+  /** Parser token. */ String COLWC = ":*";
+  /** Parser token. */ String HSH = "#";
+  /** Parser token. */ String SEMICOL = ";";
   /** Parser token. */ String COMMA = ",";
   /** Parser token. */ String DOLLAR = "$";
   /** Parser token. */ String DOT2 = "..";
@@ -359,31 +362,29 @@ public interface QueryText {
 
   // QUERY PLAN ===================================================================================
 
-  /** Query Info. */ String MAPASG = ": ";
-  /** Query Info. */ String SEP = ", ";
-  /** Query Info. */ String DOTS = "...";
-  /** Query Info. */ String ARG = "arg";
-  /** Query Info. */ String FUNC = "Function";
-  /** Query Info. */ String VARBL = "Variable";
-
   /** Query Info. */ String QUERY_PLAN = "QueryPlan";
   /** Query Info. */ String COMPILED = "compiled";
   /** Query Info. */ String EVAL = "eval";
   /** Query Info. */ String OP = "op";
   /** Query Info. */ String POS = "pos";
   /** Query Info. */ String VAR = "var";
-  /** Query Info. */ String IDX = "index";
-  /** Query Info. */ String NAM = "name";
+  /** Query Info. */ String INDEX = "index";
+  /** Query Info. */ String NAME = "name";
   /** Query Info. */ String DIR = "dir";
   /** Query Info. */ String PRE = "pre";
-  /** Query Info. */ String SIZ = "size";
-  /** Query Info. */ String AXS = "axis";
-  /** Query Info. */ String TST = "test";
+  /** Query Info. */ String SIZE = "size";
+  /** Query Info. */ String AXIS = "axis";
+  /** Query Info. */ String TEST = "test";
   /** Query Info. */ String MIN = "min";
   /** Query Info. */ String MAX = "max";
   /** Query Info. */ String INF = "inf";
   /** Query Info. */ String TCL = "tailCall";
-  /** Query Info. */ String ENT = "entries";
+  /** Query Info. */ String ENTRIES = "entries";
+
+  /** Query Info. */ String MAPASG = ": ";
+  /** Query Info. */ String SEP = ", ";
+  /** Query Info. */ String DOTS = "...";
+  /** Query Info. */ String ARG = "arg";
 
   // OPTIMIZATIONS ================================================================================
 

@@ -434,7 +434,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, sig.desc), exprs);
+    addPlan(plan, planElem(NAME, sig.desc), exprs);
   }
 
   @Override

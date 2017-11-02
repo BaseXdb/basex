@@ -150,12 +150,12 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name.string(), TCL, tailCall), exprs);
+    addPlan(plan, planElem(NAME, name.string(), TCL, tailCall), exprs);
   }
 
   @Override
   public String description() {
-    return FUNC;
+    return "Function";
   }
 
   @Override

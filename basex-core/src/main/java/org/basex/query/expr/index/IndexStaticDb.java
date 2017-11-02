@@ -103,7 +103,7 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.NAM, data.meta.name));
+    addPlan(plan, planElem(QueryText.NAME, data.meta.name));
   }
 
   @Override

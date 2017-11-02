@@ -225,7 +225,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(IDX, type, NAM, test), db, expr);
+    addPlan(plan, planElem(INDEX, type, NAME, test), db, expr);
   }
 
   @Override

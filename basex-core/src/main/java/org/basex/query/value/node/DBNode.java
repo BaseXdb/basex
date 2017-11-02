@@ -1,7 +1,6 @@
 package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.func.Function.*;
 
 import java.io.*;
 
@@ -11,12 +10,13 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type.ID;
+import org.basex.query.value.type.Type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -429,7 +429,7 @@ public class DBNode extends ANode {
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, data.meta.name, PRE, pre, TYPE, seqType()));
+    addPlan(plan, planElem(NAME, data.meta.name, PRE, pre, TYPE, seqType()));
   }
 
   @Override
@@ -468,7 +468,7 @@ public class DBNode extends ANode {
    * @return string
    */
   private String toString(final boolean func) {
-    if(func) return _DB_OPEN_PRE.args(data.meta.name, pre);
+    if(func) return Function._DB_OPEN_PRE.args(data.meta.name, pre);
 
     final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
     switch((NodeType) type) {

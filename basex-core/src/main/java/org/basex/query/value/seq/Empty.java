@@ -142,7 +142,7 @@ public final class Empty extends Value {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(SIZ, 0, TYPE, seqType()));
+    addPlan(plan, planElem(SIZE, 0, TYPE, seqType()));
   }
 
   @Override

@@ -158,7 +158,7 @@ final class JavaFunc extends JavaFunction {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, clazz.getName() + '.' + method), exprs);
+    addPlan(plan, planElem(NAME, clazz.getName() + '.' + method), exprs);
   }
 
   @Override

@@ -231,7 +231,7 @@ public abstract class Step extends Preds {
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(AXS, axis.name, TST, test), exprs);
+    addPlan(plan, planElem(AXIS, axis.name, TEST, test), exprs);
   }
 
   @Override

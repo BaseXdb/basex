@@ -75,7 +75,7 @@ public final class FPI extends FNode {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name.string(), VALUEE, value, TYPE, seqType()));
+    addPlan(plan, planElem(NAME, name.string(), VALUEE, value, TYPE, seqType()));
   }
 
   @Override

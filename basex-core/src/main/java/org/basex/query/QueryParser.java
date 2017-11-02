@@ -211,7 +211,7 @@ public class QueryParser extends InputParser {
       module = new QNm(pref, uri);
       sc.ns.add(pref, uri, info());
       namespaces.put(pref, uri);
-      wsCheck(";");
+      wsCheck(SEMICOL);
 
       // get absolute path
       final IO baseO = sc.baseIO();
@@ -316,7 +316,7 @@ public class QueryParser extends InputParser {
       pos = i;
       return;
     }
-    wsCheck(";");
+    wsCheck(SEMICOL);
   }
 
   /**
@@ -1213,7 +1213,6 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "OrderSpec" rule.
    * Parses the "OrderModifier" rule.
-   *
    * Empty order specs are ignored, {@code order} is then returned unchanged.
    * @return new order key
    * @throws QueryException query exception
@@ -2046,7 +2045,7 @@ public class QueryParser extends InputParser {
         }
       } else {
         pos = p;
-        if(!name.hasPrefix() && consume(":*")) {
+        if(!name.hasPrefix() && consume(COLWC)) {
           // name test: prefix:*
           name = new QNm(concat(name.string(), COLON));
           qnames.add(name, !att, info);
@@ -2249,7 +2248,7 @@ public class QueryParser extends InputParser {
     // named function reference
     pos = ip;
     final QNm name = eQName(null, sc.funcNS);
-    if(name != null && wsConsumeWs("#")) {
+    if(name != null && wsConsumeWs(HSH)) {
       if(keyword(name)) throw error(RESERVED_X, name.local());
       final Expr ex = numericLiteral(true);
       if(!(ex instanceof Int)) return ex;

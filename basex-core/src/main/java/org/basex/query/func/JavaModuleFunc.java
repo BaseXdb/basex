@@ -95,7 +95,7 @@ final class JavaModuleFunc extends JavaFunction {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name()), exprs);
+    addPlan(plan, planElem(NAME, name()), exprs);
   }
 
   @Override
