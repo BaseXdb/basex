@@ -40,7 +40,7 @@ final class BaseXTextHint extends JLabel implements DocumentListener {
    * Check whether the prompt should be visible or not. The visibility will change on updates to the
    * Document and on focus changes.
    */
-  private void update() {
+  public void update() {
     setVisible(tf.getText().isEmpty());
   }
 

@@ -246,6 +246,7 @@ public class BaseXCombo extends JComboBox<Object> {
         }
       }
     }
+    if(hint != null) hint.update();
   }
 
   /**

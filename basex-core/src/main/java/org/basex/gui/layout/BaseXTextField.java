@@ -132,6 +132,7 @@ public class BaseXTextField extends JTextField {
   public void setText(final String text) {
     last = text;
     super.setText(text);
+    if(hint != null) hint.update();
   }
 
   /**
