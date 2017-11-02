@@ -477,9 +477,9 @@ public abstract class Array extends FItem {
 
   @Override
   public final void plan(final FElem plan) {
-    final long size = arraySize();
-    final FElem el = planElem(SIZ, size, TYPE, seqType());
-    final int max = (int) Math.min(size, 5);
+    final long s = arraySize();
+    final FElem el = planElem(ENT, s, TYPE, seqType());
+    final int max = (int) Math.min(s, 5);
     for(int i = 0; i < max; i++) get(i).plan(el);
     addPlan(plan, el);
   }

@@ -368,6 +368,7 @@ public interface QueryText {
 
   /** Query Info. */ String QUERY_PLAN = "QueryPlan";
   /** Query Info. */ String COMPILED = "compiled";
+  /** Query Info. */ String EVAL = "eval";
   /** Query Info. */ String OP = "op";
   /** Query Info. */ String POS = "pos";
   /** Query Info. */ String VAR = "var";
@@ -382,11 +383,11 @@ public interface QueryText {
   /** Query Info. */ String MAX = "max";
   /** Query Info. */ String INF = "inf";
   /** Query Info. */ String TCL = "tailCall";
+  /** Query Info. */ String ENT = "entries";
 
   // OPTIMIZATIONS ================================================================================
 
   /** Optimization info. */ String OPTDESC = "rewrite descendant-or-self step(s)";
-  /** Optimization info. */ String OPTATOMIC_X = "atomic evaluation of %";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
   /** Optimization info. */ String OPTPRE_X_X = "pre-evaluate % to %";
   /** Optimization info. */ String OPTEMPTY_X = "pre-evaluate % to empty sequence";
