@@ -67,7 +67,7 @@ public abstract class Filter extends Preds {
     // invalidate current context value (will be overwritten by filter)
     final QueryFocus focus = cc.qc.focus;
     final Value init = focus.value;
-    focus.value = Path.initial(cc, root);
+    focus.value = root(cc, root);
     try {
       return super.compile(cc);
     } finally {
@@ -104,7 +104,7 @@ public abstract class Filter extends Preds {
     final QueryFocus focus = cc.qc.focus;
     final Value cv = focus.value;
     try {
-      focus.value = Path.initial(cc, root);
+      focus.value = root(cc, root);
       final Expr e = super.optimize(cc);
       if(e != this) return e;
     } finally {
@@ -122,7 +122,7 @@ public abstract class Filter extends Preds {
     // try to rewrite filter to index access
     if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
       final Path ip = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
-      final Expr ie = ip.index(cc, Path.initial(cc, root));
+      final Expr ie = ip.index(cc, root(cc, root));
       if(ie != ip) return ie;
     }
 
@@ -259,9 +259,7 @@ public abstract class Filter extends Preds {
 
   @Override
   public final void plan(final FElem plan) {
-    final FElem el = planElem();
-    addPlan(plan, el, root);
-    super.plan(el);
+    addPlan(plan, planElem(), root, exprs);
   }
 
   @Override

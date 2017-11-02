@@ -19,9 +19,9 @@ public final class Flt extends ANum {
   /** Value "NaN". */
   public static final Flt NAN = new Flt(Float.NaN);
   /** Value "0". */
-  private static final Flt ZERO = new Flt(0);
+  public static final Flt ZERO = new Flt(0);
   /** Value "1". */
-  private static final Flt ONE = new Flt(1);
+  public static final Flt ONE = new Flt(1);
   /** Data. */
   private final float value;
 

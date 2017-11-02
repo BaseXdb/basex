@@ -29,7 +29,7 @@ public final class FnDistinctValues extends StandardFunc {
     final Collation coll = toCollation(1, qc);
     if(exprs[0] instanceof RangeSeq) return qc.iter(exprs[0]);
 
-    final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
+    final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     final Iter iter = exprs[0].atomIter(qc, info);
     return new Iter() {
       @Override
@@ -50,7 +50,7 @@ public final class FnDistinctValues extends StandardFunc {
     if(exprs[0] instanceof RangeSeq) return (RangeSeq) exprs[0];
 
     final ValueBuilder vb = new ValueBuilder();
-    final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
+    final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     final Iter iter = exprs[0].atomIter(qc, info);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
@@ -84,7 +84,7 @@ public final class FnDistinctValues extends StandardFunc {
     final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).pathNodes(cc);
     if(nodes == null) return this;
     // loop through all nodes
-    final HashItemSet is = new HashItemSet();
+    final HashItemSet is = new HashItemSet(false);
     for(PathNode pn : nodes) {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
@@ -96,7 +96,7 @@ public final class FnDistinctValues extends StandardFunc {
       // check if distinct values are available
       if(!StatsType.isCategory(pn.stats.type)) return this;
       // if yes, add them to the item set
-      for(final byte[] c : pn.stats.values) is.put(new Atm(c), info);
+      for(final byte[] c : pn.stats.values) is.add(new Atm(c), info);
     }
     // return resulting sequence
     final ValueBuilder vb = new ValueBuilder();

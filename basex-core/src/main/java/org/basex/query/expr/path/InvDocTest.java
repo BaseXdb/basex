@@ -43,7 +43,7 @@ final class InvDocTest extends Test {
 
     // use simple test if database contains only one document
     final Data data = rt.data();
-    if(data.meta.ndocs == 1) return KindTest.DOC;
+    if(data == null || data.meta.ndocs == 1) return KindTest.DOC;
 
     // adopt nodes from existing sequence
     if(rt instanceof DBNodeSeq) {

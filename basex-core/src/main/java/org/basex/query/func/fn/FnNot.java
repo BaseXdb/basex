@@ -33,8 +33,8 @@ public final class FnNot extends StandardFunc {
     }
     // simplify: not('a' = 'b') -> 'a' != 'b'
     if(e0 instanceof CmpV || e0 instanceof CmpG) {
-      final Cmp c = ((Cmp) e0).invert();
-      return c == e0 ? this : c.optimize(cc);
+      final Expr e = ((Cmp) e0).invert(cc);
+      return e == e0 ? this : e;
     }
     // simplify: not(not(A)) -> boolean(A)
     if(e0.isFunction(Function.NOT)) {

@@ -57,10 +57,12 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * If possible, inverts the operands of the expression.
+   * If possible, returns an optimized expression with inverted operands.
+   * @param cc compilation context
    * @return original or modified expression
+   * @throws QueryException query exception
    */
-  public abstract Cmp invert();
+  public abstract Expr invert(CompileContext cc) throws QueryException;
 
   /**
    * This method is called if the first operand of the comparison expression is a

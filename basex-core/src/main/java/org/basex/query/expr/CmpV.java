@@ -236,11 +236,11 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public CmpV invert() {
+  public Expr invert(final CompileContext cc) throws QueryException {
     final Expr e1 = exprs[0], e2 = exprs[1];
     final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    return st1.oneNoArray() && st2.oneNoArray() ? new CmpV(e1, e2, op.invert(), coll, sc, info) :
-      this;
+    return st1.oneNoArray() && st2.oneNoArray() ?
+      new CmpV(e1, e2, op.invert(), coll, sc, info).optimize(cc) : this;
   }
 
   @Override

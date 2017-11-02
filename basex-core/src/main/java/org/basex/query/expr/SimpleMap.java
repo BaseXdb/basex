@@ -68,14 +68,23 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    seqType = exprs[exprs.length - 1].seqType().withOcc(Occ.ZERO_MORE);
+    // pre-evaluate map with statically known values
+    if(allAreValues()) return cc.preEval(this);
 
     // rewrite path with empty steps
     for(final Expr expr : exprs) {
       if(expr == Empty.SEQ) return cc.emptySeq(this);
     }
-    // pre-evaluate map with statically known values
-    return allAreValues() ? cc.preEval(this) : this;
+
+    // compute result size
+    size = 1;
+    final int el = exprs.length;
+    for(int e = 0; size != -1 && e < el; e++) {
+      final long s = exprs[e].size();
+      size = s == -1 ? -1 : size * s;
+    }
+    seqType = exprs[el - 1].seqType().withOcc(Occ.ZERO_MORE);
+    return this;
   }
 
   @Override

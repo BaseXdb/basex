@@ -133,7 +133,7 @@ public final class RewritingsTest extends QueryPlanTest {
     // {@link CmpR} rewritings
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", "count(//CmpR) = 1");
     check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", "count(//CmpR) = 1");
-    check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", "count(//CmpG) = 1 and count(//CmpR) = 1");
+    check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", "count(//CmpR) = 2");
 
     // {@link CmpSR} rewritings
     check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", "count(//CmpSR) = 1");

@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  */
 public final class List extends Arr {
   /** Limit for the size of sequences that are materialized at compile time. */
-  private static final int MAX_MAT_SIZE = 1 << 16;
+  private static final int MAX_MAT_SIZE = 1 << 18;
 
   /**
    * Constructor.

@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
@@ -11,6 +12,7 @@ import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
@@ -289,6 +291,38 @@ public abstract class Preds extends Arr {
   protected static boolean num(final Expr expr) {
     final SeqType st = expr.seqType();
     return st.type.isNumber() && st.zeroOrOne() && expr.isSimple();
+  }
+
+  /**
+   * Returns a context value for the given root.
+   * @param cc compilation context (can be {@code null})
+   * @param root root expression (can be {@code null})
+   * @return root or {@code null}
+   */
+  public static Value root(final CompileContext cc, final Expr root) {
+    // current context value
+    final Value v = cc != null ? cc.qc.focus.value : null;
+    // no root or context expression: return context
+    if(root == null || root instanceof ContextValue) return v;
+    // root reference
+    if(root instanceof Root) return v instanceof ANode ? ((ANode) v).root() : v;
+    // root is value: return root
+    if(root.isValue()) return (Value) root;
+    // data reference: create dummy node
+    final Data d = root.data();
+    if(d != null) return new DBNode(d, 0, Data.ELEM);
+    // string or untyped: return dummy values
+    final SeqType st = root.seqType();
+    if(st.type == AtomType.STR) return Str.ZERO;
+    if(st.type == AtomType.ITR) return Int.ZERO;
+    if(st.type == AtomType.BLN) return Bln.TRUE;
+    if(st.type == AtomType.DBL) return Dbl.ZERO;
+    if(st.type == AtomType.FLT) return Flt.ZERO;
+    if(st.type == AtomType.DEC) return Dec.ZERO;
+    if(st.type == NodeType.DOC) return FDoc.DUMMY;
+    if(st.type instanceof NodeType) return FElem.DUMMY;
+    // otherwise, return null
+    return null;
   }
 
   @Override

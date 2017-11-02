@@ -24,7 +24,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class CmpG extends Cmp {
+public class CmpG extends Cmp {
   /** Comparators. */
   public enum OpG {
     /** General comparison: less or equal. */
@@ -110,8 +110,6 @@ public final class CmpG extends Cmp {
 
   /** Comparator. */
   OpG op;
-  /** Flag for atomic evaluation. */
-  private boolean atomic;
 
   /**
    * Constructor.
@@ -170,25 +168,33 @@ public final class CmpG extends Cmp {
     // choose evaluation strategy
     final SeqType st2 = e2.seqType();
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
-      atomic = true;
-      cc.info(OPTATOMIC_X, this);
+      return cc.replaceWith(this, new CmpAtomicG(e1, e2, op, coll, sc, info).optimize(cc));
     }
 
     // pre-evaluate values
     if(allAreValues()) return cc.preEval(this);
 
-    /* pre-evaluate equality test if:
-     * - equality operator is specified,
-     * - operands are equal,
-     * - operands are deterministic, non-updating,
-     * - operands do not depend on context (unless context value exists)
-     */
-    if(op == OpG.EQ && e1.equals(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
-        (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
-      // currently limited to strings, integers and booleans
-      final Type t1 = st1.type;
-      if(st1.oneOrMore() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
-          t1 == AtomType.BLN)) return cc.replaceWith(this, Bln.TRUE);
+    if(op == OpG.EQ) {
+      /* pre-evaluate equality test if:
+       * - equality operator is specified,
+       * - operands are equal,
+       * - operands are deterministic, non-updating,
+       * - operands do not depend on context (unless context value exists)
+       */
+      final Type t1 = st1.type, t2 = st2.type;
+      if(e1.equals(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+          (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
+        // currently limited to strings, integers and booleans
+        if(st1.oneOrMore() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
+            t1 == AtomType.BLN)) return cc.replaceWith(this, Bln.TRUE);
+      }
+
+      // use hash
+      if(coll == null && e2.isValue() && e2.size() > 1 &&
+          (t1.instanceOf(AtomType.AAT) && t1.eq(t2) ||
+           t1.isStringOrUntyped() && t2.isStringOrUntyped())) {
+        return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
+      }
     }
     return this;
   }
@@ -203,15 +209,6 @@ public final class CmpG extends Cmp {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // atomic evaluation of arguments (faster)
-    if(atomic) {
-      final Item it1 = exprs[0].item(qc, info);
-      if(it1 == null) return Bln.FALSE;
-      final Item it2 = exprs[1].item(qc, info);
-      if(it2 == null) return Bln.FALSE;
-      return Bln.get(eval(it1, it2));
-    }
-
     // retrieve iterators
     Iter iter1 = exprs[0].atomIter(qc, info);
     final long is1 = iter1.size();
@@ -273,7 +270,7 @@ public final class CmpG extends Cmp {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean eval(final Item it1, final Item it2) throws QueryException {
+  final boolean eval(final Item it1, final Item it2) throws QueryException {
     final Type t1 = it1.type, t2 = it2.type;
     if(!(it1 instanceof FItem || it2 instanceof FItem) &&
         (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
@@ -283,11 +280,11 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public CmpG invert() {
+  public final Expr invert(final CompileContext cc) throws QueryException {
     final Expr e1 = exprs[0], e2 = exprs[1];
     final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    return st1.oneNoArray() && st2.oneNoArray() ? new CmpG(e1, e2, op.invert(), coll, sc, info) :
-      this;
+    return st1.oneNoArray() && st2.oneNoArray() ?
+      new CmpG(e1, e2, op.invert(), coll, sc, info).optimize(cc) : this;
   }
 
   /**
@@ -297,18 +294,15 @@ public final class CmpG extends Cmp {
    * @return resulting expression or {@code null}
    * @throws QueryException query exception
    */
-  CmpG union(final CmpG g, final CompileContext cc) throws QueryException {
+  final Expr union(final CmpG g, final CompileContext cc) throws QueryException {
     if(op != g.op || coll != g.coll || !exprs[0].equals(g.exprs[0])) return null;
 
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(cc);
-    final CmpG cmp = new CmpG(exprs[0], list, op, coll, sc, info);
-    final SeqType st = list.seqType();
-    cmp.atomic = atomic && st.zeroOrOne() && !st.mayBeArray();
-    return cmp;
+    return new CmpG(exprs[0], list, op, coll, sc, info).optimize(cc);
   }
 
   @Override
-  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
+  public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only equality expressions on default collation can be rewritten
     if(op != OpG.EQ || coll != null) return false;
 
@@ -324,12 +318,12 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public final boolean equals(final Object obj) {
     return this == obj || obj instanceof CmpG && op == ((CmpG) obj).op && super.equals(obj);
   }
 
   @Override
-  public void plan(final FElem plan) {
+  public final void plan(final FElem plan) {
     addPlan(plan, planElem(OP, op.name), exprs);
   }
 
@@ -339,7 +333,7 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return toString(" " + op + ' ');
   }
 }

@@ -18,23 +18,16 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class IndexOptimizeTest extends QueryPlanTest {
-  /**
-   * Creates a test database.
-   */
-  @BeforeClass
-  public static void start() {
+  /** Creates a test database. */
+  @BeforeClass public static void start() {
     execute(new DropDB(NAME));
     set(MainOptions.FTINDEX, true);
     set(MainOptions.TOKENINDEX, true);
     set(MainOptions.QUERYINFO, true);
   }
 
-  /**
-   * Checks the open command.
-   * Test method.
-   */
-  @Test
-  public void openDocTest() {
+  /** Checks the open command. */
+  @Test public void openDocTest() {
     createDoc();
     execute(new Open(NAME));
     check("//*[text() = '1']");
@@ -47,12 +40,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check("for $s in ('x', '') return //*[text() = $s]", "");
   }
 
-  /**
-   * Checks the open command.
-   * Test method.
-   */
-  @Test
-  public void openCollTest() {
+  /** Checks the open command. */
+  @Test public void openCollTest() {
     createColl();
     execute(new Open(NAME));
     check("//*[text() = '1']");
@@ -63,9 +52,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check("for $s in ('x', '') return //*[text() = $s]", "");
   }
 
-  /**
-   * Checks the XQuery doc() function.
-   */
+  /** Checks the XQuery doc() function. */
   @Test
   public void docTest() {
     createDoc();
@@ -79,9 +66,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check("for $s in ('x', '') return " + func + "//*[text() = $s]", "");
   }
 
-  /**
-   * Checks the XQuery collection() function.
-   */
+  /** Checks the XQuery collection() function. */
   @Test
   public void collTest() {
     createColl();
@@ -96,9 +81,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         + "return " + func + "//*[text() = $s]", "");
   }
 
-  /**
-   * Checks the XQuery db:open() function.
-   */
+  /** Checks the XQuery db:open() function. */
   @Test
   public void dbOpenTest() {
     createColl();
@@ -111,11 +94,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         + "return " + func + "//*[text() = $s]", "");
   }
 
-  /**
-   * Checks the XQuery db:open() function, using a specific path.
-   */
-  @Test
-  public void dbOpenExtTest() {
+  /** Checks the XQuery db:open() function, using a specific path. */
+  @Test public void dbOpenExtTest() {
     createColl();
     final String func = _DB_OPEN.args(NAME, "two");
     check(func + "//*[text() = '1']", "");
@@ -127,11 +107,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         + "return " + func + "//*[text() = $s]", "");
   }
 
-  /**
-   * Checks token requests.
-   */
-  @Test
-  public void tokenTest() {
+  /** Checks token requests. */
+  @Test public void tokenTest() {
     createDoc();
     execute(new Open(NAME));
     check("data(//*[tokenize(@idref) = 'id1'])", "1");
@@ -146,11 +123,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check("for $s in ('id2', 'id3') return data(//@*[contains-token(., $s)])", "id1 id2");
   }
 
-  /**
-   * Checks full-text requests.
-   */
-  @Test
-  public void ftTest() {
+  /** Checks full-text requests. */
+  @Test public void ftTest() {
     createDoc();
     execute(new Open(NAME));
     check("data(//*[text() contains text '1'])", "1");
@@ -160,11 +134,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check("//*[text() contains text {'2','4'} all words]", "");
   }
 
-  /**
-   * Checks if a full-text index with language option is used.
-   */
-  @Test
-  public void ftTestLang() {
+  /** Checks if a full-text index with language option is used. */
+  @Test public void ftTestLang() {
     set(MainOptions.LANGUAGE, "de");
     createDoc();
     execute(new Open(NAME));
@@ -173,11 +144,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check("//text()[. contains text '1' using language 'German']");
   }
 
-  /**
-   * Checks index optimizations inside functions.
-   */
-  @Test
-  public void functionTest() {
+  /** Checks index optimizations inside functions. */
+  @Test public void functionTest() {
     createColl();
     // document access after inlining
     check("declare function local:x($d) { collection($d)//text()[. = '1'] };"
@@ -198,11 +166,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         "//text()[. contains text { $x }] }; local:x('1')", "1");
   }
 
-  /**
-   * Checks predicate tests for empty strings.
-   */
-  @Test
-  public void empty() {
+  /** Checks predicate tests for empty strings. */
+  @Test public void empty() {
     createDoc();
     execute(new Open(NAME));
     query("//*[text() = '']", "");
@@ -216,12 +181,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     query("//a[not(. = '')]/text()", "1\n2 3");
   }
 
-  /**
-   * Checks the selective index feature.
-   * Test method.
-   */
-  @Test
-  public void selectiveIndexTest() {
+  /** Checks the selective index feature. */
+  @Test public void selectiveIndexTest() {
     try {
       // first run: use index; second run: no index
       for(final String include : new String[] { "a", "b" }) {
@@ -244,11 +205,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     }
   }
 
-  /**
-   * Checks mixed downward and upward axes.
-   */
-  @Test
-  public void upAndDown() {
+  /** Checks mixed downward and upward axes. */
+  @Test public void upAndDown() {
     createDoc();
     execute(new Open(NAME));
     query("name(//@x/..[@x = 'y'])", "a");
@@ -257,11 +215,13 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     query("name(//@x/..[@* = 'y'])", "a");
   }
 
-  /**
-   * Checks expressions with the pragma for enforcing index rewritings.
-   */
-  @Test
-  public void pragma() {
+  /** Comparison expressions. */
+  @Test public void cmpG() {
+    check("count(let $s := (0,1 to 99999) return $s[. = $s])", "100000", "exists(//CmpHashG)");
+  }
+
+  /** Checks expressions with the pragma for enforcing index rewritings. */
+  @Test public void pragma() {
     createDoc();
     final String pragma = "(# db:enforceindex #) { ";
     check(pragma + _DB_OPEN.args("<_>" + NAME + "</_>") + "//a[text() = '1']/text() }", "1",

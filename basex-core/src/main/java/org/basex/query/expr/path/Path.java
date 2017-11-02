@@ -133,7 +133,7 @@ public abstract class Path extends ParseExpr {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr step = steps[s];
-        // axis step: if input is a document, its type is temporarily generalized
+        // axis step: if input is a document, its type will be generalized
         final boolean as = step instanceof Step;
         if(as && s == 0 && doc) cv.type = NodeType.NOD;
         try {
@@ -358,29 +358,7 @@ public abstract class Path extends ParseExpr {
    * @return root
    */
   private Value initial(final CompileContext cc) {
-    return initial(cc, root);
-  }
-
-  /**
-   * Returns a context value for the given root, or {@code null}.
-   * @param cc compilation context (may be @code null)
-   * @param root root expression
-   * @return root
-   */
-  public static Value initial(final CompileContext cc, final Expr root) {
-    // current context value
-    final Value v = cc != null ? cc.qc.focus.value : null;
-    // no root or context expression: return context
-    if(root == null || root instanceof ContextValue) return v;
-    // root reference
-    if(root instanceof Root) return v instanceof ANode ? ((ANode) v).root() : v;
-    // root is value: return root
-    if(root.isValue()) return (Value) root;
-    // data reference
-    final Data d = root.data();
-    if(d != null) return new DBNode(d, 0, Data.ELEM);
-    // otherwise, return null
-    return null;
+    return Preds.root(cc, root);
   }
 
   /**
@@ -620,7 +598,7 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   public Expr index(final CompileContext cc, final Value rt) throws QueryException {
-    // only rewrite if data reference exists and if root points to documents
+    // do not rewrite if existing data reference does not point to documents
     final Data data = rt == null ? null : rt.data();
     if(rt != null && rt.type != NodeType.DOC) return this;
 

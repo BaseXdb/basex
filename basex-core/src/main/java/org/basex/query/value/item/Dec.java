@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class Dec extends ANum {
   /** Zero value. */
-  private static final Dec ZERO = new Dec(BigDecimal.ZERO);
+  public static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */
   private final BigDecimal value;
 

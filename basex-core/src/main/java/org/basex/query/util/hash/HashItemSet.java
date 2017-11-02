@@ -8,85 +8,75 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This is an efficient and memory-saving hash map for storing items.
- * It is related to the {@link TokenSet} class.
+ * This is an efficient and memory-saving hash map for storing items. Items with identical hash
+ * keys are checked for equivalence.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
 public class HashItemSet extends ASet implements ItemSet {
   /** Hash values. */
-  private int[] hash;
+  private int[] hash = new int[Array.CAPACITY];;
   /** Hashed items. */
-  private Item[] keys;
+  private Item[] items = new Item[Array.CAPACITY];
+  /** Equality check (stricter than equivalence check). */
+  private boolean eq;
 
   /**
    * Default constructor.
+   * @param eq equality check
    */
-  public HashItemSet() {
+  public HashItemSet(final boolean eq) {
     super(Array.CAPACITY);
-    hash = new int[Array.CAPACITY];
-    keys = new Item[Array.CAPACITY];
+    this.eq = eq;
   }
 
   @Override
-  public final boolean add(final Item key, final InputInfo ii) throws QueryException {
-    return index(key, ii) > 0;
+  public final boolean add(final Item item, final InputInfo ii) throws QueryException {
+    return !check(item, ii, true);
   }
 
   /**
-   * Stores the specified key and returns its id.
-   * @param key key to be added
+   * Checks if the specified item exists.
+   * @param item item to look up
    * @param ii input info
-   * @return unique id of stored key (larger than zero)
+   * @return result of check
    * @throws QueryException query exception
    */
-  public int put(final Item key, final InputInfo ii) throws QueryException {
-    final int i = index(key, ii);
-    return Math.abs(i);
+  public final boolean contains(final Item item, final InputInfo ii) throws QueryException {
+    return check(item, ii, false);
   }
 
   /**
-   * Returns the id of the specified key, or {@code 0} if the key does not exist.
-   * @param key key to be looked up
+   * Checks if an item exists in the index.
+   * @param item item to look up
    * @param ii input info
-   * @return id, or {@code 0} if key does not exist
-   * @throws QueryException query exception
-   */
-  public final int id(final Item key, final InputInfo ii) throws QueryException {
-    final int h = key.hash(ii);
-    final int p = h & buckets.length - 1;
-    for(int id = buckets[p]; id != 0; id = next[id]) {
-      if(keys[id].equiv(key, null, ii)) return -id;
-    }
-    return 0;
-  }
-
-  /**
-   * Stores the specified key and returns its id, or returns the negative id if the
-   * key has already been stored.
-   * @param key key to be found
-   * @param ii input info
+   * @param add add entry
    * @return id, or negative id if key has already been stored
    * @throws QueryException query exception
    */
-  private int index(final Item key, final InputInfo ii) throws QueryException {
+  private boolean check(final Item item, final InputInfo ii, final boolean add)
+      throws QueryException {
+
     checkSize();
-    final int h = key.hash(ii);
-    final int b = h & buckets.length - 1;
-    for(int r = buckets[b]; r != 0; r = next[r]) {
-      if(keys[r].equiv(key, null, ii)) return -r;
+    final int h = item.hash(ii), b = h & buckets.length - 1;
+    for(int id = buckets[b]; id != 0; id = next[id]) {
+      if(eq ? items[id].eq(item, null, null, ii) : items[id].equiv(item, null, ii)) return true;
     }
-    next[size] = buckets[b];
-    keys[size] = key;
-    hash[size] = h;
-    buckets[b] = size;
-    return size++;
+    if(add) {
+      final int s = size;
+      next[s] = buckets[b];
+      items[s] = item;
+      hash[s] = h;
+      buckets[b] = s;
+      size = s + 1;
+    }
+    return false;
   }
 
   @Override
   public Iterator<Item> iterator() {
-    return new ArrayIterator<>(keys, 1, size);
+    return new ArrayIterator<>(items, 1, size);
   }
 
   @Override
@@ -96,7 +86,7 @@ public class HashItemSet extends ASet implements ItemSet {
 
   @Override
   protected void rehash(final int newSize) {
-    keys = Array.copy(keys, new Item[newSize]);
+    items = Array.copy(items, new Item[newSize]);
     hash = Arrays.copyOf(hash, newSize);
   }
 }
