@@ -86,19 +86,9 @@ public final class FTIndex extends ValueIndex {
     tp = new int[data.meta.maxlen + 3];
     final int tl = tp.length;
     for(int i = 0; i < tl; ++i) tp[i] = -1;
-    int is = inX.readNum();
-    while(--is >= 0) {
-      int p = inX.readNum();
-      final int r;
-      if(p < tl) {
-        r = inX.read4();
-      } else {
-        // legacy issue (7.0.2 -> 7.1)
-        r = p << 24 | (inX.read1() & 0xFF) << 16 |
-            (inX.read1() & 0xFF) << 8 | inX.read1() & 0xFF;
-        p = p >> 8 | 0x40;
-      }
-      tp[p] = r;
+    for(int is = inX.readNum(); --is >= 0;) {
+      final int p = inX.readNum();
+      tp[p] = inX.read4();
     }
     tp[tl - 1] = (int) inY.length();
   }

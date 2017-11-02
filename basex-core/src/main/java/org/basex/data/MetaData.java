@@ -103,10 +103,6 @@ public final class MetaData {
 
   /** Flag for out-of-date indexes. */
   private boolean oldindex;
-  /** Flag for out-of-date wildcard index (legacy, deprecated). */
-  private boolean wcindex;
-  /** Scoring mode (legacy, deprecated). */
-  private int scoring;
 
   /**
    * Constructor for a main-memory database instance.
@@ -230,7 +226,7 @@ public final class MetaData {
    * @return result of check
    */
   public boolean oldindex() {
-    return oldindex || wcindex || scoring != 0;
+    return oldindex;
   }
 
   /**
@@ -380,47 +376,38 @@ public final class MetaData {
     while(true) {
       final String k = Token.string(in.readToken());
       if(k.isEmpty()) break;
-      if(k.equals(DBPERM)) {
-        // legacy (Version < 8)
-        for(int u = in.readNum(); u > 0; --u) { in.readToken(); in.readToken(); in.readNum(); }
-      } else {
-        final String v = Token.string(in.readToken());
-        if(k.equals(DBSTR))           storage      = v;
-        else if(k.equals(IDBSTR))     istorage     = v;
-        else if(k.equals(DBFNAME))    original     = v;
-        else if(k.equals(DBFTSW))     stopwords    = v;
-        else if(k.equals(DBFTLN))     language     = Language.get(v);
-        else if(k.equals(DBSIZE))     size         = toInt(v);
-        else if(k.equals(DBNDOCS))    ndocs        = toInt(v);
-        else if(k.equals(DBSCTYPE))   scoring      = toInt(v);
-        else if(k.equals(DBMAXLEN))   maxlen       = toInt(v);
-        else if(k.equals(DBMAXCATS))  maxcats      = toInt(v);
-        else if(k.equals(DBLASTID))   lastid       = toInt(v);
-        else if(k.equals(DBTIME))     time         = toLong(v);
-        else if(k.equals(DBFSIZE))    filesize     = toLong(v);
-        else if(k.equals(DBFTDC))     diacritics   = toBool(v);
-        else if(k.equals(DBUPDIDX))   updindex     = toBool(v);
-        else if(k.equals(DBAUTOOPT))  autooptimize = toBool(v);
-        else if(k.equals(DBTXTIDX))   textindex    = toBool(v);
-        else if(k.equals(DBATVIDX))   attrindex    = toBool(v);
-        else if(k.equals(DBTOKIDX))   tokenindex   = toBool(v);
-        else if(k.equals(DBFTXIDX))   ftindex      = toBool(v);
-        else if(k.equals(DBTXTINC))   textinclude  = v;
-        else if(k.equals(DBATVINC))   attrinclude  = v;
-        else if(k.equals(DBTOKINC))   tokeninclude = v;
-        else if(k.equals(DBFTXINC))   ftinclude    = v;
-        else if(k.equals(DBSPLITS))   splitsize    = toInt(v);
-        else if(k.equals(DBCRTTXT))   createtext   = toBool(v);
-        else if(k.equals(DBCRTATV))   createattr   = toBool(v);
-        else if(k.equals(DBCRTTOK))   createtoken  = toBool(v);
-        else if(k.equals(DBCRTFTX))   createft     = toBool(v);
-        else if(k.equals(DBWCIDX))    wcindex      = toBool(v);
-        else if(k.equals(DBFTST))     stemming     = toBool(v);
-        else if(k.equals(DBFTCS))     casesens     = toBool(v);
-        else if(k.equals(DBUPTODATE)) uptodate     = toBool(v);
-        // legacy: set up-to-date flag to false if path index does not exist
-        else if(k.equals(DBPTHIDX) && !toBool(v)) uptodate = false;
-      }
+      final String v = Token.string(in.readToken());
+      if(k.equals(DBSTR))           storage      = v;
+      else if(k.equals(IDBSTR))     istorage     = v;
+      else if(k.equals(DBFNAME))    original     = v;
+      else if(k.equals(DBFTSW))     stopwords    = v;
+      else if(k.equals(DBFTLN))     language     = Language.get(v);
+      else if(k.equals(DBSIZE))     size         = toInt(v);
+      else if(k.equals(DBNDOCS))    ndocs        = toInt(v);
+      else if(k.equals(DBMAXLEN))   maxlen       = toInt(v);
+      else if(k.equals(DBMAXCATS))  maxcats      = toInt(v);
+      else if(k.equals(DBLASTID))   lastid       = toInt(v);
+      else if(k.equals(DBTIME))     time         = toLong(v);
+      else if(k.equals(DBFSIZE))    filesize     = toLong(v);
+      else if(k.equals(DBFTDC))     diacritics   = toBool(v);
+      else if(k.equals(DBUPDIDX))   updindex     = toBool(v);
+      else if(k.equals(DBAUTOOPT))  autooptimize = toBool(v);
+      else if(k.equals(DBTXTIDX))   textindex    = toBool(v);
+      else if(k.equals(DBATVIDX))   attrindex    = toBool(v);
+      else if(k.equals(DBTOKIDX))   tokenindex   = toBool(v);
+      else if(k.equals(DBFTXIDX))   ftindex      = toBool(v);
+      else if(k.equals(DBTXTINC))   textinclude  = v;
+      else if(k.equals(DBATVINC))   attrinclude  = v;
+      else if(k.equals(DBTOKINC))   tokeninclude = v;
+      else if(k.equals(DBFTXINC))   ftinclude    = v;
+      else if(k.equals(DBSPLITS))   splitsize    = toInt(v);
+      else if(k.equals(DBCRTTXT))   createtext   = toBool(v);
+      else if(k.equals(DBCRTATV))   createattr   = toBool(v);
+      else if(k.equals(DBCRTTOK))   createtoken  = toBool(v);
+      else if(k.equals(DBCRTFTX))   createft     = toBool(v);
+      else if(k.equals(DBFTST))     stemming     = toBool(v);
+      else if(k.equals(DBFTCS))     casesens     = toBool(v);
+      else if(k.equals(DBUPTODATE)) uptodate     = toBool(v);
     }
 
     // check version of database storage
@@ -430,8 +417,6 @@ public final class MetaData {
     oldindex = !istorage.equals(ISTORAGE) &&
         new Version(istorage).compareTo(new Version(ISTORAGE)) > 0;
     corrupt = dbfile(DATAUPD).exists();
-    // deactivate full-text index if obsolete trie structure was used
-    if(wcindex) ftindex = false;
   }
 
   /**

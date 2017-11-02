@@ -30,8 +30,6 @@ public interface DataText {
   String DBFSIZE = "FSIZE";
   /** Number of documents. */
   String DBNDOCS = "NDOCS";
-  /** Path indexing. */
-  String DBPTHIDX = "PTHINDEX";
   /** Automatic index update. */
   String DBUPDIDX = "UPDINDEX";
   /** Automatic optimization. */
@@ -72,8 +70,6 @@ public interface DataText {
   String DBUPTODATE = "UPTODATE";
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
-  /** Permissions. */
-  String DBPERM = "PERM";
   /** Documents. */
   String DBDOCS = "DOCS";
   /** Recreate text index. */
@@ -84,11 +80,6 @@ public interface DataText {
   String DBCRTTOK = "CRTTOK";
   /** Recreate full-text index. */
   String DBCRTFTX = "CRTFTX";
-
-  /** Full-text wildcards indexing (legacy, obsolete). */
-  String DBWCIDX = "WCINDEX";
-  /** Scoring type (legacy, obsolete). */
-  String DBSCTYPE = "FTSCTYPE";
 
   /** Tags. */
   String DBTAGS = "TAGS";

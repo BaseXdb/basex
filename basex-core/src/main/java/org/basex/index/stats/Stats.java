@@ -43,28 +43,12 @@ public final class Stats {
   }
 
   /**
-   * Getter for leaf flag.
-   * @return leaf flag
-   */
-  public boolean isLeaf() {
-    return leaf;
-  }
-
-  /**
-   * Setter for leaf flag.
-   * @param l leaf or not
-   */
-  public void setLeaf(final boolean l) {
-    leaf = l;
-  }
-
-  /**
    * Constructor, specifying an input stream.
    * @param in input stream
    * @throws IOException I/O exception
    */
   public Stats(final DataInput in) throws IOException {
-    // 0x10 indicates format introduced with Version 7.1
+    // ignore higher bits of older databases (skipped since version 9.0)
     final int t = in.readNum() & 0xF;
     type = (byte) t;
 
@@ -77,7 +61,6 @@ public final class Stats {
     }
     count = in.readNum();
     leaf = in.readBool();
-    // legacy since version 7.1
     in.readDouble();
   }
 
@@ -97,8 +80,7 @@ public final class Stats {
       }
     }
 
-    // 0x10 indicates format introduced with Version 7.1
-    out.writeNum(type | 0x10);
+    out.writeNum(type);
     if(isNumeric(type)) {
       out.writeDouble(min);
       out.writeDouble(max);
@@ -109,7 +91,7 @@ public final class Stats {
 
     out.writeNum(count);
     out.writeBool(leaf);
-    // legacy since version 7.1
+    // legacy (required before version 7.1)
     out.writeDouble(0);
   }
 
@@ -164,6 +146,22 @@ public final class Stats {
         if(values.size() > meta.maxcats) values = null;
       }
     }
+  }
+
+  /**
+   * Getter for leaf flag.
+   * @return leaf flag
+   */
+  public boolean isLeaf() {
+    return leaf;
+  }
+
+  /**
+   * Setter for leaf flag.
+   * @param l leaf or not
+   */
+  public void setLeaf(final boolean l) {
+    leaf = l;
   }
 
   @Override

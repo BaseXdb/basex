@@ -131,7 +131,6 @@ public final class EditorArea extends TextPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    super.keyReleased(e);
     if(EXEC1.is(e) || EXEC2.is(e)) {
       release(Action.EXECUTE);
     } else if(UNIT.is(e)) {

@@ -66,17 +66,11 @@ public final class PathNode {
   PathNode(final DataInput in, final PathNode node) throws IOException {
     name = (short) in.readNum();
     kind = (byte) in.read();
-    final int count = in.readNum();
+    in.readNum();
     final int cl = in.readNum();
+    in.readDouble();
     children = new PathNode[cl];
-    if(in.readDouble() == 1) {
-      // "1" indicates the format introduced with Version 7.1
-      stats = new Stats(in);
-    } else {
-      // create old format
-      stats = new Stats();
-      stats.count = count;
-    }
+    stats = new Stats(in);
     parent = node;
     for(int c = 0; c < cl; ++c) children[c] = new PathNode(in, this);
   }
@@ -139,8 +133,10 @@ public final class PathNode {
   void write(final DataOutput out, final MetaData meta) throws IOException {
     out.writeNum(name);
     out.write1(kind);
+    // legacy (required before version 7.1)
     out.writeNum(0);
     out.writeNum(children.length);
+    // legacy (required before version 7.1)
     out.writeDouble(1);
 
     // update leaf flag
