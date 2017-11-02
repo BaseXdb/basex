@@ -759,7 +759,7 @@ public final class TextEditor {
         // quote: ignore if it equals next character
         if(ch == curr) sb.setLength(0);
         // add second quote
-        else if(!XMLToken.isNCChar(prev)) sb.append(ch);
+        else if(!XMLToken.isNCChar(prev) && !XMLToken.isNCChar(curr)) sb.append(ch);
         move = 1;
       } else if(ch == '>') {
         // closes an opening element
