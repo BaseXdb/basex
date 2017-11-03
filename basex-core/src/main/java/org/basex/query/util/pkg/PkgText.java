@@ -44,9 +44,9 @@ public interface PkgText {
 
   // Jar descriptor children
 
-  /** <jar/> element. */
+  /** jar element. */
   byte[] E_JAR = token("jar");
-  /** <class/> element. */
+  /** class element. */
   byte[] E_CLASS = token("class");
 
   // <package/> attributes

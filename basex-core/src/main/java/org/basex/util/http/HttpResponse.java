@@ -40,7 +40,7 @@ public final class HttpResponse {
    * @param conn HTTP connection
    * @param body also return body
    * @param mtype media type provided by the user (can be {@code null})
-   * @return result sequence of <http:response/> and content items
+   * @return result sequence of http:response and content items
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */

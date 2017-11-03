@@ -49,7 +49,7 @@ public final class HttpRequest {
   }
 
   /**
-   * Container for parsed data from <part/> element.
+   * Container for parsed data from "part" element.
    * @author BaseX Team 2005-17, BSD License
    * @author Rositsa Shadura
    */

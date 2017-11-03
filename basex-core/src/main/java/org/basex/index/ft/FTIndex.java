@@ -31,19 +31,19 @@ import org.basex.util.similarity.*;
  * {@link DataText#DATAFTX} and have the following format:</p>
  *
  * <ul>
- * <li>File <b>x</b> contains an entry for each token length:<br/>
- * Structure: {@code [l, p] ...}<br/>
- * {@code l} is the length of a token [byte].<br/>
+ * <li>File <b>x</b> contains an entry for each token length.
+ * Structure: {@code [l, p] ...}.
+ * {@code l} is the length of a token [byte].
  * {@code p} is the pointer of the first token with length {@code l} [int].
  * </li>
- * <li>File <b>y</b> contains the tokens and references:<br/>
- * Structure: {@code [t0, t1, ... tl, z, s]}<br/>
- * {@code t0, t1, ... tl-1} is the token [byte[l]]<br/>
- * {@code z} is the pointer on the data entries of the token [long]<br/>
+ * <li>File <b>y</b> contains the tokens and references.
+ * Structure: {@code [t0, t1, ... tl, z, s]}
+ * {@code t0, t1, ... tl-1} is the token [byte[l]]
+ * {@code z} is the pointer on the data entries of the token [long]
  * {@code s} is the number of pre values, saved in data [int]
  * </li>
  * <li>File <b>z</b> contains the {@code id/pos} references.
- *   The values are ordered, but not distinct:<br/>
+ *   The values are ordered, but not distinct:
  *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
  *

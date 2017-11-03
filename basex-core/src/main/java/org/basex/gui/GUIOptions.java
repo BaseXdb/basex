@@ -166,7 +166,7 @@ public final class GUIOptions extends Options {
   public static final NumberOption MAPOFFSETS = new NumberOption("MAPOFFSETS", 3);
   /** Map algorithm. */
   public static final NumberOption MAPALGO = new NumberOption("MAPALGO", 0);
-  /** number of children <-> size weight in (0;100). */
+  /** number of children - size weight in (0;100). */
   public static final NumberOption MAPWEIGHT = new NumberOption("MAPWEIGHT", 0);
 
   /** Slim rectangles to text length. */

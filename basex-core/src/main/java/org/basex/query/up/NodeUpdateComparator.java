@@ -31,37 +31,37 @@ import org.basex.util.*;
  * <ol>
  * <li> The PRE values of T1 and T2.
  * Consider D the document {@code <DOC><N1/><N2/></DOC>}. If P1 is a {@link DeleteNode} on N1
- * and P2 is a {@link DeleteNode} on N2, it follows that T2>T1. P2 wins the comparison
+ * and P2 is a {@link DeleteNode} on N2, it follows that T2 greater than T1. P2 wins the comparison
  * and is therefore executed first.</li>
  *
  * <li> Whether the order of P1, P2 must be switched to get the desired result.
  * Consider D the document {@code <DOC><N1><N2/></N1></DOC>}. If P1 is an {@link InsertInto} on
- * N1 and P2 is an {@link InsertInto} on N2, it follows that T2>T1. Yet, executing P2
- * first would lead to the following problem:<br/>
+ * N1 and P2 is an {@link InsertInto} on N2, it follows that T2 greater than T1. Yet, executing P2
+ * first would lead to the following problem:
  *
  * The actually affected PRE value location on disk for both updates is L1=L2=L=4. P2
  * inserts a sequence of nodes S2 at L. After this P1 inserts a sequence of nodes S1 at
  * the same location L and shifts S2 further back on disk. S1 and S2 are now ordered
- * incorrectly (S1,S2) and invalidate the document.<br/>
+ * incorrectly (S1,S2) and invalidate the document.
  *
  * Hence the correct order (S2,S1) can only be achieved if P1 is executed first and S1
- * subsequently shifted by inserting S2.<br/>
+ * subsequently shifted by inserting S2.
  *
  * The problem can exist if P1 and/or P2 are of the kind {@link InsertInto} or
  * {@link InsertAfter} and T1+size(T1) is equal T2+size(T2), hence T1 and T2 have the
  * same following node. The correct order is realized by executing the update first, that
- * is on the ancestor axis of the other. In this case P1>P2.<br/>
+ * is on the ancestor axis of the other. In this case P1 greater than P2.
  *
  * Another case similar to this is if P1 is an {@link InsertIntoAsFirst} on an element
  * T1 and P2 is i.e. a {@link ReplaceNode} on an attribute T2 of T1. To get the desired
- * order of insertion sequences (S2,S1) P1 must be executed first, hence P1>P2.</li>
+ * order of insertion sequences (S2,S1) P1 must be executed first, hence P1 greater than P2.</li>
  *
  * <li> The {@link UpdateType} of P1, P2.
  * Consider D the document {@code <DOC><N1/></DOC>} with T=N1. P1 is an {@link InsertBefore}
  * on T and P2 is an {@link InsertIntoAsFirst} on the same target T. As they both operate
  * on the same target, both have not to be re-located because of their type (see case 2),
- * hence only differ in their {@link UpdateType}, it follows that P2>P1 as nodes
- * S2 are to be inserted on the following axis of S1.<br/>
+ * hence only differ in their {@link UpdateType}, it follows that P2 greater than P1 as nodes
+ * S2 are to be inserted on the following axis of S1.
  *
  * Another case: P2 a {@link DeleteNode} on T and P1 an {@link InsertBefore} on T. As
  * L2=L1, P2, the execution sequence must be (P2,P1). for(P1,P2) S1 would be deleted by

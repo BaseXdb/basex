@@ -112,7 +112,7 @@ public interface DataText {
   String DATAUPD = "upd";
   /** Database - Document path index. */
   String DATAPTH = "pth";
-  /** Database - ID->PRE mapping. */
+  /** Database - ID-PRE mapping. */
   String DATAIDP = "idp";
 
   // XML SERIALIZATION ============================================================================

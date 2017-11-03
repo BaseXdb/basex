@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -65,8 +64,9 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},
    *     in order to pre-evaluate equality tests.
    *   </li>
-   *   <li>{@link CmpG#optimize(CompileContext)} or {@link Pos#get(OpV, Expr, Expr, InputInfo,
-   *     CompileContext)}, in order to compare the start and end value.
+   *   <li>{@link CmpG#optimize(CompileContext)} or
+   *     {@link Pos#get(CmpV.OpV, Expr, Expr, InputInfo, CompileContext)},
+   *     in order to compare the start and end value.
    *   </li>
    *   <li>{@link PathCache}, in order to find identical root values at runtime.
    *   </li>

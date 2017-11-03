@@ -581,14 +581,14 @@ public abstract class Path extends ParseExpr {
    * is used, which will be rewritten to {@link ValueAccess} instances):
    *
    * <pre>
-   * 1. A[text() = '...']    -> IA('...', A)
-   * 2. A[. = '...']         -> IA('...', A)
-   * 3. text()[. = '...']    -> IA('...')
-   * 4. A[B = '...']         -> IA('...', B)/parent::A
-   * 1. A[B/text() = '...']  -> IA('...')/parent::B/parent::A
-   * 2. A[B/C = '...']       -> IA('...', C)/parent::B/parent::A
-   * 7. A[@a = '...']        -> IA('...', @a)/parent::A
-   * 8. @a[. = '...']        -> IA('...', @a)</pre>
+   * 1. A[text() = '...']    : IA('...', A)
+   * 2. A[. = '...']         : IA('...', A)
+   * 3. text()[. = '...']    : IA('...')
+   * 4. A[B = '...']         : IA('...', B)/parent::A
+   * 1. A[B/text() = '...']  : IA('...')/parent::B/parent::A
+   * 2. A[B/C = '...']       : IA('...', C)/parent::B/parent::A
+   * 7. A[@a = '...']        : IA('...', @a)/parent::A
+   * 8. @a[. = '...']        : IA('...', @a)</pre>
    *
    * Queries of type 1, 3, 5 will not yield any results if the string to be compared is empty.
    *

@@ -15,11 +15,9 @@ import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
- * <p>Provides a method for parsing a JSON string and converting it to an XQuery
- * item made of nested maps.
- *
- * <p>The mapping from JSON to XQuery is the following:
- * <p><dl>
+ * Provides a method for parsing a JSON string and converting it to an XQuery
+ * item made of nested maps. The mapping from JSON to XQuery is the following:
+ * <dl>
  *   <dt>string<dd>xs:string
  *   <dt>number<dd>xs:double
  *   <dt>boolean<dd>xs:boolean

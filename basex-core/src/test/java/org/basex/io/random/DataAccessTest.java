@@ -10,14 +10,11 @@ import org.junit.*;
 
 /**
  * Tests for class {@link DataAccess}.
- * <br/>
  * <p>The read operations are tested using a pre-created file with different
  * types of values at fixed positions; the values occupy the first
  * {@link IO#BLOCKSIZE} bytes of the file.</p>
- * <br/>
  * <p>In order to test cross-block reads, a string is written at position
  * {@link IO#BLOCKSIZE} - 5.</p>
- * <br/>
  * <p>Write operations are tested by writing a value at a specified random
  * position.</p>
  *

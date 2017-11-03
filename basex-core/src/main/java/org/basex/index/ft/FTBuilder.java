@@ -253,7 +253,7 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Writes full-text data for a single token to disk.<br/>
+   * Writes full-text data for a single token to disk.
    * Format: {@code score? pre1 pos1 pre2 pos2 ... (0 score)? pre...}
    * @param out DataOutput for disk access
    * @param vpre compressed pre values

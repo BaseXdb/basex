@@ -85,7 +85,7 @@ public class BaseXTextField extends JTextField {
   /**
    * Constructor.
    * @param win window (of type {@link BaseXDialog} or {@link GUI})
-   * @param text input text (can be {@null})
+   * @param text input text (can be {@code null})
    */
   public BaseXTextField(final BaseXWindow win, final String text) {
     BaseXLayout.setWidth(this, DWIDTH);

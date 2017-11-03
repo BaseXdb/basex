@@ -37,7 +37,7 @@ public final class HttpRequestParser {
   }
 
   /**
-   * Parses an <http:request/> element.
+   * Parses an http:request element.
    * @param request request element (can be {@code null})
    * @param bodies request bodies
    * @return parsed request

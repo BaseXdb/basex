@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Updatable ID -> PRE mapping.
+ * Updatable ID-PRE mapping.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Dimitar Popov

@@ -118,7 +118,7 @@ public interface BuildText {
   byte[] SYSTEM = token("SYSTEM");
   /** DTD: Public. */
   byte[] PUBLIC = token("PUBLIC");
-  /** DTD: <!--. */
+  /** DTD: opening comment. */
   byte[] COMS = token("<!--");
   /** DTD: NOTATION. */
   byte[] NOTA = token("<!NOTATION");

@@ -17,8 +17,8 @@ import org.basex.util.*;
 /**
  * GUI Constants used in different views.
  *
- * To add a new view, please proceed as follows:<br/>
- * <br/>
+ * To add a new view, please proceed as follows:
+ *
  * All views have unique names, which are defined below.
  * The following steps are necessary to add a new view
  * (the implementation of the existing views might help you):

@@ -44,7 +44,6 @@ public class RegExParser {
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param mod modifiers
-   * @param ext XQuery 3.0 syntax
    * @param ii input info
    * @param check check result for empty strings
    * @return the pattern

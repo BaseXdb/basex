@@ -18,7 +18,7 @@ import com.bradmcevoy.http.Cookie;
 import com.bradmcevoy.http.Response.*;
 
 /**
- * Wrapper around {@link HttpServletRequest}, which in addition implements {@link Request}.<br/>
+ * Wrapper around {@link HttpServletRequest}, which in addition implements {@link Request}.
  * This implementation is the same as the implementation of {@code ServletRequest} found in
  * {@code milton-servlet}. Since this is one of the few classes which is needed from that library
  * the source is integrated into BaseX.
@@ -208,7 +208,7 @@ final class WebDAVRequest extends AbstractRequest {
 
 /**
  * Wrapper around {@link FileItem}, which in addition implements
- * {@link com.bradmcevoy.http.FileItem}.<br/>
+ * {@link com.bradmcevoy.http.FileItem}.
  * This implementation is the same as the implementation of
  * {@code FileItemWrapper} found in {@code milton-servlet}. Since this is one of
  * the few classes which is needed from that library, the source is integrated

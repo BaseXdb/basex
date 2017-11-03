@@ -106,18 +106,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
       </plugin>
-      <!--<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>-->
-      <!-- Temporarily removed (takes some time)
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>org/basex/query/util/regex/parse/**.java</excludes>
-        </configuration>
-      </plugin>-->
     </plugins>
   </build>
 </project>

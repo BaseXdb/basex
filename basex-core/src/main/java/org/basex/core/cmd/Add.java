@@ -14,7 +14,7 @@ import org.basex.query.up.atomic.*;
 import org.basex.util.*;
 
 /**
- * Evaluates the 'add' command and adds a document to a collection.<br/>
+ * Evaluates the 'add' command and adds a document to a collection.
  * Note that the constructors of this class have changed with Version 7.0:
  * the target path and file name have been merged and are now specified
  * as first argument.

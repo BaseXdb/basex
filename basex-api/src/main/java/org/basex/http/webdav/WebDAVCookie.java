@@ -3,12 +3,10 @@ package org.basex.http.webdav;
 import com.bradmcevoy.http.*;
 
 /**
- * Wrapper around {@link javax.servlet.http.Cookie}, which in addition
- * implements {@link Cookie}. <br/>
- * This implementation is the same as the implementation of
- * {@code ServletCookie} found in {@code milton-servlet}. Since this is one of
- * the few classes which is needed from that library, the source was integrated
- * into BaseX.
+ * Wrapper around {@link javax.servlet.http.Cookie}, which in addition implements {@link Cookie}.
+ * This implementation is the same as the implementation of {@code ServletCookie} found in
+ * {@code milton-servlet}. Since this is one of the few classes which is needed from that library,
+ * the source was integrated into BaseX.
  *
  * @author Milton Development Team
  * @author BaseX Team 2005-17, BSD License
