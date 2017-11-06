@@ -195,8 +195,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
+      throws QueryException {
 
     if(!StaticFunc.inline(cc, anns, expr) || expr.has(Flag.CTX)) return null;
     cc.info(OPTINLINE_X, this);

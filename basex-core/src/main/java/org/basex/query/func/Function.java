@@ -208,7 +208,7 @@ public enum Function {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM, ITR), FUN_OZ, flag(CTX, Flag.POS, NDT, HOF)),
+      arg(QNM, ITR), FUN_OZ, flag(Flag.POS, CTX, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
   /** XQuery function. */

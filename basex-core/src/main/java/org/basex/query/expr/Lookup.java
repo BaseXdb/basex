@@ -29,7 +29,7 @@ public final class Lookup extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param expr expression and optional context
+   * @param expr key specifier and (for postfix lookups) context expression
    */
   public Lookup(final InputInfo info, final Expr... expr) {
     super(info, expr);
@@ -76,7 +76,6 @@ public final class Lookup extends Arr {
         return cc.replaceWith(this, new GFLWOR(info, clauses, ret)).optimize(cc);
       }
     }
-
     return this;
   }
 
@@ -121,7 +120,7 @@ public final class Lookup extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return exprs.length == 1 && flag == Flag.CTX || super.has(flag);
+    return flag == Flag.CTX && exprs.length == 1 || super.has(flag);
   }
 
   @Override
@@ -149,7 +148,6 @@ public final class Lookup extends Arr {
       final long val = ((Int) keys).itr();
       if(val >= 0) return sb.append('?').append(val).toString();
     }
-
-    return sb.append(" ? (").append(keys).append(')').toString();
+    return sb.append("?(").append(keys).append(')').toString();
   }
 }

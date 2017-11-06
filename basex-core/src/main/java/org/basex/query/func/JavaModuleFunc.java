@@ -121,11 +121,11 @@ final class JavaModuleFunc extends JavaFunction {
   }
 
   @Override
-  public boolean has(final Flag f) {
-    return f == Flag.NDT && method.getAnnotation(Deterministic.class) == null ||
-      (f == Flag.CTX || f == Flag.POS) &&
+  public boolean has(final Flag flag) {
+    return flag == Flag.NDT && method.getAnnotation(Deterministic.class) == null ||
+      (flag == Flag.CTX || flag == Flag.POS) &&
       method.getAnnotation(FocusDependent.class) == null ||
-      super.has(f);
+      super.has(flag);
   }
 
   @Override

@@ -9,7 +9,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * Simple map expression.
+ * Simple map operator.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen

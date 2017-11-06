@@ -1,11 +1,8 @@
 package org.basex.query.func.fn;
 
-import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 
@@ -15,7 +12,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class FnData extends StandardFunc {
+public final class FnData extends ContextFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return ctxArg(0, qc).atomIter(qc, info);
@@ -38,15 +35,5 @@ public final class FnData extends StandardFunc {
       }
     }
     return this;
-  }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.CTX && exprs.length == 0 || super.has(flag);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return (exprs.length != 0 || visitor.lock(Locking.CONTEXT)) && super.accept(visitor);
   }
 }
