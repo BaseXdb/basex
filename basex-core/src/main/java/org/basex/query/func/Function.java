@@ -359,7 +359,7 @@ public enum Function {
   SERIALIZE(FnSerialize.class, "serialize(items[,params])", arg(ITEM_ZM, ITEM_ZO), STR),
   /** XQuery function. */
   SORT(FnSort.class, "sort(items[,collation[,function]])",
-      arg(ITEM_ZM, STR_ZO, FuncType.arity(1).seqType()), ITEM_ZM, flag(HOF)),
+      arg(ITEM_ZM, STR_ZO, FuncType.get(AAT_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith.class, "starts-with(string,sub[,collation])",
       arg(STR_ZO, STR_ZO, STR), BLN),
@@ -430,7 +430,7 @@ public enum Function {
   /** XQuery function. */
   ZERO_OR_ONE(FnZeroOrOne.class, "zero-or-one(items)", arg(ITEM_ZM), ITEM_ZO),
 
-  /* Map Module. */
+  // Map Module
 
   /** XQuery function. */
   _MAP_MERGE(MapMerge.class, "merge(maps[,options])", arg(MAP_ZM, MAP_O), MAP_O, MAP_URI),
@@ -454,7 +454,7 @@ public enum Function {
   /** XQuery function. */
   _MAP_FIND(MapFind.class, "find(input,key)", arg(ITEM_ZM, AAT), ARRAY_O, MAP_URI),
 
-  /* Array Module. */
+  // Array Module
 
   /** XQuery function. */
   _ARRAY_SIZE(ArraySize.class, "size(array)", arg(ARRAY_O), ITR, ARRAY_URI),
@@ -505,9 +505,9 @@ public enum Function {
       flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SORT(ArraySort.class, "sort(array[,collation[,function]])",
-      arg(ARRAY_O, STR_ZO, FuncType.arity(1).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
+      arg(ARRAY_O, STR_ZO, FuncType.get(AAT_ZM, ITEM).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
 
-  /* Math Module. */
+  // Math Module
 
   /** XQuery function. */
   _MATH_SQRT(MathSqrt.class, "sqrt(number)", arg(DBL_ZO), DBL_ZO, MATH_URI),
@@ -549,7 +549,7 @@ public enum Function {
   /** XQuery function. */
   _MATH_E(MathE.class, "e()", arg(), DBL, MATH_URI),
 
-  /* Admin Module. */
+  // Admin Module
 
   /** XQuery function. */
   _ADMIN_SESSIONS(AdminSessions.class, "sessions()", arg(), ELM_ZM, flag(NDT), ADMIN_URI),
@@ -562,7 +562,7 @@ public enum Function {
   _ADMIN_DELETE_LOGS(AdminDeleteLogs.class, "delete-logs(date)",
       arg(STR), EMP, flag(NDT), ADMIN_URI),
 
-  /* Archive Module. */
+  // Archive Module
 
   /** XQuery function. */
   _ARCHIVE_CREATE(ArchiveCreate.class, "create(entries,contents[,options])",
@@ -590,7 +590,7 @@ public enum Function {
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)", arg(B64), MAP_O, ARCHIVE_URI),
 
-  /* Binary Module. */
+  // Binary Module
 
   /** XQuery function. */
   _BIN_HEX(BinHex.class, "hex(string)", arg(STR_ZO), B64_ZO, BIN_URI),
@@ -659,7 +659,7 @@ public enum Function {
   /** XQuery function. */
   _BIN_SHIFT(BinShift.class, "shift(binary,by)", arg(B64_ZO, ITR), B64_ZO, BIN_URI),
 
-  /* Client Module. */
+  // Client Module
 
   /** XQuery function. */
   _CLIENT_CONNECT(ClientConnect.class, "connect(url,port,user,password)",
@@ -675,7 +675,7 @@ public enum Function {
   /** XQuery function. */
   _CLIENT_CLOSE(ClientClose.class, "close(id)", arg(URI), EMP, flag(NDT), CLIENT_URI),
 
-  /* Conversion Module. */
+  // Conversion Module
 
   /** XQuery function. */
   _CONVERT_INTEGER_TO_BASE(ConvertIntegerToBase.class, "integer-to-base(number,base)",
@@ -717,7 +717,7 @@ public enum Function {
   _CONVERT_DAYTIME_TO_INTEGER(ConvertDayTimeToInteger.class, "dayTime-to-integer(duration)",
       arg(DTD), ITR, CONVERT_URI),
 
-  /* FNCrypto functions (EXPath Cryptographic module). */
+  // FNCrypto functions (EXPath Cryptographic module)
 
   /** XQuery function. */
   _CRYPTO_HMAC(CryptoHmac.class, "hmac(message,key,algorithm[,encoding])",
@@ -736,7 +736,7 @@ public enum Function {
   _CRYPTO_VALIDATE_SIGNATURE(CryptoValidateSignature.class, "validate-signature(node)",
       arg(NOD), BLN, CRYPTO_URI),
 
-  /* CSV Module. */
+  // CSV Module
 
   /** XQuery function. */
   _CSV_PARSE(CsvParse.class, "parse(string[,config])", arg(STR, MAP_O), ITEM, CSV_URI),
@@ -744,7 +744,7 @@ public enum Function {
   _CSV_SERIALIZE(CsvSerialize.class, "serialize(item[,params])", arg(ITEM_ZO, ITEM_ZO), STR,
       CSV_URI),
 
-  /* Database Module. */
+  // Database Module
 
   /** XQuery function. */
   _DB_OPEN(DbOpen.class, "open(database[,path])", arg(STR, STR), DOC_ZM, DB_URI),
@@ -840,7 +840,7 @@ public enum Function {
   /** XQuery function. */
   _DB_PATH(DbPath.class, "path(node)", arg(NOD), STR, DB_URI),
 
-  /* Fetch Module. */
+  // Fetch Module
 
   /** XQuery function. */
   _FETCH_TEXT(FetchText.class, "text(uri[,encoding[,fallback]])",
@@ -856,7 +856,7 @@ public enum Function {
   _FETCH_CONTENT_TYPE(FetchContentType.class, "content-type(uri)", arg(STR), STR, flag(NDT),
       FETCH_URI),
 
-  /* File Module. */
+  // File Module
 
   /** XQuery function. */
   _FILE_PATH_SEPARATOR(FilePathSeparator.class, "path-separator()", arg(), STR, FILE_URI),
@@ -949,7 +949,7 @@ public enum Function {
   /** XQuery function. */
   _FILE_CHILDREN(FileChildren.class, "children(path)", arg(STR), STR_ZM, flag(NDT), FILE_URI),
 
-  /* Fulltext Module. */
+  // Fulltext Module
 
   /** XQuery function. */
   _FT_CONTAINS(FtContains.class, "contains(input,terms[,options])",
@@ -974,7 +974,7 @@ public enum Function {
   /** XQuery function. */
   _FT_NORMALIZE(FtNormalize.class, "normalize(string[,options])", arg(STR, MAP_O), STR, FT_URI),
 
-  /* Hash Module. */
+  // Hash Module
 
   /** XQuery function. */
   _HASH_MD5(HashMd5.class, "md5(value)", arg(AAT), B64, HASH_URI),
@@ -985,7 +985,7 @@ public enum Function {
   /** XQuery function. */
   _HASH_HASH(HashHash.class, "hash(value,algorithm)", arg(AAT, STR), B64, HASH_URI),
 
-  /* HOF Module. */
+  // HOF Module
 
   /** XQuery function. */
   _HOF_SORT_WITH(HofSortWith.class, "sort-with(items,lt-fun)",
@@ -1017,20 +1017,20 @@ public enum Function {
       arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM, flag(HOF),
       HOF_URI),
 
-  /* HTML Module. */
+  // HTML Module
 
   /** XQuery function. */
   _HTML_PARSER(HtmlParser.class, "parser()", arg(), STR, HTML_URI),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse.class, "parse(input[,options)", arg(STR, MAP_O), DOC_O, HTML_URI),
 
-  /* HTTP Module. */
+  // HTTP Module
 
   /** XQuery function. */
   _HTTP_SEND_REQUEST(HttpSendRequest.class, "send-request(request[,href,[bodies]])",
       arg(NOD, STR_ZO, ITEM_ZM), ITEM_ZM, flag(NDT), HTTP_URI),
 
-  /* Index Module. */
+  // Index Module
 
   /** XQuery function. */
   _INDEX_FACETS(IndexFacets.class, "facets(database[,type])", arg(STR, STR), DOC_O, flag(NDT),
@@ -1050,7 +1050,7 @@ public enum Function {
   _INDEX_ATTRIBUTE_NAMES(IndexAttributeNames.class, "attribute-names(database)", arg(STR), ELM_ZM,
       INDEX_URI),
 
-  /* Inspection Module. */
+  // Inspection Module
 
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction.class, "function(function)",
@@ -1071,7 +1071,7 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR), ELM, INSPECT_URI),
 
-  /* Jobs Module. */
+  // Jobs Module
 
   /** XQuery function. */
   _JOBS_EVAL(JobsEval.class, "eval(string[,bindings[,options]])",
@@ -1095,7 +1095,7 @@ public enum Function {
   /** XQuery function. */
   _JOBS_CURRENT(JobsCurrent.class, "current()", arg(), STR, flag(NDT), JOBS_URI),
 
-  /* JSON Module. */
+  // JSON Module
 
   /** XQuery function. */
   _JSON_PARSE(JsonParse.class, "parse(string[,config])", arg(STR, MAP_O), ITEM, JSON_URI),
@@ -1103,7 +1103,7 @@ public enum Function {
   _JSON_SERIALIZE(JsonSerialize.class, "serialize(items[,params])", arg(ITEM_ZO, ITEM_ZO), STR,
       JSON_URI),
 
-  /* Output Module. */
+  // Output Module
 
   /** XQuery function. */
   _OUT_NL(OutNl.class, "nl()", arg(), STR, OUT_URI),
@@ -1112,7 +1112,7 @@ public enum Function {
   /** XQuery function. */
   _OUT_FORMAT(OutFormat.class, "format(format,item1[,...])", arg(STR, ITEM), STR, OUT_URI),
 
-  /* Process Module. */
+  // Process Module
 
   /** XQuery function. */
   _PROC_SYSTEM(ProcSystem.class, "system(command[,args[,options]])",
@@ -1129,7 +1129,7 @@ public enum Function {
   /** XQuery function. */
   _PROC_PROPERTY(ProcProperty.class, "property(name)", arg(STR), STR, flag(NDT), PROC_URI),
 
-  /* Profiling Module. */
+  // Profiling Module
 
   /** XQuery function. */
   _PROF_MEM(ProfMem.class, "mem(value[,cache[,label]])", arg(ITEM_ZM, BLN, STR), ITEM_ZM, flag(NDT),
@@ -1154,7 +1154,7 @@ public enum Function {
   /** XQuery function. */
   _PROF_TYPE(ProfType.class, "type(value)", arg(ITEM_ZM), ITEM_ZM, PROF_URI),
 
-  /* Random Module. */
+  // Random Module
 
   /** XQuery function. */
   _RANDOM_DOUBLE(RandomDouble.class, "double()", arg(), DBL, flag(NDT), RANDOM_URI),
@@ -1174,7 +1174,7 @@ public enum Function {
   /** XQuery function. */
   _RANDOM_UUID(RandomUuid.class, "uuid()", arg(), STR, flag(NDT), RANDOM_URI),
 
-  /* Repository Module. */
+  // Repository Module
 
   /** XQuery function. */
   _REPO_INSTALL(RepoInstall.class, "install(uri)", arg(STR), EMP, flag(NDT), REPO_URI),
@@ -1183,7 +1183,7 @@ public enum Function {
   /** XQuery function. */
   _REPO_LIST(RepoList.class, "list()", arg(), STR_ZM, flag(NDT), REPO_URI),
 
-  /* SQL Module. */
+  // SQL Module
 
   /** XQuery function. */
   _SQL_INIT(SqlInit.class, "init(class)", arg(STR), EMP, flag(NDT), SQL_URI),
@@ -1204,7 +1204,7 @@ public enum Function {
   /** XQuery function. */
   _SQL_ROLLBACK(SqlRollback.class, "rollback(id)", arg(ITR), EMP, flag(NDT), SQL_URI),
 
-  /* Streaming Module. */
+  // Streaming Module
 
   /** XQuery function. */
   _STREAM_MATERIALIZE(StreamMaterialize.class, "materialize(value)", arg(ITEM_ZM), ITEM_ZM,
@@ -1213,7 +1213,7 @@ public enum Function {
   _STREAM_IS_STREAMABLE(StreamIsStreamable.class, "is-streamable(item)", arg(ITEM), BLN,
       STREAM_URI),
 
-  /* Strings Module. */
+  // Strings Module
 
   /** XQuery function. */
   _STRINGS_LEVENSHTEIN(StringsLevenshtein.class, "levenshtein(string1,string2)",
@@ -1224,7 +1224,7 @@ public enum Function {
   _STRINGS_COLOGNE_PHONETIC(StringsColognePhonetic.class, "cologne-phonetic(string)",
       arg(STR), STR, STRINGS_URI),
 
-  /* Unit Module. */
+  // Unit Module
 
   /** XQuery function. */
   _UNIT_ASSERT(UnitAssert.class, "assert(test[,failure])", arg(ITEM_ZM, ITEM), EMP, flag(NDT),
@@ -1235,7 +1235,7 @@ public enum Function {
   /** XQuery function. */
   _UNIT_FAIL(UnitFail.class, "fail([failure])", arg(ITEM), ITEM_ZM, flag(NDT), UNIT_URI),
 
-  /* User Module. */
+  // User Module
 
   /** XQuery function. */
   _USER_CURRENT(UserCurrent.class, "current()", arg(), STR, USER_URI),
@@ -1267,7 +1267,7 @@ public enum Function {
   _USER_UPDATE_INFO(UserUpdateInfo.class, "update-info(element)",
       arg(ELM), EMP, flag(UPD), USER_URI),
 
-  /* Utility Module. */
+  // Utility Module
 
   /** XQuery function. */
   _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
@@ -1280,7 +1280,7 @@ public enum Function {
   /** XQuery function. */
   _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
 
-  /* Validate Module. */
+  // Validate Module
 
   /** XQuery function. */
   _VALIDATE_XSD(ValidateXsd.class, "xsd(input[,schema[,version]])",
@@ -1310,7 +1310,7 @@ public enum Function {
   _VALIDATE_RNG_REPORT(ValidateRngReport.class, "rng-report(input,schema[,compact])",
       arg(ITEM, ITEM, BLN), ELM, flag(NDT), VALIDATE_URI),
 
-  /* Web Module. */
+  // Web Module
 
   /** XQuery function. */
   _WEB_CONTENT_TYPE(WebContentType.class, "content-type(path)", arg(STR), STR, WEB_URI),
@@ -1326,7 +1326,7 @@ public enum Function {
   /** XQuery function. */
   _WEB_DECODE_URL(WebDecodeUrl.class, "decode-url(string)", arg(STR), STR, WEB_URI),
 
-  /* XQuery Module. */
+  // XQuery Module
 
   /** XQuery function. */
   _XQUERY_EVAL(XQueryEval.class, "eval(string[,bindings[,options]])",
@@ -1347,7 +1347,7 @@ public enum Function {
   _XQUERY_FORK_JOIN(XQueryForkJoin.class, "fork-join(functions[,options])",
       arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), XQUERY_URI),
 
-  /* XSLT Module. */
+  // XSLT Module
 
   /** XQuery function. */
   _XSLT_INIT(XsltInit.class, "init()", arg(), NOD, flag(NDT), XSLT_URI),
@@ -1362,7 +1362,7 @@ public enum Function {
   _XSLT_TRANSFORM_TEXT(XsltTransformText.class, "transform-text(input,stylesheet[,params])",
       arg(ITEM, ITEM, MAP_ZO), STR, flag(NDT), XSLT_URI),
 
-  /* ZIP Module. */
+  // ZIP Module
 
   /** XQuery function. */
   _ZIP_BINARY_ENTRY(ZipBinaryEntry.class, "binary-entry(path,entry)",

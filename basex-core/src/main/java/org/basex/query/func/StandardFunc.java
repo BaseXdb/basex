@@ -72,18 +72,11 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr expr;
-    if(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) || !allAreValues()) {
-      // context-based, non-deterministic, arguments are no values: call custom optimization
-      expr = opt(cc);
-    } else if(sig.type.zeroOrOne()) {
-      // pre-evaluate function, which yields an item
-      expr = item(cc.qc, info);
-    } else {
-      // pre-evaluate function, which yields a value
-      expr = cc.qc.value(this);
-    }
-    return cc.replaceWith(this, expr);
+    return cc.replaceWith(this, isSimple() && allAreValues() ?
+      // pre-evaluate simple functions if all arguments are values
+      (sig.type.zeroOrOne() ? item(cc.qc, info) : cc.qc.value(this)) :
+      // otherwise, call custom optimization
+      opt(cc));
   }
 
   /**
