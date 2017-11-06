@@ -137,7 +137,7 @@ public class CmpG extends Cmp {
 
     // check if both arguments will always yield one result
     final Expr e1 = exprs[0], e2 = exprs[1];
-    final SeqType st1 = e1.seqType();
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
 
     // one value is empty (e.g.: () = local:expensive() )
     if(oneIsEmpty()) return cc.replaceWith(this, Bln.FALSE);
@@ -165,12 +165,6 @@ public class CmpG extends Cmp {
     if(e == this) e = CmpSR.get(this);
     if(e != this) return allAreValues() ? cc.preEval(e) : cc.replaceWith(this, e);
 
-    // choose evaluation strategy
-    final SeqType st2 = e2.seqType();
-    if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
-      return cc.replaceWith(this, new CmpAtomicG(e1, e2, op, coll, sc, info).optimize(cc));
-    }
-
     // pre-evaluate values
     if(allAreValues()) return cc.preEval(this);
 
@@ -179,14 +173,18 @@ public class CmpG extends Cmp {
        * - equality operator is specified,
        * - operands are equal,
        * - operands are deterministic, non-updating,
-       * - operands do not depend on context (unless context value exists)
-       */
+       * - operands do not depend on context (unless context value exists) */
       final Type t1 = st1.type, t2 = st2.type;
       if(e1.equals(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
           (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
-        // currently limited to strings, integers and booleans
+        /* consider query flags. do not rewrite:
+         * random:integer() = random:integer() */
         if(st1.oneOrMore() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
-            t1 == AtomType.BLN)) return cc.replaceWith(this, Bln.TRUE);
+            t1 == AtomType.BLN)) {
+          /* currently limited to strings, integers and booleans. do not rewrite:
+           * xs:double('NaN') = xs:double('NaN') */
+          return cc.replaceWith(this, Bln.TRUE);
+        }
       }
 
       // use hash
@@ -196,6 +194,12 @@ public class CmpG extends Cmp {
         return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
       }
     }
+
+    // choose evaluation strategy
+    if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
+      return cc.replaceWith(this, new CmpAtomicG(e1, e2, op, coll, sc, info).optimize(cc));
+    }
+
     return this;
   }
 

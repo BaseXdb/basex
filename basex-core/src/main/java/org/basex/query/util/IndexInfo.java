@@ -99,26 +99,26 @@ public final class IndexInfo {
 
   /**
    * Tries to rewrite the specified input for index access.
-   * @param value value to find (can be {@code null})
+   * @param search expression to find (can be {@code null})
    * @param type index type (can be {@code null})
    * @param info input info (can be {@code null})
    * @param trim normalize second string
    * @return success flag
    * @throws QueryException query exception
    */
-  public boolean create(final Expr value, final IndexType type, final InputInfo info,
+  public boolean create(final Expr search, final IndexType type, final InputInfo info,
       final boolean trim) throws QueryException {
 
     // no index or no search value: no optimization
-    if(type == null || value == null) return false;
+    if(type == null || search == null) return false;
 
     final Data data = db.data();
     if(data == null && !enforce()) return false;
 
     final ParseExpr root;
-    if(value.isValue()) {
+    if(search.isValue()) {
       // loop through all items
-      final Iter iter = qc.iter(value);
+      final Iter iter = qc.iter(search);
       final ArrayList<ValueAccess> tmp = new ArrayList<>();
       final TokenSet strings = new TokenSet();
       for(Item it; (it = iter.next()) != null;) {
@@ -155,15 +155,15 @@ public final class IndexInfo {
          //*[text() = .]
          //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
        */
-      if(!value.seqType().type.isStringOrUntyped() || value.has(Flag.CTX) || value.has(Flag.NDT) ||
-        value.has(Flag.UPD)) return false;
+      if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX) ||
+          search.has(Flag.NDT) || search.has(Flag.UPD)) return false;
 
       // estimate costs (tend to worst case)
       if(data != null) costs = IndexCosts.get(Math.max(1, data.meta.size / 10));
-      root = new ValueAccess(info, value, type, test, db);
+      root = new ValueAccess(info, search, type, test, db);
     }
 
-    create(root, false, info, Util.info(OPTINDEX_X_X, type, value));
+    create(root, false, info, Util.info(OPTINDEX_X_X, type, search));
     return true;
   }
 

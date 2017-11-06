@@ -245,7 +245,8 @@ public enum Function {
   /** XQuery function. */
   JSON_DOC(FnJsonDoc.class, "json-doc(uri[,options])", arg(STR_ZO, MAP_O), DOC_ZO),
   /** XQuery function. */
-  JSON_TO_XML(FnJsonToXml.class, "json-to-xml(string[,options])", arg(STR_ZO, MAP_O), NOD_ZO),
+  JSON_TO_XML(FnJsonToXml.class, "json-to-xml(string[,options])",
+      arg(STR_ZO, MAP_O), NOD_ZO, flag(CNS)),
   /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */

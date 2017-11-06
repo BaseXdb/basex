@@ -348,8 +348,8 @@ public final class GFLWOR extends ParseExpr {
             // inline variable references without type checks
             || expr instanceof VarRef && !lt.var.checksType()
             // inline expressions that occur once, but don't...
-            // - access context (e.g. let $x:=. return <a/>[$x=1]), or
-            // - construct nodes (e.g. let $x:=<X/> return <X xmlns='xx'>{$x/self::X}</X>)
+            // - access context  (e.g. let $x := . return <a/>[$x = 1]), or
+            // - construct nodes (e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>)
             || count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CTX) && !expr.has(Flag.CNS)
             // inline only cheap axis paths
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
@@ -462,8 +462,8 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean slideLetsOut(final CompileContext cc) {
     boolean changed = false;
-    for(int i = 1; i < clauses.size(); i++) {
-      final Clause clause = clauses.get(i);
+    for(int c = 1; c < clauses.size(); c++) {
+      final Clause clause = clauses.get(c);
       // do not move node constructors. example: for $x in 1 to 2 let $a := <x/> return $a
       if(!(clause instanceof Let) || clause.has(Flag.NDT) || clause.has(Flag.CNS) ||
           clause.has(Flag.UPD)) continue;
@@ -471,17 +471,17 @@ public final class GFLWOR extends ParseExpr {
 
       // find insertion position
       int insert = -1;
-      for(int j = i; --j >= 0;) {
-        final Clause curr = clauses.get(j);
+      for(int d = c; --d >= 0;) {
+        final Clause curr = clauses.get(d);
         if(!curr.skippable(let)) break;
         // insert directly above the highest skippable for or window clause
         // this guarantees that no unnecessary swaps occur
-        if(curr instanceof For || curr instanceof Window) insert = j;
+        if(curr instanceof For || curr instanceof Window) insert = d;
       }
 
       if(insert >= 0) {
         cc.info(QueryText.OPTLET_X, let);
-        clauses.add(insert, clauses.remove(i));
+        clauses.add(insert, clauses.remove(c));
         changed = true;
         // it's safe to go on because clauses below the current one are never touched
       }
