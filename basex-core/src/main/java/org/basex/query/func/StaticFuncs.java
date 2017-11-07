@@ -35,8 +35,8 @@ public final class StaticFuncs extends ExprInfo {
    * @param arity function arity
    * @return the function's signature
    */
-  static byte[] sig(final QNm name, final int arity) {
-    return new TokenBuilder(name.prefixId()).add('#').addInt(arity).finish();
+  static byte[] sig(final QNm name, final long arity) {
+    return new TokenBuilder(name.prefixId()).add('#').addLong(arity).finish();
   }
 
   /**
@@ -191,7 +191,7 @@ public final class StaticFuncs extends ExprInfo {
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public StaticFunc get(final QNm name, final int arity, final InputInfo ii, final boolean error)
+  public StaticFunc get(final QNm name, final long arity, final InputInfo ii, final boolean error)
       throws QueryException {
 
     final FuncCache fc = funcs.get(sig(name, arity));

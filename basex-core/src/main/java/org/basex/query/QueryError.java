@@ -790,7 +790,7 @@ public enum QueryError {
   /** XPST0003. */
   NUMBER_X(XPST, 3, "Incomplete number: '%'."),
   /** XPST0003. */
-  NUMBERITR(XPST, 3, "Integer expected, decimal point found: '%'."),
+  NUMBERITR_X_X(XPST, 3, "Integer expected, % found: %."),
   /** XPST0003. */
   QUERYEND_X(XPST, 3, "Unexpected end of query: '%'."),
   /** XPST0003. */

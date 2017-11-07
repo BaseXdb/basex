@@ -264,7 +264,7 @@ public final class Functions extends TokenSet {
 
     // Java function
     final VarScope scp = new VarScope(sc);
-    final FuncType jt = FuncType.arity(arity);
+    final FuncType ft = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
     final Expr[] args = new Expr[vs.length];
     final int vl = vs.length;
@@ -272,8 +272,8 @@ public final class Functions extends TokenSet {
       vs[v] = scp.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
       args[v] = new VarRef(info, vs[v]);
     }
-    final Expr jf = JavaFunction.get(name, args, qc, sc, info);
-    return jf == null ? null : new FuncLit(new AnnList(), name, vs, jf, jt, scp, info);
+    final Expr expr = JavaFunction.get(name, args, qc, sc, info);
+    return expr == null ? null : new FuncLit(new AnnList(), name, vs, expr, ft, scp, info);
   }
 
   /**

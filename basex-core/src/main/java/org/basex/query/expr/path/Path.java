@@ -534,7 +534,7 @@ public abstract class Path extends ParseExpr {
 
       // ignore axes other than descendant, or numeric predicates
       final Step curr = axisStep(s);
-      if(curr == null || curr.axis != DESC || curr.has(Flag.POS)) continue;
+      if(curr == null || curr.axis != DESC || curr.positional()) continue;
 
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> nodes = pathNodes(data, s);
@@ -619,7 +619,7 @@ public abstract class Path extends ParseExpr {
       // only accept descendant steps without positional predicates
       // Example for position predicate: child:x[1] != parent::x[1]
       final Step step = axisStep(s);
-      if(step == null || !step.axis.down || step.has(Flag.POS)) break;
+      if(step == null || !step.axis.down || step.positional()) break;
 
       final int el = step.exprs.length;
       if(el > 0) {
@@ -772,7 +772,7 @@ public abstract class Path extends ParseExpr {
             continue;
           }
           // //(X, Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
-          if(next instanceof Filter && !next.has(Flag.POS)) {
+          if(next instanceof Filter && !((Filter) next).positional()) {
             final Filter f = (Filter) next;
             e = mergeList(f.root);
             if(e != null) {
@@ -795,9 +795,9 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Trie to rewrite union or list expressions.
+   * Tries to rewrite union or list expressions.
    * @param expr input expression
-   * @return rewriting flag
+   * @return rewriting flag or {@code null}
    */
   private static Expr mergeList(final Expr expr) {
     if(expr instanceof Union || expr instanceof List) {
@@ -832,7 +832,7 @@ public abstract class Path extends ParseExpr {
   private static boolean simpleChild(final Expr expr) {
     if(expr instanceof Step) {
       final Step step = (Step) expr;
-      if(step.axis == CHILD && !step.has(Flag.POS)) return true;
+      if(step.axis == CHILD && !step.positional()) return true;
     }
     return false;
   }

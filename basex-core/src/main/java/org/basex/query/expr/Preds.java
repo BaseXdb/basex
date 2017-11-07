@@ -79,7 +79,7 @@ public abstract class Preds extends Arr {
         }
       } else if(expr instanceof And) {
         if(!expr.has(Flag.POS)) {
-          // replace AND expression with predicates (don't swap position tests)
+          // replace AND expression with predicates (don't rewrite position tests)
           cc.info(OPTPRED_X, expr);
           final Expr[] ands = ((Arr) expr).exprs;
           final int m = ands.length;
@@ -139,12 +139,12 @@ public abstract class Preds extends Arr {
     long max = exact ? s : Long.MAX_VALUE;
 
     // check positional predicates
-    for(final Expr pred : exprs) {
-      if(pred.isFunction(Function.LAST)) {
+    for(final Expr expr : exprs) {
+      if(expr.isFunction(Function.LAST)) {
         // use minimum of old value and 1
         max = Math.min(max, 1);
-      } else if(pred instanceof ItrPos) {
-        final ItrPos pos = (ItrPos) pred;
+      } else if(expr instanceof ItrPos) {
+        final ItrPos pos = (ItrPos) expr;
         // subtract start position. example: ...[1 to 2][2]  ->  (2 ->) 1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
         // use minimum of old value and range. example: ...[1 to 5] - >  5
@@ -179,8 +179,8 @@ public abstract class Preds extends Arr {
     qf.value = item;
     try {
       double s = qc.scoring ? 0 : -1;
-      for(final Expr pred : exprs) {
-        final Item test = pred.test(qc, info);
+      for(final Expr expr : exprs) {
+        final Item test = expr.test(qc, info);
         if(test == null) return false;
         if(s != -1) s += test.score();
       }
@@ -201,7 +201,7 @@ public abstract class Preds extends Arr {
     final SeqType st = root.seqType();
     for(final Expr expr : exprs) {
       Expr e = expr;
-      if(expr instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
+     if(expr instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
         // E [ . ]  ->  E
         cc.info(OPTSIMPLE_X, this);
         continue;
@@ -209,9 +209,9 @@ public abstract class Preds extends Arr {
         // E [ . ! ... ]  ->  E [ ... ]
         // E [ E ! ... ]  ->  E [ ... ]
         final SimpleMap map = (SimpleMap) e;
-        final Expr first = map.exprs[0];
-        if(first instanceof ContextValue && !map.has(Flag.POS) ||
-            root.equals(first) && root.isSimple() && st.one()) {
+        final Expr first = map.exprs[0], second = map.exprs[1];
+        if(!second.has(Flag.POS) && (first instanceof ContextValue ||
+            root.equals(first) && root.isSimple() && st.one())) {
           final int ml = map.exprs.length;
           final ExprList el = new ExprList(ml - 1);
           for(int m = 1; m < ml; m++) el.add(map.exprs[m]);
@@ -222,7 +222,7 @@ public abstract class Preds extends Arr {
         // E [ E / ... ]  ->  E [ ... ]
         final Path path = (Path) e;
         final Expr first = path.root;
-        if(st.type instanceof NodeType && (first instanceof ContextValue && !path.has(Flag.POS) ||
+        if(st.type instanceof NodeType && (first instanceof ContextValue ||
             root.equals(first) && root.isSimple() && st.one())) {
           e = Path.get(path.info, null, path.steps);
         }
@@ -326,19 +326,29 @@ public abstract class Preds extends Arr {
     return null;
   }
 
-  @Override
-  public boolean has(final Flag... flags) {
-    if(Flag.POS.in(flags)) {
-      for(final Expr pred : exprs) {
-        if(pred.seqType().mayBeNumber()) return true;
-      }
+  /**
+   * Checks if at least one of the predicates contains a positional access.
+   * @return result of check
+   */
+  public boolean positional() {
+    return positional(exprs);
+  }
+
+  /**
+   * Checks if some of the specified expressions are positional.
+   * @param exprs expressions
+   * @return result of check
+   */
+  public static boolean positional(final Expr[] exprs) {
+    for(final Expr expr : exprs) {
+      if(expr.seqType().mayBeNumber() || expr.has(Flag.POS)) return true;
     }
-    return super.has(flags);
+    return false;
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Expr p : exprs) if(p.uses(var)) return false;
+    for(final Expr expr : exprs) if(expr.uses(var)) return false;
     return true;
   }
 

@@ -181,13 +181,13 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types.
-   * @param anns annotations
-   * @param type return type ({@code null}: any return type)
-   * @param args argument types ({@code null}: any function)
+   * @param anns annotations (can be {@code null})
+   * @param type return type
+   * @param args argument types
    * @return function type
    */
   public static FuncType get(final AnnList anns, final SeqType type, final SeqType... args) {
-    return args == null ? SeqType.ANY_FUN : new FuncType(anns, type, args);
+    return new FuncType(anns, type, args);
   }
 
   /**
@@ -217,11 +217,11 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types with a given arity.
-   * @param a number of arguments
+   * @param arity number of arguments
    * @return function type
    */
-  public static FuncType arity(final int a) {
-    final SeqType[] args = new SeqType[a];
+  public static FuncType arity(final int arity) {
+    final SeqType[] args = new SeqType[arity];
     Arrays.fill(args, SeqType.ITEM_ZM);
     return get(new AnnList(), SeqType.ITEM_ZM, args);
   }

@@ -127,62 +127,62 @@ public abstract class Filter extends Preds {
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, exprs));
+    if(!positional()) return copyType(new IterFilter(info, root, exprs));
 
     // evaluate positional predicates
-    Expr expr = root;
+    Expr rt = root;
     boolean opt = false;
-    for(final Expr pred : exprs) {
+    for(final Expr expr : exprs) {
       Expr e = null;
-      if(pred.isFunction(Function.LAST)) {
-        if(expr.isValue()) {
+      if(expr.isFunction(Function.LAST)) {
+        if(rt.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) expr, expr.size(), 1);
+          e = FnSubsequence.eval((Value) rt, rt.size(), 1);
         } else {
           // rewrite positional predicate to util:last-from
-          e = cc.function(Function._UTIL_LAST_FROM, info, expr);
+          e = cc.function(Function._UTIL_LAST_FROM, info, rt);
         }
-      } else if(pred instanceof ItrPos) {
-        final ItrPos pos = (ItrPos) pred;
-        if(expr.isValue()) {
+      } else if(expr instanceof ItrPos) {
+        final ItrPos pos = (ItrPos) expr;
+        if(rt.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) expr, pos.min, pos.max - pos.min + 1);
+          e = FnSubsequence.eval((Value) rt, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
-          e = cc.function(Function._UTIL_ITEM_AT, info, expr, Int.get(pos.min));
+          e = cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, Int.get(pos.min),
+          e = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
               Int.get(pos.max));
         }
-      } else if(pred instanceof Pos) {
-        final Pos pos = (Pos) pred;
+      } else if(expr instanceof Pos) {
+        final Pos pos = (Pos) expr;
         if(pos.exprs[0] == pos.exprs[1]) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
-          e = cc.function(Function._UTIL_ITEM_AT, info, expr, pos.exprs[0]);
+          e = cc.function(Function._UTIL_ITEM_AT, info, rt, pos.exprs[0]);
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          e = cc.function(Function._UTIL_ITEM_RANGE, info, expr, pos.exprs[0], pos.exprs[1]);
+          e = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
         }
-      } else if(num(pred)) {
+      } else if(num(expr)) {
         /* - rewrite positional predicate to util:item-at
          *   example: expr[pos] -> util:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets
          *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = cc.function(Function._UTIL_ITEM_AT, info, expr, pred);
+        e = cc.function(Function._UTIL_ITEM_AT, info, rt, expr);
       }
 
       if(e != null) {
-        expr = e;
+        rt = e;
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
-        expr = expr instanceof Filter ? ((Filter) expr).addPred(pred) : get(info, expr, pred);
+        rt = rt instanceof Filter ? ((Filter) rt).addPred(expr) : get(info, rt, expr);
       }
     }
 
     // return optimized expression or standard iterator
-    return opt ? cc.replaceWith(this, expr) : get(info, root, exprs);
+    return opt ? cc.replaceWith(this, rt) : get(info, root, exprs);
   }
 
   /**
@@ -194,21 +194,15 @@ public abstract class Filter extends Preds {
   private static Expr simplify(final Expr root, final Expr... exprs) {
     // no predicates: return root
     if(exprs.length == 0) return root;
-    // axis path: attach predicates to last step
-    if(root instanceof AxisPath) {
-      // predicates must not be numeric: (//x)[1] != //x[1]
-      for(final Expr pred : exprs) {
-        if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) return null;
-      }
-      return ((AxisPath) root).addPreds(exprs);
-    }
+    // axis path: attach non-positional predicates to last step: (//x)[1] != //x[1]
+    if(root instanceof AxisPath && !positional(exprs)) return ((AxisPath) root).addPreds(exprs);
     return null;
   }
 
   @Override
   public final boolean has(final Flag... flags) {
     if(root.has(flags)) return true;
-    final Flag[] flgs = Flag.CTX.remove(flags);
+    final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
     return flgs.length != 0 && super.has(flgs);
   }
 
@@ -222,7 +216,7 @@ public abstract class Filter extends Preds {
     final VarUsage inPreds = super.count(var), inRoot = root.count(var);
     if(inPreds == VarUsage.NEVER) return inRoot;
     final long sz = root.size();
-    return sz >= 0 && sz <= 1 || root.seqType().zeroOrOne() ? inRoot.plus(inPreds) :
+    return sz == 0 || sz == 1 || root.seqType().zeroOrOne() ? inRoot.plus(inPreds) :
       VarUsage.MORE_THAN_ONCE;
   }
 

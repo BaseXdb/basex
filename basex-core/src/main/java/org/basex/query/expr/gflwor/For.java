@@ -172,26 +172,26 @@ public final class For extends ForLet {
 
   /**
    * Adds a predicate to the looped expression.
-   * @param pred predicate
+   * @param ex expression to add as predicate
    */
-  void addPredicate(final Expr pred) {
-    if(expr instanceof AxisPath && !pred.has(Flag.POS)) {
+  void addPredicate(final Expr ex) {
+    if(expr instanceof AxisPath && !ex.has(Flag.POS)) {
       // add to axis path, provided that predicate is not positional
-      expr = ((AxisPath) expr).addPreds(pred);
+      expr = ((AxisPath) expr).addPreds(ex);
     } else if(expr instanceof Filter) {
       // add to existing filter expression
-      expr = ((Filter) expr).addPred(pred);
+      expr = ((Filter) expr).addPred(ex);
     } else {
       // create new filter expression
-      expr = Filter.get(info, expr, pred);
+      expr = Filter.get(info, expr, ex);
     }
   }
 
   /**
-   * Tries to add the given expression as a predicate to the loop expression.
+   * Tries to add the given expression as a predicate to the looped expression.
    * @param cc compilation context
    * @param ex expression to add as predicate
-   * @return success
+   * @return success flag
    * @throws QueryException query exception
    */
   public boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {

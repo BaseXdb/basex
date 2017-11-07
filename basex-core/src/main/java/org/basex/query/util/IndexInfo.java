@@ -308,8 +308,8 @@ public final class IndexInfo {
     if(path.root != null) return null;
     // return last step
     final Step s = path.step(path.steps.length - 1);
-    // give up if step contains numeric predicate
-    if(s.has(Flag.POS)) return null;
+    // give up if step contains positional predicates
+    if(s.positional()) return null;
     // success: return step
     return s;
   }

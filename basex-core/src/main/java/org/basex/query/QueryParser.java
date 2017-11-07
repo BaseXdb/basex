@@ -2173,9 +2173,14 @@ public class QueryParser extends InputParser {
       consume();
       return Str.WC;
     }
-    return c == '(' ? parenthesized() :
-      digit(c) ? numericLiteral(true) :
-      Str.get(ncName(KEYSPEC));
+    if(c == '(') return parenthesized();
+    // numeric literal
+    if(digit(c) || c == '.') {
+      final Expr num = numericLiteral();
+      if(num instanceof FnError || num instanceof Int) return num;
+      throw error(NUMBERITR_X_X, num.seqType(), num);
+    }
+    return Str.get(ncName(KEYSPEC));
   }
 
   /**
@@ -2249,13 +2254,15 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(null, sc.funcNS);
     if(name != null && wsConsumeWs(HSH)) {
       if(keyword(name)) throw error(RESERVED_X, name.local());
-      final Expr ex = numericLiteral(true);
-      if(!(ex instanceof Int)) return ex;
-      final int card = (int) ((ANum) ex).itr();
-      final Expr lit = Functions.getLiteral(name, card, qc, sc, info(), false);
-      return lit != null ? lit : unknownLit(name, card, info());
+      final Expr num = numericLiteral();
+      if(num instanceof FnError) return num;
+      if(!(num instanceof Int)) throw error(NUMBERITR_X_X, num.seqType(), num);
+      final long lng = ((Int) num).itr();
+      if(lng > Integer.MAX_VALUE) return FnError.get(RANGE_X.get(info(), num), SeqType.ITR, sc);
+      final int arity = (int) lng;
+      final Expr lit = Functions.getLiteral(name, arity, qc, sc, info(), false);
+      return lit != null ? lit : unknownLit(name, arity, info());
     }
-
     pos = ip;
     return null;
   }
@@ -2263,14 +2270,14 @@ public class QueryParser extends InputParser {
   /**
    * Creates and registers a function literal.
    * @param name function name
-   * @param card cardinality
+   * @param arity arity
    * @param ii input info
    * @return the literal
    * @throws QueryException query exception
    */
-  private Closure unknownLit(final QNm name, final int card, final InputInfo ii)
+  private Closure unknownLit(final QNm name, final int arity, final InputInfo ii)
       throws QueryException {
-    final Closure lit = Closure.unknownLit(name, card, qc, sc, ii);
+    final Closure lit = Closure.unknownLit(name, arity, qc, sc, ii);
     qc.funcs.registerFuncLit(lit);
     return lit;
   }
@@ -2283,7 +2290,7 @@ public class QueryParser extends InputParser {
   private Expr literal() throws QueryException {
     final char c = curr();
     // literals
-    if(digit(c) || c == '.') return numericLiteral(false);
+    if(digit(c) || c == '.') return numericLiteral();
     // strings
     return quote(c) ? Str.get(stringLiteral()) : null;
   }
@@ -2292,11 +2299,10 @@ public class QueryParser extends InputParser {
    * Parses the "NumericLiteral" rule.
    * Parses the "DecimalLiteral" rule.
    * Parses the "IntegerLiteral" rule.
-   * @param itr integer flag
    * @return numeric literal
    * @throws QueryException query exception
    */
-  private Expr numericLiteral(final boolean itr) throws QueryException {
+  private Expr numericLiteral() throws QueryException {
     tok.reset();
     while(digit(curr())) tok.add(consume());
 
@@ -2304,7 +2310,6 @@ public class QueryParser extends InputParser {
     if(dot) {
       // decimal literal
       tok.add('.');
-      if(itr) throw error(NUMBERITR, tok);
       while(digit(curr())) tok.add(consume());
     }
 
