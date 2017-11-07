@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -52,12 +52,12 @@ public abstract class Pragma extends ExprInfo {
   abstract void finish(QueryContext qc, Object state);
 
   /**
-   * Indicates if an expression has the specified compiler property.
-   * @param flag flag to be checked
+   * Indicates if an expression has one of the specified compiler properties.
+   * @param flags flag to be checked
    * @return result of check
-   * @see Expr#has
+   * @see Expr#has(Flag...)
    */
-  public abstract boolean has(Flag flag);
+  public abstract boolean has(Flag... flags);
 
   /**
    * Creates a copy of this pragma.

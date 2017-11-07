@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -134,8 +135,8 @@ public final class Pos extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.POS;
+  public boolean has(final Flag... flags) {
+    return Flag.POS.in(flags);
   }
 
   @Override

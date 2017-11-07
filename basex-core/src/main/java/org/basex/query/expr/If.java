@@ -134,8 +134,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return cond.has(flag) || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return cond.has(flags) || super.has(flags);
   }
 
   @Override
@@ -181,8 +181,7 @@ public final class If extends Arr {
 
   @Override
   public void markTailCalls(final CompileContext cc) {
-    exprs[0].markTailCalls(cc);
-    exprs[1].markTailCalls(cc);
+    for(final Expr expr : exprs) expr.markTailCalls(cc);
   }
 
   @Override

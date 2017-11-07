@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -49,7 +49,7 @@ public final class DBPragma extends Pragma {
   }
 
   @Override
-  public boolean has(final Flag flag) {
+  public boolean has(final Flag... flags) {
     return false;
   }
 

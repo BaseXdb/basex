@@ -206,8 +206,10 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final boolean has(final Flag flag) {
-    return root.has(flag) || flag != Flag.CTX && super.has(flag);
+  public final boolean has(final Flag... flags) {
+    if(root.has(flags)) return true;
+    final Flag[] flgs = Flag.CTX.remove(flags);
+    return flgs.length != 0 && super.has(flgs);
   }
 
   @Override

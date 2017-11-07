@@ -78,7 +78,7 @@ final class CmpSR extends Single {
    */
   static ParseExpr get(final CmpG cmp) throws QueryException {
     final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
-    if(e1.has(Flag.NDT) || e1.has(Flag.UPD) || !(e2 instanceof AStr)) return cmp;
+    if(e1.has(Flag.NDT, Flag.UPD) || !(e2 instanceof AStr)) return cmp;
 
     final byte[] d = ((AStr) e2).string(cmp.info);
     switch(cmp.op.op) {

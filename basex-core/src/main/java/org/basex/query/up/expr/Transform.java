@@ -98,9 +98,11 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    for(final Let copy : copies) if(copy.has(flag)) return true;
-    return flag == Flag.UPD ? exprs[1].has(flag) : super.has(flag);
+  public boolean has(final Flag... flags) {
+    for(final Let copy : copies) if(copy.has(flags)) return true;
+    if(Flag.UPD.in(flags) && exprs[1].has(Flag.UPD)) return true;
+    final Flag[] flgs = Flag.UPD.remove(flags);
+    return flgs.length != 0 && super.has(flgs);
   }
 
   @Override

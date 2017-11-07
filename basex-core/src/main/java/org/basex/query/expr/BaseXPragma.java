@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.expr.Expr.Flag;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -35,8 +35,8 @@ public final class BaseXPragma extends Pragma {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.NDT && ndt;
+  public boolean has(final Flag... flags) {
+    return Flag.NDT.in(flags) && ndt;
   }
 
   @Override

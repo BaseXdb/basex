@@ -46,8 +46,8 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return expr.has(flag);
+  public boolean has(final Flag... flags) {
+    return expr.has(flags);
   }
 
   @Override

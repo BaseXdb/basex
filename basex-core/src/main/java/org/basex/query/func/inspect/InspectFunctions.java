@@ -11,6 +11,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -60,8 +61,8 @@ public final class InspectFunctions extends StandardFunc {
   }
 
   @Override
-  public boolean has(final Flag flag) {
+  public boolean has(final Flag... flags) {
     // do not relocate function, as it introduces new code
-    return flag == Flag.NDT && exprs.length == 1 || super.has(flag);
+    return Flag.NDT.in(flags) && exprs.length == 1 || super.has(flags);
   }
 }

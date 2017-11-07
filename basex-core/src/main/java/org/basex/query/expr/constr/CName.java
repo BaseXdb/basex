@@ -98,8 +98,8 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public final boolean has(final Flag flag) {
-    return name.has(flag) || super.has(flag);
+  public final boolean has(final Flag... flags) {
+    return name.has(flags) || super.has(flags);
   }
 
   @Override

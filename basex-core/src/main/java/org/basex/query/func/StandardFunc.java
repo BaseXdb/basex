@@ -140,13 +140,14 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
+  public boolean has(final Flag... flags) {
     // check signature flags
-    return sig.has(flag) ||
-      // update, mix updates: check if function invokes another function
-      flag == Flag.UPD && sc.mixUpdates && sig.has(Flag.HOF) ||
-      // otherwise, check arguments (function invocation only applies to function itself)
-      flag != Flag.HOF && super.has(flag);
+    for(final Flag flag : flags) if(sig.has(flag)) return true;
+    // mix updates: higher-order function may be updating
+    if(Flag.UPD.in(flags) && sc.mixUpdates && sig.has(Flag.HOF)) return true;
+    // check arguments (without function invocation; it only applies to function itself)
+    final Flag[] flgs = Flag.HOF.remove(flags);
+    return flgs.length != 0 && super.has(flgs);
   }
 
   @Override

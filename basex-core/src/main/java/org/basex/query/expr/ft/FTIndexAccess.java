@@ -59,8 +59,8 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return ftexpr.has(flag) || db.has(flag);
+  public boolean has(final Flag... flags) {
+    return ftexpr.has(flags) || db.has(flags);
   }
 
   @Override

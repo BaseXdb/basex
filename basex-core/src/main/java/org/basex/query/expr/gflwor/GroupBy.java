@@ -6,8 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.expr.gflwor.GFLWOR.Eval;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
@@ -15,7 +14,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -202,15 +201,15 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    for(final Spec sp : specs) if(sp.has(flag)) return true;
+  public boolean has(final Flag... flags) {
+    for(final Spec spec : specs) if(spec.has(flags)) return true;
     return false;
   }
 
   @Override
   public GroupBy compile(final CompileContext cc) throws QueryException {
-    for(final Expr e : preExpr) e.compile(cc);
-    for(final Spec s : specs) s.compile(cc);
+    for(final Expr expr : preExpr) expr.compile(cc);
+    for(final Spec spec : specs) spec.compile(cc);
     return optimize(cc);
   }
 
@@ -296,8 +295,8 @@ public final class GroupBy extends Clause {
   @Override
   public int exprSize() {
     int sz = 0;
-    for(final Expr e : preExpr) sz += e.exprSize();
-    for(final Expr s : specs) sz += s.exprSize();
+    for(final Expr expr : preExpr) sz += expr.exprSize();
+    for(final Expr spec : specs) sz += spec.exprSize();
     return sz;
   }
 

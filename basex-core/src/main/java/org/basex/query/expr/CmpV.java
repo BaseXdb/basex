@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -204,7 +205,7 @@ public final class CmpV extends Cmp {
      * - operands are deterministic, non-updating,
      * - operands do not depend on context, or if context value exists
      */
-    if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+    if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT, Flag.UPD) &&
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       // currently limited to strings, integers and booleans
       final Type t1 = st1.type;

@@ -42,8 +42,8 @@ public abstract class IndexAccess extends Simple {
   public abstract NodeIter iter(QueryContext qc) throws QueryException;
 
   @Override
-  public boolean has(final Flag flag) {
-    return db.has(flag);
+  public boolean has(final Flag... flags) {
+    return db.has(flags);
   }
 
   @Override

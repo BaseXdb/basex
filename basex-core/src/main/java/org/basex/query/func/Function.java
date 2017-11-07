@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.expr.Expr.Flag.*;
+import static org.basex.query.util.Flag.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
@@ -9,7 +9,6 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
@@ -1519,9 +1518,9 @@ public enum Function {
 
   /**
    * Indicates if an expression has the specified compiler property.
-   * @param flag flag to be found
+   * @param flag flag
    * @return result of check
-   * @see Expr#has(Flag)
+   * @see Expr#has(Flag...)
     */
   public boolean has(final Flag flag) {
     return flags.contains(flag);

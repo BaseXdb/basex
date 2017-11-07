@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.map.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -33,7 +34,7 @@ public final class FnCount extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     // skip non-deterministic and variable expressions
     final Expr e = exprs[0];
-    if(e.has(Flag.NDT) || e.has(Flag.UPD) || e instanceof VarRef) return this;
+    if(e.has(Flag.NDT, Flag.UPD) || e instanceof VarRef) return this;
 
     // return size known at compile time
     final long c = e.size();

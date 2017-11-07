@@ -7,7 +7,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -238,7 +238,7 @@ public final class Functions extends TokenSet {
         qc.updating();
       }
 
-      return sf.has(Flag.CTX) || sf.has(Flag.POS)
+      return sf.has(Flag.CTX, Flag.POS)
           ? new FuncLit(anns, name, args, sf, ft, scp, info)
           : closureOrFItem(anns, name, args, fn.type(arity, anns), sf, scp, info, runtime, upd);
     }

@@ -12,8 +12,8 @@ import org.basex.query.util.*;
  */
 public abstract class ContextFn extends StandardFunc {
   @Override
-  public final boolean has(final Flag flag) {
-    return flag == Flag.CTX && exprs.length == 0 || super.has(flag);
+  public final boolean has(final Flag... flags) {
+    return Flag.CTX.in(flags) && exprs.length == 0 || super.has(flags);
   }
 
   @Override

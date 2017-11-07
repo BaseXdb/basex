@@ -9,6 +9,7 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -326,11 +327,13 @@ public abstract class Preds extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    for(final Expr pred : exprs) {
-      if(flag == Flag.POS && pred.seqType().mayBeNumber()) return true;
+  public boolean has(final Flag... flags) {
+    if(Flag.POS.in(flags)) {
+      for(final Expr pred : exprs) {
+        if(pred.seqType().mayBeNumber()) return true;
+      }
     }
-    return super.has(flag);
+    return super.has(flags);
   }
 
   @Override

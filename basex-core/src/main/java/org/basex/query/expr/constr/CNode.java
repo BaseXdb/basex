@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -33,8 +34,8 @@ public abstract class CNode extends Arr {
   public abstract ANode item(QueryContext qc, InputInfo ii) throws QueryException;
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.CNS || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return Flag.CNS.in(flags) || super.has(flags);
   }
 
   /**

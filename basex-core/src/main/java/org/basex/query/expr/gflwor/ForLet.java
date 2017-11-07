@@ -2,7 +2,8 @@ package org.basex.query.expr.gflwor;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
+import org.basex.query.expr.gflwor.GFLWOR.*;
+import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -43,8 +44,8 @@ abstract class ForLet extends Clause {
   }
 
   @Override
-  public final boolean has(final Flag flag) {
-    return expr.has(flag);
+  public final boolean has(final Flag... flags) {
+    return expr.has(flags);
   }
 
   @Override

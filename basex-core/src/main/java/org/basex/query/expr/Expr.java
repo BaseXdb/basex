@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
@@ -28,28 +27,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
-  /** Flags that influence query compilation. */
-  public enum Flag {
-    /** Node creation. No relocation of expressions that would change number of node constructions
-     * Example: node constructor. */
-    CNS,
-    /** Context dependency. Checked to prevent relocations of expressions to different context.
-     * Example: context item ({@code .}). */
-    CTX,
-    /** Non-deterministic code. Cannot be relocated, pre-evaluated or optimized away.
-     * Examples: random:double(), file:write(). */
-    NDT,
-    /** Positional access. Prevents simple iterative evaluation.
-     * Examples: position(), last(). */
-    POS,
-    /** Performs updates. Checked to detect if an expression is updating or not, or if code
-     * can be optimized away when using {@link MainOptions#MIXUPDATES}. Example: delete node. */
-    UPD,
-    /** Function invocation. Used to suppress pre-evaluation of built-in functions with
-     * functions arguments. Example: fold-left. */
-    HOF,
-  }
-
   /**
    * {@inheritDoc}
    * <div>
@@ -226,13 +203,13 @@ public abstract class Expr extends ExprInfo {
   public abstract long size();
 
   /**
-   * Indicates if an expression has the specified compiler property. This method must only be
-   * called at compile time. It is invoked to test properties of sub-expressions.
-   * It returns {@code true} if at least one test is successful.
-   * @param flag flag to be checked
+   * Indicates if an expression has one of the specified compiler properties. This method must only
+   * be called at compile time. It is invoked to test properties of sub-expressions.
+   * It returns {@code true} if at least flag matches an expression.
+   * @param flags flags to be checked
    * @return result of check
    */
-  public abstract boolean has(Flag flag);
+  public abstract boolean has(Flag... flags);
 
   /**
    * Checks if the given variable is used by this expression.
@@ -337,7 +314,7 @@ public abstract class Expr extends ExprInfo {
   public Expr optimizeEbv(final CompileContext cc) throws QueryException {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
-    return st.type instanceof NodeType && st.oneOrMore() && !has(Flag.UPD) && !has(Flag.NDT) ?
+    return st.type instanceof NodeType && st.oneOrMore() && !has(Flag.NDT, Flag.UPD) ?
       cc.replaceEbv(this, Bln.TRUE) : this;
   }
 
@@ -386,7 +363,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public final boolean isSimple() {
-    return !(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) || has(Flag.POS));
+    return !has(Flag.CTX, Flag.NDT, Flag.HOF, Flag.UPD, Flag.POS);
   }
 
   /**

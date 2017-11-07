@@ -2,8 +2,7 @@ package org.basex.query.expr.gflwor;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.expr.gflwor.GFLWOR.Eval;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -43,8 +42,8 @@ public final class Where extends Clause {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return expr.has(flag);
+  public boolean has(final Flag... flags) {
+    return expr.has(flags);
   }
 
   @Override

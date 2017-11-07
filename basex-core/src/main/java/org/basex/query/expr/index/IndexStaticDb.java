@@ -50,7 +50,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public boolean has(final Flag flag) {
+  public boolean has(final Flag... flags) {
     return false;
   }
 

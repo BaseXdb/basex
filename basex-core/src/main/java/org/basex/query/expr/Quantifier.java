@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -62,7 +63,7 @@ public final class Quantifier extends Single {
     if(expr.isValue()) return cc.preEval(this);
 
     // pre-evaluate satisfy clause if it is a value
-    if(expr instanceof GFLWOR && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
+    if(expr instanceof GFLWOR && !expr.has(Flag.NDT, Flag.UPD)) {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;

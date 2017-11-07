@@ -9,7 +9,6 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Flag;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.scope.*;
@@ -221,20 +220,21 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
-   * Indicates if an expression has the specified compiler property.
-   * @param flag feature
+   * Indicates if an expression has one of the specified compiler properties.
+   * @param flags flags
    * @return result of check
-   * @see Expr#has(Flag)
+   * @see Expr#has(Flag...)
    */
-  boolean has(final Flag flag) {
+  boolean has(final Flag... flags) {
     // function itself does not perform any updates
-    return flag != Flag.UPD && check(flag);
+    final Flag[] flgs = Flag.UPD.remove(flags);
+    return flgs.length != 0 && check(flgs);
   }
 
   /**
    * Checks if the function body is updating.
    * @return result of check
-   * @see Expr#has(Flag)
+   * @see Expr#has(Flag...)
    */
   boolean updating() {
     // MIXUPDATES: recursive check; otherwise, rely on flag (GH-1281)
@@ -242,20 +242,25 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
-   * Checks if the function body is updating.
-   * @param flag feature
+   * Checks if the function body has one of the specified compiler properties.
+   * @param flags flags
    * @return result of check
    */
-  private boolean check(final Flag flag) {
-    // handle recursive calls: set dummy value, eventually replace it with final value
-    if(!map.containsKey(flag)) {
-      map.put(flag, false);
-      map.put(flag, expr.has(flag));
+  private boolean check(final Flag... flags) {
+    // handle recursive calls: check which flags have already been assigned
+    final ArrayList<Flag> flgs = new ArrayList<>();
+    for(final Flag flag : flags) {
+      if(!map.containsKey(flag)) {
+        map.put(flag, false);
+        flgs.add(flag);
+      }
     }
-    return map.get(flag);
+    // cache flags for remaining, new properties
+    for(final Flag flag : flgs) map.put(flag, expr.has(flag));
+    // evaluate result
+    for(final Flag flag : flags) if(map.get(flag)) return true;
+    return false;
   }
-
-
 
   @Override
   public boolean visit(final ASTVisitor visitor) {

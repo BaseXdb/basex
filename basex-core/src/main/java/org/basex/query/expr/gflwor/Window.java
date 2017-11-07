@@ -267,8 +267,8 @@ public final class Window extends Clause {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return expr.has(flag) || start.has(flag) || end != null && end.has(flag);
+  public boolean has(final Flag... flags) {
+    return expr.has(flags) || start.has(flags) || end != null && end.has(flags);
   }
 
   @Override

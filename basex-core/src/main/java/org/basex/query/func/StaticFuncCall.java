@@ -113,13 +113,16 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    // check arguments, which will be evaluated before running the function code
-    if(super.has(flag)) return true;
+  public boolean has(final Flag... flags) {
+    // check arguments, which will be evaluated previous to the function body
+    if(super.has(flags)) return true;
     // function code: position or context references of expression body have no effect
-    if(flag == Flag.POS || flag == Flag.CTX) return false;
-    // pass on check to function code
-    return flag == Flag.UPD ? func.updating() : func.has(flag);
+    if(Flag.POS.in(flags) || Flag.CTX.in(flags)) return false;
+    // function code: check for updates
+    if(Flag.UPD.in(flags) && func.updating()) return true;
+    // check remaining flags
+    final Flag[] flgs = Flag.UPD.remove(flags);
+    return flgs.length != 0 && func.has(flgs);
   }
 
   @Override

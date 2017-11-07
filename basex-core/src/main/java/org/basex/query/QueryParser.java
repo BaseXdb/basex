@@ -20,7 +20,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpN.*;
 import org.basex.query.expr.CmpV.*;
-import org.basex.query.expr.Expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;

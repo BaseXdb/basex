@@ -127,8 +127,8 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    for(final Key key : keys) if(key.has(flag)) return true;
+  public boolean has(final Flag... flags) {
+    for(final Key key : keys) if(key.has(flags)) return true;
     return false;
   }
 

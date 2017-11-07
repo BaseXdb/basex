@@ -11,7 +11,6 @@ import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.*;
@@ -155,8 +154,8 @@ public final class IndexInfo {
          //*[text() = .]
          //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
        */
-      if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX) ||
-          search.has(Flag.NDT) || search.has(Flag.UPD)) return false;
+      if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX, Flag.NDT, Flag.UPD))
+        return false;
 
       // estimate costs (tend to worst case)
       if(data != null) costs = IndexCosts.get(Math.max(1, data.meta.size / 10));

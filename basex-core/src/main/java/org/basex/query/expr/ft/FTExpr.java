@@ -67,8 +67,8 @@ public abstract class FTExpr extends ParseExpr {
   public abstract FTIter iter(QueryContext qc) throws QueryException;
 
   @Override
-  public boolean has(final Flag flag) {
-    for(final FTExpr expr : exprs) if(expr.has(flag)) return true;
+  public boolean has(final Flag... flags) {
+    for(final FTExpr expr : exprs) if(expr.has(flags)) return true;
     return false;
   }
 

@@ -18,11 +18,11 @@ import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.list.*;
@@ -215,6 +215,7 @@ public final class QueryContext extends Job implements Closeable {
     info.query = query;
     final QueryParser qp = new QueryParser(query, uri, this, sc);
     root = qp.parseMain();
+    // updating expression: check if an updating expression is left in the expression tree
     if(updating) updating = (qp.sc.mixUpdates && qp.sc.dynFuncCall) || root.expr.has(Flag.UPD);
     return root;
   }

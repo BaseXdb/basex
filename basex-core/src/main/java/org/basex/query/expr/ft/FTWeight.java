@@ -85,8 +85,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return weight.has(flag) || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return weight.has(flags) || super.has(flags);
   }
 
   @Override

@@ -125,9 +125,9 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    for(final Catch c : catches) if(c.has(flag)) return true;
-    return super.has(flag);
+  public boolean has(final Flag... flags) {
+    for(final Catch c : catches) if(c.has(flags)) return true;
+    return super.has(flags);
   }
 
   @Override

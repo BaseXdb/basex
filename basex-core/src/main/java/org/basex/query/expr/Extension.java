@@ -77,8 +77,8 @@ public final class Extension extends Single {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return pragma.has(flag) || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return pragma.has(flags) || super.has(flags);
   }
 
   @Override

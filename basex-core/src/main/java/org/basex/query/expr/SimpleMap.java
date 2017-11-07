@@ -88,8 +88,10 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final boolean has(final Flag flag) {
-    return flag == Flag.CTX ? exprs[0].has(flag) : super.has(flag);
+  public final boolean has(final Flag... flags) {
+    if(Flag.CTX.in(flags) && exprs[0].has(Flag.CTX)) return true;
+    final Flag[] flgs = Flag.CTX.remove(flags);
+    return flgs.length != 0 && super.has(flgs);
   }
 
   @Override

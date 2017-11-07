@@ -17,6 +17,7 @@ import org.basex.query.*;
 import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -81,8 +82,8 @@ public abstract class JavaFunction extends Arr {
   protected abstract Object eval(Value[] args, QueryContext qc) throws QueryException;
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.NDT || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return Flag.NDT.in(flags) || super.has(flags);
   }
 
   // STATIC METHODS ===============================================================================

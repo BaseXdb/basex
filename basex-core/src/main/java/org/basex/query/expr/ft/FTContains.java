@@ -87,8 +87,8 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return super.has(flag) || ftexpr.has(flag);
+  public boolean has(final Flag... flags) {
+    return super.has(flags) || ftexpr.has(flags);
   }
 
   @Override

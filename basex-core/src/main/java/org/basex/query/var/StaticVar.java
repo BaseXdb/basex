@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Flag;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -154,14 +153,16 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Checks if the expression bound to this variable has the given flag.
-   * @param flag flag to check for
-   * @return {@code true} if the expression has the given flag, {@code false} otherwise
+   * Indicates if the expression bound to this variable has one of the specified compiler
+   * properties.
+   * @param flags flags
+   * @return result of check
+   * @see Expr#has(Flag...)
    */
-  boolean has(final Flag flag) {
+  boolean has(final Flag... flags) {
     if(dontEnter || expr == null) return false;
     dontEnter = true;
-    final boolean res = expr.has(flag);
+    final boolean res = expr.has(flags);
     dontEnter = false;
     return res;
   }

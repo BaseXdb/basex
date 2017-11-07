@@ -78,8 +78,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return win.has(flag) || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return win.has(flags) || super.has(flags);
   }
 
   @Override

@@ -174,7 +174,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         } else if(c instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
           final Closure cl = (Closure) c;
-          if(!cl.has(Flag.NDT) && !cl.has(Flag.UPD) && cl.global.size() < 5
+          if(!cl.has(Flag.NDT, Flag.UPD) && cl.global.size() < 5
               && expr.count(v) != VarUsage.MORE_THAN_ONCE && cl.exprSize() < limit) {
             cc.info(OPTINLINE_X, e);
             for(final Entry<Var, Expr> e2 : cl.global.entrySet()) {
@@ -190,7 +190,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
           }
         }
       }
-
       // add all newly added bindings
       if(add != null) global.putAll(add);
     } catch(final QueryException qe) {
@@ -313,7 +312,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         valueType.promote(val, null, qc, vs.sc, info, false);
     } else {
       // check at each call
-      if(argType.type.instanceOf(valueType.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
+      if(argType.type.instanceOf(valueType.type) && !body.has(Flag.NDT, Flag.UPD)) {
         // reject impossible arities
         final Occ occ = argType.occ.intersect(valueType.occ);
         if(occ == null) throw typeError(body, valueType, null, info);
@@ -335,16 +334,21 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    // handle recursive calls: set dummy value, eventually replace it with final value
-    Boolean b = map.get(flag);
-    if(b == null) {
-      map.put(flag, false);
-      // function itself does not perform any updates
-      b = flag != Flag.UPD && expr.has(flag);
-      map.put(flag, b);
+  public boolean has(final Flag... flags) {
+    // handle recursive calls: check which flags have already been assigned
+    final ArrayList<Flag> flgs = new ArrayList<>();
+    for(final Flag flag : flags) {
+      if(!map.containsKey(flag)) {
+        map.put(flag, false);
+        // skip updating flag (function itself does not perform any updates)
+        if(flag != Flag.UPD) flgs.add(flag);
+      }
     }
-    return b;
+    // cache flags for remaining, new properties
+    for(final Flag flag : flgs) map.put(flag, expr.has(flag));
+    // evaluate result
+    for(final Flag flag : flags) if(map.get(flag)) return true;
+    return false;
   }
 
   @Override

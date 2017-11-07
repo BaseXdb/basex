@@ -240,7 +240,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     size = calcSize();
-    if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return cc.emptySeq(this);
+    if(size == 0 && !has(Flag.NDT, Flag.UPD)) return cc.emptySeq(this);
 
     if(clauses.getFirst() instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
@@ -299,7 +299,7 @@ public final class GFLWOR extends ParseExpr {
       final Clause clause = iter.next();
       if(clause instanceof Let) {
         final Let lt = (Let) clause;
-        if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT) && !lt.has(Flag.UPD)) {
+        if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT, Flag.UPD)) {
           cc.info(QueryText.OPTVAR_X, lt.var);
           // check type before removing variable (see {@link FuncType#funcConv})
           lt.var.checkType(lt.expr);
@@ -340,7 +340,7 @@ public final class GFLWOR extends ParseExpr {
         if(clause instanceof Let) {
           final Let lt = (Let) clause;
           final Expr expr = lt.expr;
-          if(expr.has(Flag.NDT) || expr.has(Flag.UPD)) continue;
+          if(expr.has(Flag.NDT, Flag.UPD)) continue;
 
           if(
             // inline simple values
@@ -350,7 +350,7 @@ public final class GFLWOR extends ParseExpr {
             // inline expressions that occur once, but don't...
             // - access context  (e.g. let $x := . return <a/>[$x = 1]), or
             // - construct nodes (e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>)
-            || count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CTX) && !expr.has(Flag.CNS)
+            || count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CTX, Flag.CNS)
             // inline only cheap axis paths
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
 
@@ -465,8 +465,7 @@ public final class GFLWOR extends ParseExpr {
     for(int c = 1; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
       // do not move node constructors. example: for $x in 1 to 2 let $a := <x/> return $a
-      if(!(clause instanceof Let) || clause.has(Flag.NDT) || clause.has(Flag.CNS) ||
-          clause.has(Flag.UPD)) continue;
+      if(!(clause instanceof Let) || clause.has(Flag.NDT, Flag.CNS, Flag.UPD)) continue;
       final Let let = (Let) clause;
 
       // find insertion position
@@ -500,7 +499,7 @@ public final class GFLWOR extends ParseExpr {
     final HashSet<For> fors = new HashSet<>();
     for(int i = 0; i < clauses.size(); i++) {
       final Clause clause = clauses.get(i);
-      if(!(clause instanceof Where) || clause.has(Flag.NDT) || clause.has(Flag.UPD)) continue;
+      if(!(clause instanceof Where) || clause.has(Flag.NDT, Flag.UPD)) continue;
       final Where where = (Where) clause;
 
       if(where.expr.isValue()) {
@@ -518,7 +517,7 @@ public final class GFLWOR extends ParseExpr {
         int insert = -1;
         for(int j = i; --j >= 0;) {
           final Clause curr = clauses.get(j);
-          if(curr.has(Flag.NDT) || curr.has(Flag.UPD) || !curr.skippable(where)) break;
+          if(curr.has(Flag.NDT, Flag.UPD) || !curr.skippable(where)) break;
           // where clauses are always moved to avoid unnecessary computations,
           // but skipping only other where clauses can cause infinite loops
           if(!(curr instanceof Where)) insert = j;
@@ -574,7 +573,7 @@ public final class GFLWOR extends ParseExpr {
         final Clause cl = clauses.get(i);
         if(!(cl instanceof Where)) {
           // stop if clause is no for or let expression, is non-deterministic, or updating
-          if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT) || cl.has(Flag.UPD))
+          if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT, Flag.UPD))
             break;
           continue;
         }
@@ -633,9 +632,9 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    for(final Clause clause : clauses) if(clause.has(flag)) return true;
-    return ret.has(flag);
+  public boolean has(final Flag... flags) {
+    for(final Clause clause : clauses) if(clause.has(flags)) return true;
+    return ret.has(flags);
   }
 
   @Override

@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -140,8 +141,8 @@ public final class ItrPos extends Simple {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.POS;
+  public boolean has(final Flag... flags) {
+    return Flag.POS.in(flags);
   }
 
   @Override

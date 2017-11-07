@@ -50,8 +50,8 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.CTX;
+  public boolean has(final Flag... flags) {
+    return Flag.CTX.in(flags);
   }
 
   @Override

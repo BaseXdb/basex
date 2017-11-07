@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -23,6 +24,6 @@ public final class FnEmpty extends StandardFunc {
     // ignore non-deterministic expressions (e.g.: empty(error()))
     final Expr e = exprs[0];
     final long es = e.size();
-    return es == -1 || e.has(Flag.NDT) || e.has(Flag.UPD) ? this : Bln.get(es == 0);
+    return es == -1 || e.has(Flag.NDT, Flag.UPD) ? this : Bln.get(es == 0);
   }
 }

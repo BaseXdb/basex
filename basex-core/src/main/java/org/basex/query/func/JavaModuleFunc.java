@@ -4,11 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
-
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.Type;
@@ -121,11 +121,11 @@ final class JavaModuleFunc extends JavaFunction {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.NDT && method.getAnnotation(Deterministic.class) == null ||
-      (flag == Flag.CTX || flag == Flag.POS) &&
+  public boolean has(final Flag... flags) {
+    return Flag.NDT.in(flags) && method.getAnnotation(Deterministic.class) == null ||
+      (Flag.CTX.in(flags) || Flag.POS.in(flags)) &&
       method.getAnnotation(FocusDependent.class) == null ||
-      super.has(flag);
+      super.has(flags);
   }
 
   @Override

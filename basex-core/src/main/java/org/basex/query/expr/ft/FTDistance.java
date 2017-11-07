@@ -84,8 +84,8 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return min.has(flag) || max.has(flag) || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return min.has(flags) || max.has(flags) || super.has(flags);
   }
 
   @Override

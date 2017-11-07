@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -34,8 +35,8 @@ abstract class Update extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.UPD || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return Flag.UPD.in(flags) || super.has(flags);
   }
 
   /**

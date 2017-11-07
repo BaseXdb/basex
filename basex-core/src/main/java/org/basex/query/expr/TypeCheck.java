@@ -5,12 +5,13 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -69,7 +70,7 @@ public final class TypeCheck extends Single {
     if(expr.isValue()) return cc.preEval(this);
 
     // check at each call
-    if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
+    if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT, Flag.UPD)) {
       final Occ occ = argType.occ.intersect(seqType.occ);
       if(occ == null) throw typeError(expr, seqType, null, info);
     }

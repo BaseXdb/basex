@@ -146,11 +146,11 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
+  public boolean has(final Flag... flags) {
     for(final SwitchGroup group : groups) {
-      if(group.has(flag)) return true;
+      if(group.has(flags)) return true;
     }
-    return cond.has(flag);
+    return cond.has(flags);
   }
 
   @Override

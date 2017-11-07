@@ -9,6 +9,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
@@ -119,8 +120,8 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.CTX && exprs.length == 1 || super.has(flag);
+  public boolean has(final Flag... flags) {
+    return Flag.CTX.in(flags) && exprs.length == 1 || super.has(flags);
   }
 
   @Override
@@ -136,7 +137,7 @@ public final class Lookup extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(exprs.length > 1) sb.append('(').append(exprs[1]).append(')');
+    if(exprs.length > 1) sb.append(exprs[1]);
 
     final Expr keys = exprs[0];
     if(keys == Str.WC) return sb.append("?*").toString();

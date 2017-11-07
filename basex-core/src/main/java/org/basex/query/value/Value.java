@@ -133,7 +133,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Object toJava() throws QueryException;
 
   @Override
-  public final boolean has(final Flag flag) {
+  public final boolean has(final Flag... flags) {
     return false;
   }
 

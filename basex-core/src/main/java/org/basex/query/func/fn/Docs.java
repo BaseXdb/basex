@@ -83,8 +83,8 @@ public abstract class Docs extends StandardFunc {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    if(flag == Flag.NDT && exprs.length > 0) {
+  public boolean has(final Flag... flags) {
+    if(Flag.NDT.in(flags) && exprs.length > 0) {
       final Expr expr = exprs[0];
       if(expr instanceof Str) {
         queryInput = queryInput(((Str) expr).string());
@@ -92,7 +92,7 @@ public abstract class Docs extends StandardFunc {
         if(queryInput != null && queryInput.io instanceof IOUrl) return true;
       }
     }
-    return super.has(flag);
+    return super.has(flags);
   }
 
   /**

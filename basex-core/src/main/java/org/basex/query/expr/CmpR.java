@@ -11,7 +11,7 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.expr.path.Test.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -74,7 +74,7 @@ public final class CmpR extends Single {
    */
   static ParseExpr get(final CmpG cmp) {
     final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
-    if(e1.has(Flag.NDT) || e1.has(Flag.UPD)) return cmp;
+    if(e1.has(Flag.NDT, Flag.UPD)) return cmp;
 
     if(e2 instanceof RangeSeq) {
       final RangeSeq rs = (RangeSeq) e2;

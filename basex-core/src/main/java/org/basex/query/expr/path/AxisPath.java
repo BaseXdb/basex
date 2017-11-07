@@ -1,9 +1,10 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.expr.path.PathCache.State;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.PathCache.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -35,7 +36,7 @@ public abstract class AxisPath extends Path {
     switch(cache.state) {
       case INIT:
         // first invocation: initialize caching flag
-        cache.state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD)
+        cache.state = !hasFreeVars() && !has(Flag.NDT, Flag.UPD)
             ? State.ENABLED : State.DISABLED;
         return iter(qc);
       case ENABLED:
