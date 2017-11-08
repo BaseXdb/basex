@@ -10,8 +10,8 @@ import java.awt.event.*;
  */
 public interface KeyReleasedListener extends KeyListener {
   @Override
-  default void keyTyped(KeyEvent e) { }
+  default void keyTyped(final KeyEvent e) { }
 
   @Override
-  default void keyPressed(KeyEvent e) { }
+  default void keyPressed(final KeyEvent e) { }
 }

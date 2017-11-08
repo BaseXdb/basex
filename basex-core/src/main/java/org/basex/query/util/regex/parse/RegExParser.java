@@ -7,7 +7,6 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.util.regex.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import static org.basex.util.Token.*;
 import static java.util.regex.Pattern.*;
@@ -598,31 +597,31 @@ public class RegExParser implements RegExParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  private boolean jj_2_1(int xla) {
+  private boolean jj_2_1(final int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_1(); }
-    catch(LookaheadSuccess ls) { return true; }
+    catch(final LookaheadSuccess ls) { return true; }
     finally { jj_save(0, xla); }
   }
 
-  private boolean jj_2_2(int xla) {
+  private boolean jj_2_2(final int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_2(); }
-    catch(LookaheadSuccess ls) { return true; }
+    catch(final LookaheadSuccess ls) { return true; }
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_2_3(int xla) {
+  private boolean jj_2_3(final int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_3(); }
-    catch(LookaheadSuccess ls) { return true; }
+    catch(final LookaheadSuccess ls) { return true; }
     finally { jj_save(2, xla); }
   }
 
-  private boolean jj_2_4(int xla) {
+  private boolean jj_2_4(final int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_4(); }
-    catch(LookaheadSuccess ls) { return true; }
+    catch(final LookaheadSuccess ls) { return true; }
     finally { jj_save(3, xla); }
   }
 
@@ -756,7 +755,7 @@ public class RegExParser implements RegExParserConstants {
 
 
   /** Constructor with user supplied Token Manager. */
-  public RegExParser(TokenManager tm) {
+  public RegExParser(final TokenManager tm) {
     token_source = tm;
     token = new Token();
     jj_ntk = -1;
@@ -766,7 +765,7 @@ public class RegExParser implements RegExParserConstants {
   }
 
   /** Reinitialise. */
-  public void ReInit(TokenManager tm) {
+  public void ReInit(final TokenManager tm) {
     token_source = tm;
     token = new Token();
     jj_ntk = -1;
@@ -775,7 +774,7 @@ public class RegExParser implements RegExParserConstants {
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
-  private Token jj_consume_token(int kind) throws ParseException {
+  private Token jj_consume_token(final int kind) throws ParseException {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -784,8 +783,8 @@ public class RegExParser implements RegExParserConstants {
       jj_gen++;
       if (++jj_gc > 100) {
         jj_gc = 0;
-        for (int i = 0; i < jj_2_rtns.length; i++) {
-          JJCalls c = jj_2_rtns[i];
+        for(final JJCalls jj_2_rtn : jj_2_rtns) {
+          JJCalls c = jj_2_rtn;
           while (c != null) {
             if (c.gen < jj_gen) c.first = null;
             c = c.next;
@@ -801,7 +800,7 @@ public class RegExParser implements RegExParserConstants {
 
   static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
-  private boolean jj_scan_token(int kind) {
+  private boolean jj_scan_token(final int kind) {
     if (jj_scanpos == jj_lastpos) {
       jj_la--;
       if (jj_scanpos.next == null) {
@@ -833,7 +832,7 @@ public class RegExParser implements RegExParserConstants {
   }
 
 /** Get the specific Token. */
-  final public Token getToken(int index) {
+  final public Token getToken(final int index) {
     Token t = jj_lookingAhead ? jj_scanpos : token;
     for (int i = 0; i < index; i++) {
       if (t.next != null) t = t.next;
@@ -849,13 +848,13 @@ public class RegExParser implements RegExParserConstants {
       return (jj_ntk = jj_nt.kind);
   }
 
-  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private final java.util.List<int[]> jj_expentries = new java.util.ArrayList<>();
   private int[] jj_expentry;
   private int jj_kind = -1;
-  private int[] jj_lasttokens = new int[100];
+  private final int[] jj_lasttokens = new int[100];
   private int jj_endpos;
 
-  private void jj_add_error_token(int kind, int pos) {
+  private void jj_add_error_token(final int kind, final int pos) {
     if (pos >= 100) return;
     if (pos == jj_endpos + 1) {
       jj_lasttokens[jj_endpos++] = kind;
@@ -864,8 +863,8 @@ public class RegExParser implements RegExParserConstants {
       for (int i = 0; i < jj_endpos; i++) {
         jj_expentry[i] = jj_lasttokens[i];
       }
-      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {
-        int[] oldentry = (int[])(it.next());
+      jj_entries_loop: for(final Object name : jj_expentries) {
+        final int[] oldentry = (int[])(name);
         if (oldentry.length == jj_expentry.length) {
           for (int i = 0; i < jj_expentry.length; i++) {
             if (oldentry[i] != jj_expentry[i]) {
@@ -883,7 +882,7 @@ public class RegExParser implements RegExParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[25];
+    final boolean[] la1tokens = new boolean[25];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -907,7 +906,7 @@ public class RegExParser implements RegExParserConstants {
     jj_endpos = 0;
     jj_rescan_token();
     jj_add_error_token(0, 0);
-    int[][] exptokseq = new int[jj_expentries.size()][];
+    final int[][] exptokseq = new int[jj_expentries.size()][];
     for (int i = 0; i < jj_expentries.size(); i++) {
       exptokseq[i] = jj_expentries.get(i);
     }
@@ -939,12 +938,12 @@ public class RegExParser implements RegExParserConstants {
         }
         p = p.next;
       } while (p != null);
-      } catch(LookaheadSuccess ls) { }
+      } catch(final LookaheadSuccess ls) { }
     }
     jj_rescan = false;
   }
 
-  private void jj_save(int index, int xla) {
+  private void jj_save(final int index, final int xla) {
     JJCalls p = jj_2_rtns[index];
     while (p.gen > jj_gen) {
       if (p.next == null) { p = p.next = new JJCalls(); break; }

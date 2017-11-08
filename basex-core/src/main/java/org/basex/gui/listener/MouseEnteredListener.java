@@ -10,14 +10,14 @@ import java.awt.event.*;
  */
 public interface MouseEnteredListener extends MouseListener {
   @Override
-  default void mouseClicked(MouseEvent e) { }
+  default void mouseClicked(final MouseEvent e) { }
 
   @Override
-  default void mouseExited(MouseEvent e) { }
+  default void mouseExited(final MouseEvent e) { }
 
   @Override
-  default void mousePressed(MouseEvent e) { }
+  default void mousePressed(final MouseEvent e) { }
 
   @Override
-  default void mouseReleased(MouseEvent e) { }
+  default void mouseReleased(final MouseEvent e) { }
 }

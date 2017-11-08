@@ -29,7 +29,7 @@ public final class FnFormatNumber extends StandardFunc {
     // retrieve format declaration
     QNm form = QNm.EMPTY;
     if(exprs.length == 3) {
-      byte[] qnm = toTokenOrNull(exprs[2], qc);
+      final byte[] qnm = toTokenOrNull(exprs[2], qc);
       if(qnm != null) {
         try {
           form = QNm.resolve(trim(qnm), sc);

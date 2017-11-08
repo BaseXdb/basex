@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  */
 public final class Extension extends Single {
   /** Pragma. */
-  private Pragma pragma;
+  private final Pragma pragma;
 
   /**
    * Constructor.

@@ -20,7 +20,7 @@ public class HashItemSet extends ASet implements ItemSet {
   /** Hashed items. */
   private Item[] items = new Item[Array.CAPACITY];
   /** Equality check (stricter than equivalence check). */
-  private boolean eq;
+  private final boolean eq;
 
   /**
    * Default constructor.

@@ -319,7 +319,7 @@ public class BaseXCombo extends JComboBox<Object> {
    */
   static class BaseXEditor implements ComboBoxEditor {
     /** Text field. */
-    private BaseXTextField tf;
+    private final BaseXTextField tf;
 
     /**
      * Constructor.

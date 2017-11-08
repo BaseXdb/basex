@@ -178,7 +178,7 @@ public final class CompileContext {
             }
           } else if(res instanceof FItem) {
             // refine type of function items (including maps and arrays)
-            FItem fitem = (FItem) res;
+            final FItem fitem = (FItem) res;
             final SeqType et = expr.seqType(), rt = res.seqType();
             if(!et.eq(rt) && et.instanceOf(rt)) {
               final Type t = et.type.intersect(rt.type);
