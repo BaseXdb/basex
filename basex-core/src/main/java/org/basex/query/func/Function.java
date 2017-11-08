@@ -1063,7 +1063,7 @@ public enum Function {
       arg(STR), FUN_ZM, flag(HOF), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations.class, "function-annotations(function)",
-      arg(FUN_O), MAP_ZO, UTIL_URI),
+      arg(FUN_O), MAP_ZO, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_STATIC_CONTEXT(InspectStaticContext.class, "static-context(function,name)",
       arg(FUN_O, STR), ITEM_ZM, INSPECT_URI),
