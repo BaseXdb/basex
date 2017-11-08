@@ -786,11 +786,13 @@ public enum QueryError {
   /** XPST0003. */
   NOQUOTE_X(XPST, 3, "Expecting quote%."),
   /** XPST0003. */
-  NUMBERWS(XPST, 3, "Expecting separator after number."),
+  ARITY_X(XPST, 3, "Expecting function arity, '%' found."),
+  /** XPST0003. */
+  NUMBERWS_X(XPST, 3, "Expecting separator after number: '%'."),
   /** XPST0003. */
   NUMBER_X(XPST, 3, "Incomplete number: '%'."),
   /** XPST0003. */
-  NUMBERITR_X_X(XPST, 3, "Integer expected, % found: %."),
+  NUMBERITR_X_X(XPST, 3, "Integer expected, % found: '%'."),
   /** XPST0003. */
   QUERYEND_X(XPST, 3, "Unexpected end of query: '%'."),
   /** XPST0003. */
@@ -809,6 +811,8 @@ public enum QueryError {
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** XPST0003. */
   NOEXPR(XPST, 3, "Expecting expression."),
+  /** XPST0003. */
+  NOCONTENT(XPST, 3, "Expecting node content."),
   /** XPST0003. */
   WRONGCHAR_X_X(XPST, 3, "Expecting '%'%."),
   /** XPST0003. */

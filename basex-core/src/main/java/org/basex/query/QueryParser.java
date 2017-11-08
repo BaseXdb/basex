@@ -1793,13 +1793,13 @@ public class QueryParser extends InputParser {
     final ArrayList<Pragma> el = new ArrayList<>();
     do {
       final QNm name = eQName(QNAME_X, URICHECK);
-      char c = curr();
-      if(c != '#' && !ws(c)) throw error(PRAGMAINV);
+      char ch = curr();
+      if(ch != '#' && !ws(ch)) throw error(PRAGMAINV);
       tok.reset();
-      while(c != '#' || next() != ')') {
-        if(c == 0) throw error(PRAGMAINV);
+      while(ch != '#' || next() != ')') {
+        if(ch == 0) throw error(PRAGMAINV);
         tok.add(consume());
-        c = curr();
+        ch = curr();
       }
 
       final byte[] value = tok.trim().toArray();
@@ -2105,18 +2105,18 @@ public class QueryParser extends InputParser {
    */
   private Expr primary() throws QueryException {
     skipWs();
-    final char c = curr();
+    final char ch = curr();
     // variables
-    if(c == '$') {
+    if(ch == '$') {
       final InputInfo ii = info();
       return localVars.resolve(varName(), ii);
     }
     // parentheses
-    if(c == '(' && next() != '#') return parenthesized();
+    if(ch == '(' && next() != '#') return parenthesized();
     // direct constructor
-    if(c == '<') return dirConstructor();
+    if(ch == '<') return dirConstructor();
     // string constructor
-    if(c == '`') return stringConstructor();
+    if(ch == '`') return stringConstructor();
     // function item
     Expr e = functionItem();
     if(e != null) return e;
@@ -2150,7 +2150,7 @@ public class QueryParser extends InputParser {
       pos = ip;
     }
     // context value
-    if(c == '.') {
+    if(ch == '.') {
       if(next() == '.') return null;
       if(!digit(next())) {
         consume();
@@ -2168,15 +2168,15 @@ public class QueryParser extends InputParser {
    */
   private Expr keySpecifier() throws QueryException {
     skipWs();
-    final int c = curr();
-    if(c == '*') {
+    final char ch = curr();
+    if(ch == '*') {
       consume();
       return Str.WC;
     }
-    if(c == '(') return parenthesized();
+    if(ch == '(') return parenthesized();
     // numeric literal
-    if(digit(c) || c == '.') {
-      final Expr num = numericLiteral();
+    final Expr num = numericLiteral(ch);
+    if(num != null) {
       if(num instanceof FnError || num instanceof Int) return num;
       throw error(NUMBERITR_X_X, num.seqType(), num);
     }
@@ -2254,12 +2254,13 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(null, sc.funcNS);
     if(name != null && wsConsumeWs(HSH)) {
       if(keyword(name)) throw error(RESERVED_X, name.local());
-      final Expr num = numericLiteral();
+      final char ch = curr();
+      final Expr num = numericLiteral(ch);
       if(num instanceof FnError) return num;
-      if(!(num instanceof Int)) throw error(NUMBERITR_X_X, num.seqType(), num);
-      final long lng = ((Int) num).itr();
-      if(lng > Integer.MAX_VALUE) return FnError.get(RANGE_X.get(info(), num), SeqType.ITR, sc);
-      final int arity = (int) lng;
+      if(!(num instanceof Int)) throw error(ARITY_X, num == null ? ch == 0 ? "" : ch : tok);
+      final long a = ((Int) num).itr();
+      if(a > Integer.MAX_VALUE) return FnError.get(RANGE_X.get(info(), num), SeqType.ITEM_ZM, sc);
+      final int arity = (int) a;
       final Expr lit = Functions.getLiteral(name, arity, qc, sc, info(), false);
       return lit != null ? lit : unknownLit(name, arity, info());
     }
@@ -2288,57 +2289,57 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
-    final char c = curr();
-    // literals
-    if(digit(c) || c == '.') return numericLiteral();
-    // strings
-    return quote(c) ? Str.get(stringLiteral()) : null;
+    final char ch = curr();
+    final Expr num = numericLiteral(ch);
+    return num != null ? num : quote(ch) ? Str.get(stringLiteral()) : null;
   }
 
   /**
    * Parses the "NumericLiteral" rule.
    * Parses the "DecimalLiteral" rule.
    * Parses the "IntegerLiteral" rule.
-   * @return numeric literal
+   * @param ch current character
+   * @return numeric literal or {@code null}
    * @throws QueryException query exception
    */
-  private Expr numericLiteral() throws QueryException {
+  private Expr numericLiteral(final char ch) throws QueryException {
+    if(!digit(ch) && ch != '.') return null;
+
+    // integer digits
     tok.reset();
     while(digit(curr())) tok.add(consume());
 
-    final boolean dot = consume('.');
-    if(dot) {
-      // decimal literal
+    // fractional digits?
+    final boolean dec = consume('.');
+    if(dec) {
       tok.add('.');
-      while(digit(curr())) tok.add(consume());
+      if(digit(curr())) {
+        do { tok.add(consume()); } while(digit(curr()));
+      } else if(tok.size() == 1) {
+        throw error(NUMBER_X, tok);
+      }
     }
 
+    // double value
     if(XMLToken.isNCStartChar(curr())) {
-      if(!consume('e') && !consume('E')) throw error(NUMBERWS);
-      // double literal
+      if(!consume('e') && !consume('E')) throw error(NUMBERWS_X, tok);
       tok.add('e');
       if(curr('+') || curr('-')) tok.add(consume());
-      final int s = tok.size();
-      while(digit(curr())) tok.add(consume());
-      if(s == tok.size()) throw error(NUMBER_X, tok);
+      if(!digit(curr())) throw error(NUMBER_X, tok);
+      do { tok.add(consume()); } while(digit(curr()));
 
-      if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS);
+      if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS_X, tok);
       return Dbl.get(tok.toArray(), info());
     }
 
-    final byte[] tmp = tok.toArray();
-    final int tl = tmp.length;
-    if(tl == 0) throw error(NUMBER_X, tmp);
-    if(dot) {
-      if(tl == 1 && tmp[0] == '.') throw error(NUMBER_X, tmp);
-      return Dec.get(new BigDecimal(string(trim(tmp))));
-    }
+    // decimal value
+    if(dec) return Dec.get(new BigDecimal(string(tok.toArray())));
 
-    final long l = toLong(tmp);
-    if(l != Long.MIN_VALUE) return Int.get(l);
-
-    final InputInfo ii = info();
-    return FnError.get(RANGE_X.get(ii, chop(tok, ii)), SeqType.ITR, sc);
+    // integer value
+    if(tok.isEmpty()) throw error(NUMBER_X, tok);
+    final long l = toLong(tok.toArray());
+    return l != Long.MIN_VALUE ? Int.get(l) :
+      FnError.get(RANGE_X.get(info(), chop(tok, null)), SeqType.ITR, sc);
   }
 
   /**
@@ -2459,10 +2460,10 @@ public class QueryParser extends InputParser {
 
     final Expr ret;
     if(holes != null) {
-      final int card = args.length + holes.length;
-      final Expr lit = Functions.getLiteral(name, card, qc, sc, ii, false);
-      final Expr f = lit != null ? lit : unknownLit(name, card, ii);
-      ret = new PartFunc(sc, ii, f, args, holes);
+      final int arity = args.length + holes.length;
+      final Expr lit = Functions.getLiteral(name, arity, qc, sc, ii, false);
+      final Expr expr = lit != null ? lit : unknownLit(name, arity, ii);
+      ret = new PartFunc(sc, ii, expr, args, holes);
     } else {
       final TypedFunc f = Functions.get(name, args, qc, sc, ii);
       ret = f != null ? f.fun : null;
@@ -2694,8 +2695,8 @@ public class QueryParser extends InputParser {
     final TokenBuilder tb = new TokenBuilder();
     boolean strip = true;
     do {
-      final char c = curr();
-      if(c == '<') {
+      final char ch = curr();
+      if(ch == '<') {
         if(wsConsume(CDATA)) {
           tb.add(cDataSection());
           strip = false;
@@ -2703,7 +2704,7 @@ public class QueryParser extends InputParser {
           final Str txt = text(tb, strip);
           return txt != null ? txt : next() == '/' ? null : dirConstructor();
         }
-      } else if(c == '{') {
+      } else if(ch == '{') {
         if(next() == '{') {
           tb.add(consume());
           consume();
@@ -2711,11 +2712,11 @@ public class QueryParser extends InputParser {
           final Str txt = text(tb, strip);
           return txt != null ? txt : enclosedExpr();
         }
-      } else if(c == '}') {
+      } else if(ch == '}') {
         consume();
         check('}');
         tb.add('}');
-      } else if(c != 0) {
+      } else if(ch != 0) {
         strip &= !entity(tb);
       } else {
         throw error(NOCLOSING_X, name);
@@ -3882,9 +3883,9 @@ public class QueryParser extends InputParser {
         boolean ok = true;
         int n = 0;
         do {
-          final char c = curr();
-          final boolean m = digit(c);
-          final boolean h = b == 0x10 && (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F');
+          final char ch = curr();
+          final boolean m = digit(ch);
+          final boolean h = b == 0x10 && (ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F');
           if(!m && !h) entityError(i, INVENTITY_X);
           final long nn = n;
           n = n * b + (consume() & 0xF);
@@ -3911,17 +3912,15 @@ public class QueryParser extends InputParser {
         if(!consume(';')) entityError(i, INVENTITY_X);
       }
     } else {
-      final char c = consume();
-      int ch = c;
-      if(Character.isHighSurrogate(c) && curr() != 0
-          && Character.isLowSurrogate(curr())) {
-        ch = Character.toCodePoint(c, consume());
+      final char ch = consume();
+      int cp = ch;
+      if(cp == '\r') {
+        cp = '\n';
+        if(curr(cp)) consume();
+      } else if(Character.isHighSurrogate(ch) && curr() != 0 && Character.isLowSurrogate(curr())) {
+        cp = Character.toCodePoint(ch, consume());
       }
-      if(ch == '\r') {
-        ch = '\n';
-        if(curr(ch)) consume();
-      }
-      tb.add(ch);
+      tb.add(cp);
     }
     return ent;
   }
@@ -3954,20 +3953,20 @@ public class QueryParser extends InputParser {
 
   /**
    * Raises an error if the specified character cannot be consumed.
-   * @param ch character to be found
+   * @param ch expected character
    * @throws QueryException query exception
    */
-  private void check(final int ch) throws QueryException {
-    if(!consume(ch)) throw error(WRONGCHAR_X_X, (char) ch, found());
+  private void check(final char ch) throws QueryException {
+    if(!consume(ch)) throw error(WRONGCHAR_X_X, ch, found());
   }
 
   /**
    * Skips whitespaces, raises an error if the specified string cannot be consumed.
-   * @param s string to be found
+   * @param str expected string
    * @throws QueryException query exception
    */
-  private void wsCheck(final String s) throws QueryException {
-    if(!wsConsume(s)) throw error(WRONGCHAR_X_X, s, found());
+  private void wsCheck(final String str) throws QueryException {
+    if(!wsConsume(str)) throw error(WRONGCHAR_X_X, str, found());
   }
 
   /**
@@ -3977,7 +3976,7 @@ public class QueryParser extends InputParser {
    */
   private char consumeContent() throws QueryException {
     char ch = consume();
-    if(ch == 0) throw error(WRONGCHAR_X_X, ch, found());
+    if(ch == 0) throw error(NOCONTENT);
     if(ch == '\r') {
       ch = '\n';
       consume('\n');
@@ -3987,14 +3986,15 @@ public class QueryParser extends InputParser {
 
   /**
    * Consumes the specified token and surrounding whitespaces.
-   * @param t token to consume
+   * @param str string to consume
    * @return true if token was found
    * @throws QueryException query exception
    */
-  private boolean wsConsumeWs(final String t) throws QueryException {
+  private boolean wsConsumeWs(final String str) throws QueryException {
     final int i = pos;
-    if(!wsConsume(t)) return false;
-    if(skipWs() || !XMLToken.isNCStartChar(t.charAt(0)) || !XMLToken.isNCChar(curr())) return true;
+    if(!wsConsume(str)) return false;
+    if(skipWs() || !XMLToken.isNCStartChar(str.charAt(0)) || !XMLToken.isNCChar(curr()))
+      return true;
     pos = i;
     return false;
   }
@@ -4002,21 +4002,21 @@ public class QueryParser extends InputParser {
   /**
    * Consumes the specified two strings or jumps back to the old query position. If the strings are
    * found, the cursor is placed after the first token.
-   * @param s1 string to be consumed
-   * @param s2 second string
+   * @param str1 string to consume
+   * @param str2 second string
    * @param expr alternative error message (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean wsConsumeWs(final String s1, final String s2, final QueryError expr)
+  private boolean wsConsumeWs(final String str1, final String str2, final QueryError expr)
       throws QueryException {
 
     final int i1 = pos;
-    if(!wsConsumeWs(s1)) return false;
+    if(!wsConsumeWs(str1)) return false;
     final int i2 = pos;
     alter = expr;
     alterPos = i2;
-    final boolean ok = wsConsume(s2);
+    final boolean ok = wsConsume(str2);
     pos = ok ? i2 : i1;
     return ok;
   }
@@ -4040,11 +4040,11 @@ public class QueryParser extends InputParser {
   private boolean skipWs() throws QueryException {
     final int i = pos;
     while(more()) {
-      final int c = curr();
-      if(c == '(' && next() == ':') {
+      final char ch = curr();
+      if(ch == '(' && next() == ':') {
         comment();
       } else {
-        if(c <= 0 || c > ' ') return i != pos;
+        if(ch <= 0 || ch > ' ') return i != pos;
         ++pos;
       }
     }
@@ -4099,8 +4099,8 @@ public class QueryParser extends InputParser {
   private boolean consumeWS() {
     final int i = pos;
     while(more()) {
-      final int c = curr();
-      if(c <= 0 || c > ' ') return i != pos;
+      final char ch = curr();
+      if(ch <= 0 || ch > ' ') return i != pos;
       ++pos;
     }
     return true;
