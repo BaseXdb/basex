@@ -117,30 +117,53 @@ public final class List extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) {
-    return new Iter() {
-      Iter ir;
-      int e;
+  public Iter iter(final QueryContext qc) throws QueryException {
+    // compute result size and iterator offsets
+    final int el = exprs.length;
+    final long[] off = new long[el];
+    final Iter[] iter = new Iter[el];
+    long sz1 = 0;
+    for(int i = 0; i < el; i++) {
+      iter[i] = qc.iter(exprs[i]);
+      off[i] = sz1;
+      if(sz1 != -1) {
+        final long sz2 = iter[i].size();
+        sz1 = sz2 == -1 ? -1 : sz1 + sz2;
+      }
+    }
+    final long sz = sz1;
 
+    return new Iter() {
+      int e;
       @Override
       public Item next() throws QueryException {
-        while(true) {
-          if(ir == null) {
-            if(e == exprs.length) return null;
-            ir = qc.iter(exprs[e++]);
-          }
-          final Item it = ir.next();
+        while(e < el) {
+          final Item it = iter[e].next();
           if(it != null) return it;
-          ir = null;
+          e++;
         }
+        return null;
+      }
+
+      @Override
+      public Item get(final long i) throws QueryException {
+        int o = 0;
+        while(o < el - 1 && off[o + 1] <= i) o++;
+        return iter[o].get(i - off[o]);
+      }
+
+      @Override
+      public long size() {
+        return sz;
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    // most common case
+    // special case: concatenate two sequences
     if(exprs.length == 2) return ValueBuilder.concat(qc.value(exprs[0]), qc.value(exprs[1]));
+    // general case: concatenate all sequences
     final ValueBuilder vb = new ValueBuilder();
     for(final Expr expr : exprs) vb.add(qc.value(expr));
     return vb.value();

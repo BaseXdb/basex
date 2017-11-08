@@ -225,6 +225,13 @@ public final class SimpleTest extends QueryTest {
       { "FItem 1", integers(1), "declare context item := 0; last#0()" },
       { "FItem 2", integers(2), "declare context item := 1; let $f := last#0 return (2,3)[$f()]" },
 
+      { "List 1", integers(1, 10000000000L),
+        "for $i in (1, 10000000000) return (1 to $i)[last()]" },
+      { "List 2", strings("x", "x"),
+        "for $i in (1, 10000000000) return (1 to $i, 'x')[last()]" },
+      { "List 3", integers(2, 10000000001L),
+        "for $i in (1, 10000000000) return count((1 to $i, 'x'))" },
+
       { "Count 1", integers(100000000), "count((1 to 100000000) ! string())" },
       { "Count 2", integers(100000000), "count(for $i in 1 to 100000000 return string('x'))" },
     };
