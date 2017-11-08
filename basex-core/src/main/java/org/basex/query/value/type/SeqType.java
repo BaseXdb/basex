@@ -314,21 +314,38 @@ public final class SeqType {
 
   /**
    * Returns a version of this sequence type that is adapted to the given {@link Occ}.
-   * @param o occurrence indicator
+   * @param oc occurrence indicator
    * @return sequence type
    */
-  public SeqType withOcc(final Occ o) {
+  public SeqType withOcc(final Occ oc) {
     // return original type if occurrence is identical, or if occurrence will always be 0
-    return o == occ || occ.max == 0 && o.min == 0 ? this : get(type, o, kind);
+    return oc == occ || occ.max == 0 && oc.min == 0 ? this : get(type, oc, kind);
   }
 
   /**
-   * Returns a version of this sequence type that is adapted to the given {@link Occ}.
-   * @param o occurrence indicator
+   * Returns a version of this sequence type that is adapted to the given result size.
+   * @param size result size
    * @return sequence type
    */
-  public SeqType withSize(final long o) {
-    return withOcc(o == 0 ? Occ.ZERO : o == 1 ? Occ.ONE : o > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE);
+  public SeqType withSize(final long size) {
+    return withOcc(size == 0 ? Occ.ZERO : size == 1 ? Occ.ONE : size > 1 ? Occ.ONE_MORE :
+      Occ.ZERO_MORE);
+  }
+
+  /**
+   * Returns a version of this sequence type that is adapted to the given min/max values.
+   * @param min minimum result size (0 or more)
+   * @param max maximum result size (-1 or more)
+   * @return sequence type
+   */
+  public SeqType withMinMax(final long min, final long max) {
+    /* ZERO     : min = max = 0
+     * ZERO_ONE : min = 0, max = 1
+     * ZERO_MORE: min = 0, max = -1 or >1
+     * ONE      : min = max = 1
+     * ONE_MORE : min > 0, max != -1 */
+    return withOcc(min == 0 ? max == 0 ? Occ.ZERO : max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE :
+      min == 1 && max == 1 ? Occ.ONE : Occ.ONE_MORE);
   }
 
   /**

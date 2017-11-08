@@ -27,7 +27,7 @@ public final class Var extends ExprInfo {
   /** Variable ID. */
   public final int id;
   /** Declared type, {@code null} if not specified. */
-  public SeqType type;
+  public SeqType valueType;
   /** Input info. */
   public final InputInfo info;
 
@@ -63,7 +63,7 @@ public final class Var extends ExprInfo {
     this.info = info;
     this.slot = slot;
     promote = param;
-    type = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
+    valueType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     seqType = SeqType.ITEM_ZM;
     id = qc.varIDs++;
     size = seqType.occ();
@@ -90,7 +90,7 @@ public final class Var extends ExprInfo {
    * @param sc static context
    */
   public Var(final Var var, final QueryContext qc, final StaticContext sc) {
-    this(var.name, var.type, var.param, qc, sc, var.info);
+    this(var.name, var.valueType, var.param, qc, sc, var.info);
     promote = var.promote;
     seqType = var.seqType;
     size = var.size;
@@ -101,8 +101,8 @@ public final class Var extends ExprInfo {
    * @return sequence type
    */
   public SeqType seqType() {
-    final SeqType st = type != null ? type.intersect(seqType) : null;
-    return st != null ? st : type != null ? type : seqType;
+    final SeqType st = valueType != null ? valueType.intersect(seqType) : null;
+    return st != null ? st : valueType != null ? valueType : seqType;
   }
 
   /**
@@ -110,7 +110,7 @@ public final class Var extends ExprInfo {
    * @return declared type
    */
   public SeqType declaredType() {
-    return type == null ? SeqType.ITEM_ZM : type;
+    return valueType == null ? SeqType.ITEM_ZM : valueType;
   }
 
   /**
@@ -123,12 +123,13 @@ public final class Var extends ExprInfo {
   public void refineType(final SeqType st, final CompileContext cc) throws QueryException {
     if(st == null) return;
 
-    if(type != null) {
-      if(type.occ.intersect(st.occ) == null) throw INVPROMOTE_X_X_X.get(info, this, st, type);
-      if(st.instanceOf(type)) {
+    if(valueType != null) {
+      if(valueType.occ.intersect(st.occ) == null)
+        throw INVPROMOTE_X_X_X.get(info, this, st, valueType);
+      if(st.instanceOf(valueType)) {
         if(cc != null) cc.info(QueryText.OPTTYPE_X, this);
-        type = null;
-      } else if(!st.promotable(type)) {
+        valueType = null;
+      } else if(!st.promotable(valueType)) {
         return;
       }
     }
@@ -145,7 +146,7 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the type is checked or promoted, {@code false} otherwise
    */
   public boolean checksType() {
-    return type != null;
+    return valueType != null;
   }
 
   /**
@@ -156,7 +157,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr ex, final CompileContext cc) throws QueryException {
-    return checksType() ? new TypeCheck(sc, info, ex, type, promote).optimize(cc) : ex;
+    return checksType() ? new TypeCheck(sc, info, ex, valueType, promote).optimize(cc) : ex;
   }
 
   /**
@@ -170,9 +171,9 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value val, final QueryContext qc, final boolean opt)
       throws QueryException {
 
-    if(!checksType() || type.instance(val)) return val;
-    if(promote) return type.promote(val, name, qc, sc, info, opt);
-    throw typeError(val, type, name, info);
+    if(!checksType() || valueType.instance(val)) return val;
+    if(promote) return valueType.promote(val, name, qc, sc, info, opt);
+    throw typeError(val, valueType, name, info);
   }
 
   /**
@@ -235,9 +236,9 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st, final boolean prom) {
-    if(type == null || st.instanceOf(type)) {
-      type = st;
-    } else if(!type.instanceOf(st)) {
+    if(valueType == null || st.instanceOf(valueType)) {
+      valueType = st;
+    } else if(!valueType.instanceOf(st)) {
       return false;
     }
     promote |= prom;
@@ -248,7 +249,7 @@ public final class Var extends ExprInfo {
   public void plan(final FElem plan) {
     final FElem e = planElem(QueryText.NAME, '$' + Token.string(name.string()),
         Token.ID, Token.token(id), QueryText.TYPE, seqType());
-    if(type != null) e.add(planAttr(QueryText.AS, type.toString()));
+    if(valueType != null) e.add(planAttr(QueryText.AS, valueType.toString()));
     addPlan(plan, e);
   }
 
@@ -262,9 +263,9 @@ public final class Var extends ExprInfo {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
       tb.add(QueryText.DOLLAR).add(name.string()).add('_').addInt(id);
-      if(type != null) tb.add(' ' + QueryText.AS);
+      if(valueType != null) tb.add(' ' + QueryText.AS);
     }
-    if(type != null) tb.add(" " + type);
+    if(valueType != null) tb.add(" " + valueType);
     return tb.toString();
   }
 }

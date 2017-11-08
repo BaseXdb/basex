@@ -34,19 +34,19 @@ final class IterPosStep extends Step {
     return new NodeIter() {
       final ItrPos[] posExpr = new ItrPos[exprs.length];
       final long[] cPos = new long[exprs.length];
-      boolean skip;
       BasicNodeIter iter;
+      boolean skip;
 
       @Override
       public ANode next() throws QueryException {
         if(skip) return null;
         if(iter == null) {
           iter = axis.iter(checkNode(qc));
-          final int pl = exprs.length;
-          for(int p = 0; p < pl; p++) {
-            final Expr pred = exprs[p];
+          final int el = exprs.length;
+          for(int e = 0; e < el; e++) {
+            final Expr pred = exprs[e];
             if(pred instanceof ItrPos) {
-              posExpr[p] = (ItrPos) pred;
+              posExpr[e] = (ItrPos) pred;
             } else if(num(pred)) {
               // pre-evaluate numeric position
               final Item it = pred.atomItem(qc, info);
@@ -54,8 +54,8 @@ final class IterPosStep extends Step {
               final double dbl = toDouble(it);
               final long lng = (long) dbl;
               if(dbl != lng) return null;
-              final Expr e = ItrPos.get(lng, info);
-              if(e instanceof ItrPos) posExpr[p] = (ItrPos) e;
+              final Expr ex = ItrPos.get(lng, info);
+              if(ex instanceof ItrPos) posExpr[e] = (ItrPos) ex;
               else return null;
             }
           }
@@ -68,12 +68,6 @@ final class IterPosStep extends Step {
         return null;
       }
 
-      /**
-       * Evaluates the predicates.
-       * @param node input node
-       * @return result of check
-       * @throws QueryException query exception
-       */
       private boolean preds(final ANode node) throws QueryException {
         final QueryFocus qf = qc.focus;
         final Value cv = qf.value;

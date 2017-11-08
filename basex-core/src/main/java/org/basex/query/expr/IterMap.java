@@ -27,28 +27,25 @@ final class IterMap extends SimpleMap {
   @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
-      final int sz = exprs.length;
-      final Iter[] iter = new Iter[sz];
-      final Value[] values = new Value[sz];
-      int pos = -1;
+      QueryFocus focus;
+      Value[] values;
+      Iter[] iter;
+      int pos, sz;
 
       @Override
       public Item next() throws QueryException {
         final QueryFocus qf = qc.focus;
-        final Value cv = qf.value;
-        if(pos == -1) {
-          values[++pos] = cv;
-          iter[pos] = qc.iter(exprs[pos]);
-        }
+        if(iter == null) init(qf);
+        qc.focus = focus;
 
         try {
           do {
-            qf.value = values[pos];
+            focus.value = values[pos];
             final Item it = iter[pos].next();
             if(it == null) {
               if(--pos == -1) return null;
             } else if(pos < sz - 1) {
-              qf.value = it;
+              focus.value = it;
               values[++pos] = it;
               iter[pos] = qc.iter(exprs[pos]);
             } else {
@@ -57,8 +54,17 @@ final class IterMap extends SimpleMap {
             qc.checkStop();
           } while(true);
         } finally {
-          qf.value = cv;
+          qc.focus = qf;
         }
+      }
+
+      private void init(final QueryFocus qf) throws QueryException {
+        sz = exprs.length;
+        iter = new Iter[sz];
+        iter[0] = qc.iter(exprs[0]);
+        focus = qf.copy();
+        values = new Value[sz];
+        values[0] = qf.value;
       }
     };
   }

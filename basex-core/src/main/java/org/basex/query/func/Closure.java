@@ -34,8 +34,8 @@ import org.basex.util.hash.*;
 public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Function name. */
   private final QNm name;
-  /** Arguments. */
-  private final Var[] args;
+  /** Formal parameters. */
+  private final Var[] params;
   /** Value type, {@code null} if not specified. */
   private SeqType valueType;
   /** Annotations. */
@@ -57,15 +57,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * Constructor.
    * @param info input info
    * @param valueType declared return type (can be {@code null})
-   * @param args arguments
+   * @param params formal parameters
    * @param expr function body
    * @param anns annotations
    * @param global bindings for non-local variables
    * @param vs scope
    */
-  public Closure(final InputInfo info, final SeqType valueType, final Var[] args, final Expr expr,
+  public Closure(final InputInfo info, final SeqType valueType, final Var[] params, final Expr expr,
       final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    this(info, null, valueType, args, expr, anns, global, vs);
+    this(info, null, valueType, params, expr, anns, global, vs);
   }
 
   /**
@@ -73,17 +73,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param info input info
    * @param name name of the function
    * @param valueType declared return type (can be {@code null})
-   * @param args argument variables
+   * @param params formal parameters
    * @param expr function expression
    * @param anns annotations
    * @param global bindings for non-local variables
    * @param vs variable scope
    */
-  Closure(final InputInfo info, final QNm name, final SeqType valueType, final Var[] args,
+  Closure(final InputInfo info, final QNm name, final SeqType valueType, final Var[] params,
       final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
     super(info, expr);
     this.name = name;
-    this.args = args;
+    this.params = params;
     this.valueType = valueType;
     this.anns = anns;
     this.global = global == null ? Collections.emptyMap() : global;
@@ -92,7 +92,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public int arity() {
-    return args.length;
+    return params.length;
   }
 
   @Override
@@ -102,12 +102,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public QNm argName(final int pos) {
-    return args[pos].name;
+    return params[pos].name;
   }
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, valueType, args);
+    return FuncType.get(anns, valueType, params);
   }
 
   @Override
@@ -153,7 +153,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
     final SeqType vt = valueType == null || st.instanceOf(valueType) ? st : valueType;
-    seqType = FuncType.get(anns, vt, args).seqType();
+    seqType = FuncType.get(anns, vt, params).seqType();
     size = 1;
 
     cc.pushScope(vs);
@@ -239,13 +239,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final HashMap<Var, Expr> nl = new HashMap<>();
       outer.forEach((key, value) -> nl.put(innerVars.get(key.id), value));
 
-      final Var[] vars = args.clone();
-      final int vl = vars.length;
-      for(int v = 0; v < vl; v++) vars[v] = innerVars.get(vars[v].id);
+      final Var[] prms = params.clone();
+      final int pl = prms.length;
+      for(int p = 0; p < pl; p++) prms[p] = innerVars.get(prms[p].id);
 
-      final Expr e = expr.copy(cc, innerVars);
-      e.markTailCalls(null);
-      return copyType(new Closure(info, name, valueType, vars, e, anns, nl, cc.vs()));
+      final Expr ex = expr.copy(cc, innerVars);
+      ex.markTailCalls(null);
+      return copyType(new Closure(info, name, valueType, prms, ex, anns, nl, cc.vs()));
     } finally {
       cc.removeScope();
     }
@@ -262,9 +262,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final LinkedList<Clause> cls =
         exprs.length == 0 && global.isEmpty() ? null : new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
-    final int al = args.length;
-    for(int a = 0; a < al; a++) {
-      cls.add(new Let(cc.copy(args[a], vm), exprs[a], false).optimize(cc));
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      cls.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
     }
     for(final Entry<Var, Expr> e : global.entrySet()) {
       cls.add(new Let(cc.copy(e.getKey(), vm), e.getValue(), false).optimize(cc));
@@ -320,7 +320,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = new TypeCheck(vs.sc, info, body, valueType, true);
     }
 
-    return new FuncItem(vs.sc, anns, name, args, ft, checked, vs.stackSize());
+    return new FuncItem(vs.sc, anns, name, params, ft, checked, vs.stackSize());
   }
 
   @Override
@@ -364,7 +364,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> v : global.entrySet()) {
       if(!(v.getValue().accept(visitor) && visitor.declared(v.getKey()))) return false;
     }
-    for(final Var v : args) {
+    for(final Var v : params) {
       if(!visitor.declared(v)) return false;
     }
     return expr.accept(visitor);
@@ -424,8 +424,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   void adoptSignature(final FuncType ft) {
     anns = ft.anns;
-    final int al = args.length;
-    for(int a = 0; a < al; a++) args[a].type = ft.argTypes[a];
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) params[p].valueType = ft.argTypes[p];
     final SeqType vt = ft.valueType;
     if(!vt.eq(SeqType.ITEM_ZM)) valueType = vt;
   }
@@ -458,14 +458,14 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final StaticContext sc, final InputInfo info) throws QueryException {
 
     final VarScope scp = new VarScope(sc);
-    final Var[] arg = new Var[arity];
-    final Expr[] refs = new Expr[arity];
+    final Var[] params = new Var[arity];
+    final Expr[] args = new Expr[arity];
     for(int a = 0; a < arity; a++) {
-      arg[a] = scp.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, info);
-      refs[a] = new VarRef(info, arg[a]);
+      params[a] = scp.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, info);
+      args[a] = new VarRef(info, params[a]);
     }
-    final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, info);
-    return new Closure(info, name, SeqType.ITEM_ZM, arg, call.fun, new AnnList(), null, scp);
+    final TypedFunc call = qc.funcs.getFuncRef(name, args, sc, info);
+    return new Closure(info, name, SeqType.ITEM_ZM, params, call.fun, new AnnList(), null, scp);
   }
 
   @Override
@@ -482,8 +482,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       value.plan(el);
     });
     addPlan(plan, el, expr);
-    final int al = args.length;
-    for(int a = 0; a < al; a++) el.add(planAttr(ARG + a, args[a].name.string()));
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) el.add(planAttr(ARG + p, params[p].name.string()));
   }
 
   @Override
@@ -495,10 +495,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       sb.append(RETURN).append(' ');
     }
     sb.append(FUNCTION).append(PAREN1);
-    final int al = args.length;
-    for(int a = 0; a < al; a++) {
-      if(a > 0) sb.append(", ");
-      sb.append(args[a]);
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      if(p > 0) sb.append(", ");
+      sb.append(params[p]);
     }
     sb.append(PAREN2).append(' ');
     if(valueType != null) sb.append("as ").append(valueType).append(' ');

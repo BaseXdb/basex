@@ -39,7 +39,7 @@ public final class StaticVar extends StaticDecl {
    */
   StaticVar(final VarScope vs, final AnnList anns, final Var var, final Expr expr,
       final boolean external, final String doc) {
-    super(anns, var.name, var.type, vs, doc, var.info);
+    super(anns, var.name, var.valueType, vs, doc, var.info);
     this.expr = expr;
     this.external = external;
     lazy = anns.contains(Annotation._BASEX_LAZY);

@@ -263,12 +263,12 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the requested enum value.
    * @param option option to be found
-   * @param <V> enumeration value
+   * @param <E> enumeration value
    * @return value
    */
   @SuppressWarnings({ "unchecked", "cast"})
-  public final synchronized <V extends Enum<V>> V get(final EnumOption<V> option) {
-    return (V) get((Option<?>) option);
+  public final synchronized <E extends Enum<E>> E get(final EnumOption<E> option) {
+    return (E) get((Option<?>) option);
   }
 
   /**

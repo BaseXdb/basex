@@ -1,7 +1,10 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.SeqType.*;
@@ -77,14 +80,39 @@ public abstract class SimpleMap extends Arr {
     }
 
     // compute result size
-    size = 1;
-    final int el = exprs.length;
-    for(int e = 0; size != -1 && e < el; e++) {
-      final long s = exprs[e].size();
-      size = s == -1 ? -1 : size * s;
+    final ExprList list = new ExprList(exprs.length);
+    long min = 1, max = 1;
+    boolean item = true;
+    for(final Expr expr : exprs) {
+      if(max == 0) break;
+      list.add(expr);
+      final long s = expr.size();
+      if(s == 0) {
+        min = 0;
+        max = 0;
+      } else if(s > 0) {
+        min *= s;
+        if(max != -1) max *= s;
+        if(s > 1) item = false;
+      } else {
+        final Occ o = expr.seqType().occ;
+        if(o.min == 0) min = 0;
+        if(o.max > 1) {
+          max = -1;
+          item = false;
+        }
+      }
     }
-    seqType = exprs[el - 1].seqType().withOcc(Occ.ZERO_MORE);
-    return this;
+    final int es = list.size();
+    if(exprs.length != es) {
+      if(es == 1) return cc.replaceWith(this, list.get(0));
+      cc.info(OPTSIMPLE_X, this);
+      exprs = list.finish();
+    }
+    seqType(exprs[exprs.length - 1], new long[] { min, max });
+
+    // single items: use item mapper
+    return item ? copyType(new ItemMap(info, exprs)) : this;
   }
 
   @Override

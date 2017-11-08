@@ -148,6 +148,18 @@ public abstract class ParseExpr extends Expr {
     return ex.seqType().eq(SeqType.BLN) ? ex : Function.BOOLEAN.get(sc, info, ex);
   }
 
+  /**
+   * Assigns the result size and sequence type, based on the specified min/max occurrences.
+   * @param expr sequence type expression
+   * @param minMax min/max values (min: 0 or more, max: -1 or more)
+   */
+  protected final void seqType(final Expr expr, final long[] minMax) {
+    final long min = minMax[0], max = minMax[1], sz = min == max ? min : -1;
+    final SeqType st = expr.seqType();
+    seqType = sz == -1 ? st.withMinMax(min, max) : st.withSize(sz);
+    size = sz;
+  }
+
   // VALIDITY CHECKS ==============================================================================
 
   /**

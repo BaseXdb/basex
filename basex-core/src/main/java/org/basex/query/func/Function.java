@@ -1010,7 +1010,7 @@ public enum Function {
       HOF_URI),
   /** XQuery function. */
   _HOF_TOP_K_BY(HofTopKBy.class, "top-k-by(items,key-func,k)",
-      arg(ITEM_ZM, FuncType.arity(1).seqType(), ITR), ITEM_ZM, flag(HOF), HOF_URI),
+      arg(ITEM_ZM, FuncType.get(ITEM, ITEM).seqType(), ITR), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
   _HOF_TOP_K_WITH(HofTopKWith.class, "top-k-with(items,less-than-func,k)",
       arg(ITEM_ZM, FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR), ITEM_ZM, flag(HOF),
@@ -1592,11 +1592,11 @@ public enum Function {
   }
 
   /**
-   * Returns the the variable names for an instance of this function with the given arity.
+   * Returns the the parameter names for an instance of this function with the given arity.
    * @param arity number of arguments
-   * @return array of argument names
+   * @return names of parameters
    */
-  final QNm[] argNames(final int arity) {
+  final QNm[] paramNames(final int arity) {
     final String[] names = names();
     final QNm[] res = new QNm[arity];
     final int nl = names.length;

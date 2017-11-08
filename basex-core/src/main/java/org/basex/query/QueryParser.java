@@ -1242,8 +1242,8 @@ public class QueryParser extends InputParser {
     do {
       final Var var = newVar();
       final Expr by;
-      if(var.type != null || wsConsume(ASSIGN)) {
-        if(var.type != null) wsCheck(ASSIGN);
+      if(var.valueType != null || wsConsume(ASSIGN)) {
+        if(var.valueType != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
         final VarRef vr = localVars.resolveLocal(var.name, var.info);
@@ -2239,12 +2239,12 @@ public class QueryParser extends InputParser {
 
       final HashMap<Var, Expr> global = new HashMap<>();
       localVars.pushContext(global);
-      final Var[] args = paramList();
+      final Var[] params = paramList();
       wsCheck(PAREN2);
       final SeqType type = optAsType();
       final Expr body = enclosedExpr();
       final VarScope vs = localVars.popContext();
-      return new Closure(info(), type, args, body, anns, global, vs);
+      return new Closure(info(), type, params, body, anns, global, vs);
     }
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);

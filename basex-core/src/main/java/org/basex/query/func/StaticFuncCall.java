@@ -59,10 +59,7 @@ public final class StaticFuncCall extends FuncCall {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     super.compile(cc);
-
-    // disallow call of private functions from module with different uri
-    if(func.anns.contains(Annotation.PRIVATE) && !func.sc.baseURI().eq(sc.baseURI()))
-      throw FUNCPRIVATE_X.get(info, name.string());
+    checkVisible();
 
     // compile mutually recursive functions
     func.comp(cc);
@@ -94,14 +91,23 @@ public final class StaticFuncCall extends FuncCall {
    */
   public StaticFuncCall init(final StaticFunc sf) throws QueryException {
     func = sf;
-    if(sf.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(sf.sc.baseURI()))
-      throw FUNCPRIVATE_X.get(info, sf.name.string());
+    checkVisible();
     return this;
   }
 
   /**
-   * Returns the called function if already known, {@code null} otherwise.
-   * @return the function
+   * Checks if the called function is visible
+   * (i.e., has no private annotation or is in the same namespace).
+   * @throws QueryException query exception
+   */
+  private void checkVisible() throws QueryException {
+    if(func.anns.contains(Annotation.PRIVATE) && !func.sc.baseURI().eq(sc.baseURI()))
+      throw FUNCPRIVATE_X.get(info, name.string());
+  }
+
+  /**
+   * Returns the called function if already known.
+   * @return the function or {@code null}
    */
   public StaticFunc func() {
     return func;

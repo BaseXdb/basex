@@ -75,12 +75,6 @@ public abstract class Filter extends Preds {
     }
   }
 
-  @Override
-  public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    final Expr e = optimizeEbv(root, cc);
-    return e == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, e);
-  }
-
   /**
    * Adds a predicate to the filter.
    * This function is e.g. called by {@link For#addPredicate}.
@@ -183,6 +177,12 @@ public abstract class Filter extends Preds {
 
     // return optimized expression or standard iterator
     return opt ? cc.replaceWith(this, rt) : get(info, root, exprs);
+  }
+
+  @Override
+  public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
+    final Expr e = optimizeEbv(root, cc);
+    return e == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, e);
   }
 
   /**

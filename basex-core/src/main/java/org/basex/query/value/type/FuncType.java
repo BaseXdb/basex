@@ -4,8 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.util.list.*;
@@ -24,10 +22,10 @@ public class FuncType implements Type {
   public final AnnList anns;
   /** Return type of the function. */
   public final SeqType valueType;
-  /** Argument types (can be {@code null}). */
+  /** Argument types (can be {@code null}, indicated that no types were specified). */
   public final SeqType[] argTypes;
 
-  /** This function type's sequence type (lazy instantiation). */
+  /** Actual return type (by type inference, lazy instantiation). */
   private SeqType seqType;
 
   /**
@@ -36,17 +34,17 @@ public class FuncType implements Type {
    * @param argTypes argument types (can be {@code null})
    */
   FuncType(final SeqType valueType, final SeqType... argTypes) {
-    this(null, valueType, argTypes);
+    this(new AnnList(), valueType, argTypes);
   }
 
   /**
    * Constructor.
-   * @param anns annotations (can be {@code null})
+   * @param anns annotations
    * @param valueType return type (can be {@code null})
    * @param argTypes argument types (can be {@code null})
    */
   FuncType(final AnnList anns, final SeqType valueType, final SeqType... argTypes) {
-    this.anns = anns == null ? new AnnList() : anns;
+    this.anns = anns;
     this.valueType = valueType == null ? SeqType.ITEM_ZM : valueType;
     this.argTypes = argTypes;
   }
@@ -152,7 +150,7 @@ public class FuncType implements Type {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return SeqType.ANY_FUN;
     }
-    return get(anns.intersect(ft.anns), valueType.union(ft.valueType), arg);
+    return get(anns.union(ft.anns), valueType.union(ft.valueType), arg);
   }
 
   @Override
@@ -172,8 +170,8 @@ public class FuncType implements Type {
       if(vt != null && al == ft.argTypes.length) {
         final SeqType[] arg = new SeqType[al];
         for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
-        final AnnList a = anns.union(ft.anns);
-        return a == null ? null : get(a, vt, arg);
+        final AnnList list = anns.intersect(ft.anns);
+        return list == null ? null : get(list, vt, arg);
       }
     }
     return null;
@@ -181,7 +179,7 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types.
-   * @param anns annotations (can be {@code null})
+   * @param anns annotations
    * @param type return type
    * @param args argument types
    * @return function type
@@ -197,7 +195,7 @@ public class FuncType implements Type {
    * @return function type
    */
   public static FuncType get(final SeqType type, final SeqType... args) {
-    return get(null, type, args);
+    return get(new AnnList(), type, args);
   }
 
   /**
@@ -216,19 +214,8 @@ public class FuncType implements Type {
   }
 
   /**
-   * Getter for function types with a given arity.
-   * @param arity number of arguments
-   * @return function type
-   */
-  public static FuncType arity(final int arity) {
-    final SeqType[] args = new SeqType[arity];
-    Arrays.fill(args, SeqType.ITEM_ZM);
-    return get(new AnnList(), SeqType.ITEM_ZM, args);
-  }
-
-  /**
    * Getter for a function's type.
-   * @param anns annotations (can be {@code null})
+   * @param anns annotations
    * @param type return type (can be {@code null})
    * @param args formal parameters
    * @return function type

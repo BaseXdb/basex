@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -209,11 +211,11 @@ public final class Functions extends TokenSet {
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, info);
       final VarScope scp = new VarScope(sc);
-      final Var[] args = { scp.addNew(new QNm(ITEMM, ""), SeqType.AAT_ZO, true, qc, info) };
-      final Expr e = new Cast(sc, info, new VarRef(info, args[0]), type.seqType());
+      final Var[] params = { scp.addNew(new QNm(ITEMM, ""), SeqType.AAT_ZO, true, qc, info) };
+      final Expr expr = new Cast(sc, info, new VarRef(info, params[0]), type.seqType());
       final AnnList anns = new AnnList();
-      final FuncType ft = FuncType.get(anns, e.seqType(), args);
-      return closureOrFItem(anns, name, args, ft, e, scp, info, runtime, false);
+      final FuncType ft = FuncType.get(anns, expr.seqType(), params);
+      return closureOrFItem(anns, name, params, ft, expr, scp, info, runtime, false);
     }
 
     // built-in functions
@@ -222,25 +224,25 @@ public final class Functions extends TokenSet {
       final AnnList anns = new AnnList();
       final VarScope scp = new VarScope(sc);
       final FuncType ft = fn.type(arity, anns);
-      final QNm[] argNames = fn.argNames(arity);
-
-      final Var[] args = new Var[arity];
-      final Expr[] calls = new Expr[arity];
+      final QNm[] names = fn.paramNames(arity);
+      final Var[] params = new Var[arity];
+      final Expr[] args = new Expr[arity];
       for(int i = 0; i < arity; i++) {
-        args[i] = scp.addNew(argNames[i], ft.argTypes[i], true, qc, info);
-        calls[i] = new VarRef(info, args[i]);
+        params[i] = scp.addNew(names[i], ft.argTypes[i], true, qc, info);
+        args[i] = new VarRef(info, params[i]);
       }
 
-      final StandardFunc sf = fn.get(sc, info, calls);
+      final StandardFunc sf = fn.get(sc, info, args);
       final boolean upd = sf.has(Flag.UPD);
       if(upd) {
         anns.add(new Ann(info, Annotation.UPDATING));
         qc.updating();
       }
-
+      // context/positional access must be bound to original focus
+      // example for invalid query: let $f := last#0 return (1,2)[$f()]
       return sf.has(Flag.CTX, Flag.POS)
-          ? new FuncLit(anns, name, args, sf, ft, scp, info)
-          : closureOrFItem(anns, name, args, fn.type(arity, anns), sf, scp, info, runtime, upd);
+          ? new FuncLit(anns, name, params, sf, ft.seqType(), scp, info)
+          : closureOrFItem(anns, name, params, fn.type(arity, anns), sf, scp, info, runtime, upd);
     }
 
     // user-defined function
@@ -248,32 +250,34 @@ public final class Functions extends TokenSet {
     if(sf != null) {
       final FuncType ft = sf.funcType();
       final VarScope scp = new VarScope(sc);
-      final Var[] args = new Var[arity];
-      final Expr[] calls = new Expr[arity];
+      final Var[] params = new Var[arity];
+      final Expr[] args = new Expr[arity];
       for(int a = 0; a < arity; a++) {
-        args[a] = scp.addNew(sf.argName(a), ft.argTypes[a], true, qc, info);
-        calls[a] = new VarRef(info, args[a]);
+        params[a] = scp.addNew(sf.argName(a), ft.argTypes[a], true, qc, info);
+        args[a] = new VarRef(info, params[a]);
       }
-
       final boolean upd = sf.updating;
-      final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, info);
-      final Expr f = closureOrFItem(tf.anns, sf.name, args, ft, tf.fun, scp, info, runtime, upd);
+      final TypedFunc tf = qc.funcs.getFuncRef(sf.name, args, sc, info);
+      final Expr f = closureOrFItem(tf.anns, sf.name, params, ft, tf.fun, scp, info, runtime, upd);
       if(upd) qc.updating();
       return f;
     }
 
     // Java function
+    final SeqType[] types = new SeqType[arity];
+    Arrays.fill(types, SeqType.ITEM_ZM);
+    final AnnList anns = new AnnList();
+    final SeqType st = FuncType.get(anns, SeqType.ITEM_ZM, types).seqType();
     final VarScope scp = new VarScope(sc);
-    final FuncType ft = FuncType.arity(arity);
-    final Var[] vs = new Var[arity];
-    final Expr[] args = new Expr[vs.length];
-    final int vl = vs.length;
+    final Var[] params = new Var[arity];
+    final Expr[] args = new Expr[arity];
+    final int vl = params.length;
     for(int v = 0; v < vl; v++) {
-      vs[v] = scp.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
-      args[v] = new VarRef(info, vs[v]);
+      params[v] = scp.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
+      args[v] = new VarRef(info, params[v]);
     }
-    final Expr expr = JavaFunction.get(name, args, qc, sc, info);
-    return expr == null ? null : new FuncLit(new AnnList(), name, vs, expr, ft, scp, info);
+    final JavaFunction jf = JavaFunction.get(name, args, qc, sc, info);
+    return jf == null ? null : new FuncLit(anns, name, params, jf, st, scp, info);
   }
 
   /**
@@ -324,14 +328,14 @@ public final class Functions extends TokenSet {
     }
 
     // built-in functions
-    final StandardFunc fun = get().get(name, args, sc, info);
-    if(fun != null) {
+    final StandardFunc sf = get().get(name, args, sc, info);
+    if(sf != null) {
       final AnnList anns = new AnnList();
-      if(fun.sig.has(Flag.UPD)) {
+      if(sf.sig.has(Flag.UPD)) {
         anns.add(new Ann(info, Annotation.UPDATING));
         qc.updating();
       }
-      return new TypedFunc(fun, anns);
+      return new TypedFunc(sf, anns);
     }
 
     // user-defined function

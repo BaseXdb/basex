@@ -32,17 +32,17 @@ final class IterPath extends AxisPath {
   @Override
   protected NodeIter nodeIter(final QueryContext qc) {
     return new NodeIter() {
+      QueryFocus focus;
       Expr[] exprs;
       Iter[] iter;
-      QueryFocus focus;
       ANode last;
       int pos, sz;
-      boolean r;
+      boolean rt;
 
       @Override
       public ANode next() throws QueryException {
         final QueryFocus qf = qc.focus;
-        if(exprs == null) init(qf);
+        if(iter == null) init(qf);
         qc.focus = focus;
 
         try {
@@ -52,7 +52,7 @@ final class IterPath extends AxisPath {
               if(--pos == -1) return null;
             } else if(pos < sz - 1) {
               // ensure that the root expression yields nodes
-              if(pos++ == 0 && r && !(it instanceof ANode))
+              if(pos++ == 0 && rt && !(it instanceof ANode))
                 throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
               focus.value = it;
               iter[pos] = qc.iter(exprs[pos]);
@@ -72,13 +72,12 @@ final class IterPath extends AxisPath {
       }
 
       private void init(final QueryFocus qf) throws QueryException {
-        r = root != null;
-        sz = steps.length + (r ? 1 : 0);
-        exprs = r ? new ExprList(sz).add(root).add(steps).finish() : steps;
+        rt = root != null;
+        sz = steps.length + (rt ? 1 : 0);
+        exprs = rt ? new ExprList(sz).add(root).add(steps).finish() : steps;
         iter = new Iter[sz];
         iter[0] = qc.iter(exprs[0]);
-        focus = new QueryFocus();
-        focus.value = qf.value;
+        focus = qf.copy();
       }
     };
   }

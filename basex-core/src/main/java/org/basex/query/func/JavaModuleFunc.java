@@ -124,7 +124,7 @@ final class JavaModuleFunc extends JavaFunction {
   public boolean has(final Flag... flags) {
     return Flag.NDT.in(flags) && method.getAnnotation(Deterministic.class) == null ||
       (Flag.CTX.in(flags) || Flag.POS.in(flags)) &&
-      method.getAnnotation(FocusDependent.class) == null ||
+      method.getAnnotation(FocusDependent.class) != null ||
       super.has(flags);
   }
 

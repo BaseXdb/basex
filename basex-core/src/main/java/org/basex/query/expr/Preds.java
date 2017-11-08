@@ -123,8 +123,8 @@ public abstract class Preds extends Arr {
       final CompileContext cc) {
     if(expr == Bln.TRUE) {
       cc.info(OPTREMOVE_X_X, description(), expr);
-    } else {
-      if(pos || !list.contains(expr) || !expr.isSimple() && !expr.has(Flag.CTX)) list.add(expr);
+    } else if(pos || !list.contains(expr) || expr.has(Flag.NDT, Flag.HOF, Flag.UPD, Flag.POS)) {
+      list.add(expr);
     }
     return pos || expr.has(Flag.POS);
   }

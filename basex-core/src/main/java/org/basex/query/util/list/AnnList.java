@@ -47,11 +47,11 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
   }
 
   /**
-   * Returns the union of these annotations and the given ones.
-   * @param al other annotations
-   * @return a new instance, containing all annotations, or {@code null} if union is not possible
+   * Returns the intersection of these annotations and the given ones.
+   * @param anns other annotations
+   * @return a new instance with all annotations, or {@code null} if intersection is not possible
    */
-  public AnnList union(final AnnList al) {
+  public AnnList intersect(final AnnList anns) {
     final AnnList tmp = new AnnList();
     boolean pub = false, priv = false, up = false;
     for(final Ann ann : this) {
@@ -62,7 +62,7 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
       tmp.add(ann);
     }
 
-    for(final Ann ann : al) {
+    for(final Ann ann : anns) {
       final Annotation sig = ann.sig;
       if(sig == Annotation.PUBLIC) {
         if(pub) continue;
@@ -79,14 +79,14 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
   }
 
   /**
-   * Returns the intersection of these annotations and the given ones.
-   * @param al annotations
-   * @return those annotations that are present in both collections
+   * Returns the unions of these annotations and the given ones.
+   * @param anns annotations
+   * @return a new instance with annotations that are present in both lists
    */
-  public AnnList intersect(final AnnList al) {
+  public AnnList union(final AnnList anns) {
     final AnnList tmp = new AnnList();
     for(final Ann ann : this) {
-      for(final Ann ann2 : al.list) {
+      for(final Ann ann2 : anns) {
         if(ann.equals(ann2)) tmp.add(ann);
       }
     }

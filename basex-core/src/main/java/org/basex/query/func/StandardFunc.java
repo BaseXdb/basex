@@ -56,17 +56,17 @@ public abstract class StandardFunc extends Arr {
    * Constructor. Invoked by {@link Function#get(StaticContext, InputInfo, Expr...)}.
    * @param ii input info
    * @param sctx static context
-   * @param f function definition
+   * @param func function definition
    * @param args function arguments
    * @return self reference
    */
-  final StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
+  final StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function func,
       final Expr[] args) {
     sc = sctx;
-    sig = f;
+    sig = func;
     info = ii;
     exprs = args;
-    seqType = f.type;
+    seqType = func.type;
     return this;
   }
 
@@ -383,12 +383,12 @@ public abstract class StandardFunc extends Arr {
   protected final FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
 
-    final FItem fun = toFunc(expr, qc);
-    if(!sc.mixUpdates && fun.annotations().contains(Annotation.UPDATING))
-      throw FUNCUP_X.get(info, fun);
+    final FItem fi = toFunc(expr, qc);
+    if(!sc.mixUpdates && fi.annotations().contains(Annotation.UPDATING))
+      throw FUNCUP_X.get(info, fi);
 
-    if(fun.arity() == nargs) return fun;
-    final int fargs = fun.arity();
+    if(fi.arity() == nargs) return fi;
+    final int fargs = fi.arity();
     throw FUNARITY_X_X.get(info, arguments(fargs), nargs);
   }
 

@@ -24,11 +24,8 @@ public final class FuncLit extends Single implements Scope {
   private final QNm name;
   /** Formal parameters. */
   private final Var[] args;
-  /** If the function's type should be checked at compile time. */
-  private final boolean check;
-
   /** Annotations. */
-  private AnnList anns;
+  private final AnnList anns;
   /** Compilation flag. */
   private boolean compiled;
 
@@ -38,32 +35,25 @@ public final class FuncLit extends Single implements Scope {
    * @param name function name
    * @param args formal parameters
    * @param expr function body
-   * @param ft function type
+   * @param seqType sequence type
    * @param vs variable scope
    * @param info input info
    */
-  FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr, final FuncType ft,
-      final VarScope vs, final InputInfo info) {
+  FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr,
+      final SeqType seqType, final VarScope vs, final InputInfo info) {
 
     super(info, expr);
     this.anns = anns;
     this.name = name;
     this.args = args;
     this.vs = vs;
-    check = ft == null;
-    seqType = (ft == null ? FuncType.arity(args.length) : ft).seqType();
+    this.seqType = seqType;
   }
 
   @Override
   public void comp(final CompileContext cc) throws QueryException {
     if(compiled) return;
     compiled = true;
-
-    if(check) {
-      final StaticFunc sf = cc.qc.funcs.get(name, args.length, info, true);
-      anns = sf.anns;
-      seqType = sf.funcType().seqType();
-    }
 
     cc.pushScope(vs);
     try {
@@ -84,7 +74,7 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(vs.sc, anns, name, args, (FuncType) seqType.type, expr, qc.focus,
+    return new FuncItem(vs.sc, anns, name, args, (FuncType) seqType.type, expr, qc.focus.copy(),
         vs.stackSize());
   }
 
@@ -96,9 +86,8 @@ public final class FuncLit extends Single implements Scope {
       final int al = args.length;
       final Var[] arg = new Var[al];
       for(int a = 0; a < al; a++) arg[a] = cc.copy(args[a], vm);
-
-      final Expr call = expr.copy(cc, vm);
-      return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, scp, info);
+      final Expr ex = expr.copy(cc, vm);
+      return new FuncLit(anns, name, arg, ex, seqType, scp, info);
     } finally {
       cc.removeScope();
     }
@@ -106,7 +95,7 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags) || Flag.POS.in(flags);
+    return expr.has(flags);
   }
 
   @Override
@@ -133,6 +122,6 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.string()).add('#').addExt(args.length).toString();
+    return new TokenBuilder(name.prefixId()).add('#').addExt(args.length).toString();
   }
 }

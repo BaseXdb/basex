@@ -93,7 +93,6 @@ public final class InlineTest extends QueryPlanTest {
         "exists(//IterMap)");
     check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
         "<x/>\n<x/>",
-        "exists(//IterMap)",
         "empty(//Context)");
   }
 

@@ -77,8 +77,7 @@ public final class PartFunc extends Arr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem f = toFunc(body(), qc);
 
-    final int hl = holes.length;
-    final int nargs = exprs.length + hl - 1;
+    final int hl = holes.length, nargs = exprs.length + hl - 1;
     if(f.arity() != nargs) throw INVARITY_X_X_X.get(info, arguments(nargs), f.arity(), f);
 
     final FuncType ft = f.funcType();
@@ -99,6 +98,7 @@ public final class PartFunc extends Arr {
     final FuncType tp = FuncType.get(anns, ft.valueType, vars);
     final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
         false, f, args);
+
     return new FuncItem(sc, anns, null, vars, tp, fc, qc.focus, scp.stackSize());
   }
 
@@ -130,10 +130,10 @@ public final class PartFunc extends Arr {
     final int es = exprs.length, hs = holes.length;
     exprs[es - 1].plan(e);
     int p = -1;
-    for(int i = 0; i < hs; i++) {
-      while(++p < holes[i]) exprs[p - i].plan(e);
+    for(int h = 0; h < hs; h++) {
+      while(++p < holes[h]) exprs[p - h].plan(e);
       final FElem a = new FElem(QueryText.ARG);
-      e.add(a.add(planAttr(QueryText.POS, Token.token(i))));
+      e.add(a.add(planAttr(QueryText.POS, Token.token(h))));
     }
     while(++p < es + hs - 1) exprs[p - hs].plan(e);
     plan.add(e);

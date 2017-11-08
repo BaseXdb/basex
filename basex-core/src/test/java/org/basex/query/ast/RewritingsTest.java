@@ -274,7 +274,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // map expression
     check("'s'['s' ! <a/>]", "s", "empty(QueryPlan//*[contains(name(), 'Map')])");
-    check("'s'['s' ! <a/> ! <b/>]", "s", "exists(QueryPlan//*[contains(name(), 'Map')])");
+    check("'s'['s' ! <a/>]", "s", "exists(QueryPlan/Str)");
+    check("'s'['x' ! <a/> ! <b/>]", "s", "exists(QueryPlan/Str)");
+    check("'s'['x' ! (<a/>,<b/>) ! <b/>]", "s", "exists(QueryPlan/Str)");
+    check("'s'['x' ! <a>{ . }</a>[. = 'x']]", "s", "exists(QueryPlan//*[contains(name(), 'Map')])");
 
     // path expression
     check("let $a := <a/> return $a[$a/self::a]", "<a/>", "count(//VarRef) = 1");

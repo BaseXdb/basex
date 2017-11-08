@@ -37,23 +37,23 @@ final class CachedStep extends Step {
     }
 
     // evaluate predicates
-    final QueryFocus qf = qc.focus;
+    final QueryFocus focus = qc.focus;
     final boolean scoring = qc.scoring;
     for(final Expr pred : exprs) {
       final long nl = list.size();
-      qf.size = nl;
-      qf.pos = 1;
+      focus.size = nl;
+      focus.pos = 1;
       int c = 0;
       for(int n = 0; n < nl; ++n) {
         final ANode node = list.get(n);
-        qf.value = node;
+        focus.value = node;
         final Item tst = pred.test(qc, info);
         if(tst != null) {
           // assign score value
           if(scoring) node.score(tst.score());
           list.set(c++, node);
         }
-        qf.pos++;
+        focus.pos++;
       }
       list.size(c);
     }

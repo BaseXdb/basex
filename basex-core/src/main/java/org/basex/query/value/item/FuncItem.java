@@ -45,7 +45,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param sc static context
    * @param anns function annotations
    * @param name function name (may be {@code null})
-   * @param params function arguments
+   * @param params formal parameters
    * @param type function type
    * @param expr function body
    * @param stackSize stack-frame size
@@ -60,7 +60,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param sc static context
    * @param anns function annotations
    * @param name function name (may be {@code null})
-   * @param params function arguments
+   * @param params formal parameters
    * @param type function type
    * @param expr function body
    * @param focus query focus
@@ -106,6 +106,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
+
     // bind variables and cache context
     final QueryFocus qf = qc.focus;
     qc.focus = focus;

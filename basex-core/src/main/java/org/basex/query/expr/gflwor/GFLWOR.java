@@ -239,7 +239,7 @@ public final class GFLWOR extends ParseExpr {
 
     mergeWheres();
 
-    size = calcSize();
+    calcSize();
     if(size == 0 && !has(Flag.NDT, Flag.UPD)) return cc.emptySeq(this);
 
     if(clauses.getFirst() instanceof Where) {
@@ -248,24 +248,20 @@ public final class GFLWOR extends ParseExpr {
       return cc.replaceWith(where, new If(info, where.expr, branch, Empty.SEQ));
     }
 
-    seqType = ret.seqType().withSize(size);
     return this;
   }
 
   /**
-   * Pre-calculates the number of results of this FLWOR expression.
-   * @return result size if statically computable, {@code -1} otherwise
+   * Computes the number of results of this FLWOR expression.
    */
-  private long calcSize() {
-    final long output = ret.size();
-    if(output == 0) return 0;
-
-    final long[] minMax = { 1, 1 };
+  private void calcSize() {
+    final long s = ret.size();
+    final Occ o = ret.seqType().occ;
+    final long[] minMax = { s >= 0 ? s : o.min, s >= 0 ? s : o.max > 1 ? -1 : o.max };
     for(final Clause clause : clauses) {
-      clause.calcSize(minMax);
-      if(minMax[1] == 0) break;
+      if(minMax[1] != 0) clause.calcSize(minMax);
     }
-    return output >= 0 && minMax[1] >= 0 && minMax[0] == minMax[1] ? minMax[1] * output : -1;
+    seqType(ret, minMax);
   }
 
   /**
