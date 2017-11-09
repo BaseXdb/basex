@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  */
 public final class GFLWOR extends ParseExpr {
   /** FLWOR clauses. */
-  private final LinkedList<Clause> clauses;
+  public final LinkedList<Clause> clauses;
   /** Return expression. */
   public Expr ret;
 

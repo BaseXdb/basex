@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -62,12 +63,13 @@ public final class Quantifier extends Single {
     // return pre-evaluated result
     if(expr.isValue()) return cc.preEval(this);
 
-    // pre-evaluate satisfy clause if it is a value
+    // pre-evaluate satisfy clause if its return expression is a value and returned at least once
+    // example: some $x in (1, 2) satisfies true() -> true()
     if(expr instanceof GFLWOR && !expr.has(Flag.NDT, Flag.UPD)) {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
-        return cc.replaceWith(value, Bln.get(value.ebv(cc.qc, info).bool(info)));
+        return cc.replaceWith(this, Bln.get(value.ebv(cc.qc, info).bool(info)));
       }
     }
     return this;
@@ -78,7 +80,8 @@ public final class Quantifier extends Single {
     final Iter iter = qc.iter(expr);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      if(every ^ it.ebv(qc, info).bool(info)) return Bln.get(!every);
+      // resulting item will always be boolean (no ebv check required)
+      if(every ^ it.bool(info)) return Bln.get(!every);
     }
     return Bln.get(every);
   }
@@ -106,6 +109,16 @@ public final class Quantifier extends Single {
 
   @Override
   public String toString() {
-    return (every ? EVERY : SOME) + '(' + expr + ')';
+    if(expr instanceof GFLWOR) {
+      final StringBuilder sb = new StringBuilder(every ? EVERY : SOME).append(' ');
+      final GFLWOR gflwor = (GFLWOR) expr;
+      int c = 0;
+      for(final Clause clause : gflwor.clauses) {
+        if(c++ != 0) sb.append(", ");
+        sb.append(clause.toString().replaceAll('^' + FOR + ' ', ""));
+      }
+      return sb.append(' ').append(SATISFIES).append(' ').append(gflwor.ret).toString();
+    }
+    return expr.toString();
   }
 }
