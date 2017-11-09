@@ -388,11 +388,10 @@ public interface QueryText {
 
   // OPTIMIZATIONS ================================================================================
 
+  /** Optimization info. */ String OPTREWRITE = "rewrite";
+  /** Optimization info. */ String OPTPRE = "pre-evaluate";
   /** Optimization info. */ String OPTDESC = "rewrite descendant-or-self step(s)";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
-  /** Optimization info. */ String OPTPRE_X_X_X = "pre-evaluate % to %: %";
-  /** Optimization info. */ String OPTEMPTY_X = "pre-evaluate % to empty sequence";
-  /** Optimization info. */ String OPTREWRITE_X_X_X = "rewrite % to %: %";
   /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";
   /** Optimization info. */ String OPTREMOVE_X_X = "%: remove %";
   /** Optimization info. */ String OPTTCE_X = "mark as tail call: %";

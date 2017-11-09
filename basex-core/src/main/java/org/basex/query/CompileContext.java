@@ -149,45 +149,43 @@ public final class CompileContext {
     final Expr res = result == null ? Empty.SEQ : result;
     if(res != expr) {
       final byte[] exprString = QueryError.chop(Token.token(expr.toString()), null);
-      if(res == Empty.SEQ) {
-        info(OPTEMPTY_X, exprString);
-      } else {
-        final byte[] resString = QueryError.chop(Token.token(res.toString()), null);
-        if(res instanceof ParseExpr) {
-          info(OPTREWRITE_X_X_X, exprString, res.description(), resString);
-          // Refine type. Required mostly for {@link Filter} rewritings
-          if(refine) {
-            final ParseExpr re = (ParseExpr) res;
-            final SeqType et = expr.seqType(), rt  = re.seqType();
-            if(!et.eq(rt) && et.instanceOf(rt)) {
-              final SeqType st = et.intersect(rt);
-              if(st != null) re.seqType = st;
+      final byte[] resString = QueryError.chop(Token.token(res.toString()), null);
+      final TokenBuilder tb = new TokenBuilder(res instanceof ParseExpr ? OPTREWRITE : OPTPRE);
+      tb.add(' ').add(expr.description()).add(" to ").add(res.description()).add(": ");
+      tb.add(exprString);
+      if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
+      info(tb.toString());
+
+      if(res instanceof ParseExpr) {
+        // refine type. required mostly for {@link Filter} rewritings
+        if(refine) {
+          final ParseExpr re = (ParseExpr) res;
+          final SeqType et = expr.seqType(), rt  = re.seqType();
+          if(!et.eq(rt) && et.instanceOf(rt)) {
+            final SeqType st = et.intersect(rt);
+            if(st != null) re.seqType = st;
+          }
+        }
+      } else if(res != Empty.SEQ && refine) {
+        // refine type. required because original type might have got lost in new sequence
+        if(res instanceof Seq) {
+          final Seq seq = (Seq) res;
+          final Type et = expr.seqType().type, rt = seq.type;
+          if(!et.eq(rt) && et.instanceOf(rt)) {
+            final Type t = et.intersect(rt);
+            if(t != null) {
+              seq.type = t;
+              // Indicate that types may not be homogeneous
+              seq.homo = false;
             }
           }
-        } else {
-          info(OPTPRE_X_X_X, exprString, res.description(), resString);
-          // Refine type. Required because original type might get lost in newly created sequences
-          if(refine) {
-            if(res instanceof Seq) {
-              final Seq seq = (Seq) res;
-              final Type et = expr.seqType().type, rt = seq.type;
-              if(!et.eq(rt) && et.instanceOf(rt)) {
-                final Type t = et.intersect(rt);
-                if(t != null) {
-                  seq.type = t;
-                  // Indicate that types may not be homogeneous
-                  seq.homo = false;
-                }
-              }
-            } else if(res instanceof FItem) {
-              // refine type of function items (including maps and arrays)
-              final FItem fitem = (FItem) res;
-              final SeqType et = expr.seqType(), rt = res.seqType();
-              if(!et.eq(rt) && et.instanceOf(rt)) {
-                final Type t = et.type.intersect(rt.type);
-                if(t != null) fitem.type = t;
-              }
-            }
+        } else if(res instanceof FItem) {
+          // refine type of function items (includes maps and arrays)
+          final FItem fitem = (FItem) res;
+          final SeqType et = expr.seqType(), rt = res.seqType();
+          if(!et.eq(rt) && et.instanceOf(rt)) {
+            final Type t = et.type.intersect(rt.type);
+            if(t != null) fitem.type = t;
           }
         }
       }
