@@ -78,8 +78,8 @@ public final class OptimizeAll extends ACreate {
    * @throws IOException I/O Exception during index rebuild
    * @throws BaseXException database exception
    */
-  public static void optimizeAll(final Data data, final Context context,
-      final MainOptions options, final OptimizeAll cmd) throws IOException {
+  public static void optimizeAll(final Data data, final Context context, final MainOptions options,
+      final OptimizeAll cmd) throws IOException {
 
     if(data.inMemory()) throw new BaseXException(NO_MAINMEM);
 

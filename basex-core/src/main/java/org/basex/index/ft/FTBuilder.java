@@ -158,8 +158,8 @@ public final class FTBuilder extends IndexBuilder {
    * @param lp last offset
    * @throws IOException I/O exception
    */
-  private static void writeInd(final DataOutput outX, final IntList il,
-      final int ls, final int lp) throws IOException {
+  private static void writeInd(final DataOutput outX, final IntList il, final int ls, final int lp)
+      throws IOException {
 
     final int is = il.size();
     outX.writeNum(is >> 1);

@@ -137,8 +137,8 @@ public final class SqlExecutePrepared extends SqlExecute {
    * @param isNull indicator if the parameter is null or not
    * @throws QueryException query exception
    */
-  private void setParam(final int index, final PreparedStatement stmt,
-      final byte[] paramType, final String value, final boolean isNull) throws QueryException {
+  private void setParam(final int index, final PreparedStatement stmt, final byte[] paramType,
+      final String value, final boolean isNull) throws QueryException {
     try {
       if(eq(BOOL, paramType)) {
         if(isNull) stmt.setNull(index, Types.BOOLEAN);

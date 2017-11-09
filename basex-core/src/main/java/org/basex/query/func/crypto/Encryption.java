@@ -149,10 +149,9 @@ final class Encryption {
    * @throws IllegalBlockSizeException ex
    * @throws BadPaddingException ex
    */
-  private static byte[] decrypt(final byte[] in, final byte[] k,
-      final byte[] a, final int ivl) throws NoSuchAlgorithmException, NoSuchPaddingException,
-      InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
-      BadPaddingException {
+  private static byte[] decrypt(final byte[] in, final byte[] k, final byte[] a, final int ivl)
+      throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+      InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 
     final SecretKeySpec keySpec = new SecretKeySpec(k, string(a));
     final Cipher cipher = Cipher.getInstance(string(ALGN.get(lc(a))));

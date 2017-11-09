@@ -202,11 +202,11 @@ public final class FTWords extends FTExpr {
    * @return node iterator
    * @throws QueryException query exception
    */
-  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt,
-      final Data data) throws QueryException {
+  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt, final Data data)
+      throws QueryException {
+
     final FTLexer input = new FTLexer(ftOpt);
     final FTTokens fttokens = ftt.cache(lexer.get());
-
     return new FTIndexIterator() {
       final int sz = data.meta.size;
       int pre = -1, ps;

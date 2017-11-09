@@ -47,8 +47,7 @@ final class LeafNode implements Node<Value, Value> {
   }
 
   @Override
-  public boolean insert(final Node<Value, Value>[] siblings,
-      final long pos, final Value val) {
+  public boolean insert(final Node<Value, Value>[] siblings, final long pos, final Value val) {
     final int p = (int) pos, n = values.length;
     final Value[] vals = new Value[n + 1];
     System.arraycopy(values, 0, vals, 0, p);

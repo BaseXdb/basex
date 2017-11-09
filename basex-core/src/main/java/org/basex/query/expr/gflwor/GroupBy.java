@@ -235,8 +235,8 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public Clause inline(final Var var, final Expr ex,
-      final CompileContext cc) throws QueryException {
+  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
+      throws QueryException {
     final boolean b = inlineAll(specs, var, ex, cc), p = inlineAll(preExpr, var, ex, cc);
     return b || p ? optimize(cc) : null;
   }

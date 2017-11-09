@@ -59,8 +59,8 @@ public final class DbRename extends DbAccess {
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void rename(final Data data, final IOFile src, final IOFile trg,
-      final QueryContext qc) throws QueryException {
+  private void rename(final Data data, final IOFile src, final IOFile trg, final QueryContext qc)
+      throws QueryException {
 
     if(src.isDir()) {
       // dir -> file? error

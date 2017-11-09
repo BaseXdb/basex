@@ -155,8 +155,8 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public Clause inline(final Var var, final Expr ex,
-      final CompileContext cc) throws QueryException {
+  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
+      throws QueryException {
     for(int r = refs.length; --r >= 0;) {
       if(var.is(refs[r].var)) refs = Array.delete(refs, r);
     }

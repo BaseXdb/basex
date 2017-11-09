@@ -70,8 +70,8 @@ public final class Where extends Clause {
   }
 
   @Override
-  public Clause inline(final Var var, final Expr ex,
-      final CompileContext cc) throws QueryException {
+  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
+      throws QueryException {
     final Expr sub = expr.inline(var, ex, cc);
     if(sub == null) return null;
     expr = sub;

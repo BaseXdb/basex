@@ -140,9 +140,7 @@ public final class FNCryptoTest extends SandboxTest {
    * @param second second query
    * @param expected expected output
    */
-  private static void query(final String first, final String second,
-      final String expected) {
-
+  private static void query(final String first, final String second, final String expected) {
     if(first != null) query(first);
     final String result = query(second);
     // quotes are replaced by apostrophes to simplify comparison

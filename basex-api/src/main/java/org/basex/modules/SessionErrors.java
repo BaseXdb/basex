@@ -61,9 +61,7 @@ final class SessionErrors {
    * @param ext optional error extension
    * @return query exception
    */
-  private static QueryException thrw(final int code, final String msg,
-      final Object... ext) {
-
+  private static QueryException thrw(final int code, final String msg, final Object... ext) {
     final QNm name = new QNm(String.format("%s%04d", PREFIX, code), NS);
     return new QueryException(null, name, msg, ext);
   }

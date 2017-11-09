@@ -42,7 +42,6 @@ final class SimpleFilter extends CachedFilter {
 
   @Override
   public Filter copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new SimpleFilter(info, root.copy(cc, vm),
-        Arr.copyAll(cc, vm, exprs)));
+    return copyType(new SimpleFilter(info, root.copy(cc, vm), Arr.copyAll(cc, vm, exprs)));
   }
 }
