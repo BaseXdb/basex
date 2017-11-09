@@ -30,8 +30,7 @@ public abstract class ADate extends ADateDur {
   /** Pattern for two digits. */
   static final String DD = "(\\d{2})";
   /** Year pattern. */
-  static final String YEAR =
-      "(-?(000[1-9]|00[1-9]\\d|0[1-9]\\d{2}|[1-9]\\d{3,}))";
+  static final String YEAR = "(-?(000[1-9]|00[1-9]\\d|0[1-9]\\d{2}|[1-9]\\d{3,}))";
   /** Date pattern. */
   static final String ZONE = "(([-+])" + DD + ':' + DD + "|Z)?";
   /** Day per months. */

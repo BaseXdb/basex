@@ -58,12 +58,12 @@ public final class FComm extends FNode {
   /**
    * Checks the specified token for validity.
    * @param str token to be checked
-   * @param ii input info
+   * @param info input info
    * @return token
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] str, final InputInfo ii) throws QueryException {
-    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(ii);
+  public static byte[] parse(final byte[] str, final InputInfo info) throws QueryException {
+    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(info);
     return str;
   }
 }

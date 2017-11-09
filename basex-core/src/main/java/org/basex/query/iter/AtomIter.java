@@ -38,7 +38,7 @@ public final class AtomIter extends Iter {
 
   @Override
   public Item next() throws QueryException {
-    // shortcut if no arrays will be returned
+    // shortcut if iterator will not yield any arrays
     if(size != -1) {
       final Item it = iter.next();
       return it == null ? null : it.atomItem(info);

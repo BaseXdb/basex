@@ -35,6 +35,8 @@ public final class ValueAccess extends IndexAccess {
   private final NameTest test;
   /** Trim search terms. */
   private boolean trim;
+  /** Item evaluation flag. */
+  private boolean item;
 
   /**
    * Constructor.
@@ -46,10 +48,11 @@ public final class ValueAccess extends IndexAccess {
    */
   public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
       final NameTest test, final IndexDb db) {
-    super(db, info);
+    super(db, info, type);
     this.expr = expr;
     this.type = type;
     this.test = test;
+    item = expr.seqType().zeroOrOne();
   }
 
   /**
@@ -65,12 +68,13 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = db.data(qc, type);
+    if(item) return iter(expr.item(qc, info), data);
+
     final ArrayList<BasicNodeIter> iters = new ArrayList<>();
     final Iter iter = qc.iter(expr);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      final byte[] term = it.string(info);
-      iters.add(iter(trim ? Token.trim(term) : term, data));
+      iters.add(iter(it, data));
     }
     final int is = iters.size();
     return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iters.get(0) :
@@ -79,11 +83,17 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Returns an index iterator.
-   * @param term term to be found
+   * @param it text item
    * @param data data reference
    * @return iterator
+   * @throws QueryException query exception
    */
-  private BasicNodeIter iter(final byte[] term, final Data data) {
+  private BasicNodeIter iter(final Item it, final Data data) throws QueryException {
+    if(it == null) return BasicNodeIter.EMPTY;
+
+    // retrieve and trim text
+    final byte[] token = it.string(info), term = trim ? Token.trim(token) : token;
+
     // special case: empty text node
     // - no element name: return 0 results (empty text nodes are non-existent)
     // - otherwise, return scan-based element iterator

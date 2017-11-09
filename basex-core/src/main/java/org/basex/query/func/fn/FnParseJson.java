@@ -26,7 +26,7 @@ public class FnParseJson extends Parse {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = exprs[0].atomItem(qc, info);
     if(it == null) return null;
-    return parse(toToken(it), false, qc, info);
+    return parse(toToken(it), false, qc);
   }
 
   @Override
@@ -39,20 +39,19 @@ public class FnParseJson extends Parse {
    * @param json json string
    * @param xml convert to xml
    * @param qc query context
-   * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  final Item parse(final byte[] json, final boolean xml, final QueryContext qc,
-      final InputInfo ii) throws QueryException {
+  final Item parse(final byte[] json, final boolean xml, final QueryContext qc)
+      throws QueryException {
 
     final JsonParserOptions opts = new JsonParserOptions();
     if(exprs.length > 1) new FuncOptions(info).acceptUnknown().assign(toMap(exprs[1], qc), opts);
 
     final boolean esc = opts.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);
-    final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, ii);
-    if(esc && fallback != null) throw JSON_OPT_X.get(ii,
+    final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, info);
+    if(esc && fallback != null) throw JSON_OPT_X.get(info,
         "Escaping cannot be combined with a fallback function.");
 
     try {
@@ -60,7 +59,7 @@ public class FnParseJson extends Parse {
       final JsonConverter conv = JsonConverter.get(opts);
       if(!esc && fallback != null) conv.fallback(string -> {
         try {
-          return Token.string(fallback.invokeItem(qc, info, Str.get(string)).string(ii));
+          return Token.string(fallback.invokeItem(qc, info, Str.get(string)).string(info));
         } catch(final QueryException ex) {
           throw new QueryRTException(ex);
         }
@@ -73,9 +72,9 @@ public class FnParseJson extends Parse {
       final QueryException qe = ex.getCause(info);
       final QueryError error = qe.error();
       final String message = ex.getLocalizedMessage();
-      if(error == BXJS_PARSE_X_X_X) throw JSON_PARSE_X.get(ii, message);
-      if(error == BXJS_DUPLICATE_X) throw JSON_DUPLICATE_X.get(ii, message);
-      if(error == BXJS_INVALID_X) throw JSON_OPT_X.get(ii, message);
+      if(error == BXJS_PARSE_X_X_X) throw JSON_PARSE_X.get(info, message);
+      if(error == BXJS_DUPLICATE_X) throw JSON_DUPLICATE_X.get(info, message);
+      if(error == BXJS_INVALID_X) throw JSON_OPT_X.get(info, message);
       throw qe;
     }
   }

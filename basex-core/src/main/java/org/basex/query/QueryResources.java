@@ -386,11 +386,11 @@ public final class QueryResources {
    * Creates a new database instance.
    * @param input query input
    * @param single expect single document
-   * @param ii input info
+   * @param info input info
    * @return data reference
    * @throws QueryException query exception
    */
-  private Data create(final QueryInput input, final boolean single, final InputInfo ii)
+  private Data create(final QueryInput input, final boolean single, final InputInfo info)
       throws QueryException {
 
     // check if new databases can be created
@@ -398,12 +398,12 @@ public final class QueryResources {
 
     // do not check for existence of input if user has no read permissions
     if(!context.user().has(Perm.READ))
-      throw BXXQ_PERM_X.get(ii, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
+      throw BXXQ_PERM_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input points to a single file
     final IO io = input.io;
-    if(!io.exists()) throw WHICHRES_X.get(ii, io);
-    if(single && io.isDir()) throw RESDIR_X.get(ii, io);
+    if(!io.exists()) throw WHICHRES_X.get(info, io);
+    if(single && io.isDir()) throw RESDIR_X.get(info, io);
 
     // overwrite parsing options with default values
     final boolean mem = !context.options.get(MainOptions.FORCECREATE);
@@ -414,7 +414,7 @@ public final class QueryResources {
     try {
       data = CreateDB.create(io.dbName(), parser, context, opts, mem);
     } catch(final IOException ex) {
-      throw IOERR_X.get(ii, ex);
+      throw IOERR_X.get(info, ex);
     }
     return addData(data);
   }

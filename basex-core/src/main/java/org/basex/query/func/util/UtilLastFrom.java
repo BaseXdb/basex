@@ -25,9 +25,9 @@ public final class UtilLastFrom extends StandardFunc {
 
     // loop through all items
     Item litem = null;
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      litem = item;
+      litem = it;
     }
     return litem;
   }

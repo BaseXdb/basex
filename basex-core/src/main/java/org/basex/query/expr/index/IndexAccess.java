@@ -1,5 +1,6 @@
 package org.basex.query.expr.index;
 
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -22,11 +23,13 @@ public abstract class IndexAccess extends Simple {
    * Constructor.
    * @param db index database
    * @param info input info
+   * @param type type index type
    */
-  IndexAccess(final IndexDb db, final InputInfo info) {
+  IndexAccess(final IndexDb db, final InputInfo info, final IndexType type) {
     super(info);
     this.db = db;
-    seqType = SeqType.NOD_ZM;
+    seqType = type == IndexType.TEXT || type == IndexType.FULLTEXT ? SeqType.TXT_ZM :
+      SeqType.ATT_ZM;
   }
 
   /**
@@ -35,7 +38,7 @@ public abstract class IndexAccess extends Simple {
    */
   public void size(final long s) {
     size = s;
-    seqType = seqType().withSize(s);
+    seqType = seqType.withSize(s);
   }
 
   @Override

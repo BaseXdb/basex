@@ -169,14 +169,14 @@ public final class IndexInfo {
    * Creates an index expression with an inverted axis path.
    * @param root new root expression
    * @param parent add parent step
-   * @param ii input info
+   * @param info input info
    * @param opt optimization info
    */
-  public void create(final ParseExpr root, final boolean parent, final InputInfo ii,
+  public void create(final ParseExpr root, final boolean parent, final InputInfo info,
       final String opt) {
 
     expr = invert(test == null || !parent ? root :
-      Path.get(ii, root, Step.get(ii, Axis.PARENT, test)));
+      Path.get(info, root, Step.get(info, Axis.PARENT, test)));
     optInfo = opt;
   }
 

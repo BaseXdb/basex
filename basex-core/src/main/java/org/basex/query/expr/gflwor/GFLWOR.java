@@ -81,10 +81,9 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
-      /** Clause evaluator. */
       private final Eval ev = newEval();
-      /** Return iterator. */
       private Iter sub = Empty.ITER;
+
       @Override
       public Item next() throws QueryException {
         while(true) {

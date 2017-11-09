@@ -23,13 +23,13 @@ public final class NSContext {
    * Validates and adds the specified namespace at parsing time.
    * @param pref namespace prefix
    * @param uri namespace URI
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public void add(final byte[] pref, final byte[] uri, final InputInfo ii) throws QueryException {
-    if(eq(pref, XML, XMLNS)) throw BINDXML_X.get(ii, pref);
-    if(eq(uri, XML_URI)) throw BINDXMLURI_X_X.get(ii, uri, XML);
-    if(eq(uri, XMLNS_URI)) throw BINDXMLURI_X_X.get(ii, uri, XMLNS);
+  public void add(final byte[] pref, final byte[] uri, final InputInfo info) throws QueryException {
+    if(eq(pref, XML, XMLNS)) throw BINDXML_X.get(info, pref);
+    if(eq(uri, XML_URI)) throw BINDXMLURI_X_X.get(info, uri, XML);
+    if(eq(uri, XMLNS_URI)) throw BINDXMLURI_X_X.get(info, uri, XMLNS);
     ns.add(pref, uri);
   }
 

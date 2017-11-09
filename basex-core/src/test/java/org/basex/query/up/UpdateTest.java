@@ -1082,7 +1082,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void updatingHof() {
     error(FOR_EACH.args("<a/>", " db:output#1"), FUNCUP_X);
     error(FOR_EACH_PAIR.args("<a/>", "<b/>", " db:output#1"), FUNCUP_X);
-    error(APPLY.args(" db:output#1", " <b/>"), FUNCUP_X);
+    error(APPLY.args(" db:output#1", " [<b/>]"), FUNCUP_X);
   }
 
   /**

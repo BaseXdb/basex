@@ -31,13 +31,13 @@ public final class MapType extends FuncType {
 
   @Override
   public Map cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     if(item instanceof Map) {
       final Map m = (Map) item;
       if(m.instanceOf(this)) return m;
     }
-    throw castError(item, this, ii);
+    throw castError(item, this, info);
   }
 
   @Override

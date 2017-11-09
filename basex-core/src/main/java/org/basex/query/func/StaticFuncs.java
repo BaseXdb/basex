@@ -48,20 +48,20 @@ public final class StaticFuncs extends ExprInfo {
    * @param expr function body (can be {@code null})
    * @param doc xqdoc string
    * @param vs variable scope
-   * @param ii input info
+   * @param info input info
    * @return static function reference
    * @throws QueryException query exception
    */
   public StaticFunc declare(final AnnList anns, final QNm nm, final Var[] args, final SeqType type,
-      final Expr expr, final String doc, final VarScope vs, final InputInfo ii)
+      final Expr expr, final String doc, final VarScope vs, final InputInfo info)
       throws QueryException {
 
     final byte[] uri = nm.uri();
-    if(uri.length == 0) throw FUNNONS_X.get(ii, nm.string());
+    if(uri.length == 0) throw FUNNONS_X.get(info, nm.string());
     if(NSGlobal.reserved(uri) || Functions.get().getBuiltIn(nm) != null)
-      throw FNRESERVED_X.get(ii, nm.string());
+      throw FNRESERVED_X.get(info, nm.string());
 
-    final StaticFunc sf = new StaticFunc(anns, nm, args, type, expr, doc, vs, ii);
+    final StaticFunc sf = new StaticFunc(anns, nm, args, type, expr, doc, vs, info);
     final byte[] sig = sf.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(sf);
@@ -186,20 +186,20 @@ public final class StaticFuncs extends ExprInfo {
    * Returns the function with the given name and arity.
    * @param name function name
    * @param arity function arity
-   * @param ii input info
+   * @param info input info
    * @param error raise error if function in reserved namespace is not found
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public StaticFunc get(final QNm name, final long arity, final InputInfo ii, final boolean error)
+  public StaticFunc get(final QNm name, final long arity, final InputInfo info, final boolean error)
       throws QueryException {
 
     final FuncCache fc = funcs.get(sig(name, arity));
     if(fc != null) return fc.func;
 
     if(error && NSGlobal.reserved(name.uri())) {
-      final QueryException qe = similarError(name, ii);
-      throw qe == null ? WHICHFUNC_X.get(ii, name.prefixId()) : qe;
+      final QueryException qe = similarError(name, info);
+      throw qe == null ? WHICHFUNC_X.get(info, name.prefixId()) : qe;
     }
     return null;
   }
@@ -207,10 +207,10 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Throws an exception if the name of a function is similar to the specified function name.
    * @param name function name
-   * @param ii input info
+   * @param info input info
    * @return exception
    */
-  public QueryException similarError(final QNm name, final InputInfo ii) {
+  public QueryException similarError(final QNm name, final InputInfo info) {
     // find local functions
     QueryException qe = null;
     final Levenshtein ls = new Levenshtein();
@@ -218,12 +218,12 @@ public final class StaticFuncs extends ExprInfo {
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        qe = FUNCSIMILAR_X_X.get(ii, name.prefixId(), sf.name.prefixId());
+        qe = FUNCSIMILAR_X_X.get(info, name.prefixId(), sf.name.prefixId());
         break;
       }
     }
     // find global function
-    if(qe == null) qe = Functions.get().similarError(name, ii);
+    if(qe == null) qe = Functions.get().similarError(name, info);
     return qe;
   }
 

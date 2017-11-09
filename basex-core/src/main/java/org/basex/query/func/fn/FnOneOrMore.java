@@ -51,6 +51,7 @@ public final class FnOneOrMore extends StandardFunc {
     if(!st.mayBeEmpty()) return ex;
     if(st.zero()) throw ONEORMORE.get(info);
     seqType = st;
+    size = ex.size();
     return this;
   }
 }

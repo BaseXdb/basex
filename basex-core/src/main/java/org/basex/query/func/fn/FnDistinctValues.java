@@ -24,13 +24,17 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class FnDistinctValues extends StandardFunc {
+  /** Item evaluation flag. */
+  private boolean item;
+
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
-    if(exprs[0] instanceof RangeSeq) return qc.iter(exprs[0]);
+    final Expr ex = exprs[0];
+    final Iter iter = ex.atomIter(qc, info);
+    if(item || ex instanceof RangeSeq || ex instanceof Range) return iter;
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
-    final Iter iter = exprs[0].atomIter(qc, info);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
@@ -47,11 +51,12 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
-    if(exprs[0] instanceof RangeSeq) return (RangeSeq) exprs[0];
+    final Expr ex = exprs[0];
+    if(item || ex instanceof RangeSeq || ex instanceof Range) return ex.atomValue(qc, info);
 
-    final ValueBuilder vb = new ValueBuilder();
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
-    final Iter iter = exprs[0].atomIter(qc, info);
+    final Iter iter = ex.atomIter(qc, info);
+    final ValueBuilder vb = new ValueBuilder();
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
       if(set.add(it, info)) vb.add(it);
@@ -61,30 +66,33 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final SeqType st = exprs[0].seqType();
-    if(st.type instanceof NodeType) {
-      seqType = SeqType.get(AtomType.ATM, st.occ);
-    } else if(!st.mayBeArray()) {
-      seqType = st;
+    final Expr ex = exprs[0];
+    final SeqType st = ex.seqType();
+    if(!st.mayBeArray()) {
+      seqType = st.type instanceof NodeType ? SeqType.get(AtomType.ATM, st.occ) : st;
+      item = st.zeroOrOne();
     }
-    return exprs.length == 1 ? cmpDist(cc) : this;
+    return exprs.length == 1 ? cmpDist(ex, cc) : this;
   }
 
   /**
    * Pre-evaluates distinct-values() function, utilizing database statistics.
+   * @param ex expression
    * @param cc compilation context
    * @return original or optimized expression
    * @throws QueryException query exception
    */
-  private Expr cmpDist(final CompileContext cc) throws QueryException {
+  private Expr cmpDist(final Expr ex, final CompileContext cc) throws QueryException {
     // can only be performed on axis paths
-    if(!(exprs[0] instanceof AxisPath)) return this;
+    if(!(ex instanceof AxisPath)) return this;
 
     // try to get statistics for resulting nodes
-    final ArrayList<PathNode> nodes = ((AxisPath) exprs[0]).pathNodes(cc);
+    final ArrayList<PathNode> nodes = ((AxisPath) ex).pathNodes(cc);
     if(nodes == null) return this;
+
     // loop through all nodes
-    final HashItemSet is = new HashItemSet(false);
+    final ValueBuilder vb = new ValueBuilder();
+    final HashItemSet set = new HashItemSet(false);
     for(PathNode pn : nodes) {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
@@ -96,11 +104,11 @@ public final class FnDistinctValues extends StandardFunc {
       // check if distinct values are available
       if(!StatsType.isCategory(pn.stats.type)) return this;
       // if yes, add them to the item set
-      for(final byte[] c : pn.stats.values) is.add(new Atm(c), info);
+      for(final byte[] c : pn.stats.values) {
+        final Atm it = new Atm(c);
+        if(set.add(it, info)) vb.add(it);
+      }
     }
-    // return resulting sequence
-    final ValueBuilder vb = new ValueBuilder();
-    for(final Item i : is) vb.add(i);
     return vb.value();
   }
 }

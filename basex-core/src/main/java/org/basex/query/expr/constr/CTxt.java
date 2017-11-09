@@ -20,6 +20,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CTxt extends CNode {
+  /** Item evaluation flag. */
+  private boolean item;
+
   /**
    * Constructor.
    * @param sc static context
@@ -35,16 +38,25 @@ public final class CTxt extends CNode {
   public Expr optimize(final CompileContext cc) {
     final Expr ex = exprs[0];
     if(ex == Empty.SEQ) return cc.emptySeq(this);
-    if(ex.seqType().oneOrMore()) seqType = SeqType.TXT;
+    final SeqType st = ex.seqType();
+    if(st.oneOrMore()) seqType = SeqType.TXT;
+    if(st.zeroOrOne() && !st.mayBeArray()) item = true;
     return this;
   }
 
   @Override
   public FTxt item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    // if possible, retrieve single item
+    final Expr ex = exprs[0];
+    if(item) {
+      final Item it = ex.item(qc, ii);
+      return new FTxt(it == null ? Token.EMPTY : it.string(info));
+    }
+
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
 
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = ex.atomIter(qc, info);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
       if(more) tb.add(' ');

@@ -161,12 +161,12 @@ public abstract class JavaFunction extends Arr {
    * @param args arguments
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @return Java function or {@code null}
    * @throws QueryException query exception
    */
   static JavaFunction get(final QNm qname, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+      final StaticContext sc, final InputInfo info) throws QueryException {
 
     // rewrite function name, extract argument types
     String name = Strings.camelCase(string(qname.local()));
@@ -187,11 +187,11 @@ public abstract class JavaFunction extends Arr {
     final ModuleLoader modules = qc.resources.modules();
     final Object module  = modules.findModule(className);
     if(module != null) {
-      final Method meth = moduleMethod(module, name, args.length, types, qc, ii);
+      final Method meth = moduleMethod(module, name, args.length, types, qc, info);
       final Requires req = meth.getAnnotation(Requires.class);
       final Perm perm = req == null ? Perm.ADMIN :
         Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
-      return new JavaModuleFunc(sc, ii, module, meth, args, perm);
+      return new JavaModuleFunc(sc, info, module, meth, args, perm);
     }
 
     // try to find matching Java variable or method
@@ -200,15 +200,15 @@ public abstract class JavaFunction extends Arr {
       final Class<?> clazz = modules.findClass(className);
       clz = true;
       if(name.equals(NEW) || exists(clazz, name))
-        return new JavaFunc(sc, ii, clazz, name, types, args);
+        return new JavaFunc(sc, info, clazz, name, types, args);
     } catch(final ClassNotFoundException ex) {
       if(java) Util.debug(ex);
     } catch(final Throwable th) {
-      throw JAVAINIT_X_X.get(ii, Util.className(th), th);
+      throw JAVAINIT_X_X.get(info, Util.className(th), th);
     }
 
     // no function found: raise error only if "java:" prefix was specified
-    if(java) throw (clz ? WHICHJAVA_X_X_X : WHICHCLASS_X).get(ii, className, name, args.length);
+    if(java) throw (clz ? WHICHJAVA_X_X_X : WHICHCLASS_X).get(info, className, name, args.length);
     return null;
   }
 
@@ -219,12 +219,12 @@ public abstract class JavaFunction extends Arr {
    * @param arity number of arguments
    * @param types types provided in the query (can be {@code null})
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    * @return method if found
    * @throws QueryException query exception
    */
   private static Method moduleMethod(final Object module, final String name, final int arity,
-      final String[] types, final QueryContext qc, final InputInfo ii) throws QueryException {
+      final String[] types, final QueryContext qc, final InputInfo info) throws QueryException {
 
     // find method with identical name and arity
     Method meth = null;
@@ -238,14 +238,14 @@ public abstract class JavaFunction extends Arr {
       if(methArity != arity) continue;
       methArity = -1;
       if(!typeMatches(pTypes, types)) continue;
-      if(meth != null) throw JAVAAMB_X_X_X.get(ii, clazz.getName(), name, arity);
+      if(meth != null) throw JAVAAMB_X_X_X.get(info, clazz.getName(), name, arity);
       meth = m;
     }
 
     if(meth == null) {
       if(methArity != -1) throw JAVAARITY_X_X_X_X.get(
-          ii, clazz.getName(), name, methArity, arguments(arity));
-      throw WHICHJAVA_X_X_X.get(ii, clazz.getName(), name, arity);
+          info, clazz.getName(), name, methArity, arguments(arity));
+      throw WHICHJAVA_X_X_X.get(info, clazz.getName(), name, arity);
     }
 
     // Add module locks to QueryContext.

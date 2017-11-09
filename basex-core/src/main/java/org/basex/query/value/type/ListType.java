@@ -72,24 +72,24 @@ public enum ListType implements Type {
 
   @Override
   public final Value cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
-    final byte[][] values = split(normalize(item.string(ii)), ' ');
+    final byte[][] values = split(normalize(item.string(info)), ' ');
     final ValueBuilder vb = new ValueBuilder();
-    for(final byte[] v : values) vb.add(type.cast(Str.get(v), qc, sc, ii));
+    for(final byte[] v : values) vb.add(type.cast(Str.get(v), qc, sc, info));
     return vb.value();
   }
 
   @Override
   public final Value cast(final Object value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return cast(Str.get(value, qc, ii), qc, sc, ii);
+      final InputInfo info) throws QueryException {
+    return cast(Str.get(value, qc, info), qc, sc, info);
   }
 
   @Override
   public final Value castString(final String value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return cast(value, qc, sc, ii);
+      final InputInfo info) throws QueryException {
+    return cast(value, qc, sc, info);
   }
 
   @Override

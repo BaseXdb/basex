@@ -30,13 +30,13 @@ public final class ArrayType extends FuncType {
 
   @Override
   public Array cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     if(item instanceof Array) {
       final Array a = (Array) item;
       if(a.instanceOf(this)) return a;
     }
-    throw castError(item, this, ii);
+    throw castError(item, this, info);
   }
 
   @Override

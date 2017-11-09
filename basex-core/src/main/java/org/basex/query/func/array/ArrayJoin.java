@@ -16,9 +16,19 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayJoin extends ArrayFn {
+  /** Item evaluation flag. */
+  private boolean item;
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    // if possible, retrieve single item
+    final Expr ex = exprs[0];
+    if(item) {
+      final Item it = ex.item(qc, info);
+      return it == null ? Array.empty() : toArray(it);
+    }
+
+    final Iter iter = qc.iter(ex);
     Item it = iter.next();
     if(it == null) return Array.empty();
     final Array fst = toArray(it);
@@ -38,8 +48,10 @@ public final class ArrayJoin extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
+    final SeqType st = exprs[0].seqType();
+    final Type t = st.type;
     if(t instanceof ArrayType) seqType = t.seqType();
+    item = st.zeroOrOne();
     return this;
   }
 }

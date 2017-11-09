@@ -17,11 +17,22 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnExactlyOne extends StandardFunc {
+  /** Item evaluation flag. */
+  private boolean item;
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
-    final Item it = iter.next();
-    if(it == null || iter.next() != null) throw EXACTLYONE.get(info);
+    // if possible, retrieve single item
+    final Expr ex = exprs[0];
+    Item it;
+    if(item) {
+      it = ex.item(qc, info);
+    } else {
+      final Iter iter = qc.iter(ex);
+      it = iter.next();
+      if(it != null && iter.next() != null) it = null;
+    }
+    if(it == null) throw EXACTLYONE.get(info);
     return it;
   }
 
@@ -32,6 +43,7 @@ public final class FnExactlyOne extends StandardFunc {
     if(st.one()) return ex;
     if(st.zero() || st.occ.min > 1) throw EXACTLYONE.get(info);
     seqType = st;
+    item = st.zeroOrOne();
     return this;
   }
 }

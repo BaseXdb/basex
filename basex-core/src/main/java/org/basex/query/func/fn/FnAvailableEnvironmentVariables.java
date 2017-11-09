@@ -21,7 +21,7 @@ public final class FnAvailableEnvironmentVariables extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder();
-    for(final Object k : System.getenv().keySet()) vb.add(Str.get(k.toString()));
+    for(final Object key : System.getenv().keySet()) vb.add(Str.get(key.toString()));
     return vb.value();
   }
 }

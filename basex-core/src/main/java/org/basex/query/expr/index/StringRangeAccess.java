@@ -32,7 +32,7 @@ public final class StringRangeAccess extends IndexAccess {
    * @param db index database
    */
   public StringRangeAccess(final InputInfo info, final StringRange index, final IndexDb db) {
-    super(db, info);
+    super(db, info, index.type());
     this.index = index;
   }
 

@@ -32,7 +32,7 @@ public final class RangeAccess extends IndexAccess {
    * @param db index database
    */
   public RangeAccess(final InputInfo info, final NumericRange index, final IndexDb db) {
-    super(db, info);
+    super(db, info, index.type());
     this.index = index;
   }
 

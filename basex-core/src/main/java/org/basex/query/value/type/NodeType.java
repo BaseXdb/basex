@@ -32,7 +32,7 @@ public enum NodeType implements Type {
   TXT("text", NOD, ID.TXT) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) {
+        final InputInfo info) {
       if(value instanceof BXText) return ((BXNode) value).getNode();
       if(value instanceof Text) return new FTxt((Text) value);
       return new FTxt(value.toString());
@@ -43,12 +43,12 @@ public enum NodeType implements Type {
   PI("processing-instruction", NOD, ID.PI) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(value instanceof BXPI) return ((BXNode) value).getNode();
       if(value instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) value);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(value.toString());
       if(m.find()) return new FPI(m.group(1), m.group(2));
-      throw NODEERR_X_X.get(ii, this, chop(value, ii));
+      throw NODEERR_X_X.get(info, this, chop(value, info));
     }
   },
 
@@ -56,13 +56,13 @@ public enum NodeType implements Type {
   ELM("element", NOD, ID.ELM) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(value instanceof BXElem)  return ((BXNode) value).getNode();
       if(value instanceof Element) return new FElem((Element) value, null, new TokenMap());
       try {
         return new DBNode(new IOContent(value.toString())).children().next();
       } catch(final IOException ex) {
-        throw NODEERR_X_X.get(ii, this, ex);
+        throw NODEERR_X_X.get(info, this, ex);
       }
     }
   },
@@ -71,7 +71,7 @@ public enum NodeType implements Type {
   DOC("document-node", NOD, ID.DOC) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(value instanceof BXDoc) return ((BXNode) value).getNode();
       try {
         if(value instanceof Document) {
@@ -88,7 +88,7 @@ public enum NodeType implements Type {
         if(string.startsWith("<")) return new DBNode(new IOContent(string));
         return new FDoc().add(new FTxt(string));
       } catch(final IOException ex) {
-        throw NODEERR_X_X.get(ii, this, ex);
+        throw NODEERR_X_X.get(info, this, ex);
       }
     }
   },
@@ -97,8 +97,8 @@ public enum NodeType implements Type {
   DEL("document-node(element())", NOD, ID.DEL) {
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return DOC.cast(value, qc, sc, ii);
+        final InputInfo info) throws QueryException {
+      return DOC.cast(value, qc, sc, info);
     }
   },
 
@@ -106,12 +106,12 @@ public enum NodeType implements Type {
   ATT("attribute", NOD, ID.ATT) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(value instanceof BXAttr) return ((BXNode) value).getNode();
       if(value instanceof Attr) return new FAttr((Attr) value);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(value.toString());
       if(m.find()) return new FAttr(m.group(1), m.group(2));
-      throw NODEERR_X_X.get(ii, this, chop(value, ii));
+      throw NODEERR_X_X.get(info, this, chop(value, info));
     }
   },
 
@@ -119,12 +119,12 @@ public enum NodeType implements Type {
   COM("comment", NOD, ID.COM) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(value instanceof BXComm) return ((BXNode) value).getNode();
       if(value instanceof Comment) return new FComm((Comment) value);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(value.toString());
       if(m.find()) return new FComm(m.group(1));
-      throw NODEERR_X_X.get(ii, this, chop(value, ii));
+      throw NODEERR_X_X.get(info, this, chop(value, info));
     }
   },
 
@@ -183,20 +183,20 @@ public enum NodeType implements Type {
 
   @Override
   public final Item cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return item.type == this ? item : error(item, ii);
+      final InputInfo info) throws QueryException {
+    return item.type == this ? item : error(item, info);
   }
 
   @Override
   public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
     throw Util.notExpected(value);
   }
 
   @Override
   public final Item castString(final String value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return cast(value, qc, sc, ii);
+      final InputInfo info) throws QueryException {
+    return cast(value, qc, sc, info);
   }
 
   @Override

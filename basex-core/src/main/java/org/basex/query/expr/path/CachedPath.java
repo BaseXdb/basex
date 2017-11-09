@@ -33,14 +33,14 @@ final class CachedPath extends AxisPath {
   @Override
   protected NodeIter nodeIter(final QueryContext qc) throws QueryException {
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
-    final Value r = root != null ? qc.value(root) : qf.value;
+    final Value rt = root != null ? qc.value(root) : qf.value;
     qc.focus = focus;
     final ANodeBuilder list = new ANodeBuilder();
     try {
-      if(r != null) {
-        final Iter iter = qc.iter(r);
+      if(rt != null) {
+        final Iter iter = qc.iter(rt);
         for(Item it; (it = iter.next()) != null;) {
-          // ensure that root only returns nodes
+          // check if root returns nodes
           if(root != null && !(it instanceof ANode))
             throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
           focus.value = it;

@@ -23,7 +23,7 @@ public final class FnCount extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr ex = exprs[0];
-    if(item) return ex.item(qc, info) != null ? Int.ONE : Int.ZERO;
+    if(item) return ex.item(qc, info) == null ? Int.ZERO : Int.ONE;
 
     // iterative access: if the iterator size is unknown, iterate through all results
     final Iter iter = qc.iter(ex);

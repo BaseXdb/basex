@@ -177,31 +177,31 @@ public final class SerializerOptions extends Options {
    * @param name name of option
    * @param value value
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
   public void parse(final String name, final byte[] value, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     try {
       assign(name, string(value));
     } catch(final BaseXException ex) {
-      for(final Option<?> o : this) if(o.name().equals(name)) throw SER_X.get(ii, ex);
-      throw OUTINVALID_X.get(ii, ex);
+      for(final Option<?> o : this) if(o.name().equals(name)) throw SER_X.get(info, ex);
+      throw OUTINVALID_X.get(info, ex);
     }
 
     if(name.equals(PARAMETER_DOCUMENT.name())) {
       Uri uri = Uri.uri(value);
-      if(!uri.isValid()) throw INVURI_X.get(ii, value);
-      if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, ii);
+      if(!uri.isValid()) throw INVURI_X.get(info, value);
+      if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, info);
       final IO io = IO.get(string(uri.string()));
       try {
         // check parameters and add values to serialization parameters
         final ANode root = new DBNode(io).children().next();
-        FuncOptions.serializer(root, this, ii);
+        FuncOptions.serializer(root, this, info);
 
         final HashMap<String, String> free = free();
-        if(!free.isEmpty()) throw SEROPTION_X.get(ii, free.keySet().iterator().next());
+        if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
 
         final byte[] mapsId = new QNm(USE_CHARACTER_MAPS.name(), QueryText.OUTPUT_URI).id();
         final byte[] mapId = new QNm("character-map", QueryText.OUTPUT_URI).id();
@@ -218,7 +218,7 @@ public final class SerializerOptions extends Options {
 
       } catch(final IOException ex) {
         Util.debug(ex);
-        throw OUTDOC_X.get(ii, value);
+        throw OUTDOC_X.get(info, value);
       }
     }
   }

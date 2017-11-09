@@ -16,32 +16,50 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class UtilItemAt extends StandardFunc {
+  /** Item evaluation flag. */
+  private boolean item;
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final double ds = toDouble(exprs[1], qc);
-    final long pos = (long) ds;
-    if(ds != pos || pos < 1) return null;
+    final double dp = toDouble(exprs[1], qc);
+    final long ps = (long) dp;
+    if(dp != ps || ps < 1) return null;
+
+    // if possible, retrieve single item
+    final Expr ex = exprs[0];
+    if(item) return ps == 1 ? ex.item(qc, info) : null;
 
     // fast route if the size is known
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = qc.iter(ex);
     final long max = iter.size();
-    if(max >= 0) return pos > max ? null : iter.get(pos - 1);
+    if(max >= 0) return ps > max ? null : iter.get(ps - 1);
 
     // loop through all items
     long p = 0;
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      if(++p == pos) return item;
+      if(++p == ps) return it;
     }
     return null;
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr ex = exprs[0], pos = exprs[1];
     final SeqType st = ex.seqType();
     if(st.zero()) return ex;
+
     seqType = st.withOcc(Occ.ZERO_ONE);
+    item = st.zeroOrOne();
+
+    if(pos.isValue()) {
+      final double dp = toDouble(pos, cc.qc);
+      final long ps = (long) dp;
+      // reject invalid positions
+      if(dp != ps || ps < 1) return null;
+      // pre-evaluate single expression with static position
+      if(item) return ps == 1 ? ex : null;
+    }
     return this;
   }
 }
