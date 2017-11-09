@@ -66,7 +66,7 @@ abstract class ArchiveFn extends StandardFunc {
       final Iter names = qc.iter(exprs[e]);
       for(Item en; (en = names.next()) != null;) {
         qc.checkStop();
-       hs.add(checkElemToken(en).string(info));
+        hs.add(checkElemToken(en).string(info));
       }
     }
     return hs;

@@ -78,6 +78,7 @@ public class FnOutermost extends StandardFunc {
         final ANode nd = list.get(l);
         final BasicNodeIter ax = outer ? nd.ancestor() : nd.descendant();
         for(ANode a; (a = ax.next()) != null;) {
+          qc.checkStop();
           if(list.contains(a)) continue OUTER;
         }
         res.add(nd);
