@@ -99,8 +99,8 @@ public abstract class Filter extends Preds {
     final Value cv = focus.value;
     try {
       focus.value = root(cc, root);
-      final Expr e = super.optimize(cc);
-      if(e != this) return e;
+      final Expr ex = super.optimize(cc);
+      if(ex != this) return ex;
     } finally {
       focus.value = cv;
     }
@@ -110,7 +110,7 @@ public abstract class Filter extends Preds {
     if(size == 0) return cc.emptySeq(this);
 
     // if possible, convert filter to root or path expression
-    final Expr ex = simplify(root, exprs);
+    Expr ex = simplify(root, exprs);
     if(ex != null) return ex.optimize(cc);
 
     // try to rewrite filter to index access
@@ -127,47 +127,47 @@ public abstract class Filter extends Preds {
     Expr rt = root;
     boolean opt = false;
     for(final Expr expr : exprs) {
-      Expr e = null;
+      ex = null;
       if(expr.isFunction(Function.LAST)) {
         if(rt.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) rt, rt.size(), 1);
+          ex = FnSubsequence.eval((Value) rt, rt.size(), 1);
         } else {
           // rewrite positional predicate to util:last-from
-          e = cc.function(Function._UTIL_LAST_FROM, info, rt);
+          ex = cc.function(Function._UTIL_LAST_FROM, info, rt);
         }
       } else if(expr instanceof ItrPos) {
         final ItrPos pos = (ItrPos) expr;
         if(rt.isValue()) {
           // return sub-sequence
-          e = FnSubsequence.eval((Value) rt, pos.min, pos.max - pos.min + 1);
+          ex = FnSubsequence.eval((Value) rt, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
-          e = cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));
+          ex = cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          e = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
+          ex = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
               Int.get(pos.max));
         }
       } else if(expr instanceof Pos) {
         final Pos pos = (Pos) expr;
         if(pos.exprs[0] == pos.exprs[1]) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
-          e = cc.function(Function._UTIL_ITEM_AT, info, rt, pos.exprs[0]);
+          ex = cc.function(Function._UTIL_ITEM_AT, info, rt, pos.exprs[0]);
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          e = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
+          ex = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
         }
       } else if(num(expr)) {
         /* - rewrite positional predicate to util:item-at
          *   example: expr[pos] -> util:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets
          *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = cc.function(Function._UTIL_ITEM_AT, info, rt, expr);
+        ex = cc.function(Function._UTIL_ITEM_AT, info, rt, expr);
       }
 
-      if(e != null) {
-        rt = e;
+      if(ex != null) {
+        rt = ex;
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
@@ -181,8 +181,8 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    final Expr e = optimizeEbv(root, cc);
-    return e == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, e);
+    final Expr ex = optimizeEbv(root, cc);
+    return ex == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, ex);
   }
 
   /**

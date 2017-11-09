@@ -176,7 +176,7 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public String description() {
-    return "Variable declaration";
+    return "variable declaration";
   }
 
   @Override

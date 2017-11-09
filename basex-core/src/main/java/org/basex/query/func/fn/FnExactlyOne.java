@@ -27,9 +27,9 @@ public final class FnExactlyOne extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr e = exprs[0];
-    final SeqType st = e.seqType();
-    if(st.one()) return e;
+    final Expr ex = exprs[0];
+    final SeqType st = ex.seqType();
+    if(st.one()) return ex;
     if(st.zero() || st.occ.min > 1) throw EXACTLYONE.get(info);
     seqType = st;
     return this;

@@ -127,7 +127,6 @@ public final class For extends ForLet {
     var.data = expr.data();
     if(pos != null) pos.refineType(SeqType.ITR, cc);
     if(score != null) score.refineType(SeqType.DBL, cc);
-
     return this;
   }
 

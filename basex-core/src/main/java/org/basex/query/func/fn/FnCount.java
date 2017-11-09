@@ -7,7 +7,6 @@ import org.basex.query.func.map.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -17,33 +16,40 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnCount extends StandardFunc {
+  /** Item evaluation flag. */
+  private boolean item;
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
-    long c = iter.size();
-    if(c == -1) {
+    // if possible, retrieve single item
+    final Expr ex = exprs[0];
+    if(item) return ex.item(qc, info) != null ? Int.ONE : Int.ZERO;
+
+    // iterative access: if the iterator size is unknown, iterate through all results
+    final Iter iter = qc.iter(ex);
+    long sz = iter.size();
+    if(sz == -1) {
       do {
         qc.checkStop();
-        ++c;
+        ++sz;
       } while(iter.next() != null);
     }
-    return Int.get(c);
+    return Int.get(sz);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // skip non-deterministic and variable expressions
-    final Expr e = exprs[0];
-    if(e.has(Flag.NDT, Flag.UPD) || e instanceof VarRef) return this;
-
-    // return size known at compile time
-    final long c = e.size();
-    if(c >= 0) return Int.get(c);
+    // ignore non-deterministic expressions (e.g.: count(error()))
+    final Expr ex = exprs[0];
+    if(!ex.has(Flag.NDT, Flag.UPD)) {
+      final long sz = ex.size();
+      if(sz >= 0) return Int.get(sz);
+    }
 
     // rewrite count(map:keys(...)) to map:size(...)
-    if(e instanceof MapKeys) return cc.function(Function._MAP_SIZE, info, ((MapKeys) e).exprs);
+    if(ex instanceof MapKeys) return cc.function(Function._MAP_SIZE, info, ((MapKeys) ex).exprs);
 
-    // no optimization possible
+    item = ex.seqType().zeroOrOne();
     return this;
   }
 }

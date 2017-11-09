@@ -68,21 +68,21 @@ public final class Catch extends Single {
   /**
    * Returns the value of the caught expression.
    * @param qc query context
-   * @param ex thrown exception
+   * @param qe thrown exception
    * @return resulting item
    * @throws QueryException query exception
    */
-  Value value(final QueryContext qc, final QueryException ex) throws QueryException {
+  Value value(final QueryContext qc, final QueryException qe) throws QueryException {
     int i = 0;
-    final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
-    final Value val = ex.value();
-    for(final Value v : new Value[] { ex.qname(),
-        Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Int.get(ex.line()), Int.get(ex.column()),
-        Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
+    final byte[] io = qe.file() == null ? EMPTY : token(qe.file());
+    final Value val = qe.value();
+    for(final Value v : new Value[] { qe.qname(),
+        Str.get(qe.getLocalizedMessage()), val == null ? Empty.SEQ : val,
+        Str.get(io), Int.get(qe.line()), Int.get(qe.column()),
+        Str.get(qe.getMessage().replaceAll("\r\n?", "\n")) }) {
       qc.set(vars[i++], v);
     }
-    Util.debug(ex);
+    Util.debug(qe);
     return qc.value(expr);
   }
 
@@ -112,35 +112,35 @@ public final class Catch extends Single {
 
   /**
    * Returns this clause as an inlineable expression.
-   * @param ex caught exception
+   * @param qe caught exception
    * @param cc compilation context
    * @return equivalent expression
    * @throws QueryException query exception during inlining
    */
-  Expr asExpr(final QueryException ex, final CompileContext cc) throws QueryException {
+  Expr asExpr(final QueryException qe, final CompileContext cc) throws QueryException {
     if(expr.isValue()) return expr;
     int i = 0;
-    Expr e = expr;
-    for(final Value v : values(ex)) {
-      final Expr e2 = e.inline(vars[i++], v, cc);
-      if(e2 != null) e = e2;
-      if(e.isValue()) break;
+    Expr ex = expr;
+    for(final Value v : values(qe)) {
+      final Expr e2 = ex.inline(vars[i++], v, cc);
+      if(e2 != null) ex = e2;
+      if(ex.isValue()) break;
     }
-    return e;
+    return ex;
   }
 
   /**
    * Returns all error values.
-   * @param ex exception
+   * @param qe exception
    * @return values
    */
-  public static Value[] values(final QueryException ex) {
-    final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
-    final Value val = ex.value();
-    return new Value[] { ex.qname(),
-        Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Int.get(ex.line()), Int.get(ex.column()),
-        Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) };
+  public static Value[] values(final QueryException qe) {
+    final byte[] io = qe.file() == null ? EMPTY : token(qe.file());
+    final Value val = qe.value();
+    return new Value[] { qe.qname(),
+        Str.get(qe.getLocalizedMessage()), val == null ? Empty.SEQ : val,
+        Str.get(io), Int.get(qe.line()), Int.get(qe.column()),
+        Str.get(qe.getMessage().replaceAll("\r\n?", "\n")) };
   }
 
   /**

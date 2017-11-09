@@ -50,10 +50,10 @@ public final class FnTail extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr e = exprs[0];
-    final long s = e.size();
-    if(s == 0 || s == 1) return Empty.SEQ;
-    seqType = e.seqType().withOcc(s == 2 ? Occ.ONE : Occ.ZERO_MORE);
+    final Expr ex = exprs[0];
+    final long sz = ex.size();
+    if(sz == 0 || sz == 1) return Empty.SEQ;
+    seqType = ex.seqType().withOcc(sz == 2 ? Occ.ONE : Occ.ZERO_MORE);
     return this;
   }
 }

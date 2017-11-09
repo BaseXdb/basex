@@ -89,8 +89,8 @@ public abstract class Step extends Preds {
     simplify(cc, this);
 
     // optimize predicates
-    final Expr e = super.optimize(cc);
-    if(e != this) return e;
+    final Expr ex = super.optimize(cc);
+    if(ex != this) return ex;
 
     // compute result size
     seqType(seqType, Long.MAX_VALUE);

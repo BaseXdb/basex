@@ -164,7 +164,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public String description() {
-    return "Function";
+    return "function";
   }
 
   @Override

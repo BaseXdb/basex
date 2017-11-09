@@ -84,11 +84,11 @@ public abstract class Docs extends StandardFunc {
 
   @Override
   public boolean has(final Flag... flags) {
+    // remote URLs: return non-deterministic flag to suppress pre-evaluation
     if(Flag.NDT.in(flags) && exprs.length > 0) {
       final Expr expr = exprs[0];
       if(expr instanceof Str) {
         queryInput = queryInput(((Str) expr).string());
-        // do not pre-evaluate URL input
         if(queryInput != null && queryInput.io instanceof IOUrl) return true;
       }
     }

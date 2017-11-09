@@ -42,13 +42,13 @@ public final class HofFoldLeft1 extends StandardFunc {
     if(allAreValues() && exprs[0].size() <= FnForEach.UNROLL_LIMIT) {
       final Value seq = (Value) exprs[0];
       final FItem f = checkArity(exprs[1], 2, cc.qc);
-      Expr e = seq.itemAt(0);
+      Expr ex = seq.itemAt(0);
       final long is = seq.size();
       for(int i = 1; i < is; i++) {
-        e = new DynFuncCall(info, sc, f, e, seq.itemAt(i)).optimize(cc);
+        ex = new DynFuncCall(info, sc, f, ex, seq.itemAt(i)).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return e;
+      return ex;
     }
 
     final Type t = exprs[1].seqType().type;

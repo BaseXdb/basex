@@ -590,7 +590,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns the number of occurrences, or {@code -1} if the number is unknown.
+   * Returns the number of occurrences, or {@code -1} if the exact number is unknown.
    * @return result of check
    */
   public long occ() {

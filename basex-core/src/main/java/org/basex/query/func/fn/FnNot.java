@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -20,28 +21,31 @@ public final class FnNot extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr e0 = exprs[0];
-    // simplify: not(empty(A)) -> exists(A)
-    if(e0.isFunction(Function.EMPTY)) {
-      exprs = ((Arr) e0).exprs;
-      return cc.function(Function.EXISTS, info, exprs);
+    // e.g.: not(boolean(A)) -> not(A)
+    final Expr ex = exprs[0].optimizeEbv(cc);
+
+    // not(empty(A)) -> exists(A)
+    if(ex.isFunction(Function.EMPTY)) {
+      return cc.function(Function.EXISTS, info, ((FnEmpty) ex).exprs);
     }
-    // simplify: not(exists(A)) -> empty(A)
-    if(e0.isFunction(Function.EXISTS)) {
-      exprs = ((Arr) e0).exprs;
-      return cc.function(Function.EMPTY, info, exprs);
+    // not(exists(A)) -> empty(A)
+    if(ex.isFunction(Function.EXISTS)) {
+      return cc.function(Function.EMPTY, info, exprs = ((FnExists) ex).exprs);
     }
-    // simplify: not('a' = 'b') -> 'a' != 'b'
-    if(e0 instanceof CmpV || e0 instanceof CmpG) {
-      final Expr e = ((Cmp) e0).invert(cc);
-      return e == e0 ? this : e;
+    // not(not(A)) -> boolean(A)
+    if(ex.isFunction(Function.NOT)) {
+      return compBln(((FnNot) ex).exprs[0], info, cc.sc());
     }
-    // simplify: not(not(A)) -> boolean(A)
-    if(e0.isFunction(Function.NOT)) {
-      return compBln(((Arr) e0).exprs[0], info, cc.sc());
+    // not('a' = 'b') -> 'a' != 'b'
+    if(ex instanceof CmpV || ex instanceof CmpG) {
+      final Expr e = ((Cmp) ex).invert(cc);
+      if(e != ex) return e;
     }
-    // simplify, e.g.: not(boolean(A)) -> not(A)
-    exprs[0] = e0.optimizeEbv(cc);
+    // not($node/text()) -> empty($node/text())
+    final SeqType st = ex.seqType();
+    if(st.type instanceof NodeType) return cc.function(Function.EMPTY, info, ex);
+
+    exprs[0] = ex;
     return this;
   }
 }

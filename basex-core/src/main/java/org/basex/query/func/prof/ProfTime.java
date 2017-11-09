@@ -46,9 +46,9 @@ public final class ProfTime extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr e = exprs[0];
-    seqType = e.seqType();
-    size = e.size();
+    final Expr ex = exprs[0];
+    seqType = ex.seqType();
+    size = ex.size();
     return this;
   }
 }

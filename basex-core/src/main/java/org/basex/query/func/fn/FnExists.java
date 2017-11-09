@@ -15,23 +15,34 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnExists extends StandardFunc {
+  /** Item evaluation flag. */
+  private boolean item;
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(qc.iter(exprs[0]).next() != null);
+    // if possible, retrieve single item
+    final Expr ex = exprs[0];
+    return Bln.get((item ? ex.item(qc, info) : qc.iter(ex).next()) != null);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     // ignore non-deterministic expressions (e.g.: exists(error()))
-    final Expr e = exprs[0];
-    final long es = e.size();
-    return es == -1 || e.has(Flag.NDT, Flag.UPD) ? this : Bln.get(es != 0);
+    final Expr ex = exprs[0];
+    final SeqType st = ex.seqType();
+    if(!ex.has(Flag.NDT, Flag.UPD)) {
+      final long es = ex.size();
+      if(es != -1) return Bln.get(es != 0);
+      if(st.oneOrMore()) return Bln.TRUE;
+    }
+    item = st.zeroOrOne();
+    return this;
   }
 
   @Override
   public Expr optimizeEbv(final CompileContext cc) {
     // if(exists(node*)) -> if(node*)
-    final Expr e = exprs[0];
-    return e.seqType().type instanceof NodeType ? cc.replaceEbv(this, e) : this;
+    final Expr ex = exprs[0];
+    return ex.seqType().type instanceof NodeType ? cc.replaceEbv(this, ex) : this;
   }
 }

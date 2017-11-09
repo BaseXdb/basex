@@ -178,38 +178,40 @@ public final class CmpV extends Cmp {
     final SeqType st1 = e1.seqType(), st2 = e2.seqType();
     seqType = st1.oneNoArray() && st2.oneNoArray() ? SeqType.BLN : SeqType.BLN_ZO;
 
-    Expr e = this;
+    Expr ex = this;
     if(oneIsEmpty()) return cc.emptySeq(this);
     if(allAreValues()) return cc.preEval(this);
 
     if(e1.isFunction(Function.COUNT)) {
       // rewrite count() function
-      e = compCount(op, cc);
+      ex = compCount(op, cc);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
       // rewrite string-length() function
-      e = compStringLength(op, cc);
+      ex = compStringLength(op, cc);
     } else if(e1.isFunction(Function.POSITION) && st2.oneNoArray()) {
       // position() CMP number
-      e = ItrPos.get(op, e2, this, info);
-      if(e == this) e = Pos.get(op, e2, this, info, cc);
+      ex = ItrPos.get(op, e2, this, info);
+      if(ex == this) ex = Pos.get(op, e2, this, info, cc);
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
-      e = cc.function(Function.NOT, info, e1);
+      ex = cc.function(Function.NOT, info, e1);
     }
-    if(e != this) return cc.replaceWith(this, e);
+    if(ex != this) return cc.replaceWith(this, ex);
 
     /* pre-evaluate equality test if:
      * - equality operator is specified,
      * - operands are equal,
      * - operands are deterministic, non-updating,
-     * - operands do not depend on context, or if context value exists
-     */
+     * - operands do not depend on context, or if context value exists */
     if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT, Flag.UPD) &&
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
-      // currently limited to strings, integers and booleans
+      /* consider query flags. do not rewrite:
+       * random:integer() eq random:integer() */
       final Type t1 = st1.type;
       if(st1.one() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) || t1 == AtomType.BLN))
+        /* currently limited to strings, integers and booleans. do not rewrite:
+         * xs:double('NaN') eq xs:double('NaN') */
         return cc.replaceWith(this, Bln.get(op == OpV.EQ));
     }
     return this;

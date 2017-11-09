@@ -142,28 +142,28 @@ public class CmpG extends Cmp {
     // one value is empty (e.g.: () = local:expensive() )
     if(oneIsEmpty()) return cc.replaceWith(this, Bln.FALSE);
 
-    Expr e = this;
+    Expr ex = this;
     if(e1.isFunction(Function.COUNT)) {
       // rewrite count() function
-      e = compCount(op.op, cc);
+      ex = compCount(op.op, cc);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
       // rewrite string-length() function
-      e = compStringLength(op.op, cc);
+      ex = compStringLength(op.op, cc);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number(s)
-      e = ItrPos.get(op.op, e2, this, info);
-      if(e == this) e = Pos.get(op.op, e2, this, info, cc);
+      ex = ItrPos.get(op.op, e2, this, info);
+      if(ex == this) ex = Pos.get(op.op, e2, this, info, cc);
     } else if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)
-      e = cc.function(Function.NOT, info, e1);
+      ex = cc.function(Function.NOT, info, e1);
     }
-    if(e != this) return cc.replaceWith(this, e);
+    if(ex != this) return cc.replaceWith(this, ex);
 
     // rewrite equality comparisons (range expression or number)
-    e = CmpR.get(this);
-    if(e == this) e = CmpSR.get(this);
-    if(e != this) return allAreValues() ? cc.preEval(e) : cc.replaceWith(this, e);
+    ex = CmpR.get(this);
+    if(ex == this) ex = CmpSR.get(this);
+    if(ex != this) return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
 
     // pre-evaluate values
     if(allAreValues()) return cc.preEval(this);

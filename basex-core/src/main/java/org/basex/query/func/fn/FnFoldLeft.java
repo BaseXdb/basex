@@ -51,12 +51,12 @@ public final class FnFoldLeft extends StandardFunc {
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
       final Value seq = (Value) exprs[0];
-      Expr e = exprs[1];
+      Expr ex = exprs[1];
       for(final Item it : seq) {
-        e = new DynFuncCall(info, sc, exprs[2], e, it).optimize(cc);
+        ex = new DynFuncCall(info, sc, exprs[2], ex, it).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return e;
+      return ex;
     }
     refineType(this);
     return this;

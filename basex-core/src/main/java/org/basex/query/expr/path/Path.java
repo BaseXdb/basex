@@ -160,21 +160,21 @@ public abstract class Path extends ParseExpr {
     if(rt != null && rt.isEmpty() || emptyPath(rt)) return cc.emptySeq(this);
 
     // merge descendant steps
-    Expr e = mergeSteps(cc);
-    if(e != this) return e.optimize(cc);
+    Expr ex = mergeSteps(cc);
+    if(ex != this) return ex.optimize(cc);
 
     // check index access
-    e = index(cc, rt);
+    ex = index(cc, rt);
     // recompile path
-    if(e != this) return e.optimize(cc);
+    if(ex != this) return ex.optimize(cc);
 
     /* rewrite descendant to child steps. this optimization is located after the index rewriting,
      * as it is cheaper to invert a descendant step. examples:
      * - //C[. = '...']     ->  IA('...', C)
      * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A
      */
-    e = children(cc, rt);
-    if(e != this) return e.optimize(cc);
+    ex = children(cc, rt);
+    if(ex != this) return ex.optimize(cc);
 
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
@@ -765,18 +765,18 @@ public abstract class Path extends ParseExpr {
             continue;
           }
           // descendant-or-self::node()/(X, Y) -> (descendant::X | descendant::Y)
-          Expr e = mergeList(next);
-          if(e != null) {
-            steps[s + 1] = e;
+          Expr ex = mergeList(next);
+          if(ex != null) {
+            steps[s + 1] = ex;
             opt = true;
             continue;
           }
           // //(X, Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
           if(next instanceof Filter && !((Filter) next).positional()) {
             final Filter f = (Filter) next;
-            e = mergeList(f.root);
-            if(e != null) {
-              f.root = e;
+            ex = mergeList(f.root);
+            if(ex != null) {
+              f.root = ex;
               opt = true;
               continue;
             }
@@ -803,7 +803,7 @@ public abstract class Path extends ParseExpr {
     if(expr instanceof Union || expr instanceof List) {
       final Arr next = (Arr) expr;
       if(childSteps(next)) {
-        for(final Expr e : next.exprs) ((Step) ((Path) e).steps[0]).axis = DESC;
+        for(final Expr ex : next.exprs) ((Step) ((Path) ex).steps[0]).axis = DESC;
         return new Union(next.info, next.exprs);
       }
     }

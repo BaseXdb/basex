@@ -230,11 +230,9 @@ public final class GFLWOR extends ParseExpr {
         }
       }
 
-      /*
-       * [LW] not safe:
+      /* [LW] not safe:
        * for $x in 1 to 4 return
-       *   for $y in 1 to 4 count $index return $index
-       * */
+       *   for $y in 1 to 4 count $c return $c */
     } while(changed);
 
     mergeWheres();
@@ -245,7 +243,7 @@ public final class GFLWOR extends ParseExpr {
     if(clauses.getFirst() instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
       final Expr branch = clauses.isEmpty() ? ret : this;
-      return cc.replaceWith(where, new If(info, where.expr, branch, Empty.SEQ));
+      return cc.replaceWith(where, new If(info, where.expr, branch, Empty.SEQ).optimize(cc));
     }
 
     return this;
@@ -395,9 +393,9 @@ public final class GFLWOR extends ParseExpr {
 
         if(!thisRound && (isFor || isLet)) {
           // let $x := (let $y := E return F)  ===>  let $y := E let $x := F
-          final Expr e = isFor ? ((For) clause).expr : ((Let) clause).expr;
-          if(e instanceof GFLWOR) {
-            final GFLWOR fl = (GFLWOR) e;
+          final Expr ex = isFor ? ((For) clause).expr : ((Let) clause).expr;
+          if(ex instanceof GFLWOR) {
+            final GFLWOR fl = (GFLWOR) ex;
             final LinkedList<Clause> cls = fl.clauses;
             if(cls.getFirst() instanceof Let) {
               // remove the binding from the outer clauses
@@ -606,12 +604,12 @@ public final class GFLWOR extends ParseExpr {
         if(wh.expr == Bln.FALSE) return;
         if(before != null) {
           iter.remove();
-          final Expr e = before.expr;
-          if(e instanceof And) {
-            final And and = (And) e;
+          final Expr ex = before.expr;
+          if(ex instanceof And) {
+            final And and = (And) ex;
             and.exprs = ExprList.concat(and.exprs, wh.expr);
           } else {
-            before.expr = new And(before.info, e, wh.expr);
+            before.expr = new And(before.info, ex, wh.expr);
           }
         } else {
           before = wh;

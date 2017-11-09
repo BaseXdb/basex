@@ -204,7 +204,7 @@ public final class CompileContext {
   }
 
   /**
-   * Creates and returns an optimized function instance.
+   * Creates and returns an optimized instance of the specified function.
    * @param func function
    * @param info input info
    * @param exprs expressions

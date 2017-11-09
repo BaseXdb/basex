@@ -487,7 +487,7 @@ public enum QueryError {
   // W3 Functions
 
   /** FOAP0001. */
-  APPLY_X_X(FOAP, 1, "Arity and number of array members differs: % vs. %"),
+  APPLY_X_X(FOAP, 1, "Arity differs from number of array members: % vs. %"),
 
   /** FOAR0001. */
   DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),

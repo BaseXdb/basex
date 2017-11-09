@@ -129,6 +129,7 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final long size() {
+    // return result size. if unknown, resort to occurrence indicator in sequence type
     final long s = size;
     return s == -1 ? seqType().occ() : s;
   }

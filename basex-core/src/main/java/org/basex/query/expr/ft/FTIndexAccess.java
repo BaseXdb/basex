@@ -117,11 +117,11 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    Expr e = ftexpr;
+    Expr ex = ftexpr;
     if(ftexpr instanceof FTWords) {
       final FTWords ftw = (FTWords) ftexpr;
-      if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) e = ftw.query;
+      if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) ex = ftw.query;
     }
-    return Function._FT_SEARCH.toString(db, e);
+    return Function._FT_SEARCH.toString(db, ex);
   }
 }

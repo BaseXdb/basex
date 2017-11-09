@@ -102,7 +102,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public String description() {
-    return "Variable";
+    return "variable";
   }
 
   @Override

@@ -149,11 +149,10 @@ public final class IndexInfo {
       root = vs == 1 ? tmp.get(0) : new Union(info, tmp.toArray(new ValueAccess[vs]));
     } else {
       /* index access is not possible if returned type is not a string or untyped; if
-         expression depends on context; or if it is non-deterministic. examples:
-         for $x in ('a', 1) return //*[text() = $x]
-         //*[text() = .]
-         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
-       */
+       * expression depends on context; or if it is non-deterministic. examples:
+       * - for $x in ('a', 1) return //*[text() = $x]
+       * - //*[text() = .]
+       * - //*[text() = (if(random:double() < .5) then 'X' else 'Y')] */
       if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX, Flag.NDT, Flag.UPD))
         return false;
 

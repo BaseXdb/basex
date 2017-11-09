@@ -115,15 +115,15 @@ public abstract class Preds extends Arr {
    * Adds an expression to the new expression list.
    * @param expr expression
    * @param list expression list
-   * @param pos positional predicate flag
+   * @param pos positional access flag
    * @param cc compilation context
-   * @return new positional predicate flag
+   * @return this, or a previous expression, uses positional access
    */
   private boolean add(final Expr expr, final ExprList list, final boolean pos,
       final CompileContext cc) {
     if(expr == Bln.TRUE) {
       cc.info(OPTREMOVE_X_X, description(), expr);
-    } else if(pos || !list.contains(expr) || expr.has(Flag.NDT, Flag.HOF, Flag.UPD, Flag.POS)) {
+    } else if(pos || !list.contains(expr) || expr.has(Flag.NDT, Flag.UPD, Flag.POS)) {
       list.add(expr);
     }
     return pos || expr.has(Flag.POS);
@@ -200,34 +200,34 @@ public abstract class Preds extends Arr {
     final ExprList list = new ExprList();
     final SeqType st = root.seqType();
     for(final Expr expr : exprs) {
-      Expr e = expr;
+      Expr ex = expr;
      if(expr instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
         // E [ . ]  ->  E
         cc.info(OPTSIMPLE_X, this);
         continue;
-      } else if(e instanceof SimpleMap) {
+      } else if(ex instanceof SimpleMap) {
         // E [ . ! ... ]  ->  E [ ... ]
         // E [ E ! ... ]  ->  E [ ... ]
-        final SimpleMap map = (SimpleMap) e;
+        final SimpleMap map = (SimpleMap) ex;
         final Expr first = map.exprs[0], second = map.exprs[1];
         if(!second.has(Flag.POS) && (first instanceof ContextValue ||
             root.equals(first) && root.isSimple() && st.one())) {
           final int ml = map.exprs.length;
           final ExprList el = new ExprList(ml - 1);
           for(int m = 1; m < ml; m++) el.add(map.exprs[m]);
-          e = SimpleMap.get(map.info, el.finish());
+          ex = SimpleMap.get(map.info, el.finish());
         }
-      } else if(e instanceof Path) {
+      } else if(ex instanceof Path) {
         // E [ . / ... ]  ->  E [ ... ]
         // E [ E / ... ]  ->  E [ ... ]
-        final Path path = (Path) e;
+        final Path path = (Path) ex;
         final Expr first = path.root;
         if(st.type instanceof NodeType && (first instanceof ContextValue ||
             root.equals(first) && root.isSimple() && st.one())) {
-          e = Path.get(path.info, null, path.steps);
+          ex = Path.get(path.info, null, path.steps);
         }
       }
-      list.add(cc.replaceWith(expr, e));
+      list.add(cc.replaceWith(expr, ex));
     }
     exprs = list.finish();
   }

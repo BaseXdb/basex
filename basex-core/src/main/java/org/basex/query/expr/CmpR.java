@@ -95,15 +95,15 @@ public final class CmpR extends Single {
    * @return new or original expression
    */
   private static ParseExpr get(final CmpG cmp, final double start, final double end) {
-    final Expr e = cmp.exprs[0];
+    final Expr ex = cmp.exprs[0];
     // type must be numeric
-    if(!e.seqType().type.isNumberOrUntyped()) return cmp;
+    if(!ex.seqType().type.isNumberOrUntyped()) return cmp;
     switch(cmp.op) {
-      case EQ: return new CmpR(e, start, true, end, true, cmp.info);
-      case GE: return new CmpR(e, start, true, Double.POSITIVE_INFINITY, true, cmp.info);
-      case GT: return new CmpR(e, start, false, Double.POSITIVE_INFINITY, true, cmp.info);
-      case LE: return new CmpR(e, Double.NEGATIVE_INFINITY, true, end, true, cmp.info);
-      case LT: return new CmpR(e, Double.NEGATIVE_INFINITY, true, end, false, cmp.info);
+      case EQ: return new CmpR(ex, start, true, end, true, cmp.info);
+      case GE: return new CmpR(ex, start, true, Double.POSITIVE_INFINITY, true, cmp.info);
+      case GT: return new CmpR(ex, start, false, Double.POSITIVE_INFINITY, true, cmp.info);
+      case LE: return new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, true, cmp.info);
+      case LT: return new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, false, cmp.info);
       default: return cmp;
     }
   }

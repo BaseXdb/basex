@@ -314,7 +314,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public String description() {
-    return "Function declaration";
+    return "function declaration";
   }
 
   @Override

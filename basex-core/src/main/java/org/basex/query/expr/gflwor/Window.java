@@ -283,8 +283,7 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause inline(final Var v, final Expr ex, final CompileContext cc)
-      throws QueryException {
+  public Clause inline(final Var v, final Expr ex, final CompileContext cc) throws QueryException {
     final Expr e = expr.inline(v, ex, cc);
     final Condition st = start.inline(v, ex, cc);
     final Condition en = end == null ? null : end.inline(v, ex, cc);

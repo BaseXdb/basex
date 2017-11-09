@@ -34,9 +34,9 @@ public final class UtilLastFrom extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr e = exprs[0];
-    final SeqType st = e.seqType();
-    if(st.zeroOrOne()) return e;
+    final Expr ex = exprs[0];
+    final SeqType st = ex.seqType();
+    if(st.zeroOrOne()) return ex;
     seqType = st.withOcc(Occ.ZERO_ONE);
     return this;
   }

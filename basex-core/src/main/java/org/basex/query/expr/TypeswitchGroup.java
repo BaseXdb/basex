@@ -66,8 +66,8 @@ public final class TypeswitchGroup extends Single {
    */
   void opt(final CompileContext cc, final Value value) throws QueryException {
     if(var == null) return;
-    final Expr e = expr.inline(var, var.checkType(value, cc.qc, true), cc);
-    if(e != null) expr = e;
+    final Expr ex = expr.inline(var, var.checkType(value, cc.qc, true), cc);
+    if(ex != null) expr = ex;
   }
 
   /**

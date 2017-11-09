@@ -21,16 +21,23 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr e = exprs[0].optimizeEbv(cc);
-    exprs[0] = e;
+    final Expr ex = exprs[0].optimizeEbv(cc);
+
+    // boolean($node/text()) -> exists($node/text())
+    final SeqType st = ex.seqType();
+    if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, exprs);
+
     // simplify, e.g.: boolean(true())) -> true()
-    return e.seqType().eq(SeqType.BLN) ? e : this;
+    if(st.eq(SeqType.BLN)) return ex;
+
+    exprs[0] = ex;
+    return this;
   }
 
   @Override
   public Expr optimizeEbv(final CompileContext cc) {
     // if A is not numeric: expr[boolean(A)] -> expr[A]
-    final Expr e = exprs[0];
-    return e.seqType().mayBeNumber() ? this : cc.replaceEbv(this, e);
+    final Expr ex = exprs[0];
+    return ex.seqType().mayBeNumber() ? this : cc.replaceEbv(this, ex);
   }
 }

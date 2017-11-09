@@ -90,14 +90,14 @@ public final class If extends Arr {
         // if(A) then false() else true() -> not(A)
         if(b == Bln.FALSE) return cc.replaceWith(this, cc.function(Function.NOT, info, a));
         // if(A) then B else true() -> not(A) or B
-        final Expr e = new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
-        return cc.replaceWith(this, e);
+        final Expr ex = new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
+        return cc.replaceWith(this, ex);
       }
 
       // if(A) then false() else C -> not(A) and C
       if(b == Bln.FALSE) {
-        final Expr e = new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
-        return cc.replaceWith(this, e);
+        final Expr ex = new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
+        return cc.replaceWith(this, ex);
       }
 
       // if(A) then B else false() -> A and B

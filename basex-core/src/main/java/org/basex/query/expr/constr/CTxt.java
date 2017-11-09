@@ -33,9 +33,9 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    final Expr e = exprs[0];
-    if(e == Empty.SEQ) return cc.emptySeq(this);
-    if(e.seqType().oneOrMore()) seqType = SeqType.TXT;
+    final Expr ex = exprs[0];
+    if(ex == Empty.SEQ) return cc.emptySeq(this);
+    if(ex.seqType().oneOrMore()) seqType = SeqType.TXT;
     return this;
   }
 

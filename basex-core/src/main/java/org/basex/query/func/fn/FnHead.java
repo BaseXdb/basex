@@ -17,15 +17,15 @@ import org.basex.util.*;
 public final class FnHead extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr e = exprs[0];
-    return e.seqType().zeroOrOne() ? e.item(qc, info) : qc.iter(e).next();
+    final Expr ex = exprs[0];
+    return ex.seqType().zeroOrOne() ? ex.item(qc, info) : qc.iter(ex).next();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr e = exprs[0];
-    final SeqType st = e.seqType();
-    if(st.zeroOrOne()) return e;
+    final Expr ex = exprs[0];
+    final SeqType st = ex.seqType();
+    if(st.zeroOrOne()) return ex;
     seqType = st.withOcc(Occ.ZERO_ONE);
     return this;
   }
