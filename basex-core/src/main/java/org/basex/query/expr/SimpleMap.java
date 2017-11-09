@@ -70,10 +70,7 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate map with statically known values
-    if(allAreValues()) return cc.preEval(this);
-
+  public Expr optimize(final CompileContext cc) throws QueryException {
     // rewrite path with empty steps
     for(final Expr expr : exprs) {
       if(expr == Empty.SEQ) return cc.emptySeq(this);
@@ -111,8 +108,9 @@ public abstract class SimpleMap extends Arr {
     }
     seqType(exprs[exprs.length - 1], new long[] { min, max });
 
-    // single items: use item mapper
-    return item ? copyType(new ItemMap(info, exprs)) : this;
+    // single items: use item mapper; only values: pre-evaluate
+    return item ? copyType(new ItemMap(info, exprs)).optimize(cc) : allAreValues() ?
+      cc.preEval(this) : this;
   }
 
   @Override
