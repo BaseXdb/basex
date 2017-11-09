@@ -23,16 +23,16 @@ public final class RandomSeededPermutation extends StandardFunc {
     final Random r = new Random(seed);
 
     final Iter iter = qc.iter(exprs[1]);
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
       final int ls = list.size();
       final int l = r.nextInt(ls + 1);
       if(l < ls) {
-        final Item it = list.get(l);
-        list.set(l, item);
-        item = it;
+        final Item it2 = list.get(l);
+        list.set(l, it);
+        it = it2;
       }
-      list.add(item);
+      list.add(it);
     }
     return list.value();
   }

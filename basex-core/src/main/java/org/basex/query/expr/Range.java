@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -36,10 +37,11 @@ public final class Range extends Arr {
     if(allAreValues()) return cc.preEval(this);
 
     final Expr e1 = exprs[0], e2 = exprs[1];
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
     if(e1.equals(e2)) {
-      if(e1.seqType().instanceOf(SeqType.ITR) && e2.seqType().instanceOf(SeqType.ITR))
+      if(st1.instanceOf(SeqType.ITR) && st2.instanceOf(SeqType.ITR))
         return cc.replaceWith(this, e1);
-      seqType = SeqType.ITR;
+      seqType = seqType.withOcc(Occ.ONE);
     }
     return this;
   }

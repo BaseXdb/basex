@@ -26,8 +26,8 @@ public final class FnForEachPair extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         do {
-          final Item item = iter.next();
-          if(item != null) return item;
+          final Item it = iter.next();
+          if(it != null) return it;
           final Item it1 = ir1.next(), it2 = ir2.next();
           if(it1 == null || it2 == null) return null;
           iter = fun.invokeValue(qc, info, it1, it2).iter();

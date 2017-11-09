@@ -29,7 +29,7 @@ public abstract class ParseExpr extends Expr {
   /** Input information. */
   public InputInfo info;
   /** Expression type. */
-  public SeqType seqType;
+  public  SeqType seqType;
   /** Cardinality of result; {@code -1} if unknown
    * ({@link #seqType} will then be requested to estimate result size). */
   protected long size = -1;
@@ -90,12 +90,23 @@ public abstract class ParseExpr extends Expr {
    * Copies this expression's return type and size to the given expression.
    * @param <T> expression type
    * @param ex expression
-   * @return the expression for convenience
+   * @return specified expression
    */
   protected final <T extends ParseExpr> T copyType(final T ex) {
     ex.seqType = seqType;
     ex.size = size;
     return ex;
+  }
+
+  /**
+   * Adopt the return type and size from the specified expression to this expression.
+   * @param ex expression
+   * @return self reference
+   */
+  public final ParseExpr adoptType(final Expr ex) {
+    seqType = ex.seqType();
+    size = ex.size();
+    return this;
   }
 
   @Override

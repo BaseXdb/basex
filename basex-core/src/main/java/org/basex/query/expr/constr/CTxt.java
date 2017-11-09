@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -21,7 +22,7 @@ import org.basex.util.hash.*;
  */
 public final class CTxt extends CNode {
   /** Item evaluation flag. */
-  private boolean item;
+  private boolean simple;
 
   /**
    * Constructor.
@@ -38,9 +39,9 @@ public final class CTxt extends CNode {
     final Expr ex = exprs[0];
     if(ex == Empty.SEQ) return cc.emptySeq(this);
     final SeqType st = ex.seqType();
-    final boolean atomic = !st.mayBeArray();
-    if(st.oneOrMore() && atomic) seqType = SeqType.TXT;
-    item = st.zeroOrOne() && atomic;
+    final boolean atom = !st.mayBeArray();
+    if(st.oneOrMore() && atom) seqType = seqType.withOcc(Occ.ONE);
+    simple = st.zeroOrOne() && atom;
     return this;
   }
 
@@ -48,7 +49,7 @@ public final class CTxt extends CNode {
   public FTxt item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr ex = exprs[0];
-    if(item) {
+    if(simple) {
       final Item it = ex.item(qc, ii);
       return new FTxt(it == null ? Token.EMPTY : it.string(info));
     }

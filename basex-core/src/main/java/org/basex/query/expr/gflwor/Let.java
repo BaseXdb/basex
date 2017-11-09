@@ -43,7 +43,7 @@ public final class Let extends ForLet {
    */
   static Let fromFor(final For fr) {
     final Let lt = new Let(fr.var, fr.expr, false);
-    lt.seqType = fr.expr.seqType();
+    lt.adoptType(fr.expr);
     return lt;
   }
 
@@ -99,8 +99,7 @@ public final class Let extends ForLet {
       seqType = SeqType.DBL;
       size = 1;
     } else {
-      seqType = expr.seqType();
-      size = expr.size();
+      adoptType(expr);
       var.data = expr.data();
     }
     var.refineType(seqType, cc);

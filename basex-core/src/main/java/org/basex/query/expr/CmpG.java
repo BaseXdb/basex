@@ -164,9 +164,6 @@ public class CmpG extends Cmp {
     if(ex == this) ex = CmpSR.get(this);
     if(ex != this) return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
 
-    // pre-evaluate values
-    if(allAreValues()) return cc.preEval(this);
-
     if(op == OpG.EQ) {
       /* pre-evaluate equality test if:
        * - equality operator is specified,
@@ -188,17 +185,18 @@ public class CmpG extends Cmp {
 
       // use hash
       if(coll == null && e2.isValue() && e2.size() > 1 &&
-          (st1.atomic() && t1.eq(t2) || t1.isStringOrUntyped() && t2.isStringOrUntyped())) {
+          (t1.isNumber() && t2.isNumber() || t1.isStringOrUntyped() && t2.isStringOrUntyped())) {
         return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
       }
     }
 
     // choose evaluation strategy
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
-      return cc.replaceWith(this, new CmpAtomicG(e1, e2, op, coll, sc, info).optimize(cc));
+      return cc.replaceWith(this, new CmpSimpleG(e1, e2, op, coll, sc, info).optimize(cc));
     }
 
-    return this;
+    // pre-evaluate values
+    return allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override

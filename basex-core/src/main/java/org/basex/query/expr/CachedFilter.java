@@ -46,12 +46,12 @@ public class CachedFilter extends Filter {
 
       final boolean scoring = qc.scoring;
       for(int s = 0; s < vs; s++) {
-        final Item item = val.itemAt(s);
-        focus.value = item;
+        final Item it = val.itemAt(s);
+        focus.value = it;
         final Item test = pred.test(qc, info);
         if(test != null) {
-          if(scoring) item.score(test.score());
-          buffer.add(item);
+          if(scoring) it.score(test.score());
+          buffer.add(it);
         }
         focus.pos++;
       }
@@ -67,12 +67,12 @@ public class CachedFilter extends Filter {
         focus.pos = 1;
         int c = 0;
         for(int s = 0; s < vs; ++s) {
-          final Item item = buffer.get(s);
-          focus.value = item;
+          final Item it = buffer.get(s);
+          focus.value = it;
           final Item test = pred.test(qc, info);
           if(test != null) {
-            if(scoring) item.score(test.score());
-            buffer.set(c++, item);
+            if(scoring) it.score(test.score());
+            buffer.set(c++, it);
           }
           focus.pos++;
         }

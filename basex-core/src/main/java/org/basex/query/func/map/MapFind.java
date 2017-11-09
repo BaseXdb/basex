@@ -45,8 +45,8 @@ public final class MapFind extends StandardFunc {
         final Map map = (Map) it;
         final Value value = map.get(key, info);
         if(value != Empty.SEQ) builder.append(value);
-        for(final Item item : map.keys()) {
-          find(map.get(item, info).iter(), key, builder, qc);
+        for(final Item it2 : map.keys()) {
+          find(map.get(it2, info).iter(), key, builder, qc);
         }
       } else if(it instanceof Array) {
         for(final Value value : ((Array) it).members()) {

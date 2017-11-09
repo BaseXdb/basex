@@ -20,8 +20,6 @@ import org.basex.util.hash.*;
 public final class Arith extends Arr {
   /** Calculation operator. */
   private final Calc calc;
-  /** Item evaluation flag. */
-  private boolean item;
 
   /**
    * Constructor.
@@ -42,18 +40,15 @@ public final class Arith extends Arr {
     seqType = SeqType.get(
       t1.isNumberOrUntyped() && t2.isNumberOrUntyped() ? Calc.type(t1, t2) : AtomType.AAT,
       st1.oneNoArray() && st2.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
-    item = st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray();
-
     return oneIsEmpty() ? cc.emptySeq(this) : allAreValues() ? cc.preEval(this) : this;
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = item ? exprs[0].item(qc, info) : exprs[0].atomItem(qc, info);
+    final Item it1 = exprs[0].atomItem(qc, info);
     if(it1 == null) return null;
-    final Item it2 = item ? exprs[1].item(qc, info) : exprs[1].atomItem(qc, info);
-    if(it2 == null) return null;
-    return calc.ev(it1, it2, info);
+    final Item it2 = exprs[1].atomItem(qc, info);
+    return it2 == null ? null : calc.ev(it1, it2, info);
   }
 
   @Override

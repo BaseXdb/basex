@@ -93,7 +93,7 @@ abstract class Set extends Arr {
     /** Iterator. */
     final Iter[] iter;
     /** Items. */
-    ANode[] item;
+    ANode[] nodes;
 
     /**
      * Constructor.
@@ -111,7 +111,7 @@ abstract class Set extends Arr {
      */
     final boolean next(final int i) throws QueryException {
       final ANode n = toEmptyNode(iter[i].next());
-      item[i] = n;
+      nodes[i] = n;
       return n != null;
     }
   }

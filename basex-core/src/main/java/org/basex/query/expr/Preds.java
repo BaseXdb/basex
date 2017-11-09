@@ -146,9 +146,9 @@ public abstract class Preds extends Arr {
         max = Math.min(max, 1);
       } else if(expr instanceof ItrPos) {
         final ItrPos pos = (ItrPos) expr;
-        // subtract start position. example: ...[1 to 2][2]  ->  (2 ->) 1
+        // subtract start position. example: ...[1 to 2][2] -> 2 -> 1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[1 to 5] - >  5
+        // use minimum of old value and range. example: ...[1 to 5] ->  5
         max = Math.min(max, pos.max - pos.min + 1);
       } else {
         // resulting size will be unknown for any other filter
@@ -168,16 +168,16 @@ public abstract class Preds extends Arr {
 
   /**
    * Checks if the predicates are successful for the specified item.
-   * @param item item to be checked
+   * @param it item to be checked
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item item, final QueryContext qc) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
     // set context value and position
     final QueryFocus qf = qc.focus;
     final Value cv = qf.value;
-    qf.value = item;
+    qf.value = it;
     try {
       double s = qc.scoring ? 0 : -1;
       for(final Expr expr : exprs) {
@@ -185,7 +185,7 @@ public abstract class Preds extends Arr {
         if(test == null) return false;
         if(s != -1) s += test.score();
       }
-      if(s > 0) item.score(Scoring.avg(s, exprs.length));
+      if(s > 0) it.score(Scoring.avg(s, exprs.length));
       return true;
     } finally {
       qf.value = cv;

@@ -318,7 +318,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType withOcc(final Occ oc) {
-    // return original type if occurrence is identical, or if occurrence will always be 0
+    // return original type if occurrence is identical, or if occurrence is 0 (empty sequence)
     return oc == occ || occ.max == 0 && oc.min == 0 ? this : get(type, oc, kind);
   }
 

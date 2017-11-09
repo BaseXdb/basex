@@ -42,7 +42,7 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public TypeswitchGroup compile(final CompileContext cc) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     try {
       super.compile(cc);
     } catch(final QueryException ex) {
@@ -53,9 +53,8 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public TypeswitchGroup optimize(final CompileContext cc) {
-    seqType = expr.seqType();
-    return this;
+  public Expr optimize(final CompileContext cc) {
+    return adoptType(expr);
   }
 
   /**

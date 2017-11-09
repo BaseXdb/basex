@@ -139,7 +139,7 @@ public final class IndexInfo {
           if(r != 0) {
             final ValueAccess va = new ValueAccess(info, it, type, test, db).trim(trim);
             tmp.add(va);
-            if(r == 1) va.seqType = va.seqType().withOcc(Occ.ZERO_ONE);
+            if(r == 1) va.seqType = va.seqType.withOcc(Occ.ZERO_ONE);
           }
           costs = IndexCosts.add(costs, c);
         }

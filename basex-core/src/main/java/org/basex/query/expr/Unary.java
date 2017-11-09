@@ -21,6 +21,8 @@ import org.basex.util.hash.*;
 public final class Unary extends Single {
   /** Minus flag. */
   private final boolean minus;
+  /** Simple evaluation flag. */
+  protected boolean simple;
 
   /**
    * Constructor.
@@ -44,6 +46,7 @@ public final class Unary extends Single {
     final Type t = st.type;
     seqType = SeqType.get(t.isUntyped() ? AtomType.DBL : t.isNumber() ? t : AtomType.ITR,
       st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
+    simple = st.zeroOrOne() && !st.mayBeArray();
 
     // no negation, numeric value: return operand
     return !minus && st.instanceOf(SeqType.NUM_ZO) ? cc.replaceWith(this, expr) :
@@ -52,7 +55,7 @@ public final class Unary extends Single {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = expr.atomItem(qc, info);
+    final Item it = simple ? expr.item(qc, info) : expr.atomItem(qc, info);
     if(it == null) return null;
 
     final Type ip = it.type;

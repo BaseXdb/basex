@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -74,10 +73,6 @@ public final class FnReverse extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zeroOrOne()) return ex;
-    seqType = st;
-    size = ex.size();
-    return this;
+    return ex.seqType().zeroOrOne() ? ex : adoptType(ex);
   }
 }

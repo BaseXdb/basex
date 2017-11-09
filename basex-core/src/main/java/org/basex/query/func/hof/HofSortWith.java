@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -39,10 +38,6 @@ public final class HofSortWith extends HofFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
-    seqType = st;
-    size = ex.size();
-    return this;
+    return ex.seqType().zero() ? ex : adoptType(ex);
   }
 }

@@ -27,10 +27,9 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public ContextValue optimize(final CompileContext cc) {
-    final QueryFocus focus = cc.qc.focus;
-    if(focus.value != null) seqType = focus.value.seqType();
-    return this;
+  public Expr optimize(final CompileContext cc) {
+    final Value v = cc.qc.focus.value;
+    return v == null ? this : adoptType(v);
   }
 
   @Override

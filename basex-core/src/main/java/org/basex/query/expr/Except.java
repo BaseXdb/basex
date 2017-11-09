@@ -81,17 +81,17 @@ public final class Except extends Set {
     return new SetIter(iters) {
       @Override
       public ANode next() throws QueryException {
-        if(item == null) {
+        if(nodes == null) {
           final int il = iter.length;
-          item = new ANode[il];
+          nodes = new ANode[il];
           for(int i = 0; i < il; i++) next(i);
         }
 
-        final int il = item.length;
+        final int il = nodes.length;
         for(int i = 1; i < il; i++) {
-          if(item[0] == null) return null;
-          if(item[i] == null) continue;
-          final int d = item[0].diff(item[i]);
+          if(nodes[0] == null) return null;
+          if(nodes[i] == null) continue;
+          final int d = nodes[0].diff(nodes[i]);
 
           if(d < 0 && i + 1 == il) break;
           if(d == 0) {
@@ -100,7 +100,7 @@ public final class Except extends Set {
           }
           if(d > 0) next(i--);
         }
-        final ANode temp = item[0];
+        final ANode temp = nodes[0];
         next(0);
         return temp;
       }

@@ -48,10 +48,7 @@ public final class FnOneOrMore extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
-    if(!st.mayBeEmpty()) return ex;
     if(st.zero()) throw ONEORMORE.get(info);
-    seqType = st;
-    size = ex.size();
-    return this;
+    return st.mayBeEmpty() ? adoptType(ex) : ex;
   }
 }

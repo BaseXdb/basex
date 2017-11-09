@@ -61,8 +61,7 @@ public final class Catch extends Single {
 
   @Override
   public Catch optimize(final CompileContext cc) {
-    seqType = expr.seqType();
-    return this;
+    return (Catch) adoptType(expr);
   }
 
   /**

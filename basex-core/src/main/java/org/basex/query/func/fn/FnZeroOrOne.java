@@ -31,7 +31,6 @@ public final class FnZeroOrOne extends StandardFunc {
     final SeqType st = ex.seqType();
     if(st.zeroOrOne()) return ex;
     if(st.occ.min > 1) throw ZEROORONE.get(info);
-    seqType = st;
-    return this;
+    return adoptType(ex);
   }
 }

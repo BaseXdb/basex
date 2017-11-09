@@ -46,8 +46,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    seqType = exprs[0].seqType();
-    return this;
+    return adoptType(exprs[0]);
   }
 
   @Override

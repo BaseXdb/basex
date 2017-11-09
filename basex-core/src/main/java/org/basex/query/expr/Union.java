@@ -74,17 +74,17 @@ public final class Union extends Set {
     return new SetIter(iters) {
       @Override
       public ANode next() throws QueryException {
-        if(item == null) {
+        if(nodes == null) {
           final int il = iter.length;
-          item = new ANode[il];
+          nodes = new ANode[il];
           for(int i = 0; i < il; i++) next(i);
         }
 
         int m = -1;
-        final int il = item.length;
+        final int il = nodes.length;
         for(int i = 0; i < il; i++) {
-          if(item[i] == null) continue;
-          final int d = m == -1 ? 1 : item[m].diff(item[i]);
+          if(nodes[i] == null) continue;
+          final int d = m == -1 ? 1 : nodes[m].diff(nodes[i]);
           if(d == 0) {
             next(i--);
           } else if(d > 0) {
@@ -93,7 +93,7 @@ public final class Union extends Set {
         }
         if(m == -1) return null;
 
-        final ANode it = item[m];
+        final ANode it = nodes[m];
         next(m);
         return it;
       }

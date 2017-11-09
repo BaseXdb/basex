@@ -20,7 +20,7 @@ public final class InspectFunctionAnnotations extends StandardFunc {
     Map map = Map.EMPTY;
     for(final Ann ann : toFunc(exprs[0], qc).annotations()) {
       final ValueBuilder vb = new ValueBuilder();
-      for(final Item item : ann.args()) vb.add(item);
+      for(final Item it : ann.args()) vb.add(it);
       map = map.put(ann.name(), vb.value(), info);
     }
     return map;

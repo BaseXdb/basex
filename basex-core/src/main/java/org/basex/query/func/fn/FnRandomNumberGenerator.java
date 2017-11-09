@@ -47,8 +47,8 @@ public final class FnRandomNumberGenerator extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs.length > 0 ? exprs[0].atomItem(qc, info) : null;
-    final long seed = item != null ? item.hash(info) : qc.initDateTime().nano;
+    final Item it = exprs.length > 0 ? exprs[0].atomItem(qc, info) : null;
+    final long seed = it != null ? it.hash(info) : qc.initDateTime().nano;
     return result(seed, qc);
   }
 

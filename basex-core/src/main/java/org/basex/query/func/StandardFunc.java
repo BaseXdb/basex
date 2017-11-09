@@ -300,30 +300,30 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Returns all keys and values of the specified binding argument.
-   * @param i index of argument
+   * @param e index of argument
    * @param qc query context
    * @return resulting map
    * @throws QueryException query exception
    */
-  protected final HashMap<String, Value> toBindings(final int i, final QueryContext qc)
+  protected final HashMap<String, Value> toBindings(final int e, final QueryContext qc)
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<>();
     final int es = exprs.length;
-    if(i < es) {
-      final Item item = exprs[i].item(qc, info);
-      final Map map = item == null ? Map.EMPTY : toMap(exprs[i], qc);
-      for(final Item it : map.keys()) {
+    if(e < es) {
+      final Item it = exprs[e].item(qc, info);
+      final Map map = it == null ? Map.EMPTY : toMap(exprs[e], qc);
+      for(final Item it2 : map.keys()) {
         final byte[] key;
-        if(it.type.isStringOrUntyped()) {
-          key = it.string(null);
+        if(it2.type.isStringOrUntyped()) {
+          key = it2.string(null);
         } else {
-          final QNm qnm = toQNm(it, false);
+          final QNm qnm = toQNm(it2, false);
           final TokenBuilder tb = new TokenBuilder();
           if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
           key = tb.add(qnm.local()).finish();
         }
-        hm.put(string(key), map.get(it, info));
+        hm.put(string(key), map.get(it2, info));
       }
     }
     return hm;

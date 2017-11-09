@@ -27,9 +27,6 @@ public final class StreamMaterialize extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    seqType = ex.seqType();
-    size = ex.size();
-    return this;
+    return adoptType(exprs[0]);
   }
 }

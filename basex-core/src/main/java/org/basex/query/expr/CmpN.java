@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -87,7 +88,8 @@ public final class CmpN extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    seqType = exprs[0].size() == 1 && exprs[1].size() == 1 ? SeqType.BLN : SeqType.BLN_ZO;
+    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    if(st1.one() && st2.one()) seqType = seqType.withOcc(Occ.ONE);
     return oneIsEmpty() ? cc.emptySeq(this) : allAreValues() ? cc.preEval(this) : this;
   }
 

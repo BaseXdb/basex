@@ -25,14 +25,14 @@ import org.basex.query.value.type.*;
  */
 public final class FnDistinctValues extends StandardFunc {
   /** Item evaluation flag. */
-  private boolean item;
+  protected boolean simple;
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
     final Expr ex = exprs[0];
     final Iter iter = ex.atomIter(qc, info);
-    if(item || ex instanceof RangeSeq || ex instanceof Range) return iter;
+    if(simple || ex instanceof RangeSeq || ex instanceof Range) return iter;
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     return new Iter() {
@@ -52,7 +52,7 @@ public final class FnDistinctValues extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
     final Expr ex = exprs[0];
-    if(item || ex instanceof RangeSeq || ex instanceof Range) return ex.atomValue(qc, info);
+    if(simple || ex instanceof RangeSeq || ex instanceof Range) return ex.atomValue(qc, info);
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     final Iter iter = ex.atomIter(qc, info);
@@ -70,7 +70,7 @@ public final class FnDistinctValues extends StandardFunc {
     final SeqType st = ex.seqType();
     if(!st.mayBeArray()) {
       seqType = st.type instanceof NodeType ? SeqType.get(AtomType.ATM, st.occ) : st;
-      item = st.zeroOrOne();
+      simple = st.zeroOrOne();
     }
     return exprs.length == 1 ? cmpDist(ex, cc) : this;
   }

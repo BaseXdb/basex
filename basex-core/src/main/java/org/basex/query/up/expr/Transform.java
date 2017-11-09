@@ -56,9 +56,8 @@ public final class Transform extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    for(final Let copy : copies) copy.seqType = copy.expr.seqType();
-    seqType = exprs[1].seqType();
-    return this;
+    for(final Let copy : copies) copy.adoptType(copy.expr);
+    return adoptType(exprs[1]);
   }
 
   @Override

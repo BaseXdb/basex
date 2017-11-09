@@ -34,9 +34,9 @@ abstract class UserFn extends StandardFunc {
     final StringList patterns = new StringList();
     if(exprs.length > i) {
       final Iter iter = qc.iter(exprs[i]);
-      for(Item item; (item = iter.next()) != null;) {
+      for(Item it; (it = iter.next()) != null;) {
         qc.checkStop();
-        final String pattern = Token.string(toToken(item));
+        final String pattern = Token.string(toToken(it));
         if(!pattern.isEmpty() && !Databases.validName(pattern, true))
           throw USER_PATTERN_X.get(info, pattern);
         patterns.add(pattern);
@@ -88,9 +88,9 @@ abstract class UserFn extends StandardFunc {
     final ArrayList<Perm> perms = new ArrayList<>();
     if(exprs.length > i) {
       final Iter iter = qc.iter(exprs[i]);
-      for(Item item; (item = iter.next()) != null;) {
+      for(Item it; (it = iter.next()) != null;) {
         qc.checkStop();
-        final String perm = Token.string(toToken(item));
+        final String perm = Token.string(toToken(it));
         final Perm p = Perm.get(perm);
         if(p == null) throw USER_PERMISSION_X.get(info, perm);
         perms.add(p);
