@@ -42,12 +42,11 @@ public final class FuncLit extends Single implements Scope {
   FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr,
       final SeqType seqType, final VarScope vs, final InputInfo info) {
 
-    super(info, expr);
+    super(info, expr, seqType);
     this.anns = anns;
     this.name = name;
     this.args = args;
     this.vs = vs;
-    this.seqType = seqType;
   }
 
   @Override

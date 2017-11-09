@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -30,7 +31,7 @@ public final class VarRef extends ParseExpr {
    * @param var variable
    */
   public VarRef(final InputInfo info, final Var var) {
-    super(info);
+    super(info, SeqType.ITEM_ZM);
     this.var = var;
   }
 

@@ -48,7 +48,7 @@ public abstract class Path extends ParseExpr {
    * @param steps steps
    */
   protected Path(final InputInfo info, final Expr root, final Expr[] steps) {
-    super(info);
+    super(info, SeqType.ITEM_ZM);
     this.root = root;
     this.steps = steps;
   }

@@ -66,11 +66,6 @@ public final class IndexDynDb extends IndexDb {
     final Expr sub = expr.inline(var, ex, cc);
     if(sub == null) return null;
     expr = sub;
-    return optimize(cc);
-  }
-
-  @Override
-  public IndexDb optimize(final CompileContext cc) {
     return this;
   }
 

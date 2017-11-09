@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -22,12 +23,12 @@ public abstract class CNode extends Arr {
    * Constructor.
    * @param sc static context
    * @param info input info
+   * @param seqType sequence type
    * @param exprs expressions
    */
-  CNode(final StaticContext sc, final InputInfo info, final Expr... exprs) {
-    super(info, exprs);
+  CNode(final StaticContext sc, final InputInfo info, final SeqType seqType, final Expr... exprs) {
+    super(info, seqType, exprs);
     this.sc = sc;
-    size = 1;
   }
 
   @Override

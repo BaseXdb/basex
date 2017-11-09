@@ -29,7 +29,7 @@ public final class Unary extends Single {
    * @param minus minus flag
    */
   public Unary(final InputInfo info, final Expr expr, final boolean minus) {
-    super(info, expr);
+    super(info, expr, SeqType.NUM_ZO);
     this.minus = minus;
   }
 
@@ -40,13 +40,14 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(expr.isValue()) return cc.preEval(this);
-
     final SeqType st = expr.seqType();
     final Type t = st.type;
     seqType = SeqType.get(t.isUntyped() ? AtomType.DBL : t.isNumber() ? t : AtomType.ITR,
       st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
-    return this;
+
+    // no negation, numeric value: return operand
+    return !minus && st.instanceOf(SeqType.NUM_ZO) ? cc.replaceWith(this, expr) :
+      expr.isValue() ? cc.preEval(this) : this;
   }
 
   @Override

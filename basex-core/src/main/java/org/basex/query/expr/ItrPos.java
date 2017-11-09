@@ -32,10 +32,9 @@ public final class ItrPos extends Simple {
    * @param info input info
    */
   private ItrPos(final long min, final long max, final InputInfo info) {
-    super(info);
+    super(info, SeqType.BLN);
     this.min = min;
     this.max = max;
-    seqType = SeqType.BLN;
   }
 
   /**

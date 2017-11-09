@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -20,7 +21,7 @@ public final class SwitchGroup extends Arr {
    * @param exprs return expression (placed first) and cases (default branch has 0 cases)
    */
   public SwitchGroup(final InputInfo info, final Expr... exprs) {
-    super(info, exprs);
+    super(info, SeqType.ITEM_ZM, exprs);
   }
 
   @Override

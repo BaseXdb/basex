@@ -32,10 +32,9 @@ public final class Castable extends Single {
    */
   public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType type) {
-    super(info, expr);
+    super(info, expr, SeqType.BLN);
     this.sc = sc;
     this.type = type;
-    seqType = SeqType.BLN;
   }
 
   @Override

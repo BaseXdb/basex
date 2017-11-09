@@ -13,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -33,7 +34,7 @@ public abstract class Filter extends Preds {
    * @param exprs predicates
    */
   protected Filter(final InputInfo info, final Expr root, final Expr... exprs) {
-    super(info, exprs);
+    super(info, SeqType.ITEM_ZM, exprs);
     this.root = root;
   }
 

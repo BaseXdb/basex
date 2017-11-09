@@ -7,6 +7,7 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -27,11 +28,12 @@ public abstract class Cmp extends Arr {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param coll collation (can be {@code null})
+   * @param seqType sequence type
    * @param sc static context
    */
   Cmp(final InputInfo info, final Expr expr1, final Expr expr2, final Collation coll,
-      final StaticContext sc) {
-    super(info, expr1, expr2);
+      final SeqType seqType, final StaticContext sc) {
+    super(info, seqType, expr1, expr2);
     this.coll = coll;
     this.sc = sc;
   }

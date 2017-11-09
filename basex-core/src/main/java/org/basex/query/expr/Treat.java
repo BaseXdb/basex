@@ -28,8 +28,7 @@ public final class Treat extends Single {
    * @param seqType sequence type
    */
   public Treat(final InputInfo info, final Expr expr, final SeqType seqType) {
-    super(info, expr);
-    this.seqType = seqType;
+    super(info, expr, seqType);
   }
 
   @Override

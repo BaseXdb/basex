@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -34,7 +35,7 @@ final class StaticVarRef extends ParseExpr {
    * @param sc static context
    */
   StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
-    super(info);
+    super(info, SeqType.ITEM_ZM);
     this.name = name;
     this.sc = sc;
   }
@@ -46,6 +47,11 @@ final class StaticVarRef extends ParseExpr {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     var.comp(cc);
+    return optimize(cc);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
     seqType = var.seqType();
     return var.val != null ? var.val : this;
   }

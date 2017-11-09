@@ -650,6 +650,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
+    // check if type is number, or a general atomic type that might result in a number
     return type.isNumber() || AtomType.AAT.instanceOf(type);
   }
 
@@ -658,8 +659,16 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeArray() {
-    return !(type.instanceOf(AtomType.AAT) || type instanceof ListType || type instanceof MapType ||
+    return !(atomic() || type instanceof ListType || type instanceof MapType ||
         type instanceof NodeType);
+  }
+
+  /**
+   * Tests if the type is atomic.
+   * @return result of check
+   */
+  public boolean atomic() {
+    return type.instanceOf(AtomType.AAT);
   }
 
   /**

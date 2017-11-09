@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -24,7 +25,7 @@ public abstract class FuncCall extends Arr {
    * @param exprs sub-expressions
    */
   FuncCall(final InputInfo info, final Expr[] exprs) {
-    super(info, exprs);
+    super(info, SeqType.ITEM_ZM, exprs);
   }
 
   /**

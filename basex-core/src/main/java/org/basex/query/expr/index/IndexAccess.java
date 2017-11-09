@@ -26,10 +26,9 @@ public abstract class IndexAccess extends Simple {
    * @param type type index type
    */
   IndexAccess(final IndexDb db, final InputInfo info, final IndexType type) {
-    super(info);
+    super(info, type == IndexType.TEXT || type == IndexType.FULLTEXT ? SeqType.TXT_ZM :
+      SeqType.ATT_ZM);
     this.db = db;
-    seqType = type == IndexType.TEXT || type == IndexType.FULLTEXT ? SeqType.TXT_ZM :
-      SeqType.ATT_ZM;
   }
 
   /**

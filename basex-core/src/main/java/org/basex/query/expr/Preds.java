@@ -30,10 +30,11 @@ public abstract class Preds extends Arr {
   /**
    * Constructor.
    * @param info input info
+   * @param seqType sequence type
    * @param exprs predicates
    */
-  protected Preds(final InputInfo info, final Expr... exprs) {
-    super(info, exprs);
+  protected Preds(final InputInfo info, final SeqType seqType, final Expr... exprs) {
+    super(info, seqType, exprs);
   }
 
   @Override

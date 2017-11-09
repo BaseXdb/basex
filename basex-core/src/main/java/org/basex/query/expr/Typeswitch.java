@@ -33,7 +33,7 @@ public final class Typeswitch extends ParseExpr {
    * @param groups case expressions
    */
   public Typeswitch(final InputInfo info, final Expr cond, final TypeswitchGroup[] groups) {
-    super(info);
+    super(info, SeqType.ITEM_ZM);
     this.cond = cond;
     this.groups = groups;
   }
@@ -85,8 +85,9 @@ public final class Typeswitch extends ParseExpr {
     if(eq) return cc.replaceWith(this, tg.expr);
 
     // combine types of return expressions
-    seqType = groups[0].seqType();
-    for(int g = 1; g < gl; g++) seqType = seqType.union(groups[g].seqType());
+    SeqType st = groups[0].seqType();
+    for(int g = 1; g < gl; g++) st = st.union(groups[g].seqType());
+    seqType = st;
     return this;
   }
 

@@ -49,7 +49,7 @@ public abstract class StandardFunc extends Arr {
    * Constructor.
    */
   protected StandardFunc() {
-    super(null);
+    super(null, SeqType.ITEM_ZM);
   }
 
   /**

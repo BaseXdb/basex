@@ -54,13 +54,12 @@ final class CmpSR extends Single {
   private CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
       final boolean mxi, final Collation coll, final InputInfo info) {
 
-    super(info, expr);
+    super(info, expr, SeqType.BLN);
     this.coll = coll;
     this.min = min;
     this.mni = mni;
     this.max = max;
     this.mxi = mxi;
-    seqType = SeqType.BLN;
     final SeqType st = expr.seqType();
     atomic = st.zeroOrOne() && !st.mayBeArray();
   }

@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -27,7 +28,7 @@ public final class Try extends Single {
    * @param catches catch expressions
    */
   public Try(final InputInfo info, final Expr expr, final Catch[] catches) {
-    super(info, expr);
+    super(info, expr, SeqType.ITEM_ZM);
     this.catches = catches;
   }
 
@@ -61,10 +62,11 @@ public final class Try extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(expr.isValue()) return cc.replaceWith(this, expr);
 
-    seqType = expr.seqType();
+    SeqType st = expr.seqType();
     for(final Catch c : catches) {
-      if(!c.expr.isFunction(Function.ERROR)) seqType = seqType.union(c.seqType());
+      if(!c.expr.isFunction(Function.ERROR)) st = st.union(c.seqType());
     }
+    seqType = st;
     return this;
   }
 

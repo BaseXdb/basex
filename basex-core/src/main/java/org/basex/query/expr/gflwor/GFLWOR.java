@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -36,7 +37,7 @@ public final class GFLWOR extends ParseExpr {
    * @param ret return expression
    */
   public GFLWOR(final InputInfo info, final LinkedList<Clause> clauses, final Expr ret) {
-    super(info);
+    super(info, SeqType.ITEM_ZM);
     this.clauses = clauses;
     this.ret = ret;
   }
@@ -854,7 +855,7 @@ public final class GFLWOR extends ParseExpr {
      * @param vars declared variables
      */
     Clause(final InputInfo info, final Var... vars) {
-      super(info);
+      super(info, SeqType.ITEM_ZM);
       this.vars = vars;
     }
 

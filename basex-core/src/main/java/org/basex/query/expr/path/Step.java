@@ -71,10 +71,9 @@ public abstract class Step extends Preds {
    * @param exprs predicates
    */
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... exprs) {
-    super(info, exprs);
+    super(info, SeqType.get(test.type, Occ.ZERO_MORE), exprs);
     this.axis = axis;
     this.test = test;
-    seqType = SeqType.get(test.type, Occ.ZERO_MORE);
   }
 
   @Override

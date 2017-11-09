@@ -122,9 +122,8 @@ public class CmpG extends Cmp {
    */
   public CmpG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
       final StaticContext sc, final InputInfo info) {
-    super(info, expr1, expr2, coll, sc);
+    super(info, expr1, expr2, coll, SeqType.BLN, sc);
     this.op = op;
-    seqType = SeqType.BLN;
   }
 
   @Override
@@ -189,8 +188,7 @@ public class CmpG extends Cmp {
 
       // use hash
       if(coll == null && e2.isValue() && e2.size() > 1 &&
-          (t1.instanceOf(AtomType.AAT) && t1.eq(t2) ||
-           t1.isStringOrUntyped() && t2.isStringOrUntyped())) {
+          (st1.atomic() && t1.eq(t2) || t1.isStringOrUntyped() && t2.isStringOrUntyped())) {
         return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
       }
     }

@@ -28,8 +28,7 @@ public final class CPI extends CName {
    * @param value value
    */
   public CPI(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
-    super(PI, sc, info, name, value);
-    seqType = SeqType.PI;
+    super(PI, sc, info, SeqType.PI, name, value);
   }
 
   @Override

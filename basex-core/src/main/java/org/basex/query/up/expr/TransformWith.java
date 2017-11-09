@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -28,7 +29,7 @@ public final class TransformWith extends Arr {
    * @param modify modify expression
    */
   public TransformWith(final InputInfo info, final Expr source, final Expr modify) {
-    super(info, source, modify);
+    super(info, SeqType.NOD_ZM, source, modify);
   }
 
   @Override

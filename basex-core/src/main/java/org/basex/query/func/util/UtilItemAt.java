@@ -16,9 +16,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class UtilItemAt extends StandardFunc {
-  /** Item evaluation flag. */
-  private boolean item;
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final double dp = toDouble(exprs[1], qc);
@@ -27,7 +24,7 @@ public final class UtilItemAt extends StandardFunc {
 
     // if possible, retrieve single item
     final Expr ex = exprs[0];
-    if(item) return ps == 1 ? ex.item(qc, info) : null;
+    if(ex.seqType().zeroOrOne()) return ps == 1 ? ex.item(qc, info) : null;
 
     // fast route if the size is known
     final Iter iter = qc.iter(ex);
@@ -50,7 +47,6 @@ public final class UtilItemAt extends StandardFunc {
     if(st.zero()) return ex;
 
     seqType = st.withOcc(Occ.ZERO_ONE);
-    item = st.zeroOrOne();
 
     if(pos.isValue()) {
       final double dp = toDouble(pos, cc.qc);
@@ -58,7 +54,7 @@ public final class UtilItemAt extends StandardFunc {
       // reject invalid positions
       if(dp != ps || ps < 1) return null;
       // pre-evaluate single expression with static position
-      if(item) return ps == 1 ? ex : null;
+      if(st.zeroOrOne()) return ps == 1 ? ex : null;
     }
     return this;
   }

@@ -7,6 +7,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -24,7 +25,7 @@ public abstract class SimpleMap extends Arr {
    * @param exprs expressions
    */
   SimpleMap(final InputInfo info, final Expr... exprs) {
-    super(info, exprs);
+    super(info, SeqType.ITEM_ZM, exprs);
   }
 
   /**

@@ -16,14 +16,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnCount extends StandardFunc {
-  /** Item evaluation flag. */
-  private boolean item;
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr ex = exprs[0];
-    if(item) return ex.item(qc, info) == null ? Int.ZERO : Int.ONE;
+    if(ex.seqType().zeroOrOne()) return ex.item(qc, info) == null ? Int.ZERO : Int.ONE;
 
     // iterative access: if the iterator size is unknown, iterate through all results
     final Iter iter = qc.iter(ex);
@@ -49,7 +46,6 @@ public final class FnCount extends StandardFunc {
     // rewrite count(map:keys(...)) to map:size(...)
     if(ex instanceof MapKeys) return cc.function(Function._MAP_SIZE, info, ((MapKeys) ex).exprs);
 
-    item = ex.seqType().zeroOrOne();
     return this;
   }
 }

@@ -27,8 +27,7 @@ public final class Range extends Arr {
    * @param expr2 second expression
    */
   public Range(final InputInfo info, final Expr expr1, final Expr expr2) {
-    super(info, expr1, expr2);
-    seqType = SeqType.ITR_ZM;
+    super(info, SeqType.ITR_ZM, expr1, expr2);
   }
 
   @Override

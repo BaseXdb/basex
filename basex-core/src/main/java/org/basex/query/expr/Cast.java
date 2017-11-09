@@ -33,9 +33,8 @@ public final class Cast extends Single {
    */
   public Cast(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType seqType) {
-    super(info, expr);
+    super(info, expr, seqType);
     this.sc = sc;
-    this.seqType = seqType;
   }
 
   @Override

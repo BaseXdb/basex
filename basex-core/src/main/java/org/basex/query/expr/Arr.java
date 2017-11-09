@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -23,10 +24,11 @@ public abstract class Arr extends ParseExpr {
   /**
    * Constructor.
    * @param info input info
+   * @param seqType sequence type
    * @param exprs expressions
    */
-  protected Arr(final InputInfo info, final Expr... exprs) {
-    super(info);
+  protected Arr(final InputInfo info, final SeqType seqType, final Expr... exprs) {
+    super(info, seqType);
     this.exprs = exprs;
   }
 

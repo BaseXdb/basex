@@ -81,7 +81,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   Closure(final InputInfo info, final QNm name, final SeqType valueType, final Var[] params,
       final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    super(info, expr);
+    super(info, expr, SeqType.ITEM_ZM);
     this.name = name;
     this.params = params;
     this.valueType = valueType;
@@ -154,7 +154,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final SeqType st = expr.seqType();
     final SeqType vt = valueType == null || st.instanceOf(valueType) ? st : valueType;
     seqType = FuncType.get(anns, vt, params).seqType();
-    size = 1;
 
     cc.pushScope(vs);
     try {

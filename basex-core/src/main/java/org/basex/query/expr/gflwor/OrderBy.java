@@ -8,13 +8,13 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.expr.gflwor.GFLWOR.Eval;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -259,7 +259,7 @@ public final class OrderBy extends Clause {
      */
     public Key(final InputInfo info, final Expr key, final boolean desc, final boolean least,
         final Collation coll) {
-      super(info, key);
+      super(info, key, SeqType.ITEM_ZM);
       this.desc = desc;
       this.least = least;
       this.coll = coll;

@@ -4,6 +4,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -24,7 +25,7 @@ public abstract class IndexDb extends ParseExpr {
    * @param iterable iterable flag
    */
   IndexDb(final InputInfo info, final boolean iterable) {
-    super(info);
+    super(info, SeqType.ITEM_ZM);
     this.iterable = iterable;
   }
 

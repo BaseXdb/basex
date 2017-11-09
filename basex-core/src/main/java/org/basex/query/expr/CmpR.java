@@ -52,12 +52,11 @@ public final class CmpR extends Single {
   private CmpR(final Expr expr, final double min, final boolean mni, final double max,
       final boolean mxi, final InputInfo info) {
 
-    super(info, expr);
+    super(info, expr, SeqType.BLN);
     this.min = min;
     this.mni = mni;
     this.max = max;
     this.mxi = mxi;
-    seqType = SeqType.BLN;
     final SeqType st = expr.seqType();
     atomic = st.zeroOrOne() && !st.mayBeArray();
   }

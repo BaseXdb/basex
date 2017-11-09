@@ -51,7 +51,7 @@ public abstract class JavaFunction extends Arr {
    * @param perm required permission to run the function
    */
   JavaFunction(final StaticContext sc, final InputInfo info, final Expr[] args, final Perm perm) {
-    super(info, args);
+    super(info, SeqType.ITEM_ZM, args);
     this.sc = sc;
     this.perm = perm;
   }

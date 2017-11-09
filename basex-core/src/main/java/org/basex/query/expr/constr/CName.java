@@ -29,12 +29,13 @@ abstract class CName extends CNode {
    * @param desc description
    * @param sc static context
    * @param info input info
+   * @param seqType sequence type
    * @param name name
    * @param cont contents
    */
-  CName(final String desc, final StaticContext sc, final InputInfo info, final Expr name,
-      final Expr... cont) {
-    super(sc, info, cont);
+  CName(final String desc, final StaticContext sc, final InputInfo info, final SeqType seqType,
+      final Expr name, final Expr... cont) {
+    super(sc, info, seqType, cont);
     this.name = name;
     this.desc = desc;
   }

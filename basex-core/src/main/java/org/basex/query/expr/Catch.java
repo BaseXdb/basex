@@ -44,7 +44,7 @@ public final class Catch extends Single {
    * @param vars variables to be bound
    */
   public Catch(final InputInfo info, final NameTest[] codes, final Var[] vars) {
-    super(info, null);
+    super(info, null, SeqType.ITEM_ZM);
     this.vars = vars;
     this.codes = codes;
   }

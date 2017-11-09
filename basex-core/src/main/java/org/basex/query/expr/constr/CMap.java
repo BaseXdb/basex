@@ -26,8 +26,7 @@ public final class CMap extends Arr {
    * @param expr key and value expression, interleaved
    */
   public CMap(final InputInfo info, final Expr[] expr) {
-    super(info, expr);
-    seqType = SeqType.MAP_O;
+    super(info, SeqType.MAP_O, expr);
   }
 
   @Override

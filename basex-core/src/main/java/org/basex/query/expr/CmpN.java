@@ -81,9 +81,8 @@ public final class CmpN extends Cmp {
    * @param info input info
    */
   public CmpN(final Expr expr1, final Expr expr2, final OpN op, final InputInfo info) {
-    super(info, expr1, expr2, null, null);
+    super(info, expr1, expr2, null, SeqType.BLN_ZO, null);
     this.op = op;
-    seqType = SeqType.BLN_ZO;
   }
 
   @Override

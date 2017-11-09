@@ -25,8 +25,7 @@ abstract class Logical extends Arr {
    * @param exprs expressions
    */
   Logical(final InputInfo info, final Expr[] exprs) {
-    super(info, exprs);
-    seqType = SeqType.BLN;
+    super(info, SeqType.BLN, exprs);
   }
 
   @Override

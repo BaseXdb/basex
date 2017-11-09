@@ -33,7 +33,7 @@ public final class Lookup extends Arr {
    * @param expr key specifier and (for postfix lookups) context expression
    */
   public Lookup(final InputInfo info, final Expr... expr) {
-    super(info, expr);
+    super(info, SeqType.ITEM_ZM, expr);
   }
 
   @Override
@@ -49,12 +49,12 @@ public final class Lookup extends Arr {
     if(!map && !array) return this;
 
     final boolean oneInput = expr.size() == 1;
-    SeqType vt = ((FuncType) tp).valueType;
+    SeqType st = ((FuncType) tp).valueType;
     // map lookup may result in empty sequence
-    if(map) vt = vt.withOcc(vt.occ.union(Occ.ZERO));
+    if(map) st = st.withOcc(st.occ.union(Occ.ZERO));
     // wildcard or more than one input
-    if(keys == Str.WC || !oneInput) vt = vt.withOcc(vt.occ.union(Occ.ONE_MORE));
-    seqType = vt;
+    if(keys == Str.WC || !oneInput) st = st.withOcc(st.occ.union(Occ.ONE_MORE));
+    seqType = st;
 
     if(keys != Str.WC) {
       if(oneInput) {

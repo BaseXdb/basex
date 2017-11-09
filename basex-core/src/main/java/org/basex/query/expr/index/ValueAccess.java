@@ -35,8 +35,6 @@ public final class ValueAccess extends IndexAccess {
   private final NameTest test;
   /** Trim search terms. */
   private boolean trim;
-  /** Item evaluation flag. */
-  private boolean item;
 
   /**
    * Constructor.
@@ -52,7 +50,6 @@ public final class ValueAccess extends IndexAccess {
     this.expr = expr;
     this.type = type;
     this.test = test;
-    item = expr.seqType().zeroOrOne();
   }
 
   /**
@@ -68,7 +65,7 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = db.data(qc, type);
-    if(item) return iter(expr.item(qc, info), data);
+    if(expr.seqType().zeroOrOne()) return iter(expr.item(qc, info), data);
 
     final ArrayList<BasicNodeIter> iters = new ArrayList<>();
     final Iter iter = qc.iter(expr);

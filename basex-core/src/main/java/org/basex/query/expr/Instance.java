@@ -27,9 +27,8 @@ public final class Instance extends Single {
    * @param type sequence type to check for
    */
   public Instance(final InputInfo info, final Expr expr, final SeqType type) {
-    super(info, expr);
+    super(info, expr, SeqType.BLN);
     this.type = type;
-    seqType = SeqType.BLN;
   }
 
   @Override

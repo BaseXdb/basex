@@ -353,7 +353,7 @@ public final class GroupBy extends Clause {
      * @param coll collation (can be {@code null})
      */
     public Spec(final InputInfo info, final Var var, final Expr expr, final Collation coll) {
-      super(info, expr);
+      super(info, expr, SeqType.ITEM_ZM);
       this.var = var;
       this.coll = coll;
     }

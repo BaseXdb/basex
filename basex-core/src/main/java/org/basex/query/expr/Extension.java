@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -28,7 +29,7 @@ public final class Extension extends Single {
    * @param expr enclosed expression
    */
   public Extension(final InputInfo info, final Pragma pragma, final Expr expr) {
-    super(info, expr);
+    super(info, expr, SeqType.ITEM_ZM);
     this.pragma = pragma;
   }
 

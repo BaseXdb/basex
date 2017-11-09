@@ -15,27 +15,22 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnExists extends StandardFunc {
-  /** Item evaluation flag. */
-  private boolean item;
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr ex = exprs[0];
-    return Bln.get((item ? ex.item(qc, info) : qc.iter(ex).next()) != null);
+    return Bln.get((ex.seqType().zeroOrOne() ? ex.item(qc, info) : qc.iter(ex).next()) != null);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     // ignore non-deterministic expressions (e.g.: exists(error()))
     final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
     if(!ex.has(Flag.NDT, Flag.UPD)) {
       final long es = ex.size();
       if(es != -1) return Bln.get(es != 0);
-      if(st.oneOrMore()) return Bln.TRUE;
+      if(ex.seqType().oneOrMore()) return Bln.TRUE;
     }
-    item = st.zeroOrOne();
     return this;
   }
 

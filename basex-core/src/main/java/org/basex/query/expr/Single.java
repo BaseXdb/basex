@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -20,9 +21,10 @@ public abstract class Single extends ParseExpr {
    * Constructor.
    * @param info input info
    * @param expr expression
+   * @param seqType sequence type
    */
-  protected Single(final InputInfo info, final Expr expr) {
-    super(info);
+  protected Single(final InputInfo info, final Expr expr, final SeqType seqType) {
+    super(info, seqType);
     this.expr = expr;
   }
 

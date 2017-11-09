@@ -160,7 +160,7 @@ public final class CompileContext {
         // refine type. required mostly for {@link Filter} rewritings
         if(refine) {
           final ParseExpr re = (ParseExpr) res;
-          final SeqType et = expr.seqType(), rt  = re.seqType();
+          final SeqType et = expr.seqType(), rt = re.seqType();
           if(!et.eq(rt) && et.instanceOf(rt)) {
             final SeqType st = et.intersect(rt);
             if(st != null) re.seqType = st;

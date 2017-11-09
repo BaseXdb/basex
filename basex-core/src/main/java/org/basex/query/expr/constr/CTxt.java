@@ -30,8 +30,7 @@ public final class CTxt extends CNode {
    * @param text text
    */
   public CTxt(final StaticContext sc, final InputInfo info, final Expr text) {
-    super(sc, info, text);
-    seqType = SeqType.TXT_ZO;
+    super(sc, info, SeqType.TXT_ZO, text);
   }
 
   @Override
@@ -39,8 +38,9 @@ public final class CTxt extends CNode {
     final Expr ex = exprs[0];
     if(ex == Empty.SEQ) return cc.emptySeq(this);
     final SeqType st = ex.seqType();
-    if(st.oneOrMore()) seqType = SeqType.TXT;
-    if(st.zeroOrOne() && !st.mayBeArray()) item = true;
+    final boolean atomic = !st.mayBeArray();
+    if(st.oneOrMore() && atomic) seqType = SeqType.TXT;
+    item = st.zeroOrOne() && atomic;
     return this;
   }
 

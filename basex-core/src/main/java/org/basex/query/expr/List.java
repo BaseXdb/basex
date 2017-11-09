@@ -30,7 +30,7 @@ public final class List extends Arr {
    * @param exprs expressions
    */
   public List(final InputInfo info, final Expr... exprs) {
-    super(info, exprs);
+    super(info, SeqType.ITEM_ZM, exprs);
   }
 
   @Override

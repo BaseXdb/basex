@@ -38,9 +38,8 @@ public final class TypeCheck extends Single {
    */
   public TypeCheck(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType seqType, final boolean promote) {
-    super(info, expr);
+    super(info, expr, seqType);
     this.sc = sc;
-    this.seqType = seqType;
     this.promote = promote;
   }
 

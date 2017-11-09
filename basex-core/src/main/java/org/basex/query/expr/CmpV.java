@@ -161,9 +161,8 @@ public final class CmpV extends Cmp {
    */
   public CmpV(final Expr expr1, final Expr expr2, final OpV op, final Collation coll,
       final StaticContext sc, final InputInfo info) {
-    super(info, expr1, expr2, coll, sc);
+    super(info, expr1, expr2, coll, SeqType.BLN_ZO, sc);
     this.op = op;
-    seqType = SeqType.BLN_ZO;
   }
 
   @Override

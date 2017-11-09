@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -34,7 +35,7 @@ public final class Transform extends Arr {
    * @param ret return expression
    */
   public Transform(final InputInfo info, final Let[] copies, final Expr mod, final Expr ret) {
-    super(info, mod, ret);
+    super(info, SeqType.ITEM_ZM, mod, ret);
     this.copies = copies;
   }
 

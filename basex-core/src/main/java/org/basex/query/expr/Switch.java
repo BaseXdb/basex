@@ -11,6 +11,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -34,7 +35,7 @@ public final class Switch extends ParseExpr {
    * @param groups case groups (last one is default case)
    */
   public Switch(final InputInfo info, final Expr cond, final SwitchGroup[] groups) {
-    super(info);
+    super(info, SeqType.ITEM_ZM);
     this.cond = cond;
     this.groups = groups;
   }
@@ -64,9 +65,10 @@ public final class Switch extends ParseExpr {
     if(expr != this) return cc.replaceWith(this, expr);
 
     // combine types of return expressions
-    seqType = groups[0].exprs[0].seqType();
+    SeqType st = groups[0].exprs[0].seqType();
     final int gl = groups.length;
-    for(int g = 1; g < gl; g++) seqType = seqType.union(groups[g].exprs[0].seqType());
+    for(int g = 1; g < gl; g++) st = st.union(groups[g].exprs[0].seqType());
+    seqType = st;
     return this;
   }
 

@@ -17,15 +17,12 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnExactlyOne extends StandardFunc {
-  /** Item evaluation flag. */
-  private boolean item;
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr ex = exprs[0];
     Item it;
-    if(item) {
+    if(ex.seqType().zeroOrOne()) {
       it = ex.item(qc, info);
     } else {
       final Iter iter = qc.iter(ex);
@@ -43,7 +40,6 @@ public final class FnExactlyOne extends StandardFunc {
     if(st.one()) return ex;
     if(st.zero() || st.occ.min > 1) throw EXACTLYONE.get(info);
     seqType = st;
-    item = st.zeroOrOne();
     return this;
   }
 }

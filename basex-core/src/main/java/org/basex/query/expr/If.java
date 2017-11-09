@@ -32,7 +32,7 @@ public final class If extends Arr {
    * @param branch2 else branch
    */
   public If(final InputInfo info, final Expr cond, final Expr branch1, final Expr branch2) {
-    super(info, branch1, branch2);
+    super(info, SeqType.ITEM_ZM, branch1, branch2);
     this.cond = cond;
   }
 
@@ -77,7 +77,8 @@ public final class If extends Arr {
     }
 
     // rewritings for constant booleans
-    if(exprs[0].seqType().eq(SeqType.BLN) && exprs[1].seqType().eq(SeqType.BLN)) {
+    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    if(st1.eq(SeqType.BLN) && st2.eq(SeqType.BLN)) {
       final Expr a = cond, b = exprs[0], c = exprs[1];
       if(b == Bln.TRUE) {
         // if(A) then true() else false() -> xs:boolean(A)
@@ -104,7 +105,7 @@ public final class If extends Arr {
       if(c == Bln.FALSE) return cc.replaceWith(this, new And(info, a, b).optimize(cc));
     }
 
-    seqType = exprs[0].seqType().union(exprs[1].seqType());
+    seqType = st1.union(st2);
     return this;
   }
 

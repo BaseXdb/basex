@@ -48,9 +48,8 @@ public final class Quantifier extends Single {
    * @param every every flag
    */
   private Quantifier(final InputInfo info, final Expr tests, final boolean every) {
-    super(info, tests);
+    super(info, tests, SeqType.BLN);
     this.every = every;
-    seqType = SeqType.BLN;
   }
 
   @Override

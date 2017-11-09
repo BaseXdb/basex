@@ -28,7 +28,7 @@ import org.basex.util.*;
 public abstract class ParseExpr extends Expr {
   /** Input information. */
   public InputInfo info;
-  /** Static type. */
+  /** Expression type. */
   public SeqType seqType;
   /** Cardinality of result; {@code -1} if unknown
    * ({@link #seqType} will then be requested to estimate result size). */
@@ -37,9 +37,11 @@ public abstract class ParseExpr extends Expr {
   /**
    * Constructor.
    * @param info input info (can be {@code null}
+   * @param seqType sequence type
    */
-  protected ParseExpr(final InputInfo info) {
+  protected ParseExpr(final InputInfo info, final SeqType seqType) {
     this.info = info;
+    this.seqType = seqType;
   }
 
   @Override
@@ -124,14 +126,14 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final SeqType seqType() {
-    return seqType != null ? seqType : SeqType.ITEM_ZM;
+    return seqType;
   }
 
   @Override
   public final long size() {
     // return result size. if unknown, resort to occurrence indicator in sequence type
     final long s = size;
-    return s == -1 ? seqType().occ() : s;
+    return s == -1 ? seqType.occ() : s;
   }
 
   // OPTIMIZATIONS ================================================================================

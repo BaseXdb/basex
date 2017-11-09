@@ -11,6 +11,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -45,7 +46,7 @@ public final class Condition extends Single {
    */
   public Condition(final boolean start, final Var item, final Var pos, final Var prev,
       final Var next, final Expr cond, final InputInfo info) {
-    super(info, cond);
+    super(info, cond, SeqType.ITEM_ZM);
     this.start = start;
     this.item = item;
     this.pos = pos;

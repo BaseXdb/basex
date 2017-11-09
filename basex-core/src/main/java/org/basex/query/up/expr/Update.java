@@ -29,9 +29,8 @@ abstract class Update extends Arr {
    * @param expr expressions
    */
   Update(final StaticContext sc, final InputInfo info, final Expr... expr) {
-    super(info, expr);
+    super(info, SeqType.EMP, expr);
     this.sc = sc;
-    seqType = SeqType.EMP;
   }
 
   @Override

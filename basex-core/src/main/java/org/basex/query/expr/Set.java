@@ -9,6 +9,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -27,8 +28,7 @@ abstract class Set extends Arr {
    * @param exprs expressions
    */
   Set(final InputInfo info, final Expr[] exprs) {
-    super(info, exprs);
-    seqType = SeqType.NOD_ZM;
+    super(info, SeqType.NOD_ZM, exprs);
   }
 
   @Override
@@ -41,6 +41,14 @@ abstract class Set extends Arr {
       }
     }
     iterable = i;
+
+    Type t = null;
+    for(final Expr expr : exprs) {
+      final Type t2 = expr.seqType().type;
+      t = t == null ? t2 : t.union(t2);
+    }
+    if(t instanceof NodeType) seqType = SeqType.get(t, Occ.ZERO_MORE);
+
     return this;
   }
 

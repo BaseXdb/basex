@@ -39,10 +39,9 @@ public final class PartFunc extends Arr {
   public PartFunc(final StaticContext sc, final InputInfo info, final Expr expr, final Expr[] args,
       final int[] holes) {
 
-    super(info, ExprList.concat(args, expr));
+    super(info, SeqType.FUN_O, ExprList.concat(args, expr));
     this.sc = sc;
     this.holes = holes;
-    seqType = SeqType.FUN_O;
   }
 
   /**
