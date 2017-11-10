@@ -171,6 +171,11 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public String description() {
+    return type + " " + SEQUENCE;
+  }
+
+  @Override
   public final String toErrorString() {
     return toString(true);
   }

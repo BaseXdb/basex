@@ -75,6 +75,11 @@ public final class Range extends Arr {
   }
 
   @Override
+  public String description() {
+    return "range expression";
+  }
+
+  @Override
   public String toString() {
     return toString(' ' + TO + ' ');
   }

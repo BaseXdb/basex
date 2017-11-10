@@ -258,5 +258,6 @@ public final class PathTest extends AdvancedQueryTest {
     execute(new Add("a.xml", "<a/>"));
     execute(new Add("b.xml", "<b/>"));
     query(".[/a]", "<a/>");
+    query(".[/b]", "<b/>");
   }
 }

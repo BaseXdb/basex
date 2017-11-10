@@ -1,7 +1,6 @@
 package org.basex.query.value;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import java.io.*;
 import java.util.*;
@@ -156,11 +155,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public Value copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return this;
-  }
-
-  @Override
-  public String description() {
-    return type + " " + SEQUENCE;
   }
 
   /**

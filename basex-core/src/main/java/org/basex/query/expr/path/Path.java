@@ -126,7 +126,7 @@ public abstract class Path extends ParseExpr {
     if(steps.length == 0) return root == null ? new ContextValue(info) : root;
 
     final QueryFocus focus = cc.qc.focus;
-    final Value init = focus.value, cv = initial(cc);
+    final Value init = focus.value, cv = cc.contextValue(root);
     focus.value = cv;
     final boolean doc = cv != null && cv.type == NodeType.DOC;
     try {
@@ -156,7 +156,7 @@ public abstract class Path extends ParseExpr {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // simplify path with empty root expression or empty step
-    final Value rt = initial(cc);
+    final Value rt = cc.contextValue(root);
     if(rt != null && rt.isEmpty() || emptyPath(rt)) return cc.emptySeq(this);
 
     // merge descendant steps
@@ -262,7 +262,7 @@ public abstract class Path extends ParseExpr {
    * @return path nodes or {@code null} if nodes cannot be evaluated
    */
   public final ArrayList<PathNode> pathNodes(final CompileContext cc) {
-    final Value init = initial(cc);
+    final Value init = cc.contextValue(root);
     final Data data = init != null && init.type == NodeType.DOC ? init.data() : null;
     if(data == null || !data.meta.uptodate) return null;
 
@@ -359,21 +359,12 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns the initial context value of a path or {@code null}.
-   * @param cc compilation context (may be @code null)
-   * @return root
-   */
-  private Value initial(final CompileContext cc) {
-    return Preds.root(cc, root);
-  }
-
-  /**
    * Computes the number of results.
-   * @param cc compilation context (may be @code null)
+   * @param cc compilation context
    * @return number of results
    */
   private long size(final CompileContext cc) {
-    final Value rt = initial(cc);
+    final Value rt = cc.contextValue(root);
     // skip computation if value is not a document node
     if(rt == null || rt.type != NodeType.DOC) return -1;
     final Data data = rt.data();
@@ -855,13 +846,11 @@ public abstract class Path extends ParseExpr {
 
     // #1202: during inlining, expressions will be optimized, which are based on the context value
     boolean changed;
-    final QueryFocus focus = cc.qc.focus;
-    final Value init = focus.value;
-    focus.value = null;
+    cc.pushFocus(null);
     try {
       changed = inlineAll(steps, var, ex, cc);
     } finally {
-      focus.value = init;
+      cc.popFocus();
     }
 
     if(root != null) {

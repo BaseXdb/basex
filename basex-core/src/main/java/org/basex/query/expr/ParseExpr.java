@@ -223,7 +223,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Returns the current context value or throws an exception if the context value is not set.
    * @param qc query context
-   * @return context
+   * @return context value
    * @throws QueryException query exception
    */
   protected final Value ctxValue(final QueryContext qc) throws QueryException {

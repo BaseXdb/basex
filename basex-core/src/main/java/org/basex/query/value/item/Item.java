@@ -151,8 +151,8 @@ public abstract class Item extends Value {
   public final boolean comparable(final Item it) {
     final Type t1 = type, t2 = it.type;
     return t1 == t2
-        || this instanceof ANum && it instanceof ANum
         || t1.isStringOrUntyped() && t2.isStringOrUntyped()
+        || this instanceof ANum && it instanceof ANum
         || this instanceof Dur && it instanceof Dur;
   }
 
@@ -290,22 +290,6 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public String description() {
-    return type.toString();
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    try {
-      addPlan(plan, planElem(TYPE, type), string(string(null), false, true));
-    } catch(final QueryException ex) {
-      // only function items throw exceptions in atomization, and they should
-      // override plan(Serializer) sensibly
-      throw Util.notExpected(ex);
-    }
-  }
-
-  @Override
   public int hash(final InputInfo ii) throws QueryException {
     return Token.hash(string(ii));
   }
@@ -337,6 +321,22 @@ public abstract class Item extends Value {
    */
   public ID typeId() {
     return type.id();
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    try {
+      addPlan(plan, planElem(TYPE, type), string(string(null), false, true));
+    } catch(final QueryException ex) {
+      // only function items throw exceptions in atomization, and they should
+      // override plan(Serializer) sensibly
+      throw Util.notExpected(ex);
+    }
+  }
+
+  @Override
+  public String description() {
+    return type.toString();
   }
 
   /**

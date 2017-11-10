@@ -36,7 +36,12 @@ public final class CmpHashG extends CmpG {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate values
-    return allAreValues() ? cc.preEval(this) : this;
+    if(allAreValues()) {
+      final Expr value = cc.preEval(this);
+      caches.remove();
+      return value;
+    }
+    return this;
   }
 
   @Override
@@ -82,7 +87,7 @@ public final class CmpHashG extends CmpG {
 
   @Override
   public String description() {
-    return "hashed '" + op + "' operator";
+    return "hashed " + super.description();
   }
 
   /**

@@ -667,8 +667,6 @@ public enum QueryError {
   /** FOTY0013. */
   FIATOM_X(FOTY, 13, "Items of type % cannot be atomized."),
   /** FOTY0013. */
-  FIEQ_X(FOTY, 13, "Items of type % have no defined equality."),
-  /** FOTY0013. */
   FISTRING_X(FOTY, 14, "Items of type % have no string representation."),
   /** FOTY0013. */
   FICMP_X(FOTY, 15, "Items of type % cannot be compared."),

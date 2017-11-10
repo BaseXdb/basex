@@ -33,11 +33,9 @@ public final class ArraySort extends StandardFunc {
 
     final long sz = array.arraySize();
     final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
-    if(exprs.length > 2) {
-      final FItem key = checkArity(exprs[2], 1, qc);
-      for(final Value value : array.members()) vl.add(key.invokeValue(qc, info, value));
-    } else {
-      for(final Value value : array.members()) vl.add(value.atomValue(info));
+    final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
+    for(final Value value : array.members()) {
+      vl.add((key == null ? value : key.invokeValue(qc, info, value)).atomValue(info));
     }
 
     final ArrayBuilder builder = new ArrayBuilder();

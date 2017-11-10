@@ -39,6 +39,8 @@ public final class CmpR extends Single {
   final boolean mxi;
   /** Evaluation flag: atomic evaluation. */
   private final boolean atomic;
+  /** Check for equality. */
+  private final boolean eq;
 
   /**
    * Constructor.
@@ -59,11 +61,7 @@ public final class CmpR extends Single {
     this.mxi = mxi;
     final SeqType st = expr.seqType();
     atomic = st.zeroOrOne() && !st.mayBeArray();
-  }
-
-  @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    return super.compile(cc).optimize(cc);
+    eq = min == max;
   }
 
   /**
@@ -79,7 +77,8 @@ public final class CmpR extends Single {
       final RangeSeq rs = (RangeSeq) e2;
       return get(cmp, rs.start(), rs.end());
     }
-    if(e2 instanceof ANum) {
+    // range expression uses doubles: reject decimal numbers and typed input
+    if(e2 instanceof ANum && (!(e2 instanceof Dec) || e1.seqType().type.isUntyped())) {
       final double d = ((ANum) e2).dbl();
       return get(cmp, d, d);
     }
@@ -94,9 +93,14 @@ public final class CmpR extends Single {
    * @return new or original expression
    */
   private static ParseExpr get(final CmpG cmp, final double start, final double end) {
+    /* reject:
+     * - input that cannot be compared as number
+     * - numbers that are too large or small to be safely compared as doubles */
     final Expr ex = cmp.exprs[0];
-    // type must be numeric
-    if(!ex.seqType().type.isNumberOrUntyped()) return cmp;
+    if(!ex.seqType().type.isNumberOrUntyped() ||
+        start < Integer.MIN_VALUE || start > Integer.MAX_VALUE ||
+        end < Integer.MIN_VALUE || end > Integer.MAX_VALUE) return cmp;
+
     switch(cmp.op) {
       case EQ: return new CmpR(ex, start, true, end, true, cmp.info);
       case GE: return new CmpR(ex, start, true, Double.POSITIVE_INFINITY, true, cmp.info);
@@ -108,13 +112,18 @@ public final class CmpR extends Single {
   }
 
   @Override
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return super.compile(cc).optimize(cc);
+  }
+
+  @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(atomic) {
       final Item it = expr.item(qc, info);
       if(it == null) return Bln.FALSE;
       final double d = it.dbl(info);
-      return Bln.get((mni ? d >= min : d > min) && (mxi ? d <= max : d < max));
+      return Bln.get(eq ? d == min : (mni ? d >= min : d > min) && (mxi ? d <= max : d < max));
     }
 
     // iterative evaluation

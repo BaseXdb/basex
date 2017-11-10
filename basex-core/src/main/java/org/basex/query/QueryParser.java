@@ -3604,8 +3604,7 @@ public class QueryParser extends InputParser {
     final IO fl = qc.resources.thesaurus(fn, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
-    long min = 0;
-    long max = Long.MAX_VALUE;
+    long min = 0, max = Long.MAX_VALUE;
     if(range != null) {
       wsCheck(LEVELS);
       // values will always be integer instances

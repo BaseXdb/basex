@@ -232,9 +232,6 @@ public final class CmpV extends Cmp {
     final Item it2 = exprs[1].atomItem(qc, info);
     if(it2 == null) return null;
     if(it1.comparable(it2)) return Bln.get(op.eval(it1, it2, coll, sc, info));
-
-    if(it1 instanceof FItem) throw FIEQ_X.get(info, it1.type);
-    if(it2 instanceof FItem) throw FIEQ_X.get(info, it2.type);
     throw diffError(it1, it2, info);
   }
 

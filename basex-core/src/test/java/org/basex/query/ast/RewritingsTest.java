@@ -134,6 +134,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", "count(//CmpR) = 1");
     check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", "count(//CmpR) = 1");
     check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", "count(//CmpR) = 2");
+    check("<a>5</a>[text() > 800000000]", "", "exists(//CmpR)");
+    check("<a>5</a>[text() < -800000000]", "", "exists(//CmpR)");
+    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", "true", "exists(//CmpR)");
+
+    // no {@link CmpR} rewritings
+    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", "true", "empty(//CmpR)");
+    check("<a>5</a>[text() > 8000000000]", "", "empty(//CmpR)");
+    check("<a>5</a>[text() < -8000000000]", "", "empty(//CmpR)");
+    check("(1234567890.12345678)[. = 1234567890.1234567]", "", "empty(//CmpR)");
+    check("(123456789012345678 )[. = 123456789012345679]", "", "empty(//CmpR)");
 
     // {@link CmpSR} rewritings
     check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", "count(//CmpSR) = 1");

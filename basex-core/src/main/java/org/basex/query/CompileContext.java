@@ -4,11 +4,14 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -22,10 +25,15 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CompileContext {
+  /** Limit for the size of sequences that are pre-evaluated. */
+  public static final int MAX_PREEVAL = 1 << 18;
+
   /** Query context. */
   public final QueryContext qc;
-  /** Variable scopes. */
+  /** Variable scope list. */
   private final ArrayList<VarScope> scopes = new ArrayList<>();
+  /** Query focus list. */
+  private final ArrayList<QueryFocus> focuses = new ArrayList<>();
 
   /**
    * Constructor.
@@ -67,6 +75,31 @@ public final class CompileContext {
    */
   public void removeScope(final Scope scope) {
     removeScope().cleanUp(scope);
+  }
+
+  /**
+   * Caches the current query focus and sets a new focus.
+   * @param item context item
+   */
+  public void pushFocus(final Item item) {
+    focuses.add(qc.focus);
+    qc.focus = new QueryFocus();
+    qc.focus.value = item;
+  }
+
+  /**
+   * Sets the last focus from the stack.
+   */
+  public void popFocus() {
+    qc.focus = focuses.remove(focuses.size() - 1);
+  }
+
+  /**
+   * Indicates if any query focus instanced are stored on the stack.
+   * @return result of check
+   */
+  public boolean topFocus() {
+    return focuses.isEmpty();
   }
 
   /**
@@ -215,4 +248,64 @@ public final class CompileContext {
       throws QueryException {
     return func.get(sc(), info, exprs).optimize(this);
   }
+
+  /**
+   * Returns a context value for the given expression.
+   * @param expr expression (can be {@code null})
+   * @return root value or {@code null}
+   */
+  public Value contextValue(final Expr expr) {
+    // current context value
+    final Value v = qc.focus.value;
+    // no root or context expression: return context
+    if(expr == null || expr instanceof ContextValue) return v;
+    // root reference
+    if(expr instanceof Root) return v instanceof ANode ? ((ANode) v).root() : v;
+    // root is value: return root
+    if(expr.isValue()) return (Value) expr;
+    // otherwise, return dummy node
+    return dummy(expr);
+  }
+
+  /**
+   * Returns a context item for the given root.
+   * @param root root expression (can be {@code null})
+   * @return root item or {@code null}
+   */
+  public Item contextItem(final Expr root) {
+    return dummy(contextValue(root));
+  }
+
+  /**
+   * Returns a dummy item for the specified expression.
+   * @param expr expression
+   * @return dummy item or {@code null}
+   */
+  private static Item dummy(final Expr expr) {
+    if(expr != null) {
+      final Type type = expr.seqType().type;
+      if(expr instanceof Value && expr != Empty.SEQ) {
+        // expression is value, type of first item is identical to value type: return this item
+        final Item it = ((Value) expr).itemAt(0);
+        if(type == it.type) return it;
+      }
+
+      // data reference exists: create dummy node
+      final Data d = expr.data();
+      if(d != null) return new DBNode(d, 0, Data.ELEM);
+
+      // otherwise, return dummy item
+      if(type == AtomType.STR) return Str.ZERO;
+      if(type == AtomType.ITR) return Int.ZERO;
+      if(type == AtomType.DBL) return Dbl.ZERO;
+      if(type == AtomType.FLT) return Flt.ZERO;
+      if(type == AtomType.DEC) return Dec.ZERO;
+      if(type == AtomType.BLN) return Bln.FALSE;
+      if(type == NodeType.DOC) return FDoc.DUMMY;
+      if(type instanceof NodeType) return FElem.DUMMY;
+    }
+    // otherwise, return null
+    return null;
+  }
+
 }

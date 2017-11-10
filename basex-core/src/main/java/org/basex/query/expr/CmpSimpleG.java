@@ -49,6 +49,6 @@ public final class CmpSimpleG extends CmpG {
 
   @Override
   public String description() {
-    return "atomic '" + op + "' operator";
+    return "simple " + super.description();
   }
 }

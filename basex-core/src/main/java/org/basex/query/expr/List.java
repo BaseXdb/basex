@@ -21,9 +21,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class List extends Arr {
-  /** Limit for the size of sequences that are materialized at compile time. */
-  private static final int MAX_MAT_SIZE = 1 << 18;
-
   /**
    * Constructor.
    * @param info input info
@@ -85,7 +82,7 @@ public final class List extends Arr {
       seqType = st != null ? st.withOcc(o) : SeqType.get(AtomType.ITEM, o);
     }
 
-    if(allAreValues() && size >= 0 && size <= MAX_MAT_SIZE) {
+    if(allAreValues() && size >= 0 && size <= CompileContext.MAX_PREEVAL) {
       Type type = null;
       final Value[] values = new Value[exprs.length];
       int vl = 0;

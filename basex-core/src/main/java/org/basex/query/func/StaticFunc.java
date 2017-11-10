@@ -63,10 +63,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     if(compiled || expr == null) return;
     compiling = compiled = true;
 
-    final QueryFocus focus = cc.qc.focus;
-    final Value cv = focus.value;
-    focus.value = null;
-
+    cc.pushFocus(null);
     cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
@@ -85,7 +82,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       expr = cc.error(qe, expr);
     } finally {
       cc.removeScope(this);
-      focus.value = cv;
+      cc.popFocus();
     }
 
     // convert all function calls in tail position to proper tail calls

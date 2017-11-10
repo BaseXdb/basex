@@ -7,18 +7,16 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.expr.gflwor.GFLWOR.Eval;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -187,7 +185,7 @@ public final class For extends ForLet {
   }
 
   /**
-   * Tries to add the given expression as a predicate to the looped expression.
+   * Tries to add the given expression as a predicate.
    * @param cc compilation context
    * @param ex expression to add as predicate
    * @return success flag
@@ -197,18 +195,16 @@ public final class For extends ForLet {
     if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;
 
     // reset context value (will not be accessible in predicate)
-    final QueryFocus focus = cc.qc.focus;
-    final Value v = focus.value;
     Expr pred = ex;
+    cc.pushFocus(null);
     try {
-      focus.value = null;
       // assign type of iterated items to context expression
       final ContextValue cv = new ContextValue(info);
       cv.seqType = expr.seqType().type.seqType();
       final Expr r = ex.inline(var, cv, cc);
       if(r != null) pred = r;
     } finally {
-      focus.value = v;
+      cc.popFocus();
     }
 
     // attach predicates to axis path or filter, or create a new filter

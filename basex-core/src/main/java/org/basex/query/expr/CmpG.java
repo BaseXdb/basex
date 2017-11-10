@@ -272,10 +272,9 @@ public class CmpG extends Cmp {
    */
   final boolean eval(final Item it1, final Item it2) throws QueryException {
     final Type t1 = it1.type, t2 = it2.type;
-    if(!(it1 instanceof FItem || it2 instanceof FItem) &&
-        (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
+    if(t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
         it1 instanceof ANum && it2 instanceof ANum ||
-        it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, coll, sc, info);
+        it1 instanceof AStr && it2 instanceof AStr) return op.op.eval(it1, it2, coll, sc, info);
     throw diffError(it1, it2, info);
   }
 
@@ -329,7 +328,7 @@ public class CmpG extends Cmp {
 
   @Override
   public String description() {
-    return "'" + op + "' operator";
+    return op + " operator";
   }
 
   @Override

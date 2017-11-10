@@ -34,13 +34,11 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    final QueryFocus focus = cc.qc.focus;
-    final Value v = focus.value;
+    cc.pushFocus(null);
     try {
-      focus.value = null;
       return super.compile(cc);
     } finally {
-      focus.value = v;
+      cc.popFocus();
     }
   }
 

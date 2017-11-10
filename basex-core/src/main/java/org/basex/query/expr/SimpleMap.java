@@ -110,7 +110,8 @@ public abstract class SimpleMap extends Arr {
     seqType(exprs[exprs.length - 1], new long[] { min, max });
 
     // single items: use item mapper; only values: pre-evaluate
-    return it ? copyType(new ItemMap(info, exprs)).optimize(cc) : allAreValues() ?
+    return it ? copyType(new ItemMap(info, exprs)).optimize(cc) :
+      allAreValues() && size >= 0 && size <= CompileContext.MAX_PREEVAL ?
       cc.preEval(this) : this;
   }
 
@@ -157,6 +158,11 @@ public abstract class SimpleMap extends Arr {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof SimpleMap && super.equals(obj);
+  }
+
+  @Override
+  public String description() {
+    return "map operator";
   }
 
   @Override

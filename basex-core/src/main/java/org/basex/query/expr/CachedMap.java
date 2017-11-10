@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Simple map expression.
+ * Cached map expression.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen

@@ -31,11 +31,9 @@ public final class FnSort extends StandardFunc {
 
     final long sz = value.size();
     final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
-    if(exprs.length > 2) {
-      final FItem key = checkArity(exprs[2], 1, qc);
-      for(final Item it : value) vl.add(key.invokeValue(qc, info, it));
-    } else {
-      for(final Item it : value) vl.add(it.atomValue(info));
+    final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
+    for(final Item it : value) {
+      vl.add((key == null ? it : key.invokeValue(qc, info, it)).atomValue(info));
     }
 
     final Integer[] order = sort(vl, this, coll);
@@ -75,11 +73,7 @@ public final class FnSort extends StandardFunc {
             Item m = v1.itemAt(v), n = v2.itemAt(v);
             if(m == Dbl.NAN || m == Flt.NAN) m = null;
             if(n == Dbl.NAN || n == Flt.NAN) n = null;
-            if(m != null && n != null && !m.comparable(n)) {
-              throw m instanceof FItem ? FIEQ_X.get(sf.info, m.type) :
-                    n instanceof FItem ? FIEQ_X.get(sf.info, n.type) :
-                    diffError(m, n, sf.info);
-            }
+            if(m != null && n != null && !m.comparable(n)) throw diffError(m, n, sf.info);
             final int d = m == null ? n == null ? 0 : -1 : n == null ? 1 :
               m.diff(n, coll, sf.info);
             if(d != 0 && d != Item.UNDEF) return d;
