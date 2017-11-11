@@ -2,8 +2,8 @@
 setLocal EnableDelayedExpansion
 
 REM Path to core and library classes
-set MAIN=%~dp0/..
-set CP=%MAIN%/target/classes;%MAIN%/lib/*;%MAIN%/lib/custom/*
+set MAIN=%~dp0\..
+set CP=%MAIN%\target\classes;%MAIN%\lib\*;%MAIN%\lib\custom\*
 
 REM Options for virtual machine
 set BASEX_JVM=-Xmx1200m %BASEX_JVM%
