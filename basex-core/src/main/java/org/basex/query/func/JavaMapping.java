@@ -110,7 +110,7 @@ public final class JavaMapping {
    * @param atomic only check atomic mappings
    * @return type, or {@code null}
    */
-  public static Type type(final Class<?> clazz, final boolean atomic) {
+  static Type type(final Class<?> clazz, final boolean atomic) {
     Type type = ATOMIC_MAP.get(clazz);
     if(type == null && !atomic) {
       type = XQUERY_MAP.get(clazz);

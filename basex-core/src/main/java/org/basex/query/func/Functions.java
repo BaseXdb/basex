@@ -36,7 +36,7 @@ public final class Functions extends TokenSet {
    * Returns the singleton instance.
    * @return instance
    */
-  public static Functions get() {
+  static Functions get() {
     return INSTANCE;
   }
 
@@ -91,7 +91,7 @@ public final class Functions extends TokenSet {
    * @param name function name
    * @return function if found, {@code null} otherwise
    */
-  public Function getBuiltIn(final QNm name) {
+  Function getBuiltIn(final QNm name) {
     final int id = id(name.id());
     if(id == 0) return null;
     final Function fn = funcs[id];
@@ -165,8 +165,8 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+  StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc, final InputInfo info)
+      throws QueryException {
     final Function fn = getBuiltIn(name, args.length, info);
     return fn == null ? null : fn.get(sc, info, args);
   }

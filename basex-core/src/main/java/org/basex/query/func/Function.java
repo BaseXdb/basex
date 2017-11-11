@@ -82,7 +82,8 @@ public enum Function {
   ANALYZE_STRING(FnAnalyzeString.class, "analyze-string(input,pattern[,mod])",
       arg(STR_ZO, STR, STR), ELM, flag(CNS)),
   /** XQuery function. */
-  APPLY(FnApply.class, "apply(function,args)", arg(FUN_O, ARRAY_O), ITEM_ZM, flag(HOF)),
+  APPLY(FnApply.class, "apply(function,args)", arg(FUN_O, ARRAY_O), ITEM_ZM,
+      flag(Flag.POS, CTX, NDT, HOF)),
   /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables.class,
       "available-environment-variables()", arg(), STR_ZM),
@@ -1403,6 +1404,8 @@ public enum Function {
   public final int[] minMax;
   /** Argument types. */
   public final SeqType[] args;
+  /** Function class. */
+  public final Class<? extends StandardFunc> clazz;
 
   /** Descriptions. */
   final String desc;
@@ -1411,8 +1414,6 @@ public enum Function {
 
   /** Compiler flags. */
   private final EnumSet<Flag> flags;
-  /** Function classes. */
-  private final Class<? extends StandardFunc> func;
   /** URI. */
   private final byte[] uri;
 
@@ -1472,7 +1473,7 @@ public enum Function {
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
       final SeqType type, final EnumSet<Flag> flags, final byte[] uri) {
 
-    this.func = func;
+    this.clazz = func;
     this.desc = desc;
     this.type = type;
     this.args = args;
@@ -1505,7 +1506,7 @@ public enum Function {
    * @return function
    */
   public StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... exprs) {
-    return Reflect.get(func).init(sc, info, this, exprs);
+    return Reflect.get(clazz).init(sc, info, this, exprs);
   }
 
   /**
@@ -1585,7 +1586,7 @@ public enum Function {
    * Returns the prefixed name of the annotation.
    * @return name
    */
-  public byte[] id() {
+  byte[] id() {
     final TokenBuilder tb = new TokenBuilder();
     if(!Token.eq(uri, FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     return tb.add(local()).finish();

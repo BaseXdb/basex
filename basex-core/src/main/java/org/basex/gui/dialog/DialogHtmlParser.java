@@ -32,7 +32,6 @@ final class DialogHtmlParser extends DialogParser {
    * @param opts main options
    */
   DialogHtmlParser(final BaseXDialog dialog, final MainOptions opts) {
-    super(dialog);
     hopts = new HtmlOptions(opts.get(MainOptions.HTMLPARSER));
 
     final boolean avl = HtmlParser.available();

@@ -28,10 +28,10 @@ public final class Constr {
   final Atts nspaces = new Atts();
   /** Error: attribute position. */
   public QNm errAtt;
-  /** Error: namespace position. */
-  public QNm errNS;
   /** Error: duplicate attribute. */
   public QNm duplAtt;
+  /** Error: namespace position. */
+  QNm errNS;
   /** Error: duplicate namespace. */
   byte[] duplNS;
 

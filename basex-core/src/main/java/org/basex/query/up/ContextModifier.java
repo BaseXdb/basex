@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Lukas Kircher
  */
-public abstract class ContextModifier {
+abstract class ContextModifier {
   /** Update primitives, aggregated separately for each database. */
   private final Map<Data, DataUpdates> dbUpdates = new HashMap<>();
   /** Update primitives, aggregated separately for each database name. */

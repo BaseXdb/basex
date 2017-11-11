@@ -30,23 +30,23 @@ import org.xml.sax.*;
  */
 abstract class ValidateFn extends StandardFunc {
   /** Report element. */
-  public static final String REPORT = "report";
+  private static final String REPORT = "report";
   /** Error element. */
-  public static final String MESSAGE = "message";
+  private static final String MESSAGE = "message";
   /** Status. */
-  public static final String STATUS = "status";
+  private static final String STATUS = "status";
   /** Valid. */
-  public static final String VALID = "valid";
+  private static final String VALID = "valid";
   /** Invalid. */
-  public static final String INVALID = "invalid";
+  private static final String INVALID = "invalid";
   /** Line. */
-  public static final String LINE = "line";
+  private static final String LINE = "line";
   /** Column. */
-  public static final String COLUMN = "column";
+  private static final String COLUMN = "column";
   /** Type. */
-  public static final String LEVEL = "level";
+  private static final String LEVEL = "level";
   /** File. */
-  public static final String URL = "url";
+  private static final String URL = "url";
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {

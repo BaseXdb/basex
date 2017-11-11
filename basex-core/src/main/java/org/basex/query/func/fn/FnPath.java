@@ -72,6 +72,6 @@ public final class FnPath extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst();
+    return exprs.length > 0 ? optFirst() : this;
   }
 }

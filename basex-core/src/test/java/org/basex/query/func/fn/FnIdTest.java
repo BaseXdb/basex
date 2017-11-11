@@ -12,7 +12,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-17, BSD License
  * @author Jens Erat
  */
-public final class IdTest extends AdvancedQueryTest {
+public final class FnIdTest extends AdvancedQueryTest {
   /** Test document. */
   private static final String DOC = "src/test/resources/xmark.xml";
   /**

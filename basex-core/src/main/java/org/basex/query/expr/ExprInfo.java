@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import java.util.*;
-
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -19,7 +17,17 @@ public abstract class ExprInfo {
    * @return result of check
    */
   public String description() {
-    return Util.className(this).toLowerCase(Locale.ENGLISH);
+    final TokenBuilder tb = new TokenBuilder();
+    boolean sep = false;
+    for(byte b : Token.token(Util.className(this))) {
+      if(Character.isLowerCase(b)) {
+        sep = true;
+      } else if(sep) {
+        tb.add(' ');
+      }
+      tb.add(Character.toLowerCase(b));
+    }
+    return tb.toString();
   }
 
   /**

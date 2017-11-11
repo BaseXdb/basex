@@ -109,7 +109,7 @@ public abstract class CLI extends Main {
    * @return session instance
    * @throws IOException I/O exception
    */
-  protected final Session init() throws IOException {
+  private Session init() throws IOException {
     if(local()) return new LocalSession(context, out);
 
     // user/password input

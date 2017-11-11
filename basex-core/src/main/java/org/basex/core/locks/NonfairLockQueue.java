@@ -8,7 +8,7 @@ import java.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public class NonfairLockQueue extends LockQueue {
+public final class NonfairLockQueue extends LockQueue {
   /** Queued readers. */
   private final Queue<Long> readers = new LinkedList<>();
   /** Queued writers. */
@@ -18,7 +18,7 @@ public class NonfairLockQueue extends LockQueue {
    * Constructor.
    * @param parallel parallel jobs
    */
-  public NonfairLockQueue(final int parallel) {
+  NonfairLockQueue(final int parallel) {
     super(parallel);
   }
 

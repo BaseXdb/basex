@@ -42,7 +42,7 @@ class RESTQuery extends RESTCmd {
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  final void query() throws IOException {
+  private void query() throws IOException {
     // set base path and serialization parameters
     final HTTPConnection conn = session.conn;
     context.options.set(MainOptions.SERIALIZER, conn.sopts());

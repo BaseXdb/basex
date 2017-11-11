@@ -40,7 +40,6 @@ final class DialogXmlParser extends DialogParser {
    * @param opts main options
    */
   DialogXmlParser(final BaseXDialog dialog, final MainOptions opts) {
-    super(dialog);
     final BaseXBack pp = new BaseXBack(new TableLayout(10, 1));
 
     intparse = new BaseXCheckBox(dialog, INT_PARSER, MainOptions.INTPARSE, opts).bold();

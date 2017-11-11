@@ -30,7 +30,6 @@ final class DialogTextParser extends DialogParser {
    * @param opts main options
    */
   DialogTextParser(final BaseXDialog dialog, final MainOptions opts) {
-    super(dialog);
     topts = new TextOptions(opts.get(MainOptions.TEXTPARSER));
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));

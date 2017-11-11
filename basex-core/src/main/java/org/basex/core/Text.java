@@ -776,8 +776,6 @@ public interface Text {
   String PARAMETERS = lang("parameters");
   /** "Path". */
   String PATH = lang("path");
-  /** "Jobs". */
-  String JOBS = lang("jobs");
   /** "Duration". */
   String DURATION = lang("duration");
   /** "State". */
@@ -801,8 +799,6 @@ public interface Text {
   String RUN_QUERY = lang("run_query");
   /** Command info. */
   String RUN_TESTS = lang("run_tests");
-  /** Command info. */
-  String INPUT_HISTORY = lang("input_history");
 
   /** Command info. */
   String FIND_REPLACE = lang("find_replace");

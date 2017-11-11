@@ -186,9 +186,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   /** Panel color. */
   public static final Color PANEL = DEFAULTS.getColor("Label.background");
 
-  /** Dark theme. */
-  public static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
-
   /** Color: red. */
   public static final Color RED = color(224, 0, 0);
   /** Color: light red. */
@@ -218,6 +215,8 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
 
   /** Cached color gradient. */
   private static final Color[] COLORS = new Color[100];
+  /** Dark theme. */
+  private static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
 
   /** Second bright GUI color. */
   public static Color color1;

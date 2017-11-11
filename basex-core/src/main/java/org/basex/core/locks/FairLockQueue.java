@@ -8,7 +8,7 @@ import java.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public class FairLockQueue extends LockQueue {
+public final class FairLockQueue extends LockQueue {
   /** Queue. */
   private final Queue<Long> queue = new LinkedList<>();
 
@@ -16,7 +16,7 @@ public class FairLockQueue extends LockQueue {
    * Constructor.
    * @param parallel parallel jobs
    */
-  public FairLockQueue(final int parallel) {
+  FairLockQueue(final int parallel) {
     super(parallel);
   }
 

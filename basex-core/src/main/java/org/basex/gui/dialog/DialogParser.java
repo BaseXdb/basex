@@ -19,15 +19,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class DialogParser extends BaseXBack {
-  /** Parent dialog. */
-  final BaseXDialog dialog;
-
   /**
    * Constructor.
-   * @param dialog parent dialog
    */
-  DialogParser(final BaseXDialog dialog) {
-    this.dialog = dialog;
+  DialogParser() {
     setLayout(new BorderLayout(16, 0));
   }
 

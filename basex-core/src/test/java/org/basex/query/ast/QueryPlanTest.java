@@ -18,9 +18,9 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    * Checks the query plan and the result.
    * @param qu query
    * @param res result or {@code null} for no comparison
-   * @param pr queries on the query plan
+   * @param checks queries on the query plan
    */
-  protected static void check(final String qu, final String res, final String... pr) {
+  protected static void check(final String qu, final String res, final String... checks) {
     try(QueryProcessor qp = new QueryProcessor(qu, context)) {
       // compile query
       qp.compile();
@@ -32,7 +32,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
             res, normNL(qp.value().serialize().toString()));
       }
 
-      for(final String p : pr) {
+      for(final String p : checks) {
         if(new QueryProcessor(p, context).context(plan).value() != Bln.TRUE) {
           fail(NL + "- Query: " + qu + NL + "- Check: " + p + NL +
               "- Plan: " + plan.serialize());

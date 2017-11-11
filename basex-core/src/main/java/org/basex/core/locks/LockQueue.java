@@ -16,7 +16,7 @@ public abstract class LockQueue {
    * Constructor.
    * @param parallel parallel jobs
    */
-  public LockQueue(final int parallel) {
+  LockQueue(final int parallel) {
     this.parallel = parallel;
   }
 

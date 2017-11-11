@@ -71,7 +71,7 @@ public final class Window extends Clause {
    * @return non-{@code null} variables
    * @throws QueryException query exception if the variable names aren't unique
    */
-  public static Var[] vars(final Var vr, final Condition st, final Condition nd)
+  private static Var[] vars(final Var vr, final Condition st, final Condition nd)
       throws QueryException {
 
     // determine the size of the array beforehand

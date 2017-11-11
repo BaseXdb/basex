@@ -317,7 +317,7 @@ public class BaseXCombo extends JComboBox<Object> {
    * @author BaseX Team 2005-17, BSD License
    * @author Christian Gruen
    */
-  static class BaseXEditor implements ComboBoxEditor {
+  private static final class BaseXEditor implements ComboBoxEditor {
     /** Text field. */
     private final BaseXTextField tf;
 
@@ -325,7 +325,7 @@ public class BaseXCombo extends JComboBox<Object> {
      * Constructor.
      * @param gui gui
      */
-    BaseXEditor(final GUI gui) {
+    private BaseXEditor(final GUI gui) {
       tf = new BaseXTextField(gui);
       tf.setBorder(new EmptyBorder(0, 4, 0, 0));
     }

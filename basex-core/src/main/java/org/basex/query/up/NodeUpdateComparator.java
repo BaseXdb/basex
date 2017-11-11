@@ -73,7 +73,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Lukas Kircher
  */
-public class NodeUpdateComparator implements Comparator<NodeUpdate> {
+public final class NodeUpdateComparator implements Comparator<NodeUpdate> {
   @Override
   public int compare(final NodeUpdate a, final NodeUpdate b) {
     // data the same for both primitives

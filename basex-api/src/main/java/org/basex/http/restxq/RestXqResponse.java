@@ -26,11 +26,11 @@ import org.basex.util.http.*;
  */
 final class RestXqResponse {
   /** Function. */
-  final RestXqFunction func;
+  private final RestXqFunction func;
   /** Query context. */
-  final QueryContext qc;
+  private final QueryContext qc;
   /** HTTP connection. */
-  final HTTPConnection conn;
+  private final HTTPConnection conn;
 
   /** Output stream. */
   private OutputStream out;

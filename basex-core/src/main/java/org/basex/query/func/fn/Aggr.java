@@ -19,31 +19,31 @@ abstract class Aggr extends StandardFunc {
   /**
    * Sums up the specified item(s).
    * @param iter iterator
-   * @param it first item
+   * @param item first item
    * @param avg calculate average
    * @param qc query context
    * @return summed up item
    * @throws QueryException query exception
    */
-  Item sum(final Iter iter, final Item it, final boolean avg, final QueryContext qc)
+  Item sum(final Iter iter, final Item item, final boolean avg, final QueryContext qc)
       throws QueryException {
 
-    Item rs = it.type.isUntyped() ? Dbl.get(it.dbl(info)) : it;
-    final boolean num = rs instanceof ANum, dtd = rs.type == DTD, ymd = rs.type == YMD;
-    if(!num && !dtd && !ymd) throw SUM_X_X.get(info, rs.type, rs);
+    Item res = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
+    final boolean num = res instanceof ANum, dtd = res.type == DTD, ymd = res.type == YMD;
+    if(!num && !dtd && !ymd) throw SUM_X_X.get(info, res.type, res);
 
     int c = 1;
-    for(Item i; (i = iter.next()) != null;) {
+    for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      if(i.type.isNumberOrUntyped()) {
-        if(!num) throw SUMDUR_X_X.get(info, i.type, i);
+      if(it.type.isNumberOrUntyped()) {
+        if(!num) throw SUMDUR_X_X.get(info, it.type, it);
       } else {
-        if(num) throw SUMNUM_X_X.get(info, i.type, i);
-        if(dtd && i.type != DTD || ymd && i.type != YMD) throw SUMDUR_X_X.get(info, i.type, i);
+        if(num) throw SUMNUM_X_X.get(info, it.type, it);
+        if(dtd && it.type != DTD || ymd && it.type != YMD) throw SUMDUR_X_X.get(info, it.type, it);
       }
-      rs = Calc.PLUS.ev(rs, i, info);
+      res = Calc.PLUS.ev(res, it, info);
       ++c;
     }
-    return avg ? Calc.DIV.ev(rs, Int.get(c), info) : rs;
+    return avg ? Calc.DIV.ev(res, Int.get(c), info) : res;
   }
 }

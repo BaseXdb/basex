@@ -25,7 +25,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnDistinctValues extends StandardFunc {
   /** Item evaluation flag. */
-  protected boolean simple;
+  private boolean simple;
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
