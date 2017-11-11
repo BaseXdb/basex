@@ -51,7 +51,7 @@ public final class Extension extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr.isValue() ? cc.replaceWith(this, expr) : adoptType(expr);
+    return adoptType(expr);
   }
 
   @Override
