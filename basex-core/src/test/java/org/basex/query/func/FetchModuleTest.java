@@ -31,15 +31,15 @@ public final class FetchModuleTest extends AdvancedQueryTest {
   public void xml() {
     query(_FETCH_XML.args(XML));
     query("exists(" + _FETCH_XML.args(XML, " map { 'chop':true() }") +
-        "//text()[not(normalize-space())])", "false");
+        "//text()[not(normalize-space())])", false);
     query("exists(" + _FETCH_XML.args(XML, " map { 'chop':false() }") +
-        "//text()[not(normalize-space())])", "true");
+        "//text()[not(normalize-space())])", true);
     query(COUNT.args(_FETCH_XML.args(CSV,
-        " map { 'parser':'csv','csvparser': 'header=true' }") + "//City"), "3");
+        " map { 'parser':'csv','csvparser': 'header=true' }") + "//City"), 3);
     query(COUNT.args(_FETCH_XML.args(CSV,
-        " map { 'parser':'csv','csvparser': map { 'header': true() } }") + "//City"), "3");
+        " map { 'parser':'csv','csvparser': map { 'header': true() } }") + "//City"), 3);
     query(COUNT.args(_FETCH_XML.args(CSV,
-        " map { 'parser':'csv','csvparser': map { 'header': 'true' } }") + "//City"), "3");
+        " map { 'parser':'csv','csvparser': map { 'header': 'true' } }") + "//City"), 3);
     error(_FETCH_XML.args(XML, " map { 'parser': 'unknown' }"), BASX_VALUE_X_X);
     error(_FETCH_XML.args(XML + 'x'), BXFE_IO_X);
   }
@@ -47,7 +47,7 @@ public final class FetchModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void xmlBinary() {
-    query(_FETCH_XML_BINARY.args(_CONVERT_STRING_TO_BASE64.args(" '<x/>'")), "<x/>");
+    query(_FETCH_XML_BINARY.args(_CONVERT_STRING_TO_BASE64.args("<x/>")), "<x/>");
     final String encoding = "CP1252";
     final String xml = "<x>Ä</x>";
     final String data = "<?xml version=''1.0'' encoding=''" + encoding + "''?>" + xml;

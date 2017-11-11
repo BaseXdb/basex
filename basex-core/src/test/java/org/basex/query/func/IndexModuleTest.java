@@ -40,14 +40,14 @@ public final class IndexModuleTest extends AdvancedQueryTest {
     query(tree + "//element[@name='head']/@count/data()", 1);
     query(tree + "//element[@name='title']/text/@type/data()", "string");
     query(tree + "//element[@name='title']/text/entry/data()", "XML");
-    query(tree + "//element[@name='title']/text/entry/@count/data()", "1");
+    query(tree + "//element[@name='title']/text/entry/@count/data()", 1);
     query(tree + "//element[@name='li']/text/@count/data()", 2);
 
     final String flat = _INDEX_FACETS.args(NAME, "flat");
     query(flat + "//element[@name='title']/@count/data()", 1);
     query(flat + "//element[@name='title']/@type/data()", "string");
     query(tree + "//element[@name='title']/text/entry/data()", "XML");
-    query(tree + "//element[@name='title']/text/entry/@count/data()", "1");
+    query(tree + "//element[@name='title']/text/entry/@count/data()", 1);
     query(flat + "//element[@name='li']/@count/data()", 2);
   }
 
@@ -57,19 +57,19 @@ public final class IndexModuleTest extends AdvancedQueryTest {
     // complete search
     final String entries = _INDEX_TEXTS.args(NAME);
     query("count(" + entries + ')', 5);
-    query("exists(" + entries + "/self::entry)", "true");
-    query(entries + "/@count = 1", "true");
-    query(entries + "/@count != 1", "false");
+    query("exists(" + entries + "/self::entry)", true);
+    query(entries + "/@count = 1", true);
+    query(entries + "/@count != 1", false);
     // prefix search
     query(COUNT.args(_INDEX_TEXTS.args(NAME, "X")), 1);
     // ascending traversal
-    query(COUNT.args(_INDEX_TEXTS.args(NAME, "X", "true()")), 1);
+    query(COUNT.args(_INDEX_TEXTS.args(NAME, "X", true)), 1);
     // descending traversal
-    query(_INDEX_TEXTS.args(NAME, "B", "false()") + "/text()", "Assignments");
+    query(_INDEX_TEXTS.args(NAME, "B", false) + "/text()", "Assignments");
     // main memory traversal
     // extract single entry
     //query("let $a := copy $a := parse-xml('<a>A</a>') modify () return $a " +
-    //      "return " + _INDEX_TEXTS.args("$a") + "/text()", "A");
+    //      "return " + _INDEX_TEXTS.args(" $a") + "/text()", "A");
   }
 
   /** Test method. */
@@ -78,15 +78,15 @@ public final class IndexModuleTest extends AdvancedQueryTest {
     // complete search
     final String entries = _INDEX_ATTRIBUTES.args(NAME);
     query("count(" + entries + ')', 6);
-    query("exists(" + entries + "/self::entry)", "true");
-    query(entries + "/@count = 1", "true");
-    query(entries + "/@count != 1", "false");
+    query("exists(" + entries + "/self::entry)", true);
+    query(entries + "/@count = 1", true);
+    query(entries + "/@count != 1", false);
     // prefix search
-    query(_INDEX_ATTRIBUTES.args(NAME, "1") + "/text()", "1");
+    query(_INDEX_ATTRIBUTES.args(NAME, "1") + "/text()", 1);
     // ascending traversal
-    query(_INDEX_ATTRIBUTES.args(NAME, "X", "true()") + "/text()", "right");
+    query(_INDEX_ATTRIBUTES.args(NAME, "X", true) + "/text()", "right");
     // descending traversal
-    query(_INDEX_ATTRIBUTES.args(NAME, "#000099", "false()") + "/text()", "#000000");
+    query(_INDEX_ATTRIBUTES.args(NAME, "#000099", false) + "/text()", "#000000");
   }
 
   /** Test method. */
@@ -94,7 +94,7 @@ public final class IndexModuleTest extends AdvancedQueryTest {
   public void elementNames() {
     final String entries = _INDEX_ELEMENT_NAMES.args(NAME);
     query("count(" + entries + ')', 9);
-    query("exists(" + entries + "/self::entry)", "true");
+    query("exists(" + entries + "/self::entry)", true);
   }
 
   /** Test method. */
@@ -102,6 +102,6 @@ public final class IndexModuleTest extends AdvancedQueryTest {
   public void attributeNames() {
     final String entries = _INDEX_ATTRIBUTE_NAMES.args(NAME);
     query("count(" + entries + ')', 5);
-    query("exists(" + entries + "/self::entry)", "true");
+    query("exists(" + entries + "/self::entry)", true);
   }
 }

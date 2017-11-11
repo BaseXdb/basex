@@ -42,11 +42,11 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   @Test
   public void staticField() {
     query("Q{java:java.lang.Math}PI()", Math.PI);
-    query("Q{java:org.basex.util.Prop}gui()", "false");
+    query("Q{java:org.basex.util.Prop}gui()", false);
 
-    query("Q{java:org.basex.util.Prop}debug()", "false");
-    query("Q{org.basex.util.Prop}debug()", "false");
-    query("Q{http://basex.org/util/Prop}debug()", "false");
+    query("Q{java:org.basex.util.Prop}debug()", false);
+    query("Q{org.basex.util.Prop}debug()", false);
+    query("Q{http://basex.org/util/Prop}debug()", false);
   }
 
   /** Tests calling some Java object fields from XQuery. */
@@ -75,19 +75,19 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   @Test
   public void importClass() {
     query("import module namespace set='java.util.HashSet';" +
-        "let $a := (set:add('a'), set:add('b')) return set:size()", "2");
+        "let $a := (set:add('a'), set:add('b')) return set:size()", 2);
     query("import module namespace set='java.util.HashSet';" +
-        "let $a := (set:add(128), set:add(128)) return set:size()", "1");
+        "let $a := (set:add(128), set:add(128)) return set:size()", 1);
     query("import module namespace set='java.util.HashSet';" +
-        "let $a := set:add\u00b7java.lang.Object(128) return set:size()", "1");
+        "let $a := set:add\u00b7java.lang.Object(128) return set:size()", 1);
 
     // use class with capital and lower case
-    query("import module namespace string='http://lang.java/String'; string:length()", "0");
-    query("import module namespace string='http://lang.java/string'; string:length()", "0");
+    query("import module namespace string='http://lang.java/String'; string:length()", 0);
+    query("import module namespace string='http://lang.java/string'; string:length()", 0);
 
     // handle {@link Jav} type
     query("declare namespace set = 'java.util.HashSet';" +
-        "set:add(set:new(), Q{java.awt.Point}new())", "true");
+        "set:add(set:new(), Q{java.awt.Point}new())", true);
   }
 
   /** Tests importing a query module. */

@@ -27,8 +27,8 @@ public final class ProcModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void execute() {
-    query("count(" + _PROC_EXECUTE.args("java", "-version") + "/*)", "3");
-    query(_PROC_EXECUTE.args("a b c") + "/code/text()", "9999");
+    query("count(" + _PROC_EXECUTE.args("java", "-version") + "/*)", 3);
+    query(_PROC_EXECUTE.args("a b c") + "/code/text()", 9999);
   }
 
   /** Test method. */
@@ -56,7 +56,7 @@ public final class ProcModuleTest extends AdvancedQueryTest {
   @Test
   public void propertyNames() {
     // checks if all system properties exist (i.e., have a value)
-    query(_PROC_PROPERTY_NAMES.args() + '[' + EMPTY.args(_PROC_PROPERTY.args(" .")) + ']', "");
+    query(_PROC_PROPERTY_NAMES.args() + "[empty(" + _PROC_PROPERTY.args(" .") + ")]", "");
 
     Prop.put("A", "B");
     try {

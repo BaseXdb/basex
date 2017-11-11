@@ -53,14 +53,10 @@ public final class MixedTest extends AdvancedQueryTest {
   /** Checks static context scoping in variables. */
   @Test
   public void varsInModules() {
-    contains("import module namespace a='world' at '" + XQMFILE + "';" +
-        "$a:eager", "hello:foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "';" +
-        "$a:lazy", "hello:foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "';" +
-        "$a:func()", "hello:foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "';" +
-        "a:inlined()", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:eager", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:lazy", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:func()", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; a:inlined()", "hello:foo");
   }
 
   /**
@@ -82,7 +78,7 @@ public final class MixedTest extends AdvancedQueryTest {
     query("declare function local:x() { if(<a/>) then 1 else local:x() }; local:x()");
     // call from FLWOR expression
     query("declare function local:x() { if(<a/>) then 1 else local:x() }; " +
-        "let $x := local:x() return $x", "1");
+        "let $x := local:x() return $x", 1);
   }
 
   /**
@@ -94,8 +90,8 @@ public final class MixedTest extends AdvancedQueryTest {
     execute(new Add("a", "<a/>"));
     execute(new Add("b", "<a/>"));
     execute(new Optimize());
-    query(COUNT.args(_DB_OPEN.args(NAME, "a") + "/a"), "1");
-    query(COUNT.args(_DB_OPEN.args(NAME) + "/a"), "2");
+    query(COUNT.args(_DB_OPEN.args(NAME, "a") + "/a"), 1);
+    query(COUNT.args(_DB_OPEN.args(NAME) + "/a"), 2);
   }
 
   /**

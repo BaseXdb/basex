@@ -27,67 +27,67 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void append() {
-    array(_ARRAY_APPEND.args(" []", "()"), "[()]");
-    array(_ARRAY_APPEND.args(" [()]", "()"), "[(), ()]");
-    array(_ARRAY_APPEND.args(" []", " 1"), "[1]");
-    array(_ARRAY_APPEND.args(" [1]", " 2"), "[1, 2]");
-    array(_ARRAY_APPEND.args(" [1,2,3]", "(4,5)"), "[1, 2, 3, (4, 5)]");
+    array(_ARRAY_APPEND.args(" []", " ()"), "[()]");
+    array(_ARRAY_APPEND.args(" [()]", " ()"), "[(), ()]");
+    array(_ARRAY_APPEND.args(" []", 1), "[1]");
+    array(_ARRAY_APPEND.args(" [1]", 2), "[1, 2]");
+    array(_ARRAY_APPEND.args(" [1,2,3]", " (4,5)"), "[1, 2, 3, (4, 5)]");
   }
 
   /** Test method. */
   @Test public void subarray() {
-    array(_ARRAY_SUBARRAY.args(" []", " 1"), "[]");
-    array(_ARRAY_SUBARRAY.args(" []", " 1", " 0"), "[]");
-    array(_ARRAY_SUBARRAY.args(" [1]", " 1"), "[1]");
-    array(_ARRAY_SUBARRAY.args(" [1]", " 1", " 0"), "[]");
-    array(_ARRAY_SUBARRAY.args(" [1]", " 1", " 1"), "[1]");
-    array(_ARRAY_SUBARRAY.args(" [1]", " 2", " 0"), "[]");
-    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", " 5"), "[5]");
-    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", " 6"), "[]");
-    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", " 1", " 1"), "[1]");
-    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", " 2", " 3"), "[2, 3, 4]");
+    array(_ARRAY_SUBARRAY.args(" []", 1), "[]");
+    array(_ARRAY_SUBARRAY.args(" []", 1, 0), "[]");
+    array(_ARRAY_SUBARRAY.args(" [1]", 1), "[1]");
+    array(_ARRAY_SUBARRAY.args(" [1]", 1, 0), "[]");
+    array(_ARRAY_SUBARRAY.args(" [1]", 1, 1), "[1]");
+    array(_ARRAY_SUBARRAY.args(" [1]", 2, 0), "[]");
+    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", 5), "[5]");
+    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", 6), "[]");
+    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", 1, 1), "[1]");
+    array(_ARRAY_SUBARRAY.args(" array { 1 to 5 }", 2, 3), "[2, 3, 4]");
 
-    error(_ARRAY_SUBARRAY.args(" [1]", " 0", " 0"), ARRAYBOUNDS_X_X);
-    error(_ARRAY_SUBARRAY.args(" [1]", " 1", " -1"), ARRAYNEG_X);
-    error(_ARRAY_SUBARRAY.args(" []", " 1", " 1"), ARRAYBOUNDS_X_X);
-    error(_ARRAY_SUBARRAY.args(" [1]", " 1", " 2"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_SUBARRAY.args(" [1]", 0, 0), ARRAYBOUNDS_X_X);
+    error(_ARRAY_SUBARRAY.args(" [1]", 1, " -1"), ARRAYNEG_X);
+    error(_ARRAY_SUBARRAY.args(" []", 1, 1), ARRAYBOUNDS_X_X);
+    error(_ARRAY_SUBARRAY.args(" [1]", 1, 2), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
   @Test public void remove() {
-    array(_ARRAY_REMOVE.args(" [1]", " 1"), "[]");
-    array(_ARRAY_REMOVE.args(" [1, 2]", " 1"), "[2]");
-    array(_ARRAY_REMOVE.args(" [1, 2]", " 2"), "[1]");
-    array(_ARRAY_REMOVE.args(" array { 1 to 5 }", " 1"), "[2, 3, 4, 5]");
-    array(_ARRAY_REMOVE.args(" array { 1 to 5 }", " 3"), "[1, 2, 4, 5]");
-    array(_ARRAY_REMOVE.args(" array { 1 to 5 }", " 5"), "[1, 2, 3, 4]");
+    array(_ARRAY_REMOVE.args(" [1]", 1), "[]");
+    array(_ARRAY_REMOVE.args(" [1, 2]", 1), "[2]");
+    array(_ARRAY_REMOVE.args(" [1, 2]", 2), "[1]");
+    array(_ARRAY_REMOVE.args(" array { 1 to 5 }", 1), "[2, 3, 4, 5]");
+    array(_ARRAY_REMOVE.args(" array { 1 to 5 }", 3), "[1, 2, 4, 5]");
+    array(_ARRAY_REMOVE.args(" array { 1 to 5 }", 5), "[1, 2, 3, 4]");
 
-    error(_ARRAY_REMOVE.args(" []", " 0"), ARRAYEMPTY);
-    error(_ARRAY_REMOVE.args(" [1]", " 0"), ARRAYBOUNDS_X_X);
-    error(_ARRAY_REMOVE.args(" [1]", " 2"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_REMOVE.args(" []", 0), ARRAYEMPTY);
+    error(_ARRAY_REMOVE.args(" [1]", 0), ARRAYBOUNDS_X_X);
+    error(_ARRAY_REMOVE.args(" [1]", 2), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
   @Test public void insertBefore() {
-    array(_ARRAY_INSERT_BEFORE.args(" []", " 1", " 1"), "[1]");
-    array(_ARRAY_INSERT_BEFORE.args(" [1]", " 1", " 2"), "[2, 1]");
-    array(_ARRAY_INSERT_BEFORE.args(" [1]", " 2", " 2"), "[1, 2]");
+    array(_ARRAY_INSERT_BEFORE.args(" []", 1, 1), "[1]");
+    array(_ARRAY_INSERT_BEFORE.args(" [1]", 1, 2), "[2, 1]");
+    array(_ARRAY_INSERT_BEFORE.args(" [1]", 2, 2), "[1, 2]");
 
-    error(_ARRAY_INSERT_BEFORE.args(" []", " 0", " 1"), ARRAYBOUNDS_X_X);
-    error(_ARRAY_INSERT_BEFORE.args(" []", " 2", " 1"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_INSERT_BEFORE.args(" []", 0, 1), ARRAYBOUNDS_X_X);
+    error(_ARRAY_INSERT_BEFORE.args(" []", 2, 1), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
   @Test public void put() {
-    array(_ARRAY_PUT.args(" [1]", 1, "()"), "[()]");
-    error(_ARRAY_PUT.args(" []", 1, "()"), ARRAYEMPTY);
-    error(_ARRAY_PUT.args(" [1]", 2, "()"), ARRAYBOUNDS_X_X);
+    array(_ARRAY_PUT.args(" [1]", 1, " ()"), "[()]");
+    error(_ARRAY_PUT.args(" []", 1, " ()"), ARRAYEMPTY);
+    error(_ARRAY_PUT.args(" [1]", 2, " ()"), ARRAYBOUNDS_X_X);
   }
 
   /** Test method. */
   @Test public void head() {
-    query(_ARRAY_HEAD.args(" [1]"), "1");
-    query(_ARRAY_HEAD.args(" array { 1 to 5 }"), "1");
+    query(_ARRAY_HEAD.args(" [1]"), 1);
+    query(_ARRAY_HEAD.args(" array { 1 to 5 }"), 1);
     query(_ARRAY_HEAD.args(" [1 to 2, 3]"), "1\n2");
 
     error(_ARRAY_HEAD.args(" []"), ARRAYEMPTY);
@@ -115,49 +115,49 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
   @Test public void join() {
     array(_ARRAY_JOIN.args(" []"), "[]");
     array(_ARRAY_JOIN.args(" [1]"), "[1]");
-    array(_ARRAY_JOIN.args("([1], [2])"), "[1, 2]");
-    array(_ARRAY_JOIN.args("([1], [2], [3])"), "[1, 2, 3]");
-    array(_ARRAY_JOIN.args("([1], [()], [2 to 3])"), "[1, (), (2, 3)]");
+    array(_ARRAY_JOIN.args(" ([1], [2])"), "[1, 2]");
+    array(_ARRAY_JOIN.args(" ([1], [2], [3])"), "[1, 2, 3]");
+    array(_ARRAY_JOIN.args(" ([1], [()], [2 to 3])"), "[1, (), (2, 3)]");
   }
 
   /** Test method. */
   @Test public void forEach() {
-    array(_ARRAY_FOR_EACH.args(" []", "function($a) { $a }"), "[]");
-    array(_ARRAY_FOR_EACH.args(" [1]", "function($a) { $a }"), "[1]");
-    array(_ARRAY_FOR_EACH.args(" [1,2]", "function($a) { $a+1 }"), "[2, 3]");
-    array(_ARRAY_FOR_EACH.args(" [1,2,3]", "function($a) { () }"), "[(), (), ()]");
+    array(_ARRAY_FOR_EACH.args(" []", " function($a) { $a }"), "[]");
+    array(_ARRAY_FOR_EACH.args(" [1]", " function($a) { $a }"), "[1]");
+    array(_ARRAY_FOR_EACH.args(" [1,2]", " function($a) { $a+1 }"), "[2, 3]");
+    array(_ARRAY_FOR_EACH.args(" [1,2,3]", " function($a) { () }"), "[(), (), ()]");
   }
 
   /** Test method. */
   @Test public void filter() {
-    array(_ARRAY_FILTER.args(" [1]", "function($a) { true() }"), "[1]");
-    array(_ARRAY_FILTER.args(" [1]", "function($a) { false() }"), "[]");
-    array(_ARRAY_FILTER.args(" [1,-2]", "function($a) { $a>0 }"), "[1]");
+    array(_ARRAY_FILTER.args(" [1]", " function($a) { true() }"), "[1]");
+    array(_ARRAY_FILTER.args(" [1]", " function($a) { false() }"), "[]");
+    array(_ARRAY_FILTER.args(" [1,-2]", " function($a) { $a>0 }"), "[1]");
   }
 
   /** Test method. */
   @Test public void foldLeft() {
-    query(_ARRAY_FOLD_LEFT.args(" [1,2]", " 0", "function($a,$b) { $a+$b }"), "3");
+    query(_ARRAY_FOLD_LEFT.args(" [1,2]", 0, " function($a,$b) { $a+$b }"), 3);
   }
 
   /** Test method. */
   @Test public void foldRight() {
-    query(_ARRAY_FOLD_RIGHT.args(" [1,2]", "()", "function($a,$b) { $b,$a }"), "2\n1");
+    query(_ARRAY_FOLD_RIGHT.args(" [1,2]", " ()", " function($a,$b) { $b,$a }"), "2\n1");
   }
 
   /** Test method. */
   @Test public void forEachPair() {
-    array(_ARRAY_FOR_EACH_PAIR.args(" []", " []", "function($a,$b) { $a+$b }"), "[]");
-    array(_ARRAY_FOR_EACH_PAIR.args(" [1,2]", " []", "function($a,$b) { $a+$b }"), "[]");
-    array(_ARRAY_FOR_EACH_PAIR.args(" [1]", " [2]", "function($a,$b) { $a+$b }"), "[3]");
-    array(_ARRAY_FOR_EACH_PAIR.args(" [1,2,3]", " [2]", "function($a,$b) { $a+$b }"), "[3]");
+    array(_ARRAY_FOR_EACH_PAIR.args(" []", " []", " function($a,$b) { $a+$b }"), "[]");
+    array(_ARRAY_FOR_EACH_PAIR.args(" [1,2]", " []", " function($a,$b) { $a+$b }"), "[]");
+    array(_ARRAY_FOR_EACH_PAIR.args(" [1]", " [2]", " function($a,$b) { $a+$b }"), "[3]");
+    array(_ARRAY_FOR_EACH_PAIR.args(" [1,2,3]", " [2]", " function($a,$b) { $a+$b }"), "[3]");
   }
 
   /** Test method. */
   @Test public void sort() {
     array(_ARRAY_SORT.args(" [1,4,6,5,3]"), "[1, 3, 4, 5, 6]");
     array(_ARRAY_SORT.args(" [(1,0), (1,1), (0,1), (0,0)]"), "[(0, 0), (0, 1), (1, 0), (1, 1)]");
-    array(_ARRAY_SORT.args(" [1,-2,5,10,-10,10,8]", "()", " abs#1"), "[1, -2, 5, 8, 10, -10, 10]");
+    array(_ARRAY_SORT.args(" [1,-2,5,10,-10,10,8]", " ()", " abs#1"), "[1, -2, 5, 8, 10, -10, 10]");
   }
 
   /**

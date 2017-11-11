@@ -37,7 +37,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   @Test
   public void replaceEqualBlocks() {
     query("for $i in //item/location/text() return replace node $i with $i");
-    query("count(//item)", "186");
+    query("count(//item)", 186);
   }
 
   /**
@@ -46,7 +46,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   @Test
   public void replaceEqualBlocks2() {
     query("for $i in //item return replace node $i with $i");
-    query("count(//item)", "186");
+    query("count(//item)", 186);
   }
 
   /**
@@ -84,7 +84,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
       "(count($i/descendant-or-self::node()) = $c) " +
       "return $i)[1] return for $i in //item " +
       "return replace node $i with $newitem");
-    query("count(//item)", "186");
+    query("count(//item)", 186);
   }
 
   /**
@@ -99,7 +99,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
       "return for $i in //item where " +
       "(count($i/descendant-or-self::node()) = $c) " +
       "return $i)[1] return replace node (//item)[last()] with $newitem");
-    query("count(//item)", "186");
+    query("count(//item)", 186);
   }
 
   /**
@@ -116,7 +116,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
         "(count($i/descendant-or-self::node()) = $c) " +
         "return $i)[1] return $newitem/@id/data()");
     query("replace node (//item)[last()] with (//item[@id='" + id + "'])[1]");
-    query("count(//item)", "186");
+    query("count(//item)", 186);
   }
 
   /**

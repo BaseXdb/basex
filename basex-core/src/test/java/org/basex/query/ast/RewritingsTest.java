@@ -1,7 +1,5 @@
 package org.basex.query.ast;
 
-import static org.basex.query.func.Function.*;
-
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -24,16 +22,16 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Checks if the count function is pre-compiled. */
   @Test public void preEval() {
-    check("count(1)", "1", "exists(//" + Util.className(Int.class) + ')');
+    check("count(1)", 1, "exists(//" + Util.className(Int.class) + ')');
 
     execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>"));
-    check("count(//a)", "3", "exists(//" + Util.className(Int.class) + ')');
-    check("count(/xml/a)", "3", "exists(//" + Util.className(Int.class) + ')');
-    check("count(//text())", "2", "exists(//" + Util.className(Int.class) + ')');
-    check("count(//*)", "4", "exists(//" + Util.className(Int.class) + ')');
-    check("count(//node())", "6", "exists(//" + Util.className(Int.class) + ')');
-    check("count(//comment())", "0", "exists(//" + Util.className(Int.class) + ')');
-    check("count(/self::document-node())", "1", "exists(//" + Util.className(Int.class) + ')');
+    check("count(//a)", 3, "exists(//" + Util.className(Int.class) + ')');
+    check("count(/xml/a)", 3, "exists(//" + Util.className(Int.class) + ')');
+    check("count(//text())", 2, "exists(//" + Util.className(Int.class) + ')');
+    check("count(//*)", 4, "exists(//" + Util.className(Int.class) + ')');
+    check("count(//node())", 6, "exists(//" + Util.className(Int.class) + ')');
+    check("count(//comment())", 0, "exists(//" + Util.className(Int.class) + ')');
+    check("count(/self::document-node())", 1, "exists(//" + Util.className(Int.class) + ')');
     execute(new DropDB(NAME));
   }
 
@@ -60,13 +58,13 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Checks EBV optimizations. */
   @Test public void optimizeEbv() {
-    query("not(<a/>[b])", "true");
-    query("empty(<a/>[b])", "true");
-    query("exists(<a/>[b])", "false");
+    query("not(<a/>[b])", true);
+    query("empty(<a/>[b])", true);
+    query("exists(<a/>[b])", false);
 
-    query("not(<a/>[b = 'c'])", "true");
-    query("empty(<a/>[b = 'c'])", "true");
-    query("exists(<a/>[b = 'c'])", "false");
+    query("not(<a/>[b = 'c'])", true);
+    query("empty(<a/>[b = 'c'])", true);
+    query("exists(<a/>[b = 'c'])", false);
 
     query("let $n := <n/> where $n[<a><b/><b/></a>/*] return $n", "<n/>");
 
@@ -101,24 +99,24 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Checks OR optimizations. */
   @Test public void or() {
-    check("('' or '')", "false", "empty(//Or)");
-    check("('x' or 'x' = 'x')", "true", "empty(//Or)");
-    check("(false()   or <x/> = 'x')", "false", "empty(//Or)");
-    check("(true()    or <x/> = 'x')", "true", "empty(//Or)");
-    check("('x' = 'x' or <x/> = 'x')", "true", "empty(//Or)");
+    check("('' or '')", false, "empty(//Or)");
+    check("('x' or 'x' = 'x')", true, "empty(//Or)");
+    check("(false()   or <x/> = 'x')", false, "empty(//Or)");
+    check("(true()    or <x/> = 'x')", true, "empty(//Or)");
+    check("('x' = 'x' or <x/> = 'x')", true, "empty(//Or)");
 
     // {@link CmpG} rewritings
-    check("let $x := <x/>     return ($x = 'x' or $x = 'y')", "false", "empty(//Or)");
-    check("let $x := <x>x</x> return ($x = 'x' or $x = 'y')", "true",  "empty(//Or)");
+    check("let $x := <x/>     return ($x = 'x' or $x = 'y')", false, "empty(//Or)");
+    check("let $x := <x>x</x> return ($x = 'x' or $x = 'y')", true,  "empty(//Or)");
   }
 
   /** Checks AND optimizations. */
   @Test public void and() {
-    check("('x' and 'y')", "true", "empty(//And)");
-    check("('x' and 'x' = 'x')", "true", "empty(//And)");
-    check("(true()    and <x>x</x> = 'x')", "true", "empty(//And)");
-    check("(false()   and <x>x</x> = 'x')", "false", "empty(//And)");
-    check("('x' = 'x' and <x>x</x> = 'x')", "true", "empty(//And)");
+    check("('x' and 'y')", true, "empty(//And)");
+    check("('x' and 'x' = 'x')", true, "empty(//And)");
+    check("(true()    and <x>x</x> = 'x')", true, "empty(//And)");
+    check("(false()   and <x>x</x> = 'x')", false, "empty(//And)");
+    check("('x' = 'x' and <x>x</x> = 'x')", true, "empty(//And)");
 
     // {@link Pos} rewritings
     check("(<a/>,<b/>)[last()]", "<b/>",
@@ -136,10 +134,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", "count(//CmpR) = 2");
     check("<a>5</a>[text() > 800000000]", "", "exists(//CmpR)");
     check("<a>5</a>[text() < -800000000]", "", "exists(//CmpR)");
-    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", "true", "exists(//CmpR)");
+    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", true, "exists(//CmpR)");
 
     // no {@link CmpR} rewritings
-    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", "true", "empty(//CmpR)");
+    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, "empty(//CmpR)");
     check("<a>5</a>[text() > 8000000000]", "", "empty(//CmpR)");
     check("<a>5</a>[text() < -8000000000]", "", "empty(//CmpR)");
     check("(1234567890.12345678)[. = 1234567890.1234567]", "", "empty(//CmpR)");
@@ -157,27 +155,27 @@ public final class RewritingsTest extends QueryPlanTest {
     final String string = Util.className(FnString.class);
     final String stringLength = Util.className(FnStringLength.class);
 
-    check("<a/>[" + STRING_LENGTH.args() + " >  -1]", "<a/>", "empty(//" + filter + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " != -1]", "<a/>", "empty(//" + filter + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " ge  0]", "<a/>", "empty(//" + filter + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " ne 1.1]", "<a/>", "empty(//" + filter + ')');
+    check("<a/>[string-length() >  -1]", "<a/>", "empty(//" + filter + ')');
+    check("<a/>[string-length() != -1]", "<a/>", "empty(//" + filter + ')');
+    check("<a/>[string-length() ge  0]", "<a/>", "empty(//" + filter + ')');
+    check("<a/>[string-length() ne 1.1]", "<a/>", "empty(//" + filter + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " <   0]", "", "empty(//" + filter + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " <= -1]", "", "empty(//" + filter + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " eq -1]", "", "empty(//" + filter + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " eq 1.1]", "", "empty(//" + filter + ')');
+    check("<a/>[string-length() <   0]", "", "empty(//" + filter + ')');
+    check("<a/>[string-length() <= -1]", "", "empty(//" + filter + ')');
+    check("<a/>[string-length() eq -1]", "", "empty(//" + filter + ')');
+    check("<a/>[string-length() eq 1.1]", "", "empty(//" + filter + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " >  0]", "", "exists(//" + string + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " >= 0.5]", "", "exists(//" + string + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " ne 0]", "", "exists(//" + string + ')');
+    check("<a/>[string-length() >  0]", "", "exists(//" + string + ')');
+    check("<a/>[string-length() >= 0.5]", "", "exists(//" + string + ')');
+    check("<a/>[string-length() ne 0]", "", "exists(//" + string + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " <  0.5]", "<a/>", "exists(//" + string + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " <= 0.5]", "<a/>", "exists(//" + string + ')');
-    check("<a/>[" + STRING_LENGTH.args() + " eq 0]", "<a/>", "exists(//" + string + ')');
+    check("<a/>[string-length() <  0.5]", "<a/>", "exists(//" + string + ')');
+    check("<a/>[string-length() <= 0.5]", "<a/>", "exists(//" + string + ')');
+    check("<a/>[string-length() eq 0]", "<a/>", "exists(//" + string + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " gt 1]", "", "exists(//" + stringLength + ')');
+    check("<a/>[string-length() gt 1]", "", "exists(//" + stringLength + ')');
 
-    check("<a/>[" + STRING_LENGTH.args() + " = <a>1</a>]", "", "exists(//" + stringLength + ')');
+    check("<a/>[string-length() = <a>1</a>]", "", "exists(//" + stringLength + ')');
   }
 
   /** Checks that empty sequences are eliminated and that singleton lists are flattened. */
@@ -189,7 +187,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Checks that expressions marked as non-deterministic will not be rewritten. */
   @Test
   public void nonDeterministic() {
-    check("count((# basex:non-deterministic #) { <x/> })", "1", "exists(//FnCount)");
+    check("count((# basex:non-deterministic #) { <x/> })", 1, "exists(//FnCount)");
   }
 
   /** Ensures that fn:doc with URLs will not be rewritten. */
@@ -197,11 +195,11 @@ public final class RewritingsTest extends QueryPlanTest {
   public void doc() {
     check("<a>{ doc('" + FILE + "') }</a>//x", "",
         "exists(//" + Util.className(DBNode.class) + ')');
-    check("if(<x>1</x> = 1) then 2 else doc('" + FILE + "')", "2",
+    check("if(<x>1</x> = 1) then 2 else doc('" + FILE + "')", 2,
         "exists(//" + Util.className(DBNode.class) + ')');
-    check("if(<x>1</x> = 1) then 2 else doc('http://abc.de/')", "2",
+    check("if(<x>1</x> = 1) then 2 else doc('http://abc.de/')", 2,
         "exists(//" + Util.className(FnDoc.class) + ')');
-    check("if(<x>1</x> = 1) then 2 else collection('http://abc.de/')", "2",
+    check("if(<x>1</x> = 1) then 2 else collection('http://abc.de/')", 2,
         "exists(//" + Util.className(FnCollection.class) + ')');
   }
 
@@ -277,7 +275,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/self::*[.][.]", "<a/>", "empty(//ContextValue)");
     check("('a','b')[position()[position() ! .]]", "a\nb", "count(.//FnPosition) = 2");
     check("('a','b')[. ! position()]", "a", "exists(.//*[contains(name(), 'Map')])");
-    check("1[.]", "1", "exists(//ContextValue)");
+    check("1[.]", 1, "exists(//ContextValue)");
     check("let $x := (<a/>,<a/>) where $x[. eq ''] return $x", "<a/>\n<a/>",
         "exists(.//ContextValue)");
     error("true#0[.]", QueryError.EBV_X_X);

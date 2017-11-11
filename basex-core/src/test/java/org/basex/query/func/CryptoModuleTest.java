@@ -162,7 +162,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignature1() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','','',''))",
-        "true");
+        true);
   }
 
   /**
@@ -172,7 +172,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignature1b() {
     query("crypto:validate-signature(" +
-        "crypto:generate-signature(<a/>,'','SHA1','DSA_SHA1','','enveloped'))", "true");
+        "crypto:generate-signature(<a/>,'','SHA1','DSA_SHA1','','enveloped'))", true);
   }
 
   /**
@@ -197,7 +197,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
         "</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue>" +
         "</KeyInfo></Signature></a>";
 
-    query("crypto:validate-signature(" + input + ')', "true");
+    query("crypto:validate-signature(" + input + ')', true);
   }
 
   /**
@@ -207,7 +207,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithCanonicalization() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
-        "'exclusive','','','',''))", "true");
+        "'exclusive','','','',''))", true);
   }
 
   /**
@@ -217,7 +217,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithCanonicalization2() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
-        "'exclusive-with-comments','','','',''))", "true");
+        "'exclusive-with-comments','','','',''))", true);
   }
 
   /**
@@ -227,7 +227,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithCanonicalization3() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
-        "'inclusive','','','',''))", "true");
+        "'inclusive','','','',''))", true);
   }
 
   /**
@@ -237,7 +237,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithCanonicalization4() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
-        "'inclusive-with-comments','','','',''))", "true");
+        "'inclusive-with-comments','','','',''))", true);
   }
 
   /**
@@ -247,7 +247,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithDigestAlgorithm() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','SHA1','','',''))",
-        "true");
+        true);
   }
 
   /**
@@ -257,7 +257,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithDigestAlgorithm2() {
     query("crypto:validate-signature(crypto:generate-signature(" +
-        "<a/>,'','SHA256','','',''))", "true");
+        "<a/>,'','SHA256','','',''))", true);
   }
 
   /**
@@ -267,7 +267,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithDigestAlgorithm3() {
     query("crypto:validate-signature(crypto:generate-signature(" +
-        "<a/>,'','SHA512','','',''))", "true");
+        "<a/>,'','SHA512','','',''))", true);
   }
 
   /**
@@ -277,7 +277,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithSignatureAlgorithm() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'',''," +
-        "'DSA_SHA1','',''))", "true");
+        "'DSA_SHA1','',''))", true);
   }
 
   /**
@@ -288,7 +288,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   public void validateSignatureWithSignatureAlgorithm2() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'',''," +
         "'RSA_SHA1','',''))",
-        "true");
+        true);
   }
 
   /**
@@ -298,7 +298,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithSignatureNamespace3() {
     query("crypto:validate-signature(crypto:generate-signature(" +
-        "<a/>,'','','','prefix',''))", "true");
+        "<a/>,'','','','prefix',''))", true);
   }
 
   /**
@@ -308,7 +308,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithSignatureType() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','',''," +
-        "'enveloped'))", "true");
+        "'enveloped'))", true);
   }
 
   /**
@@ -318,7 +318,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithSignatureType2() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','',''," +
-        "'enveloping'))", "true");
+        "'enveloping'))", true);
   }
 
   /**
@@ -328,7 +328,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureWithXPath() {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/><n/></a>," +
-        "'','','','','','/a/n'))", "true");
+        "'','','','','','/a/n'))", true);
   }
 
   /**
@@ -338,6 +338,6 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   @Test
   public void validateSignatureFullySpecified() {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
-        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))", "true");
+        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))", true);
   }
 }

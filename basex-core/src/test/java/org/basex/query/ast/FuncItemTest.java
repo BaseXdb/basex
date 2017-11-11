@@ -20,7 +20,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void idTest() {
     check("function($x) { $x }(42)",
-        "42",
+        42,
         "empty(//" + Util.className(Closure.class) + ')'
     );
   }
@@ -38,7 +38,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void partAppTest() {
     check("starts-with('foobar', ?)('foo')",
-        "true",
+        true,
         "empty(//" + Util.className(PartFunc.class) + ')'
     );
   }
@@ -60,7 +60,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "  let $loop := function($x) { $f(function() { $x($x) }) }" +
         "  return $loop($loop)" +
         "}(function($f) { 42 })",
-        "42",
+        42,
         // both outer inline functions are pre-compiled
         "empty(//" + Util.className(Closure.class) + ')',
         "/*/" + Util.className(Int.class) + " = '42'"
@@ -71,7 +71,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void foldLeft1Test() {
     check("hof:fold-left1(1 to 42, function($a, $b) { max(($a, $b)) })",
-        "42"
+        42
     );
   }
 
@@ -80,7 +80,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void compStatUnusedTest() {
     check("declare function local:foo() { abs(?) };" +
         "function-lookup(xs:QName(('local:foo')[random:double() < 1]), 0)()(-42)",
-        "42",
+        42,
         "empty(//" + Util.className(StaticFuncs.class) + "/*)"
     );
   }
@@ -94,7 +94,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:a() { local:b() };" +
         "declare function local:b() { 42 };" +
         "local:a#0()",
-        "42",
+        42,
         "empty(//" + Util.className(FuncLit.class) + ')'
     );
   }
@@ -148,7 +148,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:foo($f) { $f($f) };" +
         "let $id := local:foo(function($g) { $g })" +
         "return $id(42)",
-        "42",
+        42,
         "/*/" + Util.className(Int.class) + " = '42'"
     );
   }
@@ -176,7 +176,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "  }" +
         "return $fold-left(function($a,$b) {$a + $b}, 0, 1 to 100000)",
 
-        "5000050000",
+        5000050000L,
 
         // all inline functions are pre-compiled
         "empty(//" + Util.className(Closure.class) + ')',
@@ -199,7 +199,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "declare function local:g($f, $x) {if(fn:empty($f())) then local:f($x) else local:f(())};" +
         "declare variable $x := local:g(function() { () }, function() { () });" +
         "fn:count($x())",
-        "1",
+        1,
         // the query should be pre-evaluated
         "QueryPlan/Int = 1"
     );

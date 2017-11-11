@@ -54,14 +54,14 @@ public final class StringRangeTest extends QueryPlanTest {
    */
   @Test
   public void geLe() {
-    test("exists(//*[text() >= '999' and text() <= '999'])", "true", ValueAccess.class);
+    test("exists(//*[text() >= '999' and text() <= '999'])", true, ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
-    test("count(//*[text() >= '990' and text() <= '999'])", "10", clz);
-    test("count(//*[text() >= '900' and text() <= '999'])", "100", clz);
-    test("count(//*[text() >= '100' and text() <= '999'])", "900", clz);
-    test("count(//*[text() >= ' '   and text() <= 'a'  ])", "1800", clz);
-    test("count(//*[text() >= '@'   and text() <= 'a'  ])", "900", clz);
-    test("count(//*[text() >= '@'])", "900");
+    test("count(//*[text() >= '990' and text() <= '999'])", 10, clz);
+    test("count(//*[text() >= '900' and text() <= '999'])", 100, clz);
+    test("count(//*[text() >= '100' and text() <= '999'])", 900, clz);
+    test("count(//*[text() >= ' '   and text() <= 'a'  ])", 1800, clz);
+    test("count(//*[text() >= '@'   and text() <= 'a'  ])", 900, clz);
+    test("count(//*[text() >= '@'])", 900);
   }
 
   /**
@@ -69,13 +69,13 @@ public final class StringRangeTest extends QueryPlanTest {
    */
   @Test
   public void leGe() {
-    test("exists(//*[text() <= '999' and text() >= '999'])", "true", ValueAccess.class);
+    test("exists(//*[text() <= '999' and text() >= '999'])", true, ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
-    test("count(//*[text() <= '999' and text() >= '990'])", "10", clz);
-    test("count(//*[text() <= '999' and text() >= '900'])", "100", clz);
-    test("count(//*[text() <= '999' and text() >= '100'])", "900", clz);
-    test("count(//*[text() <= 'zzz' and text() >= ' '  ])", "1800", clz);
-    test("count(//*[text() <= 'a'   and text() >= '@'  ])", "900", clz);
+    test("count(//*[text() <= '999' and text() >= '990'])", 10, clz);
+    test("count(//*[text() <= '999' and text() >= '900'])", 100, clz);
+    test("count(//*[text() <= '999' and text() >= '100'])", 900, clz);
+    test("count(//*[text() <= 'zzz' and text() >= ' '  ])", 1800, clz);
+    test("count(//*[text() <= 'a'   and text() >= '@'  ])", 900, clz);
   }
 
   /**
@@ -83,14 +83,14 @@ public final class StringRangeTest extends QueryPlanTest {
    */
   @Test
   public void gtLt() {
-    test("exists(//*[text() > '999' and text() < '999'])", "false");
+    test("exists(//*[text() > '999' and text() < '999'])", false);
     final Class<? extends Expr> clz = StringRangeAccess.class;
-    test("count(//*[text() > '990' and text() < '999'])", "8", clz);
-    test("count(//*[text() > '900' and text() < '999'])", "98", clz);
-    test("count(//*[text() > '100' and text() < '999'])", "898", clz);
-    test("count(//*[text() > ' '   and text() < 'a'  ])", "1800", clz);
-    test("count(//*[text() > '@'   and text() < 'a'  ])", "900", clz);
-    test("count(//*[text() > '@'])", "900");
+    test("count(//*[text() > '990' and text() < '999'])", 8, clz);
+    test("count(//*[text() > '900' and text() < '999'])", 98, clz);
+    test("count(//*[text() > '100' and text() < '999'])", 898, clz);
+    test("count(//*[text() > ' '   and text() < 'a'  ])", 1800, clz);
+    test("count(//*[text() > '@'   and text() < 'a'  ])", 900, clz);
+    test("count(//*[text() > '@'])", 900);
   }
 
   /**
@@ -99,7 +99,7 @@ public final class StringRangeTest extends QueryPlanTest {
    * @param result expected result
    * @param expr class expected in query plan
    */
-  private static void test(final String query, final String result,
+  private static void test(final String query, final Object result,
       final Class<? extends Expr> expr) {
 
     execute(new CreateIndex(CmdIndex.TEXT));
@@ -113,7 +113,7 @@ public final class StringRangeTest extends QueryPlanTest {
    * @param query query
    * @param result expected result
    */
-  private static void test(final String query, final String result) {
+  private static void test(final String query, final Object result) {
     execute(new CreateIndex(CmdIndex.TEXT));
     check(query, result);
     execute(new DropIndex(CmdIndex.TEXT));

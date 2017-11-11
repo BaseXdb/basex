@@ -53,15 +53,15 @@ public final class SignatureTest extends AdvancedQueryTest {
       final boolean in = al >= min && al <= max;
       final StringBuilder qu = new StringBuilder(name + '(');
       int any = 0;
-      for(int a = 0; a < al; a++) {
-        if(a != 0) qu.append(", ");
+      for(int p = 0; p < al; p++) {
+        if(p != 0) qu.append(", ");
         if(in) {
           // test arguments
-          if(def.args[a].type == AtomType.STR) {
+          if(def.params[p].type == AtomType.STR) {
             qu.append('1');
           } else { // any type (skip test)
             qu.append("'X'");
-            if(SeqType.STR.instanceOf(def.args[a])) any++;
+            if(SeqType.STR.instanceOf(def.params[p])) any++;
           }
         } else {
           // test wrong number of arguments

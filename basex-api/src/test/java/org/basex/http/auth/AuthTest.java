@@ -86,7 +86,7 @@ public abstract class AuthTest extends HTTPTest {
    */
   private String sendRequest(final String user, final String pass) throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
+        " <http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "auth-method='" + method + "' username='" + user + "' password='" + pass + "' " +
         "send-authorization='true' href='" + REST_ROOT + "'/>") +
         "[. instance of node()]/@status/string()", ctx)) {

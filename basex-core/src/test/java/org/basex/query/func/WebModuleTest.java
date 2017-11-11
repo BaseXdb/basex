@@ -38,9 +38,9 @@ public final class WebModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void redirect() {
-    query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@value = 'a/b'", "true");
-    query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@name = 'location'", "true");
-    query(_WEB_REDIRECT.args("a/b") + "/*:response/@status = 302", "true");
+    query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@value = 'a/b'", true);
+    query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@name = 'location'", true);
+    query(_WEB_REDIRECT.args("a/b") + "/*:response/@status = 302", true);
 
     query(_WEB_REDIRECT.args("a/b", " map { 'a':'b' }") +
         "/*:response/*:header[@name = 'location']/@value/string()", "a/b?a=b");
@@ -57,14 +57,14 @@ public final class WebModuleTest extends AdvancedQueryTest {
         "/output:serialization-parameters/output:media-type/@value/string()", "X");
     // header is not generated if value is empty
     query("count(" + _WEB_RESPONSE_HEADER.args(" map { 'media-type': '' }") +
-        "/output:serialization-parameters/*)", "0");
+        "/output:serialization-parameters/*)", 0);
 
     // overwrite header
     query(_WEB_RESPONSE_HEADER.args(" map {}", " map { 'Cache-Control': 'X' }") +
         "/http:response/http:header[@name = 'Cache-Control']/@value/string()", "X");
     // header is not generated if value is empty
     query("count(" + _WEB_RESPONSE_HEADER.args(" map {}", " map { 'Cache-Control': '' }") +
-        "/http:response/*)", "0");
+        "/http:response/*)", 0);
 
     // status/message arguments
     query(_WEB_RESPONSE_HEADER.args(" map {}", " map {}", " map {'status':200,'message':'OK'}") +
@@ -82,7 +82,7 @@ public final class WebModuleTest extends AdvancedQueryTest {
   public void decodeUrl() {
     query(_WEB_DECODE_URL.args("a+-._*"), "a -._*");
     query("let $s := codepoints-to-string((9, 10, 13, 32 to 55295, 57344 to 65533, 65536)) " +
-        "return $s = web:decode-url(web:encode-url($s))", "true");
+        "return $s = web:decode-url(web:encode-url($s))", true);
 
     error(_WEB_DECODE_URL.args("%1"), BXWE_INVALID_X);
     error(_WEB_DECODE_URL.args("%1F"), BXWE_CODES_X);

@@ -115,11 +115,11 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   /** Tests if where clauses are converted to predicates where applicable. */
   @Test public void whereToPred() {
     check("for $i in 1 to 10 where <x/>[$i] and $i < 3 return $i",
-        "1",
+        1,
         "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(UtilItemAt.class) + ')'
     );
     check("for $i in 1 to 10 where (<a/>)[$i] return $i",
-        "1",
+        1,
         "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(UtilItemAt.class) + ')'
     );
     check("for $i in 1 to 3 " +

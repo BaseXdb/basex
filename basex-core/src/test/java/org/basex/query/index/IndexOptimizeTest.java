@@ -31,7 +31,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     createDoc();
     execute(new Open(NAME));
     check("//*[text() = '1']");
-    check("data(//*[@* = 'y'])", "1");
+    check("data(//*[@* = 'y'])", 1);
     check("data(//@*[. = 'y'])", "y");
     check("//*[text() contains text '1']");
     check("//a[. = '1']");
@@ -111,15 +111,15 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void tokenTest() {
     createDoc();
     execute(new Open(NAME));
-    check("data(//*[tokenize(@idref) = 'id1'])", "1");
+    check("data(//*[tokenize(@idref) = 'id1'])", 1);
     check("data(//@*[tokenize(.) = 'id1'])", "id1 id2");
-    check("for $s in ('id2', 'id3') return data(//*[tokenize(@idref) = $s])", "1");
+    check("for $s in ('id2', 'id3') return data(//*[tokenize(@idref) = $s])", 1);
     check("for $s in ('id2', 'id3') return data(//@*[tokenize(.) = $s])", "id1 id2");
 
-    check("data(//*[contains-token(@idref, 'id1')])", "1");
-    check("data(//*[contains-token(@idref, '   id1  ')])", "1");
+    check("data(//*[contains-token(@idref, 'id1')])", 1);
+    check("data(//*[contains-token(@idref, '   id1  ')])", 1);
     check("data(//@*[contains-token(., 'id1')])", "id1 id2");
-    check("for $s in ('id2', 'id3') return data(//*[contains-token(@idref, $s)])", "1");
+    check("for $s in ('id2', 'id3') return data(//*[contains-token(@idref, $s)])", 1);
     check("for $s in ('id2', 'id3') return data(//@*[contains-token(., $s)])", "id1 id2");
   }
 
@@ -127,7 +127,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void ftTest() {
     createDoc();
     execute(new Open(NAME));
-    check("data(//*[text() contains text '1'])", "1");
+    check("data(//*[text() contains text '1'])", 1);
     check("data(//*[text() contains text '1 2' any word])", "1\n2 3");
     check("//*[text() contains text {'2','4'} all]", "");
     check("//*[text() contains text {'2','3'} all words]", "<a>2 3</a>");
@@ -149,21 +149,21 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     createColl();
     // document access after inlining
     check("declare function local:x($d) { collection($d)//text()[. = '1'] };"
-        + "local:x('" + NAME + "')", "1");
+        + "local:x('" + NAME + "')", 1);
     check("declare function local:x($d, $s) { collection($d)//text()[. = $s] };"
-        + "local:x('" + NAME + "', '1')", "1");
+        + "local:x('" + NAME + "', '1')", 1);
 
     // text: search term must be string
     final String doc = _DB_OPEN.args(NAME);
     check("declare function local:x() {" + doc +
-        "//text()[. = '1'] }; local:x()", "1");
+        "//text()[. = '1'] }; local:x()", 1);
     check("declare function local:x($x as xs:string) {" + doc +
-        "//text()[. = $x] }; local:x('1')", "1");
+        "//text()[. = $x] }; local:x('1')", 1);
     // full-text: search term may can have any type
     check("declare function local:x() {" + doc +
-        "//text()[. contains text '1'] }; local:x()", "1");
+        "//text()[. contains text '1'] }; local:x()", 1);
     check("declare function local:x($x) {" + doc +
-        "//text()[. contains text { $x }] }; local:x('1')", "1");
+        "//text()[. contains text { $x }] }; local:x('1')", 1);
   }
 
   /** Checks predicate tests for empty strings. */
@@ -191,13 +191,13 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         execute(new CreateDB(NAME, "<xml><a a='1'>1</a></xml>"));
 
         final String test = "exists(//ValueAccess) = " + (include.equals("a") + "()");
-        check("data(//*[a = '1'])", "1", test);
-        check("data(//*[a/text() = '1'])", "1", test);
-        check("data(//a[. = '1'])", "1", test);
-        check("data(//a[text() = '1'])", "1", test);
-        check("data(//*[*/@a = '1'])", "1", test);
-        check("data(//*[@a = '1'])", "1", test);
-        check("data(//@a[. = '1'])", "1", test);
+        check("data(//*[a = '1'])", 1, test);
+        check("data(//*[a/text() = '1'])", 1, test);
+        check("data(//a[. = '1'])", 1, test);
+        check("data(//a[text() = '1'])", 1, test);
+        check("data(//*[*/@a = '1'])", 1, test);
+        check("data(//*[@a = '1'])", 1, test);
+        check("data(//@a[. = '1'])", 1, test);
       }
     } finally {
       set(MainOptions.TEXTINCLUDE, "");
@@ -217,16 +217,16 @@ public final class IndexOptimizeTest extends QueryPlanTest {
 
   /** Comparison expressions. */
   @Test public void cmpG() {
-    check("count(let $s := (0,1 to 99999) return $s[. = $s])", "100000", "exists(//CmpHashG)");
+    check("count(let $s := (0,1 to 99999) return $s[. = $s])", 100000, "exists(//CmpHashG)");
   }
 
   /** Checks expressions with the pragma for enforcing index rewritings. */
   @Test public void pragma() {
     createDoc();
     final String pragma = "(# db:enforceindex #) { ";
-    check(pragma + _DB_OPEN.args("<_>" + NAME + "</_>") + "//a[text() = '1']/text() }", "1",
+    check(pragma + _DB_OPEN.args(" <_>" + NAME + "</_>") + "//a[text() = '1']/text() }", 1,
         "exists(//ValueAccess)");
-    check(pragma + _DB_OPEN.args("<x>" + NAME + "</x>") + "//a/text()[. = '1'] }", "1",
+    check(pragma + _DB_OPEN.args(" <x>" + NAME + "</x>") + "//a/text()[. = '1'] }", 1,
         "exists(//ValueAccess)");
   }
 

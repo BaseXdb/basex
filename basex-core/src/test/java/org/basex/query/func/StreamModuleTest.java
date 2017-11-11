@@ -26,8 +26,8 @@ public final class StreamModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void isStreamable() {
-    query(_STREAM_IS_STREAMABLE.args(_FILE_READ_BINARY.args(FILE)), "true");
-    query(_STREAM_IS_STREAMABLE.args("A"), "false");
-    query(_STREAM_IS_STREAMABLE.args(_STREAM_MATERIALIZE.args(_FILE_READ_TEXT.args(FILE))), "true");
+    query(_STREAM_IS_STREAMABLE.args(_FILE_READ_BINARY.args(FILE)), true);
+    query(_STREAM_IS_STREAMABLE.args("A"), false);
+    query(_STREAM_IS_STREAMABLE.args(_STREAM_MATERIALIZE.args(_FILE_READ_TEXT.args(FILE))), true);
   }
 }

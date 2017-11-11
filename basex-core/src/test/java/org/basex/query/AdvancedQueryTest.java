@@ -15,7 +15,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   /**
    * Checks if a query yields the specified string.
    * @param query query string
-   * @param expected expected query result
+   * @param expected expected result
    */
   protected static void query(final String query, final Object expected) {
     final String res = query(query).replaceAll("(\r?\n|\r) *", "\n");

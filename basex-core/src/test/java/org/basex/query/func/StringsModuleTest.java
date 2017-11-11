@@ -17,21 +17,21 @@ public final class StringsModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void levenshtein() {
-    query(_STRINGS_LEVENSHTEIN.args("ab", "ab"), "1");
-    query(_STRINGS_LEVENSHTEIN.args("ab", "a"), "0.5");
-    query(_STRINGS_LEVENSHTEIN.args("ab", "a"), "0.5");
-    query(_STRINGS_LEVENSHTEIN.args("ab", ""), "0");
+    query(_STRINGS_LEVENSHTEIN.args("ab", "ab"), 1);
+    query(_STRINGS_LEVENSHTEIN.args("ab", "a"), 0.5);
+    query(_STRINGS_LEVENSHTEIN.args("ab", "a"), 0.5);
+    query(_STRINGS_LEVENSHTEIN.args("ab", ""), 0);
 
-    query(_STRINGS_LEVENSHTEIN.args("ac", "ab"), "0.5");
-    query(_STRINGS_LEVENSHTEIN.args("a", "ab"), "0.5");
-    query(_STRINGS_LEVENSHTEIN.args("", "ab"), "0");
+    query(_STRINGS_LEVENSHTEIN.args("ac", "ab"), 0.5);
+    query(_STRINGS_LEVENSHTEIN.args("a", "ab"), 0.5);
+    query(_STRINGS_LEVENSHTEIN.args("", "ab"), 0);
 
-    query(_STRINGS_LEVENSHTEIN.args("ab", "ba"), "0.5");
+    query(_STRINGS_LEVENSHTEIN.args("ab", "ba"), 0.5);
 
     query(_STRINGS_LEVENSHTEIN.args("", ""), 1);
 
     query("let $x := string-join((1 to 1000) ! 'a') " +
-        "return " + _STRINGS_LEVENSHTEIN.args("$x", "$x"), "1");
+        "return " + _STRINGS_LEVENSHTEIN.args(" $x", " $x"), 1);
   }
 
   /** Tests, adopted from Apache Commons project (SoundexTest.java). */
@@ -165,10 +165,10 @@ public final class StringsModuleTest extends AdvancedQueryTest {
   private static void soundexDifference(final String string1, final String string2,
       final int diff) {
 
-    query(SUM.args(FOR_EACH_PAIR.args(
-      STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string1)) + ',' +
-      STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string2)) + ',' +
-      "function($cp1, $cp2) { if($cp1 = $cp2) then 1 else 0 }")), diff);
+    query("sum(for-each-pair(" +
+      "string-to-codepoints(" + _STRINGS_SOUNDEX.args(string1) + "), " +
+      "string-to-codepoints(" + _STRINGS_SOUNDEX.args(string2) + "), " +
+      "function($cp1, $cp2) { if($cp1 = $cp2) then 1 else 0 }))", diff);
   }
 
   /** Test method. */

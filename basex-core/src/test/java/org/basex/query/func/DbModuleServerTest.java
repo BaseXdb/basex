@@ -86,15 +86,10 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
     assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
     // create
-    runClients(new XQuery(
-      _DB_DROP.args(NAME) + ',' +
-      _DB_CREATE.args(NAME, FILE, "in/")
-    ));
+    runClients(new XQuery(_DB_DROP.args(NAME) + ',' + _DB_CREATE.args(NAME, FILE, "in/")));
 
     // add, create
-    runClients(new XQuery(
-        _DB_ADD.args(NAME, "<X/>", "x.xml") + ',' +
-      _DB_DROP.args(NAME) + ',' +
+    runClients(new XQuery(_DB_ADD.args(NAME, " <X/>", "x.xml") + ',' + _DB_DROP.args(NAME) + ',' +
       _DB_CREATE.args(NAME, FILE)));
 
     check.execute(new DropDB(NAME));

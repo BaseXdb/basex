@@ -21,16 +21,16 @@ public final class HofModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void idTest() {
-    query(_HOF_ID.args("()"), "");
-    query(_HOF_ID.args("<x/>"), "<x/>");
+    query(_HOF_ID.args(" ()"), "");
+    query(_HOF_ID.args(" <x/>"), "<x/>");
     query("hof:id(1 to 10)", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
   }
 
   /** Test method. */
   @Test
   public void constTest() {
-    query(_HOF_CONST.args("(), error()"), "");
-    query(_HOF_CONST.args("<x/>, 123"), "<x/>");
+    query(_HOF_CONST.args(" (), error()"), "");
+    query(_HOF_CONST.args(" <x/>, 123"), "<x/>");
     query("hof:const(1 to 10, error('foo'))", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
   }
 
@@ -45,31 +45,31 @@ public final class HofModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void foldLeft1Test() {
-    query("hof:fold-left1(1 to 10, function($x, $y) { $x + $y })", "55");
+    query("hof:fold-left1(1 to 10, function($x, $y) { $x + $y })", 55);
     error("hof:fold-left1((), function($x, $y) { $x + $y })", EMPTYFOUND);
 
     // should be unrolled and evaluated at compile time
     final int limit = FnForEach.UNROLL_LIMIT;
     check("hof:fold-left1(1 to " + limit + ", function($a,$b) {$a+$b})",
-        "55",
+        55,
         "empty(//" + Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')])",
         "exists(*/" + Util.className(Int.class) + ')');
     // should be unrolled but not evaluated at compile time
     check("hof:fold-left1(1 to " + limit + ", function($a,$b) {0*random:integer($a)+$b})",
-        "10",
+        10,
         "empty(//" + Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')])",
         "empty(*/" + Util.className(Int.class) + ')',
         "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("hof:fold-left1(1 to " + (limit + 1) + ", function($a,$b) {$a+$b})",
-        "66",
+        66,
         "exists(//" + Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')])");
   }
 
   /** Test method. */
   @Test
   public void untilTest() {
-    query("hof:until(function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1)", "1024");
+    query("hof:until(function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1)", 1024);
     query("hof:until(function($xs) {count($xs)>3}, function($x) {$x,$x}, 1)", "1\n1\n1\n1");
   }
 

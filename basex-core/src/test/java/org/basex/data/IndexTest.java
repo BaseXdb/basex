@@ -70,7 +70,7 @@ public final class IndexTest extends AdvancedQueryTest {
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
     query(_DB_TEXT.args(NAME, "B"), "B");
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", true);
   }
 
   /**
@@ -132,7 +132,7 @@ public final class IndexTest extends AdvancedQueryTest {
 
     execute(new Add("a", "<x c='c'/>"));
     query(_DB_TOKEN.args(NAME, "a"), "");
-    query(DATA.args(_DB_TOKEN.args(NAME, "c")), "c");
+    query("data(" + _DB_TOKEN.args(NAME, "c") + ')', "c");
 
     for(int i = 0; i < 5; i++) {
       execute(new Add("a", "<x c='c'/>"));
@@ -142,7 +142,7 @@ public final class IndexTest extends AdvancedQueryTest {
     query(_DB_TOKEN.args(NAME, "a"), "");
     query(_DB_TOKEN.args(NAME, "b"), "");
     query(_DB_TOKEN.args(NAME, "c"), "");
-    query(_DB_INFO.args(NAME) + "//tokenindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//tokenindex/text()", true);
   }
 
   /**
@@ -210,20 +210,20 @@ public final class IndexTest extends AdvancedQueryTest {
   public void autooptimize() {
     set(MainOptions.AUTOOPTIMIZE, true);
     execute(new CreateDB(NAME));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", true);
     execute(new Replace("x.xml", "<a>A</a>"));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    query(_DB_REPLACE.args(NAME, "x.xml", "<a>B</a>"));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", true);
+    query(_DB_REPLACE.args(NAME, "x.xml", " <a>B</a>"));
+    query(_DB_INFO.args(NAME) + "//textindex/text()", true);
 
     set(MainOptions.AUTOOPTIMIZE, false);
     execute(new Optimize());
     execute(new Replace("x.xml", "<a>C</a>"));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", false);
 
     execute(new Optimize());
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    query(_DB_REPLACE.args(NAME, "x.xml", "<a>D</a>"));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", true);
+    query(_DB_REPLACE.args(NAME, "x.xml", " <a>D</a>"));
+    query(_DB_INFO.args(NAME) + "//textindex/text()", false);
   }
 }

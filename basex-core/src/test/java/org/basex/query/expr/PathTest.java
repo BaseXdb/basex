@@ -239,7 +239,7 @@ public final class PathTest extends AdvancedQueryTest {
    */
   @Test public void diskDoubles() {
     execute(new CreateDB(NAME, "<x>a</x>"));
-    query("/* castable as xs:double", "false");
+    query("/* castable as xs:double", false);
   }
 
   /**

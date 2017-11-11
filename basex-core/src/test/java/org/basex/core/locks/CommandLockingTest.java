@@ -131,14 +131,14 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME, DOC.args(NAME))), false, NAME_LIST);
     ckDBs(new XQuery(LANG.args(NAME, DOC.args(NAME))), false, NAME_LIST);
     ckDBs(new XQuery(DOC_AVAILABLE.args(NAME + "/foo.xml")), false, NAME_LIST, null);
-    ckDBs(new XQuery(PARSE_XML.args("<foo/>")), true, NONE);
-    ckDBs(new XQuery(PARSE_XML_FRAGMENT.args("<foo/>")), true, NONE);
-    ckDBs(new XQuery(PUT.args("<foo/>", NAME)), true, NONE);
+    ckDBs(new XQuery(PARSE_XML.args(" <foo/>")), true, NONE);
+    ckDBs(new XQuery(PARSE_XML_FRAGMENT.args(" <foo/>")), true, NONE);
+    ckDBs(new XQuery(PUT.args(" <foo/>", NAME)), true, NONE);
     ckDBs(new XQuery(PUT.args(" .", NAME)), true, CTX_LIST);
     ckDBs(new XQuery(ROOT.args()), false, CTX_LIST);
     ckDBs(new XQuery(ROOT.args(" .")), false, CTX_LIST);
     ckDBs(new XQuery(ROOT.args(" ./test")), false, CTX_LIST);
-    ckDBs(new XQuery(ROOT.args("<foo/>")), true, NONE);
+    ckDBs(new XQuery(ROOT.args(" <foo/>")), true, NONE);
     ckDBs(new XQuery(UNPARSED_TEXT.args(FILE)), false, NONE);
     ckDBs(new XQuery(UNPARSED_TEXT_AVAILABLE.args(FILE)), false, NONE);
     ckDBs(new XQuery(UNPARSED_TEXT_LINES.args(FILE)), false, NONE);
@@ -161,9 +161,9 @@ public final class CommandLockingTest extends SandboxTest {
     // Others
     ckDBs(new XQuery("."), false, CTX_LIST);
     ckDBs(new XQuery(ERROR.args()), false, NONE);
-    ckDBs(new XQuery(ERROR.args("xs:QName('foo')")), false, NONE);
-    ckDBs(new XQuery(ERROR.args("xs:QName('foo')", "bar")), false, NONE);
-    ckDBs(new XQuery(ERROR.args("xs:QName('foo')", "bar", "<batz/>")), false, NONE);
+    ckDBs(new XQuery(ERROR.args(" xs:QName('foo')")), false, NONE);
+    ckDBs(new XQuery(ERROR.args(" xs:QName('foo')", "bar")), false, NONE);
+    ckDBs(new XQuery(ERROR.args(" xs:QName('foo')", "bar", " <batz/>")), false, NONE);
     ckDBs(new XQuery(_RANDOM_INTEGER.args()), false, NONE);
 
     // User defined functions
@@ -232,11 +232,11 @@ public final class CommandLockingTest extends SandboxTest {
     // Updates
     ckDBs(new XQuery(_DB_CREATE.args(NAME)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_CREATE.args(NAME, FILE)), true, NAME_LIST);
-    ckDBs(new XQuery(_DB_CREATE.args(NAME, "<foo/>", FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_CREATE.args(NAME, " <foo/>", FILE)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_CREATE.args(NAME, FILE, FILE)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_DROP.args(NAME)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_ADD.args(NAME, FILE)), true, NAME_LIST);
-    ckDBs(new XQuery(_DB_ADD.args(NAME, "<foo/>", FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_ADD.args(NAME, " <foo/>", FILE)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_ADD.args(NAME, FILE, FILE)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_DELETE.args(NAME, FILE)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_OPTIMIZE.args(NAME)), true, NAME_LIST);
@@ -286,7 +286,7 @@ public final class CommandLockingTest extends SandboxTest {
   /** Test XQuery module. */
   @Test
   public void xqueryModule() {
-    ckDBs(new XQuery(_XQUERY_EVAL.args(1)), false, null);
+    ckDBs(new XQuery(_XQUERY_EVAL.args("1")), false, null);
     ckDBs(new XQuery(_XQUERY_EVAL.args(FILE)), false, null);
   }
 

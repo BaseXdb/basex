@@ -20,7 +20,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   public void shadowingTest() {
     query("let $x := 1 to 9 " +
       "return fold-left($x, 0, function($x, $y){$x * 10 + $y})",
-      "123456789");
+      123456789);
   }
 
   /**
@@ -33,7 +33,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       " $dec-cmb := $base-cmb(10, ?, ?)," +
       " $from-digits := fold-left(?, 0, $dec-cmb)" +
       " return $from-digits($digits)",
-      "123456789");
+      123456789);
   }
 
   /**
@@ -45,7 +45,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       " $base-cmb := function($n, $d) { 10 * $n + $d }," +
       " $from-digits := fold-left(?, 0, $base-cmb)" +
       "return $from-digits(1 to 9)",
-      "123456789");
+      123456789);
   }
 
   /**
@@ -75,7 +75,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       "  <e x='{$x}' y='{$y}'/>" +
       "};" +
       "local:f#2 instance of function(xs:long, xs:NCName) as element(e)",
-      "true");
+      true);
   }
 
   /** Closure test (#1023). */
@@ -116,14 +116,14 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   /** Tests using a partial function application as the context value (see GH-579). */
   @Test
   public void ctxValueTest() {
-    query("declare context item := contains(?, \"a\"); .(\"abc\")", "true");
+    query("declare context item := contains(?, 'a'); .('abc')", true);
   }
 
   /** Tests using a function literal that is used before the function (see GH-698). */
   @Test
   public void funcLitForward() {
     query("declare function local:a($a) { local:b#1($a) };" +
-          "declare function local:b($b) { $b }; local:a(1)", "1");
+          "declare function local:b($b) { $b }; local:a(1)", 1);
   }
 
   /** Do not pre-evaluate function items with non-deterministic expressions (see GH-1191). */

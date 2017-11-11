@@ -5,7 +5,6 @@ import static org.basex.query.util.Flag.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -50,6 +49,7 @@ import org.basex.query.func.xslt.*;
 import org.basex.query.func.zip.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -1394,16 +1394,12 @@ public enum Function {
     }
   }
 
-  /** Argument pattern. */
-  private static final Pattern ARG = Pattern.compile(
-      "^([-\\w_:.]*\\(|<|\"|\\$| ).*", Pattern.DOTALL);
-
   /** Cached enums (faster). */
   public static final Function[] VALUES = values();
   /** Minimum and maximum number of arguments. */
   public final int[] minMax;
-  /** Argument types. */
-  public final SeqType[] args;
+  /** Parameter types. */
+  public final SeqType[] params;
   /** Function class. */
   public final Class<? extends StandardFunc> clazz;
 
@@ -1465,21 +1461,21 @@ public enum Function {
    *             arguments in parentheses. Optional arguments are represented in nested
    *             square brackets; three dots indicate that the number of arguments of a
    *             function is not limited
-   * @param args types of the function arguments
+   * @param params parameter types
    * @param type return type
    * @param flags static function properties
    * @param uri uri
    */
-  Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
+  Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] params,
       final SeqType type, final EnumSet<Flag> flags, final byte[] uri) {
 
     this.clazz = func;
     this.desc = desc;
     this.type = type;
-    this.args = args;
+    this.params = params;
     this.flags = flags;
     this.uri = uri;
-    minMax = minMax(desc, args);
+    minMax = minMax(desc, params);
   }
 
   /**
@@ -1536,12 +1532,12 @@ public enum Function {
   final FuncType type(final int arity, final AnnList anns) {
     final SeqType[] st = new SeqType[arity];
     if(arity != 0 && minMax[1] == Integer.MAX_VALUE) {
-      final int al = args.length;
-      System.arraycopy(args, 0, st, 0, al);
-      final SeqType var = args[al - 1];
-      for(int a = al; a < arity; a++) st[a] = var;
+      final int pl = params.length;
+      System.arraycopy(params, 0, st, 0, pl);
+      final SeqType var = params[pl - 1];
+      for(int p = pl; p < arity; p++) st[p] = var;
     } else {
-      System.arraycopy(args, 0, st, 0, arity);
+      System.arraycopy(params, 0, st, 0, arity);
     }
     return FuncType.get(anns, type, st);
   }
@@ -1565,8 +1561,8 @@ public enum Function {
   }
 
   /**
-   * Returns the function's variable names.
-   * @return array of variable names
+   * Returns the names of the function parameters.
+   * @return names of function parameters
    */
   final String[] names() {
     final String names = desc.replaceFirst(".*?\\(", "").replace(",...", "").
@@ -1598,44 +1594,51 @@ public enum Function {
    * @return names of parameters
    */
   final QNm[] paramNames(final int arity) {
-    final String[] names = names();
-    final QNm[] res = new QNm[arity];
-    final int nl = names.length;
-    for(int i = Math.min(arity, nl); --i >= 0;) res[i] = new QNm(names[i]);
+    final String[] strings = names();
+    final QNm[] names = new QNm[arity];
+    final int nl = strings.length;
+    for(int n = Math.min(arity, nl); --n >= 0;) names[n] = new QNm(strings[n]);
     if(arity > nl) {
-      final String[] parts = names[nl - 1].split("(?=\\d+$)", 2);
+      final String[] parts = strings[nl - 1].split("(?=\\d+$)", 2);
       final int start = Integer.parseInt(parts[1]);
-      for(int i = nl; i < arity; i++) res[i] = new QNm(parts[0] + (start + i - nl + 1), "");
+      for(int n = nl; n < arity; n++) names[n] = new QNm(parts[0] + (start + n - nl + 1), "");
     }
-    return res;
+    return names;
   }
 
   /**
    * Returns a string representation of the function with the specified
    * arguments. All objects are wrapped with quotes, except for the following ones:
    * <ul>
-   * <li>integers</li>
+   * <li>numbers (integer, long, float, double)</li>
    * <li>booleans (which will be suffixed with parentheses)</li>
-   * <li>strings starting with an optional NCName and opening parenthesis</li>
-   * <li>strings starting with angle bracket, quote, dollar sign, or space</li>
+   * <li>strings starting with a space</li>
    * </ul>
-   * @param arg arguments
-   * @return string representation
+   * @param args arguments
+   * @return string representation (prefixed with a space to simplify nesting of returned string)
    */
-  public final String args(final Object... arg) {
+  public final String args(final Object... args) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final Object a : arg) {
+    for(final Object arg : args) {
       if(!tb.isEmpty()) tb.add(',');
-      final String s = a.toString();
-      if(ARG.matcher(s).matches() || a instanceof Integer || a instanceof Long) {
-        tb.add(s);
-      } else if(a instanceof Boolean) {
-        tb.add(s + "()");
+      if(arg == null) {
+        tb.add("()");
+      } else if(arg instanceof Value) {
+        tb.addExt(arg);
+      } else if(arg instanceof Number) {
+        tb.addExt(arg);
+      } else if(arg instanceof Boolean) {
+        tb.add(arg + "()");
       } else {
-        tb.add('"' + s.replaceAll("\"", "\"\"") + '"');
+        final String str = arg.toString();
+        if(str.startsWith(" ")) {
+          tb.add(str.substring(1));
+        } else {
+          tb.add('"' + str.replaceAll("\"", "\"\"") + '"');
+        }
       }
     }
-    return toString().replaceAll("\\(.*", "(") + tb + ')';
+    return ' ' + toString().replaceAll("\\(.*", "(") + tb + ')';
   }
 
   @Override

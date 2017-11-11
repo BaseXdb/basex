@@ -16,18 +16,18 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   @Test
   public void mem() {
     query(_PROF_MEM.args("()"));
-    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", false)), "100");
-    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true)), "100");
-    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true, "label")), "100");
+    query("count(" + _PROF_MEM.args(" 1 to 100 ", false) + ")", 100);
+    query("count(" + _PROF_MEM.args(" 1 to 100 ", true) + ")", 100);
+    query("count(" + _PROF_MEM.args(" 1 to 100 ", true, "label") + ")", 100);
   }
 
   /** Test method. */
   @Test
   public void time() {
     query(_PROF_TIME.args("()"));
-    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", false)), "100");
-    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true)), "100");
-    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true, "label")), "100");
+    query("count(" + _PROF_TIME.args(" 1 to 100 ", false) + ")", 100);
+    query("count(" + _PROF_TIME.args(" 1 to 100 ", true) + ")", 100);
+    query("count(" + _PROF_TIME.args(" 1 to 100 ", true, "label") + ")", 100);
   }
 
   /** Test method. */
@@ -59,23 +59,23 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   @Test
   public void variables() {
     query("for $x in 1 to 2 return " + _PROF_VARIABLES.args(), "");
-    query(_PROF_VARIABLES.args() + ", let $x := random:double() return floor($x * $x)", "0");
+    query(_PROF_VARIABLES.args() + ", let $x := random:double() return floor($x * $x)", 0);
   }
 
   /** Test method. */
   @Test
   public void voidd() {
-    query(_PROF_VOID.args("()"), "");
-    query(_PROF_VOID.args("1"), "");
+    query(_PROF_VOID.args(" ()"), "");
+    query(_PROF_VOID.args(1), "");
     query(_PROF_VOID.args("1,2"), "");
   }
 
   /** Test method. */
   @Test
   public void type() {
-    query(_PROF_TYPE.args("()"), "");
-    query(_PROF_TYPE.args("1"), "1");
-    query(_PROF_TYPE.args("(1, 2, 3)"), "1\n2\n3");
-    query(_PROF_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
+    query(_PROF_TYPE.args(" ()"), "");
+    query(_PROF_TYPE.args(1), 1);
+    query(_PROF_TYPE.args(" (1, 2, 3)"), "1\n2\n3");
+    query(_PROF_TYPE.args(" <x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
   }
 }

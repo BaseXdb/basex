@@ -17,7 +17,7 @@ public final class InspectModuleTest extends AdvancedQueryTest {
   @Test
   public void function() {
     String func = query(_INSPECT_FUNCTION.args(" true#0"));
-    query(func + "/@name/data()", "true");
+    query(func + "/@name/data()", true);
     query(func + "/@uri/data()", "http://www.w3.org/2005/xpath-functions");
     query(func + "/return/@type/data()", "xs:boolean");
     query(func + "/return/@occurrence/data()", "");
@@ -66,16 +66,16 @@ public final class InspectModuleTest extends AdvancedQueryTest {
 
     final String var1 = query(result + "/variable[@name = 'hello:lazy']");
     query(var1 + "/@uri/data()", "world");
-    query(var1 + "/@external/data()", "false");
+    query(var1 + "/@external/data()", false);
     query(var1 + "/annotation/@name/data()", "basex:lazy");
     query(var1 + "/annotation/@uri/data()", "http://basex.org");
 
     final String var2 = query(result + "/variable[@name = 'hello:ext']");
-    query(var2 + "/@external/data()", "true");
+    query(var2 + "/@external/data()", true);
 
     final String func1 = query(result + "/function[@name = 'hello:world']");
     query(func1 + "/@uri/data()", "world");
-    query(func1 + "/@external/data()", "false");
+    query(func1 + "/@external/data()", false);
     query(func1 + "/annotation/@name/data()", "public");
     query(func1 + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
     query(func1 + "/return/@type/data()", "xs:string");
@@ -88,7 +88,7 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query(func2 + "/annotation/@uri/data()[. = 'ns']", "ns");
 
     final String func3 = query(result + "/function[@name = 'hello:ext']");
-    query(func3 + "/@external/data()", "true");
+    query(func3 + "/@external/data()", true);
   }
 
   /** Test method. */
@@ -99,7 +99,7 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     // validate against xqDoc schema
     final String result = query(_INSPECT_XQDOC.args("src/test/resources/hello.xqm")).
         replace("{", "{{").replace("}", "}}");
-    query(_VALIDATE_XSD.args(result, "src/test/resources/xqdoc.xsd"));
+    query(_VALIDATE_XSD.args(' ' + result, "src/test/resources/xqdoc.xsd"));
   }
 
   /** Test method. */
@@ -107,7 +107,7 @@ public final class InspectModuleTest extends AdvancedQueryTest {
   public void context() {
     final String func = query("declare function local:x() { 1 }; " + _INSPECT_CONTEXT.args());
     query(func + "/name()", "context");
-    query(COUNT.args(func + "/function"), "1");
+    query("count(" + func + "/function)", 1);
     query(func + "/function/@name/string()", "local:x");
   }
 
@@ -115,10 +115,10 @@ public final class InspectModuleTest extends AdvancedQueryTest {
   @Test
   public void functions() {
     final String url = "src/test/resources/hello.xqm";
-    query("declare function local:x() { 1 }; " + COUNT.args(_INSPECT_FUNCTIONS.args()), "1");
-    query("declare function local:x() { 2 }; " + _INSPECT_FUNCTIONS.args() + "()", "2");
+    query("declare function local:x() { 1 }; " + COUNT.args(_INSPECT_FUNCTIONS.args()), 1);
+    query("declare function local:x() { 2 }; " + _INSPECT_FUNCTIONS.args() + "()", 2);
     query("import module namespace hello='world' at '" + url + "';" +
-        _INSPECT_FUNCTIONS.args() + "[last()] instance of function(*)", "true");
+        _INSPECT_FUNCTIONS.args() + "[last()] instance of function(*)", true);
 
     query("for $f in " + _INSPECT_FUNCTIONS.args(url)
         + "where local-name-from-QName(function-name($f)) = 'world' "
@@ -126,9 +126,9 @@ public final class InspectModuleTest extends AdvancedQueryTest {
 
     // ensure that closures will be compiled (GH-1194)
     query(_INSPECT_FUNCTIONS.args(url)
-        + "[function-name(.) = QName('world','closure')]()", "1");
+        + "[function-name(.) = QName('world','closure')]()", 1);
     query("import module namespace hello='world' at '" + url + "';"
-        + _INSPECT_FUNCTIONS.args() + "[function-name(.) = xs:QName('hello:closure')]()", "1");
+        + _INSPECT_FUNCTIONS.args() + "[function-name(.) = xs:QName('hello:closure')]()", 1);
   }
 
   /** Test method. */
@@ -136,9 +136,9 @@ public final class InspectModuleTest extends AdvancedQueryTest {
   public void functionAnnotations() {
     query(_INSPECT_FUNCTION_ANNOTATIONS.args(" true#0"), "map {\n}");
     query(_INSPECT_FUNCTION_ANNOTATIONS.args(" %local:x function() { }") +
-        "=> " + _MAP_CONTAINS.args("xs:QName('local:x')"), true);
+        "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
     query(_INSPECT_FUNCTION_ANNOTATIONS.args(" %Q{uri}name('a','b') function() {}") +
-        "(QName('uri','name'))", "a\nb");
+        " (QName('uri','name'))", "a\nb");
     query(_MAP_SIZE.args(_INSPECT_FUNCTION_ANNOTATIONS.args(
         " %basex:inline %basex:lazy function() {}")), 2);
   }
@@ -148,7 +148,7 @@ public final class InspectModuleTest extends AdvancedQueryTest {
   public void staticContext() {
     query(_INSPECT_STATIC_CONTEXT.args(" ()", "namespaces") + "?xml",
         "http://www.w3.org/XML/1998/namespace");
-    query(STARTS_WITH.args(_INSPECT_STATIC_CONTEXT.args(" ()", "base-uri"), "file:"), "true");
+    query("starts-with(" + _INSPECT_STATIC_CONTEXT.args(" ()", "base-uri") + ", 'file:')", true);
     query(_INSPECT_STATIC_CONTEXT.args(" ()", "element-namespace"), "");
     query(_INSPECT_STATIC_CONTEXT.args(" ()", "function-namespace"),
         "http://www.w3.org/2005/xpath-functions");

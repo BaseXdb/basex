@@ -46,7 +46,7 @@ public final class ClientModuleTest extends AdvancedQueryTest {
   @Test
   public void connect() {
     query(conn());
-    query(EXISTS.args(' ' + conn()));
+    query("exists(" + conn() + ")", true);
     // BXCL0001: connection errors
     error(_CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), BXCL_CONN_X);
     error(_CLIENT_CONNECT.args("xxx", DB_PORT, ADMIN, ADMIN), BXCL_CONN_X);
@@ -56,9 +56,9 @@ public final class ClientModuleTest extends AdvancedQueryTest {
   @Test
   public void execute() {
     contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), S_USERINFO[0]);
-    query("let $a := " + conn() + ", $b := " + conn() + " return (" +
-        _CLIENT_EXECUTE.args("$a", new XQuery("1")) + ',' +
-        _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ')', "1\n2");
+    query("let $a :=" + conn() + ", $b :=" + conn() + " return (" +
+        _CLIENT_EXECUTE.args(" $a", new XQuery("1")) + ',' +
+        _CLIENT_EXECUTE.args(" $b", new XQuery("2")) + ')', "1\n2");
     // BXCL0004: connection errors
     error(_CLIENT_EXECUTE.args(conn(), "x"), BXCL_COMMAND_X);
   }
@@ -68,8 +68,8 @@ public final class ClientModuleTest extends AdvancedQueryTest {
   public void info() {
     // check if the info string is not empty
     query("let $a := " + conn() + " return (" +
-        _CLIENT_EXECUTE.args("$a", "xquery 123") + " and " +
-        _CLIENT_INFO.args("$a") + ')', "true");
+        _CLIENT_EXECUTE.args(" $a", "xquery 123") + " and " +
+        _CLIENT_INFO.args(" $a") + ')', true);
   }
 
   /** Test method. */
@@ -78,29 +78,29 @@ public final class ClientModuleTest extends AdvancedQueryTest {
     contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), S_USERINFO[0]);
     // multiple sessions
     query("let $a := " + conn() + ", $b := " + conn() + " return " +
-        _CLIENT_QUERY.args("$a", "1") + '+' + _CLIENT_QUERY.args("$b", "2"), "3");
+        _CLIENT_QUERY.args(" $a", "1") + '+' + _CLIENT_QUERY.args(" $b", "2"), 3);
     // arguments
-    query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; $a*2\"",
-        " map { 'a': 1 }"), "2");
-    query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; count($a)\"",
-        " map { 'a': () }"), "0");
-    query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; count($a)\"",
-        " map { 'a': (1 to 5) }"), "5");
-    query(_CLIENT_QUERY.args(conn(), "\"declare context item external; .\"",
+    query(_CLIENT_QUERY.args(conn(), "declare variable $a external; $a*2",
+        " map { 'a': 1 }"), 2);
+    query(_CLIENT_QUERY.args(conn(), "declare variable $a external; count($a)",
+        " map { 'a': () }"), 0);
+    query(_CLIENT_QUERY.args(conn(), "declare variable $a external; count($a)",
+        " map { 'a': (1 to 5) }"), 5);
+    query(_CLIENT_QUERY.args(conn(), "declare context item external; .",
         " map { '': (1,<a/>,'a') }"), "1\n<a/>\na");
     // binary data
-    query(_CLIENT_QUERY.args(conn(), "\"xs:hexBinary('41')\""), "A");
-    query(_CLIENT_QUERY.args(conn(), "\"xs:base64Binary('QQ==')\""), "A");
+    query(_CLIENT_QUERY.args(conn(), "xs:hexBinary('41')"), "A");
+    query(_CLIENT_QUERY.args(conn(), "xs:base64Binary('QQ==')"), "A");
     // serialization parameters (should be ignored)
     query(_CLIENT_QUERY.args(conn(),
-      '"' + SerializerOptions.METHOD.arg("text") + "<xml/>\""), "<xml/>");
+      SerializerOptions.METHOD.arg("text") + "<xml/>"), "<xml/>");
     query(_CLIENT_QUERY.args(conn(),
-      '"' + SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'\""), "\u00e4");
-    query(_CLIENT_QUERY.args(conn(), "\"xs:base64Binary('QQ==')\""), "A");
+      SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'"), "\u00e4");
+    query(_CLIENT_QUERY.args(conn(), "xs:base64Binary('QQ==')"), "A");
     // query errors: returning function items
-    error(_CLIENT_QUERY.args(conn(), "\"function(){}\""), BXCL_FITEM_X);
+    error(_CLIENT_QUERY.args(conn(), "function(){}"), BXCL_FITEM_X);
     error(_CLIENT_QUERY.args(conn(), "true#0"), BXCL_FITEM_X);
-    error(_CLIENT_QUERY.args(conn(), "[]"), BXCL_FITEM_X);
+    error(_CLIENT_QUERY.args(conn(), "array{}"), BXCL_FITEM_X);
     error(_CLIENT_QUERY.args(conn(), "map{}"), BXCL_FITEM_X);
     // query errors: server-side errors
     error(_CLIENT_QUERY.args(conn(), "x"), NOCTX_X);
@@ -122,7 +122,7 @@ public final class ClientModuleTest extends AdvancedQueryTest {
   public void close() {
     query(conn() + " ! " + _CLIENT_CLOSE.args(" ."));
     // BXCL0002: session not available
-    error(_CLIENT_CLOSE.args("xs:anyURI('unknown')"), BXCL_NOTAVL_X);
+    error(_CLIENT_CLOSE.args(" xs:anyURI('unknown')"), BXCL_NOTAVL_X);
     // BXCL0002: session has already been closed
     error(conn() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " + _CLIENT_CLOSE.args(" .") + ')',
         BXCL_NOTAVL_X);

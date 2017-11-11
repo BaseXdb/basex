@@ -44,7 +44,7 @@ public final class TCOTest extends QueryPlanTest {
         "};" +
         "local:odd(12345)",
 
-        "true",
+        true,
 
         "count(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']) eq 1"
     );
@@ -60,7 +60,7 @@ public final class TCOTest extends QueryPlanTest {
         "};" +
         "local:pow(4, 5)",
 
-        "1024",
+        1024,
 
         "exists(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])",
         "count(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']) eq 2"
@@ -86,7 +86,7 @@ public final class TCOTest extends QueryPlanTest {
     check("declare function local:f($i) { if($i eq 12345) then $i else local:f($i+1) };" +
         "local:f(0)",
 
-        "12345",
+        12345,
 
         "exists(//" + Util.className(If.class) + '/' +
             Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
@@ -101,7 +101,7 @@ public final class TCOTest extends QueryPlanTest {
         "else local:f(local:inc($i)) };" +
         "local:f(0)",
 
-        "12345",
+        12345,
 
         "exists(//" + Util.className(If.class) + '/' +
             Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
@@ -122,7 +122,7 @@ public final class TCOTest extends QueryPlanTest {
         "  }" +
         "return $sum(1 to 100000)",
 
-        "5000050000",
+        5000050000L,
 
         "empty(//" + Util.className(FuncItem.class) +
             "//" + Util.className(DynFuncCall.class) + "[@tailCall eq 'false'])"
@@ -135,7 +135,7 @@ public final class TCOTest extends QueryPlanTest {
     check("declare function local:f($n) { if($n eq 0) then 42 else local:f($n - 1) };" +
         "distinct-values(fn:for-each((1 to 10) ! 1000, function($x) { local:f($x) }))",
 
-        "42"
+        42
     );
   }
 
@@ -149,6 +149,6 @@ public final class TCOTest extends QueryPlanTest {
         "declare function local:bar() { error() };" +
         "local:foo()",
 
-        "42");
+        42);
   }
 }

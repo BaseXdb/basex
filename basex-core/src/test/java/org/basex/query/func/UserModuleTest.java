@@ -40,9 +40,9 @@ public final class UserModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void exists() {
-    query(_USER_EXISTS.args(UserText.ADMIN), "true");
-    query(_USER_EXISTS.args(NAME), "true");
-    query(_USER_EXISTS.args("unknown"), "false");
+    query(_USER_EXISTS.args(UserText.ADMIN), true);
+    query(_USER_EXISTS.args(NAME), true);
+    query(_USER_EXISTS.args("unknown"), false);
 
     // invalid name
     error(_USER_EXISTS.args(""), USER_NAME_X);
@@ -56,18 +56,18 @@ public final class UserModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void listDetails() {
     // check if the admin user exists
-    query(_USER_LIST_DETAILS.args() + "/@name = '" + UserText.ADMIN + '\'', "true");
+    query(_USER_LIST_DETAILS.args() + "/@name = '" + UserText.ADMIN + '\'', true);
     // check if the temporarily created user is found
-    query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "true");
+    query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', true);
     // check if local permission is found
-    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', "true");
+    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', true);
     // check if user has been removed
     query(_USER_DROP.args(NAME));
-    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', "false");
-    query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "false");
+    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', false);
+    query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', false);
     // specify user
-    query(EXISTS.args(_USER_LIST_DETAILS.args("admin")), "true");
-    error(EXISTS.args(_USER_LIST_DETAILS.args("unknown")), USER_UNKNOWN_X);
+    query("exists(" + _USER_LIST_DETAILS.args("admin") + ")", true);
+    error("exists(" + _USER_LIST_DETAILS.args("unknown") + ")", USER_UNKNOWN_X);
   }
 
   /** Test method. */
@@ -76,7 +76,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
     query(_USER_CREATE.args(NAME, ""));
     // specify permissions
     query(_USER_CREATE.args(NAME, NAME, Perm.ADMIN));
-    query(_USER_CREATE.args(NAME, NAME, "('admin','none')", "('','x')"));
+    query(_USER_CREATE.args(NAME, NAME, " ('admin','none')", " ('','x')"));
 
     // invalid permission
     error(_USER_CREATE.args(NAME, NAME, ""), USER_PERMISSION_X);
@@ -88,8 +88,8 @@ public final class UserModuleTest extends AdvancedQueryTest {
 
     // redundant operations
     error(_USER_CREATE.args(NAME, "") + ',' + _USER_CREATE.args(NAME, ""), USER_UPDATE_X_X);
-    error(_USER_CREATE.args(NAME, "", "('admin','admin')", "('','')"), USER_SAMEPERM_X_X);
-    error(_USER_CREATE.args(NAME, "", "('admin','admin')", "('x','x')"), USER_SAMEPAT_X);
+    error(_USER_CREATE.args(NAME, "", " ('admin','admin')", " ('','')"), USER_SAMEPERM_X_X);
+    error(_USER_CREATE.args(NAME, "", " ('admin','admin')", " ('x','x')"), USER_SAMEPAT_X);
   }
 
   /** Test method. */
@@ -105,7 +105,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
         "write");
 
     // grant list of permissions
-    query(_USER_GRANT.args(NAME, "('admin','none')", "('','x')"));
+    query(_USER_GRANT.args(NAME, " ('admin','none')", " ('','x')"));
 
     // admin permission can only be set globally
     error(_USER_GRANT.args(NAME, Perm.ADMIN, NAME), USER_LOCAL);
@@ -130,7 +130,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
   @Test public void drop() {
     // create and drop local permission
     query(_USER_DROP.args(NAME, NAME));
-    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', "false");
+    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', false);
 
     // drop list of permissions
     query(_USER_DROP.args(NAME, "('x','y')"));
@@ -144,7 +144,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
 
     // drop user
     query(_USER_DROP.args(NAME));
-    query(_USER_EXISTS.args(NAME), "false");
+    query(_USER_EXISTS.args(NAME), false);
 
     // admin cannot be modified
     error(_USER_DROP.args(UserText.ADMIN), USER_ADMIN);
@@ -193,12 +193,12 @@ public final class UserModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void updateInfo() {
-    query(_USER_UPDATE_INFO.args("<info>A</info>"));
+    query(_USER_UPDATE_INFO.args(" <info>A</info>"));
     query(_USER_INFO.args(), "<info>A</info>");
-    query(_USER_UPDATE_INFO.args("<info/>"));
+    query(_USER_UPDATE_INFO.args(" <info/>"));
 
     // invalid input
-    error(_USER_UPDATE_INFO.args("<abc/>"), ELM_X_X);
+    error(_USER_UPDATE_INFO.args(" <abc/>"), ELM_X_X);
   }
 
   /** Test method. */

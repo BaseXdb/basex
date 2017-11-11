@@ -31,10 +31,10 @@ public final class NonLockingTest extends SandboxTest {
       do id = query(LIST_JOBS); while(id.isEmpty());
 
       // local locking: add document in parallel
-      query(_DB_ADD.args(NAME, "<a/>", "a.xml"));
+      query(_DB_ADD.args(NAME, " <a/>", "a.xml"));
 
       // global locking: add document in parallel; see GH-1400
-      query("let $db := <a>" + NAME + "</a> return " + _DB_ADD.args("$db", "<a/>", "a.xml"));
+      query("let $db := <a>" + NAME + "</a> return " + _DB_ADD.args(" $db", " <a/>", "a.xml"));
 
       // stop sleeping process, wait for its completion
       query(_JOBS_STOP.args(id));
@@ -52,7 +52,7 @@ public final class NonLockingTest extends SandboxTest {
 
   /** Test. */
   @Test public void nonLockingAfterGlobalWrite() {
-    nonLockingAfterWrite(_DB_CREATE.args("<_>" + NAME + "</_>"));
+    nonLockingAfterWrite(_DB_CREATE.args(" <_>" + NAME + "</_>"));
   }
 
   /**

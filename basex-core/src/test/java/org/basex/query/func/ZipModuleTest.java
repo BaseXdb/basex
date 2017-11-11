@@ -52,8 +52,7 @@ public final class ZipModuleTest extends AdvancedQueryTest {
   @Test
   public void binaryEntry() {
     query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
-    contains(STRING.args("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ')'),
-        "610A61626F");
+    contains("string(xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + "))", "610A61626F");
 
     error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), ZIP_NOTFOUND_X);
     error(_ZIP_BINARY_ENTRY.args(ZIP, ""), ZIP_NOTFOUND_X);
@@ -153,7 +152,7 @@ public final class ZipModuleTest extends AdvancedQueryTest {
    * @return parameter string
    */
   private static String paramsPrefix(final String name, final String entry) {
-    return "<zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
+    return " <zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
         new IOFile(TMPZIP).path() + "'>" +
         "<zip:entry name='" + name + "'>" + entry + "</zip:entry></zip:file>";
   }
@@ -164,14 +163,14 @@ public final class ZipModuleTest extends AdvancedQueryTest {
     String list = query(_ZIP_ENTRIES.args(ZIP));
 
     // create and compare identical zip file
-    query(_ZIP_UPDATE_ENTRIES.args(list, TMPZIP));
+    query(_ZIP_UPDATE_ENTRIES.args(' ' + list, TMPZIP));
     final String list2 = query(_ZIP_ENTRIES.args(TMPZIP));
     assertEquals(list.replaceAll(" href=\".*?\"", ""),
         list2.replaceAll(" href=\".*?\"", ""));
 
     // remove one directory
     list = list.replaceAll("<zip:dir name=.test.>.*</zip:dir>", "");
-    query(_ZIP_UPDATE_ENTRIES.args(list, TMPZIP));
+    query(_ZIP_UPDATE_ENTRIES.args(' ' + list, TMPZIP));
   }
 
   /**
@@ -180,7 +179,7 @@ public final class ZipModuleTest extends AdvancedQueryTest {
    * @return parameter string
    */
   private static String params(final String arg) {
-    return "<file xmlns='http://expath.org/ns/zip' href='" +
+    return " <file xmlns='http://expath.org/ns/zip' href='" +
         new IOFile(TMPZIP).path() + "'>" + arg + "</file>";
   }
 

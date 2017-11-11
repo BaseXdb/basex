@@ -15,8 +15,8 @@ public final class MathModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void crc32() {
-    query(STRING.args(_MATH_CRC32.args("")), "00000000");
-    query(STRING.args(_MATH_CRC32.args("BaseX")), "4C06FC7F");
+    query("string( " + _MATH_CRC32.args("") + ')', "00000000");
+    query("string( " + _MATH_CRC32.args("BaseX") + ')', "4C06FC7F");
   }
 
   /** Test method. */
@@ -34,18 +34,18 @@ public final class MathModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void sinh() {
-    query(_MATH_SINH.args(" 0"), "0");
+    query(_MATH_SINH.args(" 0"), 0);
   }
 
   /** Test method. */
   @Test
   public void cosh() {
-    query(_MATH_COSH.args(" 0"), "1");
+    query(_MATH_COSH.args(" 0"), 1);
   }
 
   /** Test method. */
   @Test
   public void tanh() {
-    query(_MATH_TANH.args(" 0"), "0");
+    query(_MATH_TANH.args(" 0"), 0);
   }
 }

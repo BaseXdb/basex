@@ -17,35 +17,35 @@ public final class MapModuleTest extends AdvancedQueryTest {
   @Test
   public void merge() {
     // no entry
-    query(EXISTS.args(_MAP_MERGE.args(" ()")), true);
+    query("exists(" + _MAP_MERGE.args(" ()") + ')', true);
     count(_MAP_ENTRY.args(1, 2), 1);
     count(_MAP_MERGE.args(" ()"), 0);
     // single entry
-    query(EXISTS.args(_MAP_MERGE.args(" map{ 'a':'b' }")), true);
+    query("exists(" + _MAP_MERGE.args(" map{ 'a':'b' }") + ')', true);
     count(_MAP_MERGE.args(" map{ 'a':'b' }"), 1);
     // single entry
-    query(EXISTS.args(_MAP_MERGE.args(" map{ 'a':'b','b':'c' }")), true);
+    query("exists(" + _MAP_MERGE.args(" map{ 'a':'b','b':'c' }") + ')', true);
     count(_MAP_MERGE.args(" map{ 'a':'b','b':'c' }"), 2);
 
-    query(_MAP_MERGE.args("(map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
+    query(_MAP_MERGE.args(" (map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
 
     // duplicates option
-    query(_MAP_MERGE.args("(map{1:2},map {1:3})") + "(1)", "2");
-    query(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'use-first'}") + "(1)", "2");
-    query(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'use-last'}") + "(1)", "3");
-    query(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'combine'}") + "(1)", "2\n3");
-    error(_MAP_MERGE.args("(map{1:2},map {1:3})", " map{'duplicates':'reject'}") + "(1)",
+    query(_MAP_MERGE.args(" (map{1:2},map {1:3})") + "(1)", 2);
+    query(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-first'}") + "(1)", 2);
+    query(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-last'}") + "(1)", 3);
+    query(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'combine'}") + "(1)", "2\n3");
+    error(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'reject'}") + "(1)",
         MERGE_DUPLICATE_X);
   }
 
   /** Test method. */
   @Test
   public void entry() {
-    query(EXISTS.args(_MAP_ENTRY.args("A", "B")), true);
-    query(EXISTS.args(_MAP_ENTRY.args(1, 2)), true);
-    query(EXISTS.args(_MAP_MERGE.args(_MAP_ENTRY.args(1, 2))), "true");
-    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), EMPTYFOUND);
-    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), SEQFOUND_X);
+    query("exists(" + _MAP_ENTRY.args("A", "B") + ')', true);
+    query("exists(" + _MAP_ENTRY.args(1, 2) + ')', true);
+    query("exists(" + _MAP_MERGE.args(_MAP_ENTRY.args(1, 2)) + ')', true);
+    error("exists(" + _MAP_ENTRY.args(" ()", 2) + ')', EMPTYFOUND);
+    error("exists(" + _MAP_ENTRY.args(" (1,2)", 2) + ')', SEQFOUND_X);
   }
 
   /** Test method. */
@@ -57,7 +57,7 @@ public final class MapModuleTest extends AdvancedQueryTest {
     count(_MAP_PUT.args(" map{ 'a': 'b' }", "c", "d"), 2);
     count(_MAP_PUT.args(" map{ 'a': 'b' }", "c", "d"), 2);
 
-    query(_MAP_PUT.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", "1"));
+    query(_MAP_PUT.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", 1));
   }
 
   /** Test method. */
@@ -85,19 +85,19 @@ public final class MapModuleTest extends AdvancedQueryTest {
   public void keys() {
     query("for $i in " + _MAP_KEYS.args(
         _MAP_MERGE.args(" for $i in 1 to 3 return " +
-        _MAP_ENTRY.args("$i", "$i+1"))) + " order by $i return $i", "1\n2\n3");
+        _MAP_ENTRY.args(" $i", " $i+1"))) + " order by $i return $i", "1\n2\n3");
     query("let $map := " + _MAP_MERGE.args(" for $i in 1 to 3 return " +
-        _MAP_ENTRY.args("$i", "$i + 1")) +
-        "for $k in " + _MAP_KEYS.args("$map") + " order by $k return " +
-        _MAP_GET.args("$map", "$k"), "2\n3\n4");
+        _MAP_ENTRY.args(" $i", " $i + 1")) +
+        "for $k in " + _MAP_KEYS.args(" $map") + " order by $k return " +
+        _MAP_GET.args(" $map", " $k"), "2\n3\n4");
   }
 
   /** Test method. */
   @Test
   public void forEach() {
-    query(_MAP_FOR_EACH.args(" map{}", "function($a, $b) { 1 }"), "");
-    query(_MAP_FOR_EACH.args(" map{1:2}", "function($a, $b) { $a+$b }"), "3");
-    query(_MAP_FOR_EACH.args(" map{'a':1, 'b':2}", "function($a, $b) { $b }"), "1\n2");
+    query(_MAP_FOR_EACH.args(" map{}", " function($a, $b) { 1 }"), "");
+    query(_MAP_FOR_EACH.args(" map{1:2}", " function($a, $b) { $a+$b }"), 3);
+    query(_MAP_FOR_EACH.args(" map{'a':1, 'b':2}", " function($a, $b) { $b }"), "1\n2");
   }
 
   /**

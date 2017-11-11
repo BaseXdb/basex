@@ -733,8 +733,8 @@ public final class QT3TS extends Main {
       // include check for comments, processing instructions and namespaces
       String flags = "'" + Mode.ALLNODES + '\'';
       if(!pref) flags += ",'" + Mode.NAMESPACES + '\'';
-      final String query = Function._UTIL_DEEP_EQUAL.args("<X>" + exp + "</X>",
-          "<X>" + res + "</X>" , '(' + flags + ')');
+      final String query = Function._UTIL_DEEP_EQUAL.args(" <X>" + exp + "</X>",
+          " <X>" + res + "</X>" , " (" + flags + ")");
       return asBoolean(query, expected) ? null : exp;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", exp, ex);

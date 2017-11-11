@@ -505,7 +505,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     error(cmr, UPNOT_X);
     error("declare function local:f() { " + cmr + " }; local:f()", UPNOT_X);
     error("declare %updating function local:f() { " + cmr + " }; local:f()", UPNOT_X);
-    query("declare function local:f() { copy $o := <x/> modify () return 1 }; local:f()", "1");
+    query("declare function local:f() { copy $o := <x/> modify () return 1 }; local:f()", 1);
   }
 
   /**
@@ -1080,9 +1080,9 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingHof() {
-    error(FOR_EACH.args("<a/>", " db:output#1"), FUNCUP_X);
-    error(FOR_EACH_PAIR.args("<a/>", "<b/>", " db:output#1"), FUNCUP_X);
-    error(APPLY.args(" db:output#1", " [<b/>]"), FUNCUP_X);
+    error("for-each(<a/>, db:output#1)", FUNCUP_X);
+    error("for-each-pair(<a/>, <b/>, db:output#1)", FUNCUP_X);
+    error("apply(db:output#1, [<b/>])", FUNCUP_X);
   }
 
   /**
@@ -1126,7 +1126,7 @@ public final class UpdateTest extends AdvancedQueryTest {
             "insert node attribute { 'b' } { '' } into $input",
             "count($input/@*)"
         ),
-        "31"
+        31
     );
   }
 
@@ -1202,7 +1202,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     error("declare updating function local:a() { () }; local:a#0()", FUNCUP_X);
 
     query("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; updating local:a()()", "1");
+        + "declare updating function local:b() { db:output('1') }; updating local:a()()", 1);
     error("declare function local:a() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:a()()", FUNCUP_X);
 
@@ -1231,8 +1231,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   /** Test output URI is correctly resolved. */
   @Test
   public void put() {
-    query("declare base-uri \"" + sandbox() + "\"; " + PUT.args("<a/>", "test.xml"));
-    query(_FILE_EXISTS.args("\"" + sandbox() + "test.xml\""), "true");
+    query("declare base-uri \"" + sandbox() + "\"; " + PUT.args(" <a/>", "test.xml"));
+    query(_FILE_EXISTS.args(sandbox() + "test.xml"), true);
   }
 
   /**
@@ -1249,8 +1249,8 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void window() {
-    query("for tumbling window $w in 1 start when true() return db:output($w)", "1");
-    query("for sliding window $w in 1 start when true() end when true() return db:output($w)", "1");
+    query("for tumbling window $w in 1 start when true() return db:output($w)", 1);
+    query("for sliding window $w in 1 start when true() end when true() return db:output($w)", 1);
     error("for tumbling window $w in 1 start when delete node <a/> return ()", UPNOT_X);
     error("for tumbling window $w in 1 start when () end when delete node <a/> return ()", UPNOT_X);
     error("for tumbling window $w in db:output(1) start when () return ()", UPNOT_X);

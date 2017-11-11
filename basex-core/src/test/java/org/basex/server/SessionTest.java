@@ -182,7 +182,7 @@ public abstract class SessionTest extends SandboxTest {
     session.store("X", new ArrayInput(""));
     assertEqual("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
-    assertEqual("AAH/", session.query(STRING.args(_DB_RETRIEVE.args(NAME, "X"))).execute());
+    assertEqual("AAH/", session.query("string(" + _DB_RETRIEVE.args(NAME, "X") + ')').execute());
     session.execute("drop db " + NAME);
   }
 

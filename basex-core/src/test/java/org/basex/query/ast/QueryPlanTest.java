@@ -16,30 +16,30 @@ import org.basex.query.value.node.*;
 public abstract class QueryPlanTest extends AdvancedQueryTest {
   /**
    * Checks the query plan and the result.
-   * @param qu query
-   * @param res result or {@code null} for no comparison
+   * @param query query
+   * @param expected result or {@code null} for no comparison
    * @param checks queries on the query plan
    */
-  protected static void check(final String qu, final String res, final String... checks) {
-    try(QueryProcessor qp = new QueryProcessor(qu, context)) {
+  protected static void check(final String query, final Object expected, final String... checks) {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
       // compile query
       qp.compile();
       // retrieve compiled query plan
       final FDoc plan = qp.plan();
       // compare results
-      if(res != null) {
-        assertEquals("\nQuery: " + qu + '\n',
-            res, normNL(qp.value().serialize().toString()));
+      if(expected != null) {
+        final String result = normNL(qp.value().serialize().toString());
+        assertEquals("\nQuery: " + query + '\n', expected.toString(), result);
       }
 
       for(final String p : checks) {
         if(new QueryProcessor(p, context).context(plan).value() != Bln.TRUE) {
-          fail(NL + "- Query: " + qu + NL + "- Check: " + p + NL +
+          fail(NL + "- Query: " + query + NL + "- Check: " + p + NL +
               "- Plan: " + plan.serialize());
         }
       }
     } catch(final Exception ex) {
-      throw new AssertionError(qu, ex);
+      throw new AssertionError(query, ex);
     }
   }
 }

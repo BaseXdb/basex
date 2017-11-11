@@ -45,15 +45,15 @@ public final class CollationTest extends AdvancedQueryTest {
     query(prolog + "'A'='a'", true);
     query(prolog + "'a'='A'", true);
     query(prolog + "'\u00c4'='A\u00e4'", false);
-    query(prolog + "compare('a', 'A')", "0");
+    query(prolog + "compare('a', 'A')", 0);
 
-    query(prolog + "contains('aaa', 'ab')", "false");
-    query(prolog + "ends-with('aaa', 'ab')", "false");
-    query(prolog + "starts-with('aaa', 'ab')", "false");
+    query(prolog + "contains('aaa', 'ab')", false);
+    query(prolog + "ends-with('aaa', 'ab')", false);
+    query(prolog + "starts-with('aaa', 'ab')", false);
 
-    query(prolog + "contains('baa', 'aa')", "true");
-    query(prolog + "ends-with('baa', 'aa')", "true");
-    query(prolog + "starts-with('aaa', 'aa')", "true");
+    query(prolog + "contains('baa', 'aa')", true);
+    query(prolog + "ends-with('baa', 'aa')", true);
+    query(prolog + "starts-with('aaa', 'aa')", true);
   }
 
   /** Tests errors. */
@@ -102,14 +102,13 @@ public final class CollationTest extends AdvancedQueryTest {
   @Test
   public void groupBy() {
     // identical strings
-    query(PROLOG + "for $a in ('a','a') group by $b:=$a return count($a)", "2");
-    query("for $a in ('a','a') group by $b:=$a return count($a)", "2");
+    query(PROLOG + "for $a in ('a','a') group by $b:=$a return count($a)", 2);
+    query("for $a in ('a','a') group by $b:=$a return count($a)", 2);
     // different strings
-    query(PROLOG + "for $a in ('a','\u00c4') group by $b:=$a return count($a)", "2");
+    query(PROLOG + "for $a in ('a','\u00c4') group by $b:=$a return count($a)", 2);
     query("for $a in ('a','\u00c4') group by $b:=$a collation '" + COLLATION +
-        "' return count($a)", "2");
-    query("for $a in 'a' group by $a, $a:=$a collation '" + COLLATION +
-        "' return $a", "a");
+        "' return count($a)", 2);
+    query("for $a in 'a' group by $a, $a:=$a collation '" + COLLATION + "' return $a", "a");
   }
 
   /** Disallow index rewritings. */

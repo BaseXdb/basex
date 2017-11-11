@@ -31,11 +31,11 @@ public final class MapTest extends AdvancedQueryTest {
     error(" map{ 'a': 'b', 'a': 'c' }", MAPDUPLKEY_X_X_X);
     error(" map{ xs:time('01:01:01'):1, xs:time('01:01:01'):1 }", MAPDUPLKEY_X_X_X);
 
-    query(_MAP_SIZE.args(" map{ xs:time('01:01:01'):1, xs:time('02:02:02'):2 }"), "2");
+    query(_MAP_SIZE.args(" map{ xs:time('01:01:01'):1, xs:time('02:02:02'):2 }"), 2);
     query("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:time('01:01:02+01:00')"
         + "let $m := map { $k1:1 }"
-        + "return map:put(map:remove($m, $k1), $k2, 2)($k2)", "2");
+        + "return map:put(map:remove($m, $k1), $k2, 2)($k2)", 2);
 
     query(" map{ xs:time('01:01:01'):1, xs:time('01:01:02+01:00'):2 }");
     query(" map{ xs:time('01:01:01'):1, xs:time('01:01:02+01:00'):2 }");

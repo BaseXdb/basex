@@ -16,7 +16,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void hex() {
-    hexQuery(_BIN_HEX.args("()"),            "");
+    hexQuery(_BIN_HEX.args(" ()"),            "");
     hexQuery(_BIN_HEX.args(""),               "");
     hexQuery(_BIN_HEX.args("1"),              "01");
     hexQuery(_BIN_HEX.args("FF"),             "FF");
@@ -36,7 +36,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void bin() {
-    hexQuery(_BIN_BIN.args("()"),               "");
+    hexQuery(_BIN_BIN.args(" ()"),              "");
     hexQuery(_BIN_BIN.args(""),                 "");
     hexQuery(_BIN_BIN.args("0"),                "00");
     hexQuery(_BIN_BIN.args("00"),               "00");
@@ -54,7 +54,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void octal() {
-    hexQuery(_BIN_OCTAL.args("()"),       "");
+    hexQuery(_BIN_OCTAL.args(" ()"),      "");
     hexQuery(_BIN_OCTAL.args(""),         "");
     hexQuery(_BIN_OCTAL.args("0"),        "00");
     hexQuery(_BIN_OCTAL.args("00"),       "00");
@@ -72,34 +72,34 @@ public final class BinModuleTest extends AdvancedQueryTest {
   @Test
   public void toOctets() {
     query(_BIN_TO_OCTETS.args(base64("")),     "");
-    query(_BIN_TO_OCTETS.args(base64("00")),   "0");
-    query(_BIN_TO_OCTETS.args(base64("FF")),   "255");
+    query(_BIN_TO_OCTETS.args(base64("00")),   0);
+    query(_BIN_TO_OCTETS.args(base64("FF")),   255);
     query(_BIN_TO_OCTETS.args(base64("1122")), "17\n34");
   }
 
   /** Test method. */
   @Test
   public void fromOctets() {
-    hexQuery(_BIN_FROM_OCTETS.args(" 0"),        "00");
-    hexQuery(_BIN_FROM_OCTETS.args("(1,127)"),   "017F");
-    hexQuery(_BIN_FROM_OCTETS.args("(128,255)"), "80FF");
+    hexQuery(_BIN_FROM_OCTETS.args(0),            "00");
+    hexQuery(_BIN_FROM_OCTETS.args(" (1,127)"),   "017F");
+    hexQuery(_BIN_FROM_OCTETS.args(" (128,255)"), "80FF");
     // errors
-    error(_BIN_FROM_OCTETS.args(" -1"),  BIN_OOR_X);
-    error(_BIN_FROM_OCTETS.args(" 256"), BIN_OOR_X);
+    error(_BIN_FROM_OCTETS.args(-1),  BIN_OOR_X);
+    error(_BIN_FROM_OCTETS.args(256), BIN_OOR_X);
   }
 
   /** Test method. */
   @Test
   public void length() {
-    query(_BIN_LENGTH.args(base64("")),         "0");
-    query(_BIN_LENGTH.args(base64("FF")),       "1");
-    query(_BIN_LENGTH.args(base64("12345678")), "4");
+    query(_BIN_LENGTH.args(base64("")),         0);
+    query(_BIN_LENGTH.args(base64("FF")),       1);
+    query(_BIN_LENGTH.args(base64("12345678")), 4);
   }
 
   /** Test method. */
   @Test
   public void part() {
-    hexQuery(_BIN_PART.args("()",         0),    "");
+    hexQuery(_BIN_PART.args(" ()",        0),    "");
     hexQuery(_BIN_PART.args(base64("FF"), 0),    "FF");
     hexQuery(_BIN_PART.args(base64("FF"), 0, 1), "FF");
     hexQuery(_BIN_PART.args(base64("FF"), 1),    "");
@@ -114,28 +114,28 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void join() {
-    hexQuery(_BIN_JOIN.args("()"),                                          "");
-    hexQuery(_BIN_JOIN.args('(' + base64("") + ')'),                        "");
-    hexQuery(_BIN_JOIN.args('(' + base64("FF") + ')'),                      "FF");
-    hexQuery(_BIN_JOIN.args('(' + base64("FF") + ',' + base64("FF") + ')'), "FFFF");
+    hexQuery(_BIN_JOIN.args(" ()"),                                          "");
+    hexQuery(_BIN_JOIN.args(" (" + base64("") + ')'),                        "");
+    hexQuery(_BIN_JOIN.args(" (" + base64("FF") + ')'),                      "FF");
+    hexQuery(_BIN_JOIN.args(" (" + base64("FF") + ',' + base64("FF") + ')'), "FFFF");
     hexQuery(_BIN_JOIN.args(" (1 to 3) ! " + base64("11")),                 "111111");
   }
 
   /** Test method. */
   @Test
   public void insertBefore() {
-    hexQuery(_BIN_INSERT_BEFORE.args("()", 0, "()"),                     "");
-    hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   0, "()"),           "12");
-    hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   1, "()"),           "12");
-    hexQuery(_BIN_INSERT_BEFORE.args(base64("1234"), 0, base64("56")),   "561234");
+    hexQuery(_BIN_INSERT_BEFORE.args(" ()", 0, " ()"),                   "");
+    hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   0, " ()"),          "12");
+    hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   1, " ()"),          "12");
+    hexQuery(_BIN_INSERT_BEFORE.args(base64("1234"), 0, base64("00")),   "001234");
     hexQuery(_BIN_INSERT_BEFORE.args(base64("1234"), 1, base64("56")),   "125634");
     hexQuery(_BIN_INSERT_BEFORE.args(base64("1234"), 2, base64("56")),   "123456");
     hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   0, base64("3456")), "345612");
     hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   1, base64("3456")), "123456");
     hexQuery(_BIN_INSERT_BEFORE.args(base64("12"),   1, base64("34")),   "1234");
     // errors
-    error(_BIN_INSERT_BEFORE.args(base64(""), -1, "()"), BIN_IOOR_X_X);
-    error(_BIN_INSERT_BEFORE.args(base64(""),  1, "()"), BIN_IOOR_X_X);
+    error(_BIN_INSERT_BEFORE.args(base64(""), -1, " ()"), BIN_IOOR_X_X);
+    error(_BIN_INSERT_BEFORE.args(base64(""),  1, " ()"), BIN_IOOR_X_X);
   }
 
   /** Test method. */
@@ -175,10 +175,10 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void decodeString() {
-    query(_BIN_DECODE_STRING.args(base64("31")),                  "1");
-    query(_BIN_DECODE_STRING.args(base64("31"), "US-ASCII"),      "1");
-    query(_BIN_DECODE_STRING.args(base64("31"), "UTF-8"),         "1");
-    query(_BIN_DECODE_STRING.args(base64("3132"), "UTF-8", 1, 1), "2");
+    query(_BIN_DECODE_STRING.args(base64("31")),                  1);
+    query(_BIN_DECODE_STRING.args(base64("31"), "US-ASCII"),      1);
+    query(_BIN_DECODE_STRING.args(base64("31"), "UTF-8"),         1);
+    query(_BIN_DECODE_STRING.args(base64("3132"), "UTF-8", 1, 1), 2);
     // errors
     error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", -1),    BIN_IOOR_X_X);
     error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 0, -1), BIN_NS_X);
@@ -186,7 +186,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
     error(_BIN_DECODE_STRING.args(base64(""), "UTF-8", 0, 1),  BIN_IOOR_X_X);
     error(_BIN_DECODE_STRING.args(base64(""), "X"),            BIN_UE_X);
     error(_BIN_DECODE_STRING.args(base64("FF"), "UTF-8"),      BIN_CE_X);
-    error(_BIN_DECODE_STRING.args(_BIN_HEX.args("03")),        BIN_CE_X);
+    error(_BIN_DECODE_STRING.args(_BIN_HEX.args("03")),  BIN_CE_X);
   }
 
   /** Test method. */
@@ -204,9 +204,9 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void or() {
-    hexQuery(_BIN_OR.args("()", base64("00")),            "");
-    hexQuery(_BIN_OR.args(base64("00"), "()"),            "");
-    hexQuery(_BIN_OR.args(base64(""), base64("")),        "");
+    hexQuery(_BIN_OR.args(" ()", base64("00")),            "");
+    hexQuery(_BIN_OR.args(base64("00"), " ()"),            "");
+    hexQuery(_BIN_OR.args(base64(""), base64("")),         "");
     hexQuery(_BIN_OR.args(base64("8081"), base64("7F7E")), "FFFF");
     // errors
     error(_BIN_OR.args(base64("00"), base64("")), BIN_DLA_X_X);
@@ -215,8 +215,8 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void xor() {
-    hexQuery(_BIN_XOR.args("()", base64("00")),             "");
-    hexQuery(_BIN_XOR.args(base64("00"), "()"),             "");
+    hexQuery(_BIN_XOR.args(" ()", base64("00")),            "");
+    hexQuery(_BIN_XOR.args(base64("00"), " ()"),            "");
     hexQuery(_BIN_XOR.args(base64(""), base64("")),         "");
     hexQuery(_BIN_XOR.args(base64("80"), base64("7F")),     "FF");
     hexQuery(_BIN_XOR.args(base64("1234"), base64("4321")), "5115");
@@ -227,8 +227,8 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void and() {
-    hexQuery(_BIN_AND.args("()", base64("00")),             "");
-    hexQuery(_BIN_AND.args(base64("00"), "()"),             "");
+    hexQuery(_BIN_AND.args(" ()", base64("00")),            "");
+    hexQuery(_BIN_AND.args(base64("00"), " ()"),            "");
     hexQuery(_BIN_AND.args(base64(""), base64("")),         "");
     hexQuery(_BIN_AND.args(base64("8081"), base64("7F7E")), "0000");
     // errors
@@ -238,7 +238,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void not() {
-    hexQuery(_BIN_NOT.args("()"),           "");
+    hexQuery(_BIN_NOT.args(" ()"),          "");
     hexQuery(_BIN_NOT.args(base64("00")),   "FF");
     hexQuery(_BIN_NOT.args(base64("8081")), "7F7E");
   }
@@ -246,7 +246,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void shift() {
-    hexQuery(_BIN_SHIFT.args("()", 1),                 "");
+    hexQuery(_BIN_SHIFT.args(" ()", 1),                "");
     hexQuery(_BIN_SHIFT.args(base64("77"), 0),         "77");
     hexQuery(_BIN_SHIFT.args(base64("33"), 1),         "66");
     hexQuery(_BIN_SHIFT.args(base64("66"), -1),        "33");
@@ -264,9 +264,9 @@ public final class BinModuleTest extends AdvancedQueryTest {
     hexQuery(_BIN_PACK_DOUBLE.args(-1),                           "BFF0000000000000");
     hexQuery(_BIN_PACK_DOUBLE.args(" -0e0"),                      "8000000000000000");
     hexQuery(_BIN_PACK_DOUBLE.args(" 0e0"),                       "0000000000000000");
-    hexQuery(_BIN_PACK_DOUBLE.args("xs:double('INF')"),           "7FF0000000000000");
-    hexQuery(_BIN_PACK_DOUBLE.args("xs:double('-INF')"),          "FFF0000000000000");
-    hexQuery(_BIN_PACK_DOUBLE.args("xs:double('NaN')"),           "7FF8000000000000");
+    hexQuery(_BIN_PACK_DOUBLE.args(" xs:double('INF')"),          "7FF0000000000000");
+    hexQuery(_BIN_PACK_DOUBLE.args(" xs:double('-INF')"),         "FFF0000000000000");
+    hexQuery(_BIN_PACK_DOUBLE.args(" xs:double('NaN')"),          "7FF8000000000000");
     hexQuery(_BIN_PACK_DOUBLE.args(1, "most-significant-first"),  "3FF0000000000000");
     hexQuery(_BIN_PACK_DOUBLE.args(1, "big-endian"),              "3FF0000000000000");
     hexQuery(_BIN_PACK_DOUBLE.args(1, "BE"),                      "3FF0000000000000");
@@ -285,9 +285,9 @@ public final class BinModuleTest extends AdvancedQueryTest {
     hexQuery(_BIN_PACK_FLOAT.args(-1),                           "BF800000");
     hexQuery(_BIN_PACK_FLOAT.args(" -0e0"),                      "80000000");
     hexQuery(_BIN_PACK_FLOAT.args(" 0e0"),                       "00000000");
-    hexQuery(_BIN_PACK_FLOAT.args("xs:float('INF')"),            "7F800000");
-    hexQuery(_BIN_PACK_FLOAT.args("xs:float('-INF')"),           "FF800000");
-    hexQuery(_BIN_PACK_FLOAT.args("xs:float('NaN')"),            "7FC00000");
+    hexQuery(_BIN_PACK_FLOAT.args(" xs:float('INF')"),           "7F800000");
+    hexQuery(_BIN_PACK_FLOAT.args(" xs:float('-INF')"),          "FF800000");
+    hexQuery(_BIN_PACK_FLOAT.args(" xs:float('NaN')"),           "7FC00000");
     hexQuery(_BIN_PACK_FLOAT.args(1, "most-significant-first"),  "3F800000");
     hexQuery(_BIN_PACK_FLOAT.args(1, "big-endian"),              "3F800000");
     hexQuery(_BIN_PACK_FLOAT.args(1, "BE"),                      "3F800000");
@@ -304,7 +304,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
     hexQuery(_BIN_PACK_INTEGER.args(1, 0),                            "");
     hexQuery(_BIN_PACK_INTEGER.args(1, 1),                            "01");
     hexQuery(_BIN_PACK_INTEGER.args(1, 2),                            "0001");
-    hexQuery(_BIN_PACK_INTEGER.args(" " + Long.MAX_VALUE, 8),         "7FFFFFFFFFFFFFFF");
+    hexQuery(_BIN_PACK_INTEGER.args(Long.MAX_VALUE, 8),               "7FFFFFFFFFFFFFFF");
     hexQuery(_BIN_PACK_INTEGER.args(-1, 8),                           "FFFFFFFFFFFFFFFF");
     hexQuery(_BIN_PACK_INTEGER.args(-1, 9),                           "FFFFFFFFFFFFFFFFFF");
     hexQuery(_BIN_PACK_INTEGER.args(1, 2, "most-significant-first"),  "0001");
@@ -325,7 +325,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
     query(_BIN_UNPACK_DOUBLE.args(base64("3FF0000000000000"), 0),                           1);
     query(_BIN_UNPACK_DOUBLE.args(base64("BFF0000000000000"), 0),                           -1);
     query(_BIN_UNPACK_DOUBLE.args(base64("8000000000000000"), 0),                           "-0");
-    query(_BIN_UNPACK_DOUBLE.args(base64("0000000000000000"), 0),                           "0");
+    query(_BIN_UNPACK_DOUBLE.args(base64("0000000000000000"), 0),                           0);
     query(_BIN_UNPACK_DOUBLE.args(base64("7FF0000000000000"), 0),                           "INF");
     query(_BIN_UNPACK_DOUBLE.args(base64("FFF0000000000000"), 0),                           "-INF");
     query(_BIN_UNPACK_DOUBLE.args(base64("7FF8000000000000"), 0),                           "NaN");
@@ -349,7 +349,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
     query(_BIN_UNPACK_FLOAT.args(base64("3F800000"), 0),                           1);
     query(_BIN_UNPACK_FLOAT.args(base64("BF800000"), 0),                           -1);
     query(_BIN_UNPACK_FLOAT.args(base64("80000000"), 0),                           "-0");
-    query(_BIN_UNPACK_FLOAT.args(base64("00000000"), 0),                           "0");
+    query(_BIN_UNPACK_FLOAT.args(base64("00000000"), 0),                           0);
     query(_BIN_UNPACK_FLOAT.args(base64("7F800000"), 0),                           "INF");
     query(_BIN_UNPACK_FLOAT.args(base64("FF800000"), 0),                           "-INF");
     query(_BIN_UNPACK_FLOAT.args(base64("7FC00000"), 0),                           "NaN");
@@ -419,8 +419,8 @@ public final class BinModuleTest extends AdvancedQueryTest {
    * @param query query string
    * @param result expected query result
    */
-  private static void hexQuery(final String query, final String result) {
-    query(STRING.args("xs:hexBinary(" + query + ')'), result);
+  private static void hexQuery(final String query, final Object result) {
+    query("string(xs:hexBinary(" + query + "))", result);
   }
 
   /**
@@ -429,6 +429,6 @@ public final class BinModuleTest extends AdvancedQueryTest {
    * @return query
    */
   private static String base64(final String input) {
-    return "xs:base64Binary(xs:hexBinary('" + input + "'))";
+    return " xs:base64Binary(xs:hexBinary('" + input + "'))";
   }
 }

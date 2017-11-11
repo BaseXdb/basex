@@ -114,7 +114,7 @@ public final class CsvModuleTest extends AdvancedQueryTest {
    * @param expected expected result
    */
   private static void serial(final String input, final String options, final String expected) {
-    query(input, options, expected, _CSV_SERIALIZE);
+    query(' ' + input, options, expected, _CSV_SERIALIZE);
   }
 
   /**
@@ -151,7 +151,7 @@ public final class CsvModuleTest extends AdvancedQueryTest {
    * @param options options
    */
   private static void serialError(final String input, final String options) {
-    error(input, options, _CSV_SERIALIZE);
+    error(' ' + input, options, _CSV_SERIALIZE);
   }
 
   /**
