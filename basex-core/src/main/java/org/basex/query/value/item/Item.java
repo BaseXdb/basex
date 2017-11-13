@@ -250,13 +250,14 @@ public abstract class Item extends Value {
    * @return materialized item
    * @throws QueryException query exception
    */
-  // Overridden by Array, FItem and ANode.
+  // Overridden by Array, FItem and ANode
   @SuppressWarnings("unused")
   public Item atomItem(final InputInfo ii) throws QueryException {
     return this;
   }
 
   @Override
+  // Overridden by Array
   public long atomSize() {
     return 1;
   }

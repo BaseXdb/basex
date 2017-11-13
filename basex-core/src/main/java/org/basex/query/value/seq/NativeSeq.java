@@ -67,7 +67,7 @@ abstract class NativeSeq extends Seq {
 
   @Override
   public final Value remove(final long pos) {
-    return size == 1 ? itemAt(1 - pos) : copyRemove(pos);
+    return copyRemove(pos);
   }
 
   @Override

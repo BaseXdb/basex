@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -49,10 +50,10 @@ public final class UtilItemAt extends StandardFunc {
     if(pos.isValue()) {
       final double dp = toDouble(pos, cc.qc);
       final long ps = (long) dp;
-      // reject invalid positions
-      if(dp != ps || ps < 1) return null;
+      // invalid positions
+      if(dp != ps || ps < 1) return Empty.SEQ;
       // pre-evaluate single expression with static position
-      if(st.zeroOrOne()) return ps == 1 ? ex : null;
+      if(st.zeroOrOne()) return ps == 1 ? ex : Empty.SEQ;
     }
     return this;
   }

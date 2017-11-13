@@ -475,6 +475,9 @@ public enum QueryError {
   /** HC0006. */
   HC_PARAMS(HC, 6, "Specify request element or HTTP URI."),
 
+  /** Util error. */
+  UTIL_NEGATIVE_X(UTIL, "negative", "Index '%' is negative."),
+
   /** ZIP0001. */
   ZIP_NOTFOUND_X(ZIP, 1, "Path '%' not found."),
   /** ZIP0002. */
@@ -1421,6 +1424,7 @@ public enum QueryError {
     /** INSP Error type. */ INSPECT(INSPECT_PREFIX, INSPECT_URI),
     /** JOBS Error type. */ JOBS(JOBS_PREFIX, JOBS_URI),
     /** UNIT Error type. */ UNIT(UNIT_PREFIX, UNIT_URI),
+    /** UTIL Error type. */ UTIL(UTIL_PREFIX, UTIL_URI),
     /** USER Error type. */ USER(USER_PREFIX, USER_URI),
 
     // EXPath errors

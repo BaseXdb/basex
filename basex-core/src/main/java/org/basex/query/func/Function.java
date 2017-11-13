@@ -1276,6 +1276,9 @@ public enum Function {
       arg(ITEM_ZM, DBL, DBL), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_REPLICATE(UtilReplicate.class, "replicate(items,count)",
+      arg(ITEM_ZM, ITR), ITEM_ZM, UTIL_URI),
 
   // Validate Module
 
