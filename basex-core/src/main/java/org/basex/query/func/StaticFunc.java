@@ -73,7 +73,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         final Type t = declType.type;
         if(declType.eq(expr.seqType()) && (t == AtomType.BLN || t == AtomType.FLT ||
             t == AtomType.DBL || t == AtomType.QNM || t == AtomType.URI)) {
-          cc.info(OPTTYPE_X, declType);
+          cc.info(OPTTYPE_X, this);
         } else {
           expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
         }

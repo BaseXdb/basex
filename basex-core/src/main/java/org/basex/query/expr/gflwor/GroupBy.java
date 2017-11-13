@@ -365,7 +365,7 @@ public final class GroupBy extends Clause {
 
     @Override
     public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-      final Spec spec = new Spec(info, cc.copy(var, vm), expr.copy(cc, vm), coll);
+      final Spec spec = copyType(new Spec(info, cc.copy(var, vm), expr.copy(cc, vm), coll));
       spec.occluded = occluded;
       return spec;
     }

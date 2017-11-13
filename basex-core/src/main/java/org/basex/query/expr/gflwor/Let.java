@@ -87,7 +87,7 @@ public final class Let extends ForLet {
     if(!scoring && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
       if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.promote)) {
-        cc.info(OPTTYPE_X, tc.seqType());
+        cc.info(OPTTYPE_X, this);
         expr = tc.expr;
       }
     }
@@ -105,7 +105,7 @@ public final class Let extends ForLet {
 
   @Override
   public Let copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Let(cc.copy(var, vm), expr.copy(cc, vm), scoring);
+    return copyType(new Let(cc.copy(var, vm), expr.copy(cc, vm), scoring));
   }
 
   @Override

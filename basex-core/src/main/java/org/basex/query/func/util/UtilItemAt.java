@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -45,8 +44,7 @@ public final class UtilItemAt extends StandardFunc {
     final Expr ex = exprs[0], pos = exprs[1];
     final SeqType st = ex.seqType();
     if(st.zero()) return ex;
-
-    exprType.assign(Occ.ZERO_ONE);
+    exprType.assign(st.type);
 
     if(pos.isValue()) {
       final double dp = toDouble(pos, cc.qc);

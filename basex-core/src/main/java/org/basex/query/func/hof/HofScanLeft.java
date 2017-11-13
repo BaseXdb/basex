@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 
 /**
@@ -40,8 +41,10 @@ public final class HofScanLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    if(exprs[0] == Empty.SEQ) return exprs[1];
-    exprType.assign(exprs[0].seqType().occ.union(Occ.ZERO));
+    final Expr ex = exprs[0];
+    if(ex == Empty.SEQ) return exprs[1];
+    final SeqType st = ex.seqType();
+    exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }
 }

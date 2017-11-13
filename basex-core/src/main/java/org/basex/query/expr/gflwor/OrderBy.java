@@ -165,7 +165,7 @@ public final class OrderBy extends Clause {
 
   @Override
   public OrderBy copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new OrderBy(Arr.copyAll(cc, vm, refs), Arr.copyAll(cc, vm, keys), info);
+    return copyType(new OrderBy(Arr.copyAll(cc, vm, refs), Arr.copyAll(cc, vm, keys), info));
   }
 
   @Override

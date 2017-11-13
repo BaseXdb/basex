@@ -127,8 +127,8 @@ public final class For extends ForLet {
 
   @Override
   public For copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new For(cc.copy(var, vm), cc.copy(pos, vm), cc.copy(score, vm),
-        expr.copy(cc, vm), empty);
+    return copyType(new For(cc.copy(var, vm), cc.copy(pos, vm), cc.copy(score, vm),
+        expr.copy(cc, vm), empty));
   }
 
   @Override

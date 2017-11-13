@@ -200,15 +200,21 @@ public final class If extends Arr {
 
   @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    boolean changed = false;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
+      Expr ex = exprs[e];
       try {
-        exprs[e] = tc.check(exprs[e], cc);
-      } catch(final QueryException ex) {
-        exprs[e] = cc.error(ex, exprs[e]);
+        ex = tc.check(ex, cc);
+      } catch(final QueryException qe) {
+        ex = cc.error(qe, ex);
+      }
+      if(ex != exprs[e]) {
+        changed = true;
+        exprs[e] = ex;
       }
     }
-    return optimize(cc);
+    return changed ? optimize(cc) : this;
   }
 
   @Override

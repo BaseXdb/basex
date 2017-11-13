@@ -54,7 +54,7 @@ public final class TypeCheck extends Single {
 
     // return type is already correct
     if(at.instanceOf(st)) {
-      cc.info(OPTTYPE_X, st);
+      cc.info(OPTTYPE_X, st + " -> " + expr);
       return expr;
     }
 
@@ -76,7 +76,7 @@ public final class TypeCheck extends Single {
 
     final Expr opt = expr.typeCheck(this, cc);
     if(opt != null) {
-      cc.info(OPTTYPE_X, st);
+      cc.info(OPTTYPE_X, st + " -> " + opt);
       return opt;
     }
 
@@ -149,7 +149,9 @@ public final class TypeCheck extends Single {
    * @throws QueryException query exception
    */
   public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
-    return new TypeCheck(sc, info, ex, exprType.seqType(), promote).optimize(cc);
+    final SeqType at = ex.seqType(), st = exprType.seqType();
+    return at.instanceOf(st) ? ex :
+      new TypeCheck(sc, info, ex, exprType.seqType(), promote).optimize(cc);
   }
 
   @Override
