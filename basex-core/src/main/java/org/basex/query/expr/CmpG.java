@@ -32,7 +32,7 @@ public class CmpG extends Cmp {
       @Override
       public OpG swap() { return OpG.GE; }
       @Override
-      public OpG invert() { return OpG.LT; }
+      public OpG invert() { return OpG.GT; }
     },
 
     /** General comparison: less. */
