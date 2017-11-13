@@ -122,16 +122,29 @@ public final class FnNotTest extends QueryTest {
         "eq false()" },
 
       { "not  1", booleans(false), "not(<X/> = <X/>)" },
-      { "not  2", booleans(true), "not(<X/> != <X/>)" },
+      { "not  2", booleans(true),  "not(<X/> != <X/>)" },
       { "not  3", booleans(false), "not(<X>a</X> < <X>b</X>)" },
-      { "not  4", booleans(true), "not(<X>a</X> > <X>b</X>)" },
+      { "not  4", booleans(true),  "not(<X>a</X> > <X>b</X>)" },
       { "not  5", booleans(false), "not(<X>a</X> >= <X>a</X>)" },
       { "not  6", booleans(false), "not(<X>a</X> <= <X>a</X>)" },
       { "not  7", booleans(false), "not((<X>b</X>,<X>a</X>) <= <X>a</X>)" },
       { "not  8", booleans(false), "not((<X>b</X>,<X>a</X>) >= <X>a</X>)" },
-      { "not  9", booleans(true), "not(not(<X/>))" },
+      { "not  9", booleans(true),  "not(not(<X/>))" },
       { "not 10", booleans(false, true), "for $b in (true(),false()) return not($b)" },
       { "not 11", booleans(true, false), "for $b in (true(),false()) return not(not($b))" },
+
+      { "not 12", booleans(false), "let $s := 1 let $e := 2 return not($s <= $e)" },
+      { "not 13", booleans(true),  "let $s := 1 let $e := 2 return not($s >= $e)" },
+      { "not 14", booleans(false), "let $s := 1 let $e := 2 return not($s <  $e)" },
+      { "not 15", booleans(true),  "let $s := 1 let $e := 2 return not($s >  $e)" },
+      { "not 16", booleans(true),  "let $s := 1 let $e := 2 return not($s =  $e)" },
+      { "not 17", booleans(false), "let $s := 1 let $e := 2 return not($s != $e)" },
+      { "not 18", booleans(false), "let $s := 1 let $e := 2 return not($s le $e)" },
+      { "not 19", booleans(true),  "let $s := 1 let $e := 2 return not($s ge $e)" },
+      { "not 20", booleans(false), "let $s := 1 let $e := 2 return not($s lt $e)" },
+      { "not 21", booleans(true),  "let $s := 1 let $e := 2 return not($s gt $e)" },
+      { "not 22", booleans(true),  "let $s := 1 let $e := 2 return not($s eq $e)" },
+      { "not 23", booleans(false), "let $s := 1 let $e := 2 return not($s ne $e)" },
     };
   }
 }
