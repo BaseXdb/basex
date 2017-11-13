@@ -28,8 +28,8 @@ public final class UtilItemAt extends StandardFunc {
 
     // fast route if the size is known
     final Iter iter = qc.iter(ex);
-    final long max = iter.size();
-    if(max >= 0) return ps > max ? null : iter.get(ps - 1);
+    final long is = iter.size();
+    if(is >= 0) return ps > is ? null : iter.get(ps - 1);
 
     // loop through all items
     long p = 0;

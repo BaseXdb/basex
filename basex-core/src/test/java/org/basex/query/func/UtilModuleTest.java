@@ -31,6 +31,15 @@ public final class UtilModuleTest extends AdvancedQueryTest {
     query(func.args(" (<a/>,<b/>)", 1), "<a/>");
     query(func.args(" (<a/>,<b/>)", 2.5), "");
     query(func.args(" (<a/>,<b/>)", 3), "");
+
+    query(func.args(" (<a/>,<b/>)[name()]", 1), "<a/>");
+    query(func.args(" (<a/>,<b/>)[name()]", 2), "<b/>");
+    query(func.args(" (<a/>,<b/>)[name()]", 3), "");
+
+    query(func.args(" prof:void(())", 0), "");
+    query(func.args(" (<a/>,<b/>)", 1.5), "");
+    query(func.args(" <a/>", 2), "");
+    query(func.args(" (<a/>,<b/>)", " <_>1</_>"), "<a/>");
   }
 
   /** Test method. */
@@ -52,6 +61,8 @@ public final class UtilModuleTest extends AdvancedQueryTest {
     query(func.args(" (<a/>,<b/>)", 1, 2), "<a/>\n<b/>");
     query(func.args(" (<a/>,<b/>)", 2.5, 3.5), "");
     query(func.args(" (<a/>,<b/>)", 3, 4), "");
+
+    query(func.args(" (<a/>,<b/>)[name()]", 1, 9223372036854775807L), "<a/>\n<b/>");
   }
 
   /** Test method. */
@@ -65,6 +76,12 @@ public final class UtilModuleTest extends AdvancedQueryTest {
     query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
     query(func.args(" (<a/>,<b/>)"), "<b/>");
     query(func.args(" (<a/>,<b/>)[position() > 2]"), "");
+
+    query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
+    query(func.args(" <a/>"), "<a/>");
+    query(func.args(" (<a/>,<b/>)"), "<b/>");
+    query(func.args(" (<a/>,<b/>)[name()]"), "<b/>");
+    query(func.args(" prof:void(())"), "");
   }
 
   /** Test method. */
