@@ -153,7 +153,7 @@ public final class IndexInfo {
        * - for $x in ('a', 1) return //*[text() = $x]
        * - //*[text() = .]
        * - //*[text() = (if(random:double() < .5) then 'X' else 'Y')] */
-      if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX, Flag.NDT, Flag.UPD))
+      if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX, Flag.NDT))
         return false;
 
       // estimate costs (tend to worst case)

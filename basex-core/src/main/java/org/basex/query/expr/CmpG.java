@@ -171,7 +171,7 @@ public class CmpG extends Cmp {
        * - operands are deterministic, non-updating,
        * - operands do not depend on context (unless context value exists) */
       final Type t1 = st1.type, t2 = st2.type;
-      if(e1.equals(e2) && !e1.has(Flag.NDT, Flag.UPD) &&
+      if(e1.equals(e2) && !e1.has(Flag.NDT) &&
           (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
         /* consider query flags. do not rewrite:
          * random:integer() = random:integer() */

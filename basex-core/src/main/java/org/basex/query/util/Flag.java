@@ -33,6 +33,7 @@ public enum Flag {
   /**
    * Performs updates. Checked to detect if an expression is updating or not, or if code
    * can be optimized away when using {@link MainOptions#MIXUPDATES}.
+   * All updating expressions are non-deterministic.
    * Example: delete node.
    */
   UPD,

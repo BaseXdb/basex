@@ -313,7 +313,7 @@ public abstract class Expr extends ExprInfo {
   public Expr optimizeEbv(final CompileContext cc) throws QueryException {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
-    return st.type instanceof NodeType && st.oneOrMore() && !has(Flag.NDT, Flag.UPD) ?
+    return st.type instanceof NodeType && st.oneOrMore() && !has(Flag.NDT) ?
       cc.replaceEbv(this, Bln.TRUE) : this;
   }
 
@@ -363,7 +363,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public final boolean isSimple() {
-    return !has(Flag.CTX, Flag.NDT, Flag.HOF, Flag.UPD, Flag.POS);
+    return !has(Flag.CTX, Flag.NDT, Flag.HOF, Flag.POS);
   }
 
   /**

@@ -238,7 +238,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     calcSize();
-    if(exprType.isEmpty() && !has(Flag.NDT, Flag.UPD)) return cc.emptySeq(this);
+    if(exprType.isEmpty() && !has(Flag.NDT)) return cc.emptySeq(this);
 
     if(clauses.getFirst() instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
@@ -293,7 +293,7 @@ public final class GFLWOR extends ParseExpr {
       final Clause clause = iter.next();
       if(clause instanceof Let) {
         final Let lt = (Let) clause;
-        if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT, Flag.UPD)) {
+        if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT)) {
           cc.info(QueryText.OPTVAR_X, lt.var);
           // check type before removing variable (see {@link FuncType})
           lt.var.checkType(lt.expr);
@@ -334,7 +334,7 @@ public final class GFLWOR extends ParseExpr {
         if(clause instanceof Let) {
           final Let lt = (Let) clause;
           final Expr expr = lt.expr;
-          if(expr.has(Flag.NDT, Flag.UPD)) continue;
+          if(expr.has(Flag.NDT)) continue;
 
           if(
             // inline simple values
@@ -459,7 +459,7 @@ public final class GFLWOR extends ParseExpr {
     for(int c = 1; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
       // do not move node constructors. example: for $x in 1 to 2 let $a := <x/> return $a
-      if(!(clause instanceof Let) || clause.has(Flag.NDT, Flag.CNS, Flag.UPD)) continue;
+      if(!(clause instanceof Let) || clause.has(Flag.NDT, Flag.CNS)) continue;
       final Let let = (Let) clause;
 
       // find insertion position
@@ -493,7 +493,7 @@ public final class GFLWOR extends ParseExpr {
     final HashSet<For> fors = new HashSet<>();
     for(int i = 0; i < clauses.size(); i++) {
       final Clause clause = clauses.get(i);
-      if(!(clause instanceof Where) || clause.has(Flag.NDT, Flag.UPD)) continue;
+      if(!(clause instanceof Where) || clause.has(Flag.NDT)) continue;
       final Where where = (Where) clause;
 
       if(where.expr.isValue()) {
@@ -511,7 +511,7 @@ public final class GFLWOR extends ParseExpr {
         int insert = -1;
         for(int j = i; --j >= 0;) {
           final Clause curr = clauses.get(j);
-          if(curr.has(Flag.NDT, Flag.UPD) || !curr.skippable(where)) break;
+          if(curr.has(Flag.NDT) || !curr.skippable(where)) break;
           // where clauses are always moved to avoid unnecessary computations,
           // but skipping only other where clauses can cause infinite loops
           if(!(curr instanceof Where)) insert = j;
@@ -567,7 +567,7 @@ public final class GFLWOR extends ParseExpr {
         final Clause cl = clauses.get(i);
         if(!(cl instanceof Where)) {
           // stop if clause is no for or let expression, is non-deterministic, or updating
-          if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT, Flag.UPD))
+          if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT))
             break;
           continue;
         }

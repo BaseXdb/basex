@@ -35,7 +35,7 @@ abstract class Update extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.UPD.in(flags) || super.has(flags);
+    return Flag.UPD.in(flags) || Flag.NDT.in(flags) || super.has(flags);
   }
 
   /**

@@ -124,7 +124,7 @@ public abstract class Preds extends Arr {
     boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
     if(expr == Bln.TRUE) {
       cc.info(OPTREMOVE_X_X, description(), expr);
-    } else if(ps || !list.contains(expr) || expr.has(Flag.NDT, Flag.UPD)) {
+    } else if(ps || !list.contains(expr) || expr.has(Flag.NDT)) {
       list.add(expr);
     }
     return ps;

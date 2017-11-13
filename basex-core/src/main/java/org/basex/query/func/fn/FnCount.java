@@ -38,7 +38,7 @@ public final class FnCount extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore non-deterministic expressions (e.g.: count(error()))
     final Expr ex = exprs[0];
-    if(!ex.has(Flag.NDT, Flag.UPD)) {
+    if(!ex.has(Flag.NDT)) {
       final long sz = ex.size();
       if(sz >= 0) return Int.get(sz);
     }

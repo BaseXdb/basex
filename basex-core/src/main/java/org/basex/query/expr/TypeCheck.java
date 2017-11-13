@@ -69,7 +69,7 @@ public final class TypeCheck extends Single {
     if(expr.isValue()) return cc.preEval(this);
 
     // check at each call
-    if(at.type.instanceOf(st.type) && !expr.has(Flag.NDT, Flag.UPD)) {
+    if(at.type.instanceOf(st.type) && !expr.has(Flag.NDT)) {
       final Occ occ = at.occ.intersect(st.occ);
       if(occ == null) throw typeError(expr, st, null, info);
     }

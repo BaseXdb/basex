@@ -36,7 +36,7 @@ public abstract class AxisPath extends Path {
     switch(cache.state) {
       case INIT:
         // first invocation: initialize caching flag
-        cache.state = !hasFreeVars() && !has(Flag.NDT, Flag.UPD) ? State.ENABLED : State.DISABLED;
+        cache.state = !hasFreeVars() && !has(Flag.NDT) ? State.ENABLED : State.DISABLED;
         return iter(qc);
       case ENABLED:
         // second invocation, caching is enabled: cache context value (copy light-weight db nodes)

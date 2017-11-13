@@ -65,7 +65,7 @@ public final class Quantifier extends Single {
 
     // pre-evaluate satisfy clause if its return expression is a value and returned at least once
     // example: some $x in (1, 2) satisfies true() -> true()
-    if(expr instanceof GFLWOR && !expr.has(Flag.NDT, Flag.UPD)) {
+    if(expr instanceof GFLWOR && !expr.has(Flag.NDT)) {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;

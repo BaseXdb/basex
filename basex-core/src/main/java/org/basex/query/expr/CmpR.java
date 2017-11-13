@@ -71,7 +71,7 @@ public final class CmpR extends Single {
    */
   static ParseExpr get(final CmpG cmp) {
     final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
-    if(e1.has(Flag.NDT, Flag.UPD)) return cmp;
+    if(e1.has(Flag.NDT)) return cmp;
 
     if(e2 instanceof RangeSeq) {
       final RangeSeq rs = (RangeSeq) e2;

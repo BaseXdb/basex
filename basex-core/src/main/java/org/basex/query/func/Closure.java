@@ -173,7 +173,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         } else if(c instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
           final Closure cl = (Closure) c;
-          if(!cl.has(Flag.NDT, Flag.UPD) && cl.global.size() < 5
+          if(!cl.has(Flag.NDT) && cl.global.size() < 5
               && expr.count(v) != VarUsage.MORE_THAN_ONCE && cl.exprSize() < limit) {
             cc.info(OPTINLINE_X, e);
             for(final Entry<Var, Expr> e2 : cl.global.entrySet()) {
@@ -307,7 +307,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         declType.promote(val, null, qc, vs.sc, info, false);
     } else {
       // check at each call
-      if(argType.type.instanceOf(declType.type) && !body.has(Flag.NDT, Flag.UPD)) {
+      if(argType.type.instanceOf(declType.type) && !body.has(Flag.NDT)) {
         // reject impossible arities
         final Occ occ = argType.occ.intersect(declType.occ);
         if(occ == null) throw typeError(body, declType, null, info);

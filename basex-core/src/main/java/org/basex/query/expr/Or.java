@@ -50,7 +50,7 @@ public final class Or extends Logical {
         }
       }
       if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
-      if(!list.contains(expr) || expr.has(Flag.NDT, Flag.UPD)) list.add(expr);
+      if(!list.contains(expr) || expr.has(Flag.NDT)) list.add(expr);
     }
   }
 

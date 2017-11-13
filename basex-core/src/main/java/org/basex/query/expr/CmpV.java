@@ -204,7 +204,7 @@ public final class CmpV extends Cmp {
      * - operands are equal,
      * - operands are deterministic, non-updating,
      * - operands do not depend on context, or if context value exists */
-    if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT, Flag.UPD) &&
+    if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT) &&
         (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       /* consider query flags. do not rewrite:
        * random:integer() eq random:integer() */
