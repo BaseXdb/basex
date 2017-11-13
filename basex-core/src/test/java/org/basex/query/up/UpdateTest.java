@@ -1255,4 +1255,14 @@ public final class UpdateTest extends AdvancedQueryTest {
     error("for tumbling window $w in 1 start when () end when delete node <a/> return ()", UPNOT_X);
     error("for tumbling window $w in db:output(1) start when () return ()", UPNOT_X);
   }
+
+  /**
+   * Checks if updating expressions are treated like non-deterministic code.
+   */
+  @Test
+  public void noOptimization() {
+    query("<a/> update { . ! (insert node text { '1' } into .) }", "<a>1</a>");
+    query("<a/> update { for $a in (1,2) return insert node text { '1' } into . }", "<a>11</a>");
+    query("(db:output('1'), db:output('2'))", "1\n2");
+  }
 }

@@ -111,7 +111,8 @@ public abstract class SimpleMap extends Arr {
 
     // single items: use item mapper; only values: pre-evaluate
     final long sz = exprType.size();
-    return it ? copyType(new ItemMap(info, exprs)).optimize(cc) :
+    return sz == 0 && !has(Flag.NDT) ? cc.emptySeq(this) :
+      it ? copyType(new ItemMap(info, exprs)).optimize(cc) :
       allAreValues() && sz <= CompileContext.MAX_PREEVAL ?
       cc.preEval(this) : this;
   }
