@@ -1242,8 +1242,8 @@ public class QueryParser extends InputParser {
     do {
       final Var var = newVar();
       final Expr by;
-      if(var.valueType != null || wsConsume(ASSIGN)) {
-        if(var.valueType != null) wsCheck(ASSIGN);
+      if(var.declType != null || wsConsume(ASSIGN)) {
+        if(var.declType != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
         final VarRef vr = localVars.resolveLocal(var.name, var.info);
@@ -2475,7 +2475,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ArgumentList" rule without the opening parenthesis.
-   * @param args list to put the argument expressions into
+   * @param args list to put the arguments into
    * @param name name of the function (item); only required for error messages
    * @return array of arguments, place-holders '?' are represented as {@code null} entries
    * @throws QueryException query exception

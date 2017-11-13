@@ -41,6 +41,14 @@ public abstract class Iter {
   }
 
   /**
+   * Indicates if the iterator is based on a value, and if the result size is known.
+   * @return result of check
+   */
+  public boolean hasValue() {
+    return false;
+  }
+
+  /**
    * Returns a value with all iterated items.
    * Must only be called if {@link #next()} has not been called before.
    * @param qc query context

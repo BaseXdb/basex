@@ -89,7 +89,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public QNm argName(final int ps) {
+  public QNm paramName(final int ps) {
     return params[ps].name;
   }
 
@@ -158,10 +158,10 @@ public final class FuncItem extends FItem implements Scope {
     cc.pushScope(scp);
 
     final Expr optimized = opt ? ex.optimize(cc) : ex, checked;
-    if(tp.valueType.instanceOf(ft.valueType)) {
+    if(tp.declType.instanceOf(ft.declType)) {
       checked = optimized;
     } else {
-      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.valueType, true);
+      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.declType, true);
       checked = opt ? tc.optimize(cc) : tc;
     }
     checked.markTailCalls(null);
@@ -270,6 +270,6 @@ public final class FuncItem extends FItem implements Scope {
       if(p != 0) tb.add(",");
       tb.addExt(error ? params[p].toErrorString() : params[p]);
     }
-    return tb.add(')').add(" as ").addExt(ft.valueType).add(" {...}").toString();
+    return tb.add(')').add(" as ").addExt(ft.declType).add(" {...}").toString();
   }
 }

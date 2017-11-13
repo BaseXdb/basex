@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -26,13 +25,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
+  /** Expression type. */
+  public final ExprType exprType;
   /** Input information. */
   public InputInfo info;
-  /** Expression type. */
-  public  SeqType seqType;
-  /** Cardinality of result; {@code -1} if unknown
-   * ({@link #seqType} will then be requested to estimate result size). */
-  protected long size = -1;
 
   /**
    * Constructor.
@@ -41,7 +37,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected ParseExpr(final InputInfo info, final SeqType seqType) {
     this.info = info;
-    this.seqType = seqType;
+    this.exprType = new ExprType(seqType);
   }
 
   @Override
@@ -86,29 +82,6 @@ public abstract class ParseExpr extends Expr {
     return it == null ? null : it.atomItem(info);
   }
 
-  /**
-   * Copies this expression's return type and size to the given expression.
-   * @param <T> expression type
-   * @param ex expression
-   * @return specified expression
-   */
-  protected final <T extends ParseExpr> T copyType(final T ex) {
-    ex.seqType = seqType;
-    ex.size = size;
-    return ex;
-  }
-
-  /**
-   * Adopt the return type and size from the specified expression to this expression.
-   * @param ex expression
-   * @return self reference
-   */
-  public final ParseExpr adoptType(final Expr ex) {
-    seqType = ex.seqType();
-    size = ex.size();
-    return this;
-  }
-
   @Override
   public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it;
@@ -137,41 +110,35 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final SeqType seqType() {
-    return seqType;
+    return exprType.seqType();
   }
 
   @Override
   public final long size() {
-    // return result size. if unknown, resort to occurrence indicator in sequence type
-    final long s = size;
-    return s == -1 ? seqType.occ() : s;
+    return exprType.size();
   }
 
   // OPTIMIZATIONS ================================================================================
 
   /**
-   * Returns a boolean equivalent for the specified expression.
-   * If the specified expression yields a boolean value anyway, it will be
-   * returned as is. Otherwise, it will be wrapped into a boolean function.
-   * @param ex expression to be rewritten
-   * @param info input info
-   * @param sc static context
-   * @return expression
+   * Copies this expression's type to the specified expression.
+   * @param <T> expression type
+   * @param ex expression
+   * @return specified expression
    */
-  protected static Expr compBln(final Expr ex, final InputInfo info, final StaticContext sc) {
-    return ex.seqType().eq(SeqType.BLN) ? ex : Function.BOOLEAN.get(sc, info, ex);
+  protected final <T extends ParseExpr> T copyType(final T ex) {
+    ex.exprType.assign(this);
+    return ex;
   }
 
   /**
-   * Assigns the result size and sequence type, based on the specified min/max occurrences.
-   * @param expr sequence type expression
-   * @param minMax min/max values (min: 0 or more, max: -1 or more)
+   * Assigns the type from the specified expression.
+   * @param ex expression
+   * @return self reference
    */
-  protected final void seqType(final Expr expr, final long[] minMax) {
-    final long min = minMax[0], max = minMax[1], sz = min == max ? min : -1;
-    final SeqType st = expr.seqType();
-    seqType = sz == -1 ? st.withMinMax(min, max) : st.withSize(sz);
-    size = sz;
+  public final ParseExpr adoptType(final Expr ex) {
+    exprType.assign(ex);
+    return this;
   }
 
   // VALIDITY CHECKS ==============================================================================

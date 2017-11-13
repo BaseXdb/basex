@@ -238,7 +238,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     calcSize();
-    if(size == 0 && !has(Flag.NDT, Flag.UPD)) return cc.emptySeq(this);
+    if(exprType.isEmpty() && !has(Flag.NDT, Flag.UPD)) return cc.emptySeq(this);
 
     if(clauses.getFirst() instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
@@ -259,7 +259,7 @@ public final class GFLWOR extends ParseExpr {
     for(final Clause clause : clauses) {
       if(minMax[1] != 0) clause.calcSize(minMax);
     }
-    seqType(ret, minMax);
+    exprType.assign(ret.seqType(), minMax);
   }
 
   /**
@@ -295,7 +295,7 @@ public final class GFLWOR extends ParseExpr {
         final Let lt = (Let) clause;
         if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT, Flag.UPD)) {
           cc.info(QueryText.OPTVAR_X, lt.var);
-          // check type before removing variable (see {@link FuncType#funcConv})
+          // check type before removing variable (see {@link FuncType})
           lt.var.checkType(lt.expr);
           iter.remove();
           changed = true;
@@ -852,10 +852,11 @@ public final class GFLWOR extends ParseExpr {
     /**
      * Constructor.
      * @param info input info
+     * @param seqType sequence type
      * @param vars declared variables
      */
-    Clause(final InputInfo info, final Var... vars) {
-      super(info, SeqType.ITEM_ZM);
+    Clause(final InputInfo info, final SeqType seqType, final Var... vars) {
+      super(info, seqType);
       this.vars = vars;
     }
 

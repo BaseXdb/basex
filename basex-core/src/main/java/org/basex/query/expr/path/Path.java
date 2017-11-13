@@ -182,15 +182,14 @@ public abstract class Path extends ParseExpr {
     final Expr lastExpr = path.steps[sl - 1];
 
     // try to compute result size and derive result type from last step
-    path.size = path.size(cc);
-    path.seqType = lastExpr.seqType().withSize(path.size);
+    path.exprType.assign(lastExpr.seqType().type, path.size(cc));
 
     // single attribute with exact name test will return at most one result
     if(path.root == null && sl == 1 && lastExpr instanceof Step) {
       final Step lastStep = (Step) lastExpr;
       if(lastStep.axis == ATTR && lastStep.test.one) {
-        lastStep.seqType = lastStep.seqType.withOcc(Occ.ZERO_ONE);
-        path.seqType = lastStep.seqType;
+        lastStep.exprType.assign(Occ.ZERO_ONE);
+        path.exprType.assign(lastStep.exprType);
       }
     }
     return path;
@@ -687,8 +686,8 @@ public abstract class Path extends ParseExpr {
     // only one hit:
     if(index.costs.results() == 1) {
       // set sequence type
-      if(resultRoot instanceof IndexAccess) ((IndexAccess) resultRoot).size(1);
-      else ((ParseExpr) resultRoot).seqType = resultRoot.seqType().withOcc(Occ.ZERO_ONE);
+      if(resultRoot instanceof IndexAccess) ((IndexAccess) resultRoot).exprType.assign(1);
+      else ((ParseExpr) resultRoot).exprType.assign(Occ.ZERO_ONE);
     }
 
     if(!newPreds.isEmpty()) {

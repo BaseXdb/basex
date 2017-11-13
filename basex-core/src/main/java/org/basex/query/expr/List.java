@@ -56,53 +56,47 @@ public final class List extends Arr {
       exprs = list.finish();
     }
 
-    // compute number of results
-    size = 0;
-    boolean ne = false;
+    // determine result type, compute number of results, set expression type
+    Type type = null;
     for(final Expr expr : exprs) {
-      final long c = expr.size();
-      ne |= c > 0 || expr.seqType().occ.min == 1;
-      if(c == -1) {
-        size = -1;
-        break;
-      } else if(size >= 0) {
-        size += c;
-      }
+      final SeqType et = expr.seqType();
+      if(!et.zero()) type = type == null ? et.type : type.union(et.type);
     }
-
-    if(size == 0) {
-      seqType = SeqType.EMP;
+    long size = 0;
+    boolean zero = true;
+    for(final Expr expr : exprs) {
+      final long sz = expr.size();
+      if(sz > 0 || expr.seqType().oneOrMore()) zero = false;
+      if(size != -1) size = sz == -1 ? -1 : size + sz;
+    }
+    if(size > -1) {
+      exprType.assign(type, size);
     } else {
-      final Occ o = size == 1 ? Occ.ONE : size < 0 && !ne ? Occ.ZERO_MORE : Occ.ONE_MORE;
-      SeqType st = null;
-      for(final Expr expr : exprs) {
-        final SeqType et = expr.seqType();
-        if(!et.zero()) st = st == null ? et : st.union(et);
-      }
-      seqType = st != null ? st.withOcc(o) : SeqType.get(AtomType.ITEM, o);
+      exprType.assign(type, zero ? Occ.ZERO_MORE : Occ.ZERO_MORE);
     }
 
-    if(allAreValues() && size >= 0 && size <= CompileContext.MAX_PREEVAL) {
-      Type type = null;
+    // pre-evaluate list
+    if(allAreValues() && size <= CompileContext.MAX_PREEVAL) {
+      Type t = null;
       final Value[] values = new Value[exprs.length];
       int vl = 0;
       for(final Expr expr : exprs) {
         final Value val = cc.qc.value(expr);
-        if(vl == 0) type = val.type;
-        else if(type != val.type) type = null;
+        if(vl == 0) t = val.type;
+        else if(t != val.type) t = null;
         values[vl++] = val;
       }
 
       final Value value;
       final int s = (int) size;
-      if(type == AtomType.STR)      value = StrSeq.get(values, s);
-      else if(type == AtomType.BLN) value = BlnSeq.get(values, s);
-      else if(type == AtomType.FLT) value = FltSeq.get(values, s);
-      else if(type == AtomType.DBL) value = DblSeq.get(values, s);
-      else if(type == AtomType.DEC) value = DecSeq.get(values, s);
-      else if(type == AtomType.BYT) value = BytSeq.get(values, s);
-      else if(type != null && type.instanceOf(AtomType.ITR)) {
-        value = IntSeq.get(values, s, type);
+      if(t == AtomType.STR)      value = StrSeq.get(values, s);
+      else if(t == AtomType.BLN) value = BlnSeq.get(values, s);
+      else if(t == AtomType.FLT) value = FltSeq.get(values, s);
+      else if(t == AtomType.DBL) value = DblSeq.get(values, s);
+      else if(t == AtomType.DEC) value = DecSeq.get(values, s);
+      else if(t == AtomType.BYT) value = BytSeq.get(values, s);
+      else if(t != null && t.instanceOf(AtomType.ITR)) {
+        value = IntSeq.get(values, s, t);
       } else {
         final ValueBuilder vb = new ValueBuilder();
         for(int v = 0; v < vl; v++) vb.add(values[v]);
@@ -110,6 +104,7 @@ public final class List extends Arr {
       }
       return cc.replaceWith(this, value);
     }
+
     return this;
   }
 

@@ -25,7 +25,7 @@ public final class Count extends Clause {
    * @param var variable
    */
   public Count(final Var var) {
-    super(var.info, var);
+    super(var.info, SeqType.ITR, var);
     this.var = var;
   }
 
@@ -65,7 +65,7 @@ public final class Count extends Clause {
 
   @Override
   public Count optimize(final CompileContext cc) throws QueryException {
-    var.refineType(SeqType.ITR, cc);
+    var.refineType(exprType.seqType(), cc);
     return this;
   }
 

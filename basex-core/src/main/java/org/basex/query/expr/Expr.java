@@ -358,7 +358,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if this is a simple expression (without side effects, context references, updates).
+   * Checks if this expression is deterministic, performs no updates, does not access the context
+   * value and position, and calls no higher-order function.
    * @return result of check
    */
   public final boolean isSimple() {

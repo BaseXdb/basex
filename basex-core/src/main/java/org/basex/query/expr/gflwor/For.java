@@ -44,7 +44,7 @@ public final class For extends ForLet {
    * @param empty {@code allowing empty} flag
    */
   public For(final Var var, final Var pos, final Var score, final Expr expr, final boolean empty) {
-    super(var.info, var, expr, score != null, vars(var, pos, score));
+    super(var.info, SeqType.ITEM_ZO, var, expr, score != null, vars(var, pos, score));
     this.pos = pos;
     this.score = score;
     this.empty = empty;
@@ -117,14 +117,11 @@ public final class For extends ForLet {
   public For optimize(final CompileContext cc) throws QueryException {
     // assign type to clause and variable
     final SeqType tp = expr.seqType();
-    final boolean emp = empty && tp.mayBeEmpty();
-    seqType = tp.withOcc(emp ? Occ.ZERO_ONE : Occ.ONE);
-    size = emp ? -1 : 1;
-    var.refineType(seqType, cc);
-    var.size = size;
+    exprType.assign(tp.type, empty && tp.mayBeEmpty() ? Occ.ZERO_ONE : Occ.ONE);
+    var.refineType(exprType.seqType(), exprType.size(), cc);
     var.data = expr.data();
-    if(pos != null) pos.refineType(SeqType.ITR, cc);
-    if(score != null) score.refineType(SeqType.DBL, cc);
+    if(pos != null) pos.refineType(SeqType.ITR, 1, cc);
+    if(score != null) score.refineType(SeqType.DBL, 1, cc);
     return this;
   }
 
@@ -200,7 +197,7 @@ public final class For extends ForLet {
     try {
       // assign type of iterated items to context expression
       final ContextValue cv = new ContextValue(info);
-      cv.seqType = expr.seqType().type.seqType();
+      cv.exprType.assign(expr.seqType().type, Occ.ONE);
       final Expr r = ex.inline(var, cv, cc);
       if(r != null) pred = r;
     } finally {

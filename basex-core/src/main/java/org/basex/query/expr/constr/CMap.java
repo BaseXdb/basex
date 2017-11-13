@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -40,9 +39,7 @@ public final class CMap extends Arr {
       key = key == null ? kt : key.union(kt);
       vt = vt == null ? st : vt.union(st);
     }
-    if(key instanceof AtomType && vt != null) {
-      seqType = SeqType.get(MapType.get((AtomType) key, vt), Occ.ONE);
-    }
+    if(key instanceof AtomType && vt != null) exprType.assign(MapType.get((AtomType) key, vt));
     return allAreValues() ? cc.preEval(this) : this;
   }
 

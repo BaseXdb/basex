@@ -43,6 +43,10 @@ public class DbList extends DbFn {
         return i < sz ? Str.get(tokenAt((int) i)) : null;
       }
       @Override
+      public boolean hasValue() {
+        return true;
+      }
+      @Override
       public Value value(final QueryContext q) {
         final TokenList tl = new TokenList(sz);
         for(int i = 0; i < sz; i++) tl.add(tokenAt(i));

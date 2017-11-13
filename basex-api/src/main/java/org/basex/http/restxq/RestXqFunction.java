@@ -119,7 +119,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean parse(final Context ctx) throws Exception {
     // parse all annotations
-    final boolean[] declared = new boolean[function.args.length];
+    final boolean[] declared = new boolean[function.params.length];
     boolean found = false;
     final MainOptions options = ctx.options;
     for(final Ann ann : function.anns) {
@@ -191,7 +191,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final int dl = declared.length;
       for(int d = 0; d < dl; d++) {
         if(declared[d]) continue;
-        throw error(function.info, VAR_UNDEFINED, function.args[d].name.string());
+        throw error(function.info, VAR_UNDEFINED, function.params[d].name.string());
       }
     }
     return found;
@@ -247,13 +247,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /**
    * Binds the annotated variables.
    * @param conn HTTP connection
-   * @param arg argument array
+   * @param args arguments
    * @param err optional query error
    * @param qc query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void bind(final HTTPConnection conn, final Expr[] arg, final QueryException err,
+  void bind(final HTTPConnection conn, final Expr[] args, final QueryException err,
       final QueryContext qc) throws QueryException, IOException {
 
     // bind variables from segments
@@ -261,7 +261,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       for(final Entry<QNm, String> entry : path.values(conn).entrySet()) {
         final QNm qnm = new QNm(entry.getKey().string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, arg, new Atm(entry.getValue()), qc);
+        bind(qnm, args, new Atm(entry.getValue()), qc);
       }
     }
 
@@ -269,7 +269,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final MainOptions mo = conn.context.options;
     if(requestBody != null) {
       try {
-        bind(requestBody, arg, HttpPayload.value(conn.params.body(), mo, conn.contentType()), qc);
+        bind(requestBody, args, HttpPayload.value(conn.params.body(), mo, conn.contentType()), qc);
       } catch(final IOException ex) {
         throw error(INPUT_CONV, ex);
       }
@@ -277,10 +277,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // bind query and form parameters
     for(final RestXqParam rxp : queryParams) {
-      bind(rxp, arg, conn.params.map().get(rxp.name), qc);
+      bind(rxp, args, conn.params.map().get(rxp.name), qc);
     }
     for(final RestXqParam rxp : formParams) {
-      bind(rxp, arg, conn.params.form(mo).get(rxp.name), qc);
+      bind(rxp, args, conn.params.form(mo).get(rxp.name), qc);
     }
 
     // bind header parameters
@@ -290,7 +290,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       while(en.hasMoreElements()) {
         for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
       }
-      bind(rxp, arg, StrSeq.get(tl), qc);
+      bind(rxp, args, StrSeq.get(tl), qc);
     }
 
     // bind cookie parameters
@@ -302,7 +302,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
           if(rxp.name.equals(c.getName())) val = Str.get(c.getValue());
         }
       }
-      bind(rxp, arg, val, qc);
+      bind(rxp, args, val, qc);
     }
 
     // bind errors
@@ -313,7 +313,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final int nl = names.length;
       for(int n = 0; n < nl; n++) errs.put(string(names[n].local()), values[n]);
     }
-    for(final RestXqParam rxp : errorParams) bind(rxp, arg, errs.get(rxp.name), qc);
+    for(final RestXqParam rxp : errorParams) bind(rxp, args, errs.get(rxp.name), qc);
   }
 
   /**
@@ -386,19 +386,19 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       throws QueryException {
 
     if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
-    int a = -1;
-    final Var[] args = function.args;
-    final int al = args.length;
-    while(++a < al && !args[a].name.eq(name));
+    int p = -1;
+    final Var[] params = function.params;
+    final int pl = params.length;
+    while(++p < pl && !params[p].name.eq(name));
 
-    if(a == args.length) throw error(UNKNOWN_VAR, name.string());
-    if(declared[a]) throw error(VAR_ASSIGNED, name.string());
+    if(p == params.length) throw error(UNKNOWN_VAR, name.string());
+    if(declared[p]) throw error(VAR_ASSIGNED, name.string());
 
-    final SeqType st = args[a].declaredType();
-    if(args[a].checksType() && !st.type.instanceOf(type))
+    final SeqType st = params[p].declaredType();
+    if(params[p].checksType() && !st.type.instanceOf(type))
       throw error(INV_VARTYPE, name.string(), type);
 
-    declared[a] = true;
+    declared[p] = true;
     return name;
   }
 
@@ -455,7 +455,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /**
    * Binds the specified value to a variable.
    * @param name variable name
-   * @param args argument array
+   * @param args arguments
    * @param value value to be bound
    * @param qc query context
    * @throws QueryException query exception
@@ -466,16 +466,16 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // skip nulled values
     if(value == null) return;
 
-    final Var[] fargs = function.args;
-    final int fl = fargs.length;
-    for(int f = 0; f < fl; f++) {
-      final Var var = fargs[f];
+    final Var[] params = function.params;
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      final Var var = params[p];
       if(var.name.eq(name)) {
         // casts and binds the value
         final SeqType decl = var.declaredType();
         final Value val = value.seqType().instanceOf(decl) ? value :
           decl.cast(value, qc, function.sc, null);
-        args[f] = var.checkType(val, qc, false);
+        args[p] = var.checkType(val, qc, false);
         break;
       }
     }

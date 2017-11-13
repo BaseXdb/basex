@@ -33,7 +33,7 @@ public final class PartFunc extends Arr {
    * @param sc static context
    * @param info input info
    * @param expr function expression
-   * @param args argument expressions
+   * @param args arguments
    * @param holes positions of the placeholders
    */
   public PartFunc(final StaticContext sc, final InputInfo info, final Expr expr, final Expr[] args,
@@ -66,7 +66,7 @@ public final class PartFunc extends Arr {
       final SeqType[] args = new SeqType[holes.length];
       final int hl = holes.length;
       for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
-      seqType = FuncType.get(ft.valueType, args).seqType();
+      exprType.assign(FuncType.get(ft.declType, args).seqType());
     }
 
     return this;
@@ -86,15 +86,16 @@ public final class PartFunc extends Arr {
     int a = -1;
     for(int h = 0; h < hl; h++) {
       while(++a < holes[h]) args[a] = qc.value(exprs[a - h]);
-      vars[h] = scp.addNew(f.argName(holes[h]), null, false, qc, info);
+      vars[h] = scp.addNew(f.paramName(holes[h]), null, false, qc, info);
       args[a] = new VarRef(info, vars[h]);
-      vars[h].refineType(ft.argTypes[a], null);
+      final SeqType at = ft.argTypes[a];
+      if(at != null) vars[h].refineType(at, null);
     }
     final int al = args.length;
     while(++a < al) args[a] = qc.value(exprs[a - hl]);
 
     final AnnList anns = f.annotations();
-    final FuncType tp = FuncType.get(anns, ft.valueType, vars);
+    final FuncType tp = FuncType.get(anns, ft.declType, vars);
     final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
         false, f, args);
 

@@ -69,7 +69,7 @@ public final class FnDistinctValues extends StandardFunc {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(!st.mayBeArray()) {
-      seqType = st.type instanceof NodeType ? SeqType.get(AtomType.ATM, st.occ) : st;
+      exprType.assign(st.type instanceof NodeType ? AtomType.ATM : st.type);
       simple = st.zeroOrOne();
     }
     return exprs.length == 1 ? cmpDist(ex, cc) : this;

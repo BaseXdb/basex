@@ -7,7 +7,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -29,9 +28,7 @@ public final class ArrayForEach extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type t = exprs[1].seqType().type;
-    if(t instanceof FuncType) {
-      seqType = SeqType.get(ArrayType.get(((FuncType) t).valueType), Occ.ONE);
-    }
+    if(t instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) t).declType));
     return this;
   }
 }

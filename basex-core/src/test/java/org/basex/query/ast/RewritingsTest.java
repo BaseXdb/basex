@@ -1,10 +1,11 @@
 package org.basex.query.ast;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.func.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -119,14 +120,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('x' = 'x' and <x>x</x> = 'x')", true, "empty(//And)");
 
     // {@link Pos} rewritings
+    final String uia = _UTIL_ITEM_AT.className(), uir = _UTIL_ITEM_RANGE.className(),
+        ulf = _UTIL_LAST_FROM.className();
     check("(<a/>,<b/>)[last()]", "<b/>",
-        "count(//" + Util.className(UtilLastFrom.class) + ") = 1");
+        "count(//" + ulf + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>",
-        "count(//" + Util.className(UtilItemAt.class) + ") = 1");
+        "count(//" + uia + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>",
-        "count(//" + Util.className(UtilItemRange.class) + ") = 1");
+        "count(//" + uir + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>",
-        "count(//" + Util.className(UtilItemAt.class) + ") = 1");
+        "count(//" + uia + ") = 1");
 
     // {@link CmpR} rewritings
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", "count(//CmpR) = 1");
@@ -215,44 +218,48 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'a'[position() <= 1]", "a", "exists(QueryPlan/Str)");
 
     // check if positional predicates are rewritten to utility functions
-    check("for $i in (1,2) return ('a')[position() = $i]", "a", "exists(//UtilItemAt)");
-    check("for $i in (1,2) return ('a')[position() = $i to $i]", "a", "exists(//UtilItemAt)");
-    check("for $i in (1,2) return ('a')[position() = $i to $i+1]", "a", "exists(//UtilItemRange)");
-    check("for $i in (1,2) return ('a')[position() = $i to 1]", "a", "exists(//UtilItemRange)");
-    check("for $i in (1,2) return ('a')[position() >= $i]", "a", "exists(//UtilItemRange)");
-    check("for $i in (1,2) return ('a')[position() > $i]", "", "exists(//UtilItemRange)");
-    check("for $i in (1,2) return ('a')[position() <= $i]", "a\na", "exists(//UtilItemRange)");
-    check("for $i in (1,2) return ('a')[position() < $i]", "a", "exists(//UtilItemRange)");
+    final String uia = _UTIL_ITEM_AT.className(), uir = _UTIL_ITEM_RANGE.className();
+    check("for $i in (1,2) return 'a'[$i]", "a", "exists(//" + uia + ")");
+    check("for $i in (1,2) return 'a'[position() = $i]", "a", "exists(//" + uia + ")");
+    check("for $i in (1,2) return 'a'[position() = $i to $i]", "a", "exists(//" + uia + ")");
+    check("for $i in (1,2) return 'a'[position() = $i to $i+1]", "a", "exists(//" + uir + ")");
+    check("for $i in (1,2) return 'a'[position() = $i to 1]", "a", "exists(//" + uir + ")");
+    check("for $i in (1,2) return 'a'[position() >= $i]", "a", "exists(//" + uir + ")");
+    check("for $i in (1,2) return 'a'[position() > $i]", "", "exists(//" + uir + ")");
+    check("for $i in (1,2) return 'a'[position() <= $i]", "a\na", "exists(//" + uir + ")");
+    check("for $i in (1,2) return 'a'[position() < $i]", "a", "exists(//" + uir + ")");
 
     // check if positional predicates are rewritten to utility functions
     final String seq = " (1, 1.1, 1.9, 2) ";
-    check("for $i in" + seq + "return ('a','b')[position() = $i]", "a\nb", "exists(//UtilItemAt)");
+    check("for $i in" + seq + "return ('a','b')[$i]", "a\nb", "exists(//" + uia + ")");
+    check("for $i in" + seq + "return ('a','b')[position() = $i]", "a\nb", "exists(//" + uia + ")");
     check("for $i in" + seq + "return ('a','b')[position() >= $i]", "a\nb\nb\nb\nb",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
     check("for $i in" + seq + "return ('a','b')[position() > $i]", "b\nb\nb",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
     check("for $i in" + seq + "return ('a','b')[position() <= $i]", "a\na\na\na\nb",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
     check("for $i in" + seq + "return ('a','b')[position() < $i]", "a\na\na",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
 
     // check if multiple positional predicates are rewritten to utility functions
+    check("for $i in" + seq + "return ('a','b')[$i][$i]", "a", "count(//UtilItemAt) = 2");
     check("for $i in" + seq + "return ('a','b')[position() = $i][position() = $i]", "a",
         "count(//UtilItemAt) = 2");
     check("for $i in" + seq + "return ('a','b')[position() < $i][position() < $i]", "a\na\na",
-        "count(//UtilItemRange) = 2");
+        "count(//" + uir + ") = 2");
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a','b')[position() = $i and position() = $i]", "a\nb",
         "exists(//UtilItemAt)");
     check("for $i in" + seq + "return ('a','b')[position() >= $i and position() <= $i]", "a\nb",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
     check("for $i in" + seq + "return ('a','b')[position() <= $i and position() >= $i]", "a\nb",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
     check("for $i in" + seq + "return ('a','b')[position() > $i and position() < $i]", "",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
     check("for $i in" + seq + "return ('a','b')[position() < $i and position() > $i]", "",
-        "exists(//UtilItemRange)");
+        "exists(//" + uir + ")");
 
     // no rewriting possible (conflicting positional predicates)
     check("for $i in" + seq + "return ('a','b')[position() = $i and position() = $i+1]", "",

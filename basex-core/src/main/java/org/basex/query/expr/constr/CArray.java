@@ -40,7 +40,7 @@ public final class CArray extends Arr {
       if(!seq) st = st.withOcc(Occ.ONE);
       vt = vt == null ? st : vt.union(st);
     }
-    if(vt != null) seqType = SeqType.get(ArrayType.get(vt), Occ.ONE);
+    if(vt != null) exprType.assign(ArrayType.get(vt));
 
     return allAreValues() ? cc.preEval(this) : this;
   }

@@ -190,7 +190,7 @@ public final class Functions extends TokenSet {
       final FuncType ft, final Expr expr, final VarScope scp, final InputInfo info,
       final boolean runtime, final boolean updating) {
     return runtime ? new FuncItem(scp.sc, anns, name, params, ft, expr, scp.stackSize()) :
-      new Closure(info, name, updating ? null : ft.valueType, params, expr, anns, null, scp);
+      new Closure(info, name, updating ? SeqType.EMP : ft.declType, params, expr, anns, null, scp);
   }
 
   /**
@@ -253,7 +253,7 @@ public final class Functions extends TokenSet {
       final Var[] params = new Var[arity];
       final Expr[] args = new Expr[arity];
       for(int a = 0; a < arity; a++) {
-        params[a] = scp.addNew(sf.argName(a), ft.argTypes[a], true, qc, info);
+        params[a] = scp.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
         args[a] = new VarRef(info, params[a]);
       }
       final boolean upd = sf.updating;
@@ -294,12 +294,12 @@ public final class Functions extends TokenSet {
 
     final FuncType ft = sf.funcType();
     final VarScope scp = new VarScope(sc);
-    final int arity = sf.args.length;
+    final int arity = sf.params.length;
     final Var[] args = new Var[arity];
     final int al = args.length;
     final Expr[] calls = new Expr[al];
     for(int a = 0; a < al; a++) {
-      args[a] = scp.addNew(sf.argName(a), ft.argTypes[a], true, qc, info);
+      args[a] = scp.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
       calls[a] = new VarRef(info, args[a]);
     }
     final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, info);

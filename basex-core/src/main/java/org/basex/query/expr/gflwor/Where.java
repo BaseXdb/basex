@@ -6,6 +6,7 @@ import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -26,7 +27,7 @@ public final class Where extends Clause {
    * @param info input info
    */
   public Where(final Expr expr, final InputInfo info) {
-    super(info);
+    super(info, SeqType.BLN);
     this.expr = expr;
   }
 
@@ -55,7 +56,7 @@ public final class Where extends Clause {
   @Override
   public Where optimize(final CompileContext cc) throws QueryException {
     expr = expr.optimizeEbv(cc);
-    if(expr.isValue()) expr = expr.ebv(cc.qc, info);
+    if(expr.isValue()) expr = cc.replaceWith(expr, Bln.get(expr.ebv(cc.qc, info).bool(info)));
     return this;
   }
 

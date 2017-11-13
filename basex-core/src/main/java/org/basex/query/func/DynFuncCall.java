@@ -85,9 +85,9 @@ public final class DynFuncCall extends FuncCall {
       final FuncType ft = (FuncType) tp;
       if(ft.argTypes != null && ft.argTypes.length != nargs)
         throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, f.toErrorString());
-      SeqType vt = ft.valueType;
+      SeqType vt = ft.declType;
       if(tp instanceof MapType) vt = vt.withOcc(vt.occ.union(Occ.ZERO));
-      seqType = vt;
+      exprType.assign(vt);
     }
 
     // maps and arrays can only contain evaluated values, so this is safe

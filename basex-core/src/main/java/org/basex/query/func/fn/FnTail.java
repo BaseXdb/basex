@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 
 /**
  * Function implementation.
@@ -19,10 +18,11 @@ import org.basex.query.value.type.SeqType.*;
 public final class FnTail extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    // check if iterator only returns single result
+    // retrieve and decrement iterator size
     final Iter iter = qc.iter(exprs[0]);
-    final long is = iter.size();
-    if(is == 0 || is == 1 || iter.next() == null) return Empty.ITER;
+    final long is = iter.size() - 1;
+    // return empty iterator if iterator is known to yield 0 or 1 results, or if it yields no item
+    if(is == -1 || is == 0 || iter.next() == null) return Empty.ITER;
 
     // create new iterator, based on original iterator
     return new Iter() {
@@ -36,27 +36,34 @@ public final class FnTail extends StandardFunc {
       }
       @Override
       public long size() {
-        // return -1, or decreased count of original iterator
-        return is == -1 ? -1 : is - 1;
+        return is < 0 ? -1 : is;
+      }
+      @Override
+      public Value value(final QueryContext q) throws QueryException {
+        return is < 0 ? super.value(q) : iter.value(q).subSeq(1, is);
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // return empty sequence if value has 0 or 1 items
     final Value val = qc.value(exprs[0]);
-    final long vs = val.size();
-    return vs < 2 ? Empty.SEQ : val.subSeq(1, vs - 1);
+    final long vs = val.size() - 1;
+    return vs < 1 ? Empty.SEQ : val.subSeq(1, vs);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr ex = exprs[0];
-    final long sz = ex.size();
+    final long sz = ex.size() - 1;
     final SeqType st = ex.seqType();
-    if(sz == 0 || sz == 1 || st.zeroOrOne()) return Empty.SEQ;
-    seqType = st.withOcc(sz == 2 ? Occ.ONE : sz > 2 ? Occ.ONE_MORE : Occ.ZERO_MORE);
-    if(sz > 0) size = sz - 1;
+    if(sz == -1 || sz == 0 || st.zeroOrOne()) return Empty.SEQ;
+    if(sz > 0) {
+      exprType.assign(st.type, sz);
+    } else {
+      exprType.assign(st.type);
+    }
     return this;
   }
 }

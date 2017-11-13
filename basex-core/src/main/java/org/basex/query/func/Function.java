@@ -175,19 +175,16 @@ public enum Function {
   FLOOR(FnFloor.class, "floor(num)", arg(NUM_ZO), NUM_ZO),
   /** XQuery function. */
   FOLD_LEFT(FnFoldLeft.class, "fold-left(items,zero,function)",
-      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()),
-      ITEM_ZM, flag(HOF)),
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOLD_RIGHT(FnFoldRight.class, "fold-right(items,zero,function)",
-      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType()),
-      ITEM_ZM, flag(HOF)),
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOR_EACH(FnForEach.class, "for-each(items,function)",
       arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOR_EACH_PAIR(FnForEachPair.class, "for-each-pair(items1,items2,function)",
-      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM).seqType()),
-      ITEM_ZM, flag(HOF)),
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FORMAT_DATE(FnFormatDate.class, "format-date(date,picture,[language,calendar,place])",
       arg(DAT_ZO, STR, STR_ZO, STR_ZO, STR_ZO), STR_ZO),
@@ -1403,10 +1400,10 @@ public enum Function {
   /** Function class. */
   public final Class<? extends StandardFunc> clazz;
 
-  /** Descriptions. */
+  /** Description. */
   final String desc;
-  /** Value return type. */
-  final SeqType type;
+  /** Sequence type. */
+  final SeqType seqType;
 
   /** Compiler flags. */
   private final EnumSet<Flag> flags;
@@ -1419,11 +1416,11 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param type return type
+   * @param seqType return type
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType type) {
-    this(func, desc, args, type, EnumSet.noneOf(Flag.class));
+      final SeqType seqType) {
+    this(func, desc, args, seqType, EnumSet.noneOf(Flag.class));
   }
 
   /**
@@ -1446,12 +1443,12 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param type return type
+   * @param seqType return type
    * @param flag static function properties
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType type, final EnumSet<Flag> flag) {
-    this(func, desc, args, type, flag, FN_URI);
+      final SeqType seqType, final EnumSet<Flag> flag) {
+    this(func, desc, args, seqType, flag, FN_URI);
   }
 
   /**
@@ -1462,16 +1459,16 @@ public enum Function {
    *             square brackets; three dots indicate that the number of arguments of a
    *             function is not limited
    * @param params parameter types
-   * @param type return type
+   * @param seqType return type
    * @param flags static function properties
    * @param uri uri
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] params,
-      final SeqType type, final EnumSet<Flag> flags, final byte[] uri) {
+      final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
 
     this.clazz = func;
     this.desc = desc;
-    this.type = type;
+    this.seqType = seqType;
     this.params = params;
     this.flags = flags;
     this.uri = uri;
@@ -1539,7 +1536,7 @@ public enum Function {
     } else {
       System.arraycopy(params, 0, st, 0, arity);
     }
-    return FuncType.get(anns, type, st);
+    return FuncType.get(anns, seqType, st);
   }
 
   /**
@@ -1639,6 +1636,14 @@ public enum Function {
       }
     }
     return ' ' + toString().replaceAll("\\(.*", "(") + tb + ')';
+  }
+
+  /**
+   * Returns the name of the class.
+   * @return class name
+   */
+  public final String className() {
+    return Util.className(clazz);
   }
 
   @Override

@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -24,14 +25,15 @@ abstract class ForLet extends Clause {
   /**
    * Constructor.
    * @param info input info
+   * @param seqType sequence type
    * @param var variables
    * @param expr expression
    * @param vars variable
    * @param scoring scoring flag
    */
-  ForLet(final InputInfo info, final Var var, final Expr expr, final boolean scoring,
-      final Var... vars) {
-    super(info, vars);
+  ForLet(final InputInfo info, final SeqType seqType, final Var var, final Expr expr,
+      final boolean scoring, final Var... vars) {
+    super(info, seqType, vars);
     this.var = var;
     this.expr = expr;
     this.scoring = scoring;

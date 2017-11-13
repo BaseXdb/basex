@@ -52,7 +52,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public QNm argName(final int pos) {
+  public QNm paramName(final int pos) {
     return new QNm("key", "");
   }
 
@@ -162,7 +162,7 @@ public final class Map extends FItem {
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].one())) return false;
 
-    SeqType ret = tp.valueType;
+    SeqType ret = tp.declType;
     if(tp instanceof MapType) {
       AtomType arg = ((MapType) tp).keyType();
       if(arg == AtomType.AAT) arg = null;

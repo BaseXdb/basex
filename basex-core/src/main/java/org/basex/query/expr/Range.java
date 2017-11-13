@@ -41,7 +41,7 @@ public final class Range extends Arr {
     if(e1.equals(e2)) {
       if(st1.instanceOf(SeqType.ITR) && st2.instanceOf(SeqType.ITR))
         return cc.replaceWith(this, e1);
-      seqType = seqType.withOcc(Occ.ONE);
+      exprType.assign(Occ.ONE);
     }
     return this;
   }

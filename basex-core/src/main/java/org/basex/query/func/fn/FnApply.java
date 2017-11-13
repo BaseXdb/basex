@@ -61,7 +61,7 @@ public final class FnApply extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type t = exprs[0].seqType().type;
-    if(t instanceof FuncType) seqType = ((FuncType) t).valueType;
+    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType);
     return this;
   }
 }

@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -103,8 +102,7 @@ public abstract class Filter extends Preds {
     }
 
     // check result size
-    seqType(root.seqType(), root.size());
-    if(size == 0) return cc.emptySeq(this);
+    if(!exprType(root.seqType(), root.size())) return cc.emptySeq(this);
 
     // if possible, convert filter to root or path expression
     Expr ex = simplify(root, exprs);
@@ -127,8 +125,8 @@ public abstract class Filter extends Preds {
       ex = null;
       if(expr.isFunction(Function.LAST)) {
         if(rt.isValue()) {
-          // return sub-sequence
-          ex = FnSubsequence.eval((Value) rt, rt.size(), 1);
+          // value: replace with last item
+          ex = rt.value(cc.qc).itemAt(rt.size() - 1);
         } else {
           // rewrite positional predicate to util:last-from
           ex = cc.function(Function._UTIL_LAST_FROM, info, rt);
@@ -136,8 +134,9 @@ public abstract class Filter extends Preds {
       } else if(expr instanceof ItrPos) {
         final ItrPos pos = (ItrPos) expr;
         if(rt.isValue()) {
-          // return sub-sequence
-          ex = FnSubsequence.eval((Value) rt, pos.min, pos.max - pos.min + 1);
+          // value: replace with sub-sequence
+          final long s = pos.min - 1, l = Math.min(pos.max, rt.size()) - s;
+          ex = l <= 0 ? Empty.SEQ : rt.value(cc.qc).subSeq(s, l);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
           ex = cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));

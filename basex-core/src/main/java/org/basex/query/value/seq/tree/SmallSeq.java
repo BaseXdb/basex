@@ -83,12 +83,12 @@ final class SmallSeq extends TreeSeq {
   public Value subSeq(final long pos, final long len) {
     if(pos < 0) throw new IndexOutOfBoundsException("first index < 0: " + pos);
     if(len < 0) throw new IndexOutOfBoundsException("length < 0: " + len);
-    if(pos + len > elems.length)
-      throw new IndexOutOfBoundsException("end out of bounds: "
-          + (pos + len) + " > " + elems.length);
+    if(pos + len > elems.length) throw new IndexOutOfBoundsException("end out of bounds: " +
+        (pos + len) + " > " + elems.length);
 
-    final int p = (int) pos, n = (int) len;
-    return n == 0 ? Empty.SEQ : n == 1 ? elems[p] : new SmallSeq(slice(elems, p, p + n), type);
+    final int p = (int) pos, l = (int) len;
+    return l == 0 ? Empty.SEQ : l == 1 ? elems[p] : l == size ? this :
+      new SmallSeq(slice(elems, p, p + l), type);
   }
 
   @Override
@@ -156,6 +156,11 @@ final class SmallSeq extends TreeSeq {
       @Override
       public Item get(final long i) {
         return elems[(int) i];
+      }
+
+      @Override
+      public boolean hasValue() {
+        return true;
       }
 
       @Override

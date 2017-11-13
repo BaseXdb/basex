@@ -30,10 +30,10 @@ public final class Let extends ForLet {
    * Constructor.
    * @param var variable
    * @param expr expression
-   * @param score score flag
+   * @param scoring scoring flag
    */
-  public Let(final Var var, final Expr expr, final boolean score) {
-    super(var.info, var, expr, score, var);
+  public Let(final Var var, final Expr expr, final boolean scoring) {
+    super(var.info, scoring ? SeqType.DBL : SeqType.ITEM_ZM, var, expr, scoring, var);
   }
 
   /**
@@ -95,15 +95,11 @@ public final class Let extends ForLet {
     if(expr.isValue() && var.checksType()) expr = var.checkType((Value) expr, cc.qc, true);
 
     // assign type to clause and variable
-    if(scoring) {
-      seqType = SeqType.DBL;
-      size = 1;
-    } else {
+    if(!scoring) {
       adoptType(expr);
       var.data = expr.data();
     }
-    var.refineType(seqType, cc);
-    var.size = size;
+    var.refineType(seqType(), size(), cc);
     return this;
   }
 

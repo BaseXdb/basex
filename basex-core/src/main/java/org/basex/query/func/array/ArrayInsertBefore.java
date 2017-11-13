@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -25,8 +24,8 @@ public final class ArrayInsertBefore extends ArrayFn {
   protected ArrayInsertBefore opt(final CompileContext cc) {
     final Type t = exprs[0].seqType().type;
     if(t instanceof ArrayType) {
-      final SeqType vt = ((ArrayType) t).valueType.union(exprs[2].seqType());
-      seqType = SeqType.get(ArrayType.get(vt), Occ.ONE);
+      final SeqType vt = ((ArrayType) t).declType.union(exprs[2].seqType());
+      exprType.assign(ArrayType.get(vt));
     }
     return this;
   }

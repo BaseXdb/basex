@@ -8,8 +8,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
-import org.basex.query.expr.gflwor.GFLWOR.Eval;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -17,7 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -54,7 +53,7 @@ public final class Window extends Clause {
    */
   public Window(final boolean sliding, final Var var, final Expr expr, final Condition start,
       final boolean only, final Condition end) throws QueryException {
-    super(var.info, vars(var, start, end));
+    super(var.info, SeqType.ITEM_ZM, vars(var, start, end));
     this.sliding = sliding;
     this.var = var;
     this.expr = expr;
@@ -261,8 +260,7 @@ public final class Window extends Clause {
 
   @Override
   public Clause optimize(final CompileContext cc) throws QueryException {
-    final SeqType st = expr.seqType();
-    var.refineType(st.withOcc(Occ.ZERO_MORE), cc);
+    var.refineType(expr.seqType().withOcc(Occ.ZERO_MORE), cc);
     return this;
   }
 

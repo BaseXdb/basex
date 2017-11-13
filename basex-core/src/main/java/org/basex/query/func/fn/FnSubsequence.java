@@ -31,23 +31,12 @@ public class FnSubsequence extends StandardFunc {
     if(range == ALL) return iter;
 
     // compute start, length
-    final long start = range[0], len = range[1], max = iter.size();
+    final long start = range[0], len = range[1], is = iter.size();
     final long e = len == Long.MAX_VALUE ? len : start + len;
-    final long s = Math.max(1, start), m = Math.min(e, max + 1), l = Math.max(0, m - s);
-
-    // basic iterator: return simplified iterator
-    if(iter instanceof BasicIter) {
-      final BasicIter<?> basic = (BasicIter<?>) iter;
-      return new BasicIter<Item>(l) {
-        @Override
-        public Item get(final long i) {
-          return basic.get(s + i - 1);
-        }
-      };
-    }
+    final long s = Math.max(1, start), m = Math.min(e, is + 1), l = Math.max(0, m - s);
 
     // fast route if the size is known
-    if(max >= 0) return new Iter() {
+    if(is >= 0) return new Iter() {
       // directly access specified items
       long c = s;
       @Override
@@ -83,31 +72,37 @@ public class FnSubsequence extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final long[] range = range(qc);
     if(range == null) return Empty.SEQ;
-    if(range == ALL) return qc.value(exprs[0]);
-
-    // optimization: return subsequence
+    final Expr ex = exprs[0];
+    if(range == ALL) return qc.value(ex);
     final long start = range[0], len = range[1];
-    final Iter iter = qc.iter(exprs[0]);
-    if(iter instanceof BasicIter) {
-      return eval(((BasicIter<?>) iter).value(qc), start, len);
+
+    // return subsequence if value access is cheap
+    final Iter iter = qc.iter(ex);
+    final long is = iter.size();
+    if(iter.hasValue()) {
+      final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
+      return l <= 0 ? Empty.SEQ : ex.value(qc).subSeq(s, l);
     }
 
-    // fast route if the size is known
-    final long max = iter.size();
-    if(max >= 0) {
-      final long s = Math.max(1, start) - 1, l = Math.min(max - s, len + Math.min(0, start - 1));
-      if(s >= max || l <= 0) return Empty.SEQ;
+    // take fast route if the size is known
+    if(is >= 0) {
+      final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
+      if(s >= is || l <= 0) return Empty.SEQ;
+      if(s == 0 && l == is) return iter.value(qc);
       final ValueBuilder vb = new ValueBuilder();
-      for(long i = 0; i < l; i++) vb.add(iter.get(s + i));
+      for(long i = 0; i < l; i++) {
+        qc.checkStop();
+        vb.add(iter.get(s + i));
+      }
       return vb.value();
     }
 
     final long e = len == Long.MAX_VALUE ? len : start + len;
     final ValueBuilder vb = new ValueBuilder();
     Item it;
-    for(int c = 1; c < e && (it = iter.next()) != null; c++) {
+    for(int i = 1; i < e && (it = iter.next()) != null; i++) {
       qc.checkStop();
-      if(c >= start) vb.add(it);
+      if(i >= start) vb.add(it);
     }
     return vb.value();
   }
@@ -136,19 +131,6 @@ public class FnSubsequence extends StandardFunc {
 
     // return all values, no values, or the specified range
     return min ? len == Long.MAX_VALUE ? ALL : null : new long[] { start, length(start, len) };
-  }
-
-  /**
-   * Returns a subsequence.
-   * @param val value
-   * @param start start position
-   * @param len length
-   * @return sub sequence
-   */
-  public static Value eval(final Value val, final long start, final long len) {
-    final long s = Math.max(0, start - 1);
-    final long l = Math.min(val.size() - s, len + Math.min(0, start - 1));
-    return l <= 0 ? Empty.SEQ : val.subSeq(s, l);
   }
 
   /**
@@ -183,7 +165,7 @@ public class FnSubsequence extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
     if(st.zero()) return exprs[0];
-    seqType = st.withOcc(st.occ.union(Occ.ZERO));
+    exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }
 }

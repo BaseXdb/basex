@@ -44,7 +44,7 @@ public final class FnRemove extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
     if(st.zero()) return exprs[0];
-    seqType = st.withOcc(st.occ.union(Occ.ZERO));
+    exprType.assign(st.occ.union(Occ.ZERO));
     return this;
   }
 }

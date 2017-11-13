@@ -17,10 +17,10 @@ import org.basex.util.*;
 public final class ArrayType extends FuncType {
   /**
    * Constructor.
-   * @param valueType return type
+   * @param declType declared return type
    */
-  ArrayType(final SeqType valueType) {
-    super(valueType, SeqType.ITR);
+  ArrayType(final SeqType declType) {
+    super(declType, SeqType.ITR);
   }
 
   @Override
@@ -41,7 +41,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean eq(final Type t) {
-    return this == t || t instanceof ArrayType && valueType.eq(((ArrayType) t).valueType);
+    return this == t || t instanceof ArrayType && declType.eq(((ArrayType) t).declType);
   }
 
   @Override
@@ -52,7 +52,7 @@ public final class ArrayType extends FuncType {
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
-    if(al != ft.argTypes.length || !valueType.instanceOf(ft.valueType)) return false;
+    if(al != ft.argTypes.length || !declType.instanceOf(ft.declType)) return false;
     if(t instanceof ArrayType) return true;
 
     // test function arguments of function type
@@ -68,7 +68,7 @@ public final class ArrayType extends FuncType {
     if(instanceOf(t)) return t;
     if(t instanceof ArrayType) {
       final ArrayType mt = (ArrayType) t;
-      return mt.instanceOf(this) ? this : get(valueType.union(mt.valueType));
+      return mt.instanceOf(this) ? this : get(declType.union(mt.declType));
     }
     return t instanceof MapType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
       AtomType.ITEM;
@@ -82,14 +82,14 @@ public final class ArrayType extends FuncType {
     if(t instanceof ArrayType) {
       final ArrayType mt = (ArrayType) t;
       if(mt.instanceOf(this)) return mt;
-      final SeqType vt = valueType.intersect(mt.valueType);
-      return vt == null ? null : get(vt);
+      final SeqType dt = declType.intersect(mt.declType);
+      return dt == null ? null : get(dt);
     }
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR)) {
-        final SeqType vt = valueType.intersect(ft.valueType);
-        return vt == null ? null : get(vt);
+        final SeqType dt = declType.intersect(ft.declType);
+        return dt == null ? null : get(dt);
       }
     }
     return null;
@@ -97,15 +97,15 @@ public final class ArrayType extends FuncType {
 
   /**
    * Creates a new array type.
-   * @param valueType value type
+   * @param declType declared return type
    * @return array type
    */
-  public static ArrayType get(final SeqType valueType) {
-    return valueType.eq(SeqType.ITEM_ZM) ? SeqType.ANY_ARRAY : new ArrayType(valueType);
+  public static ArrayType get(final SeqType declType) {
+    return declType.eq(SeqType.ITEM_ZM) ? SeqType.ANY_ARRAY : new ArrayType(declType);
   }
 
   @Override
   public String toString() {
-    return valueType.eq(SeqType.ITEM_ZM) ? "array(*)" : "array(" + valueType + ')';
+    return declType.eq(SeqType.ITEM_ZM) ? "array(*)" : "array(" + declType + ')';
   }
 }

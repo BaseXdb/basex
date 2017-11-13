@@ -97,11 +97,11 @@ final class XQDoc extends Inspect {
       final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(sf.anns);
       tb.add(FUNCTION).add(' ').add(name.string()).add(PAREN1);
       for(int i = 0; i < al; i++) {
-        final Var v = sf.args[i];
+        final Var v = sf.params[i];
         if(i > 0) tb.add(SEP);
         tb.add(DOLLAR).add(v.name.string()).add(' ').add(AS).add(' ').addExt(t.argTypes[i]);
       }
-      tb.add(PAREN2).add(' ' + AS + ' ' + t.valueType);
+      tb.add(PAREN2).add(' ' + AS + ' ' + t.declType);
       if(sf.expr == null) tb.add(" external");
 
       elem("signature", function).add(tb.toString());
@@ -109,7 +109,7 @@ final class XQDoc extends Inspect {
         final FElem fparameters = elem("parameters", function);
         for(int a = 0; a < al; a++) {
           final FElem fparameter = elem("parameter", fparameters);
-          final Var v = sf.args[a];
+          final Var v = sf.params[a];
           elem("name", fparameter).add(v.name.string());
           type(t.argTypes[a], fparameter);
         }

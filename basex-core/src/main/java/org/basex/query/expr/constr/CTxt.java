@@ -40,7 +40,7 @@ public final class CTxt extends CNode {
     if(ex == Empty.SEQ) return cc.emptySeq(this);
     final SeqType st = ex.seqType();
     final boolean atom = !st.mayBeArray();
-    if(st.oneOrMore() && atom) seqType = seqType.withOcc(Occ.ONE);
+    if(st.oneOrMore() && atom) exprType.assign(Occ.ONE);
     simple = st.zeroOrOne() && atom;
     return this;
   }

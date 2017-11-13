@@ -29,8 +29,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class StaticFunc extends StaticDecl implements XQFunction {
-  /** Arguments. */
-  public final Var[] args;
+  /** Formal parameters. */
+  public final Var[] params;
   /** Updating flag. */
   final boolean updating;
 
@@ -43,17 +43,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * Function constructor.
    * @param anns annotations
    * @param name function name
-   * @param args arguments
+   * @param params formal parameters
    * @param type declared return type (can be {@code null})
    * @param expr function body (can be {@code null})
    * @param doc xqdoc string
    * @param vs variable scope
    * @param info input info
    */
-  StaticFunc(final AnnList anns, final QNm name, final Var[] args, final SeqType type,
+  StaticFunc(final AnnList anns, final QNm name, final Var[] params, final SeqType type,
       final Expr expr, final String doc, final VarScope vs, final InputInfo info) {
     super(anns, name, type, vs, doc, info);
-    this.args = args;
+    this.params = params;
     this.expr = expr;
     updating = anns.contains(Annotation.UPDATING);
   }
@@ -68,14 +68,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     try {
       expr = expr.compile(cc);
 
-      if(type != null) {
+      if(declType != null) {
         // remove redundant casts
-        if((type.type == AtomType.BLN || type.type == AtomType.FLT ||
-            type.type == AtomType.DBL || type.type == AtomType.QNM ||
-            type.type == AtomType.URI) && type.eq(expr.seqType())) {
-          cc.info(OPTTYPE_X, type);
+        final Type t = declType.type;
+        if(declType.eq(expr.seqType()) && (t == AtomType.BLN || t == AtomType.FLT ||
+            t == AtomType.DBL || t == AtomType.QNM || t == AtomType.URI)) {
+          cc.info(OPTTYPE_X, declType);
         } else {
-          expr = new TypeCheck(sc, info, expr, type, true).optimize(cc);
+          expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
         }
       }
     } catch(final QueryException qe) {
@@ -95,8 +95,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public void plan(final FElem plan) {
     final FElem el = planElem(NAME, name.string(), TYPE, seqType());
     addPlan(plan, el, expr);
-    final int al = args.length;
-    for(int a = 0; a < al; ++a) el.add(planAttr(ARG + a, args[a].name.string()));
+    final int pl = params.length;
+    for(int p = 0; p < pl; ++p) el.add(planAttr(ARG + p, params[p].name.string()));
   }
 
   /**
@@ -119,7 +119,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public int arity() {
-    return args.length;
+    return params.length;
   }
 
   @Override
@@ -128,13 +128,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public QNm argName(final int pos) {
-    return args[pos].name;
+  public QNm paramName(final int pos) {
+    return params[pos].name;
   }
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, type, args);
+    return FuncType.get(anns, declType, params);
   }
 
   @Override
@@ -156,8 +156,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final Value cv = qf.value;
     qf.value = null;
     try {
-      final int al = args.length;
-      for(int a = 0; a < al; a++) qc.set(args[a], arg[a]);
+      final int pl = params.length;
+      for(int p = 0; p < pl; p++) qc.set(params[p], arg[p]);
       return expr.item(qc, info);
     } finally {
       qf.value = cv;
@@ -173,8 +173,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final Value cv = qf.value;
     qf.value = null;
     try {
-      final int al = args.length;
-      for(int a = 0; a < al; a++) qc.set(args[a], arg[a]);
+      final int pl = params.length;
+      for(int p = 0; p < pl; p++) qc.set(params[p], arg[p]);
       return qc.value(expr);
     } finally {
       qf.value = cv;
@@ -203,7 +203,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
     if(updating) {
       // updating function
-      if(type != null && !type.zero()) throw UUPFUNCTYPE.get(info);
+      if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(info);
       if(!upd && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(upd) {
       // uses updates, but is not declared as such
@@ -213,7 +213,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean isVacuousBody() {
-    return type != null && type.zero() && !has(Flag.UPD);
+    return declType != null && declType.zero() && !has(Flag.UPD);
   }
 
   /**
@@ -261,13 +261,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var v : args) if(!visitor.declared(v)) return false;
+    for(final Var v : params) if(!visitor.declared(v)) return false;
     return expr == null || expr.accept(visitor);
   }
 
   @Override
   public byte[] id() {
-    return StaticFuncs.sig(name, args.length);
+    return StaticFuncs.sig(name, params.length);
   }
 
   @Override
@@ -280,9 +280,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<>();
     final IntObjMap<Var> vars = new IntObjMap<>();
-    final int al = args.length;
-    for(int a = 0; a < al; a++) {
-      cls.add(new Let(cc.copy(args[a], vars), exprs[a], false).optimize(cc));
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      cls.add(new Let(cc.copy(params[p], vars), exprs[p], false).optimize(cc));
     }
 
     // copy the function body
@@ -318,8 +318,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
     tb.add(FUNCTION).add(' ').add(name.string());
-    tb.add(PAREN1).addSep(args, SEP).add(PAREN2);
-    if(type != null) tb.add(' ' + AS + ' ' + type);
+    tb.add(PAREN1).addSep(params, SEP).add(PAREN2);
+    if(declType != null) tb.add(' ' + AS + ' ' + declType);
     if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
     else tb.add(" external; ");
     return tb.toString();

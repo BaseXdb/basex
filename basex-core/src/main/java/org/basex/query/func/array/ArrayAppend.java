@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -23,8 +22,8 @@ public final class ArrayAppend extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Type t = exprs[0].seqType().type;
     if(t instanceof ArrayType) {
-      final SeqType vt = ((ArrayType) t).valueType.union(exprs[1].seqType());
-      seqType = SeqType.get(ArrayType.get(vt), Occ.ONE);
+      final SeqType vt = ((ArrayType) t).declType.union(exprs[1].seqType());
+      exprType.assign(ArrayType.get(vt));
     }
     return this;
   }

@@ -70,12 +70,8 @@ public final class FnFoldLeft extends StandardFunc {
     final Expr[] exprs = func.exprs;
     final Type t = exprs[2].seqType().type;
     if(t instanceof FuncType) {
-      final SeqType vt = ((FuncType) t).valueType;
-      if(exprs[0].seqType().mayBeEmpty()) {
-        func.seqType = vt.union(exprs[1].seqType());
-      } else {
-        func.seqType = vt;
-      }
+      final SeqType vt = ((FuncType) t).declType;
+      func.exprType.assign(exprs[0].seqType().mayBeEmpty() ? vt.union(exprs[1].seqType()) : vt);
     }
   }
 }

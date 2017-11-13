@@ -40,4 +40,17 @@ public final class FnBoolean extends StandardFunc {
     final Expr ex = exprs[0];
     return ex.seqType().mayBeNumber() ? this : cc.replaceEbv(this, ex);
   }
+
+  /**
+   * Returns a boolean equivalent for the specified expression.
+   * If the specified expression yields a boolean value anyway, it will be
+   * returned as is. Otherwise, it will be wrapped into a boolean function.
+   * @param ex expression to be rewritten
+   * @param info input info
+   * @param sc static context
+   * @return expression
+   */
+  public static Expr get(final Expr ex, final InputInfo info, final StaticContext sc) {
+    return ex.seqType().eq(SeqType.BLN) ? ex : Function.BOOLEAN.get(sc, info, ex);
+  }
 }

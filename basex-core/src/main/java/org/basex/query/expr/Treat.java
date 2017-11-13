@@ -38,24 +38,25 @@ public final class Treat extends Single {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final SeqType st = exprType.seqType();
     final Iter iter = qc.iter(expr);
     final Item it = iter.next();
     // input is empty
     if(it == null) {
-      if(seqType.mayBeEmpty()) return Empty.ITER;
-      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
+      if(st.mayBeEmpty()) return Empty.ITER;
+      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), st, Empty.SEQ);
     }
     // treat as empty sequence
-    if(seqType.zero()) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
+    if(st.zero()) throw NOTREAT_X_X_X.get(info, it.type, st, it);
 
-    if(seqType.zeroOrOne()) {
+    if(st.zeroOrOne()) {
       final Item n = iter.next();
       if(n != null) {
         final ValueBuilder vb = new ValueBuilder().add(it).add(n);
         if(iter.next() != null) vb.add(Str.get(DOTS));
-        throw NOTREAT_X_X_X.get(info, expr.seqType(), seqType, vb.value());
+        throw NOTREAT_X_X_X.get(info, expr.seqType(), st, vb.value());
       }
-      if(!it.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
+      if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
       return it.iter();
     }
 
@@ -65,7 +66,7 @@ public final class Treat extends Single {
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;
-        if(!i.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, i.type, seqType, i);
+        if(!i.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, i.type, st, i);
         final Item ii = i;
         i = iter.next();
         return ii;
@@ -75,49 +76,50 @@ public final class Treat extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final SeqType st = exprType.seqType();
     final Value val = qc.value(expr);
 
     final long len = val.size();
     // input is empty
     if(len == 0) {
-      if(seqType.mayBeEmpty()) return val;
-      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), seqType, Empty.SEQ);
+      if(st.mayBeEmpty()) return val;
+      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), st, Empty.SEQ);
     }
     // treat as empty sequence
-    if(seqType.zero()) throw NOTREAT_X_X_X.get(info, val.type, seqType, val);
+    if(st.zero()) throw NOTREAT_X_X_X.get(info, val.type, st, val);
 
-    if(seqType.zeroOrOne()) {
-      if(len > 1) throw NOTREAT_X_X_X.get(info, val.seqType(), seqType, val);
+    if(st.zeroOrOne()) {
+      if(len > 1) throw NOTREAT_X_X_X.get(info, val.seqType(), st, val);
       final Item it = val.itemAt(0);
-      if(!it.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
+      if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
       return it;
     }
 
     for(long i = 0; i < len; i++) {
       final Item it = val.itemAt(i);
-      if(!it.type.instanceOf(seqType.type)) throw NOTREAT_X_X_X.get(info, it.type, seqType, it);
+      if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
     }
     return val;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Treat(info, expr.copy(cc, vm), seqType);
+    return new Treat(info, expr.copy(cc, vm), exprType.seqType());
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Treat && seqType.eq(((Treat) obj).seqType) &&
-        super.equals(obj);
+    return this == obj || obj instanceof Treat &&
+        exprType.seqType().eq(((Treat) obj).exprType.seqType()) && super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(AS, seqType), expr);
+    addPlan(plan, planElem(AS, exprType.seqType()), expr);
   }
 
   @Override
   public String toString() {
-    return '(' + expr.toString() + ") " + TREAT + ' ' + AS + ' ' + seqType;
+    return '(' + expr.toString() + ") " + TREAT + ' ' + AS + ' ' + exprType.seqType();
   }
 }

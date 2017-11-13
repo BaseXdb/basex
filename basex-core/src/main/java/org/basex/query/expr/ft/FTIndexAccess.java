@@ -93,7 +93,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public boolean iterable() {
-    return seqType.zeroOrOne() || db.iterable();
+    return exprType.seqType().zeroOrOne() || db.iterable();
   }
 
   @Override

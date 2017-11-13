@@ -30,7 +30,7 @@ public final class FnCompare extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     if(exprs[0].seqType().oneNoArray() && exprs[1].seqType().oneNoArray())
-      seqType = seqType.withOcc(Occ.ONE);
+      exprType.assign(Occ.ONE);
     return this;
   }
 }

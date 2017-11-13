@@ -529,6 +529,11 @@ final class BigSeq extends TreeSeq {
       }
 
       @Override
+      public boolean hasValue() {
+        return true;
+      }
+
+      @Override
       public Item get(final long i) {
         return itemAt(i);
       }

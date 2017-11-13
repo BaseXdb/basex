@@ -28,7 +28,7 @@ public final class MapForEach extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type t = exprs[1].seqType().type;
-    if(t instanceof FuncType) seqType = SeqType.get(((FuncType) t).valueType.type, Occ.ZERO_MORE);
+    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType.type, Occ.ZERO_MORE);
     return this;
   }
 }

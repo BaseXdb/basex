@@ -32,12 +32,12 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class Closure extends Single implements Scope, XQFunctionExpr {
-  /** Function name. */
+  /** Function name, {@code null} if not specified. */
   private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
   /** Value type, {@code null} if not specified. */
-  private SeqType valueType;
+  private SeqType declType;
   /** Annotations. */
   private AnnList anns;
   /** Updating flag. */
@@ -56,35 +56,35 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /**
    * Constructor.
    * @param info input info
-   * @param valueType declared return type (can be {@code null})
+   * @param declType declared type (can be {@code null})
    * @param params formal parameters
    * @param expr function body
    * @param anns annotations
    * @param global bindings for non-local variables
    * @param vs scope
    */
-  public Closure(final InputInfo info, final SeqType valueType, final Var[] params, final Expr expr,
+  public Closure(final InputInfo info, final SeqType declType, final Var[] params, final Expr expr,
       final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    this(info, null, valueType, params, expr, anns, global, vs);
+    this(info, null, declType, params, expr, anns, global, vs);
   }
 
   /**
    * Package-private constructor allowing a name.
    * @param info input info
-   * @param name name of the function
-   * @param valueType declared return type (can be {@code null})
+   * @param name name of the function (can be {@code null})
+   * @param declType declared type (can be {@code null})
    * @param params formal parameters
    * @param expr function expression
    * @param anns annotations
-   * @param global bindings for non-local variables
+   * @param global bindings for non-local variables (can be {@code null})
    * @param vs variable scope
    */
-  Closure(final InputInfo info, final QNm name, final SeqType valueType, final Var[] params,
+  Closure(final InputInfo info, final QNm name, final SeqType declType, final Var[] params,
       final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
     super(info, expr, SeqType.ITEM_ZM);
     this.name = name;
     this.params = params;
-    this.valueType = valueType;
+    this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     this.anns = anns;
     this.global = global == null ? Collections.emptyMap() : global;
     this.vs = vs;
@@ -101,13 +101,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public QNm argName(final int pos) {
+  public QNm paramName(final int pos) {
     return params[pos].name;
   }
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, valueType, params);
+    return FuncType.get(anns, declType, params);
   }
 
   @Override
@@ -152,8 +152,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    final SeqType vt = valueType == null || st.instanceOf(valueType) ? st : valueType;
-    seqType = FuncType.get(anns, vt, params).seqType();
+    final SeqType dt = declType == null || st.instanceOf(declType) ? st : declType;
+    exprType.assign(FuncType.get(anns, dt, params), Occ.ONE);
 
     cc.pushScope(vs);
     try {
@@ -244,7 +244,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
       final Expr ex = expr.copy(cc, innerVars);
       ex.markTailCalls(null);
-      return copyType(new Closure(info, name, valueType, prms, ex, anns, nl, cc.vs()));
+      return copyType(new Closure(info, name, declType, prms, ex, anns, nl, cc.vs()));
     } finally {
       cc.removeScope();
     }
@@ -270,10 +270,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(cc, vm), rt = valueType == null ? cpy :
-      new TypeCheck(vs.sc, ii, cpy, valueType, true).optimize(cc);
+    final Expr cpy = expr.copy(cc, vm), dt = declType == null ? cpy :
+      new TypeCheck(vs.sc, ii, cpy, declType, true).optimize(cc);
 
-    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(cc);
+    return cls == null ? dt : new GFLWOR(ii, cls, dt).optimize(cc);
   }
 
   @Override
@@ -296,27 +296,27 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     final SeqType argType = body.seqType();
     final Expr checked;
-    if(valueType == null || argType.instanceOf(valueType)) {
+    if(declType == null || argType.instanceOf(declType)) {
       // return type is already correct
       checked = body;
-    } else if(body instanceof FuncItem && valueType.type instanceof FuncType) {
+    } else if(body instanceof FuncItem && declType.type instanceof FuncType) {
       // function item coercion
-      if(!valueType.occ.check(1)) throw typeError(body, valueType, null, info);
+      if(!declType.occ.check(1)) throw typeError(body, declType, null, info);
       final FuncItem fi = (FuncItem) body;
-      checked = fi.coerceTo((FuncType) valueType.type, qc, info, true);
+      checked = fi.coerceTo((FuncType) declType.type, qc, info, true);
     } else if(body.isValue()) {
       // we can type check immediately
       final Value val = (Value) body;
-      checked = valueType.instance(val) ? val :
-        valueType.promote(val, null, qc, vs.sc, info, false);
+      checked = declType.instance(val) ? val :
+        declType.promote(val, null, qc, vs.sc, info, false);
     } else {
       // check at each call
-      if(argType.type.instanceOf(valueType.type) && !body.has(Flag.NDT, Flag.UPD)) {
+      if(argType.type.instanceOf(declType.type) && !body.has(Flag.NDT, Flag.UPD)) {
         // reject impossible arities
-        final Occ occ = argType.occ.intersect(valueType.occ);
-        if(occ == null) throw typeError(body, valueType, null, info);
+        final Occ occ = argType.occ.intersect(declType.occ);
+        if(occ == null) throw typeError(body, declType, null, info);
       }
-      checked = new TypeCheck(vs.sc, info, body, valueType, true);
+      checked = new TypeCheck(vs.sc, info, body, declType, true);
     }
 
     return new FuncItem(vs.sc, anns, name, params, ft, checked, vs.stackSize());
@@ -374,13 +374,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     checkUpdating();
     if(updating) {
       expr.checkUp();
-      if(valueType != null && !valueType.zero()) throw UUPFUNCTYPE.get(info);
+      if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(info);
     }
   }
 
   @Override
   public boolean isVacuous() {
-    return valueType != null && valueType.zero() && !has(Flag.UPD);
+    return declType != null && declType.zero() && !has(Flag.UPD);
   }
 
   @Override
@@ -424,9 +424,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   void adoptSignature(final FuncType ft) {
     anns = ft.anns;
     final int pl = params.length;
-    for(int p = 0; p < pl; p++) params[p].valueType = ft.argTypes[p];
-    final SeqType vt = ft.valueType;
-    if(!vt.eq(SeqType.ITEM_ZM)) valueType = vt;
+    for(int p = 0; p < pl; p++) params[p].declType = ft.argTypes[p];
+    final SeqType vt = ft.declType;
+    if(!vt.eq(SeqType.ITEM_ZM)) declType = vt;
   }
 
   /**
@@ -464,7 +464,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       args[a] = new VarRef(info, params[a]);
     }
     final TypedFunc call = qc.funcs.getFuncRef(name, args, sc, info);
-    return new Closure(info, name, SeqType.ITEM_ZM, params, call.fun, new AnnList(), null, scp);
+    return new Closure(info, name, null, params, call.fun, new AnnList(), null, scp);
   }
 
   @Override
@@ -500,7 +500,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       sb.append(params[p]);
     }
     sb.append(PAREN2).append(' ');
-    if(valueType != null) sb.append("as ").append(valueType).append(' ');
+    sb.append("as ").append(declType != null ? declType : SeqType.ITEM_ZM).append(' ');
     sb.append("{ ").append(expr).append(" }");
     if(!global.isEmpty()) sb.append(')');
     return sb.toString();

@@ -68,7 +68,7 @@ public final class StaticFuncCall extends FuncCall {
     final Expr inl = func.inlineExpr(exprs, cc, info);
     if(inl != null) return inl;
 
-    seqType = func.seqType();
+    exprType.assign(func.seqType());
     return this;
   }
 

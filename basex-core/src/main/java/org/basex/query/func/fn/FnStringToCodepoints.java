@@ -26,6 +26,10 @@ public final class FnStringToCodepoints extends StandardFunc {
         return Int.get(cps[(int) i]);
       }
       @Override
+      public boolean hasValue() {
+        return true;
+      }
+      @Override
       public Value value(final QueryContext q) {
         return FnStringToCodepoints.value(cps);
       }
@@ -43,9 +47,9 @@ public final class FnStringToCodepoints extends StandardFunc {
    * @return value
    */
   private static Value value(final int[] cps) {
-    final int tl = cps.length;
-    final long[] vals = new long[tl];
-    for(int t = 0; t < tl; t++) vals[t] = cps[t];
+    final int cl = cps.length;
+    final long[] vals = new long[cl];
+    for(int c = 0; c < cl; c++) vals[c] = cps[c];
     return IntSeq.get(vals, AtomType.ITR);
   }
 }

@@ -120,20 +120,23 @@ public abstract class Preds extends Arr {
    */
   private boolean add(final Expr expr, final ExprList list, final boolean pos,
       final CompileContext cc) {
+
+    boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
     if(expr == Bln.TRUE) {
       cc.info(OPTREMOVE_X_X, description(), expr);
-    } else if(pos || !list.contains(expr) || expr.has(Flag.NDT, Flag.UPD, Flag.POS)) {
+    } else if(ps || !list.contains(expr) || expr.has(Flag.NDT, Flag.UPD)) {
       list.add(expr);
     }
-    return pos || expr.has(Flag.POS);
+    return ps;
   }
 
   /**
    * Assigns the sequence type and {@link #size} value.
    * @param st sequence type of input
    * @param s size of input ({@code -1} if unknown)
+   * @return if predicate will yield any results
    */
-  protected final void seqType(final SeqType st, final long s) {
+  protected final boolean exprType(final SeqType st, final long s) {
     boolean exact = s != -1;
     long max = exact ? s : Long.MAX_VALUE;
 
@@ -155,13 +158,12 @@ public abstract class Preds extends Arr {
     }
 
     if(exact || max == 0) {
-      seqType = st.withSize(max);
-      size = max;
+      exprType.assign(st.type, max);
     } else {
       // we only know if there will be at most 1 result
-      seqType = st.withOcc(max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-      size = -1;
+      exprType.assign(st.type, max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     }
+    return max != 0;
   }
 
   /**

@@ -45,6 +45,10 @@ public abstract class Item extends Value {
         return Item.this;
       }
       @Override
+      public boolean hasValue() {
+        return true;
+      }
+      @Override
       public Value value(final QueryContext qc) {
         return Item.this;
       }

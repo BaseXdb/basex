@@ -31,15 +31,6 @@ public abstract class IndexAccess extends Simple {
     this.db = db;
   }
 
-  /**
-   * Sets the number of results.
-   * @param s number of results
-   */
-  public void size(final long s) {
-    size = s;
-    seqType = seqType.withSize(s);
-  }
-
   @Override
   public abstract NodeIter iter(QueryContext qc) throws QueryException;
 

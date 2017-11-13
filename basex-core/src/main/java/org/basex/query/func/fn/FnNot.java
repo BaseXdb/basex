@@ -34,7 +34,7 @@ public final class FnNot extends StandardFunc {
     }
     // not(not(A)) -> boolean(A)
     if(ex.isFunction(Function.NOT)) {
-      return compBln(((FnNot) ex).exprs[0], info, cc.sc());
+      return FnBoolean.get(((FnNot) ex).exprs[0], info, cc.sc());
     }
     // not('a' = 'b') -> 'a' != 'b'
     if(ex instanceof CmpV || ex instanceof CmpG) {

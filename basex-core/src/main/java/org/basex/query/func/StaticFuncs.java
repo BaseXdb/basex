@@ -43,7 +43,7 @@ public final class StaticFuncs extends ExprInfo {
    * Declares a new user-defined function.
    * @param anns annotations
    * @param nm function name
-   * @param args formal parameters
+   * @param params formal parameters
    * @param type declared return type (can be {@code null})
    * @param expr function body (can be {@code null})
    * @param doc xqdoc string
@@ -52,16 +52,16 @@ public final class StaticFuncs extends ExprInfo {
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final AnnList anns, final QNm nm, final Var[] args, final SeqType type,
-      final Expr expr, final String doc, final VarScope vs, final InputInfo info)
-      throws QueryException {
+  public StaticFunc declare(final AnnList anns, final QNm nm, final Var[] params,
+      final SeqType type, final Expr expr, final String doc, final VarScope vs,
+      final InputInfo info) throws QueryException {
 
     final byte[] uri = nm.uri();
     if(uri.length == 0) throw FUNNONS_X.get(info, nm.string());
     if(NSGlobal.reserved(uri) || Functions.get().getBuiltIn(nm) != null)
       throw FNRESERVED_X.get(info, nm.string());
 
-    final StaticFunc sf = new StaticFunc(anns, nm, args, type, expr, doc, vs, info);
+    final StaticFunc sf = new StaticFunc(anns, nm, params, type, expr, doc, vs, info);
     final byte[] sig = sf.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(sf);
@@ -89,7 +89,7 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Returns a new reference to the function with the given name and arity.
    * @param name function name
-   * @param args argument expressions
+   * @param args arguments
    * @param sc static context of the function call
    * @param ii input info
    * @return function call
@@ -294,7 +294,7 @@ public final class StaticFuncs extends ExprInfo {
     /**
      * Creates a new call to this function.
      * @param nm function name
-     * @param args argument expressions
+     * @param args arguments
      * @param sc static context
      * @param ii input info
      * @return function call

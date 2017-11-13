@@ -27,11 +27,11 @@ public interface XQFunctionExpr {
   QNm funcName();
 
   /**
-   * Name of the argument at the given position.
-   * @param pos position of the argument
-   * @return name of the argument
+   * Name of the parameter at the given position.
+   * @param pos position of the parameter
+   * @return name of the parameter
    */
-  QNm argName(int pos);
+  QNm paramName(int pos);
 
   /**
    * Type of this function.
@@ -46,8 +46,8 @@ public interface XQFunctionExpr {
   AnnList annotations();
 
   /**
-   * Tries to inline this function with the given argument expressions.
-   * @param exprs argument expressions
+   * Tries to inline this function with the given arguments.
+   * @param exprs arguments
    * @param cc compilation context
    * @param ii input info
    * @return the expression to inline if successful, {@code null} otherwise

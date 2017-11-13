@@ -323,16 +323,6 @@ public final class SeqType {
   }
 
   /**
-   * Returns a version of this sequence type that is adapted to the given result size.
-   * @param size result size
-   * @return sequence type
-   */
-  public SeqType withSize(final long size) {
-    return withOcc(size == 0 ? Occ.ZERO : size == 1 ? Occ.ONE : size > 1 ? Occ.ONE_MORE :
-      Occ.ZERO_MORE);
-  }
-
-  /**
    * Returns a version of this sequence type that is adapted to the given min/max values.
    * @param min minimum result size (0 or more)
    * @param max maximum result size (-1 or more)
@@ -349,8 +339,8 @@ public final class SeqType {
   }
 
   /**
-   * Matches a value against this sequence type.
-   * @param value value to be checked
+   * Checks if the specified value is an instance of this type.
+   * @param value value to check
    * @return result of check
    */
   public boolean instance(final Value value) {
@@ -590,10 +580,10 @@ public final class SeqType {
   }
 
   /**
-   * Returns the number of occurrences, or {@code -1} if the exact number is unknown.
-   * @return result of check
+   * Returns the result size, or {@code -1} if the exact size is unknown.
+   * @return result size
    */
-  public long occ() {
+  public long size() {
     return zero() ? 0 : one() ? 1 : -1;
   }
 

@@ -80,7 +80,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Returns a sub-sequence of this value with the given start and length.<br>
+   * Returns a sub-sequence of this value with the given start and length.
    * The following properties must hold:
    * <ul>
    *   <li>{@code start >= 0},

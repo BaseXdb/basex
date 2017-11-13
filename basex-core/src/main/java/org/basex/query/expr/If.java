@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -82,7 +83,7 @@ public final class If extends Arr {
       final Expr a = cond, b = exprs[0], c = exprs[1];
       if(b == Bln.TRUE) {
         // if(A) then true() else false() -> xs:boolean(A)
-        if(c == Bln.FALSE) return cc.replaceWith(this, compBln(a, info, cc.sc()));
+        if(c == Bln.FALSE) return cc.replaceWith(this, FnBoolean.get(a, info, cc.sc()));
         // if(A) then true() else C -> A or C
         return cc.replaceWith(this, new Or(info, a, c).optimize(cc));
       }
@@ -105,7 +106,7 @@ public final class If extends Arr {
       if(c == Bln.FALSE) return cc.replaceWith(this, new And(info, a, b).optimize(cc));
     }
 
-    seqType = st1.union(st2);
+    exprType.assign(st1.union(st2));
     return this;
   }
 

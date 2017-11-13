@@ -37,7 +37,7 @@ public final class Arith extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
     final Type t1 = st1.type, t2 = st2.type;
-    seqType = SeqType.get(
+    exprType.assign(
       t1.isNumberOrUntyped() && t2.isNumberOrUntyped() ? Calc.type(t1, t2) : AtomType.AAT,
       st1.oneNoArray() && st2.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
     return oneIsEmpty() ? cc.emptySeq(this) : allAreValues() ? cc.preEval(this) : this;

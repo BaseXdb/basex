@@ -28,17 +28,6 @@ public final class FnReverse extends StandardFunc {
     // single result: iterator
     if(s == 1) return iter;
 
-    // basic iterator
-    if(iter instanceof BasicIter) {
-      final BasicIter<?> basic = (BasicIter<?>) iter;
-      return new BasicIter<Item>(basic.size()) {
-        @Override
-        public Item get(final long i) {
-          return basic.get(s - i - 1);
-        }
-      };
-    }
-
     // fast route if the size is known
     if(s > -1) return new Iter() {
       long c = s;

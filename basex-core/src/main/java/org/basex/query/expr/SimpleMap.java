@@ -107,11 +107,12 @@ public abstract class SimpleMap extends Arr {
       cc.info(OPTSIMPLE_X, this);
       exprs = list.finish();
     }
-    seqType(exprs[exprs.length - 1], new long[] { min, max });
+    exprType.assign(exprs[exprs.length - 1].seqType(), new long[] { min, max });
 
     // single items: use item mapper; only values: pre-evaluate
+    final long sz = exprType.size();
     return it ? copyType(new ItemMap(info, exprs)).optimize(cc) :
-      allAreValues() && size >= 0 && size <= CompileContext.MAX_PREEVAL ?
+      allAreValues() && sz <= CompileContext.MAX_PREEVAL ?
       cc.preEval(this) : this;
   }
 

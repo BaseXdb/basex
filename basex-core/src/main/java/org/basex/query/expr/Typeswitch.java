@@ -87,7 +87,7 @@ public final class Typeswitch extends ParseExpr {
     // combine types of return expressions
     SeqType st = groups[0].seqType();
     for(int g = 1; g < gl; g++) st = st.union(groups[g].seqType());
-    seqType = st;
+    exprType.assign(st);
     return this;
   }
 

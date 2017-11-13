@@ -59,7 +59,7 @@ final class RestXqResponse {
   void create(final QueryException qe) throws Exception {
     // bind variables
     final StaticFunc sf = func.function;
-    final Expr[] args = new Expr[sf.args.length];
+    final Expr[] args = new Expr[sf.params.length];
     func.bind(conn, args, qe, qc);
 
     // assign function call and http context and register process

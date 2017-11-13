@@ -21,7 +21,7 @@ public class FuncType implements Type {
   /** Annotations. */
   public final AnnList anns;
   /** Return type of the function. */
-  public final SeqType valueType;
+  public final SeqType declType;
   /** Argument types (can be {@code null}, indicated that no types were specified). */
   public final SeqType[] argTypes;
 
@@ -30,22 +30,22 @@ public class FuncType implements Type {
 
   /**
    * Constructor.
-   * @param valueType return type (can be {@code null})
+   * @param declType declared return type (can be {@code null})
    * @param argTypes argument types (can be {@code null})
    */
-  FuncType(final SeqType valueType, final SeqType... argTypes) {
-    this(new AnnList(), valueType, argTypes);
+  FuncType(final SeqType declType, final SeqType... argTypes) {
+    this(new AnnList(), declType, argTypes);
   }
 
   /**
    * Constructor.
    * @param anns annotations
-   * @param valueType return type (can be {@code null})
+   * @param declType declared return type (can be {@code null})
    * @param argTypes argument types (can be {@code null})
    */
-  FuncType(final AnnList anns, final SeqType valueType, final SeqType... argTypes) {
+  FuncType(final AnnList anns, final SeqType declType, final SeqType... argTypes) {
     this.anns = anns;
-    this.valueType = valueType == null ? SeqType.ITEM_ZM : valueType;
+    this.declType = declType == null ? SeqType.ITEM_ZM : declType;
     this.argTypes = argTypes;
   }
 
@@ -114,7 +114,7 @@ public class FuncType implements Type {
     for(int i = 0; i < al; i++) {
       if(!argTypes[i].eq(ft.argTypes[i])) return false;
     }
-    return valueType.eq(ft.valueType);
+    return declType.eq(ft.declType);
   }
 
   @Override
@@ -126,7 +126,7 @@ public class FuncType implements Type {
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
-    if(al != ft.argTypes.length || !valueType.instanceOf(ft.valueType)) return false;
+    if(al != ft.argTypes.length || !declType.instanceOf(ft.declType)) return false;
 
     for(int a = 0; a < al; a++) {
       if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
@@ -150,7 +150,7 @@ public class FuncType implements Type {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return SeqType.ANY_FUN;
     }
-    return get(anns.union(ft.anns), valueType.union(ft.valueType), arg);
+    return get(anns.union(ft.anns), declType.union(ft.declType), arg);
   }
 
   @Override
@@ -165,13 +165,13 @@ public class FuncType implements Type {
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       // ANY_FUN is excluded by the easy cases
-      final SeqType vt = valueType.intersect(ft.valueType);
+      final SeqType dt = declType.intersect(ft.declType);
       final int al = argTypes.length;
-      if(vt != null && al == ft.argTypes.length) {
+      if(dt != null && al == ft.argTypes.length) {
         final SeqType[] arg = new SeqType[al];
         for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
         final AnnList list = anns.intersect(ft.anns);
-        return list == null ? null : get(list, vt, arg);
+        return list == null ? null : get(list, dt, arg);
       }
     }
     return null;
@@ -216,15 +216,17 @@ public class FuncType implements Type {
   /**
    * Getter for a function's type.
    * @param anns annotations
-   * @param type return type (can be {@code null})
-   * @param args formal parameters
+   * @param declType declared return type (can be {@code null})
+   * @param params formal parameters
    * @return function type
    */
-  public static FuncType get(final AnnList anns, final SeqType type, final Var[] args) {
-    final int al = args.length;
-    final SeqType[] at = new SeqType[al];
-    for(int a = 0; a < al; a++) at[a] = args[a] == null ? SeqType.ITEM_ZM : args[a].declaredType();
-    return new FuncType(anns, type, at);
+  public static FuncType get(final AnnList anns, final SeqType declType, final Var[] params) {
+    final int pl = params.length;
+    final SeqType[] at = new SeqType[pl];
+    for(int p = 0; p < pl; p++) {
+      at[p] = params[p] == null ? SeqType.ITEM_ZM : params[p].declaredType();
+    }
+    return new FuncType(anns, declType, at);
   }
 
   @Override
@@ -243,7 +245,7 @@ public class FuncType implements Type {
     if(this == SeqType.ANY_FUN) {
       tb.add('*').add(')');
     } else {
-      tb.addSep(argTypes, ", ").add(") as ").add(valueType.toString());
+      tb.addSep(argTypes, ", ").add(") as ").add(declType.toString());
     }
     return tb.toString();
   }

@@ -176,7 +176,7 @@ public final class CmpV extends Cmp {
 
     final Expr e1 = exprs[0], e2 = exprs[1];
     final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    if(st1.oneNoArray() && st2.oneNoArray()) seqType = seqType.withOcc(Occ.ONE);
+    if(st1.oneNoArray() && st2.oneNoArray()) exprType.assign(Occ.ONE);
 
     Expr ex = this;
     if(oneIsEmpty()) return cc.emptySeq(this);

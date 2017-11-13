@@ -42,7 +42,7 @@ public final class FnIndexOf extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
     if(st.zero()) return exprs[0];
-    if(st.zeroOrOne()) seqType = seqType.withOcc(Occ.ZERO_ONE);
+    if(st.zeroOrOne()) exprType.assign(Occ.ZERO_ONE);
     return this;
   }
 }

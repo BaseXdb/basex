@@ -196,7 +196,7 @@ public final class CompileContext {
           final SeqType et = expr.seqType(), rt = re.seqType();
           if(!et.eq(rt) && et.instanceOf(rt)) {
             final SeqType st = et.intersect(rt);
-            if(st != null) re.seqType = st;
+            if(st != null) re.exprType.assign(st);
           }
         }
       } else if(res != Empty.SEQ && refine) {

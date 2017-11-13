@@ -49,12 +49,13 @@ public final class Lookup extends Arr {
     if(!map && !array) return this;
 
     final boolean oneInput = expr.size() == 1;
-    SeqType st = ((FuncType) tp).valueType;
+    SeqType st = ((FuncType) tp).declType;
+    Occ occ = st.occ;
     // map lookup may result in empty sequence
-    if(map) st = st.withOcc(st.occ.union(Occ.ZERO));
+    if(map) occ = st.occ.union(Occ.ZERO);
     // wildcard or more than one input
-    if(keys == Str.WC || !oneInput) st = st.withOcc(st.occ.union(Occ.ONE_MORE));
-    seqType = st;
+    if(keys == Str.WC || !oneInput) occ = st.occ.union(Occ.ONE_MORE);
+    exprType.assign(st.type, occ);
 
     if(keys != Str.WC) {
       if(oneInput) {

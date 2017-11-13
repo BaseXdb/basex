@@ -19,36 +19,35 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class Var extends ExprInfo {
-  /** Static context. */
-  private final StaticContext sc;
-
   /** Variable name. */
   public final QNm name;
   /** Variable ID. */
   public final int id;
-  /** Declared type, {@code null} if not specified. */
-  public SeqType valueType;
   /** Input info. */
   public final InputInfo info;
 
-  /** Stack slot number. */
-  int slot = -1;
-  /** Expected result size. */
-  public long size = -1;
+  /** Declared type, {@code null} if not specified. */
+  public SeqType declType;
   /** Data reference. */
   public Data data;
 
+  /** Stack slot number. */
+  int slot = -1;
+
+  /** Actual type (by type inference). */
+  private final ExprType exprType = new ExprType(SeqType.ITEM_ZM);
+  /** Static context. */
+  private final StaticContext sc;
   /** Flag for function parameters. */
   private final boolean param;
-  /** Actual return type (by type inference). */
-  private SeqType seqType;
+
   /** Flag for function conversion. */
   private boolean promote;
 
   /**
    * Constructor for a variable with an already known stack slot.
-   * @param name variable name, {@code null} for unnamed variable
-   * @param declType declared sequence type, {@code null} for no check
+   * @param name variable name
+   * @param declType declared type, {@code null} for no check
    * @param param function parameter flag
    * @param slot stack slot
    * @param qc query context, used for generating a variable ID
@@ -62,15 +61,14 @@ public final class Var extends ExprInfo {
     this.sc = sc;
     this.info = info;
     this.slot = slot;
+    this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     promote = param;
-    valueType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
-    seqType = SeqType.ITEM_ZM;
     id = qc.varIDs++;
   }
 
   /**
    * Constructor.
-   * @param name variable name, {@code null} for unnamed variable
+   * @param name variable name
    * @param declType declared sequence type, {@code null} for no check
    * @param param function parameter flag
    * @param qc query context, used for generating a variable ID
@@ -89,10 +87,9 @@ public final class Var extends ExprInfo {
    * @param sc static context
    */
   public Var(final Var var, final QueryContext qc, final StaticContext sc) {
-    this(var.name, var.valueType, var.param, qc, sc, var.info);
+    this(var.name, var.declType, var.param, qc, sc, var.info);
     promote = var.promote;
-    seqType = var.seqType;
-    size = var.size;
+    exprType.assign(var.exprType);
   }
 
   /**
@@ -100,8 +97,17 @@ public final class Var extends ExprInfo {
    * @return sequence type
    */
   public SeqType seqType() {
-    final SeqType st = valueType != null ? valueType.intersect(seqType) : null;
-    return st != null ? st : valueType != null ? valueType : seqType;
+    final SeqType st = exprType.seqType(), dt = declType;
+    final SeqType it = dt != null ? dt.intersect(st) : null;
+    return it != null ? it : dt != null ? dt : st;
+  }
+
+  /**
+   * Returns the result size.
+   * @return result size
+   */
+  public long size() {
+    return exprType.size();
   }
 
   /**
@@ -109,34 +115,45 @@ public final class Var extends ExprInfo {
    * @return declared type
    */
   public SeqType declaredType() {
-    return valueType == null ? SeqType.ITEM_ZM : valueType;
+    return declType == null ? SeqType.ITEM_ZM : declType;
   }
 
   /**
-   * Tries to refine the compile-time type of this variable through the type of the bound
-   * expression.
+   * Tries to refine the type of this variable through the type of the bound expression.
    * @param st sequence type of the bound expression
    * @param cc compilation context (can be {@code null})
    * @throws QueryException query exception
    */
   public void refineType(final SeqType st, final CompileContext cc) throws QueryException {
-    if(st == null) return;
+    refineType(st, st.size(), cc);
+  }
 
-    if(valueType != null) {
-      if(valueType.occ.intersect(st.occ) == null)
-        throw INVPROMOTE_X_X_X.get(info, this, st, valueType);
-      if(st.instanceOf(valueType)) {
+  /**
+   * Tries to refine the type of this variable through the type of the bound expression.
+   * @param st sequence type of the bound expression
+   * @param sz size
+   * @param cc compilation context (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public void refineType(final SeqType st, final long sz, final CompileContext cc)
+      throws QueryException {
+
+    if(declType != null) {
+      if(declType.occ.intersect(st.occ) == null)
+        throw INVPROMOTE_X_X_X.get(info, this, st, declType);
+      if(st.instanceOf(declType)) {
         if(cc != null) cc.info(QueryText.OPTTYPE_X, this);
-        valueType = null;
-      } else if(!st.promotable(valueType)) {
+        declType = null;
+      } else if(!st.promotable(declType)) {
         return;
       }
     }
 
-    if(!seqType.eq(st) && !seqType.instanceOf(st)) {
+    final SeqType vt = exprType.seqType();
+    if(!vt.eq(st) && !vt.instanceOf(st)) {
       // the new type provides new information
-      final SeqType is = seqType.intersect(st);
-      if(is != null) seqType = is;
+      final SeqType is = vt.intersect(st);
+      if(is != null) exprType.assign(is, sz);
     }
   }
 
@@ -145,7 +162,7 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the type is checked or promoted, {@code false} otherwise
    */
   public boolean checksType() {
-    return valueType != null;
+    return declType != null;
   }
 
   /**
@@ -156,7 +173,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr ex, final CompileContext cc) throws QueryException {
-    return checksType() ? new TypeCheck(sc, info, ex, valueType, promote).optimize(cc) : ex;
+    return checksType() ? new TypeCheck(sc, info, ex, declType, promote).optimize(cc) : ex;
   }
 
   /**
@@ -170,9 +187,9 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value val, final QueryContext qc, final boolean opt)
       throws QueryException {
 
-    if(!checksType() || valueType.instance(val)) return val;
-    if(promote) return valueType.promote(val, name, qc, sc, info, opt);
-    throw typeError(val, valueType, name, info);
+    if(!checksType() || declType.instance(val)) return val;
+    if(promote) return declType.promote(val, name, qc, sc, info, opt);
+    throw typeError(val, declType, name, info);
   }
 
   /**
@@ -202,7 +219,7 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Checks whether the given variable is identical to this one, i.e. has the same ID.
+   * Checks whether the given variable is identical to this one, i.e. has the same id.
    * @param var variable to check
    * @return {@code true} if the IDs are equal, {@code false} otherwise
    */
@@ -235,9 +252,9 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st, final boolean prom) {
-    if(valueType == null || st.instanceOf(valueType)) {
-      valueType = st;
-    } else if(!valueType.instanceOf(st)) {
+    if(declType == null || st.instanceOf(declType)) {
+      declType = st;
+    } else if(!declType.instanceOf(st)) {
       return false;
     }
     promote |= prom;
@@ -248,7 +265,7 @@ public final class Var extends ExprInfo {
   public void plan(final FElem plan) {
     final FElem e = planElem(QueryText.NAME, '$' + Token.string(name.string()),
         Token.ID, Token.token(id), QueryText.TYPE, seqType());
-    if(valueType != null) e.add(planAttr(QueryText.AS, valueType.toString()));
+    if(declType != null) e.add(planAttr(QueryText.AS, declType.toString()));
     addPlan(plan, e);
   }
 
@@ -260,11 +277,8 @@ public final class Var extends ExprInfo {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(name != null) {
-      tb.add(QueryText.DOLLAR).add(name.string()).add('_').addInt(id);
-      if(valueType != null) tb.add(' ' + QueryText.AS);
-    }
-    if(valueType != null) tb.add(" " + valueType);
+    tb.add(QueryText.DOLLAR).add(name.string()).add('_').addInt(id);
+    if(declType != null) tb.add(' ').add(QueryText.AS).add(' ').addExt(declType);
     return tb.toString();
   }
 }

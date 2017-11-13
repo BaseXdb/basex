@@ -72,9 +72,9 @@ abstract class NativeSeq extends Seq {
 
   @Override
   public final Value reverse() {
-    final int n = (int) size;
+    final long n = size;
     final ValueBuilder vb = new ValueBuilder();
-    for(int i = 0; i < n; i++) vb.add(itemAt(n - i - 1));
+    for(long i = 0; i < n; i++) vb.add(itemAt(n - i - 1));
     return vb.value(type);
   }
 }

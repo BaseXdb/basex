@@ -46,7 +46,7 @@ public final class UtilItemAt extends StandardFunc {
     final SeqType st = ex.seqType();
     if(st.zero()) return ex;
 
-    seqType = st.withOcc(Occ.ZERO_ONE);
+    exprType.assign(Occ.ZERO_ONE);
 
     if(pos.isValue()) {
       final double dp = toDouble(pos, cc.qc);

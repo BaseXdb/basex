@@ -43,7 +43,7 @@ public final class GroupBy extends Clause {
    * @param info input info
    */
   public GroupBy(final Spec[] specs, final VarRef[] pre, final Var[] post, final InputInfo info) {
-    super(info, vars(specs, post));
+    super(info, SeqType.ITEM_ZM, vars(specs, post));
     this.specs = specs;
     this.post = post;
     preExpr = Array.copy(pre, new Expr[pre.length]);
@@ -62,7 +62,7 @@ public final class GroupBy extends Clause {
    */
   private GroupBy(final Spec[] specs, final Expr[] pre, final Var[] post, final int nonOcc,
       final InputInfo info) {
-    super(info, vars(specs, post));
+    super(info, SeqType.ITEM_ZM, vars(specs, post));
     this.specs = specs;
     preExpr = pre;
     this.post = post;
@@ -377,10 +377,11 @@ public final class GroupBy extends Clause {
 
     @Override
     public Spec optimize(final CompileContext cc) throws QueryException {
-      final SeqType st = expr.seqType();
-      seqType = (st.type instanceof NodeType ? AtomType.ATM :
-        st.mayBeArray() ? AtomType.ITEM : st.type).seqType();
-      var.refineType(seqType, cc);
+      adoptType(expr);
+      final SeqType et = expr.seqType();
+      final SeqType st = SeqType.get(et.type instanceof NodeType ? AtomType.ATM :
+        et.mayBeArray() ? AtomType.ITEM : et.type, exprType.seqType().occ);
+      var.refineType(st, cc);
       return this;
     }
 

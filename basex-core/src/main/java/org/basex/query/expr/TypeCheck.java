@@ -50,33 +50,33 @@ public final class TypeCheck extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType argType = expr.seqType();
+    final SeqType at = expr.seqType(), st = exprType.seqType();
 
     // return type is already correct
-    if(argType.instanceOf(seqType)) {
-      cc.info(OPTTYPE_X, seqType);
+    if(at.instanceOf(st)) {
+      cc.info(OPTTYPE_X, st);
       return expr;
     }
 
     // function item coercion
-    if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
-      if(!seqType.occ.check(1)) throw typeError(expr, seqType, null, info);
+    if(expr instanceof FuncItem && st.type instanceof FuncType) {
+      if(!st.occ.check(1)) throw typeError(expr, st, null, info);
       final FuncItem fi = (FuncItem) expr;
-      return cc.replaceWith(this, fi.coerceTo((FuncType) seqType.type, cc.qc, info, true));
+      return cc.replaceWith(this, fi.coerceTo((FuncType) st.type, cc.qc, info, true));
     }
 
     // we can type check immediately
     if(expr.isValue()) return cc.preEval(this);
 
     // check at each call
-    if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT, Flag.UPD)) {
-      final Occ occ = argType.occ.intersect(seqType.occ);
-      if(occ == null) throw typeError(expr, seqType, null, info);
+    if(at.type.instanceOf(st.type) && !expr.has(Flag.NDT, Flag.UPD)) {
+      final Occ occ = at.occ.intersect(st.occ);
+      if(occ == null) throw typeError(expr, st, null, info);
     }
 
     final Expr opt = expr.typeCheck(this, cc);
     if(opt != null) {
-      cc.info(OPTTYPE_X, seqType);
+      cc.info(OPTTYPE_X, st);
       return opt;
     }
 
@@ -85,6 +85,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final SeqType st = exprType.seqType();
     final Iter iter = qc.iter(expr);
 
     return new Iter() {
@@ -97,7 +98,6 @@ public final class TypeCheck extends Single {
 
       @Override
       public Item next() throws QueryException {
-        final SeqType st = seqType;
         while(c == cache.size()) {
           qc.checkStop();
           cache.size(0);
@@ -126,9 +126,10 @@ public final class TypeCheck extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = qc.value(expr);
-    if(seqType.instance(val)) return val;
-    if(promote) return seqType.promote(val, null, qc, sc, info, false);
-    throw INVCAST_X_X_X.get(info, val.seqType(), seqType, val);
+    final SeqType st = exprType.seqType();
+    if(st.instance(val)) return val;
+    if(promote) return st.promote(val, null, qc, sc, info, false);
+    throw INVCAST_X_X_X.get(info, val.seqType(), st, val);
   }
 
   /**
@@ -137,7 +138,7 @@ public final class TypeCheck extends Single {
    * @return result of check
    */
   public boolean isRedundant(final Var var) {
-    return (!promote || var.promotes()) && var.declaredType().instanceOf(seqType);
+    return (!promote || var.promotes()) && var.declaredType().instanceOf(exprType.seqType());
   }
 
   /**
@@ -148,7 +149,7 @@ public final class TypeCheck extends Single {
    * @throws QueryException query exception
    */
   public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
-    return new TypeCheck(sc, info, ex, seqType, promote).optimize(cc);
+    return new TypeCheck(sc, info, ex, exprType.seqType(), promote).optimize(cc);
   }
 
   @Override
@@ -156,23 +157,23 @@ public final class TypeCheck extends Single {
     if(this == obj) return true;
     if(!(obj instanceof TypeCheck)) return false;
     final TypeCheck t = (TypeCheck) obj;
-    return seqType.eq(t.seqType) && promote == t.promote && super.equals(obj);
+    return exprType.seqType().eq(t.exprType.seqType()) && promote == t.promote && super.equals(obj);
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType, promote);
+    return new TypeCheck(sc, info, expr.copy(cc, vm), exprType.seqType(), promote);
   }
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(AS, seqType);
+    final FElem elem = planElem(AS, exprType.seqType());
     if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
     addPlan(plan, elem, expr);
   }
 
   @Override
   public String toString() {
-    return "((: " + seqType + ", " + promote + " :) " + expr + ')';
+    return "((: " + exprType.seqType() + ", " + promote + " :) " + expr + ')';
   }
 }

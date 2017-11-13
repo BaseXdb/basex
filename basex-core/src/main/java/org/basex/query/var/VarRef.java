@@ -41,9 +41,14 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public VarRef optimize(final CompileContext cc) {
-    seqType = var.seqType();
-    size = var.size;
+  public ParseExpr optimize(final CompileContext cc) {
+    final SeqType st = var.seqType();
+    final long sz = var.size();
+    if(sz >= 0) {
+      exprType.assign(st.type, sz);
+    } else {
+      exprType.assign(st);
+    }
     return this;
   }
 
@@ -84,7 +89,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public VarRef copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public ParseExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final Var nw = vm.get(var.id);
     return new VarRef(info, nw != null ? nw : var).optimize(cc);
   }

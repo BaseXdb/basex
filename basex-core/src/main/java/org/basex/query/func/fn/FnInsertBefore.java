@@ -57,7 +57,7 @@ public final class FnInsertBefore extends StandardFunc {
     final Expr ex1 = exprs[0], ex3 = exprs[2];
     if(ex1 == Empty.SEQ) return ex3;
     if(ex3 == Empty.SEQ) return ex1;
-    seqType = ex1.seqType().add(ex3.seqType());
+    exprType.assign(ex1.seqType().add(ex3.seqType()));
     return this;
   }
 }

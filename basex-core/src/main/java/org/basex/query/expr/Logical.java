@@ -76,7 +76,7 @@ abstract class Logical extends Arr {
     // perform operator-specific optimizations
     list = new ExprList(exprs.length);
     simplify(cc, list);
-    if(list.size() == 1) return cc.replaceWith(this, compBln(list.get(0), info, cc.sc()));
+    if(list.size() == 1) return cc.replaceWith(this, FnBoolean.get(list.get(0), info, cc.sc()));
     exprs = list.finish();
 
     // negate expressions

@@ -34,7 +34,7 @@ public final class MapMerge extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type t = exprs[0].seqType().type;
-    if(t instanceof MapType) seqType = t.seqType();
+    if(t instanceof MapType) exprType.assign(t);
     return this;
   }
 }

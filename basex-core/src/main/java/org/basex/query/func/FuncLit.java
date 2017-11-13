@@ -73,7 +73,7 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(vs.sc, anns, name, args, (FuncType) seqType.type, expr, qc.focus.copy(),
+    return new FuncItem(vs.sc, anns, name, args, (FuncType) seqType().type, expr, qc.focus.copy(),
         vs.stackSize());
   }
 
@@ -86,7 +86,7 @@ public final class FuncLit extends Single implements Scope {
       final Var[] arg = new Var[al];
       for(int a = 0; a < al; a++) arg[a] = cc.copy(args[a], vm);
       final Expr ex = expr.copy(cc, vm);
-      return new FuncLit(anns, name, arg, ex, seqType, scp, info);
+      return new FuncLit(anns, name, arg, ex, seqType(), scp, info);
     } finally {
       cc.removeScope();
     }

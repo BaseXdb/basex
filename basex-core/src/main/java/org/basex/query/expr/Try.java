@@ -66,7 +66,7 @@ public final class Try extends Single {
     for(final Catch c : catches) {
       if(!c.expr.isFunction(Function.ERROR)) st = st.union(c.seqType());
     }
-    seqType = st;
+    exprType.assign(st);
     return this;
   }
 

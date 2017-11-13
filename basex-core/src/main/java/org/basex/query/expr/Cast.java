@@ -45,16 +45,16 @@ public final class Cast extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    if(st.oneNoArray()) seqType = seqType.withOcc(Occ.ONE);
+    if(st.oneNoArray()) exprType.assign(Occ.ONE);
 
     // pre-evaluate value
     if(expr.isValue()) return cc.preEval(this);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
-    final Type t = seqType.type;
+    final Type t = seqType().type;
     if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
-        t == AtomType.QNM || t == AtomType.URI) && seqType.eq(expr.seqType())) {
+        t == AtomType.QNM || t == AtomType.URI) && seqType().eq(expr.seqType())) {
       return cc.replaceWith(this, expr);
     }
     return this;
@@ -68,28 +68,29 @@ public final class Cast extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value v = expr.atomValue(qc, info);
-    if(!seqType.occ.check(v.size())) throw INVCAST_X_X_X.get(info, v.seqType(), seqType, v);
-    return v instanceof Item ? seqType.cast((Item) v, qc, sc, info, true) : v;
+    final SeqType st = seqType();
+    if(!st.occ.check(v.size())) throw INVCAST_X_X_X.get(info, v.seqType(), st, v);
+    return v instanceof Item ? st.cast((Item) v, qc, sc, info, true) : v;
   }
 
   @Override
   public Cast copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Cast(sc, info, expr.copy(cc, vs), seqType);
+    return new Cast(sc, info, expr.copy(cc, vs), seqType());
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Cast && seqType.eq(((Cast) obj).seqType) &&
+    return this == obj || obj instanceof Cast && seqType().eq(((Cast) obj).seqType()) &&
         super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(AS, seqType), expr);
+    addPlan(plan, planElem(AS, seqType()), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + CAST + ' ' + AS + ' ' + seqType;
+    return expr + " " + CAST + ' ' + AS + ' ' + seqType();
   }
 }

@@ -66,17 +66,32 @@ public abstract class StandardFunc extends Arr {
     sig = func;
     info = ii;
     exprs = args;
-    seqType = func.type;
+    exprType.assign(func.seqType);
     return this;
   }
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    return cc.replaceWith(this, isSimple() && allAreValues() ?
+    return cc.replaceWith(this, preEval() ?
       // pre-evaluate simple functions if all arguments are values
-      (sig.type.zeroOrOne() ? item(cc.qc, info) : cc.qc.value(this)) :
+      (sig.seqType.zeroOrOne() ? item(cc.qc, info) : cc.qc.value(this)) :
       // otherwise, call custom optimization
       opt(cc));
+  }
+
+  /**
+   * Checks if the function can be pre-evaluated.
+   * <ul>
+   *   <li> All arguments must be values with a limited number of items, and</li>
+   *   <li> {@link #isSimple()} must be true</li>
+   * </ul>
+   * @return result of check
+   */
+  protected boolean preEval() {
+    for(final Expr expr : exprs) {
+      if(!expr.isValue() || expr.size() >= CompileContext.MAX_PREEVAL) return false;
+    }
+    return isSimple();
   }
 
   /**
@@ -107,8 +122,9 @@ public abstract class StandardFunc extends Arr {
   protected Expr optFirst() {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
-    if(st.oneOrMore() && !st.mayBeArray()) seqType = seqType.withOcc(Occ.ONE);
-    return st.zero() ? ex : this;
+    if(st.zero()) return ex;
+    if(st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
+    return this;
   }
 
   /**
@@ -157,7 +173,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean isVacuous() {
-    return !has(Flag.UPD) && seqType.zero();
+    return !has(Flag.UPD) && exprType.isEmpty();
   }
 
   /**

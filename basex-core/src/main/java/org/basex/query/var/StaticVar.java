@@ -26,7 +26,7 @@ public final class StaticVar extends StaticDecl {
   private final boolean lazy;
 
   /** Bound value. */
-  Value val;
+  Value value;
 
   /**
    * Constructor for a variable declared in a query.
@@ -39,7 +39,7 @@ public final class StaticVar extends StaticDecl {
    */
   StaticVar(final VarScope vs, final AnnList anns, final Var var, final Expr expr,
       final boolean external, final String doc) {
-    super(anns, var.name, var.valueType, vs, doc, var.info);
+    super(anns, var.name, var.declType, vs, doc, var.info);
     this.expr = expr;
     this.external = external;
     lazy = anns.contains(Annotation._BASEX_LAZY);
@@ -49,27 +49,27 @@ public final class StaticVar extends StaticDecl {
   public void comp(final CompileContext cc) throws QueryException {
     if(expr == null) throw VAREMPTY_X.get(info, name());
     if(dontEnter) throw CIRCVAR_X.get(info, name());
+    if(compiled) return;
+    compiled = true;
 
-    if(!compiled) {
-      dontEnter = true;
-      cc.pushScope(vs);
-      try {
-        expr = expr.compile(cc);
-      } catch(final QueryException qe) {
-        compiled = true;
-        if(lazy) {
-          expr = cc.error(qe, expr);
-          return;
-        }
-        throw qe.notCatchable();
-      } finally {
-        cc.removeScope(this);
-        dontEnter = false;
+    dontEnter = true;
+    cc.pushScope(vs);
+    try {
+      expr = expr.compile(cc);
+    } catch(final QueryException qe) {
+      if(lazy) {
+        expr = cc.error(qe, expr);
+        return;
       }
-
-      compiled = true;
-      if(!lazy || expr.isValue()) cc.replaceWith(expr, value(cc.qc));
+      throw qe.notCatchable();
+    } finally {
+      cc.removeScope(this);
+      dontEnter = false;
     }
+
+    // by default, pre-evaluate deterministic, non-lazy expressions
+    if(expr.isValue() || !(lazy || expr.has(Flag.NDT, Flag.UPD)))
+      cc.replaceWith(expr, value(cc.qc));
   }
 
   /**
@@ -87,7 +87,7 @@ public final class StaticVar extends StaticDecl {
       if(expr == null) throw VAREMPTY_X.get(info, name());
     }
 
-    if(val != null) return val;
+    if(value != null) return value;
     dontEnter = true;
 
     final int fp = vs.enter(qc);
@@ -112,26 +112,26 @@ public final class StaticVar extends StaticDecl {
 
   /**
    * Binds an external value.
-   * @param value value to bind
+   * @param val value to bind
    * @param qc query context
    * @throws QueryException query exception
    */
-  void bind(final Value value, final QueryContext qc) throws QueryException {
+  void bind(final Value val, final QueryContext qc) throws QueryException {
     if(!external || compiled) return;
-    bind(type == null || type.instance(value) ? value : type.cast(value, qc, sc, info));
+    bind(declType == null || declType.instance(val) ? val : declType.cast(val, qc, sc, info));
   }
 
   /**
    * Binds the specified value to the variable.
-   * @param value value to be set
+   * @param val value to be set
    * @return self reference
    * @throws QueryException query exception
    */
-  private Value bind(final Value value) throws QueryException {
-    expr = value;
-    val = value;
-    if(type != null) type.treat(value, name, info);
-    return val;
+  private Value bind(final Value val) throws QueryException {
+    expr = val;
+    value = val;
+    if(declType != null) declType.treat(val, name, info);
+    return value;
   }
 
   @Override
@@ -183,7 +183,7 @@ public final class StaticVar extends StaticDecl {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
     tb.add(VARIABLE).add(' ').add(name());
-    if(type != null) tb.add(' ').add(AS).add(' ').addExt(type);
+    if(declType != null) tb.add(' ').add(AS).add(' ').addExt(declType);
     if(external) tb.add(' ').add(EXTERNAL);
     if(expr != null) tb.add(' ').add(ASSIGN).add(' ').addExt(expr);
     return tb.add(';').toString();
