@@ -652,16 +652,31 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeArray() {
-    return !(atomic() || type instanceof ListType || type instanceof MapType ||
+    return !(type.instanceOf(AtomType.AAT) || type instanceof ListType || type instanceof MapType ||
         type instanceof NodeType);
   }
 
   /**
-   * Tests if the type is atomic.
+   * Checks if this sequence type is an instance of the specified sequence type.
+   * @param st sequence type to check
    * @return result of check
    */
-  public boolean atomic() {
-    return type.instanceOf(AtomType.AAT);
+  public boolean instanceOf(final SeqType st) {
+    return (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
+      // [LW] complete kind check
+      (st.kind == null || kind != null && kind.intersect(st.kind) != null);
+  }
+
+  /**
+   * Returns the atomic type for the specified expression.
+   * @return type or {@code null} if type may be not atomic
+   */
+  public Type atomicType() {
+    final Type tp = type;
+    return tp.instanceOf(NodeType.NOD) ?
+      tp == NodeType.PI || tp == NodeType.COM ? AtomType.STR :
+      tp == NodeType.NOD ? AtomType.AAT : AtomType.ATM :
+      tp.instanceOf(AtomType.AAT) ? tp : null;
   }
 
   /**
@@ -678,16 +693,6 @@ public final class SeqType {
     return this == obj || obj instanceof SeqType && eq((SeqType) obj);
   }
 
-  /**
-   * Checks if this sequence type is an instance of the specified sequence type.
-   * @param st sequence type to check
-   * @return result of check
-   */
-  public boolean instanceOf(final SeqType st) {
-    return (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
-      // [LW] complete kind check
-      (st.kind == null || kind != null && kind.intersect(st.kind) != null);
-  }
 
   /**
    * Returns a string representation of the type.

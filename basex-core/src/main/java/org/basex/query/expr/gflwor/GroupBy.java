@@ -378,9 +378,8 @@ public final class GroupBy extends Clause {
     @Override
     public Spec optimize(final CompileContext cc) throws QueryException {
       adoptType(expr);
-      final SeqType et = expr.seqType(), st = exprType.seqType().with(
-          et.type instanceof NodeType ? AtomType.ATM : et.mayBeArray() ? AtomType.ITEM : et.type);
-      var.refineType(st, cc);
+      final Type t = expr.seqType().atomicType();
+      if(t != null) var.refineType(exprType.seqType().with(t), cc);
       return this;
     }
 

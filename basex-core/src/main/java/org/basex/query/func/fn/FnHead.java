@@ -16,8 +16,7 @@ import org.basex.util.*;
 public final class FnHead extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr ex = exprs[0];
-    return ex.seqType().zeroOrOne() ? ex.item(qc, info) : qc.iter(ex).next();
+    return qc.iter(exprs[0]).next();
   }
 
   @Override

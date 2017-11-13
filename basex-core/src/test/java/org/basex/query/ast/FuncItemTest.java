@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -21,7 +20,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void idTest() {
     check("function($x) { $x }(42)",
         42,
-        "empty(//" + Util.className(Closure.class) + ')'
+        empty(Closure.class)
     );
   }
 
@@ -30,7 +29,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void literalTest() {
     check("lower-case#1('FooBar')",
         "foobar",
-        "empty(//" + Util.className(FuncLit.class) + ')'
+        empty(FuncLit.class)
     );
   }
 
@@ -39,7 +38,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void partAppTest() {
     check("starts-with('foobar', ?)('foo')",
         true,
-        "empty(//" + Util.className(PartFunc.class) + ')'
+        empty(PartFunc.class)
     );
   }
 
@@ -49,7 +48,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("for $sub in ('foo', 'bar')" +
         "return starts-with(?, $sub)('foobar')",
         "true\nfalse",
-        "exists(//" + Util.className(PartFunc.class) + ')'
+        exists(PartFunc.class)
     );
   }
 
@@ -62,7 +61,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "}(function($f) { 42 })",
         42,
         // both outer inline functions are pre-compiled
-        "empty(//" + Util.className(Closure.class) + ')',
+        empty(Closure.class),
         "/*/" + Util.className(Int.class) + " = '42'"
     );
   }
@@ -81,7 +80,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:foo() { abs(?) };" +
         "function-lookup(xs:QName(('local:foo')[random:double() < 1]), 0)()(-42)",
         42,
-        "empty(//" + Util.className(StaticFuncs.class) + "/*)"
+        empty(Util.className(StaticFuncs.class) + "/*")
     );
   }
 
@@ -95,7 +94,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "declare function local:b() { 42 };" +
         "local:a#0()",
         42,
-        "empty(//" + Util.className(FuncLit.class) + ')'
+        empty(FuncLit.class)
     );
   }
 
@@ -105,7 +104,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := local:Y(function($x) { $x() }) return ($f ! .)[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        exists(FuncItem.class)
     );
   }
 
@@ -115,7 +114,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "for-each(function($x) { $x() }, local:Y#1)[2]",
         "",
-        "exists(//" + Util.className(Empty.class) + ')'
+        empty()
     );
   }
 
@@ -125,7 +124,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := for-each(function($x) { $x() }, local:Y#1) return $f[2]",
         "",
-        "exists(//" + Util.className(Empty.class) + ')'
+        empty()
     );
   }
 
@@ -138,7 +137,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "let $b := local:bar($a) " +
         "return ($b ! .)[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        exists(FuncItem.class)
     );
   }
 
@@ -158,7 +157,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void noLoopTest6() {
     check("let $f := function($f) { $f($f) } return $f($f)",
         null,
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        exists(FuncItem.class)
     );
   }
 
@@ -179,11 +178,11 @@ public final class FuncItemTest extends QueryPlanTest {
         5000050000L,
 
         // all inline functions are pre-compiled
-        "empty(//" + Util.className(Closure.class) + ')',
+        empty(Closure.class),
+        // the addition function was inlined
+        count(Util.className(DynFuncCall.class), 3),
         // the outer function item was inlined and removed
         "every $f in //" + Util.className(FuncItem.class) + " satisfies $f/*[1]/@name = '$go'",
-        // the addition function was inlined
-        "count(//" + Util.className(DynFuncCall.class) + ") = 3",
         // there are only three variables left
         "count(distinct-values(//" + Util.className(Var.class) + "/@id)) = 3"
     );
@@ -220,7 +219,7 @@ public final class FuncItemTest extends QueryPlanTest {
         + "    $g := function($y) { 2 * $f($y) }"
         + "return $g($g(42))",
         "168\n672\n1512",
-        "count(//" + Util.className(Closure.class) + ") eq 1"
+        count(Util.className(Closure.class), 1)
     );
   }
 
@@ -248,9 +247,9 @@ public final class FuncItemTest extends QueryPlanTest {
         "};" +
         "local:foo(document { <foo ID=\"a\"><foo ID=\"b\"/></foo> })",
         "a\nb",
-        "empty(//" + Util.className(StaticFuncCall.class) + ')',
-        "exists(//" + Util.className(DynFuncCall.class) + ')',
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        empty(StaticFuncCall.class),
+        exists(DynFuncCall.class),
+        exists(FuncItem.class)
     );
   }
 
@@ -287,7 +286,7 @@ public final class FuncItemTest extends QueryPlanTest {
         + "declare function local:c() { local:b#0() };"
         + "local:c() ",
         "",
-        "exists(//" + Util.className(Empty.class) + ')');
+        empty());
   }
 
   /** Tests inlining of a function literal. */
@@ -295,7 +294,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void gh1113() {
     check("let $join := array:join#1 return $join(([], []))",
         "[]",
-        "empty(//" + Util.className(DynFuncCall.class) + ')',
-        "empty(//" + Util.className(StaticFuncCall.class) + ')');
+        empty(DynFuncCall.class),
+        empty(StaticFuncCall.class));
   }
 }

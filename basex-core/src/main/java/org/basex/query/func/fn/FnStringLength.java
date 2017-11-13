@@ -15,14 +15,14 @@ import org.basex.util.*;
 public final class FnStringLength extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] s;
+    final byte[] tok;
     if(exprs.length == 0) {
       final Item it = ctxValue(qc).item(qc, info);
       if(it instanceof FItem) throw FISTRING_X.get(info, it.type);
-      s = it == null ? Token.EMPTY : it.string(info);
+      tok = it == null ? Token.EMPTY : it.string(info);
     } else {
-      s = toEmptyToken(exprs[0], qc);
+      tok = toEmptyToken(exprs[0], qc);
     }
-    return Int.get(Token.length(s));
+    return Int.get(Token.length(tok));
   }
 }

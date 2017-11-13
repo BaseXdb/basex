@@ -36,8 +36,8 @@ public final class FnData extends ContextFn {
     final Expr expr = exprs.length > 0 ? exprs[0] : v != null ? v : this;
     if(expr != this) {
       final SeqType st = expr.seqType();
-      if(!st.mayBeArray()) {
-        final Type t = st.type instanceof NodeType ? AtomType.ATM : st.type;
+      final Type t = st.atomicType();
+      if(t != null) {
         final long sz = expr.size();
         if(sz >= 0) {
           exprType.assign(t, sz);

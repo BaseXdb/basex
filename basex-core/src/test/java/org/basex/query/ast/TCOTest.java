@@ -27,7 +27,7 @@ public final class TCOTest extends QueryPlanTest {
         "14721860295199062616467307339074198149529600000000000000000000000000" +
         "00",
 
-        "exists(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
+        exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']")
     );
   }
 
@@ -46,7 +46,7 @@ public final class TCOTest extends QueryPlanTest {
 
         true,
 
-        "count(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']) eq 1"
+        count(Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']", 1)
     );
   }
 
@@ -62,8 +62,8 @@ public final class TCOTest extends QueryPlanTest {
 
         1024,
 
-        "exists(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])",
-        "count(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']) eq 2"
+        exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']"),
+        count(Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']", 2)
     );
   }
 
@@ -74,9 +74,9 @@ public final class TCOTest extends QueryPlanTest {
 
         null,
 
-        "exists(//" + Util.className(StaticFunc.class) + '/' +
-            Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])",
-        "exists(//" + Util.className(StaticFuncCall.class) + "[@tailCall eq 'false'])"
+        exists(Util.className(StaticFunc.class) + '/' + Util.className(StaticFuncCall.class) +
+            "[@tailCall eq 'true']"),
+        exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'false']")
     );
   }
 
@@ -88,8 +88,8 @@ public final class TCOTest extends QueryPlanTest {
 
         12345,
 
-        "exists(//" + Util.className(If.class) + '/' +
-            Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
+        exists(Util.className(If.class) + '/' + Util.className(StaticFuncCall.class) +
+            "[@tailCall eq 'true']")
     );
   }
 
@@ -103,8 +103,8 @@ public final class TCOTest extends QueryPlanTest {
 
         12345,
 
-        "exists(//" + Util.className(If.class) + '/' +
-            Util.className(StaticFuncCall.class) + "[@tailCall eq 'true'])"
+        exists(Util.className(If.class) + '/' + Util.className(StaticFuncCall.class) +
+            "[@tailCall eq 'true']")
     );
   }
 
@@ -124,8 +124,8 @@ public final class TCOTest extends QueryPlanTest {
 
         5000050000L,
 
-        "empty(//" + Util.className(FuncItem.class) +
-            "//" + Util.className(DynFuncCall.class) + "[@tailCall eq 'false'])"
+        empty(Util.className(FuncItem.class) + "//" + Util.className(DynFuncCall.class) +
+            "[@tailCall eq 'false']")
     );
   }
 

@@ -29,17 +29,16 @@ public final class FnModuleTest extends QueryPlanTest {
     final String name = Util.className(func.clazz);
 
     // pre-evaluate empty sequence
-    check(func.args(" ()"), "", "empty(//" + name + ')');
+    check(func.args(" ()"), "", empty(name));
     // pre-evaluate argument
-    check(func.args(1), 1, "empty(//" + name + ')');
+    check(func.args(1), 1, empty(name));
 
     // function is replaced by its argument (argument yields no result)
-    check(func.args(" prof:void(())"), "", "empty(//" + name + ')');
+    check(func.args(" prof:void(())"), "", empty(name));
     // but type is adjusted
-    check(func.args(" <_>1</_>"), 1, "//" + name + "/(@type = 'xs:numeric' and @size = 1)");
+    check(func.args(" <_>1</_>"), 1, type(name, "xs:numeric"));
     // no adjustment of type
-    check(func.args(" 1 ! array { . }"), 1,
-        "//" + name + "/(@type = 'xs:numeric?' and @size = -1)");
+    check(func.args(" 1 ! array { . }"), 1, type(name, "xs:numeric?"));
   }
 
   /** Test method. */
@@ -60,16 +59,12 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args(" string-length#1", " [ ('a','b') ]"), INVPROMOTE_X);
 
     // no pre-evaluation (higher-order arguments), but type adjustment
-    check(func.args(" true#0", " []"), true,
-        "//" + name + "/(@type = 'xs:boolean' and @size = 1)");
-    check(func.args(" count#1", " [1]"), 1,
-        "//" + name + "/(@type = 'xs:integer' and @size = 1)");
-    check(func.args(" abs#1", " [1]"), 1,
-        "//" + name + "/(@type = 'xs:numeric?' and @size = -1)");
-    check(func.args(" reverse#1", " [()]"), "",
-        "//" + name + "/(@type = 'item()*' and @size = -1)");
-    check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"), true,
-        "//" + name + "/(@type = 'item()*' and @size = -1)");
+    check(func.args(" true#0", " []"), true, type(name, "xs:boolean"));
+    check(func.args(" count#1", " [1]"), 1, type(name, "xs:integer"));
+    check(func.args(" abs#1", " [1]"), 1, type(name, "xs:numeric?"));
+    check(func.args(" reverse#1", " [()]"), "", type(name, "item()*"));
+    check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"),
+        true, type(name, "item()*"));
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
@@ -83,18 +78,18 @@ public final class FnModuleTest extends QueryPlanTest {
     final String name = Util.className(func.clazz);
 
     // pre-evaluated expressions
-    check(func.args(1), true, "empty(//" + name + ")");
-    check(func.args(" ()"), false, "empty(//" + name + ")");
+    check(func.args(1), true, empty(name));
+    check(func.args(" ()"), false, empty(name));
 
     // function is replaced with fn:exists
-    check(func.args(" <a/>/self::*"), true, "exists(//FnExists)");
+    check(func.args(" <a/>/self::*"), true, exists(FnExists.class));
     // function is replaced by its argument (argument yields no result)
-    check("(false(), true())[" + func.args(" .") + "]", true, "empty(//" + name + ")");
+    check("(false(), true())[" + func.args(" .") + "]", true, empty(name));
     // no replacement
-    check("(false(), 1)[" + func.args(" .") + "]", 1, "exists(//" + name + ")");
+    check("(false(), 1)[" + func.args(" .") + "]", 1, exists(name));
 
     // optimize ebv
-    check("[][. instance of xs:int][" + func.args(" .") + "]", "", "empty(//FnExists)");
+    check("[][. instance of xs:int][" + func.args(" .") + "]", "", empty(FnExists.class));
   }
 
 
@@ -107,24 +102,28 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void data() {
+  }
+
+  /** Test method. */
   @Test public void foldLeft() {
     final Function func = Function.FOLD_LEFT;
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 2 to 10", 1, " function($a,$b) {$a+$b}"),
         55,
-        "empty(//" + Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')])",
-        "exists(*/" + Util.className(Int.class) + ')');
+        empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
+        exists(Int.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 2 to 10", 1, " function($a,$b) {0*random:integer($a)+$b}"),
         10,
-        "empty(//" + Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')])",
-        "empty(*/" + Util.className(Int.class) + ')',
-        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
+        exists(Int.class),
+        empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
+        count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
     check(func.args(" 1 to 10", 0, " function($a,$b) {$a+$b}"),
         55,
-        "exists(//" + Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')])");
+        exists(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"));
   }
 
   /** Test method. */
@@ -134,18 +133,18 @@ public final class FnModuleTest extends QueryPlanTest {
     // should be unrolled and evaluated at compile time
     check(func.args(" 1 to 9", 10, " function($a,$b) {$a+$b}"),
         55,
-        "empty(//" + Util.className(FnFoldRight.class) + ')',
-        "exists(*/" + Util.className(Int.class) + ')');
+        empty(FnFoldRight.class),
+        exists(Int.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to 9", 10, " function($a,$b) {0*random:integer($a)+$b}"),
         10,
-        "empty(//" + Util.className(FnFoldRight.class) + ')',
-        "empty(*/" + Util.className(Int.class) + ')',
-        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
+        empty(FnFoldRight.class),
+        exists(Int.class),
+        count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
     check(func.args(" 0 to 9", 10, " function($a,$b) {$a+$b}"),
         55,
-        "exists(//" + Util.className(FnFoldRight.class) + "[contains(@name, 'fold-right')])");
+        exists(Util.className(FnFoldRight.class) + "[contains(@name, 'fold-right')]"));
   }
 
   /** Test method. */
@@ -155,18 +154,32 @@ public final class FnModuleTest extends QueryPlanTest {
     // should be unrolled and evaluated at compile time
     check(func.args(" 0 to 8", " function($x) {$x+1}"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
-        "empty(//" + Util.className(FnForEach.class) + ')',
-        "exists(*/" + Util.className(IntSeq.class) + ')');
+        empty(FnForEach.class),
+        exists(IntSeq.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to 9", " function($x) {0*random:integer()+$x}"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
-        "empty(//" + Util.className(FnForEach.class) + ')',
-        "empty(*/" + Util.className(IntSeq.class) + ')',
-        "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
+        empty(FnForEach.class),
+        empty(IntSeq.class),
+        count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
     check(func.args(" 0 to 9", " function($x) {$x+1}"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
-        "exists(//" + Util.className(FnForEach.class) + "[contains(@name, 'for-each')])");
+        exists(Util.className(FnForEach.class) + "[contains(@name, 'for-each')]"));
+  }
+
+  /** Test method. */
+  @Test public void head() {
+    final Function func = Function.HEAD;
+    final String name = Util.className(func.clazz);
+
+    // pre-evaluate empty sequence
+    check(func.args(" ()"), "", empty(name));
+    check(func.args(1), 1, empty(name));
+    check(func.args(" (1,2)"), 1, empty(name));
+    check(func.args(" <a/>"), "<a/>", empty(name));
+    check(func.args(" <a/>[name()]"), "<a/>", empty(name));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(name));
   }
 
   /** Test method. */
@@ -208,24 +221,45 @@ public final class FnModuleTest extends QueryPlanTest {
     final String name = Util.className(func.clazz);
 
     // pre-evaluated expressions
-    check(func.args(1), false, "empty(//" + name + ")");
-    check(func.args(" ()"), true,  "empty(//" + name + ")");
+    check(func.args(1), false, empty(name));
+    check(func.args(" ()"), true,  empty(name));
 
     // function is replaced with fn:exists
-    check(func.args(" empty(1[.=1])"), true, "exists(//FnExists)");
+    check(func.args(" empty(1[.=1])"), true, exists(FnExists.class));
     // function is replaced with fn:empty
-    check(func.args(" exists(1[.=1])"), false, "exists(//FnEmpty)");
-    check(func.args(" <a/>/self::*"), false, "exists(//FnEmpty)");
+    check(func.args(" exists(1[.=1])"), false, exists(FnEmpty.class));
+    check(func.args(" <a/>/self::*"), false, exists(FnEmpty.class));
     // function is replaced with fn:boolean
-    check(func.args(" not(1[.=1])"), true, "exists(//FnBoolean)");
+    check(func.args(" not(1[.=1])"), true, exists(FnBoolean.class));
 
     // function is replaced with fn:boolean
     check("for $i in (1,2) return " + func.args(" $i = $i + 1"),
-        "true\ntrue", "exists(//*[@op = '!='])");
+        "true\ntrue", exists("*[@op = '!=']"));
     check("for $i in (1,2) return " + func.args(" $i eq $i + 1"),
-        "true\ntrue", "exists(//*[@op = 'ne'])");
+        "true\ntrue", exists("*[@op = 'ne']"));
     check("for $i in (1,2) return " + func.args(" $i = ($i, $i)"),
-        "false\nfalse", "exists(//" + name + ")");
+        "false\nfalse", exists(name));
+  }
+
+  /** Test method. */
+  @Test public void number() {
+    final Function func = Function.NUMBER;
+    final String name = Util.className(func.clazz);
+
+    query(func.args(1), 1);
+    query(func.args(" ()"), "NaN");
+    query(func.args(" xs:double('NaN')"), "NaN");
+    query(func.args("X"), "NaN");
+    query(func.args(" <a>1</a>"), 1);
+
+    check("for $d in (1e0, 2e-1) return " + func.args(" $d"), "1\n0.2", empty(name));
+    check("for $d in (1, 2.34) return " + func.args(" $d"), "1\n2.34", exists(name));
+    check("for $d in (1e0, 2e-1) return $d[" + func.args() + ']', 1, empty(name));
+    check("for $d in (1e0, 2e-1) return $d[" + func.args() + " = 1]", 1, empty(name));
+    check("for $d in (1, 2.34) return $d[" + func.args() + ']', 1, exists(name));
+
+    error(func.args(), QueryError.NOCTX_X);
+    error(func.args(" true#0"), QueryError.FIATOM_X);
   }
 
   /** Test method. */
@@ -349,6 +383,34 @@ public final class FnModuleTest extends QueryPlanTest {
     query("declare base-uri 'a/'; ends-with(" + func.args() + ", '/')", true);
     query("declare base-uri '.' ; ends-with(" + func.args() + ", '/')", true);
     query("declare base-uri '..'; ends-with(" + func.args() + ", '/')", true);
+  }
+
+  /** Test method. */
+  @Test public void string() {
+    final Function func = Function.STRING;
+    final String name = Util.className(func.clazz);
+
+    query(func.args(" ()"), "");
+    query(func.args("A"), "A");
+    query(func.args(" <a>A</a>"), "A");
+
+    check("for $s in ('a', 'b') return " + func.args(" $s"), "a\nb", empty(name));
+    check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(name));
+    check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(name));
+    check("for $s in ('a' ,'b') return $s[" + func.args() + " = 'a']", "a", empty(name));
+    check("for $s in (<a/> ,<b/>) return $s[" + func.args() + ']', "", exists(name));
+
+    error(func.args(), QueryError.NOCTX_X);
+    error(func.args(" true#0"), QueryError.FISTRING_X);
+  }
+
+  /** Test method. */
+  @Test public void stringLength() {
+    final Function func = Function.STRING_LENGTH;
+    query(func.args(" ()"), 0);
+    query(func.args("A"), 1);
+    query("'A'[" + func.args() + ']', "A");
+    error("true#0[" + func.args() + ']', QueryError.FISTRING_X);
   }
 
   /** Test method. */

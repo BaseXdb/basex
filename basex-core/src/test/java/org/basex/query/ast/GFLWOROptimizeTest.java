@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.up.expr.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -99,7 +100,8 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "for sliding window $w in 1 to 3 start at $p when true() only " +
         "end at $q when $q - $p + 1 eq $len where $len > 2 return <window>{$w}</window>",
         "<window>1 2 3</window>",
-        "//For << //Window and exists(//For/*[ends-with(name(), 'Filter')])"
+        "//For << //Window",
+        exists("For/*[ends-with(name(), 'Filter')]")
     );
   }
 
@@ -108,36 +110,38 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
     check("let $rnd := random:double() where $rnd div 2 >= 0.2 where $rnd < 0.5 " +
         "where round(2 * $rnd) eq 1 return $rnd",
         null,
-        "exists(exactly-one(//Where))",
-        "exists(//Where/And)"
+        count("Where", 1),
+        exists("Where/And")
     );
   }
 
   /** Tests if where clauses are converted to predicates where applicable. */
   @Test public void whereToPred() {
+    final String uia = Util.className(_UTIL_ITEM_AT.clazz);
     check("for $i in 1 to 10 where <x/>[$i] and $i < 3 return $i",
         1,
-        "exists(//*[ends-with(name(), 'Filter')]/" + _UTIL_ITEM_AT.className() + ')'
+        exists("*[ends-with(name(), 'Filter')]/" + uia)
     );
     check("for $i in 1 to 10 where (<a/>)[$i] return $i",
         1,
-        "exists(//*[ends-with(name(), 'Filter')]/" + _UTIL_ITEM_AT.className() + ')'
+        exists("*[ends-with(name(), 'Filter')]/" + uia)
     );
     check("for $i in 1 to 3 " +
         "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
         "return $i",
         "2\n3",
-        "empty(//Where)",
-        "exists(//*[ends-with(name(), 'Filter')])"
+        empty(Where.class),
+        exists("*[ends-with(name(), 'Filter')]")
     );
   }
 
   /** Tests if let clauses are moved out of any loop they don't depend on. */
   @Test public void slideLet() {
+    final String uia = Util.className(_UTIL_ITEM_AT.clazz);
     check("for $i in 0 to 3, $j in 0 to 3 where (<x/>)[$i + $j] " +
         "let $foo := $i * $i return $foo * $foo",
         "0\n1",
-        "every $let in //Let satisfies $let << exactly-one(//" + _UTIL_ITEM_AT.className() + ')'
+        "every $let in //Let satisfies $let << exactly-one(//" + uia + ')'
     );
     check("<x/>/(for $i in 1 to 3 let $x := .  where $x return $x)",
         "<x/>",
@@ -160,8 +164,8 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "    $b as xs:integer := 2 * $i " +
         "return $a * $a + $b * $b",
         "13\n13\n52\n52",
-        "exists(//For[every $let in //Let satisfies . << $let])",
-        "exists(//For[every $let in //Let satisfies . >> $let])",
+        exists("For[every $let in //Let satisfies . << $let]"),
+        exists("For[every $let in //Let satisfies . >> $let]"),
         "//Let[Var/@name='$a'] << //Let[Var/@name='$b']"
     );
   }
@@ -194,21 +198,24 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void whereToIfTest() {
     check("(1 to 3) ! (for $j in 1 to 5 where . eq 1 return $j)",
         "1\n2\n3\n4\n5",
-        "exists(//If) and empty(//GFLWOR)"
+        exists(If.class),
+        empty(GFLWOR.class)
     );
     check("(1 to 3) ! (for $j at $p in 1 to 5 where . eq 1 return $j * $p)",
         "1\n4\n9\n16\n25",
-        "exists(//If) and exists(//GFLWOR)"
+        exists(If.class),
+        exists(GFLWOR.class)
     );
     check("let $x := 0 where $x != <x>0</x> return 42 idiv $x", "",
-        "exists(//If) and starts-with(//If/*[2]/@name, 'error(')");
+        exists(If.class),
+        "starts-with(//If/*[2]/@name, 'error(')");
   }
 
   /** Tests if {@code for $x in E return $x} is rewritten to {@code E} inside FLWORs. */
   @Test public void inlineForTest() {
     check("let $x := <x>5</x> for $i in 1 to $x return $i",
         "1\n2\n3\n4\n5",
-        "empty(//For)"
+        empty(For.class)
     );
   }
 
@@ -216,7 +223,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void splitWhereTest() {
     check("for $i in 1 to 5, $j in 1 to 5 where $i < 3 and $j < 3 return $i * $j",
         "1\n2\n2\n4",
-        "empty(//Where)",
+        empty(Where.class),
         "every $for in //For satisfies exists($for/*[ends-with(name(), 'Filter')])"
     );
   }
@@ -225,21 +232,21 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void eliminateFLWORTest() {
     check("let $x := (23, 42) where true() for $y in $x return $y",
         "23\n42",
-        "empty(//GFLWOR)"
+        empty(GFLWOR.class)
     );
   }
 
   /** Tests FLWOR expressions containing updates or non-determinism are left alone. */
   @Test public void dontEliminateFLWORTest() {
     check("copy $x := <x/> modify " +
-        "  for $i in 1 to 3 let $y := <y>{$i}</y> return insert node $y into $x " +
-        "return $x",
+        "  for $i in 1 to 3 let $y := <y>{$i}</y> return insert node $y into $x  return $x",
         "<x>\n<y>1</y>\n<y>2</y>\n<y>3</y>\n</x>",
-        "exists(//GFLWOR) and exists(//Insert)"
+        exists(GFLWOR.class),
+        exists(Insert.class)
     );
     check("for $i in 1 to 3 let $x := $i * $i return error()",
         null,
-        "exists(//GFLWOR)"
+        exists(GFLWOR.class)
     );
   }
 
@@ -247,17 +254,17 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void eliminateEmptyFLWORTest() {
     // literal false()
     check("for $x in 1 to 100 where false() return $x",
-        "", "exists(//Empty)"
+        "", empty()
     );
 
     // empty return clause
     check("for $x in 1 to 100 return ()",
-        "", "exists(//Empty)"
+        "", empty()
     );
 
     // value with ebv == false in where
     check("for $x in 1 to 100 where () return $x",
-        "", "exists(//Empty)"
+        "", empty()
     );
   }
 
@@ -265,7 +272,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void dontInlineNDTTest() {
     check("let $rnd := random:double() return (1 to 10) ! $rnd",
         null,
-        "exists(//Let)"
+        exists(Let.class)
     );
   }
 
@@ -277,8 +284,8 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         + "let $x := count($x) "
         + "return $x",
         "",
-        "count(//For) eq 1",
-        "count(//GFLWOR/*) eq 2");
+        count("For", 1),
+        count("GFLWOR/*", 2));
   }
 
   /** Tests flattening. */
@@ -288,7 +295,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "  return $x + 1 " +
         "return $p",
         "1\n2",
-        "count(//VarRef) = 1"
+        count("VarRef", 1)
     );
   }
 
@@ -297,7 +304,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
     // original and optimized query plan are identical...
     check("for $a in (1 to 2) return let $b := <a>1</a> return $b + 1",
         "2\n2",
-        "count(//VarRef) = 1"
+        count("VarRef", 1)
     );
   }
 }

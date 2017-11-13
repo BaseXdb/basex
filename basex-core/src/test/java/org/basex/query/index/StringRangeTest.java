@@ -103,9 +103,9 @@ public final class StringRangeTest extends QueryPlanTest {
       final Class<? extends Expr> expr) {
 
     execute(new CreateIndex(CmdIndex.TEXT));
-    check(query, result, "exists(//" + Util.className(expr) + ')');
+    check(query, result, exists(Util.className(expr)));
     execute(new DropIndex(CmdIndex.TEXT));
-    check(query, result, "not(//" + Util.className(expr) + ')');
+    check(query, result, empty(Util.className(expr)));
   }
 
   /**

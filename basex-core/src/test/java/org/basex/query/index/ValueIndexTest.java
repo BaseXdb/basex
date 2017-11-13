@@ -7,7 +7,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.ft.*;
-import org.basex.util.*;
+import org.basex.query.expr.index.*;
+import org.basex.query.value.node.*;
 import org.junit.*;
 import org.junit.Test;
 import org.junit.runner.*;
@@ -80,8 +81,8 @@ public final class ValueIndexTest extends QueryPlanTest {
       set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
       check("count(//" + key + "[text() = " + value + "])",
-          value.split(",").length, "exists(//ValueAccess)");
-      if(!key.equals("*")) check("//X[text() = 'unknown']", "", "exists(//DBNode)");
+          value.split(",").length, exists(ValueAccess.class));
+      if(!key.equals("*")) check("//X[text() = 'unknown']", "", exists(DBNode.class));
     });
   }
 
@@ -94,8 +95,8 @@ public final class ValueIndexTest extends QueryPlanTest {
       set(MainOptions.ATTRINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
       check("count(//*[@" + key + " = " + value + "])",
-          value.split(",").length, "exists(//ValueAccess)");
-      if(!key.equals("*")) check("//*[@x = 'unknown']", "", "exists(//DBNode)");
+          value.split(",").length, exists(ValueAccess.class));
+      if(!key.equals("*")) check("//*[@x = 'unknown']", "", exists(DBNode.class));
     });
   }
 
@@ -113,8 +114,8 @@ public final class ValueIndexTest extends QueryPlanTest {
       execute(new CreateDB(NAME, FILE));
       check("count(//" + key + "[text() contains text { " + value + " }])",
           value.split(",").length,
-          "exists(//" + Util.className(FTIndexAccess.class) + ')');
-      if(!key.equals("*")) check("//X[text() contains text 'unknown']", "", "exists(//DBNode)");
+          exists(FTIndexAccess.class));
+      if(!key.equals("*")) check("//X[text() contains text 'unknown']", "", exists(DBNode.class));
     });
   }
 
@@ -127,28 +128,28 @@ public final class ValueIndexTest extends QueryPlanTest {
 
     set(MainOptions.TEXTINCLUDE, "a");
     execute(new CreateDB(NAME, "<x><a>text</a><b>TEXT</b></x>"));
-    check("count(//a[text() = 'text'])", 1, "exists(//ValueAccess)");
-    check("count(//b[text() = 'TEXT'])", 1, "empty(//ValueAccess)");
+    check("count(//a[text() = 'text'])", 1, exists(ValueAccess.class));
+    check("count(//b[text() = 'TEXT'])", 1, empty(ValueAccess.class));
 
     query("replace value of node x/a with 'TEXT'");
-    check("count(//a[text() = 'TEXT'])", 1, "exists(//ValueAccess)");
+    check("count(//a[text() = 'TEXT'])", 1, exists(ValueAccess.class));
 
     query("rename node x/a as 'b'");
-    check("//a[text() = 'TEXT']", "", "exists(//Empty)");
-    check("count(//b[text() = 'TEXT'])", 2, "empty(ValueAccess)");
+    check("//a[text() = 'TEXT']", "", empty());
+    check("count(//b[text() = 'TEXT'])", 2, empty(ValueAccess.class));
 
     query("x/b/(rename node . as 'a')");
-    check("count(//a[text() = 'TEXT'])", 2, "exists(//ValueAccess)");
-    check("count(//b[text() = 'TEXT'])", 0, "empty(//ValueAccess)");
+    check("count(//a[text() = 'TEXT'])", 2, exists(ValueAccess.class));
+    check("count(//b[text() = 'TEXT'])", 0, empty(ValueAccess.class));
 
     query("x/a/(replace value of node . with 'text')");
-    check("count(//a[text() = 'text'])", 2, "exists(//ValueAccess)");
+    check("count(//a[text() = 'text'])", 2, exists(ValueAccess.class));
 
     query("delete node x/a[1]");
-    check("count(//a[text() = 'text'])", 1, "exists(//ValueAccess)");
+    check("count(//a[text() = 'text'])", 1, exists(ValueAccess.class));
 
     query("delete node x/a[1]");
-    check("//a[text() = 'text']", "", "exists(//Empty)");
+    check("//a[text() = 'text']", "", empty());
   }
 
   /**

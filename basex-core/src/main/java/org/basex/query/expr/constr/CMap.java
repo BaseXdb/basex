@@ -30,16 +30,30 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    Type key = null;
-    SeqType dt = null;
     final int el = exprs.length;
+
+    // key type
+    Type key = null;
     for(int e = 0; e < el; e += 2) {
-      final SeqType kst = exprs[e].seqType(), st = exprs[e + 1].seqType();
-      final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
+      final SeqType kst = exprs[e].seqType();
+      final Type kt = kst.atomicType();
+      if(kt == null || !kst.one()) {
+        key = null;
+        break;
+      }
       key = key == null ? kt : key.union(kt);
-      dt = dt == null ? st : dt.union(st);
     }
-    if(key instanceof AtomType && dt != null) exprType.assign(MapType.get((AtomType) key, dt));
+
+    // value type
+    SeqType vt = null;
+    for(int e = 1; e < el; e += 2) {
+      final SeqType dst = exprs[e].seqType();
+      vt = vt == null ? dst : vt.union(dst);
+    }
+
+    // assign type if at least one key/value pair exists, and if all keys are single items
+    if(key != null) exprType.assign(MapType.get((AtomType) key, vt));
+
     return allAreValues() ? cc.preEval(this) : this;
   }
 

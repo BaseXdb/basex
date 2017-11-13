@@ -167,7 +167,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   }
 
   /** Checks predicate tests for empty strings. */
-  @Test public void empty() {
+  @Test public void emptyStrings() {
     createDoc();
     execute(new Open(NAME));
     query("//*[text() = '']", "");
@@ -190,7 +190,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         set(MainOptions.ATTRINCLUDE, include);
         execute(new CreateDB(NAME, "<xml><a a='1'>1</a></xml>"));
 
-        final String test = "exists(//ValueAccess) = " + (include.equals("a") + "()");
+        final String test = exists(ValueAccess.class) + " = " + (include.equals("a") + "()");
         check("data(//*[a = '1'])", 1, test);
         check("data(//*[a/text() = '1'])", 1, test);
         check("data(//a[. = '1'])", 1, test);
@@ -215,19 +215,14 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     query("name(//@x/..[@* = 'y'])", "a");
   }
 
-  /** Comparison expressions. */
-  @Test public void cmpG() {
-    check("count(let $s := (0,1 to 99999) return $s[. = $s])", 100000, "exists(//CmpHashG)");
-  }
-
   /** Checks expressions with the pragma for enforcing index rewritings. */
   @Test public void pragma() {
     createDoc();
     final String pragma = "(# db:enforceindex #) { ";
     check(pragma + _DB_OPEN.args(" <_>" + NAME + "</_>") + "//a[text() = '1']/text() }", 1,
-        "exists(//ValueAccess)");
+        exists(ValueAccess.class));
     check(pragma + _DB_OPEN.args(" <x>" + NAME + "</x>") + "//a/text()[. = '1'] }", 1,
-        "exists(//ValueAccess)");
+        exists(ValueAccess.class));
   }
 
   /**
@@ -263,8 +258,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
    * @param result result or {@code null} for no comparison
    */
   private static void check(final String query, final String result) {
-    check(query, result, "exists(/descendant-or-self::*" +
+    check(query, result, exists("*" +
         "[self::" + Util.className(ValueAccess.class) +
-        "|self::" + Util.className(FTIndexAccess.class) + "])");
+        "|self::" + Util.className(FTIndexAccess.class) + ']'));
   }
 }

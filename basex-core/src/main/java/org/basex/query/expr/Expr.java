@@ -122,7 +122,8 @@ public abstract class Expr extends ExprInfo {
   public final Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = qc.iter(this);
     final SeqType st = seqType();
-    return st.atomic() ? iter : new AtomIter(iter, qc, ii, st.mayBeArray() ? -1 : iter.size());
+    return st.type.instanceOf(AtomType.AAT) ? iter :
+      new AtomIter(iter, qc, ii, st.mayBeArray() ? -1 : iter.size());
   }
 
   /**

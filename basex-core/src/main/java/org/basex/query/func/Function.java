@@ -1644,14 +1644,6 @@ public enum Function {
     return ' ' + toString().replaceAll("\\(.*", "(") + tb + ')';
   }
 
-  /**
-   * Returns the name of the class.
-   * @return class name
-   */
-  public final String className() {
-    return Util.className(clazz);
-  }
-
   @Override
   public final String toString() {
     return new TokenBuilder(NSGlobal.prefix(uri)).add(':').add(desc).toString();

@@ -24,7 +24,11 @@ public final class FnString extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
+    final boolean arg = exprs.length != 0;
+    final Expr ex = arg ? exprs[0] : cc.qc.focus.value;
     // string('x') -> 'x'
-    return exprs.length != 0 && exprs[0].seqType().eq(SeqType.STR) ? exprs[0] : this;
+    // $string[string() = 'a'] -> $string[. = 'a']
+    return ex == null || !ex.seqType().eq(SeqType.STR) ? this :
+      arg ? ex : new ContextValue(info).optimize(cc);
   }
 }

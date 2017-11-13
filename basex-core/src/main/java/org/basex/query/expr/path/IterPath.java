@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-final class IterPath extends AxisPath {
+public final class IterPath extends AxisPath {
   /**
    * Constructor.
    * @param info input info

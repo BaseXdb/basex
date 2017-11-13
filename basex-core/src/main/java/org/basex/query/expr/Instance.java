@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -18,17 +19,17 @@ import org.basex.util.hash.*;
  */
 public final class Instance extends Single {
   /** Sequence type to check for. */
-  private final SeqType type;
+  private final SeqType instType;
 
   /**
    * Constructor.
    * @param info input info
    * @param expr expression
-   * @param type sequence type to check for
+   * @param instType sequence type to check for
    */
-  public Instance(final InputInfo info, final Expr expr, final SeqType type) {
+  public Instance(final InputInfo info, final Expr expr, final SeqType instType) {
     super(info, expr, SeqType.BLN);
-    this.type = type;
+    this.instType = instType;
   }
 
   @Override
@@ -37,28 +38,34 @@ public final class Instance extends Single {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return !expr.has(Flag.NDT) && expr.seqType().instanceOf(instType) ?
+      cc.replaceWith(expr, Bln.TRUE) : this;
+  }
+
+  @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(type.instance(qc.value(expr)));
+    return Bln.get(instType.instance(qc.value(expr)));
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Instance(info, expr.copy(cc, vm), type);
+    return new Instance(info, expr.copy(cc, vm), instType);
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Instance && type.eq(((Instance) obj).type) &&
+    return this == obj || obj instanceof Instance && instType.eq(((Instance) obj).instType) &&
         super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OF, type), expr);
+    addPlan(plan, planElem(OF, instType), expr);
   }
 
   @Override
   public String toString() {
-    return Util.info("% instance of %", expr, type);
+    return Util.info("% instance of %", expr, instType);
   }
 }

@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
 
 /**
  * Abstract test class for properties on the Query Plan.
@@ -18,9 +19,9 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    * Checks the query plan and the result.
    * @param query query
    * @param expected result or {@code null} for no comparison
-   * @param checks queries on the query plan
+   * @param tests queries on the query plan
    */
-  protected static void check(final String query, final Object expected, final String... checks) {
+  protected static void check(final String query, final Object expected, final String... tests) {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
       // compile query
       qp.compile();
@@ -32,14 +33,88 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
         assertEquals("\nQuery: " + query + '\n', expected.toString(), result);
       }
 
-      for(final String p : checks) {
-        if(new QueryProcessor(p, context).context(plan).value() != Bln.TRUE) {
-          fail(NL + "- Query: " + query + NL + "- Check: " + p + NL +
+      for(final String test : tests) {
+        if(new QueryProcessor(test, context).context(plan).value() != Bln.TRUE) {
+          fail(NL + "- Query: " + query + NL + "- Check: " + test + NL +
               "- Plan: " + plan.serialize());
         }
       }
     } catch(final Exception ex) {
       throw new AssertionError(query, ex);
     }
+  }
+
+  /**
+   * Returns a test to check if the specified expression or path does not occur in the query plan.
+   * @param expr expression
+   * @return test string
+   */
+  protected static String empty(final String expr) {
+    return "empty(//" + expr + ')';
+  }
+
+  /**
+   * Returns a test to check if the specified expression does not occur in the query plan.
+   * @param clazz name of expression
+   * @return test string
+   */
+  protected static String empty(final Class<?> clazz) {
+    return empty(Util.className(clazz));
+  }
+
+  /**
+   * Returns a test to check if the specified expression or path occurs in the query plan.
+   * @param expr expression
+   * @return test string
+   */
+  protected static String exists(final String expr) {
+    return "exists(//" + expr + ')';
+  }
+
+  /**
+   * Returns a test to check if the specified expression occurs in the query plan.
+   * @param clazz expression class
+   * @return test string
+   */
+  protected static String exists(final Class<?> clazz) {
+    return exists(Util.className(clazz));
+  }
+
+  /**
+   * Returns a test to check if the query plan is empty.
+   * @return test string
+   */
+  protected static String empty() {
+    return "not(QueryPlan/*/name() != 'Empty')";
+  }
+
+  /**
+   * Counts the number of results.
+   * @param clazz expression class
+   * @param count number of results
+   * @return test string
+   */
+  protected static String count(final Class<?> clazz, final int count) {
+    return count(Util.className(clazz), count);
+  }
+
+  /**
+   * Counts the number of results.
+   * @param expr expression
+   * @param count number of results
+   * @return test string
+   */
+  protected static String count(final String expr, final int count) {
+    return "count(//" + expr + ") = " + count;
+  }
+
+  /**
+   * Returns a test to check the type of an expression.
+   * @param name name of expression
+   * @param type type
+   * @return test string
+   */
+  protected static String type(final String name, final String type) {
+    return "//" + name + "/@type = '" + type + "'";
   }
 }

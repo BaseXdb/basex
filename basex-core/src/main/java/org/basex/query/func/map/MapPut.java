@@ -29,10 +29,11 @@ public final class MapPut extends StandardFunc {
     final Type t = exprs[0].seqType().type;
     if(t instanceof MapType) {
       final MapType mt = (MapType) t;
-      final SeqType kst = exprs[1].seqType(), vt = mt.declType.union(exprs[2].seqType());
-      final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
-      final Type key = kt instanceof AtomType ? mt.keyType().union(kt) : AtomType.AAT;
-      exprType.assign(MapType.get((AtomType) key, vt));
+      final Type kt = exprs[1].seqType().atomicType();
+      if(kt != null) {
+        final SeqType vt = mt.declType.union(exprs[2].seqType());
+        exprType.assign(MapType.get((AtomType) mt.keyType().union(kt), vt));
+      }
     }
     return this;
   }

@@ -68,8 +68,9 @@ public final class FnDistinctValues extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
-    if(!st.mayBeArray()) {
-      exprType.assign(st.type instanceof NodeType ? AtomType.ATM : st.type);
+    final Type t = st.atomicType();
+    if(t != null) {
+      exprType.assign(t);
       simple = st.zeroOrOne();
     }
     return exprs.length == 1 ? cmpDist(ex, cc) : this;
