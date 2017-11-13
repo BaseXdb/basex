@@ -17,6 +17,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Compilation context.
@@ -49,7 +50,9 @@ public final class CompileContext {
    * @param ext text text extensions
    */
   public void info(final String string, final Object... ext) {
-    qc.info.compInfo(string,  ext);
+    final TokenList list = new TokenList();
+    for(final Object e : ext) list.add(QueryError.chop(TokenBuilder.token(e), null));
+    qc.info.compInfo(string, list.toArray());
   }
 
   /**

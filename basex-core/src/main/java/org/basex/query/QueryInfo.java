@@ -61,7 +61,7 @@ public final class QueryInfo {
    * @param string evaluation info
    * @param ext text text extensions
    */
-  void compInfo(final String string, final Object... ext) {
+  void compInfo(final String string, final Object[] ext) {
     if(verbose) {
       String info = Util.info(string,  ext);
       if(runtime) {
