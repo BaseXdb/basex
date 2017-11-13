@@ -216,9 +216,9 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  boolean instanceOf(final AtomType kt, final SeqType vt) {
+  boolean instanceOf(final AtomType kt, final SeqType dt) {
     for(final TrieNode k : kids) {
-      if(!(k == null || k.instanceOf(kt, vt))) return false;
+      if(!(k == null || k.instanceOf(kt, dt))) return false;
     }
     return true;
   }

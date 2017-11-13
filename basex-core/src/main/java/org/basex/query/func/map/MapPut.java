@@ -7,7 +7,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -33,7 +32,7 @@ public final class MapPut extends StandardFunc {
       final SeqType kst = exprs[1].seqType(), vt = mt.declType.union(exprs[2].seqType());
       final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
       final Type key = kt instanceof AtomType ? mt.keyType().union(kt) : AtomType.AAT;
-      exprType.assign(MapType.get((AtomType) key, vt), Occ.ONE);
+      exprType.assign(MapType.get((AtomType) key, vt));
     }
     return this;
   }

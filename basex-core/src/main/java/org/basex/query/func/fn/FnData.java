@@ -37,12 +37,12 @@ public final class FnData extends ContextFn {
     if(expr != this) {
       final SeqType st = expr.seqType();
       if(!st.mayBeArray()) {
-        final Type type = st.type instanceof NodeType ? AtomType.ATM : st.type;
+        final Type t = st.type instanceof NodeType ? AtomType.ATM : st.type;
         final long sz = expr.size();
         if(sz >= 0) {
-          exprType.assign(type, sz);
+          exprType.assign(t, sz);
         } else {
-          exprType.assign(type, st.occ);
+          exprType.assign(t, st.occ);
         }
       }
     }

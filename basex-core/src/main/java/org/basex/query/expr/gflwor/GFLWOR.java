@@ -259,7 +259,7 @@ public final class GFLWOR extends ParseExpr {
     for(final Clause clause : clauses) {
       if(minMax[1] != 0) clause.calcSize(minMax);
     }
-    exprType.assign(ret.seqType(), minMax);
+    exprType.assign(ret.seqType().type, minMax);
   }
 
   /**

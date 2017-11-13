@@ -149,11 +149,11 @@ public final class Var extends ExprInfo {
       }
     }
 
-    final SeqType vt = exprType.seqType();
-    if(!vt.eq(st) && !vt.instanceOf(st)) {
+    final SeqType dt = exprType.seqType();
+    if(!dt.eq(st) && !dt.instanceOf(st)) {
       // the new type provides new information
-      final SeqType is = vt.intersect(st);
-      if(is != null) exprType.assign(is, sz);
+      final SeqType it = dt.intersect(st);
+      if(it != null) exprType.assign(it, sz);
     }
   }
 

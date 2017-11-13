@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -25,7 +24,7 @@ public final class MapEntry extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final SeqType kst = exprs[0].seqType(), st = exprs[1].seqType();
     final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
-    if(kt instanceof AtomType) exprType.assign(MapType.get((AtomType) kt, st), Occ.ONE);
+    if(kt instanceof AtomType) exprType.assign(MapType.get((AtomType) kt, st));
     return this;
   }
 }

@@ -51,7 +51,7 @@ abstract class TrieNode {
     @Override
     void materialize(final InputInfo ii) { }
     @Override
-    boolean instanceOf(final AtomType kt, final SeqType vt) { return true; }
+    boolean instanceOf(final AtomType kt, final SeqType dt) { return true; }
     @Override
     int hash(final InputInfo ii) { return 0; }
     @Override
@@ -223,10 +223,10 @@ abstract class TrieNode {
   /**
    * Checks if the map has the specified key and value type.
    * @param kt key type
-   * @param vt value type
+   * @param dt declared type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  abstract boolean instanceOf(AtomType kt, SeqType vt);
+  abstract boolean instanceOf(AtomType kt, SeqType dt);
 
   /**
    * Compares two values.

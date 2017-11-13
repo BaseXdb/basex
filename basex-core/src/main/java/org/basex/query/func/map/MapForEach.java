@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 
 /**
  * Function implementation.
@@ -28,7 +27,7 @@ public final class MapForEach extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type t = exprs[1].seqType().type;
-    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType.type, Occ.ZERO_MORE);
+    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType.type);
     return this;
   }
 }

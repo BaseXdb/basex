@@ -31,15 +31,15 @@ public final class CMap extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     Type key = null;
-    SeqType vt = null;
+    SeqType dt = null;
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       final SeqType kst = exprs[e].seqType(), st = exprs[e + 1].seqType();
       final Type kt = kst.type instanceof NodeType ? AtomType.ATM : kst.type;
       key = key == null ? kt : key.union(kt);
-      vt = vt == null ? st : vt.union(st);
+      dt = dt == null ? st : dt.union(st);
     }
-    if(key instanceof AtomType && vt != null) exprType.assign(MapType.get((AtomType) key, vt));
+    if(key instanceof AtomType && dt != null) exprType.assign(MapType.get((AtomType) key, dt));
     return allAreValues() ? cc.preEval(this) : this;
   }
 

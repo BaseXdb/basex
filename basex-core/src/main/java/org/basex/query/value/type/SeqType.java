@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class SeqType {
-  /** Number of occurrences (cardinality). */
+  /** Occurrence indicator (cardinality). */
   public enum Occ {
     /** Zero.         */ ZERO(0, 0, ""),
     /** Zero or one.  */ ZERO_ONE(0, 1, "?"),
@@ -30,15 +30,15 @@ public final class SeqType {
 
     /** String representation. */
     private final String str;
-    /** Minimal number of occurrences. */
+    /** Minimal result size. */
     public final int min;
-    /** Maximal number of occurrences. */
+    /** Maximal result size. */
     public final int max;
 
     /**
      * Constructor.
-     * @param min minimal number of occurrences
-     * @param max maximal number of occurrences
+     * @param min minimal result size
+     * @param max maximal result size
      * @param str string representation
      */
     Occ(final int min, final int max, final String str) {
@@ -80,7 +80,7 @@ public final class SeqType {
     }
 
     /**
-     * Adds two occurrences.
+     * Adds two occurrence indicators.
      * @param other other occurrence indicator
      * @return union
      */
@@ -256,7 +256,7 @@ public final class SeqType {
 
   /** Item type. */
   public final Type type;
-  /** Number of occurrences. */
+  /** Occurrence indicator. */
   public final Occ occ;
   /** Kind test (can be {@code null}). */
   private final Test kind;
@@ -282,7 +282,7 @@ public final class SeqType {
   /**
    * Private constructor.
    * @param type type
-   * @param occ occurrences
+   * @param occ occurrence indicator
    * @param kind kind test (can be {@code null})
    */
   private SeqType(final Type type, final Occ occ, final Test kind) {
@@ -294,7 +294,7 @@ public final class SeqType {
   /**
    * Returns a sequence type.
    * @param type type
-   * @param occ occurrences
+   * @param occ occurrence indicator
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ) {
@@ -304,7 +304,7 @@ public final class SeqType {
   /**
    * Returns a sequence type.
    * @param type type
-   * @param occ occurrences
+   * @param occ occurrence indicator
    * @param kind kind test (can be {@code null})
    * @return sequence type
    */
@@ -313,29 +313,32 @@ public final class SeqType {
   }
 
   /**
+   * Returns a sequence type with the specified type and occurrence indicator.
+   * Returns this sequence type if it is identical.
+   * @param tp type
+   * @param oc occurrence indicator
+   * @return sequence type
+   */
+  public SeqType with(final Type tp, final Occ oc) {
+    return type.eq(tp) && occ == oc && kind == null ? this : get(tp, oc);
+  }
+
+  /**
    * Returns a version of this sequence type that is adapted to the given {@link Occ}.
    * @param oc occurrence indicator
    * @return sequence type
    */
-  public SeqType withOcc(final Occ oc) {
-    // return original type if occurrence is identical, or if occurrence is 0 (empty sequence)
-    return oc == occ || occ.max == 0 && oc.min == 0 ? this : get(type, oc, kind);
+  public SeqType with(final Occ oc) {
+    return oc == occ ? this : get(type, oc, kind);
   }
 
   /**
-   * Returns a version of this sequence type that is adapted to the given min/max values.
-   * @param min minimum result size (0 or more)
-   * @param max maximum result size (-1 or more)
+   * Returns a version of this sequence type that is adapted to the given type.
+   * @param tp type
    * @return sequence type
    */
-  public SeqType withMinMax(final long min, final long max) {
-    /* ZERO     : min = max = 0
-     * ZERO_ONE : min = 0, max = 1
-     * ZERO_MORE: min = 0, max = -1 or >1
-     * ONE      : min = max = 1
-     * ONE_MORE : min > 0, max != -1 */
-    return withOcc(min == 0 ? max == 0 ? Occ.ZERO : max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE :
-      min == 1 && max == 1 ? Occ.ONE : Occ.ONE_MORE);
+  public SeqType with(final Type tp) {
+    return type.eq(tp) ? this : get(tp, occ, kind);
   }
 
   /**
@@ -504,13 +507,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && atom instanceof Uri) {
           cache.add(Str.get(atom.string(ii)));
         } else {
-          throw typeError(item, withOcc(Occ.ONE), name, ii);
+          throw typeError(item, with(Occ.ONE), name, ii);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       cache.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw typeError(item, withOcc(Occ.ONE), name, ii);
+      throw typeError(item, with(Occ.ONE), name, ii);
     }
   }
 

@@ -218,7 +218,7 @@ public final class GroupBy extends Clause {
     final int pl = preExpr.length;
     for(int p = 0; p < pl; p++) {
       final SeqType it = preExpr[p].seqType();
-      post[p].refineType(it.withOcc(it.occ.union(Occ.ONE_MORE)), cc);
+      post[p].refineType(it.with(it.occ.union(Occ.ONE_MORE)), cc);
     }
     return this;
   }
@@ -378,9 +378,8 @@ public final class GroupBy extends Clause {
     @Override
     public Spec optimize(final CompileContext cc) throws QueryException {
       adoptType(expr);
-      final SeqType et = expr.seqType();
-      final SeqType st = SeqType.get(et.type instanceof NodeType ? AtomType.ATM :
-        et.mayBeArray() ? AtomType.ITEM : et.type, exprType.seqType().occ);
+      final SeqType et = expr.seqType(), st = exprType.seqType().with(
+          et.type instanceof NodeType ? AtomType.ATM : et.mayBeArray() ? AtomType.ITEM : et.type);
       var.refineType(st, cc);
       return this;
     }

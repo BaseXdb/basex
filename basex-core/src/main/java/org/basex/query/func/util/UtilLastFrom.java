@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -37,7 +36,7 @@ public final class UtilLastFrom extends StandardFunc {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(st.zeroOrOne()) return ex;
-    exprType.assign(st.type, Occ.ZERO_ONE);
+    exprType.assign(st.type);
     return this;
   }
 }

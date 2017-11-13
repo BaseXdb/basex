@@ -2978,12 +2978,12 @@ public class QueryParser extends InputParser {
     }
 
     // parse item type and occurrence indicator
-    final SeqType tw = itemType();
+    final SeqType st = itemType();
     skipWs();
     final Occ occ = consume('?') ? Occ.ZERO_ONE : consume('+') ? Occ.ONE_MORE :
       consume('*') ? Occ.ZERO_MORE : Occ.ONE;
     skipWs();
-    return tw.withOcc(occ);
+    return st.with(occ);
   }
 
   /**

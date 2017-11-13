@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 
 /**
  * Function implementation.
@@ -76,7 +75,7 @@ public final class FnForEach extends StandardFunc {
     }
 
     final Type t = exprs[1].seqType().type;
-    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType.type, Occ.ZERO_MORE);
+    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType.type);
     return this;
   }
 }

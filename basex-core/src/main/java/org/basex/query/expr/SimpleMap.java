@@ -107,7 +107,7 @@ public abstract class SimpleMap extends Arr {
       cc.info(OPTSIMPLE_X, this);
       exprs = list.finish();
     }
-    exprType.assign(exprs[exprs.length - 1].seqType(), new long[] { min, max });
+    exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
 
     // single items: use item mapper; only values: pre-evaluate
     final long sz = exprType.size();

@@ -34,13 +34,13 @@ public final class CArray extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    SeqType vt = null;
+    SeqType dt = null;
     for(final Expr expr : exprs) {
       SeqType st = expr.seqType();
-      if(!seq) st = st.withOcc(Occ.ONE);
-      vt = vt == null ? st : vt.union(st);
+      if(!seq) st = st.with(Occ.ONE);
+      dt = dt == null ? st : dt.union(st);
     }
-    if(vt != null) exprType.assign(ArrayType.get(vt));
+    if(dt != null) exprType.assign(ArrayType.get(dt));
 
     return allAreValues() ? cc.preEval(this) : this;
   }

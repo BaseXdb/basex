@@ -81,7 +81,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   Closure(final InputInfo info, final QNm name, final SeqType declType, final Var[] params,
       final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    super(info, expr, SeqType.ITEM_ZM);
+    super(info, expr, SeqType.FUN_O);
     this.name = name;
     this.params = params;
     this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
@@ -153,7 +153,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
     final SeqType dt = declType == null || st.instanceOf(declType) ? st : declType;
-    exprType.assign(FuncType.get(anns, dt, params), Occ.ONE);
+    exprType.assign(FuncType.get(anns, dt, params));
 
     cc.pushScope(vs);
     try {
@@ -278,10 +278,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Type tp = seqType().type;
-    if(!(tp instanceof FuncType)) throw Util.notExpected("Closure was not compiled: %", this);
-    final FuncType ft = (FuncType) tp;
-
     final Expr body;
     if(global.isEmpty()) {
       body = expr;
@@ -319,7 +315,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = new TypeCheck(vs.sc, info, body, declType, true);
     }
 
-    return new FuncItem(vs.sc, anns, name, params, ft, checked, vs.stackSize());
+    final FuncType tp = (FuncType) seqType().type;
+    return new FuncItem(vs.sc, anns, name, params, tp, checked, vs.stackSize());
   }
 
   @Override
@@ -425,8 +422,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     anns = ft.anns;
     final int pl = params.length;
     for(int p = 0; p < pl; p++) params[p].declType = ft.argTypes[p];
-    final SeqType vt = ft.declType;
-    if(!vt.eq(SeqType.ITEM_ZM)) declType = vt;
+    final SeqType dt = ft.declType;
+    if(!dt.eq(SeqType.ITEM_ZM)) declType = dt;
   }
 
   /**

@@ -683,11 +683,10 @@ public abstract class Path extends ParseExpr {
       resultRoot = index.expr;
     }
 
-    // only one hit:
+    // only one hit: update sequence type
     if(index.costs.results() == 1) {
-      // set sequence type
-      if(resultRoot instanceof IndexAccess) ((IndexAccess) resultRoot).exprType.assign(1);
-      else ((ParseExpr) resultRoot).exprType.assign(Occ.ZERO_ONE);
+      final Occ occ = resultRoot instanceof IndexAccess ? Occ.ONE : Occ.ZERO_ONE;
+      ((ParseExpr) resultRoot).exprType.assign(occ);
     }
 
     if(!newPreds.isEmpty()) {
