@@ -96,8 +96,8 @@ public final class CmpHashG extends CmpG {
    * @author Christian Gruen
    */
   private static final class CmpCache {
-    /** cached items. */
-    final HashItemSet set = new HashItemSet(true);;
+    /** Cached items. */
+    final HashItemSet set = new HashItemSet(true);
     /** Lazy iterator. */
     Iter iter2;
   }

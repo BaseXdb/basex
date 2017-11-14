@@ -60,7 +60,7 @@ public final class CArray extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CArray(info, seq, copyAll(cc, vm, exprs));
+    return copyType(new CArray(info, seq, copyAll(cc, vm, exprs)));
   }
 
   @Override

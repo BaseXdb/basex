@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -21,20 +22,20 @@ public final class Castable extends Single {
   /** Static context. */
   private final StaticContext sc;
   /** Sequence type to check for. */
-  private final SeqType type;
+  private final SeqType castType;
 
   /**
    * Constructor.
    * @param sc static context
    * @param info input info
    * @param expr expression
-   * @param type sequence type to check for
+   * @param castType sequence type to check for
    */
   public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType type) {
+      final SeqType castType) {
     super(info, expr, SeqType.BLN);
     this.sc = sc;
-    this.type = type;
+    this.castType = castType;
   }
 
   @Override
@@ -43,30 +44,36 @@ public final class Castable extends Single {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return !expr.has(Flag.NDT) && expr.seqType().instanceOf(castType) ?
+      cc.replaceWith(this, Bln.TRUE) : this;
+  }
+
+  @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value v = qc.value(expr);
-    return Bln.get(type.occ.check(v.size()) &&
-        (v.isEmpty() || type.cast((Item) v, qc, sc, info, false) != null));
+    return Bln.get(castType.occ.check(v.size()) &&
+        (v.isEmpty() || castType.cast((Item) v, qc, sc, info, false) != null));
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Castable(sc, info, expr.copy(cc, vm), type);
+    return new Castable(sc, info, expr.copy(cc, vm), castType);
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Castable && type.eq(((Castable) obj).type) &&
+    return this == obj || obj instanceof Castable && castType.eq(((Castable) obj).castType) &&
         super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(AS, type), expr);
+    addPlan(plan, planElem(AS, castType), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + CASTABLE + ' ' + AS + ' ' + type;
+    return expr + " " + CASTABLE + ' ' + AS + ' ' + castType;
   }
 }

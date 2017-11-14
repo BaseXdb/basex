@@ -69,7 +69,9 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CTxt(sc, info, exprs[0].copy(cc, vm));
+    final CTxt ctxt = copyType(new CTxt(sc, info, exprs[0].copy(cc, vm)));
+    ctxt.simple = simple;
+    return ctxt;
   }
 
   @Override

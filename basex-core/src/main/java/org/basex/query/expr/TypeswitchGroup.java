@@ -104,7 +104,7 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public TypeswitchGroup copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeswitchGroup(info, cc.copy(var, vm), types.clone(), expr.copy(cc, vm));
+    return copyType(new TypeswitchGroup(info, cc.copy(var, vm), types.clone(), expr.copy(cc, vm)));
   }
 
   /**

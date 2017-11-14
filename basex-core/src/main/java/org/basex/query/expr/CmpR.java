@@ -14,6 +14,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -37,10 +38,11 @@ public final class CmpR extends Single {
   final double max;
   /** Include maximum value. */
   final boolean mxi;
-  /** Evaluation flag: atomic evaluation. */
-  private final boolean atomic;
   /** Check for equality. */
   private final boolean eq;
+
+  /** Evaluation flag: atomic evaluation. */
+  private boolean atomic;
 
   /**
    * Constructor.
@@ -59,28 +61,28 @@ public final class CmpR extends Single {
     this.mni = mni;
     this.max = max;
     this.mxi = mxi;
-    final SeqType st = expr.seqType();
-    atomic = st.zeroOrOne() && !st.mayBeArray();
     eq = min == max;
   }
 
   /**
    * Tries to convert the specified expression into a range expression.
    * @param cmp expression to be converted
+   * @param cc compilation context
    * @return new or original expression
+   * @throws QueryException query exception
    */
-  static ParseExpr get(final CmpG cmp) {
+  static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
     final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
     if(e1.has(Flag.NDT)) return cmp;
 
     if(e2 instanceof RangeSeq) {
       final RangeSeq rs = (RangeSeq) e2;
-      return get(cmp, rs.start(), rs.end());
+      return get(cmp, rs.start(), rs.end(), cc);
     }
     // range expression uses doubles: reject decimal numbers and typed input
     if(e2 instanceof ANum && (!(e2 instanceof Dec) || e1.seqType().type.isUntyped())) {
       final double d = ((ANum) e2).dbl();
-      return get(cmp, d, d);
+      return get(cmp, d, d, cc);
     }
     return cmp;
   }
@@ -90,9 +92,13 @@ public final class CmpR extends Single {
    * @param cmp expression to be converted
    * @param start start
    * @param end end (must be larger than end)
+   * @param cc compilation context
    * @return new or original expression
+   * @throws QueryException query exception
    */
-  private static ParseExpr get(final CmpG cmp, final double start, final double end) {
+  private static Expr get(final CmpG cmp, final double start, final double end,
+      final CompileContext cc) throws QueryException {
+
     /* reject:
      * - input that cannot be compared as number
      * - numbers that are too large or small to be safely compared as doubles */
@@ -101,19 +107,28 @@ public final class CmpR extends Single {
         start < Integer.MIN_VALUE || start > Integer.MAX_VALUE ||
         end < Integer.MIN_VALUE || end > Integer.MAX_VALUE) return cmp;
 
+    ParseExpr expr = null;
     switch(cmp.op) {
-      case EQ: return new CmpR(ex, start, true, end, true, cmp.info);
-      case GE: return new CmpR(ex, start, true, Double.POSITIVE_INFINITY, true, cmp.info);
-      case GT: return new CmpR(ex, start, false, Double.POSITIVE_INFINITY, true, cmp.info);
-      case LE: return new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, true, cmp.info);
-      case LT: return new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, false, cmp.info);
-      default: return cmp;
+      case EQ: expr = new CmpR(ex, start, true, end, true, cmp.info); break;
+      case GE: expr = new CmpR(ex, start, true, Double.POSITIVE_INFINITY, true, cmp.info); break;
+      case GT: expr = new CmpR(ex, start, false, Double.POSITIVE_INFINITY, true, cmp.info); break;
+      case LE: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, true, cmp.info); break;
+      case LT: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, false, cmp.info); break;
+      default:
     }
+    return expr != null ? expr.optimize(cc) : cmp;
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     return super.compile(cc).optimize(cc);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    final SeqType st = expr.seqType();
+    atomic = st.zeroOrOne() && !st.mayBeArray();
+    return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
@@ -228,7 +243,9 @@ public final class CmpR extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CmpR(expr.copy(cc, vm), min, mni, max, mxi, info);
+    final CmpR cmp = new CmpR(expr.copy(cc, vm), min, mni, max, mxi, info);
+    cmp.atomic = atomic;
+    return cmp;
   }
 
   @Override

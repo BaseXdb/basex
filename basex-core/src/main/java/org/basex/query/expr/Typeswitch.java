@@ -161,7 +161,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Typeswitch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups));
+    return copyType(new Typeswitch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups)));
   }
 
   @Override

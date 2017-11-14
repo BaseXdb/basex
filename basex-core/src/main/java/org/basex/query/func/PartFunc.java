@@ -114,8 +114,8 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new PartFunc(sc, info, body().copy(cc, vm),
-        copyAll(cc, vm, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
+    return copyType(new PartFunc(sc, info, body().copy(cc, vm),
+        copyAll(cc, vm, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone()));
   }
 
   @Override

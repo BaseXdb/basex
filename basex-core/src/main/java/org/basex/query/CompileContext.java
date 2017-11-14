@@ -189,7 +189,7 @@ public final class CompileContext {
       if(!Token.eq(exprString, resString)) {
         final TokenBuilder tb = new TokenBuilder(res instanceof ParseExpr ? OPTREWRITE : OPTPRE);
         tb.add(' ').add(expr.description()).add(" to ").add(res.description()).add(": ");
-        info(tb.add(" -> ").add(resString).add(exprString).toString());
+        info(tb.add(exprString).add(" -> ").add(resString).toString());
       }
 
       if(res instanceof ParseExpr) {

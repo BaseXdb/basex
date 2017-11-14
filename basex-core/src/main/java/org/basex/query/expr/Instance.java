@@ -40,7 +40,7 @@ public final class Instance extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     return !expr.has(Flag.NDT) && expr.seqType().instanceOf(instType) ?
-      cc.replaceWith(expr, Bln.TRUE) : this;
+      cc.replaceWith(this, Bln.TRUE) : this;
   }
 
   @Override

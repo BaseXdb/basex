@@ -75,7 +75,7 @@ public final class Cast extends Single {
 
   @Override
   public Cast copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return new Cast(sc, info, expr.copy(cc, vs), seqType());
+    return copyType(new Cast(sc, info, expr.copy(cc, vs), seqType()));
   }
 
   @Override

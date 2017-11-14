@@ -161,9 +161,9 @@ public class CmpG extends Cmp {
     if(ex != this) return cc.replaceWith(this, ex);
 
     // rewrite equality comparisons (range expression or number)
-    ex = CmpR.get(this);
-    if(ex == this) ex = CmpSR.get(this);
-    if(ex != this) return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
+    ex = CmpR.get(this, cc);
+    if(ex == this) ex = CmpSR.get(this, cc);
+    if(ex != this) return cc.replaceWith(this, ex);
 
     if(op == OpG.EQ) {
       /* pre-evaluate equality test if:

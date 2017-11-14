@@ -123,7 +123,7 @@ public final class Try extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Try(info, expr.copy(cc, vm), Arr.copyAll(cc, vm, catches));
+    return copyType(new Try(info, expr.copy(cc, vm), Arr.copyAll(cc, vm, catches)));
   }
 
   @Override

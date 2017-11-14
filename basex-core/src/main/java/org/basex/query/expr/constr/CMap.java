@@ -30,9 +30,8 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final int el = exprs.length;
-
     // key type
+    final int el = exprs.length;
     Type key = null;
     for(int e = 0; e < el; e += 2) {
       final SeqType kst = exprs[e].seqType();
@@ -74,7 +73,7 @@ public final class CMap extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CMap(info, copyAll(cc, vm, exprs));
+    return copyType(new CMap(info, copyAll(cc, vm, exprs)));
   }
 
   @Override

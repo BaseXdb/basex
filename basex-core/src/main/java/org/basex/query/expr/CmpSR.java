@@ -14,6 +14,7 @@ import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -38,8 +39,9 @@ public final class CmpSR extends Single {
   private final byte[] max;
   /** Include maximum value. */
   private final boolean mxi;
+
   /** Flag for atomic evaluation. */
-  private final boolean atomic;
+  private boolean atomic;
 
   /**
    * Constructor.
@@ -60,8 +62,6 @@ public final class CmpSR extends Single {
     this.mni = mni;
     this.max = max;
     this.mxi = mxi;
-    final SeqType st = expr.seqType();
-    atomic = st.zeroOrOne() && !st.mayBeArray();
   }
 
   @Override
@@ -69,24 +69,34 @@ public final class CmpSR extends Single {
     return super.compile(cc).optimize(cc);
   }
 
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    final SeqType st = expr.seqType();
+    atomic = st.zeroOrOne() && !st.mayBeArray();
+    return expr instanceof Value ? cc.preEval(this) : this;
+  }
+
   /**
    * Tries to convert the specified expression into a range expression.
    * @param cmp expression to be converted
+   * @param cc compilation context
    * @return new or original expression
    * @throws QueryException query exception
    */
-  static ParseExpr get(final CmpG cmp) throws QueryException {
+  static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
     final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
     if(e1.has(Flag.NDT) || !(e2 instanceof AStr)) return cmp;
 
     final byte[] d = ((AStr) e2).string(cmp.info);
+    ParseExpr ex = null;
     switch(cmp.op.op) {
-      case GE: return new CmpSR(e1, d,    true,  null, true,  cmp.coll, cmp.info);
-      case GT: return new CmpSR(e1, d,    false, null, true,  cmp.coll, cmp.info);
-      case LE: return new CmpSR(e1, null, true,  d,    true,  cmp.coll, cmp.info);
-      case LT: return new CmpSR(e1, null, true,  d,    false, cmp.coll, cmp.info);
-      default: return cmp;
+      case GE: ex = new CmpSR(e1, d,    true,  null, true,  cmp.coll, cmp.info); break;
+      case GT: ex = new CmpSR(e1, d,    false, null, true,  cmp.coll, cmp.info); break;
+      case LE: ex = new CmpSR(e1, null, true,  d,    true,  cmp.coll, cmp.info); break;
+      case LT: ex = new CmpSR(e1, null, true,  d,    false, cmp.coll, cmp.info); break;
+      default:
     }
+    return ex != null ? ex.optimize(cc) : cmp;
   }
 
   @Override
@@ -174,7 +184,9 @@ public final class CmpSR extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CmpSR(expr.copy(cc, vm), min, mni, max, mxi, coll, info);
+    final CmpSR cmp = new CmpSR(expr.copy(cc, vm), min, mni, max, mxi, coll, info);
+    cmp.atomic = atomic;
+    return cmp;
   }
 
   @Override

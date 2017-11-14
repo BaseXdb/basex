@@ -105,7 +105,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TransformWith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
+    return copyType(new TransformWith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override

@@ -208,7 +208,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Switch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups));
+    return copyType(new Switch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups)));
   }
 
   @Override

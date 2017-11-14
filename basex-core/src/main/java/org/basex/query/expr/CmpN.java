@@ -109,7 +109,7 @@ public final class CmpN extends Cmp {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CmpN(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, info);
+    return copyType(new CmpN(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, info));
   }
 
   @Override
