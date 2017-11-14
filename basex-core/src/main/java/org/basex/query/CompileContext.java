@@ -186,11 +186,11 @@ public final class CompileContext {
     if(res != expr) {
       final byte[] exprString = QueryError.chop(Token.token(expr.toString()), null);
       final byte[] resString = QueryError.chop(Token.token(res.toString()), null);
-      final TokenBuilder tb = new TokenBuilder(res instanceof ParseExpr ? OPTREWRITE : OPTPRE);
-      tb.add(' ').add(expr.description()).add(" to ").add(res.description()).add(": ");
-      tb.add(exprString);
-      if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
-      info(tb.toString());
+      if(!Token.eq(exprString, resString)) {
+        final TokenBuilder tb = new TokenBuilder(res instanceof ParseExpr ? OPTREWRITE : OPTPRE);
+        tb.add(' ').add(expr.description()).add(" to ").add(res.description()).add(": ");
+        info(tb.add(" -> ").add(resString).add(exprString).toString());
+      }
 
       if(res instanceof ParseExpr) {
         // refine type. required mostly for {@link Filter} rewritings
