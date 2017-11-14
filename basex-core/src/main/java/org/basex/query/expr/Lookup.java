@@ -49,7 +49,7 @@ public final class Lookup extends Arr {
     if(!map && !array) return this;
 
     final boolean oneInput = expr.size() == 1;
-    SeqType st = ((FuncType) tp).declType;
+    final SeqType st = ((FuncType) tp).declType;
     Occ occ = st.occ;
     // map lookup may result in empty sequence
     if(map) occ = st.occ.union(Occ.ZERO);

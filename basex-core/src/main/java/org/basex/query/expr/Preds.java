@@ -121,7 +121,7 @@ public abstract class Preds extends Arr {
   private boolean add(final Expr expr, final ExprList list, final boolean pos,
       final CompileContext cc) {
 
-    boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
+    final boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
     if(expr == Bln.TRUE) {
       cc.info(OPTREMOVE_X_X, description(), expr);
     } else if(ps || !list.contains(expr) || expr.has(Flag.NDT)) {

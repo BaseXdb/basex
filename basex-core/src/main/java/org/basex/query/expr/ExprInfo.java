@@ -19,7 +19,7 @@ public abstract class ExprInfo {
   public String description() {
     final TokenBuilder tb = new TokenBuilder();
     boolean sep = false;
-    for(byte b : Token.token(Util.className(this))) {
+    for(final byte b : Token.token(Util.className(this))) {
       if(Character.isLowerCase(b)) {
         sep = true;
       } else if(sep) {
