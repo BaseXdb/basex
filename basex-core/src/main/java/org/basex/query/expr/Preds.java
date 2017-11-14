@@ -96,7 +96,7 @@ public abstract class Preds extends Arr {
         expr = ItrPos.get(l, info);
         // example: ....[0]
         if(!(expr instanceof ItrPos)) return cc.emptySeq(this);
-      } else if(expr.isValue()) {
+      } else if(expr instanceof Value) {
         expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
       }
 

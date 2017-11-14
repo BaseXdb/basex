@@ -60,7 +60,7 @@ public final class Try extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(expr.isValue()) return cc.replaceWith(this, expr);
+    if(expr instanceof Value) return cc.replaceWith(this, expr);
 
     SeqType st = expr.seqType();
     for(final Catch c : catches) {
@@ -101,7 +101,7 @@ public final class Try extends Single {
     try {
       final Expr sub = expr.inline(var, ex, cc);
       if(sub != null) {
-        if(sub.isValue()) return cc.replaceWith(this, sub);
+        if(sub instanceof Value) return cc.replaceWith(this, sub);
         expr = sub;
         change = true;
       }

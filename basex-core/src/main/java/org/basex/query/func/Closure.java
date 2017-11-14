@@ -300,7 +300,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       if(!declType.occ.check(1)) throw typeError(body, declType, null, info);
       final FuncItem fi = (FuncItem) body;
       checked = fi.coerceTo((FuncType) declType.type, qc, info, true);
-    } else if(body.isValue()) {
+    } else if(body instanceof Value) {
       // we can type check immediately
       final Value val = (Value) body;
       checked = declType.instance(val) ? val :

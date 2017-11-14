@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -56,7 +57,9 @@ public final class Where extends Clause {
   @Override
   public Where optimize(final CompileContext cc) throws QueryException {
     expr = expr.optimizeEbv(cc);
-    if(expr.isValue()) expr = cc.replaceWith(expr, Bln.get(expr.ebv(cc.qc, info).bool(info)));
+    if(expr instanceof Value && !(expr instanceof Bln)) {
+      expr = cc.replaceWith(expr, Bln.get(expr.ebv(cc.qc, info).bool(info)));
+    }
     return this;
   }
 

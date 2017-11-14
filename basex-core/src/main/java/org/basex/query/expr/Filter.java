@@ -124,19 +124,19 @@ public abstract class Filter extends Preds {
     for(final Expr expr : exprs) {
       ex = null;
       if(expr.isFunction(Function.LAST)) {
-        if(rt.isValue()) {
+        if(rt instanceof Value) {
           // value: replace with last item
-          ex = rt.value(cc.qc).itemAt(rt.size() - 1);
+          ex = ((Value) rt).itemAt(rt.size() - 1);
         } else {
           // rewrite positional predicate to util:last-from
           ex = cc.function(Function._UTIL_LAST_FROM, info, rt);
         }
       } else if(expr instanceof ItrPos) {
         final ItrPos pos = (ItrPos) expr;
-        if(rt.isValue()) {
+        if(rt instanceof Value) {
           // value: replace with sub-sequence
           final long s = pos.min - 1, l = Math.min(pos.max, rt.size()) - s;
-          ex = l <= 0 ? Empty.SEQ : rt.value(cc.qc).subSeq(s, l);
+          ex = l <= 0 ? Empty.SEQ : ((Value) rt).subSeq(s, l);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
           ex = cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));

@@ -57,8 +57,8 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate expression
-    if(cond.isValue()) {
-      final Value val = cc.qc.value(cond);
+    if(cond instanceof Value) {
+      final Value val = (Value) cond;
       for(final TypeswitchGroup tg : groups) {
         if(tg.matches(val)) {
           tg.opt(cc, val);

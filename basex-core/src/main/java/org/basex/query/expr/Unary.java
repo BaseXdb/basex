@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -47,7 +48,7 @@ public final class Unary extends Single {
 
     // no negation, numeric value: return operand
     return !minus && st.instanceOf(SeqType.NUM_ZO) ? cc.replaceWith(this, expr) :
-      expr.isValue() ? cc.preEval(this) : this;
+      expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override

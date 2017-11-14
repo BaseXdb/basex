@@ -48,7 +48,7 @@ public final class Cast extends Single {
     if(st.oneNoArray()) exprType.assign(Occ.ONE);
 
     // pre-evaluate value
-    if(expr.isValue()) return cc.preEval(this);
+    if(expr instanceof Value) return cc.preEval(this);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)

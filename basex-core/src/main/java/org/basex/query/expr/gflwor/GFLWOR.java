@@ -244,7 +244,7 @@ public final class GFLWOR extends ParseExpr {
     if(sz != -1 && !has(Flag.NDT)) {
       if(sz == 0) return cc.emptySeq(this);
       Expr rep = null;
-      if(ret.isValue()) {
+      if(ret instanceof Value) {
         // rewrite expression with next value as singleton sequence
         rep = SingletonSeq.get((Value) ret, sz / ret.size());
       } else if(!ret.has(Flag.CTX, Flag.POS) && !varsInReturn()) {
@@ -379,7 +379,7 @@ public final class GFLWOR extends ParseExpr {
 
           if(
             // inline simple values
-            expr.isValue()
+            expr instanceof Value
             // inline variable references without type checks
             || expr instanceof VarRef && !lt.var.checksType()
             // inline expressions that occur once, but do not...
@@ -539,12 +539,16 @@ public final class GFLWOR extends ParseExpr {
       if(!(clause instanceof Where) || clause.has(Flag.NDT)) continue;
       final Where where = (Where) clause;
 
-      if(where.expr.isValue()) {
-        if(!(where.expr instanceof Bln))
-          where.expr = Bln.get(where.expr.ebv(cc.qc, where.info).bool(where.info));
-
+      if(where.expr instanceof Value) {
+        final boolean bool;
+        if(where.expr instanceof Bln) {
+          bool = ((Bln) where.expr).bool(info);
+        } else {
+          bool = where.expr.ebv(cc.qc, where.info).bool(where.info);
+          where.expr = Bln.get(bool);
+        }
         // predicate is always false: no results possible
-        if(!((Item) where.expr).bool(null)) break;
+        if(!bool) break;
 
         // condition is always true
         clauses.remove(i--);

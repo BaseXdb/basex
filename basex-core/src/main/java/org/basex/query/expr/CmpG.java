@@ -11,6 +11,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -184,7 +185,7 @@ public class CmpG extends Cmp {
       }
 
       // use hash
-      if(coll == null && e2.isValue() && e2.size() > 1 &&
+      if(coll == null && e2 instanceof Value && e2.size() > 1 &&
           (t1.isNumber() && t2.isNumber() || t1.isStringOrUntyped() && t2.isStringOrUntyped())) {
         return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
       }

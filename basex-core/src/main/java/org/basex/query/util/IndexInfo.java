@@ -16,6 +16,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
@@ -115,7 +116,7 @@ public final class IndexInfo {
     if(data == null && !enforce()) return false;
 
     final ParseExpr root;
-    if(search.isValue()) {
+    if(search instanceof Value) {
       // loop through all items
       final Iter iter = qc.iter(search);
       final ArrayList<ValueAccess> tmp = new ArrayList<>();

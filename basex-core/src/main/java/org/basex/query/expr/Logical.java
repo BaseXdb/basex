@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -61,7 +62,7 @@ abstract class Logical extends Arr {
         // flatten nested expressions
         for(final Expr e : ((Logical) ex).exprs) list.add(e);
         cc.info(OPTFLAT_X_X, description(), ex);
-      } else if(ex.isValue()) {
+      } else if(ex instanceof Value) {
         // pre-evaluate values
         cc.info(OPTREMOVE_X_X, description(), expr);
         if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);

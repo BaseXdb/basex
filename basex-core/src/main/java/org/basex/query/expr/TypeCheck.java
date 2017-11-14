@@ -66,7 +66,7 @@ public final class TypeCheck extends Single {
     }
 
     // we can type check immediately
-    if(expr.isValue()) return cc.preEval(this);
+    if(expr instanceof Value) return cc.preEval(this);
 
     // check at each call
     if(at.type.instanceOf(st.type) && !expr.has(Flag.NDT)) {

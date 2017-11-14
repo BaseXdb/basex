@@ -47,7 +47,7 @@ public final class If extends Arr {
   public Expr compile(final CompileContext cc) throws QueryException {
     cond = cond.compile(cc);
     // choose branches to compile
-    final int[] branches = cond.isValue() ? new int[] { branch(cc.qc) } : new int[] { 0, 1 };
+    final int[] branches = cond instanceof Value ? new int[] { branch(cc.qc) } : new int[] { 0, 1 };
     for(final int b : branches) {
       try {
         exprs[b] = exprs[b].compile(cc);
@@ -63,7 +63,7 @@ public final class If extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     // static condition: return branch in question
     cond = cond.optimizeEbv(cc);
-    if(cond.isValue()) return cc.replaceWith(this, exprs[branch(cc.qc)]);
+    if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
     // if A then B else B -> B (errors in A will be ignored)
     if(exprs[0].equals(exprs[1])) return cc.replaceWith(this, exprs[0]);

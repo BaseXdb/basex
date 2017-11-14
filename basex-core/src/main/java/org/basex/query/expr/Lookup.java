@@ -42,7 +42,8 @@ public final class Lookup extends Arr {
 
     final Expr keys = exprs[0], expr = exprs[1];
     // guaranteed to be fully evaluated
-    if(keys.isValue() && (expr instanceof Map || expr instanceof Array)) return cc.preEval(this);
+    if(keys instanceof Value && (expr instanceof Map || expr instanceof Array))
+      return cc.preEval(this);
 
     final Type tp = expr.seqType().type;
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
@@ -66,7 +67,7 @@ public final class Lookup extends Arr {
         return cc.replaceWith(this, opt);
       }
 
-      if(keys.isValue()) {
+      if(keys instanceof Value) {
         // keys are constant, so we do not duplicate work in the inner loop
         final LinkedList<Clause> clauses = new LinkedList<>();
         final Var f = cc.vs().addNew(new QNm("f"), null, false, cc.qc, info);

@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -47,7 +48,7 @@ public final class UtilItemAt extends StandardFunc {
     if(st.zero()) return ex;
     exprType.assign(st.type);
 
-    if(pos.isValue()) {
+    if(pos instanceof Value) {
       final double dp = toDouble(pos, cc.qc);
       final long ps = (long) dp;
       // invalid positions

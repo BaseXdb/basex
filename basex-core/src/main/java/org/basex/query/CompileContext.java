@@ -265,7 +265,7 @@ public final class CompileContext {
     // root reference
     if(expr instanceof Root) return v instanceof ANode ? ((ANode) v).root() : v;
     // root is value: return root
-    if(expr.isValue()) return (Value) expr;
+    if(expr instanceof Value) return (Value) expr;
     // otherwise, return dummy node
     return dummy(expr);
   }

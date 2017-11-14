@@ -109,7 +109,7 @@ public final class FTWords extends FTExpr {
    */
   public FTWords init(final QueryContext qc, final FTOpt opt) throws QueryException {
     // pre-evaluate tokens, choose fast evaluation for default search options
-    if(query.isValue()) {
+    if(query instanceof Value) {
       tokens = tokens(qc);
       simple = mode == FTMode.ANY && occ == null;
     }

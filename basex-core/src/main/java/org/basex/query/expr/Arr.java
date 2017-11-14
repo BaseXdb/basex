@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -89,7 +90,9 @@ public abstract class Arr extends ParseExpr {
    * @return result of check
    */
   protected final boolean allAreValues() {
-    for(final Expr expr : exprs) if(!expr.isValue()) return false;
+    for(final Expr expr : exprs) {
+      if(!(expr instanceof Value)) return false;
+    }
     return true;
   }
 

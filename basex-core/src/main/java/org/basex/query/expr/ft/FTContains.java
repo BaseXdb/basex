@@ -81,8 +81,7 @@ public final class FTContains extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr == Empty.SEQ ? cc.replaceWith(this, Bln.FALSE) :
-      expr.isValue() && ftexpr.isValue() ? cc.preEval(this) : this;
+    return expr == Empty.SEQ ? cc.replaceWith(this, Bln.FALSE) : this;
   }
 
   @Override

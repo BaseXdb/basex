@@ -89,7 +89,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected boolean preEval() {
     for(final Expr expr : exprs) {
-      if(!expr.isValue() || expr.size() >= CompileContext.MAX_PREEVAL) return false;
+      if(!(expr instanceof Value) || expr.size() >= CompileContext.MAX_PREEVAL) return false;
     }
     return isSimple();
   }

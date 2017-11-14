@@ -92,7 +92,7 @@ public final class Let extends ForLet {
       }
     }
     // promote at compile time
-    if(expr.isValue() && var.checksType()) expr = var.checkType((Value) expr, cc.qc, true);
+    if(expr instanceof Value && var.checksType()) expr = var.checkType((Value) expr, cc.qc, true);
 
     // assign type to clause and variable
     if(!scoring) {

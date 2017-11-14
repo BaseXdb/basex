@@ -68,8 +68,7 @@ public final class StaticVar extends StaticDecl {
     }
 
     // by default, pre-evaluate deterministic, non-lazy expressions
-    if(expr.isValue() || !(lazy || expr.has(Flag.NDT)))
-      cc.replaceWith(expr, value(cc.qc));
+    if(expr instanceof Value || !(lazy || expr.has(Flag.NDT))) cc.replaceWith(expr, value(cc.qc));
   }
 
   /**

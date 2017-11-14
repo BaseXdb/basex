@@ -61,13 +61,13 @@ public final class Quantifier extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // return pre-evaluated result
-    if(expr.isValue()) return cc.preEval(this);
+    if(expr instanceof Value) return cc.preEval(this);
 
     // pre-evaluate satisfy clause if its return expression is a value and returned at least once
     // example: some $x in (1, 2) satisfies true() -> true()
     if(expr instanceof GFLWOR && !expr.has(Flag.NDT)) {
       final GFLWOR gflwor = (GFLWOR) expr;
-      if(gflwor.size() > 0 && gflwor.ret.isValue()) {
+      if(gflwor.size() > 0 && gflwor.ret instanceof Value) {
         final Value value = (Value) gflwor.ret;
         return cc.replaceWith(this, Bln.get(value.ebv(cc.qc, info).bool(info)));
       }

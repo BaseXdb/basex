@@ -36,7 +36,7 @@ public final class UtilReplicate extends StandardFunc {
     final Expr ex = exprs[0], mult = exprs[1];
 
     // pre-evaluate static multipliers
-    final long ps = mult.isValue() ? toLong(mult, cc.qc) : -1;
+    final long ps = mult instanceof Value ? toLong(mult, cc.qc) : -1;
     if(ps == 0 || ex == Empty.SEQ) return Empty.SEQ;
     if(ps == 1) return ex;
 

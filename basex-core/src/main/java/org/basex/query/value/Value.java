@@ -119,11 +119,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public abstract long atomSize();
 
-  @Override
-  public final boolean isValue() {
-    return true;
-  }
-
   /**
    * Returns a Java representation of the value.
    * @return Java object

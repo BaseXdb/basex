@@ -117,7 +117,7 @@ public abstract class SimpleMap extends Arr {
       // check if deterministic expressions with known result size can be removed
       // expression size is never 0 (empty expressions have no followers, see above)
       if(es != -1 && !ex.has(Flag.NDT)) {
-        if(next.isValue()) {
+        if(next instanceof Value) {
           // rewrite expression with next value as singleton sequence
           rep = SingletonSeq.get((Value) next, es);
         } else if(!next.has(Flag.CTX, Flag.POS)) {

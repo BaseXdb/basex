@@ -180,14 +180,6 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Tests if this is a value.
-   * @return result of check
-   */
-  public boolean isValue() {
-    return false;
-  }
-
-  /**
    * Returns the data reference bound to this expression. This method is currently overwritten
    * by {@link DBNode}, {@link DBNodeSeq}, {@link Path} and {@link VarRef}.
    * @return data reference (can be {@code null})
