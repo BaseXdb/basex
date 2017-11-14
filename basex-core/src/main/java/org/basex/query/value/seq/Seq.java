@@ -171,7 +171,7 @@ public abstract class Seq extends Value {
   public void plan(final FElem plan) {
     final FElem el = planElem(SIZE, size, TYPE, seqType());
     addPlan(plan, el);
-    for(int v = 0; v != Math.min(size, 5); ++v) itemAt(v).plan(el);
+    for(int v = 0; v != Math.min(size, 3); ++v) itemAt(v).plan(el);
   }
 
   @Override

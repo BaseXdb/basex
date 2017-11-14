@@ -2,10 +2,14 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
@@ -72,26 +76,22 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // rewrite path with empty steps
-    for(final Expr expr : exprs) {
-      if(expr == Empty.SEQ) return cc.emptySeq(this);
-    }
-
     // compute result size
-    final ExprList list = new ExprList(exprs.length);
+    ExprList list = new ExprList(exprs.length);
     long min = 1, max = 1;
     boolean it = true;
     for(final Expr expr : exprs) {
+      // no results: skip evaluation of remaining expressions
       if(max == 0) break;
       list.add(expr);
-      final long s = expr.size();
-      if(s == 0) {
+      final long es = expr.size();
+      if(es == 0) {
         min = 0;
         max = 0;
-      } else if(s > 0) {
-        min *= s;
-        if(max != -1) max *= s;
-        if(s > 1) it = false;
+      } else if(es > 0) {
+        min *= es;
+        if(max != -1) max *= es;
+        if(es > 1) it = false;
       } else {
         final Occ o = expr.seqType().occ;
         if(o.min == 0) min = 0;
@@ -101,20 +101,52 @@ public abstract class SimpleMap extends Arr {
         }
       }
     }
-    final int es = list.size();
-    if(exprs.length != es) {
-      if(es == 1) return cc.replaceWith(this, list.get(0));
+    if(exprs.length != list.size()) {
       cc.info(OPTSIMPLE_X, this);
       exprs = list.finish();
     }
     exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
 
-    // single items: use item mapper; only values: pre-evaluate
-    final long sz = exprType.size();
-    return sz == 0 && !has(Flag.NDT) ? cc.emptySeq(this) :
-      it ? copyType(new ItemMap(info, exprs)).optimize(cc) :
-      allAreValues() && sz <= CompileContext.MAX_PREEVAL ?
-      cc.preEval(this) : this;
+    // simplify static expressions
+    int e = 0;
+    final int el = exprs.length;
+    for(int n = 1; n < el; n++) {
+      final Expr ex = exprs[e], next = exprs[n];
+      final long es = ex.size();
+      Expr rep = null;
+      // check if deterministic expressions with known result size can be removed
+      // expression size is never 0 (empty expressions have no followers, see above)
+      if(es != -1 && !ex.has(Flag.NDT)) {
+        if(next.isValue()) {
+          // rewrite expression with next value as singleton sequence
+          rep = SingletonSeq.get((Value) next, es);
+        } else if(!next.has(Flag.CTX, Flag.POS)) {
+          // skip expression that relies on the context
+          if(es == 1) {
+            // replace expression with next expression
+            rep = next;
+          } else if(!next.has(Flag.NDT, Flag.CNS)) {
+            // replace expression with replicated expression
+            rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+          }
+        }
+      }
+      if(rep != null) {
+        exprs[e] = cc.replaceWith(ex, rep);
+      } else if(!(next instanceof ContextValue)) {
+        exprs[++e] = exprs[n];
+      }
+    }
+    if(++e != el) exprs = Arrays.copyOf(exprs, e);
+
+    // single expression: return this expression
+    if(e == 1) return exprs[0];
+    // no results, deterministic expressions: return empty sequence
+    if(exprType.isEmpty() && !has(Flag.NDT)) return cc.emptySeq(this);
+    // item-based iteration
+    if(it) return copyType(new ItemMap(info, exprs)).optimize(cc);
+    // default evaluation
+    return this;
   }
 
   @Override
@@ -170,9 +202,9 @@ public abstract class SimpleMap extends Arr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder().append('(');
-    for(final Expr s : exprs) {
+    for(final Expr ex : exprs) {
       if(sb.length() != 1) sb.append(" ! ");
-      sb.append(s);
+      sb.append(ex);
     }
     return sb.append(')').toString();
   }

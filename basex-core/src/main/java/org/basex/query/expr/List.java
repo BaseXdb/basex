@@ -72,7 +72,7 @@ public final class List extends Arr {
     if(size > -1) {
       exprType.assign(type, size);
     } else {
-      exprType.assign(type, zero ? Occ.ZERO_MORE : Occ.ZERO_MORE);
+      exprType.assign(type, zero ? Occ.ZERO_MORE : Occ.ONE_MORE);
     }
 
     // pre-evaluate list

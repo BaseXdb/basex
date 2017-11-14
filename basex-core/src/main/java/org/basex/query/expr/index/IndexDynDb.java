@@ -105,7 +105,7 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public String toString() {
-    return expr.toString();
+  public Expr source() {
+    return expr;
   }
 }

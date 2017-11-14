@@ -1,8 +1,12 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
@@ -87,6 +91,23 @@ public final class SingletonSeq extends Seq {
   @Override
   public Item itemAt(final long pos) {
     return value.itemAt(pos % value.size());
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    final FElem el = planElem(SIZE, size, TYPE, seqType());
+    addPlan(plan, el);
+    value.plan(el);
+  }
+
+  @Override
+  public String description() {
+    return "singleton " + super.description();
+  }
+
+  @Override
+  public String toString() {
+    return _UTIL_REPLICATE.args(value, size / value.size()).substring(1);
   }
 
   // STATIC METHODS =====================================================================

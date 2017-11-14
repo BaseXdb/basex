@@ -89,6 +89,6 @@ public final class StrStream extends AStr {
 
   @Override
   public String toString() {
-    return value != null ? toString(value) : Util.info(Function._FILE_READ_TEXT.args(input));
+    return value != null ? toString(value) : Function._FILE_READ_TEXT.args(input).substring(1);
   }
 }

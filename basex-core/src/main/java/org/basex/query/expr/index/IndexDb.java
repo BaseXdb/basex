@@ -38,6 +38,12 @@ public abstract class IndexDb extends ParseExpr {
    */
   public abstract Data data(QueryContext qc, IndexType type) throws QueryException;
 
+  /**
+   * Source expression.
+   * @return source expression
+   */
+  public abstract Expr source();
+
   @Override
   public abstract IndexDb inline(Var var, Expr ex, CompileContext cc) throws QueryException;
 
@@ -52,5 +58,10 @@ public abstract class IndexDb extends ParseExpr {
   @Override
   public final boolean iterable() {
     return iterable;
+  }
+
+  @Override
+  public final String toString() {
+    return source().toString();
   }
 }

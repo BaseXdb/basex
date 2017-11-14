@@ -144,9 +144,8 @@ public final class RangeSeq extends Seq {
 
   @Override
   public String toString() {
-    final long s = asc ? start : start - size + 1;
-    final long e = asc ? start + size - 1 : start;
+    final long s = asc ? start : start - size + 1, e = asc ? start + size - 1 : start;
     final String str = PAREN1 + s + ' ' + TO + ' ' + e + PAREN2;
-    return asc ? str : Function.REVERSE.args(str);
+    return asc ? str : Function.REVERSE.args(' ' + str).substring(1);
   }
 }

@@ -583,14 +583,6 @@ public final class SeqType {
   }
 
   /**
-   * Returns the result size, or {@code -1} if the exact size is unknown.
-   * @return result size
-   */
-  public long size() {
-    return zero() ? 0 : one() ? 1 : -1;
-  }
-
-  /**
    * Tests if the type yields at most one item.
    * @return result of check
    */

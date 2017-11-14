@@ -125,7 +125,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public void refineType(final SeqType st, final CompileContext cc) throws QueryException {
-    refineType(st, st.size(), cc);
+    refineType(st, st.zero() ? 0 : st.one() ? 1 : -1, cc);
   }
 
   /**

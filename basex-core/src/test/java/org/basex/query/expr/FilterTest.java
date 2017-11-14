@@ -10,9 +10,7 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FilterTest extends AdvancedQueryTest {
-  /**
-   * Filter expressions with a single predicate.
-   */
+  /** Filter expressions with a single predicate. */
   @Test public void onePredicate() {
     // empty sequence
     query("()['x']", "");
@@ -53,9 +51,7 @@ public final class FilterTest extends AdvancedQueryTest {
     query("((1 to 2) ! <a b='{.}'/>)[last()]", "<a b=\"2\"/>");
   }
 
-  /**
-   * Filter expressions with two predicates (the last being a positional one).
-   */
+  /** Filter expressions with two predicates (the last being a positional one). */
   @Test public void singlePosAsLastPredicate() {
     // empty sequence
     query("()['x'][1]", "");
@@ -96,9 +92,7 @@ public final class FilterTest extends AdvancedQueryTest {
     query("((1 to 2) ! <a b='{.}'/>)[last()][1]", "<a b=\"2\"/>");
   }
 
-  /**
-   * Filter expressions with two predicates (the first being a positional one).
-   */
+  /** Filter expressions with two predicates (the first being a positional one). */
   @Test public void singlePosAsFirstPredicate() {
     // empty sequence
     query("()[1]['x']", "");
@@ -137,9 +131,7 @@ public final class FilterTest extends AdvancedQueryTest {
     query("((1 to 2) ! <a b='{.}'/>)[1][last()]", "<a b=\"1\"/>");
   }
 
-  /**
-   * Filter expressions with two predicates (the last being a positional one).
-   */
+  /** Filter expressions with two predicates (the last being a positional one). */
   @Test public void multiplePosAsLastPredicate() {
     // empty sequence
     query("()['x'][position() = 1 to 2]", "");
@@ -181,9 +173,7 @@ public final class FilterTest extends AdvancedQueryTest {
     query("((1 to 2) ! <a b='{.}'/>)[last()][position() = 1 to 2]", "<a b=\"2\"/>");
   }
 
-  /**
-   * Filter expressions with two predicates (the first being a positional one).
-   */
+  /** Filter expressions with two predicates (the first being a positional one). */
   @Test public void variablePosAsFirstPredicate() {
     // empty sequence
     query("for $i in 1 to 2 return ()[$i]['x']", "");
@@ -226,9 +216,7 @@ public final class FilterTest extends AdvancedQueryTest {
         "<a b=\"1\"/>\n<a b=\"2\"/>");
   }
 
-  /**
-   * Filter expressions with two predicates (the last being a positional one).
-   */
+  /** Filter expressions with two predicates (the last being a positional one). */
   @Test public void variablePosAsLastPredicate() {
     // empty sequence
     query("for $i in 1 to 2 return ()['x'][$i]", "");
@@ -271,9 +259,7 @@ public final class FilterTest extends AdvancedQueryTest {
     query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[last()][$i]", "<a b=\"2\"/>");
   }
 
-  /**
-   * Variable predicates.
-   */
+  /** Variable predicates. */
   @Test public void variablePreds() {
     // empty sequence
     query("for $i in (1,'a',2) return <a b='{$i}'/>[$i]", "<a b=\"1\"/>\n<a b=\"a\"/>");
@@ -284,9 +270,7 @@ public final class FilterTest extends AdvancedQueryTest {
         "<a b=\"1\"/>\n<a b=\"a\"/>");
   }
 
-  /**
-   * Start position.
-   */
+  /** Start position. */
   @Test public void startPos() {
     query("(<a/>,<b/>)[position() > 1]", "<b/>");
     query("(<a/>,<b/>,<c/>)[position() > 2]", "<c/>");

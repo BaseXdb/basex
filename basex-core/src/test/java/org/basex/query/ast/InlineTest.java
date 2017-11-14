@@ -1,5 +1,7 @@
 package org.basex.query.ast;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -31,8 +33,8 @@ public final class InlineTest extends QueryPlanTest {
     check("let $x := 42 return switch(42) case 23 return $x case 84 return $x" +
         " case $x return 123 default return 1337", 123, empty(GFLWOR.class));
     // $x is used twice
-    check("let $x := <x/> ! 42 return switch(23) case $x return 123 case 23 return $x" +
-        " default return 1337", 42, exists(GFLWOR.class));
+    check("let $x := <x/> return switch(23) case $x return 123 case 23 return $x" +
+        " default return 1337", "<x/>", exists(GFLWOR.class));
   }
 
   /** Regression test for Issue GH-738, "switch with contains". */
@@ -90,10 +92,10 @@ public final class InlineTest extends QueryPlanTest {
     check("let $d := for-each(1 to 100, function($a) { $a }) "
         + "return count((1 to 2) ! $d)",
         200,
-        exists(Let.class));
+        exists(_UTIL_REPLICATE.clazz));
     check("let $d := for-each(1 to 10, function($a) { $a }) return count((1 to 2) ! $d[1])",
         2,
-        exists(IterMap.class));
+        exists(_UTIL_REPLICATE.clazz));
     check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
         "<x/>\n<x/>",
         empty(ContextValue.class));
@@ -101,7 +103,8 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Simple map operator. */
   @Test public void gh1094() {
-    check("for $d in (true(), false()) where <a/>!<b/>!$d return $d", true, exists(Where.class));
+    check("for $d in (true(), false()) where boolean(<a/>!(.,.)!(.,.)) return $d", "true\nfalse",
+        exists(If.class));
     check("let $a := <a/> return 'bar' ! . ! $a", "<a/>", exists(Let.class));
   }
 
@@ -138,9 +141,9 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Checks that window clauses are recognized as loops. */
   @Test public void gh1126() {
-    check("let $s := (1 to 2) ! . "
+    check("let $s := 1 ! <a>{ . }</a> "
         + "for tumbling window $w in 1 to 2 start when true() end when true() return $s",
-        "1\n2\n1\n2",
+        "<a>1</a>\n<a>1</a>",
         count("Let", 1),
         count("Window", 1),
         "//Let << //Window");

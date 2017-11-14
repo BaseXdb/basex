@@ -102,8 +102,8 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void noLoopTest() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
-        "let $f := local:Y(function($x) { $x() }) return ($f ! .)[2]",
-        "",
+        "let $f := local:Y(function($x) { $x() }) return ($f ! .)[1]",
+        "(anonymous-function)#1",
         exists(FuncItem.class)
     );
   }
@@ -135,8 +135,8 @@ public final class FuncItemTest extends QueryPlanTest {
         "declare function local:bar($f) { $f(function($_) { $f }) };" +
         "let $a := local:foo(local:foo(function($e) { $e() })) " +
         "let $b := local:bar($a) " +
-        "return ($b ! .)[2]",
-        "",
+        "return ($b ! .)[1]",
+        "(anonymous-function)#1",
         exists(FuncItem.class)
     );
   }

@@ -5,6 +5,7 @@ import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -107,7 +108,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public String toString() {
-    return '"' + data.meta.name + '"';
+  public Expr source() {
+    return Str.get(data.meta.name);
   }
 }

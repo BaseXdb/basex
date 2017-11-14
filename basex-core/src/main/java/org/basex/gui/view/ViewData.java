@@ -58,7 +58,7 @@ public final class ViewData {
 
     final byte[] doc = text(data, p, true);
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(doc)));
+    tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(doc)).substring(1));
     for(int i = il.size() - 1; i >= 0; i--) {
       tb.add('/').add(text(data, il.get(i), true));
     }

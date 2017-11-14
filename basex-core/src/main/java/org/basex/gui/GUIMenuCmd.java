@@ -977,11 +977,11 @@ public enum GUIMenuCmd implements GUICommand {
 
   /**
    * Returns a database function for the first node in a node set.
-   * @param n node set
-   * @param i offset
+   * @param nodes node set
+   * @param index node index
    * @return function string
    */
-  private static String openPre(final DBNodes n, final int i) {
-    return Function._DB_OPEN_PRE.toString(Str.get(n.data().meta.name), Int.get(n.pre(i)));
+  private static String openPre(final DBNodes nodes, final int index) {
+    return Function._DB_OPEN_PRE.args(Str.get(nodes.data().meta.name), Int.get(nodes.pre(index)));
   }
 }

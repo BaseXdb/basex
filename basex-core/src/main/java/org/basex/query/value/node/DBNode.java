@@ -468,7 +468,7 @@ public class DBNode extends ANode {
    * @return string
    */
   private String toString(final boolean func) {
-    if(func) return Function._DB_OPEN_PRE.args(data.meta.name, pre);
+    if(func) return Function._DB_OPEN_PRE.args(data.meta.name, pre).substring(1);
 
     final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
     switch((NodeType) type) {

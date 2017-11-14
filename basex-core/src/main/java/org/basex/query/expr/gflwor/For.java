@@ -157,7 +157,7 @@ public final class For extends ForLet {
    * @return {@code true} if the clause was converted, {@code false} otherwise
    */
   boolean asLet(final List<Clause> clauses, final int p) {
-    if(expr.size() != 1 && !expr.seqType().one()) return false;
+    if(!expr.seqType().one()) return false;
     clauses.set(p, Let.fromFor(this));
     if(score != null) clauses.add(p + 1, Let.fromForScore(this));
     if(pos != null) clauses.add(p + 1, new Let(pos, Int.ONE, false));
@@ -189,7 +189,7 @@ public final class For extends ForLet {
    * @throws QueryException query exception
    */
   public boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
-    if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;
+    if(empty || !(vars().length == 1 && ex.uses(var) && ex.removable(var))) return false;
 
     // reset context value (will not be accessible in predicate)
     Expr pred = ex;

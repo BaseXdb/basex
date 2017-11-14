@@ -21,9 +21,9 @@ public final class UtilReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = qc.value(exprs[0]);
-    final long pos = toLong(exprs[1], qc);
-    if(pos < 0) throw UTIL_NEGATIVE_X.get(info, pos);
-    return SingletonSeq.get(value, pos);
+    final long mult = toLong(exprs[1], qc);
+    if(mult < 0) throw UTIL_NEGATIVE_X.get(info, mult);
+    return SingletonSeq.get(value, mult);
   }
 
   @Override

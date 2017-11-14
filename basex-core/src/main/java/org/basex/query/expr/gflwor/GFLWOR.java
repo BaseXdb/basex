@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -141,8 +142,8 @@ public final class GFLWOR extends ParseExpr {
       changed |= slideLetsOut(cc);
       // inline let expressions if they are used only once (and not in a loop)
       changed |= inlineLets(cc);
-      // remove unused variables
-      changed |= removeVars(cc);
+      // rewrite clauses with unused variables
+      changed |= unusedVars(cc);
       // clean unused variables from group-by and order-by expression
       changed |= cleanDeadVars();
       // include the clauses of nested FLWR expressions into this one
@@ -238,7 +239,25 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     calcSize();
-    if(exprType.isEmpty() && !has(Flag.NDT)) return cc.emptySeq(this);
+
+    final long sz = size();
+    if(sz != -1 && !has(Flag.NDT)) {
+      if(sz == 0) return cc.emptySeq(this);
+      Expr rep = null;
+      if(ret.isValue()) {
+        // rewrite expression with next value as singleton sequence
+        rep = SingletonSeq.get((Value) ret, sz / ret.size());
+      } else if(!ret.has(Flag.CTX, Flag.POS) && !varsInReturn()) {
+        // skip expression that relies on the context
+        if(sz == 1) {
+          rep = ret;
+        } else if(!ret.has(Flag.NDT, Flag.CNS)) {
+          // replace expression with replicated expression
+          rep = cc.function(Function._UTIL_REPLICATE, info, ret, Int.get(sz / ret.size()));
+        }
+      }
+      if(rep != null) return cc.replaceWith(this, rep);
+    }
 
     if(clauses.getFirst() instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
@@ -247,6 +266,19 @@ public final class GFLWOR extends ParseExpr {
     }
 
     return this;
+  }
+
+  /**
+   * Checks if the return clause references variables from this FLWOR expression.
+   * @return result of check
+   */
+  private boolean varsInReturn() {
+    for(final Clause clause : clauses) {
+      for(final Var v : clause.vars()) {
+        if(ret.count(v) != VarUsage.NEVER) return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -263,7 +295,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Tries to convert for clauses that iterate ver a single item into let bindings.
+   * Tries to convert for clauses that iterate over a single item into let bindings.
    * @param cc compilation context
    * @return change flag
    */
@@ -280,18 +312,19 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Remove unused variables.
+   * Removes unused variables or simplifies their expressions.
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean removeVars(final CompileContext cc) throws QueryException {
+  private boolean unusedVars(final CompileContext cc) throws QueryException {
     boolean changed = false;
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) {
       final int pos = iter.nextIndex();
       final Clause clause = iter.next();
       if(clause instanceof Let) {
+        // completely remove let clause
         final Let lt = (Let) clause;
         if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT)) {
           cc.info(QueryText.OPTVAR_X, lt.var);
@@ -301,15 +334,23 @@ public final class GFLWOR extends ParseExpr {
           changed = true;
         }
       } else if(clause instanceof For) {
-        final For f = (For) clause;
-        if(f.score != null && count(f.score, pos) == VarUsage.NEVER) {
-          cc.info(QueryText.OPTVAR_X, f.score);
-          f.score = null;
+        // replace deterministic expression with cheaper singleton sequence
+        final For fr = (For) clause;
+        final long fs = fr.expr.size();
+        if(fs > 1 && fr.var.declType == null && !(fr.expr instanceof SingletonSeq) &&
+            !fr.has(Flag.NDT) && count(fr.var, pos + 1) == VarUsage.NEVER) {
+          fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.ZERO, fs));
           changed = true;
         }
-        if(f.pos != null && count(f.pos, pos) == VarUsage.NEVER) {
-          cc.info(QueryText.OPTVAR_X, f.pos);
-          f.pos = null;
+        // remove scoring and positional variable in for clauses
+        if(fr.score != null && count(fr.score, pos) == VarUsage.NEVER) {
+          cc.info(QueryText.OPTVAR_X, fr.score);
+          fr.score = null;
+          changed = true;
+        }
+        if(fr.pos != null && count(fr.pos, pos) == VarUsage.NEVER) {
+          cc.info(QueryText.OPTVAR_X, fr.pos);
+          fr.pos = null;
           changed = true;
         }
       }
@@ -318,7 +359,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Inline let expressions if they are used only once (and not in a loop).
+   * Inlines let expressions if they are used only once (and not in a loop).
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
@@ -341,7 +382,7 @@ public final class GFLWOR extends ParseExpr {
             expr.isValue()
             // inline variable references without type checks
             || expr instanceof VarRef && !lt.var.checksType()
-            // inline expressions that occur once, but don't...
+            // inline expressions that occur once, but do not...
             // - access context  (e.g. let $x := . return <a/>[$x = 1]), or
             // - construct nodes (e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>)
             || count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CTX, Flag.CNS)
@@ -376,7 +417,7 @@ public final class GFLWOR extends ParseExpr {
         final Clause clause = iter.next();
         final boolean isFor = clause instanceof For, isLet = clause instanceof Let;
         if(isFor) {
-          // for $x in (for $y in A (...) return B)  ===>  for $y in A (...) for $x in B
+          // for $x in (for $y in A (...) return B)  ==>  for $y in A (...) for $x in B
           final For fr = (For) clause;
           if(!fr.empty && fr.pos == null && fr.expr instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) fr.expr;
@@ -392,7 +433,7 @@ public final class GFLWOR extends ParseExpr {
         }
 
         if(!thisRound && (isFor || isLet)) {
-          // let $x := (let $y := E return F)  ===>  let $y := E let $x := F
+          // let $x := (let $y := E return F)  ==>  let $y := E let $x := F
           final Expr ex = isFor ? ((For) clause).expr : ((Let) clause).expr;
           if(ex instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) ex;
@@ -425,9 +466,11 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean cleanDeadVars() {
     final IntObjMap<Var> decl = new IntObjMap<>();
-    final BitArray used = new BitArray();
+    for(final Clause clause : clauses) {
+      for(final Var v : clause.vars()) decl.put(v.id, v);
+    }
 
-    for(final Clause clause : clauses) for(final Var v : clause.vars()) decl.put(v.id, v);
+    final BitArray used = new BitArray();
     final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
@@ -449,8 +492,8 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Optimization pass which tries to slide let expressions out of loops. Care is taken
-   * that no unnecessary relocations are done.
+   * Tries to slide let expressions out of loops.
+   * Care is taken that no unnecessary relocations are done.
    * @param cc compilation context
    * @return {@code true} if there were relocations, {@code false} otherwise
    */
@@ -527,8 +570,8 @@ public final class GFLWOR extends ParseExpr {
         for(int b4 = newPos; --b4 >= 0;) {
           final Clause before = clauses.get(b4);
           if(before instanceof For) {
-            final For f = (For) before;
-            if(f.toPredicate(cc, where.expr)) {
+            final For fr = (For) before;
+            if(fr.toPredicate(cc, where.expr)) {
               fors.add((For) before);
               clauses.remove(newPos);
               i--;
@@ -542,13 +585,13 @@ public final class GFLWOR extends ParseExpr {
       }
     }
     // trigger optimizations on rewritten expressions
-    for(final For f : fors) f.expr = f.expr.optimize(cc);
+    for(final For fr : fors) fr.expr = fr.expr.optimize(cc);
     if(changed) cc.info(QueryText.OPTWHERE);
     return changed;
   }
 
   /**
-   * Rewrite positional variables to predicates.
+   * Rewrites positional variables to predicates.
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
@@ -566,9 +609,8 @@ public final class GFLWOR extends ParseExpr {
       for(int i = c + 1; i < clauses.size(); i++) {
         final Clause cl = clauses.get(i);
         if(!(cl instanceof Where)) {
-          // stop if clause is no for or let expression, is non-deterministic, or updating
-          if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT))
-            break;
+          // stop if clause is no for or let expression or non-deterministic
+          if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
           continue;
         }
         final Where w = (Where) cl;
@@ -579,6 +621,8 @@ public final class GFLWOR extends ParseExpr {
         // remove clause and ensure that the positional variable is only used once
         clauses.remove(i);
         if(count(pos.pos, c) == VarUsage.NEVER) {
+          /* OLD: for $v at $pos in E where $pos = P ...
+           * NEW: for $v in E[position() = P] ... */
           pos.addPredicate(ItrPos.get(cmp));
           pos.expr = pos.expr.optimize(cc);
           cc.info(QueryText.OPTPRED_X, cmp);
@@ -593,7 +637,9 @@ public final class GFLWOR extends ParseExpr {
     return changed;
   }
 
-  /** Merges consecutive {@code where} clauses. */
+  /**
+   * Merges consecutive {@code where} clauses.
+   */
   private void mergeWheres() {
     Where before = null;
     final Iterator<Clause> iter = clauses.iterator();
@@ -847,7 +893,7 @@ public final class GFLWOR extends ParseExpr {
    */
   public abstract static class Clause extends ParseExpr {
     /** All variables declared in this clause. */
-    final Var[] vars;
+    private final Var[] vars;
 
     /**
      * Constructor.

@@ -107,7 +107,7 @@ public class DBNodeSeq extends NativeSeq {
     final StringBuilder sb = new StringBuilder(PAREN1);
     for(int i = 0; i < size; ++i) {
       sb.append(i == 0 ? "" : SEP);
-      sb.append(_DB_OPEN_PRE.args(data.meta.name, pres[i]));
+      sb.append(_DB_OPEN_PRE.args(data.meta.name, pres[i]).substring(1));
       if(sb.length() <= 16 || i + 1 == size) continue;
       // output is chopped to prevent too long error strings
       sb.append(SEP).append(DOTS);
