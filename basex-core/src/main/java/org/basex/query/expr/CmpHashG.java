@@ -57,13 +57,11 @@ public final class CmpHashG extends CmpG {
       CmpCache cache = caches.get();
       if(cache == null) {
         cache = new CmpCache();
-        cache.value = val2;
-        cache.iter = iter2;
         caches.set(cache);
       }
 
-      // check if caching is successful (i.e., if same value is cached)
-      if(cache.value == val2) {
+      // check if caching is enabled
+      if(cache.active(val2, iter2)) {
         final HashItemSet set = cache.set;
         Iter ir2 = cache.iter;
 
@@ -71,7 +69,10 @@ public final class CmpHashG extends CmpG {
         for(Item it1; (it1 = iter1.next()) != null;) {
           qc.checkStop();
           // check if item has already been cached
-          if(set.contains(it1, info)) return Bln.TRUE;
+          if(set.contains(it1, info)) {
+            cache.hits++;
+            return Bln.TRUE;
+          }
 
           // cache remaining items (stop after first hit)
           if(ir2 != null) {
@@ -87,10 +88,6 @@ public final class CmpHashG extends CmpG {
         }
         return Bln.FALSE;
       }
-
-      // if cached value differs, skip hashing
-      cache.value = null;
-      cache.set = null;
     }
     return super.compare(iter1, iter2, is1, is2, qc);
   }
@@ -110,12 +107,42 @@ public final class CmpHashG extends CmpG {
    * @author BaseX Team 2005-17, BSD License
    * @author Christian Gruen
    */
-  private static final class CmpCache {
+  private final class CmpCache {
     /** Cached items. */
     private HashItemSet set = new HashItemSet(true);
     /** Cached value (right-hand operand). */
     private Value value;
     /** Lazy iterator (right-hand operand). */
     private Iter iter;
+    /** Cache hits. */
+    private int hits = Integer.MAX_VALUE;
+
+    /**
+     * Checks if caching is enabled. Assigns values required for caching.
+     * @param val value
+     * @param ir iterator
+     * @return result of check
+     */
+    private boolean active(final Value val, final Iter ir) {
+      // check if caching was dismissed
+      if(set == null) return false;
+
+      // check if this is the first call, of if the value to be cached has changed
+      if(value != val) {
+        // no cache hits: dismiss caching
+        if(hits < 1) {
+          set = null;
+          value = null;
+          iter = null;
+          return false;
+        }
+        // create new cache
+        set = new HashItemSet(true);
+        value = val;
+        iter = ir;
+        hits = 0;
+      }
+      return true;
+    }
   }
 }

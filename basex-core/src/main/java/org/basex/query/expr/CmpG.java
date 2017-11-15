@@ -146,18 +146,13 @@ public class CmpG extends Cmp {
     final Expr ex1 = exprs[0], ex2 = exprs[1];
     final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
-    if(ex == this) {
-      if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
-        ex = new CmpSimpleG(ex1, ex2, op, coll, sc, info);
-      }
-    }
+    if(ex == this && st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray())
+      ex = new CmpSimpleG(ex1, ex2, op, coll, sc, info);
+
     // hash-based comparisons
-    if(ex == this) {
-      if(op == OpG.EQ && coll == null && ((t1.isStringOrUntyped() && t2.isStringOrUntyped()) ||
-          t1.isNumber() && t2.isNumber()) && ex2.size() != 1) {
-        ex = new CmpHashG(ex1, ex2, op, coll, sc, info);
-      }
-    }
+    if(ex == this && op == OpG.EQ && coll == null && (t1.isNumber() && t2.isNumber() ||
+        (t1.isStringOrUntyped() && t2.isStringOrUntyped())) && !st2.zeroOrOne())
+      ex = new CmpHashG(ex1, ex2, op, coll, sc, info);
 
     // pre-evaluate values or return expression
     return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
