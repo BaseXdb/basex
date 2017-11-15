@@ -48,6 +48,7 @@ public final class SimpleMapTest extends QueryPlanTest {
     query("5 ! string(.)", "5");
     query("(1,2) ! position()", "1\n2");
     query("(1,2) ! last()", "2\n2");
+    query("map {} ! head(?_) ! string()", "");
 
     final String nomap = empty("*[contains(name(), 'Map')]");
     check("1 ! .", 1, nomap);

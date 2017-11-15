@@ -35,7 +35,7 @@ final class ItemMap extends SimpleMap {
     qc.focus = focus;
     try {
       final int el = exprs.length;
-      for(int e = 1; e < el; e++) {
+      for(int e = 1; e < el && result != null; e++) {
         focus.value = result;
         result = exprs[e].item(qc, ii);
       }
