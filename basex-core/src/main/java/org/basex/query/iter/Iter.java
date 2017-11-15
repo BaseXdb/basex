@@ -13,15 +13,15 @@ import org.basex.query.value.seq.*;
  */
 public abstract class Iter {
   /**
-   * Returns the next item or {@code null} if no other items are found.
-   * @return resulting item or {@code null}
+   * Returns the next item.
+   * @return resulting item, or {@code null} if all items have been returned
    * @throws QueryException query exception
    */
   public abstract Item next() throws QueryException;
 
   /**
    * Returns the specified item, or an arbitrary item if the index is invalid.
-   * If this method is implemented by an iterator, {@link #size()} needs to be implemented as well.
+   * If this method returns items, {@link #size()} needs to be implemented as well.
    * @param i value offset
    * @return specified item
    * @throws QueryException query exception
@@ -32,8 +32,8 @@ public abstract class Iter {
   }
 
   /**
-   * Returns the iterator size. Note: {@code -1} is returned if the result size is unknown. If this
-   * method is implemented by an iterator, {@link #get(long)} needs to be implemented as well.
+   * Returns the iterator size. {@code -1} is returned if the result size is unknown.
+   * If this method returns a positive value, {@link #get(long)} needs to be implemented as well.
    * @return number of entries
    */
   public long size() {
@@ -41,18 +41,18 @@ public abstract class Iter {
   }
 
   /**
-   * Indicates if the iterator is based on a value, and if the result size is known.
-   * @return result of check
+   * If available, returns a value on which the iterator is based on.
+   * @return value or {@code null}
    */
-  public boolean hasValue() {
-    return false;
+  public Value value() {
+    return null;
   }
 
   /**
-   * Returns a value with all iterated items.
-   * Must only be called if {@link #next()} has not been called before.
+   * Returns a value with all iterated items. This method returns all items
+   * that have not been requested yet, or all values if the result size is known.
    * @param qc query context
-   * @return sequence
+   * @return value
    * @throws QueryException query exception
    */
   public Value value(final QueryContext qc) throws QueryException {

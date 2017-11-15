@@ -73,14 +73,14 @@ public final class FnDistinctValues extends StandardFunc {
       exprType.assign(t);
       simple = st.zeroOrOne();
     }
-    return exprs.length == 1 ? cmpDist(ex, cc) : this;
+    return ex instanceof RangeSeq ? ex : exprs.length == 1 ? cmpDist(ex, cc) : this;
   }
 
   /**
-   * Pre-evaluates distinct-values() function, utilizing database statistics.
+   * Tries to evaluate distinct values based on the database statistics.
    * @param ex expression
    * @param cc compilation context
-   * @return original or optimized expression
+   * @return original expression or sequence of distinct values
    * @throws QueryException query exception
    */
   private Expr cmpDist(final Expr ex, final CompileContext cc) throws QueryException {

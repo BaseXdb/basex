@@ -23,10 +23,6 @@ public final class BinToOctets extends StandardFunc {
         return Int.get(bytes[(int) i] & 0xFF);
       }
       @Override
-      public boolean hasValue() {
-        return true;
-      }
-      @Override
       public Value value(final QueryContext q) {
         return ConvertBinaryToInteger.toValue(bytes);
       }

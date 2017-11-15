@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class RangeSeq extends Seq {
   /** Start value. */
   private final long start;
-  /** Ascending/descending. */
+  /** Ascending/descending order. */
   private final boolean asc;
 
   /**
@@ -47,19 +47,13 @@ public final class RangeSeq extends Seq {
   }
 
   /**
-   * Returns the first value.
+   * Returns the range as long values.
+   * @param order respect ascending/descending order
    * @return start value
    */
-  public long start() {
-    return start;
-  }
-
-  /**
-   * Returns the last value.
-   * @return end value
-   */
-  public long end() {
-    return asc ? start + size - 1 : start - size + 1;
+  public long[] range(final boolean order) {
+    final long end = asc ? start + size - 1 : start - size + 1;
+    return new long[] { order || asc ? start : end, order || asc ? end : start };
   }
 
   @Override
@@ -110,8 +104,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Value reverse() {
-    final long s = size();
-    return asc ? get(start + s - 1, s, false) : get(start - s + 1, s, true);
+    return get(range(true)[1], size(), !asc);
   }
 
   @Override
@@ -134,7 +127,8 @@ public final class RangeSeq extends Seq {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(FROM, start(), TO, end(), SIZE, size, TYPE, seqType(), ASCENDING, asc));
+    final long[] range = range(true);
+    addPlan(plan, planElem(FROM, range[0], TO, range[1], SIZE, size, TYPE, seqType()));
   }
 
   @Override
@@ -144,8 +138,8 @@ public final class RangeSeq extends Seq {
 
   @Override
   public String toString() {
-    final long s = asc ? start : start - size + 1, e = asc ? start + size - 1 : start;
-    final String str = PAREN1 + s + ' ' + TO + ' ' + e + PAREN2;
+    final long[] range = range(false);
+    final String str = PAREN1 + range[0] + ' ' + TO + ' ' + range[1] + PAREN2;
     return asc ? str : Function.REVERSE.args(' ' + str).substring(1);
   }
 }

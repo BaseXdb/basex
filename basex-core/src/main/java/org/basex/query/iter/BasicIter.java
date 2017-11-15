@@ -2,10 +2,7 @@ package org.basex.query.iter;
 
 import java.util.*;
 
-import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -49,20 +46,6 @@ public abstract class BasicIter<I extends Item> extends Iter implements Iterable
   @Override
   public final long size() {
     return size;
-  }
-
-  @Override
-  public Value value(final QueryContext qc) {
-    final long s = size;
-    if(s == 0) return Empty.SEQ;
-    if(s == 1) return get(0);
-
-    final ValueBuilder vb = new ValueBuilder();
-    for(long c = 0; c < s; c++) {
-      qc.checkStop();
-      vb.add(get(c));
-    }
-    return vb.value();
   }
 
   @Override

@@ -529,8 +529,8 @@ final class BigSeq extends TreeSeq {
       }
 
       @Override
-      public boolean hasValue() {
-        return true;
+      public Value value() {
+        return BigSeq.this;
       }
 
       @Override
@@ -540,7 +540,7 @@ final class BigSeq extends TreeSeq {
 
       @Override
       public Value value(final QueryContext qc) {
-        return BigSeq.this;
+        return value();
       }
     };
   }

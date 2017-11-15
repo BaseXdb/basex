@@ -67,12 +67,12 @@ public abstract class Seq extends Value {
         return itemAt(i);
       }
       @Override
-      public boolean hasValue() {
-        return true;
+      public Value value() {
+        return Seq.this;
       }
       @Override
       public Value value(final QueryContext qc) {
-        return Seq.this;
+        return value();
       }
     };
   }

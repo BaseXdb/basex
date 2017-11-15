@@ -79,9 +79,10 @@ public class FnSubsequence extends StandardFunc {
     // return subsequence if value access is cheap
     final Iter iter = qc.iter(ex);
     final long is = iter.size();
-    if(iter.hasValue()) {
+    final Value v = iter.value();
+    if(v != null) {
       final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
-      return l <= 0 ? Empty.SEQ : ex.value(qc).subSeq(s, l);
+      return l <= 0 ? Empty.SEQ : v.subSeq(s, l);
     }
 
     // take fast route if the size is known

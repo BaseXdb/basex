@@ -57,11 +57,14 @@ public final class Range extends Arr {
     if(it1 == null) return Empty.SEQ;
     final Item it2 = exprs[1].atomItem(qc, info);
     if(it2 == null) return Empty.SEQ;
-    final long s = toLong(it1), e = toLong(it2);
-    if(s > e) return Empty.SEQ;
-    final long n = e - s + 1;
-    if(n > 0) return RangeSeq.get(s, n, true);
-    throw RANGE_X.get(info, e);
+    final long min = toLong(it1), max = toLong(it2);
+    // min smaller than max: empty sequence
+    if(min > max) return Empty.SEQ;
+    // max smaller than min: create range
+    final long size = max - min + 1;
+    if(size > 0) return RangeSeq.get(min, size, true);
+    // overflow of long value
+    throw RANGE_X.get(info, max);
   }
 
   @Override

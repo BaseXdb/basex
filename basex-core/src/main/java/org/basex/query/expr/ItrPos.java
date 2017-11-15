@@ -83,7 +83,8 @@ public final class ItrPos extends Simple {
   public static Expr get(final OpV cmp, final Expr arg, final Expr orig, final InputInfo ii) {
     if(arg instanceof RangeSeq && cmp == OpV.EQ) {
       final RangeSeq rs = (RangeSeq) arg;
-      return get(rs.start(), rs.end(), ii);
+      final long[] range = rs.range(false);
+      return get(range[0], range[1], ii);
     } else if(arg instanceof ANum) {
       final ANum it = (ANum) arg;
       final long p = it.itr();

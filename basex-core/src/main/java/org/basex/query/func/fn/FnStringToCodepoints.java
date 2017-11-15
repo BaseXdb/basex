@@ -26,10 +26,6 @@ public final class FnStringToCodepoints extends StandardFunc {
         return Int.get(cps[(int) i]);
       }
       @Override
-      public boolean hasValue() {
-        return true;
-      }
-      @Override
       public Value value(final QueryContext q) {
         return FnStringToCodepoints.value(cps);
       }

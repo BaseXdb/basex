@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -42,31 +43,12 @@ public final class DbListDetails extends DbList {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    if(exprs.length == 0) return listDBs(qc);
+    return exprs.length == 0 ? list(qc) : resources(qc);
+  }
 
-    final Data data = checkData(qc);
-    final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
-    final IntList docs = data.resources.docs(path);
-    final TokenList bins = data.resources.binaries(path);
-    final int ds = docs.size(), sz = ds + bins.size();
-
-    return new BasicIter<FNode>(sz) {
-      @Override
-      public FNode get(final long i) {
-        if(i < ds) {
-          final int pre = docs.get((int) i);
-          final byte[] pt = data.text(pre, true);
-          return resource(pt, false, data.size(pre, Data.DOC), MediaType.APPLICATION_XML,
-              data.meta.time);
-        }
-        if(i < sz) {
-          final byte[] pt = bins.get((int) i - ds);
-          final IOFile io = data.meta.binary(string(pt));
-          return resource(pt, true, io.length(), MediaType.get(io.path()), io.timeStamp());
-        }
-        return null;
-      }
-    };
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
   }
 
   /**
@@ -74,7 +56,7 @@ public final class DbListDetails extends DbList {
    * @param qc query context
    * @return iterator
    */
-  private static Iter listDBs(final QueryContext qc) {
+  private static Iter list(final QueryContext qc) {
     final Context ctx = qc.context;
     final StringList dbs = ctx.filter(Perm.READ, ctx.databases.listDBs());
     return new BasicIter<FNode>(dbs.size()) {
@@ -100,6 +82,37 @@ public final class DbListDetails extends DbList {
   }
 
   /**
+   * Returns an iterator over all resources in a databases.
+   * @param qc query context
+   * @return resource iterator
+   * @throws QueryException query exception
+   */
+  private Iter resources(final QueryContext qc) throws QueryException {
+    final Data data = checkData(qc);
+    final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
+    final IntList docs = data.resources.docs(path);
+    final TokenList bins = data.resources.binaries(path);
+    final int ds = docs.size(), size = ds + bins.size();
+    return new BasicIter<FNode>(size) {
+      @Override
+      public FNode get(final long i) {
+        if(i < ds) {
+          final int pre = docs.get((int) i);
+          final byte[] pt = data.text(pre, true);
+          final int sz = data.size(pre, Data.DOC);
+          return resource(pt, false, sz, MediaType.APPLICATION_XML, data.meta.time);
+        }
+        if(i < size) {
+          final byte[] pt = bins.get((int) i - ds);
+          final IOFile io = data.meta.binary(string(pt));
+          return resource(pt, true, io.length(), MediaType.get(io.path()), io.timeStamp());
+        }
+        return null;
+      }
+    };
+  }
+
+  /**
    * Creates a resource node.
    * @param path path
    * @param raw is the resource a raw file
@@ -111,8 +124,7 @@ public final class DbListDetails extends DbList {
   private static FNode resource(final byte[] path, final boolean raw, final long size,
       final MediaType type, final long mdate) {
 
-    final String tstamp = DateTime.format(new Date(mdate));
-    return new FElem(RESOURCE).add(path).
-        add(RAW, token(raw)).add(CTYPE, type.toString()).add(MDATE, tstamp).add(SIZE, token(size));
+    return new FElem(RESOURCE).add(path).add(RAW, token(raw)).add(CTYPE, type.toString()).
+        add(MDATE, DateTime.format(new Date(mdate))).add(SIZE, token(size));
   }
 }

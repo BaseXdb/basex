@@ -132,7 +132,9 @@ public abstract class FNode extends ANode {
       @Override
       public long size() { return iter.size(); }
       @Override
-      public Value value(final QueryContext qc) { return iter.value(); }
+      public Value value() { return iter.value(); }
+      @Override
+      public Value value(final QueryContext qc) { return value(); }
     };
   }
 

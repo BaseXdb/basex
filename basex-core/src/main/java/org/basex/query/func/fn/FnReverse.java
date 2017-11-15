@@ -62,6 +62,7 @@ public final class FnReverse extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr ex = exprs[0];
-    return ex.seqType().zeroOrOne() ? ex : adoptType(ex);
+    return ex instanceof RangeSeq ? ((RangeSeq) ex).reverse() : ex.seqType().zeroOrOne() ? ex :
+      adoptType(ex);
   }
 }

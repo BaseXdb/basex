@@ -30,12 +30,12 @@ public final class Empty extends Value {
       return null;
     }
     @Override
-    public boolean hasValue() {
-      return true;
+    public Value value() {
+      return SEQ;
     }
     @Override
     public Value value(final QueryContext qc) {
-      return SEQ;
+      return value();
     }
   };
 

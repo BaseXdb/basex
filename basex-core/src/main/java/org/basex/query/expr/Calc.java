@@ -253,14 +253,14 @@ public enum Calc {
 
   /**
    * Returns the numeric type with the highest precedence.
-   * @param t1 first item type
-   * @param t2 second item type
+   * @param type1 first item type
+   * @param type2 second item type
    * @return type
    */
-  public static Type type(final Type t1, final Type t2) {
-    if(t1 == DBL || t2 == DBL || t1.isUntyped() || t2.isUntyped()) return DBL;
-    if(t1 == FLT || t2 == FLT) return FLT;
-    if(t1 == DEC || t2 == DEC) return DEC;
+  public static Type type(final Type type1, final Type type2) {
+    if(type1 == DBL || type2 == DBL || type1.isUntyped() || type2.isUntyped()) return DBL;
+    if(type1 == FLT || type2 == FLT) return FLT;
+    if(type1 == DEC || type2 == DEC) return DEC;
     return ITR;
   }
 
@@ -277,12 +277,12 @@ public enum Calc {
   /**
    * Returns a type error.
    * @param info input info
-   * @param t1 first type
-   * @param t2 second type
+   * @param type1 first type
+   * @param type2 second type
    * @return query exception
    */
-  final QueryException typeError(final InputInfo info, final Type t1, final Type t2) {
-    return CALCTYPE_X_X_X.get(info, info(), t1, t2);
+  final QueryException typeError(final InputInfo info, final Type type1, final Type type2) {
+    return CALCTYPE_X_X_X.get(info, info(), type1, type2);
   }
 
   /**

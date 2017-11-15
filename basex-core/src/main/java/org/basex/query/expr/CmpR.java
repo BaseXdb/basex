@@ -75,9 +75,11 @@ public final class CmpR extends Single {
     final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
     if(e1.has(Flag.NDT)) return cmp;
 
+    // range sequence: retrieve start and end value, switch them if order is descending
     if(e2 instanceof RangeSeq) {
       final RangeSeq rs = (RangeSeq) e2;
-      return get(cmp, rs.start(), rs.end(), cc);
+      final long[] range = rs.range(false);
+      return get(cmp, range[0], range[1], cc);
     }
     // range expression uses doubles: reject decimal numbers and typed input
     if(e2 instanceof ANum && (!(e2 instanceof Dec) || e1.seqType().type.isUntyped())) {
@@ -90,13 +92,13 @@ public final class CmpR extends Single {
   /**
    * Tries to convert the specified expression into a range expression.
    * @param cmp expression to be converted
-   * @param start start
-   * @param end end (must be larger than end)
+   * @param min minimum value
+   * @param max maximum value (must be larger than end)
    * @param cc compilation context
    * @return new or original expression
    * @throws QueryException query exception
    */
-  private static Expr get(final CmpG cmp, final double start, final double end,
+  private static Expr get(final CmpG cmp, final double min, final double max,
       final CompileContext cc) throws QueryException {
 
     /* reject:
@@ -104,16 +106,16 @@ public final class CmpR extends Single {
      * - numbers that are too large or small to be safely compared as doubles */
     final Expr ex = cmp.exprs[0];
     if(!ex.seqType().type.isNumberOrUntyped() ||
-        start < Integer.MIN_VALUE || start > Integer.MAX_VALUE ||
-        end < Integer.MIN_VALUE || end > Integer.MAX_VALUE) return cmp;
+        min < Integer.MIN_VALUE || min > Integer.MAX_VALUE ||
+        max < Integer.MIN_VALUE || max > Integer.MAX_VALUE) return cmp;
 
     ParseExpr expr = null;
     switch(cmp.op) {
-      case EQ: expr = new CmpR(ex, start, true, end, true, cmp.info); break;
-      case GE: expr = new CmpR(ex, start, true, Double.POSITIVE_INFINITY, true, cmp.info); break;
-      case GT: expr = new CmpR(ex, start, false, Double.POSITIVE_INFINITY, true, cmp.info); break;
-      case LE: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, true, cmp.info); break;
-      case LT: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, end, false, cmp.info); break;
+      case EQ: expr = new CmpR(ex, min, true, max, true, cmp.info); break;
+      case GE: expr = new CmpR(ex, min, true, Double.POSITIVE_INFINITY, true, cmp.info); break;
+      case GT: expr = new CmpR(ex, min, false, Double.POSITIVE_INFINITY, true, cmp.info); break;
+      case LE: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, max, true, cmp.info); break;
+      case LT: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, max, false, cmp.info); break;
       default:
     }
     return expr != null ? expr.optimize(cc) : cmp;

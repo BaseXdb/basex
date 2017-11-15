@@ -74,12 +74,12 @@ public final class ItemList extends ObjectList<Item, ItemList> {
         return list[(int) i];
       }
       @Override
-      public boolean hasValue() {
-        return true;
+      public Value value() {
+        return ItemList.this.value();
       }
       @Override
       public Value value(final QueryContext qc) {
-        return ItemList.this.value();
+        return value();
       }
     };
   }
