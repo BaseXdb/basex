@@ -138,8 +138,9 @@ public abstract class Filter extends Preds {
           final long s = pos.min - 1, l = Math.min(pos.max, rt.size()) - s;
           ex = l <= 0 ? Empty.SEQ : ((Value) rt).subSeq(s, l);
         } else if(pos.min == pos.max) {
-          // example: expr[pos] -> util:item-at(expr, pos.min)
-          ex = cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));
+          // example: expr[pos] -> head(); expr[pos] -> util:item-at(expr, pos.min)
+          ex = pos.min == 1 ? cc.function(Function.HEAD, info, rt) :
+            cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
           ex = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
