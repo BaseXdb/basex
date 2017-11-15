@@ -249,7 +249,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the parent node.
-   * @return parent node
+   * @return parent node or {@code null}
    */
   public abstract ANode parent();
 
@@ -376,6 +376,10 @@ public abstract class ANode extends Item {
       @Override
       public ANode value(final QueryContext qc) {
         return parent();
+      }
+      @Override
+      public long size() {
+        return 1;
       }
     };
   }

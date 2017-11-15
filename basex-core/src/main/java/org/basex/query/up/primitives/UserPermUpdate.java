@@ -32,8 +32,8 @@ public abstract class UserPermUpdate extends UserUpdate {
    * @throws QueryException query exception
    */
   protected UserPermUpdate(final UpdateType type, final User user, final ArrayList<Perm> perms,
-                           final StringList patterns, final QueryContext qc, final InputInfo info)
-          throws QueryException {
+      final StringList patterns, final QueryContext qc, final InputInfo info)
+      throws QueryException {
 
     super(type, user, qc, info);
     this.perms = perms;
