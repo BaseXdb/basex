@@ -49,7 +49,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" true#0", " []"), true);
     query(func.args(" count#1", " [(1,2,3)]"));
     query(func.args(" string-join#1", " [ reverse(1 to 5) ! string() ]"), 54321);
-    query("let $func := function($a,$b,$c) { $a + $b + $c } "
+    query("let $func := function($a, $b,$c) { $a + $b + $c } "
         + "let $args := [ 1, 2, 3 ] "
         + "return " + func.args(" $func", " $args"), 6);
     query("for $a in 2 to 3 "
@@ -109,7 +109,12 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args(), FUNERR1);
     error(func.args(" ()"), FUNERR1);
     query("(1," + func.args() + ")[1]", 1);
+
+    // errors: defer error if not requested; adjust declared sequence type of {@link TypeCheck}
     query("head((1," + func.args() + "))", 1);
+    query("head((1, function() { error() }()))", 1);
+    query("declare function local:e() { error() }; head((1, local:e()))", 1);
+    query("declare function local:e() as empty-sequence() { error() }; head((1, local:e()))", 1);
   }
 
   /** Test method. */
@@ -117,18 +122,18 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = Function.FOLD_LEFT;
 
     // should be unrolled and evaluated at compile time
-    check(func.args(" 2 to 10", 1, " function($a,$b) {$a+$b}"),
+    check(func.args(" 2 to 10", 1, " function($a, $b) { $a + $b }"),
         55,
         empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 2 to 10", 1, " function($a,$b) {0*random:integer($a)+$b}"),
+    check(func.args(" 2 to 10", 1, " function($a, $b) { 0 * random:integer($a) + $b }"),
         10,
         exists(Int.class),
         empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 1 to 10", 0, " function($a,$b) {$a+$b}"),
+    check(func.args(" 1 to 10", 0, " function($a, $b) { $a + $b }"),
         55,
         exists(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"));
   }
@@ -138,18 +143,18 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = Function.FOLD_RIGHT;
 
     // should be unrolled and evaluated at compile time
-    check(func.args(" 1 to 9", 10, " function($a,$b) {$a+$b}"),
+    check(func.args(" 1 to 9", 10, " function($a, $b) { $a + $b }"),
         55,
         empty(FnFoldRight.class),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 9", 10, " function($a,$b) {0*random:integer($a)+$b}"),
+    check(func.args(" 1 to 9", 10, " function($a, $b) { 0 * random:integer($a) + $b }"),
         10,
         empty(FnFoldRight.class),
         exists(Int.class),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 0 to 9", 10, " function($a,$b) {$a+$b}"),
+    check(func.args(" 0 to 9", 10, " function($a, $b) { $a + $b }"),
         55,
         exists(Util.className(FnFoldRight.class) + "[contains(@name, 'fold-right')]"));
   }
@@ -159,18 +164,18 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = Function.FOR_EACH;
 
     // should be unrolled and evaluated at compile time
-    check(func.args(" 0 to 8", " function($x) {$x+1}"),
+    check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
         empty(FnForEach.class),
         exists(IntSeq.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 9", " function($x) {0*random:integer()+$x}"),
+    check(func.args(" 1 to 9", " function($x) { 0 * random:integer() + $x }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
         empty(FnForEach.class),
         empty(IntSeq.class),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 0 to 9", " function($x) {$x+1}"),
+    check(func.args(" 0 to 9", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
         exists(Util.className(FnForEach.class) + "[contains(@name, 'for-each')]"));
   }
@@ -461,7 +466,7 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void xmlToJson() {
     final Function func = Function.XML_TO_JSON;
     query(func.args(" <map xmlns='http://www.w3.org/2005/xpath-functions'>"
-        + "<string key=''>í</string></map>", " map{'indent':'no'}"), "{\"\":\"\u00ed\"}");
+        + "<string key=''>í</string></map>", " map { 'indent' : 'no' }"), "{\"\":\"\u00ed\"}");
     query(func.args(" <fn:string key='root'>X</fn:string>"), "\"X\"");
   }
 }

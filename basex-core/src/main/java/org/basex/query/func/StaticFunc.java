@@ -79,6 +79,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         }
       }
     } catch(final QueryException qe) {
+      // error: set most general sequence type
+      declType = SeqType.ITEM_ZM;
       expr = cc.error(qe, expr);
     } finally {
       cc.removeScope(this);

@@ -17,9 +17,9 @@ public abstract class StaticDecl extends StaticScope {
   public final AnnList anns;
   /** Name of the declaration. */
   public final QNm name;
-  /** Declared type, {@code null} if not specified. */
-  protected final SeqType declType;
 
+  /** Declared type, {@code null} if not specified. */
+  protected SeqType declType;
   /** Flag that is set during compilation and execution and prevents infinite loops. */
   protected boolean dontEnter;
 

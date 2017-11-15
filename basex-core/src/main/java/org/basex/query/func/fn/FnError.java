@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -32,6 +33,11 @@ public final class FnError extends StandardFunc {
   @Override
   public boolean isVacuous() {
     return true;
+  }
+
+  @Override
+  protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    return this;
   }
 
   /**
