@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -44,40 +45,57 @@ public final class CmpHashG extends CmpG {
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   * Overwrites the original comparator.
+   */
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter1 = exprs[0].atomIter(qc, info);
-    if(iter1.size() == 0) return Bln.FALSE;
+  Bln compare(final Iter iter1, final Iter iter2, final long is1, final long is2,
+      final QueryContext qc) throws QueryException {
 
-    // first call: initialize hash
-    CmpCache cache = caches.get();
-    if(cache == null) {
-      cache = new CmpCache();
-      caches.set(cache);
-      final Iter ir2 = exprs[1].atomIter(qc, info);
-      // no values: no need to cache
-      if(ir2.size() == 0) return Bln.FALSE;
-      cache.iter2 = ir2;
-    }
-    final HashItemSet set = cache.set;
-
-    // loop through input
-    for(Item it1; (it1 = iter1.next()) != null;) {
-      qc.checkStop();
-      // check if value has already been cached
-      if(set.contains(it1, info)) return Bln.TRUE;
-
-      // cache remaining values (stop after first hit)
-      if(cache.iter2 != null) {
-        for(Item it2; (it2 = cache.iter2.next()) != null;) {
-          qc.checkStop();
-          set.add(it2, ii);
-          if(set.contains(it1, info)) return Bln.TRUE;
-        }
-        cache.iter2 = null;
+    // check if iterator is based on value with more than one item
+    final Value val2 = iter2.value();
+    if(val2 != null && val2.size() > 1) {
+      // first call: initialize cache
+      CmpCache cache = caches.get();
+      if(cache == null) {
+        cache = new CmpCache();
+        cache.value = val2;
+        cache.iter = iter2;
+        caches.set(cache);
       }
+
+      // check if caching is successful (i.e., if same value is cached)
+      if(cache.value == val2) {
+        final HashItemSet set = cache.set;
+        Iter ir2 = cache.iter;
+
+        // loop through input items
+        for(Item it1; (it1 = iter1.next()) != null;) {
+          qc.checkStop();
+          // check if item has already been cached
+          if(set.contains(it1, info)) return Bln.TRUE;
+
+          // cache remaining items (stop after first hit)
+          if(ir2 != null) {
+            for(Item it2; (it2 = ir2.next()) != null;) {
+              qc.checkStop();
+              set.add(it2, info);
+              if(set.contains(it1, info)) return Bln.TRUE;
+            }
+            // iterator is exhausted, all items are cached
+            cache.iter = null;
+            ir2 = null;
+          }
+        }
+        return Bln.FALSE;
+      }
+
+      // if cached value differs, skip hashing
+      cache.value = null;
+      cache.set = null;
     }
-    return Bln.FALSE;
+    return super.compare(iter1, iter2, is1, is2, qc);
   }
 
   @Override
@@ -97,8 +115,10 @@ public final class CmpHashG extends CmpG {
    */
   private static final class CmpCache {
     /** Cached items. */
-    final HashItemSet set = new HashItemSet(true);
-    /** Lazy iterator. */
-    Iter iter2;
+    private HashItemSet set = new HashItemSet(true);
+    /** Cached value (right-hand operand). */
+    private Value value;
+    /** Lazy iterator (right-hand operand). */
+    private Iter iter;
   }
 }

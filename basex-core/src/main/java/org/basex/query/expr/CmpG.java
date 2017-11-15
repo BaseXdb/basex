@@ -11,7 +11,6 @@ import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -165,35 +164,34 @@ public class CmpG extends Cmp {
     if(ex == this) ex = CmpSR.get(this, cc);
     if(ex != this) return cc.replaceWith(this, ex);
 
+    final Type t1 = st1.type, t2 = st2.type;
     if(op == OpG.EQ) {
       /* pre-evaluate equality test if:
        * - equality operator is specified,
        * - operands are equal,
        * - operands are deterministic, non-updating,
        * - operands do not depend on context (unless context value exists) */
-      final Type t1 = st1.type, t2 = st2.type;
-      if(e1.equals(e2) && !e1.has(Flag.NDT) &&
-          (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
+      if(e1.equals(e2) && !e1.has(Flag.NDT) && (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
         /* consider query flags. do not rewrite:
          * random:integer() = random:integer() */
         if(st1.oneOrMore() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
             t1 == AtomType.BLN)) {
-          /* currently limited to strings, integers and booleans. do not rewrite:
+          /* currently limited to strings, integers and booleans. illegal rewriting:
            * xs:double('NaN') = xs:double('NaN') */
           return cc.replaceWith(this, Bln.TRUE);
         }
       }
-
-      // use hash
-      if(coll == null && e2 instanceof Value && e2.size() > 1 &&
-          (t1.isNumber() && t2.isNumber() || t1.isStringOrUntyped() && t2.isStringOrUntyped())) {
-        return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
-      }
     }
 
-    // choose evaluation strategy
+    // simple comparison
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
       return cc.replaceWith(this, new CmpSimpleG(e1, e2, op, coll, sc, info).optimize(cc));
+    }
+
+    // hash-based comparison
+    if(op == OpG.EQ && coll == null && ((t1.isStringOrUntyped() && t2.isStringOrUntyped()) ||
+        t1.isNumber() && t2.isNumber()) && e2.size() != 1) {
+      return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
     }
 
     // pre-evaluate values
@@ -210,24 +208,38 @@ public class CmpG extends Cmp {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // retrieve iterators
-    Iter iter1 = exprs[0].atomIter(qc, info);
-    final long is1 = iter1.size();
+    final Iter ir1 = exprs[0].atomIter(qc, info);
+    final long is1 = ir1.size();
     if(is1 == 0) return Bln.FALSE;
-    final boolean s1 = is1 == 1;
-
-    Iter iter2 = exprs[1].atomIter(qc, info);
-    final long is2 = iter2.size();
+    final Iter ir2 = exprs[1].atomIter(qc, info);
+    final long is2 = ir2.size();
     if(is2 == 0) return Bln.FALSE;
 
+    return compare(ir1, ir2, is1, is2, qc);
+  }
+
+  /**
+   * Compares all values of the first and second iterators.
+   * @param iter1 first iterator
+   * @param iter2 second iterator
+   * @param is1 size of first iterator
+   * @param is2 size of second iterator
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  Bln compare(final Iter iter1, final Iter iter2, final long is1, final long is2,
+      final QueryContext qc) throws QueryException {
+
     // evaluate single items
-    final boolean s2 = is2 == 1;
-    if(s1 && s2) return Bln.get(eval(iter1.next(), iter2.next()));
+    Iter ir1 = iter1, ir2 = iter2;
+    final boolean s1 = is1 == 1, s2 = is2 == 1;
+    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
 
     if(s1) {
       // first iterator yields single result
-      final Item it1 = iter1.next();
-      for(Item it2; (it2 = iter2.next()) != null;) {
+      final Item it1 = ir1.next();
+      for(Item it2; (it2 = ir2.next()) != null;) {
         qc.checkStop();
         if(eval(it1, it2)) return Bln.TRUE;
       }
@@ -236,8 +248,8 @@ public class CmpG extends Cmp {
 
     if(s2) {
       // second iterator yields single result
-      final Item it2 = iter2.next();
-      for(Item it1; (it1 = iter1.next()) != null;) {
+      final Item it2 = ir2.next();
+      for(Item it1; (it1 = ir1.next()) != null;) {
         qc.checkStop();
         if(eval(it1, it2)) return Bln.TRUE;
       }
@@ -247,21 +259,22 @@ public class CmpG extends Cmp {
     // swap iterators if first iterator returns more results than second
     final boolean swap = is1 > is2;
     if(swap) {
-      final Iter iter = iter1;
-      iter1 = iter2;
-      iter2 = iter;
+      final Iter iter = ir1;
+      ir1 = ir2;
+      ir2 = iter;
     }
 
     // loop through all items of first and second iterator
-    for(Item it1; (it1 = iter1.next()) != null;) {
-      if(iter2 == null) iter2 = exprs[swap ? 0 : 1].atomIter(qc, info);
-      for(Item it2; (it2 = iter2.next()) != null;) {
+    for(Item it1; (it1 = ir1.next()) != null;) {
+      if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
+      for(Item it2; (it2 = ir2.next()) != null;) {
         qc.checkStop();
         if(swap ? eval(it2, it1) : eval(it1, it2)) return Bln.TRUE;
       }
-      iter2 = null;
+      ir2 = null;
     }
     return Bln.FALSE;
+
   }
 
   /**
