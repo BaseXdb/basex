@@ -35,8 +35,10 @@ public abstract class Iter {
    * Returns the iterator size. {@code -1} is returned if the result size is unknown.
    * If this method returns a positive value, {@link #get(long)} needs to be implemented as well.
    * @return number of entries
+   * @throws QueryException query exception
    */
-  public long size() {
+  @SuppressWarnings("unused")
+  public long size() throws QueryException {
     return -1;
   }
 

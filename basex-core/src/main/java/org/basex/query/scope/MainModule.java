@@ -127,7 +127,7 @@ public final class MainModule extends Module {
         return it;
       }
       @Override
-      public long size() {
+      public long size() throws QueryException {
         return iter.size();
       }
       @Override

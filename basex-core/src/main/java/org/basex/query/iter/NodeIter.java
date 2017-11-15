@@ -17,4 +17,9 @@ public abstract class NodeIter extends Iter {
   public ANode get(final long i) {
     return null;
   }
+
+  @Override
+  public long size() {
+    return -1;
+  }
 }

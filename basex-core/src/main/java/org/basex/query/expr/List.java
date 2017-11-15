@@ -110,29 +110,19 @@ public final class List extends Arr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    // compute result size and iterator offsets
-    final int el = exprs.length;
-    final long[] off = new long[el];
-    final Iter[] iter = new Iter[el];
-    long sz1 = 0;
-    for(int i = 0; i < el; i++) {
-      iter[i] = qc.iter(exprs[i]);
-      off[i] = sz1;
-      if(sz1 != -1) {
-        final long sz2 = iter[i].size();
-        sz1 = sz2 == -1 ? -1 : sz1 + sz2;
-      }
-    }
-    final long sz = sz1;
-
     return new Iter() {
+      final int el = exprs.length;
+      long[] off = new long[el];
+      Iter[] iter = new Iter[el];
+      long size = Long.MIN_VALUE;
       int e;
+
       @Override
       public Item next() throws QueryException {
         while(e < el) {
-          final Item it = iter[e].next();
+          final Item it = iter(e).next();
           if(it != null) return it;
-          e++;
+          iter[e++] = null;
         }
         return null;
       }
@@ -141,12 +131,30 @@ public final class List extends Arr {
       public Item get(final long i) throws QueryException {
         int o = 0;
         while(o < el - 1 && off[o + 1] <= i) o++;
-        return iter[o].get(i - off[o]);
+        return iter(o).get(i - off[o]);
       }
 
       @Override
-      public long size() {
-        return sz;
+      public long size() throws QueryException {
+        long s1 = 0;
+        if(size == Long.MIN_VALUE) {
+          for(int o = 0; o < el && s1 != -1; o++) {
+            final long s2 = iter(o).size();
+            off[o] = s1;
+            s1 = s2 == -1 ? -1 : s1 + s2;
+          }
+          size = s1;
+        }
+        return s1;
+      }
+
+      private Iter iter(final int i) throws QueryException {
+        Iter ir = iter[i];
+        if(ir == null) {
+          ir = qc.iter(exprs[i]);
+          iter[i] = ir;
+        }
+        return ir;
       }
     };
   }

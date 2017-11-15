@@ -115,6 +115,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query("head((1, function() { error() }()))", 1);
     query("declare function local:e() { error() }; head((1, local:e()))", 1);
     query("declare function local:e() as empty-sequence() { error() }; head((1, local:e()))", 1);
+    query("declare %basex:inline(0) function local:f() { error() }; head((1, local:f()))", 1);
   }
 
   /** Test method. */
