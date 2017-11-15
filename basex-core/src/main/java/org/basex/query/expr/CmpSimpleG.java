@@ -29,12 +29,6 @@ public final class CmpSimpleG extends CmpG {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate values
-    return allAreValues() ? cc.preEval(this) : this;
-  }
-
-  @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it1 = exprs[0].item(qc, info);
     if(it1 == null) return Bln.FALSE;

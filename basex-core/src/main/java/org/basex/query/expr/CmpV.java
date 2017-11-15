@@ -4,8 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -168,53 +166,22 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // swap expressions
+    // pre-evaluate if one value is empty (e.g.: () = local:expensive() )
+    if(oneIsEmpty()) return cc.emptySeq(this);
+
+    // operands will always yield a single item
+    if(exprs[1].seqType().oneNoArray() && exprs[0].seqType().oneNoArray())
+      exprType.assign(Occ.ONE);
+
+    // swap operands
     if(swap()) {
       cc.info(OPTSWAP_X, this);
       op = op.swap();
     }
 
-    final Expr e1 = exprs[0], e2 = exprs[1];
-    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-    if(st1.oneNoArray() && st2.oneNoArray()) exprType.assign(Occ.ONE);
-
-    Expr ex = this;
-    if(oneIsEmpty()) return cc.emptySeq(this);
-    if(allAreValues()) return cc.preEval(this);
-
-    if(e1.isFunction(Function.COUNT)) {
-      // rewrite count() function
-      ex = compCount(op, cc);
-    } else if(e1.isFunction(Function.STRING_LENGTH)) {
-      // rewrite string-length() function
-      ex = compStringLength(op, cc);
-    } else if(e1.isFunction(Function.POSITION) && st2.oneNoArray()) {
-      // position() CMP number
-      ex = ItrPos.get(op, e2, this, info);
-      if(ex == this) ex = Pos.get(op, e2, this, info, cc);
-    } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
-        op == OpV.NE && e2 == Bln.TRUE)) {
-      // (A eq false()) -> not(A)
-      ex = cc.function(Function.NOT, info, e1);
-    }
-    if(ex != this) return cc.replaceWith(this, ex);
-
-    /* pre-evaluate equality test if:
-     * - equality operator is specified,
-     * - operands are equal,
-     * - operands are deterministic, non-updating,
-     * - operands do not depend on context, or if context value exists */
-    if((op == OpV.EQ || op == OpV.NE) && e1.equals(e2) && !e1.has(Flag.NDT) &&
-        (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
-      /* consider query flags. do not rewrite:
-       * random:integer() eq random:integer() */
-      final Type t1 = st1.type;
-      if(st1.one() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) || t1 == AtomType.BLN))
-        /* currently limited to strings, integers and booleans. do not rewrite:
-         * xs:double('NaN') eq xs:double('NaN') */
-        return cc.replaceWith(this, Bln.get(op == OpV.EQ));
-    }
-    return this;
+    // optimize expression. pre-evaluate values or return expression
+    final Expr ex = opt(op, cc);
+    return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
   }
 
   @Override

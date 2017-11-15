@@ -303,4 +303,20 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void cmpG() {
     check("count(let $s := (0,1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
   }
+
+  /** Checks OR optimizations (GH-1519). */
+  @Test public void optCount() {
+    query("declare function local:replicate($seq, $n, $out) {"
+        + "  if($n eq 0) then $out "
+        + "  else ( "
+        + "    let $out2 := if($n mod 2 eq 0) then $out else ($out, $seq) "
+        + "    return local:replicate(($seq, $seq), $n idiv 2, $out2) "
+        + "  )"
+        + "};"
+        + "let $n := 1000000000 "
+        + "return ( "
+        + "  count(local:replicate((1,2,3), $n, ())) eq 3 * $n, "
+        + "  count(local:replicate((1,2,3), $n, ())) = 3 * $n "
+        + ")", "true\ntrue");
+  }
 }

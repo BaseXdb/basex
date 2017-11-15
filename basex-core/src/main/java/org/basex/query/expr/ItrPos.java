@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -73,23 +74,26 @@ public final class ItrPos extends Simple {
   }
 
   /**
+   * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
    * Returns an instance of this class, the original expression, or an optimized expression.
-   * @param cmp comparator
-   * @param arg argument
-   * @param orig original expression
+   * @param cmp comparison expression
+   * @param op comparator
    * @param ii input info
    * @return resulting or original expression
    */
-  public static Expr get(final OpV cmp, final Expr arg, final Expr orig, final InputInfo ii) {
-    if(arg instanceof RangeSeq && cmp == OpV.EQ) {
-      final RangeSeq rs = (RangeSeq) arg;
+  public static Expr get(final Cmp cmp, final OpV op, final InputInfo ii) {
+    final Expr ex1 = cmp.exprs[0], ex2 = cmp.exprs[1];
+    if(!ex1.isFunction(Function.POSITION)) return cmp;
+
+    if(ex2 instanceof RangeSeq && op == OpV.EQ) {
+      final RangeSeq rs = (RangeSeq) ex2;
       final long[] range = rs.range(false);
       return get(range[0], range[1], ii);
-    } else if(arg instanceof ANum) {
-      final ANum it = (ANum) arg;
+    } else if(ex2 instanceof ANum) {
+      final ANum it = (ANum) ex2;
       final long p = it.itr();
       final boolean exact = p == it.dbl();
-      switch(cmp) {
+      switch(op) {
         case EQ: return exact ? get(p, ii) : Bln.FALSE;
         case GE: return get(exact ? p : p + 1, Long.MAX_VALUE, ii);
         case GT: return get(p + 1, Long.MAX_VALUE, ii);
@@ -98,7 +102,7 @@ public final class ItrPos extends Simple {
         default:
       }
     }
-    return orig;
+    return cmp;
   }
 
   @Override

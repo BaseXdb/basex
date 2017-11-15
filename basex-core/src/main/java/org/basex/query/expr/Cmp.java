@@ -5,6 +5,7 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -68,53 +69,113 @@ public abstract class Cmp extends Arr {
   public abstract Expr invert(CompileContext cc) throws QueryException;
 
   /**
-   * This method is called if the first operand of the comparison expression is a
-   * {@code count()} function.
-   * @param comp comparator
+   * Performs various optimizations.
+   * @param op operator
    * @param cc compilation context
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Expr compCount(final OpV comp, final CompileContext cc) throws QueryException {
+  final Expr opt(final OpV op, final CompileContext cc) throws QueryException {
+    Expr ex = optEqual(op, true, cc);
+    if(ex == this) ex = optFalse(op, cc);
+    if(ex == this) ex = optCount(op, cc);
+    if(ex == this) ex = optStringLength(op, cc);
+    if(ex == this) ex = ItrPos.get(this, op, info);
+    if(ex == this) ex = Pos.get(this, op, info, cc);
+    return ex;
+  }
+
+  /**
+   * Tries to simplify an expression with equal operands. Rewriting is possible if:
+   * <ul>
+   *   <li> the equality operator is specified</li>
+   *   <li> operands are equal</li>
+   *   <li> operands are deterministic, non-updating</li>
+   *   <li> operands do not depend on context, or if context value exists</li>
+   * </ul>
+   * @param op operator
+   * @param cc compilation context
+   * @param single single arguments
+   * @return resulting expression
+   */
+  final Expr optEqual(final OpV op, final boolean single, final CompileContext cc) {
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    if((op == OpV.EQ || single && op == OpV.NE) && ex1.equals(ex2) && !ex1.has(Flag.NDT) &&
+        (!ex1.has(Flag.CTX) || cc.qc.focus.value != null)) {
+      /* consider query flags
+       * illegal: random:integer() eq random:integer() */
+      final SeqType st1 = ex1.seqType();
+      final Type t1 = st1.type;
+      final boolean one = single ? st1.one() : st1.oneOrMore();
+      /* limited to strings, integers and booleans.
+       * illegal rewriting: xs:double('NaN') eq xs:double('NaN') */
+      if(one && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) || t1 == AtomType.BLN))
+        return Bln.get(op == OpV.EQ);
+    }
+    return this;
+  }
+
+  /**
+   * Tries to rewrite {@code A = false()} to {@code not(A)}.
+   * @param op operator
+   * @param cc compilation context
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  final Expr optFalse(final OpV op, final CompileContext cc) throws QueryException {
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    return ex1.seqType().eq(SeqType.BLN) && (op == OpV.EQ && ex2 == Bln.FALSE ||
+        op == OpV.NE && ex2 == Bln.TRUE) ?  cc.function(Function.NOT, info, ex1) : this;
+  }
+
+  /**
+   * Tries to rewrite {@code fn:count}.
+   * @param op operator
+   * @param cc compilation context
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  final Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    if(!(ex1.isFunction(Function.COUNT) && ex2 instanceof Item)) return this;
+
     // evaluate argument
-    final Expr a = exprs[1];
-    if(!(a instanceof Item)) return this;
-    final Item it = (Item) a;
-    if(!it.type.isNumberOrUntyped()) return this;
-    final Expr[] args = ((Arr) exprs[0]).exprs;
+    final Item it2 = (Item) ex2;
+    if(!it2.type.isNumberOrUntyped()) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    switch(check(comp, it)) {
-      case  0: return Bln.TRUE;
-      case  1: return Bln.FALSE;
-      case  2: return cc.function(Function.EXISTS, info, args);
-      case  3: return cc.function(Function.EMPTY, info, args);
+    switch(check(op, it2)) {
+      case 0: return Bln.TRUE;
+      case 1: return Bln.FALSE;
+      case 2: return cc.function(Function.EXISTS, info, ((Arr) ex1).exprs);
+      case 3: return cc.function(Function.EMPTY, info, ((Arr) ex1).exprs);
       default: return this;
     }
   }
 
   /**
-   * This method is called if the first operand of the comparison expression is a
-   * {@code string-length()} function.
-   * @param comp comparator
+   * Tries to rewrite {@code fn:string-length}.
+   * @param op operator
    * @param cc compilation context
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Expr compStringLength(final OpV comp, final CompileContext cc) throws QueryException {
+  final Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    if(!(ex1.isFunction(Function.STRING_LENGTH) && ex2 instanceof Item)) return this;
+
     // evaluate argument
-    final Expr a = exprs[1];
-    if(!(a instanceof Item)) return this;
-    final Item it = (Item) a;
-    if(!it.type.isNumberOrUntyped()) return this;
-    final Expr[] args = ((Arr) exprs[0]).exprs;
+    final Item it2 = (Item) ex2;
+    if(!it2.type.isNumberOrUntyped()) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    switch(check(comp, it)) {
-      case  0: return Bln.TRUE;
-      case  1: return Bln.FALSE;
-      case  2: return cc.function(Function.BOOLEAN, info, cc.function(Function.STRING, info, args));
-      case  3: return cc.function(Function.NOT, info, cc.function(Function.STRING, info, args));
+    switch(check(op, it2)) {
+      case 0: return Bln.TRUE;
+      case 1: return Bln.FALSE;
+      case 2: return cc.function(Function.BOOLEAN, info,
+          cc.function(Function.STRING, info, ((Arr) ex1).exprs));
+      case 3: return cc.function(Function.NOT, info,
+          cc.function(Function.STRING, info, ((Arr) ex1).exprs));
       default: return this;
     }
   }
@@ -128,23 +189,23 @@ public abstract class Cmp extends Arr {
    *   <li>3: zero check</li>
    *   <li>-1: none of them</li>
    * </ul>
-   * @param comp comparator
+   * @param op operator
    * @param it input item
-   * @return comparison type (0: always true, 1:
+   * @return comparison type
    * @throws QueryException query exception
    */
-  private int check(final OpV comp, final Item it) throws QueryException {
+  private int check(final OpV op, final Item it) throws QueryException {
     final double v = it.dbl(info);
-    // > (v<0), != (v<0), >= (v<=0), != int(v)
-    if((comp == OpV.GT || comp == OpV.NE) && v < 0 || comp == OpV.GE && v <= 0 ||
-       comp == OpV.NE && v != (int) v) return 0;
-    // < (v<=0), <= (v<0), = (v<0), != int(v)
-    if(comp == OpV.LT && v <= 0 || (comp == OpV.LE || comp == OpV.EQ) && v < 0 ||
-       comp == OpV.EQ && v != (int) v) return 1;
+    // > (v<0), != (v<0), >= (v<=0), != integer(v)
+    if((op == OpV.GT || op == OpV.NE) && v < 0 || op == OpV.GE && v <= 0 ||
+       op == OpV.NE && v != (long) v) return 0;
+    // < (v<=0), <= (v<0), = (v<0), != integer(v)
+    if(op == OpV.LT && v <= 0 || (op == OpV.LE || op == OpV.EQ) && v < 0 ||
+       op == OpV.EQ && v != (long) v) return 1;
     // > (v<1), >= (v<=1), != (v=0)
-    if(comp == OpV.GT && v < 1 || comp == OpV.GE && v <= 1 || comp == OpV.NE && v == 0) return 2;
+    if(op == OpV.GT && v < 1 || op == OpV.GE && v <= 1 || op == OpV.NE && v == 0) return 2;
     // < (v<=1), <= (v<1), = (v=0)
-    if(comp == OpV.LT && v <= 1 || comp == OpV.LE && v < 1 || comp == OpV.EQ && v == 0) return 3;
+    if(op == OpV.LT && v <= 1 || op == OpV.LE && v < 1 || op == OpV.EQ && v == 0) return 3;
     return -1;
   }
 }

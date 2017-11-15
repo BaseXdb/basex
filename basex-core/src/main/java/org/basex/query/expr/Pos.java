@@ -31,60 +31,60 @@ public final class Pos extends Arr {
   }
 
   /**
+   * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
    * Returns an instance of this class, the original expression, or an optimized expression.
-   * @param cmp comparator
-   * @param arg argument
-   * @param orig original expression
-   * @param cc compilation context
+   * @param cmp comparison expression
+   * @param op comparator
    * @param ii input info
+   * @param cc compilation context
    * @return resulting or original expression
    * @throws QueryException query exception
    */
-  public static Expr get(final OpV cmp, final Expr arg, final Expr orig, final InputInfo ii,
+  public static Expr get(final Cmp cmp, final OpV op, final InputInfo ii,
       final CompileContext cc) throws QueryException {
 
+    final Expr ex1 = cmp.exprs[0], ex2 = cmp.exprs[1];
+    if(!ex1.isFunction(Function.POSITION)) return cmp;
+
     Expr min = null, max = null;
-    if(arg.isSimple()) {
-      if(arg instanceof Range && cmp == OpV.EQ) {
-        final Range r = (Range) arg;
+    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
+    if(ex2.isSimple()) {
+      if(ex2 instanceof Range && op == OpV.EQ) {
+        final Range r = (Range) ex2;
         final Expr e1 = r.exprs[0], e2 = r.exprs[1];
-        if(e1.seqType().type.instanceOf(AtomType.ITR) &&
-           e2.seqType().type.instanceOf(AtomType.ITR)) {
+        if(st1.type.instanceOf(AtomType.ITR) && st2.type.instanceOf(AtomType.ITR)) {
           min = e1;
           max = e1.equals(e2) ? e1 : e2;
         }
-      } else {
-        final SeqType st = arg.seqType();
-        if(st.oneNoArray()) {
-          switch(cmp) {
-            case EQ:
-              min = arg;
-              max = arg;
-              break;
-            case GE:
-              min = arg;
-              max = Int.MAX;
-              break;
-            case GT:
-              min = new Arith(ii, st.type.instanceOf(AtomType.ITR) ? arg :
-                cc.function(Function.FLOOR, ii, arg), Int.ONE, Calc.PLUS);
-              max = Int.MAX;
-              break;
-            case LE:
-              min = Int.ONE;
-              max = arg;
-              break;
-            case LT:
-              min = Int.ONE;
-              max = new Arith(ii, st.type.instanceOf(AtomType.ITR) ? arg :
-                cc.function(Function.CEILING, ii, arg), Int.ONE, Calc.MINUS);
-              break;
-            default:
-          }
+      } else if(st2.oneNoArray()) {
+        switch(op) {
+          case EQ:
+            min = ex2;
+            max = ex2;
+            break;
+          case GE:
+            min = ex2;
+            max = Int.MAX;
+            break;
+          case GT:
+            min = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? ex2 :
+              cc.function(Function.FLOOR, ii, ex2), Int.ONE, Calc.PLUS);
+            max = Int.MAX;
+            break;
+          case LE:
+            min = Int.ONE;
+            max = ex2;
+            break;
+          case LT:
+            min = Int.ONE;
+            max = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? ex2 :
+              cc.function(Function.CEILING, ii, ex2), Int.ONE, Calc.MINUS);
+            break;
+          default:
         }
       }
     }
-    return min == null ? orig : new Pos(ii, min, max);
+    return min == null ? cmp : new Pos(ii, min, max);
   }
 
   @Override

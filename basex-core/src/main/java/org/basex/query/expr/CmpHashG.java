@@ -36,13 +36,10 @@ public final class CmpHashG extends CmpG {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate values
-    if(allAreValues()) {
-      final Expr value = cc.preEval(this);
-      caches.remove();
-      return value;
-    }
-    return this;
+    final Expr expr = super.optimize(cc);
+    // invalidate cache if value was pre-evaluated
+    if(expr instanceof Value) caches.remove();
+    return expr;
   }
 
   /**

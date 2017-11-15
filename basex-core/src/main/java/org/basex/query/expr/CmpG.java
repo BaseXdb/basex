@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
-import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -128,74 +127,40 @@ public class CmpG extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // swap expressions; add text() to location paths to simplify optimizations
+    // pre-evaluate if one value is empty (e.g.: () eq local:expensive() )
+    if(oneIsEmpty()) return cc.replaceWith(this, Bln.FALSE);
+
+    // swap operands
     if(swap()) {
       cc.info(OPTSWAP_X, this);
       op = op.swap();
     }
 
-    // check if both arguments will always yield one result
-    final Expr e1 = exprs[0], e2 = exprs[1];
-    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
-
-    // one value is empty (e.g.: () = local:expensive() )
-    if(oneIsEmpty()) return cc.replaceWith(this, Bln.FALSE);
-
-    Expr ex = this;
-    if(e1.isFunction(Function.COUNT)) {
-      // rewrite count() function
-      ex = compCount(op.op, cc);
-    } else if(e1.isFunction(Function.STRING_LENGTH)) {
-      // rewrite string-length() function
-      ex = compStringLength(op.op, cc);
-    } else if(e1.isFunction(Function.POSITION)) {
-      // position() CMP number(s)
-      ex = ItrPos.get(op.op, e2, this, info);
-      if(ex == this) ex = Pos.get(op.op, e2, this, info, cc);
-    } else if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
-        op == OpG.NE && e2 == Bln.TRUE)) {
-      // (A = false()) -> not(A)
-      ex = cc.function(Function.NOT, info, e1);
-    }
-    if(ex != this) return cc.replaceWith(this, ex);
-
-    // rewrite equality comparisons (range expression or number)
-    ex = CmpR.get(this, cc);
+    // optimize expression
+    Expr ex = opt(op.op, cc);
+    // range comparisons
+    if(ex == this) ex = CmpR.get(this, cc);
     if(ex == this) ex = CmpSR.get(this, cc);
-    if(ex != this) return cc.replaceWith(this, ex);
 
+    // simple comparisons
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
-    if(op == OpG.EQ) {
-      /* pre-evaluate equality test if:
-       * - equality operator is specified,
-       * - operands are equal,
-       * - operands are deterministic, non-updating,
-       * - operands do not depend on context (unless context value exists) */
-      if(e1.equals(e2) && !e1.has(Flag.NDT) && (!e1.has(Flag.CTX) || cc.qc.focus.value != null)) {
-        /* consider query flags. do not rewrite:
-         * random:integer() = random:integer() */
-        if(st1.oneOrMore() && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) ||
-            t1 == AtomType.BLN)) {
-          /* currently limited to strings, integers and booleans. illegal rewriting:
-           * xs:double('NaN') = xs:double('NaN') */
-          return cc.replaceWith(this, Bln.TRUE);
-        }
+    if(ex == this) {
+      if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
+        ex = new CmpSimpleG(ex1, ex2, op, coll, sc, info);
+      }
+    }
+    // hash-based comparisons
+    if(ex == this) {
+      if(op == OpG.EQ && coll == null && ((t1.isStringOrUntyped() && t2.isStringOrUntyped()) ||
+          t1.isNumber() && t2.isNumber()) && ex2.size() != 1) {
+        ex = new CmpHashG(ex1, ex2, op, coll, sc, info);
       }
     }
 
-    // simple comparison
-    if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
-      return cc.replaceWith(this, new CmpSimpleG(e1, e2, op, coll, sc, info).optimize(cc));
-    }
-
-    // hash-based comparison
-    if(op == OpG.EQ && coll == null && ((t1.isStringOrUntyped() && t2.isStringOrUntyped()) ||
-        t1.isNumber() && t2.isNumber()) && e2.size() != 1) {
-      return cc.replaceWith(this, new CmpHashG(e1, e2, op, coll, sc, info).optimize(cc));
-    }
-
-    // pre-evaluate values
-    return allAreValues() ? cc.preEval(this) : this;
+    // pre-evaluate values or return expression
+    return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
   }
 
   @Override
