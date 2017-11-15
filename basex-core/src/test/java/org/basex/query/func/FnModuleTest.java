@@ -102,7 +102,14 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void data() {
+  @Test public void error() {
+    final Function func = Function.ERROR;
+
+    // pre-evaluate empty sequence
+    error(func.args(), FUNERR1);
+    error(func.args(" ()"), FUNERR1);
+    query("(1," + func.args() + ")[1]", 1);
+    query("head((1," + func.args() + "))", 1);
   }
 
   /** Test method. */
@@ -180,6 +187,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" <a/>"), "<a/>", empty(name));
     check(func.args(" <a/>[name()]"), "<a/>", empty(name));
     check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(name));
+    check(func.args(" (1,error())"), 1, exists(Int.class));
   }
 
   /** Test method. */
