@@ -163,6 +163,11 @@ public final class ItrPos extends Simple {
   }
 
   @Override
+  public String description() {
+    return "positional access";
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("position() ");
     if(min == max) {

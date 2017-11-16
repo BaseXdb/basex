@@ -69,11 +69,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public SeqType seqType() {
-    return SeqType.ITR_OM;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof RangeSeq)) return super.equals(obj);

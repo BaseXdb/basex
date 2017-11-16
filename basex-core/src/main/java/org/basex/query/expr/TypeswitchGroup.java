@@ -82,7 +82,7 @@ public final class TypeswitchGroup extends Single {
     final ArrayList<SeqType> tmp = new ArrayList<>();
     for(final SeqType st : types) {
       if(cache.contains(st)) {
-        cc.info(OPTREMOVE_X_X, description(), st);
+        cc.info(OPTREMOVE_X_X, st, description());
       } else {
         tmp.add(st);
         cache.add(st);

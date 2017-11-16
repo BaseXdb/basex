@@ -193,9 +193,8 @@ public final class TextView extends View {
     // will never exceed integer range as the underlying array is limited to 2^31 bytes
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
-    if(out.finished() && size >= chop.length) {
-      System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
-    }
+    final int cl = chop.length;
+    if(out.finished() && size >= cl) System.arraycopy(chop, 0, buf, size - cl, cl);
     text.setText(buf, size);
     header.setText((out.finished() ? CHOPPED : "") + RESULT);
     home.setEnabled(gui.context.data() != null);

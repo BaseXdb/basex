@@ -7,8 +7,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -65,13 +63,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public SeqType seqType() {
-    return SeqType.get(type, Occ.ONE_MORE);
-  }
-
-  @Override
-  public Value insert(final long pos, final Item it) {
-    return it.equals(value) ? get(value, size + 1) : copyInsert(pos, it);
+  public Value insert(final long pos, final Item item) {
+    return item.equals(value) ? get(value, size + 1) : copyInsert(pos, item);
   }
 
   @Override

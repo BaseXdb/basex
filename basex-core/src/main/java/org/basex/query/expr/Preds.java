@@ -71,8 +71,7 @@ public abstract class Preds extends Arr {
           if(num(e2)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              cc.info(OPTSIMPLE_X, expr);
-              expr = e2;
+              expr = cc.replaceWith(expr, e2);
             }
           }
         }
@@ -103,7 +102,7 @@ public abstract class Preds extends Arr {
       // predicate will not yield any results
       if(expr == Bln.FALSE) return cc.emptySeq(this);
       // skip expression yielding true
-      if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
+      if(exprs[e] != expr) cc.replaceWith(exprs[e], expr);
       pos = add(expr, list, pos, cc);
     }
     exprs = list.finish();
@@ -123,7 +122,7 @@ public abstract class Preds extends Arr {
 
     final boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
     if(expr == Bln.TRUE) {
-      cc.info(OPTREMOVE_X_X, description(), expr);
+      cc.info(OPTREMOVE_X_X, expr, description());
     } else if(ps || !list.contains(expr) || expr.has(Flag.NDT)) {
       list.add(expr);
     }
@@ -204,7 +203,7 @@ public abstract class Preds extends Arr {
       Expr ex = expr;
      if(expr instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
         // E [ . ]  ->  E
-        cc.info(OPTSIMPLE_X, this);
+        cc.info(OPTREMOVE_X_X, ex, description());
         continue;
       } else if(ex instanceof SimpleMap) {
         // E [ . ! ... ]  ->  E [ ... ]

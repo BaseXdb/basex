@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 
 /**
@@ -53,28 +52,5 @@ abstract class NativeSeq extends Seq {
   @Override
   public final long atomSize() {
     return size;
-  }
-
-  @Override
-  public final SeqType seqType() {
-    return SeqType.get(type, Occ.ONE_MORE);
-  }
-
-  @Override
-  public final Value insert(final long pos, final Item item) {
-    return copyInsert(pos, item);
-  }
-
-  @Override
-  public final Value remove(final long pos) {
-    return copyRemove(pos);
-  }
-
-  @Override
-  public final Value reverse() {
-    final long n = size;
-    final ValueBuilder vb = new ValueBuilder();
-    for(long i = 0; i < n; i++) vb.add(itemAt(n - i - 1));
-    return vb.value(type);
   }
 }

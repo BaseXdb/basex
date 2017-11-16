@@ -96,7 +96,10 @@ public final class FnSort extends StandardFunc {
     // optimize sort on sequences
     final Expr ex = exprs[0];
     final int el = exprs.length;
-    if(el < 1) {
+    final SeqType st = ex.seqType();
+    if(st.zero()) return ex;
+
+    if(el < 2) {
       if(ex instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) ex;
         return seq.asc ? seq : seq.reverse();
@@ -105,9 +108,9 @@ public final class FnSort extends StandardFunc {
         final SingletonSeq seq = (SingletonSeq) ex;
         if(seq.itemAt(0).seqType().type.isSortable()) return seq;
       }
+      if(st.one() && st.type.isSortable()) return ex;
     }
     // check if single item must be checked
-    final SeqType st = ex.seqType();
-    return st.zero() ? ex : el == 1 && st.one() && st.type.isSortable() ? ex : adoptType(ex);
+    return adoptType(ex);
   }
 }

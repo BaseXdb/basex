@@ -21,11 +21,13 @@ public final class FnHead extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(st.zeroOrOne()) return ex;
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
-    return this;
+
+    return ex instanceof FnReverse ?
+      cc.function(Function._UTIL_LAST_FROM, info, ((Arr) ex).exprs) : this;
   }
 }

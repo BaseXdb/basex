@@ -64,7 +64,7 @@ abstract class Logical extends Arr {
         cc.info(OPTFLAT_X_X, description(), ex);
       } else if(ex instanceof Value) {
         // pre-evaluate values
-        cc.info(OPTREMOVE_X_X, description(), expr);
+        cc.info(OPTREMOVE_X_X, expr, description());
         if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         list.add(ex);

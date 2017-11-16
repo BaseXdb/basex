@@ -144,6 +144,11 @@ public final class Pos extends Arr {
   }
 
   @Override
+  public String description() {
+    return "positional access";
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), exprs);
   }

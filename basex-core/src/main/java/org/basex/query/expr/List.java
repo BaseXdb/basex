@@ -52,7 +52,7 @@ public final class List extends Arr {
     final int ls = list.size();
     if(ls != exprs.length) {
       if(ls < 2) return cc.replaceWith(this, ls == 0 ? Empty.SEQ : list.get(0));
-      cc.info(OPTREMOVE_X_X, description(), Empty.SEQ);
+      cc.info(OPTREMOVE_X_X, Empty.SEQ, description());
       exprs = list.finish();
     }
 

@@ -3,9 +3,11 @@ package org.basex.query.func.util;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -32,11 +34,13 @@ public final class UtilLastFrom extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(st.zeroOrOne()) return ex;
-    exprType.assign(st.type);
-    return this;
+    exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+
+    return ex instanceof FnReverse ?
+      cc.function(Function.HEAD, info, ((Arr) ex).exprs) : this;
   }
 }

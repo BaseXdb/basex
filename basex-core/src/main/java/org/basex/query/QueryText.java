@@ -392,13 +392,13 @@ public interface QueryText {
   /** Optimization info. */ String OPTDESC = "rewrite descendant-or-self step(s)";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
   /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";
-  /** Optimization info. */ String OPTREMOVE_X_X = "%: remove %";
   /** Optimization info. */ String OPTTCE_X = "mark as tail call: %";
   /** Optimization info. */ String OPTLET_X = "hoist let clause: %";
   /** Optimization info. */ String OPTFORTOLET_X = "rewrite for to let: %";
   /** Optimization info. */ String OPTSWAP_X = "swap operands: %";
   /** Optimization info. */ String OPTSIMPLE_X = "simplify %";
   /** Optimization info. */ String OPTINLINE_X = "inline %";
+  /** Optimization info. */ String OPTREMOVE_X_X = "remove % from %";
   /** Optimization info. */ String OPTWHERE = "rewrite where clause(s)";
   /** Optimization info. */ String OPTPRED_X = "rewrite % to predicate(s)";
   /** Optimization info. */ String OPTVAR_X = "remove variable %";

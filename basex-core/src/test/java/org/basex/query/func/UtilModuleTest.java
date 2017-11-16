@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.ast.*;
+import org.basex.query.func.fn.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -94,6 +95,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" prof:void(())"), "", empty(name));
     check(func.args(" <a/>"), "<a/>", empty(name));
     check(func.args(" (<a/>,<b/>)[name()]"), "<b/>", type(name, "element()?"));
+    check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(FnHead.class));
   }
 
   /** Test method. */

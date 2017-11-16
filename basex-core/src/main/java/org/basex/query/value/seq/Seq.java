@@ -12,6 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -93,7 +94,7 @@ public abstract class Seq extends Value {
    */
   public Value insertBefore(final long pos, final Value val) {
     final long n = val.size();
-    return n == 1 ? insert(pos, (Item) val) : copyInsert(pos, val);
+    return n == 1 ? insert(pos, (Item) val) : n == 0 ? this : copyInsert(pos, val);
   }
 
   /**
@@ -111,7 +112,6 @@ public abstract class Seq extends Value {
    * @return resulting value
    */
   final Value copyInsert(final long pos, final Value val) {
-    if(val.isEmpty()) return this;
     final ValueBuilder vb = new ValueBuilder();
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(val);
@@ -172,6 +172,11 @@ public abstract class Seq extends Value {
     final FElem el = planElem(SIZE, size, TYPE, seqType());
     addPlan(plan, el);
     for(int v = 0; v != Math.min(size, 3); ++v) itemAt(v).plan(el);
+  }
+
+  @Override
+  public final SeqType seqType() {
+    return SeqType.get(type, Occ.ONE_MORE);
   }
 
   @Override

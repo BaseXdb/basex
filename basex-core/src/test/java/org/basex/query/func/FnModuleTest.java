@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.func.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -194,6 +195,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" <a/>[name()]"), "<a/>", empty(name));
     check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(name));
     check(func.args(" (1,error())"), 1, exists(Int.class));
+    check(func.args(" reverse((1, 2, 3)[. > 1])"), 3, exists(UtilLastFrom.class));
   }
 
   /** Test method. */

@@ -77,8 +77,11 @@ public final class And extends Logical {
           }
         }
       }
-      if(exprs[e] != expr) cc.info(OPTSIMPLE_X, exprs[e]);
-      if(!list.contains(expr) || expr.has(Flag.NDT)) list.add(expr);
+      if(!list.contains(expr) || expr.has(Flag.NDT)) {
+        list.add(cc.replaceWith(exprs[e], expr));
+      } else {
+        cc.info(OPTREMOVE_X_X, exprs[e], description());
+      }
     }
   }
 

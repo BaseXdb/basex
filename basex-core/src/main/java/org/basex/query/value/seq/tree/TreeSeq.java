@@ -11,7 +11,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -137,11 +136,6 @@ public abstract class TreeSeq extends Seq {
     final Item head = itemAt(0);
     if(head instanceof ANode) return head;
     throw EBV_X.get(ii, this);
-  }
-
-  @Override
-  public final SeqType seqType() {
-    return SeqType.get(type, Occ.ONE_MORE);
   }
 
   /**

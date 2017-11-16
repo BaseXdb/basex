@@ -187,8 +187,9 @@ public final class BitArray {
    * @param s new size
    */
   private void resize(final int s) {
-    final long[] tmp = new long[Math.max(words.length << 1, s)];
-    System.arraycopy(words, 0, tmp, 0, words.length);
+    final int wl = words.length;
+    final long[] tmp = new long[Math.max(wl << 1, s)];
+    System.arraycopy(words, 0, tmp, 0, wl);
     words = tmp;
   }
 }

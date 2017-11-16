@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -80,11 +79,6 @@ final class SubSeq extends Seq {
     final Item fst = itemAt(0);
     if(fst instanceof ANode) return fst;
     throw EBV_X.get(ii, this);
-  }
-
-  @Override
-  public SeqType seqType() {
-    return sub.seqType();
   }
 
   @Override
