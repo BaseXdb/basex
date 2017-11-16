@@ -492,6 +492,9 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 3037000499"), 4611686016981624750L);
     query(func.args(" 1 to 3037000500"), 4611686020018625250L);
     query(func.args(" 1 to 4294967295"), 9223372034707292160L);
+    query(func.args(" reverse(1 to 10)"), 55);
+    query(func.args(" sort(reverse(distinct-values(1 to 4294967295)))"), 9223372034707292160L);
+
     query(func.args(" 2 to 10"), 54);
     query(func.args(" 9 to 10"), 19);
     query(func.args(" -3037000500 to 3037000500"), 0);

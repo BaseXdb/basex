@@ -61,7 +61,7 @@ public final class FnSum extends Aggr {
   private Item gauss(final Value value) throws QueryException {
     if(value.isEmpty()) return null;
 
-    long min = value.itemAt(0).itr(info), max = min + value.size() - 1;
+    long min = value.itemAt(0).itr(info), max = value.itemAt(value.size() - 1).itr(info);
     // swap values if order is descending
     if(min > max) {
       final long t = max;
