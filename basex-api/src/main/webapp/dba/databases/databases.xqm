@@ -12,6 +12,9 @@ import module namespace util = 'dba/util' at '../modules/util.xqm';
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
 
+(:~ Regular expression for backups. :)
+declare variable $dba:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$';
+
 (:~
  : Main page.
  : @param  $sort   table sort key
@@ -44,12 +47,11 @@ function dba:databases(
     return <row name='{ $db }' resources='{ $db/@resources }' size='{ $db/@size }'
                 date='{ $db/@modified-date }'/>
   let $backups :=
-    let $regex := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$'
     for $backup in db:backups()
-    where matches($backup, $regex)
-    group by $name := replace($backup, $regex, '$1')
+    where matches($backup, $dba:BACKUP-REGEX)
+    group by $name := replace($backup, $dba:BACKUP-REGEX, '$1')
     where not($names($name))
-    let $date := replace(sort($backup)[last()], $regex, '$2T$3:$4:$5Z')
+    let $date := replace(sort($backup)[last()], $dba:BACKUP-REGEX, '$2T$3:$4:$5Z')
     return <row name='{ $name }' resources='' size='(backup)' date='{ $date }'/>
 
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
