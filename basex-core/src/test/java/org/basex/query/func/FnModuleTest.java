@@ -224,6 +224,50 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void min() {
+    final Function func = Function.MIN;
+    query(func.args(1), 1);
+    query(func.args(1.1), 1.1);
+    query(func.args(" 1e1"), 10);
+    query(func.args(" (1, 1e1)"), 1);
+    query(func.args(" (1, 1.1, 1e1)") + " instance of xs:double", true);
+    query(func.args(" <x>1</x>") + " instance of xs:double", true);
+    query(func.args(" [1]"), 1);
+    query(func.args(" (7, 6, 6, 6.0, 5.0, 5.0, xs:float('5'), xs:float('4'), xs:float('4'), " +
+        "4, 4e0, 3e0, 3e0, 2e0, 2, 2, 1, <x>0</x>, <x>0</x>)"), 0);
+    query(func.args(" (xs:double('NaN'), xs:float('NaN'))") + " instance of xs:double", true);
+
+    query(func.args(" (xs:anyURI('b'), xs:anyURI('a'))") +
+        " ! (. = 'a' and . instance of xs:anyURI)", true);
+    query(func.args(" (xs:anyURI('c'), xs:anyURI('b'), 'a')") +
+        " ! (. = 'a' and . instance of xs:string)", true);
+    query(func.args(" ('b', xs:anyURI('a'))") +
+        " ! (. = 'a' and . instance of xs:string)", true);
+    query(func.args(" (2,3,1)"), 1);
+    query(func.args(" (xs:date('2002-01-01'), xs:date('2003-01-01'), xs:date('2001-01-01'))"),
+        "2001-01-01");
+    query(func.args(" (xs:dayTimeDuration('PT1S'), xs:dayTimeDuration('PT0S'))"), "PT0S");
+    query(func.args(" (xs:hexBinary('42'), xs:hexBinary('43'), xs:hexBinary('41'))"), 'A');
+
+    query("for $n in (1, 2) return " + func.args(" $n"), "1\n2");
+    query("for $n in (1, 2) return " + func.args(" ($n, $n)"), "1\n2");
+
+    query("for $s in (['a', 'b'], ['c']) return " + func.args(" ($s, $s)"), "a\nc");
+
+    // query plan checks
+    check(func.args(" ()"), "", empty());
+    check(func.args(" prof:void(123)"), "", empty(func.clazz));
+    check(func.args(" 123"), 123, empty(func.clazz));
+    check(func.args(" <x>1</x>"), 1, exists(func.clazz));
+
+    // errors
+    error(func.args(" xs:QName('a')"), CMP_X);
+    error(func.args(" ('b', 'c', 'a', 1)"), CMP_X_X_X);
+    error(func.args(" (2, 3, 1, 'a')"), CMP_X_X_X);
+    error(func.args(" (false(), true(), false(), 1)"), CMP_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void namespaceUriForPrefix() {
     final Function func = Function.NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
@@ -248,9 +292,9 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // function is replaced with fn:boolean
     check("for $i in (1,2) return " + func.args(" $i = $i + 1"),
-        "true\ntrue", exists("*[@op = '!=']"));
+        "true\ntrue", exists("*[@op != '=']"));
     check("for $i in (1,2) return " + func.args(" $i eq $i + 1"),
-        "true\ntrue", exists("*[@op = 'ne']"));
+        "true\ntrue", exists("*[@op != 'eq']"));
     check("for $i in (1,2) return " + func.args(" $i = ($i, $i)"),
         "false\nfalse", exists(name));
   }
@@ -389,6 +433,11 @@ public final class FnModuleTest extends QueryPlanTest {
         " function($s) { number($s) }") + "[1]",
         "36-37");
     query(func.args(" (1,2)", " ()", " function($s) { [$s] }"), "1\n2");
+
+    check(func.args(" 1 to 100000000") + "[1]", 1, empty(func.clazz));
+    check(func.args(" reverse(1 to 100000000)") + "[1]", 1, empty(func.clazz));
+    check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func.clazz));
+    check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func.clazz));
   }
 
   /** Test method. */

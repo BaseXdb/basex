@@ -21,7 +21,7 @@ public final class RangeSeq extends Seq {
   /** Start value. */
   private final long start;
   /** Ascending/descending order. */
-  private final boolean asc;
+  public final boolean asc;
 
   /**
    * Constructor.

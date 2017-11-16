@@ -203,6 +203,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns the difference between the current and the specified item.
+   * This function is overwritten by the corresponding implementations.
    * @param it item to be compared
    * @param coll collation (can be {@code null})
    * @param ii input info
@@ -211,7 +212,7 @@ public abstract class Item extends Value {
    */
   @SuppressWarnings("unused")
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw (type == it.type ? CMPTYPE_X : CMPTYPES_X_X).get(ii, type, it.type);
+    throw diffError(this, it, ii);
   }
 
   /**

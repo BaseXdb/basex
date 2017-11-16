@@ -78,7 +78,7 @@ public class CmpG extends Cmp {
     public static final OpG[] VALUES = values();
     /** String representation. */
     public final String name;
-    /** Comparator. */
+    /** Value comparison operator. */
     public final OpV op;
 
     /**
@@ -105,6 +105,18 @@ public class CmpG extends Cmp {
 
     @Override
     public String toString() { return name; }
+
+    /**
+     * Returns the comparator for the specified value comparison operator.
+     * @param cmp operator to be found
+     * @return comparator or {@code null}
+     */
+    static OpG get(final OpV cmp) {
+      for(final OpG value : VALUES) {
+        if(value.op == cmp) return value;
+      }
+      return null;
+    }
   }
 
   /** Comparator. */
@@ -147,7 +159,8 @@ public class CmpG extends Cmp {
     final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
     // skip type check if types are identical (and a child instance of of any atomic type)
-    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) ||
+    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) &&
+        (t1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
         t1.isUntyped() || t2.isUntyped() ||
         t1.instanceOf(AtomType.STR) && t2.instanceOf(AtomType.STR) ||
         t1.instanceOf(AtomType.NUM) && t2.instanceOf(AtomType.NUM) ||

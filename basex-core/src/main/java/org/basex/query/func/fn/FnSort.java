@@ -12,6 +12,8 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -91,8 +93,21 @@ public final class FnSort extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    // even single items must be sorted, as the input might be invalid
+    // optimize sort on sequences
     final Expr ex = exprs[0];
-    return ex.seqType().zero() ? ex : adoptType(ex);
+    final int el = exprs.length;
+    if(el < 1) {
+      if(ex instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) ex;
+        return seq.asc ? seq : seq.reverse();
+      }
+      if(ex instanceof SingletonSeq) {
+        final SingletonSeq seq = (SingletonSeq) ex;
+        if(seq.itemAt(0).seqType().type.isSortable()) return seq;
+      }
+    }
+    // check if single item must be checked
+    final SeqType st = ex.seqType();
+    return st.zero() ? ex : el == 1 && st.one() && st.type.isSortable() ? ex : adoptType(ex);
   }
 }

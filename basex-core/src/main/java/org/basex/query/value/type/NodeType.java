@@ -182,6 +182,11 @@ public enum NodeType implements Type {
   }
 
   @Override
+  public final boolean isSortable() {
+    return true;
+  }
+
+  @Override
   public final Item cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo info) throws QueryException {
     return item.type == this ? item : error(item, info);

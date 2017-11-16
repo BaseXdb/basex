@@ -35,7 +35,9 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
 
       for(final String test : tests) {
         if(new QueryProcessor(test, context).context(plan).value() != Bln.TRUE) {
-          fail(NL + "- Query: " + query + NL + "- Check: " + test + NL +
+          fail(NL + "- Query: " + query + NL +
+              "- Optimized: " + qp.qc.root + NL +
+              "- Check: " + test + NL +
               "- Plan: " + plan.serialize());
         }
       }

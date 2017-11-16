@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Aggregation function.
@@ -35,14 +36,17 @@ abstract class Aggr extends StandardFunc {
     int c = 1;
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      if(it.type.isNumberOrUntyped()) {
-        if(!num) throw SUMDUR_X_X.get(info, it.type, it);
+      final Type t = it.type;
+      Type te = null;
+      if(t.isNumberOrUntyped()) {
+        if(!num) te = AtomType.DUR;
       } else {
-        if(num) throw SUMNUM_X_X.get(info, it.type, it);
-        if(dtd && it.type != DTD || ymd && it.type != YMD) throw SUMDUR_X_X.get(info, it.type, it);
+        if(num) te = AtomType.NUM;
+        else if(dtd && t != DTD || ymd && t != YMD) te = AtomType.DUR;
       }
+      if(te != null) throw CMP_X_X_X.get(info, te, t, it);
       res = Calc.PLUS.ev(res, it, info);
-      ++c;
+      c++;
     }
     return avg ? Calc.DIV.ev(res, Int.get(c), info) : res;
   }

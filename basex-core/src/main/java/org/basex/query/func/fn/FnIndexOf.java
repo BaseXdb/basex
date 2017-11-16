@@ -40,9 +40,10 @@ public final class FnIndexOf extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType st = exprs[0].seqType();
-    if(st.zero()) return exprs[0];
-    if(st.zeroOrOne()) exprType.assign(Occ.ZERO_ONE);
+    final Expr ex = exprs[0];
+    final SeqType st = ex.seqType();
+    if(st.zero()) return ex;
+    if(st.zeroOrOne() && !st.mayBeArray()) exprType.assign(Occ.ZERO_ONE);
     return this;
   }
 }

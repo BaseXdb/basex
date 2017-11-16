@@ -281,14 +281,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("('a','b')[position()[position() ! .]]", "a\nb", count(FnPosition.class, 2));
-    check("('a','b')[. ! position()]", "a", "exists(.//*[contains(name(), 'Map')])");
+    check("('a','b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
     check("1[.]", 1, exists(ContextValue.class));
-    check("let $x := (<a/>,<a/>) where $x[. eq ''] return $x", "<a/>\n<a/>",
-        "exists(.//ContextValue)");
+    check("let $x := (<a/>,<a/>) where $x[. eq ''] return $x", "<a/>\n<a/>", exists(CmpG.class));
     error("true#0[.]", QueryError.EBV_X_X);
 
     // map expression
-    check("'s'['s' ! <a/>]", "s", "empty(QueryPlan//*[contains(name(), 'Map')])");
+    check("'s'['s' ! <a/>]", "s", empty("*[contains(name(), 'Map')]"));
     check("'s'['s' ! <a/>]", "s", "exists(QueryPlan/Str)");
     check("'s'['x' ! <a/> ! <b/>]", "s", "exists(QueryPlan/Str)");
     check("'s'['x' ! (<a/>,<b/>) ! <b/>]", "s", "exists(QueryPlan/Str)");

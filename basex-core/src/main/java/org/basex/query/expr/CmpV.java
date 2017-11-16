@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -183,13 +184,18 @@ public final class CmpV extends Cmp {
     final Expr ex1 = exprs[0], ex2 = exprs[1];
     final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
-    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) ||
+    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) &&
+        (t1.isSortable() || op != OpV.EQ && op != OpV.NE) ||
         t1.isStringOrUntyped() && t2.isStringOrUntyped() ||
         t1.instanceOf(AtomType.NUM) && t2.instanceOf(AtomType.NUM) ||
         t1.instanceOf(AtomType.DUR) && t2.instanceOf(AtomType.DUR));
 
-    // optimize expression. pre-evaluate values or return expression
-    final Expr ex = opt(op, cc);
+    // try to rewrite to general expression (faster evaluation)
+    Expr ex = check || !st1.oneNoArray() || !st2.oneNoArray() ? this :
+      new CmpG(ex1, ex2, OpG.get(op), coll, sc, info).optimize(cc);
+
+    if(ex == this) ex = opt(op, cc);
+    // pre-evaluate values or return expression
     return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
   }
 

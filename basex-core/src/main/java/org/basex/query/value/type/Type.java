@@ -210,46 +210,51 @@ public interface Type {
   boolean instanceOf(Type type);
 
   /**
-   * Computes the union between this type and the given one, i.e. the least common
-   * ancestor of both types in the type hierarchy.
+   * Computes the union between this type and the given one, i.e. the least common ancestor
+   * of both types in the type hierarchy.
    * @param type other type
    * @return union type
    */
   Type union(Type type);
 
   /**
-   * Computes the intersection between this type and the given one, i.e. the least
-   * specific type that is sub-type of both types. If no such type exists, {@code null} is
-   * returned.
+   * Computes the intersection between this type and the given one, i.e. the least specific type
+   * that is sub-type of both types. If no such type exists, {@code null} is returned.
    * @param type other type
    * @return intersection type or {@code null}
    */
   Type intersect(Type type);
 
   /**
-   * Checks if the type refers to a number.
+   * Checks if items with this type are numbers.
    * @return result of check
    */
   boolean isNumber();
 
   /**
-   * Checks if the type refers to an untyped item.
+   * Checks if items with this type are untyped.
    * @return result of check
    */
   boolean isUntyped();
 
   /**
-   * Checks if the type refers to a number or an untyped item.
+   * Checks if items with this type are numbers or untyped.
    * @return result of check
    */
   boolean isNumberOrUntyped();
 
   /**
-   * Checks if the type refers to a string or an untyped item.
+   * Checks if items of this type are strings or untyped.
    * Returns if this item is untyped or a string.
    * @return result of check
    */
   boolean isStringOrUntyped();
+
+  /**
+   * Checks if items of this type are sortable.
+   * @return result of check
+   */
+  boolean isSortable();
 
   /**
    * Returns the string representation of this type.

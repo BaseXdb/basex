@@ -18,15 +18,18 @@ public final class FnReverse extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // optimization: reverse sequence
-    if(exprs[0] instanceof Value) return value(qc).iter();
+    final Iter iter = qc.iter(exprs[0]);
 
     // materialize value if number of results is unknown
-    final Iter iter = qc.iter(exprs[0]);
     final long s = iter.size();
     // no result: empty iterator
     if(s == 0) return Empty.ITER;
     // single result: iterator
     if(s == 1) return iter;
+
+    // value-based iterator
+    final Value v = iter.value();
+    if(v != null) return v.reverse().iter();
 
     // fast route if the size is known
     if(s > -1) return new Iter() {
@@ -62,7 +65,7 @@ public final class FnReverse extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr ex = exprs[0];
-    return ex instanceof RangeSeq ? ((RangeSeq) ex).reverse() : ex.seqType().zeroOrOne() ? ex :
-      adoptType(ex);
+    return ex instanceof RangeSeq ? ((RangeSeq) ex).reverse() :
+      ex instanceof SingletonSeq || ex.seqType().zeroOrOne() ? ex : adoptType(ex);
   }
 }

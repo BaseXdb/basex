@@ -66,6 +66,11 @@ public enum ListType implements Type {
   }
 
   @Override
+  public final boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public final byte[] string() {
     return name.string();
   }

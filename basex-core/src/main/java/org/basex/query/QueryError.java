@@ -634,19 +634,15 @@ public enum QueryError {
   EXACTLYONE(FORG, 5, "Exactly one item expected."),
 
   /** FORG0006. */
-  MINMAX_X_X_X(FORG, 6, "% expected, % found: %."),
+  CMP_X(FORG, 6, "Type % is not comparable."),
   /** FORG0006. */
-  NOTCMP_X(FORG, 6, "Items of type % cannot be compared."),
+  CMP_X_X_X(FORG, 6, "% expected, % found: %."),
   /** FORG0006. */
   EBV_X(FORG, 6, "Effective boolean value not defined for %."),
   /** FORG0006. */
   EBV_X_X(FORG, 6, "Effective boolean value not defined for %: %."),
   /** FORG0006. */
   SUM_X_X(FORG, 6, "Argument type % is invalid: %."),
-  /** FORG0006. */
-  SUMNUM_X_X(FORG, 6, "Number expected, % found: %."),
-  /** FORG0006. */
-  SUMDUR_X_X(FORG, 6, "Duration expected, % found: %."),
 
   /** FORG0008. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -672,7 +668,7 @@ public enum QueryError {
   /** FOTY0013. */
   FISTRING_X(FOTY, 14, "Items of type % have no string representation."),
   /** FOTY0013. */
-  FICMP_X(FOTY, 15, "Items of type % cannot be compared."),
+  FICMP_X(FOTY, 15, "Type % is not comparable."),
 
   /** FOUP0001. */
   UPFOTYPE_X(FOUP, 1, "Document or element expected, % found."),
@@ -1016,9 +1012,9 @@ public enum QueryError {
   /** XPTY0004. */
   NOPAREN_X_X(XPTY, 4, "No parenthesis expected after %."),
   /** XPTY0004. */
-  CMPTYPE_X(XPTY, 4, "Items of type % cannot be compared."),
+  CMPTYPE_X(XPTY, 4, "Type % is not comparable."),
   /** XPTY0004. */
-  CMPTYPES_X_X(XPTY, 4, "Items of type % and % cannot be compared."),
+  CMPTYPES_X_X(XPTY, 4, "Types % and % are not comparable."),
   /** XPTY0004. */
   DOCATTS_X(XPTY, 4, "Cannot add attributes to a document node: %."),
   /** XPTY0004. */
@@ -1535,7 +1531,7 @@ public enum QueryError {
    */
   public static QueryException diffError(final Item item1, final Item item2, final InputInfo info) {
     final Type t1 = item1.type, t2 = item2.type;
-    return (item1 == item2 ? NOTCMP_X : t1 == t2 ? CMPTYPE_X : CMPTYPES_X_X).get(info, t1, t2);
+    return t1 == t2 ? CMPTYPE_X.get(info, t1, item1) : CMPTYPES_X_X.get(info, t1, t2);
   }
 
   /**

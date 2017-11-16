@@ -36,13 +36,13 @@ public final class UtilReplicate extends StandardFunc {
     final Expr ex = exprs[0], mult = exprs[1];
 
     // pre-evaluate static multipliers
-    final long ps = mult instanceof Value ? toLong(mult, cc.qc) : -1;
-    if(ps == 0 || ex == Empty.SEQ) return Empty.SEQ;
-    if(ps == 1) return ex;
+    final long m = mult instanceof Value ? toLong(mult, cc.qc) : -1;
+    if(m == 0 || ex == Empty.SEQ) return Empty.SEQ;
+    if(m == 1) return ex;
 
     // adopt sequence type
     final SeqType st = ex.seqType();
-    exprType.assign(st.type, st.occ.union(ps > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE));
+    exprType.assign(st.type, st.occ.union(m > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE));
     return this;
   }
 }

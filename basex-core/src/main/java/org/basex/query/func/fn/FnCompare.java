@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
@@ -29,8 +30,11 @@ public final class FnCompare extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    if(exprs[0].seqType().oneNoArray() && exprs[1].seqType().oneNoArray())
-      exprType.assign(Occ.ONE);
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
+    if(st1.zero()) return ex1;
+    if(st2.zero()) return ex2;
+    if(st1.oneNoArray() && st2.oneNoArray()) exprType.assign(Occ.ONE);
     return this;
   }
 }

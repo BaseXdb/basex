@@ -70,6 +70,11 @@ public class FuncType implements Type {
   }
 
   @Override
+  public final boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public final SeqType seqType() {
     if(seqType == null) seqType = new SeqType(this);
     return seqType;
