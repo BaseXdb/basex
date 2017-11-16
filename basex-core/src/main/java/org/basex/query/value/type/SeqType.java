@@ -654,9 +654,11 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instanceOf(final SeqType st) {
-    return (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
+    final Type t1 = type, t2 = st.type;
+    final Test k1 = kind, k2 = st.kind;
+    return (t2 == AtomType.ITEM || t1.instanceOf(t2)) && occ.instanceOf(st.occ) &&
       // [LW] complete kind check
-      (st.kind == null || kind != null && kind.intersect(st.kind) != null);
+      (k2 == null || k1 != null && k1.intersect(k2) != null);
   }
 
   /**
@@ -664,11 +666,11 @@ public final class SeqType {
    * @return type or {@code null} if type may be not atomic
    */
   public Type atomicType() {
-    final Type tp = type;
-    return tp.instanceOf(NodeType.NOD) ?
-      tp == NodeType.PI || tp == NodeType.COM ? AtomType.STR :
-      tp == NodeType.NOD ? AtomType.AAT : AtomType.ATM :
-      tp.instanceOf(AtomType.AAT) ? tp : null;
+    final Type t = type;
+    return t.instanceOf(NodeType.NOD) ?
+      t == NodeType.PI || t == NodeType.COM ? AtomType.STR :
+      t == NodeType.NOD ? AtomType.AAT : AtomType.ATM :
+      t.instanceOf(AtomType.AAT) ? t : null;
   }
 
   /**

@@ -67,13 +67,16 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0];
+    if(ex instanceof RangeSeq) return ex;
+
     final SeqType st = ex.seqType();
     final Type t = st.atomicType();
     if(t != null) {
       exprType.assign(t);
       simple = st.zeroOrOne();
+      if(ex instanceof SingletonSeq) return (((Value) ex).itemAt(0)).atomItem(null);
     }
-    return ex instanceof RangeSeq ? ex : exprs.length == 1 ? cmpDist(ex, cc) : this;
+    return optStats(ex, cc);
   }
 
   /**
@@ -83,9 +86,9 @@ public final class FnDistinctValues extends StandardFunc {
    * @return original expression or sequence of distinct values
    * @throws QueryException query exception
    */
-  private Expr cmpDist(final Expr ex, final CompileContext cc) throws QueryException {
-    // can only be performed on axis paths
-    if(!(ex instanceof AxisPath)) return this;
+  private Expr optStats(final Expr ex, final CompileContext cc) throws QueryException {
+    // can only be performed without collation and on axis paths
+    if(exprs.length > 1 || !(ex instanceof AxisPath)) return this;
 
     // try to get statistics for resulting nodes
     final ArrayList<PathNode> nodes = ((AxisPath) ex).pathNodes(cc);

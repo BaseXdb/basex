@@ -93,13 +93,20 @@ public final class FnModuleTest extends QueryPlanTest {
     check("[][. instance of xs:int][" + func.args(" .") + "]", "", empty(FnExists.class));
   }
 
-
   /** Test method. */
   @Test public void count() {
     final Function func = Function.COUNT;
 
-    query(func.args(" (1 to 100000000)") + " ! string()", 100000000);
+    query(func.args(" (1 to 100000000) ! string()"), 100000000);
     query(func.args(" for $i in 1 to 100000000 return string('x')"), 100000000);
+  }
+
+  /** Test method. */
+  @Test public void distinctValues() {
+    final Function func = Function.DISTINCT_VALUES;
+
+    query(func.args(" (1 to 100000000) ! 'a'") + "", "a");
+    query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
   }
 
   /** Test method. */
