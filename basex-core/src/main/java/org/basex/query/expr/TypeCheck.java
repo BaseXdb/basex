@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -69,7 +68,7 @@ public final class TypeCheck extends Single {
     if(expr instanceof Value) return cc.preEval(this);
 
     // check at each call
-    if(at.type.instanceOf(st.type) && !expr.has(Flag.NDT)) {
+    if(at.type.instanceOf(st.type)) {
       final Occ occ = at.occ.intersect(st.occ);
       if(occ == null) throw typeError(expr, st, null, info);
     }
