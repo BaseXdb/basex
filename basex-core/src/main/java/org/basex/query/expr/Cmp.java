@@ -23,6 +23,8 @@ public abstract class Cmp extends Arr {
   final Collation coll;
   /** Static context. */
   final StaticContext sc;
+  /** Type check at runtime. */
+  boolean check = true;
 
   /**
    * Constructor.

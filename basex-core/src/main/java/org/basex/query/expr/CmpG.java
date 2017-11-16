@@ -142,10 +142,18 @@ public class CmpG extends Cmp {
     if(ex == this) ex = CmpR.get(this, cc);
     if(ex == this) ex = CmpSR.get(this, cc);
 
-    // simple comparisons
+    // try to skip type checking at runtime
     final Expr ex1 = exprs[0], ex2 = exprs[1];
     final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
+    // skip type check if types are identical (and a child instance of of any atomic type)
+    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) ||
+        t1.isUntyped() || t2.isUntyped() ||
+        t1.instanceOf(AtomType.STR) && t2.instanceOf(AtomType.STR) ||
+        t1.instanceOf(AtomType.NUM) && t2.instanceOf(AtomType.NUM) ||
+        t1.instanceOf(AtomType.DUR) && t2.instanceOf(AtomType.DUR));
+
+    // simple comparisons
     if(ex == this && st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray())
       ex = new CmpSimpleG(ex1, ex2, op, coll, sc, info);
 
@@ -173,9 +181,7 @@ public class CmpG extends Cmp {
     if(is1 == 0) return Bln.FALSE;
     final Iter ir2 = exprs[1].atomIter(qc, info);
     final long is2 = ir2.size();
-    if(is2 == 0) return Bln.FALSE;
-
-    return compare(ir1, ir2, is1, is2, qc);
+    return is2 == 0 ? Bln.FALSE : compare(ir1, ir2, is1, is2, qc);
   }
 
   /**
@@ -245,11 +251,14 @@ public class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   final boolean eval(final Item it1, final Item it2) throws QueryException {
-    final Type t1 = it1.type, t2 = it2.type;
-    if(t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
-        it1 instanceof ANum && it2 instanceof ANum ||
-        it1 instanceof AStr && it2 instanceof AStr) return op.op.eval(it1, it2, coll, sc, info);
-    throw diffError(it1, it2, info);
+    if(check) {
+      final Type t1 = it1.type, t2 = it2.type;
+      if(!(t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
+          it1 instanceof ANum && it2 instanceof ANum ||
+          it1 instanceof AStr && it2 instanceof AStr ||
+          it1 instanceof Dur && it2 instanceof Dur)) throw diffError(it1, it2, info);
+    }
+    return op.op.eval(it1, it2, coll, sc, info);
   }
 
   @Override
@@ -287,7 +296,9 @@ public class CmpG extends Cmp {
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CmpG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+    final CmpG cmp = new CmpG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+    cmp.check = check;
+    return cmp;
   }
 
   @Override

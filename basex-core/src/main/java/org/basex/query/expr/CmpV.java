@@ -179,6 +179,15 @@ public final class CmpV extends Cmp {
       op = op.swap();
     }
 
+    // try to skip type checking at runtime
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
+    final Type t1 = st1.type, t2 = st2.type;
+    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) ||
+        t1.isStringOrUntyped() && t2.isStringOrUntyped() ||
+        t1.instanceOf(AtomType.NUM) && t2.instanceOf(AtomType.NUM) ||
+        t1.instanceOf(AtomType.DUR) && t2.instanceOf(AtomType.DUR));
+
     // optimize expression. pre-evaluate values or return expression
     final Expr ex = opt(op, cc);
     return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
@@ -212,7 +221,9 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info));
+    final Cmp cmp = new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+    cmp.check = check;
+    return copyType(cmp);
   }
 
   @Override

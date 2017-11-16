@@ -635,7 +635,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    // check if type is number, or a general atomic type that might result in a number
+    // check if type is number, or any other super type
     return type.isNumber() || AtomType.AAT.instanceOf(type);
   }
 
