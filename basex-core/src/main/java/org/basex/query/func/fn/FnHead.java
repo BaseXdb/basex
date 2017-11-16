@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -24,7 +25,7 @@ public final class FnHead extends StandardFunc {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(st.zeroOrOne()) return ex;
-    exprType.assign(st.type);
+    exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
     return this;
   }
 }
