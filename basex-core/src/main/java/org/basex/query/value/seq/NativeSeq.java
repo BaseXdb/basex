@@ -53,4 +53,25 @@ abstract class NativeSeq extends Seq {
   public final long atomSize() {
     return size;
   }
+
+  /**
+   * {@inheritDoc}
+   * Because this function will mostly be invoked recursively, the standard implementation
+   * will be called, because its runtime outweighs the possibly higher memory consumption.
+   */
+  @Override
+  public final Value insert(final long pos, final Item item) {
+    // no native implementation, because this
+    return copyInsert(pos, item);
+  }
+
+  /**
+   * {@inheritDoc}
+   * Because this function will mostly be invoked recursively, the standard implementation
+   * will be called, because its runtime outweighs the possibly higher memory consumption.
+   */
+  @Override
+  public final Value remove(final long pos) {
+    return copyRemove(pos);
+  }
 }

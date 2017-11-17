@@ -103,31 +103,6 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item val) {
-    if(val instanceof DBNode) {
-      final DBNode n = (DBNode) val;
-      if(n.data() == data) {
-        final int sz = (int) size, ps = (int) pos;
-        final int[] tmp = new int[sz + 1];
-        System.arraycopy(pres, 0, tmp, 0, ps);
-        System.arraycopy(pres, ps, tmp, ps + 1, sz - ps);
-        tmp[ps] = n.pre();
-        return get(tmp, data, type, false);
-      }
-    }
-    return copyInsert(pos, val);
-  }
-
-  @Override
-  public Value remove(final long pos) {
-    final int sz = (int) size - 1, ps = (int) pos;
-    final int[] tmp = new int[sz];
-    System.arraycopy(pres, 0, tmp, 0, ps);
-    System.arraycopy(pres, ps + 1, tmp, ps, sz - ps);
-    return get(tmp, data, type, false);
-  }
-
-  @Override
   public Value reverse() {
     final int sz = (int) size;
     final int[] tmp = new int[sz];

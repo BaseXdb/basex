@@ -38,26 +38,6 @@ public final class FltSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item val) {
-    if(val.type != type) return copyInsert(pos, val);
-    final int sz = (int) size, ps = (int) pos;
-    final float[] tmp = new float[sz + 1];
-    System.arraycopy(values, 0, tmp, 0, ps);
-    System.arraycopy(values, ps, tmp, ps + 1, sz - ps);
-    tmp[ps] = ((Flt) val).flt();
-    return get(tmp);
-  }
-
-  @Override
-  public Value remove(final long pos) {
-    final int sz = (int) size - 1, ps = (int) pos;
-    final float[] tmp = new float[sz];
-    System.arraycopy(values, 0, tmp, 0, ps);
-    System.arraycopy(values, ps + 1, tmp, ps, sz - ps);
-    return get(tmp);
-  }
-
-  @Override
   public Value reverse() {
     final int sz = (int) size;
     final float[] tmp = new float[sz];
