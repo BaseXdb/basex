@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests for  {@link Array#concat(Array)}.
+ * Tests for {@link Array#concat(Array)}.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler

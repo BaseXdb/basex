@@ -111,39 +111,39 @@ final class QueryCompiler {
    */
   private void compile() throws QueryException {
     // compile the used scopes only
-    for(final Scope[] comp : components(0)) circCheck(comp).comp(cc);
+    for(final Scope[] scope : scopes(0)) circCheck(scope).comp(cc);
 
     // check for circular variable declarations without compiling the unused scopes
     for(final StaticVar v : cc.qc.vars) {
-      if(id(v) == -1) for(final Scope[] comp : components(add(v))) circCheck(comp);
+      if(id(v) == -1) for(final Scope[] scope : scopes(add(v))) circCheck(scope);
     }
   }
 
   /**
    * Checks if the given component contains a static variable that depends on itself.
-   * @param comp component to check
+   * @param scopes scope to check
    * @return scope to be compiled, the others are compiled recursively
    * @throws QueryException query exception
    */
-  private static Scope circCheck(final Scope[] comp) throws QueryException {
-    if(comp.length > 1) {
-      for(final Scope scp : comp) {
-        if(scp instanceof StaticVar) {
-          final StaticVar var = (StaticVar) scp;
+  private static Scope circCheck(final Scope[] scopes) throws QueryException {
+    if(scopes.length > 1) {
+      for(final Scope scope : scopes) {
+        if(scope instanceof StaticVar) {
+          final StaticVar var = (StaticVar) scope;
           throw CIRCVAR_X.get(var.info, var.id());
         }
       }
     }
-    return comp[0];
+    return scopes[0];
   }
 
   /**
-   * Returns the strongly connected components of the dependency graph.
+   * Returns the strongly connected scopes of the dependency graph.
    * @param p ID of the starting point
-   * @return the components
+   * @return scopes
    * @throws QueryException if a variable directly calls itself
    */
-  private Iterable<Scope[]> components(final int p) throws QueryException {
+  private Iterable<Scope[]> scopes(final int p) throws QueryException {
     result.clear();
     tarjan(p);
     return result;

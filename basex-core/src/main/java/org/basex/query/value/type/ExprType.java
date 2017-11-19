@@ -41,14 +41,6 @@ public final class ExprType {
   }
 
   /**
-   * Indicates if the expression result will be empty.
-   * @return result of check
-   */
-  public boolean isEmpty() {
-    return size == 0;
-  }
-
-  /**
    * Assigns the specified sequence type and result size.
    * @param st sequence type
    * @param sz result size

@@ -173,7 +173,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean isVacuous() {
-    return !has(Flag.UPD) && exprType.isEmpty();
+    return !has(Flag.UPD) && size() == 0;
   }
 
   /**

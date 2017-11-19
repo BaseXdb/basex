@@ -38,48 +38,74 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(exprs.length != 2) return this;
-
-    final Expr keys = exprs[0], expr = exprs[1];
-    // guaranteed to be fully evaluated
-    if(keys instanceof Value && (expr instanceof Map || expr instanceof Array))
-      return cc.preEval(this);
-
-    final Type tp = expr.seqType().type;
-    final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
-    if(!map && !array) return this;
-
-    final boolean oneInput = expr.size() == 1;
-    final SeqType st = ((FuncType) tp).declType;
-    Occ occ = st.occ;
-    // map lookup may result in empty sequence
-    if(map) occ = st.occ.union(Occ.ZERO);
-    // wildcard or more than one input
-    if(keys == Str.WC || !oneInput) occ = st.occ.union(Occ.ONE_MORE);
-    exprType.assign(st.type, occ);
-
-    if(keys != Str.WC) {
-      if(oneInput) {
-        // one function, rewrite to for-each or function call
-        final Expr opt = keys.size() == 1
-            ? new DynFuncCall(info, cc.sc(), expr, keys).optimize(cc)
-            : cc.function(Function.FOR_EACH, info, exprs);
-        return cc.replaceWith(this, opt);
+    final Expr keys = exprs[0];
+    if(exprs.length == 1) {
+      if(seqType(cc.qc.focus.value, keys)) {
+        if(keys.size() == 0) return cc.replaceWith(this, keys);
       }
+      return this;
+    }
 
-      if(keys instanceof Value) {
-        // keys are constant, so we do not duplicate work in the inner loop
-        final LinkedList<Clause> clauses = new LinkedList<>();
-        final Var f = cc.vs().addNew(new QNm("f"), null, false, cc.qc, info);
-        clauses.add(new For(f, null, null, expr, false));
-        final Var k = cc.vs().addNew(new QNm("k"), null, false, cc.qc, info);
-        clauses.add(new For(k, null, null, keys, false));
-        final VarRef rf = new VarRef(info, f), rk = new VarRef(info, k);
-        final DynFuncCall ret = new DynFuncCall(info, cc.sc(), rf, rk);
-        return cc.replaceWith(this, new GFLWOR(info, clauses, ret)).optimize(cc);
+    // postfix expression
+    final Expr ctx = exprs[1];
+    if(seqType(ctx, keys)) {
+      if((ctx instanceof Map || ctx instanceof Array) && keys instanceof Value)
+        return cc.preEval(this);
+
+      final long es = ctx.size(), ks = keys.size();
+      if(es == 0) return cc.replaceWith(this, ctx);
+      if(ks == 0) return cc.replaceWith(this, keys);
+
+      if(keys != Str.WC) {
+        Expr ex = this;
+        if(es == 1) {
+          // context expression yields one item
+          if(ks == 1) {
+            // one key: rewrite to function call
+            ex = new DynFuncCall(info, cc.sc(), ctx, keys).optimize(cc);
+          } else {
+            // otherwise, rewrite to for each loop
+            ex = cc.function(Function.FOR_EACH, info, exprs);
+          }
+        } else if(keys instanceof Value) {
+          // keys are constant, so we do not duplicate work in the inner loop
+          final LinkedList<Clause> clauses = new LinkedList<>();
+          final Var c = cc.vs().addNew(new QNm("c"), null, false, cc.qc, info);
+          clauses.add(new For(c, null, null, ctx, false));
+          final Var k = cc.vs().addNew(new QNm("k"), null, false, cc.qc, info);
+          clauses.add(new For(k, null, null, keys, false));
+          final VarRef rc = new VarRef(info, c), rk = new VarRef(info, k);
+          final DynFuncCall ret = new DynFuncCall(info, cc.sc(), rc, rk);
+          ex = new GFLWOR(info, clauses, ret).optimize(cc);
+        }
+        return cc.replaceWith(this, ex);
       }
     }
     return this;
+  }
+
+  /**
+   * Assigns a sequence type.
+   * @param ctx context expression
+   * @param keys keys
+   * @return {@code true} if static type of the expression is map or array
+   */
+  private boolean seqType(final Expr ctx, final Expr keys) {
+    if(ctx == null) return false;
+
+    final Type tp = ctx.seqType().type;
+    final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
+    if(!map && !array) return false;
+
+    // derive type from input expression
+    final SeqType st = ((FuncType) tp).declType;
+    Occ occ = st.occ;
+    // map lookup (may result in empty sequence)
+   if(map) occ = st.occ.union(Occ.ZERO);
+   // key is wildcard, or expression yields no single item
+    if(keys == Str.WC || ctx.size() != 1) occ = st.occ.union(Occ.ONE_MORE);
+    exprType.assign(st.type, occ);
+    return true;
   }
 
   @Override

@@ -270,7 +270,7 @@ public final class CmpR extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder(PAREN1);
     if(min == max) {
       sb.append(expr).append(" = ").append(min);
     } else {
@@ -278,6 +278,6 @@ public final class CmpR extends Single {
       sb.append(expr);
       if(max != Double.POSITIVE_INFINITY) sb.append(mxi ? " <= " : " < ").append(max);
     }
-    return sb.toString();
+    return sb.append(PAREN2).toString();
   }
 }

@@ -10,7 +10,9 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -305,6 +307,8 @@ public final class CompileContext {
       if(type == AtomType.DEC) return Dec.ZERO;
       if(type == AtomType.BLN) return Bln.FALSE;
       if(type == NodeType.DOC) return FDoc.DUMMY;
+      if(type.instanceOf(SeqType.ANY_MAP)) return Map.EMPTY;
+      if(type.instanceOf(SeqType.ANY_ARRAY)) return Array.empty();
       if(type instanceof NodeType) return FElem.DUMMY;
     }
     // otherwise, return null

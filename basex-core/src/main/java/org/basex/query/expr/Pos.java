@@ -155,8 +155,8 @@ public final class Pos extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("position() = ").append(exprs[0]);
+    final StringBuilder sb = new StringBuilder(PAREN1).append("position() = ").append(exprs[0]);
     if(!eq()) sb.append(' ' + TO + ' ').append(exprs[1]);
-    return sb.toString();
+    return sb.append(PAREN2).toString();
   }
 }

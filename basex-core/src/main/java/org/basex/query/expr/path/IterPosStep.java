@@ -47,7 +47,7 @@ final class IterPosStep extends Step {
             final Expr pred = exprs[e];
             if(pred instanceof ItrPos) {
               posExpr[e] = (ItrPos) pred;
-            } else if(num(pred)) {
+            } else if(numeric(pred)) {
               // pre-evaluate numeric position
               final Item it = pred.atomItem(qc, info);
               if(it == null) return null;

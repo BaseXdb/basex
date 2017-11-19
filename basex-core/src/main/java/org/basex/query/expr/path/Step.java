@@ -53,7 +53,7 @@ public abstract class Step extends Preds {
     // check for simple positional predicates
     boolean pos = false;
     for(final Expr pred : preds) {
-      if(pred instanceof ItrPos || num(pred)) {
+      if(pred instanceof ItrPos || numeric(pred)) {
         pos = true;
       } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
         // positional checks may be nested or non-deterministic: choose full evaluation

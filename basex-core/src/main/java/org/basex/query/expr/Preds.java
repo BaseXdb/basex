@@ -68,7 +68,7 @@ public abstract class Preds extends Arr {
         if(e1.isFunction(Function.POSITION)) {
           // position() = last()  ->  last()
           // position() = $n (xs:numeric)  ->  $n
-          if(num(e2)) {
+          if(numeric(e2)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
               expr = cc.replaceWith(expr, e2);
@@ -289,7 +289,7 @@ public abstract class Preds extends Arr {
    * @param expr expression
    * @return result of check
    */
-  protected static boolean num(final Expr expr) {
+  protected static boolean numeric(final Expr expr) {
     final SeqType st = expr.seqType();
     return st.type.isNumber() && st.zeroOrOne() && expr.isSimple();
   }

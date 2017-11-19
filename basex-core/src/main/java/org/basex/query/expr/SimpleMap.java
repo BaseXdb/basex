@@ -142,7 +142,7 @@ public abstract class SimpleMap extends Arr {
     // single expression: return this expression
     if(e == 1) return exprs[0];
     // no results, deterministic expressions: return empty sequence
-    if(exprType.isEmpty() && !has(Flag.NDT)) return cc.emptySeq(this);
+    if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);
     // item-based iteration
     if(it) return copyType(new ItemMap(info, exprs)).optimize(cc);
     // default evaluation

@@ -112,7 +112,7 @@ public abstract class Filter extends Preds {
     if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
       final Path ip = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
       final Expr ie = ip.index(cc, cc.contextValue(root));
-      if(ie != ip) return ie;
+      if(ie != ip) return ie.optimize(cc);
     }
 
     // no numeric predicates.. use simple iterator
@@ -155,7 +155,7 @@ public abstract class Filter extends Preds {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
           ex = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
         }
-      } else if(num(expr)) {
+      } else if(numeric(expr)) {
         /* - rewrite positional predicate to util:item-at
          *   example: expr[pos] -> util:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets
@@ -173,7 +173,10 @@ public abstract class Filter extends Preds {
     }
 
     // return optimized expression or standard iterator
-    return opt ? cc.replaceWith(this, rt) : get(info, root, exprs);
+    if(opt) return cc.replaceWith(this, rt);
+
+    ex = get(info, root, exprs);
+    return ex instanceof ParseExpr ? copyType((ParseExpr) ex) : ex;
   }
 
   @Override

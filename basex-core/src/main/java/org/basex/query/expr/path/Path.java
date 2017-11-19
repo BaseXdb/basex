@@ -363,6 +363,9 @@ public abstract class Path extends ParseExpr {
    * @return number of results
    */
   private long size(final CompileContext cc) {
+    for(final Expr step : steps) if(step.size() == 0) return 0;
+    if(root != null && root.size() == 0) return 0;
+
     final Value rt = cc.contextValue(root);
     // skip computation if value is not a document node
     if(rt == null || rt.type != NodeType.DOC) return -1;
@@ -897,9 +900,13 @@ public abstract class Path extends ParseExpr {
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
     if(root != null) sb.append(root);
-    for(final Expr s : steps) {
+    for(final Expr step : steps) {
       if(sb.length() != 0) sb.append('/');
-      sb.append(s);
+      final String s = step.toString();
+      boolean par = !s.contains("[") && s.contains(" ");
+      if(par) sb.append('(');
+      sb.append(step);
+      if(par) sb.append(')');
     }
     return sb.toString();
   }
