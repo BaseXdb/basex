@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.func.hof.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -53,7 +52,7 @@ public final class HofModuleTest extends QueryPlanTest {
     error(func.args(" ()", " function($x, $y) { $x + $y }"), EMPTYFOUND);
 
     // should be unrolled and evaluated at compile time
-    final int limit = FnForEach.UNROLL_LIMIT;
+    final int limit = StandardFunc.UNROLL_LIMIT;
     check(func.args(" 1 to " + limit, " function($a, $b) {$a + $b}"),
         55,
         empty(Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')]"),

@@ -28,9 +28,14 @@ public final class ArrayFilter extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
-    if(t instanceof ArrayType) exprType.assign(t);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr ex1 = exprs[0];
+    final Type t1 = ex1.seqType().type;
+
+    if(t1 instanceof ArrayType) {
+      coerceFunc(1, cc, SeqType.BLN, ((ArrayType) t1).declType);
+      exprType.assign(t1);
+    }
     return this;
   }
 }

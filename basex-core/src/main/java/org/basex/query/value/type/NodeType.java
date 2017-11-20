@@ -212,24 +212,24 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final boolean eq(final Type t) {
-    return this == t;
+  public final boolean eq(final Type type) {
+    return this == type;
   }
 
   @Override
-  public final boolean instanceOf(final Type t) {
-    return this == t || parent.instanceOf(t);
+  public final boolean instanceOf(final Type type) {
+    return this == type || parent.instanceOf(type);
   }
 
   @Override
-  public final Type union(final Type t) {
-    return t instanceof NodeType ? this == t ? this : NOD : AtomType.ITEM;
+  public final Type union(final Type type) {
+    return type instanceof NodeType ? this == type ? this : NOD : AtomType.ITEM;
   }
 
   @Override
-  public final NodeType intersect(final Type t) {
-    if(!(t instanceof NodeType)) return instanceOf(t) ? this : null;
-    return this == t ? this : this == NOD ? (NodeType) t : t == NOD ? this : null;
+  public final NodeType intersect(final Type type) {
+    if(!(type instanceof NodeType)) return instanceOf(type) ? this : null;
+    return this == type ? this : this == NOD ? (NodeType) type : type == NOD ? this : null;
   }
 
   @Override
@@ -265,12 +265,12 @@ public enum NodeType implements Type {
 
   /**
    * Finds and returns the specified node type.
-   * @param type type
+   * @param name name of type
    * @return type or {@code null}
    */
-  public static NodeType find(final QNm type) {
-    if(type.uri().length == 0) {
-      final byte[] ln = type.local();
+  public static NodeType find(final QNm name) {
+    if(name.uri().length == 0) {
+      final byte[] ln = name.local();
       for(final NodeType t : VALUES) {
         if(Token.eq(ln, t.name)) return t;
       }

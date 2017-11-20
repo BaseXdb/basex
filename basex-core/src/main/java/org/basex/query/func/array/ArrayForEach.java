@@ -26,9 +26,14 @@ public final class ArrayForEach extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[1].seqType().type;
-    if(t instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) t).declType));
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Type t1 = exprs[0].seqType().type;
+    if(t1 instanceof ArrayType) coerceFunc(1, cc, SeqType.ITEM_ZM, ((ArrayType) t1).declType);
+
+    // assign type after coercion (expression might have changed)
+    final Type t2 = exprs[1].seqType().type;
+    if(t2 instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) t2).declType));
+
     return this;
   }
 }

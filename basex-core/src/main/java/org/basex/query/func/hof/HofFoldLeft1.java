@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -38,10 +37,11 @@ public final class HofFoldLeft1 extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs[0] == Empty.SEQ) throw EMPTYFOUND.get(info);
-    if(allAreValues() && exprs[0].size() <= FnForEach.UNROLL_LIMIT) {
-      final Value seq = (Value) exprs[0];
-      final FItem f = checkArity(exprs[1], 2, cc.qc);
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    if(ex1 == Empty.SEQ) throw EMPTYFOUND.get(info);
+    if(allAreValues() && ex1.size() <= UNROLL_LIMIT) {
+      final Value seq = (Value) ex1;
+      final FItem f = checkArity(ex2, 2, cc.qc);
       Expr ex = seq.itemAt(0);
       final long is = seq.size();
       for(int i = 1; i < is; i++) {
@@ -51,7 +51,7 @@ public final class HofFoldLeft1 extends StandardFunc {
       return ex;
     }
 
-    final Type t = exprs[1].seqType().type;
+    final Type t = ex2.seqType().type;
     if(t instanceof FuncType) exprType.assign(((FuncType) t).declType);
     return this;
   }

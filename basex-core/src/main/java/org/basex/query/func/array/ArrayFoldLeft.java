@@ -31,7 +31,7 @@ public final class ArrayFoldLeft extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    FnFoldLeft.refineType(this);
+    FnFoldLeft.seqType(this, cc, true, true);
     return this;
   }
 }

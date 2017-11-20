@@ -56,9 +56,7 @@ public final class InlineTest extends QueryPlanTest {
         exists(Str.class));
   }
 
-  /**
-   * Tests if variables directly inside an FTDistanceExpr are correctly inlined.
-   */
+  /** Tests if variables directly inside an FTDistanceExpr are correctly inlined. */
   @Test public void gh907() {
     check("let $n := 0 return 'x y' contains text 'x y' distance exactly $n paragraphs",
         true,
@@ -93,7 +91,7 @@ public final class InlineTest extends QueryPlanTest {
         + "return count((1 to 2) ! $d)",
         200,
         exists(_UTIL_REPLICATE.clazz));
-    check("let $d := for-each(1 to 10, function($a) { $a }) return count((1 to 2) ! $d[1])",
+    check("let $d := for-each(1 to 11, function($a) { $a }) return count((1 to 2) ! $d[1])",
         2,
         exists(_UTIL_REPLICATE.clazz));
     check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
@@ -108,9 +106,7 @@ public final class InlineTest extends QueryPlanTest {
     check("let $a := <a/> return 'bar' ! . ! $a", "<a/>", exists(Let.class));
   }
 
-  /**
-   * Tests the annotation {@link Annotation#_BASEX_INLINE}.
-   */
+  /** Tests the annotation {@link Annotation#_BASEX_INLINE}. */
   @Test public void annotation() {
     // deactivate inlining globally, activate locally
     check("declare option db:inlinelimit '0';"

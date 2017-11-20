@@ -47,11 +47,6 @@ public final class FnSort extends StandardFunc {
     };
   }
 
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc);
-  }
-
   /**
    * Sort the input data.
    * @param vl value list.
@@ -92,25 +87,24 @@ public final class FnSort extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     // optimize sort on sequences
-    final Expr ex = exprs[0];
+    final Expr ex1 = exprs[0];
     final int el = exprs.length;
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final SeqType st1 = ex1.seqType();
+    if(st1.zero()) return ex1;
 
     if(el < 2) {
-      if(ex instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) ex;
+      if(ex1 instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) ex1;
         return seq.asc ? seq : seq.reverse();
       }
-      if(ex instanceof SingletonSeq) {
-        final SingletonSeq seq = (SingletonSeq) ex;
-        if(seq.itemAt(0).seqType().type.isSortable()) return seq;
-      }
-      if(st.one() && st.type.isSortable()) return ex;
+      if(st1.type.isSortable() && (st1.one() || ex1 instanceof SingletonSeq)) return ex1;
     }
+
+    if(el == 3) coerceFunc(2, cc, SeqType.AAT_ZM, st1.type.seqType());
+
     // check if single item must be checked
-    return adoptType(ex);
+    return adoptType(ex1);
   }
 }

@@ -32,10 +32,13 @@ public final class FnFilter extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(st.zero()) return ex;
+
+    coerceFunc(1, cc, SeqType.BLN, st.type.seqType());
+
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }

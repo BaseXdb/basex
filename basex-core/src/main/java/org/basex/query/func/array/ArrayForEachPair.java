@@ -3,10 +3,12 @@ package org.basex.query.func.array;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -25,5 +27,18 @@ public final class ArrayForEachPair extends ArrayFn {
     while(as.hasNext() && bs.hasNext())
       builder.append(fun.invokeValue(qc, info, as.next(), bs.next()));
     return builder.freeze();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Type t1 = exprs[0].seqType().type, t2 = exprs[1].seqType().type;
+    if(t1 instanceof ArrayType && t2 instanceof ArrayType)
+      coerceFunc(1, cc, SeqType.ITEM_ZM, ((ArrayType) t1).declType, ((ArrayType) t2).declType);
+
+    // assign type after coercion (expression might have changed)
+    final Type t3 = exprs[2].seqType().type;
+    if(t3 instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) t3).declType));
+
+    return this;
   }
 }

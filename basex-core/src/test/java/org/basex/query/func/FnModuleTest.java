@@ -23,25 +23,6 @@ public final class FnModuleTest extends QueryPlanTest {
   /** Text file. */
   private static final String TEXT = "src/test/resources/input.xml";
 
-  /** Tests functions with first argument that can be empty ({@link StandardFunc#optFirst}). */
-  @Test public void optFirst() {
-    // use fn:abs as candidate
-    final Function func = Function.ABS;
-    final String name = Util.className(func.clazz);
-
-    // pre-evaluate empty sequence
-    check(func.args(" ()"), "", empty(name));
-    // pre-evaluate argument
-    check(func.args(1), 1, empty(name));
-
-    // function is replaced by its argument (argument yields no result)
-    check(func.args(" prof:void(())"), "", empty(name));
-    // but type is adjusted
-    check(func.args(" <_>1</_>"), 1, type(name, "xs:numeric"));
-    // no adjustment of type
-    check(func.args(" 1 ! array { . }"), 1, type(name, "xs:numeric?"));
-  }
-
   /** Test method. */
   @Test public void apply() {
     final Function func = Function.APPLY;
@@ -127,8 +108,38 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void filter() {
+    final Function func = Function.FILTER;
+    query(func.args(" (0, 1)", " boolean#1"), 1);
+
+    check(func.args(" ()", " boolean#1"), "", empty());
+    check(func.args(" 1 to 9", " function($_) { $_ = 0 }"), "",
+        exists("FuncItem[@type = 'function(xs:integer) as xs:boolean']"));
+    check(func.args(" ('a',<a/>)", " function($_ as xs:string) { $_ = 'a' }"), "a",
+        exists("FuncItem[@type = 'function(xs:string) as xs:boolean']"));
+    check(func.args(" ('a',<a/>)", " function($_ as xs:string) as xs:boolean? { $_ = 'a' }"), "a",
+        exists("FuncItem[@type = 'function(xs:string) as xs:boolean']"));
+
+    check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>",
+        exists("FnFilter[@type = 'element()*']"));
+    check(func.args(" <a/>", " boolean#1"), "<a/>",
+        exists("FnFilter[@type = 'element()?']"));
+  }
+
+  /** Test method. */
   @Test public void foldLeft() {
     final Function func = Function.FOLD_LEFT;
+
+    query("(1,'a')[. instance of xs:integer] ! " +
+        func.args(" .", 0, " function($a, $b) { $b }"), 1);
+    query("(1, function($a, $b) { $b })[. instance of function(*)] ! " +
+        func.args("A", 1, " ."), "A");
+
+    query(func.args(" ()", 1, " function($a, $b) { $b }"), 1);
+    query(func.args(" prof:void(1)", 1, " function($a, $b) { $b }"), 1);
+    query(func.args(" 2", 1, " function($a, $b) { $b }"), 2);
+
+    check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 2 to 10", 1, " function($a, $b) { $a + $b }"),
@@ -142,14 +153,16 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 1 to 10", 0, " function($a, $b) { $a + $b }"),
-        55,
+    check(func.args(" 1 to 11", 0, " function($a, $b) { $a + $b }"),
+        66,
         exists(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"));
   }
 
   /** Test method. */
   @Test public void foldRight() {
     final Function func = Function.FOLD_RIGHT;
+
+    check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 1 to 9", 10, " function($a, $b) { $a + $b }"),
@@ -163,14 +176,19 @@ public final class FnModuleTest extends QueryPlanTest {
         exists(Int.class),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 0 to 9", 10, " function($a, $b) { $a + $b }"),
-        55,
+    check(func.args(" 0 to 10", 10, " function($a, $b) { $a + $b }"),
+        65,
         exists(Util.className(FnFoldRight.class) + "[contains(@name, 'fold-right')]"));
   }
 
   /** Test method. */
   @Test public void forEach() {
     final Function func = Function.FOR_EACH;
+
+    query("(1,not#1)[. instance of function(*)] ! " + func.args(" 1", " ."), "false");
+    query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
+
+    check(func.args(" ()", " boolean#1"), "", empty());
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
@@ -184,9 +202,26 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(IntSeq.class),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 0 to 9", " function($x) { $x + 1 }"),
-        "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
+    check(func.args(" 0 to 10", " function($x) { $x + 1 }"),
+        "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11",
         exists(Util.className(FnForEach.class) + "[contains(@name, 'for-each')]"));
+  }
+
+  /** Test method. */
+  @Test public void forEachPair() {
+    final Function func = Function.FOR_EACH_PAIR;
+
+    query("(0,concat#2)[. instance of function(*)] ! " +
+        func.args("A", "B", " ."), "AB");
+
+    query("sort(" + func.args(" ('aa','bb')", " (2,2)", " substring#2") + ')', "a\nb");
+
+    check(func.args(" ()", "a", " matches#2"), "", empty());
+    check(func.args("aa", " ()", " matches#2"), "", empty());
+
+    query(func.args("aa", "a", " matches#2"), "true");
+    query(func.args(" ('aa','bb')", "a", " matches#2"), "true");
+    query(func.args("aa", " ('a','b')", " matches#2"), "true");
   }
 
   /** Test method. */
@@ -434,6 +469,9 @@ public final class FnModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void sort() {
     final Function func = Function.SORT;
+    query(func.args(" ('b','a')", "http://www.w3.org/2005/xpath-functions/collation/codepoint"),
+        "a\nb");
+
     query(func.args(" (1, 4, 6, 5, 3)"), "1\n3\n4\n5\n6");
     query(func.args(" (1,-2,5,10,-10,10,8)", " ()", " abs#1"), "1\n-2\n5\n8\n10\n-10\n10");
     query(func.args(" ((1,0), (1,1), (0,1), (0,0))"), "0\n0\n0\n0\n1\n1\n1\n1");
@@ -443,10 +481,16 @@ public final class FnModuleTest extends QueryPlanTest {
         "36-37");
     query(func.args(" (1,2)", " ()", " function($s) { [$s] }"), "1\n2");
 
+    check(func.args(" ()"), "", empty());
+    check(func.args("1"), 1, empty(func.clazz));
+
     check(func.args(" 1 to 100000000") + "[1]", 1, empty(func.clazz));
     check(func.args(" reverse(1 to 100000000)") + "[1]", 1, empty(func.clazz));
     check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func.clazz));
     check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func.clazz));
+
+    error(func.args(" true#0"), FIATOM_X);
+    error(func.args(" (1 to 2) ! true#0"), FIATOM_X);
   }
 
   /** Test method. */

@@ -40,6 +40,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class StandardFunc extends Arr {
+  /** Minimum size of a loop that should not be unrolled. */
+  public static final int UNROLL_LIMIT = 10;
+
   /** Function signature. */
   public Function sig;
   /** Static context. */
@@ -174,6 +177,49 @@ public abstract class StandardFunc extends Arr {
   @Override
   public boolean isVacuous() {
     return !has(Flag.UPD) && size() == 0;
+  }
+
+  /**
+   * Refines the type of a function item argument.
+   * @param i index of argument
+   * @param cc compilation context
+   * @param declType declared return type
+   * @param argTypes argument types
+   * @throws QueryException query context
+   */
+  public void coerceFunc(final int i, final CompileContext cc, final SeqType declType,
+      final SeqType... argTypes) throws QueryException {
+
+    // check if argument is function item
+    final Expr fun = exprs[i];
+    if(fun instanceof FuncItem) {
+      FuncItem it = (FuncItem) fun;
+      FuncType ift = it.funcType();
+
+      // select return and argument types that are more specific
+      SeqType dt = declType.instanceOf(ift.declType) ? declType : ift.declType;
+      final int al = argTypes.length;
+      final SeqType[] iat = ift.argTypes, at = new SeqType[al];
+      final boolean skip = iat == null || iat.length != at.length;
+      for(int a = 0; a < al; a++) {
+        at[a] = skip || argTypes[a].instanceOf(iat[a]) ? argTypes[a] : iat[a];
+      }
+
+      // coerce to new function type
+      FuncType fc = FuncType.get(dt, at);
+      if(!fc.eq(ift)) {
+        it = it.coerceTo(fc, cc.qc, info, true);
+        ift = it.funcType();
+
+        // set new type of function item expression as return type
+        dt = it.expr.seqType();
+        if(dt.instanceOf(ift.declType)) {
+          fc = FuncType.get(dt, at);
+          if(!fc.eq(ift)) it = it.coerceTo(fc, cc.qc, info, true);
+        }
+      }
+      exprs[i] = it;
+    }
   }
 
   /**

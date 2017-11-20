@@ -151,20 +151,20 @@ public final class Map extends FItem {
 
   /**
    * Checks if this is an instance of the specified type.
-   * @param tp type
+   * @param ft type
    * @param coerce coerce value
    * @return result of check
    */
-  private boolean instanceOf(final FuncType tp, final boolean coerce) {
-    if(tp instanceof ArrayType) return false;
-    if(type.instanceOf(tp)) return true;
+  private boolean instanceOf(final FuncType ft, final boolean coerce) {
+    if(ft instanceof ArrayType) return false;
+    if(type.instanceOf(ft)) return true;
 
-    final SeqType[] at = tp.argTypes;
+    final SeqType[] at = ft.argTypes;
     if(at != null && (at.length != 1 || !at[0].one())) return false;
 
-    SeqType ret = tp.declType;
-    if(tp instanceof MapType) {
-      AtomType arg = ((MapType) tp).keyType();
+    SeqType ret = ft.declType;
+    if(ft instanceof MapType) {
+      AtomType arg = ((MapType) ft).keyType();
       if(arg == AtomType.AAT) arg = null;
       if(ret.eq(SeqType.ITEM_ZM)) ret = null;
       // map { ... } instance of function(...) as item() -> false (result may be empty sequence)

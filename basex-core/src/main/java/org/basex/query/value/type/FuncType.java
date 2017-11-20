@@ -107,10 +107,10 @@ public class FuncType implements Type {
   }
 
   @Override
-  public boolean eq(final Type t) {
-    if(this == t) return true;
-    if(t.getClass() != FuncType.class) return false;
-    final FuncType ft = (FuncType) t;
+  public boolean eq(final Type type) {
+    if(this == type) return true;
+    if(type.getClass() != FuncType.class) return false;
+    final FuncType ft = (FuncType) type;
 
     if(this == SeqType.ANY_FUN || ft == SeqType.ANY_FUN || argTypes.length != ft.argTypes.length)
       return false;
@@ -123,13 +123,13 @@ public class FuncType implements Type {
   }
 
   @Override
-  public boolean instanceOf(final Type t) {
+  public boolean instanceOf(final Type type) {
     // the only non-function super-type of function is item()
-    if(t == AtomType.ITEM || t == SeqType.ANY_FUN) return true;
-    if(!(t instanceof FuncType) || t instanceof MapType || t instanceof ArrayType ||
+    if(type == AtomType.ITEM || type == SeqType.ANY_FUN) return true;
+    if(!(type instanceof FuncType) || type instanceof MapType || type instanceof ArrayType ||
         this == SeqType.ANY_FUN) return false;
 
-    final FuncType ft = (FuncType) t;
+    final FuncType ft = (FuncType) type;
     final int al = argTypes.length;
     if(al != ft.argTypes.length || !declType.instanceOf(ft.declType)) return false;
 
@@ -141,10 +141,10 @@ public class FuncType implements Type {
   }
 
   @Override
-  public Type union(final Type t) {
-    if(!(t instanceof FuncType)) return AtomType.ITEM;
+  public Type union(final Type type) {
+    if(!(type instanceof FuncType)) return AtomType.ITEM;
 
-    final FuncType ft = (FuncType) t;
+    final FuncType ft = (FuncType) type;
     if(this == SeqType.ANY_FUN || ft == SeqType.ANY_FUN) return SeqType.ANY_FUN;
 
     final int al = argTypes.length;
@@ -159,16 +159,16 @@ public class FuncType implements Type {
   }
 
   @Override
-  public Type intersect(final Type t) {
+  public Type intersect(final Type type) {
     // ensure commutativity
-    if(t instanceof MapType || t instanceof ArrayType) return t.intersect(this);
+    if(type instanceof MapType || type instanceof ArrayType) return type.intersect(this);
 
     // the easy cases
-    if(instanceOf(t)) return this;
-    if(t.instanceOf(this)) return t;
+    if(instanceOf(type)) return this;
+    if(type.instanceOf(this)) return type;
 
-    if(t instanceof FuncType) {
-      final FuncType ft = (FuncType) t;
+    if(type instanceof FuncType) {
+      final FuncType ft = (FuncType) type;
       // ANY_FUN is excluded by the easy cases
       final SeqType dt = declType.intersect(ft.declType);
       final int al = argTypes.length;
@@ -185,32 +185,32 @@ public class FuncType implements Type {
   /**
    * Getter for function types.
    * @param anns annotations
-   * @param type return type
+   * @param declType declared return type
    * @param args argument types
    * @return function type
    */
-  public static FuncType get(final AnnList anns, final SeqType type, final SeqType... args) {
-    return new FuncType(anns, type, args);
+  public static FuncType get(final AnnList anns, final SeqType declType, final SeqType... args) {
+    return new FuncType(anns, declType, args);
   }
 
   /**
    * Getter for function types without annotations.
-   * @param type return type
+   * @param declType declared return type
    * @param args argument types
    * @return function type
    */
-  public static FuncType get(final SeqType type, final SeqType... args) {
-    return get(new AnnList(), type, args);
+  public static FuncType get(final SeqType declType, final SeqType... args) {
+    return get(new AnnList(), declType, args);
   }
 
   /**
    * Finds and returns the specified function type.
-   * @param type type
+   * @param name name of type
    * @return type or {@code null}
    */
-  public static Type find(final QNm type) {
-    if(type.uri().length == 0) {
-      final byte[] ln = type.local();
+  public static Type find(final QNm name) {
+    if(name.uri().length == 0) {
+      final byte[] ln = name.local();
       if(Token.eq(ln, token(FUNCTION))) return SeqType.ANY_FUN;
       if(Token.eq(ln, token(MAP))) return SeqType.ANY_MAP;
       if(Token.eq(ln, token(ARRAY))) return SeqType.ANY_ARRAY;

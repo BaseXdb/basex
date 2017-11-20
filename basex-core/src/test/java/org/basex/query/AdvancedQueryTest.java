@@ -77,9 +77,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       for(final QueryError e : error) tb.add(' ').add(e.qname().prefixId());
       fail(tb.add("\n[F] ").add(res).toString());
     } catch(final QueryIOException ex) {
-      check(query, ex.getCause(), error);
+      error(query, ex.getCause(), error);
     } catch(final QueryException ex) {
-      check(query, ex, error);
+      error(query, ex, error);
     } catch(final Exception ex) {
       Util.stack(ex);
       fail("Unexpected exception: " + ex);
@@ -92,7 +92,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param ex resulting query exception
    * @param errors expected errors
    */
-  protected static void check(final String query, final QueryException ex,
+  protected static void error(final String query, final QueryException ex,
       final QueryError... errors) {
 
     boolean found = false;

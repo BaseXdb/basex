@@ -44,9 +44,14 @@ public final class ArraySort extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
-    if(t instanceof ArrayType) exprType.assign(t);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final SeqType st1 = exprs[0].seqType();
+    final Type t1 = st1.type;
+
+    if(t1 instanceof ArrayType) {
+      if(exprs.length == 3) coerceFunc(2, cc, SeqType.AAT_ZM, ((ArrayType) t1).declType);
+      exprType.assign(t1);
+    }
     return this;
   }
 }

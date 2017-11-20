@@ -483,22 +483,22 @@ public enum Function {
   _ARRAY_FLATTEN(ArrayFlatten.class, "flatten(item()*)", arg(ITEM_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOR_EACH(ArrayForEach.class, "for-each(array,function)",
-      arg(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O, flag(HOF),
+      arg(ARRAY_O, FuncType.get(ITEM_ZM, ITEM).seqType()), ARRAY_O, flag(HOF),
       ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FILTER(ArrayFilter.class, "filter(array,function)",
       arg(ARRAY_O, FuncType.get(BLN, ITEM_ZM).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOLD_LEFT(ArrayFoldLeft.class, "fold-left(array,zero,function)",
-      arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM,
+      arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM,
       flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOLD_RIGHT(ArrayFoldRight.class, "fold-right(array,zero,function)",
-      arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM,
+      arg(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType()), ITEM_ZM,
       flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOR_EACH_PAIR(ArrayForEachPair.class, "for-each-pair(array1,array2,function)",
-      arg(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O,
+      arg(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM, ITEM).seqType()), ARRAY_O,
       flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SORT(ArraySort.class, "sort(array[,collation[,function]])",

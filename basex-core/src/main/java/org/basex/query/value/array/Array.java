@@ -421,19 +421,19 @@ public abstract class Array extends FItem {
 
   /**
    * Checks if this is an instance of the specified type.
-   * @param tp type
+   * @param ft type
    * @param coerce coerce value
    * @return result of check
    */
-  private boolean instanceOf(final FuncType tp, final boolean coerce) {
-    if(tp instanceof MapType) return false;
-    if(type.instanceOf(tp)) return true;
+  private boolean instanceOf(final FuncType ft, final boolean coerce) {
+    if(ft instanceof MapType) return false;
+    if(type.instanceOf(ft)) return true;
 
-    final SeqType[] at = tp.argTypes;
+    final SeqType[] at = ft.argTypes;
     if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
 
-    final SeqType ret = tp.declType;
-    if(tp instanceof ArrayType) {
+    final SeqType ret = ft.declType;
+    if(ft instanceof ArrayType) {
       // no argument and return type: no check required
       if(ret.eq(SeqType.ITEM_ZM)) return true;
       // check types of members
@@ -495,7 +495,7 @@ public abstract class Array extends FItem {
 
   @Override
   public final String toString() {
-    final StringBuilder tb = new StringBuilder().append('[');
+    final StringBuilder tb = new StringBuilder().append("[ ");
     final Iterator<Value> iter = iterator(0);
     for(boolean fst = true; iter.hasNext(); fst = false) {
       if(!fst) tb.append(", ");
@@ -508,6 +508,6 @@ public abstract class Array extends FItem {
       }
       if(vs != 1) tb.append(')');
     }
-    return tb.append(']').toString();
+    return tb.append(" ]").toString();
   }
 }

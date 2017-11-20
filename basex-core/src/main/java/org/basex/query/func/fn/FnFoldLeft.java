@@ -20,6 +20,7 @@ public final class FnFoldLeft extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = qc.iter(exprs[0]);
     final FItem fun = checkArity(exprs[2], 2, qc);
+
     Value res = qc.value(exprs[1]);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
@@ -47,31 +48,44 @@ public final class FnFoldLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs[0] == Empty.SEQ) return exprs[1];
-    if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    if(ex1 == Empty.SEQ) return ex2;
+
+    seqType(this, cc, false, true);
+
+    if(allAreValues() && ex1.size() <= UNROLL_LIMIT) {
       // unroll the loop
-      final Value seq = (Value) exprs[0];
-      Expr ex = exprs[1];
-      for(final Item it : seq) {
+      Expr ex = ex2;
+      for(final Item it : (Value) ex1) {
         ex = new DynFuncCall(info, sc, exprs[2], ex, it).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
       return ex;
     }
-    refineType(this);
     return this;
   }
 
   /**
-   * Refines the function type.
+   * Assigns more specific sequence types.
    * @param func function
+   * @param cc compilation context
+   * @param array indicates is this is array function
+   * @param left indicates is this is left/right fold
+   * @throws QueryException query exception
    */
-  public static void refineType(final StandardFunc func) {
+  public static void seqType(final StandardFunc func, final CompileContext cc,
+      final boolean array, final boolean left) throws QueryException {
+
     final Expr[] exprs = func.exprs;
-    final Type t = exprs[2].seqType().type;
-    if(t instanceof FuncType) {
-      final SeqType dt = ((FuncType) t).declType;
-      func.exprType.assign(exprs[0].seqType().mayBeEmpty() ? dt.union(exprs[1].seqType()) : dt);
+    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    if(exprs[2].seqType().type instanceof FuncType) {
+      final SeqType ft = array && st1.type instanceof ArrayType ?
+        ((ArrayType) st1.type).declType : st1;
+      func.coerceFunc(2, cc, SeqType.ITEM_ZM,
+          left ? SeqType.ITEM_ZM : ft, left ? ft : SeqType.ITEM_ZM);
+
+      final SeqType dt = ((FuncType) exprs[2].seqType().type).declType;
+      func.exprType.assign(array || st1.mayBeEmpty() ? dt.union(st2) : dt);
     }
   }
 }

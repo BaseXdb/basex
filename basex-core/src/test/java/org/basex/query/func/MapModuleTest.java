@@ -3,7 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.*;
+import org.basex.query.ast.*;
 import org.junit.*;
 
 /**
@@ -12,92 +12,116 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class MapModuleTest extends AdvancedQueryTest {
+public final class MapModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
-  public void merge() {
-    // no entry
-    query("exists(" + _MAP_MERGE.args(" ()") + ')', true);
-    count(_MAP_ENTRY.args(1, 2), 1);
-    count(_MAP_MERGE.args(" ()"), 0);
-    // single entry
-    query("exists(" + _MAP_MERGE.args(" map{ 'a':'b' }") + ')', true);
-    count(_MAP_MERGE.args(" map{ 'a':'b' }"), 1);
-    // single entry
-    query("exists(" + _MAP_MERGE.args(" map{ 'a':'b','b':'c' }") + ')', true);
-    count(_MAP_MERGE.args(" map{ 'a':'b','b':'c' }"), 2);
-
-    query(_MAP_MERGE.args(" (map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
-
-    // duplicates option
-    query(_MAP_MERGE.args(" (map{1:2},map {1:3})") + "(1)", 2);
-    query(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-first'}") + "(1)", 2);
-    query(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-last'}") + "(1)", 3);
-    query(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'combine'}") + "(1)", "2\n3");
-    error(_MAP_MERGE.args(" (map{1:2},map {1:3})", " map{'duplicates':'reject'}") + "(1)",
-        MERGE_DUPLICATE_X);
+  public void contains() {
+    final Function func = _MAP_CONTAINS;
+    query(func.args(" map{}", 1), false);
+    query(func.args(_MAP_ENTRY.args(1, 2), 1), true);
   }
 
   /** Test method. */
   @Test
   public void entry() {
-    query("exists(" + _MAP_ENTRY.args("A", "B") + ')', true);
-    query("exists(" + _MAP_ENTRY.args(1, 2) + ')', true);
-    query("exists(" + _MAP_MERGE.args(_MAP_ENTRY.args(1, 2)) + ')', true);
-    error("exists(" + _MAP_ENTRY.args(" ()", 2) + ')', EMPTYFOUND);
-    error("exists(" + _MAP_ENTRY.args(" (1,2)", 2) + ')', SEQFOUND_X);
+    final Function func = _MAP_ENTRY;
+    query("exists(" + func.args("A", "B") + ')', true);
+    query("exists(" + func.args(1, 2) + ')', true);
+    query("exists(" + _MAP_MERGE.args(func.args(1, 2)) + ')', true);
+    error("exists(" + func.args(" ()", 2) + ')', EMPTYFOUND);
+    error("exists(" + func.args(" (1,2)", 2) + ')', SEQFOUND_X);
+  }
+
+  /** Test method. */
+  @Test
+  public void forEach() {
+    final Function func = Function._MAP_FOR_EACH;
+
+    query("(1,map { 1: 2 })[. instance of map(*)] ! " +
+        func.args(" .", " function($k, $v) { $v }"), 2);
+    query("(1,matches#2)[. instance of function(*)] ! " +
+        func.args(" map{ 'aa': 'a' }", " ."), true);
+
+    query(func.args(" map { }", " function($k, $v) { 1 }"), "");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $k+$v }"), 3);
+    query(func.args(" map { 'a': 1, 'b': 2 }", " function($k, $v) { $v }"), "1\n2");
+
+    check(func.args(" map { 'aa': 'a' }", " matches#2"), true,
+        exists("MapForEach[@type = 'xs:boolean*']"));
+  }
+
+  /** Test method. */
+  @Test
+  public void get() {
+    final Function func = _MAP_GET;
+    query(func.args(" map{}", 1), "");
+    query(func.args(_MAP_ENTRY.args(1, 2), 1), 2);
+  }
+
+  /** Test method. */
+  @Test
+  public void keys() {
+    final Function func = _MAP_KEYS;
+    query("for $i in " + func.args(
+        _MAP_MERGE.args(" for $i in 1 to 3 return " +
+        _MAP_ENTRY.args(" $i", " $i+1"))) + " order by $i return $i", "1\n2\n3");
+    query("let $map := " + _MAP_MERGE.args(" for $i in 1 to 3 return " +
+        _MAP_ENTRY.args(" $i", " $i + 1")) +
+        "for $k in " + func.args(" $map") + " order by $k return " +
+        _MAP_GET.args(" $map", " $k"), "2\n3\n4");
+  }
+
+  /** Test method. */
+  @Test
+  public void merge() {
+    // no entry
+    final Function func = _MAP_MERGE;
+    query("exists(" + func.args(" ()") + ')', true);
+    mapSize(_MAP_ENTRY.args(1, 2), 1);
+    mapSize(func.args(" ()"), 0);
+    // single entry
+    query("exists(" + func.args(" map{ 'a':'b' }") + ')', true);
+    mapSize(func.args(" map{ 'a':'b' }"), 1);
+    // single entry
+    query("exists(" + func.args(" map{ 'a':'b','b':'c' }") + ')', true);
+    mapSize(func.args(" map{ 'a':'b','b':'c' }"), 2);
+
+    query(func.args(" (map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
+
+    // duplicates option
+    query(func.args(" (map{1:2},map {1:3})") + "(1)", 2);
+    query(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-first'}") + "(1)", 2);
+    query(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-last'}") + "(1)", 3);
+    query(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'combine'}") + "(1)", "2\n3");
+    error(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'reject'}") + "(1)",
+        MERGE_DUPLICATE_X);
   }
 
   /** Test method. */
   @Test
   public void put() {
     // no entry
-    count(_MAP_PUT.args(" map{}", 1, 2), 1);
-    count(_MAP_PUT.args(" map{}", "a", "b"), 1);
-    count(_MAP_PUT.args(" map{ 'a': 'b' }", "c", "d"), 2);
-    count(_MAP_PUT.args(" map{ 'a': 'b' }", "c", "d"), 2);
+    final Function func = _MAP_PUT;
+    mapSize(func.args(" map{}", 1, 2), 1);
+    mapSize(func.args(" map{}", "a", "b"), 1);
+    mapSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
+    mapSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
 
-    query(_MAP_PUT.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", 1));
-  }
-
-  /** Test method. */
-  @Test
-  public void get() {
-    query(_MAP_GET.args(" map{}", 1), "");
-    query(_MAP_GET.args(_MAP_ENTRY.args(1, 2), 1), 2);
-  }
-
-  /** Test method. */
-  @Test
-  public void contains() {
-    query(_MAP_CONTAINS.args(" map{}", 1), false);
-    query(_MAP_CONTAINS.args(_MAP_ENTRY.args(1, 2), 1), true);
+    query(func.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", 1));
   }
 
   /** Test method. */
   @Test
   public void remove() {
-    count(_MAP_REMOVE.args(_MAP_ENTRY.args(1, 2), 1), 0);
+    final Function func = _MAP_REMOVE;
+    mapSize(func.args(_MAP_ENTRY.args(1, 2), 1), 0);
   }
 
   /** Test method. */
   @Test
-  public void keys() {
-    query("for $i in " + _MAP_KEYS.args(
-        _MAP_MERGE.args(" for $i in 1 to 3 return " +
-        _MAP_ENTRY.args(" $i", " $i+1"))) + " order by $i return $i", "1\n2\n3");
-    query("let $map := " + _MAP_MERGE.args(" for $i in 1 to 3 return " +
-        _MAP_ENTRY.args(" $i", " $i + 1")) +
-        "for $k in " + _MAP_KEYS.args(" $map") + " order by $k return " +
-        _MAP_GET.args(" $map", " $k"), "2\n3\n4");
-  }
-
-  /** Test method. */
-  @Test
-  public void forEach() {
-    query(_MAP_FOR_EACH.args(" map{}", " function($a, $b) { 1 }"), "");
-    query(_MAP_FOR_EACH.args(" map{1:2}", " function($a, $b) { $a+$b }"), 3);
-    query(_MAP_FOR_EACH.args(" map{'a':1, 'b':2}", " function($a, $b) { $b }"), "1\n2");
+  public void size() {
+    final Function func = _MAP_SIZE;
+    query(func.args(" map{}"), 0);
   }
 
   /**
@@ -105,7 +129,7 @@ public final class MapModuleTest extends AdvancedQueryTest {
    * @param query query string
    * @param count expected number of entries
    */
-  private static void count(final String query, final int count) {
+  private static void mapSize(final String query, final int count) {
     query(_MAP_SIZE.args(' ' + query), count);
   }
 }

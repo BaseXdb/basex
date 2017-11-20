@@ -135,14 +135,15 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
+  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
     final int pl = params.length;
     if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, ii);
 
+    // optimization: only ignore equal types
     final FuncType tp = funcType();
-    if(tp.instanceOf(ft)) return this;
+    if(opt ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
     final VarScope scp = new VarScope(sc);
     final Var[] vars = new Var[pl];

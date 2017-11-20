@@ -29,6 +29,7 @@ public final class FnFunctionLookup extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
+    // make sure that all functions are compiled
     cc.qc.funcs.compile(cc, true);
     return this;
   }

@@ -176,7 +176,6 @@ public final class StaticFuncs extends ExprInfo {
    * @param all compile all functions (not only used ones)
    */
   public void compile(final CompileContext cc, final boolean all) {
-    // only compile those functions that are used
     for(final FuncCache fc : funcs.values()) {
       if(all || !fc.calls.isEmpty()) fc.func.comp(cc);
     }

@@ -25,9 +25,16 @@ public final class MapForEach extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[1].seqType().type;
-    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType.type);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Type t1 = exprs[0].seqType().type;
+    if(t1 instanceof MapType) {
+      final MapType mt1 = (MapType) t1;
+      coerceFunc(1, cc, SeqType.ITEM_ZM, mt1.argTypes[0].type.seqType(), mt1.declType);
+    }
+
+    final Type t2 = exprs[1].seqType().type;
+    if(t2 instanceof FuncType) exprType.assign(((FuncType) t2).declType.type);
+
     return this;
   }
 }
