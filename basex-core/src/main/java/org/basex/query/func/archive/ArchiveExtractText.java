@@ -21,7 +21,7 @@ public final class ArchiveExtractText extends ArchiveExtractBinary {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String enc = toEncoding(2, ARCH_ENCODING_X, qc);
+    final String enc = toEncoding(2, ARCHIVE_ENCODE1_X, qc);
     final ValueBuilder vb = new ValueBuilder();
     for(final byte[] b : extract(qc)) vb.add(Str.get(encode(b, enc, qc)));
     return vb.value();

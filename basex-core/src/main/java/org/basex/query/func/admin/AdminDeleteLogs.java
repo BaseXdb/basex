@@ -21,8 +21,8 @@ public final class AdminDeleteLogs extends AdminFn {
     final String name = Token.string(toToken(exprs[0], qc));
     final LogFile file = qc.context.log.file(name);
     if(file == null) throw WHICHRES_X.get(info, name);
-    if(file.current()) throw BXAD_TODAY.get(info, name);
-    if(!file.delete()) throw BXAD_DELETE_X.get(info, name);
+    if(file.current()) throw ADMIN_TODAY.get(info, name);
+    if(!file.delete()) throw ADMIN_DELETE_X.get(info, name);
     return null;
   }
 }

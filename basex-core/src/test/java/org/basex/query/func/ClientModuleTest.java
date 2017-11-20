@@ -48,8 +48,8 @@ public final class ClientModuleTest extends AdvancedQueryTest {
     query(conn());
     query("exists(" + conn() + ")", true);
     // BXCL0001: connection errors
-    error(_CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), BXCL_CONN_X);
-    error(_CLIENT_CONNECT.args("xxx", DB_PORT, ADMIN, ADMIN), BXCL_CONN_X);
+    error(_CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), CLIENT_CONNECT_X);
+    error(_CLIENT_CONNECT.args("xxx", DB_PORT, ADMIN, ADMIN), CLIENT_CONNECT_X);
   }
 
   /** Test method. */
@@ -60,7 +60,7 @@ public final class ClientModuleTest extends AdvancedQueryTest {
         _CLIENT_EXECUTE.args(" $a", new XQuery("1")) + ',' +
         _CLIENT_EXECUTE.args(" $b", new XQuery("2")) + ')', "1\n2");
     // BXCL0004: connection errors
-    error(_CLIENT_EXECUTE.args(conn(), "x"), BXCL_COMMAND_X);
+    error(_CLIENT_EXECUTE.args(conn(), "x"), CLIENT_COMMAND_X);
   }
 
   /** Test method. */
@@ -98,10 +98,10 @@ public final class ClientModuleTest extends AdvancedQueryTest {
       SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'"), "\u00e4");
     query(_CLIENT_QUERY.args(conn(), "xs:base64Binary('QQ==')"), "A");
     // query errors: returning function items
-    error(_CLIENT_QUERY.args(conn(), "function(){}"), BXCL_FITEM_X);
-    error(_CLIENT_QUERY.args(conn(), "true#0"), BXCL_FITEM_X);
-    error(_CLIENT_QUERY.args(conn(), "array{}"), BXCL_FITEM_X);
-    error(_CLIENT_QUERY.args(conn(), "map{}"), BXCL_FITEM_X);
+    error(_CLIENT_QUERY.args(conn(), "function(){}"), CLIENT_FITEM_X);
+    error(_CLIENT_QUERY.args(conn(), "true#0"), CLIENT_FITEM_X);
+    error(_CLIENT_QUERY.args(conn(), "array{}"), CLIENT_FITEM_X);
+    error(_CLIENT_QUERY.args(conn(), "map{}"), CLIENT_FITEM_X);
     // query errors: server-side errors
     error(_CLIENT_QUERY.args(conn(), "x"), NOCTX_X);
   }
@@ -122,10 +122,10 @@ public final class ClientModuleTest extends AdvancedQueryTest {
   public void close() {
     query(conn() + " ! " + _CLIENT_CLOSE.args(" ."));
     // BXCL0002: session not available
-    error(_CLIENT_CLOSE.args(" xs:anyURI('unknown')"), BXCL_NOTAVL_X);
+    error(_CLIENT_CLOSE.args(" xs:anyURI('unknown')"), CLIENT_ID_X);
     // BXCL0002: session has already been closed
     error(conn() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " + _CLIENT_CLOSE.args(" .") + ')',
-        BXCL_NOTAVL_X);
+        CLIENT_ID_X);
   }
 
   /**

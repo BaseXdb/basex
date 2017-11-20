@@ -43,12 +43,12 @@ public final class ArchiveUpdate extends ArchiveCreate {
     // count remaining entries
     if(cn != null) do c++; while(cont.next() != null);
     if(en != null) do e++; while(entr.next() != null);
-    if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
+    if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
 
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info);
         ArchiveOut out = ArchiveOut.get(in.format(), info)) {
       if(in instanceof GZIPIn)
-        throw ARCH_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
+        throw ARCHIVE_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       // delete entries to be updated
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
       // add new and updated entries
@@ -59,7 +59,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
       }
       return B64.get(out.finish());
     } catch(final IOException ex) {
-      throw ARCH_FAIL_X.get(info, ex);
+      throw ARCHIVE_FAIL_X.get(info, ex);
     }
   }
 }

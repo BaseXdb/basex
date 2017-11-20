@@ -45,39 +45,39 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
         " map { 'format': 'gzip' }"), 1);
 
     // different number of entries and contents
-    error(_ARCHIVE_CREATE.args("X", " ()"), ARCH_DIFF_X_X);
+    error(_ARCHIVE_CREATE.args("X", " ()"), ARCHIVE_NUMBER_X_X);
     // name must not be empty
-    error(_ARCHIVE_CREATE.args(" <archive:entry/>", ""), ARCH_EMPTY);
+    error(_ARCHIVE_CREATE.args(" <archive:entry/>", ""), ARCHIVE_DESC1);
     // invalid compression level
     error(_ARCHIVE_CREATE.args(" <archive:entry compression-level='x'>X</archive:entry>", ""),
-        ARCH_LEVEL_X);
+        ARCHIVE_DESC2_X);
     error(_ARCHIVE_CREATE.args(" <archive:entry compression-level='10'>X</archive:entry>", ""),
-        ARCH_LEVEL_X);
+        ARCHIVE_DESC2_X);
     // invalid modification date
     error(_ARCHIVE_CREATE.args(" <archive:entry last-modified='2020'>X</archive:entry>", ""),
-        ARCH_DATETIME_X);
+        ARCHIVE_DESC3_X);
     // content must be string or binary
     error(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", " 123"), STRBIN_X_X);
     // wrong encoding
     error(_ARCHIVE_CREATE.args(" <archive:entry encoding='x'>X</archive:entry>", ""),
-        ARCH_ENCODING_X);
+        ARCHIVE_ENCODE1_X);
     // errors while converting a string
     error(_ARCHIVE_CREATE.args(" <archive:entry encoding='US-ASCII'>X</archive:entry>",
-        "\u00fc"), ARCH_ENCODE_X);
+        "\u00fc"), ARCHIVE_ENCODE2_X);
     // format not supported
     error(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "", " map { 'format':'rar' }"),
-        ARCH_UNKNOWN);
+        ARCHIVE_FORMAT);
     // unknown option
     error(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "", " map { 'x':'y' }"),
         INVALIDOPT_X);
     error(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "",
-        " map { 'format': 'xxx' }"), ARCH_UNKNOWN);
+        " map { 'format': 'xxx' }"), ARCHIVE_FORMAT);
     // algorithm not supported
     error(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "",
-        " map { 'algorithm': 'unknown' }"), ARCH_SUPP_X_X);
+        " map { 'algorithm': 'unknown' }"), ARCHIVE_FORMAT_X_X);
     // algorithm not supported
     error(_ARCHIVE_CREATE.args(" ('x','y')", " ('a','b')",
-        " map { 'format': 'gzip' }"), ARCH_ONE_X);
+        " map { 'format': 'gzip' }"), ARCHIVE_SINGLE_X);
   }
 
   /** Test method. */
@@ -203,7 +203,7 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
         _ARCHIVE_EXTRACT_TEXT.args(" ."), "Y");
     // updates an existing entry
     error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " ! " +
-        _ARCHIVE_UPDATE.args(" .", "X", "Y"), ARCH_MODIFY_X);
+        _ARCHIVE_UPDATE.args(" .", "X", "Y"), ARCHIVE_MODIFY_X);
   }
 
   /** Test method. */
@@ -221,7 +221,7 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
           "return count(archive:entries($c))", 1);
     // updates an existing entry
     error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " ! " +
-        _ARCHIVE_DELETE.args(" .", "X"), ARCH_MODIFY_X);
+        _ARCHIVE_DELETE.args(" .", "X"), ARCHIVE_MODIFY_X);
   }
 
   /**

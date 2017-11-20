@@ -46,7 +46,7 @@ abstract class ArchiveFn extends StandardFunc {
       final boolean val = qc.context.options.get(MainOptions.CHECKSTRINGS);
       return ConvertFn.toString(new ArrayInput(value), encoding, val);
     } catch(final IOException ex) {
-      throw ARCH_ENCODE_X.get(info, ex);
+      throw ARCHIVE_ENCODE2_X.get(info, ex);
     }
   }
 

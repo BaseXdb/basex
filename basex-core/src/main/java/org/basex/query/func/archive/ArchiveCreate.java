@@ -42,17 +42,17 @@ public class ArchiveCreate extends ArchiveFn {
             // count remaining entries
             if(cn != null) do c++; while(contents.next() != null);
             if(en != null) do e++; while(entries.next() != null);
-            if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
+            if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
             break;
           }
           if(out instanceof GZIPOut && c > 0)
-            throw ARCH_ONE_X.get(info, format.toUpperCase(Locale.ENGLISH));
+            throw ARCHIVE_SINGLE_X.get(info, format.toUpperCase(Locale.ENGLISH));
           add(checkElemToken(en), cn, out, level, qc);
           e++;
           c++;
         }
       } catch(final IOException ex) {
-        throw ARCH_FAIL_X.get(info, ex);
+        throw ARCHIVE_FAIL_X.get(info, ex);
       }
       return B64.get(out.finish());
     }
@@ -71,7 +71,7 @@ public class ArchiveCreate extends ArchiveFn {
     if(alg != null) {
       if(format.equals(ZIP)  && !Strings.eq(alg, STORED, DEFLATE) ||
          format.equals(GZIP) && !Strings.eq(alg, DEFLATE)) {
-        throw ARCH_SUPP_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
+        throw ARCHIVE_FORMAT_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
       }
       if(Strings.eq(alg, STORED)) level = ZipEntry.STORED;
       else if(Strings.eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
@@ -94,7 +94,7 @@ public class ArchiveCreate extends ArchiveFn {
 
     // create new zip entry
     String name = string(entry.string(info));
-    if(name.isEmpty()) throw ARCH_EMPTY.get(info);
+    if(name.isEmpty()) throw ARCHIVE_DESC1.get(info);
     if(Prop.WIN) name = name.replace('\\', '/');
 
     final ZipEntry ze = new ZipEntry(name);
@@ -113,7 +113,7 @@ public class ArchiveCreate extends ArchiveFn {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), qc));
         } catch(final QueryException qe) {
           Util.debug(qe);
-          throw ARCH_DATETIME_X.get(info, mod);
+          throw ARCHIVE_DESC3_X.get(info, mod);
         }
       }
 
@@ -121,7 +121,7 @@ public class ArchiveCreate extends ArchiveFn {
       final byte[] ea = el.attribute(ENCODING);
       if(ea != null) {
         enc = Strings.normEncoding(string(ea));
-        if(!Charset.isSupported(enc)) throw ARCH_ENCODING_X.get(info, ea);
+        if(!Charset.isSupported(enc)) throw ARCHIVE_ENCODE1_X.get(info, ea);
       }
     }
 
@@ -133,7 +133,7 @@ public class ArchiveCreate extends ArchiveFn {
       out.level(lvl == null ? level : toInt(lvl));
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
-      throw ARCH_LEVEL_X.get(info, lvl);
+      throw ARCHIVE_DESC2_X.get(info, lvl);
     }
     out.write(ze, val);
   }

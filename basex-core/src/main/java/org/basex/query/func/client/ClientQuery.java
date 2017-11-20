@@ -49,7 +49,7 @@ public final class ClientQuery extends ClientFn {
       while(cq.more()) {
         final String result = cq.next();
         final Type tp = cq.type();
-        if(tp instanceof FuncType) throw BXCL_FITEM_X.get(info, result);
+        if(tp instanceof FuncType) throw CLIENT_FITEM_X.get(info, result);
         vb.add(cq.type().castString(result, qc, sc, info));
       }
       return vb.value();
@@ -62,9 +62,9 @@ public final class ClientQuery extends ClientFn {
         final QueryException exc = get(name, msg, info);
         throw exc == null ? new QueryException(info, new QNm(name), msg) : exc;
       }
-      throw BXCL_QUERY_X.get(info, ex);
+      throw CLIENT_QUERY_X.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM_X.get(info, ex);
+      throw CLIENT_ERROR_X.get(info, ex);
     }
   }
 }

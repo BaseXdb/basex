@@ -31,9 +31,9 @@ public final class ClientExecute extends ClientFn {
       cs.setOutputStream(null);
       return Str.get(ao.finish());
     } catch(final BaseXException ex) {
-      throw BXCL_COMMAND_X.get(info, ex);
+      throw CLIENT_COMMAND_X.get(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM_X.get(info, ex);
+      throw CLIENT_ERROR_X.get(info, ex);
     }
   }
 }

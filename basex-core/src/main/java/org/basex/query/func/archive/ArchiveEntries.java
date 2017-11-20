@@ -46,7 +46,7 @@ public final class ArchiveEntries extends StandardFunc {
       }
       return vb.value();
     } catch(final IOException ex) {
-      throw ARCH_FAIL_X.get(info, ex);
+      throw ARCHIVE_FAIL_X.get(info, ex);
     }
   }
 }

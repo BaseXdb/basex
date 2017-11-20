@@ -27,7 +27,7 @@ public final class ClientConnect extends ClientFn {
     try {
       return sessions(qc).add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
-      throw BXCL_CONN_X.get(info, ex);
+      throw CLIENT_CONNECT_X.get(info, ex);
     }
   }
 }

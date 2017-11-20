@@ -22,7 +22,7 @@ public final class ClientClose extends ClientFn {
       session(qc, true).close();
       return null;
     } catch(final IOException ex) {
-      throw BXCL_COMMAND_X.get(info, ex);
+      throw CLIENT_COMMAND_X.get(info, ex);
     }
   }
 }

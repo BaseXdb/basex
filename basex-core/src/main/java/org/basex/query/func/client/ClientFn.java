@@ -27,7 +27,7 @@ abstract class ClientFn extends StandardFunc {
     final ClientSessions sessions = sessions(qc);
     final Uri id = (Uri) checkAtomic(exprs[0], qc, AtomType.URI);
     final ClientSession cs = sessions.get(id);
-    if(cs == null) throw BXCL_NOTAVL_X.get(info, id);
+    if(cs == null) throw CLIENT_ID_X.get(info, id);
     if(del) sessions.remove(id);
     return cs;
   }
