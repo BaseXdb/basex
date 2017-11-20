@@ -66,8 +66,6 @@ public final class EditorView extends View {
   private final BaseXLabel pos;
   /** Splitter. */
   private final BaseXSplit split;
-  /** Header string. */
-  private final BaseXHeader header;
   /** Tabs. */
   private final BaseXTabs tabs;
 
@@ -91,8 +89,6 @@ public final class EditorView extends View {
     layout(new BorderLayout());
     setBackground(PANEL);
 
-    header = new BaseXHeader(EDITOR);
-
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
     tabs.addDragDrop(false);
@@ -104,11 +100,11 @@ public final class EditorView extends View {
         if(comp instanceof EditorArea) close((EditorArea) comp);
       }
     });
-    addCreateTab();
 
     final SearchEditor center = new SearchEditor(gui, tabs, null);
     search = center.bar();
 
+    final AbstractButton newB = BaseXButton.command(GUIMenuCmd.C_EDITNEW, gui);
     final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDITOPEN, gui);
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
@@ -123,20 +119,18 @@ public final class EditorView extends View {
         BaseXKeys.UNIT.toString()), false, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new TableLayout(1, 9, 1, 0)).border(0, 0, 8, 0);
+    buttons.layout(new TableLayout(1, 11)).border(0, 0, 4, 0);
+    buttons.add(newB);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
+    buttons.add(Box.createHorizontalStrut(4));
     buttons.add(find);
-    buttons.add(Box.createHorizontalStrut(6));
+    buttons.add(Box.createHorizontalStrut(4));
     buttons.add(stop);
     buttons.add(go);
     buttons.add(vars);
     buttons.add(test);
-
-    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
-    north.add(buttons, BorderLayout.WEST);
-    north.add(header, BorderLayout.EAST);
 
     // status and query pane
     search.editor(addTab(), false);
@@ -153,7 +147,7 @@ public final class EditorView extends View {
     final BaseXBack main = new BaseXBack().border(5);
     main.setOpaque(false);
     main.layout(new BorderLayout());
-    main.add(north, BorderLayout.NORTH);
+    main.add(buttons, BorderLayout.NORTH);
     main.add(center, BorderLayout.CENTER);
     main.add(south, BorderLayout.SOUTH);
 
@@ -256,7 +250,6 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    header.refreshLayout();
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     search.refreshLayout();
     final Font f = font.deriveFont((float) ((FONTSIZE + fontSize) / 2));
@@ -333,7 +326,7 @@ public final class EditorView extends View {
    * @param next next next/previous tab
    */
   public void tab(final boolean next) {
-    final int s = tabs.getTabCount() - 1;
+    final int s = tabs.getTabCount();
     final int i = (s + tabs.getSelectedIndex() + (next ? 1 : -1)) % s;
     tabs.setSelectedIndex(i);
   }
@@ -650,15 +643,14 @@ public final class EditorView extends View {
     // remove reference to last executed file
     if(execFile != null && ea.file().path().equals(execFile.path())) execFile = null;
     tabs.remove(ea);
-    final int t = tabs.getTabCount();
-    final int i = tabs.getSelectedIndex();
-    if(t == 1) {
+    final int t = tabs.getTabCount(), i = tabs.getSelectedIndex();
+    if(t == 0) {
       // no panels left: close search bar
       search.deactivate(true);
       // reopen single tab and focus project listener
       addTab();
       SwingUtilities.invokeLater(this::toggleProject);
-    } else if(i + 1 == t) {
+    } else if(i == t) {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
       focusEditor();
@@ -977,18 +969,8 @@ public final class EditorView extends View {
     close.addActionListener(e -> close(edit));
     tab.add(close, BorderLayout.EAST);
 
-    tabs.add(edit, tab, tabs.getTabCount() - 1);
+    tabs.add(edit, tab, tabs.getTabCount());
     return edit;
-  }
-
-  /**
-   * Adds a tab for creating new tabs.
-   */
-  private void addCreateTab() {
-    final AbstractButton tab = tabButton("e_new", "e_new2");
-    tab.addActionListener(e -> refreshControls(addTab(), true));
-    tabs.add(new BaseXBack(), tab, 0);
-    tabs.setEnabledAt(0, false);
   }
 
   /**
@@ -998,12 +980,12 @@ public final class EditorView extends View {
    * @return button
    */
   private AbstractButton tabButton(final String icon, final String rollover) {
-    final AbstractButton b = BaseXButton.get(icon, null, false, gui);
-    b.setBorder(BaseXLayout.border(2, 0, 2, 0));
-    b.setContentAreaFilled(false);
-    b.setFocusable(false);
-    b.setRolloverIcon(BaseXImages.icon(rollover));
-    return b;
+    final AbstractButton close = BaseXButton.get(icon, null, false, gui);
+    close.setBorder(BaseXLayout.border(2, 0, 2, 0));
+    close.setContentAreaFilled(false);
+    close.setFocusable(false);
+    close.setRolloverIcon(BaseXImages.icon(rollover));
+    return close;
   }
 
   /**
