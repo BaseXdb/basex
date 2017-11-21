@@ -110,13 +110,13 @@ public class SqlExecute extends SqlFn {
             }
             return row;
           } catch(final SQLException ex) {
-            throw BXSQ_ERROR_X.get(info, ex);
+            throw SQL_ERROR_X.get(info, ex);
           }
         }
       };
 
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR_X.get(info, ex);
+      throw SQL_ERROR_X.get(info, ex);
     }
   }
 
