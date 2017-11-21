@@ -68,6 +68,11 @@ public final class SqlExecutePrepared extends SqlExecute {
     try {
       final PreparedStatement stmt = (PreparedStatement) obj;
       try {
+        // set additition statement options
+        if(exprs.length > 2) {
+          final StatementOptions options = toOptions(2, new StatementOptions(), qc);
+          setStatementOptions(stmt, options);
+        }
         // Check if number of parameters equals number of place holders
         if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
       } catch(final SQLSyntaxErrorException ex) {
