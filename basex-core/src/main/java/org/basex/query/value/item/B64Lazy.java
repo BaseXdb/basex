@@ -9,12 +9,12 @@ import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
- * Streamable base64 item ({@code xs:base64Binary}).
+ * Lazy base64 item ({@code xs:base64Binary}).
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class B64Stream extends B64 {
+public final class B64Lazy extends B64 implements Lazy {
   /** File reference. */
   private final IO input;
   /** Error message. */
@@ -25,7 +25,7 @@ public final class B64Stream extends B64 {
    * @param input input
    * @param error error message to be thrown
    */
-  public B64Stream(final IO input, final QueryError error) {
+  public B64Lazy(final IO input, final QueryError error) {
     this.input = input;
     this.error = error;
   }
@@ -38,7 +38,7 @@ public final class B64Stream extends B64 {
 
   @Override
   public BufferInput input(final InputInfo ii) throws QueryException {
-    if(data != null) return super.input(ii);
+    if(isCached()) return super.input(ii);
     try {
       return new BufferInput(input);
     } catch(final IOException ex) {
@@ -49,14 +49,19 @@ public final class B64Stream extends B64 {
   @Override
   public void materialize(final InputInfo ii) throws QueryException {
     try {
-      if(data == null) data = input.read();
+      if(!isCached()) data = input.read();
     } catch(final IOException ex) {
       throw error.get(ii, ex);
     }
   }
 
   @Override
+  public boolean isCached() {
+    return data != null;
+  }
+
+  @Override
   public String toString() {
-    return data != null ? super.toString() : Function._FILE_READ_BINARY.args(input).substring(1);
+    return isCached() ? super.toString() : Function._FILE_READ_BINARY.args(input).substring(1);
   }
 }

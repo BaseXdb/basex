@@ -1,16 +1,18 @@
 package org.basex.modules;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
 import javax.servlet.http.*;
 
 import org.basex.data.*;
+import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -22,17 +24,30 @@ import org.basex.util.list.*;
 final class ASession {
   /** Query context. */
   private final QueryContext qc;
+  /** Session id. */
+  private final Str id;
   /** Session. */
-  private final HttpSession session;
+  private HttpSession session;
 
   /**
    * Constructor.
-   * @param session session
    * @param qc query context
+   * @param id session id (if {@code null}, local session will be retrieved)
+   * @throws QueryException query exception
    */
-  ASession(final HttpSession session, final QueryContext qc) {
-    this.session = session;
+  ASession(final QueryContext qc, final Str id) throws QueryException {
     this.qc = qc;
+    this.id = id;
+
+    final Object http = qc.http;
+    if(http == null) throw BASEX_HTTP.get(null);
+
+    if(id == null) {
+      session = ((HTTPConnection) http).req.getSession();
+    } else {
+      session = SessionListener.sessions().get(id.toJava());
+      if(session == null) throw SESSIONS_NOTFOUND_X.get(null, id);
+    }
   }
 
   /**
@@ -91,7 +106,7 @@ final class ASession {
     final Object o = session.getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Value) return (Value) o;
-    throw SessionErrors.noAttribute(Util.className(o));
+    throw (id == null ? SESSION_GET_X : SESSIONS_GET_X).get(null, o);
   }
 
   /**
@@ -103,7 +118,7 @@ final class ASession {
   void set(final Str key, final Value value) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final Item item : value) {
-      if(item instanceof FItem) throw SessionErrors.functionItem();
+      if(item instanceof FItem) throw (id == null ? SESSION_SET_X : SESSIONS_SET_X).get(null, item);
       final Data d = item.data();
       vb.add(d == null || d.inMemory() ? item : ((ANode) item).deepCopy(qc.context.options));
     }

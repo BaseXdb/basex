@@ -40,22 +40,22 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("<json type='object'><a>\"</a></json>", "{'a':'\\''}", format);
     serialize("<json type='object'><a>1</a><b/></json>", "{'a':'1','b':''}", format);
 
-    error("<json type='object' name=\"x\"/>", format, BXJS_SERIAL_X);
-    error("<json type='object'><a name='X'/></json>", format, BXJS_SERIAL_X);
-    error("<json type='object'><_ type='number'/></json>", format, BXJS_SERIAL_X);
-    error("<json type='object'><_ type='boolean'/></json>", format, BXJS_SERIAL_X);
-    error("<json type='object'><_ type='x'>1</_></json>", format, BXJS_SERIAL_X);
+    error("<json type='object' name=\"x\"/>", format, JSON_SERIALIZE_X);
+    error("<json type='object'><a name='X'/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='object'><_ type='number'/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='object'><_ type='boolean'/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='object'><_ type='x'>1</_></json>", format, JSON_SERIALIZE_X);
 
     serialize("<json type='array'/>", "[]", format);
     serialize("<json type='array'><_/></json>", "['']", format);
     serialize("<json type='array'><_>x</_></json>", "['x']", format);
 
-    error("<json type='array'><X/></json>", format, BXJS_SERIAL_X);
-    error("<json type='array' name='X'><_/></json>", format, BXJS_SERIAL_X);
-    error("<json type='array'><_ name='X'/></json>", format, BXJS_SERIAL_X);
-    error("<json type='array'><_ _='_'/></json>", format, BXJS_SERIAL_X);
-    error("<json type='array'><_ type='number'>x</_></json>", format, BXJS_SERIAL_X);
-    error("<json type='array'><_ type='boolean'>x</_></json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><X/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='array' name='X'><_/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='array'><_ name='X'/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='array'><_ _='_'/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='array'><_ type='number'>x</_></json>", format, JSON_SERIALIZE_X);
+    error("<json type='array'><_ type='boolean'>x</_></json>", format, JSON_SERIALIZE_X);
   }
 
   /**
@@ -78,10 +78,10 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("<json type='object'><pair name='a'>1</pair><pair name='b'/></json>",
         "{'a':'1','b':''}", format);
 
-    error("<json type='object'><_/></json>", format, BXJS_SERIAL_X);
-    error("<json type='object'><pair/></json>", format, BXJS_SERIAL_X);
-    error("<json type='object'><pair type='null'/></json>", format, BXJS_SERIAL_X);
-    error("<json type='object'><pair>1</pair></json>", format, BXJS_SERIAL_X);
+    error("<json type='object'><_/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='object'><pair/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='object'><pair type='null'/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='object'><pair>1</pair></json>", format, JSON_SERIALIZE_X);
 
     serialize("<json type='array'/>", "[]", format);
     serialize("<json type='array'><item/></json>", "['']", format);
@@ -92,10 +92,10 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("<json>a</json>", "'a'", format);
     serialize("<json type='number'>1</json>", "1", format);
 
-    error("<json type='array'><_/></json>", format, BXJS_SERIAL_X);
-    error("<json type='array'><item type='number'>x</item></json>", format, BXJS_SERIAL_X);
-    error("<json type='array'><item type='boolean'>x</item></json>", format, BXJS_SERIAL_X);
-    error("<json type='number'>x</json>", format, BXJS_SERIAL_X);
+    error("<json type='array'><_/></json>", format, JSON_SERIALIZE_X);
+    error("<json type='array'><item type='number'>x</item></json>", format, JSON_SERIALIZE_X);
+    error("<json type='array'><item type='boolean'>x</item></json>", format, JSON_SERIALIZE_X);
+    error("<json type='number'>x</json>", format, JSON_SERIALIZE_X);
   }
 
   /**

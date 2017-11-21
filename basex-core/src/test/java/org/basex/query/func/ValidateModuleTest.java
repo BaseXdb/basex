@@ -46,14 +46,14 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_XSD.args("unknown"), WHICHRES_X);
     error(_VALIDATE_XSD.args(FILE, "unknown.xsd"), WHICHRES_X);
-    error(_VALIDATE_XSD.args(FILE, XSD, "0.99"), BXVA_XSDVERSION_X);
-    error(_VALIDATE_XSD.args(FILE), BXVA_FAIL_X);
+    error(_VALIDATE_XSD.args(FILE, XSD, "0.99"), VALIDATE_VERSION_X);
+    error(_VALIDATE_XSD.args(FILE), VALIDATE_ERROR_X);
     error(
       "let $doc := <root/> " +
       "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
       "<xs:element name='unknown'/> " +
       "</xs:schema> " +
-      "return validate:xsd($doc, $schema)", BXVA_FAIL_X);
+      "return validate:xsd($doc, $schema)", VALIDATE_ERROR_X);
   }
 
   /** Test method. */
@@ -87,7 +87,7 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_XSD_INFO.args("unknown"), WHICHRES_X);
     error(_VALIDATE_XSD_INFO.args(FILE, "unknown.xsd"), WHICHRES_X);
-    error(_VALIDATE_XSD_INFO.args(FILE, XSD, "0.99"), BXVA_XSDVERSION_X);
+    error(_VALIDATE_XSD_INFO.args(FILE, XSD, "0.99"), VALIDATE_VERSION_X);
   }
 
   /** Test method. */
@@ -143,7 +143,7 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_XSD_REPORT.args("unknown"), WHICHRES_X);
     error(_VALIDATE_XSD_REPORT.args(FILE, "unknown.xsd"), WHICHRES_X);
-    error(_VALIDATE_XSD_REPORT.args(FILE, XSD, "0.99"), BXVA_XSDVERSION_X);
+    error(_VALIDATE_XSD_REPORT.args(FILE, XSD, "0.99"), VALIDATE_VERSION_X);
   }
 
   /** Test method. */
@@ -167,11 +167,11 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_DTD.args("unknown"), WHICHRES_X);
     error(_VALIDATE_DTD.args(FILE, "unknown.dtd"), WHICHRES_X);
-    error(_VALIDATE_DTD.args(FILE), BXVA_FAIL_X);
+    error(_VALIDATE_DTD.args(FILE), VALIDATE_ERROR_X);
     error(
       "let $doc := <root/> " +
       "let $dtd := '<!ELEMENT unknown (#PCDATA)>' " +
-      "return " + _VALIDATE_DTD.args(" $doc", " $dtd"), BXVA_FAIL_X);
+      "return " + _VALIDATE_DTD.args(" $doc", " $dtd"), VALIDATE_ERROR_X);
   }
 
   /** Test method. */

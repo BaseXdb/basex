@@ -61,7 +61,7 @@ abstract class CsvSerializer extends StandardSerializer {
       final boolean special = contains(txt, '\r') || contains(txt, '\t') || contains(txt, '"');
       if(delim || special || backslashes && contains(txt, '\\')) {
         final TokenBuilder tb = new TokenBuilder();
-        if(delim && !backslashes && !quotes) throw BXCS_SERIAL_X.getIO(
+        if(delim && !backslashes && !quotes) throw CSV_SERIALIZE_X.getIO(
             Util.info("Output must be put into quotes: %", chop(txt, null)));
 
         if(quotes && (delim || special)) tb.add('"');
@@ -92,6 +92,6 @@ abstract class CsvSerializer extends StandardSerializer {
 
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw BXCS_SERIAL_X.getIO("Atomic values cannot be serialized");
+    throw CSV_SERIALIZE_X.getIO("Atomic values cannot be serialized");
   }
 }

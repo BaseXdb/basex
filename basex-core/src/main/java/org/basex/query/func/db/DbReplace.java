@@ -36,7 +36,7 @@ public final class DbReplace extends DbNew {
     // delete binary resources
     final IOFile bin = data.meta.binary(path);
     final boolean disk = !data.inMemory();
-    if(disk && (bin == null || bin.isDir())) throw BXDB_REPLACE_X.get(info, path);
+    if(disk && (bin == null || bin.isDir())) throw DB_TARGET_X.get(info, path);
 
     if(disk && it instanceof Bin) {
       updates.add(new DBStore(data, path, it, info), qc);

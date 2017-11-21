@@ -30,7 +30,7 @@ abstract class HashFn extends StandardFunc {
     final Item it = exprs[0].atomItem(qc, info);
     try {
       final MessageDigest md = MessageDigest.getInstance(algo);
-      if(it instanceof B64Stream) {
+      if(it instanceof B64Lazy) {
         try(BufferInput bi = it.input(info)) {
           final byte[] tmp = new byte[IO.BLOCKSIZE];
           do {
@@ -47,7 +47,7 @@ abstract class HashFn extends StandardFunc {
       return B64.get(md.digest(toBytes(it)));
     } catch(final NoSuchAlgorithmException ex) {
       Util.debug(ex);
-      throw HASH_ALG_X.get(info, algo);
+      throw HASH_ALGORITHM_X.get(info, algo);
     }
   }
 }

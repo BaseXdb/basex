@@ -35,7 +35,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
     addPairs.add(true);
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.USE_LAST) throw new QueryIOException(
-        BXJS_INVALID_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
+        JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
   }
 
   @Override

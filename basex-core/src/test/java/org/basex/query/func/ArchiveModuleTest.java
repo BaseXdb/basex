@@ -47,15 +47,15 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
     // different number of entries and contents
     error(_ARCHIVE_CREATE.args("X", " ()"), ARCHIVE_NUMBER_X_X);
     // name must not be empty
-    error(_ARCHIVE_CREATE.args(" <archive:entry/>", ""), ARCHIVE_DESC1);
+    error(_ARCHIVE_CREATE.args(" <archive:entry/>", ""), ARCHIVE_DESCRIPTOR1);
     // invalid compression level
     error(_ARCHIVE_CREATE.args(" <archive:entry compression-level='x'>X</archive:entry>", ""),
-        ARCHIVE_DESC2_X);
+        ARCHIVE_DESCRIPTOR2_X);
     error(_ARCHIVE_CREATE.args(" <archive:entry compression-level='10'>X</archive:entry>", ""),
-        ARCHIVE_DESC2_X);
+        ARCHIVE_DESCRIPTOR2_X);
     // invalid modification date
     error(_ARCHIVE_CREATE.args(" <archive:entry last-modified='2020'>X</archive:entry>", ""),
-        ARCHIVE_DESC3_X);
+        ARCHIVE_DESCRIPTOR3_X);
     // content must be string or binary
     error(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", " 123"), STRBIN_X_X);
     // wrong encoding

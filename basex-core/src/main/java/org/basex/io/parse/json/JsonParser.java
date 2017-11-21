@@ -134,7 +134,7 @@ final class JsonParser extends InputParser {
         final byte[] key = !liberal || curr() == '"' ? string() : unquoted();
         final boolean dupl = set.contains(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
-          throw error(BXJS_DUPLICATE_X, "Key \"%\" occurs more than once.", key);
+          throw error(JSON_PARSE_X, "Key \"%\" occurs more than once", key);
 
         final boolean add = !(dupl && duplicates == JsonDuplicates.USE_FIRST);
         conv.openPair(key, add);
@@ -432,7 +432,7 @@ final class JsonParser extends InputParser {
    * @return build exception
    */
   private QueryIOException error(final String msg, final Object... ext) {
-    return error(BXJS_PARSE_X_X_X, msg, ext);
+    return error(JSON_PARSE_X_X_X, msg, ext);
   }
 
   /**

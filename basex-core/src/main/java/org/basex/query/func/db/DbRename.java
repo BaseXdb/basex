@@ -34,7 +34,7 @@ public final class DbRename extends DbAccess {
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
-      if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith(".")) throw BXDB_PATH_X.get(info, trg);
+      if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith(".")) throw DB_PATH_X.get(info, trg);
       updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
     }
 
@@ -42,7 +42,7 @@ public final class DbRename extends DbAccess {
     if(!data.inMemory()) {
       final IOFile src = data.meta.binary(source);
       final IOFile trg = data.meta.binary(target);
-      if(src == null || trg == null) throw BXDB_PATH_X.get(info, src);
+      if(src == null || trg == null) throw DB_PATH_X.get(info, src);
       if(!src.eq(trg)) {
         rename(data, src, trg, qc);
         updates.add(new DBDelete(data, source, info), qc);
@@ -64,12 +64,12 @@ public final class DbRename extends DbAccess {
 
     if(src.isDir()) {
       // dir -> file? error
-      if(trg.exists() && !trg.isDir()) throw BXDB_PATH_X.get(info, src);
+      if(trg.exists() && !trg.isDir()) throw DB_PATH_X.get(info, src);
       // rename children
       for(final IOFile f : src.children()) rename(data, f, new IOFile(trg, f.name()), qc);
     } else if(src.exists()) {
       // file -> dir? error
-      if(trg.isDir()) throw BXDB_PATH_X.get(info, src);
+      if(trg.isDir()) throw DB_PATH_X.get(info, src);
       qc.updates().add(new DBRename(data, src.path(), trg.path(), info), qc);
     }
   }

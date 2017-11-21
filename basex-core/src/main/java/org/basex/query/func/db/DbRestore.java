@@ -21,11 +21,11 @@ public final class DbRestore extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // extract database name from backup file
     final String name = string(toToken(exprs[0], qc));
-    if(!Databases.validName(name)) throw BXDB_NAME_X.get(info, name);
+    if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
 
     // find backup with or without date suffix
     final StringList backups = qc.context.databases.backups(name);
-    if(backups.isEmpty()) throw BXDB_NOBACKUP_X.get(info, name);
+    if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 
     final String backup = backups.get(0);
     final String db = Databases.name(backup);

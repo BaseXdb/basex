@@ -45,7 +45,7 @@ public class FetchXml extends StandardFunc {
     try {
       return new DBNode(Parser.singleParser(io, mo, ""));
     } catch(final IOException ex) {
-      throw BXFE_IO_X.get(info, ex);
+      throw FETCH_OPEN_X.get(info, ex);
     }
   }
 

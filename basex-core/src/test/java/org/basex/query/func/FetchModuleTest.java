@@ -22,8 +22,8 @@ public final class FetchModuleTest extends AdvancedQueryTest {
   @Test
   public void text() {
     query(_FETCH_TEXT.args(XML));
-    error(_FETCH_TEXT.args(XML + 'x'), BXFE_IO_X);
-    error(_FETCH_TEXT.args(XML, "xxx"), BXFE_ENCODING_X);
+    error(_FETCH_TEXT.args(XML + 'x'), FETCH_OPEN_X);
+    error(_FETCH_TEXT.args(XML, "xxx"), FETCH_ENCODING_X);
   }
 
   /** Test method. */
@@ -41,7 +41,7 @@ public final class FetchModuleTest extends AdvancedQueryTest {
     query(COUNT.args(_FETCH_XML.args(CSV,
         " map { 'parser':'csv','csvparser': map { 'header': 'true' } }") + "//City"), 3);
     error(_FETCH_XML.args(XML, " map { 'parser': 'unknown' }"), BASX_VALUE_X_X);
-    error(_FETCH_XML.args(XML + 'x'), BXFE_IO_X);
+    error(_FETCH_XML.args(XML + 'x'), FETCH_OPEN_X);
   }
 
   /** Test method. */
@@ -59,13 +59,13 @@ public final class FetchModuleTest extends AdvancedQueryTest {
   @Test
   public void binary() {
     query(_FETCH_BINARY.args(XML));
-    error(_FETCH_BINARY.args(XML + 'x'), BXFE_IO_X);
+    error(_FETCH_BINARY.args(XML + 'x'), FETCH_OPEN_X);
   }
 
   /** Test method. */
   @Test
   public void contentType() {
     query(_FETCH_CONTENT_TYPE.args(XML));
-    error(_FETCH_CONTENT_TYPE.args(XML + 'x'), BXFE_IO_X);
+    error(_FETCH_CONTENT_TYPE.args(XML + 'x'), FETCH_OPEN_X);
   }
 }

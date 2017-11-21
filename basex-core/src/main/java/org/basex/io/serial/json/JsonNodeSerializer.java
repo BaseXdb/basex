@@ -217,7 +217,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
    * @return I/O exception
    */
   private static QueryIOException error(final String msg, final Object... ext) {
-    return BXJS_SERIAL_X.getIO(Util.inf(msg, ext));
+    return JSON_SERIALIZE_X.getIO(Util.inf(msg, ext));
   }
 
   /**

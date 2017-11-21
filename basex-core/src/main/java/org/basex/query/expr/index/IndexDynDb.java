@@ -88,8 +88,7 @@ public final class IndexDynDb extends IndexDb {
   public Data data(final QueryContext qc, final IndexType type) throws QueryException {
     final Value v = qc.value(expr);
     final Data d = v.data();
-    if(d == null) throw BXDB_NOINDEX_X.get(info, v);
-    if(!v.seqType().instanceOf(SeqType.DOC_ZM)) throw BXDB_DOC_X.get(info, v);
+    if(d == null || !v.seqType().type.instanceOf(NodeType.DOC)) throw DB_NODE_X.get(info, v);
     type.check(d, info);
     return d;
   }

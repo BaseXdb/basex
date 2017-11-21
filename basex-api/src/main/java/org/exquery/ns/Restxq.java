@@ -1,5 +1,7 @@
 package org.exquery.ns;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.query.*;
@@ -15,7 +17,7 @@ import org.basex.query.value.node.*;
 public final class Restxq extends QueryModule {
   /**
    * Returns an {Code application.wadl} description including all RESTXQ services.
-   * @return wadl description
+   * @return WADL description
    * @throws QueryException query exception
    */
   public FElem wadl() throws QueryException {
@@ -24,7 +26,7 @@ public final class Restxq extends QueryModule {
 
   /**
    * Returns the base URI of the resource function.
-   * @return base uri
+   * @return base URI
    * @throws QueryException query exception
    */
   public Uri baseUri() throws QueryException {
@@ -33,8 +35,8 @@ public final class Restxq extends QueryModule {
   }
 
   /**
-   * Returns the base URI of the resource function.
-   * @return base uri
+   * Returns the URI of the resource function.
+   * @return base URI
    * @throws QueryException query exception
    */
   public Uri uri() throws QueryException {
@@ -54,7 +56,8 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   private HTTPConnection connection() throws QueryException {
-    if(queryContext.http != null) return (HTTPConnection) queryContext.http;
-    throw new QueryException("HTTP connection required.");
+    final Object http = queryContext.http;
+    if(http == null) throw BASEX_HTTP.get(null);
+    return (HTTPConnection) http;
   }
 }

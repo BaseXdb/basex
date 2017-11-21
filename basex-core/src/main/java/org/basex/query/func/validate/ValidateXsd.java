@@ -77,7 +77,7 @@ public class ValidateXsd extends ValidateFn {
         } else if(xsd11 && cp != null) {
           uri = XSD11_URI;
         } else {
-          throw BXVA_XSDVERSION_X.get(info, version);
+          throw VALIDATE_VERSION_X.get(info, version);
         }
 
         // create schema factory and set version

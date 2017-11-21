@@ -115,7 +115,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   protected void atomic(final Item item) throws IOException {
     if(sep && atomic) out.print(' ');
     try {
-      if(item instanceof StrStream && form == null) {
+      if(item instanceof StrLazy && form == null) {
         try(InputStream is = item.input(null)) {
           for(int cp; (cp = is.read()) != -1;) printChar(cp);
         }

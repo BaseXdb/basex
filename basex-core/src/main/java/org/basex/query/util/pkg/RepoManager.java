@@ -63,7 +63,7 @@ public final class RepoManager {
       cont = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw BXRE_WHICH_X.get(info, path);
+      throw REPO_NOTFOUND_X.get(info, path);
     }
 
     try {
@@ -71,7 +71,7 @@ public final class RepoManager {
       if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont, path);
       return installXAR(cont);
     } catch(final IOException ex) {
-      throw BXRE_PARSE_X_X.get(info, io.name(), ex);
+      throw REPO_PARSE_X_X.get(info, io.name(), ex);
     }
   }
 
@@ -122,7 +122,7 @@ public final class RepoManager {
         if(pkg.type() == PkgType.EXPATH) {
           // check if package to be deleted participates in a dependency
           final String dep = dependency(pkg);
-          if(dep != null) throw BXRE_DEP_X_X.get(info, dep, name);
+          if(dep != null) throw REPO_DELETE_X_X.get(info, dep, name);
           // delete files in main-memory repository
           repo.delete(pkg);
         }
@@ -130,20 +130,20 @@ public final class RepoManager {
         if(pkg.type() == PkgType.COMBINED) {
           // delete associated JAR file
           final IOFile pkgFile = repo.path(pkgPath.replaceAll("\\.[^.]+$", IO.JARSUFFIX));
-          if(!pkgFile.delete()) throw BXRE_DELETE_X.get(info, pkgPath);
+          if(!pkgFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
         }
 
         // delete package directory or file
         final IOFile pkgFile = repo.path(pkgPath);
-        if(!pkgFile.delete()) throw BXRE_DELETE_X.get(info, pkgPath);
+        if(!pkgFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
 
         // delete directory with extracted jars
         final IOFile extDir = pkgFile.parent().resolve('.' + pkg.name().replaceAll("^.*\\.", ""));
-        if(!extDir.delete()) throw BXRE_DELETE_X.get(info, extDir);
+        if(!extDir.delete()) throw REPO_DELETE_X.get(info, extDir);
         deleted = true;
       }
     }
-    if(!deleted) throw BXRE_WHICH_X.get(info, name);
+    if(!deleted) throw REPO_NOTFOUND_X.get(info, name);
   }
 
   /**
@@ -230,7 +230,7 @@ public final class RepoManager {
       final Matcher main = MAIN_CLASS.matcher(s);
       if(main.find()) return write(main.group(1).replace('.', '/') + IO.JARSUFFIX, content);
     }
-    throw BXRE_MAIN_X.get(info, path);
+    throw REPO_PARSE_X_X.get(info, path, MANIFEST);
   }
 
   /**

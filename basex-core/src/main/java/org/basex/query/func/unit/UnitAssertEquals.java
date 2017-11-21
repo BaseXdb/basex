@@ -31,6 +31,6 @@ public final class UnitAssertEquals extends UnitFn {
       qc.checkStop();
     }
     final Item it = toNodeOrAtomItem(2, qc);
-    throw new UnitException(info, UNIT_ASSERT_EQUALS_X_X_X, it1, it2, c).value(it);
+    throw new UnitException(info, UNIT_FAIL_X_X_X, it1, it2, c).value(it);
   }
 }

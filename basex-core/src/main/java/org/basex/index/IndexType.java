@@ -42,6 +42,6 @@ public enum IndexType {
    * @throws QueryException query exception
    */
   public void check(final Data data, final InputInfo info) throws QueryException {
-    if(!data.meta.index(this)) throw BXDB_INDEX_X.get(info, data.meta.name, this);
+    if(!data.meta.index(this)) throw DB_NOINDEX_X_X.get(info, data.meta.name, this);
   }
 }

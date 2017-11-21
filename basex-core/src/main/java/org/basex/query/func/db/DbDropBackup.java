@@ -21,10 +21,10 @@ public final class DbDropBackup extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = string(toToken(exprs[0], qc));
-    if(!Databases.validName(name)) throw BXDB_NAME_X.get(info, name);
+    if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
 
     final StringList backups = qc.context.databases.backups(name);
-    if(backups.isEmpty()) throw BXDB_WHICHBACK_X.get(info, name);
+    if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 
     final Updates updates = qc.updates();
     for(final String backup : backups) updates.add(new BackupDrop(backup, info, qc), qc);

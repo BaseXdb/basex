@@ -87,9 +87,9 @@ public final class UserModuleTest extends AdvancedQueryTest {
     error(_USER_CREATE.args("", "", Perm.ADMIN), USER_NAME_X);
 
     // redundant operations
-    error(_USER_CREATE.args(NAME, "") + ',' + _USER_CREATE.args(NAME, ""), USER_UPDATE_X_X);
-    error(_USER_CREATE.args(NAME, "", " ('admin','admin')", " ('','')"), USER_SAMEPERM_X_X);
-    error(_USER_CREATE.args(NAME, "", " ('admin','admin')", " ('x','x')"), USER_SAMEPAT_X);
+    error(_USER_CREATE.args(NAME, "") + ',' + _USER_CREATE.args(NAME, ""), USER_UPDATE1_X_X);
+    error(_USER_CREATE.args(NAME, "", " ('admin','admin')", " ('','')"), USER_UPDATE3_X_X);
+    error(_USER_CREATE.args(NAME, "", " ('admin','admin')", " ('x','x')"), USER_UPDATE2_X);
   }
 
   /** Test method. */
@@ -121,9 +121,9 @@ public final class UserModuleTest extends AdvancedQueryTest {
 
     // redundant operations
     error(_USER_GRANT.args(NAME, Perm.READ) + ',' + _USER_GRANT.args(NAME, Perm.WRITE),
-        USER_UPDATE_X_X);
+        USER_UPDATE1_X_X);
     error(_USER_GRANT.args(NAME, Perm.READ, 'x') + ',' + _USER_GRANT.args(NAME, Perm.WRITE, 'x'),
-        USER_SAMEPAT_X);
+        USER_UPDATE2_X);
   }
 
   /** Test method. */
@@ -138,8 +138,8 @@ public final class UserModuleTest extends AdvancedQueryTest {
     // invalid database pattern
     error(_USER_DROP.args(NAME, ";"), USER_PATTERN_X);
     // redundant operations
-    error(_USER_DROP.args(NAME) + ',' + _USER_DROP.args(NAME), USER_UPDATE_X_X);
-    error(_USER_DROP.args(NAME, 'x') + ',' + _USER_DROP.args(NAME, 'x'), USER_SAMEPAT_X);
+    error(_USER_DROP.args(NAME) + ',' + _USER_DROP.args(NAME), USER_UPDATE1_X_X);
+    error(_USER_DROP.args(NAME, 'x') + ',' + _USER_DROP.args(NAME, 'x'), USER_UPDATE2_X);
     error(_USER_DROP.args(NAME) + ',' + _USER_ALTER.args(NAME, "X"), USER_CONFLICT_X);
 
     // drop user
@@ -170,7 +170,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
     error(_USER_ALTER.args("", NAME), USER_NAME_X);
     error(_USER_ALTER.args(NAME, ""), USER_NAME_X);
     // redundant operations
-    error(_USER_ALTER.args(NAME, "X") + ',' + _USER_ALTER.args(NAME, "X"), USER_UPDATE_X_X);
+    error(_USER_ALTER.args(NAME, "X") + ',' + _USER_ALTER.args(NAME, "X"), USER_UPDATE1_X_X);
     // redundant operations
     error(_USER_ALTER.args(NAME, "X") + ',' + _USER_DROP.args(NAME), USER_CONFLICT_X);
   }
@@ -183,7 +183,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
     // invalid name
     error(_USER_PASSWORD.args("", ""), USER_NAME_X);
     // redundant operations
-    error(_USER_PASSWORD.args(NAME, "") + ',' + _USER_PASSWORD.args(NAME, ""), USER_UPDATE_X_X);
+    error(_USER_PASSWORD.args(NAME, "") + ',' + _USER_PASSWORD.args(NAME, ""), USER_UPDATE1_X_X);
   }
 
   /** Test method. */

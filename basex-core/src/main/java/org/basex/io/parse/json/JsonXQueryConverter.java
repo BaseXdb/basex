@@ -50,7 +50,7 @@ public final class JsonXQueryConverter extends JsonConverter {
     super(opts);
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.RETAIN) throw new QueryIOException(
-        BXJS_INVALID_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
+        JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
   }
 
   @Override

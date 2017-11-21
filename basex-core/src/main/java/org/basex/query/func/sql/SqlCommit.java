@@ -22,7 +22,7 @@ public final class SqlCommit extends SqlFn {
       connection(qc).commit();
       return null;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR_X.get(info, ex);
+      throw SQL_ERROR_X.get(info, ex);
     }
   }
 }

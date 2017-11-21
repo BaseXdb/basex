@@ -34,7 +34,7 @@ public final class DbDelete extends DbAccess {
     // delete raw resources
     if(!data.inMemory()) {
       final IOFile bin = data.meta.binary(path);
-      if(bin == null) throw BXDB_PATH_X.get(info, path);
+      if(bin == null) throw DB_PATH_X.get(info, path);
       updates.add(new DBDelete(data, path, info), qc);
     }
     return null;

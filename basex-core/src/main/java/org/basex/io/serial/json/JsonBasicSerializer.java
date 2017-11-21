@@ -158,7 +158,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw BXJS_SERIAL_X.getIO("Atomic values cannot be serialized");
+    throw JSON_SERIALIZE_X.getIO("Atomic values cannot be serialized");
   }
 
   /**
@@ -226,15 +226,15 @@ public final class JsonBasicSerializer extends JsonSerializer {
       while(tp.more()) {
         int cp = tp.next();
         if(cp == '\\') {
-          if(!tp.more()) throw JSON_ESCAPE_X.getIO(value);
+          if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
           switch(tp.next()) {
             case 'u':
               cp = 0;
               for(int i = 0; i < 4; i++) {
-                if(!tp.more()) throw JSON_ESCAPE_X.getIO(value);
+                if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
                 final int c = tp.next();
                 if(c < 0x30 || c > 0x39 && c < 0x41 || c > 0x46 && c < 0x61 || c > 0x66)
-                  throw JSON_ESCAPE_X.getIO(value);
+                  throw ESCAPE_JSON_X.getIO(value);
                 cp = (cp << 4) + c - (c >= 0x61 ? 0x57 : c >= 0x41 ? 0x37 : 0x30);
               }
               raw.add(cp);
@@ -252,7 +252,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
             case 't':
               raw.add('\t'); break;
             default:
-              throw JSON_ESCAPE_X.getIO(value);
+              throw ESCAPE_JSON_X.getIO(value);
           }
         } else {
           raw.add(cp);
@@ -295,6 +295,6 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @return I/O exception
    */
   private static QueryIOException error(final String msg, final Object... ext) {
-    return JSON_INVALID_X.getIO(Util.inf(msg, ext));
+    return INVALID_JSON_X.getIO(Util.inf(msg, ext));
   }
 }

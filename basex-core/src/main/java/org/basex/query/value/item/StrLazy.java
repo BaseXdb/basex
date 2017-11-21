@@ -10,12 +10,12 @@ import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
- * Streamable string item ({@code xs:string}).
+ * Lazy string item ({@code xs:string}).
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class StrStream extends AStr {
+public final class StrLazy extends AStr implements Lazy {
   /** Input reference. */
   private final IO input;
   /** Encoding (can be {@code null}). */
@@ -32,7 +32,7 @@ public final class StrStream extends AStr {
    * @param error error message to be thrown
    * @param validate validate flag
    */
-  public StrStream(final IO input, final String encoding, final QueryError error,
+  public StrLazy(final IO input, final String encoding, final QueryError error,
       final boolean validate) {
     this.input = input;
     this.encoding = encoding;
@@ -53,7 +53,7 @@ public final class StrStream extends AStr {
 
   @Override
   public BufferInput input(final InputInfo ii) throws QueryException {
-    if(value != null) return super.input(ii);
+    if(isCached()) return super.input(ii);
 
     TextInput ti = null;
     try {
@@ -69,17 +69,22 @@ public final class StrStream extends AStr {
   @Override
   public void materialize(final InputInfo ii) throws QueryException {
     try {
-      if(value == null) value = input(ii).content();
+      if(!isCached()) value = input(ii).content();
     } catch(final IOException ex) {
       throw error.get(ii, ex);
     }
   }
 
   @Override
+  public boolean isCached() {
+    return value != null;
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(obj instanceof StrStream) {
-      final StrStream s = (StrStream) obj;
+    if(obj instanceof StrLazy) {
+      final StrLazy s = (StrLazy) obj;
       if(input.eq(s.input) && Objects.equals(encoding, s.encoding) && error == s.error &&
           validate == s.validate) return true;
     }
@@ -89,6 +94,6 @@ public final class StrStream extends AStr {
 
   @Override
   public String toString() {
-    return value != null ? toString(value) : Function._FILE_READ_TEXT.args(input).substring(1);
+    return isCached() ? toString(value) : Function._FILE_READ_TEXT.args(input).substring(1);
   }
 }

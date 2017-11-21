@@ -30,14 +30,14 @@ public final class FetchContentType extends StandardFunc {
         final String ct = ((IOUrl) io).connection().getContentType();
         if(ct != null) mt = new MediaType(ct);
       } catch(final IOException ex) {
-        throw BXFE_IO_X.get(info, ex);
+        throw FETCH_OPEN_X.get(info, ex);
       }
     } else if(io instanceof IOContent) {
       mt = MediaType.APPLICATION_XML;
     } else if(io.exists()) {
       mt = MediaType.get(path);
     }
-    if(mt == null) throw BXFE_IO_X.get(info, new FileNotFoundException(path));
+    if(mt == null) throw FETCH_OPEN_X.get(info, new FileNotFoundException(path));
     return Str.get(mt.toString());
   }
 }

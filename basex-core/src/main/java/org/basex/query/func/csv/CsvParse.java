@@ -26,7 +26,7 @@ public final class CsvParse extends StandardFunc {
     try {
       return CsvConverter.get(opts).convert(new IOContent(input));
     } catch(final IOException ex) {
-      throw BXCS_PARSE_X.get(info, ex);
+      throw CSV_PARSE_X.get(info, ex);
     }
   }
 }

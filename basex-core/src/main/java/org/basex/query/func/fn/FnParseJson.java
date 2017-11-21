@@ -51,7 +51,7 @@ public class FnParseJson extends Parse {
     final boolean esc = opts.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);
     final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, info);
-    if(esc && fallback != null) throw JSON_OPT_X.get(info,
+    if(esc && fallback != null) throw OPTION_JSON_X.get(info,
         "Escaping cannot be combined with a fallback function.");
 
     try {
@@ -72,9 +72,9 @@ public class FnParseJson extends Parse {
       final QueryException qe = ex.getCause(info);
       final QueryError error = qe.error();
       final String message = ex.getLocalizedMessage();
-      if(error == BXJS_PARSE_X_X_X) throw JSON_PARSE_X.get(info, message);
-      if(error == BXJS_DUPLICATE_X) throw JSON_DUPLICATE_X.get(info, message);
-      if(error == BXJS_INVALID_X) throw JSON_OPT_X.get(info, message);
+      if(error == JSON_PARSE_X_X_X) throw PARSE_JSON_X.get(info, message);
+      if(error == JSON_PARSE_X) throw DUPLICATE_JSON_X.get(info, message);
+      if(error == JSON_OPTIONS_X) throw OPTION_JSON_X.get(info, message);
       throw qe;
     }
   }

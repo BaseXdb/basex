@@ -24,13 +24,13 @@ public final class BinToOctets extends StandardFunc {
       }
       @Override
       public Value value(final QueryContext q) {
-        return ConvertBinaryToInteger.toValue(bytes);
+        return ConvertBinaryToIntegers.toValue(bytes);
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return ConvertBinaryToInteger.toValue(toB64(exprs[0], qc, false).binary(info));
+    return ConvertBinaryToIntegers.toValue(toB64(exprs[0], qc, false).binary(info));
   }
 }

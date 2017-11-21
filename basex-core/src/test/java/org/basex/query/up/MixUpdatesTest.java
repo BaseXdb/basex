@@ -38,8 +38,8 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Update test. */
   @Test
   public void update() {
-    query(_XQUERY_UPDATE.args("1"), 1);
-    query(_XQUERY_UPDATE.args("1") + ",2", "1\n2");
+    query(_XQUERY_EVAL_UPDATE.args("1"), 1);
+    query(_XQUERY_EVAL_UPDATE.args("1") + ",2", "1\n2");
   }
 
   /** Test method. */

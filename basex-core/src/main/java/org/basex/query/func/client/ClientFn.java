@@ -16,8 +16,7 @@ import org.basex.query.value.type.*;
  */
 abstract class ClientFn extends StandardFunc {
   /**
-   * Returns a connection and removes it from list with opened connections if
-   * requested.
+   * Returns a connection and removes it from list with opened connections if requested.
    * @param qc query context
    * @param del flag indicating if connection has to be removed
    * @return connection
@@ -25,7 +24,7 @@ abstract class ClientFn extends StandardFunc {
    */
   final ClientSession session(final QueryContext qc, final boolean del) throws QueryException {
     final ClientSessions sessions = sessions(qc);
-    final Uri id = (Uri) checkAtomic(exprs[0], qc, AtomType.URI);
+    final Uri id = (Uri) checkType(exprs[0], qc, AtomType.URI);
     final ClientSession cs = sessions.get(id);
     if(cs == null) throw CLIENT_ID_X.get(info, id);
     if(del) sessions.remove(id);

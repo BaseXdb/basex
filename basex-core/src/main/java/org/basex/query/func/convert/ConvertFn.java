@@ -29,13 +29,13 @@ public abstract class ConvertFn extends StandardFunc {
    */
   final byte[] stringToBinary(final QueryContext qc) throws QueryException {
     final byte[] in = toToken(exprs[0], qc);
-    final String enc = toEncoding(1, BXCO_ENCODING_X, qc);
+    final String enc = toEncoding(1, CONVERT_ENCODING_X, qc);
     if(enc == null || enc == Strings.UTF8) return in;
     try {
       return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
       Util.debug(ex);
-      throw BXCO_BASE64_X_X.get(info, chop(in, info), enc);
+      throw CONVERT_BINARY_X_X.get(info, chop(in, info), enc);
     }
   }
 

@@ -120,7 +120,7 @@ abstract class ContextModifier {
         up.apply(qc);
       }
     } catch(final IOException ex) {
-      throw BXDB_LOCK_X.get(null, ex);
+      throw DB_LOCK2_X.get(null, ex);
     } finally {
       // remove locks: in case of a crash, remove only already acquired write locks
       for(final Data data : datas) {

@@ -242,7 +242,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final DBNode toDBNode(final Item it) throws QueryException {
     if(checkNoEmpty(it, NodeType.NOD) instanceof DBNode) return (DBNode) it;
-    throw BXDB_NODB_X_X.get(info, it.type, it);
+    throw DB_NODE_X.get(info, it);
   }
 
   /**
@@ -462,7 +462,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final long dateTimeToMs(final Expr ex, final QueryContext qc) throws QueryException {
-    final Dtm dtm = (Dtm) checkAtomic(ex, qc, AtomType.DTM);
+    final Dtm dtm = (Dtm) checkType(ex, qc, AtomType.DTM);
     if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }

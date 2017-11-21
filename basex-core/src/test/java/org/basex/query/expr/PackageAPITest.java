@@ -87,7 +87,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void mandatoryAttr() {
     error(new IOContent("<package xmlns:http='http://expath.org/ns/pkg' spec='1.0'/>"),
-        BXRE_DESC_X, "Missing mandatory attribute not detected.");
+        REPO_DESCRIPTOR_X, "Missing mandatory attribute not detected.");
   }
 
   /**
@@ -99,7 +99,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG4 + "'/>"),
-        BXRE_NOTINST_X, "Missing dependency not detected.");
+        REPO_NOTFOUND_X, "Missing dependency not detected.");
   }
 
   /**
@@ -111,7 +111,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='1.0 7.0'/>"),
-        BXRE_NOTINST_X, "Missing dependency not detected.");
+        REPO_NOTFOUND_X, "Missing dependency not detected.");
   }
 
   /**
@@ -123,7 +123,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='12.7'/>"),
-        BXRE_NOTINST_X, "Missing dependency not detected.");
+        REPO_NOTFOUND_X, "Missing dependency not detected.");
   }
 
   /**
@@ -135,7 +135,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='12.7'/>"),
-        BXRE_NOTINST_X, "Missing dependency not detected.");
+        REPO_NOTFOUND_X, "Missing dependency not detected.");
   }
 
   /**
@@ -147,7 +147,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' semver-max='11'/>"),
-        BXRE_NOTINST_X, "Missing dependency not detected.");
+        REPO_NOTFOUND_X, "Missing dependency not detected.");
   }
 
   /**
@@ -158,7 +158,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void notInstalledMinMax() {
     error(desc(PKG5, "pkg5", "12.0",
         "<dependency package='" + PKG1 + "' semver-min='5.7' "
-            + "semver-max='11'/>"), BXRE_NOTINST_X,
+            + "semver-max='11'/>"), REPO_NOTFOUND_X,
         "Missing dependency not detected.");
   }
 
@@ -170,7 +170,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void alreadyAnotherInstalled() {
     error(desc(PKG5, "pkg5", "12.0",
         "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
-        BXRE_INST_X, "Already installed component not detected.");
+        REPO_INSTALLED_X, "Already installed component not detected.");
   }
 
   /**
@@ -179,7 +179,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void notSupported() {
     error(desc(PKG5, "pkg5", "12.0",
-        "<dependency processor='basex' semver='5.0'/>"), BXRE_VERSION,
+        "<dependency processor='basex' semver='5.0'/>"), REPO_VERSION,
         "Unsupported package not detected.");
   }
 
@@ -228,7 +228,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).install("src/test/resources/pkg");
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
-      error(null, ex, BXRE_WHICH_X);
+      error(null, ex, REPO_NOTFOUND_X);
     }
 
     // try to install a XAR package
@@ -308,7 +308,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     try {
       new RepoDelete("org.basex.modules.Hello", null).execute(context);
     } catch(final BaseXException ex) {
-      assertTrue(ex.toString().contains(BXRE_WHICH_X.code));
+      assertTrue(ex.toString().contains(REPO_NOTFOUND_X.code));
     }
   }
 
@@ -370,7 +370,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).delete("xyz");
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
-      error(null, ex, BXRE_WHICH_X);
+      error(null, ex, REPO_NOTFOUND_X);
     }
     // install a package without dependencies (pkg3)
     execute(new RepoInstall(REPO + "pkg3.xar", null));
@@ -403,7 +403,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).delete(PKG3ID);
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
-      error(null, ex, BXRE_DEP_X_X);
+      error(null, ex, REPO_DELETE_X_X);
     }
     // try to delete pkg4 (use package name)
     execute(new RepoDelete(PKG4, null));

@@ -31,9 +31,9 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     error("declare variable $a:=1;" + _XQUERY_EVAL.args("$a"), VARUNDEF_X);
     error("for $a in (1,2) return " + _XQUERY_EVAL.args("$a"), VARUNDEF_X);
     // check updating expressions
-    error(_XQUERY_EVAL.args("delete node ()"), BXXQ_UPDATING);
+    error(_XQUERY_EVAL.args("delete node ()"), XQUERY_UPDATE1);
     error(_XQUERY_EVAL.args("declare %updating function local:x() {()}; local:x()"),
-        BXXQ_UPDATING);
+        XQUERY_UPDATE1);
     query(_XQUERY_EVAL.args("declare %updating function local:x() {()}; 1"));
     query(_XQUERY_EVAL.args(DOC.args(PATH).trim()));
 
@@ -45,24 +45,24 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
         " map { 'base-uri': 'http://x.x/' }"), "http://x.x/");
 
     error(_XQUERY_EVAL.args(DOC.args(NAME).trim(), " map { }",
-        " map { 'permission': 'none' }"), BXXQ_PERM_X);
+        " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(_XQUERY_EVAL.args(_DB_OPEN.args(NAME).trim(), " map { }",
-        " map { 'permission': 'none' }"), BXDB_OPEN_X);
+        " map { 'permission': 'none' }"), DB_OPEN2_X);
     error(_XQUERY_EVAL.args(_FILE_EXISTS.args("x").trim(), " map { }",
-        " map { 'permission': 'none' }"), BXXQ_PERM_X);
+        " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(_XQUERY_EVAL.args("(1 to 10000000000000)[. = 0]", " map { }",
-        " map { 'timeout': 1 }"), BXXQ_TIMEOUT);
+        " map { 'timeout': 1 }"), XQUERY_TIMEOUT);
     error(_XQUERY_EVAL.args("(1 to 10000000000000) ! <a/>", " map { }",
-        " map { 'memory': 10 }"), BXXQ_MEMORY);
+        " map { 'memory': 10 }"), XQUERY_MEMORY);
   }
 
   /** Test method. */
   @Test
-  public void update() {
-    query(_XQUERY_UPDATE.args("delete node <a/>"));
-    query(_XQUERY_UPDATE.args(" '" + _DB_OUTPUT.args(1) + '\''), 1);
-    query(_XQUERY_UPDATE.args(" '()'"));
-    error(_XQUERY_UPDATE.args("1"), BXXQ_NOUPDATE);
+  public void evalUpdate() {
+    query(_XQUERY_EVAL_UPDATE.args("delete node <a/>"));
+    query(_XQUERY_EVAL_UPDATE.args(" '" + _DB_OUTPUT.args(1) + '\''), 1);
+    query(_XQUERY_EVAL_UPDATE.args(" '()'"));
+    error(_XQUERY_EVAL_UPDATE.args("1"), XQUERY_UPDATE2);
   }
 
   /** Test method. */
@@ -70,6 +70,13 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
   public void invoke() {
     query(_XQUERY_INVOKE.args("src/test/resources/input.xq"), "XML");
     error(_XQUERY_INVOKE.args("src/test/resources/xxx.xq"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test
+  public void invokeUpdate() {
+    error(_XQUERY_INVOKE_UPDATE.args("src/test/resources/input.xq"), XQUERY_UPDATE2);
+    error(_XQUERY_INVOKE_UPDATE.args("src/test/resources/xxx.xq"), WHICHRES_X);
   }
 
   /** Test method. */

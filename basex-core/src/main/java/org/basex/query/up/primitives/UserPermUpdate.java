@@ -42,7 +42,7 @@ public abstract class UserPermUpdate extends UserUpdate {
     final StringList tmp = new StringList();
     for(final String pattern : patterns) {
       if(tmp.contains(pattern)) throw pattern.isEmpty()
-        ? USER_SAMEPERM_X_X.get(info, user.name(), operation()) : USER_SAMEPAT_X.get(info, pattern);
+        ? USER_UPDATE3_X_X.get(info, user.name(), operation()) : USER_UPDATE2_X.get(info, pattern);
       tmp.add(pattern);
     }
   }
@@ -53,7 +53,7 @@ public abstract class UserPermUpdate extends UserUpdate {
     if(!name().equals(up.name())) return;
     for(final String pattern : up.patterns) {
       if(patterns.contains(pattern)) throw pattern.isEmpty()
-        ? USER_UPDATE_X_X.get(info, name(), operation()) : USER_SAMEPAT_X.get(info, pattern);
+        ? USER_UPDATE1_X_X.get(info, name(), operation()) : USER_UPDATE2_X.get(info, pattern);
     }
   }
 

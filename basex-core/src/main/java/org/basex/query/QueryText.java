@@ -246,7 +246,6 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] ARRAY_PREFIX = token("array");
   /** XQuery prefix. */ byte[] BASEX_PREFIX = token("basex");
   /** XQuery prefix. */ byte[] BIN_PREFIX = token("bin");
-  /** XQuery prefix. */ byte[] BXERR_PREFIX = token("bxerr");
   /** XQuery prefix. */ byte[] CLIENT_PREFIX = token("client");
   /** XQuery prefix. */ byte[] CONVERT_PREFIX = token("convert");
   /** XQuery prefix. */ byte[] CRYPTO_PREFIX = token("crypto");
@@ -258,6 +257,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] FILE_PREFIX = token("file");
   /** XQuery prefix. */ byte[] FN_PREFIX = token("fn");
   /** XQuery prefix. */ byte[] FT_PREFIX = token("ft");
+  /** XQuery prefix. */ byte[] GEO_PREFIX = token("geo");
   /** XQuery prefix. */ byte[] HASH_PREFIX = token("hash");
   /** XQuery prefix. */ byte[] HOF_PREFIX = token("hof");
   /** XQuery prefix. */ byte[] HTML_PREFIX = token("html");
@@ -267,6 +267,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] INSPECT_PREFIX = token("inspect");
   /** XQuery prefix. */ byte[] JOBS_PREFIX = token("jobs");
   /** XQuery prefix. */ byte[] JSON_PREFIX = token("json");
+  /** XQuery prefix. */ byte[] LAZY_PREFIX = token("lazy");
   /** XQuery prefix. */ byte[] LOCAL_PREFIX = token("local");
   /** XQuery prefix. */ byte[] MAP_PREFIX = token("map");
   /** XQuery prefix. */ byte[] MATH_PREFIX = token("math");
@@ -278,10 +279,11 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] QUERY_PREFIX = token("query");
   /** XQuery prefix. */ byte[] RANDOM_PREFIX = token("random");
   /** XQuery prefix. */ byte[] REPO_PREFIX = token("repo");
+  /** XQuery prefix. */ byte[] REQUEST_PREFIX = token("request");
   /** XQuery prefix. */ byte[] REST_PREFIX = token("rest");
-  /** XQuery prefix. */ byte[] RESTXQ_PREFIX = token("restxq");
+  /** XQuery prefix. */ byte[] SESSION_PREFIX = token("session");
+  /** XQuery prefix. */ byte[] SESSIONS_PREFIX = token("sessions");
   /** XQuery prefix. */ byte[] SQL_PREFIX = token("sql");
-  /** XQuery prefix. */ byte[] STREAM_PREFIX = token("stream");
   /** XQuery prefix. */ byte[] STRINGS_PREFIX = token("strings");
   /** XQuery prefix. */ byte[] UNIT_PREFIX = token("unit");
   /** XQuery prefix. */ byte[] USER_PREFIX = token("user");
@@ -315,16 +317,17 @@ public interface QueryText {
   /** EXPath URI. */ byte[] BIN_URI = token(EXPATH_URI + "binary");
   /** EXPath URI. */ byte[] CRYPTO_URI = token(EXPATH_URI + "crypto");
   /** EXPath URI. */ byte[] FILE_URI = token(EXPATH_URI + "file");
+  /** EXPath URI. */ byte[] GEO_URI = token(EXPATH_URI + "geo");
   /** EXPath URI. */ byte[] HTTP_URI = token(EXPATH_URI + "http-client");
   /** EXPath URI. */ byte[] PKG_URI = token(EXPATH_URI + "pkg");
   /** EXPath URI. */ byte[] ZIP_URI = token(EXPATH_URI + "zip");
   /** EXPath URI. */ byte[] EXPERROR_URI = token(EXPATH_URI + "error");
 
   /** EXQuery URI. */ String EXQUERY_URI = "http://exquery.org/ns/";
+  /** EXQuery URI. */ byte[] REQUEST_URI = token(EXQUERY_URI + "request");
   /** EXQuery URI. */ byte[] REST_URI = token(EXQUERY_URI + "restxq");
 
   /** BaseX URI. */ byte[] BASEX_URI = token(Prop.URL);
-  /** BaseX URI. */ byte[] BXERRORS_URI = token(Prop.URL + "/errors");
 
   /** BaseX URI. */ String BXMODULES_URI = Prop.URL + "/modules/";
   /** BaseX URI. */ byte[] ADMIN_URI = token(BXMODULES_URI + "admin");
@@ -343,6 +346,7 @@ public interface QueryText {
   /** BaseX URI. */ byte[] INSPECT_URI = token(BXMODULES_URI + "inspect");
   /** BaseX URI. */ byte[] JOBS_URI = token(BXMODULES_URI + "jobs");
   /** BaseX URI. */ byte[] JSON_URI = token(BXMODULES_URI + "json");
+  /** BaseX URI. */ byte[] LAZY_URI = token(BXMODULES_URI + "lazy");
   /** BaseX URI. */ byte[] OUT_URI = token(BXMODULES_URI + "out");
   /** BaseX URI. */ byte[] PROC_URI = token(BXMODULES_URI + "proc");
   /** BaseX URI. */ byte[] PROF_URI = token(BXMODULES_URI + "prof");
@@ -350,7 +354,8 @@ public interface QueryText {
   /** BaseX URI. */ byte[] RANDOM_URI = token(BXMODULES_URI + "random");
   /** BaseX URI. */ byte[] REPO_URI = token(BXMODULES_URI + "repo");
   /** BaseX URI. */ byte[] SQL_URI = token(BXMODULES_URI + "sql");
-  /** BaseX URI. */ byte[] STREAM_URI = token(BXMODULES_URI + "stream");
+  /** BaseX URI. */ byte[] SESSION_URI = token(BXMODULES_URI + "session");
+  /** BaseX URI. */ byte[] SESSIONS_URI = token(BXMODULES_URI + "sessions");
   /** BaseX URI. */ byte[] STRINGS_URI = token(BXMODULES_URI + "strings");
   /** BaseX URI. */ byte[] UNIT_URI = token(BXMODULES_URI + "unit");
   /** BaseX URI. */ byte[] USER_URI = token(BXMODULES_URI + "user");

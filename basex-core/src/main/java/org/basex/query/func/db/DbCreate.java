@@ -25,7 +25,7 @@ public final class DbCreate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = string(toToken(exprs[0], qc));
-    if(!Databases.validName(name)) throw BXDB_NAME_X.get(info, name);
+    if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
 
     final TokenList paths = new TokenList();
     if(exprs.length > 2) {
@@ -44,7 +44,7 @@ public final class DbCreate extends DbNew {
       final Value val = qc.value(exprs[1]);
       final long is = val.size(), ps = paths.size();
       // if paths are supplied, number of specified inputs and paths must be identical
-      if(ps != 0 && is != ps) throw BXDB_CREATEARGS_X_X.get(info, is, ps);
+      if(ps != 0 && is != ps) throw DB_ARGS_X_X.get(info, is, ps);
 
       inputs = new NewInput[(int) is];
       for(int i = 0; i < is; i++) {

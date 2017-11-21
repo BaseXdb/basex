@@ -1,4 +1,4 @@
-package org.basex.query.func.stream;
+package org.basex.query.func.lazy;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -11,10 +11,10 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class StreamIsStreamable extends StandardFunc {
+public final class LazyIsLazy extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = toAtomItem(exprs[0], qc);
-    return Bln.get(it instanceof B64Stream || it instanceof StrStream);
+    return Bln.get(it instanceof Lazy);
   }
 }

@@ -3577,12 +3577,12 @@ public class QueryParser extends InputParser {
         }
       } else if(wsConsumeWs(WILDCARDS)) {
         if(opt.isSet(WC)) throw error(FTDUP_X, WILDCARDS);
-        if(opt.is(FZ)) throw error(BXFT_MATCH);
+        if(opt.is(FZ)) throw error(FT_OPTIONS);
         opt.set(WC, using);
       } else if(wsConsumeWs(FUZZY)) {
         // extension to the official extension: "using fuzzy"
         if(opt.isSet(FZ)) throw error(FTDUP_X, FUZZY);
-        if(opt.is(WC)) throw error(BXFT_MATCH);
+        if(opt.is(WC)) throw error(FT_OPTIONS);
         opt.set(FZ, using);
       } else {
         throw error(FTMATCH_X, consume());

@@ -1,4 +1,4 @@
-package org.basex.query.func.stream;
+package org.basex.query.func.lazy;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -12,7 +12,7 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class StreamMaterialize extends StandardFunc {
+public final class LazyCache extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();

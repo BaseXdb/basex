@@ -97,7 +97,7 @@ public final class Scheduled extends Job implements Runnable {
       }
 
       if(cache) {
-        if(interval > 0) throw JOBS_CONFLICT.get(info);
+        if(interval > 0) throw JOBS_OPTIONS.get(info);
         pool.results.put(id, result);
       }
 
@@ -182,7 +182,7 @@ public final class Scheduled extends Job implements Runnable {
     } catch(final QueryException ex) {
       result.exception = ex;
     } catch(final Throwable ex) {
-      result.exception = BXXQ_UNEXPECTED_X.get(info, ex);
+      result.exception = XQUERY_UNEXPECTED_X.get(info, ex);
     } finally {
       // close and invalidate query after result has been assigned. order is important!
       if(cache) {

@@ -18,12 +18,12 @@ public final class ConvertBinaryToString extends ConvertFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Bin bin = toBin(exprs[0], qc);
-    final String enc = toEncoding(1, BXCO_ENCODING_X, qc);
+    final String enc = toEncoding(1, CONVERT_ENCODING_X, qc);
     final boolean val = exprs.length < 3 || !toBoolean(exprs[2], qc);
     try {
       return Str.get(toString(bin.input(info), enc, val));
     } catch(final IOException ex) {
-      throw BXCO_STRING_X.get(info, ex);
+      throw CONVERT_STRING_X.get(info, ex);
     }
   }
 }

@@ -83,23 +83,23 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // run function on non-existing database
     execute(new DropDB(NAME));
-    error(_DB_OPEN.args(NAME), BXDB_OPEN_X);
+    error(_DB_OPEN.args(NAME), DB_OPEN2_X);
   }
 
   /** Test method. */
   @Test
   public void openPre() {
     query(_DB_OPEN_PRE.args(NAME, 0) + "//title/text()", "XML");
-    error(_DB_OPEN_PRE.args(NAME, -1), BXDB_RANGE_X_X_X);
-    error(_DB_OPEN_PRE.args(NAME, Integer.MAX_VALUE), BXDB_RANGE_X_X_X);
+    error(_DB_OPEN_PRE.args(NAME, -1), DB_RANGE_X_X_X);
+    error(_DB_OPEN_PRE.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X_X);
   }
 
   /** Test method. */
   @Test
   public void openId() {
     query(_DB_OPEN_ID.args(NAME, 0) + "//title/text()", "XML");
-    error(_DB_OPEN_ID.args(NAME, -1), BXDB_RANGE_X_X_X);
-    error(_DB_OPEN_ID.args(NAME, Integer.MAX_VALUE), BXDB_RANGE_X_X_X);
+    error(_DB_OPEN_ID.args(NAME, -1), DB_RANGE_X_X_X);
+    error(_DB_OPEN_ID.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X_X);
   }
 
   /** Test method. */
@@ -107,7 +107,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void text() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.TEXT));
-    error(_DB_TEXT.args(NAME, "XML"), BXDB_INDEX_X);
+    error(_DB_TEXT.args(NAME, "XML"), DB_NOINDEX_X_X);
     execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT.args(NAME, "XML"), "XML");
     query(_DB_TEXT.args(NAME, "XXX"), "");
@@ -118,7 +118,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void textRange() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.TEXT));
-    error(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), BXDB_INDEX_X);
+    error(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), DB_NOINDEX_X_X);
     execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
     query(_DB_TEXT_RANGE.args(NAME, "XXX", "XXX"), "");
@@ -129,7 +129,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void attribute() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.ATTRIBUTE));
-    error(_DB_ATTRIBUTE.args(NAME, 0), BXDB_INDEX_X);
+    error(_DB_ATTRIBUTE.args(NAME, 0), DB_NOINDEX_X_X);
     execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(_DB_ATTRIBUTE.args(NAME, 0), "id=\"0\"");
     query(_DB_ATTRIBUTE.args(NAME, 0, "id"), "id=\"0\"");
@@ -142,7 +142,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void attributeRange() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.ATTRIBUTE));
-    error(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", BXDB_INDEX_X);
+    error(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", DB_NOINDEX_X_X);
     execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "XXX", "XXX"), "");
@@ -153,7 +153,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void token() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.TOKEN));
-    error("data(" + _DB_TOKEN.args(NAME, 0) + ")", BXDB_INDEX_X);
+    error("data(" + _DB_TOKEN.args(NAME, 0) + ")", DB_NOINDEX_X_X);
     execute(new CreateIndex(CmdIndex.TOKEN));
     query("data(" + _DB_TOKEN.args(NAME, 0) + ")", 0);
     query("data(" + _DB_TOKEN.args(NAME, 0, "id") + ")", 0);
@@ -204,7 +204,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(rawCall + "/text()", "raw");
 
     query(_DB_LIST_DETAILS.args(NAME, "test"), "");
-    error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), BXDB_OPEN_X);
+    error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), DB_OPEN2_X);
   }
 
   /** Test method. */
@@ -237,7 +237,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void property() {
     query(_DB_PROPERTY.args(NAME, "name"), NAME);
-    error(_DB_PROPERTY.args(NAME, "xyz"), BXDB_PROP_X);
+    error(_DB_PROPERTY.args(NAME, "xyz"), DB_PROPERTY_X);
   }
 
   /** Test method. */
@@ -383,7 +383,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_OPEN.args(NAME) + "/root()", "<dummy/>");
 
     // try to create DB twice during same query
-    error(_DB_CREATE.args(NAME) + ',' + _DB_CREATE.args(NAME), BXDB_ONCE_X_X);
+    error(_DB_CREATE.args(NAME) + ',' + _DB_CREATE.args(NAME), DB_CONFLICT1_X_X);
 
     // create DB from file
     query(_DB_CREATE.args(NAME, XML, "in/"));
@@ -397,19 +397,19 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_CREATE.args(NAME, " (<a/>,<b/>)", " ('1.xml','2.xml')"));
     query(_DB_CREATE.args(NAME, " (<a/>,'" + XML + "')", " ('1.xml','2.xml')"));
 
-    error(_DB_CREATE.args(NAME, " ()", "1.xml"), BXDB_CREATEARGS_X_X);
-    error(_DB_CREATE.args(NAME, " (<a/>,<b/>)", "1.xml"), BXDB_CREATEARGS_X_X);
+    error(_DB_CREATE.args(NAME, " ()", "1.xml"), DB_ARGS_X_X);
+    error(_DB_CREATE.args(NAME, " (<a/>,<b/>)", "1.xml"), DB_ARGS_X_X);
 
     // create and drop more than one database
     query("for $i in 1 to 5 return " + _DB_CREATE.args(" '" + NAME + "' || $i"));
     query("for $i in 1 to 5 return " + _DB_DROP.args(" '" + NAME + "' || $i"));
 
     // create DB with initial EMPTY content
-    error(_DB_CREATE.args(""), BXDB_NAME_X);
+    error(_DB_CREATE.args(""), DB_NAME_X);
 
     // try to access non-existing DB
     query(_DB_DROP.args(NAME));
-    error(_DB_CREATE.args(NAME) + ',' + _DB_DROP.args(NAME), BXDB_WHICH_X);
+    error(_DB_CREATE.args(NAME) + ',' + _DB_DROP.args(NAME), DB_OPEN1_X);
 
     // run update on existing DB then drop it and create a new one
     query(_DB_CREATE.args(NAME, " <a/>", "a.xml"));
@@ -479,9 +479,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_EXISTS.args(dbName), false);
 
     // invalid name
-    error(_DB_DROP.args(" ''"), BXDB_NAME_X);
+    error(_DB_DROP.args(" ''"), DB_NAME_X);
     // try to drop non-existing DB
-    error(_DB_DROP.args(dbName), BXDB_WHICH_X);
+    error(_DB_DROP.args(dbName), DB_OPEN1_X);
   }
 
   /** Test method. */
@@ -490,7 +490,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     final String dbName = NAME + "DBCreate";
     query(_DB_CREATE.args(dbName));
     execute(new Open(dbName));
-    error(_DB_CREATE.args(dbName), BXDB_OPENED_X);
+    error(_DB_CREATE.args(dbName), DB_LOCK1_X);
     // close and try again
     execute(new Close());
     query(_DB_CREATE.args(dbName));
@@ -510,9 +510,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query("count(" + COLLECTION.args(NAME + "/newtest") + ")", XMLFILES);
 
     // invalid target
-    error(_DB_RENAME.args(NAME, "input.xml", " ''"), BXDB_PATH_X);
-    error(_DB_RENAME.args(NAME, "input.xml", " '/'"), BXDB_PATH_X);
-    error(_DB_RENAME.args(NAME, "input.xml", " '.'"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "input.xml", " ''"), DB_PATH_X);
+    error(_DB_RENAME.args(NAME, "input.xml", " '/'"), DB_PATH_X);
+    error(_DB_RENAME.args(NAME, "input.xml", " '.'"), DB_PATH_X);
 
     // rename paths
     query(_DB_RENAME.args(NAME, "", "x"));
@@ -533,8 +533,8 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_STORE.args(NAME, "file4", ""));
     query(_DB_STORE.args(NAME, "dir3/file5", ""));
 
-    error(_DB_RENAME.args(NAME, "dir2", "file4"), BXDB_PATH_X);
-    error(_DB_RENAME.args(NAME, "file4", "dir2"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "dir2", "file4"), DB_PATH_X);
+    error(_DB_RENAME.args(NAME, "file4", "dir2"), DB_PATH_X);
 
     // move files in directories
     query(_DB_RENAME.args(NAME, "dir2", "dir3"));
@@ -695,7 +695,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void flush() {
     query(_DB_FLUSH.args(NAME));
-    error(_DB_FLUSH.args(NAME + "unknown"), BXDB_OPEN_X);
+    error(_DB_FLUSH.args(NAME + "unknown"), DB_OPEN2_X);
   }
 
   /** Test method. */
@@ -782,9 +782,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
 
     // invalid name
-    error(_DB_CREATE_BACKUP.args(""), BXDB_NAME_X);
+    error(_DB_CREATE_BACKUP.args(""), DB_NAME_X);
     // try to backup non-existing database
-    error(_DB_CREATE_BACKUP.args(NAME + "backup"), BXDB_WHICH_X);
+    error(_DB_CREATE_BACKUP.args(NAME + "backup"), DB_OPEN1_X);
   }
 
   /** Test method. */
@@ -800,11 +800,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_DROP_BACKUP.args(' ' + query(_DB_BACKUPS.args(NAME))));
 
     // invalid name
-    error(_DB_DROP_BACKUP.args(""), BXDB_NAME_X);
+    error(_DB_DROP_BACKUP.args(""), DB_NAME_X);
     // backup file does not exist
-    error(_DB_DROP_BACKUP.args(NAME), BXDB_WHICHBACK_X);
+    error(_DB_DROP_BACKUP.args(NAME), DB_NOBACKUP_X);
     // check if drop is called before create
-    error(_DB_CREATE_BACKUP.args(NAME) + ',' + _DB_DROP_BACKUP.args(NAME), BXDB_WHICHBACK_X);
+    error(_DB_CREATE_BACKUP.args(NAME) + ',' + _DB_DROP_BACKUP.args(NAME), DB_NOBACKUP_X);
   }
 
   /** Test method. */
@@ -822,13 +822,13 @@ public final class DbModuleTest extends AdvancedQueryTest {
     }
 
     // invalid names
-    error(_DB_COPY.args("x", " ''"), BXDB_NAME_X);
-    error(_DB_COPY.args(" ''", "x"), BXDB_NAME_X);
+    error(_DB_COPY.args("x", " ''"), DB_NAME_X);
+    error(_DB_COPY.args(" ''", "x"), DB_NAME_X);
 
     // same name is disallowed
-    error(_DB_COPY.args(NAME, NAME), BXDB_SAME_X);
+    error(_DB_COPY.args(NAME, NAME), DB_CONFLICT4_X);
     // source database does not exist
-    error(_DB_COPY.args(NAME + "copy", NAME), BXDB_WHICH_X);
+    error(_DB_COPY.args(NAME + "copy", NAME), DB_OPEN1_X);
   }
 
   /** Test method. */
@@ -842,13 +842,13 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_ALTER.args(NAME + 'a', NAME));
 
     // invalid names
-    error(_DB_ALTER.args("x", " ''"), BXDB_NAME_X);
-    error(_DB_ALTER.args(" ''", "x"), BXDB_NAME_X);
+    error(_DB_ALTER.args("x", " ''"), DB_NAME_X);
+    error(_DB_ALTER.args(" ''", "x"), DB_NAME_X);
 
     // same name is disallowed
-    error(_DB_ALTER.args(NAME, NAME), BXDB_SAME_X);
+    error(_DB_ALTER.args(NAME, NAME), DB_CONFLICT4_X);
     // source database does not exist
-    error(_DB_ALTER.args(NAME + "alter", NAME), BXDB_WHICH_X);
+    error(_DB_ALTER.args(NAME + "alter", NAME), DB_OPEN1_X);
   }
 
   /** Test method. */
@@ -863,10 +863,10 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // drop backups
     query(_DB_DROP_BACKUP.args(NAME));
-    error(_DB_RESTORE.args(NAME), BXDB_NOBACKUP_X);
+    error(_DB_RESTORE.args(NAME), DB_NOBACKUP_X);
 
     // invalid names
-    error(_DB_RESTORE.args(" ''"), BXDB_NAME_X);
+    error(_DB_RESTORE.args(" ''"), DB_NAME_X);
   }
 
   /**

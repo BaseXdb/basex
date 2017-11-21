@@ -45,14 +45,14 @@ public final class PkgParser {
       // checks root node
       node = childElements(new DBNode(new IOContent(io.read()))).next();
       if(!eqNS(E_PACKAGE, node.qname()))
-        throw BXRE_DESC_X.get(info, Util.info(WHICHELEM, node.qname()));
+        throw REPO_DESCRIPTOR_X.get(info, Util.info(WHICHELEM, node.qname()));
     } catch(final IOException ex) {
-      throw BXRE_PARSE_X_X.get(info, io.name(), ex);
+      throw REPO_PARSE_X_X.get(info, io.name(), ex);
     }
 
     final QueryFunction<byte[], String> attribute = name -> {
       final byte[] v = node.attribute(name);
-      if(v == null) throw BXRE_DESC_X.get(info, Util.info(MISSATTR, name, E_PACKAGE));
+      if(v == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSATTR, name, E_PACKAGE));
       return string(v);
     };
     final Pkg pkg = new Pkg(attribute.apply(A_NAME));
@@ -111,12 +111,12 @@ public final class PkgParser {
       final QNm name = next.qname();
       if(eqNS(A_NAMESPACE, name)) comp.uri = string(next.string());
       else if(eqNS(A_FILE, name)) comp.file = string(next.string());
-      else throw BXRE_DESC_X.get(info, Util.info(WHICHELEM, name));
+      else throw REPO_DESCRIPTOR_X.get(info, Util.info(WHICHELEM, name));
     }
 
     // check mandatory children
-    if(comp.uri == null) throw BXRE_DESC_X.get(info, Util.info(MISSCOMP, A_NAMESPACE));
-    if(comp.file == null) throw BXRE_DESC_X.get(info, Util.info(MISSCOMP, A_FILE));
+    if(comp.uri == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSCOMP, A_NAMESPACE));
+    if(comp.file == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSCOMP, A_FILE));
     return comp;
   }
 

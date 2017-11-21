@@ -20,7 +20,7 @@ abstract class UnitFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final QueryException error(final Item it) throws QueryException {
-    return (it == null ? UNIT_ASSERT.get(info) :
-      UNIT_MESSAGE_X.get(info, it.string(info))).value(it);
+    return (it == null ? UNIT_FAIL.get(info) :
+      UNIT_FAIL_X.get(info, it.string(info))).value(it);
   }
 }

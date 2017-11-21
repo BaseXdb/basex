@@ -1,6 +1,7 @@
-package org.basex.query.func.convert;
+package org.basex.query.func.lazy;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -10,9 +11,10 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class ConvertBytesToHex extends ConvertBytesToBase64 {
+public final class LazyIsCached extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new Hex(bytesToB64(qc).binary(ii));
+    final Item it = toAtomItem(exprs[0], qc);
+    return Bln.get(it instanceof Lazy && ((Lazy) it).isCached());
   }
 }

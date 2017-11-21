@@ -178,7 +178,7 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     Pkg pkg = context.repo.pkgDict().get(id);
-    if(pkg == null) throw BXRE_NOTINST_X.get(info, id);
+    if(pkg == null) throw REPO_NOTFOUND_X.get(info, id);
     final IOFile pkgPath = context.repo.path(pkg.path());
 
     // parse package descriptor
@@ -205,7 +205,7 @@ public final class ModuleLoader {
       if(dep.name != null) {
         // we consider only package dependencies here
         final String depId = new PkgValidator(context.repo, info).depPkg(dep);
-        if(depId == null) throw BXRE_NOTINST_X.get(info, dep.name);
+        if(depId == null) throw REPO_NOTFOUND_X.get(info, dep.name);
         if(toLoad.contains(depId)) throw CIRCMODULE.get(info);
         addRepo(depId, toLoad, loaded, info, qp);
       }

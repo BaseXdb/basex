@@ -14,15 +14,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ProcExecute extends ProcFn {
-  /** Name: result. */
-  private static final String RESULT = "result";
-  /** Name: standard output. */
-  private static final String OUTPUT = "output";
-  /** Name: standard error. */
-  private static final String ERROR = "error";
-  /** Name: code. */
-  private static final String CODE = "code";
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Result result = exec(qc, false);
