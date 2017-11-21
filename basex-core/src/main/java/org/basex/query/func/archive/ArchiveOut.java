@@ -35,7 +35,7 @@ abstract class ArchiveOut implements Closeable {
       if(format.equals(ZIP)) return new ZIPOut();
       if(format.equals(GZIP)) return new GZIPOut();
     } catch(final IOException ex) {
-      throw ARCHIVE_FAIL_X.get(info, ex);
+      throw ARCHIVE_ERROR_X.get(info, ex);
     }
     throw ARCHIVE_FORMAT.get(info);
   }

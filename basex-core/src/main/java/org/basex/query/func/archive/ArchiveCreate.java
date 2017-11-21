@@ -52,7 +52,7 @@ public class ArchiveCreate extends ArchiveFn {
           c++;
         }
       } catch(final IOException ex) {
-        throw ARCHIVE_FAIL_X.get(info, ex);
+        throw ARCHIVE_ERROR_X.get(info, ex);
       }
       return B64.get(out.finish());
     }
@@ -94,7 +94,7 @@ public class ArchiveCreate extends ArchiveFn {
 
     // create new zip entry
     String name = string(entry.string(info));
-    if(name.isEmpty()) throw ARCHIVE_DESC1.get(info);
+    if(name.isEmpty()) throw ARCHIVE_DESCRIPTOR1.get(info);
     if(Prop.WIN) name = name.replace('\\', '/');
 
     final ZipEntry ze = new ZipEntry(name);
@@ -113,7 +113,7 @@ public class ArchiveCreate extends ArchiveFn {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), qc));
         } catch(final QueryException qe) {
           Util.debug(qe);
-          throw ARCHIVE_DESC3_X.get(info, mod);
+          throw ARCHIVE_DESCRIPTOR3_X.get(info, mod);
         }
       }
 
@@ -133,7 +133,7 @@ public class ArchiveCreate extends ArchiveFn {
       out.level(lvl == null ? level : toInt(lvl));
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
-      throw ARCHIVE_DESC2_X.get(info, lvl);
+      throw ARCHIVE_DESCRIPTOR2_X.get(info, lvl);
     }
     out.write(ze, val);
   }

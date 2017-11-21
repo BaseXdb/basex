@@ -50,7 +50,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
           tl.add(in.read());
       }
     } catch(final IOException ex) {
-      throw ARCHIVE_FAIL_X.get(info, ex);
+      throw ARCHIVE_ERROR_X.get(info, ex);
     }
     return tl;
   }

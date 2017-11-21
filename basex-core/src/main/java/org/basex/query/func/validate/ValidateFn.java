@@ -62,7 +62,7 @@ abstract class ValidateFn extends StandardFunc {
   protected final Empty check(final QueryContext qc) throws QueryException {
     final ArrayList<ErrorInfo> errors = errors(qc);
     if(errors.isEmpty()) return Empty.SEQ;
-    throw BXVA_FAIL_X.get(info, errors.get(0).toString());
+    throw VALIDATE_ERROR_X.get(info, errors.get(0).toString());
   }
 
   /**
@@ -123,7 +123,7 @@ abstract class ValidateFn extends StandardFunc {
       Util.rootException(ex);
       handler.add(ex, ValidationHandler.FATAL);
     } catch(final IOException | ParserConfigurationException | Error ex) {
-      throw BXVA_START_X.get(info, ex);
+      throw VALIDATE_START_X.get(info, ex);
     } finally {
       v.finish();
     }

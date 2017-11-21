@@ -21,7 +21,7 @@ public final class DbStore extends DbAccess {
     final Data data = checkData(qc);
     final String path = path(1, qc);
     final Item it = toNodeOrAtomItem(2, qc);
-    if(data.inMemory()) throw BXDB_MEM_X.get(info, data.meta.name);
+    if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 
     final IOFile file = data.meta.binary(path);
     if(file == null || path.isEmpty()) throw RESINV_X.get(info, path);

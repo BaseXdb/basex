@@ -29,7 +29,7 @@ public final class DbExists extends DbAccess {
       }
       return Bln.get(raw || data.resources.doc(path) != -1);
     } catch(final QueryException ex) {
-      if(ex.error() == BXDB_OPEN_X) return Bln.FALSE;
+      if(ex.error() == DB_OPEN2_X) return Bln.FALSE;
       throw ex;
     }
   }

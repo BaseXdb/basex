@@ -30,7 +30,7 @@ public final class FtSearch extends FtAccess {
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
-    if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
+    if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);
 
     final FTWords ftw = new FTWords(info, db, terms, mode).init(qc, opt);
     return new FTIndexAccess(info, options(ftw, opts), db).iter(qc);

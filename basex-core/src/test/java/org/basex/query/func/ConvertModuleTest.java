@@ -25,9 +25,9 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_TO_BASE.args(4, 10), 4);
     query(_CONVERT_INTEGER_TO_BASE.args(65535, 10), 65535);
     query(_CONVERT_INTEGER_TO_BASE.args(65536, 10), 65536);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), BXCO_INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), BXCO_INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), CONVERT_BASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), CONVERT_BASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), CONVERT_BASE_X);
   }
 
   /** Test method. */
@@ -43,10 +43,10 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_FROM_BASE.args("4", 10), 4);
     query(_CONVERT_INTEGER_FROM_BASE.args("65535", 10), 65535);
     query(_CONVERT_INTEGER_FROM_BASE.args("65536", 10), 65536);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), BXCO_INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), BXCO_INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), BXCO_INVBASEDIG_X_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), BXCO_INVBASEDIG_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), CONVERT_BASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), CONVERT_BASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), CONVERT_INTEGER_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), CONVERT_INTEGER_X_X);
   }
 
   /** Test method. */
@@ -66,9 +66,9 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void binaryToInteger() {
-    query(_CONVERT_BINARY_TO_INTEGER.args(" xs:hexBinary('ff')"), 255);
-    query(_CONVERT_BINARY_TO_INTEGER.args(" xs:hexBinary('007f8081ff')"), "0\n127\n128\n129\n255");
+  public void binaryToIntegers() {
+    query(_CONVERT_BINARY_TO_INTEGERS.args(" xs:hexBinary('ff')"), 255);
+    query(_CONVERT_BINARY_TO_INTEGERS.args(" xs:hexBinary('007f8081ff')"), "0\n127\n128\n129\n255");
   }
 
   /** Test method. */
@@ -78,26 +78,26 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_BINARY_TO_STRING.args(" xs:hexBinary('41')"), "A");
     query(_CONVERT_BINARY_TO_STRING.args(" xs:hexBinary('41')", "CP1252"), "A");
     query(_CONVERT_BINARY_TO_STRING.args(" xs:hexBinary('12')", "CP1252", true), "\uFFFD");
-    error(_CONVERT_BINARY_TO_STRING.args(" xs:hexBinary('41')", "X"), BXCO_ENCODING_X);
+    error(_CONVERT_BINARY_TO_STRING.args(" xs:hexBinary('41')", "X"), CONVERT_ENCODING_X);
     error(_CONVERT_BINARY_TO_STRING.args(" xs:hexBinary('12')", "CP1252", false),
-        BXCO_STRING_X);
+        CONVERT_STRING_X);
   }
 
   /** Test method. */
   @Test
-  public void bytesToHex() {
-    query(_CONVERT_BYTES_TO_HEX.args(" xs:byte(65)"), "A");
-    query(_CONVERT_BYTES_TO_HEX.args(" 65"), "A");
-    query("xs:hexBinary('ff') = " + _CONVERT_BYTES_TO_HEX.args(" 255"), true);
-    query(_CONVERT_BYTES_TO_HEX.args(" for $i in 48 to 50 return xs:byte($i)"), "012");
+  public void integersToHex() {
+    query(_CONVERT_INTEGERS_TO_HEX.args(" xs:byte(65)"), "A");
+    query(_CONVERT_INTEGERS_TO_HEX.args(" 65"), "A");
+    query("xs:hexBinary('ff') = " + _CONVERT_INTEGERS_TO_HEX.args(" 255"), true);
+    query(_CONVERT_INTEGERS_TO_HEX.args(" for $i in 48 to 50 return xs:byte($i)"), "012");
   }
 
   /** Test method. */
   @Test
-  public void bytesToBase64() {
-    query(_CONVERT_BYTES_TO_BASE64.args(" xs:byte(97)"), "a");
-    query(_CONVERT_BYTES_TO_BASE64.args(" 97"), "a");
-    query(_CONVERT_BYTES_TO_BASE64.args(" ()"), "");
+  public void integersToBase64() {
+    query(_CONVERT_INTEGERS_TO_BASE64.args(" xs:byte(97)"), "a");
+    query(_CONVERT_INTEGERS_TO_BASE64.args(" 97"), "a");
+    query(_CONVERT_INTEGERS_TO_BASE64.args(" ()"), "");
   }
 
   /** Test method. */
@@ -106,8 +106,8 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query("string( " + _CONVERT_STRING_TO_BASE64.args("a") + ')', "YQ==");
     query("string( " + _CONVERT_STRING_TO_BASE64.args("a", "UTF-8") + ')', "YQ==");
     query("string( " + _CONVERT_STRING_TO_BASE64.args("a", "US-ASCII") + ')', "YQ==");
-    error(_CONVERT_STRING_TO_BASE64.args("\u00fc", "US-ASCII"), BXCO_BASE64_X_X);
-    error(_CONVERT_STRING_TO_BASE64.args("a", "X"), BXCO_ENCODING_X);
+    error(_CONVERT_STRING_TO_BASE64.args("\u00fc", "US-ASCII"), CONVERT_BINARY_X_X);
+    error(_CONVERT_STRING_TO_BASE64.args("a", "X"), CONVERT_ENCODING_X);
   }
 
   /** Test method. */
@@ -116,8 +116,8 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query("string( " + _CONVERT_STRING_TO_HEX.args("a") + ')', 61);
     query("string( " + _CONVERT_STRING_TO_HEX.args("a", "UTF-8") + ')', 61);
     query("string( " + _CONVERT_STRING_TO_HEX.args("a", "US-ASCII") + ')', 61);
-    error(_CONVERT_STRING_TO_HEX.args("\u00fc", "US-ASCII"), BXCO_BASE64_X_X);
-    error(_CONVERT_STRING_TO_HEX.args("a", "X"), BXCO_ENCODING_X);
+    error(_CONVERT_STRING_TO_HEX.args("\u00fc", "US-ASCII"), CONVERT_BINARY_X_X);
+    error(_CONVERT_STRING_TO_HEX.args("a", "X"), CONVERT_ENCODING_X);
   }
 
   /** Test method. */

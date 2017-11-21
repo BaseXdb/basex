@@ -16,13 +16,13 @@ import org.basex.util.*;
  */
 public final class DbRetrieve extends DbAccess {
   @Override
-  public B64Stream item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public B64Lazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
     final String path = path(1, qc);
-    if(data.inMemory()) throw BXDB_MEM_X.get(info, data.meta.name);
+    if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 
     final IOFile file = data.meta.binary(path);
     if(file == null || !file.exists() || file.isDir()) throw WHICHRES_X.get(info, path);
-    return new B64Stream(file, IOERR_X);
+    return new B64Lazy(file, IOERR_X);
   }
 }

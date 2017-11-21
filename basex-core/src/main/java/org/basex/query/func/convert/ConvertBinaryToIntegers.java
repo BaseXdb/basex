@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class ConvertBinaryToInteger extends StandardFunc {
+public final class ConvertBinaryToIntegers extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final byte[] bytes = toBin(exprs[0], qc).binary(info);

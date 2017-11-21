@@ -79,14 +79,14 @@ public class XQueryEval extends StandardFunc {
     // allow limited number of nested calls
     QueryContext qcAnc = qc;
     for(int c = 5; qcAnc != null && c > 0; c--) qcAnc = qcAnc.parent;
-    if(qcAnc != null) throw BXXQ_NESTED.get(info);
+    if(qcAnc != null) throw XQUERY_NESTED.get(info);
 
     final User user = qc.context.user();
     final Perm tmp = user.perm("");
     Timer to = null;
 
     final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
-    if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
+    if(!user.has(perm)) throw XQUERY_PERMISSION2_X.get(info, perm);
     user.perm(perm);
 
     try(QueryContext qctx = new QueryContext(qc)) {
@@ -131,9 +131,9 @@ public class XQueryEval extends StandardFunc {
 
         if(updating) {
           if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())
-            throw BXXQ_NOUPDATE.get(info);
+            throw XQUERY_UPDATE2.get(info);
         } else {
-          if(qctx.updating) throw BXXQ_UPDATING.get(info);
+          if(qctx.updating) throw XQUERY_UPDATE1.get(info);
         }
 
         final ItemList cache = new ItemList();
@@ -145,11 +145,14 @@ public class XQueryEval extends StandardFunc {
         }
         return cache;
       } catch(final JobException ex) {
-        if(qctx.state == JobState.TIMEOUT) throw BXXQ_TIMEOUT.get(info);
-        if(qctx.state == JobState.MEMORY)  throw BXXQ_MEMORY.get(info);
+        if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
+        if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);
         throw ex;
       } catch(final QueryException ex) {
-        if(ex.error() == BASX_PERM_X) throw BXXQ_PERM_X.get(info, ex.getLocalizedMessage());
+        if(ex.error() == BASX_PERM_X) {
+          Util.debug(ex);
+          throw XQUERY_PERMISSION1_X.get(info, ex.getLocalizedMessage());
+        }
         if(!opts.get(XQueryOptions.PASS)) ex.info(info);
         throw ex;
       }

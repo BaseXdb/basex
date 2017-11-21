@@ -149,7 +149,7 @@ public final class QueryResources {
     try {
       return addData(Open.open(name, ctx, ctx.options));
     } catch(final IOException ex) {
-      throw BXDB_OPEN_X.get(info, ex);
+      throw DB_OPEN2_X.get(info, ex);
     }
   }
 
@@ -174,7 +174,7 @@ public final class QueryResources {
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
-    throw (docs.isEmpty() ? BXDB_NODOC_X : BXDB_SINGLE_X).get(info, qi.original);
+    throw (docs.isEmpty() ? BASX_NODOC_X : BASX_SINGLE_X).get(info, qi.original);
   }
 
   /**
@@ -398,7 +398,7 @@ public final class QueryResources {
 
     // do not check for existence of input if user has no read permissions
     if(!context.user().has(Perm.READ))
-      throw BXXQ_PERM_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
+      throw XQUERY_PERMISSION1_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input points to a single file
     final IO io = input.io;

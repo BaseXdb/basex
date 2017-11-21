@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public class ConvertBytesToBase64 extends ConvertFn {
+public class ConvertIntegersToBase64 extends ConvertFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return bytesToB64(qc);

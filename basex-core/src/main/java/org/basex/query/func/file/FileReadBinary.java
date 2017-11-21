@@ -27,7 +27,7 @@ public final class FileReadBinary extends FileFn {
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
     // read full file
-    if(exprs.length == 1) return new B64Stream(new IOFile(path.toFile()), FILE_IO_ERROR_X);
+    if(exprs.length == 1) return new B64Lazy(new IOFile(path.toFile()), FILE_IO_ERROR_X);
 
     // read file chunk
     try(DataAccess da = new DataAccess(new IOFile(path.toFile()))) {

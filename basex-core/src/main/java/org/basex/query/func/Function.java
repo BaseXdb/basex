@@ -29,6 +29,7 @@ import org.basex.query.func.index.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.func.jobs.*;
 import org.basex.query.func.json.*;
+import org.basex.query.func.lazy.*;
 import org.basex.query.func.map.*;
 import org.basex.query.func.math.*;
 import org.basex.query.func.out.*;
@@ -37,7 +38,6 @@ import org.basex.query.func.prof.*;
 import org.basex.query.func.random.*;
 import org.basex.query.func.repo.*;
 import org.basex.query.func.sql.*;
-import org.basex.query.func.stream.*;
 import org.basex.query.func.strings.*;
 import org.basex.query.func.unit.*;
 import org.basex.query.func.user.*;
@@ -684,17 +684,17 @@ public enum Function {
   _CONVERT_BINARY_TO_BYTES(ConvertBinaryToBytes.class, "binary-to-bytes(binary)",
       arg(AAT), BYT_ZM, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BINARY_TO_INTEGER(ConvertBinaryToInteger.class, "binary-to-integer(binary)",
+  _CONVERT_BINARY_TO_INTEGERS(ConvertBinaryToIntegers.class, "binary-to-integers(binary)",
       arg(AAT), ITR_ZM, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_BINARY_TO_STRING(ConvertBinaryToString.class,
       "binary-to-string(binary[,encoding[,fallback]])", arg(ITEM, STR, BLN), STR, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BYTES_TO_HEX(ConvertBytesToHex.class, "bytes-to-hex(bytes)", arg(ITR_ZM), HEX,
-      CONVERT_URI),
+  _CONVERT_INTEGERS_TO_HEX(ConvertIntegersToHex.class, "integers-to-hex(numbers)",
+      arg(ITR_ZM), HEX, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BYTES_TO_BASE64(ConvertBytesToBase64.class, "bytes-to-base64(bytes)", arg(ITR_ZM), B64,
-      CONVERT_URI),
+  _CONVERT_INTEGERS_TO_BASE64(ConvertIntegersToBase64.class, "integers-to-base64(numbers)",
+      arg(ITR_ZM), B64, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_STRING_TO_BASE64(ConvertStringToBase64.class, "string-to-base64(string[,encoding])",
       arg(STR, STR), B64, CONVERT_URI),
@@ -702,19 +702,19 @@ public enum Function {
   _CONVERT_STRING_TO_HEX(ConvertStringToHex.class, "string-to-hex(string[,encoding])",
       arg(STR, STR), HEX, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_INTEGER_TO_DATETIME(ConvertIntegerToDateTime.class, "integer-to-dateTime(ms)", arg(ITR),
-      DTM, CONVERT_URI),
+  _CONVERT_INTEGER_TO_DATETIME(ConvertIntegerToDateTime.class, "integer-to-dateTime(ms)",
+      arg(ITR), DTM, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_DATETIME_TO_INTEGER(ConvertDateTimeToInteger.class, "dateTime-to-integer(date)",
       arg(DTM), ITR, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime.class, "integer-to-dayTime(ms)", arg(ITR),
-      DTD, CONVERT_URI),
+  _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime.class, "integer-to-dayTime(ms)",
+      arg(ITR), DTD, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_DAYTIME_TO_INTEGER(ConvertDayTimeToInteger.class, "dayTime-to-integer(duration)",
       arg(DTD), ITR, CONVERT_URI),
 
-  // FNCrypto functions (EXPath Cryptographic module)
+  // Cryptographic Module
 
   /** XQuery function. */
   _CRYPTO_HMAC(CryptoHmac.class, "hmac(message,key,algorithm[,encoding])",
@@ -1100,6 +1100,15 @@ public enum Function {
   _JSON_SERIALIZE(JsonSerialize.class, "serialize(items[,params])", arg(ITEM_ZO, ITEM_ZO), STR,
       JSON_URI),
 
+  // Lazy Module
+
+  /** XQuery function. */
+  _LAZY_CACHE(LazyCache.class, "cache(value)", arg(ITEM_ZM), ITEM_ZM, LAZY_URI),
+  /** XQuery function. */
+  _LAZY_IS_LAZY(LazyIsLazy.class, "is-lazy(item)", arg(ITEM), BLN, LAZY_URI),
+  /** XQuery function. */
+  _LAZY_IS_CACHED(LazyIsCached.class, "is-cached(item)", arg(ITEM), BLN, LAZY_URI),
+
   // Output Module
 
   /** XQuery function. */
@@ -1200,15 +1209,6 @@ public enum Function {
   _SQL_COMMIT(SqlCommit.class, "commit(id)", arg(ITR), EMP, flag(NDT), SQL_URI),
   /** XQuery function. */
   _SQL_ROLLBACK(SqlRollback.class, "rollback(id)", arg(ITR), EMP, flag(NDT), SQL_URI),
-
-  // Streaming Module
-
-  /** XQuery function. */
-  _STREAM_MATERIALIZE(StreamMaterialize.class, "materialize(value)", arg(ITEM_ZM), ITEM_ZM,
-      STREAM_URI),
-  /** XQuery function. */
-  _STREAM_IS_STREAMABLE(StreamIsStreamable.class, "is-streamable(item)", arg(ITEM), BLN,
-      STREAM_URI),
 
   // Strings Module
 
@@ -1332,11 +1332,14 @@ public enum Function {
   _XQUERY_EVAL(XQueryEval.class, "eval(string[,bindings[,options]])",
       arg(STR, MAP_ZO, MAP_O), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
-  _XQUERY_UPDATE(XQueryUpdate.class, "update(string[,bindings[,options]])",
-      arg(STR, MAP_ZO, MAP_O), ITEM_ZM, flag(UPD), XQUERY_URI),
+  _XQUERY_EVAL_UPDATE(XQueryEvalUpdate.class, "eval-update(string[,bindings[,options]])",
+      arg(STR, MAP_ZO, MAP_O), EMP, flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_INVOKE(XQueryInvoke.class, "invoke(uri[,bindings[,options]])",
       arg(STR, MAP_ZO, MAP_O), ITEM_ZM, flag(NDT), XQUERY_URI),
+  /** XQuery function. */
+  _XQUERY_INVOKE_UPDATE(XQueryInvokeUpdate.class, "invoke-update(uri[,bindings[,options]])",
+      arg(STR, MAP_ZO, MAP_O), EMP, flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse.class, "parse(string[,options])",
       arg(STR, MAP_O), NOD, flag(NDT), XQUERY_URI),

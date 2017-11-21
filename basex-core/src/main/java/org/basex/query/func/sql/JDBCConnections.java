@@ -1,6 +1,11 @@
 package org.basex.query.func.sql;
 
+import static org.basex.util.Token.*;
+
+import java.sql.*;
+
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -14,33 +19,59 @@ public final class JDBCConnections implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique ids. */
-  private final IntObjMap<AutoCloseable> conns = new IntObjMap<>();
+  private final TokenObjMap<AutoCloseable> conns = new TokenObjMap<>();
 
   /**
    * Adds a connection or prepared statement.
-   * @param ac connection or prepared statement
-   * @return connection/prepared statement id
+   * @param conn connection or prepared statement
+   * @param url url
+   * @return generated id
    */
-  synchronized int add(final AutoCloseable ac) {
-    conns.put(++lastId, ac);
-    return lastId;
+  synchronized Uri add(final Connection conn, final String url) {
+    final byte[] uri = token(url + "/connection-" + ++lastId);
+    conns.put(uri, conn);
+    return Uri.uri(uri);
+  }
+
+  /**
+   * Adds a connection or prepared statement.
+   * @param stmt connection or prepared statement
+   * @return generated id
+   */
+  synchronized Uri add(final PreparedStatement stmt) {
+    final String url = string(get(stmt)).replaceAll("^(.+)/.+$", "$1");
+    final byte[] uri = token(url + "/statement-" + ++lastId);
+    conns.put(uri, stmt);
+    return Uri.uri(uri);
   }
 
   /**
    * Returns connection or prepared statement with the given id.
    * @param id id
-   * @return connection or prepared statement
+   * @return connection, prepared statement, or {@code null}
    */
-  synchronized AutoCloseable get(final int id) {
-    return conns.get(id);
+  synchronized AutoCloseable get(final Uri id) {
+    return conns.get(id.string());
   }
 
   /**
    * Removes either a connection or a prepared statement.
    * @param id connection/prepared statement id
    */
-  synchronized void remove(final int id) {
-    conns.delete(id);
+  synchronized void remove(final Uri id) {
+    conns.delete(id.string());
+  }
+
+  /**
+   * Returns the key for the specified connection or prepared statement.
+   * @param ac connection or prepared statement
+   * @return id or {@code null}
+   */
+  synchronized byte[] get(final AutoCloseable ac) {
+    for(final byte[] id : conns) {
+      if(conns.get(id) == ac) return id;
+    }
+    return null;
   }
 
   @Override

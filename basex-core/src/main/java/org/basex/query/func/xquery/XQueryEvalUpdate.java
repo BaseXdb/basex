@@ -11,7 +11,7 @@ import org.basex.query.util.list.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class XQueryUpdate extends XQueryEval {
+public final class XQueryEvalUpdate extends XQueryEval {
   @Override
   protected ItemList eval(final QueryContext qc) throws QueryException {
     return eval(qc, string(toToken(exprs[0], qc)), null, true);

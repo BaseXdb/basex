@@ -36,7 +36,7 @@ public final class CsvXQuerySerializer extends CsvSerializer {
     if(sep && level == 0) out.print(' ');
 
     if(!(item instanceof Map))
-      throw BXCS_SERIAL_X.getIO("Top level must be a map; " + item.type + " found");
+      throw CSV_SERIALIZE_X.getIO("Top level must be a map; " + item.type + " found");
 
     final Map m = (Map) item;
     final TokenList tl = new TokenList();
@@ -44,12 +44,12 @@ public final class CsvXQuerySerializer extends CsvSerializer {
       // print header
       if(header) {
         if(!m.contains(CsvXQueryConverter.NAMES, null))
-          throw BXCS_SERIAL_X.getIO("Map has no 'names' key");
+          throw CSV_SERIALIZE_X.getIO("Map has no 'names' key");
         record(m.get(CsvXQueryConverter.NAMES, null), tl);
       }
       // print records
       if(!m.contains(CsvXQueryConverter.RECORDS, null))
-        throw BXCS_SERIAL_X.getIO("Map has no 'records' key");
+        throw CSV_SERIALIZE_X.getIO("Map has no 'records' key");
       for(final Item record : m.get(CsvXQueryConverter.RECORDS, null)) {
         record(record, tl);
       }
@@ -68,10 +68,10 @@ public final class CsvXQuerySerializer extends CsvSerializer {
    */
   private void record(final Value line, final TokenList tl) throws QueryException, IOException {
     if(!(line instanceof Array))
-      throw BXCS_SERIAL_X.getIO("Array expected; " + line.type + "found");
+      throw CSV_SERIALIZE_X.getIO("Array expected; " + line.type + "found");
     for(final Value entry : ((Array) line).members()) {
       if(!(entry instanceof AStr))
-        throw BXCS_SERIAL_X.getIO("Single item expected; " + entry.type + "found");
+        throw CSV_SERIALIZE_X.getIO("Single item expected; " + entry.type + "found");
       tl.add(((Item) entry).string(null));
     }
     record(tl);

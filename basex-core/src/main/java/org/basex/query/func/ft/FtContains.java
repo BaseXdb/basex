@@ -27,7 +27,7 @@ public final class FtContains extends FtAccess {
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
-    if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
+    if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);
 
     final FTDiacritics dc = opts.get(FtContainsOptions.DIACRITICS);
     if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);

@@ -48,7 +48,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void eval2() {
     // database creation
-    error(_DB_OPEN.args("db"), BXDB_OPEN_X);
+    error(_DB_OPEN.args("db"), DB_OPEN2_X);
     query(_PROF_VOID.args(_JOBS_EVAL.args("db:open('db')")) + ',' + _DB_CREATE.args("db"));
     query(_JOBS_EVAL.args("db:drop('db')") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
     query(_JOBS_EVAL.args("delete node <a/>"));
@@ -242,7 +242,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     // receive cached error
     id = query(_JOBS_EVAL.args("db:open('db')", " ()", " map{'cache':true()}"));
     query(_JOBS_WAIT.args(id));
-    error(_JOBS_RESULT.args(id), BXDB_OPEN_X);
+    error(_JOBS_RESULT.args(id), DB_OPEN2_X);
   }
 
   /** Test method. */

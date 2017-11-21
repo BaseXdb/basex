@@ -54,19 +54,17 @@ public final class SqlExecutePrepared extends SqlExecute {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    final int id = (int) toLong(exprs[0], qc);
-    long c = 0;
+
+    final PreparedStatement stmt = prepared(qc);
+    long n = 0;
     ANode params = null;
     if(exprs.length > 1) {
       params = toElem(exprs[1], qc);
       if(!params.qname().eq(Q_PARAMETERS)) throw INVALIDOPTION_X.get(info, params.qname().local());
-      c = countParams(params);
+      n = countParams(params);
     }
 
-    final Object obj = jdbc(qc).get(id);
-    if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE_X.get(info, id);
     try {
-      final PreparedStatement stmt = (PreparedStatement) obj;
       try {
         // set additition statement options
         if(exprs.length > 2) {
@@ -74,7 +72,8 @@ public final class SqlExecutePrepared extends SqlExecute {
           setStatementOptions(stmt, options);
         }
         // Check if number of parameters equals number of place holders
-        if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
+        final int ph = stmt.getParameterMetaData().getParameterCount();
+        if(n != ph) throw SQL_PARAMETERS_X_X.get(info, n, ph);
       } catch(final SQLSyntaxErrorException ex) {
         // Oracle will fail receiving ParameterMetaData on update statement ()
         // stackoverflow.com/questions/30666622/apache-dbutils-changing-column-name-in-update-sql
@@ -85,7 +84,7 @@ public final class SqlExecutePrepared extends SqlExecute {
       // If execute returns false, statement was updating: return number of updated rows
       return iter(stmt, false, stmt.execute());
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR_X.get(info, ex);
+      throw SQL_ERROR_X.get(info, ex);
     }
   }
 
@@ -119,15 +118,15 @@ public final class SqlExecutePrepared extends SqlExecute {
       byte[] paramType = null;
       boolean isNull = false;
       for(ANode attr; (attr = attrs.next()) != null;) {
-        // Attribute "type"
+        // attribute "type"
         if(eq(attr.name(), TYPE)) paramType = attr.string();
-        // Attribute "null"
+        // attribute "null"
         else if(eq(attr.name(), NULL))
           isNull = attr.string() != null && Bln.parse(attr.string(), info);
-        // Not expected attribute
-        else throw BXSQ_ATTR_X.get(info, string(attr.name()));
+        // attribute not expected
+        else throw SQL_ATTRIBUTE_X.get(info, attr.name());
       }
-      if(paramType == null) throw BXSQ_TYPE.get(info);
+      if(paramType == null) throw SQL_PARAMETERS.get(info);
       final byte[] v = next.string();
       setParam(++i, stmt, paramType, isNull ? null : string(v), isNull);
     }
@@ -137,42 +136,42 @@ public final class SqlExecutePrepared extends SqlExecute {
    * Sets the parameter with the given index in a prepared statement.
    * @param index parameter index
    * @param stmt prepared statement
-   * @param paramType parameter type
+   * @param type parameter type
    * @param value parameter value
    * @param isNull indicator if the parameter is null or not
    * @throws QueryException query exception
    */
-  private void setParam(final int index, final PreparedStatement stmt, final byte[] paramType,
+  private void setParam(final int index, final PreparedStatement stmt, final byte[] type,
       final String value, final boolean isNull) throws QueryException {
     try {
-      if(eq(BOOL, paramType)) {
+      if(eq(BOOL, type)) {
         if(isNull) stmt.setNull(index, Types.BOOLEAN);
         else stmt.setBoolean(index, Boolean.parseBoolean(value));
-      } else if(eq(DATE, paramType)) {
+      } else if(eq(DATE, type)) {
         if(isNull) stmt.setNull(index, Types.DATE);
         else stmt.setDate(index, Date.valueOf(value));
-      } else if(eq(DOUBLE, paramType)) {
+      } else if(eq(DOUBLE, type)) {
         if(isNull) stmt.setNull(index, Types.DOUBLE);
         else stmt.setDouble(index, Double.parseDouble(value));
-      } else if(eq(FLOAT, paramType)) {
+      } else if(eq(FLOAT, type)) {
         if(isNull) stmt.setNull(index, Types.FLOAT);
         else stmt.setFloat(index, Float.parseFloat(value));
-      } else if(eq(INT, paramType)) {
+      } else if(eq(INT, type)) {
         if(isNull) stmt.setNull(index, Types.INTEGER);
         else stmt.setInt(index, Integer.parseInt(value));
-      } else if(eq(SHORT, paramType)) {
+      } else if(eq(SHORT, type)) {
         if(isNull) stmt.setNull(index, Types.SMALLINT);
         else stmt.setShort(index, Short.parseShort(value));
-      } else if(eq(STRING, paramType)) {
+      } else if(eq(STRING, type)) {
         if(isNull) stmt.setNull(index, Types.VARCHAR);
         else stmt.setString(index, value);
-      } else if(eq(TIME, paramType)) {
+      } else if(eq(TIME, type)) {
         if(isNull) stmt.setNull(index, Types.TIME);
         else stmt.setTime(index, Time.valueOf(value));
-      } else if(eq(TIMESTAMP, paramType)) {
+      } else if(eq(TIMESTAMP, type)) {
         if(isNull) stmt.setNull(index, Types.TIMESTAMP);
         else stmt.setTimestamp(index, Timestamp.valueOf(value));
-      } else if(eq(SQLXML, paramType)) {
+      } else if(eq(SQLXML, type)) {
         if(isNull) stmt.setNull(index, Types.SQLXML);
         else {
           final SQLXML xml = stmt.getConnection().createSQLXML();
@@ -180,13 +179,13 @@ public final class SqlExecutePrepared extends SqlExecute {
           stmt.setSQLXML(index, xml);
         }
       } else {
-        throw BXSQ_ERROR_X.get(info, "unsupported type: " + string(paramType));
+        throw SQL_ERROR_X.get(info, "unsupported type: " + string(type));
       }
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR_X.get(info, ex);
+      throw SQL_ERROR_X.get(info, ex);
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
-      throw BXSQ_FORMAT_X.get(info, string(paramType));
+      throw SQL_TYPE_X_X.get(info, type, value);
     }
   }
 }

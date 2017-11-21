@@ -72,9 +72,9 @@ public class ValidateRng extends ValidateFn {
           }
         } catch(final ClassNotFoundException ex) {
           Util.debug(ex);
-          throw BXVA_RELAXNG_X.get(info);
+          throw VALIDATE_NOTFOUND_X.get(info);
         } catch(final Exception ex) {
-          throw BXVA_FAIL_X.get(info, Util.rootException(ex));
+          throw VALIDATE_ERROR_X.get(info, Util.rootException(ex));
         }
       }
     });

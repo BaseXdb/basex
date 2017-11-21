@@ -21,6 +21,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class ProcFn extends StandardFunc {
+  /** Name: result. */
+  static final String RESULT = "result";
+  /** Name: standard output. */
+  static final String OUTPUT = "output";
+  /** Name: standard error. */
+  static final String ERROR = "error";
+  /** Name: code. */
+  static final String CODE = "code";
+
   /**
    * Returns the result of a command.
    * @param qc query context
@@ -51,16 +60,16 @@ abstract class ProcFn extends StandardFunc {
       cs = Charset.forName(enc);
     } catch(final Exception ex) {
       Util.debug(ex);
-      throw BXPR_ENC_X.get(info, enc);
+      throw PROC_ENCODING_X.get(info, enc);
     }
     final long sec = opts.get(ProcOptions.TIMEOUT);
     final String dir = opts.get(ProcOptions.DIR);
 
     final Result result = new Result();
     final Process proc;
+    final ProcessBuilder pb = new ProcessBuilder(args);
+    if(dir != null) pb.directory(toPath(token(dir)).toFile());
     try {
-      final ProcessBuilder pb = new ProcessBuilder(args);
-      if(dir != null) pb.directory(toPath(token(dir)).toFile());
       proc = pb.start();
     } catch(final IOException ex) {
       result.error.add(token(Util.message(ex)));
@@ -91,7 +100,7 @@ abstract class ProcFn extends StandardFunc {
         qc.checkStop();
         if(sec > 0 && (System.nanoTime() - perf.start()) / 1000000000 >= sec) {
           thread.interrupt();
-          throw BXPR_TIMEOUT.get(info);
+          throw PROC_TIMEOUT.get(info);
         }
         Performance.sleep(10);
       }

@@ -84,8 +84,8 @@ public final class WebModuleTest extends AdvancedQueryTest {
     query("let $s := codepoints-to-string((9, 10, 13, 32 to 55295, 57344 to 65533, 65536)) " +
         "return $s = web:decode-url(web:encode-url($s))", true);
 
-    error(_WEB_DECODE_URL.args("%1"), BXWE_INVALID_X);
-    error(_WEB_DECODE_URL.args("%1F"), BXWE_CODES_X);
-    error(_WEB_DECODE_URL.args("%D8%00"), BXWE_CODES_X);
+    error(_WEB_DECODE_URL.args("%1"), WEB_INVALID2_X);
+    error(_WEB_DECODE_URL.args("%1F"), WEB_INVALID1_X);
+    error(_WEB_DECODE_URL.args("%D8%00"), WEB_INVALID1_X);
   }
 }

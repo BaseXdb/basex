@@ -638,7 +638,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected Item checkAtomic(final Expr ex, final QueryContext qc, final Type type)
+  protected Item checkType(final Expr ex, final QueryContext qc, final AtomType type)
       throws QueryException {
     return checkType(ex.atomItem(qc, info), type);
   }

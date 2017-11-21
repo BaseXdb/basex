@@ -39,14 +39,14 @@ public final class NSGlobal {
     NS.add(BIN_PREFIX, BIN_URI);
     NS.add(CRYPTO_PREFIX, CRYPTO_URI);
     NS.add(FILE_PREFIX, FILE_URI);
+    NS.add(GEO_PREFIX, GEO_URI);
     NS.add(HTTP_PREFIX, HTTP_URI);
     NS.add(PKG_PREFIX, PKG_URI);
     NS.add(ZIP_PREFIX, ZIP_URI);
     // EXQuery namespaces
+    NS.add(REQUEST_PREFIX, REQUEST_URI);
     NS.add(REST_PREFIX, REST_URI);
-    NS.add(RESTXQ_PREFIX, REST_URI);
     // BaseX namespaces
-    NS.add(BXERR_PREFIX, BXERRORS_URI);
     NS.add(BASEX_PREFIX, BASEX_URI);
     // namespaces of built-in modules
     NS.add(ADMIN_PREFIX, ADMIN_URI);
@@ -65,14 +65,15 @@ public final class NSGlobal {
     NS.add(INSPECT_PREFIX, INSPECT_URI);
     NS.add(JOBS_PREFIX, JOBS_URI);
     NS.add(JSON_PREFIX, JSON_URI);
+    NS.add(LAZY_PREFIX, LAZY_URI);
     NS.add(OUT_PREFIX, OUT_URI);
     NS.add(PROC_PREFIX, PROC_URI);
     NS.add(PROF_PREFIX, PROF_URI);
     NS.add(QUERY_PREFIX, QUERY_URI);
     NS.add(RANDOM_PREFIX, RANDOM_URI);
     NS.add(REPO_PREFIX, REPO_URI);
+    NS.add(SESSION_PREFIX, SESSION_URI);
     NS.add(SQL_PREFIX, SQL_URI);
-    NS.add(STREAM_PREFIX, STREAM_URI);
     NS.add(STRINGS_PREFIX, STRINGS_URI);
     NS.add(UNIT_PREFIX, UNIT_URI);
     NS.add(USER_PREFIX, USER_URI);

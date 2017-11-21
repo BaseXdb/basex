@@ -39,7 +39,7 @@ public final class ArchiveDelete extends ArchiveFn {
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
       return B64.get(out.finish());
     } catch(final IOException ex) {
-      throw ARCHIVE_FAIL_X.get(info, ex);
+      throw ARCHIVE_ERROR_X.get(info, ex);
     }
   }
 }

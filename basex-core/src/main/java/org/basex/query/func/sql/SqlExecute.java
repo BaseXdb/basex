@@ -37,20 +37,18 @@ public class SqlExecute extends SqlFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    final int id = (int) toLong(exprs[0], qc);
+    final Connection conn = connection(qc);
     final String query = string(toToken(exprs[1], qc));
 
-    final Object obj = jdbc(qc).get(id);
-    if(!(obj instanceof Connection)) throw BXSQ_CONN_X.get(info, id);
     try {
-      final Statement stmt = ((Connection) obj).createStatement();
+      final Statement stmt = conn.createStatement();
       if(exprs.length > 2) {
         final StatementOptions options = toOptions(2, new StatementOptions(), qc);
         setStatementOptions(stmt, options);
       }
       return iter(stmt, true, stmt.execute(query));
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR_X.get(info, ex);
+      throw SQL_ERROR_X.get(info, ex);
     }
   }
 

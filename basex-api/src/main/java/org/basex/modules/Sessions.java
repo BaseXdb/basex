@@ -121,10 +121,6 @@ public final class Sessions extends QueryModule {
    * @throws QueryException query exception
    */
   private ASession session(final Str id) throws QueryException {
-    if(queryContext.http == null) throw SessionErrors.noContext();
-    final HashMap<String, HttpSession> http = SessionListener.sessions();
-    final HttpSession session = id != null ? http.get(id.toJava()) : null;
-    if(session == null) throw SessionErrors.whichSession(id);
-    return new ASession(session, queryContext);
+    return new ASession(queryContext, id);
   }
 }

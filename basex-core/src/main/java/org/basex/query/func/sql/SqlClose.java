@@ -17,13 +17,12 @@ public final class SqlClose extends SqlFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
 
-    final int id = (int) toLong(exprs[0], qc);
-    final JDBCConnections jdbc = jdbc(qc);
-    try(AutoCloseable sql = jdbc.get(id)) {
-      // try-with-resources: resource will automatically be closed
-      jdbc.remove(id);
+    @SuppressWarnings("resource")
+    final AutoCloseable ac = get(qc, true);
+    try {
+      ac.close();
     } catch(final Exception ex) {
-      throw BXSQ_ERROR_X.get(info, ex);
+      throw SQL_ERROR_X.get(info, ex);
     }
     return null;
   }

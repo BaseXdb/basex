@@ -1,5 +1,7 @@
 package org.exquery.ns;
 
+import static org.basex.query.QueryError.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -308,7 +310,8 @@ public final class Request extends QueryModule {
    * @throws QueryException query exception
    */
   private HTTPConnection connection() throws QueryException {
-    if(queryContext.http != null) return (HTTPConnection) queryContext.http;
-    throw new QueryException("required.");
+    final Object http = queryContext.http;
+    if(http == null) throw BASEX_HTTP.get(null);
+    return (HTTPConnection) http;
   }
 }

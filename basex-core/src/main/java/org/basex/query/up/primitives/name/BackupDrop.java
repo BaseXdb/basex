@@ -27,7 +27,7 @@ public final class BackupDrop extends NameUpdate {
 
   @Override
   public void merge(final Update update) throws QueryException {
-    throw BXDB_ONCEBACK_X_X.get(info, name, operation());
+    throw DB_CONFLICT2_X_X.get(info, name, operation());
   }
 
   @Override

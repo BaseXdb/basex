@@ -93,7 +93,7 @@ final class Unit {
 
         // Unit function:
         if(anns.contains(PRIVATE)) throw UNIT_PRIVATE_X.get(null, sf.name.local());
-        if(sf.params.length > 0) throw UNIT_ARGS_X.get(null, sf.name.local());
+        if(sf.params.length > 0) throw UNIT_NOARGS_X.get(null, sf.name.local());
 
         if(anns.contains(_UNIT_BEFORE_MODULE)) beforeModule.add(sf);
         if(anns.contains(_UNIT_AFTER_MODULE)) afterModule.add(sf);
@@ -218,7 +218,7 @@ final class Unit {
     final QNm name = ex.qname();
     if(code == null || !code.eq(name)) {
       final FElem error;
-      final boolean fail = UNIT_ASSERT.eq(name);
+      final boolean fail = UNIT_FAIL.eq(name);
       if(fail) {
         failures++;
         error = new FElem(FAILURE);

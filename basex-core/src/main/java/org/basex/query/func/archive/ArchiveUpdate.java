@@ -59,7 +59,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
       }
       return B64.get(out.finish());
     } catch(final IOException ex) {
-      throw ARCHIVE_FAIL_X.get(info, ex);
+      throw ARCHIVE_ERROR_X.get(info, ex);
     }
   }
 }

@@ -1,4 +1,4 @@
-package org.basex.query;
+  package org.basex.query;
 
 import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
@@ -18,6 +18,46 @@ import org.basex.util.*;
  */
 public enum QueryError {
 
+  // BaseX errors
+
+  /** Error code. */
+  BASEX_HTTP(BASEX, "http", "HTTP connection required."),
+
+  /** Error code. */
+  BASX_GENERIC_X(BASEX, 0, "%"),
+  /** Error code. */
+  BASX_PERM_X(BASEX, 1, "% permission required."),
+  /** Error code. */
+  BASX_OPTIONS_X(BASEX, 2, "Unknown database option '%'."),
+  /** Error code. */
+  BASX_VALUE_X_X(BASEX, 2, "Database option '%' cannot be set to '%'."),
+  /** Error code. */
+  BASX_WHICH_X(BASEX, 2, "%"),
+  /** Error code. */
+  BASX_RESTXQ_X(BASEX, 3, "%"),
+  /** Error code. */
+  BASX_DBTRANSFORM(BASEX, 4, "No database updates allowed within transform expression."),
+  /** Error code. */
+  BASX_STACKOVERFLOW(BASEX, 5, "Stack Overflow: Try tail recursion?"),
+  /** Error code. */
+  BASX_ANNOT_X_X(BASEX, 6, "Annotation %% is unknown."),
+  /** Error code. */
+  BASX_ANNNUM_X_X(BASEX, 6, "%: % supplied."),
+  /** Error code. */
+  BASX_ANNTYPE_X_X_X(BASEX, 6, "%: % expected, % found."),
+  /** Error code. */
+  BASX_TWICE_X_X(BASEX, 6, "Annotation %% was declared twice."),
+  /** Error code. */
+  BASX_FITEM_X(BASEX, 8, "Function items cannot be cached: %."),
+  /** Error code. */
+  BASX_UPMODIFY(BASEX, 9, "Transformations must all be updating or return an empty sequence."),
+  /** Error code. */
+  BASX_OPTDECL_X(BASEX, 10, "Database option not allowed in library module: %."),
+  /** Error code. */
+  BASX_NODOC_X(BASEX, 11, "Database path '%' yields no documents."),
+  /** Error code. */
+  BASX_SINGLE_X(BASEX, 11, "Database path '%' points to more than one document."),
+
   // Admin Module
 
   /** Error code. */
@@ -30,17 +70,17 @@ public enum QueryError {
   // Archive Module
 
   /** Error code. */
-  ARCHIVE_DESC1(ARCHIVE, "desc", "Name of ZIP entry must not be empty."),
+  ARCHIVE_DESCRIPTOR1(ARCHIVE, "descriptor", "Name of ZIP entry must not be empty."),
   /** Error code. */
-  ARCHIVE_DESC2_X(ARCHIVE, "desc", "Invalid compression level: '%'."),
+  ARCHIVE_DESCRIPTOR2_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
   /** Error code. */
-  ARCHIVE_DESC3_X(ARCHIVE, "desc", "xs:dateTime value is invalid : '%'."),
+  ARCHIVE_DESCRIPTOR3_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),
   /** Error code. */
   ARCHIVE_ENCODE1_X(ARCHIVE, "encode", "Unknown encoding '%'."),
   /** Error code. */
   ARCHIVE_ENCODE2_X(ARCHIVE, "encode", "String conversion: %."),
   /** Error code. */
-  ARCHIVE_FAIL_X(ARCHIVE, "fail", "Operation failed: %."),
+  ARCHIVE_ERROR_X(ARCHIVE, "error", "Operation failed: %."),
   /** Error code. */
   ARCHIVE_FORMAT(ARCHIVE, "format", "Packing format not supported."),
   /** Error code. */
@@ -52,327 +92,7 @@ public enum QueryError {
   /** Error code. */
   ARCHIVE_SINGLE_X(ARCHIVE, "single", "% archives are limited to a single entry."),
 
-  // Client Module
-
-  /** Error code. */
-  CLIENT_COMMAND_X(CLIENT, "command", "Command could not be executed: %"),
-  /** Error code. */
-  CLIENT_CONNECT_X(CLIENT, "connect", "Connection failed: %"),
-  /** Error code. */
-  CLIENT_ERROR_X(CLIENT, "error", "An error occurred: %"),
-  /** Error code. */
-  CLIENT_FITEM_X(CLIENT, "function", "Result is a function item: %."),
-  /** Error code. */
-  CLIENT_ID_X(CLIENT, "id", "Session with ID % is not available or has been closed."),
-  /** Error code. */
-  CLIENT_QUERY_X(CLIENT, "query", "Query could not be executed: %"),
-
-  // BaseX errors
-
-  /** Error code. */
-  BASX_GENERIC_X(BASX, 0, "%"),
-  /** Error code. */
-  BASX_PERM_X(BASX, 1, "% permission required."),
-  /** Error code. */
-  BASX_OPTIONS_X(BASX, 2, "Unknown database option '%'."),
-  /** Error code. */
-  BASX_VALUE_X_X(BASX, 2, "Database option '%' cannot be set to '%'."),
-  /** Error code. */
-  BASX_WHICH_X(BASX, 2, "%"),
-  /** Error code. */
-  BASX_RESTXQ_X(BASX, 3, "%"),
-  /** Error code. */
-  BASX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
-  /** Error code. */
-  BASX_STACKOVERFLOW(BASX, 5, "Stack Overflow: Try tail recursion?"),
-  /** Error code. */
-  BASX_ANNOT_X_X(BASX, 6, "Annotation %% is unknown."),
-  /** Error code. */
-  BASX_ANNNUM_X_X(BASX, 6, "%: % supplied."),
-  /** Error code. */
-  BASX_ANNTYPE_X_X_X(BASX, 6, "%: % expected, % found."),
-  /** Error code. */
-  BASX_TWICE_X_X(BASX, 6, "Annotation %% was declared twice."),
-  /** Error code. */
-  BASX_FITEM_X(BASX, 8, "Function items cannot be cached: %."),
-  /** Error code. */
-  BASX_UPMODIFY(BASX, 9, "Transform expressions must all be updating or return an empty sequence."),
-  /** Error code. */
-  BASX_OPTDECL_X(BASX, 10, "Database option not allowed in library module: %."),
-
-  // Conversion Module
-
-  /** Error code. */
-  BXCO_STRING_X(BXCO, 1, "String conversion: %."),
-  /** Error code. */
-  BXCO_BASE64_X_X(BXCO, 1, "Conversion of '%' to encoding '%' failed."),
-  /** Error code. */
-  BXCO_ENCODING_X(BXCO, 2, "Unknown encoding '%'."),
-  /** Error code. */
-  BXCO_INVBASE_X(BXCO, 3, "Unsupported base: %."),
-  /** Error code. */
-  BXCO_INVBASEDIG_X_X(BXCO, 4, "Invalid digit for base %: %."),
-
-  // CSV Module
-
-  /** Error code. */
-  BXCS_PARSE_X(BXCS, 1, "CSV parser: %."),
-  /** Error code. */
-  BXCS_SERIAL_X(BXCS, 2, "CSV serializer: %."),
-
-  // Database Module
-
-  /** Error code. */
-  BXDB_NODB_X_X(BXDB, 1, "Database node expected, % found: %."),
-  /** Error code. */
-  BXDB_OPEN_X(BXDB, 2, "%"),
-  /** Error code. */
-  BXDB_WHICH_X(BXDB, 2, "Database '%' not found."),
-  /** Error code. */
-  BXDB_WHICHBACK_X(BXDB, 2, "No backup found for database '%'."),
-  /** Error code. */
-  BXDB_MEM_X(BXDB, 3, "Operation requires database '%' to be persistent."),
-  /** Error code. */
-  BXDB_INDEX_X(BXDB, 4, "Database '%' has no % index."),
-  /** Error code. */
-  BXDB_NOINDEX_X(BXDB, 5, "No index access possible: %."),
-  /** Error code. */
-  BXDB_DOC_X(BXDB, 5, "Root must yield document nodes: %."),
-  /** Error code. */
-  BXDB_NODOC_X(BXDB, 6, "Database path '%' yields no documents."),
-  /** Error code. */
-  BXDB_SINGLE_X(BXDB, 6, "Database path '%' points to more than one document."),
-  /** Error code. */
-  BXDB_OPENED_X(BXDB, 7, "Database '%' cannot be updated, as it is opened by another process."),
-  /** Error code. */
-  BXDB_LOCK_X(BXDB, 7, "%"),
-  /** Error code. */
-  BXDB_PATH_X(BXDB, 8, "Invalid path: %."),
-  /** Error code. */
-  BXDB_RANGE_X_X_X(BXDB, 9, "Database '%' has no node with % value %."),
-  /** Error code. */
-  BXDB_NAME_X(BXDB, 11, "Invalid database name '%'."),
-  /** Error code. */
-  BXDB_ALTERDROP_X(BXDB, 12, "Database '%' cannot be both altered and dropped."),
-  /** Error code. */
-  BXDB_ONCE_X_X(BXDB, 12, "Database '%' can only be % once."),
-  /** Error code. */
-  BXDB_ONCEBACK_X_X(BXDB, 12, "Backup '%' can only be % once."),
-  /** Error code. */
-  BXDB_CREATEARGS_X_X(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
-  /** Error code. */
-  BXDB_REPLACE_X(BXDB, 14, "Invalid target path: %."),
-  /** Error code. */
-  BXDB_NOBACKUP_X(BXDB, 15, "No backup found: %."),
-  /** Error code. */
-  BXDB_SAME_X(BXDB, 16, "Name of source and target database is equal: %."),
-  /** Error code. */
-  BXDB_PROP_X(BXDB, 17, "Unknown database property: %."),
-
-  // Fetch Module
-
-  /** Error code. */
-  BXFE_IO_X(BXFE, 1, "%"),
-  /** Error code. */
-  BXFE_ENCODING_X(BXFE, 2, "Unknown encoding '%'."),
-
-  // Fulltext Module
-
-  /** Error code. */
-  BXFT_MATCH(BXFT, 1, "Wildcards and fuzzy option cannot be specified both."),
-
-  // HTML Module
-
-  /** Error code. */
-  BXHL_IO_X(BXHL, 1, "%"),
-
-  // Inspection Module
-
-  /** Error code. */
-  INSPECT_UNKNOWN_X(INSPECT, "unknown", "Component '%' does not exist."),
-
-  // Jobs Module
-
-  /** Error code. */
-  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown job: %."),
-  /** Error code. */
-  JOBS_RUNNING_X(JOBS, "running", "Result is not available yet: %."),
-  /** Error code. */
-  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
-  /** Error code. */
-  JOBS_RANGE_X(JOBS, "range", "Value out of range: %."),
-  /** Error code. */
-  JOBS_CONFLICT(JOBS, "conflict", "Either 'cache' or 'interval' option is allowed."),
-  /** Error code. */
-  JOBS_ID_EXISTS_X(JOBS, "id", "Job id already exists: %."),
-  /** Error code. */
-  JOBS_ID_INVALID_X(JOBS, "id", "Invalid job name: %."),
-  /** Error code. */
-  JOBS_SELF_X(JOBS, "self", "Cannot wait for own job: %"),
-
-  // JSON Module
-
-  /** Error code. */
-  BXJS_PARSE_X_X_X(BXJS, 1, "JSON parser (%:%): %."),
-  /** Error code. */
-  BXJS_DUPLICATE_X(BXJS, 1, "JSON parser: (%:%): %."),
-  /** Error code. */
-  BXJS_PARSEML_X(BXJS, 1, "JsonML parser: %."),
-  /** Error code. */
-  BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
-  /** Error code. */
-  BXJS_INVALID_X(BXJS, 1, "'%':'%' is not supported by the target format."),
-
-  // Output Module
-
-  /** Error code. */
-  ERRFORMAT_X_X(BXOU, 1, "%: %."),
-
-  // Process Module
-
-  /** Error code. */
-  BXPR_TIMEOUT(BXPR, 9998, "The timeout was exceeded."),
-  /** Error code. */
-  BXPR_ENC_X(BXPR, 9999, "Unknown encoding '%'."),
-
-  // Random Module
-
-  /** Error code. */
-  BXRA_BOUNDS_X(BXRA, 1, "Maximum value is out of bounds: %."),
-  /** Error code. */
-  BXRA_NUM_X(BXRA, 2, "Number of values is negative: %."),
-
-  // Repository Module
-
-  /** Error code. */
-  BXRE_WHICH_X(BXRE, 1, "Package '%' does not exist."),
-  /** Error code. */
-  BXRE_URI_X(BXRE, 2, "URI is invalid: '%'."),
-  /** Error code. */
-  BXRE_NOTINST_X(BXRE, 3, "Required package '%' is not installed."),
-  /** Error code. */
-  BXRE_DESC_X(BXRE, 4, "Package descriptor: %."),
-  /** Error code. */
-  BXRE_INST_X(BXRE, 5, "Module % is already installed within another package."),
-  /** Error code. */
-  BXRE_PARSE_X_X(BXRE, 6, "Package '%' could not be parsed: %."),
-  /** Error code. */
-  BXRE_MAIN_X(BXRE, 6, "No 'Main-Class' attribute found: %/META-INF/MANIFEST.MF."),
-  /** Error code. */
-  BXRE_DELETE_X(BXRE, 7, "File '%' could not be deleted."),
-  /** Error code. */
-  BXRE_DEP_X_X(BXRE, 8, "Package '%' depends on package '%'."),
-  /** Error code. */
-  BXRE_VERSION(BXRE, 9, "Package version is not supported."),
-  /** Error code. */
-  BXRE_JARDESC_X(BXRE, 10, "JAR descriptor: %."),
-  /** Error code. */
-  BXRE_JARFAIL_X(BXRE, 11, "Reading JAR descriptor failed: %."),
-
-  // XSLT Module
-
-  /** Error code. */
-  BXSL_ERROR_X(BXSL, 1, "%"),
-
-  // SQL Module
-
-  /** Error code. */
-  BXSQ_ERROR_X(BXSQ, 1, "An SQL exception occurred: '%'"),
-  /** Error code. */
-  BXSQ_CONN_X(BXSQ, 2, "No opened connection with id %"),
-  /** Error code. */
-  BXSQ_STATE_X(BXSQ, 2, "No prepared statement with id %"),
-  /** Error code. */
-  BXSQ_PARAMS(BXSQ, 3, "Number of parameters differs from number of placeholders"),
-  /** Error code. */
-  BXSQ_TYPE(BXSQ, 4, "No parameter type supplied."),
-  /** Error code. */
-  BXSQ_ATTR_X(BXSQ, 5, "Not expected attribute: %"),
-  /** Error code. */
-  BXSQ_FORMAT_X(BXSQ, 6, "Illegal % format"),
-  /** Error code. */
-  BXSQ_DRIVER_X(BXSQ, 7, "Could not initialize supplied driver: '%'"),
-
-  // Validation Module
-
-  /** Error code. */
-  BXVA_FAIL_X(BXVA, 1, "Validation failed: %"),
-  /** Error code. */
-  BXVA_START_X(BXVA, 2, "Validation could not be started: %"),
-  /** Error code. */
-  BXVA_RELAXNG_X(BXVA, 3, "RelaxNG validation is not available."),
-  /** Error code. */
-  BXVA_XSDVERSION_X(BXVA, 4, "No XML Schema implementation found for version '%'."),
-
-  // Web Module
-
-  /** Error code. */
-  BXWE_INVALID_X(BXWE, 2, "%."),
-  /** Error code. */
-  BXWE_CODES_X(BXWE, 2, "URL contains invalid characters: %"),
-
-  // XQuery Module
-
-  /** Error code. */
-  BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
-  /** Error code. */
-  BXXQ_NOUPDATE(BXXQ, 2, "Updating expression expected."),
-  /** Error code. */
-  BXXQ_PERM_X(BXXQ, 3, "%"),
-  /** Error code. */
-  BXXQ_PERM2_X(BASX, 3, "% permission required."),
-  /** Error code. */
-  BXXQ_TIMEOUT(BXXQ, 4, "The timeout was exceeded."),
-  /** Error code. */
-  BXXQ_MEMORY(BXXQ, 4, "The memory limit was exceeded."),
-  /** Error code. */
-  BXXQ_NESTED(BXXQ, 5, "Nested query evaluation is not allowed."),
-  /** Error code. */
-  BXXQ_UNEXPECTED_X(BXXQ, 6, "Unexpected error: %"),
-
-  // Unit Module
-
-  /** Error code. */
-  UNIT_ASSERT(UNIT, 1, "Assertion failed."),
-  /** Error code. */
-  UNIT_MESSAGE_X(UNIT, 1, "%"),
-  /** Error code. */
-  UNIT_ASSERT_EQUALS_X_X_X(UNIT, 1, "Item %: % expected, % returned."),
-  /** Error code. */
-  UNIT_ARGS_X(UNIT, 2, "Test function '%' must have no arguments."),
-  /** Error code. */
-  UNIT_PRIVATE_X(UNIT, 3, "Test function '%' must be public."),
-
-  // User Module
-
-  /** Error code. */
-  USER_NAME_X(USER, "name", "Invalid user name: '%'."),
-  /** Error code. */
-  USER_PATTERN_X(USER, "pattern", "Invalid database pattern: '%'."),
-  /** Error code. */
-  USER_PERMISSION_X(USER, "permission", "Invalid permission: '%'."),
-  /** Error code. */
-  USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),
-  /** Error code. */
-  USER_PASSWORD_X(USER, "password", "Wrong password supplied for user '%'."),
-  /** Error code. */
-  USER_ADMIN(USER, "admin", "User 'admin' cannot be modified."),
-  /** Error code. */
-  USER_EQUAL_X(USER, "equal", "Name of old and new user is equal: %."),
-  /** Error code. */
-  USER_LOCAL(USER, "local", "Local permission can only be 'none', 'read' or 'write'."),
-  /** Error code. */
-  USER_LOGGEDIN_X(USER, "logged-in", "User '%' is currently logged in."),
-  /** Error code. */
-  USER_UPDATE_X_X(USER, "update", "User '%' can only be % once."),
-  /** Error code. */
-  USER_SAMEPAT_X(USER, "update", "Pattern '%' is specified more than once."),
-  /** Error code. */
-  USER_SAMEPERM_X_X(USER, "update", "User '%' can only be % once."),
-  /** Error code. */
-  USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
-  /** Error code. */
-  USER_INFO_X(USER, "info", "Info can only be % once."),
+  // Binary Module
 
   /** Error code. */
   BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),
@@ -390,6 +110,36 @@ public enum QueryError {
   BIN_CE_X(BIN, "conversion-error", "%."),
   /** Error code. */
   BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
+
+  // Client Module
+
+  /** Error code. */
+  CLIENT_COMMAND_X(CLIENT, "command", "Command could not be executed: %"),
+  /** Error code. */
+  CLIENT_CONNECT_X(CLIENT, "connect", "Connection failed: %"),
+  /** Error code. */
+  CLIENT_ERROR_X(CLIENT, "error", "An error occurred: %"),
+  /** Error code. */
+  CLIENT_FITEM_X(CLIENT, "function", "Result is a function item: %."),
+  /** Error code. */
+  CLIENT_ID_X(CLIENT, "id", "Session with ID % is not available or has been closed."),
+  /** Error code. */
+  CLIENT_QUERY_X(CLIENT, "query", "Query could not be executed: %"),
+
+  // Conversion Module
+
+  /** Error code. */
+  CONVERT_STRING_X(CONVERT, "string", "String conversion: %."),
+  /** Error code. */
+  CONVERT_BINARY_X_X(CONVERT, "binary", "Conversion of '%' to encoding '%' failed."),
+  /** Error code. */
+  CONVERT_ENCODING_X(CONVERT, "encoding", "Unknown encoding '%'."),
+  /** Error code. */
+  CONVERT_BASE_X(CONVERT, "base", "Unsupported base: %."),
+  /** Error code. */
+  CONVERT_INTEGER_X_X(CONVERT, "integer", "Invalid digit for base %: %."),
+
+  // Cryptographic Module
 
   /** Error code. */
   CX_CANINV(CX, 1, "Canonicalization algorithm is not supported."),
@@ -436,6 +186,61 @@ public enum QueryError {
   /** Error code. */
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
+  // CSV Module
+
+  /** Error code. */
+  CSV_PARSE_X(CSV, "parse", "%."),
+  /** Error code. */
+  CSV_SERIALIZE_X(CSV, "serialize", "%."),
+
+  // Database Module
+
+  /** Error code. */
+  DB_ARGS_X_X(DB, "args", "Number of specified inputs and paths differs: % vs. %."),
+  /** Error code. */
+  DB_CONFLICT1_X_X(DB, "conflict", "Database '%' can only be % once."),
+  /** Error code. */
+  DB_CONFLICT2_X_X(DB, "conflict", "Backup '%' can only be % once."),
+  /** Error code. */
+  DB_CONFLICT3_X(DB, "conflict", "Database '%' cannot be both altered and dropped."),
+  /** Error code. */
+  DB_CONFLICT4_X(DB, "conflict", "Name of source and target database is equal: %."),
+  /** Error code. */
+  DB_LOCK1_X(DB, "lock", "Database '%' cannot be updated, it is opened by another process."),
+  /** Error code. */
+  DB_LOCK2_X(DB, "lock", "%"),
+  /** Error code. */
+  DB_MAINMEM_X(DB, "mainmem", "Database '%' is in main memory."),
+  /** Error code. */
+  DB_NAME_X(DB, "name", "Invalid database name: %."),
+  /** Error code. */
+  DB_NOBACKUP_X(DB, "no-backup", "No backup exists for database '%'."),
+  /** Error code. */
+  DB_NODE_X(DB, "node", "No database node: %."),
+  /** Error code. */
+  DB_NOINDEX_X_X(DB, "no-index", "Database '%' has no % index."),
+  /** Error code. */
+  DB_OPEN1_X(DB, "open", "Database '%' not found."),
+  /** Error code. */
+  DB_OPEN2_X(DB, "open", "%"),
+  /** Error code. */
+  DB_PATH_X(DB, "path", "Invalid path: %."),
+  /** Error code. */
+  DB_PROPERTY_X(DB, "property", "Unknown database property: %."),
+  /** Error code. */
+  DB_RANGE_X_X_X(DB, "range", "Database '%' has no node with % value %."),
+  /** Error code. */
+  DB_TARGET_X(DB, "target", "Invalid target path: %."),
+
+  // Fetch Module
+
+  /** Error code. */
+  FETCH_OPEN_X(FETCH, "open", "%"),
+  /** Error code. */
+  FETCH_ENCODING_X(FETCH, "encoding", "Unknown encoding '%'."),
+
+  // File Module
+
   /** Error code. */
   FILE_NOT_FOUND_X(FILE, "not-found", "'%' does not exist."),
   /** Error code. */
@@ -459,8 +264,22 @@ public enum QueryError {
   /** Error code. */
   FILE_IE_ERROR_ACCESS_X(FILE, "io-error", "Access to '%' is denied."),
 
+  // Fulltext Module
+
   /** Error code. */
-  HASH_ALG_X(HASH, 1, "Algorithm not supported: '%'."),
+  FT_OPTIONS(FT, "options", "Wildcards and fuzzy option cannot be specified both."),
+
+  // Hashing Module
+
+  /** Error code. */
+  HASH_ALGORITHM_X(HASH, "algorithm", "Algorithm not supported: '%'."),
+
+  // HTML Module
+
+  /** Error code. */
+  HTML_PARSE_X(HTML, "parse", "%"),
+
+  // HTTP Module
 
   /** Error code. */
   HC_ERROR_X(HC, 1, "%"),
@@ -475,8 +294,204 @@ public enum QueryError {
   /** Error code. */
   HC_PARAMS(HC, 6, "Specify request element or HTTP URI."),
 
+  // Inspection Module
+
+  /** Error code. */
+  INSPECT_UNKNOWN_X(INSPECT, "unknown", "Component '%' does not exist."),
+
+  // Jobs Module
+
+  /** Error code. */
+  JOBS_ID_EXISTS_X(JOBS, "id", "Job id already exists: %."),
+  /** Error code. */
+  JOBS_ID_INVALID_X(JOBS, "id", "Invalid job name: %."),
+  /** Error code. */
+  JOBS_OPTIONS(JOBS, "options", "Either 'cache' or 'interval' option is allowed."),
+  /** Error code. */
+  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
+  /** Error code. */
+  JOBS_RANGE_X(JOBS, "range", "Value out of range: %."),
+  /** Error code. */
+  JOBS_RUNNING_X(JOBS, "running", "Result is not available yet: %."),
+  /** Error code. */
+  JOBS_SELF_X(JOBS, "self", "Cannot wait for own job: %"),
+  /** Error code. */
+  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown job: %."),
+
+  // JSON Module
+
+  /** Error code. */
+  JSON_PARSE_X(JSON, "parse", "%."),
+  /** Error code. */
+  JSON_PARSE_X_X_X(JSON, "parse", "(%:%): %."),
+  /** Error code. */
+  JSON_SERIALIZE_X(JSON, "serialize", "%."),
+  /** Error code. */
+  JSON_OPTIONS_X(JSON, "options", "'%':'%' is not supported by the target format."),
+
+  // Output Module
+
+  /** Error code. */
+  OUTPUT_FORMAT_X_X(OUTPUT, "format", "%: %."),
+
+  // Process Module
+
+  /** Error code. */
+  PROC_ENCODING_X(PROC, "encoding", "Unknown encoding '%'."),
+  /** Error code. */
+  PROC_TIMEOUT(PROC, "timeout", "The timeout was exceeded."),
+
+  // Random Module
+
+  /** Error code. */
+  RANDOM_BOUNDS_X(RANDOM, "bounds", "Maximum value is out of bounds: %."),
+  /** Error code. */
+  BXRA_NEGATIVE_X(RANDOM, "negative", "Number of values is negative: %."),
+
+  // Repository Module
+
+  /** Error code. */
+  REPO_DELETE_X(REPO, "delete", "File '%' could not be deleted."),
+  /** Error code. */
+  REPO_DELETE_X_X(REPO, "delete", "Package '%' depends on package '%'."),
+  /** Error code. */
+  REPO_DESCRIPTOR_X(REPO, "descriptor", "%."),
+  /** Error code. */
+  REPO_INSTALLED_X(REPO, "installed", "Module % is already installed within another package."),
+  /** Error code. */
+  REPO_NOTFOUND_X(REPO, "not-found", "Package '%' not found."),
+  /** Error code. */
+  REPO_PARSE_X_X(REPO, "parse", "%: %."),
+  /** Error code. */
+  REPO_VERSION(REPO, "version", "Package version is not supported."),
+
+  // Session Module
+
+  /** Error code. */
+  SESSION_GET_X(SESSION, "get", "Stored attribute is no XQuery value: %."),
+  /** Error code. */
+  SESSION_SET_X(SESSION, "set", "Item cannot be stored: %."),
+
+  // Session Module
+
+  /** Error code. */
+  SESSIONS_GET_X(SESSIONS, "get", "Stored attribute is no value: %."),
+  /** Error code. */
+  SESSIONS_SET_X(SESSIONS, "http", "Function items cannot be stored: %."),
+  /** Error code. */
+  SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Session not found: %."),
+
+  // SQL Module
+
+  /** Error code. */
+  SQL_ATTRIBUTE_X(SQL, "attribute", "Attribute not expected: %."),
+  /** Error code. */
+  SQL_INIT_X(SQL, "init", "Could not find driver: %"),
+  /** Error code. */
+  SQL_ERROR_X(SQL, "error", "An SQL exception occurred: %"),
+  /** Error code. */
+  SQL_ID1_X(SQL, "id", "No connection with id %."),
+  /** Error code. */
+  SQL_ID2_X(SQL, "id", "No prepared statement with id %."),
+  /** Error code. */
+  SQL_PARAMETERS(SQL, "parameters", "No parameter type supplied."),
+  /** Error code. */
+  SQL_PARAMETERS_X_X(SQL, "parameters", "Wrong number of parameters (% vs. %)."),
+  /** Error code. */
+  SQL_TYPE_X_X(SQL, "type", "Invalid type (%): %."),
+
+  // Unit Module
+
+  /** Error code. */
+  UNIT_FAIL(UNIT, "fail", "Assertion failed."),
+  /** Error code. */
+  UNIT_FAIL_X(UNIT, "fail", "%"),
+  /** Error code. */
+  UNIT_FAIL_X_X_X(UNIT, "fail", "Item %: % expected, % returned."),
+  /** Error code. */
+  UNIT_NOARGS_X(UNIT, "no-args", "Test function '%' must have no arguments."),
+  /** Error code. */
+  UNIT_PRIVATE_X(UNIT, "private", "Test function '%' must not be private."),
+
+  // User Module
+
+  /** Error code. */
+  USER_ADMIN(USER, "admin", "User 'admin' cannot be modified."),
+  /** Error code. */
+  USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
+  /** Error code. */
+  USER_EQUAL_X(USER, "equal", "Name of old and new user is equal: %."),
+  /** Error code. */
+  USER_INFO_X(USER, "info", "Info can only be % once."),
+  /** Error code. */
+  USER_LOCAL(USER, "local", "Local permission can only be 'none', 'read' or 'write'."),
+  /** Error code. */
+  USER_LOGGEDIN_X(USER, "logged-in", "User '%' is currently logged in."),
+  /** Error code. */
+  USER_NAME_X(USER, "name", "Invalid user name: '%'."),
+  /** Error code. */
+  USER_PASSWORD_X(USER, "password", "Wrong password supplied for user '%'."),
+  /** Error code. */
+  USER_PATTERN_X(USER, "pattern", "Invalid database pattern: '%'."),
+  /** Error code. */
+  USER_PERMISSION_X(USER, "permission", "Invalid permission: '%'."),
+  /** Error code. */
+  USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),
+  /** Error code. */
+  USER_UPDATE1_X_X(USER, "update", "User '%' can only be % once."),
+  /** Error code. */
+  USER_UPDATE2_X(USER, "update", "Pattern '%' is specified more than once."),
+  /** Error code. */
+  USER_UPDATE3_X_X(USER, "update", "User '%' can only be % once."),
+
+  // Utility Module
+
   /** Error code. */
   UTIL_NEGATIVE_X(UTIL, "negative", "Index '%' is negative."),
+
+  // Validation Module
+
+  /** Error code. */
+  VALIDATE_ERROR_X(ErrType.VALIDATE, "error", "Validation failed: %"),
+  /** Error code. */
+  VALIDATE_START_X(ErrType.VALIDATE, "init", "Validation could not be started: %"),
+  /** Error code. */
+  VALIDATE_NOTFOUND_X(ErrType.VALIDATE, "not-found", "RelaxNG validation is not available."),
+  /** Error code. */
+  VALIDATE_VERSION_X(ErrType.VALIDATE, "version", "No XML Schema implementation for version '%'."),
+
+  // Web Module
+
+  /** Error code. */
+  WEB_INVALID1_X(WEB, "invalid", "URL contains invalid characters: %"),
+  /** Error code. */
+  WEB_INVALID2_X(WEB, "invalid", "%."),
+
+  // XQuery Module
+
+  /** Error code. */
+  XQUERY_UPDATE1(ErrType.XQUERY, "update", "No updating expression allowed."),
+  /** Error code. */
+  XQUERY_UPDATE2(ErrType.XQUERY, "update", "Updating expression expected."),
+  /** Error code. */
+  XQUERY_PERMISSION1_X(ErrType.XQUERY, "permission", "%"),
+  /** Error code. */
+  XQUERY_PERMISSION2_X(ErrType.XQUERY, "permission", "% permission required."),
+  /** Error code. */
+  XQUERY_TIMEOUT(ErrType.XQUERY, "timeout", "The timeout was exceeded."),
+  /** Error code. */
+  XQUERY_MEMORY(ErrType.XQUERY, "memory", "The memory limit was exceeded."),
+  /** Error code. */
+  XQUERY_NESTED(ErrType.XQUERY, "nested", "Nested query evaluation is not allowed."),
+  /** Error code. */
+  XQUERY_UNEXPECTED_X(ErrType.XQUERY, "error", "Unexpected error: %"),
+
+  // XSLT Module
+
+  /** Error code. */
+  BXSL_ERROR_X(XSLT, "error", "%"),
+
+  // ZIP Module
 
   /** Error code. */
   ZIP_NOTFOUND_X(ZIP, 1, "Path '%' not found."),
@@ -596,19 +611,19 @@ public enum QueryError {
   PICINVCOMP_X_X(FOFD, 1350, "Component '[%]' not applicable to % values."),
 
   /** Error code. */
-  JSON_PARSE_X(FOJS, 1, "%"),
+  PARSE_JSON_X(FOJS, 1, "%"),
   /** Error code. */
-  JSON_DUPLICATE_X(FOJS, 3, "%"),
+  DUPLICATE_JSON_X(FOJS, 3, "%"),
   /** Error code. */
   MERGE_DUPLICATE_X(FOJS, 3, "Key % occurs more than once."),
   /** Error code. */
-  JSON_OPT_X(FOJS, 5, "%"),
+  OPTION_JSON_X(FOJS, 5, "%"),
   /** Error code. */
-  JSON_FUNC_OPT_X_X(FOJS, 5, "% expected, % found."),
+  FUNC_JSON_OPT_X_X(FOJS, 5, "% expected, % found."),
   /** Error code. */
-  JSON_INVALID_X(FOJS, 6, "%"),
+  INVALID_JSON_X(FOJS, 6, "%"),
   /** Error code. */
-  JSON_ESCAPE_X(FOJS, 7, "Invalid escape sequence: %."),
+  ESCAPE_JSON_X(FOJS, 7, "Invalid escape sequence: %."),
 
   /** Error code. */
   NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),
@@ -1394,79 +1409,79 @@ public enum QueryError {
    * @author Leo Woerteler
    */
   public enum ErrType {
-    // Project errors
-
-    /** BASX Error type. */ BASX(BXERR_PREFIX, BXERRORS_URI),
-
-    /** BXCO Error type. */ BXCO(BXERR_PREFIX, BXERRORS_URI),
-    /** BXCS Error type. */ BXCS(BXERR_PREFIX, BXERRORS_URI),
-    /** BXDB Error type. */ BXDB(BXERR_PREFIX, BXERRORS_URI),
-    /** BXFE Error type. */ BXFE(BXERR_PREFIX, BXERRORS_URI),
-    /** BXFT Error type. */ BXFT(BXERR_PREFIX, BXERRORS_URI),
-    /** BXHL Error type. */ BXHL(BXERR_PREFIX, BXERRORS_URI),
-    /** BXJS Error type. */ BXJS(BXERR_PREFIX, BXERRORS_URI),
-    /** BXOU Error type. */ BXOU(BXERR_PREFIX, BXERRORS_URI),
-    /** BXPR Error type. */ BXPR(BXERR_PREFIX, BXERRORS_URI),
-    /** BXRA Error type. */ BXRA(BXERR_PREFIX, BXERRORS_URI),
-    /** BXRE Error type. */ BXRE(BXERR_PREFIX, BXERRORS_URI),
-    /** BXSL Error type. */ BXSL(BXERR_PREFIX, BXERRORS_URI),
-    /** BXSQ Error type. */ BXSQ(BXERR_PREFIX, BXERRORS_URI),
-    /** BXVA Error type. */ BXVA(BXERR_PREFIX, BXERRORS_URI),
-    /** BXWE Error type. */ BXWE(BXERR_PREFIX, BXERRORS_URI),
-    /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
-    /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
+    // Project-specific errors
 
     /** Error type. */ ADMIN(ADMIN_PREFIX, ADMIN_URI),
+    /** Error type. */ BASEX(BASEX_PREFIX, BASEX_URI),
     /** Error type. */ ARCHIVE(ADMIN_PREFIX, ARCHIVE_URI),
     /** Error type. */ CLIENT(CLIENT_PREFIX, CLIENT_URI),
+    /** Error type. */ CONVERT(CONVERT_PREFIX, CONVERT_URI),
+    /** Error type. */ CSV(CSV_PREFIX, CSV_URI),
+    /** Error type. */ DB(DB_PREFIX, DB_URI),
+    /** Error type. */ FETCH(FETCH_PREFIX, FETCH_URI),
+    /** Error type. */ FT(FT_PREFIX, FT_URI),
+    /** Error type. */ HTML(HTML_PREFIX, HTML_URI),
+    /** Error type. */ HASH(HASH_PREFIX, HASH_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX, INSPECT_URI),
     /** Error type. */ JOBS(JOBS_PREFIX, JOBS_URI),
+    /** Error type. */ JSON(JSON_PREFIX, JSON_URI),
+    /** Error type. */ OUTPUT(OUTPUT_PREFIX, OUTPUT_URI),
+    /** Error type. */ PROC(PROC_PREFIX, PROC_URI),
+    /** Error type. */ RANDOM(RANDOM_PREFIX, RANDOM_URI),
+    /** Error type. */ REPO(REPO_PREFIX, REPO_URI),
+    /** Error type. */ SESSION(SESSION_PREFIX, SESSION_URI),
+    /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
+    /** Error type. */ SQL(SQL_PREFIX, SQL_URI),
     /** Error type. */ UNIT(UNIT_PREFIX, UNIT_URI),
     /** Error type. */ UTIL(UTIL_PREFIX, UTIL_URI),
     /** Error type. */ USER(USER_PREFIX, USER_URI),
+    /** Error type. */ VALIDATE(VALIDATE_PREFIX, VALIDATE_URI),
+    /** Error type. */ WEB(WEB_PREFIX, WEB_URI),
+    /** Error type. */ XQUERY(XQUERY_PREFIX, XQUERY_URI),
+    /** Error type. */ XSLT(XSLT_PREFIX, XSLT_URI),
 
     // EXPath errors
 
-    /** Error type. */ BIN(BIN_PREFIX,     BIN_URI),
-    /** Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
-    /** Error type. */ FILE(FILE_PREFIX,   FILE_URI),
-    /** Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
-    /** Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
+    /** Error type. */ BIN(BIN_PREFIX,    BIN_URI),
+    /** Error type. */ CX(EXPERR_PREFIX,  EXPERROR_URI),
+    /** Error type. */ FILE(FILE_PREFIX,  FILE_URI),
+    /** Error type. */ HC(EXPERR_PREFIX,  EXPERROR_URI),
+    /** Error type. */ ZIP(EXPERR_PREFIX, EXPERROR_URI),
 
     // W3 errors
 
-    /** FOAP Error type. */ FOAP,
-    /** FOAR Error type. */ FOAR,
-    /** FOAY Error type. */ FOAY,
-    /** FOCA Error type. */ FOCA,
-    /** FOCH Error type. */ FOCH,
-    /** FODC Error type. */ FODC,
-    /** FODF Error type. */ FODF,
-    /** FODT Error type. */ FODT,
-    /** FOFD Error type. */ FOFD,
-    /** FOER Error type. */ FOER,
-    /** FOJS Error type. */ FOJS,
-    /** FONS Error type. */ FONS,
-    /** FORG Error type. */ FORG,
-    /** FORX Error type. */ FORX,
-    /** FOTY Error type. */ FOTY,
-    /** FOUP Error type. */ FOUP,
-    /** FOUT Error type. */ FOUT,
-    /** FTDY Error type. */ FTDY,
-    /** FTST Error type. */ FTST,
-    /** SENR Error type. */ SENR,
-    /** SEPM Error type. */ SEPM,
-    /** SERE Error type. */ SERE,
-    /** SEPM Error type. */ SESU,
-    /** XPDY Error type. */ XPDY,
-    /** XPST Error type. */ XPST,
-    /** XPTY Error type. */ XPTY,
-    /** XQDY Error type. */ XQDY,
-    /** XQST Error type. */ XQST,
-    /** XQTY Error type. */ XQTY,
-    /** XUDY Error type. */ XUDY,
-    /** XUST Error type. */ XUST,
-    /** XUTY Error type. */ XUTY;
+    /** Error type. */ FOAP,
+    /** Error type. */ FOAR,
+    /** Error type. */ FOAY,
+    /** Error type. */ FOCA,
+    /** Error type. */ FOCH,
+    /** Error type. */ FODC,
+    /** Error type. */ FODF,
+    /** Error type. */ FODT,
+    /** Error type. */ FOFD,
+    /** Error type. */ FOER,
+    /** Error type. */ FOJS,
+    /** Error type. */ FONS,
+    /** Error type. */ FORG,
+    /** Error type. */ FORX,
+    /** Error type. */ FOTY,
+    /** Error type. */ FOUP,
+    /** Error type. */ FOUT,
+    /** Error type. */ FTDY,
+    /** Error type. */ FTST,
+    /** Error type. */ SENR,
+    /** Error type. */ SEPM,
+    /** Error type. */ SERE,
+    /** Error type. */ SESU,
+    /** Error type. */ XPDY,
+    /** Error type. */ XPST,
+    /** Error type. */ XPTY,
+    /** Error type. */ XQDY,
+    /** Error type. */ XQST,
+    /** Error type. */ XQTY,
+    /** Error type. */ XUDY,
+    /** Error type. */ XUST,
+    /** Error type. */ XUTY;
 
     /** This error type's prefix. */
     public final String prefix;

@@ -1,6 +1,5 @@
 package org.basex.modules;
 
-import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -111,7 +110,6 @@ public final class Session extends QueryModule {
    * @throws QueryException query exception
    */
   private ASession session() throws QueryException {
-    if(queryContext.http == null) throw SessionErrors.noContext();
-    return new ASession(((HTTPConnection) queryContext.http).req.getSession(), queryContext);
+    return new ASession(queryContext, null);
   }
 }

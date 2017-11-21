@@ -50,11 +50,11 @@ final class JarParser {
         else if(eq(E_CLASS, name.local())) desc.classes.add(next.string());
         // [CG] Packaging: add warning if unknown elements are encountered
       }
-      if(desc.jars.isEmpty()) throw BXRE_JARDESC_X.get(info, NOJARS);
-      if(desc.classes.isEmpty()) throw BXRE_JARDESC_X.get(info, NOCLASSES);
+      if(desc.jars.isEmpty()) throw REPO_PARSE_X_X.get(info, io.name(), NOJARS);
+      if(desc.classes.isEmpty()) throw REPO_PARSE_X_X.get(info, io.name(), NOCLASSES);
       return desc;
     } catch(final IOException ex) {
-      throw BXRE_JARFAIL_X.get(info, ex);
+      throw REPO_PARSE_X_X.get(info, io.name(), ex);
     }
   }
 }

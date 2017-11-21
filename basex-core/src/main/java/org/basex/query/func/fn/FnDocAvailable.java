@@ -21,7 +21,7 @@ public final class FnDocAvailable extends Docs {
       if(error != null && error.code.matches("^.*\\d+$")) {
         final int num = Strings.toInt(error.code.replaceAll("^.*(\\d+)$", "$1"));
         if(error.is(ErrType.FODC) && (num == 2 || num == 4 || num == 5) ||
-           error.is(ErrType.BXDB) && num == 6) return Bln.FALSE;
+           error.is(ErrType.DB) && num == 6) return Bln.FALSE;
       }
       throw ex;
     }

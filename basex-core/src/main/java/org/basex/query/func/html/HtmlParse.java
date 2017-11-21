@@ -28,7 +28,7 @@ public final class HtmlParse extends StandardFunc {
     try {
       return new DBNode(new org.basex.build.html.HtmlParser(new IOContent(in), opts, hopts));
     } catch(final IOException ex) {
-      throw BXHL_IO_X.get(info, ex);
+      throw HTML_PARSE_X.get(info, ex);
     }
   }
 }

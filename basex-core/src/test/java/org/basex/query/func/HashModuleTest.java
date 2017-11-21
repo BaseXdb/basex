@@ -61,6 +61,6 @@ public final class HashModuleTest extends AdvancedQueryTest {
       query(_FILE_DELETE.args(file));
     }
 
-    error(_HASH_HASH.args("", ""), HASH_ALG_X);
+    error(_HASH_HASH.args("", ""), HASH_ALGORITHM_X);
   }
 }

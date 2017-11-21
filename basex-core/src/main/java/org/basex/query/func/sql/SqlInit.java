@@ -19,7 +19,7 @@ public final class SqlInit extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
     final String driver = string(toToken(exprs[0], qc));
-    if(Reflect.find(driver) == null) throw BXSQ_DRIVER_X.get(info, driver);
+    if(Reflect.find(driver) == null) throw SQL_INIT_X.get(info, driver);
     return null;
   }
 }

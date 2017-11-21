@@ -42,7 +42,7 @@ public class ArchiveExtractTo extends ArchiveFn {
         }
       }
     } catch(final IOException ex) {
-      throw ARCHIVE_FAIL_X.get(info, ex);
+      throw ARCHIVE_ERROR_X.get(info, ex);
     }
     return null;
   }
