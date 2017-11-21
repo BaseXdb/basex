@@ -31,7 +31,7 @@ public class SqlExecute extends SqlFn {
   /** Statement Options */
   public static class StatementOptions extends Options {
     /** QueryTimeout. */
-    public static final NumberOption QUERY_TIMEOUT = new NumberOption("query-timeout", 0);
+    public static final NumberOption QUERY_TIMEOUT = new NumberOption("timeout", 0);
   }
 
   @Override
@@ -47,6 +47,8 @@ public class SqlExecute extends SqlFn {
         setStatementOptions(stmt, options);
       }
       return iter(stmt, true, stmt.execute(query));
+    } catch(final SQLTimeoutException ex) {
+      throw SQL_TIMEOUT_X.get(info, ex);
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }

@@ -390,6 +390,8 @@ public enum QueryError {
   /** Error code. */
   SQL_ERROR_X(SQL, "error", "An SQL exception occurred: %"),
   /** Error code. */
+  SQL_TIMEOUT_X(SQL, "timeout", "A query timeout has occurred: %"),
+  /** Error code. */
   SQL_ID1_X(SQL, "id", "No connection with id %."),
   /** Error code. */
   SQL_ID2_X(SQL, "id", "No prepared statement with id %."),
