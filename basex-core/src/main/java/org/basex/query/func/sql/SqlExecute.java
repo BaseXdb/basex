@@ -13,6 +13,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Functions on relational databases.
@@ -27,6 +28,11 @@ public class SqlExecute extends SqlFn {
   private static final QNm Q_COLUMN = new QNm(SQL_PREFIX, "column", SQL_URI);
   /** Name. */
   private static final String NAME = "name";
+  /** Statement Options */
+  public static class StatementOptions extends Options {
+    /** QueryTimeout. */
+    public static final NumberOption QUERY_TIMEOUT = new NumberOption("timeout", 0);
+  }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
@@ -36,7 +42,13 @@ public class SqlExecute extends SqlFn {
 
     try {
       final Statement stmt = conn.createStatement();
+      if(exprs.length > 2) {
+        final StatementOptions options = toOptions(2, new StatementOptions(), qc);
+        setStatementOptions(stmt, options);
+      }
       return iter(stmt, true, stmt.execute(query));
+    } catch(final SQLTimeoutException ex) {
+      throw SQL_TIMEOUT_X.get(info, ex);
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }
@@ -108,5 +120,17 @@ public class SqlExecute extends SqlFn {
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }
+  }
+
+  /**
+   * set options to the statement
+   * @param stmt statement
+   * @param options options
+   * @throws SQLException sql exception
+   */
+  final void setStatementOptions(final Statement stmt, final StatementOptions options)
+      throws SQLException {
+    int queryTimeout = options.get(StatementOptions.QUERY_TIMEOUT);
+    if (queryTimeout > -1) stmt.setQueryTimeout(queryTimeout);
   }
 }

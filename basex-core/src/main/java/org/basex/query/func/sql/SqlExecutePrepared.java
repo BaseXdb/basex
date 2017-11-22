@@ -66,6 +66,11 @@ public final class SqlExecutePrepared extends SqlExecute {
 
     try {
       try {
+        // set additition statement options
+        if(exprs.length > 2) {
+          final StatementOptions options = toOptions(2, new StatementOptions(), qc);
+          setStatementOptions(stmt, options);
+        }
         // Check if number of parameters equals number of place holders
         final int ph = stmt.getParameterMetaData().getParameterCount();
         if(n != ph) throw SQL_PARAMETERS_X_X.get(info, n, ph);
