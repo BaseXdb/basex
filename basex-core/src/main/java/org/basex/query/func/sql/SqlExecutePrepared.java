@@ -11,7 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Functions on relational databases.
@@ -63,14 +63,11 @@ public final class SqlExecutePrepared extends SqlExecute {
       if(!params.qname().eq(Q_PARAMETERS)) throw INVALIDOPTION_X.get(info, params.qname().local());
       n = countParams(params);
     }
+    final StatementOptions options = toOptions(2, new StatementOptions(), qc);
 
     try {
+      stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       try {
-        // set additition statement options
-        if(exprs.length > 2) {
-          final StatementOptions options = toOptions(2, new StatementOptions(), qc);
-          setStatementOptions(stmt, options);
-        }
         // Check if number of parameters equals number of place holders
         final int ph = stmt.getParameterMetaData().getParameterCount();
         if(n != ph) throw SQL_PARAMETERS_X_X.get(info, n, ph);

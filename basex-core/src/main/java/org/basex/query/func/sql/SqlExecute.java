@@ -28,10 +28,11 @@ public class SqlExecute extends SqlFn {
   private static final QNm Q_COLUMN = new QNm(SQL_PREFIX, "column", SQL_URI);
   /** Name. */
   private static final String NAME = "name";
-  /** Statement Options */
+
+  /** Statement Options. */
   public static class StatementOptions extends Options {
-    /** QueryTimeout. */
-    public static final NumberOption QUERY_TIMEOUT = new NumberOption("timeout", 0);
+    /** Query timeout. */
+    public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
   }
 
   @Override
@@ -39,13 +40,11 @@ public class SqlExecute extends SqlFn {
     checkCreate(qc);
     final Connection conn = connection(qc);
     final String query = string(toToken(exprs[1], qc));
+    final StatementOptions options = toOptions(2, new StatementOptions(), qc);
 
     try {
       final Statement stmt = conn.createStatement();
-      if(exprs.length > 2) {
-        final StatementOptions options = toOptions(2, new StatementOptions(), qc);
-        setStatementOptions(stmt, options);
-      }
+      stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       return iter(stmt, true, stmt.execute(query));
     } catch(final SQLTimeoutException ex) {
       throw SQL_TIMEOUT_X.get(info, ex);
@@ -120,17 +119,5 @@ public class SqlExecute extends SqlFn {
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }
-  }
-
-  /**
-   * set options to the statement
-   * @param stmt statement
-   * @param options options
-   * @throws SQLException sql exception
-   */
-  final void setStatementOptions(final Statement stmt, final StatementOptions options)
-      throws SQLException {
-    int queryTimeout = options.get(StatementOptions.QUERY_TIMEOUT);
-    if (queryTimeout > -1) stmt.setQueryTimeout(queryTimeout);
   }
 }
