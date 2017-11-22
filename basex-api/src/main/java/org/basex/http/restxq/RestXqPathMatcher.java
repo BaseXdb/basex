@@ -208,7 +208,7 @@ final class RestXqPathMatcher {
    * @return query exception
    */
   private static QueryException error(final InputInfo ii, final String msg, final Object... e) {
-    return QueryError.BASX_RESTXQ_X.get(ii, Util.info(msg, e));
+    return QueryError.BASEX_RESTXQ_X.get(ii, Util.info(msg, e));
   }
 
   /** Character iterator. */

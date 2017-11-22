@@ -67,7 +67,7 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Updates tmp = qc.updates();
+    final Updates upd = qc.updates();
     final Updates updates = new Updates(true);
     qc.updates = updates;
 
@@ -87,13 +87,13 @@ public final class Transform extends Arr {
         updates.addData(it.data());
       }
       final Value v = qc.value(exprs[0]);
-      if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
+      if(!v.isEmpty()) throw UPMODIFY.get(info);
 
       updates.prepare(qc);
       updates.apply(qc);
       return qc.value(exprs[1]);
     } finally {
-      qc.updates = tmp;
+      qc.updates = upd;
     }
   }
 

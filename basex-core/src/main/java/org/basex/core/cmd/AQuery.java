@@ -110,7 +110,7 @@ public abstract class AQuery extends Command {
         error = ex.getMessage();
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        error = BASX_STACKOVERFLOW.desc;
+        error = BASEX_OVERFLOW.desc;
       } catch(final RuntimeException ex) {
         extError("");
         throw ex;

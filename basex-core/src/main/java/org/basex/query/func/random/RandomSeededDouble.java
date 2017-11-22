@@ -20,7 +20,7 @@ public final class RandomSeededDouble extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final long seed = toLong(exprs[0], qc);
     final long num = toLong(exprs[1], qc);
-    if(num < 0) throw BXRA_NEGATIVE_X.get(info, num);
+    if(num < 0) throw RANGE_NEGATIVE_X.get(info, num);
 
     return new Iter() {
       final Random r = new Random(seed);

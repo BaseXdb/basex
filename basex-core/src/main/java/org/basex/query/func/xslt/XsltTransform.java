@@ -53,7 +53,7 @@ public class XsltTransform extends XsltFn {
       return transform(in, xsl, opts.free(), xopts);
     } catch(final TransformerException ex) {
       Util.debug(ex);
-      throw BXSL_ERROR_X.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
+      throw XSLT_ERROR_X.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
     } finally {
       System.setErr(tmp);
     }

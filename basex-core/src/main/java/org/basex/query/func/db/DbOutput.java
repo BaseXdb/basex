@@ -19,7 +19,7 @@ public final class DbOutput extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Updates updates = qc.updates();
-    if(updates.mod instanceof TransformModifier) throw BASX_DBTRANSFORM.get(info);
+    if(updates.mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);
     final Iter iter = qc.iter(exprs[0]);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();

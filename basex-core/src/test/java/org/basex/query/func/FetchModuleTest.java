@@ -40,7 +40,7 @@ public final class FetchModuleTest extends AdvancedQueryTest {
         " map { 'parser':'csv','csvparser': map { 'header': true() } }") + "//City"), 3);
     query(COUNT.args(_FETCH_XML.args(CSV,
         " map { 'parser':'csv','csvparser': map { 'header': 'true' } }") + "//City"), 3);
-    error(_FETCH_XML.args(XML, " map { 'parser': 'unknown' }"), BASX_VALUE_X_X);
+    error(_FETCH_XML.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X_X);
     error(_FETCH_XML.args(XML + 'x'), FETCH_OPEN_X);
   }
 

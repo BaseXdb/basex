@@ -20,7 +20,7 @@ public final class RandomSeededInteger extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final long seed = toLong(exprs[0], qc);
     final long num = toLong(exprs[1], qc);
-    if(num < 0) throw BXRA_NEGATIVE_X.get(info, num);
+    if(num < 0) throw RANGE_NEGATIVE_X.get(info, num);
     final long max = exprs.length > 2 ? toLong(exprs[2], qc) : Integer.MAX_VALUE;
     if(max < 1 || max > Integer.MAX_VALUE) throw RANDOM_BOUNDS_X.get(info, max);
 

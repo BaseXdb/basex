@@ -146,6 +146,7 @@ public final class QueryResources {
     }
 
     // open and register database
+    if(!ctx.perm(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
     try {
       return addData(Open.open(name, ctx, ctx.options));
     } catch(final IOException ex) {
@@ -174,7 +175,7 @@ public final class QueryResources {
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
-    throw (docs.isEmpty() ? BASX_NODOC_X : BASX_SINGLE_X).get(info, qi.original);
+    throw (docs.isEmpty() ? BASEX_DBPATH1_X : BASEX_DBPATH2_X).get(info, qi.original);
   }
 
   /**
@@ -352,34 +353,23 @@ public final class QueryResources {
       if(Prop.CASE ? name.equals(dbName) : name.equalsIgnoreCase(dbName)) return data;
     }
 
-    // open new database
-    Data data = open(qi);
-    if(data != null) return data;
-
-    // otherwise, create new instance
-    data = create(qi, single, info);
-    // reset database path: indicates that all documents were parsed
-    qi.dbPath = "";
-    return data;
-
-  }
-
-  /**
-   * Tries to open the addressed database, or returns {@code null}.
-   * @param input query input
-   * @return data reference
-   */
-  private Data open(final QueryInput input) {
-    final String dbName = input.dbName;
-    if(dbName != null) {
+    // try to open existing database
+    final String name = qi.dbName;
+    if(name != null) {
       try {
         final Context ctx = qc.context;
-        return addData(Open.open(dbName, ctx, ctx.options));
+        return addData(Open.open(name, ctx, ctx.options));
       } catch(final IOException ex) {
         Util.debug(ex);
       }
     }
-    return null;
+
+    // otherwise, create new instance
+    final Data data = create(qi, single, info);
+    // reset database path: indicates that all documents were parsed
+    qi.dbPath = "";
+    return data;
+
   }
 
   /**

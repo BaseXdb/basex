@@ -43,7 +43,7 @@ public class QueryException extends Exception {
   private boolean catchable = true;
 
   /**
-   * Constructor, specifying an exception or error. {@link QueryError#BASX_GENERIC_X} will be set
+   * Constructor, specifying an exception or error. {@link QueryError#BASEX_ERROR_X} will be set
    * as error code.
    * @param cause exception or error
    */
@@ -53,12 +53,12 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Constructor, specifying a simple error message. {@link QueryError#BASX_GENERIC_X} will be set
+   * Constructor, specifying a simple error message. {@link QueryError#BASEX_ERROR_X} will be set
    * as error code.
    * @param message error message
    */
   public QueryException(final String message) {
-    this(null, BASX_GENERIC_X, message);
+    this(null, BASEX_ERROR_X, message);
   }
 
   /**

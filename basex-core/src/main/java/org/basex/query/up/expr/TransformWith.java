@@ -83,7 +83,7 @@ public final class TransformWith extends Arr {
         updates.addData(it.data());
 
         final Value v = qc.value(exprs[1]);
-        if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
+        if(!v.isEmpty()) throw UPMODIFY.get(info);
 
         updates.prepare(qc);
         updates.apply(qc);

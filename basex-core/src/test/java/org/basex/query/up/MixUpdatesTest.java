@@ -25,8 +25,8 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Transform expression containing a simple expression. */
   @Test
   public void transSimple() {
-    error("<a/> update ('')", BASX_UPMODIFY);
-    error("copy $a := <a/> modify ('') return $a", BASX_UPMODIFY);
+    error("<a/> update ('')", UPMODIFY);
+    error("copy $a := <a/> modify ('') return $a", UPMODIFY);
   }
 
   /** Update test. */
@@ -87,7 +87,7 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void functionItem() {
-    error("let $x := <a>a</a> update () return (delete node $x/text(), [$x])", BASX_FITEM_X);
+    error("let $x := <a>a</a> update () return (delete node $x/text(), [$x])", BASEX_FUNCTION_X);
   }
 
   /** Test method. */

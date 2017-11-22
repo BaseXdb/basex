@@ -443,23 +443,23 @@ public class QueryParser extends InputParser {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
           if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
-            throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASX_ANNOT_X_X).get(
+            throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASEX_ANNOTATION1_X_X).get(
                 info, '%', name.string());
           }
           ann = new Ann(info, name, items.finish());
 
         } else {
           // check if annotation is specified more than once
-          if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.id());
+          if(sig.single && anns.contains(sig)) throw BASEX_ANNOTATION3_X_X.get(info, '%', sig.id());
 
           final long arity = items.size();
           if(arity < sig.minMax[0] || arity > sig.minMax[1])
-            throw BASX_ANNNUM_X_X.get(info, sig, arguments(arity));
+            throw BASEX_ANNOTATION2_X_X.get(info, sig, arguments(arity));
           final int al = sig.args.length;
           for(int a = 0; a < arity; a++) {
             final SeqType st = sig.args[Math.min(al - 1, a)];
             final Item it = items.get(a);
-            if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
+            if(!st.instance(it)) throw BASEX_ANNOTATION_X_X_X.get(info, sig, st, it.seqType());
           }
           ann = new Ann(info, sig, items.finish());
         }
@@ -551,11 +551,11 @@ public class QueryParser extends InputParser {
 
     } else if(eq(qnm.uri(), DB_URI)) {
       // project-specific declaration
-      if(module != null) throw error(BASX_OPTDECL_X, qnm.local());
+      if(module != null) throw error(BASEX_OPTIONS3_X, qnm.local());
 
       final String ukey = name.toUpperCase(Locale.ENGLISH);
       final Option<?> opt = qc.context.options.option(ukey);
-      if(opt == null) throw error(BASX_OPTIONS_X, ukey);
+      if(opt == null) throw error(BASEX_OPTIONS1_X, ukey);
       // cache old value (to be reset after query evaluation)
       qc.staticOpts.put(opt, qc.context.options.get(opt));
       qc.tempOpts.add(name).add(string(val));
@@ -572,7 +572,7 @@ public class QueryParser extends InputParser {
             qc.writeLocks.add(Locking.USER_PREFIX + string(lock).trim());
           break;
         default:
-          throw error(BASX_OPTIONS_X, name);
+          throw error(BASEX_OPTIONS1_X, name);
       }
     }
     // ignore unknown options
@@ -1807,7 +1807,7 @@ public class QueryParser extends InputParser {
         // project-specific declaration
         final String key = string(uc(name.local()));
         final Option<?> opt = qc.context.options.option(key);
-        if(opt == null) throw error(BASX_OPTIONS_X, key);
+        if(opt == null) throw error(BASEX_OPTIONS1_X, key);
         el.add(new DBPragma(name, opt, value));
       } else if(eq(name.prefix(), BASEX_PREFIX)) {
         // project-specific declaration

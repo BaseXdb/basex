@@ -26,10 +26,10 @@ final class DatabaseModifier extends ContextModifier {
     // check permissions
     if(update instanceof NameUpdate) {
       if(!qc.context.perm(Perm.CREATE, ((NameUpdate) update).name()))
-        throw BASX_PERM_X.get(update.info(), Perm.CREATE);
+        throw BASEX_PERMISSION_X.get(update.info(), Perm.CREATE);
     } else if(update instanceof DataUpdate) {
       if(!qc.context.perm(Perm.WRITE, ((DataUpdate) update).data().meta.name))
-        throw BASX_PERM_X.get(update.info(), Perm.WRITE);
+        throw BASEX_PERMISSION_X.get(update.info(), Perm.WRITE);
     }
     super.add(update, qc);
   }

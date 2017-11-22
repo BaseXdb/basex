@@ -21,42 +21,41 @@ public enum QueryError {
   // BaseX errors
 
   /** Error code. */
+  BASEX_ANNOTATION1_X_X(BASEX, "annotation", "Annotation %% is unknown."),
+  /** Error code. */
+  BASEX_ANNOTATION2_X_X(BASEX, "annotation", "%: % supplied."),
+  /** Error code. */
+  BASEX_ANNOTATION3_X_X(BASEX, "annotation", "Annotation %% was declared twice."),
+  /** Error code. */
+  BASEX_ANNOTATION_X_X_X(BASEX, "annotation", "%: % expected, % found."),
+  /** Error code. */
+  BASEX_DBPATH1_X(BASEX, "doc", "Database path '%' yields no documents."),
+  /** Error code. */
+  BASEX_DBPATH2_X(BASEX, "doc", "Database path '%' yields more than one document."),
+  /** Error code. */
+  BASEX_FUNCTION_X(BASEX, "function", "Function items cannot be cached: %."),
+  /** Error code. */
+  BASEX_ERROR_X(BASEX, "error", "%"),
+  /** Error code. */
   BASEX_HTTP(BASEX, "http", "HTTP connection required."),
-
   /** Error code. */
-  BASX_GENERIC_X(BASEX, 0, "%"),
+  BASEX_OPTIONS1_X(BASEX, "options", "Unknown database option: %."),
   /** Error code. */
-  BASX_PERM_X(BASEX, 1, "% permission required."),
+  BASEX_OPTIONS2_X(BASEX, "options", "%"),
   /** Error code. */
-  BASX_OPTIONS_X(BASEX, 2, "Unknown database option '%'."),
+  BASEX_OPTIONS3_X(BASEX, "options", "Database option not allowed in library module: %."),
   /** Error code. */
-  BASX_VALUE_X_X(BASEX, 2, "Database option '%' cannot be set to '%'."),
+  BASEX_OPTIONS_X_X(BASEX, "options", "Database option '%' cannot be set to '%'."),
   /** Error code. */
-  BASX_WHICH_X(BASEX, 2, "%"),
+  BASEX_OVERFLOW(BASEX, "overflow", "Stack Overflow: Try tail recursion?"),
   /** Error code. */
-  BASX_RESTXQ_X(BASEX, 3, "%"),
+  BASEX_PERMISSION_X(BASEX, "permission", "No % permission."),
   /** Error code. */
-  BASX_DBTRANSFORM(BASEX, 4, "No database updates allowed within transform expression."),
+  BASEX_PERMISSION_X_X(BASEX, "permission", "No % permission: %."),
   /** Error code. */
-  BASX_STACKOVERFLOW(BASEX, 5, "Stack Overflow: Try tail recursion?"),
+  BASEX_RESTXQ_X(BASEX, "restxq", "%"),
   /** Error code. */
-  BASX_ANNOT_X_X(BASEX, 6, "Annotation %% is unknown."),
-  /** Error code. */
-  BASX_ANNNUM_X_X(BASEX, 6, "%: % supplied."),
-  /** Error code. */
-  BASX_ANNTYPE_X_X_X(BASEX, 6, "%: % expected, % found."),
-  /** Error code. */
-  BASX_TWICE_X_X(BASEX, 6, "Annotation %% was declared twice."),
-  /** Error code. */
-  BASX_FITEM_X(BASEX, 8, "Function items cannot be cached: %."),
-  /** Error code. */
-  BASX_UPMODIFY(BASEX, 9, "Transformations must all be updating or return an empty sequence."),
-  /** Error code. */
-  BASX_OPTDECL_X(BASEX, 10, "Database option not allowed in library module: %."),
-  /** Error code. */
-  BASX_NODOC_X(BASEX, 11, "Database path '%' yields no documents."),
-  /** Error code. */
-  BASX_SINGLE_X(BASEX, 11, "Database path '%' points to more than one document."),
+  BASEX_UPDATE(BASEX, "update", "Update target was not created by transform expression."),
 
   // Admin Module
 
@@ -65,7 +64,7 @@ public enum QueryError {
   /** Error code. */
   ADMIN_TODAY(ADMIN, "today", "Today's log file cannot be deleted."),
   /** Error code. */
-  ADMIN_TYPE_X(ADMIN, "type", "Log type must consist of uppercase letters: \"%\"."),
+  ADMIN_TYPE_X(ADMIN, "type", "Log type must consist of uppercase letters: %."),
 
   // Archive Module
 
@@ -346,7 +345,7 @@ public enum QueryError {
   /** Error code. */
   RANDOM_BOUNDS_X(RANDOM, "bounds", "Maximum value is out of bounds: %."),
   /** Error code. */
-  BXRA_NEGATIVE_X(RANDOM, "negative", "Number of values is negative: %."),
+  RANGE_NEGATIVE_X(RANDOM, "negative", "Number of values is negative: %."),
 
   // Repository Module
 
@@ -491,7 +490,7 @@ public enum QueryError {
   // XSLT Module
 
   /** Error code. */
-  BXSL_ERROR_X(XSLT, "error", "%"),
+  XSLT_ERROR_X(XSLT, "error", "%"),
 
   // ZIP Module
 
@@ -524,7 +523,7 @@ public enum QueryError {
   ARRAYNEG_X(FOAY, 2, "Length is negative: %."),
 
   /** Error code. */
-  INVALUE_X_X(FOCA, 2, "Cannot cast to %: \"%\"."),
+  INVALUE_X_X(FOCA, 2, "Cannot cast to %: %."),
   /** Error code. */
   INTRANGE_X(FOCA, 3, "Integer value out of range: %."),
   /** Error code. */
@@ -550,7 +549,7 @@ public enum QueryError {
   /** Error code. */
   WHICHRES_X(FODC, 2, "Resource '%' does not exist."),
   /** Error code. */
-  RESDIR_X(FODC, 2, "URI '%' points to a directory."),
+  RESDIR_X(FODC, 2, "URI '%' points to directory."),
   /** Error code. */
   INVCOLL_X(FODC, 4, "Invalid collection URI: '%'."),
   /** Error code. */
@@ -1258,7 +1257,7 @@ public enum QueryError {
   /** Error code. */
   UPNOPAR_X(XUDY, 9, "Target has no parent: %."),
   /** Error code. */
-  UPNOTCOPIED_X(XUDY, 14, "Node was not created by copy clause: %."),
+  UPNOTCOPIED_X(XUDY, 14, "Node was not created by transform expression: %."),
   /** Error code. */
   UPMULTREN_X(XUDY, 15, "Node can only be renamed once: %."),
   /** Error code. */
@@ -1292,7 +1291,7 @@ public enum QueryError {
   UPCTX(XUST, 1, "Context value may not declare an updating expression."),
 
   /** Error code. */
-  UPMODIFY(XUST, 2, "Expressions must all be updating or return an empty sequence."),
+  UPMODIFY(XUST, 2, "Transformations must all be updating or return an empty sequence."),
   /** Error code. */
   UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** Error code. */
@@ -1413,34 +1412,34 @@ public enum QueryError {
   public enum ErrType {
     // Project-specific errors
 
-    /** Error type. */ ADMIN(ADMIN_PREFIX, ADMIN_URI),
-    /** Error type. */ BASEX(BASEX_PREFIX, BASEX_URI),
-    /** Error type. */ ARCHIVE(ADMIN_PREFIX, ARCHIVE_URI),
-    /** Error type. */ CLIENT(CLIENT_PREFIX, CLIENT_URI),
-    /** Error type. */ CONVERT(CONVERT_PREFIX, CONVERT_URI),
-    /** Error type. */ CSV(CSV_PREFIX, CSV_URI),
-    /** Error type. */ DB(DB_PREFIX, DB_URI),
-    /** Error type. */ FETCH(FETCH_PREFIX, FETCH_URI),
-    /** Error type. */ FT(FT_PREFIX, FT_URI),
-    /** Error type. */ HTML(HTML_PREFIX, HTML_URI),
-    /** Error type. */ HASH(HASH_PREFIX, HASH_URI),
-    /** Error type. */ INSPECT(INSPECT_PREFIX, INSPECT_URI),
-    /** Error type. */ JOBS(JOBS_PREFIX, JOBS_URI),
-    /** Error type. */ JSON(JSON_PREFIX, JSON_URI),
-    /** Error type. */ OUTPUT(OUTPUT_PREFIX, OUTPUT_URI),
-    /** Error type. */ PROC(PROC_PREFIX, PROC_URI),
-    /** Error type. */ RANDOM(RANDOM_PREFIX, RANDOM_URI),
-    /** Error type. */ REPO(REPO_PREFIX, REPO_URI),
-    /** Error type. */ SESSION(SESSION_PREFIX, SESSION_URI),
+    /** Error type. */ ADMIN(ADMIN_PREFIX,       ADMIN_URI),
+    /** Error type. */ BASEX(BASEX_PREFIX,       BASEX_URI),
+    /** Error type. */ ARCHIVE(ADMIN_PREFIX,     ARCHIVE_URI),
+    /** Error type. */ CLIENT(CLIENT_PREFIX,     CLIENT_URI),
+    /** Error type. */ CONVERT(CONVERT_PREFIX,   CONVERT_URI),
+    /** Error type. */ CSV(CSV_PREFIX,           CSV_URI),
+    /** Error type. */ DB(DB_PREFIX,             DB_URI),
+    /** Error type. */ FETCH(FETCH_PREFIX,       FETCH_URI),
+    /** Error type. */ FT(FT_PREFIX,             FT_URI),
+    /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
+    /** Error type. */ HASH(HASH_PREFIX,         HASH_URI),
+    /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
+    /** Error type. */ JOBS(JOBS_PREFIX,         JOBS_URI),
+    /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
+    /** Error type. */ OUTPUT(OUTPUT_PREFIX,     OUTPUT_URI),
+    /** Error type. */ PROC(PROC_PREFIX,         PROC_URI),
+    /** Error type. */ RANDOM(RANDOM_PREFIX,     RANDOM_URI),
+    /** Error type. */ REPO(REPO_PREFIX,         REPO_URI),
+    /** Error type. */ SESSION(SESSION_PREFIX,   SESSION_URI),
     /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
-    /** Error type. */ SQL(SQL_PREFIX, SQL_URI),
-    /** Error type. */ UNIT(UNIT_PREFIX, UNIT_URI),
-    /** Error type. */ UTIL(UTIL_PREFIX, UTIL_URI),
-    /** Error type. */ USER(USER_PREFIX, USER_URI),
+    /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
+    /** Error type. */ UNIT(UNIT_PREFIX,         UNIT_URI),
+    /** Error type. */ UTIL(UTIL_PREFIX,         UTIL_URI),
+    /** Error type. */ USER(USER_PREFIX,         USER_URI),
     /** Error type. */ VALIDATE(VALIDATE_PREFIX, VALIDATE_URI),
-    /** Error type. */ WEB(WEB_PREFIX, WEB_URI),
-    /** Error type. */ XQUERY(XQUERY_PREFIX, XQUERY_URI),
-    /** Error type. */ XSLT(XSLT_PREFIX, XSLT_URI),
+    /** Error type. */ WEB(WEB_PREFIX,           WEB_URI),
+    /** Error type. */ XQUERY(XQUERY_PREFIX,     XQUERY_URI),
+    /** Error type. */ XSLT(XSLT_PREFIX,         XSLT_URI),
 
     // EXPath errors
 

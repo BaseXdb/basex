@@ -64,7 +64,7 @@ public abstract class JavaFunction extends Arr {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     // check permission
-    if(!qc.context.user().has(perm)) throw BASX_PERM_X.get(info, perm);
+    if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
 
     final int es = exprs.length;
     final Value[] args = new Value[es];

@@ -268,7 +268,7 @@ public final class QueryContext extends Job implements Closeable {
           context.options.assign(key.toUpperCase(Locale.ENGLISH), val);
         } catch(final BaseXException ex) {
           Util.debug(ex);
-          throw BASX_VALUE_X_X.get(null, key, val);
+          throw BASEX_OPTIONS_X_X.get(null, key, val);
         }
       }
       // set tail call option after assignment database option
@@ -290,8 +290,9 @@ public final class QueryContext extends Job implements Closeable {
         // cache the initial context nodes
         final DBNodes nodes = context.current();
         if(nodes != null) {
-          if(!context.perm(Perm.READ, nodes.data().meta.name))
-            throw BASX_PERM_X.get(null, Perm.READ);
+          final String name = nodes.data().meta.name;
+          if(!context.perm(Perm.READ, name))
+            throw BASEX_PERMISSION_X_X.get(null, Perm.READ, name);
           focus.value = resources.compile(nodes);
         }
       }
@@ -309,7 +310,7 @@ public final class QueryContext extends Job implements Closeable {
         else funcs.compile(cc);
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        throw BASX_STACKOVERFLOW.get(null, ex);
+        throw BASEX_OVERFLOW.get(null, ex);
       }
 
       info.runtime = true;
@@ -356,7 +357,7 @@ public final class QueryContext extends Job implements Closeable {
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw BASX_STACKOVERFLOW.get(null);
+      throw BASEX_OVERFLOW.get(null);
     }
   }
 
@@ -375,7 +376,7 @@ public final class QueryContext extends Job implements Closeable {
     for(int c = 0; c < cs; c++) {
       final Item it = results.get(c);
       // all updates are performed on database nodes
-      if(it instanceof FItem) throw BASX_FITEM_X.get(null, it);
+      if(it instanceof FItem) throw BASEX_FUNCTION_X.get(null, it);
       final Data data = it.data();
       if(data != null && (datas.contains(data) ||
           !data.inMemory() && dbs.contains(data.meta.name))) {

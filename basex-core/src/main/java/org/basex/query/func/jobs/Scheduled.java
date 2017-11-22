@@ -225,7 +225,7 @@ public final class Scheduled extends Job implements Runnable {
     final ValueBuilder vb = new ValueBuilder();
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      if(it instanceof FItem) throw BASX_FITEM_X.get(null, it);
+      if(it instanceof FItem) throw BASEX_FUNCTION_X.get(null, it);
       final Data data = it.data();
       if(data != null && !data.inMemory()) it = ((DBNode) it).dbNodeCopy(ctx.options);
       vb.add(it);

@@ -261,8 +261,8 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_OUTPUT.args(" ('x','y')"), "x\ny");
     query(_DB_OUTPUT.args(" <a/>"), "<a/>");
     error(_DB_OUTPUT.args("x") + ",1", UPALL);
-    error(_DB_OUTPUT.args(" count#1"), BASX_FITEM_X);
-    error("copy $c := <a/> modify " + _DB_OUTPUT.args("x") + " return $c", BASX_DBTRANSFORM);
+    error(_DB_OUTPUT.args(" count#1"), BASEX_FUNCTION_X);
+    error("copy $c := <a/> modify " + _DB_OUTPUT.args("x") + " return $c", BASEX_UPDATE);
   }
 
   /** Test method. */
@@ -337,9 +337,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_ADD.args(NAME, CSV, "csv.xml",
         " map { 'parser':'csv','csvparser': map { 'header': ('true','false') } }"), INVALIDOPT_X);
     error(_DB_ADD.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': map { 'headr': 'true' } }"), BASX_WHICH_X);
+        " map { 'parser':'csv','csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS2_X);
     error(_DB_ADD.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': 'headr=true' }"), BASX_WHICH_X);
+        " map { 'parser':'csv','csvparser': 'headr=true' }"), BASEX_OPTIONS2_X);
   }
 
   /** Test method. */
@@ -458,13 +458,13 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_OPEN.args(NAME), "<a> </a>");
 
     // specify unknown or invalid options
-    error(_DB_CREATE.args(NAME, " ()", " ()", " map {'xyz':'abc'}"), BASX_OPTIONS_X);
+    error(_DB_CREATE.args(NAME, " ()", " ()", " map {'xyz':'abc'}"), BASEX_OPTIONS1_X);
     error(_DB_CREATE.args(NAME, " ()", " ()", " map {'" + lc(MainOptions.MAXLEN) + "':-1}"),
-        BASX_VALUE_X_X);
+        BASEX_OPTIONS_X_X);
     error(_DB_CREATE.args(NAME, " ()", " ()", " map {'" + lc(MainOptions.MAXLEN) + "':'a'}"),
-        BASX_VALUE_X_X);
+        BASEX_OPTIONS_X_X);
     error(_DB_CREATE.args(NAME, " ()", " ()", " map {'" + lc(MainOptions.TEXTINDEX) + "':'nope'}"),
-        BASX_VALUE_X_X);
+        BASEX_OPTIONS_X_X);
   }
 
   /** Test method. */
@@ -624,15 +624,15 @@ public final class DbModuleTest extends AdvancedQueryTest {
     assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
 
     // check invalid options
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'xyz': 'abc' }"), BASX_OPTIONS_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { 'xyz': 'abc' }"), BASEX_OPTIONS1_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
-        BASX_OPTIONS_X);
+        BASEX_OPTIONS1_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
-        BASX_VALUE_X_X);
+        BASEX_OPTIONS_X_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
-        BASX_VALUE_X_X);
+        BASEX_OPTIONS_X_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
-        BASX_VALUE_X_X);
+        BASEX_OPTIONS_X_X);
 
     // check if optimize call adopts original options
     query(_DB_OPTIMIZE.args(NAME));

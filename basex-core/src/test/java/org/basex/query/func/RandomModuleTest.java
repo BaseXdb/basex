@@ -46,7 +46,7 @@ public final class RandomModuleTest extends AdvancedQueryTest {
     final int s = 12345;
     query(_RANDOM_SEEDED_INTEGER.args(s, 1), new Random(s).nextInt());
     query(_RANDOM_SEEDED_INTEGER.args(s, 1, 1000000), new Random(s).nextInt(1000000));
-    error(_RANDOM_SEEDED_INTEGER.args(1, -1), QueryError.BXRA_NEGATIVE_X);
+    error(_RANDOM_SEEDED_INTEGER.args(1, -1), QueryError.RANGE_NEGATIVE_X);
     error(_RANDOM_SEEDED_INTEGER.args(1, 1, -1), QueryError.RANDOM_BOUNDS_X);
     error(_RANDOM_SEEDED_INTEGER.args(1, 1, 8000000000L), QueryError.RANDOM_BOUNDS_X);
   }
