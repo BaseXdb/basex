@@ -153,7 +153,7 @@ public abstract class TreeSeq extends Seq {
    * If {@code from == 0 && to == arr.length}, the original items are returned.
    * @param items input sequence
    * @param from first index, inclusive (may be negative)
-   * @param to last index, exclusive (may be greater than {@code arr.length})
+   * @param to last index, exclusive (may be greater than length of input sequence)
    * @return resulting items
    */
   static Item[] slice(final Item[] items, final int from, final int to) {

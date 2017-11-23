@@ -99,7 +99,7 @@ public abstract class IdPreMapBulkTestBase {
 
     /**
      * Constructor.
-     * @param list initial list of ids.
+     * @param list initial list of ids
      */
     public DummyIdPreMap(final int[] list) {
       super(list.length - 1);

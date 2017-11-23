@@ -55,6 +55,8 @@ public final class UtilItemAt extends StandardFunc {
       if(dp != ps || ps < 1) return Empty.SEQ;
       // pre-evaluate single expression with static position
       if(st.zeroOrOne()) return ps == 1 ? ex : Empty.SEQ;
+      // check for large values
+      if(ex instanceof Value) return ps <= ex.size() ? ((Value) ex).itemAt(ps - 1) : Empty.SEQ;
     }
     return this;
   }

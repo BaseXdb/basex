@@ -300,7 +300,7 @@ final class Unit {
 
   /**
    * Returns the specified function from the given query context.
-   * @param qctx query context.
+   * @param qctx query context
    * @param func function to be found
    * @return function
    */

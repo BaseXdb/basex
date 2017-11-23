@@ -12,7 +12,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
@@ -226,8 +225,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Value subSeq(final long start, final long len) {
-    return len == 0 ? Empty.SEQ : this;
+  protected Value subSeq(final long start, final long len) {
+    throw Util.notExpected();
   }
 
   // Overridden by B64Stream, StrStream, Map and Array.

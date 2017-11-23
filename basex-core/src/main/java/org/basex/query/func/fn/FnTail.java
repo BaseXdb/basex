@@ -40,7 +40,7 @@ public final class FnTail extends StandardFunc {
       }
       @Override
       public Value value(final QueryContext q) throws QueryException {
-        return is < 0 ? super.value(q) : iter.value(q).subSeq(1, is);
+        return is < 0 ? super.value(q) : iter.value(q).subSequence(1, is);
       }
     };
   }
@@ -50,13 +50,15 @@ public final class FnTail extends StandardFunc {
     // return empty sequence if value has 0 or 1 items
     final Value val = qc.value(exprs[0]);
     final long vs = val.size() - 1;
-    return vs < 1 ? Empty.SEQ : val.subSeq(1, vs);
+    return vs < 1 ? Empty.SEQ : val.subSequence(1, vs);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr ex = exprs[0];
     final long sz = ex.size() - 1;
+    if(ex instanceof Value) return ((Value) ex).subSequence(1, sz);
+
     final SeqType st = ex.seqType();
     if(sz == -1 || sz == 0 || st.zeroOrOne()) return Empty.SEQ;
     if(sz > 0) {

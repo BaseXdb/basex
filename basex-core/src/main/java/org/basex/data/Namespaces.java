@@ -240,7 +240,7 @@ public final class Namespaces {
 
   /**
    * Caches and returns all namespace nodes in the namespace structure with a minimum pre value.
-   * @param pre minimum pre value of a namespace node.
+   * @param pre minimum pre value of a namespace node
    * @return list of namespace nodes
    */
   ArrayList<NSNode> cache(final int pre) {

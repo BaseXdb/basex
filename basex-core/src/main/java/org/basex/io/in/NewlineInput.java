@@ -68,7 +68,7 @@ public final class NewlineInput extends TextInput {
 
   /**
    * Copies a single line to the specified token builder.
-   * @param tb token builder to be filled.
+   * @param tb token builder to be filled
    * @return {@code true} if more input was found
    * @throws IOException I/O exception
    */

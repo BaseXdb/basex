@@ -23,17 +23,34 @@ import org.basex.query.value.type.*;
  */
 public final class FnSort extends StandardFunc {
   @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Value value = qc.value(exprs[0]), v = value(value);
+    return v != null ? v : iter(value, qc).value(qc);
+  }
+
+  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value value = qc.value(exprs[0]);
+    final Value value = qc.value(exprs[0]), v = value(value);
+    return v != null ? v.iter() : iter(value, qc);
+  }
+
+  /**
+   * Sort the input data.
+   * @param value value
+   * @param qc query context
+   * @return item order
+   * @throws QueryException query exception
+   */
+  private Iter iter(final Value value, final QueryContext qc) throws QueryException {
     Collation coll = sc.collation;
     if(exprs.length > 1) {
       final byte[] tok = toTokenOrNull(exprs[1], qc);
       if(tok != null) coll = Collation.get(tok, qc, sc, info, WHICHCOLL_X);
     }
+    final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
     final long sz = value.size();
     final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
-    final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
     for(final Item it : value) {
       vl.add((key == null ? it : key.invokeValue(qc, info, it)).atomValue(info));
     }
@@ -49,7 +66,7 @@ public final class FnSort extends StandardFunc {
 
   /**
    * Sort the input data.
-   * @param vl value list.
+   * @param vl value list
    * @param sf calling function
    * @param coll collation
    * @return item order
@@ -94,17 +111,32 @@ public final class FnSort extends StandardFunc {
     final SeqType st1 = ex1.seqType();
     if(st1.zero()) return ex1;
 
-    if(el < 2) {
-      if(ex1 instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) ex1;
-        return seq.asc ? seq : seq.reverse();
-      }
-      if(st1.type.isSortable() && (st1.one() || ex1 instanceof SingletonSeq)) return ex1;
+    if(ex1 instanceof Value) {
+      final Value v = value((Value) ex1);
+      if(v != null) return v;
     }
-
     if(el == 3) coerceFunc(2, cc, SeqType.AAT_ZM, st1.type.seqType());
 
-    // check if single item must be checked
     return adoptType(ex1);
+  }
+
+  /**
+   * Evaluate value arguments.
+   * @param value value
+   * @return sorted value or {@code null}
+   */
+  private Value value(final Value value) {
+    if(exprs.length < 1) {
+      // range values
+      if(value instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) value;
+        return seq.asc ? seq : seq.reverse();
+      }
+      // sortable single or singleton values
+      final SeqType st = value.seqType();
+      if(st.type.isSortable() && (st.one() || value instanceof SingletonSeq)) return value;
+    }
+    // no pre-evaluation possible
+    return null;
   }
 }

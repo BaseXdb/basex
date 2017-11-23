@@ -358,7 +358,7 @@ public class DataAccessTest {
 
   /**
    * Write initialization data.
-   * @param out file.
+   * @param out file
    * @throws IOException I/O exception
    */
   private static void initialContent(final RandomAccessFile out) throws IOException {

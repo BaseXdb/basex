@@ -77,8 +77,8 @@ public final class CmpR extends Single {
 
     // range sequence: retrieve start and end value, switch them if order is descending
     if(e2 instanceof RangeSeq) {
-      final RangeSeq rs = (RangeSeq) e2;
-      final long[] range = rs.range(false);
+      final RangeSeq seq = (RangeSeq) e2;
+      final long[] range = seq.range(false);
       return get(cmp, range[0], range[1], cc);
     }
     // range expression uses doubles: reject decimal numbers and typed input

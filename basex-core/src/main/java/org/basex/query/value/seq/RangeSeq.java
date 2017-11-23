@@ -72,8 +72,8 @@ public final class RangeSeq extends Seq {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof RangeSeq)) return super.equals(obj);
-    final RangeSeq rs = (RangeSeq) obj;
-    return start == rs.start && size == rs.size && asc == rs.asc;
+    final RangeSeq seq = (RangeSeq) obj;
+    return start == seq.start && size == seq.size && asc == seq.asc;
   }
 
   @Override
@@ -85,6 +85,11 @@ public final class RangeSeq extends Seq {
   @Override
   public Item itemAt(final long pos) {
     return Int.get(start + (asc ? pos : -pos));
+  }
+
+  @Override
+  protected Value subSeq(final long offset, final long length) {
+    return get(start + (asc ? offset : -offset), length, asc);
   }
 
   @Override

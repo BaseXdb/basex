@@ -250,7 +250,7 @@ final class XMLParser extends CommandParser {
    *   <li> <code>{}</code> means that the command must not have any arguments }</li>
    * </ul>
    * @param root root node
-   * @param checks checks to be performed.
+   * @param checks checks to be performed
    * @return success flag
    * @throws QueryException query exception
    */

@@ -170,7 +170,7 @@ public enum Annotation {
 
   /**
    * Constructor.
-   * @param desc descriptive function string, containing the function name and its arguments.
+   * @param desc descriptive function string, containing the function name and its arguments
    * @param args types of the annotation arguments
    * @param uri uri
    */
@@ -180,7 +180,7 @@ public enum Annotation {
 
   /**
    * Constructor.
-   * @param desc descriptive function string, containing the function name and its arguments.
+   * @param desc descriptive function string, containing the function name and its arguments
    * @param args types of the annotation arguments
    * @param uri uri
    * @param single annotation must only occur once

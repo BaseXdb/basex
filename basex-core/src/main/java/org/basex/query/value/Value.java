@@ -13,6 +13,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -79,18 +80,31 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Returns a sub-sequence of this value with the given start and length.
+   * Returns a sub sequence of this value with the given start and length.
    * The following properties must hold:
    * <ul>
    *   <li>{@code start >= 0},
-   *   <li>{@code len >= 0},
-   *   <li>{@code start + len <= size()}
+   *   <li>{@code length >= 0},
+   *   <li>{@code length <= size() - start}
    * </ul>
-   * @param start starting position (zero-based)
-   * @param len number of items
-   * @return the sub-sequence
+   * @param start starting position
+   * @param length number of items
+   * @return sub sequence
    */
-  public abstract Value subSeq(long start, long len);
+  public final Value subSequence(final long start, final long length) {
+    return length == 0 ? Empty.SEQ :
+           length == 1 ? itemAt(start) :
+           start > 0 || length < size() ? subSeq(start, length) :
+           this;
+  }
+
+  /**
+   * Returns a sub sequence of this value with the given start and length.
+   * @param start starting position (>= 0)
+   * @param length number of items (2 <= length <= size() - start)
+   * @return sub sequence
+   */
+  protected abstract Value subSeq(long start, long length);
 
   /**
    * Materializes streamable values.

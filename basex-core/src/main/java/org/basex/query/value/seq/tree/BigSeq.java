@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -47,10 +46,6 @@ final class BigSeq extends TreeSeq {
 
   @Override
   public Item itemAt(final long index) {
-    // index out of range?
-    if(index < 0) throw new IndexOutOfBoundsException("Index < 0: " + index);
-    if(index >= size) throw new IndexOutOfBoundsException(index + " >= " + size);
-
     // index in one of the digits?
     if(index < left.length) return left[(int) index];
     final long midSize = size - right.length;
@@ -71,9 +66,6 @@ final class BigSeq extends TreeSeq {
 
   @Override
   public TreeSeq insert(final long pos, final Item val) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos > size()) throw new IndexOutOfBoundsException("position too big: " + pos);
-
     final int l = left.length;
     if(pos <= l) {
       final int p = (int) pos;
@@ -104,9 +96,6 @@ final class BigSeq extends TreeSeq {
 
   @Override
   public TreeSeq remove(final long pos) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos >= size()) throw new IndexOutOfBoundsException("position too big: " + pos);
-
     if(pos < left.length) {
       // delete from left digit
       final int p = (int) pos, l = left.length;
@@ -237,44 +226,34 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public Value subSeq(final long pos, final long len) {
-    if(pos < 0) throw new IndexOutOfBoundsException("first index < 0: " + pos);
-    if(len < 0) throw new IndexOutOfBoundsException("length < 0: " + len);
+  protected Value subSeq(final long offset, final long length) {
     final long midSize = middle.size();
-    if(len > size - pos)
-      throw new IndexOutOfBoundsException("end out of bounds: " + (pos + len) + " > " + size);
-
-    // the easy cases
-    if(len == 0) return Empty.SEQ;
-    if(len == 1) return itemAt(pos);
-    if(len == size) return this;
-
-    final long end = pos + len;
+    final long end = offset + length;
     if(end <= left.length) {
       // completely in left digit
-      final int p = (int) pos, n = (int) len;
-      if(len <= MAX_SMALL) return new SmallSeq(slice(left, p, p + n), type);
+      final int p = (int) offset, n = (int) length;
+      if(length <= MAX_SMALL) return new SmallSeq(slice(left, p, p + n), type);
       final int mid = p + n / 2;
       final Type rt = type;
       return new BigSeq(slice(left, p, mid), FingerTree.empty(), slice(left, mid, p + n), rt);
     }
 
     final long rightOffset = left.length + midSize;
-    if(pos >= rightOffset) {
+    if(offset >= rightOffset) {
       // completely in right digit
-      final int p = (int) (pos - rightOffset), n = (int) len;
-      if(len <= MAX_SMALL) return new SmallSeq(slice(right, p, p + n), type);
+      final int p = (int) (offset - rightOffset), n = (int) length;
+      if(length <= MAX_SMALL) return new SmallSeq(slice(right, p, p + n), type);
       final int mid = p + n / 2;
       final Type rt = type;
       return new BigSeq(slice(right, p, mid), FingerTree.empty(),
           slice(right, mid, p + n), rt);
     }
 
-    final int inLeft = pos < left.length ? (int) (left.length - pos) : 0,
+    final int inLeft = offset < left.length ? (int) (left.length - offset) : 0,
         inRight = end > rightOffset ? (int) (end - rightOffset) : 0;
     if(inLeft >= MIN_DIGIT && inRight >= MIN_DIGIT) {
       // digits are still long enough
-      final Item[] newLeft = inLeft == left.length ? left : slice(left, (int) pos, left.length);
+      final Item[] newLeft = inLeft == left.length ? left : slice(left, (int) offset, left.length);
       final Item[] newRight = inRight == right.length ? right : slice(right, 0, inRight);
       return new BigSeq(newLeft, middle, newRight, type);
     }
@@ -293,19 +272,19 @@ final class BigSeq extends TreeSeq {
       return fromMerged(out, type);
     }
 
-    final long inMiddle = len - inLeft - inRight;
+    final long inMiddle = length - inLeft - inRight;
     final FingerTree<Item, Item> mid;
     if(inMiddle == midSize) {
       mid = middle;
     } else {
       // the middle tree must be split
-      final long off = pos < left.length ? 0 : pos - left.length;
+      final long off = offset < left.length ? 0 : offset - left.length;
       final TreeSlice<Item, Item> slice = middle.slice(off, inMiddle);
       // only a partial leaf, merge with digits
       if(!slice.isTree()) {
         final Item[] single = ((PartialLeafNode) slice.getPartial()).elems;
         if(inLeft > 0) {
-          final Item[] out = slice(left, (int) pos, left.length + single.length);
+          final Item[] out = slice(left, (int) offset, left.length + single.length);
           System.arraycopy(single, 0, out, inLeft, single.length);
           return fromMerged(out, type);
         }

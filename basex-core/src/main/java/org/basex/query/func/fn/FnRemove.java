@@ -36,7 +36,8 @@ public final class FnRemove extends StandardFunc {
     final Value val = qc.value(exprs[0]);
     final long pos = toLong(exprs[1], qc) - 1, n = val.size();
     if(pos < 0 || pos >= n) return val;
-    if(pos == 0 || pos + 1 == n) return val.subSeq(pos == 0 ? 1 : 0, n - 1);
+    // remove first or last item: create sub sequence
+    if(pos == 0 || pos + 1 == n) return val.subSequence(pos == 0 ? 1 : 0, n - 1);
     return ((Seq) val).remove(pos);
   }
 

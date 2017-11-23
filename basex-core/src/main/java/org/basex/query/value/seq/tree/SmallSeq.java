@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -33,12 +32,6 @@ final class SmallSeq extends TreeSeq {
 
   @Override
   public Item itemAt(final long index) {
-    // index to small?
-    if(index < 0) throw new IndexOutOfBoundsException("Index < 0: " + index);
-
-    // index too big?
-    if(index >= elems.length) throw new IndexOutOfBoundsException(index + " >= " + elems.length);
-
     return elems[(int) index];
   }
 
@@ -52,9 +45,6 @@ final class SmallSeq extends TreeSeq {
 
   @Override
   public TreeSeq insert(final long pos, final Item val) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos > elems.length) throw new IndexOutOfBoundsException("position too big: " + pos);
-
     final int p = (int) pos, n = elems.length;
     final Item[] out = new Item[n + 1];
     System.arraycopy(elems, 0, out, 0, p);
@@ -68,8 +58,6 @@ final class SmallSeq extends TreeSeq {
 
   @Override
   public Value remove(final long pos) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos >= elems.length) throw new IndexOutOfBoundsException("position too big: " + pos);
     final int p = (int) pos, n = elems.length;
     if(n == 2) return elems[pos == 0 ? 1 : 0];
 
@@ -80,15 +68,9 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public Value subSeq(final long pos, final long len) {
-    if(pos < 0) throw new IndexOutOfBoundsException("first index < 0: " + pos);
-    if(len < 0) throw new IndexOutOfBoundsException("length < 0: " + len);
-    if(pos + len > elems.length) throw new IndexOutOfBoundsException("end out of bounds: " +
-        (pos + len) + " > " + elems.length);
-
-    final int p = (int) pos, l = (int) len;
-    return l == 0 ? Empty.SEQ : l == 1 ? elems[p] : l == size ? this :
-      new SmallSeq(slice(elems, p, p + l), type);
+  protected Value subSeq(final long offset, final long len) {
+    final int o = (int) offset, l = (int) len;
+    return new SmallSeq(slice(elems, o, o + l), type);
   }
 
   @Override

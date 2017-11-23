@@ -229,7 +229,7 @@ public final class IdPreMapTest {
 
     /**
      * Constructor.
-     * @param i initial list of ids.
+     * @param i initial list of ids
      */
     DummyIdPreMap(final int[] i) {
       super(i.length - 1);

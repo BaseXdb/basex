@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
@@ -40,7 +41,9 @@ public final class UtilLastFrom extends StandardFunc {
     if(st.zeroOrOne()) return ex;
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
 
-    return ex instanceof FnReverse ?
-      cc.function(Function.HEAD, info, ((Arr) ex).exprs) : this;
+    // check for large values and fn:reverse function
+    return ex instanceof Value ? ((Value) ex).itemAt(ex.size() - 1) :
+           ex instanceof FnReverse ? cc.function(Function.HEAD, info, ((Arr) ex).exprs) :
+           this;
   }
 }

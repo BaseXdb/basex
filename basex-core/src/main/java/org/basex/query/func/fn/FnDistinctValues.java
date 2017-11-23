@@ -66,7 +66,11 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0];
+    Expr ex = exprs[0];
+    if(ex instanceof SingletonSeq) {
+      exprs[0] = ((SingletonSeq) ex).value;
+      return optimize(cc);
+    }
     if(ex instanceof RangeSeq) return ex;
 
     final SeqType st = ex.seqType();
@@ -74,7 +78,6 @@ public final class FnDistinctValues extends StandardFunc {
     if(t != null) {
       exprType.assign(t);
       simple = st.zeroOrOne();
-      if(ex instanceof SingletonSeq) return (((Value) ex).itemAt(0)).atomItem(null);
     }
     return optStats(ex, cc);
   }

@@ -55,7 +55,7 @@ abstract class ValidateFn extends StandardFunc {
 
   /**
    * Runs the validation process and returns an empty sequence or an error.
-   * @param qc query context.
+   * @param qc query context
    * @return empty sequence
    * @throws QueryException query exception
    */
@@ -67,7 +67,7 @@ abstract class ValidateFn extends StandardFunc {
 
   /**
    * Runs the validation process and returns the errors as string sequence.
-   * @param qc query context.
+   * @param qc query context
    * @return string sequence
    * @throws QueryException query exception
    */
@@ -80,7 +80,7 @@ abstract class ValidateFn extends StandardFunc {
 
   /**
    * Runs the validation process and returns the errors as XML.
-   * @param qc query context.
+   * @param qc query context
    * @return XML
    * @throws QueryException query exception
    */
@@ -102,7 +102,7 @@ abstract class ValidateFn extends StandardFunc {
 
   /**
    * Runs the validation process and returns the resulting errors.
-   * @param qc query context.
+   * @param qc query context
    * @return errors
    * @throws QueryException query exception
    */

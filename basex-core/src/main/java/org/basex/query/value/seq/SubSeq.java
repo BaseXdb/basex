@@ -24,20 +24,17 @@ final class SubSeq extends Seq {
    * Constructor.
    * @param sub underlying sequence
    * @param start starting index
-   * @param len length of the subsequence
+   * @param length length of the subsequence
    */
-  SubSeq(final Seq sub, final long start, final long len) {
-    super(len, sub.type);
+  SubSeq(final Seq sub, final long start, final long length) {
+    super(length, sub.type);
     this.sub = sub;
     this.start = start;
   }
 
   @Override
-  public Value subSeq(final long off, final long len) {
-    return len == 0   ? Empty.SEQ
-         : len == 1   ? sub.itemAt(start + off)
-         : len < size ? new SubSeq(sub, start + off, len)
-                      : this;
+  protected Value subSeq(final long offset, final long length) {
+    return new SubSeq(sub, start + offset, length);
   }
 
   @Override

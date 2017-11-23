@@ -82,7 +82,7 @@ public class FnSubsequence extends StandardFunc {
     final Value v = iter.value();
     if(v != null) {
       final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
-      return l <= 0 ? Empty.SEQ : v.subSeq(s, l);
+      return l <= 0 ? Empty.SEQ : v.subSequence(s, l);
     }
 
     // take fast route if the size is known
@@ -136,30 +136,30 @@ public class FnSubsequence extends StandardFunc {
 
   /**
    * Returns the start position.
-   * @param v double value
+   * @param value double value
    * @return long value
    */
-  public long start(final double v) {
-    return StrictMath.round(v);
+  public long start(final double value) {
+    return StrictMath.round(value);
   }
 
   /**
    * Returns the length.
-   * @param v double value
+   * @param value double value
    * @return long value
    */
-  public long length(final double v) {
-    return StrictMath.round(v);
+  public long length(final double value) {
+    return StrictMath.round(value);
   }
 
   /**
    * Computes the count of items to be returned.
    * @param start start
-   * @param len length
+   * @param length length
    * @return length
    */
-  public long length(@SuppressWarnings("unused") final long start, final long len) {
-    return len;
+  public long length(@SuppressWarnings("unused") final long start, final long length) {
+    return length;
   }
 
   @Override

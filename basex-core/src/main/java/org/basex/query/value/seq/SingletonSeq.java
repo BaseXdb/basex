@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class SingletonSeq extends Seq {
   /** Singleton value. */
-  private final Value value;
+  public final Value value;
 
   /**
    * Constructor.
@@ -60,6 +60,11 @@ public final class SingletonSeq extends Seq {
   @Override
   public long atomSize() {
     return value.atomSize();
+  }
+
+  @Override
+  protected Value subSeq(final long offset, final long length) {
+    return value.size() == 1 ? get(value, length) : super.subSeq(offset, length);
   }
 
   @Override

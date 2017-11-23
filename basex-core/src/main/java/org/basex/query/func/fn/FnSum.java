@@ -26,7 +26,7 @@ public final class FnSum extends Aggr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr ex = exprs[0];
     if(ex instanceof RangeSeq || ex instanceof Range) {
-      final Item it = gauss(ex.atomValue(qc, info));
+      final Item it = gauss(ex.value(qc));
       if(it != null) return it;
     } else {
       if(ex instanceof SingletonSeq) {

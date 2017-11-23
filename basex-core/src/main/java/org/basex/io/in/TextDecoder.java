@@ -32,7 +32,7 @@ abstract class TextDecoder {
 
   /**
    * Returns a decoder for the specified encoding.
-   * @param enc encoding, normalized via {@link Strings#normEncoding}.
+   * @param enc encoding, normalized via {@link Strings#normEncoding}
    * @return decoder
    * @throws IOException I/O exception
    */

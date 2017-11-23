@@ -9,7 +9,9 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -34,9 +36,17 @@ public class FnMin extends StandardFunc {
    */
   final Item minmax(final OpV cmp, final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
+    final Expr ex = exprs[0];
+    Item it1 = value(cmp);
+    if(it1 != null) return it1;
 
-    final Iter iter = exprs[0].atomIter(qc, info);
-    Item it1 = iter.next();
+    if(ex instanceof Range) {
+      final Value v = qc.value(ex);
+      return v.isEmpty() ? null : v.itemAt(cmp == OpV.GT ? 0 : v.size() - 1);
+    }
+
+    final Iter iter = ex.atomIter(qc, info);
+    it1 = iter.next();
     if(it1 == null) return null;
 
     // ensure that item is sortable
@@ -92,8 +102,38 @@ public class FnMin extends StandardFunc {
            null;
   }
 
+  /**
+   * Evaluate value arguments.
+   * @param cmp comparator
+   * @return smallest value or {@code null}
+   */
+  private Item value(final OpV cmp) {
+    final Expr ex = exprs[0];
+    Item it = null;
+    if(ex instanceof Value) {
+      final Value v = (Value) ex;
+      if(v instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) v;
+        it = seq.itemAt((cmp == OpV.GT ^ seq.asc) ? seq.size() - 1 : 0);
+      }
+      if(ex instanceof SingletonSeq || ex instanceof Item) {
+        it = v.itemAt(cmp == OpV.GT ? 0 : ex.size() - 1);
+      }
+    }
+    return it != null && it.seqType().type.isNumber() ? it : null;
+  }
+
   @Override
-  protected final Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return optMinmax(OpV.GT);
+  }
+
+  /**
+   * Optimizes a minimum or maximum item.
+   * @param cmp comparator
+   * @return optimized or original item
+   */
+  final Expr optMinmax(final OpV cmp) {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     Type t = st.type;
@@ -104,6 +144,8 @@ public class FnMin extends StandardFunc {
         return ex;
       }
       exprType.assign(t);
+      final Item it = value(cmp);
+      if(it != null) return it;
     }
     return optFirst();
   }

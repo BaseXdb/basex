@@ -10,17 +10,17 @@ import org.basex.query.func.fn.*;
  */
 public final class UtilItemRange extends FnSubsequence {
   @Override
-  public long start(final double v) {
-    return (long) Math.ceil(v);
+  public long start(final double value) {
+    return (long) Math.ceil(value);
   }
 
   @Override
-  public long length(final double v) {
-    return (long) Math.floor(v);
+  public long length(final double value) {
+    return (long) Math.floor(value);
   }
 
   @Override
-  public long length(final long start, final long len) {
-    return len == Long.MAX_VALUE ? len : len - start + 1;
+  public long length(final long start, final long length) {
+    return length == Long.MAX_VALUE ? length : length - start + 1;
   }
 }

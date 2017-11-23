@@ -481,6 +481,11 @@ public final class FnModuleTest extends QueryPlanTest {
         "36-37");
     query(func.args(" (1,2)", " ()", " function($s) { [$s] }"), "1\n2");
 
+    query("for $i in (10000,10001) return " + func.args(" 1 to $i") + "[1]", "1\n1");
+    query("for $i in (10000,10001) return " + func.args(" reverse(1 to $i)") + "[1]", "1\n1");
+    query("for $i in (10000,10001) return " + func.args(func.args(" reverse(1 to $i)")) + "[1]");
+    query("for $i in (1,2) return " + func.args(func.args(" (1,$i)")) + "[1]", "1\n1");
+
     check(func.args(" ()"), "", empty());
     check(func.args("1"), 1, empty(func.clazz));
 

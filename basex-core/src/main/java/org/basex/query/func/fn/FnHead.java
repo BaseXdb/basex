@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
@@ -25,6 +26,8 @@ public final class FnHead extends StandardFunc {
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(st.zeroOrOne()) return ex;
+    if(ex instanceof Value) return ((Value) ex).itemAt(0);
+
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
 
     return ex instanceof FnReverse ?
