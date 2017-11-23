@@ -167,7 +167,7 @@ public final class Scheduled extends Job implements Runnable {
       }
       qp.parse();
       updating = qp.updating;
-      result.time = perf.time();
+      result.time = perf.ns();
 
       // register job
       pushJob(qp);
@@ -197,7 +197,7 @@ public final class Scheduled extends Job implements Runnable {
         unregister(ctx);
         popJob();
         qp = null;
-        result.time += jc.performance.time();
+        result.time += jc.performance.ns();
         // invalidates the performance measurements
         jc.performance = null;
       }

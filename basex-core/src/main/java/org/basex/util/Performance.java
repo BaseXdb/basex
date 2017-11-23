@@ -22,7 +22,7 @@ public final class Performance {
    * Returns the measured execution time in nanoseconds and resets the timer.
    * @return execution time
    */
-  public long time() {
+  public long ns() {
     final long time2 = System.nanoTime();
     final long diff = time2 - time;
     time = time2;
@@ -51,13 +51,23 @@ public final class Performance {
   }
 
   /**
-   * Returns a string with the measured execution time in milliseconds.
-   * @param time measured time in nanoseconds
+   * Returns the measured execution time in nanoseconds and resets the timer.
+   * @param nano execution time in nanoseconds
    * @param runs number of runs
    * @return execution time
    */
-  public static String getTime(final long time, final int runs) {
-    return Math.round(time / 10000.0d / runs) / 100.0d + " ms" + (runs > 1 ? " (avg)" : "");
+  public static double ms(final long nano, final int runs) {
+    return Math.round(nano / 10000.0d / runs) / 100.0d;
+  }
+
+  /**
+   * Returns a string with the measured execution time in milliseconds.
+   * @param nano measured time in nanoseconds
+   * @param runs number of runs
+   * @return execution time
+   */
+  public static String getTime(final long nano, final int runs) {
+    return ms(nano, runs) + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
   /**
@@ -85,16 +95,6 @@ public final class Performance {
   }
 
   /**
-   * Returns the rounded up number of units.
-   * @param num number
-   * @param size size of unit
-   * @return units
-   */
-  private static long units(final long num, final long size) {
-    return (num + size - 1) / size;
-  }
-
-  /**
    * Sleeps the specified number of milliseconds.
    * @param ms time in milliseconds to wait
    */
@@ -106,10 +106,10 @@ public final class Performance {
    * Performs some garbage collection.
    * GC behavior in Java is a pretty complex task. Still, garbage collection
    * can be forced by calling it several times.
-   * @param number number of times to execute garbage collection
+   * @param count number of times to execute garbage collection
    */
-  public static void gc(final int number) {
-    for(int i = 0; i < number; ++i) System.gc();
+  public static void gc(final int count) {
+    for(int c = 0; c < count; ++c) System.gc();
   }
 
   /**
@@ -119,6 +119,16 @@ public final class Performance {
   public static long memory() {
     final Runtime rt = Runtime.getRuntime();
     return rt.totalMemory() - rt.freeMemory();
+  }
+
+  /**
+   * Returns the rounded up number of units.
+   * @param number number
+   * @param size size of unit
+   * @return units
+   */
+  private static long units(final long number, final long size) {
+    return (number + size - 1) / size;
   }
 
   @Override

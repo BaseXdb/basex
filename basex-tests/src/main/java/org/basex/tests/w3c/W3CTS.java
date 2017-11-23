@@ -482,7 +482,7 @@ public abstract class W3CTS extends Main {
     }
 
     // print verbose/timing information
-    final long nano = perf.time();
+    final long nano = perf.ns();
     final boolean slow = nano / 1000000 > timer;
     if(verbose) {
       if(slow) Util.out(": " + Performance.getTime(nano, 1));

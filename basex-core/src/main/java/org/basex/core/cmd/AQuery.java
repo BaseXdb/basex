@@ -76,7 +76,7 @@ public abstract class AQuery extends Command {
 
           final Performance perf = new Performance();
           qp.compile();
-          info.compiling += perf.time();
+          info.compiling += perf.ns();
           if(r == 0) plan(true);
           if(!run) continue;
 
@@ -84,13 +84,13 @@ public abstract class AQuery extends Command {
           try(Serializer ser = qp.getSerializer(po)) {
             if(maxResults >= 0) {
               result = qp.cache(maxResults);
-              info.evaluating += perf.time();
+              info.evaluating += perf.ns();
               result.serialize(ser);
               hits = result.size();
             } else {
               hits = 0;
               final Iter iter = qp.iter();
-              info.evaluating += perf.time();
+              info.evaluating += perf.ns();
               for(Item it; (it = iter.next()) != null;) {
                 ser.serialize(it);
                 ++hits;
@@ -99,7 +99,7 @@ public abstract class AQuery extends Command {
             }
           }
           qp.close();
-          info.serializing += perf.time();
+          info.serializing += perf.ns();
         }
         return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
 
@@ -162,7 +162,7 @@ public abstract class AQuery extends Command {
       else qp.bind(name, value[0], value[1]);
     }
     qp.parse();
-    qp.qc.info.parsing += perf.time();
+    qp.qc.info.parsing += perf.ns();
   }
 
   /**

@@ -103,7 +103,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void exists() {
     final String url = IO.FILEPREF + '/' + (Prop.WIN ? '/' + PATH1.replace("\\", "/") : PATH1);
-    query(_FILE_WRITE.args(PATH1, "()"));
+    query(_FILE_WRITE.args(PATH1, " ()"));
     query(_FILE_EXISTS.args(PATH1), true);
     query(_FILE_EXISTS.args(url), true);
     query(_FILE_DELETE.args(PATH1));
@@ -115,7 +115,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void isDir() {
     query(_FILE_IS_DIR.args(PATH), true);
-    query(_FILE_WRITE.args(PATH1, "()"));
+    query(_FILE_WRITE.args(PATH1, " ()"));
     query(_FILE_IS_DIR.args(PATH1), false);
     query(_FILE_DELETE.args(PATH1));
     query(_FILE_CREATE_DIR.args(PATH1));
@@ -134,7 +134,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void isFile() {
     query(_FILE_IS_FILE.args(PATH), false);
-    query(_FILE_WRITE.args(PATH1, "()"));
+    query(_FILE_WRITE.args(PATH1, " ()"));
     query(_FILE_IS_FILE.args(PATH1), true);
     query(_FILE_DELETE.args(PATH1));
     query(_FILE_CREATE_DIR.args(PATH1));
@@ -183,7 +183,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
     query(_FILE_WRITE.args(PATH1, "abcd"));
     error(_FILE_CHILDREN.args(PATH1), FILE_NO_DIR_X);
     error(_FILE_CHILDREN.args(PATH1 + NAME), FILE_NO_DIR_X);
-    query(_FILE_WRITE.args(PATH1, "()"));
+    query(_FILE_WRITE.args(PATH1, " ()"));
     error(_FILE_CHILDREN.args(PATH1), FILE_NO_DIR_X);
     contains(_FILE_CHILDREN.args(PATH), NAME);
     query(_FILE_DELETE.args(PATH1));
@@ -259,8 +259,8 @@ public final class FileModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void write() {
-    error(_FILE_WRITE.args(PATH, "()"), FILE_IS_DIR_X);
-    error(_FILE_WRITE.args(PATH4, "()"), FILE_NO_DIR_X);
+    error(_FILE_WRITE.args(PATH, " ()"), FILE_IS_DIR_X);
+    error(_FILE_WRITE.args(PATH4, " ()"), FILE_NO_DIR_X);
 
     query(_FILE_WRITE.args(PATH1, 0));
     query(_FILE_SIZE.args(PATH1), 1);
@@ -486,7 +486,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
    */
   @Test
   public void pathToNative() throws IOException {
-    query(_FILE_WRITE.args(PATH1, "()"));
+    query(_FILE_WRITE.args(PATH1, " ()"));
     assertEquals(Paths.get(PATH1).toRealPath().toString(), query(_FILE_PATH_TO_NATIVE.args(PATH1)));
     query(_FILE_PATH_TO_NATIVE.args(PATH + "../" + NAME + '/' + NAME),
         Paths.get(PATH + "../" + NAME + '/' + NAME).toRealPath().toString());

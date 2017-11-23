@@ -15,67 +15,86 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void mem() {
-    query(_PROF_MEM.args("()"));
-    query("count(" + _PROF_MEM.args(" 1 to 100 ", false) + ")", 100);
-    query("count(" + _PROF_MEM.args(" 1 to 100 ", true) + ")", 100);
-    query("count(" + _PROF_MEM.args(" 1 to 100 ", true, "label") + ")", 100);
+    final Function func = _PROF_MEMORY;
+    query(func.args(" ()"));
+    query("count(" + func.args(" 1 to 100 ") + ")", 100);
+    query("count(" + func.args(" 1 to 100 ", "label") + ")", 100);
   }
 
   /** Test method. */
   @Test
   public void time() {
-    query(_PROF_TIME.args("()"));
-    query("count(" + _PROF_TIME.args(" 1 to 100 ", false) + ")", 100);
-    query("count(" + _PROF_TIME.args(" 1 to 100 ", true) + ")", 100);
-    query("count(" + _PROF_TIME.args(" 1 to 100 ", true, "label") + ")", 100);
+    final Function func = _PROF_TIME;
+    query(func.args(" ()"));
+    query("count(" + func.args(" 1 to 100 ") + ")", 100);
+    query("count(" + func.args(" 1 to 100 ", "label") + ")", 100);
+  }
+
+  /** Test method. */
+  @Test
+  public void track() {
+    final Function func = _PROF_TRACK;
+    query(func.args(" ()"));
+    query("exists(" + func.args("A") + "?memory)", "true");
+    query("exists(" + func.args("A") + "?time)", "true");
+    query("exists(" + func.args("A") + "?value)", "true");
+    query("count(" + func.args("A") + "?*)", "3");
+    query("empty(" + func.args("A",
+        " map { 'memory': false(), 'time': false(), 'value': false() }") + "?*)", "true");
   }
 
   /** Test method. */
   @Test
   public void sleep() {
-    query(_PROF_SLEEP.args(" 10"));
-    query(_PROF_SLEEP.args(" 1"));
-    query(_PROF_SLEEP.args(" 0"));
-    query(_PROF_SLEEP.args(" -1"));
+    final Function func = _PROF_SLEEP;
+    query(func.args(" 10"));
+    query(func.args(" 1"));
+    query(func.args(" 0"));
+    query(func.args(" -1"));
   }
 
   /** Test method. */
   @Test
   public void human() {
-    query(_PROF_HUMAN.args(" 1"), "1 b");
-    query(_PROF_HUMAN.args(" 2"), "2 b");
-    query(_PROF_HUMAN.args(" 512"), "512 b");
-    query(_PROF_HUMAN.args(" 32768"), "32 kB");
-    query(_PROF_HUMAN.args(" 1048576"), "1024 kB");
+    final Function func = _PROF_HUMAN;
+    query(func.args(" 1"), "1 b");
+    query(func.args(" 2"), "2 b");
+    query(func.args(" 512"), "512 b");
+    query(func.args(" 32768"), "32 kB");
+    query(func.args(" 1048576"), "1024 kB");
   }
 
   /** Test method. */
   @Test
   public void dump() {
-    query(_PROF_DUMP.args("a"), "");
+    final Function func = _PROF_DUMP;
+    query(func.args("a"), "");
   }
 
   /** Test method. */
   @Test
   public void variables() {
-    query("for $x in 1 to 2 return " + _PROF_VARIABLES.args(), "");
-    query(_PROF_VARIABLES.args() + ", let $x := random:double() return floor($x * $x)", 0);
+    final Function func = _PROF_VARIABLES;
+    query("for $x in 1 to 2 return " + func.args(), "");
+    query(func.args() + ", let $x := random:double() return floor($x * $x)", 0);
   }
 
   /** Test method. */
   @Test
   public void voidd() {
-    query(_PROF_VOID.args(" ()"), "");
-    query(_PROF_VOID.args(1), "");
-    query(_PROF_VOID.args("1,2"), "");
+    final Function func = _PROF_VOID;
+    query(func.args(" ()"), "");
+    query(func.args(1), "");
+    query(func.args("1,2"), "");
   }
 
   /** Test method. */
   @Test
   public void type() {
-    query(_PROF_TYPE.args(" ()"), "");
-    query(_PROF_TYPE.args(1), 1);
-    query(_PROF_TYPE.args(" (1, 2, 3)"), "1\n2\n3");
-    query(_PROF_TYPE.args(" <x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
+    final Function func = _PROF_TYPE;
+    query(func.args(" ()"), "");
+    query(func.args(1), 1);
+    query(func.args(" (1, 2, 3)"), "1\n2\n3");
+    query(func.args(" <x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
   }
 }

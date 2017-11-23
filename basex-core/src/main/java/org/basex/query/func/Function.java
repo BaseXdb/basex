@@ -1140,11 +1140,14 @@ public enum Function {
   // Profiling Module
 
   /** XQuery function. */
-  _PROF_MEM(ProfMem.class, "mem(value[,cache[,label]])", arg(ITEM_ZM, BLN, STR), ITEM_ZM, flag(NDT),
-      PROF_URI),
+  _PROF_MEMORY(ProfMemory.class, "memory(value[,label])",
+      arg(ITEM_ZM, STR, MAP_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_TIME(ProfTime.class, "time(value[,cache[,label]])",
-      arg(ITEM_ZM, BLN, STR), ITEM_ZM, flag(NDT), PROF_URI),
+  _PROF_TIME(ProfTime.class, "time(value[,label])",
+      arg(ITEM_ZM, STR, MAP_O), ITEM_ZM, flag(NDT), PROF_URI),
+  /** XQuery function. */
+  _PROF_TRACK(ProfTrack.class, "track(value[,options])",
+      arg(ITEM_ZM, STR, MAP_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_SLEEP(ProfSleep.class, "sleep(ms)", arg(ITR), EMP, flag(NDT), PROF_URI),
   /** XQuery function. */

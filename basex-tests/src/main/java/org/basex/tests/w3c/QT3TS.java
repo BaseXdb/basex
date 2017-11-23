@@ -368,7 +368,7 @@ public final class QT3TS extends Main {
     }
 
     if(slow != null) {
-      final long l = perf.time();
+      final long l = perf.ns();
       if(l > 100000000) slow.put(-l, name);
     }
 

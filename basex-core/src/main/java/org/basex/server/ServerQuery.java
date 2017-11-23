@@ -120,9 +120,9 @@ public final class ServerQuery extends Job {
       final Performance perf = jc().performance;
       qp.compile();
       final QueryInfo qi = qp.qc.info;
-      qi.compiling = perf.time();
+      qi.compiling = perf.ns();
       final Iter ir = qp.iter();
-      qi.evaluating = perf.time();
+      qi.evaluating = perf.ns();
 
       // iterate through results
       int c = 0;
@@ -144,7 +144,7 @@ public final class ServerQuery extends Job {
           c++;
         }
       }
-      qi.serializing = perf.time();
+      qi.serializing = perf.ns();
 
       // generate query info
       info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
@@ -181,7 +181,7 @@ public final class ServerQuery extends Job {
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
-    qp.qc.info.parsing = perf.time();
+    qp.qc.info.parsing = perf.ns();
     parsed = true;
   }
 

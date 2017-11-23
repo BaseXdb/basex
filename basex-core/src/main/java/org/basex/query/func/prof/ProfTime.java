@@ -2,13 +2,14 @@ package org.basex.query.func.prof;
 
 import static org.basex.util.Token.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -17,35 +18,35 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class ProfTime extends StandardFunc {
+public class ProfTime extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    // create timer
-    final Performance p = new Performance();
-
-    // optional message
-    final byte[] msg = exprs.length > 2 ? toToken(exprs[2], qc) : null;
-
-    // check caching flag
-    if(exprs.length > 1 && toBoolean(exprs[1], qc)) {
-      final Value v = qc.value(exprs[0]).cache().value();
-      FnTrace.trace(token(p.getTime()), msg, qc);
-      return v.iter();
-    }
-
-    return new Iter() {
-      final Iter iter = qc.iter(exprs[0]);
-      @Override
-      public Item next() throws QueryException {
-        final Item it = iter.next();
-        if(it == null) FnTrace.trace(token(p.getTime()), msg, qc);
-        return it;
-      }
-    };
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  public Value value(final QueryContext qc) throws QueryException {
+    // create timer
+    final Performance p = new Performance();
+    return value(qc, () -> token(p.getTime()));
+  }
+
+  @Override
+  protected final Expr opt(final CompileContext cc) {
     return adoptType(exprs[0]);
+  }
+
+  /**
+   * Profiles the argument.
+   * @param qc query context
+   * @param func profiling function
+   * @return value
+   * @throws QueryException query exception
+   */
+  final Value value(final QueryContext qc, final Supplier<byte[]> func) throws QueryException {
+    final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
+    final Value v = qc.value(exprs[0]);
+    FnTrace.trace(func.get(), label, qc);
+    return v;
   }
 }
