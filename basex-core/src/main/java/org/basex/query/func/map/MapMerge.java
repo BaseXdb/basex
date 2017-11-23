@@ -4,10 +4,13 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -16,13 +19,17 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class MapMerge extends StandardFunc {
+  /** Merge options. */
+  public static final class MergeOptions extends Options {
+    /** Handle duplicates. */
+    public static final EnumOption<MergeDuplicates> DUPLICATES =
+        new EnumOption<>("duplicates", MergeDuplicates.USE_FIRST);
+  }
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = qc.iter(exprs[0]);
-    final MergeOptions opts = new MergeOptions();
-    if(exprs.length > 1) new FuncOptions(info).acceptUnknown().assign(toMap(exprs[1], qc), opts);
-
-    final MergeDuplicates merge = opts.get(MergeOptions.DUPLICATES);
+    final MergeDuplicates merge = options(qc).get(MergeOptions.DUPLICATES);
     Map map = Map.EMPTY;
     for(Item it; (it = maps.next()) != null;) {
       qc.checkStop();
@@ -32,9 +39,30 @@ public final class MapMerge extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Type t = exprs[0].seqType().type;
-    if(t instanceof MapType) exprType.assign(t);
+
+    if(t instanceof MapType) {
+      // check if values may be combined (if yes, adjust occurrence of return type)
+      MapType mt = (MapType) t;
+      if(exprs.length < 2 || !(exprs[1] instanceof Value) ||
+          options(cc.qc).get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
+        mt = MapType.get(mt.keyType(), mt.declType.with(Occ.ONE_MORE));
+      }
+      exprType.assign(mt);
+    }
     return this;
+  }
+
+  /**
+   * Returns map options.
+   * @param qc query context
+   * @return options
+   * @throws QueryException query exception
+   */
+  private MergeOptions options(final QueryContext qc) throws QueryException {
+    final MergeOptions opts = new MergeOptions();
+    if(exprs.length > 1) new FuncOptions(info).acceptUnknown().assign(toMap(exprs[1], qc), opts);
+    return opts;
   }
 }
