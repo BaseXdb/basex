@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import java.math.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -53,6 +54,15 @@ public enum Calc {
       if(t2 == TIM && t1 == DTD) return new Tim((Tim) it2, (DTDur) it1, true);
       throw typeError(info, t1, t2);
     }
+
+    @Override
+    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+      // check for neutral numbers
+      final BiFunction<Expr, Expr, Expr> f = (e1, e2) ->
+        e1 instanceof ANum && ((ANum) e1).dbl() == 0 ? e2 : null;
+      final Expr e = f.apply(ex1, ex2);
+      return e != null ? e : f.apply(ex2, ex1);
+    }
   },
 
   /** Subtraction. */
@@ -88,6 +98,13 @@ public enum Calc {
       if(t1 == DAT) return new Dat((Dat) it1, dur(info, it2), false, info);
       if(t1 == TIM && t2 == DTD) return new Tim((Tim) it1, (DTDur) it2, false);
       throw typeError(info, t1, t2);
+    }
+
+    @Override
+    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+      // check for neutral number and identical arguments
+      return ex2 instanceof ANum && ((ANum) ex2).dbl() == 0 ? ex1 :
+        ex1.equals(ex2) ? zero(ex1) : null;
     }
   },
 
@@ -132,6 +149,17 @@ public enum Calc {
       }
       throw numberError(it1, info);
     }
+
+    @Override
+    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+      // check for absorbing and neutral numbers
+      final BiFunction<Expr, Expr, Expr> f = (e1, e2) -> {
+        final double d1 = e1 instanceof ANum ? ((ANum) e1).dbl() : Double.NaN;
+        return d1 == 1 ? e2 : d1 == 0 ? zero(e1) : null;
+      };
+      final Expr e = f.apply(ex1, ex2);
+      return e != null ? e : f.apply(ex2, ex1);
+    }
   },
 
   /** Division. */
@@ -165,18 +193,24 @@ public enum Calc {
       if(t == DBL) return Dbl.get(it1.dbl(info) / it2.dbl(info));
       if(t == FLT) return Flt.get(it1.flt(info) / it2.flt(info));
 
-      final BigDecimal b1 = it1.dec(info);
-      final BigDecimal b2 = it2.dec(info);
+      final BigDecimal b1 = it1.dec(info), b2 = it2.dec(info);
       if(b2.signum() == 0) throw zeroError(info, it1);
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
       return Dec.get(b1.divide(b2, s, RoundingMode.HALF_EVEN));
+    }
+
+    @Override
+    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+      // check for neutral number and identical arguments
+      return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
+        ex1.equals(ex2) ? one(ex1) : null;
     }
   },
 
   /** Integer division. */
   IDIV("idiv") {
     @Override
-    public Item ev(final Item it1, final Item ti2, final InputInfo info) throws QueryException {
+    public Int ev(final Item it1, final Item ti2, final InputInfo info) throws QueryException {
       checkNum(info, it1, ti2);
       final Type t = type(it1.type, ti2.type);
       if(t == DBL || t == FLT) {
@@ -202,6 +236,13 @@ public enum Calc {
         throw RANGE_X.get(info, b1 + " idiv " + b2);
       return Int.get(res.longValueExact());
     }
+
+    @Override
+    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+      // check for neutral number and identical arguments
+      return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
+        ex1.equals(ex2) ? one(ex1) : null;
+    }
   },
 
   /** Modulo. */
@@ -222,6 +263,11 @@ public enum Calc {
       if(b2.signum() == 0) throw zeroError(info, it1);
       final BigDecimal q = b1.divide(b2, 0, RoundingMode.DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
+    }
+
+    @Override
+    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+      return null;
     }
   };
 
@@ -252,6 +298,15 @@ public enum Calc {
   public abstract Item ev(Item it1, Item it2, InputInfo info) throws QueryException;
 
   /**
+   * Optimizes the expressions.
+   * @param ex1 first expression
+   * @param ex2 second expression
+   * @return result type
+   * @throws QueryException query exception
+   */
+  public abstract Expr optimize(Expr ex1, Expr ex2) throws QueryException;
+
+  /**
    * Returns the numeric type with the highest precedence.
    * @param type1 first item type
    * @param type2 second item type
@@ -262,6 +317,28 @@ public enum Calc {
     if(type1 == FLT || type2 == FLT) return FLT;
     if(type1 == DEC || type2 == DEC) return DEC;
     return ITR;
+  }
+
+  /**
+   * Tries to rewrite the expression to {@code 0}.
+   * @param expr expression
+   * @return zero value or {@code null}
+   */
+  private static Expr zero(final Expr expr) {
+    // floating points
+    final Type t = expr.seqType().type;
+    return t == DEC ? Dec.ZERO : t.instanceOf(AtomType.ITR) ? Int.ZERO : null;
+  }
+
+  /**
+   * Tries to rewrite the expression to {@code 1}.
+   * @param expr expression
+   * @return zero value or {@code null}
+   */
+  private static Expr one(final Expr expr) {
+    // floating points
+    final Type t = expr.seqType().type;
+    return t == DEC ? Dec.ONE : t.instanceOf(AtomType.ITR) ? Int.ONE : null;
   }
 
   /**

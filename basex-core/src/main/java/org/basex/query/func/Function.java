@@ -563,29 +563,31 @@ public enum Function {
 
   /** XQuery function. */
   _ARCHIVE_CREATE(ArchiveCreate.class, "create(entries,contents[,options])",
-      arg(ITEM_ZM, ITEM_ZM, MAP_O), B64, ARCHIVE_URI),
+      arg(ITEM_ZM, ITEM_ZM, MAP_O), B64, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_CREATE_FROM(ArchiveCreateFrom.class, "create-from(path[,options[,entries]])",
-      arg(STR, MAP_O, ITEM_ZM), EMP, ARCHIVE_URI),
+      arg(STR, MAP_O, ITEM_ZM), EMP, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
-  _ARCHIVE_ENTRIES(ArchiveEntries.class, "entries(archive)", arg(B64), ELM_ZM, ARCHIVE_URI),
+  _ARCHIVE_ENTRIES(ArchiveEntries.class, "entries(archive)",
+      arg(B64), ELM_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText.class, "extract-text(archive[,entries[,encoding]])",
-      arg(B64, ITEM_ZM, STR), STR_ZM, ARCHIVE_URI),
+      arg(B64, ITEM_ZM, STR), STR_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary.class, "extract-binary(archive[,entries])",
-      arg(B64, ITEM_ZM), B64_ZM, ARCHIVE_URI),
+      arg(B64, ITEM_ZM), B64_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TO(ArchiveExtractTo.class, "extract-to(path,archive[,entries])",
-      arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
+      arg(STR, B64, ITEM_ZM), EMP, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate.class, "update(archive,entries,contents)",
-      arg(B64, ITEM_ZM, ITEM_ZM), B64, ARCHIVE_URI),
+      arg(B64, ITEM_ZM, ITEM_ZM), B64, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_DELETE(ArchiveDelete.class, "delete(archive,entries)",
-      arg(B64, ITEM_ZM), B64, ARCHIVE_URI),
+      arg(B64, ITEM_ZM), B64, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
-  _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)", arg(B64), MAP_O, ARCHIVE_URI),
+  _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)",
+      arg(B64), MAP_O, flag(NDT), ARCHIVE_URI),
 
   // Binary Module
 
@@ -806,8 +808,8 @@ public enum Function {
   /** XQuery function. */
   _DB_DROP(DbDrop.class, "drop(database)", arg(ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_RENAME(DbRename.class, "rename(database,path,new-path)", arg(STR, STR, STR), EMP,
-      flag(UPD), DB_URI),
+  _DB_RENAME(DbRename.class, "rename(database,path,new-path)",
+      arg(STR, STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_REPLACE(DbReplace.class, "replace(database,path,input[,options])",
       arg(STR, STR, ITEM, MAP_O), EMP, flag(UPD), DB_URI),
@@ -1225,11 +1227,11 @@ public enum Function {
   // Unit Module
 
   /** XQuery function. */
-  _UNIT_ASSERT(UnitAssert.class, "assert(test[,failure])", arg(ITEM_ZM, ITEM), EMP, flag(NDT),
-      UNIT_URI),
+  _UNIT_ASSERT(UnitAssert.class, "assert(test[,failure])",
+      arg(ITEM_ZM, ITEM), ITEM_ZM, flag(NDT), UNIT_URI),
   /** XQuery function. */
   _UNIT_ASSERT_EQUALS(UnitAssertEquals.class, "assert-equals(result,expected[,failure])",
-      arg(ITEM_ZM, ITEM_ZM, ITEM), EMP, flag(NDT), UNIT_URI),
+      arg(ITEM_ZM, ITEM_ZM, ITEM), ITEM_ZM, flag(NDT), UNIT_URI),
   /** XQuery function. */
   _UNIT_FAIL(UnitFail.class, "fail([failure])", arg(ITEM), ITEM_ZM, flag(NDT), UNIT_URI),
 

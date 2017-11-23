@@ -83,7 +83,8 @@ public abstract class Preds extends Arr {
           final int m = ands.length;
           for(int a = 0; a < m; a++) {
             // wrap test with boolean() if the result is numeric
-            expr = cc.function(Function.BOOLEAN, info, ands[a]).optimizeEbv(cc);
+            expr = ands[a];
+            if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);
             if(a + 1 < m) pos = add(expr, list, pos, cc);
           }
         }

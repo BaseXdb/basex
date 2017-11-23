@@ -5,7 +5,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -28,21 +27,6 @@ public final class ItemList extends ObjectList<Item, ItemList> {
    */
   public ItemList(final int capacity) {
     super(new Item[capacity]);
-  }
-
-  /**
-   * Adds all elements in the given value to this list.
-   * @param value value to add
-   * @return self reference
-   */
-  public ItemList add(final Value value) {
-    if(value instanceof Item) return add((Item) value);
-    final long n = value.size();
-    if(n > Integer.MAX_VALUE - size) throw Util.notExpected(n);
-    final int ns = size + (int) n;
-    if(ns > list.length) list = Array.copy(list, newList(newSize(ns)));
-    size += value.writeTo(list, size);
-    return this;
   }
 
   /**

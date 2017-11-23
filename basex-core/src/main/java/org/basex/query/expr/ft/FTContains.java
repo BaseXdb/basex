@@ -5,12 +5,12 @@ import static org.basex.query.QueryText.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -81,7 +81,7 @@ public final class FTContains extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return expr == Empty.SEQ ? cc.replaceWith(this, Bln.FALSE) : this;
+    return expr.seqType().zero() ? FnBoolean.get(expr, info, cc.sc()) : this;
   }
 
   @Override

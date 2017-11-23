@@ -87,7 +87,7 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // return empty root
-    if(root == Empty.SEQ) return cc.emptySeq(this);
+    if(root.seqType().zero()) return cc.replaceWith(this, root);
 
     // simplify predicates
     simplify(cc, root);

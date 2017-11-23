@@ -147,7 +147,7 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 2 to 10", 1, " function($a, $b) { 0 * random:integer($a) + $b }"),
+    check(func.args(" 2 to 10", 1, " function($a, $b) { 0 * random:double() + $b }"),
         10,
         exists(Int.class),
         empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
@@ -170,7 +170,7 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(FnFoldRight.class),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 9", 10, " function($a, $b) { 0 * random:integer($a) + $b }"),
+    check(func.args(" 1 to 9", 10, " function($a, $b) { 0 * random:double() + $b }"),
         10,
         empty(FnFoldRight.class),
         exists(Int.class),
@@ -196,7 +196,7 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(FnForEach.class),
         exists(IntSeq.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 9", " function($x) { 0 * random:integer() + $x }"),
+    check(func.args(" 1 to 9", " function($x) { 0 * random:double() + $x }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
         empty(FnForEach.class),
         empty(IntSeq.class),
@@ -543,8 +543,32 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 3037000499"), 4611686016981624750L);
     query(func.args(" 1 to 3037000500"), 4611686020018625250L);
     query(func.args(" 1 to 4294967295"), 9223372034707292160L);
+    query(func.args(" 1 to <x>4294967295</x>"), 9223372034707292160L);
+    query(func.args(" 1 to <x>0</x>"), 0);
     query(func.args(" reverse(1 to 10)"), 55);
     query(func.args(" sort(reverse(distinct-values(1 to 4294967295)))"), 9223372034707292160L);
+    error(func.args(" 1 to 10000000000000"), RANGE_X);
+
+    query(func.args(" (1 to 10) ! 1"), 10);
+    query(func.args(" (1 to 10) ! 10"), 100);
+    query(func.args(" (1 to 1000000) ! 1000000"), 1000000000000L);
+    query(func.args(" (1 to 10) ! xs:untypedAtomic('10')"), 100);
+    error(func.args(" (1 to 10) ! 'a'"), SUM_X_X);
+    error(func.args(" (1 to 1000000) ! 'b'"), SUM_X_X);
+
+    query("for $i in 1 to 2 return " + func.args(" ()", " $i"), "1\n2");
+    query(func.args(" ()", " <x>0</x>"), 0);
+    query(func.args(" ()", "A"), "A");
+    query(func.args(" ()", " 1"), 1);
+    query(func.args(" ()", " ()"), "");
+    query(func.args(" ()", " prof:void('x')"), "");
+
+    query("for $i in 1 to 2 return " + func.args(" prof:void('x')", " $i"), "1\n2");
+    query(func.args(" prof:void('x')", " <x>0</x>"), 0);
+    query(func.args(" prof:void('x')", "A"), "A");
+    query(func.args(" prof:void('x')", " 1"), 1);
+    query(func.args(" prof:void('x')", " ()"), "");
+    query(func.args(" prof:void('x')", " prof:void('x')"), "");
 
     query(func.args(" 2 to 10"), 54);
     query(func.args(" 9 to 10"), 19);
@@ -552,6 +576,19 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ()", " ()"), "");
     query(func.args(1, "x"), 1);
     error(func.args(" ()", " (1,2)"), SEQFOUND_X);
+
+    query(func.args(" (1,3,5)"), 9);
+    query(func.args(" (-3,-1,1,3)"), 0);
+    query(func.args(" (1,1.1,1e0)"), 3.1);
+
+    check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2",
+        exists("FnSum[@type = 'xs:integer']"));
+    check("for $i in 1 to 2 return " + func.args(" $i", "a"), "1\n2",
+        exists("FnSum[@type = 'xs:integer']"));
+    check(func.args(" 1[. = 1]", " 0.0"), 1, exists("FnSum[@type = 'xs:decimal']"));
+    check(func.args(" 1[. = 1]", "a"), 1, exists("FnSum[@type = 'xs:anyAtomicType']"));
+    check(func.args(" 1[. = 1]", " 1[. = 1]"), 1, exists("FnSum[@type = 'xs:integer?']"));
+    check(func.args(" 1[. = 1]", " 'a'[. = 'a']"), 1, exists("FnSum[@type = 'xs:anyAtomicType?']"));
   }
 
   /** Test method. */

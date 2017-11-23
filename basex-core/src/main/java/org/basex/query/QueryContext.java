@@ -349,8 +349,11 @@ public final class QueryContext extends Job implements Closeable {
 
         // append cached outputs
         if(!cache.isEmpty()) {
-          if(results.isEmpty()) results = cache;
-          else results.add(cache.value());
+          if(results.isEmpty()) {
+            results = cache;
+          } else {
+            for(final Item it : cache) results.add(it);
+          }
         }
       }
       return results.iter();

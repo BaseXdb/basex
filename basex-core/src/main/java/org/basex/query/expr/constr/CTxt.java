@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
@@ -37,8 +36,8 @@ public final class CTxt extends CNode {
   @Override
   public Expr optimize(final CompileContext cc) {
     final Expr ex = exprs[0];
-    if(ex == Empty.SEQ) return cc.emptySeq(this);
     final SeqType st = ex.seqType();
+    if(st.zero()) return cc.replaceWith(this, ex);
     final boolean atom = !st.mayBeArray();
     if(st.oneOrMore() && atom) exprType.assign(Occ.ONE);
     simple = st.zeroOrOne() && atom;

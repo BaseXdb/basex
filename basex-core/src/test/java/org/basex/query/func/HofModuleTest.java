@@ -58,7 +58,7 @@ public final class HofModuleTest extends QueryPlanTest {
         empty(Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')]"),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to " + limit, " function($a, $b) {0 * random:integer($a) + $b}"),
+    check(func.args(" 1 to " + limit, " function($a, $b) {0 * random:double() + $b}"),
         10,
         exists(Int.class),
         empty(Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')]"),

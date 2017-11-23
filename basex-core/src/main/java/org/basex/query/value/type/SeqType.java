@@ -636,7 +636,7 @@ public final class SeqType {
    */
   public boolean mayBeNumber() {
     // check if type is number, or any other super type
-    return type.isNumber() || AtomType.AAT.instanceOf(type);
+    return !zero() && (type.isNumber() || AtomType.AAT.instanceOf(type));
   }
 
   /**
@@ -644,7 +644,10 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeArray() {
-    return !(type.instanceOf(AtomType.AAT) || type instanceof ListType || type instanceof MapType ||
+    return !(zero() ||
+        type.instanceOf(AtomType.AAT) ||
+        type instanceof ListType ||
+        type instanceof MapType ||
         type instanceof NodeType);
   }
 

@@ -114,9 +114,9 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
         "qm:fast()", JAVAARITY_X_X_X_X);
 
     query("declare namespace qm='java:org.basex.query.func.QueryModuleTest';" +
-        "try{qm:error(qm:new())} catch * {local-name-from-QName($err:code)}", "BASEX0000");
+        "try{ qm:error(qm:new()) } catch * { $err:code }", "basex:error");
     query("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
-        "try { qm:error() } catch * { local-name-from-QName($err:code) }", "BASEX0000");
+        "try { qm:error() } catch * { $err:code }", "basex:error");
   }
 
   /** Tests ambiguous signatures. */

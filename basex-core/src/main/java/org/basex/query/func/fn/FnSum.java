@@ -7,10 +7,12 @@ import java.math.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -27,6 +29,10 @@ public final class FnSum extends Aggr {
       final Item it = gauss(ex.atomValue(qc, info));
       if(it != null) return it;
     } else {
+      if(ex instanceof SingletonSeq) {
+        final Item it = multiply((SingletonSeq) ex);
+        if(it != null) return it;
+      }
       final Iter iter = exprs[0].atomIter(qc, info);
       final Item it = iter.next();
       if(it != null) return sum(iter, it, false, qc);
@@ -40,14 +46,28 @@ public final class FnSum extends Aggr {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex1 = exprs[0], ex2 = exprs.length == 2 ? exprs[1] : Empty.SEQ;
     if(ex1 instanceof RangeSeq) return gauss((Value) ex1);
+    if(ex1 instanceof SingletonSeq) {
+      final Item it = multiply((SingletonSeq) ex1);
+      if(it != null) return it;
+    }
 
     // empty sequence: replace with default item
     final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
-    if(ex1 == Empty.SEQ && (ex2 == Empty.SEQ || st2.instanceOf(SeqType.ITR))) return ex2;
-
-    final Type t1 = st1.type, t2 = ex2 == Empty.SEQ ? t1 : st2.type;
-    if(t1.isNumberOrUntyped() && t2.isNumberOrUntyped()) {
-      exprType.assign(Calc.type(t1, t2).seqType());
+    if(st1.zero()) {
+      // sequence is empty
+      if(ex2 == Empty.SEQ) return ex1;
+      if(st2.instanceOf(SeqType.ITR) && !ex1.has(Flag.NDT)) return ex2;
+    } else if(st1.oneOrMore() && !st1.mayBeArray()) {
+      // sequence is not empty: assign result type
+      final Type t1 = st1.type;
+      if(t1.isNumber()) exprType.assign(t1.seqType());
+      if(t1.isUntyped()) exprType.assign(SeqType.DBL);
+    } else if(!st2.zero() && !st2.mayBeArray()) {
+      // sequence may be empty: include non-empty default argument in tests
+      final Type t1 = st1.type, t2 = st2.type;
+      final Type type = t1.isNumberOrUntyped() && t2.isNumberOrUntyped() ?
+        Calc.type(t1, t2) : AtomType.AAT;
+      exprType.assign(type, st2.one() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return this;
   }
@@ -78,6 +98,17 @@ public final class FnSum extends Aggr {
     // check if result is small enough to be represented as long value
     if(bi.equals(BigInteger.valueOf(l))) return Int.get(l);
     throw RANGE_X.get(info, bi);
+  }
 
+  /**
+   * Multiply constant value.
+   * @param seq singleton sequence
+   * @return sum or {@code null}
+   * @throws QueryException query exception
+   */
+  private Item multiply(final SingletonSeq seq) throws QueryException {
+    Item it = seq.itemAt(0);
+    if(it.type.isUntyped()) it = Dbl.get(it.dbl(info));
+    return it.type.isNumber() ? Calc.MULT.ev(it, Int.get(seq.size()), info) : null;
   }
 }

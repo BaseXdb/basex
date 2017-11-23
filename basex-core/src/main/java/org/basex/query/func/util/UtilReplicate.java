@@ -34,14 +34,14 @@ public final class UtilReplicate extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0], mult = exprs[1];
+    final SeqType st = ex.seqType();
 
     // pre-evaluate static multipliers
     final long m = mult instanceof Value ? toLong(mult, cc.qc) : -1;
-    if(m == 0 || ex == Empty.SEQ) return Empty.SEQ;
-    if(m == 1) return ex;
+    if(m == 0) return Empty.SEQ;
+    if(m == 1 || st.zero()) return ex;
 
     // adopt sequence type
-    final SeqType st = ex.seqType();
     exprType.assign(st.type, st.occ.union(m > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE));
     return this;
   }

@@ -12,7 +12,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -167,17 +166,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return number of written items
    */
   public abstract int writeTo(Item[] arr, int index);
-
-  /**
-   * Creates an array containing all items of this value.
-   * Use with care, as compressed Values are expanded, creating many objects.
-   * @return cached items
-   */
-  public final ItemList cache() {
-    final long n = size();
-    if(n > Integer.MAX_VALUE) throw Util.notExpected(n);
-    return new ItemList((int) n).add(this);
-  }
 
   /**
    * Serializes the value, using the standard XML serializer,

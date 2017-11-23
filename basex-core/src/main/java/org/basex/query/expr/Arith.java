@@ -35,12 +35,23 @@ public final class Arith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
-    exprType.assign(
-      t1.isNumberOrUntyped() && t2.isNumberOrUntyped() ? Calc.type(t1, t2) : AtomType.AAT,
-      st1.oneNoArray() && st2.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
-    return oneIsEmpty() ? cc.emptySeq(this) : allAreValues() ? cc.preEval(this) : this;
+    final boolean nums = t1.isNumberOrUntyped() && t2.isNumberOrUntyped();
+    final Type t = calc == Calc.IDIV ? AtomType.ITR : nums ? Calc.type(t1, t2) : AtomType.AAT;
+    exprType.assign(t, st1.oneNoArray() && st2.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
+
+    Expr expr = this;
+    if(oneIsEmpty()) {
+      expr = cc.emptySeq(this);
+    } else if(allAreValues()) {
+      expr = cc.qc.value(this);
+    } else if(nums && st1.oneNoArray() && st2.oneNoArray()) {
+      expr = calc.optimize(ex1, ex2);
+      if(expr == null || expr.seqType().type != t) expr = this;
+    }
+    return cc.replaceWith(this, expr);
   }
 
   @Override

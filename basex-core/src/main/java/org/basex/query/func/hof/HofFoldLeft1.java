@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -38,7 +37,7 @@ public final class HofFoldLeft1 extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if(ex1 == Empty.SEQ) throw EMPTYFOUND.get(info);
+    if(ex1.seqType().zero()) throw EMPTYFOUND.get(info);
     if(allAreValues() && ex1.size() <= UNROLL_LIMIT) {
       final Value seq = (Value) ex1;
       final FItem f = checkArity(ex2, 2, cc.qc);

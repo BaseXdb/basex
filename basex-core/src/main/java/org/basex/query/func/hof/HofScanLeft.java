@@ -41,9 +41,10 @@ public final class HofScanLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    if(ex == Empty.SEQ) return exprs[1];
-    final SeqType st = ex.seqType();
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    if(ex1 == Empty.SEQ) return ex2;
+
+    final SeqType st = ex1.seqType();
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }

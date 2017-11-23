@@ -146,13 +146,15 @@ public abstract class Cmp extends Arr {
     if(!it2.type.isNumberOrUntyped()) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    switch(check(op, it2)) {
-      case 0: return Bln.TRUE;
-      case 1: return Bln.FALSE;
-      case 2: return cc.function(Function.EXISTS, info, ((Arr) ex1).exprs);
-      case 3: return cc.function(Function.EMPTY, info, ((Arr) ex1).exprs);
-      default: return this;
+    final int type = check(op, it2);
+    if(type >= 2) {
+      final Function func = type == 2 ? Function.EXISTS : Function.EMPTY;
+      return cc.function(func, info, ((Arr) ex1).exprs);
     }
+    if(type >= 0) {
+      return Bln.get(type == 0);
+    }
+    return this;
   }
 
   /**
@@ -171,19 +173,24 @@ public abstract class Cmp extends Arr {
     if(!it2.type.isNumberOrUntyped()) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    switch(check(op, it2)) {
-      case 0: return Bln.TRUE;
-      case 1: return Bln.FALSE;
-      case 2: return cc.function(Function.BOOLEAN, info,
-          cc.function(Function.STRING, info, ((Arr) ex1).exprs));
-      case 3: return cc.function(Function.NOT, info,
-          cc.function(Function.STRING, info, ((Arr) ex1).exprs));
-      default: return this;
+    final Expr[] args = ((Arr) ex1).exprs;
+    final int type = check(op, it2);
+    if(type >= 2) {
+      final Function func = type == 2 ? Function.BOOLEAN : Function.NOT;
+      return cc.function(func, info, cc.function(Function.STRING, info, args));
     }
+    if(type >= 0) {
+      final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;
+      if(arg1 != null) {
+        final SeqType st1 = arg1.seqType();
+        if(st1.zero() || st1.one() && st1.type.isStringOrUntyped()) return Bln.get(type == 0);
+      }
+    }
+    return this;
   }
 
   /**
-   * Analyzes the comparison and returns its type. Possible types are:
+   * Analyzes the comparison and returns its optimization type. Possible types are:
    * <ul>
    *   <li>0: always true</li>
    *   <li>1: always false</li>

@@ -1,5 +1,7 @@
 package org.basex.query.func.hof;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -26,7 +28,16 @@ public final class HofSortWith extends HofFn {
     final Value v = qc.value(exprs[0]);
     final Comparator<Item> cmp = getComp(1, qc);
     if(v.size() < 2) return v;
-    final ItemList items = v.cache();
+
+    final long n = v.size();
+    if(n > Integer.MAX_VALUE) throw RANGE_X.get(info, n);
+
+    final ItemList items = new ItemList((int) n);
+    for(final Item it : v) {
+      qc.checkStop();
+      items.add(it);
+    }
+
     try {
       Arrays.sort(items.list, 0, items.size(), cmp);
     } catch(final QueryRTException ex) {

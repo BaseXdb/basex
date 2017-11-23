@@ -47,7 +47,7 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     error(_XQUERY_EVAL.args(DOC.args(NAME).trim(), " map { }",
         " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(_XQUERY_EVAL.args(_DB_OPEN.args(NAME).trim(), " map { }",
-        " map { 'permission': 'none' }"), DB_OPEN2_X);
+        " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(_XQUERY_EVAL.args(_FILE_EXISTS.args("x").trim(), " map { }",
         " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(_XQUERY_EVAL.args("(1 to 10000000000000)[. = 0]", " map { }",
