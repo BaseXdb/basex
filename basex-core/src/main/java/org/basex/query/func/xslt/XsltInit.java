@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class XsltInit extends XsltFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    CACHE.clear();
+    MAP.clear();
     return null;
   }
 }

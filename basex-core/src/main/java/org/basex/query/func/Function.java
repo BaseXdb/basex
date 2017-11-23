@@ -1141,13 +1141,13 @@ public enum Function {
 
   /** XQuery function. */
   _PROF_MEMORY(ProfMemory.class, "memory(value[,label])",
-      arg(ITEM_ZM, STR, MAP_O), ITEM_ZM, flag(NDT), PROF_URI),
+      arg(ITEM_ZM, STR), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TIME(ProfTime.class, "time(value[,label])",
-      arg(ITEM_ZM, STR, MAP_O), ITEM_ZM, flag(NDT), PROF_URI),
+      arg(ITEM_ZM, STR), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TRACK(ProfTrack.class, "track(value[,options])",
-      arg(ITEM_ZM, STR, MAP_O), ITEM_ZM, flag(NDT), PROF_URI),
+      arg(ITEM_ZM, MAP_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_SLEEP(ProfSleep.class, "sleep(ms)", arg(ITR), EMP, flag(NDT), PROF_URI),
   /** XQuery function. */
@@ -1368,8 +1368,9 @@ public enum Function {
   _XSLT_TRANSFORM(XsltTransform.class, "transform(input,stylesheet[,params[,options]])",
       arg(ITEM, ITEM, MAP_ZO, MAP_O), NOD, flag(NDT), XSLT_URI),
   /** XQuery function. */
-  _XSLT_TRANSFORM_TEXT(XsltTransformText.class, "transform-text(input,stylesheet[,params])",
-      arg(ITEM, ITEM, MAP_ZO), STR, flag(NDT), XSLT_URI),
+  _XSLT_TRANSFORM_TEXT(XsltTransformText.class,
+      "transform-text(input,stylesheet[,params[,options]])",
+      arg(ITEM, ITEM, MAP_ZO, MAP_O), STR, flag(NDT), XSLT_URI),
 
   // ZIP Module
 

@@ -25,6 +25,12 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class XsltTransform extends XsltFn {
+  /** XSLT Options. */
+  public static final class XsltOptions extends Options {
+    /** Cache flag. */
+    public static final BooleanOption CACHE = new BooleanOption("cache", false);
+  }
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
@@ -117,9 +123,9 @@ public class XsltTransform extends XsltFn {
     // system id may be null
     final String key = cache ? ss.getSystemId() : null;
     Transformer tr = null;
-    if(key != null) tr = CACHE.get(key);
+    if(key != null) tr = MAP.get(key);
     if(tr == null) tr = TransformerFactory.newInstance().newTransformer(ss);
-    if(key != null) CACHE.put(key, tr);
+    if(key != null) MAP.put(key, tr);
     return tr;
   }
 }
