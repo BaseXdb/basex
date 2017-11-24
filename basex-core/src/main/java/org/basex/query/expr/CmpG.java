@@ -133,7 +133,7 @@ public class CmpG extends Cmp {
    */
   public CmpG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
       final StaticContext sc, final InputInfo info) {
-    super(info, expr1, expr2, coll, SeqType.BLN, sc);
+    super(info, expr1, expr2, coll, SeqType.BLN_O, sc);
     this.op = op;
   }
 
@@ -184,7 +184,7 @@ public class CmpG extends Cmp {
     // e.g.: exists(...) = true() -> exists(...)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpG.EQ && exprs[1] == Bln.TRUE || op == OpG.NE && exprs[1] == Bln.FALSE) &&
-      exprs[0].seqType().eq(SeqType.BLN) ? cc.replaceEbv(this, exprs[0]) : this;
+      exprs[0].seqType().eq(SeqType.BLN_O) ? cc.replaceEbv(this, exprs[0]) : this;
   }
 
   @Override

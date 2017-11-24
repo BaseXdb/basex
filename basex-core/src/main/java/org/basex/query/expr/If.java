@@ -79,7 +79,7 @@ public final class If extends Arr {
 
     // rewritings for constant booleans
     final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
-    if(st1.eq(SeqType.BLN) && st2.eq(SeqType.BLN)) {
+    if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
       final Expr a = cond, b = exprs[0], c = exprs[1];
       if(b == Bln.TRUE) {
         // if(A) then true() else false() -> xs:boolean(A)

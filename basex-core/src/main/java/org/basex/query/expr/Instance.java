@@ -27,7 +27,7 @@ public final class Instance extends Single {
    * @param instType sequence type to check for
    */
   public Instance(final InputInfo info, final Expr expr, final SeqType instType) {
-    super(info, expr, SeqType.BLN);
+    super(info, expr, SeqType.BLN_O);
     this.instType = instType;
   }
 

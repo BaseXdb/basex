@@ -34,7 +34,7 @@ public final class FnNumber extends ContextFn {
     final Expr ex = arg ? exprs[0] : cc.qc.focus.value;
     // number(1e1) -> 1e1
     // $double[number() = 1] -> $double[. = 1]
-    return ex == null || !ex.seqType().eq(SeqType.DBL) ? this :
+    return ex == null || !ex.seqType().eq(SeqType.DBL_O) ? this :
       arg ? ex : new ContextValue(info).optimize(cc);
   }
 }

@@ -38,7 +38,7 @@ public final class WebResponseHeader extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final HashMap<String, String> output = toOptions(0, new Options(), qc).free();
-    final HashMap<String, String> http = toOptions(1, new Options(), qc).free();
+    final HashMap<String, String> headers = toOptions(1, new Options(), qc).free();
     final ResponseOptions response = toOptions(2, new ResponseOptions(), qc);
 
     // check keys
@@ -47,7 +47,7 @@ public final class WebResponseHeader extends StandardFunc {
       if(so.option(entry) == null) throw INVALIDOPTION_X.get(info, entry);
 
     final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI));
-    http.forEach((name, value) -> {
+    headers.forEach((name, value) -> {
       if(!value.isEmpty()) hresp.add(new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI)).
           add("name", name).add("value", value));
     });

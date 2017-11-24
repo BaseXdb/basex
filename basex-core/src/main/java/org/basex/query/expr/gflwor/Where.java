@@ -28,7 +28,7 @@ public final class Where extends Clause {
    * @param info input info
    */
   public Where(final Expr expr, final InputInfo info) {
-    super(info, SeqType.BLN);
+    super(info, SeqType.BLN_O);
     this.expr = expr;
   }
 

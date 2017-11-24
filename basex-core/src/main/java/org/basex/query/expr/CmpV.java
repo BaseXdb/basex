@@ -204,7 +204,7 @@ public final class CmpV extends Cmp {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
     return (op == OpV.EQ && exprs[1] == Bln.TRUE || op == OpV.NE && exprs[1] == Bln.FALSE) &&
-      exprs[0].seqType().eq(SeqType.BLN) ? cc.replaceEbv(this, exprs[0]) : this;
+      exprs[0].seqType().eq(SeqType.BLN_O) ? cc.replaceEbv(this, exprs[0]) : this;
   }
 
   @Override

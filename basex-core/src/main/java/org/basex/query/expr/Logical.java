@@ -26,7 +26,7 @@ abstract class Logical extends Arr {
    * @param exprs expressions
    */
   Logical(final InputInfo info, final Expr[] exprs) {
-    super(info, SeqType.BLN, exprs);
+    super(info, SeqType.BLN_O, exprs);
   }
 
   @Override
@@ -103,7 +103,7 @@ abstract class Logical extends Arr {
   public final void markTailCalls(final CompileContext cc) {
     // if the last expression surely returns a boolean, we can jump to it
     final Expr last = exprs[exprs.length - 1];
-    if(last.seqType().eq(SeqType.BLN)) last.markTailCalls(cc);
+    if(last.seqType().eq(SeqType.BLN_O)) last.markTailCalls(cc);
   }
 
   @Override

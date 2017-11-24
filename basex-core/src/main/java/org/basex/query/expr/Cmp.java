@@ -126,7 +126,7 @@ public abstract class Cmp extends Arr {
    */
   final Expr optFalse(final OpV op, final CompileContext cc) throws QueryException {
     final Expr ex1 = exprs[0], ex2 = exprs[1];
-    return ex1.seqType().eq(SeqType.BLN) && (op == OpV.EQ && ex2 == Bln.FALSE ||
+    return ex1.seqType().eq(SeqType.BLN_O) && (op == OpV.EQ && ex2 == Bln.FALSE ||
         op == OpV.NE && ex2 == Bln.TRUE) ?  cc.function(Function.NOT, info, ex1) : this;
   }
 

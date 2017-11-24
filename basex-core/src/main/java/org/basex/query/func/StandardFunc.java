@@ -338,9 +338,7 @@ public abstract class StandardFunc extends Arr {
    * @return node, atomized item, or {@code null}
    * @throws QueryException query exception
    */
-  protected final Item toNodeOrAtomItem(final int i, final QueryContext qc)
-      throws QueryException {
-
+  protected final Item toNodeOrAtomItem(final int i, final QueryContext qc) throws QueryException {
     if(i >= exprs.length) return null;
     final Item it = toItem(exprs[i], qc);
     return it instanceof ANode ? it : it.atomItem(info);
@@ -349,7 +347,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Parses the options at the specified index.
    * @param <E> options type
-   * @param i index of argument
+   * @param i index of argument (can exceed length of argument, or may yield an empty sequence)
    * @param opts options
    * @param qc query context
    * @return passed on options

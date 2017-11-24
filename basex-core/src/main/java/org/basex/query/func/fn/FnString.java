@@ -28,7 +28,7 @@ public final class FnString extends ContextFn {
     final Expr ex = arg ? exprs[0] : cc.qc.focus.value;
     // string('x') -> 'x'
     // $string[string() = 'a'] -> $string[. = 'a']
-    return ex == null || !ex.seqType().eq(SeqType.STR) ? this :
+    return ex == null || !ex.seqType().eq(SeqType.STR_O) ? this :
       arg ? ex : new ContextValue(info).optimize(cc);
   }
 }

@@ -145,6 +145,6 @@ abstract class CName extends CNode {
 
   @Override
   public final String toString() {
-    return toString(desc + (name.seqType().eq(SeqType.QNM) ? " " + name : " { " + name + " }"));
+    return toString(desc + (name.seqType().eq(SeqType.QNM_O) ? " " + name : " { " + name + " }"));
   }
 }

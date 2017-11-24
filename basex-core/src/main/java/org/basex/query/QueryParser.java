@@ -843,7 +843,7 @@ public class QueryParser extends InputParser {
 
     localVars.pushContext(null);
     final Expr ex = check(single(), NOVARDECL);
-    final SeqType declType = sc.contextType != null ? sc.contextType : SeqType.ITEM;
+    final SeqType declType = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
     final VarScope vs = localVars.popContext();
     qc.ctxItem = MainModule.get(vs, ex, declType, currDoc.toString(), info());
 
@@ -1081,7 +1081,7 @@ public class QueryParser extends InputParser {
       }
 
       if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
-        final Var var = localVars.add(newVar(SeqType.ITR));
+        final Var var = localVars.add(newVar(SeqType.ITR_O));
         curr.put(var.name.id(), var);
         clauses.add(new Count(var));
       }
@@ -1130,8 +1130,8 @@ public class QueryParser extends InputParser {
       final Var var = newVar();
       final boolean emp = wsConsume(ALLOWING);
       if(emp) wsCheck(EMPTYORD);
-      final Var at = wsConsumeWs(AT) ? newVar(SeqType.ITR) : null;
-      final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DBL) : null;
+      final Var at = wsConsumeWs(AT) ? newVar(SeqType.ITR_O) : null;
+      final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DBL_O) : null;
       // check for duplicate variable names
       if(at != null) {
         if(var.name.eq(at.name)) throw error(DUPLVAR_X, at);
@@ -1154,7 +1154,7 @@ public class QueryParser extends InputParser {
   private void letClause(final LinkedList<Clause> cls) throws QueryException {
     do {
       final boolean score = wsConsumeWs(SCORE);
-      final Var var = score ? newVar(SeqType.DBL) : newVar();
+      final Var var = score ? newVar(SeqType.DBL_O) : newVar();
       wsCheck(ASSIGN);
       final Expr ex = check(single(), NOVARDECL);
       cls.add(new Let(localVars.add(var), ex, score));
@@ -2339,7 +2339,7 @@ public class QueryParser extends InputParser {
     if(tok.isEmpty()) throw error(NUMBER_X, tok);
     final long l = toLong(tok.toArray());
     return l != Long.MIN_VALUE ? Int.get(l) :
-      FnError.get(RANGE_X.get(info(), chop(tok, null)), SeqType.ITR, sc);
+      FnError.get(RANGE_X.get(info(), chop(tok, null)), SeqType.ITR_O, sc);
   }
 
   /**
@@ -3720,7 +3720,7 @@ public class QueryParser extends InputParser {
 
     Let[] fl = { };
     do {
-      final Var var = newVar(SeqType.NOD);
+      final Var var = newVar(SeqType.NOD_O);
       wsCheck(ASSIGN);
       final Expr ex = check(single(), INCOMPLETE);
       fl = Array.add(fl, new Let(localVars.add(var), ex, false));

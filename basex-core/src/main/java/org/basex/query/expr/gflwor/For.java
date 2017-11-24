@@ -120,8 +120,8 @@ public final class For extends ForLet {
     exprType.assign(tp.type, empty && tp.mayBeEmpty() ? Occ.ZERO_ONE : Occ.ONE);
     var.refineType(exprType.seqType(), exprType.size(), cc);
     var.data = expr.data();
-    if(pos != null) pos.refineType(SeqType.ITR, 1, cc);
-    if(score != null) score.refineType(SeqType.DBL, 1, cc);
+    if(pos != null) pos.refineType(SeqType.ITR_O, 1, cc);
+    if(score != null) score.refineType(SeqType.DBL_O, 1, cc);
     return this;
   }
 

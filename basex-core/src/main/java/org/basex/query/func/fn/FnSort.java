@@ -126,7 +126,7 @@ public final class FnSort extends StandardFunc {
    * @return sorted value or {@code null}
    */
   private Value value(final Value value) {
-    if(exprs.length < 1) {
+    if(exprs.length < 2) {
       // range values
       if(value instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) value;

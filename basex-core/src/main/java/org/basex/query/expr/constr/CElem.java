@@ -36,7 +36,7 @@ public final class CElem extends CName {
    */
   public CElem(final StaticContext sc, final InputInfo info, final Expr name, final Atts nspaces,
       final Expr... cont) {
-    super(ELEMENT, sc, info, SeqType.ELM, name, cont);
+    super(ELEMENT, sc, info, SeqType.ELM_O, name, cont);
     this.nspaces = nspaces == null ? new Atts() : nspaces;
     comp = nspaces == null;
   }

@@ -93,7 +93,7 @@ public final class MapType extends FuncType {
     }
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT)) {
+      if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT_O)) {
         final SeqType dt = declType.intersect(ft.declType);
         return dt == null ? null : get((AtomType) keyType().union(ft.argTypes[0].type), dt);
       }

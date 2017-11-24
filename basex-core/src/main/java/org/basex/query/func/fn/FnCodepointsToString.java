@@ -41,7 +41,7 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    singleInt = exprs[0].seqType().instanceOf(SeqType.ITR);
+    singleInt = exprs[0].seqType().instanceOf(SeqType.ITR_O);
     return this;
   }
 

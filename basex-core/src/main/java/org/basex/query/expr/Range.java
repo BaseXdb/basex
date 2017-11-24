@@ -37,10 +37,8 @@ public final class Range extends Arr {
     if(allAreValues()) return cc.preEval(this);
 
     final Expr e1 = exprs[0], e2 = exprs[1];
-    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
     if(e1.equals(e2)) {
-      if(st1.instanceOf(SeqType.ITR) && st2.instanceOf(SeqType.ITR))
-        return cc.replaceWith(this, e1);
+      if(e1.seqType().instanceOf(SeqType.ITR_O)) return cc.replaceWith(this, e1);
       exprType.assign(Occ.ONE);
     }
     return this;

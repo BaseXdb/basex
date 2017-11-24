@@ -839,7 +839,7 @@ public final class QT3TS extends Main {
    */
   private static String assertBoolean(final QT3Result result, final boolean expected) {
     final XdmValue returned = result.value;
-    return returned.getType().eq(SeqType.BLN) && returned.getBoolean() == expected ?
+    return returned.getType().eq(SeqType.BLN_O) && returned.getBoolean() == expected ?
         null : Util.info(expected);
   }
 

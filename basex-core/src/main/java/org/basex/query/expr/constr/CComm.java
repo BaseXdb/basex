@@ -26,7 +26,7 @@ public final class CComm extends CNode {
    * @param comment comment
    */
   public CComm(final StaticContext sc, final InputInfo info, final Expr comment) {
-    super(sc, info, SeqType.COM, comment);
+    super(sc, info, SeqType.COM_O, comment);
   }
 
   @Override

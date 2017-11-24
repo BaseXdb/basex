@@ -430,7 +430,7 @@ public abstract class Array extends FItem {
     if(type.instanceOf(ft)) return true;
 
     final SeqType[] at = ft.argTypes;
-    if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
+    if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR_O))) return false;
 
     final SeqType ret = ft.declType;
     if(ft instanceof ArrayType) {

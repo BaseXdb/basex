@@ -28,7 +28,7 @@ public final class FnBoolean extends StandardFunc {
     if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, exprs);
 
     // simplify, e.g.: boolean(true())) -> true()
-    if(st.eq(SeqType.BLN)) return ex;
+    if(st.eq(SeqType.BLN_O)) return ex;
 
     exprs[0] = ex;
     return this;
@@ -51,6 +51,6 @@ public final class FnBoolean extends StandardFunc {
    * @return expression
    */
   public static Expr get(final Expr ex, final InputInfo info, final StaticContext sc) {
-    return ex.seqType().eq(SeqType.BLN) ? ex : Function.BOOLEAN.get(sc, info, ex);
+    return ex.seqType().eq(SeqType.BLN_O) ? ex : Function.BOOLEAN.get(sc, info, ex);
   }
 }

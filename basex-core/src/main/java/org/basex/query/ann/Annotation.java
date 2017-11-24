@@ -28,105 +28,105 @@ public enum Annotation {
   /** XQuery annotation. */
   _BASEX_LAZY("lazy()", arg(), BASEX_URI),
   /** XQuery annotation. */
-  _BASEX_INLINE("inline([limit])", arg(ITR), BASEX_URI),
+  _BASEX_INLINE("inline([limit])", arg(ITR_O), BASEX_URI),
 
   /** XQuery annotation. */
-  _INPUT_CSV("csv(option[,...])", arg(STR), INPUT_URI),
+  _INPUT_CSV("csv(option[,...])", arg(STR_O), INPUT_URI),
   /** XQuery annotation. */
-  _INPUT_HTML("html(option[,...])", arg(STR), INPUT_URI),
+  _INPUT_HTML("html(option[,...])", arg(STR_O), INPUT_URI),
   /** XQuery annotation. */
-  _INPUT_JSON("json(option[,...])", arg(STR), INPUT_URI),
+  _INPUT_JSON("json(option[,...])", arg(STR_O), INPUT_URI),
   /** XQuery annotation. */
-  _INPUT_TEXT("text(option[,...])", arg(STR), INPUT_URI),
+  _INPUT_TEXT("text(option[,...])", arg(STR_O), INPUT_URI),
 
   /** XQuery annotation. */
-  _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_CDATA_SECTION_ELEMENTS("cdata-section-elements(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_CDATA_SECTION_ELEMENTS("cdata-section-elements(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_CSV("csv(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_CSV("csv(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_DOCTYPE_PUBLIC("doctype-public(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_DOCTYPE_PUBLIC("doctype-public(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_DOCTYPE_SYSTEM("doctype-system(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_DOCTYPE_SYSTEM("doctype-system(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_ENCODING("encoding(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_ENCODING("encoding(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_HTML_VERSION("html-version(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_HTML_VERSION("html-version(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INCLUDE_CONTENT_TYPE("include-content-type(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_INCLUDE_CONTENT_TYPE("include-content-type(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INDENT("indent(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_INDENT("indent(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INDENTS("indents(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_INDENTS("indents(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_ITEM_SEPARATOR("item-separator(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_ITEM_SEPARATOR("item-separator(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_JSON("json(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_JSON("json(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_JSON_NODE_OUTPUT_METHOD("json-node-output-method(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_JSON_NODE_OUTPUT_METHOD("json-node-output-method(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_MEDIA_TYPE("media-type(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_MEDIA_TYPE("media-type(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_METHOD("method(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_METHOD("method(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_NEWLINE("newline(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_NEWLINE("newline(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_NORMALIZATION_FORM("normalization-form(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_NORMALIZATION_FORM("normalization-form(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_OMIT_XML_DECLARATION("omit-xml-declaration(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_OMIT_XML_DECLARATION("omit-xml-declaration(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_PARAMETER_DOCUMENT("parameter-document(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_PARAMETER_DOCUMENT("parameter-document(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_STANDALONE("standalone(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_STANDALONE("standalone(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_SUPPRESS_INDENTATION("suppress-indentation(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_SUPPRESS_INDENTATION("suppress-indentation(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_TABULATOR("tabulator(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_TABULATOR("tabulator(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_UNDECLARE_PREFIXES("undeclare-prefixes(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_UNDECLARE_PREFIXES("undeclare-prefixes(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_USE_CHARACTER_MAPS("use-character-maps(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_USE_CHARACTER_MAPS("use-character-maps(value)", arg(STR_O), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_VERSION("version(value)", arg(STR), OUTPUT_URI),
+  _OUTPUT_VERSION("version(value)", arg(STR_O), OUTPUT_URI),
 
   /** XQuery annotation. */
-  _REST_PATH("path(path)", arg(STR), REST_URI),
+  _REST_PATH("path(path)", arg(STR_O), REST_URI),
   /** XQuery annotation. */
-  _REST_ERROR("error(code[,...])", arg(STR), REST_URI, false),
+  _REST_ERROR("error(code[,...])", arg(STR_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_CONSUMES("consumes(type[,...])", arg(STR), REST_URI, false),
+  _REST_CONSUMES("consumes(type[,...])", arg(STR_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_PRODUCES("produces(type[,...])", arg(STR), REST_URI, false),
+  _REST_PRODUCES("produces(type[,...])", arg(STR_O), REST_URI, false),
   /** XQuery annotation. */
   _REST_QUERY_PARAM("query-param(name,variable[,default,...])",
-      arg(STR, STR, ITEM), REST_URI, false),
+      arg(STR_O, STR_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
   _REST_FORM_PARAM("form-param(name,variable[,default,...])",
-      arg(STR, STR, ITEM), REST_URI, false),
+      arg(STR_O, STR_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
   _REST_HEADER_PARAM("header-param(name,variable[,default,...])",
-      arg(STR, STR, ITEM), REST_URI, false),
+      arg(STR_O, STR_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
   _REST_COOKIE_PARAM("cookie-param(name,variable[,default,...])",
-      arg(STR, STR, ITEM), REST_URI, false),
+      arg(STR_O, STR_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
   _REST_ERROR_PARAM("error-param(name,variable[,default,...])",
-      arg(STR, STR, ITEM), REST_URI, false),
+      arg(STR_O, STR_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_METHOD("method(name[,body])", arg(STR, STR), REST_URI, false),
+  _REST_METHOD("method(name[,body])", arg(STR_O, STR_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_SINGLE("single([key])", arg(STR), REST_URI),
+  _REST_SINGLE("single([key])", arg(STR_O), REST_URI),
   /** XQuery annotation. */
   _REST_GET("GET()", arg(), REST_URI),
   /** XQuery annotation. */
-  _REST_POST("POST([body])", arg(STR), REST_URI),
+  _REST_POST("POST([body])", arg(STR_O), REST_URI),
   /** XQuery annotation. */
-  _REST_PUT("PUT([body])", arg(STR), REST_URI),
+  _REST_PUT("PUT([body])", arg(STR_O), REST_URI),
   /** XQuery annotation. */
   _REST_DELETE("DELETE()", arg(), REST_URI),
   /** XQuery annotation. */
@@ -135,17 +135,17 @@ public enum Annotation {
   _REST_OPTIONS("OPTIONS()", arg(), REST_URI),
 
   /** XQuery annotation. */
-  _UNIT_AFTER("after([function])", arg(STR), UNIT_URI),
+  _UNIT_AFTER("after([function])", arg(STR_O), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_AFTER_MODULE("after-module()", arg(), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_BEFORE("before([function])", arg(STR), UNIT_URI),
+  _UNIT_BEFORE("before([function])", arg(STR_O), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_BEFORE_MODULE("before-module()", arg(), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_IGNORE("ignore([message])", arg(STR), UNIT_URI),
+  _UNIT_IGNORE("ignore([message])", arg(STR_O), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_TEST("test(['expected',error])", arg(STR, STR), UNIT_URI);
+  _UNIT_TEST("test(['expected',error])", arg(STR_O, STR_O), UNIT_URI);
 
   /** Argument types. */
   public final SeqType[] args;

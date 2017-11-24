@@ -20,7 +20,7 @@ public final class ArrayType extends FuncType {
    * @param declType declared return type
    */
   ArrayType(final SeqType declType) {
-    super(declType, SeqType.ITR);
+    super(declType, SeqType.ITR_O);
   }
 
   @Override
@@ -87,7 +87,7 @@ public final class ArrayType extends FuncType {
     }
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR)) {
+      if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR_O)) {
         final SeqType dt = declType.intersect(ft.declType);
         return dt == null ? null : get(dt);
       }

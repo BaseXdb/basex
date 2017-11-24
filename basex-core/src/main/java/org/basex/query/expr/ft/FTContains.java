@@ -34,7 +34,7 @@ public final class FTContains extends Single {
    * @param info input info
    */
   public FTContains(final Expr expr, final FTExpr ftexpr, final InputInfo info) {
-    super(info, expr, SeqType.BLN);
+    super(info, expr, SeqType.BLN_O);
     this.ftexpr = ftexpr;
   }
 

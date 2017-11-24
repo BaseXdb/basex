@@ -32,7 +32,7 @@ public final class Castable extends Single {
    */
   public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType castType) {
-    super(info, expr, SeqType.BLN);
+    super(info, expr, SeqType.BLN_O);
     this.sc = sc;
     this.castType = castType;
   }

@@ -56,12 +56,12 @@ public final class FnSum extends Aggr {
     if(st1.zero()) {
       // sequence is empty
       if(ex2 == Empty.SEQ) return ex1;
-      if(st2.instanceOf(SeqType.ITR) && !ex1.has(Flag.NDT)) return ex2;
+      if(st2.instanceOf(SeqType.ITR_O) && !ex1.has(Flag.NDT)) return ex2;
     } else if(st1.oneOrMore() && !st1.mayBeArray()) {
       // sequence is not empty: assign result type
       final Type t1 = st1.type;
       if(t1.isNumber()) exprType.assign(t1.seqType());
-      if(t1.isUntyped()) exprType.assign(SeqType.DBL);
+      if(t1.isUntyped()) exprType.assign(SeqType.DBL_O);
     } else if(!st2.zero() && !st2.mayBeArray()) {
       // sequence may be empty: include non-empty default argument in tests
       final Type t1 = st1.type, t2 = st2.type;

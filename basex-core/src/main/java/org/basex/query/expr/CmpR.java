@@ -56,7 +56,7 @@ public final class CmpR extends Single {
   private CmpR(final Expr expr, final double min, final boolean mni, final double max,
       final boolean mxi, final InputInfo info) {
 
-    super(info, expr, SeqType.BLN);
+    super(info, expr, SeqType.BLN_O);
     this.min = min;
     this.mni = mni;
     this.max = max;

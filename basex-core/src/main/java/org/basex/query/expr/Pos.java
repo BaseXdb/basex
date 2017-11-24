@@ -27,7 +27,7 @@ public final class Pos extends Arr {
    * @param max max expression
    */
   private Pos(final InputInfo info, final Expr min, final Expr max) {
-    super(info, SeqType.BLN, min, max);
+    super(info, SeqType.BLN_O, min, max);
   }
 
   /**

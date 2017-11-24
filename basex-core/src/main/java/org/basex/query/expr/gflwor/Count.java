@@ -25,7 +25,7 @@ public final class Count extends Clause {
    * @param var variable
    */
   public Count(final Var var) {
-    super(var.info, SeqType.ITR, var);
+    super(var.info, SeqType.ITR_O, var);
     this.var = var;
   }
 
