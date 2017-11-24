@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -226,7 +227,7 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  protected Value subSeq(final long offset, final long length) {
+  protected Seq subSeq(final long offset, final long length) {
     final long midSize = middle.size();
     final long end = offset + length;
     if(end <= left.length) {

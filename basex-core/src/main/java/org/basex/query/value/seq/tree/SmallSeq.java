@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -68,8 +69,8 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  protected Value subSeq(final long offset, final long len) {
-    final int o = (int) offset, l = (int) len;
+  protected Seq subSeq(final long offset, final long length) {
+    final int o = (int) offset, l = (int) length;
     return new SmallSeq(slice(elems, o, o + l), type);
   }
 

@@ -63,8 +63,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  protected Value subSeq(final long offset, final long length) {
-    return value.size() == 1 ? get(value, length) : super.subSeq(offset, length);
+  protected Seq subSeq(final long offset, final long length) {
+    return value.size() == 1 ? new SingletonSeq(length, value) : super.subSeq(offset, length);
   }
 
   @Override

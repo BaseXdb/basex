@@ -82,6 +82,11 @@ public final class Empty extends Value {
   }
 
   @Override
+  public Empty subSequence(final long start, final long length) {
+    return this;
+  }
+
+  @Override
   public SeqType seqType() {
     return SeqType.EMP;
   }
@@ -114,11 +119,6 @@ public final class Empty extends Value {
   @Override
   public boolean homogeneous() {
     return true;
-  }
-
-  @Override
-  public Value subSeq(final long start, final long len) {
-    return this;
   }
 
   @Override

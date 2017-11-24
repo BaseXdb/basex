@@ -33,7 +33,7 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  protected Value subSeq(final long offset, final long length) {
+  protected Seq subSeq(final long offset, final long length) {
     return new SubSeq(sub, start + offset, length);
   }
 

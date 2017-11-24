@@ -78,7 +78,20 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  protected Value subSeq(final long offset, final long length) {
+  public final Value subSequence(final long start, final long length) {
+    return length == 0 ? Empty.SEQ :
+           length == 1 ? itemAt(start) :
+           length == size() ? this :
+           subSeq(start, length);
+  }
+
+  /**
+   * Returns a sub sequence of this value with the given start and length.
+   * @param offset offset (>= 0)
+   * @param length number of items (1 < length < size())
+   * @return sub sequence
+   */
+  protected Seq subSeq(final long offset, final long length) {
     return new SubSeq(this, offset, length);
   }
 

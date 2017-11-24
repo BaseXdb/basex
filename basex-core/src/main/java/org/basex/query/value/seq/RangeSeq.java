@@ -88,8 +88,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  protected Value subSeq(final long offset, final long length) {
-    return get(start + (asc ? offset : -offset), length, asc);
+  protected Seq subSeq(final long offset, final long length) {
+    return new RangeSeq(start + (asc ? offset : -offset), length, asc);
   }
 
   @Override

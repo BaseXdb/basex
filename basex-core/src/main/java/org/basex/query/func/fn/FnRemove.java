@@ -41,7 +41,10 @@ public final class FnRemove extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // ignore standard limitation for large values
+    if(allAreValues()) return value(cc.qc);
+
     final Expr ex = exprs[0];
     final SeqType st = ex.seqType();
     if(st.zero()) return ex;

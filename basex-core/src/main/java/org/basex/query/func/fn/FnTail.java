@@ -54,11 +54,12 @@ public final class FnTail extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // ignore standard limitation for large values
+    if(allAreValues()) return value(cc.qc);
+
     final Expr ex = exprs[0];
     final long sz = ex.size() - 1;
-    if(ex instanceof Value) return ((Value) ex).subSequence(1, sz);
-
     final SeqType st = ex.seqType();
     if(sz == -1 || sz == 0 || st.zeroOrOne()) return Empty.SEQ;
     if(sz > 0) {
