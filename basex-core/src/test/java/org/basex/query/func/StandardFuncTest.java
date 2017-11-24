@@ -25,7 +25,7 @@ public final class StandardFuncTest extends QueryPlanTest {
     // function is replaced by its argument (argument yields no result)
     check(func.args(" prof:void(())"), "", empty(name));
     // but type is adjusted
-    check(func.args(" <_>1</_>"), 1, type(name, "xs:numeric"));
+    check(func.args(" <_>1</_>"), 1, type(name, "xs:double"));
     // no adjustment of type
     check(func.args(" 1 ! array { . }"), 1, type(name, "xs:numeric?"));
   }

@@ -1,11 +1,13 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.value.type.AtomType.*;
 
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -20,16 +22,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class FnSum extends Aggr {
+public class FnSum extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr ex = exprs[0];
     if(ex instanceof RangeSeq || ex instanceof Range) {
-      final Item it = gauss(ex.value(qc));
+      final Item it = range(ex.value(qc));
       if(it != null) return it;
     } else {
       if(ex instanceof SingletonSeq) {
-        final Item it = multiply((SingletonSeq) ex);
+        final Item it = singleton((SingletonSeq) ex);
         if(it != null) return it;
       }
       final Iter iter = exprs[0].atomIter(qc, info);
@@ -44,9 +46,9 @@ public final class FnSum extends Aggr {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex1 = exprs[0], ex2 = exprs.length == 2 ? exprs[1] : Empty.SEQ;
-    if(ex1 instanceof RangeSeq) return gauss((Value) ex1);
+    if(ex1 instanceof RangeSeq) return range((Value) ex1);
     if(ex1 instanceof SingletonSeq) {
-      final Item it = multiply((SingletonSeq) ex1);
+      final Item it = singleton((SingletonSeq) ex1);
       if(it != null) return it;
     }
 
@@ -72,14 +74,15 @@ public final class FnSum extends Aggr {
   }
 
   /**
-   * Little Gauss computation.
-   * @param value sequence of dense and distinct numbers
-   * @return sum, or {@code null} if sequence is empty
+   * Compute result from range value.
+   * @param value sequence
+   * @return result, or {@code null} if sequence is empty
    * @throws QueryException query exception
    */
-  private Item gauss(final Value value) throws QueryException {
+  private Item range(final Value value) throws QueryException {
     if(value.isEmpty()) return null;
 
+    // Little Gauss computation
     long min = value.itemAt(0).itr(info), max = value.itemAt(value.size() - 1).itr(info);
     // swap values if order is descending
     if(min > max) {
@@ -87,6 +90,7 @@ public final class FnSum extends Aggr {
       max = min;
       min = t;
     }
+
     // range is small enough to be computed with long values
     if(max < 3037000500L) return Int.get((min + max) * (max - min + 1) / 2);
     // compute larger ranges
@@ -100,14 +104,48 @@ public final class FnSum extends Aggr {
   }
 
   /**
-   * Multiply constant value.
+   * Compute result from singleton value.
    * @param seq singleton sequence
-   * @return sum or {@code null}
+   * @return result, or {@code null} if value cannot be evaluated
    * @throws QueryException query exception
    */
-  private Item multiply(final SingletonSeq seq) throws QueryException {
+  private Item singleton(final SingletonSeq seq) throws QueryException {
     Item it = seq.itemAt(0);
     if(it.type.isUntyped()) it = Dbl.get(it.dbl(info));
     return it.type.isNumber() ? Calc.MULT.ev(it, Int.get(seq.size()), info) : null;
+  }
+
+  /**
+   * Sums up the specified item(s).
+   * @param iter iterator
+   * @param item first item
+   * @param avg calculate average
+   * @param qc query context
+   * @return summed up item
+   * @throws QueryException query exception
+   */
+  Item sum(final Iter iter, final Item item, final boolean avg, final QueryContext qc)
+      throws QueryException {
+
+    Item res = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
+    final boolean num = res instanceof ANum, dtd = res.type == DTD, ymd = res.type == YMD;
+    if(!num && !dtd && !ymd) throw SUM_X_X.get(info, res.type, res);
+
+    int c = 1;
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      final Type t = it.type;
+      Type te = null;
+      if(t.isNumberOrUntyped()) {
+        if(!num) te = AtomType.DUR;
+      } else {
+        if(num) te = AtomType.NUM;
+        else if(dtd && t != DTD || ymd && t != YMD) te = AtomType.DUR;
+      }
+      if(te != null) throw CMP_X_X_X.get(info, te, t, it);
+      res = Calc.PLUS.ev(res, it, info);
+      c++;
+    }
+    return avg ? Calc.DIV.ev(res, Int.get(c), info) : res;
   }
 }

@@ -24,6 +24,20 @@ public final class FnModuleTest extends QueryPlanTest {
   private static final String TEXT = "src/test/resources/input.xml";
 
   /** Test method. */
+  @Test public void abs() {
+    final Function func = Function.ABS;
+    final String name = Util.className(func.clazz);
+
+    check(func.args(" ()"), "", empty());
+    check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2", type(name, "xs:integer"));
+    check("for $i in (1,2.0) return " + func.args(" $i"), "1\n2", type(name, "xs:decimal"));
+    check(func.args(" <a>1</a>"), "1", type(name, "xs:double"));
+
+    check("for $i in ([],[]) return " + func.args(" $i"), "", type(name, "xs:numeric?"));
+    check("for $i in (1,<a>2</a>) return " + func.args(" $i"), "1\n2", type(name, "xs:numeric?"));
+  }
+
+  /** Test method. */
   @Test public void apply() {
     final Function func = Function.APPLY;
     final String name = Util.className(func.clazz);
@@ -52,6 +66,46 @@ public final class FnModuleTest extends QueryPlanTest {
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
     error(func.args(" true#0", " [1]"), QueryError.APPLY_X_X);
     error(func.args(" put#2", " [<_/>,'']"), QueryError.FUNCUP_X);
+  }
+
+  /** Test method. */
+  @Test public void avg() {
+    final Function func = Function.AVG;
+    final String name = Util.className(func.clazz);
+
+    check(func.args(" ()"), "", empty());
+    check(func.args(" prof:void('x')"), "", empty(func.clazz));
+
+    check(func.args(" 1"), 1, empty(func.clazz));
+    check(func.args(" 1.0"), 1, empty(func.clazz));
+    check(func.args(" 1e0"), 1, empty(func.clazz));
+    check(func.args(" xs:float('1')"), 1, empty(func.clazz));
+
+    check(func.args(" 1[. = 1]"), 1, type(name, "xs:decimal?"));
+    check(func.args(" 1.0[. = 1]"), 1, type(name, "xs:decimal?"));
+    check(func.args(" 1e0[. = 1]"), 1, type(name, "xs:double?"));
+    check(func.args(" xs:float('1')[. = 1]"), 1, type(name, "xs:float?"));
+
+    check(func.args(" (1,3[. = 5])"), 1, type(name, "xs:decimal"));
+    check(func.args(" (1,3.0[. = 5])"), 1, type(name, "xs:decimal"));
+    check(func.args(" (<a>1</a>, <a>3</a>)"), 2, type(name, "xs:double"));
+
+    check(func.args(" (1 to 3)"), 2, empty(func.clazz));
+    check(func.args(" reverse(1 to 3)"), 2, empty(func.clazz));
+    check(func.args(" (1 to <_>3</_>)"), 2, type(name, "xs:decimal?"));
+    check(func.args(" (1 to <_>0</_>)"), "", type(name, "xs:decimal?"));
+    check(func.args(" (1 to 999999)"), 500000, empty(func.clazz));
+    check(func.args(" (1 to 999999) ! 1"), 1, empty(func.clazz));
+
+    check(func.args(" (1 to 3) ! 1"), 1, empty(func.clazz));
+    check(func.args(" (1 to 3) ! xs:untypedAtomic(1)"), 1, empty(func.clazz));
+
+    check(func.args(" util:replicate(1.0, 3)"), 1, empty(func.clazz));
+    check(func.args(" util:replicate(<_>1</_>, 3)"), 1, type(name, "xs:double"));
+
+    error(func.args(" true#0"), FIATOM_X);
+    error(func.args(" util:replicate(true#0, 2)"), FIATOM_X);
+    error(func.args(" (1 to 999999) ! true#0"), FIATOM_X);
   }
 
   /** Test method. */
