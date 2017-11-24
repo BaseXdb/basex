@@ -771,8 +771,8 @@ public enum AtomType implements Type {
   /** Sortable flag. */
   private final boolean sortable;
 
-  /** Sequence type (lazy instantiation). */
-  private SeqType seqType;
+  /** Sequence types (lazy instantiation). */
+  private EnumMap<Occ, SeqType> seqTypes;
 
   /**
    * Constructor.
@@ -846,10 +846,9 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final SeqType seqType() {
-    // cannot be statically instantiated due to circular dependencies
-    if(seqType == null) seqType = new SeqType(this);
-    return seqType;
+  public final SeqType seqType(final Occ occ) {
+    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
+    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }
 
   @Override

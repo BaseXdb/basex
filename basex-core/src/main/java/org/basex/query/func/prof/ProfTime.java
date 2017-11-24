@@ -45,8 +45,8 @@ public class ProfTime extends StandardFunc {
    */
   final Value value(final QueryContext qc, final Supplier<byte[]> func) throws QueryException {
     final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
-    final Value v = qc.value(exprs[0]);
+    final Value value = qc.value(exprs[0]);
     FnTrace.trace(func.get(), label, qc);
-    return v;
+    return value;
   }
 }

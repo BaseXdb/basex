@@ -1,7 +1,7 @@
 package org.basex.query;
 
+import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.SeqType.*;
-import static org.basex.query.value.type.SeqType.Occ.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.value.type.*;
@@ -81,7 +81,7 @@ public final class SeqTypeTest {
     assertFalse(f.instanceOf(ITR_O));
     assertTrue(f.instanceOf(ITEM_O));
     assertTrue(f.instanceOf(f));
-    assertTrue(f.instanceOf(FUN_OZ));
+    assertTrue(f.instanceOf(FUN_ZO));
     assertFalse(FUN_O.instanceOf(f));
     assertFalse(f.instanceOf(FuncType.get(DEC_ZO, BLN_O, ITR_O).seqType()));
     assertFalse(f.instanceOf(FuncType.get(DEC_ZO, AAT_O).seqType()));

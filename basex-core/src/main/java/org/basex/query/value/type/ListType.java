@@ -3,11 +3,12 @@ package org.basex.query.value.type;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 
 /**
@@ -32,8 +33,8 @@ public enum ListType implements Type {
   /** Name. */
   private final QNm name;
 
-  /** Sequence type (lazy instantiation). */
-  private SeqType seq;
+  /** Sequence types (lazy instantiation). */
+  private EnumMap<Occ, SeqType> seqTypes;
 
   /**
    * Constructor.
@@ -98,9 +99,10 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final SeqType seqType() {
-    if(seq == null) seq = SeqType.get(this, Occ.ZERO_MORE);
-    return seq;
+  public SeqType seqType(final Occ occ) {
+    // cannot be statically instantiated due to circular dependencies
+    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
+    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }
 
   @Override

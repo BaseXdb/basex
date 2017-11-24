@@ -6,7 +6,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;

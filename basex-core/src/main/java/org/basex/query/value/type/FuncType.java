@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.util.list.*;
@@ -25,8 +27,8 @@ public class FuncType implements Type {
   /** Argument types (can be {@code null}, indicated that no types were specified). */
   public final SeqType[] argTypes;
 
-  /** Actual return type (by type inference, lazy instantiation). */
-  private SeqType seqType;
+  /** Sequence types (lazy instantiation). */
+  private EnumMap<Occ, SeqType> seqTypes;
 
   /**
    * Constructor.
@@ -75,9 +77,9 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final SeqType seqType() {
-    if(seqType == null) seqType = new SeqType(this);
-    return seqType;
+  public SeqType seqType(final Occ occ) {
+    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
+    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }
 
   @Override
@@ -227,11 +229,11 @@ public class FuncType implements Type {
    */
   public static FuncType get(final AnnList anns, final SeqType declType, final Var[] params) {
     final int pl = params.length;
-    final SeqType[] at = new SeqType[pl];
+    final SeqType[] argTypes = new SeqType[pl];
     for(int p = 0; p < pl; p++) {
-      at[p] = params[p] == null ? SeqType.ITEM_ZM : params[p].declaredType();
+      argTypes[p] = params[p] == null ? SeqType.ITEM_ZM : params[p].declaredType();
     }
-    return new FuncType(anns, declType, at);
+    return new FuncType(anns, declType, argTypes);
   }
 
   @Override

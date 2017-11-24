@@ -14,7 +14,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -379,7 +378,7 @@ public final class GroupBy extends Clause {
     public Spec optimize(final CompileContext cc) throws QueryException {
       adoptType(expr);
       final Type t = expr.seqType().atomicType();
-      if(t != null) var.refineType(exprType.seqType().with(t), cc);
+      if(t != null) var.refineType(seqType().with(t), cc);
       return this;
     }
 

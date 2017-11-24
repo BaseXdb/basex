@@ -65,7 +65,7 @@ public final class Count extends Clause {
 
   @Override
   public Count optimize(final CompileContext cc) throws QueryException {
-    var.refineType(exprType.seqType(), cc);
+    var.refineType(seqType(), cc);
     return this;
   }
 

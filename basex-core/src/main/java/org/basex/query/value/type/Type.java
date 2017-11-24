@@ -188,10 +188,19 @@ public interface Type {
       throws QueryException;
 
   /**
-   * Returns a sequence type with this type.
+   * Returns a sequence type with a single number of occurrence.
    * @return sequence type
    */
-  SeqType seqType();
+  default SeqType seqType() {
+    return seqType(Occ.ONE);
+  }
+
+  /**
+   * Returns a sequence type with the specified occurrence indicator.
+   * @param occ occurrence indicator
+   * @return sequence type
+   */
+  SeqType seqType(Occ occ);
 
   // PUBLIC AND STATIC METHODS ================================================
 

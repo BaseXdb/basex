@@ -1,7 +1,6 @@
 package org.basex.query.value.type;
 
 import org.basex.query.expr.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**

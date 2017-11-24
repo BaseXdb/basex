@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**

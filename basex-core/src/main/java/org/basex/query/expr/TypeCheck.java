@@ -10,7 +10,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -49,7 +48,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType at = expr.seqType(), st = exprType.seqType();
+    final SeqType at = expr.seqType(), st = seqType();
 
     // return type is already correct
     if(at.instanceOf(st)) {
@@ -84,7 +83,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final SeqType st = exprType.seqType();
+    final SeqType st = seqType();
     final Iter iter = qc.iter(expr);
 
     return new Iter() {
@@ -125,7 +124,7 @@ public final class TypeCheck extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = qc.value(expr);
-    final SeqType st = exprType.seqType();
+    final SeqType st = seqType();
     if(st.instance(val)) return val;
     if(promote) return st.promote(val, null, qc, sc, info, false);
     throw INVCAST_X_X_X.get(info, val.seqType(), st, val);
@@ -137,7 +136,7 @@ public final class TypeCheck extends Single {
    * @return result of check
    */
   public boolean isRedundant(final Var var) {
-    return (!promote || var.promotes()) && var.declaredType().instanceOf(exprType.seqType());
+    return (!promote || var.promotes()) && var.declaredType().instanceOf(seqType());
   }
 
   /**
@@ -148,9 +147,8 @@ public final class TypeCheck extends Single {
    * @throws QueryException query exception
    */
   public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
-    final SeqType at = ex.seqType(), st = exprType.seqType();
-    return at.instanceOf(st) ? ex :
-      new TypeCheck(sc, info, ex, exprType.seqType(), promote).optimize(cc);
+    final SeqType at = ex.seqType(), st = seqType();
+    return at.instanceOf(st) ? ex : new TypeCheck(sc, info, ex, st, promote).optimize(cc);
   }
 
   @Override
@@ -158,23 +156,23 @@ public final class TypeCheck extends Single {
     if(this == obj) return true;
     if(!(obj instanceof TypeCheck)) return false;
     final TypeCheck t = (TypeCheck) obj;
-    return exprType.seqType().eq(t.exprType.seqType()) && promote == t.promote && super.equals(obj);
+    return seqType().eq(t.seqType()) && promote == t.promote && super.equals(obj);
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeCheck(sc, info, expr.copy(cc, vm), exprType.seqType(), promote);
+    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType(), promote);
   }
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(AS, exprType.seqType());
+    final FElem elem = planElem(AS, seqType());
     if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
     addPlan(plan, elem, expr);
   }
 
   @Override
   public String toString() {
-    return "((: " + exprType.seqType() + ", " + promote + " :) " + expr + ')';
+    return "((: " + seqType() + ", " + promote + " :) " + expr + ')';
   }
 }

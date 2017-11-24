@@ -18,7 +18,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -92,7 +91,7 @@ public abstract class Step extends Preds {
     if(ex != this) return ex;
 
     // compute result size
-    if(!exprType(exprType.seqType(), exprType.size())) return cc.emptySeq(this);
+    if(!exprType(seqType(), size())) return cc.emptySeq(this);
 
     // choose best implementation
     return copyType(get(info, axis, test, exprs));

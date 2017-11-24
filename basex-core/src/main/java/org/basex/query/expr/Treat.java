@@ -38,7 +38,7 @@ public final class Treat extends Single {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final SeqType st = exprType.seqType();
+    final SeqType st = seqType();
     final Iter iter = qc.iter(expr);
     final Item it = iter.next();
     // input is empty
@@ -76,7 +76,7 @@ public final class Treat extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final SeqType st = exprType.seqType();
+    final SeqType st = seqType();
     final Value val = qc.value(expr);
 
     final long len = val.size();
@@ -104,22 +104,22 @@ public final class Treat extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Treat(info, expr.copy(cc, vm), exprType.seqType());
+    return new Treat(info, expr.copy(cc, vm), seqType());
   }
 
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof Treat &&
-        exprType.seqType().eq(((Treat) obj).exprType.seqType()) && super.equals(obj);
+        seqType().eq(((Treat) obj).seqType()) && super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(AS, exprType.seqType()), expr);
+    addPlan(plan, planElem(AS, seqType()), expr);
   }
 
   @Override
   public String toString() {
-    return '(' + expr.toString() + ") " + TREAT + ' ' + AS + ' ' + exprType.seqType();
+    return '(' + expr.toString() + ") " + TREAT + ' ' + AS + ' ' + seqType();
   }
 }

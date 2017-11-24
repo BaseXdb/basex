@@ -207,7 +207,7 @@ public enum Function {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM_O, ITR_O), FUN_OZ, flag(Flag.POS, CTX, NDT, HOF)),
+      arg(QNM_O, ITR_O), FUN_ZO, flag(Flag.POS, CTX, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
   /** XQuery function. */
@@ -1647,7 +1647,7 @@ public enum Function {
   public final String args(final Object... args) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Object arg : args) {
-      if(!tb.isEmpty()) tb.add(',');
+      if(!tb.isEmpty()) tb.add(", ");
       if(arg == null) {
         tb.add("()");
       } else if(arg instanceof Value) {

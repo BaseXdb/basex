@@ -20,205 +20,130 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class SeqType {
-  /** Occurrence indicator (cardinality). */
-  public enum Occ {
-    /** Zero.         */ ZERO(0, 0, ""),
-    /** Zero or one.  */ ZERO_ONE(0, 1, "?"),
-    /** Exactly one.  */ ONE(1, 1, ""),
-    /** One or more.  */ ONE_MORE(1, Integer.MAX_VALUE, "+"),
-    /** Zero or more. */ ZERO_MORE(0, Integer.MAX_VALUE, "*");
-
-    /** String representation. */
-    private final String str;
-    /** Minimal result size. */
-    public final int min;
-    /** Maximal result size. */
-    public final int max;
-
-    /**
-     * Constructor.
-     * @param min minimal result size
-     * @param max maximal result size
-     * @param str string representation
-     */
-    Occ(final int min, final int max, final String str) {
-      this.min = min;
-      this.max = max;
-      this.str = str;
-    }
-
-    /**
-     * Checks if the specified occurrence indicator is an instance of the current occurrence
-     * indicator.
-     * @param occ occurrence indicator to check
-     * @return result of check
-     */
-    public boolean instanceOf(final Occ occ) {
-      return min >= occ.min && max <= occ.max;
-    }
-
-    /**
-     * Computes the intersection between this occurrence indicator and the given one.
-     * If none exists (e.g. between {@link #ZERO} and {@link #ONE}), {@code null} is returned.
-     * @param other other occurrence indicator
-     * @return intersection or {@code null}
-     */
-    public Occ intersect(final Occ other) {
-      final int mn = Math.max(min, other.min), mx = Math.min(max, other.max);
-      return mx < mn ? null : mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE :
-        mn == 0 ? ZERO_MORE : ONE_MORE;
-    }
-
-    /**
-     * Computes the union between this occurrence indicator and the given one.
-     * @param other other occurrence indicator
-     * @return union
-     */
-    public Occ union(final Occ other) {
-      final int mn = Math.min(min, other.min), mx = Math.max(max, other.max);
-      return mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
-    }
-
-    /**
-     * Adds two occurrence indicators.
-     * @param other other occurrence indicator
-     * @return union
-     */
-    public Occ add(final Occ other) {
-      final long mn = (long) min + other.min, mx = (long) max + other.max;
-      return mx == 0 ? ZERO : mx == 1 ? mn == 0 ? ZERO_ONE : ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
-    }
-
-    /**
-     * Checks if the given cardinality is supported by this type.
-     * @param card cardinality
-     * @return result of check
-     */
-    public boolean check(final long card) {
-      return min <= card && card <= max;
-    }
-
-    @Override
-    public String toString() {
-      return str;
-    }
-  }
-
   /** Zero items (single instance). */
-  public static final SeqType EMP = new SeqType(AtomType.ITEM, Occ.ZERO);
+  public static final SeqType EMP = AtomType.ITEM.seqType(Occ.ZERO);
+
   /** Single item. */
   public static final SeqType ITEM_O = AtomType.ITEM.seqType();
   /** Zero or one item. */
-  public static final SeqType ITEM_ZO = new SeqType(AtomType.ITEM, Occ.ZERO_ONE);
+  public static final SeqType ITEM_ZO = AtomType.ITEM.seqType(Occ.ZERO_ONE);
   /** Zero or more items. */
-  public static final SeqType ITEM_ZM = new SeqType(AtomType.ITEM, Occ.ZERO_MORE);
+  public static final SeqType ITEM_ZM = AtomType.ITEM.seqType(Occ.ZERO_MORE);
   /** One or more items. */
-  public static final SeqType ITEM_OM = new SeqType(AtomType.ITEM, Occ.ONE_MORE);
+  public static final SeqType ITEM_OM = AtomType.ITEM.seqType(Occ.ONE_MORE);
+
   /** Zero or one xs:anyAtomicType. */
   public static final SeqType AAT_O = AtomType.AAT.seqType();
   /** Zero or one xs:anyAtomicType. */
-  public static final SeqType AAT_ZO = new SeqType(AtomType.AAT, Occ.ZERO_ONE);
+  public static final SeqType AAT_ZO = AtomType.AAT.seqType(Occ.ZERO_ONE);
   /** Zero or more xs:anyAtomicType. */
-  public static final SeqType AAT_ZM = new SeqType(AtomType.AAT, Occ.ZERO_MORE);
+  public static final SeqType AAT_ZM = AtomType.AAT.seqType(Occ.ZERO_MORE);
+
   /** Zero or one xs:numeric. */
   public static final SeqType NUM_O = AtomType.NUM.seqType();
   /** Zero or one xs:numeric. */
-  public static final SeqType NUM_ZO = new SeqType(AtomType.NUM, Occ.ZERO_ONE);
-  /** Single xs:boolean. */
-  public static final SeqType BLN_O = AtomType.BLN.seqType();
-  /** Zero or one xs:boolean. */
-  public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZERO_ONE);
+  public static final SeqType NUM_ZO = AtomType.NUM.seqType(Occ.ZERO_ONE);
   /** Double number. */
   public static final SeqType DBL_O = AtomType.DBL.seqType();
-  /** Double number. */
-  public static final SeqType DBL_ZM = new SeqType(AtomType.DBL, Occ.ZERO_MORE);
   /** Zero or one double. */
-  public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZERO_ONE);
+  public static final SeqType DBL_ZO = AtomType.DBL.seqType(Occ.ZERO_ONE);
+  /** Double number. */
+  public static final SeqType DBL_ZM = AtomType.DBL.seqType(Occ.ZERO_MORE);
   /** Float number. */
   public static final SeqType FLT_O = AtomType.FLT.seqType();
   /** Zero or one decimal number. */
-  public static final SeqType DEC_ZO = new SeqType(AtomType.DEC, Occ.ZERO_ONE);
+  public static final SeqType DEC_ZO = AtomType.DEC.seqType(Occ.ZERO_ONE);
   /** Single integer. */
   public static final SeqType ITR_O = AtomType.ITR.seqType();
   /** Zero or one integer. */
-  public static final SeqType ITR_ZO = new SeqType(AtomType.ITR, Occ.ZERO_ONE);
+  public static final SeqType ITR_ZO = AtomType.ITR.seqType(Occ.ZERO_ONE);
   /** Zero or more integers. */
-  public static final SeqType ITR_ZM = new SeqType(AtomType.ITR, Occ.ZERO_MORE);
+  public static final SeqType ITR_ZM = AtomType.ITR.seqType(Occ.ZERO_MORE);
   /** One or more integers. */
-  public static final SeqType ITR_OM = new SeqType(AtomType.ITR, Occ.ONE_MORE);
-  /** Single QName. */
-  public static final SeqType QNM_O = AtomType.QNM.seqType();
-  /** Zero or one QNames. */
-  public static final SeqType QNM_ZO = new SeqType(AtomType.QNM, Occ.ZERO_ONE);
-  /** Single URI. */
-  public static final SeqType URI_O = AtomType.URI.seqType();
-  /** Zero or one URIs. */
-  public static final SeqType URI_ZO = new SeqType(AtomType.URI, Occ.ZERO_ONE);
-  /** Zero or more URIs. */
-  public static final SeqType URI_ZM = new SeqType(AtomType.URI, Occ.ZERO_MORE);
-  /** Single language. */
-  public static final SeqType LAN_O = AtomType.LAN.seqType();
+  public static final SeqType ITR_OM = AtomType.ITR.seqType(Occ.ONE_MORE);
+  /** Zero or more bytes. */
+  public static final SeqType BYT_ZM = AtomType.BYT.seqType(Occ.ZERO_MORE);
+
   /** Single string. */
   public static final SeqType STR_O = AtomType.STR.seqType();
   /** Zero or one strings. */
-  public static final SeqType STR_ZO = new SeqType(AtomType.STR, Occ.ZERO_ONE);
+  public static final SeqType STR_ZO = AtomType.STR.seqType(Occ.ZERO_ONE);
   /** Zero or more strings. */
-  public static final SeqType STR_ZM = new SeqType(AtomType.STR, Occ.ZERO_MORE);
+  public static final SeqType STR_ZM = AtomType.STR.seqType(Occ.ZERO_MORE);
   /** Zero or one NCName. */
-  public static final SeqType NCN_ZO = new SeqType(AtomType.NCN, Occ.ZERO_ONE);
+  public static final SeqType NCN_ZO = AtomType.NCN.seqType(Occ.ZERO_ONE);
+  /** Single language. */
+  public static final SeqType LAN_O = AtomType.LAN.seqType();
+
+  /** Single URI. */
+  public static final SeqType URI_O = AtomType.URI.seqType();
+  /** Zero or one URIs. */
+  public static final SeqType URI_ZO = AtomType.URI.seqType(Occ.ZERO_ONE);
+  /** Zero or more URIs. */
+  public static final SeqType URI_ZM = AtomType.URI.seqType(Occ.ZERO_MORE);
+
+  /** Single QName. */
+  public static final SeqType QNM_O = AtomType.QNM.seqType();
+  /** Zero or one QNames. */
+  public static final SeqType QNM_ZO = AtomType.QNM.seqType(Occ.ZERO_ONE);
+
+  /** Single xs:boolean. */
+  public static final SeqType BLN_O = AtomType.BLN.seqType();
+  /** Zero or one xs:boolean. */
+  public static final SeqType BLN_ZO = AtomType.BLN.seqType(Occ.ZERO_ONE);
+
   /** Single date. */
   public static final SeqType DAT_O = AtomType.DAT.seqType();
   /** Zero or one date. */
-  public static final SeqType DAT_ZO = new SeqType(AtomType.DAT, Occ.ZERO_ONE);
+  public static final SeqType DAT_ZO = AtomType.DAT.seqType(Occ.ZERO_ONE);
   /** One day-time-duration. */
   public static final SeqType DTD_O = AtomType.DTD.seqType();
   /** Zero or one day-time-duration. */
-  public static final SeqType DTD_ZO = new SeqType(AtomType.DTD, Occ.ZERO_ONE);
+  public static final SeqType DTD_ZO = AtomType.DTD.seqType(Occ.ZERO_ONE);
   /** One date-time. */
   public static final SeqType DTM_O = AtomType.DTM.seqType();
   /** Zero or one date-time. */
-  public static final SeqType DTM_ZO = new SeqType(AtomType.DTM, Occ.ZERO_ONE);
+  public static final SeqType DTM_ZO = AtomType.DTM.seqType(Occ.ZERO_ONE);
   /** One time. */
   public static final SeqType TIM_O = AtomType.TIM.seqType();
   /** Zero or one time. */
-  public static final SeqType TIM_ZO = new SeqType(AtomType.TIM, Occ.ZERO_ONE);
+  public static final SeqType TIM_ZO = AtomType.TIM.seqType(Occ.ZERO_ONE);
   /** Zero or one duration. */
-  public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZERO_ONE);
-  /** Zero or more bytes. */
-  public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZERO_MORE);
+  public static final SeqType DUR_ZO = AtomType.DUR.seqType(Occ.ZERO_ONE);
+
+  /** Single binary. */
+  public static final SeqType BIN_O = AtomType.BIN.seqType();
   /** One xs:hexBinary. */
   public static final SeqType HEX_O = AtomType.HEX.seqType();
   /** Single xs:base64Binary. */
   public static final SeqType B64_O = AtomType.B64.seqType();
   /** Zero or one xs:base64Binary. */
-  public static final SeqType B64_ZO = new SeqType(AtomType.B64, Occ.ZERO_ONE);
+  public static final SeqType B64_ZO = AtomType.B64.seqType(Occ.ZERO_ONE);
   /** Zero or more xs:base64Binary. */
-  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
-  /** Single binary. */
-  public static final SeqType BIN_O = AtomType.BIN.seqType();
+  public static final SeqType B64_ZM = AtomType.B64.seqType(Occ.ZERO_MORE);
 
   /** Single node. */
   public static final SeqType NOD_O = NodeType.NOD.seqType();
   /** Zero or one nodes. */
-  public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZERO_ONE);
+  public static final SeqType NOD_ZO = NodeType.NOD.seqType(Occ.ZERO_ONE);
   /** Zero or more nodes. */
-  public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZERO_MORE);
+  public static final SeqType NOD_ZM = NodeType.NOD.seqType(Occ.ZERO_MORE);
   /** One attribute node. */
   public static final SeqType ATT_O = NodeType.ATT.seqType();
   /** Zero or more attributes. */
-  public static final SeqType ATT_ZM = new SeqType(NodeType.ATT, Occ.ZERO_MORE);
+  public static final SeqType ATT_ZM = NodeType.ATT.seqType(Occ.ZERO_MORE);
   /** One comment node. */
   public static final SeqType COM_O = NodeType.COM.seqType();
   /** One document node. */
   public static final SeqType DOC_O = NodeType.DOC.seqType();
   /** Zero or one document node. */
-  public static final SeqType DOC_ZO = new SeqType(NodeType.DOC, Occ.ZERO_ONE);
+  public static final SeqType DOC_ZO = NodeType.DOC.seqType(Occ.ZERO_ONE);
   /** Zero or more document node. */
-  public static final SeqType DOC_ZM = new SeqType(NodeType.DOC, Occ.ZERO_MORE);
+  public static final SeqType DOC_ZM = NodeType.DOC.seqType(Occ.ZERO_MORE);
   /** One element node. */
   public static final SeqType ELM_O = NodeType.ELM.seqType();
   /** Zero or more element nodes. */
-  public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZERO_MORE);
+  public static final SeqType ELM_ZM = NodeType.ELM.seqType(Occ.ZERO_MORE);
   /** Namespace node. */
   public static final SeqType NSP_O = NodeType.NSP.seqType();
   /** Processing instruction. */
@@ -226,9 +151,9 @@ public final class SeqType {
   /** Text node. */
   public static final SeqType TXT_O = NodeType.TXT.seqType();
   /** Zero or one text node. */
-  public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
+  public static final SeqType TXT_ZO = NodeType.TXT.seqType(Occ.ZERO_ONE);
   /** Zero or more text nodes. */
-  public static final SeqType TXT_ZM = new SeqType(NodeType.TXT, Occ.ZERO_MORE);
+  public static final SeqType TXT_ZM = NodeType.TXT.seqType(Occ.ZERO_MORE);
 
   /** Any function type. */
   public static final FuncType ANY_FUN = new FuncType(null, (SeqType[]) null);
@@ -237,22 +162,22 @@ public final class SeqType {
   /** The general array type. */
   public static final ArrayType ANY_ARRAY = new ArrayType(ITEM_ZM);
 
-  /** Zero of single function. */
-  public static final SeqType FUN_OZ = new SeqType(ANY_FUN, Occ.ZERO_ONE);
   /** Single function. */
   public static final SeqType FUN_O = ANY_FUN.seqType();
+  /** Zero of single function. */
+  public static final SeqType FUN_ZO = ANY_FUN.seqType(Occ.ZERO_ONE);
   /** Zero of more functions. */
-  public static final SeqType FUN_ZM = new SeqType(ANY_FUN, Occ.ZERO_MORE);
-  /** Zero or more maps. */
-  public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZERO_MORE);
-  /** Zero or one map. */
-  public static final SeqType MAP_ZO = new SeqType(ANY_MAP, Occ.ZERO_ONE);
+  public static final SeqType FUN_ZM = ANY_FUN.seqType(Occ.ZERO_MORE);
   /** Single map. */
   public static final SeqType MAP_O = ANY_MAP.seqType();
-  /** Zero or more arrays. */
-  public static final SeqType ARRAY_ZM = new SeqType(ANY_ARRAY, Occ.ZERO_MORE);
+  /** Zero or one map. */
+  public static final SeqType MAP_ZO = ANY_MAP.seqType(Occ.ZERO_ONE);
+  /** Zero or more maps. */
+  public static final SeqType MAP_ZM = ANY_MAP.seqType(Occ.ZERO_MORE);
   /** Single array. */
   public static final SeqType ARRAY_O = ANY_ARRAY.seqType();
+  /** Zero or more arrays. */
+  public static final SeqType ARRAY_ZM = ANY_ARRAY.seqType(Occ.ZERO_MORE);
 
   /** Item type. */
   public final Type type;
@@ -262,20 +187,11 @@ public final class SeqType {
   private final Test kind;
 
   /**
-   * Constructor. This one is called by {@link Type#seqType()} to create
-   * unique sequence type instances.
-   * @param type type
-   */
-  SeqType(final Type type) {
-    this(type, Occ.ONE);
-  }
-
-  /**
    * Private constructor.
    * @param type type
    * @param occ occurrence
    */
-  private SeqType(final Type type, final Occ occ) {
+  SeqType(final Type type, final Occ occ) {
     this(type, occ, null);
   }
 
@@ -298,7 +214,7 @@ public final class SeqType {
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ) {
-    return occ == Occ.ZERO ? EMP : occ == Occ.ONE ? type.seqType() : new SeqType(type, occ);
+    return occ == Occ.ZERO ? EMP : type.seqType(occ);
   }
 
   /**
@@ -314,7 +230,6 @@ public final class SeqType {
 
   /**
    * Returns a sequence type with the specified type and occurrence indicator.
-   * Returns this sequence type if it is identical.
    * @param tp type
    * @param oc occurrence indicator
    * @return sequence type
@@ -682,14 +597,13 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType st) {
-    return type.eq(st.type) && occ == st.occ && Objects.equals(kind, st.kind);
+    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(kind, st.kind);
   }
 
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof SeqType && eq((SeqType) obj);
   }
-
 
   /**
    * Returns a string representation of the type.

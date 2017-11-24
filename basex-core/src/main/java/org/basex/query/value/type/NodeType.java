@@ -3,6 +3,7 @@ package org.basex.query.value.type;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.api.dom.*;
@@ -146,8 +147,8 @@ public enum NodeType implements Type {
   /** Type id . */
   private final ID id;
 
-  /** Sequence type (lazy instantiation). */
-  private SeqType seq;
+  /** Sequence types (lazy instantiation). */
+  private EnumMap<Occ, SeqType> seqTypes;
 
   /**
    * Constructor.
@@ -205,10 +206,9 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final SeqType seqType() {
-    // cannot be statically instantiated due to circular dependency
-    if(seq == null) seq = new SeqType(this);
-    return seq;
+  public final SeqType seqType(final Occ occ) {
+    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
+    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }
 
   @Override

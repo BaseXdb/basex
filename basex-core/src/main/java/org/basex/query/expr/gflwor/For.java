@@ -16,7 +16,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -118,7 +117,7 @@ public final class For extends ForLet {
     // assign type to clause and variable
     final SeqType tp = expr.seqType();
     exprType.assign(tp.type, empty && tp.mayBeEmpty() ? Occ.ZERO_ONE : Occ.ONE);
-    var.refineType(exprType.seqType(), exprType.size(), cc);
+    var.refineType(seqType(), size(), cc);
     var.data = expr.data();
     if(pos != null) pos.refineType(SeqType.ITR_O, 1, cc);
     if(score != null) score.refineType(SeqType.DBL_O, 1, cc);
