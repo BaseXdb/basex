@@ -101,8 +101,8 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Simple map operator. */
   @Test public void gh1094() {
-    check("for $d in (true(), false()) where boolean(<a/>!(.,.)!(.,.)) return $d", "true\nfalse",
-        exists(If.class));
+    check("for $d in (true(), false()) where boolean(<a/> ! (., .) ! (., .)) return $d",
+        "true\nfalse", empty(GFLWOR.class));
     check("let $a := <a/> return 'bar' ! . ! $a", "<a/>", exists(Let.class));
   }
 

@@ -65,7 +65,7 @@ public abstract class SimpleMap extends Arr {
         // replace original expression with error
         exprs[e] = cc.error(ex, this);
       }
-      focus.value = null;
+      focus.value = cc.contextItem(exprs[e]);
     }
     focus.value = cv;
     return optimize(cc);

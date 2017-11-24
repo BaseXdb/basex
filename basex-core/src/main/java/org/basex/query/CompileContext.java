@@ -283,7 +283,7 @@ public final class CompileContext {
 
   /**
    * Returns a dummy item for the specified expression.
-   * @param expr expression
+   * @param expr expression (can be {@code null})
    * @return dummy item or {@code null}
    */
   private static Item dummy(final Expr expr) {
