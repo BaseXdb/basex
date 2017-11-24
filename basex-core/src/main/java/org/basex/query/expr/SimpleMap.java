@@ -54,7 +54,7 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
+  public final Expr compile(final CompileContext cc) throws QueryException {
     final QueryFocus focus = cc.qc.focus;
     final Value cv = focus.value;
     final int el = exprs.length;

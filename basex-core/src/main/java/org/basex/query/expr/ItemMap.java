@@ -23,12 +23,6 @@ final class ItemMap extends SimpleMap {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate values
-    return allAreValues() ? cc.preEval(this) : this;
-  }
-
-  @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Item result = exprs[0].item(qc, info);
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
