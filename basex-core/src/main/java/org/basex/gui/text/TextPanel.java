@@ -1091,11 +1091,13 @@ public class TextPanel extends BaseXPanel {
     // add functions (default functions first)
     for(final Function f : Function.VALUES) {
       if(f.uri() != QueryText.FN_URI) continue;
-      final String name = f.toString().replaceAll("^fn:|\\(.*", "");
+      final String func = f.toString();
+      final String name = func.replaceAll("^fn:|\\(.*", "");
       final String key = (name.contains("-") ?
         name.replaceAll("(.)[^-A-Z]*-?", "$1") :
         name.substring(0, Math.min(name.length(), 4))).toLowerCase(Locale.ENGLISH);
-      REPLACE2.add(new Pair<>(key, name + "(_)"));
+      final String suffix = func.contains("()") ? "()" : "(_)";
+      REPLACE2.add(new Pair<>(key, name + suffix));
     }
     for(final Function f : Function.VALUES) {
       if(f.uri() == QueryText.FN_URI) continue;
