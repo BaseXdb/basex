@@ -129,26 +129,26 @@ public abstract class Path extends ParseExpr {
     final Value init = focus.value, cv = cc.contextValue(root);
     focus.value = cv;
     final boolean doc = cv != null && cv.type == NodeType.DOC;
-    try {
-      final int sl = steps.length;
-      for(int s = 0; s < sl; s++) {
-        final Expr step = steps[s];
-        // axis step: if input is a document, its type will be generalized
-        final boolean as = step instanceof Step;
-        if(as && s == 0 && doc) cv.type = NodeType.NOD;
-        try {
-          steps[s] = step.compile(cc);
-        } catch(final QueryException ex) {
-          // replace original expression with error
-          steps[s] = cc.error(ex, this);
-        }
-        // no axis step: invalidate context value
-        if(!as) focus.value = null;
+
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) {
+      final Expr step = steps[s];
+      // axis step: if input is a document, its type will be generalized
+      final boolean as = step instanceof Step;
+      if(as && s == 0 && doc) cv.type = NodeType.NOD;
+      try {
+        steps[s] = step.compile(cc);
+      } catch(final QueryException ex) {
+        // replace original expression with error
+        steps[s] = cc.error(ex, this);
       }
-    } finally {
-      if(doc) cv.type = NodeType.DOC;
-      focus.value = init;
+      // no axis step: invalidate context value
+      if(!as) focus.value = null;
     }
+
+    if(doc) cv.type = NodeType.DOC;
+    focus.value = init;
+
     // optimize path
     return optimize(cc);
   }

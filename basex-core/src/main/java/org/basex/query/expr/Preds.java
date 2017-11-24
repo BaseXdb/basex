@@ -39,19 +39,16 @@ public abstract class Preds extends Arr {
   public Expr compile(final CompileContext cc) throws QueryException {
     final QueryFocus focus = cc.qc.focus;
     final Value init = focus.value;
-    try {
-      final int pl = exprs.length;
-      for(int p = 0; p < pl; ++p) {
-        try {
-          exprs[p] = exprs[p].compile(cc);
-        } catch(final QueryException ex) {
-          // replace original expression with error
-          exprs[p] = cc.error(ex, this);
-        }
+    final int pl = exprs.length;
+    for(int p = 0; p < pl; ++p) {
+      try {
+        exprs[p] = exprs[p].compile(cc);
+      } catch(final QueryException ex) {
+        // replace original expression with error
+        exprs[p] = cc.error(ex, this);
       }
-    } finally {
-      focus.value = init;
     }
+    focus.value = init;
     return optimize(cc);
   }
 
@@ -132,13 +129,13 @@ public abstract class Preds extends Arr {
 
   /**
    * Assigns the sequence type and {@link #size} value.
-   * @param st sequence type of input
-   * @param s size of input ({@code -1} if unknown)
+   * @param seqType sequence type of input
+   * @param size size of input ({@code -1} if unknown)
    * @return if predicate will yield any results
    */
-  protected final boolean exprType(final SeqType st, final long s) {
-    boolean exact = s != -1;
-    long max = exact ? s : Long.MAX_VALUE;
+  protected final boolean exprType(final SeqType seqType, final long size) {
+    boolean exact = size != -1;
+    long max = exact ? size : Long.MAX_VALUE;
 
     // check positional predicates
     for(final Expr expr : exprs) {
@@ -158,26 +155,26 @@ public abstract class Preds extends Arr {
     }
 
     if(exact || max == 0) {
-      exprType.assign(st.type, max);
+      exprType.assign(seqType.type, max);
     } else {
       // we only know if there will be at most 1 result
-      exprType.assign(st.type, max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+      exprType.assign(seqType.type, max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     }
     return max != 0;
   }
 
   /**
    * Checks if the predicates are successful for the specified item.
-   * @param it item to be checked
+   * @param item item to be checked
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
+  protected final boolean preds(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
     final QueryFocus qf = qc.focus;
     final Value cv = qf.value;
-    qf.value = it;
+    qf.value = item;
     try {
       double s = qc.scoring ? 0 : -1;
       for(final Expr expr : exprs) {
@@ -185,7 +182,7 @@ public abstract class Preds extends Arr {
         if(test == null) return false;
         if(s != -1) s += test.score();
       }
-      if(s > 0) it.score(Scoring.avg(s, exprs.length));
+      if(s > 0) item.score(Scoring.avg(s, exprs.length));
       return true;
     } finally {
       qf.value = cv;

@@ -54,28 +54,25 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final Expr compile(final CompileContext cc) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     final QueryFocus focus = cc.qc.focus;
     final Value cv = focus.value;
-    try {
-      final int el = exprs.length;
-      for(int e = 0; e < el; e++) {
-        try {
-          exprs[e] = exprs[e].compile(cc);
-        } catch(final QueryException ex) {
-          // replace original expression with error
-          exprs[e] = cc.error(ex, this);
-        }
-        focus.value = null;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      try {
+        exprs[e] = exprs[e].compile(cc);
+      } catch(final QueryException ex) {
+        // replace original expression with error
+        exprs[e] = cc.error(ex, this);
       }
-    } finally {
-      focus.value = cv;
+      focus.value = null;
     }
+    focus.value = cv;
     return optimize(cc);
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     // compute result size
     ExprList list = new ExprList(exprs.length);
     long min = 1, max = 1;
@@ -140,13 +137,13 @@ public abstract class SimpleMap extends Arr {
     if(++e != el) exprs = Arrays.copyOf(exprs, e);
 
     // single expression: return this expression
-    if(e == 1) return exprs[0];
-    // no results, deterministic expressions: return empty sequence
-    if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);
-    // item-based iteration
-    if(it) return copyType(new ItemMap(info, exprs)).optimize(cc);
-    // default evaluation
-    return this;
+    return e == 1 ? exprs[0] :
+      // no results, deterministic expressions: return empty sequence
+      size() == 0 && !has(Flag.NDT) ? cc.emptySeq(this) :
+      // item-based iteration
+      it ? copyType(new ItemMap(info, exprs)) :
+      // default evaluation
+      this;
   }
 
   @Override
