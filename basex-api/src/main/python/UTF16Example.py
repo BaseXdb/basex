@@ -2,7 +2,8 @@
 # Documentation: http://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team 2005-12, BSD License
-import BaseXClient
+
+from BaseXClient import BaseXClient 
 
 import sys
 if sys.version < '3': # i'm testing with Python 2.7.3

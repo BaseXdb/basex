@@ -5,7 +5,8 @@
 #
 # (C) BaseX Team 2005-12, BSD License
 
-import BaseXClient, time
+from BaseXClient import BaseXClient
+import time
 
 # initialize timer
 start = time.clock()

@@ -6,7 +6,7 @@
 #
 # (C) BaseX Team 2005-12, BSD License
 
-import BaseXClient
+from BaseXClient import BaseXClient 
 
 # create session
 session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
