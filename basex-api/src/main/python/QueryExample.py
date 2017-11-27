@@ -6,7 +6,7 @@
 #
 # (C) BaseX Team 2005-12, BSD License
 
-from BaseXClient import BaseXClient 
+from BaseXClient import BaseXClient
 
 # create session
 session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
@@ -21,7 +21,7 @@ try:
         print("typecode=%d" % typecode)
         print("item=%s" % item)
 
-    # close query object    
+    # close query object
     query.close()
 
 finally:
