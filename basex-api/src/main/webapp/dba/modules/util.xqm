@@ -31,7 +31,7 @@ declare function util:query(
 declare %updating function util:update-query(
   $query  as xs:string?
 ) {
-  xquery:update($query, map { }, util:query-options())
+  xquery:eval-update($query, map { }, util:query-options())
 };
 
 (:~

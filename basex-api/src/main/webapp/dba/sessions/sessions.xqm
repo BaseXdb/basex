@@ -55,7 +55,7 @@ function dba:sessions(
             for $name in Sessions:names($id)[. = ('dba', 'id')]
             let $value := try {
               Sessions:get($id, $name)
-            } catch bxerr:BXSE0002 {
+            } catch Sessions:get {
               (: non-XQuery session value :)
             }
             let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
