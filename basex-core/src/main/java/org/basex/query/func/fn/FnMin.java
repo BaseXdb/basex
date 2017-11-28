@@ -109,8 +109,8 @@ public class FnMin extends StandardFunc {
    */
   private Item value(final OpV cmp) {
     final Expr ex = exprs[0];
-    Item it = null;
-    if(ex instanceof Value) {
+    if(ex instanceof Value && exprs.length < 2) {
+      Item it = null;
       final Value v = (Value) ex;
       if(v instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) v;
@@ -119,8 +119,12 @@ public class FnMin extends StandardFunc {
       if(ex instanceof SingletonSeq || ex instanceof Item) {
         it = v.itemAt(cmp == OpV.GT ? 0 : ex.size() - 1);
       }
+      if(it != null) {
+        final Type t = it.seqType().type;
+        if(t.isNumber() || t.instanceOf(AtomType.STR)) return it;
+      }
     }
-    return it != null && it.seqType().type.isNumber() ? it : null;
+    return null;
   }
 
   @Override
@@ -140,7 +144,7 @@ public class FnMin extends StandardFunc {
     if(t.isSortable()) {
       if(t.isUntyped()) {
         t = AtomType.DBL;
-      } else if(st.one()) {
+      } else if(st.one() && exprs.length < 2) {
         return ex;
       }
       exprType.assign(t);

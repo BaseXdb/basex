@@ -363,6 +363,7 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args(" ('b', 'c', 'a', 1)"), CMP_X_X_X);
     error(func.args(" (2, 3, 1, 'a')"), CMP_X_X_X);
     error(func.args(" (false(), true(), false(), 1)"), CMP_X_X_X);
+    error(func.args(" 'x'", 1), INVCAST_X_X_X);
   }
 
   /** Test method. */
