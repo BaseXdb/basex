@@ -138,7 +138,7 @@ public class FnMin extends StandardFunc {
     final SeqType st = ex.seqType();
     Type t = st.type;
     if(t.isSortable()) {
-      if(t instanceof NodeType) {
+      if(t.isUntyped()) {
         t = AtomType.DBL;
       } else if(st.one()) {
         return ex;
