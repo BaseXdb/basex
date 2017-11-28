@@ -74,11 +74,14 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    return cc.replaceWith(this, preEval() ?
-      // pre-evaluate simple functions if all arguments are values
+    final Expr ex = opt(cc);
+    return cc.replaceWith(this, ex != this ?
+      // return optimized expression
+      ex : preEval() ?
+      // pre-evaluate function
       (sig.seqType.zeroOrOne() ? item(cc.qc, info) : cc.qc.value(this)) :
-      // otherwise, call custom optimization
-      opt(cc));
+      // return original function
+      this);
   }
 
   /**
