@@ -33,7 +33,7 @@ public final class ArrayForEachPair extends ArrayFn {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Type t1 = exprs[0].seqType().type, t2 = exprs[1].seqType().type;
     if(t1 instanceof ArrayType && t2 instanceof ArrayType)
-      coerceFunc(1, cc, SeqType.ITEM_ZM, ((ArrayType) t1).declType, ((ArrayType) t2).declType);
+      coerceFunc(2, cc, SeqType.ITEM_ZM, ((ArrayType) t1).declType, ((ArrayType) t2).declType);
 
     // assign type after coercion (expression might have changed)
     final Type t3 = exprs[2].seqType().type;
