@@ -113,10 +113,6 @@ public final class Let extends ForLet {
     return expr.accept(visitor) && visitor.declared(var);
   }
 
-  @Override
-  void calcSize(final long[] minMax) {
-  }
-
   /**
    * Returns an expression that is appropriate for inlining.
    * @param cc compilation context

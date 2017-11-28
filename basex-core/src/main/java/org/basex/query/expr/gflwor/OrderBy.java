@@ -10,7 +10,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -29,7 +28,7 @@ public final class OrderBy extends Clause {
   /** References to the variables to be sorted. */
   private VarRef[] refs;
   /** Sort keys. */
-  private final Key[] keys;
+  private final OrderKey[] keys;
 
   /**
    * Constructor.
@@ -37,7 +36,7 @@ public final class OrderBy extends Clause {
    * @param keys sort keys
    * @param info input info
    */
-  public OrderBy(final VarRef[] refs, final Key[] keys, final InputInfo info) {
+  public OrderBy(final VarRef[] refs, final OrderKey[] keys, final InputInfo info) {
     super(info, SeqType.ITEM_ZM);
     this.refs = refs;
     this.keys = keys;
@@ -102,7 +101,7 @@ public final class OrderBy extends Clause {
               final Item[] a = ks[x], b = ks[y];
               final int kl = keys.length;
               for(int k = 0; k < kl; k++) {
-                final Key key = keys[k];
+                final OrderKey key = keys[k];
                 Item m = a[k], n = b[k];
                 if(m == Dbl.NAN || m == Flt.NAN) m = null;
                 if(n == Dbl.NAN || n == Flt.NAN) n = null;
@@ -128,24 +127,29 @@ public final class OrderBy extends Clause {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Key key : keys) if(key.has(flags)) return true;
+    for(final OrderKey key : keys) if(key.has(flags)) return true;
     return false;
   }
 
   @Override
   public OrderBy compile(final CompileContext cc) throws QueryException {
-    for(final Key key : keys) key.compile(cc);
-    return this;
+    for(final OrderKey key : keys) key.compile(cc);
+    return optimize(cc);
   }
 
   @Override
-  public OrderBy optimize(final CompileContext cc) {
+  public OrderBy optimize(final CompileContext cc) throws QueryException {
+    SeqType st = null;
+    for(final OrderKey key : keys) {
+      st = st == null ? key.seqType() : st.union(key.seqType());
+    }
+    exprType.assign(st);
     return this;
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Key key : keys) if(!key.removable(var)) return false;
+    for(final OrderKey key : keys) if(!key.removable(var)) return false;
     return true;
   }
 
@@ -201,10 +205,6 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  void calcSize(final long[] minMax) {
-  }
-
-  @Override
   public int exprSize() {
     int sz = 0;
     for(final Expr e : refs) sz += e.exprSize();
@@ -223,7 +223,7 @@ public final class OrderBy extends Clause {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    for(final Key key : keys) key.plan(e);
+    for(final OrderKey key : keys) key.plan(e);
     plan.add(e);
   }
 
@@ -233,77 +233,5 @@ public final class OrderBy extends Clause {
     final int kl = keys.length;
     for(int k = 0; k < kl; k++) sb.append(k == 0 ? " " : SEP).append(keys[k]);
     return sb.toString();
-  }
-
-  /**
-   * Sort key.
-   *
-   * @author BaseX Team 2005-17, BSD License
-   * @author Leo Woerteler
-   */
-  public static final class Key extends Single {
-    /** Descending order flag. */
-    private final boolean desc;
-    /** Position of empty sort keys. */
-    private final boolean least;
-    /** Collation (can be {@code null}). */
-    private final Collation coll;
-
-    /**
-     * Constructor.
-     * @param info input info
-     * @param key sort key expression
-     * @param desc descending order
-     * @param least empty least
-     * @param coll collation (can be {@code null})
-     */
-    public Key(final InputInfo info, final Expr key, final boolean desc, final boolean least,
-        final Collation coll) {
-      super(info, key, SeqType.ITEM_ZM);
-      this.desc = desc;
-      this.least = least;
-      this.coll = coll;
-    }
-
-    @Override
-    public Key copy(final CompileContext cc, final IntObjMap<Var> vm) {
-      return new Key(info, expr.copy(cc, vm), desc, least, coll);
-    }
-
-    @Override
-    public Expr optimize(final CompileContext cc) throws QueryException {
-      return this;
-    }
-
-    @Override
-    public int exprSize() {
-      return expr.exprSize();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-      if(this == obj) return true;
-      if(!(obj instanceof Key)) return false;
-      final Key k = (Key) obj;
-      return desc == k.desc && least == k.least && Objects.equals(coll, k.coll) &&
-          super.equals(obj);
-    }
-
-    @Override
-    public void plan(final FElem plan) {
-      final FElem e = planElem(DIR, Token.token(desc ? DESCENDING : ASCENDING),
-          Token.token(EMPTYORD), Token.token(least ? LEAST : GREATEST));
-      expr.plan(e);
-      plan.add(e);
-    }
-
-    @Override
-    public String toString() {
-      final TokenBuilder tb = new TokenBuilder(expr.toString());
-      if(desc) tb.add(' ').add(DESCENDING);
-      tb.add(' ').add(EMPTYORD).add(' ').add(least ? LEAST : GREATEST);
-      if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
-      return tb.toString();
-    }
   }
 }

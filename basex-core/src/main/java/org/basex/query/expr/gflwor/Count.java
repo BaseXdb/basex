@@ -100,10 +100,6 @@ public final class Count extends Clause {
   }
 
   @Override
-  void calcSize(final long[] minMax) {
-  }
-
-  @Override
   public int exprSize() {
     return 0;
   }
