@@ -80,10 +80,7 @@ public final class FnApply extends StandardFunc {
           final int as = args1.length;
           final SeqType[] args2 = new SeqType[as];
           final ArrayType at2 = (ArrayType) t2;
-          for(int a = 0; a < as; a++) {
-            args2[a] = at2.declType;
-            System.out.println(at2.declType);
-          }
+          for(int a = 0; a < as; a++) args2[a] = at2.declType;
           coerceFunc(0, cc, SeqType.ITEM_ZM, args2);
         }
       }
