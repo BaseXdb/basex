@@ -15,24 +15,24 @@ import org.junit.*;
 public final class ArrayTest extends AdvancedQueryTest {
   /** Constructor. */
   @Test public void squareConstructor() {
-    array("[]", "[]");
-    array("[()]", "[()]");
-    array("[1]", "[1]");
-    array("[1,2]", "[1, 2]");
-    array("[1 to 2]", "[(1, 2)]");
-    array("[[[[[1]]]]]", "[[[[[1]]]]]");
-    array("[[[[[1],2],3],4],5]", "[[[[[1], 2], 3], 4], 5]");
+    query("[]", "[]");
+    query("[()]", "[()]");
+    query("[1]", "[1]");
+    query("[1,2]", "[1, 2]");
+    query("[1 to 2]", "[(1, 2)]");
+    query("[[[[[1]]]]]", "[[[[[1]]]]]");
+    query("[[[[[1],2],3],4],5]", "[[[[[1], 2], 3], 4], 5]");
   }
 
   /** Constructor. */
   @Test public void curlyConstructor() {
-    array("array {}", "[]");
-    array("array { () }", "[]");
-    array("array { 1 }", "[1]");
-    array("array { 1, 2 }", "[1, 2]");
-    array("array { 1, 2 }", "[1, 2]");
-    array("array {array { 1 } }", "[[1]]");
-    array("array {array { 1,2 }, array {} }", "[[1, 2], []]");
+    query("array {}", "[]");
+    query("array { () }", "[]");
+    query("array { 1 }", "[1]");
+    query("array { 1, 2 }", "[1, 2]");
+    query("array { 1, 2 }", "[1, 2]");
+    query("array {array { 1 } }", "[[1]]");
+    query("array {array { 1,2 }, array {} }", "[[1, 2], []]");
   }
 
   /** Constructor. */
@@ -41,8 +41,11 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("[1, 2, 3](2)", 2);
     query("[1 to 2](1)", "1\n2");
     query("array { 1 to 2 }(2)", 2);
-    array("[[1]](1)", "[1]");
+    query("[[1]](1)", "[1]");
     query("[[[1]]](1)(1)(1)", 1);
+
+    query("[1,2,3]?([1])", 1);
+    query("[1,2,3]?([1,2])", "1\n2");
 
     error("[](0)", ARRAYEMPTY);
     error("[](1)", ARRAYEMPTY);
@@ -229,15 +232,6 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("count(distinct-values(['a', 'a']))", 1);
     query("count(distinct-values(['a', <a>a</a>]))", 1);
     query("count(distinct-values(['a', <a>b</a>]))", 2);
-  }
-
-  /**
-   * Compares the serialized version of an array.
-   * @param query query string
-   * @param exp expected result
-   */
-  private static void array(final String query, final String exp) {
-    query(query, exp);
   }
 
   /** Atomize key. */

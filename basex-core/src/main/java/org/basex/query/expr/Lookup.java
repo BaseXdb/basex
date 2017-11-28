@@ -37,20 +37,21 @@ public final class Lookup extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr keys = exprs[0];
+    final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();
     if(exprs.length == 1) {
       if(seqType(cc.qc.focus.value, keys)) {
-        if(keys.size() == 0) return cc.replaceWith(this, keys);
+        if(ks == 0) return cc.replaceWith(this, keys);
       }
       return this;
     }
 
     // postfix expression
     final Expr ctx = exprs[1];
+    final long es = ctx.size();
     if(seqType(ctx, keys)) {
       if((ctx instanceof Map || ctx instanceof Array) && keys instanceof Value)
         return cc.preEval(this);
 
-      final long es = ctx.size(), ks = keys.size();
       if(es == 0) return cc.replaceWith(this, ctx);
       if(ks == 0) return cc.replaceWith(this, keys);
 
@@ -98,10 +99,12 @@ public final class Lookup extends Arr {
     // derive type from input expression
     final SeqType st = ((FuncType) tp).declType;
     Occ occ = st.occ;
-    // map lookup (may result in empty sequence)
-   if(map) occ = st.occ.union(Occ.ZERO);
-   // key is wildcard, or expression yields no single item
-    if(keys == Str.WC || ctx.size() != 1) occ = st.occ.union(Occ.ONE_MORE);
+    // map lookup may result in empty sequence (array lookups will always yield at least one item)
+    if(map) occ = st.occ.union(Occ.ZERO);
+    // key is wildcard, or expression yields no single item
+    if(keys == Str.WC || ctx.size() != 1 || !keys.seqType().oneNoArray())
+      occ = st.occ.union(Occ.ONE_MORE);
+
     exprType.assign(st.type, occ);
     return true;
   }
@@ -131,12 +134,8 @@ public final class Lookup extends Arr {
         } else {
           for(final Value val : ((Array) it).members()) vb.add(val);
         }
-      } else if(keys instanceof Item) {
-        // single key
-        vb.add(fit.invokeValue(qc, info, (Item) keys));
       } else {
-        // dynamic key(s)
-        final Iter ir = qc.iter(keys);
+        final Iter ir = keys.atomIter(qc, info);
         for(Item key; (key = ir.next()) != null;) {
           vb.add(fit.invokeValue(qc, info, key));
         }
