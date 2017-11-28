@@ -106,7 +106,7 @@ public class SqlExecute extends SqlFn {
                 }
               } else if(value instanceof Clob) {
                 // add huge string from clob
-                final Clob clob = ((Clob) value);
+                final Clob clob = (Clob) value;
                 col.add(clob.getSubString(1, (int) clob.length()));
               } else {
                 // add string representation of other values
