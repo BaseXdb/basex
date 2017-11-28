@@ -284,11 +284,15 @@ public final class GFLWOR extends ParseExpr {
    * Computes the number of results of this FLWOR expression.
    */
   private void calcSize() {
-    final long s = ret.size();
-    final Occ o = ret.seqType().occ;
-    final long[] minMax = { s >= 0 ? s : o.min, s >= 0 ? s : o.max > 1 ? -1 : o.max };
+    final long[] minMax = { 1, 1 };
     for(final Clause clause : clauses) {
       if(minMax[1] != 0) clause.calcSize(minMax);
+    }
+    if(minMax[1] != 0) {
+      final long sz = ret.size();
+      minMax[0] *= Math.max(sz, 0);
+      final long max = minMax[1];
+      if(max > 0) minMax[1] = sz < 0 ? -1 : max * sz;
     }
     exprType.assign(ret.seqType().type, minMax);
   }

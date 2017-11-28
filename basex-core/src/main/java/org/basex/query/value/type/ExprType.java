@@ -116,15 +116,11 @@ public final class ExprType {
   public void assign(final Type type, final long[] minMax) {
     final long min = minMax[0], max = minMax[1], sz = min == max ? min : -1;
     if(sz > -1) {
+      // ZERO, ONE
       assign(type, sz);
     } else {
-      /* ZERO     : min = max = 0
-       * ZERO_ONE : min = 0, max = 1
-       * ZERO_MORE: min = 0, max = -1 or >1
-       * ONE      : min = max = 1
-       * ONE_MORE : min > 0, max != -1 */
-      assign(type, min == 0 ? max == 0 ? Occ.ZERO : max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE :
-        min == 1 && max == 1 ? Occ.ONE : Occ.ONE_MORE);
+      // ZERO_ONE, ZERO_MORE, ONE_MORE
+      assign(type, min == 0 ? max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE : Occ.ONE_MORE);
     }
   }
 

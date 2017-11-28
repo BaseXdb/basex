@@ -216,7 +216,7 @@ public final class For extends ForLet {
     final long factor = sz > 0 ? sz : empty ? 1 : 0;
     minMax[0] *= factor;
     final long max = minMax[1];
-    minMax[1] = sz < 0 ? -1 : max > 0 ? max * factor : max;
+    if(max > 0) minMax[1] = sz < 0 ? -1 : max * factor;
   }
 
   @Override
