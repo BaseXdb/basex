@@ -104,6 +104,10 @@ public class SqlExecute extends SqlFn {
                   Util.debug(ex);
                   col.add(xml);
                 }
+              } else if(value instanceof Clob) {
+                // add huge string from clob
+                final Clob clob = ((Clob) value);
+                col.add(clob.getSubString(1, (int) clob.length()));
               } else {
                 // add string representation of other values
                 col.add(value.toString());
