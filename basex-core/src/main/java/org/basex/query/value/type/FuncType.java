@@ -118,8 +118,8 @@ public class FuncType implements Type {
       return false;
 
     final int al = argTypes.length;
-    for(int i = 0; i < al; i++) {
-      if(!argTypes[i].eq(ft.argTypes[i])) return false;
+    for(int a = 0; a < al; a++) {
+      if(!argTypes[a].eq(ft.argTypes[a])) return false;
     }
     return declType.eq(ft.declType);
   }
