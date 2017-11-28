@@ -359,7 +359,6 @@ public final class QT3TS extends Main {
       returned.query = query;
     } catch(final XQueryException ex) {
       returned.xqerror = ex;
-      returned.value = null;
     } catch(final Throwable ex) {
       // unexpected error (potential bug)
       returned.error = ex;
