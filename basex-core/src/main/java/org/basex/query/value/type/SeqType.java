@@ -466,7 +466,7 @@ public final class SeqType {
    */
   public SeqType union(final SeqType st) {
     // ignore general type of empty sequence
-    final Type t = type == st.type || st.zero() ? type : zero() ? st.type : type.union(st.type);
+    final Type t = type.eq(st.type) || st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ o = occ.union(st.occ);
     return get(t, o);
   }

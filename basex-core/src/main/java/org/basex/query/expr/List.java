@@ -82,7 +82,7 @@ public final class List extends Arr {
       for(final Expr expr : exprs) {
         final Value val = cc.qc.value(expr);
         if(vl == 0) t = val.type;
-        else if(t != val.type) t = null;
+        else if(!t.eq(val.type)) t = null;
         values[vl++] = val;
       }
 

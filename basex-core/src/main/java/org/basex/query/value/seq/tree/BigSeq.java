@@ -363,7 +363,7 @@ final class BigSeq extends TreeSeq {
 
   @Override
   public TreeSeq concat(final TreeSeq seq) {
-    final Type tp = type == seq.type ? type : null;
+    final Type tp = type.eq(seq.type) ? type : null;
     if(seq instanceof SmallSeq) {
       // merge with right digit
       final Item[] newRight = concat(right, ((SmallSeq) seq).elems);

@@ -292,7 +292,7 @@ public final class CompileContext {
       if(expr instanceof Value && expr != Empty.SEQ) {
         // expression is value, type of first item is identical to value type: return this item
         final Item it = ((Value) expr).itemAt(0);
-        if(type == it.type) return it;
+        if(type.eq(it.type)) return it;
       }
 
       // data reference exists: create dummy node

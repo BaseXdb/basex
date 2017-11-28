@@ -48,7 +48,7 @@ public final class Arith extends Arr {
       expr = cc.qc.value(this);
     } else if(nums && st1.oneNoArray() && st2.oneNoArray()) {
       expr = calc.optimize(ex1, ex2);
-      if(expr == null || expr.seqType().type != t) expr = this;
+      if(expr == null || !expr.seqType().type.eq(t)) expr = this;
     }
     return cc.replaceWith(this, expr);
   }
