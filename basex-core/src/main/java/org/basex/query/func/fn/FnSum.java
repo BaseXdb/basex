@@ -45,7 +45,7 @@ public class FnSum extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs.length == 2 ? exprs[1] : Empty.SEQ;
+    final Expr ex1 = exprs[0], ex2 = exprs.length == 2 ? exprs[1] : null;
     if(ex1 instanceof RangeSeq) return range((Value) ex1);
     if(ex1 instanceof SingletonSeq) {
       final Item it = singleton((SingletonSeq) ex1);
@@ -53,17 +53,20 @@ public class FnSum extends StandardFunc {
     }
 
     // empty sequence: replace with default item
-    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
+    final SeqType st1 = ex1.seqType(), st2 = ex2 != null ? ex2.seqType() : null;
     if(st1.zero()) {
-      // sequence is empty
-      if(ex2 == Empty.SEQ) return ex1;
-      if(st2.instanceOf(SeqType.ITR_O) && !ex1.has(Flag.NDT)) return ex2;
+      // sequence is empty: check if it also deterministic
+      if(!ex1.has(Flag.NDT)) {
+        if(ex2 == null) return Int.ZERO;
+        if(ex2 == Empty.SEQ) return ex1;
+        if(st2.instanceOf(SeqType.ITR_O)) return ex2;
+      }
     } else if(st1.oneOrMore() && !st1.mayBeArray()) {
       // sequence is not empty: assign result type
       final Type t1 = st1.type;
       if(t1.isNumber()) exprType.assign(t1.seqType());
       if(t1.isUntyped()) exprType.assign(SeqType.DBL_O);
-    } else if(!st2.zero() && !st2.mayBeArray()) {
+    } else if(st2 != null && !st2.zero() && !st2.mayBeArray()) {
       // sequence may be empty: include non-empty default argument in tests
       final Type t1 = st1.type, t2 = st2.type;
       final Type type = t1.isNumberOrUntyped() && t2.isNumberOrUntyped() ?
