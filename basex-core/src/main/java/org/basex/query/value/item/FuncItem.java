@@ -149,7 +149,7 @@ public final class FuncItem extends FItem implements Scope {
     final Expr[] refs = new Expr[pl];
     for(int p = pl; p-- > 0;) {
       vars[p] = scp.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
-      refs[p] = new VarRef(ii, vars[p]);
+      refs[p] = new VarRef(ii, vars[p]).optimize(null);
     }
 
     final Expr ex = new DynFuncCall(ii, sc, expr.has(Flag.UPD), false, this, refs);
