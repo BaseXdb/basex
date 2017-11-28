@@ -3,10 +3,12 @@ package org.basex.query.func.array;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -22,6 +24,22 @@ public final class ArrayFlatten extends ArrayFn {
     final Iter iter = qc.iter(exprs[0]);
     for(Item it; (it = iter.next()) != null;) add(vb, it, qc);
     return vb.value();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    exprType.assign(type(exprs[0].seqType().type));
+    return this;
+  }
+
+
+  /**
+   * Recursive helper method for retrieving result type.
+   * @param t type
+   * @return result type
+   */
+  private static Type type(final Type t) {
+    return t instanceof ArrayType ? type(((ArrayType) t).declType.type) : t;
   }
 
   /**
