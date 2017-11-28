@@ -44,7 +44,7 @@ public final class Arith extends Arr {
     Expr expr = this;
     if(oneIsEmpty()) {
       expr = cc.emptySeq(this);
-    } else if(allAreValues()) {
+    } else if(allAreValues(false)) {
       expr = cc.qc.value(this);
     } else if(nums && st1.oneNoArray() && st2.oneNoArray()) {
       expr = calc.optimize(ex1, ex2);

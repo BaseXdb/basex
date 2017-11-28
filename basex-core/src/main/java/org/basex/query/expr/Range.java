@@ -33,7 +33,7 @@ public final class Range extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(oneIsEmpty()) return cc.emptySeq(this);
-    if(allAreValues()) return cc.preEval(this);
+    if(allAreValues(false)) return cc.preEval(this);
 
     final Expr e1 = exprs[0], e2 = exprs[1];
     if(e1.equals(e2)) {

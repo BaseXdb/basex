@@ -38,7 +38,7 @@ public final class HofFoldLeft1 extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex1 = exprs[0], ex2 = exprs[1];
     if(ex1.seqType().zero()) throw EMPTYFOUND.get(info);
-    if(allAreValues() && ex1.size() <= UNROLL_LIMIT) {
+    if(allAreValues(false) && ex1.size() <= UNROLL_LIMIT) {
       final Value seq = (Value) ex1;
       final FItem f = checkArity(ex2, 2, cc.qc);
       Expr ex = seq.itemAt(0);

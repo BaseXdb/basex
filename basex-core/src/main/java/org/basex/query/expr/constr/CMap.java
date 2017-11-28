@@ -53,7 +53,7 @@ public final class CMap extends Arr {
     // assign type if at least one key/value pair exists, and if all keys are single items
     if(key != null) exprType.assign(MapType.get((AtomType) key, vt));
 
-    return allAreValues() ? cc.preEval(this) : this;
+    return allAreValues(true) ? cc.preEval(this) : this;
   }
 
   @Override

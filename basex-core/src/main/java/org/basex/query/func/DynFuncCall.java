@@ -90,7 +90,7 @@ public final class DynFuncCall extends FuncCall {
     }
 
     // maps and arrays can only contain evaluated values, so this is safe
-    if((f instanceof Map || f instanceof Array) && allAreValues()) return cc.preEval(this);
+    if((f instanceof Map || f instanceof Array) && allAreValues(false)) return cc.preEval(this);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function

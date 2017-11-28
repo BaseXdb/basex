@@ -195,7 +195,7 @@ public final class CmpV extends Cmp {
 
     if(ex == this) ex = opt(op, cc);
     // pre-evaluate values or return expression
-    return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
+    return allAreValues(false) ? cc.preEval(ex) : cc.replaceWith(this, ex);
   }
 
   @Override

@@ -41,7 +41,7 @@ public final class CArray extends Arr {
     }
     if(dt != null) exprType.assign(ArrayType.get(dt));
 
-    return allAreValues() ? cc.preEval(this) : this;
+    return allAreValues(true) ? cc.preEval(this) : this;
   }
 
   @Override

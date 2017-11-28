@@ -56,7 +56,7 @@ public final class FnTail extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values
-    if(allAreValues()) return value(cc.qc);
+    if(allAreValues(false)) return value(cc.qc);
 
     final Expr ex = exprs[0];
     final long sz = ex.size() - 1;

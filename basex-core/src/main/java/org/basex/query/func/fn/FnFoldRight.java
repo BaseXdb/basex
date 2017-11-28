@@ -69,7 +69,7 @@ public final class FnFoldRight extends StandardFunc {
 
     FnFoldLeft.seqType(this, cc, false, false);
 
-    if(allAreValues() && ex1.size() <= UNROLL_LIMIT) {
+    if(allAreValues(false) && ex1.size() <= UNROLL_LIMIT) {
       // unroll the loop
       Expr ex = ex2;
       for(final Item it : ((Value) ex1).reverse()) {

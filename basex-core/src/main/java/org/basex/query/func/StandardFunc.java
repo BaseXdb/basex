@@ -84,16 +84,14 @@ public abstract class StandardFunc extends Arr {
   /**
    * Checks if the function can be pre-evaluated.
    * <ul>
-   *   <li> All arguments must be values with a limited number of items, and</li>
-   *   <li> {@link #isSimple()} must be true</li>
+   *   <li> All arguments must be values. If the function may return multiple items,
+   *     the arguments must be of small size.</li>
+   *   <li> Function must be {@link #isSimple() simple}.</li>
    * </ul>
    * @return result of check
    */
   protected boolean preEval() {
-    for(final Expr expr : exprs) {
-      if(!(expr instanceof Value) || expr.size() >= CompileContext.MAX_PREEVAL) return false;
-    }
-    return isSimple();
+    return allAreValues(sig.seqType.occ.max > 1) && isSimple();
   }
 
   /**

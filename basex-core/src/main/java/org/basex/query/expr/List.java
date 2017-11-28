@@ -75,7 +75,7 @@ public final class List extends Arr {
     }
 
     // pre-evaluate list
-    if(allAreValues() && size <= CompileContext.MAX_PREEVAL) {
+    if(allAreValues(true)) {
       Type t = null;
       final Value[] values = new Value[exprs.length];
       int vl = 0;

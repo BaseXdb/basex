@@ -65,7 +65,7 @@ public final class FnForEach extends StandardFunc {
     if(t2 instanceof FuncType) exprType.assign(((FuncType) t2).declType.type);
 
     final long sz1 = ex1.size();
-    if(allAreValues() && sz1 <= UNROLL_LIMIT) {
+    if(allAreValues(false) && sz1 <= UNROLL_LIMIT) {
       // unroll the loop
       final Value seq = (Value) ex1;
       final Expr[] results = new Expr[(int) sz1];

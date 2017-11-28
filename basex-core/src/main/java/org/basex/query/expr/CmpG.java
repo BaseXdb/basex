@@ -176,7 +176,7 @@ public class CmpG extends Cmp {
       ex = new CmpHashG(ex1, ex2, op, coll, sc, info);
 
     // pre-evaluate values or return expression
-    return allAreValues() ? cc.preEval(ex) : cc.replaceWith(this, ex);
+    return allAreValues(false) ? cc.preEval(ex) : cc.replaceWith(this, ex);
   }
 
   @Override
