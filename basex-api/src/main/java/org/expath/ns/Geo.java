@@ -664,7 +664,7 @@ public final class Geo extends QueryModule {
    * @throws QueryException query exception
    */
   private static Geometry geo(final ANode node, final QNm... names) throws QueryException {
-    if(node.type != NodeType.ELM) throw castError(node, NodeType.ELM, null);
+    if(node.type != NodeType.ELM) throw typeError(node, NodeType.ELM, null);
 
     final QNm qname = node.qname();
     for(final QNm geo : names) {

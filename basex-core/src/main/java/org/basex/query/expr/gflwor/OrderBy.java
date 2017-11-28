@@ -106,7 +106,7 @@ public final class OrderBy extends Clause {
                 if(m == Dbl.NAN || m == Flt.NAN) m = null;
                 if(n == Dbl.NAN || n == Flt.NAN) n = null;
                 if(m != null && n != null && !m.comparable(n))
-                  throw castError(n, m.type, key.info);
+                  throw typeError(n, m.type, key.info);
 
                 final int c = m == null
                     ? n == null ? 0                 : key.least ? -1 : 1

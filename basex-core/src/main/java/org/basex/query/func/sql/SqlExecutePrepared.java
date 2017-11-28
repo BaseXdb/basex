@@ -118,8 +118,7 @@ public final class SqlExecutePrepared extends SqlExecute {
         // attribute "type"
         if(eq(attr.name(), TYPE)) paramType = attr.string();
         // attribute "null"
-        else if(eq(attr.name(), NULL))
-          isNull = attr.string() != null && Bln.parse(attr.string(), info);
+        else if(eq(attr.name(), NULL)) isNull = attr.string() != null && Bln.parse(attr, info);
         // attribute not expected
         else throw SQL_ATTRIBUTE_X.get(info, attr.name());
       }

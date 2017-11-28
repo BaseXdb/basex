@@ -144,7 +144,7 @@ public class DBNode extends ANode {
       final long l = data.textItr(pre, type == NodeType.TXT);
       if(l != Long.MIN_VALUE) return l;
     }
-    return Int.parse(data.atom(pre), ii);
+    return Int.parse(this, ii);
   }
 
   @Override
@@ -160,7 +160,7 @@ public class DBNode extends ANode {
       d = data.textDbl(pre, type == NodeType.TXT);
     }
     // GH-1206: parse invalid values again
-    return Double.isNaN(d) ? Dbl.parse(data.atom(pre), ii) : d;
+    return Double.isNaN(d) ? Dbl.parse(this, ii) : d;
   }
 
   @Override

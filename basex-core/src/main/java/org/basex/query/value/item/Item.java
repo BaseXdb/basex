@@ -105,7 +105,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(string(ii), ii);
+    return Dec.parse(this, ii);
   }
 
   /**
@@ -115,7 +115,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public long itr(final InputInfo ii) throws QueryException {
-    return Int.parse(string(ii), ii);
+    return Int.parse(this, ii);
   }
 
   /**
@@ -125,7 +125,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public float flt(final InputInfo ii) throws QueryException {
-    return Flt.parse(string(ii), ii);
+    return Flt.parse(this, ii);
   }
 
   /**
@@ -135,7 +135,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public double dbl(final InputInfo ii) throws QueryException {
-    return Dbl.parse(string(ii), ii);
+    return Dbl.parse(this, ii);
   }
 
   /**

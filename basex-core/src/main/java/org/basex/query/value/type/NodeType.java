@@ -255,7 +255,7 @@ public enum NodeType implements Type {
    * @throws QueryException query exception
    */
   final Item error(final Item it, final InputInfo ii) throws QueryException {
-    throw castError(it, this, ii);
+    throw typeError(it, this, ii);
   }
 
   @Override

@@ -1,7 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -70,7 +68,7 @@ public class B64 extends Bin {
    * @throws QueryException query exception
    */
   public static B64 get(final byte[] value, final InputInfo ii) throws QueryException {
-    return get(decode(value, ii));
+    return get(parse(value, ii));
   }
 
   /**
@@ -89,29 +87,42 @@ public class B64 extends Bin {
   @Override
   public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
-      decode(it.string(ii), ii));
+    return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) : parse(it, ii));
   }
 
   @Override
   public final int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return Token.diff(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
-      decode(it.string(ii), ii));
+    return Token.diff(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) : parse(it, ii));
   }
 
   /**
-   * Converts the input into a byte array.
-   * @param d textual data
-   * @param ii input info
-   * @return decoded string
+   * Converts the given item to a byte array.
+   * @param item item to be converted
+   * @param info input info
+   * @return byte array
    * @throws QueryException query exception
    */
-  private static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
+  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
     try {
-      return org.basex.util.Base64.decode(d);
+      return org.basex.util.Base64.decode(item.string(info));
     } catch(final IllegalArgumentException ex) {
-      throw castError(AtomType.B64, ex.getMessage().replaceAll("^.*?: |\\.$", ""), ii);
+      throw AtomType.B64.castError(item, info);
+    }
+  }
+
+  /**
+   * Converts the given token into a byte array.
+   * @param value value to be converted
+   * @param info input info
+   * @return byte array
+   * @throws QueryException query exception
+   */
+  public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
+    try {
+      return org.basex.util.Base64.decode(value);
+    } catch(final IllegalArgumentException ex) {
+      throw AtomType.B64.castError(value, info);
     }
   }
 

@@ -25,7 +25,7 @@ abstract class DateTime extends StandardFunc {
   protected Dur checkDur(final Item it) throws QueryException {
     if(it instanceof Dur) return (Dur) it;
     if(it.type.isUntyped()) return new Dur(it.string(info), info);
-    throw castError(it, AtomType.DUR, info);
+    throw typeError(it, AtomType.DUR, info);
   }
 
   /**

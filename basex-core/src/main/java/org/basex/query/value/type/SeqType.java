@@ -298,7 +298,7 @@ public final class SeqType {
       if(!error && info != null) info.internal(true);
       final Value v = type.cast(item, qc, sc, info);
       if(kind != null) {
-        for(final Item i : v) if(!kind.eq(item)) throw castError(i, type, info);
+        for(final Item i : v) if(!kind.eq(item)) throw typeError(i, type, info);
       }
       return v;
     } catch(final QueryException ex) {

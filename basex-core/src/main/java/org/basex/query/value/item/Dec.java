@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
@@ -129,17 +128,17 @@ public final class Dec extends ANum {
 
   /**
    * Converts the given token into a decimal value.
-   * @param value value to be converted
-   * @param ii input info
+   * @param item item to be converted
+   * @param info input info
    * @return double value
    * @throws QueryException query exception
    */
-  public static BigDecimal parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static BigDecimal parse(final Item item, final InputInfo info) throws QueryException {
+    final byte[] value = item.string(info);
     try {
       if(!contains(value, 'e') && !contains(value, 'E'))
         return new BigDecimal(Token.string(value).trim());
-    } catch(final NumberFormatException ignored) { }
-
-    throw castError(AtomType.DEC, value, ii);
+    } catch(final NumberFormatException ignored) { Util.debug(ignored); }
+    throw AtomType.DEC.castError(item, info);
   }
 }

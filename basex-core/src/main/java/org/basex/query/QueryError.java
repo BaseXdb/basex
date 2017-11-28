@@ -523,7 +523,7 @@ public enum QueryError {
   ARRAYNEG_X(FOAY, 2, "Length is negative: %."),
 
   /** Error code. */
-  INVALUE_X_X(FOCA, 2, "Cannot cast to %: %."),
+  INVALUE_X_X(FOCA, 2, "Cannot convert to %: %."),
   /** Error code. */
   INTRANGE_X(FOCA, 3, "Integer value out of range: %."),
   /** Error code. */
@@ -632,9 +632,9 @@ public enum QueryError {
   /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** Error code. */
-  FUNCAST_X_X(FORG, 1, "Cannot cast to %: %."),
+  FUNCCAST_X_X(FORG, 1, "Cannot convert to %: %."),
   /** Error code. */
-  FUNCCAST_X_X_X(FORG, 1, "Cannot cast % to %: %."),
+  FUNCCAST_X_X_X(FORG, 1, "Cannot convert % to %: %."),
   /** Error code. */
   DATEFORMAT_X_X_X(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
   /** Error code. */
@@ -1071,7 +1071,7 @@ public enum QueryError {
   /** Error code. */
   STEPNODE_X_X_X(XPTY, 20, "%: node expected, % found: %."),
   /** Error code. */
-  NSSENS_X_X(XPTY, 117, "Cannot cast % to %."),
+  NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
 
   /** Error code. */
   CATTDUPL_X(XQDY, 25, "Duplicate attribute '%'."),
@@ -1582,24 +1582,12 @@ public enum QueryError {
   /**
    * Throws a type cast exception.
    * @param value value
-   * @param type expression cast type
+   * @param type target type
    * @param info input info
    * @return query exception
    */
-  public static QueryException castError(final Value value, final Type type, final InputInfo info) {
+  public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
     return INVTYPE_X_X_X.get(info, value.type, type, value);
-  }
-
-  /**
-   * Throws a type cast exception.
-   * @param type expression cast type
-   * @param value value
-   * @param info input info
-   * @return query exception
-   */
-  public static QueryException castError(final Type type, final Object value,
-      final InputInfo info) {
-    return FUNCAST_X_X.get(info, type, chop(value, info));
   }
 
   /**

@@ -165,7 +165,7 @@ public final class TypeCheck extends Single {
   @Override
   public void plan(final FElem plan) {
     final FElem elem = planElem(AS, seqType());
-    if(promote) elem.add(planAttr(FUNCTION, Token.TRUE));
+    if(promote) elem.add(planAttr(PROMOTE, true));
     addPlan(plan, elem, expr);
   }
 

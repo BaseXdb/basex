@@ -164,19 +164,43 @@ public final class Dbl extends ANum {
   }
 
   /**
-   * Converts the given token into a double value.
-   * @param value value to be converted
-   * @param ii input info
+   * Converts the given item to a double value.
+   * @param item item to be converted
+   * @param info input info
    * @return double value
    * @throws QueryException query exception
    */
-  public static double parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static double parse(final Item item, final InputInfo info) throws QueryException {
+    final Double d = parse(item.string(info));
+    if(d != null) return d;
+    throw AtomType.DBL.castError(item, info);
+  }
+
+  /**
+   * Converts the given token into a double value.
+   * @param value value to be converted
+   * @param info input info
+   * @return double value
+   * @throws QueryException query exception
+   */
+  public static double parse(final byte[] value, final InputInfo info) throws QueryException {
+    final Double d = parse(value);
+    if(d != null) return d;
+    throw AtomType.DBL.castError(value, info);
+  }
+
+  /**
+   * Converts the given token into a double value.
+   * @param value value to be converted
+   * @return double value or {@code null}
+   */
+  private static Double parse(final byte[] value) {
     final double d = Token.toDouble(value);
     if(!Double.isNaN(d)) return d;
     final byte[] v = Token.trim(value);
     if(Token.eq(v, Token.NAN)) return Double.NaN;
     if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NINF)) return Double.NEGATIVE_INFINITY;
-    throw castError(AtomType.DBL, value, ii);
+    return null;
   }
 }

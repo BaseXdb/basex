@@ -22,7 +22,7 @@ public final class BinHex extends BinFn {
     // add leading zero
     if((bytes.length & 1) != 0) bytes = concat(ZERO, bytes);
     try {
-      return B64.get(Hex.decode(bytes, info));
+      return B64.get(Hex.parse(bytes, info));
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw BIN_NNC.get(info);

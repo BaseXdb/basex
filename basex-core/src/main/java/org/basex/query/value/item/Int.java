@@ -1,7 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.QueryError.*;
-
 import java.math.*;
 
 import org.basex.query.*;
@@ -190,15 +188,16 @@ public final class Int extends ANum {
   }
 
   /**
-   * Converts the given value to a long primitive.
-   * @param value value to be converted
-   * @param ii input info
+   * Converts the given item to a long primitive.
+   * @param item item to be converted
+   * @param info input info
    * @return long value
    * @throws QueryException query exception
    */
-  public static long parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static long parse(final Item item, final InputInfo info) throws QueryException {
+    final byte[] value = item.string(info);
     final long l = Token.toLong(value);
     if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MINLONG)) return l;
-    throw castError(AtomType.ITR, value, ii);
+    throw AtomType.ITR.castError(item, info);
   }
 }
