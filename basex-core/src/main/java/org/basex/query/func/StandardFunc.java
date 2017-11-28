@@ -192,32 +192,33 @@ public abstract class StandardFunc extends Arr {
     // check if argument is function item
     final Expr fun = exprs[i];
     if(fun instanceof FuncItem) {
-      FuncItem it = (FuncItem) fun;
-      FuncType ift = it.funcType();
-
-      // select return and argument types that are more specific
-      SeqType dt = declType.instanceOf(ift.declType) ? declType : ift.declType;
+      // stop typing refinement if number of arguments does not match function arguments
+      FuncItem fi = (FuncItem) fun;
+      FuncType ft = fi.funcType();
       final int al = argTypes.length;
-      final SeqType[] iat = ift.argTypes, at = new SeqType[al];
-      final boolean skip = iat == null || iat.length != at.length;
+      if(al != ft.argTypes.length) return;
+
+      // select most specific argument and return types
+      final SeqType[] fat = ft.argTypes, at = new SeqType[al];
       for(int a = 0; a < al; a++) {
-        at[a] = skip || argTypes[a].instanceOf(iat[a]) ? argTypes[a] : iat[a];
+        at[a] = argTypes[a].instanceOf(fat[a]) ? argTypes[a] : fat[a];
       }
+      SeqType dt = declType.instanceOf(ft.declType) ? declType : ft.declType;
 
       // coerce to new function type
       FuncType fc = FuncType.get(dt, at);
-      if(!fc.eq(ift)) {
-        it = it.coerceTo(fc, cc.qc, info, true);
-        ift = it.funcType();
+      if(!fc.eq(ft)) {
+        fi = fi.coerceTo(fc, cc.qc, info, true);
+        ft = fi.funcType();
 
         // set new type of function item expression as return type
-        dt = it.expr.seqType();
-        if(dt.instanceOf(ift.declType)) {
+        dt = fi.expr.seqType();
+        if(dt.instanceOf(ft.declType)) {
           fc = FuncType.get(dt, at);
-          if(!fc.eq(ift)) it = it.coerceTo(fc, cc.qc, info, true);
+          if(!fc.eq(ft)) fi = fi.coerceTo(fc, cc.qc, info, true);
         }
       }
-      exprs[i] = it;
+      exprs[i] = fi;
     }
   }
 

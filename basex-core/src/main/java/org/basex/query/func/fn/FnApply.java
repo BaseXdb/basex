@@ -59,9 +59,37 @@ public final class FnApply extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
-    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr ex1 = exprs[0], ex2 = exprs[1];
+    final Type t1 = ex1.seqType().type, t2 = ex2.seqType().type;
+    final FuncType ft1 = t1 instanceof FuncType ? (FuncType) t1 : null;
+
+    // try to pass on types of array argument to function item
+    if(t2 instanceof ArrayType) {
+      if(ex2 instanceof Array) {
+        // argument is a value: final types are known
+        final Array arr = (Array) ex2;
+        final int as = Math.max(0, (int) arr.arraySize());
+        final SeqType[] args = new SeqType[as];
+        for(int a = 0; a < as; a++) args[a] = arr.get(a).seqType();
+        coerceFunc(0, cc, SeqType.ITEM_ZM, args);
+      } else if(ft1 != null) {
+        // argument will be of type array: assign generic array return type to all arguments
+        final SeqType[] args1 = ft1.argTypes;
+        if(args1 != null) {
+          final int as = args1.length;
+          final SeqType[] args2 = new SeqType[as];
+          final ArrayType at2 = (ArrayType) t2;
+          for(int a = 0; a < as; a++) {
+            args2[a] = at2.declType;
+            System.out.println(at2.declType);
+          }
+          coerceFunc(0, cc, SeqType.ITEM_ZM, args2);
+        }
+      }
+    }
+
+    if(ft1 != null) exprType.assign(ft1.declType);
     return this;
   }
 }

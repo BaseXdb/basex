@@ -1083,7 +1083,6 @@ public final class UpdateTest extends AdvancedQueryTest {
     error("apply(db:output#1, [<b/>])", FUNCUP_X);
     error("for-each(<a/>, db:output#1)", FUNCUP_X);
     error("for-each-pair(<a/>, <b/>, put#2)", FUNCUP_X);
-    error("for-each-pair(<a/>, <b/>, db:output#1)", INVPROMOTE_X);
   }
 
   /**
