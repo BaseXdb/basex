@@ -204,13 +204,14 @@ public final class SerializerOptions extends Options {
         if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
 
         final byte[] mapsId = new QNm(USE_CHARACTER_MAPS.name(), QueryText.OUTPUT_URI).id();
-        final byte[] mapId = new QNm("character-map", QueryText.OUTPUT_URI).id();
+        final byte[] mapId = new QNm(QueryText.CHARACTER_MAP, QueryText.OUTPUT_URI).id();
         if(!get(USE_CHARACTER_MAPS).isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
           for(final ANode option : XMLAccess.children(root, mapsId)) {
             for(final ANode child : XMLAccess.children(option, mapId)) {
               if(!tb.isEmpty()) tb.add(',');
-              tb.add(child.attribute("character")).add('=').add(child.attribute("map-string"));
+              tb.add(child.attribute(QueryText.CHARACTER)).add('=');
+              tb.add(child.attribute(QueryText.MAP_STRING));
             }
           }
           set(USE_CHARACTER_MAPS, tb.toString());

@@ -107,7 +107,7 @@ public class ArchiveCreate extends ArchiveFn {
       lvl = el.attribute(LEVEL);
 
       // last modified
-      final byte[] mod = el.attribute(LAST_MOD);
+      final byte[] mod = el.attribute(LAST_MODIFIED);
       if(mod != null) {
         try {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), qc));

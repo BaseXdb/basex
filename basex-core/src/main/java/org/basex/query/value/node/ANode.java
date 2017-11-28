@@ -271,15 +271,6 @@ public abstract class ANode extends Item {
    * @param name attribute to be found
    * @return attribute value
    */
-  public byte[] attribute(final String name) {
-    return attribute(new QNm(name));
-  }
-
-  /**
-   * Returns the value of the specified attribute or {@code null}.
-   * @param name attribute to be found
-   * @return attribute value
-   */
   public byte[] attribute(final byte[] name) {
     return attribute(new QNm(name));
   }

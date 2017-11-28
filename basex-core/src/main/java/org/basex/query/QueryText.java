@@ -418,7 +418,11 @@ public interface QueryText {
 
   /** Base token. */ byte[] BASE = token("base");
   /** Language attribute. */ byte[] LANG = token("xml:lang");
+
   /** Serialization. */ byte[] SERIALIZATION_PARAMETERS = token("serialization-parameters");
+  /** Serialization. */ byte[] CHARACTER = token("character");
+  /** Serialization. */ byte[] CHARACTER_MAP = token("character-map");
+  /** Serialization. */ byte[] MAP_STRING = token("map-string");
 
   /** Error token. */ byte[] E_CODE = token("code");
   /** Error token. */ byte[] E_DESCRIPTION = token("description");

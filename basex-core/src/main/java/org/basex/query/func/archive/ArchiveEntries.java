@@ -38,9 +38,9 @@ public final class ArchiveEntries extends StandardFunc {
         long s = ze.getSize();
         if(s != -1) e.add(SIZE, token(s));
         s = ze.getTime();
-        if(s != -1) e.add(LAST_MOD, Dtm.get(s).string(info));
+        if(s != -1) e.add(LAST_MODIFIED, Dtm.get(s).string(info));
         s = ze.getCompressedSize();
-        if(s != -1) e.add(COMP_SIZE, token(s));
+        if(s != -1) e.add(COMPRESSED_SIZE, token(s));
         e.add(ze.getName());
         vb.add(e);
       }
