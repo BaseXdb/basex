@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
@@ -326,5 +327,13 @@ public final class GFLWORTest extends QueryPlanTest {
         "2\n2",
         count("VarRef", 1)
     );
+  }
+
+  /** Tests inlining. */
+  @Test public void inlineLetTest() {
+    check("let $x := 1 let $b := $x + 2 return $b + 3", 6, empty(Let.class));
+    check("let $x := <x>0</x> let $b := $x/text() return $b + 1",
+        1, count(Let.class, 1));
+    error("let $x := <x>false</x> let $b as xs:boolean := $x/text() return $b", INVTYPE_X_X_X);
   }
 }

@@ -52,7 +52,7 @@ public final class FnModuleTest extends QueryPlanTest {
         + "let $f := function-lookup(xs:QName('fn:concat'), $a) "
         + "return " + func.args(" $f", " array { 1 to $a }"), "12\n123");
     error(func.args(" false#0", " ['x']"), APPLY_X_X);
-    error(func.args(" string-length#1", " [ ('a','b') ]"), INVPROMOTE_X);
+    error(func.args(" string-length#1", " [ ('a','b') ]"), INVTYPE_X_X_X);
 
     // no pre-evaluation (higher-order arguments), but type adjustment
     check(func.args(" true#0", " []"), true, type(name, "xs:boolean"));
@@ -363,7 +363,7 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args(" ('b', 'c', 'a', 1)"), CMP_X_X_X);
     error(func.args(" (2, 3, 1, 'a')"), CMP_X_X_X);
     error(func.args(" (false(), true(), false(), 1)"), CMP_X_X_X);
-    error(func.args(" 'x'", 1), INVCAST_X_X_X);
+    error(func.args(" 'x'", 1), INVTYPE_X_X_X);
   }
 
   /** Test method. */

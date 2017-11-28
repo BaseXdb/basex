@@ -296,7 +296,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.value();
     } catch(final QueryException ex) {
-      assertEquals(QueryError.INVPROMOTE_X, ex.error());
+      assertEquals(QueryError.INVTYPE_X_X_X, ex.error());
     }
 
     // ensure that all files were deleted

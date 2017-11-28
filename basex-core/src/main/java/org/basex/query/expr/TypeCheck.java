@@ -87,12 +87,8 @@ public final class TypeCheck extends Single {
     final Iter iter = qc.iter(expr);
 
     return new Iter() {
-      /** Item cache. */
       final ItemList cache = new ItemList();
-      /** Item cache index. */
-      int c;
-      /** Result index. */
-      int i;
+      int c, i;
 
       @Override
       public Item next() throws QueryException {
@@ -104,8 +100,10 @@ public final class TypeCheck extends Single {
           final Item it = iter.next();
           if(it == null || st.instance(it)) {
             cache.add(it);
-          } else {
+          } else if(promote) {
             st.promote(it, null, cache, qc, sc, info, false);
+          } else {
+            throw typeError(expr, st, null, info);
           }
         }
 
@@ -127,7 +125,7 @@ public final class TypeCheck extends Single {
     final SeqType st = seqType();
     if(st.instance(val)) return val;
     if(promote) return st.promote(val, null, qc, sc, info, false);
-    throw INVCAST_X_X_X.get(info, val.seqType(), st, val);
+    throw typeError(val, st, null, info);
   }
 
   /**

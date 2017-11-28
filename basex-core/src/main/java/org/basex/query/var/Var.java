@@ -140,7 +140,7 @@ public final class Var extends ExprInfo {
 
     if(declType != null) {
       if(declType.occ.intersect(st.occ) == null)
-        throw INVPROMOTE_X_X_X.get(info, this, st, declType);
+        throw typeError(st, declType, name, info);
       if(st.instanceOf(declType)) {
         if(cc != null) cc.info(QueryText.OPTTYPE_X, this);
         declType = null;

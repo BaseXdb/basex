@@ -1016,11 +1016,7 @@ public enum QueryError {
   /** Error code. */
   CPIWRONG_X_X(XPTY, 4, "String or NCName expected, % found: %."),
   /** Error code. */
-  INVCAST_X_X_X(XPTY, 4, "Cannot cast % to %: %."),
-  /** Error code. */
-  INVPROMOTE_X(XPTY, 4, "%."),
-  /** Error code. */
-  INVPROMOTE_X_X_X(XPTY, 4, "%: Cannot promote % to %."),
+  INVTYPE_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
   /** Error code. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** Error code. */
@@ -1562,13 +1558,25 @@ public enum QueryError {
   public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
       final InputInfo info) {
 
-    final TokenBuilder tb = new TokenBuilder("Cannot ");
-    if(name == null) {
-      tb.add("return ").addExt(expr.seqType()).add(" as ");
-    } else {
-      tb.add("promote ").addExt(expr.seqType()).add(" to ").add('$').add(name.string()).add(" as ");
-    }
-    return INVPROMOTE_X.get(info, tb.addExt(type).add(": ").add(chop(expr, info)).finish());
+    final TokenBuilder tb = new TokenBuilder();
+    if(name != null) tb.add('$').add(name.string()).add(" := ");
+    final byte[] value = tb.add(chop(expr, info)).finish();
+    return INVTYPE_X_X_X.get(info, expr.seqType(), type, value);
+  }
+
+  /**
+   * Throws a type exception.
+   * @param info input info
+   * @param found found type
+   * @param type target type
+   * @param name name
+   * @return query exception
+   */
+  public static QueryException typeError(final SeqType found, final SeqType type, final QNm name,
+      final InputInfo info) {
+
+    final byte[] value = new TokenBuilder().add('$').add(name.string()).finish();
+    return INVTYPE_X_X_X.get(info, found, type, value);
   }
 
   /**
@@ -1579,7 +1587,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException castError(final Value value, final Type type, final InputInfo info) {
-    return INVCAST_X_X_X.get(info, value.type, type, value);
+    return INVTYPE_X_X_X.get(info, value.type, type, value);
   }
 
   /**

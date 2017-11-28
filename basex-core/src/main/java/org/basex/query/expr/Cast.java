@@ -68,7 +68,7 @@ public final class Cast extends Single {
   public Value value(final QueryContext qc) throws QueryException {
     final Value v = expr.atomValue(qc, info);
     final SeqType st = seqType();
-    if(!st.occ.check(v.size())) throw INVCAST_X_X_X.get(info, v.seqType(), st, v);
+    if(!st.occ.check(v.size())) throw INVTYPE_X_X_X.get(info, v.seqType(), st, v);
     return v instanceof Item ? st.cast((Item) v, qc, sc, info, true) : v;
   }
 

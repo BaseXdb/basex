@@ -312,7 +312,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void writeText() {
     error(_FILE_WRITE_TEXT.args(PATH, "x"), FILE_IS_DIR_X);
-    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), INVCAST_X_X_X);
+    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), INVTYPE_X_X_X);
 
     query(_FILE_WRITE_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1);
@@ -325,7 +325,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void writeTextLines() {
     error(_FILE_WRITE_TEXT_LINES.args(PATH, "x"), FILE_IS_DIR_X);
-    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), INVCAST_X_X_X);
+    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), INVTYPE_X_X_X);
 
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
@@ -374,7 +374,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void appendText() {
     error(_FILE_APPEND_TEXT.args(PATH, "x"), FILE_IS_DIR_X);
-    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), INVCAST_X_X_X);
+    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), INVTYPE_X_X_X);
 
     query(_FILE_APPEND_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1);
@@ -387,7 +387,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void appendTextLines() {
     error(_FILE_APPEND_TEXT_LINES.args(PATH, "x"), FILE_IS_DIR_X);
-    error(_FILE_APPEND_TEXT_LINES.args(PATH1, 123), INVCAST_X_X_X);
+    error(_FILE_APPEND_TEXT_LINES.args(PATH1, 123), INVTYPE_X_X_X);
 
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());

@@ -322,7 +322,7 @@ public final class SeqType {
       final InputInfo ii) throws QueryException {
 
     final long vs = value.size();
-    if(!occ.check(vs)) throw INVCAST_X_X_X.get(ii, value.seqType(), this, value);
+    if(!occ.check(vs)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
 
     if(value.isEmpty()) return Empty.SEQ;
     if(value instanceof Item) return cast((Item) value, qc, sc, ii, true);
