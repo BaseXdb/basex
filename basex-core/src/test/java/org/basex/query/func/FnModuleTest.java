@@ -279,6 +279,17 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void functionLookup() {
+    final Function func = Function.FUNCTION_LOOKUP;
+    final String name = Util.className(func.clazz);
+
+    check("for $f in ('fn:true', 'fn:position') ! function-lookup(xs:QName(.), 0) " +
+        "return (8,9)[$f()]", "8\n9\n9", exists(name));
+    check("for $f in xs:QName('fn:position') return (8,9)[function-lookup($f, 0)()]", "8\n9",
+        exists(name));
+  }
+
+  /** Test method. */
   @Test public void head() {
     final Function func = Function.HEAD;
     final String name = Util.className(func.clazz);
