@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
-import org.basex.query.func.*;
 import org.junit.*;
 
 /**
@@ -61,8 +60,8 @@ public final class RESTPutTest extends RESTTest {
     put(NAME + "/a", new ArrayInput(token("<a>A</a>")));
     put(NAME + "/b", new ArrayInput(token("<b>B</b>")));
     assertEquals("2", get(NAME + "?query=count(//text())"));
-    assertEquals("2", get("?query=count(" + Function._DB_OPEN.args(NAME).trim() + "//text())"));
-    assertEquals("1", get("?query=count(" + Function._DB_OPEN.args(NAME, "b").trim() + "/*)"));
+    assertEquals("2", get("?query=count(db:open('" + NAME + "')//text())"));
+    assertEquals("1", get("?query=count(db:open('" + NAME + "','b')/*)"));
     delete(NAME);
   }
 
