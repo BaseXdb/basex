@@ -813,6 +813,6 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public String toString() {
-    return root != null ? root.toString() : info.query;
+    return root != null ? QueryInfo.usedDecls(root) : info.query;
   }
 }

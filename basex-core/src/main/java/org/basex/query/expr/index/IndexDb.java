@@ -25,7 +25,7 @@ public abstract class IndexDb extends ParseExpr {
    * @param iterable iterable flag
    */
   IndexDb(final InputInfo info, final boolean iterable) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, SeqType.EMP);
     this.iterable = iterable;
   }
 

@@ -27,38 +27,6 @@ public final class ArrayFlatten extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    exprType.assign(type(exprs[0].seqType().type));
-    return this;
-  }
-
-
-  /**
-   * Recursive helper method for retrieving result type.
-   * @param t type
-   * @return result type
-   */
-  private static Type type(final Type t) {
-    return t instanceof ArrayType ? type(((ArrayType) t).declType.type) : t;
-  }
-
-  /**
-   * Recursive helper method for flattening nested arrays.
-   * @param vb sequence builder
-   * @param item item to be added
-   * @param qc query context
-   */
-  private static void add(final ValueBuilder vb, final Item item, final QueryContext qc) {
-    qc.checkStop();
-    if(item instanceof Array) {
-      for(final Value val : ((Array) item).members()) {
-        for(final Item it : val) add(vb, it, qc);
-      }
-    }
-    else vb.add(item);
-  }
-
-  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       @SuppressWarnings("unchecked")
@@ -94,5 +62,36 @@ public final class ArrayFlatten extends ArrayFn {
         }
       }
     };
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    exprType.assign(type(exprs[0].seqType().type));
+    return this;
+  }
+
+  /**
+   * Recursive helper method for retrieving result type.
+   * @param t type
+   * @return result type
+   */
+  private static Type type(final Type t) {
+    return t instanceof ArrayType ? type(((ArrayType) t).declType.type) : t;
+  }
+
+  /**
+   * Recursive helper method for flattening nested arrays.
+   * @param vb sequence builder
+   * @param item item to be added
+   * @param qc query context
+   */
+  private static void add(final ValueBuilder vb, final Item item, final QueryContext qc) {
+    qc.checkStop();
+    if(item instanceof Array) {
+      for(final Value val : ((Array) item).members()) {
+        for(final Item it : val) add(vb, it, qc);
+      }
+    }
+    else vb.add(item);
   }
 }

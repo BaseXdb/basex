@@ -37,7 +37,7 @@ public final class OrderBy extends Clause {
    * @param info input info
    */
   public OrderBy(final VarRef[] refs, final OrderKey[] keys, final InputInfo info) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, SeqType.EMP);
     this.refs = refs;
     this.keys = keys;
   }
@@ -134,16 +134,11 @@ public final class OrderBy extends Clause {
   @Override
   public OrderBy compile(final CompileContext cc) throws QueryException {
     for(final OrderKey key : keys) key.compile(cc);
-    return optimize(cc);
+    return this;
   }
 
   @Override
-  public OrderBy optimize(final CompileContext cc) throws QueryException {
-    SeqType st = null;
-    for(final OrderKey key : keys) {
-      st = st == null ? key.seqType() : st.union(key.seqType());
-    }
-    exprType.assign(st);
+  public OrderBy optimize(final CompileContext cc) {
     return this;
   }
 
