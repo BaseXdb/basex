@@ -68,10 +68,10 @@ public final class CsvXQuerySerializer extends CsvSerializer {
    */
   private void record(final Value line, final TokenList tl) throws QueryException, IOException {
     if(!(line instanceof Array))
-      throw CSV_SERIALIZE_X.getIO("Array expected; " + line.type + "found");
+      throw CSV_SERIALIZE_X.getIO("Array expected; " + line.type + " found");
     for(final Value entry : ((Array) line).members()) {
       if(!(entry instanceof AStr))
-        throw CSV_SERIALIZE_X.getIO("Single item expected; " + entry.type + "found");
+        throw CSV_SERIALIZE_X.getIO("Single item expected; " + entry.type + " found");
       tl.add(((Item) entry).string(null));
     }
     record(tl);
