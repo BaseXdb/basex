@@ -52,7 +52,6 @@ final class InvDocTest extends Test {
     }
 
     // loop through all documents and add pre values of documents
-    // not more than 2^31 documents supported
     final IntList il = new IntList((int) rt.size());
     for(final Item it : rt) il.add(((DBNode) it).pre());
     return new InvDocTest(il, data);

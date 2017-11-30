@@ -104,7 +104,7 @@ final class XQDoc extends Inspect {
       tb.add(PAREN2).add(' ' + AS + ' ' + t.declType);
       if(sf.expr == null) tb.add(" external");
 
-      elem("signature", function).add(tb.toString());
+      elem("signature", function).add(tb.finish());
       if(al != 0) {
         final FElem fparameters = elem("parameters", function);
         for(int a = 0; a < al; a++) {

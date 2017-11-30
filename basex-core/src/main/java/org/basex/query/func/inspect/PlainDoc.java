@@ -110,12 +110,10 @@ final class PlainDoc extends Inspect {
     for(int a = 0; a < al; a++) {
       final FElem argument = elem("argument", function);
       if(names != null) {
-        final byte[] name = names[a].string();
-        final byte[] uri = names[a].uri();
+        final byte[] name = names[a].string(), uri = names[a].uri(), pdoc = doc(doc, name);
         argument.add("name", name);
         if(uri.length != 0) argument.add("uri", uri);
 
-        final byte[] pdoc = doc(doc, name);
         if(pdoc != null) add(pdoc, argument);
       }
       type(ftype.argTypes[a], argument);
