@@ -40,8 +40,26 @@ public final class Root extends Simple {
   }
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = ctxValue(qc).iter();
+  public Value value(final QueryContext qc) throws QueryException {
+    final Value value = ctxValue(qc);
+    return value.seqType().type == NodeType.DOC ? value : roots(value, qc).value();
+  }
+
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Value value = ctxValue(qc);
+    return value.seqType().type == NodeType.DOC ? value.iter() : roots(value, qc).iter();
+  }
+
+  /**
+   * Returns roots of the specified value.
+   * @param value value
+   * @param qc query context
+   * @return root nodes
+   * @throws QueryException query exception
+   */
+  private ANodeBuilder roots(final Value value, final QueryContext qc) throws QueryException {
+    final Iter iter = value.iter();
     final ANodeBuilder list = new ANodeBuilder();
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
@@ -49,7 +67,7 @@ public final class Root extends Simple {
       if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
       list.add(n);
     }
-    return list.iter();
+    return list;
   }
 
   @Override
