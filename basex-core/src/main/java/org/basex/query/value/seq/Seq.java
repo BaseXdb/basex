@@ -180,7 +180,13 @@ public abstract class Seq extends Value {
   public void plan(final FElem plan) {
     final FElem el = planElem(SIZE, size, TYPE, seqType());
     addPlan(plan, el);
-    for(int v = 0; v != Math.min(size, 3); ++v) itemAt(v).plan(el);
+    for(long i = 0; i < size; i++) {
+      if(i == 3 && i + 1 < size) {
+        el.add(new FElem("etc"));
+        break;
+      }
+      itemAt(i).plan(el);
+    }
   }
 
   @Override

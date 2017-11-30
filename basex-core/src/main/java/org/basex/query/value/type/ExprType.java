@@ -82,16 +82,6 @@ public final class ExprType {
   }
 
   /**
-   * Assigns the specified type and result size.
-   * @param type type
-   * @param sz result size
-   */
-  public void assign(final Type type, final long sz) {
-    final Occ occ = sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : sz > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE;
-    assign(seqType.with(type, occ), sz);
-  }
-
-  /**
    * Assigns the specified type and occurrence indicator, updates the result size.
    * @param type type
    * @param occ occurrence indicator
@@ -109,19 +99,29 @@ public final class ExprType {
   }
 
   /**
+   * Assigns the specified type, and result size or occurrence indicator.
+   * @param type type
+   * @param sz result size. If {@code -1}, the occurrence indicator will be assigned.
+   * @param occ occurrence indicator
+   */
+  public void assign(final Type type, final Occ occ, final long sz) {
+    if(sz >= 0) {
+      final Occ o = sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : sz > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE;
+      assign(seqType.with(type, o), sz);
+    } else {
+      assign(type, occ);
+    }
+  }
+
+  /**
    * Assigns the type and result size, based on the specified min/max occurrences.
    * @param type type
    * @param minMax min/max values (min: 0 or more, max: -1 or more)
    */
   public void assign(final Type type, final long[] minMax) {
     final long min = minMax[0], max = minMax[1], sz = min == max ? min : -1;
-    if(sz > -1) {
-      // ZERO, ONE
-      assign(type, sz);
-    } else {
-      // ZERO_ONE, ZERO_MORE, ONE_MORE
-      assign(type, min == 0 ? max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE : Occ.ONE_MORE);
-    }
+    final Occ occ = min == 0 ? max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE : Occ.ONE_MORE;
+    assign(type, occ, sz);
   }
 
   @Override

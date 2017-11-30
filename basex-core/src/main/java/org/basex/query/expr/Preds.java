@@ -153,12 +153,10 @@ public abstract class Preds extends Arr {
       }
     }
 
-    if(exact || max == 0) {
-      exprType.assign(seqType.type, max);
-    } else {
-      // we only know if there will be at most 1 result
-      exprType.assign(seqType.type, max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-    }
+    // we only know if there will be at most 1 result
+    final Occ occ = max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE;
+    final long sz = exact || max == 0 ? max : -1;
+    exprType.assign(seqType.type, occ, sz);
     return max != 0;
   }
 

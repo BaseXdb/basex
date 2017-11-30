@@ -68,11 +68,7 @@ public final class List extends Arr {
       if(sz > 0 || expr.seqType().oneOrMore()) zero = false;
       if(size != -1) size = sz == -1 ? -1 : size + sz;
     }
-    if(size > -1) {
-      exprType.assign(type, size);
-    } else {
-      exprType.assign(type, zero ? Occ.ZERO_MORE : Occ.ONE_MORE);
-    }
+    exprType.assign(type, zero ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
 
     // pre-evaluate list
     if(allAreValues(true)) {

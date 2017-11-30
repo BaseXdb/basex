@@ -56,7 +56,7 @@ public abstract class Path extends ParseExpr {
    * Returns a new path instance.
    * A path implementation is chosen that works fastest for the given steps.
    * @param info input info
-   * @param root root expression, may be {@code null}
+   * @param root root expression (can be {@code null})
    * @param steps steps
    * @return path instance
    */
@@ -106,8 +106,9 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : st) axes &= step instanceof Step;
 
     // choose best implementation
-    return axes ? iterative(rt, st) ? new IterPath(info, rt, st) :
+    final Path path = axes ? iterative(rt, st) ? new IterPath(info, rt, st) :
       new CachedPath(info, rt, st) : new MixedPath(info, rt, st);
+    return path;
   }
 
   @Override
@@ -177,20 +178,7 @@ public abstract class Path extends ParseExpr {
 
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
-    final int sl = path.steps.length;
-    final Expr lastExpr = path.steps[sl - 1];
-
-    // try to compute result size and derive result type from last step
-    path.exprType.assign(lastExpr.seqType().type, path.size(cc));
-
-    // single attribute with exact name test will return at most one result
-    if(path.root == null && sl == 1 && lastExpr instanceof Step) {
-      final Step lastStep = (Step) lastExpr;
-      if(lastStep.axis == ATTR && lastStep.test.one) {
-        lastStep.exprType.assign(Occ.ZERO_ONE);
-        path.exprType.assign(lastStep.exprType);
-      }
-    }
+    path.seqType(cc);
     return path;
   }
 
@@ -276,7 +264,7 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Guesses if the evaluation of this axis path is cheap. This is used to determine if it
+   * Estimates the cost to evaluate this path. This is used to determine if the path
    * can be inlined into a loop to enable index rewritings.
    * @return guess
    */
@@ -357,20 +345,46 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
+   * Assigns a sequence type and (if statically known) result size.
+   * @param cc compilation context
+   */
+  private void seqType(final CompileContext cc) {
+    final long sz = size(cc);
+    final int sl = steps.length;
+    final Expr last = steps[sl - 1];
+    final SeqType st = last.seqType();
+    Type type = st.type;
+    Occ occ = Occ.ZERO_MORE;
+
+    // unknown result size: single attribute with exact name test will return at most one result
+    if(sz < 0 && root == null && sl == 1 && last instanceof Step && !cc.topFocus()) {
+      final Step step = (Step) last;
+      if(step.axis == ATTR && step.test.one) {
+        occ = Occ.ZERO_ONE;
+        step.exprType.assign(occ);
+      }
+    }
+    exprType.assign(type, occ, sz);
+  }
+
+  /**
    * Computes the number of results.
    * @param cc compilation context
    * @return number of results
    */
   private long size(final CompileContext cc) {
-    for(final Expr step : steps) if(step.size() == 0) return 0;
+    for(final Expr step : steps) {
+      if(step.size() == 0) return 0;
+    }
     if(root != null && root.size() == 0) return 0;
 
+    // skip computation if path does not start with document nodes
     final Value rt = cc.contextValue(root);
-    // skip computation if value is not a document node
     if(rt == null || rt.type != NodeType.DOC) return -1;
-    final Data data = rt.data();
-    // skip computation if no database instance is available, is out-of-date or
+
+    // skip computation if no database instance is available, is outdated, or
     // if context does not contain all database nodes
+    final Data data = rt.data();
     if(data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -432,7 +446,7 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Checks if the path will never yield results.
-   * @param rt root
+   * @param rt root value (can be {@code null})
    * @return {@code true} if steps will never yield results
    */
   private boolean emptyPath(final Value rt) {
@@ -443,7 +457,7 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Checks if the specified step will never yield results.
-   * @param rt root value
+   * @param rt root value (can be {@code null})
    * @param s index of step
    * @return {@code true} if steps will never yield results
    */
@@ -596,8 +610,7 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   public Expr index(final CompileContext cc, final Value rt) throws QueryException {
-    // do not rewrite if existing data reference does not point to documents
-    final Data data = rt == null ? null : rt.data();
+    // skip optimization if path does not start with document nodes
     if(rt != null && rt.type != NodeType.DOC) return this;
 
     // cache index access costs
@@ -606,6 +619,7 @@ public abstract class Path extends ParseExpr {
     int indexPred = 0, indexStep = 0;
 
     // check if path can be converted to an index access
+    final Data data = rt == null ? null : rt.data();
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // only accept descendant steps without positional predicates
@@ -713,17 +727,17 @@ public abstract class Path extends ParseExpr {
   /**
    * Checks if steps before index step need to be inverted and traversed.
    * @param data data reference
-   * @param iStep index step
+   * @param i index step
    * @return result of check
    */
-  private boolean predSteps(final Data data, final int iStep) {
-    for(int s = iStep; s >= 0; s--) {
+  private boolean predSteps(final Data data, final int i) {
+    for(int s = i; s >= 0; s--) {
       final Step step = axisStep(s);
       // ensure that the index step does not use wildcard
-      if(step.test.kind == Kind.WILDCARD && s != iStep) continue;
+      if(step.test.kind == Kind.WILDCARD && s != i) continue;
       // consider child steps with name test and without predicates
       if(step.test.kind != Kind.NAME || step.axis != CHILD ||
-          s != iStep && step.exprs.length > 0) return true;
+          s != i && step.exprs.length > 0) return true;
 
       // support only unique paths with nodes on the correct level
       final ArrayList<PathNode> pn = data.paths.desc(step.test.name.local());

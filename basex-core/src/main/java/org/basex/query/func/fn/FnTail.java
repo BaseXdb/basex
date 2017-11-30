@@ -62,11 +62,7 @@ public final class FnTail extends StandardFunc {
     final long sz = ex.size() - 1;
     final SeqType st = ex.seqType();
     if(sz == -1 || sz == 0 || st.zeroOrOne()) return Empty.SEQ;
-    if(sz > 0) {
-      exprType.assign(st.type, sz);
-    } else {
-      exprType.assign(st.type);
-    }
+    exprType.assign(st.type, Occ.ZERO_MORE, sz);
     return this;
   }
 }

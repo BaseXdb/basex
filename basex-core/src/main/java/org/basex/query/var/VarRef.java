@@ -43,12 +43,7 @@ public final class VarRef extends ParseExpr {
   @Override
   public ParseExpr optimize(final CompileContext cc) {
     final SeqType st = var.seqType();
-    final long sz = var.size();
-    if(sz >= 0) {
-      exprType.assign(st.type, sz);
-    } else {
-      exprType.assign(st);
-    }
+    exprType.assign(st.type, st.occ, var.size());
     return this;
   }
 
