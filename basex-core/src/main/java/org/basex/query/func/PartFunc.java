@@ -74,19 +74,19 @@ public final class PartFunc extends Arr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FItem f = toFunc(body(), qc);
+    final FItem fun = toFunc(body(), qc);
 
     final int hl = holes.length, nargs = exprs.length + hl - 1;
-    if(f.arity() != nargs) throw INVARITY_X_X_X.get(info, arguments(nargs), f.arity(), f);
+    if(fun.arity() != nargs) throw INVARITY_X_X_X.get(info, arguments(nargs), fun.arity(), fun);
 
-    final FuncType ft = f.funcType();
+    final FuncType ft = fun.funcType();
     final Expr[] args = new Expr[nargs];
     final VarScope scp = new VarScope(sc);
     final Var[] vars = new Var[hl];
     int a = -1;
     for(int h = 0; h < hl; h++) {
       while(++a < holes[h]) args[a] = qc.value(exprs[a - h]);
-      vars[h] = scp.addNew(f.paramName(holes[h]), null, false, qc, info);
+      vars[h] = scp.addNew(fun.paramName(holes[h]), null, false, qc, info);
       args[a] = new VarRef(info, vars[h]);
       final SeqType at = ft.argTypes[a];
       if(at != null) vars[h].refineType(at, null);
@@ -94,10 +94,10 @@ public final class PartFunc extends Arr {
     final int al = args.length;
     while(++a < al) args[a] = qc.value(exprs[a - hl]);
 
-    final AnnList anns = f.annotations();
+    final AnnList anns = fun.annotations();
     final FuncType tp = FuncType.get(anns, ft.declType, vars);
     final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
-        false, f, args);
+        false, fun, args);
 
     return new FuncItem(sc, anns, null, vars, tp, fc, qc.focus, scp.stackSize());
   }

@@ -245,7 +245,7 @@ public final class Functions extends TokenSet {
     }
 
     // user-defined function
-    final StaticFunc sf = qc.funcs.get(name, arity, info, false);
+    final StaticFunc sf = qc.funcs.get(name, arity);
     if(sf != null) {
       final FuncType ft = sf.funcType();
       final VarScope scp = new VarScope(sc);

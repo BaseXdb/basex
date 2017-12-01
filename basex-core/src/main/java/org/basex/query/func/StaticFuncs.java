@@ -139,15 +139,16 @@ public final class StaticFuncs extends ExprInfo {
         }
         // known function, wrong number of arguments
         if(!arities.isEmpty())
-          throw Functions.wrongArity(call.name, call.exprs.length, arities, call.info);
+          throw Functions.wrongArity(call.name.string(), call.exprs.length, arities, call.info);
 
-        // if not, indicate that function is unknown
-        final QueryException qe = similarError(call.name, call.info);
-        throw qe == null ? WHICHFUNC_X.get(call.info, call.name.prefixId()) : qe;
+        // function is unknown: find function with similar name
+        final QNm nm = call.name;
+        final QueryException qe = similarError(nm, call.info);
+        throw qe != null ? qe : WHICHFUNC_X.get(call.info, nm.prefixString());
       }
 
       if(call != null) {
-        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info, call.name.prefixId());
+        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info, call.name.prefixString());
         // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }
@@ -185,22 +186,11 @@ public final class StaticFuncs extends ExprInfo {
    * Returns the function with the given name and arity.
    * @param name function name
    * @param arity function arity
-   * @param info input info
-   * @param error raise error if function in reserved namespace is not found
    * @return function if found, {@code null} otherwise
-   * @throws QueryException query exception
    */
-  public StaticFunc get(final QNm name, final long arity, final InputInfo info, final boolean error)
-      throws QueryException {
-
+  public StaticFunc get(final QNm name, final long arity) {
     final FuncCache fc = funcs.get(sig(name, arity));
-    if(fc != null) return fc.func;
-
-    if(error && NSGlobal.reserved(name.uri())) {
-      final QueryException qe = similarError(name, info);
-      throw qe == null ? WHICHFUNC_X.get(info, name.prefixId()) : qe;
-    }
-    return null;
+    return fc != null ? fc.func : null;
   }
 
   /**
@@ -217,24 +207,13 @@ public final class StaticFuncs extends ExprInfo {
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        qe = FUNCSIMILAR_X_X.get(info, name.prefixId(), sf.name.prefixId());
+        qe = FUNCSIMILAR_X_X.get(info, name.prefixString(), sf.name.prefixString());
         break;
       }
     }
     // find global function
     if(qe == null) qe = Functions.get().similarError(name, info);
     return qe;
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    if(!funcs.isEmpty()) {
-      final FElem el = planElem();
-      plan.add(el);
-      for(final StaticFunc f : funcs()) {
-        if(f != null) f.plan(el);
-      }
-    }
   }
 
   /**
@@ -247,6 +226,17 @@ public final class StaticFuncs extends ExprInfo {
     int i = 0;
     for(final FuncCache fc : funcs.values()) sf[i++] = fc.func;
     return sf;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    if(!funcs.isEmpty()) {
+      final FElem el = planElem();
+      plan.add(el);
+      for(final StaticFunc f : funcs()) {
+        if(f != null) f.plan(el);
+      }
+    }
   }
 
   @Override

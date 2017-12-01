@@ -444,12 +444,12 @@ public abstract class StandardFunc extends Arr {
   protected final FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
 
-    final FItem fi = toFunc(expr, qc);
-    if(!sc.mixUpdates && fi.annotations().contains(Annotation.UPDATING))
-      throw FUNCUP_X.get(info, fi);
+    final FItem fun = toFunc(expr, qc);
+    if(!sc.mixUpdates && fun.annotations().contains(Annotation.UPDATING))
+      throw FUNCUP_X.get(info, fun);
 
-    if(fi.arity() == nargs) return fi;
-    final int fargs = fi.arity();
+    if(fun.arity() == nargs) return fun;
+    final int fargs = fun.arity();
     throw FUNARITY_X_X.get(info, arguments(fargs), nargs);
   }
 

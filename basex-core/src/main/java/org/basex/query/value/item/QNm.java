@@ -273,7 +273,7 @@ public final class QNm extends Item {
    * <li> Otherwise, if a prefix exists, the prefix and local name is returned.</li>
    * <li> Otherwise, the local name is returned.</li>
    * </ul>
-   * @return unique representation
+   * @return QName as token
    */
   public byte[] id() {
     return uri == null ? name : internal(null, local(), uri);
@@ -281,7 +281,7 @@ public final class QNm extends Item {
 
   /**
    * Returns a unique representation of the QName.
-   * @return unique representation
+   * @return QName as token
    */
   public byte[] prefixId() {
     return prefixId(null);
@@ -291,17 +291,25 @@ public final class QNm extends Item {
    * Returns a unique representation of the QName.
    * <ul>
    *   <li> Skips the prefix if the namespace of the QName equals the specified one.</li>
-   *   <li> Uses a prefix if its namespace URI is statically known.</li>
+   *   <li> Returns a prefixed name if the namespace URI is statically known.</li>
    *   <li> Otherwise, {@link #id()} is called.</li>
    * </ul>
    * @param ns default uri (can be {@code null})
-   * @return unique representation
+   * @return QName as token
    */
   public byte[] prefixId(final byte[] ns) {
     final byte[] u = uri();
     if(ns != null && Token.eq(u, ns)) return local();
     final byte[] p = NSGlobal.prefix(u);
-    return p.length == 0 ? id() : concat(p, token(":"), local());
+    return p.length != 0 ? concat(p, token(":"), local()) : id();
+  }
+
+  /**
+   * Returns the QName string if it has a prefix, or {@link #prefixId()} otherwise.</li>
+   * @return QName as token
+   */
+  public byte[] prefixString() {
+    return hasPrefix() ? string() : prefixId();
   }
 
   @Override

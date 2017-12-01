@@ -14,9 +14,9 @@ import org.basex.util.*;
 public final class InspectFunction extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FItem fn = toFunc(exprs[0], qc);
-    final QNm name = fn.funcName();
-    final StaticFunc sf = name == null ? null : qc.funcs.get(name, fn.arity(), null, false);
-    return new PlainDoc(qc, info).function(name, sf, fn.funcType(), fn.annotations(), null);
+    final FItem fun = toFunc(exprs[0], qc);
+    final QNm name = fun.funcName();
+    final StaticFunc sf = name == null ? null : qc.funcs.get(name, fun.arity());
+    return new PlainDoc(qc, info).function(name, sf, fun.funcType(), fun.annotations(), null);
   }
 }
