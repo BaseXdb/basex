@@ -133,13 +133,13 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean change = inlineAll(groups, var, ex, cc);
+    boolean changed = inlineAll(groups, var, ex, cc);
     final Expr c = cond.inline(var, ex, cc);
     if(c != null) {
-      change = true;
+      changed = true;
       cond = c;
     }
-    return change ? optimize(cc) : null;
+    return changed ? optimize(cc) : null;
   }
 
   @Override

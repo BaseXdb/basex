@@ -117,6 +117,6 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    * @return test string
    */
   protected static String type(final String name, final String type) {
-    return "//" + name + "/@type = '" + type + "'";
+    return "string(//" + name + "/@type) = '" + type + "'";
   }
 }

@@ -52,21 +52,21 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean change = false;
+    boolean changed = false;
     final int es = exprs.length;
-    for(int i = 0; i < es; i++) {
+    for(int e = 0; e < es; e++) {
       Expr nw;
       try {
-        nw = exprs[i].inline(var, ex, cc);
+        nw = exprs[e].inline(var, ex, cc);
       } catch(final QueryException qe) {
-        nw = cc.error(qe, exprs[i]);
+        nw = cc.error(qe, exprs[e]);
       }
       if(nw != null) {
-        exprs[i] = nw;
-        change = true;
+        exprs[e] = nw;
+        changed = true;
       }
     }
-    return change ? optimize(cc) : null;
+    return changed ? optimize(cc) : null;
   }
 
   /**

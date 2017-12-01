@@ -429,7 +429,7 @@ public class DBNode extends ANode {
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, data.meta.name, PRE, pre, TYPE, seqType()));
+    addPlan(plan, planElem(DATABASE, data.meta.name, PRE, pre, TYPE, type));
   }
 
   @Override

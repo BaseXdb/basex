@@ -106,14 +106,14 @@ public abstract class Step extends Preds {
   public abstract Step copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
-   * Checks if this step has no predicates and uses the specified axis text.
+   * Checks if this step uses the specified axis test and has no predicates.
    * @param ax axis to be checked
    * @param name name/node test
    * @return result of check
    */
   public final boolean simple(final Axis ax, final boolean name) {
-    return axis == ax && exprs.length == 0 &&
-        (name ? test.kind == Kind.NAME : test == KindTest.NOD);
+    return axis == ax && (name ? test.kind == Kind.NAME : test == KindTest.NOD) &&
+        exprs.length == 0;
   }
 
   /**

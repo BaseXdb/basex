@@ -152,23 +152,26 @@ public final class If extends Arr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    boolean changed = false;
     final Expr sub = cond.inline(var, ex, cc);
-    if(sub != null) cond = sub;
-    boolean te = false;
+    if(sub != null) {
+      cond = sub;
+      changed = true;
+    }
     final int es = exprs.length;
-    for(int i = 0; i < es; i++) {
-      Expr nw;
+    for(int e = 0; e < es; e++) {
+      Expr exp;
       try {
-        nw = exprs[i].inline(var, ex, cc);
+        exp = exprs[e].inline(var, ex, cc);
       } catch(final QueryException qe) {
-        nw = cc.error(qe, this);
+        exp = cc.error(qe, this);
       }
-      if(nw != null) {
-        exprs[i] = nw;
-        te = true;
+      if(exp != null) {
+        exprs[e] = exp;
+        changed = true;
       }
     }
-    return te || sub != null ? optimize(cc) : null;
+    return changed ? optimize(cc) : null;
   }
 
   @Override

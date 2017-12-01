@@ -159,7 +159,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         "//text()[. = '1'] }; local:x()", 1);
     check("declare function local:x($x as xs:string) {" + doc +
         "//text()[. = $x] }; local:x('1')", 1);
-    // full-text: search term may can have any type
+    // full-text: search term may have any type
     check("declare function local:x() {" + doc +
         "//text()[. contains text '1'] }; local:x()", 1);
     check("declare function local:x($x) {" + doc +

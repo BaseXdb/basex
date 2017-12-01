@@ -419,14 +419,6 @@ public final class QueryContext extends Job implements Closeable {
     return updates;
   }
 
-  /**
-   * Returns the current data reference of the context value or {@code null}.
-   * @return data reference
-   */
-  public Data data() {
-    return focus.value != null ? focus.value.data() : null;
-  }
-
   @Override
   public void addLocks() {
     final Locks locks = jc().locks;

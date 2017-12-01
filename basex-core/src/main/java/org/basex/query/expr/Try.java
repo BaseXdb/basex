@@ -97,13 +97,13 @@ public final class Try extends Single {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean change = false;
+    boolean changed = false;
     try {
       final Expr sub = expr.inline(var, ex, cc);
       if(sub != null) {
         if(sub instanceof Value) return cc.replaceWith(this, sub);
         expr = sub;
-        change = true;
+        changed = true;
       }
     } catch(final QueryException qe) {
       if(!qe.isCatchable()) throw qe;
@@ -117,8 +117,8 @@ public final class Try extends Single {
       throw qe;
     }
 
-    for(final Catch c : catches) change |= c.inline(var, ex, cc) != null;
-    return change ? this : null;
+    for(final Catch c : catches) changed |= c.inline(var, ex, cc) != null;
+    return changed ? this : null;
   }
 
   @Override

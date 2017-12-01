@@ -279,7 +279,7 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns a score value.
+   * Returns a score value. Overwritten by {@link FTNode}.
    * @return score value
    */
   public double score() {

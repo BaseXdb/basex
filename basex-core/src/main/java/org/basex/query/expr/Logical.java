@@ -108,30 +108,29 @@ abstract class Logical extends Arr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    final Expr[] arr = exprs;
-    boolean change = false;
-    final int al = arr.length;
-    for(int a = 0; a < al; a++) {
+    boolean changed = false;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
       try {
-        final Expr e = arr[a].inline(var, ex, cc);
-        if(e != null) {
-          arr[a] = e;
-          change = true;
+        final Expr exp = exprs[e].inline(var, ex, cc);
+        if(exp != null) {
+          exprs[e] = exp;
+          changed = true;
         }
       } catch(final QueryException qe) {
         // first expression is evaluated eagerly
-        if(a == 0) throw qe;
+        if(e == 0) throw qe;
 
         // everything behind the error is dead anyway
-        final Expr[] nw = new Expr[a + 1];
-        System.arraycopy(arr, 0, nw, 0, a);
-        nw[a] = cc.error(qe, this);
+        final Expr[] nw = new Expr[e + 1];
+        System.arraycopy(exprs, 0, nw, 0, e);
+        nw[e] = cc.error(qe, this);
         exprs = nw;
-        change = true;
+        changed = true;
         break;
       }
     }
-    return change ? optimize(cc) : null;
+    return changed ? optimize(cc) : null;
   }
 
   @Override

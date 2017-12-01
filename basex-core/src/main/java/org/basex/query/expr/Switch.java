@@ -175,13 +175,13 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean change = inlineAll(groups, var, ex, cc);
+    boolean changed = inlineAll(groups, var, ex, cc);
     final Expr cn = cond.inline(var, ex, cc);
     if(cn != null) {
-      change = true;
+      changed = true;
       cond = cn;
     }
-    return change ? optimize(cc) : null;
+    return changed ? optimize(cc) : null;
   }
 
   /**

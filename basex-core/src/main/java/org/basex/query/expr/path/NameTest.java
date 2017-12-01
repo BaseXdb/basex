@@ -46,7 +46,7 @@ public final class NameTest extends Test {
   @Override
   public boolean optimize(final QueryContext qc) {
     // skip optimizations if data reference cannot be determined statically
-    final Data data = qc.data();
+    final Data data = qc.focus.value != null ? qc.focus.value.data() : null;
     if(data == null) return true;
 
     // skip optimizations if more than one namespace is defined in the database

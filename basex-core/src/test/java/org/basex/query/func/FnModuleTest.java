@@ -58,9 +58,9 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" true#0", " []"), true, type(name, "xs:boolean"));
     check(func.args(" count#1", " [1]"), 1, type(name, "xs:integer"));
     check(func.args(" abs#1", " [1]"), 1, type(name, "xs:numeric?"));
-    check(func.args(" reverse#1", " [()]"), "", type(name, "item()*"));
-    check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"),
-        true, type(name, "item()*"));
+    check(func.args(" reverse#1", " [()]"), "", type(name, ""));
+    check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"), true,
+        type(name, ""));
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
@@ -484,6 +484,12 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void parseXML() {
     final Function func = Function.PARSE_XML;
     contains(func.args("<x>a</x>") + "//text()", "a");
+    query(func.args("<a/>") + "/a[node()]", "");
+    query(func.args("<a/>") + "/*[1]", "<a/>");
+    query(func.args("<a/>") + "/*[self::a]", "<a/>");
+    query(func.args("<a/>") + "/*[1][self::a]", "<a/>");
+    query(func.args("<a/>") + "/*[1][not(child::node())]", "<a/>");
+    query(func.args("<a/>") + "/*[1][self::a][not(child::node())]", "<a/>");
   }
 
   /** Test method. */

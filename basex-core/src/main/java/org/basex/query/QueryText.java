@@ -385,6 +385,7 @@ public interface QueryText {
   /** Query Info. */ String TCL = "tailCall";
   /** Query Info. */ String ENTRIES = "entries";
   /** Query Info. */ String PROMOTE = "promote";
+  /** Query Info. */ String DATABASE = "database";
 
   /** Query Info. */ String MAPASG = ": ";
   /** Query Info. */ String SEP = ", ";

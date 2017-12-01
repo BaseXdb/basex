@@ -210,15 +210,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean change = false;
+    boolean changed = false;
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       final Expr e = entry.getValue().inline(var, ex, cc);
       if(e != null) {
-        change = true;
+        changed = true;
         entry.setValue(e);
       }
     }
-    return change ? optimize(cc) : null;
+    return changed ? optimize(cc) : null;
   }
 
   @Override

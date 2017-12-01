@@ -63,13 +63,13 @@ public abstract class Path extends ParseExpr {
   public static Path get(final InputInfo info, final Expr root, final Expr... steps) {
     // new list with steps
     final int sl = steps.length;
-    final ExprList stps = new ExprList(sl);
+    final ExprList list = new ExprList(sl);
 
     // merge nested paths
     Expr rt = root;
     if(rt instanceof Path) {
       final Path path = (Path) rt;
-      stps.add(path.steps);
+      list.add(path.steps);
       rt = path.root;
     }
     // remove redundant context reference
@@ -92,17 +92,17 @@ public abstract class Path extends ParseExpr {
       } else if(step instanceof Path) {
         // rewrite path to axis steps
         final Path p = (Path) step;
-        if(p.root != null && !(p.root instanceof ContextValue)) stps.add(p.root);
+        if(p.root != null && !(p.root instanceof ContextValue)) list.add(p.root);
         final int pl = p.steps.length - 1;
-        for(int i = 0; i < pl; i++) stps.add(p.steps[i]);
+        for(int i = 0; i < pl; i++) list.add(p.steps[i]);
         step = p.steps[pl];
       }
-      stps.add(step);
+      list.add(step);
     }
 
     // check if all steps are axis steps
     boolean axes = true;
-    final Expr[] st = stps.finish();
+    final Expr[] st = list.finish();
     for(final Expr step : st) axes &= step instanceof Step;
 
     // choose best implementation
@@ -161,19 +161,13 @@ public abstract class Path extends ParseExpr {
 
     // merge descendant steps
     Expr ex = mergeSteps(cc);
-    if(ex != this) return ex.optimize(cc);
-
     // check index access
-    ex = index(cc, rt);
-    // recompile path
-    if(ex != this) return ex.optimize(cc);
-
-    /* rewrite descendant to child steps. this optimization is located after the index rewriting,
+    if(ex == this) ex = index(cc, rt);
+    /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
      * - //C[. = '...']     ->  IA('...', C)
-     * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A
-     */
-    ex = children(cc, rt);
+     * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A */
+    if(ex == this) ex = children(cc, rt);
     if(ex != this) return ex.optimize(cc);
 
     // choose best path implementation and set type information
