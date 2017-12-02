@@ -6,14 +6,12 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -83,28 +81,48 @@ public final class CompileContext {
   }
 
   /**
-   * Caches the current query focus and sets a new focus.
-   * @param item context item
+   * Pushes the current query focus onto the stack and, if possible, assigns a new dummy item.
+   * @param expr context expression (can be {@code null})
    */
-  public void pushFocus(final Item item) {
+  public void pushFocus(final Expr expr) {
     focuses.add(qc.focus);
-    qc.focus = new QueryFocus();
-    qc.focus.value = item;
+    final QueryFocus focus = new QueryFocus();
+    if(expr != null) focus.value = dummyItem(expr);
+    qc.focus = focus;
   }
 
   /**
-   * Sets the last focus from the stack.
+   * Assigns a new dummy item.
+   * @param expr context expression (can be {@code null})
    */
-  public void popFocus() {
+  public void updateFocus(final Expr expr) {
+    if(expr != null) qc.focus.value = dummyItem(expr);
+  }
+
+  /**
+   * Returns a dummy item, based on the type of the specified expression and the current context.
+   * @param expr expression
+   * @return dummy item
+   */
+  public Item dummyItem(final Expr expr) {
+    final Value value = qc.focus.value;
+    final Data data = (value != null && expr instanceof Step ? value : expr).data();
+    return new Dummy(expr.seqType().type, data);
+  }
+
+  /**
+   * Removes a query focus from the stack.
+   */
+  public void removeFocus() {
     qc.focus = focuses.remove(focuses.size() - 1);
   }
 
   /**
-   * Indicates if any query focus instanced are stored on the stack.
+   * Indicates if the query focus is nested.
    * @return result of check
    */
-  public boolean topFocus() {
-    return focuses.isEmpty();
+  public boolean nestedFocus() {
+    return !focuses.isEmpty();
   }
 
   /**
@@ -253,66 +271,4 @@ public final class CompileContext {
       throws QueryException {
     return func.get(sc(), info, exprs).optimize(this);
   }
-
-  /**
-   * Returns a context value for the given expression.
-   * @param expr expression (can be {@code null})
-   * @return root value or {@code null}
-   */
-  public Value contextValue(final Expr expr) {
-    // current context value
-    final Value v = qc.focus.value;
-    // no root or context expression: return context
-    if(expr == null || expr instanceof ContextValue) return v;
-    // root reference
-    if(expr instanceof Root) return v instanceof ANode ? ((ANode) v).root() : v;
-    // root is value: return root
-    if(expr instanceof Value) return (Value) expr;
-    // otherwise, return dummy node
-    return dummy(expr);
-  }
-
-  /**
-   * Returns a context item for the given root.
-   * @param root root expression (can be {@code null})
-   * @return root item or {@code null}
-   */
-  public Item contextItem(final Expr root) {
-    return dummy(contextValue(root));
-  }
-
-  /**
-   * Returns a dummy item for the specified expression.
-   * @param expr expression (can be {@code null})
-   * @return dummy item or {@code null}
-   */
-  private static Item dummy(final Expr expr) {
-    if(expr != null) {
-      final Type type = expr.seqType().type;
-      if(expr instanceof Value && expr != Empty.SEQ) {
-        // expression is value, type of first item is identical to value type: return this item
-        final Item it = ((Value) expr).itemAt(0);
-        if(type.eq(it.type)) return it;
-      }
-
-      // data reference exists: create dummy node
-      final Data d = expr.data();
-      if(d != null) return new DBNode(d, 0, Data.ELEM);
-
-      // otherwise, return dummy item
-      if(type == AtomType.STR) return Str.ZERO;
-      if(type == AtomType.ITR) return Int.ZERO;
-      if(type == AtomType.DBL) return Dbl.ZERO;
-      if(type == AtomType.FLT) return Flt.ZERO;
-      if(type == AtomType.DEC) return Dec.ZERO;
-      if(type == AtomType.BLN) return Bln.FALSE;
-      if(type == NodeType.DOC) return FDoc.DUMMY;
-      if(type.instanceOf(SeqType.ANY_MAP)) return Map.EMPTY;
-      if(type.instanceOf(SeqType.ANY_ARRAY)) return Array.empty();
-      if(type instanceof NodeType) return FElem.DUMMY;
-    }
-    // otherwise, return null
-    return null;
-  }
-
 }

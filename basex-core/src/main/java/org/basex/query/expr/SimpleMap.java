@@ -54,19 +54,20 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
-    final QueryFocus focus = cc.qc.focus;
-    final Value cv = focus.value;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
+      Expr ex = exprs[e];
       try {
-        exprs[e] = exprs[e].compile(cc);
-      } catch(final QueryException ex) {
+        ex = ex.compile(cc);
+      } catch(final QueryException qe) {
         // replace original expression with error
-        exprs[e] = cc.error(ex, this);
+        ex = cc.error(qe, this);
       }
-      focus.value = cc.contextItem(exprs[e]);
+      if(e == 0) cc.pushFocus(ex);
+      else cc.updateFocus(ex);
+      exprs[e] = ex;
     }
-    focus.value = cv;
+    cc.removeFocus();
     return optimize(cc);
   }
 

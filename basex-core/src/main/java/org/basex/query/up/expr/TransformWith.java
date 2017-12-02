@@ -38,7 +38,7 @@ public final class TransformWith extends Arr {
     try {
       return super.compile(cc);
     } finally {
-      cc.popFocus();
+      cc.removeFocus();
     }
   }
 

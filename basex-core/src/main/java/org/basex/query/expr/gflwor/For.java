@@ -192,15 +192,13 @@ public final class For extends ForLet {
 
     // reset context value (will not be accessible in predicate)
     Expr pred = ex;
-    cc.pushFocus(null);
+    cc.pushFocus(expr);
     try {
       // assign type of iterated items to context expression
-      final ContextValue cv = new ContextValue(info);
-      cv.exprType.assign(expr.seqType().type, Occ.ONE);
-      final Expr r = ex.inline(var, cv, cc);
+      final Expr r = ex.inline(var, new ContextValue(info).optimize(cc), cc);
       if(r != null) pred = r;
     } finally {
-      cc.popFocus();
+      cc.removeFocus();
     }
 
     // attach predicates to axis path or filter, or create a new filter

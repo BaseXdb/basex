@@ -31,10 +31,12 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
-    if(cc.topFocus()) {
-      final Value v = cc.qc.focus.value;
-      if(v != null && v.type == NodeType.DOC && v.size() == 1) return cc.replaceWith(this, v);
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    final Value v = cc.qc.focus.value;
+    if(cc.nestedFocus()) {
+      exprType.assign(Occ.ONE);
+    } else {
+      if(v != null) return cc.replaceWith(this, value(cc.qc));
     }
     return this;
   }

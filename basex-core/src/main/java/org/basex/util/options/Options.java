@@ -125,12 +125,12 @@ public class Options implements Iterable<Option<?>> {
         } else if(opt instanceof NumbersOption) {
           final int[] ints = get((NumbersOption) opt);
           final int is = ints == null ? 0 : ints.length;
-          for(int i = 0; i < is; ++i) lines.add(name + i + " = " + ints[i]);
+          for(int i = 0; i < is; i++) lines.add(name + i + " = " + ints[i]);
         } else if(opt instanceof StringsOption) {
           final String[] strings = get((StringsOption) opt);
           final int ss = strings == null ? 0 : strings.length;
           lines.add(name + " = " + ss);
-          for(int i = 0; i < ss; ++i) lines.add(name + (i + 1) + " = " + strings[i]);
+          for(int s = 0; s < ss; s++) lines.add(name + (s + 1) + " = " + strings[s]);
         } else {
           lines.add(name + " = " + get(opt));
         }

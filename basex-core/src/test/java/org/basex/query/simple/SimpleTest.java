@@ -216,6 +216,7 @@ public final class SimpleTest extends QueryTest {
       { "Pred 3", strings("XML"), "(('XML')[1])[1]" },
       { "Pred 4", integers(1), "1[position() = 1 to 2]" },
       { "Pred 5", integers(1), "1[position() = (1,2)]" },
+      { "Pred 6", integers(1), "count((text { 'x' }, element x {})[. instance of element()])" },
 
       { "FItem 1", integers(1), "declare context item := 0; last#0()" },
       { "FItem 2", integers(2), "declare context item := 1; let $f := last#0 return (2,3)[$f()]" },

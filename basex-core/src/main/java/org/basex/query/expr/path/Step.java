@@ -29,10 +29,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class Step extends Preds {
-  /** Axis. */
-  public Axis axis;
   /** Kind test. */
   public final Test test;
+  /** Axis. */
+  public Axis axis;
 
   /**
    * This method returns the most efficient step implementation.
@@ -46,20 +46,27 @@ public abstract class Step extends Preds {
       final Expr... preds) {
 
     // optimize single last() functions
-    if(preds.length == 1 && preds[0].isFunction(Function.LAST))
-      return new IterLastStep(info, axis, test, preds);
-
-    // check for simple positional predicates
-    boolean pos = false;
-    for(final Expr pred : preds) {
-      if(pred instanceof ItrPos || numeric(pred)) {
-        pos = true;
-      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
-        // positional checks may be nested or non-deterministic: choose full evaluation
-        return new CachedStep(info, axis, test, preds);
+    Step step = null;
+    if(preds.length == 1 && preds[0].isFunction(Function.LAST)) {
+      step = new IterLastStep(info, axis, test, preds);
+    } else {
+      // check for simple positional predicates
+      boolean pos = false;
+      for(final Expr pred : preds) {
+        if(pred instanceof ItrPos || numeric(pred)) {
+          pos = true;
+        } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
+          // positional checks may be nested or non-deterministic: choose full evaluation
+          step = new CachedStep(info, axis, test, preds);
+          break;
+        }
+      }
+      if(step == null) {
+        step = pos ? new IterPosStep(info, axis, test, preds) :
+          new IterStep(info, axis, test, preds);
       }
     }
-    return pos ? new IterPosStep(info, axis, test, preds) : new IterStep(info, axis, test, preds);
+    return step;
   }
 
   /**
@@ -76,19 +83,38 @@ public abstract class Step extends Preds {
   }
 
   @Override
+  public Expr compile(final CompileContext cc) throws QueryException {
+    cc.pushFocus(this);
+    try {
+      super.compile(cc);
+    } finally {
+      cc.removeFocus();
+    }
+    return optimize(cc);
+  }
+
+  @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // check if test will never yield results
-    if(!test.optimize(cc.qc)) {
-      cc.info(OPTNAME_X, test);
-      return Empty.SEQ;
+    final Value value = cc.qc.focus.value;
+    if(value != null) {
+      // check if test will never yield results
+      if(!test.optimize(value)) {
+        cc.info(OPTNAME_X, test);
+        return Empty.SEQ;
+      }
     }
 
     // simplifies the predicates
     simplify(cc, this);
 
     // optimize predicates
-    final Expr ex = super.optimize(cc);
-    if(ex != this) return ex;
+    cc.pushFocus(this);
+    try {
+      final Expr ex = super.optimize(cc);
+      if(ex != this) return ex;
+    } finally {
+      cc.removeFocus();
+    }
 
     // compute result size
     if(!exprType(seqType(), size())) return cc.emptySeq(this);
@@ -119,12 +145,12 @@ public abstract class Step extends Preds {
   /**
    * Returns the path nodes that are the result of this step.
    * @param nodes initial path nodes
-   * @param data data reference
+   * @param dt data reference
    * @return resulting path nodes or {@code null} if nodes cannot be evaluated
    */
-  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data) {
+  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data dt) {
     // skip steps with predicates or different namespaces
-    if(exprs.length != 0 || data.nspaces.globalUri() == null) return null;
+    if(exprs.length != 0 || dt.nspaces.globalUri() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;
@@ -135,7 +161,7 @@ public abstract class Step extends Preds {
 
       if(test.kind == Kind.NAME) {
         // element/attribute test (*:ln)
-        final Names names = kind == Data.ATTR ? data.attrNames : data.elemNames;
+        final Names names = kind == Data.ATTR ? dt.attrNames : dt.elemNames;
         name = names.id(((NameTest) test).local);
       } else if(test.kind != null && test.kind != Kind.WILDCARD) {
         // skip namespace and standard tests
@@ -186,7 +212,7 @@ public abstract class Step extends Preds {
    * @return resulting step instance
    */
   final Step addPreds(final Expr... add) {
-    return get(info, axis, test, ExprList.concat(exprs, add));
+    return copyType(get(info, axis, test, ExprList.concat(exprs, add)));
   }
 
   /**

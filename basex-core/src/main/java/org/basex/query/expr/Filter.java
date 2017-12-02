@@ -64,24 +64,13 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
     root = root.compile(cc);
-    // invalidate current context value (will be overwritten by filter)
-    cc.pushFocus(cc.contextItem(root));
+    cc.pushFocus(root);
     try {
-      return super.compile(cc);
+      super.compile(cc);
     } finally {
-      cc.popFocus();
+      cc.removeFocus();
     }
-  }
-
-  /**
-   * Adds a predicate to the filter.
-   * This function is e.g. called by {@link For#addPredicate}.
-   * @param p predicate to be added
-   * @return new filter
-   */
-  public final CachedFilter addPred(final Expr p) {
-    exprs = new ExprList(exprs.length + 1).add(exprs).add(p).finish();
-    return new CachedFilter(info, root, exprs);
+    return optimize(cc);
   }
 
   @Override
@@ -93,12 +82,12 @@ public abstract class Filter extends Preds {
     simplify(cc, root);
 
     // remember current context value (will be temporarily overwritten)
-    cc.pushFocus(cc.contextItem(root));
+    cc.pushFocus(root);
     try {
       final Expr ex = super.optimize(cc);
       if(ex != this) return ex;
     } finally {
-      cc.popFocus();
+      cc.removeFocus();
     }
 
     // check result size
@@ -108,11 +97,9 @@ public abstract class Filter extends Preds {
     Expr ex = simplify(root, exprs);
     if(ex != null) return ex.optimize(cc);
 
-    // try to rewrite filter to index access
-    if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
-      final Path ip = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
-      final Expr ie = ip.index(cc, cc.contextValue(root));
-      if(ie != ip) return ie.optimize(cc);
+    // rewrite filter with database documents to path
+    if(root instanceof Value && root.data() != null && root.seqType().type == NodeType.DOC) {
+      return Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs)).optimize(cc);
     }
 
     // no numeric predicates.. use simple iterator
@@ -179,6 +166,17 @@ public abstract class Filter extends Preds {
     return ex instanceof ParseExpr ? copyType((ParseExpr) ex) : ex;
   }
 
+  /**
+   * Adds a predicate to the filter.
+   * This function is e.g. called by {@link For#addPredicate}.
+   * @param pred predicate to be added
+   * @return new filter
+   */
+  public final CachedFilter addPred(final Expr pred) {
+    exprs = new ExprList(exprs.length + 1).add(exprs).add(pred).finish();
+    return copyType(new CachedFilter(info, root, exprs));
+  }
+
   @Override
   public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
     final Expr ex = optimizeEbv(root, cc);
@@ -194,7 +192,9 @@ public abstract class Filter extends Preds {
   private static Expr simplify(final Expr root, final Expr... exprs) {
     // no predicates: return root
     if(exprs.length == 0) return root;
-    // axis path: attach non-positional predicates to last step: (//x)[1] != //x[1]
+    /* axis path: attach non-positional predicates to last step.
+     * example: (//x)[text() = 'a'] != //x[text() = 'a']
+     * illegal: (//x)[1] != //x[1] */
     if(root instanceof AxisPath && !positional(exprs)) return ((AxisPath) root).addPreds(exprs);
     return null;
   }
@@ -224,10 +224,15 @@ public abstract class Filter extends Preds {
   public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    final Expr rt = root == null ? null : root.inline(var, ex, cc);
-    if(rt != null) root = rt;
-    final boolean pr = inlineAll(exprs, var, ex, cc);
-    return pr || rt != null ? optimize(cc) : null;
+    boolean changed = inlineAll(exprs, var, ex, cc);
+    if(root != null) {
+      final Expr rt = root.inline(var, ex, cc);
+      if(rt != null) {
+        root = rt;
+        changed = true;
+      }
+    }
+    return changed ? optimize(cc) : null;
   }
 
   @Override

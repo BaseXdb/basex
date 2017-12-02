@@ -126,6 +126,8 @@ public final class ExprType {
 
   @Override
   public String toString() {
-    return Util.className(this) + "[" + seqType + ": " + size + "]";
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
+    sb.append(seqType).append(", ").append(size);
+    return sb.append(']').toString();
   }
 }

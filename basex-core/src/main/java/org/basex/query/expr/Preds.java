@@ -48,7 +48,7 @@ public abstract class Preds extends Arr {
       }
     }
     focus.value = init;
-    return optimize(cc);
+    return this;
   }
 
   @Override
@@ -230,8 +230,8 @@ public abstract class Preds extends Arr {
   /**
    * Optimizes the predicates for boolean evaluation.
    * Drops solitary context values, flattens nested predicates.
-   * @param cc compilation context
    * @param root root expression
+   * @param cc compilation context
    * @return expression
    * @throws QueryException query exception
    */

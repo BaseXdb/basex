@@ -1,7 +1,7 @@
 package org.basex.query.expr.path;
 
-import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -41,11 +41,11 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Optimizes the expression.
-   * @param cc compilation context
+   * @param value context value
    * @return false if test always returns false
    */
   @SuppressWarnings("unused")
-  public boolean optimize(final QueryContext cc) {
+  public boolean optimize(final Value value) {
     return true;
   }
 

@@ -113,7 +113,7 @@ public abstract class AxisPath extends Path {
    */
   public final Path addPreds(final Expr... preds) {
     steps[steps.length - 1] = step(steps.length - 1).addPreds(preds);
-    return get(info, root, steps);
+    return copyType(get(info, root, steps));
   }
 
   @Override

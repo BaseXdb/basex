@@ -121,33 +121,28 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
-    if(root != null) root = root.compile(cc);
-    // no steps
-    if(steps.length == 0) return root == null ? new ContextValue(info) : root;
-
-    final QueryFocus focus = cc.qc.focus;
-    final Value init = focus.value, cv = cc.contextValue(root);
-    focus.value = cv;
-    final boolean doc = cv != null && cv.type == NodeType.DOC;
+    if(root != null) {
+      root = root.compile(cc);
+      if(root.seqType().zero() || steps.length == 0) return root;
+      cc.pushFocus(root);
+    } else {
+      if(steps.length == 0) return new ContextValue(info).optimize(cc);
+      cc.pushFocus(cc.qc.focus.value);
+    }
 
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
-      final Expr step = steps[s];
-      // axis step: if input is a document, its type will be generalized
-      final boolean as = step instanceof Step;
-      if(as && s == 0 && doc) cv.type = NodeType.NOD;
+      Expr step = steps[s];
       try {
-        steps[s] = step.compile(cc);
+        step = step.compile(cc);
       } catch(final QueryException ex) {
         // replace original expression with error
-        steps[s] = cc.error(ex, this);
+        step = cc.error(ex, this);
       }
-      // no axis step: invalidate context value
-      if(!as) focus.value = null;
+      cc.updateFocus(step);
+      steps[s] = step;
     }
-
-    if(doc) cv.type = NodeType.DOC;
-    focus.value = init;
+    cc.removeFocus();
 
     // optimize path
     return optimize(cc);
@@ -155,9 +150,14 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
+    // root returns no results...
+    if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
+
     // simplify path with empty root expression or empty step
-    final Value rt = cc.contextValue(root);
-    if(rt != null && rt.isEmpty() || emptyPath(rt)) return cc.emptySeq(this);
+    final Value rt = rootValue(cc);
+    if(emptyPath(rt)) return cc.emptySeq(this);
+
+    seqType(cc, rt);
 
     // merge descendant steps
     Expr ex = mergeSteps(cc);
@@ -171,16 +171,14 @@ public abstract class Path extends ParseExpr {
     if(ex != this) return ex.optimize(cc);
 
     // choose best path implementation and set type information
-    final Path path = get(info, root, steps);
-    path.seqType(cc);
-    return path;
+    return copyType(get(info, root, steps));
   }
 
   @Override
   public Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    final int sl = steps.length;
-    if(steps[sl - 1] instanceof Step) {
-      final Step step = (Step) steps[sl - 1];
+    final Expr last = steps[steps.length - 1];
+    if(last instanceof Step) {
+      final Step step = (Step) last;
       if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
           !step.exprs[0].seqType().mayBeNumber()) {
         // merge nested predicates. example: if(a[b]) ->  if(a/b)
@@ -242,8 +240,11 @@ public abstract class Path extends ParseExpr {
    * @return path nodes or {@code null} if nodes cannot be evaluated
    */
   public final ArrayList<PathNode> pathNodes(final CompileContext cc) {
-    final Value init = cc.contextValue(root);
-    final Data data = init != null && init.type == NodeType.DOC ? init.data() : null;
+    // skip computation if path does not start with document nodes
+    final Value rt = rootValue(cc);
+    if(cc.nestedFocus() || rt == null || rt.type != NodeType.DOC) return null;
+
+    final Data data = rt.data();
     if(data == null || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -255,6 +256,20 @@ public abstract class Path extends ParseExpr {
       if(nodes == null) return null;
     }
     return nodes;
+  }
+
+  /**
+   * Returns a root value for this path.
+   * @param cc compilation context
+   * @return context value, dummy item, or {@code null}
+   */
+  private Value rootValue(final CompileContext cc) {
+    // no root expression: return context value (possibly empty)
+    if(root == null) return cc.qc.focus.value;
+    // root is value: return root
+    if(root instanceof Value) return (Value) root;
+    // otherwise, create dummy item
+    return cc.dummyItem(root);
   }
 
   /**
@@ -340,18 +355,20 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Assigns a sequence type and (if statically known) result size.
+   * @param rt root value (can be {@code null})
    * @param cc compilation context
    */
-  private void seqType(final CompileContext cc) {
-    final long sz = size(cc);
+  private void seqType(final CompileContext cc, final Value rt) {
+    // assign data reference
     final int sl = steps.length;
+    final long sz = size(cc, rt);
     final Expr last = steps[sl - 1];
     final SeqType st = last.seqType();
     Type type = st.type;
     Occ occ = Occ.ZERO_MORE;
 
     // unknown result size: single attribute with exact name test will return at most one result
-    if(sz < 0 && root == null && sl == 1 && last instanceof Step && !cc.topFocus()) {
+    if(sz < 0 && root == null && sl == 1 && last instanceof Step && cc.nestedFocus()) {
       final Step step = (Step) last;
       if(step.axis == ATTR && step.test.one) {
         occ = Occ.ZERO_ONE;
@@ -363,18 +380,18 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Computes the number of results.
+   * @param rt root value (can be {@code null})
    * @param cc compilation context
    * @return number of results
    */
-  private long size(final CompileContext cc) {
+  private long size(final CompileContext cc, final Value rt) {
+    if(root != null && root.size() == 0) return 0;
     for(final Expr step : steps) {
       if(step.size() == 0) return 0;
     }
-    if(root != null && root.size() == 0) return 0;
 
     // skip computation if path does not start with document nodes
-    final Value rt = cc.contextValue(root);
-    if(rt == null || rt.type != NodeType.DOC) return -1;
+    if(cc.nestedFocus() || rt == null || rt.type != NodeType.DOC) return -1;
 
     // skip computation if no database instance is available, is outdated, or
     // if context does not contain all database nodes
@@ -382,7 +399,7 @@ public abstract class Path extends ParseExpr {
     if(data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
-    long m = 1;
+    long lastSize = 1;
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       final Step curr = axisStep(s);
@@ -390,16 +407,16 @@ public abstract class Path extends ParseExpr {
         nodes = curr.nodes(nodes, data);
         if(nodes == null) return -1;
       } else if(s + 1 == sl) {
-        m = steps[s].size();
+        lastSize = steps[s].size();
       } else {
         // stop if a non-axis step is not placed last
         return -1;
       }
     }
 
-    long sz = 0;
-    for(final PathNode pn : nodes) sz += pn.stats.count;
-    return sz * m;
+    long size = 0;
+    for(final PathNode pn : nodes) size += pn.stats.count;
+    return size * lastSize;
   }
 
   /**
@@ -445,7 +462,9 @@ public abstract class Path extends ParseExpr {
    */
   private boolean emptyPath(final Value rt) {
     final int sl = steps.length;
-    for(int s = 0; s < sl; s++) if(emptyStep(rt, s)) return true;
+    for(int s = 0; s < sl; s++) {
+      if(emptyStep(rt, s)) return true;
+    }
     return false;
   }
 
@@ -519,7 +538,7 @@ public abstract class Path extends ParseExpr {
    */
   private Expr children(final CompileContext cc, final Value rt) {
     // only rewrite on document level
-    if(rt == null || rt.type != NodeType.DOC) return this;
+    if(cc.nestedFocus() || rt == null || rt.type != NodeType.DOC) return this;
 
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
@@ -603,9 +622,9 @@ public abstract class Path extends ParseExpr {
    * @return original or new expression
    * @throws QueryException query exception
    */
-  public Expr index(final CompileContext cc, final Value rt) throws QueryException {
+  private Expr index(final CompileContext cc, final Value rt) throws QueryException {
     // skip optimization if path does not start with document nodes
-    if(rt != null && rt.type != NodeType.DOC) return this;
+    if(cc.nestedFocus() || rt != null && rt.type != NodeType.DOC) return this;
 
     // cache index access costs
     IndexInfo index = null;
@@ -613,7 +632,7 @@ public abstract class Path extends ParseExpr {
     int indexPred = 0, indexStep = 0;
 
     // check if path can be converted to an index access
-    final Data data = rt == null ? null : rt.data();
+    final Data data = rt != null ? rt.data() : null;
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // only accept descendant steps without positional predicates
@@ -798,7 +817,7 @@ public abstract class Path extends ParseExpr {
    * @param expr input expression
    * @return rewriting flag or {@code null}
    */
-  private static Expr mergeList(final Expr expr) {
+  private Expr mergeList(final Expr expr) {
     if(expr instanceof Union || expr instanceof List) {
       final Arr next = (Arr) expr;
       if(childSteps(next)) {
@@ -853,20 +872,28 @@ public abstract class Path extends ParseExpr {
       throws QueryException {
 
     // #1202: during inlining, expressions will be optimized, which are based on the context value
-    boolean changed;
-    cc.pushFocus(null);
-    try {
-      changed = inlineAll(steps, var, ex, cc);
-    } finally {
-      cc.popFocus();
-    }
-
+    boolean changed = false;
     if(root != null) {
       final Expr rt = root.inline(var, ex, cc);
       if(rt != null) {
         root = rt;
         changed = true;
       }
+    }
+
+    cc.pushFocus(root != null ? root : cc.qc.focus.value);
+    try {
+      final int sl = steps.length;
+      for(int s = 0; s < sl; s++) {
+        final Expr exp = steps[s].inline(var, ex, cc);
+        if(exp != null) {
+          steps[s] = exp;
+          changed = true;
+        }
+        cc.updateFocus(steps[s]);
+      }
+    } finally {
+      cc.removeFocus();
     }
     return changed ? optimize(cc) : null;
   }

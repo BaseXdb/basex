@@ -1,7 +1,7 @@
 package org.basex.query.expr.path;
 
 import org.basex.data.*;
-import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -44,9 +44,10 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean optimize(final QueryContext qc) {
-    // skip optimizations if data reference cannot be determined statically
-    final Data data = qc.focus.value != null ? qc.focus.value.data() : null;
+  public boolean optimize(final Value value) {
+    // skip optimizations if context value has no data reference
+    if(value == null) return true;
+    final Data data = value.data();
     if(data == null) return true;
 
     // skip optimizations if more than one namespace is defined in the database

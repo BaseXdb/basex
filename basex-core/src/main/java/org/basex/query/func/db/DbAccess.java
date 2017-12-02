@@ -56,7 +56,7 @@ abstract class DbAccess extends DbFn {
 
     final NameTest nt = new NameTest(nm, Kind.URI_NAME, true, sc.elemNS);
     // return empty sequence if test will yield no results
-    if(!nt.optimize(qc)) return Empty.ITER;
+    if(!nt.optimize(qc.focus.value)) return Empty.ITER;
 
     // wrap iterator with name test
     return new NodeIter() {

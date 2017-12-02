@@ -83,7 +83,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       expr = cc.error(qe, expr);
     } finally {
       cc.removeScope(this);
-      cc.popFocus();
+      cc.removeFocus();
     }
 
     // convert all function calls in tail position to proper tail calls

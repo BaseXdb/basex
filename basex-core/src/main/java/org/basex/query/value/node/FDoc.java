@@ -20,8 +20,6 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FDoc extends FNode {
-  /** Dummy nod. */
-  public static final FDoc DUMMY = new FDoc("");
   /** Child nodes. */
   private final ANodeList children;
   /** Base URI. */

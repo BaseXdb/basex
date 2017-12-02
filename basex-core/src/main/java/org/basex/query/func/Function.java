@@ -49,7 +49,6 @@ import org.basex.query.func.xslt.*;
 import org.basex.query.func.zip.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -1650,7 +1649,7 @@ public enum Function {
       if(!tb.isEmpty()) tb.add(", ");
       if(arg == null) {
         tb.add("()");
-      } else if(arg instanceof Value) {
+      } else if(arg instanceof Expr) {
         tb.addExt(arg);
       } else if(arg instanceof Number) {
         tb.addExt(arg);
