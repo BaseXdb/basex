@@ -34,7 +34,7 @@ public final class RenameNode extends NodeUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare(final MemData tmp, final QueryContext qc) { }
 
   @Override
   public void merge(final Update update) throws QueryException {

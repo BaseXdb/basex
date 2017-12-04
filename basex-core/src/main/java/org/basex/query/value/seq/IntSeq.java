@@ -41,7 +41,7 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final long[] tmp = new long[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];

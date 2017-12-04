@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class VariousArrayTest {
+public final class VariousArrayTest extends ArrayTest {
   /**
    * Test for {@link Array#cons(Value)} and {@link Array#snoc(Value)}.
    */
@@ -30,31 +30,6 @@ public final class VariousArrayTest {
     assertEquals(2 * n, seq.arraySize());
     for(long i = 0; i < 2 * n; i++) {
       final long diff = i - n, j = diff < 0 ? -(diff + 1) : diff;
-      assertEquals(j, ((Int) seq.get(i)).itr());
-    }
-  }
-
-  /**
-   * Test for {@link Array#concat(Array)}.
-   */
-  @Test
-  public void concatTest() {
-    Array seq1 = Array.empty();
-    Array seq2 = Array.empty();
-    final int n = 200_000;
-    for(int i = 0; i < n; i++) {
-      final Value val = Int.get(i);
-      seq1 = seq1.cons(val);
-      seq2 = seq2.snoc(val);
-    }
-
-    assertEquals(n, seq1.arraySize());
-    assertEquals(n, seq2.arraySize());
-    final Array seq = seq1.concat(seq2);
-    assertEquals(2 * n, seq.arraySize());
-
-    for(int i = 0; i < 2 * n; i++) {
-      final int diff = i - n, j = diff < 0 ? -(diff + 1) : diff;
       assertEquals(j, ((Int) seq.get(i)).itr());
     }
   }
@@ -110,53 +85,6 @@ public final class VariousArrayTest {
     }
 
     assertTrue(seq.isEmptyArray());
-  }
-
-  /**
-   * Test for {@link Array#insertBefore(long, Value)}.
-   */
-  @Test
-  public void insertTest() {
-    final int n = 1_000;
-    Array seq = Array.empty();
-
-    for(int i = 0; i < n; i++) seq = seq.snoc(Int.get(i));
-    assertEquals(n, seq.arraySize());
-
-    final Int val = Int.get(n);
-    for(int i = 0; i <= n; i++) {
-      final Array seq2 = seq.insertBefore(i, val);
-      assertEquals(n, ((Int) seq2.get(i)).itr());
-      assertEquals(n + 1L, seq2.arraySize());
-      for(int j = 0; j < n; j++) {
-        assertEquals(j, ((Int) seq2.get(j < i ? j : j + 1)).itr());
-      }
-    }
-  }
-
-  /**
-   * Test for {@link Array#remove(long)}.
-   */
-  @Test
-  public void removeTest() {
-    final int n = 100;
-    Array seq = Array.empty();
-
-    for(int k = 0; k < n; k++) {
-      assertEquals(k, seq.arraySize());
-      for(int i = 0; i < k; i++) {
-        final Array seq2 = seq.remove(i);
-        assertEquals(k - 1, seq2.arraySize());
-
-        final Iterator<Value> iter = seq2.iterator(0);
-        for(int j = 0; j < k - 1; j++) {
-          assertTrue(iter.hasNext());
-          assertEquals(j < i ? j : j + 1, ((Int) iter.next()).itr());
-        }
-        assertFalse(iter.hasNext());
-      }
-      seq = seq.snoc(Int.get(k));
-    }
   }
 
   /**

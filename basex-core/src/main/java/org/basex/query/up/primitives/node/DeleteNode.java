@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives.node;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
@@ -42,7 +43,7 @@ public final class DeleteNode extends NodeUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare(final MemData tmp, final QueryContext qc) { }
 
   @Override
   public void merge(final Update update) {

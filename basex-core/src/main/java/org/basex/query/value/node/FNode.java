@@ -33,7 +33,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public abstract FNode deepCopy(MainOptions options);
+  public abstract FNode deepCopy(MainOptions options, QueryContext qc);
 
   @Override
   public FNode finish() {

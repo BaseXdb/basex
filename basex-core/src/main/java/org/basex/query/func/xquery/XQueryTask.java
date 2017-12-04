@@ -53,7 +53,7 @@ final class XQueryTask extends RecursiveTask<Value> {
 
   @Override
   protected Value compute() {
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     final int s = start, e = end, l = e - s;
     if(l == 1) {
       // perform the work

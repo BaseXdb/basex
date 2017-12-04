@@ -78,10 +78,10 @@ public final class Transform extends Arr {
         if(!(it instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, it);
         final Item i2 = iter.next();
         if(i2 != null)
-          throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(it, i2));
+          throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(it, i2, qc));
 
         // copy node to main memory data instance
-        it = ((ANode) it).dbNodeCopy(qc.context.options);
+        it = ((ANode) it).dbNodeCopy(qc.context.options, qc);
         // add resulting node to variable
         qc.set(copy.var, it);
         updates.addData(it.data());

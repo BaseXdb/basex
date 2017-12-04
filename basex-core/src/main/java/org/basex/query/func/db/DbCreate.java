@@ -46,8 +46,8 @@ public final class DbCreate extends DbNew {
 
       inputs = new NewInput[(int) is];
       for(int i = 0; i < is; i++) {
-        inputs[i] = checkInput(val.itemAt(i), i < ps ? paths.get(i) : EMPTY);
         qc.checkStop();
+        inputs[i] = checkInput(val.itemAt(i), i < ps ? paths.get(i) : EMPTY);
       }
     } else {
       inputs = new NewInput[0];

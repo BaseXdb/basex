@@ -42,7 +42,7 @@ public final class FnForEach extends StandardFunc {
     final Iter iter = exprs[0].iter(qc);
     final FItem fun = checkArity(exprs[1], 1, qc);
 
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(Item it; (it = qc.next(iter)) != null;) vb.add(fun.invokeValue(qc, info, it));
     return vb.value();
   }

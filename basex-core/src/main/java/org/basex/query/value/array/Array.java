@@ -93,8 +93,6 @@ public abstract class Array extends FItem {
    * Running time: <i>O(log n)</i>
    * @param index index of the element to get
    * @return the corresponding element
-   * @throws IndexOutOfBoundsException if the index is smaller that {@code 0}
-   *             or {@code >=} the {@link #arraySize()} of this array
    */
   public abstract Value get(long index);
 
@@ -104,7 +102,6 @@ public abstract class Array extends FItem {
    * @param pos position of the entry to replace
    * @param val value to put into this array
    * @return resulting array
-   * @throws IndexOutOfBoundsException if {@code pos < 0} or {@code pos >= this.arraySize()}
    */
   public abstract Array put(long pos, Value val);
 
@@ -142,7 +139,6 @@ public abstract class Array extends FItem {
    * same order), except for the last one.
    * Running time: <i>O(1)*</i>
    * @return initial segment
-   * @throws IllegalStateException if the array is empty
    */
   public abstract Array init();
 
@@ -151,7 +147,6 @@ public abstract class Array extends FItem {
    * same order), except for the first one.
    * Running time: <i>O(1)*</i>
    * @return tail segment
-   * @throws IllegalStateException if the array is empty
    */
   public abstract Array tail();
 
@@ -159,17 +154,18 @@ public abstract class Array extends FItem {
    * Extracts a contiguous part of this array.
    * @param pos position of first element
    * @param len number of elements
+   * @param qc query context
    * @return the sub-array
-   * @throws IndexOutOfBoundsException if {@code pos < 0} or {@code pos + len > this.arraySize()}
    */
-  public abstract Array subArray(long pos, long len);
+  public abstract Array subArray(long pos, long len, QueryContext qc);
 
   /**
    * Returns an array with the same elements as this one, but their order reversed.
    * Running time: <i>O(n)</i>
+   * @param qc query context
    * @return reversed version of this array
    */
-  public abstract Array reverseArray();
+  public abstract Array reverseArray(QueryContext qc);
 
   /**
    * Checks if this array is empty.
@@ -183,19 +179,19 @@ public abstract class Array extends FItem {
    * Running time: <i>O(log n)</i>
    * @param pos insertion position, must be between {@code 0} and {@code this.arraySize()}
    * @param val element to insert
+   * @param qc query context
    * @return resulting array
-   * @throws IndexOutOfBoundsException if {@code pos < 0 || pos > this.arraySize()} holds
    */
-  public abstract Array insertBefore(long pos, Value val);
+  public abstract Array insertBefore(long pos, Value val, QueryContext qc);
 
   /**
    * Removes the element at the given position in this array.
    * Running time: <i>O(log n)</i>
    * @param pos deletion position, must be between {@code 0} and {@code this.arraySize() - 1}
+   * @param qc query context
    * @return resulting array
-   * @throws IndexOutOfBoundsException if {@code pos < 0 || pos >= this.arraySize()} holds
    */
-  public abstract Array remove(long pos);
+  public abstract Array remove(long pos, QueryContext qc);
 
   @Override
   public final void materialize(final InputInfo ii) throws QueryException {
@@ -334,17 +330,17 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public final Value atomValue(final InputInfo ii) throws QueryException {
-    if(arraySize() == 1) return get(0).atomValue(ii);
-    final ValueBuilder vb = new ValueBuilder();
-    for(final Value val : members()) vb.add(val.atomValue(ii));
+  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(arraySize() == 1) return get(0).atomValue(qc, ii);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Value val : members()) vb.add(val.atomValue(qc, ii));
     return vb.value();
   }
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(atomSize() > 1) throw SEQFOUND_X.get(ii, this);
-    final Value v = atomValue(ii);
+    final Value v = atomValue(qc, ii);
     return v.isEmpty() ? null : (Item) v;
   }
 

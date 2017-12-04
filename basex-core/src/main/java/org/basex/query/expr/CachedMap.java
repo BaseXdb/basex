@@ -41,7 +41,7 @@ final class CachedMap extends SimpleMap {
         final Expr ex = exprs[e];
         focus.pos = 0;
         focus.size = result.size();
-        final ValueBuilder vb = new ValueBuilder();
+        final ValueBuilder vb = new ValueBuilder(qc);
         final Iter iter = result.iter();
         for(Item it; (it = qc.next(iter)) != null;) {
           focus.pos++;

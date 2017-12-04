@@ -76,6 +76,7 @@ public final class List extends Arr {
       final Value[] values = new Value[exprs.length];
       int vl = 0;
       for(final Expr expr : exprs) {
+        cc.qc.checkStop();
         final Value val = expr.value(cc.qc);
         if(vl == 0) t = val.type;
         else if(t != null && !t.eq(val.type)) t = null;
@@ -93,7 +94,7 @@ public final class List extends Arr {
       else if(t != null && t.instanceOf(AtomType.ITR)) {
         value = IntSeq.get(values, s, t);
       } else {
-        final ValueBuilder vb = new ValueBuilder();
+        final ValueBuilder vb = new ValueBuilder(cc.qc);
         for(int v = 0; v < vl; v++) vb.add(values[v]);
         value = vb.value();
       }
@@ -157,9 +158,9 @@ public final class List extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // special case: concatenate two sequences
-    if(exprs.length == 2) return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc));
+    if(exprs.length == 2) return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc), qc);
     // general case: concatenate all sequences
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final Expr expr : exprs) vb.add(expr.value(qc));
     return vb.value();
   }

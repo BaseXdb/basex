@@ -2,7 +2,9 @@ package org.basex.query.value.array;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * The empty array.
@@ -30,12 +32,12 @@ final class EmptyArray extends Array {
 
   @Override
   public Value get(final long index) {
-    throw new IndexOutOfBoundsException(Long.toString(index));
+    throw Util.notExpected();
   }
 
   @Override
   public Array put(final long pos, final Value val) {
-    throw new IndexOutOfBoundsException(Long.toString(pos));
+    throw Util.notExpected();
   }
 
   @Override
@@ -50,30 +52,26 @@ final class EmptyArray extends Array {
 
   @Override
   public Value head() {
-    throw new NoSuchElementException();
+    throw Util.notExpected();
   }
 
   @Override
   public Value last() {
-    throw new NoSuchElementException();
+    throw Util.notExpected();
   }
 
   @Override
   public Array init() {
-    throw new IllegalStateException();
+    throw Util.notExpected();
   }
 
   @Override
   public Array tail() {
-    throw new IllegalStateException();
+    throw Util.notExpected();
   }
 
   @Override
-  public Array subArray(final long pos, final long len) {
-    if(pos < 0) throw new IndexOutOfBoundsException("first index < 0: " + pos);
-    if(len < 0) throw new IndexOutOfBoundsException("length < 0: " + len);
-    if(pos + len > 0)
-      throw new IndexOutOfBoundsException("end out of bounds: " + (pos + len) + " > 0");
+  public Array subArray(final long pos, final long len, final QueryContext qc) {
     return this;
   }
 
@@ -83,21 +81,18 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array reverseArray() {
+  public Array reverseArray(final QueryContext qc) {
     return this;
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value val) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos > 0) throw new IndexOutOfBoundsException("position too big: " + pos);
+  public Array insertBefore(final long pos, final Value val, final QueryContext qc) {
     return new SmallArray(new Value[] { val });
   }
 
   @Override
-  public Array remove(final long pos) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    throw new IndexOutOfBoundsException("position too big: " + pos);
+  public Array remove(final long pos, final QueryContext qc) {
+    throw Util.notExpected();
   }
 
   @Override

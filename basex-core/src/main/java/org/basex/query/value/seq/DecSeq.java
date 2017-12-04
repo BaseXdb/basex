@@ -39,7 +39,7 @@ public final class DecSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final BigDecimal[] tmp = new BigDecimal[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];

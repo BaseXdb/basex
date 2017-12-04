@@ -42,8 +42,8 @@ public final class FnForEachPair extends StandardFunc {
     final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
-    final ValueBuilder vb = new ValueBuilder();
-    for(Item it1, it2; (it1 = qc.next(ir1)) != null && (it2 = ir2.next()) != null;) {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(Item it1, it2; (it1 = ir1.next()) != null && (it2 = ir2.next()) != null;) {
       vb.add(fun.invokeValue(qc, info, it1, it2));
     }
     return vb.value();

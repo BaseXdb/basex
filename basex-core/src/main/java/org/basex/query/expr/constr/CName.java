@@ -64,7 +64,7 @@ abstract class CName extends CNode {
     for(final Expr expr : exprs) {
       final Value val = expr.value(qc);
       boolean m = false;
-      final Iter iter = val.atomValue(info).iter();
+      final Iter iter = val.atomValue(qc, info).iter();
       for(Item it; (it = qc.next(iter)) != null;) {
         if(m) tb.add(' ');
         tb.add(it.string(info));

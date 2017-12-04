@@ -94,7 +94,6 @@ final class LeafNode implements Node<Item, Item> {
 
   @Override
   public LeafNode set(final long pos, final Item val) {
-    if(pos < 0 || pos >= values.length) throw new IndexOutOfBoundsException(Long.toString(pos));
     final Item[] vals = values.clone();
     vals[(int) pos] = val;
     return new LeafNode(vals);

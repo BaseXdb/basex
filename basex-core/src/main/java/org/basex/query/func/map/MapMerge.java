@@ -30,7 +30,7 @@ public final class MapMerge extends StandardFunc {
     final Iter maps = exprs[0].iter(qc);
     final MergeDuplicates merge = options(qc).get(MergeOptions.DUPLICATES);
     Map map = Map.EMPTY;
-    for(Item it; (it = qc.next(maps)) != null;) map = map.addAll(toMap(it), merge, info);
+    for(Item it; (it = qc.next(maps)) != null;) map = map.addAll(toMap(it), merge, info, qc);
     return map;
   }
 

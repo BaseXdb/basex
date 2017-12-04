@@ -158,7 +158,7 @@ public final class GroupBy extends Clause {
             // new group, add it to the list
             final ValueBuilder[] ngs = new ValueBuilder[pl];
             final int nl = ngs.length;
-            for(int n = 0; n < nl; n++) ngs[n] = new ValueBuilder();
+            for(int n = 0; n < nl; n++) ngs[n] = new ValueBuilder(qc);
             grp = new Group(key, ngs);
             grps.add(grp);
 

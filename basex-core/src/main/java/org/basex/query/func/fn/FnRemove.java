@@ -25,7 +25,7 @@ public final class FnRemove extends StandardFunc {
       long c;
       @Override
       public Item next() throws QueryException {
-        return c++ != p || iter.next() != null ? iter.next() : null;
+        return c++ != p || iter.next() != null ? qc.next(iter) : null;
       }
     };
   }
@@ -36,8 +36,8 @@ public final class FnRemove extends StandardFunc {
     final long pos = toLong(exprs[1], qc) - 1, n = val.size();
     if(pos < 0 || pos >= n) return val;
     // remove first or last item: create sub sequence
-    if(pos == 0 || pos + 1 == n) return val.subSequence(pos == 0 ? 1 : 0, n - 1);
-    return ((Seq) val).remove(pos);
+    if(pos == 0 || pos + 1 == n) return val.subSequence(pos == 0 ? 1 : 0, n - 1, qc);
+    return ((Seq) val).remove(pos, qc);
   }
 
   @Override

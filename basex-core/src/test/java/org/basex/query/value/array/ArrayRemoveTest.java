@@ -4,58 +4,23 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests the {@link Array#remove(long)} method.
+ * Tests the {@link Array#remove(long, QueryContext)} method.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class ArrayRemoveTest {
-  /** Negative index on empty array. */
-  @Test(expected = IndexOutOfBoundsException.class)
-  public void emptyRemoveNegative() {
-    Array.empty().remove(-1);
-  }
-
-  /** Zero index on empty array. */
-  @Test(expected = IndexOutOfBoundsException.class)
-  public void emptyRemoveZero() {
-    Array.empty().remove(0);
-  }
-
-  /** Negative index on singleton array. */
-  @Test(expected = IndexOutOfBoundsException.class)
-  public void singletonRemoveNegative() {
-    Array.singleton(Int.get(42)).remove(-1);
-  }
-
-  /** Too big index on singleton array. */
-  @Test(expected = IndexOutOfBoundsException.class)
-  public void singletonRemoveOne() {
-    Array.singleton(Int.get(42)).remove(1);
-  }
-
-  /** Negative index on deep array. */
-  @Test(expected = IndexOutOfBoundsException.class)
-  public void deepRemoveNegative() {
-    Array.singleton(Int.ZERO).snoc(Int.ONE).remove(-1);
-  }
-
-  /** too big index on deep array. */
-  @Test(expected = IndexOutOfBoundsException.class)
-  public void deepRemoveTwo() {
-    Array.singleton(Int.ZERO).snoc(Int.ONE).remove(2);
-  }
-
+public final class ArrayRemoveTest extends ArrayTest {
   /** Remove one element from singleton array. */
   @Test
   public void singletonTest() {
     final Array singleton = Array.singleton(Int.get(42));
-    assertSame(Array.empty(), singleton.remove(0));
+    assertSame(Array.empty(), singleton.remove(0, qc));
   }
 
   /** Delete each element once from arrays of varying length. */
@@ -65,7 +30,7 @@ public final class ArrayRemoveTest {
     Array arr = Array.empty();
     for(int k = 0; k < n; k++) {
       for(int i = 0; i < k; i++) {
-        final Array arr2 = arr.remove(i);
+        final Array arr2 = arr.remove(i, qc);
         final Iterator<Value> iter = arr2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
           assertTrue(iter.hasNext());
@@ -85,18 +50,18 @@ public final class ArrayRemoveTest {
     final Array arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
     Array arr2 = arr.tail();
-    arr2 = arr2.remove(4);
-    arr2 = arr2.remove(2);
+    arr2 = arr2.remove(4, qc);
+    arr2 = arr2.remove(2, qc);
     assertContains(arr2, 1, 2, 4, 6, 7, 8);
 
     Array arr3 = arr.cons(Int.get(-1)).snoc(Int.get(9));
-    arr3 = arr3.remove(5);
-    arr3 = arr3.remove(5);
+    arr3 = arr3.remove(5, qc);
+    arr3 = arr3.remove(5, qc);
     assertContains(arr3, -1, 0, 1, 2, 3, 6, 7, 8, 9);
 
     Array arr4 = arr.cons(Int.get(-1));
-    arr4 = arr4.remove(5);
-    arr4 = arr4.remove(5);
+    arr4 = arr4.remove(5, qc);
+    arr4 = arr4.remove(5, qc);
     assertContains(arr4, -1, 0, 1, 2, 3, 6, 7, 8);
   }
 
@@ -104,10 +69,10 @@ public final class ArrayRemoveTest {
   @Test
   public void emptyLeftDigitTest() {
     Array arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
-    arr = arr.remove(0);
-    arr = arr.remove(0);
-    arr = arr.remove(0);
-    arr = arr.remove(0);
+    arr = arr.remove(0, qc);
+    arr = arr.remove(0, qc);
+    arr = arr.remove(0, qc);
+    arr = arr.remove(0, qc);
     assertContains(arr, 4, 5, 6, 7, 8);
   }
 
@@ -115,15 +80,15 @@ public final class ArrayRemoveTest {
   @Test
   public void emptyRightDigitTest() {
     Array arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
-    arr = arr.remove(8);
-    arr = arr.remove(7);
-    arr = arr.remove(6);
-    arr = arr.remove(5);
+    arr = arr.remove(8, qc);
+    arr = arr.remove(7, qc);
+    arr = arr.remove(6, qc);
+    arr = arr.remove(5, qc);
     assertContains(arr, 0, 1, 2, 3, 4);
 
     Array arr2 = from(1, 2, 3, 4, 5, 6, 7, 8, 9).cons(Int.ZERO);
     for(int i = 9; i >= 4; i--) {
-      arr2 = arr2.remove(i);
+      arr2 = arr2.remove(i, qc);
     }
     assertContains(arr2, 0, 1, 2, 3);
   }
@@ -132,21 +97,21 @@ public final class ArrayRemoveTest {
   @Test
   public void deepLeftTest() {
     Array arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-    arr = arr.remove(3);
+    arr = arr.remove(3, qc);
     assertContains(arr, 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
     Array arr2 = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-    arr2 = arr2.remove(6);
+    arr2 = arr2.remove(6, qc);
     assertContains(arr2, 0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
     Array arr3 = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
-    arr3 = arr3.remove(9);
-    arr3 = arr3.remove(6);
-    arr3 = arr3.remove(5);
-    arr3 = arr3.remove(4);
-    arr3 = arr3.remove(3);
-    arr3 = arr3.remove(3);
+    arr3 = arr3.remove(9, qc);
+    arr3 = arr3.remove(6, qc);
+    arr3 = arr3.remove(5, qc);
+    arr3 = arr3.remove(4, qc);
+    arr3 = arr3.remove(3, qc);
+    arr3 = arr3.remove(3, qc);
     assertContains(arr3,
         0, 1, 2, 8, 10, 11, 12, 13, 14,
         15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
@@ -155,11 +120,11 @@ public final class ArrayRemoveTest {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24);
-    arr4 = arr4.remove(6);
-    arr4 = arr4.remove(5);
-    arr4 = arr4.remove(4);
-    arr4 = arr4.remove(3);
-    arr4 = arr4.remove(3);
+    arr4 = arr4.remove(6, qc);
+    arr4 = arr4.remove(5, qc);
+    arr4 = arr4.remove(4, qc);
+    arr4 = arr4.remove(3, qc);
+    arr4 = arr4.remove(3, qc);
     assertContains(arr4,
         0, 1, 2, 8, 9, 10, 11, 12, 13, 14,
         15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
@@ -168,14 +133,14 @@ public final class ArrayRemoveTest {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24);
-    arr5 = arr5.remove(17);
-    arr5 = arr5.remove(16);
-    arr5 = arr5.remove(15);
-    arr5 = arr5.remove(6);
-    arr5 = arr5.remove(5);
-    arr5 = arr5.remove(4);
-    arr5 = arr5.remove(3);
-    arr5 = arr5.remove(3);
+    arr5 = arr5.remove(17, qc);
+    arr5 = arr5.remove(16, qc);
+    arr5 = arr5.remove(15, qc);
+    arr5 = arr5.remove(6, qc);
+    arr5 = arr5.remove(5, qc);
+    arr5 = arr5.remove(4, qc);
+    arr5 = arr5.remove(3, qc);
+    arr5 = arr5.remove(3, qc);
     assertContains(arr5, 0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24);
 
     Array arr6 = from(
@@ -184,7 +149,7 @@ public final class ArrayRemoveTest {
         21
     );
     for(int i = 12; i >= 4; i--) {
-      arr6 = arr6.remove(i);
+      arr6 = arr6.remove(i, qc);
     }
     assertContains(arr6, 0, 1, 2, 3, 13, 14, 15, 16, 17, 18, 19, 20, 21);
   }
@@ -198,11 +163,11 @@ public final class ArrayRemoveTest {
         20, 21, 22, 23, 24, 25, 26);
 
     for(int i = 8; i >= 6; i--) {
-      arr = arr.remove(i);
+      arr = arr.remove(i, qc);
     }
 
     for(int i = 15; i >= 9; i--) {
-      arr = arr.remove(i - 3);
+      arr = arr.remove(i - 3, qc);
     }
 
     assertContains(arr, 0, 1, 2, 3, 4, 5, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26);
@@ -212,7 +177,7 @@ public final class ArrayRemoveTest {
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
     for(int i = 4; i >= 0; i--) arr2 = arr2.cons(Int.get(i));
     for(int i = 31; i <= 35; i++) arr2 = arr2.snoc(Int.get(i));
-    for(int i = 22; i >= 16; i--) arr2 = arr2.remove(i);
+    for(int i = 22; i >= 16; i--) arr2 = arr2.remove(i, qc);
     assertContains(arr2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
             14, 15, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
   }
@@ -221,13 +186,13 @@ public final class ArrayRemoveTest {
   @Test
   public void deepRightTest() {
     Array arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
-    for(int i = 12; i >= 8; i--) arr = arr.remove(i);
-    arr = arr.remove(8);
+    for(int i = 12; i >= 8; i--) arr = arr.remove(i, qc);
+    arr = arr.remove(8, qc);
     assertContains(arr, 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 16, 17);
 
     Array arr2 = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
-    for(int i = 12; i >= 9; i--) arr2 = arr2.remove(i);
-    arr2 = arr2.remove(9);
+    for(int i = 12; i >= 9; i--) arr2 = arr2.remove(i, qc);
+    arr2 = arr2.remove(9, qc);
     assertContains(arr2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17);
   }
 
@@ -246,7 +211,7 @@ public final class ArrayRemoveTest {
     for(int i = 0; i < n; i++) {
       final int delPos = rng.nextInt(n - i);
       list.remove(delPos);
-      arr = arr.remove(delPos);
+      arr = arr.remove(delPos, qc);
       final int size = n - i - 1;
       assertEquals(size, arr.arraySize());
       assertEquals(size, list.size());
@@ -257,6 +222,31 @@ public final class ArrayRemoveTest {
           assertEquals(((Int) list.get(j)).itr(), ((Int) arr.get(j)).itr());
         }
       }
+    }
+  }
+
+  /**
+   * Simple remove test.
+   */
+  @Test
+  public void removeTest() {
+    final int n = 100;
+    Array seq = Array.empty();
+
+    for(int k = 0; k < n; k++) {
+      assertEquals(k, seq.arraySize());
+      for(int i = 0; i < k; i++) {
+        final Array seq2 = seq.remove(i, qc);
+        assertEquals(k - 1, seq2.arraySize());
+
+        final Iterator<Value> iter = seq2.iterator(0);
+        for(int j = 0; j < k - 1; j++) {
+          assertTrue(iter.hasNext());
+          assertEquals(j < i ? j : j + 1, ((Int) iter.next()).itr());
+        }
+        assertFalse(iter.hasNext());
+      }
+      seq = seq.snoc(Int.get(k));
     }
   }
 

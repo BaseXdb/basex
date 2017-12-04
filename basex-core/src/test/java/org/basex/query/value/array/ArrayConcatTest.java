@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class ArrayConcatTest {
+public final class ArrayConcatTest extends ArrayTest {
   /** Generates and concatenates random arrays of a given size. */
   @Test public void fuzzyTest() {
     final Random rng = new Random();
@@ -27,13 +27,13 @@ public final class ArrayConcatTest {
         final ArrayList<Integer> a2 = new ArrayList<>(l), b2 = new ArrayList<>(r);
         for(int i = 0; i < l; i++) {
           final int pos = rng.nextInt(i + 1);
-          a1 = a1.insertBefore(pos, Int.get(i));
+          a1 = a1.insertBefore(pos, Int.get(i), qc);
           a2.add(pos, i);
         }
 
         for(int i = 0; i < r; i++) {
           final int pos = rng.nextInt(i + 1);
-          b1 = b1.insertBefore(pos, Int.get(l + i));
+          b1 = b1.insertBefore(pos, Int.get(l + i), qc);
           b2.add(pos, l + i);
         }
 
@@ -52,6 +52,31 @@ public final class ArrayConcatTest {
         }
         assertFalse(it2.hasNext());
       }
+    }
+  }
+
+  /**
+   * Simple concat test.
+   */
+  @Test
+  public void concatTest() {
+    Array seq1 = Array.empty();
+    Array seq2 = Array.empty();
+    final int n = 200_000;
+    for(int i = 0; i < n; i++) {
+      final Value val = Int.get(i);
+      seq1 = seq1.cons(val);
+      seq2 = seq2.snoc(val);
+    }
+
+    assertEquals(n, seq1.arraySize());
+    assertEquals(n, seq2.arraySize());
+    final Array seq = seq1.concat(seq2);
+    assertEquals(2 * n, seq.arraySize());
+
+    for(int i = 0; i < 2 * n; i++) {
+      final int diff = i - n, j = diff < 0 ? -(diff + 1) : diff;
+      assertEquals(j, ((Int) seq.get(i)).itr());
     }
   }
 }

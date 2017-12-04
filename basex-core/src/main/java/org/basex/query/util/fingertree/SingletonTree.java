@@ -1,5 +1,7 @@
 package org.basex.query.util.fingertree;
 
+import org.basex.query.*;
+
 /**
  * A tree consisting of a single value.
  *
@@ -69,19 +71,17 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> reverse() {
+  public FingerTree<N, E> reverse(final QueryContext qc) {
     return new SingletonTree<>(elem.reverse());
   }
 
   @Override
   public FingerTree<N, E> set(final long pos, final E val) {
-    final long size = elem.size();
-    if(pos < 0 || pos >= size) throw new IndexOutOfBoundsException(pos + ", size = " + size);
     return new SingletonTree<>(elem.set(pos, val));
   }
 
   @Override
-  public FingerTree<N, E> insert(final long pos, final E val) {
+  public FingerTree<N, E> insert(final long pos, final E val, final QueryContext qc) {
     @SuppressWarnings("unchecked")
     final Node<N, E>[] siblings = new Node[4];
     if(!elem.insert(siblings, pos, val)) {
@@ -96,7 +96,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public TreeSlice<N, E> remove(final long pos) {
+  public TreeSlice<N, E> remove(final long pos, final QueryContext qc) {
     final NodeLike<N, E>[] removed = elem.remove(null, null, pos);
     return new TreeSlice<>(removed[1]);
   }

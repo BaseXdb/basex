@@ -66,14 +66,14 @@ public final class TransformWith extends Arr {
     final QueryFocus qf = qc.focus;
     final Value cv = qf.value;
 
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     try {
       final Iter iter = exprs[0].iter(qc);
       for(Item it; (it = qc.next(iter)) != null;) {
         if(!(it instanceof ANode)) throw UPSOURCE_X.get(info, it);
 
         // copy node to main memory data instance
-        it = ((ANode) it).dbNodeCopy(qc.context.options);
+        it = ((ANode) it).dbNodeCopy(qc.context.options, qc);
         // set resulting node as context
         qf.value = it;
 

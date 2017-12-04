@@ -41,10 +41,12 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final Value insertBefore(final long pos, final Value val) {
+  public final Value insertBefore(final long pos, final Value val, final QueryContext qc) {
+    qc.checkStop();
+
     final long n = val.size();
     if(n == 0) return this;
-    if(n == 1) return insert(pos, (Item) val);
+    if(n == 1) return insert(pos, (Item) val, qc);
 
     final long r = size - pos;
     if(val instanceof TreeSeq && (pos == 0 || r == 0)) {
@@ -54,17 +56,17 @@ public abstract class TreeSeq extends Seq {
 
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
     if(pos < MAX_SMALL) {
-      tsb.add(val);
+      tsb.add(val, qc);
       for(long i = pos; --i >= 0;) tsb.addFront(itemAt(i));
     } else {
-      tsb.add(subSequence(0, pos));
-      tsb.add(val);
+      tsb.add(subSequence(0, pos, qc), qc);
+      tsb.add(val, qc);
     }
 
     if(r < MAX_SMALL) {
       for(long i = size - r; i < size; i++) tsb.add(itemAt(i));
     } else {
-      tsb.add(subSequence(pos, r));
+      tsb.add(subSequence(pos, r, qc), qc);
     }
 
     return tsb.seq();
@@ -100,9 +102,9 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final Seq atomValue(final InputInfo ii) throws QueryException {
+  public final Seq atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
-    for(final Item it : this) tsb.add(it.atomValue(ii));
+    for(final Item it : this) tsb.add(it.atomValue(qc, ii), qc);
     return tsb.seq();
   }
 

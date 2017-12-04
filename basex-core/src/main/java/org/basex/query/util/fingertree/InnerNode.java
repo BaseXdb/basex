@@ -57,7 +57,6 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
 
   @Override
   public InnerNode<N, E> set(final long pos, final E val) {
-    if(pos < 0 || pos >= bounds[bounds.length - 1]) throw new IndexOutOfBoundsException();
     int i = 0;
     while(pos >= bounds[i]) i++;
     final long p = i == 0 ? pos : pos - bounds[i - 1];

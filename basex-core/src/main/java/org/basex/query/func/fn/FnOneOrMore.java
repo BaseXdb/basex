@@ -27,7 +27,7 @@ public final class FnOneOrMore extends StandardFunc {
       private boolean first = true;
       @Override
       public Item next() throws QueryException {
-        final Item it = iter.next();
+        final Item it = qc.next(iter);
         if(first) {
           if(it == null) throw ONEORMORE.get(info);
           first = false;

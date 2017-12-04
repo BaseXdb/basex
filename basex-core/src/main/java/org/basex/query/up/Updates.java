@@ -125,7 +125,7 @@ public final class Updates {
       data = fragmentIDs.get(ancID);
       // if data doesn't exist, create a new one
       if(data == null) {
-        data = (MemData) anc.dbNodeCopy(qc.context.options).data();
+        data = (MemData) anc.dbNodeCopy(qc.context.options, qc).data();
         // create a mapping between the fragment id and the data reference
         fragmentIDs.put(ancID, data);
       }

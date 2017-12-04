@@ -46,7 +46,7 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options) {
+  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
     return new FComm(value).parent(parent);
   }
 

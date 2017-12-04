@@ -78,20 +78,22 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Value subSequence(final long start, final long length) {
+  public final Value subSequence(final long start, final long length, final QueryContext qc) {
     return length == 0 ? Empty.SEQ :
            length == 1 ? itemAt(start) :
            length == size() ? this :
-           subSeq(start, length);
+           subSeq(start, length, qc);
   }
 
   /**
    * Returns a sub sequence of this value with the given start and length.
    * @param offset offset (>= 0)
    * @param length number of items (1 < length < size())
+   * @param qc query context
    * @return sub sequence
    */
-  protected Seq subSeq(final long offset, final long length) {
+  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
+    qc.checkStop();
     return new SubSeq(this, offset, length);
   }
 
@@ -99,29 +101,33 @@ public abstract class Seq extends Value {
    * Inserts a value at the given position into this sequence and returns the resulting sequence.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
    * @param val value to insert
+   * @param qc query context
    * @return resulting value
    */
-  public Value insertBefore(final long pos, final Value val) {
+  public Value insertBefore(final long pos, final Value val, final QueryContext qc) {
     final long n = val.size();
-    return n == 1 ? insert(pos, (Item) val) : n == 0 ? this : copyInsert(pos, val);
+    return n == 1 ? insert(pos, (Item) val, qc) : n == 0 ? this : copyInsert(pos, val, qc);
   }
 
   /**
    * Inserts an item at the given position into this sequence and returns the resulting sequence.
    * @param pos position at which the item should be inserted, must be between 0 and {@link #size}
    * @param val value to insert
+   * @param qc query context
    * @return resulting value
    */
-  public abstract Value insert(long pos, Item val);
+  public abstract Value insert(long pos, Item val, QueryContext qc);
 
   /**
-   * Helper for {@link #insertBefore(long, Value)} that copies all items into a {@link TreeSeq}.
+   * Helper for {@link #insertBefore(long, Value, QueryContext)} that copies all items into a
+   * {@link TreeSeq}.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
    * @param val value to insert
+   * @param qc query context
    * @return resulting value
    */
-  final Value copyInsert(final long pos, final Value val) {
-    final ValueBuilder vb = new ValueBuilder();
+  final Value copyInsert(final long pos, final Value val, final QueryContext qc) {
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(val);
     for(long i = pos; i < size; i++) vb.add(itemAt(i));
@@ -131,17 +137,19 @@ public abstract class Seq extends Value {
   /**
    * Removes the item at the given position in this sequence and returns the resulting sequence.
    * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @param qc query context
    * @return resulting sequence
    */
-  public abstract Value remove(long pos);
+  public abstract Value remove(long pos, QueryContext qc);
 
   /**
-   * Helper for {@link #remove(long)} that copies all items into a {@link TreeSeq}.
+   * Helper for {@link #remove(long, QueryContext)} that copies all items into a {@link TreeSeq}.
    * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @param qc query context
    * @return resulting sequence
    */
-  final Value copyRemove(final long pos) {
-    final ValueBuilder vb = new ValueBuilder();
+  final Value copyRemove(final long pos, final QueryContext qc) {
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     for(long i = pos + 1; i < size; i++) vb.add(itemAt(i));
     return vb.value(type);

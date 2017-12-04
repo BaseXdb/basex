@@ -53,8 +53,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
-    return get(value.atomValue(ii), size);
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return get(value.atomValue(qc, ii), size);
   }
 
   @Override
@@ -63,25 +63,25 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length) {
-    return value.size() == 1 ? new SingletonSeq(length, value) : super.subSeq(offset, length);
+  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
+    return value.size() == 1 ? new SingletonSeq(length, value) : super.subSeq(offset, length, qc);
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
-    return item.equals(value) ? get(value, size + 1) : copyInsert(pos, item);
+  public Value insert(final long pos, final Item item, final QueryContext qc) {
+    return item.equals(value) ? get(value, size + 1) : copyInsert(pos, item, qc);
   }
 
   @Override
-  public Value remove(final long pos) {
-    return value.size() == 1 ? get(value, size - 1) : copyRemove(pos);
+  public Value remove(final long pos, final QueryContext qc) {
+    return value.size() == 1 ? get(value, size - 1) : copyRemove(pos, qc);
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     if(value.size() == 1) return this;
     final long n = size;
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < n; i++) vb.add(itemAt(n - i - 1));
     return vb.value(type);
   }

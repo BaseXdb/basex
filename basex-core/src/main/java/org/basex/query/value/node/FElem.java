@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -386,7 +387,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options) {
+  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
     // nodes must be added after root constructor in order to ensure ascending node ids
     final ANodeList ch = children != null ? new ANodeList(children.size()) : null;
     final ANodeList at = atts != null ? new ANodeList(atts.size()) : null;
@@ -397,10 +398,10 @@ public final class FElem extends FNode {
       for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
     }
     if(at != null) {
-      for(final ANode n : atts) at.add(n.deepCopy(options));
+      for(final ANode n : atts) at.add(n.deepCopy(options, qc));
     }
     if(ch != null) {
-      for(final ANode n : children) ch.add(n.deepCopy(options));
+      for(final ANode n : children) ch.add(n.deepCopy(options, qc));
     }
     node.parent(parent);
     return node.optimize();

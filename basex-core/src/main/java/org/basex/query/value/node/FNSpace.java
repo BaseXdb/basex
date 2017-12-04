@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -39,7 +40,7 @@ public final class FNSpace extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options) {
+  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
     return new FNSpace(name, value);
   }
 

@@ -48,7 +48,7 @@ public final class AtomIter extends Iter {
       if(atom == null) {
         final Item it = iter.next();
         if(it == null) return null;
-        atom = it.atomValue(info).iter();
+        atom = it.atomValue(qc, info).iter();
       }
       final Item it = qc.next(atom);
       if(it != null) return it;

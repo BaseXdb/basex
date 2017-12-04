@@ -45,7 +45,7 @@ public final class Rename extends Update {
     // check target constraints
     if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
     final Item i2 = iter.next();
-    if(i2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(it, i2));
+    if(i2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(it, i2, qc));
 
     final CNode ex;
     if(it.type == NodeType.ELM) {

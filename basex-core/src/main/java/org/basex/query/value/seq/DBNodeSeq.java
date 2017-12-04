@@ -71,9 +71,9 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
-    for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(ii));
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(qc, ii));
     return vb.value();
   }
 
@@ -103,7 +103,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final int[] tmp = new int[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = pres[i];

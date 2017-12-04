@@ -115,7 +115,7 @@ public final class Window extends Clause {
 
           // find end item
           if(fst != null) {
-            final ValueBuilder window = new ValueBuilder().add(fst);
+            final ValueBuilder window = new ValueBuilder(qc).add(fst);
             final Item[] st = vals == null ? new Item[] { curr, prev, next } : vals;
             final long ps = vals == null ? p : spos;
             vals = null;
@@ -154,7 +154,7 @@ public final class Window extends Clause {
         while(true) {
           if(findStart(qc)) {
             // find end item
-            final ValueBuilder window = new ValueBuilder();
+            final ValueBuilder window = new ValueBuilder(qc);
             boolean found = false;
             do {
               window.add(curr);
@@ -199,7 +199,7 @@ public final class Window extends Clause {
           }
 
           if(curr != null) {
-            final ValueBuilder cache = new ValueBuilder();
+            final ValueBuilder cache = new ValueBuilder(qc);
             final Iterator<Item> qiter = queue.iterator();
             // the first element is already the {@code next} one
             if(qiter.hasNext()) qiter.next();

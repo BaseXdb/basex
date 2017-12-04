@@ -11,6 +11,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Array {
+  /** Maximum size for initializing arrays. */
+  public static final int MAXINIT = 1 << 20;
   /** Initial default size for new arrays. */
   public static final int CAPACITY = 1 << 3;
   /** Default factor for resizing dynamic arrays. */

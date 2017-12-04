@@ -79,7 +79,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw FIATOM_X.get(ii, type);
   }
 

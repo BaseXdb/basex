@@ -112,7 +112,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options) {
+  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
     return new FDoc(children, uri).optimize();
   }
 

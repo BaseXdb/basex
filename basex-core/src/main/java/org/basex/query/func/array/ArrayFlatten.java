@@ -20,7 +20,7 @@ import org.basex.query.value.type.*;
 public final class ArrayFlatten extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     add(vb, exprs[0], qc);
     return vb.value();
   }
@@ -36,8 +36,7 @@ public final class ArrayFlatten extends ArrayFn {
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item it = curr.next();
-
+          final Item it = qc.next(curr);
           if(it != null) {
             if(!(it instanceof Array)) return it;
             final Array arr = (Array) it;

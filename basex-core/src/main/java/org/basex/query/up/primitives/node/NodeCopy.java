@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives.node;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
@@ -37,14 +38,14 @@ abstract class NodeCopy extends NodeUpdate {
   }
 
   @Override
-  public final void prepare(final MemData tmp) {
+  public final void prepare(final MemData tmp, final QueryContext qc) throws QueryException {
     // merge texts. after that, text nodes still need to be merged,
     // as two adjacent iterators may lead to two adjacent text nodes
     final ANodeList list = mergeNodeCacheText(nodes);
     nodes = null;
     // build main memory representation of nodes to be copied
     final int start = tmp.meta.size;
-    new DataBuilder(tmp).build(list);
+    new DataBuilder(tmp, qc).build(list);
     insseq = new DataClip(tmp, start, tmp.meta.size, list.size());
   }
 

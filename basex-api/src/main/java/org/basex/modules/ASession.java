@@ -116,11 +116,11 @@ final class ASession {
    * @throws QueryException query exception
    */
   void set(final Str key, final Value value) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
       if(item instanceof FItem) throw (id == null ? SESSION_SET_X : SESSIONS_SET_X).get(null, item);
       final Data d = item.data();
-      vb.add(d == null || d.inMemory() ? item : ((ANode) item).deepCopy(qc.context.options));
+      vb.add(d == null || d.inMemory() ? item : ((ANode) item).deepCopy(qc.context.options, qc));
     }
     session.setAttribute(key.toJava(), vb.value());
   }

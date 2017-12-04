@@ -46,6 +46,7 @@ public class CachedFilter extends Filter {
 
       final boolean scoring = qc.scoring;
       for(int s = 0; s < vs; s++) {
+        qc.checkStop();
         final Item it = val.itemAt(s);
         focus.value = it;
         final Item test = pred.test(qc, info);
@@ -67,6 +68,7 @@ public class CachedFilter extends Filter {
         focus.pos = 1;
         int c = 0;
         for(int s = 0; s < vs; ++s) {
+          qc.checkStop();
           final Item it = buffer.get(s);
           focus.value = it;
           final Item test = pred.test(qc, info);

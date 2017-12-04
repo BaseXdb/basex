@@ -27,7 +27,7 @@ public final class ArrayRemove extends ArrayFn {
     list.sort().distinct();
 
     // delete entries backwards
-    for(int i = list.size() - 1; i >= 0; i--) array = array.remove(list.get(i));
+    for(int i = list.size() - 1; i >= 0; i--) array = array.remove(list.get(i), qc);
     return array;
   }
 

@@ -338,7 +338,6 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     @Override
     public E next() {
-      if(sub == null) throw new NoSuchElementException();
       final E out = sub.next();
       if(sub.hasNext()) return out;
 
@@ -388,7 +387,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     @Override
     public void remove() {
-      throw new UnsupportedOperationException();
+      throw Util.notExpected();
     }
   }
 }

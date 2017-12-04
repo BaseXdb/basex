@@ -31,7 +31,7 @@ public final class HofTakeWhile extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     final FItem pred = checkArity(exprs[1], 1, qc);
     final Iter iter = exprs[0].iter(qc);
     for(Item it; (it = qc.next(iter)) != null;) {

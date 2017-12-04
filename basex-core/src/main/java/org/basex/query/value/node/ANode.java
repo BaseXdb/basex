@@ -10,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -80,7 +79,7 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final Value atomValue(final InputInfo ii) throws QueryException {
+  public final Item atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return atomItem();
   }
 
@@ -97,13 +96,13 @@ public abstract class ANode extends Item {
     return type == NodeType.PI || type == NodeType.COM ? Str.get(string()) : new Atm(string());
   }
 
-
   /**
    * Returns a deep copy of the node.
    * @param opts main options
+   * @param qc query context
    * @return node copy
    */
-  public abstract ANode deepCopy(MainOptions opts);
+  public abstract ANode deepCopy(MainOptions opts, QueryContext qc);
 
   /**
    * Returns a final node representation. This method is called when iterating through node
@@ -115,11 +114,12 @@ public abstract class ANode extends Item {
   /**
    * Returns a database node representation of the node.
    * @param opts main options
+   * @param qc query context
    * @return database node
    */
-  public DBNode dbNodeCopy(final MainOptions opts) {
+  public DBNode dbNodeCopy(final MainOptions opts, final QueryContext qc) {
     final MemData md = new MemData(opts);
-    new DataBuilder(md).build(this);
+    new DataBuilder(md, qc).build(this);
     return new DBNode(md);
   }
 

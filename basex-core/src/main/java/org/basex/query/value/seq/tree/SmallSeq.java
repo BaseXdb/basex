@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * A small sequence that is represented as a single Java array.
@@ -37,7 +38,7 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq reverse() {
+  public TreeSeq reverse(final QueryContext qc) {
     final int n = elems.length;
     final Item[] es = new Item[n];
     for(int i = 0; i < n; i++) es[i] = elems[n - 1 - i];
@@ -45,7 +46,7 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq insert(final long pos, final Item val) {
+  public TreeSeq insert(final long pos, final Item val, final QueryContext qc) {
     final int p = (int) pos, n = elems.length;
     final Item[] out = new Item[n + 1];
     System.arraycopy(elems, 0, out, 0, p);
@@ -58,7 +59,7 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public Value remove(final long pos) {
+  public Value remove(final long pos, final QueryContext qc) {
     final int p = (int) pos, n = elems.length;
     if(n == 2) return elems[pos == 0 ? 1 : 0];
 
@@ -69,7 +70,7 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length) {
+  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
     final int o = (int) offset, l = (int) length;
     return new SmallSeq(slice(elems, o, o + l), type);
   }
@@ -96,7 +97,6 @@ final class SmallSeq extends TreeSeq {
 
       @Override
       public Item next() {
-        if(index >= elems.length) throw new NoSuchElementException();
         return elems[index++];
       }
 
@@ -112,23 +112,22 @@ final class SmallSeq extends TreeSeq {
 
       @Override
       public Item previous() {
-        if(index <= 0) throw new NoSuchElementException();
         return elems[--index];
       }
 
       @Override
       public void set(final Item e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void add(final Item e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void remove() {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
     };
   }

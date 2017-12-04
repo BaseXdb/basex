@@ -40,7 +40,7 @@ public final class ReplaceDoc extends NodeUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException {
+  public void prepare(final MemData tmp, final QueryContext qc) throws QueryException {
     newDocs.prepare(data.meta.name);
   }
 

@@ -46,7 +46,7 @@ public class ModuleDemo extends QueryModule {
   public Value sequence() {
     FElem elem1 = new FElem("root1");
     FElem elem2 = new FElem("root2");
-    ValueBuilder vb = new ValueBuilder();
+    ValueBuilder vb = new ValueBuilder(queryContext);
     vb.add(elem1);
     vb.add(elem2);
     return vb.value();
@@ -58,7 +58,7 @@ public class ModuleDemo extends QueryModule {
    * @return resulting value
    */
   public Value value(final Value value) {
-    ValueBuilder vb = new ValueBuilder();
+    ValueBuilder vb = new ValueBuilder(queryContext);
     for(final Item item : value) {
       if(item instanceof AStr) {
         vb.add(item);
@@ -76,7 +76,7 @@ public class ModuleDemo extends QueryModule {
    * @return resulting value
    */
   public Value dbnodes(final Value value) {
-    ValueBuilder vb = new ValueBuilder();
+    ValueBuilder vb = new ValueBuilder(queryContext);
     for(final Item item : value) {
       if(item instanceof DBNode) {
         final DBNode node = (DBNode) item;

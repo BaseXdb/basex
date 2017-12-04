@@ -29,8 +29,8 @@ public final class FnInsertBefore extends StandardFunc {
       public Item next() throws QueryException {
         while(!last) {
           final boolean sub = p == 0 || --p == 0;
-          final Item i = (sub ? ins : iter).next();
-          if(i != null) return i;
+          final Item it = qc.next(sub ? ins : iter);
+          if(it != null) return it;
           if(sub) --p;
           else last = true;
         }
@@ -47,9 +47,9 @@ public final class FnInsertBefore extends StandardFunc {
 
     // prepend, append or insert new value
     final long vs = val.size(), ps = Math.min(Math.max(0, pos - 1), vs);
-    if(ps == 0)  return ValueBuilder.concat(sub, val);
-    if(ps == vs) return ValueBuilder.concat(val, sub);
-    return ((Seq) val).insertBefore(ps, sub);
+    if(ps == 0)  return ValueBuilder.concat(sub, val, qc);
+    if(ps == vs) return ValueBuilder.concat(val, sub, qc);
+    return ((Seq) val).insertBefore(ps, sub, qc);
   }
 
   @Override

@@ -15,7 +15,9 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is a parser for XML input, creating {@link Command} instances.
@@ -256,8 +258,7 @@ final class XMLParser extends CommandParser {
    */
   private boolean check(final Item root, final String... checks) throws QueryException {
     // prepare validating query
-    final ValueBuilder ma = new ValueBuilder();
-    final ValueBuilder oa = new ValueBuilder();
+    final TokenList ma = new TokenList(), oa = new TokenList();
     String t = null;
     boolean ot = true;
     boolean n = false;
@@ -270,7 +271,7 @@ final class XMLParser extends CommandParser {
         ot = o;
         n = c.charAt(0) == '<';
       } else {
-        (o ? oa : ma).add(Str.get(c));
+        (o ? oa : ma).add(c);
       }
     }
 
@@ -295,7 +296,7 @@ final class XMLParser extends CommandParser {
     }
 
     // run query
-    final Value mv = ma.value(), ov = oa.value();
+    final Value mv = StrSeq.get(ma), ov = StrSeq.get(oa);
     try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
       qp.bind("A", mv).bind("O", ov);
       if(!qp.value().isEmpty()) return true;

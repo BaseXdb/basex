@@ -2,7 +2,7 @@ package org.basex.io.parse.csv;
 
 import org.basex.build.csv.*;
 import org.basex.query.*;
-import org.basex.query.value.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -20,7 +20,7 @@ public final class CsvXQueryConverter extends CsvConverter {
   public static final Str RECORDS = Str.get("records");
 
   /** Rows. */
-  private final ValueBuilder rows = new ValueBuilder();
+  private final ItemList rows = new ItemList();
   /** Current row. */
   private ArrayBuilder row;
 

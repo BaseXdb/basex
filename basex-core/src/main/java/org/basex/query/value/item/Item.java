@@ -66,7 +66,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item reverse() {
+  public final Item reverse(final QueryContext qc) {
     return this;
   }
 
@@ -226,7 +226,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Value subSequence(final long start, final long length) {
+  public final Value subSequence(final long start, final long length, final QueryContext qc) {
     return length == 1 ? this : Empty.SEQ;
   }
 
@@ -236,7 +236,7 @@ public abstract class Item extends Value {
 
   // Overwritten by Array, FItem and ANode
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 

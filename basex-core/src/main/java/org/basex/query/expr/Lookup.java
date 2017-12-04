@@ -116,7 +116,7 @@ public final class Lookup extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     final Expr keys = exprs[0];
     final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : exprs[1].iter(qc);
 
@@ -134,9 +134,7 @@ public final class Lookup extends Arr {
         }
       } else {
         final Iter ir = keys.atomIter(qc, info);
-        for(Item key; (key = qc.next(ir)) != null;) {
-          vb.add(fit.invokeValue(qc, info, key));
-        }
+        for(Item key; (key = qc.next(ir)) != null;) vb.add(fit.invokeValue(qc, info, key));
       }
     }
     return vb.value();

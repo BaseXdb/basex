@@ -191,7 +191,7 @@ public final class Request extends QueryModule {
       if(query == null && form == null) return def;
       if(query == null) return form;
       if(form == null) return query;
-      return new ValueBuilder().add(query).add(form).value();
+      return new ValueBuilder(queryContext).add(query).add(form).value();
     } catch(final IOException ex) {
       throw new QueryException(ex);
     }

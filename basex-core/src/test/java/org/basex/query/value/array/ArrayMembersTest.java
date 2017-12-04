@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class ArrayMembersTest {
+public final class ArrayMembersTest extends ArrayTest {
   /** Random movements inside the array. */
   @Test public void randomTest() {
     for(int n = 0; n < 1_000; n++) {
@@ -23,7 +23,7 @@ public final class ArrayMembersTest {
       final ArrayList<Integer> list = new ArrayList<>(n);
       for(int i = 0; i < n; i++) {
         final int insPos = rng.nextInt(i + 1);
-        arr = arr.insertBefore(insPos, Int.get(i));
+        arr = arr.insertBefore(insPos, Int.get(i), qc);
         list.add(insPos, i);
       }
 

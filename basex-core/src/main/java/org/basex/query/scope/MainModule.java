@@ -96,10 +96,10 @@ public final class MainModule extends Module {
     final int fp = vs.enter(qc);
     try {
       final Iter iter = expr.iter(qc);
-      final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
-      for(Item it; (it = qc.next(iter)) != null;) cache.add(it);
-      if(declType != null) declType.treat(cache.value(), null, info);
-      return cache;
+      final ItemList items = new ItemList(iter.size());
+      for(Item it; (it = qc.next(iter)) != null;) items.add(it);
+      if(declType != null) declType.treat(items.value(), null, info, qc);
+      return items;
     } finally {
       VarScope.exit(fp, qc);
     }
@@ -119,7 +119,7 @@ public final class MainModule extends Module {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Item it = iter.next();
+        final Item it = qc.next(iter);
         if(it == null) VarScope.exit(fp, qc);
         return it;
       }

@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.DataFTBuilder.DataFTMarker;
 import org.basex.query.util.ft.*;
@@ -22,6 +23,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DataBuilder {
+  /** Query context. */
+  private final QueryContext qc;
   /** Target data instance. */
   private final MemData data;
   /** Full-text result builder. */
@@ -30,9 +33,11 @@ public final class DataBuilder {
   /**
    * Constructor.
    * @param data target data
+   * @param qc query context (can be {@code null})
    */
-  public DataBuilder(final MemData data) {
+  public DataBuilder(final MemData data, final QueryContext qc) {
     this.data = data;
+    this.qc = qc;
   }
 
   /**
@@ -73,6 +78,7 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addNode(final ANode node, final int pre, final int par) {
+    if(qc != null) qc.checkStop();
     switch(node.nodeType()) {
       case DOC: return addDoc(node, pre);
       case ELM: return addElem(node, pre, par);
@@ -263,7 +269,7 @@ public final class DataBuilder {
     if(node.type != NodeType.ELM && node.type != NodeType.DOC) return node;
 
     final MemData data = new MemData(ctx.options);
-    final DataBuilder db = new DataBuilder(data);
+    final DataBuilder db = new DataBuilder(data, null);
     db.build(node);
 
     // flag indicating if namespace should be completely removed

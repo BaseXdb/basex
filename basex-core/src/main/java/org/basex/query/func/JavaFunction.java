@@ -150,7 +150,7 @@ public abstract class JavaFunction extends Arr {
     }
     // any other array (also nested ones)
     final Object[] objs = (Object[]) obj;
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final Object o : objs) vb.add(toValue(o, qc, sc));
     return vb.value();
   }

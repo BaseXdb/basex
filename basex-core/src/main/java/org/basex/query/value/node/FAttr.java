@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -71,7 +72,7 @@ public final class FAttr extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options) {
+  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
     return new FAttr(name, value).parent(parent);
   }
 

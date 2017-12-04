@@ -35,7 +35,7 @@ import org.basex.util.list.*;
  */
 public final class HttpPayload {
   /** Payloads (may be {@code null}). */
-  private final ValueBuilder payloads;
+  private final ItemList payloads;
   /** Input stream. */
   private final InputStream input;
   /** Input info. */
@@ -56,7 +56,7 @@ public final class HttpPayload {
     this.input = input;
     this.info = info;
     this.options = options;
-    payloads = body ? new ValueBuilder() : null;
+    payloads = body ? new ItemList() : null;
   }
 
   /**
@@ -279,12 +279,12 @@ public final class HttpPayload {
             final Map map = val instanceof Map ? (Map) val : Map.EMPTY;
             final Str file = Str.get(filename);
             final B64 contents = B64.get(cont.next());
-            final Value files = new ValueBuilder().add(map.get(file, info)).add(contents).value();
+            final Value files = new ItemList().add(map.get(file, info)).add(contents).value();
             val = map.put(file, files, info);
           } else {
             // assign string, join multiple strings
             final Str v = Str.get(cont.next());
-            val = val == null ? v : new ValueBuilder().add(val).add(v).value();
+            val = val == null ? v : new ItemList().add(val).add(v).value();
           }
 
           if(!name.isEmpty()) data.put(name, val);

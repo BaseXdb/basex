@@ -81,7 +81,7 @@ public enum ListType implements Type {
       final InputInfo info) throws QueryException {
 
     final byte[][] values = split(normalize(item.string(info)), ' ');
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final byte[] v : values) vb.add(type.cast(Str.get(v), qc, sc, info));
     return vb.value();
   }

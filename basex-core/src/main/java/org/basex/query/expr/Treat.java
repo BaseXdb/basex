@@ -52,7 +52,7 @@ public final class Treat extends Single {
     if(st.zeroOrOne()) {
       final Item n = iter.next();
       if(n != null) {
-        final ValueBuilder vb = new ValueBuilder().add(it).add(n);
+        final ValueBuilder vb = new ValueBuilder(qc).add(it).add(n);
         if(iter.next() != null) vb.add(Str.get(DOTS));
         throw NOTREAT_X_X_X.get(info, expr.seqType(), st, vb.value());
       }
@@ -96,6 +96,7 @@ public final class Treat extends Single {
     }
 
     for(long i = 0; i < len; i++) {
+      qc.checkStop();
       final Item it = val.itemAt(i);
       if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
     }

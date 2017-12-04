@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -85,9 +86,9 @@ public final class HTTPParams {
     if(values == null) {
       values = new HashMap<>();
       stringMap().forEach((key, value) -> {
-        final ValueBuilder vb = new ValueBuilder();
-        for(final String v : value) vb.add(new Atm(v));
-        values.put(key, vb.value());
+        final ItemList list = new ItemList();
+        for(final String v : value) list.add(new Atm(v));
+        values.put(key, list.value());
       });
     }
     return values;
@@ -134,7 +135,12 @@ public final class HTTPParams {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
         final Atm i = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
-        map.merge(parts[0], i, (v1, v2) -> { return new ValueBuilder().add(v1).add(v2).value(); });
+        map.merge(parts[0], i, (v1, v2) -> {
+          final ItemList list = new ItemList();
+          for(final Item item : v1) list.add(item);
+          for(final Item item : v2) list.add(item);
+          return list.value();
+        });
       }
     }
   }

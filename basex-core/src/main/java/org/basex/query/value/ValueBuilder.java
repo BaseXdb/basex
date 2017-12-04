@@ -2,6 +2,7 @@ package org.basex.query.value;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
@@ -20,20 +21,31 @@ public final class ValueBuilder {
   private Value firstValue;
   /** Underlying sequence builder, only instantiated if there are at least two items. */
   private TreeSeqBuilder builder;
+  /** QueryContext qc. */
+  private QueryContext qc;
+
+  /**
+   * Constructor.
+   * @param qc query context
+   */
+  public ValueBuilder(final QueryContext qc) {
+    this.qc = qc;
+  }
 
   /**
    * Concatenates two values.
    * @param v1 first value to concatenate
    * @param v2 second value to concatenate
+   * @param qc query context
    * @return value which contains all items of {@code v1} followed by all items of {@code v2}
    */
-  public static Value concat(final Value v1, final Value v2) {
+  public static Value concat(final Value v1, final Value v2, final QueryContext qc) {
     final long s1 = v1.size();
     if(s1 == 0) return v2;
     final long s2 = v2.size();
     if(s2 == 0) return v1;
-    if(s1 > 1) return ((Seq) v1).insertBefore(s1, v2);
-    if(s2 > 1) return ((Seq) v2).insert(0, (Item) v1);
+    if(s1 > 1) return ((Seq) v1).insertBefore(s1, v2, qc);
+    if(s2 > 1) return ((Seq) v2).insert(0, (Item) v1, qc);
     return TreeSeqBuilder.value(new Item[] { (Item) v1, (Item) v2 }, 2, null);
   }
 
@@ -54,13 +66,36 @@ public final class ValueBuilder {
    * @return reference to this builder for convenience
    */
   public ValueBuilder addFront(final Item item) {
+    qc.checkStop();
     final TreeSeqBuilder tree = builder;
     if(tree != null) {
       tree.addFront(item);
     } else {
       final Value first = firstValue;
       if(first != null) {
-        builder = new TreeSeqBuilder().add(first).addFront(item);
+        builder = new TreeSeqBuilder().add(first, qc).addFront(item);
+        firstValue = null;
+      } else {
+        firstValue = item;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Appends an item to the end of the built value.
+   * @param item value to append
+   * @return reference to this builder for convenience
+   */
+  public ValueBuilder add(final Item item) {
+    qc.checkStop();
+    final TreeSeqBuilder tree = builder;
+    if(tree != null) {
+      tree.add(item);
+    } else {
+      final Value first = firstValue;
+      if(first != null) {
+        builder = new TreeSeqBuilder().add(first, qc).add(item);
         firstValue = null;
       } else {
         firstValue = item;
@@ -75,15 +110,16 @@ public final class ValueBuilder {
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Value value) {
+    qc.checkStop();
     if(value.isEmpty()) return this;
 
     final TreeSeqBuilder tree = builder;
     if(tree != null) {
-      tree.add(value);
+      tree.add(value, qc);
     } else {
       final Value first = firstValue;
       if(first != null) {
-        builder = new TreeSeqBuilder().add(first).add(value);
+        builder = new TreeSeqBuilder().add(first, qc).add(value, qc);
         firstValue = null;
       } else {
         firstValue = value;

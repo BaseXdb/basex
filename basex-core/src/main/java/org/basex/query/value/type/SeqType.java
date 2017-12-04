@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -327,8 +328,9 @@ public final class SeqType {
     if(value.isEmpty()) return Empty.SEQ;
     if(value instanceof Item) return cast((Item) value, qc, sc, ii, true);
 
-    final ValueBuilder vb = new ValueBuilder();
-    for(final Item it : value) vb.add(cast(it, qc, sc, ii, true));
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final BasicIter<?> iter = value.iter();
+    for(Item it; (it = qc.next(iter)) != null;) vb.add(cast(it, qc, sc, ii, true));
     return vb.value();
   }
 
@@ -337,9 +339,10 @@ public final class SeqType {
    * @param value value to be checked
    * @param name name of variable (can be {@code null})
    * @param ii input info
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public void treat(final Value value, final QNm name, final InputInfo ii)
+  public void treat(final Value value, final QNm name, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
     if(value.seqType().instanceOf(this)) return;
@@ -353,8 +356,12 @@ public final class SeqType {
     boolean ins = instance(value.itemAt(0));
 
     // check heterogeneous sequences
-    if(!value.homogeneous())
-      for(int i = 1; ins && i < size; i++) ins = instance(value.itemAt(i));
+    if(!value.homogeneous()) {
+      for(int i = 1; ins && i < size; i++) {
+        qc.checkStop();
+        ins = instance(value.itemAt(i));
+      }
+    }
     if(!ins) throw typeError(value, this, name, ii);
   }
 
@@ -372,19 +379,20 @@ public final class SeqType {
   public Value promote(final Value value, final QNm name, final QueryContext qc,
       final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
-    final int n = (int) value.size();
-    if(!occ.check(n)) throw typeError(value, this, name, ii);
-    if(n == 0) return Empty.SEQ;
+    final long sz = value.size();
+    if(!occ.check(sz)) throw typeError(value, this, name, ii);
+    if(sz == 0) return Empty.SEQ;
 
     ItemList cache = null;
-    for(int i = 0; i < n; i++) {
+    for(long i = 0; i < sz; i++) {
+      qc.checkStop();
       final Item it = value.itemAt(i);
       if(instance(it)) {
         if(i == 0 && value.homogeneous()) return value;
         if(cache != null) cache.add(it);
       } else {
         if(cache == null) {
-          cache = new ItemList(n);
+          cache = new ItemList(sz);
           for(int j = 0; j < i; j++) cache.add(value.itemAt(j));
         }
         promote(it, name, cache, qc, sc, ii, opt);
@@ -408,19 +416,21 @@ public final class SeqType {
       final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
-      for(final Item atom : item.atomValue(ii)) {
-        final Type tp = atom.type;
+      final Iter iter = item.atomValue(qc, ii).iter();
+      for(Item it; (it = qc.next(iter)) != null;) {
+        final Type tp = it.type;
         if(tp.instanceOf(type)) {
-          cache.add(atom);
+          cache.add(it);
         } else if(tp == AtomType.ATM) {
           if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
-          for(final Item it : type.cast(atom, qc, sc, ii)) cache.add(it);
+          final Iter iter2 = type.cast(it, qc, sc, ii).iter();
+          for(Item it2; (it2 = qc.next(iter2)) != null;) cache.add(it2);
         } else if(type == AtomType.DBL && (tp == AtomType.FLT || tp.instanceOf(AtomType.DEC))) {
-          cache.add(Dbl.get(atom.dbl(ii)));
+          cache.add(Dbl.get(it.dbl(ii)));
         } else if(type == AtomType.FLT && tp.instanceOf(AtomType.DEC)) {
-          cache.add(Flt.get(atom.flt(ii)));
-        } else if(type == AtomType.STR && atom instanceof Uri) {
-          cache.add(Str.get(atom.string(ii)));
+          cache.add(Flt.get(it.flt(ii)));
+        } else if(type == AtomType.STR && it instanceof Uri) {
+          cache.add(Str.get(it.string(ii)));
         } else {
           throw typeError(item, with(Occ.ONE), name, ii);
         }

@@ -30,6 +30,25 @@ public final class ItemList extends ObjectList<Item, ItemList> {
   }
 
   /**
+   * Constructor, specifying an initial array capacity.
+   * @param capacity array capacity (can be negative)
+   * @throws QueryException query exception
+   */
+  public ItemList(final long capacity) throws QueryException {
+    this(ValueList.capacity(capacity));
+  }
+
+  /**
+   * Adds all items of a value to the array.
+   * @param value value to be added
+   * @return self reference
+   */
+  public ItemList add(final Value value) {
+    for(final Item item : value) add(item);
+    return this;
+  }
+
+  /**
    * Returns a value containing the items in this list.
    * @return the value
    */

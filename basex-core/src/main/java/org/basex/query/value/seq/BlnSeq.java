@@ -38,7 +38,7 @@ public final class BlnSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final boolean[] tmp = new boolean[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];

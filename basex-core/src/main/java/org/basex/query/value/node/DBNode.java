@@ -219,15 +219,15 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode dbNodeCopy(final MainOptions opts) {
+  public final DBNode dbNodeCopy(final MainOptions opts, final QueryContext qc) {
     final MemData md = new MemData(opts);
-    new DataBuilder(md).build(this);
+    new DataBuilder(md, qc).build(this);
     return new DBNode(md).parent(parent);
   }
 
   @Override
-  public final DBNode deepCopy(final MainOptions options) {
-    return dbNodeCopy(options);
+  public final DBNode deepCopy(final MainOptions options, final QueryContext qc) {
+    return dbNodeCopy(options, qc);
   }
 
   @Override
@@ -493,6 +493,6 @@ public class DBNode extends ANode {
 
   @Override
   public final BXNode toJava() {
-    return BXNode.get(deepCopy(new MainOptions()));
+    return BXNode.get(deepCopy(new MainOptions(), null));
   }
 }

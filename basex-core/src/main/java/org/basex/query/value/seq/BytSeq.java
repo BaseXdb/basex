@@ -38,7 +38,7 @@ public final class BytSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final byte[] tmp = new byte[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];

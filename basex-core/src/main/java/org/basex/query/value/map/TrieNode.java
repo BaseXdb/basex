@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -32,20 +33,20 @@ abstract class TrieNode {
     boolean contains(final int h, final Item k, final int l, final InputInfo ii) { return false; }
     @Override
     TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge,
-        final InputInfo ii) { return o; }
+        final InputInfo ii, final QueryContext qc) { return o; }
     @Override
     TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge,
-        final InputInfo ii) { return o; }
+        final InputInfo ii, final QueryContext qc) { return o; }
     @Override
     TrieNode add(final TrieList o, final int l, final MergeDuplicates merge,
-        final InputInfo ii) { return o; }
+        final InputInfo ii, final QueryContext qc) { return o; }
     @Override
     TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge,
-        final InputInfo ii) { return o; }
+        final InputInfo ii, final QueryContext qc) { return o; }
     @Override
     boolean verify() { return true; }
     @Override
-    void keys(final ValueBuilder ks) { }
+    void keys(final ItemList ks) { }
     @Override
     void values(final ValueBuilder vs) { }
     @Override
@@ -131,22 +132,24 @@ abstract class TrieNode {
    * @param lvl level
    * @param merge merge duplicates
    * @param ii input info
+   * @param qc query context
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode addAll(TrieNode o, int lvl, MergeDuplicates merge, InputInfo ii)
-      throws QueryException;
+  abstract TrieNode addAll(TrieNode o, int lvl, MergeDuplicates merge, InputInfo ii,
+      QueryContext qc) throws QueryException;
 
   /**
    * Add a leaf to this node if the key isn't already used.
    * @param o leaf to insert
    * @param lvl level
-   * @param ii input info
    * @param merge merge duplicates
+   * @param ii input info
+   * @param qc query context
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(TrieLeaf o, int lvl, MergeDuplicates merge, InputInfo ii)
+  abstract TrieNode add(TrieLeaf o, int lvl, MergeDuplicates merge, InputInfo ii, QueryContext qc)
       throws QueryException;
 
   /**
@@ -155,11 +158,12 @@ abstract class TrieNode {
    * @param lvl level
    * @param merge merge duplicates
    * @param ii input info
+   * @param qc query context
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(TrieList o, int lvl, MergeDuplicates merge, InputInfo ii)
-      throws QueryException;
+  abstract TrieNode add(TrieList o, int lvl, MergeDuplicates merge, InputInfo ii,
+      QueryContext qc) throws QueryException;
 
   /**
    * Add all bindings of the given branch to this node for which the key isn't
@@ -168,11 +172,12 @@ abstract class TrieNode {
    * @param lvl level
    * @param merge merge duplicates
    * @param ii input info
+   * @param qc query context
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(TrieBranch o, int lvl, MergeDuplicates merge, InputInfo ii)
-      throws QueryException;
+  abstract TrieNode add(TrieBranch o, int lvl, MergeDuplicates merge, InputInfo ii,
+      QueryContext qc) throws QueryException;
 
   /**
    * Verifies the tree.
@@ -184,7 +189,7 @@ abstract class TrieNode {
    * Collects all keys in this subtree.
    * @param ks key cache
    */
-  abstract void keys(ValueBuilder ks);
+  abstract void keys(ItemList ks);
 
   /**
    * Collects all values in this subtree.

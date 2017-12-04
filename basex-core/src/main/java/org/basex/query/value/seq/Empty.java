@@ -82,7 +82,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Empty subSequence(final long start, final long length) {
+  public Empty subSequence(final long start, final long length, final QueryContext qc) {
     return this;
   }
 
@@ -112,7 +112,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     return this;
   }
 
@@ -125,7 +125,7 @@ public final class Empty extends Value {
   public void materialize(final InputInfo ii) { }
 
   @Override
-  public Value atomValue(final InputInfo ii) {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 

@@ -2,6 +2,8 @@ package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
+import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -42,8 +44,6 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @return the value
    */
   public static Seq value(final Item[] items, final int n, final Type type) {
-    if(n < 2) throw new AssertionError("At least 2 items expected");
-
     if(n <= TreeSeq.MAX_SMALL) {
       final Item[] small = new Item[n];
       System.arraycopy(items, 0, small, 0, n);
@@ -125,14 +125,19 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   /**
    * Appends the items of the given value to this builder.
    * @param val value to append
+   * @param qc query context
    * @return this builder for convenience
    */
-  public TreeSeqBuilder add(final Value val) {
+  public TreeSeqBuilder add(final Value val, final QueryContext qc) {
     // shortcut for adding single items
     if(val instanceof Item) return add((Item) val);
 
     if(!(val instanceof BigSeq)) {
-      for(final Item it : val) add(it);
+      final BasicIter<?> iter = val.iter();
+      for(Item it; (it = iter.next()) != null;) {
+        qc.checkStop();
+        add(it);
+      }
       return this;
     }
 
@@ -140,8 +145,14 @@ public final class TreeSeqBuilder implements Iterable<Item> {
     final Item[] ls = big.left, rs = big.right;
     final FingerTree<Item, Item> midTree = big.middle;
     if(midTree.isEmpty()) {
-      for(final Item l : ls) add(l);
-      for(final Item r : rs) add(r);
+      for(final Item l : ls) {
+        qc.checkStop();
+        add(l);
+      }
+      for(final Item r : rs) {
+        qc.checkStop();
+        add(r);
+      }
       return this;
     }
 
@@ -159,9 +170,18 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
       inLeft = inRight = 0;
       tree.append(midTree);
-      for(int i = ls.length; --i >= 0;) addFront(ls[i]);
-      for(int i = k; --i >= 0;) addFront(temp[i]);
-      for(final Item r : rs) add(r);
+      for(int i = ls.length; --i >= 0;) {
+        qc.checkStop();
+        addFront(ls[i]);
+      }
+      for(int i = k; --i >= 0;) {
+        qc.checkStop();
+        addFront(temp[i]);
+      }
+      for(final Item r : rs) {
+        qc.checkStop();
+        add(r);
+      }
       return this;
     }
 
@@ -180,7 +200,10 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
     tree.append(midTree);
     inRight = 0;
-    for(final Item r : rs) add(r);
+    for(final Item r : rs) {
+      qc.checkStop();
+      add(r);
+    }
     return this;
   }
 
@@ -198,11 +221,8 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @return resulting sequence
    */
   public Seq seq(final Type type) {
-    final int n = inLeft + inRight;
-    final int start = (mid - inLeft + CAP) % CAP;
-    if(n < 2) throw new AssertionError("At least 2 items expected");
-
     // small int array, fill directly
+    final int n = inLeft + inRight, start = (mid - inLeft + CAP) % CAP;
     if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), type);
 
     // deep array
@@ -231,7 +251,6 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
   @Override
   public Iterator<Item> iterator() {
-
     return new Iterator<Item>() {
       private int pos = -inLeft;
       private Iterator<Item> sub;
@@ -243,8 +262,6 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
       @Override
       public Item next() {
-        if(pos > inRight) throw new NoSuchElementException();
-
         if(pos < 0) {
           final int p = pos++;
           return vals[(mid + p + CAP) % CAP];
@@ -264,7 +281,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
       @Override
       public void remove() {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
     };
   }

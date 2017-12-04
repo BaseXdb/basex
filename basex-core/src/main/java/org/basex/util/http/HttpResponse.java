@@ -8,6 +8,7 @@ import java.net.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -60,7 +61,7 @@ public final class HttpResponse {
     }
 
     // result
-    final ValueBuilder res = new ValueBuilder();
+    final ItemList res = new ItemList();
 
     // construct <http:response/>
     final FElem response = new FElem(Q_RESPONSE).declareNS();

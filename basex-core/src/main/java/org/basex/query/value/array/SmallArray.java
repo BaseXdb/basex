@@ -2,6 +2,7 @@ package org.basex.query.value.array;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
 
@@ -54,18 +55,11 @@ final class SmallArray extends Array {
 
   @Override
   public Value get(final long index) {
-    // index to small?
-    if(index < 0) throw new IndexOutOfBoundsException("Index < 0: " + index);
-
-    // index too big?
-    if(index >= elems.length) throw new IndexOutOfBoundsException(index + " >= " + elems.length);
-
     return elems[(int) index];
   }
 
   @Override
   public Array put(final long pos, final Value val) {
-    if(pos < 0 || pos >= elems.length) throw new IndexOutOfBoundsException(Long.toString(pos));
     final Value[] values = elems.clone();
     values[(int) pos] = val;
     return new SmallArray(values);
@@ -109,7 +103,8 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public Array reverseArray() {
+  public Array reverseArray(final QueryContext qc) {
+    qc.checkStop();
     final int n = elems.length;
     if(n == 1) return this;
     final Value[] es = new Value[n];
@@ -118,10 +113,8 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value val) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos > elems.length) throw new IndexOutOfBoundsException("position too big: " + pos);
-
+  public Array insertBefore(final long pos, final Value val, final QueryContext qc) {
+    qc.checkStop();
     final int p = (int) pos, n = elems.length;
     final Value[] out = new Value[n + 1];
     System.arraycopy(elems, 0, out, 0, p);
@@ -133,9 +126,8 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public Array remove(final long pos) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos >= elems.length) throw new IndexOutOfBoundsException("position too big: " + pos);
+  public Array remove(final long pos, final QueryContext qc) {
+    qc.checkStop();
     final int p = (int) pos, n = elems.length;
     if(n == 1) return empty();
 
@@ -146,13 +138,8 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public Array subArray(final long pos, final long len) {
-    if(pos < 0) throw new IndexOutOfBoundsException("first index < 0: " + pos);
-    if(len < 0) throw new IndexOutOfBoundsException("length < 0: " + len);
-    if(pos + len > elems.length)
-      throw new IndexOutOfBoundsException("end out of bounds: "
-          + (pos + len) + " > " + elems.length);
-
+  public Array subArray(final long pos, final long len, final QueryContext qc) {
+    qc.checkStop();
     final int p = (int) pos, n = (int) len;
     return n == 0 ? Array.empty() : new SmallArray(slice(elems, p, p + n));
   }
@@ -174,7 +161,6 @@ final class SmallArray extends Array {
 
       @Override
       public Value next() {
-        if(index >= elems.length) throw new NoSuchElementException();
         return elems[index++];
       }
 
@@ -190,23 +176,22 @@ final class SmallArray extends Array {
 
       @Override
       public Value previous() {
-        if(index <= 0) throw new NoSuchElementException();
         return elems[--index];
       }
 
       @Override
       public void set(final Value e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void add(final Value e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void remove() {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
     };
   }

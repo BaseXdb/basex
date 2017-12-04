@@ -2,8 +2,10 @@ package org.basex.query.value.array;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * An array containing more elements than fit into a {@link SmallArray}.
@@ -204,15 +206,9 @@ final class BigArray extends Array {
 
   @Override
   public Value get(final long index) {
-    // index to small?
-    if(index < 0) throw new IndexOutOfBoundsException("Index < 0: " + index);
-
-    // index too big?
-    final long midSize = left.length + middle.size(), size = midSize + right.length;
-    if(index >= size) throw new IndexOutOfBoundsException(index + " >= " + size);
-
     // index in one of the digits?
     if(index < left.length) return left[(int) index];
+    final long midSize = left.length + middle.size();
     if(index >= midSize) return right[(int) (index - midSize)];
 
     // the element is in the middle tree
@@ -221,7 +217,6 @@ final class BigArray extends Array {
 
   @Override
   public Array put(final long pos, final Value val) {
-    if(pos < 0) throw new IndexOutOfBoundsException(Long.toString(pos));
     long p = pos;
     if(p < left.length) {
       final Value[] newLeft = left.clone();
@@ -236,28 +231,24 @@ final class BigArray extends Array {
     }
     p -= m;
 
-    if(p < right.length) {
-      final Value[] newRight = right.clone();
-      newRight[(int) p] = val;
-      return new BigArray(left, middle, newRight);
-    }
-    throw new IndexOutOfBoundsException(pos + " > " + arraySize());
+    final Value[] newRight = right.clone();
+    newRight[(int) p] = val;
+    return new BigArray(left, middle, newRight);
   }
 
   @Override
-  public Array reverseArray() {
+  public Array reverseArray(final QueryContext qc) {
+    qc.checkStop();
     final int l = left.length, r = right.length;
     final Value[] newLeft = new Value[r], newRight = new Value[l];
     for(int i = 0; i < r; i++) newLeft[i] = right[r - 1 - i];
     for(int i = 0; i < l; i++) newRight[i] = left[l - 1 - i];
-    return new BigArray(newLeft, middle.reverse(), newRight);
+    return new BigArray(newLeft, middle.reverse(qc), newRight);
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value val) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos > arraySize()) throw new IndexOutOfBoundsException("position too big: " + pos);
-
+  public Array insertBefore(final long pos, final Value val, final QueryContext qc) {
+    qc.checkStop();
     final int l = left.length;
     if(pos <= l) {
       final int p = (int) pos;
@@ -272,7 +263,7 @@ final class BigArray extends Array {
     }
 
     final long midSize = middle.size();
-    if(pos - l < midSize) return new BigArray(left, middle.insert(pos - l, val), right);
+    if(pos - l < midSize) return new BigArray(left, middle.insert(pos - l, val, qc), right);
 
     final int r = right.length;
     final int p = (int) (pos - l - midSize);
@@ -287,10 +278,8 @@ final class BigArray extends Array {
   }
 
   @Override
-  public Array remove(final long pos) {
-    if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
-    if(pos >= arraySize()) throw new IndexOutOfBoundsException("position too big: " + pos);
-
+  public Array remove(final long pos, final QueryContext qc) {
+    qc.checkStop();
     if(pos < left.length) {
       // delete from left digit
       final int p = (int) pos, l = left.length;
@@ -381,7 +370,7 @@ final class BigArray extends Array {
     }
 
     // delete in middle tree
-    final TreeSlice<Value, Value> slice = middle.remove(pos - left.length);
+    final TreeSlice<Value, Value> slice = middle.remove(pos - left.length, qc);
 
     if(slice.isTree()) {
       // middle tree did not underflow
@@ -420,14 +409,11 @@ final class BigArray extends Array {
   }
 
   @Override
-  public Array subArray(final long pos, final long len) {
-    if(pos < 0) throw new IndexOutOfBoundsException("first index < 0: " + pos);
-    if(len < 0) throw new IndexOutOfBoundsException("length < 0: " + len);
-    final long midSize = middle.size(), size = left.length + midSize + right.length;
-    if(len > size - pos)
-      throw new IndexOutOfBoundsException("end out of bounds: " + (pos + len) + " > " + size);
+  public Array subArray(final long pos, final long len, final QueryContext qc) {
+    qc.checkStop();
 
     // the easy cases
+    final long midSize = middle.size(), size = left.length + midSize + right.length;
     if(len == 0) return Array.empty();
     if(len == size) return this;
 
@@ -592,7 +578,6 @@ final class BigArray extends Array {
 
       @Override
       public Value next() {
-        if(pos > r) throw new NoSuchElementException();
         if(pos < 0) {
           // in left digit
           return ls[l + pos++];
@@ -622,7 +607,6 @@ final class BigArray extends Array {
 
       @Override
       public Value previous() {
-        if(pos <= -l) throw new NoSuchElementException();
         if(pos > 0) {
           // in right digit
           if(--pos > 0) return rs[pos - 1];
@@ -641,17 +625,17 @@ final class BigArray extends Array {
 
       @Override
       public void add(final Value e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void set(final Value e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void remove() {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
     };
   }

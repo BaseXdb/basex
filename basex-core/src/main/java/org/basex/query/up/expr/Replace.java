@@ -56,7 +56,7 @@ public final class Replace extends Update {
     final Type tp = it.type;
     if(!(it instanceof ANode) || tp == NodeType.DOC) throw UPTRGNODE_X.get(info, it);
     final Item i2 = iter.next();
-    if(i2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(it, i2));
+    if(i2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(it, i2, qc));
     final ANode targ = (ANode) it;
     final Updates updates = qc.updates();
     final DBNode dbn = updates.determineDataRef(targ, qc);

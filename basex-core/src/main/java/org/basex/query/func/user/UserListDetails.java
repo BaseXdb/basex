@@ -27,7 +27,7 @@ public final class UserListDetails extends UserList {
   public Value value(final QueryContext qc) throws QueryException {
     final Context ctx = qc.context;
     final User u = exprs.length > 0 ? toUser(0, qc) : null;
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final User us : u != null ? Collections.singletonList(u) : ctx.users.users(null, ctx)) {
       final String perm = us.perm((String) null).toString();
       final FElem user = new FElem(USER).add(NAME, us.name()).add(PERMISSION, perm);

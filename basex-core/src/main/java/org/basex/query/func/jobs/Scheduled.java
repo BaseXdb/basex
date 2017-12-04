@@ -222,11 +222,11 @@ public final class Scheduled extends Job implements Runnable {
   static Value copy(final Iter iter, final Context ctx, final QueryContext qc)
       throws QueryException {
 
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(Item it; (it = qc.next(iter)) != null;) {
       if(it instanceof FItem) throw BASEX_FUNCTION_X.get(null, it);
       final Data data = it.data();
-      if(data != null && !data.inMemory()) it = ((DBNode) it).dbNodeCopy(ctx.options);
+      if(data != null && !data.inMemory()) it = ((DBNode) it).dbNodeCopy(ctx.options, qc);
       vb.add(it);
     }
     return vb.value();

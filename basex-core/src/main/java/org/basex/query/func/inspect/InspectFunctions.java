@@ -45,7 +45,7 @@ public final class InspectFunctions extends StandardFunc {
       }
     }
 
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : qc.funcs.funcs()) {
       if(old.contains(sf)) continue;
       final FuncItem fi = Functions.getUser(sf, qc, sf.sc, info);

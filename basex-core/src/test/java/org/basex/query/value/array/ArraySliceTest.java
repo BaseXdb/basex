@@ -4,17 +4,18 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests the {@link Array#subArray(long, long)} method.
+ * Tests the {@link Array#subArray(long, long, QueryContext)} method.
  *
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class ArraySliceTest {
+public final class ArraySliceTest extends ArrayTest {
   /** Exhaustively tests creating sub-arrays of arrays of a range of lengths. */
   @Test
   public void testSlice() {
@@ -23,7 +24,7 @@ public final class ArraySliceTest {
       assertEquals(len, arr.arraySize());
       for(int pos = 0; pos < len; pos++) {
         for(int k = 0; k <= len - pos; k++) {
-          final Array sub = arr.subArray(pos, k);
+          final Array sub = arr.subArray(pos, k, qc);
           assertEquals(k, sub.arraySize());
           sub.checkInvariants();
           final Iterator<Value> iter = sub.iterator(0);

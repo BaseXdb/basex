@@ -87,7 +87,7 @@ abstract class ContextModifier {
     for(final DataUpdates up : dbUpdates.values()) {
       // create temporary mem data instance if not available yet
       if(memData == null) memData = new MemData(qc.context.options);
-      up.prepare(memData);
+      up.prepare(memData, qc);
       datas.add(up.data());
     }
     for(final NameUpdates up : nameUpdates.values()) up.prepare();

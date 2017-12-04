@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -134,15 +135,16 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
-    return o.add(this, l, merge, ii);
+  TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
+    return o.add(this, l, merge, ii, qc);
   }
 
   @Override
-  TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
+    qc.checkStop();
     if(hash == o.hash) {
       for(int i = keys.length; i-- > 0;) {
         if(o.key.sameKey(keys[i], ii)) {
@@ -156,7 +158,7 @@ final class TrieList extends TrieNode {
               return this;
             case COMBINE:
               final Value[] cm = values.clone();
-              cm[i] = ValueBuilder.concat(o.value, cm[i]);
+              cm[i] = ValueBuilder.concat(o.value, cm[i], qc);
               return new TrieList(hash, keys, cm);
             default:
               throw MERGE_DUPLICATE_X.get(ii, o.key);
@@ -172,7 +174,7 @@ final class TrieList extends TrieNode {
 
     // same key? add recursively
     if(k == ok) {
-      ch[k] = add(o, l + 1, merge, ii);
+      ch[k] = add(o, l + 1, merge, ii, qc);
       nu = 1 << k;
     } else {
       ch[k] = this;
@@ -184,9 +186,10 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieList o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final TrieList o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
+    qc.checkStop();
     if(hash == o.hash) {
       Item[] ks = keys;
       Value[] vs = values;
@@ -209,7 +212,7 @@ final class TrieList extends TrieNode {
 
     // same key? add recursively
     if(k == ok) {
-      ch[k] = add(o, l + 1, merge, ii);
+      ch[k] = add(o, l + 1, merge, ii, qc);
       nu = 1 << k;
     } else {
       ch[k] = this;
@@ -220,13 +223,13 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
     final int k = key(hash, l);
     final TrieNode[] ch = o.copyKids();
     final TrieNode old = ch[k];
-    ch[k] = old == null ? this : old.addAll(this, l + 1, merge, ii);
+    ch[k] = old == null ? this : old.addAll(this, l + 1, merge, ii, qc);
     return new TrieBranch(ch, o.used | 1 << k, o.size + size - (old != null ? old.size : 0));
   }
 
@@ -246,13 +249,13 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  void keys(final ValueBuilder ks) {
-    for(final Item k : keys) ks.add(k);
+  void keys(final ItemList ks) {
+    for(final Item key : keys) ks.add(key);
   }
 
   @Override
   void values(final ValueBuilder vs) {
-    for(final Value v : values) vs.add(v);
+    for(final Value value : values) vs.add(value);
   }
 
   @Override

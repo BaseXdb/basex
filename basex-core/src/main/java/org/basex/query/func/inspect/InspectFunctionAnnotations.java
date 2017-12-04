@@ -19,7 +19,7 @@ public final class InspectFunctionAnnotations extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Map map = Map.EMPTY;
     for(final Ann ann : toFunc(exprs[0], qc).annotations()) {
-      final ValueBuilder vb = new ValueBuilder();
+      final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item it : ann.args()) vb.add(it);
       map = map.put(ann.name(), vb.value(), info);
     }

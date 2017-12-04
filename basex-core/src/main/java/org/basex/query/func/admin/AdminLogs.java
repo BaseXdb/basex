@@ -32,7 +32,7 @@ public final class AdminLogs extends AdminFn {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
 
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     if(exprs.length == 0) {
       // return list of all log files
       for(final IOFile f : qc.context.log.files()) {

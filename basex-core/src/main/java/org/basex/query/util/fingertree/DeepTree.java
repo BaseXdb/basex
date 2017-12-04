@@ -1,5 +1,7 @@
 package org.basex.query.util.fingertree;
 
+import org.basex.query.*;
+
 /**
  * A <i>deep</i> node containing elements in the left and right digit and a sub-tree in
  * the middle.
@@ -242,13 +244,14 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> reverse() {
+  public FingerTree<N, E> reverse(final QueryContext qc) {
+    qc.checkStop();
     final int l = left.length, r = right.length;
     @SuppressWarnings("unchecked")
     final Node<N, E>[] newLeft = new Node[r], newRight = new Node[l];
     for(int i = 0; i < r; i++) newLeft[i] = right[r - 1 - i].reverse();
     for(int i = 0; i < l; i++) newRight[i] = left[l - 1 - i].reverse();
-    return new DeepTree<>(newLeft, rightSize(), middle.reverse(), newRight, size);
+    return new DeepTree<>(newLeft, rightSize(), middle.reverse(qc), newRight, size);
   }
 
   @Override
@@ -285,7 +288,8 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> insert(final long pos, final E val) {
+  public FingerTree<N, E> insert(final long pos, final E val, final QueryContext qc) {
+    qc.checkStop();
     if(pos <= leftSize) {
       // insert into left digit
       int i = 0;
@@ -332,7 +336,8 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
     long p = pos - leftSize;
     final long midSize = middle.size();
-    if(p < midSize) return new DeepTree<>(left, leftSize, middle.insert(p, val), right, size + 1);
+    if(p < midSize)
+      return new DeepTree<>(left, leftSize, middle.insert(p, val, qc), right, size + 1);
 
     // insert into right digit
     p -= midSize;
@@ -378,12 +383,13 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public TreeSlice<N, E> remove(final long pos) {
+  public TreeSlice<N, E> remove(final long pos, final QueryContext qc) {
+    qc.checkStop();
     if(pos < leftSize) return new TreeSlice<>(removeLeft(pos));
     final long rightStart = leftSize + middle.size();
     if(pos >= rightStart) return new TreeSlice<>(removeRight(pos - rightStart));
 
-    final TreeSlice<Node<N, E>, E> slice = middle.remove(pos - leftSize);
+    final TreeSlice<Node<N, E>, E> slice = middle.remove(pos - leftSize, qc);
     if(slice.isTree()) {
       // no underflow
       final FingerTree<Node<N, E>, E> newMiddle = slice.getTree();

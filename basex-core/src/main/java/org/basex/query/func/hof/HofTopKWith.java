@@ -37,7 +37,7 @@ public final class HofTopKWith extends HofFn {
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }
 
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     while(!heap.isEmpty()) vb.addFront(heap.removeMin());
     return vb.value();
   }

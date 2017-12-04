@@ -35,7 +35,7 @@ public final class ClientQuery extends ClientFn {
     checkCreate(qc);
     final ClientSession cs = session(qc, false);
     final String query = Token.string(toToken(exprs[1], qc));
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     try(org.basex.api.client.ClientQuery cq = cs.query(query)) {
       // bind variables and context value
       for(final Entry<String, Value> binding : toBindings(2, qc).entrySet()) {

@@ -50,7 +50,7 @@ public final class JobsListDetails extends StandardFunc {
 
     final int max = ctx.soptions.get(StaticOptions.LOGMSGMAXLEN);
     final JobPool jobs = ctx.jobs;
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
 
     final byte[][] atts = { ID, TYPE, STATE, USER, DURATION, START, END, READS, WRITES };
     for(final byte[] key : ids) {

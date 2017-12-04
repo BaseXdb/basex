@@ -45,7 +45,7 @@ abstract class NativeSeq extends Seq {
   public final void materialize(final InputInfo ii) { }
 
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 
@@ -60,9 +60,9 @@ abstract class NativeSeq extends Seq {
    * will be called, because its runtime outweighs the possibly higher memory consumption.
    */
   @Override
-  public final Value insert(final long pos, final Item item) {
+  public final Value insert(final long pos, final Item item, final QueryContext qc) {
     // no native implementation, because this
-    return copyInsert(pos, item);
+    return copyInsert(pos, item, qc);
   }
 
   /**
@@ -71,7 +71,7 @@ abstract class NativeSeq extends Seq {
    * will be called, because its runtime outweighs the possibly higher memory consumption.
    */
   @Override
-  public final Value remove(final long pos) {
-    return copyRemove(pos);
+  public final Value remove(final long pos, final QueryContext qc) {
+    return copyRemove(pos, qc);
   }
 }

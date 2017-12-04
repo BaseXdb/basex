@@ -26,7 +26,7 @@ public final class AdminSessions extends AdminFn {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
 
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final ClientListener sp : qc.context.sessions) {
       final Context ctx = sp.context();
       final String user = ctx.user().name();

@@ -65,7 +65,8 @@ public final class Insert extends Update {
     final boolean loc = mode == Mode.BEFORE || mode == Mode.AFTER;
     if(!(it instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, it);
     final Item i2 = iter.next();
-    if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info, ValueBuilder.concat(it, i2));
+    if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info,
+        ValueBuilder.concat(it, i2, qc));
 
     final ANode n = (ANode) it;
     final ANode par = n.parent();

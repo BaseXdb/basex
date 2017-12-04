@@ -40,6 +40,7 @@ public class FnSubsequence extends StandardFunc {
       long c = s;
       @Override
       public Item next() throws QueryException {
+        qc.checkStop();
         return c < m ? iter.get(c++ - 1) : null;
       }
       @Override
@@ -79,7 +80,7 @@ public class FnSubsequence extends StandardFunc {
     final Value v = iter.value();
     if(v != null) {
       final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
-      return l <= 0 ? Empty.SEQ : v.subSequence(s, l);
+      return l <= 0 ? Empty.SEQ : v.subSequence(s, l, qc);
     }
 
     // take fast route if the size is known
@@ -87,16 +88,13 @@ public class FnSubsequence extends StandardFunc {
       final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
       if(s >= is || l <= 0) return Empty.SEQ;
       if(s == 0 && l == is) return iter.value(qc);
-      final ValueBuilder vb = new ValueBuilder();
-      for(long i = 0; i < l; i++) {
-        qc.checkStop();
-        vb.add(iter.get(s + i));
-      }
+      final ValueBuilder vb = new ValueBuilder(qc);
+      for(long i = 0; i < l; i++) vb.add(iter.get(s + i));
       return vb.value();
     }
 
     final long e = len == Long.MAX_VALUE ? len : start + len;
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     Item it;
     for(int i = 1; i < e && (it = qc.next(iter)) != null; i++) {
       if(i >= start) vb.add(it);

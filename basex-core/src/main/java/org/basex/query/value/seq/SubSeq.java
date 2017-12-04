@@ -33,23 +33,24 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length) {
+  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
+    qc.checkStop();
     return new SubSeq(sub, start + offset, length);
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
-    return copyInsert(pos, item);
+  public Value insert(final long pos, final Item item, final QueryContext qc) {
+    return copyInsert(pos, item, qc);
   }
 
   @Override
-  public Value remove(final long pos) {
-    return copyRemove(pos);
+  public Value remove(final long pos, final QueryContext qc) {
+    return copyRemove(pos, qc);
   }
 
   @Override
-  public Value reverse() {
-    final ValueBuilder vb = new ValueBuilder();
+  public Value reverse(final QueryContext qc) {
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < size; i++) vb.addFront(sub.itemAt(start + i));
     return vb.value();
   }
@@ -84,9 +85,9 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
-    for(long i = 0; i < size; i++) vb.add(itemAt(i).atomValue(ii));
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(long i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
     return vb.value();
   }
 

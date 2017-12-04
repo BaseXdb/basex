@@ -19,6 +19,7 @@ import org.basex.io.serial.*;
 import org.basex.query.QueryError.ErrType;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -308,13 +309,13 @@ public class FnHttpTest extends HTTPTest {
         + "</http:multipart>" + "</http:request>";
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
-    final ValueBuilder bodies = new ValueBuilder();
-    bodies.add(Str.get("Part1"));
-    bodies.add(Str.get("Part2"));
-    bodies.add(Str.get("Part3"));
+    final TokenList bodies = new TokenList();
+    bodies.add("Part1");
+    bodies.add("Part2");
+    bodies.add("Part3");
 
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next(), bodies.value());
+    final HttpRequest r = rp.parse(dbNode1.children().next(), StrSeq.get(bodies));
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -660,7 +661,7 @@ public class FnHttpTest extends HTTPTest {
     final Value returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder expected = new ValueBuilder();
+    final ItemList expected = new ItemList();
     final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
@@ -737,7 +738,7 @@ public class FnHttpTest extends HTTPTest {
     final Value returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder expected = new ValueBuilder();
+    final ItemList expected = new ItemList();
     final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"

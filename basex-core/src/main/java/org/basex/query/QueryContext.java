@@ -382,7 +382,7 @@ public final class QueryContext extends Job implements Closeable {
       final Data data = it.data();
       if(data != null && (datas.contains(data) ||
           !data.inMemory() && dbs.contains(data.meta.name))) {
-        results.set(c, ((DBNode) it).dbNodeCopy(context.options));
+        results.set(c, ((DBNode) it).dbNodeCopy(context.options, this));
       }
     }
   }
@@ -628,30 +628,30 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Casts a value to the specified type.
    * See {@link #bind(String, Object, String, StaticContext)} for more infos.
-   * @param val value to be cast
+   * @param value value to be cast
    * @param type type (may be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */
-  private Value cast(final Object val, final String type) throws QueryException {
+  private Value cast(final Object value, final String type) throws QueryException {
     final StaticContext sc = root != null ? root.sc : new StaticContext(this);
 
     // String input
-    Object vl = val;
-    if(vl instanceof String) {
-      final String string = (String) vl;
+    Object val = value;
+    if(val instanceof String) {
+      final String string = (String) val;
       final StringList strings = new StringList(1);
       // strings containing multiple items (value \1 ...)
       if(string.indexOf('\1') == -1) {
         strings.add(string);
       } else {
         strings.add(string.split("\1"));
-        vl = strings.toArray();
+        val = strings.toArray();
       }
 
       // sub types overriding the global value (value \2 type)
       if(string.indexOf('\2') != -1) {
-        final ValueBuilder vb = new ValueBuilder();
+        final ValueBuilder vb = new ValueBuilder(this);
         for(final String str : strings) {
           final int i = str.indexOf('\2');
           final String s = i == -1 ? str : str.substring(0, i);
@@ -664,7 +664,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // no type specified: return original value or convert Java object
     if(type == null || type.isEmpty()) {
-      return vl instanceof Value ? (Value) vl : JavaFunction.toValue(vl, this, sc);
+      return val instanceof Value ? (Value) val : JavaFunction.toValue(val, this, sc);
     }
 
     // convert to json
@@ -672,7 +672,7 @@ public final class QueryContext extends Job implements Closeable {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.FORMAT, JsonFormat.XQUERY);
-        return JsonConverter.get(jp).convert(token(vl.toString()), null);
+        return JsonConverter.get(jp).convert(token(val.toString()), null);
       } catch(final QueryIOException ex) {
         throw ex.getCause();
       }
@@ -697,26 +697,26 @@ public final class QueryContext extends Job implements Closeable {
     if(tp == null) throw WHICHTYPE_X.get(null, type);
 
     // cast XDM values
-    if(vl instanceof Value) {
+    if(val instanceof Value) {
       // cast single item
-      if(vl instanceof Item) return tp.cast((Item) vl, this, sc, null);
+      if(val instanceof Item) return tp.cast((Item) val, this, sc, null);
       // cast sequence
-      final Value v = (Value) vl;
-      final ValueBuilder seq = new ValueBuilder();
-      for(final Item i : v) seq.add(tp.cast(i, this, sc, null));
+      final Value v = (Value) val;
+      final ValueBuilder seq = new ValueBuilder(this);
+      final BasicIter<?> iter = v.iter();
+      for(Item it; (it = iter.next()) != null;) seq.add(tp.cast(it, this, sc, null));
       return seq.value();
     }
 
-    if(vl instanceof String[]) {
+    if(val instanceof String[]) {
       // cast string array
-      final String[] strings = (String[]) vl;
-      final ValueBuilder seq = new ValueBuilder();
-      for(final String s : strings) seq.add(tp.cast(s, this, sc, null));
+      final ValueBuilder seq = new ValueBuilder(this);
+      for(final String s : (String[]) val) seq.add(tp.cast(s, this, sc, null));
       return seq.value();
     }
 
     // cast any other object to XDM
-    return tp.cast(vl, this, sc, null);
+    return tp.cast(val, this, sc, null);
   }
 
   /**

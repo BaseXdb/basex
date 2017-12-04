@@ -72,7 +72,7 @@ public final class FnFoldRight extends StandardFunc {
     if(allAreValues(false) && ex1.size() <= UNROLL_LIMIT) {
       // unroll the loop
       Expr ex = ex2;
-      for(final Item it : ((Value) ex1).reverse()) {
+      for(final Item it : ((Value) ex1).reverse(cc.qc)) {
         ex = new DynFuncCall(info, sc, exprs[2], it, ex).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);

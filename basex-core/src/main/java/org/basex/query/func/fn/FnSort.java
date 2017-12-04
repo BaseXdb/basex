@@ -50,15 +50,13 @@ public final class FnSort extends StandardFunc {
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
     final long sz = value.size();
-    if(sz > Integer.MAX_VALUE) throw RANGE_X.get(info, sz);
-
-    final ValueList vl = new ValueList((int) sz);
+    final ValueList vl = new ValueList(sz);
     final Iter iter = value.iter();
     for(Item it; (it = qc.next(iter)) != null;) {
-      vl.add((key == null ? it : key.invokeValue(qc, info, it)).atomValue(info));
+      vl.add((key == null ? it : key.invokeValue(qc, info, it)).atomValue(qc, info));
     }
 
-    final Integer[] order = sort(vl, this, coll);
+    final Integer[] order = sort(vl, this, coll, qc);
     return new BasicIter<Item>(sz) {
       @Override
       public Item get(final long i) {
@@ -72,17 +70,19 @@ public final class FnSort extends StandardFunc {
    * @param vl value list
    * @param sf calling function
    * @param coll collation
+   * @param qc query context
    * @return item order
    * @throws QueryException query exception
    */
-  public static Integer[] sort(final ValueList vl, final StandardFunc sf, final Collation coll)
-      throws QueryException {
+  public static Integer[] sort(final ValueList vl, final StandardFunc sf, final Collation coll,
+      final QueryContext qc) throws QueryException {
 
     final int al = vl.size();
     final Integer[] order = new Integer[al];
     for(int o = 0; o < al; o++) order[o] = o;
     try {
       Arrays.sort(order, (i1, i2) -> {
+        qc.checkStop();
         try {
           final Value v1 = vl.get(i1), v2 = vl.get(i2);
           final long s1 = v1.size(), s2 = v2.size(), sl = Math.min(s1, s2);
@@ -133,7 +133,7 @@ public final class FnSort extends StandardFunc {
       // range values
       if(value instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) value;
-        return seq.asc ? seq : seq.reverse();
+        return seq.asc ? seq : seq.reverse(null);
       }
       // sortable single or singleton values
       final SeqType st = value.seqType();

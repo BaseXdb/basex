@@ -113,7 +113,7 @@ public final class Users {
     synchronized(users) {
       for(final User user : users.values()) user.toXML(root);
     }
-    return root.add(info().deepCopy(ctx.options));
+    return root.add(info().deepCopy(ctx.options, null));
   }
 
   /**

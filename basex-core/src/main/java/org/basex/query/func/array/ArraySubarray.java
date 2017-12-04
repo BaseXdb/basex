@@ -22,12 +22,12 @@ public final class ArraySubarray extends ArrayFn {
     final long n = array.arraySize();
     final long from = toLong(exprs[1], qc) - 1;
     if(from < 0 || from > n) throw ARRAYBOUNDS_X_X.get(info, from + 1, n + 1);
-    if(exprs.length == 2) return array.subArray(from, n - from);
+    if(exprs.length == 2) return array.subArray(from, n - from, qc);
 
     final long len = toLong(exprs[2], qc);
     if(len < 0) throw ARRAYNEG_X.get(info, len);
     if(from + len > n) throw ARRAYBOUNDS_X_X.get(info, from + 1 + len, n + 1);
-    return array.subArray(from, len);
+    return array.subArray(from, len, qc);
   }
 
   @Override

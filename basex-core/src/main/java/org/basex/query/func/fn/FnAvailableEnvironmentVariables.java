@@ -4,7 +4,8 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -20,8 +21,8 @@ public final class FnAvailableEnvironmentVariables extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder();
-    for(final Object key : System.getenv().keySet()) vb.add(Str.get(key.toString()));
-    return vb.value();
+    final TokenList list = new TokenList();
+    for(final Object key : System.getenv().keySet()) list.add(key.toString());
+    return StrSeq.get(list);
   }
 }

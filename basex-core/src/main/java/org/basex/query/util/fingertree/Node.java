@@ -62,7 +62,6 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @param pos position
    * @param val new value
    * @return resulting node
-   * @throws IndexOutOfBoundsException if {@code pos} is out of bounds
    */
   Node<N, E> set(long pos, E val);
 

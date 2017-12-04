@@ -26,7 +26,7 @@ public final class FnInScopePrefixes extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Atts ns = toElem(exprs[0], qc).nsScope(sc).add(XML, XML_URI);
     final int as = ns.size();
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(int a = 0; a < as; ++a) {
       final byte[] key = ns.name(a);
       if(key.length + ns.value(a).length != 0) vb.add(Str.get(key));

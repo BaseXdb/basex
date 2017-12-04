@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * A sequence containing more elements than fit into a {@link SmallSeq}.
@@ -39,10 +40,6 @@ final class BigSeq extends TreeSeq {
     this.right = right;
     assert left.length >= MIN_DIGIT && left.length <= MAX_DIGIT
         && right.length >= MIN_DIGIT && right.length <= MAX_DIGIT;
-
-    // integer overflow, caused by too many items
-    if(size < 0) throw new IndexOutOfBoundsException(
-        "Sequence has too many items (> " + Long.MAX_VALUE + ").");
   }
 
   @Override
@@ -57,16 +54,18 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq reverse() {
+  public TreeSeq reverse(final QueryContext qc) {
+    qc.checkStop();
     final int l = left.length, r = right.length;
     final Item[] newLeft = new Item[r], newRight = new Item[l];
     for(int i = 0; i < r; i++) newLeft[i] = right[r - 1 - i];
     for(int i = 0; i < l; i++) newRight[i] = left[l - 1 - i];
-    return new BigSeq(newLeft, middle.reverse(), newRight, type);
+    return new BigSeq(newLeft, middle.reverse(qc), newRight, type);
   }
 
   @Override
-  public TreeSeq insert(final long pos, final Item val) {
+  public TreeSeq insert(final long pos, final Item val, final QueryContext qc) {
+    qc.checkStop();
     final int l = left.length;
     if(pos <= l) {
       final int p = (int) pos;
@@ -81,7 +80,7 @@ final class BigSeq extends TreeSeq {
     }
 
     final long midSize = middle.size();
-    if(pos - l < midSize) return new BigSeq(left, middle.insert(pos - l, val), right, null);
+    if(pos - l < midSize) return new BigSeq(left, middle.insert(pos - l, val, qc), right, null);
 
     final int r = right.length;
     final int p = (int) (pos - l - midSize);
@@ -96,7 +95,8 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq remove(final long pos) {
+  public TreeSeq remove(final long pos, final QueryContext qc) {
+    qc.checkStop();
     if(pos < left.length) {
       // delete from left digit
       final int p = (int) pos, l = left.length;
@@ -187,7 +187,7 @@ final class BigSeq extends TreeSeq {
     }
 
     // delete in middle tree
-    final TreeSlice<Item, Item> slice = middle.remove(pos - left.length);
+    final TreeSlice<Item, Item> slice = middle.remove(pos - left.length, qc);
 
     if(slice.isTree()) {
       // middle tree did not underflow
@@ -227,7 +227,8 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length) {
+  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
+    qc.checkStop();
     final long midSize = middle.size();
     final long end = offset + length;
     if(end <= left.length) {
@@ -428,7 +429,6 @@ final class BigSeq extends TreeSeq {
 
       @Override
       public Item next() {
-        if(pos > r) throw new NoSuchElementException();
         if(pos < 0) {
           // in left digit
           return ls[l + pos++];
@@ -458,7 +458,6 @@ final class BigSeq extends TreeSeq {
 
       @Override
       public Item previous() {
-        if(pos <= -l) throw new NoSuchElementException();
         if(pos > 0) {
           // in right digit
           if(--pos > 0) return rs[pos - 1];
@@ -477,17 +476,17 @@ final class BigSeq extends TreeSeq {
 
       @Override
       public void add(final Item e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void set(final Item e) {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
 
       @Override
       public void remove() {
-        throw new UnsupportedOperationException();
+        throw Util.notExpected();
       }
     };
   }

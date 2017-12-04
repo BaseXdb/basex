@@ -53,7 +53,7 @@ public final class FnApply extends StandardFunc {
     final long ar = fun.arity(), as = array.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, ar, as);
 
-    final ValueList vl = new ValueList((int) as);
+    final ValueList vl = new ValueList(as);
     for(final Value val : array.members()) vl.add(val);
     return vl.finish();
   }

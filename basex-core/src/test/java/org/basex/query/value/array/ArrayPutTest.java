@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class ArrayPutTest {
+public final class ArrayPutTest extends ArrayTest {
   /**
    * Sets all values of a big array individually.
    */

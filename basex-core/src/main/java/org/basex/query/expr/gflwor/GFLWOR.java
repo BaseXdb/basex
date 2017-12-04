@@ -58,7 +58,7 @@ public final class GFLWOR extends ParseExpr {
     for(final Eval eval = newEval(); eval.next(qc);) {
       final Item it = ret.item(qc, info);
       if(it != null) {
-        if(out != null) throw QueryError.SEQFOUND_X.get(info, ValueBuilder.concat(out, it));
+        if(out != null) throw QueryError.SEQFOUND_X.get(info, ValueBuilder.concat(out, it, qc));
         out = it;
       }
     }
@@ -72,11 +72,8 @@ public final class GFLWOR extends ParseExpr {
     final Value v1 = ret.value(qc);
     if(!eval.next(qc)) return v1;
 
-    final ValueBuilder vb = new ValueBuilder().add(v1);
-    do {
-      qc.checkStop();
-      vb.add(ret.value(qc));
-    } while(eval.next(qc));
+    final ValueBuilder vb = new ValueBuilder(qc).add(v1);
+    do vb.add(ret.value(qc)); while(eval.next(qc));
     return vb.value();
   }
 

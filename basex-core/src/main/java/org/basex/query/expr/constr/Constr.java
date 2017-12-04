@@ -155,7 +155,7 @@ public final class Constr {
 
         // add text node
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
-        node = node.deepCopy(qc.context.options);
+        node = node.deepCopy(qc.context.options, qc);
         children.add(node);
       }
       more = false;

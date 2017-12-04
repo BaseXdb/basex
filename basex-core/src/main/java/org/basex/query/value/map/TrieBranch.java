@@ -2,6 +2,7 @@ package org.basex.query.value.map;
 
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -108,19 +109,20 @@ final class TrieBranch extends TrieNode {
   private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
-    return o.add(this, l, merge, ii);
+  TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
+    return o.add(this, l, merge, ii, qc);
   }
 
   @Override
-  TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
+    qc.checkStop();
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     if(ch != null) {
-      final TrieNode ins = ch.add(o, l + 1, merge, ii);
+      final TrieNode ins = ch.add(o, l + 1, merge, ii, qc);
       if(ins == ch) return this;
       nw = ins;
     } else nw = o;
@@ -133,14 +135,15 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieList o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final TrieList o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
+    qc.checkStop();
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     int n = o.size;
     if(ch != null) {
-      final TrieNode ins = ch.add(o, l + 1, merge, ii);
+      final TrieNode ins = ch.add(o, l + 1, merge, ii, qc);
       if(ins == ch) return this;
       n = ins.size - ch.size;
       nw = ins;
@@ -154,8 +157,8 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
     TrieNode[] ch = null;
     int nu = used, ns = size;
@@ -163,7 +166,7 @@ final class TrieBranch extends TrieNode {
     for(int k = 0; k < kl; k++) {
       final TrieNode n = kids[k], ok = o.kids[k];
       if(ok != null) {
-        final TrieNode nw = n == null ? ok : ok.addAll(n, l + 1, merge, ii);
+        final TrieNode nw = n == null ? ok : ok.addAll(n, l + 1, merge, ii, qc);
         if(nw != n) {
           if(ch == null) ch = copyKids();
           ch[k] = nw;
@@ -187,7 +190,7 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void keys(final ValueBuilder ks) {
+  void keys(final ItemList ks) {
     for(final TrieNode nd : kids) {
       if(nd != null) nd.keys(ks);
     }

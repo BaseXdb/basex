@@ -54,7 +54,7 @@ public final class FnDistinctValues extends StandardFunc {
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     final Iter iter = ex.atomIter(qc, info);
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(Item it; (it = qc.next(iter)) != null;) {
       if(set.add(it, info)) vb.add(it);
     }
@@ -95,7 +95,7 @@ public final class FnDistinctValues extends StandardFunc {
     if(nodes == null) return this;
 
     // loop through all nodes
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(cc.qc);
     final HashItemSet set = new HashItemSet(false);
     for(PathNode pn : nodes) {
       // retrieve text child if addressed node is an element

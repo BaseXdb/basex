@@ -2,6 +2,8 @@ package org.basex.query.util.fingertree;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * List iterator over the elements of a finger tree.
  *
@@ -190,7 +192,6 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
   @Override
   @SuppressWarnings("unchecked")
   public E next() {
-    if(index >= n) throw new NoSuchElementException();
     if(leaf == null) init();
 
     index++;
@@ -285,7 +286,6 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
   @Override
   @SuppressWarnings("unchecked")
   public E previous() {
-    if(index <= 0) throw new NoSuchElementException();
     if(leaf == null) init();
 
     --index;
@@ -371,16 +371,16 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
 
   @Override
   public void set(final E e) {
-    throw new UnsupportedOperationException();
+    throw Util.notExpected();
   }
 
   @Override
   public void add(final E e) {
-    throw new UnsupportedOperationException();
+    throw Util.notExpected();
   }
 
   @Override
   public void remove() {
-    throw new UnsupportedOperationException();
+    throw Util.notExpected();
   }
 }

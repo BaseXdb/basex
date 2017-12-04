@@ -18,7 +18,7 @@ public final class FnUriCollection extends Docs {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Item it = coll.next();
+        final Item it = qc.next(coll);
         // all items will be nodes
         return it == null ? null : Uri.uri(((ANode) it).baseURI(), false);
       }

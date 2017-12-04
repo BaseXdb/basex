@@ -32,14 +32,14 @@ public final class ArraySort extends StandardFunc {
     }
 
     final long sz = array.arraySize();
-    final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
+    final ValueList vl = new ValueList(sz);
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
     for(final Value value : array.members()) {
-      vl.add((key == null ? value : key.invokeValue(qc, info, value)).atomValue(info));
+      vl.add((key == null ? value : key.invokeValue(qc, info, value)).atomValue(qc, info));
     }
 
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final int order : FnSort.sort(vl, this, coll)) builder.append(array.get(order));
+    for(final int order : FnSort.sort(vl, this, coll, qc)) builder.append(array.get(order));
     return builder.freeze();
   }
 

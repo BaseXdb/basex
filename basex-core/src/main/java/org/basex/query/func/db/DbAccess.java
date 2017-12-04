@@ -64,7 +64,7 @@ abstract class DbAccess extends DbFn {
       @Override
       public ANode next() throws QueryException {
         ANode n;
-        while((n = iter.next()) != null && !nt.eq(n));
+        while((n = iter.next()) != null && !nt.eq(n)) qc.checkStop();
         return n;
       }
     };

@@ -88,9 +88,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * </ul>
    * @param start starting position
    * @param length number of items
+   * @param qc query context
    * @return sub sequence
    */
-  public abstract Value subSequence(long start, long length);
+  public abstract Value subSequence(long start, long length, QueryContext qc);
 
   /**
    * Materializes lazy values.
@@ -98,19 +99,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @throws QueryException query exception
    */
   public abstract void materialize(InputInfo ii) throws QueryException;
-
-  /**
-   * Evaluates the expression and returns the atomized items.
-   * @param ii input info
-   * @return materialized item
-   * @throws QueryException query exception
-   */
-  public abstract Value atomValue(InputInfo ii) throws QueryException;
-
-  @Override
-  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return atomValue(ii);
-  }
 
   /**
    * Computes the number of atomized items.
@@ -223,9 +211,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns all items of this value in reverse order.
+   * @param qc query context
    * @return items in reverse order
    */
-  public abstract Value reverse();
+  public abstract Value reverse(QueryContext qc);
 
   @Override
   public boolean accept(final ASTVisitor visitor) {

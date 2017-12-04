@@ -125,14 +125,15 @@ public final class Map extends FItem {
    * @param map map to add
    * @param ii input info
    * @param merge merge duplicate keys
+   * @param qc query context
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map addAll(final Map map, final MergeDuplicates merge, final InputInfo ii)
-      throws QueryException {
+  public Map addAll(final Map map, final MergeDuplicates merge, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
     if(map == EMPTY) return this;
-    final TrieNode upd = root.addAll(map.root, 0, merge, ii);
+    final TrieNode upd = root.addAll(map.root, 0, merge, ii, qc);
     return upd == map.root ? map : new Map(upd);
   }
 
@@ -200,9 +201,9 @@ public final class Map extends FItem {
    * @return list of keys
    */
   public Value keys() {
-    final ValueBuilder res = new ValueBuilder();
-    root.keys(res);
-    return res.value();
+    final ItemList keys = new ItemList(root.size);
+    root.keys(keys);
+    return keys.value();
   }
 
   /**
@@ -223,7 +224,7 @@ public final class Map extends FItem {
    */
   public Value forEach(final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     root.forEach(vb, func, qc, ii);
     return vb.value();
   }

@@ -67,7 +67,7 @@ public abstract class Iter {
     if(i2 == null) return i1;
 
     // more results: build sequence
-    final ValueBuilder vb = new ValueBuilder().add(i1).add(i2);
+    final ValueBuilder vb = new ValueBuilder(qc).add(i1).add(i2);
     for(Item it; (it = qc.next(this)) != null;) vb.add(it);
     return vb.value();
   }

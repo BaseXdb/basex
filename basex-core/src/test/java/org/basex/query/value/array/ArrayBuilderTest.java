@@ -14,8 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Leo Woerteler
  */
-public final class ArrayBuilderTest {
-
+public final class ArrayBuilderTest extends ArrayTest {
   /** Tests building arrays only with {@link ArrayBuilder#append(Value)}. */
   @Test
   public void builderTestAscending() {

@@ -88,22 +88,23 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length) {
+  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
     return new RangeSeq(start + (asc ? offset : -offset), length, asc);
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
-    return copyInsert(pos, item);
+  public Value insert(final long pos, final Item item, final QueryContext qc) {
+    return copyInsert(pos, item, qc);
   }
 
   @Override
-  public Value remove(final long pos) {
-    return pos == 0 || pos == size - 1 ? subSeq(pos == 0 ? 0 : 1, size - 1) : copyRemove(pos);
+  public Value remove(final long pos, final QueryContext qc) {
+    return pos == 0 || pos == size - 1 ? subSeq(pos == 0 ? 0 : 1, size - 1, qc) :
+      copyRemove(pos, qc);
   }
 
   @Override
-  public Value reverse() {
+  public Value reverse(final QueryContext qc) {
     return get(range(true)[1], size(), !asc);
   }
 
@@ -111,7 +112,7 @@ public final class RangeSeq extends Seq {
   public void materialize(final InputInfo ii) { }
 
   @Override
-  public Value atomValue(final InputInfo ii) {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 

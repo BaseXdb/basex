@@ -94,7 +94,7 @@ public final class StaticVar extends StaticDecl {
 
     final int fp = vs.enter(qc);
     try {
-      return bind(expr.value(qc));
+      return bindValue(expr.value(qc), qc);
     } catch(final QueryException qe) {
       if(lazy) qe.notCatchable();
       throw qe;
@@ -120,19 +120,21 @@ public final class StaticVar extends StaticDecl {
    */
   void bind(final Value val, final QueryContext qc) throws QueryException {
     if(!external || compiled) return;
-    bind(declType == null || declType.instance(val) ? val : declType.cast(val, qc, sc, info));
+    bindValue(declType == null || declType.instance(val) ? val :
+      declType.cast(val, qc, sc, info), qc);
   }
 
   /**
    * Binds the specified value to the variable.
    * @param val value to be set
+   * @param qc query context
    * @return self reference
    * @throws QueryException query exception
    */
-  private Value bind(final Value val) throws QueryException {
+  private Value bindValue(final Value val, final QueryContext qc) throws QueryException {
     expr = val;
     value = val;
-    if(declType != null) declType.treat(val, name, info);
+    if(declType != null) declType.treat(val, name, info, qc);
     return value;
   }
 

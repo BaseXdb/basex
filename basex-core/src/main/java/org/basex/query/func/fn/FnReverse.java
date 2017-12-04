@@ -29,13 +29,14 @@ public final class FnReverse extends StandardFunc {
 
     // value-based iterator
     final Value v = iter.value();
-    if(v != null) return v.reverse().iter();
+    if(v != null) return v.reverse(qc).iter();
 
     // fast route if the size is known
     if(s > -1) return new Iter() {
       long c = s;
       @Override
       public Item next() throws QueryException {
+        qc.checkStop();
         return --c >= 0 ? iter.get(c) : null;
       }
       @Override
@@ -49,20 +50,20 @@ public final class FnReverse extends StandardFunc {
     };
 
     // standard iterator
-    final ValueBuilder vb = new ValueBuilder();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(Item it; (it = qc.next(iter)) != null;) vb.addFront(it);
     return vb.value().iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return exprs[0].value(qc).reverse();
+    return exprs[0].value(qc).reverse(qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr ex = exprs[0];
-    return ex instanceof RangeSeq ? ((RangeSeq) ex).reverse() :
+    return ex instanceof RangeSeq ? ((RangeSeq) ex).reverse(cc.qc) :
       ex instanceof SingletonSeq || ex.seqType().zeroOrOne() ? ex : adoptType(ex);
   }
 }
