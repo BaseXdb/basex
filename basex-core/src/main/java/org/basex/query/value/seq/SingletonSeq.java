@@ -35,14 +35,6 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int index) {
-    final int w = Math.min((int) size, arr.length - index);
-    final long vs = value.size();
-    for(int i = 0; i < w; i++) arr[index + i] = value.itemAt(i % vs);
-    return w;
-  }
-
-  @Override
   public boolean homogeneous() {
     return value.homogeneous();
   }

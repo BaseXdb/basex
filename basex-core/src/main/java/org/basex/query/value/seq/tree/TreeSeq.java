@@ -116,14 +116,6 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final int writeTo(final Item[] arr, final int off) {
-    final int n = (int) Math.min(arr.length - off, size());
-    final Iterator<Item> iter = iterator();
-    for(int i = 0; i < n; i++) arr[off + i] = iter.next();
-    return n;
-  }
-
-  @Override
   public final boolean homogeneous() {
     return homo;
   }

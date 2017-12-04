@@ -128,9 +128,13 @@ public abstract class Seq extends Value {
    */
   final Value copyInsert(final long pos, final Value val, final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
-    vb.add(val);
-    for(long i = pos; i < size; i++) vb.add(itemAt(i));
+    if(pos == size) {
+      vb.add(this, val);
+    } else {
+      for(long i = 0; i < pos; i++) vb.add(itemAt(i));
+      vb.add(val);
+      for(long i = pos; i < size; i++) vb.add(itemAt(i));
+    }
     return vb.value(type);
   }
 

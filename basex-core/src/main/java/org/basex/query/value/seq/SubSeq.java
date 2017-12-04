@@ -56,13 +56,6 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int index) {
-    final int n = (int) Math.min(arr.length - index, size);
-    for(int i = 0; i < n; i++) arr[index + i] = itemAt(i);
-    return n;
-  }
-
-  @Override
   public Item itemAt(final long pos) {
     return sub.itemAt(start + pos);
   }

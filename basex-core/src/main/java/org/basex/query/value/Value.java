@@ -148,14 +148,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract int hash(InputInfo ii) throws QueryException;
 
   /**
-   * Writes this value's items out to the given array.
-   * @param arr array to write to
-   * @param index start position
-   * @return number of written items
-   */
-  public abstract int writeTo(Item[] arr, int index);
-
-  /**
    * Serializes the value, using the standard XML serializer,
    * and returns the cached result.
    * @return serialized value

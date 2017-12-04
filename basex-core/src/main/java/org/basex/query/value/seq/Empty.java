@@ -102,11 +102,6 @@ public final class Empty extends Value {
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int index) {
-    return 0;
-  }
-
-  @Override
   public Item itemAt(final long pos) {
     throw Util.notExpected();
   }

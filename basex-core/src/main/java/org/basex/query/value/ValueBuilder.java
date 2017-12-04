@@ -83,8 +83,8 @@ public final class ValueBuilder {
   }
 
   /**
-   * Appends an item to the end of the built value.
-   * @param item value to append
+   * Appends an item to the built value.
+   * @param item item to append
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Item item) {
@@ -105,13 +105,15 @@ public final class ValueBuilder {
   }
 
   /**
-   * Appends a value to the end of the built value.
+   * Appends a value to the built value.
    * @param value value to append
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Value value) {
-    qc.checkStop();
-    if(value.isEmpty()) return this;
+    if(value.isEmpty()) {
+      qc.checkStop();
+      return this;
+    }
 
     final TreeSeqBuilder tree = builder;
     if(tree != null) {
@@ -124,6 +126,50 @@ public final class ValueBuilder {
       } else {
         firstValue = value;
       }
+    }
+    return this;
+  }
+
+  /**
+   * Appends two item to the built value.
+   * @param item1 first item to append
+   * @param item2 second item to append
+   * @return reference to this builder for convenience
+   */
+  public ValueBuilder add(final Item item1, final Item item2) {
+    qc.checkStop();
+    if(firstValue != null) {
+      add(item1);
+      add(item2);
+    } else {
+      TreeSeqBuilder tree = builder;
+      if(tree == null) {
+        tree = new TreeSeqBuilder();
+        builder = tree;
+      }
+      tree.add(item1).add(item2);
+    }
+    return this;
+  }
+
+  /**
+   * Appends two values to the built value.
+   * @param value1 first value to append
+   * @param value2 second value to append
+   * @return reference to this builder for convenience
+   */
+  public ValueBuilder add(final Value value1, final Value value2) {
+    if(firstValue != null) {
+      add(value1);
+      add(value2);
+    } else {
+      TreeSeqBuilder tree = builder;
+      if(tree == null) {
+        tree = new TreeSeqBuilder();
+        builder = tree;
+      }
+      tree.add(value1, qc);
+      tree.add(value2, qc);
     }
     return this;
   }

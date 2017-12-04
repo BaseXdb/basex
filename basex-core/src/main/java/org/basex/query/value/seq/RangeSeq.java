@@ -77,12 +77,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int index) {
-    for(int i = 0; i < size; i++) arr[index + i] = itemAt(i);
-    return (int) size;
-  }
-
-  @Override
   public Item itemAt(final long pos) {
     return Int.get(start + (asc ? pos : -pos));
   }

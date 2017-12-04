@@ -30,13 +30,6 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final int writeTo(final Item[] arr, final int index) {
-    final int w = Math.min((int) size, arr.length - index);
-    for(int i = 0; i < w; i++) arr[index + i] = itemAt(i);
-    return w;
-  }
-
-  @Override
   public final boolean homogeneous() {
     return true;
   }

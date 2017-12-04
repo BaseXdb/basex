@@ -55,7 +55,7 @@ public abstract class ParseExpr extends Expr {
     if(it != null && iter.size() != 1) {
       final Item nx = iter.next();
       if(nx != null) {
-        final ValueBuilder vb = new ValueBuilder(qc).add(it).add(nx);
+        final ValueBuilder vb = new ValueBuilder(qc).add(it, nx);
         if(iter.next() != null) vb.add(Str.get(DOTS));
         throw SEQFOUND_X.get(info, vb.value());
       }
@@ -92,9 +92,9 @@ public abstract class ParseExpr extends Expr {
       final Iter iter = iter(qc);
       it = iter.next();
       if(it != null && !(it instanceof ANode)) {
-        final Item n = iter.next();
-        if(n != null) {
-          final ValueBuilder vb = new ValueBuilder(qc).add(it).add(n);
+        final Item nx = iter.next();
+        if(nx != null) {
+          final ValueBuilder vb = new ValueBuilder(qc).add(it, nx);
           if(iter.next() != null) vb.add(Str.get(DOTS));
           throw EBV_X.get(info, vb.value());
         }

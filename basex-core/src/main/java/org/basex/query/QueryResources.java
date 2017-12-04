@@ -11,6 +11,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -308,12 +309,12 @@ public final class QueryResources {
       throws QueryException {
 
     final int ns = paths.length;
-    final DBNode[] nodes = new DBNode[ns];
+    final ItemList items = new ItemList(ns);
     for(int n = 0; n < ns; n++) {
       final QueryInput qi = new QueryInput(paths[n], sc);
-      nodes[n] = new DBNode(create(qi, true, null), 0, Data.DOC);
+      items.add(new DBNode(create(qi, true, null), 0, Data.DOC));
     }
-    addCollection(ValueBuilder.value(nodes, ns, NodeType.DOC), name);
+    addCollection(items.value(NodeType.DOC), name);
   }
 
   /**
