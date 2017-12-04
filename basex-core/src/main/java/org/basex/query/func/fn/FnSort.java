@@ -24,13 +24,13 @@ import org.basex.query.value.type.*;
 public final class FnSort extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = qc.value(exprs[0]), v = value(value);
+    final Value value = exprs[0].value(qc), v = value(value);
     return v != null ? v : iter(value, qc).value(qc);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value value = qc.value(exprs[0]), v = value(value);
+    final Value value = exprs[0].value(qc), v = value(value);
     return v != null ? v.iter() : iter(value, qc);
   }
 
@@ -50,8 +50,11 @@ public final class FnSort extends StandardFunc {
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
     final long sz = value.size();
-    final ValueList vl = new ValueList((int) Math.min(Integer.MAX_VALUE, sz));
-    for(final Item it : value) {
+    if(sz > Integer.MAX_VALUE) throw RANGE_X.get(info, sz);
+
+    final ValueList vl = new ValueList((int) sz);
+    final Iter iter = value.iter();
+    for(Item it; (it = qc.next(iter)) != null;) {
       vl.add((key == null ? it : key.invokeValue(qc, info, it)).atomValue(info));
     }
 

@@ -93,7 +93,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value seq = qc.value(cond);
+    final Value seq = cond.value(qc);
     for(final TypeswitchGroup tg : groups) {
       final Iter iter = tg.iter(qc, seq);
       if(iter != null) return iter;

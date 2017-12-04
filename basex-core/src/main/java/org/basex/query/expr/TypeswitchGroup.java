@@ -128,9 +128,9 @@ public final class TypeswitchGroup extends Single {
   Iter iter(final QueryContext qc, final Value seq) throws QueryException {
     if(!matches(seq)) return null;
 
-    if(var == null) return qc.iter(expr);
+    if(var == null) return expr.iter(qc);
     qc.set(var, seq);
-    return qc.value(expr).iter();
+    return expr.value(qc).iter();
   }
 
   @Override

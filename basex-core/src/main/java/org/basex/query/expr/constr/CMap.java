@@ -64,7 +64,7 @@ public final class CMap extends Arr {
       final Value key = exprs[e].atomValue(qc, info);
       if(!(key instanceof Item)) throw SEQFOUND_X.get(info, key);
       final Item k = (Item) key;
-      final Value v = qc.value(exprs[e + 1]);
+      final Value v = exprs[e + 1].value(qc);
       if(map.contains(k, info)) throw MAPDUPLKEY_X_X_X.get(info, k, map.get(k, info), v);
       map = map.put(k, v, info);
     }

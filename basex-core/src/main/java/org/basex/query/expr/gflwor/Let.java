@@ -75,9 +75,7 @@ public final class Let extends ForLet {
   private static Dbl score(final Iter iter, final QueryContext qc) throws QueryException {
     double s = 0;
     int c = 0;
-    for(Item it; (it = iter.next()) != null; s += it.score(), c++) {
-      qc.checkStop();
-    }
+    for(Item it; (it = qc.next(iter)) != null; s += it.score(), c++);
     return Dbl.get(Scoring.avg(s, c));
   }
 
@@ -171,12 +169,12 @@ public final class Let extends ForLet {
           final boolean s = qc.scoring;
           try {
             qc.scoring = true;
-            vl = score(qc.iter(let.expr), qc);
+            vl = score(let.expr.iter(qc), qc);
           } finally {
             qc.scoring = s;
           }
         } else {
-          vl = qc.value(let.expr);
+          vl = let.expr.value(qc);
         }
         qc.set(let.var, vl);
       }

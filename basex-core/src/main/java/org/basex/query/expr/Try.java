@@ -79,7 +79,7 @@ public final class Try extends Single {
   public Value value(final QueryContext qc) throws QueryException {
     // don't catch errors from error handlers
     try {
-      return qc.value(expr);
+      return expr.value(qc);
     } catch(final QueryException ex) {
       if(ex.isCatchable()) {
         for(final Catch c : catches) {

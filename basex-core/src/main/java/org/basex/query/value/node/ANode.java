@@ -10,6 +10,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -79,9 +80,23 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final Item atomItem(final InputInfo ii) {
+  public final Value atomValue(final InputInfo ii) throws QueryException {
+    return atomItem();
+  }
+
+  @Override
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomItem();
+  }
+
+  /**
+   * Returns an atomic item.
+   * @return item
+   */
+  private Item atomItem() {
     return type == NodeType.PI || type == NodeType.COM ? Str.get(string()) : new Atm(string());
   }
+
 
   /**
    * Returns a deep copy of the node.

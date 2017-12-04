@@ -50,7 +50,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = iter(qc);
-    final Item it = iter.next();
+    final Item it = qc.next(iter);
     // check next item if size of iterator is larger than one or unknown (-1)
     if(it != null && iter.size() != 1) {
       final Item nx = iter.next();
@@ -69,18 +69,18 @@ public abstract class ParseExpr extends Expr {
       final Value v = item(qc, info);
       return v == null ? Empty.SEQ : v;
     }
-    return qc.iter(this).value(qc);
+    return iter(qc).value(qc);
   }
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return qc.value(this).atomValue(info);
+    return value(qc).atomValue(info);
   }
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = item(qc, info);
-    return it == null ? null : it.atomItem(info);
+    return it == null ? null : it.atomItem(qc,  info);
   }
 
   @Override

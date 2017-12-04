@@ -126,12 +126,12 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return qc.iter(getCase(qc));
+    return getCase(qc).iter(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return qc.value(getCase(qc));
+    return getCase(qc).value(qc);
   }
 
   @Override

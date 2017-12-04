@@ -41,17 +41,16 @@ public final class IterMap extends SimpleMap {
         try {
           do {
             focus.value = values[pos];
-            final Item it = iter[pos].next();
+            final Item it = qc.next(iter[pos]);
             if(it == null) {
               if(--pos == -1) return null;
             } else if(pos < sz - 1) {
               focus.value = it;
               values[++pos] = it;
-              iter[pos] = qc.iter(exprs[pos]);
+              iter[pos] = exprs[pos].iter(qc);
             } else {
               return it;
             }
-            qc.checkStop();
           } while(true);
         } finally {
           qc.focus = qf;
@@ -61,7 +60,7 @@ public final class IterMap extends SimpleMap {
       private void init(final QueryFocus qf) throws QueryException {
         sz = exprs.length;
         iter = new Iter[sz];
-        iter[0] = qc.iter(exprs[0]);
+        iter[0] = exprs[0].iter(qc);
         focus = qf.copy();
         values = new Value[sz];
         values[0] = qf.value;

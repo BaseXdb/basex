@@ -67,12 +67,12 @@ public final class For extends ForLet {
               final boolean s = qc.scoring;
               try {
                 qc.scoring = true;
-                it = iter.next();
+                it = qc.next(iter);
               } finally {
                 qc.scoring = s;
               }
             } else {
-              it = iter.next();
+              it = qc.next(iter);
             }
           }
           if(it != null) {
@@ -99,12 +99,12 @@ public final class For extends ForLet {
             final boolean s = qc.scoring;
             try {
               qc.scoring = true;
-              iter = qc.iter(expr);
+              iter = expr.iter(qc);
             } finally {
               qc.scoring = s;
             }
           } else {
-            iter = qc.iter(expr);
+            iter = expr.iter(qc);
           }
           p = 0;
         }

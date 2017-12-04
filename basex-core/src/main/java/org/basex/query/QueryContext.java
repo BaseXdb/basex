@@ -17,7 +17,6 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
@@ -389,25 +388,14 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Evaluates the specified expression and returns an iterator.
-   * @param expr expression to be evaluated
-   * @return iterator
+   * Checks if evaluation has been stopped and returns the next item of an iterator.
+   * @param iter iterator
+   * @return item or {@code null}
    * @throws QueryException query exception
    */
-  public Iter iter(final Expr expr) throws QueryException {
+  public Item next(final Iter iter) throws QueryException {
     checkStop();
-    return expr.iter(this);
-  }
-
-  /**
-   * Evaluates the specified expression and returns a value.
-   * @param expr expression to be evaluated
-   * @return value
-   * @throws QueryException query exception
-   */
-  public Value value(final Expr expr) throws QueryException {
-    checkStop();
-    return expr.value(this);
+    return iter.next();
   }
 
   /**
@@ -609,8 +597,7 @@ public final class QueryContext extends Job implements Closeable {
     final Data data = resources.globalData();
     if(defaultOutput && data != null) {
       final IntList pres = new IntList();
-      while((it = iter.next()) != null && it.data() == data && pres.size() < mx) {
-        checkStop();
+      while((it = next(iter)) != null && it.data() == data && pres.size() < mx) {
         pres.add(((DBNode) it).pre());
       }
 
@@ -629,8 +616,7 @@ public final class QueryContext extends Job implements Closeable {
     }
 
     // use standard iterator
-    while((it = iter.next()) != null && cache.size() < mx) {
-      checkStop();
+    while((it = next(iter)) != null && cache.size() < mx) {
       it.materialize(null);
       cache.add(it);
     }

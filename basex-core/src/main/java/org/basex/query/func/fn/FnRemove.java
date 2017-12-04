@@ -19,7 +19,7 @@ public final class FnRemove extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final long p = toLong(exprs[1], qc) - 1;
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final long is = iter.size();
     return p < 0 || is != -1 && p > is ? iter : new Iter() {
       long c;
@@ -32,7 +32,7 @@ public final class FnRemove extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = qc.value(exprs[0]);
+    final Value val = exprs[0].value(qc);
     final long pos = toLong(exprs[1], qc) - 1, n = val.size();
     if(pos < 0 || pos >= n) return val;
     // remove first or last item: create sub sequence

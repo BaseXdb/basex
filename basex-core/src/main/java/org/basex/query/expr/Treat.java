@@ -39,7 +39,7 @@ public final class Treat extends Single {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
-    final Iter iter = qc.iter(expr);
+    final Iter iter = expr.iter(qc);
     final Item it = iter.next();
     // input is empty
     if(it == null) {
@@ -68,7 +68,7 @@ public final class Treat extends Single {
         if(i == null) return null;
         if(!i.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, i.type, st, i);
         final Item ii = i;
-        i = iter.next();
+        i = qc.next(iter);
         return ii;
       }
     };
@@ -77,7 +77,7 @@ public final class Treat extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
-    final Value val = qc.value(expr);
+    final Value val = expr.value(qc);
 
     final long len = val.size();
     // input is empty

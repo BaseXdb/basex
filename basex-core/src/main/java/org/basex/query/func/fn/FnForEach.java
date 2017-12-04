@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 public final class FnForEach extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final FItem fun = checkArity(exprs[1], 1, qc);
 
     return new Iter() {
@@ -27,12 +27,11 @@ public final class FnForEach extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         do {
-          final Item it = ir2.next();
+          final Item it = qc.next(ir2);
           if(it != null) return it;
           final Item it2 = iter.next();
           if(it2 == null) return null;
           ir2 = fun.invokeValue(qc, info, it2).iter();
-          qc.checkStop();
         } while(true);
       }
     };
@@ -40,14 +39,11 @@ public final class FnForEach extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final FItem fun = checkArity(exprs[1], 1, qc);
 
     final ValueBuilder vb = new ValueBuilder();
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      vb.add(fun.invokeValue(qc, info, it));
-    }
+    for(Item it; (it = qc.next(iter)) != null;) vb.add(fun.invokeValue(qc, info, it));
     return vb.value();
   }
 

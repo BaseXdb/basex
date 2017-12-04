@@ -93,7 +93,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value subSequence(long start, long length);
 
   /**
-   * Materializes streamable values.
+   * Materializes lazy values.
    * @param ii input info
    * @throws QueryException query exception
    */

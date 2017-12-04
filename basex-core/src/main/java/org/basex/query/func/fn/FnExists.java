@@ -19,7 +19,7 @@ public final class FnExists extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr ex = exprs[0];
-    return Bln.get((ex.seqType().zeroOrOne() ? ex.item(qc, info) : qc.iter(ex).next()) != null);
+    return Bln.get((ex.seqType().zeroOrOne() ? ex.item(qc, info) : ex.iter(qc).next()) != null);
   }
 
   @Override

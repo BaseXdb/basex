@@ -25,7 +25,7 @@ public final class ArrayFoldRight extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Array array = toArray(exprs[0], qc);
-    Value res = qc.value(exprs[1]);
+    Value res = exprs[1].value(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
     final ListIterator<Value> iter = array.iterator(array.arraySize());
     while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);

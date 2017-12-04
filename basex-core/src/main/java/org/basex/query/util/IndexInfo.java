@@ -117,10 +117,10 @@ public final class IndexInfo {
     final ParseExpr root;
     if(search instanceof Value) {
       // loop through all items
-      final Iter iter = qc.iter(search);
+      final Iter iter = search.iter(qc);
       final ArrayList<ValueAccess> tmp = new ArrayList<>();
       final TokenSet strings = new TokenSet();
-      for(Item it; (it = iter.next()) != null;) {
+      for(Item it; (it = qc.next(iter)) != null;) {
         // only strings and untyped items are supported
         if(!it.type.isStringOrUntyped()) return false;
         // do not use text/attribute index if string is empty or too long

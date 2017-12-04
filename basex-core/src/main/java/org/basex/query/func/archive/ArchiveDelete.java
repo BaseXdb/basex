@@ -26,9 +26,8 @@ public final class ArchiveDelete extends ArchiveFn {
     final B64 archive = toB64(exprs[0], qc, false);
     // entries to be deleted
     final TokenObjMap<Item[]> hm = new TokenObjMap<>();
-    final Iter names = qc.iter(exprs[1]);
-    for(Item en; (en = names.next()) != null;) {
-      qc.checkStop();
+    final Iter names = exprs[1].iter(qc);
+    for(Item en; (en = qc.next(names)) != null;) {
       hm.put(checkElemToken(en).string(info), null);
     }
 

@@ -392,7 +392,7 @@ public final class Window extends Clause {
      */
     boolean prepareNext(final QueryContext qc, final Eval sub) throws QueryException {
       if(!sub.next(qc)) return false;
-      iter = qc.iter(expr);
+      iter = expr.iter(qc);
       prev = null;
       p = 0;
       return true;

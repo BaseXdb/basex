@@ -58,7 +58,7 @@ public final class Insert extends Update {
     if(c.duplAtt != null) throw UPATTDUPL_X.get(info, c.duplAtt);
 
     // check target constraints
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final Item it = iter.next();
     if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
 

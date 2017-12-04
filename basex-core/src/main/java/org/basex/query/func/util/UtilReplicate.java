@@ -19,7 +19,7 @@ import org.basex.query.value.type.*;
 public final class UtilReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = qc.value(exprs[0]);
+    final Value value = exprs[0].value(qc);
     final long mult = toLong(exprs[1], qc);
     if(mult < 0) throw UTIL_NEGATIVE_X.get(info, mult);
     return SingletonSeq.get(value, mult);

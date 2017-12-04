@@ -73,7 +73,7 @@ public final class Transform extends Arr {
 
     try {
       for(final Let copy : copies) {
-        final Iter iter = qc.iter(copy.expr);
+        final Iter iter = copy.expr.iter(qc);
         Item it = iter.next();
         if(!(it instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, it);
         final Item i2 = iter.next();
@@ -86,12 +86,12 @@ public final class Transform extends Arr {
         qc.set(copy.var, it);
         updates.addData(it.data());
       }
-      final Value v = qc.value(exprs[0]);
+      final Value v = exprs[0].value(qc);
       if(!v.isEmpty()) throw UPMODIFY.get(info);
 
       updates.prepare(qc);
       updates.apply(qc);
-      return qc.value(exprs[1]);
+      return exprs[1].value(qc);
     } finally {
       qc.updates = upd;
     }

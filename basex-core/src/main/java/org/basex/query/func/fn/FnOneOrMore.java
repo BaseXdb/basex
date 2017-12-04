@@ -19,7 +19,7 @@ import org.basex.query.value.type.*;
 public final class FnOneOrMore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final long len = iter.size();
     if(len == 0) throw ONEORMORE.get(info);
     if(len > 0) return iter;
@@ -39,7 +39,7 @@ public final class FnOneOrMore extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = qc.value(exprs[0]);
+    final Value val = exprs[0].value(qc);
     if(val.isEmpty()) throw ONEORMORE.get(info);
     return val;
   }

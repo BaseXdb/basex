@@ -43,10 +43,7 @@ public class ConvertIntegersToBase64 extends ConvertFn {
     } else {
       // other types
       final Iter iter = v.iter();
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
-        bl.add((int) toLong(it));
-      }
+      for(Item it; (it = qc.next(iter)) != null;) bl.add((int) toLong(it));
     }
     return B64.get(bl.finish());
   }

@@ -28,21 +28,20 @@ public final class ArchiveUpdate extends ArchiveCreate {
     // entries to be updated
     final TokenObjMap<Item[]> hm = new TokenObjMap<>();
 
-    final Iter entr = qc.iter(exprs[1]), cont = qc.iter(exprs[2]);
+    final Iter entries = exprs[1].iter(qc), contents = exprs[2].iter(qc);
     int e = 0, c = 0;
     Item en, cn;
     while(true) {
-      qc.checkStop();
-      en = entr.next();
-      cn = cont.next();
+      en = qc.next(entries);
+      cn = contents.next();
       if(en == null || cn == null) break;
       hm.put(checkElemToken(en).string(info), new Item[] { en, cn });
       e++;
       c++;
     }
     // count remaining entries
-    if(cn != null) do c++; while(cont.next() != null);
-    if(en != null) do e++; while(entr.next() != null);
+    if(cn != null) do c++; while(contents.next() != null);
+    if(en != null) do e++; while(entries.next() != null);
     if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
 
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info);

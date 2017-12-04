@@ -20,11 +20,8 @@ public final class DbOutput extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Updates updates = qc.updates();
     if(updates.mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);
-    final Iter iter = qc.iter(exprs[0]);
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      qc.updates.cache.add(it);
-    }
+    final Iter iter = exprs[0].iter(qc);
+    for(Item it; (it = qc.next(iter)) != null;) qc.updates.cache.add(it);
     return null;
   }
 }

@@ -20,8 +20,8 @@ import org.basex.query.value.seq.tree.*;
 public final class FnFoldRight extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value seq = qc.value(exprs[0]);
-    Value res = qc.value(exprs[1]);
+    final Value seq = exprs[0].value(qc);
+    Value res = exprs[1].value(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
     if(seq instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
@@ -40,13 +40,13 @@ public final class FnFoldRight extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value seq = qc.value(exprs[0]);
+    final Value seq = exprs[0].value(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
     // evaluate start value lazily if it's passed straight through
-    if(seq.isEmpty()) return qc.iter(exprs[1]);
+    if(seq.isEmpty()) return exprs[1].iter(qc);
 
-    Value res = qc.value(exprs[1]);
+    Value res = exprs[1].value(qc);
     if(seq instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {

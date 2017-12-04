@@ -31,9 +31,8 @@ public final class FnStringJoin extends StandardFunc {
     // join multiple strings
     final TokenBuilder tb = new TokenBuilder(first);
     do {
-      qc.checkStop();
       tb.add(token).add(it.string(info));
-    } while((it = iter.next()) != null);
+    } while((it = qc.next(iter)) != null);
     return Str.get(tb.finish());
   }
 }

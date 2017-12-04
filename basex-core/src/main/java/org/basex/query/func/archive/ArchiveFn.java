@@ -63,9 +63,8 @@ abstract class ArchiveFn extends StandardFunc {
     if(e < exprs.length) {
       // filter result to specified entries
       hs = new TokenSet();
-      final Iter names = qc.iter(exprs[e]);
-      for(Item en; (en = names.next()) != null;) {
-        qc.checkStop();
+      final Iter names = exprs[e].iter(qc);
+      for(Item en; (en = qc.next(names)) != null;) {
         hs.add(checkElemToken(en).string(info));
       }
     }

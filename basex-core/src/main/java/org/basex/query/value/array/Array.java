@@ -324,8 +324,7 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public final Expr inlineExpr(final Expr[] exprs, final CompileContext cc,
-      final InputInfo ii) {
+  public final Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii) {
     return null;
   }
 
@@ -336,12 +335,16 @@ public abstract class Array extends FItem {
 
   @Override
   public final Value atomValue(final InputInfo ii) throws QueryException {
-    return atm(ii, false);
+    if(arraySize() == 1) return get(0).atomValue(ii);
+    final ValueBuilder vb = new ValueBuilder();
+    for(final Value val : members()) vb.add(val.atomValue(ii));
+    return vb.value();
   }
 
   @Override
-  public final Item atomItem(final InputInfo ii) throws QueryException {
-    final Value v = atm(ii, true);
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(atomSize() > 1) throw SEQFOUND_X.get(ii, this);
+    final Value v = atomValue(ii);
     return v.isEmpty() ? null : (Item) v;
   }
 
@@ -352,22 +355,6 @@ public abstract class Array extends FItem {
       for(final Item it : val) s += it.atomSize();
     }
     return s;
-  }
-
-  /**
-   * Atomizes the values of the array.
-   * @param ii input info
-   * @param single only allow single items as result
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Value atm(final InputInfo ii, final boolean single) throws QueryException {
-    final long s = atomSize(), size = arraySize();
-    if(single && s > 1) throw SEQFOUND_X.get(ii, this);
-    if(size == 1) return get(0).atomValue(ii);
-    final ValueBuilder vb = new ValueBuilder();
-    for(final Value val : members()) vb.add(val.atomValue(ii));
-    return vb.value();
   }
 
   /**

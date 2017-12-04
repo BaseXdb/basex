@@ -176,7 +176,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], arg[p]);
-      return qc.value(expr);
+      return expr.value(qc);
     } finally {
       qf.value = cv;
     }

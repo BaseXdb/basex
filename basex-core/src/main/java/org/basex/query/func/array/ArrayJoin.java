@@ -25,7 +25,7 @@ public final class ArrayJoin extends ArrayFn {
       return it == null ? Array.empty() : toArray(it);
     }
 
-    final Iter iter = qc.iter(ex);
+    final Iter iter = ex.iter(qc);
     Item it = iter.next();
     if(it == null) return Array.empty();
     final Array fst = toArray(it);
@@ -37,9 +37,8 @@ public final class ArrayJoin extends ArrayFn {
 
     final ArrayBuilder builder = new ArrayBuilder().append(fst).append(snd);
     do {
-      qc.checkStop();
       builder.append(toArray(it));
-    } while((it = iter.next()) != null);
+    } while((it = qc.next(iter)) != null);
     return builder.freeze();
   }
 

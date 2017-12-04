@@ -118,12 +118,10 @@ public final class Lookup extends Arr {
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     final Expr keys = exprs[0];
-    final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : qc.iter(exprs[1]);
+    final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : exprs[1].iter(qc);
 
     // iterate through all map/array inputs
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-
+    for(Item it; (it = qc.next(iter)) != null;) {
       if(!(it instanceof Map || it instanceof Array)) throw LOOKUP_X.get(info, it);
       final FItem fit = (FItem) it;
 
@@ -136,7 +134,7 @@ public final class Lookup extends Arr {
         }
       } else {
         final Iter ir = keys.atomIter(qc, info);
-        for(Item key; (key = ir.next()) != null;) {
+        for(Item key; (key = qc.next(ir)) != null;) {
           vb.add(fit.invokeValue(qc, info, key));
         }
       }

@@ -17,12 +17,12 @@ import org.basex.util.*;
 public class HofId extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    return qc.iter(exprs[0]);
+    return exprs[0].iter(qc);
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return qc.value(exprs[0]);
+    return exprs[0].value(qc);
   }
 
   @Override

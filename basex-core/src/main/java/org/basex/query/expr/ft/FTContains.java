@@ -41,7 +41,7 @@ public final class FTContains extends Single {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final boolean scoring = qc.scoring;
-    final Iter iter = qc.iter(expr);
+    final Iter iter = expr.iter(qc);
 
     final FTLexer tmp = qc.ftLexer, lexer = new FTLexer(new FTOpt());
     qc.ftLexer = lexer;
@@ -50,8 +50,7 @@ public final class FTContains extends Single {
       int c = 0;
       boolean f = false;
       final FTPosData ftPosData = qc.ftPosData;
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
+      for(Item it; (it = qc.next(iter)) != null;) {
         lexer.init(it.string(info));
         final FTNode item = ftexpr.item(qc, info);
         final FTMatches all = item.matches();

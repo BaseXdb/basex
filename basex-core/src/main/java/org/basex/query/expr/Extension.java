@@ -56,14 +56,14 @@ public final class Extension extends Single {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return qc.iter(value(qc));
+    return value(qc).iter(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Object state = pragma.init(qc, info);
     try {
-      return qc.value(expr);
+      return expr.value(qc);
     } finally {
       pragma.finish(qc, state);
     }

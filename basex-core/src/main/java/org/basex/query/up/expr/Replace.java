@@ -49,7 +49,7 @@ public final class Replace extends Update {
     if(c.errAtt != null) throw UPNOATTRPER_X.get(info, c.errAtt);
     if(c.duplAtt != null) throw UPATTDUPL_X.get(info, c.duplAtt);
 
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final Item it = iter.next();
     // check target constraints
     if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));

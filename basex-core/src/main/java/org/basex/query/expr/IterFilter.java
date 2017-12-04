@@ -32,10 +32,9 @@ public final class IterFilter extends Filter {
       @Override
       public Item next() throws QueryException {
         // first call - initialize iterator
-        if(iter == null) iter = qc.iter(root);
+        if(iter == null) iter = root.iter(qc);
         // filter sequence
-        for(Item it; (it = iter.next()) != null;) {
-          qc.checkStop();
+        for(Item it; (it = qc.next(iter)) != null;) {
           if(preds(it, qc)) return it;
         }
         return null;

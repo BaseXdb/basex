@@ -25,12 +25,9 @@ public final class HofFoldLeft1 extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem f = checkArity(exprs[1], 2, qc);
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     Value sum = checkNoEmpty(iter.next());
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      sum = f.invokeValue(qc, info, sum, it);
-    }
+    for(Item it; (it = qc.next(iter)) != null;) sum = f.invokeValue(qc, info, sum, it);
     return sum;
   }
 

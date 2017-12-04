@@ -18,21 +18,20 @@ import org.basex.query.value.type.*;
 public final class HofScanLeft extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter outer = qc.iter(exprs[0]);
+    final Iter outer = exprs[0].iter(qc);
     final FItem f = checkArity(exprs[2], 2, qc);
     return new Iter() {
-      private Value acc = qc.value(exprs[1]);
+      private Value acc = exprs[1].value(qc);
       private Iter inner = acc.iter();
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item i = inner.next();
+          final Item i = qc.next(inner);
           if(i != null) return i;
           final Item o = outer.next();
           if(o == null) return null;
           acc = f.invokeValue(qc, info, acc, o);
           inner = acc.iter();
-          qc.checkStop();
         }
       }
     };

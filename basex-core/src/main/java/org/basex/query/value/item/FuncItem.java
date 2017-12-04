@@ -112,7 +112,7 @@ public final class FuncItem extends FItem implements Scope {
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
-      return qc.value(expr);
+      return expr.value(qc);
     } finally {
       qc.focus = qf;
     }

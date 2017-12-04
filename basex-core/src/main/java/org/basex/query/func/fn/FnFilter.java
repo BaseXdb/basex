@@ -17,12 +17,11 @@ public final class FnFilter extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final FItem fun = checkArity(exprs[1], 1, qc);
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        for(Item it; (it = iter.next()) != null;) {
-          qc.checkStop();
+        for(Item it; (it = qc.next(iter)) != null;) {
           if(toBoolean(fun.invokeItem(qc, info, it))) return it;
         }
         return null;

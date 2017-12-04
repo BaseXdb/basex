@@ -47,7 +47,7 @@ public final class IterPath extends AxisPath {
 
         try {
           do {
-            final Item it = iter[pos].next();
+            final Item it = qc.next(iter[pos]);
             if(it == null) {
               if(--pos == -1) return null;
             } else if(pos < sz - 1) {
@@ -55,7 +55,7 @@ public final class IterPath extends AxisPath {
               if(pos++ == 0 && rt && !(it instanceof ANode))
                 throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
               focus.value = it;
-              iter[pos] = qc.iter(exprs[pos]);
+              iter[pos] = exprs[pos].iter(qc);
             } else {
               // cast is safe (axis steps will always yield nodes); skip identical nodes
               final ANode n = (ANode) it;
@@ -64,7 +64,6 @@ public final class IterPath extends AxisPath {
                 return n;
               }
             }
-            qc.checkStop();
           } while(true);
         } finally {
           qc.focus = qf;
@@ -76,7 +75,7 @@ public final class IterPath extends AxisPath {
         sz = steps.length + (rt ? 1 : 0);
         exprs = rt ? new ExprList(sz).add(root).add(steps).finish() : steps;
         iter = new Iter[sz];
-        iter[0] = qc.iter(exprs[0]);
+        iter[0] = exprs[0].iter(qc);
         focus = qf.copy();
       }
     };

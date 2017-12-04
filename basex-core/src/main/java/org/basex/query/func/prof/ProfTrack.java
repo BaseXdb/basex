@@ -45,13 +45,13 @@ public final class ProfTrack extends StandardFunc {
     // include resulting value
     Value value = null;
     if(opts.get(TrackOptions.VALUE)) {
-      // directly retrieve value
-      value = qc.value(exprs[0]);
+      // retrieve and assign value
+      value = exprs[0].value(qc);
     } else {
       // iterate through results; skip iteration if iterator is value-based
       final Iter ir = exprs[0].iter(qc);
       if(ir.value() == null) {
-        while(ir.next() != null);
+        while(qc.next(ir) != null);
       }
     }
 

@@ -20,7 +20,7 @@ import org.basex.util.options.Options.*;
 public final class JsonSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
     return Str.get(serialize(iter, options(jopts), INVALIDOPT_X, qc));
   }

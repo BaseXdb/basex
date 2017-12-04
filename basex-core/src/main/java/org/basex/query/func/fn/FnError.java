@@ -68,7 +68,7 @@ public final class FnError extends StandardFunc {
     if(name == null) name = FUNERR1.qname();
 
     final String msg = al > 1 ? Token.string(toToken(exprs[1], qc)) : FUNERR1.desc;
-    final Value val = al > 2 ? qc.value(exprs[2]) : null;
+    final Value val = al > 2 ? exprs[2].value(qc) : null;
     throw new QueryException(info, name, msg).value(val);
   }
 }

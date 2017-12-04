@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class FnDeepEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir1 = qc.iter(exprs[0]), ir2 = qc.iter(exprs[1]);
+    final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
     final Collation coll = toCollation(2, qc);
     return Bln.get(new DeepEqual(info).collation(coll).equal(ir1, ir2, qc));
   }

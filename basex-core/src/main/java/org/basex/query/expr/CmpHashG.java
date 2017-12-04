@@ -66,8 +66,7 @@ public final class CmpHashG extends CmpG {
         Iter ir2 = cache.iter;
 
         // loop through input items
-        for(Item it1; (it1 = iter1.next()) != null;) {
-          qc.checkStop();
+        for(Item it1; (it1 = qc.next(iter1)) != null;) {
           // check if item has already been cached
           if(set.contains(it1, info)) {
             cache.hits++;
@@ -76,8 +75,7 @@ public final class CmpHashG extends CmpG {
 
           // cache remaining items (stop after first hit)
           if(ir2 != null) {
-            for(Item it2; (it2 = ir2.next()) != null;) {
-              qc.checkStop();
+            for(Item it2; (it2 = qc.next(ir2)) != null;) {
               set.add(it2, info);
               if(set.contains(it1, info)) return Bln.TRUE;
             }

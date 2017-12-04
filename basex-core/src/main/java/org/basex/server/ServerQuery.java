@@ -119,7 +119,8 @@ public final class ServerQuery extends Job {
       // create serializer
       final Performance perf = jc().performance;
       qp.compile();
-      final QueryInfo qi = qp.qc.info;
+      final QueryContext qc = qp.qc;
+      final QueryInfo qi = qc.info;
       qi.compiling = perf.ns();
       final Iter ir = qp.iter();
       qi.evaluating = perf.ns();
@@ -127,10 +128,9 @@ public final class ServerQuery extends Job {
       // iterate through results
       int c = 0;
       final PrintOutput po = PrintOutput.get(encode ? new ServerOutput(out) : out);
-      final SerializerOptions sopts = full ? SerializerMode.API.get() : qp.qc.serParams();
+      final SerializerOptions sopts = full ? SerializerMode.API.get() : qc.serParams();
       try(Serializer ser = Serializer.get(po, sopts)) {
-        for(Item it; (it = ir.next()) != null;) {
-          qp.qc.checkStop();
+        for(Item it; (it = qc.next(ir)) != null;) {
           if(iter) {
             if(full) po.write(it.xdmInfo());
             else po.write(it.typeId().asByte());

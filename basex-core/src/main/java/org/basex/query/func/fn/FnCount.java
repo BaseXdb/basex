@@ -23,13 +23,10 @@ public final class FnCount extends StandardFunc {
     if(ex.seqType().zeroOrOne()) return ex.item(qc, info) == null ? Int.ZERO : Int.ONE;
 
     // iterative access: if the iterator size is unknown, iterate through all results
-    final Iter iter = qc.iter(ex);
+    final Iter iter = ex.iter(qc);
     long sz = iter.size();
     if(sz == -1) {
-      do {
-        qc.checkStop();
-        ++sz;
-      } while(iter.next() != null);
+      do ++sz; while(qc.next(iter) != null);
     }
     return Int.get(sz);
   }

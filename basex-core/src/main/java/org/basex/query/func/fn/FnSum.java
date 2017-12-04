@@ -135,8 +135,7 @@ public class FnSum extends StandardFunc {
     if(!num && !dtd && !ymd) throw SUM_X_X.get(info, res.type, res);
 
     int c = 1;
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
+    for(Item it; (it = qc.next(iter)) != null;) {
       final Type t = it.type;
       Type te = null;
       if(t.isNumberOrUntyped()) {

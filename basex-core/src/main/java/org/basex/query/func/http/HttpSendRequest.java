@@ -27,11 +27,8 @@ public final class HttpSendRequest extends StandardFunc {
     // get payload
     final ValueBuilder bodies = new ValueBuilder();;
     if(exprs.length == 3) {
-      final Iter ir = qc.iter(exprs[2]);
-      for(Item body; (body = ir.next()) != null;) {
-        qc.checkStop();
-        bodies.add(body);
-      }
+      final Iter iter = exprs[2].iter(qc);
+      for(Item body; (body = qc.next(iter)) != null;) bodies.add(body);
     }
     // send HTTP request
     return new HttpClient(info, qc.context.options).sendRequest(href, request, bodies.value());

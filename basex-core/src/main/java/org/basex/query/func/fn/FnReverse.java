@@ -18,7 +18,7 @@ public final class FnReverse extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // optimization: reverse sequence
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
 
     // materialize value if number of results is unknown
     final long s = iter.size();
@@ -50,16 +50,13 @@ public final class FnReverse extends StandardFunc {
 
     // standard iterator
     final ValueBuilder vb = new ValueBuilder();
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      vb.addFront(it);
-    }
+    for(Item it; (it = qc.next(iter)) != null;) vb.addFront(it);
     return vb.value().iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return qc.value(exprs[0]).reverse();
+    return exprs[0].value(qc).reverse();
   }
 
   @Override

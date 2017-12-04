@@ -230,35 +230,24 @@ public abstract class Item extends Value {
     return length == 1 ? this : Empty.SEQ;
   }
 
-  // Overridden by B64Stream, StrStream, Map and Array.
+  // Overwritten by Lazy, Map and Array.
   @Override
   public void materialize(final InputInfo ii) throws QueryException { }
 
-  // Overridden by Array.
+  // Overwritten by Array, FItem and ANode
   @Override
   public Value atomValue(final InputInfo ii) throws QueryException {
-    return atomItem(ii);
-  }
-
-  @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return atomItem(ii);
-  }
-
-  /**
-   * Evaluates the expression and returns the atomized items.
-   * @param ii input info
-   * @return materialized item
-   * @throws QueryException query exception
-   */
-  // Overridden by Array, FItem and ANode
-  @SuppressWarnings("unused")
-  public Item atomItem(final InputInfo ii) throws QueryException {
     return this;
   }
 
+  // Overwritten by Array, FItem and ANode
   @Override
-  // Overridden by Array
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return this;
+  }
+
+  // Overwritten by Array
+  @Override
   public long atomSize() {
     return 1;
   }

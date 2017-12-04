@@ -207,7 +207,7 @@ public final class DynFuncCall extends FuncCall {
   Value[] evalArgs(final QueryContext qc) throws QueryException {
     final int last = exprs.length - 1;
     final Value[] args = new Value[last];
-    for(int a = 0; a < last; a++) args[a] = qc.value(exprs[a]);
+    for(int a = 0; a < last; a++) args[a] = exprs[a].value(qc);
     return args;
   }
 

@@ -43,7 +43,7 @@ public final class Instance extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(instType.instance(qc.value(expr)));
+    return Bln.get(instType.instance(expr.value(qc)));
   }
 
   @Override

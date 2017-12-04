@@ -34,18 +34,14 @@ public final class Intersect extends Set {
   @Override
   protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     ANodeBuilder list = new ANodeBuilder();
-    for(Item it; (it = iters[0].next()) != null;) {
-      qc.checkStop();
-      list.add(toNode(it));
-    }
+    for(Item it; (it = qc.next(iters[0])) != null;) list.add(toNode(it));
 
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); ++e) {
       list.check();
       final ANodeBuilder nt = new ANodeBuilder();
       final Iter iter = iters[e];
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
+      for(Item it; (it = qc.next(iter)) != null;) {
         final ANode n = toNode(it);
         if(list.contains(n)) nt.add(n);
       }
@@ -62,8 +58,8 @@ public final class Intersect extends Set {
   }
 
   @Override
-  protected NodeIter iter(final Iter[] iters) {
-    return new SetIter(iters) {
+  protected NodeIter iter(final Iter[] iters, final QueryContext qc) {
+    return new SetIter(qc, iters) {
       @Override
       public ANode next() throws QueryException {
         final int irl = iter.length;

@@ -66,10 +66,8 @@ public final class Constr {
     try {
       for(final Expr expr : exprs) {
         more = false;
-        final Iter iter = qc.iter(expr);
-        for(Item it; (it = iter.next()) != null && add(qc, it);) {
-          qc.checkStop();
-        }
+        final Iter iter = expr.iter(qc);
+        for(Item it; (it = qc.next(iter)) != null && add(qc, it););
       }
       if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
       return this;
@@ -150,9 +148,7 @@ public final class Constr {
         // type: document node
 
         final BasicNodeIter iter = node.children();
-        for(ANode ch; (ch = iter.next()) != null && add(qc, ch);) {
-          qc.checkStop();
-        }
+        for(Item it; (it = qc.next(iter)) != null && add(qc, it););
 
       } else {
         // type: element/comment/processing instruction node

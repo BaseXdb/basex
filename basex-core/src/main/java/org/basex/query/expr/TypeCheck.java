@@ -84,7 +84,7 @@ public final class TypeCheck extends Single {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
-    final Iter iter = qc.iter(expr);
+    final Iter iter = expr.iter(qc);
 
     return new Iter() {
       final ItemList cache = new ItemList();
@@ -93,11 +93,10 @@ public final class TypeCheck extends Single {
       @Override
       public Item next() throws QueryException {
         while(c == cache.size()) {
-          qc.checkStop();
           cache.size(0);
           c = 0;
 
-          final Item it = iter.next();
+          final Item it = qc.next(iter);
           if(it == null || st.instance(it)) {
             cache.add(it);
           } else if(promote) {
@@ -109,10 +108,7 @@ public final class TypeCheck extends Single {
 
         final Item it = cache.get(c);
         cache.set(c++, null);
-
-        if(it == null && i < st.occ.min || i > st.occ.max)
-          throw typeError(expr, st, null, info);
-
+        if(it == null && i < st.occ.min || i > st.occ.max) throw typeError(expr, st, null, info);
         i++;
         return it;
       }
@@ -121,7 +117,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = qc.value(expr);
+    final Value val = expr.value(qc);
     final SeqType st = seqType();
     if(st.instance(val)) return val;
     if(promote) return st.promote(val, null, qc, sc, info, false);

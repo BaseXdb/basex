@@ -112,12 +112,12 @@ public final class If extends Arr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return qc.iter(exprs[branch(qc)]);
+    return exprs[branch(qc)].iter(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return qc.value(exprs[branch(qc)]);
+    return exprs[branch(qc)].value(qc);
   }
 
   @Override

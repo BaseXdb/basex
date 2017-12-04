@@ -138,8 +138,7 @@ public class XQueryEval extends StandardFunc {
 
         final ItemList cache = new ItemList();
         final Iter iter = qctx.iter();
-        for(Item it; (it = iter.next()) != null;) {
-          qctx.checkStop();
+        for(Item it; (it = qctx.next(iter)) != null;) {
           qc.checkStop();
           cache.add(it);
         }

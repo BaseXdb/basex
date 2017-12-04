@@ -2,6 +2,7 @@ package org.basex.query.expr.constr;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
@@ -48,10 +49,11 @@ public final class CArray extends Arr {
   public Array item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ArrayBuilder builder = new ArrayBuilder();
     if(seq) {
-      for(final Expr expr : exprs) builder.append(qc.value(expr));
+      for(final Expr expr : exprs) builder.append(expr.value(qc));
     } else {
       for(final Expr expr : exprs) {
-        for(final Item it : qc.value(expr)) builder.append(it);
+        final Iter iter = expr.value(qc).iter();
+        for(Item it; (it = qc.next(iter)) != null;) builder.append(it);
       }
     }
     return builder.freeze();

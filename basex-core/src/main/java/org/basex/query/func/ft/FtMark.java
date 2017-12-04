@@ -67,7 +67,7 @@ public class FtMark extends StandardFunc {
           final FTPosData tmp = qc.ftPosData;
           try {
             qc.ftPosData = ftd;
-            if(ir == null) ir = qc.iter(exprs[0]);
+            if(ir == null) ir = exprs[0].iter(qc);
             final Item it = ir.next();
             if(it == null) return null;
 

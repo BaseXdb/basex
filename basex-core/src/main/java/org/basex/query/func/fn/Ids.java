@@ -132,8 +132,7 @@ abstract class Ids extends StandardFunc {
    */
   private TokenSet ids(final Iter iter, final QueryContext qc) throws QueryException {
     final TokenSet ts = new TokenSet();
-    for(Item ids; (ids = iter.next()) != null;) {
-      qc.checkStop();
+    for(Item ids; (ids = qc.next(iter)) != null;) {
       for(final byte[] id : distinctTokens(toToken(ids))) ts.put(id);
     }
     return ts;

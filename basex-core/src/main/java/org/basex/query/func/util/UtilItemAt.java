@@ -28,14 +28,13 @@ public final class UtilItemAt extends StandardFunc {
     if(ex.seqType().zeroOrOne()) return ps == 1 ? ex.item(qc, info) : null;
 
     // fast route if the size is known
-    final Iter iter = qc.iter(ex);
+    final Iter iter = ex.iter(qc);
     final long is = iter.size();
     if(is >= 0) return ps > is ? null : iter.get(ps - 1);
 
     // loop through all items
     long p = 0;
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
+    for(Item it; (it = qc.next(iter)) != null;) {
       if(++p == ps) return it;
     }
     return null;

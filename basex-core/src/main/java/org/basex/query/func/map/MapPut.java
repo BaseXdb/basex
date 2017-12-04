@@ -20,7 +20,7 @@ public final class MapPut extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Map map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
-    final Value val = qc.value(exprs[2]);
+    final Value val = exprs[2].value(qc);
     return map.put(key, val, info);
   }
 

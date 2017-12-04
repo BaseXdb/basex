@@ -162,7 +162,7 @@ public final class CompileContext {
    * @throws QueryException query exception
    */
   public Expr preEval(final Expr expr) throws QueryException {
-    return replaceWith(expr, qc.value(expr));
+    return replaceWith(expr, expr.value(qc));
   }
 
   /**

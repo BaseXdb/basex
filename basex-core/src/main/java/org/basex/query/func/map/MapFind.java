@@ -24,7 +24,7 @@ public final class MapFind extends StandardFunc {
   @Override
   public Array value(final QueryContext qc) throws QueryException {
     final ArrayBuilder builder = new ArrayBuilder();
-    find(qc.iter(exprs[0]), toAtomItem(exprs[1], qc), builder, qc);
+    find(exprs[0].iter(qc), toAtomItem(exprs[1], qc), builder, qc);
     return builder.freeze();
   }
 
@@ -39,8 +39,7 @@ public final class MapFind extends StandardFunc {
   private void find(final Iter ir, final Item key, final ArrayBuilder builder,
       final QueryContext qc) throws QueryException {
 
-    for(Item it; (it = ir.next()) != null;) {
-      qc.checkStop();
+    for(Item it; (it = qc.next(ir)) != null;) {
       if(it instanceof Map) {
         final Map map = (Map) it;
         final Value value = map.get(key, info);

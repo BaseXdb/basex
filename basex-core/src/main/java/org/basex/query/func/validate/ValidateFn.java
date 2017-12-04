@@ -50,7 +50,7 @@ abstract class ValidateFn extends StandardFunc {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    return qc.value(this).iter();
+    return value(qc).iter();
   }
 
   /**

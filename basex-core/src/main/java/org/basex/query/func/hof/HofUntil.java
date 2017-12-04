@@ -22,9 +22,8 @@ public final class HofUntil extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem pred = checkArity(exprs[0], 1, qc);
-    final FItem fun = checkArity(exprs[1], 1, qc);
-    Value v = qc.value(exprs[2]);
+    final FItem pred = checkArity(exprs[0], 1, qc), fun = checkArity(exprs[1], 1, qc);
+    Value v = exprs[2].value(qc);
     while(!toBoolean(pred.invokeItem(qc, info, v))) {
       qc.checkStop();
       v = fun.invokeValue(qc, info, v);

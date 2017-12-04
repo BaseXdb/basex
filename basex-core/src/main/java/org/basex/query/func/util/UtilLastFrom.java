@@ -20,16 +20,13 @@ public final class UtilLastFrom extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // fast route if the size is known
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final long sz = iter.size();
     if(sz >= 0) return sz == 0 ? null : iter.get(sz - 1);
 
     // loop through all items
     Item litem = null;
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      litem = it;
-    }
+    for(Item it; (it = qc.next(iter)) != null;) litem = it;
     return litem;
   }
 

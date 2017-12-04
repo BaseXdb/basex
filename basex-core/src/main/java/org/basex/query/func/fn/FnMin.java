@@ -41,7 +41,7 @@ public class FnMin extends StandardFunc {
     if(it1 != null) return it1;
 
     if(ex instanceof Range) {
-      final Value v = qc.value(ex);
+      final Value v = ex.value(qc);
       return v.isEmpty() ? null : v.itemAt(cmp == OpV.GT ? 0 : v.size() - 1);
     }
 
@@ -55,8 +55,7 @@ public class FnMin extends StandardFunc {
 
     // strings and URIs
     if(it1 instanceof AStr) {
-      for(Item it2; (it2 = iter.next()) != null;) {
-        qc.checkStop();
+      for(Item it2; (it2 = qc.next(iter)) != null;) {
         if(!(it2 instanceof AStr)) throw CMP_X_X_X.get(info, t1, it2.type, it2);
         final Type t2 = it2.type;
         if(cmp.eval(it1, it2, coll, sc, info)) it1 = it2;
@@ -66,8 +65,7 @@ public class FnMin extends StandardFunc {
     }
     // booleans, dates, durations, binaries
     if(t1 == BLN || it1 instanceof ADate || it1 instanceof Dur || it1 instanceof Bin) {
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
+      for(Item it; (it = qc.next(iter)) != null;) {
         if(t1 != it.type) throw CMP_X_X_X.get(info, t1, it.type, it);
         if(cmp.eval(it1, it, coll, sc, info)) it1 = it;
       }
@@ -75,8 +73,7 @@ public class FnMin extends StandardFunc {
     }
     // numbers
     if(t1.isUntyped()) it1 = DBL.cast(it1, qc, sc, info);
-    for(Item it2; (it2 = iter.next()) != null;) {
-      qc.checkStop();
+    for(Item it2; (it2 = qc.next(iter)) != null;) {
       final AtomType t = numType(it1, it2);
       if(cmp.eval(it1, it2, coll, sc, info) || Double.isNaN(it2.dbl(info))) it1 = it2;
       if(t != null) it1 = t.cast(it1, qc, sc, info);

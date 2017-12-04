@@ -25,7 +25,7 @@ public final class FnExactlyOne extends StandardFunc {
     if(ex.seqType().zeroOrOne()) {
       it = ex.item(qc, info);
     } else {
-      final Iter iter = qc.iter(ex);
+      final Iter iter = ex.iter(qc);
       it = iter.next();
       if(it != null && iter.next() != null) it = null;
     }

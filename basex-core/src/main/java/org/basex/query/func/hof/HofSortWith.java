@@ -25,18 +25,16 @@ public final class HofSortWith extends HofFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = qc.value(exprs[0]);
+    final Value v = exprs[0].value(qc);
     final Comparator<Item> cmp = getComp(1, qc);
     if(v.size() < 2) return v;
 
-    final long n = v.size();
-    if(n > Integer.MAX_VALUE) throw RANGE_X.get(info, n);
+    final long sz = v.size();
+    if(sz > Integer.MAX_VALUE) throw RANGE_X.get(info, sz);
 
-    final ItemList items = new ItemList((int) n);
-    for(final Item it : v) {
-      qc.checkStop();
-      items.add(it);
-    }
+    final ItemList items = new ItemList((int) sz);
+    final Iter iter = v.iter();
+    for(Item it; (it = qc.next(iter)) != null;) items.add(it);
 
     try {
       Arrays.sort(items.list, 0, items.size(), cmp);

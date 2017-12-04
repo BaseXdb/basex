@@ -286,12 +286,15 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final byte[] token, final int start, final int end) {
-    byte[] chrs = chars;
-    final int cl = chrs.length, l = end - start, s = size, ns = s + l;
-    if(ns > cl) chrs = Arrays.copyOf(chrs, Array.newSize(ns));
-    System.arraycopy(token, start, chrs, s, l);
-    chars = chrs;
-    size = ns;
+    final int l = end - start;
+    if(l > 0) {
+      byte[] chrs = chars;
+      final int cl = chrs.length, s = size, ns = s + l;
+      if(ns > cl) chrs = Arrays.copyOf(chrs, Array.newSize(ns));
+      System.arraycopy(token, start, chrs, s, l);
+      chars = chrs;
+      size = ns;
+    }
     return this;
   }
 

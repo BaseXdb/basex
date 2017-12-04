@@ -28,7 +28,7 @@ public final class HofTopKBy extends StandardFunc {
     final long k = Math.min(toLong(exprs[2], qc), Integer.MAX_VALUE);
     if(k < 1) return Empty.SEQ;
 
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final MinHeap<Item, Item> heap = new MinHeap<>((it1, it2) -> {
       try {
         return OpV.LT.eval(it1, it2, sc.collation, sc, info) ? -1 : 1;
@@ -38,8 +38,7 @@ public final class HofTopKBy extends StandardFunc {
     });
 
     try {
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
+      for(Item it; (it = qc.next(iter)) != null;) {
         heap.insert(checkNoEmpty(getKey.invokeItem(qc, info, it)), it);
         if(heap.size() > k) heap.removeMin();
       }

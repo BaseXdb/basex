@@ -68,11 +68,8 @@ public final class ValueAccess extends IndexAccess {
     if(expr.seqType().zeroOrOne()) return iter(expr.item(qc, info), data);
 
     final ArrayList<BasicNodeIter> iters = new ArrayList<>();
-    final Iter iter = qc.iter(expr);
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      iters.add(iter(it, data));
-    }
+    final Iter iter = expr.iter(qc);
+    for(Item it; (it = qc.next(iter)) != null;) iters.add(iter(it, data));
     final int is = iters.size();
     return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iters.get(0) :
       new Union(info, expr).eval(iters.toArray(new NodeIter[is]), qc).iter();

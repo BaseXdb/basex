@@ -56,8 +56,7 @@ public final class CTxt extends CNode {
     boolean more = false;
 
     final Iter iter = ex.atomIter(qc, info);
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
+    for(Item it; (it = qc.next(iter)) != null;) {
       if(more) tb.add(' ');
       tb.add(it.string(info));
       more = true;

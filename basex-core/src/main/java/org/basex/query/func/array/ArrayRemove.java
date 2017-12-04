@@ -22,11 +22,8 @@ public final class ArrayRemove extends ArrayFn {
 
     // collect positions, sort and remove duplicates
     final LongList list = new LongList();
-    final Iter pos = qc.iter(exprs[1]);
-    for(Item it; (it = pos.next()) != null;) {
-      qc.checkStop();
-      list.add(checkPos(array, toLong(it), false));
-    }
+    final Iter pos = exprs[1].iter(qc);
+    for(Item it; (it = qc.next(pos)) != null;) list.add(checkPos(array, toLong(it), false));
     list.sort().distinct();
 
     // delete entries backwards

@@ -21,8 +21,7 @@ public final class ArrayFlatten extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    final Iter iter = qc.iter(exprs[0]);
-    for(Item it; (it = iter.next()) != null;) add(vb, it, qc);
+    add(vb, exprs[0], qc);
     return vb.value();
   }
 
@@ -32,7 +31,7 @@ public final class ArrayFlatten extends ArrayFn {
       @SuppressWarnings("unchecked")
       private Iterator<Value>[] iters = new Iterator[2];
       private int p = -1;
-      private Iter curr = qc.iter(exprs[0]);
+      private Iter curr = exprs[0].iter(qc);
 
       @Override
       public Item next() throws QueryException {
@@ -82,16 +81,18 @@ public final class ArrayFlatten extends ArrayFn {
   /**
    * Recursive helper method for flattening nested arrays.
    * @param vb sequence builder
-   * @param item item to be added
+   * @param expr expression
    * @param qc query context
+   * @throws QueryException query exception
    */
-  private static void add(final ValueBuilder vb, final Item item, final QueryContext qc) {
-    qc.checkStop();
-    if(item instanceof Array) {
-      for(final Value val : ((Array) item).members()) {
-        for(final Item it : val) add(vb, it, qc);
+  private static void add(final ValueBuilder vb, final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Iter iter = expr.iter(qc);
+    for(Item it; (it = qc.next(iter)) != null;) {
+      if(it instanceof Array) {
+        for(final Value val : ((Array) it).members()) add(vb, val, qc);
       }
+      else vb.add(it);
     }
-    else vb.add(item);
   }
 }

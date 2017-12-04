@@ -59,26 +59,20 @@ public final class Except extends Set {
   @Override
   protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     final ANodeBuilder list = new ANodeBuilder();
-    for(Item it; (it = iters[0].next()) != null;) {
-      qc.checkStop();
-      list.add(toNode(it));
-    }
+    for(Item it; (it = qc.next(iters[0])) != null;) list.add(toNode(it));
     list.check();
 
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); e++) {
       final Iter iter = iters[e];
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
-        list.delete(toNode(it));
-      }
+      for(Item it; (it = qc.next(iter)) != null;) list.delete(toNode(it));
     }
     return list;
   }
 
   @Override
-  protected NodeIter iter(final Iter[] iters) {
-    return new SetIter(iters) {
+  protected NodeIter iter(final Iter[] iters, final QueryContext qc) {
+    return new SetIter(qc, iters) {
       @Override
       public ANode next() throws QueryException {
         if(nodes == null) {

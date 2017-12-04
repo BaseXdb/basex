@@ -21,7 +21,7 @@ import org.basex.util.*;
 public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value funcs = qc.value(exprs[0]);
+    final Value funcs = exprs[0].value(qc);
     for(final Item func : funcs) {
       if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
         throw ZEROFUNCS_X_X.get(info, func.type, func);

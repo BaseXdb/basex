@@ -15,11 +15,11 @@ import org.basex.query.value.node.*;
 public final class DbNodeId extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     return new Iter() {
       @Override
       public Int next() throws QueryException {
-        final Item it = iter.next();
+        final Item it = qc.next(iter);
         if(it == null) return null;
         final DBNode node = toDBNode(it);
         return Int.get(node.data().id(node.pre()));

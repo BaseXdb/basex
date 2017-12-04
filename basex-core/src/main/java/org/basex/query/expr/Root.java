@@ -63,8 +63,7 @@ public final class Root extends Simple {
   private ANodeBuilder roots(final Value value, final QueryContext qc) throws QueryException {
     final Iter iter = value.iter();
     final ANodeBuilder list = new ANodeBuilder();
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
+    for(Item it; (it = qc.next(iter)) != null;) {
       final ANode n = it instanceof ANode ? ((ANode) it).root() : null;
       if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
       list.add(n);

@@ -1,5 +1,8 @@
 package org.basex.query.value.item;
 
+import org.basex.query.*;
+import org.basex.util.*;
+
 /**
  * Lazy item.
  *
@@ -12,4 +15,11 @@ public interface Lazy {
    * @return result of check
    */
   boolean isCached();
+
+  /**
+   * Materializes lazy values.
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  void materialize(InputInfo ii) throws QueryException;
 }

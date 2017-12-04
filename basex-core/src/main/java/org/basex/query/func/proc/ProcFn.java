@@ -44,11 +44,8 @@ abstract class ProcFn extends StandardFunc {
     final TokenList tl = new TokenList();
     tl.add(toToken(exprs[0], qc));
     if(exprs.length > 1) {
-      final Iter iter = qc.iter(exprs[1]);
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
-        tl.add(toToken(it));
-      }
+      final Iter iter = exprs[1].iter(qc);
+      for(Item it; (it = qc.next(iter)) != null;) tl.add(toToken(it));
     }
     final String[] args = tl.toStringArray();
 

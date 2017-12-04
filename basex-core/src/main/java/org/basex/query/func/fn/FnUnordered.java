@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,7 +15,7 @@ import org.basex.query.iter.*;
 public final class FnUnordered extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return qc.iter(exprs[0]);
+    throw Util.notExpected();
   }
 
   @Override

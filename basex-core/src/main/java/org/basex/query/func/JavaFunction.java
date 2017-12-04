@@ -68,7 +68,7 @@ public abstract class JavaFunction extends Arr {
 
     final int es = exprs.length;
     final Value[] args = new Value[es];
-    for(int e = 0; e < es; ++e) args[e] = qc.value(exprs[e]);
+    for(int e = 0; e < es; ++e) args[e] = exprs[e].value(qc);
     return toValue(eval(args, qc), qc, sc);
   }
 

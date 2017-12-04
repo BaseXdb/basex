@@ -29,7 +29,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
     final ArchOptions opts = toOptions(1, new ArchOptions(), qc);
     final Iter entries;
     if(exprs.length > 2) {
-      entries = qc.iter(exprs[2]);
+      entries = exprs[2].iter(qc);
     } else {
       final TokenList tl = new TokenList();
       for(final String file : root.descendants()) tl.add(file);
@@ -44,8 +44,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
       out.level(level);
       try {
         while(true) {
-          qc.checkStop();
-          Item en = entries.next();
+          Item en = qc.next(entries);
           if(en == null) break;
           en = checkElemToken(en);
           final IOFile file = new IOFile(root, string(en.string(info)));

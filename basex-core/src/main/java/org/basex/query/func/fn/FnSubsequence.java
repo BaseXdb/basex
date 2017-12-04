@@ -26,7 +26,7 @@ public class FnSubsequence extends StandardFunc {
     if(range == null) return Empty.ITER;
 
     // return all values
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     if(range == ALL) return iter;
 
     // compute start, length
@@ -57,12 +57,10 @@ public class FnSubsequence extends StandardFunc {
       long c;
       @Override
       public Item next() throws QueryException {
-        while(true) {
-          final Item it = iter.next();
-          if(it == null || ++c >= e) return null;
+        for(Item it; (it = qc.next(iter)) != null && ++c < e;) {
           if(c >= start) return it;
-          qc.checkStop();
         }
+        return null;
       }
     };
   }
@@ -72,11 +70,11 @@ public class FnSubsequence extends StandardFunc {
     final long[] range = range(qc);
     if(range == null) return Empty.SEQ;
     final Expr ex = exprs[0];
-    if(range == ALL) return qc.value(ex);
+    if(range == ALL) return ex.value(qc);
     final long start = range[0], len = range[1];
 
     // return subsequence if value access is cheap
-    final Iter iter = qc.iter(ex);
+    final Iter iter = ex.iter(qc);
     final long is = iter.size();
     final Value v = iter.value();
     if(v != null) {
@@ -100,8 +98,7 @@ public class FnSubsequence extends StandardFunc {
     final long e = len == Long.MAX_VALUE ? len : start + len;
     final ValueBuilder vb = new ValueBuilder();
     Item it;
-    for(int i = 1; i < e && (it = iter.next()) != null; i++) {
-      qc.checkStop();
+    for(int i = 1; i < e && (it = qc.next(iter)) != null; i++) {
       if(i >= start) vb.add(it);
     }
     return vb.value();

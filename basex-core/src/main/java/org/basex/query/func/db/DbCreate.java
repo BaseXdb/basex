@@ -29,11 +29,9 @@ public final class DbCreate extends DbNew {
 
     final TokenList paths = new TokenList();
     if(exprs.length > 2) {
-      final Iter iter = qc.iter(exprs[2]);
-      for(Item it; (it = iter.next()) != null;) {
-        qc.checkStop();
-        final String path = string(toToken(it));
-        final String norm = MetaData.normPath(path);
+      final Iter iter = exprs[2].iter(qc);
+      for(Item it; (it = qc.next(iter)) != null;) {
+        final String path = string(toToken(it)), norm = MetaData.normPath(path);
         if(norm == null) throw RESINV_X.get(info, path);
         paths.add(norm);
       }
@@ -41,7 +39,7 @@ public final class DbCreate extends DbNew {
 
     final NewInput[] inputs;
     if(exprs.length > 1) {
-      final Value val = qc.value(exprs[1]);
+      final Value val = exprs[1].value(qc);
       final long is = val.size(), ps = paths.size();
       // if paths are supplied, number of specified inputs and paths must be identical
       if(ps != 0 && is != ps) throw DB_ARGS_X_X.get(info, is, ps);
@@ -49,6 +47,7 @@ public final class DbCreate extends DbNew {
       inputs = new NewInput[(int) is];
       for(int i = 0; i < is; i++) {
         inputs[i] = checkInput(val.itemAt(i), i < ps ? paths.get(i) : EMPTY);
+        qc.checkStop();
       }
     } else {
       inputs = new NewInput[0];

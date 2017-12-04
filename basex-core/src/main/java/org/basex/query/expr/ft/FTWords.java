@@ -253,9 +253,8 @@ public final class FTWords extends FTExpr {
    */
   private TokenList tokens(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
-    final Iter iter = qc.iter(query);
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
+    final Iter iter = query.iter(qc);
+    for(Item it; (it = qc.next(iter)) != null;) {
       // skip empty tokens if not all results are needed
       final byte[] qu = toToken(it);
       if(qu.length != 0 || mode == FTMode.ALL || mode == FTMode.ALL_WORDS) tl.add(qu);

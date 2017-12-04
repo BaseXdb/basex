@@ -35,6 +35,6 @@ public final class UtilDeepEqual extends StandardFunc {
         if(!found) throw INVALIDOPTION_X.get(info, key);
       }
     }
-    return Bln.get(cmp.equal(qc.iter(exprs[0]), qc.iter(exprs[1]), qc));
+    return Bln.get(cmp.equal(exprs[0].iter(qc), exprs[1].iter(qc), qc));
   }
 }

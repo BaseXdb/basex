@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class ArrayAppend extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toArray(exprs[0], qc).snoc(qc.value(exprs[1]));
+    return toArray(exprs[0], qc).snoc(exprs[1].value(qc));
   }
 
   @Override

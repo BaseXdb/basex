@@ -79,7 +79,7 @@ public abstract class StandardFunc extends Arr {
       // return optimized expression
       ex : preEval() ?
       // pre-evaluate function
-      (sig.seqType.zeroOrOne() ? item(cc.qc, info) : cc.qc.value(this)) :
+      (sig.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
       // return original function
       this);
   }
@@ -145,10 +145,7 @@ public abstract class StandardFunc extends Arr {
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = Serializer.get(ao, opts)) {
-        for(Item it; (it = ir.next()) != null;) {
-          qc.checkStop();
-          ser.serialize(it);
-        }
+        for(Item it; (it = qc.next(ir)) != null;) ser.serialize(it);
       }
       return new TokenBuilder(ao.finish()).normalize().finish();
     } catch(final QueryIOException ex) {
@@ -342,7 +339,7 @@ public abstract class StandardFunc extends Arr {
   protected final Item toNodeOrAtomItem(final int i, final QueryContext qc) throws QueryException {
     if(i >= exprs.length) return null;
     final Item it = toItem(exprs[i], qc);
-    return it instanceof ANode ? it : it.atomItem(info);
+    return it instanceof ANode ? it : it.atomItem(qc, info);
   }
 
   /**

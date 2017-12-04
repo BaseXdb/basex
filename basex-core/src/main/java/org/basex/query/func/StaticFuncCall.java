@@ -145,7 +145,7 @@ public final class StaticFuncCall extends FuncCall {
   Value[] evalArgs(final QueryContext qc) throws QueryException {
     final int al = exprs.length;
     final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = qc.value(exprs[a]);
+    for(int a = 0; a < al; ++a) args[a] = exprs[a].value(qc);
     return args;
   }
 

@@ -19,11 +19,8 @@ public final class MapRemove extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Map map = toMap(exprs[0], qc);
-    final Iter keys = qc.iter(exprs[1]);
-    for(Item it; (it = keys.next()) != null;) {
-      qc.checkStop();
-      map = map.delete(toAtomItem(it, qc), info);
-    }
+    final Iter keys = exprs[1].iter(qc);
+    for(Item it; (it = qc.next(keys)) != null;) map = map.delete(toAtomItem(it, qc), info);
     return map;
   }
 

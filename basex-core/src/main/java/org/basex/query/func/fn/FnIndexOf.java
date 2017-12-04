@@ -26,13 +26,11 @@ public final class FnIndexOf extends StandardFunc {
 
       @Override
       public Int next() throws QueryException {
-        while(true) {
-          final Item it = iter.next();
-          if(it == null) return null;
+        for(Item it; (it = qc.next(iter)) != null;) {
           ++c;
           if(it.comparable(srch) && OpV.EQ.eval(it, srch, coll, sc, info)) return Int.get(c);
-          qc.checkStop();
         }
+        return null;
       }
     };
   }

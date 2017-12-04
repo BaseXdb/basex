@@ -19,8 +19,7 @@ import org.basex.util.ft.*;
 public final class FtContains extends FtAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Value input = qc.value(exprs[0]);
-    final Value query = qc.value(exprs[1]);
+    final Value input = exprs[0].value(qc), query = exprs[1].value(qc);
     final FtContainsOptions opts = toOptions(2, new FtContainsOptions(), qc);
 
     final FTOpt opt = new FTOpt().assign(qc.ftOpt());

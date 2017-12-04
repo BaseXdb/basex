@@ -27,13 +27,10 @@ public final class MapMerge extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter maps = qc.iter(exprs[0]);
+    final Iter maps = exprs[0].iter(qc);
     final MergeDuplicates merge = options(qc).get(MergeOptions.DUPLICATES);
     Map map = Map.EMPTY;
-    for(Item it; (it = maps.next()) != null;) {
-      qc.checkStop();
-      map = map.addAll(toMap(it), merge, info);
-    }
+    for(Item it; (it = qc.next(maps)) != null;) map = map.addAll(toMap(it), merge, info);
     return map;
   }
 

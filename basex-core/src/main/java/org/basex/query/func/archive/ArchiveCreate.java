@@ -24,7 +24,7 @@ import org.basex.util.*;
 public class ArchiveCreate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter entries = qc.iter(exprs[0]), contents = qc.iter(exprs[1]);
+    final Iter entries = exprs[0].iter(qc), contents = exprs[1].iter(qc);
     final ArchOptions opts = toOptions(2, new ArchOptions(), qc);
 
     // check options
@@ -36,8 +36,7 @@ public class ArchiveCreate extends ArchiveFn {
       try {
         int e = 0, c = 0;
         while(true) {
-          qc.checkStop();
-          final Item en = entries.next(), cn = contents.next();
+          final Item en = qc.next(entries), cn = contents.next();
           if(en == null || cn == null) {
             // count remaining entries
             if(cn != null) do c++; while(contents.next() != null);

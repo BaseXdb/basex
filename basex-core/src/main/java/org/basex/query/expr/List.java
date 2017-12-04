@@ -76,7 +76,7 @@ public final class List extends Arr {
       final Value[] values = new Value[exprs.length];
       int vl = 0;
       for(final Expr expr : exprs) {
-        final Value val = cc.qc.value(expr);
+        final Value val = expr.value(cc.qc);
         if(vl == 0) t = val.type;
         else if(t != null && !t.eq(val.type)) t = null;
         values[vl++] = val;
@@ -115,7 +115,7 @@ public final class List extends Arr {
       @Override
       public Item next() throws QueryException {
         while(e < el) {
-          final Item it = iter(e).next();
+          final Item it = qc.next(iter(e));
           if(it != null) return it;
           iter[e++] = null;
         }
@@ -146,7 +146,7 @@ public final class List extends Arr {
       private Iter iter(final int i) throws QueryException {
         Iter ir = iter[i];
         if(ir == null) {
-          ir = qc.iter(exprs[i]);
+          ir = exprs[i].iter(qc);
           iter[i] = ir;
         }
         return ir;
@@ -157,10 +157,10 @@ public final class List extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // special case: concatenate two sequences
-    if(exprs.length == 2) return ValueBuilder.concat(qc.value(exprs[0]), qc.value(exprs[1]));
+    if(exprs.length == 2) return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc));
     // general case: concatenate all sequences
     final ValueBuilder vb = new ValueBuilder();
-    for(final Expr expr : exprs) vb.add(qc.value(expr));
+    for(final Expr expr : exprs) vb.add(expr.value(qc));
     return vb.value();
   }
 

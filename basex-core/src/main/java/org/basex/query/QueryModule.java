@@ -2,7 +2,7 @@ package org.basex.query;
 
 import java.lang.annotation.*;
 
-import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 
 /**
  * <p>The XQuery {@code import module} statement can be used to import XQuery modules
@@ -11,7 +11,7 @@ import org.basex.query.expr.*;
  *
  * <p>If a class extends the {@link QueryModule} class, it inherits the {@link #queryContext}
  * and {@link #staticContext} variables, which provide access to all properties of the
- * current query. E.g., they provide access to the current {@link QueryContext#value(Expr)
+ * current query. E.g., they provide access to the current {@link QueryContext#next(Iter)
  * context value} or the {@link StaticContext#ns declared namespaces} of a query.</p>
  *
  * <p>The default properties of functions can be overwritten via annotations:</p>

@@ -34,7 +34,7 @@ public class FileWrite extends FileFn {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(toPath(0, qc));
-    final Value value = qc.value(exprs[1]);
+    final Value value = exprs[1].value(qc);
     final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : null;
     final SerializerOptions sopts = FuncOptions.serializer(so, info);
 

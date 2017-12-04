@@ -218,8 +218,7 @@ public class CmpG extends Cmp {
     if(s1) {
       // first iterator yields single result
       final Item it1 = ir1.next();
-      for(Item it2; (it2 = ir2.next()) != null;) {
-        qc.checkStop();
+      for(Item it2; (it2 = qc.next(ir2)) != null;) {
         if(eval(it1, it2)) return Bln.TRUE;
       }
       return Bln.FALSE;
@@ -228,8 +227,7 @@ public class CmpG extends Cmp {
     if(s2) {
       // second iterator yields single result
       final Item it2 = ir2.next();
-      for(Item it1; (it1 = ir1.next()) != null;) {
-        qc.checkStop();
+      for(Item it1; (it1 = qc.next(ir1)) != null;) {
         if(eval(it1, it2)) return Bln.TRUE;
       }
       return Bln.FALSE;
@@ -246,8 +244,7 @@ public class CmpG extends Cmp {
     // loop through all items of first and second iterator
     for(Item it1; (it1 = ir1.next()) != null;) {
       if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
-      for(Item it2; (it2 = ir2.next()) != null;) {
-        qc.checkStop();
+      for(Item it2; (it2 = qc.next(ir2)) != null;) {
         if(swap ? eval(it2, it1) : eval(it1, it2)) return Bln.TRUE;
       }
       ir2 = null;

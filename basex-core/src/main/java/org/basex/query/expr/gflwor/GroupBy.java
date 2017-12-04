@@ -173,7 +173,7 @@ public final class GroupBy extends Clause {
           }
 
           // add values of non-grouping variables to the group
-          for(int g = 0; g < pl; g++) grp.ngv[g].add(qc.value(preExpr[g]));
+          for(int g = 0; g < pl; g++) grp.ngv[g].add(preExpr[g].value(qc));
         }
 
         // we're finished, copy the array so the list can be garbage-collected

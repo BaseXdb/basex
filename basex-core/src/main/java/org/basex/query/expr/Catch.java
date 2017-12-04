@@ -82,7 +82,7 @@ public final class Catch extends Single {
       qc.set(vars[i++], v);
     }
     Util.debug(qe);
-    return qc.value(expr);
+    return expr.value(qc);
   }
 
   @Override

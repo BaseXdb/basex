@@ -26,15 +26,15 @@ public class FnTrace extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = qc.value(exprs[0]);
+    final Value value = exprs[0].value(qc);
     final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
 
     if(value.isEmpty() || value instanceof RangeSeq || value instanceof SingletonSeq) {
       trace(token(value.toString()), label, qc);
     } else {
+      final Iter iter = value.iter();
       try {
-        for(final Item it : value) {
-          qc.checkStop();
+        for(Item it; (it = qc.next(iter)) != null;) {
           trace(it.serialize(SerializerMode.DEBUG.get()).finish(), label, qc);
         }
       } catch(final QueryIOException ex) {

@@ -55,8 +55,8 @@ abstract class Set extends Arr {
   public final NodeIter iter(final QueryContext qc) throws QueryException {
     final int el = exprs.length;
     final Iter[] iter = new Iter[el];
-    for(int e = 0; e < el; e++) iter[e] = qc.iter(exprs[e]);
-    return iterable ? iter(iter) : eval(iter, qc).iter();
+    for(int e = 0; e < el; e++) iter[e] = exprs[e].iter(qc);
+    return iterable ? iter(iter, qc) : eval(iter, qc).iter();
   }
 
   /**
@@ -71,9 +71,10 @@ abstract class Set extends Arr {
   /**
    * Evaluates the specified iterators in an iterative manner.
    * @param iters iterators
+   * @param qc query context
    * @return resulting iterator
    */
-  protected abstract NodeIter iter(Iter[] iters);
+  protected abstract NodeIter iter(Iter[] iters, QueryContext qc);
 
   @Override
   public final boolean iterable() {
@@ -89,6 +90,8 @@ abstract class Set extends Arr {
    * Abstract set iterator.
    */
   abstract class SetIter extends NodeIter {
+    /** Query context. */
+    private final QueryContext qc;
     /** Iterator. */
     final Iter[] iter;
     /** Items. */
@@ -96,9 +99,11 @@ abstract class Set extends Arr {
 
     /**
      * Constructor.
+     * @param qc query context
      * @param iter iterator
      */
-    SetIter(final Iter[] iter) {
+    SetIter(final QueryContext qc, final Iter[] iter) {
+      this.qc = qc;
       this.iter = iter;
     }
 
@@ -109,7 +114,7 @@ abstract class Set extends Arr {
      * @throws QueryException query exception
      */
     final boolean next(final int i) throws QueryException {
-      final ANode n = toEmptyNode(iter[i].next());
+      final ANode n = toEmptyNode(qc.next(iter[i]));
       nodes[i] = n;
       return n != null;
     }

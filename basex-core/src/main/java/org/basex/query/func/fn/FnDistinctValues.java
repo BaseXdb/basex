@@ -38,12 +38,10 @@ public final class FnDistinctValues extends StandardFunc {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        do {
-          final Item it = iter.next();
-          if(it == null) return null;
+        for(Item it; (it = qc.next(iter)) != null;) {
           if(set.add(it, info)) return it;
-          qc.checkStop();
-        } while(true);
+        }
+        return null;
       }
     };
   }
@@ -57,8 +55,7 @@ public final class FnDistinctValues extends StandardFunc {
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     final Iter iter = ex.atomIter(qc, info);
     final ValueBuilder vb = new ValueBuilder();
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
+    for(Item it; (it = qc.next(iter)) != null;) {
       if(set.add(it, info)) vb.add(it);
     }
     return vb.value();

@@ -22,7 +22,7 @@ public final class FtSearch extends FtAccess {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
-    final Value terms = qc.value(exprs[1]);
+    final Value terms = exprs[1].value(qc);
     final FtIndexOptions opts = toOptions(2, new FtIndexOptions(), qc);
 
     final IndexDb db = new IndexStaticDb(info, data);

@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 public final class FnForEachPair extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter ir1 = qc.iter(exprs[0]), ir2 = qc.iter(exprs[1]);
+    final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
     return new Iter() {
@@ -27,12 +27,11 @@ public final class FnForEachPair extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         do {
-          final Item it = iter.next();
+          final Item it = qc.next(iter);
           if(it != null) return it;
           final Item it1 = ir1.next(), it2 = ir2.next();
           if(it1 == null || it2 == null) return null;
           iter = fun.invokeValue(qc, info, it1, it2).iter();
-          qc.checkStop();
         } while(true);
       }
     };
@@ -40,12 +39,11 @@ public final class FnForEachPair extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter ir1 = qc.iter(exprs[0]), ir2 = qc.iter(exprs[1]);
+    final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
     final ValueBuilder vb = new ValueBuilder();
-    for(Item it1, it2; (it1 = ir1.next()) != null && (it2 = ir2.next()) != null;) {
-      qc.checkStop();
+    for(Item it1, it2; (it1 = qc.next(ir1)) != null && (it2 = ir2.next()) != null;) {
       vb.add(fun.invokeValue(qc, info, it1, it2));
     }
     return vb.value();

@@ -61,17 +61,14 @@ public final class Union extends Set {
   public ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     final ANodeBuilder list = new ANodeBuilder();
     for(final Iter ir : iters) {
-      for(Item it; (it = ir.next()) != null;) {
-        qc.checkStop();
-        list.add(toNode(it));
-      }
+      for(Item it; (it = qc.next(ir)) != null;) list.add(toNode(it));
     }
     return list;
   }
 
   @Override
-  protected NodeIter iter(final Iter[] iters) {
-    return new SetIter(iters) {
+  protected NodeIter iter(final Iter[] iters, final QueryContext qc) {
+    return new SetIter(qc, iters) {
       @Override
       public ANode next() throws QueryException {
         if(nodes == null) {

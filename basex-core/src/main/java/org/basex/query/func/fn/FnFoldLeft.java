@@ -18,31 +18,25 @@ import org.basex.query.value.type.*;
 public final class FnFoldLeft extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
-    Value res = qc.value(exprs[1]);
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      res = fun.invokeValue(qc, info, res, it);
-    }
+    Value res = exprs[1].value(qc);
+    for(Item it; (it = qc.next(iter)) != null;) res = fun.invokeValue(qc, info, res, it);
     return res;
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
+    final Iter iter = exprs[0].iter(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);
 
     // don't convert to a value if not necessary
     Item it = iter.next();
-    if(it == null) return qc.iter(exprs[1]);
+    if(it == null) return exprs[1].iter(qc);
 
-    Value res = qc.value(exprs[1]);
-    do {
-      qc.checkStop();
-      res = fun.invokeValue(qc, info, res, it);
-    } while((it = iter.next()) != null);
+    Value res = exprs[1].value(qc);
+    do res = fun.invokeValue(qc, info, res, it); while((it = qc.next(iter)) != null);
     return res.iter();
   }
 
@@ -73,8 +67,8 @@ public final class FnFoldLeft extends StandardFunc {
    * @param left indicates is this is left/right fold
    * @throws QueryException query exception
    */
-  public static void seqType(final StandardFunc func, final CompileContext cc,
-      final boolean array, final boolean left) throws QueryException {
+  public static void seqType(final StandardFunc func, final CompileContext cc, final boolean array,
+      final boolean left) throws QueryException {
 
     final Expr[] exprs = func.exprs;
     final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
