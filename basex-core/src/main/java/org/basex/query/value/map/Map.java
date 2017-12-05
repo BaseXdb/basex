@@ -62,8 +62,8 @@ public final class Map extends FItem {
   }
 
   @Override
-  public void materialize(final InputInfo ii) throws QueryException {
-    root.materialize(ii);
+  public void materialize(final InputInfo info) throws QueryException {
+    root.materialize(info);
   }
 
   @Override
@@ -72,68 +72,68 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
+  public Item invItem(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
-    return invValue(qc, ii, args).item(qc, ii);
+    return invValue(qc, info, args).item(qc, info);
   }
 
   @Override
-  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
+  public Value invValue(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
-    final Item key = args[0].atomItem(qc, ii);
-    if(key == null) throw EMPTYFOUND.get(ii);
-    return get(key, ii);
+    final Item key = args[0].atomItem(qc, info);
+    if(key == null) throw EMPTYFOUND.get(info);
+    return get(key, info);
   }
 
   /**
    * Deletes a key from this map.
    * @param key key to delete (must not be {@code null})
-   * @param ii input info
+   * @param info input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map delete(final Item key, final InputInfo ii) throws QueryException {
-    final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
+  public Map delete(final Item key, final InputInfo info) throws QueryException {
+    final TrieNode del = root.delete(key.hash(info), key, 0, info);
     return del == root ? this : del == null ? EMPTY : new Map(del);
   }
 
   /**
    * Gets the value from this map.
    * @param key key to look for (must not be {@code null})
-   * @param ii input info
+   * @param info input info
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
-  public Value get(final Item key, final InputInfo ii) throws QueryException {
-    final Value v = root.get(key.hash(ii), key, 0, ii);
-    return v == null ? Empty.SEQ : v;
+  public Value get(final Item key, final InputInfo info) throws QueryException {
+    final Value value = root.get(key.hash(info), key, 0, info);
+    return value == null ? Empty.SEQ : value;
   }
 
   /**
    * Checks if the given key exists in the map.
    * @param key key to look for (must not be {@code null})
-   * @param ii input info
+   * @param info input info
    * @return {@code true()} if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
-  public boolean contains(final Item key, final InputInfo ii) throws QueryException {
-    return root.contains(key.hash(ii), key, 0, ii);
+  public boolean contains(final Item key, final InputInfo info) throws QueryException {
+    return root.contains(key.hash(info), key, 0, info);
   }
 
   /**
    * Adds all bindings from the given map into {@code this}.
    * @param map map to add
-   * @param ii input info
+   * @param info input info
    * @param merge merge duplicate keys
    * @param qc query context
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map addAll(final Map map, final MergeDuplicates merge, final InputInfo ii,
+  public Map addAll(final Map map, final MergeDuplicates merge, final InputInfo info,
       final QueryContext qc) throws QueryException {
 
     if(map == EMPTY) return this;
-    final TrieNode upd = root.addAll(map.root, 0, merge, ii, qc);
+    final TrieNode upd = root.addAll(map.root, 0, merge, info, qc);
     return upd == map.root ? map : new Map(upd);
   }
 
@@ -143,11 +143,11 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
+  public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
       final boolean opt) throws QueryException {
 
     if(instanceOf(ft, true)) return this;
-    throw typeError(this, ft, ii);
+    throw typeError(this, ft, info);
   }
 
   /**
@@ -179,12 +179,12 @@ public final class Map extends FItem {
    * Puts the given value into this map and replaces existing keys.
    * @param key key to insert (must not be {@code null})
    * @param value value to insert
-   * @param ii input info
+   * @param info input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map put(final Item key, final Value value, final InputInfo ii) throws QueryException {
-    final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
+  public Map put(final Item key, final Value value, final InputInfo info) throws QueryException {
+    final TrieNode ins = root.put(key.hash(info), key, value, 0, info);
     return ins == root ? this : new Map(ins);
   }
 
@@ -201,9 +201,9 @@ public final class Map extends FItem {
    * @return list of keys
    */
   public Value keys() {
-    final ItemList keys = new ItemList(root.size);
-    root.keys(keys);
-    return keys.value();
+    final ItemList items = new ItemList(root.size);
+    root.keys(items);
+    return items.value();
   }
 
   /**
@@ -218,23 +218,23 @@ public final class Map extends FItem {
    * Applies a function on all entries.
    * @param func function to apply on keys and values
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Value forEach(final FItem func, final QueryContext qc, final InputInfo ii)
+  public Value forEach(final FItem func, final QueryContext qc, final InputInfo info)
       throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    root.forEach(vb, func, qc, ii);
+    root.forEach(vb, func, qc, info);
     return vb.value();
   }
 
   @Override
-  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+  public boolean deep(final Item item, final InputInfo info, final Collation coll)
       throws QueryException {
 
-    if(item instanceof Map) return root.deep(ii, ((Map) item).root, coll);
-    return item instanceof FItem && !(item instanceof Array) && super.deep(item, ii, coll);
+    if(item instanceof Map) return root.deep(info, ((Map) item).root, coll);
+    return item instanceof FItem && !(item instanceof Array) && super.deep(item, info, coll);
   }
 
   @Override
@@ -245,8 +245,8 @@ public final class Map extends FItem {
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
-    return root.hash(ii);
+  public int hash(final InputInfo info) throws QueryException {
+    return root.hash(info);
   }
 
   @Override
@@ -263,9 +263,9 @@ public final class Map extends FItem {
       final int max = Math.min(s, 5);
       for(long i = 0; i < max; i++) {
         final Item key = ks.itemAt(i);
-        final Value val = get(key, null);
+        final Value value = get(key, null);
         key.plan(el);
-        val.plan(el);
+        value.plan(el);
       }
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
@@ -278,11 +278,11 @@ public final class Map extends FItem {
    * @param indent indent output
    * @param tb token builder
    * @param level current level
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
   public void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     tb.add("map{");
     int c = 0;
@@ -294,18 +294,18 @@ public final class Map extends FItem {
       }
       tb.add(key.toString()).add(':');
       if(indent) tb.add(' ');
-      final Value v = get(key, ii);
-      final boolean par = v.size() != 1;
+      final Value value = get(key, info);
+      final boolean par = value.size() != 1;
       if(par) tb.add('(');
       int cc = 0;
-      for(final Item it : v) {
+      for(final Item item : value) {
         if(cc++ > 0) {
           tb.add(',');
           if(indent) tb.add(' ');
         }
-        if(it instanceof Map) ((Map) it).string(indent, tb, level + 1, ii);
-        else if(it instanceof Array) ((Array) it).string(indent, tb, level, ii);
-        else tb.add(it.toString());
+        if(item instanceof Map) ((Map) item).string(indent, tb, level + 1, info);
+        else if(item instanceof Array) ((Array) item).string(indent, tb, level, info);
+        else tb.add(item.toString());
       }
       if(par) tb.add(')');
     }
@@ -326,7 +326,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii) {
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
     return null;
   }
 

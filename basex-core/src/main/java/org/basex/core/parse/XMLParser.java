@@ -12,7 +12,6 @@ import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -232,8 +231,8 @@ final class XMLParser extends CommandParser {
   private String execute(final String query, final Item context) throws QueryException {
     try(QueryProcessor qp = new QueryProcessor(query, ctx).context(context)) {
       final Iter iter = qp.iter();
-      final Item it = iter.next();
-      return it == null ? "" : it.toJava().toString().trim();
+      final Item item = iter.next();
+      return item == null ? "" : item.toJava().toString().trim();
     }
   }
 
@@ -258,7 +257,7 @@ final class XMLParser extends CommandParser {
    */
   private boolean check(final Item root, final String... checks) throws QueryException {
     // prepare validating query
-    final TokenList ma = new TokenList(), oa = new TokenList();
+    final TokenList mand = new TokenList(), opt = new TokenList();
     String t = null;
     boolean ot = true;
     boolean n = false;
@@ -271,7 +270,7 @@ final class XMLParser extends CommandParser {
         ot = o;
         n = c.charAt(0) == '<';
       } else {
-        (o ? oa : ma).add(c);
+        (o ? opt : mand).add(c);
       }
     }
 
@@ -296,23 +295,16 @@ final class XMLParser extends CommandParser {
     }
 
     // run query
-    final Value mv = StrSeq.get(ma), ov = StrSeq.get(oa);
     try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
-      qp.bind("A", mv).bind("O", ov);
+      qp.bind("A", StrSeq.get(mand.toArray())).bind("O", StrSeq.get(opt.toArray()));
       if(!qp.value().isEmpty()) return true;
     }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
     final byte[] nm = ((ANode) root).qname().string();
     syntax.reset().add('<').add(nm);
-    for(final Item i : mv) {
-      final byte[] a = i.string(null);
-      syntax.add(' ').add(a).add("=\"...\"");
-    }
-    for(final Item i : ov) {
-      final byte[] a = i.string(null);
-      syntax.add(" (").add(a).add("=\"...\")");
-    }
+    for(final byte[] m : mand) syntax.add(' ').add(m).add("=\"...\"");
+    for(final byte[] o : opt) syntax.add(" (").add(o).add("=\"...\")");
     if(t != null) {
       syntax.add('>');
       if(ot) syntax.add('(');

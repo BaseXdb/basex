@@ -56,11 +56,11 @@ public final class FTOr extends FTExpr {
   public FTIter iter(final QueryContext qc) throws QueryException {
     // initialize iterators
     final int es = exprs.length;
-    final FTIter[] ir = new FTIter[es];
-    final FTNode[] it = new FTNode[es];
+    final FTIter[] ters = new FTIter[es];
+    final FTNode[] nodes = new FTNode[es];
     for(int e = 0; e < es; e++) {
-      ir[e] = exprs[e].iter(qc);
-      it[e] = ir[e].next();
+      ters[e] = exprs[e].iter(qc);
+      nodes[e] = ters[e].next();
     }
 
     return new FTIter() {
@@ -69,20 +69,20 @@ public final class FTOr extends FTExpr {
         // find item with smallest pre value
         int p = -1;
         for(int i = 0; i < es; ++i) {
-          if(it[i] != null && (p == -1 || it[p].pre() > it[i].pre())) p = i;
+          if(nodes[i] != null && (p == -1 || nodes[p].pre() > nodes[i].pre())) p = i;
         }
         // no items left - leave
         if(p == -1) return null;
 
         // merge all matches
-        final FTNode item = it[p];
+        final FTNode item = nodes[p];
         for(int i = 0; i < es; ++i) {
-          if(it[i] != null && p != i && item.pre() == it[i].pre()) {
-            or(item, it[i]);
-            it[i] = ir[i].next();
+          if(nodes[i] != null && p != i && item.pre() == nodes[i].pre()) {
+            or(item, nodes[i]);
+            nodes[i] = ters[i].next();
           }
         }
-        it[p] = ir[p].next();
+        nodes[p] = ters[p].next();
         return item;
       }
     };

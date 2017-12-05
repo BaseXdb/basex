@@ -110,8 +110,8 @@ public abstract class Step extends Preds {
     // optimize predicates
     cc.pushFocus(this);
     try {
-      final Expr ex = super.optimize(cc);
-      if(ex != this) return ex;
+      final Expr expr = super.optimize(cc);
+      if(expr != this) return expr;
     } finally {
       cc.removeFocus();
     }
@@ -222,9 +222,10 @@ public abstract class Step extends Preds {
    * @throws QueryException query exception
    */
   final ANode checkNode(final QueryContext qc) throws QueryException {
-    final Value v = qc.focus.value;
-    if(v instanceof ANode) return (ANode) v;
-    throw v == null ? NOCTX_X.get(info, this) : STEPNODE_X_X_X.get(info, this, v.type, v);
+    final Value value = qc.focus.value;
+    if(value instanceof ANode) return (ANode) value;
+    throw value == null ? NOCTX_X.get(info, this) :
+      STEPNODE_X_X_X.get(info, this, value.type, value);
   }
 
   @Override
@@ -247,9 +248,9 @@ public abstract class Step extends Preds {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Expr pred : exprs) sz += pred.exprSize();
-    return sz;
+    int size = 1;
+    for(final Expr pred : exprs) size += pred.exprSize();
+    return size;
   }
 
   @Override

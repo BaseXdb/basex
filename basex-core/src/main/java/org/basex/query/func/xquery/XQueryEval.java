@@ -123,9 +123,9 @@ public class XQueryEval extends StandardFunc {
         sctx.baseURI(uri);
         for(final Entry<String, Value> it : bindings.entrySet()) {
           final String key = it.getKey();
-          final Value val = it.getValue();
-          if(key.isEmpty()) qctx.context(val, sctx);
-          else qctx.bind(key, val, sctx);
+          final Value value = it.getValue();
+          if(key.isEmpty()) qctx.context(value, sctx);
+          else qctx.bind(key, value, sctx);
         }
         qctx.parseMain(query, null, sctx);
 
@@ -136,13 +136,13 @@ public class XQueryEval extends StandardFunc {
           if(qctx.updating) throw XQUERY_UPDATE1.get(info);
         }
 
-        final ItemList cache = new ItemList();
+        final ItemList items = new ItemList();
         final Iter iter = qctx.iter();
-        for(Item it; (it = qctx.next(iter)) != null;) {
+        for(Item item; (item = qctx.next(iter)) != null;) {
           qc.checkStop();
-          cache.add(it);
+          items.add(item);
         }
-        return cache;
+        return items;
       } catch(final JobException ex) {
         if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
         if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);

@@ -92,8 +92,8 @@ public class FuncType implements Type {
       final InputInfo info) throws QueryException {
 
     if(!(item instanceof FItem)) throw typeError(item, this, info);
-    final FItem f = (FItem) item;
-    return this == SeqType.ANY_FUN ? f : f.coerceTo(this, qc, info, false);
+    final FItem func = (FItem) item;
+    return this == SeqType.ANY_FUN ? func : func.coerceTo(this, qc, info, false);
   }
 
   @Override

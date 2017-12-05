@@ -45,12 +45,10 @@ public final class OrderBy extends Clause {
   @Override
   Eval eval(final Eval sub) {
     return new Eval() {
-      /** Sorted output tuples. */
       private Value[][] tpls;
-      /** Permutation of the values. */
       private Integer[] perm;
-      /** Current position. */
       int pos;
+
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         if(tpls == null) sort(qc);
@@ -201,10 +199,10 @@ public final class OrderBy extends Clause {
 
   @Override
   public int exprSize() {
-    int sz = 0;
-    for(final Expr e : refs) sz += e.exprSize();
-    for(final Expr e : keys) sz += e.exprSize();
-    return sz;
+    int size = 0;
+    for(final Expr ref : refs) size += ref.exprSize();
+    for(final Expr key : keys) size += key.exprSize();
+    return size;
   }
 
   @Override
@@ -217,9 +215,9 @@ public final class OrderBy extends Clause {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    for(final OrderKey key : keys) key.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    for(final OrderKey key : keys) key.plan(elem);
+    plan.add(elem);
   }
 
   @Override

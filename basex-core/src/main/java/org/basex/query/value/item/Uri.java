@@ -107,7 +107,7 @@ public final class Uri extends AStr {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string(final InputInfo info) {
     return value;
   }
 

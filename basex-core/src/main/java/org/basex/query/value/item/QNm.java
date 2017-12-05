@@ -200,7 +200,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string(final InputInfo info) {
     return name;
   }
 
@@ -214,16 +214,16 @@ public final class QNm extends Item {
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     final QNm nm;
     if(item instanceof QNm) {
       nm = (QNm) item;
     } else if(item.type.isUntyped() && sc != null) {
-      nm = new QNm(item.string(ii), sc);
-      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(ii, nm.string());
+      nm = new QNm(item.string(info), sc);
+      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(info, nm.string());
     } else {
-      throw diffError(this, item, ii);
+      throw diffError(this, item, info);
     }
     return eq(nm);
   }
@@ -238,8 +238,9 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw diffError(it, this, ii);
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    throw diffError(item, this, info);
   }
 
   /**
@@ -318,7 +319,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int hash(final InputInfo ii) {
+  public int hash(final InputInfo info) {
     return Token.hash(local());
   }
 

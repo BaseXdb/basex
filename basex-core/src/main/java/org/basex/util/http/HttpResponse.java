@@ -61,11 +61,11 @@ public final class HttpResponse {
     }
 
     // result
-    final ItemList res = new ItemList();
+    final ItemList items = new ItemList();
 
     // construct <http:response/>
     final FElem response = new FElem(Q_RESPONSE).declareNS();
-    res.add(response);
+    items.add(response);
 
     final String msg = conn.getResponseMessage();
     response.add(STATUS, token(conn.getResponseCode()));
@@ -88,11 +88,11 @@ public final class HttpResponse {
         final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
           new MediaType(ctype) : new MediaType(mtype);
         response.add(hp.parse(type, error));
-        if(body) res.add(hp.payloads());
+        if(body) items.add(hp.payloads());
       } finally {
         is.close();
       }
     }
-    return res.value();
+    return items.value();
   }
 }

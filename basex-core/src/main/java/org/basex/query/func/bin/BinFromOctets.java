@@ -20,8 +20,8 @@ public final class BinFromOctets extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = exprs[0].atomIter(qc, info);
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) iter.size()));
-    for(Item it; (it = qc.next(iter)) != null;) {
-      final long l = toLong(it);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final long l = toLong(item);
       if(l < 0 || l > 255) throw BIN_OOR_X.get(info, l);
       bl.add((int) l);
     }

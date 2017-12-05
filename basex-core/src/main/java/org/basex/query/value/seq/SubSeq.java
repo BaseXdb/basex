@@ -66,21 +66,21 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item ebv(final QueryContext qc, final InputInfo info) throws QueryException {
     final Item fst = itemAt(0);
     if(fst instanceof ANode) return fst;
-    throw EBV_X.get(ii, this);
+    throw EBV_X.get(info, this);
   }
 
   @Override
-  public void materialize(final InputInfo ii) throws QueryException {
-    for(long i = 0; i < size; i++) itemAt(i).materialize(ii);
+  public void materialize(final InputInfo info) throws QueryException {
+    for(long i = 0; i < size; i++) itemAt(i).materialize(info);
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
+    for(long i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, info));
     return vb.value();
   }
 

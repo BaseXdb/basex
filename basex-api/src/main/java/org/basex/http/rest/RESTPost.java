@@ -71,9 +71,9 @@ final class RESTPost {
 
       // handle database options
       try(QueryProcessor qp = new QueryProcessor("*/*:option", ctx).context(doc)) {
-        for(final Item it : qp.value()) {
-          final String name = value("@name", it, ctx).toUpperCase(Locale.ENGLISH);
-          final String value = value("@value", it, ctx);
+        for(final Item item : qp.value()) {
+          final String name = value("@name", item, ctx).toUpperCase(Locale.ENGLISH);
+          final String value = value("@value", item, ctx);
           ctx.options.assign(name, value);
         }
       }
@@ -81,10 +81,10 @@ final class RESTPost {
       // handle variables
       final Map<String, String[]> vars = new HashMap<>();
       try(QueryProcessor qp = new QueryProcessor("*/*:variable", ctx).context(doc)) {
-        for(final Item it : qp.value()) {
-          final String name = value("@name", it, ctx);
-          final String value = value("@value", it, ctx);
-          final String type = value("@type", it, ctx);
+        for(final Item item : qp.value()) {
+          final String name = value("@name", item, ctx);
+          final String value = value("@value", item, ctx);
+          final String type = value("@type", item, ctx);
           vars.put(name, new String[] { value, type });
         }
       }
@@ -93,10 +93,10 @@ final class RESTPost {
       String val = null;
       try(QueryProcessor qp = new QueryProcessor("*/*:context/(*, text()[normalize-space()])",
           ctx).context(doc)) {
-        for(final Item it : qp.value()) {
+        for(final Item item : qp.value()) {
           if(val != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
           // create main memory instance of the specified node
-          val = DataBuilder.stripNS((ANode) it, REST_URI, ctx).serialize().toString();
+          val = DataBuilder.stripNS((ANode) item, REST_URI, ctx).serialize().toString();
         }
       }
 
@@ -126,8 +126,8 @@ final class RESTPost {
       throws QueryException {
 
     try(QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
-      final Item it = qp.iter().next();
-      return it == null ? "" : Token.string(it.string(null));
+      final Item item = qp.iter().next();
+      return item == null ? "" : Token.string(item.string(null));
     }
   }
 }

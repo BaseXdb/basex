@@ -36,63 +36,63 @@ public class FnMin extends StandardFunc {
    */
   final Item minmax(final OpV cmp, final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
-    final Expr ex = exprs[0];
-    Item it1 = value(cmp);
-    if(it1 != null) return it1;
+    final Expr expr = exprs[0];
+    Item item1 = value(cmp);
+    if(item1 != null) return item1;
 
-    if(ex instanceof Range) {
-      final Value v = ex.value(qc);
-      return v.isEmpty() ? null : v.itemAt(cmp == OpV.GT ? 0 : v.size() - 1);
+    if(expr instanceof Range) {
+      final Value value = expr.value(qc);
+      return value.isEmpty() ? null : value.itemAt(cmp == OpV.GT ? 0 : value.size() - 1);
     }
 
-    final Iter iter = ex.atomIter(qc, info);
-    it1 = iter.next();
-    if(it1 == null) return null;
+    final Iter iter = expr.atomIter(qc, info);
+    item1 = iter.next();
+    if(item1 == null) return null;
 
     // ensure that item is sortable
-    final Type t1 = it1.type;
+    final Type t1 = item1.type;
     if(!t1.isSortable()) throw CMP_X.get(info, t1);
 
     // strings and URIs
-    if(it1 instanceof AStr) {
-      for(Item it2; (it2 = qc.next(iter)) != null;) {
-        if(!(it2 instanceof AStr)) throw CMP_X_X_X.get(info, t1, it2.type, it2);
-        final Type t2 = it2.type;
-        if(cmp.eval(it1, it2, coll, sc, info)) it1 = it2;
-        if(t1 != t2 && it1.type == AtomType.URI) it1 = STR.cast(it1, qc, sc, info);
+    if(item1 instanceof AStr) {
+      for(Item item2; (item2 = qc.next(iter)) != null;) {
+        if(!(item2 instanceof AStr)) throw CMP_X_X_X.get(info, t1, item2.type, item2);
+        final Type t2 = item2.type;
+        if(cmp.eval(item1, item2, coll, sc, info)) item1 = item2;
+        if(t1 != t2 && item1.type == AtomType.URI) item1 = STR.cast(item1, qc, sc, info);
       }
-      return it1;
+      return item1;
     }
     // booleans, dates, durations, binaries
-    if(t1 == BLN || it1 instanceof ADate || it1 instanceof Dur || it1 instanceof Bin) {
-      for(Item it; (it = qc.next(iter)) != null;) {
-        if(t1 != it.type) throw CMP_X_X_X.get(info, t1, it.type, it);
-        if(cmp.eval(it1, it, coll, sc, info)) it1 = it;
+    if(t1 == BLN || item1 instanceof ADate || item1 instanceof Dur || item1 instanceof Bin) {
+      for(Item item; (item = qc.next(iter)) != null;) {
+        if(t1 != item.type) throw CMP_X_X_X.get(info, t1, item.type, item);
+        if(cmp.eval(item1, item, coll, sc, info)) item1 = item;
       }
-      return it1;
+      return item1;
     }
     // numbers
-    if(t1.isUntyped()) it1 = DBL.cast(it1, qc, sc, info);
-    for(Item it2; (it2 = qc.next(iter)) != null;) {
-      final AtomType t = numType(it1, it2);
-      if(cmp.eval(it1, it2, coll, sc, info) || Double.isNaN(it2.dbl(info))) it1 = it2;
-      if(t != null) it1 = t.cast(it1, qc, sc, info);
+    if(t1.isUntyped()) item1 = DBL.cast(item1, qc, sc, info);
+    for(Item item2; (item2 = qc.next(iter)) != null;) {
+      final AtomType t = numType(item1, item2);
+      if(cmp.eval(item1, item2, coll, sc, info) || Double.isNaN(item2.dbl(info))) item1 = item2;
+      if(t != null) item1 = t.cast(item1, qc, sc, info);
     }
-    return it1;
+    return item1;
   }
 
   /**
    * Returns the new target type, or {@code null} if conversion is not necessary.
-   * @param it1 old item
-   * @param it2 new item
+   * @param item1 first item
+   * @param item2 second item
    * @return result (or {@code null})
    * @throws QueryException query exception
    */
-  private AtomType numType(final Item it1, final Item it2) throws QueryException {
-    final Type t2 = it2.type;
+  private AtomType numType(final Item item1, final Item item2) throws QueryException {
+    final Type t2 = item2.type;
     if(t2.isUntyped()) return DBL;
-    final Type t1 = it1.type;
-    if(!(it2 instanceof ANum)) throw CMP_X_X_X.get(info, t1, t2, it2);
+    final Type t1 = item1.type;
+    if(!(item2 instanceof ANum)) throw CMP_X_X_X.get(info, t1, t2, item2);
     return t1 == t2 ? null :
            t1 == DBL || t2 == DBL ? DBL :
            t1 == FLT || t2 == FLT ? FLT :
@@ -105,20 +105,20 @@ public class FnMin extends StandardFunc {
    * @return smallest value or {@code null}
    */
   private Item value(final OpV cmp) {
-    final Expr ex = exprs[0];
-    if(ex instanceof Value && exprs.length < 2) {
-      Item it = null;
-      final Value v = (Value) ex;
-      if(v instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) v;
-        it = seq.itemAt((cmp == OpV.GT ^ seq.asc) ? seq.size() - 1 : 0);
+    final Expr expr = exprs[0];
+    if(expr instanceof Value && exprs.length < 2) {
+      Item item = null;
+      final Value value = (Value) expr;
+      if(value instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) value;
+        item = seq.itemAt((cmp == OpV.GT ^ seq.asc) ? seq.size() - 1 : 0);
       }
-      if(ex instanceof SingletonSeq || ex instanceof Item) {
-        it = v.itemAt(cmp == OpV.GT ? 0 : ex.size() - 1);
+      if(expr instanceof SingletonSeq || expr instanceof Item) {
+        item = value.itemAt(cmp == OpV.GT ? 0 : expr.size() - 1);
       }
-      if(it != null) {
-        final Type t = it.seqType().type;
-        if(t.isNumber() || t.instanceOf(AtomType.STR)) return it;
+      if(item != null) {
+        final Type t = item.seqType().type;
+        if(t.isNumber() || t.instanceOf(AtomType.STR)) return item;
       }
     }
     return null;
@@ -135,18 +135,18 @@ public class FnMin extends StandardFunc {
    * @return optimized or original item
    */
   final Expr optMinmax(final OpV cmp) {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
     Type t = st.type;
     if(t.isSortable()) {
       if(t.isUntyped()) {
         t = AtomType.DBL;
       } else if(st.one() && exprs.length < 2) {
-        return ex;
+        return expr;
       }
       exprType.assign(t);
-      final Item it = value(cmp);
-      if(it != null) return it;
+      final Item item = value(cmp);
+      if(item != null) return item;
     }
     return optFirst();
   }

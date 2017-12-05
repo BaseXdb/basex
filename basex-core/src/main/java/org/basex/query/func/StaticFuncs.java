@@ -74,16 +74,16 @@ public final class StaticFuncs extends ExprInfo {
    * @param name name of the function
    * @param args optional arguments
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @return reference if the function is known, {@code null} otherwise
    * @throws QueryException query exception
    */
-  TypedFunc getRef(final QNm name, final Expr[] args, final StaticContext sc, final InputInfo ii)
+  TypedFunc getRef(final QNm name, final Expr[] args, final StaticContext sc, final InputInfo info)
       throws QueryException {
 
     // check if function has already been declared
     final FuncCache fc = funcs.get(sig(name, args.length));
-    return fc == null ? null : fc.newCall(name, args, sc, ii);
+    return fc == null ? null : fc.newCall(name, args, sc, info);
   }
 
   /**
@@ -91,20 +91,20 @@ public final class StaticFuncs extends ExprInfo {
    * @param name function name
    * @param args arguments
    * @param sc static context of the function call
-   * @param ii input info
+   * @param info input info
    * @return function call
    * @throws QueryException query exception
    */
   TypedFunc getFuncRef(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) {
-      final QueryException qe = similarError(name, ii);
+      final QueryException qe = similarError(name, info);
       if(qe != null) throw qe;
     }
     final byte[] sig = sig(name, args.length);
     if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
-    return getRef(name, args, sc, ii);
+    return getRef(name, args, sc, info);
   }
 
   /**
@@ -282,17 +282,17 @@ public final class StaticFuncs extends ExprInfo {
 
     /**
      * Creates a new call to this function.
-     * @param nm function name
+     * @param name function name
      * @param args arguments
      * @param sc static context
-     * @param ii input info
+     * @param info input info
      * @return function call
      * @throws QueryException query exception
      */
-    public TypedFunc newCall(final QNm nm, final Expr[] args, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+    public TypedFunc newCall(final QNm name, final Expr[] args, final StaticContext sc,
+        final InputInfo info) throws QueryException {
 
-      final StaticFuncCall call = new StaticFuncCall(nm, args, sc, ii);
+      final StaticFuncCall call = new StaticFuncCall(name, args, sc, info);
       calls.add(call);
 
       // [LW] should be deferred until the actual types are known (i.e. compile time)

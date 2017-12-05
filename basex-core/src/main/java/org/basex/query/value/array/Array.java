@@ -68,7 +68,7 @@ public abstract class Array extends FItem {
   @SafeVarargs
   public static Array from(final Value... values) {
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : values) builder.append(val);
+    for(final Value value : values) builder.append(value);
     return builder.freeze();
   }
 
@@ -178,11 +178,11 @@ public abstract class Array extends FItem {
    * Inserts the given element at the given position into this array.
    * Running time: <i>O(log n)</i>
    * @param pos insertion position, must be between {@code 0} and {@code this.arraySize()}
-   * @param val element to insert
+   * @param value element to insert
    * @param qc query context
    * @return resulting array
    */
-  public abstract Array insertBefore(long pos, Value val, QueryContext qc);
+  public abstract Array insertBefore(long pos, Value value, QueryContext qc);
 
   /**
    * Removes the element at the given position in this array.
@@ -194,8 +194,8 @@ public abstract class Array extends FItem {
   public abstract Array remove(long pos, QueryContext qc);
 
   @Override
-  public final void materialize(final InputInfo ii) throws QueryException {
-    for(final Value v : members()) v.materialize(ii);
+  public final void materialize(final InputInfo info) throws QueryException {
+    for(final Value value : members()) value.materialize(info);
   }
 
   /**
@@ -220,10 +220,10 @@ public abstract class Array extends FItem {
 
   /**
    * Prepends the given elements to this array.
-   * @param vals values, with length at most {@link Array#MAX_SMALL}
+   * @param values values, with length at most {@link Array#MAX_SMALL}
    * @return resulting array
    */
-  abstract Array consSmall(Value[] vals);
+  abstract Array consSmall(Value[] values);
 
   /**
    * Returns an array containing the values at the indices {@code from} to {@code to - 1} in
@@ -231,30 +231,30 @@ public abstract class Array extends FItem {
    * the first {@code -from} entries in the resulting array are {@code null}.
    * If {@code to > arr.length} then the last {@code to - arr.length} entries are {@code null}.
    * If {@code from == 0 && to == arr.length}, the original array is returned.
-   * @param arr input array
+   * @param values input values
    * @param from first index, inclusive (may be negative)
    * @param to last index, exclusive (may be greater than {@code arr.length})
    * @return resulting array
    */
-  static Value[] slice(final Value[] arr, final int from, final int to) {
+  static Value[] slice(final Value[] values, final int from, final int to) {
     final Value[] out = new Value[to - from];
-    final int in0 = Math.max(0, from), in1 = Math.min(to, arr.length);
+    final int in0 = Math.max(0, from), in1 = Math.min(to, values.length);
     final int out0 = Math.max(-from, 0);
-    System.arraycopy(arr, in0, out, out0, in1 - in0);
+    System.arraycopy(values, in0, out, out0, in1 - in0);
     return out;
   }
 
   /**
    * Concatenates the two int arrays.
-   * @param as first array
-   * @param bs second array
+   * @param values1 first values
+   * @param values2 second values
    * @return resulting array
    */
-  static Value[] concat(final Value[] as, final Value[] bs) {
-    final int l = as.length, r = bs.length, n = l + r;
+  static Value[] concat(final Value[] values1, final Value[] values2) {
+    final int l = values1.length, r = values2.length, n = l + r;
     final Value[] out = new Value[n];
-    System.arraycopy(as, 0, out, 0, l);
-    System.arraycopy(bs, 0, out, l, r);
+    System.arraycopy(values1, 0, out, 0, l);
+    System.arraycopy(values2, 0, out, l, r);
     return out;
   }
 
@@ -265,33 +265,33 @@ public abstract class Array extends FItem {
   abstract void checkInvariants();
 
   @Override
-  public final Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
+  public final Value invValue(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
-    final Item key = args[0].atomItem(qc, ii);
-    if(key == null) throw EMPTYFOUND_X.get(ii, AtomType.ITR);
-    return get(key, ii);
+    final Item key = args[0].atomItem(qc, info);
+    if(key == null) throw EMPTYFOUND_X.get(info, AtomType.ITR);
+    return get(key, info);
   }
 
   @Override
-  public final Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
+  public final Item invItem(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
-    return invValue(qc, ii, args).item(qc, ii);
+    return invValue(qc, info, args).item(qc, info);
   }
 
   /**
    * Gets the value from this array.
    * @param key key to look for (must be an integer)
-   * @param ii input info
+   * @param info input info
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
-  public final Value get(final Item key, final InputInfo ii) throws QueryException {
+  public final Value get(final Item key, final InputInfo info) throws QueryException {
     if(!key.type.instanceOf(AtomType.ITR) && !key.type.isUntyped())
-      throw typeError(key, AtomType.ITR, ii);
+      throw typeError(key, AtomType.ITR, info);
 
-    final long pos = key.itr(ii), size = arraySize();
+    final long pos = key.itr(info), size = arraySize();
     if(pos > 0 && pos <= size) return get(pos - 1);
-    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
+    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, size);
   }
 
   @Override
@@ -320,7 +320,7 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public final Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii) {
+  public final Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
     return null;
   }
 
@@ -330,25 +330,25 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(arraySize() == 1) return get(0).atomValue(qc, ii);
+  public final Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+    if(arraySize() == 1) return get(0).atomValue(qc, info);
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value val : members()) vb.add(val.atomValue(qc, ii));
+    for(final Value value : members()) vb.add(value.atomValue(qc, info));
     return vb.value();
   }
 
   @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(atomSize() > 1) throw SEQFOUND_X.get(ii, this);
-    final Value v = atomValue(qc, ii);
-    return v.isEmpty() ? null : (Item) v;
+  public final Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
+    if(atomSize() > 1) throw SEQFOUND_X.get(info, this);
+    final Value value = atomValue(qc, info);
+    return value.isEmpty() ? null : (Item) value;
   }
 
   @Override
   public final long atomSize() {
     long s = 0;
-    for(final Value val : members()) {
-      for(final Item it : val) s += it.atomSize();
+    for(final Value value : members()) {
+      for(final Item item : value) s += item.atomSize();
     }
     return s;
   }
@@ -358,20 +358,20 @@ public abstract class Array extends FItem {
    * @param indent indent output
    * @param tb token builder
    * @param level current level
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
   public final void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     tb.add('[');
     int c = 0;
-    for(final Value val : members()) {
+    for(final Value value : members()) {
       if(c++ > 0) {
         tb.add(',');
         if(indent) tb.add(' ');
       }
-      final long vs = val.size();
+      final long vs = value.size();
       if(vs != 1) tb.add('(');
       int cc = 0;
       for(int i = 0; i < vs; i++) {
@@ -379,10 +379,10 @@ public abstract class Array extends FItem {
           tb.add(',');
           if(indent) tb.add(' ');
         }
-        final Item it = val.itemAt(i);
-        if(it instanceof Array) ((Array) it).string(indent, tb, level, ii);
-        else if(it instanceof Map) ((Map) it).string(indent, tb, level + 1, ii);
-        else tb.add(it.toString());
+        final Item item = value.itemAt(i);
+        if(item instanceof Array) ((Array) item).string(indent, tb, level, info);
+        else if(item instanceof Map) ((Map) item).string(indent, tb, level + 1, info);
+        else tb.add(item.toString());
       }
       if(vs != 1) tb.add(')');
     }
@@ -395,11 +395,11 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
+  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
       final boolean opt) throws QueryException {
 
     if(instanceOf(ft, true)) return this;
-    throw typeError(this, ft, ii);
+    throw typeError(this, ft, info);
   }
 
   /**
@@ -420,8 +420,8 @@ public abstract class Array extends FItem {
       // no argument and return type: no check required
       if(ret.eq(SeqType.ITEM_ZM)) return true;
       // check types of members
-      for(final Value val : members()) {
-        if(!ret.instance(val)) return false;
+      for(final Value value : members()) {
+        if(!ret.instance(value)) return false;
       }
       return true;
     }
@@ -430,21 +430,21 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public final boolean deep(final Item item, final InputInfo ii, final Collation coll)
+  public final boolean deep(final Item item, final InputInfo info, final Collation coll)
       throws QueryException {
 
     if(item instanceof Array) {
       final Array o = (Array) item;
       if(arraySize() != o.arraySize()) return false;
-      final Iterator<Value> it1 = iterator(0), it2 = o.iterator(0);
-      while(it1.hasNext()) {
-        final Value v1 = it1.next(), v2 = it2.next();
-        if(v1.size() != v2.size() || !new DeepEqual(ii).collation(coll).equal(v1, v2))
-          return false;
+      final Iterator<Value> iter1 = iterator(0), iter2 = o.iterator(0);
+      while(iter1.hasNext()) {
+        final Value value1 = iter1.next(), value2 = iter2.next();
+        if(value1.size() != value2.size() ||
+            !new DeepEqual(info).collation(coll).equal(value1, value2)) return false;
       }
       return true;
     }
-    return item instanceof FItem && !(item instanceof Map) && super.deep(item, ii, coll);
+    return item instanceof FItem && !(item instanceof Map) && super.deep(item, info, coll);
   }
 
   @Override

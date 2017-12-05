@@ -41,15 +41,15 @@ public final class IterMap extends SimpleMap {
         try {
           do {
             focus.value = values[pos];
-            final Item it = qc.next(iter[pos]);
-            if(it == null) {
+            final Item item = qc.next(iter[pos]);
+            if(item == null) {
               if(--pos == -1) return null;
             } else if(pos < sz - 1) {
-              focus.value = it;
-              values[++pos] = it;
+              focus.value = item;
+              values[++pos] = item;
               iter[pos] = exprs[pos].iter(qc);
             } else {
-              return it;
+              return item;
             }
           } while(true);
         } finally {

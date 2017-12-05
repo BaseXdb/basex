@@ -28,7 +28,7 @@ abstract class Format extends StandardFunc {
     final int el = exprs.length;
     if(el == 3 || el == 4) throw Functions.wrongArity(sig, el, new IntList(), info);
 
-    final Item it = exprs[0].atomItem(qc, info);
+    final Item item = exprs[0].atomItem(qc, info);
     final byte[] pic = toEmptyToken(exprs[1], qc);
 
     final boolean ext = el == 5;
@@ -39,9 +39,9 @@ abstract class Format extends StandardFunc {
       if(cal != null) cal = trim(cal);
     }
     final byte[] plc = ext ? toEmptyToken(exprs[4], qc) : EMPTY;
-    if(it == null) return null;
+    if(item == null) return null;
 
-    final ADate date = (ADate) checkType(it, tp);
+    final ADate date = (ADate) checkType(item, tp);
     final Formatter form = Formatter.get(lng);
     return Str.get(form.formatDate(date, lng, pic, cal, plc, info, sc));
   }

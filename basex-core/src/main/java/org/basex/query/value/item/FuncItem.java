@@ -103,7 +103,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
+  public Value invValue(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
 
     // bind variables and cache context
@@ -119,7 +119,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
+  public Item invItem(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
     // bind variables and cache context
     final QueryFocus qf = qc.focus;
@@ -127,18 +127,18 @@ public final class FuncItem extends FItem implements Scope {
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
-      return expr.item(qc, ii);
+      return expr.item(qc, info);
     } finally {
       qc.focus = qf;
     }
   }
 
   @Override
-  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
+  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
       final boolean opt) throws QueryException {
 
     final int pl = params.length;
-    if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, ii);
+    if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, info);
 
     // optimization: only ignore equal types
     final FuncType tp = funcType();
@@ -148,11 +148,11 @@ public final class FuncItem extends FItem implements Scope {
     final Var[] vars = new Var[pl];
     final Expr[] args = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vars[p] = scp.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
-      args[p] = new VarRef(ii, vars[p]).optimize(null);
+      vars[p] = scp.addNew(params[p].name, ft.argTypes[p], true, qc, info);
+      args[p] = new VarRef(info, vars[p]).optimize(null);
     }
 
-    final Expr ex = new DynFuncCall(ii, sc, expr.has(Flag.UPD), false, this, args);
+    final Expr ex = new DynFuncCall(info, sc, expr.has(Flag.UPD), false, this, args);
 
     final CompileContext cc = new CompileContext(qc);
     cc.pushScope(scp);
@@ -161,7 +161,7 @@ public final class FuncItem extends FItem implements Scope {
     if(tp.declType.instanceOf(ft.declType)) {
       checked = optimized;
     } else {
-      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.declType, true);
+      final TypeCheck tc = new TypeCheck(sc, info, optimized, ft.declType, true);
       checked = opt ? tc.optimize(cc) : tc;
     }
     checked.markTailCalls(null);
@@ -196,7 +196,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
+  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo info)
       throws QueryException {
 
     if(!StaticFunc.inline(cc, anns, expr) || expr.has(Flag.CTX)) return null;
@@ -225,7 +225,7 @@ public final class FuncItem extends FItem implements Scope {
         return true;
       }
     });
-    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(cc);
+    return cls == null ? rt : new GFLWOR(info, cls, rt).optimize(cc);
   }
 
   @Override

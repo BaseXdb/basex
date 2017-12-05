@@ -137,8 +137,8 @@ public final class QT3TS extends Main {
     for(final XdmItem ienv : new XQuery("*:catalog/*:environment", ctx).context(doc))
       genvs.add(new QT3Env(ctx, ienv));
 
-    for(final XdmItem it : new XQuery("for $f in //*:test-set/@file return string($f)",
-        ctx).context(doc)) testSet(it.getString());
+    for(final XdmItem item : new XQuery("for $f in //*:test-set/@file return string($f)",
+        ctx).context(doc)) testSet(item.getString());
 
     final StringBuilder result = new StringBuilder();
     result.append(" Rate    : ").append(pc(correct, tested)).append(NL);
@@ -577,8 +577,8 @@ public final class QT3TS extends Main {
    */
   private String not(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final XdmItem it : environment(new XQuery("*", ctx), result.env).context(exp)) {
-      final String msg = test(result, it);
+    for(final XdmItem item : environment(new XQuery("*", ctx), result.env).context(exp)) {
+      final String msg = test(result, item);
       if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
     return tb.isEmpty() ? "not(...)" : null;
@@ -592,8 +592,8 @@ public final class QT3TS extends Main {
    */
   private String allOf(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final XdmItem it : environment(new XQuery("*", ctx), result.env).context(exp)) {
-      final String msg = test(result, it);
+    for(final XdmItem item : environment(new XQuery("*", ctx), result.env).context(exp)) {
+      final String msg = test(result, item);
       if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
     return tb.isEmpty() ? null : tb.toString();
@@ -607,8 +607,8 @@ public final class QT3TS extends Main {
    */
   private String anyOf(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final XdmItem it : environment(new XQuery("*", ctx), result.env).context(exp)) {
-      final String msg = test(result, it);
+    for(final XdmItem item : environment(new XQuery("*", ctx), result.env).context(exp)) {
+      final String msg = test(result, item);
       if(msg == null) return null;
       tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
@@ -684,11 +684,11 @@ public final class QT3TS extends Main {
   private String assertPermutation(final QT3Result result, final XdmValue expected) {
     // cache expected results
     final HashSet<String> exp = new HashSet<>();
-    for(final XdmItem it : environment(new XQuery(expected.getString(), ctx), result.env))
-      exp.add(it.getString());
+    for(final XdmItem item : environment(new XQuery(expected.getString(), ctx), result.env))
+      exp.add(item.getString());
     // cache actual results
     final HashSet<String> res = new HashSet<>();
-    for(final XdmItem it : result.value) res.add(it.getString());
+    for(final XdmItem item : result.value) res.add(item.getString());
 
     if(exp.size() != res.size())
       return Util.info("% results (found: %)", exp.size(), res.size());
@@ -799,7 +799,7 @@ public final class QT3TS extends Main {
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = result.query.qp().getSerializer(ao)) {
-        for(final Item it : result.value.internal()) ser.serialize(it);
+        for(final Item item : result.value.internal()) ser.serialize(item);
       }
       return ao.toString();
     } catch(final QueryIOException ex) {
@@ -821,9 +821,9 @@ public final class QT3TS extends Main {
 
     final TokenBuilder tb = new TokenBuilder();
     int c = 0;
-    for(final XdmItem it : result.value) {
+    for(final XdmItem item : result.value) {
       if(c++ != 0) tb.add(' ');
-      tb.add(it.getString());
+      tb.add(item.getString());
     }
 
     final String res = norm ? string(normalize(tb.finish())) : tb.toString();

@@ -26,7 +26,7 @@ public final class DbReplace extends DbNew {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
     final String path = path(1, qc);
-    final Item it = toNodeOrAtomItem(2, qc);
+    final Item item = toNodeOrAtomItem(2, qc);
     final Options opts = toOptions(3, new Options(), qc);
 
     final Updates updates = qc.updates();
@@ -38,11 +38,11 @@ public final class DbReplace extends DbNew {
     final boolean disk = !data.inMemory();
     if(disk && (bin == null || bin.isDir())) throw DB_TARGET_X.get(info, path);
 
-    if(disk && it instanceof Bin) {
-      updates.add(new DBStore(data, path, it, info), qc);
+    if(disk && item instanceof Bin) {
+      updates.add(new DBStore(data, path, item, info), qc);
     } else {
       if(disk && bin.exists()) updates.add(new DBDelete(data, path, info), qc);
-      final NewInput input = checkInput(it, token(path));
+      final NewInput input = checkInput(item, token(path));
       if(docs.isEmpty()) {
         updates.add(new DBAdd(data, input, opts, true, qc, info), qc);
       } else {

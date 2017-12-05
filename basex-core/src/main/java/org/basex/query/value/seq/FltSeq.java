@@ -72,15 +72,15 @@ public final class FltSeq extends NativeSeq {
   public static Value get(final Value[] values, final int size) throws QueryException {
     final float[] tmp = new float[size];
     int t = 0;
-    for(final Value val : values) {
+    for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) val.size();
-      if(val instanceof FltSeq) {
-        final FltSeq sq = (FltSeq) val;
-        System.arraycopy(sq.values, 0, tmp, t, vs);
+      final int vs = (int) value.size();
+      if(value instanceof FltSeq) {
+        final FltSeq seq = (FltSeq) value;
+        System.arraycopy(seq.values, 0, tmp, t, vs);
         t += vs;
       } else {
-        for(int v = 0; v < vs; v++) tmp[t++] = val.itemAt(v).flt(null);
+        for(int v = 0; v < vs; v++) tmp[t++] = value.itemAt(v).flt(null);
       }
     }
     return get(tmp);

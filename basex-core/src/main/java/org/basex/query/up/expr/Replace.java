@@ -50,14 +50,14 @@ public final class Replace extends Update {
     if(c.duplAtt != null) throw UPATTDUPL_X.get(info, c.duplAtt);
 
     final Iter iter = exprs[0].iter(qc);
-    final Item it = iter.next();
+    final Item item = iter.next();
     // check target constraints
-    if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
-    final Type tp = it.type;
-    if(!(it instanceof ANode) || tp == NodeType.DOC) throw UPTRGNODE_X.get(info, it);
-    final Item i2 = iter.next();
-    if(i2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(it, i2, qc));
-    final ANode targ = (ANode) it;
+    if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
+    final Type type = item.type;
+    if(!(item instanceof ANode) || type == NodeType.DOC) throw UPTRGNODE_X.get(info, item);
+    final Item item2 = iter.next();
+    if(item2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2, qc));
+    final ANode targ = (ANode) item;
     final Updates updates = qc.updates();
     final DBNode dbn = updates.determineDataRef(targ, qc);
 
@@ -69,14 +69,14 @@ public final class Replace extends Update {
       final byte[] txt = list.size() < 1 ? aList.size() < 1 ? EMPTY :
         aList.get(0).string() : list.get(0).string();
       // check validity of future comments or PIs
-      if(tp == NodeType.COM) FComm.parse(txt, info);
-      if(tp == NodeType.PI) FPI.parse(txt, info);
+      if(type == NodeType.COM) FComm.parse(txt, info);
+      if(type == NodeType.PI) FPI.parse(txt, info);
 
       updates.add(new ReplaceValue(dbn.pre(), dbn.data(), info, txt), qc);
     } else {
       final ANode par = targ.parent();
       if(par == null) throw UPNOPAR_X.get(info, targ);
-      if(tp == NodeType.ATT) {
+      if(type == NodeType.ATT) {
         // replace attribute node
         if(!list.isEmpty()) throw UPWRATTR_X.get(info, list.get(0));
         list = checkNS(aList, par);

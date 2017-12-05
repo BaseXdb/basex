@@ -34,9 +34,9 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return cc.replaceWith(this, ex);
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(st.zero()) return cc.replaceWith(this, expr);
     final boolean atom = !st.mayBeArray();
     if(st.oneOrMore() && atom) exprType.assign(Occ.ONE);
     simple = st.zeroOrOne() && atom;
@@ -46,19 +46,19 @@ public final class CTxt extends CNode {
   @Override
   public FTxt item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
-    final Expr ex = exprs[0];
+    final Expr expr = exprs[0];
     if(simple) {
-      final Item it = ex.item(qc, ii);
-      return new FTxt(it == null ? Token.EMPTY : it.string(info));
+      final Item item = expr.item(qc, ii);
+      return new FTxt(item == null ? Token.EMPTY : item.string(info));
     }
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
 
-    final Iter iter = ex.atomIter(qc, info);
-    for(Item it; (it = qc.next(iter)) != null;) {
+    final Iter iter = expr.atomIter(qc, info);
+    for(Item item; (item = qc.next(iter)) != null;) {
       if(more) tb.add(' ');
-      tb.add(it.string(info));
+      tb.add(item.string(info));
       more = true;
     }
     return more ? new FTxt(tb.finish()) : null;

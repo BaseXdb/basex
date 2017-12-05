@@ -64,8 +64,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw EBV_X.get(ii, this);
+  public Item ebv(final QueryContext qc, final InputInfo info) throws QueryException {
+    throw EBV_X.get(info, this);
   }
 
   @Override
@@ -103,10 +103,10 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public void materialize(final InputInfo ii) { }
+  public void materialize(final InputInfo info) { }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) {
+  public Value atomValue(final QueryContext qc, final InputInfo info) {
     return this;
   }
 

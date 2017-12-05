@@ -86,9 +86,9 @@ public final class HTTPParams {
     if(values == null) {
       values = new HashMap<>();
       stringMap().forEach((key, value) -> {
-        final ItemList list = new ItemList();
-        for(final String v : value) list.add(new Atm(v));
-        values.put(key, list.value());
+        final ItemList items = new ItemList();
+        for(final String string : value) items.add(new Atm(string));
+        values.put(key, items.value());
       });
     }
     return values;
@@ -136,10 +136,10 @@ public final class HTTPParams {
       if(parts.length == 2) {
         final Atm i = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
         map.merge(parts[0], i, (v1, v2) -> {
-          final ItemList list = new ItemList();
-          for(final Item item : v1) list.add(item);
-          for(final Item item : v2) list.add(item);
-          return list.value();
+          final ItemList items = new ItemList();
+          for(final Item item : v1) items.add(item);
+          for(final Item item : v2) items.add(item);
+          return items.value();
         });
       }
     }

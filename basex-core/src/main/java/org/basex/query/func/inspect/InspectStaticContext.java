@@ -24,15 +24,15 @@ import org.basex.util.list.*;
 public final class InspectStaticContext extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    Item fun = exprs[0].item(qc, info);
+    Item func = exprs[0].item(qc, info);
     final String name = Token.string(toToken(exprs[1], qc));
     final StaticContext sctx;
-    if(fun == null) {
+    if(func == null) {
       sctx = sc;
     } else {
-      fun = toFunc(fun, qc);
-      if(!(fun instanceof FuncItem)) throw INVFUNCITEM_X_X.get(info, fun.type, fun);
-      sctx = ((FuncItem) fun).sc;
+      func = toFunc(func, qc);
+      if(!(func instanceof FuncItem)) throw INVFUNCITEM_X_X.get(info, func.type, func);
+      sctx = ((FuncItem) func).sc;
     }
 
     switch(name) {

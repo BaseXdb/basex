@@ -20,24 +20,24 @@ public final class FnExactlyOne extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
-    final Expr ex = exprs[0];
-    Item it;
-    if(ex.seqType().zeroOrOne()) {
-      it = ex.item(qc, info);
+    final Expr expr = exprs[0];
+    Item item;
+    if(expr.seqType().zeroOrOne()) {
+      item = expr.item(qc, info);
     } else {
-      final Iter iter = ex.iter(qc);
-      it = iter.next();
-      if(it != null && iter.next() != null) it = null;
+      final Iter iter = expr.iter(qc);
+      item = iter.next();
+      if(item != null && iter.next() != null) item = null;
     }
-    if(it == null) throw EXACTLYONE.get(info);
-    return it;
+    if(item == null) throw EXACTLYONE.get(info);
+    return item;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
     if(st.zero() || st.occ.min > 1) throw EXACTLYONE.get(info);
-    return st.one() ? ex : adoptType(ex);
+    return st.one() ? expr : adoptType(expr);
   }
 }

@@ -104,15 +104,15 @@ public final class IntSeq extends NativeSeq {
 
     final long[] tmp = new long[size];
     int t = 0;
-    for(final Value val : values) {
+    for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) val.size();
-      if(val instanceof IntSeq) {
-        final IntSeq sq = (IntSeq) val;
-        System.arraycopy(sq.values, 0, tmp, t, vs);
+      final int vs = (int) value.size();
+      if(value instanceof IntSeq) {
+        final IntSeq seq = (IntSeq) value;
+        System.arraycopy(seq.values, 0, tmp, t, vs);
         t += vs;
       } else {
-        for(int v = 0; v < vs; v++) tmp[t++] = val.itemAt(v).itr(null);
+        for(int v = 0; v < vs; v++) tmp[t++] = value.itemAt(v).itr(null);
       }
     }
     return get(tmp, type);

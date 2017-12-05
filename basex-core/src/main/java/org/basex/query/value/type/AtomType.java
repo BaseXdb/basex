@@ -398,11 +398,11 @@ public enum AtomType implements Type {
     @Override
     public Uln cast(final Object value, final QueryContext qc, final StaticContext sc,
         final InputInfo info) throws QueryException {
-      final Item it = value instanceof Item ? (Item) value : Str.get(value.toString());
-      final BigDecimal v = checkNum(it, info).dec(info), i = v.setScale(0, RoundingMode.DOWN);
+      final Item item = value instanceof Item ? (Item) value : Str.get(value.toString());
+      final BigDecimal v = checkNum(item, info).dec(info), i = v.setScale(0, RoundingMode.DOWN);
       // equals() used to also test fractional digits
       if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
-        it.type.isStringOrUntyped() && !v.equals(i)) throw castError(it, info);
+        item.type.isStringOrUntyped() && !v.equals(i)) throw castError(item, info);
       return Uln.get(i.toBigInteger());
     }
   },
@@ -903,8 +903,8 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    */
   final Item checkNum(final Item item, final InputInfo info) throws QueryException {
-    final Type ip = item.type;
-    if(item instanceof ANum || ip.isStringOrUntyped() && ip != URI || ip == BLN) return item;
+    final Type type = item.type;
+    if(item instanceof ANum || type.isStringOrUntyped() && type != URI || type == BLN) return item;
     throw typeError(item, this, info);
   }
 
@@ -920,20 +920,20 @@ public enum AtomType implements Type {
   final long checkLong(final Object value, final long min, final long max, final InputInfo info)
       throws QueryException {
 
-    final Item it = value instanceof Item ? (Item) value : Str.get(value.toString());
-    checkNum(it, info);
+    final Item item = value instanceof Item ? (Item) value : Str.get(value.toString());
+    checkNum(item, info);
 
-    final Type ip = it.type;
-    if(ip == DBL || ip == FLT) {
-      final double d = it.dbl(info);
-      if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(this, it.string(info), info);
-      if(min != max && (d < min || d > max)) throw castError(it, info);
+    final Type type = item.type;
+    if(type == DBL || type == FLT) {
+      final double d = item.dbl(info);
+      if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(this, item.string(info), info);
+      if(min != max && (d < min || d > max)) throw castError(item, info);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE_X.get(info, d);
       return (long) d;
     }
 
-    final long l = it.itr(info);
-    if(min != max && (l < min || l > max)) throw castError(it, info);
+    final long l = item.itr(info);
+    if(min != max && (l < min || l > max)) throw castError(item, info);
     return l;
   }
 
@@ -943,8 +943,8 @@ public enum AtomType implements Type {
    * @return item argument
    */
   static boolean str(final Item item) {
-    final Type ip = item.type;
-    return ip.isStringOrUntyped() && ip != URI;
+    final Type type = item.type;
+    return type.isStringOrUntyped() && type != URI;
   }
 
   /**

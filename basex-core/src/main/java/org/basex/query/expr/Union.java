@@ -33,12 +33,12 @@ public final class Union extends Set {
     super.optimize(cc);
 
     final ExprList el = new ExprList(exprs.length);
-    for(final Expr ex : exprs) {
-      if(ex == Empty.SEQ) {
+    for(final Expr expr : exprs) {
+      if(expr == Empty.SEQ) {
         // remove empty operands
-        cc.info(OPTREMOVE_X_X, ex, description());
+        cc.info(OPTREMOVE_X_X, expr, description());
       } else {
-        el.add(ex);
+        el.add(expr);
       }
     }
     // no expressions: return empty sequence
@@ -60,8 +60,8 @@ public final class Union extends Set {
   @Override
   public ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     final ANodeBuilder list = new ANodeBuilder();
-    for(final Iter ir : iters) {
-      for(Item it; (it = qc.next(ir)) != null;) list.add(toNode(it));
+    for(final Iter iter : iters) {
+      for(Item item; (item = qc.next(iter)) != null;) list.add(toNode(item));
     }
     return list;
   }

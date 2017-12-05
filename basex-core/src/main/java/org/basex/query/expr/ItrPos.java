@@ -78,27 +78,26 @@ public final class ItrPos extends Simple {
    * Returns an instance of this class, the original expression, or an optimized expression.
    * @param cmp comparison expression
    * @param op comparator
-   * @param ii input info
+   * @param info input info
    * @return resulting or original expression
    */
-  public static Expr get(final Cmp cmp, final OpV op, final InputInfo ii) {
-    final Expr ex1 = cmp.exprs[0], ex2 = cmp.exprs[1];
-    if(!ex1.isFunction(Function.POSITION)) return cmp;
+  public static Expr get(final Cmp cmp, final OpV op, final InputInfo info) {
+    final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+    if(!cmp1.isFunction(Function.POSITION)) return cmp;
 
-    if(ex2 instanceof RangeSeq && op == OpV.EQ) {
-      final RangeSeq rs = (RangeSeq) ex2;
-      final long[] range = rs.range(false);
-      return get(range[0], range[1], ii);
-    } else if(ex2 instanceof ANum) {
-      final ANum it = (ANum) ex2;
-      final long p = it.itr();
-      final boolean exact = p == it.dbl();
+    if(cmp2 instanceof RangeSeq && op == OpV.EQ) {
+      final long[] range = ((RangeSeq) cmp2).range(false);
+      return get(range[0], range[1], info);
+    } else if(cmp2 instanceof ANum) {
+      final ANum item2 = (ANum) cmp2;
+      final long pos = item2.itr();
+      final boolean exact = pos == item2.dbl();
       switch(op) {
-        case EQ: return exact ? get(p, ii) : Bln.FALSE;
-        case GE: return get(exact ? p : p + 1, Long.MAX_VALUE, ii);
-        case GT: return get(p + 1, Long.MAX_VALUE, ii);
-        case LE: return get(1, p, ii);
-        case LT: return get(1, exact ? p - 1 : p, ii);
+        case EQ: return exact ? get(pos, info) : Bln.FALSE;
+        case GE: return get(exact ? pos : pos + 1, Long.MAX_VALUE, info);
+        case GT: return get(pos + 1, Long.MAX_VALUE, info);
+        case LE: return get(1, pos, info);
+        case LT: return get(1, exact ? pos - 1 : pos, info);
         default:
       }
     }

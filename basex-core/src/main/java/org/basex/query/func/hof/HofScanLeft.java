@@ -19,18 +19,18 @@ public final class HofScanLeft extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter outer = exprs[0].iter(qc);
-    final FItem f = checkArity(exprs[2], 2, qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
     return new Iter() {
       private Value acc = exprs[1].value(qc);
       private Iter inner = acc.iter();
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item i = qc.next(inner);
-          if(i != null) return i;
-          final Item o = outer.next();
-          if(o == null) return null;
-          acc = f.invokeValue(qc, info, acc, o);
+          final Item in = qc.next(inner);
+          if(in != null) return in;
+          final Item out = outer.next();
+          if(out == null) return null;
+          acc = func.invokeValue(qc, info, acc, out);
           inner = acc.iter();
         }
       }
@@ -39,10 +39,10 @@ public final class HofScanLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if(ex1 == Empty.SEQ) return ex2;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1 == Empty.SEQ) return expr2;
 
-    final SeqType st = ex1.seqType();
+    final SeqType st = expr1.seqType();
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }

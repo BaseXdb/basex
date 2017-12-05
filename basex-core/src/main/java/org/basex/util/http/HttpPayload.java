@@ -273,21 +273,21 @@ public final class HttpPayload {
       if(lines >= 0) {
         if(startsWith(line, bound)) {
           // get old value
-          Value val = data.get(name);
+          Value value = data.get(name);
           if(filename != null) {
             // assign file and contents, join multiple files
-            final Map map = val instanceof Map ? (Map) val : Map.EMPTY;
+            final Map map = value instanceof Map ? (Map) value : Map.EMPTY;
             final Str file = Str.get(filename);
             final B64 contents = B64.get(cont.next());
             final Value files = new ItemList().add(map.get(file, info)).add(contents).value();
-            val = map.put(file, files, info);
+            value = map.put(file, files, info);
           } else {
             // assign string, join multiple strings
             final Str v = Str.get(cont.next());
-            val = val == null ? v : new ItemList().add(val).add(v).value();
+            value = value == null ? v : new ItemList().add(value).add(v).value();
           }
 
-          if(!name.isEmpty()) data.put(name, val);
+          if(!name.isEmpty()) data.put(name, value);
           lines = -1;
           if(eq(line, last)) break;
         } else {

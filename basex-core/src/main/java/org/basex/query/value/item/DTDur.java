@@ -51,16 +51,16 @@ public final class DTDur extends Dur {
    * @param dur duration item
    * @param add duration to be added/subtracted
    * @param plus plus/minus flag
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DTDur(final DTDur dur, final DTDur add, final boolean plus, final InputInfo ii)
+  public DTDur(final DTDur dur, final DTDur add, final boolean plus, final InputInfo info)
       throws QueryException {
 
     this(dur);
     sec = plus ? sec.add(add.sec) : sec.subtract(add.sec);
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE_X.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE_X.get(info, d);
   }
 
   /**
@@ -68,15 +68,15 @@ public final class DTDur extends Dur {
    * @param dur duration item
    * @param factor factor
    * @param mult multiplication flag
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DTDur(final Dur dur, final double factor, final boolean mult, final InputInfo ii)
+  public DTDur(final Dur dur, final double factor, final boolean mult, final InputInfo info)
       throws QueryException {
 
     this(dur);
-    if(Double.isNaN(factor)) throw DATECALC_X_X.get(ii, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(ii, type, factor);
+    if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, description(), factor);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
     if(mult ? factor == 0 : Double.isInfinite(factor)) {
       sec = BigDecimal.ZERO;
     } else {
@@ -96,32 +96,32 @@ public final class DTDur extends Dur {
 
   /**
    * Constructor.
-   * @param dat date item
+   * @param date date item
    * @param sub date to be subtracted
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DTDur(final ADate dat, final ADate sub, final InputInfo ii) throws QueryException {
+  public DTDur(final ADate date, final ADate sub, final InputInfo info) throws QueryException {
     super(AtomType.DTD);
-    sec = dat.days().subtract(sub.days()).multiply(DAYSECONDS).add(
-        dat.seconds().subtract(sub.seconds()));
+    sec = date.days().subtract(sub.days()).multiply(DAYSECONDS).add(
+        date.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);
   }
 
   /**
    * Constructor.
    * @param value value
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public DTDur(final byte[] value, final InputInfo ii) throws QueryException {
+  public DTDur(final byte[] value, final InputInfo info) throws QueryException {
     super(AtomType.DTD);
 
     final String val = Token.string(value).trim();
     final Matcher mt = DTD.matcher(val);
-    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) throw dateError(value, XDTD, ii);
-    dayTime(value, mt, 2, ii);
+    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) throw dateError(value, XDTD, info);
+    dayTime(value, mt, 2, info);
   }
 
   /**
@@ -133,7 +133,7 @@ public final class DTDur extends Dur {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string(final InputInfo info) {
     final TokenBuilder tb = new TokenBuilder();
     final int ss = sec.signum();
     if(ss < 0) tb.add('-');
@@ -145,9 +145,10 @@ public final class DTDur extends Dur {
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    if(it.type == type) return sec.subtract(((ADateDur) it).sec).signum();
-    throw diffError(it, this, ii);
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    if(item.type == type) return sec.subtract(((ADateDur) item).sec).signum();
+    throw diffError(item, this, info);
   }
 
   /**

@@ -848,8 +848,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     long sz = 0;
     for(final Node<N, E> nd : left)
       sz += nd.checkInvariants();
-    if(sz != leftSize) throw new AssertionError("Wrong leftSize: " + leftSize + " vs. "
-        + sz);
+    if(sz != leftSize) throw new AssertionError("Wrong leftSize: " + leftSize + " vs. " + sz);
     sz += middle.checkInvariants();
     if(right.length < 1 || right.length > MAX_DIGIT) throw new AssertionError(
         "Wrong right digit length: " + right.length);

@@ -29,12 +29,12 @@ public final class DBStore extends DBUpdate {
    * Constructor.
    * @param data data
    * @param path target path
-   * @param it item to be stored
-   * @param inf input info
+   * @param item item to be stored
+   * @param info input info
    */
-  public DBStore(final Data data, final String path, final Item it, final InputInfo inf) {
-    super(UpdateType.DBSTORE, data, inf);
-    map.put(token(path), it);
+  public DBStore(final Data data, final String path, final Item item, final InputInfo info) {
+    super(UpdateType.DBSTORE, data, info);
+    map.put(token(path), item);
   }
 
   @Override

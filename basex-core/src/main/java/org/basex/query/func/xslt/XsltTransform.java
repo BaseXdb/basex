@@ -73,18 +73,18 @@ public class XsltTransform extends XsltFn {
    * @throws QueryException query exception
    */
   private IO read(final int i, final QueryContext qc) throws QueryException {
-    final Item it = toNodeOrAtomItem(i, qc);
-    if(it instanceof ANode) {
+    final Item item = toNodeOrAtomItem(i, qc);
+    if(item instanceof ANode) {
       try {
-        final IO io = new IOContent(it.serialize(SerializerMode.NOINDENT.get()).finish());
-        io.name(string(((ANode) it).baseURI()));
+        final IO io = new IOContent(item.serialize(SerializerMode.NOINDENT.get()).finish());
+        io.name(string(((ANode) item).baseURI()));
         return io;
       } catch(final QueryIOException e) {
         e.getCause(info);
       }
     }
-    if(it.type.isStringOrUntyped()) return checkPath(toToken(it));
-    throw STRNOD_X_X.get(info, it.type, it);
+    if(item.type.isStringOrUntyped()) return checkPath(toToken(item));
+    throw STRNOD_X_X.get(info, item.type, item);
   }
 
   /**

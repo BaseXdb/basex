@@ -72,15 +72,15 @@ public final class BlnSeq extends NativeSeq {
   public static Value get(final Value[] values, final int size) throws QueryException {
     final boolean[] tmp = new boolean[size];
     int t = 0;
-    for(final Value val : values) {
+    for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) val.size();
-      if(val instanceof BlnSeq) {
-        final BlnSeq sq = (BlnSeq) val;
-        System.arraycopy(sq.values, 0, tmp, t, vs);
+      final int vs = (int) value.size();
+      if(value instanceof BlnSeq) {
+        final BlnSeq seq = (BlnSeq) value;
+        System.arraycopy(seq.values, 0, tmp, t, vs);
         t += vs;
       } else {
-        for(int v = 0; v < vs; v++) tmp[t++] = val.itemAt(v).bool(null);
+        for(int v = 0; v < vs; v++) tmp[t++] = value.itemAt(v).bool(null);
       }
     }
     return get(tmp);

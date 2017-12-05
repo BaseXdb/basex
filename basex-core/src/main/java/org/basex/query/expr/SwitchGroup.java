@@ -95,9 +95,9 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public int exprSize() {
-    int sz = 0;
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
+    int size = 0;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
   }
 
   @Override

@@ -69,7 +69,7 @@ public final class ValueAccess extends IndexAccess {
 
     final ArrayList<BasicNodeIter> iters = new ArrayList<>();
     final Iter iter = expr.iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) iters.add(iter(it, data));
+    for(Item item; (item = qc.next(iter)) != null;) iters.add(iter(item, data));
     final int is = iters.size();
     return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iters.get(0) :
       new Union(info, expr).eval(iters.toArray(new NodeIter[is]), qc).iter();
@@ -77,16 +77,16 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Returns an index iterator.
-   * @param it text item
+   * @param item text item
    * @param data data reference
    * @return iterator
    * @throws QueryException query exception
    */
-  private BasicNodeIter iter(final Item it, final Data data) throws QueryException {
-    if(it == null) return BasicNodeIter.EMPTY;
+  private BasicNodeIter iter(final Item item, final Data data) throws QueryException {
+    if(item == null) return BasicNodeIter.EMPTY;
 
     // retrieve and trim text
-    final byte[] token = it.string(info), term = trim ? Token.trim(token) : token;
+    final byte[] token = item.string(info), term = trim ? Token.trim(token) : token;
 
     // special case: empty text node
     // - no element name: return 0 results (empty text nodes are non-existent)

@@ -58,8 +58,8 @@ public class FnSubsequence extends StandardFunc {
       long c;
       @Override
       public Item next() throws QueryException {
-        for(Item it; (it = qc.next(iter)) != null && ++c < e;) {
-          if(c >= start) return it;
+        for(Item item; (item = qc.next(iter)) != null && ++c < e;) {
+          if(c >= start) return item;
         }
         return null;
       }
@@ -70,17 +70,17 @@ public class FnSubsequence extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final long[] range = range(qc);
     if(range == null) return Empty.SEQ;
-    final Expr ex = exprs[0];
-    if(range == ALL) return ex.value(qc);
+    final Expr expr = exprs[0];
+    if(range == ALL) return expr.value(qc);
     final long start = range[0], len = range[1];
 
     // return subsequence if value access is cheap
-    final Iter iter = ex.iter(qc);
+    final Iter iter = expr.iter(qc);
     final long is = iter.size();
-    final Value v = iter.value();
-    if(v != null) {
+    final Value value = iter.value();
+    if(value != null) {
       final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
-      return l <= 0 ? Empty.SEQ : v.subSequence(s, l, qc);
+      return l <= 0 ? Empty.SEQ : value.subSequence(s, l, qc);
     }
 
     // take fast route if the size is known
@@ -95,9 +95,9 @@ public class FnSubsequence extends StandardFunc {
 
     final long e = len == Long.MAX_VALUE ? len : start + len;
     final ValueBuilder vb = new ValueBuilder(qc);
-    Item it;
-    for(int i = 1; i < e && (it = qc.next(iter)) != null; i++) {
-      if(i >= start) vb.add(it);
+    Item item;
+    for(int i = 1; i < e && (item = qc.next(iter)) != null; i++) {
+      if(i >= start) vb.add(item);
     }
     return vb.value();
   }
@@ -158,9 +158,9 @@ public class FnSubsequence extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }

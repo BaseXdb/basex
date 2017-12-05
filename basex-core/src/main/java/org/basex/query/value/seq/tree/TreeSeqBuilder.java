@@ -134,9 +134,9 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
     if(!(val instanceof BigSeq)) {
       final BasicIter<?> iter = val.iter();
-      for(Item it; (it = iter.next()) != null;) {
+      for(Item item; (item = iter.next()) != null;) {
         qc.checkStop();
-        add(it);
+        add(item);
       }
       return this;
     }

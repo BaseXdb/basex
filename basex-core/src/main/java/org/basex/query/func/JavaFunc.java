@@ -140,12 +140,12 @@ final class JavaFunc extends JavaFunction {
 
   /**
    * Creates the instance on which a non-static field getter or method is invoked.
-   * @param v XQuery value
+   * @param value XQuery value
    * @return Java object
    * @throws QueryException query exception
    */
-  private Object instObj(final Value v) throws QueryException {
-    return clazz.isInstance(v) ? v : v.toJava();
+  private Object instObj(final Value value) throws QueryException {
+    return clazz.isInstance(value) ? value : value.toJava();
   }
 
   /**

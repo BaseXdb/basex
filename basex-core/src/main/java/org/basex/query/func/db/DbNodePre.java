@@ -18,8 +18,8 @@ public final class DbNodePre extends StandardFunc {
     return new Iter() {
       @Override
       public Int next() throws QueryException {
-        final Item it = qc.next(iter);
-        return it == null ? null : Int.get(toDBNode(it).pre());
+        final Item item = qc.next(iter);
+        return item == null ? null : Int.get(toDBNode(item).pre());
       }
     };
   }

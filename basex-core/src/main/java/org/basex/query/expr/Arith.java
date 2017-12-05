@@ -34,8 +34,8 @@ public final class Arith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
     final boolean nums = t1.isNumberOrUntyped() && t2.isNumberOrUntyped();
     final Type t = calc == Calc.IDIV ? AtomType.ITR : nums ? Calc.type(t1, t2) : AtomType.AAT;
@@ -47,7 +47,7 @@ public final class Arith extends Arr {
     } else if(allAreValues(false)) {
       expr = value(cc.qc);
     } else if(nums && st1.oneNoArray() && st2.oneNoArray()) {
-      expr = calc.optimize(ex1, ex2);
+      expr = calc.optimize(expr1, expr2);
       if(expr == null || !expr.seqType().type.eq(t)) expr = this;
     }
     return cc.replaceWith(this, expr);
@@ -55,10 +55,10 @@ public final class Arith extends Arr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = exprs[0].atomItem(qc, info);
-    if(it1 == null) return null;
-    final Item it2 = exprs[1].atomItem(qc, info);
-    return it2 == null ? null : calc.ev(it1, it2, info);
+    final Item item1 = exprs[0].atomItem(qc, info);
+    if(item1 == null) return null;
+    final Item item2 = exprs[1].atomItem(qc, info);
+    return item2 == null ? null : calc.eval(item1, item2, info);
   }
 
   @Override

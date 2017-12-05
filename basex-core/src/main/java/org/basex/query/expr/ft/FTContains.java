@@ -50,16 +50,16 @@ public final class FTContains extends Single {
       int c = 0;
       boolean f = false;
       final FTPosData ftPosData = qc.ftPosData;
-      for(Item it; (it = qc.next(iter)) != null;) {
-        lexer.init(it.string(info));
-        final FTNode item = ftexpr.item(qc, info);
-        final FTMatches all = item.matches();
+      for(Item item; (item = qc.next(iter)) != null;) {
+        lexer.init(item.string(info));
+        final FTNode it = ftexpr.item(qc, info);
+        final FTMatches all = it.matches();
         if(all.matches()) {
           f = true;
-          if(scoring) s += item.score();
+          if(scoring) s += it.score();
           // cache entry for visualizations or ft:mark/ft:extract
-          if(ftPosData != null && it instanceof DBNode) {
-            final DBNode node = (DBNode) it;
+          if(ftPosData != null && item instanceof DBNode) {
+            final DBNode node = (DBNode) item;
             ftPosData.add(node.data(), node.pre(), all);
           }
         }

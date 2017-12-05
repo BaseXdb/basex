@@ -72,9 +72,9 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> concat(final Node<N, E>[] nodes, final long sz,
+  public FingerTree<N, E> concat(final Node<N, E>[] nodes, final long size,
       final FingerTree<N, E> other) {
-    return other.addAll(nodes, sz, true);
+    return other.addAll(nodes, size, true);
   }
 
   @Override
@@ -119,7 +119,7 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean left) {
-    return buildTree(nodes, nodes.length, sz);
+  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long size, final boolean left) {
+    return buildTree(nodes, nodes.length, size);
   }
 }

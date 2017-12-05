@@ -193,12 +193,12 @@ public final class EditorView extends View {
       Font f = null;
       for(final String en : hst.sort(Prop.CASE)) {
         // disable opened files
-        final JMenuItem it = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
+        final JMenuItem item = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
         if(opened.contains(en)) {
-          if(f == null) f = it.getFont().deriveFont(Font.BOLD);
-          it.setFont(f);
+          if(f == null) f = item.getFont().deriveFont(Font.BOLD);
+          item.setFont(f);
         }
-        pm.add(it).addActionListener(al);
+        pm.add(item).addActionListener(al);
       }
       al = ac -> hist.getActionListeners()[0].actionPerformed(null);
       if(e != null && pm.getComponentCount() == BaseXHistory.MAXCOMPACT) {

@@ -40,35 +40,35 @@ public final class Treat extends Single {
   public Iter iter(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
     final Iter iter = expr.iter(qc);
-    final Item it = iter.next();
+    final Item item = iter.next();
     // input is empty
-    if(it == null) {
+    if(item == null) {
       if(st.mayBeEmpty()) return Empty.ITER;
       throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), st, Empty.SEQ);
     }
     // treat as empty sequence
-    if(st.zero()) throw NOTREAT_X_X_X.get(info, it.type, st, it);
+    if(st.zero()) throw NOTREAT_X_X_X.get(info, item.type, st, item);
 
     if(st.zeroOrOne()) {
       final Item n = iter.next();
       if(n != null) {
-        final ValueBuilder vb = new ValueBuilder(qc).add(it, n);
+        final ValueBuilder vb = new ValueBuilder(qc).add(item, n);
         if(iter.next() != null) vb.add(Str.get(DOTS));
         throw NOTREAT_X_X_X.get(info, expr.seqType(), st, vb.value());
       }
-      if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
-      return it.iter();
+      if(!item.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, item.type, st, item);
+      return item.iter();
     }
 
     return new Iter() {
-      Item i = it;
+      Item it = item;
 
       @Override
       public Item next() throws QueryException {
-        if(i == null) return null;
-        if(!i.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, i.type, st, i);
-        final Item ii = i;
-        i = qc.next(iter);
+        if(it == null) return null;
+        if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
+        final Item ii = it;
+        it = qc.next(iter);
         return ii;
       }
     };
@@ -77,30 +77,30 @@ public final class Treat extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
-    final Value val = expr.value(qc);
+    final Value value = expr.value(qc);
 
-    final long len = val.size();
+    final long len = value.size();
     // input is empty
     if(len == 0) {
-      if(st.mayBeEmpty()) return val;
+      if(st.mayBeEmpty()) return value;
       throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), st, Empty.SEQ);
     }
     // treat as empty sequence
-    if(st.zero()) throw NOTREAT_X_X_X.get(info, val.type, st, val);
+    if(st.zero()) throw NOTREAT_X_X_X.get(info, value.type, st, value);
 
     if(st.zeroOrOne()) {
-      if(len > 1) throw NOTREAT_X_X_X.get(info, val.seqType(), st, val);
-      final Item it = val.itemAt(0);
-      if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
-      return it;
+      if(len > 1) throw NOTREAT_X_X_X.get(info, value.seqType(), st, value);
+      final Item item = value.itemAt(0);
+      if(!item.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, item.type, st, item);
+      return item;
     }
 
     for(long i = 0; i < len; i++) {
       qc.checkStop();
-      final Item it = val.itemAt(i);
-      if(!it.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, it.type, st, it);
+      final Item item = value.itemAt(i);
+      if(!item.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, item.type, st, item);
     }
-    return val;
+    return value;
   }
 
   @Override

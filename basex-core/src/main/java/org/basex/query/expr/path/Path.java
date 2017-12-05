@@ -160,15 +160,15 @@ public abstract class Path extends ParseExpr {
     seqType(cc, rt);
 
     // merge descendant steps
-    Expr ex = mergeSteps(cc);
+    Expr expr = mergeSteps(cc);
     // check index access
-    if(ex == this) ex = index(cc, rt);
+    if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
      * - //C[. = '...']     ->  IA('...', C)
      * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A */
-    if(ex == this) ex = children(cc, rt);
-    if(ex != this) return ex.optimize(cc);
+    if(expr == this) expr = children(cc, rt);
+    if(expr != this) return expr.optimize(cc);
 
     // choose best path implementation and set type information
     return copyType(get(info, root, steps));
@@ -299,9 +299,9 @@ public abstract class Path extends ParseExpr {
     if(root == null || !root.iterable()) return false;
 
     final long size = root.size();
-    final SeqType tp = root.seqType();
-    boolean atMostOne = size == 0 || size == 1 || tp.zeroOrOne();
-    boolean sameDepth = atMostOne || tp.type == NodeType.DOC || tp.type == NodeType.DEL;
+    final SeqType st = root.seqType();
+    boolean atMostOne = size == 0 || size == 1 || st.zeroOrOne();
+    boolean sameDepth = atMostOne || st.type == NodeType.DOC || st.type == NodeType.DEL;
 
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
@@ -361,21 +361,21 @@ public abstract class Path extends ParseExpr {
   private void seqType(final CompileContext cc, final Value rt) {
     // assign data reference
     final int sl = steps.length;
-    final long sz = size(cc, rt);
+    final long size = size(cc, rt);
     final Expr last = steps[sl - 1];
     final SeqType st = last.seqType();
     Type type = st.type;
     Occ occ = Occ.ZERO_MORE;
 
     // unknown result size: single attribute with exact name test will return at most one result
-    if(sz < 0 && root == null && sl == 1 && last instanceof Step && cc.nestedFocus()) {
+    if(size < 0 && root == null && sl == 1 && last instanceof Step && cc.nestedFocus()) {
       final Step step = (Step) last;
       if(step.axis == ATTR && step.test.one) {
         occ = Occ.ZERO_ONE;
         step.exprType.assign(occ);
       }
     }
-    exprType.assign(type, occ, sz);
+    exprType.assign(type, occ, size);
   }
 
   /**
@@ -783,18 +783,18 @@ public abstract class Path extends ParseExpr {
             continue;
           }
           // descendant-or-self::node()/(X, Y) -> (descendant::X | descendant::Y)
-          Expr ex = mergeList(next);
-          if(ex != null) {
-            steps[s + 1] = ex;
+          Expr expr = mergeList(next);
+          if(expr != null) {
+            steps[s + 1] = expr;
             opt = true;
             continue;
           }
           // //(X, Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
           if(next instanceof Filter && !((Filter) next).positional()) {
             final Filter f = (Filter) next;
-            ex = mergeList(f.root);
-            if(ex != null) {
-              f.root = ex;
+            expr = mergeList(f.root);
+            if(expr != null) {
+              f.root = expr;
               opt = true;
               continue;
             }
@@ -819,10 +819,10 @@ public abstract class Path extends ParseExpr {
    */
   private Expr mergeList(final Expr expr) {
     if(expr instanceof Union || expr instanceof List) {
-      final Arr next = (Arr) expr;
-      if(childSteps(next)) {
-        for(final Expr ex : next.exprs) ((Step) ((Path) ex).steps[0]).axis = DESC;
-        return new Union(next.info, next.exprs);
+      final Arr array = (Arr) expr;
+      if(childSteps(array)) {
+        for(final Expr ex : array.exprs) ((Step) ((Path) ex).steps[0]).axis = DESC;
+        return new Union(array.info, array.exprs);
       }
     }
     return null;
@@ -830,14 +830,14 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Checks if the expressions in the specified array start with child steps.
-   * @param list array to be checked
+   * @param array array expression to be checked
    * @return result of check
    */
-  private static boolean childSteps(final Arr list) {
-    for(final Expr e : list.exprs) {
-      if(!(e instanceof Path)) return false;
-      final Path p = (Path) e;
-      if(p.root != null || !simpleChild(p.steps[0])) return false;
+  private static boolean childSteps(final Arr array) {
+    for(final Expr expr : array.exprs) {
+      if(!(expr instanceof Path)) return false;
+      final Path path = (Path) expr;
+      if(path.root != null || !simpleChild(path.steps[0])) return false;
     }
     return true;
   }
@@ -913,16 +913,16 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final int exprSize() {
-    int sz = 1;
-    for(final Expr e : steps) sz += e.exprSize();
-    return root == null ? sz : sz + root.exprSize();
+    int size = 1;
+    for(final Expr step : steps) size += step.exprSize();
+    return root == null ? size : size + root.exprSize();
   }
 
   @Override
   public final boolean equals(final Object obj) {
     if(!(obj instanceof Path)) return false;
-    final Path p = (Path) obj;
-    return Objects.equals(root, p.root) && Array.equals(steps, p.steps);
+    final Path path = (Path) obj;
+    return Objects.equals(root, path.root) && Array.equals(steps, path.steps);
   }
 
   @Override

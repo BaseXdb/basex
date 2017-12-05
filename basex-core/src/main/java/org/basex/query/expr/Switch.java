@@ -81,25 +81,25 @@ public final class Switch extends ParseExpr {
   private Expr opt(final CompileContext cc) throws QueryException {
     // cached switch cases
     final ExprList cases = new ExprList();
-    final Item it = cond instanceof Value ? cond.atomItem(cc.qc, info) : null;
+    final Item item = cond instanceof Value ? cond.atomItem(cc.qc, info) : null;
     final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
     for(final SwitchGroup group : groups) {
       final int el = group.exprs.length;
       final Expr ret = group.exprs[0];
       final ExprList list = new ExprList(el).add(ret);
       for(int e = 1; e < el; e++) {
-        final Expr ex = group.exprs[e];
-        if(cond instanceof Value && ex instanceof Value) {
+        final Expr expr = group.exprs[e];
+        if(cond instanceof Value && expr instanceof Value) {
           // includes check for empty sequence (null reference)
-          final Item cs = ex.atomItem(cc.qc, info);
-          if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) return ret;
-          cc.info(OPTREMOVE_X_X, ex, description());
-        } else if(cases.contains(ex)) {
+          final Item cs = expr.atomItem(cc.qc, info);
+          if(item == cs || cs != null && item != null && item.equiv(cs, null, info)) return ret;
+          cc.info(OPTREMOVE_X_X, expr, description());
+        } else if(cases.contains(expr)) {
           // case has already been checked before
-          cc.info(OPTREMOVE_X_X, ex, description());
+          cc.info(OPTREMOVE_X_X, expr, description());
         } else {
-          cases.add(ex);
-          list.add(ex);
+          cases.add(expr);
+          list.add(expr);
         }
       }
       // build list of branches (add those with case left, or the default branch)
@@ -191,13 +191,13 @@ public final class Switch extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr getCase(final QueryContext qc) throws QueryException {
-    final Item it = cond.atomItem(qc, info);
+    final Item item = cond.atomItem(qc, info);
     for(final SwitchGroup group : groups) {
       final int gl = group.exprs.length;
       for(int e = 1; e < gl; e++) {
         // includes check for empty sequence (null reference)
         final Item cs = group.exprs[e].atomItem(qc, info);
-        if(it == cs || it != null && cs != null && it.equiv(cs, null, info))
+        if(item == cs || item != null && cs != null && item.equiv(cs, null, info))
           return group.exprs[0];
       }
       if(gl == 1) return group.exprs[0];
@@ -223,9 +223,9 @@ public final class Switch extends ParseExpr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Expr e : groups) sz += e.exprSize();
-    return sz;
+    int size = 1;
+    for(final Expr group : groups) size += group.exprSize();
+    return size;
   }
 
   @Override

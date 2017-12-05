@@ -33,56 +33,56 @@ public class CachedFilter extends Filter {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    Value val = root.value(qc);
+    Value value = root.value(qc);
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
     qc.focus = focus;
     try {
       // evaluate first predicate, based on incoming value
-      final ItemList buffer = new ItemList();
+      final ItemList items = new ItemList();
       Expr pred = exprs[0];
-      long vs = val.size();
+      long vs = value.size();
       focus.size = vs;
       focus.pos = 1;
 
       final boolean scoring = qc.scoring;
       for(int s = 0; s < vs; s++) {
         qc.checkStop();
-        final Item it = val.itemAt(s);
-        focus.value = it;
+        final Item item = value.itemAt(s);
+        focus.value = item;
         final Item test = pred.test(qc, info);
         if(test != null) {
-          if(scoring) it.score(test.score());
-          buffer.add(it);
+          if(scoring) item.score(test.score());
+          items.add(item);
         }
         focus.pos++;
       }
       // save memory
-      val = null;
+      value = null;
 
       // evaluate remaining predicates, based on value builder
       final int pl = exprs.length;
       for(int i = 1; i < pl; i++) {
-        vs = buffer.size();
+        vs = items.size();
         pred = exprs[i];
         focus.size = vs;
         focus.pos = 1;
         int c = 0;
         for(int s = 0; s < vs; ++s) {
           qc.checkStop();
-          final Item it = buffer.get(s);
-          focus.value = it;
+          final Item item = items.get(s);
+          focus.value = item;
           final Item test = pred.test(qc, info);
           if(test != null) {
-            if(scoring) it.score(test.score());
-            buffer.set(c++, it);
+            if(scoring) item.score(test.score());
+            items.set(c++, item);
           }
           focus.pos++;
         }
-        buffer.size(c);
+        items.size(c);
       }
 
       // return resulting values
-      return buffer.value();
+      return items.value();
     } finally {
       qc.focus = qf;
     }

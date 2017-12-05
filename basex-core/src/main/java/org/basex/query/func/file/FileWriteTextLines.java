@@ -46,9 +46,9 @@ public class FileWriteTextLines extends FileFn {
     final Charset cs = enc == null || enc == Strings.UTF8 ? null : Charset.forName(enc);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
-      for(final Item it : value) {
-        if(!it.type.isStringOrUntyped()) throw typeError(it, AtomType.STR, info);
-        final byte[] s = it.string(info);
+      for(final Item item : value) {
+        if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STR, info);
+        final byte[] s = item.string(info);
         out.write(cs == null ? s : string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));
       }

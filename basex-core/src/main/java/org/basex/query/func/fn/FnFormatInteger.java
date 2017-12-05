@@ -24,9 +24,9 @@ public final class FnFormatInteger extends StandardFunc {
     final byte[] pic = toToken(exprs[1], qc);
     final byte[] lng = exprs.length == 2 ? EMPTY : toToken(exprs[2], qc);
 
-    final Item it = exprs[0].atomItem(qc, info);
-    if(it == null) return Str.ZERO;
-    final long num = toLong(it);
+    final Item item = exprs[0].atomItem(qc, info);
+    if(item == null) return Str.ZERO;
+    final long num = toLong(item);
 
     IntFormat format;
     synchronized(formats) {

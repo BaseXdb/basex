@@ -14,40 +14,40 @@ import org.basex.util.ft.*;
 abstract class FtAccess extends StandardFunc {
   /**
    * Parses fulltext options.
-   * @param ftexpr full-text expression
+   * @param expr full-text expression
    * @param opts full-text options
    * @return expressions
    */
-  final FTExpr options(final FTExpr ftexpr, final FtIndexOptions opts) {
-    FTExpr fte = ftexpr;
+  final FTExpr options(final FTExpr expr, final FtIndexOptions opts) {
+    FTExpr ex = expr;
     if(opts != null) {
       if(opts.get(FtIndexOptions.ORDERED)) {
-        fte = new FTOrder(info, fte);
+        ex = new FTOrder(info, ex);
       }
       if(opts.contains(FtIndexOptions.DISTANCE)) {
         final FTDistanceOptions fopts = opts.get(FtIndexOptions.DISTANCE);
         final Int min = Int.get(fopts.get(FTDistanceOptions.MIN));
         final Int max = Int.get(fopts.get(FTDistanceOptions.MAX));
         final FTUnit unit = fopts.get(FTDistanceOptions.UNIT);
-        fte = new FTDistance(info, fte, min, max, unit);
+        ex = new FTDistance(info, ex, min, max, unit);
       }
       if(opts.contains(FtIndexOptions.WINDOW)) {
         final FTWindowOptions fopts = opts.get(FtIndexOptions.WINDOW);
-        final Int sz = Int.get(fopts.get(FTWindowOptions.SIZE));
+        final Int size = Int.get(fopts.get(FTWindowOptions.SIZE));
         final FTUnit unit = fopts.get(FTWindowOptions.UNIT);
-        fte = new FTWindow(info, fte, sz, unit);
+        ex = new FTWindow(info, ex, size, unit);
       }
       if(opts.contains(FtIndexOptions.SCOPE)) {
         final FTScopeOptions fopts = opts.get(FtIndexOptions.SCOPE);
         final boolean same = fopts.get(FTScopeOptions.SAME);
         final FTUnit unit = fopts.get(FTScopeOptions.UNIT).unit();
-        fte = new FTScope(info, fte, same, unit);
+        ex = new FTScope(info, ex, same, unit);
       }
       if(opts.contains(FtIndexOptions.CONTENT)) {
-        final FTContents cont = opts.get(FtIndexOptions.CONTENT);
-        fte = new FTContent(info, fte, cont);
+        final FTContents content = opts.get(FtIndexOptions.CONTENT);
+        ex = new FTContent(info, ex, content);
       }
     }
-    return fte;
+    return ex;
   }
 }

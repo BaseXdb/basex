@@ -30,25 +30,25 @@ public final class MapFind extends StandardFunc {
 
   /**
    * Finds map entries in the specified iterator.
-   * @param ir iterator
+   * @param iter iterator
    * @param key item to be found
    * @param builder array builder
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void find(final Iter ir, final Item key, final ArrayBuilder builder,
+  private void find(final Iter iter, final Item key, final ArrayBuilder builder,
       final QueryContext qc) throws QueryException {
 
-    for(Item it; (it = qc.next(ir)) != null;) {
-      if(it instanceof Map) {
-        final Map map = (Map) it;
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(item instanceof Map) {
+        final Map map = (Map) item;
         final Value value = map.get(key, info);
         if(value != Empty.SEQ) builder.append(value);
-        for(final Item it2 : map.keys()) {
-          find(map.get(it2, info).iter(), key, builder, qc);
+        for(final Item it : map.keys()) {
+          find(map.get(it, info).iter(), key, builder, qc);
         }
-      } else if(it instanceof Array) {
-        for(final Value value : ((Array) it).members()) {
+      } else if(item instanceof Array) {
+        for(final Value value : ((Array) item).members()) {
           find(value.iter(), key, builder, qc);
         }
       }

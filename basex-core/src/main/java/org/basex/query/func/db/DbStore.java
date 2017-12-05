@@ -20,12 +20,12 @@ public final class DbStore extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
     final String path = path(1, qc);
-    final Item it = toNodeOrAtomItem(2, qc);
+    final Item item = toNodeOrAtomItem(2, qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 
     final IOFile file = data.meta.binary(path);
     if(file == null || path.isEmpty()) throw RESINV_X.get(info, path);
-    qc.updates().add(new DBStore(data, path, it, info), qc);
+    qc.updates().add(new DBStore(data, path, item, info), qc);
     return null;
   }
 }

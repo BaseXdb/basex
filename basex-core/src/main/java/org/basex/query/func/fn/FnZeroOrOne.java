@@ -20,17 +20,17 @@ public final class FnZeroOrOne extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final Item it = iter.next();
-    if(it != null && iter.next() != null) throw ZEROORONE.get(info);
-    return it;
+    final Item item = iter.next();
+    if(item != null && iter.next() != null) throw ZEROORONE.get(info);
+    return item;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zeroOrOne()) return ex;
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(st.zeroOrOne()) return expr;
     if(st.occ.min > 1) throw ZEROORONE.get(info);
-    return adoptType(ex);
+    return adoptType(expr);
   }
 }

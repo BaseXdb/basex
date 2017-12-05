@@ -20,30 +20,30 @@ import org.basex.util.*;
 public class FnAvg extends FnSum {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr ex = exprs[0];
-    if(ex instanceof RangeSeq || ex instanceof Range) return range(ex.value(qc));
+    final Expr expr = exprs[0];
+    if(expr instanceof RangeSeq || expr instanceof Range) return range(expr.value(qc));
 
-    if(ex instanceof SingletonSeq) {
-      final Item it = singleton((SingletonSeq) ex);
-      if(it != null) return it;
+    if(expr instanceof SingletonSeq) {
+      final Item item = singleton((SingletonSeq) expr);
+      if(item != null) return item;
     }
-    final Iter iter = ex.atomIter(qc, info);
-    final Item it = iter.next();
-    return it == null ? null : sum(iter, it, true, qc);
+    final Iter iter = expr.atomIter(qc, info);
+    final Item item = iter.next();
+    return item == null ? null : sum(iter, item, true, qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0];
-    if(ex instanceof RangeSeq) return range((Value) ex);
-    if(ex instanceof SingletonSeq) {
-      final Item it = singleton((SingletonSeq) ex);
-      if(it != null) return it;
+    final Expr expr = exprs[0];
+    if(expr instanceof RangeSeq) return range((Value) expr);
+    if(expr instanceof SingletonSeq) {
+      final Item item = singleton((SingletonSeq) expr);
+      if(item != null) return item;
     }
 
     // empty sequence: replace with default item
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
 
     if(!st.mayBeArray()) {
       // sequence is not empty: assign result type
@@ -63,9 +63,9 @@ public class FnAvg extends FnSum {
    * @throws QueryException query exception
    */
   private Item singleton(final SingletonSeq seq) throws QueryException {
-    Item it = seq.itemAt(0);
-    if(it.type.isUntyped()) it = Dbl.get(it.dbl(info));
-    return it.type.isNumber() ? it : null;
+    Item item = seq.itemAt(0);
+    if(item.type.isUntyped()) item = Dbl.get(item.dbl(info));
+    return item.type.isNumber() ? item : null;
   }
 
   /**

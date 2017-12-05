@@ -73,14 +73,7 @@ public final class Catch extends Single {
    */
   Value value(final QueryContext qc, final QueryException qe) throws QueryException {
     int i = 0;
-    final byte[] io = qe.file() == null ? EMPTY : token(qe.file());
-    final Value val = qe.value();
-    for(final Value v : new Value[] { qe.qname(),
-        Str.get(qe.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Int.get(qe.line()), Int.get(qe.column()),
-        Str.get(qe.getMessage().replaceAll("\r\n?", "\n")) }) {
-      qc.set(vars[i++], v);
-    }
+    for(final Value value : values(qe)) qc.set(vars[i++], value);
     Util.debug(qe);
     return expr.value(qc);
   }
@@ -118,11 +111,11 @@ public final class Catch extends Single {
    */
   Expr asExpr(final QueryException qe, final CompileContext cc) throws QueryException {
     if(expr instanceof Value) return expr;
-    int i = 0;
+    int v = 0;
     Expr ex = expr;
-    for(final Value v : values(qe)) {
-      final Expr e2 = ex.inline(vars[i++], v, cc);
-      if(e2 != null) ex = e2;
+    for(final Value value : values(qe)) {
+      final Expr ex2 = ex.inline(vars[v++], value, cc);
+      if(ex2 != null) ex = ex2;
       if(ex instanceof Value) break;
     }
     return ex;
@@ -135,9 +128,9 @@ public final class Catch extends Single {
    */
   public static Value[] values(final QueryException qe) {
     final byte[] io = qe.file() == null ? EMPTY : token(qe.file());
-    final Value val = qe.value();
+    final Value value = qe.value();
     return new Value[] { qe.qname(),
-        Str.get(qe.getLocalizedMessage()), val == null ? Empty.SEQ : val,
+        Str.get(qe.getLocalizedMessage()), value == null ? Empty.SEQ : value,
         Str.get(io), Int.get(qe.line()), Int.get(qe.column()),
         Str.get(qe.getMessage().replaceAll("\r\n?", "\n")) };
   }

@@ -53,12 +53,12 @@ abstract class BinFn extends StandardFunc {
   final Int unpackInteger(final QueryContext qc, final boolean signed) throws QueryException {
     final B64 b64 = toB64(exprs[0], qc, false);
     final Long off = toLong(exprs[1], qc);
-    final Long sz = toLong(exprs[2], qc);
+    final Long size = toLong(exprs[2], qc);
     final ByteOrder bo = order(3, qc);
 
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(off, sz, bl);
+    final int[] bounds = bounds(off, size, bl);
     final int o = bounds[0], l = Math.min(8, bounds[1]);
     if(l == 0) return Int.ZERO;
 
@@ -111,20 +111,20 @@ abstract class BinFn extends StandardFunc {
    */
   final B64 pad(final QueryContext qc, final boolean left) throws QueryException {
     final B64 b64 = toB64(exprs[0], qc, true);
-    final long sz = toLong(exprs[1], qc);
+    final long size = toLong(exprs[1], qc);
     final long octet = exprs.length > 2 ? toLong(exprs[2], qc) : 0;
     if(b64 == null) return null;
 
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
 
-    if(sz < 0) throw BIN_NS_X.get(info, sz);
+    if(size < 0) throw BIN_NS_X.get(info, size);
     if(octet < 0 || octet > 255) throw BIN_OOR_X.get(info, octet);
 
-    final byte[] tmp = new byte[(int) (bl + sz)];
+    final byte[] tmp = new byte[(int) (bl + size)];
     if(left) {
-      Arrays.fill(tmp, 0, (int) sz, (byte) octet);
-      System.arraycopy(bytes, 0, tmp, (int) sz, bl);
+      Arrays.fill(tmp, 0, (int) size, (byte) octet);
+      System.arraycopy(bytes, 0, tmp, (int) size, bl);
     } else {
       System.arraycopy(bytes, 0, tmp, 0, bl);
       Arrays.fill(tmp, bl, tmp.length, (byte) octet);
@@ -151,25 +151,25 @@ abstract class BinFn extends StandardFunc {
    * Checks the bounds of the specified offset value.
    * @param off offset value (may be {@code null})
    * @param len length value (may be {@code null})
-   * @param sz size of input data
+   * @param size size of input data
    * @return bounds
    * @throws QueryException query exception
    */
-  final int[] bounds(final Long off, final Long len, final int sz) throws QueryException {
-    int o = 0;
+  final int[] bounds(final Long off, final Long len, final int size) throws QueryException {
+    int of = 0;
     if(off != null) {
-      if(off < 0 || off > sz || off > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, off, sz);
-      o = (int) off.longValue();
+      if(off < 0 || off > size || off > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, off, size);
+      of = (int) off.longValue();
     }
-    final int s;
+    final int sz;
     if(len != null) {
       if(len < 0) throw BIN_NS_X.get(info, off);
-      if(o + len > sz || len > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, o + len, sz);
-      s = (int) len.longValue();
+      if(of + len > size || len > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, of + len, size);
+      sz = (int) len.longValue();
     } else {
-      s = sz - o;
+      sz = size - of;
     }
-    return new int[] { o, s };
+    return new int[] { of, sz };
   }
 
   /**
@@ -202,7 +202,7 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final byte[] str(final int o, final QueryContext qc) throws QueryException {
-    final Item it = exprs[o].atomItem(qc, info);
-    return it == null ? null : toToken(it);
+    final Item item = exprs[o].atomItem(qc, info);
+    return item == null ? null : toToken(item);
   }
 }

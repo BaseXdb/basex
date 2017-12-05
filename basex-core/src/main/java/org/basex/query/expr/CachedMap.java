@@ -38,15 +38,15 @@ final class CachedMap extends SimpleMap {
     try {
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
-        final Expr ex = exprs[e];
+        final Expr expr = exprs[e];
         focus.pos = 0;
         focus.size = result.size();
         final ValueBuilder vb = new ValueBuilder(qc);
         final Iter iter = result.iter();
-        for(Item it; (it = qc.next(iter)) != null;) {
+        for(Item item; (item = qc.next(iter)) != null;) {
           focus.pos++;
-          focus.value = it;
-          vb.add(ex.value(qc));
+          focus.value = item;
+          vb.add(expr.value(qc));
         }
         result = vb.value();
       }

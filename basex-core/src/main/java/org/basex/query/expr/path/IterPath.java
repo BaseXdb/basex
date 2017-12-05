@@ -47,18 +47,18 @@ public final class IterPath extends AxisPath {
 
         try {
           do {
-            final Item it = qc.next(iter[pos]);
-            if(it == null) {
+            final Item item = qc.next(iter[pos]);
+            if(item == null) {
               if(--pos == -1) return null;
             } else if(pos < sz - 1) {
               // ensure that the root expression yields nodes
-              if(pos++ == 0 && rt && !(it instanceof ANode))
-                throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
-              focus.value = it;
+              if(pos++ == 0 && rt && !(item instanceof ANode))
+                throw PATHNODE_X_X_X.get(info, steps[0], item.type, item);
+              focus.value = item;
               iter[pos] = exprs[pos].iter(qc);
             } else {
               // cast is safe (axis steps will always yield nodes); skip identical nodes
-              final ANode n = (ANode) it;
+              final ANode n = (ANode) item;
               if(last == null || !last.is(n)) {
                 last = n;
                 return n;

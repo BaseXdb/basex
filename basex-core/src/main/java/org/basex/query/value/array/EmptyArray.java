@@ -86,8 +86,8 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value val, final QueryContext qc) {
-    return new SmallArray(new Value[] { val });
+  public Array insertBefore(final long pos, final Value value, final QueryContext qc) {
+    return new SmallArray(new Value[] { value });
   }
 
   @Override
@@ -106,7 +106,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  Array consSmall(final Value[] vals) {
-    return new SmallArray(vals);
+  Array consSmall(final Value[] values) {
+    return new SmallArray(values);
   }
 }

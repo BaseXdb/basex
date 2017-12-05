@@ -14,14 +14,14 @@ import org.basex.util.*;
 public final class FnDateTime extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
-    final Item zon = exprs.length == 2 ? exprs[1].atomItem(qc, info) : null;
-    if(it == null || zon == null) return null;
+    final Item item = exprs[0].atomItem(qc, info);
+    final Item zone = exprs.length == 2 ? exprs[1].atomItem(qc, info) : null;
+    if(item == null || zone == null) return null;
 
-    final Dat d = it.type.isUntyped() ? new Dat(it.string(info), info) :
-      (Dat) checkType(it, AtomType.DAT);
-    final Tim t = zon.type.isUntyped() ? new Tim(zon.string(info), info) :
-      (Tim) checkType(zon, AtomType.TIM);
+    final Dat d = item.type.isUntyped() ? new Dat(item.string(info), info) :
+      (Dat) checkType(item, AtomType.DAT);
+    final Tim t = zone.type.isUntyped() ? new Tim(zone.string(info), info) :
+      (Tim) checkType(zone, AtomType.TIM);
     return new Dtm(d, t, info);
   }
 }

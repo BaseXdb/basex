@@ -18,8 +18,8 @@ import org.basex.query.value.type.*;
 public final class FnForEachPair extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
-    final FItem fun = checkArity(exprs[2], 2, qc);
+    final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
 
     return new Iter() {
       Iter iter = Empty.ITER;
@@ -27,11 +27,11 @@ public final class FnForEachPair extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         do {
-          final Item it = qc.next(iter);
-          if(it != null) return it;
-          final Item it1 = ir1.next(), it2 = ir2.next();
-          if(it1 == null || it2 == null) return null;
-          iter = fun.invokeValue(qc, info, it1, it2).iter();
+          final Item item = qc.next(iter);
+          if(item != null) return item;
+          final Item item1 = iter1.next(), item2 = iter2.next();
+          if(item1 == null || item2 == null) return null;
+          iter = func.invokeValue(qc, info, item1, item2).iter();
         } while(true);
       }
     };
@@ -39,22 +39,22 @@ public final class FnForEachPair extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter ir1 = exprs[0].iter(qc), ir2 = exprs[1].iter(qc);
-    final FItem fun = checkArity(exprs[2], 2, qc);
+    final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item it1, it2; (it1 = ir1.next()) != null && (it2 = ir2.next()) != null;) {
-      vb.add(fun.invokeValue(qc, info, it1, it2));
+    for(Item item1, item2; (item1 = iter1.next()) != null && (item2 = iter2.next()) != null;) {
+      vb.add(func.invokeValue(qc, info, item1, item2));
     }
     return vb.value();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
-    if(st1.zero()) return ex1;
-    if(st2.zero()) return ex2;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    if(st1.zero()) return expr1;
+    if(st2.zero()) return expr2;
 
     coerceFunc(2, cc, SeqType.ITEM_ZM, st1.type.seqType(), st2.type.seqType());
 

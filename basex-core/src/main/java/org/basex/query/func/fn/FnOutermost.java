@@ -31,7 +31,7 @@ public class FnOutermost extends StandardFunc {
   NodeIter most(final QueryContext qc, final boolean outer) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
     final ANodeBuilder list = new ANodeBuilder();
-    for(Item it; (it = qc.next(iter)) != null;) list.add(toNode(it));
+    for(Item item; (item = qc.next(iter)) != null;) list.add(toNode(item));
     list.check();
 
     // only go further if there are at least two nodes

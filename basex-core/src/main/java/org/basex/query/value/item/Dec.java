@@ -56,7 +56,7 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) {
+  public boolean bool(final InputInfo info) {
     return value.signum() != 0;
   }
 
@@ -76,7 +76,7 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public BigDecimal dec(final InputInfo ii) {
+  public BigDecimal dec(final InputInfo info) {
     return value;
   }
 
@@ -103,17 +103,18 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return it.type == AtomType.DBL || it.type == AtomType.FLT ?
-        it.eq(this, coll, sc, ii) : value.compareTo(it.dec(ii)) == 0;
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    return item.type == AtomType.DBL || item.type == AtomType.FLT ?
+        item.eq(this, coll, sc, info) : value.compareTo(item.dec(info)) == 0;
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    final double d = it.dbl(ii);
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    final double d = item.dbl(info);
     return d == Double.NEGATIVE_INFINITY ? -1 : d == Double.POSITIVE_INFINITY ? 1 :
-      Double.isNaN(d) ? UNDEF : value.compareTo(it.dec(ii));
+      Double.isNaN(d) ? UNDEF : value.compareTo(item.dec(info));
   }
 
   @Override

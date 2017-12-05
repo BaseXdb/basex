@@ -34,8 +34,8 @@ public class FnTrace extends StandardFunc {
     } else {
       final Iter iter = value.iter();
       try {
-        for(Item it; (it = qc.next(iter)) != null;) {
-          trace(it.serialize(SerializerMode.DEBUG.get()).finish(), label, qc);
+        for(Item item; (item = qc.next(iter)) != null;) {
+          trace(item.serialize(SerializerMode.DEBUG.get()).finish(), label, qc);
         }
       } catch(final QueryIOException ex) {
         throw ex.getCause(info);

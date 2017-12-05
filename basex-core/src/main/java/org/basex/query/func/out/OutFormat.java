@@ -21,8 +21,9 @@ public final class OutFormat extends StandardFunc {
     final int es = exprs.length;
     final Object[] args = new Object[es - 1];
     for(int e = 1; e < es; e++) {
-      final Item it = exprs[e].item(qc, info);
-      args[e - 1] = it == null ? null : it.type.isUntyped() ? string(it.string(info)) : it.toJava();
+      final Item item = exprs[e].item(qc, info);
+      args[e - 1] = item == null ? null : item.type.isUntyped() ? string(item.string(info)) :
+        item.toJava();
     }
     try {
       return Str.get(String.format(form, args));

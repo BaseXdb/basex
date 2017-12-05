@@ -62,13 +62,13 @@ abstract class CName extends CNode {
   final byte[] atomValue(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
-      final Value val = expr.value(qc);
-      boolean m = false;
-      final Iter iter = val.atomValue(qc, info).iter();
-      for(Item it; (it = qc.next(iter)) != null;) {
-        if(m) tb.add(' ');
-        tb.add(it.string(info));
-        m = true;
+      final Value value = expr.value(qc);
+      boolean more = false;
+      final Iter iter = value.atomValue(qc, info).iter();
+      for(Item item; (item = qc.next(iter)) != null;) {
+        if(more) tb.add(' ');
+        tb.add(item.string(info));
+        more = true;
       }
     }
     return tb.finish();
@@ -82,13 +82,13 @@ abstract class CName extends CNode {
    * @throws QueryException query exception
    */
   final QNm qname(final QueryContext qc, final boolean elem) throws QueryException {
-    final Item it = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
-    final Type ip = it.type;
-    if(ip == AtomType.QNM) return (QNm) it;
-    if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw STRQNM_X_X.get(info, ip, it);
+    final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
+    final Type type = item.type;
+    if(type == AtomType.QNM) return (QNm) item;
+    if(!type.isStringOrUntyped() || type == AtomType.URI) throw STRQNM_X_X.get(info, type, item);
 
     // create and update namespace
-    final byte[] str = it.string(info);
+    final byte[] str = item.string(info);
     if(XMLToken.isQName(str)) {
       return elem || Token.contains(str, ':') ? new QNm(str, sc) : new QNm(str);
     }
@@ -128,9 +128,9 @@ abstract class CName extends CNode {
 
   @Override
   public final int exprSize() {
-    int sz = 1;
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz + name.exprSize();
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size + name.exprSize();
   }
 
   @Override

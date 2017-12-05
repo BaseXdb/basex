@@ -19,32 +19,32 @@ import org.basex.util.*;
 public final class UtilItemAt extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final double dp = toDouble(exprs[1], qc);
-    final long ps = (long) dp;
-    if(dp != ps || ps < 1) return null;
+    final double ps = toDouble(exprs[1], qc);
+    final long pos = (long) ps;
+    if(ps != pos || pos < 1) return null;
 
     // if possible, retrieve single item
-    final Expr ex = exprs[0];
-    if(ex.seqType().zeroOrOne()) return ps == 1 ? ex.item(qc, info) : null;
+    final Expr expr = exprs[0];
+    if(expr.seqType().zeroOrOne()) return pos == 1 ? expr.item(qc, info) : null;
 
     // fast route if the size is known
-    final Iter iter = ex.iter(qc);
+    final Iter iter = expr.iter(qc);
     final long is = iter.size();
-    if(is >= 0) return ps > is ? null : iter.get(ps - 1);
+    if(is >= 0) return pos > is ? null : iter.get(pos - 1);
 
     // loop through all items
     long p = 0;
-    for(Item it; (it = qc.next(iter)) != null;) {
-      if(++p == ps) return it;
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(++p == pos) return item;
     }
     return null;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0], pos = exprs[1];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final Expr expr = exprs[0], pos = exprs[1];
+    final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
     exprType.assign(st.type);
 
     if(pos instanceof Value) {
@@ -53,9 +53,10 @@ public final class UtilItemAt extends StandardFunc {
       // invalid positions
       if(dp != ps || ps < 1) return Empty.SEQ;
       // pre-evaluate single expression with static position
-      if(st.zeroOrOne()) return ps == 1 ? ex : Empty.SEQ;
+      if(st.zeroOrOne()) return ps == 1 ? expr : Empty.SEQ;
       // check for large values
-      if(ex instanceof Value) return ps <= ex.size() ? ((Value) ex).itemAt(ps - 1) : Empty.SEQ;
+      if(expr instanceof Value) return ps <= expr.size() ? ((Value) expr).itemAt(ps - 1) :
+        Empty.SEQ;
     }
     return this;
   }

@@ -153,12 +153,12 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
 
     /**
      * Constructor.
-     * @param u uri
-     * @param it item
+     * @param uri uri
+     * @param item item
      */
-    private InsertItemThread(final String u, final XQItem it) {
-      uri = u;
-      item = it;
+    private InsertItemThread(final String uri, final XQItem item) {
+      this.uri = uri;
+      this.item = item;
     }
 
     @Override

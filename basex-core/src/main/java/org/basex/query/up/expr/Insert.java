@@ -59,22 +59,22 @@ public final class Insert extends Update {
 
     // check target constraints
     final Iter iter = exprs[0].iter(qc);
-    final Item it = iter.next();
-    if(it == null) throw UPSEQEMP_X.get(info, Util.className(this));
+    final Item item = iter.next();
+    if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
 
     final boolean loc = mode == Mode.BEFORE || mode == Mode.AFTER;
-    if(!(it instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, it);
+    if(!(item instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
     final Item i2 = iter.next();
     if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info,
-        ValueBuilder.concat(it, i2, qc));
+        ValueBuilder.concat(item, i2, qc));
 
-    final ANode n = (ANode) it;
-    final ANode par = n.parent();
+    final ANode node = (ANode) item;
+    final ANode par = node.parent();
     if(loc) {
-      if(n.type == NodeType.ATT || n.type == NodeType.DOC) throw UPTRGTYP2_X.get(info, n);
-      if(par == null) throw UPPAREMPTY_X.get(info, n);
+      if(node.type == NodeType.ATT || node.type == NodeType.DOC) throw UPTRGTYP2_X.get(info, node);
+      if(par == null) throw UPPAREMPTY_X.get(info, node);
     } else {
-      if(n.type != NodeType.ELM && n.type != NodeType.DOC) throw UPTRGTYP_X.get(info, n);
+      if(node.type != NodeType.ELM && node.type != NodeType.DOC) throw UPTRGTYP_X.get(info, node);
     }
 
     NodeUpdate up;
@@ -82,7 +82,7 @@ public final class Insert extends Update {
     // no update primitive is created if node list is empty
     final Updates updates = qc.updates();
     if(!aList.isEmpty()) {
-      final ANode targ = loc ? par : n;
+      final ANode targ = loc ? par : node;
       if(targ.type != NodeType.ELM) throw (loc ? UPATTELM_X : UPATTELM2_X).get(info, targ);
 
       dbn = updates.determineDataRef(targ, qc);
@@ -92,7 +92,7 @@ public final class Insert extends Update {
 
     // no update primitive is created if node list is empty
     if(!cList.isEmpty()) {
-      dbn = updates.determineDataRef(n, qc);
+      dbn = updates.determineDataRef(node, qc);
       switch(mode) {
         case BEFORE: up = new InsertBefore(dbn.pre(), dbn.data(), info, cList); break;
         case AFTER : up = new InsertAfter(dbn.pre(), dbn.data(), info, cList); break;

@@ -19,9 +19,9 @@ public final class DbNodeId extends StandardFunc {
     return new Iter() {
       @Override
       public Int next() throws QueryException {
-        final Item it = qc.next(iter);
-        if(it == null) return null;
-        final DBNode node = toDBNode(it);
+        final Item item = qc.next(iter);
+        if(item == null) return null;
+        final DBNode node = toDBNode(item);
         return Int.get(node.data().id(node.pre()));
       }
     };

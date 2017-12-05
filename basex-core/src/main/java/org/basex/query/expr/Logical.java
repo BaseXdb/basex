@@ -60,7 +60,7 @@ abstract class Logical extends Arr {
       final Expr ex = expr.optimizeEbv(cc);
       if(and ? ex instanceof And : ex instanceof Or) {
         // flatten nested expressions
-        for(final Expr e : ((Logical) ex).exprs) list.add(e);
+        for(final Expr exp : ((Logical) ex).exprs) list.add(exp);
         cc.info(OPTFLAT_X_X, description(), ex);
       } else if(ex instanceof Value) {
         // pre-evaluate values

@@ -117,16 +117,16 @@ public final class Condition extends Single {
    * Binds the variables and checks if the item satisfies this condition.
    * @param qc query context for variable binding
    * @param it current item
-   * @param p position in the input sequence
+   * @param ps position in the input sequence
    * @param pr previous item
    * @param nx next item
    * @return {@code true} if {@code it} matches the condition, {@code false} otherwise
    * @throws QueryException query exception
    */
-  boolean matches(final QueryContext qc, final Item it, final long p, final Item pr, final Item nx)
+  boolean matches(final QueryContext qc, final Item it, final long ps, final Item pr, final Item nx)
       throws QueryException {
     // bind variables
-    bind(qc, it, p, pr, nx);
+    bind(qc, it, ps, pr, nx);
     // evaluate as effective boolean value
     return expr.ebv(qc, info).bool(info);
   }
@@ -135,15 +135,15 @@ public final class Condition extends Single {
    * Binds this condition's variables to the given values.
    * @param qc query context
    * @param it current item
-   * @param p position
+   * @param ps position
    * @param pr previous item
    * @param nx next item
    * @throws QueryException query exception
    */
-  void bind(final QueryContext qc, final Item it, final long p, final Item pr, final Item nx)
+  void bind(final QueryContext qc, final Item it, final long ps, final Item pr, final Item nx)
       throws QueryException {
     if(item != null) qc.set(item, it == null ? Empty.SEQ : it);
-    if(pos  != null) qc.set(pos,  Int.get(p));
+    if(pos  != null) qc.set(pos,  Int.get(ps));
     if(prev != null) qc.set(prev, pr == null ? Empty.SEQ : pr);
     if(next != null) qc.set(next, nx == null ? Empty.SEQ : nx);
   }

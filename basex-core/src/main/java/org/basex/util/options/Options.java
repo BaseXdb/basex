@@ -370,33 +370,33 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value
    * @param error error
-   * @param ii input info
+   * @param info input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   public synchronized void assign(final Item name, final Item value, final boolean error,
-      final InputInfo ii) throws BaseXException, QueryException {
+      final InputInfo info) throws BaseXException, QueryException {
 
-    final String key = string(name.string(ii));
+    final String key = string(name.string(info));
     if(options.isEmpty()) {
       final byte[] val;
       if(value instanceof Map) {
         final TokenBuilder tb = new TokenBuilder();
         final Map map = (Map) value;
-        for(final Item it : map.keys()) {
+        for(final Item item : map.keys()) {
           if(!tb.isEmpty()) tb.add(',');
-          tb.add(it.string(ii)).add('=');
-          final Value v = map.get(it, ii);
-          if(v instanceof Item) tb.add(string(((Item) v).string(ii)).replace(",", ",,"));
-          else throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, v.seqType(), v);
+          tb.add(item.string(info)).add('=');
+          final Value vl = map.get(item, info);
+          if(vl instanceof Item) tb.add(string(((Item) vl).string(info)).replace(",", ",,"));
+          else throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, vl.seqType(), vl);
         }
         val = tb.finish();
       } else {
-        val = value.string(ii);
+        val = value.string(info);
       }
       free.put(key, string(val));
     } else {
-      assign(key, value, error, ii);
+      assign(key, value, error, info);
     }
   }
 
@@ -531,22 +531,22 @@ public class Options implements Iterable<Option<?>> {
    * Parses and assigns options from the specified map.
    * @param map map
    * @param error raise error if option is unknown
-   * @param ii input info
+   * @param info input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final Map map, final boolean error, final InputInfo ii)
+  public final synchronized void assign(final Map map, final boolean error, final InputInfo info)
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {
       if(!name.type.isStringOrUntyped())
         throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
 
-      final Value value = map.get(name, ii);
+      final Value value = map.get(name, info);
       if(!(value instanceof Item))
         throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, value.seqType(), value);
 
-      assign(name, (Item) value, error, ii);
+      assign(name, (Item) value, error, info);
     }
   }
 
@@ -732,12 +732,12 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param item value of option
    * @param error raise error if option is unknown
-   * @param ii input info
+   * @param info input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   private synchronized void assign(final String name, final Item item, final boolean error,
-      final InputInfo ii) throws BaseXException, QueryException {
+      final InputInfo info) throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
@@ -783,7 +783,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
       if(item instanceof Map) {
-        o.assign((Map) item, error, ii);
+        o.assign((Map) item, error, info);
       } else {
         throw new BaseXException(Text.OPT_MAP_X_X, option.name(), item);
       }

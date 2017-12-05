@@ -71,14 +71,14 @@ public class ClientQuery extends Query {
 
       try {
         final TokenBuilder tb = new TokenBuilder();
-        for(final Item it : val) {
+        for(final Item item : val) {
           if(!tb.isEmpty()) tb.add(1);
-          if(it instanceof ANode) {
-            tb.add(it.serialize(SerializerMode.NOINDENT.get()).finish());
+          if(item instanceof ANode) {
+            tb.add(item.serialize(SerializerMode.NOINDENT.get()).finish());
           } else {
-            tb.add(it.string(null));
+            tb.add(item.string(null));
           }
-          if(it.type != tp) tb.add(2).add(it.type.toString());
+          if(item.type != tp) tb.add(2).add(item.type.toString());
         }
         v = tb.toString();
       } catch(final QueryException ex) {

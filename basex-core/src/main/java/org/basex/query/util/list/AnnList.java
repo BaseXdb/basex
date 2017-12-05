@@ -18,13 +18,11 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
    * @param sig signature to be found
    */
   public void delete(final Annotation sig) {
-    final Ann[] lst = list;
-    final int sz = size;
-    int s = 0;
-    for(int i = 0; i < sz; ++i) {
-      if(lst[i].sig != sig) lst[s++] = lst[i];
+    int ls = 0;
+    for(int l = 0; l < size; ++l) {
+      if(list[l].sig != sig) list[ls++] = list[l];
     }
-    size = s;
+    size = ls;
   }
 
   /**

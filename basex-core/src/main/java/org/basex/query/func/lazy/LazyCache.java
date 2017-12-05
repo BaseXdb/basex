@@ -20,9 +20,9 @@ public final class LazyCache extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = exprs[0].value(qc);
-    v.materialize(info);
-    return v;
+    final Value value = exprs[0].value(qc);
+    value.materialize(info);
+    return value;
   }
 
   @Override

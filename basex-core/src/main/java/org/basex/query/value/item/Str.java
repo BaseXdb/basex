@@ -58,11 +58,11 @@ public final class Str extends AStr {
    * Returns a string representation of the specified value.
    * @param value object (will be converted to token)
    * @param qc query context
-   * @param ii input info
+   * @param inf input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Str get(final Object value, final QueryContext qc, final InputInfo ii)
+  public static Str get(final Object value, final QueryContext qc, final InputInfo inf)
       throws QueryException {
 
     final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
@@ -72,7 +72,7 @@ public final class Str extends AStr {
     for(int c = 0; c < bl; c += Token.cl(bytes, c)) {
       int cp = Token.cp(bytes, c);
       if(!XMLToken.valid(cp)) {
-        if(validate) throw INVCODE_X.get(ii, Integer.toHexString(cp));
+        if(validate) throw INVCODE_X.get(inf, Integer.toHexString(cp));
         cp = Token.REPLACEMENT;
         if(tb == null) {
           tb = new TokenBuilder(bl);
@@ -85,7 +85,7 @@ public final class Str extends AStr {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string(final InputInfo info) {
     return value;
   }
 

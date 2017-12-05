@@ -19,20 +19,20 @@ import org.basex.util.*;
 public final class FnCompare extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = exprs[0].atomItem(qc, info), it2 = exprs[1].atomItem(qc, info);
+    final Item item1 = exprs[0].atomItem(qc, info), item2 = exprs[1].atomItem(qc, info);
     final Collation coll = toCollation(2, qc);
-    if(it1 == null || it2 == null) return null;
-    final byte[] t1 = toToken(it1), t2 = toToken(it2);
+    if(item1 == null || item2 == null) return null;
+    final byte[] t1 = toToken(item1), t2 = toToken(item2);
     final long d = coll == null ? diff(t1, t2) : coll.compare(t1, t2);
     return Int.get(d < 0 ? -1 : d > 0 ? 1 : 0);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
-    if(st1.zero()) return ex1;
-    if(st2.zero()) return ex2;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    if(st1.zero()) return expr1;
+    if(st2.zero()) return expr2;
     if(st1.oneNoArray() && st2.oneNoArray()) exprType.assign(Occ.ONE);
     return this;
   }

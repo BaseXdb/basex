@@ -31,8 +31,8 @@ public final class HofTopKWith extends HofFn {
     final Iter iter = exprs[0].iter(qc);
     final MinHeap<Item, Item> heap = new MinHeap<>(cmp);
     try {
-      for(Item it; (it = qc.next(iter)) != null;) {
-        heap.insert(it, it);
+      for(Item item; (item = qc.next(iter)) != null;) {
+        heap.insert(item, item);
         if(heap.size() > k) heap.removeMin();
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }
@@ -45,7 +45,7 @@ public final class HofTopKWith extends HofFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     // even single items must be sorted, as the input might be invalid
-    final Expr ex = exprs[0];
-    return ex.seqType().zero() ? ex : adoptType(ex);
+    final Expr expr = exprs[0];
+    return expr.seqType().zero() ? expr : adoptType(expr);
   }
 }

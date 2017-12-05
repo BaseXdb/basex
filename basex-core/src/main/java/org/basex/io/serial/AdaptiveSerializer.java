@@ -80,13 +80,15 @@ public class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected void atomic(final Item item) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    final Type tp = item.type;
-    if(tp == AtomType.BLN || tp == AtomType.STR || tp == AtomType.ATM || tp == AtomType.ITR ||
-       tp == AtomType.DEC || tp == AtomType.DBL || tp == AtomType.QNM) {
+    final Type type = item.type;
+    if(type == AtomType.BLN || type == AtomType.STR || type == AtomType.ATM ||
+       type == AtomType.ITR || type == AtomType.DEC || type == AtomType.DBL ||
+       type == AtomType.QNM) {
       tb.add(item.toString());
     } else {
       try {
-        tb.add(tp.toString()).add('(').add(Item.toString(item.string(null), true, false)).add(')');
+        tb.add(type.toString());
+        tb.add('(').add(Item.toString(item.string(null), true, false)).add(')');
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }
@@ -121,18 +123,18 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   /**
    * Serializes an array.
-   * @param item item
+   * @param array item
    * @throws IOException I/O exception
    */
-  protected void array(final Array item) throws IOException {
+  protected void array(final Array array) throws IOException {
     final TokenBuilder tb = new TokenBuilder().add('[');
     int c = 0;
-    for(final Value val : item.members()) {
+    for(final Value value : array.members()) {
       if(c++ > 0) {
         tb.add(',');
         if(indent) tb.add(' ');
       }
-      final long vs = val.size();
+      final long vs = value.size();
       if(vs != 1) tb.add('(');
       for(int i = 0, cc = 0; i < vs; i++, cc++) {
         if(cc > 0) {
@@ -141,7 +143,7 @@ public class AdaptiveSerializer extends OutputSerializer {
         }
         printChars(tb.next());
         more = false;
-        serialize(val.itemAt(i));
+        serialize(value.itemAt(i));
       }
       if(vs != 1) tb.add(')');
     }
@@ -150,16 +152,16 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   /**
    * Serializes a map.
-   * @param item item
+   * @param map item
    * @throws IOException I/O exception
    */
-  protected void map(final Map item) throws IOException {
+  protected void map(final Map map) throws IOException {
     final TokenBuilder tb = new TokenBuilder().add("map");
     if(indent) tb.add(' ');
     tb.add('{');
     int c = 0;
     ++level;
-    for(final Item key : item.keys()) {
+    for(final Item key : map.keys()) {
       if(c++ > 0) tb.add(',');
       printChars(tb.next());
       indent();
@@ -168,18 +170,18 @@ public class AdaptiveSerializer extends OutputSerializer {
       tb.add(':');
       if(indent) tb.add(' ');
       try {
-        final Value v = item.get(key, null);
-        final boolean par = v.size() != 1;
+        final Value value = map.get(key, null);
+        final boolean par = value.size() != 1;
         if(par) tb.add('(');
         int cc = 0;
-        for(final Item it : v) {
+        for(final Item item : value) {
           if(cc++ > 0) {
             tb.add(',');
             if(indent) tb.add(' ');
           }
           printChars(tb.next());
           more = false;
-          serialize(it);
+          serialize(item);
         }
         if(par) tb.add(')');
       } catch(final QueryException ex) {

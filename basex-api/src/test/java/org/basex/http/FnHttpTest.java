@@ -122,19 +122,19 @@ public class FnHttpTest extends HTTPTest {
     // GET1 - just send a GET request
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
-      final Value v = qp.value();
-      checkResponse(v, 2, HttpURLConnection.HTTP_OK);
+      final Value value = qp.value();
+      checkResponse(value, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(NodeType.DOC, v.itemAt(1).type);
+      assertEquals(NodeType.DOC, value.itemAt(1).type);
     }
 
     // GET2 - with override-media-type='text/plain'
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='get' override-media-type='text/plain'/>", REST_ROOT), ctx)) {
-      final Value v = qp.value();
-      checkResponse(v, 2, HttpURLConnection.HTTP_OK);
+      final Value value = qp.value();
+      checkResponse(value, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(AtomType.STR, v.itemAt(1).type);
+      assertEquals(AtomType.STR, value.itemAt(1).type);
     }
 
     // Get3 - with status-only='true'
@@ -833,14 +833,14 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Checks the response to an HTTP request.
-   * @param v query result
+   * @param value query result
    * @param itemsCount expected number of items
    * @param expStatus expected status
    */
-  private static void checkResponse(final Value v, final int itemsCount, final int expStatus) {
-    assertEquals(itemsCount, v.size());
-    assertTrue(v.itemAt(0) instanceof FElem);
-    final FElem response = (FElem) v.itemAt(0);
+  private static void checkResponse(final Value value, final int itemsCount, final int expStatus) {
+    assertEquals(itemsCount, value.size());
+    assertTrue(value.itemAt(0) instanceof FElem);
+    final FElem response = (FElem) value.itemAt(0);
     assertNotNull(response.attributes());
     if(!eq(response.attribute(STATUS), token(expStatus))) {
       fail("Expected: " + expStatus + "\nFound: " + response);

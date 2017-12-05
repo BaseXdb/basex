@@ -65,9 +65,9 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> concat(final Node<N, E>[] mid, final long sz,
+  public FingerTree<N, E> concat(final Node<N, E>[] mid, final long size,
       final FingerTree<N, E> other) {
-    return other.isEmpty() ? addAll(mid, sz, false) : other.addAll(mid, sz, true).cons(elem);
+    return other.isEmpty() ? addAll(mid, size, false) : other.addAll(mid, size, true).cons(elem);
   }
 
   @Override
@@ -108,7 +108,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean left) {
+  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long size, final boolean left) {
     if(nodes.length == 0) return this;
     if(nodes.length <= MAX_DIGIT) {
       @SuppressWarnings("unchecked")
@@ -116,7 +116,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
       return left ? DeepTree.get(nodes, arr) : DeepTree.get(arr, nodes);
     }
 
-    final FingerTree<N, E> tree = buildTree(nodes, nodes.length, sz);
+    final FingerTree<N, E> tree = buildTree(nodes, nodes.length, size);
     return left ? tree.snoc(elem) : tree.cons(elem);
   }
 

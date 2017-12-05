@@ -77,10 +77,10 @@ public final class List extends Arr {
       int vl = 0;
       for(final Expr expr : exprs) {
         cc.qc.checkStop();
-        final Value val = expr.value(cc.qc);
-        if(vl == 0) t = val.type;
-        else if(t != null && !t.eq(val.type)) t = null;
-        values[vl++] = val;
+        final Value value = expr.value(cc.qc);
+        if(vl == 0) t = value.type;
+        else if(t != null && !t.eq(value.type)) t = null;
+        values[vl++] = value;
       }
 
       final Value value;
@@ -116,8 +116,8 @@ public final class List extends Arr {
       @Override
       public Item next() throws QueryException {
         while(e < el) {
-          final Item it = qc.next(iter(e));
-          if(it != null) return it;
+          final Item item = qc.next(iter(e));
+          if(item != null) return item;
           iter[e++] = null;
         }
         return null;

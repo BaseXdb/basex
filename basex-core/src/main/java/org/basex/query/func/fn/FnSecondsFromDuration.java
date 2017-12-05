@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class FnSecondsFromDuration extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
-    return it == null ? null : Dec.get(checkDur(it).sec());
+    final Item item = exprs[0].atomItem(qc, info);
+    return item == null ? null : Dec.get(checkDur(item).sec());
   }
 }

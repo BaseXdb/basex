@@ -19,26 +19,26 @@ public final class ArrayJoin extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
-    final Expr ex = exprs[0];
-    if(ex.seqType().zeroOrOne()) {
-      final Item it = ex.item(qc, info);
-      return it == null ? Array.empty() : toArray(it);
+    final Expr expr = exprs[0];
+    if(expr.seqType().zeroOrOne()) {
+      final Item item = expr.item(qc, info);
+      return item == null ? Array.empty() : toArray(item);
     }
 
-    final Iter iter = ex.iter(qc);
-    Item it = iter.next();
-    if(it == null) return Array.empty();
-    final Array fst = toArray(it);
-    it = iter.next();
-    if(it == null) return fst;
-    final Array snd = toArray(it);
-    it = iter.next();
-    if(it == null) return fst.concat(snd);
+    final Iter iter = expr.iter(qc);
+    Item item = iter.next();
+    if(item == null) return Array.empty();
+    final Array fst = toArray(item);
+    item = iter.next();
+    if(item == null) return fst;
+    final Array snd = toArray(item);
+    item = iter.next();
+    if(item == null) return fst.concat(snd);
 
     final ArrayBuilder builder = new ArrayBuilder().append(fst).append(snd);
     do {
-      builder.append(toArray(it));
-    } while((it = qc.next(iter)) != null);
+      builder.append(toArray(item));
+    } while((item = qc.next(iter)) != null);
     return builder.freeze();
   }
 

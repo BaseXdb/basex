@@ -25,33 +25,33 @@ public abstract class ANum extends Item {
   /* Removing "throws QueryException" */
 
   @Override
-  public final byte[] string(final InputInfo ii) {
+  public final byte[] string(final InputInfo info) {
     return string();
   }
 
   @Override
-  public final double dbl(final InputInfo ii) {
+  public final double dbl(final InputInfo info) {
     return dbl();
   }
 
   @Override
-  public final long itr(final InputInfo ii) {
+  public final long itr(final InputInfo info) {
     return itr();
   }
 
   @Override
-  public final float flt(final InputInfo ii) {
+  public final float flt(final InputInfo info) {
     return flt();
   }
 
   @Override
-  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
-    if(it instanceof ANum) {
-      final double d1 = dbl(ii), d2 = it.dbl(ii);
+  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
+    if(item instanceof ANum) {
+      final double d1 = dbl(info), d2 = item.dbl(info);
       final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
       if(n1 || n2) return n1 == n2;
       if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
-      return dec(ii).compareTo(it.dec(ii)) == 0;
+      return dec(info).compareTo(item.dec(info)) == 0;
     }
     return false;
   }
@@ -107,15 +107,15 @@ public abstract class ANum extends Item {
   public abstract ANum round(int scale, boolean even);
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo ii) {
+  public Item test(final QueryContext qc, final InputInfo info) {
     return dbl() == qc.focus.pos ? this : null;
   }
 
   @Override
-  public final int hash(final InputInfo ii) {
+  public final int hash(final InputInfo info) {
     // makes sure the hashing is good for very small and very big numbers
     final long l = itr();
-    final float f = flt(ii);
+    final float f = flt(info);
 
     // extract fractional part from a finite float
     final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY ||

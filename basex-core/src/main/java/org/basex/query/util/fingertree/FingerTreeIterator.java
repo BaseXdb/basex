@@ -109,9 +109,9 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
           int i = 0;
           for(;; i++) {
             node = left[i];
-            final long sz = node.size();
-            if(pos < sz) break;
-            pos -= sz;
+            final long size = node.size();
+            if(pos < size) break;
+            pos -= size;
           }
           deepPos = i - left.length;
           break;
@@ -127,9 +127,9 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
           int i = 0;
           for(;; i++) {
             node = right[i];
-            final long sz = node.size();
-            if(pos < sz) break;
-            pos -= sz;
+            final long size = node.size();
+            if(pos < size) break;
+            pos -= size;
           }
           deepPos = i + 1;
           break;
@@ -160,9 +160,9 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
       int idx = 0;
       Node<?, E> sub = inner.getSub(0);
       while(true) {
-        final long sz = sub.size();
-        if(pos < sz) break;
-        pos -= sz;
+        final long size = sub.size();
+        if(pos < size) break;
+        pos -= size;
         sub = inner.getSub(++idx);
       }
 

@@ -86,11 +86,13 @@ public final class IndexDynDb extends IndexDb {
 
   @Override
   public Data data(final QueryContext qc, final IndexType type) throws QueryException {
-    final Value v = expr.value(qc);
-    final Data d = v.data();
-    if(d == null || !v.seqType().type.instanceOf(NodeType.DOC)) throw DB_NODE_X.get(info, v);
-    type.check(d, info);
-    return d;
+    final Value value = expr.value(qc);
+    final Data data = value.data();
+    if(data == null || !value.seqType().type.instanceOf(NodeType.DOC))
+      throw DB_NODE_X.get(info, value);
+
+    type.check(data, info);
+    return data;
   }
 
   @Override

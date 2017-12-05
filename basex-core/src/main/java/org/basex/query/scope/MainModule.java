@@ -97,7 +97,7 @@ public final class MainModule extends Module {
     try {
       final Iter iter = expr.iter(qc);
       final ItemList items = new ItemList(iter.size());
-      for(Item it; (it = qc.next(iter)) != null;) items.add(it);
+      for(Item item; (item = qc.next(iter)) != null;) items.add(item);
       if(declType != null) declType.treat(items.value(), null, info, qc);
       return items;
     } finally {
@@ -119,9 +119,9 @@ public final class MainModule extends Module {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Item it = qc.next(iter);
-        if(it == null) VarScope.exit(fp, qc);
-        return it;
+        final Item item = qc.next(iter);
+        if(item == null) VarScope.exit(fp, qc);
+        return item;
       }
       @Override
       public long size() throws QueryException {

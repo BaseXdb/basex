@@ -27,28 +27,28 @@ public final class FnOneOrMore extends StandardFunc {
       private boolean first = true;
       @Override
       public Item next() throws QueryException {
-        final Item it = qc.next(iter);
+        final Item item = qc.next(iter);
         if(first) {
-          if(it == null) throw ONEORMORE.get(info);
+          if(item == null) throw ONEORMORE.get(info);
           first = false;
         }
-        return it;
+        return item;
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = exprs[0].value(qc);
-    if(val.isEmpty()) throw ONEORMORE.get(info);
-    return val;
+    final Value value = exprs[0].value(qc);
+    if(value.isEmpty()) throw ONEORMORE.get(info);
+    return value;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
     if(st.zero()) throw ONEORMORE.get(info);
-    return st.mayBeEmpty() ? adoptType(ex) : ex;
+    return st.mayBeEmpty() ? adoptType(expr) : expr;
   }
 }

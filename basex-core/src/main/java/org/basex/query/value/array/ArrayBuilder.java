@@ -108,7 +108,7 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder append(final Array arr) {
     if(!(arr instanceof BigArray)) {
-      for(final Value val : arr.members()) append(val);
+      for(final Value value : arr.members()) append(value);
       return this;
     }
 
@@ -197,7 +197,7 @@ public final class ArrayBuilder {
       final int first = (mid - inLeft + CAP) % CAP;
       sb.append(vals[first]);
       for(int i = 1; i < inLeft; i++) sb.append(", ").append(vals[(first + i) % CAP]);
-      for(final Value val : tree) sb.append(", ").append(val);
+      for(final Value value : tree) sb.append(", ").append(value);
       for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     }
     return sb.append(']').toString();

@@ -23,10 +23,10 @@ public final class ArrayFoldLeft extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Array array = toArray(exprs[0], qc);
-    Value res = exprs[1].value(qc);
-    final FItem fun = checkArity(exprs[2], 2, qc);
-    for(final Value val : array.members()) res = fun.invokeValue(qc, info, res, val);
-    return res;
+    Value result = exprs[1].value(qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
+    for(final Value value : array.members()) result = func.invokeValue(qc, info, result, value);
+    return result;
   }
 
   @Override

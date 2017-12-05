@@ -35,26 +35,26 @@ final class InvDocTest extends Test {
   /**
    * Returns a document test. This test will be called by {@link AxisPath#index} if the context
    * value only consists of database nodes.
-   * @param rt root value
+   * @param root root value
    * @return document test
    */
-  static Test get(final Value rt) {
-    if(rt == null) return KindTest.DOC;
+  static Test get(final Value root) {
+    if(root == null) return KindTest.DOC;
 
     // use simple test if database contains only one document
-    final Data data = rt.data();
+    final Data data = root.data();
     if(data == null || data.meta.ndocs == 1) return KindTest.DOC;
 
     // adopt nodes from existing sequence
-    if(rt instanceof DBNodeSeq) {
-      final DBNodeSeq seq = (DBNodeSeq) rt;
+    if(root instanceof DBNodeSeq) {
+      final DBNodeSeq seq = (DBNodeSeq) root;
       return seq.all() ? KindTest.DOC : new InvDocTest(new IntList(seq.pres()), data);
     }
 
     // loop through all documents and add pre values of documents
-    final IntList il = new IntList((int) rt.size());
-    for(final Item it : rt) il.add(((DBNode) it).pre());
-    return new InvDocTest(il, data);
+    final IntList pres = new IntList((int) root.size());
+    for(final Item item : root) pres.add(((DBNode) item).pre());
+    return new InvDocTest(pres, data);
   }
 
   @Override

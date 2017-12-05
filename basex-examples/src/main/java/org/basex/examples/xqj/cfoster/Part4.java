@@ -68,8 +68,8 @@ public final class Part4 extends Main {
       System.out.println(ex.getMessage());
     }
 
-    for(XQItem it : items) {
-      if(it != null) it.writeItem(System.out, null);
+    for(XQItem item : items) {
+      if(item != null) item.writeItem(System.out, null);
       System.out.print(' ');
     }
     System.out.println();
@@ -104,8 +104,8 @@ public final class Part4 extends Main {
     // Create an XQItem with a type of xs:hexBinary
     items[2] = conn.createItemFromObject(new byte[] { 1, 2, 3, 4 }, null);
 
-    for(XQItem it : items) {
-      if(it != null) System.out.println(it.getAtomicValue());
+    for(XQItem item : items) {
+      if(item != null) System.out.println(item.getAtomicValue());
     }
 
     // Create and bind XQuery sequences

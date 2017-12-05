@@ -130,8 +130,8 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final FTExpr expr : exprs) sz += expr.exprSize();
-    return min.exprSize() + max.exprSize() + sz;
+    int size = 1;
+    for(final FTExpr expr : exprs) size += expr.exprSize();
+    return min.exprSize() + max.exprSize() + size;
   }
 }

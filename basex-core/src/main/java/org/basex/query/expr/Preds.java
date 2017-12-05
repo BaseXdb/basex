@@ -60,14 +60,14 @@ public abstract class Preds extends Arr {
       Expr expr = exprs[e].optimizeEbv(cc);
       if(expr instanceof CmpG || expr instanceof CmpV) {
         final Cmp cmp = (Cmp) expr;
-        final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
-        if(e1.isFunction(Function.POSITION)) {
+        final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+        if(cmp1.isFunction(Function.POSITION)) {
           // position() = last()  ->  last()
           // position() = $n (xs:numeric)  ->  $n
-          if(numeric(e2)) {
+          if(numeric(cmp2)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              expr = cc.replaceWith(expr, e2);
+              expr = cc.replaceWith(expr, cmp2);
             }
           }
         }
@@ -196,7 +196,7 @@ public abstract class Preds extends Arr {
     final SeqType st = root.seqType();
     for(final Expr expr : exprs) {
       Expr ex = expr;
-     if(expr instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
+      if(ex instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
         // E [ . ]  ->  E
         cc.info(OPTREMOVE_X_X, ex, description());
         continue;

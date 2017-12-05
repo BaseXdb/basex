@@ -21,18 +21,18 @@ public final class FnStringJoin extends StandardFunc {
     final byte[] token = exprs.length == 2 ? toToken(exprs[1], qc) : EMPTY;
 
     // no results: empty string
-    Item it = iter.next();
-    if(it == null) return Str.ZERO;
+    Item item = iter.next();
+    if(item == null) return Str.ZERO;
 
     // single result
-    final byte[] first = it.string(info);
-    if((it = iter.next()) == null) return Str.get(first);
+    final byte[] first = item.string(info);
+    if((item = iter.next()) == null) return Str.get(first);
 
     // join multiple strings
     final TokenBuilder tb = new TokenBuilder(first);
     do {
-      tb.add(token).add(it.string(info));
-    } while((it = qc.next(iter)) != null);
+      tb.add(token).add(item.string(info));
+    } while((item = qc.next(iter)) != null);
     return Str.get(tb.finish());
   }
 }

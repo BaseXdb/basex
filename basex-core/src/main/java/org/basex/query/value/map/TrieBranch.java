@@ -46,38 +46,38 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int h, final Item k, final Value v, final int l, final InputInfo ii)
-      throws QueryException {
-    final int key = key(h, l);
-    final TrieNode sub = kids[key], nsub;
+  TrieNode put(final int hs, final Item key, final Value value, final int level,
+      final InputInfo info) throws QueryException {
+    final int k = key(hs, level);
+    final TrieNode sub = kids[k], nsub;
     final int bs, rem;
     if(sub != null) {
-      nsub = sub.put(h, k, v, l + 1, ii);
+      nsub = sub.put(hs, key, value, level + 1, info);
       if(nsub == sub) return this;
       bs = used;
       rem = sub.size;
     } else {
-      nsub = new TrieLeaf(h, k, v);
-      bs = used | 1 << key;
+      nsub = new TrieLeaf(hs, key, value);
+      bs = used | 1 << k;
       rem = 0;
     }
     final TrieNode[] ks = copyKids();
-    ks[key] = nsub;
+    ks[k] = nsub;
     return new TrieBranch(ks, bs, size - rem + nsub.size);
   }
 
   @Override
-  TrieNode delete(final int h, final Item k, final int l, final InputInfo ii)
+  TrieNode delete(final int hash, final Item key, final int level, final InputInfo info)
       throws QueryException {
-    final int key = key(h, l);
-    final TrieNode sub = kids[key];
+    final int k = key(hash, level);
+    final TrieNode sub = kids[k];
     if(sub == null) return this;
-    final TrieNode nsub = sub.delete(h, k, l + 1, ii);
+    final TrieNode nsub = sub.delete(hash, key, level + 1, info);
     if(nsub == sub) return this;
 
     final int nu;
     if(nsub == null) {
-      nu = used ^ 1 << key;
+      nu = used ^ 1 << k;
       if(Integer.bitCount(nu) == 1) {
         final TrieNode single = kids[Integer.numberOfTrailingZeros(nu)];
         // check whether the child depends on the right offset
@@ -86,46 +86,47 @@ final class TrieBranch extends TrieNode {
     } else nu = used;
 
     final TrieNode[] ks = copyKids();
-    ks[key] = nsub;
+    ks[k] = nsub;
     return new TrieBranch(ks, nu, size - 1);
   }
 
   @Override
-  Value get(final int h, final Item k, final int l, final InputInfo ii) throws QueryException {
-    final int key = key(h, l);
-    final TrieNode sub = kids[key];
-    return sub == null ? null : sub.get(h, k, l + 1, ii);
+  Value get(final int hash, final Item key, final int level, final InputInfo info)
+      throws QueryException {
+    final int k = key(hash, level);
+    final TrieNode sub = kids[k];
+    return sub == null ? null : sub.get(hash, key, level + 1, info);
   }
 
   @Override
-  boolean contains(final int h, final Item k, final int l, final InputInfo ii)
+  boolean contains(final int hash, final Item key, final int level, final InputInfo info)
       throws QueryException {
-    final int key = key(h, l);
-    final TrieNode sub = kids[key];
-    return sub != null && sub.contains(h, k, l + 1, ii);
+    final int k = key(hash, level);
+    final TrieNode sub = kids[k];
+    return sub != null && sub.contains(hash, key, level + 1, info);
   }
 
   /** End strings. */
   private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final MergeDuplicates merge, final InputInfo ii,
-      final QueryContext qc) throws QueryException {
-    return o.add(this, l, merge, ii, qc);
+  TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
+      final InputInfo info, final QueryContext qc) throws QueryException {
+    return node.add(this, level, merge, info, qc);
   }
 
   @Override
-  TrieNode add(final TrieLeaf o, final int l, final MergeDuplicates merge, final InputInfo ii,
-      final QueryContext qc) throws QueryException {
+  TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
+      final InputInfo info, final QueryContext qc) throws QueryException {
 
     qc.checkStop();
-    final int k = key(o.hash, l);
+    final int k = key(leaf.hash, level);
     final TrieNode ch = kids[k], nw;
     if(ch != null) {
-      final TrieNode ins = ch.add(o, l + 1, merge, ii, qc);
+      final TrieNode ins = ch.add(leaf, level + 1, merge, info, qc);
       if(ins == ch) return this;
       nw = ins;
-    } else nw = o;
+    } else nw = leaf;
 
     final TrieNode[] ks = copyKids();
     ks[k] = nw;
@@ -135,19 +136,19 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieList o, final int l, final MergeDuplicates merge, final InputInfo ii,
-      final QueryContext qc) throws QueryException {
+  TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
+      final InputInfo info, final QueryContext qc) throws QueryException {
 
     qc.checkStop();
-    final int k = key(o.hash, l);
+    final int k = key(list.hash, level);
     final TrieNode ch = kids[k], nw;
-    int n = o.size;
+    int n = list.size;
     if(ch != null) {
-      final TrieNode ins = ch.add(o, l + 1, merge, ii, qc);
+      final TrieNode ins = ch.add(list, level + 1, merge, info, qc);
       if(ins == ch) return this;
       n = ins.size - ch.size;
       nw = ins;
-    } else nw = o;
+    } else nw = list;
 
     final TrieNode[] ks = copyKids();
     ks[k] = nw;
@@ -157,16 +158,16 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final TrieBranch o, final int l, final MergeDuplicates merge, final InputInfo ii,
-      final QueryContext qc) throws QueryException {
+  TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
+      final InputInfo info, final QueryContext qc) throws QueryException {
 
     TrieNode[] ch = null;
     int nu = used, ns = size;
     final int kl = kids.length;
     for(int k = 0; k < kl; k++) {
-      final TrieNode n = kids[k], ok = o.kids[k];
+      final TrieNode n = kids[k], ok = branch.kids[k];
       if(ok != null) {
-        final TrieNode nw = n == null ? ok : ok.addAll(n, l + 1, merge, ii, qc);
+        final TrieNode nw = n == null ? ok : ok.addAll(n, level + 1, merge, info, qc);
         if(nw != n) {
           if(ch == null) ch = copyKids();
           ch[k] = nw;
@@ -204,17 +205,17 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void materialize(final InputInfo ii) throws QueryException {
+  void materialize(final InputInfo info) throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null) nd.materialize(ii);
+      if(nd != null) nd.materialize(info);
     }
   }
 
   @Override
-  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
+  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo info)
       throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null) nd.forEach(vb, func, qc, ii);
+      if(nd != null) nd.forEach(vb, func, qc, info);
     }
   }
 
@@ -227,36 +228,37 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  int hash(final InputInfo ii) throws QueryException {
+  int hash(final InputInfo info) throws QueryException {
     int hash = 0;
-    for(final TrieNode ch : kids) if(ch != null) hash = 31 * hash + ch.hash(ii);
+    for(final TrieNode ch : kids) if(ch != null) hash = 31 * hash + ch.hash(info);
     return hash;
   }
 
   @Override
-  boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) throws QueryException {
-    if(!(o instanceof TrieBranch)) return false;
-    final TrieBranch ob = (TrieBranch) o;
+  boolean deep(final InputInfo info, final TrieNode node, final Collation coll)
+      throws QueryException {
+    if(!(node instanceof TrieBranch)) return false;
+    final TrieBranch ob = (TrieBranch) node;
 
     // check bin usage first
     if(used != ob.used) return false;
 
     // recursively compare children
     for(int i = 0; i < KIDS; i++)
-      if(kids[i] != null && !kids[i].deep(ii, ob.kids[i], coll)) return false;
+      if(kids[i] != null && !kids[i].deep(info, ob.kids[i], coll)) return false;
 
     // everything OK
     return true;
   }
 
   @Override
-  StringBuilder append(final StringBuilder sb, final String ind) {
+  StringBuilder append(final StringBuilder sb, final String indent) {
     final int s = Integer.bitCount(used);
     for(int i = 0, j = 0; i < s; i++, j++) {
       while((used & 1 << j) == 0) j++;
       final int e = i == s - 1 ? 2 : 0;
-      sb.append(ind).append(ENDS[e]).append(String.format("%x", j)).append('\n');
-      kids[j].append(sb, ind + ENDS[e + 1]);
+      sb.append(indent).append(ENDS[e]).append(String.format("%x", j)).append('\n');
+      kids[j].append(sb, indent + ENDS[e + 1]);
     }
     return sb;
   }

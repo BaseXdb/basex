@@ -39,11 +39,11 @@ final class CachedPath extends AxisPath {
     try {
       if(rt != null) {
         final Iter iter = rt.iter(qc);
-        for(Item it; (it = iter.next()) != null;) {
+        for(Item item; (item = iter.next()) != null;) {
           // check if root returns nodes
-          if(root != null && !(it instanceof ANode))
-            throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
-          focus.value = it;
+          if(root != null && !(item instanceof ANode))
+            throw PATHNODE_X_X_X.get(info, steps[0], item.type, item);
+          focus.value = item;
           iter(0, list, qc);
         }
       } else {

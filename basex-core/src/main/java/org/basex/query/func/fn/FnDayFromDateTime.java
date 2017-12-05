@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnDayFromDateTime extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
-    return it == null ? null : Int.get(checkDate(it, AtomType.DTM, qc).day());
+    final Item item = exprs[0].atomItem(qc, info);
+    return item == null ? null : Int.get(checkDate(item, AtomType.DTM, qc).day());
   }
 }

@@ -22,8 +22,8 @@ public final class HofTakeWhile extends StandardFunc {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Item it = qc.next(iter);
-        if(it != null && toBoolean(pred.invokeValue(qc, info, it), qc)) return it;
+        final Item item = qc.next(iter);
+        if(item != null && toBoolean(pred.invokeValue(qc, info, item), qc)) return item;
         return null;
       }
     };
@@ -34,18 +34,18 @@ public final class HofTakeWhile extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(qc);
     final FItem pred = checkArity(exprs[1], 1, qc);
     final Iter iter = exprs[0].iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) {
-      if(!pred.invokeValue(qc, info, it).ebv(qc, info).bool(info)) break;
-      vb.add(it);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(!pred.invokeValue(qc, info, item).ebv(qc, info).bool(info)) break;
+      vb.add(item);
     }
     return vb.value();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }

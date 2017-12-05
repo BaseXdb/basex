@@ -19,21 +19,21 @@ public final class RandomSeededPermutation extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final long seed = toLong(exprs[0], qc);
-    final ItemList list = new ItemList();
+    final ItemList items = new ItemList();
     final Random r = new Random(seed);
 
     final Iter iter = exprs[1].iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) {
-      final int ls = list.size();
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final int ls = items.size();
       final int l = r.nextInt(ls + 1);
       if(l < ls) {
-        final Item it2 = list.get(l);
-        list.set(l, it);
-        it = it2;
+        final Item it = items.get(l);
+        items.set(l, item);
+        item = it;
       }
-      list.add(it);
+      items.add(item);
     }
-    return list.value();
+    return items.value();
   }
 
   @Override

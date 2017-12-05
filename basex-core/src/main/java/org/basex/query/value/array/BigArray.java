@@ -247,14 +247,14 @@ final class BigArray extends Array {
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value val, final QueryContext qc) {
+  public Array insertBefore(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
     final int l = left.length;
     if(pos <= l) {
       final int p = (int) pos;
       final Value[] temp = slice(left, 0, l + 1);
       System.arraycopy(temp, p, temp, p + 1, l - p);
-      temp[p] = val;
+      temp[p] = value;
       if(l < MAX_DIGIT) return new BigArray(temp, middle, right);
 
       final int m = (l + 1) / 2;
@@ -263,13 +263,13 @@ final class BigArray extends Array {
     }
 
     final long midSize = middle.size();
-    if(pos - l < midSize) return new BigArray(left, middle.insert(pos - l, val, qc), right);
+    if(pos - l < midSize) return new BigArray(left, middle.insert(pos - l, value, qc), right);
 
     final int r = right.length;
     final int p = (int) (pos - l - midSize);
     final Value[] temp = slice(right, 0, r + 1);
     System.arraycopy(temp, p, temp, p + 1, r - p);
-    temp[p] = val;
+    temp[p] = value;
     if(r < MAX_DIGIT) return new BigArray(left, middle, temp);
 
     final int m = (r + 1) / 2;
@@ -649,21 +649,21 @@ final class BigArray extends Array {
   }
 
   @Override
-  Array consSmall(final Value[] vals) {
-    final int a = vals.length, b = left.length, n = a + b;
+  Array consSmall(final Value[] values) {
+    final int a = values.length, b = left.length, n = a + b;
     if(n <= MAX_DIGIT) {
       // no need to change the middle tree
-      return new BigArray(concat(vals, left), middle, right);
+      return new BigArray(concat(values, left), middle, right);
     }
 
     if(a >= MIN_DIGIT && MIN_LEAF <= b && b <= MAX_LEAF) {
       // reuse the arrays
-      return new BigArray(vals, middle.cons(new LeafNode(left)), right);
+      return new BigArray(values, middle.cons(new LeafNode(left)), right);
     }
 
     // left digit is too big
     final int mid = n / 2, move = mid - a;
-    final Value[] newLeft = slice(vals, 0, mid);
+    final Value[] newLeft = slice(values, 0, mid);
     System.arraycopy(left, 0, newLeft, a, move);
     final LeafNode leaf = new LeafNode(slice(left, move, b));
     return new BigArray(newLeft, middle.cons(leaf), right);

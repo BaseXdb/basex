@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class MathExp10 extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
-    return it == null ? null : Dbl.get(pow(10, toDouble(it)));
+    final Item item = exprs[0].atomItem(qc, info);
+    return item == null ? null : Dbl.get(pow(10, toDouble(item)));
   }
 }

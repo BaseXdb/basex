@@ -113,12 +113,12 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value val, final QueryContext qc) {
+  public Array insertBefore(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
     final int p = (int) pos, n = elems.length;
     final Value[] out = new Value[n + 1];
     System.arraycopy(elems, 0, out, 0, p);
-    out[p] = val;
+    out[p] = value;
     System.arraycopy(elems, p, out, p + 1, n - p);
 
     if(n < MAX_SMALL) return new SmallArray(out);

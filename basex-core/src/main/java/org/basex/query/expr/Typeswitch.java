@@ -58,10 +58,10 @@ public final class Typeswitch extends ParseExpr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate expression
     if(cond instanceof Value) {
-      final Value val = (Value) cond;
+      final Value value = (Value) cond;
       for(final TypeswitchGroup tg : groups) {
-        if(tg.matches(val)) {
-          tg.opt(cc, val);
+        if(tg.matches(value)) {
+          tg.opt(cc, value);
           return cc.replaceWith(this, tg.expr);
         }
       }
@@ -154,9 +154,9 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Expr e : groups) sz += e.exprSize();
-    return sz + cond.exprSize();
+    int size = 1;
+    for(final Expr group : groups) size += group.exprSize();
+    return size + cond.exprSize();
   }
 
   @Override

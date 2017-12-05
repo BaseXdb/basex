@@ -40,10 +40,10 @@ public abstract class Parse extends StandardFunc {
       throws QueryException {
 
     checkCreate(qc);
-    final Item it = exprs[0].atomItem(qc, info);
-    if(it == null) return check ? Bln.FALSE : null;
+    final Item item = exprs[0].atomItem(qc, info);
+    if(item == null) return check ? Bln.FALSE : null;
 
-    final byte[] path = toToken(it);
+    final byte[] path = toToken(item);
 
     String enc = null;
     IO io = null;
@@ -97,10 +97,10 @@ public abstract class Parse extends StandardFunc {
    * @throws QueryException query exception
    */
   ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
-    if(it == null) return null;
+    final Item item = exprs[0].atomItem(qc, info);
+    if(item == null) return null;
 
-    final IO io = new IOContent(toToken(it), string(sc.baseURI().string()));
+    final IO io = new IOContent(toToken(item), string(sc.baseURI().string()));
     try {
       return new DBNode(frag ? new XMLParser(io, MainOptions.get(), true) : Parser.xmlParser(io));
     } catch(final IOException ex) {

@@ -21,7 +21,7 @@ public final class DbOutput extends StandardFunc {
     final Updates updates = qc.updates();
     if(updates.mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);
     final Iter iter = exprs[0].iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) qc.updates.cache.add(it);
+    for(Item item; (item = qc.next(iter)) != null;) qc.updates.items.add(item);
     return null;
   }
 }

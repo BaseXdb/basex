@@ -29,17 +29,17 @@ public final class HofTopKBy extends StandardFunc {
     if(k < 1) return Empty.SEQ;
 
     final Iter iter = exprs[0].iter(qc);
-    final MinHeap<Item, Item> heap = new MinHeap<>((it1, it2) -> {
+    final MinHeap<Item, Item> heap = new MinHeap<>((item1, item2) -> {
       try {
-        return OpV.LT.eval(it1, it2, sc.collation, sc, info) ? -1 : 1;
+        return OpV.LT.eval(item1, item2, sc.collation, sc, info) ? -1 : 1;
       } catch(final QueryException qe) {
         throw new QueryRTException(qe);
       }
     });
 
     try {
-      for(Item it; (it = qc.next(iter)) != null;) {
-        heap.insert(checkNoEmpty(getKey.invokeItem(qc, info, it)), it);
+      for(Item item; (item = qc.next(iter)) != null;) {
+        heap.insert(checkNoEmpty(getKey.invokeItem(qc, info, item)), item);
         if(heap.size() > k) heap.removeMin();
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }
@@ -51,7 +51,7 @@ public final class HofTopKBy extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    return ex.seqType().zero() ? ex : adoptType(ex);
+    final Expr expr = exprs[0];
+    return expr.seqType().zero() ? expr : adoptType(expr);
   }
 }

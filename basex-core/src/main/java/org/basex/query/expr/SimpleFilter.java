@@ -29,12 +29,13 @@ final class SimpleFilter extends CachedFilter {
   public Value value(final QueryContext qc) throws QueryException {
     final Item pred = exprs[0].ebv(qc, info);
     if(pred != null) {
-      final Value val = root.value(qc);
+      final Value value = root.value(qc);
       if(pred instanceof ANum) {
         final double pos = pred.dbl(info);
-        if(pos > 0 && pos <= val.size() && pos == (long) pos) return val.itemAt((long) pos - 1);
+        if(pos > 0 && pos <= value.size() && pos == (long) pos)
+          return value.itemAt((long) pos - 1);
       } else {
-        if(pred.bool(info)) return val;
+        if(pred.bool(info)) return value;
       }
     }
     return Empty.SEQ;

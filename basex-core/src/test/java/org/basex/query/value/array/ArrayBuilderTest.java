@@ -98,12 +98,12 @@ public final class ArrayBuilderTest extends ArrayTest {
       final ArrayBuilder builder = new ArrayBuilder();
 
       for(int i = 0; i < len; i++) {
-        final Value val = Int.get(i);
+        final Value value = Int.get(i);
         if(rng.nextBoolean()) {
-          builder.prepend(val);
+          builder.prepend(value);
           deque.addFirst(i);
         } else {
-          builder.append(val);
+          builder.append(value);
           deque.addLast(i);
         }
       }

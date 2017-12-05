@@ -84,46 +84,46 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
-    final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
-    if(e1.has(Flag.NDT) || !(e2 instanceof AStr)) return cmp;
+    final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+    if(cmp1.has(Flag.NDT) || !(cmp2 instanceof AStr)) return cmp;
 
-    final byte[] d = ((AStr) e2).string(cmp.info);
-    ParseExpr ex = null;
+    final byte[] d = ((AStr) cmp2).string(cmp.info);
+    ParseExpr expr = null;
     switch(cmp.op.op) {
-      case GE: ex = new CmpSR(e1, d,    true,  null, true,  cmp.coll, cmp.info); break;
-      case GT: ex = new CmpSR(e1, d,    false, null, true,  cmp.coll, cmp.info); break;
-      case LE: ex = new CmpSR(e1, null, true,  d,    true,  cmp.coll, cmp.info); break;
-      case LT: ex = new CmpSR(e1, null, true,  d,    false, cmp.coll, cmp.info); break;
+      case GE: expr = new CmpSR(cmp1, d,    true,  null, true,  cmp.coll, cmp.info); break;
+      case GT: expr = new CmpSR(cmp1, d,    false, null, true,  cmp.coll, cmp.info); break;
+      case LE: expr = new CmpSR(cmp1, null, true,  d,    true,  cmp.coll, cmp.info); break;
+      case LT: expr = new CmpSR(cmp1, null, true,  d,    false, cmp.coll, cmp.info); break;
       default:
     }
-    return ex != null ? ex.optimize(cc) : cmp;
+    return expr != null ? expr.optimize(cc) : cmp;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it = expr.item(qc, info);
-      return Bln.get(it != null && eval(it));
+      final Item item = expr.item(qc, info);
+      return Bln.get(item != null && eval(item));
     }
 
     // iterative evaluation
     final Iter iter = expr.atomIter(qc, info);
-    for(Item it; (it = qc.next(iter)) != null;) {
-      if(eval(it)) return Bln.TRUE;
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(eval(item)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }
 
   /**
    * Evaluates the range for the specified item.
-   * @param it item to be evaluated
+   * @param item item to be evaluated
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean eval(final Item it) throws QueryException {
-    if(!it.type.isStringOrUntyped()) throw diffError(it, Str.ZERO, info);
-    final byte[] s = it.string(info);
+  private boolean eval(final Item item) throws QueryException {
+    if(!item.type.isStringOrUntyped()) throw diffError(item, Str.ZERO, info);
+    final byte[] s = item.string(info);
     final int mn = min == null ?  1 :
       coll == null ? Token.diff(s, min) : coll.compare(s, min);
     final int mx = max == null ? -1 :
@@ -133,16 +133,16 @@ public final class CmpSR extends Single {
 
   /**
    * Creates an intersection of the existing and the specified expressions.
-   * @param c range comparison
+   * @param cmp range comparison
    * @return resulting expression or {@code null}
    */
-  Expr intersect(final CmpSR c) {
+  Expr intersect(final CmpSR cmp) {
     // skip intersection if expressions to be compared are different
-    if(!(coll == null && c.expr.equals(expr))) return null;
+    if(!(coll == null && cmp.expr.equals(expr))) return null;
 
     // find common minimum and maximum value
-    final byte[] mn = min == null ? c.min : c.min == null ? min : Token.max(min, c.min);
-    final byte[] mx = max == null ? c.max : c.max == null ? max : Token.min(max, c.max);
+    final byte[] mn = min == null ? cmp.min : cmp.min == null ? min : Token.max(min, cmp.min);
+    final byte[] mx = max == null ? cmp.max : cmp.max == null ? max : Token.min(max, cmp.max);
 
     if(mn != null && mx != null) {
       final int d = Token.diff(mn, mx);
@@ -153,7 +153,7 @@ public final class CmpSR extends Single {
         return mni && mxi ? new CmpG(expr, Str.get(mn), OpG.EQ, null, null, info) : Bln.FALSE;
       }
     }
-    return new CmpSR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, null, info);
+    return new CmpSR(cmp.expr, mn, mni && cmp.mni, mx, mxi && cmp.mxi, null, info);
   }
 
   @Override

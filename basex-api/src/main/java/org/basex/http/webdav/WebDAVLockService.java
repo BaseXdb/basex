@@ -161,8 +161,8 @@ final class WebDAVLockService {
       final StringList items = new StringList();
       final ArrayOutput ao = new ArrayOutput();
       final Serializer ser = qp.getSerializer(ao);
-      for(final Item it : qp.value()) {
-        ser.serialize(it);
+      for(final Item item : qp.value()) {
+        ser.serialize(item);
         items.add(ao.toString());
         ao.reset();
       }

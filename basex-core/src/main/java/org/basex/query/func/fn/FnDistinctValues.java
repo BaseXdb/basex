@@ -30,16 +30,16 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
-    final Expr ex = exprs[0];
-    final Iter iter = ex.atomIter(qc, info);
-    if(simple || ex instanceof RangeSeq || ex instanceof Range) return iter;
+    final Expr expr = exprs[0];
+    final Iter iter = expr.atomIter(qc, info);
+    if(simple || expr instanceof RangeSeq || expr instanceof Range) return iter;
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        for(Item it; (it = qc.next(iter)) != null;) {
-          if(set.add(it, info)) return it;
+        for(Item item; (item = qc.next(iter)) != null;) {
+          if(set.add(item, info)) return item;
         }
         return null;
       }
@@ -49,49 +49,50 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
-    final Expr ex = exprs[0];
-    if(simple || ex instanceof RangeSeq || ex instanceof Range) return ex.atomValue(qc, info);
+    final Expr expr = exprs[0];
+    if(simple || expr instanceof RangeSeq || expr instanceof Range)
+      return expr.atomValue(qc, info);
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
-    final Iter iter = ex.atomIter(qc, info);
+    final Iter iter = expr.atomIter(qc, info);
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item it; (it = qc.next(iter)) != null;) {
-      if(set.add(it, info)) vb.add(it);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(set.add(item, info)) vb.add(item);
     }
     return vb.value();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr ex = exprs[0];
-    if(ex instanceof SingletonSeq) {
-      exprs[0] = ((SingletonSeq) ex).value;
+    Expr expr = exprs[0];
+    if(expr instanceof SingletonSeq) {
+      exprs[0] = ((SingletonSeq) expr).value;
       return optimize(cc);
     }
-    if(ex instanceof RangeSeq) return ex;
+    if(expr instanceof RangeSeq) return expr;
 
-    final SeqType st = ex.seqType();
+    final SeqType st = expr.seqType();
     final Type t = st.atomicType();
     if(t != null) {
       exprType.assign(t);
       simple = st.zeroOrOne();
     }
-    return optStats(ex, cc);
+    return optStats(expr, cc);
   }
 
   /**
    * Tries to evaluate distinct values based on the database statistics.
-   * @param ex expression
+   * @param expr expression
    * @param cc compilation context
    * @return original expression or sequence of distinct values
    * @throws QueryException query exception
    */
-  private Expr optStats(final Expr ex, final CompileContext cc) throws QueryException {
+  private Expr optStats(final Expr expr, final CompileContext cc) throws QueryException {
     // can only be performed without collation and on axis paths
-    if(exprs.length > 1 || !(ex instanceof AxisPath)) return this;
+    if(exprs.length > 1 || !(expr instanceof AxisPath)) return this;
 
     // try to get statistics for resulting nodes
-    final ArrayList<PathNode> nodes = ((AxisPath) ex).pathNodes(cc);
+    final ArrayList<PathNode> nodes = ((AxisPath) expr).pathNodes(cc);
     if(nodes == null) return this;
 
     // loop through all nodes

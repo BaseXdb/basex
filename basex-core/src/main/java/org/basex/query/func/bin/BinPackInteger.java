@@ -17,22 +17,22 @@ import org.basex.util.*;
 public final class BinPackInteger extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    long b = toLong(exprs[0], qc);
-    final long sz = toLong(exprs[1], qc);
+    long value = toLong(exprs[0], qc);
+    final long size = toLong(exprs[1], qc);
     final ByteOrder bo = order(2, qc);
-    if(sz < 0) throw BIN_NS_X.get(info, sz);
+    if(size < 0) throw BIN_NS_X.get(info, size);
 
-    final byte[] tmp = new byte[(int) sz];
+    final byte[] tmp = new byte[(int) size];
     final int tl = tmp.length;
     if(bo == ByteOrder.BIG_ENDIAN) {
       for(int t = tl - 1; t >= 0; t--) {
-        tmp[t] = (byte) b;
-        b >>= 8;
+        tmp[t] = (byte) value;
+        value >>= 8;
       }
     } else {
       for(int t = 0; t < tl; t++) {
-        tmp[t] = (byte) b;
-        b >>= 8;
+        tmp[t] = (byte) value;
+        value >>= 8;
       }
     }
     return B64.get(tmp);

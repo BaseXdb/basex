@@ -242,9 +242,9 @@ final class Unit {
       }
 
       // add info
-      final Value v = ex.value();
-      if(v instanceof Item) {
-        error.add(element((Item) v, INFO, -1));
+      final Value value = ex.value();
+      if(value instanceof Item) {
+        error.add(element((Item) value, INFO, -1));
       } else {
         // otherwise, add error message
         error.add(new FElem(INFO).add(ex.getLocalizedMessage()));
@@ -255,24 +255,24 @@ final class Unit {
 
   /**
    * Creates a new element.
-   * @param it item
+   * @param item item
    * @param name name (expected/returned)
-   * @param c item count (ignore it {@code -1})
+   * @param count item count (ignore it {@code -1})
    * @return new element
    */
-  private static FElem element(final Item it, final byte[] name, final int c) {
+  private static FElem element(final Item item, final byte[] name, final int count) {
     final FElem exp = new FElem(name);
-    if(it != null) {
-      if(it instanceof ANode) {
-        exp.add((ANode) it);
+    if(item != null) {
+      if(item instanceof ANode) {
+        exp.add((ANode) item);
       } else {
         try {
-          exp.add(it.string(null));
+          exp.add(item.string(null));
         } catch(final QueryException ignored) {
-          exp.add(chop(it.toString(), null));
+          exp.add(chop(item.toString(), null));
         }
       }
-      if(c != -1) exp.add(ITEM, token(c)).add(TYPE, it.type.toString());
+      if(count != -1) exp.add(ITEM, token(count)).add(TYPE, item.type.toString());
     }
     return exp;
   }

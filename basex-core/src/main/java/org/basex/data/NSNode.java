@@ -166,7 +166,7 @@ final class NSNode {
   // Updating Namespaces ==========================================================================
 
   /**
-   * Deletes nodes in the specified range (p .. p + sz - 1) and updates the following pre values.
+   * Deletes nodes in the specified range (p .. p + s - 1) and updates the following pre values.
    * @param p pre value
    * @param s number of nodes to be deleted, or actually the size of the pre
    * value which is to be deleted

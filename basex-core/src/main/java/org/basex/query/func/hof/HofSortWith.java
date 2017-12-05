@@ -23,13 +23,13 @@ public final class HofSortWith extends HofFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = exprs[0].value(qc);
+    final Value value = exprs[0].value(qc);
     final Comparator<Item> cmp = getComp(1, qc);
-    if(v.size() < 2) return v;
+    if(value.size() < 2) return value;
 
-    final ItemList items = new ItemList(v.size());
-    final Iter iter = v.iter();
-    for(Item it; (it = qc.next(iter)) != null;) items.add(it);
+    final ItemList items = new ItemList(value.size());
+    final Iter iter = value.iter();
+    for(Item item; (item = qc.next(iter)) != null;) items.add(item);
 
     try {
       Arrays.sort(items.list, 0, items.size(), cmp);
@@ -41,7 +41,7 @@ public final class HofSortWith extends HofFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    return ex.seqType().zero() ? ex : adoptType(ex);
+    final Expr expr = exprs[0];
+    return expr.seqType().zero() ? expr : adoptType(expr);
   }
 }

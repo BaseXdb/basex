@@ -43,14 +43,14 @@ public final class ArrayConcatTest extends ArrayTest {
         assertEquals(n, a1.arraySize());
         assertEquals(n, a2.size());
 
-        final Iterator<Value> it1 = a1.iterator(0);
-        final Iterator<Integer> it2 = a2.iterator();
-        while(it1.hasNext()) {
-          assertTrue(it2.hasNext());
-          final long i1 = ((Int) it1.next()).itr(), i2 = it2.next();
+        final Iterator<Value> iter1 = a1.iterator(0);
+        final Iterator<Integer> iter2 = a2.iterator();
+        while(iter1.hasNext()) {
+          assertTrue(iter2.hasNext());
+          final long i1 = ((Int) iter1.next()).itr(), i2 = iter2.next();
           assertEquals(i2, i1);
         }
-        assertFalse(it2.hasNext());
+        assertFalse(iter2.hasNext());
       }
     }
   }
@@ -64,9 +64,9 @@ public final class ArrayConcatTest extends ArrayTest {
     Array seq2 = Array.empty();
     final int n = 200_000;
     for(int i = 0; i < n; i++) {
-      final Value val = Int.get(i);
-      seq1 = seq1.cons(val);
-      seq2 = seq2.snoc(val);
+      final Value value = Int.get(i);
+      seq1 = seq1.cons(value);
+      seq2 = seq2.snoc(value);
     }
 
     assertEquals(n, seq1.arraySize());

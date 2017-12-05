@@ -159,13 +159,13 @@ public final class FTWords extends FTExpr {
               if(ftOpt.sw != null && ftOpt.sw.contains(tok)) {
                 ++d;
               } else {
-                final FTIndexIterator ir = lexer.get().length > data.meta.maxlen ?
+                final FTIndexIterator iter = lexer.get().length > data.meta.maxlen ?
                   scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
-                ir.pos(++qc.ftPos);
+                iter.pos(++qc.ftPos);
                 if(ii == null) {
-                  ii = ir;
+                  ii = iter;
                 } else {
-                  ii = FTIndexIterator.intersect(ii, ir, ++d);
+                  ii = FTIndexIterator.intersect(ii, iter, ++d);
                   d = 0;
                 }
               }
@@ -254,9 +254,9 @@ public final class FTWords extends FTExpr {
   private TokenList tokens(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
     final Iter iter = query.iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       // skip empty tokens if not all results are needed
-      final byte[] qu = toToken(it);
+      final byte[] qu = toToken(item);
       if(qu.length != 0 || mode == FTMode.ALL || mode == FTMode.ALL_WORDS) tl.add(qu);
     }
     return tl;
@@ -484,10 +484,10 @@ public final class FTWords extends FTExpr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    if(occ != null) for(final Expr o : occ) sz += o.exprSize();
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz + query.exprSize();
+    int size = 1;
+    if(occ != null) for(final Expr o : occ) size += o.exprSize();
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size + query.exprSize();
   }
 
   @Override

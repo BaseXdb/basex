@@ -72,18 +72,18 @@ public final class CmpR extends Single {
    * @throws QueryException query exception
    */
   static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
-    final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
-    if(e1.has(Flag.NDT)) return cmp;
+    final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+    if(cmp1.has(Flag.NDT)) return cmp;
 
     // range sequence: retrieve start and end value, switch them if order is descending
-    if(e2 instanceof RangeSeq) {
-      final RangeSeq seq = (RangeSeq) e2;
+    if(cmp2 instanceof RangeSeq) {
+      final RangeSeq seq = (RangeSeq) cmp2;
       final long[] range = seq.range(false);
       return get(cmp, range[0], range[1], cc);
     }
     // range expression uses doubles: reject decimal numbers and typed input
-    if(e2 instanceof ANum && (!(e2 instanceof Dec) || e1.seqType().type.isUntyped())) {
-      final double d = ((ANum) e2).dbl();
+    if(cmp2 instanceof ANum && (!(cmp2 instanceof Dec) || cmp1.seqType().type.isUntyped())) {
+      final double d = ((ANum) cmp2).dbl();
       return get(cmp, d, d, cc);
     }
     return cmp;
@@ -104,18 +104,18 @@ public final class CmpR extends Single {
     /* reject:
      * - input that cannot be compared as number
      * - numbers that are too large or small to be safely compared as doubles */
-    final Expr ex = cmp.exprs[0];
-    if(!ex.seqType().type.isNumberOrUntyped() ||
+    final Expr cmp1 = cmp.exprs[0];
+    if(!cmp1.seqType().type.isNumberOrUntyped() ||
         min < Integer.MIN_VALUE || min > Integer.MAX_VALUE ||
         max < Integer.MIN_VALUE || max > Integer.MAX_VALUE) return cmp;
 
     ParseExpr expr = null;
     switch(cmp.op) {
-      case EQ: expr = new CmpR(ex, min, true, max, true, cmp.info); break;
-      case GE: expr = new CmpR(ex, min, true, Double.POSITIVE_INFINITY, true, cmp.info); break;
-      case GT: expr = new CmpR(ex, min, false, Double.POSITIVE_INFINITY, true, cmp.info); break;
-      case LE: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, max, true, cmp.info); break;
-      case LT: expr = new CmpR(ex, Double.NEGATIVE_INFINITY, true, max, false, cmp.info); break;
+      case EQ: expr = new CmpR(cmp1, min, true, max, true, cmp.info); break;
+      case GE: expr = new CmpR(cmp1, min, true, Double.POSITIVE_INFINITY, true, cmp.info); break;
+      case GT: expr = new CmpR(cmp1, min, false, Double.POSITIVE_INFINITY, true, cmp.info); break;
+      case LE: expr = new CmpR(cmp1, Double.NEGATIVE_INFINITY, true, max, true, cmp.info); break;
+      case LT: expr = new CmpR(cmp1, Double.NEGATIVE_INFINITY, true, max, false, cmp.info); break;
       default:
     }
     return expr != null ? expr.optimize(cc) : cmp;
@@ -137,16 +137,16 @@ public final class CmpR extends Single {
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it = expr.item(qc, info);
-      if(it == null) return Bln.FALSE;
-      final double d = it.dbl(info);
+      final Item item = expr.item(qc, info);
+      if(item == null) return Bln.FALSE;
+      final double d = item.dbl(info);
       return Bln.get(eq ? d == min : (mni ? d >= min : d > min) && (mxi ? d <= max : d < max));
     }
 
     // iterative evaluation
     final Iter iter = expr.atomIter(qc, info);
-    for(Item it; (it = qc.next(iter)) != null;) {
-      final double d = it.dbl(info);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final double d = item.dbl(info);
       if((mni ? d >= min : d > min) && (mxi ? d <= max : d < max)) return Bln.TRUE;
     }
     return Bln.FALSE;

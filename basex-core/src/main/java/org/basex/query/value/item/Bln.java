@@ -60,44 +60,45 @@ public final class Bln extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string(final InputInfo info) {
     return Token.token(value);
   }
 
   @Override
-  public boolean bool(final InputInfo ii) {
+  public boolean bool(final InputInfo info) {
     return value;
   }
 
   @Override
-  public long itr(final InputInfo ii) {
+  public long itr(final InputInfo info) {
     return value ? 1 : 0;
   }
 
   @Override
-  public float flt(final InputInfo ii) {
+  public float flt(final InputInfo info) {
     return value ? 1 : 0;
   }
 
   @Override
-  public double dbl(final InputInfo ii) {
+  public double dbl(final InputInfo info) {
     return value ? 1 : 0;
   }
 
   @Override
-  public BigDecimal dec(final InputInfo ii) {
+  public BigDecimal dec(final InputInfo info) {
     return value ? BigDecimal.ONE : BigDecimal.ZERO;
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc, final InputInfo ii)
-      throws QueryException {
-    return value == (it.type == type ? it.bool(ii) : parse(it, ii));
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    return value == (item.type == type ? item.bool(info) : parse(item, info));
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    final boolean n = it.type == type ? it.bool(ii) : parse(it, ii);
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    final boolean n = item.type == type ? item.bool(info) : parse(item, info);
     return value ? n ? 0 : 1 : n ? -1 : 0;
   }
 

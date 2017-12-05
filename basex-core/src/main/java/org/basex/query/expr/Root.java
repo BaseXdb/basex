@@ -32,11 +32,11 @@ public final class Root extends Simple {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final Value v = cc.qc.focus.value;
+    final Value value = cc.qc.focus.value;
     if(cc.nestedFocus()) {
       exprType.assign(Occ.ONE);
     } else {
-      if(v != null) return cc.replaceWith(this, value(cc.qc));
+      if(value != null) return cc.replaceWith(this, value(cc.qc));
     }
     return this;
   }
@@ -63,10 +63,10 @@ public final class Root extends Simple {
   private ANodeBuilder roots(final Value value, final QueryContext qc) throws QueryException {
     final Iter iter = value.iter();
     final ANodeBuilder list = new ANodeBuilder();
-    for(Item it; (it = qc.next(iter)) != null;) {
-      final ANode n = it instanceof ANode ? ((ANode) it).root() : null;
-      if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
-      list.add(n);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final ANode node = item instanceof ANode ? ((ANode) item).root() : null;
+      if(node == null || node.type != NodeType.DOC) throw CTXNODE.get(info);
+      list.add(node);
     }
     return list;
   }

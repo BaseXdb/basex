@@ -39,67 +39,67 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
+  public final Value invokeValue(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
-    return FuncCall.value(this, args, qc, ii);
+    return FuncCall.value(this, args, qc, info);
   }
 
   @Override
-  public final Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
+  public final Item invokeItem(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
-    return FuncCall.item(this, args, qc, ii);
+    return FuncCall.item(this, args, qc, info);
   }
 
   /**
    * Coerces this function item to the given function type.
    * @param ft function type
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    * @param opt if the result should be optimized
    * @return coerced item
    * @throws QueryException query exception
    */
-  public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo ii, boolean opt)
+  public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo info, boolean opt)
       throws QueryException;
 
   @Override
-  public final byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(ii, type);
+  public final byte[] string(final InputInfo info) throws QueryException {
+    throw FIATOM_X.get(info, type);
   }
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(ii, type);
+  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    throw FIATOM_X.get(info, type);
   }
 
   @Override
-  public boolean sameKey(final Item it, final InputInfo ii) {
+  public boolean sameKey(final Item item, final InputInfo info) {
     return false;
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(ii, type);
+  public Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+    throw FIATOM_X.get(info, type);
   }
 
   @Override
-  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(ii, type);
+  public Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
+    throw FIATOM_X.get(info, type);
   }
 
   /**
    * Performs a deep comparison of two items.
    * @param item item to be compared
-   * @param ii input info
+   * @param info input info
    * @param coll collation (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+  public boolean deep(final Item item, final InputInfo info, final Collation coll)
       throws QueryException {
-    throw FICMP_X.get(ii, type);
+    throw FICMP_X.get(info, type);
   }
 
   @Override

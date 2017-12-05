@@ -41,8 +41,8 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) throws QueryException {
-    materialize(ii);
+  public byte[] string(final InputInfo info) throws QueryException {
+    materialize(info);
     return value;
   }
 
@@ -52,8 +52,8 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public BufferInput input(final InputInfo ii) throws QueryException {
-    if(isCached()) return super.input(ii);
+  public BufferInput input(final InputInfo info) throws QueryException {
+    if(isCached()) return super.input(info);
 
     TextInput ti = null;
     try {
@@ -62,16 +62,16 @@ public final class StrLazy extends AStr implements Lazy {
       return ti;
     } catch(final IOException ex) {
       if(ti != null) try { ti.close(); } catch(final IOException ignore) { }
-      throw error.get(ii, ex);
+      throw error.get(info, ex);
     }
   }
 
   @Override
-  public void materialize(final InputInfo ii) throws QueryException {
+  public void materialize(final InputInfo info) throws QueryException {
     try {
-      if(!isCached()) value = input(ii).content();
+      if(!isCached()) value = input(info).content();
     } catch(final IOException ex) {
-      throw error.get(ii, ex);
+      throw error.get(info, ex);
     }
   }
 

@@ -81,15 +81,15 @@ public class ArchiveCreate extends ArchiveFn {
   /**
    * Adds the specified entry to the output stream.
    * @param entry entry descriptor
-   * @param cont contents
+   * @param content contents
    * @param out output archive
    * @param level default compression level
    * @param qc query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected final void add(final Item entry, final Item cont, final ArchiveOut out, final int level,
-      final QueryContext qc) throws QueryException, IOException {
+  protected final void add(final Item entry, final Item content, final ArchiveOut out,
+      final int level, final QueryContext qc) throws QueryException, IOException {
 
     // create new zip entry
     String name = string(entry.string(info));
@@ -125,8 +125,8 @@ public class ArchiveCreate extends ArchiveFn {
     }
 
     // data to be compressed
-    byte[] val = toBytes(cont);
-    if(!(cont instanceof Bin) && enc != Strings.UTF8) val = encode(val, enc, qc);
+    byte[] val = toBytes(content);
+    if(!(content instanceof Bin) && enc != Strings.UTF8) val = encode(val, enc, qc);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));

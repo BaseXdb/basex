@@ -36,10 +36,10 @@ public final class ArrayFlatten extends ArrayFn {
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item it = qc.next(curr);
-          if(it != null) {
-            if(!(it instanceof Array)) return it;
-            final Array arr = (Array) it;
+          final Item item = qc.next(curr);
+          if(item != null) {
+            if(!(item instanceof Array)) return item;
+            final Array arr = (Array) item;
             if(++p == iters.length) {
               @SuppressWarnings("unchecked")
               final Iterator<Value>[] temp = new Iterator[2 * p];
@@ -87,11 +87,11 @@ public final class ArrayFlatten extends ArrayFn {
   private static void add(final ValueBuilder vb, final Expr expr, final QueryContext qc)
       throws QueryException {
     final Iter iter = expr.iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) {
-      if(it instanceof Array) {
-        for(final Value val : ((Array) it).members()) add(vb, val, qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(item instanceof Array) {
+        for(final Value value : ((Array) item).members()) add(vb, value, qc);
       }
-      else vb.add(it);
+      else vb.add(item);
     }
   }
 }

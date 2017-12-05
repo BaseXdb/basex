@@ -46,7 +46,7 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) {
+  public boolean bool(final InputInfo info) {
     return value.signum() != 0;
   }
 
@@ -66,7 +66,7 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public BigDecimal dec(final InputInfo ii) {
+  public BigDecimal dec(final InputInfo info) {
     return new BigDecimal(value);
   }
 
@@ -93,18 +93,19 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc, final InputInfo ii)
-      throws QueryException {
-    return it.type == AtomType.ULN ? value.equals(((Uln) it).value) :
-           it.type == AtomType.DBL || it.type == AtomType.FLT ? it.eq(this, coll, sc, ii) :
-             value.compareTo(BigInteger.valueOf(it.itr(ii))) == 0;
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    return item.type == AtomType.ULN ? value.equals(((Uln) item).value) :
+           item.type == AtomType.DBL || item.type == AtomType.FLT ? item.eq(this, coll, sc, info) :
+             value.compareTo(BigInteger.valueOf(item.itr(info))) == 0;
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    if(it.type == AtomType.ULN) return value.compareTo(((Uln) it).value);
-    if(it.type == AtomType.DBL || it.type == AtomType.FLT) return -it.diff(this, coll, ii);
-    return value.compareTo(BigInteger.valueOf(it.itr(ii)));
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    if(item.type == AtomType.ULN) return value.compareTo(((Uln) item).value);
+    if(item.type == AtomType.DBL || item.type == AtomType.FLT) return -item.diff(this, coll, info);
+    return value.compareTo(BigInteger.valueOf(item.itr(info)));
   }
 
   @Override

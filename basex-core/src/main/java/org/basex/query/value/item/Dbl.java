@@ -47,12 +47,12 @@ public final class Dbl extends ANum {
   /**
    * Returns an instance of this class.
    * @param value value
-   * @param ii input info
+   * @param info input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Dbl get(final byte[] value, final InputInfo ii) throws QueryException {
-    return get(parse(value, ii));
+  public static Dbl get(final byte[] value, final InputInfo info) throws QueryException {
+    return get(parse(value, info));
   }
 
   @Override
@@ -61,7 +61,7 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) {
+  public boolean bool(final InputInfo info) {
     return !Double.isNaN(value) && value != 0;
   }
 
@@ -81,9 +81,9 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public BigDecimal dec(final InputInfo ii) throws QueryException {
+  public BigDecimal dec(final InputInfo info) throws QueryException {
     if(Double.isNaN(value) || Double.isInfinite(value))
-     throw valueError(AtomType.DEC, string(), ii);
+     throw valueError(AtomType.DEC, string(), info);
     return new BigDecimal(value);
   }
 
@@ -141,14 +141,15 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return value == it.dbl(ii);
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    return value == item.dbl(info);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    final double n = it.dbl(ii);
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    final double n = item.dbl(info);
     return Double.isNaN(n) || Double.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 

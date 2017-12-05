@@ -18,8 +18,8 @@ public interface Lazy {
 
   /**
    * Materializes lazy values.
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  void materialize(InputInfo ii) throws QueryException;
+  void materialize(InputInfo info) throws QueryException;
 }

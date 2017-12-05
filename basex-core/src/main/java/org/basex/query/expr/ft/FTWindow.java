@@ -118,9 +118,9 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final FTExpr expr : exprs) sz += expr.exprSize();
-    return sz + win.exprSize();
+    int size = 1;
+    for(final FTExpr expr : exprs) size += expr.exprSize();
+    return size + win.exprSize();
   }
 
   @Override

@@ -22,30 +22,30 @@ public final class FnNot extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // e.g.: not(boolean(A)) -> not(A)
-    final Expr ex = exprs[0].optimizeEbv(cc);
+    final Expr expr = exprs[0].optimizeEbv(cc);
 
     // not(empty(A)) -> exists(A)
-    if(ex.isFunction(Function.EMPTY)) {
-      return cc.function(Function.EXISTS, info, ((FnEmpty) ex).exprs);
+    if(expr.isFunction(Function.EMPTY)) {
+      return cc.function(Function.EXISTS, info, ((FnEmpty) expr).exprs);
     }
     // not(exists(A)) -> empty(A)
-    if(ex.isFunction(Function.EXISTS)) {
-      return cc.function(Function.EMPTY, info, exprs = ((FnExists) ex).exprs);
+    if(expr.isFunction(Function.EXISTS)) {
+      return cc.function(Function.EMPTY, info, exprs = ((FnExists) expr).exprs);
     }
     // not(not(A)) -> boolean(A)
-    if(ex.isFunction(Function.NOT)) {
-      return FnBoolean.get(((FnNot) ex).exprs[0], info, cc.sc());
+    if(expr.isFunction(Function.NOT)) {
+      return FnBoolean.get(((FnNot) expr).exprs[0], info, cc.sc());
     }
     // not('a' = 'b') -> 'a' != 'b'
-    if(ex instanceof CmpV || ex instanceof CmpG) {
-      final Expr e = ((Cmp) ex).invert(cc);
-      if(e != ex) return e;
+    if(expr instanceof CmpV || expr instanceof CmpG) {
+      final Expr ex = ((Cmp) expr).invert(cc);
+      if(ex != expr) return ex;
     }
     // not($node/text()) -> empty($node/text())
-    final SeqType st = ex.seqType();
-    if(st.type instanceof NodeType) return cc.function(Function.EMPTY, info, ex);
+    final SeqType st = expr.seqType();
+    if(st.type instanceof NodeType) return cc.function(Function.EMPTY, info, expr);
 
-    exprs[0] = ex;
+    exprs[0] = expr;
     return this;
   }
 }

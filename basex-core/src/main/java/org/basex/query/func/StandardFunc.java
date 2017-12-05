@@ -74,10 +74,10 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr ex = opt(cc);
-    return cc.replaceWith(this, ex != this ?
+    final Expr expr = opt(cc);
+    return cc.replaceWith(this, expr != this ?
       // return optimized expression
-      ex : preEval() ?
+      expr : preEval() ?
       // pre-evaluate function
       (sig.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
       // return original function
@@ -123,29 +123,29 @@ public abstract class StandardFunc extends Arr {
    * @return original expression, or function argument (if it yields no results)
    */
   protected Expr optFirst() {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
     if(st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
     return this;
   }
 
   /**
    * Serializes the data from the specified iterator.
-   * @param ir data to serialize
+   * @param iter data to serialize
    * @param opts serialization parameters
    * @param err error code
    * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  protected final byte[] serialize(final Iter ir, final SerializerOptions opts,
+  protected final byte[] serialize(final Iter iter, final SerializerOptions opts,
       final QueryError err, final QueryContext qc) throws QueryException {
 
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = Serializer.get(ao, opts)) {
-        for(Item it; (it = qc.next(ir)) != null;) ser.serialize(it);
+        for(Item item; (item = qc.next(iter)) != null;) ser.serialize(item);
       }
       return new TokenBuilder(ao.finish()).normalize().finish();
     } catch(final QueryIOException ex) {
@@ -234,13 +234,13 @@ public abstract class StandardFunc extends Arr {
   /**
    * Checks if the specified expression is a database node.
    * Returns the node or an exception.
-   * @param it item to be checked
+   * @param item item to be checked
    * @return item
    * @throws QueryException query exception
    */
-  protected final DBNode toDBNode(final Item it) throws QueryException {
-    if(checkNoEmpty(it, NodeType.NOD) instanceof DBNode) return (DBNode) it;
-    throw DB_NODE_X.get(info, it);
+  protected final DBNode toDBNode(final Item item) throws QueryException {
+    if(checkNoEmpty(item, NodeType.NOD) instanceof DBNode) return (DBNode) item;
+    throw DB_NODE_X.get(info, item);
   }
 
   /**
@@ -338,8 +338,8 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Item toNodeOrAtomItem(final int i, final QueryContext qc) throws QueryException {
     if(i >= exprs.length) return null;
-    final Item it = toItem(exprs[i], qc);
-    return it instanceof ANode ? it : it.atomItem(qc, info);
+    final Item item = toItem(exprs[i], qc);
+    return item instanceof ANode ? item : item.atomItem(qc, info);
   }
 
   /**
@@ -358,30 +358,30 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Returns all keys and values of the specified binding argument.
-   * @param e index of argument
+   * @param i index of argument
    * @param qc query context
    * @return resulting map
    * @throws QueryException query exception
    */
-  protected final HashMap<String, Value> toBindings(final int e, final QueryContext qc)
+  protected final HashMap<String, Value> toBindings(final int i, final QueryContext qc)
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<>();
     final int es = exprs.length;
-    if(e < es) {
-      final Item it = exprs[e].item(qc, info);
-      final Map map = it == null ? Map.EMPTY : toMap(exprs[e], qc);
-      for(final Item it2 : map.keys()) {
+    if(i < es) {
+      final Item item = exprs[i].item(qc, info);
+      final Map map = item == null ? Map.EMPTY : toMap(exprs[i], qc);
+      for(final Item it : map.keys()) {
         final byte[] key;
-        if(it2.type.isStringOrUntyped()) {
-          key = it2.string(null);
+        if(it.type.isStringOrUntyped()) {
+          key = it.string(null);
         } else {
-          final QNm qnm = toQNm(it2, false);
+          final QNm qnm = toQNm(it, false);
           final TokenBuilder tb = new TokenBuilder();
           if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
           key = tb.add(qnm.local()).finish();
         }
-        hm.put(string(key), map.get(it2, info));
+        hm.put(string(key), map.get(it, info));
       }
     }
     return hm;
@@ -423,11 +423,11 @@ public abstract class StandardFunc extends Arr {
    * Checks if the current user has given permissions. If negative, an
    * exception is thrown.
    * @param qc query context
-   * @param p permission
+   * @param perm permission
    * @throws QueryException query exception
    */
-  private void checkPerm(final QueryContext qc, final Perm p) throws QueryException {
-    if(!qc.context.user().has(p)) throw BASEX_PERMISSION_X_X.get(info, p, this);
+  private void checkPerm(final QueryContext qc, final Perm perm) throws QueryException {
+    if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
   }
 
   /**
@@ -441,24 +441,24 @@ public abstract class StandardFunc extends Arr {
   protected final FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
 
-    final FItem fun = toFunc(expr, qc);
-    if(!sc.mixUpdates && fun.annotations().contains(Annotation.UPDATING))
-      throw FUNCUP_X.get(info, fun);
+    final FItem func = toFunc(expr, qc);
+    if(!sc.mixUpdates && func.annotations().contains(Annotation.UPDATING))
+      throw FUNCUP_X.get(info, func);
 
-    if(fun.arity() == nargs) return fun;
-    final int fargs = fun.arity();
+    if(func.arity() == nargs) return func;
+    final int fargs = func.arity();
     throw FUNARITY_X_X.get(info, arguments(fargs), nargs);
   }
 
   /**
    * Converts the specified dateTime to milliseconds.
-   * @param ex expression
+   * @param expr expression
    * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  protected final long dateTimeToMs(final Expr ex, final QueryContext qc) throws QueryException {
-    final Dtm dtm = (Dtm) checkType(ex, qc, AtomType.DTM);
+  protected final long dateTimeToMs(final Expr expr, final QueryContext qc) throws QueryException {
+    final Dtm dtm = (Dtm) checkType(expr, qc, AtomType.DTM);
     if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }

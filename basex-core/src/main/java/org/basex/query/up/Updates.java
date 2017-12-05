@@ -63,7 +63,7 @@ public final class Updates {
   /** All file paths that are targeted during a snapshot by an fn:put expression. */
   public final TokenSet putPaths = new TokenSet();
   /** Cached outputs. */
-  public final ItemList cache = new ItemList();
+  public final ItemList items = new ItemList();
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */

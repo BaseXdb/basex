@@ -29,8 +29,8 @@ public final class FnInsertBefore extends StandardFunc {
       public Item next() throws QueryException {
         while(!last) {
           final boolean sub = p == 0 || --p == 0;
-          final Item it = qc.next(sub ? ins : iter);
-          if(it != null) return it;
+          final Item item = qc.next(sub ? ins : iter);
+          if(item != null) return item;
           if(sub) --p;
           else last = true;
         }
@@ -41,25 +41,25 @@ public final class FnInsertBefore extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = exprs[0].value(qc);
+    final Value value = exprs[0].value(qc);
     final long pos = toLong(exprs[1], qc);
     final Value sub = exprs[2].value(qc);
 
     // prepend, append or insert new value
-    final long vs = val.size(), ps = Math.min(Math.max(0, pos - 1), vs);
-    if(ps == 0)  return ValueBuilder.concat(sub, val, qc);
-    if(ps == vs) return ValueBuilder.concat(val, sub, qc);
-    return ((Seq) val).insertBefore(ps, sub, qc);
+    final long vs = value.size(), ps = Math.min(Math.max(0, pos - 1), vs);
+    if(ps == 0)  return ValueBuilder.concat(sub, value, qc);
+    if(ps == vs) return ValueBuilder.concat(value, sub, qc);
+    return ((Seq) value).insertBefore(ps, sub, qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex1 = exprs[0], ex2 = exprs[1], ex3 = exprs[2];
-    if(ex2.seqType().oneNoArray()) {
-      if(ex1 == Empty.SEQ) return ex3;
-      if(ex3 == Empty.SEQ) return ex1;
+    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
+    if(expr2.seqType().oneNoArray()) {
+      if(expr1 == Empty.SEQ) return expr3;
+      if(expr3 == Empty.SEQ) return expr1;
     }
-    exprType.assign(ex1.seqType().add(ex3.seqType()));
+    exprType.assign(expr1.seqType().add(expr3.seqType()));
     return this;
   }
 }

@@ -104,12 +104,12 @@ public final class ServerQuery extends Job {
   /**
    * Executes the query.
    * @param out output stream
-   * @param iter iterative evaluation
+   * @param iterative iterative evaluation
    * @param encode encode results (client/server communication, iterative processing)
    * @param full return full type information (only applicable to iterative evaluation)
    * @throws IOException I/O Exception
    */
-  public void execute(final OutputStream out, final boolean iter, final boolean encode,
+  public void execute(final OutputStream out, final boolean iterative, final boolean encode,
       final boolean full) throws IOException {
 
     try {
@@ -122,7 +122,7 @@ public final class ServerQuery extends Job {
       final QueryContext qc = qp.qc;
       final QueryInfo qi = qc.info;
       qi.compiling = perf.ns();
-      final Iter ir = qp.iter();
+      final Iter iter = qp.iter();
       qi.evaluating = perf.ns();
 
       // iterate through results
@@ -130,16 +130,16 @@ public final class ServerQuery extends Job {
       final PrintOutput po = PrintOutput.get(encode ? new ServerOutput(out) : out);
       final SerializerOptions sopts = full ? SerializerMode.API.get() : qc.serParams();
       try(Serializer ser = Serializer.get(po, sopts)) {
-        for(Item it; (it = qc.next(ir)) != null;) {
-          if(iter) {
-            if(full) po.write(it.xdmInfo());
-            else po.write(it.typeId().asByte());
+        for(Item item; (item = qc.next(iter)) != null;) {
+          if(iterative) {
+            if(full) po.write(item.xdmInfo());
+            else po.write(item.typeId().asByte());
             ser.reset();
-            ser.serialize(it);
+            ser.serialize(item);
             po.flush();
             out.write(0);
           } else {
-            ser.serialize(it);
+            ser.serialize(item);
           }
           c++;
         }

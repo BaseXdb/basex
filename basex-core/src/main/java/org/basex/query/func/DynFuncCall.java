@@ -76,33 +76,34 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr f = body();
-    final Type tp = f.seqType().type;
+    final Expr func = body();
+    final Type type = func.seqType().type;
 
     final int nargs = exprs.length - 1;
-    if(tp instanceof FuncType) {
-      final FuncType ft = (FuncType) tp;
+    if(type instanceof FuncType) {
+      final FuncType ft = (FuncType) type;
       if(ft.argTypes != null && ft.argTypes.length != nargs)
-        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, f.toErrorString());
+        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, func.toErrorString());
       SeqType dt = ft.declType;
-      if(tp instanceof MapType) dt = dt.with(dt.occ.union(Occ.ZERO));
+      if(type instanceof MapType) dt = dt.with(dt.occ.union(Occ.ZERO));
       exprType.assign(dt);
     }
 
     // maps and arrays can only contain evaluated values, so this is safe
-    if((f instanceof Map || f instanceof Array) && allAreValues(false)) return cc.preEval(this);
+    if((func instanceof Map || func instanceof Array) && allAreValues(false))
+      return cc.preEval(this);
 
-    if(f instanceof XQFunctionExpr) {
+    if(func instanceof XQFunctionExpr) {
       // try to inline the function
-      final XQFunctionExpr fe = (XQFunctionExpr) f;
-      if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
+      final XQFunctionExpr fe = (XQFunctionExpr) func;
+      if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
         checkUpdating(fe);
         final Expr[] args = Arrays.copyOf(exprs, nargs);
         final Expr in = fe.inlineExpr(args, cc, info);
         if(in != null) return in;
       }
-    } else if(f instanceof Item) {
-      throw INVFUNCITEM_X_X.get(info, ((Item) f).type, f);
+    } else if(func instanceof Item) {
+      throw INVFUNCITEM_X_X.get(info, ((Item) func).type, func);
     }
     return this;
   }
@@ -115,22 +116,22 @@ public final class DynFuncCall extends FuncCall {
 
   /**
    * Marks this call after it was inlined from the given function item.
-   * @param it the function item
+   * @param item the function item
    */
-  public void markInlined(final FuncItem it) {
-    final int hash = it.hashCode();
+  public void markInlined(final FuncItem item) {
+    final int hash = item.hashCode();
     inlinedFrom = inlinedFrom == null ? new int[] { hash } :
       org.basex.util.Array.add(inlinedFrom, hash);
   }
 
   /**
    * Checks if this call was inlined from the body of the given function item.
-   * @param it function item
+   * @param item function item
    * @return result of check
    */
-  private boolean comesFrom(final FuncItem it) {
+  private boolean comesFrom(final FuncItem item) {
     if(inlinedFrom != null) {
-      final int hash = it.hashCode();
+      final int hash = item.hashCode();
       for(final int h : inlinedFrom) {
         if(hash == h) return true;
       }
@@ -176,15 +177,15 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
-    final Item it = toItem(body(), qc);
-    if(!(it instanceof FItem)) throw INVFUNCITEM_X_X.get(info, it.type, it);
+    final Item item = toItem(body(), qc);
+    if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.type, item);
 
-    final FItem f = (FItem) it;
+    final FItem func = (FItem) item;
     final int nargs = exprs.length - 1;
-    if(f.arity() != nargs) throw INVARITY_X_X_X.get(
-        info, arguments(nargs), f.arity(), f.toErrorString());
-    checkUpdating(f);
-    return f;
+    if(func.arity() != nargs) throw INVARITY_X_X_X.get(
+        info, arguments(nargs), func.arity(), func.toErrorString());
+    checkUpdating(func);
+    return func;
   }
 
   /**

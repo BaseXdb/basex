@@ -17,19 +17,19 @@ import org.basex.util.*;
 public final class FnExists extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // if possible, retrieve single item
-    final Expr ex = exprs[0];
-    return Bln.get((ex.seqType().zeroOrOne() ? ex.item(qc, info) : ex.iter(qc).next()) != null);
+    final Expr expr = exprs[0];
+    final Item item = expr.seqType().zeroOrOne() ? expr.item(qc, info) : expr.iter(qc).next();
+    return Bln.get(item != null);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     // ignore non-deterministic expressions (e.g.: exists(error()))
-    final Expr ex = exprs[0];
-    if(!ex.has(Flag.NDT)) {
-      final long es = ex.size();
+    final Expr expr = exprs[0];
+    if(!expr.has(Flag.NDT)) {
+      final long es = expr.size();
       if(es != -1) return Bln.get(es != 0);
-      if(ex.seqType().oneOrMore()) return Bln.TRUE;
+      if(expr.seqType().oneOrMore()) return Bln.TRUE;
     }
     return this;
   }
@@ -37,7 +37,7 @@ public final class FnExists extends StandardFunc {
   @Override
   public Expr optimizeEbv(final CompileContext cc) {
     // if(exists(node*)) -> if(node*)
-    final Expr ex = exprs[0];
-    return ex.seqType().type instanceof NodeType ? cc.replaceEbv(this, ex) : this;
+    final Expr expr = exprs[0];
+    return expr.seqType().type instanceof NodeType ? cc.replaceEbv(this, expr) : this;
   }
 }

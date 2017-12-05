@@ -59,16 +59,16 @@ public abstract class Iter {
    */
   public Value value(final QueryContext qc) throws QueryException {
     // check if sequence is empty
-    final Item i1 = next();
-    if(i1 == null) return Empty.SEQ;
+    final Item item1 = next();
+    if(item1 == null) return Empty.SEQ;
 
     // check for single result
-    final Item i2 = next();
-    if(i2 == null) return i1;
+    final Item item2 = next();
+    if(item2 == null) return item1;
 
     // more results: build sequence
-    final ValueBuilder vb = new ValueBuilder(qc).add(i1, i2);
-    for(Item it; (it = qc.next(this)) != null;) vb.add(it);
+    final ValueBuilder vb = new ValueBuilder(qc).add(item1, item2);
+    for(Item item; (item = qc.next(this)) != null;) vb.add(item);
     return vb.value();
   }
 }

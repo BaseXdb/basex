@@ -18,28 +18,28 @@ abstract class DateTime extends StandardFunc {
   /**
    * Checks if the specified item is a Duration item. If it is untyped,
    * a duration is returned.
-   * @param it item to be checked
+   * @param item item to be checked
    * @return duration
    * @throws QueryException query exception
    */
-  protected Dur checkDur(final Item it) throws QueryException {
-    if(it instanceof Dur) return (Dur) it;
-    if(it.type.isUntyped()) return new Dur(it.string(info), info);
-    throw typeError(it, AtomType.DUR, info);
+  protected Dur checkDur(final Item item) throws QueryException {
+    if(item instanceof Dur) return (Dur) item;
+    if(item.type.isUntyped()) return new Dur(item.string(info), info);
+    throw typeError(item, AtomType.DUR, info);
   }
 
   /**
    * Checks if the specified item has the specified Date type.
    * If it is item, the specified Date is returned.
-   * @param it item to be checked
-   * @param t target type
+   * @param item item to be checked
+   * @param type target type
    * @param qc query context
    * @return date
    * @throws QueryException query exception
    */
-  protected ADate checkDate(final Item it, final AtomType t, final QueryContext qc)
+  protected ADate checkDate(final Item item, final AtomType type, final QueryContext qc)
       throws QueryException {
-    return (ADate) (it.type.isUntyped() ? t.cast(it, qc, sc, info) : checkType(it, t));
+    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, sc, info) : checkType(item, type));
   }
 
   /**
@@ -53,22 +53,22 @@ abstract class DateTime extends StandardFunc {
 
   /**
    * Adjusts a Time item to the specified time zone.
-   * @param it item
-   * @param t target type
+   * @param item item
+   * @param type target type
    * @param qc query context
    * @return duration
    * @throws QueryException query exception
    */
-  protected ADate adjust(final Item it, final AtomType t, final QueryContext qc)
+  protected ADate adjust(final Item item, final AtomType type, final QueryContext qc)
       throws QueryException {
 
     final ADate ad;
-    if(it.type.isUntyped()) {
-      ad = (ADate) t.cast(it, qc, sc, info);
+    if(item.type.isUntyped()) {
+      ad = (ADate) type.cast(item, qc, sc, info);
     } else {
       // clone item
-      final ADate a = (ADate) checkType(it, t);
-      ad = t == AtomType.TIM ? new Tim(a) : t == AtomType.DAT ? new Dat(a) : new Dtm(a);
+      final ADate a = (ADate) checkType(item, type);
+      ad = type == AtomType.TIM ? new Tim(a) : type == AtomType.DAT ? new Dat(a) : new Dtm(a);
     }
     final boolean spec = exprs.length == 2;
     final Item zon = spec ? exprs[1].atomItem(qc, info) : null;

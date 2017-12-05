@@ -173,11 +173,11 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Concatenates this finger tree with the given one.
    * @param mid nodes between the two trees
-   * @param sz sum of the sizes of all nodes in the middle array
+   * @param size sum of the sizes of all nodes in the middle array
    * @param other the other tree
    * @return concatenation of both trees
    */
-  public abstract FingerTree<N, E> concat(Node<N, E>[] mid, long sz, FingerTree<N, E> other);
+  public abstract FingerTree<N, E> concat(Node<N, E>[] mid, long size, FingerTree<N, E> other);
 
   /**
    * Creates a reversed version of this tree.
@@ -276,11 +276,11 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Adds all nodes in the given array to the given side of this tree.
    * @param nodes the nodes
-   * @param sz sum of the sizes of all nodes in the array
+   * @param size sum of the sizes of all nodes in the array
    * @param left insertion direction, {@code true} adds to the left, {@code false} to the right
    * @return resulting tree
    */
-  abstract FingerTree<N, E> addAll(Node<N, E>[] nodes, long sz, boolean left);
+  abstract FingerTree<N, E> addAll(Node<N, E>[] nodes, long size, boolean left);
 
   @Override
   public final String toString() {

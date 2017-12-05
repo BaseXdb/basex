@@ -37,18 +37,18 @@ public abstract class QueryTest extends SandboxTest {
       final Value cmp = correct ? (Value) qu[1] : null;
 
       try(QueryProcessor qp = new QueryProcessor(query, context)) {
-        final Value val = qp.value();
-        if(!correct || !new DeepEqual().equal(val, cmp)) {
+        final Value value = qp.value();
+        if(!correct || !new DeepEqual().equal(value, cmp)) {
           sb.append('[').append(qu[0]).append("] ").append(query);
           sb.append("\n[E] ");
           if(correct) {
             sb.append(cmp.size()).append(" result(s): ");
-            for(final Item it : cmp) sb.append(it.serialize()).append("; ");
+            for(final Item item : cmp) sb.append(item.serialize()).append("; ");
           } else {
             sb.append("error");
           }
-          sb.append("\n[F] ").append(val.size()).append(" result(s): ");
-          for(final Item it : val) sb.append(it.serialize()).append(", ");
+          sb.append("\n[F] ").append(value.size()).append(" result(s): ");
+          for(final Item item : value) sb.append(item.serialize()).append(", ");
           sb.append(details()).append('\n');
           ++fail;
         }

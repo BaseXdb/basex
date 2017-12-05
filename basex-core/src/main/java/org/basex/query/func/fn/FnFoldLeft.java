@@ -19,42 +19,42 @@ public final class FnFoldLeft extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final FItem fun = checkArity(exprs[2], 2, qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
 
     Value res = exprs[1].value(qc);
-    for(Item it; (it = qc.next(iter)) != null;) res = fun.invokeValue(qc, info, res, it);
+    for(Item item; (item = qc.next(iter)) != null;) res = func.invokeValue(qc, info, res, item);
     return res;
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final FItem fun = checkArity(exprs[2], 2, qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
 
     // don't convert to a value if not necessary
-    Item it = iter.next();
-    if(it == null) return exprs[1].iter(qc);
+    Item item = iter.next();
+    if(item == null) return exprs[1].iter(qc);
 
     Value res = exprs[1].value(qc);
-    do res = fun.invokeValue(qc, info, res, it); while((it = qc.next(iter)) != null);
+    do res = func.invokeValue(qc, info, res, item); while((item = qc.next(iter)) != null);
     return res.iter();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if(ex1 == Empty.SEQ) return ex2;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1 == Empty.SEQ) return expr2;
 
     seqType(this, cc, false, true);
 
-    if(allAreValues(false) && ex1.size() <= UNROLL_LIMIT) {
+    if(allAreValues(false) && expr1.size() <= UNROLL_LIMIT) {
       // unroll the loop
-      Expr ex = ex2;
-      for(final Item it : (Value) ex1) {
-        ex = new DynFuncCall(info, sc, exprs[2], ex, it).optimize(cc);
+      Expr expr = expr2;
+      for(final Item item : (Value) expr1) {
+        expr = new DynFuncCall(info, sc, exprs[2], expr, item).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return ex;
+      return expr;
     }
     return this;
   }

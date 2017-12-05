@@ -75,7 +75,7 @@ public final class Let extends ForLet {
   private static Dbl score(final Iter iter, final QueryContext qc) throws QueryException {
     double s = 0;
     int c = 0;
-    for(Item it; (it = qc.next(iter)) != null; s += it.score(), c++);
+    for(Item item; (item = qc.next(iter)) != null; s += item.score(), c++);
     return Dbl.get(Scoring.avg(s, c));
   }
 

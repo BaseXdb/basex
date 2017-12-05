@@ -31,8 +31,8 @@ public final class ArraySort extends StandardFunc {
       if(tok != null) coll = Collation.get(tok, qc, sc, info, WHICHCOLL_X);
     }
 
-    final long sz = array.arraySize();
-    final ValueList vl = new ValueList(sz);
+    final long size = array.arraySize();
+    final ValueList vl = new ValueList(size);
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
     for(final Value value : array.members()) {
       vl.add((key == null ? value : key.invokeValue(qc, info, value)).atomValue(qc, info));

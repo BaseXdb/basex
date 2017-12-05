@@ -119,8 +119,8 @@ public final class TarInputStream extends FilterInputStream {
     // read name, remove trailing zero byte
     final ByteList result = new ByteList();
     for(int b; (b = read()) != -1;) result.add(b);
-    final int sz = result.size() - 1;
-    if(sz >= 0 && result.get(sz) == 0) result.size(sz);
+    final int size = result.size() - 1;
+    if(size >= 0 && result.get(size) == 0) result.size(size);
     return TarEntry.name(result);
   }
 }

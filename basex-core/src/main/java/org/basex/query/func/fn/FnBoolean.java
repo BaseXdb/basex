@@ -21,36 +21,36 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0].optimizeEbv(cc);
+    final Expr expr = exprs[0].optimizeEbv(cc);
 
     // boolean($node/text()) -> exists($node/text())
-    final SeqType st = ex.seqType();
+    final SeqType st = expr.seqType();
     if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, exprs);
 
     // simplify, e.g.: boolean(true())) -> true()
-    if(st.eq(SeqType.BLN_O)) return ex;
+    if(st.eq(SeqType.BLN_O)) return expr;
 
-    exprs[0] = ex;
+    exprs[0] = expr;
     return this;
   }
 
   @Override
   public Expr optimizeEbv(final CompileContext cc) {
     // if A is not numeric: expr[boolean(A)] -> expr[A]
-    final Expr ex = exprs[0];
-    return ex.seqType().mayBeNumber() ? this : cc.replaceEbv(this, ex);
+    final Expr expr = exprs[0];
+    return expr.seqType().mayBeNumber() ? this : cc.replaceEbv(this, expr);
   }
 
   /**
    * Returns a boolean equivalent for the specified expression.
    * If the specified expression yields a boolean value anyway, it will be
    * returned as is. Otherwise, it will be wrapped into a boolean function.
-   * @param ex expression to be rewritten
+   * @param expr expression to be rewritten
    * @param info input info
    * @param sc static context
    * @return expression
    */
-  public static Expr get(final Expr ex, final InputInfo info, final StaticContext sc) {
-    return ex.seqType().eq(SeqType.BLN_O) ? ex : Function.BOOLEAN.get(sc, info, ex);
+  public static Expr get(final Expr expr, final InputInfo info, final StaticContext sc) {
+    return expr.seqType().eq(SeqType.BLN_O) ? expr : Function.BOOLEAN.get(sc, info, expr);
   }
 }

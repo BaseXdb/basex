@@ -195,8 +195,9 @@ public final class GroupBy extends Clause {
 
     final int il = its1.length;
     for(int i = 0; i < il; i++) {
-      final Item it1 = its1[i], it2 = its2[i];
-      if(it1 == null ^ it2 == null || it1 != null && !it1.equiv(it2, coll[i], info)) return false;
+      final Item item1 = its1[i], item2 = its2[i];
+      if(item1 == null ^ item2 == null || item1 != null && !item1.equiv(item2, coll[i], info))
+        return false;
     }
     return true;
   }
@@ -300,10 +301,10 @@ public final class GroupBy extends Clause {
 
   @Override
   public int exprSize() {
-    int sz = 0;
-    for(final Expr expr : preExpr) sz += expr.exprSize();
-    for(final Expr spec : specs) sz += spec.exprSize();
-    return sz;
+    int size = 0;
+    for(final Expr expr : preExpr) size += expr.exprSize();
+    for(final Expr spec : specs) size += spec.exprSize();
+    return size;
   }
 
   @Override

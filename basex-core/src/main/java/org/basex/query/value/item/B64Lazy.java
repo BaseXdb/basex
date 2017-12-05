@@ -31,27 +31,27 @@ public final class B64Lazy extends B64 implements Lazy {
   }
 
   @Override
-  public byte[] binary(final InputInfo ii) throws QueryException {
-    materialize(ii);
+  public byte[] binary(final InputInfo info) throws QueryException {
+    materialize(info);
     return data;
   }
 
   @Override
-  public BufferInput input(final InputInfo ii) throws QueryException {
-    if(isCached()) return super.input(ii);
+  public BufferInput input(final InputInfo info) throws QueryException {
+    if(isCached()) return super.input(info);
     try {
       return new BufferInput(input);
     } catch(final IOException ex) {
-      throw error.get(ii, ex);
+      throw error.get(info, ex);
     }
   }
 
   @Override
-  public void materialize(final InputInfo ii) throws QueryException {
+  public void materialize(final InputInfo info) throws QueryException {
     try {
       if(!isCached()) data = input.read();
     } catch(final IOException ex) {
-      throw error.get(ii, ex);
+      throw error.get(info, ex);
     }
   }
 

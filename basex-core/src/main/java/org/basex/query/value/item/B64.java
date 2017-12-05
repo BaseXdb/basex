@@ -52,23 +52,23 @@ public class B64 extends Bin {
   /**
    * Returns an instance of this class.
    * @param bin binary input
-   * @param ii input info
+   * @param info input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static B64 get(final Bin bin, final InputInfo ii) throws QueryException {
-    return get(bin.binary(ii));
+  public static B64 get(final Bin bin, final InputInfo info) throws QueryException {
+    return get(bin.binary(info));
   }
 
   /**
    * Returns an instance of this class.
    * @param value textual representation
-   * @param ii input info
+   * @param info input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static B64 get(final byte[] value, final InputInfo ii) throws QueryException {
-    return get(parse(value, ii));
+  public static B64 get(final byte[] value, final InputInfo info) throws QueryException {
+    return get(parse(value, info));
   }
 
   /**
@@ -80,20 +80,22 @@ public class B64 extends Bin {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) throws QueryException {
-    return org.basex.util.Base64.encode(binary(ii));
+  public byte[] string(final InputInfo info) throws QueryException {
+    return org.basex.util.Base64.encode(binary(info));
   }
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) : parse(it, ii));
+  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
+    return Token.eq(binary(info), bin);
   }
 
   @Override
-  public final int diff(final Item it, final Collation coll, final InputInfo ii)
+  public final int diff(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
-    return Token.diff(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) : parse(it, ii));
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
+    return Token.diff(binary(info), bin);
   }
 
   /**

@@ -49,15 +49,15 @@ public final class FnSort extends StandardFunc {
     }
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
-    final long sz = value.size();
-    final ValueList vl = new ValueList(sz);
+    final long size = value.size();
+    final ValueList vl = new ValueList(size);
     final Iter iter = value.iter();
-    for(Item it; (it = qc.next(iter)) != null;) {
-      vl.add((key == null ? it : key.invokeValue(qc, info, it)).atomValue(qc, info));
+    for(Item item; (item = qc.next(iter)) != null;) {
+      vl.add((key == null ? item : key.invokeValue(qc, info, item)).atomValue(qc, info));
     }
 
     final Integer[] order = sort(vl, this, coll, qc);
-    return new BasicIter<Item>(sz) {
+    return new BasicIter<Item>(size) {
       @Override
       public Item get(final long i) {
         return value.itemAt(order[(int) i]);
@@ -109,18 +109,18 @@ public final class FnSort extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // optimize sort on sequences
-    final Expr ex1 = exprs[0];
+    final Expr expr1 = exprs[0];
     final int el = exprs.length;
-    final SeqType st1 = ex1.seqType();
-    if(st1.zero()) return ex1;
+    final SeqType st1 = expr1.seqType();
+    if(st1.zero()) return expr1;
 
-    if(ex1 instanceof Value) {
-      final Value v = value((Value) ex1);
-      if(v != null) return v;
+    if(expr1 instanceof Value) {
+      final Value value = value((Value) expr1);
+      if(value != null) return value;
     }
     if(el == 3) coerceFunc(2, cc, SeqType.AAT_ZM, st1.type.seqType());
 
-    return adoptType(ex1);
+    return adoptType(expr1);
   }
 
   /**

@@ -20,7 +20,7 @@ public final class MapRemove extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Map map = toMap(exprs[0], qc);
     final Iter keys = exprs[1].iter(qc);
-    for(Item it; (it = qc.next(keys)) != null;) map = map.delete(toAtomItem(it, qc), info);
+    for(Item item; (item = qc.next(keys)) != null;) map = map.delete(toAtomItem(item, qc), info);
     return map;
   }
 

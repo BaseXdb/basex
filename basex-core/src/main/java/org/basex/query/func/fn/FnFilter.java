@@ -16,13 +16,13 @@ import org.basex.query.value.type.*;
 public final class FnFilter extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final FItem fun = checkArity(exprs[1], 1, qc);
+    final FItem func = checkArity(exprs[1], 1, qc);
     final Iter iter = exprs[0].iter(qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        for(Item it; (it = qc.next(iter)) != null;) {
-          if(toBoolean(fun.invokeItem(qc, info, it))) return it;
+        for(Item item; (item = qc.next(iter)) != null;) {
+          if(toBoolean(func.invokeItem(qc, info, item))) return item;
         }
         return null;
       }
@@ -31,9 +31,9 @@ public final class FnFilter extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
 
     coerceFunc(1, cc, SeqType.BLN_O, st.type.seqType());
 

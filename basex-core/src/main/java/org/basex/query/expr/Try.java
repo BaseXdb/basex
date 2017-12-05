@@ -48,13 +48,13 @@ public final class Try extends Single {
       super.compile(cc);
     } catch(final QueryException ex) {
       if(!ex.isCatchable()) throw ex;
-      for(final Catch c : catches) {
+      for(final Catch ctch : catches) {
         // found a matching clause: compile and inline error message
-        if(c.matches(ex)) return cc.replaceWith(this, c.compile(cc).asExpr(ex, cc));
+        if(ctch.matches(ex)) return cc.replaceWith(this, ctch.compile(cc).asExpr(ex, cc));
       }
       throw ex;
     }
-    for(final Catch c : catches) c.compile(cc);
+    for(final Catch ctch : catches) ctch.compile(cc);
     return optimize(cc);
   }
 
@@ -63,8 +63,8 @@ public final class Try extends Single {
     if(expr instanceof Value) return cc.replaceWith(this, expr);
 
     SeqType st = expr.seqType();
-    for(final Catch c : catches) {
-      if(!c.expr.isFunction(Function.ERROR)) st = st.union(c.seqType());
+    for(final Catch ctch : catches) {
+      if(!ctch.expr.isFunction(Function.ERROR)) st = st.union(ctch.seqType());
     }
     exprType.assign(st);
     return this;
@@ -82,8 +82,8 @@ public final class Try extends Single {
       return expr.value(qc);
     } catch(final QueryException ex) {
       if(ex.isCatchable()) {
-        for(final Catch c : catches) {
-          if(c.matches(ex)) return c.value(qc, ex);
+        for(final Catch ctch : catches) {
+          if(ctch.matches(ex)) return ctch.value(qc, ex);
         }
       }
       throw ex;
@@ -107,17 +107,17 @@ public final class Try extends Single {
       }
     } catch(final QueryException qe) {
       if(!qe.isCatchable()) throw qe;
-      for(final Catch c : catches) {
-        if(c.matches(qe)) {
+      for(final Catch ctch : catches) {
+        if(ctch.matches(qe)) {
           // found a matching clause, inline variable and error message
-          final Catch nw = c.inline(var, ex, cc);
-          return cc.replaceWith(this, (nw == null ? c : nw).asExpr(qe, cc));
+          final Catch nw = ctch.inline(var, ex, cc);
+          return cc.replaceWith(this, (nw == null ? ctch : nw).asExpr(qe, cc));
         }
       }
       throw qe;
     }
 
-    for(final Catch c : catches) changed |= c.inline(var, ex, cc) != null;
+    for(final Catch ctch : catches) changed |= ctch.inline(var, ex, cc) != null;
     return changed ? this : null;
   }
 
@@ -128,19 +128,19 @@ public final class Try extends Single {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Catch c : catches) if(c.has(flags)) return true;
+    for(final Catch ctch : catches) if(ctch.has(flags)) return true;
     return super.has(flags);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Catch c : catches) if(!c.removable(var)) return false;
+    for(final Catch ctch : catches) if(!ctch.removable(var)) return false;
     return super.removable(var);
   }
 
   @Override
   public void markTailCalls(final CompileContext cc) {
-    for(final Catch c : catches) c.markTailCalls(cc);
+    for(final Catch ctch : catches) ctch.markTailCalls(cc);
   }
 
   @Override
@@ -150,9 +150,9 @@ public final class Try extends Single {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Expr e : catches) sz += e.exprSize();
-    return sz;
+    int size = 1;
+    for(final Catch ctch : catches) size += ctch.exprSize();
+    return size;
   }
 
   @Override
@@ -169,7 +169,7 @@ public final class Try extends Single {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("try { " + expr + " }");
-    for(final Catch c : catches) sb.append(' ').append(c);
+    for(final Catch ctch : catches) sb.append(' ').append(ctch);
     return sb.toString();
   }
 }

@@ -297,11 +297,13 @@ public final class SeqType {
     if(item.type.eq(type)) return item;
     try {
       if(!error && info != null) info.internal(true);
-      final Value v = type.cast(item, qc, sc, info);
+      final Value value = type.cast(item, qc, sc, info);
       if(kind != null) {
-        for(final Item i : v) if(!kind.eq(item)) throw typeError(i, type, info);
+        for(final Item it : value) {
+          if(!kind.eq(item)) throw typeError(it, type, info);
+        }
       }
-      return v;
+      return value;
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
@@ -315,22 +317,22 @@ public final class SeqType {
    * @param value value to cast
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @return cast value
    * @throws QueryException query exception
    */
   public Value cast(final Value value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     final long vs = value.size();
-    if(!occ.check(vs)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
+    if(!occ.check(vs)) throw INVTYPE_X_X_X.get(info, value.seqType(), this, value);
 
     if(value.isEmpty()) return Empty.SEQ;
-    if(value instanceof Item) return cast((Item) value, qc, sc, ii, true);
+    if(value instanceof Item) return cast((Item) value, qc, sc, info, true);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     final BasicIter<?> iter = value.iter();
-    for(Item it; (it = qc.next(iter)) != null;) vb.add(cast(it, qc, sc, ii, true));
+    for(Item item; (item = qc.next(iter)) != null;) vb.add(cast(item, qc, sc, info, true));
     return vb.value();
   }
 
@@ -338,17 +340,17 @@ public final class SeqType {
    * Checks the specified value for this sequence type.
    * @param value value to be checked
    * @param name name of variable (can be {@code null})
-   * @param ii input info
+   * @param info input info
    * @param qc query context
    * @throws QueryException query exception
    */
-  public void treat(final Value value, final QNm name, final InputInfo ii, final QueryContext qc)
+  public void treat(final Value value, final QNm name, final InputInfo info, final QueryContext qc)
       throws QueryException {
 
     if(value.seqType().instanceOf(this)) return;
 
     final int size = (int) value.size();
-    if(!occ.check(size)) throw typeError(value, this, name, ii);
+    if(!occ.check(size)) throw typeError(value, this, name, info);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -362,7 +364,7 @@ public final class SeqType {
         ins = instance(value.itemAt(i));
       }
     }
-    if(!ins) throw typeError(value, this, name, ii);
+    if(!ins) throw typeError(value, this, name, info);
   }
 
   /**
@@ -371,74 +373,74 @@ public final class SeqType {
    * @param name variable name (can be {@code null})
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value promote(final Value value, final QNm name, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
+      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
 
-    final long sz = value.size();
-    if(!occ.check(sz)) throw typeError(value, this, name, ii);
-    if(sz == 0) return Empty.SEQ;
+    final long size = value.size();
+    if(!occ.check(size)) throw typeError(value, this, name, info);
+    if(size == 0) return Empty.SEQ;
 
-    ItemList cache = null;
-    for(long i = 0; i < sz; i++) {
+    ItemList items = null;
+    for(long i = 0; i < size; i++) {
       qc.checkStop();
-      final Item it = value.itemAt(i);
-      if(instance(it)) {
+      final Item item = value.itemAt(i);
+      if(instance(item)) {
         if(i == 0 && value.homogeneous()) return value;
-        if(cache != null) cache.add(it);
+        if(items != null) items.add(item);
       } else {
-        if(cache == null) {
-          cache = new ItemList(sz);
-          for(int j = 0; j < i; j++) cache.add(value.itemAt(j));
+        if(items == null) {
+          items = new ItemList(size);
+          for(int j = 0; j < i; j++) items.add(value.itemAt(j));
         }
-        promote(it, name, cache, qc, sc, ii, opt);
+        promote(item, name, items, qc, sc, info, opt);
       }
     }
-    return cache != null ? cache.value(type) : value;
+    return items != null ? items.value(type) : value;
   }
 
   /**
    * Promotes an item to the type of this sequence type.
    * @param item item to promote
    * @param name variable name (can be {@code null})
-   * @param cache item cache
+   * @param items item cache
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @param opt if the result should be optimized
    * @throws QueryException query exception
    */
-  public void promote(final Item item, final QNm name, final ItemList cache, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
+  public void promote(final Item item, final QNm name, final ItemList items, final QueryContext qc,
+      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
-      final Iter iter = item.atomValue(qc, ii).iter();
-      for(Item it; (it = qc.next(iter)) != null;) {
-        final Type tp = it.type;
+      final Iter iter = item.atomValue(qc, info).iter();
+      for(Item item1; (item1 = qc.next(iter)) != null;) {
+        final Type tp = item1.type;
         if(tp.instanceOf(type)) {
-          cache.add(it);
+          items.add(item1);
         } else if(tp == AtomType.ATM) {
-          if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
-          final Iter iter2 = type.cast(it, qc, sc, ii).iter();
-          for(Item it2; (it2 = qc.next(iter2)) != null;) cache.add(it2);
+          if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
+          final Iter iter2 = type.cast(item1, qc, sc, info).iter();
+          for(Item item2; (item2 = qc.next(iter2)) != null;) items.add(item2);
         } else if(type == AtomType.DBL && (tp == AtomType.FLT || tp.instanceOf(AtomType.DEC))) {
-          cache.add(Dbl.get(it.dbl(ii)));
+          items.add(Dbl.get(item1.dbl(info)));
         } else if(type == AtomType.FLT && tp.instanceOf(AtomType.DEC)) {
-          cache.add(Flt.get(it.flt(ii)));
-        } else if(type == AtomType.STR && it instanceof Uri) {
-          cache.add(Str.get(it.string(ii)));
+          items.add(Flt.get(item1.flt(info)));
+        } else if(type == AtomType.STR && item1 instanceof Uri) {
+          items.add(Str.get(item1.string(info)));
         } else {
-          throw typeError(item, with(Occ.ONE), name, ii);
+          throw typeError(item, with(Occ.ONE), name, info);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
-      cache.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
+      items.add(((FItem) item).coerceTo((FuncType) type, qc, info, opt));
     } else {
-      throw typeError(item, with(Occ.ONE), name, ii);
+      throw typeError(item, with(Occ.ONE), name, info);
     }
   }
 
@@ -462,11 +464,11 @@ public final class SeqType {
 
   /**
    * Checks if this type's item type could be instance of the given one.
-   * @param t other type
+   * @param tp other type
    * @return result of check
    */
-  private boolean couldBe(final Type t) {
-    return type.intersect(t) != null;
+  private boolean couldBe(final Type tp) {
+    return type.intersect(tp) != null;
   }
 
   /**
@@ -476,9 +478,9 @@ public final class SeqType {
    */
   public SeqType union(final SeqType st) {
     // ignore general type of empty sequence
-    final Type t = type.eq(st.type) || st.zero() ? type : zero() ? st.type : type.union(st.type);
-    final Occ o = occ.union(st.occ);
-    return get(t, o);
+    final Type tp = type.eq(st.type) || st.zero() ? type : zero() ? st.type : type.union(st.type);
+    final Occ oc = occ.union(st.occ);
+    return get(tp, oc);
   }
 
   /**
@@ -497,14 +499,14 @@ public final class SeqType {
    * @return resulting type or {@code null}
    */
   public SeqType intersect(final SeqType st) {
-    final Occ o = occ.intersect(st.occ);
-    if(o == null) return null;
     final Type tp = type.intersect(st.type);
     if(tp == null) return null;
+    final Occ oc = occ.intersect(st.occ);
+    if(oc == null) return null;
     if(kind == null || st.kind == null || kind.equals(st.kind))
-      return get(tp, o, kind != null ? kind : st.kind);
-    final Test k = kind.intersect(st.kind);
-    return k == null ? null : get(tp, o, k);
+      return get(tp, oc, kind != null ? kind : st.kind);
+    final Test kn = kind.intersect(st.kind);
+    return kn == null ? null : get(tp, oc, kn);
   }
 
   /**
@@ -594,11 +596,11 @@ public final class SeqType {
    * @return type or {@code null} if type may be not atomic
    */
   public Type atomicType() {
-    final Type t = type;
-    return t.instanceOf(NodeType.NOD) ?
-      t == NodeType.PI || t == NodeType.COM ? AtomType.STR :
-      t == NodeType.NOD ? AtomType.AAT : AtomType.ATM :
-      t.instanceOf(AtomType.AAT) ? t : null;
+    final Type tp = type;
+    return tp.instanceOf(NodeType.NOD) ?
+      tp == NodeType.PI || tp == NodeType.COM ? AtomType.STR :
+      tp == NodeType.NOD ? AtomType.AAT : AtomType.ATM :
+      tp.instanceOf(AtomType.AAT) ? tp : null;
   }
 
   /**

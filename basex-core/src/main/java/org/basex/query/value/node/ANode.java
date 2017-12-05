@@ -44,12 +44,12 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final boolean bool(final InputInfo ii) {
+  public final boolean bool(final InputInfo info) {
     return true;
   }
 
   @Override
-  public final byte[] string(final InputInfo ii) {
+  public final byte[] string(final InputInfo info) {
     return string();
   }
 
@@ -60,31 +60,31 @@ public abstract class ANode extends Item {
   public abstract byte[] string();
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return it.type.isUntyped() ? coll == null ? Token.eq(string(), it.string(ii)) :
-      coll.compare(string(), it.string(ii)) == 0 : it.eq(this, coll, sc, ii);
+  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    return item.type.isUntyped() ? coll == null ? Token.eq(string(), item.string(info)) :
+      coll.compare(string(), item.string(info)) == 0 : item.eq(this, coll, sc, info);
   }
 
   @Override
-  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
-    return it.type.isStringOrUntyped() && eq(it, null, null, ii);
+  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
+    return item.type.isStringOrUntyped() && eq(item, null, null, info);
   }
 
   @Override
-  public final int diff(final Item it, final Collation coll, final InputInfo ii)
+  public final int diff(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
-    return it.type.isUntyped() ? coll == null ? Token.diff(string(), it.string(ii)) :
-      coll.compare(string(), it.string(ii)) : -it.diff(this, coll, ii);
+    return item.type.isUntyped() ? coll == null ? Token.diff(string(), item.string(info)) :
+      coll.compare(string(), item.string(info)) : -item.diff(this, coll, info);
   }
 
   @Override
-  public final Item atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Item atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
     return atomItem();
   }
 
   @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
     return atomItem();
   }
 

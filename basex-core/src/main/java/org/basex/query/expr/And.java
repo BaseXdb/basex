@@ -91,9 +91,9 @@ public final class And extends Logical {
     if(qc.scoring) {
       double s = 0;
       for(final Expr expr : exprs) {
-        final Item it = expr.ebv(qc, info);
-        if(!it.bool(info)) return Bln.FALSE;
-        s += it.score();
+        final Item item = expr.ebv(qc, info);
+        if(!item.bool(info)) return Bln.FALSE;
+        s += item.score();
       }
       return Bln.get(true, Scoring.avg(s, exprs.length));
     }

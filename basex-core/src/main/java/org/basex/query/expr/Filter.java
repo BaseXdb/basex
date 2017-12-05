@@ -84,8 +84,8 @@ public abstract class Filter extends Preds {
     // remember current context value (will be temporarily overwritten)
     cc.pushFocus(root);
     try {
-      final Expr ex = super.optimize(cc);
-      if(ex != this) return ex;
+      final Expr expr = super.optimize(cc);
+      if(expr != this) return expr;
     } finally {
       cc.removeFocus();
     }
@@ -94,8 +94,8 @@ public abstract class Filter extends Preds {
     if(!exprType(root.seqType(), root.size())) return cc.emptySeq(this);
 
     // if possible, convert filter to root or path expression
-    Expr ex = simplify(root, exprs);
-    if(ex != null) return ex.optimize(cc);
+    Expr exp = simplify(root, exprs);
+    if(exp != null) return exp.optimize(cc);
 
     // rewrite filter with database documents to path
     if(root instanceof Value && root.data() != null && root.seqType().type == NodeType.DOC) {
@@ -109,49 +109,49 @@ public abstract class Filter extends Preds {
     Expr rt = root;
     boolean opt = false;
     for(final Expr expr : exprs) {
-      ex = null;
+      exp = null;
       if(expr.isFunction(Function.LAST)) {
         if(rt instanceof Value) {
           // value: replace with last item
-          ex = ((Value) rt).itemAt(rt.size() - 1);
+          exp = ((Value) rt).itemAt(rt.size() - 1);
         } else {
           // rewrite positional predicate to util:last-from
-          ex = cc.function(Function._UTIL_LAST_FROM, info, rt);
+          exp = cc.function(Function._UTIL_LAST_FROM, info, rt);
         }
       } else if(expr instanceof ItrPos) {
         final ItrPos pos = (ItrPos) expr;
         if(rt instanceof Value) {
           // value: replace with subsequence
           final long s = pos.min - 1, l = Math.min(pos.max, rt.size()) - s;
-          ex = l <= 0 ? Empty.SEQ : ((Value) rt).subSequence(s, l, cc.qc);
+          exp = l <= 0 ? Empty.SEQ : ((Value) rt).subSequence(s, l, cc.qc);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> head(); expr[pos] -> util:item-at(expr, pos.min)
-          ex = pos.min == 1 ? cc.function(Function.HEAD, info, rt) :
+          exp = pos.min == 1 ? cc.function(Function.HEAD, info, rt) :
             cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          ex = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
+          exp = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
               Int.get(pos.max));
         }
       } else if(expr instanceof Pos) {
         final Pos pos = (Pos) expr;
         if(pos.exprs[0] == pos.exprs[1]) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
-          ex = cc.function(Function._UTIL_ITEM_AT, info, rt, pos.exprs[0]);
+          exp = cc.function(Function._UTIL_ITEM_AT, info, rt, pos.exprs[0]);
         } else {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          ex = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
+          exp = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
         }
       } else if(numeric(expr)) {
         /* - rewrite positional predicate to util:item-at
          *   example: expr[pos] -> util:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets
          *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        ex = cc.function(Function._UTIL_ITEM_AT, info, rt, expr);
+        exp = cc.function(Function._UTIL_ITEM_AT, info, rt, expr);
       }
 
-      if(ex != null) {
-        rt = ex;
+      if(exp != null) {
+        rt = exp;
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
@@ -162,8 +162,8 @@ public abstract class Filter extends Preds {
     // return optimized expression or standard iterator
     if(opt) return cc.replaceWith(this, rt);
 
-    ex = get(info, root, exprs);
-    return ex instanceof ParseExpr ? copyType((ParseExpr) ex) : ex;
+    exp = get(info, root, exprs);
+    return exp instanceof ParseExpr ? copyType((ParseExpr) exp) : exp;
   }
 
   /**
@@ -179,8 +179,8 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    final Expr ex = optimizeEbv(root, cc);
-    return ex == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, ex);
+    final Expr expr = optimizeEbv(root, cc);
+    return expr == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, expr);
   }
 
   /**
@@ -215,8 +215,8 @@ public abstract class Filter extends Preds {
   public final VarUsage count(final Var var) {
     final VarUsage inPreds = super.count(var), inRoot = root.count(var);
     if(inPreds == VarUsage.NEVER) return inRoot;
-    final long sz = root.size();
-    return sz == 0 || sz == 1 || root.seqType().zeroOrOne() ? inRoot.plus(inPreds) :
+    final long size = root.size();
+    return size == 0 || size == 1 || root.seqType().zeroOrOne() ? inRoot.plus(inPreds) :
       VarUsage.MORE_THAN_ONCE;
   }
 
@@ -247,9 +247,9 @@ public abstract class Filter extends Preds {
 
   @Override
   public final int exprSize() {
-    int sz = 1;
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz + root.exprSize();
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size + root.exprSize();
   }
 
   @Override

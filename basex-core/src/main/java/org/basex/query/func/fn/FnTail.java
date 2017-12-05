@@ -49,9 +49,9 @@ public final class FnTail extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // return empty sequence if value has 0 or 1 items
-    final Value val = exprs[0].value(qc);
-    final long vs = val.size() - 1;
-    return vs < 1 ? Empty.SEQ : val.subSequence(1, vs, qc);
+    final Value value = exprs[0].value(qc);
+    final long vs = value.size() - 1;
+    return vs < 1 ? Empty.SEQ : value.subSequence(1, vs, qc);
   }
 
   @Override
@@ -59,11 +59,11 @@ public final class FnTail extends StandardFunc {
     // ignore standard limitation for large values
     if(allAreValues(false)) return value(cc.qc);
 
-    final Expr ex = exprs[0];
-    final long sz = ex.size() - 1;
-    final SeqType st = ex.seqType();
-    if(sz == -1 || sz == 0 || st.zeroOrOne()) return Empty.SEQ;
-    exprType.assign(st.type, Occ.ZERO_MORE, sz);
+    final Expr expr = exprs[0];
+    final long size = expr.size() - 1;
+    final SeqType st = expr.seqType();
+    if(size == -1 || size == 0 || st.zeroOrOne()) return Empty.SEQ;
+    exprType.assign(st.type, Occ.ZERO_MORE, size);
     return this;
   }
 }

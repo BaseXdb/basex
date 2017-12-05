@@ -19,10 +19,10 @@ public final class FnFormatNumber extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // evaluate arguments
-    Item it = exprs[0].atomItem(qc, info);
-    if(it == null) it = Dbl.NAN;
-    else if(it.type.isUntyped()) it = Dbl.get(it.dbl(info));
-    else if(!it.type.isNumberOrUntyped()) throw numberError(this, it);
+    Item item = exprs[0].atomItem(qc, info);
+    if(item == null) item = Dbl.NAN;
+    else if(item.type.isUntyped()) item = Dbl.get(item.dbl(info));
+    else if(!item.type.isNumberOrUntyped()) throw numberError(this, item);
 
     // retrieve picture
     final byte[] pic = toToken(exprs[1], qc);
@@ -41,6 +41,6 @@ public final class FnFormatNumber extends StandardFunc {
     final DecFormatter df = sc.decFormat(form.id());
     if(df == null) throw FORMNUM_X.get(info, form.prefixId(XML));
 
-    return Str.get(df.format(info, (ANum) it, pic));
+    return Str.get(df.format(info, (ANum) item, pic));
   }
 }

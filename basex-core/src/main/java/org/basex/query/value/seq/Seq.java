@@ -40,7 +40,7 @@ public abstract class Seq extends Value {
   @Override
   public Object toJava() throws QueryException {
     final ArrayList<Object> obj = new ArrayList<>((int) size);
-    for(final Item it : this) obj.add(it.toJava());
+    for(final Item item : this) obj.add(item.toJava());
     return obj.toArray();
   }
 
@@ -50,13 +50,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw SEQFOUND_X.get(ii, this);
+  public final Item item(final QueryContext qc, final InputInfo info) throws QueryException {
+    throw SEQFOUND_X.get(info, this);
   }
 
   @Override
-  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return ebv(qc, ii);
+  public final Item test(final QueryContext qc, final InputInfo info) throws QueryException {
+    return ebv(qc, info);
   }
 
   @Override
@@ -160,19 +160,19 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final int hash(final InputInfo ii) throws QueryException {
+  public final int hash(final InputInfo info) throws QueryException {
     // final hash function because equivalent sequences *must* produce the
     // same hash value, otherwise they get lost in hash maps.
     // example: hash(RangeSeq(1 to 3)) == hash(ItrSeq(1, 2, 3))
     //                                 == hash(ItemSeq(Itr(1), Itr(2), Itr(3)))
     int h = 1;
-    for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);
+    for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(info);
     return h;
   }
 
   @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw SEQFOUND_X.get(ii, this);
+  public final Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
+    throw SEQFOUND_X.get(info, this);
   }
 
   @Override
@@ -181,9 +181,9 @@ public abstract class Seq extends Value {
     if(!(obj instanceof Seq)) return false;
     final Seq s = (Seq) obj;
     if(size != s.size) return false;
-    final BasicIter<Item> i1 = iter(), i2 = s.iter();
-    for(Item it1; (it1 = i1.next()) != null;) {
-      if(!it1.equals(i2.next())) return false;
+    final BasicIter<Item> iter1 = iter(), iter2 = s.iter();
+    for(Item item1; (item1 = iter1.next()) != null;) {
+      if(!item1.equals(iter2.next())) return false;
     }
     return true;
   }
@@ -230,8 +230,8 @@ public abstract class Seq extends Value {
     final StringBuilder sb = new StringBuilder(PAREN1);
     for(int i = 0; i < size; ++i) {
       sb.append(i == 0 ? "" : SEP);
-      final Item it = itemAt(i);
-      sb.append(error ? it.toErrorString() : it.toString());
+      final Item item = itemAt(i);
+      sb.append(error ? item.toErrorString() : item.toString());
       if(sb.length() <= 16 || i + 1 == size) continue;
       // output is chopped to prevent too long error strings
       sb.append(SEP).append(DOTS);

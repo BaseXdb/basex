@@ -131,11 +131,11 @@ public final class Var extends ExprInfo {
   /**
    * Tries to refine the type of this variable through the type of the bound expression.
    * @param st sequence type of the bound expression
-   * @param sz size
+   * @param size size
    * @param cc compilation context (can be {@code null})
    * @throws QueryException query exception
    */
-  public void refineType(final SeqType st, final long sz, final CompileContext cc)
+  public void refineType(final SeqType st, final long size, final CompileContext cc)
       throws QueryException {
 
     if(declType != null) {
@@ -153,7 +153,7 @@ public final class Var extends ExprInfo {
     if(!dt.eq(st) && !dt.instanceOf(st)) {
       // the new type provides new information
       final SeqType it = dt.intersect(st);
-      if(it != null) exprType.assign(it, sz);
+      if(it != null) exprType.assign(it, size);
     }
   }
 
@@ -167,29 +167,29 @@ public final class Var extends ExprInfo {
 
   /**
    * Returns an equivalent to the given expression that checks this variable's type.
-   * @param ex expression
+   * @param expr expression
    * @param cc compilation context
    * @return checked expression
    * @throws QueryException query exception
    */
-  public Expr checked(final Expr ex, final CompileContext cc) throws QueryException {
-    return checksType() ? new TypeCheck(sc, info, ex, declType, promote).optimize(cc) : ex;
+  public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
+    return checksType() ? new TypeCheck(sc, info, expr, declType, promote).optimize(cc) : expr;
   }
 
   /**
    * Checks the type of this value and casts/promotes it when necessary.
-   * @param val value to be checked
+   * @param value value to be checked
    * @param qc query context
    * @param opt if the result should be optimized
    * @return checked and possibly cast value
    * @throws QueryException if the check failed
    */
-  public Value checkType(final Value val, final QueryContext qc, final boolean opt)
+  public Value checkType(final Value value, final QueryContext qc, final boolean opt)
       throws QueryException {
 
-    if(!checksType() || declType.instance(val)) return val;
-    if(promote) return declType.promote(val, name, qc, sc, info, opt);
-    throw typeError(val, declType, name, info);
+    if(!checksType() || declType.instance(value)) return value;
+    if(promote) return declType.promote(value, name, qc, sc, info, opt);
+    throw typeError(value, declType, name, info);
   }
 
   /**

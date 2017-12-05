@@ -61,26 +61,26 @@ public final class For extends ForLet {
       public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
           // next iteration, reset iterator and counter
-          Item it = null;
+          Item item = null;
           if(iter != null) {
             if(scoring) {
               final boolean s = qc.scoring;
               try {
                 qc.scoring = true;
-                it = qc.next(iter);
+                item = qc.next(iter);
               } finally {
                 qc.scoring = s;
               }
             } else {
-              it = qc.next(iter);
+              item = qc.next(iter);
             }
           }
-          if(it != null) {
+          if(item != null) {
             // there's another item to serve
             ++p;
-            qc.set(var, it);
+            qc.set(var, item);
             if(pos != null) qc.set(pos, Int.get(p));
-            if(score != null) qc.set(score, Dbl.get(it.score()));
+            if(score != null) qc.set(score, Dbl.get(item.score()));
             return true;
           }
           if(empty && iter != null && p == 0) {
@@ -115,8 +115,8 @@ public final class For extends ForLet {
   @Override
   public For optimize(final CompileContext cc) throws QueryException {
     // assign type to clause and variable
-    final SeqType tp = expr.seqType();
-    exprType.assign(tp.type, empty && tp.mayBeEmpty() ? Occ.ZERO_ONE : Occ.ONE);
+    final SeqType type = expr.seqType();
+    exprType.assign(type.type, empty && type.mayBeEmpty() ? Occ.ZERO_ONE : Occ.ONE);
     var.refineType(seqType(), size(), cc);
     var.data = expr.data();
     if(pos != null) pos.refineType(SeqType.ITR_O, 1, cc);
@@ -210,11 +210,10 @@ public final class For extends ForLet {
 
   @Override
   void calcSize(final long[] minMax) {
-    final long sz = expr.size();
-    final long factor = sz > 0 ? sz : empty ? 1 : 0;
+    final long size = expr.size(), factor = size > 0 ? size : empty ? 1 : 0;
     minMax[0] *= factor;
     final long max = minMax[1];
-    if(max > 0) minMax[1] = sz < 0 ? -1 : max * factor;
+    if(max > 0) minMax[1] = size < 0 ? -1 : max * factor;
   }
 
   @Override

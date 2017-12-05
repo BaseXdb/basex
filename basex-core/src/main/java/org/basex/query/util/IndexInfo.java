@@ -120,11 +120,11 @@ public final class IndexInfo {
       final Iter iter = search.iter(qc);
       final ArrayList<ValueAccess> tmp = new ArrayList<>();
       final TokenSet strings = new TokenSet();
-      for(Item it; (it = qc.next(iter)) != null;) {
+      for(Item item; (item = qc.next(iter)) != null;) {
         // only strings and untyped items are supported
-        if(!it.type.isStringOrUntyped()) return false;
+        if(!item.type.isStringOrUntyped()) return false;
         // do not use text/attribute index if string is empty or too long
-        byte[] string = it.string(info);
+        byte[] string = item.string(info);
         if(trim) string = Token.trim(string);
         final int sl = string.length;
         if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
@@ -137,7 +137,7 @@ public final class IndexInfo {
           if(c == null) return false;
           final int r = c.results();
           if(r != 0) {
-            final ValueAccess va = new ValueAccess(info, it, type, test, db).trim(trim);
+            final ValueAccess va = new ValueAccess(info, item, type, test, db).trim(trim);
             tmp.add(va);
             if(r == 1) va.exprType.assign(Occ.ZERO_ONE);
           }

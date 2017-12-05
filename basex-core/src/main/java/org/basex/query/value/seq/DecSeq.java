@@ -73,15 +73,15 @@ public final class DecSeq extends NativeSeq {
   public static Value get(final Value[] values, final int size) throws QueryException {
     final BigDecimal[] tmp = new BigDecimal[size];
     int t = 0;
-    for(final Value val : values) {
+    for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) val.size();
-      if(val instanceof DecSeq) {
-        final DecSeq sq = (DecSeq) val;
-        System.arraycopy(sq.values, 0, tmp, t, vs);
+      final int vs = (int) value.size();
+      if(value instanceof DecSeq) {
+        final DecSeq seq = (DecSeq) value;
+        System.arraycopy(seq.values, 0, tmp, t, vs);
         t += vs;
       } else {
-        for(int v = 0; v < vs; v++) tmp[t++] = val.itemAt(v).dec(null);
+        for(int v = 0; v < vs; v++) tmp[t++] = value.itemAt(v).dec(null);
       }
     }
     return get(tmp);

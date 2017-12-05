@@ -51,8 +51,8 @@ public final class CmpHashG extends CmpG {
       final QueryContext qc) throws QueryException {
 
     // check if iterator is based on value with more than one item
-    final Value val2 = iter2.value();
-    if(val2 != null && val2.size() > 1) {
+    final Value value2 = iter2.value();
+    if(value2 != null && value2.size() > 1) {
       // first call: initialize cache
       CmpCache cache = caches.get();
       if(cache == null) {
@@ -61,23 +61,23 @@ public final class CmpHashG extends CmpG {
       }
 
       // check if caching is enabled
-      if(cache.active(val2, iter2)) {
+      if(cache.active(value2, iter2)) {
         final HashItemSet set = cache.set;
         Iter ir2 = cache.iter;
 
         // loop through input items
-        for(Item it1; (it1 = qc.next(iter1)) != null;) {
+        for(Item item1; (item1 = qc.next(iter1)) != null;) {
           // check if item has already been cached
-          if(set.contains(it1, info)) {
+          if(set.contains(item1, info)) {
             cache.hits++;
             return Bln.TRUE;
           }
 
           // cache remaining items (stop after first hit)
           if(ir2 != null) {
-            for(Item it2; (it2 = qc.next(ir2)) != null;) {
-              set.add(it2, info);
-              if(set.contains(it1, info)) return Bln.TRUE;
+            for(Item item2; (item2 = qc.next(ir2)) != null;) {
+              set.add(item2, info);
+              if(set.contains(item1, info)) return Bln.TRUE;
             }
             // iterator is exhausted, all items are cached
             cache.iter = null;

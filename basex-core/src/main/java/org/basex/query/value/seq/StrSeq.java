@@ -84,15 +84,15 @@ public final class StrSeq extends NativeSeq {
   public static Value get(final Value[] values, final int size) throws QueryException {
     final byte[][] tmp = new byte[size][];
     int t = 0;
-    for(final Value val : values) {
+    for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) val.size();
-      if(val instanceof StrSeq) {
-        final StrSeq sq = (StrSeq) val;
-        System.arraycopy(sq.values, 0, tmp, t, vs);
+      final int vs = (int) value.size();
+      if(value instanceof StrSeq) {
+        final StrSeq seq = (StrSeq) value;
+        System.arraycopy(seq.values, 0, tmp, t, vs);
         t += vs;
       } else {
-        for(int v = 0; v < vs; v++) tmp[t++] = val.itemAt(v).string(null);
+        for(int v = 0; v < vs; v++) tmp[t++] = value.itemAt(v).string(null);
       }
     }
     return get(tmp);

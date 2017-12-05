@@ -22,24 +22,24 @@ public final class CmpN extends Cmp {
     /** Node comparison: same. */
     EQ("is") {
       @Override
-      public boolean eval(final ANode it1, final ANode it2) {
-        return it1.is(it2);
+      public boolean eval(final ANode item1, final ANode item2) {
+        return item1.is(item2);
       }
     },
 
     /** Node comparison: before. */
     ET("<<") {
       @Override
-      public boolean eval(final ANode it1, final ANode it2) {
-        return it1.diff(it2) < 0;
+      public boolean eval(final ANode item1, final ANode item2) {
+        return item1.diff(item2) < 0;
       }
     },
 
     /** Node comparison: after. */
     GT(">>") {
       @Override
-      public boolean eval(final ANode it1, final ANode it2) {
-        return it1.diff(it2) > 0;
+      public boolean eval(final ANode item1, final ANode item2) {
+        return item1.diff(item2) > 0;
       }
     };
 
@@ -58,11 +58,11 @@ public final class CmpN extends Cmp {
 
     /**
      * Evaluates the expression.
-     * @param it1 first node
-     * @param it2 second node
+     * @param item1 first node
+     * @param item2 second node
      * @return result
      */
-    public abstract boolean eval(ANode it1, ANode it2);
+    public abstract boolean eval(ANode item1, ANode item2);
 
     @Override
     public String toString() {

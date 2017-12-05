@@ -97,21 +97,21 @@ public abstract class TreeSeq extends Seq {
   public abstract BasicIter<Item> iter();
 
   @Override
-  public final void materialize(final InputInfo ii) throws QueryException {
-    for(final Item it : this) it.materialize(ii);
+  public final void materialize(final InputInfo info) throws QueryException {
+    for(final Item item : this) item.materialize(info);
   }
 
   @Override
-  public final Seq atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Seq atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
-    for(final Item it : this) tsb.add(it.atomValue(qc, ii), qc);
+    for(final Item item : this) tsb.add(item.atomValue(qc, info), qc);
     return tsb.seq();
   }
 
   @Override
   public final long atomSize() {
     long s = 0;
-    for(final Item it : this) s += it.atomSize();
+    for(final Item item : this) s += item.atomSize();
     return s;
   }
 
@@ -126,10 +126,10 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Item ebv(final QueryContext qc, final InputInfo info) throws QueryException {
     final Item head = itemAt(0);
     if(head instanceof ANode) return head;
-    throw EBV_X.get(ii, this);
+    throw EBV_X.get(info, this);
   }
 
   /**

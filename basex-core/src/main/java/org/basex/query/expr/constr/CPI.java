@@ -33,15 +33,16 @@ public final class CPI extends CName {
 
   @Override
   public FPI item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
-    final Type ip = it.type;
+    final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
+    final Type type = item.type;
     final QNm qnm;
-    if(ip == AtomType.QNM) {
-      qnm = (QNm) it;
+    if(type == AtomType.QNM) {
+      qnm = (QNm) item;
     } else {
-      if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw CPIWRONG_X_X.get(info, ip, it);
+      if(!type.isStringOrUntyped() || type == AtomType.URI)
+        throw CPIWRONG_X_X.get(info, type, item);
 
-      final byte[] nm = trim(it.string(info));
+      final byte[] nm = trim(item.string(info));
       if(eq(lc(nm), XML)) throw CPIXML_X.get(info, nm);
       if(!XMLToken.isNCName(nm)) throw CPIINVAL_X.get(info, nm);
       qnm = new QNm(nm);

@@ -69,24 +69,24 @@ public final class TransformWith extends Arr {
     final ValueBuilder vb = new ValueBuilder(qc);
     try {
       final Iter iter = exprs[0].iter(qc);
-      for(Item it; (it = qc.next(iter)) != null;) {
-        if(!(it instanceof ANode)) throw UPSOURCE_X.get(info, it);
+      for(Item item; (item = qc.next(iter)) != null;) {
+        if(!(item instanceof ANode)) throw UPSOURCE_X.get(info, item);
 
         // copy node to main memory data instance
-        it = ((ANode) it).dbNodeCopy(qc.context.options, qc);
+        item = ((ANode) item).dbNodeCopy(qc.context.options, qc);
         // set resulting node as context
-        qf.value = it;
+        qf.value = item;
 
         final Updates updates = new Updates(true);
         qc.updates = updates;
-        updates.addData(it.data());
+        updates.addData(item.data());
 
-        final Value v = exprs[1].value(qc);
-        if(!v.isEmpty()) throw UPMODIFY.get(info);
+        final Value value = exprs[1].value(qc);
+        if(!value.isEmpty()) throw UPMODIFY.get(info);
 
         updates.prepare(qc);
         updates.apply(qc);
-        vb.add(it);
+        vb.add(item);
       }
     } finally {
       qc.updates = upd;
@@ -119,8 +119,8 @@ public final class TransformWith extends Arr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
   }
 }

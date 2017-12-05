@@ -35,9 +35,9 @@ public final class Range extends Arr {
     if(oneIsEmpty()) return cc.emptySeq(this);
     if(allAreValues(false)) return cc.preEval(this);
 
-    final Expr e1 = exprs[0], e2 = exprs[1];
-    if(e1.equals(e2)) {
-      if(e1.seqType().instanceOf(SeqType.ITR_O)) return cc.replaceWith(this, e1);
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1.equals(expr2)) {
+      if(expr1.seqType().instanceOf(SeqType.ITR_O)) return cc.replaceWith(this, expr1);
       exprType.assign(Occ.ONE);
     }
     return this;
@@ -50,11 +50,11 @@ public final class Range extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item it1 = exprs[0].atomItem(qc, info);
-    if(it1 == null) return Empty.SEQ;
-    final Item it2 = exprs[1].atomItem(qc, info);
-    if(it2 == null) return Empty.SEQ;
-    final long min = toLong(it1), max = toLong(it2);
+    final Item item1 = exprs[0].atomItem(qc, info);
+    if(item1 == null) return Empty.SEQ;
+    final Item item2 = exprs[1].atomItem(qc, info);
+    if(item2 == null) return Empty.SEQ;
+    final long min = toLong(item1), max = toLong(item2);
     // min smaller than max: empty sequence
     if(min > max) return Empty.SEQ;
     // max smaller than min: create range

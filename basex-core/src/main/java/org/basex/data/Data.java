@@ -503,7 +503,7 @@ public abstract class Data {
       final int nsPre = kind == ATTR ? parent(pre, kind) : pre;
       final int uriId = nsFlag ? nspaces.add(nsPre, prefix, uri, this) :
         oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
-      final int sz = size(pre, kind);
+      final int size = size(pre, kind);
 
       // write ids of namespace uri and name, and namespace flag
       if(kind == ATTR) {
@@ -526,7 +526,7 @@ public abstract class Data {
         final IntList pres = new IntList();
         // update text index
         if(meta.updindex && meta.textindex) {
-          final int last = pre + sz;
+          final int last = pre + size;
           for(int curr = pre + attSize(pre, kind); curr < last; curr += size(curr, kind(curr))) {
             if(kind(curr) == TEXT) pres.add(curr);
           }

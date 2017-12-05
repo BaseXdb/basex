@@ -34,8 +34,8 @@ public final class IterFilter extends Filter {
         // first call - initialize iterator
         if(iter == null) iter = root.iter(qc);
         // filter sequence
-        for(Item it; (it = qc.next(iter)) != null;) {
-          if(preds(it, qc)) return it;
+        for(Item item; (item = qc.next(iter)) != null;) {
+          if(preds(item, qc)) return item;
         }
         return null;
       }

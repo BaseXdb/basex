@@ -28,14 +28,14 @@ public final class FnApply extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem fun = toFunc(exprs[0], qc);
-    return fun.invokeValue(qc, info, values(fun, qc));
+    final FItem func = toFunc(exprs[0], qc);
+    return func.invokeValue(qc, info, values(func, qc));
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FItem fun = toFunc(exprs[0], qc);
-    return fun.invokeItem(qc, info, values(fun, qc));
+    final FItem func = toFunc(exprs[0], qc);
+    return func.invokeItem(qc, info, values(func, qc));
   }
 
   /**
@@ -53,22 +53,22 @@ public final class FnApply extends StandardFunc {
     final long ar = fun.arity(), as = array.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, ar, as);
 
-    final ValueList vl = new ValueList(as);
-    for(final Value val : array.members()) vl.add(val);
-    return vl.finish();
+    final ValueList values = new ValueList(as);
+    for(final Value value : array.members()) values.add(value);
+    return values.finish();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    final Type t1 = ex1.seqType().type, t2 = ex2.seqType().type;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final Type t1 = expr1.seqType().type, t2 = expr2.seqType().type;
     final FuncType ft1 = t1 instanceof FuncType ? (FuncType) t1 : null;
 
     // try to pass on types of array argument to function item
     if(t2 instanceof ArrayType) {
-      if(ex2 instanceof Array) {
+      if(expr2 instanceof Array) {
         // argument is a value: final types are known
-        final Array arr = (Array) ex2;
+        final Array arr = (Array) expr2;
         final int as = Math.max(0, (int) arr.arraySize());
         final SeqType[] args = new SeqType[as];
         for(int a = 0; a < as; a++) args[a] = arr.get(a).seqType();

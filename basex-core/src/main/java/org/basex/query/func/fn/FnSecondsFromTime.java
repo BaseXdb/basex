@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnSecondsFromTime extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
-    return it == null ? null : Dec.get(checkDate(it, AtomType.TIM, qc).sec());
+    final Item item = exprs[0].atomItem(qc, info);
+    return item == null ? null : Dec.get(checkDate(item, AtomType.TIM, qc).sec());
   }
 }

@@ -78,13 +78,13 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   final Expr opt(final OpV op, final CompileContext cc) throws QueryException {
-    Expr ex = optEqual(op, true, cc);
-    if(ex == this) ex = optFalse(op, cc);
-    if(ex == this) ex = optCount(op, cc);
-    if(ex == this) ex = optStringLength(op, cc);
-    if(ex == this) ex = ItrPos.get(this, op, info);
-    if(ex == this) ex = Pos.get(this, op, info, cc);
-    return ex;
+    Expr expr = optEqual(op, true, cc);
+    if(expr == this) expr = optFalse(op, cc);
+    if(expr == this) expr = optCount(op, cc);
+    if(expr == this) expr = optStringLength(op, cc);
+    if(expr == this) expr = ItrPos.get(this, op, info);
+    if(expr == this) expr = Pos.get(this, op, info, cc);
+    return expr;
   }
 
   /**
@@ -101,12 +101,12 @@ public abstract class Cmp extends Arr {
    * @return resulting expression
    */
   final Expr optEqual(final OpV op, final boolean single, final CompileContext cc) {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if((op == OpV.EQ || single && op == OpV.NE) && ex1.equals(ex2) && !ex1.has(Flag.NDT) &&
-        (!ex1.has(Flag.CTX) || cc.qc.focus.value != null)) {
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if((op == OpV.EQ || single && op == OpV.NE) && expr1.equals(expr2) && !expr1.has(Flag.NDT) &&
+        (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       /* consider query flags
        * illegal: random:integer() eq random:integer() */
-      final SeqType st1 = ex1.seqType();
+      final SeqType st1 = expr1.seqType();
       final Type t1 = st1.type;
       final boolean one = single ? st1.one() : st1.oneOrMore();
       /* limited to strings, integers and booleans.
@@ -125,9 +125,9 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   final Expr optFalse(final OpV op, final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    return ex1.seqType().eq(SeqType.BLN_O) && (op == OpV.EQ && ex2 == Bln.FALSE ||
-        op == OpV.NE && ex2 == Bln.TRUE) ?  cc.function(Function.NOT, info, ex1) : this;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    return expr1.seqType().eq(SeqType.BLN_O) && (op == OpV.EQ && expr2 == Bln.FALSE ||
+        op == OpV.NE && expr2 == Bln.TRUE) ?  cc.function(Function.NOT, info, expr1) : this;
   }
 
   /**
@@ -138,18 +138,18 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   final Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if(!(ex1.isFunction(Function.COUNT) && ex2 instanceof Item)) return this;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(!(expr1.isFunction(Function.COUNT) && expr2 instanceof Item)) return this;
 
     // evaluate argument
-    final Item it2 = (Item) ex2;
-    if(!it2.type.isNumberOrUntyped()) return this;
+    final Item item2 = (Item) expr2;
+    if(!item2.type.isNumberOrUntyped()) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    final int type = check(op, it2);
+    final int type = check(op, item2);
     if(type >= 2) {
       final Function func = type == 2 ? Function.EXISTS : Function.EMPTY;
-      return cc.function(func, info, ((Arr) ex1).exprs);
+      return cc.function(func, info, ((Arr) expr1).exprs);
     }
     if(type >= 0) {
       return Bln.get(type == 0);
@@ -165,16 +165,16 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   final Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if(!(ex1.isFunction(Function.STRING_LENGTH) && ex2 instanceof Item)) return this;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(!(expr1.isFunction(Function.STRING_LENGTH) && expr2 instanceof Item)) return this;
 
     // evaluate argument
-    final Item it2 = (Item) ex2;
-    if(!it2.type.isNumberOrUntyped()) return this;
+    final Item item2 = (Item) expr2;
+    if(!item2.type.isNumberOrUntyped()) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    final Expr[] args = ((Arr) ex1).exprs;
-    final int type = check(op, it2);
+    final Expr[] args = ((Arr) expr1).exprs;
+    final int type = check(op, item2);
     if(type >= 2) {
       final Function func = type == 2 ? Function.BOOLEAN : Function.NOT;
       return cc.function(func, info, cc.function(Function.STRING, info, args));
@@ -199,12 +199,12 @@ public abstract class Cmp extends Arr {
    *   <li>-1: none of them</li>
    * </ul>
    * @param op operator
-   * @param it input item
+   * @param item input item
    * @return comparison type
    * @throws QueryException query exception
    */
-  private int check(final OpV op, final Item it) throws QueryException {
-    final double v = it.dbl(info);
+  private int check(final OpV op, final Item item) throws QueryException {
+    final double v = item.dbl(info);
     // > (v<0), != (v<0), >= (v<=0), != integer(v)
     if((op == OpV.GT || op == OpV.NE) && v < 0 || op == OpV.GE && v <= 0 ||
        op == OpV.NE && v != (long) v) return 0;

@@ -67,17 +67,17 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  public Item item(final QueryContext qc, final InputInfo info) {
     return null;
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) {
+  public Item ebv(final QueryContext qc, final InputInfo info) {
     return Bln.FALSE;
   }
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo ii) {
+  public Item test(final QueryContext qc, final InputInfo info) {
     return null;
   }
 
@@ -97,7 +97,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public int hash(final InputInfo ii) {
+  public int hash(final InputInfo info) {
     return 0;
   }
 
@@ -117,15 +117,15 @@ public final class Empty extends Value {
   }
 
   @Override
-  public void materialize(final InputInfo ii) { }
+  public void materialize(final InputInfo info) { }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) {
+  public Value atomValue(final QueryContext qc, final InputInfo info) {
     return this;
   }
 
   @Override
-  public Item atomItem(final QueryContext qc, final InputInfo ii) {
+  public Item atomItem(final QueryContext qc, final InputInfo info) {
     return null;
   }
 

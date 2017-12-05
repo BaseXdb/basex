@@ -15,14 +15,14 @@ import org.basex.query.value.seq.*;
 public final class FnUnparsedTextLines extends Parse {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Item it = unparsedText(qc, false, true);
-    return it == null ? Empty.ITER : lineIter(it.string(info));
+    final Item item = unparsedText(qc, false, true);
+    return item == null ? Empty.ITER : lineIter(item.string(info));
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item it = unparsedText(qc, false, true);
-    return it == null ? Empty.SEQ : lines(it.string(info));
+    final Item item = unparsedText(qc, false, true);
+    return item == null ? Empty.SEQ : lines(item.string(info));
   }
 
   @Override

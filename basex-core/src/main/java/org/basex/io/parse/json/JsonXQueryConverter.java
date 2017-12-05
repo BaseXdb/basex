@@ -55,8 +55,8 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   public Item finish() {
-    final Value v = stack.pop();
-    return v.isEmpty() ? null : (Item) v;
+    final Value value = stack.pop();
+    return value.isEmpty() ? null : (Item) value;
   }
 
   @Override
@@ -71,11 +71,11 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   void closePair(final boolean add) throws QueryIOException {
-    final Value val = stack.pop();
+    final Value value = stack.pop();
     final Item key = (Item) stack.pop();
     if(add) {
       try {
-        maps.push(maps.pop().put(key, val, null));
+        maps.push(maps.pop().put(key, value, null));
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }

@@ -149,14 +149,14 @@ public class CmpG extends Cmp {
     }
 
     // optimize expression
-    Expr ex = opt(op.op, cc);
+    Expr expr = opt(op.op, cc);
     // range comparisons
-    if(ex == this) ex = CmpR.get(this, cc);
-    if(ex == this) ex = CmpSR.get(this, cc);
+    if(expr == this) expr = CmpR.get(this, cc);
+    if(expr == this) expr = CmpSR.get(this, cc);
 
     // try to skip type checking at runtime
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
     // skip type check if types are identical (and a child instance of of any atomic type)
     check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) &&
@@ -167,16 +167,16 @@ public class CmpG extends Cmp {
         t1.instanceOf(AtomType.DUR) && t2.instanceOf(AtomType.DUR));
 
     // simple comparisons
-    if(ex == this && st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray())
-      ex = new CmpSimpleG(ex1, ex2, op, coll, sc, info);
+    if(expr == this && st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray())
+      expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
 
     // hash-based comparisons
-    if(ex == this && op == OpG.EQ && coll == null && (t1.isNumber() && t2.isNumber() ||
+    if(expr == this && op == OpG.EQ && coll == null && (t1.isNumber() && t2.isNumber() ||
         (t1.isStringOrUntyped() && t2.isStringOrUntyped())) && !st2.zeroOrOne())
-      ex = new CmpHashG(ex1, ex2, op, coll, sc, info);
+      expr = new CmpHashG(expr1, expr2, op, coll, sc, info);
 
     // pre-evaluate values or return expression
-    return allAreValues(false) ? cc.preEval(ex) : cc.replaceWith(this, ex);
+    return allAreValues(false) ? cc.preEval(expr) : cc.replaceWith(this, expr);
   }
 
   @Override
@@ -189,52 +189,52 @@ public class CmpG extends Cmp {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir1 = exprs[0].atomIter(qc, info);
-    final long is1 = ir1.size();
-    if(is1 == 0) return Bln.FALSE;
-    final Iter ir2 = exprs[1].atomIter(qc, info);
-    final long is2 = ir2.size();
-    return is2 == 0 ? Bln.FALSE : compare(ir1, ir2, is1, is2, qc);
+    final Iter iter1 = exprs[0].atomIter(qc, info);
+    final long size1 = iter1.size();
+    if(size1 == 0) return Bln.FALSE;
+    final Iter iter2 = exprs[1].atomIter(qc, info);
+    final long size2 = iter2.size();
+    return size2 == 0 ? Bln.FALSE : compare(iter1, iter2, size1, size2, qc);
   }
 
   /**
    * Compares all values of the first and second iterators.
    * @param iter1 first iterator
    * @param iter2 second iterator
-   * @param is1 size of first iterator
-   * @param is2 size of second iterator
+   * @param size1 size of first iterator
+   * @param size2 size of second iterator
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  Bln compare(final Iter iter1, final Iter iter2, final long is1, final long is2,
+  Bln compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
       final QueryContext qc) throws QueryException {
 
     // evaluate single items
     Iter ir1 = iter1, ir2 = iter2;
-    final boolean s1 = is1 == 1, s2 = is2 == 1;
-    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
+    final boolean single1 = size1 == 1, single2 = size2 == 1;
+    if(single1 && single2) return Bln.get(eval(ir1.next(), ir2.next()));
 
-    if(s1) {
+    if(single1) {
       // first iterator yields single result
-      final Item it1 = ir1.next();
-      for(Item it2; (it2 = qc.next(ir2)) != null;) {
-        if(eval(it1, it2)) return Bln.TRUE;
+      final Item item1 = ir1.next();
+      for(Item item2; (item2 = qc.next(ir2)) != null;) {
+        if(eval(item1, item2)) return Bln.TRUE;
       }
       return Bln.FALSE;
     }
 
-    if(s2) {
+    if(single2) {
       // second iterator yields single result
-      final Item it2 = ir2.next();
-      for(Item it1; (it1 = qc.next(ir1)) != null;) {
-        if(eval(it1, it2)) return Bln.TRUE;
+      final Item item2 = ir2.next();
+      for(Item item1; (item1 = qc.next(ir1)) != null;) {
+        if(eval(item1, item2)) return Bln.TRUE;
       }
       return Bln.FALSE;
     }
 
     // swap iterators if first iterator returns more results than second
-    final boolean swap = is1 > is2;
+    final boolean swap = size1 > size2;
     if(swap) {
       final Iter iter = ir1;
       ir1 = ir2;
@@ -242,10 +242,10 @@ public class CmpG extends Cmp {
     }
 
     // loop through all items of first and second iterator
-    for(Item it1; (it1 = ir1.next()) != null;) {
+    for(Item item1; (item1 = ir1.next()) != null;) {
       if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
-      for(Item it2; (it2 = qc.next(ir2)) != null;) {
-        if(swap ? eval(it2, it1) : eval(it1, it2)) return Bln.TRUE;
+      for(Item item2; (item2 = qc.next(ir2)) != null;) {
+        if(swap ? eval(item2, item1) : eval(item1, item2)) return Bln.TRUE;
       }
       ir2 = null;
     }
@@ -255,28 +255,28 @@ public class CmpG extends Cmp {
 
   /**
    * Compares a single item.
-   * @param it1 first item to be compared
-   * @param it2 second item to be compared
+   * @param item1 first item to be compared
+   * @param item2 second item to be compared
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean eval(final Item it1, final Item it2) throws QueryException {
+  final boolean eval(final Item item1, final Item item2) throws QueryException {
     if(check) {
-      final Type t1 = it1.type, t2 = it2.type;
+      final Type t1 = item1.type, t2 = item2.type;
       if(!(t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
-          it1 instanceof ANum && it2 instanceof ANum ||
-          it1 instanceof AStr && it2 instanceof AStr ||
-          it1 instanceof Dur && it2 instanceof Dur)) throw diffError(it1, it2, info);
+          item1 instanceof ANum && item2 instanceof ANum ||
+          item1 instanceof AStr && item2 instanceof AStr ||
+          item1 instanceof Dur && item2 instanceof Dur)) throw diffError(item1, item2, info);
     }
-    return op.op.eval(it1, it2, coll, sc, info);
+    return op.op.eval(item1, item2, coll, sc, info);
   }
 
   @Override
   public final Expr invert(final CompileContext cc) throws QueryException {
-    final Expr e1 = exprs[0], e2 = exprs[1];
-    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.oneNoArray() && st2.oneNoArray() ?
-      new CmpG(e1, e2, op.invert(), coll, sc, info).optimize(cc) : this;
+      new CmpG(expr1, expr2, op.invert(), coll, sc, info).optimize(cc) : this;
   }
 
   /**

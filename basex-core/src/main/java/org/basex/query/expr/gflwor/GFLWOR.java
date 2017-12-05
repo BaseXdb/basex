@@ -56,10 +56,10 @@ public final class GFLWOR extends ParseExpr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Item out = null;
     for(final Eval eval = newEval(); eval.next(qc);) {
-      final Item it = ret.item(qc, info);
-      if(it != null) {
-        if(out != null) throw QueryError.SEQFOUND_X.get(info, ValueBuilder.concat(out, it, qc));
-        out = it;
+      final Item item = ret.item(qc, info);
+      if(item != null) {
+        if(out != null) throw QueryError.SEQFOUND_X.get(info, ValueBuilder.concat(out, item, qc));
+        out = item;
       }
     }
     return out;
@@ -86,8 +86,8 @@ public final class GFLWOR extends ParseExpr {
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item it = qc.next(sub);
-          if(it != null) return it;
+          final Item item = qc.next(sub);
+          if(item != null) return item;
           if(!ev.next(qc)) {
             sub = null;
             return null;
@@ -121,10 +121,10 @@ public final class GFLWOR extends ParseExpr {
     while(iter.hasNext()) {
       final Clause clause = iter.next();
       if(clause instanceof Where) {
-        final Where wh = (Where) clause;
-        if(wh.expr instanceof And) {
+        final Where where = (Where) clause;
+        if(where.expr instanceof And) {
           iter.remove();
-          for(final Expr e : ((Arr) wh.expr).exprs) iter.add(new Where(e, wh.info));
+          for(final Expr expr : ((Arr) where.expr).exprs) iter.add(new Where(expr, where.info));
         }
       }
     }
@@ -236,20 +236,20 @@ public final class GFLWOR extends ParseExpr {
 
     calcSize();
 
-    final long sz = size();
-    if(sz != -1 && !has(Flag.NDT)) {
-      if(sz == 0) return cc.emptySeq(this);
+    final long size = size();
+    if(size != -1 && !has(Flag.NDT)) {
+      if(size == 0) return cc.emptySeq(this);
       Expr rep = null;
       if(ret instanceof Value) {
         // rewrite expression with next value as singleton sequence
-        rep = SingletonSeq.get((Value) ret, sz / ret.size());
+        rep = SingletonSeq.get((Value) ret, size / ret.size());
       } else if(!ret.has(Flag.CTX, Flag.POS) && !varsInReturn()) {
         // skip expression that relies on the context
-        if(sz == 1) {
+        if(size == 1) {
           rep = ret;
         } else if(!ret.has(Flag.NDT, Flag.CNS)) {
           // replace expression with replicated expression
-          rep = cc.function(Function._UTIL_REPLICATE, info, ret, Int.get(sz / ret.size()));
+          rep = cc.function(Function._UTIL_REPLICATE, info, ret, Int.get(size / ret.size()));
         }
       }
       if(rep != null) return cc.replaceWith(this, rep);
@@ -286,10 +286,10 @@ public final class GFLWOR extends ParseExpr {
       if(minMax[1] != 0) clause.calcSize(minMax);
     }
     if(minMax[1] != 0) {
-      final long sz = ret.size();
-      minMax[0] *= Math.max(sz, 0);
+      final long size = ret.size();
+      minMax[0] *= Math.max(size, 0);
       final long max = minMax[1];
-      if(max > 0) minMax[1] = sz < 0 ? -1 : max * sz;
+      if(max > 0) minMax[1] = size < 0 ? -1 : max * size;
     }
     exprType.assign(ret.seqType().type, minMax);
   }
@@ -434,9 +434,9 @@ public final class GFLWOR extends ParseExpr {
 
         if(!thisRound && (isFor || isLet)) {
           // let $x := (let $y := E return F)  ==>  let $y := E let $x := F
-          final Expr ex = isFor ? ((For) clause).expr : ((Let) clause).expr;
-          if(ex instanceof GFLWOR) {
-            final GFLWOR fl = (GFLWOR) ex;
+          final Expr expr = isFor ? ((For) clause).expr : ((Let) clause).expr;
+          if(expr instanceof GFLWOR) {
+            final GFLWOR fl = (GFLWOR) expr;
             final LinkedList<Clause> cls = fl.clauses;
             if(cls.getFirst() instanceof Let) {
               // remove the binding from the outer clauses
@@ -654,12 +654,12 @@ public final class GFLWOR extends ParseExpr {
         if(wh.expr == Bln.FALSE) return;
         if(before != null) {
           iter.remove();
-          final Expr ex = before.expr;
-          if(ex instanceof And) {
-            final And and = (And) ex;
+          final Expr expr = before.expr;
+          if(expr instanceof And) {
+            final And and = (And) expr;
             and.exprs = ExprList.concat(and.exprs, wh.expr);
           } else {
-            before.expr = new And(before.info, ex, wh.expr);
+            before.expr = new And(before.info, expr, wh.expr);
           }
         } else {
           before = wh;
@@ -825,9 +825,9 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Clause clause : clauses) sz += clause.exprSize();
-    return ret.exprSize() + sz;
+    int size = 1;
+    for(final Clause clause : clauses) size += clause.exprSize();
+    return ret.exprSize() + size;
   }
 
   @Override

@@ -20,23 +20,23 @@ public final class MapPut extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Map map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
-    final Value val = exprs[2].value(qc);
-    return map.put(key, val, info);
+    final Value value = exprs[2].value(qc);
+    return map.put(key, value, info);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex1 = exprs[0], ex2 = exprs[1], ex3 = exprs[2];
-    final Type t = ex1.seqType().type;
+    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
+    final Type t = expr1.seqType().type;
     if(t instanceof MapType) {
-      Type kt = ex2.seqType().atomicType();
+      Type kt = expr2.seqType().atomicType();
       if(kt != null) {
-        SeqType st = ex3.seqType();
+        SeqType st = expr3.seqType();
         // merge types if input is expected to have at least one entry
-        if(!(ex1 instanceof Map && ((Map) ex1).mapSize() == 0)) {
+        if(!(expr1 instanceof Map && ((Map) expr1).mapSize() == 0)) {
           final MapType mt = (MapType) t;
           kt = mt.keyType().union(kt);
-          st = mt.declType.union(ex3.seqType());
+          st = mt.declType.union(expr3.seqType());
         }
         exprType.assign(MapType.get((AtomType) kt, st));
       }

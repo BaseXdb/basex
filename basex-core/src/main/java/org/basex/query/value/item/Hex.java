@@ -23,38 +23,40 @@ public final class Hex extends Bin {
   /**
    * Constructor.
    * @param value textual representation
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public Hex(final byte[] value, final InputInfo ii) throws QueryException {
-    super(parse(Token.trim(value), ii), AtomType.HEX);
+  public Hex(final byte[] value, final InputInfo info) throws QueryException {
+    super(parse(Token.trim(value), info), AtomType.HEX);
   }
 
   /**
    * Constructor.
    * @param bin binary data
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public Hex(final Bin bin, final InputInfo ii) throws QueryException {
-    this(bin.binary(ii));
+  public Hex(final Bin bin, final InputInfo info) throws QueryException {
+    this(bin.binary(info));
   }
 
   @Override
-  public byte[] string(final InputInfo ii) throws QueryException {
-    return Token.hex(binary(ii), true);
+  public byte[] string(final InputInfo info) throws QueryException {
+    return Token.hex(binary(info), true);
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) : parse(it, ii));
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
+    return Token.eq(binary(info), bin);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
+  public int diff(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
-    return Token.diff(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) : parse(it, ii));
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
+    return Token.diff(binary(info), bin);
   }
 
   /**

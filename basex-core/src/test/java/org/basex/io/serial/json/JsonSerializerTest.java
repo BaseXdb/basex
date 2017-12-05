@@ -201,7 +201,7 @@ public final class JsonSerializerTest extends SandboxTest {
       sopts.set(SerializerOptions.JSON, jopts);
 
       try(Serializer ser = Serializer.get(ao, sopts)) {
-        for(final Item it : qp.value()) ser.serialize(it);
+        for(final Item item : qp.value()) ser.serialize(item);
       }
     }
     // replace quotes with apostrophes to increase legibility of tests

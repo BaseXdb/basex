@@ -35,72 +35,72 @@ public final class Pos extends Arr {
    * Returns an instance of this class, the original expression, or an optimized expression.
    * @param cmp comparison expression
    * @param op comparator
-   * @param ii input info
+   * @param info input info
    * @param cc compilation context
    * @return resulting or original expression
    * @throws QueryException query exception
    */
-  public static Expr get(final Cmp cmp, final OpV op, final InputInfo ii,
+  public static Expr get(final Cmp cmp, final OpV op, final InputInfo info,
       final CompileContext cc) throws QueryException {
 
-    final Expr ex1 = cmp.exprs[0], ex2 = cmp.exprs[1];
-    if(!ex1.isFunction(Function.POSITION)) return cmp;
+    final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+    if(!cmp1.isFunction(Function.POSITION)) return cmp;
 
     Expr min = null, max = null;
-    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
-    if(ex2.isSimple()) {
-      if(ex2 instanceof Range && op == OpV.EQ) {
-        final Range r = (Range) ex2;
-        final Expr e1 = r.exprs[0], e2 = r.exprs[1];
+    final SeqType st1 = cmp1.seqType(), st2 = cmp2.seqType();
+    if(cmp2.isSimple()) {
+      if(cmp2 instanceof Range && op == OpV.EQ) {
+        final Range range = (Range) cmp2;
+        final Expr start = range.exprs[0], end = range.exprs[1];
         if(st1.type.instanceOf(AtomType.ITR) && st2.type.instanceOf(AtomType.ITR)) {
-          min = e1;
-          max = e1.equals(e2) ? e1 : e2;
+          min = start;
+          max = start.equals(end) ? start : end;
         }
       } else if(st2.oneNoArray()) {
         switch(op) {
           case EQ:
-            min = ex2;
-            max = ex2;
+            min = cmp2;
+            max = cmp2;
             break;
           case GE:
-            min = ex2;
+            min = cmp2;
             max = Int.MAX;
             break;
           case GT:
-            min = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? ex2 :
-              cc.function(Function.FLOOR, ii, ex2), Int.ONE, Calc.PLUS);
+            min = new Arith(info, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
+              cc.function(Function.FLOOR, info, cmp2), Int.ONE, Calc.PLUS);
             max = Int.MAX;
             break;
           case LE:
             min = Int.ONE;
-            max = ex2;
+            max = cmp2;
             break;
           case LT:
             min = Int.ONE;
-            max = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? ex2 :
-              cc.function(Function.CEILING, ii, ex2), Int.ONE, Calc.MINUS);
+            max = new Arith(info, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
+              cc.function(Function.CEILING, info, cmp2), Int.ONE, Calc.MINUS);
             break;
           default:
         }
       }
     }
-    return min == null ? cmp : new Pos(ii, min, max);
+    return min == null ? cmp : new Pos(info, min, max);
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
 
-    final Item it1 = exprs[0].atomItem(qc, info);
-    if(it1 == null) return Bln.FALSE;
+    final Item item1 = exprs[0].atomItem(qc, info);
+    if(item1 == null) return Bln.FALSE;
     final long pos = qc.focus.pos;
-    final double s = toDouble(it1);
-    if(eq()) return Bln.get(pos == s);
+    final double start = toDouble(item1);
+    if(eq()) return Bln.get(pos == start);
 
-    final Item it2 = exprs[1].atomItem(qc, info);
-    if(it2 == null) return Bln.FALSE;
-    final double e = toDouble(it2);
-    return Bln.get(pos >= s && pos <= e);
+    final Item item2 = exprs[1].atomItem(qc, info);
+    if(item2 == null) return Bln.FALSE;
+    final double end = toDouble(item2);
+    return Bln.get(pos >= start && pos <= end);
   }
 
   @Override

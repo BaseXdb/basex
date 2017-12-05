@@ -92,14 +92,14 @@ public final class If extends Arr {
         // if(A) then false() else true() -> not(A)
         if(b == Bln.FALSE) return cc.replaceWith(this, cc.function(Function.NOT, info, a));
         // if(A) then B else true() -> not(A) or B
-        final Expr ex = new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
-        return cc.replaceWith(this, ex);
+        final Expr expr = new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
+        return cc.replaceWith(this, expr);
       }
 
       // if(A) then false() else C -> not(A) and C
       if(b == Bln.FALSE) {
-        final Expr ex = new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
-        return cc.replaceWith(this, ex);
+        final Expr expr = new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
+        return cc.replaceWith(this, expr);
       }
 
       // if(A) then B else false() -> A and B
@@ -196,9 +196,9 @@ public final class If extends Arr {
 
   @Override
   public int exprSize() {
-    int sz = cond.exprSize();
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
+    int size = cond.exprSize();
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
   }
 
   @Override
@@ -206,15 +206,15 @@ public final class If extends Arr {
     boolean changed = false;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      Expr ex = exprs[e];
+      Expr expr = exprs[e];
       try {
-        ex = tc.check(ex, cc);
+        expr = tc.check(expr, cc);
       } catch(final QueryException qe) {
-        ex = cc.error(qe, ex);
+        expr = cc.error(qe, expr);
       }
-      if(ex != exprs[e]) {
+      if(expr != exprs[e]) {
         changed = true;
-        exprs[e] = ex;
+        exprs[e] = expr;
       }
     }
     return changed ? optimize(cc) : this;

@@ -17,9 +17,9 @@ public final class ArrayInsertBefore extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Array array = toArray(exprs[0], qc);
-    final long p = checkPos(array, toLong(exprs[1], qc), true);
-    final Value val = exprs[2].value(qc);
-    return array.insertBefore(p, val, qc);
+    final long pos = checkPos(array, toLong(exprs[1], qc), true);
+    final Value value = exprs[2].value(qc);
+    return array.insertBefore(pos, value, qc);
   }
 
   @Override

@@ -25,9 +25,9 @@ public final class CmpV extends Cmp {
     /** Item comparison: less or equal. */
     LE("le") {
       @Override
-      public boolean eval(final Item it1, final Item it2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = it1.diff(it2, coll, ii);
+      public boolean eval(final Item item1, final Item item2, final Collation coll,
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        final int v = item1.diff(item2, coll, info);
         return v != Item.UNDEF && v <= 0;
       }
       @Override
@@ -39,9 +39,9 @@ public final class CmpV extends Cmp {
     /** Item comparison: less. */
     LT("lt") {
       @Override
-      public boolean eval(final Item it1, final Item it2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = it1.diff(it2, coll, ii);
+      public boolean eval(final Item item1, final Item item2, final Collation coll,
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        final int v = item1.diff(item2, coll, info);
         return v != Item.UNDEF && v < 0;
       }
       @Override
@@ -53,9 +53,9 @@ public final class CmpV extends Cmp {
     /** Item comparison: greater of equal. */
     GE("ge") {
       @Override
-      public boolean eval(final Item it1, final Item it2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = it1.diff(it2, coll, ii);
+      public boolean eval(final Item item1, final Item item2, final Collation coll,
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        final int v = item1.diff(item2, coll, info);
         return v != Item.UNDEF && v >= 0;
       }
       @Override
@@ -67,9 +67,9 @@ public final class CmpV extends Cmp {
     /** Item comparison: greater. */
     GT("gt") {
       @Override
-      public boolean eval(final Item it1, final Item it2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = it1.diff(it2, coll, ii);
+      public boolean eval(final Item item1, final Item item2, final Collation coll,
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        final int v = item1.diff(item2, coll, info);
         return v != Item.UNDEF && v > 0;
       }
       @Override
@@ -81,9 +81,9 @@ public final class CmpV extends Cmp {
     /** Item comparison: equal. */
     EQ("eq") {
       @Override
-      public boolean eval(final Item it1, final Item it2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        return it1.eq(it2, coll, sc, ii);
+      public boolean eval(final Item item1, final Item item2, final Collation coll,
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        return item1.eq(item2, coll, sc, info);
       }
       @Override
       public OpV swap() { return EQ; }
@@ -94,9 +94,9 @@ public final class CmpV extends Cmp {
     /** Item comparison: not equal. */
     NE("ne") {
       @Override
-      public boolean eval(final Item it1, final Item it2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        return !it1.eq(it2, coll, sc, ii);
+      public boolean eval(final Item item1, final Item item2, final Collation coll,
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        return !item1.eq(item2, coll, sc, info);
       }
       @Override
       public OpV swap() { return NE; }
@@ -119,16 +119,16 @@ public final class CmpV extends Cmp {
 
     /**
      * Evaluates the expression.
-     * @param it1 first item
-     * @param it2 second item
+     * @param item1 first item
+     * @param item2 second item
      * @param coll collation (can be {@code null})
      * @param sc static context
-     * @param ii input info
+     * @param info input info
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean eval(Item it1, Item it2, Collation coll, StaticContext sc,
-        InputInfo ii) throws QueryException;
+    public abstract boolean eval(Item item1, Item item2, Collation coll, StaticContext sc,
+        InputInfo info) throws QueryException;
 
     /**
      * Swaps the comparator.
@@ -180,8 +180,8 @@ public final class CmpV extends Cmp {
     }
 
     // try to skip type checking at runtime
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    final SeqType st1 = ex1.seqType(), st2 = ex2.seqType();
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Type t1 = st1.type, t2 = st2.type;
     check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) &&
         (t1.isSortable() || op != OpV.EQ && op != OpV.NE) ||
@@ -190,12 +190,12 @@ public final class CmpV extends Cmp {
         t1.instanceOf(AtomType.DUR) && t2.instanceOf(AtomType.DUR));
 
     // try to rewrite to general expression (faster evaluation)
-    Expr ex = check || !st1.oneNoArray() || !st2.oneNoArray() ? this :
-      new CmpG(ex1, ex2, OpG.get(op), coll, sc, info).optimize(cc);
+    Expr expr = check || !st1.oneNoArray() || !st2.oneNoArray() ? this :
+      new CmpG(expr1, expr2, OpG.get(op), coll, sc, info).optimize(cc);
 
-    if(ex == this) ex = opt(op, cc);
+    if(expr == this) expr = opt(op, cc);
     // pre-evaluate values or return expression
-    return allAreValues(false) ? cc.preEval(ex) : cc.replaceWith(this, ex);
+    return allAreValues(false) ? cc.preEval(expr) : cc.replaceWith(this, expr);
   }
 
   @Override
@@ -208,20 +208,20 @@ public final class CmpV extends Cmp {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = exprs[0].atomItem(qc, info);
-    if(it1 == null) return null;
-    final Item it2 = exprs[1].atomItem(qc, info);
-    if(it2 == null) return null;
-    if(it1.comparable(it2)) return Bln.get(op.eval(it1, it2, coll, sc, info));
-    throw diffError(it1, it2, info);
+    final Item item1 = exprs[0].atomItem(qc, info);
+    if(item1 == null) return null;
+    final Item item2 = exprs[1].atomItem(qc, info);
+    if(item2 == null) return null;
+    if(item1.comparable(item2)) return Bln.get(op.eval(item1, item2, coll, sc, info));
+    throw diffError(item1, item2, info);
   }
 
   @Override
   public Expr invert(final CompileContext cc) throws QueryException {
-    final Expr e1 = exprs[0], e2 = exprs[1];
-    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.oneNoArray() && st2.oneNoArray() ?
-      new CmpV(e1, e2, op.invert(), coll, sc, info).optimize(cc) : this;
+      new CmpV(expr1, expr2, op.invert(), coll, sc, info).optimize(cc) : this;
   }
 
   @Override

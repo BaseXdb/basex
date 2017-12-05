@@ -32,7 +32,7 @@ public final class FnCodepointsToString extends StandardFunc {
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Math.max(8, (int) is));
-    for(Item it; (it = qc.next(iter)) != null;) tb.add(check(toLong(it), info));
+    for(Item item; (item = qc.next(iter)) != null;) tb.add(check(toLong(item), info));
     return Str.get(tb.finish());
   }
 

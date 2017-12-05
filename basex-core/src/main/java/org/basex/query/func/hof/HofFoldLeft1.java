@@ -24,30 +24,30 @@ public final class HofFoldLeft1 extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem f = checkArity(exprs[1], 2, qc);
+    final FItem func = checkArity(exprs[1], 2, qc);
     final Iter iter = exprs[0].iter(qc);
     Value sum = checkNoEmpty(iter.next());
-    for(Item it; (it = qc.next(iter)) != null;) sum = f.invokeValue(qc, info, sum, it);
+    for(Item item; (item = qc.next(iter)) != null;) sum = func.invokeValue(qc, info, sum, item);
     return sum;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if(ex1.seqType().zero()) throw EMPTYFOUND.get(info);
-    if(allAreValues(false) && ex1.size() <= UNROLL_LIMIT) {
-      final Value seq = (Value) ex1;
-      final FItem f = checkArity(ex2, 2, cc.qc);
-      Expr ex = seq.itemAt(0);
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1.seqType().zero()) throw EMPTYFOUND.get(info);
+    if(allAreValues(false) && expr1.size() <= UNROLL_LIMIT) {
+      final Value seq = (Value) expr1;
+      final FItem func = checkArity(expr2, 2, cc.qc);
+      Expr expr = seq.itemAt(0);
       final long is = seq.size();
       for(int i = 1; i < is; i++) {
-        ex = new DynFuncCall(info, sc, f, ex, seq.itemAt(i)).optimize(cc);
+        expr = new DynFuncCall(info, sc, func, expr, seq.itemAt(i)).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return ex;
+      return expr;
     }
 
-    final Type t = ex2.seqType().type;
+    final Type t = expr2.seqType().type;
     if(t instanceof FuncType) exprType.assign(((FuncType) t).declType);
     return this;
   }

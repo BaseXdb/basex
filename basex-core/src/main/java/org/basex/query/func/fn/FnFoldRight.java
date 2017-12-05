@@ -22,17 +22,17 @@ public final class FnFoldRight extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Value seq = exprs[0].value(qc);
     Value res = exprs[1].value(qc);
-    final FItem fun = checkArity(exprs[2], 2, qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
     if(seq instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
-        res = fun.invokeValue(qc, info, iter.previous(), res);
+        res = func.invokeValue(qc, info, iter.previous(), res);
       }
     } else {
       for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        res = fun.invokeValue(qc, info, seq.itemAt(i), res);
+        res = func.invokeValue(qc, info, seq.itemAt(i), res);
       }
     }
     return res;
@@ -41,7 +41,7 @@ public final class FnFoldRight extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Value seq = exprs[0].value(qc);
-    final FItem fun = checkArity(exprs[2], 2, qc);
+    final FItem func = checkArity(exprs[2], 2, qc);
 
     // evaluate start value lazily if it's passed straight through
     if(seq.isEmpty()) return exprs[1].iter(qc);
@@ -51,12 +51,12 @@ public final class FnFoldRight extends StandardFunc {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
-        res = fun.invokeValue(qc, info, iter.previous(), res);
+        res = func.invokeValue(qc, info, iter.previous(), res);
       }
     } else {
       for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        res = fun.invokeValue(qc, info, seq.itemAt(i), res);
+        res = func.invokeValue(qc, info, seq.itemAt(i), res);
       }
     }
     return res.iter();
@@ -64,19 +64,19 @@ public final class FnFoldRight extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0], ex2 = exprs[1];
-    if(ex1 == Empty.SEQ) return ex2;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1 == Empty.SEQ) return expr2;
 
     FnFoldLeft.seqType(this, cc, false, false);
 
-    if(allAreValues(false) && ex1.size() <= UNROLL_LIMIT) {
+    if(allAreValues(false) && expr1.size() <= UNROLL_LIMIT) {
       // unroll the loop
-      Expr ex = ex2;
-      for(final Item it : ((Value) ex1).reverse(cc.qc)) {
-        ex = new DynFuncCall(info, sc, exprs[2], it, ex).optimize(cc);
+      Expr expr = expr2;
+      for(final Item item : ((Value) expr1).reverse(cc.qc)) {
+        expr = new DynFuncCall(info, sc, exprs[2], item, expr).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return ex;
+      return expr;
     }
     return this;
   }

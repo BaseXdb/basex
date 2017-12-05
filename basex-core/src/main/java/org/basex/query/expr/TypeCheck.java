@@ -87,41 +87,41 @@ public final class TypeCheck extends Single {
     final Iter iter = expr.iter(qc);
 
     return new Iter() {
-      final ItemList cache = new ItemList();
+      final ItemList items = new ItemList();
       int c, i;
 
       @Override
       public Item next() throws QueryException {
-        while(c == cache.size()) {
-          cache.size(0);
+        while(c == items.size()) {
+          items.size(0);
           c = 0;
 
-          final Item it = qc.next(iter);
-          if(it == null || st.instance(it)) {
-            cache.add(it);
+          final Item item = qc.next(iter);
+          if(item == null || st.instance(item)) {
+            items.add(item);
           } else if(promote) {
-            st.promote(it, null, cache, qc, sc, info, false);
+            st.promote(item, null, items, qc, sc, info, false);
           } else {
             throw typeError(expr, st, null, info);
           }
         }
 
-        final Item it = cache.get(c);
-        cache.set(c++, null);
-        if(it == null && i < st.occ.min || i > st.occ.max) throw typeError(expr, st, null, info);
+        final Item item = items.get(c);
+        items.set(c++, null);
+        if(item == null && i < st.occ.min || i > st.occ.max) throw typeError(expr, st, null, info);
         i++;
-        return it;
+        return item;
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value val = expr.value(qc);
+    final Value value = expr.value(qc);
     final SeqType st = seqType();
-    if(st.instance(val)) return val;
-    if(promote) return st.promote(val, null, qc, sc, info, false);
-    throw typeError(val, st, null, info);
+    if(st.instance(value)) return value;
+    if(promote) return st.promote(value, null, qc, sc, info, false);
+    throw typeError(value, st, null, info);
   }
 
   /**

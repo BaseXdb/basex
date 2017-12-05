@@ -56,36 +56,36 @@ public final class FTAnd extends FTExpr {
   public FTIter iter(final QueryContext qc) throws QueryException {
     // initialize iterators
     final int es = exprs.length;
-    final FTIter[] ir = new FTIter[es];
-    final FTNode[] it = new FTNode[es];
+    final FTIter[] iters = new FTIter[es];
+    final FTNode[] nodes = new FTNode[es];
     for(int e = 0; e < es; e++) {
-      ir[e] = exprs[e].iter(qc);
-      it[e] = ir[e].next();
+      iters[e] = exprs[e].iter(qc);
+      nodes[e] = iters[e].next();
     }
 
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
         // find item with lowest pre value
-        final int il = it.length;
+        final int il = nodes.length;
         for(int i = 0; i < il; ++i) {
-          if(it[i] == null) return null;
+          if(nodes[i] == null) return null;
 
-          final int d = it[0].pre() - it[i].pre();
+          final int d = nodes[0].pre() - nodes[i].pre();
           if(d != 0) {
             if(d < 0) i = 0;
-            it[i] = ir[i].next();
+            nodes[i] = iters[i].next();
             i = -1;
           }
         }
 
         // merge all matches
-        final FTNode item = it[0];
+        final FTNode item = nodes[0];
         for(int i = 1; i < il; ++i) {
-          and(item, it[i]);
-          it[i] = ir[i].next();
+          and(item, nodes[i]);
+          nodes[i] = iters[i].next();
         }
-        it[0] = ir[0].next();
+        nodes[0] = iters[0].next();
         return item;
       }
     };

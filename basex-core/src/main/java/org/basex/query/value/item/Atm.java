@@ -33,31 +33,32 @@ public final class Atm extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string(final InputInfo info) {
     return value;
   }
 
   @Override
-  public boolean bool(final InputInfo ii) {
+  public boolean bool(final InputInfo info) {
     return value.length != 0;
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return it.type.isUntyped() ? coll == null ? Token.eq(value, it.string(ii)) :
-      coll.compare(value, it.string(ii)) == 0 : it.eq(this, coll, sc, ii);
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    return item.type.isUntyped() ? coll == null ? Token.eq(value, item.string(info)) :
+      coll.compare(value, item.string(info)) == 0 : item.eq(this, coll, sc, info);
   }
 
   @Override
-  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
-    return it.type.isStringOrUntyped() && eq(it, null, null, ii);
+  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
+    return item.type.isStringOrUntyped() && eq(item, null, null, info);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    return it.type.isUntyped() ? coll == null ? Token.diff(value, it.string(ii)) :
-      coll.compare(value, it.string(ii)) : -it.diff(this, coll, ii);
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    return item.type.isUntyped() ? coll == null ? Token.diff(value, item.string(info)) :
+      coll.compare(value, item.string(info)) : -item.diff(this, coll, info);
   }
 
   @Override

@@ -333,8 +333,8 @@ public class IndexTree {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add("IndexTree[Root: ").addInt(root).add(Prop.NL);
-    final int sz = keys.size();
-    for(int c = 0; c < sz; c++) {
+    final int size = keys.size();
+    for(int c = 0; c < size; c++) {
       tb.add("  \"").add(keys.get(c)).add("\": ").add("ids");
       if(tokenize) tb.add("/pos");
       tb.add(": (").add(Num.toString(ids.get(c))).add(')');

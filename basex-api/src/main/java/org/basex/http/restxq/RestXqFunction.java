@@ -216,19 +216,19 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param method HTTP method as a string
    * @param body variable to which the HTTP request body to be bound (optional)
    * @param declared variable declaration flags
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
   private void addMethod(final String method, final Item body, final boolean[] declared,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     if(body != null && !body.isEmpty()) {
       final HttpMethod m = HttpMethod.get(method);
-      if(m != null && !m.body) throw error(ii, METHOD_VALUE, m);
-      if(requestBody != null) throw error(ii, ANN_BODYVAR);
+      if(m != null && !m.body) throw error(info, METHOD_VALUE, m);
+      if(requestBody != null) throw error(info, ANN_BODYVAR);
       requestBody = checkVariable(toString(body), declared);
     }
-    if(methods.contains(method)) throw error(ii, ANN_TWICE, "%", method);
+    if(methods.contains(method)) throw error(info, ANN_TWICE, "%", method);
     methods.add(method);
   }
 
@@ -329,13 +329,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Creates an exception with the specified message.
-   * @param ii input info
+   * @param info input info
    * @param msg message
    * @param ext error extension
    * @return exception
    */
-  private static QueryException error(final InputInfo ii, final String msg, final Object... ext) {
-    return BASEX_RESTXQ_X.get(ii, Util.info(msg, ext));
+  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
+    return BASEX_RESTXQ_X.get(info, Util.info(msg, ext));
   }
 
   @Override
@@ -497,7 +497,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param list list to add values to
    */
   private static void strings(final Ann ann, final ArrayList<MediaType> list) {
-    for(final Item it : ann.args()) list.add(new MediaType(toString(it)));
+    for(final Item item : ann.args()) list.add(new MediaType(toString(item)));
   }
 
   /**

@@ -16,22 +16,22 @@ import org.basex.util.*;
 public final class MathPow extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
-    return it == null ? null : Dbl.get(power(toDouble(it), toDouble(exprs[1], qc)));
+    final Item item = exprs[0].atomItem(qc, info);
+    return item == null ? null : Dbl.get(power(toDouble(item), toDouble(exprs[1], qc)));
   }
 
   /**
    * Calculates the power.
-   * @param b base
-   * @param e exponent
+   * @param base base
+   * @param exp exponent
    * @return power
    */
-  private static double power(final double b, final double e) {
-    if(b == 1) return 1;
-    if(b == -1) {
-      if(Double.isNaN(e)) return -1;
-      if(Double.isInfinite(e)) return 1;
+  private static double power(final double base, final double exp) {
+    if(base == 1) return 1;
+    if(base == -1) {
+      if(Double.isNaN(exp)) return -1;
+      if(Double.isInfinite(exp)) return 1;
     }
-    return pow(b, e);
+    return pow(base, exp);
   }
 }

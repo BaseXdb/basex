@@ -91,8 +91,8 @@ public abstract class AQuery extends Command {
               hits = 0;
               final Iter iter = qp.iter();
               info.evaluating += perf.ns();
-              for(Item it; (it = iter.next()) != null;) {
-                ser.serialize(it);
+              for(Item item; (item = iter.next()) != null;) {
+                ser.serialize(item);
                 ++hits;
                 checkStop();
               }

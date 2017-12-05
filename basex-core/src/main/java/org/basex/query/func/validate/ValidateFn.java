@@ -132,24 +132,24 @@ abstract class ValidateFn extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the first argument.
-   * @param it item
+   * @param item item
    * @param sopts serializer parameters
    * @return item
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  protected final IO read(final Item it, final SerializerOptions sopts)
+  protected final IO read(final Item item, final SerializerOptions sopts)
       throws QueryException, IOException {
 
-    if(it instanceof ANode) {
+    if(item instanceof ANode) {
       // return node as main-memory string
-      final IOContent io = new IOContent(it.serialize(sopts).finish());
-      io.name(string(((ANode) it).baseURI()));
+      final IOContent io = new IOContent(item.serialize(sopts).finish());
+      io.name(string(((ANode) item).baseURI()));
       return io;
     }
 
-    if(it.type.isStringOrUntyped()) {
-      IO io = checkPath(toToken(it));
+    if(item.type.isStringOrUntyped()) {
+      IO io = checkPath(toToken(item));
       if(sopts != null) {
         // add doctype declaration if specified
         io = new IOContent(new DBNode(io).serialize(sopts).finish());
@@ -158,6 +158,6 @@ abstract class ValidateFn extends StandardFunc {
       return io;
     }
 
-    throw STRNOD_X_X.get(info, it.type, it);
+    throw STRNOD_X_X.get(info, item.type, item);
   }
 }

@@ -34,9 +34,9 @@ public abstract class Docs extends StandardFunc {
     // return default collection or parse specified collection
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item it = exprs.length == 0 ? null : exprs[0].atomItem(qc, info);
-      if(it != null) {
-        final byte[] uri = toToken(it);
+      final Item item = exprs.length == 0 ? null : exprs[0].atomItem(qc, info);
+      if(item != null) {
+        final byte[] uri = toToken(item);
         qi = queryInput(uri);
         if(qi == null) throw INVCOLL_X.get(info, uri);
       }
@@ -53,9 +53,9 @@ public abstract class Docs extends StandardFunc {
   ANode doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item it = exprs[0].atomItem(qc, info);
-      if(it == null) return null;
-      final byte[] uri = toToken(it);
+      final Item item = exprs[0].atomItem(qc, info);
+      if(item == null) return null;
+      final byte[] uri = toToken(item);
       qi = queryInput(uri);
       if(qi == null) throw INVDOC_X.get(info, uri);
     }

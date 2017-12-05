@@ -38,22 +38,22 @@ public final class MixedPath extends Path {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     Iter iter;
-    long sz;
+    long size;
     if(root != null) {
       final Iter rt = root.iter(qc);
-      final long s = rt.size();
-      if(s >= 0) {
+      final long sz = rt.size();
+      if(sz >= 0) {
         iter = rt;
-        sz = s;
+        size = sz;
       } else {
-        final Value val = rt.value(qc);
-        iter = val.iter();
-        sz = val.size();
+        final Value value = rt.value(qc);
+        iter = value.iter();
+        size = value.size();
       }
     } else {
       final Value rt = ctxValue(qc);
       iter = rt.iter();
-      sz = rt.size();
+      size = rt.size();
     }
 
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
@@ -63,22 +63,22 @@ public final class MixedPath extends Path {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         // set context position and size
-        focus.size = sz;
+        focus.size = size;
         focus.pos = 1;
 
         // loop through all input items; cache nodes and items
         final ANodeBuilder nodes = new ANodeBuilder();
         final ItemList items = new ItemList();
         final Expr step = steps[s];
-        for(Item it; (it = iter.next()) != null;) {
-          if(!(it instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, it.type, it);
-          focus.value = it;
+        for(Item item; (item = iter.next()) != null;) {
+          if(!(item instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, item.type, item);
+          focus.value = item;
 
           // loop through all resulting items
           final Iter ir = step.iter(qc);
-          for(Item it2; (it2 = qc.next(ir)) != null;) {
-            if(it2 instanceof ANode) nodes.add((ANode) it2);
-            else items.add(it2);
+          for(Item it; (it = qc.next(ir)) != null;) {
+            if(it instanceof ANode) nodes.add((ANode) it);
+            else items.add(it);
           }
           focus.pos++;
         }
@@ -94,7 +94,7 @@ public final class MixedPath extends Path {
           if(!nodes.isEmpty()) throw MIXEDRESULTS.get(info);
           iter = items.iter();
         }
-        sz = iter.size();
+        size = iter.size();
       }
       return iter;
     } finally {

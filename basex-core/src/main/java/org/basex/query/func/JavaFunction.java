@@ -334,15 +334,15 @@ public abstract class JavaFunction extends Arr {
 
   /**
    * Returns a string representation of all found arguments.
-   * @param args array with arguments
+   * @param args arguments
    * @return string representation
    */
   protected static String foundArgs(final Value[] args) {
     // compose found arguments
     final StringBuilder sb = new StringBuilder();
-    for(final Value v : args) {
+    for(final Value arg : args) {
       if(sb.length() != 0) sb.append(", ");
-      sb.append(v instanceof Jav ? Util.className(((Jav) v).toJava()) : v.seqType());
+      sb.append(arg instanceof Jav ? Util.className(((Jav) arg).toJava()) : arg.seqType());
     }
     return sb.toString();
   }

@@ -30,10 +30,10 @@ public final class CmpSimpleG extends CmpG {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = exprs[0].item(qc, info);
-    if(it1 == null) return Bln.FALSE;
-    final Item it2 = exprs[1].item(qc, info);
-    return Bln.get(it2 != null && eval(it1, it2));
+    final Item item1 = exprs[0].item(qc, info);
+    if(item1 == null) return Bln.FALSE;
+    final Item item2 = exprs[1].item(qc, info);
+    return Bln.get(item2 != null && eval(item1, item2));
   }
 
   @Override

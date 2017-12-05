@@ -26,9 +26,9 @@ public final class FnIndexOf extends StandardFunc {
 
       @Override
       public Int next() throws QueryException {
-        for(Item it; (it = qc.next(iter)) != null;) {
+        for(Item item; (item = qc.next(iter)) != null;) {
           ++c;
-          if(it.comparable(srch) && OpV.EQ.eval(it, srch, coll, sc, info)) return Int.get(c);
+          if(item.comparable(srch) && OpV.EQ.eval(item, srch, coll, sc, info)) return Int.get(c);
         }
         return null;
       }
@@ -37,9 +37,9 @@ public final class FnIndexOf extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr ex = exprs[0];
-    final SeqType st = ex.seqType();
-    if(st.zero()) return ex;
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
     if(st.zeroOrOne() && !st.mayBeArray()) exprType.assign(Occ.ZERO_ONE);
     return this;
   }

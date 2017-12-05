@@ -64,9 +64,9 @@ public final class Or extends Logical {
       double s = 0;
       boolean f = false;
       for(final Expr expr : exprs) {
-        final Item it = expr.ebv(qc, info);
-        f |= it.bool(info);
-        s += it.score();
+        final Item item = expr.ebv(qc, info);
+        f |= item.bool(info);
+        s += item.score();
       }
       return Bln.get(f, Scoring.avg(s, exprs.length));
     }

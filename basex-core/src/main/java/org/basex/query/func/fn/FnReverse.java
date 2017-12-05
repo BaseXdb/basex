@@ -21,19 +21,19 @@ public final class FnReverse extends StandardFunc {
     final Iter iter = exprs[0].iter(qc);
 
     // materialize value if number of results is unknown
-    final long s = iter.size();
+    final long size = iter.size();
     // no result: empty iterator
-    if(s == 0) return Empty.ITER;
+    if(size == 0) return Empty.ITER;
     // single result: iterator
-    if(s == 1) return iter;
+    if(size == 1) return iter;
 
     // value-based iterator
-    final Value v = iter.value();
-    if(v != null) return v.reverse(qc).iter();
+    final Value value = iter.value();
+    if(value != null) return value.reverse(qc).iter();
 
     // fast route if the size is known
-    if(s > -1) return new Iter() {
-      long c = s;
+    if(size > -1) return new Iter() {
+      long c = size;
       @Override
       public Item next() throws QueryException {
         qc.checkStop();
@@ -41,17 +41,17 @@ public final class FnReverse extends StandardFunc {
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return iter.get(s - i - 1);
+        return iter.get(size - i - 1);
       }
       @Override
       public long size() {
-        return s;
+        return size;
       }
     };
 
     // standard iterator
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item it; (it = qc.next(iter)) != null;) vb.addFront(it);
+    for(Item item; (item = qc.next(iter)) != null;) vb.addFront(item);
     return vb.value().iter();
   }
 
@@ -62,8 +62,8 @@ public final class FnReverse extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex = exprs[0];
-    return ex instanceof RangeSeq ? ((RangeSeq) ex).reverse(cc.qc) :
-      ex instanceof SingletonSeq || ex.seqType().zeroOrOne() ? ex : adoptType(ex);
+    final Expr expr = exprs[0];
+    return expr instanceof RangeSeq ? ((RangeSeq) expr).reverse(cc.qc) :
+      expr instanceof SingletonSeq || expr.seqType().zeroOrOne() ? expr : adoptType(expr);
   }
 }

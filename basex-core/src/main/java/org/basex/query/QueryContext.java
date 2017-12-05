@@ -331,31 +331,31 @@ public final class QueryContext extends Job implements Closeable {
       if(!updating) return root.iter(this);
 
       // cache results
-      ItemList results = root.cache(this);
+      ItemList items = root.cache(this);
 
       // only perform updates if no parent context exists
       if(updates != null && parent == null) {
         // create copies of results that will be modified by an update operation
-        final ItemList cache = updates.cache;
+        final ItemList items2 = updates.items;
         final HashSet<Data> datas = updates.prepare(this);
         final StringList dbs = updates.databases();
-        check(results, datas, dbs);
-        check(cache, datas, dbs);
+        check(items, datas, dbs);
+        check(items2, datas, dbs);
 
         // invalidate current node set in context, apply updates
         if(context.data() != null) context.invalidate();
         updates.apply(this);
 
         // append cached outputs
-        if(!cache.isEmpty()) {
-          if(results.isEmpty()) {
-            results = cache;
+        if(!items2.isEmpty()) {
+          if(items.isEmpty()) {
+            items = items2;
           } else {
-            for(final Item it : cache) results.add(it);
+            for(final Item item : items2) items.add(item);
           }
         }
       }
-      return results.iter();
+      return items.iter();
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -366,23 +366,23 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Checks the specified results, and replaces nodes with their copies if they will be
    * affected by update operations.
-   * @param results node cache
+   * @param items node cache
    * @param datas data references
    * @param dbs database names
    * @throws QueryException query exception
    */
-  private void check(final ItemList results, final HashSet<Data> datas, final StringList dbs)
+  private void check(final ItemList items, final HashSet<Data> datas, final StringList dbs)
       throws QueryException {
 
-    final long cs = results.size();
-    for(int c = 0; c < cs; c++) {
-      final Item it = results.get(c);
+    final long is = items.size();
+    for(int i = 0; i < is; i++) {
+      final Item item = items.get(i);
       // all updates are performed on database nodes
-      if(it instanceof FItem) throw BASEX_FUNCTION_X.get(null, it);
-      final Data data = it.data();
+      if(item instanceof FItem) throw BASEX_FUNCTION_X.get(null, item);
+      final Data data = item.data();
       if(data != null && (datas.contains(data) ||
           !data.inMemory() && dbs.contains(data.meta.name))) {
-        results.set(c, ((DBNode) it).dbNodeCopy(context.options, this));
+        items.set(i, ((DBNode) item).dbNodeCopy(context.options, this));
       }
     }
   }
@@ -590,37 +590,37 @@ public final class QueryContext extends Job implements Closeable {
 
     // evaluates the query
     final Iter iter = iter();
-    final ItemList cache;
-    Item it;
+    final ItemList items;
+    Item item;
 
     // check if all results belong to the database of the input context
     final Data data = resources.globalData();
     if(defaultOutput && data != null) {
       final IntList pres = new IntList();
-      while((it = next(iter)) != null && it.data() == data && pres.size() < mx) {
-        pres.add(((DBNode) it).pre());
+      while((item = next(iter)) != null && item.data() == data && pres.size() < mx) {
+        pres.add(((DBNode) item).pre());
       }
 
       // all results processed: return compact node sequence
       final int ps = pres.size();
-      if(it == null || ps == mx) {
+      if(item == null || ps == mx) {
         return ps == 0 ? Empty.SEQ : new DBNodes(data, pres.finish()).ftpos(ftPosData);
       }
 
       // otherwise, add nodes to standard iterator
-      cache = new ItemList();
-      for(int p = 0; p < ps; p++) cache.add(new DBNode(data, pres.get(p)));
-      cache.add(it);
+      items = new ItemList();
+      for(int p = 0; p < ps; p++) items.add(new DBNode(data, pres.get(p)));
+      items.add(item);
     } else {
-      cache = new ItemList();
+      items = new ItemList();
     }
 
     // use standard iterator
-    while((it = next(iter)) != null && cache.size() < mx) {
-      it.materialize(null);
-      cache.add(it);
+    while((item = next(iter)) != null && items.size() < mx) {
+      item.materialize(null);
+      items.add(item);
     }
-    return cache.value();
+    return items.value();
   }
 
   // PRIVATE METHODS ====================================================================
@@ -701,10 +701,10 @@ public final class QueryContext extends Job implements Closeable {
       // cast single item
       if(val instanceof Item) return tp.cast((Item) val, this, sc, null);
       // cast sequence
-      final Value v = (Value) val;
+      final Value vl = (Value) val;
       final ValueBuilder seq = new ValueBuilder(this);
-      final BasicIter<?> iter = v.iter();
-      for(Item it; (it = iter.next()) != null;) seq.add(tp.cast(it, this, sc, null));
+      final BasicIter<?> iter = vl.iter();
+      for(Item item; (item = iter.next()) != null;) seq.add(tp.cast(item, this, sc, null));
       return seq.value();
     }
 

@@ -56,16 +56,16 @@ public abstract class SimpleMap extends Arr {
   public final Expr compile(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      Expr ex = exprs[e];
+      Expr expr = exprs[e];
       try {
-        ex = ex.compile(cc);
+        expr = expr.compile(cc);
       } catch(final QueryException qe) {
         // replace original expression with error
-        ex = cc.error(qe, this);
+        expr = cc.error(qe, this);
       }
-      if(e == 0) cc.pushFocus(ex);
-      else cc.updateFocus(ex);
-      exprs[e] = ex;
+      if(e == 0) cc.pushFocus(expr);
+      else cc.updateFocus(expr);
+      exprs[e] = expr;
     }
     cc.removeFocus();
     return optimize(cc);
@@ -108,12 +108,12 @@ public abstract class SimpleMap extends Arr {
     int e = 0;
     final int el = exprs.length;
     for(int n = 1; n < el; n++) {
-      final Expr ex = exprs[e], next = exprs[n];
-      final long es = ex.size();
+      final Expr expr = exprs[e], next = exprs[n];
+      final long es = expr.size();
       Expr rep = null;
       // check if deterministic expressions with known result size can be removed
       // expression size is never 0 (empty expressions have no followers, see above)
-      if(es != -1 && !ex.has(Flag.NDT)) {
+      if(es != -1 && !expr.has(Flag.NDT)) {
         if(next instanceof Value) {
           // rewrite expression with next value as singleton sequence
           rep = SingletonSeq.get((Value) next, es);
@@ -129,7 +129,7 @@ public abstract class SimpleMap extends Arr {
         }
       }
       if(rep != null) {
-        exprs[e] = cc.replaceWith(ex, rep);
+        exprs[e] = cc.replaceWith(expr, rep);
       } else if(!(next instanceof ContextValue)) {
         exprs[++e] = exprs[n];
       }
@@ -199,9 +199,9 @@ public abstract class SimpleMap extends Arr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder().append('(');
-    for(final Expr ex : exprs) {
+    for(final Expr expr : exprs) {
       if(sb.length() != 1) sb.append(" ! ");
-      sb.append(ex);
+      sb.append(expr);
     }
     return sb.append(')').toString();
   }

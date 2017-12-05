@@ -27,11 +27,11 @@ abstract class HashFn extends StandardFunc {
    * @throws QueryException exception
    */
   final B64 hash(final String algo, final QueryContext qc) throws QueryException {
-    final Item it = exprs[0].atomItem(qc, info);
+    final Item item = exprs[0].atomItem(qc, info);
     try {
       final MessageDigest md = MessageDigest.getInstance(algo);
-      if(it instanceof B64Lazy) {
-        try(BufferInput bi = it.input(info)) {
+      if(item instanceof B64Lazy) {
+        try(BufferInput bi = item.input(info)) {
           final byte[] tmp = new byte[IO.BLOCKSIZE];
           do {
             final int n = bi.read(tmp);
@@ -44,7 +44,7 @@ abstract class HashFn extends StandardFunc {
         }
       }
       // non-streaming item, string
-      return B64.get(md.digest(toBytes(it)));
+      return B64.get(md.digest(toBytes(item)));
     } catch(final NoSuchAlgorithmException ex) {
       Util.debug(ex);
       throw HASH_ALGORITHM_X.get(info, algo);

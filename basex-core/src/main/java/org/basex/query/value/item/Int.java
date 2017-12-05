@@ -79,7 +79,7 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) {
+  public boolean bool(final InputInfo info) {
     return value != 0;
   }
 
@@ -99,12 +99,12 @@ public final class Int extends ANum {
   }
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo ii) {
+  public Item test(final QueryContext qc, final InputInfo info) {
     return value == qc.focus.pos ? this : null;
   }
 
   @Override
-  public BigDecimal dec(final InputInfo ii) {
+  public BigDecimal dec(final InputInfo info) {
     return BigDecimal.valueOf(value);
   }
 
@@ -151,17 +151,18 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return it instanceof Int ? value == ((Int) it).value :
-           it.type != AtomType.DEC ? value == it.dbl(ii) :
-           it.eq(this, coll, sc, ii);
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    return item instanceof Int ? value == ((Int) item).value :
+           item.type != AtomType.DEC ? value == item.dbl(info) :
+           item.eq(this, coll, sc, info);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    if(it instanceof Int) return Long.compare(value, ((Int) it).value);
-    final double n = it.dbl(ii);
+  public int diff(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    if(item instanceof Int) return Long.compare(value, ((Int) item).value);
+    final double n = item.dbl(info);
     return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 

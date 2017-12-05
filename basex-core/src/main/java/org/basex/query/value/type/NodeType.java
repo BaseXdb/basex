@@ -249,13 +249,13 @@ public enum NodeType implements Type {
 
   /**
    * Throws a casting exception.
-   * @param it item to be included in the error message
-   * @param ii input info
+   * @param item item to be included in the error message
+   * @param info input info
    * @return dummy item
    * @throws QueryException query exception
    */
-  final Item error(final Item it, final InputInfo ii) throws QueryException {
-    throw typeError(it, this, ii);
+  final Item error(final Item item, final InputInfo info) throws QueryException {
+    throw typeError(item, this, info);
   }
 
   @Override

@@ -43,7 +43,7 @@ public final class Window extends Clause {
    * Constructor.
    * @param sliding {@code sliding window} flag
    * @param var window variable
-   * @param expr sequence
+   * @param expr input sequence
    * @param start start condition
    * @param only {@code only} flag
    * @param end end condition (can be {@code null})
@@ -107,6 +107,7 @@ public final class Window extends Clause {
       private Item[] vals;
       /** Position of the start item. */
       private long spos;
+
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
@@ -117,13 +118,13 @@ public final class Window extends Clause {
           if(fst != null) {
             final ValueBuilder window = new ValueBuilder(qc).add(fst);
             final Item[] st = vals == null ? new Item[] { curr, prev, next } : vals;
-            final long ps = vals == null ? p : spos;
+            final long ps = vals == null ? pos : spos;
             vals = null;
 
             while(readNext()) {
-              if(start.matches(qc, curr, p, prev, next)) {
+              if(start.matches(qc, curr, pos, prev, next)) {
                 vals = new Item[] { curr, prev, next };
-                spos = p;
+                spos = pos;
                 break;
               }
               window.add(curr);
@@ -158,7 +159,7 @@ public final class Window extends Clause {
             boolean found = false;
             do {
               window.add(curr);
-              if(end.matches(qc, curr, p, prev, next)) {
+              if(end.matches(qc, curr, pos, prev, next)) {
                 found = true;
                 break;
               }
@@ -187,6 +188,7 @@ public final class Window extends Clause {
     return new WindowEval() {
       /** Queue holding the items of the current window. */
       private final ArrayDeque<Item> queue = new ArrayDeque<>();
+
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         while(true) {
@@ -194,7 +196,7 @@ public final class Window extends Clause {
           while((curr = advance()) != null) {
             next = queue.peekFirst();
             if(next == null && (next = next()) != null) queue.addLast(next);
-            if(start.matches(qc, curr, p, prev, next)) break;
+            if(start.matches(qc, curr, pos, prev, next)) break;
             prev = curr;
           }
 
@@ -204,7 +206,7 @@ public final class Window extends Clause {
             // the first element is already the {@code next} one
             if(qiter.hasNext()) qiter.next();
             Item pr = prev, it = curr, nx = next;
-            long ps = p;
+            long ps = pos;
             do {
               cache.add(it);
               if(end.matches(qc, it, ps++, pr, nx)) break;
@@ -220,7 +222,7 @@ public final class Window extends Clause {
 
             // return window if end was found or {@code only} isn't set
             if(!(it == null && only)) {
-              start.bind(qc, curr, p, prev, next);
+              start.bind(qc, curr, pos, prev, next);
               prev = curr;
               qc.set(var, cache.value());
               return true;
@@ -234,16 +236,16 @@ public final class Window extends Clause {
       }
 
       /**
-       * tries to advance the start of the queue by one element and returns the removed
+       * Tries to advance the start of the queue by one element and returns the removed
        * element in case of success, {@code null} otherwise.
        * @return removed element or {@code null}
        * @throws QueryException evaluation exception
        */
       private Item advance() throws QueryException {
-        Item it = queue.pollFirst();
-        if(it == null) it = next();
-        if(it != null) p++;
-        return it;
+        Item item = queue.pollFirst();
+        if(item == null) item = next();
+        if(item != null) pos++;
+        return item;
       }
     };
   }
@@ -280,13 +282,13 @@ public final class Window extends Clause {
 
   @Override
   public Clause inline(final Var v, final Expr ex, final CompileContext cc) throws QueryException {
-    final Expr e = expr.inline(v, ex, cc);
+    final Expr exp = expr.inline(v, ex, cc);
     final Condition st = start.inline(v, ex, cc);
     final Condition en = end == null ? null : end.inline(v, ex, cc);
-    if(e != null) expr = e;
+    if(exp != null) expr = exp;
     if(st != null) start = st;
     if(en != null) end = en;
-    return e != null || st != null || en != null ? optimize(cc) : null;
+    return exp != null || st != null || en != null ? optimize(cc) : null;
   }
 
   @Override
@@ -346,9 +348,9 @@ public final class Window extends Clause {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(FOR).append(' ').append(
-        sliding ? SLIDING : TUMBLING).append(' ').append(WINDOW).append(' ').append(var
-            ).append(' ').append(IN).append(' ').append(expr).append(' ').append(start);
+    final StringBuilder sb = new StringBuilder(FOR).append(' ').
+        append(sliding ? SLIDING : TUMBLING).append(' ').append(WINDOW).append(' ').append(var).
+        append(' ').append(IN).append(' ').append(expr).append(' ').append(start);
     if(end != null) {
       if(only) sb.append(' ').append(ONLY);
       sb.append(' ').append(end);
@@ -368,7 +370,7 @@ public final class Window extends Clause {
     /** Previous item. */
     Item prev;
     /** Current position. */
-    long p;
+    long pos;
 
     /**
      * Reads the next item from {@code iter} if it isn't {@code null} and sets it to
@@ -378,9 +380,9 @@ public final class Window extends Clause {
      */
     final Item next() throws QueryException {
       if(iter == null) return null;
-      final Item it = iter.next();
-      if(it == null) iter = null;
-      return it;
+      final Item item = iter.next();
+      if(item == null) iter = null;
+      return item;
     }
 
     /**
@@ -394,7 +396,7 @@ public final class Window extends Clause {
       if(!sub.next(qc)) return false;
       iter = expr.iter(qc);
       prev = null;
-      p = 0;
+      pos = 0;
       return true;
     }
   }
@@ -420,18 +422,18 @@ public final class Window extends Clause {
      */
     final boolean readNext() throws QueryException {
       prev = curr;
-      p++;
-      final Item n = next();
+      pos++;
+      final Item item = next();
       // serve the stored item if available
       if(next != null) {
         curr = next;
-        next = n;
-      } else if(n != null && popNext) {
+        next = item;
+      } else if(item != null && popNext) {
         // only assign if necessary
         next = next();
-        curr = n;
+        curr = item;
       } else {
-        curr = n;
+        curr = item;
       }
       return curr != null;
     }
@@ -445,7 +447,7 @@ public final class Window extends Clause {
      */
     final boolean findStart(final QueryContext qc) throws QueryException {
       while(readNext()) {
-        if(start.matches(qc, curr, p, prev, next)) return true;
+        if(start.matches(qc, curr, pos, prev, next)) return true;
       }
       return false;
     }

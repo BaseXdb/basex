@@ -19,18 +19,18 @@ public final class ArrayFilter extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Array array = toArray(exprs[0], qc);
-    final FItem fun = checkArity(exprs[1], 1, qc);
+    final FItem func = checkArity(exprs[1], 1, qc);
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : array.members()) {
-      if(toBoolean(fun.invokeItem(qc, info, val))) builder.append(val);
+    for(final Value value : array.members()) {
+      if(toBoolean(func.invokeItem(qc, info, value))) builder.append(value);
     }
     return builder.freeze();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr ex1 = exprs[0];
-    final Type t1 = ex1.seqType().type;
+    final Expr expr1 = exprs[0];
+    final Type t1 = expr1.seqType().type;
 
     if(t1 instanceof ArrayType) {
       coerceFunc(1, cc, SeqType.BLN_O, ((ArrayType) t1).declType);

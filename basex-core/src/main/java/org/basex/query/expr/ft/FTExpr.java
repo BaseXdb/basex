@@ -107,9 +107,9 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
   }
 
   @Override

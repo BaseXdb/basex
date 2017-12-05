@@ -95,10 +95,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Materializes lazy values.
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public abstract void materialize(InputInfo ii) throws QueryException;
+  public abstract void materialize(InputInfo info) throws QueryException;
 
   /**
    * Computes the number of atomized items.
@@ -141,11 +141,11 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a hash code for this value.
-   * @param ii input info
+   * @param info input info
    * @return hash code
    * @throws QueryException if atomization can't be applied (e.g. function item)
    */
-  public abstract int hash(InputInfo ii) throws QueryException;
+  public abstract int hash(InputInfo info) throws QueryException;
 
   /**
    * Serializes the value, using the standard XML serializer,
@@ -181,9 +181,9 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @throws IOException I/O exception
    */
   public final void serialize(final Serializer ser) throws IOException {
-    for(final Item it : this) {
+    for(final Item item : this) {
       if(ser.finished()) break;
-      ser.serialize(it);
+      ser.serialize(item);
     }
   }
 

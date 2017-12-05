@@ -331,7 +331,7 @@ public final class HttpClient {
       out.write(IO.get(src).read());
     } else {
       try(Serializer ser = Serializer.get(out, sopts)) {
-        for(final Item it : payload) ser.serialize(it);
+        for(final Item item : payload) ser.serialize(item);
       }
     }
   }

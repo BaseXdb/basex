@@ -97,50 +97,51 @@ public abstract class ADateDur extends Item {
 
   /**
    * Throws a date format exception.
-   * @param i input
+   * @param input input
    * @param ex example format
-   * @param ii input info
+   * @param info input info
    * @return date format exception
    */
-  final QueryException dateError(final byte[] i, final String ex, final InputInfo ii) {
-    return DATEFORMAT_X_X_X.get(ii, type, i, ex);
+  final QueryException dateError(final byte[] input, final String ex, final InputInfo info) {
+    return DATEFORMAT_X_X_X.get(info, type, input, ex);
   }
 
   /**
    * Date and durations: converts the specified string to an integer value.
    * Returns an exception if the value is invalid.
-   * @param s string to be converted
+   * @param string string to be converted
    * @param dur duration
-   * @param ii input info
+   * @param info input info
    * @return long value
    * @throws QueryException query exception
    */
-  long toLong(final String s, final boolean dur, final InputInfo ii) throws QueryException {
+  final long toLong(final String string, final boolean dur, final InputInfo info)
+      throws QueryException {
     try {
-      return Long.parseLong(s);
+      return Long.parseLong(string);
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, chop(s, ii));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(info, type, chop(string, info));
     }
   }
 
   /**
    * Date and durations: converts the specified string to a decimal value.
    * Returns an exception if the value is invalid.
-   * @param s string to be converted
+   * @param string string to be converted
    * @param dur duration
-   * @param ii input info
+   * @param info input info
    * @return decimal
    * @throws QueryException query exception
    */
-  BigDecimal toDecimal(final String s, final boolean dur, final InputInfo ii)
+  final BigDecimal toDecimal(final String string, final boolean dur, final InputInfo info)
       throws QueryException {
 
     try {
-      return new BigDecimal(s);
+      return new BigDecimal(string);
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, chop(s, ii));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(info, type, chop(string, info));
     }
   }
 }

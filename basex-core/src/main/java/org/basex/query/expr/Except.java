@@ -33,13 +33,13 @@ public final class Except extends Set {
     super.optimize(cc);
 
     final ExprList el = new ExprList(exprs.length);
-    for(final Expr ex : exprs) {
-      if(ex == Empty.SEQ) {
+    for(final Expr expr : exprs) {
+      if(expr == Empty.SEQ) {
         // remove empty operands (return empty sequence if first value is empty)
         if(el.isEmpty()) return cc.emptySeq(this);
-        cc.info(OPTREMOVE_X_X, ex, description());
+        cc.info(OPTREMOVE_X_X, expr, description());
       } else {
-        el.add(ex);
+        el.add(expr);
       }
     }
     // ensure that results are always sorted
@@ -59,13 +59,13 @@ public final class Except extends Set {
   @Override
   protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     final ANodeBuilder list = new ANodeBuilder();
-    for(Item it; (it = qc.next(iters[0])) != null;) list.add(toNode(it));
+    for(Item item; (item = qc.next(iters[0])) != null;) list.add(toNode(item));
     list.check();
 
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); e++) {
       final Iter iter = iters[e];
-      for(Item it; (it = qc.next(iter)) != null;) list.delete(toNode(it));
+      for(Item item; (item = qc.next(iter)) != null;) list.delete(toNode(item));
     }
     return list;
   }

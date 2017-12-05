@@ -23,13 +23,13 @@ import org.basex.util.hash.*;
 abstract class ArchiveFn extends StandardFunc {
   /**
    * Checks if the specified item is a string or element.
-   * @param it item to be checked
+   * @param item item to be checked
    * @return item
    * @throws QueryException query exception
    */
-  final Item checkElemToken(final Item it) throws QueryException {
-    if(it instanceof AStr || ENTRY.eq(it)) return it;
-    throw ELMSTR_X_X_X.get(info, Q_ENTRY.prefixId(), it.type, it);
+  final Item checkElemToken(final Item item) throws QueryException {
+    if(item instanceof AStr || ENTRY.eq(item)) return item;
+    throw ELMSTR_X_X_X.get(info, Q_ENTRY.prefixId(), item.type, item);
   }
 
   /**

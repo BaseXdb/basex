@@ -56,15 +56,15 @@ public final class Lookup extends Arr {
       if(ks == 0) return cc.replaceWith(this, keys);
 
       if(keys != Str.WC) {
-        Expr ex = this;
+        Expr expr = this;
         if(es == 1) {
           // context expression yields one item
           if(ks == 1) {
             // one key: rewrite to function call
-            ex = new DynFuncCall(info, cc.sc(), ctx, keys).optimize(cc);
+            expr = new DynFuncCall(info, cc.sc(), ctx, keys).optimize(cc);
           } else {
             // otherwise, rewrite to for each loop
-            ex = cc.function(Function.FOR_EACH, info, exprs);
+            expr = cc.function(Function.FOR_EACH, info, exprs);
           }
         } else if(keys instanceof Value) {
           // keys are constant, so we do not duplicate work in the inner loop
@@ -75,9 +75,9 @@ public final class Lookup extends Arr {
           clauses.add(new For(k, null, null, keys, false));
           final VarRef rc = new VarRef(info, c), rk = new VarRef(info, k);
           final DynFuncCall ret = new DynFuncCall(info, cc.sc(), rc, rk);
-          ex = new GFLWOR(info, clauses, ret).optimize(cc);
+          expr = new GFLWOR(info, clauses, ret).optimize(cc);
         }
-        return cc.replaceWith(this, ex);
+        return cc.replaceWith(this, expr);
       }
     }
     return this;
@@ -92,12 +92,12 @@ public final class Lookup extends Arr {
   private boolean seqType(final Expr ctx, final Expr keys) {
     if(ctx == null) return false;
 
-    final Type tp = ctx.seqType().type;
-    final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
+    final Type type = ctx.seqType().type;
+    final boolean map = type instanceof MapType, array = type instanceof ArrayType;
     if(!map && !array) return false;
 
     // derive type from input expression
-    final SeqType st = ((FuncType) tp).declType;
+    final SeqType st = ((FuncType) type).declType;
     Occ occ = st.occ;
     // map lookup may result in empty sequence (array lookups will always yield at least one item)
     if(map) occ = st.occ.union(Occ.ZERO);
@@ -121,16 +121,16 @@ public final class Lookup extends Arr {
     final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : exprs[1].iter(qc);
 
     // iterate through all map/array inputs
-    for(Item it; (it = qc.next(iter)) != null;) {
-      if(!(it instanceof Map || it instanceof Array)) throw LOOKUP_X.get(info, it);
-      final FItem fit = (FItem) it;
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(!(item instanceof Map || item instanceof Array)) throw LOOKUP_X.get(info, item);
+      final FItem fit = (FItem) item;
 
       if(keys == Str.WC) {
         // wildcard: add all values
         if(fit instanceof Map) {
           ((Map) fit).values(vb);
         } else {
-          for(final Value val : ((Array) it).members()) vb.add(val);
+          for(final Value value : ((Array) item).members()) vb.add(value);
         }
       } else {
         final Iter ir = keys.atomIter(qc, info);

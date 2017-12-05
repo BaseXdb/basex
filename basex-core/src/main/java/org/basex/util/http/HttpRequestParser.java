@@ -134,7 +134,7 @@ public final class HttpRequestParser {
         for(final ANode n : body.children()) payload.add(n);
       } else {
         // payload is taken from $bodies parameter
-        for(final Item it : items) payload.add(it);
+        for(final Item item : items) payload.add(item);
       }
     }
   }

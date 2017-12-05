@@ -35,12 +35,12 @@ public class FileWrite extends FileFn {
 
     final Path path = checkParentDir(toPath(0, qc));
     final Value value = exprs[1].value(qc);
-    final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : null;
-    final SerializerOptions sopts = FuncOptions.serializer(so, info);
+    final Item opts = exprs.length > 2 ? exprs[2].item(qc, info) : null;
+    final SerializerOptions sopts = FuncOptions.serializer(opts, info);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       try(Serializer ser = Serializer.get(out, sopts)) {
-        for(final Item it : value) ser.serialize(it);
+        for(final Item item : value) ser.serialize(item);
       }
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);

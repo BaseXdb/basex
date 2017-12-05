@@ -52,23 +52,23 @@ public final class Unary extends Single {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = expr.atomItem(qc, info);
-    if(it == null) return null;
+    final Item item = expr.atomItem(qc, info);
+    if(item == null) return null;
 
-    final Type ip = it.type;
-    if(ip.isUntyped()) {
-      final double d = it.dbl(info);
+    final Type type = item.type;
+    if(type.isUntyped()) {
+      final double d = item.dbl(info);
       return Dbl.get(minus ? -d : d);
     }
-    if(!ip.isNumber()) throw numberError(this, it);
+    if(!type.isNumber()) throw numberError(this, item);
 
-    if(!minus) return it;
-    if(ip == AtomType.DBL) return Dbl.get(-it.dbl(info));
-    if(ip == AtomType.FLT) return Flt.get(-it.flt(info));
-    if(ip == AtomType.DEC) return Dec.get(it.dec(info).negate());
+    if(!minus) return item;
+    if(type == AtomType.DBL) return Dbl.get(-item.dbl(info));
+    if(type == AtomType.FLT) return Flt.get(-item.flt(info));
+    if(type == AtomType.DEC) return Dec.get(item.dec(info).negate());
     // default: integer
-    final long l = it.itr(info);
-    if(l == Long.MIN_VALUE) throw RANGE_X.get(info, it);
+    final long l = item.itr(info);
+    if(l == Long.MIN_VALUE) throw RANGE_X.get(info, item);
     return Int.get(-l);
   }
 

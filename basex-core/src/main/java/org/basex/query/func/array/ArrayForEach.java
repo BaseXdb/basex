@@ -19,9 +19,9 @@ public final class ArrayForEach extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Array array = toArray(exprs[0], qc);
-    final FItem fun = checkArity(exprs[1], 1, qc);
+    final FItem func = checkArity(exprs[1], 1, qc);
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : array.members()) builder.append(fun.invokeValue(qc, info, val));
+    for(final Value value : array.members()) builder.append(func.invokeValue(qc, info, value));
     return builder.freeze();
   }
 

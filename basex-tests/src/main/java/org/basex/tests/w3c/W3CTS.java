@@ -315,7 +315,7 @@ public abstract class W3CTS extends Main {
           // serialize query
           final SerializerOptions sopts = context.options.get(MainOptions.SERIALIZER);
           try(Serializer ser = Serializer.get(ao, sopts)) {
-            for(final Item it : value) ser.serialize(it);
+            for(final Item item : value) ser.serialize(item);
           }
 
         } catch(final Exception ex) {
@@ -574,8 +574,8 @@ public abstract class W3CTS extends Main {
     for(int n = 0; n < ns; ++n) {
       final String nm = string(nodes.itemAt(n).string(null));
       final String src = srcs.get(nm);
-      final Item it = src == null ? coll(nm, qp) : Str.get(src);
-      qp.bind(string(vars.itemAt(n).string(null)), it);
+      final Item item = src == null ? coll(nm, qp) : Str.get(src);
+      qp.bind(string(vars.itemAt(n).string(null)), item);
     }
   }
 

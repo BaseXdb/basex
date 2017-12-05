@@ -67,7 +67,7 @@ public final class Constr {
       for(final Expr expr : exprs) {
         more = false;
         final Iter iter = expr.iter(qc);
-        for(Item it; (it = qc.next(iter)) != null && add(qc, it););
+        for(Item item; (item = qc.next(iter)) != null && add(qc, item););
       }
       if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
       return this;
@@ -85,9 +85,9 @@ public final class Constr {
    */
   private boolean add(final QueryContext qc, final Item item) throws QueryException {
     if(item instanceof Array) {
-      for(final Value val : ((Array) item).members()) {
-        for(final Item i : val) {
-          if(!add(qc, i)) return false;
+      for(final Value value : ((Array) item).members()) {
+        for(final Item it : value) {
+          if(!add(qc, it)) return false;
         }
       }
       return true;
@@ -99,12 +99,12 @@ public final class Constr {
       // type: nodes
       ANode node = (ANode) item;
 
-      final Type ip = item.type;
-      if(ip == NodeType.TXT) {
+      final Type type = item.type;
+      if(type == NodeType.TXT) {
         // type: text node
         text.add(node.string());
 
-      } else if(ip == NodeType.ATT) {
+      } else if(type == NodeType.ATT) {
         // type: attribute node
 
         // check if attribute is specified after texts or child nodes
@@ -125,7 +125,7 @@ public final class Constr {
         // add new namespace
         if(name.hasURI()) sc.ns.add(name.prefix(), name.uri());
 
-      } else if(ip == NodeType.NSP) {
+      } else if(type == NodeType.NSP) {
         // type: namespace node
 
         // no attribute allowed after texts or child nodes
@@ -144,7 +144,7 @@ public final class Constr {
           return false;
         }
 
-      } else if(ip == NodeType.DOC) {
+      } else if(type == NodeType.DOC) {
         // type: document node
 
         final BasicNodeIter iter = node.children();

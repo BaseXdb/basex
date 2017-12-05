@@ -74,20 +74,20 @@ public final class Transform extends Arr {
     try {
       for(final Let copy : copies) {
         final Iter iter = copy.expr.iter(qc);
-        Item it = iter.next();
-        if(!(it instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, it);
+        Item item = iter.next();
+        if(!(item instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, item);
         final Item i2 = iter.next();
         if(i2 != null)
-          throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(it, i2, qc));
+          throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(item, i2, qc));
 
         // copy node to main memory data instance
-        it = ((ANode) it).dbNodeCopy(qc.context.options, qc);
+        item = ((ANode) item).dbNodeCopy(qc.context.options, qc);
         // add resulting node to variable
-        qc.set(copy.var, it);
-        updates.addData(it.data());
+        qc.set(copy.var, item);
+        updates.addData(item.data());
       }
-      final Value v = exprs[0].value(qc);
-      if(!v.isEmpty()) throw UPMODIFY.get(info);
+      final Value value = exprs[0].value(qc);
+      if(!value.isEmpty()) throw UPMODIFY.get(info);
 
       updates.prepare(qc);
       updates.apply(qc);
@@ -135,10 +135,10 @@ public final class Transform extends Arr {
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Let copy : copies) sz += copy.exprSize();
-    for(final Expr expr : exprs) sz += expr.exprSize();
-    return sz;
+    int size = 1;
+    for(final Let copy : copies) size += copy.exprSize();
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
   }
 
   @Override

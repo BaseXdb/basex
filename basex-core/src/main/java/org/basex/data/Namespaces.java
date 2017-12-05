@@ -256,11 +256,11 @@ public final class Namespaces {
    * @param pre pre value
    */
   private static void addNodes(final NSNode node, final List<NSNode> list, final int pre) {
-    final int sz = node.children();
-    int i = Math.max(0, node.find(pre));
-    while(i > 0 && (i == sz || node.child(i).pre() >= pre)) i--;
-    for(; i < sz; i++) {
-      final NSNode child = node.child(i);
+    final int size = node.children();
+    int n = Math.max(0, node.find(pre));
+    while(n > 0 && (n == size || node.child(n).pre() >= pre)) n--;
+    for(; n < size; n++) {
+      final NSNode child = node.child(n);
       if(child.pre() >= pre) list.add(child);
       addNodes(child, list, pre);
     }

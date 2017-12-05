@@ -22,8 +22,8 @@ public final class UtilDeepEqual extends StandardFunc {
     final DeepEqual cmp = new DeepEqual(info);
     final Mode[] modes = Mode.values();
     if(exprs.length == 3) {
-      for(final Item it : exprs[2].atomValue(qc, info)) {
-        final byte[] key = uc(toToken(it));
+      for(final Item item : exprs[2].atomValue(qc, info)) {
+        final byte[] key = uc(toToken(item));
         boolean found = false;
         for(final Mode m : modes) {
           found = eq(key, token(m.name()));

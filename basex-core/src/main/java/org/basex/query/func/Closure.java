@@ -212,10 +212,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     boolean changed = false;
     for(final Entry<Var, Expr> entry : global.entrySet()) {
-      final Expr e = entry.getValue().inline(var, ex, cc);
-      if(e != null) {
+      final Expr exp = entry.getValue().inline(var, ex, cc);
+      if(exp != null) {
         changed = true;
-        entry.setValue(e);
+        entry.setValue(exp);
       }
     }
     return changed ? optimize(cc) : null;
@@ -282,8 +282,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } else {
       // collect closure
       final LinkedList<Clause> cls = new LinkedList<>();
-      for(final Entry<Var, Expr> e : global.entrySet()) {
-        cls.add(new Let(e.getKey(), e.getValue().value(qc), false));
+      for(final Entry<Var, Expr> entry : global.entrySet()) {
+        cls.add(new Let(entry.getKey(), entry.getValue().value(qc), false));
       }
       body = new GFLWOR(info, cls, expr);
     }
@@ -300,9 +300,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = fi.coerceTo((FuncType) declType.type, qc, info, true);
     } else if(body instanceof Value) {
       // we can type check immediately
-      final Value val = (Value) body;
-      checked = declType.instance(val) ? val :
-        declType.promote(val, null, qc, vs.sc, info, false);
+      final Value value = (Value) body;
+      checked = declType.instance(value) ? value :
+        declType.promote(value, null, qc, vs.sc, info, false);
     } else {
       // check at each call
       if(argType.type.instanceOf(declType.type) && !body.has(Flag.NDT)) {
@@ -313,8 +313,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = new TypeCheck(vs.sc, info, body, declType, true);
     }
 
-    final FuncType tp = (FuncType) seqType().type;
-    return new FuncItem(vs.sc, anns, name, params, tp, checked, vs.stackSize());
+    final FuncType type = (FuncType) seqType().type;
+    return new FuncItem(vs.sc, anns, name, params, type, checked, vs.stackSize());
   }
 
   @Override
@@ -385,17 +385,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Expr e : global.values()) {
-      if(!e.accept(visitor)) return false;
+    for(final Expr ex : global.values()) {
+      if(!ex.accept(visitor)) return false;
     }
     return visitor.inlineFunc(this);
   }
 
   @Override
   public int exprSize() {
-    int sz = 1;
-    for(final Expr e : global.values()) sz += e.exprSize();
-    return sz + expr.exprSize();
+    int size = 1;
+    for(final Expr ex : global.values()) size += ex.exprSize();
+    return size + expr.exprSize();
   }
 
   @Override

@@ -30,8 +30,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value.ebv(qc, ii);
+  public Item ebv(final QueryContext qc, final InputInfo info) throws QueryException {
+    return value.ebv(qc, info);
   }
 
   @Override
@@ -40,13 +40,13 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public void materialize(final InputInfo ii) throws QueryException {
-    value.materialize(ii);
+  public void materialize(final InputInfo info) throws QueryException {
+    value.materialize(info);
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return get(value.atomValue(qc, ii), size);
+  public Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+    return get(value.atomValue(qc, info), size);
   }
 
   @Override

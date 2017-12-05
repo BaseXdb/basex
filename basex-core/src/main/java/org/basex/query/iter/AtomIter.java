@@ -40,18 +40,18 @@ public final class AtomIter extends Iter {
   public Item next() throws QueryException {
     // shortcut if iterator will not yield any arrays
     if(size != -1) {
-      final Item it = qc.next(iter);
-      return it == null ? null : it.atomItem(qc, info);
+      final Item item = qc.next(iter);
+      return item == null ? null : item.atomItem(qc, info);
     }
 
     while(true) {
       if(atom == null) {
-        final Item it = iter.next();
-        if(it == null) return null;
-        atom = it.atomValue(qc, info).iter();
+        final Item item = iter.next();
+        if(item == null) return null;
+        atom = item.atomValue(qc, info).iter();
       }
-      final Item it = qc.next(atom);
-      if(it != null) return it;
+      final Item item = qc.next(atom);
+      if(item != null) return item;
       atom = null;
     }
   }
