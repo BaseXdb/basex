@@ -41,15 +41,9 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final Value insertBefore(final long pos, final Value value, final QueryContext qc) {
-    qc.checkStop();
-
-    final long n = value.size();
-    if(n == 0) return this;
-    if(n == 1) return insert(pos, (Item) value, qc);
-
-    final long r = size - pos;
-    if(value instanceof TreeSeq && (pos == 0 || r == 0)) {
+  protected final Value copyInsert(final long pos, final Value value, final QueryContext qc) {
+    final long right = size - pos;
+    if(value instanceof TreeSeq && (pos == 0 || right == 0)) {
       final TreeSeq other = (TreeSeq) value;
       return pos == 0 ? other.concat(this) : concat(other);
     }
@@ -63,10 +57,10 @@ public abstract class TreeSeq extends Seq {
       tsb.add(value, qc);
     }
 
-    if(r < MAX_SMALL) {
-      for(long i = size - r; i < size; i++) tsb.add(itemAt(i));
+    if(right < MAX_SMALL) {
+      for(long i = size - right; i < size; i++) tsb.add(itemAt(i));
     } else {
-      tsb.add(subSequence(pos, r, qc), qc);
+      tsb.add(subSequence(pos, right, qc), qc);
     }
 
     return tsb.seq();
@@ -102,17 +96,19 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final Seq atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
-    final TreeSeqBuilder tsb = new TreeSeqBuilder();
-    for(final Item item : this) tsb.add(item.atomValue(qc, info), qc);
-    return tsb.seq();
+  public final Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final BasicIter<?> iter = iter();
+    for(Item item; (item = iter.next()) != null;) vb.add(item.atomValue(qc, info));
+    return vb.value();
   }
 
   @Override
   public final long atomSize() {
-    long s = 0;
-    for(final Item item : this) s += item.atomSize();
-    return s;
+    long sz = 0;
+    final BasicIter<?> iter = iter();
+    for(Item item; (item = iter.next()) != null;) sz += item.atomSize();
+    return sz;
   }
 
   @Override

@@ -53,9 +53,9 @@ public abstract class ParseExpr extends Expr {
     final Item item = qc.next(iter);
     // check next item if size of iterator is larger than one or unknown (-1)
     if(item != null && iter.size() != 1) {
-      final Item nx = iter.next();
-      if(nx != null) {
-        final ValueBuilder vb = new ValueBuilder(qc).add(item, nx);
+      final Item next = iter.next();
+      if(next != null) {
+        final ValueBuilder vb = new ValueBuilder(qc, item, next);
         if(iter.next() != null) vb.add(Str.get(DOTS));
         throw SEQFOUND_X.get(info, vb.value());
       }
@@ -92,9 +92,9 @@ public abstract class ParseExpr extends Expr {
       final Iter iter = iter(qc);
       item = iter.next();
       if(item != null && !(item instanceof ANode)) {
-        final Item nx = iter.next();
-        if(nx != null) {
-          final ValueBuilder vb = new ValueBuilder(qc).add(item, nx);
+        final Item next = iter.next();
+        if(next != null) {
+          final ValueBuilder vb = new ValueBuilder(qc, item, next);
           if(iter.next() != null) vb.add(Str.get(DOTS));
           throw EBV_X.get(info, vb.value());
         }
@@ -178,13 +178,13 @@ public abstract class ParseExpr extends Expr {
    */
   void checkAllUp(final Expr... exprs) throws QueryException {
     // updating state: 0 = initial state, 1 = updating, -1 = non-updating
-    int s = 0;
+    int state = 0;
     for(final Expr expr : exprs) {
       expr.checkUp();
       if(expr.isVacuous()) continue;
-      final boolean u = expr.has(Flag.UPD);
-      if(u ? s == -1 : s == 1) throw UPALL.get(info);
-      s = u ? 1 : -1;
+      final boolean updating = expr.has(Flag.UPD);
+      if(updating ? state == -1 : state == 1) throw UPALL.get(info);
+      state = updating ? 1 : -1;
     }
   }
 

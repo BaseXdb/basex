@@ -61,9 +61,9 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    */
   private Map result(final long s0, final QueryContext qc) throws QueryException {
     // derived from Java's random class
-    final long s1 = next(s0), s2 = next(s1);
-    final Dbl number = Dbl.get(((s1 >>> 22 << 27) + (s2 >>> 21)) / (double) (1L << 53));
-    final FItem next = nextFunc(s2), permute = permuteFunc(s1, qc);
+    final long itr1 = next(s0), itr2 = next(itr1);
+    final Dbl number = Dbl.get(((itr1 >>> 22 << 27) + (itr2 >>> 21)) / (double) (1L << 53));
+    final FItem next = nextFunc(itr2), permute = permuteFunc(itr1, qc);
     return Map.EMPTY.put(NUMBER, number, info).put(NEXT, next, info).put(PERMUTE, permute, info);
   }
 

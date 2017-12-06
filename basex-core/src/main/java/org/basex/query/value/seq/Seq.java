@@ -104,9 +104,9 @@ public abstract class Seq extends Value {
    * @param qc query context
    * @return resulting value
    */
-  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
+  public final Value insertBefore(final long pos, final Value value, final QueryContext qc) {
     final long n = value.size();
-    return n == 1 ? insert(pos, (Item) value, qc) : n == 0 ? this : copyInsert(pos, value, qc);
+    return n == 0 ? this : n == 1 ? insert(pos, (Item) value, qc) : copyInsert(pos, value, qc);
   }
 
   /**
@@ -126,15 +126,13 @@ public abstract class Seq extends Value {
    * @param qc query context
    * @return resulting value
    */
-  final Value copyInsert(final long pos, final Value value, final QueryContext qc) {
+  protected Value copyInsert(final long pos, final Value value, final QueryContext qc) {
+    if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).seq();
+
     final ValueBuilder vb = new ValueBuilder(qc);
-    if(pos == size) {
-      vb.add(this, value);
-    } else {
-      for(long i = 0; i < pos; i++) vb.add(itemAt(i));
-      vb.add(value);
-      for(long i = pos; i < size; i++) vb.add(itemAt(i));
-    }
+    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
+    vb.add(value);
+    for(long i = pos; i < size; i++) vb.add(itemAt(i));
     return vb.value(type);
   }
 

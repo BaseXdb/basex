@@ -72,16 +72,16 @@ public final class FTMildNot extends FTExpr {
 
   /**
    * Performs a mild not operation.
-   * @param m1 first match list
-   * @param m2 second match list
+   * @param matches1 first match list
+   * @param matches2 second match list
    * @return resulting match
    */
-  private static FTMatches mildnot(final FTMatches m1, final FTMatches m2) {
-    final FTMatches all = new FTMatches(m1.pos);
-    for(final FTMatch s1 : m1) {
+  private static FTMatches mildnot(final FTMatches matches1, final FTMatches matches2) {
+    final FTMatches all = new FTMatches(matches1.pos);
+    for(final FTMatch match1 : matches1) {
       boolean n = true;
-      for(final FTMatch s2 : m2) n &= s1.notin(s2);
-      if(n) all.add(s1);
+      for(final FTMatch match2 : matches2) n &= match1.notin(match2);
+      if(n) all.add(match1);
     }
     return all;
   }

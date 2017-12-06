@@ -346,11 +346,11 @@ public abstract class Array extends FItem {
 
   @Override
   public final long atomSize() {
-    long s = 0;
+    long size = 0;
     for(final Value value : members()) {
-      for(final Item item : value) s += item.atomSize();
+      for(final Item item : value) size += item.atomSize();
     }
-    return s;
+    return size;
   }
 
   /**

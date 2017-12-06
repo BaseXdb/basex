@@ -50,9 +50,9 @@ public final class Treat extends Single {
     if(st.zero()) throw NOTREAT_X_X_X.get(info, item.type, st, item);
 
     if(st.zeroOrOne()) {
-      final Item n = iter.next();
-      if(n != null) {
-        final ValueBuilder vb = new ValueBuilder(qc).add(item, n);
+      final Item next = iter.next();
+      if(next != null) {
+        final ValueBuilder vb = new ValueBuilder(qc, item, next);
         if(iter.next() != null) vb.add(Str.get(DOTS));
         throw NOTREAT_X_X_X.get(info, expr.seqType(), st, vb.value());
       }

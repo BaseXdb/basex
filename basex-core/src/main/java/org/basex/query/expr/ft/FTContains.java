@@ -46,7 +46,7 @@ public final class FTContains extends Single {
     final FTLexer tmp = qc.ftLexer, lexer = new FTLexer(new FTOpt());
     qc.ftLexer = lexer;
     try {
-      double s = 0;
+      double score = 0;
       int c = 0;
       boolean f = false;
       final FTPosData ftPosData = qc.ftPosData;
@@ -56,7 +56,7 @@ public final class FTContains extends Single {
         final FTMatches all = it.matches();
         if(all.matches()) {
           f = true;
-          if(scoring) s += it.score();
+          if(scoring) score += it.score();
           // cache entry for visualizations or ft:mark/ft:extract
           if(ftPosData != null && item instanceof DBNode) {
             final DBNode node = (DBNode) item;
@@ -65,7 +65,7 @@ public final class FTContains extends Single {
         }
         c++;
       }
-      return scoring ? Bln.get(f, Scoring.avg(s, c)) : Bln.get(f);
+      return scoring ? Bln.get(f, Scoring.avg(score, c)) : Bln.get(f);
     } finally {
       qc.ftLexer = tmp;
     }

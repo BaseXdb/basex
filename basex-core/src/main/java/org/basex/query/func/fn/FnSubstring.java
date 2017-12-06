@@ -19,41 +19,42 @@ public final class FnSubstring extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // normalize positions
-    final byte[] str = toEmptyToken(exprs[0], qc);
+    final byte[] string = toEmptyToken(exprs[0], qc);
 
-    final Item is = toAtomItem(exprs[1], qc);
-    int s;
-    if(is instanceof Int) {
-      s = (int) is.itr(info) - 1;
+    final Item item = toAtomItem(exprs[1], qc);
+    int start;
+    if(item instanceof Int) {
+      start = (int) item.itr(info) - 1;
     } else {
-      final double ds = is.dbl(info);
-      if(Double.isNaN(ds)) return Str.ZERO;
-      s = subPos(ds);
+      final double dbl = item.dbl(info);
+      if(Double.isNaN(dbl)) return Str.ZERO;
+      start = subPos(dbl);
     }
 
-    final boolean end = exprs.length == 3, ascii = ascii(str);
-    int l = ascii ? str.length : length(str);
-    int e = l;
-    if(end) {
+    final boolean ascii = ascii(string);
+    int length = ascii ? string.length : length(string);
+    int end = length;
+    if(exprs.length == 3) {
       final Item ie = toAtomItem(exprs[2], qc);
-      e = ie instanceof Int ? (int) ie.itr(info) : subPos(ie.dbl(info) + 1);
+      end = ie instanceof Int ? (int) ie.itr(info) : subPos(ie.dbl(info) + 1);
     }
-    if(s < 0) {
-      e += s;
-      s = 0;
+    if(start < 0) {
+      end += start;
+      start = 0;
     }
-    e = Math.min(l, end ? s + e : Integer.MAX_VALUE);
-    if(s >= e) return Str.ZERO;
-    if(ascii) return Str.get(substring(str, s, e));
+    end = Math.min(length, exprs.length == 3 ? start + end : Integer.MAX_VALUE);
+    if(start >= end) return Str.ZERO;
+    if(ascii) return Str.get(substring(string, start, end));
 
-    int ss = s, ee = e, p = 0;
-    final int sl = str.length;
-    for(l = 0; l < sl; l += cl(str, l), ++p) {
-      if(p == s) ss = l;
-      if(p == e) ee = l;
+    // process strings with non-ascii characters
+    int ss = start, ee = end, p = 0;
+    final int sl = string.length;
+    for(length = 0; length < sl; length += cl(string, length), ++p) {
+      if(p == start) ss = length;
+      if(p == end) ee = length;
     }
-    if(p == e) ee = l;
-    return Str.get(Arrays.copyOfRange(str, ss, ee));
+    if(p == end) ee = length;
+    return Str.get(Arrays.copyOfRange(string, ss, ee));
   }
 
   /**

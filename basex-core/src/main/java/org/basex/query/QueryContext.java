@@ -637,16 +637,16 @@ public final class QueryContext extends Job implements Closeable {
     final StaticContext sc = root != null ? root.sc : new StaticContext(this);
 
     // String input
-    Object val = value;
-    if(val instanceof String) {
-      final String string = (String) val;
+    Object object = value;
+    if(object instanceof String) {
+      final String string = (String) object;
       final StringList strings = new StringList(1);
       // strings containing multiple items (value \1 ...)
       if(string.indexOf('\1') == -1) {
         strings.add(string);
       } else {
         strings.add(string.split("\1"));
-        val = strings.toArray();
+        object = strings.toArray();
       }
 
       // sub types overriding the global value (value \2 type)
@@ -654,9 +654,9 @@ public final class QueryContext extends Job implements Closeable {
         final ValueBuilder vb = new ValueBuilder(this);
         for(final String str : strings) {
           final int i = str.indexOf('\2');
-          final String s = i == -1 ? str : str.substring(0, i);
-          final String t = i == -1 ? type : str.substring(i + 1);
-          vb.add(cast(s, t));
+          final String val = i == -1 ? str : str.substring(0, i);
+          final String tp = i == -1 ? type : str.substring(i + 1);
+          vb.add(cast(val, tp));
         }
         return vb.value();
       }
@@ -664,7 +664,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // no type specified: return original value or convert Java object
     if(type == null || type.isEmpty()) {
-      return val instanceof Value ? (Value) val : JavaFunction.toValue(val, this, sc);
+      return object instanceof Value ? (Value) object : JavaFunction.toValue(object, this, sc);
     }
 
     // convert to json
@@ -672,7 +672,7 @@ public final class QueryContext extends Job implements Closeable {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.FORMAT, JsonFormat.XQUERY);
-        return JsonConverter.get(jp).convert(token(val.toString()), null);
+        return JsonConverter.get(jp).convert(token(object.toString()), null);
       } catch(final QueryIOException ex) {
         throw ex.getCause();
       }
@@ -697,26 +697,26 @@ public final class QueryContext extends Job implements Closeable {
     if(tp == null) throw WHICHTYPE_X.get(null, type);
 
     // cast XDM values
-    if(val instanceof Value) {
+    if(object instanceof Value) {
       // cast single item
-      if(val instanceof Item) return tp.cast((Item) val, this, sc, null);
+      if(object instanceof Item) return tp.cast((Item) object, this, sc, null);
       // cast sequence
-      final Value vl = (Value) val;
+      final Value vl = (Value) object;
       final ValueBuilder vb = new ValueBuilder(this);
       final BasicIter<?> iter = vl.iter();
       for(Item item; (item = iter.next()) != null;) vb.add(tp.cast(item, this, sc, null));
       return vb.value();
     }
 
-    if(val instanceof String[]) {
+    if(object instanceof String[]) {
       // cast string array
       final ValueBuilder vb = new ValueBuilder(this);
-      for(final String s : (String[]) val) vb.add(tp.cast(s, this, sc, null));
+      for(final String string : (String[]) object) vb.add(tp.cast(string, this, sc, null));
       return vb.value();
     }
 
     // cast any other object to XDM
-    return tp.cast(val, this, sc, null);
+    return tp.cast(object, this, sc, null);
   }
 
   /**

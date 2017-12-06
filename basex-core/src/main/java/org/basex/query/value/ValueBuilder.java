@@ -17,47 +17,59 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class ValueBuilder {
+  /** QueryContext. */
+  private final QueryContext qc;
+
   /** The first added value is cached. */
   private Value firstValue;
   /** Underlying sequence builder, only instantiated if there are at least two items. */
   private TreeSeqBuilder builder;
-  /** QueryContext qc. */
-  private QueryContext qc;
 
   /**
    * Constructor.
-   * @param qc query context
+   * @param qc query context (required for interrupting running queries)
    */
   public ValueBuilder(final QueryContext qc) {
     this.qc = qc;
   }
 
   /**
-   * Concatenates two values.
-   * @param v1 first value to concatenate
-   * @param v2 second value to concatenate
-   * @param qc query context
-   * @return value which contains all items of {@code v1} followed by all items of {@code v2}
+   * Constructor with initial items.
+   * @param qc query context (required for interrupting running queries)
+   * @param item1 first item to append
+   * @param item2 second item to append
    */
-  public static Value concat(final Value v1, final Value v2, final QueryContext qc) {
-    final long s1 = v1.size();
-    if(s1 == 0) return v2;
-    final long s2 = v2.size();
-    if(s2 == 0) return v1;
-    if(s1 > 1) return ((Seq) v1).insertBefore(s1, v2, qc);
-    if(s2 > 1) return ((Seq) v2).insert(0, (Item) v1, qc);
-    return TreeSeqBuilder.value(new Item[] { (Item) v1, (Item) v2 }, 2, null);
+  public ValueBuilder(final QueryContext qc, final Item item1, final Item item2) {
+    this(qc);
+    builder = new TreeSeqBuilder().add(item1).add(item2);
+  }
+
+  /**
+   * Concatenates two values.
+   * @param value1 first value to concatenate
+   * @param value2 second value to concatenate
+   * @param qc query context
+   * @return concatenated values
+   */
+  public static Value concat(final Value value1, final Value value2, final QueryContext qc) {
+    final long size1 = value1.size();
+    if(size1 == 0) return value2;
+    final long size2 = value2.size();
+    if(size2 == 0) return value1;
+    if(size1 > 1) return ((Seq) value1).insertBefore(size1, value2, qc);
+    if(size2 > 1) return ((Seq) value2).insert(0, (Item) value1, qc);
+    return TreeSeqBuilder.value(new Item[] { (Item) value1, (Item) value2 }, 2, null);
   }
 
   /**
    * Returns a {@link Value} representation of the given items.
    * @param items array containing the items
-   * @param n number of items
+   * @param size number of items
    * @param type item type of the resulting value (not checked), may be {@code null}
    * @return the value
    */
-  public static Value value(final Item[] items, final int n, final Type type) {
-    return n == 0 ? Empty.SEQ : n == 1 ? items[0] : TreeSeqBuilder.value(items, n, type);
+  public static Value value(final Item[] items, final int size, final Type type) {
+    return size == 0 ? Empty.SEQ : size == 1 ? items[0] : TreeSeqBuilder.value(items, size, type);
   }
 
   /**
@@ -126,50 +138,6 @@ public final class ValueBuilder {
       } else {
         firstValue = value;
       }
-    }
-    return this;
-  }
-
-  /**
-   * Appends two item to the built value.
-   * @param item1 first item to append
-   * @param item2 second item to append
-   * @return reference to this builder for convenience
-   */
-  public ValueBuilder add(final Item item1, final Item item2) {
-    qc.checkStop();
-    if(firstValue != null) {
-      add(item1);
-      add(item2);
-    } else {
-      TreeSeqBuilder tree = builder;
-      if(tree == null) {
-        tree = new TreeSeqBuilder();
-        builder = tree;
-      }
-      tree.add(item1).add(item2);
-    }
-    return this;
-  }
-
-  /**
-   * Appends two values to the built value.
-   * @param value1 first value to append
-   * @param value2 second value to append
-   * @return reference to this builder for convenience
-   */
-  public ValueBuilder add(final Value value1, final Value value2) {
-    if(firstValue != null) {
-      add(value1);
-      add(value2);
-    } else {
-      TreeSeqBuilder tree = builder;
-      if(tree == null) {
-        tree = new TreeSeqBuilder();
-        builder = tree;
-      }
-      tree.add(value1, qc);
-      tree.add(value2, qc);
     }
     return this;
   }

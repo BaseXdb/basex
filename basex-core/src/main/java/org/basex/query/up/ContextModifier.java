@@ -137,10 +137,10 @@ abstract class ContextModifier {
    * @return number of updates
    */
   final synchronized int size() {
-    int s = 0;
-    for(final DataUpdates up : dbUpdates.values()) s += up.size();
-    for(final NameUpdates up : nameUpdates.values()) s += up.size();
-    for(final UserUpdates up : userUpdates.values()) s += up.size();
-    return s;
+    int size = 0;
+    for(final DataUpdates up : dbUpdates.values()) size += up.size();
+    for(final NameUpdates up : nameUpdates.values()) size += up.size();
+    for(final UserUpdates up : userUpdates.values()) size += up.size();
+    return size;
   }
 }

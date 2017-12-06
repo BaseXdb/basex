@@ -67,35 +67,37 @@ public final class FnSort extends StandardFunc {
 
   /**
    * Sort the input data and returns integers representing the item order.
-   * @param vl value list
+   * @param values value list
    * @param sf calling function
    * @param coll collation
    * @param qc query context
    * @return item order
    * @throws QueryException query exception
    */
-  public static Integer[] sort(final ValueList vl, final StandardFunc sf, final Collation coll,
+  public static Integer[] sort(final ValueList values, final StandardFunc sf, final Collation coll,
       final QueryContext qc) throws QueryException {
 
-    final int al = vl.size();
+    final int al = values.size();
     final Integer[] order = new Integer[al];
     for(int o = 0; o < al; o++) order[o] = o;
     try {
       Arrays.sort(order, (i1, i2) -> {
         qc.checkStop();
         try {
-          final Value v1 = vl.get(i1), v2 = vl.get(i2);
-          final long s1 = v1.size(), s2 = v2.size(), sl = Math.min(s1, s2);
-          for(int v = 0; v < sl; v++) {
-            Item m = v1.itemAt(v), n = v2.itemAt(v);
-            if(m == Dbl.NAN || m == Flt.NAN) m = null;
-            if(n == Dbl.NAN || n == Flt.NAN) n = null;
-            if(m != null && n != null && !m.comparable(n)) throw diffError(m, n, sf.info);
-            final int d = m == null ? n == null ? 0 : -1 : n == null ? 1 :
-              m.diff(n, coll, sf.info);
-            if(d != 0 && d != Item.UNDEF) return d;
+          final Value value1 = values.get(i1), value2 = values.get(i2);
+          final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
+          for(int i = 0; i < il; i++) {
+            Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
+            if(item1 == Dbl.NAN || item1 == Flt.NAN) item1 = null;
+            if(item2 == Dbl.NAN || item2 == Flt.NAN) item2 = null;
+            if(item1 != null && item2 != null && !item1.comparable(item2))
+              throw diffError(item1, item2, sf.info);
+
+            final int diff = item1 == null ? item2 == null ? 0 : -1 : item2 == null ? 1 :
+              item1.diff(item2, coll, sf.info);
+            if(diff != 0 && diff != Item.UNDEF) return diff;
           }
-          return (int) (s1 - s2);
+          return (int) (size1 - size2);
         } catch(final QueryException ex) {
           throw new QueryRTException(ex);
         }
@@ -110,7 +112,6 @@ public final class FnSort extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     // optimize sort on sequences
     final Expr expr1 = exprs[0];
-    final int el = exprs.length;
     final SeqType st1 = expr1.seqType();
     if(st1.zero()) return expr1;
 
@@ -118,7 +119,7 @@ public final class FnSort extends StandardFunc {
       final Value value = value((Value) expr1);
       if(value != null) return value;
     }
-    if(el == 3) coerceFunc(2, cc, SeqType.AAT_ZM, st1.type.seqType());
+    if(exprs.length == 3) coerceFunc(2, cc, SeqType.AAT_ZM, st1.type.seqType());
 
     return adoptType(expr1);
   }

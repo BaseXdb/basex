@@ -39,36 +39,35 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   /**
    * Returns a {@link Value} representation of the given items.
    * @param items array containing the items
-   * @param n number of items (must be {@code 2} or more)
+   * @param size number of items (must be {@code 2} or more)
    * @param type item type of the resulting value (not checked), may be {@code null}
    * @return the value
    */
-  public static Seq value(final Item[] items, final int n, final Type type) {
-    if(n <= TreeSeq.MAX_SMALL) {
-      final Item[] small = new Item[n];
-      System.arraycopy(items, 0, small, 0, n);
+  public static Seq value(final Item[] items, final int size, final Type type) {
+    if(size <= TreeSeq.MAX_SMALL) {
+      final Item[] small = new Item[size];
+      System.arraycopy(items, 0, small, 0, size);
       return new SmallSeq(small, type);
     }
-
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
-    for(int i = 0; i < n; i++) tsb.add(items[i]);
+    for(int i = 0; i < size; i++) tsb.add(items[i]);
     return tsb.seq(type);
   }
 
   /**
-   * Adds an element to the start of the array.
-   * @param elem element to add
+   * Adds an item to the start of the array.
+   * @param item item to add
    * @return reference to this builder for convenience
    */
-  public TreeSeqBuilder addFront(final Item elem) {
+  public TreeSeqBuilder addFront(final Item item) {
     if(inLeft < TreeSeq.MAX_DIGIT) {
       // just insert the element
-      vals[(mid - inLeft + CAP - 1) % CAP] = elem;
+      vals[(mid - inLeft + CAP - 1) % CAP] = item;
       inLeft++;
     } else if(tree.isEmpty() && inRight < TreeSeq.MAX_DIGIT) {
       // move the middle to the left
       mid = (mid + CAP - 1) % CAP;
-      vals[(mid - inLeft + CAP) % CAP] = elem;
+      vals[(mid - inLeft + CAP) % CAP] = item;
       inRight++;
     } else {
       // push leaf node into the tree
@@ -83,40 +82,40 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       }
 
       // insert the element
-      vals[(mid - rest + CAP - 1) % CAP] = elem;
+      vals[(mid - rest + CAP - 1) % CAP] = item;
       inLeft = rest + 1;
     }
     return this;
   }
 
   /**
-   * Adds an element to the end of the array.
-   * @param elem element to add
+   * Adds an item to the end of the array.
+   * @param item item to add
    * @return reference to this builder for convenience
    */
-  public TreeSeqBuilder add(final Item elem) {
+  public TreeSeqBuilder add(final Item item) {
     if(inRight < TreeSeq.MAX_DIGIT) {
       // just insert the element
-      vals[(mid + inRight) % CAP] = elem;
+      vals[(mid + inRight) % CAP] = item;
       inRight++;
+
     } else if(tree.isEmpty() && inLeft < TreeSeq.MAX_DIGIT) {
       // move the middle to the right
       mid = (mid + 1) % CAP;
-      vals[(mid + inRight + CAP - 1) % CAP] = elem;
+      vals[(mid + inRight + CAP - 1) % CAP] = item;
       inLeft++;
+
     } else {
       // push leaf node into the tree
       tree.append(new LeafNode(items(mid, NODE_SIZE)));
-
       // move rest of the nodes to the right
       final int rest = inRight - NODE_SIZE;
       for(int i = 0; i < rest; i++) {
         final int to = (mid + i) % CAP, from = (to + NODE_SIZE) % CAP;
         vals[to] = vals[from];
       }
-
-      // insert the element
-      vals[(mid + rest) % CAP] = elem;
+      // insert the item
+      vals[(mid + rest) % CAP] = item;
       inRight = rest + 1;
     }
     return this;
@@ -211,7 +210,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * Creates a sequence containing the current elements of this builder.
    * @return resulting sequence
    */
-  Seq seq() {
+  public Seq seq() {
     return seq(null);
   }
 

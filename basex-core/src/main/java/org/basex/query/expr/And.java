@@ -89,13 +89,13 @@ public final class And extends Logical {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // compute scoring
     if(qc.scoring) {
-      double s = 0;
+      double score = 0;
       for(final Expr expr : exprs) {
         final Item item = expr.ebv(qc, info);
         if(!item.bool(info)) return Bln.FALSE;
-        s += item.score();
+        score += item.score();
       }
-      return Bln.get(true, Scoring.avg(s, exprs.length));
+      return Bln.get(true, Scoring.avg(score, exprs.length));
     }
 
     // standard evaluation

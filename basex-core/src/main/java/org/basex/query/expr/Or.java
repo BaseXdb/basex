@@ -61,14 +61,14 @@ public final class Or extends Logical {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // compute scoring
     if(qc.scoring) {
-      double s = 0;
-      boolean f = false;
+      double score = 0;
+      boolean found = false;
       for(final Expr expr : exprs) {
         final Item item = expr.ebv(qc, info);
-        f |= item.bool(info);
-        s += item.score();
+        found |= item.bool(info);
+        score += item.score();
       }
-      return Bln.get(f, Scoring.avg(s, exprs.length));
+      return Bln.get(found, Scoring.avg(score, exprs.length));
     }
 
     // standard evaluation

@@ -82,7 +82,7 @@ public enum ListType implements Type {
 
     final byte[][] values = split(normalize(item.string(info)), ' ');
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final byte[] v : values) vb.add(type.cast(Str.get(v), qc, sc, info));
+    for(final byte[] value : values) vb.add(type.cast(Str.get(value), qc, sc, info));
     return vb.value();
   }
 

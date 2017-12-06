@@ -90,68 +90,68 @@ public abstract class JavaFunction extends Arr {
 
   /**
    * Converts the specified result to an XQuery value.
-   * @param obj result object
+   * @param object result object
    * @param qc query context
    * @param sc static context
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object obj, final QueryContext qc, final StaticContext sc)
+  public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc)
       throws QueryException {
 
-    if(obj == null) return Empty.SEQ;
-    if(obj instanceof Value) return (Value) obj;
-    if(obj instanceof Iter) return ((Iter) obj).value(qc);
+    if(object == null) return Empty.SEQ;
+    if(object instanceof Value) return (Value) object;
+    if(object instanceof Iter) return ((Iter) object).value(qc);
     // find XQuery mapping for specified type
-    final Type type = type(obj);
-    if(type != null) return type.cast(obj, qc, sc, null);
+    final Type type = type(object);
+    if(type != null) return type.cast(object, qc, sc, null);
 
     // primitive arrays
-    if(obj instanceof byte[])    return BytSeq.get((byte[]) obj);
-    if(obj instanceof long[])    return IntSeq.get((long[]) obj, AtomType.ITR);
-    if(obj instanceof char[])    return Str.get(new String((char[]) obj));
-    if(obj instanceof boolean[]) return BlnSeq.get((boolean[]) obj);
-    if(obj instanceof double[])  return DblSeq.get((double[]) obj);
-    if(obj instanceof float[])   return FltSeq.get((float[]) obj);
+    if(object instanceof byte[])    return BytSeq.get((byte[]) object);
+    if(object instanceof long[])    return IntSeq.get((long[]) object, AtomType.ITR);
+    if(object instanceof char[])    return Str.get(new String((char[]) object));
+    if(object instanceof boolean[]) return BlnSeq.get((boolean[]) object);
+    if(object instanceof double[])  return DblSeq.get((double[]) object);
+    if(object instanceof float[])   return FltSeq.get((float[]) object);
 
     // no array: return Java type
-    if(!obj.getClass().isArray()) return new Jav(obj, qc);
+    if(!object.getClass().isArray()) return new Jav(object, qc);
 
     // empty array
-    final int s = Array.getLength(obj);
+    final int s = Array.getLength(object);
     if(s == 0) return Empty.SEQ;
     // string array
-    if(obj instanceof String[]) {
-      final String[] r = (String[]) obj;
+    if(object instanceof String[]) {
+      final String[] r = (String[]) object;
       final byte[][] b = new byte[r.length][];
       for(int v = 0; v < s; v++) b[v] = token(r[v]);
       return StrSeq.get(b);
     }
     // character array
-    if(obj instanceof char[][]) {
-      final char[][] r = (char[][]) obj;
+    if(object instanceof char[][]) {
+      final char[][] r = (char[][]) object;
       final byte[][] b = new byte[r.length][];
       for(int v = 0; v < s; v++) b[v] = token(new String(r[v]));
       return StrSeq.get(b);
     }
     // short array
-    if(obj instanceof short[]) {
-      final short[] r = (short[]) obj;
+    if(object instanceof short[]) {
+      final short[] r = (short[]) object;
       final long[] b = new long[r.length];
       for(int v = 0; v < s; v++) b[v] = r[v];
       return IntSeq.get(b, AtomType.SHR);
     }
     // integer array
-    if(obj instanceof int[]) {
-      final int[] r = (int[]) obj;
+    if(object instanceof int[]) {
+      final int[] r = (int[]) object;
       final long[] b = new long[r.length];
       for(int v = 0; v < s; v++) b[v] = r[v];
       return IntSeq.get(b, AtomType.INT);
     }
     // any other array (also nested ones)
-    final Object[] objs = (Object[]) obj;
+    final Object[] objects = (Object[]) object;
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Object o : objs) vb.add(toValue(o, qc, sc));
+    for(final Object obj : objects) vb.add(toValue(obj, qc, sc));
     return vb.value();
   }
 

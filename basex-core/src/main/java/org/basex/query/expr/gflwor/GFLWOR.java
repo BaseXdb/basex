@@ -68,12 +68,8 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Eval eval = newEval();
-    if(!eval.next(qc)) return Empty.SEQ;
-    final Value v1 = ret.value(qc);
-    if(!eval.next(qc)) return v1;
-
-    final ValueBuilder vb = new ValueBuilder(qc).add(v1);
-    do vb.add(ret.value(qc)); while(eval.next(qc));
+    final ValueBuilder vb = new ValueBuilder(qc);
+    while(eval.next(qc)) vb.add(ret.value(qc));
     return vb.value();
   }
 

@@ -213,10 +213,10 @@ public class Dur extends ADateDur {
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo info) throws QueryException {
-    final Dur d = (Dur) (item instanceof Dur ? item : type.cast(item, null, null, info));
-    final BigDecimal s1 = sec == null ? BigDecimal.ZERO : sec;
-    final BigDecimal s2 = d.sec == null ? BigDecimal.ZERO : d.sec;
-    return mon == d.mon && s1.compareTo(s2) == 0;
+    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, null, info));
+    final BigDecimal dec1 = sec == null ? BigDecimal.ZERO : sec;
+    final BigDecimal dec2 = dur.sec == null ? BigDecimal.ZERO : dur.sec;
+    return mon == dur.mon && dec1.compareTo(dec2) == 0;
   }
 
   @Override
@@ -239,9 +239,9 @@ public class Dur extends ADateDur {
   public final boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof Dur)) return false;
-    final Dur d = (Dur) obj;
-    return type.eq(d.type) && mon == d.mon &&
-        (sec == null ? d.sec == null : sec.compareTo(d.sec) == 0);
+    final Dur dur = (Dur) obj;
+    return type.eq(dur.type) && mon == dur.mon &&
+        (sec == null ? dur.sec == null : sec.compareTo(dur.sec) == 0);
   }
 
   @Override

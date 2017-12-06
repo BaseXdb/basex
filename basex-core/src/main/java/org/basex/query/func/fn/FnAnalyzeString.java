@@ -31,18 +31,18 @@ public final class FnAnalyzeString extends RegEx {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toEmptyToken(exprs[0], qc);
-    final Pattern p = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
-    final String str = string(value);
-    final Matcher m = p.matcher(str);
+    final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
+    final String string = string(value);
+    final Matcher matcher = pattern.matcher(string);
 
     final FElem root = new FElem(Q_ANALYZE).declareNS();
-    int s = 0;
-    while(m.find()) {
-      if(s != m.start()) nonmatch(str.substring(s, m.start()), root);
-      match(m, str, root, 0);
-      s = m.end();
+    int start = 0;
+    while(matcher.find()) {
+      if(start != matcher.start()) nonmatch(string.substring(start, matcher.start()), root);
+      match(matcher, string, root, 0);
+      start = matcher.end();
     }
-    if(s != str.length()) nonmatch(str.substring(s), root);
+    if(start != string.length()) nonmatch(string.substring(start), root);
     return root;
   }
 

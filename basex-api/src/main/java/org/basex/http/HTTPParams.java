@@ -134,11 +134,11 @@ public final class HTTPParams {
     for(final String param : Strings.split(body().toString(), '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
-        final Atm i = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
-        map.merge(parts[0], i, (v1, v2) -> {
+        final Atm atm = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
+        map.merge(parts[0], atm, (value1, value2) -> {
           final ItemList items = new ItemList();
-          for(final Item item : v1) items.add(item);
-          for(final Item item : v2) items.add(item);
+          for(final Item item : value1) items.add(item);
+          for(final Item item : value2) items.add(item);
           return items.value();
         });
       }

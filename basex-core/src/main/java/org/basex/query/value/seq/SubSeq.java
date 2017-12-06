@@ -51,7 +51,7 @@ final class SubSeq extends Seq {
   @Override
   public Value reverse(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long i = 0; i < size; i++) vb.addFront(sub.itemAt(start + i));
+    for(long i = 0; i < size; i++) vb.addFront(itemAt(i));
     return vb.value();
   }
 

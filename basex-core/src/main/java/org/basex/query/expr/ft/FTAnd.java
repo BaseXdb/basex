@@ -93,18 +93,18 @@ public final class FTAnd extends FTExpr {
 
   /**
    * Merges two matches.
-   * @param i1 first item
-   * @param i2 second item
+   * @param node1 first node
+   * @param node2 second node
    */
-  private static void and(final FTNode i1, final FTNode i2) {
-    final FTMatches all = new FTMatches((byte) Math.max(i1.matches().pos, i2.matches().pos));
-    for(final FTMatch s1 : i1.matches()) {
-      for(final FTMatch s2 : i2.matches()) {
-        all.add(new FTMatch(s1.size() + s2.size()).add(s1).add(s2));
+  private static void and(final FTNode node1, final FTNode node2) {
+    final FTMatches all = new FTMatches((byte) Math.max(node1.matches().pos, node2.matches().pos));
+    for(final FTMatch match1 : node1.matches()) {
+      for(final FTMatch match2 : node2.matches()) {
+        all.add(new FTMatch(match1.size() + match2.size()).add(match1).add(match2));
       }
     }
-    i1.score(Scoring.avg(i1.score() + i2.score(), 2));
-    i1.matches(all);
+    node1.score(Scoring.avg(node1.score() + node2.score(), 2));
+    node1.matches(all);
   }
 
   @Override

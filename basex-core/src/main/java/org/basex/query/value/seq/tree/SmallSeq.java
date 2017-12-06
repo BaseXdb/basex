@@ -39,9 +39,9 @@ final class SmallSeq extends TreeSeq {
 
   @Override
   public TreeSeq reverse(final QueryContext qc) {
-    final int n = elems.length;
-    final Item[] es = new Item[n];
-    for(int i = 0; i < n; i++) es[i] = elems[n - 1 - i];
+    final int el = elems.length;
+    final Item[] es = new Item[el];
+    for(int e = 0; e < el; e++) es[e] = elems[el - 1 - e];
     return new SmallSeq(es, type);
   }
 

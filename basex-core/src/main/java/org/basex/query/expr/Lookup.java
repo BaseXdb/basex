@@ -116,11 +116,11 @@ public final class Lookup extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    final Expr keys = exprs[0];
     final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : exprs[1].iter(qc);
 
     // iterate through all map/array inputs
+    final Expr keys = exprs[0];
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof Map || item instanceof Array)) throw LOOKUP_X.get(info, item);
       final FItem fit = (FItem) item;

@@ -18,20 +18,20 @@ import org.basex.util.*;
 public final class FnReplace extends RegEx {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toEmptyToken(exprs[0], qc);
-    final Pattern pat = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);
-    final byte[] rep = toToken(exprs[2], qc);
-    String replace = string(rep);
-    if((pat.flags() & Pattern.LITERAL) == 0) {
+    final byte[] value1 = toEmptyToken(exprs[0], qc);
+    final Pattern pattern = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);
+    final byte[] value2 = toToken(exprs[2], qc);
+    String replace = string(value2);
+    if((pattern.flags() & Pattern.LITERAL) == 0) {
       // standard parsing: raise errors for some special cases
-      final int rl = rep.length;
+      final int rl = value2.length;
       for (int r = 0; r < rl; ++r) {
-        final int n = r + 1 == rl ? 0 : rep[r + 1];
-        if (rep[r] == '\\') {
-          if (n != '\\' && n != '$') throw FUNREPBS_X.get(info, rep);
+        final int n = r + 1 == rl ? 0 : value2[r + 1];
+        if(value2[r] == '\\') {
+          if (n != '\\' && n != '$') throw FUNREPBS_X.get(info, value2);
           ++r;
-        } else if (rep[r] == '$' && (r == 0 || rep[r - 1] != '\\') && !digit(n)) {
-          throw FUNREPDOL_X.get(info, rep);
+        } else if(value2[r] == '$' && (r == 0 || value2[r - 1] != '\\') && !digit(n)) {
+          throw FUNREPDOL_X.get(info, value2);
         }
       }
     } else {
@@ -40,7 +40,7 @@ public final class FnReplace extends RegEx {
     }
 
     try {
-      return Str.get(pat.matcher(string(value)).replaceAll(replace));
+      return Str.get(pattern.matcher(string(value1)).replaceAll(replace));
     } catch(final Exception ex) {
       if(ex.getMessage().contains("No group")) throw REGROUP.get(info);
       throw REGPAT_X.get(info, ex);

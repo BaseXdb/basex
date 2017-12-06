@@ -13,11 +13,11 @@ import org.basex.util.*;
 final class NoCaseCollation extends Collation {
   @Override
   public int compare(final byte[] string, final byte[] compare) {
-    final String str = string(string), cmp = string(compare);
-    final int tl = str.length(), cl = cmp.length(), l = Math.min(tl, cl);
+    final String str = string(string), comp = string(compare);
+    final int tl = str.length(), cl = comp.length(), l = Math.min(tl, cl);
     for(int i = 0; i < l; ++i) {
-      final int c = diff(str.charAt(i), cmp.charAt(i));
-      if(c != 0) return c;
+      final int diff = diff(str.charAt(i), comp.charAt(i));
+      if(diff != 0) return diff;
     }
     return tl - cl;
   }

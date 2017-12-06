@@ -103,10 +103,10 @@ final class ASession {
    * @throws QueryException query exception
    */
   Value get(final Str key, final Value def) throws QueryException {
-    final Object o = session.getAttribute(key.toJava());
-    if(o == null) return def;
-    if(o instanceof Value) return (Value) o;
-    throw (id == null ? SESSION_GET_X : SESSIONS_GET_X).get(null, o);
+    final Object object = session.getAttribute(key.toJava());
+    if(object == null) return def;
+    if(object instanceof Value) return (Value) object;
+    throw (id == null ? SESSION_GET_X : SESSIONS_GET_X).get(null, object);
   }
 
   /**
@@ -119,8 +119,9 @@ final class ASession {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
       if(item instanceof FItem) throw (id == null ? SESSION_SET_X : SESSIONS_SET_X).get(null, item);
-      final Data d = item.data();
-      vb.add(d == null || d.inMemory() ? item : ((ANode) item).deepCopy(qc.context.options, qc));
+      final Data data = item.data();
+      vb.add(data == null || data.inMemory() ? item :
+        ((ANode) item).deepCopy(qc.context.options, qc));
     }
     session.setAttribute(key.toJava(), vb.value());
   }

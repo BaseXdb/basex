@@ -28,7 +28,7 @@ public final class HttpSendRequest extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(qc);;
     if(exprs.length == 3) {
       final Iter iter = exprs[2].iter(qc);
-      for(Item body; (body = qc.next(iter)) != null;) vb.add(body);
+      for(Item item; (item = qc.next(iter)) != null;) vb.add(item);
     }
     // send HTTP request
     return new HttpClient(info, qc.context.options).sendRequest(href, request, vb.value());
