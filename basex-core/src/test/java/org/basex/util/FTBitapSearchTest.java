@@ -70,9 +70,9 @@ public final class FTBitapSearchTest {
       };
 
       needles = new FTTokens();
-      for(final String[] s : needle) {
-        final TokenList tl = new TokenList(s.length);
-        for(final String t : s) tl.add(t);
+      for(final String[] strings : needle) {
+        final TokenList tl = new TokenList(strings.length);
+        for(final String string : strings) tl.add(string);
         needles.add(tl);
       }
     }

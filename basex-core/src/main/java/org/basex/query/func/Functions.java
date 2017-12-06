@@ -75,11 +75,11 @@ public final class Functions extends TokenSet {
 
     // include similar function name in error message
     final Levenshtein ls = new Levenshtein();
-    for(final AtomType t : AtomType.VALUES) {
-      if(t.parent == null) continue;
-      final byte[] u = t.name.uri();
-      if(eq(u, XS_URI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
-          lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(info, name.prefixId(), t.string());
+    for(final AtomType tp : AtomType.VALUES) {
+      if(tp.parent == null) continue;
+      final byte[] u = tp.name.uri();
+      if(eq(u, XS_URI) && tp != AtomType.NOT && tp != AtomType.AAT && ls.similar(
+          lc(ln), lc(tp.string()))) throw FUNCSIMILAR_X_X.get(info, name.prefixId(), tp.string());
     }
     // no similar name: constructor function found, or abstract type specified
     throw WHICHFUNC_X.get(info, name.prefixId());
@@ -179,17 +179,17 @@ public final class Functions extends TokenSet {
    * @param params formal parameters
    * @param ft function type
    * @param expr function body
-   * @param scp variable scope
+   * @param vs variable scope
    * @param info input info
    * @param runtime run-time flag
    * @param updating flag for updating functions
    * @return the function expression
    */
   private static Expr closureOrFItem(final AnnList anns, final QNm name, final Var[] params,
-      final FuncType ft, final Expr expr, final VarScope scp, final InputInfo info,
+      final FuncType ft, final Expr expr, final VarScope vs, final InputInfo info,
       final boolean runtime, final boolean updating) {
-    return runtime ? new FuncItem(scp.sc, anns, name, params, ft, expr, scp.stackSize()) :
-      new Closure(info, name, updating ? SeqType.EMP : ft.declType, params, expr, anns, null, scp);
+    return runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize()) :
+      new Closure(info, name, updating ? SeqType.EMP : ft.declType, params, expr, anns, null, vs);
   }
 
   /**
@@ -209,25 +209,25 @@ public final class Functions extends TokenSet {
     // parse type constructors
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, info);
-      final VarScope scp = new VarScope(sc);
-      final Var[] params = { scp.addNew(new QNm(ITEMM, ""), SeqType.AAT_ZO, true, qc, info) };
+      final VarScope vs = new VarScope(sc);
+      final Var[] params = { vs.addNew(new QNm(ITEMM, ""), SeqType.AAT_ZO, true, qc, info) };
       final Expr expr = new Cast(sc, info, new VarRef(info, params[0]), type.seqType());
       final AnnList anns = new AnnList();
       final FuncType ft = FuncType.get(anns, expr.seqType(), params);
-      return closureOrFItem(anns, name, params, ft, expr, scp, info, runtime, false);
+      return closureOrFItem(anns, name, params, ft, expr, vs, info, runtime, false);
     }
 
     // built-in functions
     final Function fn = get().getBuiltIn(name, arity, info);
     if(fn != null) {
       final AnnList anns = new AnnList();
-      final VarScope scp = new VarScope(sc);
+      final VarScope vs = new VarScope(sc);
       final FuncType ft = fn.type(arity, anns);
       final QNm[] names = fn.paramNames(arity);
       final Var[] params = new Var[arity];
       final Expr[] args = new Expr[arity];
       for(int i = 0; i < arity; i++) {
-        params[i] = scp.addNew(names[i], ft.argTypes[i], true, qc, info);
+        params[i] = vs.addNew(names[i], ft.argTypes[i], true, qc, info);
         args[i] = new VarRef(info, params[i]);
       }
 
@@ -240,43 +240,44 @@ public final class Functions extends TokenSet {
       // context/positional access must be bound to original focus
       // example for invalid query: let $f := last#0 return (1,2)[$f()]
       return sf.has(Flag.CTX, Flag.POS)
-          ? new FuncLit(anns, name, params, sf, ft.seqType(), scp, info)
-          : closureOrFItem(anns, name, params, fn.type(arity, anns), sf, scp, info, runtime, upd);
+          ? new FuncLit(anns, name, params, sf, ft.seqType(), vs, info)
+          : closureOrFItem(anns, name, params, fn.type(arity, anns), sf, vs, info, runtime, upd);
     }
 
     // user-defined function
     final StaticFunc sf = qc.funcs.get(name, arity);
     if(sf != null) {
       final FuncType ft = sf.funcType();
-      final VarScope scp = new VarScope(sc);
+      final VarScope vs = new VarScope(sc);
       final Var[] params = new Var[arity];
       final Expr[] args = new Expr[arity];
       for(int a = 0; a < arity; a++) {
-        params[a] = scp.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
+        params[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
         args[a] = new VarRef(info, params[a]);
       }
       final boolean upd = sf.updating;
-      final TypedFunc tf = qc.funcs.getFuncRef(sf.name, args, sc, info);
-      final Expr f = closureOrFItem(tf.anns, sf.name, params, ft, tf.fun, scp, info, runtime, upd);
+      final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, args, sc, info);
+      final Expr func = closureOrFItem(tf.anns, sf.name, params, ft, tf.func, vs, info,
+          runtime, upd);
       if(upd) qc.updating();
-      return f;
+      return func;
     }
 
     // Java function
-    final SeqType[] types = new SeqType[arity];
-    Arrays.fill(types, SeqType.ITEM_ZM);
+    final SeqType[] sts = new SeqType[arity];
+    Arrays.fill(sts, SeqType.ITEM_ZM);
     final AnnList anns = new AnnList();
-    final SeqType st = FuncType.get(anns, SeqType.ITEM_ZM, types).seqType();
-    final VarScope scp = new VarScope(sc);
+    final SeqType st = FuncType.get(anns, SeqType.ITEM_ZM, sts).seqType();
+    final VarScope vs = new VarScope(sc);
     final Var[] params = new Var[arity];
     final Expr[] args = new Expr[arity];
     final int vl = params.length;
     for(int v = 0; v < vl; v++) {
-      params[v] = scp.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
+      params[v] = vs.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
       args[v] = new VarRef(info, params[v]);
     }
     final JavaFunction jf = JavaFunction.get(name, args, qc, sc, info);
-    return jf == null ? null : new FuncLit(anns, name, params, jf, st, scp, info);
+    return jf == null ? null : new FuncLit(anns, name, params, jf, st, vs, info);
   }
 
   /**
@@ -292,17 +293,17 @@ public final class Functions extends TokenSet {
       final StaticContext sc, final InputInfo info) throws QueryException {
 
     final FuncType ft = sf.funcType();
-    final VarScope scp = new VarScope(sc);
+    final VarScope vs = new VarScope(sc);
     final int arity = sf.params.length;
     final Var[] args = new Var[arity];
     final int al = args.length;
     final Expr[] calls = new Expr[al];
     for(int a = 0; a < al; a++) {
-      args[a] = scp.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
+      args[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
       calls[a] = new VarRef(info, args[a]);
     }
-    final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, info);
-    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.fun, scp.stackSize());
+    final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, calls, sc, info);
+    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.func, vs.stackSize());
   }
 
   /**
@@ -338,7 +339,7 @@ public final class Functions extends TokenSet {
     }
 
     // user-defined function
-    final TypedFunc tf = qc.funcs.getRef(name, args, sc, info);
+    final TypedFunc tf = qc.funcs.funcCall(name, args, sc, info);
     if(tf != null) {
       if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
       return tf;
@@ -349,7 +350,7 @@ public final class Functions extends TokenSet {
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
-    if(FuncType.find(name) == null) return qc.funcs.getFuncRef(name, args, sc, info);
+    if(FuncType.find(name) == null) return qc.funcs.undeclaredFuncCall(name, args, sc, info);
 
     // no function found
     return null;

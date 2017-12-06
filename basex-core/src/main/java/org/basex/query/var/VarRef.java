@@ -96,9 +96,9 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    var.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    var.plan(elem);
+    plan.add(elem);
   }
 
   @Override

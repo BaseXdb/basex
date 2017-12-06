@@ -69,7 +69,7 @@ public abstract class Clause extends ParseExpr {
     return cl.accept(new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
-        for(final Var v : vars) if(v.is(ref.var)) return false;
+        for(final Var var : vars) if(var.is(ref.var)) return false;
         return true;
       }
     });

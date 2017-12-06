@@ -62,7 +62,7 @@ public final class Constr {
    * @throws QueryException query exception
    */
   public Constr add(final QueryContext qc, final Expr... exprs) throws QueryException {
-    final int s = sc.ns.size();
+    final int size = sc.ns.size();
     try {
       for(final Expr expr : exprs) {
         more = false;
@@ -72,7 +72,7 @@ public final class Constr {
       if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
       return this;
     } finally {
-      sc.ns.size(s);
+      sc.ns.size(size);
     }
   }
 

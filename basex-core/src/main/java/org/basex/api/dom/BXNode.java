@@ -116,9 +116,9 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode getLastChild() {
-    ANode n = null;
-    for(final ANode t : nd.children()) n = t;
-    return n != null ? get(n) : null;
+    ANode node = null;
+    for(final ANode n : nd.children()) node = n;
+    return node != null ? get(node) : null;
   }
 
   @Override

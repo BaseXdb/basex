@@ -226,23 +226,21 @@ public final class For extends ForLet {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    if(empty) e.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
-    var.plan(e);
+    final FElem elem = planElem();
+    if(empty) elem.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
+    var.plan(elem);
     if(pos != null) {
-      final FElem e2 = new FElem(AT);
-      pos.plan(e2);
-      e.add(e2);
+      final FElem el = new FElem(AT);
+      pos.plan(el);
+      elem.add(el);
     }
-
     if(score != null) {
-      final FElem e2 = new FElem(SCORE);
-      score.plan(e2);
-      e.add(e2);
+      final FElem el = new FElem(SCORE);
+      score.plan(el);
+      elem.add(el);
     }
-
-    expr.plan(e);
-    plan.add(e);
+    expr.plan(elem);
+    plan.add(elem);
   }
 
   @Override

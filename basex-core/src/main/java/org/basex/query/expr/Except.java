@@ -32,20 +32,20 @@ public final class Except extends Set {
   public Expr optimize(final CompileContext cc) throws QueryException {
     super.optimize(cc);
 
-    final ExprList el = new ExprList(exprs.length);
+    final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.SEQ) {
         // remove empty operands (return empty sequence if first value is empty)
-        if(el.isEmpty()) return cc.emptySeq(this);
+        if(list.isEmpty()) return cc.emptySeq(this);
         cc.info(OPTREMOVE_X_X, expr, description());
       } else {
-        el.add(expr);
+        list.add(expr);
       }
     }
     // ensure that results are always sorted
-    if(el.size() == 1 && iterable) return el.get(0);
+    if(list.size() == 1 && iterable) return list.get(0);
     // replace expressions with optimized list
-    exprs = el.finish();
+    exprs = list.finish();
     return this;
   }
 

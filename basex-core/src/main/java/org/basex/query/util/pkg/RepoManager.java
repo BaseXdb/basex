@@ -80,21 +80,21 @@ public final class RepoManager {
    * @return table
    */
   public Table table() {
-    final Table t = new Table();
-    t.description = PACKAGES_X;
-    t.header.add(NAME);
-    t.header.add(VERSINFO);
-    t.header.add(TYPE);
-    t.header.add(PATH);
+    final Table table = new Table();
+    table.description = PACKAGES_X;
+    table.header.add(NAME);
+    table.header.add(VERSINFO);
+    table.header.add(TYPE);
+    table.header.add(PATH);
     for(final Pkg pkg : packages()) {
       final TokenList tl = new TokenList();
       tl.add(pkg.name());
       tl.add(pkg.version());
       tl.add(pkg.type().toString());
       tl.add(pkg.path());
-      t.contents.add(tl);
+      table.contents.add(tl);
     }
-    return t;
+    return table;
   }
 
   /**

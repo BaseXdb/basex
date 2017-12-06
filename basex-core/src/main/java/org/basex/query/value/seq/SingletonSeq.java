@@ -85,9 +85,9 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(SIZE, size, TYPE, seqType());
-    addPlan(plan, el);
-    value.plan(el);
+    final FElem elem = planElem(SIZE, size, TYPE, seqType());
+    addPlan(plan, elem);
+    value.plan(elem);
   }
 
   @Override

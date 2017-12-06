@@ -32,9 +32,9 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   @Override
   void openPair(final byte[] name, final boolean add) {
     if(add) {
-      final FElem e = new FElem(PAIR).add(NAME, name);
-      curr.add(e);
-      curr = e;
+      final FElem elem = new FElem(PAIR).add(NAME, name);
+      curr.add(elem);
+      curr = elem;
       nm = name;
     }
   }
@@ -56,9 +56,9 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   void openItem() {
-    final FElem e = new FElem(ITEM);
-    curr.add(e);
-    curr = e;
+    final FElem elem = new FElem(ITEM);
+    curr.add(elem);
+    curr = elem;
   }
 
   @Override
@@ -96,8 +96,8 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * @return the element
    */
   private FElem addType(final byte[] type) {
-    final FElem e = element();
-    addType(e, nm, type);
-    return e;
+    final FElem elem = element();
+    addType(elem, nm, type);
+    return elem;
   }
 }

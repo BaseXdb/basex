@@ -157,22 +157,22 @@ public class CmpG extends Cmp {
     // try to skip type checking at runtime
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Type t1 = st1.type, t2 = st2.type;
+    final Type type1 = st1.type, type2 = st2.type;
     // skip type check if types are identical (and a child instance of of any atomic type)
-    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) &&
-        (t1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
-        t1.isUntyped() || t2.isUntyped() ||
-        t1.instanceOf(AtomType.STR) && t2.instanceOf(AtomType.STR) ||
-        t1.instanceOf(AtomType.NUM) && t2.instanceOf(AtomType.NUM) ||
-        t1.instanceOf(AtomType.DUR) && t2.instanceOf(AtomType.DUR));
+    check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+        (type1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
+        type1.isUntyped() || type2.isUntyped() ||
+        type1.instanceOf(AtomType.STR) && type2.instanceOf(AtomType.STR) ||
+        type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
+        type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
 
     // simple comparisons
     if(expr == this && st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray())
       expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
 
     // hash-based comparisons
-    if(expr == this && op == OpG.EQ && coll == null && (t1.isNumber() && t2.isNumber() ||
-        (t1.isStringOrUntyped() && t2.isStringOrUntyped())) && !st2.zeroOrOne())
+    if(expr == this && op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
+        (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne())
       expr = new CmpHashG(expr1, expr2, op, coll, sc, info);
 
     // pre-evaluate values or return expression
@@ -262,8 +262,8 @@ public class CmpG extends Cmp {
    */
   final boolean eval(final Item item1, final Item item2) throws QueryException {
     if(check) {
-      final Type t1 = item1.type, t2 = item2.type;
-      if(!(t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
+      final Type type1 = item1.type, type2 = item2.type;
+      if(!(type1 == type2 || type1.isUntyped() || type2.isUntyped() ||
           item1 instanceof ANum && item2 instanceof ANum ||
           item1 instanceof AStr && item2 instanceof AStr ||
           item1 instanceof Dur && item2 instanceof Dur)) throw diffError(item1, item2, info);

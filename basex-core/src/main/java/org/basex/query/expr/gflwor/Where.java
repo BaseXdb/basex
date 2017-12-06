@@ -121,9 +121,9 @@ public final class Where extends Clause {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    expr.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    expr.plan(elem);
+    plan.add(elem);
   }
 
   @Override

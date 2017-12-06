@@ -11,17 +11,17 @@ import org.basex.query.util.list.*;
  */
 public final class TypedFunc {
   /** Function expression. */
-  public final Expr fun;
+  public final Expr func;
   /** Annotations. */
   public final AnnList anns;
 
   /**
    * Constructor.
-   * @param fun function expression
+   * @param func function expression
    * @param anns annotations
    */
-  TypedFunc(final Expr fun, final AnnList anns) {
-    this.fun = fun;
+  TypedFunc(final Expr func, final AnnList anns) {
+    this.func = func;
     this.anns = anns;
   }
 

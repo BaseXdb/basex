@@ -82,8 +82,8 @@ public final class DynFuncCall extends FuncCall {
     final int nargs = exprs.length - 1;
     if(type instanceof FuncType) {
       final FuncType ft = (FuncType) type;
-      if(ft.argTypes != null && ft.argTypes.length != nargs)
-        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, func.toErrorString());
+      if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X.get(info,
+          arguments(nargs), ft.argTypes.length, func.toErrorString());
       SeqType dt = ft.declType;
       if(type instanceof MapType) dt = dt.with(dt.occ.union(Occ.ZERO));
       exprType.assign(dt);
@@ -164,10 +164,10 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(TCL, tailCall);
-    addPlan(plan, el, body());
+    final FElem elem = planElem(TCL, tailCall);
+    addPlan(plan, elem, body());
     final int last = exprs.length - 1;
-    for(int e = 0; e < last; e++) exprs[e].plan(el);
+    for(int e = 0; e < last; e++) exprs[e].plan(elem);
   }
 
   @Override

@@ -122,8 +122,8 @@ public abstract class Filter extends Preds {
         final ItrPos pos = (ItrPos) expr;
         if(rt instanceof Value) {
           // value: replace with subsequence
-          final long s = pos.min - 1, l = Math.min(pos.max, rt.size()) - s;
-          exp = l <= 0 ? Empty.SEQ : ((Value) rt).subSequence(s, l, cc.qc);
+          final long size = pos.min - 1, len = Math.min(pos.max, rt.size()) - size;
+          exp = len <= 0 ? Empty.SEQ : ((Value) rt).subSequence(size, len, cc.qc);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> head(); expr[pos] -> util:item-at(expr, pos.min)
           exp = pos.min == 1 ? cc.function(Function.HEAD, info, rt) :

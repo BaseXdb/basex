@@ -54,12 +54,12 @@ public final class FltSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param values values
    * @return value
    */
-  public static Value get(final float[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Flt.get(items[0]) :
-      new FltSeq(items);
+  public static Value get(final float[] values) {
+    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Flt.get(values[0]) :
+      new FltSeq(values);
   }
 
   /**

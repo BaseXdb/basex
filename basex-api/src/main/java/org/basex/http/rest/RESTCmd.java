@@ -124,14 +124,14 @@ abstract class RESTCmd extends Command {
    */
   static void list(final Table table, final FElem root, final QNm header, final int skip) {
     for(final TokenList list : table.contents) {
-      final FElem el = new FElem(header);
+      final FElem elem = new FElem(header);
       // don't show last attribute (input path)
       final int ll = list.size() - skip;
       for(int l = 1; l < ll; l++) {
-        el.add(new QNm(lc(table.header.get(l))), list.get(l));
+        elem.add(new QNm(lc(table.header.get(l))), list.get(l));
       }
-      el.add(list.get(0));
-      root.add(el);
+      elem.add(list.get(0));
+      root.add(elem);
     }
   }
 

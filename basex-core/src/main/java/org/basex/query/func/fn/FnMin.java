@@ -50,33 +50,33 @@ public class FnMin extends StandardFunc {
     if(item1 == null) return null;
 
     // ensure that item is sortable
-    final Type t1 = item1.type;
-    if(!t1.isSortable()) throw CMP_X.get(info, t1);
+    final Type type1 = item1.type;
+    if(!type1.isSortable()) throw CMP_X.get(info, type1);
 
     // strings and URIs
     if(item1 instanceof AStr) {
       for(Item item2; (item2 = qc.next(iter)) != null;) {
-        if(!(item2 instanceof AStr)) throw CMP_X_X_X.get(info, t1, item2.type, item2);
-        final Type t2 = item2.type;
+        if(!(item2 instanceof AStr)) throw CMP_X_X_X.get(info, type1, item2.type, item2);
+        final Type type2 = item2.type;
         if(cmp.eval(item1, item2, coll, sc, info)) item1 = item2;
-        if(t1 != t2 && item1.type == AtomType.URI) item1 = STR.cast(item1, qc, sc, info);
+        if(type1 != type2 && item1.type == AtomType.URI) item1 = STR.cast(item1, qc, sc, info);
       }
       return item1;
     }
     // booleans, dates, durations, binaries
-    if(t1 == BLN || item1 instanceof ADate || item1 instanceof Dur || item1 instanceof Bin) {
+    if(type1 == BLN || item1 instanceof ADate || item1 instanceof Dur || item1 instanceof Bin) {
       for(Item item; (item = qc.next(iter)) != null;) {
-        if(t1 != item.type) throw CMP_X_X_X.get(info, t1, item.type, item);
+        if(type1 != item.type) throw CMP_X_X_X.get(info, type1, item.type, item);
         if(cmp.eval(item1, item, coll, sc, info)) item1 = item;
       }
       return item1;
     }
     // numbers
-    if(t1.isUntyped()) item1 = DBL.cast(item1, qc, sc, info);
+    if(type1.isUntyped()) item1 = DBL.cast(item1, qc, sc, info);
     for(Item item2; (item2 = qc.next(iter)) != null;) {
-      final AtomType t = numType(item1, item2);
+      final AtomType type = numType(item1, item2);
       if(cmp.eval(item1, item2, coll, sc, info) || Double.isNaN(item2.dbl(info))) item1 = item2;
-      if(t != null) item1 = t.cast(item1, qc, sc, info);
+      if(type != null) item1 = type.cast(item1, qc, sc, info);
     }
     return item1;
   }
@@ -89,13 +89,13 @@ public class FnMin extends StandardFunc {
    * @throws QueryException query exception
    */
   private AtomType numType(final Item item1, final Item item2) throws QueryException {
-    final Type t2 = item2.type;
-    if(t2.isUntyped()) return DBL;
-    final Type t1 = item1.type;
-    if(!(item2 instanceof ANum)) throw CMP_X_X_X.get(info, t1, t2, item2);
-    return t1 == t2 ? null :
-           t1 == DBL || t2 == DBL ? DBL :
-           t1 == FLT || t2 == FLT ? FLT :
+    final Type type2 = item2.type;
+    if(type2.isUntyped()) return DBL;
+    final Type type1 = item1.type;
+    if(!(item2 instanceof ANum)) throw CMP_X_X_X.get(info, type1, type2, item2);
+    return type1 == type2 ? null :
+           type1 == DBL || type2 == DBL ? DBL :
+           type1 == FLT || type2 == FLT ? FLT :
            null;
   }
 
@@ -117,8 +117,8 @@ public class FnMin extends StandardFunc {
         item = value.itemAt(cmp == OpV.GT ? 0 : expr.size() - 1);
       }
       if(item != null) {
-        final Type t = item.seqType().type;
-        if(t.isNumber() || t.instanceOf(AtomType.STR)) return item;
+        final Type type = item.seqType().type;
+        if(type.isNumber() || type.instanceOf(AtomType.STR)) return item;
       }
     }
     return null;
@@ -137,14 +137,14 @@ public class FnMin extends StandardFunc {
   final Expr optMinmax(final OpV cmp) {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
-    Type t = st.type;
-    if(t.isSortable()) {
-      if(t.isUntyped()) {
-        t = AtomType.DBL;
+    Type type = st.type;
+    if(type.isSortable()) {
+      if(type.isUntyped()) {
+        type = AtomType.DBL;
       } else if(st.one() && exprs.length < 2) {
         return expr;
       }
-      exprType.assign(t);
+      exprType.assign(type);
       final Item item = value(cmp);
       if(item != null) return item;
     }

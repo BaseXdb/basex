@@ -54,12 +54,12 @@ public final class DblSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param values values
    * @return value
    */
-  public static Value get(final double[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Dbl.get(items[0]) :
-      new DblSeq(items);
+  public static Value get(final double[] values) {
+    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Dbl.get(values[0]) :
+      new DblSeq(values);
   }
 
   /**

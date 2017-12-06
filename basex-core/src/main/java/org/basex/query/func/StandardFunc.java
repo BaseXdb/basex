@@ -188,11 +188,11 @@ public abstract class StandardFunc extends Arr {
       final SeqType... argTypes) throws QueryException {
 
     // check if argument is function item
-    final Expr fun = exprs[i];
-    if(fun instanceof FuncItem) {
+    final Expr func = exprs[i];
+    if(func instanceof FuncItem) {
       // stop typing refinement if number of arguments does not match function arguments
-      FuncItem fi = (FuncItem) fun;
-      FuncType ft = fi.funcType();
+      FuncItem fitem = (FuncItem) func;
+      FuncType ft = fitem.funcType();
       final int al = argTypes.length;
       if(al != ft.argTypes.length) return;
 
@@ -204,19 +204,19 @@ public abstract class StandardFunc extends Arr {
       SeqType dt = declType.instanceOf(ft.declType) ? declType : ft.declType;
 
       // coerce to new function type
-      FuncType fc = FuncType.get(dt, at);
-      if(!fc.eq(ft)) {
-        fi = fi.coerceTo(fc, cc.qc, info, true);
-        ft = fi.funcType();
+      FuncType ftp = FuncType.get(dt, at);
+      if(!ftp.eq(ft)) {
+        fitem = fitem.coerceTo(ftp, cc.qc, info, true);
+        ft = fitem.funcType();
 
         // set new type of function item expression as return type
-        dt = fi.expr.seqType();
+        dt = fitem.expr.seqType();
         if(dt.instanceOf(ft.declType)) {
-          fc = FuncType.get(dt, at);
-          if(!fc.eq(ft)) fi = fi.coerceTo(fc, cc.qc, info, true);
+          ftp = FuncType.get(dt, at);
+          if(!ftp.eq(ft)) fitem = fitem.coerceTo(ftp, cc.qc, info, true);
         }
       }
-      exprs[i] = fi;
+      exprs[i] = fitem;
     }
   }
 

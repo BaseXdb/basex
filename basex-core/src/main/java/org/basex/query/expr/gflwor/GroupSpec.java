@@ -63,8 +63,8 @@ public final class GroupSpec extends Single {
   @Override
   public GroupSpec optimize(final CompileContext cc) throws QueryException {
     adoptType(expr);
-    final Type t = expr.seqType().atomicType();
-    if(t != null) var.refineType(seqType().with(t), cc);
+    final Type type = expr.seqType().atomicType();
+    if(type != null) var.refineType(seqType().with(type), cc);
     return this;
   }
 
@@ -89,10 +89,10 @@ public final class GroupSpec extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    var.plan(e);
-    expr.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    var.plan(elem);
+    expr.plan(elem);
+    plan.add(elem);
   }
 
   @Override

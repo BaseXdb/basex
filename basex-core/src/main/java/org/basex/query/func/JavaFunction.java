@@ -295,39 +295,39 @@ public abstract class JavaFunction extends Arr {
 
   /**
    * Returns an appropriate XQuery type for the specified Java object.
-   * @param o object
+   * @param object object
    * @return item type or {@code null} if no appropriate type was found
    */
-  private static Type type(final Object o) {
-    final Type t = JavaMapping.type(o.getClass(), true);
-    if(t != null) return t;
+  private static Type type(final Object object) {
+    final Type type = JavaMapping.type(object.getClass(), true);
+    if(type != null) return type;
 
-    if(o instanceof Element) return NodeType.ELM;
-    if(o instanceof Document) return NodeType.DOC;
-    if(o instanceof DocumentFragment) return NodeType.DOC;
-    if(o instanceof Attr) return NodeType.ATT;
-    if(o instanceof Comment) return NodeType.COM;
-    if(o instanceof ProcessingInstruction) return NodeType.PI;
-    if(o instanceof Text) return NodeType.TXT;
+    if(object instanceof Element) return NodeType.ELM;
+    if(object instanceof Document) return NodeType.DOC;
+    if(object instanceof DocumentFragment) return NodeType.DOC;
+    if(object instanceof Attr) return NodeType.ATT;
+    if(object instanceof Comment) return NodeType.COM;
+    if(object instanceof ProcessingInstruction) return NodeType.PI;
+    if(object instanceof Text) return NodeType.TXT;
 
-    if(o instanceof Duration) {
-      final Duration d = (Duration) o;
+    if(object instanceof Duration) {
+      final Duration d = (Duration) object;
       return !d.isSet(DatatypeConstants.YEARS) && !d.isSet(DatatypeConstants.MONTHS)
           ? AtomType.DTD : !d.isSet(DatatypeConstants.HOURS) &&
           !d.isSet(DatatypeConstants.MINUTES) && !d.isSet(DatatypeConstants.SECONDS)
           ? AtomType.YMD : AtomType.DUR;
     }
 
-    if(o instanceof XMLGregorianCalendar) {
-      final QName type = ((XMLGregorianCalendar) o).getXMLSchemaType();
-      if(type == DatatypeConstants.DATE) return AtomType.DAT;
-      if(type == DatatypeConstants.DATETIME) return AtomType.DTM;
-      if(type == DatatypeConstants.TIME) return AtomType.TIM;
-      if(type == DatatypeConstants.GYEARMONTH) return AtomType.YMO;
-      if(type == DatatypeConstants.GMONTHDAY) return AtomType.MDA;
-      if(type == DatatypeConstants.GYEAR) return AtomType.YEA;
-      if(type == DatatypeConstants.GMONTH) return AtomType.MON;
-      if(type == DatatypeConstants.GDAY) return AtomType.DAY;
+    if(object instanceof XMLGregorianCalendar) {
+      final QName qnm = ((XMLGregorianCalendar) object).getXMLSchemaType();
+      if(qnm == DatatypeConstants.DATE) return AtomType.DAT;
+      if(qnm == DatatypeConstants.DATETIME) return AtomType.DTM;
+      if(qnm == DatatypeConstants.TIME) return AtomType.TIM;
+      if(qnm == DatatypeConstants.GYEARMONTH) return AtomType.YMO;
+      if(qnm == DatatypeConstants.GMONTHDAY) return AtomType.MDA;
+      if(qnm == DatatypeConstants.GYEAR) return AtomType.YEA;
+      if(qnm == DatatypeConstants.GMONTH) return AtomType.MON;
+      if(qnm == DatatypeConstants.GDAY) return AtomType.DAY;
     }
     return null;
   }

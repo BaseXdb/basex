@@ -41,23 +41,24 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public boolean eq(final Type t) {
-    if(this == t) return true;
-    if(!(t instanceof MapType)) return false;
-    final MapType mt = (MapType) t;
+  public boolean eq(final Type type) {
+    if(this == type) return true;
+    if(!(type instanceof MapType)) return false;
+    final MapType mt = (MapType) type;
     return keyType().eq(mt.keyType()) && declType.eq(mt.declType);
   }
 
   @Override
-  public boolean instanceOf(final Type t) {
+  public boolean instanceOf(final Type type) {
     // the only non-function super-type of function is item()
-    if(t == AtomType.ITEM || t == SeqType.ANY_MAP || t == SeqType.ANY_FUN) return true;
-    if(!(t instanceof FuncType) || t instanceof ArrayType || this == SeqType.ANY_MAP) return false;
+    if(type == AtomType.ITEM || type == SeqType.ANY_MAP || type == SeqType.ANY_FUNC) return true;
+    if(!(type instanceof FuncType) || type instanceof ArrayType || this == SeqType.ANY_MAP)
+      return false;
 
-    final FuncType ft = (FuncType) t;
+    final FuncType ft = (FuncType) type;
     final int al = argTypes.length;
     if(al != ft.argTypes.length || !declType.instanceOf(ft.declType)) return false;
-    if(t instanceof MapType) return keyType().instanceOf(((MapType) t).keyType());
+    if(type instanceof MapType) return keyType().instanceOf(((MapType) type).keyType());
 
     // test function arguments of function type
     // example: map { 'x':'y' } instance of function(xs:string) as xs:string
@@ -68,31 +69,31 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public Type union(final Type t) {
-    if(instanceOf(t)) return t;
-    if(t instanceof MapType) {
-      final MapType mt = (MapType) t;
+  public Type union(final Type type) {
+    if(instanceOf(type)) return type;
+    if(type instanceof MapType) {
+      final MapType mt = (MapType) type;
       if(mt.instanceOf(this)) return this;
-      final AtomType a = (AtomType) keyType().intersect(mt.keyType());
-      return a != null ? get(a, declType.union(mt.declType)) : SeqType.ANY_FUN;
+      final AtomType at = (AtomType) keyType().intersect(mt.keyType());
+      return at != null ? get(at, declType.union(mt.declType)) : SeqType.ANY_FUNC;
     }
-    return t instanceof ArrayType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
-      AtomType.ITEM;
+    return type instanceof ArrayType ? SeqType.ANY_FUNC :
+      type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
   @Override
-  public MapType intersect(final Type t) {
+  public MapType intersect(final Type type) {
     // case for item() and compatible FuncType, e.g. function(xs:anyAtomicType) as item()*
     // also excludes FuncType.ANY_FUN
-    if(instanceOf(t)) return this;
-    if(t instanceof MapType) {
-      final MapType mt = (MapType) t;
+    if(instanceOf(type)) return this;
+    if(type instanceof MapType) {
+      final MapType mt = (MapType) type;
       if(mt.instanceOf(this)) return mt;
       final SeqType dt = declType.intersect(mt.declType);
       return dt == null ? null : get((AtomType) keyType().union(mt.keyType()), dt);
     }
-    if(t instanceof FuncType) {
-      final FuncType ft = (FuncType) t;
+    if(type instanceof FuncType) {
+      final FuncType ft = (FuncType) type;
       if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT_O)) {
         final SeqType dt = declType.intersect(ft.declType);
         return dt == null ? null : get((AtomType) keyType().union(ft.argTypes[0].type), dt);

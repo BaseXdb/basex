@@ -50,21 +50,21 @@ final class NodeUpdates {
    * @return primitive of type t, null if not found
    */
   private NodeUpdate find(final UpdateType type) {
-    for(final NodeUpdate p : updates) {
-      if(p.type == type) return p;
+    for(final NodeUpdate update : updates) {
+      if(update.type == type) return update;
     }
     return null;
   }
 
   /**
    * Finds the update primitive with the given {@link UpdateType} and returns its index.
-   * @param t PrimitiveType
+   * @param type update type
    * @return index of primitive with given type or -1 if not found
    */
-  private int indexOf(final UpdateType t) {
+  private int indexOf(final UpdateType type) {
     final int us = updates.size();
     for(int u = 0; u < us; u++) {
-      if(updates.get(u).type == t) return u;
+      if(updates.get(u).type == type) return u;
     }
     return -1;
   }
@@ -95,9 +95,9 @@ final class NodeUpdates {
     // removed.
     final NodeUpdate replace = find(REPLACENODE);
     if(replace != null) {
-      for(final NodeUpdate p : updates) {
-        if(p.type == REPLACENODE || p.type == INSERTBEFORE || p.type == INSERTAFTER)
-          primnew.add(p);
+      for(final NodeUpdate update : updates) {
+        if(update.type == REPLACENODE || update.type == INSERTBEFORE || update.type == INSERTAFTER)
+          primnew.add(update);
       }
       updates = null;
       return primnew;
@@ -109,12 +109,12 @@ final class NodeUpdates {
      * expression forms the only exception. */
     final ReplaceValue rec = (ReplaceValue) find(REPLACEVALUE);
     if(rec != null && rec.rec) {
-      for(final NodeUpdate p : updates) {
+      for(final NodeUpdate update : updates) {
         /* Add only InsertIntos that are part of the substitution and make sure no
          * other primitive is added, that adds nodes to the child axis of T. */
-        if(p.type != INSERTINTOFIRST && p.type != INSERTINTO && p.type != INSERTINTOLAST
-            || p.type == INSERTINTO && p instanceof ReplaceContent)
-          primnew.add(p);
+        if(update.type != INSERTINTOFIRST && update.type != INSERTINTO &&
+           update.type != INSERTINTOLAST || update.type == INSERTINTO &&
+           update instanceof ReplaceContent) primnew.add(update);
       }
       updates = null;
       return primnew;

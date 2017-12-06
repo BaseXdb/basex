@@ -182,12 +182,12 @@ public final class CmpV extends Cmp {
     // try to skip type checking at runtime
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Type t1 = st1.type, t2 = st2.type;
-    check = !(t1 == t2 && !AtomType.AAT.instanceOf(t1) &&
-        (t1.isSortable() || op != OpV.EQ && op != OpV.NE) ||
-        t1.isStringOrUntyped() && t2.isStringOrUntyped() ||
-        t1.instanceOf(AtomType.NUM) && t2.instanceOf(AtomType.NUM) ||
-        t1.instanceOf(AtomType.DUR) && t2.instanceOf(AtomType.DUR));
+    final Type type1 = st1.type, type2 = st2.type;
+    check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+        (type1.isSortable() || op != OpV.EQ && op != OpV.NE) ||
+        type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+        type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
+        type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
 
     // try to rewrite to general expression (faster evaluation)
     Expr expr = check || !st1.oneNoArray() || !st2.oneNoArray() ? this :

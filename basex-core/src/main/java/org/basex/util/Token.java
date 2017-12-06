@@ -137,7 +137,7 @@ public final class Token {
    * @return result of check
    */
   public static boolean ascii(final byte[] token) {
-    for(final byte t : token) if(t < 0) return false;
+    for(final byte b : token) if(b < 0) return false;
     return true;
   }
 
@@ -613,7 +613,7 @@ public final class Token {
    * @return true if one test is successful
    */
   public static boolean eq(final byte[] token, final byte[]... tokens) {
-    for(final byte[] t : tokens) if(eq(token, t)) return true;
+    for(final byte[] tok : tokens) if(eq(token, tok)) return true;
     return false;
   }
 
@@ -928,7 +928,7 @@ public final class Token {
    * @return true if all characters are whitespaces
    */
   public static boolean ws(final byte[] token) {
-    for(final byte t : token) if(!ws(t)) return false;
+    for(final byte b : token) if(!ws(b)) return false;
     return true;
   }
 
@@ -986,11 +986,10 @@ public final class Token {
    * @return resulting array
    */
   public static byte[] concat(final byte[] token1, final byte[] token2) {
-    final int t1 = token1.length;
-    final int t2 = token2.length;
-    final byte[] tmp = new byte[t1 + t2];
-    System.arraycopy(token1, 0, tmp, 0, t1);
-    System.arraycopy(token2, 0, tmp, t1, t2);
+    final int tl1 = token1.length, tl2 = token2.length;
+    final byte[] tmp = new byte[tl1 + tl2];
+    System.arraycopy(token1, 0, tmp, 0, tl1);
+    System.arraycopy(token2, 0, tmp, tl1, tl2);
     return tmp;
   }
 
@@ -1003,13 +1002,11 @@ public final class Token {
    * @return resulting array
    */
   public static byte[] concat(final byte[] token1, final byte[] token2, final byte[] token3) {
-    final int t1 = token1.length;
-    final int t2 = token2.length;
-    final int t3 = token3.length;
-    final byte[] tmp = new byte[t1 + t2 + t3];
-    System.arraycopy(token1, 0, tmp, 0, t1);
-    System.arraycopy(token2, 0, tmp, t1, t2);
-    System.arraycopy(token3, 0, tmp, t1 + t2, t3);
+    final int tl1 = token1.length, tl2 = token2.length, tl3 = token3.length;
+    final byte[] tmp = new byte[tl1 + tl2 + tl3];
+    System.arraycopy(token1, 0, tmp, 0, tl1);
+    System.arraycopy(token2, 0, tmp, tl1, tl2);
+    System.arraycopy(token3, 0, tmp, tl1 + tl2, tl3);
     return tmp;
   }
 
@@ -1053,10 +1050,10 @@ public final class Token {
     final byte[] tmp = new byte[l];
     int c = 0;
     boolean ws1 = true;
-    for(final byte t : token) {
-      final boolean ws2 = ws(t);
+    for(final byte b : token) {
+      final boolean ws2 = ws(b);
       if(ws2 && ws1) continue;
-      tmp[c++] = ws2 ? (byte) ' ' : t;
+      tmp[c++] = ws2 ? (byte) ' ' : b;
       ws1 = ws2;
     }
     if(c > 0 && ws(tmp[c - 1])) --c;
@@ -1194,9 +1191,9 @@ public final class Token {
    */
   public static byte[] uri(final byte[] token, final boolean iri) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte t : token) {
-      if(letterOrDigit(t) || contains(iri ? IRIRES : RES, t)) tb.addByte(t);
-      else hex(tb, t);
+    for(final byte b : token) {
+      if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.addByte(b);
+      else hex(tb, b);
     }
     return tb.finish();
   }
@@ -1208,9 +1205,9 @@ public final class Token {
    */
   public static byte[] escape(final byte[] token) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte t : token) {
-      if(t >= 0x20 && t <= 0x7e) tb.addByte(t);
-      else hex(tb, t);
+    for(final byte b : token) {
+      if(b >= 0x20 && b <= 0x7e) tb.addByte(b);
+      else hex(tb, b);
     }
     return tb.finish();
   }

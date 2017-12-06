@@ -984,11 +984,11 @@ public final class QT3TS extends Main {
             ((Map<String, String>) f.get(System.getenv())).putAll(ne);
           }
         }
-      } catch(final Exception e2) {
-        Util.errln("Test environment variable could not be set:" + e2);
+      } catch(final Exception ex2) {
+        Util.errln("Test environment variable could not be set:" + ex2);
       }
-    } catch(final Exception e1) {
-      Util.errln("Test environment variable could not be set: " + e1);
+    } catch(final Exception ex1) {
+      Util.errln("Test environment variable could not be set: " + ex1);
     }
   }
 

@@ -34,15 +34,15 @@ public final class ArchiveEntries extends StandardFunc {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
-        final FElem e = new FElem(Q_ENTRY).declareNS();
-        long s = ze.getSize();
-        if(s != -1) e.add(SIZE, token(s));
-        s = ze.getTime();
-        if(s != -1) e.add(LAST_MODIFIED, Dtm.get(s).string(info));
-        s = ze.getCompressedSize();
-        if(s != -1) e.add(COMPRESSED_SIZE, token(s));
-        e.add(ze.getName());
-        vb.add(e);
+        final FElem elem = new FElem(Q_ENTRY).declareNS();
+        long size = ze.getSize();
+        if(size != -1) elem.add(SIZE, token(size));
+        size = ze.getTime();
+        if(size != -1) elem.add(LAST_MODIFIED, Dtm.get(size).string(info));
+        size = ze.getCompressedSize();
+        if(size != -1) elem.add(COMPRESSED_SIZE, token(size));
+        elem.add(ze.getName());
+        vb.add(elem);
       }
       return vb.value();
     } catch(final IOException ex) {

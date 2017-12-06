@@ -264,36 +264,36 @@ public final class WesternTokenizer extends Tokenizer {
 
   /**
    * Converts the specified token to upper case.
-   * @param t token to be converted
-   * @param a ascii flag
+   * @param token token to be converted
+   * @param ascii ascii flag
    * @return the converted token
    */
-  static byte[] upper(final byte[] t, final boolean a) {
-    final int tl = t.length;
-    if(a) {
-      for(int i = 0; i < tl; ++i) t[i] = (byte) uc(t[i]);
-      return t;
+  static byte[] upper(final byte[] token, final boolean ascii) {
+    final int tl = token.length;
+    if(ascii) {
+      for(int i = 0; i < tl; ++i) token[i] = (byte) uc(token[i]);
+      return token;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i)) tb.add(uc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(token, i)) tb.add(uc(cp(token, i)));
     return tb.finish();
   }
 
   /**
    * Converts the specified token to lower case.
-   * @param t token to be converted
-   * @param a ascii flag
+   * @param token token to be converted
+   * @param ascii ascii flag
    * @return the converted token
    */
-  static byte[] lower(final byte[] t, final boolean a) {
-    final int tl = t.length;
-    if(a) {
+  static byte[] lower(final byte[] token, final boolean ascii) {
+    final int tl = token.length;
+    if(ascii) {
       for(int i = 0; i < tl; ++i)
-        t[i] = (byte) lc(t[i]);
-      return t;
+        token[i] = (byte) lc(token[i]);
+      return token;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i)) tb.add(lc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(token, i)) tb.add(lc(cp(token, i)));
     return tb.finish();
   }
 

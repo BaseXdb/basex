@@ -81,7 +81,7 @@ public enum Function {
   ANALYZE_STRING(FnAnalyzeString.class, "analyze-string(input,pattern[,mod])",
       arg(STR_ZO, STR_O, STR_O), ELM_O, flag(CNS)),
   /** XQuery function. */
-  APPLY(FnApply.class, "apply(function,args)", arg(FUN_O, ARRAY_O), ITEM_ZM,
+  APPLY(FnApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), ITEM_ZM,
       flag(Flag.POS, CTX, NDT, HOF)),
   /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables.class,
@@ -203,12 +203,12 @@ public enum Function {
   FORMAT_TIME(FnFormatTime.class, "format-time(number,picture,[language,calendar,place])",
       arg(TIM_ZO, STR_O, STR_ZO, STR_ZO, STR_ZO), STR_ZO),
   /** XQuery function. */
-  FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR_O),
+  FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUNC_O), ITR_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM_O, ITR_O), FUN_ZO, flag(Flag.POS, CTX, NDT, HOF)),
+      arg(QNM_O, ITR_O), FUNC_ZO, flag(Flag.POS, CTX, NDT, HOF)),
   /** XQuery function. */
-  FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
+  FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUNC_O), QNM_ZO),
   /** XQuery function. */
   GENERATE_ID(FnGenerateId.class, "generate-id([node])", arg(NOD_ZO), STR_O),
   /** XQuery function. */
@@ -1068,15 +1068,15 @@ public enum Function {
       arg(STR_O), ELM_O, flag(HOF), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations.class, "function-annotations(function)",
-      arg(FUN_O), MAP_ZO, INSPECT_URI),
+      arg(FUNC_O), MAP_ZO, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])",
-      arg(STR_O), FUN_ZM, flag(HOF), INSPECT_URI),
+      arg(STR_O), FUNC_ZM, flag(HOF), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule.class, "module(uri)", arg(STR_O), ELM_O, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_STATIC_CONTEXT(InspectStaticContext.class, "static-context(function,name)",
-      arg(FUN_O, STR_O), ITEM_ZM, INSPECT_URI),
+      arg(FUNC_O, STR_O), ITEM_ZM, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR_O), ELM_O, INSPECT_URI),
 
@@ -1355,7 +1355,7 @@ public enum Function {
       arg(STR_O, MAP_ZO, MAP_ZO), EMP, flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin.class, "fork-join(functions[,options])",
-      arg(FUN_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI),
+      arg(FUNC_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_INVOKE(XQueryInvoke.class, "invoke(uri[,bindings[,options]])",
       arg(STR_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),

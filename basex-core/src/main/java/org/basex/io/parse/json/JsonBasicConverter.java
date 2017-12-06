@@ -83,8 +83,8 @@ public final class JsonBasicConverter extends JsonXmlConverter {
   @Override
   public void stringLit(final byte[] value) {
     if(add()) {
-      final FElem e = addElem(STRING).add(value);
-      if(escape && contains(value, '\\')) e.add(ESCAPED, TRUE);
+      final FElem elem = addElem(STRING).add(value);
+      if(escape && contains(value, '\\')) elem.add(ESCAPED, TRUE);
     }
   }
 
@@ -104,19 +104,19 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    * @return new element
    */
   private FElem addElem(final byte[] type) {
-    final FElem e = new FElem(type, QueryText.FN_URI);
+    final FElem elem = new FElem(type, QueryText.FN_URI);
     // root node: declare namespace
-    if(curr == null) e.declareNS();
+    if(curr == null) elem.declareNS();
 
     if(name != null) {
-      e.add(KEY, name);
-      if(escape && contains(name, '\\')) e.add(ESCAPED_KEY, TRUE);
+      elem.add(KEY, name);
+      if(escape && contains(name, '\\')) elem.add(ESCAPED_KEY, TRUE);
       name = null;
     }
 
-    if(curr != null) curr.add(e);
-    else curr = e;
-    return e;
+    if(curr != null) curr.add(elem);
+    else curr = elem;
+    return elem;
   }
 
   /**

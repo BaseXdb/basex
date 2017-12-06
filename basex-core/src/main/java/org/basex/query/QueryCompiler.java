@@ -81,8 +81,8 @@ final class QueryCompiler {
       }
 
       @Override
-      public boolean inlineFunc(final Scope sub) {
-        if(map.put(sub, sub) == null) sub.visit(this);
+      public boolean inlineFunc(final Scope scope) {
+        if(map.put(scope, scope) == null) scope.visit(this);
         return true;
       }
 
@@ -114,8 +114,8 @@ final class QueryCompiler {
     for(final Scope[] scope : scopes(0)) circCheck(scope).comp(cc);
 
     // check for circular variable declarations without compiling the unused scopes
-    for(final StaticVar v : cc.qc.vars) {
-      if(id(v) == -1) for(final Scope[] scope : scopes(add(v))) circCheck(scope);
+    for(final StaticVar var : cc.qc.vars) {
+      if(id(var) == -1) for(final Scope[] scope : scopes(add(var))) circCheck(scope);
     }
   }
 
@@ -250,7 +250,7 @@ final class QueryCompiler {
       @Override
       public boolean staticFuncCall(final StaticFuncCall call) { return neighbor(call.func()); }
       @Override
-      public boolean inlineFunc(final Scope sub) { return sub.visit(this); }
+      public boolean inlineFunc(final Scope scope) { return scope.visit(this); }
       @Override
       public boolean funcItem(final FuncItem func) { return neighbor(func); }
 

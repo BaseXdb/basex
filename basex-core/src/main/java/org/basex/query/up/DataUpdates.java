@@ -106,17 +106,17 @@ final class DataUpdates {
    */
   void prepare(final MemData tmp, final QueryContext qc) throws QueryException {
     // Prepare/check database operations
-    for(final DBUpdate d : dbUpdates) d.prepare();
+    for(final DBUpdate update : dbUpdates) update.prepare();
 
     // Prepare/check XQUP primitives:
-    final int s = nodeUpdates.size();
-    nodes = new IntList(s);
-    for(int i = 1; i <= s; i++) nodes.add(nodeUpdates.key(i));
+    final int sz = nodeUpdates.size();
+    nodes = new IntList(sz);
+    for(int i = 1; i <= sz; i++) nodes.add(nodeUpdates.key(i));
     nodes.sort();
 
-    for(int i = 0; i < s; ++i) {
-      final NodeUpdates ups = nodeUpdates.get(nodes.get(i));
-      for(final NodeUpdate p : ups.updates) p.prepare(tmp, qc);
+    for(int i = 0; i < sz; ++i) {
+      final NodeUpdates updates = nodeUpdates.get(nodes.get(i));
+      for(final NodeUpdate update : updates.updates) update.prepare(tmp, qc);
     }
 
     // check attribute duplicates
@@ -170,8 +170,8 @@ final class DataUpdates {
 
     // execute database operations
     Collections.sort(dbUpdates);
-    final int s = dbUpdates.size();
-    for(int i = 0; i < s; i++) {
+    final int sz = dbUpdates.size();
+    for(int i = 0; i < sz; i++) {
       dbUpdates.get(i).apply();
       dbUpdates.set(i, null);
     }
@@ -236,8 +236,8 @@ final class DataUpdates {
   private AtomicUpdateCache createAtomicUpdates(final List<NodeUpdate> l) {
     final AtomicUpdateCache ac = new AtomicUpdateCache(data);
     //  from the lowest to the highest score, corresponds w/ from lowest to highest PRE
-    final int s = l.size();
-    for(int i = 0; i < s; i++) {
+    final int sz = l.size();
+    for(int i = 0; i < sz; i++) {
       final NodeUpdate u = l.get(i);
       u.addAtomics(ac);
       l.set(i, null);

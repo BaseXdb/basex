@@ -57,10 +57,10 @@ public final class CompileContext {
 
   /**
    * Pushes a new variable scope to the stack.
-   * @param scp variable scope
+   * @param vs variable scope
    */
-  public void pushScope(final VarScope scp) {
-    scopes.add(scp);
+  public void pushScope(final VarScope vs) {
+    scopes.add(vs);
   }
 
   /**
@@ -150,9 +150,9 @@ public final class CompileContext {
   public Var copy(final Var var, final IntObjMap<Var> vm) {
     if(var == null) return null;
     final VarScope vs = vs();
-    final Var v = vs.add(new Var(var, qc, vs.sc));
-    if(vm != null) vm.put(var.id, v);
-    return v;
+    final Var vr = vs.add(new Var(var, qc, vs.sc));
+    if(vm != null) vm.put(var.id, vr);
+    return vr;
   }
 
   /**
@@ -228,9 +228,9 @@ public final class CompileContext {
           final Seq seq = (Seq) res;
           final Type et = expr.seqType().type, rt = seq.type;
           if(!et.eq(rt) && et.instanceOf(rt)) {
-            final Type t = et.intersect(rt);
-            if(t != null) {
-              seq.type = t;
+            final Type type = et.intersect(rt);
+            if(type != null) {
+              seq.type = type;
               // Indicate that types may not be homogeneous
               seq.homo = false;
             }
@@ -240,8 +240,8 @@ public final class CompileContext {
           final FItem fitem = (FItem) res;
           final SeqType et = expr.seqType(), rt = res.seqType();
           if(!et.eq(rt) && et.instanceOf(rt)) {
-            final Type t = et.type.intersect(rt.type);
-            if(t != null) fitem.type = t;
+            final Type type = et.type.intersect(rt.type);
+            if(type != null) fitem.type = type;
           }
         }
       }

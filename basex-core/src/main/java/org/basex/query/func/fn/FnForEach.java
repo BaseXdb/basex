@@ -57,15 +57,15 @@ public final class FnForEach extends StandardFunc {
 
     // assign type after coercion (expression might have changed)
     final Expr expr2 = exprs[1];
-    final Type t2 = expr2.seqType().type;
-    if(t2 instanceof FuncType) exprType.assign(((FuncType) t2).declType.type);
+    final Type type2 = expr2.seqType().type;
+    if(type2 instanceof FuncType) exprType.assign(((FuncType) type2).declType.type);
 
-    final long sz1 = expr1.size();
-    if(allAreValues(false) && sz1 <= UNROLL_LIMIT) {
+    final long size1 = expr1.size();
+    if(allAreValues(false) && size1 <= UNROLL_LIMIT) {
       // unroll the loop
       final Value seq = (Value) expr1;
-      final Expr[] results = new Expr[(int) sz1];
-      for(int i = 0; i < sz1; i++) {
+      final Expr[] results = new Expr[(int) size1];
+      for(int i = 0; i < size1; i++) {
         results[i] = new DynFuncCall(info, sc, expr2, seq.itemAt(i)).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);

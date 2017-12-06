@@ -82,13 +82,13 @@ public final class IntSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param values values
    * @param type type
    * @return value
    */
-  public static Value get(final long[] items, final Type type) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Int.get(items[0], type) :
-      new IntSeq(items, type);
+  public static Value get(final long[] values, final Type type) {
+    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Int.get(values[0], type) :
+      new IntSeq(values, type);
   }
 
   /**

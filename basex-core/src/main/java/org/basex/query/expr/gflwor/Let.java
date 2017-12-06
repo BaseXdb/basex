@@ -129,11 +129,11 @@ public final class Let extends ForLet {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    if(scoring) e.add(planAttr(Token.token(SCORE), Token.TRUE));
-    var.plan(e);
-    expr.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    if(scoring) elem.add(planAttr(Token.token(SCORE), Token.TRUE));
+    var.plan(elem);
+    expr.plan(elem);
+    plan.add(elem);
   }
 
   @Override

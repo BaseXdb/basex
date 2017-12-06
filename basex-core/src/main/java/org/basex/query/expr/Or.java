@@ -86,19 +86,19 @@ public final class Or extends Logical {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     IndexCosts costs = IndexCosts.ZERO;
-    final ExprList el = new ExprList(exprs.length);
+    final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       // check if expression can be rewritten, and if access is not sequential
       if(!expr.indexAccessible(ii)) return false;
       // skip expressions without results
       if(ii.costs.results() == 0) continue;
       costs = IndexCosts.add(costs, ii.costs);
-      el.add(ii.expr);
+      list.add(ii.expr);
     }
     // use summarized costs for estimation
     ii.costs = costs;
     // no expressions means no costs: expression will later be pre-evaluated
-    ii.expr = el.size() == 1 ? el.get(0) : new Union(info, el.finish());
+    ii.expr = list.size() == 1 ? list.get(0) : new Union(info, list.finish());
     return true;
   }
 

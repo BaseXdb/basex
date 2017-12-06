@@ -149,8 +149,8 @@ public final class TypeCheck extends Single {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof TypeCheck)) return false;
-    final TypeCheck t = (TypeCheck) obj;
-    return seqType().eq(t.seqType()) && promote == t.promote && super.equals(obj);
+    final TypeCheck tc = (TypeCheck) obj;
+    return seqType().eq(tc.seqType()) && promote == tc.promote && super.equals(obj);
   }
 
   @Override

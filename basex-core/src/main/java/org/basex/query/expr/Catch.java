@@ -157,7 +157,7 @@ public final class Catch extends Single {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Var v : vars) if(!visitor.declared(v)) return false;
+    for(final Var var : vars) if(!visitor.declared(var)) return false;
     return visitAll(visitor, expr);
   }
 

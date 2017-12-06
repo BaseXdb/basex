@@ -54,12 +54,12 @@ public final class BlnSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param values values
    * @return value
    */
-  public static Value get(final boolean[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Bln.get(items[0]) :
-      new BlnSeq(items);
+  public static Value get(final boolean[] values) {
+    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Bln.get(values[0]) :
+      new BlnSeq(values);
   }
 
   /**

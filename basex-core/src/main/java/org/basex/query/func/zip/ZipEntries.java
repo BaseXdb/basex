@@ -84,9 +84,9 @@ public final class ZipEntries extends ZipFn {
    * @return element
    */
   private static FElem createDir(final FElem par, final String name) {
-    final FElem e = new FElem(Q_DIR).add(NAME, name);
-    par.add(e);
-    return e;
+    final FElem elem = new FElem(Q_DIR).add(NAME, name);
+    par.add(elem);
+    return elem;
   }
 
   /**

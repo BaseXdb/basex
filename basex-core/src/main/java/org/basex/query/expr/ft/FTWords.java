@@ -276,8 +276,8 @@ public final class FTWords extends FTExpr {
     // use faster evaluation for default options
     int num = 0;
     if(simple) {
-      for(final byte[] t : tokens) {
-        final FTTokens qtok = ftt.cache(t);
+      for(final byte[] token : tokens) {
+        final FTTokens qtok = ftt.cache(token);
         num = Math.max(num, contains(qtok, lexer, ftt) * qtok.firstSize());
       }
       return num;
@@ -399,26 +399,26 @@ public final class FTWords extends FTExpr {
       ii.costs = data == null ? null : IndexCosts.get(Math.max(2, data.meta.size / 30));
     } else {
       // summarize number of hits; break loop if no hits are expected
-      final FTLexer ft = new FTLexer(ftOpt);
+      final FTLexer lexer = new FTLexer(ftOpt);
       ii.costs = IndexCosts.ZERO;
-      for(byte[] t : tokens) {
-        ft.init(t);
-        while(ft.hasNext()) {
-          final byte[] tok = ft.nextToken();
+      for(byte[] token : tokens) {
+        lexer.init(token);
+        while(lexer.hasNext()) {
+          final byte[] tok = lexer.nextToken();
           if(ftOpt.sw != null && ftOpt.sw.contains(tok)) continue;
 
           if(ftOpt.is(WC)) {
             // don't use index if one of the terms starts with a wildcard
-            t = ft.get();
-            if(t[0] == '.') return false;
+            token = lexer.get();
+            if(token[0] == '.') return false;
             // don't use index if certain characters or more than 1 dot are found
             int d = 0;
-            for(final byte w : t) {
+            for(final byte w : token) {
               if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
             }
           }
           // favor full-text index requests over exact queries
-          final IndexCosts c = ii.costs(data, ft);
+          final IndexCosts c = ii.costs(data, lexer);
           if(c == null) return false;
           final int r = c.results();
           if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));

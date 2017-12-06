@@ -31,14 +31,14 @@ public final class MainModule extends Module {
    * Creates a new main module for a context item declared in the prolog.
    * @param vs variable scope
    * @param expr root expression
-   * @param type optional type
-   * @param doc documentation
-   * @param info input info
+   * @param declType declared type (can be {@code null})
+   * @param doc documentation (can be {@code null})
+   * @param info input info (can be {@code null})
    * @return main module
    */
-  public static MainModule get(final VarScope vs, final Expr expr, final SeqType type,
+  public static MainModule get(final VarScope vs, final Expr expr, final SeqType declType,
       final String doc, final InputInfo info) {
-    return new MainModule(vs, expr, type, doc, info, null, null, null);
+    return new MainModule(vs, expr, declType, doc, info, null, null, null);
   }
 
   /**
@@ -217,9 +217,9 @@ public final class MainModule extends Module {
     }
 
     @Override
-    public boolean inlineFunc(final Scope sub) {
+    public boolean inlineFunc(final Scope scope) {
       enterFocus();
-      final boolean ac = sub.visit(this);
+      final boolean ac = scope.visit(this);
       exitFocus();
       return ac;
     }

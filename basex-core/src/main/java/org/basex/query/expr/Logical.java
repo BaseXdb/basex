@@ -135,8 +135,8 @@ abstract class Logical extends Arr {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem();
-    plan.add(el);
-    for(final ExprInfo expr : exprs) expr.plan(el);
+    final FElem elem = planElem();
+    plan.add(elem);
+    for(final ExprInfo expr : exprs) expr.plan(elem);
   }
 }

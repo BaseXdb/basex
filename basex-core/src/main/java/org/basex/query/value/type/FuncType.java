@@ -93,7 +93,7 @@ public class FuncType implements Type {
 
     if(!(item instanceof FItem)) throw typeError(item, this, info);
     final FItem func = (FItem) item;
-    return this == SeqType.ANY_FUN ? func : func.coerceTo(this, qc, info, false);
+    return this == SeqType.ANY_FUNC ? func : func.coerceTo(this, qc, info, false);
   }
 
   @Override
@@ -114,8 +114,8 @@ public class FuncType implements Type {
     if(type.getClass() != FuncType.class) return false;
     final FuncType ft = (FuncType) type;
 
-    if(this == SeqType.ANY_FUN || ft == SeqType.ANY_FUN || argTypes.length != ft.argTypes.length)
-      return false;
+    if(this == SeqType.ANY_FUNC || ft == SeqType.ANY_FUNC ||
+        argTypes.length != ft.argTypes.length) return false;
 
     final int al = argTypes.length;
     for(int a = 0; a < al; a++) {
@@ -127,9 +127,9 @@ public class FuncType implements Type {
   @Override
   public boolean instanceOf(final Type type) {
     // the only non-function super-type of function is item()
-    if(type == AtomType.ITEM || type == SeqType.ANY_FUN) return true;
+    if(type == AtomType.ITEM || type == SeqType.ANY_FUNC) return true;
     if(!(type instanceof FuncType) || type instanceof MapType || type instanceof ArrayType ||
-        this == SeqType.ANY_FUN) return false;
+        this == SeqType.ANY_FUNC) return false;
 
     final FuncType ft = (FuncType) type;
     final int al = argTypes.length;
@@ -147,15 +147,15 @@ public class FuncType implements Type {
     if(!(type instanceof FuncType)) return AtomType.ITEM;
 
     final FuncType ft = (FuncType) type;
-    if(this == SeqType.ANY_FUN || ft == SeqType.ANY_FUN) return SeqType.ANY_FUN;
+    if(this == SeqType.ANY_FUNC || ft == SeqType.ANY_FUNC) return SeqType.ANY_FUNC;
 
     final int al = argTypes.length;
-    if(al != ft.argTypes.length) return SeqType.ANY_FUN;
+    if(al != ft.argTypes.length) return SeqType.ANY_FUNC;
 
     final SeqType[] arg = new SeqType[al];
     for(int a = 0; a < al; a++) {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
-      if(arg[a] == null) return SeqType.ANY_FUN;
+      if(arg[a] == null) return SeqType.ANY_FUNC;
     }
     return get(anns.union(ft.anns), declType.union(ft.declType), arg);
   }
@@ -213,7 +213,7 @@ public class FuncType implements Type {
   public static Type find(final QNm name) {
     if(name.uri().length == 0) {
       final byte[] ln = name.local();
-      if(Token.eq(ln, token(FUNCTION))) return SeqType.ANY_FUN;
+      if(Token.eq(ln, token(FUNCTION))) return SeqType.ANY_FUNC;
       if(Token.eq(ln, token(MAP))) return SeqType.ANY_MAP;
       if(Token.eq(ln, token(ARRAY))) return SeqType.ANY_ARRAY;
     }
@@ -249,7 +249,7 @@ public class FuncType implements Type {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(anns.toString()).add(FUNCTION).add('(');
-    if(this == SeqType.ANY_FUN) {
+    if(this == SeqType.ANY_FUNC) {
       tb.add('*').add(')');
     } else {
       tb.addSep(argTypes, ", ").add(") as ").add(declType.toString());

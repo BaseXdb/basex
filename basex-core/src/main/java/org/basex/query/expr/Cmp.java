@@ -107,12 +107,12 @@ public abstract class Cmp extends Arr {
       /* consider query flags
        * illegal: random:integer() eq random:integer() */
       final SeqType st1 = expr1.seqType();
-      final Type t1 = st1.type;
+      final Type type1 = st1.type;
       final boolean one = single ? st1.one() : st1.oneOrMore();
       /* limited to strings, integers and booleans.
        * illegal rewriting: xs:double('NaN') eq xs:double('NaN') */
-      if(one && (t1.isStringOrUntyped() || t1.instanceOf(AtomType.ITR) || t1 == AtomType.BLN))
-        return Bln.get(op == OpV.EQ);
+      if(one && (type1.isStringOrUntyped() || type1.instanceOf(AtomType.ITR) ||
+          type1 == AtomType.BLN)) return Bln.get(op == OpV.EQ);
     }
     return this;
   }

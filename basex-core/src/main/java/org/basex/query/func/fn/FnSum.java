@@ -63,14 +63,14 @@ public class FnSum extends StandardFunc {
       }
     } else if(st1.oneOrMore() && !st1.mayBeArray()) {
       // sequence is not empty: assign result type
-      final Type t1 = st1.type;
-      if(t1.isNumber()) exprType.assign(t1.seqType());
-      if(t1.isUntyped()) exprType.assign(SeqType.DBL_O);
+      final Type type1 = st1.type;
+      if(type1.isNumber()) exprType.assign(type1.seqType());
+      if(type1.isUntyped()) exprType.assign(SeqType.DBL_O);
     } else if(st2 != null && !st2.zero() && !st2.mayBeArray()) {
       // sequence may be empty: include non-empty default argument in tests
-      final Type t1 = st1.type, t2 = st2.type;
-      final Type type = t1.isNumberOrUntyped() && t2.isNumberOrUntyped() ?
-        Calc.type(t1, t2) : AtomType.AAT;
+      final Type type1 = st1.type, type2 = st2.type;
+      final Type type = type1.isNumberOrUntyped() && type2.isNumberOrUntyped() ?
+        Calc.type(type1, type2) : AtomType.AAT;
       exprType.assign(type, st2.one() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return this;
@@ -136,15 +136,15 @@ public class FnSum extends StandardFunc {
 
     int c = 1;
     for(Item it; (it = qc.next(iter)) != null;) {
-      final Type t = it.type;
-      Type te = null;
-      if(t.isNumberOrUntyped()) {
-        if(!num) te = AtomType.DUR;
+      final Type type = it.type;
+      Type tp = null;
+      if(type.isNumberOrUntyped()) {
+        if(!num) tp = AtomType.DUR;
       } else {
-        if(num) te = AtomType.NUM;
-        else if(dtd && t != DTD || ymd && t != YMD) te = AtomType.DUR;
+        if(num) tp = AtomType.NUM;
+        else if(dtd && type != DTD || ymd && type != YMD) tp = AtomType.DUR;
       }
-      if(te != null) throw CMP_X_X_X.get(info, te, t, it);
+      if(tp != null) throw CMP_X_X_X.get(info, tp, type, it);
       res = Calc.PLUS.eval(res, it, info);
       c++;
     }

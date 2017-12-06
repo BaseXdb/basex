@@ -31,13 +31,13 @@ public final class ArrayForEachPair extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Type t1 = exprs[0].seqType().type, t2 = exprs[1].seqType().type;
-    if(t1 instanceof ArrayType && t2 instanceof ArrayType)
-      coerceFunc(2, cc, SeqType.ITEM_ZM, ((ArrayType) t1).declType, ((ArrayType) t2).declType);
+    final Type type1 = exprs[0].seqType().type, type2 = exprs[1].seqType().type;
+    if(type1 instanceof ArrayType && type2 instanceof ArrayType) coerceFunc(2, cc,
+        SeqType.ITEM_ZM, ((ArrayType) type1).declType, ((ArrayType) type2).declType);
 
     // assign type after coercion (expression might have changed)
-    final Type t3 = exprs[2].seqType().type;
-    if(t3 instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) t3).declType));
+    final Type type3 = exprs[2].seqType().type;
+    if(type3 instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) type3).declType));
 
     return this;
   }

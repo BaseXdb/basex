@@ -30,7 +30,7 @@ public abstract class Tokenizer extends LanguageImpl {
    * @return result of check
    */
   public static boolean supportFor(final Language l) {
-    for(final Tokenizer t : IMPL) if(t.supports(l)) return true;
+    for(final Tokenizer toknzr : IMPL) if(toknzr.supports(l)) return true;
     return false;
   }
 

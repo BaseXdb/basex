@@ -53,9 +53,9 @@ public final class FTScope extends FTFilter {
     for(final FTStringMatch sm : match) {
       if(sm.exclude) continue;
       c++;
-      final int p = pos(sm.start, lexer), s = bl.size();
-      if(p < s && bl.get(p) && p == pos(sm.end, lexer)) return false;
-      bl.set(p, true);
+      final int pos = pos(sm.start, lexer), size = bl.size();
+      if(pos < size && bl.get(pos) && pos == pos(sm.end, lexer)) return false;
+      bl.set(pos, true);
     }
     return c > 1;
   }

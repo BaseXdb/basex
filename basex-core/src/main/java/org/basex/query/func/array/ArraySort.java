@@ -32,25 +32,25 @@ public final class ArraySort extends StandardFunc {
     }
 
     final long size = array.arraySize();
-    final ValueList vl = new ValueList(size);
+    final ValueList values = new ValueList(size);
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
     for(final Value value : array.members()) {
-      vl.add((key == null ? value : key.invokeValue(qc, info, value)).atomValue(qc, info));
+      values.add((key == null ? value : key.invokeValue(qc, info, value)).atomValue(qc, info));
     }
 
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final int order : FnSort.sort(vl, this, coll, qc)) builder.append(array.get(order));
+    for(final int order : FnSort.sort(values, this, coll, qc)) builder.append(array.get(order));
     return builder.freeze();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final SeqType st1 = exprs[0].seqType();
-    final Type t1 = st1.type;
+    final Type type1 = st1.type;
 
-    if(t1 instanceof ArrayType) {
-      if(exprs.length == 3) coerceFunc(2, cc, SeqType.AAT_ZM, ((ArrayType) t1).declType);
-      exprType.assign(t1);
+    if(type1 instanceof ArrayType) {
+      if(exprs.length == 3) coerceFunc(2, cc, SeqType.AAT_ZM, ((ArrayType) type1).declType);
+      exprType.assign(type1);
     }
     return this;
   }

@@ -157,18 +157,18 @@ public final class SeqType {
   public static final SeqType TXT_ZM = NodeType.TXT.seqType(Occ.ZERO_MORE);
 
   /** Any function type. */
-  public static final FuncType ANY_FUN = new FuncType(null, (SeqType[]) null);
+  public static final FuncType ANY_FUNC = new FuncType(null, (SeqType[]) null);
   /** The general map type. */
   public static final MapType ANY_MAP = new MapType(AtomType.AAT, ITEM_ZM);
   /** The general array type. */
   public static final ArrayType ANY_ARRAY = new ArrayType(ITEM_ZM);
 
   /** Single function. */
-  public static final SeqType FUN_O = ANY_FUN.seqType();
+  public static final SeqType FUNC_O = ANY_FUNC.seqType();
   /** Zero of single function. */
-  public static final SeqType FUN_ZO = ANY_FUN.seqType(Occ.ZERO_ONE);
+  public static final SeqType FUNC_ZO = ANY_FUNC.seqType(Occ.ZERO_ONE);
   /** Zero of more functions. */
-  public static final SeqType FUN_ZM = ANY_FUN.seqType(Occ.ZERO_MORE);
+  public static final SeqType FUNC_ZM = ANY_FUNC.seqType(Occ.ZERO_MORE);
   /** Single map. */
   public static final SeqType MAP_O = ANY_MAP.seqType();
   /** Zero or one map. */
@@ -584,11 +584,11 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instanceOf(final SeqType st) {
-    final Type t1 = type, t2 = st.type;
-    final Test k1 = kind, k2 = st.kind;
-    return (t2 == AtomType.ITEM || t1.instanceOf(t2)) && occ.instanceOf(st.occ) &&
+    final Type type1 = type, type2 = st.type;
+    final Test kind1 = kind, kind2 = st.kind;
+    return (type2 == AtomType.ITEM || type1.instanceOf(type2)) && occ.instanceOf(st.occ) &&
       // [LW] complete kind check
-      (k2 == null || k1 != null && k1.intersect(k2) != null);
+      (kind2 == null || kind1 != null && kind1.intersect(kind2) != null);
   }
 
   /**

@@ -51,9 +51,9 @@ public final class Cast extends Single {
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
-    final Type t = seqType().type;
-    if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
-        t == AtomType.QNM || t == AtomType.URI) && seqType().eq(expr.seqType())) {
+    final Type type = seqType().type;
+    if((type == AtomType.BLN || type == AtomType.FLT || type == AtomType.DBL ||
+        type == AtomType.QNM || type == AtomType.URI) && seqType().eq(expr.seqType())) {
       return cc.replaceWith(this, expr);
     }
     return this;

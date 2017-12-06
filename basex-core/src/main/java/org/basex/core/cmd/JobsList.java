@@ -111,8 +111,8 @@ public final class JobsList extends Command {
    */
   private static TokenList sort(final TokenList list) {
     return list.sort((token1, token2) -> {
-      final byte[] t1 = substring(token1, 3), t2 = substring(token2, 3);
-      final long diff = toLong(t1) - toLong(t2);
+      final byte[] id1 = substring(token1, 3), id2 = substring(token2, 3);
+      final long diff = toLong(id1) - toLong(id2);
       return diff < 0 ? -1 : diff > 0 ? 1 : 0;
     }, true);
   }

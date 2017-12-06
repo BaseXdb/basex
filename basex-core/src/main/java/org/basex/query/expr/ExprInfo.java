@@ -54,12 +54,12 @@ public abstract class ExprInfo {
    * @return tree node
    */
   protected FElem planElem(final Object... atts) {
-    final FElem el = new FElem(Util.className(this));
+    final FElem elem = new FElem(Util.className(this));
     final int al = atts.length;
     for(int a = 0; a < al - 1; a += 2) {
-      if(atts[a + 1] != null) el.add(planAttr(atts[a], atts[a + 1]));
+      if(atts[a + 1] != null) elem.add(planAttr(atts[a], atts[a + 1]));
     }
-    return el;
+    return elem;
   }
 
   /**

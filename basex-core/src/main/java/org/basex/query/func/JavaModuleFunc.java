@@ -81,8 +81,8 @@ final class JavaModuleFunc extends JavaFunction {
     final TokenBuilder expect = new TokenBuilder();
     for(final Class<?> param : method.getParameterTypes()) {
       if(!expect.isEmpty()) expect.add(", ");
-      final Type t = JavaMapping.type(param, false);
-      expect.add(t != null ? t.toString() : Util.className(param));
+      final Type type = JavaMapping.type(param, false);
+      expect.add(type != null ? type.toString() : Util.className(param));
     }
     final String name = method.getName();
     throw JAVAARGS_X_X_X.get(info, name, expect, foundArgs(args));

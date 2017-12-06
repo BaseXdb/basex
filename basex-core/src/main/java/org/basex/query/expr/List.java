@@ -72,27 +72,27 @@ public final class List extends Arr {
 
     // pre-evaluate list
     if(allAreValues(true)) {
-      Type t = null;
+      Type tp = null;
       final Value[] values = new Value[exprs.length];
       int vl = 0;
       for(final Expr expr : exprs) {
         cc.qc.checkStop();
         final Value value = expr.value(cc.qc);
-        if(vl == 0) t = value.type;
-        else if(t != null && !t.eq(value.type)) t = null;
+        if(vl == 0) tp = value.type;
+        else if(tp != null && !tp.eq(value.type)) tp = null;
         values[vl++] = value;
       }
 
       final Value value;
-      final int s = (int) size;
-      if(t == AtomType.STR)      value = StrSeq.get(values, s);
-      else if(t == AtomType.BLN) value = BlnSeq.get(values, s);
-      else if(t == AtomType.FLT) value = FltSeq.get(values, s);
-      else if(t == AtomType.DBL) value = DblSeq.get(values, s);
-      else if(t == AtomType.DEC) value = DecSeq.get(values, s);
-      else if(t == AtomType.BYT) value = BytSeq.get(values, s);
-      else if(t != null && t.instanceOf(AtomType.ITR)) {
-        value = IntSeq.get(values, s, t);
+      final int sz = (int) size;
+      if(tp == AtomType.STR)      value = StrSeq.get(values, sz);
+      else if(tp == AtomType.BLN) value = BlnSeq.get(values, sz);
+      else if(tp == AtomType.FLT) value = FltSeq.get(values, sz);
+      else if(tp == AtomType.DBL) value = DblSeq.get(values, sz);
+      else if(tp == AtomType.DEC) value = DecSeq.get(values, sz);
+      else if(tp == AtomType.BYT) value = BytSeq.get(values, sz);
+      else if(tp != null && tp.instanceOf(AtomType.ITR)) {
+        value = IntSeq.get(values, sz, tp);
       } else {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
         for(int v = 0; v < vl; v++) vb.add(values[v]);

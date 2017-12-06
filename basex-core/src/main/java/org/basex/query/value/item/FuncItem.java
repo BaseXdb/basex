@@ -144,18 +144,18 @@ public final class FuncItem extends FItem implements Scope {
     final FuncType tp = funcType();
     if(opt ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
-    final VarScope scp = new VarScope(sc);
+    final VarScope vs = new VarScope(sc);
     final Var[] vars = new Var[pl];
     final Expr[] args = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vars[p] = scp.addNew(params[p].name, ft.argTypes[p], true, qc, info);
+      vars[p] = vs.addNew(params[p].name, ft.argTypes[p], true, qc, info);
       args[p] = new VarRef(info, vars[p]).optimize(null);
     }
 
     final Expr ex = new DynFuncCall(info, sc, expr.has(Flag.UPD), false, this, args);
 
     final CompileContext cc = new CompileContext(qc);
-    cc.pushScope(scp);
+    cc.pushScope(vs);
 
     final Expr optimized = opt ? ex.optimize(cc) : ex, checked;
     if(tp.declType.instanceOf(ft.declType)) {
@@ -166,7 +166,7 @@ public final class FuncItem extends FItem implements Scope {
     }
     checked.markTailCalls(null);
 
-    return new FuncItem(sc, anns, name, vars, ft, checked, scp.stackSize());
+    return new FuncItem(sc, anns, name, vars, ft, checked, vs.stackSize());
   }
 
   @Override
@@ -203,11 +203,11 @@ public final class FuncItem extends FItem implements Scope {
     cc.info(OPTINLINE_X, this);
 
     // create let bindings for all variables
-    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<>();
+    final LinkedList<Clause> clauses = exprs.length == 0 ? null : new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      cls.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
+      clauses.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
     }
 
     // copy the function body
@@ -215,8 +215,8 @@ public final class FuncItem extends FItem implements Scope {
 
     rt.accept(new ASTVisitor() {
       @Override
-      public boolean inlineFunc(final Scope sub) {
-        return sub.visit(this);
+      public boolean inlineFunc(final Scope scope) {
+        return scope.visit(this);
       }
 
       @Override
@@ -225,7 +225,7 @@ public final class FuncItem extends FItem implements Scope {
         return true;
       }
     });
-    return cls == null ? rt : new GFLWOR(info, cls, rt).optimize(cc);
+    return clauses == null ? rt : new GFLWOR(info, clauses, rt).optimize(cc);
   }
 
   @Override

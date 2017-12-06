@@ -71,9 +71,9 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
         Node<?, E> nd = null;
         for(int i = 0; i < deep.left.length; i++) {
           nd = deep.left[i];
-          final long s = nd.size();
-          if(pos < s) break;
-          pos -= s;
+          final long sz = nd.size();
+          if(pos < sz) break;
+          pos -= sz;
         }
         digit = nd;
         break;
@@ -88,9 +88,9 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
         Node<?, E> nd = null;
         for(int i = 0; i < deep.right.length; i++) {
           nd = deep.right[i];
-          final long s = nd.size();
-          if(pos < s) break;
-          pos -= s;
+          final long sz = nd.size();
+          if(pos < sz) break;
+          pos -= sz;
         }
         digit = nd;
         break;

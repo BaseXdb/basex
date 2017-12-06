@@ -121,9 +121,9 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   @Override
   public void plan(final FElem plan) {
     if(vars.isEmpty()) return;
-    final FElem e = planElem();
-    for(final VarEntry v : vars.values()) v.var.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    for(final VarEntry v : vars.values()) v.var.plan(elem);
+    plan.add(elem);
   }
 
   @Override

@@ -41,8 +41,8 @@ public final class Unary extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    final Type t = st.type;
-    exprType.assign(t.isUntyped() ? AtomType.DBL : t.isNumber() ? t : AtomType.ITR,
+    final Type type = st.type;
+    exprType.assign(type.isUntyped() ? AtomType.DBL : type.isNumber() ? type : AtomType.ITR,
       st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
 
     // no negation, numeric value: return operand

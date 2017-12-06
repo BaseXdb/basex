@@ -583,7 +583,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected FItem toFunc(final Expr expr, final QueryContext qc) throws QueryException {
-    return (FItem) checkType(toItem(expr, qc, SeqType.ANY_FUN), SeqType.ANY_FUN);
+    return (FItem) checkType(toItem(expr, qc, SeqType.ANY_FUNC), SeqType.ANY_FUNC);
   }
 
   /**

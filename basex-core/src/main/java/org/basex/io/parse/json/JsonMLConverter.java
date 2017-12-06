@@ -125,9 +125,9 @@ final class JsonMLConverter extends JsonXmlConverter {
     }
 
     if(curr == null) {
-      final FElem e = stack.isEmpty() ? null : stack.peek();
-      if(e == null) curr = new FElem(check(value));
-      else e.add(new FTxt(value));
+      final FElem elem = stack.isEmpty() ? null : stack.peek();
+      if(elem == null) curr = new FElem(check(value));
+      else elem.add(new FTxt(value));
     } else if(attName != null) {
       curr.add(attName, value);
       attName = null;

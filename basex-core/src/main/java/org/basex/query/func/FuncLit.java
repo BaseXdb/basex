@@ -23,7 +23,7 @@ public final class FuncLit extends Single implements Scope {
   /** Function name. */
   private final QNm name;
   /** Formal parameters. */
-  private final Var[] args;
+  private final Var[] params;
   /** Annotations. */
   private final AnnList anns;
   /** Compilation flag. */
@@ -33,19 +33,19 @@ public final class FuncLit extends Single implements Scope {
    * Constructor.
    * @param anns annotations
    * @param name function name
-   * @param args formal parameters
+   * @param params formal parameters
    * @param expr function body
    * @param seqType sequence type
    * @param vs variable scope
    * @param info input info
    */
-  FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr,
+  FuncLit(final AnnList anns, final QNm name, final Var[] params, final Expr expr,
       final SeqType seqType, final VarScope vs, final InputInfo info) {
 
     super(info, expr, seqType);
     this.anns = anns;
     this.name = name;
-    this.args = args;
+    this.params = params;
     this.vs = vs;
   }
 
@@ -73,20 +73,20 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(vs.sc, anns, name, args, (FuncType) seqType().type, expr, qc.focus.copy(),
+    return new FuncItem(vs.sc, anns, name, params, (FuncType) seqType().type, expr, qc.focus.copy(),
         vs.stackSize());
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final VarScope scp = new VarScope(vs.sc);
-    cc.pushScope(scp);
+    final VarScope vsc = new VarScope(vs.sc);
+    cc.pushScope(vsc);
     try {
-      final int al = args.length;
-      final Var[] arg = new Var[al];
-      for(int a = 0; a < al; a++) arg[a] = cc.copy(args[a], vm);
+      final int pl = params.length;
+      final Var[] vars = new Var[pl];
+      for(int p = 0; p < pl; p++) vars[p] = cc.copy(params[p], vm);
       final Expr ex = expr.copy(cc, vm);
-      return new FuncLit(anns, name, arg, ex, seqType(), scp, info);
+      return new FuncLit(anns, name, vars, ex, seqType(), vsc, info);
     } finally {
       cc.removeScope();
     }
@@ -99,7 +99,7 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var v : args) if(!visitor.declared(v)) return false;
+    for(final Var var : params) if(!visitor.declared(var)) return false;
     return expr.accept(visitor);
   }
 
@@ -121,6 +121,6 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.prefixId()).add('#').addExt(args.length).toString();
+    return new TokenBuilder(name.prefixId()).add('#').addExt(params.length).toString();
   }
 }

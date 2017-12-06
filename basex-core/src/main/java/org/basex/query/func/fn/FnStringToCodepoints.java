@@ -44,8 +44,8 @@ public final class FnStringToCodepoints extends StandardFunc {
    */
   private static Value value(final int[] cps) {
     final int cl = cps.length;
-    final long[] vals = new long[cl];
-    for(int c = 0; c < cl; c++) vals[c] = cps[c];
-    return IntSeq.get(vals, AtomType.ITR);
+    final long[] values = new long[cl];
+    for(int c = 0; c < cl; c++) values[c] = cps[c];
+    return IntSeq.get(values, AtomType.ITR);
   }
 }

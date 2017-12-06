@@ -72,19 +72,19 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
     final TokenList tl = new TokenList();
     if(headers != null) {
-      final int s = headers.size();
+      final int size = headers.size();
       // print header
       if(header) {
-        for(int i = 0; i < s; i++) tl.add(headers.get(i));
+        for(int i = 0; i < size; i++) tl.add(headers.get(i));
         record(tl);
         header = false;
       }
       // print data, sorted by headers
-      for(int i = 0; i < s; i++) tl.add(data.get(headers.get(i)));
+      for(int i = 0; i < size; i++) tl.add(data.get(headers.get(i)));
       record(tl);
     } else {
       // no headers available: print data
-      for(final byte[] v : data.values()) tl.add(v);
+      for(final byte[] value : data.values()) tl.add(value);
       record(tl);
     }
   }

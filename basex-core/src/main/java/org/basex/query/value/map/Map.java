@@ -256,21 +256,21 @@ public final class Map extends FItem {
 
   @Override
   public void plan(final FElem plan) {
-    final int s = mapSize();
-    final FElem el = planElem(ENTRIES, s, TYPE, seqType());
-    final Value ks = keys();
+    final int size = mapSize();
+    final FElem elem = planElem(ENTRIES, size, TYPE, seqType());
+    final Value keys = keys();
     try {
-      final int max = Math.min(s, 5);
+      final int max = Math.min(size, 5);
       for(long i = 0; i < max; i++) {
-        final Item key = ks.itemAt(i);
+        final Item key = keys.itemAt(i);
         final Value value = get(key, null);
-        key.plan(el);
-        value.plan(el);
+        key.plan(elem);
+        value.plan(elem);
       }
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }
-    addPlan(plan, el);
+    addPlan(plan, elem);
   }
 
   /**

@@ -32,21 +32,21 @@ public final class Union extends Set {
   public Expr optimize(final CompileContext cc) throws QueryException {
     super.optimize(cc);
 
-    final ExprList el = new ExprList(exprs.length);
+    final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.SEQ) {
         // remove empty operands
         cc.info(OPTREMOVE_X_X, expr, description());
       } else {
-        el.add(expr);
+        list.add(expr);
       }
     }
     // no expressions: return empty sequence
-    if(el.isEmpty()) return Empty.SEQ;
+    if(list.isEmpty()) return Empty.SEQ;
     // ensure that results are always sorted
-    if(el.size() == 1 && iterable) return el.get(0);
+    if(list.size() == 1 && iterable) return list.get(0);
     // replace expressions with optimized list
-    exprs = el.finish();
+    exprs = list.finish();
     return this;
   }
 
@@ -59,11 +59,11 @@ public final class Union extends Set {
 
   @Override
   public ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
-    final ANodeBuilder list = new ANodeBuilder();
+    final ANodeBuilder nodes = new ANodeBuilder();
     for(final Iter iter : iters) {
-      for(Item item; (item = qc.next(iter)) != null;) list.add(toNode(item));
+      for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
     }
-    return list;
+    return nodes;
   }
 
   @Override

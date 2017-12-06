@@ -318,9 +318,9 @@ public final class GroupBy extends Clause {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    for(final GroupSpec spec : specs) spec.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    for(final GroupSpec spec : specs) spec.plan(elem);
+    plan.add(elem);
   }
 
   @Override

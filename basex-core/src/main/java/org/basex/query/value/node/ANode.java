@@ -498,11 +498,11 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a database kind for the specified node type.
-   * @param t node type
+   * @param type node type
    * @return node kind
    */
-  public static int kind(final NodeType t) {
-    switch(t) {
+  public static int kind(final NodeType type) {
+    switch(type) {
       case DOC: return Data.DOC;
       case ELM: return Data.ELEM;
       case TXT: return Data.TEXT;

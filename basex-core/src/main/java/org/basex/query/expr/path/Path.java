@@ -705,9 +705,9 @@ public abstract class Path extends ParseExpr {
     final ExprList resultSteps = new ExprList();
     final Expr resultRoot;
     if(index.expr instanceof Path) {
-      final Path p = (Path) index.expr;
-      resultRoot = p.root;
-      resultSteps.add(p.steps);
+      final Path path = (Path) index.expr;
+      resultRoot = path.root;
+      resultSteps.add(path.steps);
     } else {
       resultRoot = index.expr;
     }

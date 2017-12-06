@@ -36,11 +36,10 @@ public final class MapMerge extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Type t = exprs[0].seqType().type;
-
-    if(t instanceof MapType) {
-      // check if values may be combined (if yes, adjust occurrence of return type)
-      MapType mt = (MapType) t;
+    final Type type = exprs[0].seqType().type;
+    if(type instanceof MapType) {
+      // check if duplicates will be combined (if yes, adjust occurrence of return type)
+      MapType mt = (MapType) type;
       if(exprs.length < 2 || !(exprs[1] instanceof Value) ||
           options(cc.qc).get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
         mt = MapType.get(mt.keyType(), mt.declType.with(Occ.ONE_MORE));

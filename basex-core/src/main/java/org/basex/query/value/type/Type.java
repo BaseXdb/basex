@@ -147,9 +147,9 @@ public interface Type {
     public static Type getType(final int id) {
       final ID i = get(id);
       if(i == null) return null;
-      if(i == FUN) return SeqType.ANY_FUN;
-      final Type t = AtomType.getType(i);
-      return t != null ? t : NodeType.getType(i);
+      if(i == FUN) return SeqType.ANY_FUNC;
+      final Type type = AtomType.getType(i);
+      return type != null ? type : NodeType.getType(i);
     }
   }
 

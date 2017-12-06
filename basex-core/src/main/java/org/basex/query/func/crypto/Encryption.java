@@ -129,9 +129,9 @@ final class Encryption {
 
     // encrypt/decrypt
     cipher.init(Cipher.ENCRYPT_MODE, kspec, ivspec);
-    final byte[] t = cipher.doFinal(in);
+    final byte[] ciph = cipher.doFinal(in);
     // initialization vector is appended to the message for later decryption
-    return concat(iv, t);
+    return concat(iv, ciph);
   }
 
   /**

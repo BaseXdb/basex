@@ -30,11 +30,11 @@ public final class ArrayFilter extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0];
-    final Type t1 = expr1.seqType().type;
+    final Type type1 = expr1.seqType().type;
 
-    if(t1 instanceof ArrayType) {
-      coerceFunc(1, cc, SeqType.BLN_O, ((ArrayType) t1).declType);
-      exprType.assign(t1);
+    if(type1 instanceof ArrayType) {
+      coerceFunc(1, cc, SeqType.BLN_O, ((ArrayType) type1).declType);
+      exprType.assign(type1);
     }
     return this;
   }

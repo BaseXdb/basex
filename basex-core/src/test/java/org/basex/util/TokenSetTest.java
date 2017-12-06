@@ -30,33 +30,33 @@ public class TokenSetTest {
   /** Initializes a single test. */
   @Before
   public void initTest() {
-    for(final byte[] t : LIST) set.add(t);
+    for(final byte[] token : LIST) set.add(token);
   }
 
   /** Tests added tokens. */
   @Test
   public void add() {
     assertEquals(SIZE, set.size());
-    for(final byte[] t : LIST) assertTrue("Token is missing.", set.contains(t));
+    for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
   }
 
   /** Tests removed tokens. */
   @Test
   public void delete() {
-    for(final byte[] t : LIST) set.delete(t);
-    for(final byte[] t : LIST) assertFalse("Token exists.", set.contains(t));
+    for(final byte[] token : LIST) set.delete(token);
+    for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
   }
 
   /** Tests removed tokens. */
   @Test
   public void addDelete() {
-    for(final byte[] t : LIST) set.add(t);
-    for(final byte[] t : LIST) assertTrue("Token is missing.", set.contains(t));
-    for(final byte[] t : LIST) set.delete(t);
-    for(final byte[] t : LIST) assertFalse("Token exists.", set.contains(t));
-    for(final byte[] t : LIST) set.add(t);
-    for(final byte[] t : LIST) assertTrue("Token is missing.", set.contains(t));
-    for(final byte[] t : LIST) set.delete(t);
-    for(final byte[] t : LIST) assertFalse("Token exists.", set.contains(t));
+    for(final byte[] token : LIST) set.add(token);
+    for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
+    for(final byte[] token : LIST) set.delete(token);
+    for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
+    for(final byte[] token : LIST) set.add(token);
+    for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
+    for(final byte[] token : LIST) set.delete(token);
+    for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
   }
 }

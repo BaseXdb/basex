@@ -144,25 +144,24 @@ public final class FTWildcard {
 
   /**
    * Checks if the wildcard can match a sub-string in a string.
-   * @param t token to search for match
+   * @param token token to search for match
    * @param tp input position
    * @param qp query position
    * @return {@code true} if a match is found
    */
-  private boolean match(final int[] t, final int tp, final int qp) {
-    int qi = qp;
-    int ti = tp;
-    final int tl = t.length;
+  private boolean match(final int[] token, final int tp, final int qp) {
+    final int tl = token.length;
+    int qi = qp, ti = tp;
     while(qi < size) {
       if(wc[qi] == DOT) {
         int n = min[qi];
         final int m = max[qi++];
         // recursively evaluates wildcards (non-greedy)
-        while(!match(t, ti + n, qi)) if(ti + ++n > tl) return false;
+        while(!match(token, ti + n, qi)) if(ti + ++n > tl) return false;
         if(n > m) return false;
         ti += n;
       } else {
-        if(ti >= tl || t[ti++] != wc[qi++]) return false;
+        if(ti >= tl || token[ti++] != wc[qi++]) return false;
       }
     }
     return ti == tl;

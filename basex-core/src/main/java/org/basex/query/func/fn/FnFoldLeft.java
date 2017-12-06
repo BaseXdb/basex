@@ -73,10 +73,10 @@ public final class FnFoldLeft extends StandardFunc {
     final Expr[] exprs = func.exprs;
     final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
     if(exprs[2].seqType().type instanceof FuncType) {
-      final SeqType ft = array && st1.type instanceof ArrayType ?
+      final SeqType fst1 = array && st1.type instanceof ArrayType ?
         ((ArrayType) st1.type).declType : st1;
       func.coerceFunc(2, cc, SeqType.ITEM_ZM,
-          left ? SeqType.ITEM_ZM : ft, left ? ft : SeqType.ITEM_ZM);
+          left ? SeqType.ITEM_ZM : fst1, left ? fst1 : SeqType.ITEM_ZM);
 
       final SeqType dt = ((FuncType) exprs[2].seqType().type).declType;
       func.exprType.assign(array || st1.mayBeEmpty() ? dt.union(st2) : dt);

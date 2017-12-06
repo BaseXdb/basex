@@ -32,21 +32,20 @@ abstract class Set extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    boolean i = true;
+    iterable = true;
     for(final Expr expr : exprs) {
       if(!expr.iterable()) {
-        i = false;
+        iterable = false;
         break;
       }
     }
-    iterable = i;
 
-    Type t = null;
+    Type type = null;
     for(final Expr expr : exprs) {
-      final Type t2 = expr.seqType().type;
-      t = t == null ? t2 : t.union(t2);
+      final Type type2 = expr.seqType().type;
+      type = type == null ? type2 : type.union(type2);
     }
-    if(t instanceof NodeType) exprType.assign(t);
+    if(type instanceof NodeType) exprType.assign(type);
 
     return this;
   }

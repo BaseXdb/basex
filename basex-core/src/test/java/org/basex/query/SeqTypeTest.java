@@ -81,8 +81,8 @@ public final class SeqTypeTest {
     assertFalse(f.instanceOf(ITR_O));
     assertTrue(f.instanceOf(ITEM_O));
     assertTrue(f.instanceOf(f));
-    assertTrue(f.instanceOf(FUN_ZO));
-    assertFalse(FUN_O.instanceOf(f));
+    assertTrue(f.instanceOf(FUNC_ZO));
+    assertFalse(FUNC_O.instanceOf(f));
     assertFalse(f.instanceOf(FuncType.get(DEC_ZO, BLN_O, ITR_O).seqType()));
     assertFalse(f.instanceOf(FuncType.get(DEC_ZO, AAT_O).seqType()));
     assertFalse(f.instanceOf(FuncType.get(BLN_O, BLN_O).seqType()));
@@ -91,7 +91,7 @@ public final class SeqTypeTest {
     final MapType m = MapType.get(AtomType.STR, ITR_O);
     assertTrue(m.instanceOf(m));
     assertTrue(m.instanceOf(AtomType.ITEM));
-    assertTrue(m.instanceOf(ANY_FUN));
+    assertTrue(m.instanceOf(ANY_FUNC));
     assertTrue(m.instanceOf(ANY_MAP));
     assertTrue(m.instanceOf(MapType.get(AtomType.ITEM, ITR_O)));
     assertTrue(m.instanceOf(MapType.get(AtomType.STR, ITR_O)));
@@ -103,7 +103,7 @@ public final class SeqTypeTest {
     final ArrayType a = ArrayType.get(ITR_O);
     assertTrue(a.instanceOf(a));
     assertTrue(a.instanceOf(AtomType.ITEM));
-    assertTrue(a.instanceOf(ANY_FUN));
+    assertTrue(a.instanceOf(ANY_FUNC));
     assertTrue(a.instanceOf(ANY_ARRAY));
     assertTrue(a.instanceOf(ArrayType.get(ITR_O)));
     assertTrue(a.instanceOf(ArrayType.get(ITR_O)));
@@ -150,9 +150,9 @@ public final class SeqTypeTest {
       f5 = FuncType.get(ITR_O, BLN_O).seqType();
 
     union(f, ITR_O, ITEM_O);
-    union(f, FUN_O, FUN_O);
-    union(f2, f3, FUN_O);
-    union(f2, f4, FUN_O);
+    union(f, FUNC_O, FUNC_O);
+    union(f2, f3, FUNC_O);
+    union(f2, f4, FUNC_O);
 
     // maps
     final SeqType
@@ -171,7 +171,7 @@ public final class SeqTypeTest {
     union(m, f2, f5);
     //union(m, m2, m2);
     //union(m, m3, m2);
-    union(m2, m4, FUN_O);
+    union(m2, m4, FUNC_O);
 
     /* arrays
     final SeqType
@@ -253,7 +253,7 @@ public final class SeqTypeTest {
     //intersect(m, m3, MapType.get(AtomType.AAT, AtomType.NNI.seqType()).seqType());
     intersect(m2, m4, m);
     intersect(m2, MapType.get(AtomType.BLN, BLN_O).seqType(), null);
-    intersect(m, FUN_O, m);
+    intersect(m, FUNC_O, m);
     intersect(m, f, m);
     intersect(m4, f5, m);
     intersect(m, f3, null);

@@ -86,34 +86,34 @@ final class DigitalSignature {
   /**
    * Generates a signature.
    * @param node node to be signed
-   * @param c canonicalization algorithm
-   * @param d digest algorithm
+   * @param can canonicalization algorithm
+   * @param dig digest algorithm
    * @param sig signature algorithm
    * @param ns signature element namespace prefix
-   * @param t signature type (enveloped, enveloping, detached)
+   * @param tp signature type (enveloped, enveloping, detached)
    * @param expr XPath expression which specifies node to be signed
-   * @param ce certificate which contains keystore information for signing the node, may be null
+   * @param cert certificate which contains keystore information for signing the node, may be null
    * @param qc query context
    * @param ii input info
    *
    * @return signed node
    * @throws QueryException query exception
    */
-  Item generateSignature(final ANode node, final byte[] c, final byte[] d, final byte[] sig,
-      final byte[] ns, final byte[] t, final byte[] expr, final ANode ce, final QueryContext qc,
+  Item generateSignature(final ANode node, final byte[] can, final byte[] dig, final byte[] sig,
+      final byte[] ns, final byte[] tp, final byte[] expr, final ANode cert, final QueryContext qc,
       final InputInfo ii) throws QueryException {
 
     // checking input variables
-    byte[] b = c;
+    byte[] b = can;
     if(b.length == 0) b = DEFC;
     b = CANONICALS.get(lc(b));
-    if(b == null) throw CX_CANINV.get(info, c);
+    if(b == null) throw CX_CANINV.get(info, can);
     final String canonicalization = string(b);
 
-    b = d;
+    b = dig;
     if(b.length == 0) b = DEFD;
     b = DIGESTS.get(lc(b));
-    if(b == null) throw CX_DIGINV.get(info, d);
+    if(b == null) throw CX_DIGINV.get(info, dig);
     final String digest = string(b);
 
     b = sig;
@@ -124,9 +124,9 @@ final class DigitalSignature {
     final String signature = string(b);
     final String keytype = string(tsig).substring(0, 3);
 
-    b = t;
+    b = tp;
     if(b.length == 0) b = DEFT;
-    if(!TYPES.contains(lc(b))) throw CX_SIGTYPINV.get(info, t);
+    if(!TYPES.contains(lc(b))) throw CX_SIGTYPINV.get(info, tp);
     final byte[] type = b;
 
     final Item signedNode;
@@ -136,8 +136,8 @@ final class DigitalSignature {
       final KeyInfo ki;
 
       // dealing with given certificate details to initialize the keystore
-      if(ce != null) {
-        final Document ceDOM = toDOMNode(ce);
+      if(cert != null) {
+        final Document ceDOM = toDOMNode(cert);
         if(!"digital-certificate".equals(ceDOM.getDocumentElement().getNodeName()))
           throw CX_INVNM.get(info, ceDOM);
         final NodeList ceChildren = ceDOM.getDocumentElement().getChildNodes();

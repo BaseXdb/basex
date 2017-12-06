@@ -129,8 +129,8 @@ public final class DeepEqual {
       }
 
       // node types must be equal
-      Type t1 = item1.type, t2 = item2.type;
-      if(t1 != t2) return false;
+      Type type1 = item1.type, type2 = item2.type;
+      if(type1 != type2) return false;
 
       ANode node1 = (ANode) item1, node2 = (ANode) item2;
       if(node1.is(node2)) continue;
@@ -142,16 +142,16 @@ public final class DeepEqual {
 
       boolean skip = false;
       do {
-        t1 = node1 != null ? node1.type : null;
-        t2 = node2 != null ? node2.type : null;
+        type1 = node1 != null ? node1.type : null;
+        type2 = node2 != null ? node2.type : null;
 
         // skip comparison of descendant comments and processing instructions
         if(skip) {
-          if(t1 == NodeType.COM || t1 == NodeType.PI) {
+          if(type1 == NodeType.COM || type1 == NodeType.PI) {
             node1 = ch1.next();
             continue;
           }
-          if(t2 == NodeType.COM || t2 == NodeType.PI) {
+          if(type2 == NodeType.COM || type2 == NodeType.PI) {
             node2 = ch2.next();
             continue;
           }
@@ -163,7 +163,7 @@ public final class DeepEqual {
           ch1 = stack.pop();
         } else {
           // ensure that nodes have same type
-          if(t1 != t2) return false;
+          if(type1 != type2) return false;
 
           // compare names
           QNm n1 = node1.qname(), n2 = node2.qname();
@@ -171,11 +171,11 @@ public final class DeepEqual {
               flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
             return false;
 
-          if(t1 == NodeType.TXT || t1 == NodeType.ATT || t1 == NodeType.COM ||
-             t1 == NodeType.PI || t1 == NodeType.NSP) {
+          if(type1 == NodeType.TXT || type1 == NodeType.ATT || type1 == NodeType.COM ||
+             type1 == NodeType.PI || type1 == NodeType.NSP) {
             // compare string values
             if(!eq(node1.string(), node2.string())) return false;
-          } else if(t1 == NodeType.ELM) {
+          } else if(type1 == NodeType.ELM) {
             // compare attributes
             final BasicNodeIter ir1 = node1.attributes();
             BasicNodeIter ir2 = node2.attributes();

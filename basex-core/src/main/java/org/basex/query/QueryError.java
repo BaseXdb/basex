@@ -1129,7 +1129,7 @@ public enum QueryError {
   /** Error code. */
   WHICHDEFCOLL_X(XQST, 38, "%."),
   /** Error code. */
-  FUNCDUPL_X(XQST, 39, "Duplicate function argument %."),
+  FUNCDUPL_X(XQST, 39, "Duplicate parameter name: %."),
   /** Error code. */
   ATTDUPL_X(XQST, 40, "Duplicate attribute '%'."),
   /** Error code. */
@@ -1543,8 +1543,9 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException diffError(final Item item1, final Item item2, final InputInfo info) {
-    final Type t1 = item1.type, t2 = item2.type;
-    return t1 == t2 ? CMPTYPE_X.get(info, t1, item1) : CMPTYPES_X_X.get(info, t1, t2);
+    final Type type1 = item1.type, type2 = item2.type;
+    return type1 == type2 ? CMPTYPE_X.get(info, type1, item1) :
+      CMPTYPES_X_X.get(info, type1, type2);
   }
 
   /**

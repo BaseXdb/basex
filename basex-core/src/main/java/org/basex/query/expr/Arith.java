@@ -36,10 +36,11 @@ public final class Arith extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Type t1 = st1.type, t2 = st2.type;
-    final boolean nums = t1.isNumberOrUntyped() && t2.isNumberOrUntyped();
-    final Type t = calc == Calc.IDIV ? AtomType.ITR : nums ? Calc.type(t1, t2) : AtomType.AAT;
-    exprType.assign(t, st1.oneNoArray() && st2.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
+    final Type type1 = st1.type, type2 = st2.type;
+    final boolean nums = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
+    final Type type = calc == Calc.IDIV ? AtomType.ITR : nums ? Calc.type(type1, type2) :
+      AtomType.AAT;
+    exprType.assign(type, st1.oneNoArray() && st2.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
 
     Expr expr = this;
     if(oneIsEmpty()) {
@@ -48,7 +49,7 @@ public final class Arith extends Arr {
       expr = value(cc.qc);
     } else if(nums && st1.oneNoArray() && st2.oneNoArray()) {
       expr = calc.optimize(expr1, expr2);
-      if(expr == null || !expr.seqType().type.eq(t)) expr = this;
+      if(expr == null || !expr.seqType().type.eq(type)) expr = this;
     }
     return cc.replaceWith(this, expr);
   }

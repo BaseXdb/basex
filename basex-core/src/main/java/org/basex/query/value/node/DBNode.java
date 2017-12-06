@@ -443,13 +443,13 @@ public class DBNode extends ANode {
   @Override
   public final ID typeId() {
     // check if a document has a single element as child
-    ID t = type.id();
+    ID i = type.id();
     if(type == NodeType.DOC) {
       final DBNodeIter iter = children();
       final ANode n = iter.next();
-      if(n != null && n.type == NodeType.ELM && iter.next() == null) t = NodeType.DEL.id();
+      if(n != null && n.type == NodeType.ELM && iter.next() == null) i = NodeType.DEL.id();
     }
-    return t;
+    return i;
   }
 
   @Override

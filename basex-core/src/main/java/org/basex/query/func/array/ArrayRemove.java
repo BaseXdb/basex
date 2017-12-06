@@ -33,8 +33,8 @@ public final class ArrayRemove extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
-    if(t instanceof ArrayType) exprType.assign(t);
+    final Type type1 = exprs[0].seqType().type;
+    if(type1 instanceof ArrayType) exprType.assign(type1);
     return this;
   }
 }

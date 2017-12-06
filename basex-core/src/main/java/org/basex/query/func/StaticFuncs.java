@@ -30,12 +30,12 @@ public final class StaticFuncs extends ExprInfo {
   private final TokenObjMap<FuncCache> funcs = new TokenObjMap<>();
 
   /**
-   * returns the signature of the function with the given name and arity.
+   * Returns the signature of the function with the given name and arity.
    * @param name function name
    * @param arity function arity
    * @return the function's signature
    */
-  static byte[] sig(final QNm name, final long arity) {
+  static byte[] signature(final QNm name, final long arity) {
     return new TokenBuilder(name.prefixId()).add('#').addLong(arity).finish();
   }
 
@@ -70,7 +70,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Creates a reference to an already declared or referenced function.
+   * Creates a call to an already declared or referenced function.
    * @param name name of the function
    * @param args optional arguments
    * @param sc static context
@@ -78,16 +78,16 @@ public final class StaticFuncs extends ExprInfo {
    * @return reference if the function is known, {@code null} otherwise
    * @throws QueryException query exception
    */
-  TypedFunc getRef(final QNm name, final Expr[] args, final StaticContext sc, final InputInfo info)
-      throws QueryException {
+  TypedFunc funcCall(final QNm name, final Expr[] args, final StaticContext sc,
+      final InputInfo info) throws QueryException {
 
     // check if function has already been declared
-    final FuncCache fc = funcs.get(sig(name, args.length));
+    final FuncCache fc = funcs.get(signature(name, args.length));
     return fc == null ? null : fc.newCall(name, args, sc, info);
   }
 
   /**
-   * Returns a new reference to the function with the given name and arity.
+   * Returns a function call to the function with the given name and arity.
    * @param name function name
    * @param args arguments
    * @param sc static context of the function call
@@ -95,30 +95,30 @@ public final class StaticFuncs extends ExprInfo {
    * @return function call
    * @throws QueryException query exception
    */
-  TypedFunc getFuncRef(final QNm name, final Expr[] args, final StaticContext sc,
+  TypedFunc undeclaredFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo info) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) {
       final QueryException qe = similarError(name, info);
       if(qe != null) throw qe;
     }
-    final byte[] sig = sig(name, args.length);
+    final byte[] sig = signature(name, args.length);
     if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
-    return getRef(name, args, sc, info);
+    return funcCall(name, args, sc, info);
   }
 
   /**
    * Registers a literal for a function that was not yet encountered during parsing.
-   * @param lit the literal
+   * @param literal the literal
    */
-  public void registerFuncLit(final Closure lit) {
-    final byte[] sig = sig(lit.funcName(), lit.arity());
+  public void registerFuncLiteral(final Closure literal) {
+    final byte[] sig = signature(literal.funcName(), literal.arity());
     FuncCache cache = funcs.get(sig);
     if(cache == null) {
       cache = new FuncCache(null);
       funcs.put(sig, cache);
     }
-    cache.lits.add(lit);
+    cache.literals.add(literal);
   }
 
   /**
@@ -189,7 +189,7 @@ public final class StaticFuncs extends ExprInfo {
    * @return function if found, {@code null} otherwise
    */
   public StaticFunc get(final QNm name, final long arity) {
-    final FuncCache fc = funcs.get(sig(name, arity));
+    final FuncCache fc = funcs.get(signature(name, arity));
     return fc != null ? fc.func : null;
   }
 
@@ -231,10 +231,10 @@ public final class StaticFuncs extends ExprInfo {
   @Override
   public void plan(final FElem plan) {
     if(!funcs.isEmpty()) {
-      final FElem el = planElem();
-      plan.add(el);
+      final FElem elem = planElem();
+      plan.add(elem);
       for(final StaticFunc f : funcs()) {
-        if(f != null) f.plan(el);
+        if(f != null) f.plan(elem);
       }
     }
   }
@@ -255,7 +255,7 @@ public final class StaticFuncs extends ExprInfo {
     /** Function calls. */
     final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
     /** Function literals. */
-    final ArrayList<Closure> lits = new ArrayList<>(0);
+    final ArrayList<Closure> literals = new ArrayList<>(0);
     /** Function. */
     StaticFunc func;
 
@@ -277,7 +277,7 @@ public final class StaticFuncs extends ExprInfo {
       func = sf;
       for(final StaticFuncCall call : calls) call.init(sf);
       final FuncType ft = sf.funcType();
-      for(final Closure lit : lits) lit.adoptSignature(ft);
+      for(final Closure literal : literals) literal.adoptSignature(ft);
     }
 
     /**

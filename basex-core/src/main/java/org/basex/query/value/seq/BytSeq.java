@@ -54,12 +54,12 @@ public final class BytSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param values values
    * @return value
    */
-  public static Value get(final byte[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Int.get(items[0], AtomType.BYT) :
-      new BytSeq(items);
+  public static Value get(final byte[] values) {
+    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Int.get(values[0], AtomType.BYT) :
+      new BytSeq(values);
   }
 
   /**

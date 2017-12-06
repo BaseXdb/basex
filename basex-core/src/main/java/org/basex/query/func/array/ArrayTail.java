@@ -25,8 +25,8 @@ public final class ArrayTail extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
-    if(t instanceof ArrayType) exprType.assign(t);
+    final Type type = exprs[0].seqType().type;
+    if(type instanceof ArrayType) exprType.assign(type);
     return this;
   }
 }

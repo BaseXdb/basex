@@ -70,11 +70,11 @@ public final class ArrayFlatten extends ArrayFn {
 
   /**
    * Recursive helper method for retrieving result type.
-   * @param t type
+   * @param type type
    * @return result type
    */
-  private static Type type(final Type t) {
-    return t instanceof ArrayType ? type(((ArrayType) t).declType.type) : t;
+  private static Type type(final Type type) {
+    return type instanceof ArrayType ? type(((ArrayType) type).declType.type) : type;
   }
 
   /**

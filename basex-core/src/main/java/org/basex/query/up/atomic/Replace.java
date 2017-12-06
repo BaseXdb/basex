@@ -82,11 +82,7 @@ final class Replace extends StructuralUpdate {
 
     final List<BasicUpdate> valueUpdates = new ArrayList<>();
     for(int c = 0; c < srcSize; c++) {
-      final int s = clip.start + c;
-      final int t = location + c;
-      final int sk = src.kind(s);
-      final int tk = data.kind(t);
-
+      final int s = clip.start + c, t = location + c, sk = src.kind(s), tk = data.kind(t);
       if(sk != tk)
         return false;
       // distance can differ for first two tuples

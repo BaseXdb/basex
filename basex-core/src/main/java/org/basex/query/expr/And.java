@@ -113,7 +113,7 @@ public final class And extends Logical {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     IndexCosts costs = IndexCosts.ZERO;
-    final ExprList el = new ExprList(exprs.length);
+    final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       // check if expression can be rewritten, and if access is not sequential
       if(!expr.indexAccessible(ii)) return false;
@@ -121,12 +121,12 @@ public final class And extends Logical {
       if(ii.costs.results() == 0) return true;
       // summarize costs
       costs = IndexCosts.add(costs, ii.costs);
-      el.add(ii.expr);
+      list.add(ii.expr);
     }
     // use summarized costs for estimation
     ii.costs = costs;
     // create intersection of all index requests
-    ii.expr = new Intersect(info, el.finish());
+    ii.expr = new Intersect(info, list.finish());
     return true;
   }
 

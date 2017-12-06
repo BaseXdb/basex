@@ -69,9 +69,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
       if(declType != null) {
         // remove redundant casts
-        final Type t = declType.type;
-        if(declType.eq(expr.seqType()) && (t == AtomType.BLN || t == AtomType.FLT ||
-            t == AtomType.DBL || t == AtomType.QNM || t == AtomType.URI)) {
+        final Type type = declType.type;
+        if(declType.eq(expr.seqType()) && (type == AtomType.BLN || type == AtomType.FLT ||
+            type == AtomType.DBL || type == AtomType.QNM || type == AtomType.URI)) {
           cc.info(OPTTYPE_X, this);
         } else {
           expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
@@ -94,10 +94,10 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(NAME, name.string(), TYPE, seqType());
-    addPlan(plan, el, expr);
+    final FElem elem = planElem(NAME, name.string(), TYPE, seqType());
+    addPlan(plan, elem, expr);
     final int pl = params.length;
-    for(int p = 0; p < pl; ++p) el.add(planAttr(ARG + p, params[p].name.string()));
+    for(int p = 0; p < pl; ++p) elem.add(planAttr(ARG + p, params[p].name.string()));
   }
 
   /**
@@ -112,8 +112,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       }
 
       @Override
-      public boolean inlineFunc(final Scope sub) {
-        return sub.visit(this);
+      public boolean inlineFunc(final Scope scope) {
+        return scope.visit(this);
       }
     });
   }
@@ -262,13 +262,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var v : params) if(!visitor.declared(v)) return false;
+    for(final Var var : params) if(!visitor.declared(var)) return false;
     return expr == null || expr.accept(visitor);
   }
 
   @Override
   public byte[] id() {
-    return StaticFuncs.sig(name, params.length);
+    return StaticFuncs.signature(name, params.length);
   }
 
   @Override
@@ -279,16 +279,16 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     cc.info(OPTINLINE_X, id());
 
     // create let bindings for all variables
-    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<>();
+    final LinkedList<Clause> clauses = exprs.length == 0 ? null : new LinkedList<>();
     final IntObjMap<Var> vars = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      cls.add(new Let(cc.copy(params[p], vars), exprs[p], false).optimize(cc));
+      clauses.add(new Let(cc.copy(params[p], vars), exprs[p], false).optimize(cc));
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(cc, vars);
-    return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(cc);
+    final Expr ex = expr.copy(cc, vars);
+    return clauses == null ? ex : new GFLWOR(info, clauses, ex).optimize(cc);
   }
 
   /**

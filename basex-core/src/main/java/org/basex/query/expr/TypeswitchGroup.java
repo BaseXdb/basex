@@ -152,26 +152,26 @@ public final class TypeswitchGroup extends Single {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof TypeswitchGroup)) return false;
-    final TypeswitchGroup t = (TypeswitchGroup) obj;
-    return Array.equals(types, t.types) && var.equals(t.var) && super.equals(obj);
+    final TypeswitchGroup tg = (TypeswitchGroup) obj;
+    return Array.equals(types, tg.types) && var.equals(tg.var) && super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
+    final FElem elem = planElem();
     if(types.length == 0) {
-      e.add(planAttr(Token.token(DEFAULT), Token.TRUE));
+      elem.add(planAttr(Token.token(DEFAULT), Token.TRUE));
     } else {
       final ByteList bl = new ByteList();
       for(final SeqType st : types) {
         if(!bl.isEmpty()) bl.add('|');
         bl.add(Token.token(st.toString()));
       }
-      e.add(planAttr(Token.token(CASE), bl.finish()));
+      elem.add(planAttr(Token.token(CASE), bl.finish()));
     }
-    if(var != null) e.add(planAttr(VAR, Token.token(var.toString())));
-    expr.plan(e);
-    plan.add(e);
+    if(var != null) elem.add(planAttr(VAR, Token.token(var.toString())));
+    expr.plan(elem);
+    plan.add(elem);
   }
 
   @Override

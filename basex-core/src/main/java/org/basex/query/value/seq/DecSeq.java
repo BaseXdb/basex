@@ -55,12 +55,12 @@ public final class DecSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param values values
    * @return value
    */
-  private static Value get(final BigDecimal[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Dec.get(items[0]) :
-      new DecSeq(items);
+  private static Value get(final BigDecimal[] values) {
+    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Dec.get(values[0]) :
+      new DecSeq(values);
   }
 
   /**

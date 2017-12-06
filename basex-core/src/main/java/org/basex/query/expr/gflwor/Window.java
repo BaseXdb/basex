@@ -338,12 +338,12 @@ public final class Window extends Clause {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem(token(SLIDING), token(sliding));
-    var.plan(e);
-    expr.plan(e);
-    start.plan(e);
-    if(end != null) end.plan(e);
-    plan.add(e);
+    final FElem elem = planElem(token(SLIDING), token(sliding));
+    var.plan(elem);
+    expr.plan(elem);
+    start.plan(elem);
+    if(end != null) end.plan(elem);
+    plan.add(elem);
   }
 
   @Override

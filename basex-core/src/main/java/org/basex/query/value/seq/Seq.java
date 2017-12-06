@@ -190,14 +190,14 @@ public abstract class Seq extends Value {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem(SIZE, size, TYPE, seqType());
-    addPlan(plan, el);
+    final FElem elem = planElem(SIZE, size, TYPE, seqType());
+    addPlan(plan, elem);
     for(long i = 0; i < size; i++) {
       if(i == 3 && i + 1 < size) {
-        el.add(new FElem("etc"));
+        elem.add(new FElem("etc"));
         break;
       }
-      itemAt(i).plan(el);
+      itemAt(i).plan(elem);
     }
   }
 

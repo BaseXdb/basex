@@ -263,11 +263,11 @@ public final class Var extends ExprInfo {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem(QueryText.NAME, '$' + Token.string(name.string()),
+    final FElem elem = planElem(QueryText.NAME, '$' + Token.string(name.string()),
         Token.ID, Token.token(id), QueryText.TYPE, seqType());
-    if(declType != null) e.add(planAttr(QueryText.AS, declType.toString()));
-    if(promote) e.add(planAttr(QueryText.PROMOTE, true));
-    addPlan(plan, e);
+    if(declType != null) elem.add(planAttr(QueryText.AS, declType.toString()));
+    if(promote) elem.add(planAttr(QueryText.PROMOTE, true));
+    addPlan(plan, elem);
   }
 
   @Override

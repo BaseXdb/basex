@@ -55,12 +55,11 @@ public final class FnForEachPair extends StandardFunc {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     if(st1.zero()) return expr1;
     if(st2.zero()) return expr2;
-
     coerceFunc(2, cc, SeqType.ITEM_ZM, st1.type.seqType(), st2.type.seqType());
 
     // assign type after coercion (expression might have changed)
-    final Type t3 = exprs[2].seqType().type;
-    if(t3 instanceof FuncType) exprType.assign(((FuncType) t3).declType.type);
+    final Type type3 = exprs[2].seqType().type;
+    if(type3 instanceof FuncType) exprType.assign(((FuncType) type3).declType.type);
 
     return this;
   }

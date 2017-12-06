@@ -47,13 +47,13 @@ final class RESTRetrieve extends RESTCmd {
     } else {
       // list database resources
       final Table table = new Table(run(new List(conn.db(), conn.dbpath())));
-      final FElem el = new FElem(RESTText.Q_DATABASE).declareNS();
-      el.add(RESTText.NAME, conn.db()).add(RESTText.RESOURCES, token(table.contents.size()));
-      list(table, el, RESTText.Q_RESOURCE, 0);
+      final FElem elem = new FElem(RESTText.Q_DATABASE).declareNS();
+      elem.add(RESTText.NAME, conn.db()).add(RESTText.RESOURCES, token(table.contents.size()));
+      list(table, elem, RESTText.Q_RESOURCE, 0);
 
       conn.initResponse();
       try(Serializer ser = Serializer.get(conn.res.getOutputStream(), sopts)) {
-        ser.serialize(el);
+        ser.serialize(elem);
       }
     }
   }

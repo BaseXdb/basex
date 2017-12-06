@@ -16,20 +16,20 @@ import org.basex.util.*;
 public final class FnTranslate extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int[] tok = cps(toEmptyToken(exprs[0], qc));
-    final int[] srch = cps(toToken(exprs[1], qc));
-    final int[] rep = cps(toToken(exprs[2], qc));
+    final int[] token = cps(toEmptyToken(exprs[0], qc));
+    final int[] search = cps(toToken(exprs[1], qc));
+    final int[] replace = cps(toToken(exprs[2], qc));
 
-    final TokenBuilder tb = new TokenBuilder(tok.length);
-    for(final int t : tok) {
+    final TokenBuilder tb = new TokenBuilder(token.length);
+    for(final int b : token) {
       int j = -1;
-      final int sl = srch.length, rl = rep.length;
-      while(++j < sl && t != srch[j]) ;
+      final int sl = search.length, rl = replace.length;
+      while(++j < sl && b != search[j]) ;
       if(j < sl) {
         if(j >= rl) continue;
-        tb.add(rep[j]);
+        tb.add(replace[j]);
       } else {
-        tb.add(t);
+        tb.add(b);
       }
     }
     return Str.get(tb.finish());

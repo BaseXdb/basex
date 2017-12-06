@@ -35,8 +35,8 @@ final class Insert extends StructuralUpdate {
    * @return instance
    */
   static Insert getInstance(final int pre, final int par, final DataClip clip) {
-    final int s = clip.size();
-    return new Insert(pre, s, s, pre, par, clip);
+    final int size = clip.size();
+    return new Insert(pre, size, size, pre, par, clip);
   }
 
   @Override

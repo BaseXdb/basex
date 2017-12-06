@@ -188,8 +188,8 @@ public final class CElem extends CName {
    */
   private int addNS() {
     final NSContext ns = sc.ns;
-    final int s = ns.size(), nl = nspaces.size();
+    final int size = ns.size(), nl = nspaces.size();
     for(int n = 0; n < nl; n++) ns.add(nspaces.name(n), nspaces.value(n));
-    return s;
+    return size;
   }
 }

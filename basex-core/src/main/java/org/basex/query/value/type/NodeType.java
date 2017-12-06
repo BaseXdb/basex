@@ -271,8 +271,8 @@ public enum NodeType implements Type {
   public static NodeType find(final QNm name) {
     if(name.uri().length == 0) {
       final byte[] ln = name.local();
-      for(final NodeType t : VALUES) {
-        if(Token.eq(ln, t.name)) return t;
+      for(final NodeType type : VALUES) {
+        if(Token.eq(ln, type.name)) return type;
       }
     }
     return null;
@@ -284,7 +284,7 @@ public enum NodeType implements Type {
    * @return corresponding type if found, {@code null} otherwise
    */
   static Type getType(final ID id) {
-    for(final NodeType t : VALUES) if(t.id == id) return t;
+    for(final NodeType type : VALUES) if(type.id == id) return type;
     return null;
   }
 }

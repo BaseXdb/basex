@@ -18,10 +18,10 @@ public final class FnDateTime extends DateTime {
     final Item zone = exprs.length == 2 ? exprs[1].atomItem(qc, info) : null;
     if(item == null || zone == null) return null;
 
-    final Dat d = item.type.isUntyped() ? new Dat(item.string(info), info) :
+    final Dat date = item.type.isUntyped() ? new Dat(item.string(info), info) :
       (Dat) checkType(item, AtomType.DAT);
-    final Tim t = zone.type.isUntyped() ? new Tim(zone.string(info), info) :
+    final Tim time = zone.type.isUntyped() ? new Tim(zone.string(info), info) :
       (Tim) checkType(zone, AtomType.TIM);
-    return new Dtm(d, t, info);
+    return new Dtm(date, time, info);
   }
 }

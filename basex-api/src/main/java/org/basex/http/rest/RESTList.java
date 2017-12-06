@@ -31,14 +31,14 @@ final class RESTList extends RESTCmd {
     for(final Command cmd : session) result = run(cmd);
 
     final Table table = new Table(result);
-    final FElem el = new FElem(RESTText.Q_DATABASES).declareNS();
-    el.add(RESTText.RESOURCES, token(table.contents.size()));
-    list(table, el, RESTText.Q_DATABASE, 1);
+    final FElem elem = new FElem(RESTText.Q_DATABASES).declareNS();
+    elem.add(RESTText.RESOURCES, token(table.contents.size()));
+    list(table, elem, RESTText.Q_DATABASE, 1);
 
     final HTTPConnection conn = session.conn;
     conn.initResponse();
     try(Serializer ser = Serializer.get(conn.res.getOutputStream(), conn.sopts())) {
-      ser.serialize(el);
+      ser.serialize(elem);
     }
   }
 }

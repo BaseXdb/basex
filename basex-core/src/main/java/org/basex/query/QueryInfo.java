@@ -177,8 +177,8 @@ public final class QueryInfo {
       }
 
       @Override
-      public boolean inlineFunc(final Scope sub) {
-        if(map.put(sub, sub) == null) sub.visit(this);
+      public boolean inlineFunc(final Scope scope) {
+        if(map.put(scope, scope) == null) scope.visit(this);
         return true;
       }
 

@@ -86,8 +86,8 @@ final class SubSeq extends Seq {
 
   @Override
   public long atomSize() {
-    long s = 0;
-    for(int i = 0; i < size; i++) s += itemAt(i).atomSize();
-    return s;
+    long sz = 0;
+    for(int i = 0; i < size; i++) sz += itemAt(i).atomSize();
+    return sz;
   }
 }

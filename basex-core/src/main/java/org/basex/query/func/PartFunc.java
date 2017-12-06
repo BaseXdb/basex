@@ -39,7 +39,7 @@ public final class PartFunc extends Arr {
   public PartFunc(final StaticContext sc, final InputInfo info, final Expr expr, final Expr[] args,
       final int[] holes) {
 
-    super(info, SeqType.FUN_O, ExprList.concat(args, expr));
+    super(info, SeqType.FUNC_O, ExprList.concat(args, expr));
     this.sc = sc;
     this.holes = holes;
   }
@@ -56,13 +56,13 @@ public final class PartFunc extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(allAreValues(false)) return cc.preEval(this);
 
-    final Expr f = body();
-    final SeqType t = f.seqType();
-    if(t.instanceOf(SeqType.FUN_O) && t.type != SeqType.ANY_FUN) {
-      final FuncType ft = (FuncType) t.type;
+    final Expr body = body();
+    final SeqType st = body.seqType();
+    if(st.instanceOf(SeqType.FUNC_O) && st.type != SeqType.ANY_FUNC) {
+      final FuncType ft = (FuncType) st.type;
       final int nargs = exprs.length + holes.length - 1;
       if(ft.argTypes.length != nargs)
-        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, f);
+        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, body);
       final SeqType[] args = new SeqType[holes.length];
       final int hl = holes.length;
       for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
@@ -81,12 +81,12 @@ public final class PartFunc extends Arr {
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];
-    final VarScope scp = new VarScope(sc);
+    final VarScope vs = new VarScope(sc);
     final Var[] vars = new Var[hl];
     int a = -1;
     for(int h = 0; h < hl; h++) {
       while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
-      vars[h] = scp.addNew(func.paramName(holes[h]), null, false, qc, info);
+      vars[h] = vs.addNew(func.paramName(holes[h]), null, false, qc, info);
       args[a] = new VarRef(info, vars[h]);
       final SeqType at = ft.argTypes[a];
       if(at != null) vars[h].refineType(at, null);
@@ -99,7 +99,7 @@ public final class PartFunc extends Arr {
     final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
         false, func, args);
 
-    return new FuncItem(sc, anns, null, vars, type, fc, qc.focus, scp.stackSize());
+    return new FuncItem(sc, anns, null, vars, type, fc, qc.focus, vs.stackSize());
   }
 
   @Override
@@ -126,17 +126,17 @@ public final class PartFunc extends Arr {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
+    final FElem elem = planElem();
     final int es = exprs.length, hs = holes.length;
-    exprs[es - 1].plan(e);
+    exprs[es - 1].plan(elem);
     int p = -1;
     for(int h = 0; h < hs; h++) {
-      while(++p < holes[h]) exprs[p - h].plan(e);
+      while(++p < holes[h]) exprs[p - h].plan(elem);
       final FElem a = new FElem(QueryText.ARG);
-      e.add(a.add(planAttr(QueryText.POS, Token.token(h))));
+      elem.add(a.add(planAttr(QueryText.POS, Token.token(h))));
     }
-    while(++p < es + hs - 1) exprs[p - hs].plan(e);
-    plan.add(e);
+    while(++p < es + hs - 1) exprs[p - hs].plan(elem);
+    plan.add(elem);
   }
 
   @Override

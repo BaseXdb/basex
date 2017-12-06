@@ -16,11 +16,11 @@ import org.basex.query.var.*;
 public abstract class ASTVisitor {
   /**
    * Notifies the visitor of a variable declaration.
-   * @param count declared variable
+   * @param var declared variable
    * @return if more expressions should be visited ({@code true} by default)
    */
   @SuppressWarnings("unused")
-  public boolean declared(final Var count) {
+  public boolean declared(final Var var) {
     return true;
   }
 
@@ -46,11 +46,11 @@ public abstract class ASTVisitor {
 
   /**
    * Notifies the visitor of a sub-scope.
-   * @param sub scope
+   * @param scope sub scope
    * @return if more expressions should be visited ({@code true} by default)
    */
   @SuppressWarnings("unused")
-  public boolean inlineFunc(final Scope sub) {
+  public boolean inlineFunc(final Scope scope) {
     return true;
   }
 

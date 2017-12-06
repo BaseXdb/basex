@@ -173,22 +173,22 @@ public final class Condition extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = new FElem(start ? START : END);
+    final FElem elem = new FElem(start ? START : END);
 
     // mapping variable names to roles
-    if(item != null) e.add(planAttr(VAR, token(item.toString())));
-    if(pos  != null) e.add(planAttr(token(AT), token(pos.toString())));
-    if(prev != null) e.add(planAttr(token(PREVIOUS), token(prev.toString())));
-    if(next != null) e.add(planAttr(token(NEXT), token(next.toString())));
+    if(item != null) elem.add(planAttr(VAR, token(item.toString())));
+    if(pos  != null) elem.add(planAttr(token(AT), token(pos.toString())));
+    if(prev != null) elem.add(planAttr(token(PREVIOUS), token(prev.toString())));
+    if(next != null) elem.add(planAttr(token(NEXT), token(next.toString())));
 
     // IDs and stack slots
-    if(item != null) item.plan(e);
-    if(pos  != null) pos.plan(e);
-    if(prev != null) prev.plan(e);
-    if(next != null) next.plan(e);
+    if(item != null) item.plan(elem);
+    if(pos  != null) pos.plan(elem);
+    if(prev != null) prev.plan(elem);
+    if(next != null) next.plan(elem);
 
-    expr.plan(e);
-    plan.add(e);
+    expr.plan(elem);
+    plan.add(elem);
   }
 
   @Override

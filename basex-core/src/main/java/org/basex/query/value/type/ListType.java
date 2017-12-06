@@ -106,23 +106,23 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final boolean eq(final Type t) {
-    return this == t;
+  public final boolean eq(final Type tp) {
+    return this == tp;
   }
 
   @Override
-  public final boolean instanceOf(final Type t) {
-    return this == t;
+  public final boolean instanceOf(final Type tp) {
+    return this == tp;
   }
 
   @Override
-  public final Type union(final Type t) {
-    return this == t ? t : AtomType.ITEM;
+  public final Type union(final Type tp) {
+    return this == tp ? tp : AtomType.ITEM;
   }
 
   @Override
-  public final Type intersect(final Type t) {
-    return this == t ? this : t.instanceOf(this) ? t : null;
+  public final Type intersect(final Type tp) {
+    return this == tp ? this : tp.instanceOf(this) ? tp : null;
   }
 
   @Override
@@ -146,7 +146,7 @@ public enum ListType implements Type {
    * @return type or {@code null}
    */
   public static ListType find(final QNm type) {
-    for(final ListType t : VALUES) if(t.name.eq(type)) return t;
+    for(final ListType tp : VALUES) if(tp.name.eq(type)) return tp;
     return null;
   }
 }

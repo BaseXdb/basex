@@ -28,8 +28,8 @@ public final class ArrayHead extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
-    if(t instanceof ArrayType) exprType.assign(((ArrayType) t).declType);
+    final Type type = exprs[0].seqType().type;
+    if(type instanceof ArrayType) exprType.assign(((ArrayType) type).declType);
     return this;
   }
 }

@@ -47,8 +47,8 @@ public final class HofFoldLeft1 extends StandardFunc {
       return expr;
     }
 
-    final Type t = expr2.seqType().type;
-    if(t instanceof FuncType) exprType.assign(((FuncType) t).declType);
+    final Type type = expr2.seqType().type;
+    if(type instanceof FuncType) exprType.assign(((FuncType) type).declType);
     return this;
   }
 }

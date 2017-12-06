@@ -22,9 +22,9 @@ public final class FnAbs extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    Type t = exprs[0].seqType().type;
-    if(t.isUntyped()) t = AtomType.DBL;
-    if(t.isNumber()) exprType.assign(t.instanceOf(AtomType.ITR) ? AtomType.ITR : t);
+    Type type = exprs[0].seqType().type;
+    if(type.isUntyped()) type = AtomType.DBL;
+    if(type.isNumber()) exprType.assign(type.instanceOf(AtomType.ITR) ? AtomType.ITR : type);
     return optFirst();
   }
 }

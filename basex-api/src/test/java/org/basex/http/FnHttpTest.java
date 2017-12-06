@@ -501,8 +501,8 @@ public class FnHttpTest extends HTTPTest {
     final OutputStream out1 = fakeOutput();
     req1.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     // Node child
-    final FElem e1 = new FElem("a").add("a");
-    req1.payload.add(e1);
+    final FElem elem1 = new FElem("a").add("a");
+    req1.payload.add(elem1);
     // String item child
     req1.payload.add(Str.get("<b>b</b>"));
     HttpClient.writePayload(out1, req1);
@@ -513,8 +513,8 @@ public class FnHttpTest extends HTTPTest {
     final OutputStream out2 = fakeOutput();
     req2.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/plain");
     // Node child
-    final FElem e2 = new FElem("a").add("a");
-    req2.payload.add(e2);
+    final FElem elem2 = new FElem("a").add("a");
+    req2.payload.add(elem2);
     // String item child
     req2.payload.add(Str.get("<b>b</b>"));
     HttpClient.writePayload(out2, req2);

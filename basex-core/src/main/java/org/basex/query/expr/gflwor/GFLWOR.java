@@ -47,9 +47,9 @@ public final class GFLWOR extends ParseExpr {
    * @return the evaluator
    */
   private Eval newEval() {
-    Eval e = new StartEval();
-    for(final Clause cls : clauses) e = cls.eval(e);
-    return e;
+    Eval eval = new StartEval();
+    for(final Clause clause : clauses) eval = clause.eval(eval);
+    return eval;
   }
 
   @Override
@@ -199,8 +199,8 @@ public final class GFLWOR extends ParseExpr {
           if(sub.isFLW()) {
             // flatten nested FLWOR expressions
             // example: for $a in (1 to 2) return let $f := <a>1</a> return $f + 1
-            final Clause c = sub.clauses.getFirst();
-            final ExprInfo var = c instanceof ForLet ? ((ForLet) c).var : c;
+            final Clause clause = sub.clauses.getFirst();
+            final ExprInfo var = clause instanceof ForLet ? ((ForLet) clause).var : clause;
             cc.info(QueryText.OPTFLAT_X_X, description(), var);
             clauses.addAll(sub.clauses);
             ret = sub.ret;
@@ -211,10 +211,10 @@ public final class GFLWOR extends ParseExpr {
         final TypeCheck tc = ret instanceof TypeCheck ? (TypeCheck) ret : null;
         if(ret instanceof GFLWOR || tc != null && tc.expr instanceof GFLWOR) {
           final GFLWOR sub = (GFLWOR) (tc == null ? ret : tc.expr);
-          final Clause c = sub.clauses.getFirst();
-          if(c instanceof Let) {
+          final Clause clause = sub.clauses.getFirst();
+          if(clause instanceof Let) {
             // example: ?
-            cc.info(QueryText.OPTFLAT_X_X, description(), ((Let) c).var);
+            cc.info(QueryText.OPTFLAT_X_X, description(), ((Let) clause).var);
             final LinkedList<Clause> cls = sub.clauses;
             // propagate all leading let bindings into outer clauses
             do {
@@ -270,8 +270,8 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean varsInReturn() {
     for(final Clause clause : clauses) {
-      for(final Var v : clause.vars()) {
-        if(ret.count(v) != VarUsage.NEVER) return true;
+      for(final Var var : clause.vars()) {
+        if(ret.count(var) != VarUsage.NEVER) return true;
       }
     }
     return false;
@@ -467,7 +467,7 @@ public final class GFLWOR extends ParseExpr {
   private boolean cleanDeadVars() {
     final IntObjMap<Var> decl = new IntObjMap<>();
     for(final Clause clause : clauses) {
-      for(final Var v : clause.vars()) decl.put(v.id, v);
+      for(final Var var : clause.vars()) decl.put(var.id, var);
     }
 
     final BitArray used = new BitArray();
@@ -486,7 +486,7 @@ public final class GFLWOR extends ParseExpr {
       final Clause clause = clauses.get(c);
       changed |= clause.clean(decl, used);
       clause.accept(marker);
-      for(final Var v : clause.vars()) used.clear(v.id);
+      for(final Var var : clause.vars()) used.clear(var.id);
     }
     return changed;
   }
@@ -847,10 +847,10 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem();
-    for(final Clause clause : clauses) clause.plan(e);
-    ret.plan(e);
-    plan.add(e);
+    final FElem elem = planElem();
+    for(final Clause clause : clauses) clause.plan(elem);
+    ret.plan(elem);
+    plan.add(elem);
   }
 
   @Override

@@ -472,7 +472,7 @@ public abstract class Formatter extends FormatUtil {
    * @param min minimum width
    */
   private static void roman(final TokenBuilder tb, final long n, final int min) {
-    final int s = tb.size();
+    final int sz = tb.size();
     if(n > 0 && n < 4000) {
       final int v = (int) n;
       tb.add(ROMANM[v / 1000]);
@@ -482,7 +482,7 @@ public abstract class Formatter extends FormatUtil {
     } else {
       tb.addLong(n);
     }
-    while(tb.size() - s < min) tb.add(' ');
+    while(tb.size() - sz < min) tb.add(' ');
   }
 
   /**

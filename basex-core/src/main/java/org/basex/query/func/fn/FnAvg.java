@@ -47,11 +47,11 @@ public class FnAvg extends FnSum {
 
     if(!st.mayBeArray()) {
       // sequence is not empty: assign result type
-      Type t = st.type;
-      if(t.isUntyped()) t = AtomType.DBL;
-      else if(t.instanceOf(AtomType.ITR)) t = AtomType.DEC;
-      else if(!t.isNumber()) t = AtomType.AAT;
-      exprType.assign(t, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+      Type type = st.type;
+      if(type.isUntyped()) type = AtomType.DBL;
+      else if(type.instanceOf(AtomType.ITR)) type = AtomType.DEC;
+      else if(!type.isNumber()) type = AtomType.AAT;
+      exprType.assign(type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return optFirst();
   }

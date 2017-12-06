@@ -153,9 +153,9 @@ public abstract class Item extends Value {
    * @return result of check
    */
   public final boolean comparable(final Item item) {
-    final Type t1 = type, t2 = item.type;
-    return t1 == t2
-        || t1.isStringOrUntyped() && t2.isStringOrUntyped()
+    final Type type1 = type, type2 = item.type;
+    return type1 == type2
+        || type1.isStringOrUntyped() && type2.isStringOrUntyped()
         || this instanceof ANum && item instanceof ANum
         || this instanceof Dur && item instanceof Dur;
   }

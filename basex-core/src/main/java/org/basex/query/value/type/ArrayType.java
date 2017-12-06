@@ -40,20 +40,21 @@ public final class ArrayType extends FuncType {
   }
 
   @Override
-  public boolean eq(final Type t) {
-    return this == t || t instanceof ArrayType && declType.eq(((ArrayType) t).declType);
+  public boolean eq(final Type type) {
+    return this == type || type instanceof ArrayType && declType.eq(((ArrayType) type).declType);
   }
 
   @Override
-  public boolean instanceOf(final Type t) {
+  public boolean instanceOf(final Type type) {
     // the only non-function super-type of function is item()
-    if(t == AtomType.ITEM || t == SeqType.ANY_ARRAY || t == SeqType.ANY_FUN) return true;
-    if(!(t instanceof FuncType) || t instanceof MapType || this == SeqType.ANY_ARRAY) return false;
+    if(type == AtomType.ITEM || type == SeqType.ANY_ARRAY || type == SeqType.ANY_FUNC) return true;
+    if(!(type instanceof FuncType) || type instanceof MapType || this == SeqType.ANY_ARRAY)
+      return false;
 
-    final FuncType ft = (FuncType) t;
+    final FuncType ft = (FuncType) type;
     final int al = argTypes.length;
     if(al != ft.argTypes.length || !declType.instanceOf(ft.declType)) return false;
-    if(t instanceof ArrayType) return true;
+    if(type instanceof ArrayType) return true;
 
     // test function arguments of function type
     // example: ["A"] instance of function(xs:string) as xs:string
@@ -64,29 +65,29 @@ public final class ArrayType extends FuncType {
   }
 
   @Override
-  public Type union(final Type t) {
-    if(instanceOf(t)) return t;
-    if(t instanceof ArrayType) {
-      final ArrayType mt = (ArrayType) t;
+  public Type union(final Type type) {
+    if(instanceOf(type)) return type;
+    if(type instanceof ArrayType) {
+      final ArrayType mt = (ArrayType) type;
       return mt.instanceOf(this) ? this : get(declType.union(mt.declType));
     }
-    return t instanceof MapType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
-      AtomType.ITEM;
+    return type instanceof MapType ? SeqType.ANY_FUNC :
+      type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
   @Override
-  public ArrayType intersect(final Type t) {
+  public ArrayType intersect(final Type type) {
     // case for item() and compatible FuncType, e.g. function(xs:anyAtomicType) as item()*
     // also excludes FuncType.ANY_FUN
-    if(instanceOf(t)) return this;
-    if(t instanceof ArrayType) {
-      final ArrayType mt = (ArrayType) t;
-      if(mt.instanceOf(this)) return mt;
-      final SeqType dt = declType.intersect(mt.declType);
+    if(instanceOf(type)) return this;
+    if(type instanceof ArrayType) {
+      final ArrayType at = (ArrayType) type;
+      if(at.instanceOf(this)) return at;
+      final SeqType dt = declType.intersect(at.declType);
       return dt == null ? null : get(dt);
     }
-    if(t instanceof FuncType) {
-      final FuncType ft = (FuncType) t;
+    if(type instanceof FuncType) {
+      final FuncType ft = (FuncType) type;
       if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR_O)) {
         final SeqType dt = declType.intersect(ft.declType);
         return dt == null ? null : get(dt);

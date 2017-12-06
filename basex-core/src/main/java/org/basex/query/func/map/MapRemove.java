@@ -26,8 +26,8 @@ public final class MapRemove extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type t = exprs[0].seqType().type;
-    if(t instanceof MapType) exprType.assign(t);
+    final Type type = exprs[0].seqType().type;
+    if(type instanceof MapType) exprType.assign(type);
     return this;
   }
 }

@@ -41,11 +41,11 @@ public class KindTest extends Test {
 
   /**
    * Returns a test instance.
-   * @param t node type
+   * @param type node type
    * @return kind test
    */
-  public static KindTest get(final NodeType t) {
-    switch(t) {
+  public static KindTest get(final NodeType type) {
+    switch(type) {
       case TXT: return TXT;
       case PI:  return PI;
       case ELM: return ELM;

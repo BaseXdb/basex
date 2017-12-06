@@ -993,8 +993,8 @@ public enum AtomType implements Type {
    */
   public static AtomType find(final QNm type, final boolean all) {
     if(!Token.eq(type.uri(), BASEX_URI)) {
-      for(final AtomType t : VALUES) {
-        if(t.name.eq(type) && (all || t.parent != null)) return t;
+      for(final AtomType tp : VALUES) {
+        if(tp.name.eq(type) && (all || tp.parent != null)) return tp;
       }
     }
     return null;
@@ -1006,7 +1006,7 @@ public enum AtomType implements Type {
    * @return corresponding type if found, {@code null} otherwise
    */
   static Type getType(final Type.ID id) {
-    for(final AtomType t : VALUES) if(t.id == id) return t;
+    for(final AtomType tp : VALUES) if(tp.id == id) return tp;
     return null;
   }
 }

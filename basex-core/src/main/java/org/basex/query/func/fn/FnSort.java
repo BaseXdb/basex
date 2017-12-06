@@ -24,8 +24,8 @@ import org.basex.query.value.type.*;
 public final class FnSort extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc), v = value(value);
-    return v != null ? v : iter(value, qc).value(qc);
+    final Value value = exprs[0].value(qc), val = value(value);
+    return val != null ? val : iter(value, qc).value(qc);
   }
 
   @Override
@@ -35,7 +35,7 @@ public final class FnSort extends StandardFunc {
   }
 
   /**
-   * Sort the input data.
+   * Sort the input data and returns an iterator.
    * @param value value
    * @param qc query context
    * @return item order
@@ -44,19 +44,19 @@ public final class FnSort extends StandardFunc {
   private Iter iter(final Value value, final QueryContext qc) throws QueryException {
     Collation coll = sc.collation;
     if(exprs.length > 1) {
-      final byte[] tok = toTokenOrNull(exprs[1], qc);
-      if(tok != null) coll = Collation.get(tok, qc, sc, info, WHICHCOLL_X);
+      final byte[] token = toTokenOrNull(exprs[1], qc);
+      if(token != null) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
     }
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
     final long size = value.size();
-    final ValueList vl = new ValueList(size);
+    final ValueList values = new ValueList(size);
     final Iter iter = value.iter();
     for(Item item; (item = qc.next(iter)) != null;) {
-      vl.add((key == null ? item : key.invokeValue(qc, info, item)).atomValue(qc, info));
+      values.add((key == null ? item : key.invokeValue(qc, info, item)).atomValue(qc, info));
     }
 
-    final Integer[] order = sort(vl, this, coll, qc);
+    final Integer[] order = sort(values, this, coll, qc);
     return new BasicIter<Item>(size) {
       @Override
       public Item get(final long i) {
@@ -66,7 +66,7 @@ public final class FnSort extends StandardFunc {
   }
 
   /**
-   * Sort the input data.
+   * Sort the input data and returns integers representing the item order.
    * @param vl value list
    * @param sf calling function
    * @param coll collation
@@ -124,7 +124,7 @@ public final class FnSort extends StandardFunc {
   }
 
   /**
-   * Evaluate value arguments.
+   * Evaluates value arguments.
    * @param value value
    * @return sorted value or {@code null}
    */
