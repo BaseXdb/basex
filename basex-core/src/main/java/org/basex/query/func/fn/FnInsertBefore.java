@@ -46,9 +46,9 @@ public final class FnInsertBefore extends StandardFunc {
     final Value sub = exprs[2].value(qc);
 
     // prepend, append or insert new value
-    final long vs = value.size(), ps = Math.min(Math.max(0, pos - 1), vs);
+    final long size = value.size(), ps = Math.min(Math.max(0, pos - 1), size);
     if(ps == 0)  return ValueBuilder.concat(sub, value, qc);
-    if(ps == vs) return ValueBuilder.concat(value, sub, qc);
+    if(ps == size) return ValueBuilder.concat(value, sub, qc);
     return ((Seq) value).insertBefore(ps, sub, qc);
   }
 

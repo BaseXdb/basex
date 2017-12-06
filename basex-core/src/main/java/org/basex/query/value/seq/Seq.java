@@ -100,39 +100,39 @@ public abstract class Seq extends Value {
   /**
    * Inserts a value at the given position into this sequence and returns the resulting sequence.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
-   * @param val value to insert
+   * @param value value to insert
    * @param qc query context
    * @return resulting value
    */
-  public Value insertBefore(final long pos, final Value val, final QueryContext qc) {
-    final long n = val.size();
-    return n == 1 ? insert(pos, (Item) val, qc) : n == 0 ? this : copyInsert(pos, val, qc);
+  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
+    final long n = value.size();
+    return n == 1 ? insert(pos, (Item) value, qc) : n == 0 ? this : copyInsert(pos, value, qc);
   }
 
   /**
    * Inserts an item at the given position into this sequence and returns the resulting sequence.
    * @param pos position at which the item should be inserted, must be between 0 and {@link #size}
-   * @param val value to insert
+   * @param value value to insert
    * @param qc query context
    * @return resulting value
    */
-  public abstract Value insert(long pos, Item val, QueryContext qc);
+  public abstract Value insert(long pos, Item value, QueryContext qc);
 
   /**
    * Helper for {@link #insertBefore(long, Value, QueryContext)} that copies all items into a
    * {@link TreeSeq}.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
-   * @param val value to insert
+   * @param value value to insert
    * @param qc query context
    * @return resulting value
    */
-  final Value copyInsert(final long pos, final Value val, final QueryContext qc) {
+  final Value copyInsert(final long pos, final Value value, final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
     if(pos == size) {
-      vb.add(this, val);
+      vb.add(this, value);
     } else {
       for(long i = 0; i < pos; i++) vb.add(itemAt(i));
-      vb.add(val);
+      vb.add(value);
       for(long i = pos; i < size; i++) vb.add(itemAt(i));
     }
     return vb.value(type);

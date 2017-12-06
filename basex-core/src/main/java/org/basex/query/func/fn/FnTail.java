@@ -20,9 +20,9 @@ public final class FnTail extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     // retrieve and decrement iterator size
     final Iter iter = exprs[0].iter(qc);
-    final long is = iter.size() - 1;
+    final long size = iter.size() - 1;
     // return empty iterator if iterator is known to yield 0 or 1 results, or if it yields no item
-    if(is == -1 || is == 0 || iter.next() == null) return Empty.ITER;
+    if(size == -1 || size == 0 || iter.next() == null) return Empty.ITER;
 
     // create new iterator, based on original iterator
     return new Iter() {
@@ -37,11 +37,11 @@ public final class FnTail extends StandardFunc {
       }
       @Override
       public long size() {
-        return is < 0 ? -1 : is;
+        return size < 0 ? -1 : size;
       }
       @Override
       public Value value(final QueryContext q) throws QueryException {
-        return is < 0 ? super.value(q) : iter.value(q).subSequence(1, is, q);
+        return size < 0 ? super.value(q) : iter.value(q).subSequence(1, size, q);
       }
     };
   }

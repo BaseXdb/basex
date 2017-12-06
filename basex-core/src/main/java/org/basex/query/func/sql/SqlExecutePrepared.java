@@ -92,10 +92,10 @@ public final class SqlExecutePrepared extends SqlExecute {
    */
   private static long countParams(final ANode params) {
     final BasicNodeIter iter = params.children();
-    long n = iter.size();
-    if(n == -1) do ++n;
+    long size = iter.size();
+    if(size == -1) do ++size;
     while(iter.next() != null);
-    return n;
+    return size;
   }
 
   /**

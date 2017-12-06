@@ -41,26 +41,26 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final Value insertBefore(final long pos, final Value val, final QueryContext qc) {
+  public final Value insertBefore(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
 
-    final long n = val.size();
+    final long n = value.size();
     if(n == 0) return this;
-    if(n == 1) return insert(pos, (Item) val, qc);
+    if(n == 1) return insert(pos, (Item) value, qc);
 
     final long r = size - pos;
-    if(val instanceof TreeSeq && (pos == 0 || r == 0)) {
-      final TreeSeq other = (TreeSeq) val;
+    if(value instanceof TreeSeq && (pos == 0 || r == 0)) {
+      final TreeSeq other = (TreeSeq) value;
       return pos == 0 ? other.concat(this) : concat(other);
     }
 
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
     if(pos < MAX_SMALL) {
-      tsb.add(val, qc);
+      tsb.add(value, qc);
       for(long i = pos; --i >= 0;) tsb.addFront(itemAt(i));
     } else {
       tsb.add(subSequence(0, pos, qc), qc);
-      tsb.add(val, qc);
+      tsb.add(value, qc);
     }
 
     if(r < MAX_SMALL) {

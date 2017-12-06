@@ -211,15 +211,15 @@ public abstract class FNode extends ANode {
           final ANodeList list = new ANodeList();
           ANode node = FNode.this, par = node.parent();
           while(par != null) {
-            final BasicNodeIter i = par.children();
+            final BasicNodeIter ir = par.children();
             if(node.type != NodeType.ATT) {
-              for(final ANode n : i) {
-                if(n.is(node)) break;
+              for(final ANode nd : ir) {
+                if(nd.is(node)) break;
               }
             }
-            for(final ANode n : i) {
-              list.add(n.finish());
-              addDesc(n.children(), list);
+            for(final ANode nd : ir) {
+              list.add(nd.finish());
+              addDesc(nd.children(), list);
             }
             node = par;
             par = par.parent();

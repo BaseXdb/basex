@@ -20,9 +20,10 @@ public final class FnOneOrMore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final long len = iter.size();
-    if(len == 0) throw ONEORMORE.get(info);
-    if(len > 0) return iter;
+    final long size = iter.size();
+    if(size == 0) throw ONEORMORE.get(info);
+    if(size > 0) return iter;
+
     return new Iter() {
       private boolean first = true;
       @Override

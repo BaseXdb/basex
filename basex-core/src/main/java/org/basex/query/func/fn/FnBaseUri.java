@@ -22,14 +22,14 @@ public final class FnBaseUri extends ContextFn {
     if(node.type != NodeType.ELM && node.type != NodeType.DOC && node.parent() == null) return null;
 
     Uri base = Uri.EMPTY;
-    ANode n = node;
+    ANode nd = node;
     do {
-      if(n == null) return sc.baseURI().resolve(base, info);
-      final Uri bu = Uri.uri(n.baseURI(), false);
-      if(!bu.isValid()) throw INVURI_X.get(info, n.baseURI());
+      if(nd == null) return sc.baseURI().resolve(base, info);
+      final Uri bu = Uri.uri(nd.baseURI(), false);
+      if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       base = bu.resolve(base, info);
-      if(n.type == NodeType.DOC && n instanceof DBNode) break;
-      n = n.parent();
+      if(nd.type == NodeType.DOC && nd instanceof DBNode) break;
+      nd = nd.parent();
     } while(!base.isAbsolute());
     return base;
   }

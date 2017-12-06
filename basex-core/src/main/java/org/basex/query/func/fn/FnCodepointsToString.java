@@ -27,11 +27,11 @@ public final class FnCodepointsToString extends StandardFunc {
 
     // current input is single item
     final Iter iter = exprs[0].atomIter(qc, info);
-    final long is = iter.size();
-    if(is == 1) return toStr(toLong(iter.next()), info);
+    final long size = iter.size();
+    if(size == 1) return toStr(toLong(iter.next()), info);
 
     // handle arbitrary input
-    final TokenBuilder tb = new TokenBuilder(Math.max(8, (int) is));
+    final TokenBuilder tb = new TokenBuilder(Math.max(8, (int) size));
     for(Item item; (item = qc.next(iter)) != null;) tb.add(check(toLong(item), info));
     return Str.get(tb.finish());
   }

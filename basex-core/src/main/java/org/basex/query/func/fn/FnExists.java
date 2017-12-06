@@ -27,8 +27,8 @@ public final class FnExists extends StandardFunc {
     // ignore non-deterministic expressions (e.g.: exists(error()))
     final Expr expr = exprs[0];
     if(!expr.has(Flag.NDT)) {
-      final long es = expr.size();
-      if(es != -1) return Bln.get(es != 0);
+      final long size = expr.size();
+      if(size != -1) return Bln.get(size != 0);
       if(expr.seqType().oneOrMore()) return Bln.TRUE;
     }
     return this;

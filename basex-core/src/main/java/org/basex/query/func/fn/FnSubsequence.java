@@ -30,35 +30,37 @@ public class FnSubsequence extends StandardFunc {
     if(range == ALL) return iter;
 
     // compute start, length
-    final long start = range[0], len = range[1], is = iter.size();
-    final long e = len == Long.MAX_VALUE ? len : start + len;
-    final long s = Math.max(1, start), m = Math.min(e, is + 1), l = Math.max(0, m - s);
+    final long st = range[0], ln = range[1], size = iter.size();
+    final long max = ln == Long.MAX_VALUE ? ln : st + ln;
+    final long start = Math.max(1, st), end = Math.min(max, size + 1);
 
     // fast route if the size is known
-    if(is >= 0) return new Iter() {
-      // directly access specified items
-      long c = s;
+    if(size >= 0) return new Iter() {
+      final long s = Math.max(0, end - start);
+      long c = start;
+
       @Override
       public Item next() throws QueryException {
         qc.checkStop();
-        return c < m ? iter.get(c++ - 1) : null;
+        return c < end ? iter.get(c++ - 1) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return iter.get(s + i - 1);
+        return iter.get(start + i - 1);
       }
       @Override
       public long size() {
-        return l;
+        return s;
       }
     };
 
     // return simple iterator if number of returned values is unknown
     return new Iter() {
       long c;
+
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(iter)) != null && ++c < e;) {
+        for(Item item; (item = qc.next(iter)) != null && ++c < max;) {
           if(c >= start) return item;
         }
         return null;
@@ -72,32 +74,35 @@ public class FnSubsequence extends StandardFunc {
     if(range == null) return Empty.SEQ;
     final Expr expr = exprs[0];
     if(range == ALL) return expr.value(qc);
-    final long start = range[0], len = range[1];
+
+    final Iter iter = expr.iter(qc);
+    final long size = iter.size();
+    final Value value = iter.value();
 
     // return subsequence if value access is cheap
-    final Iter iter = expr.iter(qc);
-    final long is = iter.size();
-    final Value value = iter.value();
+    final long st = range[0], ln = range[1];
     if(value != null) {
-      final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
-      return l <= 0 ? Empty.SEQ : value.subSequence(s, l, qc);
+      final long start = Math.max(0, st - 1);
+      final long length = Math.min(size - start, ln + Math.min(0, st - 1));
+      return length <= 0 ? Empty.SEQ : value.subSequence(start, length, qc);
     }
 
     // take fast route if the size is known
-    if(is >= 0) {
-      final long s = Math.max(0, start - 1), l = Math.min(is - s, len + Math.min(0, start - 1));
-      if(s >= is || l <= 0) return Empty.SEQ;
-      if(s == 0 && l == is) return iter.value(qc);
+    if(size >= 0) {
+      final long start = Math.max(0, st - 1);
+      final long length = Math.min(size - start, ln + Math.min(0, st - 1));
+      if(start >= size || length <= 0) return Empty.SEQ;
+      if(start == 0 && length == size) return iter.value(qc);
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(long i = 0; i < l; i++) vb.add(iter.get(s + i));
+      for(long i = 0; i < length; i++) vb.add(iter.get(start + i));
       return vb.value();
     }
 
-    final long e = len == Long.MAX_VALUE ? len : start + len;
+    final long max = ln == Long.MAX_VALUE ? ln : st + ln;
     final ValueBuilder vb = new ValueBuilder(qc);
     Item item;
-    for(int i = 1; i < e && (item = qc.next(iter)) != null; i++) {
-      if(i >= start) vb.add(item);
+    for(int i = 1; i < max && (item = qc.next(iter)) != null; i++) {
+      if(i >= st) vb.add(item);
     }
     return vb.value();
   }
@@ -109,23 +114,24 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   private long[] range(final QueryContext qc) throws QueryException {
-    final double ds = toDouble(exprs[1], qc);
-    if(Double.isNaN(ds)) return null;
+    final double st = toDouble(exprs[1], qc);
+    if(Double.isNaN(st)) return null;
 
-    final long start = start(ds);
+    final long start = start(st);
     final boolean min = start == Long.MIN_VALUE;
-    long len = Long.MAX_VALUE;
+    long length = Long.MAX_VALUE;
 
     final int el = exprs.length;
     if(el > 2) {
-      final double dl = toDouble(exprs[2], qc);
-      if(Double.isNaN(dl)) return null;
-      if(min && dl == Double.POSITIVE_INFINITY) return null;
-      len = length(dl);
+      final double ln = toDouble(exprs[2], qc);
+      if(Double.isNaN(ln)) return null;
+      if(min && ln == Double.POSITIVE_INFINITY) return null;
+      length = length(ln);
     }
 
     // return all values, no values, or the specified range
-    return min ? len == Long.MAX_VALUE ? ALL : null : new long[] { start, length(start, len) };
+    return min ? length == Long.MAX_VALUE ? ALL : null :
+      new long[] { start, length(start, length) };
   }
 
   /**

@@ -116,7 +116,7 @@ public final class Window extends Clause {
 
           // find end item
           if(fst != null) {
-            final ValueBuilder window = new ValueBuilder(qc).add(fst);
+            final ValueBuilder vb = new ValueBuilder(qc).add(fst);
             final Item[] st = vals == null ? new Item[] { curr, prev, next } : vals;
             final long ps = vals == null ? pos : spos;
             vals = null;
@@ -127,11 +127,11 @@ public final class Window extends Clause {
                 spos = pos;
                 break;
               }
-              window.add(curr);
+              vb.add(curr);
             }
 
             start.bind(qc, st[0], ps, st[1], st[2]);
-            qc.set(var, window.value());
+            qc.set(var, vb.value());
             return true;
           }
 
@@ -155,10 +155,10 @@ public final class Window extends Clause {
         while(true) {
           if(findStart(qc)) {
             // find end item
-            final ValueBuilder window = new ValueBuilder(qc);
+            final ValueBuilder vb = new ValueBuilder(qc);
             boolean found = false;
             do {
-              window.add(curr);
+              vb.add(curr);
               if(end.matches(qc, curr, pos, prev, next)) {
                 found = true;
                 break;
@@ -167,7 +167,7 @@ public final class Window extends Clause {
 
             // don't return dangling items if the {@code only} flag was specified
             if(found || !only) {
-              qc.set(var, window.value());
+              qc.set(var, vb.value());
               return true;
             }
           }
@@ -201,19 +201,19 @@ public final class Window extends Clause {
           }
 
           if(curr != null) {
-            final ValueBuilder cache = new ValueBuilder(qc);
-            final Iterator<Item> qiter = queue.iterator();
+            final ValueBuilder vb = new ValueBuilder(qc);
+            final Iterator<Item> iter = queue.iterator();
             // the first element is already the {@code next} one
-            if(qiter.hasNext()) qiter.next();
+            if(iter.hasNext()) iter.next();
             Item pr = prev, it = curr, nx = next;
             long ps = pos;
             do {
-              cache.add(it);
+              vb.add(it);
               if(end.matches(qc, it, ps++, pr, nx)) break;
               pr = it;
               it = nx;
-              if(qiter.hasNext()) {
-                nx = qiter.next();
+              if(iter.hasNext()) {
+                nx = iter.next();
               } else {
                 nx = next();
                 if(nx != null) queue.addLast(nx);
@@ -224,7 +224,7 @@ public final class Window extends Clause {
             if(!(it == null && only)) {
               start.bind(qc, curr, pos, prev, next);
               prev = curr;
-              qc.set(var, cache.value());
+              qc.set(var, vb.value());
               return true;
             }
           }

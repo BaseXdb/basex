@@ -20,8 +20,8 @@ public final class FnRemove extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final long pos = toLong(exprs[1], qc) - 1;
     final Iter iter = exprs[0].iter(qc);
-    final long is = iter.size();
-    return pos < 0 || is != -1 && pos > is ? iter : new Iter() {
+    final long size = iter.size();
+    return pos < 0 || size != -1 && pos > size ? iter : new Iter() {
       long c;
       @Override
       public Item next() throws QueryException {
@@ -33,10 +33,11 @@ public final class FnRemove extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc);
-    final long pos = toLong(exprs[1], qc) - 1, n = value.size();
-    if(pos < 0 || pos >= n) return value;
+    final long pos = toLong(exprs[1], qc) - 1, size = value.size();
+    // position out of bounds: return original value
+    if(pos < 0 || pos >= size) return value;
     // remove first or last item: create sub sequence
-    if(pos == 0 || pos + 1 == n) return value.subSequence(pos == 0 ? 1 : 0, n - 1, qc);
+    if(pos == 0 || pos + 1 == size) return value.subSequence(pos == 0 ? 1 : 0, size - 1, qc);
     return ((Seq) value).remove(pos, qc);
   }
 
