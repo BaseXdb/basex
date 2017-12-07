@@ -22,8 +22,8 @@ public final class MapEntry extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type kt = exprs[0].seqType().atomicType();
-    if(kt != null) exprType.assign(MapType.get((AtomType) kt, exprs[1].seqType()));
+    final AtomType type1 = exprs[0].seqType().type.atomic();
+    if(type1 != null) exprType.assign(MapType.get(type1, exprs[1].seqType()));
     return this;
   }
 }

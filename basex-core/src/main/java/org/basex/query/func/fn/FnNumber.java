@@ -30,11 +30,13 @@ public final class FnNumber extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean arg = exprs.length != 0;
-    final Expr expr = arg ? exprs[0] : cc.qc.focus.value;
-    // number(1e1) -> 1e1
-    // $double[number() = 1] -> $double[. = 1]
-    return expr == null || !expr.seqType().eq(SeqType.DBL_O) ? this :
-      arg ? expr : new ContextValue(info).optimize(cc);
+    final boolean context = exprs.length == 0;
+    final Expr expr = context ? cc.qc.focus.value : exprs[0];
+    if(expr != null && expr.seqType().eq(SeqType.DBL_O)) {
+      // number(1e1) -> 1e1
+      // $double[number() = 1] -> $double[. = 1]
+      return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
+    }
+    return this;
   }
 }

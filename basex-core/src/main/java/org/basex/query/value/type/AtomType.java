@@ -797,36 +797,6 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final boolean isNumber() {
-    return numeric;
-  }
-
-  @Override
-  public final boolean isUntyped() {
-    return untyped;
-  }
-
-  @Override
-  public final boolean isNumberOrUntyped() {
-    return numeric || untyped;
-  }
-
-  @Override
-  public final boolean isStringOrUntyped() {
-    return string || untyped;
-  }
-
-  @Override
-  public final boolean isSortable() {
-    return sortable;
-  }
-
-  @Override
-  public final byte[] string() {
-    return name.string();
-  }
-
-  @Override
   public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo info) throws QueryException {
     if(item.type == this) return item;
@@ -878,6 +848,41 @@ public enum AtomType implements Type {
   @Override
   public final Type intersect(final Type type) {
     return instanceOf(type) ? this : type.instanceOf(this) ? type : null;
+  }
+
+  @Override
+  public final boolean isNumber() {
+    return numeric;
+  }
+
+  @Override
+  public final boolean isUntyped() {
+    return untyped;
+  }
+
+  @Override
+  public final boolean isNumberOrUntyped() {
+    return numeric || untyped;
+  }
+
+  @Override
+  public final boolean isStringOrUntyped() {
+    return string || untyped;
+  }
+
+  @Override
+  public final boolean isSortable() {
+    return sortable;
+  }
+
+  @Override
+  public final byte[] string() {
+    return name.string();
+  }
+
+  @Override
+  public final AtomType atomic() {
+    return instanceOf(AtomType.AAT) ? this : null;
   }
 
   @Override

@@ -24,11 +24,13 @@ public final class FnString extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean arg = exprs.length != 0;
-    final Expr expr = arg ? exprs[0] : cc.qc.focus.value;
-    // string('x') -> 'x'
-    // $string[string() = 'a'] -> $string[. = 'a']
-    return expr == null || !expr.seqType().eq(SeqType.STR_O) ? this :
-      arg ? expr : new ContextValue(info).optimize(cc);
+    final boolean context = exprs.length == 0;
+    final Expr expr = context ? cc.qc.focus.value : exprs[0];
+    if(expr != null && expr.seqType().eq(SeqType.STR_O)) {
+      // string('x') -> 'x'
+      // $string[string() = 'a'] -> $string[. = 'a']
+      return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
+    }
+    return this;
   }
 }

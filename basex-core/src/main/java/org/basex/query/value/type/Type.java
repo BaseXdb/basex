@@ -272,6 +272,12 @@ public interface Type {
   byte[] string();
 
   /**
+   * Returns the atomic type.
+   * @return atomic type (can be {@code null})
+   */
+  AtomType atomic();
+
+  /**
    * Returns a type id to differentiate all types.
    * @return id
    */

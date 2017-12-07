@@ -233,13 +233,18 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final ID id() {
-    return id;
+  public final byte[] string() {
+    return name;
   }
 
   @Override
-  public final byte[] string() {
-    return name;
+  public final AtomType atomic() {
+    return this == NodeType.PI || this == NodeType.COM ? AtomType.STR : AtomType.ATM;
+  }
+
+  @Override
+  public final ID id() {
+    return id;
   }
 
   @Override

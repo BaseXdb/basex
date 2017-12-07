@@ -72,7 +72,7 @@ public final class FnDistinctValues extends StandardFunc {
     if(expr instanceof RangeSeq) return expr;
 
     final SeqType st = expr.seqType();
-    final Type type = st.atomicType();
+    final AtomType type = st.type.atomic();
     if(type != null) {
       exprType.assign(type);
       simple = st.zeroOrOne();

@@ -592,18 +592,6 @@ public final class SeqType {
   }
 
   /**
-   * Returns the atomic type for the specified expression.
-   * @return type or {@code null} if type may be not atomic
-   */
-  public Type atomicType() {
-    final Type tp = type;
-    return tp.instanceOf(NodeType.NOD) ?
-      tp == NodeType.PI || tp == NodeType.COM ? AtomType.STR :
-      tp == NodeType.NOD ? AtomType.AAT : AtomType.ATM :
-      tp.instanceOf(AtomType.AAT) ? tp : null;
-  }
-
-  /**
    * Checks the types for equality.
    * @param st type
    * @return result of check

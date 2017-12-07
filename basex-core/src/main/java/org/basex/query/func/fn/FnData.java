@@ -32,11 +32,14 @@ public final class FnData extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Value value = cc.qc.focus.value;
-    final Expr expr = exprs.length > 0 ? exprs[0] : value != null ? value : this;
-    if(expr != this) {
+    final boolean context = exprs.length == 0;
+    final Expr expr = context ? cc.qc.focus.value : exprs[0];
+    if(expr != null) {
       final SeqType st = expr.seqType();
-      final Type type = st.atomicType();
+      final AtomType type = st.type.atomic();
+      if(type == st.type) {
+        return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
+      }
       if(type != null) exprType.assign(type, st.occ, expr.size());
     }
     return this;

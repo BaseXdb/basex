@@ -34,13 +34,13 @@ public final class CMap extends Arr {
     final int el = exprs.length;
     Type key = null;
     for(int e = 0; e < el; e += 2) {
-      final SeqType kst = exprs[e].seqType();
-      final Type kt = kst.atomicType();
-      if(kt == null || !kst.one()) {
+      final SeqType st = exprs[e].seqType();
+      final Type type = st.type.atomic();
+      if(type == null || !st.one()) {
         key = null;
         break;
       }
-      key = key == null ? kt : key.union(kt);
+      key = key == null ? type : key.union(type);
     }
 
     // value type

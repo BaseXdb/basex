@@ -29,16 +29,16 @@ public final class MapPut extends StandardFunc {
     final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
     final Type type1 = expr1.seqType().type;
     if(type1 instanceof MapType) {
-      Type kt = expr2.seqType().atomicType();
-      if(kt != null) {
+      Type type2 = expr2.seqType().type.atomic();
+      if(type2 != null) {
         SeqType st = expr3.seqType();
         // merge types if input is expected to have at least one entry
         if(!(expr1 instanceof Map && ((Map) expr1).mapSize() == 0)) {
           final MapType mt = (MapType) type1;
-          kt = mt.keyType().union(kt);
+          type2 = mt.keyType().union(type2);
           st = mt.declType.union(expr3.seqType());
         }
-        exprType.assign(MapType.get((AtomType) kt, st));
+        exprType.assign(MapType.get((AtomType) type2, st));
       }
     }
     return this;

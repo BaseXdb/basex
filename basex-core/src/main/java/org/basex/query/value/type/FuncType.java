@@ -237,6 +237,11 @@ public class FuncType implements Type {
   }
 
   @Override
+  public final AtomType atomic() {
+    return null;
+  }
+
+  @Override
   public final ID id() {
     return Type.ID.FUN;
   }

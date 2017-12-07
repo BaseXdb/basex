@@ -126,6 +126,11 @@ public enum ListType implements Type {
   }
 
   @Override
+  public final AtomType atomic() {
+    return null;
+  }
+
+  @Override
   public final ID id() {
     return null;
   }
