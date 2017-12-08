@@ -572,7 +572,7 @@ public enum QueryError {
   /** Error code. */
   INVGROUP_X(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
   /** Error code. */
-  DIFFMAND_X(FODF, 1310, "Mandatory digits must be of the same group: '%'."),
+  DIFFMAND_X(FODF, 1310, "Mandatory digits is not of the same group: '%'."),
   /** Error code. */
   INVORDINAL_X(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
   /** Error code. */
@@ -788,7 +788,7 @@ public enum QueryError {
   /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */
-  CTXNODE(XPDY, 50, "Root of the context value must be a document node."),
+  CTXNODE(XPDY, 50, "Root of the context value is no document node."),
   /** Error code. */
   NOTREAT_X_X_X(XPDY, 50, "Cannot treat % as %: %."),
 
@@ -849,11 +849,13 @@ public enum QueryError {
   /** Error code. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
   /** Error code. */
+  NOCIDECL(XPST, 3, "Expecting context item."),
+  /** Error code. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** Error code. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** Error code. */
-  FUNCMISS_X(XPST, 3, "Expecting closing bracket: %."),
+  FUNCARG_X(XPST, 3, "Expecting function argument%."),
   /** Error code. */
   MAPTAAT_X(XPST, 3, "Expecting atomic key type for map, found '%'."),
   /** Error code. */
@@ -909,7 +911,7 @@ public enum QueryError {
   /** Error code. */
   BINDNAME_X(XPST, 3, "Invalid name: '%'."),
   /** Error code. */
-  PIXML_X(XPST, 3, "Processing instruction has illegal name: '%'."),
+  PIXML_X(XPST, 3, "Processing instruction has illegal name: %."),
   /** Error code. */
   QNAME_X(XPST, 3, "Expecting QName, '%' found."),
   /** Error code. */
@@ -1205,9 +1207,9 @@ public enum QueryError {
   /** Error code. */
   INVDECFORM_X_X(XQST, 97, "Invalid decimal-format property: %='%'."),
   /** Error code. */
-  INVDECSINGLE_X_X(XQST, 97, "Decimal-format property must be a single character: %='%'."),
+  INVDECSINGLE_X_X(XQST, 97, "Decimal-format property is no single character: %='%'."),
   /** Error code. */
-  INVDECZERO_X(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
+  INVDECZERO_X(XQST, 97, "Zero-digit property is no Unicode digit with value zero: %."),
   /** Error code. */
   DUPLDECFORM_X(XQST, 98, "Clash of decimal format properties: '%'."),
   /** Error code. */
@@ -1257,7 +1259,7 @@ public enum QueryError {
   /** Error code. */
   UPMULTREN_X(XUDY, 15, "Node can only be renamed once: %."),
   /** Error code. */
-  UPPATHREN_X(XUDY, 15, "Path can only be renamed once: '%'."),
+  UPPATHREN_X(XUDY, 15, "Path can only be renamed once: %."),
   /** Error code. */
   UPMULTREPL_X(XUDY, 16, "Node can only be replaced once: %."),
   /** Error code. */
@@ -1289,7 +1291,7 @@ public enum QueryError {
   /** Error code. */
   UPMODIFY(XUST, 2, "Transformations must all be updating or return an empty sequence."),
   /** Error code. */
-  UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
+  UPEXPECTF(XUST, 2, "Function body is no an updating expression."),
   /** Error code. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
   /** Error code. */
@@ -1300,31 +1302,31 @@ public enum QueryError {
   /** Error code. */
   UPNOATTRPER_X(XUTY, 4, "Attribute does not follow root element: %."),
   /** Error code. */
-  UPTRGTYP_X(XUTY, 5, "Target must be element or document: %."),
+  UPTRGTYP_X(XUTY, 5, "Target is not an element or document: %."),
   /** Error code. */
-  UPTRGSNGL_X(XUTY, 5, "Target must be single node: %."),
+  UPTRGSNGL_X(XUTY, 5, "Target is not a single node: %."),
   /** Error code. */
-  UPTRGTYP2_X(XUTY, 6, "Target must be element, text, comment or pi: %."),
+  UPTRGTYP2_X(XUTY, 6, "Target is not an element, text, comment or pi: %."),
   /** Error code. */
-  UPTRGSNGL2_X(XUTY, 6, "Target must be single node: %."),
+  UPTRGSNGL2_X(XUTY, 6, "Target is not a single node: %."),
   /** Error code. */
-  UPTRGDELEMPT_X(XUTY, 7, "Target must be node: %."),
+  UPTRGDELEMPT_X(XUTY, 7, "Target is not a node: %."),
   /** Error code. */
-  UPTRGNODE_X(XUTY, 8, "Target must be element, text, attribute, comment or pi: %."),
+  UPTRGNODE_X(XUTY, 8, "Target is not an element, text, attribute, comment or pi: %."),
   /** Error code. */
-  UPTRGSINGLE_X(XUTY, 8, "Target must be single node: %."),
+  UPTRGSINGLE_X(XUTY, 8, "Target is not a single node: %."),
   /** Error code. */
   UPWRELM_X(XUTY, 10, "Node cannot be replaced with attribute: %."),
   /** Error code. */
   UPWRATTR_X(XUTY, 11, "Target is no attribute: %."),
   /** Error code. */
-  UPWRTRGTYP_X(XUTY, 12, "Target must be element, attribute or pi: %."),
+  UPWRTRGTYP_X(XUTY, 12, "Target is not an element, attribute or pi: %."),
   /** Error code. */
-  UPWRTRGSINGLE_X(XUTY, 12, "Target must be single node: %."),
+  UPWRTRGSINGLE_X(XUTY, 12, "Target is not a single node: %."),
   /** Error code. */
-  UPSINGLE_X_X(XUTY, 13, "Value of $% must be single node: %."),
+  UPSINGLE_X_X(XUTY, 13, "Value of $% is not a single node: %."),
   /** Error code. */
-  UPSOURCE_X(XUTY, 13, "Source must be node: %."),
+  UPSOURCE_X(XUTY, 13, "Source is not a node: %."),
   /** Error code. */
   UPATTELM2_X(XUTY, 22, "Attribute cannot be added to %.");
 

@@ -199,9 +199,9 @@ final class ProjectFiles {
           if(exclude.contains(path)) continue;
           // check if current file matches the pattern
           final String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
-          if(mode == 0 ? startsWith(file, query) :
-             mode == 1 ? contains(file, query) :
-             matches(file, query)) {
+          if(mode == 0 ? Strings.startsWith(file, query) :
+             mode == 1 ? Strings.contains(file, query) :
+             Strings.matches(file, query)) {
 
             // check file contents
             if(filterContent(path, search)) {
@@ -253,64 +253,5 @@ final class ProjectFiles {
       Util.debug(ex);
       return false;
     }
-  }
-
-  /**
-   * Checks if a filename starts with the specified pattern.
-   * @param input input string
-   * @param query query string
-   * @return result of check
-   */
-  private static boolean startsWith(final String input, final String query) {
-    final int il = input.length(), ql = query.length();
-    if(ql > il) return false;
-    for(int q = 0; q < ql; q++) {
-      if(!equals(input.charAt(q), query.charAt(q))) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Checks if a filename contains the specified pattern.
-   * @param input input string
-   * @param query query string
-   * @return result of check
-   */
-  private static boolean contains(final String input, final String query) {
-    final int ql = query.length();
-    if(ql == 0) return true;
-    final int il = input.length() - ql;
-    for(int i = 0; i <= il; i++) {
-      int q = 0;
-      while(equals(input.charAt(i + q), query.charAt(q))) {
-        if(++q == ql) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Checks if the all characters of the pattern occur in the input in the given order.
-   * @param input input string
-   * @param query query string
-   * @return result of check
-   */
-  private static boolean matches(final String input, final String query) {
-    final int il = input.length(), ql = query.length();
-    int q = 0;
-    for(int i = 0; i < il && q < ql; i++) {
-      if(equals(input.charAt(i), query.charAt(q))) q++;
-    }
-    return q == ql;
-  }
-
-  /**
-   * Compares two characters. If the query character is lower case, search case insensitive.
-   * @param input input character
-   * @param query query character
-   * @return result of check
-   */
-  private static boolean equals(final char input, final char query) {
-    return query == (Character.isUpperCase(query) ? input : Character.toLowerCase(input));
   }
 }

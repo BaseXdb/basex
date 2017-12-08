@@ -984,15 +984,27 @@ public class TextPanel extends BaseXPanel {
     // find first character
     final int caret = editor.pos(), start = editor.completionStart();
     final String input = string(substring(editor.text(), start, caret)).toLowerCase(Locale.ENGLISH);
-    if(input.isEmpty()) return;
 
     // find insertion candidates
     final ArrayList<Pair<String, String>> pairs = new ArrayList<>();
-    add(pairs, input, REPLACE1);
-    pairs.add(null);
-    add(pairs, input, REPLACE2);
-    pairs.add(null);
-    add(pairs, input, REPLACE3);
+    final int il = LISTS.size();
+    for(int i = 0; i < il; i++) {
+      if(i > 0) pairs.add(null);
+      for(final Pair<String, String> pair : LISTS.get(i)) {
+        final String name = pair.name();
+        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) pairs.add(pair);
+      }
+    }
+    if(pairs.size() < il) {
+      pairs.clear();
+      for(int i = 0; i < il; i++) {
+        if(i > 0) pairs.add(null);
+        for(final Pair<String, String> pair : LISTS.get(i)) {
+          if(Strings.matches(pair.name(), input)) pairs.add(pair);
+        }
+      }
+    }
+
     // remove duplicate and trailing separators
     for(int l = 0; l < pairs.size();) {
       if(pairs.get(l) == null && (l == 0 || l + 1 == pairs.size() || pairs.get(l + 1) == null)) {
@@ -1014,7 +1026,7 @@ public class TextPanel extends BaseXPanel {
         if(entry == null) {
           pm.addSeparator();
         } else {
-          final JMenuItem mi = new JMenuItem('[' + entry.name() + "] " + entry.value());
+          final JMenuItem mi = new JMenuItem(entry.value());
           pm.add(mi);
           mi.addActionListener(al);
         }
@@ -1036,21 +1048,6 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Adds a relevant match.
-   * @param list list of relevant completions
-   * @param input user input
-   * @param replace code completions
-   */
-  private static void add(final ArrayList<Pair<String, String>> list, final String input,
-      final ArrayList<Pair<String, String>> replace) {
-
-    for(final Pair<String, String> pair : replace) {
-      final String name = pair.name();
-      if(name.startsWith(input) || name.replace(":", "").startsWith(input)) list.add(pair);
-    }
-  }
-
-  /**
    * Auto-completes a string at the specified position.
    * @param string string
    * @param start start position
@@ -1062,15 +1059,12 @@ public class TextPanel extends BaseXPanel {
     scrollCode.invokeLater(true);
   }
 
-  /** Replacement list (1). */
-  private static final ArrayList<Pair<String, String>> REPLACE1 = new ArrayList<>();
-  /** Replacement list (2). */
-  private static final ArrayList<Pair<String, String>> REPLACE2 = new ArrayList<>();
-  /** Replacement list (3). */
-  private static final ArrayList<Pair<String, String>> REPLACE3 = new ArrayList<>();
+  /** Replacement lists. */
+  private static final ArrayList<ArrayList<Pair<String, String>>> LISTS = new ArrayList<>();
 
   /* Reads in the property file. */
   static {
+    for(int i = 0; i < 5; i++) LISTS.add(new ArrayList<>());
     final String file = "/completions.properties";
     final InputStream is = TextPanel.class.getResourceAsStream(file);
     if(is == null) {
@@ -1081,8 +1075,8 @@ public class TextPanel extends BaseXPanel {
         for(String line; (line = nli.readLine()) != null;) {
           final int i = line.indexOf('=');
           if(i == -1 || line.startsWith("#")) continue;
-          final String key = line.substring(0, i);
-          REPLACE1.add(new Pair<>(key, line.substring(i + 1).replace("\\n", "\n")));
+          LISTS.get(0).add(new Pair<>(line.substring(0, i),
+              line.substring(i + 1).replace("\\n", "\n")));
         }
       } catch(final IOException ex) {
         Util.errln(ex);
@@ -1090,20 +1084,19 @@ public class TextPanel extends BaseXPanel {
     }
     // add functions (default functions first)
     for(final Function f : Function.VALUES) {
-      if(f.uri() != QueryText.FN_URI) continue;
       final String func = f.toString();
       final String name = func.replaceAll("^fn:|\\(.*", "");
-      final String key = (name.contains("-") ?
-        name.replaceAll("(.)[^-A-Z]*-?", "$1") :
-        name.substring(0, Math.min(name.length(), 4))).toLowerCase(Locale.ENGLISH);
-      final String suffix = func.contains("()") ? "()" : "(_)";
-      REPLACE2.add(new Pair<>(key, name + suffix));
-    }
-    for(final Function f : Function.VALUES) {
-      if(f.uri() == QueryText.FN_URI) continue;
-      final String name = f.toString().replaceAll("\\(.*", "");
-      final String key = name.replaceAll("(:?.)[^-:A-Z]*-?", "$1").toLowerCase(Locale.ENGLISH);
-      REPLACE3.add(new Pair<>(key, name + "(_)"));
+      final String value = name + (func.contains("()") ? "()" : "(_)");
+      if(f.uri() == QueryText.FN_URI) {
+        if(name.contains("-")) LISTS.get(1).add(
+            new Pair<>(name.replaceAll("(.)[^-A-Z]*-?", "$1").
+            toLowerCase(Locale.ENGLISH), value));
+        LISTS.get(2).add(new Pair<>(name.toLowerCase(Locale.ENGLISH), value));
+      } else {
+        LISTS.get(3).add(new Pair<>(name.replaceAll("(:?.)[^-:A-Z]*-?", "$1").
+            toLowerCase(Locale.ENGLISH), value));
+        LISTS.get(4).add(new Pair<>(name.toLowerCase(Locale.ENGLISH), value));
+      }
     }
   }
 }

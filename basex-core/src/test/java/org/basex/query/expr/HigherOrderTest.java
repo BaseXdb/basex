@@ -88,7 +88,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   /**  Test for name heavy currying. */
   @Test
   public void placeHolderTest() {
-    error("string-join(('a', 'b'), )(',')", FUNCMISS_X);
+    error("string-join(('a', 'b'), )(',')", FUNCARG_X);
   }
 
   /**  Test for invalid function expressions. */

@@ -41,7 +41,7 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Optimizes the expression.
-   * @param value context value
+   * @param value context value (can be {@code null})
    * @return false if test always returns false
    */
   @SuppressWarnings("unused")

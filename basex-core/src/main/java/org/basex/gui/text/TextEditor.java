@@ -25,7 +25,7 @@ public final class TextEditor {
   }
 
   /** Completion characters. */
-  private static final char[] ALLOWED = { '@', '.', '/', ':', '&', '<', '>' };
+  private static final char[] ALLOWED = { ':', '-' };
   /** Opening brackets. */
   private static final String OPENING = "{([";
   /** Closing brackets. */

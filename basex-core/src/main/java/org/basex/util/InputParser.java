@@ -108,15 +108,15 @@ public class InputParser {
 
   /**
    * Peeks forward and consumes the string if it equals the specified one.
-   * @param str string to consume
+   * @param string string to consume
    * @return true if string was found
    */
-  public final boolean consume(final String str) {
+  public final boolean consume(final String string) {
     int i = pos;
-    final int l = str.length();
+    final int l = string.length();
     if(i + l > length) return false;
     for(int s = 0; s < l; ++s) {
-      if(input.charAt(i++) != str.charAt(s)) return false;
+      if(input.charAt(i++) != string.charAt(s)) return false;
     }
     pos = i;
     return true;

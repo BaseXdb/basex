@@ -838,7 +838,7 @@ public class QueryParser extends InputParser {
     else if(!wsConsumeWs(ASSIGN)) return;
 
     localVars.pushContext(null);
-    final Expr ex = check(single(), NOVARDECL);
+    final Expr ex = check(single(), NOCIDECL);
     final SeqType st = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
     final VarScope vs = localVars.popContext();
     qc.ctxItem = MainModule.get(vs, ex, st, currDoc.toString(), info());
@@ -1696,7 +1696,7 @@ public class QueryParser extends InputParser {
           ex = function(name, info, new ExprList(ex));
         } else {
           final ExprList argList = new ExprList(ex);
-          final int[] holes = argumentList(argList, ex);
+          final int[] holes = argumentList(argList);
           final Expr[] args = argList.finish();
           ex = holes == null ? new DynFuncCall(info, sc, e, args) :
             new PartFunc(sc, info, e, args, holes);
@@ -2078,7 +2078,7 @@ public class QueryParser extends InputParser {
           // parses the "ArgumentList" rule
           final InputInfo info = info();
           final ExprList argList = new ExprList();
-          final int[] holes = argumentList(argList, ex);
+          final int[] holes = argumentList(argList);
           final Expr[] args = argList.finish();
           ex = holes == null ? new DynFuncCall(info, sc, ex, args) :
             new PartFunc(sc, info, ex, args, holes);
@@ -2448,7 +2448,7 @@ public class QueryParser extends InputParser {
    */
   private Expr function(final QNm name, final InputInfo info, final ExprList argList)
       throws QueryException {
-    final int[] holes = argumentList(argList, name.string());
+    final int[] holes = argumentList(argList);
     final Expr[] args = argList.finish();
     alter = WHICHFUNC_X;
     alterFunc = name;
@@ -2472,11 +2472,10 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "ArgumentList" rule without the opening parenthesis.
    * @param args list to put the arguments into
-   * @param name name of the function (item); only required for error messages
    * @return array of arguments, place-holders '?' are represented as {@code null} entries
    * @throws QueryException query exception
    */
-  private int[] argumentList(final ExprList args, final Object name) throws QueryException {
+  private int[] argumentList(final ExprList args) throws QueryException {
     int[] holes = null;
     if(!wsConsume(PAREN2)) {
       int i = args.size();
@@ -2487,11 +2486,11 @@ public class QueryParser extends InputParser {
         } else if(wsConsume(QUESTION)) {
           holes = holes == null ? new int[] { i } : Array.add(holes, i);
         } else {
-          throw funcMiss(name);
+          throw error(FUNCARG_X, found());
         }
         i++;
       } while(wsConsume(COMMA));
-      if(!wsConsume(PAREN2)) throw funcMiss(name);
+      if(!wsConsume(PAREN2)) throw error(FUNCARG_X, found());
     }
     return holes;
   }
@@ -3748,10 +3747,10 @@ public class QueryParser extends InputParser {
         if(!wsConsume(PAREN2)) {
           do {
             final Expr ex = single();
-            if(ex == null) throw funcMiss(func);
+            if(ex == null) throw error(FUNCARG_X, found());
             argList.add(ex);
           } while(wsConsume(COMMA));
-          if(!wsConsume(PAREN2)) throw funcMiss(func);
+          if(!wsConsume(PAREN2)) throw error(FUNCARG_X, found());
         }
         // skip if primary expression cannot be a function
         if(func instanceof Value && !(func instanceof FItem)) throw error(NOPAREN_X_X, func);
@@ -3765,34 +3764,34 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "NCName" rule.
-   * @param err optional error message
+   * @param error optional error message
    * @return string
    * @throws QueryException query exception
    */
-  private byte[] ncName(final QueryError err) throws QueryException {
+  private byte[] ncName(final QueryError error) throws QueryException {
     tok.reset();
     if(ncName()) return tok.toArray();
-    if(err != null) {
+    if(error != null) {
       final char ch = consume();
-      throw error(err, ch == 0 ? "" : ch);
+      throw error(error, ch == 0 ? "" : ch);
     }
     return EMPTY;
   }
 
   /**
    * Parses the "EQName" rule.
-   * @param err optional error message. Will be thrown if no EQName is found, or ignored if set to
+   * @param error optional error message. Will be thrown if no EQName is found, or ignored if set to
    * {@code null}
-   * @param def default namespace, or operation mode ({@link #URICHECK}, {@link #SKIPCHECK})
+   * @param ns default namespace, or operation mode ({@link #URICHECK}, {@link #SKIPCHECK})
    * @return QName or {@code null}
    * @throws QueryException query exception
    */
-  private QNm eQName(final QueryError err, final byte[] def) throws QueryException {
+  private QNm eQName(final QueryError error, final byte[] ns) throws QueryException {
     final int p = pos;
     if(consume(EQNAME)) {
       final byte[] uri = bracedURILiteral(), name = ncName(null);
       if(name.length != 0) {
-        if(def == URICHECK && uri.length == 0) {
+        if(ns == URICHECK && uri.length == 0) {
           pos = p;
           throw error(NOURI_X, name);
         }
@@ -3802,14 +3801,14 @@ public class QueryParser extends InputParser {
     }
 
     // parse QName
-    final byte[] nm = qName(err);
+    final byte[] nm = qName(error);
     if(nm.length == 0) return null;
-    if(def == SKIPCHECK) return new QNm(nm);
+    if(ns == SKIPCHECK) return new QNm(nm);
 
     // create new EQName and set namespace
     final QNm name = new QNm(nm, sc);
     if(!name.hasURI()) {
-      if(def == URICHECK) {
+      if(ns == URICHECK) {
         pos = p;
         throw error(NSMISS_X, name);
       }
@@ -3817,24 +3816,24 @@ public class QueryParser extends InputParser {
         pos = p;
         throw error(NOURI_X, name.string());
       }
-      name.uri(def);
+      name.uri(ns);
     }
     return name;
   }
 
   /**
    * Parses the "QName" rule.
-   * @param err optional error message. Will be thrown if no QName is found, and ignored if set to
+   * @param error optional error message. Will be thrown if no QName is found, and ignored if set to
    * {@code null}
    * @return QName string
    * @throws QueryException query exception
    */
-  private byte[] qName(final QueryError err) throws QueryException {
+  private byte[] qName(final QueryError error) throws QueryException {
     tok.reset();
     if(!ncName()) {
-      if(err != null) {
+      if(error != null) {
         final char ch = consume();
-        throw error(err, ch == 0 ? "" : ch);
+        throw error(error, ch == 0 ? "" : ch);
       }
     } else if(consume(':')) {
       if(XMLToken.isNCStartChar(curr())) {
@@ -3933,12 +3932,12 @@ public class QueryParser extends InputParser {
    * Raises an error if the specified expression is {@code null}.
    * @param <E> expression type
    * @param expr expression
-   * @param err error message
+   * @param error error message
    * @return expression
    * @throws QueryException query exception
    */
-  private <E extends Expr> E check(final E expr, final QueryError err) throws QueryException {
-    if(expr == null) throw error(err);
+  private <E extends Expr> E check(final E expr, final QueryError error) throws QueryException {
+    if(expr == null) throw error(error);
     return expr;
   }
 
@@ -3953,11 +3952,11 @@ public class QueryParser extends InputParser {
 
   /**
    * Skips whitespaces, raises an error if the specified string cannot be consumed.
-   * @param str expected string
+   * @param string expected string
    * @throws QueryException query exception
    */
-  private void wsCheck(final String str) throws QueryException {
-    if(!wsConsume(str)) throw error(WRONGCHAR_X_X, str, found());
+  private void wsCheck(final String string) throws QueryException {
+    if(!wsConsume(string)) throw error(WRONGCHAR_X_X, string, found());
   }
 
   /**
@@ -3977,14 +3976,14 @@ public class QueryParser extends InputParser {
 
   /**
    * Consumes the specified token and surrounding whitespaces.
-   * @param str string to consume
+   * @param string string to consume
    * @return true if token was found
    * @throws QueryException query exception
    */
-  private boolean wsConsumeWs(final String str) throws QueryException {
+  private boolean wsConsumeWs(final String string) throws QueryException {
     final int p = pos;
-    if(!wsConsume(str)) return false;
-    if(skipWs() || !XMLToken.isNCStartChar(str.charAt(0)) || !XMLToken.isNCChar(curr()))
+    if(!wsConsume(string)) return false;
+    if(skipWs() || !XMLToken.isNCStartChar(string.charAt(0)) || !XMLToken.isNCChar(curr()))
       return true;
     pos = p;
     return false;
@@ -3993,34 +3992,34 @@ public class QueryParser extends InputParser {
   /**
    * Consumes the specified two strings or jumps back to the old query position. If the strings are
    * found, the cursor is placed after the first token.
-   * @param str1 string to consume
-   * @param str2 second string
+   * @param string1 string to consume
+   * @param string2 second string
    * @param expr alternative error message (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean wsConsumeWs(final String str1, final String str2, final QueryError expr)
+  private boolean wsConsumeWs(final String string1, final String string2, final QueryError expr)
       throws QueryException {
 
     final int p1 = pos;
-    if(!wsConsumeWs(str1)) return false;
+    if(!wsConsumeWs(string1)) return false;
     final int p2 = pos;
     alter = expr;
     alterPos = p2;
-    final boolean ok = wsConsume(str2);
+    final boolean ok = wsConsume(string2);
     pos = ok ? p2 : p1;
     return ok;
   }
 
   /**
    * Skips whitespaces, consumes the specified string and ignores trailing characters.
-   * @param str string to consume
+   * @param string string to consume
    * @return true if string was found
    * @throws QueryException query exception
    */
-  private boolean wsConsume(final String str) throws QueryException {
+  private boolean wsConsume(final String string) throws QueryException {
     skipWs();
-    return consume(str);
+    return consume(string);
   }
 
   /**
@@ -4120,37 +4119,23 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Creates a function parsing error.
-   * @param func function
-   * @return error
-   */
-  private QueryException funcMiss(final Object func) {
-    Object name = func;
-    if(func instanceof XQFunctionExpr) {
-      final QNm qnm = ((XQFunctionExpr) func).funcName();
-      if(qnm != null) name = qnm.prefixId();
-    }
-    return error(FUNCMISS_X, name);
-  }
-
-  /**
    * Creates the specified error.
-   * @param err error to be thrown
+   * @param error error to be thrown
    * @param arg error arguments
    * @return error
    */
-  private QueryException error(final QueryError err, final Object... arg) {
-    return error(err, info(), arg);
+  private QueryException error(final QueryError error, final Object... arg) {
+    return error(error, info(), arg);
   }
 
   /**
    * Creates the specified error.
-   * @param err error to be thrown
+   * @param error error to be thrown
    * @param info input info
    * @param arg error arguments
    * @return error
    */
-  public QueryException error(final QueryError err, final InputInfo info, final Object... arg) {
-    return err.get(info, arg);
+  public QueryException error(final QueryError error, final InputInfo info, final Object... arg) {
+    return error.get(info, arg);
   }
 }
