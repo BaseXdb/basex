@@ -236,11 +236,11 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
         while(++s < sl && !split[s].isEmpty()) plan.add(split[s]);
       } else if(line.equals(Text.ERROR + COL)) {
         while(++s < sl && !split[s].isEmpty()) {
-          final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
-          final Matcher m = p.matcher(split[s]);
-          if(m.find()) {
+          final Pattern pattern = Pattern.compile(STOPPED_AT + "(.*)" + COL);
+          final Matcher matcher = pattern.matcher(split[s]);
+          if(matcher.find()) {
             final TokenBuilder tmp = new TokenBuilder();
-            tmp.add(STOPPED_AT).uline().add(m.group(1)).uline().add(COL);
+            tmp.add(STOPPED_AT).uline().add(matcher.group(1)).uline().add(COL);
             split[s] = tmp.toString();
           }
           error.add(split[s]);

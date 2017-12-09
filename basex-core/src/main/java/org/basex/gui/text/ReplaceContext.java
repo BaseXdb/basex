@@ -45,13 +45,13 @@ final class ReplaceContext {
         // regular expressions, ignoring position arrays
         int flags = Pattern.DOTALL;
         if(!sc.mcase) flags |= Pattern.CASE_INSENSITIVE;
-        final Pattern p = Pattern.compile(sc.search, flags);
+        final Pattern pattern = Pattern.compile(sc.search, flags);
         if(sc.multi) {
-          tb.add(p.matcher(string(txt, start, end)).replaceAll(replace));
+          tb.add(pattern.matcher(string(txt, start, end)).replaceAll(replace));
         } else {
           for(int e = start, s = start; e <= end; e++) {
             if(e < end ? txt[e] == '\n' : e != s) {
-              tb.add(p.matcher(string(txt, s, e - s)).replaceAll(replace));
+              tb.add(pattern.matcher(string(txt, s, e - s)).replaceAll(replace));
               if(e < end) tb.add('\n');
               s = e + 1;
             }

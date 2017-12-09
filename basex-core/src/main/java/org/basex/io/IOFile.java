@@ -189,13 +189,13 @@ public final class IOFile extends IO {
    * @return children
    */
   public IOFile[] children(final String regex) {
-    final File[] ch = file.listFiles();
-    if(ch == null) return new IOFile[0];
+    final File[] children = file.listFiles();
+    if(children == null) return new IOFile[0];
 
-    final ArrayList<IOFile> io = new ArrayList<>(ch.length);
-    final Pattern p = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
-    for(final File f : ch) {
-      if(p.matcher(f.getName()).matches()) io.add(new IOFile(f));
+    final ArrayList<IOFile> io = new ArrayList<>(children.length);
+    final Pattern pattern = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
+    for(final File child : children) {
+      if(pattern.matcher(child.getName()).matches()) io.add(new IOFile(child));
     }
     return io.toArray(new IOFile[io.size()]);
   }
@@ -206,12 +206,12 @@ public final class IOFile extends IO {
    * @return children
    */
   public IOFile[] children(final FileFilter filter) {
-    final File[] ch = filter == null ? file.listFiles() : file.listFiles(filter);
-    if(ch == null) return new IOFile[0];
+    final File[] children = filter == null ? file.listFiles() : file.listFiles(filter);
+    if(children == null) return new IOFile[0];
 
-    final ArrayList<IOFile> io = new ArrayList<>(ch.length);
-    for(final File f : ch) {
-      io.add(new IOFile(f));
+    final ArrayList<IOFile> io = new ArrayList<>(children.length);
+    for(final File child : children) {
+      io.add(new IOFile(child));
     }
     return io.toArray(new IOFile[io.size()]);
   }
@@ -231,8 +231,8 @@ public final class IOFile extends IO {
    */
   public StringList descendants(final FileFilter filter) {
     final StringList files = new StringList();
-    final File[] ch = filter == null ? file.listFiles() : file.listFiles(filter);
-    if(ch == null) return files;
+    final File[] children = filter == null ? file.listFiles() : file.listFiles(filter);
+    if(children == null) return files;
     if(exists()) addDescendants(this, files, filter, path().length() + 1);
     return files;
   }

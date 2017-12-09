@@ -7,8 +7,9 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -24,13 +25,13 @@ public final class FnInScopePrefixes extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Atts ns = toElem(exprs[0], qc).nsScope(sc).add(XML, XML_URI);
-    final int as = ns.size();
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final Atts atts = toElem(exprs[0], qc).nsScope(sc).add(XML, XML_URI);
+    final int as = atts.size();
+    final TokenList tl = new TokenList();
     for(int a = 0; a < as; ++a) {
-      final byte[] key = ns.name(a);
-      if(key.length + ns.value(a).length != 0) vb.add(Str.get(key));
+      final byte[] key = atts.name(a);
+      if(key.length + atts.value(a).length != 0) tl.add(key);
     }
-    return vb.value();
+    return StrSeq.get(tl);
   }
 }

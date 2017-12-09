@@ -226,14 +226,14 @@ public final class PathIndex implements Index {
     final int[] occs = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes
-    final TokenList list = new TokenList();
+    final TokenList tl = new TokenList();
     for(int n = 0; n < ns; n++) {
       final PathNode node = nodes.get(occ ? occs[n] : n);
       final byte[] name = node.token(data);
-      if(name.length != 0 && !list.contains(name) && !contains(name, '(')) list.add(name);
+      if(name.length != 0 && !tl.contains(name) && !contains(name, '(')) tl.add(name);
     }
-    if(!occ) list.sort(false);
-    return list;
+    if(!occ) tl.sort(false);
+    return tl;
   }
 
   // Info =====================================================================

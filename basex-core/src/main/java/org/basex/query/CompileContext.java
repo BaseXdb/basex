@@ -50,9 +50,9 @@ public final class CompileContext {
    * @param ext text text extensions
    */
   public void info(final String string, final Object... ext) {
-    final TokenList list = new TokenList();
-    for(final Object e : ext) list.add(QueryError.chop(TokenBuilder.token(e), null));
-    qc.info.compInfo(string, list.toArray());
+    final TokenList tl = new TokenList();
+    for(final Object e : ext) tl.add(QueryError.chop(TokenBuilder.token(e), null));
+    qc.info.compInfo(string, tl.finish());
   }
 
   /**

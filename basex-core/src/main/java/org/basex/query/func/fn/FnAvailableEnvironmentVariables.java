@@ -21,8 +21,8 @@ public final class FnAvailableEnvironmentVariables extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) {
-    final TokenList list = new TokenList();
-    for(final Object key : System.getenv().keySet()) list.add(key.toString());
-    return StrSeq.get(list);
+    final TokenList tl = new TokenList();
+    for(final Object key : System.getenv().keySet()) tl.add(key.toString());
+    return StrSeq.get(tl);
   }
 }

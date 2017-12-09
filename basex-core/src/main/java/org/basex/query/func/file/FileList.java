@@ -11,6 +11,7 @@ import java.util.regex.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -24,16 +25,21 @@ import org.basex.util.list.*;
 public final class FileList extends FileRead {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     try {
       final Path dir = toPath(0, qc).toRealPath();
-      final boolean rec = optionalBool(1, qc);
-      final Pattern pat = exprs.length == 3 ? Pattern.compile(IOFile.regex(
+      final boolean recursive = optionalBool(1, qc);
+      final Pattern pattern = exprs.length == 3 ? Pattern.compile(IOFile.regex(
           string(toToken(exprs[2], qc))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
-      final TokenList list = new TokenList();
-      list(dir.getNameCount(), dir, list, rec, pat);
-      return StrSeq.get(list).iter();
+      final TokenList tl = new TokenList();
+      list(dir.getNameCount(), dir, tl, recursive, pattern);
+      return StrSeq.get(tl);
     } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
     } catch(final AccessDeniedException ex) {

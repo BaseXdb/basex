@@ -7,6 +7,7 @@ import java.nio.file.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
@@ -19,13 +20,18 @@ import org.basex.util.list.*;
 public final class FileChildren extends FileRead {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     try {
-      final TokenList children = new TokenList();
+      final TokenList tl = new TokenList();
       try(DirectoryStream<Path> paths = Files.newDirectoryStream(toPath(0, qc))) {
-        for(final Path child : paths) children.add(get(child, Files.isDirectory(child)).string());
+        for(final Path path : paths) tl.add(get(path, Files.isDirectory(path)).string());
       }
-      return StrSeq.get(children).iter();
+      return StrSeq.get(tl);
     } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
     } catch(final AccessDeniedException ex) {
