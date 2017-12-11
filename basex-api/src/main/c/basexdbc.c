@@ -127,7 +127,10 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
 #endif
 
 	/* BaseX Server expects an authentification sequence:
- 	 * {username}\0{md5(md5(password) + timestamp)}\0 */
+           {username}\0{md5(md5(user:realm:password) + timestamp)}\0 */
+ 	/* legacy - 
+        /* {username}\0{md5(md5(password) + timestamp)}\0 */
+        
 
 	/* Send {username}\0 */
 	int user_len = strlen(user) + 1;
@@ -136,19 +139,47 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
 		warnx("Sending username failed. %d != %d", rc, user_len);
 		return -1;
 	}
-
-	/* Compute md5 for passwd. */
-	md5_pwd = md5(passwd);
-	if (md5_pwd == NULL) {
-		warnx("md5 computation for password failed.");
-		return -1;
-	}
-	int md5_pwd_len = strlen(md5_pwd);
+        
+        char* p = strchr(ts,':');
+        char* t;
+        if (!p) {
+            /* legacy login */
+            t = ts;
+            /* Compute md5 for passwd. */
+            md5_pwd = md5(passwd);
+            if (md5_pwd == NULL) {
+                    warnx("md5 computation for password failed.");
+                    return -1;
+            }  
+        }
+        else {
+            /* v8.0+ login */
+            t = p + 1;
+            /* Compute md5 for codeword. */
+            int user_len = strlen(user);
+            int pass_len = strlen(passwd);
+            int realm_len = p - ts;
+            char codewd[user_len + realm_len + pass_len + 2];
+            strncpy(codewd, user, user_len);
+            codewd[user_len] = ':';
+            strncpy(codewd + user_len + 1, ts, realm_len);
+            codewd[user_len + 1 + realm_len] = ':';
+            strncpy(codewd + user_len + 1 + realm_len + 1, passwd, pass_len);
+            
+            md5_pwd = md5(codewd);
+            if (md5_pwd == NULL) {
+                    warnx("md5 computation for password failed.");
+                    return -1;
+            }
+            ts_len = ts_len - realm_len -1;
+        }
+        int md5_pwd_len = strlen(md5_pwd);
+        
 #if DEBUG
 	warnx("md5(pwd)        : %s (%d)", md5_pwd, md5_pwd_len);
 #endif
 	
-	/* Concat md5'ed passwd string and timestamp string. */
+	/* Concat md5'ed codewd string and timestamp/nonce string. */
 	int pwdts_len = md5_pwd_len + ts_len + 1;
 	char pwdts[pwdts_len];
 	memset(pwdts, 0, sizeof(pwdts));
@@ -156,13 +187,13 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
 		pwdts[i] = md5_pwd[i];
 	int j = md5_pwd_len;
 	for (i = 0; i < ts_len; i++,j++)
-		pwdts[j] = ts[i];
+		pwdts[j] = t[i];
 	pwdts[pwdts_len - 1] = '\0';
 #if DEBUG
 	warnx("md5(pwd)+ts     : %s (%d)", pwdts, strlen(pwdts));
 #endif
 
-	/* Compute md5 for md5'ed password + timestamp */
+	/* Compute md5 for md5'ed codeword + timestamp */
 	char *md5_pwdts = md5(pwdts);
 	if (md5_pwdts == NULL) {
 		warnx("md5 computation for password + timestamp failed.");
@@ -173,7 +204,7 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
 	warnx("md5(md5(pwd)+ts): %s (%d)", md5_pwdts, md5_pwdts_len);
 #endif
 
-	/* Send md5'ed(md5'ed password + timestamp) to basex. */
+	/* Send md5'ed(md5'ed codeword + timestamp) to basex. */
 	rc = send_db(sfd, md5_pwdts, md5_pwdts_len + 1);  // also send '\0'
 	if (rc == -1) {
 		warnx("Sending credentials failed.");
