@@ -24,6 +24,8 @@ public final class LookupTest extends AdvancedQueryTest {
     query("map { 'first' : 'Jenna', 'last' : 'Scott' } ? first", "Jenna");
     query("(map {'first': 'Tom'}, map {'first': 'Dick'}, map {'first': 'Harry'}) ? first",
         "Tom\nDick\nHarry");
+
+    query("<_>X</_>[map { 'Y': <_/> }?(text())]", "");
   }
 
   /** Test. */
