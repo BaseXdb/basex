@@ -303,7 +303,7 @@ public enum GUIMenuCmd implements GUICommand {
 
   /* EDIT COMMANDS */
 
-  /** Copies the current path to the clipboard. */
+  /** Copies the current database path to the clipboard. */
   C_COPYPATH(COPY_PATH, "% shift C", true, false) {
     @Override
     public void execute(final GUI gui) {

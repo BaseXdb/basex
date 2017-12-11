@@ -316,7 +316,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPYPATH); }
 
     @Override public void execute() {
-      BaseXLayout.copy(selectedNode().file.path());
+      BaseXLayout.copyPath(selectedNode().file.path());
     }
 
     @Override public boolean enabled(final GUI main) {

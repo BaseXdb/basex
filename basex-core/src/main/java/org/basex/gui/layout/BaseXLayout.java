@@ -9,6 +9,7 @@ import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 
@@ -176,8 +177,7 @@ public final class BaseXLayout {
     final int ll = label.length();
     for(int l = 0; l < ll; l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
-      if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
-        continue;
+      if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1) continue;
       b.setMnemonic(ch);
       mnem.append(ch);
       break;
@@ -216,6 +216,18 @@ public final class BaseXLayout {
    */
   public static void copy(final String text) {
     Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+  }
+
+  /**
+   * Copies the specified file path to the clipboard.
+   * @param path path
+   */
+  public static void copyPath(final String path) {
+    try {
+      copy(Paths.get(path).toRealPath().toString());
+    } catch(final Exception ex) {
+      Util.stack(ex);
+    }
   }
 
   /**
