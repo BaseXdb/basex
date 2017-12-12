@@ -3,9 +3,9 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.update.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -20,37 +20,34 @@ import org.basex.util.*;
  * @author BaseX Team 2005-17, BSD License
  * @author Christian Gruen
  */
-public final class FnApply extends StandardFunc {
+public class FnApply extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     final FItem func = toFunc(exprs[0], qc);
     return func.invokeValue(qc, info, values(func, qc));
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem func = toFunc(exprs[0], qc);
     return func.invokeItem(qc, info, values(func, qc));
   }
 
   /**
    * Returns the values to apply to the function.
-   * @param fun function
+   * @param func function
    * @param qc query context
    * @return values
    * @throws QueryException query exception
    */
-  private Value[] values(final FItem fun, final QueryContext qc) throws QueryException {
+  protected Value[] values(final FItem func, final QueryContext qc) throws QueryException {
     final Array array = toArray(exprs[1], qc);
-    if(!sc.mixUpdates && fun.annotations().contains(Annotation.UPDATING))
-      throw FUNCUP_X.get(info, fun);
-
-    final long ar = fun.arity(), as = array.arraySize();
+    final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, ar, as);
 
     final ValueList values = new ValueList(as);
@@ -86,7 +83,8 @@ public final class FnApply extends StandardFunc {
       }
     }
 
-    if(ft1 != null) exprType.assign(ft1.declType);
+    final boolean updating = this instanceof UpdateApply;
+    if(ft1 != null && !updating) exprType.assign(ft1.declType);
     return this;
   }
 }

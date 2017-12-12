@@ -32,12 +32,12 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Update test. */
   @Test
   public void list() {
-    query("delete node <a/>, 1, db:output('2')", "1\n2");
+    query("delete node <a/>, 1, update:output('2')", "1\n2");
   }
 
   /** Update test. */
   @Test
-  public void update() {
+  public void evalUpdate() {
     query(_XQUERY_EVAL_UPDATE.args("1"), 1);
     query(_XQUERY_EVAL_UPDATE.args("1") + ",2", "1\n2");
   }
@@ -45,7 +45,7 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void output() {
-    query(_DB_OUTPUT.args("x") + ",1", "1\nx");
+    query(_UPDATE_OUTPUT.args("x") + ",1", "1\nx");
   }
 
   /** Annotations. */
@@ -57,23 +57,23 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Updating functions. */
   @Test
   public void updatingFunctions() {
-    query("declare %updating function local:b() { db:output('1') }; local:b()", 1);
+    query("declare %updating function local:b() { update:output('1') }; local:b()", 1);
 
     query("declare function local:not-used() { local:b#0 };"
-        + "declare %updating function local:b() { db:output('1') }; local:b()", 1);
+        + "declare %updating function local:b() { update:output('1') }; local:b()", 1);
 
-    query("function($a) { db:output($a) }(1)", 1);
-    query("db:output(?)(1)", 1);
-    query("db:output#1(1)", 1);
+    query("function($a) { update:output($a) }(1)", 1);
+    query("update:output(?)(1)", 1);
+    query("update:output#1(1)", 1);
     query("declare function local:a() { 1 }; local:a#0()", 1);
     query("declare function local:a() { local:b#0 };"
-        + "declare function local:b() { db:output('1') }; local:a()()", 1);
+        + "declare function local:b() { update:output('1') }; local:a()()", 1);
   }
 
   /** Test method. */
   @Test
   public void functionLookup() {
-    query("declare function local:a() { db:output(1) };"
+    query("declare function local:a() { update:output(1) };"
         + "function-lookup(xs:QName('local:a'), 0)()", 1);
   }
 
@@ -100,7 +100,7 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Test method (GH-1281). */
   @Test
   public void inlineFunction() {
-    query("declare function local:f() { db:output('1') }; local:f()", 1);
+    query("declare function local:f() { update:output('1') }; local:f()", 1);
   }
 
   /**
@@ -108,7 +108,7 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingHof() {
-    query("for-each(1, db:output#1)", 1);
-    query("apply(db:output#1, [1])", 1);
+    query("for-each(1, update:output#1)", 1);
+    query("apply(update:output#1, [1])", 1);
   }
 }

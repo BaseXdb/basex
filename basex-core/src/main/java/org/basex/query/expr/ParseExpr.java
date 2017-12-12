@@ -8,6 +8,8 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -145,6 +147,26 @@ public abstract class ParseExpr extends Expr {
   // VALIDITY CHECKS ==============================================================================
 
   /**
+   * Ensures that the specified function expression is (not) updating.
+   * Otherwise, throws an exception.
+   * @param <T> expression type
+   * @param expr expression (may be {@code null})
+   * @param updating indicates if expression is expected to be updating.
+   * @param sc static context
+   * @return specified expression
+   * @throws QueryException query exception
+   */
+  protected <T extends XQFunctionExpr> T checkUp(final T expr, final boolean updating,
+      final StaticContext sc) throws QueryException {
+
+    if(!(sc.mixUpdates || updating == expr.annotations().contains(Annotation.UPDATING))) {
+      if(!updating) throw FUNCUP_X.get(info, expr);
+      if(!expr.isVacuousBody()) throw FUNCNOTUP_X.get(info, expr);
+    }
+    return expr;
+  }
+
+  /**
    * Ensures that the specified expression performs no updates.
    * Otherwise, throws an exception.
    * @param expr expression (may be {@code null})
@@ -176,7 +198,7 @@ public abstract class ParseExpr extends Expr {
    * @param exprs expressions to be checked
    * @throws QueryException query exception
    */
-  void checkAllUp(final Expr... exprs) throws QueryException {
+  protected void checkAllUp(final Expr... exprs) throws QueryException {
     // updating state: 0 = initial state, 1 = updating, -1 = non-updating
     int state = 0;
     for(final Expr expr : exprs) {

@@ -40,6 +40,7 @@ import org.basex.query.func.repo.*;
 import org.basex.query.func.sql.*;
 import org.basex.query.func.strings.*;
 import org.basex.query.func.unit.*;
+import org.basex.query.func.update.*;
 import org.basex.query.func.user.*;
 import org.basex.query.func.util.*;
 import org.basex.query.func.validate.*;
@@ -814,9 +815,9 @@ public enum Function {
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize.class, "optimize(database[,all[,options]])",
       arg(STR_O, BLN_O, MAP_ZO), EMP, flag(UPD), DB_URI),
-  /** XQuery function. */
+  /** XQuery function (legacy). */
   _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), DB_URI),
-  /** XQuery function. */
+  /** XQuery function (legacy). */
   _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_PATH(DbPath.class, "path(node)", arg(NOD_O), STR_O, DB_URI),
@@ -1250,6 +1251,26 @@ public enum Function {
   /** XQuery function. */
   _UNIT_FAIL(UnitFail.class, "fail([failure])", arg(ITEM_O), ITEM_ZM, flag(NDT), UNIT_URI),
 
+  // Update Module
+
+  /** XQuery function. */
+  _UPDATE_APPLY(UpdateApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), EMP,
+      flag(Flag.POS, UPD, NDT, HOF), UPDATE_URI),
+  /** XQuery function. */
+  _UPDATE_CACHE(UpdateCache.class, "cache()", arg(), ITEM_ZO, flag(NDT), UPDATE_URI),
+  /** XQuery function. */
+  _UPDATE_FOR_EACH(UpdateForEach.class, "for-each(items,function)",
+      arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), EMP, flag(UPD, HOF), UPDATE_URI),
+  /** XQuery function. */
+  _UPDATE_FOR_EACH_PAIR(UpdateForEachPair.class, "for-each-pair(items1,items2,function)",
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()),
+      EMP, flag(UPD, HOF), UPDATE_URI),
+  /** XQuery function. */
+  _UPDATE_MAP_FOR_EACH(UpdateMapForEach.class, "map-for-each(map,function)",
+      arg(MAP_O, FuncType.get(ITEM_ZM, AAT_O, ITEM_ZM).seqType()), EMP, flag(UPD, HOF), UPDATE_URI),
+  /** XQuery function. */
+  _UPDATE_OUTPUT(UpdateOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), UPDATE_URI),
+
   // User Module
 
   /** XQuery function. */
@@ -1368,6 +1389,9 @@ public enum Function {
   /** XQuery function. */
   _XQUERY_PARSE_URI(XQueryParseUri.class, "parse-uri(uri[,options])",
       arg(STR_O, MAP_ZO), NOD_O, flag(NDT), XQUERY_URI),
+  /** XQuery function (legacy). */
+  _XQUERY_UPDATE(XQueryUpdate.class, "update(string[,bindings[,options]])",
+      arg(STR_O, MAP_ZO, MAP_ZO), EMP, flag(UPD), XQUERY_URI),
 
   // XSLT Module
 

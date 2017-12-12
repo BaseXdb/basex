@@ -1432,6 +1432,7 @@ public enum QueryError {
     /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
     /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
     /** Error type. */ UNIT(UNIT_PREFIX,         UNIT_URI),
+    /** Error type. */ UPDATE(UPDATE_PREFIX,     UPDATE_URI),
     /** Error type. */ UTIL(UTIL_PREFIX,         UTIL_URI),
     /** Error type. */ USER(USER_PREFIX,         USER_URI),
     /** Error type. */ VALIDATE(VALIDATE_PREFIX, VALIDATE_URI),

@@ -244,7 +244,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_RENAME.args(NAME, FILE, FILE + '2')), true, NAME_LIST);
     ckDBs(new XQuery(_DB_REPLACE.args(NAME, FILE, FILE + '2')), true, NAME_LIST);
     ckDBs(new XQuery(_DB_STORE.args(NAME, FILE, "foo")), true, NAME_LIST);
-    ckDBs(new XQuery(_DB_OUTPUT.args("foo")), true, NONE);
     ckDBs(new XQuery(_DB_FLUSH.args(NAME)), true, NAME_LIST);
 
     // Helper Functions
@@ -275,6 +274,11 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_INDEX_ATTRIBUTES.args(NAME, "foo", "true()")), false, NAME_LIST);
     ckDBs(new XQuery(_INDEX_ELEMENT_NAMES.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_INDEX_ATTRIBUTE_NAMES.args(NAME)), false, NAME_LIST);
+  }
+
+  /** Update module. */
+  public void update() {
+    ckDBs(new XQuery(_UPDATE_OUTPUT.args("foo")), true, NONE);
   }
 
   /** Test repository module. */

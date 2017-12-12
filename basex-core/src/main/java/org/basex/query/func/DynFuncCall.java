@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -97,7 +96,7 @@ public final class DynFuncCall extends FuncCall {
       // try to inline the function
       final XQFunctionExpr fe = (XQFunctionExpr) func;
       if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
-        checkUpdating(fe);
+        checkUp(fe, updating, sc);
         final Expr[] args = Arrays.copyOf(exprs, nargs);
         final Expr in = fe.inlineExpr(args, cc, info);
         if(in != null) return in;
@@ -180,28 +179,11 @@ public final class DynFuncCall extends FuncCall {
     final Item item = toItem(body(), qc);
     if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.type, item);
 
-    final FItem func = (FItem) item;
+    final FItem func = checkUp((FItem) item, updating, sc);
     final int nargs = exprs.length - 1;
     if(func.arity() != nargs) throw INVARITY_X_X_X.get(
         info, arguments(nargs), func.arity(), func.toErrorString());
-    checkUpdating(func);
     return func;
-  }
-
-  /**
-   * Checks if the function is updating or not.
-   * @param expr function expression
-   * @throws QueryException query exception
-   */
-  private void checkUpdating(final XQFunctionExpr expr) throws QueryException {
-    // mix updates, correct annotation: all fine
-    if(sc.mixUpdates || updating == expr.annotations().contains(Annotation.UPDATING)) return;
-
-    if(!updating) {
-      throw FUNCUP_X.get(info, expr);
-    } else if(!expr.isVacuousBody()) {
-      throw FUNCNOTUP_X.get(info, expr);
-    }
   }
 
   @Override

@@ -17,7 +17,6 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -440,11 +439,22 @@ public abstract class StandardFunc extends Arr {
    */
   protected final FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
+    return checkArity(expr, nargs, false, qc);
+  }
 
-    final FItem func = toFunc(expr, qc);
-    if(!sc.mixUpdates && func.annotations().contains(Annotation.UPDATING))
-      throw FUNCUP_X.get(info, func);
+  /**
+   * Casts and checks the function item for its arity.
+   * @param expr expression
+   * @param nargs number of arguments (arity)
+   * @param qc query context
+   * @param updating updating flag
+   * @return function item
+   * @throws QueryException query exception
+   */
+  protected final FItem checkArity(final Expr expr, final int nargs, final boolean updating,
+      final QueryContext qc) throws QueryException {
 
+    final FItem func = checkUp(toFunc(expr, qc), updating, sc);
     if(func.arity() == nargs) return func;
     final int fargs = func.arity();
     throw FUNARITY_X_X.get(info, arguments(fargs), nargs);

@@ -502,10 +502,11 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void transformFunc() {
     final String cmr = "copy $o := <x/> modify () return delete node <a/>";
-    error(cmr, UPNOT_X);
-    error("declare function local:f() { " + cmr + " }; local:f()", UPNOT_X);
-    error("declare %updating function local:f() { " + cmr + " }; local:f()", UPNOT_X);
+    query(cmr);
+    query("declare %updating function local:f() { " + cmr + " }; local:f()");
     query("declare function local:f() { copy $o := <x/> modify () return 1 }; local:f()", 1);
+
+    error("declare function local:f() { " + cmr + " }; local:f()", UPNOT_X);
   }
 
   /**
@@ -1065,11 +1066,11 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if side-effecting updates within transform expressions are rejected.
-   * Also includes db:output() and fn:put().
+   * Also includes update:output() and fn:put().
    */
   @Test
   public void dbUpdateTransform() {
-    error("copy $c := <a/> modify db:output('x') return $c", BASEX_UPDATE);
+    error("copy $c := <a/> modify update:output('x') return $c", BASEX_UPDATE);
     error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
         BASEX_UPDATE);
     error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", BASEX_UPDATE);
@@ -1080,8 +1081,8 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingHof() {
-    error("apply(db:output#1, [<b/>])", FUNCUP_X);
-    error("for-each(<a/>, db:output#1)", FUNCUP_X);
+    error("apply(update:output#1, [<b/>])", FUNCUP_X);
+    error("for-each(<a/>, update:output#1)", FUNCUP_X);
     error("for-each-pair(<a/>, <b/>, put#2)", FUNCUP_X);
   }
 
@@ -1141,12 +1142,12 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("<x/> update {} update {}", "<x/>");
     query("<x/> update {}", "<x/>");
     query("(<x/>,<y/>) update {}", "<x/>\n<y/>");
-    error("db:output('a') update ()", UPNOT_X);
+    error("update:output('a') update ()", UPNOT_X);
     error("<x/> update 1", UPMODIFY);
 
     query("<x/> transform with {}", "<x/>");
     query("<x/> transform with { insert node <y/> into . }", "<x>\n<y/>\n</x>");
-    error("db:output('a') transform with {}", UPNOT_X);
+    error("update:output('a') transform with {}", UPNOT_X);
     error("<x/> transform with { 1 }", UPMODIFY);
   }
 
@@ -1178,14 +1179,14 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingFuncItems() {
-    query("db:output(?)", "(anonymous-function)#1");
-    query("db:output#1", "db:output#1");
-    query("db:output#1, db:output#1", "db:output#1\ndb:output#1");
+    query("update:output(?)", "(anonymous-function)#1");
+    query("update:output#1", "update:output#1");
+    query("update:output#1, update:output#1", "update:output#1\nupdate:output#1");
 
     query("function() { () }()", "");
     query("declare updating function local:a() { () }; local:a#0", "local:a#0");
     query("declare function local:a() { local:a#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()", "local:a#0");
+        + "declare updating function local:b() { update:output('1') }; local:a()", "local:a#0");
     query("updating function() { delete node <a/> }()");
 
     query("let $f := %updating function() {} return updating $f()", "");
@@ -1196,15 +1197,15 @@ public final class UpdateTest extends AdvancedQueryTest {
     error("updating %updating function() { 1 }()", UPEXPECTF);
     error("%updating function() { 1 }()", UPEXPECTF);
 
-    error("db:output(?)(<a/>)", FUNCUP_X);
-    error("db:output#1(<a/>)", FUNCUP_X);
-    error("%updating function($a) { db:output($a) }(1)", FUNCUP_X);
+    error("update:output(?)(<a/>)", FUNCUP_X);
+    error("update:output#1(<a/>)", FUNCUP_X);
+    error("%updating function($a) { update:output($a) }(1)", FUNCUP_X);
     error("declare updating function local:a() { () }; local:a#0()", FUNCUP_X);
 
     query("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; updating local:a()()", 1);
+        + "declare updating function local:b() { update:output('1') }; updating local:a()()", 1);
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()()", FUNCUP_X);
+        + "declare updating function local:b() { update:output('1') }; local:a()()", FUNCUP_X);
 
     error("updating count(?)(1)", FUNCNOTUP_X);
     error("updating count#1(1)", FUNCNOTUP_X);
@@ -1249,11 +1250,12 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void window() {
-    query("for tumbling window $w in 1 start when true() return db:output($w)", 1);
-    query("for sliding window $w in 1 start when true() end when true() return db:output($w)", 1);
+    query("for tumbling window $w in 1 start when true() return update:output($w)", 1);
+    query("for sliding window $w in 1 start when true() end when true() "
+        + "return update:output($w)", 1);
     error("for tumbling window $w in 1 start when delete node <a/> return ()", UPNOT_X);
     error("for tumbling window $w in 1 start when () end when delete node <a/> return ()", UPNOT_X);
-    error("for tumbling window $w in db:output(1) start when () return ()", UPNOT_X);
+    error("for tumbling window $w in update:output(1) start when () return ()", UPNOT_X);
   }
 
   /**
@@ -1263,6 +1265,6 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void noOptimization() {
     query("<a/> update { . ! (insert node text { '1' } into .) }", "<a>1</a>");
     query("<a/> update { for $a in (1,2) return insert node text { '1' } into . }", "<a>11</a>");
-    query("(db:output('1'), db:output('2'))", "1\n2");
+    query("(update:output('1'), update:output('2'))", "1\n2");
   }
 }

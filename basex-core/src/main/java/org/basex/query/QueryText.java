@@ -286,6 +286,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] SQL_PREFIX = token("sql");
   /** XQuery prefix. */ byte[] STRINGS_PREFIX = token("strings");
   /** XQuery prefix. */ byte[] UNIT_PREFIX = token("unit");
+  /** XQuery prefix. */ byte[] UPDATE_PREFIX = token("update");
   /** XQuery prefix. */ byte[] USER_PREFIX = token("user");
   /** XQuery prefix. */ byte[] UTIL_PREFIX = token("util");
   /** XQuery prefix. */ byte[] VALIDATE_PREFIX = token("validate");
@@ -358,6 +359,7 @@ public interface QueryText {
   /** BaseX URI. */ byte[] SESSIONS_URI = token(BXMODULES_URI + "sessions");
   /** BaseX URI. */ byte[] STRINGS_URI = token(BXMODULES_URI + "strings");
   /** BaseX URI. */ byte[] UNIT_URI = token(BXMODULES_URI + "unit");
+  /** BaseX URI. */ byte[] UPDATE_URI = token(BXMODULES_URI + "update");
   /** BaseX URI. */ byte[] USER_URI = token(BXMODULES_URI + "user");
   /** BaseX URI. */ byte[] UTIL_URI = token(BXMODULES_URI + "util");
   /** BaseX URI. */ byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");

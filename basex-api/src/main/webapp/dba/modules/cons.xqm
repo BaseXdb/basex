@@ -122,7 +122,7 @@ declare %updating function cons:redirect(
   $url     as xs:string,
   $params  as map(*)
 ) as empty-sequence() {
-  db:output(web:redirect($url, $params))
+  update:output(web:redirect($url, $params))
 };
 
 (:~

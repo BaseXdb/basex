@@ -46,7 +46,7 @@ public final class Transform extends Arr {
     final Expr modify = exprs[0];
     modify.checkUp();
     if(!modify.isVacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
-    checkNoUp(exprs[1]);
+    exprs[1].checkUp();
   }
 
   @Override
@@ -93,10 +93,10 @@ public final class Transform extends Arr {
 
       updates.prepare(qc);
       updates.apply(qc);
-      return exprs[1].value(qc);
     } finally {
       qc.updates = upd;
     }
+    return exprs[1].value(qc);
   }
 
   @Override

@@ -60,8 +60,8 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
   @Test
   public void evalUpdate() {
     query(_XQUERY_EVAL_UPDATE.args("delete node <a/>"));
-    query(_XQUERY_EVAL_UPDATE.args(" '" + _DB_OUTPUT.args(1) + '\''), 1);
-    query(_XQUERY_EVAL_UPDATE.args(" '()'"));
+    query(_XQUERY_EVAL_UPDATE.args("update:output(1)"), 1);
+    query(_XQUERY_EVAL_UPDATE.args("()"));
     error(_XQUERY_EVAL_UPDATE.args("1"), XQUERY_UPDATE2);
   }
 
