@@ -139,7 +139,7 @@ public final class IOUrl extends IO {
   /**
    * Ignore Hostname verification.
    */
-  public static void ignoreHostnameVerification() {
+  public static void ignoreHostname() {
     // http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
     HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
   }
@@ -148,8 +148,7 @@ public final class IOUrl extends IO {
    * Ignore certificates.
    */
   public static void ignoreCert() {
-    
-    ignoreHostnameVerification();
+    ignoreHostname();
 
     final TrustManager[] tm = { new X509TrustManager() {
       @Override
