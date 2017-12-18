@@ -143,7 +143,7 @@ public final class IOUrl extends IO {
     // http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
     HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
   }
-  
+
   /**
    * Ignore certificates.
    */
