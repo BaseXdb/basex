@@ -62,7 +62,9 @@ public final class StaticOptions extends Options {
   public static final StringOption NONPROXYHOSTS = new StringOption("NONPROXYHOSTS", "");
   /** Ignore missing certificates. */
   public static final BooleanOption IGNORECERT = new BooleanOption("IGNORECERT", false);
-
+  /** Ignore verification of hostname in certificates. */
+  public static final BooleanOption IGNOREHOSTNAME = new BooleanOption("IGNOREHOSTNAME", false);
+  
   /** Timeout (seconds) for processing client requests; deactivated if set to 0. */
   public static final NumberOption TIMEOUT = new NumberOption("TIMEOUT", 30);
   /** Keep alive time (seconds) for clients; deactivated if set to 0. */
@@ -134,6 +136,7 @@ public final class StaticOptions extends Options {
       Prop.setSystem("http.nonProxyHosts", nph);
     }
     if(get(IGNORECERT)) IOUrl.ignoreCert();
+    if(get(IGNOREHOSTNAME)) IOUrl.ignoreHostname();
   }
 
   /**
