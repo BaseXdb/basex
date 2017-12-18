@@ -16,8 +16,8 @@ function openQuery(file) {
   request("POST", "query-open?name=" + encodeURIComponent(name),
     null,
     function(request) {
-      _editorMirror.setValue(request.responseText);
       setInfo("Query was opened.");
+      _editorMirror.setValue(request.responseText);
       _editorMirror.focus();
     },
     function(req) {
@@ -58,6 +58,8 @@ function closeQuery() {
     null,
     function(req) {
       document.getElementById("file").value = "";
+      _editorMirror.setValue("");
+      _editorMirror.focus();
       checkButtons();
     },
     function(req) {
