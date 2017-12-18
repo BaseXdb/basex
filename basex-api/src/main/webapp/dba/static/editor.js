@@ -51,6 +51,22 @@ function saveQuery() {
 };
 
 /**
+ * Closes a query file.
+ */
+function closeQuery() {
+  request("POST", "query-close?name=" + encodeURIComponent(fileName()),
+    null,
+    function(req) {
+      document.getElementById("file").value = "";
+      checkButtons();
+    },
+    function(req) {
+      setErrorFromResponse(req);
+    }
+  );
+};
+
+/**
  * Refreshes the list of available query files.
  * @param {object} request  HTTP request
  */
@@ -74,6 +90,7 @@ function refreshDataList(request) {
 function checkButtons() {
   document.getElementById("open").disabled = !queryExists();
   document.getElementById("save").disabled = fileName().length == 0;
+  document.getElementById("close").disabled = !queryExists();
 };
 
 /**

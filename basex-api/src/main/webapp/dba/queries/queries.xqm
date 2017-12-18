@@ -69,8 +69,10 @@ function dba:queries(
                   }</datalist>{ ' ' }
                   <button type='submit' name='open' id='open' disabled=''
                           onclick='openQuery()'>Open</button>{ ' ' }
-                  <button type='save' name='save' id='save' disabled=''
-                          onclick='saveQuery()'>Save</button>
+                  <button name='save' id='save' disabled=''
+                          onclick='saveQuery()'>Save</button>{ ' ' }
+                  <button name='close' id='close' disabled=''
+                          onclick='closeQuery()'>Close</button>
                 </div>
               </td>
             </tr>
