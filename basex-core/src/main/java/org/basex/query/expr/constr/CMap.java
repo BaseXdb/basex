@@ -92,7 +92,7 @@ public final class CMap extends Arr {
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       if(e != 0) tb.add(", ");
-      tb.addExt(exprs[e]).add(':').addExt(exprs[e + 1]);
+      tb.addExt(exprs[e]).add(": ").addExt(exprs[e + 1]);
     }
     return tb.add(" }").toString();
   }

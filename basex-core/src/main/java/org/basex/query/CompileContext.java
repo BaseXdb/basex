@@ -207,9 +207,11 @@ public final class CompileContext {
       final byte[] exprString = QueryError.chop(Token.token(expr.toString()), null);
       final byte[] resString = QueryError.chop(Token.token(res.toString()), null);
       if(!Token.eq(exprString, resString)) {
-        final TokenBuilder tb = new TokenBuilder(res instanceof ParseExpr ? OPTREWRITE : OPTPRE);
-        tb.add(' ').add(expr.description()).add(" to ").add(res.description()).add(": ");
-        info(tb.add(exprString).add(" -> ").add(resString).toString());
+        final TokenBuilder tb = new TokenBuilder();
+        final String exprDesc = expr.description(), resDesc = res.description();
+        tb.add(res instanceof ParseExpr ? OPTREWRITE : OPTPRE).add(' ').add(exprDesc);
+        if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
+        info(tb.add(": ").add(exprString).add(" -> ").add(resString).toString());
       }
 
       if(res instanceof ParseExpr) {
