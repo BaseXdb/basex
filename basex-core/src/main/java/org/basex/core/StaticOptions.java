@@ -136,6 +136,7 @@ public final class StaticOptions extends Options {
       Prop.setSystem("http.nonProxyHosts", nph);
     }
     if(get(IGNORECERT)) IOUrl.ignoreCert();
+    if(get(IGNORECERTHOSTNAME)) IOUrl.ignoreHostnameVerification();
   }
 
   /**
