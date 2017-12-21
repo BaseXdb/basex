@@ -1,5 +1,6 @@
 package org.basex.query.ast;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.core.cmd.*;
@@ -124,17 +125,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(true()    and <x>x</x> = 'x')", true, empty(And.class));
     check("(false()   and <x>x</x> = 'x')", false, empty(And.class));
     check("('x' = 'x' and <x>x</x> = 'x')", true, empty(And.class));
+  }
 
-    // {@link Pos} rewritings
-    final String uia = Util.className(_UTIL_ITEM_AT.clazz);
-    final String uir = Util.className(_UTIL_ITEM_RANGE.clazz);
-    final String ulf = Util.className(_UTIL_LAST_FROM.clazz);
-    check("(<a/>,<b/>)[last()]", "<b/>", count(ulf , 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", count(uia , 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>", count(uir , 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(uia , 1));
-
-    // {@link CmpR} rewritings
+  /** Checks {@link CmpR} optimizations. */
+  @Test public void cmpR() {
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", count(CmpR.class, 1));
     check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", count(CmpR.class, 1));
     check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", count(CmpR.class, 2));
@@ -142,14 +136,33 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() < -800000000]", "", exists(CmpR.class));
     check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", true, exists(CmpR.class));
 
-    // no {@link CmpR} rewritings
     check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, empty(CmpR.class));
     check("<a>5</a>[text() > 8000000000000000000]", "", empty(CmpR.class));
     check("<a>5</a>[text() < -8000000000000000000]", "", empty(CmpR.class));
     check("(1234567890.12345678)[. = 1234567890.1234567]", "", empty(CmpR.class));
     check("(123456789012345678 )[. = 123456789012345679]", "", empty(CmpR.class));
 
-    // {@link CmpSR} rewritings
+    check("1[. = 1] = 1", true, exists(CmpR.class));
+    check("1[. = 1] = 1.0", true, exists(CmpR.class));
+    check("1[. = 1] = 1e0", true, exists(CmpR.class));
+    check("1e0[. = 1] = 1", true, exists(CmpR.class));
+    check("1e0[. = 1] = 1.0", true, exists(CmpR.class));
+    check("1e0[. = 1] = 1e0", true, exists(CmpR.class));
+    check("1[. = 1] = 1 to 2", true, exists(CmpR.class));
+    check("1[. = 2] = 1 to 2", false, exists(CmpR.class));
+    check("<_>1.1</_> = 1.1", true, exists(CmpR.class));
+
+    // suppressed rewritings
+    check("random:double() = 2", false, empty(CmpR.class));
+    check("1.1[. != 0] = 1.3", false, empty(CmpR.class));
+    check("'x'[. = 'x'] = 'x'", true, empty(CmpR.class));
+    check("'x'[. != 'x'] = 1.3", false, empty(CmpR.class));
+
+    check("1.1[. = 1.1] = 1.1", true, empty(CmpR.class));
+  }
+
+  /** Checks {@link CmpSR} optimizations. */
+  @Test public void cmpSR() {
     check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", count(CmpSR.class, 1));
     check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", count(CmpSR.class, 1));
     check("<a>5</a>[text() > '1' and . < '9']", "<a>5</a>", count(CmpSR.class, 2));
@@ -223,6 +236,8 @@ public final class RewritingsTest extends QueryPlanTest {
     // check if positional predicates are rewritten to utility functions
     final String uia = Util.className(_UTIL_ITEM_AT.clazz);
     final String uir = Util.className(_UTIL_ITEM_RANGE.clazz);
+    final String ulf = Util.className(_UTIL_LAST_FROM.clazz);
+
     check("for $i in (1,2) return 'a'[$i]", "a", exists(uia));
     check("for $i in (1,2) return 'a'[position() = $i]", "a", exists(uia));
     check("for $i in (1,2) return 'a'[position() = $i to $i]", "a", exists(uia));
@@ -270,6 +285,11 @@ public final class RewritingsTest extends QueryPlanTest {
         exists(CachedFilter.class));
     check("for $i in" + seq + "return ('a','b')[position() < $i and position() < $i+1]", "a\na\na",
         exists(CachedFilter.class));
+
+    check("(<a/>,<b/>)[last()]", "<b/>", count(ulf , 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", count(uia , 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>", count(uir , 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(uia , 1));
   }
 
   /** Predicates. */

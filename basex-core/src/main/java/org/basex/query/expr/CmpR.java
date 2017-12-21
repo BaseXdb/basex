@@ -64,18 +64,20 @@ public final class CmpR extends Single {
    */
   static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
     final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-    if(cmp1.has(Flag.NDT)) return cmp;
+    final Type type1 = cmp1.seqType().type;
+    if(cmp1.has(Flag.NDT) || (type1.isNumber() ? type1 == AtomType.DEC : !type1.isUntyped())) {
+      return cmp;
+    }
 
     // range sequence: retrieve start and end value
     if(cmp2 instanceof RangeSeq) {
       final RangeSeq seq = (RangeSeq) cmp2;
       final long[] range = seq.range(false);
-      System.out.println("[1] " + cmp1.seqType() + " : " + cmp);
       return get(cmp, range[0], range[1], cc);
     }
-    // range expression uses doubles: reject decimal numbers and typed input
-    if(cmp2 instanceof ANum && (!(cmp2 instanceof Dec) || cmp1.seqType().type.isUntyped())) {
-      System.out.println("[2] " + cmp1.seqType() + " : " + cmp);
+    // numbers: do not rewrite decimals that will be compared against numbers with fractional digits
+    if(cmp2 instanceof ANum && (!(cmp2 instanceof Dec) || type1.isUntyped() ||
+        type1.instanceOf(AtomType.ITR))) {
       final double d = ((ANum) cmp2).dbl();
       return get(cmp, d, d, cc);
     }
