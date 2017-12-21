@@ -70,10 +70,12 @@ public final class CmpR extends Single {
     if(cmp2 instanceof RangeSeq) {
       final RangeSeq seq = (RangeSeq) cmp2;
       final long[] range = seq.range(false);
+      System.out.println("[1] " + cmp1.seqType() + " : " + cmp);
       return get(cmp, range[0], range[1], cc);
     }
     // range expression uses doubles: reject decimal numbers and typed input
     if(cmp2 instanceof ANum && (!(cmp2 instanceof Dec) || cmp1.seqType().type.isUntyped())) {
+      System.out.println("[2] " + cmp1.seqType() + " : " + cmp);
       final double d = ((ANum) cmp2).dbl();
       return get(cmp, d, d, cc);
     }

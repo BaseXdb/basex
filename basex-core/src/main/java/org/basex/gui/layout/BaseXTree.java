@@ -21,7 +21,7 @@ public class BaseXTree extends JTree {
     super(root);
     BaseXLayout.addInteraction(this, win);
     setLargeModel(true);
-    addMouseListener((MouseClickedListener) (e) -> {
+    addMouseListener((MouseClickedListener) e -> {
       if(!e.isShiftDown()) setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
     });
   }

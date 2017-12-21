@@ -249,7 +249,7 @@ public final class BaseXLayout {
    * @param win parent window
    */
   public static void addInteraction(final Component comp, final BaseXWindow win) {
-    comp.addMouseListener((MouseEnteredListener) (e) -> focus(comp));
+    comp.addMouseListener((MouseEnteredListener) e -> focus(comp));
 
     // check if component is a dialog
     final BaseXDialog dialog = win.dialog();

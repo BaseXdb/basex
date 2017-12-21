@@ -43,7 +43,7 @@ public final class DialogAbout extends BaseXDialog {
     final BaseXLabel url = new BaseXLabel("<html><u>" + Prop.URL + "</u></html>");
     url.setForeground(GUIConstants.BLUE);
     url.setCursor(GUIConstants.CURSORHAND);
-    url.addMouseListener((MouseClickedListener) (e) -> BaseXDialog.browse(gui, Prop.URL));
+    url.addMouseListener((MouseClickedListener) e -> BaseXDialog.browse(gui, Prop.URL));
 
     pp.add(url);
     pp.add(Box.createVerticalStrut(7));

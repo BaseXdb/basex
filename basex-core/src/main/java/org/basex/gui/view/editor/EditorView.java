@@ -207,7 +207,7 @@ public final class EditorView extends View {
       pm.show(hist, 0, hist.getHeight());
     });
     refreshHistory(null);
-    info.addMouseListener((MouseClickedListener) (e) -> markError(true));
+    info.addMouseListener((MouseClickedListener) e -> markError(true));
     stop.addActionListener(e -> {
       stop.setEnabled(false);
       go.setEnabled(false);

@@ -40,7 +40,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     // choose common parent directories of project directories
     setCellRenderer(renderer);
     addTreeWillExpandListener(this);
-    addMouseListener((MouseClickedListener) (e) -> {
+    addMouseListener((MouseClickedListener) e -> {
       if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
         new OpenCmd().execute(pv.gui);
     });

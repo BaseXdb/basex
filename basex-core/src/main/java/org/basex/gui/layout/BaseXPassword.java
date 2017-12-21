@@ -23,6 +23,6 @@ public final class BaseXPassword extends JPasswordField {
     if(dialog == null) return;
 
     addKeyListener(dialog.keys);
-    addMouseListener((MouseEnteredListener) (e) -> BaseXLayout.focus(this));
+    addMouseListener((MouseEnteredListener) e -> BaseXLayout.focus(this));
   }
 }

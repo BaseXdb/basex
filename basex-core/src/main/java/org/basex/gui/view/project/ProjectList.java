@@ -61,7 +61,7 @@ final class ProjectList extends JList<String> {
     this.view = view;
     setBorder(BaseXLayout.border(4, 4, 4, 4));
     setCellRenderer(new CellRenderer());
-    addMouseListener((MouseClickedListener) (e) -> {
+    addMouseListener((MouseClickedListener) e -> {
       if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
     });
     new BaseXPopup(this, view.gui, commands);
