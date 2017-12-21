@@ -389,9 +389,9 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(VARIABLE)) {
           // variables cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGVAR);
-          varDecl(anns.check(true));
+          varDecl(anns.check(true, true));
         } else if(wsConsumeWs(FUNCTION)) {
-          functionDecl(anns.check(false));
+          functionDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -2226,8 +2226,8 @@ public class QueryParser extends InputParser {
     skipWs();
     final int p = pos;
 
-    // parse annotations; will only be visited for XQuery 3.0 expressions
-    final AnnList anns = annotations(false).check(false);
+    // parse annotations
+    final AnnList anns = annotations(false).check(false, true);
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAREN1)) {
       if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
@@ -3004,7 +3004,7 @@ public class QueryParser extends InputParser {
     }
 
     // parse optional annotation and type name
-    final AnnList anns = annotations(false).check(false);
+    final AnnList anns = annotations(false).check(false, false);
     final QNm name = eQName(TYPEINVALID, null);
     skipWs();
     // check if name is followed by parentheses

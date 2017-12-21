@@ -75,12 +75,12 @@ public final class JsonModuleTest extends AdvancedQueryTest {
   @Test public void parseXQuery() {
     final String map = " map { 'format':'xquery' }";
     query(_JSON_PARSE.args("{}", map), "map {\n}");
-    query(_JSON_PARSE.args("{\"A\":1}", map), "map {\n\"A\": 1\n}");
+    query(_JSON_PARSE.args("{\"A\":1}", map), "map {\n\"A\": 1.0e0\n}");
     query(_JSON_PARSE.args("{\"\":null}", map), "map {\n\"\": ()\n}");
 
     query(_JSON_PARSE.args("[]", map), "[]");
     query(_JSON_PARSE.args("[\"A\"]", map), "[\"A\"]");
-    query(_JSON_PARSE.args("[1,true]", map), "[1, true()]");
+    query(_JSON_PARSE.args("[1,true]", map), "[1.0e0, true()]");
 
     query(_JSON_PARSE.args("1", map), 1);
     query(_JSON_PARSE.args("\"f\"", map), "f");

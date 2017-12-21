@@ -93,20 +93,21 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
 
   /**
    * Checks all annotations for parsing errors.
-   * @param var variable flag (triggers different error codes)
+   * @param variable variable flag (triggers different error codes)
+   * @param visible check visibility annotations
    * @return self reference
    * @throws QueryException query exception
    */
-  public AnnList check(final boolean var) throws QueryException {
+  public AnnList check(final boolean variable, final boolean visible) throws QueryException {
     boolean up = false, vis = false;
     for(final Ann ann : this) {
       final Annotation sig = ann.sig;
       if(sig == Annotation.UPDATING) {
         if(up) throw DUPLUPD.get(ann.info);
         up = true;
-      } else if(sig == Annotation.PUBLIC || sig == Annotation.PRIVATE) {
+      } else if(visible && (sig == Annotation.PUBLIC || sig == Annotation.PRIVATE)) {
         // only one visibility modifier allowed
-        if(vis) throw (var ? DUPLVARVIS : DUPLFUNVIS).get(ann.info);
+        if(vis) throw (variable ? DUPLVARVIS : DUPLFUNVIS).get(ann.info);
         vis = true;
       }
     }

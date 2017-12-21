@@ -17,7 +17,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
   /** Binary. */
   private final boolean binary;
   /** Level counter. */
-  private int count;
+  private int nested;
 
   /**
    * Constructor, specifying serialization options.
@@ -32,7 +32,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected void atomic(final Item item) throws IOException {
-    if(count == 0) {
+    if(nested == 0) {
       try {
         if(binary && item instanceof Bin) {
           try(InputStream is = item.input(null)) {
@@ -51,15 +51,15 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected void array(final Array item) throws IOException {
-    ++count;
+    ++nested;
     super.array(item);
-    --count;
+    --nested;
   }
 
   @Override
   protected void map(final Map item) throws IOException {
-    ++count;
+    ++nested;
     super.map(item);
-    --count;
+    --nested;
   }
 }

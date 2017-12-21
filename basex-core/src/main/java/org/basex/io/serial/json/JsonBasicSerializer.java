@@ -277,7 +277,8 @@ public final class JsonBasicSerializer extends JsonSerializer {
         else if(cp == '\t') tb.add('t');
         else tb.add('u').add('0').add('0').add(HEX[cp >> 4]).add(HEX[cp & 0xF]);
       } else {
-        if(cp == '"' && !bs || !escape && cp == '\\') {
+        if(cp == '/') tb.add('\\');
+        else if(cp == '"' && !bs || cp == '\\' && !escape) {
           bs = true;
           tb.add('\\');
         }

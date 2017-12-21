@@ -1,4 +1,4 @@
-  package org.basex.query;
+package org.basex.query;
 
 import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
