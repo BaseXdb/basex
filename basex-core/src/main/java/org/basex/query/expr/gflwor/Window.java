@@ -373,9 +373,9 @@ public final class Window extends Clause {
     long pos;
 
     /**
-     * Reads the next item from {@code iter} if it isn't {@code null} and sets it to
-     * {@code null} if it's drained.
-     * @return success flag
+     * Reads the next item from {@code iter} if it is not {@code null} and sets it to
+     * {@code null} if it is drained.
+     * @return next item or {@code null}
      * @throws QueryException evaluation exception
      */
     final Item next() throws QueryException {

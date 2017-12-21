@@ -87,16 +87,17 @@ public abstract class Query implements Closeable {
   public abstract void cache(boolean full) throws IOException;
 
   /**
-   * Returns the next item of the query.
-   * @return item string or {@code null}
+   * Returns the next item of the query as string.
+   * @return string or {@code null}
    * @throws IOException I/O exception
    */
   public final String next() throws IOException {
-    if(!more()) return null;
-    final byte[] item = cache.get(pos);
-    cache.set(pos++, null);
-    if(out == null) return Token.string(item);
-    out.write(item);
+    if(more()) {
+      final byte[] item = cache.get(pos);
+      cache.set(pos++, null);
+      if(out == null) return Token.string(item);
+      out.write(item);
+    }
     return null;
   }
 

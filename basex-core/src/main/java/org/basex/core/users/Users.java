@@ -153,7 +153,7 @@ public final class Users {
   /**
    * Returns user with the specified name.
    * @param name user name
-   * @return user name, or {@code null}
+   * @return user name or {@code null}
    */
   public User get(final String name) {
     synchronized(users) {

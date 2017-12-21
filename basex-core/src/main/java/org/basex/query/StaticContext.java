@@ -139,7 +139,7 @@ public final class StaticContext {
   /**
    * Returns a decimal format.
    * @param id format id
-   * @return decimal format, or {@code null}
+   * @return decimal format or {@code null}
    * @throws QueryException query exception
    */
   public DecFormatter decFormat(final byte[] id) throws QueryException {

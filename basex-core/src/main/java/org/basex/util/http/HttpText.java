@@ -123,7 +123,7 @@ public interface HttpText {
     /**
      * Returns an enum for the specified string.
      * @param key key
-     * @return enum
+     * @return enum or {@code null}
      */
     public static Request get(final String key) {
       for(final Request r : VALUES) {

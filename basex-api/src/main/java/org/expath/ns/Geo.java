@@ -642,7 +642,7 @@ public final class Geo extends QueryModule {
    * @param node xml node containing gml object(s)
    * @param type expected type (can be {@code null})
    * @param names allowed geometry types
-   * @return geometry, or {@code null}
+   * @return geometry
    * @throws QueryException query exception
    */
   private static Geometry geo(final ANode node, final String type, final QNm... names)
@@ -660,7 +660,7 @@ public final class Geo extends QueryModule {
    * Reads an element as a gml node. Returns a geometry element or {@code null}.
    * @param node xml node containing gml object(s)
    * @param names allowed geometry types
-   * @return geometry, or {@code null}
+   * @return geometry or {@code null}
    * @throws QueryException query exception
    */
   private static Geometry geo(final ANode node, final QNm... names) throws QueryException {

@@ -429,7 +429,7 @@ public final class EditorView extends View {
    * @param file query file
    * @param parse parse contents
    * @param error display error if file does not exist
-   * @return opened editor or {@code null} if file could not be opened
+   * @return opened editor, or {@code null} if file could not be opened
    */
   private EditorArea open(final IOFile file, final boolean parse, final boolean error) {
     if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
@@ -558,7 +558,7 @@ public final class EditorView extends View {
 
   /**
    * Returns the editor whose contents have been executed last.
-   * @return editor
+   * @return editor or {@code null}
    */
   private EditorArea execEditor() {
     final IOFile file = execFile;
@@ -925,7 +925,7 @@ public final class EditorView extends View {
   /**
    * Finds the editor that contains the specified file.
    * @param file file to be found
-   * @return editor
+   * @return editor or {@code null}
    */
   private EditorArea find(final IO file) {
     for(final EditorArea edit : editors()) {

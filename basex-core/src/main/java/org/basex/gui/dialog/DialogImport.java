@@ -243,7 +243,7 @@ final class DialogImport extends BaseXBack {
   /**
    * Guesses the content type of the specified input.
    * @param in input stream
-   * @return type
+   * @return type or {@code null}
    */
   private static MainParser guess(final IO in) {
     if(!in.exists() || in instanceof IOUrl) return null;

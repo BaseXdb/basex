@@ -68,7 +68,7 @@ public final class TarInputStream extends FilterInputStream {
 
   /**
    * Returns the next entry.
-   * @return entry
+   * @return entry or {@code null}
    * @throws IOException I/O exception
    */
   public TarEntry getNextEntry() throws IOException {

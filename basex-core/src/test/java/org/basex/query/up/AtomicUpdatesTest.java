@@ -553,7 +553,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Creates an {@link AtomicUpdateCache} for the given XML fragment.
    * @param doc XML fragment string
-   * @return atomic update list
+   * @return atomic update list or {@code null}
    */
   private static AtomicUpdateCache atomics(final String doc) {
     try {

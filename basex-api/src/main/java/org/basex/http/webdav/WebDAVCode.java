@@ -28,7 +28,7 @@ abstract class WebDAVCode<E> {
 
   /**
    * Runs the contained code.
-   * @return result
+   * @return result (can be {@code null})
    * @throws BadRequestException bad request exception
    * @throws NotAuthorizedException not authorized exception
    */
@@ -46,7 +46,7 @@ abstract class WebDAVCode<E> {
 
   /**
    * Runs the contained code, throwing no exception.
-   * @return result
+   * @return result (can be {@code null})
    */
   final E evalNoEx() {
     try {

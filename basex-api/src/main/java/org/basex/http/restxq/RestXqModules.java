@@ -92,10 +92,9 @@ public final class RestXqModules {
 
   /**
    * Returns the function that matches the current request or the specified error code.
-   * Returns {@code null} if no function matches.
    * @param conn HTTP connection
    * @param error error code (optional)
-   * @return function
+   * @return function, or {@code null} if no function matches
    * @throws Exception exception (including unexpected ones)
    */
   RestXqFunction find(final HTTPConnection conn, final QNm error) throws Exception {

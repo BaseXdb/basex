@@ -144,7 +144,7 @@ public final class BaseXLayout {
   /**
    * Returns a keystroke for the specified string.
    * @param cmd command
-   * @return keystroke
+   * @return keystroke or {@code null}
    */
   public static KeyStroke keyStroke(final GUICommand cmd) {
     final Object sc = cmd.shortcuts();

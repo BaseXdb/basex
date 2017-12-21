@@ -2828,7 +2828,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "CompElemConstructor" rule.
    * Parses the "ContextExpr" rule.
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr compElement() throws QueryException {
@@ -2852,7 +2852,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CompAttrConstructor" rule.
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr compAttribute() throws QueryException {
@@ -2876,7 +2876,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CompNamespaceConstructor" rule.
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
@@ -2914,7 +2914,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CompPIConstructor" rule.
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr compPI() throws QueryException {
@@ -3085,7 +3085,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "ElementTest" rule without the type name and the opening bracket.
    * @param type type
-   * @return test, or {@code null}
+   * @return test or {@code null}
    * @throws QueryException query exception
    */
   private Test kindTest(final NodeType type) throws QueryException {
@@ -3105,7 +3105,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "DocumentTest" rule without the leading keyword and its brackets.
-   * @return test
+   * @return test or {@code null}
    * @throws QueryException query exception
    */
   private Test documentTest() throws QueryException {
@@ -3121,7 +3121,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ElementTest" rule without the leading keyword and its brackets.
-   * @return test, or {@code null}
+   * @return test or {@code null}
    * @throws QueryException query exception
    */
   private NodeTest elementTest() throws QueryException {
@@ -3155,7 +3155,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "AttributeTest" rule without the leading keyword and its brackets.
-   * @return test, or {@code null}
+   * @return test or {@code null}
    * @throws QueryException query exception
    */
   private Test attributeTest() throws QueryException {
@@ -3177,7 +3177,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PITest" rule without the leading keyword and its brackets.
-   * @return test, or {@code null}
+   * @return test or {@code null}
    * @throws QueryException query exception
    */
   private Test piTest() throws QueryException {

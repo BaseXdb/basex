@@ -182,7 +182,7 @@ public abstract class ANode extends Item {
   /**
    * Recursively finds the uri for the specified prefix.
    * @param pref prefix
-   * @return uri, or {@code null}
+   * @return uri or {@code null}
    */
   public final byte[] uri(final byte[] pref) {
     final Atts at = namespaces();

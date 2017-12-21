@@ -45,7 +45,7 @@ public final class LocalVars {
    * Tries to resolve a local variable reference.
    * @param name variable name
    * @param ii input info
-   * @return variable reference (may be {@code null})
+   * @return variable reference or {@code null}
    */
   public VarRef resolveLocal(final QNm name, final InputInfo ii) {
     int l = vars.size();

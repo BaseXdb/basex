@@ -215,12 +215,12 @@ public final class ViewContainer extends BaseXBack {
   /**
    * Finds the view under the mouse position and returns it as possible
    * target for dropping the dragged view.
-   * @return view container
+   * @return view container or {@code null}
    */
   private ViewPanel getTarget() {
-    for(final ViewPanel v : views) {
-      if(v.isVisible() && new Rectangle(absLoc(v), v.getSize()).contains(sp))
-        return v;
+    for(final ViewPanel view : views) {
+      if(view.isVisible() && new Rectangle(absLoc(view), view.getSize()).contains(sp))
+        return view;
     }
     return null;
   }
@@ -375,7 +375,7 @@ public final class ViewContainer extends BaseXBack {
    * Returns the view specified by its internal name. The view names
    * are specified in the {@link GUIConstants} class.
    * @param name name of the view
-   * @return found view container
+   * @return found view container or {@code null}
    */
   private ViewPanel getView(final String name) {
     for(final ViewPanel view : views) {

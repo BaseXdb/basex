@@ -261,7 +261,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns a root value for this path.
    * @param cc compilation context
-   * @return context value, dummy item, or {@code null}
+   * @return context value, dummy item or {@code null}
    */
   private Value rootValue(final CompileContext cc) {
     // no root expression: return context value (possibly empty)
@@ -420,11 +420,10 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns all summary path nodes for the specified location step or
-   * {@code null} if nodes cannot be retrieved or are found on different levels.
+   * Returns all summary path nodes for the specified location step.
    * @param data data reference (can be {@code null})
    * @param last last step to be checked
-   * @return path nodes
+   * @return path nodes, or {@code null} if nodes cannot be retrieved
    */
   private ArrayList<PathNode> pathNodes(final Data data, final int last) {
     // skip request if no path index exists or might be out-of-date

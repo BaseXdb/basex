@@ -738,7 +738,7 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Returns the clipboard text.
-   * @return text
+   * @return text or {@code null}
    */
   private static String clip() {
     // copy selection to clipboard

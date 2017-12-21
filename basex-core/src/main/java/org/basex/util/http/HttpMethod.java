@@ -37,12 +37,12 @@ public enum HttpMethod {
   }
 
   /**
-   * Finds the specified method, or returns {@code null}.
+   * Returns an enum for the specified string.
    * @param name method name
-   * @return method
+   * @return enum or {@code null}
    */
   public static HttpMethod get(final String name) {
-    for(final HttpMethod m : values()) if(m.name().equals(name)) return m;
+    for(final HttpMethod method : values()) if(method.name().equals(name)) return method;
     return null;
   }
 }

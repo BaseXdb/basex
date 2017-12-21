@@ -98,7 +98,7 @@ public abstract class CsvConverter extends Job {
 
   /**
    * Returns the resulting byte array.
-   * @return result
+   * @return result (can be {@code null})
    * @throws IOException I/O exception
    */
   protected abstract Item finish() throws IOException;

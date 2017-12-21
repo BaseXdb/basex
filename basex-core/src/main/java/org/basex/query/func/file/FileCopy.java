@@ -24,7 +24,7 @@ public class FileCopy extends FileFn {
    * Transfers a file path, given a source and a target.
    * @param copy copy flag (no move)
    * @param qc query context
-   * @return result
+   * @return {@code null}
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */

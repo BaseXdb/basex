@@ -17,9 +17,9 @@ public final class Datas {
   private final IdentityHashMap<Data, Integer> list = new IdentityHashMap<>();
 
   /**
-   * Pins and returns a database with the specified name, or returns {@code null}.
+   * Pins and returns a database with the specified name.
    * @param name name of the database
-   * @return data reference
+   * @return data reference, or {@code null} if the database is not registered
    */
   public synchronized Data pin(final String name) {
     final Entry<Data, Integer> entry = get(name);
@@ -87,7 +87,7 @@ public final class Datas {
   /**
    * Returns an entry for the database with the specified name.
    * @param name name of the database
-   * @return entry, or {@code null}
+   * @return entry, or {@code null} if the database is not registered
    */
   private Entry<Data, Integer> get(final String name) {
     for(final Entry<Data, Integer> entry : list.entrySet()) {

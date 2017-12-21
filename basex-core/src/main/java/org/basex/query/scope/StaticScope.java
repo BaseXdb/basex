@@ -57,7 +57,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * no documentation exists. The main description is flagged with the "description" key.
    * The supported tags are defined in {@link Inspect#DOC_TAGS} (other tags will be
    * included in the map, too).
-   * @return documentation
+   * @return documentation or {@code null}
    */
   public final TokenObjMap<TokenList> doc() {
     if(doc == null) return null;

@@ -89,7 +89,7 @@ final class DOTData {
   /**
    * Returns the color for the specified string or {@code null}.
    * @param string string string
-   * @return color
+   * @return color or {@code null}
    */
   static String color(final byte[] string) {
     for(final Object[] color : COLORS) {

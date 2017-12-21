@@ -187,7 +187,7 @@ public final class User {
   /**
    * Returns the first entry for the specified database.
    * @param db database
-   * @return entry, or {@code null}
+   * @return entry, or {@code null} if no entry exists
    */
   synchronized Entry<String, Perm> find(final String db) {
     for(final Entry<String, Perm> entry : locals.entrySet()) {

@@ -37,7 +37,7 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
   /**
    * Returns an annotation with the specified signature.
    * @param sig signature to be found
-   * @return result, or {@code null}
+   * @return annotation or {@code null}
    */
   public Ann get(final Annotation sig) {
     for(final Ann ann : this) if(ann.sig == sig) return ann;

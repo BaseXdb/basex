@@ -41,8 +41,8 @@ public final class NamePool {
   }
 
   /**
-   * Returns the name of a duplicate attribute or {@code null}.
-   * @return name of duplicate attribute
+   * Returns the name of a duplicate attribute.
+   * @return name of duplicate attribute or {@code null}
    */
   QNm duplicate() {
     // if node has been deleted, overall count for duplicates must be bigger 2
@@ -55,7 +55,7 @@ public final class NamePool {
 
   /**
    * Checks if no namespace conflicts occur.
-   * @return {@code null} or conflicting namespaces
+   * @return conflicting namespaces or {@code null}
    */
   byte[][] nsOK() {
     final Atts at = new Atts();

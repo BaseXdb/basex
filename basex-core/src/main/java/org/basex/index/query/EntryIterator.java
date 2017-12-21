@@ -9,7 +9,7 @@ package org.basex.index.query;
 public interface EntryIterator {
   /**
    * Returns the next index entry.
-   * @return entry
+   * @return entry or {@code null}
    */
   byte[] next();
 

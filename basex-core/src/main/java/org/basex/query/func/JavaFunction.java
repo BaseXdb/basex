@@ -349,12 +349,11 @@ public abstract class JavaFunction extends Arr {
 
   /**
    * Converts the arguments to values that match the specified function parameters.
-   * {@code null} is returned if conversion is not possible.
    * @param pTypes parameter types
    * @param vTypes indicates which parameter types are values
    * @param args arguments
    * @param stat static flag
-   * @return converted arguments, or {@code null}
+   * @return converted arguments, or {@code null} if the conversion is not possible.
    * @throws QueryException query exception
    */
   protected static Object[] javaArgs(final Class<?>[] pTypes, final boolean[] vTypes,

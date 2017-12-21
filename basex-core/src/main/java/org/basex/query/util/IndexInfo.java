@@ -68,7 +68,7 @@ public final class IndexInfo {
    * @param input input (if {@code null}, no optimization will be possible)
    * @param type proposed index type ({@link IndexType#TOKEN}, {@link IndexType#FULLTEXT},
    * or {@code null})
-   * @return type of applicable index, or {@code null}
+   * @return type of applicable index or {@code null}
    */
   public IndexType type(final Expr input, final IndexType type) {
     pred = input;
@@ -295,7 +295,7 @@ public final class IndexInfo {
    *   <li>{@code /xml/a[text() = 'A']} -> {@code text()}</li>
    *   <li>{@code /xml/a/text()[. = 'A']} -> {@code text()}</li>
    * </ul>
-   * @return step
+   * @return step or {@code null}
    */
   private Step lastStep() {
     // expression in predicate is context value: return global step

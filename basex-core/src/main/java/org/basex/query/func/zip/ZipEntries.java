@@ -44,7 +44,7 @@ public final class ZipEntries extends ZipFn {
    * @param it iterator
    * @param par parent node
    * @param pref directory prefix
-   * @return current prefix
+   * @return current prefix or {@code null}
    */
   private static String createEntries(final Iterator<String> it, final FElem par,
       final String pref) {

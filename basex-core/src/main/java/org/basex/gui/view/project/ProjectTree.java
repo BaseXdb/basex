@@ -120,7 +120,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
   /**
    * Returns a single selected node, or {@code null} if zero or more than node is selected.
-   * @return selected node
+   * @return selected node or {@code null}
    */
   ProjectNode selectedNode() {
     final TreePath tp = selectedPath();

@@ -136,7 +136,7 @@ public final class ValueCache implements Iterable<byte[]> {
   /**
    * Returns the position list for the specified key.
    * @param key key
-   * @return id list, or {@code null}
+   * @return id list or {@code null}
    */
   IntList pos(final byte[] key) {
     return pos != null ? pos.get(keys.id(key) - 1) : null;

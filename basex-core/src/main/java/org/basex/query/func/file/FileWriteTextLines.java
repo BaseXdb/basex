@@ -33,7 +33,7 @@ public class FileWriteTextLines extends FileFn {
    * Writes items to a file.
    * @param append append flag
    * @param qc query context
-   * @return true if file was successfully written
+   * @return {@code null}
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */

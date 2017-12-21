@@ -224,7 +224,7 @@ public final class Prop {
   /**
    * Returns a system property or global option. System properties override global options.
    * @param option option
-   * @return value, or {@code null}
+   * @return value or {@code null}
    */
   public static String get(final Option<?> option) {
     return get(key(option));

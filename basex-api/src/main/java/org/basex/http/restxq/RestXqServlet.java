@@ -68,9 +68,9 @@ public final class RestXqServlet extends BaseXServlet {
   }
 
   /**
-   * Converts the specified session value to a string.
+   * Tries to convert the specified session value to a string.
    * @param value value
-   * @return return string, or {@code null}
+   * @return return string or {@code null}
    */
   private static byte[] token(final Object value) {
     if(value instanceof Str) return ((Str) value).string();

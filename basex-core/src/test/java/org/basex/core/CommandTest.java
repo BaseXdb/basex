@@ -646,7 +646,7 @@ public class CommandTest extends SandboxTest {
   /**
    * Assumes that this command is successful.
    * @param cmd command reference
-   * @return result as string
+   * @return result as string or {@code null}
    */
   static String ok(final Command cmd) {
     try {

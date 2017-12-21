@@ -332,7 +332,7 @@ public abstract class StandardFunc extends Arr {
    * Returns the item or throws an exception.
    * @param i index of argument
    * @param qc query context
-   * @return node, atomized item, or {@code null}
+   * @return node, atomized item or {@code null}
    * @throws QueryException query exception
    */
   protected final Item toNodeOrAtomItem(final int i, final QueryContext qc) throws QueryException {

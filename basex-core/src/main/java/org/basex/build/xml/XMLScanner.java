@@ -513,7 +513,7 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a PEReference. [69]
-   * @return entity, or {@code null}
+   * @return entity or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] peRef() throws IOException {
@@ -611,7 +611,7 @@ final class XMLScanner extends Job {
   /**
    * Consumes an XML name. [5]
    * @param force force parsing
-   * @return name, or {@code null}
+   * @return name or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] name(final boolean force) throws IOException {
@@ -662,7 +662,7 @@ final class XMLScanner extends Job {
    * Scans an external ID.
    * @param full full flag
    * @param root root flag
-   * @return id, or {@code null}
+   * @return id or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] externalID(final boolean full, final boolean root) throws IOException {
@@ -908,7 +908,7 @@ final class XMLScanner extends Job {
   /**
    * Scans an entity value. [9]
    * @param p pe reference flag
-   * @return value, or {@code null}
+   * @return value or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] entityValue(final boolean p) throws IOException {
@@ -953,7 +953,7 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a document encoding.
-   * @return encoding, or {@code null}
+   * @return encoding or {@code null}
    * @throws IOException I/O exception
    */
   private String encoding() throws IOException {
@@ -981,7 +981,7 @@ final class XMLScanner extends Job {
 
   /**
    * Scans a standalone flag.
-   * @return flag, or {@code null}
+   * @return flag or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] sddecl() throws IOException {

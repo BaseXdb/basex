@@ -43,7 +43,6 @@ public final class IndexCache {
     } finally {
       rwl.readLock().unlock();
     }
-
     return null;
   }
 

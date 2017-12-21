@@ -121,7 +121,7 @@ public final class Bln extends Item {
    * Converts the specified item to a boolean.
    * @param item item to be converted
    * @param info input info
-   * @return resulting boolean value, or {@code null}
+   * @return resulting boolean value
    * @throws QueryException query exception
    */
   public static boolean parse(final Item item, final InputInfo info) throws QueryException {

@@ -44,10 +44,9 @@ final class NodeUpdates {
   }
 
   /**
-   * Finds the update primitive with the given type. In case there is no
-   * primitive of the given type, null is returned.
+   * Finds the update primitive with the given type.
    * @param type update type
-   * @return primitive of type t, null if not found
+   * @return primitive of type or {code null}
    */
   private NodeUpdate find(final UpdateType type) {
     for(final NodeUpdate update : updates) {

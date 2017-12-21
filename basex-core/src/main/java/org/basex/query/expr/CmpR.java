@@ -224,7 +224,7 @@ public final class CmpR extends Single {
    * Retrieves the statistics key for the element/attribute name.
    * @param ii index info
    * @param type index type
-   * @return key
+   * @return key, or {@code null} if statistics are not available
    */
   private Stats key(final IndexInfo ii, final IndexType type) {
     // statistics are not up-to-date

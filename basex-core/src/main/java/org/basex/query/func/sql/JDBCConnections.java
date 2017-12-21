@@ -48,7 +48,7 @@ public final class JDBCConnections implements QueryResource {
   /**
    * Returns connection or prepared statement with the given id.
    * @param id id
-   * @return connection, prepared statement, or {@code null}
+   * @return connection, prepared statement or {@code null}
    */
   synchronized AutoCloseable get(final Uri id) {
     return conns.get(id.string());

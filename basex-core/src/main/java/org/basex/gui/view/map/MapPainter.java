@@ -34,7 +34,7 @@ abstract class MapPainter {
    * @param rects rectangles to be drawn
    * @param ri current position
    * @param data data reference
-   * @return next color mark
+   * @return next color mark or {@code null}
    */
   final Color color(final MapRects rects, final int ri, final Data data) {
     // find marked node

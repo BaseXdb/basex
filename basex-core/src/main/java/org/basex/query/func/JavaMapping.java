@@ -108,7 +108,7 @@ public final class JavaMapping {
    * Returns an appropriate XQuery type for the specified Java class.
    * @param clazz Java class
    * @param atomic only check atomic mappings
-   * @return type, or {@code null}
+   * @return type or {@code null}
    */
   static Type type(final Class<?> clazz, final boolean atomic) {
     Type type = ATOMIC_MAP.get(clazz);
@@ -122,7 +122,7 @@ public final class JavaMapping {
   /**
    * Returns an appropriate XQuery node type for the specified Java class.
    * @param clazz Java class
-   * @return type, or {@code null}
+   * @return type or {@code null}
    */
   private static Type nodeType(final Class<?> clazz) {
     for(final Pair<Class<?>, Type> pair : NODES) {

@@ -313,7 +313,7 @@ public final class Functions extends TokenSet {
    * @param qc query context
    * @param sc static context
    * @param info input info
-   * @return function instance, or {@code null}
+   * @return function instance, {@code null} otherwise
    * @throws QueryException query exception
    */
   public static TypedFunc get(final QNm name, final Expr[] args, final QueryContext qc,

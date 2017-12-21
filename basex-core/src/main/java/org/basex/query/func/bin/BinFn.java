@@ -80,7 +80,7 @@ abstract class BinFn extends StandardFunc {
    * Returns bitwise operations.
    * @param op bit operation
    * @param qc query context
-   * @return result
+   * @return result or {@code null}
    * @throws QueryException query exception
    */
   final B64 bit(final Bit op, final QueryContext qc) throws QueryException {
@@ -106,7 +106,7 @@ abstract class BinFn extends StandardFunc {
    * Pads an array.
    * @param qc query context
    * @param left left/right flag
-   * @return result
+   * @return result or {@code null}
    * @throws QueryException query exception
    */
   final B64 pad(final QueryContext qc, final boolean left) throws QueryException {

@@ -405,7 +405,7 @@ public final class Token {
   /**
    * Tries to create a byte array representation from a floating point.
    * @param value value to be converted
-   * @return byte array, or {@code null}
+   * @return byte array or {@code null}
    */
   private static byte[] tok(final double value) {
     if(value == Double.POSITIVE_INFINITY) return INF;

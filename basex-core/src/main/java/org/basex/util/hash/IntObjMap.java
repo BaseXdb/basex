@@ -73,7 +73,7 @@ public final class IntObjMap<E> extends IntSet {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(Util.className(this)).add('[');
     for(int i = 1; i < size; i++) {
-      tb.add(Integer.toString(keys[i])).add(": ").add(get(keys[i]).toString());
+      tb.add(Integer.toString(keys[i])).add(": ").addExt(get(keys[i]));
       if(i < size - 1) tb.add(",\n\t");
     }
     return tb.add(']').toString();

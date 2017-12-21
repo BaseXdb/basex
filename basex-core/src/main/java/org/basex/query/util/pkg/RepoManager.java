@@ -324,7 +324,7 @@ public final class RepoManager {
   /**
    * Checks if a package participates in a dependency.
    * @param pkg package
-   * @return package depending on the current one, or {@code null}
+   * @return package (that depends on the current one) or {@code null}
    * @throws QueryException query exception
    */
   private String dependency(final Pkg pkg) throws QueryException {

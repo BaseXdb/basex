@@ -293,7 +293,7 @@ public final class Util {
    * Returns the error message of a process.
    * @param process process
    * @param timeout time out in milliseconds
-   * @return error message, or {@code null}
+   * @return error message or {@code null}
    */
   public static String error(final Process process, final int timeout) {
     final int wait = 200, to = Math.max(timeout / wait, 1);

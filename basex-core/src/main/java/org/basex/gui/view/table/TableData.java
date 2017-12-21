@@ -308,7 +308,7 @@ final class TableData {
 
   /**
    * Builds and returns an XQuery for the filtered terms.
-   * @return query
+   * @return query, or {@code null} if the query is identical to the last one
    */
   String find() {
     final Data data = ctx.data();

@@ -93,7 +93,7 @@ public abstract class BaseXServlet extends HttpServlet {
   /**
    * Returns a servlet-specific user name. By default, it returns the name of the database user.
    * @param http HTTP connection
-   * @return user name, or {@code null}
+   * @return user name or {@code null}
    */
   public String username(final HTTPConnection http) {
     return http.context.user().name();

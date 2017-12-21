@@ -187,7 +187,7 @@ public abstract class Filter extends Preds {
    * Checks if the specified filter input can be rewritten to the root or an axis path.
    * @param root root expression
    * @param exprs predicate expressions
-   * @return filter expression, or {@code null}
+   * @return filter expression or {@code null}
    */
   private static Expr simplify(final Expr root, final Expr... exprs) {
     // no predicates: return root

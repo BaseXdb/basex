@@ -246,7 +246,7 @@ public final class QueryResources {
   /**
    * Returns the document path of a textual resource and its encoding. Only required for test APIs.
    * @param uri resource uri
-   * @return path and encoding, or {@code null}
+   * @return path and encoding or {@code null}
    */
   public String[] text(final String uri) {
     return texts == null ? null : texts.get(uri);

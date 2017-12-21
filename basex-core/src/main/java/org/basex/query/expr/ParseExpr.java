@@ -546,7 +546,7 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified item is a Base64 item.
    * @param empty allow empty result
    * @param item item
-   * @return Bas64 item, or {@code null} if the item is an empty sequences and {@code empty} is true
+   * @return Bas64 item, or {@code null} if the item is {@code null} and {@code empty} is true
    * @throws QueryException query exception
    */
   protected final B64 toB64(final Item item, final boolean empty) throws QueryException {
@@ -585,7 +585,7 @@ public abstract class ParseExpr extends Expr {
    * Returns the item or throws an exception.
    * @param item item
    * @param empty allow empty result
-   * @return QNm item
+   * @return QName, or {@code null} if the item is {@code null} and {@code empty} is true
    * @throws QueryException query exception
    */
   protected final QNm toQNm(final Item item, final boolean empty) throws QueryException {

@@ -285,9 +285,9 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Initializes the renderer.
-   * @param g graphics reference, or {@code null}
+   * @param g graphics reference (can be {@code null})
    * @param start start at beginning of text or at current scroll position
-   * @return iterator, or {@code null} if graphics reference is invalid
+   * @return text iterator
    */
   private TextIterator init(final Graphics g, final boolean start) {
     syntax.init(GUIConstants.TEXT);

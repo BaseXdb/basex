@@ -44,9 +44,9 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
   }
 
   /**
-   * Returns an enumeration value for the specified string or {@code null}.
+   * Returns an enum for the specified string.
    * @param string value
-   * @return enumeration
+   * @return enum or {@code null}
    */
   public V get(final String string) {
     for(final V v : values()) if(v.toString().equals(string)) return v;

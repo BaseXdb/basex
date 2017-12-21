@@ -272,10 +272,10 @@ public final class MetaData {
   }
 
   /**
-   * Returns the specified binary file or {@code null} if the resource path cannot be resolved
-   * (e.g. if it points to a parent directory).
+   * Returns a reference to the specified binary file.
    * @param pth internal file path
-   * @return binary directory
+   * @return binary directory, or {@code null} if the resource path cannot be resolved
+   * (e.g. if it points to a parent directory).
    */
   public IOFile binary(final String pth) {
     if(path == null) return null;

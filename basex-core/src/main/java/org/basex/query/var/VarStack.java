@@ -29,9 +29,9 @@ public final class VarStack extends ObjectList<Var, VarStack> {
 
   /**
    * Returns a variable with the specified name; should only be
-   * used while parsing because it ignores ids of variables.
+   * used while parsing, because it ignores the ids of variables.
    * @param name variable name
-   * @return variable
+   * @return variable or {@code null}
    */
   public Var get(final QNm name) {
     for(int i = size; i-- > 0;) if(name.eq(list[i].name)) return list[i];

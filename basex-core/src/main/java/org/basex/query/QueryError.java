@@ -1529,7 +1529,7 @@ public enum QueryError {
    * @param name error name
    * @param msg error message
    * @param info input info
-   * @return exception or null
+   * @return exception or {@code null}
    */
   public static QueryException get(final String name, final String msg, final InputInfo info) {
     for(final QueryError err : VALUES) {

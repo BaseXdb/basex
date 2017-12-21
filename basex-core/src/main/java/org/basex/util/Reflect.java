@@ -38,9 +38,9 @@ public final class Reflect {
   }
 
   /**
-   * Caches and returns a reference to the specified class or {@code null}.
+   * Caches and returns a reference to the specified class.
    * @param name fully qualified class name
-   * @return reference or {@code null} if the class is not found
+   * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String name) {
     try {
@@ -97,9 +97,9 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class reference to one of the specified classes or {@code null}.
+   * Returns a class reference to one of the specified classes.
    * @param names fully qualified class names
-   * @return reference or {@code null} if the class is not found
+   * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String[] names) {
     for(final String n : names) {
@@ -167,10 +167,10 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class instance, or throws a runtime exception.
+   * Returns a class instance.
    * @param clazz class
    * @param <O> type
-   * @return instance
+   * @return instance or {@code null}
    */
   public static <O> O get(final Class<O> clazz) {
     try {
@@ -186,7 +186,7 @@ public final class Reflect {
    * @param clazz class
    * @param args arguments
    * @param <O> class type
-   * @return instance
+   * @return instance or {@code null}
    */
   public static <O> O get(final Constructor<O> clazz, final Object... args) {
     try {
@@ -202,7 +202,7 @@ public final class Reflect {
    * @param method method to run
    * @param object object ({@code null} for static methods)
    * @param args arguments
-   * @return result of method call
+   * @return result of method call or {@code null}
    */
   public static Object invoke(final Method method, final Object object, final Object... args) {
     try {

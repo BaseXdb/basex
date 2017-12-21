@@ -287,8 +287,8 @@ public final class SeqType {
    * @param qc query context
    * @param sc static context
    * @param info input info
-   * @param error raise error, or return {@code null}
-   * @return cast value
+   * @param error raise error (return {@code null} otherwise)
+   * @return cast value or {@code null}
    * @throws QueryException query exception
    */
   public Value cast(final Item item, final QueryContext qc, final StaticContext sc,

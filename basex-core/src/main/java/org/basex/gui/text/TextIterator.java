@@ -228,7 +228,7 @@ final class TextIterator {
 
   /**
    * Retrieves the current hyperlink.
-   * @return link string, or {@code null}
+   * @return link string or {@code null}
    */
   String link() {
     if(!link) return null;

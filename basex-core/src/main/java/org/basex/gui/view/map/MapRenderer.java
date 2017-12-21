@@ -485,7 +485,7 @@ final class MapRenderer {
    * @param y mouseY
    * @param w width of map view
    * @param g Graphics
-   * @return token list
+   * @return token list or {@code null}
    */
   static TokenList calculateToolTip(final MapRect r, final int[][] data, final int x, final int y,
       final int w, final Graphics g) {

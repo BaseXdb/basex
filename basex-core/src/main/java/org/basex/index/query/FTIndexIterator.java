@@ -25,7 +25,7 @@ public abstract class FTIndexIterator implements IndexIterator {
 
   /**
    * Returns the next match.
-   * @return next match
+   * @return next match (can be {@code null})
    */
   public abstract FTMatches matches();
 

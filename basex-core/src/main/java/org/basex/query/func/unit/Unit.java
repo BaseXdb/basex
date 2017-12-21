@@ -196,7 +196,7 @@ final class Unit {
    * Returns an annotation argument as QName.
    * @param sf static function
    * @param ann annotation
-   * @return QName
+   * @return QName or {@code null}
    * @throws QueryException query exception
    */
   private static QNm name(final StaticFunc sf, final Ann ann) throws QueryException {
@@ -300,7 +300,7 @@ final class Unit {
    * Returns the specified function from the given query context.
    * @param qctx query context
    * @param func function to be found
-   * @return function
+   * @return function or {@code null}
    */
   private static StaticFunc find(final QueryContext qctx, final StaticFunc func) {
     for(final StaticFunc sf : qctx.funcs.funcs()) {

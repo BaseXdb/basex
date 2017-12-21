@@ -70,7 +70,7 @@ public final class PkgValidator {
   /**
    * Checks if a secondary package, i.e. package involved in a dependency is already installed.
    * @param dep dependency
-   * @return result, or {@code null}
+   * @return result or {@code null}
    */
   String depPkg(final PkgDep dep) {
     // get installed versions of secondary package
@@ -110,7 +110,7 @@ public final class PkgValidator {
    * @param dep dependency
    * @param versions current versions - either currently installed versions
    * for a package or current version of BaseX
-   * @return available appropriate version
+   * @return available appropriate version or {@code null}
    */
   private static String availVersion(final PkgDep dep, final HashSet<String> versions) {
     if(versions.isEmpty()) return null;

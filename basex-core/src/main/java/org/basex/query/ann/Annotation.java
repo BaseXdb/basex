@@ -196,7 +196,7 @@ public enum Annotation {
   /**
    * Returns an annotation with the specified name.
    * @param name name
-   * @return annotation, or {@code null}
+   * @return annotation or {@code null}
    */
   public static Annotation get(final QNm name) {
     return MAP.get(name.id());

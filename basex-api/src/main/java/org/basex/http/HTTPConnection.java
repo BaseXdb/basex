@@ -304,7 +304,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Normalizes the specified path.
-   * @param path path, or {@code null}
+   * @param path path
    * @return normalized path
    */
   private static String normalize(final String path) {

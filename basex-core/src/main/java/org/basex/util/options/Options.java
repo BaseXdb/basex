@@ -882,9 +882,9 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns an option name similar to the specified string or {@code null}.
+   * Returns an option name similar to the specified string.
    * @param name name to be found
-   * @return similar name
+   * @return similar name or {@code null}
    */
   private String similar(final String name) {
     final byte[] nm = token(name);

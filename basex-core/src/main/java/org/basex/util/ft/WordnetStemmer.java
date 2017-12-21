@@ -46,7 +46,7 @@ final class WordnetStemmer extends Stemmer {
   /**
    * Create new instance of the WordNet dictionary.
    * @param dct dictionary class
-   * @return new instance of the WordNet dictionary
+   * @return new instance of the WordNet dictionary or {@code null}
    */
   private static Object newDict(final Class<?> dct) {
     try {

@@ -497,7 +497,7 @@ public final class AtomicUpdateCache {
    * Returns atomic text node merging operations if necessary for the given node PRE and
    * its right neighbor PRE+1.
    * @param pre node PRE value
-   * @return list of text merging operations
+   * @return list of text merging operations or {@code null}
    */
   private Delete mergeTextNodes(final int pre) {
     final int s = data.meta.size;

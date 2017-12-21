@@ -266,7 +266,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     /**
      * Returns the middle tree as a buffer node.
-     * @return middle buffer node
+     * @return middle buffer node (can be {@code null})
      */
     private BufferNode<Node<N, E>, E> midBuffer() {
       if(middle == null) return null;
