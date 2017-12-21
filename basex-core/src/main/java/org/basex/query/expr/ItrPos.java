@@ -68,9 +68,7 @@ public final class ItrPos extends Simple {
    */
   public static Expr get(final CmpR expr) {
     final double min = expr.min, max = expr.max;
-    final long mn = (long) (expr.mni ? (long) Math.ceil(min) : Math.floor(min + 1));
-    final long mx = (long) (expr.mxi ? (long) Math.floor(max) : Math.ceil(max - 1));
-    return get(mn, mx, expr.info);
+    return get((long) Math.ceil(min), (long) Math.floor(max), expr.info);
   }
 
   /**

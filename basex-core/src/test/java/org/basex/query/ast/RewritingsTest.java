@@ -144,8 +144,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // no {@link CmpR} rewritings
     check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, empty(CmpR.class));
-    check("<a>5</a>[text() > 8000000000]", "", empty(CmpR.class));
-    check("<a>5</a>[text() < -8000000000]", "", empty(CmpR.class));
+    check("<a>5</a>[text() > 8000000000000000000]", "", empty(CmpR.class));
+    check("<a>5</a>[text() < -8000000000000000000]", "", empty(CmpR.class));
     check("(1234567890.12345678)[. = 1234567890.1234567]", "", empty(CmpR.class));
     check("(123456789012345678 )[. = 123456789012345679]", "", empty(CmpR.class));
 

@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static java.lang.Double.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
@@ -30,16 +31,13 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CmpR extends Single {
+  /** Maximum integer value that can be represented losslessly as double value. */
+  private static final double MAX_INTEGER = 1L << 53;
+
   /** Minimum. */
   final double min;
-  /** Include minimum value. */
-  final boolean mni;
   /** Maximum. */
   final double max;
-  /** Include maximum value. */
-  final boolean mxi;
-  /** Check for equality. */
-  private final boolean eq;
 
   /** Evaluation flag: atomic evaluation. */
   private boolean atomic;
@@ -48,20 +46,13 @@ public final class CmpR extends Single {
    * Constructor.
    * @param expr (compiled) expression
    * @param min minimum value
-   * @param mni include minimum value
    * @param max maximum value
-   * @param mxi include maximum value
    * @param info input info
    */
-  private CmpR(final Expr expr, final double min, final boolean mni, final double max,
-      final boolean mxi, final InputInfo info) {
-
+  private CmpR(final Expr expr, final double min, final double max, final InputInfo info) {
     super(info, expr, SeqType.BLN_O);
     this.min = min;
-    this.mni = mni;
     this.max = max;
-    this.mxi = mxi;
-    eq = min == max;
   }
 
   /**
@@ -75,7 +66,7 @@ public final class CmpR extends Single {
     final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
     if(cmp1.has(Flag.NDT)) return cmp;
 
-    // range sequence: retrieve start and end value, switch them if order is descending
+    // range sequence: retrieve start and end value
     if(cmp2 instanceof RangeSeq) {
       final RangeSeq seq = (RangeSeq) cmp2;
       final long[] range = seq.range(false);
@@ -106,16 +97,17 @@ public final class CmpR extends Single {
      * - numbers that are too large or small to be safely compared as doubles */
     final Expr cmp1 = cmp.exprs[0];
     if(!cmp1.seqType().type.isNumberOrUntyped() ||
-        min < Integer.MIN_VALUE || min > Integer.MAX_VALUE ||
-        max < Integer.MIN_VALUE || max > Integer.MAX_VALUE) return cmp;
+        min < -MAX_INTEGER || min > MAX_INTEGER ||
+        max < -MAX_INTEGER || max > MAX_INTEGER) return cmp;
 
     ParseExpr expr = null;
+    final InputInfo ii = cmp.info;
     switch(cmp.op) {
-      case EQ: expr = new CmpR(cmp1, min, true, max, true, cmp.info); break;
-      case GE: expr = new CmpR(cmp1, min, true, Double.POSITIVE_INFINITY, true, cmp.info); break;
-      case GT: expr = new CmpR(cmp1, min, false, Double.POSITIVE_INFINITY, true, cmp.info); break;
-      case LE: expr = new CmpR(cmp1, Double.NEGATIVE_INFINITY, true, max, true, cmp.info); break;
-      case LT: expr = new CmpR(cmp1, Double.NEGATIVE_INFINITY, true, max, false, cmp.info); break;
+      case EQ: expr = new CmpR(cmp1, min, max, ii); break;
+      case GE: expr = new CmpR(cmp1, min, POSITIVE_INFINITY, ii); break;
+      case GT: expr = new CmpR(cmp1, Math.nextUp(min), POSITIVE_INFINITY, ii); break;
+      case LE: expr = new CmpR(cmp1, NEGATIVE_INFINITY, max, ii); break;
+      case LT: expr = new CmpR(cmp1, NEGATIVE_INFINITY, Math.nextDown(max), ii); break;
       default:
     }
     return expr != null ? expr.optimize(cc) : cmp;
@@ -138,18 +130,33 @@ public final class CmpR extends Single {
     // atomic evaluation of arguments (faster)
     if(atomic) {
       final Item item = expr.item(qc, info);
-      if(item == null) return Bln.FALSE;
-      final double d = item.dbl(info);
-      return Bln.get(eq ? d == min : (mni ? d >= min : d > min) && (mxi ? d <= max : d < max));
+      return Bln.get(item != null && inRange(item.dbl(info)));
+    }
+
+    // pre-evaluate ranges
+    if(expr instanceof Range || expr instanceof RangeSeq) {
+      final Value value = expr.value(qc);
+      if(value.isEmpty()) return Bln.FALSE;
+      if(value instanceof Item) return Bln.get(inRange(((Item) value).dbl(info)));
+      final long[] range = ((RangeSeq) value).range(false);
+      return Bln.get(range[1] >= min && range[0] <= max);
     }
 
     // iterative evaluation
     final Iter iter = expr.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
-      final double d = item.dbl(info);
-      if((mni ? d >= min : d > min) && (mxi ? d <= max : d < max)) return Bln.TRUE;
+      if(inRange(item.dbl(info))) return Bln.TRUE;
     }
     return Bln.FALSE;
+  }
+
+  /**
+   * Checks if the specified value is within the allowed range.
+   * @param value double value
+   * @return result of check
+   */
+  private boolean inRange(final double value) {
+    return value >= min && value <= max;
   }
 
   /**
@@ -166,7 +173,7 @@ public final class CmpR extends Single {
     if(mn > mx) return Bln.FALSE;
 
     // do not rewrite checks for identical values (will be evaluated faster by index)
-    return new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);
+    return new CmpR(c.expr, mn, mx, info);
   }
 
   @Override
@@ -176,7 +183,6 @@ public final class CmpR extends Single {
     // sequential main memory scan is usually faster than range index access
     if(data == null ? !ii.enforce() : data.inMemory()) return false;
 
-    if(!mni || !mxi) return false;
     final IndexType type = ii.type(expr, null);
     if(type == null) return false;
 
@@ -201,11 +207,11 @@ public final class CmpR extends Single {
     if(mnl != mxl || mnl == -1) return false;
 
     // don't use index if min/max values are infinite
-    if(min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY ||
+    if(min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ||
         token((int) nr.min).length != token((int) nr.max).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
+    tb.add('[').addExt(min).add(',').addExt(max).add(']');
     ii.create(new RangeAccess(info, nr, ii.db), true, info, Util.info(OPTINDEX_X_X, "range", tb));
     return true;
   }
@@ -244,7 +250,7 @@ public final class CmpR extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final CmpR cmp = new CmpR(expr.copy(cc, vm), min, mni, max, mxi, info);
+    final CmpR cmp = new CmpR(expr.copy(cc, vm), min, max, info);
     cmp.atomic = atomic;
     return cmp;
   }
@@ -254,7 +260,7 @@ public final class CmpR extends Single {
     if(this == obj) return true;
     if(!(obj instanceof CmpR)) return false;
     final CmpR c = (CmpR) obj;
-    return min == c.min && mni == c.mni && max == c.max && mxi && c.mxi && super.equals(obj);
+    return min == c.min && max == c.max && super.equals(obj);
   }
 
   @Override
@@ -273,9 +279,9 @@ public final class CmpR extends Single {
     if(min == max) {
       sb.append(expr).append(" = ").append(min);
     } else {
-      if(min != Double.NEGATIVE_INFINITY) sb.append(min).append(mni ? " <= " : " < ");
+      if(min != NEGATIVE_INFINITY) sb.append(min).append(" <= ");
       sb.append(expr);
-      if(max != Double.POSITIVE_INFINITY) sb.append(mxi ? " <= " : " < ").append(max);
+      if(max != POSITIVE_INFINITY) sb.append(" <= ").append(max);
     }
     return sb.append(PAREN2).toString();
   }
