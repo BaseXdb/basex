@@ -1183,6 +1183,8 @@ public enum QueryError {
   /** Error code. */
   BINDXMLURI_X_X(XQST, 70, "'%' can only be bound to '%'."),
   /** Error code. */
+  ILLEGALEQNAME_X(XQST, 70, "Illegal namespace: %."),
+  /** Error code. */
   DUPLNSDEF_X(XQST, 71, "Duplicate declaration of prefix '%'."),
   /** Error code. */
   IMPLVAL(XQST, 75, "Validation not supported."),

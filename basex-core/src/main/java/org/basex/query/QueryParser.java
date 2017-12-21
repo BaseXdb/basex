@@ -1788,7 +1788,7 @@ public class QueryParser extends InputParser {
 
     final ArrayList<Pragma> el = new ArrayList<>();
     do {
-      final QNm name = eQName(QNAME_X, URICHECK);
+      final QNm name = eQName(QNAME_X, null);
       char ch = curr();
       if(ch != '#' && !ws(ch)) throw error(PRAGMAINV);
       tok.reset();
@@ -2366,12 +2366,18 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] bracedURILiteral() throws QueryException {
+    int p = pos;
     tok.reset();
     while(!consume('}')) {
-      if(!more()) throw error(WRONGCHAR_X_X, CURLY2, found());
+      if(!more() || curr() == '{') throw error(WRONGCHAR_X_X, CURLY2, found());
       entity(tok);
     }
-    return tok.toArray();
+    final byte[] ns = normalize(tok.toArray());
+    if(eq(ns, XMLNS_URI)) {
+      pos = p;
+      throw error(QueryError.ILLEGALEQNAME_X, info(), ns);
+    }
+    return ns;
   }
 
   /**
