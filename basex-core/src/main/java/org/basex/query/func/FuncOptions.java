@@ -171,7 +171,7 @@ public final class FuncOptions {
       } else {
         final byte[] vl = elem.nsScope(null).value(substring(name, 0, i));
         if(vl != null) {
-          tb.add("Q{").add(vl).add('}').add(substring(name, i + 1));
+          tb.add(QNm.eqName(vl, substring(name, i + 1)));
         } else {
           tb.add(name);
         }

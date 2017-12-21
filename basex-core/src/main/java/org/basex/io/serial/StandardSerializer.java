@@ -6,9 +6,11 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.text.*;
-import java.text.Normalizer.Form;
+import java.text.Normalizer.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -108,7 +110,10 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   protected void function(final FItem item) throws IOException {
-    throw SERFUNC_X.getIO(item.seqType());
+    if(!(item instanceof Array)) throw SERFUNC_X.getIO(item.seqType());
+    for(final Value value : ((Array) item).members()) {
+      for(final Item it : value) serialize(it);
+    }
   }
 
   @Override

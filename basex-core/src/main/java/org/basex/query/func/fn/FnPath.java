@@ -26,11 +26,7 @@ public final class FnPath extends ContextFn {
       int i = 1;
       final TokenBuilder tb = new TokenBuilder();
       if(node.type == NodeType.ATT) {
-        tb.add('@');
-        final QNm qnm = node.qname();
-        final byte[] uri = qnm.uri();
-        if(uri.length != 0) tb.add("Q{").add(qnm.uri()).add('}');
-        tb.add(qnm.local());
+        tb.add('@').add(node.qname().id());
       } else if(node.type == NodeType.ELM) {
         final QNm qnm = node.qname();
         final BasicNodeIter iter = node.precedingSibling();
@@ -39,8 +35,7 @@ public final class FnPath extends ContextFn {
           final QNm q = fs.qname();
           if(q != null && q.eq(qnm)) i++;
         }
-        tb.add("Q{").add(qnm.uri()).add('}').add(qnm.local());
-        tb.add('[').add(Integer.toString(i)).add(']');
+        tb.add(qnm.eqName()).add('[').add(Integer.toString(i)).add(']');
       } else if(node.type == NodeType.COM || node.type == NodeType.TXT) {
         final BasicNodeIter iter = node.precedingSibling();
         for(ANode fs; (fs = iter.next()) != null;) {
@@ -64,7 +59,8 @@ public final class FnPath extends ContextFn {
 
     final TokenBuilder tb = new TokenBuilder();
     // add root function
-    if(node.type != NodeType.DOC) tb.add("Q{").add(QueryText.FN_URI).add("}root()");
+    if(node.type != NodeType.DOC)
+      tb.add(QNm.eqName(QueryText.FN_URI, Token.token("root()")));
     // add all steps in reverse order
     for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));
     return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());

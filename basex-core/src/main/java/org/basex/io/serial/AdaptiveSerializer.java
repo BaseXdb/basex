@@ -3,6 +3,7 @@ package org.basex.io.serial;
 import static org.basex.io.serial.SerializerOptions.*;
 
 import java.io.*;
+import java.text.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -20,6 +21,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class AdaptiveSerializer extends OutputSerializer {
+  /** Format for double values. */
+  private static final String DOUBLES = "0.0##########################E0";
   /** Original output stream. */
   private final OutputStream os;
   /** XML serializer (lazy instantiation). */
@@ -81,14 +84,19 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void atomic(final Item item) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     final Type type = item.type;
-    if(type == AtomType.BLN || type == AtomType.STR || type == AtomType.ATM ||
-       type == AtomType.ITR || type == AtomType.DEC || type == AtomType.DBL ||
-       type == AtomType.QNM) {
+    if(type.instanceOf(AtomType.STR) || type.instanceOf(AtomType.DEC) ||
+       type == AtomType.BLN || type == AtomType.ATM || type == AtomType.URI) {
       tb.add(item.toString());
+    } else if(type == AtomType.QNM) {
+      tb.add(((QNm) item).eqName());
+    } else if(type == AtomType.DBL) {
+      final double d = ((Dbl) item).dbl();
+      if(Double.isInfinite(d) || Double.isNaN(d)) tb.add(((Dbl) item).string());
+      else tb.add(new DecimalFormat(DOUBLES, Token.LOC).format(d).toLowerCase());
     } else {
+      final Item it = type.instanceOf(AtomType.DUR) ? new Dur((Dur) item) : item;
       try {
-        tb.add(type.toString());
-        tb.add('(').add(Item.toString(item.string(null), true, false)).add(')');
+        tb.addExt(it.type).add('(').add(Item.toString(it.string(null), true, false)).add(')');
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }

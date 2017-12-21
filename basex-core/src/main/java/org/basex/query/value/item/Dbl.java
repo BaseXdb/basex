@@ -56,7 +56,7 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  protected byte[] string() {
+  public byte[] string() {
     return Token.token(value);
   }
 

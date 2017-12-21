@@ -348,16 +348,16 @@ public final class Token {
   }
 
   /** US charset. */
-  private static final DecimalFormatSymbols LOC =
+  public static final DecimalFormatSymbols LOC =
     new DecimalFormatSymbols(Locale.US);
   /** Scientific double output. */
-  private static final DecimalFormat SD = new DecimalFormat("0.0##################E0", LOC);
+  public static final DecimalFormat SD = new DecimalFormat("0.0##################E0", LOC);
   /** Decimal double output. */
-  private static final DecimalFormat DD = new DecimalFormat("#####0.0################", LOC);
+  public static final DecimalFormat DD = new DecimalFormat("#####0.0################", LOC);
   /** Scientific float output. */
-  private static final DecimalFormat SF = new DecimalFormat("0.0######E0", LOC);
+  public static final DecimalFormat SF = new DecimalFormat("0.0######E0", LOC);
   /** Decimal float output. */
-  private static final DecimalFormat DF = new DecimalFormat("#####0.0######", LOC);
+  public static final DecimalFormat DF = new DecimalFormat("#####0.0######", LOC);
 
   /**
    * Creates a byte array representation from the specified double value.

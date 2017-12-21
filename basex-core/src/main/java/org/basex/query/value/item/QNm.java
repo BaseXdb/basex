@@ -29,7 +29,7 @@ public final class QNm extends Item {
   /** URL pattern (matching Clark and EQName notation). */
   public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)}(.+)$");
 
-  /** Namespace URI. */
+  /** Namespace URI (can be {@code null}). */
   private byte[] uri;
   /** Name with optional prefix. */
   private final byte[] name;
@@ -281,6 +281,14 @@ public final class QNm extends Item {
   }
 
   /**
+   * Returns an EQName representation.
+   * @return QName as token
+   */
+  public byte[] eqName() {
+    return eqName(uri(), local());
+  }
+
+  /**
    * Returns a unique representation of the QName.
    * @return QName as token
    */
@@ -369,6 +377,17 @@ public final class QNm extends Item {
     }
     System.arraycopy(local, 0, key, i, local.length);
     return key;
+  }
+
+  /**
+   * Returns an EQName representation.
+   * @param uri URI
+   * @param local local name
+   * @return QName as token
+   */
+  public static byte[] eqName(final byte[] uri, final byte[] local) {
+    return new TokenBuilder(QueryText.EQNAME).add(uri).add(QueryText.CURLY2).
+        add(local).finish();
   }
 
   @Override
