@@ -308,7 +308,7 @@ final class TrieList extends TrieNode {
     for(int i = 0; i < size; i++) {
       final Item k = keys[i];
       for(int j = 0; j < size; j++) {
-        if(k.sameKey(ol.keys[i], info)) {
+        if(k.sameKey(ol.keys[j], info)) {
           // check bound value, too
           if(!deep(values[i], ol.values[j], coll, info)) return false;
           // value matched, continue with next key

@@ -108,6 +108,8 @@ public final class MapModuleTest extends QueryPlanTest {
     mapSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
 
     query(func.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", 1));
+
+    query("deep-equal(" + func.args(" map{ 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
   }
 
   /** Test method. */
