@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 import java.util.Set;
 import java.util.regex.*;
 
@@ -64,6 +63,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   final SerializerOptions output;
   /** Associated function. */
   final StaticFunc function;
+  /** Permissions (can be empty). */
+  final TokenList allows = new TokenList();
 
   /** Associated module. */
   private final RestXqModule module;
@@ -75,14 +76,18 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Consumed media types. */
   private final ArrayList<MediaType> consumes = new ArrayList<>();
 
-  /** Path. */
+  /** Path (can be {@code null}). */
   RestXqPath path;
   /** Singleton id (can be {@code null}). */
   String singleton;
-  /** Error. */
-  private RestXqError error;
-  /** Post/Put variable. */
+
+  /** Post/Put variable (can be {@code null}). */
   private QNm requestBody;
+
+  /** Error (can be {@code null}). */
+  private RestXqError error;
+  /** Error (can be {@code null}). */
+  private RestXqPerm permission;
 
   /**
    * Constructor.
@@ -100,12 +105,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Processes the HTTP request.
    * Parses new modules and discards obsolete ones.
    * @param conn HTTP connection
-   * @param qe query exception (optional)
+   * @param ext extended processing information (can be {@code null})
+   * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  void process(final HTTPConnection conn, final QueryException qe) throws Exception {
+  boolean process(final HTTPConnection conn, final Object ext) throws Exception {
     try {
-      module.process(conn, this, qe);
+      return module.process(conn, this, ext);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;
@@ -113,9 +119,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
-   * Checks a function for RESTFful annotations.
+   * Checks a function for REST and permission annotations.
    * @param ctx database context
-   * @return {@code true} if module contains relevant annotations
+   * @return {@code true} if function contains relevant annotations
    * @throws Exception exception
    */
   boolean parse(final Context ctx) throws Exception {
@@ -123,11 +129,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final boolean[] declared = new boolean[function.params.length];
     boolean found = false;
     final MainOptions options = ctx.options;
+
     for(final Ann ann : function.anns) {
       final Annotation sig = ann.sig;
       if(sig == null) continue;
 
-      found |= eq(sig.uri, QueryText.REST_URI);
+      found |= eq(sig.uri, QueryText.REST_URI, QueryText.PERM_URI);
       final Item[] args = ann.args();
       if(sig == _REST_PATH) {
         try {
@@ -135,7 +142,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
-        for(final QNm v : path.vars()) checkVariable(v, AtomType.AAT, declared);
+        for(final QNm name : path.varNames()) checkVariable(name, AtomType.AAT, declared);
       } else if(sig == _REST_ERROR) {
         error(ann);
       } else if(sig == _REST_CONSUMES) {
@@ -180,19 +187,26 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
           output.assign(string(sig.local()), toString(args[0]));
         } catch(final BaseXException ex) {
           Util.debug(ex);
-          throw error(ann.info, UNKNOWN_SER, sig.local());
+          throw error(ann.info, UNKNOWN_SER_X, sig.local());
         }
+      } else if(sig == _PERM_ALLOW) {
+        for(final Item arg : args) allows.add(toString(arg));
+      } else if(sig == _PERM_CHECK) {
+        final String p = args.length > 0 ? toString(args[0]) : "";
+        final QNm v = args.length > 1 ? checkVariable(toString(args[1]), declared) : null;
+        permission = new RestXqPerm(p, v);
       }
     }
 
     if(found) {
-      if(path == null && error == null)
-        throw error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
+      final int paths = (path != null ? 1 : 0) + (error != null ? 1 : 0) +
+          (permission != null ? 1 : 0);
+      if(paths != 1) throw error(function.info, paths == 0 ? ANN_MISSING : ANN_CONFLICT);
 
       final int dl = declared.length;
       for(int d = 0; d < dl; d++) {
         if(declared[d]) continue;
-        throw error(function.info, VAR_UNDEFINED, function.params[d].name.string());
+        throw error(function.info, VAR_UNDEFINED_X, function.params[d].name.string());
       }
     }
     return found;
@@ -224,42 +238,46 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     if(body != null && !body.isEmpty()) {
       final HttpMethod m = HttpMethod.get(method);
-      if(m != null && !m.body) throw error(info, METHOD_VALUE, m);
+      if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
       if(requestBody != null) throw error(info, ANN_BODYVAR);
       requestBody = checkVariable(toString(body), declared);
     }
-    if(methods.contains(method)) throw error(info, ANN_TWICE, "%", method);
+    if(methods.contains(method)) throw error(info, ANN_TWICE_X_X, "%", method);
     methods.add(method);
   }
 
   /**
    * Checks if an HTTP request matches this function and its constraints.
    * @param conn HTTP connection
-   * @param err error code
+   * @param err error code (assigned if error function is to be called)
+   * @param perm permission flag
    * @return result of check
    */
-  boolean matches(final HTTPConnection conn, final QNm err) {
+  boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
     // check method, consumed and produced media type, and path or error
-    return (methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
-        produces(conn) && (err == null ? path != null && path.matches(conn) :
-          error != null && error.matches(err));
+    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
+        produces(conn))) return false;
+
+    if(perm) return permission != null && permission.matches(conn);
+    if(err != null) return error != null && error.matches(err);
+    return path != null && path.matches(conn);
   }
 
   /**
    * Binds the annotated variables.
    * @param conn HTTP connection
    * @param args arguments
-   * @param err optional query error
+   * @param ext extended processing information (can be {@code null})
    * @param qc query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void bind(final HTTPConnection conn, final Expr[] args, final QueryException err,
-      final QueryContext qc) throws QueryException, IOException {
+  void bind(final HTTPConnection conn, final Expr[] args, final Object ext, final QueryContext qc)
+      throws QueryException, IOException {
 
     // bind variables from segments
     if(path != null) {
-      for(final Entry<QNm, String> entry : path.values(conn).entrySet()) {
+      for(final Map.Entry<QNm, String> entry : path.values(conn).entrySet()) {
         final QNm qnm = new QNm(entry.getKey().string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
         bind(qnm, args, new Atm(entry.getValue()), qc);
@@ -272,7 +290,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       try {
         bind(requestBody, args, HttpPayload.value(conn.params.body(), mo, conn.contentType()), qc);
       } catch(final IOException ex) {
-        throw error(INPUT_CONV, ex);
+        throw error(INPUT_CONV_X, ex);
       }
     }
 
@@ -308,13 +326,18 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // bind errors
     final Map<String, Value> errs = new HashMap<>();
-    if(err != null) {
-      final Value[] values = Catch.values(err);
+    if(ext instanceof QueryException) {
+      final Value[] values = Catch.values((QueryException) ext);
       final QNm[] names = Catch.NAMES;
       final int nl = names.length;
       for(int n = 0; n < nl; n++) errs.put(string(names[n].local()), values[n]);
     }
     for(final RestXqParam rxp : errorParams) bind(rxp, args, errs.get(rxp.name), qc);
+
+    // bind permission information
+    if(ext instanceof RestXqFunction && permission.var != null) {
+      bind(permission.var, args, permission.map((RestXqFunction) ext), qc);
+    }
   }
 
   /**
@@ -340,7 +363,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   @Override
   public int compareTo(final RestXqFunction rxf) {
-    return path == null ? error.compareTo(rxf.error) : path.compareTo(rxf.path);
+    if(path != null) return path.compareTo(rxf.path);
+    if(error != null) return error.compareTo(rxf.error);
+    return permission.compareTo(rxf.permission);
   }
 
   // PRIVATE METHODS ====================================================================
@@ -352,27 +377,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return resulting variable
    * @throws QueryException query exception
    */
-  private QNm checkVariable(final String tmp, final boolean... declared) throws QueryException {
-    return checkVariable(tmp, AtomType.ITEM, declared);
-  }
-
-  /**
-   * Checks the specified template and adds a variable.
-   * @param tmp template string
-   * @param type allowed type
-   * @param declared variable declaration flags
-   * @return resulting variable
-   * @throws QueryException query exception
-   */
-  private QNm checkVariable(final String tmp, final Type type, final boolean... declared)
-      throws QueryException {
-
+  QNm checkVariable(final String tmp, final boolean... declared) throws QueryException {
     final Matcher m = TEMPLATE.matcher(tmp);
-    if(!m.find()) throw error(INV_TEMPLATE, tmp);
+    if(!m.find()) throw error(INV_TEMPLATE_X, tmp);
     final byte[] vn = token(m.group(1));
-    if(!XMLToken.isQName(vn)) throw error(INV_VARNAME, vn);
+    if(!XMLToken.isQName(vn)) throw error(INV_VARNAME_X, vn);
     final QNm name = new QNm(vn);
-    return checkVariable(name, type, declared);
+    return checkVariable(name, AtomType.ITEM, declared);
   }
 
   /**
@@ -392,12 +403,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final int pl = params.length;
     while(++p < pl && !params[p].name.eq(name));
 
-    if(p == params.length) throw error(UNKNOWN_VAR, name.string());
-    if(declared[p]) throw error(VAR_ASSIGNED, name.string());
+    if(p == params.length) throw error(UNKNOWN_VAR_X, name.string());
+    if(declared[p]) throw error(VAR_ASSIGNED_X, name.string());
 
     final SeqType st = params[p].declaredType();
     if(params[p].checksType() && !st.type.instanceOf(type))
-      throw error(INV_VARTYPE, name.string(), type);
+      throw error(INV_VARTYPE_X_X, name.string(), type);
 
     declared[p] = true;
     return name;
@@ -487,7 +498,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param item item
    * @return string
    */
-  private static String toString(final Item item) {
+  static String toString(final Item item) {
     return ((Str) item).toJava();
   }
 
@@ -538,12 +549,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         kind = Kind.WILDCARD;
       } else if(err.startsWith("*:")) {
         final byte[] local = token(err.substring(2));
-        if(!XMLToken.isNCName(local)) throw error(INV_CODE, err);
+        if(!XMLToken.isNCName(local)) throw error(INV_CODE_X, err);
         qnm = new QNm(local);
         kind = Kind.NAME;
       } else if(err.endsWith(":*")) {
         final byte[] prefix = token(err.substring(0, err.length() - 2));
-        if(!XMLToken.isNCName(prefix)) throw error(INV_CODE, err);
+        if(!XMLToken.isNCName(prefix)) throw error(INV_CODE_X, err);
         qnm = new QNm(concat(prefix, COLON), function.sc);
         kind = Kind.URI;
       } else {
@@ -555,22 +566,22 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
             qnm = new QNm(COLON, uri);
             kind = Kind.URI;
           } else {
-            if(!XMLToken.isNCName(local) || !Uri.uri(uri).isValid()) throw error(INV_CODE, err);
+            if(!XMLToken.isNCName(local) || !Uri.uri(uri).isValid()) throw error(INV_CODE_X, err);
             qnm = new QNm(local, uri);
             kind = Kind.URI_NAME;
           }
         } else {
           final byte[] nm = token(err);
-          if(!XMLToken.isQName(nm)) throw error(INV_CODE, err);
+          if(!XMLToken.isQName(nm)) throw error(INV_CODE_X, err);
           qnm = new QNm(nm, function.sc);
           kind = Kind.URI_NAME;
         }
       }
       // message
-      if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS, qnm);
+      if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS_X, qnm);
       final NameTest test = new NameTest(qnm, kind, false, null);
-      if(last != null && last.kind != kind) throw error(INV_PRIORITY, last, test);
-      if(!error.add(test)) throw error(INV_ERR_SAME, last);
+      if(last != null && last.kind != kind) throw error(INV_PRIORITY_X_X, last, test);
+      if(!error.add(test)) throw error(INV_ERR_SAME_X, last);
       last = test;
     }
   }

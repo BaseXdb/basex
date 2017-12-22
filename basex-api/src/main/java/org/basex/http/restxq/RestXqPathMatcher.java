@@ -23,7 +23,7 @@ final class RestXqPathMatcher {
   private static final RestXqPathMatcher EMPTY =
       new RestXqPathMatcher("/", Collections.emptyList(), 0, ZERO);
   /** Variable names defined in the path template. */
-  final List<QNm> vars;
+  final List<QNm> varNames;
   /** Compiled regular expression which matches paths defined by the path annotation. */
   final Pattern pattern;
   /** Number of path segments. */
@@ -34,13 +34,13 @@ final class RestXqPathMatcher {
   /**
    * Constructor.
    * @param regex regular expression which matches paths defined by the path annotation
-   * @param vars variable names defined in the path template
+   * @param varNames variable names defined in the path template
    * @param segments segment count
    * @param varsPos variable position
    */
-  private RestXqPathMatcher(final String regex, final List<QNm> vars, final int segments,
+  private RestXqPathMatcher(final String regex, final List<QNm> varNames, final int segments,
     final BigInteger varsPos) {
-    this.vars = vars;
+    this.varNames = varNames;
     this.segments = segments;
     this.varsPos = varsPos;
     pattern = Pattern.compile(regex);
@@ -65,9 +65,9 @@ final class RestXqPathMatcher {
     final Matcher m = matcher(path);
     if(m.matches()) {
       final int groupCount = m.groupCount();
-      if(vars.size() <= groupCount) {
+      if(varNames.size() <= groupCount) {
         int group = 1;
-        for(final QNm var : vars) {
+        for(final QNm var : varNames) {
           result.put(var, m.group(group));
           // skip nested groups
           final int end = m.end(group);
@@ -97,7 +97,7 @@ final class RestXqPathMatcher {
   static RestXqPathMatcher parse(final String path, final InputInfo info) throws QueryException {
     if(path.isEmpty()) return EMPTY;
 
-    final ArrayList<QNm> vars = new ArrayList<>();
+    final ArrayList<QNm> varNames = new ArrayList<>();
     final StringBuilder result = new StringBuilder();
     final StringBuilder literals = new StringBuilder();
     final TokenBuilder variable = new TokenBuilder();
@@ -115,7 +115,7 @@ final class RestXqPathMatcher {
         decodeAndEscape(literals, result);
 
         // variable
-        if(!i.hasNext() || i.nextNonWS() != '$') throw error(info, INV_TEMPLATE, path);
+        if(!i.hasNext() || i.nextNonWS() != '$') throw error(info, INV_TEMPLATE_X, path);
 
         // default variable regular expression
         regex.append("[^/]+?");
@@ -127,7 +127,7 @@ final class RestXqPathMatcher {
           if(ch == '=') {
             regex.setLength(0);
             addRegex(i, regex);
-            if(regex.length() == 0) throw error(info, INV_TEMPLATE, path);
+            if(regex.length() == 0) throw error(info, INV_TEMPLATE_X, path);
             break;
           } else if(ch == '{') {
             ++braces;
@@ -140,8 +140,8 @@ final class RestXqPathMatcher {
         }
 
         final byte[] var = variable.toArray();
-        if(!XMLToken.isQName(var)) throw error(info, INV_VARNAME, variable);
-        vars.add(new QNm(var));
+        if(!XMLToken.isQName(var)) throw error(info, INV_VARNAME_X, variable);
+        varNames.add(new QNm(var));
         variable.reset();
         varsPos.set(segment);
 
@@ -155,7 +155,7 @@ final class RestXqPathMatcher {
     decodeAndEscape(literals, result);
 
     final BigInteger vp = varsPos.cardinality() == 0 ? ZERO : new BigInteger(varsPos.toByteArray());
-    return new RestXqPathMatcher(result.toString(), vars, segment + 1, vp);
+    return new RestXqPathMatcher(result.toString(), varNames, segment + 1, vp);
   }
 
   /**

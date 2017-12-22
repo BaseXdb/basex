@@ -53,14 +53,15 @@ final class RestXqResponse {
 
   /**
    * Evaluates the specified function and serializes the result.
-   * @param qe query exception (optional)
+   * @param ext extended processing information (can be {@code null})
+   * @return {@code true} if function creates no result
    * @throws Exception exception (including unexpected ones)
    */
-  void create(final QueryException qe) throws Exception {
+  boolean create(final Object ext) throws Exception {
     // bind variables
     final StaticFunc sf = func.function;
     final Expr[] args = new Expr[sf.params.length];
-    func.bind(conn, args, qe, qc);
+    func.bind(conn, args, ext, qc);
 
     // assign function call and http context and register process
     qc.mainModule(MainModule.get(sf, args));
@@ -72,6 +73,7 @@ final class RestXqResponse {
     String redirect = null, forward = null;
 
     qc.register(qc.context);
+    boolean empty = false;
     try {
       // evaluate query
       final Iter iter = qc.iter();
@@ -82,26 +84,26 @@ final class RestXqResponse {
         if(REST_REDIRECT.eq(node)) {
           // send redirect to browser
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE, node.name());
+          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           redirect = string(ch.string()).trim();
         } else if(REST_FORWARD.eq(node)) {
           // server-side forwarding
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE, node.name());
+          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
         } else if(REST_RESPONSE.eq(node)) {
           // custom response
           build(node, iter);
         } else {
           // standard serialization
-          serialize(first, iter, false);
+          serialize(first, iter, ext instanceof RestXqFunction);
         }
       } else if(singleton != null) {
         // cached serialization
         serialize(first, iter, true);
       } else {
         // standard serialization
-        serialize(first, iter, false);
+        serialize(first, iter, ext instanceof RestXqFunction);
       }
     } finally {
       qc.close();
@@ -114,9 +116,11 @@ final class RestXqResponse {
         conn.forward(forward);
       } else {
         qc.checkStop();
+        empty = out instanceof ArrayOutput && ((ArrayOutput) out).size() == 0;
         finish();
       }
     }
+    return empty;
   }
 
   /**
@@ -129,7 +133,7 @@ final class RestXqResponse {
     // don't allow attributes
     final BasicNodeIter atts = response.attributes();
     final ANode attr = atts.next();
-    if(attr != null) throw func.error(UNEXP_NODE, attr);
+    if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
     SerializerOptions sp = func.output;
@@ -143,7 +147,7 @@ final class RestXqResponse {
           final QNm qnm = a.qname();
           if(qnm.eq(Q_STATUS)) sta = a.string();
           else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)) msg = a.string();
-          else throw func.error(UNEXP_NODE, a);
+          else throw func.error(UNEXP_NODE_X, a);
         }
         if(sta != null) {
           status = toInt(sta);
@@ -165,14 +169,14 @@ final class RestXqResponse {
               }
             }
           } else {
-            throw func.error(UNEXP_NODE, c);
+            throw func.error(UNEXP_NODE_X, c);
           }
         }
       } else if(OUTPUT_SERIAL.eq(n)) {
         // parse output:serialization-parameters
         sp = FuncOptions.serializer(n, func.output, func.function.info);
       } else {
-        throw func.error(UNEXP_NODE, n);
+        throw func.error(UNEXP_NODE_X, n);
       }
     }
     // set content type and serialize data

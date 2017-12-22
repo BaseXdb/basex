@@ -86,10 +86,11 @@ final class RestXqModule {
    * Processes the HTTP request.
    * @param conn HTTP connection
    * @param func function to be processed
-   * @param qe query exception (optional)
+   * @param ext extended processing information (can be {@code null})
+   * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  void process(final HTTPConnection conn, final RestXqFunction func, final QueryException qe)
+  boolean process(final HTTPConnection conn, final RestXqFunction func, final Object ext)
       throws Exception {
 
     // create new XQuery instance
@@ -101,7 +102,7 @@ final class RestXqModule {
 
       final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
       rxf.parse(ctx);
-      new RestXqResponse(rxf, qc, conn).create(qe);
+      return new RestXqResponse(rxf, qc, conn).create(ext);
     }
   }
 

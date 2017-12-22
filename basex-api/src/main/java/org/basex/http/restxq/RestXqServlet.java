@@ -3,6 +3,8 @@ package org.basex.http.restxq;
 import static org.basex.http.HTTPText.*;
 import static org.basex.http.restxq.RestXqText.*;
 
+import java.util.*;
+
 import javax.servlet.http.*;
 
 import org.basex.http.*;
@@ -40,13 +42,22 @@ public final class RestXqServlet extends BaseXServlet {
       return;
     }
 
-    // select function that closest matches the request
+    // select the closest match for this request
     RestXqFunction func = rxm.find(conn, null);
     if(func == null) throw HTTPCode.NO_XQUERY.get();
 
     try {
+      boolean valid = true;
+      List<RestXqFunction> checks = rxm.checks(conn);
+      for(final RestXqFunction check : checks) {
+        if(!check.process(conn, func)) {
+          valid = false;
+          break;
+        }
+      }
+
       // process function
-      func.process(conn, null);
+      if(valid) func.process(conn, null);
     } catch(final QueryException ex) {
       // run optional error function
       func = rxm.find(conn, ex.qname());

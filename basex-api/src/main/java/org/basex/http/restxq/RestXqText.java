@@ -14,11 +14,6 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 public interface RestXqText {
-  /** Token "error". */
-  byte[] ERROR = token("error");
-  /** Token "path". */
-  byte[] PATH = token("path");
-
   /** Token "header". */
   byte[] HEADER = token("header");
   /** Token "response". */
@@ -38,6 +33,11 @@ public interface RestXqText {
   /** Token "forward". */
   byte[] FORWARD = token("forward");
 
+  /** Token "allow". */
+  byte[] ALLOW = token("allow");
+  /** Token "function". */
+  byte[] FUNCTION = token("function");
+
   /** RESTXQ string. */
   String RESTXQ = "RESTXQ";
   /** WADL prefix. */
@@ -50,47 +50,49 @@ public interface RestXqText {
   String INIT = ".init";
 
   /** Error message. */
-  String ANN_MISSING = "Annotation %% or %% missing.";
+  String ANN_MISSING = "Path annotation missing.";
+  /** Error message. */
+  String ANN_CONFLICT = "Conflicting path annotations found.";
   /** Error message. */
   String ANN_BODYVAR = "More than one body request variable specified.";
   /** Error message. */
-  String ANN_TWICE = "Annotation %% is specified twice.";
+  String ANN_TWICE_X_X = "Annotation %% is specified twice.";
   /** Error message. */
-  String INV_TEMPLATE = "Invalid path template: \"%\".";
+  String INV_TEMPLATE_X = "Invalid path template: \"%\".";
   /** Error message. */
-  String INV_VARNAME = "Invalid variable name: $%.";
+  String INV_VARNAME_X = "Invalid variable name: $%.";
   /** Error message. */
-  String INV_CODE = "Invalid error code: '%'.";
+  String INV_CODE_X = "Invalid error code: %.";
   /** Error message. */
-  String INV_PRIORITY = "Errors must be of the same priority (\"%\" vs \"%\").";
+  String INV_PRIORITY_X_X = "Errors must be of the same priority (\"%\" vs \"%\").";
   /** Error message. */
-  String INV_ERR_SAME = "The same error has been specified twice: \"%\".";
+  String INV_ERR_SAME_X = "The same error has been specified twice: \"%\".";
   /** Error message. */
-  String INV_NONS = "No namespace declared for '%'.";
+  String INV_NONS_X = "No namespace declared for '%'.";
   /** Error message. */
-  String INV_VARTYPE = "Variable $% must inherit from %.";
+  String INV_VARTYPE_X_X = "Variable $% must inherit from %.";
   /** Error message. */
-  String UNKNOWN_VAR = "Variable $% is not specified as argument.";
+  String UNKNOWN_VAR_X = "Variable $% is not specified as argument.";
   /** Error message. */
-  String VAR_ASSIGNED = "Variable $% is specified more than once.";
+  String VAR_ASSIGNED_X = "Variable $% is specified more than once.";
   /** Error message. */
-  String VAR_UNDEFINED = "Variable $% is not assigned by the annotations.";
+  String VAR_UNDEFINED_X = "Variable $% is not assigned by the annotations.";
   /** Error message. */
-  String UNKNOWN_SER = "Unknown serialization parameter \"%\".";
+  String UNKNOWN_SER_X = "Unknown serialization parameter: %.";
   /** Error message. */
-  String UNEXP_NODE = "Unexpected node: %.";
+  String UNEXP_NODE_X = "Unexpected node: %.";
   /** Error message. */
   String HEAD_METHOD = "HEAD method must return a single 'restxq:response' element.";
   /** Error message. */
-  String METHOD_VALUE = "Method % does not allow values.";
+  String METHOD_VALUE_X = "Method % does not allow values.";
   /** Error message. */
-  String INPUT_CONV = "Input could not be converted: %";
+  String INPUT_CONV_X = "Input could not be converted: %";
   /** Error message. */
-  String PATH_CONFLICT = "Path \"%\" assigned to several functions:%";
+  String PATH_CONFLICT_X_X = "Path \"%\" assigned to several functions:%";
   /** Error message. */
-  String ERROR_CONFLICT = "Error \"%\" matched by several functions:%";
+  String ERROR_CONFLICT_X_X = "Error \"%\" matched by several functions:%";
   /** Error message. */
-  String NO_VALUE = "'%' element has no string value.";
+  String NO_VALUE_X = "'%' element has no string value.";
 
   /** QName. */
   QNm Q_STATUS = new QNm(STATUS);

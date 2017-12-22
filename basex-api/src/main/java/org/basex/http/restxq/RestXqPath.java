@@ -44,8 +44,8 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * Returns the names of the template variables.
    * @return list of qualified variable names
    */
-  List<QNm> vars() {
-    return matcher.vars;
+  List<QNm> varNames() {
+    return matcher.varNames;
   }
 
   /**

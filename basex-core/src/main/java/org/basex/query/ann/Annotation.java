@@ -95,6 +95,11 @@ public enum Annotation {
   _OUTPUT_VERSION("version(value)", arg(STR_O), OUTPUT_URI),
 
   /** XQuery annotation. */
+  _PERM_CHECK("check([path[,map]])", arg(STR_O, STR_O), PERM_URI),
+  /** XQuery annotation. */
+  _PERM_ALLOW("allow(name[,...])", arg(STR_O), PERM_URI, false),
+
+  /** XQuery annotation. */
   _REST_PATH("path(path)", arg(STR_O), REST_URI),
   /** XQuery annotation. */
   _REST_ERROR("error(code[,...])", arg(STR_O), REST_URI, false),

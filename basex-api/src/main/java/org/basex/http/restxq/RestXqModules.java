@@ -54,9 +54,7 @@ public final class RestXqModules {
       new Timer(true).scheduleAtFixedRate(new TimerTask() {
         @Override
         public void run() {
-          synchronized(parsed) {
-            if(parsed.get() && System.currentTimeMillis() - last >= ms) parsed.set(false);
-          }
+          if(System.currentTimeMillis() - last >= ms) init();
         }
       }, 0, 500);
     }
@@ -93,28 +91,21 @@ public final class RestXqModules {
   /**
    * Returns the function that matches the current request or the specified error code.
    * @param conn HTTP connection
-   * @param error error code (optional)
+   * @param error error code (assigned if error function is to be called)
    * @return function, or {@code null} if no function matches
    * @throws Exception exception (including unexpected ones)
    */
   RestXqFunction find(final HTTPConnection conn, final QNm error) throws Exception {
     // collect all functions
-    final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqModule mod : cache(conn.context).values()) {
-      for(final RestXqFunction rxf : mod.functions()) {
-        if(rxf.matches(conn, error)) list.add(rxf);
-      }
-    }
+    final List<RestXqFunction> list = find(conn, error, false);
     // no path matches
     if(list.isEmpty()) return null;
-
-    // sort by relevance
-    Collections.sort(list);
 
     // return best matching function
     final RestXqFunction best = list.get(0);
     if(list.size() == 1 || best.compareTo(list.get(1)) != 0) return best;
 
+    // check quality factor
     final RestXqFunction bestQf = bestQf(list, conn);
     if(bestQf != null) return bestQf;
 
@@ -125,8 +116,41 @@ public final class RestXqModules {
       tb.add(Prop.NL).add(rxf.function.info.toString());
     }
     throw best.path == null ?
-      best.error(ERROR_CONFLICT, error, tb) :
-      best.error(PATH_CONFLICT, best.path, tb);
+      best.error(ERROR_CONFLICT_X_X, error, tb) :
+      best.error(PATH_CONFLICT_X_X, best.path, tb);
+  }
+
+  /**
+   * Returns permission functions that match the current request.
+   * @param conn HTTP connection
+   * @return list of function, ordered by relevance
+   * @throws Exception exception (including unexpected ones)
+   */
+  List<RestXqFunction> checks(final HTTPConnection conn) throws Exception {
+    return find(conn, null, true);
+  }
+
+  /**
+   * Returns the functions that match the current request.
+   * @param conn HTTP connection
+   * @param error error code (assigned if error function is to be called)
+   * @param perm permission flag
+   * @return list of function, ordered by relevance
+   * @throws Exception exception (including unexpected ones)
+   */
+  private List<RestXqFunction> find(final HTTPConnection conn, final QNm error, final boolean perm)
+      throws Exception {
+
+    // collect all functions
+    final ArrayList<RestXqFunction> list = new ArrayList<>();
+    for(final RestXqModule rxm : cache(conn.context).values()) {
+      for(final RestXqFunction rxf : rxm.functions()) {
+        if(rxf.matches(conn, error, perm)) list.add(rxf);
+      }
+    }
+    // sort by relevance
+    Collections.sort(list);
+    return list;
   }
 
   /**
@@ -135,7 +159,7 @@ public final class RestXqModules {
    * @param conn HTTP connection
    * @return best function, or {@code null} if more than one function exists
    */
-  private static RestXqFunction bestQf(final ArrayList<RestXqFunction> list,
+  private static RestXqFunction bestQf(final List<RestXqFunction> list,
       final HTTPConnection conn) {
 
     // media types accepted by the client

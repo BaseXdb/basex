@@ -180,7 +180,7 @@ public final class RestXqPathMatcherTest {
 
     final RestXqPathMatcher p = RestXqPathMatcher.parse(input, null);
     assertEquals(regex, p.pattern.toString());
-    assertEquals(Arrays.asList(vars), p.vars);
+    assertEquals(Arrays.asList(vars), p.varNames);
     assertEquals(segments, p.segments);
     assertEquals(variables, p.varsPos);
   }
