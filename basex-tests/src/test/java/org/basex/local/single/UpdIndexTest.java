@@ -17,7 +17,7 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * This test class performs some incremental updates.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 @RunWith(Parameterized.class)

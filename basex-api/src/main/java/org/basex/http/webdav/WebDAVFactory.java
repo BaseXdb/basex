@@ -12,7 +12,7 @@ import com.bradmcevoy.http.*;
 /**
  * WebDAV resource factory. Main class for generating WebDAV resources.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

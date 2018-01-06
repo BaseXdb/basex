@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Update operation that references databases by their name.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Lukas Kircher
  */
 public abstract class NameUpdate extends Update implements Comparable<NameUpdate> {

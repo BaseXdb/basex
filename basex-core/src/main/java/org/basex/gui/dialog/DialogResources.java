@@ -19,7 +19,7 @@ import org.basex.gui.layout.*;
  * Combination of a JTree and a text field. The tree visualizes the database content including raw
  * files and documents. The search field allows to quickly access specific files/documents.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Lukas Kircher
  */
 final class DialogResources extends BaseXBack {
@@ -225,7 +225,7 @@ final class DialogResources extends BaseXBack {
 
   /**
    * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
-   * @author BaseX Team 2005-17, BSD License
+   * @author BaseX Team 2005-18, BSD License
    * @author Lukas Kircher
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {

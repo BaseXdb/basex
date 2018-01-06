@@ -60,7 +60,7 @@ import org.basex.util.hash.*;
  * New namespace mappings for function prefixes and URIs must be added to the static initializer of
  * the {@link NSGlobal} class.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public enum Function {

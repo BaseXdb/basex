@@ -11,7 +11,7 @@ import org.basex.query.util.ft.*;
 /**
  * Adds default paint operations to TreeMap.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 final class MapDefault extends MapPainter {

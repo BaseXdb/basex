@@ -7,7 +7,7 @@ import org.basex.query.*;
 /**
  * A node of a FingerTree.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

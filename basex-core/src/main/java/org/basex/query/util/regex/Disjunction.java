@@ -3,7 +3,7 @@ package org.basex.query.util.regex;
 /**
  * A disjunction of branches.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
 public final class Disjunction extends RegExp {

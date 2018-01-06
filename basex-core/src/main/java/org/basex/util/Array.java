@@ -7,7 +7,7 @@ import org.basex.util.list.*;
 /**
  * Convenience functions for handling arrays; serves as an extension to Java's {@link Arrays} class.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class Array {

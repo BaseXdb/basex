@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * Tests for {@link BitArray}.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Dimitar Popov
  */
 public final class BitArrayTest {

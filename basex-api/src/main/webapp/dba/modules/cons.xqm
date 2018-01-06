@@ -1,7 +1,7 @@
 (:~
  : Global constants and functions.
  :
- : @author Christian Grün, BaseX Team, 2014-17
+ : @author Christian Grün, BaseX Team, 2014-18
  :)
 module namespace cons = 'dba/cons';
 

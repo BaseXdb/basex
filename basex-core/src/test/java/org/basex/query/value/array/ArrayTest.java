@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * Tests for {@link Array#reverse(QueryContext)}.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
 public class ArrayTest extends SandboxTest {

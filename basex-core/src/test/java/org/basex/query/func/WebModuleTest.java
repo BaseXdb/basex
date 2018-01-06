@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Web Module.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class WebModuleTest extends AdvancedQueryTest {

@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * This class tests the Request Module.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class RequestTest extends HTTPTest {

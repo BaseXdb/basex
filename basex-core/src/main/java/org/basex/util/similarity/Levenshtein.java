@@ -8,7 +8,7 @@ import static org.basex.util.FTToken.*;
  * "Binary codes capable of correcting spurious insertions and deletions of ones", and
  * Damerau (1964): "A technique for computer detection and correction of spelling errors.".</p>
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class Levenshtein {

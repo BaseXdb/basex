@@ -9,7 +9,7 @@ import org.basex.*;
  * This class is a simple example to demonstrate the REST implementation.
  * It shows the function of the HTTP DELETE method.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  */
 public final class RESTPost {
   /**

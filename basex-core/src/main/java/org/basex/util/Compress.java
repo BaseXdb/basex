@@ -6,7 +6,7 @@ import java.util.*;
  * This class compresses and decompresses tokens. It is inspired by the
  * Huffman coding, but was simplified to speed up processing.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class Compress {

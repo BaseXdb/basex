@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class contains common methods for full-text index builders.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class FTBuilder extends IndexBuilder {

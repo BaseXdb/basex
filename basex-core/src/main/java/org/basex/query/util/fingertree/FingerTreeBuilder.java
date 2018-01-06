@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * A builder for {@link FingerTree}s from leaf nodes.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  *
  * @param <E> element type

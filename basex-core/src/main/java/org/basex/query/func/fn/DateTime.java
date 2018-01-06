@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Date/time functions.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 abstract class DateTime extends StandardFunc {

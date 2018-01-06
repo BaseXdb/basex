@@ -7,7 +7,7 @@ import java.io.*;
 /**
  * This class is a stream-wrapper for textual data encoded in UTF8.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {

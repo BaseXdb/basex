@@ -35,7 +35,7 @@ import org.junit.Test;
 /**
  * This class tests the server-based HTTP Client.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  */
 public class FnHttpTest extends HTTPTest {
@@ -859,7 +859,7 @@ public class FnHttpTest extends HTTPTest {
 
 /**
  * Fake HTTP connection.
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  */
 final class FakeHttpConnection extends HttpURLConnection {

@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized.Parameters;
  * This class tests database locking inside BaseX. For this purpose, two queries are forced to be
  * executed in parallel. If this fails, locking prevents these queries to run in parallel.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)

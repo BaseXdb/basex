@@ -7,7 +7,7 @@ package org.basex.query;
  * <p>If the interface is implemented by a Java module that subclasses {@link QueryModule},
  * its {@link #close()} method will be called after the query has been evaluated.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public interface QueryResource {

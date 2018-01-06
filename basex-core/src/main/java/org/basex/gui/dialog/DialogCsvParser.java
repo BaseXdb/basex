@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * CSV parser panel.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 final class DialogCsvParser extends DialogParser {

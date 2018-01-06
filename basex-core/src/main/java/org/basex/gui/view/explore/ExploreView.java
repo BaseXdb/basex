@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 /**
  * This view allows the input of database queries.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class ExploreView extends View {

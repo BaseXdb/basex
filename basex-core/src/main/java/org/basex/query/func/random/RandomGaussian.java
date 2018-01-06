@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Dirk Kirsten
  */
 public final class RandomGaussian extends StandardFunc {

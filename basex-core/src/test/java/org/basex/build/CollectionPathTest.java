@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * Tests queries on collections.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Michael Seiferle
  */
 public final class CollectionPathTest extends SandboxTest {

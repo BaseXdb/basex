@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * Tests for the {@link MainOptions#MIXUPDATES} flag.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class MixUpdatesTest extends AdvancedQueryTest {

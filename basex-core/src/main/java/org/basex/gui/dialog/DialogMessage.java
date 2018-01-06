@@ -14,7 +14,7 @@ import org.basex.gui.text.*;
 /**
  * Dialog window for messages.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class DialogMessage extends BaseXDialog {

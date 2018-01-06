@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * List with strings that serve as lock keys.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class LockList implements Iterable<String> {

@@ -6,7 +6,7 @@ import java.util.*;
  * Linked element list.
  * @param <E> element type
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class ElementNodes<E> implements Iterable<E> {

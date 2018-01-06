@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Definitions of all built-in XQuery annotations.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public enum Annotation {

@@ -19,7 +19,7 @@ import org.basex.util.*;
  * client/server architecture. All sent data is received by the
  * {@link ClientListener} and interpreted by the {@link ServerQuery}.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public class ClientQuery extends Query {

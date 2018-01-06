@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Full-text units.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public enum FTUnit {

@@ -9,7 +9,7 @@ import org.basex.util.http.*;
 /**
  * Resource meta data.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Dimitar Popov
  */
 final class WebDAVMetaData {

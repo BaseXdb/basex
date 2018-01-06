@@ -25,7 +25,7 @@ import org.basex.util.*;
  * parallel by the same thread (it is fine to call arbitrary locking methods by different threads at
  * the same time).
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Jens Erat
  */
 public final class Locking {

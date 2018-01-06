@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
 /**
  * This class contains methods for storing information on new index expressions.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class IndexInfo {
