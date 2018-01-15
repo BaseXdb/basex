@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * Tests the command-line arguments of the client starter class.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class BaseXClientTest extends BaseXTest {

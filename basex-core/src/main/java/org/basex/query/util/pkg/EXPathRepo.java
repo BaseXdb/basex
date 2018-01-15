@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * EXPath repositories.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  */
 public final class EXPathRepo {

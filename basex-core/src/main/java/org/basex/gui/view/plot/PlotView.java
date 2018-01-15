@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * A scatter plot visualization of the database.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Lukas Kircher
  */
 public final class PlotView extends View {

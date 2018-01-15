@@ -16,7 +16,7 @@ import org.basex.util.*;
  * This class contains internationalized text strings, which are used throughout the project.
  * If this class is called first, the Strings are initialized by the {@link Lang} class.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public interface Text {
@@ -235,7 +235,7 @@ public interface Text {
   /** "Stack Trace". */
   String STACK_TRACE = "Stack Trace";
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-17 " + Prop.ENTITY;
+  String COPYRIGHT = "\u00A9 2005-18 " + Prop.ENTITY;
 
   // SERVER ===================================================================
 

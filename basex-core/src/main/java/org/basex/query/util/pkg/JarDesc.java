@@ -5,7 +5,7 @@ import org.basex.util.list.*;
 /**
  * Jar descriptor.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  */
 final class JarDesc {

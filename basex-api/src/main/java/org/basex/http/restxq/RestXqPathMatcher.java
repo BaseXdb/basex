@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * RESTXQ path template.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Dimitar Popov
  */
 final class RestXqPathMatcher {

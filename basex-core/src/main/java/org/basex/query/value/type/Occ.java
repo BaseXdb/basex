@@ -3,7 +3,7 @@ package org.basex.query.value.type;
 /**
  * Occurrence indicator (cardinality).
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public enum Occ {

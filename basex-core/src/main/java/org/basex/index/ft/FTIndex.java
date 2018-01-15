@@ -47,7 +47,7 @@ import org.basex.util.similarity.*;
  *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class FTIndex extends ValueIndex {

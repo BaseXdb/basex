@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Sets some Mac OS X specific interface options.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Bastian Lemke
  */
 public final class GUIMacOSX {

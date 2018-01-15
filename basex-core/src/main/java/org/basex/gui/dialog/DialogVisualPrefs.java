@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Visualization preferences.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 final class DialogVisualPrefs extends BaseXBack {

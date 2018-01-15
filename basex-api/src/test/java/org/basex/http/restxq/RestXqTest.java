@@ -14,7 +14,7 @@ import org.junit.*;
 /**
  * This class contains RESTXQ tests.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {

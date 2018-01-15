@@ -30,7 +30,7 @@ import org.basex.util.*;
  *     <code>{'foo':42, 'bar':()}</code>)
  * </dl>
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
 public final class JsonXQueryConverter extends JsonConverter {

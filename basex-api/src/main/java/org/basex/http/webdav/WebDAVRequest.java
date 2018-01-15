@@ -24,7 +24,7 @@ import com.bradmcevoy.http.Response.*;
  * the source is integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
@@ -214,7 +214,7 @@ final class WebDAVRequest extends AbstractRequest {
  * the few classes which is needed from that library, the source is integrated
  * into BaseX.
  * @author Milton Development Team
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

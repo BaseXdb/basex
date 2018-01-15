@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Untyped atomic item ({@code xs:untypedAtomic}).
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class Atm extends Item {

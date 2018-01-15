@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * Panel for importing new database resources. Embedded by both the database creation and
  * properties dialog.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 final class DialogImport extends BaseXBack {

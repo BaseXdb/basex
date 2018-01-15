@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * General comparison.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class CmpHashG extends CmpG {
@@ -102,7 +102,7 @@ public final class CmpHashG extends CmpG {
 
   /**
    * Cached items.
-   * @author BaseX Team 2005-17, BSD License
+   * @author BaseX Team 2005-18, BSD License
    * @author Christian Gruen
    */
   private final class CmpCache {

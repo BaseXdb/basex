@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * XQuery list types.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public enum ListType implements Type {

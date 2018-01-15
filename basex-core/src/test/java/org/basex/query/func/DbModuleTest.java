@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the Database Module.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class DbModuleTest extends AdvancedQueryTest {

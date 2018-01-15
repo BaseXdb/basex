@@ -26,7 +26,7 @@ import org.basex.util.options.Options.YesNo;
 /**
  * XQuery Test Suite wrapper.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public abstract class W3CTS extends Main {

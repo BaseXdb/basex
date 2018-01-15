@@ -1,7 +1,7 @@
 (:~
  : Users page.
  :
- : @author Christian Grün, BaseX Team, 2014-17
+ : @author Christian Grün, BaseX Team, 2014-18
  :)
 module namespace dba = 'dba/users';
 

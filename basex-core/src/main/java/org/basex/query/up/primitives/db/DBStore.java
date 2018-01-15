@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Update primitive for the {@link Function#_DB_STORE} function.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class DBStore extends DBUpdate {

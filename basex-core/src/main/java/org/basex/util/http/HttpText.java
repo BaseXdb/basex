@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * HTTP strings.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
  */
 public interface HttpText {

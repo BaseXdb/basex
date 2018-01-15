@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Driver environment for the {@link QT3TS} test suite driver.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 final class QT3Env {

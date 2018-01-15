@@ -15,7 +15,7 @@ import org.junit.runners.Parameterized.*;
 /**
  * Locking tests.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)

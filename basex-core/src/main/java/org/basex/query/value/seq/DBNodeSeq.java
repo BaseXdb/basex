@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two ordered database nodes.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public class DBNodeSeq extends NativeSeq {

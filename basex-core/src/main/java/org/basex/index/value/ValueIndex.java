@@ -6,7 +6,7 @@ import org.basex.index.*;
 /**
  * Index for texts, attribute values and full-texts.
  *
- * @author BaseX Team 2005-17, BSD License
+ * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public abstract class ValueIndex implements Index {
