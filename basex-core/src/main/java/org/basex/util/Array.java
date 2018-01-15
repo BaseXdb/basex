@@ -234,7 +234,9 @@ public final class Array {
    * @return resulting size
    */
   public static int newSize(final int old, final double factor) {
-    return (int) (old * factor) + 1;
+    final int s = Math.min(Integer.MAX_VALUE - 5, (int) (old * factor) + 1);
+    if(s <= old) throw new ArrayIndexOutOfBoundsException("Maximum array size reached.");
+    return s;
   }
 
   /**

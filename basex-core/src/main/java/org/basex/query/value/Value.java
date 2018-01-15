@@ -171,6 +171,9 @@ public abstract class Value extends Expr implements Iterable<Item> {
       throw ex;
     } catch(final IOException ex) {
       throw SER_X.getIO(ex);
+    } catch(final ArrayIndexOutOfBoundsException ex) {
+      Util.debug(ex);
+      throw BASEX_ERROR_X.getIO(ex.getLocalizedMessage());
     }
     return ao;
   }
