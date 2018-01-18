@@ -16,12 +16,16 @@ import org.basex.util.*;
 public final class ProcExecute extends ProcFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Result result = exec(qc, false);
+    final ProcResult result = exec(qc, false);
+    final boolean ex = result.exception != null;
+    if(ex) result.error.add(result.exception.getMessage());
+    final byte[] output = result.output.normalize().finish();
+    final byte[] error = result.error.normalize().finish();
 
     final FElem root = new FElem(RESULT);
-    root.add(new FElem(OUTPUT).add(result.output.normalize().finish()));
-    root.add(new FElem(ERROR).add(result.error.normalize().finish()));
-    root.add(new FElem(CODE).add(token(result.code)));
+    if(output.length != 0) root.add(new FElem(OUTPUT).add(output));
+    if(error.length != 0) root.add(new FElem(ERROR).add(error));
+    if(!ex) root.add(new FElem(CODE).add(token(result.code)));
     return root;
   }
 }

@@ -338,6 +338,8 @@ public enum QueryError {
   /** Error code. */
   PROC_ENCODING_X(PROC, "encoding", "Unknown encoding '%'."),
   /** Error code. */
+  PROC_ERROR_X(PROC, "error", "%"),
+  /** Error code. */
   PROC_TIMEOUT(PROC, "timeout", "The timeout was exceeded."),
 
   // Random Module

@@ -29,6 +29,8 @@ abstract class ProcFn extends StandardFunc {
   static final String ERROR = "error";
   /** Name: code. */
   static final String CODE = "code";
+  /** Name: exception. */
+  static final String EXCEPTION = "exception";
 
   /**
    * Returns the result of a command.
@@ -37,7 +39,7 @@ abstract class ProcFn extends StandardFunc {
    * @return result, or {@code null} if process is forked
    * @throws QueryException query exception
    */
-  final Result exec(final QueryContext qc, final boolean fork) throws QueryException {
+  final ProcResult exec(final QueryContext qc, final boolean fork) throws QueryException {
     checkAdmin(qc);
 
     // arguments
@@ -59,34 +61,41 @@ abstract class ProcFn extends StandardFunc {
       Util.debug(ex);
       throw PROC_ENCODING_X.get(info, enc);
     }
-    final long sec = opts.get(ProcOptions.TIMEOUT);
+    final long seconds = opts.get(ProcOptions.TIMEOUT);
     final String dir = opts.get(ProcOptions.DIR);
+    final String input = opts.get(ProcOptions.INPUT);
 
-    final Result result = new Result();
+    final ProcResult result = new ProcResult();
     final Process proc;
     final ProcessBuilder pb = new ProcessBuilder(args);
     if(dir != null) pb.directory(toPath(token(dir)).toFile());
     try {
       proc = pb.start();
     } catch(final IOException ex) {
-      result.error.add(token(Util.message(ex)));
-      result.code = 9999;
+      result.exception(ex);
       return result;
     }
     if(fork) return null;
 
-    final Thread outt = reader(proc.getInputStream(), result.output, cs);
-    final Thread errt = reader(proc.getErrorStream(), result.error, cs);
+    final Thread outt = reader(proc.getInputStream(), result.output, cs, result);
+    final Thread errt = reader(proc.getErrorStream(), result.error, cs, result);
     outt.start();
     errt.start();
 
     final Thread thread = new Thread(() -> {
       try {
+        if(input != null) {
+          try(OutputStream os = proc.getOutputStream()) {
+            os.write(token(input));
+          }
+        }
         proc.waitFor();
         outt.join();
         errt.join();
+      } catch(final IOException ex) {
+        result.exception(ex);
       } catch(final InterruptedException ex) {
-        result.error.add(token(Util.message(ex)));
+        result.error.add(Util.message(ex));
       }
     });
     thread.start();
@@ -95,7 +104,7 @@ abstract class ProcFn extends StandardFunc {
     try {
       while(thread.isAlive()) {
         qc.checkStop();
-        if(sec > 0 && (System.nanoTime() - perf.start()) / 1000000000 >= sec) {
+        if(seconds > 0 && (System.nanoTime() - perf.start()) / 1000000000 >= seconds) {
           thread.interrupt();
           throw PROC_TIMEOUT.get(info);
         }
@@ -104,7 +113,6 @@ abstract class ProcFn extends StandardFunc {
       result.code = proc.exitValue();
       return result;
     } catch(final JobException ex) {
-      Util.debug(ex);
       thread.interrupt();
       throw ex;
     }
@@ -115,29 +123,19 @@ abstract class ProcFn extends StandardFunc {
    * @param in input stream
    * @param tb token builder
    * @param cs charset
+   * @param pr process result
    * @return result
    */
-  private static Thread reader(final InputStream in, final TokenBuilder tb, final Charset cs) {
+  private Thread reader(final InputStream in, final TokenBuilder tb, final Charset cs,
+      final ProcResult pr) {
     final InputStreamReader isr = new InputStreamReader(in, cs);
     final BufferedReader br = new BufferedReader(isr);
     return new Thread(() -> {
       try {
         for(int b; (b = br.read()) != -1;) tb.add(b);
       } catch(final IOException ex) {
-        Util.stack(ex);
+        pr.exception = ex;
       }
     });
-  }
-
-  /**
-   * Error object.
-   */
-  static final class Result {
-    /** Process output. */
-    final TokenBuilder output = new TokenBuilder();
-    /** Process error. */
-    final TokenBuilder error = new TokenBuilder();
-    /** Exit code. */
-    int code;
   }
 }

@@ -20,15 +20,21 @@ public final class ProcModuleTest extends AdvancedQueryTest {
   @Test
   public void system() {
     query(_PROC_SYSTEM.args("java", "-version"), "");
+    query("try { " + _PROC_SYSTEM.args("java", "x") + "} catch proc:* { 'error' }", "error");
+
     error(_PROC_SYSTEM.args("java", "-version", " map {'encoding': 'xx'}"), PROC_ENCODING_X);
-    query("try { " + _PROC_SYSTEM.args("a b c") + "} catch proc:code9999 {}", "");
+    error(_PROC_SYSTEM.args("a b c"), PROC_ERROR_X);
   }
 
   /** Test method. */
   @Test
   public void execute() {
-    query("count(" + _PROC_EXECUTE.args("java", "-version") + "/*)", 3);
-    query(_PROC_EXECUTE.args("a b c") + "/code/text()", 9999);
+    query("contains(" + _PROC_EXECUTE.args("java", "-version") + "/error, 'java')", true);
+    query("exists(" + _PROC_EXECUTE.args("java", "x") + "/code)", true);
+    query("exists(" + _PROC_EXECUTE.args("a b c") + "/error)", true);
+    query("empty(" + _PROC_EXECUTE.args("a b c") + "/(output, code))", true);
+
+    error(_PROC_SYSTEM.args("java", "-version", " map {'encoding': 'xx'}"), PROC_ENCODING_X);
   }
 
   /** Test method. */
