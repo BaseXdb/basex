@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~
@@ -27,6 +26,5 @@ function dba:db-query(
   $resource  as xs:string,
   $query     as xs:string
 ) as xs:string {
-  cons:check(),
   util:query(if($query) then $query else '.', db:open($name, $resource))
 };

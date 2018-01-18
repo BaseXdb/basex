@@ -32,7 +32,6 @@ function dba:user-edit(
   $pw       as xs:string,
   $perm     as xs:string
 ) as empty-sequence() {
-  cons:check(),
   try {
     let $old := user:list-details($name) return (
       if($name = $newname) then () else if(user:exists($newname)) then (

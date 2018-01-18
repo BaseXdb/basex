@@ -30,7 +30,6 @@ function dba:queries(
   $info   as xs:string?,
   $file   as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(
     map {
       'header': $dba:CAT, 'info': $info, 'error': $error,

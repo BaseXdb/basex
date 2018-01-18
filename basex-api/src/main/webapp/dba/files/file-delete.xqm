@@ -23,7 +23,6 @@ declare
 function dba:file-delete(
   $names  as xs:string*
 ) as element(rest:response) {
-  cons:check(),
   try {
     (: delete all files, ignore reference to parent directory :)
     for $name in $names

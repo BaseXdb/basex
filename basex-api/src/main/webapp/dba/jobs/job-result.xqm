@@ -5,8 +5,6 @@
  :)
 module namespace dba = 'dba/jobs';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs';
 
@@ -22,7 +20,6 @@ declare
 function dba:job-result(
   $id  as xs:string
 ) as item()+ {
-  cons:check(),
   let $details := jobs:list-details($id)
   return if(empty($details)) then (
     dba:job-result($id, false(), 'Job is defunct.')

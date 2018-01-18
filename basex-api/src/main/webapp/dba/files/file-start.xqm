@@ -22,7 +22,6 @@ declare
 function dba:file-start(
   $file  as xs:string
 ) as element(rest:response) {
-  cons:check(),
   let $id := replace($file, '\.\.+|/|\\', '')
   let $params := try {
     (: stop running job before starting new job :)

@@ -38,7 +38,6 @@ function dba:db-add(
   $binary  as xs:string?,
   $error   as xs:string?
 ) as element(html) {
-  cons:check(),
   let $opts := if($opts = 'x') then $opts else 'chop'
   return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
@@ -112,7 +111,6 @@ function dba:db-add-post(
   $file    as map(*),
   $binary  as xs:string?
 ) as empty-sequence() {
-  cons:check(),
   try {
     let $key := map:keys($file)
     let $path := if(not($path) or ends-with($path, '/')) then ($path || $key) else $path

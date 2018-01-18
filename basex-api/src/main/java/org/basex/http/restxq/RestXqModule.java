@@ -86,7 +86,7 @@ final class RestXqModule {
    * Processes the HTTP request.
    * @param conn HTTP connection
    * @param func function to be processed
-   * @param ext extended processing information (can be {@code null})
+   * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */

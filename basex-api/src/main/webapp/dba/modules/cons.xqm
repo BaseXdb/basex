@@ -5,7 +5,6 @@
  :)
 module namespace cons = 'dba/cons';
 
-import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace Session = 'http://basex.org/modules/session';
 
 (:~ Session key. :)
@@ -102,15 +101,6 @@ declare function cons:save(
       element { $key } { ($settings($key), $value)[1] }
     })
   })
-};
-
-(:~
- : Checks if the current client is logged in. If not, raises an error.
- :)
-declare function cons:check(
-) as empty-sequence() {
-  if($cons:SESSION-VALUE) then () else
-    error(xs:QName('basex:login'), 'Please log in again', Request:path())
 };
 
 (:~

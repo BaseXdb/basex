@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/jobs';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
@@ -34,8 +33,6 @@ function dba:jobs(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  cons:check(),
-
   html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>{
       <td>
@@ -134,6 +131,5 @@ function dba:jobs-redirect(
   $action  as xs:string,
   $ids     as xs:string*
 ) as element(rest:response) {
-  cons:check(),
   web:redirect($action, map { 'id': $ids })
 };

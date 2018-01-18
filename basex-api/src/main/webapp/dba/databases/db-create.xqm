@@ -35,8 +35,6 @@ function dba:db-create(
   $lang   as xs:string?,
   $error  as xs:string?
 ) as element(html) {
-  cons:check(),
-
   let $opts := if($opts = 'x') then $opts else ('textindex', 'attrindex')
   return html:wrap(map { 'header': $dba:CAT, 'error': $error },
     <tr>
@@ -105,7 +103,6 @@ function dba:create(
   $opts  as xs:string*,
   $lang  as xs:string?
 ) as empty-sequence() {
-  cons:check(),
   try {
     if(db:exists($name)) then (
       error((), 'Database already exists.')

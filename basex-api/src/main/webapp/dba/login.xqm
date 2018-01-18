@@ -10,28 +10,49 @@ import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
 import module namespace html = 'dba/html' at 'modules/html.xqm';
 
 (:~
+ : Permissions: checks the user credentials.
+ : @param  $perm  permission data
+ : @return redirection to login page or empty sequence
+ :)
+declare
+  %perm:check('/dba', '{$request}')
+function dba:check(
+  $perm  as map(*)
+) as element(rest:response)? {
+  (: redirect to login page if user is not logged in, or if page is not public :)
+  let $path := $perm?path
+  where not($cons:SESSION-VALUE or $perm?allow = 'public')
+  (: normalize login path :)
+  let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
+  (: last visited page to redirect to (if there was one) :)
+  let $page := replace($path, '^.*dba/?', '')[.]
+  return web:redirect($target, map { 'page': $page })
+};
+
+(:~
  : Login page.
  : @param  $name   user name (optional)
  : @param  $error  error string (optional)
- : @param  $path   path to redirect to (optional)
+ : @param  $page   page to redirect to (optional)
  : @return page
  :)
 declare
   %rest:path("/dba/login")
   %rest:query-param("name" , "{$name}")
   %rest:query-param("error", "{$error}")
-  %rest:query-param("path",  "{$path}")
+  %rest:query-param("page",  "{$page}")
   %output:method("html")
+  %perm:allow("all")
 function dba:welcome(
   $name   as xs:string?,
   $error  as xs:string?,
-  $path   as xs:string?
+  $page   as xs:string?
 ) as element(html) {
   html:wrap(map { 'error': $error },
     <tr>
       <td>
         <form action="login-check" method="post">
-          <input type="hidden" name="path" value="{ $path }"/>
+          <input type="hidden" name="page" value="{ $page }"/>
           <div class='note'>
             Enter your admin credentials:
           </div>
@@ -63,28 +84,29 @@ function dba:welcome(
  : Checks the user input and redirects to the main page, or back to the login page.
  : @param  $name  user name
  : @param  $pass  password
- : @param  $path  path to redirect to (optional)
+ : @param  $page  page to redirect to (optional)
  : @return redirection
  :)
 declare
   %rest:path("/dba/login-check")
   %rest:query-param("name", "{$name}")
   %rest:query-param("pass", "{$pass}")
-  %rest:query-param("path", "{$path}")
+  %rest:query-param("page", "{$page}")
+  %perm:allow("all")
 function dba:login(
   $name  as xs:string,
   $pass  as xs:string,
-  $path  as xs:string?
+  $page  as xs:string?
 ) as element(rest:response) {
   try {
     user:check($name, $pass),
     if(user:list-details($name)/@permission != 'admin') then (
-      dba:reject($name, 'Admin credentials required', $path)
+      dba:reject($name, 'Admin credentials required', $page)
     ) else (
-      dba:accept($name, $pass, $path)
+      dba:accept($name, $pass, $page)
     )
   } catch user:* {
-    dba:reject($name, 'Please check your login data', $path)
+    dba:reject($name, 'Please check your login data', $page)
   }
 };
 
@@ -104,31 +126,31 @@ function dba:logout(
 (:~
  : Accepts a user and redirects to the main page.
  : @param  $name  entered user name
- : @param  $path  path to redirect to
+ : @param  $page  page to redirect to
  : @return redirection
  :)
 declare %private function dba:accept(
   $name  as xs:string,
   $pass  as xs:string,
-  $path  as xs:string?
+  $page  as xs:string?
 ) as element(rest:response) {
   Session:set($cons:SESSION-KEY, $name),
   admin:write-log('DBA user was logged in: ' || $name),
-  web:redirect(if($path) then $path else "databases")
+  web:redirect(if($page) then $page else "databases")
 };
 
 (:~
  : Rejects a user and redirects to the login page.
  : @param  $name     entered user name
  : @param  $message  error message
- : @param  $path     path to redirect to
+ : @param  $page     path to redirect to
  : @return redirection
  :)
 declare %private function dba:reject(
   $name     as xs:string,
   $message  as xs:string,
-  $path     as xs:string?
+  $page     as xs:string?
 ) as element(rest:response) {
   admin:write-log('DBA login was denied: ' || $name),
-  web:redirect("login", map { 'name': $name, 'error': $message, 'path': $path })
+  web:redirect("login", map { 'name': $name, 'error': $message, 'page': $page })
 };

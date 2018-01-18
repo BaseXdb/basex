@@ -33,10 +33,12 @@ public interface RestXqText {
   /** Token "forward". */
   byte[] FORWARD = token("forward");
 
-  /** Token "allow". */
+  /** Permission token. */
   byte[] ALLOW = token("allow");
-  /** Token "function". */
-  byte[] FUNCTION = token("function");
+  /** Permission token. */
+  byte[] PATH = token("path");
+  /** Permission token. */
+  byte[] METHOD = token("method");
 
   /** RESTXQ string. */
   String RESTXQ = "RESTXQ";

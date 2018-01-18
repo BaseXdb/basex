@@ -81,7 +81,6 @@ declare %updating function dba:action(
   $info    as xs:string,
   $action  as %updating function(*)
 ) as empty-sequence() {
-  cons:check(),
   try {
     updating $action(),
     cons:redirect($dba:SUB, map { 'name': $name, 'info': $info })

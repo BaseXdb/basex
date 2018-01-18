@@ -105,7 +105,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Processes the HTTP request.
    * Parses new modules and discards obsolete ones.
    * @param conn HTTP connection
-   * @param ext extended processing information (can be {@code null})
+   * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
@@ -336,7 +336,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // bind permission information
     if(ext instanceof RestXqFunction && permission.var != null) {
-      bind(permission.var, args, permission.map((RestXqFunction) ext), qc);
+      bind(permission.var, args, permission.map((RestXqFunction) ext, conn), qc);
     }
   }
 

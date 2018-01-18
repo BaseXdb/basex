@@ -32,7 +32,6 @@ function dba:alter(
   $newname  as xs:string?,
   $error    as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
@@ -75,7 +74,6 @@ function dba:alter(
   $name     as xs:string,
   $newname  as xs:string
 ) {
-  cons:check(),
   try {
     if(db:exists($newname)) then (
       error((), 'Database already exists.')

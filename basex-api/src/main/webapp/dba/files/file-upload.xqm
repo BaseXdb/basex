@@ -23,8 +23,6 @@ declare
 function dba:file-upload(
   $files  as map(xs:string, xs:base64Binary)
 ) as element(rest:response) {
-  cons:check(),
-
   (: save files :)
   let $dir := cons:current-dir()
   return try {

@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
@@ -37,8 +36,6 @@ function dba:databases(
   $info   as xs:string?,
   $error  as xs:string?
 ) as element(html) {
-  cons:check(),
-
   let $names := map:merge(db:list() ! map:entry(., true()))
   let $databases :=
     let $start := util:start($page, $sort)

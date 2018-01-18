@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~
@@ -21,7 +20,6 @@ declare
 function dba:query-eval(
   $query  as xs:string?
 ) as xs:string {
-  cons:check(),
   util:query($query, ())
 };
 
@@ -39,6 +37,5 @@ declare
 function dba:query-update(
   $query  as xs:string?
 ) as empty-sequence() {
-  cons:check(),
   util:update-query($query)
 };

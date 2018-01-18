@@ -27,7 +27,6 @@ function dba:db-delete(
   $name       as xs:string,
   $resources  as xs:string*
 ) as empty-sequence() {
-  cons:check(),
   try {
     $resources ! db:delete($name, .),
     cons:redirect($dba:SUB,

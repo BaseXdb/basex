@@ -18,6 +18,5 @@ declare
 function dba:query-save(
   $name   as xs:string
 ) as empty-sequence() {
-  cons:check(),
   cons:save(map { $cons:K-QUERY: '' })
 };

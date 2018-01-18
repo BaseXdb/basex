@@ -18,7 +18,6 @@ declare
 function dba:files(
   $name  as xs:string
 ) as item()+ {
-  cons:check(),
   web:response-header(map { 'media-type': 'application/octet-stream' }),
   file:read-binary(cons:current-dir() || $name)
 };

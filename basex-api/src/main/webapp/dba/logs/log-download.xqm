@@ -5,8 +5,6 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
-
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
 
@@ -25,7 +23,6 @@ function dba:drop(
   $name   as xs:string,
   $input  as xs:string
 ) as element()+ {
-  cons:check(),
   let $ext := if($input) then ('-' || encode-for-uri($input)) else ()
   return web:response-header(
     map { 'media-type': 'text/xml' },

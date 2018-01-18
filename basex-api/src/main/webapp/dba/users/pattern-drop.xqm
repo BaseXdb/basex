@@ -27,7 +27,6 @@ function dba:pattern-drop(
   $name      as xs:string,
   $patterns  as xs:string*
 ) as empty-sequence() {
-  cons:check(),
   try {
     $patterns ! user:drop($name, .),
     cons:redirect($dba:SUB, map {

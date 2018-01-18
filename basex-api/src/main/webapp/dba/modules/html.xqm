@@ -81,23 +81,21 @@ declare function html:wrap(
                         ) else ()
                       }
                     }</span>
-                    return try {
-                      cons:check(),
-                      let $cats :=
-                        for $cat in ('Databases', 'Queries', 'Files', 'Jobs', 'Logs', 
-                          'Users', 'Sessions', 'Settings')
-                        let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
-                        return if($link = $header) then (
-                          <b>{ $link }</b>
-                        ) else (
-                          $link
-                        )
-                      return (head($cats), tail($cats) ! (' · ', .)),
+                    let $cats :=
+                      for $cat in ('Databases', 'Queries', 'Files', 'Jobs', 'Logs', 
+                        'Users', 'Sessions', 'Settings')
+                      let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
+                      return if($link = $header) then (
+                        <b>{ $link }</b>
+                      ) else (
+                        $link
+                      )
+                    return (
+                      head($cats),
+                      tail($cats) ! (' · ', .),
                       (1 to 3) ! '&#x2000;',
                       $emph
-                    } catch basex:login {
-                      $emph
-                    }
+                    )
                   }</div>
                   <hr/>
                 </td>

@@ -39,7 +39,6 @@ function dba:create(
   $lang   as xs:string?,
   $error  as xs:string?
 ) as element(html) {
-  cons:check(),
   let $opts := if($opts = 'x') then $opts else db:info($name)//*[text() = 'true']/name()
   let $lang := if($opts = 'x') then $lang else 'en'
   return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
@@ -106,7 +105,6 @@ function dba:db-optimize(
   $lang  as xs:string?
 ) as empty-sequence() {
   try {
-    cons:check(),
     db:optimize($name, boolean($all), map:merge((
       ('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics') !
         map:entry(., $opts = .),
@@ -133,7 +131,6 @@ declare
 function dba:drop(
   $names  as xs:string*
 ) as empty-sequence() {
-  cons:check(),
   try {
     $names ! db:optimize(.),
     cons:redirect($dba:CAT, map { 'info': util:info($names, 'database', 'optimized') })

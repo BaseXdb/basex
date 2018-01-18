@@ -19,7 +19,6 @@ declare
 function dba:query-open(
   $name  as xs:string
 ) as xs:string {
-  cons:check(),
   cons:save(map { $cons:K-QUERY: $name }),
   file:read-text(cons:current-dir() || $name)
 };

@@ -7,7 +7,6 @@ module namespace dba = 'dba/sessions';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace Session = 'http://basex.org/modules/session';
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
@@ -33,7 +32,6 @@ function dba:sessions(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>

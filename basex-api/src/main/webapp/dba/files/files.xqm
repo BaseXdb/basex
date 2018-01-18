@@ -31,8 +31,6 @@ function dba:files(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  cons:check(),
-
   let $dir := cons:current-dir()
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -144,7 +142,6 @@ function dba:files-redirect(
   $action  as xs:string,
   $names   as xs:string*
 ) as element(rest:response) {
-  cons:check(),
   web:redirect($action, map { 'name': $names, 'redirect': $dba:CAT })
 };
 

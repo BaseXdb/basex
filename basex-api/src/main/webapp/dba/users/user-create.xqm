@@ -33,7 +33,6 @@ function dba:user-create(
   $perm   as xs:string,
   $error  as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(map { 'header': $dba:CAT, 'error': $error },
     <tr>
       <td>
@@ -100,7 +99,6 @@ function dba:user-create(
   $pw    as xs:string,
   $perm  as xs:string
 ) as empty-sequence() {
-  cons:check(),
   try {
     if(user:exists($name)) then (
       error((), 'User already exists.')

@@ -5,8 +5,6 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
-
 (:~
  : Downloads a resource.
  : @param  $name      database
@@ -22,7 +20,6 @@ function dba:db-download(
   $name      as xs:string,
   $resource  as xs:string
 ) as item()+ {
-  cons:check(),
   try {
     web:response-header(
       map { 'media-type': db:content-type($name, $resource) },

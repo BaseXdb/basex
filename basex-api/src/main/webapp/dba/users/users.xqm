@@ -30,7 +30,6 @@ function dba:users(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>

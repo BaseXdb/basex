@@ -28,7 +28,6 @@ function dba:settings(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  cons:check(),
   let $system := html:properties(db:system())
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -105,7 +104,6 @@ declare
   %rest:path("/dba/settings")
 function dba:settings-save(
 ) as element(rest:response) {
-  cons:check(),
   cons:save(map:merge(Request:parameter-names() ! map:entry(., Request:parameter(.)))),
   web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
 };

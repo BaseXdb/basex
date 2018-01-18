@@ -53,7 +53,7 @@ final class RestXqResponse {
 
   /**
    * Evaluates the specified function and serializes the result.
-   * @param ext extended processing information (can be {@code null})
+   * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
    * @throws Exception exception (including unexpected ones)
    */
@@ -73,7 +73,6 @@ final class RestXqResponse {
     String redirect = null, forward = null;
 
     qc.register(qc.context);
-    boolean empty = false;
     try {
       // evaluate query
       final Iter iter = qc.iter();
@@ -96,15 +95,16 @@ final class RestXqResponse {
           build(node, iter);
         } else {
           // standard serialization
-          serialize(first, iter, ext instanceof RestXqFunction);
+          serialize(first, iter, false);
         }
       } else if(singleton != null) {
         // cached serialization
         serialize(first, iter, true);
       } else {
         // standard serialization
-        serialize(first, iter, ext instanceof RestXqFunction);
+        serialize(first, iter, false);
       }
+      return first == null;
     } finally {
       qc.close();
       qc.unregister(qc.context);
@@ -116,11 +116,9 @@ final class RestXqResponse {
         conn.forward(forward);
       } else {
         qc.checkStop();
-        empty = out instanceof ArrayOutput && ((ArrayOutput) out).size() == 0;
         finish();
       }
     }
-    return empty;
   }
 
   /**

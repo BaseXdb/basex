@@ -32,7 +32,6 @@ function dba:db-replace(
   $resource  as xs:string,
   $error     as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
@@ -79,7 +78,6 @@ function dba:db-replace-post(
   $resource  as xs:string,
   $file      as map(*)?
 ) as empty-sequence() {
-  cons:check(),
   try {
     let $key := map:keys($file)
     return if($key = '') then (

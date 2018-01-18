@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -23,7 +22,6 @@ declare
 function dba:file-stop(
   $id  as xs:string
 ) as element(rest:response) {
-  cons:check(),
   let $params := try {
     jobs:stop($id),
     map { 'info': util:info($id, 'job', 'stopped') }

@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/jobs';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -52,7 +51,6 @@ declare %private function dba:job-stop(
   $ids     as xs:string*,
   $action  as xs:string
 ) as element(rest:response) {
-  cons:check(),
   let $params := try {
     $ids ! jobs:stop(.),
     map { 'info': util:info($ids, 'job', $action) }

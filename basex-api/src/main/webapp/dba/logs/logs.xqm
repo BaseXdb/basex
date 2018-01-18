@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/logs';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 
 (:~ Top category :)
@@ -39,8 +38,6 @@ function dba:logs(
   $info   as xs:string?,
   $page   as xs:string
 ) as element(html) {
-  cons:check(),
-
   let $files := (
     for $file in admin:logs()
     order by $file descending
@@ -124,7 +121,6 @@ function dba:log(
   $sort   as xs:string,
   $page   as xs:string
 ) as element()+ {
-  cons:check(),
   let $headers := (
     <time type='time' order='desc'>Time</time>,
     <address>Address</address>,

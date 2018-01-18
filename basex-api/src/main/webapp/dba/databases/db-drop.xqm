@@ -24,7 +24,6 @@ declare
 function dba:db-drop(
   $names  as xs:string*
 ) as empty-sequence() {
-  cons:check(),
   try {
     $names ! db:drop(.),
     cons:redirect($dba:CAT, map { 'info': util:info($names, 'database', 'dropped') })

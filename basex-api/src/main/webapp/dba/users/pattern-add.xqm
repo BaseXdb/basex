@@ -35,7 +35,6 @@ function dba:pattern-add(
   $perm     as xs:string,
   $error    as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
@@ -93,7 +92,6 @@ function dba:create(
   $perm     as xs:string,
   $pattern  as xs:string
 ) as empty-sequence() {
-  cons:check(),
   try {
     user:grant($name, $perm, $pattern),
     cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern was created.' })

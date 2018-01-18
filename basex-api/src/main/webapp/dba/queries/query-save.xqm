@@ -22,7 +22,6 @@ function dba:query-save(
   $name   as xs:string,
   $query  as xs:string
 ) as xs:string {
-  cons:check(),
   let $path := cons:current-dir() || $name
   return (
     try {

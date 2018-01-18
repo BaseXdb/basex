@@ -6,7 +6,6 @@
 module namespace dba = 'dba/common';
 
 import module namespace Request = 'http://exquery.org/ns/request';
-import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
 import module namespace html = 'dba/html' at 'modules/html.xqm';
 
 (:~
@@ -27,6 +26,7 @@ function dba:redirect(
  :)
 declare
   %rest:path("/dba/static/{$file=.+}")
+  %perm:allow("all")
 function dba:file(
   $file as xs:string
 ) as item()+ {
@@ -51,7 +51,6 @@ declare
 function dba:unknown(
   $path  as xs:string
 ) as element(html) {
-  cons:check(),
   html:wrap(
     <tr>
       <td>
@@ -63,18 +62,4 @@ function dba:unknown(
       </td>
     </tr>
   )
-};
-
-(:~
- : Login error: redirects to the login page.
- : @param  $page page to redirect to
- : @return redirection
- :)
-declare
-  %rest:error("basex:login")
-  %rest:error-param("value", "{$path}")
-function dba:error-login(
-  $path  as xs:string?
-) as element(rest:response) {
-  web:redirect("login", map { 'path': replace($path, '.*/', '') })
 };

@@ -41,7 +41,6 @@ function dba:user(
   $error    as xs:string?,
   $info     as xs:string?
 ) as element(html) {
-  cons:check(),
   let $user := user:list-details($name)
   let $admin := $name eq 'admin'
   return html:wrap(map { 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },

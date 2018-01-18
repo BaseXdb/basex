@@ -32,7 +32,6 @@ function dba:db-copy(
   $newname  as xs:string?,
   $error    as xs:string?
 ) as element(html) {
-  cons:check(),
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
@@ -75,7 +74,6 @@ function dba:db-copy(
   $name     as xs:string,
   $newname  as xs:string
 ) as empty-sequence() {
-  cons:check(),
   try {
     if(db:exists($newname)) then (
       error((), 'Database already exists.')

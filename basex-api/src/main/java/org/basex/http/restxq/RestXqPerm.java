@@ -15,8 +15,8 @@ import org.basex.query.value.seq.*;
  * @author Christian Gruen
  */
 public final class RestXqPerm implements Comparable<RestXqPerm> {
-  /** Permission path. */
-  final String path;
+  /** Permission path (with heading and trailing slash). */
+  private final String path;
   /** Permission variable (can be {@code null}). */
   final QNm var;
 
@@ -26,18 +26,23 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    * @param var name of variable (can be {@code null})
    */
   RestXqPerm(final String path, final QNm var) {
-    this.path = path.startsWith("/") ? path : '/' + path;
+    this.path = ('/' + path + '/').replaceAll("^/+|/+$", "/");
     this.var = var;
   }
 
   /**
    * Returns a map with permission information.
    * @param func function for which permission should be checked
+   * @param conn HTTP connection
    * @return permission information
    * @throws QueryException query exception
    */
-  Map map(final RestXqFunction func) throws QueryException {
-    return Map.EMPTY.put(Str.get(ALLOW), StrSeq.get(func.allows), null);
+  Map map(final RestXqFunction func, final HTTPConnection conn) throws QueryException {
+    Map map = Map.EMPTY;
+    map = map.put(Str.get(ALLOW), StrSeq.get(func.allows), null);
+    map = map.put(Str.get(PATH), Str.get(conn.req.getPathInfo()), null);
+    map = map.put(Str.get(METHOD), Str.get(conn.method), null);
+    return map;
   }
 
   /**
@@ -46,7 +51,8 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    * @return result of check
    */
   boolean matches(final HTTPConnection conn) {
-    return conn.path().startsWith(path);
+    final String p = conn.path();
+    return (p.endsWith("/") ? p : p + '/').startsWith(path);
   }
 
   @Override

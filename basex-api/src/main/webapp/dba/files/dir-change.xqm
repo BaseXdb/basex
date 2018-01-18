@@ -21,7 +21,6 @@ declare
 function dba:dir-change(
   $dir  as xs:string
 ) as element(rest:response) {
-  cons:check(),
   let $path := if(contains($dir, file:dir-separator())) then (
     $dir
   ) else (

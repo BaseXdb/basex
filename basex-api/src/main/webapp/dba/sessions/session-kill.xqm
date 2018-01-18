@@ -6,7 +6,6 @@
 module namespace dba = 'dba/sessions';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -24,7 +23,6 @@ declare
 function dba:drop(
   $ids  as xs:string*
 ) as element(rest:response) {
-  cons:check(),
   try {
     for $id in $ids
     return Sessions:delete(substring-before($id, '|'), substring-after($id, '|')),
