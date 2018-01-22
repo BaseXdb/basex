@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -150,6 +151,11 @@ public class CmpG extends Cmp {
 
     // optimize expression
     Expr expr = opt(op.op, cc);
+
+    // simplify singleton sequences
+    for(int e = 0; e < 2; e++) {
+      if(exprs[e] instanceof SingletonSeq) exprs[e] = ((SingletonSeq) exprs[e]).value;
+    }
     // range comparisons
     if(expr == this) expr = CmpR.get(this, cc);
     if(expr == this) expr = CmpSR.get(this, cc);
