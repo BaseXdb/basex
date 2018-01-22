@@ -3,7 +3,7 @@
 # Docker image for RestXQ applications.
 
 # For production applications, better choose a fixed version tag
-FROM basex/basexhttp:latest
+FROM basex/basexhttp:8.5.4
 MAINTAINER BaseX Team <basex-talk@mailman.uni-konstanz.de>
 
 # If you need to install additional Java dependencies, switch to root
