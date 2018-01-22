@@ -22,8 +22,8 @@ public final class JDBCConnections implements QueryResource {
   private final TokenObjMap<AutoCloseable> conns = new TokenObjMap<>();
 
   /**
-   * Adds a connection or prepared statement.
-   * @param conn connection or prepared statement
+   * Adds a connection.
+   * @param conn connection
    * @param url url
    * @return generated id
    */
@@ -34,12 +34,13 @@ public final class JDBCConnections implements QueryResource {
   }
 
   /**
-   * Adds a connection or prepared statement.
-   * @param stmt connection or prepared statement
+   * Adds a prepared statement.
+   * @param stmt prepared statement
    * @return generated id
+   * @throws SQLException SQL connection
    */
-  synchronized Uri add(final PreparedStatement stmt) {
-    final String url = string(get(stmt)).replaceAll("^(.+)/.+$", "$1");
+  synchronized Uri add(final PreparedStatement stmt) throws SQLException {
+    final String url = string(get(stmt.getConnection())).replaceAll("^(.+)/.+$", "$1");
     final byte[] uri = token(url + "/statement-" + ++lastId);
     conns.put(uri, stmt);
     return Uri.uri(uri);
