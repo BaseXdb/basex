@@ -40,7 +40,7 @@ public final class GUIOptions extends Options {
   /** Font TYPE = plain, bold, italics). */
   public static final NumberOption FONTTYPE = new NumberOption("FONTTYPE", 0);
   /** Font size. */
-  public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", GUIConstants.FONTSIZE);
+  public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", 15);
   /** Only display monospace fonts. */
   public static final BooleanOption ONLYMONO = new BooleanOption("ONLYMONO", false);
 

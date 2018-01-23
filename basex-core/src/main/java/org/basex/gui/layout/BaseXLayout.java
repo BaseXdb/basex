@@ -309,7 +309,7 @@ public final class BaseXLayout {
       } else if(DECFONT.is(e)) {
         nfs = Math.max(1, fs - 1);
       } else if(NORMFONT.is(e)) {
-        nfs = 13;
+        nfs = LABEL.getFont().getSize();
       }
       if(fs != nfs) {
         gui.gopts.set(GUIOptions.FONTSIZE, nfs);

@@ -252,7 +252,7 @@ public final class EditorView extends View {
   public void refreshLayout() {
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     search.refreshLayout();
-    final Font f = font.deriveFont((float) ((FONTSIZE + fontSize) / 2));
+    final Font f = font.deriveFont((search.getFont().getSize() * 1.2f + fontSize) / 2);
     info.setFont(f);
     pos.setFont(f);
     project.refreshLayout();

@@ -260,8 +260,8 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
 
   // FONTS ========================================================================================
 
-  /** Standard font size (unscaled). */
-  public static final int FONTSIZE = 13;
+  /** Dummy component for adjusting font sizes. */
+  public static final JLabel LABEL = new JLabel();
 
   /** Large font. */
   public static Font lfont;
@@ -276,8 +276,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   /** Current font size. */
   public static int fontSize;
 
-  /** Dummy component. */
-  private static final JLabel LABEL = new JLabel();
   /** Character widths. */
   private static int[] fwidth;
   /** Monospace character widths. */
@@ -301,6 +299,8 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   public static final int CTRL = Event.CTRL_MASK;
   /** Shortcut key (CTRL/META). */
   public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
+
+  // INITIALIZATION ===============================================================================
 
   /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }
@@ -343,12 +343,13 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     final String name = opts.get(GUIOptions.FONT);
     final int type = opts.get(GUIOptions.FONTTYPE);
 
+    final int sz = LABEL.getFont().getSize();
     fontSize = opts.get(GUIOptions.FONTSIZE);
     font  = new Font(name, type, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    lfont = new Font(name, type, (int) (FONTSIZE * 1.5 + fontSize / 2.0));
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, FONTSIZE);
+    lfont = new Font(name, type, (int) (sz * 1.2 + fontSize / 2.0));
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, sz);
 
     dmwidth  = LABEL.getFontMetrics(dmfont).getWidths();
     fwidth  = LABEL.getFontMetrics(font).getWidths();
