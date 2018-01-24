@@ -15,13 +15,13 @@ import module namespace html = 'dba/html' at 'modules/html.xqm';
  : @return redirection to login page or empty sequence
  :)
 declare
-  %perm:check('/dba', '{$request}')
+  %perm:check('/dba', '{$perm}')
 function dba:check(
   $perm  as map(*)
 ) as element(rest:response)? {
   (: redirect to login page if user is not logged in, or if page is not public :)
   let $path := $perm?path
-  where not($cons:SESSION-VALUE or $perm?allow = 'public')
+  where not($cons:SESSION-VALUE or $perm?allow = 'all')
   (: normalize login path :)
   let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
   (: last visited page to redirect to (if there was one) :)
