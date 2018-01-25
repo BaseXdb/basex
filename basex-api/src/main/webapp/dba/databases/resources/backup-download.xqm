@@ -16,5 +16,5 @@ declare
 function dba:backup-download(
   $backup  as xs:string
 ) as xs:base64Binary {
-  file:read-binary(db:system()/globaloptions/dbpath || '/' || $backup)
+  file:read-binary(db:option('dbpath') || '/' || $backup)
 };

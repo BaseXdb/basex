@@ -14,7 +14,7 @@ declare variable $cons:SESSION-VALUE := Session:get($cons:SESSION-KEY);
 
 (:~ Directory for DBA files. :)
 declare variable $cons:DBA-DIR := (
-  for $dir in db:system()//dbpath || '/.dba'
+  for $dir in db:option('dbpath') || '/.dba'
   return (
     if(file:exists($dir)) then () else file:create-dir($dir),
     file:path-to-native($dir)

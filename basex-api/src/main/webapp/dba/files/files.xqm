@@ -38,13 +38,12 @@ function dba:files(
         <h2>Directory</h2>
         <form action="dir-change" method="post">
           <select name="dir" style="width: 350px;" onchange="this.form.submit();">{
-            let $system := db:system()
-            let $webapp := dba:dir($system//webpath)[.]
+            let $webapp := dba:dir(db:option('webpath'))[.]
             let $options := (
               ['DBA'       , $cons:DBA-DIR],
               ['Webapp'    , $webapp],
-              ['RESTXQ'    , dba:dir($webapp ! file:resolve-path($system//restxqpath, .))],
-              ['Repository', dba:dir($system//repopath)],
+              ['RESTXQ'    , dba:dir($webapp ! file:resolve-path(db:option('restxqpath'), .))],
+              ['Repository', dba:dir(db:option('repopath'))],
               Q{java:java.io.File}listRoots() ! ['Root', string(.)],
               ['Current'   , $dir]
             )
