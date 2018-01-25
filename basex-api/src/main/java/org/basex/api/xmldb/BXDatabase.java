@@ -49,12 +49,8 @@ public final class BXDatabase implements Database {
 
   @Override
   public String getProperty(final String name) {
-    try {
-      return Get.get(name.toUpperCase(Locale.ENGLISH), ctx);
-    } catch(final BaseXException ex) {
-      Util.debug(ex);
-      return null;
-    }
+    final Object value = Get.get(name.toUpperCase(Locale.ENGLISH), ctx);
+    return value == null ? null : value.toString();
   }
 
   @Override

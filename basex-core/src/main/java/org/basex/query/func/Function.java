@@ -815,6 +815,8 @@ public enum Function {
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize.class, "optimize(database[,all[,options]])",
       arg(STR_O, BLN_O, MAP_ZO), EMP, flag(UPD), DB_URI),
+  /** XQuery function. */
+  _DB_OPTION(DbOption.class, "option(name)", arg(STR_ZO), STR_O, DB_URI),
   /** XQuery function (legacy). */
   _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), DB_URI),
   /** XQuery function (legacy). */

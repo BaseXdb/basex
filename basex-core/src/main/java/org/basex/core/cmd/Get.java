@@ -52,11 +52,9 @@ public final class Get extends AGet {
     } else {
       // retrieve value of specific option
       final String name = args[0].toUpperCase(Locale.ENGLISH);
-      try {
-        out.println(name + COLS + get(name, context));
-      } catch(final BaseXException ex) {
-        return error(ex.getMessage());
-      }
+      final Object value = get(name, context);
+      if(value == null) return error(context.options.error(name));
+      out.println(name + COLS + value);
     }
     return true;
   }
@@ -66,16 +64,14 @@ public final class Get extends AGet {
    * @param name name of option
    * @param ctx database context
    * @return value
-   * @throws BaseXException database exception
    */
-  public static String get(final String name, final Context ctx) throws BaseXException {
+  public static Object get(final String name, final Context ctx) {
     Options opts = ctx.options;
     Option<?> opt = opts.option(name);
     if(opt == null && ctx.user().has(Perm.ADMIN)) {
       opts = ctx.soptions;
       opt = opts.option(name);
     }
-    if(opt == null) throw new BaseXException(ctx.options.error(name));
-    return opts.get(opt).toString();
+    return opt == null ? null : opts.get(opt);
   }
 }

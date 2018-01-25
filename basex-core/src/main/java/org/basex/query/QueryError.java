@@ -223,6 +223,8 @@ public enum QueryError {
   /** Error code. */
   DB_OPEN2_X(DB, "open", "%"),
   /** Error code. */
+  DB_OPTION_X(DB, "option", "Unknown option: %."),
+  /** Error code. */
   DB_PATH_X(DB, "path", "Invalid path: %."),
   /** Error code. */
   DB_PROPERTY_X(DB, "property", "Unknown database property: %."),

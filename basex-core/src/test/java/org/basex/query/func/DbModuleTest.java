@@ -226,6 +226,16 @@ public final class DbModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
+  @Test public void option() {
+    final Function func = _DB_OPTION;
+    query(func.args("addraw"), false);
+    query(func.args("ADDRAW"), false);
+    query(func.args("runs"), 1);
+    query(func.args("bindings"), "");
+    error(func.args("XYZ"), DB_OPTION_X);
+  }
+
+  /** Test method. */
   @Test public void info() {
     final Function func = _DB_INFO;
     query("count(" + func.args(NAME) + "//" +
