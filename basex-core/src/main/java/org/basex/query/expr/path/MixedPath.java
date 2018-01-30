@@ -68,7 +68,7 @@ public final class MixedPath extends Path {
 
         // loop through all input items; cache nodes and items
         final ANodeBuilder nodes = new ANodeBuilder();
-        final ItemList items = new ItemList();
+        final ItemList atomics = new ItemList();
         final Expr step = steps[s];
         for(Item item; (item = iter.next()) != null;) {
           if(!(item instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, item.type, item);
@@ -78,21 +78,21 @@ public final class MixedPath extends Path {
           final Iter ir = step.iter(qc);
           for(Item it; (it = qc.next(ir)) != null;) {
             if(it instanceof ANode) nodes.add((ANode) it);
-            else items.add(it);
+            else atomics.add(it);
           }
           focus.pos++;
         }
 
-        if(items.isEmpty()) {
+        if(atomics.isEmpty()) {
           // all results are nodes: create new iterator
           iter = nodes.iter();
         } else {
           // raise error if this is not the final result
           if(s + 1 < sl)
-            throw PATHNODE_X_X_X.get(info, steps[s + 1], items.get(0).type, items.get(0));
+            throw PATHNODE_X_X_X.get(info, steps[s + 1], atomics.get(0).type, atomics.get(0));
           // result contains non-nodes: raise error if result any contains nodes
           if(!nodes.isEmpty()) throw MIXEDRESULTS.get(info);
-          iter = items.iter();
+          iter = atomics.iter();
         }
         size = iter.size();
       }

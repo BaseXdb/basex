@@ -60,9 +60,9 @@ public abstract class Path extends ParseExpr {
    * @param steps steps
    * @return path instance
    */
-  public static Path get(final InputInfo info, final Expr root, final Expr... steps) {
+  public static ParseExpr get(final InputInfo info, final Expr root, final Expr... steps) {
     // new list with steps
-    final int sl = steps.length;
+    int sl = steps.length;
     final ExprList list = new ExprList(sl);
 
     // merge nested paths
@@ -101,14 +101,23 @@ public abstract class Path extends ParseExpr {
     }
 
     // check if all steps are axis steps
-    boolean axes = true;
-    final Expr[] st = list.finish();
-    for(final Expr step : st) axes &= step instanceof Step;
+    int axes = 0;
+    final Expr[] st = list.toArray();
+    for(final Expr step : st) {
+      if(step instanceof Step) axes++;
+    }
+    sl = st.length;
+    if(axes == sl) return iterative(rt, st) ? new IterPath(info, rt, st) :
+      new CachedPath(info, rt, st);
 
-    // choose best implementation
-    final Path path = axes ? iterative(rt, st) ? new IterPath(info, rt, st) :
-      new CachedPath(info, rt, st) : new MixedPath(info, rt, st);
-    return path;
+    // if last expression yields no nodes, rewrite mixed path to simple map
+    // example: $a/b/string -> $a/b ! string()
+    final Expr last = st[sl - 1];
+    if(sl > 1 && last.seqType().type.instanceOf(AtomType.AAT)) {
+      list.remove(sl - 1);
+      return (SimpleMap) SimpleMap.get(info, Path.get(info, rt, list.finish()), last);
+    }
+    return new MixedPath(info, rt, st);
   }
 
   @Override
@@ -543,7 +552,7 @@ public abstract class Path extends ParseExpr {
     final Data data = rt.data();
     if(data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
 
-    Path path = this;
+    Expr path = this;
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // don't allow predicates in preceding location steps

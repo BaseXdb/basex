@@ -94,7 +94,7 @@ public abstract class AxisPath extends Path {
       stps.add(Step.get(info, step(s + 1).axis.invert(), step(s).test, step(s).exprs));
     }
     stps.add(Step.get(info, step(s + 1).axis.invert(), curr.test));
-    return Path.get(info, r, stps.finish());
+    return (Path) Path.get(info, r, stps.finish());
   }
 
   /**
@@ -111,7 +111,7 @@ public abstract class AxisPath extends Path {
    * @param preds predicate to be added
    * @return resulting path instance
    */
-  public final Path addPreds(final Expr... preds) {
+  public final ParseExpr addPreds(final Expr... preds) {
     steps[steps.length - 1] = step(steps.length - 1).addPreds(preds);
     return copyType(get(info, root, steps));
   }
