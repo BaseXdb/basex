@@ -68,8 +68,8 @@ final class RestXqResponse {
     qc.http(conn);
     qc.jc().type(RESTXQ);
 
-    final String singleton = func.singleton;
-    final RestXqSession session = new RestXqSession(conn, singleton, qc);
+    final String sngl = func.singleton;
+    final RestXqSingleton singleton = sngl != null ? new RestXqSingleton(conn, sngl, qc) : null;
     String redirect = null, forward = null;
 
     qc.register(qc.context);
@@ -97,18 +97,15 @@ final class RestXqResponse {
           // standard serialization
           serialize(first, iter, false);
         }
-      } else if(singleton != null) {
-        // cached serialization
-        serialize(first, iter, true);
       } else {
-        // standard serialization
-        serialize(first, iter, false);
+        // standard serialization (cache singleton requests)
+        serialize(first, iter, singleton != null);
       }
       return first == null;
     } finally {
       qc.close();
       qc.unregister(qc.context);
-      session.close();
+      if(singleton != null) singleton.close();
 
       if(redirect != null) {
         conn.redirect(redirect);
