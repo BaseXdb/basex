@@ -25,6 +25,28 @@ import org.basex.util.*;
  * for textual content in a compressed disk structure.
  * The table mapping is documented in {@link Data}.
  *
+ * Texts may be inlined on disk. The bits of the first byte of the 5-byte text reference can be
+ * decoded as follows:
+ *
+ * <pre>
+ * Bit 0 [INLINED]    indicates if value is inlined in table or stored externally
+ * Bit 1 [COMPRESSED] indicates if value is compressed
+ * Bit 2 [STRING]     indicates if an inlined value is a string
+ *
+ * - INLINED (text is inlined):
+ *   - STRING (value is string):
+ *     - Bits 4-7 contain string length
+ *     - 32 remaining bits contain inlined string
+ *     - COMPRESSED: unpack and return inlined text
+ *     - NOT COMPRESSED: return text unchanged
+ *   - NOT STRING (value is integer):
+ *     - return 32 bits of remaining 4 bytes as integer
+ * - NOT INLINED (text is stored externally):
+ *   - 38 remaining bits contain text reference
+ *   - COMPRESSED: unpack and return external text
+ *   - NOT COMPRESSED: return external text unchanged
+ * </pre>
+ *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
@@ -247,59 +269,42 @@ public final class DiskData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    final long o = textRef(pre);
-    return number(o) ? token((int) o) : txt(o, text);
+    final long value = textRef(pre);
+    return Inline.inlined(value) ? Inline.unpack(value) : txt(value, text);
   }
 
   @Override
   public long textItr(final int pre, final boolean text) {
-    final long o = textRef(pre);
-    return number(o) ? o & IO.OFFNUM - 1 : toLong(txt(o, text));
+    final long value = textRef(pre);
+    return Inline.inlined(value) ? Inline.unpackLong(value) : toLong(txt(value, text));
   }
 
   @Override
   public double textDbl(final int pre, final boolean text) {
-    final long o = textRef(pre);
-    return number(o) ? o & IO.OFFNUM - 1 : toDouble(txt(o, text));
+    final long value = textRef(pre);
+    return Inline.inlined(value) ? Inline.unpackDouble(value) : toDouble(txt(value, text));
   }
 
   @Override
   public int textLen(final int pre, final boolean text) {
-    final long o = textRef(pre);
-    if(number(o)) return numDigits((int) o);
+    final long value = textRef(pre);
+    if(Inline.inlined(value)) return Inline.unpackLength(value);
+
     final DataAccess da = text ? texts : values;
-    final int l = da.readNum(o & IO.OFFCOMP - 1);
-    // compressed: next number contains number of compressed bytes
-    return compressed(o) ? da.readNum() : l;
+    final int l = da.readNum(value & Compress.COMPRESS - 1);
+    // if text is compressed, read number of compressed bytes
+    return Compress.compressed(value) ? da.readNum() : l;
   }
 
   /**
    * Returns a text (text, comment, pi) or attribute value.
-   * @param off text offset
+   * @param offset text offset
    * @param text text or attribute flag
    * @return text
    */
-  private byte[] txt(final long off, final boolean text) {
-    final byte[] txt = (text ? texts : values).readToken(off & IO.OFFCOMP - 1);
-    return compressed(off) ? Compress.unpack(txt) : txt;
-  }
-
-  /**
-   * Returns true if the specified value contains a number.
-   * @param offset offset
-   * @return result of check
-   */
-  private static boolean number(final long offset) {
-    return (offset & IO.OFFNUM) != 0;
-  }
-
-  /**
-   * Returns true if the specified value references a compressed token.
-   * @param offset offset
-   * @return result of check
-   */
-  private static boolean compressed(final long offset) {
-    return (offset & IO.OFFCOMP) != 0;
+  private byte[] txt(final long offset, final boolean text) {
+    final byte[] txt = (text ? texts : values).readToken(offset & Compress.COMPRESS - 1);
+    return Compress.compressed(offset) ? Compress.unpack(txt) : txt;
   }
 
   @Override
@@ -313,8 +318,8 @@ public final class DiskData extends Data {
   protected void delete(final int pre, final boolean text) {
     // old entry (offset or value)
     final long old = textRef(pre);
-    // fill unused space with zero-bytes
-    if(!number(old)) (text ? texts : values).free(old & IO.OFFCOMP - 1, 0);
+    // if old text was not inlined, fill unused space in text file with zero bytes
+    if(!Inline.inlined(old)) (text ? texts : values).free(old & Compress.COMPRESS - 1, 0);
   }
 
   @Override
@@ -327,30 +332,30 @@ public final class DiskData extends Data {
     // old entry (offset or value)
     final long oldRef = textRef(pre);
 
-    // check if new entry is numeric and can be inlined
-    final long v = toSimpleInt(value);
-    if(v == Integer.MIN_VALUE) {
+    // check if new entry can be inlined
+    final long v = Inline.packInt(value);
+    if(v != -1) {
+      // invalidate old entry if it was not inlined
+      if(!Inline.inlined(oldRef)) store.free(oldRef & Compress.COMPRESS - 1, 0);
+      // inline integer value
+      textRef(pre, v);
+    } else {
       // otherwise, try to compress new value
       final byte[] val = Compress.pack(value);
 
       // choose inserting position
       final long off;
-      if(number(oldRef)) {
-        // old entry was numeric: append new entry to heap file
+      if(Inline.inlined(oldRef)) {
+        // old entry was inlined: append new entry to heap file
         off = store.length();
       } else {
         // otherwise, compute inserting position and invalidate old entry
         final int vl = val.length;
-        off = store.free(oldRef & IO.OFFCOMP - 1, vl + Num.length(vl));
+        off = store.free(oldRef & Compress.COMPRESS - 1, vl + Num.length(vl));
       }
 
       store.writeToken(off, val);
-      textRef(pre, val == value ? off : off | IO.OFFCOMP);
-    } else {
-      // invalidate old entry if it was not inlined
-      if(!number(oldRef)) store.free(oldRef & IO.OFFCOMP - 1, 0);
-      // inline integer value
-      textRef(pre, v | IO.OFFNUM);
+      textRef(pre, val == value ? off : off | Compress.COMPRESS);
     }
 
     // insert new entries
@@ -359,15 +364,15 @@ public final class DiskData extends Data {
 
   @Override
   protected long textRef(final byte[] value, final boolean text) {
-    // inline integer value
-    final long v = toSimpleInt(value);
-    if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
+    // try to inline value
+    final long inlined = Inline.pack(value);
+    if(inlined != 0) return inlined;
 
-    // store text to heap file
+    // store text in heap file
+    final byte[] packed = Compress.pack(value);
     final DataAccess store = text ? texts : values;
-    final long off = store.length();
-    final byte[] val = Compress.pack(value);
-    store.writeToken(off, val);
-    return val == value ? off : off | IO.OFFCOMP;
+    final long offset = store.length();
+    store.writeToken(offset, packed);
+    return packed != value ? Compress.COMPRESS | offset : offset;
   }
 }

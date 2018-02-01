@@ -165,15 +165,15 @@ public final class DiskBuilder extends Builder {
    * @throws IOException I/O exception
    */
   private long textRef(final byte[] value, final boolean text) throws IOException {
-    // inline integer value
-    final long v = Token.toSimpleInt(value);
-    if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
+    // try to inline value
+    final long inlined = Inline.pack(value);
+    if(inlined != 0) return inlined;
 
     // store text to heap file
+    final byte[] packed = Compress.pack(value);
     final DataOutput store = text ? xout : vout;
-    final long off = store.size();
-    final byte[] val = Compress.pack(value);
-    store.writeToken(val);
-    return val == value ? off : off | IO.OFFCOMP;
+    final long offset = store.size();
+    store.writeToken(packed);
+    return packed != value ? Compress.COMPRESS | offset : offset;
   }
 }

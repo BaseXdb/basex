@@ -565,26 +565,6 @@ public final class Token {
   }
 
   /**
-   * Converts the specified token into a positive integer value.
-   * {@link Integer#MIN_VALUE} is returned if non-digits are found
-   * or if the input is longer than nine characters.
-   * @param token token to be converted
-   * @return resulting integer value
-   */
-  public static int toSimpleInt(final byte[] token) {
-    final int te = token.length;
-    if(te >= 10 || te == 0) return Integer.MIN_VALUE;
-    if(token[0] == '0') return te == 1 ? 0 : Integer.MIN_VALUE;
-
-    int v = 0;
-    for(final byte c : token) {
-      if(c < '0' || c > '9') return Integer.MIN_VALUE;
-      v = (v << 3) + (v << 1) + c - '0';
-    }
-    return v;
-  }
-
-  /**
    * Calculates a hash code for the specified token.
    * @param token specified token
    * @return hash code

@@ -93,10 +93,6 @@ public abstract class IO {
 
   /** Maximum number of attributes (see bit layout in {@link Data} class). */
   public static final int MAXATTS = 0x1F;
-  /** Offset for inlining numbers (see bit layout in {@link Data} class). */
-  public static final long OFFNUM = 0x8000000000L;
-  /** Offset for compressing texts (see bit layout in {@link Data} class). */
-  public static final long OFFCOMP = 0x4000000000L;
 
   /** Absolute file path. All paths have forward slashes, no matter which OS is used. */
   protected String pth;

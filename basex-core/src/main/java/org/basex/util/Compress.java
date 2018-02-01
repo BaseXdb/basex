@@ -2,6 +2,8 @@ package org.basex.util;
 
 import java.util.*;
 
+import org.basex.data.*;
+
 /**
  * This class compresses and decompresses tokens. It is inspired by the
  * Huffman coding, but was simplified to speed up processing.
@@ -10,6 +12,9 @@ import java.util.*;
  * @author Christian Gruen
  */
 public final class Compress {
+  /** Offset for compressing texts (see {@link DiskData}). */
+  public static final long COMPRESS = 0x4000000000L;
+
   /** Private constructor. */
   private Compress() { }
 
@@ -122,6 +127,15 @@ public final class Compress {
       bytes[b] = (byte) (out >= 0x80 ? out : map[out]);
     }
     return bytes;
+  }
+
+  /**
+   * Indicates if the specified value is inlined.
+   * @param value value
+   * @return result of check
+   */
+  public static boolean compressed(final long value) {
+    return (value & COMPRESS) != 0;
   }
 
   /**
