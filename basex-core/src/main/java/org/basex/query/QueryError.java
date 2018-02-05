@@ -401,8 +401,6 @@ public enum QueryError {
   /** Error code. */
   SQL_PARAMETERS(SQL, "parameters", "No parameter type supplied."),
   /** Error code. */
-  SQL_PARAMETERS_X_X(SQL, "parameters", "Wrong number of parameters (% vs. %)."),
-  /** Error code. */
   SQL_TYPE_X_X(SQL, "type", "Invalid type (%): %."),
 
   // Unit Module
