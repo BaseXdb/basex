@@ -56,46 +56,26 @@ public final class SqlExecutePrepared extends SqlExecute {
     checkCreate(qc);
 
     final PreparedStatement stmt = prepared(qc);
-    long n = 0;
     ANode params = null;
     if(exprs.length > 1) {
       params = toElem(exprs[1], qc);
       if(!params.qname().eq(Q_PARAMETERS)) throw INVALIDOPTION_X.get(info, params.qname().local());
-      n = countParams(params);
     }
     final StatementOptions options = toOptions(2, new StatementOptions(), qc);
 
     try {
       stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
-      try {
-        // Check if number of parameters equals number of place holders
-        final int ph = stmt.getParameterMetaData().getParameterCount();
-        if(n != ph) throw SQL_PARAMETERS_X_X.get(info, n, ph);
-      } catch(final SQLSyntaxErrorException ex) {
-        // Oracle will fail receiving ParameterMetaData on update statement ()
-        // stackoverflow.com/questions/30666622/apache-dbutils-changing-column-name-in-update-sql
-        // disable all oracle exceptions (found beside ORA-00904 ORA-00936 also)
-        if(!ex.getMessage().startsWith("ORA-")) throw ex;
-      }
       if(params != null) setParameters(params.children(), stmt);
       // If execute returns false, statement was updating: return number of updated rows
       return iter(stmt, false, stmt.execute());
-    } catch(final SQLException ex) {
+    } catch(final QueryException ex) {
+      // already handled
+      throw ex;
+    } catch(final Exception ex) {
+      // assume other then SQLException related to SQL Processing also
+      // Eg. java.lang.ArrayIndexOutOfBoundsException in case of SQLite
       throw SQL_ERROR_X.get(info, ex);
     }
-  }
-
-  /**
-   * Counts the numbers of <sql:parameter/> elements.
-   * @param params element <sql:parameter/>
-   * @return number of parameters
-   */
-  private static long countParams(final ANode params) {
-    final BasicNodeIter iter = params.children();
-    long size = iter.size();
-    if(size == -1) do ++size;
-    while(iter.next() != null);
-    return size;
   }
 
   /**
