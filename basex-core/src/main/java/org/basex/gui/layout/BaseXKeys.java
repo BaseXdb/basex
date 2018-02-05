@@ -98,7 +98,6 @@ public enum BaseXKeys {
   // General
 
   /** Execute.               */ EXEC1(META, VK_ENTER),
-  /** Execute.               */ EXEC2(META, VK_F11),
   /** Test.                  */ UNIT(META | SHIFT, VK_ENTER),
 
   /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),

@@ -49,13 +49,13 @@ public final class EditorView extends View {
 
   /** Project files. */
   final ProjectView project;
+  /** Go button. */
+  final AbstractButton go;
 
   /** History Button. */
   private final AbstractButton hist;
   /** Stop Button. */
   private final AbstractButton stop;
-  /** Go button. */
-  private final AbstractButton go;
   /** Test button. */
   private final AbstractButton test;
   /** Search bar. */
@@ -248,8 +248,10 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    final boolean script = getEditor().script;
-    go.setEnabled(script || !gui.gopts.get(GUIOptions.EXECRT));
+    final IOFile file = getEditor().file();
+    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.name().contains(".");
+    final boolean script = file.hasSuffix(IO.BXSSUFFIX), rt = gui.gopts.get(GUIOptions.EXECRT);
+    go.setEnabled(xquery && !rt || script);
     test.setEnabled(!script);
   }
 
@@ -492,8 +494,9 @@ public final class EditorView extends View {
     editor.last = in;
 
     IOFile file = editor.file();
-    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.path().contains(".");
-    if(editor.script && run) {
+    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.name().contains(".");
+    final boolean script = file.hasSuffix(IO.BXSSUFFIX);
+    if(script && run) {
       // run query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(string(in)));
     } else if(xquery || run) {
@@ -538,13 +541,13 @@ public final class EditorView extends View {
       } catch(final IOException ex) {
         info(ex);
       }
-    } else if(editor.script || file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.XSLSUFFIXES)) {
+    } else if(script || file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.XSLSUFFIXES)) {
       final ArrayInput ai = new ArrayInput(in);
       try {
         // check XML syntax
-        if(startsWith(in, '<') || !editor.script) new XmlParser().parse(ai);
+        if(startsWith(in, '<') || !script) new XmlParser().parse(ai);
         // check command script
-        if(editor.script) CommandParser.get(string(in), gui.context).parse();
+        if(script) CommandParser.get(string(in), gui.context).parse();
         info(null);
       } catch(final Exception ex) {
         info(ex);
@@ -913,7 +916,6 @@ public final class EditorView extends View {
     String title = edit.file().name();
     if(mod) title += '*';
     edit.label.setText(title);
-    edit.script = edit.file().hasSuffix(IO.BXSSUFFIX);
 
     // update components
     gui.refreshControls();

@@ -31,8 +31,6 @@ public final class EditorArea extends TextPanel {
   private boolean modified;
   /** Last input. */
   byte[] last;
-  /** This flag indicates if the input is a command script. */
-  boolean script;
 
   /** View reference. */
   private final EditorView view;
@@ -131,10 +129,11 @@ public final class EditorArea extends TextPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    if(EXEC1.is(e) || EXEC2.is(e)) {
-      release(Action.EXECUTE);
+    final boolean exec = gui.editor.go.isEnabled();
+    if(EXEC1.is(e)) {
+      if(exec) release(Action.EXECUTE);
     } else if(UNIT.is(e)) {
-      release(Action.TEST);
+      if(exec) release(Action.TEST);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
       release(Action.CHECK);
     }
