@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -26,8 +25,8 @@ function dba:user-drop(
 ) as empty-sequence() {
   try {
     $names ! user:drop(.),
-    cons:redirect($dba:CAT, map { 'info': util:info($names, 'user', 'dropped') })
+    util:redirect($dba:CAT, map { 'info': util:info($names, 'user', 'dropped') })
   } catch * {
-    cons:redirect($dba:CAT, map { 'error': $err:description })
+    util:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

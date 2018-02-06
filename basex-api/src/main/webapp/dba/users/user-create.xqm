@@ -5,8 +5,9 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace options = 'dba/options' at '../modules/options.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -67,7 +68,7 @@ function dba:user-create(
               <td>Permission:</td>
               <td>
                 <select name='perm' size='5'>{
-                  for $p in $cons:PERMISSIONS
+                  for $p in $options:PERMISSIONS
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>
                 <div class='small'/>
@@ -105,9 +106,9 @@ function dba:user-create(
     ) else (
       user:create($name, $pw, $perm)
     ),
-    cons:redirect($dba:CAT, map { 'info': 'User was created.' })
+    util:redirect($dba:CAT, map { 'info': 'User was created.' })
   } catch * {
-    cons:redirect('user-create', map {
+    util:redirect('user-create', map {
       'name': $name, 'pw': $pw, 'perm': $perm, 'error': $err:description
     })
   }

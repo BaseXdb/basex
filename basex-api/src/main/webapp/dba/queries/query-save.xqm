@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~
  : Saves a query file and returns the list of stored queries.
@@ -22,7 +22,7 @@ function dba:query-save(
   $name   as xs:string,
   $query  as xs:string
 ) as xs:string {
-  let $path := cons:current-dir() || $name
+  let $path := session:directory() || $name
   return (
     try {
       prof:void(xquery:parse($query, map {
@@ -31,8 +31,8 @@ function dba:query-save(
     } catch * {
       error($err:code, 'Query was not stored: ' || $err:description, $err:value)
     },
-    cons:save(map { $cons:K-QUERY: $name }),
+    session:set($session:QUERY, $name),
     file:write-text($path, $query),
-    string-join(cons:query-files(), '/')
+    string-join(session:query-files(), '/')
   )
 };

@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Sub category :)
@@ -83,8 +82,8 @@ declare %updating function dba:action(
 ) as empty-sequence() {
   try {
     updating $action(),
-    cons:redirect($dba:SUB, map { 'name': $name, 'info': $info })
+    util:redirect($dba:SUB, map { 'name': $name, 'info': $info })
   } catch * {
-    cons:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
+    util:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
   }
 };

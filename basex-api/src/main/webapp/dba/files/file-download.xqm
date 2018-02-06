@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~
  : Downloads a file.
@@ -19,5 +19,5 @@ function dba:files(
   $name  as xs:string
 ) as item()+ {
   web:response-header(map { 'media-type': 'application/octet-stream' }),
-  file:read-binary(cons:current-dir() || $name)
+  file:read-binary(session:directory() || $name)
 };

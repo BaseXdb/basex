@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~
  : Returns the contents of a query file.
@@ -19,6 +19,6 @@ declare
 function dba:query-open(
   $name  as xs:string
 ) as xs:string {
-  cons:save(map { $cons:K-QUERY: $name }),
-  file:read-text(cons:current-dir() || $name)
+  session:set($session:QUERY, $name),
+  file:read-text(session:directory() || $name)
 };

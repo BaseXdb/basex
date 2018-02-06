@@ -8,6 +8,7 @@ module namespace dba = 'dba/sessions';
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace Session = 'http://basex.org/modules/session';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -50,7 +51,7 @@ function dba:sessions(
             let $access := Sessions:accessed($id)
             let $you := if(Session:id() = $id) then '✓' else '–'
             (: supported session ids (application-specific, can be extended :)
-            for $name in Sessions:names($id)[. = ('dba', 'id')]
+            for $name in Sessions:names($id)[. = ($session:ID, 'id')]
             let $value := try {
               Sessions:get($id, $name)
             } catch Sessions:get {

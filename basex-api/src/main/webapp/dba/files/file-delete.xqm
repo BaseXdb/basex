@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -27,7 +27,7 @@ function dba:file-delete(
     (: delete all files, ignore reference to parent directory :)
     for $name in $names
     where $name != '..'
-    return file:delete(cons:current-dir() || $name),
+    return file:delete(session:directory() || $name),
     web:redirect($dba:CAT, map { 'info': util:info($names, 'file', 'deleted') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })

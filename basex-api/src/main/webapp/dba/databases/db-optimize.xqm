@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
@@ -110,9 +109,9 @@ function dba:db-optimize(
         map:entry(., $opts = .),
       $lang ! map:entry('language', .)
     ))),
-    cons:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was optimized.' })
+    util:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was optimized.' })
   } catch * {
-    cons:redirect($dba:SUB, map {
+    util:redirect($dba:SUB, map {
       'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }
@@ -133,8 +132,8 @@ function dba:drop(
 ) as empty-sequence() {
   try {
     $names ! db:optimize(.),
-    cons:redirect($dba:CAT, map { 'info': util:info($names, 'database', 'optimized') })
+    util:redirect($dba:CAT, map { 'info': util:info($names, 'database', 'optimized') })
   } catch * {
-    cons:redirect($dba:CAT, map { 'error': $err:description })
+    util:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

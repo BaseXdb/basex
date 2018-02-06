@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -127,12 +127,12 @@ function dba:db-add-post(
           ('intparse', 'dtd', 'stripns', 'chop', 'xinclude') ! map:entry(., $opts = .))
         )
       ),
-      cons:redirect($dba:SUB,
+      util:redirect($dba:SUB,
         map { 'name': $name, 'path': $path, 'info': 'Resource was added.' }
       )
     )
   } catch * {
-    cons:redirect('db-add', map {
+    util:redirect('db-add', map {
       'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary, 'error': $err:description
     })
   }

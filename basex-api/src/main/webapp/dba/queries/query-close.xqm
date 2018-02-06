@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~
  : Closes a query file.
@@ -18,5 +18,5 @@ declare
 function dba:query-save(
   $name   as xs:string
 ) as empty-sequence() {
-  cons:save(map { $cons:K-QUERY: '' })
+  session:set($session:QUERY, '')
 };

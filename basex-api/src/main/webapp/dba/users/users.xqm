@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -44,7 +44,7 @@ function dba:users(
           let $rows :=
             for $user in user:list-details()
             let $name := string($user/@name)
-            let $you := if($cons:SESSION-VALUE = $name) then '✓' else '–'
+            let $you := if($session:VALUE = $name) then '✓' else '–'
             return <row name='{ $name }' perm='{ $user/@permission }' you='{ $you }'/>
           let $buttons := (
             html:button('user-create', 'Create…'),

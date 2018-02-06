@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -89,12 +89,12 @@ function dba:db-replace-post(
         fetch:xml-binary($file($key))
       )
       return db:replace($name, $resource, $input),
-      cons:redirect($dba:SUB, map {
+      util:redirect($dba:SUB, map {
         'name': $name, 'resource': $resource, 'info': 'Resource was replaced.'
       })
     )
   } catch * {
-    cons:redirect('db-replace', map {
+    util:redirect('db-replace', map {
       'name': $name, 'resource': $resource, 'error': $err:description
     })
   }

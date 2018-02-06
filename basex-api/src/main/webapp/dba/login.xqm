@@ -5,8 +5,7 @@
  :)
 module namespace dba = 'dba/login';
 
-import module namespace Session = 'http://basex.org/modules/session';
-import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
+import module namespace session = 'dba/session' at 'modules/session.xqm';
 import module namespace html = 'dba/html' at 'modules/html.xqm';
 
 (:~
@@ -21,7 +20,7 @@ function dba:check(
 ) as element(rest:response)? {
   (: redirect to login page if user is not logged in, or if page is not public :)
   let $path := $perm?path
-  where not($cons:SESSION-VALUE or $perm?allow = 'all')
+  where not($session:VALUE or $perm?allow = 'all')
   (: normalize login path :)
   let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
   (: last visited page to redirect to (if there was one) :)
@@ -103,7 +102,7 @@ function dba:login(
     if(user:list-details($name)/@permission != 'admin') then (
       dba:reject($name, 'Admin credentials required', $page)
     ) else (
-      dba:accept($name, $pass, $page)
+      dba:accept($name, $page)
     )
   } catch user:* {
     dba:reject($name, 'Please check your login data', $page)
@@ -118,24 +117,28 @@ declare
   %rest:path("/dba/logout")
 function dba:logout(
 ) as element(rest:response) {
-  admin:write-log('DBA user was logged out: ' || $cons:SESSION-VALUE),
-  web:redirect("/dba/login", map { 'name': $cons:SESSION-VALUE }),
-  Session:delete($cons:SESSION-KEY)
+  (: write log entry, redirect to login page :)
+  admin:write-log('DBA user was logged out: ' || $session:VALUE),
+  web:redirect("/dba/login", map { 'name': $session:VALUE }),
+  (: closes the DBA session :)
+  session:close()
 };
 
 (:~
- : Accepts a user and redirects to the main page.
+ : Registers a user and redirects to the main page.
  : @param  $name  entered user name
- : @param  $page  page to redirect to
+ : @param  $page  page to redirect to (optional)
  : @return redirection
  :)
 declare %private function dba:accept(
   $name  as xs:string,
-  $pass  as xs:string,
   $page  as xs:string?
 ) as element(rest:response) {
-  Session:set($cons:SESSION-KEY, $name),
+  (: register user, write log entry :)
+  session:set($session:ID, $name),
   admin:write-log('DBA user was logged in: ' || $name),
+
+  (: redirect to supplied page or main page :)
   web:redirect(if($page) then $page else "databases")
 };
 
@@ -143,7 +146,7 @@ declare %private function dba:accept(
  : Rejects a user and redirects to the login page.
  : @param  $name     entered user name
  : @param  $message  error message
- : @param  $page     path to redirect to
+ : @param  $page     path to redirect to (optional)
  : @return redirection
  :)
 declare %private function dba:reject(
@@ -151,6 +154,7 @@ declare %private function dba:reject(
   $message  as xs:string,
   $page     as xs:string?
 ) as element(rest:response) {
+  (: write log entry, redirect to login page :)
   admin:write-log('DBA login was denied: ' || $name),
   web:redirect("login", map { 'name': $name, 'error': $message, 'page': $page })
 };

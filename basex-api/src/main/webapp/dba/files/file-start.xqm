@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -26,7 +26,7 @@ function dba:file-start(
   let $params := try {
     (: stop running job before starting new job :)
     jobs:stop($id),
-    prof:void(jobs:invoke(cons:current-dir() || $id, (), map { 'cache': 'true', 'id': $file })),
+    prof:void(jobs:invoke(session:directory() || $id, (), map { 'cache': 'true', 'id': $file })),
     map { 'info': 'Job was started.', 'job': $id }
   } catch * {
     map { 'error': $err:description }

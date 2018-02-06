@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -22,6 +22,6 @@ declare
 function dba:file-delete(
   $name  as xs:string
 ) as element(rest:response) {
-  file:create-dir(cons:current-dir() || $name),
+  file:create-dir(session:directory() || $name),
   web:redirect($dba:CAT, map { 'info': 'Directory "' || $name || '" was created.' })
 };

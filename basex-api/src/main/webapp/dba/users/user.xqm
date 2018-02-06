@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace options = 'dba/options' at '../modules/options.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -85,7 +85,7 @@ function dba:user(
                   <td>
                     <select name="perm" size="5">{
                       let $perm := head(($perm, $user/@permission))
-                      for $p in $cons:PERMISSIONS
+                      for $p in $options:PERMISSIONS
                       return element option { attribute selected { }[$p = $perm], $p }
                     }</select>
                     <div class='small'/>

@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -113,11 +113,11 @@ function dba:create(
         return map:entry($option, $opts = $option),
         $lang ! map:entry('language', .)))
       ),
-      cons:redirect($dba:SUB, map { 'name': $name,
+      util:redirect($dba:SUB, map { 'name': $name,
         'info': 'Database "' || $name || '"  was created.' })
     )
   } catch * {
-    cons:redirect('db-create', map {
+    util:redirect('db-create', map {
       'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }

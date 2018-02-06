@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -88,12 +88,12 @@ function dba:db-rename(
       error((), 'Resource already exists.')
     ) else (
       db:rename($name, $resource, $target),
-      cons:redirect($dba:SUB, map {
+      util:redirect($dba:SUB, map {
         'name': $name, 'resource': $target, 'info': 'Resource was renamed.'
       })
     )
   } catch * {
-    cons:redirect('db-rename', map {
+    util:redirect('db-rename', map {
       'name': $name, 'resource': $resource, 'target': $target, 'error': $err:description
     })
   }

@@ -5,7 +5,8 @@
  :)
 module namespace html = 'dba/html';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace options = 'dba/options' at 'options.xqm';
+import module namespace session = 'dba/session' at 'session.xqm';
 import module namespace util = 'dba/util' at 'util.xqm';
 
 (: Number formats. :)
@@ -61,7 +62,7 @@ declare function html:wrap(
                   <span style='float:left'>
                     <h1>BaseX Database Administration</h1>
                   </span>,
-                  for $name in $cons:SESSION-VALUE
+                  for $name in $session:VALUE
                   return <span style='float:right'>
                     <b>{ $name }</b> (<a href='logout'>logout</a>)
                   </span>
@@ -338,7 +339,7 @@ declare function html:table(
       return $row
   )
 
-  let $max := $cons:OPTIONS($cons:K-MAXROWS)
+  let $max := options:get($options:MAXROWS)
   let $start := head((($page - 1) * $max + 1, 1))
 
   let $entries := if($count) then (

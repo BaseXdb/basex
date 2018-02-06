@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -24,7 +24,7 @@ function dba:file-upload(
   $files  as map(xs:string, xs:base64Binary)
 ) as element(rest:response) {
   (: save files :)
-  let $dir := cons:current-dir()
+  let $dir := session:directory()
   return try {
     (: Parse all XQuery files; reject files that cannot be parsed :)
     map:for-each($files, function($file, $content) {

@@ -5,8 +5,9 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace options = 'dba/options' at '../modules/options.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
@@ -31,7 +32,7 @@ function dba:files(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  let $dir := cons:current-dir()
+  let $dir := session:directory()
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
@@ -40,7 +41,7 @@ function dba:files(
           <select name="dir" style="width: 350px;" onchange="this.form.submit();">{
             let $webapp := dba:dir(db:option('webpath'))[.]
             let $options := (
-              ['DBA'       , $cons:DBA-DIR],
+              ['DBA'       , $options:DBA-DIRECTORY],
               ['Webapp'    , $webapp],
               ['RESTXQ'    , dba:dir($webapp ! file:resolve-path(db:option('restxqpath'), .))],
               ['Repository', dba:dir(db:option('repopath'))],

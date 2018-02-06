@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -21,11 +21,13 @@ declare
 function dba:dir-change(
   $dir  as xs:string
 ) as element(rest:response) {
-  let $path := if(contains($dir, file:dir-separator())) then (
-    $dir
-  ) else (
-    file:path-to-native(cons:current-dir() || $dir || '/')    
-  )
-  return cons:save(map { $cons:K-DIRECTORY: $path, $cons:K-QUERY: '' }),
+  session:set($session:DIRECTORY,
+    if(contains($dir, file:dir-separator())) then (
+      $dir
+    ) else (
+      file:path-to-native(session:directory() || $dir || '/')    
+    )
+  ),
+  session:set($session:QUERY, ''),
   web:redirect($dba:CAT)
 };

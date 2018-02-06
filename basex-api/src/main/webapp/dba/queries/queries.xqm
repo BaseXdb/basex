@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace session = 'dba/session' at '../modules/session.xqm';
 
 (:~ Top category. :)
 declare variable $dba:CAT := 'queries';
@@ -63,7 +63,7 @@ function dba:queries(
                   <input id='file' name='file' placeholder='Name of query' size='35'
                          list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
                   <datalist id='files'>{
-                    for $file in cons:query-files()
+                    for $file in session:query-files()
                     return element option { $file }
                   }</datalist>{ ' ' }
                   <button type='submit' name='open' id='open' disabled=''
@@ -89,7 +89,7 @@ function dba:queries(
         </table>,
         <textarea name='output' id='output' readonly=''/>,
         html:js('loadCodeMirror(true);'),
-        for $name in (($file, $cons:OPTIONS($cons:K-QUERY))[.])[1]
+        for $name in (($file, session:get($session:QUERY))[.])[1]
         return html:js('openQuery("' || $name || '");')
       }</td>
     </tr>
