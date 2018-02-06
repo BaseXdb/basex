@@ -102,7 +102,7 @@
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>	9.4.8.v20171121</version>
+        <version>9.4.8.v20171121</version>
         <configuration>
           <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <stopKey>keyToStopJetty</stopKey>
