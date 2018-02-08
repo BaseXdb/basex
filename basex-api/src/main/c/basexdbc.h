@@ -4,9 +4,6 @@
  * Copyright (c) 2005-12, Alexander Holupirek <alex@holupirek.de>, BSD license
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /* Connect to BaseX server and open session. Returns socket file descriptor. */
 int basex_connect(const char *host, const char *port);
 
@@ -28,6 +25,3 @@ int basex_execute(int sfd, const char *command, char **result, char **info);
 
 /* Close session with descriptor sfd. */
 void basex_close(int sfd);
-#ifdef __cplusplus
-}
-#endif
