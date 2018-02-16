@@ -7,6 +7,7 @@ import static org.basex.util.http.HttpText.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.zip.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
@@ -63,11 +64,14 @@ public final class HttpPayload {
    * Parses the HTTP payload and returns a result body element.
    * @param type media type
    * @param error error flag
+   * @param encoding content encoding
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FElem parse(final MediaType type, final boolean error) throws IOException, QueryException {
+  FElem parse(final MediaType type, final boolean error, final String encoding)
+      throws IOException, QueryException {
+
     final FElem body;
     if(type.isMultipart()) {
       // multipart response
@@ -80,9 +84,10 @@ public final class HttpPayload {
       // single part response
       body = new FElem(Q_BODY);
       if(payloads != null) {
+        final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
         final byte[] pl = (type.isXML() || type.isText()
-          ? new NewlineInput(input).encoding(type.parameters().get(CHARSET))
-          : new BufferInput(input)
+          ? new NewlineInput(in).encoding(type.parameters().get(CHARSET))
+          : new BufferInput(in)
         ).content();
         Value value = Empty.SEQ;
         try {

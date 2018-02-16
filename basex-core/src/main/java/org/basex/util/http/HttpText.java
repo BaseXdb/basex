@@ -19,6 +19,8 @@ public interface HttpText {
   /** HTTP header string. */
   String AUTHORIZATION = "Authorization";
   /** HTTP header string. */
+  String CONTENT_ENCODING = "Content-Encoding";
+  /** HTTP header string. */
   String CONTENT_TYPE = "Content-Type";
   /** HTTP header string. */
   String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
@@ -67,6 +69,9 @@ public interface HttpText {
   String AUTH = "auth";
   /** Auth-int. */
   String AUTH_INT = "auth-int";
+
+  /** Content encoding: gzip. */
+  String GZIP = "gzip";
 
   /** QName. */
   QNm Q_BODY = new QNm(HTTP_PREFIX, "body", HTTP_URI);
