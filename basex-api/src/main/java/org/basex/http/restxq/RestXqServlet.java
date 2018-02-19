@@ -3,8 +3,6 @@ package org.basex.http.restxq;
 import static org.basex.http.HTTPText.*;
 import static org.basex.http.restxq.RestXqText.*;
 
-import java.util.*;
-
 import javax.servlet.http.*;
 
 import org.basex.http.*;
@@ -48,8 +46,7 @@ public final class RestXqServlet extends BaseXServlet {
 
     try {
       boolean valid = true;
-      List<RestXqFunction> checks = rxm.checks(conn);
-      for(final RestXqFunction check : checks) {
+      for(final RestXqFunction check : rxm.checks(conn)) {
         if(!check.process(conn, func)) {
           valid = false;
           break;
