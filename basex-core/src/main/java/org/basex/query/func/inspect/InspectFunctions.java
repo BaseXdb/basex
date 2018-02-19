@@ -7,13 +7,11 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -47,9 +45,7 @@ public final class InspectFunctions extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : qc.funcs.funcs()) {
-      if(old.contains(sf)) continue;
-      final FuncItem fi = Functions.getUser(sf, qc, sf.sc, info);
-      if(sc.mixUpdates || !fi.annotations().contains(Annotation.UPDATING)) vb.add(fi);
+      if(!old.contains(sf)) vb.add(Functions.getUser(sf, qc, sf.sc, info));
     }
     return vb.value();
   }
