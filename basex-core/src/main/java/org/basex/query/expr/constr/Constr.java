@@ -2,6 +2,7 @@ package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -155,7 +156,8 @@ public final class Constr {
 
         // add text node
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
-        node = node.deepCopy(qc.context.options, qc);
+        final MainOptions mopts = qc.context.options;
+        if(mopts.get(MainOptions.COPYNODE)) node = node.deepCopy(mopts, qc);
         children.add(node);
       }
       more = false;

@@ -141,6 +141,8 @@ public final class MainOptions extends Options {
   public static final NumberOption RUNS = new NumberOption("RUNS", 1);
   /** Flag for enforcing index rewritings. */
   public static final BooleanOption ENFORCEINDEX = new BooleanOption("ENFORCEINDEX", false);
+  /** Deep node copies. */
+  public static final BooleanOption COPYNODE = new BooleanOption("COPYNODE", true);
 
   // Serialize
 

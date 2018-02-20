@@ -227,6 +227,15 @@ public final class SimpleTest extends QueryTest {
         "for $i in (1, 10000000000) return (1 to $i, 'x')[last()]" },
       { "List 3", integers(2, 10000000001L),
         "for $i in (1, 10000000000) return count((1 to $i, 'x'))" },
+
+      { "Identity 1", booleans(false),
+          "let $a := <a/> " +
+          "let $b := <_>{ $a }</_> " +
+          "return $b/a is $a" },
+      { "Identity 2", booleans(true),
+          "let $a := <a/> " +
+          "let $b := (# db:copynode false #) { <_>{ $a }</_> } " +
+          "return $b/a is $a" },
     };
   }
 }
