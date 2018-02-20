@@ -90,9 +90,11 @@ public interface RestXqText {
   /** Error message. */
   String INPUT_CONV_X = "Input could not be converted: %";
   /** Error message. */
-  String PATH_CONFLICT_X_X = "Path \"%\" assigned to several functions:%";
+  String PATH_CONFLICT_X_X = "Several functions found for path \"%\":%";
   /** Error message. */
-  String ERROR_CONFLICT_X_X = "Error \"%\" matched by several functions:%";
+  String ERROR_CONFLICT_X_X = "Several functions found for error \"%\":%";
+  /** Error message. */
+  String ERROR_QS_X = "Invalid quality factor: qs=%";
   /** Error message. */
   String NO_VALUE_X = "'%' element has no string value.";
 

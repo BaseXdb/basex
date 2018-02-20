@@ -198,6 +198,16 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       }
     }
 
+    // check validity of quality factors
+    for(final MediaType produce : produces) {
+      final String qf = produce.parameters().get("qs");
+      if(qf != null) {
+        final double d = toDouble(token(qf));
+        // NaN will be included if negated condition is used...
+        if(!(d >= 0 && d <= 1)) throw error(function.info, ERROR_QS_X, qf);
+      }
+    }
+
     if(found) {
       final int paths = (path != null ? 1 : 0) + (error != null ? 1 : 0) +
           (permission != null ? 1 : 0);

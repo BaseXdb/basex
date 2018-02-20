@@ -1,9 +1,11 @@
 package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -89,35 +91,38 @@ public final class RestXqModules {
   }
 
   /**
-   * Returns the function that matches the current request or the specified error code.
+   * Returns the function that matches the current request or the specified error code best.
    * @param conn HTTP connection
    * @param error error code (assigned if error function is to be called)
    * @return function, or {@code null} if no function matches
    * @throws Exception exception (including unexpected ones)
    */
   RestXqFunction find(final HTTPConnection conn, final QNm error) throws Exception {
-    // collect all functions
-    final List<RestXqFunction> list = find(conn, error, false);
-    // no path matches
-    if(list.isEmpty()) return null;
+    // collect all function candidates
+    List<RestXqFunction> funcs = find(conn, error, false);
+    if(funcs.isEmpty()) return null;
 
-    // return best matching function
-    final RestXqFunction best = list.get(0);
-    if(list.size() == 1 || best.compareTo(list.get(1)) != 0) return best;
-
-    // check quality factor
-    final RestXqFunction bestQf = bestQf(list, conn);
-    if(bestQf != null) return bestQf;
-
-    // show error if more than one path with the same specifity exists
-    final TokenBuilder tb = new TokenBuilder();
-    for(final RestXqFunction rxf : list) {
-      if(best.compareTo(rxf) != 0) break;
-      tb.add(Prop.NL).add(rxf.function.info.toString());
+    // remove functions with different specifity
+    final RestXqFunction first = funcs.get(0);
+    for(int l = funcs.size() - 1; l > 0; l--) {
+      if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
     }
-    throw best.path == null ?
-      best.error(ERROR_CONFLICT_X_X, error, tb) :
-      best.error(PATH_CONFLICT_X_X, best.path, tb);
+    // return single function
+    if(funcs.size() == 1) return first;
+
+    // multiple functions: check quality factors
+    funcs = bestQf(funcs, conn);
+    if(funcs.size() == 1) return funcs.get(0);
+
+    // show error if we are left with multiple function candidates
+    final TokenBuilder tb = new TokenBuilder();
+    for(final RestXqFunction func : funcs) {
+      tb.add(Text.NL).add(Text.LI).addExt(func.function.name.prefixString());
+      if(!func.produces.isEmpty()) tb.add(" ").addExt(func.produces);
+    }
+    throw first.path == null ?
+      first.error(ERROR_CONFLICT_X_X, error, tb) :
+      first.error(PATH_CONFLICT_X_X, first.path, tb);
   }
 
   /**
@@ -135,7 +140,7 @@ public final class RestXqModules {
    * @param conn HTTP connection
    * @param error error code (assigned if error function is to be called)
    * @param perm permission flag
-   * @return list of function, ordered by relevance
+   * @return list of matching functions, ordered by specifity
    * @throws Exception exception (including unexpected ones)
    */
   private List<RestXqFunction> find(final HTTPConnection conn, final QNm error, final boolean perm)
@@ -143,51 +148,89 @@ public final class RestXqModules {
 
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqModule rxm : cache(conn.context).values()) {
-      for(final RestXqFunction rxf : rxm.functions()) {
-        if(rxf.matches(conn, error, perm)) list.add(rxf);
+    for(final RestXqModule mod : cache(conn.context).values()) {
+      for(final RestXqFunction func : mod.functions()) {
+        if(func.matches(conn, error, perm)) list.add(func);
       }
     }
-    // sort by relevance
+    // sort by specifity
     Collections.sort(list);
     return list;
   }
 
   /**
-   * Returns the function that has a media type whose quality factor matches the HTTP request best.
-   * @param list list of functions
+   * Returns the functions with media type whose quality factors match best.
+   * @param funcs list of functions
    * @param conn HTTP connection
-   * @return best function, or {@code null} if more than one function exists
+   * @return list of matching functions
    */
-  private static RestXqFunction bestQf(final List<RestXqFunction> list,
+  private static List<RestXqFunction> bestQf(final List<RestXqFunction> funcs,
       final HTTPConnection conn) {
 
-    // media types accepted by the client
+    // find highest matching quality factors
     final MediaType[] accepts = conn.accepts();
-
-    double bestQf = 0;
-    RestXqFunction best = list.get(0);
-    for(final RestXqFunction rxf : list) {
-      // skip remaining functions with a weaker specifity
-      if(best.compareTo(rxf) != 0) break;
-      if(rxf.produces.isEmpty()) return null;
-
-      for(final MediaType produce : rxf.produces) {
-        for(final MediaType accept : accepts) {
-          final String value = accept.parameters().get("q");
-          final double qf = value == null ? 1 : Double.parseDouble(value);
-          if(produce.matches(accept)) {
-            // multiple functions with the same quality factor
-            if(bestQf == qf) return null;
-            if(bestQf < qf) {
-              bestQf = qf;
-              best = rxf;
+    double cQf = 0, sQf = 0;
+    for(final RestXqFunction func : funcs) {
+      for(final MediaType accept : accepts) {
+        if(func.produces.isEmpty()) {
+          cQf = Math.max(cQf, qf(accept, "q"));
+          sQf = 1;
+        } else {
+          for(final MediaType produce : func.produces) {
+            if(produce.matches(accept)) {
+              cQf = Math.max(cQf, qf(accept, "q"));
+              sQf = Math.max(sQf, qf(produce, "qs"));
             }
           }
         }
       }
     }
-    return best;
+
+    // find matching functions
+    final List<RestXqFunction> list = bestQf(funcs, accepts, cQf, -1);
+    return list.size() > 1 ? bestQf(funcs, accepts, cQf, sQf) : list;
+  }
+
+  /**
+   * Returns the functions with media type whose quality factors match best.
+   * @param funcs list of functions
+   * @param accepts accept media types
+   * @param clientQf client quality factor
+   * @param serverQf server quality factor (ignore if {@code -1})
+   * @return list of matching functions
+   */
+  private static List<RestXqFunction> bestQf(final List<RestXqFunction> funcs,
+      final MediaType[] accepts, final double clientQf, final double serverQf) {
+
+    final ArrayList<RestXqFunction> list = new ArrayList<>();
+    for(final RestXqFunction func : funcs) {
+      final BooleanSupplier s = () -> {
+        for(final MediaType accept : accepts) {
+          if(func.produces.isEmpty()) {
+            if(qf(accept, "q") == clientQf) return true;
+          } else {
+            for(final MediaType produce : func.produces) {
+              if(produce.matches(accept) && qf(accept, "q") == clientQf &&
+                  (serverQf == -1 || qf(produce, "qs") == serverQf)) return true;
+            }
+          }
+        }
+        return false;
+      };
+      if(s.getAsBoolean()) list.add(func);
+    }
+    return list;
+  }
+
+  /**
+   * Returns the quality factor of the specified media type.
+   * @param mt media type
+   * @param f quality factor string
+   * @return quality factor
+   */
+  private static double qf(final MediaType mt, final String f) {
+    final String qf = mt.parameters().get(f);
+    return qf != null ? toDouble(token(qf)) : 1;
   }
 
   /**
