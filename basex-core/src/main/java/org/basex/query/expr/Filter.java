@@ -102,8 +102,17 @@ public abstract class Filter extends Preds {
       return Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs)).optimize(cc);
     }
 
-    // no numeric predicates.. use simple iterator
-    if(!positional()) return copyType(new IterFilter(info, root, exprs));
+    // no numeric predicates..
+    if(!positional()) {
+      // rewrite independent deterministic single filter to if expression:
+      // example: (1 to 10)[$boolean] -> if($boolean) then (1 to 10) else ()
+      final Expr expr = exprs[0];
+      if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber())
+        return new If(info, expr, root, Empty.SEQ).optimize(cc);
+
+      // otherwise, return iterative filter
+      return copyType(new IterFilter(info, root, exprs));
+    }
 
     // evaluate positional predicates
     Expr rt = root;
