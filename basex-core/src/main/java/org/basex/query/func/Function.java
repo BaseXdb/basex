@@ -753,7 +753,7 @@ public enum Function {
 
   /** XQuery function. */
   _DB_ADD(DbAdd.class, "add(database,input[,path[,options]])",
-      arg(STR_O, NOD_O, STR_O, MAP_ZO), EMP, flag(UPD), DB_URI),
+      arg(STR_O, ITEM_O, STR_O, MAP_ZO), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR_O, STR_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
