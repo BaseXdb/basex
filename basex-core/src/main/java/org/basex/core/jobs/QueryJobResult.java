@@ -9,7 +9,7 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class JobResult {
+public final class QueryJobResult {
   /** Job. */
   public final Job job;
   /** Query result. */
@@ -23,7 +23,7 @@ public final class JobResult {
    * Job.
    * @param job job
    */
-  public JobResult(final Job job) {
+  public QueryJobResult(final Job job) {
     this.job = job;
   }
 

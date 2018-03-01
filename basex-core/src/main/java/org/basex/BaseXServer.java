@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
@@ -60,6 +61,8 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   public BaseXServer(final String... args) throws IOException {
     this(new Context(), args);
+    // start persistent jobs
+    new Jobs(context).run();
   }
 
   /**

@@ -18,9 +18,9 @@ public final class JobPool {
   /** Queued or running jobs. */
   public final Map<String, Job> active = new ConcurrentHashMap<>();
   /** Cached results. */
-  public final Map<String, JobResult> results = new ConcurrentHashMap<>();
+  public final Map<String, QueryJobResult> results = new ConcurrentHashMap<>();
   /** Timer tasks. */
-  public final Map<String, JobTask> tasks = new ConcurrentHashMap<>();
+  public final Map<String, QueryJobTask> tasks = new ConcurrentHashMap<>();
 
   /** Timer. */
   final Timer timer = new Timer(true);

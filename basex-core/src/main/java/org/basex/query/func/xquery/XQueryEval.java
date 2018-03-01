@@ -73,8 +73,7 @@ public class XQueryEval extends StandardFunc {
 
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final Options opts = new XQueryOptions();
-    if(exprs.length > 2) toOptions(2, opts, qc);
+    final Options opts = toOptions(2, new XQueryOptions(), qc);
 
     // allow limited number of nested calls
     QueryContext qcAnc = qc;

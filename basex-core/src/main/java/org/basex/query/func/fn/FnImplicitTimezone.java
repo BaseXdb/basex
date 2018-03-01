@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class FnImplicitTimezone extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return qc.initDateTime().zone;
+    return qc.dateTime().zone;
   }
 }

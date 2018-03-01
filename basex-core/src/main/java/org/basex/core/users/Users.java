@@ -47,14 +47,13 @@ public final class Users {
   private void read() {
     if(!file.exists()) return;
     try {
-      final byte[] io = file.read();
-      final IOContent content = new IOContent(io, file.path());
+      final IOContent content = new IOContent(file.read(), file.path());
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
       final ANode doc = new DBNode(Parser.singleParser(content, options, ""));
       final ANode root = children(doc, USERS).next();
       if(root == null) {
-        Util.errln(file.name() + ": No '%' root element.", USERS);
+        Util.errln(file + ": No '%' root element.", USERS);
       } else {
         for(final ANode child : children(root)) {
           final byte[] qname = child.qname().id();
@@ -63,19 +62,19 @@ public final class Users {
               final User user = new User(child);
               final String name = user.name();
               if(users.get(name) != null) {
-                Util.errln(file.name() + ": User '%' supplied more than once.", name);
+                Util.errln(file + ": User '%' supplied more than once.", name);
               } else {
                 users.put(name, user);
               }
             } catch(final BaseXException ex) {
               // reject users with faulty data
-              Util.errln(file.name() + ": " + ex.getLocalizedMessage());
+              Util.errln(file + ": " + ex.getLocalizedMessage());
             }
           } else if(eq(qname, INFO)) {
-            if(info != null) Util.errln(file.name() + ": occurs more than once: %.", qname);
+            if(info != null) Util.errln(file + ": occurs more than once: %.", qname);
             else info = child.finish();
           } else {
-            Util.errln(file.name() + ": invalid element: %.", qname);
+            Util.errln(file + ": invalid element: %.", qname);
           }
         }
       }

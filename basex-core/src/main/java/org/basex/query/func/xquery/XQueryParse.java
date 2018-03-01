@@ -55,8 +55,7 @@ public class XQueryParse extends StandardFunc {
   protected final FElem parse(final QueryContext qc, final byte[] query, final String path)
       throws QueryException {
 
-    final XQueryOptions opts = new XQueryOptions();
-    if(exprs.length > 1) toOptions(1, opts, qc);
+    final XQueryOptions opts = toOptions(1, new XQueryOptions(), qc);
 
     // base-uri: adopt specified uri, passed on uri, or uri from parent query
     final String bu = opts.get(XQueryOptions.BASE_URI);

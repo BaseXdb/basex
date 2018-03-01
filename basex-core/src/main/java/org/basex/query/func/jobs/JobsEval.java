@@ -3,6 +3,7 @@ package org.basex.query.func.jobs;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -30,7 +31,7 @@ public class JobsEval extends StandardFunc {
    * Evaluates a job.
    * @param qc query context
    * @param query query
-   * @param path path
+   * @param path path (can be {@code null})
    * @return resulting value
    * @throws QueryException query exception
    */
@@ -39,20 +40,42 @@ public class JobsEval extends StandardFunc {
 
     checkAdmin(qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final JobsOptions opts = new JobsOptions();
-    if(exprs.length > 2) toOptions(2, opts, qc);
+    final JobsOptions opts = toOptions(2, new JobsOptions(), qc);
 
     // copy variable values
     final Context ctx = qc.context;
     for(final Entry<String, Value> it : bindings.entrySet()) {
-      final String key = it.getKey();
-      bindings.put(key, Scheduled.copy(it.getValue().iter(), ctx, qc));
+      bindings.put(it.getKey(), QueryJob.copy(it.getValue().iter(), ctx, qc));
     }
 
     // check if number of maximum queries has been reached
     if(ctx.jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
-    final Scheduled job = new Scheduled(query, path, bindings, opts, info, qc, sc);
+    final String base = opts.get(JobsOptions.BASE_URI);
+    final String uri = base != null ? base : path != null ? path : string(sc.baseURI().string());
+    opts.set(JobsOptions.BASE_URI, uri);
+
+    final boolean service = opts.contains(JobsOptions.SERVICE) && opts.get(JobsOptions.SERVICE);
+    if(service) {
+      if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
+      // invalidate option (not relevant for next steps, i.e., if services are written to disk)
+      opts.put(JobsOptions.SERVICE, null);
+    }
+
+    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query);
+    final QueryJob job = new QueryJob(spec, info, qc.context);
+
+    // add service
+    if(service) {
+      if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
+      try {
+        final Jobs jobs = new Jobs(qc.context);
+        jobs.add(spec);
+        jobs.write();
+      } catch(final IOException ex) {
+        throw JOBS_SERVICE_X_X.get(info, ex);
+      }
+    }
     return Str.get(job.jc().id());
   }
 }

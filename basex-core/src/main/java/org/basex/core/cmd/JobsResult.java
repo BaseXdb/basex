@@ -35,8 +35,8 @@ public final class JobsResult extends Command {
   protected boolean run() {
     final String id = args[0];
     final JobPool jobs = context.jobs;
-    final Map<String, JobResult> results = jobs.results;
-    final JobResult result = results.get(id);
+    final Map<String, QueryJobResult> results = jobs.results;
+    final QueryJobResult result = results.get(id);
     if(result == null) return error(JOBS_UNKNOWN_X.desc, id);
     if(!result.cached()) error(JOBS_RUNNING_X.desc, id);
 

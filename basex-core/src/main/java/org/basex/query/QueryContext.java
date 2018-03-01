@@ -75,6 +75,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Current context value. */
   public QueryFocus focus = new QueryFocus();
+  /** Current date/time values. */
+  public QueryDateTime dateTime;
 
   /** Full-text position data (needed for highlighting full-text results). */
   public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
@@ -86,17 +88,6 @@ public final class QueryContext extends Job implements Closeable {
   public int ftPos;
   /** Scoring flag. */
   public boolean scoring;
-
-  /** Current Date. */
-  public Dat date;
-  /** Current DateTime. */
-  public Dtm datm;
-  /** Current Time. */
-  public Tim time;
-  /** Current timezone. */
-  public DTDur zone;
-  /** Current nanoseconds. */
-  public long nano;
 
   /** Available collations. */
   public TokenObjMap<Collation> collations;
@@ -774,20 +765,9 @@ public final class QueryContext extends Job implements Closeable {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryContext initDateTime() throws QueryException {
-    if(time == null) {
-      final Date d = new Date();
-      final String ymd = DateTime.format(d, DateTime.DATE);
-      final String hms = DateTime.format(d, DateTime.TIME);
-      final String zon = DateTime.format(d, DateTime.ZONE);
-      final String znm = zon.substring(0, 3), zns = zon.substring(3);
-      time = new Tim(token(hms + znm + ':' + zns), null);
-      date = new Dat(token(ymd + znm + ':' + zns), null);
-      datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), null);
-      zone = new DTDur(Strings.toInt(znm), Strings.toInt(zns));
-      nano = System.nanoTime();
-    }
-    return this;
+  public QueryDateTime dateTime() throws QueryException {
+    if(dateTime == null) dateTime = new QueryDateTime();
+    return dateTime;
   }
 
   @Override

@@ -8,6 +8,7 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.server.*;
@@ -151,6 +152,9 @@ public final class BaseXHTTP extends CLI {
     for(final ServerConnector conn : conns) {
       context.log.writeServer(LogType.OK, Util.info(startX, conn.getPort()));
     }
+
+    // start persistent jobs
+    new Jobs(context).run();
   }
 
   /**

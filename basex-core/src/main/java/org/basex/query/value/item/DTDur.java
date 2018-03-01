@@ -97,7 +97,7 @@ public final class DTDur extends Dur {
   /**
    * Constructor.
    * @param date date item
-   * @param sub date to be subtracted
+   * @param sub date/time to be subtracted
    * @param info input info
    * @throws QueryException query exception
    */

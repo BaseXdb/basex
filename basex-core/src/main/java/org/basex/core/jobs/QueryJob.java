@@ -1,14 +1,12 @@
-package org.basex.query.func.jobs;
+package org.basex.core.jobs;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
-import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -23,21 +21,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class Scheduled extends Job implements Runnable {
+public final class QueryJob extends Job implements Runnable {
   /** Result. */
-  private final JobResult result = new JobResult(this);
-  /** Variable bindings. */
-  private final HashMap<String, Value> bindings;
-  /** Input info. */
-  private final InputInfo info;
-  /** Caching flag. */
-  private final boolean cache;
-  /** Query string. */
-  private final String query;
-  /** Query path (can be {@code null}). */
-  private final String path;
-  /** Base URI. */
-  private final String uri;
+  private final QueryJobResult result = new QueryJobResult(this);
+  /** Job info. */
+  private final QueryJobSpec job;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -46,63 +34,63 @@ public final class Scheduled extends Job implements Runnable {
 
   /**
    * Constructor.
-   * @param query query string
-   * @param path (can be {@code null})
-   * @param bindings variable bindings
-   * @param opts options
+   * @param job job info
    * @param info input info
-   * @param qc query context
-   * @param sc static context
+   * @param ctx database context
    * @throws QueryException query exception
    */
-  Scheduled(final String query, final String path, final HashMap<String, Value> bindings,
-    final JobsOptions opts, final InputInfo info, final QueryContext qc, final StaticContext sc)
-    throws QueryException {
+  public QueryJob(final QueryJobSpec job, final InputInfo info, final Context ctx)
+      throws QueryException {
 
-    this.query = query;
-    this.path = path;
-    this.bindings = bindings;
-    this.info = info;
-    cache = opts.get(JobsOptions.CACHE);
-    jc().context = qc.context;
-
-    final String bu = opts.get(JobsOptions.BASE_URI);
-    uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
+    this.job = job;
+    jc().context = ctx;
 
     // check when job is to be started
-    final String del = opts.get(JobsOptions.START);
-    final long delay = del.isEmpty() ? 0 : ms(del, 0, qc);
+    final JobsOptions opts = job.options;
+    final String start = opts.get(JobsOptions.START);
+    long delay = start == null || start.isEmpty() ? 0 : delay(start, 0, info);
 
     // check when job is to be repeated
     long interval = 0;
     final String inter = opts.get(JobsOptions.INTERVAL);
-    if(!inter.isEmpty()) interval = ms(new DTDur(token(inter), info));
-    if(interval < 1000 && interval != 0) throw JOBS_RANGE_X.get(info, inter);
+    if(inter != null && !inter.isEmpty()) {
+      interval = ms(new DTDur(token(inter), info));
+      if(interval < 1000) throw JOBS_RANGE_X.get(info, inter);
+      while(delay < 0) delay += interval;
+    }
+    if(delay < 0) throw JOBS_RANGE_X.get(info, start);
 
     // check when job is to be stopped
-    final String dur = opts.get(JobsOptions.END);
-    final long duration = dur.isEmpty() ? Long.MAX_VALUE : ms(dur, delay, qc);
+    final String end = opts.get(JobsOptions.END);
+    final long duration = end == null || end.isEmpty() ? Long.MAX_VALUE : delay(end, delay, info);
+    if(duration <= delay) throw JOBS_RANGE_X.get(info, end);
 
-    final JobPool pool = qc.context.jobs;
-    synchronized(pool.tasks) {
+    // check job results are to be cached
+    final boolean cache = opts.contains(JobsOptions.CACHE) && opts.get(JobsOptions.CACHE);
+    if(cache && interval > 0) throw JOBS_OPTIONS.get(info);
+
+    final JobPool jobs = ctx.jobs;
+    synchronized(jobs.tasks) {
       // custom job id: check if it is invalid or has already been assigned
       String id = opts.get(JobsOptions.ID);
       if(id != null) {
         if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(info, id);
-        if(pool.tasks.containsKey(id) || pool.active.containsKey(id) ||
-           pool.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
+        if(jobs.tasks.containsKey(id) || jobs.active.containsKey(id) ||
+           jobs.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
         jc().id(id);
       } else {
         id = jc().id();
       }
+      if(cache) jobs.results.put(id, result);
 
-      if(cache) {
-        if(interval > 0) throw JOBS_OPTIONS.get(info);
-        pool.results.put(id, result);
+      // create and schedule job task
+      final QueryJobTask task = new QueryJobTask(this, jobs, delay, interval, duration);
+      jobs.tasks.put(id, task);
+      if(interval > 0) {
+        jobs.timer.scheduleAtFixedRate(task, delay, interval);
+      } else {
+        jobs.timer.schedule(task, delay);
       }
-
-      // start job task and wait until job is registered or time was assigned
-      new JobTask(this, pool, delay, interval, duration);
     }
   }
 
@@ -110,27 +98,26 @@ public final class Scheduled extends Job implements Runnable {
    * Returns a delay.
    * @param string string with dayTimeDuration, date, or dateTime
    * @param min minimum time
-   * @param qc query context
+   * @param info input info
    * @return milliseconds to wait
    * @throws QueryException query exception
    */
-  private long ms(final String string, final long min, final QueryContext qc)
+  private long delay(final String string, final long min, final InputInfo info)
       throws QueryException {
 
-    qc.initDateTime();
+    final QueryDateTime qdt = new QueryDateTime();
     long ms;
     if(Dur.DTD.matcher(string).matches()) {
       // dayTimeDuration
       ms = ms(new DTDur(token(string), info));
     } else if(ADate.TIME.matcher(string).matches()) {
       // time
-      ms = ms(new DTDur(new Tim(token(string), info), qc.time, info));
+      ms = ms(new DTDur(new Tim(token(string), info), qdt.time, info));
       while(ms <= min) ms += 86400000;
     } else {
       // dateTime
-      ms = ms(new DTDur(new Dtm(token(string), info), qc.datm, info));
+      ms = ms(new DTDur(new Dtm(token(string), info), qdt.datm, info));
     }
-    if(ms <= min) throw JOBS_RANGE_X.get(info, string);
     return ms;
   }
 
@@ -154,12 +141,12 @@ public final class Scheduled extends Job implements Runnable {
   public void run() {
     final JobContext jc = jc();
     final Context ctx = jc.context;
-
-    qp = new QueryProcessor(query, uri, ctx);
+    final JobsOptions opts = job.options;
+    qp = new QueryProcessor(job.query, opts.get(JobsOptions.BASE_URI), ctx);
     try {
       // parse, push and register query. order is important!
       final Performance perf = new Performance();
-      for(final Entry<String, Value> binding : bindings.entrySet()) {
+      for(final Entry<String, Value> binding : job.bindings.entrySet()) {
         final String key = binding.getKey();
         final Value value = binding.getValue();
         if(key.isEmpty()) qp.context(value);
@@ -182,10 +169,11 @@ public final class Scheduled extends Job implements Runnable {
     } catch(final QueryException ex) {
       result.exception = ex;
     } catch(final Throwable ex) {
-      result.exception = XQUERY_UNEXPECTED_X.get(info, ex);
+      result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
     } finally {
       // close and invalidate query after result has been assigned. order is important!
-      if(cache) {
+      final Boolean cache = opts.get(JobsOptions.CACHE);
+      if(cache != null && cache) {
         ctx.jobs.scheduleResult(this);
         state(JobState.CACHED);
       } else {
@@ -219,7 +207,7 @@ public final class Scheduled extends Job implements Runnable {
    * @return result
    * @throws QueryException query exception
    */
-  static Value copy(final Iter iter, final Context ctx, final QueryContext qc)
+  public static Value copy(final Iter iter, final Context ctx, final QueryContext qc)
       throws QueryException {
 
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -234,6 +222,7 @@ public final class Scheduled extends Job implements Runnable {
 
   @Override
   public String toString() {
-    return path != null ? path : query;
+    final String uri = job.options.get(JobsOptions.BASE_URI);
+    return uri == null || uri.isEmpty() ? job.query : uri;
   }
 }

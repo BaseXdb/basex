@@ -36,43 +36,49 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void eval1() {
-    query(_JOBS_EVAL.args("1"));
-    query(_JOBS_EVAL.args(".", " map { '': '1' }"));
-    query(_JOBS_EVAL.args(".", " map { '': <a/> }"));
-    query(_JOBS_EVAL.args("declare variable $a external;$a", " map { 'a': <a/> }"));
-    query(_JOBS_EVAL.args("static-base-uri()", " map { 'base-uri': 'abc.xq' }"));
-    query(_JOBS_EVAL.args("1", " ()", " map{ 'id':'123' }"));
+    final Function func = _JOBS_EVAL;
+    query(func.args("1"));
+    query(func.args(".", " map { '': '1' }"));
+    query(func.args(".", " map { '': <a/> }"));
+    query(func.args("declare variable $a external;$a", " map { 'a': <a/> }"));
+    query(func.args("static-base-uri()", " map { 'base-uri': 'abc.xq' }"));
+    query(func.args("1", " ()", " map{ 'id':'123' }"));
   }
 
   /** Test method. */
   @Test
   public void eval2() {
     // database creation
+    final Function func = _JOBS_EVAL;
     error(_DB_OPEN.args("db"), DB_OPEN2_X);
-    query(_PROF_VOID.args(_JOBS_EVAL.args("db:open('db')")) + ',' + _DB_CREATE.args("db"));
-    query(_JOBS_EVAL.args("db:drop('db')") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
-    query(_JOBS_EVAL.args("delete node <a/>"));
+    query(_PROF_VOID.args(func.args("db:open('db')")) + ',' + _DB_CREATE.args("db"));
+    query(func.args("db:drop('db')") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
+    query(func.args("delete node <a/>"));
   }
 
   /** Test method. */
   @Test
   public void eval3() {
     // errors (will not be raised before runtime)
-    query(_JOBS_EVAL.args("db:open('db')"));
-    query(_JOBS_EVAL.args("1+"));
-    query(_JOBS_EVAL.args("1, delete node <a/>"));
+    final Function func = _JOBS_EVAL;
+    query(func.args("db:open('db')"));
+    query(func.args("1+"));
+    query(func.args("1, delete node <a/>"));
   }
 
   /** Test method. */
   @Test
   public void evalError() {
     // errors
-    error(_JOBS_EVAL.args("1", " ()", " map{ 'start':'12345' }"), DATEFORMAT_X_X_X);
-    error(_JOBS_EVAL.args("1", " ()", " map{ 'interval':'12345' }"), DATEFORMAT_X_X_X);
-    error(_JOBS_EVAL.args("1", " ()", " map{ 'interval':'-PT1S' }"), JOBS_RANGE_X);
-    error(_JOBS_EVAL.args("1", " ()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
-    error(_JOBS_EVAL.args("1", " ()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
-    error("(1,2)!" + _JOBS_EVAL.args(SLOW_QUERY, " ()", " map{ 'id':'abc','cache':true() }"),
+    final Function func = _JOBS_EVAL;
+    error(func.args("1", " ()", " map{ 'start':'12345' }"), DATEFORMAT_X_X_X);
+    error(func.args("1", " ()",
+        " map{ 'start':'2030-01-01T01:01:01','end':'2029-01-01T01:01:01' }"), JOBS_RANGE_X);
+    error(func.args("1", " ()", " map{ 'interval':'12345' }"), DATEFORMAT_X_X_X);
+    error(func.args("1", " ()", " map{ 'interval':'-PT1S' }"), JOBS_RANGE_X);
+    error(func.args("1", " ()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
+    error(func.args("1", " ()", " map{ 'id':'job123' }"), JOBS_ID_INVALID_X);
+    error("(1,2)!" + func.args(SLOW_QUERY, " ()", " map{ 'id':'abc','cache':true() }"),
         JOBS_ID_EXISTS_X);
   }
 
@@ -80,7 +86,8 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void evalStart() {
     // delayed execution
-    final String id = query(_JOBS_EVAL.args(" 'prof:sleep(200)'", " ()", " map{'start':'PT0.2S'}"));
+    final Function func = _JOBS_EVAL;
+    final String id = query(func.args(" 'prof:sleep(200)'", " ()", " map{'start':'PT0.2S'}"));
     // ensure that query is not run again
     Performance.sleep(100);
     query(_JOBS_FINISHED.args(id), true);
@@ -94,8 +101,8 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void evalInterval() {
     // scheduled execution
-    final String id = query(_JOBS_EVAL.args("prof:sleep(400)", " ()",
-        " map{'interval':'PT1S'}"));
+    final Function func = _JOBS_EVAL;
+    final String id = query(func.args("prof:sleep(400)", " ()", " map{'interval':'PT1S'}"));
     // ensure that query is running
     Performance.sleep(200);
     query(_JOBS_FINISHED.args(id), false);
@@ -118,7 +125,8 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void evalEnd() {
     // scheduled execution
-    final String id = query(_JOBS_EVAL.args("123", " ()",
+    final Function func = _JOBS_EVAL;
+    final String id = query(func.args("123", " ()",
         " map{'interval':'PT1S','end':'PT1.5S'}"));
     // ensure that query is running
     Performance.sleep(500);
@@ -127,8 +135,21 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query(_JOBS_LIST.args() + "='" + id + '\'', false);
 
     // error
-    error(_JOBS_EVAL.args("1", " ()", " map{'start':'PT2S','interval':'PT1S','end':'PT1S'}"),
+    error(func.args("1", " ()", " map{'start':'PT2S','interval':'PT1S','end':'PT1S'}"),
         JOBS_RANGE_X);
+  }
+
+  /** Test method. */
+  @Test
+  public void evalService() {
+    final Function func = _JOBS_EVAL;
+    query(func.args("1", " ()", " map{ 'id':'ID','service':true() }"));
+    query("file:exists(db:option('dbpath') || '/jobs.xml')", true);
+    query("exists(" + _JOBS_SERVICES.args() + "[@id = 'ID'])", true);
+    query(_JOBS_STOP.args("id"));
+    query("exists(" + _JOBS_SERVICES.args() + "[@id = 'ID'])", true);
+    query(_JOBS_STOP.args("ID", " map{ 'service':true() }"));
+    query("exists(" + _JOBS_SERVICES.args() + "[@id = 'ID'])", false);
   }
 
   /** Test method. */
@@ -182,7 +203,8 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void stop() throws IOException {
     final String id = verySlowQuery();
-    query(_JOBS_STOP.args(id));
+    final Function func = _JOBS_STOP;
+    query(func.args(id));
 
     // check if query was interrupted
     while(true) {
@@ -205,17 +227,18 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   @Test
   public void result() throws IOException {
     // receive result of asynchronous execution
+    final Function func = _JOBS_RESULT;
     query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " ()", " map{'cache':true()}") +
         " return ("
         + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args(" $q") + " },"
             + "function($c) { prof:sleep(1) }, ()") + ','
-        + _JOBS_RESULT.args(" $q") + ')', 1);
+        + func.args(" $q") + ')', 1);
 
     // ensure that the result will not be cached
     String id = query(_JOBS_EVAL.args(SLOW_QUERY));
     while(true) {
       try {
-        eval(_JOBS_RESULT.args(id));
+        eval(func.args(id));
         fail("Result was cached.");
       } catch(final QueryException ex) {
         // query was successfully stopped
@@ -230,7 +253,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     id = query(_JOBS_EVAL.args(SLOW_QUERY, " ()", " map{'cache':true()}"));
     while(true) {
       try {
-        assertEquals("1", eval(_JOBS_RESULT.args(id)));
+        assertEquals("1", eval(func.args(id)));
         break;
       } catch(final QueryException ex) {
         // query is still running: check error code
@@ -242,14 +265,15 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     // receive cached error
     id = query(_JOBS_EVAL.args("db:open('db')", " ()", " map{'cache':true()}"));
     query(_JOBS_WAIT.args(id));
-    error(_JOBS_RESULT.args(id), DB_OPEN2_X);
+    error(func.args(id), DB_OPEN2_X);
   }
 
   /** Test method. */
   @Test
   public void waitFor() {
-    query(_JOBS_WAIT.args(_JOBS_EVAL.args("1",  " ()", " map { 'start':'PT0.1S' }")));
-    error(_JOBS_WAIT.args(_JOBS_CURRENT.args()), JOBS_SELF_X);
+    final Function func = _JOBS_WAIT;
+    query(func.args(_JOBS_EVAL.args("1",  " ()", " map { 'start':'PT0.1S' }")));
+    error(func.args(_JOBS_CURRENT.args()), JOBS_SELF_X);
   }
 
   /**

@@ -318,6 +318,10 @@ public enum QueryError {
   JOBS_SELF_X(JOBS, "self", "Cannot wait for own job: %"),
   /** Error code. */
   JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown job: %."),
+  /** Error code. */
+  JOBS_SERVICE(JOBS, "service", "No variables allowed."),
+  /** Error code. */
+  JOBS_SERVICE_X_X(JOBS, "service", "Could not write service: %."),
 
   // JSON Module
 

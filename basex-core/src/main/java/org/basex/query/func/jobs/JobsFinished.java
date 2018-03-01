@@ -19,7 +19,7 @@ public final class JobsFinished extends StandardFunc {
 
     final String id = Token.string(toToken(exprs[0], qc));
     final JobPool pool = qc.context.jobs;
-    final JobResult result = pool.results.get(id);
+    final QueryJobResult result = pool.results.get(id);
     // returns true if job is not active, and if no result exists or if it has been cached
     return Bln.get(!pool.active.containsKey(id) && (result == null || result.cached()));
   }

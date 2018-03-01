@@ -79,8 +79,8 @@ public final class JobsList extends Command {
   public static TokenList entry(final byte[] key, final JobPool jobs, final int max) {
     final String id = string(key);
     Job job = jobs.active.get(id);
-    final JobTask jt = jobs.tasks.get(id);
-    final JobResult jr = jobs.results.get(id);
+    final QueryJobTask jt = jobs.tasks.get(id);
+    final QueryJobResult jr = jobs.results.get(id);
     if(job == null && jr != null) job = jr.job;
     if(job == null && jt != null) job = jt.job;
     if(job == null) return null;
