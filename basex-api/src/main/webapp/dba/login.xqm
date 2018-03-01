@@ -139,7 +139,7 @@ declare %private function dba:accept(
   admin:write-log('DBA user was logged in: ' || $name),
 
   (: redirect to supplied page or main page :)
-  web:redirect(if($page) then $page else "databases")
+  web:redirect(if($page) then $page else 'logs')
 };
 
 (:~

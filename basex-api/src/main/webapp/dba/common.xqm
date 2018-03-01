@@ -16,7 +16,7 @@ declare
   %rest:path("/dba")
 function dba:redirect(
 ) as element(rest:response) {
-  web:redirect("/dba/databases")
+  web:redirect("/dba/logs")
 };
 
 (:~

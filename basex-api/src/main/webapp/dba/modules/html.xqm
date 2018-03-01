@@ -83,7 +83,7 @@ declare function html:wrap(
                       }
                     }</span>
                     let $cats :=
-                      for $cat in ('Databases', 'Queries', 'Files', 'Jobs', 'Logs', 
+                      for $cat in ('Logs', 'Databases', 'Queries', 'Files', 'Jobs',
                         'Users', 'Sessions', 'Settings')
                       let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
                       return if($link = $header) then (
