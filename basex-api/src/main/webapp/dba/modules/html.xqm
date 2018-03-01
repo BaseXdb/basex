@@ -280,7 +280,7 @@ declare function html:properties(
  :   * 'sort': argument contains the key of the ordered column.
  :   * 'link': argument contains a function for generating a link reference.
  :   * 'page': currently displayed page
- :   * 'count': maximum number of results (if not set, )
+ :   * 'count': maximum number of results
  :
  : @param  $entries  table entries: values are represented via attributes
  : @param  $headers  table headers:
@@ -332,11 +332,12 @@ declare function html:table(
       ) else (
         function($a) { $a }
       )
-    return
+    return (
       for $row in $rows
       order by string($row/@*[name() = $sort-key])[.] ! $order(.)
         empty greatest collation '?lang=en'
       return $row
+    )
   )
 
   let $max := options:get($options:MAXROWS)
