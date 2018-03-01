@@ -13,12 +13,15 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class RestXqSingleton {
+  /** Mutex. */
+  private static final Object MUTEX = new Object();
+
   /** Id of singleton function. */
   private final String singleton;
   /** Query context. */
   private final QueryContext qc;
   /** HTTP session. */
-  private HttpSession session;
+  private final HttpSession session;
 
   /**
    * Constructor for singleton functions.
@@ -29,24 +32,48 @@ final class RestXqSingleton {
   RestXqSingleton(final HTTPConnection conn, final String singleton, final QueryContext qc) {
     this.qc = qc;
     this.singleton = singleton;
-
-    // stop existing job, wait until it has been finished
     session = conn.req.getSession();
-    final Object oldQc = session.getAttribute(singleton);
-    if(oldQc instanceof QueryContext) {
-      ((QueryContext) oldQc).stop();
-      do {
-        Performance.sleep(1);
-      } while(session.getAttribute(singleton) == oldQc);
+    queue();
+    register();
+  }
+
+  /**
+   * Waits until a running query has been stopped.
+   */
+  void queue() {
+    final QueryContext oldQc = qc();
+    if(oldQc != null) {
+      oldQc.stop();
+      do Performance.sleep(1); while(qc() == oldQc);
+    }
+  }
+
+  /**
+   * Registers a query.
+   */
+  void register() {
+    synchronized(MUTEX) {
       session.setAttribute(singleton, qc);
     }
   }
 
   /**
-   * Closes a session. Drops a previously cached query context.
+   * Unregisters a query.
    */
-  void close() {
-    final Object oldQc = session.getAttribute(singleton);
-    if(oldQc == qc) session.removeAttribute(singleton);
+  void unregister() {
+    synchronized(MUTEX) {
+      if(qc == qc()) session.removeAttribute(singleton);
+    }
+  }
+
+  /**
+   * Returns a registered query context.
+   * @return query context or {@code null}
+   */
+  private QueryContext qc() {
+    synchronized(MUTEX) {
+      final Object obj = session.getAttribute(singleton);
+      return obj instanceof QueryContext ? (QueryContext) obj : null;
+    }
   }
 }

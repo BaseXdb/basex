@@ -105,7 +105,7 @@ final class RestXqResponse {
     } finally {
       qc.close();
       qc.unregister(qc.context);
-      if(singleton != null) singleton.close();
+      if(singleton != null) singleton.unregister();
 
       if(redirect != null) {
         conn.redirect(redirect);
