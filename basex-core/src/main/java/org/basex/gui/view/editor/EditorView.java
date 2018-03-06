@@ -95,7 +95,7 @@ public final class EditorView extends View {
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
-    tabs.addDragDrop(false);
+    tabs.addDragDrop();
     tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     tabs.addMouseListener((MouseClickedListener) e -> {
       final int i = tabs.indexAtLocation(e.getX(), e.getY());
