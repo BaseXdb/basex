@@ -79,7 +79,7 @@ public final class Functions extends TokenSet {
       if(tp.parent == null) continue;
       final byte[] u = tp.name.uri();
       if(eq(u, XS_URI) && tp != AtomType.NOT && tp != AtomType.AAT && ls.similar(
-          lc(ln), lc(tp.string()))) throw FUNCSIMILAR_X_X.get(info, name.prefixId(), tp.string());
+          lc(ln), lc(tp.string()))) throw FUNCSIMILAR_X_X.get(info, name.prefixId(), tp.toString());
     }
     // no similar name: constructor function found, or abstract type specified
     throw WHICHFUNC_X.get(info, name.prefixId());
