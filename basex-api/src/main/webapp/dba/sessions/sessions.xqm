@@ -64,7 +64,7 @@ function dba:sessions(
           let $buttons := (
             html:button('session-kill', 'Kill', true())
           )
-          return html:table($headers, $rows, $buttons, map { }, map { })
+          return html:table($headers, $rows, $buttons, map { }, map { 'sort': $sort })
         }
         </form>
       </td>

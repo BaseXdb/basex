@@ -44,6 +44,7 @@ function dba:jobs(
             <type>Type</type>,
             <state>State</state>,
             <dur type='number' order='desc'>Dur.</dur>,
+            <user>User</user>,
             <you>You</you>
           )
           let $rows :=
@@ -59,13 +60,11 @@ function dba:jobs(
             let $end := string($details/@end)
             order by $sec descending, $start descending
             return <row id='{ $id }' type='{ $details/@type }' state='{ $details/@state }'
-                        dur='{ html:duration($sec) }' you='{ $you }' user='{ $details/@user }'
-                        reads='{ $details/@reads }' writes='{ $details/@writes }'
-                        start='{ $start}' end='{ $end }'/>
+                        dur='{ html:duration($sec) }' user='{ $details/@user }' you='{ $you }'/>
           let $buttons := (
             html:button('job-stop', 'Stop', true())
           )
-          return html:table($headers, $rows, $buttons, map { }, map { }) update {
+          return html:table($headers, $rows, $buttons, map { }, map { 'sort': $sort }) update {
             (: replace job ids with links :)
             for $tr at $p in tr[not(th)]
             for $row in $rows[$p][@you = '–']

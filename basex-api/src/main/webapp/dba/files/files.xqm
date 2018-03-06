@@ -108,7 +108,7 @@ function dba:files(
             )}'/>
           )
           let $buttons := html:button('file-delete', 'Delete', true())
-          return html:table($headers, $rows, $buttons, map { }, map { })
+          return html:table($headers, $rows, $buttons, map { }, map { 'sort': $sort })
         }
         </form>
         <h3>Upload Files</h3>
