@@ -42,7 +42,7 @@ final class DialogInput extends BaseXDialog {
     super(dialog, title);
     this.old = old;
     this.type = type;
-    db = dialog.gui.context.databases.listDBs();
+    db = dialog.gui.context.listDBs();
 
     String t = "";
     if(type == 0) {

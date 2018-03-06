@@ -246,18 +246,19 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   @Override
-  public String user() {
-    return context.user().name();
+  public String clientName() {
+    final User user = context.user();
+    return user != null ? user.name() : null;
   }
 
   @Override
-  public String address() {
+  public String clientAddress() {
     return socket.getInetAddress().getHostAddress() + ':' + socket.getPort();
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("[").append(address()).append(']');
+    final StringBuilder sb = new StringBuilder("[").append(clientAddress()).append(']');
     if(context.data() != null) sb.append(COLS).append(context.data().meta.name);
     return sb.toString();
   }
@@ -448,7 +449,6 @@ public final class ClientListener extends Thread implements ClientInfo {
    * @param info message info
    */
   private void log(final LogType type, final String info) {
-    final User user = context.user();
-    context.log.write(address(), user != null ? user.name() : null, type, info, perf);
+    context.log.write(type, info, perf, context);
   }
 }

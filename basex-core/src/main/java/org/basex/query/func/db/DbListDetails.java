@@ -59,7 +59,7 @@ public final class DbListDetails extends DbList {
    */
   private static Iter list(final QueryContext qc) {
     final Context ctx = qc.context;
-    final StringList dbs = ctx.filter(Perm.READ, ctx.databases.listDBs());
+    final StringList dbs = ctx.listDBs();
     return new BasicIter<FNode>(dbs.size()) {
       @Override
       public FElem get(final long i) {

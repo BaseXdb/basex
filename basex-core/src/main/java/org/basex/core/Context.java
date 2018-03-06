@@ -21,8 +21,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Context {
-  /** Client info. Set to {@code null} in standalone/server mode. */
-  public final ClientInfo client;
   /** Blocked clients. */
   public final ClientBlocker blocker;
   /** Job pool. */
@@ -46,6 +44,8 @@ public final class Context {
   /** Locking. */
   public final Locking locking;
 
+  /** Client info. Set to {@code null} in standalone/server mode. */
+  private final ClientInfo client;
   /** Current node context. {@code null} if all documents of the current database are referenced. */
   private DBNodes current;
   /** User reference. */
@@ -92,7 +92,7 @@ public final class Context {
    * Constructor, called by clients, and adopting the variables of the main context.
    * The {@link #user} reference must be set after calling this method.
    * @param ctx main context
-   * @param client client info
+   * @param client client info (can be {@code null})
    */
   public Context(final Context ctx, final ClientInfo client) {
     this.client = client;
@@ -253,14 +253,40 @@ public final class Context {
   }
 
   /**
-   * Filters databases to the ones that have the specified permission.
-   * @param perm requested permission
-   * @param dbs list of databases
+   * Returns the host and port of a client.
+   * @return address (or {@code null})
+   */
+  public String clientAddress() {
+    return client != null ? client.clientAddress() : null;
+  }
+
+  /**
+   * Returns the name of the current client or user.
+   * @return user name (or {@code null})
+   */
+  public String clientName() {
+    return client != null ? client.clientName() : user != null ? user.name() : null;
+  }
+
+  /**
+   * Returns all databases for which the current user has read access.
    * @return resulting list
    */
-  public StringList filter(final Perm perm, final StringList dbs) {
+  public StringList listDBs() {
+    return listDBs(null);
+  }
+
+  /**
+   * Returns all databases for which the current user has read access.
+   * @param name database pattern (can be {@code null})
+   * @return resulting list
+   */
+  public StringList listDBs(final String name) {
+    final StringList dbs = databases.listDBs(name);
     final StringList sl = new StringList(dbs.size());
-    for(final String db : dbs) if(perm(perm, db)) sl.add(db);
+    for(final String db : dbs) {
+      if(perm(Perm.READ, db)) sl.add(db);
+    }
     return sl;
   }
 }

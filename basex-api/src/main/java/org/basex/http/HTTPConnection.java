@@ -93,7 +93,7 @@ public final class HTTPConnection implements ClientInfo {
     User user = context.users.get(name);
     if(user == null) user = login();
 
-    // successful authentication: assign user; after that, generate servlet-specific user name
+    // successful authentication: assign user
     context.user(user);
     username = servlet.username(this);
 
@@ -101,7 +101,7 @@ public final class HTTPConnection implements ClientInfo {
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    context.log.write(address(), user(), LogType.REQUEST, '[' + method + "] " + uri, null);
+    context.log.write(LogType.REQUEST, '[' + method + "] " + uri, null, context);
   }
 
   /**
@@ -217,11 +217,11 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Writes a log message.
-   * @param type log type
+   * @param status HTTP status code
    * @param info info string (can be {@code null})
    */
-  void log(final int type, final String info) {
-    context.log.write(address(), user(), type, info, perf);
+  void log(final int status, final String info) {
+    context.log.write(Integer.toString(status), info, perf, context);
   }
 
   /**
@@ -258,12 +258,12 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   @Override
-  public String address() {
+  public String clientAddress() {
     return req.getRemoteAddr() + ':' + req.getRemotePort();
   }
 
   @Override
-  public String user() {
+  public String clientName() {
     return username;
   }
 

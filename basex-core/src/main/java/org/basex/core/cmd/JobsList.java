@@ -90,11 +90,11 @@ public final class JobsList extends Command {
         ? (System.nanoTime() - jc.performance.start()) / 1000000 : jr != null
         ? jr.time / 1000000 : -1;
 
-    final TokenList tl = new TokenList(5);
+    final TokenList tl = new TokenList(10);
     tl.add(id);
     tl.add(jc.type());
     tl.add(job.state.toString().toLowerCase(Locale.ENGLISH));
-    tl.add(jc.context.user().name());
+    tl.add(jc.context.clientName());
     tl.add(ms >= 0 ? DTDur.get(ms).string(null) : EMPTY);
     tl.add(jt != null ? Dtm.get(jt.start).string(null) : EMPTY);
     tl.add(jt != null && jt.end != Long.MAX_VALUE ? Dtm.get(jt.end).string(null) : EMPTY);

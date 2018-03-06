@@ -73,7 +73,7 @@ public final class List extends Command {
     table.header.add(SIZE);
     if(create) table.header.add(INPUT_PATH);
 
-    for(final String name : context.filter(Perm.READ, context.databases.listDBs())) {
+    for(final String name : context.listDBs()) {
       String file;
       long dbsize = 0;
       int count = 0;

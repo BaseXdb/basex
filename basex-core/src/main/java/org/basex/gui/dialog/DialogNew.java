@@ -134,7 +134,7 @@ public final class DialogNew extends BaseXDialog {
         // database will be empty
         inf = EMPTY_DB;
         icon = Msg.WARN;
-      } else if(gui.context.databases.listDBs().contains(nm)) {
+      } else if(gui.context.listDBs().contains(nm)) {
         // old database will be overwritten
         inf = OVERWRITE_DB;
         icon = Msg.WARN;

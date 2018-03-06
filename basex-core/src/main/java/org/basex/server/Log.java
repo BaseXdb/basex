@@ -67,45 +67,43 @@ public final class Log {
    * @param info info string (can be {@code null})
    */
   public void writeServer(final LogType type, final String info) {
-    write(SERVER, null, type, info, null);
+    write(type.toString(), info, null, null, null);
   }
 
   /**
    * Writes an entry to the log file.
-   * @param address address string
-   * @param user user ({@code admin} if null)
-   * @param type type (HTTP status code)
-   * @param info info string (can be {@code null})
-   * @param perf performance string
-   */
-  public void write(final String address, final String user, final int type,
-      final String info, final Performance perf) {
-    write(address, user, Integer.toString(type), info, perf);
-  }
-
-  /**
-   * Writes an entry to the log file.
-   * @param address address string
-   * @param user user ({@code admin} if null)
    * @param type type (ERROR, OK, REQUEST, INFO)
    * @param info info string (can be {@code null})
-   * @param perf performance string
+   * @param perf performance string (can be {@code null})
+   * @param ctx database context
    */
-  public void write(final String address, final String user, final LogType type, final String info,
-      final Performance perf) {
-    write(address, user, type.toString(), info, perf);
+  public void write(final LogType type, final String info, final Performance perf,
+      final Context ctx) {
+    write(type.toString(), info, perf, ctx);
   }
 
   /**
    * Writes an entry to the log file.
-   * @param address address string
-   * @param user user ({@code admin} if null)
+   * @param type type (ERROR, OK, REQUEST, INFO, HTTP status code, custom string)
+   * @param info info string (can be {@code null})
+   * @param perf performance string (can be {@code null})
+   * @param ctx database context
+   */
+  public void write(final String type, final String info, final Performance perf,
+      final Context ctx) {
+    write(type, info, perf, ctx.clientAddress(), ctx.clientName());
+  }
+
+  /**
+   * Writes an entry to the log file.
    * @param type type (ERROR, OK, REQUEST, INFO, HTTP status code)
    * @param info info string (can be {@code null})
-   * @param perf performance string
+   * @param perf performance string (can be {@code null})
+   * @param address address string ({@code SERVER} is written if value is {@code null})
+   * @param user user ({@code admin} is written if value is {@code null})
    */
-  public void write(final String address, final String user, final String type, final String info,
-      final Performance perf) {
+  private void write(final String type, final String info, final Performance perf,
+      final String address, final String user) {
 
     // check if logging is disabled
     if(!sopts.get(StaticOptions.LOG)) return;
@@ -115,10 +113,10 @@ public final class Log {
     final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
     final TokenBuilder tb = new TokenBuilder();
     tb.add(DateTime.format(date, DateTime.TIME));
-    tb.add('\t').add(address);
-    tb.add('\t').add(user == null ? UserText.ADMIN : user);
+    tb.add('\t').add(address != null ? address : SERVER);
+    tb.add('\t').add(user != null ? user : UserText.ADMIN);
     tb.add('\t').add(type);
-    tb.add('\t').add(info == null ? EMPTY : chop(normalize(token(info)), ml));
+    tb.add('\t').add(info != null ? chop(normalize(token(info)), ml) : EMPTY);
     if(perf != null) tb.add('\t').add(perf.toString());
     tb.add(Prop.NL);
 

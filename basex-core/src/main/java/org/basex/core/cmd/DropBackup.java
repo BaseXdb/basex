@@ -31,7 +31,7 @@ public final class DropBackup extends ABackup {
     if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
 
     // loop through all databases and collect databases to be dropped
-    final StringList dbs = context.filter(Perm.READ, context.databases.listDBs(name));
+    final StringList dbs = context.listDBs(name);
     // if the given argument is not a database name, it could be the name of a backup file
     if(dbs.isEmpty() && context.perm(Perm.READ, name)) dbs.add(name);
 

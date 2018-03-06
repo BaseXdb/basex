@@ -11,11 +11,11 @@ public interface ClientInfo {
    * Returns the host and port of a client.
    * @return string representation
    */
-  String address();
+  String clientAddress();
 
   /**
-   * Returns the name of the current user.
+   * Returns the name of the current client.
    * @return user name
    */
-  String user();
+  String clientName();
 }

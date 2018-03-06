@@ -30,7 +30,7 @@ public final class AdminSessions extends AdminFn {
     for(final ClientListener sp : qc.context.sessions) {
       final Context ctx = sp.context();
       final String user = ctx.user().name();
-      final String addr = sp.address();
+      final String addr = sp.clientAddress();
       final Data data = ctx.data();
       final FElem elem = new FElem(SESSION).add(USER, user).add(ADDRESS, addr);
       if(data != null) elem.add(DATABASE, data.meta.name);

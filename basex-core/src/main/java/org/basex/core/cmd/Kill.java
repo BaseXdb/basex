@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.server.*;
 
@@ -53,8 +54,9 @@ public final class Kill extends AUser {
     final Sessions ss = context.sessions;
     for(int s = ss.size() - 1; s >= 0; --s) {
       final ClientListener cl = ss.get(s);
-      // don't kill own sessions
-      if(cl.context() != context && user.equals(cl.context().user().name())) {
+      final Context ctx = cl.context();
+      if(ctx != context && user.equals(ctx.user().name())) {
+        // do not kill own sessions
         cl.close();
         count++;
       }

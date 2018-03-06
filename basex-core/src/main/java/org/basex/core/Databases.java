@@ -54,16 +54,8 @@ public final class Databases {
   }
 
   /**
-   * Lists all available databases.
-   * @return database list
-   */
-  public StringList listDBs() {
-    return listDBs(null);
-  }
-
-  /**
    * Lists all available databases matching the given name. Supports glob patterns.
-   * @param name database name, glob patterns allowed (may be {@code null})
+   * @param name database pattern (may be {@code null})
    * @return database list
    */
   public StringList listDBs(final String name) {
@@ -75,7 +67,7 @@ public final class Databases {
    * Filters for {@code name} if not {@code null} with glob support.
    * @param db return databases?
    * @param backup return backups?
-   * @param name name filter (may be {@code null})
+   * @param name database pattern (may be {@code null})
    * @return database and backups list
    */
   private StringList list(final boolean db, final boolean backup, final String name) {

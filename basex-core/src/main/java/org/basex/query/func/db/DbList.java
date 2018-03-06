@@ -3,7 +3,6 @@ package org.basex.query.func.db;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
-import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -37,7 +36,7 @@ public class DbList extends DbFn {
    */
   private static Value list(final QueryContext qc) {
     final Context ctx = qc.context;
-    final StringList dbs = ctx.filter(Perm.READ, ctx.databases.listDBs());
+    final StringList dbs = ctx.listDBs();
     final TokenList list = new TokenList(dbs.size());
     for(final String name : dbs) list.add(name);
     return StrSeq.get(list);
