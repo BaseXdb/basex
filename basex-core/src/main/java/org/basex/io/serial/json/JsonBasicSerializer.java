@@ -220,49 +220,11 @@ public final class JsonBasicSerializer extends JsonSerializer {
   private byte[] escape(final byte[] value, final boolean escape, final boolean key)
       throws QueryIOException {
 
-    final TokenBuilder raw = new TokenBuilder();
-    if(escape && contains(value, '\\')) {
-      final TokenParser tp = new TokenParser(value);
-      while(tp.more()) {
-        int cp = tp.next();
-        if(cp == '\\') {
-          if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
-          switch(tp.next()) {
-            case 'u':
-              cp = 0;
-              for(int i = 0; i < 4; i++) {
-                if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
-                final int c = tp.next();
-                if(c < 0x30 || c > 0x39 && c < 0x41 || c > 0x46 && c < 0x61 || c > 0x66)
-                  throw ESCAPE_JSON_X.getIO(value);
-                cp = (cp << 4) + c - (c >= 0x61 ? 0x57 : c >= 0x41 ? 0x37 : 0x30);
-              }
-              raw.add(cp);
-              break;
-            case '"': case '\\': case '/':
-              raw.add(cp); break;
-            case 'b':
-              raw.add('\b'); break;
-            case 'f':
-              raw.add('\f'); break;
-            case 'n':
-              raw.add('\n'); break;
-            case 'r':
-              raw.add('\r'); break;
-            case 't':
-              raw.add('\t'); break;
-            default:
-              throw ESCAPE_JSON_X.getIO(value);
-          }
-        } else {
-          raw.add(cp);
-        }
-      }
-    } else {
-      raw.add(value);
-    }
-    if(key && !printedKeys.add(raw.finish())) throw error("Duplicate key: %.", value);
+    // parse escaped strings, check for errors
+    final byte[] unescaped = escape && contains(value, '\\') ? unescape(value) : value;
+    if(key && !printedKeys.add(unescaped)) throw error("Duplicate key: %.", value);
 
+    // create result, based on escaped string (contains unicode sequences)
     final TokenBuilder tb = new TokenBuilder();
     boolean bs = false;
     final int vl = value.length;
@@ -277,16 +239,60 @@ public final class JsonBasicSerializer extends JsonSerializer {
         else if(cp == '\t') tb.add('t');
         else tb.add('u').add('0').add('0').add(HEX[cp >> 4]).add(HEX[cp & 0xF]);
       } else {
-        if(cp == '/') tb.add('\\');
-        else if(cp == '"' && !bs || cp == '\\' && !escape) {
-          bs = true;
-          tb.add('\\');
-        }
+        if((cp == '\\' || cp == '"' || cp == '/') && (!escape || !bs && cp != '\\')) tb.add('\\');
         tb.add(cp);
       }
       bs = !bs && cp == '\\';
     }
     return tb.finish();
+  }
+
+  /**
+   * Returns an unescaped representation of the value.
+   * @param value value to escape
+   * @return raw token
+   * @throws QueryIOException I/O exception
+   */
+  private static byte[] unescape(final byte[] value) throws QueryIOException {
+    final TokenBuilder raw = new TokenBuilder();
+    final TokenParser tp = new TokenParser(value);
+    while(tp.more()) {
+      int cp = tp.next();
+      if(cp == '\\') {
+        if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
+        cp = tp.next();
+        switch(cp) {
+          case 'u':
+            cp = 0;
+            for(int i = 0; i < 4; i++) {
+              if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
+              final int c = tp.next();
+              if(c < 0x30 || c > 0x39 && c < 0x41 || c > 0x46 && c < 0x61 || c > 0x66)
+                throw ESCAPE_JSON_X.getIO(value);
+              cp = (cp << 4) + c - (c >= 0x61 ? 0x57 : c >= 0x41 ? 0x37 : 0x30);
+            }
+            raw.add(cp);
+            break;
+          case '"': case '\\': case '/':
+            raw.add(cp); break;
+          case 'b':
+            raw.add('\b'); break;
+          case 'f':
+            raw.add('\f'); break;
+          case 'n':
+            raw.add('\n'); break;
+          case 'r':
+            raw.add('\r'); break;
+          case 't':
+            raw.add('\t'); break;
+          default:
+            throw ESCAPE_JSON_X.getIO(value);
+        }
+      } else {
+        raw.add(cp);
+      }
+    }
+    return raw.finish();
   }
 
   /**
