@@ -35,6 +35,14 @@ public final class ArrayModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void flatten() {
+    final Function func = Function._ARRAY_FLATTEN;
+    query(func.args(" [1,2]"), "1\n2");
+    query(func.args(" ([1],[2])"), "1\n2");
+    query(func.args(" for $c in (1,2) return [$c]"), "1\n2");
+  }
+
+  /** Test method. */
   @Test public void foldLeft() {
     final Function func = Function._ARRAY_FOLD_LEFT;
     query(func.args(" [1,2]", 0, " function($a,$b) { $a+$b }"), 3);

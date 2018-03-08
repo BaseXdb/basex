@@ -28,36 +28,31 @@ public final class ArrayFlatten extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      @SuppressWarnings("unchecked")
-      private Iterator<Value>[] iters = new Iterator[2];
-      private int p = -1;
-      private Iter curr = exprs[0].iter(qc);
+      private final LinkedList<Iterator<Value>> iters = new LinkedList<>();
+      private final Iter iter = exprs[0].iter(qc);
+      private Iter curr = iter;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
           final Item item = qc.next(curr);
-          if(item != null) {
-            if(!(item instanceof Array)) return item;
-            final Array arr = (Array) item;
-            if(++p == iters.length) {
-              @SuppressWarnings("unchecked")
-              final Iterator<Value>[] temp = new Iterator[2 * p];
-              System.arraycopy(iters, 0, temp, 0, p);
-              iters = temp;
-            }
-            iters[p] = arr.iterator(0);
-          } else if(p < 0) {
+          if(item instanceof Array) {
+            iters.add(((Array) item).iterator(0));
+          } else if(item != null) {
+            return item;
+          } else if(iters.isEmpty()) {
             return null;
           }
-
-          while(!iters[p].hasNext()) {
-            iters[p] = null;
-            if(--p < 0) return null;
-          }
-
-          curr = iters[p].next().iter();
+          curr = nextIter();
         }
+      }
+
+      private Iter nextIter() {
+        for(; !iters.isEmpty(); iters.removeLast()) {
+          final Iterator<Value> ir = iters.getLast();
+          if(ir.hasNext()) return ir.next().iter();
+        }
+        return iter;
       }
     };
   }
