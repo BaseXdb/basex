@@ -26,7 +26,7 @@ final class SearchContext {
   /** Mode: whole word. */
   final boolean word;
   /** Search string. */
-  final String search;
+  final String string;
   /** Number of results. */
   int nr;
 
@@ -45,7 +45,7 @@ final class SearchContext {
     // speed up regular expressions starting with wildcards
     if(regex && (srch.startsWith(".*") || srch.startsWith("(.*") ||
         srch.startsWith(".+") || srch.startsWith("(.+"))) srch = '^' + srch;
-    search = srch;
+    string = srch;
   }
 
   /**
@@ -55,7 +55,7 @@ final class SearchContext {
    */
   IntList[] search(final byte[] txt) {
     final IntList start = new IntList(), end = new IntList();
-    if(!search.isEmpty()) {
+    if(!string.isEmpty()) {
       if(regex) searchRegEx(start, end, txt);
       else searchSimple(start, end, txt);
     }
@@ -73,7 +73,7 @@ final class SearchContext {
   private void searchRegEx(final IntList start, final IntList end, final byte[] text) {
     int flags = Pattern.DOTALL;
     if(!mcase) flags |= Pattern.CASE_INSENSITIVE;
-    final Pattern pattern = Pattern.compile(search, flags);
+    final Pattern pattern = Pattern.compile(string, flags);
     if(multi) {
       int c = 0, p = 0;
       final Matcher m = pattern.matcher(string(text));
@@ -124,7 +124,7 @@ final class SearchContext {
    * @param text text to be searched
    */
   private void searchSimple(final IntList start, final IntList end, final byte[] text) {
-    final byte[] srch = token(search);
+    final byte[] srch = token(string);
     final int ss = srch.length, os = text.length;
     boolean s = true;
     for(int o = 0; o < os;) {
@@ -153,25 +153,25 @@ final class SearchContext {
 
   /**
    * Checks if the specified string matches the search string.
-   * @param string string to be checked
+   * @param str string to be checked
    * @return result of check
    */
-  boolean matches(final String string) {
+  boolean matches(final String str) {
     // ignore empty strings and others that stretch over multiple lines
-    if(string.isEmpty() || string.contains("\n")) return true;
+    if(str.isEmpty() || str.contains("\n")) return true;
 
     if(regex) {
       try {
         int flags = Pattern.DOTALL;
         if(!mcase) flags |= Pattern.CASE_INSENSITIVE;
-        final Pattern pattern = Pattern.compile(search, flags);
-        return pattern.matcher(string).matches();
+        final Pattern pattern = Pattern.compile(string, flags);
+        return pattern.matcher(str).matches();
       } catch(final Exception ex) {
         Util.debug(ex);
         return false;
       }
     }
-    return mcase ? search.equals(string) : search.equalsIgnoreCase(string);
+    return mcase ? string.equals(str) : string.equalsIgnoreCase(str);
   }
 
   /**
@@ -188,6 +188,6 @@ final class SearchContext {
     if(!(obj instanceof SearchContext)) return false;
     final SearchContext sc = (SearchContext) obj;
     return mcase == sc.mcase && word == sc.word && regex == sc.regex &&
-        multi == sc.multi && Strings.eq(search, sc.search);
+        multi == sc.multi && Strings.eq(string, sc.string);
   }
 }

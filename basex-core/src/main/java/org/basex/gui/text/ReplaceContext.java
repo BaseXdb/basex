@@ -36,7 +36,7 @@ final class ReplaceContext {
    */
   int[] replace(final SearchContext sc, final byte[] txt, final int start, final int end) {
     final int os = txt.length;
-    if(sc.search.isEmpty()) {
+    if(sc.string.isEmpty()) {
       text = txt;
     } else {
       final TokenBuilder tb = new TokenBuilder(os);
@@ -45,7 +45,7 @@ final class ReplaceContext {
         // regular expressions, ignoring position arrays
         int flags = Pattern.DOTALL;
         if(!sc.mcase) flags |= Pattern.CASE_INSENSITIVE;
-        final Pattern pattern = Pattern.compile(sc.search, flags);
+        final Pattern pattern = Pattern.compile(sc.string, flags);
         if(sc.multi) {
           tb.add(pattern.matcher(string(txt, start, end)).replaceAll(replace));
         } else {
@@ -58,7 +58,7 @@ final class ReplaceContext {
           }
         }
       } else {
-        final byte[] srch = token(sc.search);
+        final byte[] srch = token(sc.string);
         final byte[] rplc = token(replace);
         final int ss = srch.length;
         boolean s = true;

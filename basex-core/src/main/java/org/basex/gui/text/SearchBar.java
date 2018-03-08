@@ -164,35 +164,35 @@ public final class SearchBar extends BaseXBack {
 
   /**
    * Sets the specified editor and updates the component layout.
-   * @param e editor
+   * @param text editor
    * @param srch triggers a search in the specified editor
    */
-  public void editor(final TextPanel e, final boolean srch) {
-    final boolean ed = e.isEditable();
+  public void editor(final TextPanel text, final boolean srch) {
+    final boolean ed = text.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();
-      final BaseXBack wst = new BaseXBack(false).layout(new TableLayout(1, 4, 1, 0));
-      wst.add(mcase);
-      wst.add(word);
-      wst.add(regex);
-      wst.add(multi);
+      final BaseXBack west = new BaseXBack(false).layout(new TableLayout(1, 4, 1, 0));
+      west.add(mcase);
+      west.add(word);
+      west.add(regex);
+      west.add(multi);
 
-      final BaseXBack ctr = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
-      ctr.add(search);
-      if(ed) ctr.add(replace);
+      final BaseXBack center = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
+      center.add(search);
+      if(ed) center.add(replace);
 
-      final BaseXBack est = new BaseXBack(false).layout(new TableLayout(1, 3, 1, 0));
-      if(ed) est.add(rplc);
-      est.add(cls);
+      final BaseXBack east = new BaseXBack(false).layout(new TableLayout(1, 3, 1, 0));
+      if(ed) east.add(rplc);
+      east.add(cls);
 
-      add(wst, BorderLayout.WEST);
-      add(ctr, BorderLayout.CENTER);
-      add(est, BorderLayout.EAST);
+      add(west, BorderLayout.WEST);
+      add(center, BorderLayout.CENTER);
+      add(east, BorderLayout.EAST);
     }
 
-    editor = e;
+    editor = text;
     refreshLayout();
-    e.setSearch(this);
+    text.setSearch(this);
 
     if(srch) search(false);
   }
@@ -274,13 +274,14 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Refreshes the panel for the specified context.
+   * Refreshes the panel after a successful search operation.
    * @param sc search context
    */
   void refresh(final SearchContext sc) {
-    final boolean hits = sc.nr != 0, empty = sc.search.isEmpty();
+    final boolean hits = sc.nr != 0, empty = sc.string.isEmpty();
     rplc.setEnabled(hits && !empty);
     search.highlight(hits || empty);
+    if(!empty) gui.status.setText(Util.info(Text.STRINGS_FOUND_X, sc.nr()));
   }
 
   // PRIVATE METHODS ====================================================================
@@ -355,8 +356,7 @@ public final class SearchBar extends BaseXBack {
    * @param jump jump to next hit
    */
   private void search(final boolean jump) {
-    final String text = isVisible() ? search.getText() : "";
-    editor.search(new SearchContext(this, text), jump);
+    editor.search(new SearchContext(this, isVisible() ? search.getText() : ""), jump);
   }
 
   /**

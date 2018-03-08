@@ -26,7 +26,7 @@ final class TextIterator {
   /** Start position of an error highlighting. */
   private final int errPos;
   /** Start and end positions of search terms. */
-  private final IntList[] searchPos;
+  private final IntList[] searchResults;
 
   /** Current start position. */
   private int pos;
@@ -48,7 +48,7 @@ final class TextIterator {
     start = et.start;
     end = et.end;
     errPos = et.error;
-    searchPos = et.searchPos;
+    searchResults = et.searchResults;
   }
 
   /**
@@ -183,12 +183,12 @@ final class TextIterator {
    * @return result of check
    */
   boolean searchStart() {
-    if(searchPos == null) return false;
-    if(searchIndex == searchPos[0].size()) return false;
-    while(pos > searchPos[1].get(searchIndex)) {
-      if(++searchIndex == searchPos[0].size()) return false;
+    if(searchResults == null) return false;
+    if(searchIndex == searchResults[0].size()) return false;
+    while(pos > searchResults[1].get(searchIndex)) {
+      if(++searchIndex == searchResults[0].size()) return false;
     }
-    return posEnd > searchPos[0].get(searchIndex);
+    return posEnd > searchResults[0].get(searchIndex);
   }
 
   /**
@@ -196,8 +196,10 @@ final class TextIterator {
    * @return result of check
    */
   boolean inSearch() {
-    if(searchIndex >= searchPos[0].size() || pos < searchPos[0].get(searchIndex)) return false;
-    final boolean in = pos < searchPos[1].get(searchIndex);
+    final IntList starts = searchResults[0], ends = searchResults[1];
+    final int i = searchIndex;
+    if(i >= starts.size() || pos < starts.get(i)) return false;
+    final boolean in = pos < ends.get(i);
     if(!in) searchIndex++;
     return in;
   }

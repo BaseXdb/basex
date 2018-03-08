@@ -31,8 +31,8 @@ public final class TextEditor {
   /** Closing brackets. */
   private static final String CLOSING = "})]";
 
-  /** Start and end positions of search terms (initally empty). */
-  IntList[] searchPos = { new IntList(), new IntList() };
+  /** Start and end positions of search terms (initially empty). */
+  IntList[] searchResults = { new IntList(), new IntList() };
   /** Start position of a text selection. */
   int start = -1;
   /** End position of a text selection (+1). */
@@ -70,7 +70,7 @@ public final class TextEditor {
     text = txt;
     lines = -1;
     noSelect();
-    if(search != null) searchPos = search.search(txt);
+    if(search != null) searchResults = search.search(text);
     if(pos > tl) pos = tl;
     return true;
   }
@@ -80,14 +80,8 @@ public final class TextEditor {
    * @param sc search context
    */
   void search(final SearchContext sc) {
-    // skip search if criteria have not changed
-    if(sc.equals(search)) {
-      sc.nr = search.nr;
-      sc.bar.refresh(sc);
-    } else {
-      searchPos = sc.search(text);
-      search = sc;
-    }
+    searchResults = sc.search(text);
+    search = sc;
   }
 
   /**
@@ -1211,23 +1205,23 @@ public final class TextEditor {
    * @return new cursor position, or {@code -1}
    */
   int jump(final SearchDir dir, final boolean select) {
-    if(searchPos[0].isEmpty()) {
+    if(searchResults[0].isEmpty()) {
       if(select) noSelect();
       return -1;
     }
 
-    int s = searchPos[0].sortedIndexOf(!select || selected() ? pos : pos - 1);
+    int s = searchResults[0].sortedIndexOf(!select || selected() ? pos : pos - 1);
     switch(dir) {
       case CURRENT:  s = s < 0 ? -s - 1 : s;     break;
       case FORWARD:  s = s < 0 ? -s - 1 : s + 1; break;
       case BACKWARD: s = s < 0 ? -s - 2 : s - 1; break;
     }
-    final int sl = searchPos[0].size();
+    final int sl = searchResults[0].size();
     if(s < 0) s = sl - 1;
     else if(s == sl) s = 0;
-    final int p = searchPos[0].get(s);
+    final int p = searchResults[0].get(s);
     if(select) {
-      start = searchPos[1].get(s);
+      start = searchResults[1].get(s);
       end = p;
     }
     pos = p;
