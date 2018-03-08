@@ -90,11 +90,25 @@ public final class MapModuleTest extends QueryPlanTest {
 
     // duplicates option
     query(func.args(" (map{1:2},map {1:3})") + "(1)", 2);
-    query(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-first'}") + "(1)", 2);
-    query(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'use-last'}") + "(1)", 3);
-    query(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'combine'}") + "(1)", "2\n3");
-    error(func.args(" (map{1:2},map {1:3})", " map{'duplicates':'reject'}") + "(1)",
+    query(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'use-first' }") + "(1)", 2);
+    query(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'use-last' }") + "(1)", 3);
+    query(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'combine' }") + "(1)", "2\n3");
+    error(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'reject' }") + "(1)",
         MERGE_DUPLICATE_X);
+
+    // GH1543
+    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })") +
+        ", function($k, $v) { () })", "");
+    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })",
+        " map { 'duplicates': 'combine' }") + ", function($k, $v) { () })", "");
+    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })",
+        " map { 'duplicates': 'use-first' }") + ", function($k, $v) { () })", "");
+    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })") +
+        ", function($k, $v) { $v })", "");
+    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })",
+        " map { 'duplicates': 'combine' }") + ", function($k, $v) { $v })", "");
+    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })",
+        " map { 'duplicates': 'use-first' }") + ", function($k, $v) { $v })", "");
   }
 
   /** Test method. */
