@@ -54,11 +54,15 @@ final class DateFormat extends FormatParser {
     if(width != null) {
       final Matcher m = WIDTH.matcher(string(width));
       if(!m.find()) throw PICDATE_X.get(info, width);
-      int i = Strings.toInt(m.group(1));
-      if(i != Integer.MIN_VALUE) min = i;
-      final String mc = m.group(3);
-      i = mc != null ? Strings.toInt(mc) : Integer.MIN_VALUE;
-      if(i != Integer.MIN_VALUE) max = i;
+      final String mn = m.group(1), mx = m.group(3);
+      if(!mn.equals("*")) {
+        min = Strings.toInt(mn);
+        if(min < 1) throw PICDATE_X.get(info, width);
+      }
+      if(mx != null && !mx.equals("*")) {
+        max = Strings.toInt(mx);
+        if(max < 1 || max < min) throw PICDATE_X.get(info, width);
+      }
     }
   }
 }
