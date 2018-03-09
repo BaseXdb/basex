@@ -23,8 +23,9 @@ public final class ProfType extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    FnTrace.trace(Util.inf("{ type: %, size: %, exprSize: % }", exprs[0].seqType(), exprs[0].size(),
-        exprs[0].exprSize()), token(exprs[0].toString()), cc.qc);
-    return exprs[0];
+    final Expr expr = exprs[0];
+    FnTrace.trace(Util.inf("{ type: %, size: %, exprSize: % }", expr.seqType(), expr.size(),
+        expr.exprSize()), token(expr.toString()), cc.qc);
+    return expr;
   }
 }
