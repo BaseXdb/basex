@@ -40,6 +40,8 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" [1,2]"), "1\n2");
     query(func.args(" ([1],[2])"), "1\n2");
     query(func.args(" for $c in (1,2) return [$c]"), "1\n2");
+    query(func.args(" [for $c in (1,2) return [$c]]"), "1\n2");
+    query("head(" + func.args(" 1 to 1000000000000") + ')', "1");
   }
 
   /** Test method. */

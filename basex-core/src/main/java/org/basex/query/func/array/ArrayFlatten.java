@@ -1,7 +1,5 @@
 package org.basex.query.func.array;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -27,44 +25,20 @@ public final class ArrayFlatten extends ArrayFn {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return new Iter() {
-      private final LinkedList<Iterator<Value>> iters = new LinkedList<>();
-      private final Iter iter = exprs[0].iter(qc);
-      private Iter curr = iter;
-
-      @Override
-      public Item next() throws QueryException {
-        while(true) {
-          final Item item = qc.next(curr);
-          if(item instanceof Array) {
-            iters.add(((Array) item).iterator(0));
-          } else if(item != null) {
-            return item;
-          } else if(iters.isEmpty()) {
-            return null;
-          }
-          curr = nextIter();
-        }
-      }
-
-      private Iter nextIter() {
-        for(; !iters.isEmpty(); iters.removeLast()) {
-          final Iterator<Value> ir = iters.getLast();
-          if(ir.hasNext()) return ir.next().iter();
-        }
-        return iter;
-      }
-    };
+    return value(qc).iter();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    exprType.assign(type(exprs[0].seqType().type));
+    final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+    if(!st.mayBeArray()) return expr;
+    exprType.assign(type(st.type));
     return this;
   }
 
   /**
-   * Recursive helper method for retrieving result type.
+   * Recursive helper method for retrieving static result type.
    * @param type type
    * @return result type
    */
