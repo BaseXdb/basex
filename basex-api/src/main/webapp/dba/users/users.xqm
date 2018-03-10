@@ -37,21 +37,25 @@ function dba:users(
         <h2>Users</h2>
         {
           let $headers := (
-            <name>Name</name>,
-            <perm>Permission</perm>,
-            <you>You</you>
+            map { 'key': 'name', 'label': 'Name' },
+            map { 'key': 'permission', 'label': 'Permission' },
+            map { 'key': 'you', 'label': 'You' }
           )
-          let $rows :=
+          let $entries := (
             for $user in user:list-details()
             let $name := string($user/@name)
-            let $you := if($session:VALUE = $name) then '✓' else '–'
-            return <row name='{ $name }' perm='{ $user/@permission }' you='{ $you }'/>
+            return map {
+              'name': $name,
+              'permission': $user/@permission,
+              'you': if($session:VALUE = $name) then '✓' else '–'
+            }
+          )
           let $buttons := (
             html:button('user-create', 'Create…'),
             html:button('user-drop', 'Drop', true())
           )
-          let $link := function($value) { 'user' }
-          return html:table($headers, $rows, $buttons, map { }, map { 'link': $link })
+          let $options := map { 'link': function($value) { 'user' }, 'sort': $sort }
+          return html:table($headers, $entries, $buttons, map { }, $options)
         }
         </form>
         <div>&#xa0;</div>

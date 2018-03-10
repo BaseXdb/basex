@@ -61,18 +61,21 @@ function dba:database(
           {
             if($db-exists) then (
               let $headers := (
-                <resource>Name</resource>,
-                <type>Content type</type>,
-                <raw>Raw</raw>,
-                <size type='number' order='desc'>Size</size>
+                map { 'key': 'resource' , 'label': 'Name' },
+                map { 'key': 'type' , 'label': 'Content type' },
+                map { 'key': 'raw' , 'label': 'Raw' },
+                map { 'key': 'size' , 'label': 'Size', 'type': 'number', 'order': 'desc' }
               )
-              let $rows :=
+              let $entries :=
                 let $start := util:start($page, $sort)
                 let $end := util:end($page, $sort)
                 for $res in db:list-details($name)[position() = $start to $end]
-                return <row resource='{ $res }' type='{ $res/@content-type }'
-                            raw='{ if($res/@raw = 'true') then '✓' else '–' }'
-                            size='{ $res/@size }'/>
+                return map {
+                  'resource': $res,
+                  'type': $res/@content-type,
+                  'raw': if($res/@raw = 'true') then '✓' else '–',
+                  'size': $res/@size
+                }
               let $buttons := (
                 html:button('db-add', 'Add…'),
                 html:button('db-delete', 'Delete', true()),
@@ -80,11 +83,14 @@ function dba:database(
                 html:button('db-alter', 'Rename…', false()),
                 html:button('db-optimize', 'Optimize…', false(), map { 'class': 'global' })
               )
-              let $map := map { 'name': $name }
-              let $link := function($value) { $dba:SUB }
-              let $count := count(db:list($name))
-              return html:table($headers, $rows, $buttons, $map,
-                map { 'sort': $sort, 'link': $link, 'page': $page, 'count': $count })
+              let $params := map { 'name': $name }
+              let $options := map {
+                'sort': $sort,
+                'link': function($value) { $dba:SUB },
+                'page': $page,
+                'count': count(db:list($name))
+              }
+              return html:table($headers, $entries, $buttons, $params, $options)
             ) else ()
           }
         </form>
@@ -93,18 +99,20 @@ function dba:database(
           <h3>Backups</h3>
           {
             let $headers := (
-              <backup order='desc'>Name</backup>,
-              <size type='bytes'>Size</size>,
-              <action type='xml'>Action</action>
+              map { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
+              map { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
+              map { 'key': 'action', 'label': 'Action', 'type': 'xml' }
             )
-            let $rows :=
+            let $entries :=
               for $backup in db:backups($name)
               order by $backup descending
-              let $actions := (
-                html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
-              )
-              return <row backup='{ $backup }' size='{ $backup/@size }'
-                action='{ serialize($actions) }'/>
+              return map {
+                'backup': $backup,
+                'size': $backup/@size,
+                'action': function() {
+                  html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
+                }
+              }
             let $buttons := (
               html:button('backup-create', 'Create', false(), map { 'class': 'global' }) update (
                 if($db-exists) then () else insert node attribute disabled { '' } into .
@@ -112,8 +120,8 @@ function dba:database(
               html:button('backup-restore', 'Restore', true()),
               html:button('backup-drop', 'Drop', true())
             )
-            let $map := map { 'name': $name }
-            return html:table($headers, $rows, $buttons, $map, map { })
+            let $params := map { 'name': $name }
+            return html:table($headers, $entries, $buttons, $params, map { })
           }
         </form>
       </td>

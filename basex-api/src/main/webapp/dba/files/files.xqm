@@ -63,59 +63,58 @@ function dba:files(
             }
           }</select><![CDATA[ ]]>
         </form>
-        <form action="{ $dba:CAT }" method="post" class="update">
-        {
+
+        <form action="{ $dba:CAT }" method="post" class="update">{
           let $headers := (
-            <name type='xml'>Name</name>,
-            <date type='dateTime' order='desc'>Date</date>,
-            <bytes type='bytes' order='desc'>Bytes</bytes>,
-            <action type='xml'>Action</action>
+            map { 'key': 'name', 'label': 'Name', 'type': 'xml' },
+            map { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc' },
+            map { 'key': 'bytes', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
+            map { 'key': 'action', 'label': 'Action', 'type': 'xml' }
           )
-          let $rows := (
+          let $entries :=
             let $jobs := jobs:list-details()
             let $parent := if(file:parent($dir)) then ($dir || '..') else ()
             for $file in ($parent, file:children($dir))
             let $dir := file:is-dir($file)
             let $name := file:name($file)
             order by $dir descending, $name != '..', $name collation '?lang=en'
-            let $actions := util:item-join((
-              if($dir) then () else html:link('Download', 'file/' || encode-for-uri($name)),
-              if($dir or not(ends-with($name, '.xq') or ends-with($name, '.xqm'))) then () else (
-                html:link('Edit', 'queries', map { 'file': $name })
-              ),
-              if($dir or not(ends-with($name, '.xq'))) then () else (
-                let $job := (
-                  let $uri := replace(file:path-to-uri($file), '^file:/*', '')
-                  return $jobs[replace(., '^file:/*', '') = $uri]
-                )
-                let $id := string($job/@id)
-                return if(empty($job)) then (
-                  html:link('Start', 'file-start', map { 'file': $name })
-                ) else (
-                  html:link('Job', 'jobs', map { 'job': $id })
-                )
-              )
-            ), ' · ')
-
-            return <row name='{ serialize(
-              if($dir) then html:link($name, 'dir-change', map { 'dir': $name }) else $name
-            )}' date='{
-              file:last-modified($file)
-            }' bytes='{
-              file:size($file)
-            }' action='{ serialize(
-              $actions
-            )}'/>
-          )
+            return map {
+              'name': function() {
+                if($dir) then html:link($name, 'dir-change', map { 'dir': $name }) else $name
+              },
+              'date': file:last-modified($file),
+              'bytes': file:size($file),
+              'action': function() {
+                util:item-join((
+                  if($dir) then () else html:link('Download', 'file/' || encode-for-uri($name)),
+                  if($dir or not(ends-with($name, '.xq') or ends-with($name, '.xqm'))) then () else
+                    html:link('Edit', 'queries', map { 'file': $name }),
+                  if($dir or not(ends-with($name, '.xq'))) then () else (
+                    let $job := (
+                      let $uri := replace(file:path-to-uri($file), '^file:/*', '')
+                      return $jobs[replace(., '^file:/*', '') = $uri]
+                    )
+                    let $id := string($job/@id)
+                    return if(empty($job)) then (
+                      html:link('Start', 'file-start', map { 'file': $name })
+                    ) else (
+                      html:link('Job', 'jobs', map { 'job': $id })
+                    )
+                  )
+                ), ' · ')
+              }
+            }
           let $buttons := html:button('file-delete', 'Delete', true())
-          return html:table($headers, $rows, $buttons, map { }, map { 'sort': $sort })
-        }
-        </form>
+          let $options := map { 'sort': $sort }
+          return html:table($headers, $entries, $buttons, map { }, $options)
+        }</form>
+
         <h3>Upload Files</h3>
         <form action="file-upload" method="post" enctype="multipart/form-data">
           <input type="file" name="files" multiple="multiple"/>
           <input type="submit" value='Send'/>
         </form>
+
         <h3>Create Directory</h3>
         <form action="dir-create" method="post">
           <input type="text" name="name"/><![CDATA[ ]]>

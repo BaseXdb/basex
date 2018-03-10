@@ -40,14 +40,14 @@ function dba:jobs(
         <h2>Jobs</h2>
         {
           let $headers := (
-            <id>ID</id>,
-            <type>Type</type>,
-            <state>State</state>,
-            <dur type='number' order='desc'>Dur.</dur>,
-            <user>User</user>,
-            <you>You</you>
+            map { 'key': 'id', 'label': 'ID' },
+            map { 'key': 'type', 'label': 'Type' },
+            map { 'key': 'state', 'label': 'State' },
+            map { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
+            map { 'key': 'user', 'label': 'User' },
+            map { 'key': 'you', 'label': 'You' }
           )
-          let $rows :=
+          let $entries :=
             let $curr := jobs:current()
             for $details in jobs:list-details()
             let $id := $details/@id
@@ -55,25 +55,30 @@ function dba:jobs(
               let $dur := xs:dayTimeDuration($details/@duration)
               return if(exists($dur)) then $dur div xs:dayTimeDuration('PT1S') else 0
             )
-            let $you := if($id = $curr) then '✓' else '–'
-            let $start := string($details/@start)
-            let $end := string($details/@end)
-            order by $sec descending, $start descending
-            return <row id='{ $id }' type='{ $details/@type }' state='{ $details/@state }'
-                        dur='{ html:duration($sec) }' user='{ $details/@user }' you='{ $you }'/>
+            order by $sec descending, $details/@start descending
+            return map {
+              'id': $id,
+              'type': $details/@type,
+              'state': $details/@state,
+              'duration': html:duration($sec),
+              'user': $details/@user,
+              'you': if($id = $curr) then '✓' else '–'
+            }
           let $buttons := (
             html:button('job-stop', 'Stop', true())
           )
-          return html:table($headers, $rows, $buttons, map { }, map { 'sort': $sort }) update {
+          let $options := map { 'sort': $sort }
+          return html:table($headers, $entries, $buttons, map { }, $options) update {
             (: replace job ids with links :)
             for $tr at $p in tr[not(th)]
-            for $row in $rows[$p][@you = '–']
+            for $entries in $entries[$p][?you = '–']
             let $text := $tr/td[1]/text()
-            return replace node $text with <a href='?job={ $row/@id }'>{ $text }</a>
+            return replace node $text with <a href='?job={ $entries?id }'>{ $text }</a>
           }
         }
         </form>
       </td>,
+
       if($job) then (
         let $details := jobs:list-details($job)
         let $cached := $details/@state = 'cached'

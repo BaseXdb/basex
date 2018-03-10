@@ -54,22 +54,19 @@ function dba:logs(
           <input type='hidden' name='page' id='page' value='{ $page }'/>
           <div id='list'>{
             let $headers := (
-              <name>Name</name>,
-              <size type='bytes'>Size</size>
+              map { 'key': 'name', 'label': 'Name' },
+              map { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
             )
-            let $rows := (
-              for $file in $files
-              order by $file descending
-              return <row name='{ $file }' size='{ $file/@size }'/>
-            )
+            let $entries := reverse(sort($files)) ! map {
+              'name': .,
+              'size': @size
+            }
             let $buttons := html:button('log-delete', 'Delete', true())
-            let $link := function($value) { $dba:CAT }
-            return html:table($headers, $rows, $buttons,
-              map { 'sort': $sort }, map { 'link': $link }
-            ) update {
+            let $params := map { 'sort': $sort }
+            let $options := map { 'link': function($value) { $dba:CAT } }
+            return html:table($headers, $entries, $buttons, $params, $options) update {
               (: enrich link targets with current search string :)
-              for $a in .//a
-              return insert node attribute onclick { 'addInput(this); ' } into $a
+              .//a ! (insert node attribute onclick { 'addInput(this);' } into .)
             }
           }</div>
         </form>
@@ -122,17 +119,17 @@ function dba:log(
   $page   as xs:string
 ) as element()+ {
   let $headers := (
-    <time type='time' order='desc'>Time</time>,
-    <address>Address</address>,
-    <user type='xml'>User</user>,
-    <type>Type</type>,
-    <ms type='decimal' order='desc'>ms</ms>,
-    <message type='xml'>Message</message>
+    map { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
+    map { 'key': 'address', 'label': 'Address' },
+    map { 'key': 'user', 'label': 'User', 'type': 'xml' },
+    map { 'key': 'type', 'label': 'Type' },
+    map { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc' },
+    map { 'key': 'message', 'label': 'Message', 'type': 'xml' }
   )
-  let $rows := (
+  let $entries :=
     let $input-exists := boolean($input)
     let $highlight := function($string, $found) {
-      if($found) then serialize(
+      if($found) then (
         for $match in analyze-string($string, $input, 'i')/*
         let $text := string($match)
         return if(local-name($match) = 'match') then element b { $text } else $text
@@ -141,19 +138,22 @@ function dba:log(
       )
     }
     for $log in admin:logs($name, true())
-    let $message := data($log/text())
     let $user := data($log/@user)
-    let $user-found := $input-exists and contains($log/@user, $input)
+    let $message := data($log/text())
+    let $user-found := $input-exists and contains($user, $input)
     let $message-found := $input-exists and matches($message, $input, 'i')
     where not($input-exists) or $user-found or $message-found
-    return <row time='{ $log/@time }' address='{ $log/@address }'
-                user='{ $highlight($user, $user-found) }' type='{ $log/@type }'
-                ms='{ $log/@ms }' message='{ $highlight($message, $message-found) }'/>
-  )
-  return html:table($headers, $rows, (),
-    map { 'name': $name, 'input': $input },
-    map { 'sort': head(($sort[.], 'time')), 'page': xs:integer($page[.]) }
-  )
+    return map {
+      'time': $log/@time,
+      'address': $log/@address,
+      'user': function() { $highlight($user, $user-found) },
+      'type': $log/@type,
+      'ms': $log/@ms,
+      'message': function() { $highlight($message, $message-found) }
+    }
+  let $params := map { 'name': $name, 'input': $input }
+  let $options := map { 'sort': head(($sort[.], 'time')), 'page': xs:integer($page[.]) }
+  return html:table($headers, $entries, (), $params, $options)
 };
 
 (:~

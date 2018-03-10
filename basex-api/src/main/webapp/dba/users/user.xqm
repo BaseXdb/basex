@@ -104,17 +104,18 @@ function dba:user(
             <div class='small'/>
             {
               let $headers := (
-                <pattern>Pattern</pattern>,
-                <perm>Local Permission</perm>
+                map { 'key': 'pattern', 'label': 'Pattern' },
+                map { 'key': 'permission', 'label': 'Local Permission' }
               )
-              let $rows :=
-                for $db in $user/database
-                return <row pattern='{ $db/@pattern }' perm='{ $db/@permission }'/>
+              let $entries := $user/database ! map {
+                'pattern': @pattern,
+                'permission': @permission
+              }
               let $buttons := if($admin) then () else (
                 html:button('pattern-add', 'Add…'),
                 html:button('pattern-drop', 'Drop', true())
               )
-              return html:table($headers, $rows, $buttons, map { }, map { })
+              return html:table($headers, $entries, $buttons, map { }, map { })
             }
           </form>
           <div class='note'>

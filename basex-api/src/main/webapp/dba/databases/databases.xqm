@@ -41,15 +41,23 @@ function dba:databases(
     let $start := util:start($page, $sort)
     let $end := util:end($page, $sort)
     for $db in db:list-details()[position() = $start to $end]
-    return <row name='{ $db }' resources='{ $db/@resources }' size='{ $db/@size }'
-                date='{ $db/@modified-date }'/>
+    return map {
+      'name': $db,
+      'resources': $db/@resources,
+      'size': $db/@size,
+      'date': $db/@modified-date
+    }
   let $backups :=
     for $backup in db:backups()
     where matches($backup, $dba:BACKUP-REGEX)
     group by $name := replace($backup, $dba:BACKUP-REGEX, '$1')
     where not($names($name))
     let $date := replace(sort($backup)[last()], $dba:BACKUP-REGEX, '$2T$3:$4:$5Z')
-    return <row name='{ $name }' resources='' size='(backup)' date='{ $date }'/>
+    return map {
+      'name': $name,
+      'size': '(backup)',
+      'date': $date
+    }
 
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -58,12 +66,12 @@ function dba:databases(
           <h2>Databases</h2>
           {
             let $headers := (
-              <name>Name</name>,
-              <resources type='number' order='desc'>Count</resources>,
-              <size type='bytes' order='desc'>Bytes</size>,
-              <date type='dateTime' order='desc'>Last Modified</date>
+              map { 'key': 'name', 'label': 'Name' },
+              map { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc' },
+              map { 'key': 'size', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
+              map { 'key': 'date', 'label': 'Last Modified', 'type': 'dateTime', 'order': 'desc' }
             )
-            let $rows := ($databases, $backups)
+            let $entries := ($databases, $backups)
             let $buttons := (
               html:button('db-create', 'Create…'),
               html:button('db-optimize-all', 'Optimize'),
@@ -71,8 +79,8 @@ function dba:databases(
             )
             let $link := function($value) { 'database' }
             let $count := map:size($names) + count($backups)
-            return html:table($headers, $rows, $buttons, map { },
-              map { 'sort': $sort, 'link': $link, 'page': $page, 'count': $count })
+            let $options := map { 'sort': $sort, 'link': $link, 'page': $page, 'count': $count }
+            return html:table($headers, $entries, $buttons, map { }, $options)
           }
         </form>
       </td>
