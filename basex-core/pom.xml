@@ -78,7 +78,7 @@
               <packageName>org.basex</packageName>
             </manifest>
             <manifestEntries>
-              <SplashScreen-Image>img/start.png</SplashScreen-Image>
+              <SplashScreen-Image>img/logo_256.png</SplashScreen-Image>
             </manifestEntries>
           </archive>
         </configuration>
