@@ -1129,6 +1129,8 @@ public enum Function {
   // Output Module
 
   /** XQuery function. */
+  _OUT_CR(OutCr.class, "cr()", arg(), STR_O, OUT_URI),
+  /** XQuery function. */
   _OUT_FORMAT(OutFormat.class, "format(format,item1[,...])", arg(STR_O, ITEM_O), STR_O, OUT_URI),
   /** XQuery function. */
   _OUT_NL(OutNl.class, "nl()", arg(), STR_O, OUT_URI),
@@ -1144,13 +1146,13 @@ public enum Function {
   _PROC_FORK(ProcFork.class, "fork(command[,args[,options]])",
       arg(STR_O, STR_ZM, AAT_O), EMP, flag(NDT), PROC_URI),
   /** XQuery function. */
-  _PROC_SYSTEM(ProcSystem.class, "system(command[,args[,options]])",
-      arg(STR_O, STR_ZM, AAT_O), STR_O, flag(NDT), PROC_URI),
-  /** XQuery function. */
-  _PROC_PROPERTY(ProcProperty.class, "property(name)", arg(STR_O), STR_O, flag(NDT), PROC_URI),
+  _PROC_PROPERTY(ProcProperty.class, "property(name)", arg(STR_O), STR_ZO, flag(NDT), PROC_URI),
   /** XQuery function. */
   _PROC_PROPERTY_NAMES(ProcPropertyNames.class, "property-names()",
-      arg(), STR_ZO, flag(NDT), PROC_URI),
+      arg(), STR_ZM, flag(NDT), PROC_URI),
+  /** XQuery function. */
+  _PROC_SYSTEM(ProcSystem.class, "system(command[,args[,options]])",
+      arg(STR_O, STR_ZM, AAT_O), STR_O, flag(NDT), PROC_URI),
 
   // Profiling Module
 
