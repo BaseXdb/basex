@@ -187,8 +187,6 @@ public final class GUIOptions extends Options {
   /** Comment: written to options file. */
   public static final Comment C_SEARCH = new Comment("Search");
 
-  /** Search modes (4x '!' or '.', separated with commas). */
-  public static final StringOption SEARCHMODES = new StringOption("SEARCHMODES", "");
   /** Last searched strings. */
   public static final StringsOption SEARCHED = new StringsOption("SEARCHED");
   /** Last replaced strings. */

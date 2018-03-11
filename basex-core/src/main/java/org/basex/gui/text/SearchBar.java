@@ -4,7 +4,6 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 import javax.swing.*;
 
@@ -13,7 +12,6 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.listener.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This panel provides search and replace facilities.
@@ -22,9 +20,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class SearchBar extends BaseXBack {
-  /** History values for buttons. */
-  private final HashMap<String, boolean[]> modeHistory = new HashMap<>();
-
   /** Search direction. */
   public enum SearchDir {
     /** Current hit. */
@@ -115,8 +110,6 @@ public final class SearchBar extends BaseXBack {
           editor.jump(SearchDir.FORWARD, true);
         } else if(SHIFT_ENTER.is(e)) {
           editor.jump(SearchDir.BACKWARD, true);
-        } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
-          setModes(modeHistory.get(search.getText()));
         }
       }
 
@@ -158,8 +151,6 @@ public final class SearchBar extends BaseXBack {
     if(searched.length > 0) setSearch(searched[0]);
     final String[] replaced = gui.gopts.get(GUIOptions.REPLACED);
     if(replaced.length > 0) replace.setText(replaced[0]);
-    initModes();
-    setModes(modeHistory.get(search.getText()));
   }
 
   /**
@@ -222,18 +213,6 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Resets the search options.
-   * @param values array with four booleans (ignored if {@code null})
-   */
-  public void setModes(final boolean[] values) {
-    if(values != null) {
-      final int ml = modeButtons.length;
-      for(int m = 0; m < ml; m++) modeButtons[m].setSelected(values[m]);
-    }
-    refreshButtons();
-  }
-
-  /**
    * Activates the search bar. A new search is triggered if the new seaerch term differs from
    * the last one.
    * @param string search string (ignored if empty)
@@ -287,43 +266,10 @@ public final class SearchBar extends BaseXBack {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Initializes the mode history map.
-   */
-  private void initModes() {
-    final String[] searchModes = Strings.split(gui.gopts.get(GUIOptions.SEARCHMODES), ',');
-    final String[] searches = gui.gopts.get(GUIOptions.SEARCHED);
-    final int ml = Math.min(searchModes.length, searches.length);
-    for(int m = 0; m < ml; m++) {
-      final int bl = modeButtons.length;
-      final BoolList list = new BoolList(bl);
-      for(final char ch : searchModes[m].toCharArray()) list.add(ch == '!');
-      modeHistory.put(searches[m], list.size() == bl ? list.finish() : new boolean[bl]);
-    }
-  }
-
-  /**
    * Stores the search text.
    */
   private void store() {
     search.store();
-
-    final String text = search.getText();
-    final HashMap<String, boolean[]> map = new HashMap<>();
-    final StringBuilder sb = new StringBuilder();
-    for(final String t : gui.gopts.get(GUIOptions.SEARCHED)) {
-      boolean[] modes = modeHistory.get(t);
-      if(modes == null || t.equals(text)) {
-        final BoolList list = new BoolList(modeButtons.length);
-        for(final AbstractButton mode : modeButtons) list.add(mode.isSelected());
-        modes = list.finish();
-      }
-      if(sb.length() > 0) sb.append(',');
-      for(final boolean mode : modes) sb.append(mode ? '!' : '.');
-      map.put(t, modes);
-    }
-    gui.gopts.set(GUIOptions.SEARCHMODES, sb.toString());
-    modeHistory.clear();
-    modeHistory.putAll(map);
   }
 
   /**
