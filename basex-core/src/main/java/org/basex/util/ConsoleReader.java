@@ -148,7 +148,7 @@ public abstract class ConsoleReader implements AutoCloseable {
       final Class<?> history = Reflect.find(JLINE_HISTORY);
       fileHistoryC = Reflect.find(JLINE_FILE_HISTORY);
       fileHistory = Reflect.get(Reflect.find(fileHistoryC, File.class),
-          new File(Prop.HOME, HISTORY_FILE));
+          new File(Prop.HOMEDIR, HISTORY_FILE));
 
       final Class<?> completer = Reflect.find(JLINE_COMPLETER);
       final Class<?> enumCompleter = Reflect.find(JLINE_ENUM_COMPLETER);

@@ -20,7 +20,7 @@ import org.junit.*;
  */
 public final class FileModuleTest extends AdvancedQueryTest {
   /** Test path. */
-  private static final String PATH = Prop.TMP + NAME + '/';
+  private static final String PATH = Prop.TEMPDIR + NAME + '/';
   /** Test path. */
   private static final String PATH1 = PATH + NAME;
   /** Test path. */
@@ -62,7 +62,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void tempDir() {
-    assertEquals(query(_FILE_TEMP_DIR.args()), Prop.TMP);
+    assertEquals(query(_FILE_TEMP_DIR.args()), Prop.TEMPDIR);
   }
 
   /** Test method. */

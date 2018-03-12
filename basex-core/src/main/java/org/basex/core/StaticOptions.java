@@ -14,22 +14,17 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class StaticOptions extends Options {
-  /** Indicates if the user's home directory has been chosen as home directory. */
-  private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
-
   /** Comment: written to options file. */
   public static final Comment C_GENERAL = new Comment("General Options");
 
   /** Debug mode. */
   public static final BooleanOption DEBUG = new BooleanOption("DEBUG", false);
   /** Database path. */
-  public static final StringOption DBPATH = new StringOption("DBPATH",
-      Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data"));
+  public static final StringOption DBPATH = new StringOption("DBPATH", Prop.HOMEDIR + "data");
   /** Log path (relative to database path). */
   public static final StringOption LOGPATH = new StringOption("LOGPATH", ".logs");
   /** Package repository path. */
-  public static final StringOption REPOPATH = new StringOption("REPOPATH",
-      Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo"));
+  public static final StringOption REPOPATH = new StringOption("REPOPATH", Prop.HOMEDIR + "repo");
   /** Language name. */
   public static final StringOption LANG = new StringOption("LANG", Prop.language);
   /** Flag to include key names in the language strings. */
@@ -80,8 +75,7 @@ public final class StaticOptions extends Options {
   public static final Comment C_HTTP = new Comment("HTTP Services");
 
   /** Web path. */
-  public static final StringOption WEBPATH = new StringOption("WEBPATH",
-      Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp"));
+  public static final StringOption WEBPATH = new StringOption("WEBPATH", Prop.HOMEDIR + "webapp");
   /** REST path (relative to web path). */
   public static final StringOption RESTPATH = new StringOption("RESTPATH", "");
   /** RESTXQ path (relative to web path). */
@@ -114,7 +108,7 @@ public final class StaticOptions extends Options {
    * @param file if {@code true}, options will be read from disk
    */
   StaticOptions(final boolean file) {
-    super(file ? new IOFile(Prop.HOME, IO.BASEXSUFFIX) : null);
+    super(file ? new IOFile(Prop.HOMEDIR, IO.BASEXSUFFIX) : null);
     setSystem();
 
     // set some static options

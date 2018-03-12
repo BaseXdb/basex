@@ -5,10 +5,9 @@ import java.net.*;
 import java.nio.file.*;
 import java.security.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 import java.util.concurrent.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.util.options.*;
 
@@ -19,29 +18,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class Prop {
-  /** Global options, assigned by the starter classes and the web.xml context parameters. */
-  private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
-
-  /** User's home directory. */
-  public static final String USERHOME;
-  /** Application URL. */
-  public static final URL LOCATION;
-
-  static {
-    // linux: check HOME variable (#773)
-    final String home = System.getenv("HOME");
-    USERHOME = dir(home != null ? home : System.getProperty("user.home"));
-
-    // retrieve application URL
-    URL loc = null;
-    final ProtectionDomain pd = MainOptions.class.getProtectionDomain();
-    if(pd != null) {
-      final CodeSource cs = pd.getCodeSource();
-      if(cs != null) loc = cs.getLocation();
-    }
-    LOCATION = loc;
-  }
-
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
@@ -78,9 +54,6 @@ public final class Prop {
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");
 
-  /** System's temporary directory. */
-  public static final String TMP = dir(System.getProperty("java.io.tmpdir"));
-
   /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
   private static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
@@ -95,8 +68,41 @@ public final class Prop {
   /** System property for specifying database home directory. */
   public static final String PATH = DBPREFIX + "path";
 
-  /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = dir(homeDir());
+  /** System's temporary directory. */
+  public static final String TEMPDIR = dir(System.getProperty("java.io.tmpdir"));
+  /** Project home directory. */
+  public static final String HOMEDIR;
+  /** Application URL. */
+  public static final URL LOCATION;
+
+  /** Global options, assigned by the starter classes and the web.xml context parameters. */
+  private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
+
+  // determine project home directory for storing property files and directories...
+  static {
+    // check system property 'org.basex.path'
+    String homedir = System.getProperty(PATH);
+    // check if current working directory contains configuration file
+    if(homedir == null) homedir = configDir(System.getProperty("user.dir"));
+    // check if application directory contains configuration file
+    if(homedir == null) homedir = configDir(applicationDir());
+    // check if application directory contains configuration file
+    if(homedir == null) {
+      // linux: check HOME variable (#773)
+      final String home = System.getenv("HOME");
+      homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT_NAME;
+    }
+    HOMEDIR = dir(homedir);
+
+    // retrieve application URL
+    URL location = null;
+    final ProtectionDomain pd = Prop.class.getProtectionDomain();
+    if(pd != null) {
+      final CodeSource cs = pd.getCodeSource();
+      if(cs != null) location = cs.getLocation();
+    }
+    LOCATION = location;
+  }
 
   // STATIC OPTIONS =====================================================================
 
@@ -104,7 +110,7 @@ public final class Prop {
   public static String language = "English";
   /** Flag for prefixing texts with their keys (helps while translating texts). */
   public static boolean langkeys;
-  /** Language direction (right vs. left). */
+  /** Rendering orientation (right vs. left). */
   public static boolean langright;
   /** Debug mode. */
   public static boolean debug;
@@ -117,56 +123,42 @@ public final class Prop {
   // STATIC METHODS =====================================================================
 
   /**
-   * <p>Determines the project's home directory for storing property files
-   * and directories. The directory is chosen as follows:</p>
-   * <ol>
-   *   <li> First, the <b>system property</b> {@code "org.basex.path"} is checked.
-   *        If it contains a value, it is adopted as home directory.</li>
-   *   <li> If not, the <b>current working directory</b> (defined by the system
-   *        property {@code "user.dir"}) is chosen if the file {@code .basex} or
-   *        {@code .basexhome} is found in this directory.</li>
-   *   <li> Otherwise, the files are searched in the <b>application directory</b>
-   *        (the folder in which the application code is located).</li>
-   *   <li> Otherwise, the <b>user's home directory</b> (defined in
-   *        {@code "user.home"}) is chosen.</li>
-   * </ol>
-   * @return path to home directory
+   * Checks if one of the files .basexhome or .basex are found in the specified directory.
+   * @param dir directory (can be {@code null})
+   * @return configuration directory (can be {@code null})
    */
-  private static String homeDir() {
-    // check for system property
-    String dir = System.getProperty(PATH);
-    if(dir != null) return dir;
+  private static String configDir(final String dir) {
+    if(dir != null) {
+      final String home = IO.BASEXSUFFIX + "home";
+      final IOFile file = new IOFile(dir, home);
+      if(file.exists() || new IOFile(dir, IO.BASEXSUFFIX).exists()) return dir;
+    }
+    return null;
+  }
 
-    // not found; check working directory for property file
-    dir = System.getProperty("user.dir");
-    final String home = IO.BASEXSUFFIX + "home";
-    IOFile file = new IOFile(dir, home);
-    if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
-    if(file.exists()) return file.dir();
-
-    // not found; check application directory
+  /**
+   * Returns the application directory.
+   * @return application directory (can be {@code null})
+   */
+  private static String applicationDir() {
     if(LOCATION != null) {
       try {
-        dir = new IOFile(Paths.get(LOCATION.toURI()).toString()).dir();
-        file = new IOFile(dir, home);
-        if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
-        if(file.exists()) return file.dir();
+        return new IOFile(Paths.get(LOCATION.toURI()).toString()).dir();
       } catch(final Exception ex) {
         Util.stack(ex);
       }
     }
-
-    // not found; choose user home directory as default
-    return USERHOME;
+    return null;
   }
 
   /**
    * Attaches a directory separator to the specified directory string.
-   * @param dir input string
+   * @param path directory path
    * @return directory string
    */
-  private static String dir(final String dir) {
-    return dir.endsWith("\\") || dir.endsWith("/") ? dir : dir + File.separator;
+  private static String dir(final String path) {
+    return path.isEmpty() || path.endsWith("\\") || path.endsWith("/") ? path :
+      path + File.separator;
   }
 
   /**

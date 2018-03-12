@@ -141,6 +141,7 @@ public class Options implements Iterable<Option<?>> {
       if(update(lines)) {
         final TokenBuilder tb = new TokenBuilder();
         for(final String line : lines) tb.add(line).add(NL);
+        file.parent().md();
         file.write(tb.finish());
       }
 

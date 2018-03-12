@@ -763,7 +763,7 @@ public abstract class W3CTS extends Main {
    * @return database path
    */
   private IOFile sandbox() {
-    return new IOFile(Prop.TMP, testid);
+    return new IOFile(Prop.TEMPDIR, testid);
   }
 
   @Override

@@ -23,9 +23,9 @@ public final class ZipModuleTest extends AdvancedQueryTest {
   /** Test ZIP file. */
   private static final String ZIP = "src/test/resources/xml.zip";
   /** Temporary ZIP file. */
-  private static final String TMPZIP = Prop.TMP + NAME + ".zip";
+  private static final String TMPZIP = Prop.TEMPDIR + NAME + ".zip";
   /** Temporary file. */
-  private static final String TMPFILE = Prop.TMP + NAME + ".tmp";
+  private static final String TMPFILE = Prop.TEMPDIR + NAME + ".tmp";
   /** Test ZIP entry. */
   private static final String ENTRY1 = "infos/stopWords";
   /** Test ZIP entry. */

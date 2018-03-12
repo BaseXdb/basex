@@ -41,7 +41,7 @@ public class FileCreateTempFile extends FileFn {
       root = toPath(2, qc);
       if(Files.isRegularFile(root)) throw FILE_NO_DIR_X.get(info, root);
     } else {
-      root = Paths.get(Prop.TMP);
+      root = Paths.get(Prop.TEMPDIR);
     }
 
     // choose non-existing file path

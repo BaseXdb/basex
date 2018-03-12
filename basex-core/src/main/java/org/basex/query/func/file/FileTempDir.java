@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class FileTempDir extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return Str.get(Prop.TMP);
+    return Str.get(Prop.TEMPDIR);
   }
 }

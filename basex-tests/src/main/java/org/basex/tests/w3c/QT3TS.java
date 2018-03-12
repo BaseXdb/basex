@@ -1013,7 +1013,7 @@ public final class QT3TS extends Main {
    * @return database path
    */
   private IOFile sandbox() {
-    return new IOFile(TMP, TESTID);
+    return new IOFile(TEMPDIR, TESTID);
   }
 
   @Override

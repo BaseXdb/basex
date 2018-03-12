@@ -26,7 +26,7 @@ public final class CsvParserTest extends SandboxTest {
   /** Test CSV file. */
   private static final String FILE = "src/test/resources/input.csv";
   /** Temporary CSV file. */
-  private static final String TEMP = Prop.TMP + NAME + IO.CSVSUFFIX;
+  private static final String TEMP = Prop.TEMPDIR + NAME + IO.CSVSUFFIX;
 
   /**
    * Creates the initial database.

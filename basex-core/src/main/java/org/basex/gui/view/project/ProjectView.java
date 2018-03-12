@@ -59,7 +59,7 @@ public final class ProjectView extends BaseXPanel {
 
     tree = new ProjectTree(this);
     IOFile dir = dir();
-    if(dir == null) dir = new IOFile(Prop.HOME).normalize();
+    if(dir == null) dir = new IOFile(Prop.HOMEDIR).normalize();
     root = new ProjectDir(dir, this);
     tree.init(root);
 
@@ -189,14 +189,13 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Refreshes the project view.
    * @param reset invalidate the file cache
-   * @param parse parse
+   * @param enforce enforce parsing of XQuery files
    */
-  private void refresh(final boolean reset, final boolean parse) {
+  private void refresh(final boolean reset, final boolean enforce) {
     if(reset) files.reset();
     filter.refresh(true);
 
-    final boolean parseproj = gui.gopts.get(GUIOptions.PARSEPROJ);
-    if(parseproj && !root.file.eq(new IOFile(Prop.USERHOME)) && (!parsed || parse)) {
+    if(gui.gopts.get(GUIOptions.PARSEPROJ) && (!parsed || enforce)) {
       parsed = false;
       // do not parse if project view is hidden
       if(getWidth() == 0) return;

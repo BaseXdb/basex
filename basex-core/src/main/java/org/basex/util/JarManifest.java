@@ -19,10 +19,10 @@ final class JarManifest {
   private JarManifest() { }
 
   static {
-    Attributes m = null;
-    final URL loc = Prop.LOCATION;
-    if(loc != null) {
-      final String jar = loc.getFile();
+    Attributes map = null;
+    final URL location = Prop.LOCATION;
+    if(location != null) {
+      final String jar = location.getFile();
       try {
         final ClassLoader cl = JarManifest.class.getClassLoader();
         final Enumeration<URL> list = cl.getResources("META-INF/MANIFEST.MF");
@@ -30,15 +30,15 @@ final class JarManifest {
           final URL url = list.nextElement();
           if(!url.getFile().contains(jar)) continue;
           try(InputStream in = url.openStream()) {
-            m = new Manifest(in).getMainAttributes();
+            map = new Manifest(in).getMainAttributes();
             break;
           }
         }
       } catch(final IOException ex) {
-        Util.errln(ex);
+        Util.stack(ex);
       }
     }
-    MAP = m;
+    MAP = map;
   }
 
   /**

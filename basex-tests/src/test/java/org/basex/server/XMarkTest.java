@@ -29,7 +29,7 @@ public final class XMarkTest {
   private static final String DB = "111mb";
 
   /** Test directory. */
-  private static final IOFile DIR = new IOFile(Prop.TMP, "XMark");
+  private static final IOFile DIR = new IOFile(Prop.TEMPDIR, "XMark");
   /** Output file. */
   private static final IOFile FILE = new IOFile(DIR, "master- " + DB + ".graph");
 

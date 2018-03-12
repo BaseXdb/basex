@@ -21,11 +21,11 @@ public final class GUIOptions extends Options {
   public static final Comment C_PATHS = new Comment("Paths");
 
   /** Path to database input. */
-  public static final StringOption INPUTPATH = new StringOption("INPUTPATH", HOME);
+  public static final StringOption INPUTPATH = new StringOption("INPUTPATH", HOMEDIR);
   /** Path for additional material. */
-  public static final StringOption DATAPATH = new StringOption("DATAPATH", HOME);
+  public static final StringOption DATAPATH = new StringOption("DATAPATH", HOMEDIR);
   /** Path to working directory. */
-  public static final StringOption WORKPATH = new StringOption("WORKPATH", HOME);
+  public static final StringOption WORKPATH = new StringOption("WORKPATH", HOMEDIR);
   /** Path to database project. */
   public static final StringOption PROJECTPATH = new StringOption("PROJECTPATH", "");
 
@@ -222,7 +222,7 @@ public final class GUIOptions extends Options {
    * Constructor.
    */
   public GUIOptions() {
-    super(new IOFile(HOME + IO.BASEXSUFFIX + "gui"));
+    super(new IOFile(HOMEDIR + IO.BASEXSUFFIX + "gui"));
     // reset realtime operations
     set(FILTERRT, false);
     set(EXECRT, false);
