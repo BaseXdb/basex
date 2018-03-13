@@ -213,7 +213,7 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Activates the search bar. A new search is triggered if the new seaerch term differs from
+   * Activates the search bar. A new search is triggered if the new search term differs from
    * the last one.
    * @param string search string (ignored if empty)
    * @param focus indicates if the search field should be focused
@@ -255,12 +255,14 @@ public final class SearchBar extends BaseXBack {
   /**
    * Refreshes the panel after a successful search operation.
    * @param sc search context
+   * @param jump jump to next search result
    */
-  void refresh(final SearchContext sc) {
+  void refresh(final SearchContext sc, final boolean jump) {
     final boolean hits = sc.nr != 0, empty = sc.string.isEmpty();
     rplc.setEnabled(hits && !empty);
     search.highlight(hits || empty);
-    if(!empty) gui.status.setText(Util.info(Text.STRINGS_FOUND_X, sc.nr()));
+    if(isVisible()) gui.status.setText(Util.info(Text.STRINGS_FOUND_X, sc.nr()));
+    if(jump) editor.jump(SearchDir.CURRENT, false);
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -299,7 +301,7 @@ public final class SearchBar extends BaseXBack {
 
   /**
    * Searches text in the current editor.
-   * @param jump jump to next hit
+   * @param jump jump to next search result
    */
   private void search(final boolean jump) {
     final String text = isVisible() ? search.getText() : "";

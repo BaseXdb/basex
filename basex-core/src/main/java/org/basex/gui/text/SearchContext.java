@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  */
 final class SearchContext {
   /** Maximum number of hits. */
-  private static final int MAX = 50000000;
+  private static final int MAX = 10000000;
 
   /** Search bar. */
   final SearchBar bar;
@@ -52,11 +52,12 @@ final class SearchContext {
   }
 
   /**
-   * Performs the search.
+   * Performs the search and refreshes the editor.
    * @param txt text to be searched
+   * @param jump jump to next search result
    * @return result positions
    */
-  IntList[] search(final byte[] txt) {
+  IntList[] search(final byte[] txt, final boolean jump) {
     final IntList start = new IntList(), end = new IntList();
     if(!string.isEmpty()) {
       if(regex) searchRegEx(start, end, txt);
@@ -64,7 +65,7 @@ final class SearchContext {
     }
     InterruptibleString.checkStop();
     nr = start.size();
-    bar.refresh(this);
+    bar.refresh(this, jump);
     return new IntList[] { start, end };
   }
 

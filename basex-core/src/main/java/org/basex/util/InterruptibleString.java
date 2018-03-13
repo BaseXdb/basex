@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import org.basex.core.*;
 import org.basex.core.jobs.*;
 
 /**
@@ -47,6 +48,6 @@ public class InterruptibleString implements CharSequence {
    * Checks if search should be interrupted.
    */
   public static void checkStop() {
-    if(Thread.interrupted()) throw new JobException();
+    if(Thread.interrupted()) throw new JobException(Text.INTERRUPTED);
   }
 }

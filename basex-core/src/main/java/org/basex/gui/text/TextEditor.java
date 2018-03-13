@@ -5,6 +5,8 @@ import static org.basex.util.Token.*;
 import java.text.*;
 import java.util.*;
 
+import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.gui.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.util.*;
@@ -40,10 +42,12 @@ public final class TextEditor {
   /** Start position of an error highlighting. */
   int error = -1;
 
-  /** GUI options. */
-  private final GUIOptions gopts;
+  /** GUI reference. */
+  private final GUI gui;
   /** Search context. */
-  private SearchContext search;
+  private SearchContext searchContext;
+  /** Search thread. */
+  private Thread searchThread;
   /** Text array to be written. */
   private byte[] text = EMPTY;
   /** Number of lines. Required for displaying line numbers. */
@@ -56,7 +60,7 @@ public final class TextEditor {
    * @param gui gui reference
    */
   TextEditor(final GUI gui) {
-    gopts = gui.gopts;
+    this.gui = gui;
   }
 
   /**
@@ -70,18 +74,38 @@ public final class TextEditor {
     text = txt;
     lines = -1;
     noSelect();
-    if(search != null) searchResults = search.search(text);
+    search(searchContext, false);
     if(pos > tl) pos = tl;
     return true;
   }
 
   /**
    * Sets a new search context.
-   * @param sc search context
+   * @param sc search context (can be {@code null})
+   * @param jump jump to next search result
    */
-  void search(final SearchContext sc) {
-    searchResults = sc.search(text);
-    search = sc;
+  void search(final SearchContext sc, final boolean jump) {
+    if(sc == null) return;
+
+    // interrupt old search thread
+    Thread t = searchThread;
+    if(t != null) t.interrupt();
+
+    // start new search
+    t = new Thread(() -> {
+      try {
+        searchResults = sc.search(text, jump);
+        searchContext = sc;
+        searchThread = null;
+      } catch(final JobException ex) {
+        // search was interrupted
+      } catch(final Exception ex) {
+        final String info = Util.message(ex).replaceAll(Prop.NL + ".*", "");
+        gui.status.setError(Text.REGULAR_EXPR + Text.COLS + info);
+      }
+    });
+    t.start();
+    searchThread = t;
   }
 
   /**
@@ -103,7 +127,7 @@ public final class TextEditor {
       s = 0;
       e = ts;
     }
-    return rc.replace(search, text, s, e);
+    return rc.replace(searchContext, text, s, e);
   }
 
   /**
@@ -255,7 +279,7 @@ public final class TextEditor {
    * @return indentation
    */
   private int indent() {
-    return Math.max(1, gopts.get(GUIOptions.INDENT));
+    return Math.max(1, gui.gopts.get(GUIOptions.INDENT));
   }
 
   /**
@@ -264,7 +288,7 @@ public final class TextEditor {
    */
   private byte[] spaces() {
     final byte[] spaces;
-    if(gopts.get(GUIOptions.TABSPACES)) {
+    if(gui.gopts.get(GUIOptions.TABSPACES)) {
       spaces = new byte[indent()];
       Arrays.fill(spaces, (byte) ' ');
     } else {
@@ -630,6 +654,7 @@ public final class TextEditor {
    * @param tokens list of tokens
    */
   private void sort(final TokenList tokens) {
+    final GUIOptions gopts = gui.gopts;
     final boolean asc = gopts.get(GUIOptions.ASCSORT), cs = gopts.get(GUIOptions.CASESORT);
     final Collator coll = gopts.get(GUIOptions.UNICODE) ? null : Collator.getInstance();
     final int column = gopts.get(GUIOptions.COLUMN) - 1;
@@ -729,7 +754,7 @@ public final class TextEditor {
     if(sb.length() == 0) return 0;
 
     int move = 0;
-    if(!selected && gopts.get(GUIOptions.AUTO)) {
+    if(!selected && gui.gopts.get(GUIOptions.AUTO)) {
       final char ch = sb.charAt(0);
       final int next = pos + 1 < size() ? text[pos + 1] : 0;
       final int curr = pos < size() ? text[pos] : 0;
@@ -842,7 +867,7 @@ public final class TextEditor {
       final int curr = curr(), prev = prev();
       endSelection();
 
-      if(gopts.get(GUIOptions.AUTO)) {
+      if(gui.gopts.get(GUIOptions.AUTO)) {
         if(curr == prev && (curr == '"' || curr == '\'')) {
           // remove closing quote
           start++;

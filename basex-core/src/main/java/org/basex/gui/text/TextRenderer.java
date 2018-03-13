@@ -190,9 +190,10 @@ final class TextRenderer extends BaseXBack {
   /**
    * Sets a new search context.
    * @param sc new search context
+   * @param jump jump to next search result
    */
-  void search(final SearchContext sc) {
-    text.search(sc);
+  void search(final SearchContext sc, final boolean jump) {
+    text.search(sc, jump);
   }
 
   /**
