@@ -1,5 +1,7 @@
 package org.basex.query.func.array;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -25,7 +27,27 @@ public final class ArrayFlatten extends ArrayFn {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
+    final Deque<Iter> stack = new ArrayDeque<>();
+    stack.push(exprs[0].iter(qc));
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        while(!stack.isEmpty()) {
+          final Item next = stack.peek().next();
+          if(next == null) {
+            stack.pop();
+          } else if(next instanceof Array) {
+            final Array arr = (Array) next;
+            for(long i = arr.arraySize(); --i >= 0;) {
+              stack.push(arr.get(i).iter());
+            }
+          } else {
+            return next;
+          }
+        }
+        return null;
+      }
+    };
   }
 
   @Override

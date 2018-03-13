@@ -42,6 +42,52 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" for $c in (1,2) return [$c]"), "1\n2");
     query(func.args(" [for $c in (1,2) return [$c]]"), "1\n2");
     query("head(" + func.args(" 1 to 1000000000000") + ')', "1");
+
+    // check that the input sequence is evaluated lazily
+    query(func.args(" ([1, [[2]]], [3], error())") + "[3]", "3");
+    error("declare %basex:inline(0) function local:value($val) { $val };"
+        + "local:value(array:flatten(([1, [[2]]], [3], error())))[3]", FUNERR1);
+
+    // some more complex tests for the iterative variant using a complex, deeply nested array
+    final String nested = "let $nested := "
+        + "  fold-left(1 to $n, [0], function($seq, $i) { "
+            + Function._ARRAY_APPEND.args(" $seq", " [$seq, $i]") + " }) ";
+    // each distinct value `x` should occur `2^(10 - x)` times
+    query("let $n := 10 "
+        + nested
+        + "for $v at $p in " + func.args(" $nested") + " "
+        + "group by $v "
+        + "order by $v descending "
+        + "return count($p)",
+        "1\n2\n4\n8\n16\n32\n64\n128\n256\n512\n1024");
+    // the first occurrence of `x` should be at position `2^(x + 1) - 1`
+    query("let $n := 10 "
+        + nested
+        + "return fold-left(" + func.args(" $nested") + ", [(), 0], function($acc, $v) {"
+        + "  let $seq := $acc(1),"
+        + "      $idx := $acc(2) + 1"
+        + "  return ("
+        + "    if(count($seq) gt $v) then [$seq, $idx]"
+        + "    else [($seq, $idx), $idx]"
+        + "  )"
+        + "})(1)",
+        "1\n3\n7\n15\n31\n63\n127\n255\n511\n1023\n2047");
+    // the flattened result should be the same as that of a reference implementation
+    query("declare function local:flatten($seq) {"
+        + "  for $it in $seq"
+        + "  return typeswitch($it)"
+        + "    case array(*) return local:flatten($it?*)"
+        + "    default return $it"
+        + "};"
+        + "let $n := 13 "
+        + nested
+        + "return deep-equal("
+        + "  for $it in " + func.args(" $nested")
+        + "  where random:double() le 1"
+        + "  return $it,"
+        + "  local:flatten($nested)"
+        + ")",
+        "true");
   }
 
   /** Test method. */
