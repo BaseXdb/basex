@@ -47,7 +47,12 @@ public final class ArrayFlatten extends ArrayFn {
                   final Item it = iter.next();
                   if(it != null) return it;
                   if(!members.hasNext()) return null;
-                  iter = members.next().iter();
+                  final Value val = members.next();
+                  if(val instanceof Item) {
+                    iter = Empty.ITER;
+                    return (Item) val;
+                  }
+                  iter = val.iter();
                 }
               }
             });
