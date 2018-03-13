@@ -42,6 +42,7 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" for $c in (1,2) return [$c]"), "1\n2");
     query(func.args(" [for $c in (1,2) return [$c]]"), "1\n2");
     query("head(" + func.args(" 1 to 1000000000000") + ')', "1");
+    query(func.args(" array { 1 to 100000 }") + "[last()]", "100000");
 
     // check that the input sequence is evaluated lazily
     query(func.args(" ([1, [[2]]], [3], error())") + "[3]", "3");
