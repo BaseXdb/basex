@@ -818,6 +818,8 @@ public interface Text {
   String STRINGS_FOUND_X = lang("strings_found_%");
   /** "Strings were replaced.". */
   String STRINGS_REPLACED = lang("strings_replaced");
+  /** Searching. */
+  String SEARCHING = lang("searching");
 
   /** Serialization parameters. */
   String SERIALIZATION = lang("serialization");

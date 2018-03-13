@@ -15,6 +15,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class SearchContext {
+  /** Maximum number of hits. */
+  private static final int MAX = 50000000;
+
   /** Search bar. */
   final SearchBar bar;
   /** Mode: match case. */
@@ -59,6 +62,7 @@ final class SearchContext {
       if(regex) searchRegEx(start, end, txt);
       else searchSimple(start, end, txt);
     }
+    InterruptibleString.checkStop();
     nr = start.size();
     bar.refresh(this);
     return new IntList[] { start, end };
@@ -76,7 +80,7 @@ final class SearchContext {
     final Pattern pattern = Pattern.compile(string, flags);
     if(multi) {
       int c = 0, p = 0;
-      final Matcher m = pattern.matcher(string(text));
+      final Matcher m = pattern.matcher(new InterruptibleString(string(text)));
       while(m.find()) {
         final int s = m.start(), e = m.end();
         while(c < s) {
@@ -89,14 +93,16 @@ final class SearchContext {
           c++;
         }
         end.add(p);
+        if(start.size() >= MAX) return;
       }
     } else {
       final int os = text.length;
       final TokenBuilder tb = new TokenBuilder(os);
       for(int t = 0, o = 0; o <= os; o++) {
+        InterruptibleString.checkStop();
         if(o < os ? text[o] == '\n' : o != t) {
           int c = 0, p = t;
-          final Matcher m = pattern.matcher(string(text, t, o - t));
+          final Matcher m = pattern.matcher(new InterruptibleString(string(text, t, o - t)));
           while(m.find()) {
             final int s = m.start(), e = m.end();
             while(c < s) {
@@ -109,6 +115,7 @@ final class SearchContext {
               c++;
             }
             end.add(p);
+            if(start.size() >= MAX) return;
           }
           if(o < os) tb.add('\n');
           t = o + 1;
@@ -125,28 +132,29 @@ final class SearchContext {
    */
   private void searchSimple(final IntList start, final IntList end, final byte[] text) {
     final byte[] srch = token(string);
-    final int ss = srch.length, os = text.length;
+    final int sl = srch.length, tl = text.length;
     boolean s = true;
-    for(int o = 0; o < os;) {
+    for(int t = 0; t < tl;) {
+      InterruptibleString.checkStop();
       int sp = 0;
-      if(o + ss <= os && s) {
+      if(t + sl <= tl && s) {
         if(mcase) {
-          while(sp < ss && text[o + sp] == srch[sp]) sp++;
+          while(sp < sl && text[t + sp] == srch[sp]) sp++;
         } else {
-          while(sp < ss && lc(cp(text, o + sp)) == cp(srch, sp)) sp += cl(srch, sp);
+          while(sp < sl && lc(cp(text, t + sp)) == cp(srch, sp)) sp += cl(srch, sp);
         }
       }
-      if(sp == ss && (!word || o + ss == os ||
-          !Character.isLetterOrDigit(cp(text, o + ss)))) {
-        start.add(o);
-        end.add(o + ss);
-        o += ss;
+      if(sp == sl && (!word || t + sl == tl || !Character.isLetterOrDigit(cp(text, t + sl)))) {
+        start.add(t);
+        end.add(t + sl);
+        if(start.size() >= MAX) return;
+        t += sl;
         s = !word;
       } else if(word) {
-        s = !Character.isLetterOrDigit(cp(text, o));
-        o += cl(text, o);
+        s = !Character.isLetterOrDigit(cp(text, t));
+        t += cl(text, t);
       } else {
-        o++;
+        t++;
       }
     }
   }

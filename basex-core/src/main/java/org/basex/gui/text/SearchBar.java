@@ -302,7 +302,9 @@ public final class SearchBar extends BaseXBack {
    * @param jump jump to next hit
    */
   private void search(final boolean jump) {
-    editor.search(new SearchContext(this, isVisible() ? search.getText() : ""), jump);
+    final String text = isVisible() ? search.getText() : "";
+    if(!text.isEmpty()) gui.status.setText(Text.SEARCHING + Text.DOTS);
+    editor.search(new SearchContext(this, text), jump);
   }
 
   /**

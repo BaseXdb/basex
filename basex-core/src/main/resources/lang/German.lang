@@ -325,6 +325,7 @@ run_tests            = Tests ausführen
 save                 = Speichern
 save_as              = Speichern unter
 save_before_execute  = Speichere vor Ausführung
+searching            = Suche
 select_all           = Alles markieren
 separator            = Trennzeichen
 serialization        = Serialization Parameters

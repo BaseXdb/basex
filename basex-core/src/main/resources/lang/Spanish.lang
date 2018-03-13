@@ -325,6 +325,7 @@ run_tests            = Ejecutar tests
 save                 = Guardar
 save_as              = Guardar como
 save_before_execute  = Guardar antes de ejecutar el fichero
+searching            = Buscando
 select_all           = Seleccionar Todo
 separator            = Separador
 serialization        = Serialization Parameters

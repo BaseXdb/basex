@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
@@ -365,19 +366,30 @@ public class TextPanel extends BaseXPanel {
     return search;
   }
 
+  /** Search thread. */
+  private Thread searchThread;
+
   /**
    * Performs a search.
    * @param sc search context
    * @param jump jump to next hit
    */
   final void search(final SearchContext sc, final boolean jump) {
-    try {
-      rend.search(sc);
-      if(jump) jump(SearchDir.CURRENT, false);
-    } catch(final Exception ex) {
-      final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
-      gui.status.setError(Text.REGULAR_EXPR + Text.COLS + msg);
-    }
+    Thread t = searchThread;
+    if(t != null) t.interrupt();
+    t = new Thread(() -> {
+      try {
+        rend.search(sc);
+        if(jump) jump(SearchDir.CURRENT, false);
+      } catch(final JobException ex) {
+        // ignore interrupted search
+      } catch(final Exception ex) {
+        final String info = Util.message(ex).replaceAll(Prop.NL + ".*", "");
+        gui.status.setError(Text.REGULAR_EXPR + Text.COLS + info);
+      }
+    });
+    t.start();
+    searchThread = t;
   }
 
   /**

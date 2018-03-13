@@ -9,6 +9,12 @@ package org.basex.core.jobs;
 public final class JobException extends RuntimeException {
   /**
    * Constructor.
+   */
+  public JobException() {
+  }
+
+  /**
+   * Constructor.
    * @param message error message
    */
   public JobException(final String message) {

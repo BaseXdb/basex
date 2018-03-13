@@ -325,6 +325,7 @@ run_tests            = Rulare teste
 save                 = Salvare
 save_as              = Salvează ca
 save_before_execute  = Salveaza inainte sa executi fisierul
+searching            = Searching
 select_all           = Selectare totală
 separator            = Separator
 serialization        = Serialization Parameters

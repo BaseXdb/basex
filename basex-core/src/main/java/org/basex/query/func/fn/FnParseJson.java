@@ -3,7 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.JsonFormat;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
