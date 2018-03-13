@@ -603,6 +603,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ()"), 0);
     query(func.args("A"), 1);
     query("'A'[" + func.args() + ']', "A");
+    query(func.args(" ([()], 'a')"), 1);
     error("true#0[" + func.args() + ']', QueryError.FISTRING_X);
   }
 

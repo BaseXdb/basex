@@ -170,7 +170,10 @@ public abstract class Seq extends Value {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
-    throw SEQFOUND_X.get(info, this);
+    final Iter ir = atomIter(qc, info);
+    final Item it = ir.next();
+    if(it != null && ir.next() != null) throw SEQFOUND_X.get(info, this);
+    return it;
   }
 
   @Override

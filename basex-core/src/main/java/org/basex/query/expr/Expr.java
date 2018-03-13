@@ -114,7 +114,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
-   * @param ii input info (only required by {@link Seq} instances, which have no input info)
+   * @param ii input info
    * @return iterator
    * @throws QueryException query exception
    */
