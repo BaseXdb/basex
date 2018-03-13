@@ -8,6 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -37,10 +38,19 @@ public final class ArrayFlatten extends ArrayFn {
           if(next == null) {
             stack.pop();
           } else if(next instanceof Array) {
-            final Array arr = (Array) next;
-            for(long i = arr.arraySize(); --i >= 0;) {
-              stack.push(arr.get(i).iter());
-            }
+            final Iterator<Value> members = ((Array) next).members().iterator();
+            stack.push(new Iter() {
+              private Iter iter = Empty.ITER;
+              @Override
+              public Item next() throws QueryException {
+                for(;;) {
+                  final Item it = iter.next();
+                  if(it != null) return it;
+                  if(!members.hasNext()) return null;
+                  iter = members.next().iter();
+                }
+              }
+            });
           } else {
             return next;
           }
