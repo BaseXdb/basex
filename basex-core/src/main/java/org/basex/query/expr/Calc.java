@@ -311,7 +311,7 @@ public enum Calc {
    * Optimizes the expressions.
    * @param ex1 first expression
    * @param ex2 second expression
-   * @return result type
+   * @return result expression, or {@code null} if expression cannot be optimized
    * @throws QueryException query exception
    */
   public abstract Expr optimize(Expr ex1, Expr ex2) throws QueryException;

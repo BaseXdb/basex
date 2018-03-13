@@ -40,16 +40,18 @@ public final class Arith extends Arr {
     final boolean nums = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
     final Type type = calc == Calc.IDIV ? AtomType.ITR : nums ? Calc.type(type1, type2) :
       AtomType.AAT;
-    exprType.assign(type, st1.oneNoArray() && st2.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
+    final boolean oneNoArray = st1.oneNoArray() && st2.oneNoArray();
+    exprType.assign(type, oneNoArray ? Occ.ONE : Occ.ZERO_ONE);
 
     Expr expr = this;
     if(oneIsEmpty()) {
       expr = cc.emptySeq(this);
     } else if(allAreValues(false)) {
       expr = value(cc.qc);
-    } else if(nums && st1.oneNoArray() && st2.oneNoArray()) {
-      expr = calc.optimize(expr1, expr2);
-      if(expr == null || !expr.seqType().type.eq(type)) expr = this;
+    } else if(nums && oneNoArray) {
+      // example: number($a) + 0  ->  number($a)
+      final Expr ex = calc.optimize(expr1, expr2);
+      if(ex != null && ex.seqType().type.eq(type)) expr = ex;
     }
     return cc.replaceWith(this, expr);
   }
