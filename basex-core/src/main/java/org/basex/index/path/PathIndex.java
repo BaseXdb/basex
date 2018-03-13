@@ -89,7 +89,7 @@ public final class PathIndex implements Index {
   @Override
   public void close() { }
 
-  // Build Index ==============================================================
+  // Build Index ==================================================================================
 
   /**
    * Adds an element or document node.
@@ -122,7 +122,7 @@ public final class PathIndex implements Index {
     }
   }
 
-  // Traverse Index ===========================================================
+  // Traverse Index ===============================================================================
 
   /**
    * Returns the root node.
@@ -236,14 +236,14 @@ public final class PathIndex implements Index {
     return tl;
   }
 
-  // Info =====================================================================
+  // Info =========================================================================================
 
   @Override
   public byte[] info(final MainOptions options) {
     return root != null ? chop(root.info(data, 0), 1 << 20) : EMPTY;
   }
 
-  // Unsupported methods ======================================================
+  // Unsupported methods ==========================================================================
 
   @Override
   public boolean drop() {

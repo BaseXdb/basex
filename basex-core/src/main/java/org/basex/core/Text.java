@@ -237,7 +237,7 @@ public interface Text {
   /** Copyright info. */
   String COPYRIGHT = "\u00A9 2005-18 " + Prop.ENTITY;
 
-  // SERVER ===================================================================
+  // SERVER =======================================================================================
 
   /** Server was started. */
   String PORT_X = " (" + lang("port") + ": %).";
@@ -264,7 +264,7 @@ public interface Text {
   /** Password. */
   String PASSWORD = lang("password");
 
-  // COMMANDS =================================================================
+  // COMMANDS =====================================================================================
 
   /** Console text. */
   String TRY_MORE_X = lang("try_more_%", "'help'");
@@ -480,7 +480,7 @@ public interface Text {
     "", lang("c_exit1"), lang("c_exit2")
   };
 
-  // COMMAND INFOS ============================================================
+  // COMMAND INFOS ================================================================================
 
   /** Command timing information. */
   String TIME_REQUIRED = lang("time_required");
@@ -511,7 +511,7 @@ public interface Text {
   /** Unknown command: % (similar: %). */
   String UNKNOWN_SIMILAR_X_X = UNKNOWN_CMD_X + ' ' + lang("similar_cmd_%");
 
-  // CREATE COMMAND ===========================================================
+  // CREATE COMMAND ===============================================================================
 
   /** Create database question. */
   String CREATE_DB_FILE = lang("create_db_file");
@@ -570,7 +570,7 @@ public interface Text {
   /** No stemmer found. */
   String NO_STEMMER_X = lang("no_stemmer_%");
 
-  // DATABASE COMMANDS ========================================================
+  // DATABASE COMMANDS ============================================================================
 
   /** Database not found. */
   String DB_NOT_FOUND_X = lang("db_not_found_%");
@@ -642,7 +642,7 @@ public interface Text {
   /** Index not available. */
   String NOT_AVAILABLE = lang("not_available");
 
-  // XQUERY COMMAND ===========================================================
+  // XQUERY COMMAND ===============================================================================
 
   /** Query info: query. */
   String QUERY = lang("query");
@@ -691,7 +691,7 @@ public interface Text {
   /** Line info. */
   String LINE_X = lang("line_%");
 
-  // ADMIN COMMANDS ==========================================================
+  // ADMIN COMMANDS ==============================================================================
 
   /** Show sessions. */
   String SESSIONS_X = lang("sessions_%");
@@ -740,7 +740,7 @@ public interface Text {
   /** Jobs stopped. */
   String JOBS_STOPPED_X = lang("jobs_stopped_%");
 
-  // GENERAL COMMANDS =========================================================
+  // GENERAL COMMANDS =============================================================================
 
   /** "Global option '%' cannot be set". */
   String GLOBAL_OPTION_X = lang("global_option_%");
@@ -749,7 +749,7 @@ public interface Text {
   /** Unknown command error. */
   String UNKNOWN_OPT_SIMILAR_X_X = lang("unknown_option_%") + ' ' + lang("similar_cmd_%");
 
-  // INFO STRINGS =============================================================
+  // INFO STRINGS =================================================================================
 
   /** Waiting information. */
   String PLEASE_WAIT_D = lang("please_wait") + DOTS;
@@ -858,7 +858,7 @@ public interface Text {
   /** "Error". */
   String ERROR = lang("error");
 
-  // MENU ENTRIES =============================================================
+  // MENU ENTRIES =================================================================================
 
   /** "Database". */
   String DATABASE = lang("database");
@@ -873,7 +873,7 @@ public interface Text {
   /** "Help". */
   String HELP = lang("help");
 
-  // GUI COMMANDS =============================================================
+  // GUI COMMANDS =================================================================================
 
   /** Command info. */
   String ABOUT = lang("about_%", Prop.NAME);
@@ -977,7 +977,7 @@ public interface Text {
   /** Command info. */
   String FONTS_D = lang("fonts") + DOTS;
 
-  // BUTTONS ==================================================================
+  // BUTTONS ======================================================================================
 
   /** Button: " OK ". */
   String B_OK = "  " + lang("ok") + "  ";
@@ -1041,7 +1041,7 @@ public interface Text {
   /** Filter button. */
   String FILTER = lang("filter");
 
-  // VISUALIZATIONS ===========================================================
+  // VISUALIZATIONS ===============================================================================
 
   /** "No data available.". */
   String NO_DATA = lang("no_data");
@@ -1050,7 +1050,7 @@ public interface Text {
   /** "file". */
   String FILE = lang("file");
 
-  // DIALOG WINDOWS ===========================================================
+  // DIALOG WINDOWS ===============================================================================
 
   /** Open dialog - No database. */
   String INFORMATION = lang("information");
@@ -1354,7 +1354,7 @@ public interface Text {
   /** Translation. */
   String TRANSLATION = lang("translation");
 
-  // HELP TEXTS ===============================================================
+  // HELP TEXTS ===================================================================================
 
   /** Memory help. */
   String H_USED_MEM = lang("h_used_mem");

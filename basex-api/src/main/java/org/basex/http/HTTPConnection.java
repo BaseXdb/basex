@@ -300,7 +300,7 @@ public final class HTTPConnection implements ClientInfo {
     return MediaType.TEXT_PLAIN;
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Normalizes the specified path.

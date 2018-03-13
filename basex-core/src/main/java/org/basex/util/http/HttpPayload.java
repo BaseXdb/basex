@@ -313,7 +313,7 @@ public final class HttpPayload {
     return data;
   }
 
-  // STATIC METHODS =====================================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Returns an XQuery value for the specified content type.

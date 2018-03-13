@@ -381,7 +381,7 @@ public final class DataAccess implements Closeable {
     }
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Reads the next byte.

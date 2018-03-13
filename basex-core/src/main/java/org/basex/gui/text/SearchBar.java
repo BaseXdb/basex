@@ -263,7 +263,7 @@ public final class SearchBar extends BaseXBack {
     if(!empty) gui.status.setText(Util.info(Text.STRINGS_FOUND_X, sc.nr()));
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Stores the search text.

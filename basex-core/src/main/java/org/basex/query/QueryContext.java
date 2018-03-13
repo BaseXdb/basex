@@ -568,7 +568,7 @@ public final class QueryContext extends Job implements Closeable {
     return SAVE;
   }
 
-  // CLASS METHODS ======================================================================
+  // CLASS METHODS ================================================================================
 
   /**
    * Caches and returns the result of the specified query. If all nodes are of the same database
@@ -615,7 +615,7 @@ public final class QueryContext extends Job implements Closeable {
     return items.value();
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Casts a value to the specified type.

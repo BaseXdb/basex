@@ -23,7 +23,7 @@ public final class RESTParallelPutTest extends HTTPTest {
   /** Failed string. */
   private static String failed;
 
-  // INITIALIZERS =============================================================
+  // INITIALIZERS =================================================================================
 
   /**
    * Start server.
@@ -34,7 +34,7 @@ public final class RESTParallelPutTest extends HTTPTest {
     init(REST_ROOT, true);
   }
 
-  // TEST METHODS =============================================================
+  // TEST METHODS =================================================================================
 
   /**
    * Concurrency test.

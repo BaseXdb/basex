@@ -621,7 +621,7 @@ public final class Geo extends QueryModule {
     return toElement(((Polygon) geo).getInteriorRingN((int) n - 1));
   }
 
-  // PRIVATE METHODS (hidden from user of module) ========================================
+  // PRIVATE METHODS (hidden from user of module) =================================================
 
   /**
    * Reads an element as a gml node. Returns a geometry element

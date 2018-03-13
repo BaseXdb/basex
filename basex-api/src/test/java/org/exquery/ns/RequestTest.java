@@ -153,7 +153,7 @@ public final class RequestTest extends HTTPTest {
     assertEquals("0", get("?query=" + request("count(R:cookie('x'))")));
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Returns an encoded version of the query, including a Request module import.

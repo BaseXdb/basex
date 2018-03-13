@@ -33,7 +33,7 @@ public abstract class HTTPTest extends SandboxTest {
   /** Root path. */
   private static String rootUrl;
 
-  // INITIALIZATION =====================================================================
+  // INITIALIZATION ===============================================================================
 
   /**
    * Initializes the test.
@@ -83,7 +83,7 @@ public abstract class HTTPTest extends SandboxTest {
     for(final String key : keys) props.remove(key);
   }
 
-  // PROTECTED METHODS ==================================================================
+  // PROTECTED METHODS ============================================================================
 
   /**
    * Executes the specified GET request and returns the result.

@@ -97,7 +97,7 @@ public abstract class Serializer implements Closeable {
     }
   }
 
-  // PUBLIC METHODS =====================================================================
+  // PUBLIC METHODS ===============================================================================
 
   /**
    * Serializes the specified item, which may be a node or an atomic value.
@@ -145,7 +145,7 @@ public abstract class Serializer implements Closeable {
     return this;
   }
 
-  // PROTECTED METHODS ==================================================================
+  // PROTECTED METHODS ============================================================================
 
   /**
    * Serializes the specified node.
@@ -478,7 +478,7 @@ public abstract class Serializer implements Closeable {
     }
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Serializes a comment.

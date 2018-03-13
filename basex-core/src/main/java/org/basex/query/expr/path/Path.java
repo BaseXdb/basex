@@ -373,7 +373,7 @@ public abstract class Path extends ParseExpr {
     final long size = size(cc, rt);
     final Expr last = steps[sl - 1];
     final SeqType st = last.seqType();
-    Type type = st.type;
+    final Type type = st.type;
     Occ occ = Occ.ZERO_MORE;
 
     // unknown result size: single attribute with exact name test will return at most one result
@@ -945,7 +945,7 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : steps) {
       if(sb.length() != 0) sb.append('/');
       final String s = step.toString();
-      boolean par = !s.contains("[") && s.contains(" ");
+      final boolean par = !s.contains("[") && s.contains(" ");
       if(par) sb.append('(');
       sb.append(step);
       if(par) sb.append(')');

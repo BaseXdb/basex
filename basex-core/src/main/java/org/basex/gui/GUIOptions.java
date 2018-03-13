@@ -15,7 +15,7 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class GUIOptions extends Options {
-  // DATABASE & PROGRAM PATHS =================================================
+  // DATABASE & PROGRAM PATHS =====================================================================
 
   /** Comment: written to options file. */
   public static final Comment C_PATHS = new Comment("Paths");

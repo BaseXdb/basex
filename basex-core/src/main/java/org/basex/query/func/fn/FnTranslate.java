@@ -24,7 +24,7 @@ public final class FnTranslate extends StandardFunc {
     for(final int b : token) {
       int j = -1;
       final int sl = search.length, rl = replace.length;
-      while(++j < sl && b != search[j]) ;
+      while(++j < sl && b != search[j]);
       if(j < sl) {
         if(j >= rl) continue;
         tb.add(replace[j]);

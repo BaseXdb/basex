@@ -420,7 +420,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertFalse(isDir(pkg3Dir));
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /** Header string. */
   private static final byte[] HEADER = token("<package "

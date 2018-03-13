@@ -52,7 +52,7 @@ public final class StrSeq extends NativeSeq {
     return tmp;
   }
 
-  // STATIC METHODS =====================================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Creates a sequence with the specified items.

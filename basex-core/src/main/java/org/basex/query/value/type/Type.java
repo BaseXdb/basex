@@ -202,7 +202,7 @@ public interface Type {
    */
   SeqType seqType(Occ occ);
 
-  // PUBLIC AND STATIC METHODS ================================================
+  // PUBLIC AND STATIC METHODS ====================================================================
 
   /**
    * Checks if this type is equal to the given one.

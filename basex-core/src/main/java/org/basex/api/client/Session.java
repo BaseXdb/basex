@@ -116,7 +116,7 @@ public abstract class Session implements Closeable {
     return out;
   }
 
-  // PROTECTED METHODS ========================================================
+  // PROTECTED METHODS ============================================================================
 
   /**
    * Constructor.

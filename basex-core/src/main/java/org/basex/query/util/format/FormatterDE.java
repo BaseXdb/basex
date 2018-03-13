@@ -121,7 +121,7 @@ final class FormatterDE extends Formatter {
     return ERAS[year <= 0 ? 0 : 1];
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Creates a word character sequence for the specified number.

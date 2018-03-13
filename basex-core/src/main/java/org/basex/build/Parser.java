@@ -82,7 +82,7 @@ public abstract class Parser extends Job {
     return this;
   }
 
-  // STATIC METHODS ===========================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Returns a parser instance for creating empty databases.

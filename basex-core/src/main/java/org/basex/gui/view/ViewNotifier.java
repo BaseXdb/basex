@@ -232,7 +232,7 @@ public final class ViewNotifier {
       hist < histsize ? queries[hist + 1] : null;
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Checks the history data arrays.

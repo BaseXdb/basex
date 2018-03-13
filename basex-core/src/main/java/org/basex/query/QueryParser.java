@@ -2366,7 +2366,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] bracedURILiteral() throws QueryException {
-    int p = pos;
+    final int p = pos;
     tok.reset();
     while(!consume('}')) {
       if(!more() || curr() == '{') throw error(WRONGCHAR_X_X, CURLY2, found());

@@ -116,7 +116,7 @@ public final class TableMemAccess extends TableAccess {
     dirty = true;
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Moves data inside the value arrays.

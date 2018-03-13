@@ -951,7 +951,7 @@ public enum GUIMenuCmd implements GUICommand {
   @Override
   public Object shortcuts() { return key; }
 
-  // STATIC METHODS ===========================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Checks if data can be updated.

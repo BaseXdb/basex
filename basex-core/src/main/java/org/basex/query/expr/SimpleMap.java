@@ -74,7 +74,7 @@ public abstract class SimpleMap extends Arr {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // compute result size
-    ExprList list = new ExprList(exprs.length);
+    final ExprList list = new ExprList(exprs.length);
     long min = 1, max = 1;
     boolean it = true;
     for(final Expr expr : exprs) {

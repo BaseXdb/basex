@@ -70,7 +70,7 @@ public final class SessionModuleTest extends HTTPTest {
     assertEquals("", get("?query=" + request("S:close()")));
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Returns an encoded version of the query, including a Request module import.

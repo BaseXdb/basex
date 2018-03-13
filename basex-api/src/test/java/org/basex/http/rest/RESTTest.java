@@ -23,7 +23,7 @@ public abstract class RESTTest extends HTTPTest {
   /** Input file. */
   static final String FILE = "src/test/resources/input.xml";
 
-  // INITIALIZERS =============================================================
+  // INITIALIZERS =================================================================================
 
   /**
    * Start server.

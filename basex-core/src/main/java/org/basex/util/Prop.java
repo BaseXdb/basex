@@ -104,7 +104,7 @@ public final class Prop {
     LOCATION = location;
   }
 
-  // STATIC OPTIONS =====================================================================
+  // STATIC OPTIONS ===============================================================================
 
   /** Language (applied after restart). */
   public static String language = "English";
@@ -120,7 +120,7 @@ public final class Prop {
   /** Private constructor. */
   private Prop() { }
 
-  // STATIC METHODS =====================================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Checks if one of the files .basexhome or .basex are found in the specified directory.

@@ -46,7 +46,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     this.item = item;
   }
 
-  // XMLReader ==========================================================================
+  // XMLReader ====================================================================================
 
   @Override
   public ContentHandler getContentHandler() {
@@ -132,7 +132,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     throw new SAXNotRecognizedException();
   }
 
-  // Serializer =========================================================================
+  // Serializer ===================================================================================
 
   /** Map containing all attributes. */
   private final Atts attributes = new Atts();

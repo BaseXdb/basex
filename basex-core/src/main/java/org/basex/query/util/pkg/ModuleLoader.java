@@ -159,7 +159,7 @@ public final class ModuleLoader {
     return null;
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Adds a package from the package repository.

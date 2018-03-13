@@ -584,7 +584,7 @@ public class Options implements Iterable<Option<?>> {
     return sb.toString();
   }
 
-  // STATIC METHODS =====================================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Returns a message with allowed keys.
@@ -599,7 +599,7 @@ public class Options implements Iterable<Option<?>> {
     return Util.info(Text.OPT_ONEOF_X_X_X, option.name(), value, vals);
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Returns all options from the specified class.

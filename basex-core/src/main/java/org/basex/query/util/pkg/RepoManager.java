@@ -172,7 +172,7 @@ public final class RepoManager {
     return new ArrayList<>(map.values());
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Adds a package to the specified map.

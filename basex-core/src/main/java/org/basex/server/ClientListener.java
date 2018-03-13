@@ -263,7 +263,7 @@ public final class ClientListener extends Thread implements ClientInfo {
     return sb.toString();
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Returns error feedback.

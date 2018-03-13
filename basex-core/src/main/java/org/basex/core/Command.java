@@ -310,7 +310,7 @@ public abstract class Command extends Job {
     return toString(false);
   }
 
-  // PROTECTED METHODS ========================================================
+  // PROTECTED METHODS ============================================================================
 
   /**
    * Executes the command and serializes the result (internal call).

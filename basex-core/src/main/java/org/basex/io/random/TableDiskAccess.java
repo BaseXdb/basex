@@ -432,7 +432,7 @@ public final class TableDiskAccess extends TableAccess {
     dirty = true;
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Searches for the page containing the entry for the specified pre value.

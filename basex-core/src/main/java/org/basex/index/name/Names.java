@@ -152,7 +152,7 @@ public final class Names extends TokenSet implements Index {
   @Override
   public void close() { }
 
-  // Unsupported methods ======================================================
+  // Unsupported methods ==========================================================================
 
   @Override
   public boolean drop() {

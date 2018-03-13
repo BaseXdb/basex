@@ -124,7 +124,7 @@ public class DBNodeSeq extends NativeSeq {
     return sb.append(PAREN2).toString();
   }
 
-  // STATIC METHODS =====================================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Creates a sequence with the specified items.

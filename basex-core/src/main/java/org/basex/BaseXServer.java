@@ -272,7 +272,7 @@ public final class BaseXServer extends CLI implements Runnable {
     return S_SERVERINFO;
   }
 
-  // STATIC METHODS ===========================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Starts the database server in a separate process.

@@ -256,7 +256,7 @@ public abstract class Data {
     }
   }
 
-  // RETRIEVING VALUES ========================================================
+  // RETRIEVING VALUES ============================================================================
 
   /**
    * Returns a pre value for the specified id.
@@ -481,7 +481,7 @@ public abstract class Data {
    */
   public abstract int textLen(int pre, boolean text);
 
-  // UPDATE OPERATIONS ========================================================
+  // UPDATE OPERATIONS ============================================================================
 
   /**
    * Updates (renames) the name of an element, attribute or processing instruction.
@@ -920,7 +920,7 @@ public abstract class Data {
    */
   protected abstract void delete(int pre, boolean text);
 
-  // INSERTS WITHOUT TABLE UPDATES ============================================
+  // INSERTS WITHOUT TABLE UPDATES ================================================================
 
   /** Buffer for caching new table entries. */
   private byte[] b = new byte[IO.NODESIZE];
@@ -1081,7 +1081,7 @@ public abstract class Data {
     }
   }
 
-  // HELPER FUNCTIONS ===================================================================
+  // HELPER FUNCTIONS =============================================================================
 
   /**
    * Indicates if this data instance is in main memory or on disk.

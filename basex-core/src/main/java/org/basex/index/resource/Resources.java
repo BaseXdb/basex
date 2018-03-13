@@ -136,7 +136,7 @@ public final class Resources implements Index {
     return tbm;
   }
 
-  // Inherited methods ========================================================
+  // Inherited methods ============================================================================
 
   @Override
   public boolean drop() {

@@ -63,7 +63,7 @@ public abstract class Builder extends Job {
     this.parser = parser;
   }
 
-  // PUBLIC METHODS ===========================================================
+  // PUBLIC METHODS ===============================================================================
 
   /**
    * Parses the given input source and builds the database.
@@ -172,7 +172,7 @@ public abstract class Builder extends Job {
     addText(pi, Data.PI);
   }
 
-  // PROGRESS INFORMATION =====================================================
+  // PROGRESS INFORMATION =========================================================================
 
   @Override
   public final String shortInfo() {
@@ -189,7 +189,7 @@ public abstract class Builder extends Job {
     return spos == 0 ? parser.progressInfo() : (double) spos / ssize;
   }
 
-  // ABSTRACT METHODS =========================================================
+  // ABSTRACT METHODS =============================================================================
 
   /**
    * Builds the database.
@@ -253,7 +253,7 @@ public abstract class Builder extends Job {
    */
   protected abstract void setSize(int pre, int size) throws IOException;
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Adds an element node to the storage.

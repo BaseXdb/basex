@@ -283,7 +283,7 @@ public final class BaseXHTTP extends CLI {
     }
   }
 
-  // STATIC METHODS ===========================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Starts the HTTP server in a separate process.

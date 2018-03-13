@@ -106,7 +106,7 @@ final class RestXqModule {
     }
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Retrieves a query context for the given module.

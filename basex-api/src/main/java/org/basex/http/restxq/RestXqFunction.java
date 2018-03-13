@@ -378,7 +378,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     return permission.compareTo(rxf.permission);
   }
 
-  // PRIVATE METHODS ====================================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Checks the specified template and adds a variable.

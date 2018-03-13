@@ -312,7 +312,7 @@ public final class DiskData extends Data {
     return false;
   }
 
-  // UPDATE OPERATIONS ========================================================
+  // UPDATE OPERATIONS ============================================================================
 
   @Override
   protected void delete(final int pre, final boolean text) {

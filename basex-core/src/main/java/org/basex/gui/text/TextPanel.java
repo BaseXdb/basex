@@ -339,7 +339,7 @@ public class TextPanel extends BaseXPanel {
     rend.repaint();
   }
 
-  // SEARCH OPERATIONS ==================================================================
+  // SEARCH OPERATIONS ============================================================================
 
   /**
    * Installs a link listener.
@@ -415,7 +415,7 @@ public class TextPanel extends BaseXPanel {
     rend.repaint();
   }
 
-  // MOUSE INTERACTIONS =================================================================
+  // MOUSE INTERACTIONS ===========================================================================
 
   @Override
   public final void mouseEntered(final MouseEvent e) {
@@ -502,7 +502,7 @@ public class TextPanel extends BaseXPanel {
     rend.repaint();
   }
 
-  // KEY INTERACTIONS =======================================================
+  // KEY INTERACTIONS ===========================================================================
 
   /**
    * Invokes special keys.
@@ -709,7 +709,7 @@ public class TextPanel extends BaseXPanel {
     scroll.refreshLayout();
   }
 
-  // EDITOR COMMANDS ==========================================================
+  // EDITOR COMMANDS ==============================================================================
 
   /**
    * Pastes a string.

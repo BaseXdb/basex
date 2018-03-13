@@ -248,7 +248,7 @@ public final class TextEditor {
     return text;
   }
 
-  // POSITION ===========================================================================
+  // POSITION =====================================================================================
 
   /**
    * Returns the current indentation.
@@ -1186,7 +1186,7 @@ public final class TextEditor {
     end = pos;
   }
 
-  // ERROR HIGHLIGHTING =================================================================
+  // ERROR HIGHLIGHTING ===========================================================================
 
   /**
    * Sets the error position.
@@ -1196,7 +1196,7 @@ public final class TextEditor {
     error = s;
   }
 
-  // SEARCH HIGHLIGHTING ================================================================
+  // SEARCH HIGHLIGHTING ==========================================================================
 
   /**
    * Selects a search string.
@@ -1228,7 +1228,7 @@ public final class TextEditor {
     return p;
   }
 
-  // CURSOR =============================================================================
+  // CURSOR =======================================================================================
 
   @Override
   public String toString() {

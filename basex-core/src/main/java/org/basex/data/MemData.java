@@ -160,7 +160,7 @@ public final class MemData extends Data {
     return text ? texts : values;
   }
 
-  // UPDATE OPERATIONS ========================================================
+  // UPDATE OPERATIONS ============================================================================
 
   @Override
   protected void delete(final int pre, final boolean text) { }
