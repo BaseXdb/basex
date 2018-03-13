@@ -19,7 +19,7 @@ public abstract class BasicIter<I extends Item> extends Iter implements Iterable
   /** Result size. */
   protected final long size;
   /** Current position. */
-  protected int pos;
+  protected long pos;
 
   /**
    * Constructor.
@@ -34,13 +34,8 @@ public abstract class BasicIter<I extends Item> extends Iter implements Iterable
 
   @Override
   public I next() {
-    final int p = pos;
-    if(p < size) {
-      final I item = get(p);
-      pos++;
-      return item;
-    }
-    return null;
+    final long p = pos++;
+    return p < size ? get(p) : null;
   }
 
   @Override

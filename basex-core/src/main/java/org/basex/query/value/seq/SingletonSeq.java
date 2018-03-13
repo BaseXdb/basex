@@ -99,16 +99,31 @@ public final class SingletonSeq extends Seq {
     return _UTIL_REPLICATE.args(value, size / value.size()).substring(1);
   }
 
-  // STATIC METHODS =====================================================================
+  // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a sequence with the specified value.
+   * Creates a singleton sequence with the specified value.
    * @param value value
-   * @param size number of repetitions
+   * @param count number of repetitions
    * @return value
    */
-  public static Value get(final Value value, final long size) {
-    final long sz = size * value.size();
-    return sz == 0 ? Empty.SEQ : size == 1 ? value : new SingletonSeq(sz, value);
+  public static Value get(final Value value, final long count) {
+    // single count: return value itself
+    if(count == 1) return value;
+    // zero results: return empty sequence
+    final long vs = value.size(), size = vs * count;
+    if(size == 0) return Empty.SEQ;
+
+    // if all items are equal, reduce value to single item
+    Value val = value;
+    if(val instanceof SingletonSeq) {
+      val = ((SingletonSeq) val).value;
+    } else if(vs > 1 && val.homogeneous()) {
+      final Item it = val.itemAt(0);
+      int v = 0;
+      while(++v < vs && it.equals(val.itemAt(v)));
+      if(v == vs) val = it;
+    }
+    return size == 1 ? val : new SingletonSeq(size, val);
   }
 }

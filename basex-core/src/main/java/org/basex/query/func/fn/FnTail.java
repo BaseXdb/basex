@@ -28,7 +28,6 @@ public final class FnTail extends StandardFunc {
     return new Iter() {
       @Override
       public Item get(final long i) throws QueryException {
-        qc.checkStop();
         return iter.get(i + 1);
       }
       @Override

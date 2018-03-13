@@ -7,6 +7,7 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.junit.*;
 
 /**
@@ -79,5 +80,9 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1 to 2) ! 'a'[.]", "a\na", exists(_UTIL_REPLICATE.clazz));
     check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(_UTIL_REPLICATE.clazz));
     check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE.clazz));
+    // combine identical values in singleton sequence
+    check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
+    check("(1 to 2) ! util:replicate('a', 2) ! util:replicate('a', 2)", "a\na\na\na\na\na\na\na",
+        exists(SingletonSeq.class) + " and .//@size = 8");
   }
 }
