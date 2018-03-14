@@ -13,8 +13,8 @@ public final class FTToken {
   private FTToken() { }
 
   /**
-   * Returns true if the specified character is whitespace.
-   * @param ch character to be tested
+   * Returns true if the specified codepoint is whitespace.
+   * @param ch codepoint to be tested
    * @return result of check
    */
   public static boolean ws(final int ch) {
@@ -22,12 +22,12 @@ public final class FTToken {
   }
 
   /**
-   * Returns true if the specified character is a valid full-text letter or digit.
-   * @param ch character to be tested
+   * Returns true if the specified codepoint is a valid letter, digit, or a combining mark.
+   * @param cp codepoint to be tested
    * @return result of check
    */
-  public static boolean lod(final int ch) {
-    final int t = Character.getType(ch);
+  public static boolean lod(final int cp) {
+    final int t = Character.getType(cp);
     return isLOD(t) || isCombining(t);
   }
 

@@ -53,21 +53,25 @@ final class TextIterator {
 
   /**
    * Checks if the text contains more strings.
+   * @param max maximum number of characters to check (long strings will be chopped later on)
    * @return result of check
    */
-  boolean moreStrings() {
+  boolean moreStrings(final int max) {
+    final int l = length;
     int p = posEnd;
     pos = p;
-    if(p >= length) return false;
+    if(p >= l) return false;
 
     // find next token boundary
-    int ch = cp(text, p);
-    p += cl(text, p);
+    final int e = pos + max;
+    final byte[] txt = text;
+    int ch = cp(txt, p);
+    p += cl(txt, p);
     if(lod(ch)) {
-      while(p < length) {
-        ch = cp(text, p);
+      while(p < l && p < e) {
+        ch = cp(txt, p);
         if(!lod(ch)) break;
-        p += cl(text, p);
+        p += cl(txt, p);
       }
     }
     posEnd = p;

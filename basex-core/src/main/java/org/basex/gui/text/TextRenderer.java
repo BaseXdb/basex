@@ -345,14 +345,15 @@ final class TextRenderer extends BaseXBack {
    */
   private boolean more(final TextIterator iter, final Graphics g) {
     // no valid graphics reference, no more words found: quit
-    if(g == null || !iter.moreStrings()) return false;
+    final int w = width;
+    if(g == null || !iter.moreStrings(w)) return false;
 
-    // calculate word width
+    // calculate width of next string to be drawn
+    final int p = iter.pos(), m = w - offset;
     int sw = 0;
-    final int p = iter.pos();
     while(iter.more()) {
       final int ch = iter.next();
-      // internal special codes...
+      // process special codes
       if(ch == TokenBuilder.BOLD) {
         font(boldFont);
       } else if(ch == TokenBuilder.NORM) {
@@ -361,8 +362,9 @@ final class TextRenderer extends BaseXBack {
         link ^= true;
       } else {
         sw += charWidth(ch);
-        if(x + sw > width) {
-          if(offset + sw > width) {
+        // check if string width exceeds panel width
+        if(sw > w - x) {
+          if(sw > m) {
             iter.posEnd(iter.pos());
             break;
           }
@@ -373,7 +375,7 @@ final class TextRenderer extends BaseXBack {
     iter.pos(p);
     stringWidth = sw;
 
-    // check if word has been found, and word is still visible
+    // check if string is visible
     return y < height;
   }
 
