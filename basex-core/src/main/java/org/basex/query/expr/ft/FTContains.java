@@ -79,7 +79,7 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     return expr.seqType().zero() ? FnBoolean.get(expr, info, cc.sc()) : this;
   }
 

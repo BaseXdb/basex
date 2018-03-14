@@ -79,8 +79,6 @@ public interface PkgText {
   String MISSDESC = "Missing package descriptor for package '%'";
   /** Attribute missing. */
   String MISSATTR = "'%' attribute missing in '%' element";
-  /** Invalid attribute. */
-  String WHICHATTR = "Invalid attribute '%'";
   /** Invalid element. */
   String WHICHELEM = "Invalid element %";
   /** Secondary package missing. */

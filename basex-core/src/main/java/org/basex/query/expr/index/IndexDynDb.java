@@ -41,7 +41,7 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
+  public Expr compile(final CompileContext cc) {
     return this;
   }
 

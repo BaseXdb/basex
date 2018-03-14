@@ -2584,33 +2584,41 @@ public class QueryParser extends InputParser {
       do {
         while(!consume(delim)) {
           final char ch = curr();
-          if(ch == '{') {
-            if(next() == '{') {
-              tb.add(consume());
-              consume();
-            } else {
-              final byte[] text = tb.next();
-              if(text.length == 0) {
-                add(attv, enclosedExpr());
-                simple = false;
+          switch(ch) {
+            case '{':
+              if(next() == '{') {
+                tb.add(consume());
+                consume();
               } else {
-                add(attv, Str.get(text));
+                final byte[] text = tb.next();
+                if(text.length == 0) {
+                  add(attv, enclosedExpr());
+                  simple = false;
+                } else {
+                  add(attv, Str.get(text));
+                }
               }
-            }
-          } else if(ch == '}') {
-            consume();
-            check('}');
-            tb.add('}');
-          } else if(ch == '<' || ch == 0) {
-            throw error(NOQUOTE_X, found());
-          } else if(ch == '\n' || ch == '\t') {
-            tb.add(' ');
-            consume();
-          } else if(ch == '\r') {
-            if(next() != '\n') tb.add(' ');
-            consume();
-          } else {
-            entity(tb);
+              break;
+            case '}':
+              consume();
+              check('}');
+              tb.add('}');
+              break;
+            case '<':
+            case 0:
+              throw error(NOQUOTE_X, found());
+            case '\n':
+            case '\t':
+              tb.add(' ');
+              consume();
+              break;
+            case '\r':
+              if(next() != '\n') tb.add(' ');
+              consume();
+              break;
+            default:
+              entity(tb);
+              break;
           }
         }
         if(!consume(delim)) break;

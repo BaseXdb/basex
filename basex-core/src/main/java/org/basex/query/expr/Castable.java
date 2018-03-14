@@ -43,7 +43,7 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     return expr.seqType().instanceOf(castType) ? cc.replaceWith(this, Bln.TRUE) : this;
   }
 

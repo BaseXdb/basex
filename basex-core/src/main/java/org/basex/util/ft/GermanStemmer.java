@@ -145,22 +145,15 @@ final class GermanStemmer extends InternalStemmer {
     final int s = tb.size();
     for(int c = 0; c < s; c++) {
       final int ch = tb.get(c);
-      if(ch == '*') {
-        tmp.add(tmp.get(c - 1));
-      } else if(ch == '\1') {
-        tmp.add('s').add('c').add('h');
-      } else if(ch == '\2') {
-        tmp.add('c').add('h');
-      } else if(ch == '\3') {
-        tmp.add('e').add('i');
-      } else if(ch == '\4') {
-        tmp.add('i').add('e');
-      } else if(ch == '\5') {
-        tmp.add('i').add('g');
-      } else if(ch == '\6') {
-        tmp.add('s').add('t');
-      } else {
-        tmp.add(ch);
+      switch(ch) {
+        case '*':  tmp.add(tmp.get(c - 1)); break;
+        case '\1': tmp.add('s').add('c').add('h'); break;
+        case '\2': tmp.add('c').add('h'); break;
+        case '\3': tmp.add('e').add('i'); break;
+        case '\4': tmp.add('i').add('e'); break;
+        case '\5': tmp.add('i').add('g'); break;
+        case '\6': tmp.add('s').add('t'); break;
+        default: tmp.add(ch); break;
       }
     }
     return tmp;

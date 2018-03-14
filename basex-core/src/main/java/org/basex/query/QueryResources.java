@@ -308,10 +308,9 @@ public final class QueryResources {
   public void addCollection(final String name, final String[] paths, final StaticContext sc)
       throws QueryException {
 
-    final int ns = paths.length;
-    final ItemList items = new ItemList(ns);
-    for(int n = 0; n < ns; n++) {
-      final QueryInput qi = new QueryInput(paths[n], sc);
+    final ItemList items = new ItemList(paths.length);
+    for(final String path : paths) {
+      final QueryInput qi = new QueryInput(path, sc);
       items.add(new DBNode(create(qi, true, null), 0, Data.DOC));
     }
     addCollection(items.value(NodeType.DOC), name);

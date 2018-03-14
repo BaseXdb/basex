@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class FnError extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
@@ -36,7 +36,7 @@ public final class FnError extends StandardFunc {
   }
 
   @Override
-  protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+  protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) {
     return this;
   }
 

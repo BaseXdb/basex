@@ -496,14 +496,20 @@ public abstract class Path extends ParseExpr {
         if(axis == CHILD || axis == DESC) return true;
       } else if(root instanceof Root || root instanceof CDoc ||
           rt != null && rt.type == NodeType.DOC) {
-        if(axis == SELF || axis == ANCORSELF) {
-          if(step.test != KindTest.NOD && step.test != KindTest.DOC) return true;
-        } else if(axis == CHILD || axis == DESC) {
-          if(step.test == KindTest.DOC || step.test == KindTest.ATT) return true;
-        } else if(axis == DESCORSELF) {
-          if(step.test == KindTest.ATT) return true;
-        } else {
-          return true;
+        switch(axis) {
+          case SELF:
+          case ANCORSELF:
+            if(step.test != KindTest.NOD && step.test != KindTest.DOC) return true;
+            break;
+          case CHILD:
+          case DESC:
+            if(step.test == KindTest.DOC || step.test == KindTest.ATT) return true;
+            break;
+          case DESCORSELF:
+            if(step.test == KindTest.ATT) return true;
+            break;
+          default:
+            return true;
         }
       }
     } else {

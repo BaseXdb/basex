@@ -102,7 +102,7 @@ public class XsltTransform extends XsltFn {
     // retrieve new or cached transformer
     final Transformer tr = transformer(xsl.streamSource(), xopts.get(XsltOptions.CACHE));
     // bind parameters
-    par.forEach((key, value) -> tr.setParameter(key, value));
+    par.forEach(tr::setParameter);
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();

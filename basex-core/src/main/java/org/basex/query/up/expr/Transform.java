@@ -56,7 +56,7 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     for(final Let copy : copies) copy.adoptType(copy.expr);
     return adoptType(exprs[1]);
   }

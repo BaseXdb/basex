@@ -119,7 +119,7 @@ public final class DBOptions {
    * @return main options
    */
   public MainOptions assignTo(final MainOptions opts) {
-    map.forEach((key, value) -> opts.put(key, value));
+    map.forEach(opts::put);
     return opts;
   }
 }

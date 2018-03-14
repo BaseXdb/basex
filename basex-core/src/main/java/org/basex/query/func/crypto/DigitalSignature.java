@@ -147,12 +147,13 @@ final class DigitalSignature {
         String ksURI = null, pkPW = null, kAlias = null, ksPW = null, ksTY = null;
         while(ci < s) {
           final Node cn = ceChildren.item(ci++);
-          final String name = cn.getNodeName();
-          if("keystore-type".equals(name)) ksTY = cn.getTextContent();
-          else if("keystore-password".equals(name)) ksPW = cn.getTextContent();
-          else if("key-alias".equals(name)) kAlias = cn.getTextContent();
-          else if("private-key-password".equals(name)) pkPW = cn.getTextContent();
-          else if("keystore-uri".equals(name)) ksURI = cn.getTextContent();
+          switch(cn.getNodeName()) {
+            case "keystore-type":        ksTY = cn.getTextContent(); break;
+            case "keystore-password":    ksPW = cn.getTextContent(); break;
+            case "key-alias":            kAlias = cn.getTextContent(); break;
+            case "private-key-password": pkPW = cn.getTextContent(); break;
+            case "keystore-uri":         ksURI = cn.getTextContent(); break;
+          }
         }
 
         // initialize the keystore

@@ -14,18 +14,6 @@ import org.basex.util.list.*;
  */
 public final class AnnList extends ObjectList<Ann, AnnList> {
   /**
-   * Removes an annotation.
-   * @param sig signature to be found
-   */
-  public void delete(final Annotation sig) {
-    int ls = 0;
-    for(int l = 0; l < size; ++l) {
-      if(list[l].sig != sig) list[ls++] = list[l];
-    }
-    size = ls;
-  }
-
-  /**
    * Checks if the specified signature is found in the list.
    * @param sig signature to be found
    * @return result of check

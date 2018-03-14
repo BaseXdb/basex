@@ -47,7 +47,7 @@ abstract class Format extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     return optFirst();
   }
 }

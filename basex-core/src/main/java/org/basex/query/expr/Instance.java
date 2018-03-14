@@ -37,7 +37,7 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     return expr.seqType().instanceOf(instType) ? cc.replaceWith(this, Bln.TRUE) : this;
   }
 

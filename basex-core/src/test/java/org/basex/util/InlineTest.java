@@ -90,8 +90,8 @@ public final class InlineTest extends SandboxTest {
       sb.append("\nFound: ").append(Arrays.toString(unpacked));
       sb.append("\nInlined Value:\n");
       for(int i = 32; i >= 0; i -= 8) {
-        String bin = Long.toBinaryString((packed >> i) & 0xFF);
-        while(bin.length() < 8) bin = '0' + bin;
+        final StringBuilder bin = new StringBuilder(Long.toBinaryString((packed >> i) & 0xFF));
+        while(bin.length() < 8) bin.insert(0, '0');
         sb.append(bin).append("\n");
       }
       fail(sb.toString());
@@ -110,8 +110,8 @@ public final class InlineTest extends SandboxTest {
       sb.append("Value must not be inlined: ").append(string);
       sb.append("\nInlined Value:\n");
       for(int i = 32; i >= 0; i -= 8) {
-        String bin = Long.toBinaryString((packed >> i) & 0xFF);
-        while(bin.length() < 8) bin = '0' + bin;
+        final StringBuilder bin = new StringBuilder(Long.toBinaryString((packed >> i) & 0xFF));
+        while(bin.length() < 8) bin.insert(0, '0');
         sb.append(bin).append("\n");
       }
       fail(sb.toString());

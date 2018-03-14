@@ -52,8 +52,8 @@ public final class DBNew {
     final int is = list.length;
     inputs = new ArrayList<>(is);
     dboptions = new ArrayList<>(is);
-    for(int i = 0; i < is; i++) {
-      inputs.add(list[i]);
+    for(final NewInput input : list) {
+      inputs.add(input);
       dboptions.add(options);
     }
   }

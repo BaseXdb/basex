@@ -105,11 +105,11 @@ public final class List extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       final int el = exprs.length;
-      long[] offsets = new long[el];
-      Iter[] iters = new Iter[el];
+      final long[] offsets = new long[el];
+      final Iter[] iters = new Iter[el];
       long size = Long.MIN_VALUE;
       int e;
 

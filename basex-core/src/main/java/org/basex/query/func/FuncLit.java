@@ -50,7 +50,7 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public void comp(final CompileContext cc) throws QueryException {
+  public void comp(final CompileContext cc) {
     if(compiled) return;
     compiled = true;
 

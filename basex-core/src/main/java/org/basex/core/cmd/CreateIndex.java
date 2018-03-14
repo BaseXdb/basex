@@ -34,25 +34,30 @@ public final class CreateIndex extends ACreate {
     final CmdIndex ci = getOption(CmdIndex.class);
     if(ci == null) return error(UNKNOWN_CMD_X, this);
     final IndexType type;
-    if(ci == CmdIndex.TEXT) {
-      type = IndexType.TEXT;
-      data.meta.createtext = true;
-    } else if(ci == CmdIndex.ATTRIBUTE) {
-      type = IndexType.ATTRIBUTE;
-      data.meta.createattr = true;
-    } else if(ci == CmdIndex.TOKEN) {
-      type = IndexType.TOKEN;
-      data.meta.createtoken = true;
-    } else if(ci == CmdIndex.FULLTEXT) {
-      type = IndexType.FULLTEXT;
-      data.meta.createft = true;
-      data.meta.stemming = options.get(MainOptions.STEMMING);
-      data.meta.casesens = options.get(MainOptions.CASESENS);
-      data.meta.diacritics = options.get(MainOptions.DIACRITICS);
-      data.meta.language = Language.get(options);
-      data.meta.stopwords = options.get(MainOptions.STOPWORDS);
-    } else {
-      return error(UNKNOWN_CMD_X, this);
+    switch(ci) {
+      case TEXT:
+        type = IndexType.TEXT;
+        data.meta.createtext = true;
+        break;
+      case ATTRIBUTE:
+        type = IndexType.ATTRIBUTE;
+        data.meta.createattr = true;
+        break;
+      case TOKEN:
+        type = IndexType.TOKEN;
+        data.meta.createtoken = true;
+        break;
+      case FULLTEXT:
+        type = IndexType.FULLTEXT;
+        data.meta.createft = true;
+        data.meta.stemming = options.get(MainOptions.STEMMING);
+        data.meta.casesens = options.get(MainOptions.CASESENS);
+        data.meta.diacritics = options.get(MainOptions.DIACRITICS);
+        data.meta.language = Language.get(options);
+        data.meta.stopwords = options.get(MainOptions.STOPWORDS);
+        break;
+      default:
+        return error(UNKNOWN_CMD_X, this);
     }
     data.meta.names(type, options);
     data.meta.splitsize = options.get(MainOptions.SPLITSIZE);

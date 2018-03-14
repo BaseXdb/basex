@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  */
 public class HashItemSet extends ASet implements ItemSet {
   /** Hash values. */
-  private int[] hash = new int[Array.CAPACITY];;
+  private int[] hash = new int[Array.CAPACITY];
   /** Hashed items. */
   private Item[] items = new Item[Array.CAPACITY];
   /** Equality check (stricter than equivalence check). */

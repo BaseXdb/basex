@@ -101,9 +101,8 @@ public final class User {
       });
       user.add(pw);
     });
-    locals.forEach((key, value) -> {
-      user.add(new FElem(DATABASE).add(PATTERN, key).add(PERMISSION, value.toString()));
-    });
+    locals.forEach((key, value) -> user.add(new FElem(DATABASE).add(PATTERN, key).
+        add(PERMISSION, value.toString())));
     root.add(user);
   }
 

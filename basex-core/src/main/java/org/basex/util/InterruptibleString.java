@@ -41,7 +41,7 @@ public class InterruptibleString implements CharSequence {
 
   @Override
   public String toString() {
-    return string.toString();
+    return string;
   }
 
   /**

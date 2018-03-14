@@ -43,7 +43,7 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     return adoptType(exprs[0]);
   }
 

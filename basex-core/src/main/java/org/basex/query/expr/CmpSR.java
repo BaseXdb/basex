@@ -209,10 +209,10 @@ public final class CmpSR extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(PAREN1);
-    if(min != null) sb.append('"').append(min).append('"').append(mni ? " <= " : " < ");
-    sb.append(expr);
-    if(max != null) sb.append(mxi ? " <= " : " < ").append('"').append(max).append('"');
-    return sb.append(PAREN2).toString();
+    final TokenBuilder tb = new TokenBuilder(PAREN1);
+    if(min != null) tb.add('"').add(min).add('"').add(mni ? " <= " : " < ");
+    tb.addExt(expr);
+    if(max != null) tb.add(mxi ? " <= " : " < ").add('"').add(max).add('"');
+    return tb.add(PAREN2).toString();
   }
 }

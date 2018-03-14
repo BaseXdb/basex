@@ -44,7 +44,7 @@ public final class CsvXQueryConverter extends CsvConverter {
   }
 
   @Override
-  protected void entry(final byte[] value) throws QueryIOException {
+  protected void entry(final byte[] value) {
     row.append(Str.get(value));
   }
 

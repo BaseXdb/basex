@@ -79,12 +79,12 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final Item atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+  public final Item atomValue(final QueryContext qc, final InputInfo info) {
     return atomItem();
   }
 
   @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
+  public final Item atomItem(final QueryContext qc, final InputInfo info) {
     return atomItem();
   }
 

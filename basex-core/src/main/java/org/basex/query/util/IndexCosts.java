@@ -22,7 +22,7 @@ public final class IndexCosts implements Comparable<IndexCosts> {
    * -1 = unknown,
    * other values: estimates (the smaller, the better)
    */
-  private int results = -1;
+  private final int results;
 
   /**
    * Constructor.

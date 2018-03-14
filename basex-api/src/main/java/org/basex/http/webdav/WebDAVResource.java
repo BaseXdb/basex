@@ -336,18 +336,26 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     @Override
     public void characters(final char[] ch, final int start, final int length) {
       final String v = String.valueOf(ch, start, length);
-      if("token".equals(elementName))
-        lockToken.tokenId = v;
-      else if("scope".equals(elementName))
-        lockToken.info.scope = LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
-      else if("type".equals(elementName))
-        lockToken.info.type = LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
-      else if("depth".equals(elementName))
-        lockToken.info.depth = LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
-      else if("owner".equals(elementName))
-        lockToken.info.lockedByUser = v;
-      else if("timeout".equals(elementName))
-        lockToken.timeout = LockTimeout.parseTimeout(v);
+      switch(elementName) {
+        case "token":
+          lockToken.tokenId = v;
+          break;
+        case "scope":
+          lockToken.info.scope = LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
+          break;
+        case "type":
+          lockToken.info.type = LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
+          break;
+        case "depth":
+          lockToken.info.depth = LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
+          break;
+        case "owner":
+          lockToken.info.lockedByUser = v;
+          break;
+        case "timeout":
+          lockToken.timeout = LockTimeout.parseTimeout(v);
+          break;
+      }
     }
   }
 }

@@ -334,7 +334,7 @@ public abstract class IO {
    * @param suffixes suffixes to compare with
    * @return result of check
    */
-  public static final boolean checkSuffix(final String path, final String... suffixes) {
+  public static boolean checkSuffix(final String path, final String... suffixes) {
     final int i = path.lastIndexOf('.');
     if(i == -1) return false;
     final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);

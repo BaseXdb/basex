@@ -265,16 +265,12 @@ public abstract class Formatter extends FormatUtil {
         } else if(fp.first == 'n') {
           // output name representation
           byte[] in = null;
-          if(compSpec == 'M') {
-            in = month((int) num - 1, fp.min, fp.max);
-          } else if(compSpec == 'F') {
-            in = day((int) num - 1, fp.min, fp.max);
-          } else if(compSpec == 'P') {
-            in = ampm(num == 0);
-          } else if(compSpec == 'C') {
-            in = calendar();
-          } else if(compSpec == 'E') {
-            in = era((int) num);
+          switch(compSpec) {
+            case 'M': in = month((int) num - 1, fp.min, fp.max); break;
+            case 'F': in = day((int) num - 1, fp.min, fp.max); break;
+            case 'P': in = ampm(num == 0); break;
+            case 'C': in = calendar(); break;
+            case 'E': in = era((int) num); break;
           }
           if(in != null) {
             if(fp.cs == Case.LOWER) in = lc(in);

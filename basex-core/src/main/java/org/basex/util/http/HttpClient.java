@@ -184,7 +184,7 @@ public final class HttpClient {
       final String redirect = request.attribute(FOLLOW_REDIRECT);
       if(redirect != null) setFollowRedirects(Strings.yes(redirect));
 
-      request.headers.forEach((key, value) -> conn.addRequestProperty(key, value));
+      request.headers.forEach(conn::addRequestProperty);
     }
     return conn;
   }

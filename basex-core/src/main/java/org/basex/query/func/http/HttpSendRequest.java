@@ -25,7 +25,7 @@ public final class HttpSendRequest extends StandardFunc {
     // get HTTP URI
     final byte[] href = exprs.length >= 2 ? toEmptyToken(exprs[1], qc) : null;
     // get payload
-    final ValueBuilder vb = new ValueBuilder(qc);;
+    final ValueBuilder vb = new ValueBuilder(qc);
     if(exprs.length == 3) {
       final Iter iter = exprs[2].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) vb.add(item);

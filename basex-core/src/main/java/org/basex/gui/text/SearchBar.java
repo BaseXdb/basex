@@ -41,8 +41,6 @@ public final class SearchBar extends BaseXBack {
     search();
   };
 
-  /** Mode buttons. */
-  final AbstractButton[] modeButtons;
   /** Mode: regular expression. */
   final AbstractButton regex;
   /** Mode: match case. */
@@ -90,7 +88,6 @@ public final class SearchBar extends BaseXBack {
     word = button("f_word", Text.WHOLE_WORD);
     regex = button("f_regex", Text.REGULAR_EXPR);
     multi = button("f_multi", Text.MULTI_LINE);
-    modeButtons = new AbstractButton[] { mcase, word, regex, multi };
 
     rplc  = BaseXButton.get("f_replace", Text.REPLACE_ALL, false, gui);
     cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),

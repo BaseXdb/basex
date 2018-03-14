@@ -57,7 +57,7 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+    public Expr optimize(final Expr ex1, final Expr ex2) {
       // check for neutral numbers
       final BiFunction<Expr, Expr, Expr> func = (expr1, expr2) ->
         expr1 instanceof ANum && ((ANum) expr1).dbl() == 0 ? expr2 : null;
@@ -104,7 +104,7 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+    public Expr optimize(final Expr ex1, final Expr ex2) {
       // check for neutral number and identical arguments
       return ex2 instanceof ANum && ((ANum) ex2).dbl() == 0 ? ex1 :
         ex1.equals(ex2) ? zero(ex1) : null;
@@ -155,7 +155,7 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+    public Expr optimize(final Expr ex1, final Expr ex2) {
       // check for absorbing and neutral numbers
       final BiFunction<Expr, Expr, Expr> func = (expr1, expr2) -> {
         final double dbl1 = expr1 instanceof ANum ? ((ANum) expr1).dbl() : Double.NaN;
@@ -206,7 +206,7 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+    public Expr optimize(final Expr ex1, final Expr ex2) {
       // check for neutral number and identical arguments
       return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
         ex1.equals(ex2) ? one(ex1) : null;
@@ -247,7 +247,7 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+    public Expr optimize(final Expr ex1, final Expr ex2) {
       // check for neutral number and identical arguments
       return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
         ex1.equals(ex2) ? one(ex1) : null;
@@ -276,7 +276,7 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) throws QueryException {
+    public Expr optimize(final Expr ex1, final Expr ex2) {
       return null;
     }
   };
@@ -312,9 +312,8 @@ public enum Calc {
    * @param ex1 first expression
    * @param ex2 second expression
    * @return result expression, or {@code null} if expression cannot be optimized
-   * @throws QueryException query exception
    */
-  public abstract Expr optimize(Expr ex1, Expr ex2) throws QueryException;
+  public abstract Expr optimize(Expr ex1, Expr ex2);
 
   /**
    * Returns the numeric type with the highest precedence.

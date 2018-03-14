@@ -66,8 +66,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public IndexDb inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
+  public IndexDb inline(final Var var, final Expr ex, final CompileContext cc) {
     return null;
   }
 

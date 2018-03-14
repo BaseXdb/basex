@@ -560,7 +560,7 @@ public final class QueryContext extends Job implements Closeable {
       parent.popJob();
     }
     // reassign original database options (changed by compile step)
-    staticOpts.forEach((key, value) -> context.options.put(key, value));
+    staticOpts.forEach(context.options::put);
   }
 
   @Override

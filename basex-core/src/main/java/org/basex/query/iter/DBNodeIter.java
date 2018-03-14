@@ -29,7 +29,7 @@ public abstract class DBNodeIter extends BasicNodeIter {
   public abstract DBNode next();
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     final IntList il = new IntList();
     for(DBNode n; (n = next()) != null;) {
       qc.checkStop();

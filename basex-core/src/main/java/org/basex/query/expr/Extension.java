@@ -50,7 +50,7 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     return adoptType(expr);
   }
 
@@ -102,7 +102,6 @@ public final class Extension extends Single {
 
   @Override
   public String toString() {
-    return new StringBuilder().append(pragma).append(' ').append(CURLY1 + ' ').
-        append(expr).append(' ').append(CURLY2).toString();
+    return String.valueOf(pragma) + ' ' + CURLY1 + ' ' + expr + ' ' + CURLY2;
   }
 }

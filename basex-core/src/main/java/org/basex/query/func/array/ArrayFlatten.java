@@ -66,7 +66,7 @@ public final class ArrayFlatten extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(!st.mayBeArray()) return expr;

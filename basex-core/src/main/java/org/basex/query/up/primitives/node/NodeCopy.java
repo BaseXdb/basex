@@ -38,7 +38,7 @@ abstract class NodeCopy extends NodeUpdate {
   }
 
   @Override
-  public final void prepare(final MemData tmp, final QueryContext qc) throws QueryException {
+  public final void prepare(final MemData tmp, final QueryContext qc) {
     // merge texts. after that, text nodes still need to be merged,
     // as two adjacent iterators may lead to two adjacent text nodes
     final ANodeList list = mergeNodeCacheText(nodes);

@@ -73,13 +73,13 @@ public final class ProjectView extends BaseXPanel {
 
     rootPath = new BaseXCombo(gui, true).history(GUIOptions.PROJECTS, gui.gopts);
     rootPath.setFocusable(false);
-    SwingUtilities.invokeLater(() -> {
-      rootPath.textField().getDocument().addDocumentListener(new DocumentListener() {
+    SwingUtilities.invokeLater(() -> rootPath.textField().getDocument().addDocumentListener(
+      new DocumentListener() {
         @Override public void insertUpdate(final DocumentEvent e) { changeRoot(true); }
         @Override public void removeUpdate(final DocumentEvent e) { changeRoot(true); }
         @Override public void changedUpdate(final DocumentEvent e) { }
-      });
-    });
+      }
+    ));
 
     final AbstractButton browse = BaseXButton.get("c_editopen", OPEN, false, gui);
     browse.setToolTipText(CHOOSE_DIR + DOTS);

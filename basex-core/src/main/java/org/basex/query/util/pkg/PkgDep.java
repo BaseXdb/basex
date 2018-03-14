@@ -8,7 +8,7 @@ package org.basex.query.util.pkg;
  */
 final class PkgDep {
   /** Name of package a package depends on. */
-  String name;
+  final String name;
   /** Name of processor a package depends on. */
   String processor;
   /** Set of acceptable version. */

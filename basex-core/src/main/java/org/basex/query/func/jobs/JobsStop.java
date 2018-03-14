@@ -35,7 +35,7 @@ public final class JobsStop extends StandardFunc {
     org.basex.core.cmd.JobsStop.stop(qc.context, id);
 
     // remove service
-    if(opts.contains(JobsOptions.SERVICE) && opts.get(JobsOptions.SERVICE)) {
+    if(opts.contains(StopOptions.SERVICE) && opts.get(StopOptions.SERVICE)) {
       try {
         final Jobs jobs = new Jobs(qc.context);
         jobs.remove(id);

@@ -277,6 +277,7 @@ public final class CommandLockingTest extends SandboxTest {
   }
 
   /** Update module. */
+  @Test
   public void update() {
     ckDBs(new XQuery(_UPDATE_OUTPUT.args("foo")), true, NONE);
   }

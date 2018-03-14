@@ -121,7 +121,7 @@ public final class HTTPParams {
 
     try(InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, options);
-      hp.multiForm(type).forEach((k, v) -> map.put(k, v));
+      hp.multiForm(type).forEach(map::put);
     }
   }
 

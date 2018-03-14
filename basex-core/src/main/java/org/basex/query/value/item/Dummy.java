@@ -44,18 +44,17 @@ public final class Dummy extends Item {
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo info) {
     throw Util.notExpected();
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
+  public boolean sameKey(final Item item, final InputInfo info) {
     throw Util.notExpected();
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo info) {
     throw Util.notExpected();
   }
 

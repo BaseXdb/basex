@@ -31,8 +31,4 @@ public interface JobsText {
   byte[] READS = token("reads");
   /** Write locks. */
   byte[] WRITES = token("writes");
-
-  /** Base URI. */
-  byte[] BASE_URI = token("base-uri");
-
 }

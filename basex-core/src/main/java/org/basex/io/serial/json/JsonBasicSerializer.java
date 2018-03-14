@@ -232,12 +232,14 @@ public final class JsonBasicSerializer extends JsonSerializer {
       final int cp = cp(value, v);
       if(cp >= 0 && cp < 32 || cp >= 127 && cp < 160) {
         tb.add('\\');
-        if(cp == '\b') tb.add('b');
-        else if(cp == '\f') tb.add('f');
-        else if(cp == '\n') tb.add('n');
-        else if(cp == '\r') tb.add('r');
-        else if(cp == '\t') tb.add('t');
-        else tb.add('u').add('0').add('0').add(HEX[cp >> 4]).add(HEX[cp & 0xF]);
+        switch(cp) {
+          case '\b': tb.add('b'); break;
+          case '\f': tb.add('f'); break;
+          case '\n': tb.add('n'); break;
+          case '\r': tb.add('r'); break;
+          case '\t': tb.add('t'); break;
+          default: tb.add('u').add('0').add('0').add(HEX[cp >> 4]).add(HEX[cp & 0xF]); break;
+        }
       } else {
         if((cp == '\\' || cp == '"' || cp == '/') && (!escape || !bs && cp != '\\')) tb.add('\\');
         tb.add(cp);

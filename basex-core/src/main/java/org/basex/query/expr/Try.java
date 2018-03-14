@@ -59,7 +59,7 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     if(expr instanceof Value) return cc.replaceWith(this, expr);
 
     SeqType st = expr.seqType();

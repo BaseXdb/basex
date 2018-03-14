@@ -68,83 +68,103 @@ public class BaseX extends CLI {
         final int c = ops.get(o);
         String value = vals.get(o);
 
-        if(c == 'b') {
-          // set/add variable binding
-          if(bind.length() != 0) bind.append(',');
-          // commas are escaped by a second comma
-          value = bind.append(value.replaceAll(",", ",,")).toString();
-          execute(new Set(MainOptions.BINDINGS, value), false);
-        } else if(c == 'c') {
-          // evaluate commands
-          console = false;
-          if(!execute(input(value))) return;
-        } else if(c == 'D') {
-          // hidden option: show/hide dot query graph
-          execute(new Set(MainOptions.DOTPLAN, null), false);
-        } else if(c == 'i') {
-          // open database or create main memory representation
-          execute(new Set(MainOptions.MAINMEM, true), false);
-          execute(new Check(value), verbose);
-          execute(new Set(MainOptions.MAINMEM, false), false);
-        } else if(c == 'I') {
-          // set/add variable binding
-          if(bind.length() != 0) bind.append(',');
-          // commas are escaped by a second comma
-          value = bind.append('=').append(value.replaceAll(",", ",,")).toString();
-          execute(new Set(MainOptions.BINDINGS, value), false);
-        } else if(c == 'o') {
-          // change output stream
-          if(out != System.out) out.close();
-          out = new PrintOutput(value);
-          session().setOutputStream(out);
-        } else if(c == 'q') {
-          // evaluate query
-          console = false;
-          execute(new XQuery(value), verbose);
-        } else if(c == 'Q') {
-          console = false;
-          // evaluate file contents or string as query
-          final Pair<String, String> input = input(value);
-          execute(new XQuery(input.value()).baseURI(input.name()), verbose);
-        } else if(c == 'r') {
-          // parse number of runs
-          execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
-        } else if(c == 'R') {
-          // toggle query evaluation
-          execute(new Set(MainOptions.RUNQUERY, null), false);
-        } else if(c == 's') {
-          // set/add serialization parameter
-          if(sopts == null) sopts = new SerializerOptions();
-          final String[] kv = value.split("=", 2);
-          sopts.assign(kv[0], kv.length > 1  ? kv[1] : "");
-          execute(new Set(MainOptions.SERIALIZER, sopts), false);
-        } else if(c == 't') {
-          // evaluate query
-          console = false;
-          execute(new Test(value), verbose);
-        } else if(c == 'u') {
-          // (de)activate write-back for updates
-          execute(new Set(MainOptions.WRITEBACK, null), false);
-        } else if(c == 'v') {
-          // show/hide verbose mode
-          v ^= true;
-        } else if(c == 'V') {
-          // show/hide query info
-          qi ^= true;
-          execute(new Set(MainOptions.QUERYINFO, null), false);
-        } else if(c == 'w') {
-          // toggle chopping of whitespaces
-          execute(new Set(MainOptions.CHOP, null), false);
-        } else if(c == 'x') {
-          // show/hide xml query plan
-          execute(new Set(MainOptions.XMLPLAN, null), false);
-          qp ^= true;
-        } else if(c == 'X') {
-          // show query plan before/after query compilation
-          execute(new Set(MainOptions.COMPPLAN, null), false);
-        } else if(c == 'z') {
-          // toggle result serialization
-          execute(new Set(MainOptions.SERIALIZE, null), false);
+        switch(c) {
+          case 'b':
+            // set/add variable binding
+            if(bind.length() != 0) bind.append(',');
+            // commas are escaped by a second comma
+            value = bind.append(value.replaceAll(",", ",,")).toString();
+            execute(new Set(MainOptions.BINDINGS, value), false);
+            break;
+          case 'c':
+            // evaluate commands
+            console = false;
+            if(!execute(input(value))) return;
+            break;
+          case 'D':
+            // hidden option: show/hide dot query graph
+            execute(new Set(MainOptions.DOTPLAN, null), false);
+            break;
+          case 'i':
+            // open database or create main memory representation
+            execute(new Set(MainOptions.MAINMEM, true), false);
+            execute(new Check(value), verbose);
+            execute(new Set(MainOptions.MAINMEM, false), false);
+            break;
+          case 'I':
+            // set/add variable binding
+            if(bind.length() != 0) bind.append(',');
+            // commas are escaped by a second comma
+            value = bind.append('=').append(value.replaceAll(",", ",,")).toString();
+            execute(new Set(MainOptions.BINDINGS, value), false);
+            break;
+          case 'o':
+            // change output stream
+            if(out != System.out) out.close();
+            out = new PrintOutput(value);
+            session().setOutputStream(out);
+            break;
+          case 'q':
+            // evaluate query
+            console = false;
+            execute(new XQuery(value), verbose);
+            break;
+          case 'Q':
+            console = false;
+            // evaluate file contents or string as query
+            final Pair<String, String> input = input(value);
+            execute(new XQuery(input.value()).baseURI(input.name()), verbose);
+            break;
+          case 'r':
+            // parse number of runs
+            execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
+            break;
+          case 'R':
+            // toggle query evaluation
+            execute(new Set(MainOptions.RUNQUERY, null), false);
+            break;
+          case 's':
+            // set/add serialization parameter
+            if(sopts == null) sopts = new SerializerOptions();
+            final String[] kv = value.split("=", 2);
+            sopts.assign(kv[0], kv.length > 1 ? kv[1] : "");
+            execute(new Set(MainOptions.SERIALIZER, sopts), false);
+            break;
+          case 't':
+            // evaluate query
+            console = false;
+            execute(new Test(value), verbose);
+            break;
+          case 'u':
+            // (de)activate write-back for updates
+            execute(new Set(MainOptions.WRITEBACK, null), false);
+            break;
+          case 'v':
+            // show/hide verbose mode
+            v ^= true;
+            break;
+          case 'V':
+            // show/hide query info
+            qi ^= true;
+            execute(new Set(MainOptions.QUERYINFO, null), false);
+            break;
+          case 'w':
+            // toggle chopping of whitespaces
+            execute(new Set(MainOptions.CHOP, null), false);
+            break;
+          case 'x':
+            // show/hide xml query plan
+            execute(new Set(MainOptions.XMLPLAN, null), false);
+            qp ^= true;
+            break;
+          case 'X':
+            // show query plan before/after query compilation
+            execute(new Set(MainOptions.COMPPLAN, null), false);
+            break;
+          case 'z':
+            // toggle result serialization
+            execute(new Set(MainOptions.SERIALIZE, null), false);
+            break;
         }
         verbose = qi || qp || v;
       }
@@ -219,20 +239,16 @@ public class BaseX extends CLI {
           v = "";
         } else if(!local()) {
           // client options: need to be set before other options
-          if(c == 'n') {
+          switch(c) {
             // set server name
-            context.soptions.set(StaticOptions.HOST, arg.string());
-          } else if(c == 'p') {
+            case 'n': context.soptions.set(StaticOptions.HOST, arg.string()); break;
             // set server port
-            context.soptions.set(StaticOptions.PORT, arg.number());
-          } else if(c == 'P') {
+            case 'p': context.soptions.set(StaticOptions.PORT, arg.number()); break;
             // specify password
-            context.soptions.set(StaticOptions.PASSWORD, arg.string());
-          } else if(c == 'U') {
+            case 'P': context.soptions.set(StaticOptions.PASSWORD, arg.string()); break;
             // specify user name
-            context.soptions.set(StaticOptions.USER, arg.string());
-          } else {
-            throw arg.usage();
+            case 'U': context.soptions.set(StaticOptions.USER, arg.string()); break;
+            default: throw arg.usage();
           }
         } else {
           throw arg.usage();

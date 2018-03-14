@@ -60,8 +60,6 @@ public final class SeqType {
   public static final SeqType ITR_ZO = AtomType.ITR.seqType(Occ.ZERO_ONE);
   /** Zero or more integers. */
   public static final SeqType ITR_ZM = AtomType.ITR.seqType(Occ.ZERO_MORE);
-  /** One or more integers. */
-  public static final SeqType ITR_OM = AtomType.ITR.seqType(Occ.ONE_MORE);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = AtomType.BYT.seqType(Occ.ZERO_MORE);
 
@@ -149,8 +147,6 @@ public final class SeqType {
   public static final SeqType NSP_O = NodeType.NSP.seqType();
   /** Processing instruction. */
   public static final SeqType PI_O = NodeType.PI.seqType();
-  /** Text node. */
-  public static final SeqType TXT_O = NodeType.TXT.seqType();
   /** Zero or one text node. */
   public static final SeqType TXT_ZO = NodeType.TXT.seqType(Occ.ZERO_ONE);
   /** Zero or more text nodes. */

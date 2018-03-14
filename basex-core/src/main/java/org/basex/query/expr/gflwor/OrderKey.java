@@ -49,7 +49,7 @@ public final class OrderKey extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     // override pre-evaluation
     return this;
   }

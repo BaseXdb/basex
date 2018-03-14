@@ -63,18 +63,19 @@ public class FnForEach extends StandardFunc {
     final Type type2 = expr2.seqType().type;
     if(type2 instanceof FuncType && !updating) {
       final SeqType ft2 = ((FuncType) type2).declType;
-      final long size = ft2.one() ? expr1.size() : -1;
-      exprType.assign(ft2.type, ft2.mayBeEmpty() ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
+      final boolean mayBeEmpty = st1.mayBeEmpty() || ft2.mayBeEmpty();
+      final long size = ft2.zero() ? 0 : ft2.one() ? expr1.size() : -1;
+      exprType.assign(ft2.type, mayBeEmpty ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
     }
 
     final long size1 = expr1.size();
     if(allAreValues(false) && size1 <= UNROLL_LIMIT) {
       // unroll the loop
+      final boolean ndt = expr2.has(Flag.NDT);
       final Value seq = (Value) expr1;
       final Expr[] results = new Expr[(int) size1];
       for(int i = 0; i < size1; i++) {
-        results[i] = new DynFuncCall(info, sc, updating, expr2.has(Flag.NDT), expr2,
-            seq.itemAt(i)).optimize(cc);
+        results[i] = new DynFuncCall(info, sc, updating, ndt, expr2, seq.itemAt(i)).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
       return new List(info, results).optimize(cc);

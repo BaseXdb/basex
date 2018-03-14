@@ -29,8 +29,6 @@ abstract class ProcFn extends StandardFunc {
   static final String ERROR = "error";
   /** Name: code. */
   static final String CODE = "code";
-  /** Name: exception. */
-  static final String EXCEPTION = "exception";
 
   /**
    * Returns the result of a command.

@@ -59,7 +59,6 @@ public final class FTExtension extends FTExpr {
 
   @Override
   public String toString() {
-    return new StringBuilder().append(pragma).append(' ').append(CURLY1 + ' ').
-        append(exprs[0]).append(' ').append(CURLY2).toString();
+    return String.valueOf(pragma) + ' ' + CURLY1 + ' ' +  exprs[0] + ' ' + CURLY2;
   }
 }

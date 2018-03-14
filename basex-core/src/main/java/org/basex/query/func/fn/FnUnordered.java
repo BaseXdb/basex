@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FnUnordered extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     throw Util.notExpected();
   }
 
