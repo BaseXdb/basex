@@ -155,7 +155,7 @@ public final class EditorArea extends TextPanel {
           BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name())))) {
         try {
           setText(file.read());
-          file(file);
+          file(file, false);
           release(Action.PARSE);
         } catch(final IOException ex) {
           Util.debug(ex);
@@ -184,7 +184,7 @@ public final class EditorArea extends TextPanel {
     if(rename || modified) {
       try {
         io.write(getText());
-        file(io);
+        file(io, true);
         view.project.save(io, rename);
         return true;
       } catch(final Exception ex) {
@@ -211,8 +211,9 @@ public final class EditorArea extends TextPanel {
   /**
    * Updates the file reference, timestamp and history.
    * @param io file
+   * @param save save option files
    */
-  void file(final IOFile io) {
+  void file(final IOFile io, final boolean save) {
     if(io != file) {
       file = io;
       label.setIcon(BaseXImages.file(io));
@@ -223,5 +224,6 @@ public final class EditorArea extends TextPanel {
     hist.save();
     view.refreshHistory(file);
     view.refreshControls(this, true);
+    if(save) gui.saveOptions();
   }
 }

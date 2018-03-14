@@ -100,10 +100,11 @@ public final class TextEditor {
       } catch(final JobException ex) {
         // search was interrupted
       } catch(final Exception ex) {
-        final String info = Util.message(ex).replaceAll(Prop.NL + ".*", "");
+        final String info = Util.message(ex).replaceAll(Text.NL + ".*", "");
         gui.status.setError(Text.REGULAR_EXPR + Text.COLS + info);
       }
     });
+    t.setDaemon(true);
     t.start();
     searchThread = t;
   }

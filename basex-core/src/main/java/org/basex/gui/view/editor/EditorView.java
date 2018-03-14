@@ -460,7 +460,7 @@ public final class EditorView extends View {
         // create new tab if text in current tab is stored on disk or has been modified
         if(edit.opened() || edit.modified()) edit = addTab();
         edit.initText(text);
-        edit.file(file);
+        edit.file(file, error);
         if(parse) run(edit, Action.PARSE);
       } catch(final IOException ex) {
         refreshHistory(null);
@@ -641,7 +641,8 @@ public final class EditorView extends View {
    * Closes all editors.
    */
   public void closeAll() {
-    for(final EditorArea ea : editors()) close(ea);
+    for(final EditorArea ea : editors()) closeEditor(ea);
+    gui.saveOptions();
   }
 
   /**
@@ -649,6 +650,15 @@ public final class EditorView extends View {
    * @param edit editor to be closed. {@code null} closes the currently opened editor.
    */
   public void close(final EditorArea edit) {
+    closeEditor(edit);
+    gui.saveOptions();
+  }
+
+  /**
+   * Closes an editor.
+   * @param edit editor to be closed. {@code null} closes the currently opened editor.
+   */
+  private void closeEditor(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();
     if(!confirm(ea)) return;
 
@@ -845,15 +855,16 @@ public final class EditorView extends View {
   }
 
   /**
-   * Saves the current configuration.
+   * Returns paths of all open files.
+   * @return file paths
    */
-  public void saveOptions() {
+  public String[] openFiles() {
     // remember opened files
     final StringList files = new StringList();
     for(final EditorArea edit : editors()) {
       if(edit.opened()) files.add(edit.file().path());
     }
-    gui.gopts.set(GUIOptions.OPEN, files.finish());
+    return files.finish();
   }
 
   /**
@@ -886,11 +897,11 @@ public final class EditorView extends View {
         if(dir) {
           // change path to files in a renamed directory
           if(editPath.startsWith(oldPath)) {
-            ea.file(new IOFile(renamed + File.separator + editPath.substring(oldPath.length())));
+            ea.file(new IOFile(renamed, editPath.substring(oldPath.length())), true);
           }
         } else if(oldPath.equals(editPath)) {
           // update file reference and label of editor tab
-          ea.file(renamed);
+          ea.file(renamed, true);
           ea.label.setText(renamed.name());
           break;
         }

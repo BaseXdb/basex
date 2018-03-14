@@ -131,7 +131,7 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   @Override
   public void dispose() {
     super.dispose();
-    gui.gopts.write();
+    gui.saveOptions();
   }
 
   /**

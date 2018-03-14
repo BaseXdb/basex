@@ -138,13 +138,13 @@ public class Options implements Iterable<Option<?>> {
       lines.add("").add(PROPUSER).add(user);
 
       // only write file if contents have changed
-      if(update(lines)) {
-        final TokenBuilder tb = new TokenBuilder();
-        for(final String line : lines) tb.add(line).add(NL);
+      final TokenBuilder tb = new TokenBuilder();
+      for(final String line : lines) tb.add(line).add(NL);
+      final byte[] contents = tb.finish();
+      if(!file.exists() || !eq(file.read(), contents)) {
         file.parent().md();
-        file.write(tb.finish());
+        file.write(contents);
       }
-
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
       Util.debug(ex);
@@ -698,25 +698,6 @@ public class Options implements Iterable<Option<?>> {
       errs.add("writing new configuration file.");
       for(final String s : errs) Util.errln(file + ": " + s);
     }
-  }
-
-  /**
-   * Checks if the options file needs to be updated.
-   * @param lines lines of new file
-   * @return result of check
-   * @throws IOException I/O exception
-   */
-  private boolean update(final StringList lines) throws IOException {
-    if(!file.exists()) return true;
-
-    int l = 0;
-    final int ls = lines.size();
-    try(NewlineInput nli = new NewlineInput(file)) {
-      for(String line; (line = nli.readLine()) != null;) {
-        if(l == ls || !lines.get(l++).equals(line)) return true;
-      }
-    }
-    return l != ls;
   }
 
   /**

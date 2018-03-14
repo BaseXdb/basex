@@ -334,7 +334,7 @@ public final class ProjectView extends BaseXPanel {
 
     if(save) {
       gui.gopts.set(GUIOptions.PROJECTPATH, path.path());
-      gui.gopts.write();
+      gui.saveOptions();
     }
     root.file = path;
     root.refresh();

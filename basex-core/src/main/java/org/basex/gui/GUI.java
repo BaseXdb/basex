@@ -252,7 +252,7 @@ public final class GUI extends JFrame implements BaseXWindow {
    * Saves the current configuration.
    */
   public void saveOptions() {
-    editor.saveOptions();
+    gopts.set(GUIOptions.OPEN, editor.openFiles());
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
     gopts.set(GUIOptions.MAXSTATE, max);
     if(!max) {
@@ -738,7 +738,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
       private void writeVersion(final Version version) {
         gopts.set(GUIOptions.UPDATEVERSION, version.toString());
-        gopts.write();
+        saveOptions();
       }
     }.execute();
   }
