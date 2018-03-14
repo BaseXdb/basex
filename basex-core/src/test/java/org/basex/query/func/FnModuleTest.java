@@ -241,8 +241,12 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query("(1,not#1)[. instance of function(*)] ! " + func.args(" 1", " ."), "false");
     query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
-
     check(func.args(" ()", " boolean#1"), "", empty());
+
+    // pre-compute result size
+    query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
+    check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')', 40,
+        exists(FnForEach.class));
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
@@ -269,6 +273,16 @@ public final class FnModuleTest extends QueryPlanTest {
         func.args("A", "B", " ."), "AB");
 
     query("sort(" + func.args(" ('aa','bb')", " (2,2)", " substring#2") + ')', "a\nb");
+
+    // pre-compute result size
+    check("count(" + func.args(" 1 to 10000000000", " 1 to 10000000000",
+        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(FnForEachPair.class));
+    check("count(" + func.args(" 1 to 20000000000", " 1 to 10000000000",
+        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(FnForEachPair.class));
+    check("count(" + func.args(" 1 to 10000000000", " 1 to 20000000000",
+        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(FnForEachPair.class));
+    check("count(" + func.args(" 1 to 20", " 1 to 20", " function($a,$b) { $a,$b }") + ')', 40,
+        exists(FnForEachPair.class));
 
     check(func.args(" ()", "a", " matches#2"), "", empty());
     check(func.args("aa", " ()", " matches#2"), "", empty());

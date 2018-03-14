@@ -61,7 +61,11 @@ public class FnForEach extends StandardFunc {
     final boolean updating = this instanceof UpdateForEach;
     final Expr expr2 = exprs[1];
     final Type type2 = expr2.seqType().type;
-    if(type2 instanceof FuncType && !updating) exprType.assign(((FuncType) type2).declType.type);
+    if(type2 instanceof FuncType && !updating) {
+      final SeqType ft2 = ((FuncType) type2).declType;
+      final long size = ft2.one() ? expr1.size() : -1;
+      exprType.assign(ft2.type, ft2.mayBeEmpty() ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
+    }
 
     final long size1 = expr1.size();
     if(allAreValues(false) && size1 <= UNROLL_LIMIT) {
