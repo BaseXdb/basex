@@ -3,11 +3,14 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -163,11 +166,47 @@ public class FnSubsequence extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
+
+    // faster retrieval of specified lines
+    if(exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value)) {
+      final long[] range = range(cc.qc);
+      if(range != null) return readTextLines(this, range[0], range[1], cc, info);
+    }
     return this;
+  }
+
+  /**
+   * Creates an updated version of {@link FileReadTextLines}.
+   * @param func calling function
+   * @param start first item to return
+   * @param length number of items to return
+   * @param cc compilation context
+   * @param info input info
+   * @return optimized expression, or calling function
+   * @throws QueryException query exception
+   */
+  public static Expr readTextLines(final StandardFunc func, final long start, final long length,
+      final CompileContext cc, final InputInfo info) throws QueryException {
+
+    final Expr arg = func.exprs[0];
+    if(arg instanceof FileReadTextLines) {
+      final Expr[] args = ((Arr) arg).exprs;
+      final int el = args.length;
+      if(el < 4) {
+        final ExprList list = new ExprList();
+        list.add(args);
+        if(el < 2) list.add(Str.get(Strings.UTF8));
+        if(el < 3) list.add(Bln.FALSE);
+        list.add(Int.get(start));
+        list.add(Int.get(length));
+        return cc.function(Function._FILE_READ_TEXT_LINES, info, list.finish());
+      }
+    }
+    return func;
   }
 }

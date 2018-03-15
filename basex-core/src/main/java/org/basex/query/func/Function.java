@@ -938,8 +938,9 @@ public enum Function {
   _FILE_READ_TEXT(FileReadText.class, "read-text(path[,encoding[,fallback]])",
       arg(STR_O, STR_O, BLN_O), STR_O, flag(NDT), FILE_URI),
   /** XQuery function. */
-  _FILE_READ_TEXT_LINES(FileReadTextLines.class, "read-text-lines(path[,encoding[,fallback]])",
-      arg(STR_O, STR_O, BLN_O), STR_ZM, flag(NDT), FILE_URI),
+  _FILE_READ_TEXT_LINES(FileReadTextLines.class,
+      "read-text-lines(path[,encoding[,fallback[,offset[,length]]]])",
+      arg(STR_O, STR_O, BLN_O, ITR_O, ITR_O), STR_ZM, flag(NDT), FILE_URI),
   /** XQuery function. */
   _FILE_RESOLVE_PATH(FileResolvePath.class, "resolve-path(path[,base])",
       arg(STR_O, STR_O), STR_O, flag(NDT), FILE_URI),

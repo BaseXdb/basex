@@ -44,12 +44,14 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (<a/>,<b/>)", " <_>1</_>"), "<a/>");
 
     check(func.args(" prof:void(())", 0), "", empty(name));
-    check(func.args(" (7 to 9)[. = 8]", 1), 8, exists(name), type(name, "xs:integer?"));
     check(func.args(" (7 to 9)[. = 8]", -1), "", empty());
     check(func.args(" (7 to 9)[. = 8]", 0), "", empty());
     check(func.args(" (7 to 9)[. = 8]", 1.5), "", empty());
     check(func.args(" 1[. = 1]", 1), 1, empty(name));
     check(func.args(" 1[. = 1]", 2), "", empty());
+
+    check(func.args(" (7 to 9)[. = 8]", 1), 8, exists(FnHead.class),
+        type(Util.className(FnHead.class), "xs:integer?"));
   }
 
   /** Test method. */

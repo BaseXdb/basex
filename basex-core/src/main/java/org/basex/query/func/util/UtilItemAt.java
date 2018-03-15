@@ -3,6 +3,7 @@ package org.basex.query.func.util;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -54,9 +55,15 @@ public final class UtilItemAt extends StandardFunc {
       if(dp != ps || ps < 1) return Empty.SEQ;
       // pre-evaluate single expression with static position
       if(st.zeroOrOne()) return ps == 1 ? expr : Empty.SEQ;
-      // check for large values
-      if(expr instanceof Value) return ps <= expr.size() ? ((Value) expr).itemAt(ps - 1) :
-        Empty.SEQ;
+      // pre-evaluate values
+      if(expr instanceof Value) {
+        return ps <= expr.size() ? ((Value) expr).itemAt(ps - 1) : Empty.SEQ;
+      }
+      // rewrite retrieval of first item
+      if(ps == 1) return cc.function(Function.HEAD, info, exprs[0]);
+
+      // faster retrieval of single line
+      return FnSubsequence.readTextLines(this, ps, 1, cc, info);
     }
     return this;
   }
