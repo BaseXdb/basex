@@ -137,7 +137,7 @@ public final class List extends Arr {
           for(int o = 0; o < el && size1 != -1; o++) {
             final long size2 = iter(o).size();
             offsets[o] = size1;
-            size1 = size2 == -1 ? -1 : size1 + size2;
+            size1 = size2 == -1 || size1 + size2 < 0 ? -1 : size1 + size2;
           }
           size = size1;
         }
