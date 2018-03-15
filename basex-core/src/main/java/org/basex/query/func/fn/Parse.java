@@ -135,7 +135,6 @@ public abstract class Parse extends StandardFunc {
     return StrSeq.get(tl);
   }
 
-
   /**
    * Returns an iterator for the lines of the specified text.
    * @param string text string
@@ -168,5 +167,4 @@ public abstract class Parse extends StandardFunc {
       throw Util.notExpected(ex);
     }
   }
-
 }
