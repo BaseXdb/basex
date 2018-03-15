@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.file.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -32,6 +33,6 @@ public final class FnHead extends StandardFunc {
       return cc.function(Function._UTIL_LAST_FROM, info, ((Arr) expr).exprs);
 
     // faster retrieval of single line
-    return FnSubsequence.readTextLines(this, 1, 1, cc, info);
+    return FileReadTextLines.rewrite(this, 1, 1, cc, info);
   }
 }

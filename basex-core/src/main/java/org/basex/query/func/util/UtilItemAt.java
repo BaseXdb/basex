@@ -3,7 +3,7 @@ package org.basex.query.func.util;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
+import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -33,7 +33,7 @@ public final class UtilItemAt extends StandardFunc {
     final long size = iter.size();
     if(size >= 0) return pos > size ? null : iter.get(pos - 1);
 
-    // loop through all items
+    // iterate until specified item is found
     long p = 0;
     for(Item item; (item = qc.next(iter)) != null;) {
       if(++p == pos) return item;
@@ -63,7 +63,7 @@ public final class UtilItemAt extends StandardFunc {
       if(ps == 1) return cc.function(Function.HEAD, info, exprs[0]);
 
       // faster retrieval of single line
-      return FnSubsequence.readTextLines(this, ps, 1, cc, info);
+      return FileReadTextLines.rewrite(this, ps, 1, cc, info);
     }
     return this;
   }

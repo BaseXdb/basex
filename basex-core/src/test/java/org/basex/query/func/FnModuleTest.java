@@ -622,6 +622,69 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void subsequence() {
+    final Function func = Function.SUBSEQUENCE;
+
+    // static rewrites
+    query(func.args(" ()", 0), "");
+    query(func.args("A", 0), "A");
+    query(func.args("A", 0, 0), "");
+    query(func.args("A", 1), "A");
+    query(func.args("A", 1), "A");
+    query(func.args("A", 1, 1), "A");
+    query(func.args(" (1, 2)", 2, 0), "");
+    query(func.args(" (1, 2)", 2, 1), 2);
+    query(func.args(" (1 to 3)", 2, 2), "2\n3");
+
+    // special offset and length values
+    query(func.args("A", 0.5), "A");
+    query(func.args("A", " xs:double('NaN')"), "");
+    query(func.args("A", 1, " xs:double('NaN')"), "");
+
+    // known result size, iterative evaluation
+    query(func.args(" (1 to 2) ! (. + 1)", 2), 3);
+    query(func.args(" (1 to 3) ! (. + 1)", 2, 1), 3);
+    query(func.args(" (1 to 3) ! (. + 1)", 2), "3\n4");
+    query(func.args(" (1 to 3) ! (. + 1)", 3), 4);
+    query(func.args(" (1 to 3) ! (. + 1)", 4), "");
+
+    // non-numeric offsets and lengths
+    query(func.args(" (1 to 3)", " <_>0</_>"), "1\n2\n3");
+    query(func.args(" (1 to 3)", " <_>0</_>", 10), "1\n2\n3");
+    query(func.args(" (1 to 3)", " <_>0</_>", " <_>10</_>"), "1\n2\n3");
+    query(func.args(" (1 to 3)", 0, " <_>10</_>"), "1\n2\n3");
+    query(func.args(" (1 to 2)", " <_>2</_>"), 2);
+    query(func.args(" (1 to 2)", " <_>2</_>", 1), 2);
+    query(func.args(" (1 to 2)", " <_>2</_>", " <_>1</_>"), 2);
+    query(func.args(" (1 to 2)", 2, " <_>1</_>"), 2);
+
+    // known result size
+    query(func.args(" <_>1</_> + 1", 1), 2);
+    query(func.args(" (<_>1</_> + 1, 2)", 2), 2);
+    query(func.args(" (<_>1</_> + 1, 2)", 3), "");
+    query(func.args(" (<_>1</_> + 1, 2, 3)", 2) + "[2]", 3);
+    query(func.args(" prof:void(())", 1), "");
+    query(func.args(" prof:void(())", 2), "");
+
+    // unknown result size
+    query(func.args(" 1[. = 0]", 1), "");
+    query(func.args(" 1[. = 1]", 1), 1);
+    query(func.args(" 1[. = 0]", 2), "");
+    query(func.args(" 1[. = 1]", 2), "");
+    query(func.args(" (1 to 2)[. = 0]", 1), "");
+    query(func.args(" (1 to 4)[. < 3]", 1), "1\n2");
+    query(func.args(" (1 to 2)[. = 0]", 2), "");
+    query(func.args(" (1 to 4)[. < 3]", 2), 2);
+
+    // value-based iterator
+    query(func.args(" tokenize(<_></_>)", 3), "");
+    query(func.args(" tokenize(<_>W</_>)", 3), "");
+    query(func.args(" tokenize(<_>W X</_>)", 3), "");
+    query(func.args(" tokenize(<_>W X Y</_>)", 3), "Y");
+    query(func.args(" tokenize(<_>W X Y Z</_>)", 3), "Y\nZ");
+  }
+
+  /** Test method. */
   @Test public void substring() {
     final Function func = Function.SUBSTRING;
     contains(func.args("'ab'", " [2]"), "b");
@@ -681,6 +744,34 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 1[. = 1]", "a"), 1, exists("FnSum[@type = 'xs:anyAtomicType']"));
     check(func.args(" 1[. = 1]", " 1[. = 1]"), 1, exists("FnSum[@type = 'xs:integer?']"));
     check(func.args(" 1[. = 1]", " 'a'[. = 'a']"), 1, exists("FnSum[@type = 'xs:anyAtomicType?']"));
+  }
+
+  /** Test method. */
+  @Test public void tail() {
+    final Function func = Function.TAIL;
+
+    // static rewrites
+    query(func.args(" ()"), "");
+    query(func.args("A"), "");
+    query(func.args(" (1,2)"), 2);
+    query(func.args(" (1 to 3)"), "2\n3");
+
+    // known result size
+    query(func.args(" <_>1</_> + 1"), "");
+    query(func.args(" (<_>1</_> + 1, 2)"), 2);
+    query(func.args(" prof:void(())"), "");
+
+    // unknown result size
+    query(func.args(" 1[. = 0]"), "");
+    query(func.args(" 1[. = 1]"), "");
+    query(func.args(" (1 to 2)[. = 0]"), "");
+    query(func.args(" (1 to 4)[. < 3]"), 2);
+
+    // value-based iterator
+    query(func.args(" tokenize(<_></_>)"), "");
+    query(func.args(" tokenize(<_>X</_>)"), "");
+    query(func.args(" tokenize(<_>X Y</_>)"), "Y");
+    query(func.args(" tokenize(<_>X Y Z</_>)"), "Y\nZ");
   }
 
   /** Test method. */

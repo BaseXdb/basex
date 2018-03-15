@@ -8,9 +8,14 @@ import java.nio.file.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -33,22 +38,54 @@ public final class FileReadTextLines extends FileRead {
     final String encoding = toEncoding(1, FILE_UNKNOWN_ENCODING_X, qc);
     final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
     final long start = exprs.length < 4 ? 1 : toLong(exprs[3], qc);
-    final long end = exprs.length < 5 ? Long.MAX_VALUE : start + toLong(exprs[4], qc) - 1;
+    final long length = exprs.length < 5 ? Long.MAX_VALUE : toLong(exprs[4], qc);
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
-    final TokenList tl = new TokenList();
     try(NewlineInput ni = new NewlineInput(new IOFile(path.toFile()))) {
       ni.encoding(encoding).validate(validate);
-      int c = 0;
-      for(String line; (line = ni.readLine()) != null;) {
-        if(++c >= start) tl.add(line);
-        if(c == end) break;
+
+      // end exceeds maximum: use maximum (too large to be reached)
+      final long end = start + length < 0 ? Long.MAX_VALUE : start + length;
+      final TokenBuilder tb = new TokenBuilder();
+      final TokenList tl = new TokenList();
+      for(long c = 1; c < end; c++) {
+        if(!ni.readLine(tb)) break;
+        if(c >= start) tl.add(tb.toArray());
       }
+      return StrSeq.get(tl);
+
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
     }
-    return StrSeq.get(tl);
+  }
+
+  /**
+   * Creates an updated version of {@link FileReadTextLines}.
+   * @param func calling function
+   * @param start first item to return
+   * @param length number of items to return
+   * @param cc compilation context
+   * @param info input info
+   * @return optimized expression, or calling function
+   * @throws QueryException query exception
+   */
+  public static Expr rewrite(final StandardFunc func, final long start, final long length,
+      final CompileContext cc, final InputInfo info) throws QueryException {
+
+    final Expr arg = func.exprs[0];
+    if(arg instanceof FileReadTextLines) {
+      final Expr[] args = ((Arr) arg).exprs;
+      final int al = args.length;
+      if(al < 4) {
+        final ExprList list = new ExprList().add(args);
+        if(al < 2) list.add(Str.get(Strings.UTF8));
+        if(al < 3) list.add(Bln.FALSE);
+        list.add(Int.get(start)).add(Int.get(length));
+        return cc.function(Function._FILE_READ_TEXT_LINES, info, list.finish());
+      }
+    }
+    return func;
   }
 }

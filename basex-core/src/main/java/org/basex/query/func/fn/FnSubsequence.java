@@ -5,12 +5,10 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -24,40 +22,50 @@ public class FnSubsequence extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final long[] range = range(qc);
     // no range: return empty sequence
+    final long[] range = range(qc);
     if(range == null) return Empty.ITER;
 
-    // return all values
+    // create iterator
     final Iter iter = exprs[0].iter(qc);
     if(range == ALL) return iter;
 
+    // return empty iterator if iterator yields 0 items
+    final long sz = iter.size();
+    if(sz == 0) return Empty.ITER;
+
     // compute start, length
-    final long st = range[0], ln = range[1], size = iter.size();
-    final long max = ln == Long.MAX_VALUE ? ln : st + ln;
-    final long start = Math.max(1, st), end = Math.min(max, size + 1);
+    final long s = range[0], l = range[1], max = l == Long.MAX_VALUE ? l : s + l;
+    final long start = Math.max(1, s), end = Math.min(max, sz + 1);
 
-    // fast route if the size is known
-    if(size >= 0) return new Iter() {
-      final long s = Math.max(0, end - start);
-      long c = start;
+    // return subsequence iterator if iterator is value-based
+    final Value value = iter.value();
+    final long size = Math.max(0, end - start);
+    if(value != null) return value.subSequence(start - 1, size, qc).iter();
 
-      @Override
-      public Item next() throws QueryException {
-        qc.checkStop();
-        return c < end ? iter.get(c++ - 1) : null;
-      }
-      @Override
-      public Item get(final long i) throws QueryException {
-        return iter.get(start + i - 1);
-      }
-      @Override
-      public long size() {
-        return s;
-      }
-    };
+    // return optimized iterator if result size is known
+    if(sz > 0) {
+      if(size == 0) return Empty.ITER;
+      return new Iter() {
+        long c = start;
 
-    // return simple iterator if number of returned values is unknown
+        @Override
+        public Item next() throws QueryException {
+          qc.checkStop();
+          return c < end ? iter.get(c++ - 1) : null;
+        }
+        @Override
+        public Item get(final long i) throws QueryException {
+          return iter.get(start + i - 1);
+        }
+        @Override
+        public long size() {
+          return size;
+        }
+      };
+    }
+
+    // otherwise, return standard iterator
     return new Iter() {
       long c;
 
@@ -78,19 +86,19 @@ public class FnSubsequence extends StandardFunc {
     final Expr expr = exprs[0];
     if(range == ALL) return expr.value(qc);
 
+    final long st = range[0], ln = range[1];
     final Iter iter = expr.iter(qc);
     final long size = iter.size();
-    final Value value = iter.value();
 
-    // return subsequence if value access is cheap
-    final long st = range[0], ln = range[1];
+    // return subsequence if iterator is value-based
+    final Value value = iter.value();
     if(value != null) {
       final long start = Math.max(0, st - 1);
       final long length = Math.min(size - start, ln + Math.min(0, st - 1));
       return length <= 0 ? Empty.SEQ : value.subSequence(start, length, qc);
     }
 
-    // take fast route if the size is known
+    // take fast route if result size is known
     if(size >= 0) {
       final long start = Math.max(0, st - 1);
       final long length = Math.min(size - start, ln + Math.min(0, st - 1));
@@ -101,6 +109,7 @@ public class FnSubsequence extends StandardFunc {
       return vb.value();
     }
 
+    // otherwise, retrieve all items
     final long max = ln == Long.MAX_VALUE ? ln : st + ln;
     final ValueBuilder vb = new ValueBuilder(qc);
     Item item;
@@ -113,7 +122,7 @@ public class FnSubsequence extends StandardFunc {
   /**
    * Returns the start position and length of the requested sub sequence.
    * @param qc query context
-   * @return range or {@code null}
+   * @return range (start and length) or {@code null}
    * @throws QueryException query exception
    */
   private long[] range(final QueryContext qc) throws QueryException {
@@ -166,47 +175,21 @@ public class FnSubsequence extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
 
-    // faster retrieval of specified lines
     if(exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value)) {
       final long[] range = range(cc.qc);
-      if(range != null) return readTextLines(this, range[0], range[1], cc, info);
-    }
-    return this;
-  }
-
-  /**
-   * Creates an updated version of {@link FileReadTextLines}.
-   * @param func calling function
-   * @param start first item to return
-   * @param length number of items to return
-   * @param cc compilation context
-   * @param info input info
-   * @return optimized expression, or calling function
-   * @throws QueryException query exception
-   */
-  public static Expr readTextLines(final StandardFunc func, final long start, final long length,
-      final CompileContext cc, final InputInfo info) throws QueryException {
-
-    final Expr arg = func.exprs[0];
-    if(arg instanceof FileReadTextLines) {
-      final Expr[] args = ((Arr) arg).exprs;
-      final int el = args.length;
-      if(el < 4) {
-        final ExprList list = new ExprList();
-        list.add(args);
-        if(el < 2) list.add(Str.get(Strings.UTF8));
-        if(el < 3) list.add(Bln.FALSE);
-        list.add(Int.get(start));
-        list.add(Int.get(length));
-        return cc.function(Function._FILE_READ_TEXT_LINES, info, list.finish());
+      if(range != null) {
+        // all values?
+        if(range == ALL) return expr;
+        // faster retrieval of specified lines
+        return FileReadTextLines.rewrite(this, range[0], range[1], cc, info);
       }
     }
-    return func;
+    return this;
   }
 }

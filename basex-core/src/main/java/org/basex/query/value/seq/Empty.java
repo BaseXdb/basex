@@ -35,7 +35,7 @@ public final class Empty extends Value {
     }
     @Override
     public Value value(final QueryContext qc) {
-      return value();
+      return SEQ;
     }
   };
 
