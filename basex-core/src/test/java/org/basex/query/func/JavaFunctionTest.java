@@ -194,4 +194,10 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   public void data() {
     query("Q{java:java.util.ArrayList}new()", "[]");
   }
+
+  /** Retrieve function items as Java objects. */
+  @Test
+  public void toJava() {
+    query("import module namespace set = \"java:java.util.HashSet\"; set:add(true#0)", "true");
+  }
 }
