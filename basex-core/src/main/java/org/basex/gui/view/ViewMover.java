@@ -14,10 +14,8 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 final class ViewMover extends BaseXPanel {
-  /** Panel height. */
-  private int height;
   /** Flag if current mover is active. */
-  private boolean active;
+  private boolean move;
   /** Indicates if cursor is placed inside the mover. */
   private boolean in;
 
@@ -32,7 +30,7 @@ final class ViewMover extends BaseXPanel {
     addMouseListener(this);
     addMouseMotionListener(this);
     setCursor(GUIConstants.CURSORMOVE);
-    refreshLayout();
+    setPreferredSize(new Dimension(getPreferredSize().width, SEPARATOR_SIZE));
 
     new BaseXPopup(this, new GUIPopupCmd(Text.CLOSE) {
       @Override
@@ -42,16 +40,11 @@ final class ViewMover extends BaseXPanel {
 
   @Override
   public void paintComponent(final Graphics g) {
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
-    final int w = getWidth();
-    final int h = getHeight();
-    g.setColor(GUIConstants.color(active ? 5 : in ? 3 : 1));
+    final int w = getWidth(), h = getHeight();
+    g.setColor(GUIConstants.PANEL);
     g.fillRect(0, 0, w, h);
-    g.setColor(GUIConstants.color(active ? 16 : in ? 13 : 10));
-    final int d = height >> 1;
-    for(int x = -d >> 1; x < w; x += 2 + (height >> 2)) g.drawLine(x + d, 0, x, h - 1);
-    g.drawRect(0, 0, w - 1, h - 1);
+    g.setColor(move || in ? GUIConstants.mgray : GUIConstants.gray);
+    for(int y = h - 1; y >= 0; y -= 2) g.drawLine(0, y, w, y);
   }
 
   @Override
@@ -60,26 +53,25 @@ final class ViewMover extends BaseXPanel {
     Component comp = view;
     while(!((comp = comp.getParent()) instanceof ViewContainer));
 
-    final Point a = getLocationOnScreen();
-    final Point b = comp.getLocationOnScreen();
+    final Point a = getLocationOnScreen(), b = comp.getLocationOnScreen();
     final Point c = new Point(a.x - b.x + e.getX(), a.y - b.y + e.getY());
     ((ViewContainer) comp).dragPanel(view, c);
-    active = true;
+    move = true;
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    active = true;
+    move = true;
     repaint();
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(!active) return;
+    if(!move) return;
     Component comp = this;
     while(!((comp = comp.getParent()) instanceof ViewContainer));
     ((ViewContainer) comp).dropPanel();
-    active = false;
+    move = false;
     repaint();
   }
 
@@ -93,13 +85,5 @@ final class ViewMover extends BaseXPanel {
   public void mouseExited(final MouseEvent e) {
     in = false;
     repaint();
-  }
-
-  /**
-   * Called when GUI design has changed.
-   */
-  public void refreshLayout() {
-    height = Math.max(10, 6 + (int) (GUIConstants.fontSize * 0.333));
-    setPreferredSize(new Dimension(getPreferredSize().width, height));
   }
 }

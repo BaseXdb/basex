@@ -17,10 +17,10 @@ final class ViewAlignment implements ViewLayout {
 
   /**
    * Constructor.
-   * @param h alignment (horizontal/vertical)
+   * @param horiz alignment (horizontal/vertical)
    */
-  ViewAlignment(final boolean h) {
-    horiz = h;
+  ViewAlignment(final boolean horiz) {
+    this.horiz = horiz;
   }
 
   /**

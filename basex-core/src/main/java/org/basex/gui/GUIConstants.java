@@ -210,6 +210,8 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   public static Color lgray;
   /** Button color. */
   public static Color gray;
+  /** Middle gray color. */
+  public static Color mgray;
   /** Background color. */
   public static Color dgray;
 
@@ -312,6 +314,7 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   public static synchronized void init(final GUIOptions opts) {
     lgray = color(224, 224, 224);
     gray = color(160, 160, 160);
+    mgray = color(128, 128, 128);
     dgray = color(64, 64, 64);
 
     // create color array

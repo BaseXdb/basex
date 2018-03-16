@@ -214,12 +214,7 @@ public final class ViewNotifier {
    * Notifies all views of layout changes.
    */
   public void layout() {
-    for(final View v : view) {
-      v.refreshLayout();
-      final ViewPanel vp = (ViewPanel) v.getParent();
-      final ViewMover vm = (ViewMover) vp.getComponent(0);
-      vm.refreshLayout();
-    }
+    for(final View v : view) v.refreshLayout();
   }
 
   /**

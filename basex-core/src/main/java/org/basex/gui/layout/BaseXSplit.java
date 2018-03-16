@@ -141,7 +141,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     for(final double d : propSize) if(d == 0) c--;
 
     // set bounds of all components
-    final int sz = (horizontal ? w : h) - c * BaseXSplitSep.SIZE;
+    final int sz = (horizontal ? w : h) - c * SEPARATOR_SIZE;
     double posD = 0;
     boolean invisible = false;
     for(c = 0; c < cl; c++) {
@@ -152,7 +152,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
         invisible = size == 0;
       } else {
         // splitter: hide when last panel was invisible
-        size = invisible ? 0 : BaseXSplitSep.SIZE;
+        size = invisible ? 0 : SEPARATOR_SIZE;
       }
       final int pos = (int) posD;
       if(horizontal) {

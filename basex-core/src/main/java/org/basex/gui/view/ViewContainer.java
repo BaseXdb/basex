@@ -249,10 +249,10 @@ public final class ViewContainer extends BaseXBack {
 
     ((Graphics2D) g).setStroke(STROKE);
     if(orient != null) {
-      g.setColor(color(16));
+      g.setColor(dgray);
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
-      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
-      g.setColor(color(8));
+      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+      g.setColor(lgray);
       g.fillRect(pos[0], pos[1], pos[2], pos[3]);
     }
   }

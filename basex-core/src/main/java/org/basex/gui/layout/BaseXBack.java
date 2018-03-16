@@ -12,6 +12,9 @@ import javax.swing.border.*;
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {
+  /** Size of visual separators. */
+  public static final int SEPARATOR_SIZE = 8;
+
   /**
    * Default constructor.
    */

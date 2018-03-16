@@ -14,9 +14,6 @@ import org.basex.gui.*;
  * @author Christian Gruen
  */
 final class BaseXSplitSep extends BaseXBack {
-  /** Size of splitter. */
-  static final int SIZE = 8;
-
   /** Layout: horizontal = true, vertical = false. */
   private final boolean horizontal;
 
@@ -43,10 +40,7 @@ final class BaseXSplitSep extends BaseXBack {
 
   @Override
   public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
-    final int w = getWidth();
-    final int h = getHeight();
-
+    final int w = getWidth(), h = getHeight();
     g.setColor(GUIConstants.PANEL);
     g.fillRect(0, 0, w, h);
     g.setColor(GUIConstants.gray);
