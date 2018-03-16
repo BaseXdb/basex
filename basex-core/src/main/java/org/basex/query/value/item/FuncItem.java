@@ -192,7 +192,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public Object toJava() {
-    throw Util.notExpected();
+    return this;
   }
 
   @Override
