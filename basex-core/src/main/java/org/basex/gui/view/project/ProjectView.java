@@ -308,9 +308,7 @@ public final class ProjectView extends BaseXPanel {
    */
   void open(final IOFile file, final String search) {
     final EditorArea ea = gui.editor.open(file);
-    if(ea != null) {
-      SwingUtilities.invokeLater(() -> ea.jump(search));
-    }
+    if(ea != null) SwingUtilities.invokeLater(() -> ea.jump(search));
   }
 
   /**
