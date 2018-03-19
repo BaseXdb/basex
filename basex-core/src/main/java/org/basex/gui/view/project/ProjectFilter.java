@@ -137,6 +137,7 @@ final class ProjectFilter extends BaseXBack {
       public void keyPressed(final KeyEvent e) {
         if(combo.isPopupVisible()) return;
         if(BaseXKeys.SELECTALL.is(e)) {
+          combo.textField().selectAll();
           view.list.dispatchEvent(e);
         } else {
           for(final GUIPopupCmd cmd : view.list.commands) {

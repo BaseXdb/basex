@@ -73,38 +73,15 @@ final class ProjectList extends JList<String> {
    * @param srch content search string
    */
   void setElements(final String[] list, final String srch) {
-    // set new values and selections
-    if(changed(list)) {
-      // check which old values had been selected
-      final List<String> values = getSelectedValuesList();
-      final IntList il = new IntList();
-      for(final String value : values) {
-        final int is = list.length;
-        for(int i = 0; i < is; i++) {
-          if(value.equals(list[i])) {
-            il.add(i);
-            break;
-          }
-        }
-      }
-      setListData(list);
-      setSelectedIndices(il.finish());
-    }
-    search = srch;
-  }
+    // only update list if the values have changed (preserves selections)
+    final List<String> values = getSelectedValuesList();
+    final int ll = list.length, vs = values.size();
+    boolean same = ll == vs;
+    for(int l = 0; same && l < ll; l++) same = list[l].equals(values.get(l));
+    if(!same) setListData(list);
 
-  /**
-   * Checks if the list contents have changed.
-   * @param list entries to set
-   * @return result of check
-   */
-  private boolean changed(final String[] list) {
-    final int sl = list.length, el = getModel().getSize();
-    if(sl != el) return true;
-    for(int i = 0; i < sl; i++) {
-      if(!list[i].equals(getModel().getElementAt(i))) return true;
-    }
-    return false;
+    // remember search string
+    search = srch;
   }
 
   /**

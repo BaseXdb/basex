@@ -197,15 +197,11 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Jumps to the specified string.
-   * @param string search string (ignored if empty)
+   * @param string search string
    */
   public void jump(final String string) {
-    if(string.isEmpty()) {
-      search.deactivate(true);
-    } else {
-      search.activate(string, false);
-      SwingUtilities.invokeLater(() -> jump(SearchDir.CURRENT, true));
-    }
+    search.activate(string, false);
+    SwingUtilities.invokeLater(() -> jump(SearchDir.CURRENT, true));
   }
 
   /**

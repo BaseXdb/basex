@@ -329,7 +329,7 @@ public final class EditorView extends View {
    */
   public void jumpToFile() {
     final EditorArea editor = getEditor();
-    if(editor.opened()) project.jumpTo(editor.file(), true);
+    project.jumpTo(editor.file(), true);
   }
 
   /**
@@ -660,21 +660,18 @@ public final class EditorView extends View {
    */
   private void closeEditor(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();
-    if(!confirm(ea)) return;
+    final int t = tabs.getTabCount();
+    // check if single tab is unchanged, or if user cancels operation
+    if((t == 1 && !ea.modified() && !ea.opened()) || !confirm(ea)) return;
 
     // remove reference to last executed file
     if(execFile != null && ea.file().path().equals(execFile.path())) execFile = null;
     tabs.remove(ea);
-    final int t = tabs.getTabCount(), i = tabs.getSelectedIndex();
-    if(t == 0) {
-      // no panels left: close search bar
-      search.deactivate(true);
-      // reopen single tab and focus project listener
+    // no panels left: open default tab
+    if(t == 1) {
       addTab();
       SwingUtilities.invokeLater(this::toggleProject);
-    } else if(i == t) {
-      // if necessary, activate last editor tab
-      tabs.setSelectedIndex(i - 1);
+    } else {
       focusEditor();
     }
   }
