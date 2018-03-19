@@ -80,20 +80,6 @@ public final class Prop {
 
   // determine project home directory for storing property files and directories...
   static {
-    // check system property 'org.basex.path'
-    String homedir = System.getProperty(PATH);
-    // check if current working directory contains configuration file
-    if(homedir == null) homedir = configDir(System.getProperty("user.dir"));
-    // check if application directory contains configuration file
-    if(homedir == null) homedir = configDir(applicationDir());
-    // check if application directory contains configuration file
-    if(homedir == null) {
-      // linux: check HOME variable (#773)
-      final String home = System.getenv("HOME");
-      homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT_NAME;
-    }
-    HOMEDIR = dir(homedir);
-
     // retrieve application URL
     URL location = null;
     final ProtectionDomain pd = Prop.class.getProtectionDomain();
@@ -102,6 +88,19 @@ public final class Prop {
       if(cs != null) location = cs.getLocation();
     }
     LOCATION = location;
+
+    // check system property 'org.basex.path'
+    String homedir = System.getProperty(PATH);
+    // check if current working directory contains configuration file
+    if(homedir == null) homedir = configDir(System.getProperty("user.dir"));
+    // check if application directory contains configuration file
+    if(homedir == null) homedir = configDir(applicationDir(location));
+    // fallback: choose home directory (linux: check HOME variable, GH-773)
+    if(homedir == null) {
+      final String home = System.getenv("HOME");
+      homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT_NAME;
+    }
+    HOMEDIR = dir(homedir);
   }
 
   // STATIC OPTIONS ===============================================================================
@@ -138,15 +137,14 @@ public final class Prop {
 
   /**
    * Returns the application directory.
+   * @param location location of application
    * @return application directory (can be {@code null})
    */
-  private static String applicationDir() {
-    if(LOCATION != null) {
-      try {
-        return new IOFile(Paths.get(LOCATION.toURI()).toString()).dir();
-      } catch(final Exception ex) {
-        Util.stack(ex);
-      }
+  private static String applicationDir(final URL location) {
+    try {
+      return new IOFile(Paths.get(location.toURI()).toString()).dir();
+    } catch(final Exception ex) {
+      Util.stack(ex);
     }
     return null;
   }
