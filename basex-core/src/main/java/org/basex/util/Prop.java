@@ -97,7 +97,7 @@ public final class Prop {
     if(homedir == null) homedir = configDir(applicationDir(location));
     // fallback: choose home directory (linux: check HOME variable, GH-773)
     if(homedir == null) {
-      final String home = System.getenv("HOME");
+      final String home = WIN ? null : System.getenv("HOME");
       homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT_NAME;
     }
     HOMEDIR = dir(homedir);
