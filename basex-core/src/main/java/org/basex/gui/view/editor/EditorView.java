@@ -248,10 +248,9 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    final IOFile file = getEditor().file();
-    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.name().contains(".");
-    final boolean script = file.hasSuffix(IO.BXSSUFFIX), rt = gui.gopts.get(GUIOptions.EXECRT);
-    go.setEnabled(xquery && !rt || script);
+    final boolean script = getEditor().file().hasSuffix(IO.BXSSUFFIX);
+    final boolean realtime = gui.gopts.get(GUIOptions.EXECRT);
+    go.setEnabled(script || !realtime);
     test.setEnabled(!script);
   }
 
@@ -481,60 +480,49 @@ public final class EditorView extends View {
   void run(final EditorArea editor, final Action action) {
     refreshControls(editor, false);
 
-    final byte[] in = editor.getText();
-    final boolean eq = eq(in, editor.last);
-    if(eq && action == Action.CHECK) return;
+    // skip checks if input has not changed
+    final byte[] text = editor.getText();
+    if(eq(text, editor.last) && action == Action.CHECK) return;
+    editor.last = text;
 
-    final boolean run = action == Action.EXECUTE || action == Action.TEST;
-    if(run && gui.gopts.get(GUIOptions.SAVERUN)) {
+    // save modified files before executing queries
+    if(gui.gopts.get(GUIOptions.SAVERUN) && (action == Action.EXECUTE || action == Action.TEST)) {
       for(final EditorArea edit : editors()) {
         if(edit.opened()) edit.save();
       }
     }
-    editor.last = in;
 
     IOFile file = editor.file();
     final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !file.name().contains(".");
     final boolean script = file.hasSuffix(IO.BXSSUFFIX);
-    if(script && run) {
-      // run query if forced, or if realtime execution is activated
-      gui.execute(true, new Execute(string(in)));
-    } else if(xquery || run) {
-      // check if input is an XQuery main or library module
-      String input = string(in);
-      boolean lib = QueryProcessor.isLibrary(input);
 
-      // check if query is to be executed
-      final boolean exec = action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT);
-      if(exec) {
-        if(lib) {
-          // library module: run recently evaluated main module
+    if(action == Action.TEST) {
+      // test query
+      if(xquery) gui.execute(true, new Test(file.path()));
+    } else if(action == Action.EXECUTE && script) {
+      // execute script
+      gui.execute(true, new Execute(string(text)));
+    } else if(action == Action.EXECUTE || xquery) {
+      // execute or parse query
+      String input = string(text);
+      if(action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT)) {
+        // find main module if current file cannot be evaluated; return early if no module is found
+        if(!xquery || QueryProcessor.isLibrary(input)) {
           final EditorArea ea = execEditor();
-          if(ea != null) {
-            file = ea.file();
-            input = string(ea.getText());
-            lib = false;
-          }
+          if(ea == null) return;
+          file = ea.file();
+          input = string(ea.getText());
         }
-      } else if(input.isEmpty()) {
-        // parse empty query: replace with empty sequence (suppresses errors for plain text files)
-        input = "()";
-      }
-
-      if(exec && !lib) {
-        // run query if forced, or if realtime execution is activated
+        // execute query
         gui.execute(true, new XQuery(input).baseURI(file.path()));
         execFile = file;
-      } else if(action == Action.TEST) {
-        // run query if forced, or if realtime execution is activated
-        gui.execute(true, new Test(file.path()));
-        execFile = file;
       } else {
-        parse(input, file, lib);
+        // parse: replace empty query with empty sequence (suppresses errors for plain text files)
+        parse(input.isEmpty() ? "()" : input, file, QueryProcessor.isLibrary(input));
       }
     } else if(file.hasSuffix(IO.JSONSUFFIX)) {
       try {
-        final IOContent io = new IOContent(in);
+        final IOContent io = new IOContent(text);
         io.name(file.path());
         JsonConverter.get(new JsonParserOptions()).convert(io);
         info(null);
@@ -542,12 +530,12 @@ public final class EditorView extends View {
         info(ex);
       }
     } else if(script || file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.XSLSUFFIXES)) {
-      final ArrayInput ai = new ArrayInput(in);
+      final ArrayInput ai = new ArrayInput(text);
       try {
         // check XML syntax
-        if(startsWith(in, '<') || !script) new XmlParser().parse(ai);
+        if(startsWith(text, '<') || !script) new XmlParser().parse(ai);
         // check command script
-        if(script) CommandParser.get(string(in), gui.context).parse();
+        if(script) CommandParser.get(string(text), gui.context).parse();
         info(null);
       } catch(final Exception ex) {
         info(ex);
