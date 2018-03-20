@@ -344,12 +344,12 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Refreshes the root path.
    * @param path root path
-   * @param save save project path
+   * @param history update history
    */
-  public void rootPath(final IOFile path, final boolean save) {
+  public void rootPath(final IOFile path, final boolean history) {
     rootPath.setText(path.normalize().path());
-    changeRoot(save);
-    if(save) rootPath.store();
+    changeRoot(history);
+    if(history) rootPath.updateHistory();
   }
 
   /**

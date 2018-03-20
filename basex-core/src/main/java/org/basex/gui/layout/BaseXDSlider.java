@@ -72,7 +72,7 @@ public final class BaseXDSlider extends BaseXPanel {
     BaseXLayout.setWidth(this, 200 + LABELW);
     setPreferredSize(new Dimension(getPreferredSize().width, getFont().getSize() + 9));
 
-    addFocusListener(new FocusAdapter() {
+    addFocusListener(new FocusListener() {
       @Override
       public void focusGained(final FocusEvent e) {
         repaint();

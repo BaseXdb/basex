@@ -58,7 +58,7 @@ final class TableHeader extends BaseXPanel {
     // restore default focus traversal with TAB key
     setFocusTraversalKeysEnabled(false);
 
-    addFocusListener(new FocusAdapter() {
+    addFocusListener(new FocusListener() {
       @Override
       public void focusGained(final FocusEvent e) {
         filter(e.getOppositeComponent() instanceof TableView ? 0 :

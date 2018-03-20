@@ -96,7 +96,7 @@ public class TextPanel extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
 
-    addFocusListener(new FocusAdapter() {
+    addFocusListener(new FocusListener() {
       @Override
       public void focusGained(final FocusEvent e) {
         if(isEnabled()) caret(true);

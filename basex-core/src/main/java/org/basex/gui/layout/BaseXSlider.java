@@ -71,7 +71,7 @@ public final class BaseXSlider extends BaseXPanel {
     setFocusable(true);
 
     setPreferredSize(new Dimension(DWIDTH, (int) (getFont().getSize() * 1.2)));
-    addFocusListener(new FocusAdapter() {
+    addFocusListener(new FocusListener() {
       @Override
       public void focusGained(final FocusEvent e) {
         repaint();

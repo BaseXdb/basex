@@ -183,7 +183,7 @@ final class DialogImport extends BaseXBack {
     gui.set(MainOptions.ARCHIVENAME, archiveName.isSelected());
     gui.set(MainOptions.SKIPCORRUPT, skipCorrupt.isSelected());
     gui.set(MainOptions.ADDRAW, addRaw.isSelected());
-    input.store();
+    input.updateHistory();
     parsing.setOptions();
   }
 
