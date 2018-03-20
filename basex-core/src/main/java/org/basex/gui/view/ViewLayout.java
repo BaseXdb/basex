@@ -52,6 +52,26 @@ final class ViewLayout implements ViewComponent {
     list.add(i, comp);
   }
 
+  /**
+   * Removes the specified panel.
+   * @param panel panel to be removed
+   * @return left over component, {@code null} otherwise
+   */
+  ViewComponent delete(final ViewPanel panel) {
+    // number of components changes during iteration
+    for(int c = 0; c < list.size(); c++) {
+      ViewComponent comp = list.get(c);
+      if(comp instanceof ViewLayout) {
+        comp = ((ViewLayout) comp).delete(panel);
+        if(comp != null) list.set(c, comp);
+      } else if(comp == panel) {
+        list.remove(c--);
+      }
+    }
+    // return component if a single one is left over
+    return list.size() == 1 ? list.get(0) : null;
+  }
+
   @Override
   public boolean isVisible() {
     for(final ViewComponent comp : list) {
@@ -63,26 +83,6 @@ final class ViewLayout implements ViewComponent {
   @Override
   public void setVisibility(final boolean db) {
     for(final ViewComponent comp : list) comp.setVisibility(db);
-  }
-
-  /**
-   * Removes the specified panel.
-   * @param panel panel to be removed
-   * @return left over component, {@code null} otherwise
-   */
-  ViewComponent delete(final ViewPanel panel) {
-    // number of components changes
-    for(int c = 0; c < list.size(); c++) {
-      ViewComponent comp = list.get(c);
-      if(comp instanceof ViewLayout) {
-        comp = ((ViewLayout) comp).delete(panel);
-        if(comp != null) list.set(c, comp);
-      } else if(comp == panel) {
-        list.remove(c--);
-      }
-    }
-    // indicates if a single component is left
-    return list.size() < 2 ? list.get(0) : null;
   }
 
   @Override
@@ -97,10 +97,9 @@ final class ViewLayout implements ViewComponent {
 
   @Override
   public String layoutString(final boolean all) {
-    final StringBuilder string = new StringBuilder(horizontal ? "H " : "V ");
-    for(final ViewComponent comp : list) string.append(comp.layoutString(all));
-    string.append("- ");
-    return string.toString();
+    final StringBuilder sb = new StringBuilder(horizontal ? "H " : "V ");
+    for(final ViewComponent comp : list) sb.append(comp.layoutString(all));
+    return sb.append("- ").toString();
   }
 
   @Override

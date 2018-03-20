@@ -60,8 +60,6 @@ public final class GUIOptions extends Options {
 
   /** GUI layout. */
   public static final StringOption VIEWS = new StringOption("VIEWS", GUIConstants.VIEWS);
-  /** GUI layout sizes. */
-  public static final StringOption VIEWSIZES = new StringOption("VIEWSIZES");
 
   /** GUI height. */
   public static final NumbersOption GUISIZE = new NumbersOption("GUISIZE", 1004, 748);

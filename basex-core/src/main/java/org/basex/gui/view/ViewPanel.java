@@ -18,13 +18,13 @@ final class ViewPanel extends BaseXBack implements ViewComponent {
 
   /**
    * Constructor.
-   * @param v view to be stored
+   * @param view view to be stored
    */
-  ViewPanel(final View v) {
+  ViewPanel(final View view) {
+    this.view = view;
     layout(new BorderLayout());
-    add(new ViewMover(v.gui), BorderLayout.NORTH);
-    add(v, BorderLayout.CENTER);
-    view = v;
+    add(new ViewMover(view.gui), BorderLayout.NORTH);
+    add(view, BorderLayout.CENTER);
   }
 
   @Override

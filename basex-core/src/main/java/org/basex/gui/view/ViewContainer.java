@@ -76,20 +76,22 @@ public final class ViewContainer extends BaseXBack {
    * Updates and validates the views.
    */
   public void updateViews() {
-    // update visibility of all components, dependent of the existence of a database
+    // update visibility of all components
     layout.setVisibility(gui.context.data() != null);
 
     // check if the layout of visible components has changed
     final String ls = layout.layoutString(false);
     if(ls.equals(layoutString)) return;
 
+    // remember new layout
+    gui.gopts.set(GUIOptions.VIEWS, layout.layoutString(true));
+    layoutString = ls;
+
     // rebuild views
     removeAll();
     layout.addTo(this);
     validate();
     repaint();
-    gui.gopts.set(GUIOptions.VIEWS, layout.layoutString(true));
-    layoutString = ls;
   }
 
   @Override
@@ -132,7 +134,7 @@ public final class ViewContainer extends BaseXBack {
   /**
    * Adds the dragged view after if it has been removed.
    * @param vl layout instance
-   * @return true if component was successfully added
+   * @return {@code true} if component was successfully added
    */
   private boolean add(final ViewLayout vl) {
     for(int c = 0; c < vl.list.size(); c++) {
