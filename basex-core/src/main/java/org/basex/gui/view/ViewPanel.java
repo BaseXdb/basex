@@ -7,13 +7,12 @@ import org.basex.gui.layout.*;
 import org.basex.util.options.*;
 
 /**
- * This class contains a view reference and adds a {@link ViewMover}
- * on top of the view.
+ * This class contains a view and a {@link ViewMover} on top.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class ViewPanel extends BaseXBack implements ViewLayout {
+final class ViewPanel extends BaseXBack implements ViewComponent {
   /** View reference. */
   private final View view;
 
@@ -34,12 +33,7 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
   }
 
   @Override
-  public boolean delete(final ViewPanel panel) {
-    return this == panel;
-  }
-
-  @Override
-  public void createView(final BaseXBack panel) {
+  public void addTo(final BaseXBack panel) {
     if(isVisible()) panel.add(this);
   }
 

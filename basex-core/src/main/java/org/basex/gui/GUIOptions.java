@@ -58,8 +58,10 @@ public final class GUIOptions extends Options {
   public static final StringOption UPDATEVERSION = new StringOption("UPDATEVERSION",
     VERSION.replaceAll(" .*", ""));
 
-  /** GUI Layout. */
+  /** GUI layout. */
   public static final StringOption VIEWS = new StringOption("VIEWS", GUIConstants.VIEWS);
+  /** GUI layout sizes. */
+  public static final StringOption VIEWSIZES = new StringOption("VIEWSIZES");
 
   /** GUI height. */
   public static final NumbersOption GUISIZE = new NumbersOption("GUISIZE", 1004, 748);

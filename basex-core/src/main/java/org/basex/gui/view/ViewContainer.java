@@ -1,6 +1,5 @@
 package org.basex.gui.view;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
@@ -22,33 +21,34 @@ public final class ViewContainer extends BaseXBack {
   private static final BasicStroke STROKE = new BasicStroke(2);
 
   /** Orientation enumerator. */
-  private enum Target {
+  private enum Location {
     /** North orientation. */ NORTH,
     /** West orientation.  */ WEST,
     /** East orientation.  */ EAST,
     /** South orientation. */ SOUTH
   }
 
-  /** reference to the main window. */
+  /** Reference to the main window. */
   private final GUI gui;
   /** View panels. */
   private final ViewPanel[] views;
+  /** Temporary rectangle position. */
+  private final int[] pos = new int[4];
+  /** Logo. */
+  private final Image logo;
+
   /** View Layout. */
-  private ViewAlignment layout;
+  private ViewLayout layout;
   /** Current layout string. */
   private String layoutString;
   /** Source View. */
   private ViewPanel source;
   /** Target View. */
   private ViewPanel target;
-  /** Logo reference. */
-  private final Image logo;
   /** Target orientation. */
-  private Target orient;
+  private Location location;
   /** Temporary mouse position. */
   private Point sp;
-  /** Temporary rectangle position. */
-  private final int[] pos = new int[4];
 
   /**
    * Constructor.
@@ -57,17 +57,18 @@ public final class ViewContainer extends BaseXBack {
    */
   public ViewContainer(final GUI gui, final View... view) {
     layout(new BorderLayout());
-    setOpaque(true);
-    logo = BaseXImages.get("logo_transparent");
     setBackground(BACK);
+
+    this.gui = gui;
+    logo = BaseXImages.get("logo_256");
 
     final int vl = view.length;
     views = new ViewPanel[vl];
-    for(int i = 0; i < vl; ++i) views[i] = new ViewPanel(view[i]);
-    this.gui = gui;
+    for(int v = 0; v < vl; ++v) views[v] = new ViewPanel(view[v]);
+
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
-      Util.errln(Util.className(this) + ": could not build layout \"%\"", VIEWS);
+      Util.errln(Util.className(this) + ": could not build layout.");
     }
   }
 
@@ -84,7 +85,7 @@ public final class ViewContainer extends BaseXBack {
 
     // rebuild views
     removeAll();
-    layout.createView(this);
+    layout.addTo(this);
     validate();
     repaint();
     gui.gopts.set(GUIOptions.VIEWS, layout.layoutString(true));
@@ -94,21 +95,8 @@ public final class ViewContainer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    if(getComponentCount() != 0) return;
-
-    final int w = getWidth();
-    final int h = getHeight();
-    final int hh = Math.max(220, Math.min(700, h));
-    if(w < 150 || h < 160) return;
-
-    final int lh = logo.getHeight(this);
-    final int y = (hh - lh - 60) / 2;
-    g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
-    if(w < 200 || h < 200) return;
-
-    g.setColor(dgray);
-    g.setFont(lfont);
-    BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 20 + lh);
+    if(getComponentCount() == 0) g.drawImage(logo, (getWidth() - logo.getWidth(this)) / 2,
+        (getHeight() - logo.getHeight(this)) / 2, this);
   }
 
   /**
@@ -129,9 +117,9 @@ public final class ViewContainer extends BaseXBack {
   void dropPanel() {
     if(source == null) return;
 
-    if(orient != null) {
-      if(layout.delete(source) && !(layout.comp[0] instanceof ViewPanel))
-        layout = (ViewAlignment) layout.comp[0];
+    if(location != null) {
+      final ViewComponent comp = layout.delete(source);
+      if(comp instanceof ViewLayout) layout = (ViewLayout) comp;
 
       if(target == null) layout = addView(layout);
       else add(layout);
@@ -143,35 +131,27 @@ public final class ViewContainer extends BaseXBack {
 
   /**
    * Adds the dragged view after if it has been removed.
-   * @param lay layout instance
+   * @param vl layout instance
    * @return true if component was successfully added
    */
-  private boolean add(final ViewAlignment lay) {
-    for(int o = 0; o < lay.comp.length; ++o) {
-      final ViewLayout comp = lay.comp[o];
-      if(comp instanceof ViewAlignment) {
-        if(add((ViewAlignment) comp)) return true;
+  private boolean add(final ViewLayout vl) {
+    for(int c = 0; c < vl.list.size(); c++) {
+      final ViewComponent comp = vl.list.get(c);
+      if(comp instanceof ViewLayout) {
+        if(add((ViewLayout) comp)) return true;
       } else if(comp == target) {
-        final boolean west = orient == Target.WEST;
-        final boolean east = orient == Target.EAST;
-
-        if(orient == Target.NORTH || west) {
-          if(lay.horiz == west) {
-            lay.add(source, o);
+        final boolean west = location == Location.WEST, east = location == Location.EAST;
+        if(location == Location.NORTH || west) {
+          if(vl.horizontal == west) {
+            vl.insert(source, c);
           } else {
-            final ViewAlignment l = new ViewAlignment(west);
-            l.add(source);
-            l.add(target);
-            lay.comp[o] = l;
+            vl.set(new ViewLayout(west, source, target), c);
           }
-        } else if(orient == Target.SOUTH || east) {
-          if(lay.horiz == east) {
-            lay.add(source, o + 1);
+        } else if(location == Location.SOUTH || east) {
+          if(vl.horizontal == east) {
+            vl.insert(source, c + 1);
           } else {
-            final ViewAlignment l = new ViewAlignment(east);
-            l.add(target);
-            l.add(source);
-            lay.comp[o] = l;
+            vl.set(new ViewLayout(east, target, source), c);
           }
         }
         return true;
@@ -182,31 +162,23 @@ public final class ViewContainer extends BaseXBack {
 
   /**
    * Adds the dragged view into the specified layout instance.
-   * @param lay layout instance
+   * @param vl layout instance
    * @return resulting layout
    */
-  private ViewAlignment addView(final ViewAlignment lay) {
-    final boolean west = orient == Target.WEST;
-    final boolean east = orient == Target.EAST;
-    ViewAlignment l = lay;
-
-    if(orient == Target.NORTH || west) {
-      if(l.horiz == west) {
-        l.add(source, 0);
+  private ViewLayout addView(final ViewLayout vl) {
+    final boolean west = location == Location.WEST, east = location == Location.EAST;
+    ViewLayout l = vl;
+    if(location == Location.NORTH || west) {
+      if(l.horizontal == west) {
+        l.insert(source, 0);
       } else {
-        final ViewAlignment ll = new ViewAlignment(west);
-        ll.add(source);
-        ll.add(l);
-        l = ll;
+        l = new ViewLayout(west, source, l);
       }
-    } else if(orient == Target.SOUTH || east) {
-      if(l.horiz == east) {
+    } else if(location == Location.SOUTH || east) {
+      if(l.horizontal == east) {
         l.add(source);
       } else {
-        final ViewAlignment ll = new ViewAlignment(east);
-        ll.add(l);
-        ll.add(source);
-        l = ll;
+        l = new ViewLayout(east, l, source);
       }
     }
     return l;
@@ -248,7 +220,7 @@ public final class ViewContainer extends BaseXBack {
     if(source == null) return;
 
     ((Graphics2D) g).setStroke(STROKE);
-    if(orient != null) {
+    if(location != null) {
       g.setColor(dgray);
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
       ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
@@ -269,7 +241,7 @@ public final class ViewContainer extends BaseXBack {
     pos[2] = ww - 2;
     pos[3] = hh - 2;
 
-    orient = null;
+    location = null;
     target = getTarget();
 
     // paint panel which is currently moved somewhere else
@@ -284,13 +256,13 @@ public final class ViewContainer extends BaseXBack {
           pos[1] = tr.y;
           pos[2] = tr.width;
           pos[3] = miny;
-          orient = Target.NORTH;
+          location = Location.NORTH;
         } else if(sp.y > tr.y + tr.height - miny && sp.y < tr.y + tr.height) {
           pos[0] = tr.x;
           pos[1] = tr.y + tr.height - miny;
           pos[2] = tr.width;
           pos[3] = miny;
-          orient = Target.SOUTH;
+          location = Location.SOUTH;
         }
       } else if(Math.abs(tr.y + tr.height / 2 - sp.y) < tr.height / 3) {
         if(sp.x > tr.x && sp.x < tr.x + minx) {
@@ -298,75 +270,72 @@ public final class ViewContainer extends BaseXBack {
           pos[1] = tr.y;
           pos[2] = minx;
           pos[3] = tr.height;
-          orient = Target.WEST;
+          location = Location.WEST;
         } else if(sp.x > tr.x + tr.width - minx && sp.x < tr.x + tr.width) {
           pos[0] = tr.x + tr.width - minx;
           pos[1] = tr.y;
           pos[2] = minx;
           pos[3] = tr.height;
-          orient = Target.EAST;
+          location = Location.EAST;
         }
       }
     }
 
-    if(orient == null) {
+    if(location == null) {
       final int minx = ww >> 2;
       final int miny = hh >> 2;
       target = null;
       if(sp.y < miny) {
         pos[3] = miny;
-        orient = Target.NORTH;
+        location = Location.NORTH;
       } else if(sp.y > hh - miny) {
         pos[3] = miny;
         pos[1] = hh - miny;
-        orient = Target.SOUTH;
+        location = Location.SOUTH;
       } else if(sp.x < minx) {
         pos[2] = minx;
-        orient = Target.WEST;
+        location = Location.WEST;
       } else if(sp.x > ww - minx) {
         pos[2] = minx;
         pos[0] = ww - minx;
-        orient = Target.EAST;
+        location = Location.EAST;
       }
     }
   }
 
   /**
    * Builds the view layout by parsing the layout string.
-   * @param cnstr layout string
+   * @param string layout string
    * @return true if everything went alright
    */
-  private boolean buildLayout(final String cnstr) {
+  private boolean buildLayout(final String string) {
     try {
       layout = null;
-      int lvl = -1;
-      final ViewAlignment[] l = new ViewAlignment[16];
-      final StringTokenizer st = new StringTokenizer(cnstr);
       int nv = 0;
-      while(st.hasMoreTokens()) {
-        final String t = st.nextToken();
-        if(Strings.eq(t, "H", "V")) {
-          l[lvl + 1] = new ViewAlignment("H".equals(t));
-          if(layout == null) {
-            layout = l[0];
+      final Stack<ViewLayout> layouts = new Stack<>();
+      final StringTokenizer tokens = new StringTokenizer(string);
+      while(tokens.hasMoreTokens()) {
+        final String token = tokens.nextToken();
+        if(Strings.eq(token, "H", "V")) {
+          final ViewLayout view = new ViewLayout("H".equals(token));
+          if(layouts.isEmpty()) {
+            layout = view;
           } else {
-            l[lvl].add(l[lvl + 1]);
+            layouts.peek().add(view);
           }
-          ++lvl;
-        } else if("-".equals(t)) {
-          --lvl;
+          layouts.add(view);
+        } else if("-".equals(token)) {
+          layouts.pop();
         } else {
-          final ViewPanel view = getView(t);
+          final ViewPanel view = getView(token);
           if(view == null) return false;
-          l[lvl].add(view);
+          layouts.peek().add(view);
           ++nv;
         }
       }
-      if(nv == views.length) return true;
-      Util.errln(Util.className(this) + ": initializing views: " + cnstr);
+      return nv == views.length;
     } catch(final Exception ex) {
-      Util.debug(ex);
-      Util.errln(Util.className(this) + ": could not build layout: " + cnstr);
+      Util.errln(ex);
     }
     return false;
   }
