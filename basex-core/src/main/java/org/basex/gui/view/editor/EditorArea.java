@@ -201,7 +201,7 @@ public final class EditorArea extends TextPanel {
    */
   public void jump(final String string) {
     search.activate(string, false);
-    SwingUtilities.invokeLater(() -> jump(SearchDir.CURRENT, true));
+    jump(SearchDir.CURRENT, true);
   }
 
   /**

@@ -53,7 +53,7 @@ public final class EditorView extends View {
   final AbstractButton go;
 
   /** History Button. */
-  private final AbstractButton hist;
+  private final AbstractButton history;
   /** Stop Button. */
   private final AbstractButton stop;
   /** Test button. */
@@ -114,7 +114,7 @@ public final class EditorView extends View {
     final AbstractButton find = search.button(FIND_REPLACE);
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_VARS, gui);
 
-    hist = BaseXButton.get("c_hist", RECENTLY_OPENED, false, gui);
+    history = BaseXButton.get("c_history", RECENTLY_OPENED, false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
     go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
@@ -127,7 +127,7 @@ public final class EditorView extends View {
     buttons.add(newB);
     buttons.add(openB);
     buttons.add(saveB);
-    buttons.add(hist);
+    buttons.add(history);
     buttons.add(Box.createHorizontalStrut(4));
     buttons.add(find);
     buttons.add(Box.createHorizontalStrut(4));
@@ -182,7 +182,7 @@ public final class EditorView extends View {
       pop.add(sas);
       pop.show(saveB, 0, saveB.getHeight());
     });
-    hist.addActionListener(e -> {
+    history.addActionListener(e -> {
       final JPopupMenu pm = new JPopupMenu();
       ActionListener al = ac -> {
         // rewrite and open chosen file
@@ -208,11 +208,11 @@ public final class EditorView extends View {
         }
         pm.add(item).addActionListener(al);
       }
-      al = ac -> hist.getActionListeners()[0].actionPerformed(null);
+      al = ac -> history.getActionListeners()[0].actionPerformed(null);
       if(e != null && pm.getComponentCount() == BaseXHistory.MAXCOMPACT) {
         pm.add(new JMenuItem(DOTS)).addActionListener(al);
       }
-      pm.show(hist, 0, hist.getHeight());
+      pm.show(history, 0, history.getHeight());
     });
     refreshHistory(null);
     info.addMouseListener((MouseClickedListener) e -> markError(true));
@@ -622,7 +622,7 @@ public final class EditorView extends View {
 
     // store sorted history
     gui.gopts.set(GUIOptions.EDITOR, paths.finish());
-    hist.setEnabled(!paths.isEmpty());
+    history.setEnabled(!paths.isEmpty());
   }
 
   /**
