@@ -188,6 +188,13 @@ public class BaseXCombo extends JComboBox<Object> {
     return this;
   }
 
+  @Override
+  public void setFont(final Font font) {
+    super.setFont(font);
+    final BaseXTextField tf = textField();
+    if(hint != null && tf != null) hint.setFont(tf.getFont());
+  }
+
   /**
    * Sets the specified items.
    * @param items items
