@@ -78,7 +78,10 @@ final class ProjectList extends JList<String> {
     final int ll = list.length, ms = model.getSize();
     boolean same = ll == ms;
     for(int l = 0; same && l < ll; l++) same = list[l].equals(model.getElementAt(l));
-    if(!same) setListData(list);
+    if(!same) {
+      setListData(list);
+      if(ll > 0) setSelectedIndex(0);
+    }
 
     // remember search string
     search = srch;
