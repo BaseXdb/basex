@@ -369,7 +369,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     if(i < es) {
       final Item item = exprs[i].item(qc, info);
-      final Map map = item == null ? Map.EMPTY : toMap(exprs[i], qc);
+      final Map map = item == null ? Map.EMPTY : toMap(item);
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it.type.isStringOrUntyped()) {

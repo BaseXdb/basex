@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.core.jobs.*;
 import org.basex.core.users.*;

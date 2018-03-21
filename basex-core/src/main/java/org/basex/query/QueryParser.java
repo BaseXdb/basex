@@ -137,12 +137,14 @@ public class QueryParser extends InputParser {
     final MainOptions opts = qctx.context.options;
     if(uri != null) sc.baseURI(uri);
 
-    // bind external variables
-    for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
-      final String key = entry.getKey();
-      final Atm value = new Atm(entry.getValue());
-      if(key.isEmpty()) qctx.context(value, sc);
-      else qctx.bind(key, value, sc);
+    // bind external variables on top level
+    if(qctx.parent == null) {
+      for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
+        final String key = entry.getKey();
+        final Atm value = new Atm(entry.getValue());
+        if(key.isEmpty()) qctx.context(value, sc);
+        else qctx.bind(key, value, sc);
+      }
     }
   }
 

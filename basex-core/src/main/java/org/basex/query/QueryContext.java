@@ -246,6 +246,7 @@ public final class QueryContext extends Job implements Closeable {
   public void compile() throws QueryException {
     checkStop();
     if(compiled) return;
+    info.runtime = false;
 
     final CompileContext cc = new CompileContext(this);
     try {
@@ -302,9 +303,8 @@ public final class QueryContext extends Job implements Closeable {
         Util.debug(ex);
         throw BASEX_OVERFLOW.get(null, ex);
       }
-
-      info.runtime = true;
     } finally {
+      info.runtime = true;
       compiled = true;
     }
   }
@@ -413,32 +413,32 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Binds the HTTP connection.
-   * @param val HTTP connection
+   * @param value HTTP connection
    */
-  public void http(final Object val) {
-    http = val;
+  public void http(final Object value) {
+    http = value;
   }
 
   /**
    * Binds the context value, using the same rules as for
    * {@link #bind(String, Object, String, StaticContext) binding variables}.
-   * @param val value to be bound
+   * @param value value to be bound
    * @param type type (may be {@code null})
    * @param sc static context
    * @throws QueryException query exception
    */
-  public void context(final Object val, final String type, final StaticContext sc)
+  public void context(final Object value, final String type, final StaticContext sc)
       throws QueryException {
-    context(cast(val, type), sc);
+    context(cast(value, type), sc);
   }
 
   /**
    * Binds the context value.
-   * @param val value to be bound
+   * @param value value to be bound
    * @param sc static context
    */
-  public void context(final Value val, final StaticContext sc) {
-    ctxItem = MainModule.get(new VarScope(sc), val, null, null, null);
+  public void context(final Value value, final StaticContext sc) {
+    ctxItem = MainModule.get(new VarScope(sc), value, null, null, null);
   }
 
   /**
@@ -451,27 +451,27 @@ public final class QueryContext extends Job implements Closeable {
    * If the value is an XQuery {@link Value}, it is directly assigned.
    * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
    * @param name name of variable
-   * @param val value to be bound
+   * @param value value to be bound
    * @param type type (may be {@code null})
    * @param sc static context
    * @throws QueryException query exception
    */
-  public void bind(final String name, final Object val, final String type, final StaticContext sc)
+  public void bind(final String name, final Object value, final String type, final StaticContext sc)
       throws QueryException {
-    bind(name, cast(val, type), sc);
+    bind(name, cast(value, type), sc);
   }
 
   /**
    * Binds a value to a global variable.
    * @param name name of variable
-   * @param val value to be bound
+   * @param value value to be bound
    * @param sc static context
    * @throws QueryException query exception
    */
-  public void bind(final String name, final Value val, final StaticContext sc)
+  public void bind(final String name, final Value value, final StaticContext sc)
       throws QueryException {
-    final byte[] n = token(name);
-    bindings.put(QNm.resolve(indexOf(n, '$') == 0 ? substring(n, 1) : n, sc), val);
+    final byte[] nm = token(name);
+    bindings.put(QNm.resolve(indexOf(nm, '$') == 0 ? substring(nm, 1) : nm, sc), value);
   }
 
   /**
