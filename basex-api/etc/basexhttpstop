@@ -14,4 +14,4 @@ CORE="$( cd -P "$MAIN/../basex-core" && pwd )"
 CP=$MAIN/target/classes:$MAIN/lib/*:$CORE/lib/*:$MAIN/lib/custom/*:$CLASSPATH
 
 # Run code
-java -cp "$CP" $BASEX_JVM org.basex.BaseXHTTP "$@" stop
+exec java -cp "$CP" $BASEX_JVM org.basex.BaseXHTTP "$@" stop
