@@ -1169,7 +1169,7 @@ public final class Token {
    * @param iri input
    * @return encoded token
    */
-  public static byte[] uri(final byte[] token, final boolean iri) {
+  public static byte[] encodeUri(final byte[] token, final boolean iri) {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte b : token) {
       if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.addByte(b);
