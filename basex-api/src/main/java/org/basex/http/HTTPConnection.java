@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 
 import javax.servlet.*;
@@ -74,7 +73,7 @@ public final class HTTPConnection implements ClientInfo {
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(Strings.UTF8);
-    path = decode(normalize(req.getPathInfo()));
+    path = normalize(req.getPathInfo());
 
     // authentication method
     auth = servlet.auth != null ? servlet.auth : context.soptions.get(StaticOptions.AUTHMETHOD);
@@ -137,8 +136,8 @@ public final class HTTPConnection implements ClientInfo {
    * @return database path
    */
   public String dbpath() {
-    final int s = path.indexOf('/', 1);
-    return s == -1 ? "" : path.substring(s + 1);
+    final int i = path.indexOf('/', 1);
+    return i == -1 ? "" : path.substring(i + 1);
   }
 
   /**
@@ -146,8 +145,8 @@ public final class HTTPConnection implements ClientInfo {
    * @return database, or {@code null} if the root directory was specified.
    */
   public String db() {
-    final int s = path.indexOf('/', 1);
-    return path.substring(1, s == -1 ? path.length() : s);
+    final int i = path.indexOf('/', 1);
+    return path.substring(1, i == -1 ? path.length() : i);
   }
 
   /**
@@ -265,20 +264,6 @@ public final class HTTPConnection implements ClientInfo {
   @Override
   public String clientName() {
     return username;
-  }
-
-  /**
-   * Decodes the specified path.
-   * @param path strings to be decoded
-   * @return argument
-   */
-  public static String decode(final String path) {
-    try {
-      return URLDecoder.decode(path, Prop.ENCODING);
-    } catch(final UnsupportedEncodingException | IllegalArgumentException ex) {
-      Util.debug(ex);
-      return path;
-    }
   }
 
   /**

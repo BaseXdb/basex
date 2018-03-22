@@ -185,26 +185,6 @@ public final class UriParser {
     final ParsedUri pu = new ParsedUri();
     pu.scheme = matcher.group("scheme");
     pu.valid = true;
-    /*
-    pu.authority = matcher.group("authority");
-    pu.userInfo = matcher.group("userinfo");
-    pu.host = matcher.group("host");
-    final String port = matcher.group("port");
-    pu.port = port == null ? -1 : Integer.parseInt(port);
-    pu.query = matcher.group("query");
-    pu.fragment = matcher.group("fragment");
-    String path = matcher.group("pathAbempty");
-    if(path == null) {
-      path = matcher.group("pathAbsolute");
-      if(path == null) {
-        path = matcher.group("pathRootless");
-        if(path == null) {
-          path = matcher.group("pathNoScheme");
-        }
-      }
-    }
-    pu.path = path;
-    */
     return pu;
   }
 
@@ -221,20 +201,6 @@ public final class UriParser {
     private String scheme;
     /** Valid flag. */
     private boolean valid;
-    /* Authority.
-    private String authority;
-    /** User info.
-    private String userInfo;
-    /** Host.
-    private String host;
-    /** Port.
-    private int port;
-    /** Path.
-    private String path;
-    /** Query.
-    private String query;
-    /** Fragment.
-    private String fragment; */
 
     /**
      * Indicates if the URI is valid.

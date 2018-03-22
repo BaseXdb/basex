@@ -137,7 +137,9 @@ public final class Token {
    * @return result of check
    */
   public static boolean ascii(final byte[] token) {
-    for(final byte b : token) if(b < 0) return false;
+    for(final byte b : token) {
+      if(b < 0) return false;
+    }
     return true;
   }
 
@@ -908,7 +910,9 @@ public final class Token {
    * @return true if all characters are whitespaces
    */
   public static boolean ws(final byte[] token) {
-    for(final byte b : token) if(!ws(b)) return false;
+    for(final byte b : token) {
+      if(!ws(b)) return false;
+    }
     return true;
   }
 
@@ -1004,8 +1008,8 @@ public final class Token {
 
       final int tl = token.length;
       final TokenBuilder tb = new TokenBuilder(tl);
-      for(final byte c : token) {
-        if(c != ch) tb.add(c);
+      for(final byte b : token) {
+        if(b != ch) tb.add(b);
       }
       return tb.finish();
     }
@@ -1114,8 +1118,7 @@ public final class Token {
    * @return resulting character
    */
   public static int uc(final int ch) {
-    return ch >= 'a' && ch <= 'z' ? ch - 0x20 :
-      ch > 0x7F ? Character.toUpperCase(ch) : ch;
+    return ch >= 'a' && ch <= 'z' ? ch - 0x20 : ch > 0x7F ? Character.toUpperCase(ch) : ch;
   }
 
   /**
@@ -1139,8 +1142,7 @@ public final class Token {
    * @return resulting character
    */
   public static int lc(final int ch) {
-    return ch >= 'A' && ch <= 'Z' ? ch | 0x20 :
-      ch > 0x7F ? Character.toLowerCase(ch) : ch;
+    return ch >= 'A' && ch <= 'Z' ? ch | 0x20 : ch > 0x7F ? Character.toLowerCase(ch) : ch;
   }
 
   /**
@@ -1221,4 +1223,48 @@ public final class Token {
     return data;
   }
 
+  /**
+   * Converts a hex character to an integer value.
+   * @param ch character
+   * @return integer value, or {@code -1} if the input is invalid
+   */
+  public static int dec(final int ch) {
+    if(ch >= '0' && ch <= '9') return ch - '0';
+    if(ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F') return (ch & 0x0F) + 9;
+    return -1;
+  }
+
+  /**
+   * Converts hex characters to an integer value.
+   * @param ch1 first character
+   * @param ch2 second character
+   * @return integer value, or {@code -1} if the input is invalid
+   */
+  public static int dec(final int ch1, final int ch2) {
+    final int n1 = dec(ch1), n2 = dec(ch2);
+    return n1 < 0 || n2 < 0 ? -1 : (n1 << 4) | n2;
+  }
+
+  /**
+   * Returns a URI decoded token.
+   * @param token token
+   * @return decoded token, or {@code null} if input was invalid
+   */
+  public static byte[] decodeUri(final byte[] token) {
+    if(!contains(token, '%')) return token;
+
+    final int tl = token.length;
+    final TokenBuilder tb = new TokenBuilder(tl);
+    for(int t = 0; t < tl; t++) {
+      byte b = token[t];
+      if(b == '%') {
+        final int n = t + 2 < tl ? dec(token[t + 1], token[t + 2]) : -1;
+        if(n < 0) return null;
+        b = (byte) n;
+        t += 2;
+      }
+      tb.addByte(b);
+    }
+    return tb.finish();
+  }
 }
