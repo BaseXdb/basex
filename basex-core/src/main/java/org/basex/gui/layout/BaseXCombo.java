@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
@@ -146,7 +145,7 @@ public class BaseXCombo extends JComboBox<Object> {
     this.win = win;
 
     setEditable(editable);
-    setEditor(new BaseXEditor(win.gui()));
+    setEditor(new BaseXEditor(win.gui(), this));
 
     BaseXLayout.addInteraction(this, win);
 
@@ -337,27 +336,35 @@ public class BaseXCombo extends JComboBox<Object> {
     /**
      * Constructor.
      * @param gui gui
+     * @param combo combo box
      */
-    private BaseXEditor(final GUI gui) {
+    private BaseXEditor(final GUI gui, final BaseXCombo combo) {
       tf = new BaseXTextField(gui);
-      tf.setBorder(new EmptyBorder(0, 4, 0, 0));
+      // adopt border of original editor
+      final Component comp = combo.getEditor().getEditorComponent();
+      if(comp instanceof JTextField) tf.setBorder(((JTextField) comp).getBorder());
     }
+
     @Override
     public Component getEditorComponent() {
       return tf;
     }
+
     @Override
     public void setItem(final Object text) {
       if(text != null) tf.setText(text.toString());
     }
+
     @Override
     public String getItem() {
       return tf.getText();
     }
+
     @Override
     public void selectAll() {
       tf.selectAll();
     }
+
     @Override
     public void addActionListener(final ActionListener l) {
       tf.addActionListener(l);
