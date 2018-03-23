@@ -18,12 +18,6 @@ public final class BaseXHeader extends BaseXLabel {
   public BaseXHeader(final String string) {
     super(string, true, false);
     setForeground(dgray);
-  }
-
-  /**
-   * Called when GUI design has changed.
-   */
-  public void refreshLayout() {
     setBorder(new EmptyBorder(-4, 0, -getFontMetrics(lfont).getLeading() / 2, 2));
     setFont(lfont);
   }

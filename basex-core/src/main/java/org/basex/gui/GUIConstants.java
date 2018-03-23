@@ -284,8 +284,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   private static int[] mfwidth;
   /** Bold character widths. */
   private static int[] bwidth;
-  /** Character large character widths. */
-  private static int[] lwidth;
   /** Default monospace font widths. */
   private static int[] dmwidth;
 
@@ -347,16 +345,16 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     final int type = opts.get(GUIOptions.FONTTYPE);
 
     final int sz = LABEL.getFont().getSize();
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, sz);
+    lfont = new Font(name, type, sz * 2);
+
     fontSize = opts.get(GUIOptions.FONTSIZE);
     font  = new Font(name, type, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    lfont = new Font(name, type, (int) (sz * 1.2 + fontSize / 2.0));
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, sz);
 
     dmwidth  = LABEL.getFontMetrics(dmfont).getWidths();
     fwidth  = LABEL.getFontMetrics(font).getWidths();
-    lwidth  = LABEL.getFontMetrics(lfont).getWidths();
     mfwidth = LABEL.getFontMetrics(mfont).getWidths();
     bwidth  = LABEL.getFontMetrics(bfont).getWidths();
   }
@@ -379,7 +377,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     if(f == font)  return fwidth;
     if(f == mfont) return mfwidth;
     if(f == bfont) return bwidth;
-    if(f == lfont) return lwidth;
     if(f == dmfont) return dmwidth;
     return LABEL.getFontMetrics(f).getWidths();
   }

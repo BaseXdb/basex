@@ -144,7 +144,10 @@ public final class EditorView extends View {
     search.editor(addTab(), false);
 
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
+    info.setFont(font);
     pos = new BaseXLabel(" ");
+    pos.setFont(font);
+
     posCode.invokeLater();
 
     final BaseXBack south = new BaseXBack(false).border(4, 0, 0, 0);
@@ -259,12 +262,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    header.refreshLayout();
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
-    search.refreshLayout();
-    final Font f = font.deriveFont((search.getFont().getSize() * 1.2f + fontSize) / 2);
-    info.setFont(f);
-    pos.setFont(f);
     project.refreshLayout();
   }
 
