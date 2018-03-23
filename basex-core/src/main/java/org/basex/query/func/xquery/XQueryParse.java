@@ -4,7 +4,8 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.scope.*;
+import org.basex.query.scope.Module;
+import org.basex.query.scope.LibraryModule;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
