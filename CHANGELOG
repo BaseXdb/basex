@@ -1,3 +1,65 @@
+VERSION 9.0 (March 23, 2018) -------------------------------------------
+ 
+ XQUERY
+ - Comprehensive extensions in the internal XQuery optimizer framework
+ - Dynamic hash joins rewritings of general comparisons
+ - Register query jobs as persistent services
+ - Process very large CSV files via the new CSV 'xquery' format
+ - Update Module: higher-order functions for performing updates
+ - Unified static typing, including maps, arrays and function items
+ - COPYNODE: Lightweight copying of XML fragments
+ - ENFORCEINDEX: Enforce rewriting for index access
+ 
+ STORAGE
+ - Improved database compression (short strings, whitespaces)
+ 
+ WEB APPLICATIONS
+ - Permissions layer: Unified definition of RESTXQ access patterns
+ - RESTXQ: Full support for client- and server-side quality factors
+ - REST: Run BaseX command scripts
+ - Web server upgrade to Jetty 9
+ 
+ REPOSITORIES
+ - Combined packaging mechanism (XQuery and Java)
+ - Java Packaging: Bundling of additional libraries
+ 
+ DISTRIBUTIONS
+ - Revised detection and configuration of BaseX home directory
+ - Windows executable: better detection of Java libraries
+ 
+ DBA: BASEX DATABASE ADMINISTRATION
+ - Improved editing and evaluation of XQuery modules
+ - Revised file, session and job management
+ 
+ MINOR UPDATES
+ - NEW: convert:binary-to-integers: return binary data as octets
+ - NEW: db:option: return value of system option
+ - NEW: fetch:xml-binary: retrieve XML from binary data
+ - NEW: jobs:invoke: schedule job based on input file
+ - NEW: out:cr: return carriage return
+ - NEW: proc:fork: execute command in separate thread
+ - NEW: prof:track: measure runtime and memory
+ - NEW: util:replicate: return results multiple times
+ - NEW: IGNOREHOSTNAME (certificates verification)
+ - UPDATE: convert:integers-to-(base64|hex) renamed
+ - UPDATE: file:read-text-lines: new $offset/$length arguments
+ - UPDATE: fn:put: specify serialization parameters
+ - UPDATE: http:send-request: support for compressed responses
+ - UPDATE: proc:system, new input option: pass on stdin
+ - UPDATE: prof:time, prof:memory: signatures updated
+ - UPDATE: sql:execute(-prepared) returns update count
+ - UPDATE: update:output(-cache) renamed; before: db:output(-cache)
+ - UPDATE: web:response-header: status/message attributes
+ - UPDATE: xquery:eval: new pass option (pass on error info)
+ - UPDATE: xquery:eval-update renamed; before: xquery:update
+ - UPDATE: xquery:parse(-uri): base-uri option added
+ - UPDATE: xslt:transform(-text): cache XSLT transformer
+ - UPDATE: JSON Module, 'xquery' format renamed; before: 'map'
+ - UPDATE: Lazy Module renamed; before: Streaming Module
+ - UPDATE: GUI: serialization parameters for result output
+ - UPDATE: XQuery: numeric errors replaced with descriptive names
+ - UPDATE: BaseXServer option -c accepts URLs and file references
+
 VERSION 8.6.7 (September 21, 2017) -------------------------------------
 
  Bug fixes, performance (fn:tail, static typing in group by clauses).
