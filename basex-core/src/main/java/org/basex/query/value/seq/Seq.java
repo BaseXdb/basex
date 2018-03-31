@@ -87,8 +87,8 @@ public abstract class Seq extends Value {
 
   /**
    * Returns a sub sequence of this value with the given start and length.
-   * @param offset offset (>= 0)
-   * @param length number of items (1 < length < size())
+   * @param offset offset (ge 0)
+   * @param length number of items (1 lt length lt size())
    * @param qc query context
    * @return sub sequence
    */
