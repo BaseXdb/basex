@@ -16,4 +16,4 @@ CP=$MAIN/target/classes:$MAIN/lib/*:$MAIN/lib/custom/*:$CLASSPATH
 BASEX_JVM="-Xmx2g $BASEX_JVM"
 
 # Run code
-java -cp "$CP" $BASEX_JVM org.basex.BaseXGUI "$@"
+exec java -cp "$CP" $BASEX_JVM org.basex.BaseXGUI "$@"
