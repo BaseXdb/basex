@@ -683,6 +683,8 @@ public abstract class Path extends ParseExpr {
 
     // skip rewriting if no index access is possible, or if it is too expensive
     if(index == null || data != null && index.costs.tooExpensive(data)) return this;
+    // skip optimization if it is not enforced
+    if(rt instanceof Dummy && !index.enforce()) return this;
 
     // rewrite for index access
     cc.info(index.optInfo);
