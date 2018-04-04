@@ -44,7 +44,7 @@ main(void)
 	char *info;
 	rc = basex_execute(sfd, command, &result, &info);
 	if (rc == -1) { // general (i/o or the like) error
-		warnx("An error occured during execution of '%s'.", command);
+		warnx("An error occurred during execution of '%s'.", command);
 		goto free_and_out;		
 	}
 	if (rc == 1) { // database error while processing command

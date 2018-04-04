@@ -86,7 +86,7 @@ public final class ValueIndexTest extends SandboxTest {
     tokens.put("3", 3);
     tokens.put("3.4", 1);
     tokens.put("text in child", 1);
-    tokens.put("nonexistant", 0);
+    tokens.put("nonexistent", 0);
     tokens.put("", 0);
 
     valueIndexTest(IndexType.TEXT, tokens, paramSet);
@@ -104,7 +104,7 @@ public final class ValueIndexTest extends SandboxTest {
     tokens.put("bar", 0);
     tokens.put("blu", 0);
     tokens.put("", 0);
-    tokens.put("nonexistant", 0);
+    tokens.put("nonexistent", 0);
     valueIndexTest(IndexType.ATTRIBUTE, tokens, paramSet);
   }
 
@@ -122,7 +122,7 @@ public final class ValueIndexTest extends SandboxTest {
     tokens.put("bar", 1);
     tokens.put("blu", 1);
     tokens.put("", 0);
-    tokens.put("nonexistant", 0);
+    tokens.put("nonexistent", 0);
     valueIndexTest(IndexType.TOKEN, tokens, paramSet);
   }
 
