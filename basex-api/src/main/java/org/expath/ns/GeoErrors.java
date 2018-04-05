@@ -39,7 +39,7 @@ final class GeoErrors {
    * @return query exception
    */
   static QueryException geoType(final byte[] name, final String geo) {
-    return thrw(3, "% is not an appropiate geometry for this function. "
+    return thrw(3, "% is not an appropriate geometry for this function. "
               + "The input geometry should be a %.", name, geo);
   }
 

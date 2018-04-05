@@ -484,7 +484,7 @@ public final class LockingTest extends SandboxTest {
     th3.start();
     th1.release();
     assertTrue(
-        "One of the threads should be able to aquire its locks now.",
+        "One of the threads should be able to acquire its locks now.",
         test2.await(WAIT, TimeUnit.MILLISECONDS)
             || test3.await(WAIT, TimeUnit.MILLISECONDS));
     boolean which = false;
