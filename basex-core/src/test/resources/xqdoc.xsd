@@ -74,7 +74,7 @@
   </xsd:simpleType>
   
   <!-- Simple type for defining the names associated
-       with things such as functions, paramters, module name, etc. -->
+       with things such as functions, parameters, module name, etc. -->
   <xsd:simpleType name="name">
     <xsd:restriction base="xsd:string"/>
   </xsd:simpleType>

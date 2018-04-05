@@ -230,7 +230,7 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
 	}
 
 #if DEBUG
-	warnx("Authentification succeded.");
+	warnx("Authentification succeeded.");
 #endif
 	return 0;
 }
