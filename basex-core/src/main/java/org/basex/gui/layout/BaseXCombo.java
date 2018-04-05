@@ -145,7 +145,7 @@ public class BaseXCombo extends JComboBox<Object> {
     this.win = win;
 
     setEditable(editable);
-    setEditor(new BaseXEditor(win.gui(), this));
+    setEditor(new BaseXEditor(win.gui()));
 
     BaseXLayout.addInteraction(this, win);
 
@@ -336,13 +336,9 @@ public class BaseXCombo extends JComboBox<Object> {
     /**
      * Constructor.
      * @param gui gui
-     * @param combo combo box
      */
-    private BaseXEditor(final GUI gui, final BaseXCombo combo) {
+    private BaseXEditor(final GUI gui) {
       tf = new BaseXTextField(gui);
-      // adopt border of original editor
-      final Component comp = combo.getEditor().getEditorComponent();
-      if(comp instanceof JTextField) tf.setBorder(((JTextField) comp).getBorder());
     }
 
     @Override
