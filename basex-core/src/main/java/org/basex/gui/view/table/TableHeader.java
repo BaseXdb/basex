@@ -123,7 +123,8 @@ final class TableHeader extends BaseXPanel {
       g.setFont(bfont);
 
       final int off = clicked ? 1 : 0;
-      BaseXLayout.chopString(g, tdata.cols[n].name, (int) x + 4 + off, 2 + off, (int) cw, fsz);
+      final byte[] text = tdata.cols[n].name;
+      BaseXLayout.chopString(g, text, (int) x + 4 + off, 2 + off, (int) cw, fsz);
 
       if(n == tdata.sortCol) {
         if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,

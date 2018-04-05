@@ -28,7 +28,7 @@ final class TextRenderer extends BaseXBack {
   /** Indicates if the text is edited. */
   private final boolean edit;
   /** Current brackets. */
-  private final IntList pars = new IntList();
+  private final IntList parentheses = new IntList();
 
   /** Font. */
   private Font font;
@@ -125,7 +125,8 @@ final class TextRenderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    pars.reset();
+
+    parentheses.reset();
     final TextIterator iter = init(g, false);
     int oldL = 0;
     while(more(iter, g)) {
@@ -259,14 +260,14 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Sets the current font.
+   * Sets a new font.
    * @param f font
    */
   private void font(final Font f) {
     font = f;
     fontHeight = f.getSize() * 5 / 4;
-    charWidths = GUIConstants.fontWidths(f);
     fontMetrics = getFontMetrics(f);
+    charWidths = fontMetrics.getWidths();
   }
 
   @Override
@@ -293,6 +294,7 @@ final class TextRenderer extends BaseXBack {
   private TextIterator init(final Graphics g, final boolean start) {
     syntax.init(GUIConstants.TEXT);
     font = defaultFont;
+    font(font);
 
     offset = OFFSET;
     if(g != null) {
@@ -507,17 +509,17 @@ final class TextRenderer extends BaseXBack {
 
     // handle matching parentheses
     if(ch == '(' || ch == '[' || ch == '{') {
-      pars.add(x);
-      pars.add(y);
-      pars.add(cp);
-      pars.add(ch);
-    } else if((ch == ')' || ch == ']' || ch == '}') && !pars.isEmpty()) {
+      parentheses.add(x);
+      parentheses.add(y);
+      parentheses.add(cp);
+      parentheses.add(ch);
+    } else if((ch == ')' || ch == ']' || ch == '}') && !parentheses.isEmpty()) {
       final int open = ch == ')' ? '(' : ch == ']' ? '[' : '{';
-      if(pars.peek() == open) {
-        pars.pop();
-        final int cr = pars.pop();
-        final int yy = pars.pop();
-        final int xx = pars.pop();
+      if(parentheses.peek() == open) {
+        parentheses.pop();
+        final int cr = parentheses.pop();
+        final int yy = parentheses.pop();
+        final int xx = parentheses.pop();
         if(cc == cp || cc == cr) {
          g.setColor(GUIConstants.color4);
           g.drawRect(xx, yy - (fontHeight << 2) / 5, charWidth(open), fontHeight);

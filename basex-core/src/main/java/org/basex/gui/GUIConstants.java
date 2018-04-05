@@ -278,15 +278,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   /** Current font size. */
   public static int fontSize;
 
-  /** Character widths. */
-  private static int[] fwidth;
-  /** Monospace character widths. */
-  private static int[] mfwidth;
-  /** Bold character widths. */
-  private static int[] bwidth;
-  /** Default monospace font widths. */
-  private static int[] dmwidth;
-
   // KEYS =========================================================================================
 
   /** No modifier. */
@@ -352,11 +343,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     font  = new Font(name, type, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-
-    dmwidth  = LABEL.getFontMetrics(dmfont).getWidths();
-    fwidth  = LABEL.getFontMetrics(font).getWidths();
-    mfwidth = LABEL.getFontMetrics(mfont).getWidths();
-    bwidth  = LABEL.getFontMetrics(bfont).getWidths();
   }
 
   /**
@@ -366,19 +352,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
    */
   public static Color color(final int i) {
     return COLORS[Math.min(COLORS.length - 1, i)];
-  }
-
-  /**
-   * Returns the character widths for the current font.
-   * @param f font reference
-   * @return character widths
-   */
-  public static int[] fontWidths(final Font f) {
-    if(f == font)  return fwidth;
-    if(f == mfont) return mfwidth;
-    if(f == bfont) return bwidth;
-    if(f == dmfont) return dmwidth;
-    return LABEL.getFontMetrics(f).getWidths();
   }
 
   /**

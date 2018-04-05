@@ -104,7 +104,7 @@ public final class MapView extends View {
     final Data data = gui.context.data();
     final GUIOptions gopts = gui.gopts;
     if(data != null && visible()) {
-      painter = new MapDefault(this, gopts);
+      painter = new MapPainter(this, gopts);
       mainMap = createImage();
       zoomMap = createImage();
       refreshLayout();
@@ -303,6 +303,7 @@ public final class MapView extends View {
     gui.painting = true;
 
     // paint map
+    final MapRenderer renderer = new MapRenderer(g);
     final boolean in = zoomStep > 0 && zoomIn;
     final Image img1 = in ? zoomMap : mainMap;
     final Image img2 = in ? mainMap : zoomMap;
@@ -373,10 +374,10 @@ public final class MapView extends View {
         final byte[] text = MapPainter.text(data, f);
         // calculate tooltip
         final int[][] info = new FTLexer().init(text).info();
-        final TokenList tl = MapRenderer.calculateToolTip(f, info, mouseX, mouseY, getWidth(), g);
+        final TokenList tl = renderer.computeToolTip(f, info, mouseX, mouseY, getWidth());
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         // draw calculated tooltip
-        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl, fontSize);
+        renderer.drawToolTip(mr, mouseX, mouseY, tl);
         f.x -= 3;
         f.w += 3;
       }

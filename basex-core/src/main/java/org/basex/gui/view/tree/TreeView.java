@@ -182,7 +182,7 @@ public final class TreeView extends View {
 
       if(paintType == Refresh.INIT) {
         sub = new TreeSubtree(data, showAtts);
-        tr = new TreeRects(this);
+        tr = new TreeRects(this, g);
       }
       tr.nodes = nodes;
 
@@ -195,7 +195,7 @@ public final class TreeView extends View {
       if(winChange && paintType == Refresh.VOID
           || paintType == Refresh.INIT || paintType == Refresh.CONTEXT
           || paintType == Refresh.RESIZE) {
-        treedist = tr.generateRects(sub, g, wstart, wwidth, slimToText);
+        treedist = tr.generateRects(sub, wstart, wwidth, slimToText);
         nes = treedist == -1;
         if(!nes) {
           markedImage = null;

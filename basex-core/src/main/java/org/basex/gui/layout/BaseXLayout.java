@@ -323,19 +323,19 @@ public final class BaseXLayout {
 
   /**
    * Adds human readable shortcuts to the specified string.
-   * @param str text of tooltip
+   * @param string tooltip string
    * @param sc shortcut
    * @return tooltip
    */
-  public static String addShortcut(final String str, final String sc) {
-    if(sc == null || str == null) return str;
+  public static String addShortcut(final String string, final String sc) {
+    if(sc == null || string == null) return string;
     final StringBuilder sb = new StringBuilder();
     for(final String s : sc.split(" ")) {
       String t = "%".equals(s) ? Prop.MAC ? "meta" : "control" : s;
       if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(Locale.ENGLISH), t);
       sb.append('+').append(t);
     }
-    return str + " (" + sb.substring(1) + ')';
+    return string + " (" + sb.substring(1) + ')';
   }
 
   /**
@@ -370,12 +370,12 @@ public final class BaseXLayout {
   /**
    * Draws a centered string to the panel.
    * @param g graphics reference
-   * @param text text to be painted
+   * @param string string to be drawn
    * @param w panel width
    * @param y vertical position
    */
-  public static void drawCenter(final Graphics g, final String text, final int w, final int y) {
-    g.drawString(text, (w - width(g, text)) / 2, y);
+  public static void drawCenter(final Graphics g, final String string, final int w, final int y) {
+    g.drawString(string, (w - width(g, string)) / 2, y);
   }
 
   /**
@@ -409,56 +409,52 @@ public final class BaseXLayout {
   }
 
   /**
-   * Draws the specified string.
-   *
+   * Draws the specified string. Chops the last character if space is not enough space.
    * @param g graphics reference
-   * @param s text
+   * @param string string
    * @param x x coordinate
    * @param y y coordinate
    * @param w width
    * @param fs font size
    */
-  public static void chopString(final Graphics g, final byte[] s, final int x, final int y,
+  public static void chopString(final Graphics g, final byte[] string, final int x, final int y,
       final int w, final int fs) {
 
     if(w < 12) return;
-    final int[] cw = fontWidths(g.getFont());
-
-    int j = s.length;
+    int j = string.length;
     try {
       int l = 0;
       int fw = 0;
       for(int k = 0; k < j; k += l) {
-        final int ww = width(g, cw, cp(s, k));
+        final int ww = width(g, cp(string, k));
         if(fw + ww >= w - 4) {
           j = Math.max(1, k - l);
-          if(k > 1) fw -= width(g, cw, cp(s, k - 1));
+          if(k > 1) fw -= width(g, cp(string, k - 1));
           g.drawString("..", x + fw, y + fs);
           break;
         }
         fw += ww;
-        l = cl(s, k);
+        l = cl(string, k);
       }
     } catch(final Exception ex) {
       Util.debug(ex);
     }
-    g.drawString(string(s, 0, j), x, y + fs);
+    g.drawString(string(string, 0, j), x, y + fs);
   }
 
   /**
-   * Returns the width of the specified text.
+   * Returns the width of the specified string.
    * Cached font widths are used to speed up calculation.
    * @param g graphics reference
-   * @param s string to be evaluated
+   * @param string string
    * @return string width
    */
-  public static int width(final Graphics g, final byte[] s) {
-    final int[] cw = fontWidths(g.getFont());
-    final int l = s.length;
+  public static int width(final Graphics g, final byte[] string) {
     int fw = 0;
     try {
       // ignore faulty character sets
-      for(int k = 0; k < l; k += cl(s, k)) fw += width(g, cw, cp(s, k));
+      final int l = string.length;
+      for(int k = 0; k < l; k += cl(string, k)) fw += width(g, cp(string, k));
     } catch(final Exception ex) {
       Util.debug(ex);
     }
@@ -468,11 +464,10 @@ public final class BaseXLayout {
   /**
    * Returns the character width of the specified character.
    * @param g graphics reference
-   * @param cw array with character widths
-   * @param c character
+   * @param cp code point
    * @return character width
    */
-  public static int width(final Graphics g, final int[] cw, final int c) {
-    return c >= cw.length ? g.getFontMetrics().charWidth(c) : cw[c];
+  public static int width(final Graphics g, final int cp) {
+    return g.getFontMetrics().charWidth(cp);
   }
 }
