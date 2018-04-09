@@ -32,9 +32,9 @@ public final class CompileContext {
   /** Query context. */
   public final QueryContext qc;
   /** Variable scope list. */
-  private final ArrayList<VarScope> scopes = new ArrayList<>();
+  private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();
   /** Query focus list. */
-  private final ArrayList<QueryFocus> focuses = new ArrayList<>();
+  private final ArrayDeque<QueryFocus> focuses = new ArrayDeque<>();
 
   /**
    * Constructor.
@@ -64,11 +64,11 @@ public final class CompileContext {
   }
 
   /**
-   * Removes a variable scope from the stack.
+   * Removes and returns the current variable scope.
    * @return the removed element
    */
   public VarScope removeScope() {
-    return scopes.remove(scopes.size() - 1);
+    return scopes.removeLast();
   }
 
   /**
@@ -111,10 +111,10 @@ public final class CompileContext {
   }
 
   /**
-   * Removes a query focus from the stack.
+   * Removes the current query focus from the stack.
    */
   public void removeFocus() {
-    qc.focus = focuses.remove(focuses.size() - 1);
+    qc.focus = focuses.pollLast();
   }
 
   /**
@@ -130,7 +130,7 @@ public final class CompileContext {
    * @return variable scope
    */
   public VarScope vs() {
-    return scopes.get(scopes.size() - 1);
+    return scopes.getLast();
   }
 
   /**

@@ -148,22 +148,22 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void functionTest() {
     createColl();
     // document access after inlining
-    check("declare function local:x($d) { collection($d)//text()[. = '1'] };"
-        + "local:x('" + NAME + "')", 1);
-    check("declare function local:x($d, $s) { collection($d)//text()[. = $s] };"
-        + "local:x('" + NAME + "', '1')", 1);
+    check("declare function db:x($d) { collection($d)//text()[. = '1'] }; "
+        + "db:x('" + NAME + "')", 1);
+    check("declare function db:x($d, $s) { collection($d)//text()[. = $s] }; "
+        + "db:x('" + NAME + "', '1')", 1);
 
     // text: search term must be string
-    final String doc = _DB_OPEN.args(NAME);
-    check("declare function local:x() {" + doc +
-        "//text()[. = '1'] }; local:x()", 1);
-    check("declare function local:x($x as xs:string) {" + doc +
-        "//text()[. = $x] }; local:x('1')", 1);
+    final String db = _DB_OPEN.args(NAME);
+    check("declare function db:x() {" + db + "//text()[. = '1'] }; db:x()", 1);
+    check("declare function db:x($x as xs:string) {" + db + "//text()[. = $x] }; db:x('1')", 1);
     // full-text: search term may have any type
-    check("declare function local:x() {" + doc +
-        "//text()[. contains text '1'] }; local:x()", 1);
-    check("declare function local:x($x) {" + doc +
-        "//text()[. contains text { $x }] }; local:x('1')", 1);
+    check("declare function db:x() {" + db + "//text()[. contains text '1'] }; db:x()", 1);
+    check("declare function db:x($x) {" + db + "//text()[. contains text { $x }] }; db:x('1')", 1);
+
+    // optimization in functions. GH-1553
+    check("declare function db:f() { " + db + "//a[text() = '1'] }; db:f()", "<a>1</a>");
+    check("declare function db:f() { collection('" + NAME + "')//text()[. = '1'] }; db:f()", "1");
   }
 
   /** Checks predicate tests for empty strings. */

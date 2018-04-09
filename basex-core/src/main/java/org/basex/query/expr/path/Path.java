@@ -174,8 +174,8 @@ public abstract class Path extends ParseExpr {
     if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
-     * - //C[. = '...']     ->  IA('...', C)
-     * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A */
+     * - //B [. = '...']  ->  IA('...', B)
+     * - /A/B[. = '...']  ->  IA('...', B)/parent::A *[parent::document-node()] */
     if(expr == this) expr = children(cc, rt);
     if(expr != this) return expr.optimize(cc);
 
@@ -251,7 +251,8 @@ public abstract class Path extends ParseExpr {
   public final ArrayList<PathNode> pathNodes(final CompileContext cc) {
     // skip computation if path does not start with document nodes
     final Value rt = rootValue(cc);
-    if(cc.nestedFocus() || rt == null || rt.type != NodeType.DOC) return null;
+    if(rt == null || rt.type != NodeType.DOC || cc.nestedFocus() && cc.qc.focus.value == null)
+      return null;
 
     final Data data = rt.data();
     if(data == null || !data.meta.uptodate) return null;
@@ -400,7 +401,8 @@ public abstract class Path extends ParseExpr {
     }
 
     // skip computation if path does not start with document nodes
-    if(cc.nestedFocus() || rt == null || rt.type != NodeType.DOC) return -1;
+    if(rt == null || rt.type != NodeType.DOC || cc.nestedFocus() && cc.qc.focus.value == null)
+      return -1;
 
     // skip computation if no database instance is available, is outdated, or
     // if context does not contain all database nodes
@@ -547,12 +549,13 @@ public abstract class Path extends ParseExpr {
   /**
    * Converts descendant to child steps.
    * @param cc compilation context
-   * @param rt root value
+   * @param rt root value (can be {@code null})
    * @return original or new expression
    */
   private Expr children(final CompileContext cc, final Value rt) {
     // only rewrite on document level
-    if(cc.nestedFocus() || rt == null || rt.type != NodeType.DOC) return this;
+    if(rt == null || rt.type != NodeType.DOC || cc.nestedFocus() && cc.qc.focus.value == null)
+      return this;
 
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
@@ -624,8 +627,8 @@ public abstract class Path extends ParseExpr {
    * 2. A[. = '...']         : IA('...', A)
    * 3. text()[. = '...']    : IA('...')
    * 4. A[B = '...']         : IA('...', B)/parent::A
-   * 1. A[B/text() = '...']  : IA('...')/parent::B/parent::A
-   * 2. A[B/C = '...']       : IA('...', C)/parent::B/parent::A
+   * 5. A[B/text() = '...']  : IA('...')/parent::B/parent::A
+   * 6. A[B/C = '...']       : IA('...', C)/parent::B/parent::A
    * 7. A[@a = '...']        : IA('...', @a)/parent::A
    * 8. @a[. = '...']        : IA('...', @a)</pre>
    *
@@ -637,8 +640,11 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr index(final CompileContext cc, final Value rt) throws QueryException {
-    // skip optimization if path does not start with document nodes
-    if(cc.nestedFocus() || rt != null && rt.type != NodeType.DOC) return this;
+    /* skip optimization...
+     * - if root is known, but does not point to document node, or
+     * - if focus is nested, and if value is bound to focus */
+    if(rt != null && rt.type != NodeType.DOC || cc.nestedFocus() && cc.qc.focus.value != null)
+      return this;
 
     // cache index access costs
     IndexInfo index = null;
