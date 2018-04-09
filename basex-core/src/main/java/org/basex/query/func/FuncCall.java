@@ -85,6 +85,7 @@ public abstract class FuncCall extends Arr {
     final int fp = qc.stack.enterFrame(fn.stackFrameSize());
     try {
       while(true) {
+        qc.checkStop();
         final Value ret = item ? fn.invItem(qc, info, args) : fn.invValue(qc, info, args);
         fn = qc.pollTailCall();
         if(fn == null) return ret;
@@ -111,6 +112,7 @@ public abstract class FuncCall extends Arr {
   private static Value invokeTail(final XQFunction func, final Value[] arg, final boolean item,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
+    qc.checkStop();
     final int calls = qc.tailCalls, max = qc.maxCalls;
     if(max >= 0 && calls >= max) {
       // too many tail calls on the stack, eliminate them
