@@ -264,6 +264,7 @@ public final class EditorView extends View {
   public void refreshLayout() {
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     project.refreshLayout();
+    search.refreshLayout();
   }
 
   @Override

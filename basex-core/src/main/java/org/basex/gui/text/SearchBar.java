@@ -175,10 +175,7 @@ public final class SearchBar extends BaseXBack {
     }
 
     editor = text;
-    Font ef = editor.getFont();
-    if(ef == GUIConstants.mfont) ef = GUIConstants.dmfont;
-    search.setFont(ef);
-    replace.setFont(ef);
+    refreshLayout();
     text.setSearch(this);
 
     if(srch) search(false);
@@ -196,6 +193,16 @@ public final class SearchBar extends BaseXBack {
       else activate("", true);
     });
     return button;
+  }
+
+  /**
+   * Refreshes the layout.
+   */
+  public void refreshLayout() {
+    if(editor == null) return;
+    final Font ef = editor.getFont().deriveFont((float) GUIConstants.dmfont.getSize() + 2);
+    search.setFont(ef);
+    replace.setFont(ef);
   }
 
   /**

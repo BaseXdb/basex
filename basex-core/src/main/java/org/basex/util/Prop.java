@@ -62,6 +62,8 @@ public final class Prop {
   public static final boolean WIN = OS.startsWith("Windows");
   /** Respect lower/upper case when doing file comparisons. */
   public static final boolean CASE = !(MAC || WIN);
+  /** Java version. */
+  public static final String JAVA = System.getProperty("java.specification.version");
 
   /** Prefix for project specific options. */
   public static final String DBPREFIX = "org.basex.";

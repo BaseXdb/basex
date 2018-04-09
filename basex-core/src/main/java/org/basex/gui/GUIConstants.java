@@ -265,8 +265,6 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
   /** Dummy component for adjusting font sizes. */
   public static final JLabel LABEL = new JLabel();
 
-  /** Large font. */
-  public static Font lfont;
   /** Font. */
   public static Font font;
   /** Bold Font. */
@@ -335,14 +333,11 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     final String name = opts.get(GUIOptions.FONT);
     final int type = opts.get(GUIOptions.FONTTYPE);
 
-    final int sz = LABEL.getFont().getSize();
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, sz);
-    lfont = new Font(name, type, sz * 2);
-
     fontSize = opts.get(GUIOptions.FONTSIZE);
     font  = new Font(name, type, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, LABEL.getFont().getSize());
   }
 
   /**

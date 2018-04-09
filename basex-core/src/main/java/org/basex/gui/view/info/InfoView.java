@@ -147,6 +147,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   @Override
   public void refreshLayout() {
     area.setFont(GUIConstants.font);
+    editor.bar().refreshLayout();
   }
 
   @Override
