@@ -47,20 +47,29 @@ public final class ViewData {
   public static byte[] path(final Data data, final int pre) {
     if(data == null || pre >= data.meta.size) return Token.EMPTY;
 
-    int p = pre;
-    int k = data.kind(p);
-    final IntList il = new IntList();
+    final IntList pres = new IntList();
+    int p = pre, k = data.kind(p);
     while(k != Data.DOC) {
-      il.add(p);
+      pres.add(p);
       p = data.parent(p, k);
       k = data.kind(p);
     }
 
-    final byte[] doc = text(data, p, true);
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(doc)).substring(1));
-    for(int i = il.size() - 1; i >= 0; i--) {
-      tb.add('/').add(text(data, il.get(i), true));
+    tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(data.text(p, true))).substring(1));
+    for(int i = pres.size() - 1; i >= 0; i--) {
+      p = pres.get(i);
+      k = data.kind(pre);
+      final byte[] txt;
+      switch(k) {
+        case Data.TEXT: txt = TEXT; break;
+        case Data.COMM: txt = COMMENT; break;
+        case Data.PI:   txt = PI; break;
+        case Data.ATTR: txt = Token.concat(ATT, data.name(pre, k)); break;
+        // element node
+        default: txt = data.name(pre, k); break;
+      }
+      tb.add('/').add(txt);
     }
     return tb.finish();
   }
@@ -69,47 +78,34 @@ public final class ViewData {
    * Returns textual contents for the specified node.
    * @param data data reference
    * @param pre pre value
-   * @param compact if specified, a compact representation is returned
    * @return text
    */
-  public static byte[] text(final Data data, final int pre, final boolean compact) {
+  public static byte[] text(final Data data, final int pre) {
     final int kind = data.kind(pre);
     switch(kind) {
       case Data.ELEM: return data.name(pre, kind);
-      case Data.DOC:  return data.text(pre, true);
-      case Data.TEXT: return compact ? TEXT : data.text(pre, true);
-      case Data.COMM: return compact ? COMMENT : data.text(pre, true);
-      case Data.PI:   return compact ? PI : data.text(pre, true);
+      case Data.ATTR: return new TokenBuilder().add(ATT).add(data.name(pre, kind)).
+          add(ATT1).add(data.text(pre, false)).add(ATT2).finish();
+      default: return data.text(pre, true);
     }
-
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(ATT);
-    tb.add(data.name(pre, kind));
-    if(!compact) {
-      tb.add(ATT1);
-      tb.add(data.text(pre, false));
-      tb.add(ATT2);
-    }
-    return tb.finish();
   }
 
   /**
-   * Returns the name of the specified element.
-   * Note that the pre value must reference an element node.
+   * Returns the name of the specified node or a standard text representation.
    * @param opts gui options
    * @param data data reference
    * @param pre pre value
    * @return name
    */
-  public static byte[] name(final GUIOptions opts, final Data data, final int pre) {
-    if(data.kind(pre) == Data.ELEM) {
+  public static byte[] namedText(final GUIOptions opts, final Data data, final int pre) {
+    if(opts.get(GUIOptions.SHOWNAME) && data.kind(pre) == Data.ELEM) {
       final int id = nameID(data);
-      if(id != 0 && opts.get(GUIOptions.SHOWNAME)) {
-        final byte[] att = data.attValue(id, pre);
-        if(att != null) return att;
+      if(id != 0) {
+        final byte[] attr = data.attValue(id, pre);
+        if(attr != null) return attr;
       }
     }
-    return text(data, pre, true);
+    return Token.chop(text(data, pre), 32);
   }
 
   /**

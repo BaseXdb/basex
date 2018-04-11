@@ -1,6 +1,5 @@
 package org.basex.gui.view.map;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 
@@ -349,10 +348,7 @@ public final class MapView extends View {
       g.drawRect(selBox.x - 1, selBox.y - 1, selBox.w + 2, selBox.h + 2);
     } else {
       // paint focused rectangle
-      final int x = f.x;
-      final int y = f.y;
-      final int w = f.w;
-      final int h = f.h;
+      final int x = f.x, y = f.y, w = f.w, h = f.h;
       g.setColor(color4);
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
@@ -360,11 +356,8 @@ public final class MapView extends View {
       // draw element label
       g.setFont(font);
       BaseXLayout.antiAlias(g);
-      if(data.kind(f.pre) == Data.ELEM) {
-        String tt = Token.string(ViewData.name(gopts, data, f.pre));
-        if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
-        BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), f.level + 5);
-      }
+      if(data.kind(f.pre) == Data.ELEM) BaseXLayout.drawTooltip(g,
+          Token.string(ViewData.namedText(gopts, data, f.pre)), x, y, getWidth(), f.level + 5);
 
       if(f.thumb) {
         // draw tooltip for thumbnail

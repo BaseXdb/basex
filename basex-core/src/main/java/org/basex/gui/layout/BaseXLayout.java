@@ -420,12 +420,11 @@ public final class BaseXLayout {
   public static void chopString(final Graphics g, final byte[] string, final int x, final int y,
       final int w, final int fs) {
 
-    if(w < 12) return;
+    // too little space: skip rendering
+    if(w < 10) return;
     int j = string.length;
     try {
-      int l = 0;
-      int fw = 0;
-      for(int k = 0; k < j; k += l) {
+      for(int k = 0, l = 0, fw = 0; k < j; k += l) {
         final int ww = width(g, cp(string, k));
         if(fw + ww >= w - 4) {
           j = Math.max(1, k - l);

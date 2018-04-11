@@ -126,12 +126,11 @@ final class MapPainter {
       if(kind == Data.ELEM || kind == Data.DOC) {
         g.setColor(GUIConstants.TEXT);
         g.setFont(GUIConstants.font);
-        renderer.chopText(ViewData.name(gopts, data, pre), rect.x, rect.y, rect.w);
+        renderer.chopText(ViewData.namedText(gopts, data, pre), rect.x, rect.y, rect.w);
       } else {
         g.setColor(GUIConstants.color((rect.level << 1) + 8));
         g.setFont(GUIConstants.mfont);
-        final byte[] text = ViewData.text(data, pre, false);
-
+        final byte[] text = ViewData.text(data, pre);
         rect.thumb = renderer.calcHeight(rect, text) >= rect.h;
         if(rect.thumb) {
           renderer.drawThumbnails(rect, text);
@@ -151,6 +150,6 @@ final class MapPainter {
    * @return byte[] content
    */
   static byte[] text(final Data data, final MapRect mr) {
-    return ViewData.text(data, mr.pre, false);
+    return ViewData.text(data, mr.pre);
   }
 }

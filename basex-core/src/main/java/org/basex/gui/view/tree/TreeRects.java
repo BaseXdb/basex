@@ -14,8 +14,6 @@ import org.basex.query.value.seq.*;
  * @author Wolfgang Miller
  */
 final class TreeRects {
-  /** Graphics reference. */
-  private final Graphics g;
   /** View. */
   private final View view;
 
@@ -23,15 +21,15 @@ final class TreeRects {
   private TreeRect[][][] rects;
   /** Displayed nods. */
   DBNodes nodes;
+  /** Graphics reference. */
+  Graphics g;
 
   /**
    * Constructor.
    * @param view view
-   * @param g graphics reference
    */
-  TreeRects(final View view, final Graphics g) {
+  TreeRects(final View view) {
     this.view = view;
-    this.g = g;
   }
 
   /**
@@ -108,13 +106,11 @@ final class TreeRects {
     // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[subSi];
 
-    double xx = rn * w * subSi + ds;
-    double ww = w;
-
+    double xx = rn * w * subSi + ds, ww = w;
     for(int i = 0; i < subSi; ++i) {
       if(slim) {
         final double boxMiddle = xx + ww / 2.0f;
-        final byte[] text = getText(sub.prePerIndex(rn, lv, i));
+        final byte[] text = text(sub.prePerIndex(rn, lv, i));
         int o = calcOptimalRectWidth(text) + 10;
         if(o < MIN_TXT_SPACE) o = MIN_TXT_SPACE;
         if(w > o) {
@@ -122,8 +118,7 @@ final class TreeRects {
           ww = o;
         }
       }
-      rects[rn][lv][i] = new TreeRect((int) xx + BORDER_PADDING, (int) ww
-          - BORDER_PADDING);
+      rects[rn][lv][i] = new TreeRect((int) xx + BORDER_PADDING, (int) ww - BORDER_PADDING);
 
       xx += w;
     }
@@ -135,7 +130,7 @@ final class TreeRects {
    * @param lv level
    * @return TreeRect array
    */
-  TreeRect[] getTreeRectsPerLevel(final int rn, final int lv) {
+  TreeRect[] treeRectsPerLevel(final int rn, final int lv) {
     return rects[rn][lv];
   }
 
@@ -146,7 +141,7 @@ final class TreeRects {
    * @param ix index
    * @return tree rectangle
    */
-  TreeRect getTreeRectPerIndex(final int rn, final int lv, final int ix) {
+  TreeRect treeRectPerIndex(final int rn, final int lv, final int ix) {
     return rects[rn][lv][ix];
   }
 
@@ -155,8 +150,8 @@ final class TreeRects {
    * @param pre pre
    * @return text
    */
-  byte[] getText(final int pre) {
-    return ViewData.name(view.gui.gopts, nodes.data(), pre);
+  byte[] text(final int pre) {
+    return ViewData.namedText(view.gui.gopts, nodes.data(), pre);
   }
 
   /**
@@ -187,8 +182,8 @@ final class TreeRects {
    * @param x x position
    * @return pre value
    */
-  int getPrePerXPos(final TreeSubtree sub, final int rn, final int lv, final int x) {
-    final TreeRect r = getTreeRectsPerLevel(rn, lv)[0];
+  int prePerXPos(final TreeSubtree sub, final int rn, final int lv, final int x) {
+    final TreeRect r = treeRectsPerLevel(rn, lv)[0];
     final double ratio = (x - r.x) / (double) r.w;
     final int idx = (int) (ratio * sub.levelSize(rn, lv));
     return sub.prePerIndex(rn, lv, idx);
