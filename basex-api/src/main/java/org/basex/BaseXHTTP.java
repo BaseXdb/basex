@@ -85,7 +85,6 @@ public final class BaseXHTTP extends CLI {
     handlers.addHandler(new WebSocketHandler() {
       @Override
       public void configure(final WebSocketServletFactory factory) {
-        System.out.println("Configure call");
         // set a 10 second timeout
         factory.getPolicy().setIdleTimeout(10000);
 
