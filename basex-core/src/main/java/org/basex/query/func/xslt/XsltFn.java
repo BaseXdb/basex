@@ -21,9 +21,9 @@ abstract class XsltFn extends StandardFunc {
   /** XSLT implementations. */
   static final String[] IMPL = {
     "", "Java", "1.0",
-    "net.sf.saxon.TransformerFactoryImpl", "Saxon HE", "2.0",
-    "com.saxonica.config.ProfessionalTransformerFactory", "Saxon PE", "2.0",
-    "com.saxonica.config.EnterpriseTransformerFactory", "Saxon EE", "2.0"
+    "net.sf.saxon.TransformerFactoryImpl", "Saxon HE", "3.0",
+    "com.saxonica.config.ProfessionalTransformerFactory", "Saxon PE", "3.0",
+    "com.saxonica.config.EnterpriseTransformerFactory", "Saxon EE", "3.0"
   };
   /** Implementation offset. */
   static final int OFFSET;
