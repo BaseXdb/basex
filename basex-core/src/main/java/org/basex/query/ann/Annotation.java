@@ -150,7 +150,18 @@ public enum Annotation {
   /** XQuery annotation. */
   _UNIT_IGNORE("ignore([message])", arg(STR_O), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_TEST("test(['expected',error])", arg(STR_O, STR_O), UNIT_URI);
+  _UNIT_TEST("test(['expected',error])", arg(STR_O, STR_O), UNIT_URI),
+
+  /** XQuery annotation. */
+  _WS_CONNECT("connect([path])", arg(STR_O), WS_URI),
+  /** XQuery annotation. */
+  _WS_MESSAGE("message([path])", arg(STR_O), WS_URI),
+  /** XQuery annotation. */
+  _WS_SENDTO("send-to([path])", arg(STR_O), WS_URI),
+  /** XQuery annotation. */
+  _WS_ERROR("error-case([path])", arg(STR_O), WS_URI),
+  /** XQuery annotation. */
+  _WS_CLOSE("close([path])", arg(STR_O), WS_URI);
 
   /** Argument types. */
   public final SeqType[] args;
