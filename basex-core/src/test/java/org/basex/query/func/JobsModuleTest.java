@@ -64,6 +64,11 @@ public final class JobsModuleTest extends AdvancedQueryTest {
     query(func.args("db:open('db')"));
     query(func.args("1+"));
     query(func.args("1, delete node <a/>"));
+
+    // error in List implementation
+    query("trace(true()) and (prof:void(" +
+      func.args("prof:sleep(100)", " ()", " map { 'id': 'eval4' }") +
+    "), true())", "true");
   }
 
   /** Test method. */

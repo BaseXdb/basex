@@ -107,18 +107,18 @@ public final class List extends Arr {
   @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
-      final int el = exprs.length;
-      final long[] offsets = new long[el];
-      final Iter[] iters = new Iter[el];
-      long size = Long.MIN_VALUE;
-      int e;
+      private final int el = exprs.length;
+      private final Iter[] iters = new Iter[el];
+      private long[] offsets;
+      private long size;
+      private int e;
 
       @Override
       public Item next() throws QueryException {
         while(e < el) {
           final Item item = qc.next(iter(e));
           if(item != null) return item;
-          iters[e++] = null;
+          e++;
         }
         return null;
       }
@@ -132,16 +132,17 @@ public final class List extends Arr {
 
       @Override
       public long size() throws QueryException {
-        long size1 = 0;
-        if(size == Long.MIN_VALUE) {
-          for(int o = 0; o < el && size1 != -1; o++) {
-            final long size2 = iter(o).size();
-            offsets[o] = size1;
-            size1 = size2 == -1 || size1 + size2 < 0 ? -1 : size1 + size2;
+        if(offsets == null) {
+          // first call: sum up sizes
+          offsets = new long[el];
+          for(int o = 0; o < el && size != -1; o++) {
+            // cache offsets for direct access
+            offsets[o] = size;
+            final long s = iter(o).size();
+            size = s == -1 || size + s < 0 ? -1 : size + s;
           }
-          size = size1;
         }
-        return size1;
+        return size;
       }
 
       private Iter iter(final int i) throws QueryException {
