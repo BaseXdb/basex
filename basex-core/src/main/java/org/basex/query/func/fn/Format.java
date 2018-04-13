@@ -29,21 +29,21 @@ abstract class Format extends StandardFunc {
     if(el == 3 || el == 4) throw Functions.wrongArity(sig, el, new IntList(), info);
 
     final Item item = exprs[0].atomItem(qc, info);
-    final byte[] pic = toEmptyToken(exprs[1], qc);
+    final byte[] picture = toEmptyToken(exprs[1], qc);
 
-    final boolean ext = el == 5;
-    final byte[] lng = ext ? toEmptyToken(exprs[2], qc) : EMPTY;
-    byte[] cal = null;
-    if(ext) {
-      cal = toTokenOrNull(exprs[3], qc);
-      if(cal != null) cal = trim(cal);
+    final boolean more = el == 5;
+    final byte[] language = more ? toEmptyToken(exprs[2], qc) : EMPTY;
+    byte[] calendar = null;
+    if(more) {
+      calendar = toTokenOrNull(exprs[3], qc);
+      if(calendar != null) calendar = trim(calendar);
     }
-    final byte[] plc = ext ? toEmptyToken(exprs[4], qc) : EMPTY;
+    final byte[] place = more ? toEmptyToken(exprs[4], qc) : EMPTY;
     if(item == null) return null;
 
     final ADate date = (ADate) checkType(item, tp);
-    final Formatter form = Formatter.get(lng);
-    return Str.get(form.formatDate(date, lng, pic, cal, plc, info, sc));
+    final Formatter form = Formatter.get(language);
+    return Str.get(form.formatDate(date, language, picture, calendar, place, info, sc));
   }
 
   @Override
