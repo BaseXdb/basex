@@ -98,7 +98,9 @@ public final class Token {
     if(length <= 0) return "";
     /// check if string contains non-ascii characters
     final int e = start + length;
-    for(int p = start; p < e; ++p) if(token[p] < 0) return utf8(token, start, length);
+    for(int p = start; p < e; ++p) {
+      if(token[p] < 0) return utf8(token, start, length);
+    }
     /// copy ascii characters to character array
     final char[] str = new char[length];
     for(int p = 0; p < length; ++p) str[p] = (char) token[start + p];
