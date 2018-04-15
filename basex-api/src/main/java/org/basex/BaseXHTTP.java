@@ -82,14 +82,14 @@ public final class BaseXHTTP extends CLI {
     HandlerList handlers = new HandlerList();
 
     // Add a new WebSocketHandler which defines which Websocket is used
-//    handlers.addHandler(new WebSocketHandler() {
-//      @Override
-//      public void configure(final WebSocketServletFactory factory) {
-//        // set a 10 second timeout
-//        factory.getPolicy().setIdleTimeout(10000);
-//
-//        factory.register(WebSocke.class);
-//      }});
+    handlers.addHandler(new WebSocketHandler() {
+      @Override
+      public void configure(final WebSocketServletFactory factory) {
+        // set a 10 second timeout
+        factory.getPolicy().setIdleTimeout(10000);
+
+        factory.register(WebSocke.class);
+      }});
 
     // Add the WebAppContext handler
     handlers.addHandler(wac);

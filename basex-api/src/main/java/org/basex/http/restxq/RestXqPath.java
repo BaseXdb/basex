@@ -4,6 +4,7 @@ import org.basex.http.*;
 import org.basex.query.QueryException;
 import org.basex.query.value.item.QNm;
 import org.basex.util.InputInfo;
+import org.basex.ws.*;
 
 import java.util.List;
 import java.util.Map;
@@ -81,5 +82,18 @@ final class RestXqPath implements Comparable<RestXqPath> {
   @Override
   public String toString() {
     return path;
+  }
+
+  /**
+   * WebsocketStuff
+   * */
+
+  /**
+   * Checks if the path matches the HTTP request.
+   * @param conn HTTP connection
+   * @return result of check
+   */
+  boolean matches(final WebsocketConnection conn) {
+    return matcher.matches(conn.path());
   }
 }

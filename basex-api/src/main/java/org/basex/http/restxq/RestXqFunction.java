@@ -35,6 +35,7 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
+import org.basex.ws.*;
 
 /**
  * This class represents a single RESTXQ function.
@@ -42,7 +43,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqFunction implements Comparable<RestXqFunction> {
+public final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Single template pattern. */
   private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
   /** EQName pattern. */
@@ -594,5 +595,25 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       if(!error.add(test)) throw error(INV_ERR_SAME_X, last);
       last = test;
     }
+  }
+
+  /**
+   * WEBSOCKETSTUFF
+   * */
+  /**
+   * Checks if an WEbsocket request matches this function and its constraints.
+   * @param conn HTTP connection
+   * @param err error code (assigned if error function is to be called)
+   * @param perm permission flag
+   * @return result of check
+   */
+  boolean matches(final WebsocketConnection conn, final QNm err, final boolean perm) {
+    // check method, consumed and produced media type, and path or error
+//    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
+//        produces(conn))) return false;
+
+//    if(perm) return permission != null && permission.matches(conn);
+    if(err != null) return error != null && error.matches(err);
+    return path != null && path.matches(conn);
   }
 }

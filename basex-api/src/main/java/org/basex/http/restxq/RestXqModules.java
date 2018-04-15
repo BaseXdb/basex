@@ -14,6 +14,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.ws.*;
 
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
@@ -104,6 +105,11 @@ public final class RestXqModules {
 
     // remove functions with different specifity
     final RestXqFunction first = funcs.get(0);
+    for(final RestXqFunction ftest: funcs) {
+      System.out.println("ftest.path.tostring");
+      System.out.println(ftest.path.toString());
+    }
+
     for(int l = funcs.size() - 1; l > 0; l--) {
       if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
     }
@@ -293,5 +299,74 @@ public final class RestXqModules {
         }
       }
     }
+  }
+
+
+  /**
+   * WEBSOCKET STUFF
+   * */
+
+  /**
+   * Returns the function that matches the current request or the specified error code best.
+   * @param conn WebSocketConnection
+   * @param error error code (assigned if error function is to be called)
+   * @return function, or {@code null} if no function matches
+   * @throws Exception exception (including unexpected ones)
+   */
+  public RestXqFunction find(final WebsocketConnection conn, final QNm error) throws Exception {
+    // collect all function candidates
+    List<RestXqFunction> funcs = find(conn, error, false);
+    if(funcs.isEmpty()) return null;
+
+    // remove functions with different specifity
+    final RestXqFunction first = funcs.get(0);
+    for(final RestXqFunction ftest: funcs) {
+      System.out.println("Websocket ftest.path.tostring");
+      System.out.println(ftest.path.toString());
+    }
+
+    for(int l = funcs.size() - 1; l > 0; l--) {
+      if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
+    }
+    // return single function
+    if(funcs.size() == 1) return first;
+
+    // multiple functions: check quality factors
+    // funcs = bestQf(funcs, conn);
+    if(funcs.size() == 1) return funcs.get(0);
+
+    // show error if we are left with multiple function candidates
+    final TokenBuilder tb = new TokenBuilder();
+    for(final RestXqFunction func : funcs) {
+      tb.add(Text.NL).add(Text.LI).addExt(func.function.name.prefixString());
+      if(!func.produces.isEmpty()) tb.add(" ").addExt(func.produces);
+    }
+    throw first.path == null ?
+      first.error(ERROR_CONFLICT_X_X, error, tb) :
+      first.error(PATH_CONFLICT_X_X, first.path, tb);
+  }
+
+  /**
+   * Returns the functions that match the current request.
+   * @param conn WebSocketConnection
+   * @param error error code (assigned if error function is to be called)
+   * @param perm permission flag
+   * @return list of matching functions, ordered by specifity
+   * @throws Exception exception (including unexpected ones)
+   */
+  private List<RestXqFunction> find(final WebsocketConnection conn,
+      final QNm error, final boolean perm)
+      throws Exception {
+
+    // collect all functions
+    final ArrayList<RestXqFunction> list = new ArrayList<>();
+    for(final RestXqModule mod : cache(conn.context).values()) {
+      for(final RestXqFunction func : mod.functions()) {
+        if(func.matches(conn, error, perm)) list.add(func);
+      }
+    }
+    // sort by specifity
+    Collections.sort(list);
+    return list;
   }
 }

@@ -1,9 +1,11 @@
 package org.basex.ws;
 
+import java.net.*;
 import java.util.*;
 
 import javax.validation.constraints.*;
 
+import org.basex.http.restxq.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -34,12 +36,34 @@ public class WebSocke extends WebSocketAdapter
         UpgradeRequest req = sess.getUpgradeRequest();
         channelName = req.getParameterMap().get("channelName");
 
+        // Get path
+        URI path = sess.getUpgradeRequest().getRequestURI();
+        System.out.println("Websocke path.toString");
+        System.out.println(path.toString());
+
         // Get the Accepted Subprotocols
         UpgradeResponse resp = sess.getUpgradeResponse();
         subprotocol = resp.getAcceptedSubProtocol();
 
         // Add to the WebSocketRoom
         Room.getInstance().join(this);
+
+        // Create new WebsocketConnection
+        final WebsocketConnection wsconnection =
+            new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse());
+
+        final RestXqModules rxm = RestXqModules.get(wsconnection.context);
+
+     // select the closest match for this request
+        try {
+          RestXqFunction func = rxm.find(wsconnection, null);
+          System.out.println("WebSocke found: ");
+          System.out.println(func.toString());
+        } catch(Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+
 
         // Just for Logging purpose
         System.out.println("Socket Connected: " + sess);
