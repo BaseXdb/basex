@@ -255,8 +255,7 @@ public final class HttpPayload {
   private byte[] boundary(final MediaType type) throws QueryException {
     final String b = type.parameters().get(BOUNDARY);
     if(b == null) throw HC_REQ_X.get(info, "No separation boundary specified");
-    // if the boundary is enclosed in quotes, strip them
-    return token(b.charAt(0) == '"' ? b.substring(1, b.lastIndexOf('"')) : b);
+    return token(b);
   }
 
   /**

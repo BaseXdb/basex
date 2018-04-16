@@ -15,6 +15,7 @@ import java.util.List;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.QueryError.ErrType;
 import org.basex.query.*;
@@ -604,8 +605,7 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests response handling with specified charset in the header
-   * 'Content-Type'.
+   * Tests response handling with specified charset in the header 'Content-Type'.
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
@@ -620,6 +620,28 @@ public class FnHttpTest extends HTTPTest {
     final Value res = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
     // compare results
     assertEquals(test, string(res.itemAt(1).string(null)));
+  }
+
+  /**
+   * Tests content-type parsing.
+   * @throws IOException I/O Exception
+   * @throws QueryException query exception
+   */
+  @Test public void parseContentType() throws IOException, QueryException {
+    final FakeHttpConnection conn = new FakeHttpConnection();
+    // upper case attribute, quoted string
+    conn.contentType = "text/plain; CHARSET=\"CP1252\"";
+    conn.content = new byte[] { };
+    new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+
+    conn.contentType = "text/plain; ChArSeT=\"\\C\\P\\1\\2\\5\\2\"";
+    new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+
+    try {
+      conn.contentType = "text/plain; CHARSET=\\C\\P\\1\\2\\5\\2";
+      new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+      fail("Encoding exception expected");
+    } catch(final EncodingException expected) { }
   }
 
   /**
