@@ -616,4 +616,23 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
     if(err != null) return error != null && error.matches(err);
     return path != null && path.matches(conn);
   }
+
+  /**
+   * Processes the HTTP request.
+   * Parses new modules and discards obsolete ones.
+   * @param conn HTTP connection
+   * @param ext extended processing information (function, error; can be {@code null})
+   * @return {@code true} if function creates no result
+   * @throws Exception exception
+   */
+  boolean process(final WebsocketConnection conn, final Object ext) throws Exception {
+    try {
+      return module.process(conn, this, ext);
+    } catch(final QueryException ex) {
+      if(ex.file() == null) ex.info(function.info);
+      throw ex;
+    }
+  }
+
+
 }

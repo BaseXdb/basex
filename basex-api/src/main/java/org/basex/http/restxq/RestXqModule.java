@@ -11,6 +11,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.ws.*;
 
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
@@ -136,5 +137,33 @@ final class RestXqModule {
       if(func.info.equals(sf.info)) return sf;
     }
     return null;
+  }
+
+
+  /**
+   * WebsocketStuff
+   * */
+  /**
+   * Processes the HTTP request.
+   * @param conn HTTP connection
+   * @param func function to be processed
+   * @param ext extended processing information (function, error; can be {@code null})
+   * @return {@code true} if function creates no result
+   * @throws Exception exception
+   */
+  boolean process(final WebsocketConnection conn, final RestXqFunction func, final Object ext)
+      throws Exception {
+
+    // create new XQuery instance
+    final Context ctx = conn.context;
+    try(QueryContext qc = qc(ctx)) {
+      final StaticFunc sf = find(qc, func.function);
+      // will only happen if file has been swapped between caching and parsing
+      if(sf == null) throw HTTPCode.NO_XQUERY.get();
+
+      final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
+      rxf.parse(ctx);
+      return true;//new RestXqResponse(rxf, qc, conn).create(ext);
+    }
   }
 }

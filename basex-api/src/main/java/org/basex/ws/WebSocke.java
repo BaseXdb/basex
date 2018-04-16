@@ -38,8 +38,6 @@ public class WebSocke extends WebSocketAdapter
 
         // Get path
         URI path = sess.getUpgradeRequest().getRequestURI();
-        System.out.println("Websocke path.toString");
-        System.out.println(path.toString());
 
         // Get the Accepted Subprotocols
         UpgradeResponse resp = sess.getUpgradeResponse();
@@ -55,8 +53,9 @@ public class WebSocke extends WebSocketAdapter
         final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
      // select the closest match for this request
+        RestXqFunction func = null;
         try {
-          RestXqFunction func = rxm.find(wsconnection, null);
+           func = rxm.find(wsconnection, null);
           System.out.println("WebSocke found: ");
           System.out.println(func.toString());
         } catch(Exception e) {
@@ -64,6 +63,7 @@ public class WebSocke extends WebSocketAdapter
           e.printStackTrace();
         }
 
+//        func.process(wsconnection, null);
 
         // Just for Logging purpose
         System.out.println("Socket Connected: " + sess);

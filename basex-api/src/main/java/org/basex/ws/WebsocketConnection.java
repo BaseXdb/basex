@@ -23,7 +23,6 @@ public class WebsocketConnection implements ClientInfo {
     this.req = req;
     this.res = res;
     context = new Context(HTTPContext.context(), this);
-    // todo: normalize path
     this.path = req.getRequestURI().toString().substring(19);
   }
 
