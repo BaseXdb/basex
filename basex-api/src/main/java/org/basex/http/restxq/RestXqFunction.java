@@ -625,7 +625,7 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  boolean process(final WebsocketConnection conn, final Object ext) throws Exception {
+  public boolean process(final WebsocketConnection conn, final Object ext) throws Exception {
     try {
       return module.process(conn, this, ext);
     } catch(final QueryException ex) {

@@ -9,8 +9,13 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.scope.*;
+import org.basex.query.value.item.*;
 import org.basex.ws.*;
 
 /**
@@ -163,6 +168,15 @@ final class RestXqModule {
 
       final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
       rxf.parse(ctx);
+
+      qc.mainModule(MainModule.get(sf, new Expr[0]));
+//      conn.sess.getRemote().sendBytes(data);
+      Serializer ser = Serializer.get(null);
+      Iter iter = qc.iter();
+      for(Item it; (it = iter.next()) != null;) {
+        conn.sess.getRemote().sendString(it.toString());;
+//        ser.serialize(it);
+      }
       return true;//new RestXqResponse(rxf, qc, conn).create(ext);
     }
   }

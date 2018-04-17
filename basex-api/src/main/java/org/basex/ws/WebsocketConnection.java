@@ -18,12 +18,14 @@ public class WebsocketConnection implements ClientInfo {
   public final UpgradeResponse res;
   public final Context context;
   private final String path;
+  public final Session sess;
 
-  WebsocketConnection(final UpgradeRequest req, final UpgradeResponse res) {
+  WebsocketConnection(final UpgradeRequest req, final UpgradeResponse res, final Session sess) {
     this.req = req;
     this.res = res;
     context = new Context(HTTPContext.context(), this);
     this.path = req.getRequestURI().toString().substring(19);
+    this.sess = sess;
   }
 
   @Override

@@ -36,9 +36,6 @@ public class WebSocke extends WebSocketAdapter
         UpgradeRequest req = sess.getUpgradeRequest();
         channelName = req.getParameterMap().get("channelName");
 
-        // Get path
-        URI path = sess.getUpgradeRequest().getRequestURI();
-
         // Get the Accepted Subprotocols
         UpgradeResponse resp = sess.getUpgradeResponse();
         subprotocol = resp.getAcceptedSubProtocol();
@@ -48,7 +45,7 @@ public class WebSocke extends WebSocketAdapter
 
         // Create new WebsocketConnection
         final WebsocketConnection wsconnection =
-            new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse());
+            new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(), sess);
 
         final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
@@ -63,7 +60,11 @@ public class WebSocke extends WebSocketAdapter
           e.printStackTrace();
         }
 
-//        func.process(wsconnection, null);
+        try {
+          func.process(wsconnection, null);
+        } catch(Exception e) {
+          e.printStackTrace();
+        }
 
         // Just for Logging purpose
         System.out.println("Socket Connected: " + sess);
