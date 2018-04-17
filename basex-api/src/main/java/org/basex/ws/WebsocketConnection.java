@@ -1,7 +1,5 @@
 package org.basex.ws;
 
-import javax.servlet.http.*;
-
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.server.*;
@@ -9,17 +7,38 @@ import org.eclipse.jetty.websocket.api.*;
 
 /**
  * Clientinfo in Websocket context.
- * Should be like HTTPConnection.java, just for websockets
+ * @author BaseX Team 2005-18, BSD License
  *
  */
 public class WebsocketConnection implements ClientInfo {
 
+  /**
+   * The UpdateRequest.
+   */
   public final UpgradeRequest req;
+  /**
+   * The UpdateResponse.
+   * */
   public final UpgradeResponse res;
+  /**
+   * The DatabaseContext.
+   * */
   public final Context context;
+  /**
+   * The path of the Connection.
+   * */
   private final String path;
+  /**
+   * The corresponding session for the connection.
+   * */
   public final Session sess;
 
+  /**
+   * Constructor for the WebsocketConnection.
+   * @param req the UpdateRequest
+   * @param res the UpdateResponse
+   * @param sess the Session
+   */
   WebsocketConnection(final UpgradeRequest req, final UpgradeResponse res, final Session sess) {
     this.req = req;
     this.res = res;
@@ -28,20 +47,25 @@ public class WebsocketConnection implements ClientInfo {
     this.sess = sess;
   }
 
+  // @TODO: Implement
   @Override
   public String clientAddress() {
     // TODO Auto-generated method stub
     return null;
   }
 
+//@TODO: Implement
   @Override
   public String clientName() {
     // TODO Auto-generated method stub
     return null;
   }
 
+  /**
+   * Returns the Path of the Connection.
+   * @return path String
+   */
   public String path() {
     return this.path;
   }
-
 }

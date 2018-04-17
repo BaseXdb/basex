@@ -14,13 +14,9 @@ import org.basex.io.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
-import org.basex.ws.*;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.webapp.*;
 import org.eclipse.jetty.xml.*;
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
-import org.eclipse.jetty.websocket.servlet.*;
 /**
  * This is the main class for the starting the database HTTP services.
  *
@@ -77,23 +73,7 @@ public final class BaseXHTTP extends CLI {
     final String webapp = sopts.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
-
-    // Create a Handler list for adding multiple Handlers to the same Server
-    HandlerList handlers = new HandlerList();
-
-    // Add a new WebSocketHandler which defines which Websocket is used
-    handlers.addHandler(new WebSocketHandler() {
-      @Override
-      public void configure(final WebSocketServletFactory factory) {
-        // set a 10 second timeout
-        factory.getPolicy().setIdleTimeout(10000);
-
-        factory.register(WebSocke.class);
-      }});
-
-    // Add the WebAppContext handler
-    handlers.addHandler(wac);
-    jetty.setHandler(handlers);
+    jetty.setHandler(wac);
 
     final ArrayList<ServerConnector> conns = new ArrayList<>(1);
     for(final Connector conn : jetty.getConnectors()) {

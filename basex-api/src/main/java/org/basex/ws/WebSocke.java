@@ -1,10 +1,7 @@
 package org.basex.ws;
 
-import java.net.*;
 import java.util.*;
-
 import javax.validation.constraints.*;
-
 import org.basex.http.restxq.*;
 import org.eclipse.jetty.websocket.api.*;
 
