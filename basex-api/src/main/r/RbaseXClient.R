@@ -1,0 +1,265 @@
+# R client for BaseX.
+# Works with BaseX 8.0 and later
+#
+# Documentation: http://docs.basex.org/wiki/Clients
+#
+# (C) Ben Engbergs
+
+library(utils)
+library(R6)
+library(openssl)
+library(dplyr)
+library(purrr)
+library(stringr)
+library(magrittr)
+
+BasexClient <- R6Class("BasexClient",
+  public = list(
+    initialize = function(host, port, username, password) {
+      private$sock <- socketConnection(host = "localhost", port = 1984L, 
+                                    open = "w+b", server = FALSE, blocking = TRUE, 
+                                    encoding = "utf-8")
+      private$response <- self$str_receive()
+      splitted <-strsplit(private$response, "\\:")
+      ifelse(length(splitted[[1]]) > 1,
+             { code <- paste(username, splitted[[1]][1],password, sep=":")
+             nonce <- splitted[[1]][2]
+             },
+             { code <- password
+             nonce <- splitted[[1]][1]
+             }
+      )
+      code <- md5(paste(md5(code), nonce, sep = ""))
+      class(code) <- "hash"
+      private$void_send(username)
+      private$void_send(code)
+      if (!self$bool_test_sock()) stop("Access denied")},
+    execute = function(command) {
+      private$void_send(command)
+      private$result <- self$str_receive()
+      private$info <-   self$str_receive()
+      if (length(private$info) > 0) cat(private$info, "\n")
+      self$bool_test_sock()
+      return(private$result %>% strsplit("\n", fixed = TRUE))
+    },
+    query = function(query) {
+      query_id <- Query$new(query, private$get_sock())
+      if (!self$bool_test_sock()) {
+        Error <- paste("Error in ", query)
+        stop(Error)
+      } else {
+        cat("Query \'", query, "\'created successfully.", "\n")
+      }
+      return(query_id)},
+    bool_test_sock = function(socket) {
+      if (missing(socket)) socket <- private$get_sock()
+      test <- readBin(socket, what = "raw", n =1)
+      return(test == 0x00)
+    },
+    create = function(name, input) {
+      if (missing(input)) input <- ""
+      writeBin(as.raw(0x08), private$sock)
+      writeBin(private$raw_terminated_string(name), private$sock)
+      writeBin(private$raw_terminated_string(input), private$sock)
+      private$info <- self$str_receive()
+      success <- self$bool_test_sock()
+      if (!success)
+        cat("Database \'", name, "\' could not be created.", "\n")
+      success
+    },
+    add = function(name, path, input) {
+      writeBin(as.raw(0x09), private$sock)
+      writeBin(private$raw_terminated_string(name), private$sock)
+      writeBin(private$raw_terminated_string(path), private$sock)
+      writeBin(private$raw_terminated_string(input), private$sock)
+      private$info <- self$str_receive()
+      success <- self$bool_test_sock()
+    },
+    replace = function(path, input) {
+      writeBin(as.raw(0x0C), private$sock)
+      writeBin(private$raw_terminated_string(path), private$sock)
+      writeBin(private$raw_terminated_string(input), private$sock)
+      private$info <- self$str_receive()
+      success <- self$bool_test_sock()
+    },
+    store = function(path, input) {
+      writeBin(as.raw(0x0D), private$sock)
+      writeBin(private$raw_terminated_string(path), private$sock)
+      writeBin(private$raw_terminated_string(input), private$sock)
+      private$info <- self$str_receive()
+      success <- self$bool_test_sock()
+    },
+    finalize = function() {
+      private$close_sock()},
+    print = function(...) {
+      cat("Socket: ", private$get_sock(), "\n", sep = "")
+      invisible(self)},
+    str_receive = function(input, output) {
+      if (missing(input)) input   <- private$get_sock()
+      if (missing(output)) output <- raw(0)
+      while ((rd <- readBin(input, what = "raw", n =1)) > 0) {
+        if (rd == 0xff) next
+        output <- c(output, rd)
+      }
+      ret <- rawToChar(output)
+      return(ret)},
+    term_string = function(string) {
+      return(charToRaw(string) %>% append(0) %>% as.raw())}
+  ),
+  
+  private = list(
+    result = NULL,
+    info = NULL,
+    sock = NULL,
+    response = NULL,
+    get_sock = function() { private$sock },
+    close_sock = function() { close(private$sock)},
+    raw_terminated_string = function(string) {
+      return(charToRaw(string) %>% append(0) %>% as.raw())},
+    void_send = function(code, todo, input) {
+      if (missing(todo)) {                                    # 'code' to be handled is either a string, hash or stream
+        classTest <- class(code)
+        if (class(code) == "character" || (class(code) == "hash")) private$void_send0term_string(code)
+      } else {
+        writeBin(as.raw(code), private$get_sock())
+        private$void_send0term_string(todo)
+        private$void_send_stream(input)
+      }},
+    void_send0term_string = function(string) {
+      zero_term <- self$term_string(string)
+      writeBin(zero_term, private$get_sock())},
+    void_send_stream = function(input) {
+      rd_id <- 1
+      end <- length(input)
+      zero_term <- raw()
+      while (rd_id < end) { 
+        rd <- c(input[rd_id])
+        if (rd == 255 || rd == 0) zero_term <- c(zero_term, c(0x00))
+        rd_id <- rd_id + 1
+        zero_term <- c(zero_term, rd)
+      }
+      zero_term <- c(zero_term, c(0x00))
+      writeBin(zero_term, private$get_sock())}
+  )
+)
+
+Query <- R6Class("Query",
+  inherit = BasexClient,
+  
+  public = list(
+    str_id = NULL,
+    raw_id = NULL,
+    text = NULL,
+    initialize = function(query, sock) {    
+      init_string <- super$term_string(query) 
+      private$sock <- sock
+      out_stream <- super$get_sock()
+      writeBin(as.raw(0x00), out_stream)
+      writeBin(init_string, out_stream)
+      self$str_id <- super$str_receive()
+      self$raw_id <- super$term_string(self$str_id)},
+    close = function() { 
+      to_close <- self$str_id
+      private$req_exe(0x02, self$raw_id)
+      if (!private$req_success) cat("Query \'",to_close, "\' could not be closed.", "\n")
+      return(private$req_success)
+    },
+    bind = function(name, value, type) {
+      socket <- super$get_sock()
+      if (missing(type)) type = ""
+      private$write_code_ID(0x03, self$raw_id)
+      name  %>% charToRaw() %>% append(0) %>% as.raw() %>% writeBin(socket)
+      value %>% charToRaw() %>% append(0) %>% as.raw() %>% writeBin(socket)
+      type  %>% charToRaw() %>% append(0) %>% as.raw() %>% writeBin(socket)
+      private$req_result <- super$str_receive()
+      private$req_success <- super$bool_test_sock()
+      return(private$req_success)
+    },
+    execute = function() {
+      private$req_exe(0x05, self$raw_id)
+      result <- private$req_result %>% private$clean()
+      return(result)
+    },  
+    more = function() {
+      if (is.null(private$cache)) {
+        in_stream <- out_stream <- super$get_sock()
+        writeBin(as.raw(0x04), out_stream)
+        writeBin(self$raw_id, out_stream)
+        cache <- c()
+        while ((rd <- readBin(in_stream, what = "raw", n =1)) > 0) {
+          cache <- c(cache, super$str_receive())
+        }
+        private$req_success <- super$bool_test_sock()
+        private$cache <- cache
+        private$pos <- 0
+      }
+      if ( length(private$cache) > private$pos) return(TRUE)
+      else
+      { private$cache <- NULL
+        return(FALSE)
+      }},
+    next_row = function() {      
+      if (self$more()) {
+        private$pos <- private$pos + 1
+        result <- private$cache[private$pos]
+      }
+      return(result)},
+    info = function() { 
+      private$req_exe(0x06, self$raw_id)
+      result <- private$req_result %>% private$clean()
+      return(result)},  
+    options = function() { 
+      private$req_exe(0x07, self$raw_id)
+      res <- private$req_result 
+      res <- ifelse(length(private$req_result) > 1,
+      private$req_result %>% private$clean(), "No options set")},  
+    updating = function() { 
+      private$req_exe(0x1E, self$raw_id)
+      result <- private$req_result %>% as.logical()
+      return(result)},  
+    full = function() { 
+      in_stream <- out_stream <- super$get_sock()
+      writeBin(as.raw(0x1F), out_stream)
+      writeBin(self$raw_id, out_stream)
+      cache <- c()
+      while ((rd <- readBin(in_stream, what = "raw", n =1)) > 0) {
+        cache <- c(cache, super$str_receive())
+      }
+      private$req_success <- super$bool_test_sock()
+      result <- cache
+      return(result)},  
+  
+    print = function(...) {
+      cat("Query-ID: ", self$str_id, "\n", sep = "")
+      invisible(self)}
+  ),
+  private = list(
+    cache = NULL,
+    pos = NULL,
+    req_result = NULL,
+    req_success = NULL,
+    write_code_ID = function(id_code, arg) {
+      out_stream <- super$get_sock()
+      writeBin(as.raw(id_code), out_stream)
+      writeBin(arg, out_stream)},
+    req_exe = function(id_code, arg) {
+      private$write_code_ID(id_code, arg)
+      private$req_result <- super$str_receive()
+      private$req_success <- super$bool_test_sock()
+    }, 
+    receive_more = function(input, output) {
+      if (missing(input)) input   <- private$get_sock()
+      if (missing(output)) output <- raw(0)
+      while ((rd <- readBin(input, what = "raw", n =1)) > 0) {
+        if (rd == 0xff) next
+        output <- c(output, rd)
+      }
+      ret <- rawToChar(output)
+      return(ret)},
+    clean = function(input) {
+      result <- input %>% strsplit("\n", fixed = TRUE) 
+      if ((result[[1]][1]  == "")) result <- result[[1]][2]
+      return(result)
+    }
+  )
+)
