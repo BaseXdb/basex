@@ -52,7 +52,7 @@ public final class Inline {
     if(tl <= 4) {
       value = INLINE | STRING | tl << 32;
       int c = 32;
-      for(final byte b : token) value |= b << (c -= 8);
+      for(final byte b : token) value |= (b & 0xFFL) << (c -= 8);
       return value;
     }
     // compressed whitespace token
