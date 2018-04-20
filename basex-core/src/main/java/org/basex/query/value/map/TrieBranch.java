@@ -122,17 +122,17 @@ final class TrieBranch extends TrieNode {
     qc.checkStop();
     final int k = key(leaf.hash, level);
     final TrieNode ch = kids[k], nw;
+    int n = 1;
     if(ch != null) {
       final TrieNode ins = ch.add(leaf, level + 1, merge, info, qc);
       if(ins == ch) return this;
+      n = ins.size - ch.size;
       nw = ins;
     } else nw = leaf;
 
     final TrieNode[] ks = copyKids();
     ks[k] = nw;
-
-    // we don't replace here, so the size must increase
-    return new TrieBranch(ks, used | 1 << k, size + 1);
+    return new TrieBranch(ks, used | 1 << k, size + n);
   }
 
   @Override
@@ -152,8 +152,6 @@ final class TrieBranch extends TrieNode {
 
     final TrieNode[] ks = copyKids();
     ks[k] = nw;
-
-    // we don't replace here, so the size must increase
     return new TrieBranch(ks, used | 1 << k, size + n);
   }
 

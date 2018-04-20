@@ -109,6 +109,13 @@ public final class MapModuleTest extends QueryPlanTest {
         " map { 'duplicates': 'combine' }") + ", function($k, $v) { $v })", "");
     query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })",
         " map { 'duplicates': 'use-first' }") + ", function($k, $v) { $v })", "");
+
+    // GH1561
+    final String arg1 = " (map { 'A': 'a' }, map { 'A': 'a', 'B': 'b' })";
+    query("map:size(" + func.args(arg1) + ")", 2);
+    query("map:size(" + func.args(arg1, " map{ 'duplicates': 'use-first' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " map{ 'duplicates': 'use-last' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " map{ 'duplicates': 'combine' }") + ")", 2);
   }
 
   /** Test method. */
