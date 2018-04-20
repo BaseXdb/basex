@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -20,16 +21,26 @@ import org.basex.util.*;
  */
 public class Execute extends Command {
   /** Commands to execute. */
-  final ArrayList<Command> commands = new ArrayList<>();
+  final java.util.List<Command> commands;
   /** Error message. */
   String error;
 
   /**
-   * Default constructor.
+   * Constructor for string input.
    * @param input user input
    */
   public Execute(final String input) {
     super(Perm.ADMIN, false, input);
+    commands = new ArrayList<>();
+  }
+
+  /**
+   * Constructor for command input.
+   * @param commands commands to execute
+   */
+  public Execute(final Command... commands) {
+    super(Perm.ADMIN, false);
+    this.commands = Arrays.asList(commands);
   }
 
   @Override
@@ -76,12 +87,12 @@ public class Execute extends Command {
   }
 
   /**
-   * Initializes the specified input.
+   * Initializes command execution.
    * @param ctx database context
    * @return success flag
    */
   boolean init(final Context ctx) {
-    return init(args[0], uri, ctx);
+    return args.length == 0 || init(args[0], uri, ctx);
   }
 
   /**
@@ -105,6 +116,11 @@ public class Execute extends Command {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init().arg(0);
+    cb.init();
+    if(args.length == 0) {
+      cb.arg(null, commands.stream().map(Command::toString).collect(Collectors.joining(";")));
+    } else {
+      cb.arg(0);
+    }
   }
 }
