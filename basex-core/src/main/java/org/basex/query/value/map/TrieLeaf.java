@@ -92,7 +92,9 @@ final class TrieLeaf extends TrieNode {
 
     qc.checkStop();
     if(hash == leaf.hash) {
-      if(!key.sameKey(leaf.key, info)) return new TrieList(hash, key, value, leaf.key, leaf.value);
+      if(!key.sameKey(leaf.key, info))
+        return new TrieList(hash, key, value, leaf.key, leaf.value);
+
       switch(merge) {
         case USE_FIRST:
         case UNSPECIFIED:
@@ -153,8 +155,7 @@ final class TrieLeaf extends TrieNode {
     }
 
     final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, level), ok = key(list.hash, level);
-    final int nu;
+    final int k = key(hash, level), ok = key(list.hash, level), nu;
 
     // same key? add recursively
     if(k == ok) {

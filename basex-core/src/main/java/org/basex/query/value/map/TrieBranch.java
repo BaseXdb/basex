@@ -83,7 +83,9 @@ final class TrieBranch extends TrieNode {
         // check whether the child depends on the right offset
         if(!(single instanceof TrieBranch)) return single;
       }
-    } else nu = used;
+    } else {
+      nu = used;
+    }
 
     final TrieNode[] ks = copyKids();
     ks[k] = nsub;
@@ -121,17 +123,19 @@ final class TrieBranch extends TrieNode {
 
     qc.checkStop();
     final int k = key(leaf.hash, level);
-    final TrieNode ch = kids[k], nw;
+    final TrieNode ch = kids[k], kid;
     int n = 1;
     if(ch != null) {
       final TrieNode ins = ch.add(leaf, level + 1, merge, info, qc);
       if(ins == ch) return this;
       n = ins.size - ch.size;
-      nw = ins;
-    } else nw = leaf;
+      kid = ins;
+    } else {
+      kid = leaf;
+    }
 
     final TrieNode[] ks = copyKids();
-    ks[k] = nw;
+    ks[k] = kid;
     return new TrieBranch(ks, used | 1 << k, size + n);
   }
 
@@ -141,17 +145,19 @@ final class TrieBranch extends TrieNode {
 
     qc.checkStop();
     final int k = key(list.hash, level);
-    final TrieNode ch = kids[k], nw;
+    final TrieNode ch = kids[k], kid;
     int n = list.size;
     if(ch != null) {
       final TrieNode ins = ch.add(list, level + 1, merge, info, qc);
       if(ins == ch) return this;
       n = ins.size - ch.size;
-      nw = ins;
-    } else nw = list;
+      kid = ins;
+    } else {
+      kid = list;
+    }
 
     final TrieNode[] ks = copyKids();
-    ks[k] = nw;
+    ks[k] = kid;
     return new TrieBranch(ks, used | 1 << k, size + n);
   }
 
@@ -165,12 +171,12 @@ final class TrieBranch extends TrieNode {
     for(int k = 0; k < kl; k++) {
       final TrieNode n = kids[k], ok = branch.kids[k];
       if(ok != null) {
-        final TrieNode nw = n == null ? ok : ok.addAll(n, level + 1, merge, info, qc);
-        if(nw != n) {
+        final TrieNode kid = n == null ? ok : ok.addAll(n, level + 1, merge, info, qc);
+        if(kid != n) {
           if(ch == null) ch = copyKids();
-          ch[k] = nw;
+          ch[k] = kid;
           nu |= 1 << k;
-          ns += nw.size - (n == null ? 0 : n.size);
+          ns += kid.size - (n == null ? 0 : n.size);
         }
       }
     }

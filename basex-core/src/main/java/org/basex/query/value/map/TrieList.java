@@ -170,8 +170,7 @@ final class TrieList extends TrieNode {
     }
 
     final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, level), ok = key(leaf.hash, level);
-    final int nu;
+    final int k = key(hash, level), ok = key(leaf.hash, level), nu;
 
     // same key? add recursively
     if(k == ok) {
@@ -208,8 +207,7 @@ final class TrieList extends TrieNode {
     }
 
     final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, level), ok = key(list.hash, level);
-    final int nu;
+    final int k = key(hash, level), ok = key(list.hash, level), nu;
 
     // same key? add recursively
     if(k == ok) {
