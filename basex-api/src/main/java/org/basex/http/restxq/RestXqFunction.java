@@ -35,7 +35,6 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
-import org.basex.ws.*;
 
 /**
  * This class represents a single RESTXQ function.
@@ -596,43 +595,4 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
       last = test;
     }
   }
-
-  /**
-   * WEBSOCKETSTUFF
-   * */
-  /**
-   * Checks if an WEbsocket request matches this function and its constraints.
-   * @param conn HTTP connection
-   * @param err error code (assigned if error function is to be called)
-   * @param perm permission flag
-   * @return result of check
-   */
-  boolean matches(final WebsocketConnection conn, final QNm err, final boolean perm) {
-    // check method, consumed and produced media type, and path or error
-//    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
-//        produces(conn))) return false;
-
-//    if(perm) return permission != null && permission.matches(conn);
-    if(err != null) return error != null && error.matches(err);
-    return path != null && path.matches(conn);
-  }
-
-  /**
-   * Processes the HTTP request.
-   * Parses new modules and discards obsolete ones.
-   * @param conn HTTP connection
-   * @param ext extended processing information (function, error; can be {@code null})
-   * @return {@code true} if function creates no result
-   * @throws Exception exception
-   */
-  public boolean process(final WebsocketConnection conn, final Object ext) throws Exception {
-    try {
-      return module.process(conn, this, ext);
-    } catch(final QueryException ex) {
-      if(ex.file() == null) ex.info(function.info);
-      throw ex;
-    }
-  }
-
-
 }

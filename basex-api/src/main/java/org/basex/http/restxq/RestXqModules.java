@@ -10,6 +10,7 @@ import java.util.function.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.query.ann.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -313,37 +314,31 @@ public final class RestXqModules {
    * @return function, or {@code null} if no function matches
    * @throws Exception exception (including unexpected ones)
    */
-  public RestXqFunction find(final WebsocketConnection conn, final QNm error) throws Exception {
+  public WsXqFunction find(final WebsocketConnection conn, final QNm error,
+      final Annotation ann) throws Exception {
     // collect all function candidates
-    List<RestXqFunction> funcs = find(conn, error, false);
+    List<WsXqFunction> funcs = find(conn, error, false, ann);
     if(funcs.isEmpty()) return null;
 
     // remove functions with different specifity
-    final RestXqFunction first = funcs.get(0);
-    for(final RestXqFunction ftest: funcs) {
-      System.out.println("Websocket ftest.path.tostring");
-      System.out.println(ftest.path.toString());
-    }
+    // Vergleich auf Permissions hier relevant
+    final WsXqFunction first = funcs.get(0);
 
-    for(int l = funcs.size() - 1; l > 0; l--) {
-      if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
-    }
+//    for(int l = funcs.size() - 1; l > 0; l--) {
+//      if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
+//    }
     // return single function
     if(funcs.size() == 1) return first;
 
     // multiple functions: check quality factors
     // funcs = bestQf(funcs, conn);
-    if(funcs.size() == 1) return funcs.get(0);
+    // if(funcs.size() == 1) return funcs.get(0);
 
     // show error if we are left with multiple function candidates
-    final TokenBuilder tb = new TokenBuilder();
-    for(final RestXqFunction func : funcs) {
-      tb.add(Text.NL).add(Text.LI).addExt(func.function.name.prefixString());
-      if(!func.produces.isEmpty()) tb.add(" ").addExt(func.produces);
-    }
-    throw first.path == null ?
-      first.error(ERROR_CONFLICT_X_X, error, tb) :
-      first.error(PATH_CONFLICT_X_X, first.path, tb);
+    // @TODO: Handle Error, state now: propagate it to basexservlet
+    // ->Httconnection and send it. Not with ws!
+    // throw first.error(WS_ANN_CONFLICT_X, ann);
+    throw new Exception();
   }
 
   /**
@@ -354,15 +349,15 @@ public final class RestXqModules {
    * @return list of matching functions, ordered by specifity
    * @throws Exception exception (including unexpected ones)
    */
-  private List<RestXqFunction> find(final WebsocketConnection conn,
-      final QNm error, final boolean perm)
+  private List<WsXqFunction> find(final WebsocketConnection conn,
+      final QNm error, final boolean perm, Annotation ann)
       throws Exception {
 
     // collect all functions
-    final ArrayList<RestXqFunction> list = new ArrayList<>();
+    final ArrayList<WsXqFunction> list = new ArrayList<>();
     for(final RestXqModule mod : cache(conn.context).values()) {
-      for(final RestXqFunction func : mod.functions()) {
-        if(func.matches(conn, error, perm)) list.add(func);
+      for(final WsXqFunction func : mod.wsFunctions()) {
+        if(func.matches(ann)) list.add(func);
       }
     }
     // sort by specifity

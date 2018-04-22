@@ -3,6 +3,7 @@ package org.basex.ws;
 import java.util.*;
 import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
+import org.basex.query.ann.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -22,6 +23,10 @@ public class WebSocke extends WebSocketAdapter
      * The accepted Subprotocols.
      * */
     String subprotocol;
+    /**
+     * The Websocketconnection.
+     */
+    private WebsocketConnection wsconnection;
 
     @Override
     public void onWebSocketConnect(@NotNull final Session sess)
@@ -41,24 +46,22 @@ public class WebSocke extends WebSocketAdapter
         Room.getInstance().join(this);
 
         // Create new WebsocketConnection
-        final WebsocketConnection wsconnection =
+        wsconnection =
             new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(), sess);
 
         final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
      // select the closest match for this request
-        RestXqFunction func = null;
+        WsXqFunction func = null;
         try {
-           func = rxm.find(wsconnection, null);
-          System.out.println("WebSocke found: ");
-          System.out.println(func.toString());
+           func = rxm.find(wsconnection, null, Annotation._WS_CONNECT);
         } catch(Exception e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
 
         try {
-          func.process(wsconnection, null);
+          if(func != null)
+            func.process(wsconnection);
         } catch(Exception e) {
           e.printStackTrace();
         }
@@ -78,12 +81,50 @@ public class WebSocke extends WebSocketAdapter
 
         // Broadcast the Message to all connected instances
         Room.getInstance().broadcast(message);
+
+        final RestXqModules rxm = RestXqModules.get(wsconnection.context);
+
+        // select the closest match for this request
+        WsXqFunction func = null;
+           try {
+              func = rxm.find(wsconnection, null, Annotation._WS_MESSAGE);
+           } catch(Exception e) {
+             // TODO Auto-generated catch block
+             e.printStackTrace();
+           }
+
+           try {
+             if(func != null)
+               func.process(wsconnection);
+           } catch(Exception e) {
+             e.printStackTrace();
+           }
+
     }
 
     @Override
     public void onWebSocketClose(final int statusCode, final String reason)
     {
-        // Resets Session and Remote in Superclass
+      final RestXqModules rxm = RestXqModules.get(wsconnection.context);
+
+      // select the closest match for this request
+      WsXqFunction func = null;
+         try {
+            func = rxm.find(wsconnection, null, Annotation._WS_CLOSE);
+         } catch(Exception e) {
+           // TODO Auto-generated catch block
+           e.printStackTrace();
+         }
+
+         try {
+           if(func != null)
+             func.process(wsconnection);
+         } catch(Exception e) {
+           e.printStackTrace();
+         }
+
+
+      // Resets Session and Remote in Superclass
         super.onWebSocketClose(statusCode, reason);
 
         // Just for Loggingpurpose
@@ -91,6 +132,7 @@ public class WebSocke extends WebSocketAdapter
 
         // Remove the user from the Room
         Room.getInstance().remove(this);
+
     }
 
     @Override

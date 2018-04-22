@@ -24,9 +24,11 @@ import org.basex.ws.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqModule {
+public final class RestXqModule {
   /** Supported methods. */
   private final ArrayList<RestXqFunction> functions = new ArrayList<>();
+  /** Supported Websocket Methods */
+  private final ArrayList<WsXqFunction> wsFunctions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
   /** Parsing timestamp. */
@@ -49,6 +51,7 @@ final class RestXqModule {
    */
   boolean parse(final Context ctx) throws Exception {
     functions.clear();
+    wsFunctions.clear();
 
     // loop through all functions
     try(QueryContext qc = qc(ctx)) {
@@ -58,11 +61,18 @@ final class RestXqModule {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
-          if(rxf.parse(ctx)) functions.add(rxf);
+          final WsXqFunction wxq = new WsXqFunction(sf, this);
+          if(rxf.parse(ctx)) {
+            functions.add(rxf);
+            }
+          if(wxq.parse()) {
+            wsFunctions.add(wxq);
+          }
         }
       }
     }
-    return !functions.isEmpty();
+    // Check if seperate Method is here necessessary
+    return !functions.isEmpty() || !wsFunctions.isEmpty();
   }
 
   /**
@@ -86,6 +96,14 @@ final class RestXqModule {
    */
   ArrayList<RestXqFunction> functions() {
     return functions;
+  }
+
+  /**
+   * Returns all WebsocketFunctions.
+   * @return functions
+   */
+  ArrayList<WsXqFunction> wsFunctions() {
+    return wsFunctions;
   }
 
   /**
@@ -156,7 +174,7 @@ final class RestXqModule {
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  boolean process(final WebsocketConnection conn, final RestXqFunction func, final Object ext)
+  public boolean process(final WebsocketConnection conn, final WsXqFunction func, final Object ext)
       throws Exception {
 
     // create new XQuery instance
@@ -166,18 +184,18 @@ final class RestXqModule {
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();
 
-      final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
-      rxf.parse(ctx);
+      final WsXqFunction rxf = new WsXqFunction(sf, this);
+      rxf.parse();
 
       qc.mainModule(MainModule.get(sf, new Expr[0]));
 //      conn.sess.getRemote().sendBytes(data);
-      Serializer ser = Serializer.get(null);
+//      Serializer ser = Serializer.get(null);
       Iter iter = qc.iter();
       for(Item it; (it = iter.next()) != null;) {
         conn.sess.getRemote().sendString(it.toString());;
 //        ser.serialize(it);
       }
-      return true;//new RestXqResponse(rxf, qc, conn).create(ext);
+      return true;
     }
   }
 }

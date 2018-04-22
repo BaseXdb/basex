@@ -91,6 +91,8 @@ public interface RestXqText {
   String INPUT_CONV_X = "Input could not be converted: %";
   /** Error message. */
   String PATH_CONFLICT_X_X = "Several functions found for path \"%\":%";
+  /** Errormessage. */
+  String WS_ANN_CONFLICT_X = "Several functions found for path: %";
   /** Error message. */
   String ERROR_CONFLICT_X_X = "Several functions found for error \"%\":%";
   /** Error message. */
