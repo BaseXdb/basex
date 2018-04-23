@@ -34,38 +34,25 @@ BasexClient <- R6Class("BasexClient",
       private$void_send(username)
       private$void_send(code)
       if (!self$bool_test_sock()) stop("Access denied")},
-    execute = function(command) {
+    command = function(command) {
       private$void_send(command)
       private$result <- self$str_receive()
       private$info <-   self$str_receive()
       if (length(private$info) > 0) cat(private$info, "\n")
-      self$bool_test_sock()
-      return(private$result %>% strsplit("\n", fixed = TRUE))
+      return(list(result = private$result %>% strsplit("\n", fixed = TRUE), 
+                  info = private$info, 
+                  success = self$bool_test_sock()))
     },
     query = function(query) {
-      query_id <- Query$new(query, private$get_sock())
-      if (!self$bool_test_sock()) {
-        Error <- paste("Error in ", query)
-        stop(Error)
-      } else {
-        cat("Query \'", query, "\'created successfully.", "\n")
-      }
-      return(query_id)},
-    bool_test_sock = function(socket) {
-      if (missing(socket)) socket <- private$get_sock()
-      test <- readBin(socket, what = "raw", n =1)
-      return(test == 0x00)
-    },
+      return(list(query = Query$new(query, private$get_sock()), success = self$bool_test_sock()))
+      },
     create = function(name, input) {
       if (missing(input)) input <- ""
       writeBin(as.raw(0x08), private$sock)
       writeBin(private$raw_terminated_string(name), private$sock)
       writeBin(private$raw_terminated_string(input), private$sock)
       private$info <- self$str_receive()
-      success <- self$bool_test_sock()
-      if (!success)
-        cat("Database \'", name, "\' could not be created.", "\n")
-      success
+      return(list(info = private$info, success = self$bool_test_sock()))
     },
     add = function(name, path, input) {
       writeBin(as.raw(0x09), private$sock)
@@ -73,21 +60,29 @@ BasexClient <- R6Class("BasexClient",
       writeBin(private$raw_terminated_string(path), private$sock)
       writeBin(private$raw_terminated_string(input), private$sock)
       private$info <- self$str_receive()
-      success <- self$bool_test_sock()
+      return(list(info = private$info, success = self$bool_test_sock()))
+      #      success <- self$bool_test_sock()
     },
     replace = function(path, input) {
       writeBin(as.raw(0x0C), private$sock)
       writeBin(private$raw_terminated_string(path), private$sock)
       writeBin(private$raw_terminated_string(input), private$sock)
       private$info <- self$str_receive()
-      success <- self$bool_test_sock()
+      return(list(info = private$info, success = self$bool_test_sock()))
+      #      success <- self$bool_test_sock()
     },
     store = function(path, input) {
       writeBin(as.raw(0x0D), private$sock)
       writeBin(private$raw_terminated_string(path), private$sock)
       writeBin(private$raw_terminated_string(input), private$sock)
       private$info <- self$str_receive()
-      success <- self$bool_test_sock()
+      #      success <- self$bool_test_sock()
+    },
+    
+    bool_test_sock = function(socket) {
+      if (missing(socket)) socket <- private$get_sock()
+      test <- readBin(socket, what = "raw", n =1)
+      return(test == 0x00)
     },
     finalize = function() {
       private$close_sock()},
@@ -149,19 +144,16 @@ Query <- R6Class("Query",
   public = list(
     str_id = NULL,
     raw_id = NULL,
-    text = NULL,
-    initialize = function(query, sock) {    
-      init_string <- super$term_string(query) 
+    initialize = function(query, sock) {  
       private$sock <- sock
       out_stream <- super$get_sock()
       writeBin(as.raw(0x00), out_stream)
-      writeBin(init_string, out_stream)
+      writeBin(super$term_string(query), out_stream)
       self$str_id <- super$str_receive()
       self$raw_id <- super$term_string(self$str_id)},
     close = function() { 
-      to_close <- self$str_id
       private$req_exe(0x02, self$raw_id)
-      if (!private$req_success) cat("Query \'",to_close, "\' could not be closed.", "\n")
+      if (!private$req_success) cat("Query \'", self$str_id, "\' could not be closed.", "\n")
       return(private$req_success)
     },
     bind = function(name, value, type) {
@@ -187,6 +179,7 @@ Query <- R6Class("Query",
         writeBin(self$raw_id, out_stream)
         cache <- c()
         while ((rd <- readBin(in_stream, what = "raw", n =1)) > 0) {
+          cache <- c(cache, as.character(rd))
           cache <- c(cache, super$str_receive())
         }
         private$req_success <- super$bool_test_sock()
@@ -223,6 +216,7 @@ Query <- R6Class("Query",
       writeBin(self$raw_id, out_stream)
       cache <- c()
       while ((rd <- readBin(in_stream, what = "raw", n =1)) > 0) {
+        cache <- c(cache, as.character(rd))
         cache <- c(cache, super$str_receive())
       }
       private$req_success <- super$bool_test_sock()
