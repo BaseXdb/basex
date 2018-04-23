@@ -3,7 +3,7 @@
 #
 # Documentation: http://docs.basex.org/wiki/Clients
 #
-# (C) Ben Engbergs
+# (C) Ben Engbers
 
 library(utils)
 library(R6)
