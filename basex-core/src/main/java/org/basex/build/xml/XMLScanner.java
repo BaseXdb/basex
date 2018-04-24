@@ -85,14 +85,14 @@ final class XMLScanner extends Job {
       for(int e = 0; e < el; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
       dtd = opts.get(MainOptions.DTD);
 
-      final String enc;
+      final String encoding;
       // process document declaration...
       if(consume(DOCDECL)) {
         if(s()) {
           if(!version()) throw error(DECLSTART);
           boolean s = s();
-          enc = encoding();
-          if(enc != null) {
+          encoding = encoding();
+          if(encoding != null) {
             if(!s) throw error(WSERROR);
             s = s();
           }
@@ -962,19 +962,19 @@ final class XMLScanner extends Job {
       return null;
     }
     s(); check('='); s();
-    final TokenBuilder enc = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     final int d = qu();
     int ch = nextChar();
     if(letter(ch) && ch != '_') {
       while(letterOrDigit(ch) || ch == '.' || ch == '-') {
-        enc.add(ch);
+        tb.add(ch);
         ch = nextChar();
       }
       prev(1);
     }
     check((char) d);
-    if(enc.isEmpty()) throw error(DECLENCODE, enc);
-    final String e = string(enc.finish());
+    if(tb.isEmpty()) throw error(DECLENCODE, tb);
+    final String e = string(tb.finish());
     input.encoding(e);
     return e;
   }

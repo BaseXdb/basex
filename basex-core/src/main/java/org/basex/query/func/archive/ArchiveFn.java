@@ -43,8 +43,8 @@ abstract class ArchiveFn extends StandardFunc {
   final byte[] encode(final byte[] value, final String encoding, final QueryContext qc)
       throws QueryException {
     try {
-      final boolean val = qc.context.options.get(MainOptions.CHECKSTRINGS);
-      return ConvertFn.toString(new ArrayInput(value), encoding, val);
+      final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
+      return ConvertFn.toString(new ArrayInput(value), encoding, validate);
     } catch(final IOException ex) {
       throw ARCHIVE_ENCODE2_X.get(info, ex);
     }

@@ -626,13 +626,12 @@ public class Options implements Iterable<Option<?>> {
    */
   private synchronized void read(final IOFile opts) {
     file = opts;
-    final StringList read = new StringList();
-    final StringList errs = new StringList();
+    final StringList read = new StringList(), errs = new StringList();
     final boolean exists = file.exists();
     if(exists) {
-      try(NewlineInput nli = new NewlineInput(opts)) {
+      try(NewlineInput ni = new NewlineInput(opts)) {
         boolean local = false;
-        for(String line; (line = nli.readLine()) != null;) {
+        for(String line; (line = ni.readLine()) != null;) {
           line = line.trim();
 
           // start of local options

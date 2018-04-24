@@ -318,13 +318,13 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     if(i >= exprs.length) return null;
-    final String enc = string(toToken(exprs[i], qc));
+    final String encoding = string(toToken(exprs[i], qc));
     try {
-      if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
+      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
     } catch(final IllegalArgumentException ignored) {
       /* character set is invalid or unknown (e.g. empty string) */
     }
-    throw err.get(info, enc);
+    throw err.get(info, encoding);
   }
 
   /**

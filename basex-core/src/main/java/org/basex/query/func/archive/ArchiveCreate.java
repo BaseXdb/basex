@@ -97,7 +97,7 @@ public class ArchiveCreate extends ArchiveFn {
     if(Prop.WIN) name = name.replace('\\', '/');
 
     final ZipEntry ze = new ZipEntry(name);
-    String enc = Strings.UTF8;
+    String encoding = Strings.UTF8;
 
     // compression level
     byte[] lvl = null;
@@ -119,14 +119,14 @@ public class ArchiveCreate extends ArchiveFn {
       // encoding
       final byte[] ea = el.attribute(ENCODING);
       if(ea != null) {
-        enc = Strings.normEncoding(string(ea));
-        if(!Charset.isSupported(enc)) throw ARCHIVE_ENCODE1_X.get(info, ea);
+        encoding = Strings.normEncoding(string(ea));
+        if(!Charset.isSupported(encoding)) throw ARCHIVE_ENCODE1_X.get(info, ea);
       }
     }
 
     // data to be compressed
     byte[] val = toBytes(content);
-    if(!(content instanceof Bin) && enc != Strings.UTF8) val = encode(val, enc, qc);
+    if(!(content instanceof Bin) && encoding != Strings.UTF8) val = encode(val, encoding, qc);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));

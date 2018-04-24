@@ -51,13 +51,13 @@ abstract class ProcFn extends StandardFunc {
 
     // options
     final ProcOptions opts = toOptions(2, new ProcOptions(), qc);
-    final String enc = opts.get(ProcOptions.ENCODING);
+    final String encoding = opts.get(ProcOptions.ENCODING);
     final Charset cs;
     try {
-      cs = Charset.forName(enc);
+      cs = Charset.forName(encoding);
     } catch(final Exception ex) {
       Util.debug(ex);
-      throw PROC_ENCODING_X.get(info, enc);
+      throw PROC_ENCODING_X.get(info, encoding);
     }
     final long seconds = opts.get(ProcOptions.TIMEOUT);
     final String dir = opts.get(ProcOptions.DIR);

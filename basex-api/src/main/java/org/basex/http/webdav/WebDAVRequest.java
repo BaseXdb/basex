@@ -91,8 +91,8 @@ final class WebDAVRequest extends AbstractRequest {
   @Override
   public Auth getAuthorization() {
     if(auth == null) {
-      final String enc = getRequestHeader(Header.AUTHORIZATION);
-      if(enc != null && !enc.isEmpty()) auth = new Auth(enc);
+      final String encoding = getRequestHeader(Header.AUTHORIZATION);
+      if(encoding != null && !encoding.isEmpty()) auth = new Auth(encoding);
     }
     return auth;
   }

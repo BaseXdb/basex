@@ -36,6 +36,15 @@ public final class NewlineInput extends TextInput {
     super(in);
   }
 
+  /**
+   * Constructor.
+   * @param token token
+   * @throws IOException I/O exception
+   */
+  public NewlineInput(final byte[] token) throws IOException {
+    super(token);
+  }
+
   @Override
   public NewlineInput encoding(final String encoding) throws IOException {
     super.encoding(encoding);

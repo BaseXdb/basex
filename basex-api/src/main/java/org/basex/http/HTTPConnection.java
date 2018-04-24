@@ -118,9 +118,9 @@ public final class HTTPConnection implements ClientInfo {
   public void initResponse() {
     // set content type and encoding
     final SerializerOptions opts = sopts();
-    final String enc = opts.get(SerializerOptions.ENCODING);
-    res.setCharacterEncoding(enc);
-    res.setContentType(new MediaType(mediaType(opts) + "; " + CHARSET + '=' + enc).toString());
+    final String encoding = opts.get(SerializerOptions.ENCODING);
+    res.setCharacterEncoding(encoding);
+    res.setContentType(new MediaType(mediaType(opts) + "; " + CHARSET + '=' + encoding).toString());
   }
 
   /**

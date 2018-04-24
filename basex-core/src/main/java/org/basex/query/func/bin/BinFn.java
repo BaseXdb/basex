@@ -196,13 +196,13 @@ abstract class BinFn extends StandardFunc {
   /**
    * Converts the specified expression to a string.
    * Returns a token representation or an exception.
-   * @param o expression offset
+   * @param offset expression offset
    * @param qc query context
    * @return string representation
    * @throws QueryException query exception
    */
-  final byte[] str(final int o, final QueryContext qc) throws QueryException {
-    final Item item = exprs[o].atomItem(qc, info);
+  final byte[] token(final int offset, final QueryContext qc) throws QueryException {
+    final Item item = exprs[offset].atomItem(qc, info);
     return item == null ? null : toToken(item);
   }
 }

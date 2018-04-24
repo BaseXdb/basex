@@ -34,20 +34,19 @@ final class RESTPost {
    */
   public static RESTCmd get(final RESTSession session) throws IOException {
     final HTTPConnection conn = session.conn;
-    String enc = conn.req.getCharacterEncoding();
-    if(enc == null) enc = Strings.UTF8;
+    String encoding = conn.req.getCharacterEncoding();
+    if(encoding == null) encoding = Strings.UTF8;
 
     // perform queries
-    final byte[] input = new NewlineInput(conn.req.getInputStream()).encoding(enc).content();
-    final Context ctx = conn.context;
     final DBNode doc;
-    try {
-      doc = new DBNode(new IOContent(input));
+    try(NewlineInput ni = new NewlineInput(conn.req.getInputStream())) {
+      doc = new DBNode(new IOContent(ni.encoding(encoding).content()));
     } catch(final IOException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
 
     try {
+      final Context ctx = conn.context;
       // handle request
       final String cmd = value("local-name(*)", doc, ctx);
       if(cmd.equals(COMMANDS)) {

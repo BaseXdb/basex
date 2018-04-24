@@ -43,6 +43,15 @@ public class TextInput extends BufferInput {
   }
 
   /**
+   * Constructor.
+   * @param token token
+   * @throws IOException I/O exception
+   */
+  public TextInput(final byte[] token) throws IOException {
+    this(new IOContent(token));
+  }
+
+  /**
    * Reads the first bytes of the input stream to guess the text encoding.
    * @throws IOException I/O exception
    */
@@ -138,12 +147,12 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public final TokenBuilder cache() throws IOException {
-    final TokenBuilder tb = new TokenBuilder(Math.max(Array.CAPACITY, (int) length));
     try {
+      final TokenBuilder tb = new TokenBuilder(Math.max(Array.CAPACITY, (int) length));
       for(int ch; (ch = read()) != -1;) tb.add(ch);
+      return tb;
     } finally {
       close();
     }
-    return tb;
   }
 }

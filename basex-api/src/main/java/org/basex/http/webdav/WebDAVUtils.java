@@ -73,12 +73,12 @@ final class WebDAVUtils {
    * @throws IOException I/O exception
    */
   static int peek(final BufferInput bi) throws IOException {
+    // input stream will be closed outside this function
     final TextInput ti = new TextInput(bi);
     final int c = ti.read();
     try {
       bi.reset();
-    } catch(final IOException ignore) {
-    }
+    } catch(final IOException ignore) { }
     return c;
   }
 }

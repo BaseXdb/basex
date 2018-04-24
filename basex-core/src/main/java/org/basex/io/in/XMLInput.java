@@ -80,9 +80,9 @@ public class XMLInput extends InputStream {
    * @throws IOException I/O exception
    */
   public boolean add(final byte[] value, final boolean spaces) throws IOException {
-    if(spaces) add(new NewlineInput(new ArrayInput(Token.SPACE)));
-    add(new NewlineInput(new ArrayInput(value)));
-    if(spaces) add(new NewlineInput(new ArrayInput(Token.SPACE)));
+    if(spaces) add(new NewlineInput(Token.token(" ")));
+    add(new NewlineInput(value));
+    if(spaces) add(new NewlineInput(Token.token(" ")));
     return ip < 32;
   }
 

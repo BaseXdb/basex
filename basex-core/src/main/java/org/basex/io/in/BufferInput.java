@@ -57,7 +57,7 @@ public class BufferInput extends InputStream {
   public BufferInput(final InputStream in, final int bs) {
     this.in = in;
     array = new byte[bs];
-    length = -1;
+    length = in instanceof BufferInput ? ((BufferInput) in).length : -1;
   }
 
   /**
