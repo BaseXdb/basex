@@ -1,3 +1,23 @@
+VERSION 9.0.1 (April 24, 2018) -----------------------------------------
+
+ Critical bug fixes:
+ - Storage: Short strings with extended Unicode characters fixed
+ - XQuery: Nested path optimizations reenabled (e.g. in functions)
+ - XQuery: map:merge, size computation fixed
+ - XQuery: node ordering across multiple database instances fixed
+
+ Improvements:
+ - GUI: Better Java 9 support (DPI scaling, font rendering)
+ - XQuery, collections: faster document root tests
+ - New R client. Thanks Ben Engbers!
+ - Linux: exec command used in startup scripts
+
+ Minor Bug fixes
+ - XQuery: Allow interruption of tail-call function calls
+ - XQuery, HTTP parsing of content-type parameters
+ - XQuery, restrict rewriting of filter to path expression
+ - GUI: progress feedback when creating databases via double-click
+
 VERSION 9.0 (March 23, 2018) -------------------------------------------
  
  XQUERY
