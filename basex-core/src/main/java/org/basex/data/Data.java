@@ -66,7 +66,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public abstract class Data {
+public abstract class Data implements Comparable<Data> {
   /** Node kind: document (code: {@code 0}). */
   public static final byte DOC = 0x00;
   /** Node kind: element (code: {@code 1}). */
@@ -1088,6 +1088,17 @@ public abstract class Data {
    * @return result of check
    */
   public abstract boolean inMemory();
+
+  @Override
+  public int compareTo(final Data data) {
+    // check if data instances are identical
+    if(this == data) return 0;
+    // compare database path, or path to original document(s) if database is a main memory instance
+    final IOFile path1 = meta.path, path2 = data.meta.path;
+    final String source1 = path1 == null ? meta.original : path1.path();
+    final String source2 = path2 == null ? data.meta.original : path2.path();
+    return source1.compareTo(source2);
+  }
 
   @Override
   public final String toString() {
