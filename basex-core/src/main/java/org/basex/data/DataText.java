@@ -12,7 +12,7 @@ public interface DataText {
   // META DATA ====================================================================================
 
   /** Database version; older version cannot open these instances. */
-  String STORAGE = "9.0";
+  String STORAGE = "9.0.1";
   /** Index version; older version cannot open indexes of these instances. */
   String ISTORAGE = "8.6";
 
