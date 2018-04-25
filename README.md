@@ -118,6 +118,17 @@ If you want to add your own application, create an image
 developing against. Usually, you will add your application code to
 `/srv/basex/webapp` and modules to `/srv/basex/repo`.
 
+If you are in the cloned directory of the BaseX git repository, you can include
+the DBA application in the running container :
+
+    docker run -d \
+    	--name basexhttp \
+    	--publish 1984:1984 \
+    	--publish 8984:8984 \
+    	--volume "$HOME/basex/data":/srv/basex/data \
+    	--volume "$(pwd)/basex-api/src/main/webapp":/srv/basex/webapp \
+      basex/basexhttp:latest
+
 ### Docker images for versions 8.x
 
 Up to version 8.x, BaseX used directories `BaseXData`, `BaseXRepo` and
