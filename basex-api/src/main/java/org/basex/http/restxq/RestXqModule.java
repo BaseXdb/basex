@@ -29,7 +29,7 @@ import org.basex.ws.*;
 public final class RestXqModule {
   /** Supported methods. */
   private final ArrayList<RestXqFunction> functions = new ArrayList<>();
-  /** Supported Websocket Methods */
+  /** Supported Websocket Methods. */
   private final ArrayList<WsXqFunction> wsFunctions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
@@ -172,11 +172,10 @@ public final class RestXqModule {
    * Processes the HTTP request.
    * @param conn HTTP connection
    * @param func function to be processed
-   * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  public boolean process(final WebsocketConnection conn, final WsXqFunction func, final Object ext)
+  public boolean process(final WebsocketConnection conn, final WsXqFunction func)
       throws Exception {
 
     final Context ctx = conn.context;

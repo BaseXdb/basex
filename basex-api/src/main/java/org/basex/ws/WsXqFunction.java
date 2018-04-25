@@ -25,6 +25,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * Constructor.
    * @param function associated user function
    * @param module associated module
+   * @param qc QueryContext
    */
   public WsXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
     this.function = function;
@@ -71,7 +72,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    */
   public boolean process(final WebsocketConnection conn) throws Exception {
     try {
-      return module.process(conn, this, null);
+      return module.process(conn, this);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;

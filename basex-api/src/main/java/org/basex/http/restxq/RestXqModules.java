@@ -311,6 +311,7 @@ public final class RestXqModules {
    * Returns the function that matches the current request or the specified error code best.
    * @param conn WebSocketConnection
    * @param error error code (assigned if error function is to be called)
+   * @param ann Annotation
    * @return function, or {@code null} if no function matches
    * @throws Exception exception (including unexpected ones)
    */
@@ -346,6 +347,7 @@ public final class RestXqModules {
    * @param conn WebSocketConnection
    * @param error error code (assigned if error function is to be called)
    * @param perm permission flag
+   * @param ann Annotation
    * @return list of matching functions, ordered by specifity
    * @throws Exception exception (including unexpected ones)
    */

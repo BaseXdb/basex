@@ -51,17 +51,12 @@ public class WebSocke extends WebSocketAdapter
 
         final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
-     // select the closest match for this request
+        // select the closest match for this request
         WsXqFunction func = null;
         try {
            func = rxm.find(wsconnection, null, Annotation._WS_CONNECT);
-        } catch(Exception e) {
-          e.printStackTrace();
-        }
-
-        try {
-          if(func != null)
-            func.process(wsconnection);
+           if(func != null)
+             func.process(wsconnection);
         } catch(Exception e) {
           e.printStackTrace();
         }
@@ -73,14 +68,8 @@ public class WebSocke extends WebSocketAdapter
     @Override
     public void onWebSocketText(final String message)
     {
-        // does nothing in superclass?!
-        // super.onWebSocketText(message);
-
         // Just for Logging purpose
         System.out.println("Received TEXT message: " + message);
-
-        // Broadcast the Message to all connected instances
-//        Room.getInstance().broadcast(message);
 
         final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
@@ -88,18 +77,11 @@ public class WebSocke extends WebSocketAdapter
         WsXqFunction func = null;
            try {
               func = rxm.find(wsconnection, null, Annotation._WS_MESSAGE);
-           } catch(Exception e) {
-             // TODO Auto-generated catch block
-             e.printStackTrace();
-           }
-
-           try {
-             if(func != null)
-               func.process(wsconnection);
+              if(func != null)
+                func.process(wsconnection);
            } catch(Exception e) {
              e.printStackTrace();
            }
-
     }
 
     @Override
@@ -111,18 +93,12 @@ public class WebSocke extends WebSocketAdapter
       WsXqFunction func = null;
          try {
             func = rxm.find(wsconnection, null, Annotation._WS_CLOSE);
+            if(func != null)
+              func.process(wsconnection);
          } catch(Exception e) {
            // TODO Auto-generated catch block
            e.printStackTrace();
          }
-
-         try {
-           if(func != null)
-             func.process(wsconnection);
-         } catch(Exception e) {
-           e.printStackTrace();
-         }
-
 
       // Resets Session and Remote in Superclass
         super.onWebSocketClose(statusCode, reason);
@@ -132,14 +108,11 @@ public class WebSocke extends WebSocketAdapter
 
         // Remove the user from the Room
         Room.getInstance().remove(this);
-
     }
 
     @Override
     public void onWebSocketError(final Throwable cause)
     {
-        // Does nothing in superclass?!
-        //super.onWebSocketError(cause);
         cause.printStackTrace(System.err);
     }
 }
