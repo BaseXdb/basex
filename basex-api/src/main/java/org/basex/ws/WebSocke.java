@@ -80,7 +80,7 @@ public class WebSocke extends WebSocketAdapter
         System.out.println("Received TEXT message: " + message);
 
         // Broadcast the Message to all connected instances
-        Room.getInstance().broadcast(message);
+//        Room.getInstance().broadcast(message);
 
         final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
