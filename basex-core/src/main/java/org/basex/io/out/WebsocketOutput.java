@@ -2,6 +2,7 @@ package org.basex.io.out;
 
 import java.io.*;
 import java.nio.*;
+import java.util.*;
 
 import org.eclipse.jetty.websocket.api.*;
 
@@ -18,14 +19,10 @@ public class WebsocketOutput extends OutputStream {
   RemoteEndpoint os;
 
   /**
-   * The standard Bytebuffersize.
+   * The bytearray for building the messages.
+   * @TODO: Search for better Implementation (List of Objects not very efficient)
    * */
-  final int bytebufferSize = 10000;
-
-  /**
-   * The Bytebuffer for building the messages.
-   * */
-  ByteBuffer bbuf = ByteBuffer.allocate(bytebufferSize);
+  ArrayList<Byte> bytes = new ArrayList<>();
 
   /**
    * Standardconstructor.
@@ -37,10 +34,7 @@ public class WebsocketOutput extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    if(bbuf.remaining() == 0) {
-      // Increase bbuf-capacity
-    }
-    bbuf.put((byte) b);
+    bytes.add((byte) b);
   }
 
   /**
@@ -48,9 +42,14 @@ public class WebsocketOutput extends OutputStream {
    * */
   @Override
   public void flush() throws IOException {
-    System.out.println("websocket write " + new String(bbuf.array(), "UTF-8"));
-    os.sendBytes(bbuf);
-    bbuf = null;
-    bbuf = ByteBuffer.allocate(bytebufferSize);
+    // Convert the bytearraylist to bytebuffer
+    ByteBuffer buffer = ByteBuffer.allocate(bytes.size());
+    for(Byte byt : bytes) {
+        buffer.put(byt);
+    }
+
+    System.out.println("websocket write " + new String(buffer.array(), "UTF-8"));
+    //os.sendBytes(result);
+    os.sendString(new String(buffer.array(), "UTF-8"));
   }
 }

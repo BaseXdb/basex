@@ -3,6 +3,7 @@ package org.basex.ws;
 import static org.basex.util.Token.*;
 
 import org.basex.http.restxq.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.func.*;
@@ -17,15 +18,18 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
   public final StaticFunc function;
   /** Associated module. */
   private final RestXqModule module;
+  /** Serialization parameters. */
+  public final SerializerOptions output;
 
   /**
    * Constructor.
    * @param function associated user function
    * @param module associated module
    */
-  public WsXqFunction(final StaticFunc function, final RestXqModule module) {
+  public WsXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
     this.function = function;
     this.module = module;
+    output = qc.serParams();
   }
 
   /**

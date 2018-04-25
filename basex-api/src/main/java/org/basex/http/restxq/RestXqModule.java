@@ -63,7 +63,7 @@ public final class RestXqModule {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
-          final WsXqFunction wxq = new WsXqFunction(sf, this);
+          final WsXqFunction wxq = new WsXqFunction(sf, qc, this);
           if(rxf.parse(ctx)) {
             functions.add(rxf);
             }
@@ -179,24 +179,27 @@ public final class RestXqModule {
   public boolean process(final WebsocketConnection conn, final WsXqFunction func, final Object ext)
       throws Exception {
 
-    // create new XQuery instance
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
       final StaticFunc sf = find(qc, func.function);
+
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();
 
-      final WsXqFunction rxf = new WsXqFunction(sf, this);
-      rxf.parse();
+      final WsXqFunction wxf = new WsXqFunction(sf, qc, this);
+      wxf.parse();
 
-      if(rxf.matches(Annotation._WS_CLOSE)) {
+      qc.mainModule(MainModule.get(sf, new Expr[0]));
+
+      //conn.sess.getRemote().sendBytes(data);
+      Serializer ser = Serializer.get(new WebsocketOutput(conn.sess.getRemote()), wxf.output);
+      Iter iter = qc.iter();
+
+      // Dont send anything if Websocket gets closed
+      if(wxf.matches(Annotation._WS_CLOSE)) {
         return true;
       }
 
-      qc.mainModule(MainModule.get(sf, new Expr[0]));
-//      conn.sess.getRemote().sendBytes(data);
-      Serializer ser = Serializer.get(new WebsocketOutput(conn.sess.getRemote()));
-      Iter iter = qc.iter();
       for(Item it; (it = iter.next()) != null;) {
         //conn.sess.getRemote().sendString(it.toString());;
         ser.serialize(it);
