@@ -48,7 +48,8 @@ public final class TextParser extends SingleParser {
     builder.openElem(TEXT, atts, nsp);
 
     final TokenBuilder tb = new TokenBuilder();
-    try(NewlineInput nli = new NewlineInput(source).encoding(encoding)) {
+    try(NewlineInput nli = new NewlineInput(source)) {
+      nli.encoding(encoding);
       for(int ch; (ch = nli.read()) != -1;) {
         if(ch == '\n' && lines) {
           builder.openElem(LINE, atts, nsp);

@@ -28,7 +28,7 @@ final class TextRenderer extends BaseXBack {
   /** Indicates if the text is edited. */
   private final boolean edit;
   /** Current brackets. */
-  private final IntList pars = new IntList();
+  private final IntList parentheses = new IntList();
 
   /** Font. */
   private Font font;
@@ -74,6 +74,8 @@ final class TextRenderer extends BaseXBack {
   private int line;
   /** Indicates if the cursor is located in the current line. */
   private boolean lineC;
+  /** String rendering cache. */
+  final TokenBuilder stringCache = new TokenBuilder(4);
 
   /** Cursor position. */
   private final int[] cursor = new int[2];
@@ -125,7 +127,8 @@ final class TextRenderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    pars.reset();
+
+    parentheses.reset();
     final TextIterator iter = init(g, false);
     int oldL = 0;
     while(more(iter, g)) {
@@ -154,7 +157,7 @@ final class TextRenderer extends BaseXBack {
     if(edit && showLines) {
       g.setColor(GUIConstants.gray);
       final String s = Integer.toString(line);
-      g.drawString(s, offset - stringWidth(s) - (OFFSET << 1), y);
+      g.drawString(s, offset - fontMetrics.stringWidth(s) - (OFFSET << 1), y);
     }
   }
 
@@ -259,14 +262,14 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Sets the current font.
+   * Sets a new font.
    * @param f font
    */
   private void font(final Font f) {
     font = f;
     fontHeight = f.getSize() * 5 / 4;
-    charWidths = GUIConstants.fontWidths(f);
     fontMetrics = getFontMetrics(f);
+    charWidths = fontMetrics.getWidths();
   }
 
   @Override
@@ -293,11 +296,14 @@ final class TextRenderer extends BaseXBack {
   private TextIterator init(final Graphics g, final boolean start) {
     syntax.init(GUIConstants.TEXT);
     font = defaultFont;
+    font(font);
 
     offset = OFFSET;
     if(g != null) {
       g.setFont(font);
-      if(edit && showLines) offset += stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
+      if(edit && showLines) {
+        offset += fontMetrics.stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
+      }
     }
     x = offset;
     y = fontHeight - (start ? 0 : scroll.pos()) - 2;
@@ -353,7 +359,7 @@ final class TextRenderer extends BaseXBack {
     int sw = 0;
     while(iter.more()) {
       final int ch = iter.next();
-      // process special codes
+      // process control codes
       if(ch == TokenBuilder.BOLD) {
         font(boldFont);
       } else if(ch == TokenBuilder.NORM) {
@@ -430,11 +436,10 @@ final class TextRenderer extends BaseXBack {
       GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
 
     // retrieve first character of current token
-    final int ch = iter.curr();
-    highlighted = ch == TokenBuilder.MARK;
+    int cp = iter.curr();
+    highlighted = cp == TokenBuilder.MARK;
 
-    final int cp = iter.pos();
-    final int cc = iter.caret();
+    final int pos = iter.pos(), cpos = iter.caret();
     if(y > 0 && y < height) {
       // mark selected text
       if(iter.selectStart()) {
@@ -444,12 +449,11 @@ final class TextRenderer extends BaseXBack {
         while(iter.inSelect() && iter.more()) cw += charWidth(iter.next());
         g.setColor(GUIConstants.color2A);
         g.fillRect(xx, lineY, cw, fontHeight);
-        iter.pos(cp);
+        iter.pos(pos);
       }
 
       // mark found text
-      int xx = x;
-      while(iter.more() && iter.searchStart()) {
+      for(int xx = x; iter.more() && iter.searchStart();) {
         while(!iter.inSearch() && iter.more()) xx += charWidth(iter.next());
         int cw = 0;
         while(iter.inSearch() && iter.more()) cw += charWidth(iter.next());
@@ -457,34 +461,40 @@ final class TextRenderer extends BaseXBack {
         g.fillRect(xx, lineY, cw, fontHeight);
         xx += cw;
       }
-      iter.pos(cp);
+      iter.pos(pos);
 
       // retrieve first character of current token
       if(iter.erroneous()) drawError(g);
 
-      // don't write whitespaces
-      if(showNL && ch == '\n') {
+      if(showNL && cp == '\n') {
+        // draw newline character
         g.setColor(GUIConstants.gray);
         g.drawString("\u00b6", x, y);
-      } else if(showInvisible && ch == '\t') {
-        final int yy = y - fontHeight * 3 / 10;
-        final int s = 1 + fontHeight / 12;
-        final int xe = x + charWidth('\t') - s;
-        final int as = (s << 1) - 1;
+      } else if(showInvisible && cp == '\t') {
+        // draw tab arrow
+        final int lh = 1 + fontHeight / 12, xe = x + charWidth('\t') - lh;
+        final int yy = y - fontHeight * 3 / 10, as = (lh << 1) - 1;
         g.setColor(GUIConstants.gray);
-        g.drawLine(x + s, yy, xe, yy);
+        g.drawLine(x + lh, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
-      } else if(ch >= TokenBuilder.PRIVATE_START && ch <= TokenBuilder.PRIVATE_END) {
+      } else if(cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END) {
+        // control code: set new font
         g.setFont(font);
-      } else if(ch > ' ') {
-        if(showInvisible && Character.isSpaceChar(ch)) {
+      } else if(cp > ' ') {
+        if(showInvisible && Character.isSpaceChar(cp)) {
+          // draw whitespace character
           final int s = fontHeight / 12 + 1;
           g.setColor(GUIConstants.gray);
           g.fillRect(x + (stringWidth >> 1), y - fontHeight * 3 / 10, s, s);
         } else {
+          // draw non-whitespace string (character by character, required by Java 9)
           g.setColor(color);
-          g.drawString(iter.currString(), x, y);
+          for(int xx = x; iter.more(); xx += charWidth(cp)) {
+            cp = iter.next();
+            g.drawString(stringCache.reset().add(cp).toString(), xx, y);
+          }
+          iter.pos(pos);
         }
       }
 
@@ -493,35 +503,33 @@ final class TextRenderer extends BaseXBack {
 
       // show cursor
       if(caret && iter.edited()) {
-        xx = x;
-        while(iter.more()) {
-          if(cc == iter.pos()) {
+        for(int xx = x; iter.more(); xx += charWidth(iter.next())) {
+          if(cpos == iter.pos()) {
             drawCaret(g, xx);
             break;
           }
-          xx += charWidth(iter.next());
         }
-        iter.pos(cp);
+        iter.pos(pos);
       }
     }
 
     // handle matching parentheses
-    if(ch == '(' || ch == '[' || ch == '{') {
-      pars.add(x);
-      pars.add(y);
-      pars.add(cp);
-      pars.add(ch);
-    } else if((ch == ')' || ch == ']' || ch == '}') && !pars.isEmpty()) {
-      final int open = ch == ')' ? '(' : ch == ']' ? '[' : '{';
-      if(pars.peek() == open) {
-        pars.pop();
-        final int cr = pars.pop();
-        final int yy = pars.pop();
-        final int xx = pars.pop();
-        if(cc == cp || cc == cr) {
+    if(cp == '(' || cp == '[' || cp == '{') {
+      parentheses.add(x);
+      parentheses.add(y);
+      parentheses.add(pos);
+      parentheses.add(cp);
+    } else if((cp == ')' || cp == ']' || cp == '}') && !parentheses.isEmpty()) {
+      final int open = cp == ')' ? '(' : cp == ']' ? '[' : '{';
+      if(parentheses.peek() == open) {
+        parentheses.pop();
+        final int cr = parentheses.pop();
+        final int yy = parentheses.pop();
+        final int xx = parentheses.pop();
+        if(cpos == pos || cpos == cr) {
          g.setColor(GUIConstants.color4);
           g.drawRect(xx, yy - (fontHeight << 2) / 5, charWidth(open), fontHeight);
-          g.drawRect(x, lineY, charWidth(ch), fontHeight);
+          g.drawRect(x, lineY, charWidth(cp), fontHeight);
         }
       }
     }
@@ -561,18 +569,6 @@ final class TextRenderer extends BaseXBack {
     return cp == '\t' ? charWidths[' '] * indent : cp < 256 ? charWidths[cp] :
       cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END ||
       cp >= 0xD800 && cp <= 0xDC00 ? 0 : fontMetrics.charWidth(cp);
-  }
-
-  /**
-   * Returns the width of the specified string.
-   * @param string string
-   * @return width
-   */
-  private int stringWidth(final String string) {
-    final int cl = string.length();
-    int w = 0;
-    for(int c = 0; c < cl; c++) w += charWidth(string.charAt(c));
-    return w;
   }
 
   /**

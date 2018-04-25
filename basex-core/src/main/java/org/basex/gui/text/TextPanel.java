@@ -96,7 +96,7 @@ public class TextPanel extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
 
-    addFocusListener(new FocusAdapter() {
+    addFocusListener(new FocusListener() {
       @Override
       public void focusGained(final FocusEvent e) {
         if(isEnabled()) caret(true);
@@ -400,13 +400,15 @@ public class TextPanel extends BaseXPanel {
    * @param select select hit
    */
   protected final void jump(final SearchDir dir, final boolean select) {
-    // updates the visible area
-    final int y = rend.jump(dir, select);
-    final int h = getHeight();
-    final int p = scroll.pos();
-    final int m = y + rend.fontHeight() * 3 - h;
-    if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
-    rend.repaint();
+    SwingUtilities.invokeLater(() -> {
+      // updates the visible area
+      final int y = rend.jump(dir, select);
+      final int h = getHeight();
+      final int p = scroll.pos();
+      final int m = y + rend.fontHeight() * 3 - h;
+      if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
+      rend.repaint();
+    });
   }
 
   // MOUSE INTERACTIONS ===========================================================================

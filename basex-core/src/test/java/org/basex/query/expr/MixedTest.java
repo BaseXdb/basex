@@ -3,8 +3,12 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import java.io.*;
+
 import org.basex.core.cmd.*;
+import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -24,6 +28,7 @@ public final class MixedTest extends AdvancedQueryTest {
   @AfterClass
   public static void after() {
     execute(new DropDB(NAME));
+    execute(new DropDB(NAME + '2'));
   }
 
   /** Catches duplicate module import. */
@@ -118,5 +123,29 @@ public final class MixedTest extends AdvancedQueryTest {
     query("let $a := function($f) as element(xml) { $f() }"
         + "let $b := $a(function() as element(*)* { <xml/> })"
         + "return $b", "<xml/>");
+  }
+
+  /**
+   * Tests document order across multiple documents or databases.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void diffDatabases() throws IOException {
+    final String xml1 = "<xml><n1a/><n1b/></xml>";
+    final String xml2 = "<xml><n2a/><n2b/></xml>";
+    final IOFile file1 = new IOFile(sandbox(), "doc1.xml");
+    final IOFile file2 = new IOFile(sandbox(), "doc2.xml");
+    file1.write(Token.token(xml1));
+    file2.write(Token.token(xml2));
+
+    // compare order of multiple document (based on original path)
+    query("doc('" + file1.path() + "')/*/* union doc('" + file2.path() + "')/*/*",
+        "<n1a/>\n<n1b/>\n<n2a/>\n<n2b/>");
+
+    // compare order of multiple document (based on database path)
+    execute(new CreateDB(NAME, file1.path()));
+    execute(new CreateDB(NAME + '2', file2.path()));
+    query("db:open('" + NAME + "')/*/* union db:open('" + NAME + "2')/*/*",
+        "<n1a/>\n<n1b/>\n<n2a/>\n<n2b/>");
   }
 }

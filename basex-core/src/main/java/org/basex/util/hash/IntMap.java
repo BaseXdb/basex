@@ -25,11 +25,11 @@ public final class IntMap extends IntSet {
 
   /**
    * Default constructor.
-   * @param capacity initial array capacity
+   * @param capacity initial array capacity (will be resized to a power of two)
    */
   public IntMap(final int capacity) {
     super(capacity);
-    values = new int[Array.CAPACITY];
+    values = new int[buckets.length];
     values[0] = Integer.MIN_VALUE;
   }
 

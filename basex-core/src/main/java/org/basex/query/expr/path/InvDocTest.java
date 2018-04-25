@@ -18,12 +18,12 @@ import org.basex.util.list.*;
 final class InvDocTest extends Test {
   /** Data reference. */
   private final Data data;
-  /** Pre values. */
+  /** Sorted pre values. */
   private final IntList pres;
 
   /**
    * Constructor.
-   * @param pres pre values
+   * @param pres sorted pre values
    * @param data data reference
    */
   private InvDocTest(final IntList pres, final Data data) {
@@ -35,26 +35,29 @@ final class InvDocTest extends Test {
   /**
    * Returns a document test. This test will be called by {@link AxisPath#index} if the context
    * value only consists of database nodes.
-   * @param root root value
+   * @param root root value (can be {@code null})
    * @return document test
    */
   static Test get(final Value root) {
+    // root unknown: use simple test
     if(root == null) return KindTest.DOC;
 
     // use simple test if database contains only one document
     final Data data = root.data();
     if(data == null || data.meta.ndocs == 1) return KindTest.DOC;
 
-    // adopt nodes from existing sequence
+    // include pre values of root nodes in document test
+    final IntList pres;
     if(root instanceof DBNodeSeq) {
       final DBNodeSeq seq = (DBNodeSeq) root;
-      return seq.all() ? KindTest.DOC : new InvDocTest(new IntList(seq.pres()), data);
+      if(seq.all()) return KindTest.DOC;
+      pres = new IntList(seq.pres());
+    } else {
+      // loop through all documents and add pre values of documents
+      pres = new IntList((int) root.size());
+      for(final Item item : root) pres.add(((DBNode) item).pre());
     }
-
-    // loop through all documents and add pre values of documents
-    final IntList pres = new IntList((int) root.size());
-    for(final Item item : root) pres.add(((DBNode) item).pre());
-    return new InvDocTest(pres, data);
+    return new InvDocTest(pres.sort(), data);
   }
 
   @Override
@@ -63,7 +66,7 @@ final class InvDocTest extends Test {
     if(!(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
     final DBNode db = (DBNode) node;
-    return data == db.data() && pres.contains(db.pre());
+    return data == db.data() && pres.sortedIndexOf(db.pre()) >= 0;
   }
 
   @Override

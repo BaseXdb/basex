@@ -77,7 +77,6 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshLayout() {
-    header.refreshLayout();
     refreshMark();
   }
 

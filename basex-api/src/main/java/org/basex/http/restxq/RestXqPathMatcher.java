@@ -7,7 +7,6 @@ import java.math.*;
 import java.util.*;
 import java.util.regex.*;
 
-import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -112,7 +111,7 @@ final class RestXqPathMatcher {
     while(i.hasNext()) {
       char ch = i.next();
       if(ch == '{') {
-        decodeAndEscape(literals, result);
+        decodeAndEscape(literals, result, info);
 
         // variable
         if(!i.hasNext() || i.nextNonWS() != '$') throw error(info, INV_TEMPLATE_X, path);
@@ -152,7 +151,7 @@ final class RestXqPathMatcher {
         literals.append(ch);
       }
     }
-    decodeAndEscape(literals, result);
+    decodeAndEscape(literals, result, info);
 
     final BigInteger vp = varsPos.cardinality() == 0 ? ZERO : new BigInteger(varsPos.toByteArray());
     return new RestXqPathMatcher(result.toString(), varNames, segment + 1, vp);
@@ -176,28 +175,24 @@ final class RestXqPathMatcher {
   /**
    * Decodes the URL and escapes regex characters in path template literals.
    * @param literals literals to escape
+   * @param info input info
    * @param result string builder where the escaped literals will be appended to.
+   * @throws QueryException query exception
    */
-  private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result) {
+  private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result,
+      final InputInfo info) throws QueryException {
+
     if(literals.length() > 0) {
-      final String decoded = HTTPConnection.decode(literals.toString());
-      final int n = decoded.length();
-      for(int i = 0; i < n; ++i) {
-        final char c = decoded.charAt(i);
-        if(isRegexChar(c)) result.append('\\');
-        result.append(c);
+      final byte[] path = Token.decodeUri(Token.token(literals.toString()));
+      if(path == null) throw error(info, INV_ENCODING_X, literals);
+      final TokenBuilder tb = new TokenBuilder(path.length);
+      for(final byte b : path) {
+        if(".^&!?-:<>()[]{}$=,*+|".indexOf(b) >= 0) tb.addByte((byte) '\\');
+        tb.addByte(b);
       }
+      result.append(tb.toString());
       literals.setLength(0);
     }
-  }
-
-  /**
-   * Checks if a character is a regex character.
-   * @param c character to check.
-   * @return result of check
-   */
-  private static boolean isRegexChar(final char c) {
-    return ".^&!?-:<>()[]{}$=,*+|".indexOf(c) >= 0;
   }
 
   /**

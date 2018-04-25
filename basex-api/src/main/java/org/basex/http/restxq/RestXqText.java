@@ -62,6 +62,8 @@ public interface RestXqText {
   /** Error message. */
   String INV_TEMPLATE_X = "Invalid path template: \"%\".";
   /** Error message. */
+  String INV_ENCODING_X = "Invalid URL encoding: \"%\".";
+  /** Error message. */
   String INV_VARNAME_X = "Invalid variable name: $%.";
   /** Error message. */
   String INV_CODE_X = "Invalid error code: %.";

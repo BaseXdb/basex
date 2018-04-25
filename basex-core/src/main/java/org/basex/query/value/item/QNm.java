@@ -314,7 +314,7 @@ public final class QNm extends Item {
   }
 
   /**
-   * Returns the QName string if it has a prefix, or {@link #prefixId()} otherwise.</li>
+   * Returns the QName string if it has a prefix, or {@link #prefixId()} otherwise.
    * @return QName as token
    */
   public byte[] prefixString() {

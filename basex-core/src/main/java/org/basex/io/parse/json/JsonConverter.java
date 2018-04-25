@@ -47,7 +47,9 @@ public abstract class JsonConverter {
    */
   public final Item convert(final IO input) throws IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
-    return convert(new NewlineInput(input).encoding(encoding).content(), input.path());
+    try(NewlineInput ni = new NewlineInput(input)) {
+      return convert(ni.encoding(encoding).content(), input.path());
+    }
   }
 
   /**

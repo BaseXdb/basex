@@ -206,11 +206,10 @@ public class DBNode extends ANode {
   @Override
   public final int diff(final ANode node) {
     // compare fragment with database node; specify fragment first to save time
-    return node instanceof FNode ? -diff(node, this) :
-      // same database instance: compare pre values
-      data == node.data() ? Integer.compare(pre, ((DBNode) node).pre) :
-      // check order via lowest common ancestor
-      diff(this, node);
+    if(node instanceof FNode) return -diff(node, this);
+    // same database instance: compare pre values; otherwise, compare database instances
+    final Data ndata = node.data();
+    return data == ndata ? pre - ((DBNode) node).pre : data.compareTo(ndata);
   }
 
   @Override

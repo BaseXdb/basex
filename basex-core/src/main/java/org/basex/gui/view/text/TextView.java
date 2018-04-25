@@ -104,7 +104,6 @@ public final class TextView extends View {
 
   @Override
   public void refreshLayout() {
-    header.refreshLayout();
     text.setFont(mfont);
     search.bar().refreshLayout();
   }

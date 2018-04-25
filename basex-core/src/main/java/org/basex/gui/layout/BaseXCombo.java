@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
@@ -28,10 +27,12 @@ public class BaseXCombo extends JComboBox<Object> {
   private Option<?> option;
   /** History. */
   private BaseXHistory history;
-  /** History listener. */
-  private KeyListener listener;
   /** Hint. */
   private BaseXTextHint hint;
+  /** Key listener. */
+  private KeyListener keys;
+  /** Focus listener. */
+  private FocusListener focus;
 
   /** Reference to parent window (of type {@link BaseXDialog} or {@link GUI}). */
   private final BaseXWindow win;
@@ -85,23 +86,27 @@ public class BaseXCombo extends JComboBox<Object> {
     history = new BaseXHistory(opt, options);
     setItems(opts.get(opt));
 
+    // store input if enter is pressed; scroll between history entries
     final JTextComponent comp = textField();
-    comp.removeKeyListener(listener);
-    listener = (KeyPressedListener) e -> {
-      if(ENTER.is(e)) {
-        store();
-      } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
-        if(e.isShiftDown()) {
-          final String value = history.get(NEXTLINE.is(e));
-          if(value != null) {
-            setText(value);
-            final BaseXDialog dialog = win.dialog();
-            if(dialog != null) dialog.action(this);
-          }
+    comp.removeKeyListener(keys);
+    keys = (KeyPressedListener) e -> {
+      final boolean next = NEXTLINE.is(e), prev = PREVLINE.is(e);
+      if((next || prev) && e.isShiftDown()) {
+        final String value = history.get(next);
+        if(value != null) {
+          setText(value);
+          final BaseXDialog dialog = win.dialog();
+          if(dialog != null) dialog.action(this);
         }
       }
     };
-    comp.addKeyListener(listener);
+    comp.addKeyListener(keys);
+
+    // store input if focus is lost
+    comp.removeFocusListener(focus);
+    focus = (FocusLostListener) e -> updateHistory();
+    comp.addFocusListener(focus);
+
     return this;
   }
 
@@ -140,7 +145,7 @@ public class BaseXCombo extends JComboBox<Object> {
     this.win = win;
 
     setEditable(editable);
-    setEditor(new BaseXEditor(win.gui()));
+    setEditor(new BaseXEditor(win.gui(), this));
 
     BaseXLayout.addInteraction(this, win);
 
@@ -182,6 +187,13 @@ public class BaseXCombo extends JComboBox<Object> {
     return this;
   }
 
+  @Override
+  public void setFont(final Font font) {
+    super.setFont(font);
+    final BaseXTextField tf = textField();
+    if(hint != null && tf != null) hint.setFont(tf.getFont());
+  }
+
   /**
    * Sets the specified items.
    * @param items items
@@ -193,9 +205,9 @@ public class BaseXCombo extends JComboBox<Object> {
   /**
    * Stores the current history and refreshes the selectable items.
    */
-  public void store() {
+  public void updateHistory() {
     if(history != null) {
-      history.store(getText());
+      history.add(getText());
       SwingUtilities.invokeLater(() -> setItems(history.values()));
     }
   }
@@ -305,7 +317,7 @@ public class BaseXCombo extends JComboBox<Object> {
     } else if(option instanceof BooleanOption) {
       options.set((BooleanOption) option, Boolean.parseBoolean(getSelectedItem()));
     } else if(option instanceof StringsOption) {
-      store();
+      updateHistory();
     } else {
       throw Util.notExpected("Option type not supported: " + option);
     }
@@ -324,27 +336,37 @@ public class BaseXCombo extends JComboBox<Object> {
     /**
      * Constructor.
      * @param gui gui
+     * @param combo combo box
      */
-    private BaseXEditor(final GUI gui) {
+    private BaseXEditor(final GUI gui, final BaseXCombo combo) {
       tf = new BaseXTextField(gui);
-      tf.setBorder(new EmptyBorder(0, 4, 0, 0));
+      // adopt border of original editor
+      if(Prop.JAVA.startsWith("1")) {
+        final Component comp = combo.getEditor().getEditorComponent();
+        if(comp instanceof JTextField) tf.setBorder(((JTextField) comp).getBorder());
+      }
     }
+
     @Override
     public Component getEditorComponent() {
       return tf;
     }
+
     @Override
     public void setItem(final Object text) {
       if(text != null) tf.setText(text.toString());
     }
+
     @Override
     public String getItem() {
       return tf.getText();
     }
+
     @Override
     public void selectAll() {
       tf.selectAll();
     }
+
     @Override
     public void addActionListener(final ActionListener l) {
       tf.addActionListener(l);

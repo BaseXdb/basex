@@ -42,19 +42,12 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Returns a formatter for the specified language.
-   * @param ln language
+   * @param language language
    * @return formatter instance
    */
-  public static Formatter get(final byte[] ln) {
-    // check if formatter has already been created
-    Formatter form = MAP.get(ln);
-    if(form == null) {
-      final String clz = Util.className(Formatter.class) + string(uc(ln));
-      form = (Formatter) Reflect.get(Reflect.find(clz));
-      // instantiation not successful: return default formatter
-      if(form == null) form = MAP.get(EN);
-    }
-    return form;
+  public static Formatter get(final byte[] language) {
+    final Formatter form = MAP.get(language);
+    return form != null ? form : MAP.get(EN);
   }
 
   /**
@@ -114,46 +107,46 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Formats the specified date.
    * @param date date to be formatted
-   * @param lng language
-   * @param pic picture
-   * @param cal calendar (can be {@code null})
-   * @param plc place
+   * @param language language
+   * @param picture picture
+   * @param calendar calendar (can be {@code null})
+   * @param place place
    * @param info input info
    * @param sc static context
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final ADate date, final byte[] lng, final byte[] pic,
-      final byte[] cal, final byte[] plc, final InputInfo info, final StaticContext sc)
+  public final byte[] formatDate(final ADate date, final byte[] language, final byte[] picture,
+      final byte[] calendar, final byte[] place, final InputInfo info, final StaticContext sc)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
-    if(cal != null) {
+    if(language.length != 0 && MAP.get(language) == null) tb.add("[Language: en]");
+    if(calendar != null) {
       final QNm qnm;
       try {
-        qnm = QNm.resolve(trim(cal), sc);
+        qnm = QNm.resolve(trim(calendar), sc);
       } catch(final QueryException ex) {
-        throw CALWHICH_X.get(info, cal);
+        throw CALWHICH_X.get(info, calendar);
       }
       if(qnm.uri().length == 0) {
         int c = -1;
         final byte[] ln = qnm.local();
         final int cl = CALENDARS.length;
         while(++c < cl && !eq(CALENDARS[c], ln));
-        if(c == cl) throw CALWHICH_X.get(info, cal);
+        if(c == cl) throw CALWHICH_X.get(info, calendar);
         if(c > 1) tb.add("[Calendar: AD]");
       }
     }
-    if(plc.length != 0) tb.add("[Place: ]");
+    if(place.length != 0) tb.add("[Place: ]");
 
-    final DateParser dp = new DateParser(info, pic);
+    final DateParser dp = new DateParser(info, picture);
     while(dp.more()) {
       final int ch = dp.literal();
       if(ch == -1) {
         // retrieve variable marker
         final byte[] marker = dp.marker();
-        if(marker.length == 0) throw PICDATE_X.get(info, pic);
+        if(marker.length == 0) throw PICDATE_X.get(info, picture);
 
         // parse component specifier
         final int compSpec = ch(marker, 0);

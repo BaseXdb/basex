@@ -25,7 +25,7 @@ public final class FnUnparsedTextLines extends Parse {
     final Item item = unparsedText(qc, false, true);
     if(item == null) return Empty.SEQ;
 
-    try(NewlineInput ni = new NewlineInput(new ArrayInput(item.string(info)))) {
+    try(NewlineInput ni = new NewlineInput(item.string(info))) {
       final TokenList tl = new TokenList();
       final TokenBuilder tb = new TokenBuilder();
       while(ni.readLine(tb)) tl.add(tb.toArray());
@@ -58,7 +58,7 @@ public final class FnUnparsedTextLines extends Parse {
      */
     private LinesIter(final byte[] contents) {
       try {
-        nli = new NewlineInput(new ArrayInput(contents));
+        nli = new NewlineInput(contents);
       } catch(final IOException ex) {
         // input has already been converted to the correct encoding
         throw Util.notExpected(ex);

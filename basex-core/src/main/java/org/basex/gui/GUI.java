@@ -192,10 +192,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     });
 
     go = BaseXButton.get("c_go", RUN_QUERY, false, this);
-    go.addActionListener(e -> {
-      input.store();
-      execute();
-    });
+    go.addActionListener(e -> execute());
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, this);
 

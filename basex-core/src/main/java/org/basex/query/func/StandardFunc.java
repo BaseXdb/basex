@@ -318,13 +318,13 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     if(i >= exprs.length) return null;
-    final String enc = string(toToken(exprs[i], qc));
+    final String encoding = string(toToken(exprs[i], qc));
     try {
-      if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
+      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
     } catch(final IllegalArgumentException ignored) {
       /* character set is invalid or unknown (e.g. empty string) */
     }
-    throw err.get(info, enc);
+    throw err.get(info, encoding);
   }
 
   /**
@@ -369,7 +369,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     if(i < es) {
       final Item item = exprs[i].item(qc, info);
-      final Map map = item == null ? Map.EMPTY : toMap(exprs[i], qc);
+      final Map map = item == null ? Map.EMPTY : toMap(item);
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it.type.isStringOrUntyped()) {

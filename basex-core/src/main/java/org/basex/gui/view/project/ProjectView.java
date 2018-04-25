@@ -219,12 +219,14 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Jumps to the specified file.
-   * @param file file to be focused
+   * @param file file to be focused (can be {@code null})
    * @param focus focus tree
    */
   public void jumpTo(final IOFile file, final boolean focus) {
-    final IOFile fl = file.normalize();
-    if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
+    if(file != null) {
+      final IOFile fl = file.normalize();
+      if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
+    }
     if(focus) tree.requestFocusInWindow();
   }
 
@@ -308,7 +310,7 @@ public final class ProjectView extends BaseXPanel {
    */
   void open(final IOFile file, final String search) {
     final EditorArea ea = gui.editor.open(file);
-    if(ea != null) SwingUtilities.invokeLater(() -> ea.jump(search));
+    if(ea != null && !search.isEmpty()) SwingUtilities.invokeLater(() -> ea.jump(search));
   }
 
   /**
@@ -342,12 +344,12 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Refreshes the root path.
    * @param path root path
-   * @param save save project path
+   * @param history update history
    */
-  public void rootPath(final IOFile path, final boolean save) {
+  public void rootPath(final IOFile path, final boolean history) {
     rootPath.setText(path.normalize().path());
-    changeRoot(save);
-    if(save) rootPath.store();
+    changeRoot(history);
+    if(history) rootPath.updateHistory();
   }
 
   /**

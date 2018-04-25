@@ -69,26 +69,27 @@ public abstract class FuncCall extends Arr {
 
   /**
    * Calls the given function with the given arguments and takes care of tail-calls.
-   * @param fun function to call
+   * @param func function to call
    * @param arg arguments for the call
    * @param qc query context
-   * @param itm flag for requesting a single item
+   * @param item flag for requesting a single item
    * @param info input info
    * @return result of the function call
    * @throws QueryException query exception
    */
-  private static Value invoke(final XQFunction fun, final Value[] arg, final boolean itm,
+  private static Value invoke(final XQFunction func, final Value[] arg, final boolean item,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
-    XQFunction func = fun;
+    XQFunction fn = func;
     Value[] args = arg;
-    final int fp = qc.stack.enterFrame(func.stackFrameSize());
+    final int fp = qc.stack.enterFrame(fn.stackFrameSize());
     try {
       while(true) {
-        final Value ret = itm ? func.invItem(qc, info, args) : func.invValue(qc, info, args);
-        func = qc.pollTailCall();
-        if(func == null) return ret;
-        qc.stack.reuseFrame(func.stackFrameSize());
+        qc.checkStop();
+        final Value ret = item ? fn.invItem(qc, info, args) : fn.invValue(qc, info, args);
+        fn = qc.pollTailCall();
+        if(fn == null) return ret;
+        qc.stack.reuseFrame(fn.stackFrameSize());
         args = qc.pollTailArgs();
       }
     } catch(final QueryException ex) {
@@ -100,28 +101,29 @@ public abstract class FuncCall extends Arr {
 
   /**
    * Tail-calls the given function with the given arguments.
-   * @param fun function to call
+   * @param func function to call
    * @param arg arguments for the call
    * @param qc query context
-   * @param itm flag for requesting a single item
+   * @param item flag for requesting a single item
    * @param info input info
    * @return result of the function call
    * @throws QueryException query exception
    */
-  private static Value invokeTail(final XQFunction fun, final Value[] arg, final boolean itm,
+  private static Value invokeTail(final XQFunction func, final Value[] arg, final boolean item,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
+    qc.checkStop();
     final int calls = qc.tailCalls, max = qc.maxCalls;
     if(max >= 0 && calls >= max) {
-      // there are at least `ctx.maxCalls` tail-calls on the stack, eliminate them
-      qc.registerTailCall(fun, arg);
-      return itm ? null : Empty.SEQ;
+      // too many tail calls on the stack, eliminate them
+      qc.registerTailCall(func, arg);
+      return item ? null : Empty.SEQ;
     }
 
     qc.tailCalls++;
-    final int fp = qc.stack.enterFrame(fun.stackFrameSize());
+    final int fp = qc.stack.enterFrame(func.stackFrameSize());
     try {
-      return itm ? fun.invItem(qc, info, arg) : fun.invValue(qc, info, arg);
+      return item ? func.invItem(qc, info, arg) : func.invValue(qc, info, arg);
     } catch(final QueryException ex) {
       throw ex.add(info);
     } finally {
@@ -133,30 +135,30 @@ public abstract class FuncCall extends Arr {
   /**
    * Calls the given function with the given arguments, returning zero or one item.
    * This method takes care of tail calls.
-   * @param fun function to call
+   * @param func function to call
    * @param arg arguments to the function
    * @param qc query context
    * @param info input info
    * @return the resulting item
    * @throws QueryException query exception
    */
-  public static Item item(final XQFunction fun, final Value[] arg, final QueryContext qc,
+  public static Item item(final XQFunction func, final Value[] arg, final QueryContext qc,
       final InputInfo info) throws QueryException {
-    return (Item) invoke(fun, arg, true, qc, info);
+    return (Item) invoke(func, arg, true, qc, info);
   }
 
   /**
    * Calls the given function with the given arguments, returning zero or more items.
    * This method takes care of tail calls.
-   * @param fun function to call
+   * @param func function to call
    * @param arg arguments to the function
    * @param qc query context
    * @param info input info
    * @return the resulting value
    * @throws QueryException query exception
    */
-  public static Value value(final XQFunction fun, final Value[] arg, final QueryContext qc,
+  public static Value value(final XQFunction func, final Value[] arg, final QueryContext qc,
       final InputInfo info) throws QueryException {
-    return invoke(fun, arg, false, qc, info);
+    return invoke(func, arg, false, qc, info);
   }
 }

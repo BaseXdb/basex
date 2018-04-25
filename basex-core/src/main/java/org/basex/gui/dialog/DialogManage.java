@@ -62,7 +62,7 @@ public final class DialogManage extends BaseXDialog {
     // create database chooser
     final String[] dbs = gui.context.databases.list().finish();
     choice = new BaseXList(this, false, dbs);
-    choice.setSize(200, 500);
+    choice.setSize(200, 600);
     final Data data = gui.context.data();
     if(data != null) {
       data.flush(true);
@@ -70,7 +70,6 @@ public final class DialogManage extends BaseXDialog {
     }
 
     doc1 = new BaseXLabel(" ").large();
-    doc1.setSize(420, doc1.getHeight());
 
     detail = new TextPanel(this, false);
     detail.setFont(panel.getFont());
@@ -91,7 +90,7 @@ public final class DialogManage extends BaseXDialog {
     doc2.setFont(doc1.getFont());
 
     backups = new BaseXList(this);
-    backups.setSize(400, 400);
+    backups.setSize(600, 470);
 
     // backup buttons
     backup = new BaseXButton(this, BACKUP);
@@ -109,9 +108,6 @@ public final class DialogManage extends BaseXDialog {
     tabs.addTab(INFORMATION, tab1);
     tabs.addTab(BACKUPS, tab2);
 
-    BaseXLayout.setWidth(detail, 400);
-    BaseXLayout.setWidth(doc1, 400);
-    BaseXLayout.setWidth(doc2, 400);
     set(choice, BorderLayout.CENTER);
     set(tabs, BorderLayout.EAST);
 

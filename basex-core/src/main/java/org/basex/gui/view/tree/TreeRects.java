@@ -14,33 +14,33 @@ import org.basex.query.value.seq.*;
  * @author Wolfgang Miller
  */
 final class TreeRects {
-  /** Saved rectangles. */
-  private TreeRect[][][] rects;
   /** View. */
   private final View view;
+
+  /** Saved rectangles. */
+  private TreeRect[][][] rects;
   /** Displayed nods. */
   DBNodes nodes;
+  /** Graphics reference. */
+  Graphics g;
 
   /**
    * Constructor.
-   * @param v view
+   * @param view view
    */
-  TreeRects(final View v) {
-    view = v;
+  TreeRects(final View view) {
+    this.view = view;
   }
 
   /**
    * Create new rectangles and set subtree borders.
    * @param sub subtree
-   * @param g graphics reference
    * @param ds draw start
    * @param dw draw width
    * @param slim slim to text
    * @return tree distance
    */
-  double generateRects(final TreeSubtree sub, final Graphics g, final int ds, final int dw,
-      final boolean slim) {
-
+  double generateRects(final TreeSubtree sub, final int ds, final int dw, final boolean slim) {
     final int[] roots = nodes.pres();
     final int rl = roots.length;
     if(rl == 0) return 0;
@@ -48,7 +48,7 @@ final class TreeRects {
     if(w < 2) return -1;
 
     rects = new TreeRect[rl][][];
-    for(int i = 0; i < rl; ++i) generateRects(sub, g, i, ds, w, slim);
+    for(int i = 0; i < rl; ++i) generateRects(sub, i, ds, w, slim);
     return w;
   }
 
@@ -56,14 +56,13 @@ final class TreeRects {
    * Generates cached rectangles.
    *
    * @param sub subtree
-   * @param g graphics reference
    * @param rn root number
    * @param ds draw start
    * @param dw draw width
    * @param slim slim to text
    */
-  private void generateRects(final TreeSubtree sub, final Graphics g, final int rn, final int ds,
-      final double dw, final boolean slim) {
+  private void generateRects(final TreeSubtree sub, final int rn, final int ds, final double dw,
+      final boolean slim) {
 
     final int h = sub.subtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
@@ -73,7 +72,7 @@ final class TreeRects {
       if(w < 2) {
         bigRectangle(rn, lv, ds, dw);
       } else {
-        normalRectangle(sub, g, rn, lv, ds, w, slim);
+        normalRectangle(sub, rn, lv, ds, w, slim);
       }
     }
   }
@@ -94,36 +93,32 @@ final class TreeRects {
   /**
    * Creates normal rectangles.
    * @param sub subtree
-   * @param g graphics reference
    * @param rn root
    * @param lv level
    * @param ds draw start
    * @param w width
    * @param slim slim to text
    */
-  private void normalRectangle(final TreeSubtree sub, final Graphics g, final int rn,
-      final int lv, final int ds, final double w, final boolean slim) {
+  private void normalRectangle(final TreeSubtree sub, final int rn, final int lv, final int ds,
+      final double w, final boolean slim) {
 
     final int subSi = sub.levelSize(rn, lv);
     // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[subSi];
 
-    double xx = rn * w * subSi + ds;
-    double ww = w;
-
+    double xx = rn * w * subSi + ds, ww = w;
     for(int i = 0; i < subSi; ++i) {
       if(slim) {
         final double boxMiddle = xx + ww / 2.0f;
-        final byte[] b = getText(sub.prePerIndex(rn, lv, i));
-        int o = calcOptimalRectWidth(g, b) + 10;
+        final byte[] text = text(sub.prePerIndex(rn, lv, i));
+        int o = calcOptimalRectWidth(text) + 10;
         if(o < MIN_TXT_SPACE) o = MIN_TXT_SPACE;
         if(w > o) {
           xx = boxMiddle - o / 2.0d;
           ww = o;
         }
       }
-      rects[rn][lv][i] = new TreeRect((int) xx + BORDER_PADDING, (int) ww
-          - BORDER_PADDING);
+      rects[rn][lv][i] = new TreeRect((int) xx + BORDER_PADDING, (int) ww - BORDER_PADDING);
 
       xx += w;
     }
@@ -135,7 +130,7 @@ final class TreeRects {
    * @param lv level
    * @return TreeRect array
    */
-  TreeRect[] getTreeRectsPerLevel(final int rn, final int lv) {
+  TreeRect[] treeRectsPerLevel(final int rn, final int lv) {
     return rects[rn][lv];
   }
 
@@ -146,7 +141,7 @@ final class TreeRects {
    * @param ix index
    * @return tree rectangle
    */
-  TreeRect getTreeRectPerIndex(final int rn, final int lv, final int ix) {
+  TreeRect treeRectPerIndex(final int rn, final int lv, final int ix) {
     return rects[rn][lv][ix];
   }
 
@@ -155,18 +150,17 @@ final class TreeRects {
    * @param pre pre
    * @return text
    */
-  byte[] getText(final int pre) {
-    return ViewData.name(view.gui.gopts, nodes.data(), pre);
+  byte[] text(final int pre) {
+    return ViewData.namedText(view.gui.gopts, nodes.data(), pre);
   }
 
   /**
    * Calculates optimal rectangle width.
-   * @param g the graphics reference
-   * @param b byte array
+   * @param string string
    * @return optimal rectangle width
    */
-  private static int calcOptimalRectWidth(final Graphics g, final byte[] b) {
-    return BaseXLayout.width(g, b);
+  private int calcOptimalRectWidth(final byte[] string) {
+    return BaseXLayout.width(g, string);
   }
 
   /**
@@ -188,8 +182,8 @@ final class TreeRects {
    * @param x x position
    * @return pre value
    */
-  int getPrePerXPos(final TreeSubtree sub, final int rn, final int lv, final int x) {
-    final TreeRect r = getTreeRectsPerLevel(rn, lv)[0];
+  int prePerXPos(final TreeSubtree sub, final int rn, final int lv, final int x) {
+    final TreeRect r = treeRectsPerLevel(rn, lv)[0];
     final double ratio = (x - r.x) / (double) r.w;
     final int idx = (int) (ratio * sub.levelSize(rn, lv));
     return sub.prePerIndex(rn, lv, idx);

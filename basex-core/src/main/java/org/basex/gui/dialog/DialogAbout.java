@@ -32,7 +32,7 @@ public final class DialogAbout extends BaseXDialog {
         BaseXLayout.border(10, 10, 15, 22)));
 
     final BaseXLabel label = new BaseXLabel();
-    label.setIcon(BaseXImages.icon("logo_transparent"));
+    label.setIcon(BaseXImages.icon("logo_256"));
     label.setVerticalAlignment(SwingConstants.TOP);
 
     p.add(label, BorderLayout.WEST);

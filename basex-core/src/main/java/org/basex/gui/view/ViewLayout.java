@@ -1,43 +1,109 @@
 package org.basex.gui.view;
 
+import java.util.*;
+
 import org.basex.gui.layout.*;
 
 /**
- * This is an interface for view layout components.
+ * Layout class.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-interface ViewLayout {
-  /**
-   * Checks if the view layout is visible.
-   * @return true if layout is visible
-   */
-  boolean isVisible();
+final class ViewLayout implements ViewComponent {
+  /** Alignment (horizontal/vertical). */
+  final boolean horizontal;
+  /** Layout Components. */
+  final ArrayList<ViewComponent> list = new ArrayList<>();
 
   /**
-   * Sets the visibility of the view layout.
-   * @param db database flag
+   * Constructor.
+   * @param horizontal alignment (horizontal/vertical)
+   * @param components initial components
    */
-  void setVisibility(boolean db);
+  ViewLayout(final boolean horizontal, final ViewComponent... components) {
+    this.horizontal = horizontal;
+    list.addAll(Arrays.asList(components));
+  }
+
+  /**
+   * Adds a component.
+   * @param comp component to be added
+   */
+  void add(final ViewComponent comp) {
+    list.add(comp);
+  }
+
+  /**
+   * Replaces a component.
+   * @param comp component to be set
+   * @param i index
+   */
+  void set(final ViewComponent comp, final int i) {
+    list.set(i, comp);
+  }
+
+  /**
+   * Inserts a component at the specified position.
+   * @param comp component to insert
+   * @param i index
+   */
+  void insert(final ViewComponent comp, final int i) {
+    list.add(i, comp);
+  }
 
   /**
    * Removes the specified panel.
    * @param panel panel to be removed
-   * @return true if panel was removed
+   * @return left over component, {@code null} otherwise
    */
-  boolean delete(ViewPanel panel);
+  ViewComponent delete(final ViewPanel panel) {
+    // number of components changes during iteration
+    for(int c = 0; c < list.size(); c++) {
+      ViewComponent comp = list.get(c);
+      if(comp instanceof ViewLayout) {
+        comp = ((ViewLayout) comp).delete(panel);
+        if(comp != null) list.set(c, comp);
+      } else if(comp == panel) {
+        list.remove(c--);
+      }
+    }
+    // return component if a single one is left over
+    return list.size() == 1 ? list.get(0) : null;
+  }
 
-  /**
-   * Adds a layout to the specified panel.
-   * @param panel current panel
-   */
-  void createView(BaseXBack panel);
+  @Override
+  public boolean isVisible() {
+    for(final ViewComponent comp : list) {
+      if(comp.isVisible()) return true;
+    }
+    return false;
+  }
 
-  /**
-   * Constructs a build string.
-   * @param all also include invisible components
-   * @return build string
-   */
-  String layoutString(boolean all);
+  @Override
+  public void setVisibility(final boolean db) {
+    for(final ViewComponent comp : list) comp.setVisibility(db);
+  }
+
+  @Override
+  public void addTo(final BaseXBack panel) {
+    // skip invisible layouts
+    if(!isVisible()) return;
+
+    final BaseXBack split = new BaseXSplit(horizontal);
+    for(final ViewComponent comp : list) comp.addTo(split);
+    panel.add(split);
+  }
+
+  @Override
+  public String layoutString(final boolean all) {
+    final StringBuilder sb = new StringBuilder(horizontal ? "H " : "V ");
+    for(final ViewComponent comp : list) sb.append(comp.layoutString(all));
+    return sb.append("- ").toString();
+  }
+
+  @Override
+  public String toString() {
+    return (horizontal ? "Horizontal" : "Vertical") + " Layout";
+  }
 }

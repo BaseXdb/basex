@@ -13,8 +13,7 @@ import org.basex.util.*;
 public final class BinBin extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] bytes = str(0, qc);
-    if(bytes == null) return null;
-    return B64.get(binary2bytes(bytes));
+    final byte[] token = token(0, qc);
+    return token == null ? null : B64.get(binary2bytes(token));
   }
 }

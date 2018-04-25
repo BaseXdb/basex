@@ -137,12 +137,14 @@ public class QueryParser extends InputParser {
     final MainOptions opts = qctx.context.options;
     if(uri != null) sc.baseURI(uri);
 
-    // bind external variables
-    for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
-      final String key = entry.getKey();
-      final Atm value = new Atm(entry.getValue());
-      if(key.isEmpty()) qctx.context(value, sc);
-      else qctx.bind(key, value, sc);
+    // bind external variables on top level
+    if(qctx.parent == null) {
+      for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
+        final String key = entry.getKey();
+        final Atm value = new Atm(entry.getValue());
+        if(key.isEmpty()) qctx.context(value, sc);
+        else qctx.bind(key, value, sc);
+      }
     }
   }
 
@@ -305,8 +307,8 @@ public class QueryParser extends InputParser {
     }
     // parse xquery encoding (ignored, as input always comes in as string)
     if(wsConsumeWs(ENCODING)) {
-      final String enc = string(stringLiteral());
-      if(!Strings.supported(enc)) throw error(XQUERYENC2_X, enc);
+      final String encoding = string(stringLiteral());
+      if(!Strings.supported(encoding)) throw error(XQUERYENC2_X, encoding);
     } else if(!version) {
       pos = p;
       return;

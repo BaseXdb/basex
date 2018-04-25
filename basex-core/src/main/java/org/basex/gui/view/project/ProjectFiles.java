@@ -105,8 +105,7 @@ final class ProjectFiles {
       if(id != parseId) throw new InterruptedException();
       if(parsed.contains(path)) continue;
 
-      final IOFile file = new IOFile(path);
-      try(TextInput ti = new TextInput(file)) {
+      try(TextInput ti = new TextInput(new IOFile(path))) {
         // parse query
         try(QueryContext qc = new QueryContext(ctx)) {
           final String input = ti.cache().toString();

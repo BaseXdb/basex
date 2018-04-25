@@ -19,7 +19,7 @@ public final class LookupTest extends AdvancedQueryTest {
     query("(map { 'a':'b' }, map { 'c':'d' }) ? a", "b");
     query("map { 'a':'b', 'c':'d' } ? ('a','c')", "b\nd");
     query("(map { 'a':'b' }, map { 'c':'d' }) ? ('a','c')", "b\nd");
-    query(_MAP_MERGE.args(" for $i in 1 to 5 return map { $i: $i+1 }") + " ? 2", 3);
+    query("map:merge(for $i in 1 to 5 return map { $i: $i+1 })? 2", 3);
 
     query("map { 'first' : 'Jenna', 'last' : 'Scott' } ? first", "Jenna");
     query("(map {'first': 'Tom'}, map {'first': 'Dick'}, map {'first': 'Harry'}) ? first",

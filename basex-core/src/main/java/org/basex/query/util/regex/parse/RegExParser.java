@@ -754,7 +754,6 @@ public class RegExParser implements RegExParserConstants {
   private int jj_gc = 0;
 
 
-  /** Constructor with user supplied Token Manager. */
   public RegExParser(TokenManager tm) {
     token_source = tm;
     token = new Token();
@@ -764,7 +763,6 @@ public class RegExParser implements RegExParserConstants {
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
-  /** Reinitialise. */
   public void ReInit(TokenManager tm) {
     token_source = tm;
     token = new Token();
@@ -822,7 +820,6 @@ public class RegExParser implements RegExParserConstants {
   }
 
 
-/** Get the next Token. */
   final public Token getNextToken() {
     if (token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -831,7 +828,6 @@ public class RegExParser implements RegExParserConstants {
     return token;
   }
 
-/** Get the specific Token. */
   final public Token getToken(int index) {
     Token t = jj_lookingAhead ? jj_scanpos : token;
     for (int i = 0; i < index; i++) {
@@ -879,7 +875,6 @@ public class RegExParser implements RegExParserConstants {
     }
   }
 
-  /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
     boolean[] la1tokens = new boolean[25];

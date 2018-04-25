@@ -102,6 +102,6 @@ public final class DialogExport extends BaseXDialog {
     if(!ok) return;
     super.close();
     gui.set(MainOptions.EXPORTER, serial.options());
-    path.store();
+    path.updateHistory();
   }
 }

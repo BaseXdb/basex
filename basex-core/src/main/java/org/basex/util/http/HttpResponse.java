@@ -49,17 +49,6 @@ public final class HttpResponse {
   public Value getResponse(final HttpURLConnection conn, final boolean body, final String mtype)
       throws IOException, QueryException {
 
-    // check content type
-    boolean error = false;
-    InputStream is;
-    try {
-      is = conn.getInputStream();
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      is = conn.getErrorStream();
-      error = true;
-    }
-
     // result
     final ItemList items = new ItemList();
 
@@ -79,14 +68,26 @@ public final class HttpResponse {
         response.add(hdr);
       }
     }
+
     // construct <http:body/>
+    boolean error = false;
+    InputStream is;
+    try {
+      is = conn.getInputStream();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      is = conn.getErrorStream();
+      error = true;
+    }
+
     if(is != null) {
+      final String ctype = conn.getContentType();
+      // error: adopt original type as content type
+      final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
+        new MediaType(ctype) : new MediaType(mtype);
+
+      final HttpPayload hp = new HttpPayload(is, body, info, options);
       try {
-        final HttpPayload hp = new HttpPayload(is, body, info, options);
-        final String ctype = conn.getContentType();
-        // error: adopt original type as content type
-        final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
-          new MediaType(ctype) : new MediaType(mtype);
         response.add(hp.parse(type, error, conn.getHeaderField(CONTENT_ENCODING)));
         if(body) items.add(hp.payloads());
       } finally {

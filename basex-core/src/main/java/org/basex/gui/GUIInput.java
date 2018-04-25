@@ -64,7 +64,7 @@ public final class GUIInput extends BaseXCombo {
             completeInput();
             popup.setVisible(false);
           } else {
-            store();
+            updateHistory();
             // evaluate the input
             if(e.getModifiers() == 0) gui.execute();
           }

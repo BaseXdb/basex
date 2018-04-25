@@ -67,11 +67,9 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
-    try {
-      return parse(item.string(info));
-    } catch(final IllegalArgumentException ex) {
-      throw AtomType.HEX.castError(item, info);
-    }
+    final byte[] bytes = parse(item.string(info));
+    if(bytes != null) return bytes;
+    throw AtomType.HEX.castError(item, info);
   }
 
   /**
@@ -82,39 +80,26 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
-    try {
-      return parse(value);
-    } catch(final IllegalArgumentException ex) {
-      throw AtomType.HEX.castError(value, info);
-    }
+    final byte[] bytes = parse(value);
+    if(bytes != null) return bytes;
+    throw AtomType.HEX.castError(value, info);
   }
 
   /**
    * Converts the input into a byte array.
    * @param data textual data
-   * @return decoded string
-   * @throws IllegalArgumentException illegal argument exception
+   * @return byte array, or {@code null} if input is invalid
    */
-  private static byte[] parse(final byte[] data) throws IllegalArgumentException {
-    if((data.length & 1) != 0) throw new IllegalArgumentException();
-    final int l = data.length >>> 1;
-    final byte[] v = new byte[l];
-    for(int i = 0; i < l; ++i) {
-      v[i] = (byte) ((dec(data[i << 1]) << 4) + dec(data[(i << 1) + 1]));
+  private static byte[] parse(final byte[] data) {
+    final int dl = data.length;
+    if((dl & 1) != 0) return null;
+    final byte[] value = new byte[dl >>> 1];
+    for(int d = 0; d < dl; d += 2) {
+      final int n = Token.dec(data[d], data[d + 1]);
+      if(n < 0) return null;
+      value[d >>> 1] = (byte) n;
     }
-    return v;
-  }
-
-  /**
-   * Converts a single character into a byte value.
-   * @param ch character
-   * @return byte value
-   * @throws IllegalArgumentException illegal argument exception
-   */
-  private static int dec(final byte ch) throws IllegalArgumentException {
-    if(ch >= '0' && ch <= '9') return ch - '0';
-    if(ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F') return (ch & 0x0F) + 9;
-    throw new IllegalArgumentException();
+    return value;
   }
 
   @Override

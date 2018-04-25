@@ -97,15 +97,15 @@ public abstract class Filter extends Preds {
     Expr exp = simplify(root, exprs);
     if(exp != null) return exp.optimize(cc);
 
-    // rewrite filter with database documents to path
-    if(root instanceof Value && root.data() != null && root.seqType().type == NodeType.DOC) {
-      return Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs)).optimize(cc);
-    }
-
     // no numeric predicates..
     if(!positional()) {
+      // rewrite filter with document nodes to path; enables index rewritings
+      // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
+      if(root instanceof Value && root.data() != null && root.seqType().type == NodeType.DOC)
+        return Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs)).optimize(cc);
+
       // rewrite independent deterministic single filter to if expression:
-      // example: (1 to 10)[$boolean] -> if($boolean) then (1 to 10) else ()
+      // example: (1 to 10)[$boolean]  ->  if($boolean) then (1 to 10) else ()
       final Expr expr = exprs[0];
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber())
         return new If(info, expr, root, Empty.SEQ).optimize(cc);

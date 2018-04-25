@@ -5,15 +5,16 @@ import java.awt.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.view.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.seq.*;
 
 /**
- * Provides an interface for data specific TreeMap visualizations.
+ * Adds default paint operations to the tree map.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-abstract class MapPainter {
+final class MapPainter {
   /** Graphics reference. */
   final MapView view;
   /** GUI options. */
@@ -36,7 +37,7 @@ abstract class MapPainter {
    * @param data data reference
    * @return next color mark or {@code null}
    */
-  final Color color(final MapRects rects, final int ri, final Data data) {
+  Color color(final MapRects rects, final int ri, final Data data) {
     // find marked node
     final DBNodes marked = view.gui.context.marked;
     if(marked != null) {
@@ -68,9 +69,79 @@ abstract class MapPainter {
   /**
    * Draws the specified rectangles.
    * @param g graphics reference
-   * @param r rectangles to be drawn
+   * @param rects rectangles to be drawn
    */
-  abstract void drawRectangles(Graphics g, MapRects r);
+  void drawRectangles(final Graphics g, final MapRects rects) {
+    // some additions to set up borders
+    final MapRenderer renderer = new MapRenderer(g);
+    final MapRect l = view.layout.layout;
+    final int ww = view.getWidth(), hh = view.getHeight();
+
+    final Data data = view.gui.context.data();
+    final FTPosData ftpos = view.gui.context.marked.ftpos();
+
+    final int off = gopts.get(GUIOptions.MAPOFFSETS);
+    final int rs = rects.size;
+    for(int ri = 0; ri < rs; ++ri) {
+      // get rectangle information
+      final MapRect rect = rects.get(ri);
+      final int pre = rect.pre;
+
+      // level 1: next context node, set marker pointer to 0
+      final int lvl = rect.level;
+      final boolean full = rect.w == ww && rect.h == hh;
+      Color col = color(rects, ri, data);
+      final boolean mark = col != null;
+
+      rect.pos = ftpos != null ? ftpos.get(data, pre) : null;
+      g.setColor(mark ? col : GUIConstants.color(lvl));
+
+      if(rect.w < l.x + l.w || rect.h < l.y + l.h || off < 2 || ViewData.leaf(gopts, data, pre)) {
+        g.fillRect(rect.x, rect.y, rect.w, rect.h);
+      } else {
+        // painting only border for non-leaf nodes..
+        g.fillRect(rect.x, rect.y, l.x, rect.h);
+        g.fillRect(rect.x, rect.y, rect.w, l.y);
+        g.fillRect(rect.x + rect.w - l.w, rect.y, l.w, rect.h);
+        g.fillRect(rect.x, rect.y + rect.h - l.h, rect.w, l.h);
+      }
+
+      if(!full) {
+        col = mark ? GUIConstants.colormark3 : GUIConstants.color(lvl + 2);
+        g.setColor(col);
+        g.drawRect(rect.x, rect.y, rect.w, rect.h);
+        col = mark ? GUIConstants.colormark4 : GUIConstants.color(Math.max(0, lvl - 2));
+        g.setColor(col);
+        g.drawLine(rect.x + rect.w, rect.y, rect.x + rect.w, rect.y + rect.h);
+        g.drawLine(rect.x, rect.y + rect.h, rect.x + rect.w, rect.y + rect.h);
+      }
+
+      // skip drawing of string if there is no space
+      if(rect.w <= 3 || rect.h < GUIConstants.fontSize) continue;
+
+      rect.x += 3;
+      rect.w -= 3;
+
+      final int kind = data.kind(pre);
+      if(kind == Data.ELEM || kind == Data.DOC) {
+        g.setColor(GUIConstants.TEXT);
+        g.setFont(GUIConstants.font);
+        renderer.chopText(ViewData.namedText(gopts, data, pre), rect.x, rect.y, rect.w);
+      } else {
+        g.setColor(GUIConstants.color((rect.level << 1) + 8));
+        g.setFont(GUIConstants.mfont);
+        final byte[] text = ViewData.text(data, pre);
+        rect.thumb = renderer.calcHeight(rect, text) >= rect.h;
+        if(rect.thumb) {
+          renderer.drawThumbnails(rect, text);
+        } else {
+          renderer.drawText(rect, text);
+        }
+      }
+      rect.x -= 3;
+      rect.w += 3;
+    }
+  }
 
   /**
    * Returns textual contents for a rectangle.
@@ -79,6 +150,6 @@ abstract class MapPainter {
    * @return byte[] content
    */
   static byte[] text(final Data data, final MapRect mr) {
-    return ViewData.text(data, mr.pre, false);
+    return ViewData.text(data, mr.pre);
   }
 }

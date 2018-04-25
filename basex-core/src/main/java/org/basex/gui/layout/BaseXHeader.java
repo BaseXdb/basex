@@ -1,8 +1,8 @@
 package org.basex.gui.layout;
 
-import static org.basex.gui.GUIConstants.*;
-
 import javax.swing.border.*;
+
+import org.basex.gui.*;
 
 /**
  * Header label.
@@ -17,14 +17,8 @@ public final class BaseXHeader extends BaseXLabel {
    */
   public BaseXHeader(final String string) {
     super(string, true, false);
-    setForeground(dgray);
-  }
-
-  /**
-   * Called when GUI design has changed.
-   */
-  public void refreshLayout() {
-    setBorder(new EmptyBorder(-4, 0, -getFontMetrics(lfont).getLeading() / 2, 2));
-    setFont(lfont);
+    setForeground(GUIConstants.dgray);
+    setFont(getFont().deriveFont(24f));
+    setBorder(new EmptyBorder(-2, 0, 8, 2));
   }
 }

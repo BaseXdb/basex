@@ -574,6 +574,10 @@ public class CommandTest extends SandboxTest {
     ok(new Execute("<info/>"));
     ok(new Execute("<commands><info/><drop-db name='" + NAME + "'/></commands>"));
     no(new XQuery("//li"));
+
+    // pass on command instances
+    ok(new Execute(new Info()));
+    ok(new Execute(new Info(), new Info()));
   }
 
   /** Command test. */

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  */
 final class TextIterator {
   /** Text. */
-  private final byte[] text;
+  final byte[] text;
   /** Text length. */
   private final int length;
   /** Caret position. */

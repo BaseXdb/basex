@@ -21,13 +21,13 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("9.0 RC3");
+  public static final String VERSION = version("9.0.2 beta");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
   public static final String TEAM1 = "Michael Seiferle, Alexander Holupirek";
   /** Co-authors (2). */
-  public static final String TEAM2 = "Marc H. Scholl, Sabine Teubner, Jagrut Kosti";
+  public static final String TEAM2 = "Marc H. Scholl, Sabine Teubner";
   /** Entity. */
   public static final String ENTITY = NAME + " Team";
   /** Project namespace. */
@@ -62,6 +62,8 @@ public final class Prop {
   public static final boolean WIN = OS.startsWith("Windows");
   /** Respect lower/upper case when doing file comparisons. */
   public static final boolean CASE = !(MAC || WIN);
+  /** Java version. */
+  public static final String JAVA = System.getProperty("java.specification.version");
 
   /** Prefix for project specific options. */
   public static final String DBPREFIX = "org.basex.";
@@ -80,20 +82,6 @@ public final class Prop {
 
   // determine project home directory for storing property files and directories...
   static {
-    // check system property 'org.basex.path'
-    String homedir = System.getProperty(PATH);
-    // check if current working directory contains configuration file
-    if(homedir == null) homedir = configDir(System.getProperty("user.dir"));
-    // check if application directory contains configuration file
-    if(homedir == null) homedir = configDir(applicationDir());
-    // check if application directory contains configuration file
-    if(homedir == null) {
-      // linux: check HOME variable (#773)
-      final String home = System.getenv("HOME");
-      homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT_NAME;
-    }
-    HOMEDIR = dir(homedir);
-
     // retrieve application URL
     URL location = null;
     final ProtectionDomain pd = Prop.class.getProtectionDomain();
@@ -102,6 +90,19 @@ public final class Prop {
       if(cs != null) location = cs.getLocation();
     }
     LOCATION = location;
+
+    // check system property 'org.basex.path'
+    String homedir = System.getProperty(PATH);
+    // check if current working directory contains configuration file
+    if(homedir == null) homedir = configDir(System.getProperty("user.dir"));
+    // check if application directory contains configuration file
+    if(homedir == null) homedir = configDir(applicationDir(location));
+    // fallback: choose home directory (linux: check HOME variable, GH-773)
+    if(homedir == null) {
+      final String home = WIN ? null : System.getenv("HOME");
+      homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT_NAME;
+    }
+    HOMEDIR = dir(homedir);
   }
 
   // STATIC OPTIONS ===============================================================================
@@ -138,15 +139,14 @@ public final class Prop {
 
   /**
    * Returns the application directory.
+   * @param location location of application
    * @return application directory (can be {@code null})
    */
-  private static String applicationDir() {
-    if(LOCATION != null) {
-      try {
-        return new IOFile(Paths.get(LOCATION.toURI()).toString()).dir();
-      } catch(final Exception ex) {
-        Util.stack(ex);
-      }
+  private static String applicationDir(final URL location) {
+    try {
+      if(location != null) return new IOFile(Paths.get(location.toURI()).toString()).dir();
+    } catch(final Exception ex) {
+      Util.stack(ex);
     }
     return null;
   }

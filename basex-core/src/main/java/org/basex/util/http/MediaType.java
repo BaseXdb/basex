@@ -74,14 +74,21 @@ public final class MediaType {
     final int p = string.indexOf(';');
     final String type = p == -1 ? string : string.substring(0, p);
 
+    // set main and sub type
     final int s = type.indexOf('/');
     main = s == -1 ? type : type.substring(0, s);
     sub  = s == -1 ? "" : type.substring(s + 1);
 
+    // parse parameters (simplified version of RFC 2045; no support for comments, etc.)
     if(p != -1) {
       for(final String param : Strings.split(string.substring(p + 1), ';')) {
         final String[] kv = Strings.split(param, '=', 2);
-        params.put(kv[0].trim(), kv.length < 2 ? "" : kv[1].trim());
+        // attribute: trim whitespaces, convert to lower case
+        final String k = kv[0].trim().toLowerCase(Locale.ENGLISH);
+        // value: trim whitespaces, remove quotes and backslashed characters
+        String v = kv.length < 2 ? "" : kv[1].trim();
+        if(v.startsWith("\"")) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
+        params.put(k, v);
       }
     }
   }

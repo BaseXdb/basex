@@ -299,13 +299,12 @@ public final class IOFile extends IO {
 
   @Override
   public boolean eq(final IO io) {
-    return io instanceof IOFile && (Prop.CASE ? pth.equals(io.pth) :
-      pth.equalsIgnoreCase(io.pth));
+    return io instanceof IOFile && (Prop.CASE ? pth.equals(io.pth) : pth.equalsIgnoreCase(io.pth));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof IOFile && ((IOFile) obj).pth.equals(pth);
+    return obj instanceof IOFile && pth.equals(((IOFile) obj).pth);
   }
 
   @Override

@@ -1,7 +1,9 @@
 package org.basex.query.expr;
 
+import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
+import org.junit.Test;
 
 /**
  * Tests for optimizations of the filter expression.
@@ -10,6 +12,11 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FilterTest extends AdvancedQueryTest {
+  /** Drops a test database. */
+  @AfterClass public static void end() {
+    execute(new DropDB(NAME));
+  }
+
   /** Filter expressions with a single predicate. */
   @Test public void onePredicate() {
     // empty sequence
@@ -275,5 +282,15 @@ public final class FilterTest extends AdvancedQueryTest {
     query("(<a/>,<b/>)[position() > 1]", "<b/>");
     query("(<a/>,<b/>,<c/>)[position() > 2]", "<c/>");
     query("(<a/>,<b/>,<c/>)[position() = 2 to 3]", "<b/>\n<c/>");
+  }
+
+  /** Start position. */
+  @Test public void documents() {
+    execute(new CreateDB(NAME));
+    execute(new Add("one", "<one/>"));
+    execute(new Add("two", "<two/>"));
+    execute(new Close());
+    query("collection('" + NAME + "')[2]", "<two/>");
+    query("db:open('" + NAME + "')[2]", "<two/>");
   }
 }

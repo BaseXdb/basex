@@ -78,7 +78,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     header = new BaseXHeader(INFO);
 
-    timer = new BaseXLabel(" ", true, false);
+    timer = new BaseXLabel(" ").border(4, 4, 0, 0);
     timer.setForeground(GUIConstants.dgray);
 
     area = new TextPanel(gui, false);
@@ -146,8 +146,6 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   @Override
   public void refreshLayout() {
-    header.refreshLayout();
-    timer.setFont(GUIConstants.font);
     area.setFont(GUIConstants.font);
     editor.bar().refreshLayout();
   }

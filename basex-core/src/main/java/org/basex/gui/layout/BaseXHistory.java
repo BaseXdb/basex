@@ -37,7 +37,7 @@ public final class BaseXHistory {
    * Empty values will be ignored.
    * @param input new input
    */
-  public void store(final String input) {
+  public void add(final String input) {
     if(input.isEmpty()) return;
     final StringList list = new StringList(MAX).add(input);
     for(final String value : values()) {

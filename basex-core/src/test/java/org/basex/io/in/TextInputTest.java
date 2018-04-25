@@ -17,20 +17,18 @@ import org.junit.*;
 public final class TextInputTest {
   /**
    * Test small array.
-   * @throws IOException I/O exception
    */
   @Test
-  public void read1() throws IOException {
+  public void read1() {
     final byte[] data = { ' ' };
     run(data);
   }
 
   /**
    * Test intermediate array.
-   * @throws IOException I/O exception
    */
   @Test
-  public void read255() throws IOException {
+  public void read255() {
     final int dl = 255;
     final byte[] data = new byte[dl];
     for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
@@ -39,10 +37,9 @@ public final class TextInputTest {
 
   /**
    * Test large array.
-   * @throws IOException I/O exception
    */
   @Test
-  public void read4095() throws IOException {
+  public void read4095() {
     final int dl = 4095;
     final byte[] data = new byte[dl];
     for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
@@ -51,10 +48,9 @@ public final class TextInputTest {
 
   /**
    * Test large array.
-   * @throws IOException I/O exception
    */
   @Test
-  public void read65535() throws IOException {
+  public void read65535() {
     final int dl = 65536;
     final byte[] data = new byte[dl];
     for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
@@ -111,25 +107,22 @@ public final class TextInputTest {
    * @throws IOException I/O exception
    */
   private static void encoding(final String enc, final String input) throws IOException {
-    final byte[] utf8 = Token.token(input);
-    final IO io = new IOContent(input.getBytes(enc));
-    final byte[] cache = new TextInput(io).encoding(enc).content();
-    assertSame(cache, utf8);
+    try(TextInput ti = new TextInput(input.getBytes(enc))) {
+      assertSame(ti.encoding(enc).content(), Token.token(input));
+    }
   }
 
   /**
    * Performs a test on the specified data.
    * @param data data to be tested
-   * @throws IOException I/O exception
    */
-  private static void run(final byte[] data) throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
-    final TextInput ti = new TextInput(new IOContent(data));
-    ti.read();
-    ti.reset();
+  private static void run(final byte[] data) {
+    try(TextInput ti = new TextInput(data)) {
+      ti.read();
+      ti.reset();
 
-    for(int b; (b = ti.read()) != -1;) tb.add(b);
-    try {
+      final TokenBuilder tb = new TokenBuilder();
+      for(int b; (b = ti.read()) != -1;) tb.add(b);
       ti.reset();
       assertTrue("Mark should not be supported for data size of " + data.length,
           data.length < IO.BLOCKSIZE);

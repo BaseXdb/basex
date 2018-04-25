@@ -10,7 +10,7 @@ package org.basex.query.util.regex.parse;
 public interface TokenManager {
   /**
    * This gets the next token from the input stream.
-   * A token of kind 0 (&lt;EOF>) should be returned on EOF.
+   * A token of kind 0 (&lt;EOF&gt;) should be returned on EOF.
    * @return the next token
    */
   Token getNextToken();

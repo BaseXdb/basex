@@ -50,9 +50,9 @@ public final class SearchEditor extends BaseXBack {
   }
 
   /**
-   * Sets the search button.
+   * Returns a search button.
    * @param help help text
-   * @return self reference
+   * @return button
    */
   public AbstractButton button(final String help) {
     return search.button(help);

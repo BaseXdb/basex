@@ -136,7 +136,8 @@ final class ProjectFilter extends BaseXBack {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(combo.isPopupVisible()) return;
-        if(BaseXKeys.SELECTALL.is(e)) {
+        if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
+            BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
           view.list.dispatchEvent(e);
         } else {
           for(final GUIPopupCmd cmd : view.list.commands) {

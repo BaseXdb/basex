@@ -85,6 +85,7 @@ public final class HttpPayload {
       body = new FElem(Q_BODY);
       if(payloads != null) {
         final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
+        // if something goes wrong, input streams will be closed outside the function
         final byte[] pl = (type.isXML() || type.isText()
           ? new NewlineInput(in).encoding(type.parameters().get(CHARSET))
           : new BufferInput(in)
@@ -243,7 +244,7 @@ public final class HttpPayload {
       if(!bl.isEmpty()) bl.add(CRLF);
       bl.add(line);
     }
-    return new TextInput(new IOContent(bl.finish())).encoding(enc).content();
+    return new TextInput(bl.finish()).encoding(enc).content();
   }
 
   /**
@@ -255,8 +256,7 @@ public final class HttpPayload {
   private byte[] boundary(final MediaType type) throws QueryException {
     final String b = type.parameters().get(BOUNDARY);
     if(b == null) throw HC_REQ_X.get(info, "No separation boundary specified");
-    // if the boundary is enclosed in quotes, strip them
-    return token(b.charAt(0) == '"' ? b.substring(1, b.lastIndexOf('"')) : b);
+    return token(b);
   }
 
   /**
@@ -341,8 +341,9 @@ public final class HttpPayload {
       opts.assign(type);
       value = new DBNode(new HtmlParser(input, options, opts));
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
-      final String enc = type.parameters().get(CHARSET);
-      value = Str.get(URLDecoder.decode(string(input.read()), enc == null ? Strings.UTF8 : enc));
+      String encoding = type.parameters().get(CHARSET);
+      if(encoding == null) encoding = Strings.UTF8;
+      value = Str.get(URLDecoder.decode(string(input.read()), encoding));
     } else if(type.isXML()) {
       value = new DBNode(input);
     } else if(type.isText()) {

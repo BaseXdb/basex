@@ -89,12 +89,11 @@ public final class HtmlParser extends XMLParser {
     // reader could not be initialized; fall back to XML
     if(READER == null) return io;
 
-    // tries to extract the encoding from the input
-    final TextInput ti = new TextInput(io);
-    String enc = ti.encoding();
-    final byte[] content = ti.content();
+    try(TextInput ti = new TextInput(io)) {
+      // tries to extract the encoding from the input
+      String enc = ti.encoding();
+      final byte[] content = ti.content();
 
-    try {
       // looks for a charset definition
       final byte[] encoding = token("charset=");
       int cs = indexOf(content, encoding);

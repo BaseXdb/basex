@@ -49,7 +49,7 @@ public abstract class FNode extends ANode {
   public final int diff(final ANode node) {
     // compare fragment with database node
     if(node instanceof DBNode) return diff(this, node);
-    // compare fragments. due to subtraction, node id can overflow
+    // compare fragments. due to subtraction, also negative values will yield valid results
     return Integer.compare(id - node.id, 0);
   }
 

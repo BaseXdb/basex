@@ -8,6 +8,7 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.query.util.ft.*;
 import org.basex.util.ft.*;
@@ -21,184 +22,193 @@ import org.basex.util.list.*;
  * @author Sebastian Gath
  */
 final class MapRenderer {
-  /** Color for each tooltip token. */
-  private static BoolList ttcol;
-  /** Index of tooltip token to underline. */
-  private static int ul;
+  /** Font size. */
+  private final int fs = GUIConstants.fontSize;
+  /** Graphics reference. */
+  private final Graphics g;
 
-  /** Private constructor. */
-  private MapRenderer() { }
+  /** Color for each tooltip token. */
+  private BoolList ttcol;
+  /** Index of tooltip token to underline. */
+  private int ul;
+
+  /**
+   * Private constructor.
+   * @param g graphics reference
+   */
+  MapRenderer(final Graphics g) {
+    this.g = g;
+  }
 
   /**
    * Calculates the height of the specified text.
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
-   * @param fs font size
+   * @param rect rectangle
+   * @param string string to be drawn
    * @return last height that was occupied
    */
-  static int calcHeight(final Graphics g, final MapRect r, final byte[] s, final int fs) {
-    return drawText(g, r, s, false, fs);
+  int calcHeight(final MapRect rect, final byte[] string) {
+    return drawText(rect, string, false);
   }
 
   /**
    * Draws a text.
-   *
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
-   * @param fs font size
+   * @param rect rectangle
+   * @param string string to be drawn
    */
-  static void drawText(final Graphics g, final MapRect r, final byte[] s, final int fs) {
-    drawText(g, r, s, true, fs);
+  void drawText(final MapRect rect, final byte[] string) {
+    drawText(rect, string, true);
+  }
+
+  /**
+   * Draws the specified string. Chops the last character if space is not enough space.
+   * @param string string to be drawn
+   * @param x x coordinate
+   * @param y y coordinate
+   * @param w width
+   */
+  void chopText(final byte[] string, final int x, final int y, final int w) {
+    BaseXLayout.chopString(g, string, x, y, w, fs);
   }
 
   /**
    * Draws a text.
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
+   * @param rect rectangle
+   * @param string string to be drawn
    * @param draw draw text (otherwise: just calculate space)
-   * @param fs font size
    * @return height of the text
    */
-  private static int drawText(final Graphics g, final MapRect r, final byte[] s, final boolean draw,
-      final int fs) {
-
+  private int drawText(final MapRect rect, final byte[] string, final boolean draw) {
     // limit string to given space
-    final int[] cw = fontWidths(g.getFont());
     final int fh = (int) (1.2 * fs);
     final Color textc = g.getColor();
 
-    int xx = r.x;
-    int yy = r.y + fh;
-    final int ww = r.w;
+    int xx = rect.x;
+    int yy = rect.y + fh;
+    final int ww = rect.w;
 
     // get index on first pre value
     int ll = 0;
-    final FTLexer lexer = new FTLexer().original().init(s);
+    final FTLexer lexer = new FTLexer().original().init(string);
     while(lexer.hasNext()) {
       final FTSpan span = lexer.next();
-      byte[] tok = span.text;
+      byte[] token = span.text;
       int wl = 0;
 
-      final int tl = tok.length;
-      for(int t = 0; t < tl; t += cl(tok, t)) {
-        wl += BaseXLayout.width(g, cw, cp(tok, t));
+      final int tl = token.length;
+      for(int t = 0; t < tl; t += cl(token, t)) {
+        wl += BaseXLayout.width(g, cp(token, t));
       }
 
       if(ll + wl >= ww) {
-        xx = r.x;
+        xx = rect.x;
         if(ll != 0) yy += fh;
-        if(yy + fh > r.y + r.h) {
+        if(yy + fh > rect.y + rect.h) {
           // text to high, skip drawing
           if(draw) g.drawString(Text.DOTS, xx + ll, yy);
-          return r.h;
+          return rect.h;
         }
 
         ll = 0;
 
         if(draw && wl >= ww) {
           // single word is too long for the rectangle
-          int twl = 2 * BaseXLayout.width(g, cw, '.');
+          int twl = 2 * BaseXLayout.width(g, '.');
           if(twl >= ww) return Integer.MAX_VALUE;
 
           int n = 0;
-          for(; n < tl; n += cl(tok, n)) {
-            final int l = BaseXLayout.width(g, cw, cp(tok, n));
+          for(; n < tl; n += cl(token, n)) {
+            final int l = BaseXLayout.width(g, cp(token, n));
             if(twl + l >= ww) break;
             twl += l;
           }
-          tok = Arrays.copyOf(tok, n + 2);
-          tok[n] = '.';
-          tok[n + 1] = '.';
+          token = Arrays.copyOf(token, n + 2);
+          token[n] = '.';
+          token[n + 1] = '.';
         }
       }
 
       if(draw) {
         // color each full-text hit
-        g.setColor(r.pos != null && r.pos.contains(span.pos) && !span.del ? GREEN : textc);
-        g.drawString(string(tok), xx + ll, yy);
+        g.setColor(rect.pos != null && rect.pos.contains(span.pos) && !span.del ? GREEN : textc);
+        g.drawString(string(token), xx + ll, yy);
       }
       ll += wl;
       if(lexer.paragraph()) {
         // new paragraph
         ll = 0;
         yy += fh;
-        if(yy + fh > r.y + r.h) {
+        if(yy + fh > rect.y + rect.h) {
           // text to high, skip drawing
           if(draw) g.drawString(Text.DOTS, xx + ll, yy);
-          return r.h;
+          return rect.h;
         }
       }
     }
-    return yy - r.y;
+    return yy - rect.y;
   }
 
   /**
    * Draws a text using thumbnail visualization.
    * Calculates the needed space and chooses an abstraction level.
    * Token/Sentence/Paragraphs
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
-   * @param fs font size
+   * @param rect rectangle
+   * @param string string to be drawn
    */
-  static void drawThumbnails(final Graphics g, final MapRect r, final byte[] s, final int fs) {
+  void drawThumbnails(final MapRect rect, final byte[] string) {
     // thumbnail width and height, empty line height
     final double ffmax = 0.25, ffhmax = 0.5, flhmax = 0.3;
     double ff = ffmax, ffh = ffhmax, flh = flhmax;
     byte lhmi = (byte) Math.max(3, ffh * fs), fhmi = (byte) Math.max(6, (flh + ffh) * fs);
 
-    int h = r.h;
-    r.thumbf = ff * fs;
-    r.thumbal = 0;
+    int h = rect.h;
+    rect.thumbf = ff * fs;
+    rect.thumbal = 0;
 
-    final int[][] data = new FTLexer().init(s).info();
+    final int[][] data = new FTLexer().init(string).info();
     boolean l = false;
     final double flhmin = 0.168, ffhmin = 0.28, ffmin = 0.14;
     double flhtmin = flhmin, ffhtmax = ffhmax, ffhtmin = ffhmin, fftmax = ffmax, fftmin = ffmin;
     double bflh = flhmax, bffh = ffhmax, bff = ffmax, flhtmax = flhmax;
-    while(r.thumbal < 2) {
+    while(rect.thumbal < 2) {
       // find parameter setting for the available space
       ff = round(fftmax, fftmin);
-      r.thumbf = ff * fs;
+      rect.thumbf = ff * fs;
       ffh = round(ffhtmax, ffhtmin);
-      r.thumbfh = (byte) Math.max(1, ffh * fs);
+      rect.thumbfh = (byte) Math.max(1, ffh * fs);
       flh = round(flhtmax, flhtmin);
-      r.thumblh = (byte) Math.max(1, (flh + ffh) * fs);
-      r.thumbsw = r.thumbf;
+      rect.thumblh = (byte) Math.max(1, (flh + ffh) * fs);
+      rect.thumbsw = rect.thumbf;
 
-      switch(r.thumbal) {
+      switch(rect.thumbal) {
         case 0:
-          h = drawToken(g, r, data, false);
+          h = drawToken(rect, data, false);
           break;
         case 1: case 2:
-          h = drawSentence(g, r, data, false, r.h);
+          h = drawSentence(rect, data, false, rect.h);
           break;
       }
 
-      if(h >= r.h || le(ffmax, ff) || le(ffhmax, ffh) || le(flhmax, flh)) {
+      if(h >= rect.h || le(ffmax, ff) || le(ffhmax, ffh) || le(flhmax, flh)) {
         if(l) {
           // use last setup to draw
-          r.thumbf = bff * fs;
-          r.thumbfh = (byte) Math.max(1, bffh * fs);
-          r.thumblh = (byte) Math.max(1, (bflh + bffh) * fs);
-          r.thumbsw = r.thumbf;
-          switch(r.thumbal) {
+          rect.thumbf = bff * fs;
+          rect.thumbfh = (byte) Math.max(1, bffh * fs);
+          rect.thumblh = (byte) Math.max(1, (bflh + bffh) * fs);
+          rect.thumbsw = rect.thumbf;
+          switch(rect.thumbal) {
             case 0:
-              drawToken(g, r, data, true);
+              drawToken(rect, data, true);
               return;
             case 1: case 2:
-              drawSentence(g, r, data, true, r.h);
+              drawSentence(rect, data, true, rect.h);
               return;
           }
         }
         if(le(ff, ffmin) || le(ffh, ffhmin) || le(flh, flhmin)) {
           // change abstraction level
-          r.thumbal++;
-          fhmi = r.thumbfh;
-          lhmi = r.thumblh;
+          rect.thumbal++;
+          fhmi = rect.thumbfh;
+          lhmi = rect.thumblh;
           fftmin = ffmin;
           fftmax = ffmax;
           ffhtmin = ffhmin;
@@ -227,61 +237,35 @@ final class MapRenderer {
     // total number of bytes
     final double sum = data[3].length + data[4].length;
     // number of lines printable
-    final double nl = (r.h - 3.0) / lhmi;
+    final double nl = (rect.h - 3.0) / lhmi;
     // factor for the width of a thumbnail
-    final double fnew = (nl * (r.w - 3) - data[4].length) / sum;
-    r.thumbf = fnew;
-    r.thumbfh = fhmi;
-    r.thumblh = lhmi;
-    r.thumbsw = Math.max(1, fnew);
-    drawSentence(g, r, data, true, r.h);
-  }
-
-  /**
-   * Checks if the first is smaller than the second value, ignoring a
-   * small difference.
-   * @param a double 1
-   * @param b double 2
-   * @return true if a < b
-   */
-  private static boolean le(final double a, final double b) {
-    return a < b || a / b < 1.05;
-  }
-
-  /**
-   * Returns the rounded average of the specified values.
-   * @param a first double
-   * @param b second double
-   * @return rounded double
-   */
-  private static double round(final double a, final double b) {
-    final double v = (a + b) / 2;
-    final double d = v * 100000;
-    final int i = (int) d;
-    final double r = d - i >= 0.5 ? i + 1 : i;
-    return r / 100000;
+    final double fnew = (nl * (rect.w - 3) - data[4].length) / sum;
+    rect.thumbf = fnew;
+    rect.thumbfh = fhmi;
+    rect.thumblh = lhmi;
+    rect.thumbsw = Math.max(1, fnew);
+    drawSentence(rect, data, true, rect.h);
   }
 
   /**
    * Draws a text using thumbnail visualization, that represents a sentence
    * through a thumbnail. Sentences are separated through black thumbnails.
-   * @param g graphics reference
-   * @param r rectangle
+   * @param rect rectangle
    * @param data full-text to be drawn
    * @param draw boolean for drawing (used for calculating the height)
    * @param mh maximum height
    * @return height
    */
-  private static int drawSentence(final Graphics g, final MapRect r, final int[][] data,
-      final boolean draw, final int mh) {
+  private int drawSentence(final MapRect rect, final int[][] data, final boolean draw,
+      final int mh) {
 
-    final boolean sen = r.thumbal == 1;
-    final FTPos ftp = r.pos;
-    final int xx = r.x;
-    final int ww = r.w;
-    int yy = r.y + 3;
+    final boolean sen = rect.thumbal == 1;
+    final FTPos ftp = rect.pos;
+    final int xx = rect.x;
+    final int ww = rect.w;
+    int yy = rect.y + 3;
 
-    final Color textc = color(r.level + 4);
+    final Color textc = color(rect.level + 4);
     g.setColor(textc);
     int count = -1;
     int pp = 0, sl = 0, pl = 0;
@@ -301,8 +285,8 @@ final class MapRenderer {
         (psl < dl1 && data1[psl] > sl || psl >= dl1)) {
         sl += data0[i];
         pl += data0[i];
-        final int lastl = (int) (data0[i] * r.thumbf);
-        error += data0[i] * r.thumbf - lastl;
+        final int lastl = (int) (data0[i] * rect.thumbf);
+        error += data0[i] * rect.thumbf - lastl;
         if(error >= 1) {
           wl += (int) error;
           error -= (int) error;
@@ -320,16 +304,16 @@ final class MapRenderer {
 
       if(ct == 0) {
         while(ll + wl >= ww) {
-          if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
+          if(draw) g.fillRect(xx + ll, yy, ww - ll, rect.thumbfh);
           wl -= ww - ll;
           ll = 0;
-          yy += r.thumblh;
-          if(yy + r.thumblh >= r.y + mh) {
+          yy += rect.thumblh;
+          if(yy + rect.thumblh >= rect.y + mh) {
             // height to big
-            return r.h;
+            return rect.h;
           }
         }
-        if(draw) g.fillRect(xx + ll, yy, wl, r.thumbfh);
+        if(draw) g.fillRect(xx + ll, yy, wl, rect.thumbfh);
         ll += wl;
       } else {
         int cttmp = 0;
@@ -338,14 +322,14 @@ final class MapRenderer {
           if(pp - ct + cttmp < ftp.size()) g.setColor(GREEN);
 
           while(ll + wltmp >= ww) {
-            if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
+            if(draw) g.fillRect(xx + ll, yy, ww - ll, rect.thumbfh);
             wltmp -= ww - ll;
             ll = 0;
-            yy += r.thumblh;
+            yy += rect.thumblh;
             // skip rest if no space is left
-            if(yy + r.thumblh >= r.y + mh) return r.h;
+            if(yy + rect.thumblh >= rect.y + mh) return rect.h;
           }
-          if(draw) g.fillRect(xx + ll, yy, wltmp, r.thumbfh);
+          if(draw) g.fillRect(xx + ll, yy, wltmp, rect.thumbfh);
           ll += wltmp;
           wltmp = wl / ct + (cttmp == ct - 2 ? wl - wl / ct * ct : 0);
           ++cttmp;
@@ -354,19 +338,19 @@ final class MapRenderer {
 
       // new sentence
       if(psl < dl1 && data1[psl] == sl) {
-        if(ll + r.thumbsw >= ww) {
-          yy += r.thumblh;
+        if(ll + rect.thumbsw >= ww) {
+          yy += rect.thumblh;
           ll = 0;
           // skip rest if no space is left
-          if(yy + r.thumblh >= r.y + mh) return r.h;
+          if(yy + rect.thumblh >= rect.y + mh) return rect.h;
         }
 
         if(draw) {
           g.setColor(TEXT);
-          g.fillRect(xx + ll, yy, (int) r.thumbsw, r.thumbfh);
+          g.fillRect(xx + ll, yy, (int) rect.thumbsw, rect.thumbfh);
           g.setColor(textc);
         }
-        ll += r.thumbsw;
+        ll += rect.thumbsw;
         sl = 0;
         ++psl;
       }
@@ -376,45 +360,42 @@ final class MapRenderer {
         pl = 0;
         ++ppl;
         if(sen) {
-          yy += r.thumblh;
+          yy += rect.thumblh;
           ll = 0;
           // skip rest if no space is left
-          if(yy + r.thumblh >= r.y + mh) return r.h;
+          if(yy + rect.thumblh >= rect.y + mh) return rect.h;
         }
       }
     }
-    return yy - r.y + r.thumbfh;
+    return yy - rect.y + rect.thumbfh;
   }
 
   /**
    * Draws a text using thumbnail visualization, that represents a token
    * through a thumbnail.
-   * @param g graphics reference
-   * @param r rectangle
+   * @param rect rectangle
    * @param data full-text to be drawn
    * @param draw boolean for drawing (used for calculating the height)
    * @return heights
    */
-  private static int drawToken(final Graphics g, final MapRect r, final int[][] data,
-      final boolean draw) {
+  private int drawToken(final MapRect rect, final int[][] data, final boolean draw) {
+    final double xx = rect.x;
+    final double ww = rect.w;
+    final FTPos ftp = rect.pos;
 
-    final double xx = r.x;
-    final double ww = r.w;
-    final FTPos ftp = r.pos;
-
-    int yy = r.y + 3;
+    int yy = rect.y + 3;
     double ll = 0; // line length
     double e = 0;
 
-    final Color textc = color(r.level + 4);
+    final Color textc = color(rect.level + 4);
     int count = 0;
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     final int[] data0 = data[0], data1 = data[1], data2 = data[2];
     final int dl1 = data1.length, dl2 = data2.length;
     for(final int ad0 : data0) {
-      int wl = (int) (ad0 * r.thumbf); // word length
-      e += ad0 * r.thumbf - wl;
+      int wl = (int) (ad0 * rect.thumbf); // word length
+      e += ad0 * rect.thumbf - wl;
 
       if(e >= 1) {
         wl += (int) e;
@@ -423,16 +404,16 @@ final class MapRenderer {
       sl += ad0;
       pl += ad0;
       // check if rectangle fits in line - don't split token and dot
-      if(ll + wl + r.thumbsw * (psl < dl1 && sl == data1[psl] ? 1 : 0) >= ww) {
-        yy += r.thumblh;
+      if(ll + wl + rect.thumbsw * (psl < dl1 && sl == data1[psl] ? 1 : 0) >= ww) {
+        yy += rect.thumblh;
         ll = 0;
-        if(wl >= ww) return r.h + 3;
+        if(wl >= ww) return rect.h + 3;
       }
 
       if(draw) {
         // draw word
         g.setColor(ftp != null && ftp.contains(count) ? GREEN : textc);
-        g.fillRect((int) (xx + ll), yy, wl, r.thumbfh);
+        g.fillRect((int) (xx + ll), yy, wl, rect.thumbfh);
       }
 
       ll += wl;
@@ -442,63 +423,47 @@ final class MapRenderer {
         // new sentence, draw dot
         if(draw) {
           g.setColor(TEXT);
-          g.fillRect((int) (xx + ll), yy, (int) r.thumbsw, r.thumbfh);
+          g.fillRect((int) (xx + ll), yy, (int) rect.thumbsw, rect.thumbfh);
           g.setColor(textc);
         }
-        ll += r.thumbsw;
+        ll += rect.thumbsw;
         ++psl;
         sl = 0;
       }
 
-      ll += r.thumbf;
+      ll += rect.thumbf;
       if(ppl < dl2 && pl == data2[ppl]) {
         // new paragraph
-        yy += r.thumblh;
+        yy += rect.thumblh;
         ll = 0;
         ++ppl;
         pl = 0;
       }
     }
-    return yy - r.y + 3;
-  }
-
-  /**
-   * Checks if cursor is inside the rectangle.
-   * @param rx int x-value
-   * @param ry int y-value
-   * @param rw double width
-   * @param rh int height
-   * @param xx int x-value of the cursor
-   * @param yy int y-value of the cursor
-   * @return boolean
-   */
-  private static boolean inRect(final double rx, final int ry, final double rw, final int rh,
-      final int xx, final int yy) {
-    return xx >= rx && xx <= rx + rw && yy >= ry && yy <= ry + rh;
+    return yy - rect.y + 3;
   }
 
   /**
    * Calculates a the tooltip text for the thumbnail visualization.
-   * @param r rectangle
+   * @param rect rectangle
    * @param data full-text to be drawn
    * @param x mouseX
    * @param y mouseY
    * @param w width of map view
-   * @param g Graphics
    * @return token list or {@code null}
    */
-  static TokenList calculateToolTip(final MapRect r, final int[][] data, final int x, final int y,
-      final int w, final Graphics g) {
+  TokenList computeToolTip(final MapRect rect, final int[][] data, final int x, final int y,
+      final int w) {
 
     // rectangle is empty - don't need a tooltip
-    if(r.thumbf == 0) return null;
+    if(rect.thumbf == 0) return null;
 
-    final boolean sen = r.thumbal < 2;
-    final boolean ds = r.thumbal < 1;
+    final boolean sen = rect.thumbal < 2;
+    final boolean ds = rect.thumbal < 1;
 
-    final FTPos ftp = r.pos;
-    final int ww = r.w;
-    int yy = r.y + 3;
+    final FTPos ftp = rect.pos;
+    final int ww = rect.w;
+    int yy = rect.y + 3;
 
     ul = -1;
     final TokenList tl = new TokenList();
@@ -513,9 +478,9 @@ final class MapRenderer {
     final int[] data0 = data[0], data1 = data[1], data2 = data[2], data3 = data[3], data4 = data[4];
     final int dl0 = data0.length, dl1 = data1.length, dl2 = data2.length, dl3 = data3.length;
     for(int i = 0; i < dl0; ++i) {
-      double wl = data0[i] * r.thumbf;
+      double wl = data0[i] * rect.thumbf;
       // sum up error, caused by int cast
-      error += data0[i] * r.thumbf - wl;
+      error += data0[i] * rect.thumbf - wl;
       if(error >= 1) {
         // adjust word length
         wl += error;
@@ -528,32 +493,31 @@ final class MapRenderer {
 
       // find hovered thumbnail and corresponding text
       boolean ir = false;
-      if(ll + wl + (ds && psl < dl1 && data1[psl] == sl ? r.thumbsw : 0) >= ww) {
+      if(ll + wl + (ds && psl < dl1 && data1[psl] == sl ? rect.thumbsw : 0) >= ww) {
         if(ds) {
           // do not split token
-          yy += r.thumblh;
-          ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
+          yy += rect.thumblh;
+          ir = inRect(rect.x, yy, wl, rect.thumbfh, x, y);
           ll = wl + (psl < dl1 && data1[psl] == sl ?
-              r.thumbsw : r.thumbf);
+              rect.thumbsw : rect.thumbf);
         } else {
           // split token to safe space
-          yy += r.thumblh;
+          yy += rect.thumblh;
           wl -= ww - ll;
-          ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
+          ir = inRect(rect.x, yy, wl, rect.thumbfh, x, y);
           ll = wl +
-          (psl < dl1 && data1[psl] == sl ? r.thumbsw :  r.thumbf);
+          (psl < dl1 && data1[psl] == sl ? rect.thumbsw :  rect.thumbf);
         }
       } else {
-        ir |= inRect(r.x + ll, yy, wl, r.thumbfh, x, y);
-        ll += wl + (ds ? r.thumbf : 0);
+        ir |= inRect(rect.x + ll, yy, wl, rect.thumbfh, x, y);
+        ll += wl + (ds ? rect.thumbf : 0);
       }
 
       if(ir) {
         // go back and forward through the text, centralize the hovered token
         final int si = i;
-        final int[] cw = fontWidths(g.getFont());
-        final int sp = BaseXLayout.width(g, cw, ' ');
-        final int sd = BaseXLayout.width(g, cw, '.');
+        final int sp = BaseXLayout.width(g, ' ');
+        final int sd = BaseXLayout.width(g, '.');
         // go some tokens backwards form current token
         final int bpsl = data1[psl] == sl ? psl + 1 : psl;
         final int bsl = data1[psl] == sl ? 0 : sl;
@@ -582,8 +546,7 @@ final class MapRenderer {
           }
 
           l = 0;
-          for(int n = 0; n < ts; n += cl(tok, n))
-            l += BaseXLayout.width(g, cw, cp(tok, n));
+          for(int n = 0; n < ts; n += cl(tok, n)) l += BaseXLayout.width(g, cp(tok, n));
           if(si > i && ll + l + sp >= w / 2.0d) break;
           ll += l + sp;
 
@@ -633,8 +596,7 @@ final class MapRenderer {
           if(apm) tok[ts - 1] = (byte) data4[psl - 1];
           sl += apm ? sl : ts;
 
-          for(int n = 0; n < ts; n += cl(tok, n))
-            l += BaseXLayout.width(g, cw, cp(tok, n));
+          for(int n = 0; n < ts; n += cl(tok, n)) l += BaseXLayout.width(g, cp(tok, n));
           if(ll + l + sp + 2 * sd >= w / 2.0d) break;
           ll += l + sp;
 
@@ -654,12 +616,12 @@ final class MapRenderer {
 
       // new sentence
       if(ds && psl < dl1 && data1[psl] == sl) {
-        if(ll + r.thumbsw >= ww) {
-          yy += r.thumblh;
+        if(ll + rect.thumbsw >= ww) {
+          yy += rect.thumblh;
           ll -= ww;
         }
 
-        ll += r.thumbsw;
+        ll += rect.thumbsw;
         sl = 0;
         ++psl;
       }
@@ -669,7 +631,7 @@ final class MapRenderer {
         pl = 0;
         ++ppl;
         if(sen) {
-          yy += r.thumblh;
+          yy += rect.thumblh;
           ll = 0;
         }
       }
@@ -679,22 +641,17 @@ final class MapRenderer {
 
   /**
    * Draws pre-calculated tooltip.
-   * @param g graphics reference
-   * @param x x-value
-   * @param y y-value
-   * @param mr view rectangle
+   * @param rect view rectangle
+   * @param x x value
+   * @param y y value
    * @param tl token list
-   * @param fs font size
    */
-  static void drawToolTip(final Graphics g, final int x, final int y, final MapRect mr,
-      final TokenList tl, final int fs) {
-
+  void drawToolTip(final MapRect rect, final int x, final int y, final TokenList tl) {
     if(tl == null || tl.isEmpty()) return;
-    final int[] cw = fontWidths(g.getFont());
-    final int sw = BaseXLayout.width(g, cw, ' ');
+    final int sw = BaseXLayout.width(g, ' ');
     int wl = 0;
     int nl = 1;
-    int wi = mr.w / 2;
+    int wi = rect.w / 2;
     final IntList len = new IntList();
     final int ts = tl.size();
     for(int i = 0; i < ts; i++) {
@@ -702,7 +659,7 @@ final class MapRenderer {
       final byte[] tok = tl.get(i);
       final int ns = tok.length;
       for(int n = 0; n < ns; n += cl(tok, n)) {
-        l += BaseXLayout.width(g, cw, cp(tok, n));
+        l += BaseXLayout.width(g, cp(tok, n));
       }
       if(wl + l + sw < wi) {
         wl += l + sw;
@@ -716,9 +673,9 @@ final class MapRenderer {
 
     final int ww = nl == 1 && wl < wi ? wl : wi;
     // find optimal position for the tooltip
-    final int xx = x + 10 + ww >= mr.x + mr.w ? mr.x + mr.w - ww - 2 : x + 10;
-    int yy = y + 28 + fs * nl + 4 < mr.y + mr.h ? y + 28 :
-      y - mr.y - 4 > fs * nl ? y - fs * nl : mr.y + mr.h - 4 - fs * nl;
+    final int xx = x + 10 + ww >= rect.x + rect.w ? rect.x + rect.w - ww - 2 : x + 10;
+    int yy = y + 28 + fs * nl + 4 < rect.y + rect.h ? y + 28 :
+      y - rect.y - 4 > fs * nl ? y - fs * nl : rect.y + rect.h - 4 - fs * nl;
 
     g.setColor(color(10));
     g.drawRect(xx - 3, yy - fs - 1, ww + 3, fs * nl + 7);
@@ -742,5 +699,44 @@ final class MapRenderer {
       g.setColor(color(24));
       wl += l + sw;
     }
+  }
+
+  /**
+   * Checks if cursor is inside the rectangle.
+   * @param rx x value
+   * @param ry y value
+   * @param rw width
+   * @param rh height
+   * @param xx x value of the cursor
+   * @param yy y value of the cursor
+   * @return result of check
+   */
+  private static boolean inRect(final double rx, final int ry, final double rw, final int rh,
+      final int xx, final int yy) {
+    return xx >= rx && xx <= rx + rw && yy >= ry && yy <= ry + rh;
+  }
+
+  /**
+   * Checks if the first is smaller than the second value, ignoring a small difference.
+   * @param a double 1
+   * @param b double 2
+   * @return result of check
+   */
+  private static boolean le(final double a, final double b) {
+    return a < b || a / b < 1.05;
+  }
+
+  /**
+   * Returns the rounded average of the specified values.
+   * @param a first double
+   * @param b second double
+   * @return rounded double
+   */
+  private static double round(final double a, final double b) {
+    final double v = (a + b) / 2;
+    final double d = v * 100000;
+    final int i = (int) d;
+    final double r = d - i >= 0.5 ? i + 1 : i;
+    return r / 100000;
   }
 }

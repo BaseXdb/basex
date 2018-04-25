@@ -3,8 +3,10 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  * This class tests the functions of the XQuery Module.
@@ -21,12 +23,6 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
   public void eval() {
     query(_XQUERY_EVAL.args("1"), 1);
     query(_XQUERY_EVAL.args("1 + 2"), 3);
-    query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
-    query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { 'a': 'b' }"), "b");
-    query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { 'a': (1,2) }"), "1\n2");
-    query(_XQUERY_EVAL.args("declare variable $local:a external; $local:a",
-        " map { xs:QName('local:a'): 1 }"), 1);
-    query(_XQUERY_EVAL.args(".", " map { '': 1 }"), 1);
     error(_XQUERY_EVAL.args("1+"), CALCEXPR);
     error("declare variable $a:=1;" + _XQUERY_EVAL.args("$a"), VARUNDEF_X);
     error("for $a in (1,2) return " + _XQUERY_EVAL.args("$a"), VARUNDEF_X);
@@ -54,6 +50,25 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
         " map { 'timeout': 1 }"), XQUERY_TIMEOUT);
     error(_XQUERY_EVAL.args("(1 to 10000000000000) ! <a/>", " map { }",
         " map { 'memory': 10 }"), XQUERY_MEMORY);
+  }
+
+  /** Test method. */
+  @Test
+  public void evalBindings() {
+    query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
+    query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { 'a': 'b' }"), "b");
+    query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { 'a': (1,2) }"), "1\n2");
+    query(_XQUERY_EVAL.args("declare variable $local:a external; $local:a",
+        " map { xs:QName('local:a'): 1 }"), 1);
+    query(_XQUERY_EVAL.args(".", " map { '': 1 }"), 1);
+
+    // ensure that global bindings will not overwrite local bindings
+    execute(new Set(MainOptions.BINDINGS, "a=X"));
+    try {
+      query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
+    } finally {
+      execute(new Set(MainOptions.BINDINGS, ""));
+    }
   }
 
   /** Test method. */
