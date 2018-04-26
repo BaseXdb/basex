@@ -143,34 +143,36 @@ public final class FTIndex extends ValueIndex {
       boolean inner;
 
       @Override
-      public synchronized byte[] next() {
-        if(inner && i < e) {
-          // loop through all entries with the same character length
-          final byte[] entry = inY.readBytes(i, ti);
-          if(startsWith(entry, prefix)) {
-            final long poi = inY.read5();
-            nr = inY.read4();
-            if(prefix.length != 0) cache.add(entry, nr, poi);
-            i += ti + ENTRY;
-            return entry;
+      public byte[] next() {
+        synchronized(FTIndex.this) {
+          if(inner && i < e) {
+            // loop through all entries with the same character length
+            final byte[] entry = inY.readBytes(i, ti);
+            if(startsWith(entry, prefix)) {
+              final long poi = inY.read5();
+              nr = inY.read4();
+              if(prefix.length != 0) cache.add(entry, nr, poi);
+              i += ti + ENTRY;
+              return entry;
+            }
           }
+          // find next available entry group
+          final int tl = tp.length;
+          while(++ti < tl - 1) {
+            i = tp[ti];
+            if(i == -1) continue;
+            int c = ti + 1;
+            do e = tp[c++]; while(e == -1);
+            nr = 0;
+            inner = true;
+            i = find(prefix, i, e, ti);
+            // jump to inner loop
+            final byte[] n = next();
+            if(n != null) return n;
+          }
+          // all entries processed: return null
+          return null;
         }
-        // find next available entry group
-        final int tl = tp.length;
-        while(++ti < tl - 1) {
-          i = tp[ti];
-          if(i == -1) continue;
-          int c = ti + 1;
-          do e = tp[c++]; while(e == -1);
-          nr = 0;
-          inner = true;
-          i = find(prefix, i, e, ti);
-          // jump to inner loop
-          final byte[] n = next();
-          if(n != null) return n;
-        }
-        // all entries processed: return null
-        return null;
       }
       @Override
       public int count() {
@@ -323,7 +325,7 @@ public final class FTIndex extends ValueIndex {
    * @param k number of errors allowed
    * @return iterator
    */
-  private synchronized IndexIterator fuzzy(final byte[] token, final int k) {
+  private IndexIterator fuzzy(final byte[] token, final int k) {
     FTIndexIterator it = FTIndexIterator.FTEMPTY;
     final int tokl = token.length, tl = tp.length;
     final int e = Math.min(tl - 1, tokl + k);
@@ -349,7 +351,7 @@ public final class FTIndex extends ValueIndex {
    * @param token token to look for
    * @return iterator
    */
-  private synchronized IndexIterator wc(final byte[] token) {
+  private IndexIterator wc(final byte[] token) {
     final FTIndexIterator it = FTIndexIterator.FTEMPTY;
     final FTWildcard wc = new FTWildcard(token);
     if(!wc.parse()) return it;
@@ -409,7 +411,7 @@ public final class FTIndex extends ValueIndex {
    * @param token index token
    * @return iterator
    */
-  private static synchronized FTIndexIterator iter(final FTCache ftc, final byte[] token) {
+  private static FTIndexIterator iter(final FTCache ftc, final byte[] token) {
     final int size = ftc.pre.size();
 
     return new FTIndexIterator() {
@@ -417,7 +419,7 @@ public final class FTIndex extends ValueIndex {
       int pos, pre, c;
 
       @Override
-      public synchronized boolean more() {
+      public boolean more() {
         if(c == size) return false;
         all.reset(pos);
         pre = ftc.pre.get(ftc.order[c]);
@@ -429,12 +431,12 @@ public final class FTIndex extends ValueIndex {
       }
 
       @Override
-      public synchronized FTMatches matches() {
+      public FTMatches matches() {
         return all;
       }
 
       @Override
-      public synchronized int pre() {
+      public int pre() {
         return pre;
       }
 
@@ -444,7 +446,7 @@ public final class FTIndex extends ValueIndex {
       }
 
       @Override
-      public synchronized int size() {
+      public int size() {
         return size;
       }
 
