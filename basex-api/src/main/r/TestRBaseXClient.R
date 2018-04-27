@@ -1,6 +1,6 @@
 source("RbaseXClient.R")
 
-BasexClient$undebug("query")
+BasexClient$undebug("void_send")
 
 # Test 'command'
 Session <- BasexClient$new("localhost", 1984, "admin", "admin")
@@ -24,6 +24,7 @@ Session$command("DROP DB test1")
 cat("Test Query1\n\n")
 query1 <- "for $i in 1 to 2 return <xml>Text { $i }</xml>"
 query1 <- Session$query(query1)
+
 cat("query1$query$options():", query1$query$options(), sep = " ", "\n")
 cat("query1$query$execute(): ")
 print(query1$query$execute())

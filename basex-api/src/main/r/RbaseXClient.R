@@ -30,11 +30,11 @@ BasexClient <- R6Class("BasexClient",
              }
       )
       code <- md5(paste(md5(code), nonce, sep = ""))
-      class(code) <- "hash"
+      class(code) <- "character"
       private$void_send(username)
       private$void_send(code)
       if (!self$bool_test_sock()) stop("Access denied")},
-    command = function(command) {
+    command = function(command = command) {
       private$void_send(command)
       private$result <- self$str_receive()
       private$info <-   self$str_receive()
@@ -43,40 +43,38 @@ BasexClient <- R6Class("BasexClient",
                   info = private$info, 
                   success = self$bool_test_sock()))
     },
-    query = function(query) {
+    query = function(query = query) {
       return(list(query = Query$new(query, private$get_sock()), success = self$bool_test_sock()))
       },
-    create = function(name, input) {
+    create = function(name = name, input = input) {
       if (missing(input)) input <- ""
       writeBin(as.raw(0x08), private$sock)
-      writeBin(private$raw_terminated_string(name), private$sock)
-      writeBin(private$raw_terminated_string(input), private$sock)
+      private$void_send(name)
+      private$void_send(input)
+#      writeBin(private$raw_terminated_string(name), private$sock)
+#      writeBin(private$raw_terminated_string(input), private$sock)
       private$info <- self$str_receive()
       return(list(info = private$info, success = self$bool_test_sock()))
     },
-    add = function(name, path, input) {
+    add = function(path = path, input = input) {
       writeBin(as.raw(0x09), private$sock)
-      writeBin(private$raw_terminated_string(name), private$sock)
-      writeBin(private$raw_terminated_string(path), private$sock)
-      writeBin(private$raw_terminated_string(input), private$sock)
+      private$void_send(path)
+      private$void_send(input)
       private$info <- self$str_receive()
       return(list(info = private$info, success = self$bool_test_sock()))
-      #      success <- self$bool_test_sock()
     },
-    replace = function(path, input) {
+    replace = function(path = path, input = input) {
       writeBin(as.raw(0x0C), private$sock)
-      writeBin(private$raw_terminated_string(path), private$sock)
-      writeBin(private$raw_terminated_string(input), private$sock)
+      private$void_send(path)
+      private$void_send(input)
       private$info <- self$str_receive()
       return(list(info = private$info, success = self$bool_test_sock()))
-      #      success <- self$bool_test_sock()
     },
-    store = function(path, input) {
+    store = function(path = path, input = input) {
       writeBin(as.raw(0x0D), private$sock)
-      writeBin(private$raw_terminated_string(path), private$sock)
-      writeBin(private$raw_terminated_string(input), private$sock)
+      private$void_send(path)
+      private$void_send(input)
       private$info <- self$str_receive()
-      #      success <- self$bool_test_sock()
     },
     
     bool_test_sock = function(socket) {
@@ -109,32 +107,24 @@ BasexClient <- R6Class("BasexClient",
     response = NULL,
     get_sock = function() { private$sock },
     close_sock = function() { close(private$sock)},
-    raw_terminated_string = function(string) {
-      return(charToRaw(string) %>% append(0) %>% as.raw())},
-    void_send = function(code, todo, input) {
-      if (missing(todo)) {                                    # 'code' to be handled is either a string, hash or stream
-        classTest <- class(code)
-        if (class(code) == "character" || (class(code) == "hash")) private$void_send0term_string(code)
+    void_send = function(input) {
+      if (class(input) == "character") {
+        streamOut <- charToRaw(input)
       } else {
-        writeBin(as.raw(code), private$get_sock())
-        private$void_send0term_string(todo)
-        private$void_send_stream(input)
-      }},
-    void_send0term_string = function(string) {
-      zero_term <- self$term_string(string)
-      writeBin(zero_term, private$get_sock())},
-    void_send_stream = function(input) {
-      rd_id <- 1
-      end <- length(input)
-      zero_term <- raw()
-      while (rd_id < end) { 
-        rd <- c(input[rd_id])
-        if (rd == 255 || rd == 0) zero_term <- c(zero_term, c(0x00))
-        rd_id <- rd_id + 1
-        zero_term <- c(zero_term, rd)
+        rd_id <- 1
+        end <- length(input)
+        streamOut <- raw()
+        while (rd_id <= end) { 
+          rd <- c(input[rd_id])
+          if (rd == 255 || rd == 0) streamOut <- c(streamOut, c(0x00))
+          rd_id <- rd_id + 1
+          streamOut <- c(streamOut, rd)
+        }
       }
-      zero_term <- c(zero_term, c(0x00))
-      writeBin(zero_term, private$get_sock())}
+      streamOut <- c(streamOut, c(0x00)) %>% as.raw()
+      writeBin(streamOut, private$get_sock())
+      
+    }
   )
 )
 
@@ -148,7 +138,7 @@ Query <- R6Class("Query",
       private$sock <- sock
       out_stream <- super$get_sock()
       writeBin(as.raw(0x00), out_stream)
-      writeBin(super$term_string(query), out_stream)
+      super$void_send(query)
       self$str_id <- super$str_receive()
       self$raw_id <- super$term_string(self$str_id)},
     close = function() { 
@@ -187,9 +177,9 @@ Query <- R6Class("Query",
         private$pos <- 0
       }
       if ( length(private$cache) > private$pos) return(TRUE)
-      else
-      { private$cache <- NULL
-        return(FALSE)
+      else { 
+        private$cache <- NULL
+        return(FALSE) 
       }},
     next_row = function() {      
       if (self$more()) {
