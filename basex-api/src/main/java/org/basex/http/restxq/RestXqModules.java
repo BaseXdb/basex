@@ -106,10 +106,6 @@ public final class RestXqModules {
 
     // remove functions with different specifity
     final RestXqFunction first = funcs.get(0);
-    for(final RestXqFunction ftest: funcs) {
-      System.out.println("ftest.path.tostring");
-      System.out.println(ftest.path.toString());
-    }
 
     for(int l = funcs.size() - 1; l > 0; l--) {
       if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);

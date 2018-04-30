@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -191,7 +192,8 @@ public final class RestXqModule {
       qc.mainModule(MainModule.get(sf, new Expr[0]));
 
       //conn.sess.getRemote().sendBytes(data);
-      Serializer ser = Serializer.get(new WebsocketOutput(conn.sess.getRemote()), wxf.output);
+      ArrayOutput ao = new ArrayOutput();
+      Serializer ser = Serializer.get(ao, wxf.output);
       Iter iter = qc.iter();
 
       // Dont send anything if Websocket gets closed
@@ -200,8 +202,16 @@ public final class RestXqModule {
       }
 
       for(Item it; (it = iter.next()) != null;) {
-        //conn.sess.getRemote().sendString(it.toString());;
+        ser.reset();
         ser.serialize(it);
+        if(it instanceof Bin) {
+          //final byte[] bytes = ((Bin) it).binary(null);
+          final byte[] bytes = ao.toArray();
+          conn.sess.getRemote().sendBytes(ByteBuffer.wrap(bytes));
+        } else {
+          conn.sess.getRemote().sendString(ao.toString());
+        }
+        ao.reset();
       }
       return true;
     }

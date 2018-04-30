@@ -1,5 +1,7 @@
 package org.basex.ws;
 
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.server.*;
@@ -67,5 +69,18 @@ public class WebsocketConnection implements ClientInfo {
    */
   public String path() {
     return this.path;
+  }
+
+  /**
+   * Send an Error.
+   * @param errorMsg String
+   * @param errorcode int
+   * */
+  public void error(final String errorMsg, final int errorcode) {
+      try {
+        this.sess.getRemote().sendString(errorcode + ":" + errorMsg);
+      } catch(IOException e) {
+        e.printStackTrace();
+      }
   }
 }

@@ -46,7 +46,7 @@ public class PrintOutput extends OutputStream {
    * @return print output
    */
   public static PrintOutput get(final OutputStream out) {
-    if(out instanceof WebsocketOutput) {
+    if(out instanceof PrintOutput) {
       return new PrintOutput(out);
     }
     return out instanceof PrintOutput ? (PrintOutput) out : new PrintOutput(
@@ -141,13 +141,11 @@ public class PrintOutput extends OutputStream {
 
   @Override
   public final void flush() throws IOException {
-    System.out.println("PrintOutput.flush");
     if(os != null) os.flush();
   }
 
   @Override
   public final void close() throws IOException {
-    System.out.println("PrintOutput.close");
     if(os != null) {
       if(os == System.out || os == System.err) os.flush();
       else os.close();
@@ -159,7 +157,6 @@ public class PrintOutput extends OutputStream {
    * @return {@code true} if stream is exhausted
    */
   public boolean finished() {
-    System.out.println("PrintOutput.finished");
     return size == max;
   }
 }

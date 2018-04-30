@@ -58,19 +58,13 @@ public class WebSocke extends WebSocketAdapter
            if(func != null)
              func.process(wsconnection);
         } catch(Exception e) {
-          e.printStackTrace();
+          wsconnection.error("Error in the Websocket-Xquery-Function", 500);
         }
-
-        // Just for Logging purpose
-        System.out.println("Socket Connected: " + sess);
     }
 
     @Override
     public void onWebSocketText(final String message)
     {
-        // Just for Logging purpose
-        System.out.println("Received TEXT message: " + message);
-
         final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
         // select the closest match for this request
@@ -80,7 +74,7 @@ public class WebSocke extends WebSocketAdapter
               if(func != null)
                 func.process(wsconnection);
            } catch(Exception e) {
-             e.printStackTrace();
+             wsconnection.error("Error in the Websocket-Xquery-Function", 500);
            }
     }
 
@@ -96,15 +90,11 @@ public class WebSocke extends WebSocketAdapter
             if(func != null)
               func.process(wsconnection);
          } catch(Exception e) {
-           // TODO Auto-generated catch block
-           e.printStackTrace();
+           wsconnection.error("Error in the Websocket-Xquery-Function", 500);
          }
 
       // Resets Session and Remote in Superclass
         super.onWebSocketClose(statusCode, reason);
-
-        // Just for Loggingpurpose
-        System.out.println("Socket Closed: [" + statusCode + "] " + reason);
 
         // Remove the user from the Room
         Room.getInstance().remove(this);
