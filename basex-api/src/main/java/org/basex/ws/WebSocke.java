@@ -56,7 +56,7 @@ public class WebSocke extends WebSocketAdapter
         try {
            func = rxm.find(wsconnection, null, Annotation._WS_CONNECT);
            if(func != null)
-             func.process(wsconnection);
+             func.process(wsconnection, null);
         } catch(Exception e) {
           wsconnection.error("Error in the Websocket-Xquery-Function", 500);
         }
@@ -72,7 +72,7 @@ public class WebSocke extends WebSocketAdapter
            try {
               func = rxm.find(wsconnection, null, Annotation._WS_MESSAGE);
               if(func != null)
-                func.process(wsconnection);
+                func.process(wsconnection, message);
            } catch(Exception e) {
              wsconnection.error("Error in the Websocket-Xquery-Function", 500);
            }
@@ -88,7 +88,7 @@ public class WebSocke extends WebSocketAdapter
          try {
             func = rxm.find(wsconnection, null, Annotation._WS_CLOSE);
             if(func != null)
-              func.process(wsconnection);
+              func.process(wsconnection, null);
          } catch(Exception e) {
            wsconnection.error("Error in the Websocket-Xquery-Function", 500);
          }

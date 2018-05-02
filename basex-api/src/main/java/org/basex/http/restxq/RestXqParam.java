@@ -9,9 +9,9 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqParam {
+public final class RestXqParam {
   /** Variable name. */
-  final QNm var;
+  public final QNm var;
   /** Name of parameter. */
   final String name;
   /** Default value. */
@@ -23,7 +23,7 @@ final class RestXqParam {
    * @param name name of parameter
    * @param value default value
    */
-  RestXqParam(final QNm var, final String name, final Value value) {
+  public RestXqParam(final QNm var, final String name, final Value value) {
     this.var = var;
     this.name = name;
     this.value = value;

@@ -348,7 +348,7 @@ public final class RestXqModules {
    * @throws Exception exception (including unexpected ones)
    */
   private List<WsXqFunction> find(final WebsocketConnection conn,
-      final QNm error, final boolean perm, Annotation ann)
+      final QNm error, final boolean perm, final Annotation ann)
       throws Exception {
 
     // collect all functions

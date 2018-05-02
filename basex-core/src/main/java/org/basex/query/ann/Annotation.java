@@ -161,7 +161,10 @@ public enum Annotation {
   /** XQuery annotation. */
   _WS_ERROR("error-case([path])", arg(STR_O), WS_URI),
   /** XQuery annotation. */
-  _WS_CLOSE("close([path])", arg(STR_O), WS_URI);
+  _WS_CLOSE("close([path])", arg(STR_O), WS_URI),
+  /** XQuery annotation. */
+  _WS_PARAM("param(name,variable[,default,...])",
+      arg(STR_O, STR_O, ITEM_O), WS_URI, false);
 
   /** Argument types. */
   public final SeqType[] args;

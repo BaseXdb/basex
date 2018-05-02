@@ -537,7 +537,9 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
     // default value
     final int al = args.length;
     final ItemList items = new ItemList(al - 2);
-    for(int a = 2; a < al; a++) items.add(args[a]);
+    for(int a = 2; a < al; a++) {
+      items.add(args[a]);
+      }
     return new RestXqParam(var, name, items.value());
   }
 

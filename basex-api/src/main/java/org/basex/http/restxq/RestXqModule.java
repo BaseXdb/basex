@@ -173,11 +173,12 @@ public final class RestXqModule {
    * Processes the HTTP request.
    * @param conn HTTP connection
    * @param func function to be processed
+   * @param message String the Message which arrives in onText
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  public boolean process(final WebsocketConnection conn, final WsXqFunction func)
-      throws Exception {
+  public boolean process(final WebsocketConnection conn, final WsXqFunction func,
+      final String message) throws Exception {
 
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
@@ -189,7 +190,10 @@ public final class RestXqModule {
       final WsXqFunction wxf = new WsXqFunction(sf, qc, this);
       wxf.parse();
 
-      qc.mainModule(MainModule.get(sf, new Expr[0]));
+      final Expr[] args = new Expr[sf.params.length];
+      wxf.bind(args, qc, message);
+
+      qc.mainModule(MainModule.get(sf, args));
 
       //conn.sess.getRemote().sendBytes(data);
       ArrayOutput ao = new ArrayOutput();
