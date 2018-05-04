@@ -41,7 +41,7 @@ md5toa(unsigned char *md_value, unsigned int md_len, char **md5_string)
 static char *
 md5_digest(int n, ...)
 {
-	EVP_MD_CTX mdctx;
+	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
 	const EVP_MD *md;
 	unsigned char md_value[EVP_MAX_MD_SIZE];
 	unsigned int md_len = 0;
@@ -55,17 +55,17 @@ md5_digest(int n, ...)
 	if(!md)
 		err(1, "Unknown message digest");
 
-	EVP_MD_CTX_init(&mdctx);
-	EVP_DigestInit_ex(&mdctx, md, NULL);
+	EVP_MD_CTX_init(mdctx);
+	EVP_DigestInit_ex(mdctx, md, NULL);
 	va_list argPtr;
 	va_start(argPtr, n);
 	for (i = 0; i < n; i++) {
 		string = va_arg(argPtr, char *);
-		EVP_DigestUpdate(&mdctx, string, strlen(string));
+		EVP_DigestUpdate(mdctx, string, strlen(string));
 	}
 	va_end(argPtr);
-	EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
-	EVP_MD_CTX_cleanup(&mdctx);
+	EVP_DigestFinal_ex(mdctx, md_value, &md_len);
+	EVP_MD_CTX_free(mdctx);
 	EVP_cleanup();
 
 	rc = md5toa(md_value, md_len, &md5_result);
