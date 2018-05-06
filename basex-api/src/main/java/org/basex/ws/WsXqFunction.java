@@ -1,7 +1,11 @@
 package org.basex.ws;
 
+import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.ws.WebsocketText.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.regex.*;
@@ -73,32 +77,27 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
     return ((Str) item).toJava();
   }
 
-
   /**
    * Checks the specified Template.
    * @param tmp template string
    * @return resulting variable
-   * TODO: Declared? Exceptions!
+   * @throws QueryException query exception
+   * TODO: Declared?
    * */
-  QNm checkVariable(final String tmp) {
+  QNm checkVariable(final String tmp) throws QueryException {
     final Matcher m = TEMPLATE.matcher(tmp);
-    if(!m.find()) {
-      System.out.println("Error Handling here for Invalid Template");
-      return null;
-    }
+    if(!m.find()) throw error(INV_TEMPLATE_X, tmp);
     final byte[] vn = token(m.group(1));
-    if(!XMLToken.isQName(vn)) {
-      System.out.println("Error Handling here for Invalid Variable name");
-      return null;
-    }
+    if(!XMLToken.isQName(vn)) throw error(INV_VARNAME_X, vn);
     return new QNm(vn);
   }
 
   /**
    * Checks a function for Websocket and permission Annotations.
    * @return {@code true} if function contains relevant annotations
+   * @throws Exception exception
    */
-  public boolean parse() {
+  public boolean parse() throws Exception {
     boolean found = false;
 
     for(final Ann ann : function.anns) {
@@ -153,18 +152,33 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
   }
 
   /**
+   * Creates an exception with the specified message.
+   * @param msg message
+   * @param ext error extension
+   * @return exception
+   */
+  private QueryException error(final String msg, final Object... ext) {
+    InputInfo info = function.info;
+    return BASEX_WSXQ_X.get(info, Util.info(msg, ext));
+  }
+
+  /**
    * Binds the params of the Function.
    * @param args The Expr
    * @param qc The QueryContext
    * @param message The Messagestring
+   * @throws QueryException  query exception
+   * @throws UnsupportedEncodingException encoding excepiton
    */
-  public void bind(final Expr[] args, final QueryContext qc, final WebsocketMessage message) {
+  public void bind(final Expr[] args, final QueryContext qc,
+      final WebsocketMessage message) throws QueryException,
+        UnsupportedEncodingException {
     for(final RestXqParam rxp: wsParameters) {
-      try {
         final Var[] params = function.params;
         final int pl = params.length;
+        final MESSAGETYPE msgType = message.getMsgType();
 
-        if(message.getMsgType() == MESSAGETYPE.STRING) {
+        if(msgType == MESSAGETYPE.STRING) {
           Value test = new Atm(URLDecoder.decode(message.getStringMessage(), Strings.UTF8));
           for(int p = 0; p < pl; p++) {
             final Var var = params[p];
@@ -177,16 +191,11 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
             }
           }
         }
-        else if(message.getMsgType() == MESSAGETYPE.BINARY) {
+        else if(msgType == MESSAGETYPE.BINARY) {
           // TODO: Bind the binary message
         } else {
-          // TODO: Throw senseful Exception
-          throw new Exception("Wrong Messagetype");
+          throw error(WRONG_MSG_TYPE, msgType);
         }
-
-      } catch(Exception e) {
-        e.printStackTrace();
-      }
     }
   }
 }
