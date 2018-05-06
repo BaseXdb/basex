@@ -1,9 +1,11 @@
 package org.basex.ws;
 
+import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import java.net.*;
 import java.util.*;
+import java.util.regex.*;
 
 import org.basex.http.restxq.*;
 import org.basex.io.serial.*;
@@ -24,6 +26,8 @@ import org.basex.util.*;
  * */
 public class WsXqFunction implements Comparable<WsXqFunction> {
 
+  /** Single template pattern. */
+  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
   /** Associated function. */
   public final StaticFunc function;
   /** Associated module. */
@@ -61,6 +65,36 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
   }
 
   /**
+   * Returns the specified item as a string.
+   * @param item item
+   * @return string
+   * */
+  static String toString(final Item item) {
+    return ((Str) item).toJava();
+  }
+
+
+  /**
+   * Checks the specified Template.
+   * @param tmp template string
+   * @return resulting variable
+   * TODO: Declared? Exceptions!
+   * */
+  QNm checkVariable(final String tmp) {
+    final Matcher m = TEMPLATE.matcher(tmp);
+    if(!m.find()) {
+      System.out.println("Error Handling here for Invalid Template");
+      return null;
+    }
+    final byte[] vn = token(m.group(1));
+    if(!XMLToken.isQName(vn)) {
+      System.out.println("Error Handling here for Invalid Variable name");
+      return null;
+    }
+    return new QNm(vn);
+  }
+
+  /**
    * Checks a function for Websocket and permission Annotations.
    * @return {@code true} if function contains relevant annotations
    */
@@ -76,11 +110,9 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
       // If the Annotation is a ws:param(..) annotation: Add the Params to wsParameters
       if(sig == Annotation._WS_PARAM) {
         final Item[] args = ann.args();
-        final String name = ((Str) args[0]).toJava();
+        final String name = toString(args[0]);
 
-        // TODO: Hier name uas den args nehmen und declared verwenden:
-        // checkVariable(toString(args[1], declared);
-        final QNm var = new QNm("nachricht");
+        final QNm var = checkVariable(toString(args[1]));
 
         final int al = args.length;
         final ItemList items = new ItemList(al - 2);
