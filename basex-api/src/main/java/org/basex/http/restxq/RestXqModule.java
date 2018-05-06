@@ -178,7 +178,7 @@ public final class RestXqModule {
    * @throws Exception exception
    */
   public boolean process(final WebsocketConnection conn, final WsXqFunction func,
-      final String message) throws Exception {
+      final WebsocketMessage message) throws Exception {
 
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {

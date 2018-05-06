@@ -1,6 +1,5 @@
 package org.basex.ws;
 
-import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import java.net.*;
@@ -19,6 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.ws.WebsocketMessage.*;
 
 /**
  * This class represents a single Websocket-Function.
@@ -132,11 +132,12 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * Processes the websocket request.
    * Parses new modules and discards obsolete ones.
    * @param conn Websocket connection
-   * @param message The MessageString
+   * @param message The WebsocketMessage
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  public boolean process(final WebsocketConnection conn, final String message) throws Exception {
+  public boolean process(final WebsocketConnection conn,
+      final WebsocketMessage message) throws Exception {
     try {
       return module.process(conn, this, message);
     } catch(final QueryException ex) {
@@ -157,22 +158,32 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * @param qc The QueryContext
    * @param message The Messagestring
    */
-  public void bind(final Expr[] args, final QueryContext qc, final String message) {
+  public void bind(final Expr[] args, final QueryContext qc, final WebsocketMessage message) {
     for(final RestXqParam rxp: wsParameters) {
       try {
-        Value test = new Atm(URLDecoder.decode(message, Strings.UTF8));
         final Var[] params = function.params;
         final int pl = params.length;
-        for(int p = 0; p < pl; p++) {
-          final Var var = params[p];
-          if(var.name.eq(rxp.var)) {
-            final SeqType decl = var.declaredType();
-            final Value val = test.seqType().instanceOf(decl) ? test :
-              decl.cast(test, qc, function.sc, null);
-            args[p] = var.checkType(val, qc, false);
-            break;
+
+        if(message.getMsgType() == MESSAGETYPE.STRING) {
+          Value test = new Atm(URLDecoder.decode(message.getStringMessage(), Strings.UTF8));
+          for(int p = 0; p < pl; p++) {
+            final Var var = params[p];
+            if(var.name.eq(rxp.var)) {
+              final SeqType decl = var.declaredType();
+              final Value val = test.seqType().instanceOf(decl) ? test :
+                decl.cast(test, qc, function.sc, null);
+              args[p] = var.checkType(val, qc, false);
+              break;
+            }
           }
         }
+        else if(message.getMsgType() == MESSAGETYPE.BINARY) {
+          // TODO: Bind the binary message
+        } else {
+          // TODO: Throw senseful Exception
+          throw new Exception("Wrong Messagetype");
+        }
+
       } catch(Exception e) {
         e.printStackTrace();
       }

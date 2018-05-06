@@ -72,10 +72,25 @@ public class WebSocke extends WebSocketAdapter
            try {
               func = rxm.find(wsconnection, null, Annotation._WS_MESSAGE);
               if(func != null)
-                func.process(wsconnection, message);
+                func.process(wsconnection, new WebsocketMessage(message));
            } catch(Exception e) {
              wsconnection.error("Error in the Websocket-Xquery-Function", 500);
            }
+    }
+
+    @Override
+    public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
+      final RestXqModules rxm = RestXqModules.get(wsconnection.context);
+
+      // select the closest match for this request
+      WsXqFunction func = null;
+         try {
+            func = rxm.find(wsconnection, null, Annotation._WS_MESSAGE);
+            if(func != null)
+              func.process(wsconnection, new WebsocketMessage(payload));
+         } catch(Exception e) {
+           wsconnection.error("Error in the Websocket-Xquery-Function", 500);
+         }
     }
 
     @Override
