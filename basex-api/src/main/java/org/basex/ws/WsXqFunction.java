@@ -1,12 +1,10 @@
 package org.basex.ws;
 
 import static org.basex.http.restxq.RestXqText.*;
-import static org.basex.ws.WebsocketText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -17,12 +15,9 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.ws.WebsocketMessage.*;
+import org.basex.ws.serializers.*;
 
 /**
  * This class represents a single Websocket-Function.
@@ -132,13 +127,15 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * Parses new modules and discards obsolete ones.
    * @param conn Websocket connection
    * @param message The WebsocketMessage
+   * @param serializer The Wsseriaizer
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
   public boolean process(final WebsocketConnection conn,
-      final WebsocketMessage message) throws Exception {
+                         final WebsocketMessage message,
+                         final WsSerializer serializer) throws Exception {
     try {
-      return module.process(conn, this, message);
+      return module.process(conn, this, message, serializer);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;
@@ -157,8 +154,18 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * @param ext error extension
    * @return exception
    */
-  private QueryException error(final String msg, final Object... ext) {
-    InputInfo info = function.info;
+  public QueryException error(final String msg, final Object... ext) {
+    return error(function.info, Util.info(msg, ext));
+  }
+
+  /**
+   * Creates an exception with the specific message.
+   * @param info the StaticFunc info
+   * @param msg the message
+   * @param ext error extension
+   * @return exception
+   */
+  private QueryException error(final InputInfo info, final String msg, final Object... ext) {
     return BASEX_WSXQ_X.get(info, Util.info(msg, ext));
   }
 
@@ -167,35 +174,13 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * @param args The Expr
    * @param qc The QueryContext
    * @param message The Messagestring
+   * @param serializer The Message serializer
    * @throws QueryException  query exception
    * @throws UnsupportedEncodingException encoding excepiton
    */
   public void bind(final Expr[] args, final QueryContext qc,
-      final WebsocketMessage message) throws QueryException,
+      final WebsocketMessage message, final WsSerializer serializer) throws QueryException,
         UnsupportedEncodingException {
-    for(final RestXqParam rxp: wsParameters) {
-        final Var[] params = function.params;
-        final int pl = params.length;
-        final MESSAGETYPE msgType = message.getMsgType();
-
-        if(msgType == MESSAGETYPE.STRING) {
-          Value test = new Atm(URLDecoder.decode(message.getStringMessage(), Strings.UTF8));
-          for(int p = 0; p < pl; p++) {
-            final Var var = params[p];
-            if(var.name.eq(rxp.var)) {
-              final SeqType decl = var.declaredType();
-              final Value val = test.seqType().instanceOf(decl) ? test :
-                decl.cast(test, qc, function.sc, null);
-              args[p] = var.checkType(val, qc, false);
-              break;
-            }
-          }
-        }
-        else if(msgType == MESSAGETYPE.BINARY) {
-          // TODO: Bind the binary message
-        } else {
-          throw error(WRONG_MSG_TYPE, msgType);
-        }
-    }
+      serializer.bind(args, qc, message, wsParameters, function, this);
   }
 }

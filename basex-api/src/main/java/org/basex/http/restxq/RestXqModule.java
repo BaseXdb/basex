@@ -4,22 +4,17 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.*;
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.scope.*;
-import org.basex.query.value.item.*;
 import org.basex.ws.*;
+import org.basex.ws.serializers.*;
 
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
@@ -174,11 +169,12 @@ public final class RestXqModule {
    * @param conn HTTP connection
    * @param func function to be processed
    * @param message String the Message which arrives in onText
+   * @param serializer The WsSerializer
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
   public boolean process(final WebsocketConnection conn, final WsXqFunction func,
-      final WebsocketMessage message) throws Exception {
+      final WebsocketMessage message, final WsSerializer serializer) throws Exception {
 
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
@@ -191,33 +187,11 @@ public final class RestXqModule {
       wxf.parse();
 
       final Expr[] args = new Expr[sf.params.length];
-      wxf.bind(args, qc, message);
+      wxf.bind(args, qc, message, serializer);
 
       qc.mainModule(MainModule.get(sf, args));
 
-      //conn.sess.getRemote().sendBytes(data);
-      ArrayOutput ao = new ArrayOutput();
-      Serializer ser = Serializer.get(ao, wxf.output);
-      Iter iter = qc.iter();
-
-      // Dont send anything if Websocket gets closed
-      if(wxf.matches(Annotation._WS_CLOSE)) {
-        return true;
-      }
-
-      for(Item it; (it = iter.next()) != null;) {
-        ser.reset();
-        ser.serialize(it);
-        if(it instanceof Bin) {
-          //final byte[] bytes = ((Bin) it).binary(null);
-          final byte[] bytes = ao.toArray();
-          conn.sess.getRemote().sendBytes(ByteBuffer.wrap(bytes));
-        } else {
-          conn.sess.getRemote().sendString(ao.toString());
-        }
-        ao.reset();
-      }
-      return true;
+      return serializer.generateOutput(conn, wxf, qc);
     }
   }
 }

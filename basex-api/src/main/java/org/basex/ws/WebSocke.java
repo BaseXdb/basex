@@ -4,6 +4,7 @@ import java.util.*;
 import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
 import org.basex.query.ann.*;
+import org.basex.ws.serializers.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -27,6 +28,37 @@ public class WebSocke extends WebSocketAdapter
      * The Websocketconnection.
      */
     private WebsocketConnection wsconnection;
+    /**
+     * The Serializer for specific Subprotocols.
+     * */
+    private WsSerializer serializer;
+
+
+    /**
+     * Sets the Subprotocol in the Response. Uses the first matching Protocol and sets it.
+     * @param sess Session
+     */
+    private void setSubprotocol(final Session sess) {
+        List<String> subprotocols = sess.getUpgradeRequest().getSubProtocols();
+        // If Client gives no subprotocol no one has to be accepted
+        if(subprotocols.size() == 0) {
+          serializer = new WsSerializer();
+          return;
+          }
+
+        for(String sp: subprotocols) {
+          if(sp.equals("stomp")) {
+            subprotocol = sp;
+            sess.getUpgradeResponse().setAcceptedSubProtocol(sp);
+            // serializer = new StompSerializer();
+            return;
+          }
+        }
+
+        // If no subprotocol is supported, close connection with error
+        // TODO
+    }
+
 
     @Override
     public void onWebSocketConnect(@NotNull final Session sess)
@@ -38,9 +70,7 @@ public class WebSocke extends WebSocketAdapter
         UpgradeRequest req = sess.getUpgradeRequest();
         channelName = req.getParameterMap().get("channelName");
 
-        // Get the Accepted Subprotocols
-        UpgradeResponse resp = sess.getUpgradeResponse();
-        subprotocol = resp.getAcceptedSubProtocol();
+        setSubprotocol(sess);
 
         // Add to the WebSocketRoom
         Room.getInstance().join(this);
@@ -93,8 +123,8 @@ public class WebSocke extends WebSocketAdapter
       WsXqFunction func = null;
          try {
             func = rxm.find(wsconnection, null, ann);
-            if(func != null)
-              func.process(wsconnection, msg);
+            if(func != null && serializer != null)
+              func.process(wsconnection, msg, serializer);
          } catch(Exception e) {
            wsconnection.error(e.getMessage(), 500);
          }
