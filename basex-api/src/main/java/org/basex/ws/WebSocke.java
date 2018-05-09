@@ -33,32 +33,25 @@ public class WebSocke extends WebSocketAdapter
      * */
     private WsSerializer serializer;
 
-
     /**
-     * Sets the Subprotocol in the Response. Uses the first matching Protocol and sets it.
-     * @param sess Session
-     */
-    private void setSubprotocol(final Session sess) {
-        List<String> subprotocols = sess.getUpgradeRequest().getSubProtocols();
-        // If Client gives no subprotocol no one has to be accepted
-        if(subprotocols.size() == 0) {
-          serializer = new WsSerializer();
-          return;
-          }
-
-        for(String sp: subprotocols) {
-          if(sp.equals("stomp")) {
-            subprotocol = sp;
-            sess.getUpgradeResponse().setAcceptedSubProtocol(sp);
-            // serializer = new StompSerializer();
-            return;
-          }
-        }
-
-        // If no subprotocol is supported, close connection with error
-        // TODO
+     * Constructor.
+     * @param subprotocol String subprotocol
+     * */
+    public WebSocke(final String subprotocol) {
+      this.subprotocol = subprotocol;
+      setSerializer();
     }
 
+    /**
+     * Sets the Serializer.
+     */
+    private void setSerializer() {
+      if(this.subprotocol == null) {
+        this.serializer = new WsStandardSerializer();
+      } else if("v10.stomp".equals(this.subprotocol)) {
+        this.serializer = new StompSerializer();
+      }
+    }
 
     @Override
     public void onWebSocketConnect(@NotNull final Session sess)
@@ -69,8 +62,6 @@ public class WebSocke extends WebSocketAdapter
         // Get the ChannelName if it is set
         UpgradeRequest req = sess.getUpgradeRequest();
         channelName = req.getParameterMap().get("channelName");
-
-        setSubprotocol(sess);
 
         // Add to the WebSocketRoom
         Room.getInstance().join(this);

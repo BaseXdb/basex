@@ -9,6 +9,6 @@ import org.eclipse.jetty.websocket.servlet.*;
 public class WebsocketServlet extends WebSocketServlet {
   @Override
   public void configure(final WebSocketServletFactory factory) {
-    factory.register(WebSocke.class);
+    factory.setCreator(new WsCreator());
   }
 }
