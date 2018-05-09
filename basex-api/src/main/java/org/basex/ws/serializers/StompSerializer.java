@@ -22,6 +22,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.ws.*;
 import org.basex.ws.WebsocketMessage.*;
+import org.basex.ws.serializers.stomp.*;
 
 /**
  * Represents the Serializer for the Stomp Subprotocol.
@@ -35,6 +36,10 @@ public class StompSerializer implements WsSerializer {
                    final ArrayList<RestXqParam> wsParameters, final StaticFunc function,
                    final WsXqFunction wsfunc)
       throws QueryException, UnsupportedEncodingException {
+
+    // TODO: auch für binarys, gerade nur string, message kann aber auch binary sein
+    StompFrame stompframe = StompFrame.parse(message.getStringMessage());
+    System.out.println(stompframe.toString());
 
     for(final RestXqParam rxp: wsParameters) {
       final Var[] params = function.params;
