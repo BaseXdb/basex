@@ -38,8 +38,12 @@ public class StompSerializer implements WsSerializer {
       throws QueryException, UnsupportedEncodingException {
 
     // TODO: auch für binarys, gerade nur string, message kann aber auch binary sein
-    StompFrame stompframe = StompFrame.parse(message.getStringMessage());
-    System.out.println(stompframe.toString());
+    // If no Message is provided (e.g. in the handshake) no stompframe is provided
+    StompFrame stompframe = null;
+    if(message != null) {
+      stompframe = StompFrame.parse(message.getStringMessage());
+      System.out.println(stompframe.toString());
+    }
 
     for(final RestXqParam rxp: wsParameters) {
       final Var[] params = function.params;

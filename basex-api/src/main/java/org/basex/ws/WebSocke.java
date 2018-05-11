@@ -5,6 +5,7 @@ import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
 import org.basex.query.ann.*;
 import org.basex.ws.serializers.*;
+import org.basex.ws.serializers.stomp.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -70,13 +71,59 @@ public class WebSocke extends WebSocketAdapter
         wsconnection =
             new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(), sess);
 
-        findAndProcess(Annotation._WS_CONNECT, null);
+        // If the STOMP-Protocol is used, no connect-execution in WebsocketConnect.
+        // The XQuery connectfunction in the stompprotocol is executed within the
+        // CONNECT-Frame (onWebSocketText)
+        if(!this.subprotocol.equals("v10.stomp")) {
+          findAndProcess(Annotation._WS_CONNECT, null);
+        }
     }
 
     @Override
     public void onWebSocketText(final String message)
     {
-      findAndProcess(Annotation._WS_MESSAGE, new WebsocketMessage(message));
+      Annotation ann = Annotation._WS_CONNECT;
+      WebsocketMessage wm;
+
+      // Check if the Protocol is stomp
+      if(this.subprotocol.equals("v10.stomp")) {
+        //TODO Stompframe here
+        wm = new WebsocketMessage(message);
+        // If it is Stomp, parse the message to a StompFrame
+        StompFrame stompframe = StompFrame.parse(message);
+        // Check the Command of the Stompframe and search a different
+        // Annotation per Command
+        switch(stompframe.getCommand()) {
+          case SEND:
+            break;
+          case SUBSCRIBE:
+            break;
+          case UNSUBSCRIBE:
+            break;
+          case BEGIN:
+            break;
+          case COMMIT:
+            break;
+          case ABORT:
+            break;
+          case ACK:
+            break;
+          case NACK:
+            break;
+          case DISCONNECT:
+            break;
+          case CONNECT:
+          case STOMP:
+            ann = Annotation._WS_CONNECT;
+            break;
+          default:
+              wsconnection.error("Not a Stomp Command", 500);
+              return;
+        }
+      } else {
+        wm = new WebsocketMessage(message);
+      }
+      findAndProcess(ann, wm);
     }
 
     @Override

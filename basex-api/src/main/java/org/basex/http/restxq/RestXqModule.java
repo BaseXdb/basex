@@ -179,7 +179,6 @@ public final class RestXqModule {
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
       final StaticFunc sf = find(qc, func.function);
-
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();
 
@@ -190,7 +189,6 @@ public final class RestXqModule {
       wxf.bind(args, qc, message, serializer);
 
       qc.mainModule(MainModule.get(sf, args));
-
       return serializer.generateOutput(conn, wxf, qc);
     }
   }

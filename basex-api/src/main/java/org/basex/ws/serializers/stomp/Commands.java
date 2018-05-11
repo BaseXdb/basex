@@ -7,7 +7,7 @@ package org.basex.ws.serializers.stomp;
 public enum Commands {
   //Client -> Server
     /**
-     * Send Message to the Server.
+     * Send a Message to the Server.
      * Required headers: destination
      * Optional headers: transaction
      * */
