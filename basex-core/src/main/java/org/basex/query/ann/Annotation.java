@@ -164,7 +164,11 @@ public enum Annotation {
   _WS_CLOSE("close([path])", arg(STR_O), WS_URI),
   /** XQuery annotation. */
   _WS_PARAM("param(name,variable[,default,...])",
-      arg(STR_O, STR_O, ITEM_O), WS_URI, false);
+      arg(STR_O, STR_O, ITEM_O), WS_URI, false),
+  /** XQuery annotation. */
+  _WS_STOMP_SUBSCRIBE("subscribe([path])", arg(STR_O), WS_URI),
+  /** XQuery annotation. */
+  _WS_STOMP_UNSUBSCRIBE("unsubscribe([path])", arg(STR_O), WS_URI);
 
   /** Argument types. */
   public final SeqType[] args;

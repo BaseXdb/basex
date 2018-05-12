@@ -9,6 +9,8 @@ import java.util.*;
  *
  * @author BaseX Team 2005-18, BSD License
  */
+
+// TODO: Check id-header in the SUBSCRIBTION
 public class Room {
   /**
    * The Room-Singleton.
@@ -29,11 +31,30 @@ public class Room {
   private List<WebSocke> members = new ArrayList<>();
 
   /**
+   * The List of Members per Channel.
+   */
+  private HashMap<String, List<WebSocke>> channels = new HashMap<>();
+
+  /**
    * Adds a WebSocket to the membersList.
    * @param socket WebSocke
    */
   public void join(final WebSocke socket) {
     members.add(socket);
+  }
+
+  /**
+   * Adds a Websocket to a specific Channel.
+   * @param socket WebSocke
+   * @param channel String
+   * */
+  public void joinChannel(final WebSocke socket, final String channel) {
+    List<WebSocke> channelMembers = channels.get(channel);
+    if(channelMembers == null) {
+      channelMembers = new ArrayList<>();
+    }
+    channelMembers.add(socket);
+    channels.put(channel, channelMembers);
   }
 
   /**
@@ -45,11 +66,43 @@ public class Room {
   }
 
   /**
+   * Removes a Member from the ChannelMemberList.
+   * @param socket WebSocke
+   * @param channel String
+   */
+  public void removeFromChannel(final WebSocke socket, final String channel) {
+    List<WebSocke> channelMembers = channels.get(channel);
+    // Channel list doesnt exist, return
+    if(channelMembers == null) {
+      return;
+    }
+    channelMembers.remove(socket);
+    channels.put(channel, channelMembers);
+  }
+
+  /**
    * Sends a Message to all connected Members.
    * @param message String
    */
   public void broadcast(final String message) {
     for(WebSocke member: members) {
+      // Sends a String asynchronely, method maybe return before the message was sent
+      member.getSession().getRemote().sendStringByFuture(message);
+    }
+  }
+
+  /**
+   * Sens a Message to all connected Members in the Channel.
+   * @param message String
+   * @param channel String
+   * */
+  public void broadcast(final String message, final String channel) {
+    List<WebSocke> channelMembers = channels.get(channel);
+    // Channel list doesnt exist, return
+    if(channelMembers == null) {
+      return;
+    }
+    for(WebSocke member: channelMembers) {
       // Sends a String asynchronely, method maybe return before the message was sent
       member.getSession().getRemote().sendStringByFuture(message);
     }

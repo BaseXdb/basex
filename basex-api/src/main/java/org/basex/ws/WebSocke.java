@@ -95,11 +95,20 @@ public class WebSocke extends WebSocketAdapter
         // Annotation per Command
         switch(stompframe.getCommand()) {
           case SEND:
+            ann = Annotation._WS_MESSAGE;
             break;
           case SUBSCRIBE:
+            ann = Annotation._WS_STOMP_SUBSCRIBE;
+            String channel = stompframe.getHeaders().get("destination");
+            if(channel == null) {
+              // Send ErrorFrame
+            }
+            Room.getInstance().joinChannel(this, channel);
             break;
           case UNSUBSCRIBE:
+            ann = Annotation._WS_STOMP_UNSUBSCRIBE;
             break;
+            // Transaction stuff
           case BEGIN:
             break;
           case COMMIT:
@@ -111,6 +120,7 @@ public class WebSocke extends WebSocketAdapter
           case NACK:
             break;
           case DISCONNECT:
+            ann = Annotation._WS_CLOSE;
             break;
           case CONNECT:
           case STOMP:
