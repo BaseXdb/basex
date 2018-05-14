@@ -39,7 +39,7 @@ public final class Lookup extends Arr {
     final Expr keys = exprs[0];
     final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();
     if(exprs.length == 1) {
-      if(seqType(cc.qc.focus.value, keys)) {
+      if(exprType(cc.qc.focus.value, keys)) {
         if(ks == 0) return cc.replaceWith(this, keys);
       }
       return this;
@@ -47,11 +47,11 @@ public final class Lookup extends Arr {
 
     // postfix expression
     final Expr ctx = exprs[1];
-    final long es = ctx.size();
-    if(seqType(ctx, keys)) {
+    if(exprType(ctx, keys)) {
       if((ctx instanceof Map || ctx instanceof Array) && keys instanceof Value)
         return cc.preEval(this);
 
+      final long es = ctx.size();
       if(es == 0) return cc.replaceWith(this, ctx);
       if(ks == 0) return cc.replaceWith(this, keys);
 
@@ -62,7 +62,7 @@ public final class Lookup extends Arr {
           if(ks == 1) {
             // one key: rewrite to function call
             expr = new DynFuncCall(info, cc.sc(), ctx, keys).optimize(cc);
-          } else {
+          } else if(ks != -1) {
             // otherwise, rewrite to for each loop
             expr = cc.function(Function.FOR_EACH, info, exprs);
           }
@@ -87,9 +87,9 @@ public final class Lookup extends Arr {
    * Assigns a sequence type.
    * @param ctx context expression
    * @param keys keys
-   * @return {@code true} if static type of the expression is map or array
+   * @return {@code true} if expression type was assigned
    */
-  private boolean seqType(final Expr ctx, final Expr keys) {
+  private boolean exprType(final Expr ctx, final Expr keys) {
     if(ctx == null) return false;
 
     final Type type = ctx.seqType().type;
