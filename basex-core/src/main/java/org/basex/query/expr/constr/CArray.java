@@ -76,13 +76,13 @@ public final class CArray extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(seq ? "[ " : "array { ");
     final int el = exprs.length;
+    if(seq && el == 0) return "[]";
+
+    final TokenBuilder tb = new TokenBuilder().add(seq ? "[" : QueryText.ARRAY + " {");
     for(int e = 0; e < el; e++) {
-      if(e != 0) tb.add(", ");
-      tb.addExt(exprs[e]);
+      tb.add(e == 0 ? " " : ", ").addExt(exprs[e]);
     }
-    return tb.add(seq ? " ]" : "}").toString();
+    return tb.add(seq ? " ]" : " }").toString();
   }
 }

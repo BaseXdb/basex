@@ -88,11 +88,10 @@ public final class CMap extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder("map { ");
+    final TokenBuilder tb = new TokenBuilder(QueryText.MAP).add(" {");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      if(e != 0) tb.add(", ");
-      tb.addExt(exprs[e]).add(": ").addExt(exprs[e + 1]);
+      tb.add(e == 0 ? " " : ", ").addExt(exprs[e]).add(": ").addExt(exprs[e + 1]);
     }
     return tb.add(" }").toString();
   }

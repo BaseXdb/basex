@@ -478,19 +478,21 @@ public abstract class Array extends FItem {
 
   @Override
   public final String toString() {
-    final StringBuilder tb = new StringBuilder().append("[ ");
+    if(arraySize() == 0) return "[]";
+
+    final TokenBuilder tb = new TokenBuilder().add('[');
     final Iterator<Value> iter = iterator(0);
     for(boolean fst = true; iter.hasNext(); fst = false) {
-      if(!fst) tb.append(", ");
+      tb.add(fst ? " " : ", ");
       final Value value = iter.next();
       final long vs = value.size();
-      if(vs != 1) tb.append('(');
+      if(vs != 1) tb.add('(');
       for(int i = 0; i < vs; i++) {
-        if(i != 0) tb.append(", ");
-        tb.append(value.itemAt(i));
+        if(i != 0) tb.add(", ");
+        tb.addExt(value.itemAt(i));
       }
-      if(vs != 1) tb.append(')');
+      if(vs != 1) tb.add(')');
     }
-    return tb.append(" ]").toString();
+    return tb.add(" ]").toString();
   }
 }
