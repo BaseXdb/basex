@@ -99,11 +99,12 @@ public final class Lookup extends Arr {
     // derive type from input expression
     final SeqType st = ((FuncType) type).declType;
     Occ occ = st.occ;
-    // map lookup may result in empty sequence (array lookups will always yield at least one item)
-    if(map) occ = occ.union(Occ.ZERO);
-    // key is wildcard, or expression yields no single item
     if(keys == Str.WC || ctx.size() != 1 || !keys.seqType().oneNoArray()) {
-      occ = occ.union(Occ.ONE_MORE);
+      // key is wildcard, or expression yields no single item
+      occ = occ.union(Occ.ZERO_MORE);
+    } else if(map) {
+      // map lookup may result in empty sequence
+      occ = occ.union(Occ.ZERO);
     }
 
     exprType.assign(st.type, occ);
