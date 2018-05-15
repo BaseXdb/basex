@@ -33,6 +33,10 @@ public class WebSocke extends WebSocketAdapter
      * The Serializer for specific Subprotocols.
      * */
     private WsSerializer serializer;
+    /**
+     * The subscribtion-ids with the corresponding channel.
+     * */
+    private HashMap<String, String> idchannelMap = new HashMap<>();
 
     /**
      * Constructor.
@@ -82,6 +86,7 @@ public class WebSocke extends WebSocketAdapter
     @Override
     public void onWebSocketText(final String message)
     {
+      System.out.println("onWebsocketText: " + message);
       Annotation ann = Annotation._WS_CONNECT;
       WebsocketMessage wm;
 
@@ -90,23 +95,46 @@ public class WebSocke extends WebSocketAdapter
         //TODO Stompframe here
         wm = new WebsocketMessage(message);
         // If it is Stomp, parse the message to a StompFrame
-        StompFrame stompframe = StompFrame.parse(message);
-        // Check the Command of the Stompframe and search a different
-        // Annotation per Command
+        // Return specific StompFrame here? -> ConnectFrame extend StompFrame,
+        // in parse check for all required parameters and set optional also?
+        // Maybe bind method in the Frame? or returning list with all parameters to bind?
+        StompFrame stompframe = null;
+        try {
+          stompframe = StompFrame.parse(message);
+        } catch(HeadersException e) {
+          wsconnection.error(e.getMessage(), 500);
+        }
+        String id;
+        String channel;
         switch(stompframe.getCommand()) {
           case SEND:
             ann = Annotation._WS_MESSAGE;
+            // Required header
+            channel = stompframe.getHeaders().get("destination");
+            // Optional Header
+            String contentType = stompframe.getHeaders().get("content-type");
+            String contentLength = stompframe.getHeaders().get("content-length");
+            String transaction = stompframe.getHeaders().get("transaction");
+
             break;
           case SUBSCRIBE:
             ann = Annotation._WS_STOMP_SUBSCRIBE;
-            String channel = stompframe.getHeaders().get("destination");
-            if(channel == null) {
-              // Send ErrorFrame
-            }
+            // Required Header
+            channel = stompframe.getHeaders().get("destination");
+            id = stompframe.getHeaders().get("id");
+            // Optional Header
+            String ack = stompframe.getHeaders().get("ack");
+
+            idchannelMap.put(id, channel);
             Room.getInstance().joinChannel(this, channel);
             break;
           case UNSUBSCRIBE:
             ann = Annotation._WS_STOMP_UNSUBSCRIBE;
+            // REquired Header
+            id = stompframe.getHeaders().get("id");
+            channel = idchannelMap.get(id);
+            idchannelMap.remove(id);
+            Room.getInstance().removeFromChannel(this, channel);
             break;
             // Transaction stuff
           case BEGIN:
@@ -121,10 +149,20 @@ public class WebSocke extends WebSocketAdapter
             break;
           case DISCONNECT:
             ann = Annotation._WS_CLOSE;
+            // Optional Headers
+            String receipt = stompframe.getHeaders().get("receipt");
+            String receiptId = stompframe.getHeaders().get("receiptId");
             break;
           case CONNECT:
           case STOMP:
             ann = Annotation._WS_CONNECT;
+            // Required Headers
+            String acceptVersion = stompframe.getHeaders().get("accept-version");
+            String host = stompframe.getHeaders().get("host");
+            // Optional Headers
+            String login = stompframe.getHeaders().get("login");
+            String passcode = stompframe.getHeaders().get("passcode");
+            String heartBeat = stompframe.getHeaders().get("heart-beat");
             break;
           default:
               wsconnection.error("Not a Stomp Command", 500);
@@ -144,6 +182,10 @@ public class WebSocke extends WebSocketAdapter
     @Override
     public void onWebSocketClose(final int statusCode, final String reason)
     {
+      Room room = Room.getInstance();
+      // Remove any Subscriptions
+      idchannelMap.forEach((id, channel) -> room.removeFromChannel(this, channel));
+
       findAndProcess(Annotation._WS_CLOSE, null);
 
       // Resets Session and Remote in Superclass

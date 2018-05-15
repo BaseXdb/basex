@@ -41,7 +41,11 @@ public class StompSerializer implements WsSerializer {
     // If no Message is provided (e.g. in the handshake) no stompframe is provided
     StompFrame stompframe = null;
     if(message != null) {
-      stompframe = StompFrame.parse(message.getStringMessage());
+      try {
+        stompframe = StompFrame.parse(message.getStringMessage());
+      } catch(HeadersException e) {
+        throw wsfunc.error(HEADER_MISSING);
+      }
       System.out.println(stompframe.toString());
     }
 

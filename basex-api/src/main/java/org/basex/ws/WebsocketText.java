@@ -7,4 +7,6 @@ package org.basex.ws;
 public interface WebsocketText {
   /** Err-Text. */
   String WRONG_MSG_TYPE = "Wrong Messagetype: %";
+  /** Err-Text. */
+  String HEADER_MISSING = "Not all required headers are set";
 }
