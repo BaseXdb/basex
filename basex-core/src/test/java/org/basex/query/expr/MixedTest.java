@@ -125,6 +125,12 @@ public final class MixedTest extends AdvancedQueryTest {
         + "return $b", "<xml/>");
   }
 
+  /** Optimizations of nested path expressions. */
+  @Test
+  public void gh1567() {
+    query("let $_ := '_' return document { <_/> }/*[self::*[name() = $_]]", "<_/>");
+  }
+
   /** Node ids. */
   @Test
   public void gh1566() {
