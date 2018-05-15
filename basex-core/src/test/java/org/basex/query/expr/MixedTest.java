@@ -125,6 +125,13 @@ public final class MixedTest extends AdvancedQueryTest {
         + "return $b", "<xml/>");
   }
 
+  /** Node ids. */
+  @Test
+  public void gh1566() {
+    query("((<_><a/><b/></_> update {})/* ! element _ { . })/*", "<a/>\n<b/>");
+    query("((<_><a>A</a><b>B</b></_> update {})/* ! element _ { . })/*/node()", "A\nB");
+  }
+
   /**
    * Tests document order across multiple documents or databases.
    * @throws IOException I/O exception
@@ -145,6 +152,7 @@ public final class MixedTest extends AdvancedQueryTest {
     // compare order of multiple document (based on database path)
     execute(new CreateDB(NAME, file1.path()));
     execute(new CreateDB(NAME + '2', file2.path()));
+    execute(new Close());
     query("db:open('" + NAME + "')/*/* union db:open('" + NAME + "2')/*/*",
         "<n1a/>\n<n1b/>\n<n2a/>\n<n2b/>");
   }

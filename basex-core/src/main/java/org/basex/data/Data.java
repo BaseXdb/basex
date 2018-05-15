@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.index.*;
@@ -66,7 +67,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public abstract class Data implements Comparable<Data> {
+public abstract class Data {
   /** Node kind: document (code: {@code 0}). */
   public static final byte DOC = 0x00;
   /** Node kind: element (code: {@code 1}). */
@@ -79,6 +80,11 @@ public abstract class Data implements Comparable<Data> {
   public static final byte COMM = 0x04;
   /** Node kind: processing instruction (code: {@code 5}). */
   public static final byte PI = 0x05;
+
+  /** Static node counter. */
+  private static final AtomicInteger ID = new AtomicInteger();
+  /** Unique id. ID can get negative, as subtraction of ids is used for all comparisons. */
+  public final int dbid = ID.incrementAndGet();
 
   /** Resource index. */
   public final Resources resources = new Resources(this);
@@ -1088,17 +1094,6 @@ public abstract class Data implements Comparable<Data> {
    * @return result of check
    */
   public abstract boolean inMemory();
-
-  @Override
-  public int compareTo(final Data data) {
-    // check if data instances are identical
-    if(this == data) return 0;
-    // compare database path, or path to original document(s) if database is a main memory instance
-    final IOFile path1 = meta.path, path2 = data.meta.path;
-    final String source1 = path1 == null ? meta.original : path1.path();
-    final String source2 = path2 == null ? data.meta.original : path2.path();
-    return source1.compareTo(source2);
-  }
 
   @Override
   public final String toString() {

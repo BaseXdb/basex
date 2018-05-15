@@ -250,7 +250,7 @@ public abstract class ANode extends Item {
       }
       c2 = n;
     }
-    return node1.id - node2.id < 0 ? -1 : 1;
+    return node1.id - node2.id;
   }
 
   /**
