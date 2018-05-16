@@ -268,9 +268,7 @@ public final class RepoManager {
           }
           if(trg != null) {
             if(!trg.parent().md()) throw new BaseXException("Could not create %.", trg);
-            try(InputStream is = jarFile.getInputStream(entry)) {
-              trg.write(is);
-            }
+            trg.write(jarFile.getInputStream(entry));
           }
         }
       }

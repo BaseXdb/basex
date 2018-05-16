@@ -101,7 +101,7 @@ public class BaseX extends CLI {
           case 'o':
             // change output stream
             if(out != System.out) out.close();
-            out = new PrintOutput(value);
+            out = new PrintOutput(new IOFile(value));
             session().setOutputStream(out);
             break;
           case 'q':

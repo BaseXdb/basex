@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.query.func.Function.*;
-import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -9,7 +8,7 @@ import java.io.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -550,18 +549,18 @@ public class CommandTest extends SandboxTest {
     // test xquery
     IOFile io = new IOFile("test.xq");
     no(new Run(io.path()));
-    io.write(token("// li"));
+    io.write("// li");
     no(new Run(io.path()));
     ok(new CreateDB(NAME, FILE));
     ok(new Run(io.path()));
     io.delete();
     // test command script (1)
     io = new IOFile("test.bxs");
-    io.write(token("<info/>"));
+    io.write("<info/>");
     ok(new Run(io.path()));
     // test command script (2)
     io = new IOFile("test.bxs");
-    io.write(token("</>"));
+    io.write("</>");
     no(new Run(io.path()));
     io.delete();
   }

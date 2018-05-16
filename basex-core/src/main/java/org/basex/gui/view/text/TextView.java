@@ -206,12 +206,12 @@ public final class TextView extends View {
     final BaseXFileChooser fc = new BaseXFileChooser(gui,
         SAVE_AS, gui.gopts.get(GUIOptions.WORKPATH)).suffix(IO.XMLSUFFIX);
 
-    final IO file = fc.select(Mode.FSAVE);
+    final IOFile file = fc.select(Mode.FSAVE);
     if(file == null) return;
     gui.gopts.set(GUIOptions.WORKPATH, file.path());
 
     gui.cursor(CURSORWAIT, true);
-    try(PrintOutput out = new PrintOutput(file.toString())) {
+    try(PrintOutput out = new PrintOutput(file)) {
       if(cachedCmd != null) {
         cachedCmd.execute(gui.context, out);
       } else if(cachedNodes != null) {

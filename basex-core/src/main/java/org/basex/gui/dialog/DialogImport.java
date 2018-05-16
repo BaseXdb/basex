@@ -248,15 +248,15 @@ final class DialogImport extends BaseXBack {
   private static MainParser guess(final IO in) {
     if(!in.exists() || in instanceof IOUrl) return null;
 
-    try(BufferInput ti = new BufferInput(in)) {
-      int b = ti.read();
+    try(BufferInput bi = BufferInput.get(in)) {
+      int b = bi.read();
       // input starts with opening bracket: may be xml
       if(b == '<') return MainParser.XML;
 
       for(int c = 0; b >= 0 && ++c < IO.BLOCKSIZE;) {
         // treat as raw data if characters are no ascii
         if(b < ' ' && !Token.ws(b) || b >= 128) return MainParser.RAW;
-        b = ti.read();
+        b = bi.read();
       }
       // all characters were of type ascii
       return MainParser.TEXT;

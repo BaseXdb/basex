@@ -1,6 +1,5 @@
 package org.basex;
 
-import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -33,7 +32,7 @@ public abstract class BaseXTest extends MainTest {
   @Test
   public void queryFile() throws IOException {
     final String query = "1";
-    INPUT.write(token(query));
+    INPUT.write(query);
     equals(query, INPUT.path());
   }
 
@@ -48,7 +47,7 @@ public abstract class BaseXTest extends MainTest {
         "-qdeclare variable $a external; declare variable $b external; $a+$b");
     equals("3", "-ba=1", "-bb=2",
         "-qdeclare variable $a external; declare variable $b external; $a+$b");
-    INPUT.write(token("declare variable $a external; $a"));
+    INPUT.write("declare variable $a external; $a");
     equals("4", "-ba=4", INPUT.toString());
     equals("5,6;7'", "-ba=5,6;7'", "-qdeclare variable $a external; $a");
     // bind variables with namespaces
@@ -85,7 +84,7 @@ public abstract class BaseXTest extends MainTest {
   @Test
   public void input() throws IOException {
     final String in = "<X/>";
-    INPUT.write(token(in));
+    INPUT.write(in);
     equals(in, "-i" + INPUT, "-q.");
     equals(in, "-i" + in, "-q.");
   }
@@ -115,7 +114,7 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void commands() throws IOException {
-    INPUT.write(token("xquery 1" + Prop.NL + "xquery 2" + Prop.NL));
+    INPUT.write("xquery 1" + Prop.NL + "xquery 2" + Prop.NL);
     equals("12", "-c" + INPUT.path());
   }
 
@@ -183,7 +182,7 @@ public abstract class BaseXTest extends MainTest {
   @Test
   public void chop() throws IOException {
     final String in = "<a> CHOP </a>";
-    INPUT.write(token(in));
+    INPUT.write(in);
     equals(in, "-w", "-i" + INPUT, "-q.");
   }
 

@@ -17,7 +17,7 @@ public final class BufferOutput extends OutputStream {
   /** Byte buffer. */
   private final byte[] buffer;
   /** Reference to the data output stream. */
-  private final OutputStream os;
+  private final OutputStream out;
   /** Current buffer position. */
   private int pos;
 
@@ -26,27 +26,27 @@ public final class BufferOutput extends OutputStream {
    * @param file target file
    * @throws IOException I/O exception
    */
-  public BufferOutput(final String file) throws IOException {
-    this(new FileOutputStream(file), IO.BLOCKSIZE);
+  public BufferOutput(final IOFile file) throws IOException {
+    this(file.outputStream());
   }
 
   /**
    * Constructor with a default buffer size.
-   * @param os the stream to write to
+   * @param out the stream to write to
    */
-  public BufferOutput(final OutputStream os) {
-    this(os, IO.BLOCKSIZE);
+  public BufferOutput(final OutputStream out) {
+    this(out, IO.BLOCKSIZE);
   }
 
   /**
    * Constructor with a specific buffer size.
-   * @param os the stream to write to
-   * @param bufs buffer size
+   * @param out the stream to write to
+   * @param bufsize buffer size
    */
-  public BufferOutput(final OutputStream os, final int bufs) {
-    this.os = os;
-    buffer = new byte[bufs];
-    bufsize = bufs;
+  BufferOutput(final OutputStream out, final int bufsize) {
+    this.out = out;
+    this.bufsize = bufsize;
+    buffer = new byte[bufsize];
   }
 
   @Override
@@ -56,14 +56,22 @@ public final class BufferOutput extends OutputStream {
   }
 
   @Override
+  public void write(final byte[] b) throws IOException {
+    super.write(b);
+  }
+
+  @Override
   public void flush() throws IOException {
-    os.write(buffer, 0, pos);
+    out.write(buffer, 0, pos);
     pos = 0;
   }
 
   @Override
   public void close() throws IOException {
-    flush();
-    os.close();
+    try {
+      flush();
+    } finally {
+      out.close();
+    }
   }
 }

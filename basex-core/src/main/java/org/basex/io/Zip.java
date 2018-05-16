@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.zip.*;
 
 import org.basex.core.jobs.*;
+import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -65,7 +66,6 @@ public final class Zip extends Job {
     total = size();
     curr = 0;
     try(ZipInputStream in = new ZipInputStream(file.inputStream())) {
-      final byte[] data = new byte[IO.BLOCKSIZE];
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
         final IOFile trg = new IOFile(target, ze.getName());
@@ -73,9 +73,7 @@ public final class Zip extends Job {
           trg.md();
         } else {
           trg.parent().md();
-          try(OutputStream out = new FileOutputStream(trg.path())) {
-            for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
-          }
+          trg.write(in);
         }
       }
     }
@@ -91,8 +89,7 @@ public final class Zip extends Job {
     if(!(file instanceof IOFile)) throw new FileNotFoundException(file.path());
 
     curr = 0;
-    try(ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
-        new FileOutputStream(file.path())))) {
+    try(ZipOutputStream out = new ZipOutputStream(new BufferOutput((IOFile) file))) {
       // use simple, fast compression
       out.setLevel(1);
       // loop through all files

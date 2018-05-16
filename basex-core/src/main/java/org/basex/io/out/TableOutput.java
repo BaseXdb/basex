@@ -36,7 +36,7 @@ public final class TableOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public TableOutput(final MetaData md, final String fn) throws IOException {
-    os = new FileOutputStream(md.dbfile(fn).file());
+    os = md.dbfile(fn).outputStream();
     meta = md;
     file = fn;
   }

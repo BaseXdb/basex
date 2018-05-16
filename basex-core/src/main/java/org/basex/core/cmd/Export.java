@@ -85,39 +85,39 @@ public final class Export extends Command {
     root.md();
 
     // XML documents
-    final IntList il = data.resources.docs();
+    final IntList docs = data.resources.docs();
     // raw files
-    final IOFile bin;
-    final StringList desc;
+    final IOFile source;
+    final StringList files;
     if(data.inMemory()) {
-      bin = null;
-      desc = new StringList();
+      source = null;
+      files = new StringList();
     } else {
-      bin = data.meta.binaries();
-      desc = bin.descendants();
+      source = data.meta.binaries();
+      files = source.descendants();
     }
 
     if(export != null) {
       export.progPos = 0;
-      export.progSize = il.size() + desc.size();
+      export.progSize = docs.size() + files.size();
     }
 
     // XML documents
-    final HashSet<String> exported = new HashSet<>();
-    final int is = il.size();
+    final HashSet<String> target = new HashSet<>();
+    final int is = docs.size();
     for(int i = 0; i < is; i++) {
-      final int pre = il.get(i);
+      final int pre = docs.get(i);
       // create file path
-      final IOFile fl = root.resolve(Token.string(data.text(pre, true)));
+      final IOFile io = root.resolve(Token.string(data.text(pre, true)));
       if(export != null) {
         export.checkStop();
-        export.progFile = fl;
+        export.progFile = io;
       }
       // create dir if necessary
-      fl.parent().md();
+      io.parent().md();
 
       // serialize file
-      try(PrintOutput po = new PrintOutput(unique(exported, fl.path()))) {
+      try(PrintOutput po = new PrintOutput(unique(target, io.path()))) {
         try(Serializer ser = Serializer.get(po, sopts)) {
           ser.serialize(new DBNode(data, pre));
         }
@@ -127,14 +127,13 @@ public final class Export extends Command {
     }
 
     // export raw files
-    for(final String s : desc) {
-      final IOFile fl = new IOFile(root.path(), s);
+    for(final String file : files) {
+      final IOFile io = new IOFile(root.path(), file);
       if(export != null) {
         export.checkStop();
-        export.progFile = fl;
+        export.progFile = io;
       }
-      final String u = unique(exported, fl.path());
-      new IOFile(bin, s).copyTo(new IOFile(u));
+      new IOFile(source, file).copyTo(unique(target, io.path()));
 
       if(export != null) export.progPos++;
     }
@@ -168,17 +167,17 @@ public final class Export extends Command {
   /**
    * Returns a unique file path.
    * @param exp exported names
-   * @param fp file path
+   * @param file file path
    * @return unique path
    */
-  private static String unique(final HashSet<String> exp, final String fp) {
+  private static IOFile unique(final HashSet<String> exp, final String file) {
     int c = 1;
-    String path = fp;
+    String path = file;
     while(exp.contains(path)) {
-      path = fp.indexOf('.') == -1 ? fp + '(' + ++c + ')' :
-           fp.replaceAll("(.*)\\.(.*)", "$1(" + ++c + ").$2");
+      path = file.indexOf('.') == -1 ? file + '(' + ++c + ')' :
+           file.replaceAll("(.*)\\.(.*)", "$1(" + ++c + ").$2");
     }
     exp.add(path);
-    return path;
+    return new IOFile(path);
   }
 }

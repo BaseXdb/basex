@@ -152,7 +152,7 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     try {
       conn.setRequestMethod(method);
-      return read(new BufferInput(conn.getInputStream()));
+      return read(conn.getInputStream());
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {
@@ -214,31 +214,31 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   protected static String read(final InputStream is) throws IOException {
-    return is == null ? "" : string(new BufferInput(is).content());
+    return is == null ? "" : string(BufferInput.get(is).content());
   }
 
   /**
    * Executes the specified PUT request.
-   * @param u url
+   * @param url url
    * @param is input stream
    * @throws IOException I/O exception
    */
-  protected static void put(final String u, final InputStream is) throws IOException {
-    put(u, is, null);
+  protected static void put(final String url, final InputStream is) throws IOException {
+    put(url, is, null);
   }
 
   /**
    * Executes the specified PUT request.
-   * @param u url
+   * @param url url
    * @param is input stream
    * @param type media type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
-  protected static void put(final String u, final InputStream is, final MediaType type)
+  protected static void put(final String url, final InputStream is, final MediaType type)
       throws IOException {
 
-    final IOUrl url = new IOUrl(rootUrl + u);
-    final HttpURLConnection conn = (HttpURLConnection) url.connection();
+    final IOUrl io = new IOUrl(rootUrl + url);
+    final HttpURLConnection conn = (HttpURLConnection) io.connection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
     if(type != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, type.toString());

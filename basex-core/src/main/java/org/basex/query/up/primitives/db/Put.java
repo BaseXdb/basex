@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -54,7 +55,7 @@ public final class Put extends DBUpdate {
 
     final int pl = paths.size();
     for(int p = 0; p < pl; p++) {
-      final String path = paths.get(p);
+      final IOFile path = new IOFile(paths.get(p));
       final DBNode node = new DBNode(data, pre);
       try(PrintOutput po = new PrintOutput(path)) {
         try(Serializer ser = Serializer.get(po, options.get(p))) {

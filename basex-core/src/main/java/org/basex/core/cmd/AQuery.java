@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
+import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.dot.*;
@@ -216,7 +217,7 @@ public abstract class AQuery extends Command {
     // show dot plan
     try {
       if(options.get(MainOptions.DOTPLAN)) {
-        try(BufferOutput bo = new BufferOutput("plan.dot")) {
+        try(BufferOutput bo = new BufferOutput(new IOFile("plan.dot"))) {
           try(DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
             d.serialize(qp.plan());
           }

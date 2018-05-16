@@ -180,7 +180,7 @@ public final class ClientListener extends Thread implements ClientInfo {
       send(true);
 
       // evaluate login data
-      in = new BufferInput(socket.getInputStream());
+      in = BufferInput.get(socket.getInputStream());
       // receive {USER}0{DIGEST-HASH}0
       final String name = in.readString(), hash = in.readString();
       final User user = context.users.get(name);

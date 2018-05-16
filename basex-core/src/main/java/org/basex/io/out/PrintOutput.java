@@ -4,6 +4,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.io.*;
+
 /**
  * This class is a stream-wrapper for textual data encoded in UTF8.
  *
@@ -11,32 +13,27 @@ import java.io.*;
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {
-  /** Output stream reference. */
+  /** Output stream reference (can be {@code null}). */
   protected final OutputStream os;
   /** Maximum numbers of bytes to write. */
   protected long max = Long.MAX_VALUE;
   /** Number of bytes written. */
   protected long size;
 
-  /** Protected default constructor. */
-  PrintOutput() {
-    this((OutputStream) null);
-  }
-
   /**
    * Constructor, given a filename.
-   * @param fn filename
+   * @param file file
    * @throws IOException I/O exception
    */
-  public PrintOutput(final String fn) throws IOException {
-    this(new BufferOutput(fn));
+  public PrintOutput(final IOFile file) throws IOException {
+    this(new BufferOutput(file));
   }
 
   /**
    * Constructor, given an output stream.
-   * @param os output stream reference
+   * @param os output stream reference (can be {@code null})
    */
-  protected PrintOutput(final OutputStream os) {
+  PrintOutput(final OutputStream os) {
     this.os = os;
   }
 

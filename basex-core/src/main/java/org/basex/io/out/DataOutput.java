@@ -15,41 +15,41 @@ import org.basex.util.list.*;
  */
 public final class DataOutput extends OutputStream {
   /** The underlying output stream. */
-  private final OutputStream os;
+  private final OutputStream out;
   /** Number of written bytes. */
   private long size;
 
   /**
    * Constructor, specifying an output stream.
-   * @param os output stream to operate on
+   * @param out the stream to write to
    */
-  public DataOutput(final OutputStream os) {
-    this.os = os;
+  public DataOutput(final OutputStream out) {
+    this.out = out;
   }
 
   /**
    * Constructor, specifying a file.
-   * @param db name of the database
+   * @param input input to be read
    * @throws IOException I/O exception
    */
-  public DataOutput(final IOFile db) throws IOException {
-    this(db, IO.BLOCKSIZE);
+  public DataOutput(final IOFile input) throws IOException {
+    this(input, IO.BLOCKSIZE);
   }
 
   /**
    * Constructor, specifying a file and a buffer size.
    * The specified buffer size is used.
-   * @param db name of the database
-   * @param bufs size of the buffer to use
+   * @param input input to be read
+   * @param bufsize size of the buffer to use
    * @throws IOException I/O exception
    */
-  public DataOutput(final IOFile db, final int bufs) throws IOException {
-    os = new BufferOutput(new FileOutputStream(db.file()), bufs);
+  public DataOutput(final IOFile input, final int bufsize) throws IOException {
+    out = new BufferOutput(input.outputStream(), bufsize);
   }
 
   @Override
   public void write(final int b) throws IOException {
-    os.write(b);
+    out.write(b);
     ++size;
   }
 
@@ -235,11 +235,11 @@ public final class DataOutput extends OutputStream {
 
   @Override
   public void flush() throws IOException {
-    os.flush();
+    out.flush();
   }
 
   @Override
   public void close() throws IOException {
-    os.close();
+    out.close();
   }
 }

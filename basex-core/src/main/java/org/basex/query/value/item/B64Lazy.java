@@ -40,7 +40,7 @@ public final class B64Lazy extends B64 implements Lazy {
   public BufferInput input(final InputInfo info) throws QueryException {
     if(isCached()) return super.input(info);
     try {
-      return new BufferInput(input);
+      return BufferInput.get(input);
     } catch(final IOException ex) {
       throw error.get(info, ex);
     }

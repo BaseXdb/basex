@@ -32,7 +32,7 @@ public final class IOStream extends IO {
    */
   public IOStream(final InputStream is, final String path) {
     super(path);
-    input = is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
+    input = BufferInput.get(is);
   }
 
   @Override

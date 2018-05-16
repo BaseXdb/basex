@@ -13,6 +13,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayOutput extends PrintOutput {
+  /**
+   * Constructor.
+   */
+  public ArrayOutput() {
+    super((OutputStream) null);
+  }
+
   /** Byte buffer. */
   private byte[] buffer = new byte[Array.CAPACITY];
 

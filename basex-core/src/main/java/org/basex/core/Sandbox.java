@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -122,7 +121,7 @@ public abstract class Sandbox {
    */
   protected static void write(final IOFile file, final String data) {
     try {
-      file.write(token(data));
+      file.write(data);
     } catch(final IOException ex) {
       Util.stack(ex);
       throw new AssertionError(ex.getMessage(), ex);

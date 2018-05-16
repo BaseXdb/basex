@@ -38,7 +38,7 @@ public final class ZipModuleTest extends AdvancedQueryTest {
   @BeforeClass
   public static void init() throws IOException {
     // create temporary file
-    new IOFile(TMPFILE).write(token("!"));
+    new IOFile(TMPFILE).write("!");
   }
 
   /** Finishes the test. */
