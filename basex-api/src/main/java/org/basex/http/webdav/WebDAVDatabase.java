@@ -25,7 +25,7 @@ final class WebDAVDatabase extends WebDAVFolder {
   }
 
   @Override
-  protected void del() throws IOException {
+  protected void remove() throws IOException {
     service.dropDb(meta.db);
   }
 

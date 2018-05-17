@@ -127,7 +127,6 @@ final class WebDAVNotAuthorized implements FolderResource, LockableResource {
 
   @Override
   public void unlock(final String s) {
-
   }
 
   @Override

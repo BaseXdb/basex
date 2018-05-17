@@ -52,7 +52,7 @@ abstract class WebDAVCode<E> {
     try {
       return eval();
     } catch(final Exception ex) {
-      Util.errln(ex);
+      Util.stack(ex);
       return null;
     }
   }

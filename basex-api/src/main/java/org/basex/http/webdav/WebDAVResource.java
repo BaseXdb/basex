@@ -6,16 +6,15 @@ import static org.basex.http.webdav.WebDAVUtils.*;
 import java.io.*;
 import java.util.*;
 
-import com.bradmcevoy.http.LockInfo.LockDepth;
-import com.bradmcevoy.http.LockInfo.LockScope;
-import com.bradmcevoy.http.LockInfo.LockType;
-import com.bradmcevoy.http.Request.Method;
-
+import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
 
 import com.bradmcevoy.http.*;
+import com.bradmcevoy.http.LockInfo.*;
+import com.bradmcevoy.http.Request.*;
 import com.bradmcevoy.http.exceptions.*;
 
 /**
@@ -83,7 +82,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        del();
+        remove();
       }
     }.eval();
   }
@@ -95,10 +94,11 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        if(target instanceof WebDAVRoot)
+        if(target instanceof WebDAVRoot) {
           copyToRoot(name);
-        else if(target instanceof WebDAVFolder)
+        } else if(target instanceof WebDAVFolder) {
           copyTo((WebDAVFolder) target, name);
+        }
       }
     }.eval();
   }
@@ -110,10 +110,11 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        if(target instanceof WebDAVRoot)
+        if(target instanceof WebDAVRoot) {
           moveToRoot(name);
-        else if(target instanceof WebDAVFolder)
+        } else if(target instanceof WebDAVFolder) {
           moveTo((WebDAVFolder) target, name);
+        }
       }
     }.eval();
   }
@@ -123,7 +124,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
    *
    * @param timeout - in seconds, or null
    * @param lockInfo lock info
-   * @return - a result containing the token representing the lock if successful,
+   * @return result containing the token representing the lock if successful,
    * otherwise a failure reason code
    */
   @Override
@@ -133,7 +134,21 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     return new WebDAVCode<LockResult>(this) {
       @Override
       public LockResult get() {
-        return lockResource(timeout, lockInfo);
+        try {
+          final String tokenId = service.locking.lock(
+            meta.db,
+            meta.path,
+            lockInfo.scope.name().toLowerCase(Locale.ENGLISH),
+            lockInfo.type.name().toLowerCase(Locale.ENGLISH),
+            lockInfo.depth.name().toLowerCase(Locale.ENGLISH),
+            lockInfo.lockedByUser,
+            timeout.getSeconds()
+          );
+          return success(new LockToken(tokenId, lockInfo, timeout));
+        } catch(final IOException ex) {
+          Util.stack(ex);
+          return failed(FailureReason.ALREADY_LOCKED);
+        }
       }
     }.evalNoEx();
   }
@@ -150,48 +165,49 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     return new WebDAVCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
-        return refresh(token);
+        service.locking.refreshLock(token);
+        final LockToken lock = parse(service.locking.locks(token));
+        return lock == null ? failed(FailureReason.ALREADY_LOCKED) : success(lock);
       }
     }.evalNoEx();
   }
 
   /**
-   * If the resource is currently locked, and the tokenId  matches the current
-   * one, unlock the resource.
-   *
-   * @param tokenId lock token
+   * If the resource is currently locked, and the token matches the current one,
+   * unlock the resource.
+   * @param token lock token
    */
   @Override
-  public void unlock(final String tokenId) throws NotAuthorizedException,
+  public void unlock(final String token) throws NotAuthorizedException,
       PreConditionFailedException {
     new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        service.locking.unlock(tokenId);
+        service.locking.unlock(token);
       }
     }.evalNoEx();
   }
 
   /**
    * Get the active lock for the current resource.
-   * @return - the current lock if the resource is locked, or null
+   * @return the current lock if the resource is locked, {@code null} otherwise
    */
   @Override
   public LockToken getCurrentLock() {
     return new WebDAVCode<LockToken>(this) {
       @Override
       public LockToken get() throws IOException {
-        return getCurrentActiveLock();
+        return parse(service.locking.locks(meta.db, meta.path));
       }
     }.evalNoEx();
   }
 
   /**
-   * Delete document or folder.
+   * Deletes a document or folder.
    * @throws IOException I/O exception
    */
-  void del() throws IOException {
-    service.delete(meta.db, meta.path);
+  void remove() throws IOException {
+    service.remove(meta.db, meta.path);
   }
 
   /**
@@ -226,7 +242,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   void moveToRoot(final String n) throws IOException {
     // folder is moved to the root: create new database with it
     copyToRoot(n);
-    del();
+    remove();
   }
 
   /**
@@ -242,120 +258,48 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
     } else {
       // folder is moved to a folder in another database
       copyTo(f, n);
-      del();
+      remove();
     }
-  }
-
-  /**
-   * Lock the current resource.
-   * @param timeout lock timeout
-   * @param lockInfo lock info
-   * @return lock result
-   */
-  private LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo) {
-    try {
-      final String tokenId = service.locking.lock(
-        meta.db,
-        meta.path,
-        lockInfo.scope.name().toLowerCase(Locale.ENGLISH),
-        lockInfo.type.name().toLowerCase(Locale.ENGLISH),
-        lockInfo.depth.name().toLowerCase(Locale.ENGLISH),
-        lockInfo.lockedByUser,
-        timeout.getSeconds()
-      );
-      return success(new LockToken(tokenId, lockInfo, timeout));
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return failed(FailureReason.ALREADY_LOCKED);
-    }
-  }
-
-  /**
-   * Get the active lock on the current resource.
-   * @return the token of the active lock or {@code null} if resource is not locked
-   * @throws IOException I/O exception
-   */
-  private LockToken getCurrentActiveLock() throws IOException {
-    final String lockInfoStr = service.locking.lock(meta.db, meta.path);
-    return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
-  }
-
-  /**
-   * Renew a lock with the given token.
-   * @param token lock token
-   * @return lock result
-   * @throws IOException I/O exception
-   */
-  private LockResult refresh(final String token) throws IOException {
-    service.locking.refreshLock(token);
-    final String lockInfoStr = service.locking.lock(token);
-    final LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
-    return lockToken == null ? failed(FailureReason.ALREADY_LOCKED) : success(lockToken);
   }
 
   /**
    * Parse the lock info.
-   * @param lockInfo lock info as a string
-   * @return parsed lock info bean
+   * @param locks lock infos
+   * @return lock token (can be {@code null})
    * @throws IOException I/O exception
    */
-  private static LockToken parseLockInfo(final String lockInfo) throws IOException {
+  private LockToken parse(final Value locks) throws IOException {
+    if(locks.isEmpty()) return null;
     try {
-      final XMLReader reader = XMLReaderFactory.createXMLReader();
-      final LockTokenSaxHandler handler = new LockTokenSaxHandler();
-      reader.setContentHandler(handler);
-      reader.parse(new InputSource(new StringReader(lockInfo)));
-      return handler.lockToken;
-    } catch(final SAXException ex) {
-      Util.errln("Error while parsing lock info: %", ex);
-      return null;
-    }
-  }
-
-  /** SAX handler for lock token. */
-  private static final class LockTokenSaxHandler extends DefaultHandler {
-    /** Parsed lock token. */
-    private final LockToken lockToken = new LockToken(null, new LockInfo(), null);
-    /** Current element name. */
-    private String elementName;
-
-    @Override
-    public void startElement(final String uri, final String localName, final String name,
-        final Attributes attributes) throws SAXException {
-      elementName = localName;
-      super.startElement(uri, localName, name, attributes);
-    }
-
-    @Override
-    public void endElement(final String uri, final String localName, final String qName)
-        throws SAXException {
-      elementName = null;
-      super.endElement(uri, localName, qName);
-    }
-
-    @Override
-    public void characters(final char[] ch, final int start, final int length) {
-      final String v = String.valueOf(ch, start, length);
-      switch(elementName) {
-        case "token":
-          lockToken.tokenId = v;
-          break;
-        case "scope":
-          lockToken.info.scope = LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
-          break;
-        case "type":
-          lockToken.info.type = LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
-          break;
-        case "depth":
-          lockToken.info.depth = LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
-          break;
-        case "owner":
-          lockToken.info.lockedByUser = v;
-          break;
-        case "timeout":
-          lockToken.timeout = LockTimeout.parseTimeout(v);
-          break;
+      final LockToken lock = new LockToken(null, new LockInfo(), null);
+      final Item info = locks.itemAt(0);
+      for(Item item : new QueryProcessor("*", service.conn.context).context(info).value()) {
+        final ANode node = (ANode) item;
+        final String value = Token.string(node.string());
+        switch(Token.string(node.qname().local())) {
+          case "token":
+            lock.tokenId = value;
+            break;
+          case "scope":
+            lock.info.scope = LockScope.valueOf(value.toUpperCase(Locale.ENGLISH));
+            break;
+          case "type":
+            lock.info.type = LockType.valueOf(value.toUpperCase(Locale.ENGLISH));
+            break;
+          case "depth":
+            lock.info.depth = LockDepth.valueOf(value.toUpperCase(Locale.ENGLISH));
+            break;
+          case "owner":
+            lock.info.lockedByUser = value;
+            break;
+          case "timeout":
+            lock.timeout = LockTimeout.parseTimeout(value);
+            break;
+        }
       }
+      return lock;
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
     }
   }
 }

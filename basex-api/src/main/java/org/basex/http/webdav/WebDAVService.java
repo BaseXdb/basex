@@ -41,7 +41,6 @@ final class WebDAVService {
     WEBDAV = sb.toString();
   }
 
-
   /** HTTP connection. */
   final HTTPConnection conn;
   /** Locking service. */
@@ -143,7 +142,7 @@ final class WebDAVService {
    * @param path path
    * @throws IOException I/O exception
    */
-  void delete(final String db, final String path) throws IOException {
+  void remove(final String db, final String path) throws IOException {
     final LocalSession session = session();
     session.execute(new Open(db));
     session.execute(new Delete(path));

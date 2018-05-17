@@ -187,11 +187,11 @@ final class DataUpdates {
 
     /* optional: export file if...
      * - WRITEBACK option is turned on
-     * - an original file path exists
+     * - an original file path exists (and does not start with a tilde)
      * - data is a main-memory instance
      */
     final String original = data.meta.original;
-    if(!original.isEmpty() && data.inMemory()) {
+    if(!(original.isEmpty() || original.startsWith("~")) && data.inMemory()) {
       if(writeback) {
         try {
           Export.export(data, original, qc.context.options, null);
