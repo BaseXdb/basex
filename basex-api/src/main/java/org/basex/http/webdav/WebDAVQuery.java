@@ -32,6 +32,8 @@ final class WebDAVQuery {
   private final String query;
   /** Bindings. */
   private final HashMap<String, String> bindings = new HashMap<>();
+  /** Import library. */
+  private boolean library;
 
   static {
     try {
@@ -65,6 +67,15 @@ final class WebDAVQuery {
   }
 
   /**
+   * Import locking library.
+   * @return self reference
+   */
+  WebDAVQuery lock() {
+    library = true;
+    return this;
+  }
+
+  /**
    * Binds a variable.
    * @param name name of variable (without '$' sign).
    * @param value value of variable
@@ -91,12 +102,22 @@ final class WebDAVQuery {
    */
   Value execute(final HTTPConnection conn) throws IOException {
     try(QueryProcessor qp = new QueryProcessor(toString(), conn.context)) {
-      qp.qc.resources.addData(db);
+      // add data reference and library module
+      final QueryContext qc = qp.qc;
+      qc.resources.addData(db);
       for(final Entry<String, String> entry : entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }
-      qp.qc.parseLibrary(module, FILE, qp.sc);
-      return qp.value();
+      if(library) qc.parseLibrary(module, FILE, qp.sc);
+
+      // run query, return result
+      qc.register(qc.context);
+      try {
+        return qp.value();
+      } finally {
+        qp.close();
+        qp.unregister(qc.context);
+      }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
@@ -105,9 +126,9 @@ final class WebDAVQuery {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("declare option db:mainmem 'true';");
-    for(final String v : bindings.keySet()) {
-      sb.append("declare variable $").append(v).append(" external;");
+    if(library) sb.append("declare option db:mainmem 'true';");
+    for(final String name : bindings.keySet()) {
+      sb.append("declare variable $").append(name).append(" external;");
     }
     return sb.append(query).toString();
   }

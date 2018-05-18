@@ -49,7 +49,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   @Override
   public boolean authorise(final Request request, final Method method, final Auth auth) {
-    return WebDAVService.authorize(meta.db);
+    return true;
   }
 
   @Override
@@ -88,8 +88,8 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   }
 
   @Override
-  public void copyTo(final CollectionResource target, final String name) throws BadRequestException,
-      NotAuthorizedException {
+  public void copyTo(final CollectionResource target, final String name)
+      throws BadRequestException, NotAuthorizedException {
 
     new WebDAVCode<Object>(this) {
       @Override
@@ -104,8 +104,8 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   }
 
   @Override
-  public void moveTo(final CollectionResource target, final String name) throws BadRequestException,
-      NotAuthorizedException {
+  public void moveTo(final CollectionResource target, final String name)
+      throws BadRequestException, NotAuthorizedException {
 
     new WebDAVCode<Object>(this) {
       @Override
@@ -154,14 +154,14 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   }
 
   /**
-   * Renew the lock and return new lock info.
-   *
+   * Renews the lock and returns new lock info.
    * @param token lock token
    * @return lock result
    */
   @Override
-  public LockResult refreshLock(final String token) throws NotAuthorizedException,
-      PreConditionFailedException {
+  public LockResult refreshLock(final String token)
+      throws NotAuthorizedException, PreConditionFailedException {
+
     return new WebDAVCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
@@ -173,13 +173,13 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   }
 
   /**
-   * If the resource is currently locked, and the token matches the current one,
-   * unlock the resource.
+   * Unlock the resource if the resource is currently locked and the token matches the current one.
    * @param token lock token
    */
   @Override
-  public void unlock(final String token) throws NotAuthorizedException,
-      PreConditionFailedException {
+  public void unlock(final String token)
+      throws NotAuthorizedException, PreConditionFailedException {
+
     new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
@@ -247,17 +247,17 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   /**
    * Move folder to another folder.
-   * @param f target folder
-   * @param n new name of the folder
+   * @param folder target folder
+   * @param name new name of the folder
    * @throws IOException I/O exception
    */
-  private void moveTo(final WebDAVFolder f, final String n) throws IOException {
-    if(f.meta.db.equals(meta.db)) {
+  private void moveTo(final WebDAVFolder folder, final String name) throws IOException {
+    if(folder.meta.db.equals(meta.db)) {
       // folder is moved to a folder in the same database
-      rename(f.meta.path + SEP + n);
+      rename(folder.meta.path + SEP + name);
     } else {
       // folder is moved to a folder in another database
-      copyTo(f, n);
+      copyTo(folder, name);
       remove();
     }
   }

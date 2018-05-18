@@ -27,8 +27,6 @@ import org.basex.util.list.*;
  * @author Dimitar Popov
  */
 final class WebDAVService {
-  /** Name of the database with the WebDAV locks. */
-  private static final String WEBDAV_DB = "~webdav";
   /** Static WebDAV character map. */
   private static final String WEBDAV;
 
@@ -63,15 +61,6 @@ final class WebDAVService {
    */
   void close() {
     if(ls != null) ls.close();
-  }
-
-  /**
-   * Checks if the user is authorized to perform the given action.
-   * @param db database (can be {@code null})
-   * @return {@code true} if the user is authorized
-   */
-  static boolean authorize(final String db) {
-    return !WEBDAV_DB.equals(db);
   }
 
   /**
@@ -326,8 +315,7 @@ final class WebDAVService {
    */
   List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-        _DB_LIST_DETAILS.args() + "[. != $db] ! (text(), @modified-date)", _OUT_TAB.args()));
-    query.bind("db", WEBDAV_DB);
+        _DB_LIST_DETAILS.args() + " ! (text(), @modified-date)", _OUT_TAB.args()));
 
     final String[] result = results(query);
     final List<WebDAVResource> dbs = new ArrayList<>();
@@ -457,13 +445,13 @@ final class WebDAVService {
    * @return object representing the newly added XML
    * @throws IOException I/O exception
    */
-  private WebDAVResource addXML(final String db, final String path, final InputStream in)
+  private WebDAVResource replace(final String db, final String path, final InputStream in)
       throws IOException {
 
     final LocalSession session = session();
     session.execute(new Set(MainOptions.CHOP, false));
     session.execute(new Open(db));
-    session.add(path, in);
+    session.replace(path, in);
     return WebDAVFactory.file(this, new WebDAVMetaData(db, path, timestamp(db), false,
       MediaType.APPLICATION_XML, null));
   }
@@ -502,7 +490,7 @@ final class WebDAVService {
       if(peek(bi) == '<') {
         try {
           // add input as XML document
-          return db == null ? createDb(dbName(path), bi) : addXML(db, path, bi);
+          return db == null ? createDb(dbName(path), bi) : replace(db, path, bi);
         } catch(final IOException ex) {
           // reset stream if it did not work out
           try {
@@ -515,7 +503,7 @@ final class WebDAVService {
         }
       }
 
-      // add input as raw file
+      // add input as raw file (do this also if an error occurred, and if the stream could be reset)
       final String d;
       if(db == null) {
         d = dbName(path);

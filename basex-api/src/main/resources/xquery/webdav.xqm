@@ -36,8 +36,7 @@ declare function w:is-prefix(
 };
 
 (:~
- : Checks if a lock with the given path has locked
- : (possibly indirectly) another resource.
+ : Checks if a lock with the given path has locked (possibly indirectly) another resource.
  : @param  $ancestor    ancestor resource
  : @param  $descendant  descendant resource
  : @param  $depth       depth
@@ -50,19 +49,15 @@ declare function w:has-locked(
 ) as xs:boolean {
   let $ancestor-segments := w:path-segments($ancestor),
       $descendant-segments := w:path-segments($descendant)
-  return
-    switch($depth)
+  return switch($depth)
     case '0'
     case '1'
-      return
-        count($ancestor-segments) + $depth eq count($descendant-segments)
-        and
-        w:is-prefix($ancestor-segments, $descendant-segments)
+      return count($ancestor-segments) + $depth = count($descendant-segments) and
+             w:is-prefix($ancestor-segments, $descendant-segments)
     case 'infinity'
-      return
-        w:is-prefix($ancestor-segments, $descendant-segments)
-   default
-     return false()
+      return w:is-prefix($ancestor-segments, $descendant-segments)
+    default
+      return false()
 };
 
 (:~
@@ -100,20 +95,8 @@ declare function w:in-conflict(
   $lock2  as element(lockinfo)
 ) as xs:boolean {
   (w:has-locked($lock1/path, $lock2/path, $lock1/depth) or
-   w:has-locked($lock2/path, $lock1/path, $lock2/depth))
-  and
-  (w:is-exclusive($lock1) or w:is-exclusive($lock2))
-};
-
-(:~
- : Checks if a lock is exclusive.
- : @param  $lock  lock to check
- : @return result of check
- :)
-declare function w:is-exclusive(
-  $lock  as element(lockinfo)
-) as xs:boolean {
-  $lock/scope = 'exclusive'
+   w:has-locked($lock2/path, $lock1/path, $lock2/depth)) and
+  ($lock1, $lock2)/scope = 'exclusive'
 };
 
 (:~
@@ -170,7 +153,6 @@ declare %updating function w:create-lock(
   $owner    as xs:string,
   $timeout  as xs:string
 ) as empty-sequence() {
-  let $to := min((xs:integer($timeout), 31700000))
   let $lock := element lockinfo {
     element path    { $path },
     element token   { $token },
@@ -178,13 +160,13 @@ declare %updating function w:create-lock(
     element type    { $type },
     element depth   { $depth },
     element owner   { $owner },
-    element timeout { $to (: avoid overflow :) },
-    element expiry  { w:expiry-dateTime($to) }
+    element timeout { $timeout },
+    element expiry  { w:expiry-dateTime(xs:integer($timeout)) }
   }
   return if(w:conflicting-locks($lock)) then (
     error($w:err-locked, 'Resource has a conflicting lock', $path)
   ) else (
-    insert node $lock as last into $w:webdav-db
+    insert node $lock into $w:webdav-db
   )
 };
 

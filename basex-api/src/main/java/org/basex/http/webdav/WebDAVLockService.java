@@ -33,7 +33,7 @@ final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   void unlock(final String token) throws IOException {
-    new WebDAVQuery("w:unlock($token)").bind("token", token).execute(conn);
+    new WebDAVQuery("w:unlock($token)").lock().bind("token", token).execute(conn);
   }
 
   /**
@@ -42,7 +42,7 @@ final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   void refreshLock(final String token) throws IOException {
-    new WebDAVQuery("w:refresh-lock($token)").bind("token", token).execute(conn);
+    new WebDAVQuery("w:refresh-lock($token)").lock().bind("token", token).execute(conn);
   }
 
   /**
@@ -62,14 +62,15 @@ final class WebDAVLockService {
 
     final String token = UUID.randomUUID().toString();
     final WebDAVQuery query = new WebDAVQuery("w:create-lock(" +
-        "$path, $token, $scope, $type, $depth, $owner, $timeout)");
+        "$path, $token, $scope, $type, $depth, $owner, $timeout)").lock();
     query.bind("path", db + SEP + p);
     query.bind("token", token);
     query.bind("scope", scope);
     query.bind("type", type);
     query.bind("depth", depth);
     query.bind("owner", user);
-    query.bind("timeout", to == null ? Long.toString(Long.MAX_VALUE) : to.toString());
+    final long timeout = to == null ? Long.MAX_VALUE : to.longValue();
+    query.bind("timeout", Long.toString(Math.min(31700000, timeout)));
     query.execute(conn);
     return token;
   }
@@ -82,7 +83,7 @@ final class WebDAVLockService {
    */
   Value locks(final String token) throws IOException {
     return WebDAVQuery.hasLocks() ?
-      new WebDAVQuery("w:lock($token)").bind("token", token).execute(conn) : Empty.SEQ;
+      new WebDAVQuery("w:lock($token)").lock().bind("token", token).execute(conn) : Empty.SEQ;
   }
 
   /**
@@ -93,8 +94,8 @@ final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   Value locks(final String db, final String path) throws IOException {
-    return WebDAVQuery.hasLocks() ?
-      new WebDAVQuery("w:locks-on($path)").bind("path", db + SEP + path).execute(conn) : Empty.SEQ;
+    return WebDAVQuery.hasLocks() ? new WebDAVQuery("w:locks-on($path)").lock().
+      bind("path", db + SEP + path).execute(conn) : Empty.SEQ;
   }
 
   /**
@@ -113,7 +114,8 @@ final class WebDAVLockService {
         "<w:scope>exclusive</w:scope>" +
         "<w:depth>infinity</w:depth>" +
         "<w:owner>{ $owner }</w:owner>" +
-      "</w:lockinfo>)").bind("path", db + SEP + p).bind("owner", conn.context.user().name());
+      "</w:lockinfo>)").lock();
+    query.bind("path", db + SEP + p).bind("owner", conn.context.user().name());
     return !query.execute(conn).isEmpty();
   }
 }
