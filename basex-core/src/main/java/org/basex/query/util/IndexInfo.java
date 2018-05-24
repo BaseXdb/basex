@@ -157,7 +157,8 @@ public final class IndexInfo {
         return false;
 
       // estimate costs (tend to worst case)
-      if(data != null) costs = IndexCosts.get(Math.max(1, data.meta.size / 10));
+      if(data != null) costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
+        IndexCosts.get(Math.max(1, data.meta.size / 10));
       root = new ValueAccess(info, search, type, test, db);
     }
 
@@ -187,7 +188,7 @@ public final class IndexInfo {
    * @return costs costs, or {@code null} if index access is not possible
    */
   public IndexCosts costs(final Data data, final IndexToken token) {
-    return enforce() ? IndexCosts.ENFORCE : data.costs(token);
+    return enforce() ? IndexCosts.ENFORCE_STATIC : data.costs(token);
   }
 
   /**

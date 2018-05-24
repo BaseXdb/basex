@@ -10,8 +10,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class IndexCosts implements Comparable<IndexCosts> {
-  /** Enforce index creation. */
-  public static final IndexCosts ENFORCE = new IndexCosts(-1);
+  /** Enforce index creation (static query terms). */
+  public static final IndexCosts ENFORCE_STATIC = new IndexCosts(-2);
+  /** Enforce index creation (dynamic query terms). */
+  public static final IndexCosts ENFORCE_DYNAMIC = new IndexCosts(-1);
   /** No results. */
   public static final IndexCosts ZERO = new IndexCosts(0);
 
@@ -19,7 +21,8 @@ public final class IndexCosts implements Comparable<IndexCosts> {
    * Number of expected results.
    * 0 = no results,
    * 1 = exactly one result,
-   * -1 = unknown,
+   * -1 = dynamic query, unknown (but enforced),
+   * -2 = static query, unknown (but enforced),
    * other values: estimates (the smaller, the better)
    */
   private final int results;
@@ -49,9 +52,8 @@ public final class IndexCosts implements Comparable<IndexCosts> {
    * @return new costs
    */
   public static IndexCosts add(final IndexCosts ic1, final IndexCosts ic2) {
-    if(ic1 == ENFORCE || ic2 == ENFORCE) return ENFORCE;
-    final int r = (ic1 == null ? 0 : ic1.results) + (ic2 == null ? 0 : ic2.results);
-    return get(r >= 0 ? r : Integer.MAX_VALUE);
+    final int r1 = ic1 == null ? 0 : ic1.results, r2 = ic2 == null ? 0 : ic2.results, r = r1 + r2;
+    return r1 < 0 || r2 < 0 ? IndexCosts.ENFORCE_DYNAMIC : get(r >= 0 ? r : Integer.MAX_VALUE);
   }
 
   /**
@@ -68,19 +70,16 @@ public final class IndexCosts implements Comparable<IndexCosts> {
    * @return result of check
    */
   public boolean tooExpensive(final Data data) {
-    return this != ENFORCE && results > data.meta.size;
+    return results > data.meta.size;
   }
 
   @Override
   public int compareTo(final IndexCosts ic) {
-    return this == ENFORCE ? ic == ENFORCE ? 0 : -1 : ic == ENFORCE ? 1 : results - ic.results;
+    return results - ic.results;
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
-    if(this == ENFORCE) sb.append("always");
-    else sb.append(results);
-    return sb.append(']').toString();
+    return Util.className(this) + '[' + results + ']';
   }
 }
