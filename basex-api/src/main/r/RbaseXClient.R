@@ -9,7 +9,6 @@ library(utils)
 library(R6)
 library(openssl)
 library(dplyr)
-library(purrr)
 library(stringr)
 library(magrittr)
 
@@ -17,8 +16,7 @@ BasexClient <- R6Class("BasexClient",
   public = list(
     initialize = function(host, port, username, password) {
       private$sock <- socketConnection(host = "localhost", port = 1984L, 
-                                    open = "w+b", server = FALSE, blocking = TRUE, 
-                                    encoding = "utf-8")
+        open = "w+b", server = FALSE, blocking = TRUE, encoding = "utf-8")
       private$response <- self$str_receive()
       splitted <-strsplit(private$response, "\\:")
       ifelse(length(splitted[[1]]) > 1,
@@ -35,13 +33,15 @@ BasexClient <- R6Class("BasexClient",
       private$void_send(code)
       if (!self$bool_test_sock()) stop("Access denied")},
     command = function(command = command) {
+      bin <- if (grepl("retrieve\\s+", command, ignore.case = TRUE)) TRUE
+      else FALSE
       private$void_send(command)
-      private$result <- self$str_receive()
+      private$result <- self$str_receive(bin = bin)
       private$info <-   self$str_receive()
+      if (class(private$result) == "character") {result <- private$result %>% strsplit("\n")}
+      else result <- private$result
       if (length(private$info) > 0) cat(private$info, "\n")
-      return(list(result = private$result %>% strsplit("\n", fixed = TRUE), 
-                  info = private$info, 
-                  success = self$bool_test_sock()))
+      return(list(result = result, info = private$info, success = self$bool_test_sock()))
     },
     query = function(query = query) {
       return(list(query = Query$new(query, private$get_sock()), success = self$bool_test_sock()))
@@ -51,8 +51,6 @@ BasexClient <- R6Class("BasexClient",
       writeBin(as.raw(0x08), private$sock)
       private$void_send(name)
       private$void_send(input)
-#      writeBin(private$raw_terminated_string(name), private$sock)
-#      writeBin(private$raw_terminated_string(input), private$sock)
       private$info <- self$str_receive()
       return(list(info = private$info, success = self$bool_test_sock()))
     },
@@ -75,8 +73,8 @@ BasexClient <- R6Class("BasexClient",
       private$void_send(path)
       private$void_send(input)
       private$info <- self$str_receive()
+      return(list(info = private$info, success = self$bool_test_sock()))
     },
-    
     bool_test_sock = function(socket) {
       if (missing(socket)) socket <- private$get_sock()
       test <- readBin(socket, what = "raw", n =1)
@@ -87,14 +85,15 @@ BasexClient <- R6Class("BasexClient",
     print = function(...) {
       cat("Socket: ", private$get_sock(), "\n", sep = "")
       invisible(self)},
-    str_receive = function(input, output) {
+    str_receive = function(input, output, bin = FALSE) {
       if (missing(input)) input   <- private$get_sock()
       if (missing(output)) output <- raw(0)
       while ((rd <- readBin(input, what = "raw", n =1)) > 0) {
-        if (rd == 0xff) next
+        if (rd == 0xff) rd <- readBin(input, what = "raw", n =1)
         output <- c(output, rd)
       }
-      ret <- rawToChar(output)
+      if (!bin) ret <- rawToChar(output)
+      else ret <- output
       return(ret)},
     term_string = function(string) {
       return(charToRaw(string) %>% append(0) %>% as.raw())}
@@ -116,14 +115,13 @@ BasexClient <- R6Class("BasexClient",
         streamOut <- raw()
         while (rd_id <= end) { 
           rd <- c(input[rd_id])
-          if (rd == 255 || rd == 0) streamOut <- c(streamOut, c(0x00))
+          if (rd == 255 || rd == 0) streamOut <- c(streamOut, c(0xFF))
           rd_id <- rd_id + 1
           streamOut <- c(streamOut, rd)
         }
       }
       streamOut <- c(streamOut, c(0x00)) %>% as.raw()
       writeBin(streamOut, private$get_sock())
-      
     }
   )
 )
