@@ -1,18 +1,11 @@
 package org.basex.http.webdav;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 
-import org.basex.build.*;
-import org.basex.data.*;
-import org.basex.http.*;
-import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.value.*;
-import org.basex.util.*;
+import org.basex.api.client.*;
+import org.basex.core.cmd.*;
 
 /**
  * WebDAV query.
@@ -21,42 +14,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class WebDAVQuery {
-  /** Path to WebDAV module. */
-  private static final String FILE = "xquery/webdav.xqm";
-  /** Path to WebDAV database. */
-  private static Data db;
-  /** Module contents. */
-  private static String module;
-
   /** String query. */
   private final String query;
   /** Bindings. */
   private final HashMap<String, String> bindings = new HashMap<>();
-  /** Import library. */
-  private boolean library;
-
-  static {
-    try {
-      final ClassLoader cl = WebDAVQuery.class.getClassLoader();
-      final InputStream is = cl.getResourceAsStream(FILE);
-      if(is == null) throw new IOException("WebDAV module not found: " + FILE);
-      module = string(new IOStream(is).read());
-
-      final IO io = new IOContent("<webdav/>");
-      io.name("~webdav~");
-      db = MemBuilder.build(io);
-    } catch(final Exception ex) {
-      throw Util.notExpected("Could not initialize WebDAV");
-    }
-  }
-
-  /**
-   * Checks if the database contains any lock entries.
-   * @return result of check
-   */
-  static boolean hasLocks() {
-    return db.meta.size > 2;
-  }
 
   /**
    * Constructor.
@@ -64,15 +25,6 @@ final class WebDAVQuery {
    */
   WebDAVQuery(final String query) {
     this.query = query;
-  }
-
-  /**
-   * Import locking library.
-   * @return self reference
-   */
-  WebDAVQuery lock() {
-    library = true;
-    return this;
   }
 
   /**
@@ -87,46 +39,22 @@ final class WebDAVQuery {
   }
 
   /**
-   * Returns all variable bindings.
-   * @return variable bindings
+   * Executes the query and returns the result as string.
+   * @param session user session
+   * @return result
+   * @throws IOException I/O execution
    */
-  Set<Entry<String, String>> entries() {
-    return bindings.entrySet();
-  }
-
-  /**
-   * Executes a query and returns the resulting items.
-   * @param conn HTTP connection
-   * @return resulting values
-   * @throws IOException error during query execution
-   */
-  Value execute(final HTTPConnection conn) throws IOException {
-    try(QueryProcessor qp = new QueryProcessor(toString(), conn.context)) {
-      // add data reference and library module
-      final QueryContext qc = qp.qc;
-      qc.resources.addData(db);
-      for(final Entry<String, String> entry : entries()) {
-        qp.bind(entry.getKey(), entry.getValue());
-      }
-      if(library) qc.parseLibrary(module, FILE, qp.sc);
-
-      // run query, return result
-      qc.register(qc.context);
-      try {
-        return qp.value();
-      } finally {
-        qp.close();
-        qp.unregister(qc.context);
-      }
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
+  String execute(final Session session) throws IOException {
+    final XQuery xquery = new XQuery(toString());
+    for(final Entry<String, String> entry : bindings.entrySet()) {
+      xquery.bind(entry.getKey(), entry.getValue());
     }
+    return session.execute(xquery);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(library) sb.append("declare option db:mainmem 'true';");
     for(final String name : bindings.keySet()) {
       sb.append("declare variable $").append(name).append(" external;");
     }

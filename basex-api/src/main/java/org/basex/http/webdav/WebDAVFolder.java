@@ -57,12 +57,7 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
 
   @Override
   public final boolean isLockedOutRecursive(final Request request) {
-    return new WebDAVCode<Boolean>(this) {
-      @Override
-      public Boolean get() throws IOException {
-        return service.locking.conflictingLocks(meta.db, meta.path);
-      }
-    }.evalNoEx();
+    return WebDAVLocks.get().isLockedOut(meta);
   }
 
   @Override

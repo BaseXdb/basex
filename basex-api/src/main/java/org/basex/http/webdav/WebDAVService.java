@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.List;
 
 import org.basex.api.client.*;
@@ -41,9 +40,6 @@ final class WebDAVService {
 
   /** HTTP connection. */
   final HTTPConnection conn;
-  /** Locking service. */
-  final WebDAVLockService locking;
-
   /** Session. */
   private LocalSession ls;
 
@@ -53,7 +49,6 @@ final class WebDAVService {
    */
   WebDAVService(final HTTPConnection conn) {
     this.conn = conn;
-    locking = new WebDAVLockService(conn);
   }
 
   /**
@@ -87,7 +82,7 @@ final class WebDAVService {
    */
   boolean dbExists(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(_DB_EXISTS.args(" $db")).bind("db", db);
-    return execute(query).equals(Text.TRUE);
+    return query.execute(session()).equals(Text.TRUE);
   }
 
   /**
@@ -99,7 +94,7 @@ final class WebDAVService {
   long timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args(" $db") +
         "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("db",  db);
-    return DateTime.parse(execute(query)).getTime();
+    return DateTime.parse(query.execute(session())).getTime();
   }
 
   /**
@@ -182,7 +177,7 @@ final class WebDAVService {
     query.bind("path", path);
     query.bind("tdb", tdb);
     query.bind("tpath", tpath);
-    execute(query);
+    query.execute(session());
   }
 
   /**
@@ -207,7 +202,7 @@ final class WebDAVService {
     query.bind("path", path);
     query.bind("tdb", tdb);
     query.bind("tpath", tpath);
-    execute(query);
+    query.execute(session());
   }
 
   /**
@@ -227,7 +222,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(string);
     query.bind("db", db);
     query.bind("path", path);
-    execute(query);
+    query.execute(session());
   }
 
   /**
@@ -408,7 +403,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(EXISTS.args(_DB_LIST.args(" $db", " $path")));
     query.bind("db", db);
     query.bind("path", path);
-    return execute(query).equals(Text.TRUE);
+    return query.execute(session()).equals(Text.TRUE);
   }
 
   /**
@@ -422,7 +417,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(_DB_EXISTS.args(" $db", " $path"));
     query.bind("db", db);
     query.bind("path", path);
-    return execute(query).equals(Text.TRUE);
+    return query.execute(session()).equals(Text.TRUE);
   }
 
   /**
@@ -531,20 +526,6 @@ final class WebDAVService {
   }
 
   /**
-   * Executes a query.
-   * @param query query to be executed
-   * @return result
-   * @throws IOException error during query execution
-   */
-  private String execute(final WebDAVQuery query) throws IOException {
-    final XQuery xquery = new XQuery(query.toString());
-    for(final Entry<String, String> entry : query.entries()) {
-      xquery.bind(entry.getKey(), entry.getValue());
-    }
-    return session().execute(xquery);
-  }
-
-  /**
    * Executes a query and returns all results as a list.
    * @param query query to be executed
    * @return result
@@ -552,7 +533,7 @@ final class WebDAVService {
    */
   private String[] results(final WebDAVQuery query) throws IOException {
     final StringList sl = new StringList();
-    for(final String result : Strings.split(execute(query), '\t')) {
+    for(final String result : Strings.split(query.execute(session()), '\t')) {
       if(!result.isEmpty()) sl.add(result);
     }
     return sl.finish();

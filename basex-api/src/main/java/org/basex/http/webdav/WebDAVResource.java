@@ -6,14 +6,9 @@ import static org.basex.http.webdav.WebDAVUtils.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.query.*;
-import org.basex.query.value.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
-import com.bradmcevoy.http.LockInfo.*;
 import com.bradmcevoy.http.Request.*;
 import com.bradmcevoy.http.exceptions.*;
 
@@ -120,82 +115,44 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   }
 
   /**
-   * Lock this resource and return a token.
-   *
+   * Locks this resource and returns a token.
    * @param timeout in seconds (can be {@code null})
    * @param lockInfo lock info
-   * @return result containing the token representing the lock if successful,
-   * otherwise a failure reason code
+   * @return result containing the token if successful, otherwise a failure reason code
    */
   @Override
-  public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo)
-      throws PreConditionFailedException, LockedException {
-
-    return new WebDAVCode<LockResult>(this) {
-      @Override
-      public LockResult get() {
-        try {
-          final String tokenId = service.locking.lock(
-            meta.db,
-            meta.path,
-            lockInfo.scope.name().toLowerCase(Locale.ENGLISH),
-            lockInfo.type.name().toLowerCase(Locale.ENGLISH),
-            lockInfo.depth.name().toLowerCase(Locale.ENGLISH),
-            lockInfo.lockedByUser,
-            timeout.getSeconds()
-          );
-          return success(new LockToken(tokenId, lockInfo, timeout));
-        } catch(final IOException ex) {
-          Util.stack(ex);
-          return failed(FailureReason.ALREADY_LOCKED);
-        }
-      }
-    }.evalNoEx();
+  public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo) {
+    final WebDAVLock lock = WebDAVLocks.get().create(timeout, lockInfo, meta);
+    return lock == null ? failed(FailureReason.PRECONDITION_FAILED) : success(lock.token);
   }
 
   /**
-   * Renews the lock and returns new lock info.
-   * @param token lock token
-   * @return lock result
+   * Refreshes a lock.
+   * @param id token id
+   * @return result containing the token if successful, otherwise a failure reason code
    */
   @Override
-  public LockResult refreshLock(final String token) throws PreConditionFailedException {
-    return new WebDAVCode<LockResult>(this) {
-      @Override
-      public LockResult get() throws IOException {
-        service.locking.refreshLock(token);
-        final LockToken lock = parse(service.locking.locks(token));
-        return lock == null ? failed(FailureReason.ALREADY_LOCKED) : success(lock);
-      }
-    }.evalNoEx();
+  public LockResult refreshLock(final String id) {
+    final WebDAVLock lock = WebDAVLocks.get().refreshLock(id);
+    return lock == null ? failed(FailureReason.PRECONDITION_FAILED) : success(lock.token);
   }
 
   /**
-   * Unlock the resource if the resource is currently locked and the token matches the current one.
-   * @param token lock token
+   * Unlocks a resource.
+   * @param id token id
    */
   @Override
-  public void unlock(final String token) throws PreConditionFailedException {
-    new WebDAVCode<Object>(this) {
-      @Override
-      public void run() throws IOException {
-        service.locking.unlock(token);
-      }
-    }.evalNoEx();
+  public void unlock(final String id) {
+    WebDAVLocks.get().unlock(id);
   }
 
   /**
-   * Get the active lock for the current resource.
+   * Gets the active lock for the current resource.
    * @return the current lock if the resource is locked, {@code null} otherwise
    */
   @Override
   public LockToken getCurrentLock() {
-    return new WebDAVCode<LockToken>(this) {
-      @Override
-      public LockToken get() throws IOException {
-        return parse(service.locking.locks(meta.db, meta.path));
-      }
-    }.evalNoEx();
+    return WebDAVLocks.get().lockOn(meta);
   }
 
   /**
@@ -208,36 +165,36 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   /**
    * Rename document or folder.
-   * @param n new name
+   * @param name new name
    * @throws IOException I/O exception
    */
-  void rename(final String n) throws IOException {
-    service.rename(meta.db, meta.path, n);
+  void rename(final String name) throws IOException {
+    service.rename(meta.db, meta.path, name);
   }
 
   /**
    * Copy folder to the root, creating a new database.
-   * @param n new name of the folder (database)
+   * @param name new name of the folder (database)
    * @throws IOException I/O exception
    */
-  protected abstract void copyToRoot(String n) throws IOException;
+  protected abstract void copyToRoot(String name) throws IOException;
 
   /**
    * Copy folder to another folder.
-   * @param f target folder
-   * @param n new name of the folder
+   * @param folder target folder
+   * @param name new name of the folder
    * @throws IOException I/O exception
    */
-  protected abstract void copyTo(WebDAVFolder f, String n) throws IOException;
+  protected abstract void copyTo(WebDAVFolder folder, String name) throws IOException;
 
   /**
    * Move folder to the root, creating a new database.
-   * @param n new name of the folder (database)
+   * @param name new name of the folder (database)
    * @throws IOException I/O exception
    */
-  void moveToRoot(final String n) throws IOException {
+  void moveToRoot(final String name) throws IOException {
     // folder is moved to the root: create new database with it
-    copyToRoot(n);
+    copyToRoot(name);
     remove();
   }
 
@@ -255,47 +212,6 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
       // folder is moved to a folder in another database
       copyTo(folder, name);
       remove();
-    }
-  }
-
-  /**
-   * Parse the lock info.
-   * @param locks lock infos
-   * @return lock token (can be {@code null})
-   * @throws IOException I/O exception
-   */
-  private LockToken parse(final Value locks) throws IOException {
-    if(locks.isEmpty()) return null;
-    try {
-      final LockToken lock = new LockToken(null, new LockInfo(), null);
-      final Item info = locks.itemAt(0);
-      for(Item item : new QueryProcessor("*", service.conn.context).context(info).value()) {
-        final ANode node = (ANode) item;
-        final String value = Token.string(node.string());
-        switch(Token.string(node.qname().local())) {
-          case "token":
-            lock.tokenId = value;
-            break;
-          case "scope":
-            lock.info.scope = LockScope.valueOf(value.toUpperCase(Locale.ENGLISH));
-            break;
-          case "type":
-            lock.info.type = LockType.valueOf(value.toUpperCase(Locale.ENGLISH));
-            break;
-          case "depth":
-            lock.info.depth = LockDepth.valueOf(value.toUpperCase(Locale.ENGLISH));
-            break;
-          case "user":
-            lock.info.lockedByUser = value;
-            break;
-          case "timeout":
-            lock.timeout = LockTimeout.parseTimeout(value);
-            break;
-        }
-      }
-      return lock;
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
     }
   }
 }
