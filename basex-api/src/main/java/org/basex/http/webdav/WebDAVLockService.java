@@ -53,24 +53,24 @@ final class WebDAVLockService {
    * @param type lock type
    * @param depth lock depth
    * @param user lock user
-   * @param to lock timeout
+   * @param timeout lock timeout
    * @return lock token
    * @throws IOException I/O exception
    */
   String lock(final String db, final String p, final String scope, final String type,
-      final String depth, final String user, final Long to) throws IOException {
+      final String depth, final String user, final Long timeout) throws IOException {
 
     final String token = UUID.randomUUID().toString();
     final WebDAVQuery query = new WebDAVQuery("w:create-lock(" +
-        "$path, $token, $scope, $type, $depth, $owner, $timeout)").lock();
+        "$path, $token, $scope, $type, $depth, $user, $timeout)").lock();
     query.bind("path", db + SEP + p);
     query.bind("token", token);
     query.bind("scope", scope);
     query.bind("type", type);
     query.bind("depth", depth);
-    query.bind("owner", user);
-    final long timeout = to == null ? Long.MAX_VALUE : to.longValue();
-    query.bind("timeout", Long.toString(Math.min(31700000, timeout)));
+    query.bind("user", user);
+    final long t = timeout == null ? Long.MAX_VALUE : timeout.longValue();
+    query.bind("timeout", Long.toString(Math.min(31700000, t)));
     query.execute(conn);
     return token;
   }
@@ -109,13 +109,13 @@ final class WebDAVLockService {
     if(!WebDAVQuery.hasLocks()) return false;
 
     final WebDAVQuery query = new WebDAVQuery("w:conflicting-locks(" +
-      "<w:lockinfo>" +
-        "<w:path>{ $path }</w:path>" +
-        "<w:scope>exclusive</w:scope>" +
-        "<w:depth>infinity</w:depth>" +
-        "<w:owner>{ $owner }</w:owner>" +
-      "</w:lockinfo>)").lock();
-    query.bind("path", db + SEP + p).bind("owner", conn.context.user().name());
+      "<lockinfo>" +
+        "<path>{ $path }</user>" +
+        "<scope>exclusive</user>" +
+        "<depth>infinity</user>" +
+        "<user>{ $user }</user>" +
+      "</lockinfo>)").lock();
+    query.bind("path", db + SEP + p).bind("user", conn.context.user().name());
     return !query.execute(conn).isEmpty();
   }
 }

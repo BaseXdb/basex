@@ -3,7 +3,6 @@ package org.basex.http.webdav;
 import javax.servlet.http.*;
 
 import org.basex.http.*;
-import org.basex.server.*;
 import org.basex.util.*;
 
 import com.bradmcevoy.common.*;
@@ -40,21 +39,18 @@ final class WebDAVFactory implements ResourceFactory {
   public Resource getResource(final String host, final String dbpath) {
     try {
       final WebDAVService service = SERVICES.get();
-      final HttpServletRequest r = service.conn.req;
-      Path p = Path.path(dbpath);
-      if(!r.getContextPath().isEmpty()) p = p.getStripFirst();
-      if(!r.getServletPath().isEmpty()) p = p.getStripFirst();
-      if(p.isRoot()) return new WebDAVRoot(service);
+      final HttpServletRequest req = service.conn.req;
+      Path path = Path.path(dbpath);
+      if(!req.getContextPath().isEmpty()) path = path.getStripFirst();
+      if(!req.getServletPath().isEmpty()) path = path.getStripFirst();
+      if(path.isRoot()) return new WebDAVRoot(service);
 
-      final String db = p.getFirst();
-      return p.getLength() > 1 ?
-        service.resource(db, p.getStripFirst().toString()) :
+      final String db = path.getFirst();
+      return path.getLength() > 1 ?
+        service.resource(db, path.getStripFirst().toString()) :
         service.dbExists(db) ?
           new WebDAVDatabase(new WebDAVMetaData(db, service.timestamp(db)), service) :
           null;
-    } catch(final LoginException ex) {
-      Util.debug(ex);
-      return WebDAVNotAuthorized.NOAUTH;
     } catch(final Exception ex) {
       Util.stack(ex);
     }

@@ -78,7 +78,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   }
 
   @Override
-  public void delete() throws BadRequestException, NotAuthorizedException {
+  public void delete() throws BadRequestException {
     new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
@@ -89,7 +89,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   @Override
   public void copyTo(final CollectionResource target, final String name)
-      throws BadRequestException, NotAuthorizedException {
+      throws BadRequestException {
 
     new WebDAVCode<Object>(this) {
       @Override
@@ -105,7 +105,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   @Override
   public void moveTo(final CollectionResource target, final String name)
-      throws BadRequestException, NotAuthorizedException {
+      throws BadRequestException {
 
     new WebDAVCode<Object>(this) {
       @Override
@@ -122,14 +122,14 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   /**
    * Lock this resource and return a token.
    *
-   * @param timeout - in seconds, or null
+   * @param timeout in seconds (can be {@code null})
    * @param lockInfo lock info
    * @return result containing the token representing the lock if successful,
    * otherwise a failure reason code
    */
   @Override
   public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo)
-      throws NotAuthorizedException, PreConditionFailedException, LockedException {
+      throws PreConditionFailedException, LockedException {
 
     return new WebDAVCode<LockResult>(this) {
       @Override
@@ -159,9 +159,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
    * @return lock result
    */
   @Override
-  public LockResult refreshLock(final String token)
-      throws NotAuthorizedException, PreConditionFailedException {
-
+  public LockResult refreshLock(final String token) throws PreConditionFailedException {
     return new WebDAVCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
@@ -177,9 +175,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
    * @param token lock token
    */
   @Override
-  public void unlock(final String token)
-      throws NotAuthorizedException, PreConditionFailedException {
-
+  public void unlock(final String token) throws PreConditionFailedException {
     new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
@@ -289,7 +285,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
           case "depth":
             lock.info.depth = LockDepth.valueOf(value.toUpperCase(Locale.ENGLISH));
             break;
-          case "owner":
+          case "user":
             lock.info.lockedByUser = value;
             break;
           case "timeout":

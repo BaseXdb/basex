@@ -28,8 +28,8 @@ public final class WebDAVServlet extends BaseXServlet {
     WebDAVFactory.init(conn);
 
     // create response
-    final WebDAVRequest request = new WebDAVRequest(conn.req);
-    final WebDAVResponse response = new WebDAVResponse(conn.res);
+    final WebDAVRequest request = new WebDAVRequest(conn);
+    final WebDAVResponse response = new WebDAVResponse(conn);
     try {
       manager.process(request, response);
     } finally {

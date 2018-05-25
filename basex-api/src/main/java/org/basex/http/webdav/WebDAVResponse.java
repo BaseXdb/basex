@@ -5,6 +5,8 @@ import java.util.*;
 
 import javax.servlet.http.*;
 
+import org.basex.http.*;
+
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Cookie;
 
@@ -29,10 +31,10 @@ final class WebDAVResponse extends AbstractResponse {
 
   /**
    * Constructor.
-   * @param res HTTP servlet response
+   * @param conn HTTP connection
    */
-  WebDAVResponse(final HttpServletResponse res) {
-    this.res = res;
+  WebDAVResponse(final HTTPConnection conn) {
+    res = conn.res;
   }
 
   @Override

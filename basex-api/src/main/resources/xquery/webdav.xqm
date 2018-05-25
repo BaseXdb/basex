@@ -141,7 +141,7 @@ declare function w:lock(
  : @param  $scope    scope
  : @param  $type     type
  : @param  $depth    depth
- : @param  $owner    owner
+ : @param  $user     user
  : @param  $timeout  timeout
  :)
 declare %updating function w:create-lock(
@@ -150,7 +150,7 @@ declare %updating function w:create-lock(
   $scope    as xs:string,
   $type     as xs:string,
   $depth    as xs:string,
-  $owner    as xs:string,
+  $user     as xs:string,
   $timeout  as xs:string
 ) as empty-sequence() {
   let $lock := element lockinfo {
@@ -159,7 +159,7 @@ declare %updating function w:create-lock(
     element scope   { $scope },
     element type    { $type },
     element depth   { $depth },
-    element owner   { $owner },
+    element user    { $user },
     element timeout { $timeout },
     element expiry  { w:expiry-dateTime(xs:integer($timeout)) }
   }
