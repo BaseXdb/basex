@@ -306,11 +306,12 @@ public final class IndexInfo {
     // give up if path contains is not relative
     final AxisPath path = (AxisPath) pred;
     if(path.root != null) return null;
+    // give up if one of the steps contains positional predicates
+    final int sl = path.steps.length;
+    for(int s = 0; s < sl; s++) {
+      if(path.step(s).positional()) return null;
+    }
     // return last step
-    final Step s = path.step(path.steps.length - 1);
-    // give up if step contains positional predicates
-    if(s.positional()) return null;
-    // success: return step
-    return s;
+    return path.step(sl - 1);
   }
 }

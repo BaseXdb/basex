@@ -215,6 +215,16 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     query("name(//@x/..[@* = 'y'])", "a");
   }
 
+  /** Index access with nested predicates. */
+  @Test public void gh1573() {
+    execute(new CreateDB(NAME, "<xml><a>"
+        + "<b>A</b></a><a>"
+        + "<b>B</b><c>correct</c></a><a>"
+        + "<b>B</b><c>wrong</c></a>"
+        + "</xml>"));
+    query("//c[../preceding-sibling::a[1]/b = 'A']", "<c>correct</c>");
+  }
+
   /** Checks expressions with the pragma for enforcing index rewritings. */
   @Test public void pragma() {
     createDoc();
