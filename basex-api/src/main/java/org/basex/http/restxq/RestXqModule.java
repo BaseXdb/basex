@@ -170,11 +170,13 @@ public final class RestXqModule {
    * @param func function to be processed
    * @param message String the Message which arrives in onText
    * @param serializer The WsSerializer
+   * @param header The headers to set
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
   public boolean process(final WebsocketConnection conn, final WsXqFunction func,
-      final WebsocketMessage message, final WsSerializer serializer) throws Exception {
+      final WebsocketMessage message, final WsSerializer serializer,
+      final Map<String, String> header) throws Exception {
 
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
@@ -186,7 +188,7 @@ public final class RestXqModule {
       wxf.parse();
 
       final Expr[] args = new Expr[sf.params.length];
-      wxf.bind(args, qc, message, serializer);
+      wxf.bind(args, qc, message, serializer, header);
 
       qc.mainModule(MainModule.get(sf, args));
       return serializer.generateOutput(conn, wxf, qc);

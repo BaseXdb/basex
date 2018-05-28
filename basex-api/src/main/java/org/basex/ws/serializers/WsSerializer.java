@@ -23,6 +23,7 @@ public interface WsSerializer {
    * @param wsParameters The list of wsParameters
    * @param function The Staticfunction
    * @param wsfunc The WebsocketFunction which is executing the bind method
+   * @param header The header to set
    * @throws UnsupportedEncodingException exception
    * @throws QueryException query exception
    */
@@ -31,7 +32,8 @@ public interface WsSerializer {
             WebsocketMessage message,
             ArrayList<RestXqParam> wsParameters,
             StaticFunc function,
-            WsXqFunction wsfunc) throws QueryException, UnsupportedEncodingException;
+            WsXqFunction wsfunc,
+            Map<String, String> header) throws QueryException, UnsupportedEncodingException;
 
   /**
    * Generates the Output and send it to the Client.

@@ -49,7 +49,6 @@ public abstract class StompFrame {
     String[] headers = cmdhead.split("\n");
 
     Map<String, String> header = new HashMap<>();
-
     for (int i = 1; i < headers.length; i++) {
       String head = headers[i].split(":")[0];
       header.put(head, headers[i].substring(head.length() + 1));
@@ -131,8 +130,36 @@ public abstract class StompFrame {
     return body;
   }
 
+  /**
+   * Returns a Serialized Frame.
+   * @return String frame
+   * */
+  public String serializedFrame() {
+    StringBuilder sb = new StringBuilder();
+    // Add Command
+    sb.append(this.command);
+    sb.append((char) 13).append((char) 10);
+    // Add Headers
+    if(this.header != null && this.header.size() >= 1) {
+      this.header.forEach(
+          (k, v) -> {
+                      sb.append(k + ":" + v);
+                      sb.append((char) 13).append((char) 10);
+                    });
+    }
+    sb.append((char) 13).append((char) 10);
+    // Add the Body
+    sb.append(this.body);
+    sb.append((char) 0);
+    return sb.toString();
+  }
+
   @Override
   public String toString() {
+    if(this.header == null || this.header.size() < 1) {
+      return "COMMAND: " + this.command + " HEADERS: " +
+          "" + " BODY: " + this.body;
+    }
     return "COMMAND: " + this.command + " HEADERS: " +
            this.header.toString() + " BODY: " + this.body;
   }

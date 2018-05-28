@@ -41,7 +41,9 @@ public class WebsocketConnection implements ClientInfo {
    * @param res the UpdateResponse
    * @param sess the Session
    */
-  WebsocketConnection(final UpgradeRequest req, final UpgradeResponse res, final Session sess) {
+  public WebsocketConnection(final UpgradeRequest req,
+                             final UpgradeResponse res,
+                             final Session sess) {
     this.req = req;
     this.res = res;
     context = new Context(HTTPContext.context(), this);

@@ -2,6 +2,8 @@ package org.basex.ws;
 
 import java.util.*;
 
+import org.eclipse.jetty.websocket.api.*;
+
 /**
  * This class defines a Room for Websockets. It manages all Websockets which are connected.
  * https://stackoverflow.com/questions/15646213/how-do-i-access-instantiated-websockets-in-jetty-9
@@ -28,18 +30,18 @@ public class Room {
   /**
    * The members of the Room.
    */
-  private List<WebSocke> members = new ArrayList<>();
+  private List<WebSocketAdapter> members = new ArrayList<>();
 
   /**
    * The List of Members per Channel.
    */
-  private HashMap<String, List<WebSocke>> channels = new HashMap<>();
+  private HashMap<String, List<WebSocketAdapter>> channels = new HashMap<>();
 
   /**
    * Adds a WebSocket to the membersList.
    * @param socket WebSocke
    */
-  public void join(final WebSocke socket) {
+  public void join(final WebSocketAdapter socket) {
     members.add(socket);
   }
 
@@ -48,8 +50,8 @@ public class Room {
    * @param socket WebSocke
    * @param channel String
    * */
-  public void joinChannel(final WebSocke socket, final String channel) {
-    List<WebSocke> channelMembers = channels.get(channel);
+  public void joinChannel(final WebSocketAdapter socket, final String channel) {
+    List<WebSocketAdapter> channelMembers = channels.get(channel);
     if(channelMembers == null) {
       channelMembers = new ArrayList<>();
     }
@@ -61,7 +63,7 @@ public class Room {
    * Removes a Websocket from the MembersList.
    * @param socket WebSocke
    */
-  public void remove(final WebSocke socket) {
+  public void remove(final WebSocketAdapter socket) {
     members.remove(socket);
   }
 
@@ -70,8 +72,8 @@ public class Room {
    * @param socket WebSocke
    * @param channel String
    */
-  public void removeFromChannel(final WebSocke socket, final String channel) {
-    List<WebSocke> channelMembers = channels.get(channel);
+  public void removeFromChannel(final WebSocketAdapter socket, final String channel) {
+    List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
@@ -85,7 +87,7 @@ public class Room {
    * @param message String
    */
   public void broadcast(final String message) {
-    for(WebSocke member: members) {
+    for(WebSocketAdapter member: members) {
       // Sends a String asynchronely, method maybe return before the message was sent
       member.getSession().getRemote().sendStringByFuture(message);
     }
@@ -99,12 +101,12 @@ public class Room {
   // TODO: Maybe not todo her but todo: what if the connection closed of one websocketclient
   // in the channel?
   public void broadcast(final String message, final String channel) {
-    List<WebSocke> channelMembers = channels.get(channel);
+    List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
     }
-    for(WebSocke member: channelMembers) {
+    for(WebSocketAdapter member: channelMembers) {
       // Sends a String asynchronely, method maybe return before the message was sent
       member.getSession().getRemote().sendStringByFuture(message);
     }

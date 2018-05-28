@@ -1,5 +1,6 @@
 package org.basex.ws;
 
+import org.basex.ws.Adapters.*;
 import org.eclipse.jetty.websocket.servlet.*;
 
 /**
@@ -15,13 +16,12 @@ public class WsCreator implements WebSocketCreator {
     for (String subprotocol : req.getSubProtocols()) {
       if("v10.stomp".equals(subprotocol)) {
         resp.setAcceptedSubProtocol(subprotocol);
-        WebSocke websocke = new WebSocke(subprotocol);
-        return websocke;
+        return new StompWebSocket(subprotocol);
       }
     }
 
     // If no valid subprotocol
-    return new WebSocke(null);
+    return new StandardWebSocket();
   }
 
 }

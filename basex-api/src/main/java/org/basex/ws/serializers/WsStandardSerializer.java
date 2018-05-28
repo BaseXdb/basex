@@ -1,7 +1,5 @@
 package org.basex.ws.serializers;
 
-import static org.basex.ws.WebsocketText.*;
-
 import java.io.*;
 import java.net.*;
 import java.nio.*;
@@ -29,34 +27,71 @@ import org.basex.ws.WebsocketMessage.*;
  */
 public class WsStandardSerializer implements WsSerializer {
 
+  /**
+   * Checks the ParamName and sets it.
+   * @param header Map of header params
+   * @param var the var
+   * @param qc the QueryContext
+   * @param function The staticFunction
+   * @param decl the Seqtype
+   * @return Value
+   * @throws QueryException query exception
+   * @throws UnsupportedEncodingException encoding exception
+   */
+  private Value checkParam(final Map<String, String> header, final Var var,
+                           final QueryContext qc, final StaticFunc function,
+                           final SeqType decl)
+                               throws QueryException, UnsupportedEncodingException {
+    Value msg = null;
+    String headerParam = header.get(var.name.toString());
+    if(headerParam != null) {
+      msg =  new Atm(URLDecoder.decode(
+          headerParam, Strings.UTF8));
+    }
+
+    return msg.seqType().instanceOf(decl) ? msg :
+      decl.cast(msg, qc, function.sc, null);
+  }
+
   @Override
   public void bind(final Expr[] args, final QueryContext qc,
                    final WebsocketMessage message, final ArrayList<RestXqParam> wsParameters,
-                   final StaticFunc function, final WsXqFunction wsfunc)
+                   final StaticFunc function, final WsXqFunction wsfunc,
+                   final Map<String, String> header)
           throws QueryException, UnsupportedEncodingException {
 
     for(final RestXqParam rxp: wsParameters) {
       final Var[] params = function.params;
       final int pl = params.length;
-      final MESSAGETYPE msgType = message.getMsgType();
+      MESSAGETYPE msgType = null;
 
-      if(msgType == MESSAGETYPE.STRING) {
-        Value test = new Atm(URLDecoder.decode(message.getStringMessage(), Strings.UTF8));
-        for(int p = 0; p < pl; p++) {
-          final Var var = params[p];
-          if(var.name.eq(rxp.var)) {
-            final SeqType decl = var.declaredType();
-            final Value val = test.seqType().instanceOf(decl) ? test :
-              decl.cast(test, qc, function.sc, null);
-            args[p] = var.checkType(val, qc, false);
-            break;
-          }
-        }
-      }
-      else if(msgType == MESSAGETYPE.BINARY) {
-        // TODO: Bind the binary message
+      if(message != null) {
+         msgType = message.getMsgType();
       } else {
-        throw wsfunc.error(WRONG_MSG_TYPE, msgType);
+
+      }
+      for(int p = 0; p < pl; p++) {
+        final Var var = params[p];
+        final Value val;
+        if(var.name.eq(rxp.var)) {
+          final SeqType decl = var.declaredType();
+          if(var.name.toString().equals("message")) {
+            final Value msg;
+              if(msgType == MESSAGETYPE.STRING) {
+                msg = new Atm(URLDecoder.decode(
+                    message.getStringMessage(), Strings.UTF8));
+              } else if(msgType == MESSAGETYPE.BINARY) {
+                msg = new Atm(message.getBinMessage());
+              } else {
+                break;
+              }
+              val = msg.seqType().instanceOf(decl) ? msg :
+                decl.cast(msg, qc, function.sc, null);
+          } else {
+            val = checkParam(header, var, qc, function, decl);
+          }
+          args[p] = var.checkType(val, qc, false);
+        }
       }
     }
   }
@@ -69,12 +104,10 @@ public class WsStandardSerializer implements WsSerializer {
     Serializer ser = Serializer.get(ao, wxf.output);
     Iter iter = qc.iter();
 
-    // Dont send anything if Websocket gets closed
-    if(wxf.matches(Annotation._WS_CLOSE)) {
-      return true;
-    }
-
     for(Item it; (it = iter.next()) != null;) {
+      // Dont send anything if Websocket gets closed
+      if(!wxf.matches(Annotation._WS_MESSAGE)) continue;
+
       ser.reset();
       ser.serialize(it);
       if(it instanceof Bin) {

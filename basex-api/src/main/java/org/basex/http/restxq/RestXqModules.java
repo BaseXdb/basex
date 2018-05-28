@@ -317,25 +317,11 @@ public final class RestXqModules {
     List<WsXqFunction> funcs = find(conn, error, false, ann);
     if(funcs.isEmpty()) return null;
 
-    // remove functions with different specifity
-    // Vergleich auf Permissions hier relevant
     final WsXqFunction first = funcs.get(0);
 
-//    for(int l = funcs.size() - 1; l > 0; l--) {
-//      if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
-//    }
-    // return single function
     if(funcs.size() == 1) return first;
 
-    // multiple functions: check quality factors
-    // funcs = bestQf(funcs, conn);
-    // if(funcs.size() == 1) return funcs.get(0);
-
-    // show error if we are left with multiple function candidates
-    // @TODO: Handle Error, state now: propagate it to basexservlet
-    // ->Httconnection and send it. Not with ws!
-    // throw first.error(WS_ANN_CONFLICT_X, ann);
-    throw new Exception();
+    throw new Exception("Something went wrong in find wsxqfunction");
   }
 
   /**

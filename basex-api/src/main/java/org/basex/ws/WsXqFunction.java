@@ -128,14 +128,16 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * @param conn Websocket connection
    * @param message The WebsocketMessage
    * @param serializer The Wsseriaizer
+   * @param header The header to set
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
   public boolean process(final WebsocketConnection conn,
                          final WebsocketMessage message,
-                         final WsSerializer serializer) throws Exception {
+                         final WsSerializer serializer,
+                         final Map<String, String> header) throws Exception {
     try {
-      return module.process(conn, this, message, serializer);
+      return module.process(conn, this, message, serializer, header);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;
@@ -175,12 +177,14 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * @param qc The QueryContext
    * @param message The Messagestring
    * @param serializer The Message serializer
+   * @param header The header to set
    * @throws QueryException  query exception
    * @throws UnsupportedEncodingException encoding excepiton
    */
   public void bind(final Expr[] args, final QueryContext qc,
-      final WebsocketMessage message, final WsSerializer serializer) throws QueryException,
+      final WebsocketMessage message, final WsSerializer serializer,
+      final Map<String, String> header) throws QueryException,
         UnsupportedEncodingException {
-      serializer.bind(args, qc, message, wsParameters, function, this);
+      serializer.bind(args, qc, message, wsParameters, function, this, header);
   }
 }

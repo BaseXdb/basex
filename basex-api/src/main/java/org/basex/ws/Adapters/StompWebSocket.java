@@ -1,9 +1,10 @@
-package org.basex.ws;
+package org.basex.ws.Adapters;
 
 import java.util.*;
 import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
 import org.basex.query.ann.*;
+import org.basex.ws.*;
 import org.basex.ws.serializers.*;
 import org.basex.ws.serializers.stomp.*;
 import org.eclipse.jetty.websocket.api.*;
@@ -14,7 +15,7 @@ import org.eclipse.jetty.websocket.api.*;
  *
  * @author BaseX Team 2005-18, BSD License
  */
-public class WebSocke extends WebSocketAdapter
+public class StompWebSocket extends WebSocketAdapter
 {
     /**
      * The Channelname.
@@ -42,7 +43,7 @@ public class WebSocke extends WebSocketAdapter
      * Constructor.
      * @param subprotocol String subprotocol
      * */
-    public WebSocke(final String subprotocol) {
+    public StompWebSocket(final String subprotocol) {
       this.subprotocol = subprotocol;
       setSerializer();
     }
@@ -63,10 +64,6 @@ public class WebSocke extends WebSocketAdapter
     {
         // Sets Session and Remote in Superclass
         super.onWebSocketConnect(sess);
-
-        // Get the ChannelName if it is set
-        UpgradeRequest req = sess.getUpgradeRequest();
-        channelName = req.getParameterMap().get("channelName");
 
         // Add to the WebSocketRoom
         Room.getInstance().join(this);
@@ -92,8 +89,6 @@ public class WebSocke extends WebSocketAdapter
 
       // Check if the Protocol is stomp
       if(this.subprotocol.equals("v10.stomp")) {
-        //TODO Stompframe here
-        wm = new WebsocketMessage(message);
         // If it is Stomp, parse the message to a StompFrame
         // Return specific StompFrame here? -> ConnectFrame extend StompFrame,
         // in parse check for all required parameters and set optional also?
@@ -101,9 +96,11 @@ public class WebSocke extends WebSocketAdapter
         StompFrame stompframe = null;
         try {
           stompframe = StompFrame.parse(message);
+
         } catch(HeadersException e) {
           wsconnection.error(e.getMessage(), 500);
         }
+        wm = new WebsocketMessage(stompframe);
         String id;
         String channel;
         switch(stompframe.getCommand()) {
@@ -111,19 +108,12 @@ public class WebSocke extends WebSocketAdapter
             ann = Annotation._WS_MESSAGE;
             // Required header
             channel = stompframe.getHeaders().get("destination");
-            // Optional Header
-            String contentType = stompframe.getHeaders().get("content-type");
-            String contentLength = stompframe.getHeaders().get("content-length");
-            String transaction = stompframe.getHeaders().get("transaction");
-
             break;
           case SUBSCRIBE:
             ann = Annotation._WS_STOMP_SUBSCRIBE;
             // Required Header
             channel = stompframe.getHeaders().get("destination");
             id = stompframe.getHeaders().get("id");
-            // Optional Header
-            String ack = stompframe.getHeaders().get("ack");
 
             idchannelMap.put(id, channel);
             Room.getInstance().joinChannel(this, channel);
@@ -149,20 +139,10 @@ public class WebSocke extends WebSocketAdapter
             break;
           case DISCONNECT:
             ann = Annotation._WS_CLOSE;
-            // Optional Headers
-            String receipt = stompframe.getHeaders().get("receipt");
-            String receiptId = stompframe.getHeaders().get("receiptId");
             break;
           case CONNECT:
           case STOMP:
             ann = Annotation._WS_CONNECT;
-            // Required Headers
-            String acceptVersion = stompframe.getHeaders().get("accept-version");
-            String host = stompframe.getHeaders().get("host");
-            // Optional Headers
-            String login = stompframe.getHeaders().get("login");
-            String passcode = stompframe.getHeaders().get("passcode");
-            String heartBeat = stompframe.getHeaders().get("heart-beat");
             break;
           default:
               wsconnection.error("Not a Stomp Command", 500);
@@ -214,7 +194,7 @@ public class WebSocke extends WebSocketAdapter
          try {
             func = rxm.find(wsconnection, null, ann);
             if(func != null && serializer != null)
-              func.process(wsconnection, msg, serializer);
+              func.process(wsconnection, msg, serializer, null);
          } catch(Exception e) {
            wsconnection.error(e.getMessage(), 500);
          }
