@@ -329,6 +329,7 @@ public final class Strings {
 
   /**
    * Checks if a string starts with the specified substring.
+   * If the query character is lower case, search case insensitive.
    * @param string string
    * @param sub substring
    * @return result of check
@@ -343,7 +344,18 @@ public final class Strings {
   }
 
   /**
+   * Checks if a string starts with the specified character.
+   * @param string string
+   * @param ch character to be found
+   * @return result of check
+   */
+  public static boolean startsWith(final String string, final char ch) {
+    return string.indexOf(ch) == 0;
+  }
+
+  /**
    * Checks if a string contains the specified substring.
+   * If the query character is lower case, search case insensitive.
    * @param string string
    * @param sub substring
    * @return result of check

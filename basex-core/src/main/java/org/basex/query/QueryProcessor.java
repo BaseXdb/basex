@@ -174,7 +174,7 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
-   * Binds the HTTP context to the query processor.
+   * Binds the HTTP context to the query processor. Must be assigned before parsing the query.
    * @param value HTTP connection
    * @return self reference
    */

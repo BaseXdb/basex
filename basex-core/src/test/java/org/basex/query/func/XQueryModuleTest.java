@@ -65,6 +65,7 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     // ensure that global bindings will not overwrite local bindings
     execute(new Set(MainOptions.BINDINGS, "a=X"));
     try {
+      error(_XQUERY_EVAL.args("declare variable $a external; $a", " ()"), VAREMPTY_X);
       query(_XQUERY_EVAL.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
     } finally {
       execute(new Set(MainOptions.BINDINGS, ""));
