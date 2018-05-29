@@ -35,6 +35,8 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
   public final SerializerOptions output;
   /** Parameters of the Websocket Function. */
   final ArrayList<RestXqParam> wsParameters = new ArrayList<>();
+  /** The Path of the WsXqFunction. */
+  public WsPath path;
 
   /**
    * Constructor.
@@ -57,6 +59,22 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
     boolean found = false;
     for(Ann checkAnn : function.anns) {
       if(checkAnn.sig == ann) {
+        found = true;
+      }
+    }
+    return found;
+  }
+
+  /**
+   * Checks if an WEbsocket request matches this Annotation and Path.
+   * @param ann Annotation the annotation parameter
+   * @param pPath The Path to compare to
+   * @return result of check
+   */
+  public boolean matches(final Annotation ann, final WsPath pPath) {
+    boolean found = false;
+    for(Ann checkAnn : function.anns) {
+      if((path != null) && (checkAnn.sig == ann) && (path.compareTo(pPath) == 0)) {
         found = true;
       }
     }
@@ -101,21 +119,28 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
 
       found |= eq(sig.uri, QueryText.WS_URI);
 
+      final Item[] args = ann.args();
       // If the Annotation is a ws:param(..) annotation: Add the Params to wsParameters
-      if(sig == Annotation._WS_PARAM) {
-        final Item[] args = ann.args();
-        final String name = toString(args[0]);
-
-        final QNm var = checkVariable(toString(args[1]));
-
-        final int al = args.length;
-        final ItemList items = new ItemList(al - 2);
-        for(int a = 2; a < al; a++) {
-          items.add(args[a]);
-        }
-
-        RestXqParam test = new RestXqParam(var, name, items.value());
-        wsParameters.add(test);
+      switch(sig) {
+        case _WS_PARAM:
+          final String name = toString(args[0]);
+          final QNm var = checkVariable(toString(args[1]));
+          final int al = args.length;
+          final ItemList items = new ItemList(al - 2);
+          for(int a = 2; a < al; a++) {
+            items.add(args[a]);
+          }
+          RestXqParam test = new RestXqParam(var, name, items.value());
+          wsParameters.add(test);
+          break;
+        case _WS_CONNECT:
+        case _WS_MESSAGE:
+        case _WS_CLOSE:
+        case _WS_ERROR:
+          path = new WsPath(toString(args[0]));
+          break;
+        default:
+          break;
       }
     }
 

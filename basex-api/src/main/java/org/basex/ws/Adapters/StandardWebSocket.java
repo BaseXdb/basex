@@ -23,6 +23,11 @@ public class StandardWebSocket extends WebSocketAdapter
     private WebsocketConnection wsconnection;
 
     /**
+     * The Path.
+     * */
+    private WsPath path;
+
+    /**
      * The StandardSerializer.
      * */
     private WsSerializer serializer = new WsStandardSerializer();
@@ -35,6 +40,15 @@ public class StandardWebSocket extends WebSocketAdapter
 
         UpgradeRequest ur = sess.getUpgradeRequest();
 
+        // Set the path.
+        String tPath = ur.getRequestURI().toString();
+        int idx = tPath.indexOf("/ws") + 3;
+        String strPath = tPath.substring(idx);
+        if(strPath.length() == 0) {
+          strPath = "/";
+        }
+        path = new WsPath(strPath);
+
         // Add Headers (for binding them to the XQueryParameters in the
         // corresponding bind Method
         Map<String, String> header = new HashMap<>();
@@ -43,7 +57,7 @@ public class StandardWebSocket extends WebSocketAdapter
         header.put("Protocol-version", ur.getProtocolVersion());
         header.put("QueryString", ur.getQueryString());
         header.put("IsSecure", String.valueOf(ur.isSecure()));
-        header.put("RequestURI", sess.getUpgradeRequest().getRequestURI().toString());
+        header.put("RequestURI", ur.getRequestURI().toString());
         // The Headers of the upgraderequest we are interested in
         List<String> headerKeys = new ArrayList<>();
         Collections.addAll(headerKeys, "Host", "Sec-WebSocket-Version");
@@ -119,7 +133,7 @@ public class StandardWebSocket extends WebSocketAdapter
       // select the closest match for this request
       WsXqFunction func = null;
          try {
-            func = rxm.find(wsconnection, null, ann);
+            func = rxm.find(wsconnection, null, ann, this.path);
             if(func != null && serializer != null)
               func.process(wsconnection, msg, serializer, header);
          } catch(Exception e) {

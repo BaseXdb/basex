@@ -192,7 +192,7 @@ public class StompWebSocket extends WebSocketAdapter
       // select the closest match for this request
       WsXqFunction func = null;
          try {
-            func = rxm.find(wsconnection, null, ann);
+            func = rxm.find(wsconnection, null, ann, new WsPath(""));
             if(func != null && serializer != null)
               func.process(wsconnection, msg, serializer, null);
          } catch(Exception e) {
