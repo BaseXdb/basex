@@ -683,9 +683,9 @@ public final class EditorView extends View {
    * Parses the current query after a little delay.
    * @param input query input
    * @param file file
-   * @param lib library flag
+   * @param library library flag
    */
-  private void parse(final String input, final IO file, final boolean lib) {
+  private void parse(final String input, final IO file, final boolean library) {
     final int id = ++statusID;
     new Timer(true).schedule(new TimerTask() {
       @Override
@@ -697,7 +697,7 @@ public final class EditorView extends View {
         // parse query
         try(QueryContext qc = new QueryContext(gui.context)) {
           parseQC = qc;
-          qc.parse(input, lib, file.path(), null);
+          qc.parse(input, library, file.path());
           if(id == statusID) info(null);
         } catch(final QueryException ex) {
           if(id == statusID) info(ex);

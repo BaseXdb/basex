@@ -109,8 +109,8 @@ final class ProjectFiles {
         // parse query
         try(QueryContext qc = new QueryContext(ctx)) {
           final String input = ti.cache().toString();
-          final boolean lib = QueryProcessor.isLibrary(input);
-          qc.parse(input, lib, path, null);
+          final boolean library = QueryProcessor.isLibrary(input);
+          qc.parse(input, library, path);
           // parsing was successful: remember path
           parsed.add(path);
           for(final byte[] mod : qc.modParsed) parsed.add(Token.string(mod));

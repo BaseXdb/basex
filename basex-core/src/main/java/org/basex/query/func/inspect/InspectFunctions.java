@@ -36,7 +36,7 @@ public final class InspectFunctions extends StandardFunc {
       Collections.addAll(old, qc.funcs.funcs());
       try {
         final IO io = checkPath(0, qc);
-        qc.parse(Token.string(io.read()), io.path(), null);
+        qc.parse(Token.string(io.read()), io.path());
         qc.funcs.compile(new CompileContext(qc), true);
       } catch(final IOException ex) {
         throw IOERR_X.get(info, ex);

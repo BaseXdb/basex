@@ -76,6 +76,13 @@ public abstract class AQuery extends Command {
           if(r == 0) plan(false);
 
           final Performance perf = new Performance();
+          for(final Entry<String, String[]> entry : vars.entrySet()) {
+            final String name = entry.getKey();
+            final String[] value = entry.getValue();
+            if(name == null) qp.context(value[0], value[1]);
+            else qp.bind(name, value[0], value[1]);
+          }
+
           qp.compile();
           info.compiling += perf.ns();
           if(r == 0) plan(true);
@@ -156,12 +163,6 @@ public abstract class AQuery extends Command {
     }
 
     qp.http(http);
-    for(final Entry<String, String[]> entry : vars.entrySet()) {
-      final String name = entry.getKey();
-      final String[] value = entry.getValue();
-      if(name == null) qp.context(value[0], value[1]);
-      else qp.bind(name, value[0], value[1]);
-    }
     qp.parse();
     qp.qc.info.parsing += perf.ns();
   }

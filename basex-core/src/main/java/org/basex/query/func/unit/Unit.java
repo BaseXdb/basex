@@ -81,7 +81,7 @@ final class Unit {
 
     try(QueryContext qc = new QueryContext(ctx)) {
       input = string(file.read());
-      qc.parse(input, file.path(), null);
+      qc.parse(input, file.path());
 
       // loop through all functions
       for(final StaticFunc sf : qc.funcs.funcs()) {
@@ -286,7 +286,7 @@ final class Unit {
     current = func;
 
     try(QueryContext qctx = job.pushJob(new QueryContext(ctx))) {
-      qctx.parse(input, file.path(), null);
+      qctx.parse(input, file.path());
       qctx.mainModule(MainModule.get(find(qctx, func), new Expr[0]));
       // ignore results
       final Iter iter = qctx.iter();
