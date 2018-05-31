@@ -44,7 +44,8 @@ final class DialogEditorPrefs extends BaseXBack {
    * @param dialog dialog reference
    */
   DialogEditorPrefs(final BaseXDialog dialog) {
-    border(8).setLayout(new TableLayout(1, 2, 40, 0));
+    border(8).setLayout(new ColumnLayout(40));
+
     final GUIOptions gopts = dialog.gui.gopts;
     showmargin = new BaseXCheckBox(dialog, SHOW_LINE_MARGIN + COL, GUIOptions.SHOWMARGIN, gopts);
     margin = new BaseXTextField(dialog, GUIOptions.MARGIN, gopts);
@@ -63,9 +64,9 @@ final class DialogEditorPrefs extends BaseXBack {
     indent.setColumns(3);
     files.setColumns(18);
 
-    BaseXBack p = new BaseXBack().layout(new TableLayout(8, 1));
+    BaseXBack p = new BaseXBack().layout(new RowLayout());
     p.add(new BaseXLabel(VIEW + COL, true, true));
-    BaseXBack pp = new BaseXBack().layout(new TableLayout(1, 2, 8, 0));
+    BaseXBack pp = new BaseXBack().layout(new ColumnLayout(8));
     pp.add(showmargin);
     pp.add(margin);
     p.add(pp);
@@ -77,10 +78,10 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(files);
     add(p);
 
-    final BaseXBack pv = new BaseXBack().layout(new TableLayout(3, 1, 0, 8));
-    p = new BaseXBack().layout(new TableLayout(4, 1));
+    final BaseXBack pv = new BaseXBack().layout(new RowLayout(8));
+    p = new BaseXBack().layout(new RowLayout());
     p.add(new BaseXLabel(EDIT + COL, true, true));
-    pp = new BaseXBack().layout(new TableLayout(1, 2, 8, 0));
+    pp = new BaseXBack().layout(new ColumnLayout(8));
     pp.add(new BaseXLabel(INDENTATION_SIZE + COL));
     pp.add(indent);
     p.add(pp);
@@ -88,13 +89,13 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(auto);
     pv.add(p);
 
-    p = new BaseXBack().layout(new TableLayout(3, 1));
+    p = new BaseXBack().layout(new RowLayout());
     p.add(new BaseXLabel(EVALUATING + COL, true, true));
     p.add(saverun);
     p.add(parseproj);
     pv.add(p);
 
-    p = new BaseXBack().layout(new TableLayout(2, 1));
+    p = new BaseXBack().layout(new RowLayout());
     p.add(new BaseXLabel(PROJECT + COL, true, true));
     p.add(showHidden);
     pv.add(p);

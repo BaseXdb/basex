@@ -155,7 +155,7 @@ public final class SearchBar extends BaseXBack {
     final boolean ed = text.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();
-      final BaseXBack west = new BaseXBack(false).layout(new TableLayout(1, 4, 1, 0));
+      final BaseXBack west = new BaseXBack(false).layout(new ColumnLayout(1));
       west.add(mcase);
       west.add(word);
       west.add(regex);
@@ -165,7 +165,7 @@ public final class SearchBar extends BaseXBack {
       center.add(search);
       if(ed) center.add(replace);
 
-      final BaseXBack east = new BaseXBack(false).layout(new TableLayout(1, 3, 1, 0));
+      final BaseXBack east = new BaseXBack(false).layout(new ColumnLayout(1));
       if(ed) east.add(rplc);
       east.add(cls);
 

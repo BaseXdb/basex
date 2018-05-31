@@ -64,7 +64,7 @@ public class DialogOptions extends BaseXBack {
     p.add(splitsize);
 
     border(8);
-    layout(new TableLayout(5, 1));
+    layout(new RowLayout());
     add(new BaseXLabel(INDEX_CREATION).border(0, 0, 8, 0).large());
     add(updindex);
     add(autooptimize);

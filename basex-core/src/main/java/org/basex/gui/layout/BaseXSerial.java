@@ -38,11 +38,11 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
    * @param sopts serialization parameters
    */
   public BaseXSerial(final BaseXDialog dialog, final SerializerOptions sopts) {
-    super(new TableLayout(3, 1));
+    super(new RowLayout());
 
     add(new BaseXLabel(SERIALIZATION + COL, true, true));
 
-    panel = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    panel = new BaseXBack(new ColumnLayout(8));
     this.dialog = dialog;
 
     params = new BaseXCombo(dialog, sopts.names());
@@ -153,7 +153,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
    * @return panel
    */
   private Component addOption(final OptionsOption<?> option, final Options options) {
-    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    final BaseXBack p = new BaseXBack(new ColumnLayout(8));
     final Options opts = options.get(option);
     options.put(option, opts);
     final BaseXCombo combo = new BaseXCombo(dialog, opts.names());

@@ -109,10 +109,10 @@ final class TextRenderer extends BaseXBack {
 
   @Override
   public void setFont(final Font f) {
-    if(gui == null) return;
-
     defaultFont = f;
     boldFont = f.deriveFont(Font.BOLD);
+    if(gui == null) return;
+
     final GUIOptions gopts = gui.gopts;
     margin = gopts.get(GUIOptions.SHOWMARGIN) ? Math.max(gopts.get(GUIOptions.MARGIN), 1) : -1;
     showInvisible = gopts.get(GUIOptions.SHOWINVISIBLE);

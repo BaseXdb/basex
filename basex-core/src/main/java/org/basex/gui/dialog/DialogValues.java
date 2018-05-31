@@ -27,7 +27,7 @@ final class DialogValues extends DialogIndex {
   DialogValues(final BaseXDialog dialog, final IndexType type) {
     super(dialog);
 
-    layout(new TableLayout(2, 1));
+    layout(new RowLayout());
 
     final MainOptions opts = dialog.gui.context.options;
     final String text = type == IndexType.TOKEN ? H_TOKEN_INDEX : type == IndexType.TEXT

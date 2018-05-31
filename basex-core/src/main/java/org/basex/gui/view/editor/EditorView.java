@@ -123,7 +123,7 @@ public final class EditorView extends View {
         BaseXKeys.UNIT.toString()), false, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new TableLayout(1, 11)).border(0, 0, 4, 0);
+    buttons.layout(new ColumnLayout()).border(0, 0, 4, 0);
     buttons.add(newB);
     buttons.add(openB);
     buttons.add(saveB);
@@ -598,7 +598,7 @@ public final class EditorView extends View {
 
   /**
    * Refreshes the list of recent query files and updates the query path.
-   * @param file new file
+   * @param file new file (can be {@code null})
    */
   void refreshHistory(final IOFile file) {
     final StringList paths = new StringList();

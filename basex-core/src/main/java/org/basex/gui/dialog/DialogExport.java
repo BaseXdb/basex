@@ -34,11 +34,11 @@ public final class DialogExport extends BaseXDialog {
     super(gui, EXPORT);
 
     // create checkboxes
-    final BaseXBack p = new BaseXBack(new TableLayout(4, 1));
+    final BaseXBack p = new BaseXBack(new RowLayout());
     p.add(new BaseXLabel(OUTPUT_DIR + COL, true, true).border(0, 0, 6, 0));
 
     // output label
-    BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    BaseXBack pp = new BaseXBack(new ColumnLayout(8));
 
     path = new BaseXCombo(this, true).history(GUIOptions.INPUTS, gui.gopts);
     BaseXLayout.setWidth(path, BaseXTextField.DWIDTH);

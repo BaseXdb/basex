@@ -62,7 +62,7 @@ public final class DialogManage extends BaseXDialog {
     // create database chooser
     final String[] dbs = gui.context.databases.list().finish();
     choice = new BaseXList(this, false, dbs);
-    choice.setSize(200, 600);
+    choice.setSize(250, 650);
     final Data data = gui.context.data();
     if(data != null) {
       data.flush(true);

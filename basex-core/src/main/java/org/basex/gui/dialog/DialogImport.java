@@ -66,7 +66,7 @@ final class DialogImport extends BaseXBack {
     this.parsing = parsing;
     gui = dialog.gui;
 
-    layout(new TableLayout(11, 1));
+    layout(new RowLayout());
     border(8);
 
     // add options
@@ -82,7 +82,7 @@ final class DialogImport extends BaseXBack {
 
     browse = new BaseXButton(dialog, BROWSE_D);
     browse.addActionListener(e -> choose());
-    final BaseXBack b = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    final BaseXBack b = new BaseXBack(new ColumnLayout(8));
     b.add(input);
     b.add(browse);
     add(b);

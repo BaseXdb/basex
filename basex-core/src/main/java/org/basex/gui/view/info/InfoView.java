@@ -110,7 +110,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     final AbstractButton find = editor.button(FIND);
     final BaseXBack top = new BaseXBack(false);
-    top.layout(new TableLayout(1, 3, 6, 0));
+    top.layout(new ColumnLayout(6));
     top.add(find);
     top.add(cats);
     top.add(timer);

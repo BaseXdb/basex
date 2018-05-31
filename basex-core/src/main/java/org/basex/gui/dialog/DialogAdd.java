@@ -39,7 +39,7 @@ final class DialogAdd extends BaseXBack {
 
     target = new BaseXTextField(dialog, "/");
 
-    final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
+    final BaseXBack pnl = new BaseXBack(new RowLayout());
     pnl.add(new BaseXLabel(TARGET_PATH + COLS, true, true).border(8, 0, 6, 0));
     pnl.add(target);
 

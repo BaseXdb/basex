@@ -18,7 +18,7 @@ import org.basex.util.options.*;
  */
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
-  public static final int DWIDTH = 350;
+  public static final int DWIDTH = 450;
   /** Default foreground color. */
   private static Color back;
 

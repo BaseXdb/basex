@@ -49,7 +49,7 @@ final class DialogFT extends DialogIndex {
    */
   DialogFT(final BaseXDialog dialog, final boolean create) {
     super(dialog);
-    layout(new TableLayout(create ? 10 : 16, 1, 0, 0));
+    layout(new TableLayout(create ? 10 : 16, 1));
 
     final MainOptions opts = dialog.gui.context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
@@ -76,7 +76,7 @@ final class DialogFT extends DialogIndex {
       }
     }
 
-    final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(12, 0, 0, 0);
+    final BaseXBack b1 = new BaseXBack(new ColumnLayout(8)).border(12, 0, 0, 0);
     b1.add(check[F_LANG]);
     final String[] langs = FTLexer.languages().finish();
     language = new BaseXCombo(dialog, langs);
@@ -97,7 +97,7 @@ final class DialogFT extends DialogIndex {
 
     add(check[F_STOP]);
     add(Box.createVerticalStrut(4));
-    final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    final BaseXBack b3 = new BaseXBack(new ColumnLayout(8));
     swpath = new BaseXTextField(
         dialog, sw.isEmpty() ? dialog.gui.gopts.get(GUIOptions.DATAPATH) : sw);
     b3.add(swpath);

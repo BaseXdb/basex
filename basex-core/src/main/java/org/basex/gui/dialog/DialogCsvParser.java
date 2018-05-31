@@ -56,14 +56,14 @@ final class DialogCsvParser extends DialogParser {
   DialogCsvParser(final BaseXDialog dialog, final MainOptions opts) {
     copts = new CsvParserOptions(opts.get(MainOptions.CSVPARSER));
 
-    final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
+    final BaseXBack pp = new BaseXBack(new RowLayout(8));
     BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
 
     p.add(new BaseXLabel(ENCODING + COL, true, true));
     encoding = encoding(dialog, copts.get(CsvParserOptions.ENCODING));
     p.add(encoding);
 
-    final BaseXBack sep = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
+    final BaseXBack sep = new BaseXBack().layout(new ColumnLayout(6));
     final StringList csv = new StringList();
     for(final CsvSep cs : CsvSep.values()) csv.add(cs.toString());
     final String[] sa = csv.toArray();
@@ -93,7 +93,7 @@ final class DialogCsvParser extends DialogParser {
     p.add(format);
     pp.add(p);
 
-    p = new BaseXBack(new TableLayout(4, 1));
+    p = new BaseXBack(new RowLayout());
     header = new BaseXCheckBox(dialog, FIRST_LINE_HEADER, CsvOptions.HEADER, copts);
     p.add(header);
     quotes = new BaseXCheckBox(dialog, PARSE_QUOTES, CsvOptions.QUOTES, copts);

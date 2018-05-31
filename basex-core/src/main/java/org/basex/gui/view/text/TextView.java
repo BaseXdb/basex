@@ -67,7 +67,7 @@ public final class TextView extends View {
     final AbstractButton find = search.button(FIND);
 
     final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new TableLayout(1, 3));
+    buttons.layout(new ColumnLayout());
     buttons.add(save);
     buttons.add(home);
     buttons.add(find);

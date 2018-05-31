@@ -2,6 +2,8 @@ package org.basex.gui.layout;
 
 import java.awt.*;
 
+import org.basex.util.*;
+
 /**
  * This LayoutManager is similar to the GridLayout. The added components
  * keep their minimum size even when the parent container is resized.
@@ -14,44 +16,38 @@ public final class TableLayout implements LayoutManager {
   private final int cols;
   /** Number of rows. */
   private final int rows;
-  /** Horizontal inset. */
-  private final int insetX;
-  /** Vertical inset. */
-  private final int insetY;
-  /** Panel width. */
-  private int width;
-  /** Panel height. */
-  private int height;
+  /** Horizontal gap. */
+  private final int hgap;
+  /** Vertical gap. */
+  private final int vgap;
   /** Horizontal position. */
   private final int[] posX;
   /** Vertical position. */
   private final int[] posY;
 
   /**
-   * Creates a grid layout with the specified number of rows and columns.
-   * When displayed, the grid has the minimum size.
-   * @param r number of rows
-   * @param c number of columns
+   * Creates a table layout with the specified number of rows and columns.
+   * @param rows number of rows
+   * @param cols number of columns
    */
-  public TableLayout(final int r, final int c) {
-    this(r, c, 0, 0);
+  public TableLayout(final int rows, final int cols) {
+    this(rows, cols, 0, 0);
   }
 
   /**
-   * Creates a grid layout with the specified number of rows and columns.
-   * When displayed, the grid has the minimum size.
-   * @param r number of rows
-   * @param c number of columns
-   * @param ix horizontal gap
-   * @param iy vertical gap
+   * Creates a table layout with the specified number of rows and columns.
+   * @param rows number of rows
+   * @param cols number of columns
+   * @param hgap horizontal gap
+   * @param vgap vertical gap
    */
-  public TableLayout(final int r, final int c, final int ix, final int iy) {
-    rows = r;
-    cols = c;
-    insetX = ix;
-    insetY = iy;
-    posX = new int[c];
-    posY = new int[r];
+  public TableLayout(final int rows, final int cols, final int hgap, final int vgap) {
+    this.rows = rows;
+    this.cols = cols;
+    this.hgap = hgap;
+    this.vgap = vgap;
+    posX = new int[cols];
+    posY = new int[rows];
   }
 
   @Override
@@ -61,35 +57,34 @@ public final class TableLayout implements LayoutManager {
   public void removeLayoutComponent(final Component comp) { }
 
   @Override
-  public Dimension preferredLayoutSize(final Container parent) {
-    synchronized(parent.getTreeLock()) {
-      final Insets in = parent.getInsets();
-      final int nr = parent.getComponentCount();
+  public Dimension preferredLayoutSize(final Container cont) {
+    synchronized(cont.getTreeLock()) {
+      final Insets in = cont.getInsets();
+      final int nr = cont.getComponentCount();
+      if(nr > cols * rows) Util.errln("Too many components specified in TableLayout (%/%): %",
+          nr, cols, cont.getComponent(cols * rows));
 
-      int maxW = 0;
-      int maxH = 0;
-      for(int i = 0; i < cols; ++i) {
-        posX[i] = maxW;
+      int maxW = 0, maxH = 0;
+      for(int c = 0; c < cols; c++) {
+        posX[c] = maxW;
         final int w = maxW;
         int h = 0;
 
-        for(int j = 0; j < rows; ++j) {
-          final int n = j * cols + i;
+        for(int r = 0; r < rows; r++) {
+          final int n = r * cols + c;
           if(n >= nr) break;
 
-          final Component c = parent.getComponent(n);
-          final Dimension d = c.getPreferredSize();
-          if(maxW < w + d.width) maxW = w + d.width;
-          if(posY[j] < h) posY[j] = h;
-          else h = posY[j];
+          final Dimension d = cont.getComponent(n).getPreferredSize();
+          maxW = Math.max(maxW, w + d.width);
+          if(posY[r] < h) posY[r] = h;
+          else h = posY[r];
           h += d.height;
         }
-        if(maxH < h) maxH = h;
+        maxH = Math.max(maxH, h);
       }
-      width = in.left + maxW + (cols - 1) * insetX + in.right;
-      height = in.top + maxH + (rows - 1) * insetY + in.bottom;
-
-      return new Dimension(width, height);
+      final int w = in.left + maxW + (cols - 1) * hgap + in.right;
+      final int h = in.top + maxH + (rows - 1) * vgap + in.bottom;
+      return new Dimension(w, h);
     }
   }
 
@@ -99,21 +94,20 @@ public final class TableLayout implements LayoutManager {
   }
 
   @Override
-  public void layoutContainer(final Container p) {
-    preferredLayoutSize(p);
-    synchronized(p.getTreeLock()) {
-      final Insets in = p.getInsets();
-      final int nr = p.getComponentCount();
-      for(int j = 0; j < rows; ++j) {
-        for(int i = 0; i < cols; ++i) {
-          final int n = j * cols + i;
+  public void layoutContainer(final Container cont) {
+    synchronized(cont.getTreeLock()) {
+      preferredLayoutSize(cont);
+      final Insets in = cont.getInsets();
+      final int nr = cont.getComponentCount();
+      for(int r = 0; r < rows; r++) {
+        for(int c = 0; c < cols; c++) {
+          final int n = r * cols + c;
           if(n >= nr) return;
-          final Dimension cs = p.getComponent(n).getPreferredSize();
-          final int x = in.left + posX[i] + i * insetX;
-          final int y = in.top + posY[j] + j * insetY;
-          final int w = cs.width > 0 ? cs.width : width - in.left - in.right;
-          final int h = cs.height > 0 ? cs.height : height - in.top - in.bottom;
-          p.getComponent(n).setBounds(x, y, w, h);
+
+          final Component comp = cont.getComponent(n);
+          final Dimension cs = comp.getPreferredSize();
+          final int x = in.left + posX[c] + c * hgap, y = in.top + posY[r] + r * vgap;
+          comp.setBounds(x, y, cs.width, cs.height);
         }
       }
     }

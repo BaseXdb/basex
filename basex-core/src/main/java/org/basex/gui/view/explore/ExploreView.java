@@ -39,7 +39,7 @@ public final class ExploreView extends View {
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new TableLayout(1, 1, 1, 0)).border(0, 0, 4, 0);
+    buttons.layout(new ColumnLayout(1)).border(0, 0, 4, 0);
     buttons.add(filter);
 
     final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
