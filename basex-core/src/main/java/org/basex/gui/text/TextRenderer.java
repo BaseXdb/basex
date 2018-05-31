@@ -109,19 +109,18 @@ final class TextRenderer extends BaseXBack {
 
   @Override
   public void setFont(final Font f) {
+    if(gui == null) return;
+
     defaultFont = f;
     boldFont = f.deriveFont(Font.BOLD);
-    font(f);
-    if(gui != null) {
-      margin = gui.gopts.get(GUIOptions.SHOWMARGIN)
-          ? Math.max(gui.gopts.get(GUIOptions.MARGIN), 1) : -1;
-      showInvisible = gui.gopts.get(GUIOptions.SHOWINVISIBLE);
-      showNL = gui.gopts.get(GUIOptions.SHOWNL);
-      showLines = gui.gopts.get(GUIOptions.SHOWLINES);
-      markline = gui.gopts.get(GUIOptions.MARKLINE);
-      indent = Math.max(1, gui.gopts.get(GUIOptions.INDENT));
-      repaint();
-    }
+    final GUIOptions gopts = gui.gopts;
+    margin = gopts.get(GUIOptions.SHOWMARGIN) ? Math.max(gopts.get(GUIOptions.MARGIN), 1) : -1;
+    showInvisible = gopts.get(GUIOptions.SHOWINVISIBLE);
+    showNL = gopts.get(GUIOptions.SHOWNL);
+    showLines = gopts.get(GUIOptions.SHOWLINES);
+    markline = gopts.get(GUIOptions.MARKLINE);
+    indent = Math.max(1, gopts.get(GUIOptions.INDENT));
+    repaint();
   }
 
   @Override

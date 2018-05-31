@@ -144,9 +144,9 @@ public final class EditorView extends View {
     search.editor(addTab(), false);
 
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
-    info.setFont(font);
+    info.resize(1.2f);
     pos = new BaseXLabel(" ");
-    pos.setFont(font);
+    pos.resize(1.2f);
 
     posCode.invokeLater();
 
@@ -201,14 +201,10 @@ public final class EditorView extends View {
       final int fl = Math.min(all.size(), e == null ? BaseXHistory.MAX : BaseXHistory.MAXCOMPACT);
       for(int f = 0; f < fl; f++) hst.add(all.get(f));
 
-      Font f = null;
       for(final String en : hst.sort(Prop.CASE)) {
         // disable opened files
         final JMenuItem item = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
-        if(opened.contains(en)) {
-          if(f == null) f = item.getFont().deriveFont(Font.BOLD);
-          item.setFont(f);
-        }
+        if(opened.contains(en)) BaseXLayout.boldFont(item);
         pm.add(item).addActionListener(al);
       }
       al = ac -> history.getActionListeners()[0].actionPerformed(null);

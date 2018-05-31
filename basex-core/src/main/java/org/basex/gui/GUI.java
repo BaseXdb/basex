@@ -151,7 +151,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     buttons.add(toolbar, BorderLayout.WEST);
 
     hits = new BaseXLabel(" ");
-    hits.setFont(hits.getFont().deriveFont(18.0f));
+    hits.resize(1.7f);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
 
     BaseXBack b = new BaseXBack();

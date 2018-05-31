@@ -56,7 +56,7 @@ public final class BaseXCheckBox extends JCheckBox {
    * @return self reference
    */
   public BaseXCheckBox bold() {
-    setFont(getFont().deriveFont(Font.BOLD));
+    BaseXLayout.boldFont(this);
     return this;
   }
 
@@ -65,8 +65,8 @@ public final class BaseXCheckBox extends JCheckBox {
    * @return self reference
    */
   public BaseXCheckBox large() {
-    final Font f = getFont();
-    setFont(new Font(f.getName(), Font.BOLD, (int) (f.getSize2D() * 1.4)));
+    BaseXLayout.boldFont(this);
+    BaseXLayout.resizeFont(this, 1.4f);
     return this;
   }
 

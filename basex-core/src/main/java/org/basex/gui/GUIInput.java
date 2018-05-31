@@ -40,13 +40,7 @@ public final class GUIInput extends BaseXCombo {
     super(main, true);
     gui = main;
 
-    // use larger font for input bar
-    final Font f = getFont();
-    final int fs = f.getSize();
-    final float fs2 = fs * 1.2f;
-    setFont(f.deriveFont(fs2));
-    final Dimension ps = getPreferredSize();
-    setPreferredSize(new Dimension(ps.width, ps.height + (int) fs2 - fs));
+    BaseXLayout.resizeFont(this, 1.3f);
 
     completions = new BaseXCombo(main);
     completions.addActionListener(e -> {
