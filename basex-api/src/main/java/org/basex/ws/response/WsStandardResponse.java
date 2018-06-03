@@ -1,4 +1,4 @@
-package org.basex.ws.serializers;
+package org.basex.ws.response;
 
 import java.io.*;
 import java.net.*;
@@ -25,7 +25,7 @@ import org.basex.ws.WebsocketMessage.*;
  * Represents the standard serializer for WebsocketMessages.
  * @author BaseX Team 2005-18, BSD License
  */
-public class WsStandardSerializer implements WsSerializer {
+public class WsStandardResponse implements WsResponse {
 
   /**
    * Checks the ParamName and sets it.

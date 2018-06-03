@@ -1,4 +1,4 @@
-package org.basex.ws.serializers.stomp;
+package org.basex.ws.response.stomp;
 
 import java.util.*;
 

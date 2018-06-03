@@ -14,7 +14,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.ws.*;
-import org.basex.ws.serializers.*;
+import org.basex.ws.response.*;
 
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
@@ -175,7 +175,7 @@ public final class RestXqModule {
    * @throws Exception exception
    */
   public boolean process(final WebsocketConnection conn, final WsXqFunction func,
-      final WebsocketMessage message, final WsSerializer serializer,
+      final WebsocketMessage message, final WsResponse serializer,
       final Map<String, String> header) throws Exception {
 
     final Context ctx = conn.context;

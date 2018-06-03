@@ -5,8 +5,8 @@ import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
 import org.basex.query.ann.*;
 import org.basex.ws.*;
-import org.basex.ws.serializers.*;
-import org.basex.ws.serializers.stomp.*;
+import org.basex.ws.response.*;
+import org.basex.ws.response.stomp.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -33,7 +33,7 @@ public class StompWebSocket extends WebSocketAdapter
     /**
      * The Serializer for specific Subprotocols.
      * */
-    private WsSerializer serializer;
+    private WsResponse serializer;
 
     /**
      * The uuid of the Websocketinstance.
@@ -59,9 +59,9 @@ public class StompWebSocket extends WebSocketAdapter
      */
     private void setSerializer() {
       if(this.subprotocol == null) {
-        this.serializer = new WsStandardSerializer();
+        this.serializer = new WsStandardResponse();
       } else if("v10.stomp".equals(this.subprotocol)) {
-        this.serializer = new StompSerializer();
+        this.serializer = new StompResponse();
       }
     }
 

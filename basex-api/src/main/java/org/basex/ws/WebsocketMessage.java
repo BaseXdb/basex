@@ -1,6 +1,6 @@
 package org.basex.ws;
 
-import org.basex.ws.serializers.stomp.*;
+import org.basex.ws.response.stomp.*;
 
 /**
  * Describes a WebSocketMessage.

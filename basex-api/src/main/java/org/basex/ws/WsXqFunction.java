@@ -17,7 +17,7 @@ import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.ws.serializers.*;
+import org.basex.ws.response.*;
 
 /**
  * This class represents a single Websocket-Function.
@@ -177,7 +177,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    */
   public boolean process(final WebsocketConnection conn,
                          final WebsocketMessage message,
-                         final WsSerializer serializer,
+                         final WsResponse serializer,
                          final Map<String, String> header) throws Exception {
     try {
       return module.process(conn, this, message, serializer, header);
@@ -225,7 +225,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * @throws UnsupportedEncodingException encoding excepiton
    */
   public void bind(final Expr[] args, final QueryContext qc,
-      final WebsocketMessage message, final WsSerializer serializer,
+      final WebsocketMessage message, final WsResponse serializer,
       final Map<String, String> header) throws QueryException,
         UnsupportedEncodingException {
       serializer.bind(args, qc, message, wsParameters, function, this, header);

@@ -6,7 +6,7 @@ import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
 import org.basex.query.ann.*;
 import org.basex.ws.*;
-import org.basex.ws.serializers.*;
+import org.basex.ws.response.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -34,7 +34,7 @@ public class StandardWebSocket extends WebSocketAdapter {
   /**
    * The StandardSerializer.
    */
-  private WsSerializer serializer = new WsStandardSerializer();
+  private WsResponse serializer = new WsStandardResponse();
 
   @Override
   public void onWebSocketConnect(@NotNull final Session sess) {

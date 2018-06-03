@@ -1,12 +1,12 @@
-package org.basex.ws.serializers.stomp;
+package org.basex.ws.stomp.copy;
 
 import java.util.*;
 
 /**
- * Class for a Connected Frame.
+ * Class for a Subscribe Frame.
  * @author BaseX Team 2005-18, BSD License
  * */
-public class ConnectedFrame extends StompFrame {
+public class SubscribeFrame extends StompFrame {
 
   /**
    * Constructor.
@@ -14,15 +14,16 @@ public class ConnectedFrame extends StompFrame {
    * @param header The header map
    * @param body the body
    */
-  public ConnectedFrame(final Commands cmd, final Map<String, String> header, final String body) {
+  public SubscribeFrame(final Commands cmd, final Map<String, String> header, final String body) {
     super(cmd, header, body);
   }
 
   @Override
   public boolean checkValidity() {
     Map<String, String> headers = this.getHeaders();
-    System.out.println(headers.toString());
-    if(headers.get("version") == null) {
+    if((headers.get("destination") == null) ||
+        (headers.get("id") == null)
+        ) {
       return false;
     }
     return true;

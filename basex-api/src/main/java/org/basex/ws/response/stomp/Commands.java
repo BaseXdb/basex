@@ -1,4 +1,4 @@
-package org.basex.ws.serializers.stomp;
+package org.basex.ws.response.stomp;
 
 /**
  * Possible Command-Strings in a Stomp Message from Client to Server or Server to Client.

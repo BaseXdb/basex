@@ -1,4 +1,4 @@
-package org.basex.ws.serializers.stomp;
+package org.basex.ws.response.stomp;
 
 import static org.basex.ws.WebsocketText.*;
 import java.util.*;

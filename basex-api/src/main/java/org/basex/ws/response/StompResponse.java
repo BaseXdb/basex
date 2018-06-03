@@ -1,4 +1,4 @@
-package org.basex.ws.serializers;
+package org.basex.ws.response;
 
 import static org.basex.ws.WebsocketText.*;
 
@@ -22,13 +22,13 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.ws.*;
 import org.basex.ws.WebsocketMessage.*;
-import org.basex.ws.serializers.stomp.*;
+import org.basex.ws.response.stomp.*;
 
 /**
  * Represents the Serializer for the Stomp Subprotocol.
  * @author BaseX Team 2005-18, BSD License
  */
-public class StompSerializer implements WsSerializer {
+public class StompResponse implements WsResponse {
 
   /**
    * Checks the ParamName and sets it.

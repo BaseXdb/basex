@@ -1,4 +1,4 @@
-package org.basex.ws.serializers;
+package org.basex.ws.response;
 
 import java.io.*;
 import java.util.*;
@@ -13,7 +13,7 @@ import org.basex.ws.*;
  * Represents the Interface for a WebsocketSerializer.
  * @author BaseX Team 2005-18, BSD License
  */
-public interface WsSerializer {
+public interface WsResponse {
 
   /**
    * Binds the params of the Function.

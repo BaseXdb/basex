@@ -1,12 +1,12 @@
-package org.basex.ws.serializers.stomp;
+package org.basex.ws.stomp;
 
 import java.util.*;
 
 /**
- * Class for a Error Frame.
+ * Class for a Disconnect Frame.
  * @author BaseX Team 2005-18, BSD License
  * */
-public class ErrorFrame extends StompFrame {
+public class DisconnectFrame extends StompFrame {
 
   /**
    * Constructor.
@@ -14,13 +14,12 @@ public class ErrorFrame extends StompFrame {
    * @param header The header map
    * @param body the body
    */
-  public ErrorFrame(final Commands cmd, final Map<String, String> header, final String body) {
+  public DisconnectFrame(final Commands cmd, final Map<String, String> header, final String body) {
     super(cmd, header, body);
   }
 
   @Override
   public boolean checkValidity() {
-    // Nothing required
     return true;
   }
 
