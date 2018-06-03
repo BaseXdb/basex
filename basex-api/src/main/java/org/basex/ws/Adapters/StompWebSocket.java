@@ -34,6 +34,12 @@ public class StompWebSocket extends WebSocketAdapter
      * The Serializer for specific Subprotocols.
      * */
     private WsSerializer serializer;
+
+    /**
+     * The uuid of the Websocketinstance.
+     * */
+    private String id;
+
     /**
      * The subscribtion-ids with the corresponding channel.
      * */
@@ -66,7 +72,7 @@ public class StompWebSocket extends WebSocketAdapter
         super.onWebSocketConnect(sess);
 
         // Add to the WebSocketRoom
-        Room.getInstance().join(this);
+        id = Room.getInstance().join(this);
 
         // Create new WebsocketConnection
         wsconnection =
@@ -172,7 +178,7 @@ public class StompWebSocket extends WebSocketAdapter
         super.onWebSocketClose(statusCode, reason);
 
         // Remove the user from the Room
-        Room.getInstance().remove(this);
+        Room.getInstance().remove(id);
     }
 
     @Override

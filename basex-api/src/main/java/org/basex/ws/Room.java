@@ -30,7 +30,7 @@ public class Room {
   /**
    * The members of the Room.
    */
-  private List<WebSocketAdapter> members = new ArrayList<>();
+  private HashMap<String, WebSocketAdapter> members = new HashMap<>();
 
   /**
    * The List of Members per Channel.
@@ -40,9 +40,12 @@ public class Room {
   /**
    * Adds a WebSocket to the membersList.
    * @param socket WebSocke
+   * @return string
    */
-  public void join(final WebSocketAdapter socket) {
-    members.add(socket);
+  public String join(final WebSocketAdapter socket) {
+    String uniqueID = UUID.randomUUID().toString();
+    members.put(uniqueID, socket);
+    return uniqueID;
   }
 
   /**
@@ -61,10 +64,10 @@ public class Room {
 
   /**
    * Removes a Websocket from the MembersList.
-   * @param socket WebSocke
+   * @param id String
    */
-  public void remove(final WebSocketAdapter socket) {
-    members.remove(socket);
+  public void remove(final String id) {
+    members.remove(id);
   }
 
   /**
@@ -87,10 +90,9 @@ public class Room {
    * @param message String
    */
   public void broadcast(final String message) {
-    for(WebSocketAdapter member: members) {
-      // Sends a String asynchronely, method maybe return before the message was sent
-      member.getSession().getRemote().sendStringByFuture(message);
-    }
+    members.forEach((k, v) -> {
+      v.getSession().getRemote().sendStringByFuture(message);
+    });
   }
 
   /**

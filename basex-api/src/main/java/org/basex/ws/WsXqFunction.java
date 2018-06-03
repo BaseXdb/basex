@@ -133,9 +133,19 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
           RestXqParam test = new RestXqParam(var, name, items.value());
           wsParameters.add(test);
           break;
-        case _WS_CONNECT:
-        case _WS_MESSAGE:
         case _WS_CLOSE:
+        case _WS_CONNECT:
+          if(args.length >= 2) {
+            final QNm varId = checkVariable(toString(args[1]));
+            RestXqParam id = new RestXqParam(varId, "id", null);
+            wsParameters.add(id);
+          }
+          path = new WsPath(toString(args[0]));
+          break;
+        case _WS_MESSAGE:
+          // MEssage auf args[1] required
+//          final QNm varMsg = checkVariable(toString(args[1]));
+          // id auf args[2] optional
         case _WS_ERROR:
           path = new WsPath(toString(args[0]));
           break;

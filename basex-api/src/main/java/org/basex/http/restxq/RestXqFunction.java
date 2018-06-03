@@ -387,7 +387,7 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return resulting variable
    * @throws QueryException query exception
    */
-  QNm checkVariable(final String tmp, final boolean... declared) throws QueryException {
+  private QNm checkVariable(final String tmp, final boolean... declared) throws QueryException {
     final Matcher m = TEMPLATE.matcher(tmp);
     if(!m.find()) throw error(INV_TEMPLATE_X, tmp);
     final byte[] vn = token(m.group(1));

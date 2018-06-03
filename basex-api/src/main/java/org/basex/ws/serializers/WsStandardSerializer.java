@@ -48,7 +48,9 @@ public class WsStandardSerializer implements WsSerializer {
       msg =  new Atm(URLDecoder.decode(
           headerParam, Strings.UTF8));
     }
-
+    if(msg == null) {
+      return null;
+    }
     return msg.seqType().instanceOf(decl) ? msg :
       decl.cast(msg, qc, function.sc, null);
   }
@@ -78,10 +80,9 @@ public class WsStandardSerializer implements WsSerializer {
           if(var.name.toString().equals("message")) {
             final Value msg;
               if(msgType == MESSAGETYPE.STRING) {
-                msg = new Atm(URLDecoder.decode(
-                    message.getStringMessage(), Strings.UTF8));
+                msg = Str.get(message.getStringMessage());
               } else if(msgType == MESSAGETYPE.BINARY) {
-                msg = new Atm(message.getBinMessage());
+                msg = B64.get(message.getBinMessage());
               } else {
                 break;
               }
@@ -106,7 +107,7 @@ public class WsStandardSerializer implements WsSerializer {
 
     for(Item it; (it = iter.next()) != null;) {
       // Dont send anything if Websocket gets closed
-      if(!wxf.matches(Annotation._WS_MESSAGE)) continue;
+      if(wxf.matches(Annotation._WS_CLOSE)) continue;
 
       ser.reset();
       ser.serialize(it);

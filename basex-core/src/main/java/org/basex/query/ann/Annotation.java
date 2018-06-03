@@ -153,22 +153,23 @@ public enum Annotation {
   _UNIT_TEST("test(['expected',error])", arg(STR_O, STR_O), UNIT_URI),
 
   /** XQuery annotation. */
-  _WS_CONNECT("connect(path)", arg(STR_O), WS_URI),
+  _WS_CONNECT("connect(path[,id])", arg(STR_O, STR_O), WS_URI),
   /** XQuery annotation. */
-  _WS_MESSAGE("message(path)", arg(STR_O), WS_URI),
+  _WS_MESSAGE("message(path,message[,id])", arg(STR_O, STR_O), WS_URI),
   /** XQuery annotation. */
-  _WS_SENDTO("send-to(path)", arg(STR_O), WS_URI),
+  _WS_CLOSE("close(path[,id])", arg(STR_O), WS_URI),
   /** XQuery annotation. */
-  _WS_ERROR("error-case(path)", arg(STR_O), WS_URI),
-  /** XQuery annotation. */
-  _WS_CLOSE("close(path)", arg(STR_O), WS_URI),
-  /** XQuery annotation. */
-  _WS_PARAM("param(name,variable[,default,...])",
-      arg(STR_O, STR_O, ITEM_O), WS_URI, false),
-  /** XQuery annotation. */
+  _WS_PARAM("param(name,variable[,default,...])", arg(STR_O, STR_O, ITEM_O), WS_URI, false),
+
+  /** [JF] XQuery annotation. */
   _WS_STOMP_SUBSCRIBE("subscribe(path)", arg(STR_O), WS_URI),
-  /** XQuery annotation. */
-  _WS_STOMP_UNSUBSCRIBE("unsubscribe(path)", arg(STR_O), WS_URI);
+  /** [JF] XQuery annotation. */
+  _WS_STOMP_UNSUBSCRIBE("unsubscribe(path)", arg(STR_O), WS_URI),
+
+  /** [JF] Introduce later? XQuery annotation. */
+  _WS_SENDTO("send-to(path)", arg(STR_O), WS_URI),
+  /** [JF] Does it already work? XQuery annotation. */
+  _WS_ERROR("error(path[,id])", arg(STR_O), WS_URI);
 
   /** Argument types. */
   public final SeqType[] args;
