@@ -1,4 +1,4 @@
-package org.basex.ws.response;
+package org.basex.ws.stomp;
 
 import static org.basex.ws.WebsocketText.*;
 
@@ -22,7 +22,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.ws.*;
 import org.basex.ws.WebsocketMessage.*;
-import org.basex.ws.response.stomp.*;
+import org.basex.ws.response.*;
 
 /**
  * Represents the Serializer for the Stomp Subprotocol.

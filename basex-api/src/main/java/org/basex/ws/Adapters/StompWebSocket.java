@@ -6,7 +6,7 @@ import org.basex.http.restxq.*;
 import org.basex.query.ann.*;
 import org.basex.ws.*;
 import org.basex.ws.response.*;
-import org.basex.ws.response.stomp.*;
+import org.basex.ws.stomp.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
