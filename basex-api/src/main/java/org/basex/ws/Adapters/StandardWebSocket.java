@@ -85,7 +85,9 @@ public class StandardWebSocket extends WebSocketAdapter {
   public void onWebSocketText(final String message) {
     Annotation ann = Annotation._WS_MESSAGE;
     WebsocketMessage wm = new WebsocketMessage(message);
-    findAndProcess(ann, wm, null);
+    Map<String, String> header = new HashMap<>();
+    header.put("id", id);
+    findAndProcess(ann, wm, header);
   }
 
   @Override
@@ -95,6 +97,7 @@ public class StandardWebSocket extends WebSocketAdapter {
     Map<String, String> header = new HashMap<>();
     header.put("offset", "" + offset);
     header.put("len", "" + len);
+    header.put("id", id);
     findAndProcess(Annotation._WS_MESSAGE, new WebsocketMessage(payload), header);
   }
 

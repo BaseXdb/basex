@@ -135,6 +135,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
+        case _WS_ERROR:
           if(args.length >= 2) {
             final QNm varId = checkVariable(toString(args[1]));
             RestXqParam id = new RestXqParam(varId, "id", null);
@@ -143,10 +144,17 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
           path = new WsPath(toString(args[0]));
           break;
         case _WS_MESSAGE:
-          // MEssage auf args[1] required
-//          final QNm varMsg = checkVariable(toString(args[1]));
-          // id auf args[2] optional
-        case _WS_ERROR:
+          if(args.length < 2) {
+            throw new Exception("More Params required");
+          }
+          final QNm varMsg = checkVariable(toString(args[1]));
+          RestXqParam msg = new RestXqParam(varMsg, "message", null);
+          wsParameters.add(msg);
+          if(args.length > 2) {
+            final QNm varId = checkVariable(toString(args[2]));
+            RestXqParam id = new RestXqParam(varId, "id", null);
+            wsParameters.add(id);
+          }
           path = new WsPath(toString(args[0]));
           break;
         default:

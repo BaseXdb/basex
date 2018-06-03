@@ -155,7 +155,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _WS_CONNECT("connect(path[,id])", arg(STR_O, STR_O), WS_URI),
   /** XQuery annotation. */
-  _WS_MESSAGE("message(path,message[,id])", arg(STR_O, STR_O), WS_URI),
+  _WS_MESSAGE("message(path,message[,id])", arg(STR_O, STR_O, STR_O), WS_URI),
   /** XQuery annotation. */
   _WS_CLOSE("close(path[,id])", arg(STR_O), WS_URI),
   /** XQuery annotation. */
