@@ -9,8 +9,8 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.util.*;
 import org.basex.http.ws.response.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -23,32 +23,20 @@ import org.basex.util.*;
  * This class represents a single Websocket-Function.
  * @author BaseX Team 2005-18, BSD License
  * */
-public class WsXqFunction implements Comparable<WsXqFunction> {
-
-  /** Single template pattern. */
-  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
-  /** Associated function. */
-  public final StaticFunc function;
-  /** Associated module. */
-  private final RestXqModule module;
-  /** Serialization parameters. */
-  public final SerializerOptions output;
-  /** Parameters of the Websocket Function. */
-  final ArrayList<RestXqParam> wsParameters = new ArrayList<>();
-  /** The Path of the WsXqFunction. */
-  public WsPath path;
-
+public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction> {
   /**
    * Constructor.
    * @param function associated user function
+   * @param qc query context
    * @param module associated module
-   * @param qc QueryContext
    */
-  public WsXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
-    this.function = function;
-    this.module = module;
-    output = qc.serParams();
+  public WsXqFunction(final StaticFunc function,
+      final QueryContext qc, final RestXqModule module) {
+    super(function, qc, module);
   }
+
+  /** The Path of the WsXqFunction. */
+  public WsPath path;
 
   /**
    * Checks if an WEbsocket request matches this Annotation.
@@ -79,15 +67,6 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
       }
     }
     return found;
-  }
-
-  /**
-   * Returns the specified item as a string.
-   * @param item item
-   * @return string
-   * */
-  static String toString(final Item item) {
-    return ((Str) item).toJava();
   }
 
   /**
@@ -131,7 +110,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
             items.add(args[a]);
           }
           RestXqParam test = new RestXqParam(var, name, items.value());
-          wsParameters.add(test);
+          headerParams.add(test);
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
@@ -139,7 +118,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
           if(args.length >= 2) {
             final QNm varId = checkVariable(toString(args[1]));
             RestXqParam id = new RestXqParam(varId, "id", null);
-            wsParameters.add(id);
+            headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));
           break;
@@ -149,11 +128,11 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
           }
           final QNm varMsg = checkVariable(toString(args[1]));
           RestXqParam msg = new RestXqParam(varMsg, "message", null);
-          wsParameters.add(msg);
+          headerParams.add(msg);
           if(args.length > 2) {
             final QNm varId = checkVariable(toString(args[2]));
             RestXqParam id = new RestXqParam(varId, "id", null);
-            wsParameters.add(id);
+            headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));
           break;
@@ -199,6 +178,7 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
    * @param ext error extension
    * @return exception
    */
+  @Override
   public QueryException error(final String msg, final Object... ext) {
     return error(function.info, Util.info(msg, ext));
   }
@@ -228,6 +208,6 @@ public class WsXqFunction implements Comparable<WsXqFunction> {
       final WebsocketMessage message, final WsResponse serializer,
       final Map<String, String> header) throws QueryException,
         UnsupportedEncodingException {
-      serializer.bind(args, qc, message, wsParameters, function, this, header);
+      serializer.bind(args, qc, message, headerParams, function, this, header);
   }
 }

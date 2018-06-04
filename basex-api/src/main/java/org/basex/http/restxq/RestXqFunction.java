@@ -18,7 +18,7 @@ import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.http.*;
-import org.basex.io.serial.*;
+import org.basex.http.util.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -42,9 +42,17 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class RestXqFunction implements Comparable<RestXqFunction> {
-  /** Single template pattern. */
-  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
+public final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
+  /**
+   * Constructor.
+   * @param function associated user function
+   * @param qc query context
+   * @param module associated module
+   */
+  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
+    super(function, qc, module);
+  }
+
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
@@ -52,22 +60,15 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
   final ArrayList<RestXqParam> queryParams = new ArrayList<>();
   /** Form parameters. */
   final ArrayList<RestXqParam> formParams = new ArrayList<>();
-  /** Header parameters. */
-  final ArrayList<RestXqParam> headerParams = new ArrayList<>();
   /** Returned media types. */
   final ArrayList<MediaType> produces = new ArrayList<>();
 
   /** Supported methods. */
   final Set<String> methods = new HashSet<>();
-  /** Serialization parameters. */
-  final SerializerOptions output;
-  /** Associated function. */
-  final StaticFunc function;
+
   /** Permissions (can be empty). */
   final TokenList allows = new TokenList();
 
-  /** Associated module. */
-  private final RestXqModule module;
   /** Query parameters. */
   private final ArrayList<RestXqParam> errorParams = new ArrayList<>();
 
@@ -88,18 +89,6 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
   private RestXqError error;
   /** Error (can be {@code null}). */
   private RestXqPerm permission;
-
-  /**
-   * Constructor.
-   * @param function associated user function
-   * @param qc query context
-   * @param module associated module
-   */
-  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
-    this.function = function;
-    this.module = module;
-    output = qc.serParams();
-  }
 
   /**
    * Processes the HTTP request. Parses new modules and discards obsolete ones.
@@ -362,7 +351,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param ext error extension
    * @return exception
    */
-  QueryException error(final String msg, final Object... ext) {
+  @Override
+  protected QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
   }
 
@@ -508,15 +498,6 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
         break;
       }
     }
-  }
-
-  /**
-   * Returns the specified item as a string.
-   * @param item item
-   * @return string
-   */
-  static String toString(final Item item) {
-    return ((Str) item).toJava();
   }
 
   /**
