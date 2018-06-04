@@ -1,6 +1,6 @@
-package org.basex.ws;
+package org.basex.http.ws;
 
-import org.basex.ws.Adapters.*;
+import org.basex.http.ws.adapter.*;
 import org.eclipse.jetty.websocket.servlet.*;
 
 /**

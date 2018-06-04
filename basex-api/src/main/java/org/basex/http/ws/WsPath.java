@@ -1,4 +1,4 @@
-package org.basex.ws;
+package org.basex.http.ws;
 
 /**
  * This class represents the Path of a Websocket-Endpoint.

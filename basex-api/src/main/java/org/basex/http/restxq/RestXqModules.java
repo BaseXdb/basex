@@ -9,13 +9,13 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.ann.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.basex.ws.*;
 
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.

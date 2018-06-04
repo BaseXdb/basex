@@ -1,4 +1,4 @@
-package org.basex.ws;
+package org.basex.http.ws;
 
 import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.query.QueryError.*;
@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.ws.response.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -17,7 +18,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.ws.response.*;
 
 /**
  * This class represents a single Websocket-Function.

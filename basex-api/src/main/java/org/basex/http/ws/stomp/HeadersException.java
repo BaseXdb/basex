@@ -1,4 +1,4 @@
-package org.basex.ws.stomp;
+package org.basex.http.ws.stomp;
 
 /**
  * The Exception witch is thrown if not all required Headers are set.

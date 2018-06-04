@@ -11,13 +11,16 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * <p>This servlet receives and processes REST requests.
- * The evaluated code is defined in XQuery modules, which are located in the web server's
- * root directory (specified by the {@code HTTPPATH} option), and decorated with RESTXQ
- * annotations.</p>
+ * <p>
+ * This servlet receives and processes REST requests. The evaluated code is defined in XQuery
+ * modules, which are located in the web server's root directory (specified by the {@code HTTPPATH}
+ * option), and decorated with RESTXQ annotations.
+ * </p>
  *
- * <p>The implementation is based on Adam Retter's paper presented at XMLPrague 2012,
- * titled "RESTful XQuery - Standardised XQuery 3.0 Annotations for REST".</p>
+ * <p>
+ * The implementation is based on Adam Retter's paper presented at XMLPrague 2012, titled "RESTful
+ * XQuery - Standardised XQuery 3.0 Annotations for REST".
+ * </p>
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen

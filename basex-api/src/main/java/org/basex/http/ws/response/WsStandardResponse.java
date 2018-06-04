@@ -1,4 +1,4 @@
-package org.basex.ws.response;
+package org.basex.http.ws.response;
 
 import java.io.*;
 import java.net.*;
@@ -6,6 +6,8 @@ import java.nio.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.ws.*;
+import org.basex.http.ws.WebsocketMessage.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -18,8 +20,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.ws.*;
-import org.basex.ws.WebsocketMessage.*;
 
 /**
  * Represents the standard serializer for WebsocketMessages.

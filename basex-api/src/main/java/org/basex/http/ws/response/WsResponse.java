@@ -1,13 +1,13 @@
-package org.basex.ws.response;
+package org.basex.http.ws.response;
 
 import java.io.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.ws.*;
 
 /**
  * Represents the Interface for a WebsocketSerializer.

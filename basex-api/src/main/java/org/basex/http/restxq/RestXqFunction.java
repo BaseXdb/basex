@@ -102,8 +102,7 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
-   * Processes the HTTP request.
-   * Parses new modules and discards obsolete ones.
+   * Processes the HTTP request. Parses new modules and discards obsolete ones.
    * @param conn HTTP connection
    * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
@@ -142,7 +141,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
-        for(final QNm name : path.varNames()) checkVariable(name, AtomType.AAT, declared);
+        for(final QNm name : path.varNames())
+          checkVariable(name, AtomType.AAT, declared);
       } else if(sig == _REST_ERROR) {
         error(ann);
       } else if(sig == _REST_CONSUMES) {
@@ -164,8 +164,9 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
         final Item body = args.length > 1 ? args[1] : null;
         addMethod(mth, body, declared, ann.info);
       } else if(sig == _REST_SINGLE) {
-        singleton = '\u0001' + (args.length > 0 ? toString(args[0]) :
-          (function.info.path() + ':' + function.info.line()));
+        singleton = '\u0001'
+            + (args.length > 0 ? toString(args[0])
+                               : (function.info.path() + ':' + function.info.line()));
       } else if(eq(sig.uri, QueryText.REST_URI)) {
         final Item body = args.length == 0 ? null : args[0];
         addMethod(string(sig.local()), body, declared, ann.info);
@@ -190,7 +191,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
           throw error(ann.info, UNKNOWN_SER_X, sig.local());
         }
       } else if(sig == _PERM_ALLOW) {
-        for(final Item arg : args) allows.add(toString(arg));
+        for(final Item arg : args)
+          allows.add(toString(arg));
       } else if(sig == _PERM_CHECK) {
         final String p = args.length > 0 ? toString(args[0]) : "";
         final QNm v = args.length > 1 ? checkVariable(toString(args[1]), declared) : null;
@@ -209,8 +211,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     if(found) {
-      final int paths = (path != null ? 1 : 0) + (error != null ? 1 : 0) +
-          (permission != null ? 1 : 0);
+      final int paths = (path != null ? 1 : 0) + (error != null ? 1 : 0)
+          + (permission != null ? 1 : 0);
       if(paths != 1) throw error(function.info, paths == 0 ? ANN_MISSING : ANN_CONFLICT);
 
       final int dl = declared.length;
@@ -231,7 +233,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws Exception any exception
    */
   private static <O extends Options> O parse(final O opts, final Ann ann) throws Exception {
-    for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
+    for(final Item arg : ann.args())
+      opts.assign(string(arg.string(ann.info)));
     return opts;
   }
 
@@ -265,8 +268,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
     // check method, consumed and produced media type, and path or error
-    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
-        produces(conn))) return false;
+    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) && produces(conn)))
+      return false;
 
     if(perm) return permission != null && permission.matches(conn);
     if(err != null) return error != null && error.matches(err);
@@ -315,9 +318,10 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      final Enumeration<?> en =  conn.req.getHeaders(rxp.name);
+      final Enumeration<?> en = conn.req.getHeaders(rxp.name);
       while(en.hasMoreElements()) {
-        for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
+        for(final String s : en.nextElement().toString().split(", *"))
+          tl.add(s);
       }
       bind(rxp, args, StrSeq.get(tl), qc);
     }
@@ -340,9 +344,11 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
       final Value[] values = Catch.values((QueryException) ext);
       final QNm[] names = Catch.NAMES;
       final int nl = names.length;
-      for(int n = 0; n < nl; n++) errs.put(string(names[n].local()), values[n]);
+      for(int n = 0; n < nl; n++)
+        errs.put(string(names[n].local()), values[n]);
     }
-    for(final RestXqParam rxp : errorParams) bind(rxp, args, errs.get(rxp.name), qc);
+    for(final RestXqParam rxp : errorParams)
+      bind(rxp, args, errs.get(rxp.name), qc);
 
     // bind permission information
     if(ext instanceof RestXqFunction && permission.var != null) {
@@ -411,7 +417,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
     int p = -1;
     final Var[] params = function.params;
     final int pl = params.length;
-    while(++p < pl && !params[p].name.eq(name));
+    while(++p < pl && !params[p].name.eq(name))
+      ;
 
     if(p == params.length) throw error(UNKNOWN_VAR_X, name.string());
     if(declared[p]) throw error(VAR_ASSIGNED_X, name.string());
@@ -464,8 +471,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
    * Binds the specified parameter to a variable.
    * @param rxp parameter
    * @param args argument array
-   * @param value values to be bound; the parameter's default value is assigned
-   *        if the argument is {@code null} or empty
+   * @param value values to be bound; the parameter's default value is assigned if the argument is
+   *          {@code null} or empty
    * @param qc query context
    * @throws QueryException query exception
    */
@@ -495,8 +502,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
       if(var.name.eq(name)) {
         // casts and binds the value
         final SeqType decl = var.declaredType();
-        final Value val = value.seqType().instanceOf(decl) ? value :
-          decl.cast(value, qc, function.sc, null);
+        final Value val = value.seqType().instanceOf(
+            decl) ? value : decl.cast(value, qc, function.sc, null);
         args[p] = var.checkType(val, qc, false);
         break;
       }
@@ -518,7 +525,8 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param list list to add values to
    */
   private static void strings(final Ann ann, final ArrayList<MediaType> list) {
-    for(final Item item : ann.args()) list.add(new MediaType(toString(item)));
+    for(final Item item : ann.args())
+      list.add(new MediaType(toString(item)));
   }
 
   /**
@@ -539,7 +547,7 @@ public final class RestXqFunction implements Comparable<RestXqFunction> {
     final ItemList items = new ItemList(al - 2);
     for(int a = 2; a < al; a++) {
       items.add(args[a]);
-      }
+    }
     return new RestXqParam(var, name, items.value());
   }
 

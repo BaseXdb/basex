@@ -8,13 +8,13 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.http.ws.*;
+import org.basex.http.ws.response.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
-import org.basex.ws.*;
-import org.basex.ws.response.*;
 
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.

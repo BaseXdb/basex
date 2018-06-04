@@ -1,6 +1,6 @@
-package org.basex.ws.stomp;
+package org.basex.http.ws.stomp;
 
-import static org.basex.ws.WebsocketText.*;
+import static org.basex.http.ws.WebsocketText.*;
 
 import java.io.*;
 import java.net.*;
@@ -8,6 +8,9 @@ import java.nio.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.ws.*;
+import org.basex.http.ws.WebsocketMessage.*;
+import org.basex.http.ws.response.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -20,9 +23,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.ws.*;
-import org.basex.ws.WebsocketMessage.*;
-import org.basex.ws.response.*;
 
 /**
  * Represents the Serializer for the Stomp Subprotocol.

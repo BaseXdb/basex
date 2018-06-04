@@ -1,12 +1,12 @@
-package org.basex.ws.Adapters;
+package org.basex.http.ws.adapter;
 
 import java.util.*;
 
 import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
+import org.basex.http.ws.*;
+import org.basex.http.ws.response.*;
 import org.basex.query.ann.*;
-import org.basex.ws.*;
-import org.basex.ws.response.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**

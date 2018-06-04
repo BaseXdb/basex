@@ -1,4 +1,4 @@
-package org.basex.ws.stomp;
+package org.basex.http.ws.stomp;
 
 /**
  * Possible Command-Strings in a Stomp Message from Client to Server or Server to Client.
