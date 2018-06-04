@@ -139,6 +139,7 @@ public class StandardWebSocket extends WebSocketAdapter {
     WsXqFunction func = null;
     try {
       func = rxm.find(wsconnection, null, ann, this.path);
+      if(func == null) wsconnection.error("Function not found", 500);
       if(func != null && serializer != null) func.process(wsconnection, msg, serializer, header);
     } catch(Exception e) {
       e.printStackTrace();

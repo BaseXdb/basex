@@ -1,7 +1,5 @@
 package org.basex.ws;
 
-import org.basex.ws.stomp.*;
-
 /**
  * Describes a WebSocketMessage.
  *  @author BaseX Team 2005-18, BSD License
@@ -19,11 +17,7 @@ public class WebsocketMessage {
     /**
      * String Message type.
      */
-    STRING,
-    /**
-     * STOMP Frame.
-     * */
-    STOMP
+    STRING
   }
   /**
    * Represents the MessageType.
@@ -37,10 +31,6 @@ public class WebsocketMessage {
    * Represents a Binary message.
    * */
   private byte[] binMessage;
-  /**
-   * Represents a STOMP Message.
-   * */
-  private StompFrame stompMessage;
 
   /**
    * Constructor for String-messages.
@@ -61,15 +51,6 @@ public class WebsocketMessage {
   }
 
   /**
-   * Constructor for STOMP-Messages.
-   * @param message STOMPFrame
-   * */
-  public WebsocketMessage(final StompFrame message) {
-    this.stompMessage = message;
-    this.msgType = MESSAGETYPE.STOMP;
-  }
-
-  /**
    * Returns the StringMessage.
    * @return String message
    */
@@ -83,14 +64,6 @@ public class WebsocketMessage {
    */
   public byte[] getBinMessage() {
     return this.binMessage;
-  }
-
-  /**
-   * Returns the StompMessage.
-   * @return StompFrame message
-   * */
-  public StompFrame getStompMessage() {
-    return this.stompMessage;
   }
 
   /**

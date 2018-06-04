@@ -99,14 +99,14 @@ public class StompWebSocket extends WebSocketAdapter
         // Return specific StompFrame here? -> ConnectFrame extend StompFrame,
         // in parse check for all required parameters and set optional also?
         // Maybe bind method in the Frame? or returning list with all parameters to bind?
+        wm = new WebsocketMessage(message);
         StompFrame stompframe = null;
         try {
           stompframe = StompFrame.parse(message);
-
         } catch(HeadersException e) {
-          wsconnection.error(e.getMessage(), 500);
+          // TODO Auto-generated catch block
+          e.printStackTrace();
         }
-        wm = new WebsocketMessage(stompframe);
         String id;
         String channel;
         switch(stompframe.getCommand()) {

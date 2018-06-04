@@ -45,61 +45,61 @@ public class StompResponse implements WsResponse {
                                throws QueryException, UnsupportedEncodingException {
     final SeqType decl = var.declaredType();
     Value msg = null;
-    if(var.name.toString().equals("destination")) {
-      String header = message.getStompMessage().getHeaders().get("destination");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-              header, Strings.UTF8));
-    } else if(var.name.toString().equals("id")) {
-      String header = message.getStompMessage().getHeaders().get("id");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("transaction")) {
-      String header = message.getStompMessage().getHeaders().get("transaction");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("accept-version")) {
-      String header = message.getStompMessage().getHeaders().get("accept-version");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("host")) {
-      String header = message.getStompMessage().getHeaders().get("host");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("ack")) {
-      String header = message.getStompMessage().getHeaders().get("ack");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("receipt")) {
-      String header = message.getStompMessage().getHeaders().get("receipt");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("login")) {
-      String header = message.getStompMessage().getHeaders().get("login");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("passcode")) {
-      String header = message.getStompMessage().getHeaders().get("passcode");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else if(var.name.toString().equals("heart-beat")) {
-      String header = message.getStompMessage().getHeaders().get("heart-beat");
-      header = header != null ? header : "";
-      msg = new Atm(URLDecoder.decode(
-          header, Strings.UTF8));
-    } else {
-      msg = new Atm(URLDecoder.decode(
-          message.getStompMessage().getBody().toString(), Strings.UTF8));
-    }
-
+//    if(var.name.toString().equals("destination")) {
+//      String header = message.getStompMessage().getHeaders().get("destination");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//              header, Strings.UTF8));
+//    } else if(var.name.toString().equals("id")) {
+//      String header = message.getStompMessage().getHeaders().get("id");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("transaction")) {
+//      String header = message.getStompMessage().getHeaders().get("transaction");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("accept-version")) {
+//      String header = message.getStompMessage().getHeaders().get("accept-version");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("host")) {
+//      String header = message.getStompMessage().getHeaders().get("host");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("ack")) {
+//      String header = message.getStompMessage().getHeaders().get("ack");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("receipt")) {
+//      String header = message.getStompMessage().getHeaders().get("receipt");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("login")) {
+//      String header = message.getStompMessage().getHeaders().get("login");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("passcode")) {
+//      String header = message.getStompMessage().getHeaders().get("passcode");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else if(var.name.toString().equals("heart-beat")) {
+//      String header = message.getStompMessage().getHeaders().get("heart-beat");
+//      header = header != null ? header : "";
+//      msg = new Atm(URLDecoder.decode(
+//          header, Strings.UTF8));
+//    } else {
+//      msg = new Atm(URLDecoder.decode(
+//          message.getStompMessage().getBody().toString(), Strings.UTF8));
+//    }
+//
     return msg.seqType().instanceOf(decl) ? msg :
       decl.cast(msg, qc, function.sc, null);
   }
@@ -111,8 +111,7 @@ public class StompResponse implements WsResponse {
       throws QueryException, UnsupportedEncodingException {
 
     // If no Message is provided (e.g. in the handshake) no stompframe is provided
-    if((message != null) &&
-       (message.getMsgType() != MESSAGETYPE.STOMP)) {
+    if((message != null)) {
       throw new QueryException("Wrong Message Type in StompSerializer: " +
                                 message.getMsgType() + "! Needed STOMP");
     }
@@ -121,24 +120,23 @@ public class StompResponse implements WsResponse {
       final Var[] params = function.params;
       final int pl = params.length;
       final MESSAGETYPE msgType = message.getMsgType();
-
-      if(msgType == MESSAGETYPE.STOMP) {
-
-        for(int p = 0; p < pl; p++) {
-          // Parameter over the xqueryfuncs wit %ws:param annotation
-          final Var var = params[p];
-          if(var.name.eq(rxp.var)) {
-            // if var.name.eq.("destination") { final Value val = destHeasder.seqType....}
-            final Value val = checkParam(message, var, qc, function);
-            args[p] = var.checkType(val, qc, false);
-          }
-        }
-      }
-      else if(msgType == MESSAGETYPE.BINARY) {
-        // TODO: Bind the binary message
-      } else {
-        throw wsfunc.error(WRONG_MSG_TYPE, msgType);
-      }
+//      if(msgType == MESSAGETYPE.STOMP) {
+//
+//        for(int p = 0; p < pl; p++) {
+//          // Parameter over the xqueryfuncs wit %ws:param annotation
+//          final Var var = params[p];
+//          if(var.name.eq(rxp.var)) {
+//            // if var.name.eq.("destination") { final Value val = destHeasder.seqType....}
+//            final Value val = checkParam(message, var, qc, function);
+//            args[p] = var.checkType(val, qc, false);
+//          }
+//        }
+//      }
+//      else if(msgType == MESSAGETYPE.BINARY) {
+//        // TODO: Bind the binary message
+//      } else {
+//        throw wsfunc.error(WRONG_MSG_TYPE, msgType);
+//      }
     }
   }
 
