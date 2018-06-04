@@ -29,7 +29,7 @@ public interface WsResponse {
    */
   void bind(Expr[] args,
             QueryContext qc,
-            WebsocketMessage message,
+            Object message,
             ArrayList<RestXqParam> wsParameters,
             StaticFunc function,
             WsXqFunction wsfunc,

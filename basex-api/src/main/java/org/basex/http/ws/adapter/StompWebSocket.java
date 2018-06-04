@@ -82,7 +82,7 @@ public class StompWebSocket extends WebSocketAdapter
         // The XQuery connectfunction in the stompprotocol is executed within the
         // CONNECT-Frame (onWebSocketText)
         if(!this.subprotocol.equals("v10.stomp")) {
-          findAndProcess(Annotation._WS_CONNECT, null);
+//          findAndProcess(Annotation._WS_CONNECT, null);
         }
     }
 
@@ -91,7 +91,7 @@ public class StompWebSocket extends WebSocketAdapter
     {
       System.out.println("onWebsocketText: " + message);
       Annotation ann = Annotation._WS_CONNECT;
-      WebsocketMessage wm;
+//      WebsocketMessage wm;
 
       // Check if the Protocol is stomp
       if(this.subprotocol.equals("v10.stomp")) {
@@ -99,7 +99,7 @@ public class StompWebSocket extends WebSocketAdapter
         // Return specific StompFrame here? -> ConnectFrame extend StompFrame,
         // in parse check for all required parameters and set optional also?
         // Maybe bind method in the Frame? or returning list with all parameters to bind?
-        wm = new WebsocketMessage(message);
+//        wm = new WebsocketMessage(message);
         StompFrame stompframe = null;
         try {
           stompframe = StompFrame.parse(message);
@@ -155,14 +155,14 @@ public class StompWebSocket extends WebSocketAdapter
               return;
         }
       } else {
-        wm = new WebsocketMessage(message);
+//        wm = new WebsocketMessage(message);
       }
-      findAndProcess(ann, wm);
+//      findAndProcess(ann, wm);
     }
 
     @Override
     public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
-      findAndProcess(Annotation._WS_MESSAGE, new WebsocketMessage(payload));
+//      findAndProcess(Annotation._WS_MESSAGE, new WebsocketMessage(payload));
     }
 
     @Override
@@ -172,7 +172,7 @@ public class StompWebSocket extends WebSocketAdapter
       // Remove any Subscriptions
       idchannelMap.forEach((id, channel) -> room.removeFromChannel(this, channel));
 
-      findAndProcess(Annotation._WS_CLOSE, null);
+//      findAndProcess(Annotation._WS_CLOSE, null);
 
       // Resets Session and Remote in Superclass
         super.onWebSocketClose(statusCode, reason);
@@ -192,7 +192,7 @@ public class StompWebSocket extends WebSocketAdapter
      * @param ann The Websocketannotation
      * @param msg The Message
      */
-    private void findAndProcess(final Annotation ann, final WebsocketMessage msg) {
+    private void findAndProcess(final Annotation ann, final Object msg) {
       final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
       // select the closest match for this request

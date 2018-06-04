@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
-import org.basex.http.ws.WebsocketMessage.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -57,7 +56,7 @@ public class WsStandardResponse implements WsResponse {
 
   @Override
   public void bind(final Expr[] args, final QueryContext qc,
-                   final WebsocketMessage message, final ArrayList<RestXqParam> wsParameters,
+                   final Object message, final ArrayList<RestXqParam> wsParameters,
                    final StaticFunc function, final WsXqFunction wsfunc,
                    final Map<String, String> header)
           throws QueryException, UnsupportedEncodingException {
@@ -65,13 +64,7 @@ public class WsStandardResponse implements WsResponse {
     for(final RestXqParam rxp: wsParameters) {
       final Var[] params = function.params;
       final int pl = params.length;
-      MESSAGETYPE msgType = null;
 
-      if(message != null) {
-         msgType = message.getMsgType();
-      } else {
-
-      }
       for(int p = 0; p < pl; p++) {
         final Var var = params[p];
         final Value val;
@@ -79,10 +72,10 @@ public class WsStandardResponse implements WsResponse {
           final SeqType decl = var.declaredType();
           if(var.name.toString().equals("message")) {
             final Value msg;
-              if(msgType == MESSAGETYPE.STRING) {
-                msg = Str.get(message.getStringMessage());
-              } else if(msgType == MESSAGETYPE.BINARY) {
-                msg = B64.get(message.getBinMessage());
+              if(message instanceof String) {
+                msg = Str.get((String) message);
+              } else if(message instanceof byte[]) {
+                msg = B64.get((byte[]) message);
               } else {
                 break;
               }

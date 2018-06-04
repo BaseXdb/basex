@@ -155,7 +155,7 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
    * @throws Exception exception
    */
   public boolean process(final WebsocketConnection conn,
-                         final WebsocketMessage message,
+                         final Object message,
                          final WsResponse serializer,
                          final Map<String, String> header) throws Exception {
     try {
@@ -199,15 +199,15 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
    * @param args The Expr
    * @param qc The QueryContext
    * @param message The Messagestring
-   * @param serializer The Message serializer
+   * @param response The Message response
    * @param header The header to set
    * @throws QueryException  query exception
    * @throws UnsupportedEncodingException encoding excepiton
    */
   public void bind(final Expr[] args, final QueryContext qc,
-      final WebsocketMessage message, final WsResponse serializer,
+      final Object message, final WsResponse response,
       final Map<String, String> header) throws QueryException,
         UnsupportedEncodingException {
-      serializer.bind(args, qc, message, headerParams, function, this, header);
+      response.bind(args, qc, message, headerParams, function, this, header);
   }
 }

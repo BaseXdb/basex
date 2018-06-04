@@ -9,7 +9,6 @@ import java.util.*;
 
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
-import org.basex.http.ws.WebsocketMessage.*;
 import org.basex.http.ws.response.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -40,7 +39,7 @@ public class StompResponse implements WsResponse {
    * @throws QueryException query exception
    * @throws UnsupportedEncodingException encoding exception
    */
-  private Value checkParam(final WebsocketMessage message, final Var var,
+  private Value checkParam(final Object message, final Var var,
                            final QueryContext qc, final StaticFunc function)
                                throws QueryException, UnsupportedEncodingException {
     final SeqType decl = var.declaredType();
@@ -105,21 +104,21 @@ public class StompResponse implements WsResponse {
   }
 
   @Override
-  public void bind(final Expr[] args, final QueryContext qc, final WebsocketMessage message,
+  public void bind(final Expr[] args, final QueryContext qc, final Object message,
                    final ArrayList<RestXqParam> wsParameters, final StaticFunc function,
                    final WsXqFunction wsfunc, final Map<String, String> header)
       throws QueryException, UnsupportedEncodingException {
 
     // If no Message is provided (e.g. in the handshake) no stompframe is provided
-    if((message != null)) {
-      throw new QueryException("Wrong Message Type in StompSerializer: " +
-                                message.getMsgType() + "! Needed STOMP");
-    }
+//    if((message != null)) {
+//      throw new QueryException("Wrong Message Type in StompSerializer: " +
+//                                message.getMsgType() + "! Needed STOMP");
+//    }
 
     for(final RestXqParam rxp: wsParameters) {
       final Var[] params = function.params;
       final int pl = params.length;
-      final MESSAGETYPE msgType = message.getMsgType();
+//      final MESSAGETYPE msgType = message.getMsgType();
 //      if(msgType == MESSAGETYPE.STOMP) {
 //
 //        for(int p = 0; p < pl; p++) {
