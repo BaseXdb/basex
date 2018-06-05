@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.http.restxq.*;
 import org.basex.http.util.*;
@@ -70,27 +69,13 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
   }
 
   /**
-   * Checks the specified Template.
-   * @param tmp template string
-   * @return resulting variable
-   * @throws QueryException query exception
-   * TODO: Declared?
-   * */
-  QNm checkVariable(final String tmp) throws QueryException {
-    final Matcher m = TEMPLATE.matcher(tmp);
-    if(!m.find()) throw error(INV_TEMPLATE_X, tmp);
-    final byte[] vn = token(m.group(1));
-    if(!XMLToken.isQName(vn)) throw error(INV_VARNAME_X, vn);
-    return new QNm(vn);
-  }
-
-  /**
    * Checks a function for Websocket and permission Annotations.
    * @return {@code true} if function contains relevant annotations
    * @throws Exception exception
    */
   public boolean parse() throws Exception {
     boolean found = false;
+    final boolean[] declared = new boolean[function.params.length];
 
     for(final Ann ann : function.anns) {
       final Annotation sig = ann.sig;
@@ -103,7 +88,7 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
       switch(sig) {
         case _WS_PARAM:
           final String name = toString(args[0]);
-          final QNm var = checkVariable(toString(args[1]));
+          final QNm var = checkVariable(toString(args[1]), declared);
           final int al = args.length;
           final ItemList items = new ItemList(al - 2);
           for(int a = 2; a < al; a++) {
@@ -116,7 +101,7 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
         case _WS_CONNECT:
         case _WS_ERROR:
           if(args.length >= 2) {
-            final QNm varId = checkVariable(toString(args[1]));
+            final QNm varId = checkVariable(toString(args[1]), declared);
             RestXqParam id = new RestXqParam(varId, "id", null);
             headerParams.add(id);
           }
@@ -126,11 +111,11 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
           if(args.length < 2) {
             throw new Exception("More Params required");
           }
-          final QNm varMsg = checkVariable(toString(args[1]));
+          final QNm varMsg = checkVariable(toString(args[1]), declared);
           RestXqParam msg = new RestXqParam(varMsg, "message", null);
           headerParams.add(msg);
           if(args.length > 2) {
-            final QNm varId = checkVariable(toString(args[2]));
+            final QNm varId = checkVariable(toString(args[2]), declared);
             RestXqParam id = new RestXqParam(varId, "id", null);
             headerParams.add(id);
           }
@@ -141,6 +126,14 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
       }
     }
 
+    if(found) {
+      if(path == null) throw error(function.info, ANN_MISSING);
+      final int dl = declared.length;
+      for(int d = 0; d < dl; d++) {
+        if(declared[d]) continue;
+        throw error(function.info, VAR_UNDEFINED_X, function.params[d].name.string());
+      }
+    }
     return found;
   }
 

@@ -377,51 +377,6 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Checks the specified template and adds a variable.
-   * @param tmp template string
-   * @param declared variable declaration flags
-   * @return resulting variable
-   * @throws QueryException query exception
-   */
-  private QNm checkVariable(final String tmp, final boolean... declared) throws QueryException {
-    final Matcher m = TEMPLATE.matcher(tmp);
-    if(!m.find()) throw error(INV_TEMPLATE_X, tmp);
-    final byte[] vn = token(m.group(1));
-    if(!XMLToken.isQName(vn)) throw error(INV_VARNAME_X, vn);
-    final QNm name = new QNm(vn);
-    return checkVariable(name, AtomType.ITEM, declared);
-  }
-
-  /**
-   * Checks if the specified variable exists in the current function.
-   * @param name variable
-   * @param type allowed type
-   * @param declared variable declaration flags
-   * @return resulting variable
-   * @throws QueryException query exception
-   */
-  private QNm checkVariable(final QNm name, final Type type, final boolean[] declared)
-      throws QueryException {
-
-    if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
-    int p = -1;
-    final Var[] params = function.params;
-    final int pl = params.length;
-    while(++p < pl && !params[p].name.eq(name))
-      ;
-
-    if(p == params.length) throw error(UNKNOWN_VAR_X, name.string());
-    if(declared[p]) throw error(VAR_ASSIGNED_X, name.string());
-
-    final SeqType st = params[p].declaredType();
-    if(params[p].checksType() && !st.type.instanceOf(type))
-      throw error(INV_VARTYPE_X_X, name.string(), type);
-
-    declared[p] = true;
-    return name;
-  }
-
-  /**
    * Checks if the consumed content type matches.
    * @param conn HTTP connection
    * @return result of check
