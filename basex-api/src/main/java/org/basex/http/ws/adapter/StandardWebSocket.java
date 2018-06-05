@@ -36,21 +36,21 @@ public class StandardWebSocket extends WebSocketAdapter {
    */
   private WsResponse serializer = new WsStandardResponse();
 
+  /**
+   * Constructor.
+   * @param pPath as a String
+   * */
+  public StandardWebSocket(final String pPath) {
+    super();
+    path = new WsPath(pPath);
+  }
+
   @Override
   public void onWebSocketConnect(@NotNull final Session sess) {
     // Sets Session and Remote in Superclass
     super.onWebSocketConnect(sess);
 
     UpgradeRequest ur = sess.getUpgradeRequest();
-
-    // Set the path.
-    String tPath = ur.getRequestURI().toString();
-    int idx = tPath.indexOf("/ws") + 3;
-    String strPath = tPath.substring(idx);
-    if(strPath.length() == 0) {
-      strPath = "/";
-    }
-    path = new WsPath(strPath);
 
     // Add to the WebSocketRoom
     id = Room.getInstance().join(this);

@@ -1,7 +1,5 @@
 package org.basex.http.ws;
 
-import java.util.*;
-
 import org.eclipse.jetty.websocket.servlet.*;
 
 /**

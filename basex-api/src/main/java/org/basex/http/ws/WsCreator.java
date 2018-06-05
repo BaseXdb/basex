@@ -12,6 +12,10 @@ public class WsCreator implements WebSocketCreator {
   @Override
   public Object createWebSocket(final ServletUpgradeRequest req,
                                 final ServletUpgradeResponse resp) {
+
+    String path = req.getHttpServletRequest().getPathInfo();
+    if(path == null) path = "/";
+
     // Check for subprotocols, take the first matching
     for (String subprotocol : req.getSubProtocols()) {
       if("v10.stomp".equals(subprotocol)) {
@@ -21,7 +25,7 @@ public class WsCreator implements WebSocketCreator {
     }
 
     // If no valid subprotocol
-    return new StandardWebSocket();
+    return new StandardWebSocket(path);
   }
 
 }
