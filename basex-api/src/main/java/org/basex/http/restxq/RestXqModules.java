@@ -123,9 +123,8 @@ public final class RestXqModules {
       tb.add(Text.NL).add(Text.LI).addExt(func.function.name.prefixString());
       if(!func.produces.isEmpty()) tb.add(" ").addExt(func.produces);
     }
-    throw first.path == null ?
-      first.error(ERROR_CONFLICT_X_X, error, tb) :
-      first.error(PATH_CONFLICT_X_X, first.path, tb);
+    throw first.path == null ? first.error(ERROR_CONFLICT_X_X, error, tb)
+                             : first.error(PATH_CONFLICT_X_X, first.path, tb);
   }
 
   /**
@@ -213,8 +212,9 @@ public final class RestXqModules {
             if(qf(accept, "q") == clientQf) return true;
           } else {
             for(final MediaType produce : func.produces) {
-              if(produce.matches(accept) && qf(accept, "q") == clientQf &&
-                  (serverQf == -1 || qf(produce, "qs") == serverQf)) return true;
+              if(produce.matches(accept) && qf(accept, "q") == clientQf
+                  && (serverQf == -1 || qf(produce, "qs") == serverQf))
+                return true;
             }
           }
         }
@@ -271,7 +271,8 @@ public final class RestXqModules {
 
     // check if directory is to be skipped
     final IOFile[] files = root.children();
-    for(final IOFile file : files) if(file.name().equals(IO.IGNORESUFFIX)) return;
+    for(final IOFile file : files)
+      if(file.name().equals(IO.IGNORESUFFIX)) return;
 
     for(final IOFile file : files) {
       if(file.isDir()) {
@@ -298,24 +299,22 @@ public final class RestXqModules {
     }
   }
 
-
   /**
    * WEBSOCKET STUFF
-   * */
+   */
 
   /**
-   * Returns the function that matches the current request or the specified error code best.
+   * Returns the function that matches the current request.
    * @param conn WebSocketConnection
-   * @param error error code (assigned if error function is to be called)
    * @param ann Annotation
    * @param pPath The Path.
    * @return function, or {@code null} if no function matches
    * @throws Exception exception (including unexpected ones)
    */
-  public WsXqFunction find(final WebsocketConnection conn, final QNm error,
-      final Annotation ann, final WsPath pPath) throws Exception {
+  public WsXqFunction find(final WebsocketConnection conn, final Annotation ann, final WsPath pPath)
+      throws Exception {
     // collect all function candidates
-    List<WsXqFunction> funcs = find(conn, error, false, ann, pPath);
+    List<WsXqFunction> funcs = findListWsXqFunctions(conn, ann, pPath);
     if(funcs.isEmpty()) return null;
 
     final WsXqFunction first = funcs.get(0);
@@ -328,17 +327,13 @@ public final class RestXqModules {
   /**
    * Returns the functions that match the current request.
    * @param conn WebSocketConnection
-   * @param error error code (assigned if error function is to be called)
-   * @param perm permission flag
    * @param ann Annotation
    * @param pPath the Path
    * @return list of matching functions, ordered by specifity
    * @throws Exception exception (including unexpected ones)
    */
-  private List<WsXqFunction> find(final WebsocketConnection conn,
-      final QNm error, final boolean perm, final Annotation ann,
-      final WsPath pPath)
-      throws Exception {
+  private List<WsXqFunction> findListWsXqFunctions(final WebsocketConnection conn,
+      final Annotation ann, final WsPath pPath) throws Exception {
 
     // collect all functions
     final ArrayList<WsXqFunction> list = new ArrayList<>();
