@@ -99,7 +99,6 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
-        case _WS_ERROR:
           if(args.length >= 2) {
             final QNm varId = checkVariable(toString(args[1]), declared);
             RestXqParam id = new RestXqParam(varId, "id", null);
@@ -107,6 +106,7 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
           }
           path = new WsPath(toString(args[0]));
           break;
+        case _WS_ERROR:
         case _WS_MESSAGE:
           if(args.length < 2) {
             throw new Exception("More Params required");

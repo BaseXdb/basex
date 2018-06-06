@@ -37,6 +37,11 @@ public class StandardWebSocket extends WebSocketAdapter {
   private WsResponse serializer = new WsStandardResponse();
 
   /**
+   * The HeaderParams.
+   * */
+  private Map<String, String> headerParams = new HashMap<>();
+
+  /**
    * Constructor.
    * @param pPath as a String
    * */
@@ -61,20 +66,20 @@ public class StandardWebSocket extends WebSocketAdapter {
 
     // Add Headers (for binding them to the XQueryParameters in the
     // corresponding bind Method
-    Map<String, String> header = new HashMap<>();
-    header.put("Http-Version", ur.getHttpVersion());
-    header.put("Origin", ur.getOrigin());
-    header.put("Protocol-version", ur.getProtocolVersion());
-    header.put("QueryString", ur.getQueryString());
-    header.put("IsSecure", String.valueOf(ur.isSecure()));
-    header.put("RequestURI", ur.getRequestURI().toString());
-    header.put("id", id);
+
+    headerParams.put("Http-Version", ur.getHttpVersion());
+    headerParams.put("Origin", ur.getOrigin());
+    headerParams.put("Protocol-version", ur.getProtocolVersion());
+    headerParams.put("QueryString", ur.getQueryString());
+    headerParams.put("IsSecure", String.valueOf(ur.isSecure()));
+    headerParams.put("RequestURI", ur.getRequestURI().toString());
+    headerParams.put("id", id);
     // The Headers of the upgraderequest we are interested in
     List<String> headerKeys = new ArrayList<>();
     Collections.addAll(headerKeys, "Host", "Sec-WebSocket-Version");
     sess.getUpgradeRequest().getHeaders().forEach((k, v) -> {
       if(headerKeys.contains(k)) {
-        header.put(k, v.get(0));
+        headerParams.put(k, v.get(0));
       }
     });
     ;
@@ -82,26 +87,23 @@ public class StandardWebSocket extends WebSocketAdapter {
     // Create new WebsocketConnection
     wsconnection = new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(),
         sess);
-    findAndProcess(Annotation._WS_CONNECT, null, header);
+    findAndProcess(Annotation._WS_CONNECT, null, headerParams);
   }
 
   @Override
   public void onWebSocketText(final String message) {
     Annotation ann = Annotation._WS_MESSAGE;
-    Map<String, String> header = new HashMap<>();
-    header.put("id", id);
-    findAndProcess(ann, message, header);
+    findAndProcess(ann, message, headerParams);
   }
 
   @Override
   public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
     System.out.println("On binary: ");
     System.out.println(payload);
-    Map<String, String> header = new HashMap<>();
-    header.put("offset", "" + offset);
-    header.put("len", "" + len);
-    header.put("id", id);
-    findAndProcess(Annotation._WS_MESSAGE, payload, header);
+    headerParams.put("offset", "" + offset);
+    headerParams.put("len", "" + len);
+    headerParams.put("id", id);
+    findAndProcess(Annotation._WS_MESSAGE, payload, headerParams);
   }
 
   @Override
@@ -127,7 +129,10 @@ public class StandardWebSocket extends WebSocketAdapter {
    */
   @Override
   public void onWebSocketError(final Throwable cause) {
-    wsconnection.error(cause.toString(), 500);
+    System.out.println("Errorfunction");
+//    wsconnection.error(cause.toString(), 500);
+//    headerParams.put("errormessage", cause.toString());
+    findAndProcess(Annotation._WS_ERROR, cause.toString(), headerParams);
     cause.printStackTrace(System.err);
     super.getSession().close();
   }
