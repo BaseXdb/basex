@@ -94,14 +94,14 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
           for(int a = 2; a < al; a++) {
             items.add(args[a]);
           }
-          RestXqParam test = new RestXqParam(var, name, items.value());
+          WebXqParam test = new WebXqParam(var, name, items.value());
           headerParams.add(test);
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
           if(args.length >= 2) {
             final QNm varId = checkVariable(toString(args[1]), declared);
-            RestXqParam id = new RestXqParam(varId, "id", null);
+            WebXqParam id = new WebXqParam(varId, "id", null);
             headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));
@@ -112,11 +112,11 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
             throw error(PARAM_MISSING_X, "path,message[,id]");
           }
           final QNm varMsg = checkVariable(toString(args[1]), declared);
-          RestXqParam msg = new RestXqParam(varMsg, "message", null);
+          WebXqParam msg = new WebXqParam(varMsg, "message", null);
           headerParams.add(msg);
           if(args.length > 2) {
             final QNm varId = checkVariable(toString(args[2]), declared);
-            RestXqParam id = new RestXqParam(varId, "id", null);
+            WebXqParam id = new WebXqParam(varId, "id", null);
             headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));

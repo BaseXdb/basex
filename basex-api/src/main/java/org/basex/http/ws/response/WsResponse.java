@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.util.*;
 import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -30,7 +31,7 @@ public interface WsResponse {
   void bind(Expr[] args,
             QueryContext qc,
             Object message,
-            ArrayList<RestXqParam> wsParameters,
+            ArrayList<WebXqParam> wsParameters,
             StaticFunc function,
             WsXqFunction wsfunc,
             Map<String, String> header) throws QueryException, UnsupportedEncodingException;

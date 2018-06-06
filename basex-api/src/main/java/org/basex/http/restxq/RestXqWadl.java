@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.http.*;
+import org.basex.http.util.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -71,11 +72,11 @@ final class RestXqWadl {
 
         // create request
         final FElem request = elem("request", method);
-        for(final RestXqParam rxp : func.queryParams)
+        for(final WebXqParam rxp : func.queryParams)
           addParam(rxp.name, "query",  request, xqdoc, func);
-        for(final RestXqParam rxp : func.formParams)
+        for(final WebXqParam rxp : func.formParams)
           addParam(rxp.name, "query",  request, xqdoc, func);
-        for(final RestXqParam rxp : func.headerParams)
+        for(final WebXqParam rxp : func.headerParams)
           addParam(rxp.name, "header",  request, xqdoc, func);
 
         // create response

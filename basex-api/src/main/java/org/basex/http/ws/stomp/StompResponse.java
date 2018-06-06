@@ -5,6 +5,7 @@ import java.nio.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.util.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.io.out.*;
@@ -101,7 +102,7 @@ public class StompResponse implements WsResponse {
 
   @Override
   public void bind(final Expr[] args, final QueryContext qc, final Object message,
-                   final ArrayList<RestXqParam> wsParameters, final StaticFunc function,
+                   final ArrayList<WebXqParam> wsParameters, final StaticFunc function,
                    final WsXqFunction wsfunc, final Map<String, String> header)
       throws QueryException, UnsupportedEncodingException {
 
@@ -111,7 +112,7 @@ public class StompResponse implements WsResponse {
 //                                message.getMsgType() + "! Needed STOMP");
 //    }
 
-    for(final RestXqParam rxp: wsParameters) {
+    for(final WebXqParam rxp: wsParameters) {
       final Var[] params = function.params;
       final int pl = params.length;
 //      final MESSAGETYPE msgType = message.getMsgType();
