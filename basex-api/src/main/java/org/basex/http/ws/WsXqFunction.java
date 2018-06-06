@@ -1,6 +1,6 @@
 package org.basex.http.ws;
 
-import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.http.util.WebText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
@@ -109,7 +109,7 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
         case _WS_ERROR:
         case _WS_MESSAGE:
           if(args.length < 2) {
-            throw new Exception("More Params required");
+            throw error(PARAM_MISSING_X, "path,message[,id]");
           }
           final QNm varMsg = checkVariable(toString(args[1]), declared);
           RestXqParam msg = new RestXqParam(varMsg, "message", null);

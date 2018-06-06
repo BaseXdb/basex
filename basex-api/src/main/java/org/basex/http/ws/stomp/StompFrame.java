@@ -1,6 +1,6 @@
 package org.basex.http.ws.stomp;
 
-import static org.basex.http.ws.WebsocketText.*;
+import static org.basex.http.util.WebText.*;
 
 import java.util.*;
 

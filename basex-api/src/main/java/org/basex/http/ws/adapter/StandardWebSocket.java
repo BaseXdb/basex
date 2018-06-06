@@ -3,6 +3,8 @@ package org.basex.http.ws.adapter;
 import java.util.*;
 
 import javax.validation.constraints.*;
+
+import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
@@ -129,9 +131,6 @@ public class StandardWebSocket extends WebSocketAdapter {
    */
   @Override
   public void onWebSocketError(final Throwable cause) {
-    System.out.println("Errorfunction");
-//    wsconnection.error(cause.toString(), 500);
-//    headerParams.put("errormessage", cause.toString());
     findAndProcess(Annotation._WS_ERROR, cause.toString(), headerParams);
     cause.printStackTrace(System.err);
     super.getSession().close();
@@ -151,11 +150,11 @@ public class StandardWebSocket extends WebSocketAdapter {
     WsXqFunction func = null;
     try {
       func = rxm.find(wsconnection, ann, this.path);
-      if(func == null) wsconnection.error("Function not found", 500);
+      if(func == null) wsconnection.error(HTTPCode.NO_XQUERY.toString(), 500);
       if(func != null && serializer != null) func.process(wsconnection, msg, serializer, header);
     } catch(Exception e) {
       e.printStackTrace();
-      wsconnection.error("Find and Process" + e.getMessage(), 500);
+      wsconnection.error(e.getMessage(), 500);
     }
   }
 }

@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.http.util.WebText.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
