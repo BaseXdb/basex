@@ -12,7 +12,6 @@ import org.eclipse.jetty.websocket.api.*;
  * @author BaseX Team 2005-18, BSD License
  */
 
-// TODO: Check id-header in the SUBSCRIBTION
 public class Room {
   /**
    * The Room-Singleton.
@@ -108,8 +107,6 @@ public class Room {
    * @param message String
    * @param channel String
    * */
-  // TODO: Maybe not todo her but todo: what if the connection closed of one websocketclient
-  // in the channel?
   public void broadcast(final String message, final String channel) {
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return

@@ -161,8 +161,7 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
 
   @Override
   public int compareTo(final WsXqFunction wsxf) {
-    // TODO Auto-generated method stub
-    return 0;
+    return path.compareTo(wsxf.path);
   }
 
   /**

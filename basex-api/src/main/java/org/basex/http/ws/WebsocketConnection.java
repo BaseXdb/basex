@@ -51,11 +51,9 @@ public class WebsocketConnection implements ClientInfo {
     this.sess = sess;
   }
 
-  // @TODO: Implement
   @Override
   public String clientAddress() {
-    // TODO Auto-generated method stub
-    return null;
+    return sess.getRemoteAddress().toString();
   }
 
 //@TODO: Implement
