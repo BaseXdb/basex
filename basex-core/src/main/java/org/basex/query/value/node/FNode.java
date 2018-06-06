@@ -42,15 +42,13 @@ public abstract class FNode extends ANode {
 
   @Override
   public final boolean is(final ANode node) {
-    return id == node.id;
+    return this == node || id == node.id;
   }
 
   @Override
   public final int diff(final ANode node) {
-    // compare fragment with database node
-    if(node instanceof DBNode) return diff(this, node);
-    // compare fragments. due to subtraction, also negative values will yield valid results
-    return Integer.compare(id - node.id, 0);
+    // fragments: compare node ids. otherwise, find LCA
+    return this == node ? 0 : node instanceof FNode ? id - node.id : diff(this, node);
   }
 
   @Override

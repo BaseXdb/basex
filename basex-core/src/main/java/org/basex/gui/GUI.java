@@ -126,12 +126,12 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int[] loc = this.gopts.get(GUIOptions.GUILOC);
-    final int[] size = this.gopts.get(GUIOptions.GUISIZE);
+    final int[] loc = gopts.get(GUIOptions.GUILOC);
+    final int[] size = gopts.get(GUIOptions.GUISIZE);
     final int x = Math.max(0, Math.min(scr.width - size[0], loc[0]));
     final int y = Math.max(0, Math.min(scr.height - size[1], loc[1]));
     setBounds(x, y, size[0], size[1]);
-    if(this.gopts.get(GUIOptions.MAXSTATE)) {
+    if(gopts.get(GUIOptions.MAXSTATE)) {
       setExtendedState(MAXIMIZED_HORIZ);
       setExtendedState(MAXIMIZED_VERT);
       setExtendedState(MAXIMIZED_BOTH);
@@ -151,7 +151,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     buttons.add(toolbar, BorderLayout.WEST);
 
     hits = new BaseXLabel(" ");
-    hits.setFont(hits.getFont().deriveFont(18.0f));
+    hits.resize(1.7f);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
 
     BaseXBack b = new BaseXBack();
@@ -196,7 +196,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, this);
 
-    b = new BaseXBack(new TableLayout(1, 3, 1, 0));
+    b = new BaseXBack(new ColumnLayout(1));
     b.add(stop);
     b.add(go);
     b.add(filter);

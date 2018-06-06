@@ -101,7 +101,7 @@ public final class HTTPParams {
    */
   public IOContent body() throws IOException {
     if(content == null) {
-      content = new IOContent(new BufferInput(conn.req.getInputStream()).content());
+      content = new IOContent(BufferInput.get(conn.req.getInputStream()).content());
     }
     return content;
   }

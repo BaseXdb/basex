@@ -14,7 +14,7 @@ import module namespace html = 'dba/html' at 'modules/html.xqm';
  : @return redirection to login page or empty sequence
  :)
 declare
-  %perm:check('/dba', '{$perm}')
+  %perm:check("/dba", "{$perm}")
 function dba:check(
   $perm  as map(*)
 ) as element(rest:response)? {
@@ -37,7 +37,7 @@ function dba:check(
  :)
 declare
   %rest:path("/dba/login")
-  %rest:query-param("name" , "{$name}")
+  %rest:query-param("name",  "{$name}")
   %rest:query-param("error", "{$error}")
   %rest:query-param("page",  "{$page}")
   %output:method("html")
@@ -52,9 +52,6 @@ function dba:welcome(
       <td>
         <form action="login-check" method="post">
           <input type="hidden" name="page" value="{ $page }"/>
-          <div class='note'>
-            Enter your admin credentials:
-          </div>
           <div class='small'/>
           <table>
             <tr>

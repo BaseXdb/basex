@@ -34,7 +34,7 @@ public final class DialogSort extends BaseXDialog {
   public DialogSort(final GUI gui) {
     super(gui, SORT);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(6, 1));
+    final BaseXBack p = new BaseXBack(new RowLayout());
 
     final GUIOptions gopts = gui.gopts;
     asc = new BaseXCheckBox(this, ASCENDING_ORDER, GUIOptions.ASCSORT, gopts);
@@ -44,7 +44,7 @@ public final class DialogSort extends BaseXDialog {
     column = new BaseXTextField(this, GUIOptions.COLUMN, gopts);
     column.setColumns(4);
 
-    final BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 4));
+    final BaseXBack pp = new BaseXBack(new ColumnLayout(8));
     pp.border(12, 0, 0, 0);
     pp.add(new BaseXLabel(COLUMN + COLS));
     pp.add(column);

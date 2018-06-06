@@ -92,7 +92,7 @@ public class BaseX extends CLI {
             execute(new Set(MainOptions.MAINMEM, false), false);
             break;
           case 'I':
-            // set/add variable binding
+            // set context item binding
             if(bind.length() != 0) bind.append(',');
             // commas are escaped by a second comma
             value = bind.append('=').append(value.replaceAll(",", ",,")).toString();
@@ -101,7 +101,7 @@ public class BaseX extends CLI {
           case 'o':
             // change output stream
             if(out != System.out) out.close();
-            out = new PrintOutput(value);
+            out = new PrintOutput(new IOFile(value));
             session().setOutputStream(out);
             break;
           case 'q':

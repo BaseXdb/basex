@@ -41,6 +41,7 @@ declare function html:wrap(
   $rows     as element(tr)+
 ) as element(html) {
   let $header := head($options?header) ! util:capitalize(.)
+  let $user := $session:VALUE
   return <html xml:space="preserve">
     <head>
       <meta charset="utf-8"/>
@@ -48,9 +49,9 @@ declare function html:wrap(
       <meta name="description" content="Database Administration"/>
       <meta name="author" content="BaseX Team, 2014-18"/>
       <link rel="stylesheet" type="text/css" href="static/style.css"/>
-      { $options?css ! <link rel="stylesheet" type="text/css" href="static/{.}"/> }
+      { $options?css ! <link rel="stylesheet" type="text/css" href="static/{ . }"/> }
       <script type="text/javascript" src="static/js.js"/>
-      { $options?scripts ! <script type="text/javascript" src="static/{.}"/> }
+      { $options?scripts ! <script type="text/javascript" src="static/{ . }"/> }
     </head>
     <body>
       <table cellpadding='0' cellspacing='0'>
@@ -62,16 +63,38 @@ declare function html:wrap(
                   <span style='float:left'>
                     <h1>BaseX Database Administration</h1>
                   </span>,
-                  for $name in $session:VALUE
-                  return <span style='float:right'>
-                    <b>{ $name }</b> (<a href='logout'>logout</a>)
-                  </span>
+                  if($user) then (
+                    <span style='float:right'>
+                      <b>{ $user }</b> (<a href='logout'>logout</a>)
+                    </span>
+                  ) else ()
                 }</td>
               </tr>
               <tr>
                 <td>
                   <div class='ellipsis'>{
-                    let $emph := <span>{
+                    if($user) then (
+                      let $cats := (
+                        for $cat in ('Logs', 'Databases', 'Queries', 'Files', 'Jobs',
+                          'Users', 'Sessions', 'Settings')
+                        let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
+                        return if($link = $header) then (
+                          <b>{ $link }</b>
+                        ) else (
+                          $link
+                        )
+                      )
+                      return (
+                        head($cats),
+                        tail($cats) ! (' · ', .),
+                        (1 to 3) ! '&#x2000;'
+                      )
+                    ) else (
+                      <div class='note'>
+                        Please enter your admin credentials:
+                      </div>
+                    ),
+                    <span>{
                       element b {
                         attribute id { 'info' },
                         let $error := $options?error[.], $info := $options?info[.]
@@ -82,21 +105,6 @@ declare function html:wrap(
                         ) else ()
                       }
                     }</span>
-                    let $cats :=
-                      for $cat in ('Logs', 'Databases', 'Queries', 'Files', 'Jobs',
-                        'Users', 'Sessions', 'Settings')
-                      let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
-                      return if($link = $header) then (
-                        <b>{ $link }</b>
-                      ) else (
-                        $link
-                      )
-                    return (
-                      head($cats),
-                      tail($cats) ! (' · ', .),
-                      (1 to 3) ! '&#x2000;',
-                      $emph
-                    )
                   }</div>
                   <hr/>
                 </td>

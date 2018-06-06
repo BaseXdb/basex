@@ -124,13 +124,13 @@ public final class BXQueryService implements XPathQueryService {
     try(QueryProcessor qp = new QueryProcessor(query, ctx)) {
       qp.context(nodes);
       qp.parse();
+      // add default namespaces
+      for(final Entry<String, String> entry : ns.entrySet()) {
+        qp.sc.ns.add(token(entry.getKey()), token(entry.getValue()), null);
+      }
+      // perform query and return result
+      qp.register(ctx);
       try {
-        qp.register(ctx);
-        // add default namespaces
-        for(final Entry<String, String> entry : ns.entrySet()) {
-          qp.sc.ns.add(token(entry.getKey()), token(entry.getValue()), null);
-        }
-        // perform query and return result
         return new BXResourceSet(qp.value(), coll);
       } finally {
         qp.close();

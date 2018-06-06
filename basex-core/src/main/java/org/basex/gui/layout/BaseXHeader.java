@@ -18,7 +18,7 @@ public final class BaseXHeader extends BaseXLabel {
   public BaseXHeader(final String string) {
     super(string, true, false);
     setForeground(GUIConstants.dgray);
-    setFont(getFont().deriveFont(24f));
+    resize(1.7f);
     setBorder(new EmptyBorder(-2, 0, 8, 2));
   }
 }

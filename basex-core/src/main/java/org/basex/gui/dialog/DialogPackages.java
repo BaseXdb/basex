@@ -55,7 +55,7 @@ public final class DialogPackages extends BaseXDialog {
 
     // create package chooser
     packages = new BaseXList(this, false);
-    packages.setSize(270, 220);
+    packages.setSize(400, 280);
 
     title = new BaseXLabel(" ").large().border(0, 5, 5, 0);
     name = new BaseXLabel(" ");
@@ -80,7 +80,7 @@ public final class DialogPackages extends BaseXDialog {
 
     BaseXBack p = new BaseXBack(new BorderLayout());
     p.add(packages, BorderLayout.CENTER);
-    final BaseXBack ss = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(8, 0, 0, 0);
+    final BaseXBack ss = new BaseXBack(new ColumnLayout(8)).border(8, 0, 0, 0);
     ss.add(new BaseXLabel(PATH + COL, true, true), BorderLayout.NORTH);
     ss.add(new BaseXLabel(gui.context.soptions.get(StaticOptions.REPOPATH)));
     p.add(ss, BorderLayout.SOUTH);

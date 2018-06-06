@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -19,10 +20,7 @@ import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.scope.Module;
-import org.basex.query.scope.MainModule;
-import org.basex.query.scope.LibraryModule;
-import org.basex.query.scope.StaticScope;
+import org.basex.query.scope.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -38,7 +36,6 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * This class organizes both static and dynamic properties that are specific to a
@@ -72,9 +69,7 @@ public final class QueryContext extends Job implements Closeable {
   public Updates updates;
 
   /** Global database options (will be reassigned after query execution). */
-  final HashMap<Option<?>, Object> staticOpts = new HashMap<>();
-  /** Temporary query options (key/value pairs), supplied by option declarations. */
-  final StringList tempOpts = new StringList();
+  QueryOptions options = new QueryOptions(this);
 
   /** Current context value. */
   public QueryFocus focus = new QueryFocus();
@@ -171,13 +166,11 @@ public final class QueryContext extends Job implements Closeable {
    * Parses the specified query.
    * @param query query string
    * @param uri base URI (may be {@code null})
-   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
-  public Module parse(final String query, final String uri, final StaticContext sc)
-      throws QueryException {
-    return parse(query, QueryProcessor.isLibrary(query), uri, sc);
+  public Module parse(final String query, final String uri) throws QueryException {
+    return parse(query, QueryProcessor.isLibrary(query), uri);
   }
 
   /**
@@ -185,13 +178,23 @@ public final class QueryContext extends Job implements Closeable {
    * @param query query string
    * @param library library/main module
    * @param uri base URI (may be {@code null})
-   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
-  public Module parse(final String query, final boolean library, final String uri,
-      final StaticContext sc) throws QueryException {
-    return library ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
+  public Module parse(final String query, final boolean library, final String uri)
+      throws QueryException {
+    return library ? parseLibrary(query, uri) : parseMain(query, uri);
+  }
+
+  /**
+   * Parses the specified query.
+   * @param query query string
+   * @param uri base URI (may be {@code null})
+   * @return main module
+   * @throws QueryException query exception
+   */
+  public MainModule parseMain(final String query, final String uri) throws QueryException {
+    return parseMain(query, uri, null);
   }
 
   /**
@@ -217,16 +220,13 @@ public final class QueryContext extends Job implements Closeable {
    * Parses the specified module.
    * @param query query string
    * @param uri base URI (may be {@code null})
-   * @param sc static context (may be {@code null})
    * @return name of module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String query, final String uri, final StaticContext sc)
-      throws QueryException {
-
+  public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
     info.query = query;
     try {
-      return new QueryParser(query, uri, this, sc).parseLibrary(true);
+      return new QueryParser(query, uri, this, null).parseLibrary(true);
     } finally {
       // library module itself is not updating
       updating = false;
@@ -253,20 +253,25 @@ public final class QueryContext extends Job implements Closeable {
 
     final CompileContext cc = new CompileContext(this);
     try {
-      // set database options
-      final StringList opts = tempOpts;
-      final int os = opts.size();
-      for(int o = 0; o < os; o += 2) {
-        final String key = opts.get(o), val = opts.get(o + 1);
-        try {
-          context.options.assign(key.toUpperCase(Locale.ENGLISH), val);
-        } catch(final BaseXException ex) {
-          Util.debug(ex);
-          throw BASEX_OPTIONS_X_X.get(null, key, val);
+      // bind external variables of global option (if not assigned yet by other APIs)
+      final MainOptions mopts = context.options;
+      if(root != null && parent == null) {
+        for(final Entry<String, String> entry : mopts.toMap(MainOptions.BINDINGS).entrySet()) {
+          final String key = entry.getKey();
+          final Atm value = new Atm(entry.getValue());
+          if(key.isEmpty()) {
+            if(ctxItem != null) context(value, root.sc);
+          } else {
+            final QNm name = qname(key, root.sc);
+            if(!bindings.containsKey(name)) bind(name, value);
+          }
         }
       }
-      // set tail call option after assignment database option
-      maxCalls = context.options.get(MainOptions.TAILCALLS);
+
+      // set database options
+      options.compile();
+      // set tail call option after assigning database options
+      maxCalls = mopts.get(MainOptions.TAILCALLS);
 
       // bind external variables
       vars.bindExternal(this, bindings);
@@ -293,7 +298,7 @@ public final class QueryContext extends Job implements Closeable {
 
       // if specified, convert context value to specified type
       // [LW] should not be necessary
-      if(focus.value != null && root.sc.contextType != null) {
+      if(focus.value != null && root.sc != null && root.sc.contextType != null) {
         focus.value = root.sc.contextType.promote(focus.value, null, this, root.sc, null, true);
       }
 
@@ -473,8 +478,16 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void bind(final String name, final Value value, final StaticContext sc)
       throws QueryException {
-    final byte[] nm = token(name);
-    bindings.put(QNm.resolve(indexOf(nm, '$') == 0 ? substring(nm, 1) : nm, sc), value);
+    bind(qname(name, sc), value);
+  }
+
+  /**
+   * Binds a value to a global variable.
+   * @param name name of variable
+   * @param value value to be bound
+   */
+  public void bind(final QNm name, final Value value) {
+    bindings.put(name, value);
   }
 
   /**
@@ -562,8 +575,7 @@ public final class QueryContext extends Job implements Closeable {
       parent.updates = updates;
       parent.popJob();
     }
-    // reassign original database options (changed by compile step)
-    staticOpts.forEach(context.options::put);
+    options.close();
   }
 
   @Override
@@ -776,5 +788,16 @@ public final class QueryContext extends Job implements Closeable {
   @Override
   public String toString() {
     return root != null ? QueryInfo.usedDecls(root) : info.query;
+  }
+
+  /**
+   * Converts the specified variable name to a QName.
+   * @param name name of variable
+   * @param sc static context
+   * @return QName
+   * @throws QueryException query context
+   */
+  private static QNm qname(final String name, final StaticContext sc) throws QueryException {
+    return QNm.resolve(token(Strings.startsWith(name, '$') ? name.substring(1) : name), sc);
   }
 }

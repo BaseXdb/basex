@@ -5,7 +5,7 @@
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>9.0.2-SNAPSHOT</version>
+  <version>9.0.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <distributionManagement>

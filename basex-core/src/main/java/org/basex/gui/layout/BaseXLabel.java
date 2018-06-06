@@ -37,9 +37,8 @@ public class BaseXLabel extends JLabel {
    */
   public BaseXLabel(final String text, final boolean dist, final boolean bold) {
     super(text);
-    final Font f = getFont();
-    if(dist) border(0, 0, f.getSize() / 2, 0);
-    if(bold) setFont(f.deriveFont(Font.BOLD));
+    if(dist) border(0, 0, getFont().getSize() / 2, 0);
+    if(bold) BaseXLayout.boldFont(this);
   }
 
   /**
@@ -62,6 +61,16 @@ public class BaseXLabel extends JLabel {
    */
   public final BaseXLabel color(final Color c) {
     setForeground(c);
+    return this;
+  }
+
+  /**
+   * Resizes the used font.
+   * @param factor resize factor
+   * @return self reference
+   */
+  public final BaseXLabel resize(final float factor) {
+    BaseXLayout.resizeFont(this, factor);
     return this;
   }
 

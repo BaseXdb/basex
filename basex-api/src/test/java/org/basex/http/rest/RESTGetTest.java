@@ -7,7 +7,6 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.util.*;
 import org.basex.util.http.*;
 import org.junit.*;
 
@@ -132,19 +131,19 @@ public final class RESTGetTest extends RESTTest {
   @Test
   public void runOption() throws IOException {
     final String path = context.soptions.get(StaticOptions.WEBPATH);
-    new IOFile(path, "x.xq").write(Token.token("1"));
+    new IOFile(path, "x.xq").write("1");
     assertEquals("1", get("?run=x.xq"));
 
-    new IOFile(path, "x.bxs").write(Token.token("xquery 2"));
+    new IOFile(path, "x.bxs").write("xquery 2");
     assertEquals("2", get("?run=x.bxs"));
 
-    new IOFile(path, "x.bxs").write(Token.token("xquery 3\nxquery 4"));
+    new IOFile(path, "x.bxs").write("xquery 3\nxquery 4");
     assertEquals("34", get("?run=x.bxs"));
 
-    new IOFile(path, "x.bxs").write(Token.token("<commands><xquery>5</xquery></commands>"));
+    new IOFile(path, "x.bxs").write("<commands><xquery>5</xquery></commands>");
     assertEquals("5", get("?run=x.bxs"));
 
-    new IOFile(path, "x.bxs").write(Token.token("<set option='maxlen'>123</set>"));
+    new IOFile(path, "x.bxs").write("<set option='maxlen'>123</set>");
     assertEquals("", get("?run=x.bxs"));
 
     try {
@@ -154,7 +153,7 @@ public final class RESTGetTest extends RESTTest {
     }
 
     try {
-      new IOFile(path, "x.bxs").write(Token.token("<set option='unknown'>123</set>"));
+      new IOFile(path, "x.bxs").write("<set option='unknown'>123</set>");
       assertEquals("", get("?run=x.bxs"));
       fail("Error expected.");
     } catch(final IOException ignored) {

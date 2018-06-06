@@ -53,7 +53,7 @@ public final class DialogNew extends BaseXDialog {
 
     dbName = new BaseXTextField(this, gopts.get(GUIOptions.DBNAME));
 
-    final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
+    final BaseXBack pnl = new BaseXBack(new RowLayout());
     pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
     pnl.add(dbName);
 
@@ -73,7 +73,7 @@ public final class DialogNew extends BaseXDialog {
     ftindex = new BaseXCheckBox(this, FULLTEXT_INDEX, MainOptions.FTINDEX, opts).bold().large();
 
     // index panel
-    final BaseXBack indexPanel = new BaseXBack(new TableLayout(8, 1)).border(8);
+    final BaseXBack indexPanel = new BaseXBack(new RowLayout()).border(8);
     indexPanel.add(textindex);
     indexPanel.add(index[0]);
     indexPanel.add(new BaseXBack());
@@ -84,7 +84,7 @@ public final class DialogNew extends BaseXDialog {
     indexPanel.add(index[2]);
 
     // full-text index panel
-    final BaseXBack ftPanel = new BaseXBack(new TableLayout(2, 1)).border(8);
+    final BaseXBack ftPanel = new BaseXBack(new RowLayout()).border(8);
     ftPanel.add(ftindex);
     ftPanel.add(index[3]);
 

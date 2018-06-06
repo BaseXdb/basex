@@ -7,6 +7,7 @@ import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
+import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -144,8 +145,17 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public InputStream inputStream() throws IOException {
+  public FileInputStream inputStream() throws IOException {
     return new FileInputStream(file);
+  }
+
+  /**
+   * Returns an output stream.
+   * @return output stream
+   * @throws IOException I/O exception
+   */
+  public FileOutputStream outputStream() throws IOException {
+    return new FileOutputStream(file);
   }
 
   /**
@@ -238,6 +248,15 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Writes the specified string as UTF8.
+   * @param string string
+   * @throws IOException I/O exception
+   */
+  public void write(final String string) throws IOException {
+    write(Token.token(string));
+  }
+
+  /**
    * Writes the specified byte array.
    * @param bytes bytes
    * @throws IOException I/O exception
@@ -248,11 +267,11 @@ public final class IOFile extends IO {
 
   /**
    * Writes the specified input. The specified input stream is eventually closed.
-   * @param in input stream
+   * @param is input stream
    * @throws IOException I/O exception
    */
-  public void write(final InputStream in) throws IOException {
-    try(BufferOutput out = new BufferOutput(pth)) {
+  public void write(final InputStream is) throws IOException {
+    try(BufferInput in = BufferInput.get(is); BufferOutput out = new BufferOutput(this)) {
       for(int i; (i = in.read()) != -1;) out.write(i);
     }
   }

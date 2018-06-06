@@ -73,7 +73,7 @@ final class DialogJsonParser extends DialogParser {
     strings = new BaseXCheckBox(dialog, INCLUDE_STRINGS, JsonOptions.STRINGS, jopts);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, JsonOptions.LAX, jopts);
 
-    final BaseXBack pp = new BaseXBack(new TableLayout(2, 1, 0, 8));
+    final BaseXBack pp = new BaseXBack(new RowLayout(8));
     BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
     p.add(encoding);
@@ -81,7 +81,7 @@ final class DialogJsonParser extends DialogParser {
     p.add(format);
     pp.add(p);
 
-    p = new BaseXBack(new TableLayout(5, 1));
+    p = new BaseXBack(new RowLayout());
     p.add(liberal);
     p.add(escape);
     p.add(merge);

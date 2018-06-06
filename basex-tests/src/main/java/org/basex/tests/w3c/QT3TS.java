@@ -149,7 +149,7 @@ public final class QT3TS extends Main {
 
     // save log data
     Util.outln(NL + "Writing log file '" + TESTID + ".log'...");
-    try(PrintOutput po = new PrintOutput(TESTID + ".log")) {
+    try(PrintOutput po = new PrintOutput(new IOFile(TESTID + ".log"))) {
       po.println("QT3TS RESULTS __________________________" + NL);
       po.println(result.toString());
       po.println("WRONG __________________________________" + NL);

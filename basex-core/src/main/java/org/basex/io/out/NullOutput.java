@@ -1,5 +1,7 @@
 package org.basex.io.out;
 
+import java.io.*;
+
 /**
  * This output stream swallows all data it receives.
  *
@@ -7,6 +9,13 @@ package org.basex.io.out;
  * @author Christian Gruen
  */
 public final class NullOutput extends PrintOutput {
+  /**
+   * Constructor.
+   */
+  public NullOutput() {
+    super((OutputStream) null);
+  }
+
   @Override
   public void write(final int value) { }
 }

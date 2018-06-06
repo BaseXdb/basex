@@ -37,7 +37,7 @@ public final class IOUrl extends IO {
 
   @Override
   public byte[] read() throws IOException {
-    return new BufferInput(this).content();
+    return BufferInput.get(this).content();
   }
 
   @Override

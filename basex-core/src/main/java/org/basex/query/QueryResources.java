@@ -67,8 +67,7 @@ public final class QueryResources {
    */
   Value compile(final DBNodes nodes) {
     // add globally opened database
-    final Data data = nodes.data();
-    addData(data);
+    final Data data = addData(nodes.data());
     synchronized(qc.context.datas) { qc.context.datas.pin(data); }
     globalData = true;
 
@@ -414,7 +413,7 @@ public final class QueryResources {
    * @param data data reference to be added
    * @return argument
    */
-  private Data addData(final Data data) {
+  public Data addData(final Data data) {
     datas.add(data);
     return data;
   }

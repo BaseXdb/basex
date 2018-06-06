@@ -53,8 +53,8 @@ final class DialogResources extends BaseXBack {
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setRowHeight(getFontMetrics(getFont()).getHeight());
-
     tree.setCellRenderer(new TreeNodeRenderer());
+
     // add default children to tree
     final Context context = dialog.gui.context;
     final Data data = context.data();
@@ -79,7 +79,7 @@ final class DialogResources extends BaseXBack {
 
     filterText = new BaseXTextField(dialog, PLEASE_WAIT_D);
     filterText.setEnabled(false);
-    BaseXLayout.setWidth(filterText, 250);
+    BaseXLayout.setWidth(filterText, 300);
 
     // left panel
     final BaseXBack panel = new BaseXBack(new BorderLayout());
@@ -87,7 +87,6 @@ final class DialogResources extends BaseXBack {
     panel.add(btn, BorderLayout.SOUTH);
 
     final JScrollPane sp = new JScrollPane(tree);
-    BaseXLayout.setWidth(sp, 250);
     add(sp, BorderLayout.CENTER);
     add(panel, BorderLayout.SOUTH);
 

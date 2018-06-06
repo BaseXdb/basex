@@ -33,7 +33,7 @@ public final class DialogMessage extends BaseXDialog {
 
     panel.setLayout(new BorderLayout());
 
-    final BaseXBack back = new BaseXBack(new TableLayout(1, 2, 12, 0));
+    final BaseXBack back = new BaseXBack(new ColumnLayout(12));
     final BaseXLabel label = new BaseXLabel();
     label.setIcon(ic.large);
     back.add(label);

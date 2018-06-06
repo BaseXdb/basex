@@ -123,7 +123,7 @@ public final class EditorView extends View {
         BaseXKeys.UNIT.toString()), false, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new TableLayout(1, 11)).border(0, 0, 4, 0);
+    buttons.layout(new ColumnLayout()).border(0, 0, 4, 0);
     buttons.add(newB);
     buttons.add(openB);
     buttons.add(saveB);
@@ -144,9 +144,9 @@ public final class EditorView extends View {
     search.editor(addTab(), false);
 
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
-    info.setFont(font);
+    info.resize(1.2f);
     pos = new BaseXLabel(" ");
-    pos.setFont(font);
+    pos.resize(1.2f);
 
     posCode.invokeLater();
 
@@ -201,14 +201,10 @@ public final class EditorView extends View {
       final int fl = Math.min(all.size(), e == null ? BaseXHistory.MAX : BaseXHistory.MAXCOMPACT);
       for(int f = 0; f < fl; f++) hst.add(all.get(f));
 
-      Font f = null;
       for(final String en : hst.sort(Prop.CASE)) {
         // disable opened files
         final JMenuItem item = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
-        if(opened.contains(en)) {
-          if(f == null) f = item.getFont().deriveFont(Font.BOLD);
-          item.setFont(f);
-        }
+        if(opened.contains(en)) BaseXLayout.boldFont(item);
         pm.add(item).addActionListener(al);
       }
       al = ac -> history.getActionListeners()[0].actionPerformed(null);
@@ -602,7 +598,7 @@ public final class EditorView extends View {
 
   /**
    * Refreshes the list of recent query files and updates the query path.
-   * @param file new file
+   * @param file new file (can be {@code null})
    */
   void refreshHistory(final IOFile file) {
     final StringList paths = new StringList();
@@ -683,9 +679,9 @@ public final class EditorView extends View {
    * Parses the current query after a little delay.
    * @param input query input
    * @param file file
-   * @param lib library flag
+   * @param library library flag
    */
-  private void parse(final String input, final IO file, final boolean lib) {
+  private void parse(final String input, final IO file, final boolean library) {
     final int id = ++statusID;
     new Timer(true).schedule(new TimerTask() {
       @Override
@@ -697,7 +693,7 @@ public final class EditorView extends View {
         // parse query
         try(QueryContext qc = new QueryContext(gui.context)) {
           parseQC = qc;
-          qc.parse(input, lib, file.path(), null);
+          qc.parse(input, library, file.path());
           if(id == statusID) info(null);
         } catch(final QueryException ex) {
           if(id == statusID) info(ex);

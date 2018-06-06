@@ -343,6 +343,10 @@ public final class Map extends FItem {
 
   @Override
   public String toString() {
-    return MAP + " { " + root.append(new StringBuilder()).toString().replaceAll(", $", "") + " }";
+    final TokenBuilder tb = new TokenBuilder().add(MAP).add(" { ");
+    if(mapSize() > 0) {
+      tb.add(root.append(new StringBuilder()).toString().replaceAll(", $", "")).add(" ");
+    }
+    return tb.add("}").toString();
   }
 }

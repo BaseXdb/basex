@@ -29,7 +29,7 @@ public final class ModuleTest extends SandboxTest {
   @Test
   public void module() {
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "", null);
+      qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "");
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
       assertSame(QueryError.WHICHFUNC_X, e.error());
@@ -44,7 +44,7 @@ public final class ModuleTest extends SandboxTest {
   public void module2() throws Exception {
     final IOFile a = new IOFile("src/test/resources/recmod/a.xqm");
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseLibrary(Token.string(a.read()), a.path(), null);
+      qc.parseLibrary(Token.string(a.read()), a.path());
     }
   }
 
@@ -60,7 +60,7 @@ public final class ModuleTest extends SandboxTest {
     write(new IOFile(repo, "a.xqm"), "module namespace a='a'; declare function a:a(){()};");
 
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseMain("import module namespace a='a'; a:a()", null, null);
+      qc.parseMain("import module namespace a='a'; a:a()", null);
     }
   }
 
@@ -89,7 +89,7 @@ public final class ModuleTest extends SandboxTest {
         + "import module namespace a='a'; declare function b:b(){a:a()};");
 
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseMain("import module namespace a='a'; ()", null, null);
+      qc.parseMain("import module namespace a='a'; ()", null);
     }
   }
 

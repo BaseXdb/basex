@@ -9,9 +9,7 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
-import java.util.Map.*;
 
-import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -124,28 +122,14 @@ public class QueryParser extends InputParser {
    * @param uri base URI (can be {@code null}; only passed on if not bound to static context yet)
    * @param qctx query context
    * @param sctx static context (can be {@code null})
-   * @throws QueryException query exception
    */
   public QueryParser(final String query, final String uri, final QueryContext qctx,
-      final StaticContext sctx) throws QueryException {
+      final StaticContext sctx) {
 
     super(query);
     qc = qctx;
     sc = sctx != null ? sctx : new StaticContext(qctx);
-
-    // set path to query file
-    final MainOptions opts = qctx.context.options;
     if(uri != null) sc.baseURI(uri);
-
-    // bind external variables on top level
-    if(qctx.parent == null) {
-      for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
-        final String key = entry.getKey();
-        final Atm value = new Atm(entry.getValue());
-        if(key.isEmpty()) qctx.context(value, sc);
-        else qctx.bind(key, value, sc);
-      }
-    }
   }
 
   /**
@@ -536,7 +520,7 @@ public class QueryParser extends InputParser {
   private void optionDecl() throws QueryException {
     skipWs();
     final QNm qnm = eQName(QNAME_X, XQ_URI);
-    final byte[] val = stringLiteral();
+    final byte[] value = stringLiteral();
     final String name = string(qnm.local());
 
     if(eq(qnm.uri(), OUTPUT_URI)) {
@@ -545,28 +529,22 @@ public class QueryParser extends InputParser {
 
       final SerializerOptions sopts = qc.serParams();
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
-      sopts.parse(name, val, sc, info());
+      sopts.parse(name, value, sc, info());
 
     } else if(eq(qnm.uri(), DB_URI)) {
       // project-specific declaration
       if(module != null) throw error(BASEX_OPTIONS3_X, qnm.local());
-
-      final String ukey = name.toUpperCase(Locale.ENGLISH);
-      final Option<?> opt = qc.context.options.option(ukey);
-      if(opt == null) throw error(BASEX_OPTIONS1_X, ukey);
-      // cache old value (to be reset after query evaluation)
-      qc.staticOpts.put(opt, qc.context.options.get(opt));
-      qc.tempOpts.add(name).add(string(val));
+      qc.options.add(name, value, this);
 
     } else if(eq(qnm.uri(), QUERY_URI)) {
       // query-specific options
       switch(name) {
         case READ_LOCK:
-          for(final byte[] lock : split(val, ','))
+          for(final byte[] lock : split(value, ','))
             qc.readLocks.add(Locking.USER_PREFIX + string(lock).trim());
           break;
         case WRITE_LOCK:
-          for(final byte[] lock : split(val, ','))
+          for(final byte[] lock : split(value, ','))
             qc.writeLocks.add(Locking.USER_PREFIX + string(lock).trim());
           break;
         default:

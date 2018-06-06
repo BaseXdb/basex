@@ -45,30 +45,28 @@ final class WebDAVRoot extends WebDAVFolder {
   }
 
   @Override
-  public WebDAVResource child(final String name) {
+  public WebDAVResource child(final String name) throws BadRequestException {
     return new WebDAVCode<WebDAVResource>(this) {
       @Override
       public WebDAVResource get() throws IOException {
         return service.dbExists(name) ?
           new WebDAVDatabase(new WebDAVMetaData(name, service.timestamp(name)), service) : null;
       }
-    }.evalNoEx();
+    }.eval();
   }
 
   @Override
-  public List<WebDAVResource> getChildren() {
+  public List<WebDAVResource> getChildren() throws BadRequestException {
     return new WebDAVCode<List<WebDAVResource>>(this) {
       @Override
       public List<WebDAVResource> get() throws IOException {
         return service.listDbs();
       }
-    }.evalNoEx();
+    }.eval();
   }
 
   @Override
-  public WebDAVDatabase createCollection(final String name)
-      throws BadRequestException, NotAuthorizedException {
-
+  public WebDAVDatabase createCollection(final String name) throws BadRequestException {
     return new WebDAVCode<WebDAVDatabase>(this) {
       @Override
       public WebDAVDatabase get() throws IOException {
@@ -79,7 +77,7 @@ final class WebDAVRoot extends WebDAVFolder {
 
   @Override
   public WebDAVResource createNew(final String name, final InputStream input, final Long length,
-      final String contentType) throws BadRequestException, NotAuthorizedException {
+      final String contentType) throws BadRequestException {
 
     return new WebDAVCode<WebDAVResource>(this) {
       @Override

@@ -1,10 +1,14 @@
 package org.basex.http.webdav;
 
+import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
+
+import org.basex.api.client.*;
+import org.basex.core.cmd.*;
 
 /**
- * Query builder.
+ * WebDAV query.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
@@ -35,18 +39,24 @@ final class WebDAVQuery {
   }
 
   /**
-   * Returns the hash map entries.
-   * @return self reference
+   * Executes the query and returns the result as string.
+   * @param session user session
+   * @return result
+   * @throws IOException I/O execution
    */
-  Set<Entry<String, String>> entries() {
-    return bindings.entrySet();
+  String execute(final Session session) throws IOException {
+    final XQuery xquery = new XQuery(toString());
+    for(final Entry<String, String> entry : bindings.entrySet()) {
+      xquery.bind(entry.getKey(), entry.getValue());
+    }
+    return session.execute(xquery);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final String v : bindings.keySet()) {
-      sb.append("declare variable $").append(v).append(" external;");
+    for(final String name : bindings.keySet()) {
+      sb.append("declare variable $").append(name).append(" external;");
     }
     return sb.append(query).toString();
   }

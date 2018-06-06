@@ -49,7 +49,7 @@ final class DialogVisualPrefs extends BaseXBack {
    * @param dialog dialog reference
    */
   DialogVisualPrefs(final BaseXDialog dialog) {
-    border(8).setLayout(new TableLayout(2, 1, 0, 8));
+    border(8).setLayout(new ColumnLayout(40));
     gui = dialog.gui;
 
     final GUIOptions gopts = dialog.gui.gopts;
@@ -78,45 +78,44 @@ final class DialogVisualPrefs extends BaseXBack {
 
     serial = new BaseXSerial(dialog, gui.context.options.get(MainOptions.SERIALIZER));
 
-    BaseXBack pp = new BaseXBack().layout(new TableLayout(3, 1, 0, 8)), ppp;
-    ppp = new BaseXBack(new TableLayout(2, 1));
-    ppp.add(new BaseXLabel(JAVA_LF + COL, true, true));
-    ppp.add(lookfeel);
-    pp.add(ppp);
-
-    ppp = new BaseXBack(new TableLayout(2, 1));
-    ppp.add(new BaseXLabel(GENERAL + COL, true, true));
-    ppp.add(showNames);
-    pp.add(ppp);
-
-    ppp = new BaseXBack(new TableLayout(3, 1));
-    ppp.add(new BaseXLabel(TREE + COL, true, true));
-    ppp.add(treeSlims);
-    ppp.add(treeAtts);
-    pp.add(ppp);
-
-    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 40, 0));
+    BaseXBack p = new BaseXBack().layout(new RowLayout(8)), pp;
+    pp = new BaseXBack(new RowLayout());
+    pp.add(new BaseXLabel(JAVA_LF + COL, true, true));
+    pp.add(lookfeel);
     p.add(pp);
 
-    pp = new BaseXBack(new TableLayout(3, 1));
-    pp.add(new BaseXLabel(MAP + COL, true, true));
-
-    ppp = new BaseXBack(new TableLayout(2, 2, 8, 8));
-    ppp.add(new BaseXLabel(ALGORITHM + COL));
-    ppp.add(mapAlgo);
-    ppp.add(new BaseXLabel(OFFSETS + COL));
-    ppp.add(mapOffsets);
-    pp.add(ppp);
-
-    ppp = new BaseXBack(new TableLayout(3, 1, 0, 8));
-    ppp.add(new BaseXLabel(RATIO + COLS));
-    ppp.add(mapWeight);
-    ppp.add(mapAtts);
-    pp.add(ppp);
+    pp = new BaseXBack(new RowLayout());
+    pp.add(new BaseXLabel(GENERAL + COL, true, true));
+    pp.add(showNames);
     p.add(pp);
+
+    p.add(serial);
+
     add(p);
 
-    add(serial);
+    p = new BaseXBack(new RowLayout());
+    p.add(new BaseXLabel(MAP + COL, true, true));
+
+    pp = new BaseXBack(new TableLayout(2, 2, 8, 8));
+    pp.add(new BaseXLabel(ALGORITHM + COL));
+    pp.add(mapAlgo);
+    pp.add(new BaseXLabel(OFFSETS + COL));
+    pp.add(mapOffsets);
+    p.add(pp);
+
+    pp = new BaseXBack(new RowLayout(8));
+    pp.add(new BaseXLabel(RATIO + COLS));
+    pp.add(mapWeight);
+    pp.add(mapAtts);
+    p.add(pp);
+
+    pp = new BaseXBack(new RowLayout());
+    pp.add(new BaseXLabel(TREE + COL, true, true));
+    pp.add(treeSlims);
+    pp.add(treeAtts);
+    p.add(pp);
+
+    add(p);
   }
 
   /**

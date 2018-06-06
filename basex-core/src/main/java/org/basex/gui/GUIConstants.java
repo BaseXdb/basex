@@ -349,6 +349,8 @@ C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
     return COLORS[Math.min(COLORS.length - 1, i)];
   }
 
+  // PRIVATE METHODS ==============================================================================
+
   /**
    * Combines the color value with specified factor and returns a new value.
    * @param c color

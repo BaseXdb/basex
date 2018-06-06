@@ -199,17 +199,18 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean is(final ANode node) {
-    return node == this || node instanceof DBNode &&
-        data == node.data() && pre == ((DBNode) node).pre;
+    return this == node || data == node.data() && pre == ((DBNode) node).pre;
   }
 
   @Override
   public final int diff(final ANode node) {
-    // compare fragment with database node; specify fragment first to save time
-    if(node instanceof FNode) return -diff(node, this);
-    // same database instance: compare pre values; otherwise, compare database instances
+    if(this == node) return 0;
     final Data ndata = node.data();
-    return data == ndata ? pre - ((DBNode) node).pre : data.compareTo(ndata);
+    return ndata != null ?
+      // comparison of two databases: compare pre values or database ids
+      data == ndata ? pre - ((DBNode) node).pre : data.dbid - ndata.dbid :
+      // comparison of database and fragment: find LCA
+      diff(this, node);
   }
 
   @Override

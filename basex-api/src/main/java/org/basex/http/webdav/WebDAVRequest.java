@@ -11,6 +11,7 @@ import javax.servlet.http.*;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.servlet.*;
+import org.basex.http.*;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
@@ -54,12 +55,13 @@ final class WebDAVRequest extends AbstractRequest {
 
   /**
    * Constructor.
-   * @param req HTTP servlet request
+   * @param conn HTTP connection
    */
-  WebDAVRequest(final HttpServletRequest req) {
-    this.req = req;
+  WebDAVRequest(final HTTPConnection conn) {
+    req = conn.req;
     method = Method.valueOf(req.getMethod());
     url = decode(req.getRequestURL().toString());
+    auth = new Auth(conn.clientName(), null);
   }
 
   @Override
@@ -90,10 +92,6 @@ final class WebDAVRequest extends AbstractRequest {
 
   @Override
   public Auth getAuthorization() {
-    if(auth == null) {
-      final String encoding = getRequestHeader(Header.AUTHORIZATION);
-      if(encoding != null && !encoding.isEmpty()) auth = new Auth(encoding);
-    }
     return auth;
   }
 

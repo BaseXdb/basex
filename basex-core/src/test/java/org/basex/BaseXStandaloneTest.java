@@ -21,7 +21,7 @@ public final class BaseXStandaloneTest extends BaseXTest {
    */
   @Test
   public void writeBack() throws IOException {
-    INPUT.write(token("<a>X</a>"));
+    INPUT.write("<a>X</a>");
     run("-i", INPUT.toString(), "-u", "-q", "delete node //text()");
     assertEquals("<a/>", string(INPUT.read()));
   }

@@ -41,18 +41,17 @@ public class ZipZipFile extends ZipFn {
     final ANode elm = toElem(exprs[0], qc);
     if(!elm.qname().eq(Q_FILE)) throw ZIP_UNKNOWN_X.get(info, elm.qname());
     // get file
-    final String file = attribute(elm, HREF, true);
+    final IOFile file = new IOFile(attribute(elm, HREF, true));
 
     // write zip file
     boolean ok = true;
-    try(FileOutputStream fos = new FileOutputStream(file);
-        ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
+    try(ZipOutputStream zos = new ZipOutputStream(new BufferOutput(file))) {
       create(zos, elm.children(), "", null, qc);
     } catch(final IOException ex) {
       ok = false;
       throw ZIP_FAIL_X.get(info, ex);
     } finally {
-      if(!ok) new IOFile(file).delete();
+      if(!ok) file.delete();
     }
     return null;
   }

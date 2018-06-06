@@ -69,7 +69,7 @@ public final class OptionsTest extends SandboxTest {
 
     final String input = "<a/>";
     final IOFile file = new IOFile(Prop.TEMPDIR + NAME + '/' + NAME);
-    file.write(Token.token(input));
+    file.write(input);
 
     // check if original file will be updated
     set(name, true);
@@ -81,7 +81,7 @@ public final class OptionsTest extends SandboxTest {
     }
 
     // original file will stay untouched
-    file.write(Token.token(input));
+    file.write(input);
     query("delete node doc('" + file + "')/a");
     assertEquals(input, Token.string(file.read()));
   }

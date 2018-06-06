@@ -63,7 +63,7 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @param dialog dialog reference
    */
   DialogGeneralPrefs(final BaseXDialog dialog) {
-    border(8).setLayout(new TableLayout(10, 1));
+    border(8).setLayout(new RowLayout());
     gui = dialog.gui;
 
     final StaticOptions opts = gui.context.soptions;
@@ -102,42 +102,42 @@ final class DialogGeneralPrefs extends BaseXBack {
     creds = new BaseXLabel(" ");
 
     add(new BaseXLabel(DATABASE_PATH + COL, true, true));
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0)), pp, ppp;
+    BaseXBack p = new BaseXBack(new ColumnLayout(8)), pp, ppp;
     p.add(dbPath);
     p.add(dbButton);
     add(p);
 
     add(new BaseXLabel(REPOSITORY_PATH + COL, true, true));
-    p = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    p = new BaseXBack(new ColumnLayout(8));
     p.add(repoPath);
     p.add(repoButton);
     add(p);
 
-    p = new BaseXBack(new TableLayout(2, 2, 24, 0)).border(0);
+    p = new BaseXBack(new TableLayout(2, 2, 24, 0));
     p.add(new BaseXLabel(LIMITS + COL, true, true).border(8, 0, 8, 0));
     p.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(8, 0, 8, 0));
 
-    pp = new BaseXBack(new TableLayout(4, 1, 0, 0)).border(0);
-    ppp = new BaseXBack(new TableLayout(1, 2, 12, 0)).border(0);
+    pp = new BaseXBack(new RowLayout());
+    ppp = new BaseXBack(new ColumnLayout(12));
     ppp.add(maxResults);
     ppp.add(labelResults);
     pp.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
     pp.add(ppp);
-    ppp = new BaseXBack(new TableLayout(1, 2, 12, 0)).border(0);
+    ppp = new BaseXBack(new ColumnLayout(12));
     ppp.add(maxText);
     ppp.add(labelText);
     pp.add(new BaseXLabel(SIZE_TEXT_RESULTS + COL));
     pp.add(ppp);
     p.add(pp);
 
-    pp = new BaseXBack(new TableLayout(1, 1, 0, 0)).border(0);
+    pp = new BaseXBack(new ColumnLayout(12));
     pp.add(mousefocus);
     p.add(pp);
     add(p);
 
     // checkbox for simple file dialog
     add(new BaseXLabel(LANGUAGE_RESTART + COL, true, true).border(8, 0, 8, 0));
-    p = new BaseXBack(new TableLayout(1, 2, 12, 0));
+    p = new BaseXBack(new ColumnLayout(12));
     p.add(lang);
     p.add(creds);
     add(p);

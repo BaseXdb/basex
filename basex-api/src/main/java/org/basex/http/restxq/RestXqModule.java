@@ -139,7 +139,7 @@ public final class RestXqModule {
   private QueryContext qc(final Context ctx) throws Exception {
     final QueryContext qc = new QueryContext(ctx);
     try {
-      qc.parse(string(file.read()), file.path(), null);
+      qc.parse(string(file.read()), file.path());
       return qc;
     } catch(final IOException ex) {
       // may be triggered when reading the file

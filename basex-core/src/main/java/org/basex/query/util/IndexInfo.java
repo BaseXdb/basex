@@ -157,7 +157,8 @@ public final class IndexInfo {
         return false;
 
       // estimate costs (tend to worst case)
-      if(data != null) costs = IndexCosts.get(Math.max(1, data.meta.size / 10));
+      if(data != null) costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
+        IndexCosts.get(Math.max(1, data.meta.size / 10));
       root = new ValueAccess(info, search, type, test, db);
     }
 
@@ -187,7 +188,7 @@ public final class IndexInfo {
    * @return costs costs, or {@code null} if index access is not possible
    */
   public IndexCosts costs(final Data data, final IndexToken token) {
-    return enforce() ? IndexCosts.ENFORCE : data.costs(token);
+    return enforce() ? IndexCosts.ENFORCE_STATIC : data.costs(token);
   }
 
   /**
@@ -305,11 +306,12 @@ public final class IndexInfo {
     // give up if path contains is not relative
     final AxisPath path = (AxisPath) pred;
     if(path.root != null) return null;
+    // give up if one of the steps contains positional predicates
+    final int sl = path.steps.length;
+    for(int s = 0; s < sl; s++) {
+      if(path.step(s).positional()) return null;
+    }
     // return last step
-    final Step s = path.step(path.steps.length - 1);
-    // give up if step contains positional predicates
-    if(s.positional()) return null;
-    // success: return step
-    return s;
+    return path.step(sl - 1);
   }
 }

@@ -58,12 +58,12 @@ public class XQueryParse extends StandardFunc {
 
     final XQueryOptions opts = toOptions(1, new XQueryOptions(), qc);
 
-    // base-uri: adopt specified uri, passed on uri, or uri from parent query
+    // base-uri: choose uri specified in options, file path, or base-uri from parent query
     final String bu = opts.get(XQueryOptions.BASE_URI);
     final String uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
 
     try(QueryContext qctx = new QueryContext(qc.context)) {
-      final Module mod = qctx.parse(string(query), uri, null);
+      final Module mod = qctx.parse(string(query), uri);
       final FElem root;
       if(mod instanceof LibraryModule) {
         final LibraryModule lib = (LibraryModule) mod;

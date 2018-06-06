@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.List;
 
 import org.basex.api.client.*;
@@ -27,8 +26,6 @@ import org.basex.util.list.*;
  * @author Dimitar Popov
  */
 final class WebDAVService {
-  /** Name of the database with the WebDAV locks. */
-  private static final String WEBDAV_DB = "~webdav";
   /** Static WebDAV character map. */
   private static final String WEBDAV;
 
@@ -41,12 +38,8 @@ final class WebDAVService {
     WEBDAV = sb.toString();
   }
 
-
   /** HTTP connection. */
   final HTTPConnection conn;
-  /** Locking service. */
-  final WebDAVLockService locking;
-
   /** Session. */
   private LocalSession ls;
 
@@ -56,7 +49,6 @@ final class WebDAVService {
    */
   WebDAVService(final HTTPConnection conn) {
     this.conn = conn;
-    locking = new WebDAVLockService(conn);
   }
 
   /**
@@ -64,15 +56,6 @@ final class WebDAVService {
    */
   void close() {
     if(ls != null) ls.close();
-  }
-
-  /**
-   * Checks if the user is authorized to perform the given action.
-   * @param db database (can be {@code null})
-   * @return {@code true} if the user is authorized
-   */
-  static boolean authorize(final String db) {
-    return !WEBDAV_DB.equals(db);
   }
 
   /**
@@ -99,7 +82,7 @@ final class WebDAVService {
    */
   boolean dbExists(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(_DB_EXISTS.args(" $db")).bind("db", db);
-    return execute(query).equals(Text.TRUE);
+    return query.execute(session()).equals(Text.TRUE);
   }
 
   /**
@@ -111,7 +94,7 @@ final class WebDAVService {
   long timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args(" $db") +
         "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("db",  db);
-    return DateTime.parse(execute(query)).getTime();
+    return DateTime.parse(query.execute(session())).getTime();
   }
 
   /**
@@ -143,7 +126,7 @@ final class WebDAVService {
    * @param path path
    * @throws IOException I/O exception
    */
-  void delete(final String db, final String path) throws IOException {
+  void remove(final String db, final String path) throws IOException {
     final LocalSession session = session();
     session.execute(new Open(db));
     session.execute(new Delete(path));
@@ -194,7 +177,7 @@ final class WebDAVService {
     query.bind("path", path);
     query.bind("tdb", tdb);
     query.bind("tpath", tpath);
-    execute(query);
+    query.execute(session());
   }
 
   /**
@@ -219,7 +202,7 @@ final class WebDAVService {
     query.bind("path", path);
     query.bind("tdb", tdb);
     query.bind("tpath", tpath);
-    execute(query);
+    query.execute(session());
   }
 
   /**
@@ -239,7 +222,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(string);
     query.bind("db", db);
     query.bind("path", path);
-    execute(query);
+    query.execute(session());
   }
 
   /**
@@ -327,8 +310,7 @@ final class WebDAVService {
    */
   List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-        _DB_LIST_DETAILS.args() + "[. != $db] ! (text(), @modified-date)", _OUT_TAB.args()));
-    query.bind("db", WEBDAV_DB);
+        _DB_LIST_DETAILS.args() + " ! (text(), @modified-date)", _OUT_TAB.args()));
 
     final String[] result = results(query);
     final List<WebDAVResource> dbs = new ArrayList<>();
@@ -421,7 +403,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(EXISTS.args(_DB_LIST.args(" $db", " $path")));
     query.bind("db", db);
     query.bind("path", path);
-    return execute(query).equals(Text.TRUE);
+    return query.execute(session()).equals(Text.TRUE);
   }
 
   /**
@@ -435,7 +417,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(_DB_EXISTS.args(" $db", " $path"));
     query.bind("db", db);
     query.bind("path", path);
-    return execute(query).equals(Text.TRUE);
+    return query.execute(session()).equals(Text.TRUE);
   }
 
   /**
@@ -458,13 +440,13 @@ final class WebDAVService {
    * @return object representing the newly added XML
    * @throws IOException I/O exception
    */
-  private WebDAVResource addXML(final String db, final String path, final InputStream in)
+  private WebDAVResource replace(final String db, final String path, final InputStream in)
       throws IOException {
 
     final LocalSession session = session();
     session.execute(new Set(MainOptions.CHOP, false));
     session.execute(new Open(db));
-    session.add(path, in);
+    session.replace(path, in);
     return WebDAVFactory.file(this, new WebDAVMetaData(db, path, timestamp(db), false,
       MediaType.APPLICATION_XML, null));
   }
@@ -503,7 +485,7 @@ final class WebDAVService {
       if(peek(bi) == '<') {
         try {
           // add input as XML document
-          return db == null ? createDb(dbName(path), bi) : addXML(db, path, bi);
+          return db == null ? createDb(dbName(path), bi) : replace(db, path, bi);
         } catch(final IOException ex) {
           // reset stream if it did not work out
           try {
@@ -516,7 +498,7 @@ final class WebDAVService {
         }
       }
 
-      // add input as raw file
+      // add input as raw file (do this also if an error occurred, and if the stream could be reset)
       final String d;
       if(db == null) {
         d = dbName(path);
@@ -544,20 +526,6 @@ final class WebDAVService {
   }
 
   /**
-   * Executes a query.
-   * @param query query to be executed
-   * @return result
-   * @throws IOException error during query execution
-   */
-  private String execute(final WebDAVQuery query) throws IOException {
-    final XQuery xquery = new XQuery(query.toString());
-    for(final Entry<String, String> entry : query.entries()) {
-      xquery.bind(entry.getKey(), entry.getValue());
-    }
-    return session().execute(xquery);
-  }
-
-  /**
    * Executes a query and returns all results as a list.
    * @param query query to be executed
    * @return result
@@ -565,7 +533,7 @@ final class WebDAVService {
    */
   private String[] results(final WebDAVQuery query) throws IOException {
     final StringList sl = new StringList();
-    for(final String result : Strings.split(execute(query), '\t')) {
+    for(final String result : Strings.split(query.execute(session()), '\t')) {
       if(!result.isEmpty()) sl.add(result);
     }
     return sl.finish();

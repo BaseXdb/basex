@@ -206,7 +206,7 @@ public final class RepoManager {
 
     // parse module to find namespace uri
     try(QueryContext qc = new QueryContext(context)) {
-      final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
+      final byte[] uri = qc.parseLibrary(string(content), path).name.uri();
       // copy file to rewritten URI file path
       return write(Strings.uri2path(string(uri)) + IO.XQMSUFFIX, content);
     }
@@ -268,9 +268,7 @@ public final class RepoManager {
           }
           if(trg != null) {
             if(!trg.parent().md()) throw new BaseXException("Could not create %.", trg);
-            try(InputStream is = jarFile.getInputStream(entry)) {
-              trg.write(is);
-            }
+            trg.write(jarFile.getInputStream(entry));
           }
         }
       }

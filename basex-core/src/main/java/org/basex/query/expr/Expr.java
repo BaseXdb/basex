@@ -62,7 +62,6 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Compiles and optimizes the expression, assigns types and cardinalities.
-   * This method will be initially called by {@link QueryContext#compile()}.
    * @param cc compilation context
    * @return optimized expression
    * @throws QueryException query exception

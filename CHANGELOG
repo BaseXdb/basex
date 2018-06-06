@@ -1,3 +1,19 @@
+VERSION 9.0.2 (May 31, 2018) -------------------------------------------
+
+ Critical bug fixes:
+ - XQuery: Node ordering of mixed database/fragment instances
+ - XQuery: Index rewritings of paths with nested positional predicates
+
+ Improvements:
+ - WebDAV: Much faster locking of database resources
+ - XQuery: Enable ENFORCEINDEX for variable predicate arguments
+ - GUI: Larger interaction components, unified font sizes
+
+ Minor Bug fixes:
+ - DBA: Suppress menu on login page
+ - Commands: Nested evaluation with variable bindings
+ - XQuery: Static typing of lookup expressions
+
 VERSION 9.0.1 (April 24, 2018) -----------------------------------------
 
  Critical bug fixes:
@@ -12,7 +28,7 @@ VERSION 9.0.1 (April 24, 2018) -----------------------------------------
  - New R client. Thanks Ben Engbers!
  - Linux: exec command used in startup scripts
 
- Minor Bug fixes
+ Minor Bug fixes:
  - XQuery: Allow interruption of tail-call function calls
  - XQuery, HTTP parsing of content-type parameters
  - XQuery, restrict rewriting of filter to path expression

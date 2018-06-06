@@ -57,17 +57,11 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
 
   @Override
   public final boolean isLockedOutRecursive(final Request request) {
-    return new WebDAVCode<Boolean>(this) {
-      @Override
-      public Boolean get() throws IOException {
-        return service.locking.conflictingLocks(meta.db, meta.path);
-      }
-    }.evalNoEx();
+    return WebDAVLocks.get().isLockedOut(meta);
   }
 
   @Override
-  public WebDAVFolder createCollection(final String folder) throws BadRequestException,
-    NotAuthorizedException {
+  public WebDAVFolder createCollection(final String folder) throws BadRequestException {
     return new WebDAVCode<WebDAVFolder>(this) {
       @Override
       public WebDAVFolder get() throws IOException {
@@ -77,9 +71,7 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
   }
 
   @Override
-  public WebDAVResource child(final String childName)
-      throws BadRequestException, NotAuthorizedException {
-
+  public WebDAVResource child(final String childName) throws BadRequestException {
     return new WebDAVCode<WebDAVResource>(this) {
       @Override
       public WebDAVResource get() throws IOException {
@@ -89,7 +81,7 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
   }
 
   @Override
-  public List<WebDAVResource> getChildren() throws BadRequestException, NotAuthorizedException {
+  public List<WebDAVResource> getChildren() throws BadRequestException {
     return new WebDAVCode<List<WebDAVResource>>(this) {
       @Override
       public List<WebDAVResource> get() throws IOException {
@@ -100,8 +92,7 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
 
   @Override
   public WebDAVResource createNew(final String newName, final InputStream input,
-      final Long length, final String contentType)
-      throws BadRequestException, NotAuthorizedException {
+      final Long length, final String contentType) throws BadRequestException {
     return new WebDAVCode<WebDAVResource>(this) {
       @Override
       public WebDAVResource get() throws IOException {

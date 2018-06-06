@@ -469,4 +469,22 @@ public final class BaseXLayout {
   public static int width(final Graphics g, final int cp) {
     return g.getFontMetrics().charWidth(cp);
   }
+
+  /**
+   * Resizes a font.
+   * @param comp component
+   * @param factor resize factor
+   */
+  public static void resizeFont(final JComponent comp, final float factor) {
+    final Font f = comp.getFont();
+    comp.setFont(f.deriveFont(f.getSize() * factor));
+  }
+
+  /**
+   * Uses a bold font for the specified component.
+   * @param comp component
+   */
+  public static void boldFont(final JComponent comp) {
+    comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+  }
 }

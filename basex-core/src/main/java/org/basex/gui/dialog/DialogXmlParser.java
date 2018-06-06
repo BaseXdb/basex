@@ -40,7 +40,7 @@ final class DialogXmlParser extends DialogParser {
    * @param opts main options
    */
   DialogXmlParser(final BaseXDialog dialog, final MainOptions opts) {
-    final BaseXBack pp = new BaseXBack(new TableLayout(10, 1));
+    final BaseXBack pp = new BaseXBack(new RowLayout());
 
     intparse = new BaseXCheckBox(dialog, INT_PARSER, MainOptions.INTPARSE, opts).bold();
     pp.add(intparse);
@@ -87,7 +87,7 @@ final class DialogXmlParser extends DialogParser {
     cr.add(browsec);
     pp.add(cr);
     if(!rsen) {
-      final BaseXBack rs = new BaseXBack(new TableLayout(2, 1));
+      final BaseXBack rs = new BaseXBack(new RowLayout());
       rs.add(new BaseXLabel(HELP1_USE_CATALOG).color(GUIConstants.dgray));
       rs.add(new BaseXLabel(HELP2_USE_CATALOG).color(GUIConstants.dgray));
       pp.add(rs);

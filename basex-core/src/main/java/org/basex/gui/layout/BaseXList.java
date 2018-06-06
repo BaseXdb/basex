@@ -58,7 +58,7 @@ public final class BaseXList extends BaseXBack {
     // checks if list is purely numeric
     for(final String v : values) num = num && v.matches("[0-9]+");
 
-    layout(new TableLayout(2, 1));
+    layout(new RowLayout());
     text = new BaseXTextField(dialog);
     text.addKeyListener(new KeyAdapter() {
       boolean multi, typed;

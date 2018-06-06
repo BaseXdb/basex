@@ -36,14 +36,13 @@ public final class ScanTest extends SandboxTest {
      * </XML>
      */
     final IOFile dbfile = new IOFile(sandbox(), NAME);
-    try(BufferOutput bo = new BufferOutput(dbfile.path())) {
+    try(BufferOutput bo = new BufferOutput(dbfile)) {
       final int max = 16;
       final byte[] cache = new byte[max];
       // use constant seed to create same test document every time
       final Random rnd = new Random(0);
       bo.write(Token.token("<XML>"));
-      final byte[] start = Token.token("<SUB>");
-      final byte[] end = Token.token("</SUB>");
+      final byte[] start = Token.token("<SUB>"), end = Token.token("</SUB>");
       for(int e = 0; e < ELEMENTS; e++) {
         bo.write(start);
         final int rl = rnd.nextInt(max) + 1;

@@ -27,23 +27,23 @@ abstract class MainTest extends SandboxTest {
 
   /**
    * Runs a request and compares the result with the expected result.
-   * @param exp expected result
+   * @param expected expected result
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  final void equals(final String exp, final String... args) throws IOException {
-    assertEquals(exp, run(args));
+  final void equals(final String expected, final String... args) throws IOException {
+    assertEquals(expected, run(args));
   }
 
   /**
    * Runs a request and checks if the expected string is contained in the
    * result.
-   * @param exp expected result
+   * @param expected expected result
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  final void contains(final String exp, final String... args) throws IOException {
+  final void contains(final String expected, final String... args) throws IOException {
     final String result = run(args);
-    if(!result.contains(exp)) fail('\'' + exp + "' not contained in '" + result + "'.");
+    if(!result.contains(expected)) fail('\'' + expected + "' not contained in '" + result + "'.");
   }
 }

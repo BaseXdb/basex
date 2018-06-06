@@ -100,7 +100,7 @@ public class ClientSession extends Session {
     sin = socket.getInputStream();
 
     // receive server response
-    final BufferInput bi = new BufferInput(sin);
+    final BufferInput bi = BufferInput.get(sin);
     final String[] response = Strings.split(bi.readString(), ':');
     final String code, nonce;
     if(response.length > 1) {
@@ -185,7 +185,7 @@ public class ClientSession extends Session {
    */
   @SuppressWarnings("resource")
   private void receive(final OutputStream output) throws IOException {
-    final BufferInput bi = new BufferInput(sin);
+    final BufferInput bi = BufferInput.get(sin);
     if(output != null) receive(bi, output);
     info = bi.readString();
     if(!ok(bi)) throw new BaseXException(info);
@@ -253,7 +253,7 @@ public class ClientSession extends Session {
     sout.write(command.code);
     send(arg);
     sout.flush();
-    final BufferInput bi = new BufferInput(sin);
+    final BufferInput bi = BufferInput.get(sin);
     receive(bi, o);
     if(!ok(bi)) throw new BaseXException(bi.readString());
     return o.toString();

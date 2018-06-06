@@ -8,7 +8,6 @@ import java.io.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -125,6 +124,19 @@ public final class MixedTest extends AdvancedQueryTest {
         + "return $b", "<xml/>");
   }
 
+  /** Optimizations of nested path expressions. */
+  @Test
+  public void gh1567() {
+    query("let $_ := '_' return document { <_/> }/*[self::*[name() = $_]]", "<_/>");
+  }
+
+  /** Node ids. */
+  @Test
+  public void gh1566() {
+    query("((<_><a/><b/></_> update {})/* ! element _ { . })/*", "<a/>\n<b/>");
+    query("((<_><a>A</a><b>B</b></_> update {})/* ! element _ { . })/*/node()", "A\nB");
+  }
+
   /**
    * Tests document order across multiple documents or databases.
    * @throws IOException I/O exception
@@ -135,8 +147,8 @@ public final class MixedTest extends AdvancedQueryTest {
     final String xml2 = "<xml><n2a/><n2b/></xml>";
     final IOFile file1 = new IOFile(sandbox(), "doc1.xml");
     final IOFile file2 = new IOFile(sandbox(), "doc2.xml");
-    file1.write(Token.token(xml1));
-    file2.write(Token.token(xml2));
+    file1.write(xml1);
+    file2.write(xml2);
 
     // compare order of multiple document (based on original path)
     query("doc('" + file1.path() + "')/*/* union doc('" + file2.path() + "')/*/*",
@@ -145,6 +157,7 @@ public final class MixedTest extends AdvancedQueryTest {
     // compare order of multiple document (based on database path)
     execute(new CreateDB(NAME, file1.path()));
     execute(new CreateDB(NAME + '2', file2.path()));
+    execute(new Close());
     query("db:open('" + NAME + "')/*/* union db:open('" + NAME + "2')/*/*",
         "<n1a/>\n<n1b/>\n<n2a/>\n<n2b/>");
   }

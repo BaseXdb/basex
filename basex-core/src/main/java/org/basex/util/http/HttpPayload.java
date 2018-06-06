@@ -88,7 +88,7 @@ public final class HttpPayload {
         // if something goes wrong, input streams will be closed outside the function
         final byte[] pl = (type.isXML() || type.isText()
           ? new NewlineInput(in).encoding(type.parameters().get(CHARSET))
-          : new BufferInput(in)
+          : BufferInput.get(in)
         ).content();
         Value value = Empty.SEQ;
         try {
@@ -324,7 +324,7 @@ public final class HttpPayload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value value(final IO input, final MainOptions options, final MediaType type)
+  public static Value value(final IOContent input, final MainOptions options, final MediaType type)
       throws IOException, QueryException {
 
     Value value = null;

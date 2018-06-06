@@ -53,8 +53,7 @@ final class WebDAVFile extends WebDAVResource implements FileResource {
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
-      final Map<String, String> params, final String contentType)
-      throws BadRequestException, NotAuthorizedException {
+      final Map<String, String> params, final String contentType) throws BadRequestException {
 
     new WebDAVCode<Object>(this) {
       @Override

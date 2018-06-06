@@ -42,7 +42,7 @@ public abstract class Command extends Job {
   /** Optional input source. */
   protected InputSource in;
   /** Base URI. */
-  protected String uri;
+  protected String uri = "";
 
   /** Exception, resulting from command execution. */
   protected Exception exception;

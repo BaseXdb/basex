@@ -1301,7 +1301,7 @@ public enum QueryError {
   /** Error code. */
   UPMODIFY(XUST, 2, "Transformations must all be updating or return an empty sequence."),
   /** Error code. */
-  UPEXPECTF(XUST, 2, "Function body is no an updating expression."),
+  UPEXPECTF(XUST, 2, "Function body must be updating."),
   /** Error code. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
   /** Error code. */

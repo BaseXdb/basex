@@ -203,7 +203,7 @@ public abstract class W3CTS extends Main {
 
     final String time = perf.getTime();
     Util.outln("Writing log file..." + NL);
-    try(PrintOutput po = new PrintOutput(path + pathlog)) {
+    try(PrintOutput po = new PrintOutput(new IOFile(path + pathlog))) {
       po.println("TEST RESULTS ________________________________________________");
       po.println(NL + "Total #Queries: " + total);
       po.println("Correct / Empty Results: " + ok + " / " + ok2);
@@ -222,7 +222,7 @@ public abstract class W3CTS extends Main {
     }
 
     if(reporting) {
-      try(PrintOutput po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX)) {
+      try(PrintOutput po = new PrintOutput(new IOFile(report + Prop.NAME + IO.XMLSUFFIX))) {
         print(po, report + Prop.NAME + "Pre" + IO.XMLSUFFIX);
         po.print(logReport.toString());
         print(po, report + Prop.NAME + "Pos" + IO.XMLSUFFIX);

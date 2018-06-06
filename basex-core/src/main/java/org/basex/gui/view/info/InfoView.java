@@ -78,7 +78,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     header = new BaseXHeader(INFO);
 
-    timer = new BaseXLabel(" ").border(4, 4, 0, 0);
+    timer = new BaseXLabel(" ").border(0, 4, 0, 0).resize(1.2f);
     timer.setForeground(GUIConstants.dgray);
 
     area = new TextPanel(gui, false);
@@ -110,7 +110,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     final AbstractButton find = editor.button(FIND);
     final BaseXBack top = new BaseXBack(false);
-    top.layout(new TableLayout(1, 3, 6, 0));
+    top.layout(new ColumnLayout(6));
     top.add(find);
     top.add(cats);
     top.add(timer);

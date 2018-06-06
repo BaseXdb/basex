@@ -115,7 +115,7 @@ public class ClientQuery extends Query {
     cs.sout.flush();
 
     @SuppressWarnings("resource")
-    final BufferInput bi = new BufferInput(cs.sin);
+    final BufferInput bi = BufferInput.get(cs.sin);
     cache(bi, full);
     if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
   }

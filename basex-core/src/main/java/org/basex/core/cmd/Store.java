@@ -79,7 +79,7 @@ public final class Store extends ACreate {
     if(file.isDir()) file.delete();
     file.parent().md();
 
-    try(PrintOutput po = new PrintOutput(file.path())) {
+    try(PrintOutput po = new PrintOutput(file)) {
       final Reader r = in.getCharacterStream();
       final InputStream is = in.getByteStream();
       final String id = in.getSystemId();
@@ -88,7 +88,7 @@ public final class Store extends ACreate {
       } else if(is != null) {
         for(int b; (b = is.read()) != -1;) po.write(b);
       } else if(id != null) {
-        try(BufferInput bi = new BufferInput(IO.get(id))) {
+        try(BufferInput bi = BufferInput.get(IO.get(id))) {
           for(int b; (b = bi.read()) != -1;) po.write(b);
         }
       }

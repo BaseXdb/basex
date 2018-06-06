@@ -87,7 +87,7 @@ public abstract class RestXqTest extends HTTPTest {
     final String path = context.soptions.get(StaticOptions.WEBPATH);
     for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());
     // create new module
-    module().write(new TokenBuilder(HEADER).add(function).finish());
+    module().write(HEADER + function);
     // invalidate module cache
     RestXqModules.get(context).init();
   }
