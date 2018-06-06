@@ -53,7 +53,11 @@ public class StandardWebSocket extends WebSocketAdapter {
     UpgradeRequest ur = sess.getUpgradeRequest();
 
     // Add to the WebSocketRoom
-    id = Room.getInstance().join(this);
+    if(this.path != null) {
+      id = Room.getInstance().joinChannel(this, path.toString());
+    } else {
+      id = Room.getInstance().join(this);
+    }
 
     // Add Headers (for binding them to the XQueryParameters in the
     // corresponding bind Method
@@ -108,7 +112,11 @@ public class StandardWebSocket extends WebSocketAdapter {
     super.onWebSocketClose(statusCode, reason);
 
     // Remove the user from the Room
-    Room.getInstance().remove(id);
+    if(path == null) {
+      Room.getInstance().remove(id);
+    } else {
+      Room.getInstance().removeFromChannel(this, path.toString(), id);
+    }
   }
 
   /*

@@ -52,14 +52,19 @@ public class Room {
    * Adds a Websocket to a specific Channel.
    * @param socket WebSocke
    * @param channel String
+   * @return string unique id
    * */
-  public void joinChannel(final WebSocketAdapter socket, final String channel) {
+  public String joinChannel(final WebSocketAdapter socket, final String channel) {
+    String uniqueID = UUID.randomUUID().toString();
+    members.put(uniqueID, socket);
+
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     if(channelMembers == null) {
       channelMembers = new ArrayList<>();
     }
     channelMembers.add(socket);
     channels.put(channel, channelMembers);
+    return uniqueID;
   }
 
   /**
@@ -74,8 +79,11 @@ public class Room {
    * Removes a Member from the ChannelMemberList.
    * @param socket WebSocke
    * @param channel String
+   * @param id String
    */
-  public void removeFromChannel(final WebSocketAdapter socket, final String channel) {
+  public void removeFromChannel(final WebSocketAdapter socket, final String channel,
+      final String id) {
+    members.remove(id);
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {

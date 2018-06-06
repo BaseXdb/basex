@@ -36,14 +36,19 @@ public class StompWebSocket extends WebSocketAdapter
     private WsResponse serializer;
 
     /**
-     * The uuid of the Websocketinstance.
+     * The Stomp-Id with the corresponding server unique id - <stompd,serverid>
      * */
-    private String id;
+    private HashMap<String, String> serverIds;
 
     /**
      * The subscribtion-ids with the corresponding channel.
      * */
     private HashMap<String, String> idchannelMap = new HashMap<>();
+
+    /**
+     * The unigque serverid from the initial connect.
+     * */
+    private String serverId;
 
     /**
      * Constructor.
@@ -72,7 +77,7 @@ public class StompWebSocket extends WebSocketAdapter
         super.onWebSocketConnect(sess);
 
         // Add to the WebSocketRoom
-        id = Room.getInstance().join(this);
+        serverId = Room.getInstance().join(this);
 
         // Create new WebsocketConnection
         wsconnection =
@@ -107,7 +112,7 @@ public class StompWebSocket extends WebSocketAdapter
           // TODO Auto-generated catch block
           e.printStackTrace();
         }
-        String id;
+        String stompId;
         String channel;
         switch(stompframe.getCommand()) {
           case SEND:
@@ -119,18 +124,20 @@ public class StompWebSocket extends WebSocketAdapter
             ann = Annotation._WS_STOMP_SUBSCRIBE;
             // Required Header
             channel = stompframe.getHeaders().get("destination");
-            id = stompframe.getHeaders().get("id");
+            stompId = stompframe.getHeaders().get("id");
 
-            idchannelMap.put(id, channel);
-            Room.getInstance().joinChannel(this, channel);
+            idchannelMap.put(stompId, channel);
+            serverIds.put(stompId,Room.getInstance().joinChannel(this, channel));
             break;
           case UNSUBSCRIBE:
             ann = Annotation._WS_STOMP_UNSUBSCRIBE;
             // REquired Header
-            id = stompframe.getHeaders().get("id");
-            channel = idchannelMap.get(id);
-            idchannelMap.remove(id);
-            Room.getInstance().removeFromChannel(this, channel);
+            stompId = stompframe.getHeaders().get("id");
+            channel = idchannelMap.get(stompId);
+            idchannelMap.remove(stompId);
+            String sId = serverIds.get(stompId);
+            serverIds.remove(stompId);
+            Room.getInstance().removeFromChannel(this, channel,sId);
             break;
             // Transaction stuff
           case BEGIN:
@@ -170,7 +177,11 @@ public class StompWebSocket extends WebSocketAdapter
     {
       Room room = Room.getInstance();
       // Remove any Subscriptions
-      idchannelMap.forEach((id, channel) -> room.removeFromChannel(this, channel));
+      idchannelMap.forEach((stompId, channel) -> {
+        String sId = serverIds.get(stompId);
+        serverIds.remove(stompId);
+        room.removeFromChannel(this, channel, sId);
+      });
 
 //      findAndProcess(Annotation._WS_CLOSE, null);
 
@@ -178,7 +189,7 @@ public class StompWebSocket extends WebSocketAdapter
         super.onWebSocketClose(statusCode, reason);
 
         // Remove the user from the Room
-        Room.getInstance().remove(id);
+        Room.getInstance().remove(serverId);
     }
 
     @Override
