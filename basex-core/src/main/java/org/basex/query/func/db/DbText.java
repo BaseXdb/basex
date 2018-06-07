@@ -5,6 +5,8 @@ import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -27,6 +29,9 @@ public class DbText extends DbAccess {
    */
   final ValueAccess valueAccess(final IndexType type, final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
-    return new ValueAccess(info, exprs[1], type, null, new IndexStaticDb(info, data));
+    final TokenSet set = new TokenSet();
+    final Iter iter = exprs[1].iter(qc);
+    for(Item it; (it = qc.next(iter)) != null;) set.put(toToken(it));
+    return new ValueAccess(info, set, type, null, new IndexStaticDb(info, data));
   }
 }

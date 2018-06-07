@@ -103,6 +103,11 @@ public final class UpdatableDiskValues extends DiskValues {
     deleteKeys(keys);
   }
 
+  @Override
+  protected IntList pres(final int sz, final long offset) {
+    return super.pres(sz, offset).sort();
+  }
+
   /**
    * Removes record ids from the index.
    * @param index index of the key

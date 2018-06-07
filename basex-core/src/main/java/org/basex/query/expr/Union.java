@@ -58,7 +58,7 @@ public final class Union extends Set {
   }
 
   @Override
-  public ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
+  protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
     final ANodeBuilder nodes = new ANodeBuilder();
     for(final Iter iter : iters) {
       for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));

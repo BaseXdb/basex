@@ -757,8 +757,8 @@ public enum Function {
   /** XQuery function. */
   _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR_O, STR_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_ATTRIBUTE(DbAttribute.class, "attribute(database,string[,name])",
-      arg(STR_O, ITEM_O, STR_O), ATT_ZM, flag(NDT), DB_URI),
+  _DB_ATTRIBUTE(DbAttribute.class, "attribute(database,strings[,name])",
+      arg(STR_O, ITEM_ZM, STR_O), ATT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ATTRIBUTE_RANGE(DbAttributeRange.class, "attribute-range(database,from,to[,name])",
       arg(STR_O, ITEM_O, ITEM_O, STR_O), ATT_ZM, flag(NDT), DB_URI),
@@ -842,13 +842,13 @@ public enum Function {
   /** XQuery function. */
   _DB_SYSTEM(DbSystem.class, "system()", arg(), STR_O, DB_URI),
   /** XQuery function. */
-  _DB_TEXT(DbText.class, "text(database,string)", arg(STR_O, ITEM_O), TXT_ZM, flag(NDT), DB_URI),
+  _DB_TEXT(DbText.class, "text(database,strings)", arg(STR_O, ITEM_ZM), TXT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_TEXT_RANGE(DbTextRange.class, "text-range(database,from,to)",
       arg(STR_O, ITEM_O, ITEM_O), TXT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_TOKEN(DbToken.class, "token(database,string[,name])",
-      arg(STR_O, ITEM_O, STR_O), ATT_ZM, flag(NDT), DB_URI),
+  _DB_TOKEN(DbToken.class, "token(database,strings[,name])",
+      arg(STR_O, ITEM_ZM, STR_O), ATT_ZM, flag(NDT), DB_URI),
 
   // Fetch Module
 

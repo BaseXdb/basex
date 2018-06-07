@@ -123,12 +123,12 @@ public final class DbModuleTest extends AdvancedQueryTest {
     // run function without and with index
     final Function func = _DB_ATTRIBUTE;
     execute(new DropIndex(CmdIndex.ATTRIBUTE));
-    error(func.args(NAME, 0), DB_NOINDEX_X_X);
+    error(func.args(NAME, "0"), DB_NOINDEX_X_X);
 
     execute(new CreateIndex(CmdIndex.ATTRIBUTE));
-    query(func.args(NAME, 0), "id=\"0\"");
-    query(func.args(NAME, 0, "id"), "id=\"0\"");
-    query(func.args(NAME, 0, "XXX"), "");
+    query(func.args(NAME, "0"), "id=\"0\"");
+    query(func.args(NAME, "0", "id"), "id=\"0\"");
+    query(func.args(NAME, "0", "XXX"), "");
     query(func.args(NAME, "XXX"), "");
   }
 
@@ -149,12 +149,12 @@ public final class DbModuleTest extends AdvancedQueryTest {
     // run function without and with index
     final Function func = _DB_TOKEN;
     execute(new DropIndex(CmdIndex.TOKEN));
-    error("data(" + func.args(NAME, 0) + ")", DB_NOINDEX_X_X);
+    error("data(" + func.args(NAME, "0") + ")", DB_NOINDEX_X_X);
 
     execute(new CreateIndex(CmdIndex.TOKEN));
-    query("data(" + func.args(NAME, 0) + ")", 0);
-    query("data(" + func.args(NAME, 0, "id") + ")", 0);
-    query("data(" + func.args(NAME, 0, "XXX") + ")", "");
+    query("data(" + func.args(NAME, "0") + ")", 0);
+    query("data(" + func.args(NAME, "0", "id") + ")", 0);
+    query("data(" + func.args(NAME, "0", "XXX") + ")", "");
     query("data(" + func.args(NAME, "XXX") + ")", "");
   }
 

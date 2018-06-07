@@ -100,11 +100,27 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public final IndexIterator iter(final IndexToken it) {
-    if(it instanceof StringRange) return idRange((StringRange) it);
-    if(it instanceof NumericRange) return idRange((NumericRange) it);
-    final IndexEntry ie = entry(it.get());
-    return iter(ie.size, ie.offset);
+  public final IndexIterator iter(final IndexToken token) {
+    final IntList pres;
+    if(token instanceof StringRange) {
+      pres = idRange((StringRange) token);
+    } else if(token instanceof NumericRange) {
+      pres = idRange((NumericRange) token);
+    } else {
+      final IndexEntry ie = entry(token.get());
+      pres = pres(ie.size, ie.offset);
+    }
+
+    return new IndexIterator() {
+      final int s = pres.size();
+      int p;
+      @Override
+      public boolean more() { return p < s; }
+      @Override
+      public int pre() { return pres.get(p++); }
+      @Override
+      public int size() { return s; }
+    };
   }
 
   @Override
@@ -362,20 +378,20 @@ public class DiskValues extends ValueIndex {
    * <p><em>Important:</em> This method is thread-safe.</p>
    * @param sz number of values
    * @param offset offset
-   * @return iterator
+   * @return sorted pre values
    */
-  private IndexIterator iter(final int sz, final long offset) {
+  protected IntList pres(final int sz, final long offset) {
     final IntList pres = new IntList(sz);
     synchronized(monitor) {
       idxl.cursor(offset);
       for(int i = 0, id = 0; i < sz; i++) {
         id += idxl.readNum();
-        // pass over token position
+        // token index: skip position
         if(type == IndexType.TOKEN) idxl.readNum();
         pres.add(pre(id));
       }
     }
-    return iter(pres.sort());
+    return pres;
   }
 
   /**
@@ -384,7 +400,7 @@ public class DiskValues extends ValueIndex {
    * @param tok index term
    * @return results
    */
-  private IndexIterator idRange(final StringRange tok) {
+  private IntList idRange(final StringRange tok) {
     // check if min and max are positive integers with the same number of digits
     final IntList pres = new IntList();
     synchronized(monitor) {
@@ -403,7 +419,7 @@ public class DiskValues extends ValueIndex {
         }
       }
     }
-    return iter(pres.sort());
+    return pres.sort();
   }
 
   /**
@@ -412,7 +428,7 @@ public class DiskValues extends ValueIndex {
    * @param tok index term
    * @return results
    */
-  private IndexIterator idRange(final NumericRange tok) {
+  private IntList idRange(final NumericRange tok) {
     // check if min and max are positive integers with the same number of digits
     final double min = tok.min, max = tok.max;
     final int len = max > 0 && (long) max == max ? token(max).length : 0;
@@ -442,25 +458,7 @@ public class DiskValues extends ValueIndex {
         }
       }
     }
-    return iter(pres.sort());
-  }
-
-  /**
-   * Returns an iterator for the specified id list.
-   * @param pres pre values
-   * @return iterator
-   */
-  private static IndexIterator iter(final IntList pres) {
-    return new IndexIterator() {
-      final int s = pres.size();
-      int p = -1;
-      @Override
-      public boolean more() { return ++p < s; }
-      @Override
-      public int pre() { return pres.get(p); }
-      @Override
-      public int size() { return s; }
-    };
+    return pres.sort();
   }
 
   /**

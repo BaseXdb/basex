@@ -124,20 +124,20 @@ public final class IndexInfo {
         // only strings and untyped items are supported
         if(!item.type.isStringOrUntyped()) return false;
         // do not use text/attribute index if string is empty or too long
-        byte[] string = item.string(info);
-        if(trim) string = Token.trim(string);
-        final int sl = string.length;
+        byte[] token = item.string(info);
+        if(trim) token = Token.trim(token);
+        final int sl = token.length;
         if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
           return false;
 
         // add only expressions that yield results and that have not been requested before
-        if(!strings.contains(string)) {
-          strings.put(string);
-          final IndexCosts c = costs(data, new StringToken(type, string));
+        if(!strings.contains(token)) {
+          strings.put(token);
+          final IndexCosts c = costs(data, new StringToken(type, token));
           if(c == null) return false;
           final int r = c.results();
           if(r != 0) {
-            final ValueAccess va = new ValueAccess(info, item, type, test, db).trim(trim);
+            final ValueAccess va = new ValueAccess(info, new TokenSet(token), type, test, db);
             tmp.add(va);
             if(r == 1) va.exprType.assign(Occ.ZERO_ONE);
           }
