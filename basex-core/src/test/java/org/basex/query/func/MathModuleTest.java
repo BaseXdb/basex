@@ -15,37 +15,45 @@ public final class MathModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void crc32() {
-    query("string( " + _MATH_CRC32.args("") + ')', "00000000");
-    query("string( " + _MATH_CRC32.args("BaseX") + ')', "4C06FC7F");
+    final Function func = _MATH_CRC32;
+    query(func.args(" ()"), "");
+    query(func.args(" ()"), "");
+    query("string( " + func.args("") + ')', "00000000");
+    query("string( " + func.args("BaseX") + ')', "4C06FC7F");
   }
 
   /** Test method. */
   @Test
   public void pi() {
-    query(_MATH_PI.args(), StrictMath.PI);
+    final Function func = _MATH_PI;
+    query(func.args(), StrictMath.PI);
   }
 
   /** Test method. */
   @Test
   public void e() {
-    query(_MATH_E.args(), StrictMath.E);
+    final Function func = _MATH_E;
+    query(func.args(), StrictMath.E);
   }
 
   /** Test method. */
   @Test
   public void sinh() {
-    query(_MATH_SINH.args(" 0"), 0);
+    final Function func = _MATH_SINH;
+    query(func.args(" 0"), 0);
   }
 
   /** Test method. */
   @Test
   public void cosh() {
-    query(_MATH_COSH.args(" 0"), 1);
+    final Function func = _MATH_COSH;
+    query(func.args(" 0"), 1);
   }
 
   /** Test method. */
   @Test
   public void tanh() {
-    query(_MATH_TANH.args(" 0"), 0);
+    final Function func = _MATH_TANH;
+    query(func.args(" 0"), 0);
   }
 }

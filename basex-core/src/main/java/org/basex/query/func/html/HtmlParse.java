@@ -22,11 +22,14 @@ import org.basex.util.*;
 public final class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] in = toBytes(exprs[0], qc);
+    final Item item = exprs[0].atomItem(qc, info);
     final HtmlOptions hopts = toOptions(1, new HtmlOptions(), qc);
+    if(item == null) return null;
+
     final MainOptions opts = MainOptions.get();
     try {
-      return new DBNode(new org.basex.build.html.HtmlParser(new IOContent(in), opts, hopts));
+      final IO io = new IOContent(toToken(item));
+      return new DBNode(new org.basex.build.html.HtmlParser(io, opts, hopts));
     } catch(final IOException ex) {
       throw HTML_PARSE_X.get(info, ex);
     }

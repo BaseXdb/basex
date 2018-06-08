@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -17,8 +18,9 @@ import org.basex.util.*;
 public final class FnSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter iter = exprs[0].iter(qc);
     final Item so = exprs.length > 1 ? exprs[1].item(qc, info) : null;
     final SerializerOptions sopts = FuncOptions.serializer(so, info);
-    return Str.get(serialize(exprs[0].iter(qc), sopts, SER_X, qc));
+    return Str.get(serialize(iter, sopts, SER_X, qc));
   }
 }

@@ -15,6 +15,8 @@ import org.junit.*;
 public final class CsvModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void parseXml() {
+    parse(" ()", "", "");
+    parse(" []", "", "");
     parse("", "", "<csv/>");
     parse("X", "", "<csv>\n<record>\n<entry>X</entry>\n</record>\n</csv>");
     parse(" '\"X\"\"Y\"'", "", "...<entry>X\"Y</entry>");
