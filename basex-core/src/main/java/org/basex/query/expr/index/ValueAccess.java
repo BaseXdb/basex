@@ -129,10 +129,10 @@ public final class ValueAccess extends IndexAccess {
 
     // check if index is available and if it may contain the requested term
     // otherwise, use sequential scan
-    boolean index = data.meta.index(type);
-    if(type == IndexType.TEXT || type == IndexType.ATTRIBUTE) {
-      index &= tl > 0 && tl <= data.meta.maxlen;
-    }
+    final boolean index = data.meta.index(type) && (
+        !(type == IndexType.TEXT || type == IndexType.ATTRIBUTE) ||
+        tl > 0 && tl <= data.meta.maxlen
+    );
 
     final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term, data);
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
@@ -150,6 +150,11 @@ public final class ValueAccess extends IndexAccess {
           return tmp.finish();
         }
         return null;
+      }
+      @Override
+      public long size() {
+        // index access: number of results is known in advance
+        return index ? ii.size() : -1;
       }
     };
   }
