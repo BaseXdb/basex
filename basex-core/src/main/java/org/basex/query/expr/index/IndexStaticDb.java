@@ -1,7 +1,6 @@
 package org.basex.query.expr.index;
 
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -91,8 +90,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public Data data(final QueryContext qc, final IndexType type) throws QueryException {
-    type.check(data, info);
+  Data data(final QueryContext qc) throws QueryException {
     return data;
   }
 

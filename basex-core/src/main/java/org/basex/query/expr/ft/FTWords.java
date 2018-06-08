@@ -135,7 +135,7 @@ public final class FTWords extends FTExpr {
     final Data data = db.data(qc, IndexType.FULLTEXT);
     return new FTIter() {
       FTIndexIterator ftiter;
-      int len;
+      int length;
 
       @Override
       public FTNode next() throws QueryException {
@@ -144,8 +144,8 @@ public final class FTWords extends FTExpr {
           final FTLexer lexer = new FTLexer(ftOpt).
               lserror(qc.context.options.get(MainOptions.LSERROR));
 
-          // number of distinct tokens
-          int count = 0;
+          // length distinct tokens
+          int len = 0;
           // loop through unique tokens
           for(final byte[] txt : unique(tokens != null ? tokens : tokens(qc))) {
             lexer.init(txt);
@@ -155,7 +155,7 @@ public final class FTWords extends FTExpr {
             FTIndexIterator ii = null;
             do {
               final byte[] tok = lexer.nextToken();
-              count += tok.length;
+              len += tok.length;
               if(ftOpt.sw != null && ftOpt.sw.contains(tok)) {
                 ++d;
               } else {
@@ -174,22 +174,22 @@ public final class FTWords extends FTExpr {
             if(ii != null) {
               // create or combine iterator
               if(ftiter == null) {
-                len = count;
+                length = len;
                 ftiter = ii;
               } else if(mode == FTMode.ALL || mode == FTMode.ALL_WORDS) {
                 if(ii.size() == 0) return null;
-                len += count;
+                length += len;
                 ftiter = FTIndexIterator.intersect(ftiter, ii, 0);
               } else {
                 if(ii.size() == 0) continue;
-                len = Math.max(count, len);
+                length = Math.max(len, length);
                 ftiter = FTIndexIterator.union(ftiter, ii);
               }
             }
           }
         }
         return ftiter == null || !ftiter.more() ? null :
-          new FTNode(ftiter.matches(), data, ftiter.pre(), len, ftiter.size(), -1);
+          new FTNode(ftiter.matches(), data, ftiter.pre(), length, ftiter.size());
       }
     };
   }
