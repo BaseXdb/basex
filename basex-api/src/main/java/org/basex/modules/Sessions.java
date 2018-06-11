@@ -23,6 +23,7 @@ public final class Sessions extends QueryModule {
    * @return session ids
    */
   public static Value ids() {
+    System.out.println("Session ids");
     final HashMap<String, HttpSession> http = SessionListener.sessions();
     final TokenList tl = new TokenList(http.size());
     for(final String s : http.keySet()) tl.add(s);

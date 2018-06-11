@@ -49,6 +49,7 @@ public class WsConnection implements ClientInfo {
     this.req = req;
     this.res = res;
     context = new Context(HTTPContext.context(), this);
+    context.user(HTTPContext.context().user());
     this.path = path;
     this.sess = sess;
   }

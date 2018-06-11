@@ -98,6 +98,7 @@ public class WsPool {
    * @param message Object
    */
   public void broadcast(final Object message) {
+    if(message == null) return;
     if(message instanceof String) {
       members.forEach((k, v) -> {
         v.getSession().getRemote().sendStringByFuture((String) message);
