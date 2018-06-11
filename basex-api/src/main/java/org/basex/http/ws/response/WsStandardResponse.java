@@ -5,7 +5,6 @@ import java.net.*;
 import java.nio.*;
 import java.util.*;
 
-import org.basex.http.restxq.*;
 import org.basex.http.util.*;
 import org.basex.http.ws.*;
 import org.basex.io.out.*;
@@ -57,12 +56,12 @@ public class WsStandardResponse implements WsResponse {
 
   @Override
   public void bind(final Expr[] args, final QueryContext qc,
-                   final Object message, final ArrayList<WebXqParam> wsParameters,
-                   final StaticFunc function, final WsXqFunction wsfunc,
+                   final Object value, final ArrayList<WebParam> wsParameters,
+                   final StaticFunc function, final WsFunction wsfunc,
                    final Map<String, String> header)
           throws QueryException, UnsupportedEncodingException {
 
-    for(final WebXqParam rxp: wsParameters) {
+    for(final WebParam rxp: wsParameters) {
       final Var[] params = function.params;
       final int pl = params.length;
 
@@ -73,10 +72,10 @@ public class WsStandardResponse implements WsResponse {
           final SeqType decl = var.declaredType();
           if(var.name.toString().equals("message")) {
             final Value msg;
-              if(message instanceof String) {
-                msg = Str.get((String) message);
-              } else if(message instanceof byte[]) {
-                msg = B64.get((byte[]) message);
+              if(value instanceof String) {
+                msg = Str.get((String) value);
+              } else if(value instanceof byte[]) {
+                msg = B64.get((byte[]) value);
               } else {
                 break;
               }
@@ -92,8 +91,8 @@ public class WsStandardResponse implements WsResponse {
   }
 
   @Override
-  public boolean generateOutput(final WebsocketConnection conn,
-                                final WsXqFunction wxf, final QueryContext qc)
+  public boolean create(final WsConnection conn,
+                                final WsFunction wxf, final QueryContext qc)
                  throws IOException, QueryException {
     ArrayOutput ao = new ArrayOutput();
     Serializer ser = Serializer.get(ao, wxf.output);

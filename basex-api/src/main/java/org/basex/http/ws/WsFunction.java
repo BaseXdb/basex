@@ -15,21 +15,24 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * This class represents a single Websocket-Function.
  * @author BaseX Team 2005-18, BSD License
  * */
-public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction> {
+public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   /**
    * Constructor.
    * @param function associated user function
    * @param qc query context
    * @param module associated module
    */
-  public WsXqFunction(final StaticFunc function,
+  public WsFunction(final StaticFunc function,
       final QueryContext qc, final RestXqModule module) {
     super(function, qc, module);
   }
@@ -94,14 +97,14 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
           for(int a = 2; a < al; a++) {
             items.add(args[a]);
           }
-          WebXqParam test = new WebXqParam(var, name, items.value());
+          WebParam test = new WebParam(var, name, items.value());
           headerParams.add(test);
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
           if(args.length >= 2) {
             final QNm varId = checkVariable(toString(args[1]), declared);
-            WebXqParam id = new WebXqParam(varId, "id", null);
+            WebParam id = new WebParam(varId, "id", null);
             headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));
@@ -112,11 +115,11 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
             throw error(PARAM_MISSING_X, "path,message[,id]");
           }
           final QNm varMsg = checkVariable(toString(args[1]), declared);
-          WebXqParam msg = new WebXqParam(varMsg, "message", null);
+          WebParam msg = new WebParam(varMsg, "message", null);
           headerParams.add(msg);
           if(args.length > 2) {
             final QNm varId = checkVariable(toString(args[2]), declared);
-            WebXqParam id = new WebXqParam(varId, "id", null);
+            WebParam id = new WebParam(varId, "id", null);
             headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));
@@ -142,17 +145,17 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
    * Parses new modules and discards obsolete ones.
    * @param conn Websocket connection
    * @param message The WebsocketMessage
-   * @param serializer The Wsseriaizer
+   * @param resonse The Wsseriaizer
    * @param header The header to set
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  public boolean process(final WebsocketConnection conn,
+  public boolean process(final WsConnection conn,
                          final Object message,
-                         final WsResponse serializer,
+                         final WsResponse resonse,
                          final Map<String, String> header) throws Exception {
     try {
-      return module.process(conn, this, message, serializer, header);
+      return module.process(conn, this, message, resonse, header);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;
@@ -160,7 +163,7 @@ public class WsXqFunction extends WebFunction implements Comparable<WsXqFunction
   }
 
   @Override
-  public int compareTo(final WsXqFunction wsxf) {
+  public int compareTo(final WsFunction wsxf) {
     return path.compareTo(wsxf.path);
   }
 

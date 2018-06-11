@@ -3,7 +3,6 @@ package org.basex.http.ws.response;
 import java.io.*;
 import java.util.*;
 
-import org.basex.http.restxq.*;
 import org.basex.http.util.*;
 import org.basex.http.ws.*;
 import org.basex.query.*;
@@ -31,21 +30,20 @@ public interface WsResponse {
   void bind(Expr[] args,
             QueryContext qc,
             Object message,
-            ArrayList<WebXqParam> wsParameters,
+            ArrayList<WebParam> wsParameters,
             StaticFunc function,
-            WsXqFunction wsfunc,
+            WsFunction wsfunc,
             Map<String, String> header) throws QueryException, UnsupportedEncodingException;
 
   /**
-   * Generates the Output and send it to the Client.
-   * @param conn The Websocketconnection
-   * @param wxf The WebsocetFunction
-   * @param qc the Querycontext
-   * @return {@code true} if function creates no result
-   * @throws QueryException Query exception
-   * @throws IOException  exception
+   * Creates the Response.
+   * @param conn The WsConnection
+   * @param wxf The WsFunction
+   * @param qc The QueryContext
+   * @return Boolean
+   * @throws IOException IOException
+   * @throws QueryException QueryException
    */
-  boolean generateOutput(WebsocketConnection conn,
-                         WsXqFunction wxf,
-                         QueryContext qc) throws IOException, QueryException;
+  boolean create(WsConnection conn, WsFunction wxf, QueryContext qc)
+      throws IOException, QueryException;
 }

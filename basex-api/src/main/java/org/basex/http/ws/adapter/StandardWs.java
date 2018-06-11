@@ -17,11 +17,11 @@ import org.eclipse.jetty.websocket.api.*;
  *
  * @author BaseX Team 2005-18, BSD License
  */
-public class StandardWebSocket extends WebSocketAdapter {
+public class StandardWs extends WebSocketAdapter {
   /**
    * The Websocketconnection.
    */
-  private WebsocketConnection wsconnection;
+  private WsConnection wsconnection;
 
   /**
    * The Path.
@@ -36,7 +36,7 @@ public class StandardWebSocket extends WebSocketAdapter {
   /**
    * The StandardSerializer.
    */
-  private WsResponse serializer = new WsStandardResponse();
+  private WsResponse response = new WsStandardResponse();
 
   /**
    * The HeaderParams.
@@ -47,7 +47,7 @@ public class StandardWebSocket extends WebSocketAdapter {
    * Constructor.
    * @param pPath as a String
    * */
-  public StandardWebSocket(final String pPath) {
+  public StandardWs(final String pPath) {
     super();
     path = new WsPath(pPath);
   }
@@ -61,9 +61,9 @@ public class StandardWebSocket extends WebSocketAdapter {
 
     // Add to the WebSocketRoom
     if(this.path != null) {
-      id = Room.getInstance().joinChannel(this, path.toString());
+      id = WsPool.getInstance().joinChannel(this, path.toString());
     } else {
-      id = Room.getInstance().join(this);
+      id = WsPool.getInstance().join(this);
     }
 
     // Add Headers (for binding them to the XQueryParameters in the
@@ -87,8 +87,8 @@ public class StandardWebSocket extends WebSocketAdapter {
     ;
 
     // Create new WebsocketConnection
-    wsconnection = new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(),
-        sess);
+    wsconnection = new WsConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(),
+        sess, this.path.toString());
     findAndProcess(Annotation._WS_CONNECT, null, headerParams);
   }
 
@@ -117,9 +117,9 @@ public class StandardWebSocket extends WebSocketAdapter {
 
     // Remove the user from the Room
     if(path == null) {
-      Room.getInstance().remove(id);
+      WsPool.getInstance().remove(id);
     } else {
-      Room.getInstance().removeFromChannel(this, path.toString(), id);
+      WsPool.getInstance().removeFromChannel(this, path.toString(), id);
     }
   }
 
@@ -145,13 +145,12 @@ public class StandardWebSocket extends WebSocketAdapter {
   private void findAndProcess(final Annotation ann, final Object msg,
       final Map<String, String> header) {
     final RestXqModules rxm = RestXqModules.get(wsconnection.context);
-
     // select the closest match for this request
-    WsXqFunction func = null;
+    WsFunction func = null;
     try {
-      func = rxm.find(wsconnection, ann, this.path);
+      func = rxm.find(wsconnection, ann);
       if(func == null) wsconnection.error(HTTPCode.NO_XQUERY.toString(), 500);
-      if(func != null && serializer != null) func.process(wsconnection, msg, serializer, header);
+      if(func != null && response != null) func.process(wsconnection, msg, response, header);
     } catch(Exception e) {
       e.printStackTrace();
       wsconnection.error(e.getMessage(), 500);

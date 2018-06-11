@@ -1,5 +1,6 @@
 package org.basex.http.ws;
 
+import java.nio.*;
 import java.util.*;
 
 import org.eclipse.jetty.websocket.api.*;
@@ -12,17 +13,17 @@ import org.eclipse.jetty.websocket.api.*;
  * @author BaseX Team 2005-18, BSD License
  */
 
-public class Room {
+public class WsPool {
   /**
    * The Room-Singleton.
    * */
-  private static final Room INSTANCE = new Room();
+  private static final WsPool INSTANCE = new WsPool();
 
   /**
    * Returns the Room instance.
    * @return INSTANCE Room
    */
-  public static Room getInstance() {
+  public static WsPool getInstance() {
     return INSTANCE;
   }
 
@@ -94,12 +95,29 @@ public class Room {
 
   /**
    * Sends a Message to all connected Members.
-   * @param message String
+   * @param message Object
    */
-  public void broadcast(final String message) {
-    members.forEach((k, v) -> {
-      v.getSession().getRemote().sendStringByFuture(message);
-    });
+  public void broadcast(final Object message) {
+    if(message instanceof String) {
+      members.forEach((k, v) -> {
+        v.getSession().getRemote().sendStringByFuture((String) message);
+      });
+    } else {
+      byte[] bytes = (byte[]) message;
+      members.forEach((k, v) -> {
+        v.getSession().getRemote().sendBytesByFuture(ByteBuffer.wrap(bytes));
+      });
+    }
+
+  }
+
+  /**
+   * Sends a Message to all connected Members except the ids given.
+   * @param message Object
+   * @param idss List of Ids
+   * */
+  public void broadcast(final Object message, final List ids) {
+
   }
 
   /**
@@ -107,15 +125,34 @@ public class Room {
    * @param message String
    * @param channel String
    * */
-  public void broadcast(final String message, final String channel) {
+  public void broadcast(final Object message, final String channel) {
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
     }
-    for(WebSocketAdapter member: channelMembers) {
-      // Sends a String asynchronely, method maybe return before the message was sent
-      member.getSession().getRemote().sendStringByFuture(message);
+    if(message instanceof String) {
+      String msg = (String) message;
+      for(WebSocketAdapter member: channelMembers) {
+        // Sends a String asynchronely, method maybe return before the message was sent
+        member.getSession().getRemote().sendStringByFuture(msg);
+      }
+    } else {
+      byte[] bytes = (byte[]) message;
+      for(WebSocketAdapter member: channelMembers) {
+        // Sends a String asynchronely, method maybe return before the message was sent
+        member.getSession().getRemote().sendBytesByFuture(ByteBuffer.wrap(bytes));
+      }
     }
+  }
+
+  /**
+   * Sends a Message to all connected Members in a Channel except the ids given.
+   * @param message String
+   * @param channel String
+   * @param ids List of Ids
+   * */
+  public void broadcast(final Object message, final String channel, final List ids) {
+
   }
 }

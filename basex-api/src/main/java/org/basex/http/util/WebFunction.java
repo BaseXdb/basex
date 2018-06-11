@@ -30,7 +30,7 @@ public abstract class WebFunction {
   /** Serialization parameters. */
   public final SerializerOptions output;
   /** Header Parameters. */
-  public final ArrayList<WebXqParam> headerParams = new ArrayList<>();
+  public final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /**
    * Constructor.

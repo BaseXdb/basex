@@ -15,7 +15,7 @@ import org.eclipse.jetty.websocket.api.*;
  *
  * @author BaseX Team 2005-18, BSD License
  */
-public class StompWebSocket extends WebSocketAdapter
+public class StompWs extends WebSocketAdapter
 {
     /**
      * The Channelname.
@@ -29,7 +29,7 @@ public class StompWebSocket extends WebSocketAdapter
     /**
      * The Websocketconnection.
      */
-    private WebsocketConnection wsconnection;
+    private WsConnection wsconnection;
     /**
      * The Serializer for specific Subprotocols.
      * */
@@ -54,7 +54,7 @@ public class StompWebSocket extends WebSocketAdapter
      * Constructor.
      * @param subprotocol String subprotocol
      * */
-    public StompWebSocket(final String subprotocol) {
+    public StompWs(final String subprotocol) {
       this.subprotocol = subprotocol;
       setSerializer();
     }
@@ -77,11 +77,11 @@ public class StompWebSocket extends WebSocketAdapter
         super.onWebSocketConnect(sess);
 
         // Add to the WebSocketRoom
-        serverId = Room.getInstance().join(this);
+        serverId = WsPool.getInstance().join(this);
 
         // Create new WebsocketConnection
-        wsconnection =
-            new WebsocketConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(), sess);
+//        wsconnection =
+//            new WsConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(), sess);
 
         // If the STOMP-Protocol is used, no connect-execution in WebsocketConnect.
         // The XQuery connectfunction in the stompprotocol is executed within the
@@ -127,7 +127,7 @@ public class StompWebSocket extends WebSocketAdapter
             stompId = stompframe.getHeaders().get("id");
 
             idchannelMap.put(stompId, channel);
-            serverIds.put(stompId,Room.getInstance().joinChannel(this, channel));
+            serverIds.put(stompId,WsPool.getInstance().joinChannel(this, channel));
             break;
           case UNSUBSCRIBE:
             ann = Annotation._WS_STOMP_UNSUBSCRIBE;
@@ -137,7 +137,7 @@ public class StompWebSocket extends WebSocketAdapter
             idchannelMap.remove(stompId);
             String sId = serverIds.get(stompId);
             serverIds.remove(stompId);
-            Room.getInstance().removeFromChannel(this, channel,sId);
+            WsPool.getInstance().removeFromChannel(this, channel,sId);
             break;
             // Transaction stuff
           case BEGIN:
@@ -175,7 +175,7 @@ public class StompWebSocket extends WebSocketAdapter
     @Override
     public void onWebSocketClose(final int statusCode, final String reason)
     {
-      Room room = Room.getInstance();
+      WsPool room = WsPool.getInstance();
       // Remove any Subscriptions
       idchannelMap.forEach((stompId, channel) -> {
         String sId = serverIds.get(stompId);
@@ -189,7 +189,7 @@ public class StompWebSocket extends WebSocketAdapter
         super.onWebSocketClose(statusCode, reason);
 
         // Remove the user from the Room
-        Room.getInstance().remove(serverId);
+        WsPool.getInstance().remove(serverId);
     }
 
     @Override
@@ -207,9 +207,9 @@ public class StompWebSocket extends WebSocketAdapter
       final RestXqModules rxm = RestXqModules.get(wsconnection.context);
 
       // select the closest match for this request
-      WsXqFunction func = null;
+      WsFunction func = null;
          try {
-            func = rxm.find(wsconnection, ann, new WsPath(""));
+//            func = rxm.find(wsconnection, ann, new WsPath(""));
             if(func != null && serializer != null)
               func.process(wsconnection, msg, serializer, null);
          } catch(Exception e) {

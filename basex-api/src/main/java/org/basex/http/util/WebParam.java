@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class WebXqParam {
+public final class WebParam {
   /** Variable name. */
   public final QNm var;
   /** Name of parameter. */
@@ -23,7 +23,7 @@ public final class WebXqParam {
    * @param name name of parameter
    * @param value default value
    */
-  public WebXqParam(final QNm var, final String name, final Value value) {
+  public WebParam(final QNm var, final String name, final Value value) {
     this.var = var;
     this.name = name;
     this.value = value;

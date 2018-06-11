@@ -26,7 +26,7 @@ public final class RestXqModule {
   /** Supported methods. */
   private final ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** Supported Websocket Methods. */
-  private final ArrayList<WsXqFunction> wsFunctions = new ArrayList<>();
+  private final ArrayList<WsFunction> wsFunctions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
   /** Parsing timestamp. */
@@ -59,7 +59,7 @@ public final class RestXqModule {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
-          final WsXqFunction wxq = new WsXqFunction(sf, qc, this);
+          final WsFunction wxq = new WsFunction(sf, qc, this);
           if(rxf.parse(ctx)) {
             functions.add(rxf);
             }
@@ -100,7 +100,7 @@ public final class RestXqModule {
    * Returns all WebsocketFunctions.
    * @return functions
    */
-  ArrayList<WsXqFunction> wsFunctions() {
+  ArrayList<WsFunction> wsFunctions() {
     return wsFunctions;
   }
 
@@ -169,29 +169,28 @@ public final class RestXqModule {
    * @param conn HTTP connection
    * @param func function to be processed
    * @param message String the Message which arrives in onText
-   * @param serializer The WsSerializer
+   * @param response The WsSerializer
    * @param header The headers to set
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  public boolean process(final WebsocketConnection conn, final WsXqFunction func,
-      final Object message, final WsResponse serializer,
+  public boolean process(final WsConnection conn, final WsFunction func,
+      final Object message, final WsResponse response,
       final Map<String, String> header) throws Exception {
-
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
       final StaticFunc sf = find(qc, func.function);
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();
 
-      final WsXqFunction wxf = new WsXqFunction(sf, qc, this);
+      final WsFunction wxf = new WsFunction(sf, qc, this);
       wxf.parse();
 
       final Expr[] args = new Expr[sf.params.length];
-      wxf.bind(args, qc, message, serializer, header);
+      wxf.bind(args, qc, message, response, header);
 
       qc.mainModule(MainModule.get(sf, args));
-      return serializer.generateOutput(conn, wxf, qc);
+      return response.create(conn, wxf, qc);
     }
   }
 }

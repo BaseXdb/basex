@@ -12,7 +12,7 @@ import org.eclipse.jetty.websocket.api.*;
  * @author BaseX Team 2005-18, BSD License
  *
  */
-public class WebsocketConnection implements ClientInfo {
+public class WsConnection implements ClientInfo {
 
   /**
    * The UpdateRequest.
@@ -40,14 +40,16 @@ public class WebsocketConnection implements ClientInfo {
    * @param req the UpdateRequest
    * @param res the UpdateResponse
    * @param sess the Session
+   * @param path the Path
    */
-  public WebsocketConnection(final UpgradeRequest req,
+  public WsConnection(final UpgradeRequest req,
                              final UpgradeResponse res,
-                             final Session sess) {
+                             final Session sess,
+                             final String path) {
     this.req = req;
     this.res = res;
     context = new Context(HTTPContext.context(), this);
-    this.path = req.getRequestURI().toString().substring(19);
+    this.path = path;
     this.sess = sess;
   }
 

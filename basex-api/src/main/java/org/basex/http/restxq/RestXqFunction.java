@@ -57,9 +57,9 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
   /** Query parameters. */
-  final ArrayList<WebXqParam> queryParams = new ArrayList<>();
+  final ArrayList<WebParam> queryParams = new ArrayList<>();
   /** Form parameters. */
-  final ArrayList<WebXqParam> formParams = new ArrayList<>();
+  final ArrayList<WebParam> formParams = new ArrayList<>();
   /** Returned media types. */
   final ArrayList<MediaType> produces = new ArrayList<>();
 
@@ -70,10 +70,10 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   final TokenList allows = new TokenList();
 
   /** Query parameters. */
-  private final ArrayList<WebXqParam> errorParams = new ArrayList<>();
+  private final ArrayList<WebParam> errorParams = new ArrayList<>();
 
   /** Cookie parameters. */
-  private final ArrayList<WebXqParam> cookieParams = new ArrayList<>();
+  private final ArrayList<WebParam> cookieParams = new ArrayList<>();
   /** Consumed media types. */
   private final ArrayList<MediaType> consumes = new ArrayList<>();
 
@@ -297,15 +297,15 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
     }
 
     // bind query and form parameters
-    for(final WebXqParam rxp : queryParams) {
+    for(final WebParam rxp : queryParams) {
       bind(rxp, args, conn.params.map().get(rxp.name), qc);
     }
-    for(final WebXqParam rxp : formParams) {
+    for(final WebParam rxp : formParams) {
       bind(rxp, args, conn.params.form(mo).get(rxp.name), qc);
     }
 
     // bind header parameters
-    for(final WebXqParam rxp : headerParams) {
+    for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
       final Enumeration<?> en = conn.req.getHeaders(rxp.name);
       while(en.hasMoreElements()) {
@@ -317,7 +317,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
 
     // bind cookie parameters
     final Cookie[] ck = conn.req.getCookies();
-    for(final WebXqParam rxp : cookieParams) {
+    for(final WebParam rxp : cookieParams) {
       Value val = Empty.SEQ;
       if(ck != null) {
         for(final Cookie c : ck) {
@@ -336,7 +336,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
       for(int n = 0; n < nl; n++)
         errs.put(string(names[n].local()), values[n]);
     }
-    for(final WebXqParam rxp : errorParams)
+    for(final WebParam rxp : errorParams)
       bind(rxp, args, errs.get(rxp.name), qc);
 
     // bind permission information
@@ -421,7 +421,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void bind(final WebXqParam rxp, final Expr[] args, final Value value,
+  private void bind(final WebParam rxp, final Expr[] args, final Value value,
       final QueryContext qc) throws QueryException {
     bind(rxp.var, args, value == null || value.isEmpty() ? rxp.value : value, qc);
   }
@@ -472,7 +472,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @return parameter
    * @throws QueryException HTTP exception
    */
-  private WebXqParam param(final Ann ann, final boolean... declared) throws QueryException {
+  private WebParam param(final Ann ann, final boolean... declared) throws QueryException {
     // name of parameter
     final Item[] args = ann.args();
     final String name = toString(args[0]);
@@ -484,7 +484,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
     for(int a = 2; a < al; a++) {
       items.add(args[a]);
     }
-    return new WebXqParam(var, name, items.value());
+    return new WebParam(var, name, items.value());
   }
 
   /**

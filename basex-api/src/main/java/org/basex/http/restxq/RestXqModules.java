@@ -307,17 +307,16 @@ public final class RestXqModules {
    * Returns the function that matches the current request.
    * @param conn WebSocketConnection
    * @param ann Annotation
-   * @param pPath The Path.
    * @return function, or {@code null} if no function matches
    * @throws Exception exception (including unexpected ones)
    */
-  public WsXqFunction find(final WebsocketConnection conn, final Annotation ann, final WsPath pPath)
+  public WsFunction find(final WsConnection conn, final Annotation ann)
       throws Exception {
     // collect all function candidates
-    List<WsXqFunction> funcs = findListWsXqFunctions(conn, ann, pPath);
+    List<WsFunction> funcs = findListWsXqFunctions(conn, ann);
     if(funcs.isEmpty()) return null;
 
-    final WsXqFunction first = funcs.get(0);
+    final WsFunction first = funcs.get(0);
 
     if(funcs.size() == 1) return first;
 
@@ -328,18 +327,17 @@ public final class RestXqModules {
    * Returns the functions that match the current request.
    * @param conn WebSocketConnection
    * @param ann Annotation
-   * @param pPath the Path
    * @return list of matching functions, ordered by specifity
    * @throws Exception exception (including unexpected ones)
    */
-  private List<WsXqFunction> findListWsXqFunctions(final WebsocketConnection conn,
-      final Annotation ann, final WsPath pPath) throws Exception {
+  private List<WsFunction> findListWsXqFunctions(final WsConnection conn,
+      final Annotation ann) throws Exception {
 
     // collect all functions
-    final ArrayList<WsXqFunction> list = new ArrayList<>();
+    final ArrayList<WsFunction> list = new ArrayList<>();
     for(final RestXqModule mod : cache(conn.context).values()) {
-      for(final WsXqFunction func : mod.wsFunctions()) {
-        if(func.matches(ann, pPath)) list.add(func);
+      for(final WsFunction func : mod.wsFunctions()) {
+        if(func.matches(ann, new WsPath(conn.path()))) list.add(func);
       }
     }
     // sort by specifity

@@ -102,8 +102,8 @@ public class StompResponse implements WsResponse {
 
   @Override
   public void bind(final Expr[] args, final QueryContext qc, final Object message,
-                   final ArrayList<WebXqParam> wsParameters, final StaticFunc function,
-                   final WsXqFunction wsfunc, final Map<String, String> header)
+                   final ArrayList<WebParam> wsParameters, final StaticFunc function,
+                   final WsFunction wsfunc, final Map<String, String> header)
       throws QueryException, UnsupportedEncodingException {
 
     // If no Message is provided (e.g. in the handshake) no stompframe is provided
@@ -112,7 +112,7 @@ public class StompResponse implements WsResponse {
 //                                message.getMsgType() + "! Needed STOMP");
 //    }
 
-    for(final WebXqParam rxp: wsParameters) {
+    for(final WebParam rxp: wsParameters) {
       final Var[] params = function.params;
       final int pl = params.length;
 //      final MESSAGETYPE msgType = message.getMsgType();
@@ -136,44 +136,10 @@ public class StompResponse implements WsResponse {
     }
   }
 
-
-  // TODO output for STOMP!
   @Override
-  public boolean generateOutput(final WebsocketConnection conn, final WsXqFunction wxf,
-                                final QueryContext qc)
+  public boolean create(WsConnection conn, WsFunction wxf, QueryContext qc)
       throws IOException, QueryException {
-    ArrayOutput ao = new ArrayOutput();
-    Serializer ser = Serializer.get(ao, wxf.output);
-    Iter iter = qc.iter();
-
-    // Dont send anything if Websocket gets closed
-    if(wxf.matches(Annotation._WS_CLOSE)) {
-      return true;
-    }
-
-    StompFrame frame;
-    // TODO: ADD RESPONSE HEADERS!
-    for(Item it; (it = iter.next()) != null;) {
-      ser.reset();
-      ser.serialize(it);
-      if(it instanceof Bin) {
-        //final byte[] bytes = ((Bin) it).binary(null);
-        final byte[] bytes = ao.toArray();
-        conn.sess.getRemote().sendBytes(ByteBuffer.wrap(bytes));
-      } else {
-        if(wxf.matches(Annotation._WS_CONNECT)) {
-          frame = new ConnectedFrame(Commands.CONNECTED, null, ao.toString());
-        } else if(wxf.matches(Annotation._WS_MESSAGE)) {
-          frame = new MessageFrame(Commands.MESSAGE, null, ao.toString());
-        } else if(wxf.matches(Annotation._WS_ERROR)) {
-          frame = new ErrorFrame(Commands.MESSAGE, null, ao.toString());
-        } else {
-          frame = new MessageFrame(Commands.MESSAGE, null, ao.toString());
-        }
-        conn.sess.getRemote().sendString(frame.serializedFrame());
-      }
-      ao.reset();
-    }
-    return true;
+    // TODO Auto-generated method stub
+    return false;
   }
 }
