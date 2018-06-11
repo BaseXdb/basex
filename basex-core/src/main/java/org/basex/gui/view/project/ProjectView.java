@@ -161,22 +161,23 @@ public final class ProjectView extends BaseXPanel {
     while(en.hasMoreElements()) {
       final ProjectNode child = (ProjectNode) en.nextElement();
       final IOFile file = child.file;
-      if(file == null) continue;
-
-      final String path = file.path(), dirPath = path + '/';
-      boolean found = false;
-
-      // loop through all erroneous paths
-      for(final String errPath : errPaths) {
-        // check if error path equals node path, or if it is a descendant
-        if(errPath.equals(path) || errPath.startsWith(dirPath)) {
-          found = true;
-          break;
-        }
-      }
-      child.error = found;
+      if(file != null) child.error = find(errPaths, file);
     }
     repaint();
+  }
+
+  /**
+   * Checks if the specified file is an error path.
+   * @param errPaths error paths
+   * @param file file to be found
+   * @return result of check
+   */
+  private boolean find(final Set<String> errPaths, final IOFile file) {
+    final String path = file.path();
+    for(final String errPath : errPaths) {
+      if(errPath.startsWith(path)) return true;
+    }
+    return false;
   }
 
   /**
