@@ -187,7 +187,7 @@ public final class RestXqModule {
       wxf.parse();
 
       final Expr[] args = new Expr[sf.params.length];
-      wxf.bind(args, qc, message, response, header);
+      wxf.bind(args, qc, message, header);
 
       qc.mainModule(MainModule.get(sf, args));
       return response.create(conn, wxf, qc);

@@ -100,7 +100,6 @@ public class StompResponse implements WsResponse {
       decl.cast(msg, qc, function.sc, null);
   }
 
-  @Override
   public void bind(final Expr[] args, final QueryContext qc, final Object message,
                    final ArrayList<WebParam> wsParameters, final StaticFunc function,
                    final WsFunction wsfunc, final Map<String, String> header)

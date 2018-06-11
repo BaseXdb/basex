@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
@@ -194,15 +195,67 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @param args The Expr
    * @param qc The QueryContext
    * @param message The Messagestring
-   * @param response The Message response
    * @param header The header to set
    * @throws QueryException  query exception
    * @throws UnsupportedEncodingException encoding excepiton
    */
   public void bind(final Expr[] args, final QueryContext qc,
-      final Object message, final WsResponse response,
-      final Map<String, String> header) throws QueryException,
+      final Object message, final Map<String, String> header) throws QueryException,
         UnsupportedEncodingException {
-      response.bind(args, qc, message, headerParams, function, this, header);
+
+      for(final WebParam rxp: headerParams) {
+        final Var[] params = function.params;
+        final int pl = params.length;
+
+        for(int p = 0; p < pl; p++) {
+          final Var var = params[p];
+          final Value val;
+          if(var.name.eq(rxp.var)) {
+            final SeqType decl = var.declaredType();
+            if(var.name.toString().equals("message")) {
+              final Value msg;
+                if(message instanceof String) {
+                  msg = Str.get((String) message);
+                } else if(message instanceof byte[]) {
+                  msg = B64.get((byte[]) message);
+                } else {
+                  break;
+                }
+                val = msg.seqType().instanceOf(decl) ? msg :
+                  decl.cast(msg, qc, function.sc, null);
+            } else {
+              val = checkParam(header, var, qc, decl);
+            }
+            args[p] = var.checkType(val, qc, false);
+          }
+        }
+      }
+
+  }
+
+  /**
+   * Checks the ParamName and sets it.
+   * @param header Map of header params
+   * @param var the var
+   * @param qc the QueryContext
+   * @param decl the Seqtype
+   * @return Value
+   * @throws QueryException query exception
+   * @throws UnsupportedEncodingException encoding exception
+   */
+  private Value checkParam(final Map<String, String> header, final Var var,
+                           final QueryContext qc, final SeqType decl)
+                               throws QueryException, UnsupportedEncodingException {
+    Value msg = null;
+    String headerParam = header.get(var.name.toString());
+    if(headerParam != null) {
+      msg =  new Atm(URLDecoder.decode(
+          headerParam, Strings.UTF8));
+    }
+    if(msg == null) {
+      return null;
+    }
+    return msg.seqType().instanceOf(decl) ? msg :
+      decl.cast(msg, qc, function.sc, null);
   }
 }
