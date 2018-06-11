@@ -21,10 +21,12 @@ import org.basex.util.*;
 public final class CsvParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] input = toToken(exprs[0], qc);
+    final Item item = exprs[0].atomItem(qc, info);
     final CsvParserOptions opts = toOptions(1, new CsvParserOptions(), qc);
+    if(item == null) return null;
+
     try {
-      return CsvConverter.get(opts).convert(new IOContent(input));
+      return CsvConverter.get(opts).convert(new IOContent(toToken(item)));
     } catch(final IOException ex) {
       throw CSV_PARSE_X.get(info, ex);
     }

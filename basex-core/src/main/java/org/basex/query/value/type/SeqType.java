@@ -114,6 +114,8 @@ public final class SeqType {
   public static final SeqType BIN_O = AtomType.BIN.seqType();
   /** One xs:hexBinary. */
   public static final SeqType HEX_O = AtomType.HEX.seqType();
+  /** Zero or one xs:hexBinary. */
+  public static final SeqType HEX_ZO = AtomType.HEX.seqType(Occ.ZERO_ONE);
   /** Single xs:base64Binary. */
   public static final SeqType B64_O = AtomType.B64.seqType();
   /** Zero or one xs:base64Binary. */

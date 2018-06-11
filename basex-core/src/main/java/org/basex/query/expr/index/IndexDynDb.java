@@ -3,7 +3,6 @@ package org.basex.query.expr.index;
 import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -85,13 +84,11 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public Data data(final QueryContext qc, final IndexType type) throws QueryException {
+  Data data(final QueryContext qc) throws QueryException {
     final Value value = expr.value(qc);
     final Data data = value.data();
     if(data == null || !value.seqType().type.instanceOf(NodeType.DOC))
       throw DB_NODE_X.get(info, value);
-
-    type.check(data, info);
     return data;
   }
 

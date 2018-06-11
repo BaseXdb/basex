@@ -40,8 +40,6 @@ final class TextRenderer extends BaseXBack {
   private int fontHeight;
   /** Font metrics. */
   private FontMetrics fontMetrics;
-  /** Character widths. */
-  private int[] charWidths;
   /** Width of current string. */
   private int stringWidth;
   /** Show invisible characters. */
@@ -268,7 +266,6 @@ final class TextRenderer extends BaseXBack {
     font = f;
     fontHeight = f.getSize() * 5 / 4;
     fontMetrics = getFontMetrics(f);
-    charWidths = fontMetrics.getWidths();
   }
 
   @Override
@@ -283,7 +280,7 @@ final class TextRenderer extends BaseXBack {
       if(iter.curr() == '\n') maxX = Math.max(x, maxX);
       next(iter);
     }
-    return new Dimension(Math.max(x, maxX) + charWidths[' '], y + fontHeight);
+    return new Dimension(Math.max(x, maxX) + charWidth(' '), y + fontHeight);
   }
 
   /**
@@ -487,12 +484,24 @@ final class TextRenderer extends BaseXBack {
           g.setColor(GUIConstants.gray);
           g.fillRect(x + (stringWidth >> 1), y - fontHeight * 3 / 10, s, s);
         } else {
-          // draw non-whitespace string (character by character, required by Java 9)
+          // draw non-whitespace string
           g.setColor(color);
-          for(int xx = x; iter.more(); xx += charWidth(cp)) {
-            cp = iter.next();
-            g.drawString(stringCache.reset().add(cp).toString(), xx, y);
+
+          // draw character by character (required by Java 9), but combine zero-width characters
+          cp = iter.next();
+          int xx = x;
+          for(int cw = 0, xxx = xx + charWidth(cp); iter.more();) {
+            stringCache.reset();
+            do {
+              stringCache.add(cp);
+              cp = iter.next();
+              cw = charWidth(cp);
+            } while(cw <= 0 && iter.more());
+            g.drawString(stringCache.toString(), xx, y);
+            xx = xxx;
+            xxx += cw;
           }
+          g.drawString(stringCache.reset().add(cp).toString(), xx, y);
           iter.pos(pos);
         }
       }
@@ -565,7 +574,7 @@ final class TextRenderer extends BaseXBack {
    * @return width
    */
   private int charWidth(final int cp) {
-    return cp == '\t' ? charWidths[' '] * indent : cp < 256 ? charWidths[cp] :
+    return cp == '\t' ? fontMetrics.charWidth(' ') * indent :
       cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END ||
       cp >= 0xD800 && cp <= 0xDC00 ? 0 : fontMetrics.charWidth(cp);
   }

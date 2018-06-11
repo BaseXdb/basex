@@ -9,7 +9,8 @@ import java.io.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.parse.Commands.*;
+import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -50,6 +51,7 @@ public final class PermissionTest extends SandboxTest {
   @AfterClass
   public static void stop() {
     stopServer(server);
+    new IOFile(Prop.TEMPDIR, NAME + "-export").delete();
   }
 
   /** Set up method. */

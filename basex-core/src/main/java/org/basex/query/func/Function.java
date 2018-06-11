@@ -311,7 +311,7 @@ public enum Function {
   /** XQuery function. */
   PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, MAP_O), ITEM_ZO),
   /** XQuery function. */
-  PARSE_XML(FnParseXml.class, "parse-xml(string)", arg(STR_ZO), DOC_O, flag(CNS)),
+  PARSE_XML(FnParseXml.class, "parse-xml(string)", arg(STR_ZO), DOC_ZO, flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment.class, "parse-xml-fragment(string)", arg(STR_ZO), DOC_ZO,
       flag(CNS)),
@@ -541,7 +541,7 @@ public enum Function {
   /** XQuery function. */
   _MATH_COSH(MathCosh.class, "cosh(number)", arg(DBL_ZO), DBL_ZO, MATH_URI),
   /** XQuery function. */
-  _MATH_CRC32(MathCrc32.class, "crc32(string)", arg(STR_O), HEX_O, MATH_URI),
+  _MATH_CRC32(MathCrc32.class, "crc32(string)", arg(STR_ZO), HEX_ZO, MATH_URI),
   /** XQuery function. */
   _MATH_E(MathE.class, "e()", arg(), DBL_O, MATH_URI),
   /** XQuery function. */
@@ -744,7 +744,7 @@ public enum Function {
   // CSV Module
 
   /** XQuery function. */
-  _CSV_PARSE(CsvParse.class, "parse(string[,options])", arg(STR_O, MAP_ZO), ITEM_O, CSV_URI),
+  _CSV_PARSE(CsvParse.class, "parse(string[,options])", arg(STR_ZO, MAP_ZO), ITEM_ZO, CSV_URI),
   /** XQuery function. */
   _CSV_SERIALIZE(CsvSerialize.class, "serialize(item[,options])", arg(ITEM_ZO, ITEM_ZO), STR_O,
       CSV_URI),
@@ -757,8 +757,8 @@ public enum Function {
   /** XQuery function. */
   _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR_O, STR_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_ATTRIBUTE(DbAttribute.class, "attribute(database,string[,name])",
-      arg(STR_O, ITEM_O, STR_O), ATT_ZM, flag(NDT), DB_URI),
+  _DB_ATTRIBUTE(DbAttribute.class, "attribute(database,strings[,name])",
+      arg(STR_O, ITEM_ZM, STR_O), ATT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ATTRIBUTE_RANGE(DbAttributeRange.class, "attribute-range(database,from,to[,name])",
       arg(STR_O, ITEM_O, ITEM_O, STR_O), ATT_ZM, flag(NDT), DB_URI),
@@ -842,13 +842,13 @@ public enum Function {
   /** XQuery function. */
   _DB_SYSTEM(DbSystem.class, "system()", arg(), STR_O, DB_URI),
   /** XQuery function. */
-  _DB_TEXT(DbText.class, "text(database,string)", arg(STR_O, ITEM_O), TXT_ZM, flag(NDT), DB_URI),
+  _DB_TEXT(DbText.class, "text(database,strings)", arg(STR_O, ITEM_ZM), TXT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_TEXT_RANGE(DbTextRange.class, "text-range(database,from,to)",
       arg(STR_O, ITEM_O, ITEM_O), TXT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_TOKEN(DbToken.class, "token(database,string[,name])",
-      arg(STR_O, ITEM_O, STR_O), ATT_ZM, flag(NDT), DB_URI),
+  _DB_TOKEN(DbToken.class, "token(database,strings[,name])",
+      arg(STR_O, ITEM_ZM, STR_O), ATT_ZM, flag(NDT), DB_URI),
 
   // Fetch Module
 
@@ -975,14 +975,14 @@ public enum Function {
   _FT_MARK(FtMark.class, "mark(nodes[,name])", arg(NOD_ZM, STR_O), NOD_ZM, FT_URI),
   /** XQuery function. */
   _FT_NORMALIZE(FtNormalize.class, "normalize(string[,options])",
-      arg(STR_O, MAP_ZO), STR_O, FT_URI),
+      arg(STR_ZO, MAP_ZO), STR_O, FT_URI),
   /** XQuery function. */
   _FT_SCORE(FtScore.class, "score(items)", arg(ITEM_ZM), DBL_ZM, FT_URI),
   /** XQuery function. */
   _FT_SEARCH(FtSearch.class, "search(database,terms[,options])",
       arg(STR_O, ITEM_ZM, MAP_ZO), TXT_ZM, flag(NDT), FT_URI),
   /** XQuery function. */
-  _FT_TOKENIZE(FtTokenize.class, "tokenize(string[,options])", arg(STR_O, MAP_ZO), STR_ZM, FT_URI),
+  _FT_TOKENIZE(FtTokenize.class, "tokenize(string[,options])", arg(STR_ZO, MAP_ZO), STR_ZM, FT_URI),
   /** XQuery function. */
   _FT_TOKENS(FtTokens.class, "tokens(database[,prefix])",
       arg(STR_O, STR_O), ELM_ZM, flag(NDT), FT_URI),
@@ -1033,7 +1033,7 @@ public enum Function {
   // HTML Module
 
   /** XQuery function. */
-  _HTML_PARSE(HtmlParse.class, "parse(input[,options)", arg(STR_O, MAP_ZO), DOC_O, HTML_URI),
+  _HTML_PARSE(HtmlParse.class, "parse(string[,options])", arg(STR_ZO, MAP_ZO), DOC_ZO, HTML_URI),
   /** XQuery function. */
   _HTML_PARSER(HtmlParser.class, "parser()", arg(), STR_O, HTML_URI),
 
@@ -1113,7 +1113,7 @@ public enum Function {
   // JSON Module
 
   /** XQuery function. */
-  _JSON_PARSE(JsonParse.class, "parse(string[,options])", arg(STR_O, MAP_ZO), ITEM_O, JSON_URI),
+  _JSON_PARSE(JsonParse.class, "parse(string[,options])", arg(STR_ZO, MAP_ZO), ITEM_ZO, JSON_URI),
   /** XQuery function. */
   _JSON_SERIALIZE(JsonSerialize.class, "serialize(items[,options])",
       arg(ITEM_ZO, MAP_ZO), STR_O, JSON_URI),

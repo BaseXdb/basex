@@ -15,16 +15,21 @@ public final class HtmlModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void parser() {
+    final Function func = _HTML_PARSER;
     // check if function returns a string
-    query(_HTML_PARSER.args() + " instance of xs:string", true);
+    query(func.args() + " instance of xs:string", true);
   }
 
   /** Test method. */
   @Test
   public void parse() {
+    final Function func = _HTML_PARSE;
+    query(func.args(" ()"), "");
+    query(func.args(" []"), "");
+
     // check if the function returns a HTML root node
-    query("exists(" + _HTML_PARSE.args("&lt;html/&gt;") + "/*:html)", true);
+    query("exists(" + func.args("&lt;html/&gt;") + "/*:html)", true);
     // check if the function returns <html/>
-    query(_HTML_PARSE.args("&lt;html/&gt;", " map {'nons': true()}"), "<html/>");
+    query(func.args("&lt;html/&gt;", " map {'nons': true()}"), "<html/>");
   }
 }

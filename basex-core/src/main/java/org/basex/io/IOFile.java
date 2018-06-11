@@ -190,7 +190,7 @@ public final class IOFile extends IO {
    * @return children
    */
   public IOFile[] children() {
-    return children(".*");
+    return children((FileFilter) null);
   }
 
   /**
@@ -202,10 +202,12 @@ public final class IOFile extends IO {
     final File[] children = file.listFiles();
     if(children == null) return new IOFile[0];
 
-    final ArrayList<IOFile> io = new ArrayList<>(children.length);
+    final ArrayList<IOFile> io = new ArrayList<>();
     final Pattern pattern = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
     for(final File child : children) {
-      if(pattern.matcher(child.getName()).matches()) io.add(new IOFile(child));
+      if(pattern.matcher(child.getName()).matches()) {
+        io.add(child.isDirectory() ? new IOFile(child.getPath() + '/') : new IOFile(child));
+      }
     }
     return io.toArray(new IOFile[io.size()]);
   }
@@ -221,7 +223,7 @@ public final class IOFile extends IO {
 
     final ArrayList<IOFile> io = new ArrayList<>(children.length);
     for(final File child : children) {
-      io.add(new IOFile(child));
+      io.add(child.isDirectory() ? new IOFile(child + "/") : new IOFile(child));
     }
     return io.toArray(new IOFile[io.size()]);
   }
@@ -241,9 +243,10 @@ public final class IOFile extends IO {
    */
   public StringList descendants(final FileFilter filter) {
     final StringList files = new StringList();
-    final File[] children = filter == null ? file.listFiles() : file.listFiles(filter);
-    if(children == null) return files;
-    if(exists()) addDescendants(this, files, filter, path().length() + 1);
+    if(isDir()) {
+      final int offset = path().length() + (path().endsWith("/") ? 0 : 1);
+      addDescendants(this, files, filter, offset);
+    }
     return files;
   }
 
@@ -362,7 +365,8 @@ public final class IOFile extends IO {
    */
   public IOFile normalize() {
     try {
-      return new IOFile(toPath().toRealPath().toFile());
+      final Path path = toPath().toRealPath();
+      return new IOFile(path + (Files.isDirectory(path) ? "/" : ""));
     } catch(final IOException ex) {
       Util.debug(ex);
       return this;
@@ -395,8 +399,9 @@ public final class IOFile extends IO {
   private static void addDescendants(final IOFile io, final StringList files,
       final FileFilter filter, final int offset) {
     if(io.isDir()) {
-      for(final IOFile f : io.children(filter))
-        addDescendants(f, files, filter, offset);
+      for(final IOFile child : io.children(filter)) {
+        addDescendants(child, files, filter, offset);
+      }
     } else {
       if(filter == null || filter.accept(io.file)) {
         files.add(io.path().substring(offset));

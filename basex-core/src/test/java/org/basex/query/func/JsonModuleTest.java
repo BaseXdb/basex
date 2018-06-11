@@ -16,6 +16,8 @@ public final class JsonModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void parseXml() {
     // default output
+    parse(" ()", "", "");
+    parse(" []", "", "");
     parse("[]", "", "<json type=\"array\"/>");
     parse("{}", "", "<json type=\"object\"/>");
     parse("{ } ", "", "<json type=\"object\"/>");

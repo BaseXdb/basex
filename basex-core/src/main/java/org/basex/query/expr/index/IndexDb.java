@@ -30,17 +30,29 @@ public abstract class IndexDb extends ParseExpr {
   }
 
   /**
-   * Returns a data reference.
+   * Checks if the specified index is available and returns the data reference.
    * @param qc query context
    * @param type index type
    * @return data reference
    * @throws QueryException query exception
    */
-  public abstract Data data(QueryContext qc, IndexType type) throws QueryException;
+  public final Data data(final QueryContext qc, final IndexType type) throws QueryException {
+    final Data data = data(qc);
+    type.check(data, info);
+    return data;
+  }
 
   /**
-   * Source expression.
-   * @return source expression
+   * Returns a data reference.
+   * @param qc query context
+   * @return data reference
+   * @throws QueryException query exception
+   */
+  abstract Data data(QueryContext qc) throws QueryException;
+
+  /**
+   * Returns the expression containing the data source.
+   * @return source
    */
   public abstract Expr source();
 

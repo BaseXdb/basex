@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
+import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -23,7 +25,9 @@ import org.junit.Test;
  */
 public final class PackageAPITest extends AdvancedQueryTest {
   /** Test repository. */
-  private static final String REPO = "src/test/resources/repo/";
+  private static final String SOURCE = "src/test/resources/repo/";
+  /** Test repository. */
+  private static final String REPO = sandbox() + "repo/";
 
   /** Pkg1 URI. */
   private static final String PKG1 = "http://www.pkg1.com";
@@ -44,15 +48,41 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /** Pkg4 identifier. */
   private static final String PKG4ID = PKG4 + "-2.0";
 
-  /** Prepare test. */
+  /**
+   * Prepares a test.
+   * @throws IOException I/O exception
+   */
   @Before
-  public void setUpBeforeClass() {
-    for(final IOFile f : new IOFile(REPO).children()) {
-      if(f.isDir() && f.name().contains(".")) f.delete();
-    }
-    context = new Context();
-    context.soptions.set(StaticOptions.REPOPATH, REPO);
+  public void init() throws IOException {
+    new IOFile(REPO).delete();
+    copy(Paths.get(SOURCE), Paths.get(REPO));
   }
+
+  /**
+   * Finalizes a test.
+   */
+  @After
+  public void finish() {
+    new IOFile(REPO).delete();
+  }
+
+  /**
+   * Recursively copies files.
+   * @param source source
+   * @param target target
+   * @throws IOException I/O exception
+   */
+  private static void copy(final Path source, final Path target) throws IOException {
+    if(Files.isDirectory(source)) {
+      Files.createDirectory(target);
+      try(DirectoryStream<Path> paths = Files.newDirectoryStream(source)) {
+        for(final Path path : paths) copy(path, target.resolve(path.getFileName()));
+      }
+    } else {
+      Files.copy(source, target);
+    }
+  }
+
 
   /** Tests repository initialization. */
   @Test
@@ -282,6 +312,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void installJar() {
     // ensure that all files are installed
     execute(new RepoInstall(REPO + "Hello.jar", null));
+
     final IOFile jar = new IOFile(REPO, "org/basex/modules/Hello.jar");
     final IOFile xqm = new IOFile(REPO, "org/basex/modules/Hello.xqm");
     assertTrue("File not found: " + jar, jar.exists());

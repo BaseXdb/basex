@@ -16,10 +16,12 @@ import org.basex.util.*;
 public final class JsonParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] input = toToken(exprs[0], qc);
+    final Item item = exprs[0].atomItem(qc, info);
     final JsonParserOptions opts = toOptions(1, new JsonParserOptions(), qc);
+    if(item == null) return null;
+
     try {
-      return JsonConverter.get(opts).convert(input, null);
+      return JsonConverter.get(opts).convert(toToken(item), null);
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     }

@@ -14,8 +14,10 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -27,14 +29,27 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class ValueAccess extends IndexAccess {
-  /** Search expression. */
-  private Expr expr;
   /** Index type. */
   private final IndexType type;
   /** Parent name test (can be {@code null}). */
   private final NameTest test;
-  /** Trim search terms. */
-  private boolean trim;
+  /** Token set ({@code null} if expression was specified). */
+  private final TokenSet tokens;
+  /** Search expression (empty sequence if token set was specified). */
+  private Expr expr;
+
+  /**
+   * Constructor.
+   * @param info input info
+   * @param tokens tokens
+   * @param type index type
+   * @param test name test (can be {@code null})
+   * @param db index database
+   */
+  public ValueAccess(final InputInfo info, final TokenSet tokens, final IndexType type,
+      final NameTest test, final IndexDb db) {
+    this(info, type, test, db, Empty.SEQ, tokens);
+  }
 
   /**
    * Constructor.
@@ -46,48 +61,65 @@ public final class ValueAccess extends IndexAccess {
    */
   public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
       final NameTest test, final IndexDb db) {
-    super(db, info, type);
-    this.expr = expr;
-    this.type = type;
-    this.test = test;
+    this(info, type, test, db, expr, null);
   }
 
   /**
-   * Sets the trim flag.
-   * @param tr trim flag
-   * @return self reference
+   * Constructor.
+   * @param info input info
+   * @param type index type
+   * @param test test test (can be {@code null})
+   * @param db index database
+   * @param expr search expression
+   * @param tokens tokens (can be {@code null})
    */
-  public ValueAccess trim(final boolean tr) {
-    trim = tr;
-    return this;
+  private ValueAccess(final InputInfo info, final IndexType type, final NameTest test,
+      final IndexDb db, final Expr expr, final TokenSet tokens) {
+    super(db, info, type);
+    this.type = type;
+    this.test = test;
+    this.tokens = tokens;
+    this.expr = expr;
   }
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
-    final Data data = db.data(qc, type);
-    if(expr.seqType().zeroOrOne()) return iter(expr.item(qc, info), data);
+    // cache distinct search terms
+    final TokenSet cache;
+    if(tokens == null) {
+      cache = new TokenSet();
+      final Iter ir = expr.iter(qc);
+      for(Item it; (it = qc.next(ir)) != null;) cache.add(toToken(it));
+    } else {
+      cache = tokens;
+    }
 
-    final ArrayList<BasicNodeIter> iters = new ArrayList<>();
-    final Iter iter = expr.iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) iters.add(iter(item, data));
-    final int is = iters.size();
-    return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iters.get(0) :
-      new Union(info, expr).eval(iters.toArray(new NodeIter[is]), qc).iter();
+    // no search terms: return empty iterator
+    final int c = cache.size();
+    if(c == 0) return BasicNodeIter.EMPTY;
+
+    // single search term: return single iterator
+    final Data data = db.data(qc, type);
+    if(c == 1) return iter(cache.key(1), data);
+
+    // multiple search terms: collect results, return result iterator
+    final ANodeBuilder nodes = new ANodeBuilder();
+    for(final byte[] token : cache) {
+      for(final ANode node : iter(token, data)) {
+        qc.checkStop();
+        nodes.add(node);
+      }
+    }
+    return nodes.iter();
   }
 
   /**
    * Returns an index iterator.
-   * @param item text item
+   * @param term search term
    * @param data data reference
    * @return iterator
-   * @throws QueryException query exception
    */
-  private BasicNodeIter iter(final Item item, final Data data) throws QueryException {
-    if(item == null) return BasicNodeIter.EMPTY;
-
-    // retrieve and trim text
-    final byte[] token = item.string(info), term = trim ? Token.trim(token) : token;
-
+  private BasicNodeIter iter(final byte[] term, final Data data) {
     // special case: empty text node
     // - no element name: return 0 results (empty text nodes are non-existent)
     // - otherwise, return scan-based element iterator
@@ -97,10 +129,10 @@ public final class ValueAccess extends IndexAccess {
 
     // check if index is available and if it may contain the requested term
     // otherwise, use sequential scan
-    boolean index = data.meta.index(type);
-    if(type == IndexType.TEXT || type == IndexType.ATTRIBUTE) {
-      index &= tl > 0 && tl <= data.meta.maxlen;
-    }
+    final boolean index = data.meta.index(type) && (
+        !(type == IndexType.TEXT || type == IndexType.ATTRIBUTE) ||
+        tl > 0 && tl <= data.meta.maxlen
+    );
 
     final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term, data);
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
@@ -118,6 +150,11 @@ public final class ValueAccess extends IndexAccess {
           return tmp.finish();
         }
         return null;
+      }
+      @Override
+      public long size() {
+        // index access: number of results is known in advance
+        return index ? ii.size() : -1;
       }
     };
   }
@@ -206,7 +243,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new ValueAccess(info, expr.copy(cc, vm), type, test, db.copy(cc, vm)));
+    return copyType(new ValueAccess(info, type, test, db.copy(cc, vm), expr.copy(cc, vm), tokens));
   }
 
   @Override
@@ -223,8 +260,7 @@ public final class ValueAccess extends IndexAccess {
   public boolean equals(final Object obj) {
     if(!(obj instanceof ValueAccess)) return false;
     final ValueAccess v = (ValueAccess) obj;
-    return expr.equals(obj) && type == v.type && Objects.equals(test, v.test) && trim == v.trim &&
-        super.equals(obj);
+    return expr.equals(obj) && type == v.type && Objects.equals(test, v.test) && super.equals(obj);
   }
 
   @Override

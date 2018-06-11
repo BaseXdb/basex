@@ -133,7 +133,7 @@ public abstract class Sandbox {
    */
   public static void initSandbox() {
     final IOFile sb = sandbox();
-    sb.delete();
+    //sb.delete();
     if(!sb.md()) throw Util.notExpected("Sandbox could not be created.");
 
     final String path = sb.path();

@@ -14,14 +14,11 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Id functions.
@@ -46,11 +43,8 @@ abstract class Ids extends StandardFunc {
 
     if(index(root, idref)) {
       // create index iterator
-      final TokenList idList = new TokenList(idSet.size());
-      for(final byte[] id : idSet) idList.add(id);
-      final Value ids = StrSeq.get(idList);
       final Data data = root.data();
-      final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN :
+      final ValueAccess va = new ValueAccess(info, idSet, idref ? IndexType.TOKEN :
         IndexType.ATTRIBUTE, null, new IndexStaticDb(info, data));
 
       // collect and return index results, filtered by id/idref attributes
@@ -99,9 +93,9 @@ abstract class Ids extends StandardFunc {
     for(final ANode attr : node.attributes()) {
       if(XMLToken.isId(attr.name(), idref)) {
         // id/idref found
-        for(final byte[] val : distinctTokens(attr.string())) {
+        for(final byte[] token : distinctTokens(attr.string())) {
           // correct value: add to results
-          if(idSet.contains(val)) {
+          if(idSet.contains(token)) {
             results.add(idref ? attr.finish() : node.finish());
             break;
           }
