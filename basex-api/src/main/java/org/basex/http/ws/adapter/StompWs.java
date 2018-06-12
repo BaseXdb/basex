@@ -1,7 +1,6 @@
 package org.basex.http.ws.adapter;
 
 import java.util.*;
-import javax.validation.constraints.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
@@ -71,7 +70,7 @@ public class StompWs extends WebSocketAdapter
     }
 
     @Override
-    public void onWebSocketConnect(@NotNull final Session sess)
+    public void onWebSocketConnect(final Session sess)
     {
         // Sets Session and Remote in Superclass
         super.onWebSocketConnect(sess);
