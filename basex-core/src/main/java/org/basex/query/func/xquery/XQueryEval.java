@@ -97,9 +97,14 @@ public class XQueryEval extends StandardFunc {
         to = new Timer(true);
         to.schedule(new TimerTask() {
           @Override
-          // limit reached: stop query
-          public void run() { if(Performance.memory() > limit) qctx.memory(); }
-        }, 500, 500);
+          // limit reached: stop query if garbage collection does not help
+          public void run() {
+            if(!qctx.stopped() && Performance.memory() > limit) {
+              Performance.gc(1);
+              if(Performance.memory() > limit) qctx.memory();
+            }
+          }
+        }, 250, 250);
       }
 
       // timeout
@@ -143,6 +148,7 @@ public class XQueryEval extends StandardFunc {
         }
         return items;
       } catch(final JobException ex) {
+        System.out.println("[EXCEPTION] " + ex);
         if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
         if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);
         throw ex;
