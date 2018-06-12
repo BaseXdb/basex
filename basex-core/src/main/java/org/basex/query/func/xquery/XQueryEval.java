@@ -148,7 +148,6 @@ public class XQueryEval extends StandardFunc {
         }
         return items;
       } catch(final JobException ex) {
-        System.out.println("[EXCEPTION] " + ex);
         if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
         if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);
         throw ex;
