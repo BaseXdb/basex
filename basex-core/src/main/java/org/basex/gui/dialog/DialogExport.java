@@ -88,11 +88,11 @@ public final class DialogExport extends BaseXDialog {
   @Override
   public void action(final Object comp) {
     final String pth = path();
-    final IOFile io = new IOFile(pth);
+    final IOFile file = new IOFile(pth);
     ok = !pth.isEmpty();
-    if(ok) gui.gopts.set(GUIOptions.INPUTPATH, pth);
+    if(ok) gui.gopts.setFile(GUIOptions.INPUTPATH, file);
 
-    final String text = io.isDir() && io.children().length > 0 ? DIR_NOT_EMPTY : null;
+    final String text = file.isDir() && file.children().length > 0 ? DIR_NOT_EMPTY : null;
     info.setText(text, ok ? Msg.WARN : Msg.ERROR);
     enableOK(buttons, B_OK, ok);
   }

@@ -34,23 +34,6 @@ public final class IOFile extends IO {
   /**
    * Constructor.
    * @param file file reference
-   * @param last last path segment
-   */
-  public IOFile(final File file, final String last) {
-    super(create(file.getAbsolutePath(), last));
-    boolean abs = file.isAbsolute();
-    this.file = abs ? file : new File(pth);
-    // Windows: checks if the original file path starts with a slash
-    if(!abs && Prop.WIN) {
-      final String p = file.getPath();
-      abs = p.startsWith("/") || p.startsWith("\\");
-    }
-    absolute = abs;
-  }
-
-  /**
-   * Constructor.
-   * @param file file reference
    */
   public IOFile(final File file) {
     this(file, "");
@@ -80,6 +63,23 @@ public final class IOFile extends IO {
    */
   public IOFile(final IOFile dir, final String child) {
     this(new File(dir.file, child), child);
+  }
+
+  /**
+   * Constructor.
+   * @param file file reference
+   * @param last last path segment; if it ends with a slash, it indicates a directory
+   */
+  private IOFile(final File file, final String last) {
+    super(create(file.getAbsolutePath(), last.endsWith("/") || last.endsWith("\\")));
+    boolean abs = file.isAbsolute();
+    this.file = abs ? file : new File(pth);
+    // Windows: checks if the original file path starts with a slash
+    if(!abs && Prop.WIN) {
+      final String p = file.getPath();
+      abs = p.startsWith("/") || p.startsWith("\\");
+    }
+    absolute = abs;
   }
 
   /**
@@ -488,10 +488,10 @@ public final class IOFile extends IO {
   /**
    * Creates a path.
    * @param path input path
-   * @param last last segment
+   * @param directory directory flag
    * @return path
    */
-  private static String create(final String path, final String last) {
+  private static String create(final String path, final boolean directory) {
     final StringList sl = new StringList();
     final int l = path.length();
     final TokenBuilder tb = new TokenBuilder(l);
@@ -509,7 +509,7 @@ public final class IOFile extends IO {
     }
 
     // add slash if original file ends with a slash, or if path is a Windows root directory
-    boolean dir = last.endsWith("/") || last.endsWith("\\");
+    boolean dir = directory;
     if(!dir && Prop.WIN && tb.size() == 2) {
       final int c = Character.toLowerCase(tb.get(0));
       dir = c >= 'a' && c <= 'z' && tb.get(1) == ':';

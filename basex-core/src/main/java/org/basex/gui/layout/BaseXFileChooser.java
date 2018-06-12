@@ -137,11 +137,14 @@ public final class BaseXFileChooser {
     final File[] fls = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
       new File[] { fc.getSelectedFile() };
     final int fl = fls.length;
+
     final IOFile[] files = new IOFile[fl];
     for(int f = 0; f < fl; f++) {
       // chop too long paths (usually result of copy'n'paste)
-      final String path = fls[f].getPath();
-      files[f] = new IOFile(path.substring(0, Math.min(path.length(), 512)));
+      String path = fls[f].getPath();
+      path.substring(0, Math.min(path.length(), 512));
+      if(fls[f].isDirectory()) path += '/';
+      files[f] = new IOFile(path);
     }
 
     if(mode == Mode.FSAVE) {

@@ -57,10 +57,11 @@ public final class ProjectView extends BaseXPanel {
     super(ev.gui);
     setLayout(new BorderLayout());
 
-    tree = new ProjectTree(this);
-    IOFile dir = dir();
-    if(dir == null) dir = new IOFile(Prop.HOMEDIR).normalize();
+    final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
+    final IOFile dir = new IOFile(project.isEmpty() ? Prop.HOMEDIR : project).normalize();
     root = new ProjectDir(dir, this);
+
+    tree = new ProjectTree(this);
     tree.init(root);
 
     filter = new ProjectFilter(this);
@@ -73,13 +74,15 @@ public final class ProjectView extends BaseXPanel {
 
     rootPath = new BaseXCombo(gui, true).history(GUIOptions.PROJECTS, gui.gopts);
     rootPath.setFocusable(false);
-    SwingUtilities.invokeLater(() -> rootPath.textField().getDocument().addDocumentListener(
+
+    // update project tree if another root is chosen
+    rootPath.textField().getDocument().addDocumentListener(
       new DocumentListener() {
-        @Override public void insertUpdate(final DocumentEvent e) { changeRoot(true); }
-        @Override public void removeUpdate(final DocumentEvent e) { changeRoot(true); }
+        @Override public void insertUpdate(final DocumentEvent e) { changeRoot(); }
+        @Override public void removeUpdate(final DocumentEvent e) { }
         @Override public void changedUpdate(final DocumentEvent e) { }
       }
-    ));
+    );
 
     final AbstractButton browse = BaseXButton.get("c_editopen", OPEN, false, gui);
     browse.setToolTipText(CHOOSE_DIR + DOTS);
@@ -118,7 +121,7 @@ public final class ProjectView extends BaseXPanel {
       }
     });
 
-    rootPath(dir, false);
+    rootPath.setText(dir.path());
   }
 
   /**
@@ -322,43 +325,24 @@ public final class ProjectView extends BaseXPanel {
     final IOFile file = (child != null ? child : root).file;
     final BaseXFileChooser fc = new BaseXFileChooser(gui, CHOOSE_DIR, file.path());
     final IOFile io = fc.select(Mode.DOPEN);
-    if(io != null) rootPath(io.normalize(), true);
+    if(io != null) {
+      rootPath.setText(io.normalize().path());
+      rootPath.updateHistory();
+    }
   }
 
   /**
-   * Changes the root directory.
-   * @param save save project path
+   * Changes the root directory. Called by document listener of editable root path component.
    */
-  public void changeRoot(final boolean save) {
+  private void changeRoot() {
     final IOFile path = new IOFile(rootPath.getText());
     if(root.file.eq(path)) return;
 
-    if(save) {
-      gui.gopts.set(GUIOptions.PROJECTPATH, path.path());
-      gui.saveOptions();
-    }
+    gui.gopts.setFile(GUIOptions.PROJECTPATH, path);
+    gui.saveOptions();
+
     root.file = path;
     root.refresh();
     refresh();
-  }
-
-  /**
-   * Refreshes the root path.
-   * @param path root path
-   * @param history update history
-   */
-  public void rootPath(final IOFile path, final boolean history) {
-    rootPath.setText(path.normalize().path());
-    changeRoot(history);
-    if(history) rootPath.updateHistory();
-  }
-
-  /**
-   * Returns the project directory.
-   * @return project directory, or {@code null} if no path has been assigned so far
-   */
-  public IOFile dir() {
-    final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
-    return project.isEmpty() ? null : new IOFile(project).normalize();
   }
 }

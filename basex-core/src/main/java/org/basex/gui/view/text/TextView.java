@@ -208,7 +208,7 @@ public final class TextView extends View {
 
     final IOFile file = fc.select(Mode.FSAVE);
     if(file == null) return;
-    gui.gopts.set(GUIOptions.WORKPATH, file.path());
+    gui.gopts.setFile(GUIOptions.WORKPATH, file.parent());
 
     gui.cursor(CURSORWAIT, true);
     try(PrintOutput out = new PrintOutput(file)) {

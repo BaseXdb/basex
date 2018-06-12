@@ -198,8 +198,8 @@ final class DialogImport extends BaseXBack {
     final IOFile file = fc.select(Mode.FDOPEN);
     if(file == null) return;
 
+    gui.gopts.setFile(GUIOptions.INPUTPATH, file);
     path = file.path();
-    gui.gopts.set(GUIOptions.INPUTPATH, path);
     input.setText(path);
     setType(path);
   }

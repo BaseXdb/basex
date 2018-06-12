@@ -56,6 +56,17 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   }
 
   /**
+   * Adds an element to the array if it is not contained yet.
+   * @param element element to be added
+   * @return result of check
+   */
+  @SuppressWarnings("unchecked")
+  public L addUnique(final E element) {
+    if(!contains(element)) add(element);
+    return (L) this;
+  }
+
+  /**
    * Adds an element to the array.
    * @param element element to be added
    * @return self reference
