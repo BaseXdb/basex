@@ -98,8 +98,6 @@ public class StandardWs extends WebSocketAdapter {
 
   @Override
   public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
-    System.out.println("On binary: ");
-    System.out.println(payload);
     headerParams.put("offset", "" + offset);
     headerParams.put("len", "" + len);
     headerParams.put("id", id);
@@ -129,6 +127,13 @@ public class StandardWs extends WebSocketAdapter {
    */
   @Override
   public void onWebSocketError(final Throwable cause) {
+    // Remove the user from the Room
+    if(path == null) {
+      WsPool.getInstance().remove(id);
+    } else {
+      WsPool.getInstance().removeFromChannel(this, path.toString(), id);
+    }
+
     findAndProcess(Annotation._WS_ERROR, cause.toString(), headerParams);
     cause.printStackTrace(System.err);
     super.getSession().close();

@@ -14,7 +14,7 @@ import org.eclipse.jetty.websocket.api.*;
 public class WsPool {
   /**
    * The Room-Singleton.
-   * */
+   */
   private static final WsPool INSTANCE = new WsPool();
 
   /**
@@ -32,7 +32,7 @@ public class WsPool {
 
   /**
    * The members of the Room.
-   * */
+   */
   private HashMap<WebSocketAdapter, String> membersInv = new HashMap<>();
 
   /**
@@ -57,7 +57,7 @@ public class WsPool {
    * @param socket WebSocke
    * @param channel String
    * @return string unique id
-   * */
+   */
   public String joinChannel(final WebSocketAdapter socket, final String channel) {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
@@ -109,8 +109,13 @@ public class WsPool {
   public void broadcast(final Object message) {
     if(message == null) return;
     members.forEach((k, v) -> {
-      RemoteEndpoint reMember = v.getSession().getRemote();
-      checkAndSend(message, reMember);
+      if(!v.getSession().isOpen()) {
+        membersInv.remove(v);
+        members.remove(k);
+      } else {
+        RemoteEndpoint reMember = v.getSession().getRemote();
+        checkAndSend(message, reMember);
+      }
     });
   }
 
@@ -132,13 +137,18 @@ public class WsPool {
    * Sends a Message to all connected Members except the ids given.
    * @param message Object
    * @param ids List of Ids
-   * */
+   */
   public void broadcast(final Object message, final List<String> ids) {
     if(message == null || ids == null || ids.size() == 0) return;
     members.forEach((id, member) -> {
       if(ids.contains(id)) {
-        RemoteEndpoint reMember = member.getSession().getRemote();
-         checkAndSend(message, reMember);
+        if(!member.getSession().isOpen()) {
+          membersInv.remove(member);
+          members.remove(id);
+        } else {
+          RemoteEndpoint reMember = member.getSession().getRemote();
+          checkAndSend(message, reMember);
+        }
       }
     });
   }
@@ -147,16 +157,22 @@ public class WsPool {
    * Sens a Message to all connected Members in the Channel.
    * @param message String
    * @param channel String
-   * */
+   */
   public void broadcast(final Object message, final String channel) {
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
     }
-    for(WebSocketAdapter member: channelMembers) {
-      RemoteEndpoint reMember = member.getSession().getRemote();
-      checkAndSend(message, reMember);
+    for(WebSocketAdapter member : channelMembers) {
+      if(!member.getSession().isOpen()) {
+        String id = membersInv.get(member);
+        membersInv.remove(member);
+        members.remove(id);
+      } else {
+        RemoteEndpoint reMember = member.getSession().getRemote();
+        checkAndSend(message, reMember);
+      }
     }
   }
 
@@ -165,18 +181,23 @@ public class WsPool {
    * @param message String
    * @param channel String
    * @param ids List of Ids
-   * */
+   */
   public void broadcast(final Object message, final String channel, final List<String> ids) {
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
     }
-    for(WebSocketAdapter member: channelMembers) {
+    for(WebSocketAdapter member : channelMembers) {
       String id = membersInv.get(member);
       if(ids.contains(id)) {
-        RemoteEndpoint reMember = member.getSession().getRemote();
-        checkAndSend(message, reMember);
+        if(!member.getSession().isOpen()) {
+          membersInv.remove(member);
+          members.remove(id);
+        } else {
+          RemoteEndpoint reMember = member.getSession().getRemote();
+          checkAndSend(message, reMember);
+        }
       }
     }
   }
