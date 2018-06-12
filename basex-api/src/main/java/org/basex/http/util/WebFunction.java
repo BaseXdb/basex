@@ -9,7 +9,9 @@ import java.util.regex.*;
 import org.basex.http.restxq.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -103,5 +105,34 @@ public abstract class WebFunction {
 
     declared[p] = true;
     return name;
+  }
+
+  /**
+   * Binds the specified value to a variable.
+   * @param name variable name
+   * @param args arguments
+   * @param value value to be bound
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  protected void bind(final QNm name, final Expr[] args, final Value value, final QueryContext qc)
+      throws QueryException {
+
+    // skip nulled values
+    if(value == null) return;
+
+    final Var[] params = function.params;
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      final Var var = params[p];
+      if(var.name.eq(name)) {
+        // casts and binds the value
+        final SeqType decl = var.declaredType();
+        final Value val = value.seqType().instanceOf(
+            decl) ? value : decl.cast(value, qc, function.sc, null);
+        args[p] = var.checkType(val, qc, false);
+        break;
+      }
+    }
   }
 }

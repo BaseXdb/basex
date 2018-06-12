@@ -30,7 +30,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -424,35 +423,6 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   private void bind(final WebParam rxp, final Expr[] args, final Value value,
       final QueryContext qc) throws QueryException {
     bind(rxp.var, args, value == null || value.isEmpty() ? rxp.value : value, qc);
-  }
-
-  /**
-   * Binds the specified value to a variable.
-   * @param name variable name
-   * @param args arguments
-   * @param value value to be bound
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  private void bind(final QNm name, final Expr[] args, final Value value, final QueryContext qc)
-      throws QueryException {
-
-    // skip nulled values
-    if(value == null) return;
-
-    final Var[] params = function.params;
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) {
-      final Var var = params[p];
-      if(var.name.eq(name)) {
-        // casts and binds the value
-        final SeqType decl = var.declaredType();
-        final Value val = value.seqType().instanceOf(
-            decl) ? value : decl.cast(value, qc, function.sc, null);
-        args[p] = var.checkType(val, qc, false);
-        break;
-      }
-    }
   }
 
   /**

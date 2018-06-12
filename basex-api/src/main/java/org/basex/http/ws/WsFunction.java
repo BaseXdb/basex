@@ -18,14 +18,12 @@ import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
  * This class represents a single Websocket-Function.
  * @author BaseX Team 2005-18, BSD License
- * */
+ */
 public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   /**
    * Constructor.
@@ -33,8 +31,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @param qc query context
    * @param module associated module
    */
-  public WsFunction(final StaticFunc function,
-      final QueryContext qc, final RestXqModule module) {
+  public WsFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
     super(function, qc, module);
   }
 
@@ -142,8 +139,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   }
 
   /**
-   * Processes the websocket request.
-   * Parses new modules and discards obsolete ones.
+   * Processes the websocket request. Parses new modules and discards obsolete ones.
    * @param conn Websocket connection
    * @param message The WebsocketMessage
    * @param resonse The Wsseriaizer
@@ -151,10 +147,8 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  public boolean process(final WsConnection conn,
-                         final Object message,
-                         final WsResponse resonse,
-                         final Map<String, String> header) throws Exception {
+  public boolean process(final WsConnection conn, final Object message, final WsResponse resonse,
+      final Map<String, String> header) throws Exception {
     try {
       return module.process(conn, this, message, resonse, header);
     } catch(final QueryException ex) {
@@ -196,66 +190,29 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @param qc The QueryContext
    * @param message The Messagestring
    * @param header The header to set
-   * @throws QueryException  query exception
-   * @throws UnsupportedEncodingException encoding excepiton
-   */
-  public void bind(final Expr[] args, final QueryContext qc,
-      final Object message, final Map<String, String> header) throws QueryException,
-        UnsupportedEncodingException {
-
-      for(final WebParam rxp: headerParams) {
-        final Var[] params = function.params;
-        final int pl = params.length;
-
-        for(int p = 0; p < pl; p++) {
-          final Var var = params[p];
-          final Value val;
-          if(var.name.eq(rxp.var)) {
-            final SeqType decl = var.declaredType();
-            if(var.name.toString().equals("message")) {
-              final Value msg;
-                if(message instanceof String) {
-                  msg = Str.get((String) message);
-                } else if(message instanceof byte[]) {
-                  msg = B64.get((byte[]) message);
-                } else {
-                  break;
-                }
-                val = msg.seqType().instanceOf(decl) ? msg :
-                  decl.cast(msg, qc, function.sc, null);
-            } else {
-              val = checkParam(header, var, qc, decl);
-            }
-            args[p] = var.checkType(val, qc, false);
-          }
-        }
-      }
-
-  }
-
-  /**
-   * Checks the ParamName and sets it.
-   * @param header Map of header params
-   * @param var the var
-   * @param qc the QueryContext
-   * @param decl the Seqtype
-   * @return Value
    * @throws QueryException query exception
-   * @throws UnsupportedEncodingException encoding exception
    */
-  private Value checkParam(final Map<String, String> header, final Var var,
-                           final QueryContext qc, final SeqType decl)
-                               throws QueryException, UnsupportedEncodingException {
-    Value msg = null;
-    String headerParam = header.get(var.name.toString());
-    if(headerParam != null) {
-      msg =  new Atm(URLDecoder.decode(
-          headerParam, Strings.UTF8));
+  public void bind(final Expr[] args, final QueryContext qc, final Object message,
+      final Map<String, String> header) throws QueryException {
+    // Create a Map with Values, done for the message wich could be byte[] or String
+    Map<String, Value> valueMap = new HashMap<>();
+    if(header != null) header.forEach((k, v) -> {
+      if(v != null) try {
+        valueMap.put(k, new Atm(URLDecoder.decode(v, Strings.UTF8)));
+      } catch(UnsupportedEncodingException e) {
+        valueMap.put(k, null);
+      }
+    });
+    if(message instanceof String) {
+      valueMap.put("message", Str.get((String) message));
+    } else if(message instanceof byte[]) {
+      valueMap.put("message", B64.get((byte[]) message));
     }
-    if(msg == null) {
-      return null;
+
+    for(final WebParam rxp : headerParams) {
+      final QNm name = rxp.var;
+      Value val = valueMap.get(rxp.name);
+      bind(name, args, val, qc);
     }
-    return msg.seqType().instanceOf(decl) ? msg :
-      decl.cast(msg, qc, function.sc, null);
   }
 }
