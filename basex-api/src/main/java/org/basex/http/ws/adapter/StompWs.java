@@ -121,7 +121,7 @@ public class StompWs extends WebSocketAdapter
             channel = stompframe.getHeaders().get("destination");
             break;
           case SUBSCRIBE:
-            ann = Annotation._WS_STOMP_SUBSCRIBE;
+//            ann = Annotation._WS_STOMP_SUBSCRIBE;
             // Required Header
             channel = stompframe.getHeaders().get("destination");
             stompId = stompframe.getHeaders().get("id");
@@ -130,7 +130,7 @@ public class StompWs extends WebSocketAdapter
             serverIds.put(stompId,WsPool.getInstance().joinChannel(this, channel));
             break;
           case UNSUBSCRIBE:
-            ann = Annotation._WS_STOMP_UNSUBSCRIBE;
+//            ann = Annotation._WS_STOMP_UNSUBSCRIBE;
             // REquired Header
             stompId = stompframe.getHeaders().get("id");
             channel = idchannelMap.get(stompId);

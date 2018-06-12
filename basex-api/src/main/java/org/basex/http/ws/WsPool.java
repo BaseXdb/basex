@@ -7,8 +7,6 @@ import org.eclipse.jetty.websocket.api.*;
 
 /**
  * This class defines a Room for Websockets. It manages all Websockets which are connected.
- * https://stackoverflow.com/questions/15646213/how-do-i-access-instantiated-websockets-in-jetty-9
- * @TODO: Maybe define different Rooms for different Channels
  *
  * @author BaseX Team 2005-18, BSD License
  */
@@ -33,6 +31,11 @@ public class WsPool {
   private HashMap<String, WebSocketAdapter> members = new HashMap<>();
 
   /**
+   * The members of the Room.
+   * */
+  private HashMap<WebSocketAdapter, String> membersInv = new HashMap<>();
+
+  /**
    * The List of Members per Channel.
    */
   private HashMap<String, List<WebSocketAdapter>> channels = new HashMap<>();
@@ -45,6 +48,7 @@ public class WsPool {
   public String join(final WebSocketAdapter socket) {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
+    membersInv.put(socket, uniqueID);
     return uniqueID;
   }
 
@@ -57,6 +61,7 @@ public class WsPool {
   public String joinChannel(final WebSocketAdapter socket, final String channel) {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
+    membersInv.put(socket, uniqueID);
 
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     if(channelMembers == null) {
@@ -72,7 +77,9 @@ public class WsPool {
    * @param id String
    */
   public void remove(final String id) {
+    WebSocketAdapter socket = members.get(id);
     members.remove(id);
+    membersInv.remove(socket);
   }
 
   /**
@@ -83,7 +90,9 @@ public class WsPool {
    */
   public void removeFromChannel(final WebSocketAdapter socket, final String channel,
       final String id) {
+    WebSocketAdapter socketM = members.get(id);
     members.remove(id);
+    membersInv.remove(socketM);
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
@@ -99,26 +108,39 @@ public class WsPool {
    */
   public void broadcast(final Object message) {
     if(message == null) return;
+    members.forEach((k, v) -> {
+      RemoteEndpoint reMember = v.getSession().getRemote();
+      checkAndSend(message, reMember);
+    });
+  }
+
+  /**
+   * Checks the Message-Type and sends the Message.
+   * @param message Object
+   * @param member the RemoteEndpoint
+   */
+  private void checkAndSend(final Object message, final RemoteEndpoint member) {
     if(message instanceof String) {
-      members.forEach((k, v) -> {
-        v.getSession().getRemote().sendStringByFuture((String) message);
-      });
+      member.sendStringByFuture((String) message);
     } else {
       byte[] bytes = (byte[]) message;
-      members.forEach((k, v) -> {
-        v.getSession().getRemote().sendBytesByFuture(ByteBuffer.wrap(bytes));
-      });
+      member.sendBytesByFuture(ByteBuffer.wrap(bytes));
     }
-
   }
 
   /**
    * Sends a Message to all connected Members except the ids given.
    * @param message Object
-   * @param idss List of Ids
+   * @param ids List of Ids
    * */
-  public void broadcast(final Object message, final List ids) {
-
+  public void broadcast(final Object message, final List<String> ids) {
+    if(message == null || ids == null || ids.size() == 0) return;
+    members.forEach((id, member) -> {
+      if(ids.contains(id)) {
+        RemoteEndpoint reMember = member.getSession().getRemote();
+         checkAndSend(message, reMember);
+      }
+    });
   }
 
   /**
@@ -132,18 +154,9 @@ public class WsPool {
     if(channelMembers == null) {
       return;
     }
-    if(message instanceof String) {
-      String msg = (String) message;
-      for(WebSocketAdapter member: channelMembers) {
-        // Sends a String asynchronely, method maybe return before the message was sent
-        member.getSession().getRemote().sendStringByFuture(msg);
-      }
-    } else {
-      byte[] bytes = (byte[]) message;
-      for(WebSocketAdapter member: channelMembers) {
-        // Sends a String asynchronely, method maybe return before the message was sent
-        member.getSession().getRemote().sendBytesByFuture(ByteBuffer.wrap(bytes));
-      }
+    for(WebSocketAdapter member: channelMembers) {
+      RemoteEndpoint reMember = member.getSession().getRemote();
+      checkAndSend(message, reMember);
     }
   }
 
@@ -153,7 +166,18 @@ public class WsPool {
    * @param channel String
    * @param ids List of Ids
    * */
-  public void broadcast(final Object message, final String channel, final List ids) {
-
+  public void broadcast(final Object message, final String channel, final List<String> ids) {
+    List<WebSocketAdapter> channelMembers = channels.get(channel);
+    // Channel list doesnt exist, return
+    if(channelMembers == null) {
+      return;
+    }
+    for(WebSocketAdapter member: channelMembers) {
+      String id = membersInv.get(member);
+      if(ids.contains(id)) {
+        RemoteEndpoint reMember = member.getSession().getRemote();
+        checkAndSend(message, reMember);
+      }
+    }
   }
 }

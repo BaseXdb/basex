@@ -18,7 +18,6 @@ public final class Websocket extends QueryModule {
    * @param message Object
    */
   public void broadcast(final Object message) {
-    System.out.println("Broadcast");
     WsPool.getInstance().broadcast(message);
   }
 

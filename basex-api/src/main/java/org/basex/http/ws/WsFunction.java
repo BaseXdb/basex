@@ -187,7 +187,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @return exception
    */
   private QueryException error(final InputInfo info, final String msg, final Object... ext) {
-    return BASEX_WSXQ_X.get(info, Util.info(msg, ext));
+    return BASEX_WS_X.get(info, Util.info(msg, ext));
   }
 
   /**
