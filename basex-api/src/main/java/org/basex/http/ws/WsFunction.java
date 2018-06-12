@@ -77,6 +77,10 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   public boolean parse() throws Exception {
     boolean found = false;
     final boolean[] declared = new boolean[function.params.length];
+    // Counts the Annotations which should occur only once
+    int countOccureOnce = 0;
+    // Checks if a _WS_PARAM Annotation is used
+    boolean wsParamUsed = false;
 
     for(final Ann ann : function.anns) {
       final Annotation sig = ann.sig;
@@ -97,6 +101,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
           }
           WebParam test = new WebParam(var, name, items.value());
           headerParams.add(test);
+          wsParamUsed = true;
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
@@ -106,6 +111,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
             headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));
+          countOccureOnce++;
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
@@ -121,6 +127,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
             headerParams.add(id);
           }
           path = new WsPath(toString(args[0]));
+          countOccureOnce++;
           break;
         default:
           break;
@@ -129,6 +136,8 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
 
     if(found) {
       if(path == null) throw error(function.info, ANN_MISSING);
+      if(countOccureOnce > 1 || ((countOccureOnce != 1) && wsParamUsed))
+        throw error(function.info, ANN_CONFLICT);
       final int dl = declared.length;
       for(int d = 0; d < dl; d++) {
         if(declared[d]) continue;
