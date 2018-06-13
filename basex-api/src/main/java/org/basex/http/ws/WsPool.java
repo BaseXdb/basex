@@ -178,7 +178,7 @@ public class WsPool {
 
   /**
    * Sends a Message to all connected Members in a Channel except the ids given.
-   * @param message String
+   * @param message Object
    * @param channel String
    * @param ids List of Ids
    */
@@ -200,5 +200,47 @@ public class WsPool {
         }
       }
     }
+  }
+
+  /**
+   * Sends a Message to a specific Member.
+   * @param message Object
+   * @param id String
+   *
+   * */
+  public void sendTo(final Object message, final String id) {
+    WebSocketAdapter member = members.get(id);
+    if(member == null) return;
+    checkAndSend(message, member.getSession().getRemote());
+  }
+
+  /**
+   * Get all Ids.
+   * @return List<String>
+   * */
+  public List<String> getAllIds() {
+    List<String> ids = new ArrayList<>();
+    members.forEach((id, adapter) -> {
+      ids.add(id);
+    });
+    return ids;
+  }
+
+  /**
+   * Get all Ids subscribed to a Channel.
+   * @param channel String
+   * @return List<String>
+   * */
+  public List<String> getChannelIds(final String channel) {
+    List<String> ids = new ArrayList<>();
+    List<WebSocketAdapter> channelMembers = channels.get(channel);
+    // Channel list doesnt exist, return
+    if(channelMembers == null) {
+      return ids;
+    }
+    for(WebSocketAdapter member : channelMembers) {
+        ids.add(membersInv.get(member));
+    }
+    return ids;
   }
 }

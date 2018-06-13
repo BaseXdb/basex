@@ -49,4 +49,30 @@ public final class Websocket extends QueryModule {
   public void broadcast(final Object message, final String channel, final List<String> ids) {
     WsPool.getInstance().broadcast(message, channel, ids);
   }
+
+  /**
+   * Sends a Message to a specific Member.
+   * @param message Object
+   * @param id Specific id
+   * */
+  public void sendTo(final Object message, final String id) {
+    WsPool.getInstance().sendTo(message, id);
+  }
+
+  /**
+   * Get all connected Ids.
+   * @return List<String>
+   * */
+  public List<String> getAllIds() {
+    return WsPool.getInstance().getAllIds();
+  }
+
+  /**
+   * Get all connected IDs to a Channel.
+   * @param channel String
+   * @return List<String>
+   * */
+  public List<String> getChannelIds(final String channel) {
+    return WsPool.getInstance().getChannelIds(channel);
+  }
 }

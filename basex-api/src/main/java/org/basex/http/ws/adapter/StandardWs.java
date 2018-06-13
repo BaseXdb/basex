@@ -66,7 +66,6 @@ public class StandardWs extends WebSocketAdapter {
 
     // Add Headers (for binding them to the XQueryParameters in the
     // corresponding bind Method
-
     headerParams.put("Http-Version", ur.getHttpVersion());
     headerParams.put("Origin", ur.getOrigin());
     headerParams.put("Protocol-version", ur.getProtocolVersion());
@@ -152,6 +151,7 @@ public class StandardWs extends WebSocketAdapter {
     WsFunction func = null;
     try {
       func = rxm.find(wsconnection, ann);
+      // If no matching XQuery-Function, throw Error
       if(func == null) wsconnection.error(HTTPCode.NO_XQUERY.toString(), 500);
       if(func != null && response != null) func.process(wsconnection, msg, response, header);
     } catch(Exception e) {
