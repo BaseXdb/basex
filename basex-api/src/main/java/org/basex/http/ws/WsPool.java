@@ -3,6 +3,7 @@ package org.basex.http.ws;
 import java.nio.*;
 import java.util.*;
 
+import org.basex.query.value.item.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -49,6 +50,8 @@ public class WsPool {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
     membersInv.put(socket, uniqueID);
+    System.out.println("members length: " + members.size());
+    System.out.println("membersinv length: " + membersInv.size());
     return uniqueID;
   }
 
@@ -62,7 +65,8 @@ public class WsPool {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
     membersInv.put(socket, uniqueID);
-
+    System.out.println("members length: " + members.size());
+    System.out.println("membersinv length: " + membersInv.size());
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     if(channelMembers == null) {
       channelMembers = new ArrayList<>();
@@ -134,14 +138,14 @@ public class WsPool {
   }
 
   /**
-   * Sends a Message to all connected Members except the ids given.
+   * Sends a Message to all connected Members except the one with the id given.
    * @param message Object
-   * @param ids List of Ids
+   * @param pId The ID
    */
-  public void broadcast(final Object message, final List<String> ids) {
-    if(message == null || ids == null || ids.size() == 0) return;
+  public void broadcastWithoutID(final Object message, final Str pId) {
+    if(message == null || pId == null) return;
     members.forEach((id, member) -> {
-      if(ids.contains(id)) {
+      if(!id.equals(pId.toJava())) {
         if(!member.getSession().isOpen()) {
           membersInv.remove(member);
           members.remove(id);
@@ -158,8 +162,8 @@ public class WsPool {
    * @param message String
    * @param channel String
    */
-  public void broadcast(final Object message, final String channel) {
-    List<WebSocketAdapter> channelMembers = channels.get(channel);
+  public void broadcastChannel(final Object message, final Str channel) {
+    List<WebSocketAdapter> channelMembers = channels.get(channel.toJava());
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
@@ -177,20 +181,21 @@ public class WsPool {
   }
 
   /**
-   * Sends a Message to all connected Members in a Channel except the ids given.
+   * Sends a Message to all connected Members in a Channel except the one with the given id.
    * @param message Object
-   * @param channel String
-   * @param ids List of Ids
+   * @param channel Str
+   * @param pId Id to dismiss
    */
-  public void broadcast(final Object message, final String channel, final List<String> ids) {
-    List<WebSocketAdapter> channelMembers = channels.get(channel);
+  public void broadcastChannelWoID(final Object message, final Str channel,
+      final Str pId) {
+    List<WebSocketAdapter> channelMembers = channels.get(channel.toJava());
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
     }
     for(WebSocketAdapter member : channelMembers) {
       String id = membersInv.get(member);
-      if(ids.contains(id)) {
+      if(!pId.toJava().equals(id)) {
         if(!member.getSession().isOpen()) {
           membersInv.remove(member);
           members.remove(id);
@@ -207,40 +212,10 @@ public class WsPool {
    * @param message Object
    * @param id String
    *
-   * */
-  public void sendTo(final Object message, final String id) {
-    WebSocketAdapter member = members.get(id);
+   */
+  public void sendTo(final Object message, final Str id) {
+    WebSocketAdapter member = members.get(id.toJava());
     if(member == null) return;
     checkAndSend(message, member.getSession().getRemote());
-  }
-
-  /**
-   * Get all Ids.
-   * @return List<String>
-   * */
-  public List<String> getAllIds() {
-    List<String> ids = new ArrayList<>();
-    members.forEach((id, adapter) -> {
-      ids.add(id);
-    });
-    return ids;
-  }
-
-  /**
-   * Get all Ids subscribed to a Channel.
-   * @param channel String
-   * @return List<String>
-   * */
-  public List<String> getChannelIds(final String channel) {
-    List<String> ids = new ArrayList<>();
-    List<WebSocketAdapter> channelMembers = channels.get(channel);
-    // Channel list doesnt exist, return
-    if(channelMembers == null) {
-      return ids;
-    }
-    for(WebSocketAdapter member : channelMembers) {
-        ids.add(membersInv.get(member));
-    }
-    return ids;
   }
 }

@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.http.ws.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 
 /**
  * This module contains functions for processing WebSockets.
@@ -21,58 +22,41 @@ public final class Websocket extends QueryModule {
     WsPool.getInstance().broadcast(message);
   }
 
-
   /**
    * Broadcasts a Message to all connected Members in the Channel.
    * @param message Object
-   * @param channel String
+   * @param channel Str
    */
-  public void broadcast(final Object message, final String channel) {
-    WsPool.getInstance().broadcast(message, channel);
+  public void broadcastChannel(final Object message, final Str channel) {
+    WsPool.getInstance().broadcastChannel(message, channel);
   }
 
   /**
-   * Broadcasts a Message to all connected Members except the Ids.
+   * Broadcasts a Message to all connected Members except the one with the given Id.
    * @param message Object
-   * @param ids List of Ids
-   * */
-  public void broadcast(final Object message, final List<String> ids) {
-    WsPool.getInstance().broadcast(message, ids);
+   * @param id id to dismiss
+   */
+  public void broadcastWithoutID(final Object message, final Str id) {
+    WsPool.getInstance().broadcastWithoutID(message, id);
   }
 
   /**
-   * Broadcasts a Message to all connected Members in the channel except the Ids.
+   * Broadcasts a Message to all connected Members in the channel except the one with the given Id.
    * @param message Object
-   * @param channel String
-   * @param ids List of Ids
-   * */
-  public void broadcast(final Object message, final String channel, final List<String> ids) {
-    WsPool.getInstance().broadcast(message, channel, ids);
+   * @param channel Str
+   * @param id id to miss
+   */
+  public void broadcastChannelWoID(final Object message, final Str channel,
+      final Str id) {
+    WsPool.getInstance().broadcastChannelWoID(message, channel, id);
   }
 
   /**
    * Sends a Message to a specific Member.
    * @param message Object
    * @param id Specific id
-   * */
-  public void sendTo(final Object message, final String id) {
+   */
+  public void sendTo(final Object message, final Str id) {
     WsPool.getInstance().sendTo(message, id);
-  }
-
-  /**
-   * Get all connected Ids.
-   * @return List<String>
-   * */
-  public List<String> getAllIds() {
-    return WsPool.getInstance().getAllIds();
-  }
-
-  /**
-   * Get all connected IDs to a Channel.
-   * @param channel String
-   * @return List<String>
-   * */
-  public List<String> getChannelIds(final String channel) {
-    return WsPool.getInstance().getChannelIds(channel);
   }
 }
