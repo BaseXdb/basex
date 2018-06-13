@@ -20,7 +20,7 @@ public class WsCreator implements WebSocketCreator {
     for (String subprotocol : req.getSubProtocols()) {
       if("v10.stomp".equals(subprotocol)) {
         resp.setAcceptedSubProtocol(subprotocol);
-        return new StompWs(subprotocol);
+        return new StompWsV10(path);
       }
     }
 

@@ -1,0 +1,122 @@
+package org.basex.http.ws.adapter;
+
+import static org.basex.http.util.WebText.*;
+
+import java.util.*;
+
+import org.basex.http.restxq.*;
+import org.basex.http.ws.*;
+import org.basex.http.ws.response.*;
+import org.basex.query.ann.*;
+import org.basex.util.*;
+import org.eclipse.jetty.websocket.api.*;
+
+/**
+ * This class defines a abstract WebsocketAdapter.
+ * @author BaseX Team 2005-18, BSD License
+ */
+public abstract class WsAdapter  extends WebSocketAdapter {
+  /**
+   * The Websocketconnection.
+   */
+  protected WsConnection wsconnection;
+
+  /**
+   * The Path.
+   */
+  protected WsPath path;
+
+  /**
+   * The UUID of the Websocket.
+   */
+  protected String id;
+
+  /**
+   * The HeaderParams.
+   */
+  protected Map<String, String> headerParams = new HashMap<>();
+
+  /**
+   * The Serializer for specific Subprotocols.
+   */
+  protected WsResponse response;
+
+  @Override
+  public void onWebSocketConnect(final Session sess) {
+    super.onWebSocketConnect(sess);
+    UpgradeRequest ur = sess.getUpgradeRequest();
+
+    if(this.path != null) {
+      id = WsPool.getInstance().joinChannel(this, path.toString());
+    } else {
+      id = WsPool.getInstance().join(this);
+    }
+
+    // Add Headers (for binding them to the XQueryParameters in the
+    // corresponding bind Method
+    headerParams.put("Http-Version", ur.getHttpVersion());
+    headerParams.put("Origin", ur.getOrigin());
+    headerParams.put("Protocol-version", ur.getProtocolVersion());
+    headerParams.put("QueryString", ur.getQueryString());
+    headerParams.put("IsSecure", String.valueOf(ur.isSecure()));
+    headerParams.put("RequestURI", ur.getRequestURI().toString());
+    headerParams.put("id", id);
+    List<String> headerKeys = new ArrayList<>();
+    Collections.addAll(headerKeys, "Host", "Sec-WebSocket-Version");
+    sess.getUpgradeRequest().getHeaders().forEach((k, v) -> {
+      if(headerKeys.contains(k)) {
+        headerParams.put(k, v.get(0));
+      }
+    });
+
+    wsconnection = new WsConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(), sess,
+        this.path.toString());
+    findAndProcess(Annotation._WS_CONNECT, null, headerParams);
+  }
+
+  /*
+   * This is a way for the internal implementation to notify of exceptions occured during the
+   * processing of websocket. Usually this occurs from bad / malformed incoming packets. (example:
+   * bad UTF8 data, frames that are too big, violations of the spec). This will result in the
+   * Session being closed by the implementing side.
+   */
+  @Override
+  public void onWebSocketError(final Throwable cause) {
+    this.removeWebsocketFromPool();
+    findAndProcess(Annotation._WS_ERROR, cause.toString(), headerParams);
+    super.getSession().close();
+  }
+
+  @Override
+  public void onWebSocketClose(final int statusCode, final String reason) {
+    findAndProcess(Annotation._WS_CLOSE, null, null);
+    super.onWebSocketClose(statusCode, reason);
+    this.removeWebsocketFromPool();
+  }
+
+  /**
+   * Implement the removing of the Websocket from the Pool. Remove from all
+   * Channels in the Pool too.
+   */
+  protected abstract void removeWebsocketFromPool();
+
+  /**
+   * Finds a WSFunction and processes it.
+   * @param ann The Websocketannotation
+   * @param msg The Message
+   * @param header The headers to set
+   */
+  protected void findAndProcess(final Annotation ann, final Object msg,
+      final Map<String, String> header) {
+    final RestXqModules rxm = RestXqModules.get(wsconnection.context);
+    WsFunction func = null;
+    try {
+      func = rxm.find(wsconnection, ann);
+      // If no matching XQuery-Function, throw Error
+      if(func == null) wsconnection.error(Util.info(XQUERY_MISSING_X, ann.toString()), 500);
+      if(func != null && response != null) func.process(wsconnection, msg, response, header);
+    } catch(Exception e) {
+      wsconnection.error(e.getMessage(), 500);
+    }
+  }
+}
