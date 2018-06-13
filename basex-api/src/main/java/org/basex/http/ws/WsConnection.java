@@ -81,7 +81,8 @@ public class WsConnection implements ClientInfo {
    * */
   public void error(final String errorMsg, final int errorcode) {
       try {
-        this.sess.getRemote().sendString(errorcode + ":" + errorMsg);
+        if(this.sess.isOpen())
+          this.sess.getRemote().sendString(errorcode + ":" + errorMsg);
       } catch(IOException e) {
         e.printStackTrace();
       }

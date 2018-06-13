@@ -50,8 +50,6 @@ public class WsPool {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
     membersInv.put(socket, uniqueID);
-    System.out.println("members length: " + members.size());
-    System.out.println("membersinv length: " + membersInv.size());
     return uniqueID;
   }
 
@@ -65,8 +63,6 @@ public class WsPool {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
     membersInv.put(socket, uniqueID);
-    System.out.println("members length: " + members.size());
-    System.out.println("membersinv length: " + membersInv.size());
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     if(channelMembers == null) {
       channelMembers = new ArrayList<>();
