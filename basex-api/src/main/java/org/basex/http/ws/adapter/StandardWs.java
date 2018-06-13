@@ -1,13 +1,15 @@
 package org.basex.http.ws.adapter;
 
-import java.util.*;
+import static org.basex.http.util.WebText.XQUERY_MISSING_X;
 
-import org.basex.http.*;
+import java.util.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.query.ann.*;
+import org.basex.util.*;
 import org.eclipse.jetty.websocket.api.*;
+
 
 /**
  * This class defines a Websocket. It implements WebsocketAdapter of jetty-native-websockets.
@@ -139,7 +141,7 @@ public class StandardWs extends WebSocketAdapter {
     try {
       func = rxm.find(wsconnection, ann);
       // If no matching XQuery-Function, throw Error
-      if(func == null) wsconnection.error(HTTPCode.NO_XQUERY.toString(), 500);
+      if(func == null) wsconnection.error(Util.info(XQUERY_MISSING_X, ann.toString()), 500);
       if(func != null && response != null) func.process(wsconnection, msg, response, header);
     } catch(Exception e) {
       wsconnection.error(e.getMessage(), 500);

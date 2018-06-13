@@ -107,6 +107,8 @@ public interface WebText {
   String WRONG_MSG_TYPE = "Wrong Messagetype: %";
   /** Error message. */
   String HEADER_MISSING = "Not all required headers are set";
+  /** Error message. */
+  String XQUERY_MISSING_X = "XQuery Function missing for: %";
 
   /** QName. */
   QNm Q_STATUS = new QNm(STATUS);
