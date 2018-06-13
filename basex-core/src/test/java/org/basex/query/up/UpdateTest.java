@@ -1133,7 +1133,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /** Tests the "update" and "transform with" operators. */
   @Test
-  public void transform() {
+  public void update() {
     query("<x/> update ()", "<x/>");
     query("<x/> update insert node <y/> into .", "<x>\n<y/>\n</x>");
     query("<x/> update (insert node <y/> into .)", "<x>\n<y/>\n</x>");
@@ -1144,6 +1144,8 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("(<x/>,<y/>) update {}", "<x/>\n<y/>");
     error("update:output('a') update ()", UPNOT_X);
     error("<x/> update 1", UPMODIFY);
+
+    query("(<a>X</a>/text() update {})/..", "");
 
     query("<x/> transform with {}", "<x/>");
     query("<x/> transform with { insert node <y/> into . }", "<x>\n<y/>\n</x>");
@@ -1266,5 +1268,21 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("<a/> update { . ! (insert node text { '1' } into .) }", "<a>1</a>");
     query("<a/> update { for $a in (1,2) return insert node text { '1' } into . }", "<a>11</a>");
     query("(update:output('1'), update:output('2'))", "1\n2");
+  }
+
+  /**
+   * GH1576.
+   */
+  @Test
+  public void gh1576() {
+    query("update:output([])", "[]");
+    query("update:output([1,(2,[3,4])])", "[1, (2, [3, 4])]");
+    query("update:output(map { })", "map {\n}");
+    query("update:output(map { 1: map { 2: 3 }})", "map {\n1: map {\n2: 3\n}\n}");
+
+    error("update:output(true#0)", BASEX_FUNCTION_X);
+    error("update:output([true#0])", BASEX_FUNCTION_X);
+    error("update:output([1,(2,[3,true#0])])", BASEX_FUNCTION_X);
+    error("update:output(map { 1: map { 2: true#0 }})", BASEX_FUNCTION_X);
   }
 }

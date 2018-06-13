@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 
 import java.math.*;
 
+import org.basex.data.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -233,7 +234,7 @@ public abstract class Item extends Value {
 
   // Overwritten by Lazy, Map and Array.
   @Override
-  public void materialize(final InputInfo info) throws QueryException { }
+  public void cache(final InputInfo info) throws QueryException { }
 
   // Overwritten by Array, FItem and ANode
   @Override
@@ -253,6 +254,18 @@ public abstract class Item extends Value {
     return 1;
   }
 
+  /**
+   * Returns a materialized, context-independent version of this item.
+   * {@code null} is returned if the item cannot be materialized
+   * @param qc query context (if {@code null}, process cannot be interrupted)
+   * @param copy create full copy
+   * @return item copy
+   */
+  @SuppressWarnings("unused")
+  public Item materialize(final QueryContext qc, final boolean copy) {
+    return this;
+  }
+
   @Override
   public final SeqType seqType() {
     return type.seqType();
@@ -266,6 +279,15 @@ public abstract class Item extends Value {
   @Override
   public final boolean iterable() {
     return true;
+  }
+
+  /**
+   * Indicates if this item references a persistent database.
+   * @return result of check
+   */
+  public final boolean persistent() {
+    final Data data = data();
+    return data != null && !data.inMemory();
   }
 
   /**

@@ -17,9 +17,9 @@ public interface Lazy {
   boolean isCached();
 
   /**
-   * Materializes lazy values.
+   * Caches the value.
    * @param info input info
    * @throws QueryException query exception
    */
-  void materialize(InputInfo info) throws QueryException;
+  void cache(InputInfo info) throws QueryException;
 }

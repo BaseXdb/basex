@@ -62,8 +62,8 @@ public final class Map extends FItem {
   }
 
   @Override
-  public void materialize(final InputInfo info) throws QueryException {
-    root.materialize(info);
+  public void cache(final InputInfo info) throws QueryException {
+    root.cache(info);
   }
 
   @Override
@@ -148,6 +148,11 @@ public final class Map extends FItem {
 
     if(instanceOf(ft, true)) return this;
     throw typeError(this, ft, info);
+  }
+
+  @Override
+  public Item materialize(final QueryContext qc, final boolean copy) {
+    return root.materialized() ? this : null;
   }
 
   /**

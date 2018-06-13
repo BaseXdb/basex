@@ -259,11 +259,21 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  void materialize(final InputInfo info) throws QueryException {
+  void cache(final InputInfo info) throws QueryException {
     for(int i = 0; i < size; i++) {
-      keys[i].materialize(info);
-      values[i].materialize(info);
+      keys[i].cache(info);
+      values[i].cache(info);
     }
+  }
+
+  @Override
+  boolean materialized() {
+    for(final Value value : values)  {
+      for(final Item item : value) {
+        if(item.persistent() || item.materialize(null, false) == null) return false;
+      }
+    }
+    return true;
   }
 
   @Override

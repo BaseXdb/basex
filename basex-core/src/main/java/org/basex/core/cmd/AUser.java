@@ -51,7 +51,7 @@ abstract class AUser extends Command {
     // loop through all users
     boolean ok = true;
     for(final String user : users) ok &= run(user, pattern);
-    context.users.write(context);
+    context.users.write();
     return ok;
   }
 

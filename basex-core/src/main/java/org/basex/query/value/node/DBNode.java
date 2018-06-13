@@ -12,7 +12,6 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -219,22 +218,15 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode dbNodeCopy(final MainOptions opts, final QueryContext qc) {
-    final MemData md = new MemData(opts);
-    new DataBuilder(md, qc).build(this);
-    return new DBNode(md).parent(parent);
-  }
-
-  @Override
-  public final DBNode deepCopy(final MainOptions options, final QueryContext qc) {
-    return dbNodeCopy(options, qc);
+  public final DBNode materialize(final QueryContext qc, final boolean copy) {
+    return copy ? copy(qc) : this;
   }
 
   @Override
   public final DBNode finish() {
-    final DBNode n = new DBNode(data, pre, parent, nodeType());
-    n.score = score;
-    return n;
+    final DBNode node = new DBNode(data, pre, parent, nodeType());
+    node.score = score;
+    return node;
   }
 
   @Override
@@ -246,12 +238,6 @@ public class DBNode extends ANode {
     final DBNode node = finish();
     node.set(p, data.kind(p));
     return node;
-  }
-
-  @Override
-  protected final DBNode parent(final ANode par) {
-    parent = par;
-    return this;
   }
 
   @Override
@@ -493,6 +479,6 @@ public class DBNode extends ANode {
 
   @Override
   public final BXNode toJava() {
-    return BXNode.get(deepCopy(new MainOptions(), null));
+    return BXNode.get(copy(new MainOptions(), null));
   }
 }

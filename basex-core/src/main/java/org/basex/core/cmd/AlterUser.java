@@ -38,7 +38,7 @@ public final class AlterUser extends AUser {
     if(users.get(newname) != null) return error(USER_EXISTS_X, newname);
 
     users.alter(user, newname);
-    users.write(context);
+    users.write();
     return info(USER_RENAMED_X_X, name, newname);
   }
 

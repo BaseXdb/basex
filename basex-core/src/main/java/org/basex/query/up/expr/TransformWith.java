@@ -72,8 +72,8 @@ public final class TransformWith extends Arr {
       for(Item item; (item = qc.next(iter)) != null;) {
         if(!(item instanceof ANode)) throw UPSOURCE_X.get(info, item);
 
-        // copy node to main memory data instance
-        item = ((ANode) item).dbNodeCopy(qc.context.options, qc);
+        // create main memory copy of node
+        item = ((ANode) item).copy(qc);
         // set resulting node as context
         qf.value = item;
 

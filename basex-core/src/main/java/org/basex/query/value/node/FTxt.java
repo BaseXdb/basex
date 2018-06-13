@@ -2,11 +2,10 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.w3c.dom.Text;
+import org.w3c.dom.*;
 
 /**
  * Text node fragment.
@@ -42,8 +41,8 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
-    return new FTxt(value).parent(parent);
+  public FTxt materialize(final QueryContext qc, final boolean copy) {
+    return copy ? new FTxt(value) : this;
   }
 
   @Override

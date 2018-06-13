@@ -6,12 +6,10 @@ import java.util.*;
 
 import javax.servlet.http.*;
 
-import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
@@ -118,10 +116,9 @@ final class ASession {
   void set(final Str key, final Value value) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
-      if(item instanceof FItem) throw (id == null ? SESSION_SET_X : SESSIONS_SET_X).get(null, item);
-      final Data data = item.data();
-      vb.add(data == null || data.inMemory() ? item :
-        ((ANode) item).deepCopy(qc.context.options, qc));
+      final Item it = item.materialize(qc, item.persistent());
+      if(it == null) throw (id == null ? SESSION_SET_X : SESSIONS_SET_X).get(null, item);
+      vb.add(it);
     }
     session.setAttribute(key.toJava(), vb.value());
   }

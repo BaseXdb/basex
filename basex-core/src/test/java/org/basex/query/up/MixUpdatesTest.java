@@ -87,7 +87,7 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void functionItem() {
-    error("let $x := <a>a</a> update () return (delete node $x/text(), [$x])", BASEX_FUNCTION_X);
+    query("let $x := <a>a</a> update () return (delete node $x/text(), [$x])", "[<a/>]");
   }
 
   /** Test method. */

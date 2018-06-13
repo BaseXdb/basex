@@ -101,7 +101,7 @@ abstract class ContextModifier {
   final synchronized void apply(final QueryContext qc) throws QueryException {
     final Context ctx = qc.context;
     for(final UserUpdates up : userUpdates.values()) up.apply();
-    if(!userUpdates.isEmpty()) ctx.users.write(ctx);
+    if(!userUpdates.isEmpty()) ctx.users.write();
 
     // apply initial updates based on database names
     for(final NameUpdates up : nameUpdates.values()) up.apply(true);

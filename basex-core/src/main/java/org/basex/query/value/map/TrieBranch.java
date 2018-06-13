@@ -209,10 +209,18 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void materialize(final InputInfo info) throws QueryException {
+  void cache(final InputInfo info) throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null) nd.materialize(info);
+      if(nd != null) nd.cache(info);
     }
+  }
+
+  @Override
+  boolean materialized() {
+    for(final TrieNode nd : kids) {
+      if(!nd.materialized()) return false;
+    }
+    return true;
   }
 
   @Override

@@ -1,5 +1,7 @@
 package org.basex.query.func.user;
 
+import static org.basex.core.users.UserText.*;
+
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -13,6 +15,7 @@ import org.basex.util.*;
 public final class UserInfo extends UserFn {
   @Override
   public ANode item(final QueryContext qc, final InputInfo ii) {
-    return qc.context.users.info();
+    final ANode node = qc.context.users.info();
+    return node == null ? new FElem(INFO) : node;
   }
 }

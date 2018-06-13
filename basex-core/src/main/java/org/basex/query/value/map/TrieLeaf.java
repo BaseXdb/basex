@@ -202,9 +202,17 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  void materialize(final InputInfo info) throws QueryException {
-    key.materialize(info);
-    value.materialize(info);
+  void cache(final InputInfo info) throws QueryException {
+    key.cache(info);
+    value.cache(info);
+  }
+
+  @Override
+  boolean materialized() {
+    for(final Item item : value) {
+      if(item.persistent() || item.materialize(null, false) == null) return false;
+    }
+    return true;
   }
 
   @Override

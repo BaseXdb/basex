@@ -74,7 +74,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo info) {
+  public final boolean sameKey(final Item item, final InputInfo info) {
     return false;
   }
 
@@ -86,6 +86,11 @@ public abstract class FItem extends Item implements XQFunction {
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
     throw FIATOM_X.get(info, type);
+  }
+
+  @Override
+  public Item materialize(final QueryContext qc, final boolean copy) {
+    return null;
   }
 
   /**
