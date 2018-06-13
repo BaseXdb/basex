@@ -7,32 +7,32 @@ import org.basex.query.value.item.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
- * This class defines a Room for Websockets. It manages all Websockets which are connected.
+ * This class defines a Pool for Websockets. It manages all Websockets which are connected.
  *
  * @author BaseX Team 2005-18, BSD License
  */
 
 public class WsPool {
   /**
-   * The Room-Singleton.
+   * The Pool-Singleton.
    */
   private static final WsPool INSTANCE = new WsPool();
 
   /**
-   * Returns the Room instance.
-   * @return INSTANCE Room
+   * Returns the Pool instance.
+   * @return INSTANCE Pool
    */
   public static WsPool getInstance() {
     return INSTANCE;
   }
 
   /**
-   * The members of the Room.
+   * The members of the Pool. ID -> WebSocketAdapter.
    */
   private HashMap<String, WebSocketAdapter> members = new HashMap<>();
 
   /**
-   * The members of the Room.
+   * The members of the Pool. WebSocketAdapter -> ID.
    */
   private HashMap<WebSocketAdapter, String> membersInv = new HashMap<>();
 
@@ -43,8 +43,8 @@ public class WsPool {
 
   /**
    * Adds a WebSocket to the membersList.
-   * @param socket WebSocke
-   * @return string
+   * @param socket WebSocketAdapter
+   * @return string The Unique Id of the WebSocketInstance
    */
   public String join(final WebSocketAdapter socket) {
     String uniqueID = UUID.randomUUID().toString();
@@ -55,9 +55,9 @@ public class WsPool {
 
   /**
    * Adds a Websocket to a specific Channel.
-   * @param socket WebSocke
+   * @param socket WebSocketAdapter
    * @param channel String
-   * @return string unique id
+   * @return string The Unique ID of the WebSocketInstance
    */
   public String joinChannel(final WebSocketAdapter socket, final String channel) {
     String uniqueID = UUID.randomUUID().toString();
@@ -84,7 +84,7 @@ public class WsPool {
 
   /**
    * Removes a Member from the ChannelMemberList.
-   * @param socket WebSocke
+   * @param socket WebSocketAdapter
    * @param channel String
    * @param id String
    */
@@ -120,20 +120,6 @@ public class WsPool {
   }
 
   /**
-   * Checks the Message-Type and sends the Message.
-   * @param message Object
-   * @param member the RemoteEndpoint
-   */
-  private void checkAndSend(final Object message, final RemoteEndpoint member) {
-    if(message instanceof String) {
-      member.sendStringByFuture((String) message);
-    } else {
-      byte[] bytes = (byte[]) message;
-      member.sendBytesByFuture(ByteBuffer.wrap(bytes));
-    }
-  }
-
-  /**
    * Sends a Message to all connected Members except the one with the id given.
    * @param message Object
    * @param pId The ID
@@ -154,7 +140,7 @@ public class WsPool {
   }
 
   /**
-   * Sens a Message to all connected Members in the Channel.
+   * Sends a Message to all connected Members in the Channel.
    * @param message String
    * @param channel String
    */
@@ -182,8 +168,7 @@ public class WsPool {
    * @param channel Str
    * @param pId Id to dismiss
    */
-  public void broadcastChannelWoID(final Object message, final Str channel,
-      final Str pId) {
+  public void broadcastChannelWoID(final Object message, final Str channel, final Str pId) {
     List<WebSocketAdapter> channelMembers = channels.get(channel.toJava());
     // Channel list doesnt exist, return
     if(channelMembers == null) {
@@ -207,11 +192,24 @@ public class WsPool {
    * Sends a Message to a specific Member.
    * @param message Object
    * @param id String
-   *
    */
   public void sendTo(final Object message, final Str id) {
     WebSocketAdapter member = members.get(id.toJava());
     if(member == null) return;
     checkAndSend(message, member.getSession().getRemote());
+  }
+
+  /**
+   * Checks the Message-Type and sends the Message.
+   * @param message Object
+   * @param member the RemoteEndpoint
+   */
+  private void checkAndSend(final Object message, final RemoteEndpoint member) {
+    if(message instanceof String) {
+      member.sendStringByFuture((String) message);
+    } else {
+      byte[] bytes = (byte[]) message;
+      member.sendBytesByFuture(ByteBuffer.wrap(bytes));
+    }
   }
 }

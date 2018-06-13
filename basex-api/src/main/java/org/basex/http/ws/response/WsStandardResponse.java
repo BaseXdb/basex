@@ -23,11 +23,10 @@ public class WsStandardResponse implements WsResponse {
     ArrayOutput ao = new ArrayOutput();
     Serializer ser = Serializer.get(ao, wxf.output);
     Iter iter = qc.iter();
-
     for(Item it; (it = iter.next()) != null;) {
-      // Dont send anything if Websocket gets closed
+      // Dont send anything if Websocket gets closed because the Connection is already
+      // closed
       if(wxf.matches(Annotation._WS_CLOSE)) continue;
-
       ser.reset();
       ser.serialize(it);
       if(it instanceof Bin) {

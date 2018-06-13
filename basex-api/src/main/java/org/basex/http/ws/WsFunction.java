@@ -26,7 +26,7 @@ import org.basex.util.*;
  */
 public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   /**
-   * Constructor.
+   * The Constructor.
    * @param function associated user function
    * @param qc query context
    * @param module associated module
@@ -35,13 +35,13 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
     super(function, qc, module);
   }
 
-  /** The Path of the WsXqFunction. */
+  /** The Path of the WsFunction. */
   public WsPath path;
 
   /**
-   * Checks if an WEbsocket request matches this Annotation.
+   * Checks if an Websocket request matches this Annotation.
    * @param ann Annotation the annotation parameter
-   * @return result of check
+   * @return boolean Result of the Check
    */
   public boolean matches(final Annotation ann) {
     boolean found = false;
@@ -54,10 +54,10 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   }
 
   /**
-   * Checks if an WEbsocket request matches this Annotation and Path.
+   * Checks if an Websocket request matches this Annotation and Path.
    * @param ann Annotation the annotation parameter
    * @param pPath The Path to compare to
-   * @return result of check
+   * @return boolean Result of the check
    */
   public boolean matches(final Annotation ann, final WsPath pPath) {
     boolean found = false;
@@ -70,7 +70,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   }
 
   /**
-   * Checks a function for Websocket and permission Annotations.
+   * Checks a function for Websocket Annotations.
    * @return {@code true} if function contains relevant annotations
    * @throws Exception exception
    */
@@ -148,18 +148,18 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   }
 
   /**
-   * Processes the websocket request. Parses new modules and discards obsolete ones.
+   * Processes the Websocket request. Parses new modules and discards obsolete ones.
    * @param conn Websocket connection
    * @param message The WebsocketMessage
-   * @param resonse The Wsseriaizer
+   * @param response The WSResponse
    * @param header The header to set
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
-  public boolean process(final WsConnection conn, final Object message, final WsResponse resonse,
+  public boolean process(final WsConnection conn, final Object message, final WsResponse response,
       final Map<String, String> header) throws Exception {
     try {
-      return module.process(conn, this, message, resonse, header);
+      return module.process(conn, this, message, response, header);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;

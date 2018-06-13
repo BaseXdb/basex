@@ -18,9 +18,9 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- *  This abstract class defines common Methods of WebFunctions.
+ * This abstract class defines common Methods of WebFunctions.
  *
- *  @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-18, BSD License
  */
 public abstract class WebFunction {
   /** Single template pattern. */
@@ -35,13 +35,13 @@ public abstract class WebFunction {
   public final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /**
-   * Constructor.
+   * The Constructor.
    * @param function associated user function
    * @param qc query context
    * @param module associated module
    */
-  protected WebFunction(final StaticFunc function,
-      final QueryContext qc, final RestXqModule module) {
+  protected WebFunction(final StaticFunc function, final QueryContext qc,
+      final RestXqModule module) {
     this.function = function;
     this.module = module;
     output = qc.serParams();

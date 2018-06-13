@@ -28,7 +28,7 @@ public class StandardWs extends WebSocketAdapter {
 
   /**
    * The UUID of the Websocket.
-   * */
+   */
   private String id;
 
   /**
@@ -38,13 +38,13 @@ public class StandardWs extends WebSocketAdapter {
 
   /**
    * The HeaderParams.
-   * */
+   */
   private Map<String, String> headerParams = new HashMap<>();
 
   /**
    * Constructor.
    * @param pPath as a String
-   * */
+   */
   public StandardWs(final String pPath) {
     super();
     path = new WsPath(pPath);
@@ -52,12 +52,9 @@ public class StandardWs extends WebSocketAdapter {
 
   @Override
   public void onWebSocketConnect(final Session sess) {
-    // Sets Session and Remote in Superclass
     super.onWebSocketConnect(sess);
-
     UpgradeRequest ur = sess.getUpgradeRequest();
 
-    // Add to the WebSocketRoom
     if(this.path != null) {
       id = WsPool.getInstance().joinChannel(this, path.toString());
     } else {
@@ -73,7 +70,6 @@ public class StandardWs extends WebSocketAdapter {
     headerParams.put("IsSecure", String.valueOf(ur.isSecure()));
     headerParams.put("RequestURI", ur.getRequestURI().toString());
     headerParams.put("id", id);
-    // The Headers of the upgraderequest we are interested in
     List<String> headerKeys = new ArrayList<>();
     Collections.addAll(headerKeys, "Host", "Sec-WebSocket-Version");
     sess.getUpgradeRequest().getHeaders().forEach((k, v) -> {
@@ -81,11 +77,9 @@ public class StandardWs extends WebSocketAdapter {
         headerParams.put(k, v.get(0));
       }
     });
-    ;
 
-    // Create new WebsocketConnection
-    wsconnection = new WsConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(),
-        sess, this.path.toString());
+    wsconnection = new WsConnection(sess.getUpgradeRequest(), sess.getUpgradeResponse(), sess,
+        this.path.toString());
     findAndProcess(Annotation._WS_CONNECT, null, headerParams);
   }
 
@@ -106,11 +100,7 @@ public class StandardWs extends WebSocketAdapter {
   @Override
   public void onWebSocketClose(final int statusCode, final String reason) {
     findAndProcess(Annotation._WS_CLOSE, null, null);
-
-    // Resets Session and Remote in Superclass
     super.onWebSocketClose(statusCode, reason);
-
-    // Remove the user from the Room
     if(path == null) {
       WsPool.getInstance().remove(id);
     } else {
@@ -126,7 +116,6 @@ public class StandardWs extends WebSocketAdapter {
    */
   @Override
   public void onWebSocketError(final Throwable cause) {
-    // Remove the user from the Room
     if(path == null) {
       WsPool.getInstance().remove(id);
     } else {
@@ -134,7 +123,6 @@ public class StandardWs extends WebSocketAdapter {
     }
 
     findAndProcess(Annotation._WS_ERROR, cause.toString(), headerParams);
-    cause.printStackTrace(System.err);
     super.getSession().close();
   }
 
@@ -147,7 +135,6 @@ public class StandardWs extends WebSocketAdapter {
   private void findAndProcess(final Annotation ann, final Object msg,
       final Map<String, String> header) {
     final RestXqModules rxm = RestXqModules.get(wsconnection.context);
-    // select the closest match for this request
     WsFunction func = null;
     try {
       func = rxm.find(wsconnection, ann);
@@ -155,7 +142,6 @@ public class StandardWs extends WebSocketAdapter {
       if(func == null) wsconnection.error(HTTPCode.NO_XQUERY.toString(), 500);
       if(func != null && response != null) func.process(wsconnection, msg, response, header);
     } catch(Exception e) {
-      e.printStackTrace();
       wsconnection.error(e.getMessage(), 500);
     }
   }

@@ -8,12 +8,12 @@ package org.basex.http.util;
  */
 public abstract class WebPath {
   /**
-   * Path.
+   * The Path.
    * */
   protected final String path;
 
   /**
-   * Constructor.
+   * The Constructor.
    * @param path The Path
    */
   protected WebPath(final String path) {

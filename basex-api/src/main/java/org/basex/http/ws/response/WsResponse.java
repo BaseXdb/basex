@@ -5,7 +5,8 @@ import org.basex.http.ws.*;
 import org.basex.query.*;
 
 /**
- * Represents the Interface for a WebsocketSerializer.
+ * Represents the Interface for a WebsocketResponse. The Responses can be different for
+ * different subprotocols.
  * @author BaseX Team 2005-18, BSD License
  */
 public interface WsResponse {

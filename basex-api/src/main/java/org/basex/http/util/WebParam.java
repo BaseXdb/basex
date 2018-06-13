@@ -4,7 +4,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
- * This class contains a single RESTXQ parameter.
+ * This class contains a single Web parameter.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
@@ -18,7 +18,7 @@ public final class WebParam {
   public final Value value;
 
   /**
-   * Constructor.
+   * The Constructor.
    * @param var variable name
    * @param name name of parameter
    * @param value default value

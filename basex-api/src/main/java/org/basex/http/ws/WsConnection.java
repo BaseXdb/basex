@@ -59,11 +59,9 @@ public class WsConnection implements ClientInfo {
     return sess.getRemoteAddress().toString();
   }
 
-//@TODO: Implement
   @Override
   public String clientName() {
-    // TODO Auto-generated method stub
-    return null;
+    return context.user().name();
   }
 
   /**
