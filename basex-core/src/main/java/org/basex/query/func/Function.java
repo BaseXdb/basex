@@ -817,6 +817,10 @@ public enum Function {
       arg(STR_O, BLN_O, MAP_ZO), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OPTION(DbOption.class, "option(name)", arg(STR_ZO), ITEM_O, DB_URI),
+  /** XQuery function (legacy). */
+  _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), DB_URI),
+  /** XQuery function (legacy). */
+  _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_PATH(DbPath.class, "path(node)", arg(NOD_O), STR_O, DB_URI),
   /** XQuery function. */
@@ -1392,6 +1396,9 @@ public enum Function {
   /** XQuery function. */
   _XQUERY_PARSE_URI(XQueryParseUri.class, "parse-uri(uri[,options])",
       arg(STR_O, MAP_ZO), NOD_O, flag(NDT), XQUERY_URI),
+  /** XQuery function (legacy). */
+  _XQUERY_UPDATE(XQueryUpdate.class, "update(string[,bindings[,options]])",
+      arg(STR_O, MAP_ZO, MAP_ZO), EMP, flag(UPD), XQUERY_URI),
 
   // XSLT Module
 
