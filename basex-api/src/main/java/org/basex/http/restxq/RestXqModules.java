@@ -332,7 +332,6 @@ public final class RestXqModules {
    */
   private List<WsFunction> findListWsXqFunctions(final WsConnection conn,
       final Annotation ann) throws Exception {
-
     // collect all functions
     final ArrayList<WsFunction> list = new ArrayList<>();
     for(final RestXqModule mod : cache(conn.context).values()) {

@@ -47,6 +47,7 @@ public abstract class WsAdapter  extends WebSocketAdapter {
     UpgradeRequest ur = sess.getUpgradeRequest();
 
     if(this.path != null) {
+      System.out.println("join channel " + path.toString());
       id = WsPool.getInstance().joinChannel(this, path.toString());
     } else {
       id = WsPool.getInstance().join(this);
@@ -113,7 +114,9 @@ public abstract class WsAdapter  extends WebSocketAdapter {
     try {
       func = rxm.find(wsconnection, ann);
       // If no matching XQuery-Function, throw Error
-      if(func == null) wsconnection.error(Util.info(XQUERY_MISSING_X, ann.toString()), 500);
+      if(func == null) {
+        wsconnection.error(Util.info(XQUERY_MISSING_X, ann.toString()), 500);
+        }
       if(func != null && response != null) func.process(wsconnection, msg, response, header);
     } catch(Exception e) {
       wsconnection.error(e.getMessage(), 500);

@@ -124,6 +124,19 @@ public abstract class StompFrame {
   }
 
   /**
+   * Appends the found STOMP-Headers to the given Header-Map.
+   * @param pHeaderMap Map<String,String>
+   * */
+  public void appendHeader(final Map<String, String> pHeaderMap) {
+    header.forEach((k, v) -> {
+      if(k.equals("id")) {
+        pHeaderMap.put("stompId", v);
+      } else {
+        pHeaderMap.put(k, v);
+      }
+    });
+  }
+  /**
    * Returns the Body.
    * @return String body
    * */

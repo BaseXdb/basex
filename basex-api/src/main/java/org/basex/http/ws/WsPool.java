@@ -32,9 +32,9 @@ public class WsPool {
   private HashMap<String, WebSocketAdapter> members = new HashMap<>();
 
   /**
-   * The members of the Pool. WebSocketAdapter -> ID.
+   * The members of the Pool. WebSocketAdapter -> List<ID>.
    */
-  private HashMap<WebSocketAdapter, String> membersInv = new HashMap<>();
+  private HashMap<WebSocketAdapter, List<String>> membersInv = new HashMap<>();
 
   /**
    * The List of Members per Channel.
@@ -49,7 +49,13 @@ public class WsPool {
   public String join(final WebSocketAdapter socket) {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
-    membersInv.put(socket, uniqueID);
+
+    List<String> membersinvids = membersInv.get(socket);
+    if(membersinvids == null) {
+      membersinvids = new ArrayList<>();
+    }
+    membersinvids.add(uniqueID);
+    membersInv.put(socket, membersinvids);
     return uniqueID;
   }
 
@@ -62,7 +68,14 @@ public class WsPool {
   public String joinChannel(final WebSocketAdapter socket, final String channel) {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
-    membersInv.put(socket, uniqueID);
+    // Add uniqueId to membersinvid-list
+    List<String> membersinvids = membersInv.get(socket);
+    if(membersinvids == null) {
+      membersinvids = new ArrayList<>();
+    }
+    membersinvids.add(uniqueID);
+    membersInv.put(socket, membersinvids);
+
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     if(channelMembers == null) {
       channelMembers = new ArrayList<>();
@@ -92,7 +105,17 @@ public class WsPool {
       final String id) {
     WebSocketAdapter socketM = members.get(id);
     members.remove(id);
-    membersInv.remove(socketM);
+
+    List<String> membersinvids = membersInv.get(socketM);
+    if(membersinvids == null) {
+      membersinvids = new ArrayList<>();
+    }
+    membersinvids.remove(id);
+    if(membersinvids.isEmpty()) {
+      membersInv.remove(socketM);
+    }
+    membersInv.put(socketM, membersinvids);
+
     List<WebSocketAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
@@ -108,15 +131,19 @@ public class WsPool {
    */
   public void broadcast(final Object message) {
     if(message == null) return;
-    members.forEach((k, v) -> {
-      if(!v.getSession().isOpen()) {
-        membersInv.remove(v);
-        members.remove(k);
-      } else {
-        RemoteEndpoint reMember = v.getSession().getRemote();
-        checkAndSend(message, reMember);
-      }
-    });
+    try {
+      members.forEach((k, v) -> {
+        if((v.getSession() == null) || (!v.getSession().isOpen())) {
+          membersInv.remove(v);
+          members.remove(k);
+        } else {
+          RemoteEndpoint reMember = v.getSession().getRemote();
+          checkAndSend(message, reMember);
+        }
+      });
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -152,9 +179,11 @@ public class WsPool {
     }
     for(WebSocketAdapter member : channelMembers) {
       if(!member.getSession().isOpen()) {
-        String id = membersInv.get(member);
+        List<String> ids = membersInv.get(member);
         membersInv.remove(member);
-        members.remove(id);
+        ids.forEach((id) -> {
+          members.remove(id);
+        });
       } else {
         RemoteEndpoint reMember = member.getSession().getRemote();
         checkAndSend(message, reMember);
@@ -175,11 +204,14 @@ public class WsPool {
       return;
     }
     for(WebSocketAdapter member : channelMembers) {
-      String id = membersInv.get(member);
-      if(!pId.toJava().equals(id)) {
+      List<String> ids = membersInv.get(member);
+      if(!ids.contains(pId.toJava())) {
         if(!member.getSession().isOpen()) {
+          List<String> pids = membersInv.get(member);
           membersInv.remove(member);
-          members.remove(id);
+          pids.forEach((id) -> {
+            members.remove(id);
+          });
         } else {
           RemoteEndpoint reMember = member.getSession().getRemote();
           checkAndSend(message, reMember);

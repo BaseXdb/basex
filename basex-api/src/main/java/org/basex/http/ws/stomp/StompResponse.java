@@ -135,10 +135,28 @@ public class StompResponse implements WsResponse {
     }
   }
 
+  // @TODO [JF] Implement stomp response, not standardresponse!
   @Override
-  public boolean create(WsConnection conn, WsFunction wxf, QueryContext qc)
+  public boolean create(final WsConnection conn, final WsFunction wxf, final QueryContext qc)
       throws IOException, QueryException {
-    // TODO Auto-generated method stub
-    return false;
+    ArrayOutput ao = new ArrayOutput();
+    Serializer ser = Serializer.get(ao, wxf.output);
+    Iter iter = qc.iter();
+    for(Item it; (it = iter.next()) != null;) {
+      // Dont send anything if Websocket gets closed because the Connection is already
+      // closed
+      if(wxf.matches(Annotation._WS_CLOSE)) continue;
+      ser.reset();
+      ser.serialize(it);
+      if(it instanceof Bin) {
+        //final byte[] bytes = ((Bin) it).binary(null);
+        final byte[] bytes = ao.toArray();
+        conn.sess.getRemote().sendBytes(ByteBuffer.wrap(bytes));
+      } else {
+        conn.sess.getRemote().sendString(ao.toString());
+      }
+      ao.reset();
+    }
+    return true;
   }
 }

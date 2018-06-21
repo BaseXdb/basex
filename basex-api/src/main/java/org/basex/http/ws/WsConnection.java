@@ -29,7 +29,7 @@ public class WsConnection implements ClientInfo {
   /**
    * The path of the Connection.
    * */
-  private final String path;
+  private String path;
   /**
    * The corresponding session for the connection.
    * */
@@ -70,6 +70,14 @@ public class WsConnection implements ClientInfo {
    */
   public String path() {
     return this.path;
+  }
+
+  /**
+   * Updates the Path.
+   * @param pPath String
+   * */
+  public void updatePath(final String pPath) {
+    this.path = pPath;
   }
 
   /**

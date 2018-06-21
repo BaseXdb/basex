@@ -15,7 +15,7 @@ public class WsCreator implements WebSocketCreator {
     // Get the PathInfo of the WebSocket
     String path = req.getHttpServletRequest().getPathInfo();
     if(path == null) path = "/";
-
+    System.out.println(req.getSubProtocols());
     // Check for subprotocols, take the first matching
     for (String subprotocol : req.getSubProtocols()) {
       if("v10.stomp".equals(subprotocol)) {
