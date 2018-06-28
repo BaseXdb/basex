@@ -59,15 +59,15 @@ public final class ViewData {
     tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(data.text(p, true))).substring(1));
     for(int i = pres.size() - 1; i >= 0; i--) {
       p = pres.get(i);
-      k = data.kind(pre);
+      k = data.kind(p);
       final byte[] txt;
       switch(k) {
         case Data.TEXT: txt = TEXT; break;
         case Data.COMM: txt = COMMENT; break;
         case Data.PI:   txt = PI; break;
-        case Data.ATTR: txt = Token.concat(ATT, data.name(pre, k)); break;
+        case Data.ATTR: txt = Token.concat(ATT, data.name(p, k)); break;
         // element node
-        default: txt = data.name(pre, k); break;
+        default: txt = data.name(p, k); break;
       }
       tb.add('/').add(txt);
     }
