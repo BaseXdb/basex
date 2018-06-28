@@ -44,6 +44,9 @@ public final class WebModuleTest extends AdvancedQueryTest {
 
     query(_WEB_REDIRECT.args("a/b", " map { 'a':'b' }") +
         "/*:response/*:header[@name = 'location']/@value/string()", "a/b?a=b");
+
+    // GH1585
+    query("count((" + _WEB_REDIRECT.args("a") + " update {})/http:response)", 1);
   }
 
   /** Test method. */
@@ -69,6 +72,10 @@ public final class WebModuleTest extends AdvancedQueryTest {
     // status/message arguments
     query(_WEB_RESPONSE_HEADER.args(" map {}", " map {}", " map {'status':200,'message':'OK'}") +
         " ! (@status, @message) ! string()", "200\nOK");
+
+    // GH1585
+    query("count((" + _WEB_RESPONSE_HEADER.args() + " update {})/http:response)", 1);
+    query("count((" + _WEB_RESPONSE_HEADER.args() + " update {})/output:*)", 1);
   }
 
   /** Test method. */
