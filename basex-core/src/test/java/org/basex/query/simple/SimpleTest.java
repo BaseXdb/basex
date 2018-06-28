@@ -15,6 +15,24 @@ public final class SimpleTest extends QueryTest {
     queries = new Object[][] {
       { "Number 1", decimal(2), "1.+1." },
 
+      { "Float 1", "xs:float('Infinity')" },
+      { "Float 2", "xs:float('infinity')" },
+      { "Float 3", booleans(true), "xs:float('INF') > 0" },
+      { "Float 4", "xs:float('inf')" },
+      { "Float 5", "xs:float('-Infinity')" },
+      { "Float 6", "xs:float('-infinity')" },
+      { "Float 7", booleans(true), "xs:float('-INF') < 0" },
+      { "Float 8", "xs:float('-inf')" },
+
+      { "Double 1", "xs:double('Infinity')" },
+      { "Double 2", "xs:double('infinity')" },
+      { "Double 3", booleans(true), "xs:double('INF') > 0" },
+      { "Double 4", "xs:double('inf')" },
+      { "Double 5", "xs:double('-Infinity')" },
+      { "Double 6", "xs:double('-infinity')" },
+      { "Double 7", booleans(true), "xs:double('-INF') < 0" },
+      { "Double 8", "xs:double('-inf')" },
+
       { "Annotation 1", integers(1), "declare %local:x(.1) variable $a := 1; $a" },
       { "Annotation 2", integers(1), "declare %local:x(1.) variable $a := 1; $a" },
       { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
