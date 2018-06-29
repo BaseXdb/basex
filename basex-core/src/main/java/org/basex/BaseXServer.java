@@ -135,6 +135,7 @@ public final class BaseXServer extends CLI implements Runnable {
     while(running) {
       try {
         final Socket s = socket.accept();
+        s.setTcpNoDelay(true);
         if(stopFile.exists()) {
           close();
         } else {
