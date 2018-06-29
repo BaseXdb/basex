@@ -232,7 +232,7 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Adds a namespace declaration for the namespace in the given QName.
+   * Adds a namespace declaration for the QName of this element.
    * @return self reference
    */
   public FElem declareNS() {

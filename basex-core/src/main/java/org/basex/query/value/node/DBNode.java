@@ -159,7 +159,7 @@ public class DBNode extends ANode {
       d = data.textDbl(pre, type == NodeType.TXT);
     }
     // GH-1206: parse invalid values again
-    return Double.isNaN(d) ? Dbl.parse(this, info) : d;
+    return Double.isNaN(d) ? Dbl.parse(string(), info) : d;
   }
 
   @Override

@@ -38,6 +38,10 @@ public final class Token {
   public static final byte[] INF = token("INF");
   /** Token '-INF'. */
   public static final byte[] NINF = token("-INF");
+  /** Token 'Infinity'. */
+  public static final byte[] INFINITY = token("Infinity");
+  /** Token '-Infinity'. */
+  public static final byte[] NINFINITY = token("-Infinity");
   /** Minimum long value. */
   public static final byte[] MINLONG = token("-9223372036854775808");
   /** Space. */

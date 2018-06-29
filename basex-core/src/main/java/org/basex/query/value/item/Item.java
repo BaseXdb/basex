@@ -126,7 +126,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public float flt(final InputInfo info) throws QueryException {
-    return Flt.parse(this, info);
+    return Flt.parse(string(info), info);
   }
 
   /**
@@ -136,7 +136,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public double dbl(final InputInfo info) throws QueryException {
-    return Dbl.parse(this, info);
+    return Dbl.parse(string(info), info);
   }
 
   /**
