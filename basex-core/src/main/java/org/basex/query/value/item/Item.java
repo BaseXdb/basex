@@ -256,10 +256,9 @@ public abstract class Item extends Value {
 
   /**
    * Returns a materialized, context-independent version of this item.
-   * {@code null} is returned if the item cannot be materialized
    * @param qc query context (if {@code null}, process cannot be interrupted)
    * @param copy create full copy
-   * @return item copy
+   * @return item copy, or {@code null}) if the item cannot be materialized
    */
   @SuppressWarnings("unused")
   public Item materialize(final QueryContext qc, final boolean copy) {

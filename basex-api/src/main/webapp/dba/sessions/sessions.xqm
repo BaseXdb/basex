@@ -42,7 +42,7 @@ function dba:sessions(
           let $headers := (
             map { 'key': 'id', 'label': 'ID', 'type': 'id' },
             map { 'key': 'name', 'label': 'Name' },
-            map { 'key': 'vaule', 'label': 'Value' },
+            map { 'key': 'value', 'label': 'Value' },
             map { 'key': 'access', 'label': 'Last Access', 'type': 'dateTime', 'order': 'desc' },
             map { 'key': 'you', 'label': 'You' }
           )
@@ -55,7 +55,7 @@ function dba:sessions(
             let $value := try {
               Sessions:get($id, $name)
             } catch Sessions:get {
-              (: non-XQuery session value :)
+              '–' (: non-XQuery session value :)
             }
             let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
             order by $access descending

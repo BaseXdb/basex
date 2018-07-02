@@ -85,23 +85,27 @@ function dba:files(
               'date': file:last-modified($file),
               'bytes': file:size($file),
               'action': function() {
-                util:item-join((
-                  if($dir) then () else html:link('Download', 'file/' || encode-for-uri($name)),
-                  if($dir or not(ends-with($name, '.xq') or ends-with($name, '.xqm'))) then () else
-                    html:link('Edit', 'queries', map { 'file': $name }),
-                  if($dir or not(ends-with($name, '.xq'))) then () else (
-                    let $job := (
-                      let $uri := replace(file:path-to-uri($file), '^file:/*', '')
-                      return $jobs[replace(., '^file:/*', '') = $uri]
-                    )
-                    let $id := string($job/@id)
-                    return if(empty($job)) then (
-                      html:link('Start', 'file-start', map { 'file': $name })
-                    ) else (
-                      html:link('Job', 'jobs', map { 'job': $id })
-                    )
+                util:item-join(
+                  if($dir) then () else (
+                    html:link('Download', 'file/' || encode-for-uri($name)),
+                    if(matches($name, '\.xqm?$')) then (
+                      html:link('Edit', 'queries', map { 'file': $name })
+                    ) else (),
+                    if(matches($name, '\.xq$')) then (
+                      (: choose first running job :)
+                      let $job := head(
+                        let $uri := replace(file:path-to-uri($file), '^file:/*', '')
+                        return $jobs[replace(., '^file:/*', '') = $uri]
+                      )
+                      let $id := string($job/@id)
+                      return if(empty($job)) then (
+                        html:link('Start', 'file-start', map { 'file': $name })
+                      ) else (
+                        html:link('Job', 'jobs', map { 'job': $id })
+                      )
+                    ) else ()
                   )
-                ), ' · ')
+                , ' · ')
               }
             }
           let $buttons := html:button('file-delete', 'Delete', true())

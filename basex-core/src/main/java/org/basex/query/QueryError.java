@@ -1648,7 +1648,7 @@ public enum QueryError {
    * Chops the specified value to a maximum size.
    * @param value value
    * @param info input info (can be {@code null}; an empty string will be returned if
-   * {@link InputInfo#internal()} returns null)
+   * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
   public static byte[] chop(final Object value, final InputInfo info) {
@@ -1661,7 +1661,7 @@ public enum QueryError {
    * Chops the specified string to a maximum size.
    * @param string string
    * @param info input info (can be {@code null}; an empty string will be returned if
-   * {@link InputInfo#internal()} returns null)
+   * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
   public static byte[] chop(final String string, final InputInfo info) {
@@ -1672,7 +1672,7 @@ public enum QueryError {
    * Chops the specified token to a maximum size.
    * @param token token
    * @param info input info (can be {@code null}; an empty string will be returned if
-   * {@link InputInfo#internal()} returns null)
+   * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
   public static byte[] chop(final byte[] token, final InputInfo info) {
