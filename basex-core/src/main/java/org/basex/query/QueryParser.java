@@ -623,7 +623,6 @@ public class QueryParser extends InputParser {
         map.put(s, stringLiteral());
         break;
       }
-      if(map.isEmpty()) throw error(NODECLFORM_X, prop);
     } while(n != map.size());
 
     // completes the format declaration

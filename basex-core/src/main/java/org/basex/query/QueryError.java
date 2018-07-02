@@ -867,8 +867,6 @@ public enum QueryError {
   /** Error code. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** Error code. */
-  NODECLFORM_X(XPST, 3, "Decimal-format property '%' is invalid."),
-  /** Error code. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** Error code. */
   NOSWITCH(XPST, 3, "Incomplete switch expression."),
