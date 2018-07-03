@@ -1,7 +1,6 @@
 package org.basex.http.restxq;
 
 import org.basex.http.*;
-import org.basex.query.QueryException;
 import org.basex.query.value.item.QNm;
 import org.basex.util.InputInfo;
 
@@ -24,9 +23,9 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * Constructor.
    * @param path path
    * @param info input info
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  RestXqPath(final String path, final InputInfo info) throws QueryException {
+  RestXqPath(final String path, final InputInfo info) throws Exception {
     this.path = path;
     matcher = RestXqPathMatcher.parse(path, info);
   }

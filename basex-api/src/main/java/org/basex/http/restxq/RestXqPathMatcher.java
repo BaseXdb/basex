@@ -7,7 +7,6 @@ import java.math.*;
 import java.util.*;
 import java.util.regex.*;
 
-import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -91,9 +90,9 @@ final class RestXqPathMatcher {
    * @param path path template string to be parsed
    * @param info input info
    * @return parsed path template
-   * @throws QueryException if given template is invalid
+   * @throws Exception if given template is invalid
    */
-  static RestXqPathMatcher parse(final String path, final InputInfo info) throws QueryException {
+  static RestXqPathMatcher parse(final String path, final InputInfo info) throws Exception {
     if(path.isEmpty()) return EMPTY;
 
     final ArrayList<QNm> varNames = new ArrayList<>();
@@ -114,7 +113,8 @@ final class RestXqPathMatcher {
         decodeAndEscape(literals, result, info);
 
         // variable
-        if(!i.hasNext() || i.nextNonWS() != '$') throw error(info, INV_TEMPLATE_X, path);
+        if(!i.hasNext() || i.nextNonWS() != '$')
+          throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
 
         // default variable regular expression
         regex.append("[^/]+?");
@@ -126,7 +126,7 @@ final class RestXqPathMatcher {
           if(ch == '=') {
             regex.setLength(0);
             addRegex(i, regex);
-            if(regex.length() == 0) throw error(info, INV_TEMPLATE_X, path);
+            if(regex.length() == 0) throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
             break;
           } else if(ch == '{') {
             ++braces;
@@ -139,7 +139,7 @@ final class RestXqPathMatcher {
         }
 
         final byte[] var = variable.toArray();
-        if(!XMLToken.isQName(var)) throw error(info, INV_VARNAME_X, variable);
+        if(!XMLToken.isQName(var)) throw RestXqFunction.error(info, INV_VARNAME_X, variable);
         varNames.add(new QNm(var));
         variable.reset();
         varsPos.set(segment);
@@ -177,14 +177,14 @@ final class RestXqPathMatcher {
    * @param literals literals to escape
    * @param info input info
    * @param result string builder where the escaped literals will be appended to.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result,
-      final InputInfo info) throws QueryException {
+      final InputInfo info) throws Exception {
 
     if(literals.length() > 0) {
       final byte[] path = Token.decodeUri(Token.token(literals.toString()));
-      if(path == null) throw error(info, INV_ENCODING_X, literals);
+      if(path == null) throw RestXqFunction.error(info, INV_ENCODING_X, literals);
       final TokenBuilder tb = new TokenBuilder(path.length);
       for(final byte b : path) {
         if(".^&!?-:<>()[]{}$=,*+|".indexOf(b) >= 0) tb.addByte((byte) '\\');
@@ -193,17 +193,6 @@ final class RestXqPathMatcher {
       result.append(tb.toString());
       literals.setLength(0);
     }
-  }
-
-  /**
-   * Creates a query exception.
-   * @param info input info
-   * @param msg exception message
-   * @param e text extensions
-   * @return query exception
-   */
-  private static QueryException error(final InputInfo info, final String msg, final Object... e) {
-    return QueryError.BASEX_RESTXQ_X.get(info, Util.info(msg, e));
   }
 
   /** Character iterator. */

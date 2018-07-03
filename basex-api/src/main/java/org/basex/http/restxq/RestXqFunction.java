@@ -241,10 +241,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param body variable to which the HTTP request body to be bound (optional)
    * @param declared variable declaration flags
    * @param info input info
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   private void addMethod(final String method, final Item body, final boolean[] declared,
-      final InputInfo info) throws QueryException {
+      final InputInfo info) throws Exception {
 
     if(body != null && !body.isEmpty()) {
       final HttpMethod m = HttpMethod.get(method);
@@ -279,11 +279,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param args arguments
    * @param ext extended processing information (can be {@code null})
    * @param qc query context
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
   void bind(final HTTPConnection conn, final Expr[] args, final Object ext, final QueryContext qc)
-      throws QueryException, IOException {
+      throws Exception {
 
     // bind variables from segments
     if(path != null) {
@@ -354,9 +353,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Creates an exception with the specified message.
    * @param msg message
    * @param ext error extension
-   * @return exception
+   * @return I/O exception (or query exception if {@link Prop#debug} is enabled
    */
-  QueryException error(final String msg, final Object... ext) {
+  Exception error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
   }
 
@@ -365,10 +364,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param info input info
    * @param msg message
    * @param ext error extension
-   * @return exception
+   * @return I/O exception (or query exception if {@link Prop#debug} is enabled
    */
-  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
-    return BASEX_RESTXQ_X.get(info, Util.info(msg, ext));
+  static Exception error(final InputInfo info, final String msg, final Object... ext) {
+    final String desc = Util.info(msg, ext);
+    return Prop.debug ? BASEX_RESTXQ_X.get(info, desc) : new BaseXException(desc);
   }
 
   @Override
@@ -385,9 +385,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param tmp template string
    * @param declared variable declaration flags
    * @return resulting variable
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  QNm checkVariable(final String tmp, final boolean... declared) throws QueryException {
+  QNm checkVariable(final String tmp, final boolean... declared) throws Exception {
     final Matcher m = TEMPLATE.matcher(tmp);
     if(!m.find()) throw error(INV_TEMPLATE_X, tmp);
     final byte[] vn = token(m.group(1));
@@ -402,10 +402,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param type allowed type
    * @param declared variable declaration flags
    * @return resulting variable
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   private QNm checkVariable(final QNm name, final Type type, final boolean[] declared)
-      throws QueryException {
+      throws Exception {
 
     if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
     int p = -1;
@@ -526,9 +526,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param ann annotation
    * @param declared variable declaration flags
    * @return parameter
-   * @throws QueryException HTTP exception
+   * @throws Exception exception
    */
-  private RestXqParam param(final Ann ann, final boolean... declared) throws QueryException {
+  private RestXqParam param(final Ann ann, final boolean... declared) throws Exception {
     // name of parameter
     final Item[] args = ann.args();
     final String name = toString(args[0]);
@@ -544,9 +544,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /**
    * Creates an error function.
    * @param ann annotation
-   * @throws QueryException HTTP exception
+   * @throws Exception exception
    */
-  private void error(final Ann ann) throws QueryException {
+  private void error(final Ann ann) throws Exception {
     if(error == null) error = new RestXqError();
 
     // name of parameter

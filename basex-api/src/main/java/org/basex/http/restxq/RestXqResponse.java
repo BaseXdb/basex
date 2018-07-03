@@ -215,9 +215,9 @@ final class RestXqResponse {
 
   /**
    * Checks if the HEAD method was specified.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  private void checkHead() throws QueryException {
+  private void checkHead() throws Exception {
     if(func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name()))
       throw func.error(HEAD_METHOD);
   }
