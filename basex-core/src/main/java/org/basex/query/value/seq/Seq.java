@@ -58,7 +58,7 @@ public abstract class Seq extends Value {
     if(homo) {
       // shortcut for strings (avoid intermediate token representation)
       if(type == AtomType.STR) {
-        final StringList tmp = new StringList();
+        final StringList tmp = new StringList((int) size);
         for(final Item item : this) tmp.add(item.string(null));
         return tmp.finish();
       }
