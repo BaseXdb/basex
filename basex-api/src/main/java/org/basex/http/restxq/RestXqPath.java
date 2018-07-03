@@ -1,11 +1,11 @@
 package org.basex.http.restxq;
 
-import org.basex.http.*;
-import org.basex.query.value.item.QNm;
-import org.basex.util.InputInfo;
+import java.util.*;
 
-import java.util.List;
-import java.util.Map;
+import org.basex.http.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This class represents the path of a RESTXQ function.
@@ -23,9 +23,9 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * Constructor.
    * @param path path
    * @param info input info
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
-  RestXqPath(final String path, final InputInfo info) throws Exception {
+  RestXqPath(final String path, final InputInfo info) throws QueryException {
     this.path = path;
     matcher = RestXqPathMatcher.parse(path, info);
   }

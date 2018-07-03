@@ -6,6 +6,8 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import javax.servlet.*;
+
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
@@ -39,9 +41,10 @@ final class RestXqModule {
    * Checks the module for RESTXQ annotations.
    * @param ctx database context
    * @return {@code true} if module contains relevant annotations
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  boolean parse(final Context ctx) throws Exception {
+  boolean parse(final Context ctx) throws QueryException, IOException {
     functions.clear();
 
     // loop through all functions
@@ -88,10 +91,12 @@ final class RestXqModule {
    * @param func function to be processed
    * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   * @throws ServletException servlet exception
    */
   boolean process(final HTTPConnection conn, final RestXqFunction func, final Object ext)
-      throws Exception {
+      throws QueryException, IOException, ServletException {
 
     // create new XQuery instance
     final Context ctx = conn.context;
@@ -112,9 +117,9 @@ final class RestXqModule {
    * Retrieves a query context for the given module.
    * @param ctx database context
    * @return query context
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
-  private QueryContext qc(final Context ctx) throws Exception {
+  private QueryContext qc(final Context ctx) throws QueryException {
     final QueryContext qc = new QueryContext(ctx);
     try {
       qc.parse(string(file.read()), file.path());

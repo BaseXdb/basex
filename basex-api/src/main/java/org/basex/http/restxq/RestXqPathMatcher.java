@@ -7,6 +7,7 @@ import java.math.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -90,9 +91,9 @@ final class RestXqPathMatcher {
    * @param path path template string to be parsed
    * @param info input info
    * @return parsed path template
-   * @throws Exception if given template is invalid
+   * @throws QueryException query exception
    */
-  static RestXqPathMatcher parse(final String path, final InputInfo info) throws Exception {
+  static RestXqPathMatcher parse(final String path, final InputInfo info) throws QueryException {
     if(path.isEmpty()) return EMPTY;
 
     final ArrayList<QNm> varNames = new ArrayList<>();
@@ -177,10 +178,10 @@ final class RestXqPathMatcher {
    * @param literals literals to escape
    * @param info input info
    * @param result string builder where the escaped literals will be appended to.
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result,
-      final InputInfo info) throws Exception {
+      final InputInfo info) throws QueryException {
 
     if(literals.length() > 0) {
       final byte[] path = Token.decodeUri(Token.token(literals.toString()));

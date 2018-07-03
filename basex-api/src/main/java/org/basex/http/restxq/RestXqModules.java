@@ -3,6 +3,7 @@ package org.basex.http.restxq;
 import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
@@ -10,6 +11,7 @@ import java.util.function.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -95,9 +97,12 @@ public final class RestXqModules {
    * @param conn HTTP connection
    * @param error error code (assigned if error function is to be called)
    * @return function, or {@code null} if no function matches
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  RestXqFunction find(final HTTPConnection conn, final QNm error) throws Exception {
+  RestXqFunction find(final HTTPConnection conn, final QNm error)
+      throws QueryException, IOException {
+
     // collect all function candidates
     List<RestXqFunction> funcs = find(conn, error, false);
     if(funcs.isEmpty()) return null;
@@ -129,9 +134,10 @@ public final class RestXqModules {
    * Returns permission functions that match the current request.
    * @param conn HTTP connection
    * @return list of function, ordered by relevance
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  List<RestXqFunction> checks(final HTTPConnection conn) throws Exception {
+  List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
     return find(conn, null, true);
   }
 
@@ -141,10 +147,11 @@ public final class RestXqModules {
    * @param error error code (assigned if error function is to be called)
    * @param perm permission flag
    * @return list of matching functions, ordered by specifity
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private List<RestXqFunction> find(final HTTPConnection conn, final QNm error, final boolean perm)
-      throws Exception {
+      throws QueryException, IOException {
 
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
@@ -237,9 +244,12 @@ public final class RestXqModules {
    * Updates the module cache. Parses new modules and discards obsolete ones.
    * @param ctx database context
    * @return module cache
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private HashMap<String, RestXqModule> cache(final Context ctx) throws Exception {
+  private HashMap<String, RestXqModule> cache(final Context ctx)
+      throws QueryException, IOException {
+
     synchronized(parsed) {
       if(!parsed.get()) {
         if(!path.exists()) throw HTTPCode.NO_RESTXQ.get();
@@ -260,11 +270,12 @@ public final class RestXqModules {
    * @param ctx database context
    * @param cache cached modules
    * @param old old cache
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private static void cache(final Context ctx, final IOFile root,
       final HashMap<String, RestXqModule> cache, final HashMap<String, RestXqModule> old)
-      throws Exception {
+      throws QueryException, IOException {
 
     // check if directory is to be skipped
     final IOFile[] files = root.children();
