@@ -82,18 +82,6 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
   }
 
   /**
-   * Returns an array with all elements as strings.
-   * @return array
-   */
-  public String[] toStringArray() {
-    final int is = size;
-    final byte[][] l = list;
-    final String[] items = new String[is];
-    for(int i = 0; i < is; ++i) items[i] = string(l[i]);
-    return items;
-  }
-
-  /**
    * Sorts the elements.
    * @return self reference
    */

@@ -41,13 +41,13 @@ abstract class ProcFn extends StandardFunc {
     checkAdmin(qc);
 
     // arguments
-    final TokenList tl = new TokenList();
-    tl.add(toToken(exprs[0], qc));
+    final StringList sl = new StringList();
+    sl.add(toToken(exprs[0], qc));
     if(exprs.length > 1) {
       final Iter iter = exprs[1].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) tl.add(toToken(item));
+      for(Item item; (item = qc.next(iter)) != null;) sl.add(toToken(item));
     }
-    final String[] args = tl.toStringArray();
+    final String[] args = sl.finish();
 
     // options
     final ProcOptions opts = toOptions(2, new ProcOptions(), qc);

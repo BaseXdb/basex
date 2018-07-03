@@ -63,13 +63,13 @@ public final class DblSeq extends NativeSeq {
   }
 
   /**
-   * Creates a sequence with the items in the specified expressions.
-   * @param values values
+   * Creates a typed sequence with the items of the specified values.
    * @param size size of resulting sequence
+   * @param values values
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] values, final int size) throws QueryException {
+  public static Value get(final int size, final Value... values) throws QueryException {
     final double[] tmp = new double[size];
     int t = 0;
     for(final Value value : values) {
@@ -80,7 +80,7 @@ public final class DblSeq extends NativeSeq {
         System.arraycopy(seq.values, 0, tmp, t, vs);
         t += vs;
       } else {
-        for(int v = 0; v < vs; v++) tmp[t++] = value.itemAt(v).dbl(null);
+        for(final Item item : value) tmp[t++] = item.dbl(null);
       }
     }
     return get(tmp);

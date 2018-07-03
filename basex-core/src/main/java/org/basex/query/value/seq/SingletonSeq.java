@@ -71,10 +71,7 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Value reverse(final QueryContext qc) {
-    if(value.size() == 1) return this;
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(long i = 0; i < size; i++) vb.add(itemAt(size - i - 1));
-    return vb.value(type);
+    return get(value.reverse(qc), size / value.size());
   }
 
   @Override

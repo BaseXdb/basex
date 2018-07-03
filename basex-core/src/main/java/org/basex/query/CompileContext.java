@@ -233,7 +233,7 @@ public final class CompileContext {
             final Type type = et.intersect(rt);
             if(type != null) {
               seq.type = type;
-              // Indicate that types may not be homogeneous
+              // intersected type may not be exact anymore: invalidate homogeneous flag
               seq.homo = false;
             }
           }

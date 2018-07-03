@@ -367,7 +367,7 @@ final class BigSeq extends TreeSeq {
     final Type tp = type.eq(seq.type) ? type : null;
     if(seq instanceof SmallSeq) {
       // merge with right digit
-      final Item[] newRight = concat(right, ((SmallSeq) seq).elems);
+      final Item[] newRight = concat(right, ((SmallSeq) seq).items);
       final int r = newRight.length;
       if(r <= MAX_DIGIT) return new BigSeq(left, middle, newRight, tp);
       final int mid = r / 2;

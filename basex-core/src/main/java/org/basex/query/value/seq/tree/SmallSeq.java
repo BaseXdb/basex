@@ -19,39 +19,39 @@ import org.basex.util.*;
  */
 final class SmallSeq extends TreeSeq {
   /** The elements. */
-  final Item[] elems;
+  final Item[] items;
 
   /**
    * Constructor.
-   * @param elems elements
-   * @param type type of all elements in this sequence
+   * @param items elements
+   * @param type type of all items in this sequence, can be {@code null}
    */
-  SmallSeq(final Item[] elems, final Type type) {
-    super(elems.length, type);
-    this.elems = elems;
-    assert elems.length >= 2 && elems.length <= MAX_SMALL;
+  SmallSeq(final Item[] items, final Type type) {
+    super(items.length, type);
+    this.items = items;
+    assert items.length >= 2 && items.length <= MAX_SMALL;
   }
 
   @Override
   public Item itemAt(final long index) {
-    return elems[(int) index];
+    return items[(int) index];
   }
 
   @Override
   public TreeSeq reverse(final QueryContext qc) {
-    final int el = elems.length;
+    final int el = items.length;
     final Item[] es = new Item[el];
-    for(int e = 0; e < el; e++) es[e] = elems[el - 1 - e];
+    for(int e = 0; e < el; e++) es[e] = items[el - 1 - e];
     return new SmallSeq(es, type);
   }
 
   @Override
   public TreeSeq insert(final long pos, final Item value, final QueryContext qc) {
-    final int p = (int) pos, n = elems.length;
+    final int p = (int) pos, n = items.length;
     final Item[] out = new Item[n + 1];
-    System.arraycopy(elems, 0, out, 0, p);
+    System.arraycopy(items, 0, out, 0, p);
     out[p] = value;
-    System.arraycopy(elems, p, out, p + 1, n - p);
+    System.arraycopy(items, p, out, p + 1, n - p);
 
     if(n < MAX_SMALL) return new SmallSeq(out, null);
     return new BigSeq(slice(out, 0, MIN_DIGIT), FingerTree.empty(),
@@ -60,24 +60,24 @@ final class SmallSeq extends TreeSeq {
 
   @Override
   public Value remove(final long pos, final QueryContext qc) {
-    final int p = (int) pos, n = elems.length;
-    if(n == 2) return elems[pos == 0 ? 1 : 0];
+    final int p = (int) pos, n = items.length;
+    if(n == 2) return items[pos == 0 ? 1 : 0];
 
     final Item[] out = new Item[n - 1];
-    System.arraycopy(elems, 0, out, 0, p);
-    System.arraycopy(elems, p + 1, out, p, n - 1 - p);
+    System.arraycopy(items, 0, out, 0, p);
+    System.arraycopy(items, p + 1, out, p, n - 1 - p);
     return new SmallSeq(out, type);
   }
 
   @Override
   protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
     final int o = (int) offset, l = (int) length;
-    return new SmallSeq(slice(elems, o, o + l), type);
+    return new SmallSeq(slice(items, o, o + l), type);
   }
 
   @Override
   public TreeSeq concat(final TreeSeq other) {
-    return other.consSmall(elems);
+    return other.consSmall(items);
   }
 
   @Override
@@ -92,12 +92,12 @@ final class SmallSeq extends TreeSeq {
 
       @Override
       public boolean hasNext() {
-        return index < elems.length;
+        return index < items.length;
       }
 
       @Override
       public Item next() {
-        return elems[index++];
+        return items[index++];
       }
 
       @Override
@@ -112,7 +112,7 @@ final class SmallSeq extends TreeSeq {
 
       @Override
       public Item previous() {
-        return elems[--index];
+        return items[--index];
       }
 
       @Override
@@ -137,7 +137,7 @@ final class SmallSeq extends TreeSeq {
     return new BasicIter<Item>(size) {
       @Override
       public Item get(final long i) {
-        return elems[(int) i];
+        return items[(int) i];
       }
 
       @Override
@@ -154,15 +154,15 @@ final class SmallSeq extends TreeSeq {
 
   @Override
   TreeSeq consSmall(final Item[] left) {
-    final int l = left.length, r = elems.length, n = l + r;
+    final int l = left.length, r = items.length, n = l + r;
     if(Math.min(l, r) >= MIN_DIGIT) {
       // both arrays can be used as digits
-      return new BigSeq(left, FingerTree.empty(), elems, null);
+      return new BigSeq(left, FingerTree.empty(), items, null);
     }
 
     final Item[] out = new Item[n];
     System.arraycopy(left, 0, out, 0, l);
-    System.arraycopy(elems, 0, out, l, r);
+    System.arraycopy(items, 0, out, l, r);
     if(n <= MAX_SMALL) return new SmallSeq(out, null);
 
     final int mid = n / 2;
@@ -171,7 +171,7 @@ final class SmallSeq extends TreeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof SmallSeq ? Arrays.equals(elems, ((SmallSeq) obj).elems) :
+    return this == obj || (obj instanceof SmallSeq ? Arrays.equals(items, ((SmallSeq) obj).items) :
       super.equals(obj));
   }
 }

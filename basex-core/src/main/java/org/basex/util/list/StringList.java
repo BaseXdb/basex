@@ -36,6 +36,15 @@ public class StringList extends ObjectList<String, StringList> {
   }
 
   /**
+   * Adds a token.
+   * @param element element to be added
+   * @return self reference
+   */
+  public StringList add(final byte[] element) {
+    return add(Token.string(element));
+  }
+
+  /**
    * Sorts the elements in ascending order, using the standard options.
    * @return self reference
    */

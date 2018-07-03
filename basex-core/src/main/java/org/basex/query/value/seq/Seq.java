@@ -3,8 +3,6 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -13,6 +11,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Sequence, containing at least two items.
@@ -29,7 +28,7 @@ public abstract class Seq extends Value {
   /**
    * Constructor, specifying a type.
    * @param size size
-   * @param type type
+   * @param type exact type, {@code item()*} otherwise
    */
   protected Seq(final long size, final Type type) {
     super(type);
@@ -39,9 +38,38 @@ public abstract class Seq extends Value {
 
   @Override
   public Object toJava() throws QueryException {
-    final ArrayList<Object> obj = new ArrayList<>((int) size);
-    for(final Item item : this) obj.add(item.toJava());
-    return obj.toArray();
+    // Java representation may consume much memory: check again whether sequence is homogeneous
+    if(!homo) {
+      Type tp = null;
+      for(final Item item : this) {
+        if(tp == null) {
+          tp = item.type;
+        } else if(tp != item.type) {
+          tp = null;
+          break;
+        }
+      }
+      if(tp != null) {
+        homo = true;
+        type = tp;
+      }
+    }
+    // try to create custom Java representation
+    if(homo) {
+      // shortcut for strings (avoid intermediate token representation)
+      if(type == AtomType.STR) {
+        final StringList tmp = new StringList();
+        for(final Item item : this) tmp.add(item.string(null));
+        return tmp.finish();
+      }
+      final Value v = get((int) size, type, this);
+      if(v != null) return v.toJava();
+    }
+
+    int t = 0;
+    final Object[] tmp = new Object[(int) size];
+    for(final Item item : this) tmp[t++] = item.toJava();
+    return tmp;
   }
 
   @Override
@@ -239,5 +267,26 @@ public abstract class Seq extends Value {
       break;
     }
     return sb.append(PAREN2).toString();
+  }
+
+  /**
+   * Tries to create a typed sequence with the items of the specified values.
+   * @param size size of resulting sequence
+   * @param values values
+   * @param type type
+   * @return value, or {@code null} if sequence could not be created.
+   * @throws QueryException query exception
+   */
+  public static Value get(final int size, final Type type, final Value... values)
+      throws QueryException {
+
+    if(type == AtomType.STR) return StrSeq.get(size, values);
+    if(type == AtomType.BLN) return BlnSeq.get(size, values);
+    if(type == AtomType.FLT) return FltSeq.get(size, values);
+    if(type == AtomType.DBL) return DblSeq.get(size, values);
+    if(type == AtomType.DEC) return DecSeq.get(size, values);
+    if(type == AtomType.BYT) return BytSeq.get(size, values);
+    if(type != null && type.instanceOf(AtomType.ITR)) return IntSeq.get(size, type, values);
+    return null;
   }
 }

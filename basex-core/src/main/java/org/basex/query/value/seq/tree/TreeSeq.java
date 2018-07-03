@@ -34,7 +34,7 @@ public abstract class TreeSeq extends Seq {
   /**
    * Default constructor.
    * @param size number of elements in this sequence
-   * @param type type of all items in this sequence
+   * @param type type of all items in this sequence, can be {@code null}
    */
   TreeSeq(final long size, final Type type) {
     super(size, type == null ? AtomType.ITEM : type);

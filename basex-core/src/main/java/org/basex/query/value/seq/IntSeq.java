@@ -92,14 +92,14 @@ public final class IntSeq extends NativeSeq {
   }
 
   /**
-   * Creates a sequence with the items in the specified expressions.
-   * @param values values
+   * Creates a typed sequence with the items of the specified values.
    * @param size size of resulting sequence
    * @param type item type
+   * @param values values
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] values, final int size, final Type type)
+  public static Value get(final int size, final Type type, final Value... values)
       throws QueryException {
 
     final long[] tmp = new long[size];
@@ -112,7 +112,7 @@ public final class IntSeq extends NativeSeq {
         System.arraycopy(seq.values, 0, tmp, t, vs);
         t += vs;
       } else {
-        for(int v = 0; v < vs; v++) tmp[t++] = value.itemAt(v).itr(null);
+        for(final Item item : value) tmp[t++] = item.itr(null);
       }
     }
     return get(tmp, type);

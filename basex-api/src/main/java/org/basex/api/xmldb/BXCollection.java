@@ -116,7 +116,7 @@ public final class BXCollection implements Collection {
     final IntList docs = data.resources.docs();
     final int ds = docs.size();
     final StringList sl = new StringList(ds);
-    for(int d = 0; d < ds; d++) sl.add(Token.string(data.text(docs.get(d), true)));
+    for(int d = 0; d < ds; d++) sl.add(data.text(docs.get(d), true));
     return sl.finish();
   }
 

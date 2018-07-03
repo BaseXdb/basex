@@ -61,6 +61,10 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     query("Q{java.lang.Math}sqrt(xs:double(9.0))", 3);
     query("Q{java.lang.Math}sqrt\u00b7double(xs:double(9.0))", 3);
     error("Q{java:org.basex.query.func.JavaFunctionExample}error()", JAVAERROR_X_X_X);
+
+    // sequence types
+    query("Q{java:org.basex.util.Strings}eqic('1', (('1','2')))", true);
+    query("Q{java:org.basex.util.Strings}eqic('1', (1 to 2) ! string())", true);
   }
 
   /** Tests calling some Java static methods from XQuery. */
