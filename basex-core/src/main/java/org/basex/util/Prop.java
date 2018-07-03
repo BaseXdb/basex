@@ -64,6 +64,8 @@ public final class Prop {
   public static final boolean CASE = !(MAC || WIN);
   /** Java version. */
   public static final String JAVA = System.getProperty("java.specification.version");
+  /** Java 8. */
+  public static boolean JAVA8 = JAVA.startsWith("8");
 
   /** Prefix for project specific options. */
   public static final String DBPREFIX = "org.basex.";
