@@ -27,8 +27,6 @@ public final class BaseXGUI extends Main {
   private final Context context = new Context();
   /** Files, specified as arguments. */
   private final StringList files = new StringList(0);
-  /** Mac OS X GUI optimizations. */
-  GUIMacOSX osxGUI;
 
   /**
    * Main method.
@@ -52,16 +50,6 @@ public final class BaseXGUI extends Main {
     super(args);
     parseArgs();
 
-    // set Mac-specific properties
-    if(Prop.MAC) {
-      try {
-        osxGUI = new GUIMacOSX();
-      } catch(final Exception ex) {
-        Util.errln("Failed to initialize native Mac OS X interface:");
-        Util.stack(ex);
-      }
-    }
-
     // read options
     final GUIOptions gopts = new GUIOptions();
     // initialize look and feel
@@ -72,7 +60,6 @@ public final class BaseXGUI extends Main {
     SwingUtilities.invokeLater(() -> {
       // open main window
       final GUI gui = new GUI(context, gopts);
-      if(osxGUI != null) osxGUI.init(gui);
 
       // open specified file
       final ArrayList<IOFile> xqfiles = new ArrayList<>();

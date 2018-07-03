@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Bastian Lemke
  */
-public final class GUIMacOSX {
+public final class GUIMacOSX extends GUIMacOS {
   /** Native class name. */
   private static final String C_APPLICATION = "com.apple.eawt.Application";
   /** Native class name. */
@@ -30,8 +30,6 @@ public final class GUIMacOSX {
   /** Empty object array. */
   private static final Object[] EO = {};
 
-  /** Reference to the main gui. */
-  GUI main;
   /** Instance of the 'Application' class. */
   private final Object appObj;
 
@@ -72,6 +70,7 @@ public final class GUIMacOSX {
    * immediately after creating the gui.
    * @param gui main gui reference
    */
+  @Override
   public void init(final GUI gui) {
     main = gui;
   }
@@ -89,8 +88,14 @@ public final class GUIMacOSX {
    * @param value string value
    * @throws Exception if any error occurs
    */
+  @Override
   public void setBadge(final String value) throws Exception {
     invoke(appObj, "setDockIconBadge", String.class, value);
+  }
+
+  @Override
+  public void adjustMenuBar(final GUI gui, final GUIMenu menu) {
+    gui.setJMenuBar(menu);
   }
 
   /**
@@ -180,25 +185,8 @@ public final class GUIMacOSX {
     }
   }
 
-  /**
-   * Returns true if the System has native Fullscreen support.
-   * @return fullscreen support
-   */
-  public static boolean nativeFullscreen() {
-    try {
-      Class.forName("com.apple.eawt.FullScreenUtilities");
-      return true;
-    } catch(final ClassNotFoundException ex) {
-      Util.debug(ex);
-      return false;
-    }
-  }
-
-  /**
-   * Enables OSX Lion native fullscreen where available.
-   * @param window the window
-   */
-  public static void enableOSXFullscreen(final Window window) {
+  @Override
+  public void enableOSXFullscreen(final Window window) {
     if(window == null) return;
     try {
       final Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
