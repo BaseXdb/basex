@@ -2,8 +2,6 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
@@ -118,8 +116,7 @@ public final class IndexInfo {
     if(search instanceof Value) {
       // loop through all items
       final Iter iter = search.iter(qc);
-      final ArrayList<ValueAccess> tmp = new ArrayList<>();
-      final TokenSet strings = new TokenSet();
+      final TokenIntMap cache = new TokenIntMap();
       for(Item item; (item = qc.next(iter)) != null;) {
         // only strings and untyped items are supported
         if(!item.type.isStringOrUntyped()) return false;
@@ -130,23 +127,29 @@ public final class IndexInfo {
         if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
           return false;
 
-        // add only expressions that yield results and that have not been requested before
-        if(!strings.contains(token)) {
-          strings.put(token);
+        // only cache distinct tokens that have not been requested before
+        if(!cache.contains(token)) {
           final IndexCosts c = costs(data, new StringToken(type, token));
           if(c == null) return false;
-          final int r = c.results();
-          if(r != 0) {
-            final ValueAccess va = new ValueAccess(info, new TokenSet(token), type, test, db);
-            tmp.add(va);
-            if(r == 1) va.exprType.assign(Occ.ZERO_ONE);
-          }
+          cache.put(token, c.results());
           costs = IndexCosts.add(costs, c);
         }
       }
-      // more than one string: merge index results
-      final int vs = tmp.size();
-      root = vs == 1 ? tmp.get(0) : new Union(info, tmp.toArray(new ValueAccess[vs]));
+
+      // ignore expressions that yield no results
+      final TokenSet tokens = new TokenSet();
+      int counts = 0;
+      for(final byte[] token : cache) {
+        final int count = cache.get(token);
+        if(count != 0) tokens.add(token);
+        if(counts >= 0) counts = count >= 0 ? counts + count : -1;
+      }
+
+      // create expression for index access
+      final ValueAccess va = new ValueAccess(info, tokens, type, test, db);
+      if(counts == 1) va.exprType.assign(Occ.ZERO_ONE);
+      root = va;
+
     } else {
       /* index access is not possible if returned type is not a string or untyped; if
        * expression depends on context; or if it is non-deterministic. examples:
