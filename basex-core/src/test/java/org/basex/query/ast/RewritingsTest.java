@@ -89,8 +89,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("empty(<a>X</a>/.[text()])", null, "//@axis = 'child'");
   }
 
-  /** Checks if iterative evaluation of XPaths is used iff no duplicated occur (see GH-1001). */
-  @Test public void iterPath() {
+  /** Checks if iterative evaluation of XPaths is used if no duplicates occur. */
+  @Test public void gh1001() {
     execute(new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"
         + "<d id='3'/><e id='4'/></a>"));
     check("(/a/*/../*) ! name()", "b\nc\nd\ne", empty(IterPath.class));
@@ -325,8 +325,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(let $s := (0,1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
   }
 
-  /** Checks OR optimizations (GH-1519). */
-  @Test public void optCount() {
+  /** Checks OR optimizations. */
+  @Test public void gh1519() {
     query("declare function local:replicate($seq, $n, $out) {"
         + "  if($n eq 0) then $out "
         + "  else ( "
@@ -339,5 +339,12 @@ public final class RewritingsTest extends QueryPlanTest {
         + "  count(local:replicate((1,2,3), $n, ())) eq 3 * $n, "
         + "  count(local:replicate((1,2,3), $n, ())) = 3 * $n "
         + ")", "true\ntrue");
+  }
+
+  /** Checks simplification of empty path expressions. */
+  @Test public void gh1587() {
+    check("document {}/..", "", empty(CDoc.class));
+    check("function() { document {}/.. }()", "", empty(CDoc.class));
+    check("declare function local:f() { document {}/.. }; local:f()", "", empty(CDoc.class));
   }
 }

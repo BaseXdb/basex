@@ -130,6 +130,17 @@ public final class MixedTest extends AdvancedQueryTest {
     query("let $_ := '_' return document { <_/> }/*[self::*[name() = $_]]", "<_/>");
   }
 
+  /** Optimizations of nested path expressions. */
+  @Test
+  public void gh1587() {
+    execute(new CreateDB(NAME, "<a id='0'><b id='1'/></a>"));
+    final String query = "let $id := '0' return db:attribute('" + NAME + "', '1')/..";
+    query(query, "<b id=\"1\"/>");
+    query(query + "[../@id = $id]", "<b id=\"1\"/>");
+    query(query + "[..[@id = $id]]", "<b id=\"1\"/>");
+    query(query + "[..[@id = $id]/parent::document-node()]", "<b id=\"1\"/>");
+  }
+
   /** Node ids. */
   @Test
   public void gh1566() {

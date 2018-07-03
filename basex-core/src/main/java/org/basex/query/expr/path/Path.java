@@ -130,15 +130,17 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
+    final Expr rt;
     if(root != null) {
       root = root.compile(cc);
       if(root.seqType().zero() || steps.length == 0) return root;
-      cc.pushFocus(root);
+      rt = root;
     } else {
       if(steps.length == 0) return new ContextValue(info).optimize(cc);
-      cc.pushFocus(cc.qc.focus.value);
+      rt = cc.qc.focus.value;
     }
 
+    cc.pushFocus(rt);
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       Expr step = steps[s];
@@ -159,12 +161,17 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // root returns no results...
+    // return root if it returns no result (it may have side effects)
     if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
+
+    // check for empty sequence
+    for(final Expr step : steps) {
+      if(step == Empty.SEQ) return cc.emptySeq(this);
+    }
 
     // simplify path with empty root expression or empty step
     final Value rt = rootValue(cc);
-    if(emptyPath(rt)) return cc.emptySeq(this);
+    if((!cc.nestedFocus() || cc.qc.focus.value == null) && emptyPath(rt)) return cc.emptySeq(this);
 
     seqType(cc, rt);
 
@@ -485,8 +492,6 @@ public abstract class Path extends ParseExpr {
    * @return {@code true} if steps will never yield results
    */
   private boolean emptyStep(final Value rt, final int s) {
-    if(steps[s] == Empty.SEQ) return true;
-
     final Step step = axisStep(s);
     if(step == null) return false;
 
