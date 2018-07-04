@@ -48,7 +48,6 @@ public abstract class GUIMacOS {
   /**
    * Initializes this macOS-specific settings.
    * @param gui main UI reference
-   * @throws Exception if any error occurs
    */
   public abstract void init(GUI gui);
 

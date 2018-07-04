@@ -1,7 +1,7 @@
 package org.basex.gui;
 
 import java.awt.*;
-import java.awt.Desktop.*;
+//import java.awt.Desktop.*;
 //import java.awt.desktop.*;
 
 import org.basex.gui.dialog.*;
@@ -22,10 +22,12 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   /** Desktop reference, which allows to interact with various desktop capabilities. */
 //  private Desktop d;
   private Class<?> dClass;
+  /** Desktop reference. */
   private Object d;
   /** Taskbar reference to interact with the system task area (taskbar, Dock, etc.). */
 //  private Taskbar tb;
   private Class<?> tbClass;
+  /** Taskbar reference. */
   private Object tb;
 
   /**
@@ -42,30 +44,37 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
     tb = tbClass.getMethod("getTaskbar").invoke(null);
 
     Class<?> aboutHandler = Class.forName("java.awt.desktop.AboutHandler");
-    Object proxy = Proxy.newProxyInstance(GUIMacOSX9.class.getClassLoader(), new Class<?>[] {aboutHandler}, this);
+    Object proxy = Proxy.newProxyInstance(
+        GUIMacOSX9.class.getClassLoader(), new Class<?>[] {aboutHandler}, this);
     dClass.getDeclaredMethod("setAboutHandler", aboutHandler).invoke(d, proxy);
   }
 
   @Override
   public void init(final GUI gui) {
     try {
-    main = gui;
-    if (tb != null) {
-      initDockIcon();
-    }
-    if (d != null) {
-      initAboutMenu();
-    }
+      main = gui;
+      if (tb != null) {
+        initDockIcon();
+      }
+      if (d != null) {
+        initAboutMenu();
+      }
     } catch(Exception e) {
       Util.debug(e);
     }
   }
 
   @Override
-  public void adjustMenuBar(GUI gui, GUIMenu menu)
-  {
+  public void adjustMenuBar(final GUI gui, final GUIMenu menu) {
 //    if(d != null && d.isSupported(Desktop.Action.APP_MENU_BAR))
 //      d.setDefaultMenuBar(menu);
+    try {
+      Class<?>[] params = { Class.forName("javax.swing.JMenuBar") };
+      Method m = dClass.getDeclaredMethod("setDefaultMenuBar", params);
+      m.invoke(d, menu);
+    } catch(final Exception e) {
+       Util.debug(e);
+    }
   }
 
   @Override
@@ -75,7 +84,7 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   }
 
   @Override
-  public void enableOSXFullscreen(Window window) {
+  public void enableOSXFullscreen(final Window window) {
     /** Nothing to be done using Java9 and greater. */
   }
 
@@ -86,8 +95,8 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   private void initDockIcon() throws Exception {
 //    if (tb.isSupported(Taskbar.Feature.ICON_IMAGE))
 //      tb.setIconImage(BaseXImages.get("logo_256"));
-    Class<?>[] PARAMS = { Class.forName("java.awt.Image") };
-    Method m = tbClass.getMethod("setIconImage", PARAMS);
+    Class<?>[] params = { Class.forName("java.awt.Image") };
+    Method m = tbClass.getMethod("setIconImage", params);
     m.invoke(tb, BaseXImages.get("logo_256"));
   }
 
@@ -111,11 +120,11 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
 //  public void handleAbout(final AboutEvent e) {
 //    new DialogAbout(main);
 //  }
-
 @Override
-public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+public Object invoke(final Object proxy, final Method method, final Object[] args)
+    throws Throwable {
     if ("handleAbout".equals(method.getName())) {
-        System.err.println("handleAbout");
+      new DialogAbout(main);
     }
     return null;
   }

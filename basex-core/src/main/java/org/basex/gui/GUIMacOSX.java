@@ -11,6 +11,7 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Bastian Lemke
+ * @author Alexander Holupirek
  */
 public final class GUIMacOSX extends GUIMacOS {
   /** Native class name. */
@@ -139,6 +140,15 @@ public final class GUIMacOSX extends GUIMacOS {
      * Finder or another application.
      */
     public void handleOpenApplication()  { /* NOT IMPLEMENTED */ }
+
+    /**
+     * Called when the application receives an Open Application event from the
+     * Finder or another application.
+     *
+     * @param obj application event
+     */
+    @SuppressWarnings("unused")
+    public void handleOpenApplication(final Object obj)  { /* NOT IMPLEMENTED */ }
 
     /**
      * Called when the application receives an Open Document event from the
