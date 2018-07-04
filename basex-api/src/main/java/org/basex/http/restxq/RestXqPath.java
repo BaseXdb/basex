@@ -1,12 +1,11 @@
 package org.basex.http.restxq;
 
-import org.basex.http.*;
-import org.basex.query.QueryException;
-import org.basex.query.value.item.QNm;
-import org.basex.util.InputInfo;
+import java.util.*;
 
-import java.util.List;
-import java.util.Map;
+import org.basex.http.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This class represents the path of a RESTXQ function.

@@ -5,6 +5,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import javax.servlet.*;
+
 import org.basex.http.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -55,9 +57,11 @@ final class RestXqResponse {
    * Evaluates the specified function and serializes the result.
    * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   * @throws ServletException servlet exception
    */
-  boolean create(final Object ext) throws Exception {
+  boolean create(final Object ext) throws QueryException, IOException, ServletException {
     // bind variables
     final StaticFunc sf = func.function;
     final Expr[] args = new Expr[sf.params.length];
@@ -122,9 +126,10 @@ final class RestXqResponse {
    * Builds a response element and creates the serialization parameters.
    * @param response response element
    * @param iter result iterator
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception (including unexpected ones)
+   * @throws IOException I/O exception
    */
-  private void build(final ANode response, final Iter iter) throws Exception {
+  private void build(final ANode response, final Iter iter) throws QueryException, IOException {
     // don't allow attributes
     final BasicNodeIter atts = response.attributes();
     final ANode attr = atts.next();
@@ -187,9 +192,11 @@ final class RestXqResponse {
    * @param first first item
    * @param iter iterator
    * @param cache cache result
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private void serialize(final Item first, final Iter iter, final boolean cache) throws Exception {
+  private void serialize(final Item first, final Iter iter, final boolean cache)
+      throws QueryException, IOException {
     checkHead();
     serialize(first, iter, func.output, cache);
   }
@@ -200,10 +207,11 @@ final class RestXqResponse {
    * @param iter iterator
    * @param sp serialization parameters
    * @param cache cache result
-   * @throws Exception exception (including unexpected ones)
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private void serialize(final Item first, final Iter iter, final SerializerOptions sp,
-      final boolean cache) throws Exception {
+      final boolean cache) throws QueryException, IOException {
     conn.sopts(sp);
     conn.initResponse();
     out = cache ? new ArrayOutput() : conn.res.getOutputStream();

@@ -91,7 +91,7 @@ final class RestXqPathMatcher {
    * @param path path template string to be parsed
    * @param info input info
    * @return parsed path template
-   * @throws QueryException if given template is invalid
+   * @throws QueryException query exception
    */
   static RestXqPathMatcher parse(final String path, final InputInfo info) throws QueryException {
     if(path.isEmpty()) return EMPTY;
@@ -114,7 +114,8 @@ final class RestXqPathMatcher {
         decodeAndEscape(literals, result, info);
 
         // variable
-        if(!i.hasNext() || i.nextNonWS() != '$') throw error(info, INV_TEMPLATE_X, path);
+        if(!i.hasNext() || i.nextNonWS() != '$')
+          throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
 
         // default variable regular expression
         regex.append("[^/]+?");
@@ -126,7 +127,7 @@ final class RestXqPathMatcher {
           if(ch == '=') {
             regex.setLength(0);
             addRegex(i, regex);
-            if(regex.length() == 0) throw error(info, INV_TEMPLATE_X, path);
+            if(regex.length() == 0) throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
             break;
           } else if(ch == '{') {
             ++braces;
@@ -139,7 +140,7 @@ final class RestXqPathMatcher {
         }
 
         final byte[] var = variable.toArray();
-        if(!XMLToken.isQName(var)) throw error(info, INV_VARNAME_X, variable);
+        if(!XMLToken.isQName(var)) throw RestXqFunction.error(info, INV_VARNAME_X, variable);
         varNames.add(new QNm(var));
         variable.reset();
         varsPos.set(segment);
@@ -184,7 +185,7 @@ final class RestXqPathMatcher {
 
     if(literals.length() > 0) {
       final byte[] path = Token.decodeUri(Token.token(literals.toString()));
-      if(path == null) throw error(info, INV_ENCODING_X, literals);
+      if(path == null) throw RestXqFunction.error(info, INV_ENCODING_X, literals);
       final TokenBuilder tb = new TokenBuilder(path.length);
       for(final byte b : path) {
         if(".^&!?-:<>()[]{}$=,*+|".indexOf(b) >= 0) tb.addByte((byte) '\\');
@@ -193,17 +194,6 @@ final class RestXqPathMatcher {
       result.append(tb.toString());
       literals.setLength(0);
     }
-  }
-
-  /**
-   * Creates a query exception.
-   * @param info input info
-   * @param msg exception message
-   * @param e text extensions
-   * @return query exception
-   */
-  private static QueryException error(final InputInfo info, final String msg, final Object... e) {
-    return QueryError.BASEX_RESTXQ_X.get(info, Util.info(msg, e));
   }
 
   /** Character iterator. */

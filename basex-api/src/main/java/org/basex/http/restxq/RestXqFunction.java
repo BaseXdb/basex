@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.Set;
 import java.util.regex.*;
 
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.build.csv.*;
@@ -107,9 +108,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param conn HTTP connection
    * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   * @throws ServletException servlet exception
    */
-  boolean process(final HTTPConnection conn, final Object ext) throws Exception {
+  boolean process(final HTTPConnection conn, final Object ext)
+      throws QueryException, IOException, ServletException {
     try {
       return module.process(conn, this, ext);
     } catch(final QueryException ex) {
@@ -122,9 +126,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Checks a function for REST and permission annotations.
    * @param ctx database context
    * @return {@code true} if function contains relevant annotations
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  boolean parse(final Context ctx) throws Exception {
+  boolean parse(final Context ctx) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.params.length];
     boolean found = false;
@@ -228,9 +233,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param opts options instance
    * @param ann annotation
    * @return options instance
-   * @throws Exception any exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private static <O extends Options> O parse(final O opts, final Ann ann) throws Exception {
+  private static <O extends Options> O parse(final O opts, final Ann ann)
+      throws QueryException, IOException {
     for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
     return opts;
   }
@@ -279,7 +286,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param args arguments
    * @param ext extended processing information (can be {@code null})
    * @param qc query context
-   * @throws QueryException query exception
+   * @throws QueryException exception
    * @throws IOException I/O exception
    */
   void bind(final HTTPConnection conn, final Expr[] args, final Object ext, final QueryContext qc)
@@ -354,7 +361,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Creates an exception with the specified message.
    * @param msg message
    * @param ext error extension
-   * @return exception
+   * @return QueryException query exception
    */
   QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
@@ -365,9 +372,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param info input info
    * @param msg message
    * @param ext error extension
-   * @return exception
+   * @return QueryException query exception
    */
-  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
+  static QueryException error(final InputInfo info, final String msg, final Object... ext) {
     return BASEX_RESTXQ_X.get(info, Util.info(msg, ext));
   }
 
@@ -526,7 +533,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param ann annotation
    * @param declared variable declaration flags
    * @return parameter
-   * @throws QueryException HTTP exception
+   * @throws QueryException query exception
    */
   private RestXqParam param(final Ann ann, final boolean... declared) throws QueryException {
     // name of parameter
@@ -544,7 +551,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /**
    * Creates an error function.
    * @param ann annotation
-   * @throws QueryException HTTP exception
+   * @throws QueryException query exception
    */
   private void error(final Ann ann) throws QueryException {
     if(error == null) error = new RestXqError();
