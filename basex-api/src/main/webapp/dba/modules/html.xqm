@@ -410,7 +410,7 @@ declare function html:table(
               $label
             ) else (
               (: generate sort link :)
-              html:link($label, '', ($params, map { 'sort': $name, 'page': $page }))
+              html:link($label, '', ($params, map { 'sort': $name }))
             )
           }
         },
