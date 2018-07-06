@@ -112,11 +112,14 @@ public abstract class Path extends ParseExpr {
 
     // if last expression yields no nodes, rewrite mixed path to simple map
     // example: $a/b/string -> $a/b ! string()
-    final Expr last = st[sl - 1];
-    if(sl > 1 && last.seqType().type.instanceOf(AtomType.AAT)) {
+    final Expr s1 = sl > 1 ? st[sl - 2] : rt, s2 = st[sl - 1];
+    if(s1 != null && s1.seqType().type.instanceOf(NodeType.NOD) &&
+        s2.seqType().type.instanceOf(AtomType.AAT)) {
       list.remove(sl - 1);
-      return (SimpleMap) SimpleMap.get(info, Path.get(info, rt, list.finish()), last);
+      if(sl > 1) rt = Path.get(info, rt, list.finish());
+      return (SimpleMap) SimpleMap.get(info, rt, s2);
     }
+
     return new MixedPath(info, rt, st);
   }
 
