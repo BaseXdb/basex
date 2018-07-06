@@ -28,7 +28,7 @@ public final class FnReplace extends RegEx {
       for (int r = 0; r < rl; ++r) {
         final int n = r + 1 == rl ? 0 : value2[r + 1];
         if(value2[r] == '\\') {
-          if (n != '\\' && n != '$') throw FUNREPBS_X.get(info, value2);
+          if(n != '\\' && n != '$') throw FUNREPBS_X.get(info, value2);
           ++r;
         } else if(value2[r] == '$' && (r == 0 || value2[r - 1] != '\\') && !digit(n)) {
           throw FUNREPDOL_X.get(info, value2);
