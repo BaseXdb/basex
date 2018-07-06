@@ -36,9 +36,12 @@ public final class GUIMacOSX extends GUIMacOS {
 
   /**
    * Constructor.
-   * @throws Exception if any error occurs.
+   * @param main reference to main window
+   * @throws Exception if any error occurs
    */
-  public GUIMacOSX() throws Exception {
+  GUIMacOSX(final GUI main) throws Exception {
+    super(main);
+
     // name for the dock icon and the application menu
     System.setProperty(P_ABOUT_NAME, Prop.NAME);
     // show menu in the screen menu instead of inside the application window
@@ -69,12 +72,9 @@ public final class GUIMacOSX extends GUIMacOS {
   /**
    * Initializes this mac gui with the main gui. Has to be called
    * immediately after creating the gui.
-   * @param gui main gui reference
    */
   @Override
-  public void init(final GUI gui) {
-    main = gui;
-  }
+  public void init() { /* NOT IMPLEMENTED */ }
 
   /**
    * Adds the project icon to the dock.

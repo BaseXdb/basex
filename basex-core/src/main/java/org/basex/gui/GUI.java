@@ -106,12 +106,11 @@ public final class GUI extends JFrame implements BaseXWindow {
   private int menuHeight;
   /** Fullscreen Window. */
   private JFrame fullscr;
+  /** Custom macOS optimizations. */
+  private GUIMacOS osxGUI;
 
   /** Password reader. */
   private static volatile PasswordReader pwReader;
-
-  /** macOS GUI optimizations. */
-  GUIMacOS osxGUI;
 
   /**
    * Default constructor.
@@ -122,15 +121,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     this.context = context;
     this.gopts = gopts;
 
-    if (Prop.MAC) {
-      try {
-        osxGUI = (Prop.JAVA8) ? new GUIMacOSX() : new GUIMacOSX9();
-      } catch(final Exception ex) {
-        Util.errln("Failed to initialize native Mac OS X interface:");
-        Util.stack(ex);
-      }
-    }
-
+    if(Prop.MAC) osxGUI = GUIMacOS.get(this);
     setIconImage(BaseXImages.get("logo_64"));
     setTitle();
 
@@ -153,9 +144,11 @@ public final class GUI extends JFrame implements BaseXWindow {
     control = new BaseXBack(new BorderLayout());
 
     // add menu bar
-    menu = addMenuBar();
+    menu = new GUIMenu(this);
+    if(osxGUI != null) osxGUI.adjustMenuBar(this, menu);
+    else setJMenuBar(menu);
 
-    if (osxGUI != null) osxGUI.init(this);
+    if(osxGUI != null) osxGUI.init();
 
     buttons = new BaseXBack(new BorderLayout());
     toolbar = new GUIToolBar(TOOLBAR, this);
@@ -382,21 +375,6 @@ public final class GUI extends JFrame implements BaseXWindow {
       }
     }).start();
   }
-
-  /**
-   * Initializes applications main menu.
-   *
-   * @return menu the applications menu
-   */
-  private GUIMenu addMenuBar() {
-    GUIMenu m = new GUIMenu(this);
-
-    if (osxGUI != null) osxGUI.adjustMenuBar(this, m);
-    else setJMenuBar(m);
-
-    return m;
-  }
-
   /**
    * Executes the specified command.
    * @param cmd command to be executed
