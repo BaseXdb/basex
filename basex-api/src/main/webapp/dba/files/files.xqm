@@ -45,6 +45,9 @@ function dba:files(
               ['Webapp'    , $webapp],
               ['RESTXQ'    , dba:dir($webapp ! file:resolve-path(db:option('restxqpath'), .))],
               ['Repository', dba:dir(db:option('repopath'))],
+              ['Home'      , Q{org.basex.util.Prop}HOMEDIR() ],
+              ['Working'   , file:current-dir() ],
+              ['Temporary' , file:temp-dir() ],
               Q{java:java.io.File}listRoots() ! ['Root', string(.)],
               ['Current'   , $dir]
             )
