@@ -1,7 +1,6 @@
 package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.http.HTTPText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 
@@ -303,7 +302,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Normalizes the specified path.
-   * @param path path
+   * @param path path (can be {@code null})
    * @return normalized path
    */
   private static String normalize(final String path) {
@@ -344,7 +343,7 @@ public final class HTTPConnection implements ClientInfo {
         final String header = req.getHeader(AUTHORIZATION);
         final String[] am = header != null ? Strings.split(header, ' ', 2) : new String[] { "" };
         final AuthMethod meth = StaticOptions.AUTHMETHOD.get(am[0]);
-        if(auth != meth) throw new LoginException(WRONGAUTH_X, auth);
+        if(auth != meth) throw new LoginException(HTTPText.WRONGAUTH_X, auth);
 
         if(auth == AuthMethod.BASIC) {
           final String details = am.length > 1 ? am[1] : "";
