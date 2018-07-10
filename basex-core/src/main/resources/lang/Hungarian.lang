@@ -325,6 +325,7 @@ run_tests            = Tesztek futtatása
 save                 = Mentés
 save_as              = Mentés másként
 save_before_execute  = Mentés a futtatás előtt
+scroll_tabs          = Scroll editor tabs
 searching            = Keresés
 select_all           = Mind kijelölése
 separator            = Elválasztó

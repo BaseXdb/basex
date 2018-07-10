@@ -325,6 +325,7 @@ run_tests            = Tests uitvoeren
 save                 = Opslaan
 save_as              = Opslaan als
 save_before_execute  = Opslaan voor uitvoeren van bestand
+scroll_tabs          = Scroll editor tabs
 searching            = Searching
 select_all           = Selecteer alles
 separator            = Scheidingsteken

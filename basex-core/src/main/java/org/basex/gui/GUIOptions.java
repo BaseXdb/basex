@@ -103,6 +103,8 @@ public final class GUIOptions extends Options {
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
   /** Flag for dissolving name attributes. */
   public static final BooleanOption SHOWNAME = new BooleanOption("SHOWNAME", true);
+  /** Flag for scrolling editor tabs. */
+  public static final BooleanOption SCROLLTABS = new BooleanOption("SCROLLTABS", true);
   /** Focus follows mouse. */
   public static final BooleanOption MOUSEFOCUS = new BooleanOption("MOUSEFOCUS", false);
 
