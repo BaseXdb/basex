@@ -221,7 +221,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public boolean has(final Flag... flags) {
-    return expr.has(flags) && super.has(flags);
+    return expr.has(flags) || super.has(flags);
   }
 
   @Override
