@@ -39,14 +39,18 @@ final class FTIndexTrees {
    * Initializes all trees for adding new full-text data.
    */
   void initFT() {
-    for(final FTIndexTree tree : trees) if(tree != null) tree.initFT();
+    for(final FTIndexTree tree : trees) {
+      if(tree != null) tree.initFT();
+    }
   }
 
   /**
    * Initializes all trees for iterative traversal.
    */
   void init() {
-    for(final FTIndexTree tree : trees) if(tree != null) tree.init();
+    for(final FTIndexTree tree : trees) {
+      if(tree != null) tree.init();
+    }
     ctree = -1;
   }
 
@@ -58,7 +62,9 @@ final class FTIndexTrees {
   boolean more(final int index) {
     if(ctree != -1 && trees[ctree].more(index)) return true;
     final int tl = trees.length;
-    while(++ctree < tl) if(trees[ctree] != null) return more(index);
+    while(++ctree < tl) {
+      if(trees[ctree] != null) return more(index);
+    }
     return false;
   }
 

@@ -1547,7 +1547,9 @@ public enum Function {
     if(b == -1) return new int[] { al, al };
 
     int c = b + 1 < desc.length() && desc.charAt(b + 1) == ',' ? 1 : 0;
-    for(int i = 0; i < b; i++) if(desc.charAt(i) == ',') c++;
+    for(int i = 0; i < b; i++) {
+      if(desc.charAt(i) == ',') c++;
+    }
     return new int[] { c, desc.contains(DOTS) ? Integer.MAX_VALUE : al };
   }
 

@@ -955,24 +955,26 @@ public enum GUIMenuCmd implements GUICommand {
 
   /**
    * Checks if data can be updated.
-   * @param n node instance
-   * @param no disallowed node types
+   * @param node node instance
+   * @param kinds disallowed node kinds
    * @return result of check
    */
-  private static boolean updatable(final DBNodes n, final int... no) {
-    if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1)) return false;
-    final int k = n.data().kind(n.pre(0));
-    for(final int i : no) if(k == i) return false;
+  private static boolean updatable(final DBNodes node, final int... kinds) {
+    if(node == null || (kinds.length == 0 ? node.size() < 1 : node.size() != 1)) return false;
+    final int k = node.data().kind(node.pre(0));
+    for(final int kind : kinds) {
+      if(k == kind) return false;
+    }
     return true;
   }
 
   /**
    * Returns a quoted string.
-   * @param s string to encode
+   * @param string string to encode
    * @return quoted string
    */
-  private static String quote(final String s) {
-    return '"' + s.replaceAll("\"", "&quot;") + '"';
+  private static String quote(final String string) {
+    return '"' + string.replaceAll("\"", "&quot;") + '"';
   }
 
   /**

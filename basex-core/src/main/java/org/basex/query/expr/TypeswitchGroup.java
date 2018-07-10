@@ -114,7 +114,9 @@ public final class TypeswitchGroup extends Single {
    */
   boolean matches(final Value val) {
     if(types.length == 0) return true;
-    for(final SeqType st : types) if(st.instance(val)) return true;
+    for(final SeqType st : types) {
+      if(st.instance(val)) return true;
+    }
     return false;
   }
 

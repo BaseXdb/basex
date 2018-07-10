@@ -128,13 +128,17 @@ public final class Try extends Single {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Catch ctch : catches) if(ctch.has(flags)) return true;
+    for(final Catch ctch : catches) {
+      if(ctch.has(flags)) return true;
+    }
     return super.has(flags);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Catch ctch : catches) if(!ctch.removable(var)) return false;
+    for(final Catch ctch : catches) {
+      if(!ctch.removable(var)) return false;
+    }
     return super.removable(var);
   }
 

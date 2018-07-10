@@ -135,7 +135,9 @@ public interface Type {
      * @return type ID if found, {@code null} otherwise
      */
     public static ID get(final int id) {
-      for(final ID i : VALUES) if(i.id == id) return i;
+      for(final ID value : VALUES) {
+        if(value.id == id) return value;
+      }
       return null;
     }
 

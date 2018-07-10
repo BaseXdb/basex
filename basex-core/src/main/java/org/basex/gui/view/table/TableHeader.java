@@ -221,7 +221,9 @@ final class TableHeader extends BaseXPanel {
         for(int i = 0; i < moveC; ++i) ww[i] += p / moveC;
         for(int i = moveC; i < wl; ++i) ww[i] -= p / (wl - moveC);
       }
-      for(final double w : ww) if(w < 0.0001) return;
+      for(final double w : ww) {
+        if(w < 0.0001) return;
+      }
       mouseX = x;
 
       for(int w = 0; w < wl; ++w) tdata.cols[w].width = ww[w];

@@ -279,7 +279,9 @@ public final class FTBuilder extends IndexBuilder {
    * @return boolean
    */
   private static boolean check(final FTList[] lists) {
-    for(final FTList l : lists) if(l.tok.length > 0) return true;
+    for(final FTList list : lists) {
+      if(list.tok.length > 0) return true;
+    }
     return false;
   }
 }

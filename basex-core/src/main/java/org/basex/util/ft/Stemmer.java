@@ -51,11 +51,13 @@ public abstract class Stemmer extends LanguageImpl {
 
   /**
    * Checks if the language is supported by the available stemmers.
-   * @param l language to be found
+   * @param language language to be found
    * @return result of check
    */
-  public static boolean supportFor(final Language l) {
-    for(final Stemmer s : IMPL) if(s.supports(l)) return true;
+  public static boolean supportFor(final Language language) {
+    for(final Stemmer impl : IMPL) {
+      if(impl.supports(language)) return true;
+    }
     return false;
   }
 

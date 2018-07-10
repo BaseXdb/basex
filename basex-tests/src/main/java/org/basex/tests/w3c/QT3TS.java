@@ -470,7 +470,9 @@ public final class QT3TS extends Main {
    * @return environment
    */
   private static QT3Env envs(final ArrayList<QT3Env> envs, final String ref) {
-    for(final QT3Env e : envs) if(e.name.equals(ref)) return e;
+    for(final QT3Env env : envs) {
+      if(env.name.equals(ref)) return env;
+    }
     return null;
   }
 

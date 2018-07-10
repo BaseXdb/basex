@@ -141,8 +141,10 @@ public final class Catch extends Single {
    * @return result of check
    */
   boolean matches(final QueryException qe) {
-    final QNm code = qe.qname();
-    for(final NameTest c : codes) if(c.eq(code)) return true;
+    final QNm c = qe.qname();
+    for(final NameTest code : codes) {
+      if(code.eq(c)) return true;
+    }
     return false;
   }
 
@@ -157,7 +159,9 @@ public final class Catch extends Single {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Var var : vars) if(!visitor.declared(var)) return false;
+    for(final Var var : vars) {
+      if(!visitor.declared(var)) return false;
+    }
     return visitAll(visitor, expr);
   }
 

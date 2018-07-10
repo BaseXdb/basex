@@ -265,7 +265,9 @@ final class Docs {
    */
   synchronized boolean isDir(final byte[] path) {
     final byte[] pref = concat(path, SLASH);
-    for(final byte[] pth : paths()) if(startsWith(pth, pref)) return true;
+    for(final byte[] pth : paths()) {
+      if(startsWith(pth, pref)) return true;
+    }
     return false;
   }
 

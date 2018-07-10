@@ -121,7 +121,9 @@ final class TableContent extends BaseXBack {
       }
 
       // add dots if content is too long
-      for(final TokenBuilder t : tb) if(t.size() > 100) t.add(DOTS);
+      for(final TokenBuilder t : tb) {
+        if(t.size() > 100) t.add(DOTS);
+      }
 
       // draw row contents
       byte[] focusStr = null;

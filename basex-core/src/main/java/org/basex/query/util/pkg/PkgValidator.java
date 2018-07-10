@@ -119,7 +119,9 @@ public final class PkgValidator {
       final HashSet<String> versList = new HashSet<>();
       Collections.addAll(versList, Strings.split(dep.versions, ' '));
       // check if any acceptable version is already installed
-      for(final String v : versList) if(versions.contains(v)) return v;
+      for(final String v : versList) {
+        if(versions.contains(v)) return v;
+      }
     } else if(dep.semver != null) {
       // version template - version of secondary package or BaseX version must
       // be compatible with the defined template

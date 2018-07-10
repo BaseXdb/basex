@@ -176,7 +176,9 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var var : params) if(!visitor.declared(var)) return false;
+    for(final Var param : params) {
+      if(!visitor.declared(param)) return false;
+    }
     return expr.accept(visitor);
   }
 

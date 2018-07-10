@@ -159,7 +159,9 @@ final class NSNode {
   int uri(final int prefix) {
     final int[] vls = values;
     final int vl = vls.length;
-    for(int v = 0; v < vl; v += 2) if(vls[v] == prefix) return vls[v + 1];
+    for(int v = 0; v < vl; v += 2) {
+      if(vls[v] == prefix) return vls[v + 1];
+    }
     return 0;
   }
 

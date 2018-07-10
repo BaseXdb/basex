@@ -311,7 +311,9 @@ public abstract class Preds extends Arr {
 
   @Override
   public boolean removable(final Var var) {
-    for(final Expr expr : exprs) if(expr.uses(var)) return false;
+    for(final Expr expr : exprs) {
+      if(expr.uses(var)) return false;
+    }
     return true;
   }
 

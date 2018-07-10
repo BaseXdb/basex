@@ -34,7 +34,10 @@ public final class VarStack extends ObjectList<Var, VarStack> {
    * @return variable or {@code null}
    */
   public Var get(final QNm name) {
-    for(int i = size; i-- > 0;) if(name.eq(list[i].name)) return list[i];
+    for(int l = size; l-- > 0;) {
+      final Var var = list[l];
+      if(name.eq(var.name)) return var;
+    }
     return null;
   }
 

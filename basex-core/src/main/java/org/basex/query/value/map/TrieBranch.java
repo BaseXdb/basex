@@ -242,7 +242,9 @@ final class TrieBranch extends TrieNode {
   @Override
   int hash(final InputInfo info) throws QueryException {
     int hash = 0;
-    for(final TrieNode ch : kids) if(ch != null) hash = 31 * hash + ch.hash(info);
+    for(final TrieNode ch : kids) {
+      if(ch != null) hash = (hash << 5) - hash + ch.hash(info);
+    }
     return hash;
   }
 

@@ -213,7 +213,7 @@ public final class BXCollection implements Collection {
     String id;
     do {
       id = Long.toString(System.currentTimeMillis());
-    } while(exists(res, id));
+    } while(contains(res, id));
     return id;
   }
 
@@ -265,12 +265,14 @@ public final class BXCollection implements Collection {
 
   /**
    * Checks if the specified id exists in the specified id list.
-   * @param list id list
+   * @param ids id list
    * @param id id to be found
    * @return result of check
    */
-  private static boolean exists(final String[] list, final String id) {
-    for(final String l : list) if(l.equals(id)) return true;
+  private static boolean contains(final String[] ids, final String id) {
+    for(final String i : ids) {
+      if(i.equals(id)) return true;
+    }
     return false;
   }
 

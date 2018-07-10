@@ -198,7 +198,9 @@ final class TrieList extends TrieNode {
       for(int i = 0; i < size; i++) {
         final Item ok = list.keys[i];
         // skip all entries that are overridden
-        for(final Item k : keys) if(k.sameKey(ok, info)) continue OUTER;
+        for(final Item k : keys) {
+          if(k.sameKey(ok, info)) continue OUTER;
+        }
         // key is not in this list, add it
         ks = Array.add(ks, ok);
         vs = Array.add(vs, list.values[i]);

@@ -68,7 +68,9 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
    * @return result of check
    */
   public boolean matches() {
-    for(final FTMatch m : this) if(m.match()) return true;
+    for(final FTMatch m : this) {
+      if(m.match()) return true;
+    }
     return false;
   }
 

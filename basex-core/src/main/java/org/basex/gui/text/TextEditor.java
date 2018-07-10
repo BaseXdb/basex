@@ -138,7 +138,9 @@ public final class TextEditor {
   int lines() {
     if(lines == -1) {
       int c = 1;
-      for(final byte ch : text) if(ch == '\n') ++c;
+      for(final byte ch : text) {
+        if(ch == '\n') ++c;
+      }
       lines = c;
     }
     return lines;
@@ -620,7 +622,9 @@ public final class TextEditor {
     int l = 1;
     final int s = start, e = end, ts = size();
     final byte[] tmp = Arrays.copyOf(text, ts);
-    for(int i = s; i < e; i++) if(tmp[i] == '\n') l++;
+    for(int i = s; i < e; i++) {
+      if(tmp[i] == '\n') l++;
+    }
 
     // collect lines to be sorted
     final TokenList tl = new TokenList(l);

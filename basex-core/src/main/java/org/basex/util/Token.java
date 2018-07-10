@@ -335,7 +335,9 @@ public final class Token {
    * @return number of digits
    */
   public static int numDigits(final int integer) {
-    for(int i = 0;; ++i) if(integer <= INTSIZE[i]) return i + 1;
+    for(int i = 0;; ++i) {
+      if(integer <= INTSIZE[i]) return i + 1;
+    }
   }
 
   /** Minimum integer. */
@@ -396,7 +398,9 @@ public final class Token {
     if(b != null) return b;
 
     final int fl = FLT.length;
-    for(int i = 0; i < fl; ++i) if(flt == FLT[i]) return FLTSTR[i];
+    for(int i = 0; i < fl; ++i) {
+      if(flt == FLT[i]) return FLTSTR[i];
+    }
     final float a = Math.abs(flt);
     final boolean small = a >= 1.0e-6f && a < 1.0e6f;
     String s1;
@@ -601,7 +605,9 @@ public final class Token {
    * @return true if one test is successful
    */
   public static boolean eq(final byte[] token, final byte[]... tokens) {
-    for(final byte[] tok : tokens) if(eq(token, tok)) return true;
+    for(final byte[] tok : tokens) {
+      if(eq(token, tok)) return true;
+    }
     return false;
   }
 
@@ -683,9 +689,13 @@ public final class Token {
   public static int indexOf(final byte[] token, final int ch) {
     final int tl = token.length;
     if(ch < 0x80) {
-      for(int t = 0; t < tl; t++) if(token[t] == ch) return t;
+      for(int t = 0; t < tl; t++) {
+        if(token[t] == ch) return t;
+      }
     } else {
-      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == ch) return t;
+      for(int t = 0; t < tl; t += cl(token, t)) {
+        if(cp(token, t) == ch) return t;
+      }
     }
     return -1;
   }
@@ -700,9 +710,13 @@ public final class Token {
     final int tl = token.length;
     int p = -1;
     if(ch < 128) {
-      for(int t = tl - 1; t >= 0; --t) if(token[t] == ch) return t;
+      for(int t = tl - 1; t >= 0; --t) {
+        if(token[t] == ch) return t;
+      }
     } else {
-      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == ch) p = t;
+      for(int t = 0; t < tl; t += cl(token, t)) {
+        if(cp(token, t) == ch) p = t;
+      }
     }
     return p;
   }
@@ -733,7 +747,9 @@ public final class Token {
     // compare tokens character wise
     for(int t = pos; t <= tl; ++t) {
       int s = 0;
-      while(sub[s] == token[t + s]) if(++s == sl) return t;
+      while(sub[s] == token[t + s]) {
+        if(++s == sl) return t;
+      }
     }
     return -1;
   }
@@ -805,7 +821,9 @@ public final class Token {
     final int sl = sub.length;
     final int tl = token.length;
     if(sl > tl) return false;
-    for(int s = sl; s > 0; s--) if(sub[sl - s] != token[tl - s]) return false;
+    for(int s = sl; s > 0; s--) {
+      if(sub[sl - s] != token[tl - s]) return false;
+    }
     return true;
   }
 
@@ -948,8 +966,12 @@ public final class Token {
    */
   public static byte[] trim(final byte[] token) {
     int s = -1, e = token.length;
-    while(++s < e) if(!ws(token[s])) break;
-    while(--e > s) if(!ws(token[e])) break;
+    while(++s < e) {
+      if(!ws(token[s])) break;
+    }
+    while(--e > s) {
+      if(!ws(token[e])) break;
+    }
     if(++e == token.length && s == 0) return token;
     return s == e ? EMPTY : Arrays.copyOfRange(token, s, e);
   }

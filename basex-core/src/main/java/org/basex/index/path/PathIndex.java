@@ -142,7 +142,9 @@ public final class PathIndex implements Index {
    */
   public static ArrayList<PathNode> parent(final ArrayList<PathNode> nodes) {
     final ArrayList<PathNode> out = new ArrayList<>();
-    for(final PathNode node : nodes) if(!out.contains(node.parent)) out.add(node.parent);
+    for(final PathNode node : nodes) {
+      if(!out.contains(node.parent)) out.add(node.parent);
+    }
     return out;
   }
 

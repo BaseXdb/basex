@@ -51,6 +51,8 @@ public final class AdminStressTest extends SandboxTest {
     for(int i = 0; i < NUM; ++i) clients[i] = new Client(new ShowSessions(), start, stop);
     start.countDown(); // start all clients
     stop.await();
-    for(final Client c : clients) if(c.error != null) fail(c.error);
+    for(final Client c : clients) {
+      if(c.error != null) fail(c.error);
+    }
   }
 }

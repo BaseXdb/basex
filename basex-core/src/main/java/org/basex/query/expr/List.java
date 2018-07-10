@@ -169,7 +169,9 @@ public final class List extends Arr {
 
   @Override
   public boolean isVacuous() {
-    for(final Expr expr : exprs) if(!expr.isVacuous()) return false;
+    for(final Expr expr : exprs) {
+      if(!expr.isVacuous()) return false;
+    }
     return true;
   }
 

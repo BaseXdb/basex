@@ -51,7 +51,9 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   public boolean contains(final E element) {
     final E[] lst = list;
     final int s = size;
-    for(int l = 0; l < s; l++) if(eq(lst[l], element)) return true;
+    for(int l = 0; l < s; l++) {
+      if(eq(lst[l], element)) return true;
+    }
     return false;
   }
 

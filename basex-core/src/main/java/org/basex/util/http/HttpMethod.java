@@ -42,7 +42,9 @@ public enum HttpMethod {
    * @return enum or {@code null}
    */
   public static HttpMethod get(final String name) {
-    for(final HttpMethod method : values()) if(method.name().equals(name)) return method;
+    for(final HttpMethod method : values()) {
+      if(method.name().equals(name)) return method;
+    }
     return null;
   }
 }

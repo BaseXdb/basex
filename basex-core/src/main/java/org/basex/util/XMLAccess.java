@@ -90,7 +90,9 @@ public final class XMLAccess {
       throws BaseXException {
 
     final String n = string(name);
-    for(final E nm : names) if(n.equals(nm.toString())) return nm;
+    for(final E nm : names) {
+      if(n.equals(nm.toString())) return nm;
+    }
     throw new BaseXException("%: Unexpected element: \"%\".", pref, name);
   }
 }

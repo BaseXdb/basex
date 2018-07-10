@@ -45,7 +45,9 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
 
     for(final SimpleQueryThread s : sqtList) s.start();
     for(final SimpleQueryThread s : sqtList) s.join();
-    for(final SimpleQueryThread s : sqtList) if(s.thrown != null) throw s.thrown;
+    for(final SimpleQueryThread s : sqtList) {
+      if(s.thrown != null) throw s.thrown;
+    }
   }
 
   /**

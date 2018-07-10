@@ -274,9 +274,13 @@ public abstract class Data {
 
     // find pre value in the table; start with specified id
     final int size = meta.size;
-    for(int p = Math.max(0, id); p < meta.size; ++p) if(id == id(p)) return p;
+    for(int p = Math.max(0, id); p < meta.size; ++p) {
+      if(id == id(p)) return p;
+    }
     final int ps = Math.min(size, id);
-    for(int p = 0; p < ps; ++p) if(id == id(p)) return p;
+    for(int p = 0; p < ps; ++p) {
+      if(id == id(p)) return p;
+    }
     // id not found
     return -1;
   }
@@ -366,7 +370,9 @@ public abstract class Data {
   public final byte[] attValue(final int att, final int pre) {
     final int a = pre + attSize(pre, kind(pre));
     int p = pre;
-    while(++p != a) if(nameId(p) == att) return text(p, false);
+    while(++p != a) {
+      if(nameId(p) == att) return text(p, false);
+    }
     return null;
   }
 

@@ -21,7 +21,9 @@ final class RestXqError implements Comparable<RestXqError> {
    * @return success flag
    */
   boolean add(final NameTest test) {
-    for(final NameTest nm : tests) if(nm.equals(test)) return false;
+    for(final NameTest nt : tests) {
+      if(nt.equals(test)) return false;
+    }
     tests.add(test);
     return true;
   }
@@ -41,7 +43,9 @@ final class RestXqError implements Comparable<RestXqError> {
    * @return result of check
    */
   boolean matches(final QNm name) {
-    for(final NameTest test : tests) if(test.eq(name)) return true;
+    for(final NameTest nt : tests) {
+      if(nt.eq(name)) return true;
+    }
     return false;
   }
 

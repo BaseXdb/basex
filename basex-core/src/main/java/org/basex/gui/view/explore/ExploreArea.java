@@ -157,7 +157,9 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       // find modified component
       int cp = 0;
       final int cs = panel.getComponentCount();
-      for(int c = 0; c < cs; ++c) if(panel.getComponent(c) == source) cp = c;
+      for(int c = 0; c < cs; ++c) {
+        if(panel.getComponent(c) == source) cp = c;
+      }
 
       if((cp & 1) == 0) {
         // combo box with element/attribute names

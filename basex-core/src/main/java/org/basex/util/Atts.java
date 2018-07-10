@@ -74,7 +74,9 @@ public final class Atts extends ElementList {
    * @return offset or -1
    */
   public int get(final byte[] name) {
-    for(int i = 0; i < size; ++i) if(Token.eq(nm[i], name)) return i;
+    for(int i = 0; i < size; ++i) {
+      if(Token.eq(nm[i], name)) return i;
+    }
     return -1;
   }
 

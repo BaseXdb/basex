@@ -338,7 +338,9 @@ public abstract class IO {
     final int i = path.lastIndexOf('.');
     if(i == -1) return false;
     final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-    for(final String z : suffixes) if(suf.equals(z)) return true;
+    for(final String suffix : suffixes) {
+      if(suf.equals(suffix)) return true;
+    }
     return false;
   }
 }

@@ -107,7 +107,9 @@ public final class XMLToken {
    */
   public static boolean isNMToken(final byte[] value) {
     final int l = value.length;
-    for(int i = 0; i < l; i += cl(value, i)) if(!isChar(cp(value, i))) return false;
+    for(int i = 0; i < l; i += cl(value, i)) {
+      if(!isChar(cp(value, i))) return false;
+    }
     return l != 0;
   }
 

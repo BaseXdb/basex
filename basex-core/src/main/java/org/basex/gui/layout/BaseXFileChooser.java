@@ -156,7 +156,7 @@ public final class BaseXFileChooser {
           if(!path.contains(".")) files[f] = new IOFile(path + suffix);
         }
       } else if(ff instanceof Filter) {
-        final String[] sufs = ((Filter) ff).sufs;
+        final String[] sufs = ((Filter) ff).suffixes;
         final int sl = sufs.length;
         for(int f = 0; f < fl && sl != 0; f++) {
           final String path = files[f].path();
@@ -179,36 +179,38 @@ public final class BaseXFileChooser {
    */
   private static class Filter extends FileFilter {
     /** Suffixes. */
-    final String[] sufs;
+    final String[] suffixes;
     /** Description. */
-    final String desc;
+    final String description;
 
     /**
      * Constructor.
-     * @param s suffixes
-     * @param d description
+     * @param suffixes suffixes
+     * @param description description
      */
-    Filter(final String[] s, final String d) {
-      sufs = s;
-      desc = d;
+    Filter(final String[] suffixes, final String description) {
+      this.suffixes = suffixes;
+      this.description = description;
     }
 
     @Override
     public boolean accept(final File file) {
       if(file.isDirectory()) return true;
       final String name = file.getName().toLowerCase(Locale.ENGLISH);
-      for(final String s : sufs) if(name.endsWith(s)) return true;
+      for(final String suf : suffixes) {
+        if(name.endsWith(suf)) return true;
+      }
       return false;
     }
 
     @Override
     public String getDescription() {
       final StringBuilder sb = new StringBuilder();
-      for(final String s : sufs) {
+      for(final String s : suffixes) {
         if(sb.length() != 0) sb.append(", ");
         sb.append('*').append(s);
       }
-      return desc + " (" + sb + ')';
+      return description + " (" + sb + ')';
     }
   }
 }

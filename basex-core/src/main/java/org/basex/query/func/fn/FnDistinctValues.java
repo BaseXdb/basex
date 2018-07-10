@@ -102,7 +102,9 @@ public final class FnDistinctValues extends StandardFunc {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
         if(!pn.stats.isLeaf()) return this;
-        for(final PathNode n : pn.children) if(n.kind == Data.TEXT) pn = n;
+        for(final PathNode n : pn.children) {
+          if(n.kind == Data.TEXT) pn = n;
+        }
       }
       // skip nodes others than texts and attributes
       if(pn.kind != Data.TEXT && pn.kind != Data.ATTR) return this;

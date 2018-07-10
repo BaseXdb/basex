@@ -28,7 +28,9 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
    * @return annotation or {@code null}
    */
   public Ann get(final Annotation sig) {
-    for(final Ann ann : this) if(ann.sig == sig) return ann;
+    for(final Ann ann : this) {
+      if(ann.sig == sig) return ann;
+    }
     return null;
   }
 

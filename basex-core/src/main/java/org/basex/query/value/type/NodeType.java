@@ -289,7 +289,9 @@ public enum NodeType implements Type {
    * @return corresponding type if found, {@code null} otherwise
    */
   static Type getType(final ID id) {
-    for(final NodeType type : VALUES) if(type.id == id) return type;
+    for(final NodeType type : VALUES) {
+      if(type.id == id) return type;
+    }
     return null;
   }
 }

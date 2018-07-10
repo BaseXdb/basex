@@ -106,7 +106,9 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public synchronized void flush(final boolean all) throws IOException {
-    for(final Buffer b : bm.all()) if(b.dirty) write(b);
+    for(final Buffer b : bm.all()) {
+      if(b.dirty) write(b);
+    }
     if(!dirty || !all) return;
 
     try(DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {

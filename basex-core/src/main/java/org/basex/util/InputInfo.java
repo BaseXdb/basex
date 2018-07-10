@@ -84,7 +84,8 @@ public final class InputInfo {
     int l = 1, c = 1;
     for(int i = 0, ch; i < cl; i += Character.charCount(ch)) {
       ch = q.codePointAt(i);
-      if(ch == '\n') { l++; c = 1; } else if(ch != '\r') { c++; }
+      if(ch == '\n') { l++; c = 1; }
+      else if(ch != '\r') { c++; }
     }
     line = l;
     col = c;

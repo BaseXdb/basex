@@ -238,7 +238,9 @@ public abstract class Path extends ParseExpr {
     // check remaining flags
     final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
     if(flgs.length != 0) {
-      for(final Expr step : steps) if(step.has(flgs)) return true;
+      for(final Expr step : steps) {
+        if(step.has(flgs)) return true;
+      }
       return root != null && root.has(flgs);
     }
     return false;
@@ -887,7 +889,9 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean removable(final Var var) {
-    for(final Expr step : steps) if(step.uses(var)) return false;
+    for(final Expr step : steps) {
+      if(step.uses(var)) return false;
+    }
     return root == null || root.removable(var);
   }
 

@@ -673,13 +673,17 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Clause clause : clauses) if(clause.has(flags)) return true;
+    for(final Clause clause : clauses) {
+      if(clause.has(flags)) return true;
+    }
     return ret.has(flags);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Clause clause : clauses) if(!clause.removable(var)) return false;
+    for(final Clause clause : clauses) {
+      if(!clause.removable(var)) return false;
+    }
     return ret.removable(var);
   }
 
@@ -799,7 +803,9 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Clause clause : clauses) if(!clause.accept(visitor)) return false;
+    for(final Clause clause : clauses) {
+      if(!clause.accept(visitor)) return false;
+    }
     return ret.accept(visitor);
   }
 

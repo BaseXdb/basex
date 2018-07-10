@@ -101,7 +101,9 @@ public final class Transform extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Let copy : copies) if(copy.has(flags)) return true;
+    for(final Let copy : copies) {
+      if(copy.has(flags)) return true;
+    }
     if(Flag.UPD.in(flags) && exprs[1].has(Flag.UPD)) return true;
     final Flag[] flgs = Flag.UPD.remove(flags);
     return flgs.length != 0 && super.has(flgs);
@@ -109,7 +111,9 @@ public final class Transform extends Arr {
 
   @Override
   public boolean removable(final Var var) {
-    for(final Let copy : copies) if(!copy.removable(var)) return false;
+    for(final Let copy : copies) {
+      if(!copy.removable(var)) return false;
+    }
     return super.removable(var);
   }
 

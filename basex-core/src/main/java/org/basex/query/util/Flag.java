@@ -70,7 +70,9 @@ public enum Flag {
    */
   private int indexOf(final Flag[] flags) {
     final int fl = flags.length;
-    for(int f = 0; f < fl; f++) if(flags[f] == this) return f;
+    for(int f = 0; f < fl; f++) {
+      if(flags[f] == this) return f;
+    }
     return -1;
   }
 }

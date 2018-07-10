@@ -256,13 +256,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // cache flags for remaining, new properties
     for(final Flag flag : flgs) map.put(flag, expr.has(flag));
     // evaluate result
-    for(final Flag flag : flags) if(map.get(flag)) return true;
+    for(final Flag flag : flags) {
+      if(map.get(flag)) return true;
+    }
     return false;
   }
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var var : params) if(!visitor.declared(var)) return false;
+    for(final Var var : params) {
+      if(!visitor.declared(var)) return false;
+    }
     return expr == null || expr.accept(visitor);
   }
 

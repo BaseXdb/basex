@@ -26,11 +26,13 @@ public abstract class Tokenizer extends LanguageImpl {
 
   /**
    * Checks if the language is supported by the available tokenizers.
-   * @param l language to be found
+   * @param language language to be found
    * @return result of check
    */
-  public static boolean supportFor(final Language l) {
-    for(final Tokenizer toknzr : IMPL) if(toknzr.supports(l)) return true;
+  public static boolean supportFor(final Language language) {
+    for(final Tokenizer impl : IMPL) {
+      if(impl.supports(language)) return true;
+    }
     return false;
   }
 

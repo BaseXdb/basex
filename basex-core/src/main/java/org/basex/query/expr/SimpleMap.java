@@ -182,7 +182,9 @@ public abstract class SimpleMap extends Arr {
   public final boolean removable(final Var var) {
     if(!exprs[0].removable(var)) return false;
     final int el = exprs.length;
-    for(int e = 1; e < el; e++) if(exprs[e].uses(var)) return false;
+    for(int e = 1; e < el; e++) {
+      if(exprs[e].uses(var)) return false;
+    }
     return true;
   }
 

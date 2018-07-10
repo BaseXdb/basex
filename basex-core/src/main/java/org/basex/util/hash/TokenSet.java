@@ -114,7 +114,9 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    */
   public final int id(final byte[] key) {
     final int p = Token.hash(key) & buckets.length - 1;
-    for(int i = buckets[p]; i != 0; i = next[i]) if(eq(key, keys[i])) return i;
+    for(int i = buckets[p]; i != 0; i = next[i]) {
+      if(eq(key, keys[i])) return i;
+    }
     return 0;
   }
 
@@ -156,7 +158,9 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   private int index(final byte[] key) {
     checkSize();
     final int b = Token.hash(key) & buckets.length - 1;
-    for(int r = buckets[b]; r != 0; r = next[r]) if(eq(key, keys[r])) return -r;
+    for(int r = buckets[b]; r != 0; r = next[r]) {
+      if(eq(key, keys[r])) return -r;
+    }
     next[size] = buckets[b];
     keys[size] = key;
     buckets[b] = size;

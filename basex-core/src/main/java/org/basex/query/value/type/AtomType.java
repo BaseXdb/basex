@@ -1011,7 +1011,9 @@ public enum AtomType implements Type {
    * @return corresponding type if found, {@code null} otherwise
    */
   static Type getType(final Type.ID id) {
-    for(final AtomType tp : VALUES) if(tp.id == id) return tp;
+    for(final AtomType type : VALUES) {
+      if(type.id == id) return type;
+    }
     return null;
   }
 }

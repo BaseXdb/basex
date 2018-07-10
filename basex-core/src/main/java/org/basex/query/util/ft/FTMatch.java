@@ -33,7 +33,9 @@ public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
    */
   public boolean notin(final FTMatch ftm) {
     for(final FTStringMatch s : this) {
-      for(final FTStringMatch sm : ftm) if(!s.in(sm)) return true;
+      for(final FTStringMatch sm : ftm) {
+        if(!s.in(sm)) return true;
+      }
     }
     return false;
   }
@@ -43,7 +45,9 @@ public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
    * @return result of check
    */
   boolean match() {
-    for(final FTStringMatch s : this) if(s.exclude) return false;
+    for(final FTStringMatch s : this) {
+      if(s.exclude) return false;
+    }
     return true;
   }
 

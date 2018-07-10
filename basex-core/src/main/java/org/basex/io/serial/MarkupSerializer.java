@@ -355,7 +355,9 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     final String string = opts.get(option);
     if(string.isEmpty()) return allowed.length > 0 ? allowed[0] : string;
-    for(final String value : allowed) if(value.equals(string)) return string;
+    for(final String value : allowed) {
+      if(value.equals(string)) return string;
+    }
     throw SERNOTSUPP_X.getIO(Options.allowed(option, string, (Object[]) allowed));
   }
 

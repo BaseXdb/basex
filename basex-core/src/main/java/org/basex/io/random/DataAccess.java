@@ -46,7 +46,9 @@ public final class DataAccess implements Closeable {
    */
   public synchronized void flush() {
     try {
-      for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
+      for(final Buffer b : bm.all()) {
+        if(b.dirty) writeBlock(b);
+      }
       if(changed) {
         raf.setLength(length);
         changed = false;

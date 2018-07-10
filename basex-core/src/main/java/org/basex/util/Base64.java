@@ -91,7 +91,9 @@ public final class Base64 {
    */
   public static byte[] decode(final byte[] token) {
     final ByteList bl = new ByteList();
-    for(final byte c : token) if(c < 0 || c > ' ') bl.add(c);
+    for(final byte c : token) {
+      if(c < 0 || c > ' ') bl.add(c);
+    }
     final byte[] s = bl.finish();
 
     // input must be a multiple of four characters
