@@ -912,11 +912,18 @@ public final class TextEditor {
   }
 
   /**
-   * Deletes a line.
+   * Deletes lines.
    */
-  void deleteLine() {
-    selectLine();
+  void deleteLines() {
+    extend();
     delete();
+  }
+
+  /**
+   * Duplicate lines.
+   */
+  void duplLines() {
+    extend();
   }
 
   /**
@@ -1148,9 +1155,10 @@ public final class TextEditor {
    * @return string
    */
   String copy() {
-    final TokenBuilder tb = new TokenBuilder();
     final int e = start < end ? end : start;
-    for(int s = start < end ? start : end; s < e; s += cl(text, s)) {
+    int s = start < end ? start : end;
+    final TokenBuilder tb = new TokenBuilder(e - s);
+    for(; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);
       if(cp >= ' ' && cp < TokenBuilder.PRIVATE_START || cp == 0x0A || cp == 0x09 ||
           cp > TokenBuilder.PRIVATE_END) tb.add(cp);

@@ -602,7 +602,7 @@ public class TextPanel extends BaseXPanel {
       } else if(MOVEUP.is(e)) {
         editor.move(false);
       } else if(DELLINE.is(e)) {
-        editor.deleteLine();
+        editor.deleteLines();
       } else if(DELNEXTWORD.is(e)) {
         editor.deleteNext(true);
       } else if(DELLINEEND.is(e)) {
