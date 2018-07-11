@@ -155,7 +155,7 @@ public class TextPanel extends BaseXPanel {
    * @return search string
    */
   public final String searchString() {
-    final String string = editor.copy();
+    final String string = editor.selected();
     return string.indexOf('\n') == -1 ? string : "";
   }
 
@@ -253,7 +253,7 @@ public class TextPanel extends BaseXPanel {
    * @return result of check
    */
   public final boolean selected() {
-    return editor.selected();
+    return editor.isSelected();
   }
 
   @Override
@@ -382,7 +382,7 @@ public class TextPanel extends BaseXPanel {
     try {
       final int[] select = rend.replace(rc);
       if(rc.text != null) {
-        final boolean sel = editor.selected();
+        final boolean sel = editor.isSelected();
         setText(rc.text);
         editor.select(select[0], select[sel ? 1 : 0]);
         release(Action.CHECK);
@@ -437,7 +437,7 @@ public class TextPanel extends BaseXPanel {
     if(SwingUtilities.isLeftMouseButton(e)) {
       editor.endSelection();
       // evaluate link
-      if(!editor.selected()) {
+      if(!editor.isSelected()) {
         final TextIterator iter = rend.jump(e.getPoint());
         final String link = iter.link();
         if(link != null) linkListener.linkClicked(link);
@@ -471,7 +471,7 @@ public class TextPanel extends BaseXPanel {
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
     final boolean shift = e.isShiftDown();
-    final boolean selected = editor.selected();
+    final boolean selected = editor.isSelected();
     if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
@@ -541,7 +541,7 @@ public class TextPanel extends BaseXPanel {
     }
 
     // set cursor position
-    final boolean selected = editor.selected();
+    final boolean selected = editor.isSelected();
     final int pos = editor.pos();
 
     final boolean shift = e.isShiftDown();
@@ -601,7 +601,9 @@ public class TextPanel extends BaseXPanel {
         editor.move(true);
       } else if(MOVEUP.is(e)) {
         editor.move(false);
-      } else if(DELLINE.is(e)) {
+      } else if(DUPLLINES.is(e)) {
+        editor.duplLines();
+      } else if(DELLINES.is(e)) {
         editor.deleteLines();
       } else if(DELNEXTWORD.is(e)) {
         editor.deleteNext(true);
@@ -629,7 +631,7 @@ public class TextPanel extends BaseXPanel {
       // text has changed: add old text to history
       hist.store(tmp, pos, editor.pos());
       scrollCode.invokeLater(down);
-    } else if(pos != editor.pos() || selected != editor.selected()) {
+    } else if(pos != editor.pos() || selected != editor.isSelected()) {
       // cursor position or selection state has changed
       cursorCode.invokeLater(down ? 2 : 0);
     }
@@ -675,7 +677,7 @@ public class TextPanel extends BaseXPanel {
     final boolean indent = TAB.is(e) && editor.indent(sb, e.isShiftDown());
 
     // delete marked text
-    final boolean selected = editor.selected() && !indent;
+    final boolean selected = editor.isSelected() && !indent;
     if(selected) editor.delete();
 
     final int move = ENTER.is(e) ? editor.enter(sb) : editor.add(sb, selected);
@@ -713,8 +715,8 @@ public class TextPanel extends BaseXPanel {
    */
   private void paste(final String string) {
     final int pos = editor.pos();
-    if(editor.selected()) editor.delete();
-    editor.add(string);
+    if(editor.isSelected()) editor.delete();
+    editor.insert(string);
     finish(pos);
   }
 
@@ -723,7 +725,7 @@ public class TextPanel extends BaseXPanel {
    * @return true if text was copied
    */
   private boolean copy() {
-    final String txt = editor.copy();
+    final String txt = editor.selected();
     if(txt.isEmpty()) return false;
 
     // copy selection to clipboard
@@ -839,7 +841,7 @@ public class TextPanel extends BaseXPanel {
       finish(pos);
     }
     @Override
-    public boolean enabled(final GUI main) { return hist.active() && editor.selected(); }
+    public boolean enabled(final GUI main) { return hist.active() && editor.isSelected(); }
   }
 
   /** Copy command. */
@@ -850,7 +852,7 @@ public class TextPanel extends BaseXPanel {
     @Override
     public void execute() { copy(); }
     @Override
-    public boolean enabled(final GUI main) { return editor.selected(); }
+    public boolean enabled(final GUI main) { return editor.isSelected(); }
   }
 
   /** Paste command. */
@@ -879,7 +881,7 @@ public class TextPanel extends BaseXPanel {
       finish(pos);
     }
     @Override
-    public boolean enabled(final GUI main) { return hist.active() && editor.selected(); }
+    public boolean enabled(final GUI main) { return hist.active() && editor.isSelected(); }
   }
 
   /** Select all command. */

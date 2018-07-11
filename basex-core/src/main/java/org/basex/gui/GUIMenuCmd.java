@@ -54,7 +54,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows database info. */
-  C_INFO(PROPERTIES + DOTS, "% D", true, false) {
+  C_INFO(PROPERTIES + DOTS, "% shift M", true, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogProps(gui);

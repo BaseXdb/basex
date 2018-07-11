@@ -35,11 +35,11 @@ public final class TextEditor {
 
   /** Start and end positions of search terms (initially empty). */
   IntList[] searchResults = { new IntList(), new IntList() };
-  /** Start position of a text selection. */
+  /** Start position of a text selection ({@code -1} if no text is selected). */
   int start = -1;
-  /** End position of a text selection (+1). */
+  /** End position of a text selection +1 ({@code -1} if no text is selected)). */
   int end = -1;
-  /** Start position of an error highlighting. */
+  /** Start position of an error highlighting ({@code -1} for no error). */
   int error = -1;
 
   /** GUI reference. */
@@ -118,7 +118,7 @@ public final class TextEditor {
     // only adopt selection if it extends over more than one line
     final int ts = size();
     int s = Math.min(start, end), e = Math.max(start, end);
-    boolean sel = selected();
+    boolean sel = isSelected();
     if(sel) {
       int p = s - 1;
       while(++p < e && text[p] != '\n');
@@ -151,7 +151,7 @@ public final class TextEditor {
    * @param select selection flag
    */
   private void forward(final boolean select) {
-    if(select || !selected()) {
+    if(select || !isSelected()) {
       next();
     } else {
       pos(Math.max(start, end));
@@ -163,7 +163,7 @@ public final class TextEditor {
    * @param select selection flag
    */
   void next(final boolean select) {
-    if(select && !selected()) startSelect();
+    if(select && !isSelected()) startSelect();
     forward(select);
     if(select) endSelection();
   }
@@ -173,7 +173,7 @@ public final class TextEditor {
    * @param select selection flag
    */
   void previous(final boolean select) {
-    if(select && !selected()) startSelect();
+    if(select && !isSelected()) startSelect();
     back(select);
     if(select) endSelection();
   }
@@ -183,7 +183,7 @@ public final class TextEditor {
    * @param select selection flag
    */
   void nextWord(final boolean select) {
-    if(select && !selected()) startSelect();
+    if(select && !isSelected()) startSelect();
 
     int ch = curr();
     forward(select);
@@ -207,7 +207,7 @@ public final class TextEditor {
    * @param select selection flag
    */
   void prevWord(final boolean select) {
-    if(select && !selected()) startSelect();
+    if(select && !isSelected()) startSelect();
 
     int ch = back(select);
     if(ch != '\n') {
@@ -322,7 +322,7 @@ public final class TextEditor {
    * @param select selection flag
    */
   void lineStart(final boolean select) {
-    if(select && !selected()) startSelect();
+    if(select && !isSelected()) startSelect();
 
     final int p = pos;
     boolean s = true;
@@ -353,7 +353,7 @@ public final class TextEditor {
    * @return previous character
    */
   private int back(final boolean select) {
-    if(select || !selected()) return prev();
+    if(select || !isSelected()) return prev();
     pos(Math.min(start, end));
     return curr();
   }
@@ -435,7 +435,7 @@ public final class TextEditor {
    * Adds a string at the current position.
    * @param str string
    */
-  void add(final String str) {
+  void insert(final String str) {
     final int cl = str.length();
     final TokenBuilder tb = new TokenBuilder(cl);
     for(int c = 0; c < cl; ++c) {
@@ -461,7 +461,7 @@ public final class TextEditor {
     final byte[] ste = concat(st, SPACE), ene = concat(SPACE, en);
     final int sl = st.length, el = en.length, sle = ste.length, ele = ene.length;
 
-    if(!selected()) {
+    if(!isSelected()) {
       // no selection: select line
       start = pos;
       end = pos;
@@ -480,7 +480,7 @@ public final class TextEditor {
 
     final int min = start;
     int max = end;
-    if(selected() && text[max - 1] == '\n') max--;
+    if(isSelected() && text[max - 1] == '\n') max--;
 
     // create new text with or without comment
     final TokenBuilder tb = new TokenBuilder();
@@ -526,7 +526,7 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   boolean toCase(final Case cs) {
-    if(!selected()) return false;
+    if(!isSelected()) return false;
     final int s = Math.min(start, end), e = Math.max(start, end), d = size() - e;
     final byte[] tmp = substring(text, s, e);
 
@@ -601,7 +601,7 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   boolean format(final Syntax syntax) {
-    final boolean sel = selected();
+    final boolean sel = isSelected();
     final int s = sel ? Math.min(start, end) : 0;
     final int e = sel ? Math.max(start, end) : size();
     final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), spaces());
@@ -615,7 +615,7 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   boolean sort() {
-    if(!selected()) selectAll();
+    if(!isSelected()) selectAll();
     if(!extend()) return false;
 
     // count lines
@@ -696,13 +696,13 @@ public final class TextEditor {
    */
   boolean indent(final StringBuilder sb, final boolean shift) {
     // no selection, shift pressed: select current character
-    if(!selected() && shift && size() != 0) selectLine();
+    if(!isSelected() && shift && size() != 0) selectLine();
 
     // check if something is selected
-    if(selected()) {
+    if(isSelected()) {
       indent(shift);
       sb.setLength(0);
-      return selected();
+      return isSelected();
     }
 
     if(shift) {
@@ -822,7 +822,7 @@ public final class TextEditor {
         }
       }
     }
-    add(sb.toString());
+    insert(sb.toString());
     return move;
   }
 
@@ -866,7 +866,7 @@ public final class TextEditor {
    * Deletes the previous character or the current selection.
    */
   void deletePrev() {
-    if(!selected()) {
+    if(!isSelected()) {
       if(pos == 0) return;
       startSelect();
       final int curr = curr(), prev = prev();
@@ -891,7 +891,7 @@ public final class TextEditor {
    * Assumes that the current position allows a deletion.
    */
   void delete() {
-    if(!selected()) {
+    if(!isSelected()) {
       if(pos == size()) return;
       start = pos;
       end = pos + cl(text, pos);
@@ -923,7 +923,18 @@ public final class TextEditor {
    * Duplicate lines.
    */
   void duplLines() {
+    final int p = pos, s = start, e = end;
     extend();
+    final String selected = selected();
+    if(selected.isEmpty()) return;
+
+    final StringBuilder sb = new StringBuilder();
+    if(end > 0 && text[end - 1] != '\n') sb.append('\n');
+    pos = end;
+    insert(sb.append(selected).toString());
+    pos = p;
+    start = s;
+    end = e;
   }
 
   /**
@@ -931,7 +942,7 @@ public final class TextEditor {
    * @param word word/line flag
    */
   void deleteNext(final boolean word) {
-    if(!selected()) {
+    if(!isSelected()) {
       if(pos() == size()) return;
       startSelect();
       if(word) nextWord(true);
@@ -946,7 +957,7 @@ public final class TextEditor {
    * @param word word/line flag
    */
   void deletePrev(final boolean word) {
-    if(!selected()) {
+    if(!isSelected()) {
       if(pos() == 0) return;
       startSelect();
       if(word) prevWord(true);
@@ -967,7 +978,7 @@ public final class TextEditor {
   private void replace(final int s, final int e, final String value) {
     select(s, e);
     delete();
-    add(value);
+    insert(value);
   }
 
   /**
@@ -975,9 +986,9 @@ public final class TextEditor {
    * @return if text is selected
    */
   private boolean extend() {
-    if(!selected()) {
+    if(!isSelected()) {
       selectLine();
-      if(!selected()) return false;
+      if(!isSelected()) return false;
     }
 
     int s = Math.min(start, end), e = Math.max(start, end);
@@ -1121,7 +1132,7 @@ public final class TextEditor {
    */
   void startSelection(final boolean select) {
     if(select) {
-      if(!selected()) startSelect();
+      if(!isSelected()) startSelect();
     } else {
       noSelect();
     }
@@ -1146,7 +1157,7 @@ public final class TextEditor {
    * Tests if text has been selected.
    * @return result of check
    */
-  boolean selected() {
+  boolean isSelected() {
     return start != end;
   }
 
@@ -1154,7 +1165,7 @@ public final class TextEditor {
    * Returns the selected string.
    * @return string
    */
-  String copy() {
+  String selected() {
     final int e = start < end ? end : start;
     int s = start < end ? start : end;
     final TokenBuilder tb = new TokenBuilder(e - s);
@@ -1248,7 +1259,7 @@ public final class TextEditor {
       return -1;
     }
 
-    int s = searchResults[0].sortedIndexOf(!select || selected() ? pos : pos - 1);
+    int s = searchResults[0].sortedIndexOf(!select || isSelected() ? pos : pos - 1);
     switch(dir) {
       case CURRENT:  s = s < 0 ? -s - 1 : s;     break;
       case FORWARD:  s = s < 0 ? -s - 1 : s + 1; break;
@@ -1264,12 +1275,5 @@ public final class TextEditor {
     }
     pos = p;
     return p;
-  }
-
-  // CURSOR =======================================================================================
-
-  @Override
-  public String toString() {
-    return copy();
   }
 }
