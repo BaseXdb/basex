@@ -502,7 +502,7 @@ public final class FTWords extends FTExpr {
     if(!(obj instanceof FTWords)) return false;
     final FTWords f = (FTWords) obj;
     return query.equals(f.query) && mode == f.mode && Objects.equals(db, f.db) &&
-        Array.equals(occ, f.occ) && super.equals(obj);
+        Objects.equals(ftOpt, f.ftOpt) && Array.equals(occ, f.occ) && super.equals(obj);
   }
 
   @Override

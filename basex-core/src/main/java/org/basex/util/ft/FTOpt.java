@@ -20,15 +20,15 @@ import org.basex.query.value.node.*;
 public final class FTOpt extends ExprInfo {
   /** Flag values. */
   private final EnumMap<FTFlag, Boolean> map = new EnumMap<>(FTFlag.class);
-  /** Case. */
+  /** Case (can be {@code null}). */
   public FTCase cs;
-  /** Stemming dictionary. */
+  /** Stemming dictionary (can be {@code null}). */
   public StemDir sd;
-  /** Stop words. */
+  /** Stop words (can be {@code null}). */
   public StopWords sw;
-  /** Thesaurus. */
+  /** Thesaurus (can be {@code null}). */
   public ThesQuery th;
-  /** Language. */
+  /** Language (can be {@code null}). */
   public Language ln;
 
   /**
@@ -86,6 +86,15 @@ public final class FTOpt extends ExprInfo {
   public boolean is(final FTFlag flag) {
     final Boolean b = map.get(flag);
     return b != null && b;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FTOpt)) return false;
+    final FTOpt f = (FTOpt) obj;
+    return map.equals(f.map) && cs == f.cs && Objects.equals(sd, f.sd) &&
+        Objects.equals(sw, f.sw) && Objects.equals(th, f.th) && Objects.equals(ln, f.ln);
   }
 
   @Override
