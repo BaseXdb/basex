@@ -977,18 +977,16 @@ public final class Token {
   }
 
   /**
-   * Chops a token to the specified length and adds dots.
+   * Chops a token to the specified length. Appends trailing dots if the string is too long.
    * @param token token to be chopped
    * @param max maximum length
    * @return chopped token
    */
   public static byte[] chop(final byte[] token, final int max) {
     if(token.length <= max) return token;
-    final byte[] tt = Arrays.copyOf(token, max);
-    if(max > 2) tt[max - 3] = '.';
-    if(max > 1) tt[max - 2] = '.';
-    if(max > 0) tt[max - 1] = '.';
-    return tt;
+    final TokenBuilder tb = new TokenBuilder(max + 3);
+    for(int t = 0; t < max; t += cl(token, t)) tb.add(cp(token, t));
+    return tb.add('.').add('.').add('.').finish();
   }
 
   /**
