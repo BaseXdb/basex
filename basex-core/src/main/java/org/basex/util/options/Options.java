@@ -772,13 +772,13 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Assigns the specified name and value.
    * @param name name of option
-   * @param val value of option
+   * @param value value of option
    * @param index index (optional, can be {@code -1})
    * @param error raise error if option is unknown
    * @return success flag
    * @throws BaseXException database exception
    */
-  private synchronized boolean assign(final String name, final String val, final int index,
+  private synchronized boolean assign(final String name, final String value, final int index,
       final boolean error) throws BaseXException {
 
     final Option<?> option = options.get(name);
@@ -789,34 +789,34 @@ public class Options implements Iterable<Option<?>> {
 
     if(option instanceof BooleanOption) {
       final boolean v;
-      if(val == null || val.isEmpty()) {
+      if(value == null || value.isEmpty()) {
         final Boolean b = get((BooleanOption) option);
         if(b == null) throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), "");
         v = !b;
       } else {
-        v = Strings.yes(val);
-        if(!v && !Strings.no(val))
-          throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), val);
+        v = Strings.yes(value);
+        if(!v && !Strings.no(value))
+          throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), value);
       }
       put(option, v);
     } else if(option instanceof NumberOption) {
-      final int v = Strings.toInt(val);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), val);
+      final int v = Strings.toInt(value);
+      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), value);
       put(option, v);
     } else if(option instanceof StringOption) {
-      put(option, val);
+      put(option, value);
     } else if(option instanceof EnumOption) {
       final EnumOption<?> eo = (EnumOption<?>) option;
-      final Object v = eo.get(val);
-      if(v == null) throw new BaseXException(allowed(option, val, (Object[]) eo.values()));
+      final Object v = eo.get(value);
+      if(v == null) throw new BaseXException(allowed(option, value, (Object[]) eo.values()));
       put(option, v);
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
-      o.assign(val);
+      o.assign(value);
       put(option, o);
     } else if(option instanceof NumbersOption) {
-      final int v = Strings.toInt(val);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), val);
+      final int v = Strings.toInt(value);
+      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), value);
       int[] ii = (int[]) get(option);
       if(index == -1) {
         if(ii == null) ii = new int[0];
@@ -834,15 +834,15 @@ public class Options implements Iterable<Option<?>> {
         if(ss == null) ss = new String[0];
         final StringList sl = new StringList(ss.length + 1);
         for(final String s : ss) sl.add(s);
-        put(option, sl.add(val).finish());
+        put(option, sl.add(value).finish());
       } else if(index == 0) {
-        final int v = Strings.toInt(val);
-        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), val);
+        final int v = Strings.toInt(value);
+        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), value);
         values.put(name, new String[v]);
       } else {
         if(index <= 0 || index > ss.length)
           throw new BaseXException(Text.OPT_OFFSET_X, option.name());
-        ss[index - 1] = val;
+        ss[index - 1] = value;
       }
     } else {
       throw Util.notExpected("Unsupported option: " + option);

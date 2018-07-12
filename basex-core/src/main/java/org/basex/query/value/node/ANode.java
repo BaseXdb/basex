@@ -92,7 +92,7 @@ public abstract class ANode extends Item {
    * Returns an atomic item.
    * @return item
    */
-  private Item atomItem() {
+  public Item atomItem() {
     return type == NodeType.PI || type == NodeType.COM ? Str.get(string()) : new Atm(string());
   }
 

@@ -541,21 +541,40 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test public void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
-    final HttpRequest req1 = new HttpRequest();
-    req1.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    req1.payload.add(B64.get(token("test")));
-    final OutputStream out1 = fakeOutput();
-    HttpClient.writePayload(out1, req1);
-    assertEquals("test", out1.toString());
+    HttpRequest req = new HttpRequest();
+    req.payloadAtts.put("method", SerialMethod.BASEX.toString());
+    req.payload.add(B64.get(token("test")));
+    OutputStream out = fakeOutput();
+    HttpClient.writePayload(out, req);
+    assertEquals("test", out.toString());
 
     // Case 2: content is a node
-    final HttpRequest req2 = new HttpRequest();
-    req2.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    final FElem e3 = new FElem("a").add("test");
-    req2.payload.add(e3);
-    final OutputStream out2 = fakeOutput();
-    HttpClient.writePayload(out2, req2);
-    assertEquals("<a>test</a>", out2.toString());
+    req = new HttpRequest();
+    req.payloadAtts.put("method", SerialMethod.BASEX.toString());
+    req.payload.add(new FElem("a").add("test"));
+    out = fakeOutput();
+    HttpClient.writePayload(out, req);
+    assertEquals("<a>test</a>", out.toString());
+  }
+
+  /**
+   * Tests writing text nodes (children of http:send-request bodies).
+   * @throws IOException I/O Exception
+   */
+  @Test public void writeText() throws IOException {
+    HttpRequest req1 = new HttpRequest();
+    req1.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "application/octet-stream");
+    req1.payload.add(new FTxt("&"));
+    OutputStream out1 = fakeOutput();
+    HttpClient.writePayload(out1, req1);
+    assertEquals("&", out1.toString());
+
+    req1 = new HttpRequest();
+    req1.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "application/x-www-form-urlencoded");
+    req1.payload.add(new FTxt("&"));
+    out1 = fakeOutput();
+    HttpClient.writePayload(out1, req1);
+    assertEquals("&", out1.toString());
   }
 
   /**

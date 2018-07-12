@@ -1,11 +1,11 @@
 (:~
- : This module contains some basic examples for RESTXQ annotations
+ : This module contains some basic examples for RESTXQ annotations.
  : @author BaseX Team
  :)
 module namespace page = 'http://basex.org/modules/web-page';
 
 (:~
- : This function generates the welcome page.
+ : Generates a welcome page.
  : @return HTML page
  :)
 declare
@@ -14,9 +14,8 @@ declare
   %output:omit-xml-declaration("no")
   %output:doctype-public("-//W3C//DTD XHTML 1.0 Transitional//EN")
   %output:doctype-system("http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd")
-  function page:start()
-  as element(Q{http://www.w3.org/1999/xhtml}html)
-{
+function page:start(
+) as element(Q{http://www.w3.org/1999/xhtml}html) {
   <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
       <title>BaseX HTTP Services</title>
@@ -34,7 +33,7 @@ declare
 
       <p>Single services can be deactivated by modifying the <code>web.xml</code> file.</p>
 
-      <p>The <a href="dba">Database Administration</a> interface (DBA) is an
+      <p>The <a href="dba/">Database Administration</a> interface (DBA) is an
       example for a full RESTXQ web application.<br/>
       Both DBA and the following examples may help you to create your own web sites:</p>
 
@@ -63,17 +62,16 @@ declare
 };
 
 (:~
- : This function returns an XML response message.
- : @param $world  string to be included in the response
+ : Returns an XML response message.
+ : @param  $world  string to be included in the response
  : @return response element 
  :)
 declare
   %rest:path("/hello/{$world}")
   %rest:GET
-  function page:hello(
-    $world as xs:string)
-    as element(response)
-{
+function page:hello(
+  $world as xs:string
+) as element(response) {
   <response>
     <title>Hello { $world }!</title>
     <time>The current time is: { current-time() }</time>
@@ -81,9 +79,9 @@ declare
 };
 
 (:~
- : This function returns the result of a form request.
+ : Returns the result of a form request.
  : @param  $message  message to be included in the response
- : @param $agent  user agent string
+ : @param  $agent    user agent string
  : @return response element 
  :)
 declare
@@ -91,11 +89,11 @@ declare
   %rest:POST
   %rest:form-param("message","{$message}", "(no message)")
   %rest:header-param("User-Agent", "{$agent}")
-  function page:hello-postman(
-    $message as xs:string,
-    $agent   as xs:string*)
-    as element(response)
-{
+function page:hello-postman(
+  $message as xs:string,
+  $agent   as xs:string*
+
+) as element(response) {
   <response type='form'>
     <message>{ $message }</message>
     <user-agent>{ $agent }</user-agent>
