@@ -66,7 +66,7 @@ public final class If extends Arr {
     if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(exprs[0].equals(exprs[1])) return cc.replaceWith(this, exprs[0]);
+    if(exprs[0].equals(exprs[1]) && !cond.has(Flag.NDT)) return cc.replaceWith(this, exprs[0]);
 
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
