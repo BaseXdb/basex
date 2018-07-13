@@ -39,6 +39,8 @@ public abstract class AQuery extends Command {
   private QueryInfo info;
   /** Query result. */
   private Value result;
+  /** Query plan was serialized. */
+  private boolean plan;
 
   /**
    * Protected constructor.
@@ -64,6 +66,7 @@ public abstract class AQuery extends Command {
         long hits = 0;
         final boolean run = options.get(MainOptions.RUNQUERY);
         final boolean serial = options.get(MainOptions.SERIALIZE);
+        final boolean compplan = options.get(MainOptions.COMPPLAN);
         final int runs = Math.max(1, options.get(MainOptions.RUNS));
         for(int r = 0; r < runs; ++r) {
           // reuse existing processor instance
@@ -72,8 +75,7 @@ public abstract class AQuery extends Command {
             popJob();
           }
           init(query, context);
-
-          if(r == 0) plan(false);
+          if(!compplan) queryPlan();
 
           final Performance perf = new Performance();
           for(final Entry<String, String[]> entry : vars.entrySet()) {
@@ -85,7 +87,7 @@ public abstract class AQuery extends Command {
 
           qp.compile();
           info.compiling += perf.ns();
-          if(r == 0) plan(true);
+          if(compplan) queryPlan();
           if(!run) continue;
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
@@ -127,6 +129,7 @@ public abstract class AQuery extends Command {
         if(qp != null) qp.close();
       }
     }
+    queryPlan();
     return extError(error);
   }
 
@@ -210,28 +213,27 @@ public abstract class AQuery extends Command {
 
   /**
    * Creates query plans.
-   * @param comp compiled flag
    */
-  private void plan(final boolean comp) {
-    if(comp != options.get(MainOptions.COMPPLAN)) return;
-
-    // show dot plan
-    try {
-      if(options.get(MainOptions.DOTPLAN)) {
-        try(BufferOutput bo = new BufferOutput(new IOFile("plan.dot"))) {
-          try(DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
-            d.serialize(qp.plan());
+  private void queryPlan() {
+    if(!plan && qp != null) {
+      try {
+        // show dot plan
+        if(options.get(MainOptions.DOTPLAN)) {
+          try(BufferOutput bo = new BufferOutput(new IOFile("plan.dot"))) {
+            try(DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
+              d.serialize(qp.plan());
+            }
           }
         }
+        // show XML plan
+        if(options.get(MainOptions.XMLPLAN)) {
+          info(NL + QUERY_PLAN + COL);
+          info(qp.plan().serialize().toString());
+        }
+        plan = true;
+      } catch(final Exception ex) {
+        Util.stack(ex);
       }
-
-      // show XML plan
-      if(options.get(MainOptions.XMLPLAN)) {
-        info(NL + QUERY_PLAN + COL);
-        info(qp.plan().serialize().toString());
-      }
-    } catch(final Exception ex) {
-      Util.stack(ex);
     }
   }
 
