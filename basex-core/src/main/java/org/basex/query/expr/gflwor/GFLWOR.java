@@ -255,7 +255,7 @@ public final class GFLWOR extends ParseExpr {
     if(clauses.getFirst() instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
       final Expr branch = clauses.isEmpty() ? ret : this;
-      return cc.replaceWith(where, new If(info, where.expr, branch, Empty.SEQ).optimize(cc));
+      return cc.replaceWith(this, new If(info, where.expr, branch, Empty.SEQ).optimize(cc));
     }
 
     return this;
