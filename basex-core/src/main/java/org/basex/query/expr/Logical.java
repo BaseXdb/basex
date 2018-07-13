@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.Supplier;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
@@ -61,10 +63,10 @@ abstract class Logical extends Arr {
       if(and ? ex instanceof And : ex instanceof Or) {
         // flatten nested expressions
         for(final Expr exp : ((Logical) ex).exprs) list.add(exp);
-        cc.info(OPTFLAT_X_X, description(), ex);
+        cc.info(OPTFLAT_X_X, (Supplier<?>) () -> description(), ex);
       } else if(ex instanceof Value) {
         // pre-evaluate values
-        cc.info(OPTREMOVE_X_X, expr, description());
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) () -> description());
         if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         list.add(ex);

@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -51,7 +53,7 @@ public final class List extends Arr {
     final int ls = list.size();
     if(ls != exprs.length) {
       if(ls < 2) return cc.replaceWith(this, ls == 0 ? Empty.SEQ : list.get(0));
-      cc.info(OPTREMOVE_X_X, Empty.SEQ, description());
+      cc.info(OPTREMOVE_X_X, Empty.SEQ, (Supplier<?>) () -> description());
       exprs = list.finish();
     }
 

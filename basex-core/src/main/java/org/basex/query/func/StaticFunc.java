@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -280,7 +281,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       throws QueryException {
 
     if(!inline(cc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
-    cc.info(OPTINLINE_X, id());
+    cc.info(OPTINLINE_X, (Supplier<?>) () -> id());
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = exprs.length == 0 ? null : new LinkedList<>();

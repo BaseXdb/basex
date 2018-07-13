@@ -1,11 +1,12 @@
 package org.basex.query.expr.gflwor;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -147,7 +148,7 @@ public final class GFLWOR extends ParseExpr {
 
       // remove FLWOR expressions when all clauses were removed
       if(clauses.isEmpty()) {
-        cc.info(QueryText.OPTSIMPLE_X, description());
+        cc.info(QueryText.OPTSIMPLE_X, (Supplier<?>) () -> description());
         return ret;
       }
 

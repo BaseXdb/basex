@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -80,7 +82,7 @@ public final class And extends Logical {
       if(!list.contains(expr) || expr.has(Flag.NDT)) {
         list.add(cc.replaceWith(exprs[e], expr));
       } else {
-        cc.info(OPTREMOVE_X_X, exprs[e], description());
+        cc.info(OPTREMOVE_X_X, exprs[e], (Supplier<?>) () -> description());
       }
     }
   }

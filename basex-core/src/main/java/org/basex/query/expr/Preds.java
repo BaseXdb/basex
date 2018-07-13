@@ -2,12 +2,14 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -119,7 +121,7 @@ public abstract class Preds extends Arr {
 
     final boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
     if(expr == Bln.TRUE) {
-      cc.info(OPTREMOVE_X_X, expr, description());
+      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) () -> description());
     } else if(ps || !list.contains(expr) || expr.has(Flag.NDT)) {
       list.add(expr);
     }
@@ -198,7 +200,7 @@ public abstract class Preds extends Arr {
       Expr ex = expr;
       if(ex instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
         // E [ . ]  ->  E
-        cc.info(OPTREMOVE_X_X, ex, description());
+        cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) () -> description());
         continue;
       } else if(ex instanceof SimpleMap) {
         // E [ . ! ... ]  ->  E [ ... ]

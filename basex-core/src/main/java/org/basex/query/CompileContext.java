@@ -3,11 +3,13 @@ package org.basex.query;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.*;
@@ -17,7 +19,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Compilation context.
@@ -50,9 +51,7 @@ public final class CompileContext {
    * @param ext text text extensions
    */
   public void info(final String string, final Object... ext) {
-    final TokenList tl = new TokenList();
-    for(final Object e : ext) tl.add(QueryError.chop(TokenBuilder.token(e), null));
-    qc.info.compInfo(string, tl.finish());
+    qc.info.compInfo(string, ext);
   }
 
   /**
@@ -204,15 +203,19 @@ public final class CompileContext {
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
     final Expr res = result == null ? Empty.SEQ : result;
     if(res != expr) {
-      final byte[] exprString = QueryError.chop(Token.token(expr.toString()), null);
-      final byte[] resString = QueryError.chop(Token.token(res.toString()), null);
-      if(!Token.eq(exprString, resString)) {
+      final Supplier<String> f  = () -> {
+        final byte[] exprString = QueryError.chop(Token.token(expr.toString()), null);
+        final byte[] resString = QueryError.chop(Token.token(res.toString()), null);
+        if(Token.eq(exprString, resString)) return "";
+
         final TokenBuilder tb = new TokenBuilder();
         final String exprDesc = expr.description(), resDesc = res.description();
         tb.add(res instanceof ParseExpr ? OPTREWRITE : OPTPRE).add(' ').add(exprDesc);
         if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
-        info(tb.add(": ").add(exprString).add(" -> ").add(resString).toString());
-      }
+        tb.add(": ").add(exprString).add(" -> ").add(resString);
+        return tb.toString();
+      };
+      info("%", f);
 
       if(res instanceof ParseExpr) {
         // refine type. required mostly for {@link Filter} rewritings

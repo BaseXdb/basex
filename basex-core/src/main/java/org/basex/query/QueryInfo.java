@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -61,14 +62,22 @@ public final class QueryInfo {
    * @param string evaluation info
    * @param ext text text extensions
    */
-  void compInfo(final String string, final Object[] ext) {
+  void compInfo(final String string, final Object... ext) {
     if(verbose) {
-      String info = Util.info(string,  ext);
-      if(runtime) {
-        info = "RUNTIME: " + info;
-        if(Prop.debug) Util.stack(info);
+      final int el = ext.length;
+      for(int e = 0; e < el; e++) {
+        final Object o = ext[e];
+        ext[e] = o instanceof Supplier<?> ? ((Supplier<?>) o).get() :
+          QueryError.chop(TokenBuilder.token(o), null);
       }
-      compile.add(info);
+      String info = Util.info(string, ext);
+      if(!info.isEmpty()) {
+        if(runtime) {
+          info = "RUNTIME: " + info;
+          if(Prop.debug) Util.stack(info);
+        }
+        compile.add(info);
+      }
     }
   }
 
