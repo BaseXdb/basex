@@ -47,7 +47,6 @@ public abstract class WsAdapter  extends WebSocketAdapter {
     UpgradeRequest ur = sess.getUpgradeRequest();
 
     if(this.path != null) {
-      System.out.println("join channel " + path.toString());
       id = WsPool.getInstance().joinChannel(this, path.toString());
     } else {
       id = WsPool.getInstance().join(this);

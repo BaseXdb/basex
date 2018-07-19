@@ -78,7 +78,6 @@ public class StompWsV10 extends WsAdapter {
       case SUBSCRIBE:
         // Get Headers needed for the Channel-Maps
         stompId = stompframe.getHeaders().get("id");
-
         // Add to the ID-Channel Map (Stomp-id from the Client, Channel)
         idchannelMap.put(stompId, channel);
         // Add the Stomp id to the map: stompID - WSuuid (returned from the WSPool
@@ -129,7 +128,9 @@ public class StompWsV10 extends WsAdapter {
 
   @Override
   public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
-    wsconnection.error("Binary not supported within the STOMP-Protocol", 500);
+    wsconnection.error("Plain Binary Messages are not supported by the STOMP-Protocol. "
+        + "Try to send a regualar STOMP-Message, add a content-type HEADER and "
+        + "send your Binary-Data as Message-Body", 500);
   }
 
   @Override

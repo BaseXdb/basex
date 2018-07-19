@@ -181,9 +181,7 @@ public class WsPool {
       if(!member.getSession().isOpen()) {
         List<String> ids = membersInv.get(member);
         membersInv.remove(member);
-        ids.forEach((id) -> {
-          members.remove(id);
-        });
+        ids.forEach(id -> members.remove(id));
       } else {
         RemoteEndpoint reMember = member.getSession().getRemote();
         checkAndSend(message, reMember);
@@ -209,9 +207,7 @@ public class WsPool {
         if(!member.getSession().isOpen()) {
           List<String> pids = membersInv.get(member);
           membersInv.remove(member);
-          pids.forEach((id) -> {
-            members.remove(id);
-          });
+          pids.forEach(id -> members.remove(id));
         } else {
           RemoteEndpoint reMember = member.getSession().getRemote();
           checkAndSend(message, reMember);
