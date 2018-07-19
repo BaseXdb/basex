@@ -53,6 +53,8 @@ public final class QueryContext extends Job implements Closeable {
   public final StaticFuncs funcs = new StaticFuncs();
   /** Externally bound variables. */
   private final HashMap<QNm, Value> bindings = new HashMap<>();
+  /** External query properties. */
+  private final HashMap<String, Object> props;
 
   /** Parent query context. */
   public final QueryContext parent;
@@ -63,8 +65,6 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Query resources. */
   public QueryResources resources;
-  /** HTTP connection. */
-  public Object http;
   /** Update container. */
   public Updates updates;
 
@@ -134,10 +134,9 @@ public final class QueryContext extends Job implements Closeable {
    * @param parent parent context
    */
   public QueryContext(final QueryContext parent) {
-    this(parent.context, parent, parent.info);
+    this(parent.context, parent, parent.info, parent.props);
     parent.pushJob(this);
     resources = parent.resources;
-    http = parent.http;
     updates = parent.updates;
   }
 
@@ -146,7 +145,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    */
   public QueryContext(final Context context) {
-    this(context, null, null);
+    this(context, null, null, new HashMap<>());
     resources = new QueryResources(this);
   }
 
@@ -155,11 +154,14 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    * @param parent parent context (can be {@code null})
    * @param info query info
+   * @param props external properties
    */
-  private QueryContext(final Context context, final QueryContext parent, final QueryInfo info) {
+  private QueryContext(final Context context, final QueryContext parent, final QueryInfo info,
+      final HashMap<String, Object> props) {
     this.context = context;
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(this);
+    this.props = props;
   }
 
   /**
@@ -418,11 +420,21 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds the HTTP connection.
-   * @param value HTTP connection
+   * Assigns an external property.
+   * @param key key
+   * @param value value
    */
-  public void http(final Object value) {
-    http = value;
+  public void putProperty(final String key, final Object value) {
+    props.put(key, value);
+  }
+
+  /**
+   * Returns an external property.
+   * @param key key
+   * @return value (can be {@code null})
+   */
+  public Object getProperty(final String key) {
+    return props.get(key);
   }
 
   /**

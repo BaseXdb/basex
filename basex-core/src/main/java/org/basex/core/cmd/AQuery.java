@@ -28,11 +28,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AQuery extends Command {
-  /** Variables. */
+  /** External variable bindings. */
   protected final HashMap<String, String[]> vars = new HashMap<>();
+  /** External properties. */
+  protected final HashMap<String, Object> props = new HashMap<>();
 
-  /** HTTP connection. */
-  private Object http;
   /** Query processor. */
   private QueryProcessor qp;
   /** Query info. */
@@ -165,7 +165,8 @@ public abstract class AQuery extends Command {
       info.locks = jc().locks;
     }
 
-    qp.http(http);
+    for(final Map.Entry<String, Object> entry : props.entrySet())
+      qp.qc.putProperty(entry.getKey(), entry.getValue());
     qp.parse();
     qp.qc.info.parsing += perf.ns();
   }
@@ -189,11 +190,12 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Binds the HTTP context.
-   * @param value HTTP context
+   * Caches an external property.
+   * @param key key
+   * @param value value
    */
-  public final void http(final Object value) {
-    http = value;
+  public void putExternal(final String key, final Object value) {
+    props.put(key, value);
   }
 
   /**

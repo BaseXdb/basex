@@ -57,7 +57,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   private HTTPConnection connection() throws QueryException {
-    final Object http = queryContext.http;
+    final Object http = queryContext.getProperty(HTTPText.HTTP);
     if(http == null) throw BASEX_HTTP.get(null);
     return (HTTPConnection) http;
   }

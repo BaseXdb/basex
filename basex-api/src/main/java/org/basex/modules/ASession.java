@@ -37,7 +37,7 @@ final class ASession {
     this.qc = qc;
     this.id = id;
 
-    final Object http = qc.http;
+    final Object http = qc.getProperty(HTTPText.HTTP);
     if(http == null) throw BASEX_HTTP.get(null);
 
     if(id == null) {
