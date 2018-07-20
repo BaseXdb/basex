@@ -1,21 +1,21 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
- * This class contains a single RESTXQ parameter.
+ * This class contains a single Web parameter.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqParam {
+public final class WebParam {
   /** Variable name. */
-  final QNm var;
+  public final QNm var;
   /** Name of parameter. */
-  final String name;
+  public final String name;
   /** Default value. */
-  final Value value;
+  public final Value value;
 
   /**
    * Constructor.
@@ -23,7 +23,7 @@ final class RestXqParam {
    * @param name name of parameter
    * @param value default value
    */
-  RestXqParam(final QNm var, final String name, final Value value) {
+  public WebParam(final QNm var, final String name, final Value value) {
     this.var = var;
     this.name = name;
     this.value = value;

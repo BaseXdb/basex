@@ -1,7 +1,7 @@
 package org.basex.http.restxq;
 
 import static java.math.BigInteger.*;
-import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.http.web.WebText.*;
 
 import java.math.*;
 import java.util.*;

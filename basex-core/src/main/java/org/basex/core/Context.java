@@ -134,6 +134,7 @@ public final class Context {
    * @return user
    */
   public User user() {
+    if(user == null) throw Util.notExpected("User has not been assigned yet.");
     return user;
   }
 

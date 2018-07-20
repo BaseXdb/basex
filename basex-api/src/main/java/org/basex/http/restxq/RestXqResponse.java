@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

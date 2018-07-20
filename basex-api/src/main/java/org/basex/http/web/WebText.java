@@ -1,4 +1,4 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
@@ -8,12 +8,12 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 
 /**
- * This class assembles texts which are used in the HTTP classes.
+ * This class assembles texts which are used in the Web classes.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public interface RestXqText {
+public interface WebText {
   /** Token "header". */
   byte[] HEADER = token("header");
   /** Token "response". */

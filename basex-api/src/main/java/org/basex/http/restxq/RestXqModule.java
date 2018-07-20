@@ -20,7 +20,7 @@ import org.basex.query.func.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqModule {
+public final class RestXqModule {
   /** Supported methods. */
   private final ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** File reference. */

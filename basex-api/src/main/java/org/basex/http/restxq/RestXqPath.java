@@ -3,6 +3,7 @@ package org.basex.http.restxq;
 import java.util.*;
 
 import org.basex.http.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -13,9 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqPath implements Comparable<RestXqPath> {
-  /** Path. */
-  private final String path;
+final class RestXqPath extends WebPath implements Comparable<RestXqPath> {
   /** Path matcher. */
   private final RestXqPathMatcher matcher;
 
@@ -26,7 +25,7 @@ final class RestXqPath implements Comparable<RestXqPath> {
    * @throws QueryException query exception
    */
   RestXqPath(final String path, final InputInfo info) throws QueryException {
-    this.path = path;
+    super(path);
     matcher = RestXqPathMatcher.parse(path, info);
   }
 
@@ -75,10 +74,5 @@ final class RestXqPath implements Comparable<RestXqPath> {
       if(wc1 != wc2) return wc1 ? 1 : -1;
     }
     return 0;
-  }
-
-  @Override
-  public String toString() {
-    return path;
   }
 }
