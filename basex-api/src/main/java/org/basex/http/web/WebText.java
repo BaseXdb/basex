@@ -107,6 +107,10 @@ public interface WebText {
   String PARAM_MISSING_X = "Params missing. Required Params: %";
   /** Error message. */
   String HEADER_MISSING = "Not all required headers are set";
+  /** Error message. */
+  String NO_WSID_FOUND = "Internal Error: No WebsocketclientId found";
+  /** Error Message. */
+  String WS_CAST_FAILED = "Internal Error: Casting of WebsocketClientid failed";
 
   /** QName. */
   QNm Q_STATUS = new QNm(STATUS);

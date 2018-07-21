@@ -157,13 +157,14 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @param message The WebsocketMessage
    * @param response The WSResponse
    * @param header The header to set
+   * @param id The id of the WebsocketClient
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
   public boolean process(final WsConnection conn, final Object message, final WsResponse response,
-      final Map<String, String> header) throws Exception {
+      final Map<String, String> header, final String id) throws Exception {
     try {
-      return module.process(conn, this, message, response, header);
+      return module.process(conn, this, message, response, header, id);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;

@@ -8,6 +8,7 @@ import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.query.ann.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 import org.eclipse.jetty.websocket.api.*;
 
@@ -37,9 +38,48 @@ public abstract class WsAdapter  extends WebSocketAdapter {
   protected Map<String, String> headerParams = new HashMap<>();
 
   /**
+   * Map with the Attributes.
+   * */
+  protected Map<String, Value> attributes = new HashMap<>();
+
+  /**
    * The Serializer for specific Subprotocols.
    */
   protected WsResponse response;
+
+  /**
+   * Sets a Attribute of the WebsocketAttributes.
+   * @param key The String key
+   * @param value The Value to put in
+   * */
+  public void setAttribute(final String key, final Value value) {
+    attributes.put(key, value);
+  }
+
+  /**
+   * Returns a specific Attribute.
+   * @param key The String key
+   * @return The requested Attribute
+   * */
+  public Value getAttribute(final String key) {
+    return attributes.get(key);
+  }
+
+  /**
+   * Deletes a Attribute.
+   * @param key The String key.
+   * */
+  public void delete(final String key) {
+    attributes.remove(key);
+  }
+
+  /**
+   * Returns the String Path of the WebsocketClient.
+   * @return String Path
+   * */
+  public String getPath() {
+    return path.toString();
+  }
 
   @Override
   public void onWebSocketConnect(final Session sess) {
@@ -116,7 +156,7 @@ public abstract class WsAdapter  extends WebSocketAdapter {
       if(func == null) {
         wsconnection.error(Util.info(XQUERY_MISSING_X, ann.toString()), 500);
         }
-      if(func != null && response != null) func.process(wsconnection, msg, response, header);
+      if(func != null && response != null) func.process(wsconnection, msg, response, header, id);
     } catch(Exception e) {
       wsconnection.error(e.getMessage(), 500);
     }

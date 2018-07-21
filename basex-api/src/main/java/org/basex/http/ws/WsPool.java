@@ -1,9 +1,13 @@
 package org.basex.http.ws;
 
 import java.nio.*;
+import java.nio.charset.*;
 import java.util.*;
 
+import org.basex.http.ws.adapter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -27,26 +31,78 @@ public class WsPool {
   }
 
   /**
-   * The members of the Pool. ID -> WebSocketAdapter.
+   * The members of the Pool. ID -> WsAdapter.
    */
-  private HashMap<String, WebSocketAdapter> members = new HashMap<>();
+  private HashMap<String, WsAdapter> members = new HashMap<>();
 
   /**
-   * The members of the Pool. WebSocketAdapter -> List<ID>.
+   * The members of the Pool. WsAdapter -> List<ID>.
    */
-  private HashMap<WebSocketAdapter, List<String>> membersInv = new HashMap<>();
+  private HashMap<WsAdapter, List<String>> membersInv = new HashMap<>();
 
   /**
    * The List of Members per Channel.
    */
-  private HashMap<String, List<WebSocketAdapter>> channels = new HashMap<>();
+  private HashMap<String, List<WsAdapter>> channels = new HashMap<>();
+
+  /**
+   * Updates a Attribute in the WebsocketClient with the id id.
+   * @param id String id of the WebsocketClient
+   * @param key String key of the Attribute
+   * @param value Value value of the Attribute
+   * */
+  public void setAttribute(final String id, final String key, final Value value) {
+    members.get(id).setAttribute(key, value);
+  }
+
+  /**
+   * Returns a Attribute of the WebsocketClient with the id id.
+   * @param id String id of the WebsocketClient
+   * @param key String key of the Attribute.
+   * @return Value the requested Value
+   * */
+  public Value getAttribute(final String id, final String key) {
+    return members.get(id).getAttribute(key);
+  }
+
+  /**
+   * Deletes a Attribute of the WebsocketClient with the id id.
+   * @param id String id of the WebsocketClient
+   * @param key String key of the Attribute
+   * */
+  public void delete(final String id, final String key) {
+    members.get(id).delete(key);
+  }
+
+  /**
+   * Returns the String path of a WebsocketClient with the Id id.
+   * @param id String id of the WebsocketClient
+   * @return String the WebsocketPathString
+   * */
+  public String path(final String id) {
+    return members.get(id).getPath();
+  }
+
+  /**
+   * Returns the IDs of all connected WebSocketClients.
+   * @return IDs of connected WebSocketClients
+   * */
+  public Value ids() {
+    byte[][] theids = new byte[members.size()][];
+    int idx = 0;
+    for(String key : members.keySet()) {
+      theids[idx] = key.getBytes(StandardCharsets.UTF_8);
+      idx++;
+    }
+    return StrSeq.get(theids);
+  }
 
   /**
    * Adds a WebSocket to the membersList.
-   * @param socket WebSocketAdapter
+   * @param socket WsAdapter
    * @return string The Unique Id of the WebSocketInstance
    */
-  public String join(final WebSocketAdapter socket) {
+  public String join(final WsAdapter socket) {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
 
@@ -61,11 +117,11 @@ public class WsPool {
 
   /**
    * Adds a Websocket to a specific Channel.
-   * @param socket WebSocketAdapter
+   * @param socket WsAdapter
    * @param channel String
    * @return string The Unique ID of the WebSocketInstance
    */
-  public String joinChannel(final WebSocketAdapter socket, final String channel) {
+  public String joinChannel(final WsAdapter socket, final String channel) {
     String uniqueID = UUID.randomUUID().toString();
     members.put(uniqueID, socket);
     // Add uniqueId to membersinvid-list
@@ -76,7 +132,7 @@ public class WsPool {
     membersinvids.add(uniqueID);
     membersInv.put(socket, membersinvids);
 
-    List<WebSocketAdapter> channelMembers = channels.get(channel);
+    List<WsAdapter> channelMembers = channels.get(channel);
     if(channelMembers == null) {
       channelMembers = new ArrayList<>();
     }
@@ -90,20 +146,20 @@ public class WsPool {
    * @param id String
    */
   public void remove(final String id) {
-    WebSocketAdapter socket = members.get(id);
+    WsAdapter socket = members.get(id);
     members.remove(id);
     membersInv.remove(socket);
   }
 
   /**
    * Removes a Member from the ChannelMemberList.
-   * @param socket WebSocketAdapter
+   * @param socket WsAdapter
    * @param channel String
    * @param id String
    */
-  public void removeFromChannel(final WebSocketAdapter socket, final String channel,
+  public void removeFromChannel(final WsAdapter socket, final String channel,
       final String id) {
-    WebSocketAdapter socketM = members.get(id);
+    WsAdapter socketM = members.get(id);
     members.remove(id);
 
     List<String> membersinvids = membersInv.get(socketM);
@@ -116,7 +172,7 @@ public class WsPool {
     }
     membersInv.put(socketM, membersinvids);
 
-    List<WebSocketAdapter> channelMembers = channels.get(channel);
+    List<WsAdapter> channelMembers = channels.get(channel);
     // Channel list doesnt exist, return
     if(channelMembers == null) {
       return;
@@ -129,7 +185,7 @@ public class WsPool {
    * Sends a Message to all connected Members.
    * @param message Object
    */
-  public void broadcast(final Object message) {
+  public void emit(final Object message) {
     if(message == null) return;
     try {
       members.forEach((k, v) -> {
@@ -151,7 +207,7 @@ public class WsPool {
    * @param message Object
    * @param pId The ID
    */
-  public void broadcastWithoutID(final Object message, final Str pId) {
+  public void broadcast(final Object message, final Str pId) {
     if(message == null || pId == null) return;
     members.forEach((id, member) -> {
       if(!id.equals(pId.toJava())) {
@@ -167,62 +223,12 @@ public class WsPool {
   }
 
   /**
-   * Sends a Message to all connected Members in the Channel.
-   * @param message String
-   * @param channel String
-   */
-  public void broadcastChannel(final Object message, final Str channel) {
-    List<WebSocketAdapter> channelMembers = channels.get(channel.toJava());
-    // Channel list doesnt exist, return
-    if(channelMembers == null) {
-      return;
-    }
-    for(WebSocketAdapter member : channelMembers) {
-      if(!member.getSession().isOpen()) {
-        List<String> ids = membersInv.get(member);
-        membersInv.remove(member);
-        ids.forEach(id -> members.remove(id));
-      } else {
-        RemoteEndpoint reMember = member.getSession().getRemote();
-        checkAndSend(message, reMember);
-      }
-    }
-  }
-
-  /**
-   * Sends a Message to all connected Members in a Channel except the one with the given id.
-   * @param message Object
-   * @param channel Str
-   * @param pId Id to dismiss
-   */
-  public void broadcastChannelWoID(final Object message, final Str channel, final Str pId) {
-    List<WebSocketAdapter> channelMembers = channels.get(channel.toJava());
-    // Channel list doesnt exist, return
-    if(channelMembers == null) {
-      return;
-    }
-    for(WebSocketAdapter member : channelMembers) {
-      List<String> ids = membersInv.get(member);
-      if(!ids.contains(pId.toJava())) {
-        if(!member.getSession().isOpen()) {
-          List<String> pids = membersInv.get(member);
-          membersInv.remove(member);
-          pids.forEach(id -> members.remove(id));
-        } else {
-          RemoteEndpoint reMember = member.getSession().getRemote();
-          checkAndSend(message, reMember);
-        }
-      }
-    }
-  }
-
-  /**
    * Sends a Message to a specific Member.
    * @param message Object
    * @param id String
    */
   public void sendTo(final Object message, final Str id) {
-    WebSocketAdapter member = members.get(id.toJava());
+    WsAdapter member = members.get(id.toJava());
     if(member == null) return;
     checkAndSend(message, member.getSession().getRemote());
   }

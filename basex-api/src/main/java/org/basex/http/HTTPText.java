@@ -9,6 +9,8 @@ package org.basex.http;
 public interface HTTPText {
   /** HTTP String. */
   String HTTP = "HTTP";
+  /** Websocket String. */
+  String WS = "WebSocket";
   /** WEB-INF directory. */
   String WEB_INF = "WEB-INF/";
   /** Path to jetty configuration file. */

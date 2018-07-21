@@ -176,14 +176,16 @@ public final class RestXqModule {
    * @param message String the Message which arrives in onText
    * @param response The WsSerializer
    * @param header The headers to set
+   * @param id The id of the WebsocketClient
    * @return {@code true} if function creates no result
    * @throws Exception exception
    */
   public boolean process(final WsConnection conn, final WsFunction func,
       final Object message, final WsResponse response,
-      final Map<String, String> header) throws Exception {
+      final Map<String, String> header, final String id) throws Exception {
     final Context ctx = conn.context;
     try(QueryContext qc = qc(ctx)) {
+      qc.putProperty(HTTPText.WS, id);
       final StaticFunc sf = find(qc, func.function);
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();
