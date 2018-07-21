@@ -153,15 +153,15 @@ public enum Annotation {
   _UNIT_TEST("test(['expected',error])", arg(STR_O, STR_O), UNIT_URI),
 
   /** XQuery annotation. */
-  _WS_CONNECT("connect(path[,id])", arg(STR_O, STR_O), WS_URI),
+  _WS_CONNECT("connect(path)", arg(STR_O), WS_URI),
   /** XQuery annotation. */
-  _WS_MESSAGE("message(path,message[,id])", arg(STR_O, STR_O, STR_O), WS_URI),
+  _WS_MESSAGE("message(path,message)", arg(STR_O, STR_O), WS_URI),
   /** XQuery annotation. */
-  _WS_CLOSE("close(path[,id])", arg(STR_O, STR_O), WS_URI),
+  _WS_CLOSE("close(path)", arg(STR_O), WS_URI),
   /** XQuery annotation. */
   _WS_PARAM("param(name,variable[,default,...])", arg(STR_O, STR_O, ITEM_O), WS_URI, false),
   /** XQuery annotation. */
-  _WS_ERROR("error(path,message[,id])", arg(STR_O, STR_O, STR_O), WS_URI);
+  _WS_ERROR("error(path,message)", arg(STR_O, STR_O), WS_URI);
 
   /** Argument types. */
   public final SeqType[] args;

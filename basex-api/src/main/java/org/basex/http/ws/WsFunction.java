@@ -109,27 +109,17 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
-          if(args.length >= 2) {
-            final QNm varId = checkVariable(toString(args[1]), declared);
-            WebParam id = new WebParam(varId, "id", null);
-            headerParams.add(id);
-          }
           path = new WsPath(toString(args[0]));
           countOccureOnce++;
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
           if(args.length < 2) {
-            throw error(PARAM_MISSING_X, "path,message[,id]");
+            throw error(PARAM_MISSING_X, "path,message");
           }
           final QNm varMsg = checkVariable(toString(args[1]), declared);
           WebParam msg = new WebParam(varMsg, "message", null);
           headerParams.add(msg);
-          if(args.length > 2) {
-            final QNm varId = checkVariable(toString(args[2]), declared);
-            WebParam id = new WebParam(varId, "id", null);
-            headerParams.add(id);
-          }
           path = new WsPath(toString(args[0]));
           countOccureOnce++;
           break;

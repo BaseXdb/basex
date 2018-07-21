@@ -227,7 +227,7 @@ public class WsPool {
    * @param message Object
    * @param id String
    */
-  public void sendTo(final Object message, final Str id) {
+  public void send(final Object message, final Str id) {
     WsAdapter member = members.get(id.toJava());
     if(member == null) return;
     checkAndSend(message, member.getSession().getRemote());

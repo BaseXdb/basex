@@ -46,7 +46,7 @@ public final class Websocket extends QueryModule {
    * @param id Specific id
    */
   public void send(final Object message, final Str id) {
-    WsPool.getInstance().sendTo(message, id);
+    WsPool.getInstance().send(message, id);
   }
 
   /**

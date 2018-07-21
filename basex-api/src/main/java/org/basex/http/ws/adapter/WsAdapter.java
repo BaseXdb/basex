@@ -100,7 +100,6 @@ public abstract class WsAdapter  extends WebSocketAdapter {
     headerParams.put("QueryString", ur.getQueryString());
     headerParams.put("IsSecure", String.valueOf(ur.isSecure()));
     headerParams.put("RequestURI", ur.getRequestURI().toString());
-    headerParams.put("id", id);
     List<String> headerKeys = new ArrayList<>();
     Collections.addAll(headerKeys, "Host", "Sec-WebSocket-Version");
     sess.getUpgradeRequest().getHeaders().forEach((k, v) -> {
