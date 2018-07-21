@@ -17,8 +17,8 @@ public final class ProfVoid extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
 
-    // materialize items to ensure that lazy items will be evaluated
-    for(Item item; (item = qc.next(iter)) != null;) item.materialize(info);
+    // caches items; ensures that lazy items will be evaluated
+    for(Item item; (item = qc.next(iter)) != null;) item.cache(info);
     return null;
   }
 }

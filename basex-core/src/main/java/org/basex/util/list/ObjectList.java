@@ -51,8 +51,21 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   public boolean contains(final E element) {
     final E[] lst = list;
     final int s = size;
-    for(int l = 0; l < s; l++) if(eq(lst[l], element)) return true;
+    for(int l = 0; l < s; l++) {
+      if(eq(lst[l], element)) return true;
+    }
     return false;
+  }
+
+  /**
+   * Adds an element to the array if it is not contained yet.
+   * @param element element to be added
+   * @return result of check
+   */
+  @SuppressWarnings("unchecked")
+  public L addUnique(final E element) {
+    if(!contains(element)) add(element);
+    return (L) this;
   }
 
   /**

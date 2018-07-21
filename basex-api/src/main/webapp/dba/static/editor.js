@@ -1,6 +1,6 @@
 /**
  * Opens a query file.
- * @param {string} file  optional file name
+ * @param {string} file optional file name
  */
 function openQuery(file) {
   if(_editorMirror.getValue().trim() && !confirm("Replace editor contents?")) return;
@@ -24,7 +24,7 @@ function openQuery(file) {
       setError("Query could not be opened.");
     }
   )
-};
+}
 
 /**
  * Saves a query file.
@@ -48,7 +48,7 @@ function saveQuery() {
       setErrorFromResponse(req);
     }
   )
-};
+}
 
 /**
  * Closes a query file.
@@ -66,11 +66,11 @@ function closeQuery() {
       setErrorFromResponse(req);
     }
   );
-};
+}
 
 /**
  * Refreshes the list of available query files.
- * @param {object} request  HTTP request
+ * @param {object} request HTTP request
  */
 function refreshDataList(request) {
   var files = document.getElementById("files");
@@ -84,16 +84,16 @@ function refreshDataList(request) {
     files.appendChild(opt);
   }
   checkButtons();
-};
+}
 
 /**
  * Refreshes the editor buttons.
  */
 function checkButtons() {
   document.getElementById("open").disabled = !queryExists();
-  document.getElementById("save").disabled = fileName().length == 0;
+  document.getElementById("save").disabled = fileName().length === 0;
   document.getElementById("close").disabled = !queryExists();
-};
+}
 
 /**
  * Checks if the typed in query file exists.
@@ -103,10 +103,10 @@ function queryExists() {
   var file = fileName();
   var files = document.getElementById("files").children;
   for (var f = 0; f < files.length; f++) {
-    if(files[f].value == file) return true;
+    if(files[f].value === file) return true;
   }
   return false;
-};
+}
 
 /**
  * Returns the current file name without file suffix
@@ -114,4 +114,4 @@ function queryExists() {
  */
 function fileName() {
   return document.getElementById("file").value.trim();
-};
+}

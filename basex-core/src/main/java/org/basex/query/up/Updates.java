@@ -117,15 +117,14 @@ public final class Updates {
     for(ANode n; (n = iter.next()) != null;) anc = n;
 
     /* See if this ancestor has already been added to the pending update list.
-     * In this case a database has already been created.
-     */
+     * In this case a database has already been created. */
     final int ancID = anc.id;
     MemData data;
     synchronized(fragmentIDs) {
       data = fragmentIDs.get(ancID);
-      // if data doesn't exist, create a new one
+      // if data instance does not exist, create new one
       if(data == null) {
-        data = (MemData) anc.dbNodeCopy(qc.context.options, qc).data();
+        data = (MemData) anc.copy(qc).data();
         // create a mapping between the fragment id and the data reference
         fragmentIDs.put(ancID, data);
       }

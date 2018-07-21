@@ -35,7 +35,9 @@ public final class ArchiveDelete extends ArchiveFn {
         ArchiveOut out = ArchiveOut.get(in.format(), info)) {
       if(in instanceof GZIPIn)
         throw ARCHIVE_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
-      while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
+      while(in.more()) {
+        if(!hm.contains(token(in.entry().getName()))) out.write(in);
+      }
       return B64.get(out.finish());
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);

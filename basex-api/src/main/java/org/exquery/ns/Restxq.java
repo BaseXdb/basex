@@ -16,7 +16,7 @@ import org.basex.query.value.node.*;
  */
 public final class Restxq extends QueryModule {
   /**
-   * Returns an {Code application.wadl} description including all RESTXQ services.
+   * Returns an {@code application.wadl} description with all RESTXQ endpoints.
    * @return WADL description
    * @throws QueryException query exception
    */
@@ -25,17 +25,18 @@ public final class Restxq extends QueryModule {
   }
 
   /**
-   * Returns the base URI of the resource function.
+   * Returns the base URI of the request.
    * @return base URI
    * @throws QueryException query exception
    */
   public Uri baseUri() throws QueryException {
     final HTTPConnection conn = connection();
-    return Uri.uri(conn.req.getRequestURI().replace(conn.req.getPathInfo(), ""));
+    final String uri = conn.req.getRequestURI(), path = conn.req.getPathInfo();
+    return Uri.uri(path != null ? uri.substring(0, uri.length() - path.length()) : uri);
   }
 
   /**
-   * Returns the URI of the resource function.
+   * Returns the full URI of the request.
    * @return base URI
    * @throws QueryException query exception
    */
@@ -56,7 +57,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   private HTTPConnection connection() throws QueryException {
-    final Object http = queryContext.http;
+    final Object http = queryContext.getProperty(HTTPText.HTTP);
     if(http == null) throw BASEX_HTTP.get(null);
     return (HTTPConnection) http;
   }

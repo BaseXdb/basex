@@ -1,6 +1,6 @@
 package org.basex.http.ws;
 
-import static org.basex.http.util.WebText.*;
+import static org.basex.http.web.WebText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
@@ -9,7 +9,7 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
-import org.basex.http.util.*;
+import org.basex.http.web.*;
 import org.basex.http.ws.response.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -25,6 +25,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  */
 public class WsFunction extends WebFunction implements Comparable<WsFunction> {
+  /** Associated module. */
+  private final RestXqModule module;
+
   /**
    * The Constructor.
    * @param function associated user function
@@ -32,7 +35,8 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @param module associated module
    */
   public WsFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
-    super(function, qc, module);
+    super(function, qc);
+    this.module = module;
   }
 
   /** The Path of the WsFunction. */
@@ -72,9 +76,9 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   /**
    * Checks a function for Websocket Annotations.
    * @return {@code true} if function contains relevant annotations
-   * @throws Exception exception
+   * @throws QueryException exception
    */
-  public boolean parse() throws Exception {
+  public boolean parse() throws QueryException {
     boolean found = false;
     final boolean[] declared = new boolean[function.params.length];
     // Counts the Annotations which should occur only once

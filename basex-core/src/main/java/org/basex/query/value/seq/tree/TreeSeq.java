@@ -34,7 +34,7 @@ public abstract class TreeSeq extends Seq {
   /**
    * Default constructor.
    * @param size number of elements in this sequence
-   * @param type type of all items in this sequence
+   * @param type type of all items in this sequence, can be {@code null}
    */
   TreeSeq(final long size, final Type type) {
     super(size, type == null ? AtomType.ITEM : type);
@@ -91,8 +91,8 @@ public abstract class TreeSeq extends Seq {
   public abstract BasicIter<Item> iter();
 
   @Override
-  public final void materialize(final InputInfo info) throws QueryException {
-    for(final Item item : this) item.materialize(info);
+  public final void cache(final InputInfo info) throws QueryException {
+    for(final Item item : this) item.cache(info);
   }
 
   @Override

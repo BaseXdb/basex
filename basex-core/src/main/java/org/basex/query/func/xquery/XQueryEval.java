@@ -97,9 +97,14 @@ public class XQueryEval extends StandardFunc {
         to = new Timer(true);
         to.schedule(new TimerTask() {
           @Override
-          // limit reached: stop query
-          public void run() { if(Performance.memory() > limit) qctx.memory(); }
-        }, 500, 500);
+          // limit reached: stop query if garbage collection does not help
+          public void run() {
+            if(!qctx.stopped() && Performance.memory() > limit) {
+              Performance.gc(1);
+              if(Performance.memory() > limit) qctx.memory();
+            }
+          }
+        }, 250, 250);
       }
 
       // timeout

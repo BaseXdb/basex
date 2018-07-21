@@ -24,7 +24,7 @@ declare variable $dba:SUB := 'user';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/add-pattern")
+  %rest:path("/dba/pattern-add")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("pattern", "{$pattern}")
   %rest:query-param("perm",    "{$perm}", "write")

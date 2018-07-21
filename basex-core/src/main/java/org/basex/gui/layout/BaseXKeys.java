@@ -64,7 +64,8 @@ public enum BaseXKeys {
   /** Delete word.           */ DELNEXTWORD(MAC ? ALT : META, VK_DELETE),
   /** Delete line to begin.  */ DELLINESTART(META | (MAC ? NO_MOD : SHIFT), VK_BACK_SPACE),
   /** Delete line to end.    */ DELLINEEND(META | (MAC ? NO_MOD : SHIFT), VK_DELETE),
-  /** Delete complete line.  */ DELLINE(META | SHIFT, VK_D),
+  /** Delete complete line.  */ DELLINES(META | SHIFT, VK_D),
+  /** Duplicate line(s).     */ DUPLLINES(META, VK_D),
 
   // Navigation
 

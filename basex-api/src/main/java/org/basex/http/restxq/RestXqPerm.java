@@ -1,12 +1,13 @@
 package org.basex.http.restxq;
 
-import static org.basex.http.util.WebText.*;
+import static org.basex.http.web.WebText.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.http.*;
 
 /**
  * RESTXQ permissions.
@@ -38,11 +39,12 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    * @throws QueryException query exception
    */
   Map map(final RestXqFunction func, final HTTPConnection conn) throws QueryException {
-    Map map = Map.EMPTY;
-    map = map.put(Str.get(ALLOW), StrSeq.get(func.allows), null);
-    map = map.put(Str.get(PATH), Str.get(conn.req.getPathInfo()), null);
-    map = map.put(Str.get(METHOD), Str.get(conn.method), null);
-    return map;
+    final MapBuilder mb = new MapBuilder();
+    mb.put(ALLOW, StrSeq.get(func.allows));
+    mb.put(PATH, conn.path());
+    mb.put(METHOD, conn.method);
+    mb.put(AUTHORIZATION, conn.req.getHeader(HttpText.AUTHORIZATION));
+    return mb.finish();
   }
 
   /**

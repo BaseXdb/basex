@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import static org.basex.http.util.WebText.*;
+import static org.basex.http.web.WebText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.ann.Annotation.*;
 import static org.basex.util.Token.*;
@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.Set;
 import java.util.regex.*;
 
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.build.csv.*;
@@ -18,7 +19,7 @@ import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.http.*;
-import org.basex.http.util.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -41,17 +42,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
-  /**
-   * Constructor.
-   * @param function associated user function
-   * @param qc query context
-   * @param module associated module
-   */
-  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
-    super(function, qc, module);
-  }
-
+final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
@@ -64,10 +55,11 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
 
   /** Supported methods. */
   final Set<String> methods = new HashSet<>();
-
   /** Permissions (can be empty). */
   final TokenList allows = new TokenList();
 
+  /** Associated module. */
+  private final RestXqModule module;
   /** Query parameters. */
   private final ArrayList<WebParam> errorParams = new ArrayList<>();
 
@@ -90,13 +82,28 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   private RestXqPerm permission;
 
   /**
-   * Processes the HTTP request. Parses new modules and discards obsolete ones.
+   * Constructor.
+   * @param function associated user function
+   * @param qc query context
+   * @param module associated module
+   */
+  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
+    super(function, qc);
+    this.module = module;
+  }
+
+  /**
+   * Processes the HTTP request.
+   * Parses new modules and discards obsolete ones.
    * @param conn HTTP connection
    * @param ext extended processing information (function, error; can be {@code null})
    * @return {@code true} if function creates no result
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   * @throws ServletException servlet exception
    */
-  boolean process(final HTTPConnection conn, final Object ext) throws Exception {
+  boolean process(final HTTPConnection conn, final Object ext)
+      throws QueryException, IOException, ServletException {
     try {
       return module.process(conn, this, ext);
     } catch(final QueryException ex) {
@@ -109,9 +116,10 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * Checks a function for REST and permission annotations.
    * @param ctx database context
    * @return {@code true} if function contains relevant annotations
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  boolean parse(final Context ctx) throws Exception {
+  boolean parse(final Context ctx) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.params.length];
     boolean found = false;
@@ -218,11 +226,12 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @param opts options instance
    * @param ann annotation
    * @return options instance
-   * @throws Exception any exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private static <O extends Options> O parse(final O opts, final Ann ann) throws Exception {
-    for(final Item arg : ann.args())
-      opts.assign(string(arg.string(ann.info)));
+  private static <O extends Options> O parse(final O opts, final Ann ann)
+      throws QueryException, IOException {
+    for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
     return opts;
   }
 
@@ -270,7 +279,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @param args arguments
    * @param ext extended processing information (can be {@code null})
    * @param qc query context
-   * @throws QueryException query exception
+   * @throws QueryException exception
    * @throws IOException I/O exception
    */
   void bind(final HTTPConnection conn, final Expr[] args, final Object ext, final QueryContext qc)
@@ -335,8 +344,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
       for(int n = 0; n < nl; n++)
         errs.put(string(names[n].local()), values[n]);
     }
-    for(final WebParam rxp : errorParams)
-      bind(rxp, args, errs.get(rxp.name), qc);
+    for(final WebParam rxp : errorParams) bind(rxp, args, errs.get(rxp.name), qc);
 
     // bind permission information
     if(ext instanceof RestXqFunction && permission.var != null) {
@@ -344,12 +352,6 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
     }
   }
 
-  /**
-   * Creates an exception with the specified message.
-   * @param msg message
-   * @param ext error extension
-   * @return exception
-   */
   @Override
   protected QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
@@ -360,9 +362,9 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @param info input info
    * @param msg message
    * @param ext error extension
-   * @return exception
+   * @return QueryException query exception
    */
-  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
+  static QueryException error(final InputInfo info, final String msg, final Object... ext) {
     return BASEX_RESTXQ_X.get(info, Util.info(msg, ext));
   }
 
@@ -440,7 +442,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @param ann annotation
    * @param declared variable declaration flags
    * @return parameter
-   * @throws QueryException HTTP exception
+   * @throws QueryException query exception
    */
   private WebParam param(final Ann ann, final boolean... declared) throws QueryException {
     // name of parameter
@@ -451,16 +453,14 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
     // default value
     final int al = args.length;
     final ItemList items = new ItemList(al - 2);
-    for(int a = 2; a < al; a++) {
-      items.add(args[a]);
-    }
+    for(int a = 2; a < al; a++) items.add(args[a]);
     return new WebParam(var, name, items.value());
   }
 
   /**
    * Creates an error function.
    * @param ann annotation
-   * @throws QueryException HTTP exception
+   * @throws QueryException query exception
    */
   private void error(final Ann ann) throws QueryException {
     if(error == null) error = new RestXqError();

@@ -37,7 +37,9 @@ public final class Where extends Clause {
     return new Eval() {
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
-        while(sub.next(qc)) if(expr.ebv(qc, info).bool(info)) return true;
+        while(sub.next(qc)) {
+          if(expr.ebv(qc, info).bool(info)) return true;
+        }
         return false;
       }
     };

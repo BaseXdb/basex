@@ -623,7 +623,6 @@ public class QueryParser extends InputParser {
         map.put(s, stringLiteral());
         break;
       }
-      if(map.isEmpty()) throw error(NODECLFORM_X, prop);
     } while(n != map.size());
 
     // completes the format declaration
@@ -735,7 +734,9 @@ public class QueryParser extends InputParser {
     final byte[] uri = mi.uri;
     if(mi.paths.isEmpty()) {
       // no paths specified: skip statically available modules
-      for(final byte[] u : Function.URIS) if(eq(uri, u)) return;
+      for(final byte[] u : Function.URIS) {
+        if(eq(uri, u)) return;
+      }
       // try to resolve module uri
       if(qc.resources.modules().addImport(string(uri), mi.info, this)) return;
       // module not found
@@ -1020,7 +1021,9 @@ public class QueryParser extends InputParser {
         for(final GroupSpec spec : specs) curr.put(spec.var.name.id(), spec.var);
         VARS:
         for(final Var var : curr.values()) {
-          for(final GroupSpec spec : specs) if(spec.var.is(var)) continue VARS;
+          for(final GroupSpec spec : specs) {
+            if(spec.var.is(var)) continue VARS;
+          }
           ng.add(new VarRef(specs[0].info, var));
         }
 
@@ -1437,12 +1440,18 @@ public class QueryParser extends InputParser {
   private Expr comparison() throws QueryException {
     final Expr ex = ftContains();
     if(ex != null) {
-      for(final OpV c : OpV.VALUES) if(wsConsumeWs(c.name))
-        return new CmpV(ex, check(ftContains(), CMPEXPR), c, sc.collation, sc, info());
-      for(final OpN c : OpN.VALUES) if(wsConsumeWs(c.name))
-        return new CmpN(ex, check(ftContains(), CMPEXPR), c, info());
-      for(final OpG c : OpG.VALUES) if(wsConsumeWs(c.name))
-        return new CmpG(ex, check(ftContains(), CMPEXPR), c, sc.collation, sc, info());
+      for(final OpV c : OpV.VALUES) {
+        if(wsConsumeWs(c.name))
+          return new CmpV(ex, check(ftContains(), CMPEXPR), c, sc.collation, sc, info());
+      }
+      for(final OpN c : OpN.VALUES) {
+        if(wsConsumeWs(c.name))
+          return new CmpN(ex, check(ftContains(), CMPEXPR), c, info());
+      }
+      for(final OpG c : OpG.VALUES) {
+        if(wsConsumeWs(c.name))
+          return new CmpG(ex, check(ftContains(), CMPEXPR), c, sc.collation, sc, info());
+      }
     }
     return ex;
   }

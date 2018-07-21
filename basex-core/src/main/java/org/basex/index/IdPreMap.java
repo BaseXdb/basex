@@ -101,7 +101,6 @@ public class IdPreMap {
     if(id > baseid) {
       // id was inserted by update
       for(int i = 0; i < rows; ++i) {
-        // if(fids[i] == id) return pres[i]; // is this optimization?
         if(fids[i] <= id && id <= nids[i]) return pres[i] + id - fids[i];
       }
     } else {

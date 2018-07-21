@@ -436,13 +436,19 @@ public final class FTWords extends FTExpr {
 
   @Override
   public boolean has(final Flag... flags) {
-    if(occ != null) for(final Expr o : occ) if(o.has(flags)) return true;
+    if(occ != null) for(final Expr o : occ) {
+      if(o.has(flags)) return true;
+    }
     return query.has(flags);
   }
 
   @Override
   public boolean removable(final Var var) {
-    if(occ != null) for(final Expr o : occ) if(!o.removable(var)) return false;
+    if(occ != null) {
+      for(final Expr o : occ) {
+        if(!o.removable(var)) return false;
+      }
+    }
     return query.removable(var);
   }
 
@@ -496,7 +502,7 @@ public final class FTWords extends FTExpr {
     if(!(obj instanceof FTWords)) return false;
     final FTWords f = (FTWords) obj;
     return query.equals(f.query) && mode == f.mode && Objects.equals(db, f.db) &&
-        Array.equals(occ, f.occ) && super.equals(obj);
+        Objects.equals(ftOpt, f.ftOpt) && Array.equals(occ, f.occ) && super.equals(obj);
   }
 
   @Override

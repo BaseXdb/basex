@@ -53,7 +53,9 @@ abstract class TrieNode {
     @Override
     void values(final ValueBuilder vs) { }
     @Override
-    void materialize(final InputInfo info) { }
+    void cache(final InputInfo info) { }
+    @Override
+    boolean materialized() { return true; }
     @Override
     boolean instanceOf(final AtomType kt, final SeqType dt) { return true; }
     @Override
@@ -203,11 +205,17 @@ abstract class TrieNode {
   abstract void values(ValueBuilder vs);
 
   /**
-   * Materializes all keys and values.
+   * Caches all keys and values.
    * @param info input info
    * @throws QueryException query exception
    */
-  abstract void materialize(InputInfo info) throws QueryException;
+  abstract void cache(InputInfo info) throws QueryException;
+
+  /**
+   * Checks if all values are materialized.
+   * @return result of check
+   */
+  abstract boolean materialized();
 
   /**
    * Applies a function on all entries.

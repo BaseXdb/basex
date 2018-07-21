@@ -410,7 +410,7 @@ declare function html:table(
               $label
             ) else (
               (: generate sort link :)
-              html:link($label, '', ($params, map { 'sort': $name, 'page': $page }))
+              html:link($label, '', ($params, map { 'sort': $name }))
             )
           }
         },
@@ -433,12 +433,12 @@ declare function html:table(
                 html:date(xs:dateTime($v))
               ) else if($type = 'xml') then (
                 $v()
+              ) else (
+                string($v)
               )
-              else string($v)
             } catch * {
               (: error: show original value :)
-              prof:dump($err:description),
-              string($v)
+              'Error: ' || $err:description
             }
           return element td {
             attribute align { if($type = $html:NUMBER) then 'right' else 'left' },

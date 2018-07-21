@@ -90,7 +90,9 @@ public final class GDt extends ADate {
    */
   private static int type(final Type type) {
     final int tl = TYPES.length;
-    for(int t = 0; t < tl; t++) if(TYPES[t] == type) return t;
+    for(int t = 0; t < tl; t++) {
+      if(TYPES[t] == type) return t;
+    }
     throw Util.notExpected();
   }
 

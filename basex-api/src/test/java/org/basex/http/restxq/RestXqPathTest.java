@@ -122,11 +122,10 @@ public final class RestXqPathTest extends RestXqTest {
   @Test
   public void unknownFunction() {
     try {
-      get("declare function m:foo($x) { $x };" +
-          "declare %R:path('') function m:f() { m:foo() };", "", "");
-      fail("Unknown function 'm:foo()' should not be found.");
+      get("declare %R:path('') function m:f() { m:foo() };", "", "");
+      fail("Error expected (Unknown function: m:foo.)");
     } catch(final IOException ex) {
-      assertTrue(ex.getMessage().contains("XPST0017"));
+      assertTrue(ex.getMessage().contains("m:foo"));
     }
   }
 

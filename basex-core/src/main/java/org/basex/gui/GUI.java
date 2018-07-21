@@ -106,6 +106,8 @@ public final class GUI extends JFrame implements BaseXWindow {
   private int menuHeight;
   /** Fullscreen Window. */
   private JFrame fullscr;
+  /** Custom macOS optimizations. */
+  private GUIMacOS osxGUI;
 
   /** Password reader. */
   private static volatile PasswordReader pwReader;
@@ -119,10 +121,9 @@ public final class GUI extends JFrame implements BaseXWindow {
     this.context = context;
     this.gopts = gopts;
 
+    if(Prop.MAC) osxGUI = GUIMacOS.get(this);
     setIconImage(BaseXImages.get("logo_64"));
     setTitle();
-
-    GUIMacOSX.enableOSXFullscreen(this);
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
@@ -144,7 +145,10 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     // add menu bar
     menu = new GUIMenu(this);
-    setJMenuBar(menu);
+    if(osxGUI != null) osxGUI.adjustMenuBar(this, menu);
+    else setJMenuBar(menu);
+
+    if(osxGUI != null) osxGUI.init();
 
     buttons = new BaseXBack(new BorderLayout());
     toolbar = new GUIToolBar(TOOLBAR, this);
@@ -249,7 +253,7 @@ public final class GUI extends JFrame implements BaseXWindow {
    * Saves the current configuration.
    */
   public void saveOptions() {
-    gopts.set(GUIOptions.OPEN, editor.openFiles());
+    gopts.setFiles(GUIOptions.OPEN, editor.openFiles());
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
     gopts.set(GUIOptions.MAXSTATE, max);
     if(!max) {
@@ -371,7 +375,6 @@ public final class GUI extends JFrame implements BaseXWindow {
       }
     }).start();
   }
-
   /**
    * Executes the specified command.
    * @param cmd command to be executed

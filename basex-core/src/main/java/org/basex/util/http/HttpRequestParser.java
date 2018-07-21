@@ -131,7 +131,7 @@ public final class HttpRequestParser {
       // no linked resource for setting request content
       if(items.isEmpty()) {
         // payload is taken from children of <http:body/> element
-        for(final ANode n : body.children()) payload.add(n);
+        for(final ANode node : body.children()) payload.add(node);
       } else {
         // payload is taken from $bodies parameter
         for(final Item item : items) payload.add(item);

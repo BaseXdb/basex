@@ -1,11 +1,12 @@
 package org.basex.query.expr.gflwor;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -147,7 +148,7 @@ public final class GFLWOR extends ParseExpr {
 
       // remove FLWOR expressions when all clauses were removed
       if(clauses.isEmpty()) {
-        cc.info(QueryText.OPTSIMPLE_X, description());
+        cc.info(QueryText.OPTSIMPLE_X, (Supplier<?>) () -> description());
         return ret;
       }
 
@@ -254,7 +255,7 @@ public final class GFLWOR extends ParseExpr {
     if(clauses.getFirst() instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
       final Expr branch = clauses.isEmpty() ? ret : this;
-      return cc.replaceWith(where, new If(info, where.expr, branch, Empty.SEQ).optimize(cc));
+      return cc.replaceWith(this, new If(info, where.expr, branch, Empty.SEQ).optimize(cc));
     }
 
     return this;
@@ -673,13 +674,17 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Clause clause : clauses) if(clause.has(flags)) return true;
+    for(final Clause clause : clauses) {
+      if(clause.has(flags)) return true;
+    }
     return ret.has(flags);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Clause clause : clauses) if(!clause.removable(var)) return false;
+    for(final Clause clause : clauses) {
+      if(!clause.removable(var)) return false;
+    }
     return ret.removable(var);
   }
 
@@ -799,7 +804,9 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Clause clause : clauses) if(!clause.accept(visitor)) return false;
+    for(final Clause clause : clauses) {
+      if(!clause.accept(visitor)) return false;
+    }
     return ret.accept(visitor);
   }
 

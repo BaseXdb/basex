@@ -34,10 +34,14 @@ public final class FTContent extends FTFilter {
   @Override
   protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
     if(content == FTContents.START) {
-      for(final FTStringMatch sm : match) if(sm.start == 0) return true;
+      for(final FTStringMatch sm : match) {
+        if(sm.start == 0) return true;
+      }
     } else if(content == FTContents.END) {
       final int p = lexer.count() - 1;
-      for(final FTStringMatch sm : match) if(sm.end == p) return true;
+      for(final FTStringMatch sm : match) {
+        if(sm.end == p) return true;
+      }
     } else {
       final int s = lexer.count();
       final boolean[] bl = new boolean[s];
@@ -45,7 +49,9 @@ public final class FTContent extends FTFilter {
         if(sm.gaps) continue;
         for(int p = sm.start; p <= sm.end; ++p) bl[p] = true;
       }
-      for(final boolean b : bl) if(!b) return false;
+      for(final boolean b : bl) {
+        if(!b) return false;
+      }
       return true;
     }
     return false;

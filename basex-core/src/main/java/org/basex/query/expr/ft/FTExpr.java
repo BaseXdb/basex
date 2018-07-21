@@ -67,13 +67,17 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final FTExpr expr : exprs) if(expr.has(flags)) return true;
+    for(final FTExpr expr : exprs) {
+      if(expr.has(flags)) return true;
+    }
     return false;
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Expr expr : exprs) if(!expr.removable(var)) return false;
+    for(final Expr expr : exprs) {
+      if(!expr.removable(var)) return false;
+    }
     return true;
   }
 
@@ -96,7 +100,9 @@ public abstract class FTExpr extends ParseExpr {
    * @return result of check
    */
   public boolean usesExclude() {
-    for(final FTExpr expr : exprs) if(expr.usesExclude()) return true;
+    for(final FTExpr expr : exprs) {
+      if(expr.usesExclude()) return true;
+    }
     return false;
   }
 

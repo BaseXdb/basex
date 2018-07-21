@@ -24,6 +24,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.HttpRequest.*;
 import org.basex.util.options.Options.*;
@@ -298,40 +299,47 @@ public final class HttpClient {
     sopts.set(SerializerOptions.INDENT, YesNo.NO);
     sopts.set(SerializerOptions.NEWLINE, Newline.NL);
 
-    String src = null, method = null;
+    String method = null, type = null;
     for(final Entry<String, String> entry : atts.entrySet()) {
       final String key = entry.getKey(), value = entry.getValue();
+
+      // send specified source
       if(key.equals(SRC)) {
-        src = value;
-      } else if(key.equals(SerializerOptions.METHOD.name())) {
+        out.write(IO.get(value).read());
+        return;
+      }
+
+      // serialization parameters
+      if(key.equals(SerializerOptions.METHOD.name())) {
         method = value.equals(BINARY) ? SerialMethod.BASEX.toString() : value;
       } else {
         sopts.assign(key, value);
-        // no method specified (yet): choose method based on media type
-        if(method == null && key.equals(SerializerOptions.MEDIA_TYPE.name())) {
-          final MediaType type = new MediaType(value);
-          if(type.is(MediaType.APPLICATION_HTML_XML)) {
-            method = SerialMethod.XHTML.toString();
-          } else if(type.is(MediaType.TEXT_HTML)) {
-            method = SerialMethod.HTML.toString();
-          } else if(type.isXML()) {
-            method = SerialMethod.XML.toString();
-          } else if(type.isText()) {
-            method = SerialMethod.TEXT.toString();
-          } else {
-            method = SerialMethod.BASEX.toString();
-          }
-        }
+        if(key.equals(SerializerOptions.MEDIA_TYPE.name())) type = value;
       }
     }
+
+    // no method specified (yet): choose method based on media type
+    if(method == null && type != null) {
+      final MediaType mt = new MediaType(type);
+      if(mt.is(MediaType.APPLICATION_HTML_XML)) {
+        method = SerialMethod.XHTML.toString();
+      } else if(mt.is(MediaType.TEXT_HTML)) {
+        method = SerialMethod.HTML.toString();
+      } else if(mt.isXML()) {
+        method = SerialMethod.XML.toString();
+      } else if(mt.isText()) {
+        method = SerialMethod.TEXT.toString();
+      }
+    }
+    // no method, EXPath binary method: use default serialization, atomize nodes
+    final boolean atom = method == null || method.equals(BINARY);
+    if(atom) method = SerialMethod.BASEX.toString();
     sopts.assign(SerializerOptions.METHOD.name(), method);
 
     // serialize payload
-    if(src != null) {
-      out.write(IO.get(src).read());
-    } else {
-      try(Serializer ser = Serializer.get(out, sopts)) {
-        for(final Item item : payload) ser.serialize(item);
+    try(Serializer ser = Serializer.get(out, sopts)) {
+      for(final Item item : payload) {
+        ser.serialize(atom && item.type instanceof NodeType ? ((ANode) item).atomItem() : item);
       }
     }
   }

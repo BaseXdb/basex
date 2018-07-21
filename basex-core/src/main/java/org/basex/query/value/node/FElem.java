@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -14,7 +13,6 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.w3c.dom.*;
-import org.w3c.dom.Text;
 
 /**
  * Element node fragment.
@@ -234,7 +232,7 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Adds a namespace declaration for the namespace in the given QName.
+   * Adds a namespace declaration for the QName of this element.
    * @return self reference
    */
   public FElem declareNS() {
@@ -387,7 +385,9 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
+  public FElem materialize(final QueryContext qc, final boolean copy) {
+    if(!copy) return this;
+
     // nodes must be added after root constructor in order to ensure ascending node ids
     final ANodeList ch = children != null ? new ANodeList(children.size()) : null;
     final ANodeList at = atts != null ? new ANodeList(atts.size()) : null;
@@ -398,12 +398,11 @@ public final class FElem extends FNode {
       for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
     }
     if(at != null) {
-      for(final ANode n : atts) at.add(n.deepCopy(options, qc));
+      for(final ANode n : atts) at.add(n.materialize(qc, copy));
     }
     if(ch != null) {
-      for(final ANode n : children) ch.add(n.deepCopy(options, qc));
+      for(final ANode n : children) ch.add(n.materialize(qc, copy));
     }
-    node.parent(parent);
     return node.optimize();
   }
 

@@ -11,8 +11,9 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Bastian Lemke
+ * @author Alexander Holupirek
  */
-public final class GUIMacOSX {
+public final class GUIMacOSX extends GUIMacOS {
   /** Native class name. */
   private static final String C_APPLICATION = "com.apple.eawt.Application";
   /** Native class name. */
@@ -30,16 +31,17 @@ public final class GUIMacOSX {
   /** Empty object array. */
   private static final Object[] EO = {};
 
-  /** Reference to the main gui. */
-  GUI main;
   /** Instance of the 'Application' class. */
   private final Object appObj;
 
   /**
    * Constructor.
-   * @throws Exception if any error occurs.
+   * @param main reference to main window
+   * @throws Exception if any error occurs
    */
-  public GUIMacOSX() throws Exception {
+  GUIMacOSX(final GUI main) throws Exception {
+    super(main);
+
     // name for the dock icon and the application menu
     System.setProperty(P_ABOUT_NAME, Prop.NAME);
     // show menu in the screen menu instead of inside the application window
@@ -70,11 +72,9 @@ public final class GUIMacOSX {
   /**
    * Initializes this mac gui with the main gui. Has to be called
    * immediately after creating the gui.
-   * @param gui main gui reference
    */
-  public void init(final GUI gui) {
-    main = gui;
-  }
+  @Override
+  public void init() { /* NOT IMPLEMENTED */ }
 
   /**
    * Adds the project icon to the dock.
@@ -89,8 +89,14 @@ public final class GUIMacOSX {
    * @param value string value
    * @throws Exception if any error occurs
    */
+  @Override
   public void setBadge(final String value) throws Exception {
     invoke(appObj, "setDockIconBadge", String.class, value);
+  }
+
+  @Override
+  public void adjustMenuBar(final GUI gui, final GUIMenu menu) {
+    gui.setJMenuBar(menu);
   }
 
   /**
@@ -134,6 +140,15 @@ public final class GUIMacOSX {
      * Finder or another application.
      */
     public void handleOpenApplication()  { /* NOT IMPLEMENTED */ }
+
+    /**
+     * Called when the application receives an Open Application event from the
+     * Finder or another application.
+     *
+     * @param obj application event
+     */
+    @SuppressWarnings("unused")
+    public void handleOpenApplication(final Object obj)  { /* NOT IMPLEMENTED */ }
 
     /**
      * Called when the application receives an Open Document event from the
@@ -180,25 +195,8 @@ public final class GUIMacOSX {
     }
   }
 
-  /**
-   * Returns true if the System has native Fullscreen support.
-   * @return fullscreen support
-   */
-  public static boolean nativeFullscreen() {
-    try {
-      Class.forName("com.apple.eawt.FullScreenUtilities");
-      return true;
-    } catch(final ClassNotFoundException ex) {
-      Util.debug(ex);
-      return false;
-    }
-  }
-
-  /**
-   * Enables OSX Lion native fullscreen where available.
-   * @param window the window
-   */
-  public static void enableOSXFullscreen(final Window window) {
+  @Override
+  public void enableOSXFullscreen(final Window window) {
     if(window == null) return;
     try {
       final Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");

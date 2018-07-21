@@ -157,7 +157,9 @@ public abstract class StandardFunc extends Arr {
   @Override
   public boolean has(final Flag... flags) {
     // check signature flags
-    for(final Flag flag : flags) if(sig.has(flag)) return true;
+    for(final Flag flag : flags) {
+      if(sig.has(flag)) return true;
+    }
     // mix updates: higher-order function may be updating
     if(Flag.UPD.in(flags) && sc.mixUpdates && sig.has(Flag.HOF)) return true;
     // check arguments (without function invocation; it only applies to function itself)

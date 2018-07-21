@@ -5,6 +5,7 @@ import static org.basex.util.Prop.*;
 import java.awt.*;
 
 import org.basex.io.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -20,13 +21,13 @@ public final class GUIOptions extends Options {
   /** Comment: written to options file. */
   public static final Comment C_PATHS = new Comment("Paths");
 
-  /** Path to database input. */
+  /** Current path to database input. */
   public static final StringOption INPUTPATH = new StringOption("INPUTPATH", HOMEDIR);
-  /** Path for additional material. */
+  /** Current path to additional database input files. */
   public static final StringOption DATAPATH = new StringOption("DATAPATH", HOMEDIR);
-  /** Path to working directory. */
+  /** Current path to current working directory. */
   public static final StringOption WORKPATH = new StringOption("WORKPATH", HOMEDIR);
-  /** Path to database project. */
+  /** Current path to database project. */
   public static final StringOption PROJECTPATH = new StringOption("PROJECTPATH", "");
 
   /** Comment: written to options file. */
@@ -102,6 +103,8 @@ public final class GUIOptions extends Options {
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
   /** Flag for dissolving name attributes. */
   public static final BooleanOption SHOWNAME = new BooleanOption("SHOWNAME", true);
+  /** Flag for scrolling editor tabs. */
+  public static final BooleanOption SCROLLTABS = new BooleanOption("SCROLLTABS", true);
   /** Focus follows mouse. */
   public static final BooleanOption MOUSEFOCUS = new BooleanOption("MOUSEFOCUS", false);
 
@@ -227,5 +230,34 @@ public final class GUIOptions extends Options {
     set(FILTERRT, false);
     set(EXECRT, false);
     gui = true;
+
+    // normalize and clean file paths
+    for(final StringOption path : new StringOption[] { WORKPATH, PROJECTPATH })
+      setFile(path, new IOFile(get(path)));
+    for(final StringsOption input : new StringsOption[] { EDITOR, OPEN, PROJECTS })
+      setFiles(input, get(input));
+  }
+
+  /**
+   * Sets the string array value of an option. Duplicates and orphaned files will be removed.
+   * @param option option to be set
+   * @param paths file paths to be assigned
+   */
+  public synchronized void setFiles(final StringsOption option, final String[] paths) {
+    final StringList list = new StringList();
+    for(final String path : paths) {
+      final IOFile file = new IOFile(path);
+      if(file.exists()) list.addUnique(file.path());
+    }
+    set(option, list.finish());
+  }
+
+  /**
+   * Sets the string value of an option. The file path will be normalized.
+   * @param option option to be set
+   * @param file file to be assigned
+   */
+  public synchronized void setFile(final StringOption option, final IOFile file) {
+    set(option, file.normalize().path());
   }
 }

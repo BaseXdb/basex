@@ -325,6 +325,7 @@ run_tests            = Выполнить тесты
 save                 = Сохранить
 save_as              = Сохранить как
 save_before_execute  = Сохранять перед выполнением
+scroll_tabs          = Scroll editor tabs
 searching            = Searching
 select_all           = Найти все
 separator            = Разделитель

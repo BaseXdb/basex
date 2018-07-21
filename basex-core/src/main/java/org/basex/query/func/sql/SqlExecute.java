@@ -82,7 +82,7 @@ public class SqlExecute extends SqlFn {
               return null;
             }
 
-            final FElem row = new FElem(Q_ROW);
+            final FElem row = new FElem(Q_ROW).declareNS();
             for(int c = 1; c <= cols; c++) {
               // for each row add column values as children
               final String name = md.getColumnLabel(c);

@@ -7,12 +7,10 @@ import java.math.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -162,7 +160,7 @@ public final class QueryJob extends Job implements Runnable {
       if(remove) ctx.jobs.tasks.remove(jc.id());
 
       // retrieve result
-      result.value = copy(qp.iter(), ctx, qp.qc);
+      result.value = materialize(qp.iter(), qp.qc);
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
       ctx.jobs.results.remove(jc.id());
@@ -200,22 +198,16 @@ public final class QueryJob extends Job implements Runnable {
   }
 
   /**
-   * Creates a context-independent copy of the iterator results.
-   * @param ctx database context
+   * Creates a materialized, context-independent version of the iterator results.
    * @param iter result iterator
    * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  public static Value copy(final Iter iter, final Context ctx, final QueryContext qc)
-      throws QueryException {
-
+  public static Value materialize(final Iter iter, final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(item instanceof FItem) throw BASEX_FUNCTION_X.get(null, item);
-      final Data data = item.data();
-      if(data != null && !data.inMemory()) item = ((DBNode) item).dbNodeCopy(ctx.options, qc);
-      vb.add(item);
+      vb.add(item.materialize(qc, item.persistent()));
     }
     return vb.value();
   }

@@ -125,7 +125,7 @@ public final class DialogPackages extends BaseXDialog {
       fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
       final IOFile file = fc.select(Mode.FDOPEN);
       if(file == null) return;
-      gui.gopts.set(GUIOptions.WORKPATH, file.path());
+      gui.gopts.setFile(GUIOptions.WORKPATH, file);
       refresh = true;
       cmds.add(new RepoInstall(file.path(), null));
 

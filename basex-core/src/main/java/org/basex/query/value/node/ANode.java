@@ -92,36 +92,40 @@ public abstract class ANode extends Item {
    * Returns an atomic item.
    * @return item
    */
-  private Item atomItem() {
+  public Item atomItem() {
     return type == NodeType.PI || type == NodeType.COM ? Str.get(string()) : new Atm(string());
   }
 
-  /**
-   * Returns a deep copy of the node.
-   * @param opts main options
-   * @param qc query context
-   * @return node copy
-   */
-  public abstract ANode deepCopy(MainOptions opts, QueryContext qc);
+  @Override
+  public abstract ANode materialize(QueryContext qc, boolean copy);
 
   /**
-   * Returns a final node representation. This method is called when iterating through node
-   * results: Iterated node instances may be reused and may need to be copied in the final step.
-   * @return node
-   */
-  public abstract ANode finish();
-
-  /**
-   * Returns a database node representation of the node.
-   * @param opts main options
+   * Creates a database node copy from this node.
    * @param qc query context
    * @return database node
    */
-  public DBNode dbNodeCopy(final MainOptions opts, final QueryContext qc) {
-    final MemData md = new MemData(opts);
-    new DataBuilder(md, qc).build(this);
-    return new DBNode(md);
+  public final DBNode copy(final QueryContext qc) {
+    return copy(qc.context.options, qc);
   }
+
+  /**
+   * Creates a database node copy from this node.
+   * @param options main options
+   * @param qc query context (can be {@code null}; if supplied, allows interruption of process)
+   * @return database node
+   */
+  public final DBNode copy(final MainOptions options, final QueryContext qc) {
+    final MemData data = new MemData(options);
+    new DataBuilder(data, qc).build(this);
+    return new DBNode(data);
+  }
+
+  /**
+   * Returns a finalized node instance. This method is called when iterating through node results:
+   * If a single node instances is recycled, it needs to be duplicated in the final step.
+   * @return node
+   */
+  public abstract ANode finish();
 
   /**
    * Returns the name of the node, composed of an optional prefix and the local name.
@@ -271,9 +275,10 @@ public abstract class ANode extends Item {
   /**
    * Sets the parent node.
    * @param par parent node
-   * @return self reference
    */
-  protected abstract ANode parent(ANode par);
+  public final void parent(final ANode par) {
+    parent = par;
+  }
 
   /**
    * Returns true if the node has children.

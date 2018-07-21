@@ -2,7 +2,6 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -61,10 +60,22 @@ public final class FDoc extends FNode {
     for(final ANode n : children) n.parent(this);
   }
 
+  /**
+   * Constructor for DOM nodes.
+   * Originally provided by Erdal Karaca.
+   * @param doc DOM node
+   * @param bu base uri
+   */
+  public FDoc(final DocumentFragment doc, final byte[] bu) {
+    this(bu);
+    final Node elem = doc.getFirstChild();
+    if(elem instanceof Element) children.add(new FElem((Element) elem, this, new TokenMap()));
+  }
+
   @Override
   public FDoc optimize() {
     // update parent references
-    for(final ANode n : children) n.parent(this);
+    for(final ANode node : children) node.parent(this);
     return this;
   }
 
@@ -77,18 +88,6 @@ public final class FDoc extends FNode {
     children.add(node);
     node.parent(this);
     return this;
-  }
-
-  /**
-   * Constructor for DOM nodes.
-   * Originally provided by Erdal Karaca.
-   * @param doc DOM node
-   * @param bu base uri
-   */
-  public FDoc(final DocumentFragment doc, final byte[] bu) {
-    this(bu);
-    final Node elem = doc.getFirstChild();
-    if(elem instanceof Element) children.add(new FElem((Element) elem, this, new TokenMap()));
   }
 
   @Override
@@ -112,8 +111,8 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
-    return new FDoc(children, uri).optimize();
+  public FDoc materialize(final QueryContext qc, final boolean copy) {
+    return copy ? new FDoc(children, uri).optimize() : this;
   }
 
   @Override

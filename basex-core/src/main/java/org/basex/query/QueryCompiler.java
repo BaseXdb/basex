@@ -199,7 +199,9 @@ final class QueryCompiler {
     }
 
     final int ss = scopes.size();
-    for(int s = 0; s < ss; s++) if(scopes.get(s) == scp) return s;
+    for(int s = 0; s < ss; s++) {
+      if(scopes.get(s) == scp) return s;
+    }
     return -1;
   }
 

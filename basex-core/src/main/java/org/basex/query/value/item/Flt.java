@@ -125,20 +125,21 @@ public final class Flt extends ANum {
 
   /**
    * Converts the given item to a float value.
-   * @param item item to be converted
+   * @param value value to be converted
    * @param info input info
    * @return float value
    * @throws QueryException query exception
    */
-  public static float parse(final Item item, final InputInfo info) throws QueryException {
-    final byte[] value = item.string(info);
-    try {
-      return Float.parseFloat(Token.string(value));
-    } catch(final NumberFormatException ex) {
-      final byte[] v = Token.trim(value);
-      if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
-      if(Token.eq(v, Token.NINF)) return Float.NEGATIVE_INFINITY;
-      throw AtomType.FLT.castError(item, info);
+  public static float parse(final byte[] value, final InputInfo info) throws QueryException {
+    final byte[] v = Token.trim(value);
+    if(!Token.eq(v, Token.INFINITY, Token.NINFINITY)) {
+      try {
+        return Float.parseFloat(Token.string(v));
+      } catch(final NumberFormatException ignore) { }
     }
+
+    if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
+    if(Token.eq(v, Token.NINF)) return Float.NEGATIVE_INFINITY;
+    throw AtomType.FLT.castError(value, info);
   }
 }

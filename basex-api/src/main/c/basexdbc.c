@@ -12,8 +12,6 @@
 #include <err.h>
 #include <errno.h>
 #include <netdb.h>
-#include <openssl/evp.h>
-#include <openssl/md5.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -163,13 +161,13 @@ basex_authenticate(int sfd, const char *user, const char *passwd)
             int user_len = strlen(user);
             int pass_len = strlen(passwd);
             int realm_len = p - ts;
-            char codewd[user_len + realm_len + pass_len + 2];
+            char codewd[user_len + realm_len + pass_len + 3];
             strncpy(codewd, user, user_len);
             codewd[user_len] = ':';
             strncpy(codewd + user_len + 1, ts, realm_len);
             codewd[user_len + 1 + realm_len] = ':';
             strncpy(codewd + user_len + 1 + realm_len + 1, passwd, pass_len);
-            
+            codewd[user_len + 1 + realm_len + 1 + pass_len] = '\0';
             md5_pwd = md5(codewd);
             if (md5_pwd == NULL) {
                     warnx("md5 computation for password failed.");

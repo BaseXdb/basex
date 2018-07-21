@@ -5,7 +5,7 @@ import java.nio.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
-import org.basex.http.util.*;
+import org.basex.http.web.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.io.out.*;

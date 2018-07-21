@@ -1,7 +1,6 @@
 package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.http.HTTPText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 
@@ -180,10 +179,23 @@ public final class HTTPConnection implements ClientInfo {
   /**
    * Sends an error with an info message.
    * @param code status code
+   * @param info detailed information
+   * @param log log message
+   * @throws IOException I/O exception
+   */
+  public void error(final int code, final String info, final String log) throws IOException {
+    log(code, log);
+    status(code, null, info);
+  }
+
+  /**
+   * Sends an error with an info message.
+   * @param code status code
    * @param info info, sent as body
    * @throws IOException I/O exception
    */
   public void error(final int code, final String info) throws IOException {
+    log(code, info);
     status(code, null, info);
   }
 
@@ -194,6 +206,7 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   public void status(final int code, final String message) throws IOException {
+    log(code, message);
     status(code, message, null);
   }
 
@@ -289,7 +302,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Normalizes the specified path.
-   * @param path path
+   * @param path path (can be {@code null})
    * @return normalized path
    */
   private static String normalize(final String path) {
@@ -330,7 +343,7 @@ public final class HTTPConnection implements ClientInfo {
         final String header = req.getHeader(AUTHORIZATION);
         final String[] am = header != null ? Strings.split(header, ' ', 2) : new String[] { "" };
         final AuthMethod meth = StaticOptions.AUTHMETHOD.get(am[0]);
-        if(auth != meth) throw new LoginException(WRONGAUTH_X, auth);
+        if(auth != meth) throw new LoginException(HTTPText.WRONGAUTH_X, auth);
 
         if(auth == AuthMethod.BASIC) {
           final String details = am.length > 1 ? am[1] : "";
@@ -415,12 +428,11 @@ public final class HTTPConnection implements ClientInfo {
    * Sets a status and sends an info message.
    * @param code status code
    * @param message status message (can be {@code null})
-   * @param info info, sent as body (can be {@code null})
+   * @param info detailed information (can be {@code null})
    * @throws IOException I/O exception
    */
   @SuppressWarnings("deprecation")
   private void status(final int code, final String message, final String info) throws IOException {
-    log(code, message != null ? message : info != null ? info : "");
     try {
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
@@ -454,7 +466,7 @@ public final class HTTPConnection implements ClientInfo {
    * Sets a status and sends an info message.
    * @param code status code
    * @param message status message (can be {@code null})
-   * @param info info, sent as body (can be {@code null})
+   * @param info detailed information (can be {@code null})
    * @param ex exception
    */
   private void logError(final int code, final String message, final String info,

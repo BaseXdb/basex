@@ -28,7 +28,7 @@ public final class UserUpdateInfo extends UserFn {
     final ANode node = toElem(exprs[0], qc);
     if(!T_INFO.eq(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
 
-    qc.updates().add(new UpdateInfo(node.deepCopy(qc.context.options, qc), qc, info), qc);
+    qc.updates().add(new UpdateInfo(node.materialize(qc, true), qc, info), qc);
     return null;
   }
 
@@ -61,6 +61,8 @@ public final class UserUpdateInfo extends UserFn {
     }
 
     @Override
-    public String operation() { return "updated"; }
+    public String operation() {
+      return "updated";
+    }
   }
 }

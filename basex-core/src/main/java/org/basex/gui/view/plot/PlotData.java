@@ -41,40 +41,38 @@ final class PlotData {
   }
 
   /**
-   * Returns a string array with all top items
-   * and the keys of the specified set.
-   * @return key array
+   * Returns a string array with all top items and the keys of the specified set.
+   * @return items
    */
-  TokenList getItems() {
+  String[] getItems() {
     final Data data = context.data();
-    final TokenList tl = new TokenList();
-    for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
-      if(getCategories(k).size() > 1) tl.add(k);
+    final StringList sl = new StringList();
+    for(final byte[] name : data.paths.desc(EMPTY, true, true)) {
+      if(getCategories(name).length > 1) sl.add(name);
     }
-    return tl;
+    return sl.finish();
   }
 
   /**
    * Returns a string array with suitable categories for the specified item.
-   * @param it top item
-   * @return key array
+   * @param name element/attribute name
+   * @return categories
    */
-  TokenList getCategories(final byte[] it) {
+  String[] getCategories(final byte[] name) {
     final Data data = context.data();
-    final TokenList tl = new TokenList();
-    for(final byte[] k : data.paths.desc(it, true, false)) {
-      final Names names = startsWith(k, '@') ? data.attrNames : data.elemNames;
-      if(names.stats(names.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
+    final StringList sl = new StringList();
+    for(final byte[] nm : data.paths.desc(name, true, false)) {
+      final Names names = startsWith(nm, '@') ? data.attrNames : data.elemNames;
+      if(names.stats(names.id(delete(nm, '@'))).type != StatsType.NONE) sl.add(nm);
     }
-    return tl;
+    return sl.finish();
   }
 
   /**
-   * Called if the user changes the item level displayed in the plot. If a new
-   * item was selected the plot data is recalculated.
+   * Called if the user changes the item level displayed in the plot.
+   * If a new item was selected, the plot data is recalculated.
    * @param newItem item selected by the user
-   * @return true if a new item was selected and the plot data has been
-   * recalculated
+   * @return {@code true} if a new item was selected and the plot data has been recalculated
    */
   boolean setItem(final String newItem) {
     if(newItem == null) return false;
@@ -86,8 +84,8 @@ final class PlotData {
   }
 
   /**
-   * Refreshes item list and coordinates if the selection has changed. So far
-   * only numerical data is considered for plotting.
+   * Refreshes item list and coordinates if the selection has changed.
+   * So far, only numerical data is considered for plotting.
    * @param nodes nodes to be displayed
    * @param sub determine descendant nodes of given context nodes
    */
@@ -124,7 +122,7 @@ final class PlotData {
    * Returns the array position of a given pre value by performing a binary
    * search on the sorted pre values array currently displayed in the plot.
    * @param pre pre value to be looked up
-   * @return array index if found, -1 if not
+   * @return array index if found, {@code -1} if not
    */
   int findPre(final int pre) {
     return Arrays.binarySearch(pres, pre);

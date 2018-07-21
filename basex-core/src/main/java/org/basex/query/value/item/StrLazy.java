@@ -42,7 +42,7 @@ public final class StrLazy extends AStr implements Lazy {
 
   @Override
   public byte[] string(final InputInfo info) throws QueryException {
-    materialize(info);
+    cache(info);
     return value;
   }
 
@@ -67,7 +67,7 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public void materialize(final InputInfo info) throws QueryException {
+  public void cache(final InputInfo info) throws QueryException {
     try {
       if(!isCached()) value = input(info).content();
     } catch(final IOException ex) {

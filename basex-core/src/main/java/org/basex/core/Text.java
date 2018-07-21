@@ -1254,6 +1254,8 @@ public interface Text {
   String RT_FOCUS = lang("rt_focus");
   /** Name display flag. */
   String SHOW_NAME_ATTS = lang("show_name_atts");
+  /** Scroll editor tabs. */
+  String SCROLL_TABS = lang("scroll_tabs");
   /** Maximum number of results. */
   String MAX_NO_OF_HITS = lang("max_nr_of_hits");
   /** Size of text result. */

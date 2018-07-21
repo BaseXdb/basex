@@ -32,7 +32,7 @@ public final class B64Lazy extends B64 implements Lazy {
 
   @Override
   public byte[] binary(final InputInfo info) throws QueryException {
-    materialize(info);
+    cache(info);
     return data;
   }
 
@@ -47,7 +47,7 @@ public final class B64Lazy extends B64 implements Lazy {
   }
 
   @Override
-  public void materialize(final InputInfo info) throws QueryException {
+  public void cache(final InputInfo info) throws QueryException {
     try {
       if(!isCached()) data = input.read();
     } catch(final IOException ex) {

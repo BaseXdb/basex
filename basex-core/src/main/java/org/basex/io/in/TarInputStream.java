@@ -106,7 +106,9 @@ public final class TarInputStream extends FilterInputStream {
    * @return result of check
    */
   private static boolean eof(final byte[] header) {
-    for(final byte b : header) if(b != 0) return false;
+    for(final byte b : header) {
+      if(b != 0) return false;
+    }
     return true;
   }
 

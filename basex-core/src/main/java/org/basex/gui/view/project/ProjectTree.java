@@ -28,11 +28,11 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
   /**
    * Constructor.
-   * @param pv project view
+   * @param view project view
    */
-  ProjectTree(final ProjectView pv) {
-    super(pv.gui, new DefaultMutableTreeNode());
-    view = pv;
+  ProjectTree(final ProjectView view) {
+    super(view.gui, new DefaultMutableTreeNode());
+    this.view = view;
 
     border(4, 4, 4, 4);
     setExpandsSelectedPaths(true);
@@ -42,7 +42,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     addTreeWillExpandListener(this);
     addMouseListener((MouseClickedListener) e -> {
       if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2)
-        new OpenCmd().execute(pv.gui);
+        new OpenCmd().execute(view.gui);
     });
 
     setCellEditor(new ProjectCellEditor(this, renderer));
@@ -51,7 +51,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     if(h > 16) setRowHeight(Math.max(32, h));
 
     // add popup
-    new BaseXPopup(this, pv.gui,
+    new BaseXPopup(this, view.gui,
       new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
       new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
       new RefreshCmd(), null, new CopyPathCmd()

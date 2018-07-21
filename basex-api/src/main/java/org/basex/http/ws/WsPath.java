@@ -1,6 +1,6 @@
 package org.basex.http.ws;
 
-import org.basex.http.util.*;
+import org.basex.http.web.*;
 
 /**
  * This class represents the Path of a Websocket-Endpoint.

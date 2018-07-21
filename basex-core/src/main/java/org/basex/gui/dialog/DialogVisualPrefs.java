@@ -20,6 +20,8 @@ import org.basex.util.list.*;
 final class DialogVisualPrefs extends BaseXBack {
   /** GUI reference. */
   private final GUI gui;
+  /** Wrap tabs. */
+  private final BaseXCheckBox scrollTabs;
   /** Show names checkbox. */
   private final BaseXCheckBox showNames;
 
@@ -53,6 +55,7 @@ final class DialogVisualPrefs extends BaseXBack {
     gui = dialog.gui;
 
     final GUIOptions gopts = dialog.gui.gopts;
+    scrollTabs = new BaseXCheckBox(dialog, SCROLL_TABS, GUIOptions.SCROLLTABS, gopts);
     showNames = new BaseXCheckBox(dialog, SHOW_NAME_ATTS, GUIOptions.SHOWNAME, gopts);
     treeSlims = new BaseXCheckBox(dialog, ADJUST_NODES, GUIOptions.TREESLIMS, gopts);
     treeAtts = new BaseXCheckBox(dialog, SHOW_ATTS, GUIOptions.TREEATTS, gopts);
@@ -82,6 +85,8 @@ final class DialogVisualPrefs extends BaseXBack {
     pp = new BaseXBack(new RowLayout());
     pp.add(new BaseXLabel(JAVA_LF + COL, true, true));
     pp.add(lookfeel);
+    pp.add(Box.createVerticalStrut(8));
+    pp.add(scrollTabs);
     p.add(pp);
 
     pp = new BaseXBack(new RowLayout());
@@ -126,6 +131,7 @@ final class DialogVisualPrefs extends BaseXBack {
     treeSlims.assign();
     treeAtts.assign();
     mapAtts.assign();
+    scrollTabs.assign();
     showNames.assign();
     mapWeight.assign();
     mapAlgo.assign();

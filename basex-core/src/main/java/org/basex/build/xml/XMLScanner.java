@@ -698,7 +698,8 @@ final class XMLScanner extends Job {
         if(consume(XDECL)) {
           check(XML); s();
           if(version()) checkS();
-          s(); if(encoding() == null) throw error(TEXTENC);
+          s();
+          if(encoding() == null) throw error(TEXTENC);
           ch = nextChar();
           if(s(ch)) ch = nextChar();
           if(ch != '?') throw error(WRONGCHAR, '?', ch);

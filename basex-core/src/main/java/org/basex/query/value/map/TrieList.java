@@ -198,7 +198,9 @@ final class TrieList extends TrieNode {
       for(int i = 0; i < size; i++) {
         final Item ok = list.keys[i];
         // skip all entries that are overridden
-        for(final Item k : keys) if(k.sameKey(ok, info)) continue OUTER;
+        for(final Item k : keys) {
+          if(k.sameKey(ok, info)) continue OUTER;
+        }
         // key is not in this list, add it
         ks = Array.add(ks, ok);
         vs = Array.add(vs, list.values[i]);
@@ -259,11 +261,21 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  void materialize(final InputInfo info) throws QueryException {
+  void cache(final InputInfo info) throws QueryException {
     for(int i = 0; i < size; i++) {
-      keys[i].materialize(info);
-      values[i].materialize(info);
+      keys[i].cache(info);
+      values[i].cache(info);
     }
+  }
+
+  @Override
+  boolean materialized() {
+    for(final Value value : values)  {
+      for(final Item item : value) {
+        if(item.persistent() || item.materialize(null, false) == null) return false;
+      }
+    }
+    return true;
   }
 
   @Override

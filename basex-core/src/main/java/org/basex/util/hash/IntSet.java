@@ -66,7 +66,9 @@ public class IntSet extends ASet {
    */
   final int id(final int key) {
     final int p = key & buckets.length - 1;
-    for(int id = buckets[p]; id != 0; id = next[id]) if(key == keys[id]) return id;
+    for(int id = buckets[p]; id != 0; id = next[id]) {
+      if(key == keys[id]) return id;
+    }
     return 0;
   }
 
@@ -108,7 +110,9 @@ public class IntSet extends ASet {
   private int index(final int key) {
     checkSize();
     final int b = key & buckets.length - 1;
-    for(int r = buckets[b]; r != 0; r = next[r]) if(key == keys[r]) return -r;
+    for(int r = buckets[b]; r != 0; r = next[r]) {
+      if(key == keys[r]) return -r;
+    }
     next[size] = buckets[b];
     keys[size] = key;
     buckets[b] = size;

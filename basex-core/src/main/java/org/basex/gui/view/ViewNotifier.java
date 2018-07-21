@@ -35,7 +35,7 @@ public final class ViewNotifier {
   /** Command history. */
   private final String[] queries = new String[MAXHIST];
   /** Attached views. */
-  private View[] view = {};
+  private View[] views = {};
   /** Number of history entries. */
   private int histsize;
 
@@ -52,7 +52,7 @@ public final class ViewNotifier {
    * @param vw view to be added
    */
   void add(final View vw) {
-    view = Array.add(view, vw);
+    views = Array.add(views, vw);
   }
 
   /**
@@ -65,10 +65,12 @@ public final class ViewNotifier {
       /// visualizations should be closed first
       final long size = data.meta.dbsize();
       boolean open = false;
-      for(final View v : view) open |= v.visible() && v.db();
+      for(final View view : views) open |= view.visible() && view.db();
       if(open && size > LARGEDB && BaseXDialog.confirm(gui,
           Util.info(H_LARGE_DB, Performance.format(size)))) {
-        for(final View v : view) if(v.visible() && v.db()) v.visible(false);
+        for(final View view : views) {
+          if(view.visible() && view.db()) view.visible(false);
+        }
       }
     } else {
       // database closed: close open dialogs
@@ -78,7 +80,7 @@ public final class ViewNotifier {
     }
 
     gui.context.focused = -1;
-    for(final View v : view) v.refreshInit();
+    for(final View view : views) view.refreshInit();
     gui.layoutViews();
     gui.setTitle();
   }
@@ -91,7 +93,9 @@ public final class ViewNotifier {
   public void focus(final int pre, final View vw) {
     if(gui.context.focused == pre) return;
     gui.context.focused = pre;
-    for(final View v : view) if(v != vw && v.visible()) v.refreshFocus();
+    for(final View view : views) {
+      if(view != vw && view.visible()) view.refreshFocus();
+    }
     if(pre != -1) {
       gui.status.setText(Token.string(ViewData.path(gui.context.data(), pre)));
     }
@@ -105,7 +109,9 @@ public final class ViewNotifier {
   public void mark(final DBNodes mark, final View vw) {
     final Context ctx = gui.context;
     ctx.marked = mark;
-    for(final View v : view) if(v != vw && v.visible()) v.refreshMark();
+    for(final View view : views) {
+      if(view != vw && view.visible()) view.refreshMark();
+    }
     gui.filter.setEnabled(!mark.isEmpty());
     gui.refreshControls();
   }
@@ -155,7 +161,9 @@ public final class ViewNotifier {
     ctx.set(cont[hist], marked[hist]);
 
     gui.input.setText(query);
-    for(final View v : view) if(v.visible()) v.refreshContext(forward, false);
+    for(final View view : views) {
+      if(view.visible()) view.refreshContext(forward, false);
+    }
     gui.refreshControls();
   }
 
@@ -195,7 +203,9 @@ public final class ViewNotifier {
     }
     ctx.set(newn, empty);
 
-    for(final View v : view) if(v != vw && v.visible()) v.refreshContext(true, quick);
+    for(final View view : views) {
+      if(view != vw && view.visible()) view.refreshContext(true, quick);
+    }
     gui.refreshControls();
   }
 
@@ -206,7 +216,9 @@ public final class ViewNotifier {
     final Data data = initHistory(gui.context);
     if(data == null) return;
     gui.context.marked = new DBNodes(data);
-    for(final View v : view) if(v.visible()) v.refreshUpdate();
+    for(final View view : views) {
+      if(view.visible()) view.refreshUpdate();
+    }
     gui.refreshControls();
   }
 
@@ -214,7 +226,7 @@ public final class ViewNotifier {
    * Notifies all views of layout changes.
    */
   public void layout() {
-    for(final View v : view) v.refreshLayout();
+    for(final View view : views) view.refreshLayout();
   }
 
   /**

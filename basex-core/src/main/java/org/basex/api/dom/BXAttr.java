@@ -101,6 +101,8 @@ public final class BXAttr extends BXNode implements Attr {
    * @return text node
    */
   private FNode text() {
-    return new FTxt(nd.string()).parent(nd);
+    final FNode node = new FTxt(nd.string());
+    node.parent(nd);
+    return node;
   }
 }

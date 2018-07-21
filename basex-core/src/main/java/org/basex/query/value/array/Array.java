@@ -194,8 +194,8 @@ public abstract class Array extends FItem {
   public abstract Array remove(long pos, QueryContext qc);
 
   @Override
-  public final void materialize(final InputInfo info) throws QueryException {
-    for(final Value value : members()) value.materialize(info);
+  public final void cache(final InputInfo info) throws QueryException {
+    for(final Value value : members()) value.cache(info);
   }
 
   /**
@@ -400,6 +400,16 @@ public abstract class Array extends FItem {
 
     if(instanceOf(ft, true)) return this;
     throw typeError(this, ft, info);
+  }
+
+  @Override
+  public Item materialize(final QueryContext qc, final boolean copy) {
+    for(final Value value : members()) {
+      for(final Item item : value) {
+        if(item.persistent() || item.materialize(null, false) == null) return null;
+      }
+    }
+    return this;
   }
 
   /**

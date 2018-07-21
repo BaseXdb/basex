@@ -82,8 +82,8 @@ public final class Transform extends Arr {
         if(i2 != null)
           throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(item, i2, qc));
 
-        // copy node to main memory data instance
-        item = ((ANode) item).dbNodeCopy(qc.context.options, qc);
+        // create main memory copy of node
+        item = ((ANode) item).copy(qc);
         // add resulting node to variable
         qc.set(copy.var, item);
         updates.addData(item.data());
@@ -101,7 +101,9 @@ public final class Transform extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Let copy : copies) if(copy.has(flags)) return true;
+    for(final Let copy : copies) {
+      if(copy.has(flags)) return true;
+    }
     if(Flag.UPD.in(flags) && exprs[1].has(Flag.UPD)) return true;
     final Flag[] flgs = Flag.UPD.remove(flags);
     return flgs.length != 0 && super.has(flgs);
@@ -109,7 +111,9 @@ public final class Transform extends Arr {
 
   @Override
   public boolean removable(final Var var) {
-    for(final Let copy : copies) if(!copy.removable(var)) return false;
+    for(final Let copy : copies) {
+      if(!copy.removable(var)) return false;
+    }
     return super.removable(var);
   }
 

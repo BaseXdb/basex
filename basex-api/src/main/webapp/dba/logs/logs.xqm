@@ -80,14 +80,14 @@ function dba:logs(
               <input type='hidden' name='name' value='{ $name }'/>,
               <input size='40' id='input' name='input' value='{ $input }'
                 title='Enter regular expression'
-                onkeydown='if(event.keyCode == 13) {{ logEntries(true); event.preventDefault(); }}'
-                onkeyup='logEntries(false);'/>,
+                onkeydown='if(event.keyCode == 13) {{ logEntries(true, true); event.preventDefault(); }}'
+                onkeyup='logEntries(false, true);'/>,
               ' ',
               html:button('download', 'Download')
             }</h3>
           </form>,
           <div id='output'/>,
-          html:js('logEntries(true);')
+          html:js('logEntries(true, false);')
         ) else (),
         html:focus('input')
       }</td>

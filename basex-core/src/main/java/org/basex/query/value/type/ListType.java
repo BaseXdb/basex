@@ -151,7 +151,9 @@ public enum ListType implements Type {
    * @return type or {@code null}
    */
   public static ListType find(final QNm type) {
-    for(final ListType tp : VALUES) if(tp.name.eq(type)) return tp;
+    for(final ListType lt : VALUES) {
+      if(lt.name.eq(type)) return lt;
+    }
     return null;
   }
 }

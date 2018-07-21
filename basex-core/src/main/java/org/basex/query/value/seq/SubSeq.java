@@ -73,8 +73,8 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  public void materialize(final InputInfo info) throws QueryException {
-    for(long i = 0; i < size; i++) itemAt(i).materialize(info);
+  public void cache(final InputInfo info) throws QueryException {
+    for(long i = 0; i < size; i++) itemAt(i).cache(info);
   }
 
   @Override

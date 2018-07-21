@@ -99,7 +99,9 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var var : params) if(!visitor.declared(var)) return false;
+    for(final Var var : params) {
+      if(!visitor.declared(var)) return false;
+    }
     return expr.accept(visitor);
   }
 

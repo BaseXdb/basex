@@ -85,14 +85,19 @@ public final class Users {
 
   /**
    * Writes permissions to disk.
-   * @param ctx database context
    */
-  public void write(final Context ctx) {
+  public void write() {
     synchronized(users) {
       if(store()) {
+        file.parent().md();
+        final FElem root = new FElem(USERS);
+        for(final User user : users.values()) user.toXML(root);
+        if(info != null) {
+          root.add(info);
+          info.parent(null);
+        }
         try {
-          file.parent().md();
-          file.write(toXML(ctx).serialize().finish());
+          file.write(root.serialize().finish());
         } catch(final IOException ex) {
           Util.errln(ex);
         }
@@ -100,19 +105,6 @@ public final class Users {
         file.delete();
       }
     }
-  }
-
-  /**
-   * Writes permissions to the specified XML builder.
-   * @param ctx database context
-   * @return root element
-   */
-  private FElem toXML(final Context ctx) {
-    final FElem root = new FElem(USERS);
-    synchronized(users) {
-      for(final User user : users.values()) user.toXML(root);
-    }
-    return root.add(info().deepCopy(ctx.options, null));
   }
 
   /**
@@ -224,7 +216,7 @@ public final class Users {
    * @return info element
    */
   public ANode info() {
-    return info == null ? new FElem(INFO) : info;
+    return info;
   }
 
   /**

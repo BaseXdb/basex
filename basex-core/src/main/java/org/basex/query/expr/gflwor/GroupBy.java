@@ -49,7 +49,9 @@ public final class GroupBy extends Clause {
     this.post = post;
     preExpr = Array.copy(pre, new Expr[pre.length]);
     int n = 0;
-    for(final GroupSpec spec : specs) if(!spec.occluded) n++;
+    for(final GroupSpec spec : specs) {
+      if(!spec.occluded) n++;
+    }
     nonOcc = n;
   }
 
@@ -204,7 +206,9 @@ public final class GroupBy extends Clause {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final GroupSpec spec : specs) if(spec.has(flags)) return true;
+    for(final GroupSpec spec : specs) {
+      if(spec.has(flags)) return true;
+    }
     return false;
   }
 
@@ -232,7 +236,9 @@ public final class GroupBy extends Clause {
 
   @Override
   public boolean removable(final Var var) {
-    for(final GroupSpec b : specs) if(!b.removable(var)) return false;
+    for(final GroupSpec spec : specs) {
+      if(!spec.removable(var)) return false;
+    }
     return true;
   }
 
@@ -265,8 +271,12 @@ public final class GroupBy extends Clause {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     if(!visitAll(visitor, specs)) return false;
-    for(final Expr ng : preExpr) if(!ng.accept(visitor)) return false;
-    for(final Var ng : post) if(!visitor.declared(ng)) return false;
+    for(final Expr ng : preExpr) {
+      if(!ng.accept(visitor)) return false;
+    }
+    for(final Var ng : post) {
+      if(!visitor.declared(ng)) return false;
+    }
     return true;
   }
 

@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -51,7 +53,7 @@ public final class List extends Arr {
     final int ls = list.size();
     if(ls != exprs.length) {
       if(ls < 2) return cc.replaceWith(this, ls == 0 ? Empty.SEQ : list.get(0));
-      cc.info(OPTREMOVE_X_X, Empty.SEQ, description());
+      cc.info(OPTREMOVE_X_X, Empty.SEQ, (Supplier<?>) () -> description());
       exprs = list.finish();
     }
 
@@ -83,17 +85,8 @@ public final class List extends Arr {
         values[vl++] = value;
       }
 
-      final Value value;
-      final int sz = (int) size;
-      if(tp == AtomType.STR)      value = StrSeq.get(values, sz);
-      else if(tp == AtomType.BLN) value = BlnSeq.get(values, sz);
-      else if(tp == AtomType.FLT) value = FltSeq.get(values, sz);
-      else if(tp == AtomType.DBL) value = DblSeq.get(values, sz);
-      else if(tp == AtomType.DEC) value = DecSeq.get(values, sz);
-      else if(tp == AtomType.BYT) value = BytSeq.get(values, sz);
-      else if(tp != null && tp.instanceOf(AtomType.ITR)) {
-        value = IntSeq.get(values, sz, tp);
-      } else {
+      Value value = Seq.get((int) size, tp, values);
+      if(value == null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
         for(int v = 0; v < vl; v++) vb.add(values[v]);
         value = vb.value();
@@ -178,7 +171,9 @@ public final class List extends Arr {
 
   @Override
   public boolean isVacuous() {
-    for(final Expr expr : exprs) if(!expr.isVacuous()) return false;
+    for(final Expr expr : exprs) {
+      if(!expr.isVacuous()) return false;
+    }
     return true;
   }
 

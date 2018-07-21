@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -36,7 +38,7 @@ public final class Union extends Set {
     for(final Expr expr : exprs) {
       if(expr == Empty.SEQ) {
         // remove empty operands
-        cc.info(OPTREMOVE_X_X, expr, description());
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) () -> description());
       } else {
         list.add(expr);
       }

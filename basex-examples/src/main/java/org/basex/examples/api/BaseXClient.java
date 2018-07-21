@@ -39,6 +39,7 @@ public final class BaseXClient implements Closeable {
       final String password) throws IOException {
 
     socket = new Socket();
+    socket.setTcpNoDelay(true);
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = new BufferedInputStream(socket.getInputStream());
     out = socket.getOutputStream();

@@ -109,7 +109,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
       if(combo.getSelectedIndex() == 0) continue;
       final String elem = combo.getSelectedItem();
-      if(!elem.startsWith("@")) tl.add(Token.token(elem));
+      if(!elem.startsWith("@")) tl.add(elem);
     }
 
     final String[] entries = entries(data.paths.desc(tl, true, false));
@@ -157,7 +157,9 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       // find modified component
       int cp = 0;
       final int cs = panel.getComponentCount();
-      for(int c = 0; c < cs; ++c) if(panel.getComponent(c) == source) cp = c;
+      for(int c = 0; c < cs; ++c) {
+        if(panel.getComponent(c) == source) cp = c;
+      }
 
       if((cp & 1) == 0) {
         // combo box with element/attribute names
@@ -280,9 +282,10 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @return key array
    */
   private static String[] entries(final TokenList names) {
-    final StringList entries = new StringList();
-    entries.add(Util.info(ENTRIES_X, names.size()));
-    for(final byte[] k : names) entries.add(Token.string(k));
+    final int ns = names.size();
+    final StringList entries = new StringList(ns);
+    entries.add(Util.info(ENTRIES_X, ns));
+    for(final byte[] name : names) entries.add(name);
     return entries.sort(true, true, 1).finish();
   }
 }

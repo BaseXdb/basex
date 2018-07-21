@@ -65,7 +65,9 @@ public final class Intersect extends Set {
         final int irl = iter.length;
         if(nodes == null) nodes = new ANode[irl];
 
-        for(int i = 0; i < irl; i++) if(!next(i)) return null;
+        for(int i = 0; i < irl; i++) {
+          if(!next(i)) return null;
+        }
 
         final int il = nodes.length;
         for(int i = 1; i < il;) {

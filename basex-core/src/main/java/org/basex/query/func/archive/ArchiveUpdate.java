@@ -49,7 +49,9 @@ public final class ArchiveUpdate extends ArchiveCreate {
       if(in instanceof GZIPIn)
         throw ARCHIVE_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       // delete entries to be updated
-      while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
+      while(in.more()) {
+        if(!hm.contains(token(in.entry().getName()))) out.write(in);
+      }
       // add new and updated entries
       for(final byte[] h : hm) {
         if(h == null) continue;

@@ -341,7 +341,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // cache flags for remaining, new properties
     for(final Flag flag : flgs) map.put(flag, expr.has(flag));
     // evaluate result
-    for(final Flag flag : flags) if(map.get(flag)) return true;
+    for(final Flag flag : flags) {
+      if(map.get(flag)) return true;
+    }
     return false;
   }
 

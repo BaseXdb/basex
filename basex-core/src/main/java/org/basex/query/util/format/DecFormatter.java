@@ -97,7 +97,9 @@ public final class DecFormatter extends FormatUtil {
     final IntSet is = new IntSet();
     for(int i = 0; i < 10; i++) is.add(zero + i);
     final int[] ss = { decimal, grouping, exponent, percent, permille, optional, pattern };
-    for(final int s : ss) if(!is.add(s)) throw DUPLDECFORM_X.get(info, (char) s);
+    for(final int s : ss) {
+      if(!is.add(s)) throw DUPLDECFORM_X.get(info, (char) s);
+    }
 
     // create auxiliary strings
     final TokenBuilder tb = new TokenBuilder();

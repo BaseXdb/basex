@@ -1,13 +1,13 @@
 package org.basex.http.restxq;
 
-import static org.basex.http.util.WebText.*;
+import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.regex.*;
 
 import org.basex.http.*;
-import org.basex.http.util.*;
+import org.basex.http.web.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;

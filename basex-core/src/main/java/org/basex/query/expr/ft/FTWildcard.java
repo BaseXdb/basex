@@ -157,7 +157,9 @@ public final class FTWildcard {
         int n = min[qi];
         final int m = max[qi++];
         // recursively evaluates wildcards (non-greedy)
-        while(!match(token, ti + n, qi)) if(ti + ++n > tl) return false;
+        while(!match(token, ti + n, qi)) {
+          if(ti + ++n > tl) return false;
+        }
         if(n > m) return false;
         ti += n;
       } else {

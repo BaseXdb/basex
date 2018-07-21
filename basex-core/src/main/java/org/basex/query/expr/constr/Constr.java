@@ -98,7 +98,7 @@ public final class Constr {
 
     if(item instanceof ANode) {
       // type: nodes
-      ANode node = (ANode) item;
+      final ANode node = (ANode) item;
 
       final Type type = item.type;
       if(type == NodeType.TXT) {
@@ -156,9 +156,7 @@ public final class Constr {
 
         // add text node
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
-        final MainOptions mopts = qc.context.options;
-        if(mopts.get(MainOptions.COPYNODE)) node = node.deepCopy(mopts, qc);
-        children.add(node);
+        children.add(node.materialize(qc, qc.context.options.get(MainOptions.COPYNODE)));
       }
       more = false;
     } else {

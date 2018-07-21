@@ -103,7 +103,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public void materialize(final InputInfo info) { }
+  public void cache(final InputInfo info) { }
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo info) {

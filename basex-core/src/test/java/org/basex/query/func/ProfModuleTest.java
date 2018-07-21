@@ -14,7 +14,7 @@ import org.junit.*;
 public final class ProfModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
-  public void mem() {
+  public void memory() {
     final Function func = _PROF_MEMORY;
     query(func.args(" ()"));
     query("count(" + func.args(" 1 to 100 ") + ")", 100);

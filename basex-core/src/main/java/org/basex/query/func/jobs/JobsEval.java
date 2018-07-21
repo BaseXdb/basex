@@ -45,7 +45,7 @@ public class JobsEval extends StandardFunc {
     // copy variable values
     final Context ctx = qc.context;
     for(final Entry<String, Value> it : bindings.entrySet()) {
-      bindings.put(it.getKey(), QueryJob.copy(it.getValue().iter(), ctx, qc));
+      bindings.put(it.getKey(), QueryJob.materialize(it.getValue().iter(), qc));
     }
 
     // check if number of maximum queries has been reached

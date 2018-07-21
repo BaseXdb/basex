@@ -209,10 +209,18 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void materialize(final InputInfo info) throws QueryException {
+  void cache(final InputInfo info) throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null) nd.materialize(info);
+      if(nd != null) nd.cache(info);
     }
+  }
+
+  @Override
+  boolean materialized() {
+    for(final TrieNode nd : kids) {
+      if(!nd.materialized()) return false;
+    }
+    return true;
   }
 
   @Override
@@ -234,7 +242,9 @@ final class TrieBranch extends TrieNode {
   @Override
   int hash(final InputInfo info) throws QueryException {
     int hash = 0;
-    for(final TrieNode ch : kids) if(ch != null) hash = 31 * hash + ch.hash(info);
+    for(final TrieNode ch : kids) {
+      if(ch != null) hash = (hash << 5) - hash + ch.hash(info);
+    }
     return hash;
   }
 

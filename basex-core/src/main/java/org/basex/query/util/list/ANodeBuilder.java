@@ -105,7 +105,9 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
     final ANode[] nodes = list;
     final Data data = s > 0 ? nodes[0].data() : null;
     if(data == null) return;
-    for(int l = 1; l < s; ++l) if(data != nodes[l].data()) return;
+    for(int l = 1; l < s; ++l) {
+      if(data != nodes[l].data()) return;
+    }
     dbnodes = true;
   }
 

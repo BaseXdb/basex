@@ -3,7 +3,6 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -46,8 +45,8 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FNode deepCopy(final MainOptions options, final QueryContext qc) {
-    return new FComm(value).parent(parent);
+  public FComm materialize(final QueryContext qc, final boolean copy) {
+    return copy ? new FComm(value) : this;
   }
 
   @Override

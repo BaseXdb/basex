@@ -29,7 +29,9 @@ public enum Perm {
    * @return permission, or {@code null} if no match is found
    */
   public static Perm get(final String perm) {
-    for(final Perm p : VALUES) if(p.toString().equals(perm)) return p;
+    for(final Perm p : VALUES) {
+      if(p.toString().equals(perm)) return p;
+    }
     return null;
   }
 

@@ -94,11 +94,11 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value subSequence(long start, long length, QueryContext qc);
 
   /**
-   * Materializes lazy values.
+   * Caches lazy values.
    * @param info input info
    * @throws QueryException query exception
    */
-  public abstract void materialize(InputInfo info) throws QueryException;
+  public abstract void cache(InputInfo info) throws QueryException;
 
   /**
    * Computes the number of atomized items.

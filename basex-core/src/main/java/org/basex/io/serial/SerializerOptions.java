@@ -186,7 +186,9 @@ public final class SerializerOptions extends Options {
     try {
       assign(name, string(value));
     } catch(final BaseXException ex) {
-      for(final Option<?> o : this) if(o.name().equals(name)) throw SER_X.get(info, ex);
+      for(final Option<?> o : this) {
+        if(o.name().equals(name)) throw SER_X.get(info, ex);
+      }
       throw OUTINVALID_X.get(info, ex);
     }
 

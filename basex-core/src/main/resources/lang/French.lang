@@ -325,6 +325,7 @@ run_tests            = Exécuter les tests
 save                 = Enregistrer
 save_as              = Enregistrer sous
 save_before_execute  = Enregistrer avant d'exécuter le fichier
+scroll_tabs          = Défiler les onglets de l'éditeur
 searching            = Recherche
 select_all           = Sélectionner tout
 separator            = Séparateur
@@ -413,8 +414,8 @@ yes                  = Oui
 
 # Help texts
 
-h_attr_index         = Cet index accélère les comparaisons d'attributs dans les prédicats.
-h_binary_file        = Le fichier est peut-être binaire.\nVoulez-vous l'ouvrir à l'extérieur ?
+h_attr_index         = Cet index accélère les comparaisons dattributs dans les prédicats.
+h_binary_file        = Le fichier est peut-être binaire.\nVoulez-vous louvrir à l'extérieur ?
 h_browser_error_%    = Impossible d'ouvrir un navigateur.\nVeuillez ouvrir l'URL manuellement :\n\n%
 h_case               = La casse est conservée dans l'index.
 h_chop_ws            = Cette option supprime les espaces entre balises et contenus.

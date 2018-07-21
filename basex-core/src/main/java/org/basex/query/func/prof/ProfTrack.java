@@ -31,14 +31,14 @@ public final class ProfTrack extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TrackOptions opts = toOptions(1, new TrackOptions(), qc);
 
-    Performance perf = null;
-    long min = -1;
     // include memory consumption
+    long min = -1;
     if(opts.get(TrackOptions.MEMORY)) {
       Performance.gc(4);
       min = Performance.memory();
     }
     // include execution time (called after garbage collection)
+    Performance perf = null;
     if(opts.get(TrackOptions.TIME)) {
       perf = new Performance();
     }
@@ -48,30 +48,24 @@ public final class ProfTrack extends StandardFunc {
       // retrieve and assign value
       value = exprs[0].value(qc);
     } else {
-      // iterate through results; skip iteration if iterator is value-based
+      // iterate through results; skip iteration if iterator is already a value
       final Iter iter = exprs[0].iter(qc);
       if(iter.value() == null) {
         while(qc.next(iter) != null);
       }
     }
 
-    Map map = Map.EMPTY;
-    // resulting execution time (called before garbage collection)
-    if(perf != null) {
-      final long time = perf.ns();
-      map = map.put(Str.get(TrackOptions.TIME.name()), Dbl.get(Performance.ms(time, 1)), info);
-    }
-    // resulting memory consumption
+    final MapBuilder mb = new MapBuilder();
+    // execution time (called before garbage collection)
+    if(perf != null) mb.put(TrackOptions.TIME.name(), Dbl.get(Performance.ms(perf.ns(), 1)));
+    // memory consumption
     if(min != -1) {
       Performance.gc(2);
-      final long mem = Math.max(0, Performance.memory() - min);
-      map = map.put(Str.get(TrackOptions.MEMORY.name()), Int.get(mem), info);
+      mb.put(TrackOptions.MEMORY.name(), Int.get(Math.max(0, Performance.memory() - min)));
     }
-    // resulting value
-    if(value != null) {
-      map = map.put(Str.get(TrackOptions.VALUE.name()), value, info);
-    }
-    return map;
+    // evaluated value
+    if(value != null) mb.put(TrackOptions.VALUE.name(), value);
+    return mb.finish();
   }
 
   @Override

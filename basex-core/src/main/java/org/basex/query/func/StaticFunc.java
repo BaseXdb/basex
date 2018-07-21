@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -256,13 +257,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // cache flags for remaining, new properties
     for(final Flag flag : flgs) map.put(flag, expr.has(flag));
     // evaluate result
-    for(final Flag flag : flags) if(map.get(flag)) return true;
+    for(final Flag flag : flags) {
+      if(map.get(flag)) return true;
+    }
     return false;
   }
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var var : params) if(!visitor.declared(var)) return false;
+    for(final Var var : params) {
+      if(!visitor.declared(var)) return false;
+    }
     return expr == null || expr.accept(visitor);
   }
 
@@ -276,7 +281,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       throws QueryException {
 
     if(!inline(cc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
-    cc.info(OPTINLINE_X, id());
+    cc.info(OPTINLINE_X, (Supplier<?>) () -> id());
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = exprs.length == 0 ? null : new LinkedList<>();

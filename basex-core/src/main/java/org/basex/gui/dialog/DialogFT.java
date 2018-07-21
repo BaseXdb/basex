@@ -35,7 +35,7 @@ final class DialogFT extends DialogIndex {
   private final BaseXCheckBox[] check = new BaseXCheckBox[FLAGS];
     /** Full-text language. */
   private final BaseXCombo language;
-  /** Path for Full-text stopword list. */
+  /** Path to Full-text stopword list. */
   private final BaseXTextField swpath;
   /** Element names to include. */
   private final BaseXTextField ftinc;
@@ -116,10 +116,10 @@ final class DialogFT extends DialogIndex {
     final GUIOptions gopts = dialog.gui.gopts;
     final BaseXFileChooser fc = new BaseXFileChooser(dialog,
         FILE_OR_DIR, gopts.get(GUIOptions.DATAPATH));
-    final IO file = fc.select(Mode.FOPEN);
+    final IOFile file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());
-      gopts.set(GUIOptions.DATAPATH, file.path());
+      gopts.setFile(GUIOptions.DATAPATH, file);
     }
   }
 

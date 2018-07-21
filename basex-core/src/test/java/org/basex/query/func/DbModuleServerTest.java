@@ -110,6 +110,8 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
     }
     start.countDown();
     stop.await();
-    for(final Client c : clients) if(c.error != null) fail(c.error);
+    for(final Client c : clients) {
+      if(c.error != null) fail(c.error);
+    }
   }
 }

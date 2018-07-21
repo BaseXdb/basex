@@ -38,6 +38,10 @@ public final class Token {
   public static final byte[] INF = token("INF");
   /** Token '-INF'. */
   public static final byte[] NINF = token("-INF");
+  /** Token 'Infinity'. */
+  public static final byte[] INFINITY = token("Infinity");
+  /** Token '-Infinity'. */
+  public static final byte[] NINFINITY = token("-Infinity");
   /** Minimum long value. */
   public static final byte[] MINLONG = token("-9223372036854775808");
   /** Space. */
@@ -331,7 +335,9 @@ public final class Token {
    * @return number of digits
    */
   public static int numDigits(final int integer) {
-    for(int i = 0;; ++i) if(integer <= INTSIZE[i]) return i + 1;
+    for(int i = 0;; ++i) {
+      if(integer <= INTSIZE[i]) return i + 1;
+    }
   }
 
   /** Minimum integer. */
@@ -392,7 +398,9 @@ public final class Token {
     if(b != null) return b;
 
     final int fl = FLT.length;
-    for(int i = 0; i < fl; ++i) if(flt == FLT[i]) return FLTSTR[i];
+    for(int i = 0; i < fl; ++i) {
+      if(flt == FLT[i]) return FLTSTR[i];
+    }
     final float a = Math.abs(flt);
     final boolean small = a >= 1.0e-6f && a < 1.0e6f;
     String s1;
@@ -597,7 +605,9 @@ public final class Token {
    * @return true if one test is successful
    */
   public static boolean eq(final byte[] token, final byte[]... tokens) {
-    for(final byte[] tok : tokens) if(eq(token, tok)) return true;
+    for(final byte[] tok : tokens) {
+      if(eq(token, tok)) return true;
+    }
     return false;
   }
 
@@ -679,9 +689,13 @@ public final class Token {
   public static int indexOf(final byte[] token, final int ch) {
     final int tl = token.length;
     if(ch < 0x80) {
-      for(int t = 0; t < tl; t++) if(token[t] == ch) return t;
+      for(int t = 0; t < tl; t++) {
+        if(token[t] == ch) return t;
+      }
     } else {
-      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == ch) return t;
+      for(int t = 0; t < tl; t += cl(token, t)) {
+        if(cp(token, t) == ch) return t;
+      }
     }
     return -1;
   }
@@ -696,9 +710,13 @@ public final class Token {
     final int tl = token.length;
     int p = -1;
     if(ch < 128) {
-      for(int t = tl - 1; t >= 0; --t) if(token[t] == ch) return t;
+      for(int t = tl - 1; t >= 0; --t) {
+        if(token[t] == ch) return t;
+      }
     } else {
-      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == ch) p = t;
+      for(int t = 0; t < tl; t += cl(token, t)) {
+        if(cp(token, t) == ch) p = t;
+      }
     }
     return p;
   }
@@ -729,7 +747,9 @@ public final class Token {
     // compare tokens character wise
     for(int t = pos; t <= tl; ++t) {
       int s = 0;
-      while(sub[s] == token[t + s]) if(++s == sl) return t;
+      while(sub[s] == token[t + s]) {
+        if(++s == sl) return t;
+      }
     }
     return -1;
   }
@@ -801,7 +821,9 @@ public final class Token {
     final int sl = sub.length;
     final int tl = token.length;
     if(sl > tl) return false;
-    for(int s = sl; s > 0; s--) if(sub[sl - s] != token[tl - s]) return false;
+    for(int s = sl; s > 0; s--) {
+      if(sub[sl - s] != token[tl - s]) return false;
+    }
     return true;
   }
 
@@ -944,25 +966,27 @@ public final class Token {
    */
   public static byte[] trim(final byte[] token) {
     int s = -1, e = token.length;
-    while(++s < e) if(!ws(token[s])) break;
-    while(--e > s) if(!ws(token[e])) break;
+    while(++s < e) {
+      if(!ws(token[s])) break;
+    }
+    while(--e > s) {
+      if(!ws(token[e])) break;
+    }
     if(++e == token.length && s == 0) return token;
     return s == e ? EMPTY : Arrays.copyOfRange(token, s, e);
   }
 
   /**
-   * Chops a token to the specified length and adds dots.
+   * Chops a token to the specified length. Appends trailing dots if the string is too long.
    * @param token token to be chopped
    * @param max maximum length
    * @return chopped token
    */
   public static byte[] chop(final byte[] token, final int max) {
     if(token.length <= max) return token;
-    final byte[] tt = Arrays.copyOf(token, max);
-    if(max > 2) tt[max - 3] = '.';
-    if(max > 1) tt[max - 2] = '.';
-    if(max > 0) tt[max - 1] = '.';
-    return tt;
+    final TokenBuilder tb = new TokenBuilder(max + 3);
+    for(int t = 0; t < max; t += cl(token, t)) tb.add(cp(token, t));
+    return tb.add('.').add('.').add('.').finish();
   }
 
   /**

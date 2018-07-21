@@ -3,7 +3,6 @@ package org.basex.query.value.node;
 import java.util.*;
 
 import org.basex.api.dom.*;
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -31,9 +30,6 @@ public abstract class FNode extends ANode {
     if(value == null) value = Token.EMPTY;
     return value;
   }
-
-  @Override
-  public abstract FNode deepCopy(MainOptions options, QueryContext qc);
 
   @Override
   public FNode finish() {
@@ -92,12 +88,6 @@ public abstract class FNode extends ANode {
   @Override
   public BasicNodeIter children() {
     return BasicNodeIter.EMPTY;
-  }
-
-  @Override
-  public final FNode parent(final ANode par) {
-    parent = par;
-    return this;
   }
 
   @Override

@@ -21,6 +21,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This index class retrieves texts and attribute values from the index.
@@ -220,7 +221,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public boolean has(final Flag... flags) {
-    return expr.has(flags) && super.has(flags);
+    return expr.has(flags) || super.has(flags);
   }
 
   @Override
@@ -260,12 +261,13 @@ public final class ValueAccess extends IndexAccess {
   public boolean equals(final Object obj) {
     if(!(obj instanceof ValueAccess)) return false;
     final ValueAccess v = (ValueAccess) obj;
-    return expr.equals(obj) && type == v.type && Objects.equals(test, v.test) && super.equals(obj);
+    return Objects.equals(tokens, v.tokens) && expr.equals(obj) && type == v.type &&
+        Objects.equals(test, v.test) && super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(INDEX, type, NAME, test), db, expr);
+    addPlan(plan, planElem(INDEX, type, NAME, test), db, toExpr());
   }
 
   @Override
@@ -273,8 +275,19 @@ public final class ValueAccess extends IndexAccess {
     final TokenBuilder tb = new TokenBuilder();
     final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
         ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
-    tb.add(func.args(db.source(), expr).substring(1));
+    tb.add(func.args(db.source(), toExpr()).substring(1));
     if(test != null) tb.add("/parent::").addExt(test);
     return tb.toString();
+  }
+
+  /**
+   * Returns an expression instance for cached tokens, or the search expression itself.
+   * @return expression
+   */
+  private Expr toExpr() {
+    if(tokens == null) return expr;
+    final TokenList tl = new TokenList(tokens.size());
+    for(final byte[] token : tokens) tl.add(token);
+    return StrSeq.get(tl);
   }
 }

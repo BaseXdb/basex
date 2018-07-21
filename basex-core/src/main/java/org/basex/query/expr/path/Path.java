@@ -112,11 +112,14 @@ public abstract class Path extends ParseExpr {
 
     // if last expression yields no nodes, rewrite mixed path to simple map
     // example: $a/b/string -> $a/b ! string()
-    final Expr last = st[sl - 1];
-    if(sl > 1 && last.seqType().type.instanceOf(AtomType.AAT)) {
+    final Expr s1 = sl > 1 ? st[sl - 2] : rt, s2 = st[sl - 1];
+    if(s1 != null && s1.seqType().type.instanceOf(NodeType.NOD) &&
+        s2.seqType().type.instanceOf(AtomType.AAT)) {
       list.remove(sl - 1);
-      return (SimpleMap) SimpleMap.get(info, Path.get(info, rt, list.finish()), last);
+      if(sl > 1) rt = Path.get(info, rt, list.finish());
+      return (SimpleMap) SimpleMap.get(info, rt, s2);
     }
+
     return new MixedPath(info, rt, st);
   }
 
@@ -130,15 +133,17 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
+    final Expr rt;
     if(root != null) {
       root = root.compile(cc);
       if(root.seqType().zero() || steps.length == 0) return root;
-      cc.pushFocus(root);
+      rt = root;
     } else {
       if(steps.length == 0) return new ContextValue(info).optimize(cc);
-      cc.pushFocus(cc.qc.focus.value);
+      rt = cc.qc.focus.value;
     }
 
+    cc.pushFocus(rt);
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       Expr step = steps[s];
@@ -159,12 +164,17 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // root returns no results...
+    // return root if it returns no result (it may have side effects)
     if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
+
+    // check for empty sequence
+    for(final Expr step : steps) {
+      if(step == Empty.SEQ) return cc.emptySeq(this);
+    }
 
     // simplify path with empty root expression or empty step
     final Value rt = rootValue(cc);
-    if(emptyPath(rt)) return cc.emptySeq(this);
+    if((!cc.nestedFocus() || cc.qc.focus.value == null) && emptyPath(rt)) return cc.emptySeq(this);
 
     seqType(cc, rt);
 
@@ -228,7 +238,9 @@ public abstract class Path extends ParseExpr {
     // check remaining flags
     final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
     if(flgs.length != 0) {
-      for(final Expr step : steps) if(step.has(flgs)) return true;
+      for(final Expr step : steps) {
+        if(step.has(flgs)) return true;
+      }
       return root != null && root.has(flgs);
     }
     return false;
@@ -485,8 +497,6 @@ public abstract class Path extends ParseExpr {
    * @return {@code true} if steps will never yield results
    */
   private boolean emptyStep(final Value rt, final int s) {
-    if(steps[s] == Empty.SEQ) return true;
-
     final Step step = axisStep(s);
     if(step == null) return false;
 
@@ -879,7 +889,9 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean removable(final Var var) {
-    for(final Expr step : steps) if(step.uses(var)) return false;
+    for(final Expr step : steps) {
+      if(step.uses(var)) return false;
+    }
     return root == null || root.removable(var);
   }
 

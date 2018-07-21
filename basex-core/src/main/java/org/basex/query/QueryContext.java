@@ -53,6 +53,8 @@ public final class QueryContext extends Job implements Closeable {
   public final StaticFuncs funcs = new StaticFuncs();
   /** Externally bound variables. */
   private final HashMap<QNm, Value> bindings = new HashMap<>();
+  /** External query properties. */
+  private final HashMap<String, Object> props;
 
   /** Parent query context. */
   public final QueryContext parent;
@@ -63,8 +65,6 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Query resources. */
   public QueryResources resources;
-  /** HTTP connection. */
-  public Object http;
   /** Update container. */
   public Updates updates;
 
@@ -134,10 +134,9 @@ public final class QueryContext extends Job implements Closeable {
    * @param parent parent context
    */
   public QueryContext(final QueryContext parent) {
-    this(parent.context, parent, parent.info);
+    this(parent.context, parent, parent.info, parent.props);
     parent.pushJob(this);
     resources = parent.resources;
-    http = parent.http;
     updates = parent.updates;
   }
 
@@ -146,7 +145,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    */
   public QueryContext(final Context context) {
-    this(context, null, null);
+    this(context, null, null, new HashMap<>());
     resources = new QueryResources(this);
   }
 
@@ -155,11 +154,14 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    * @param parent parent context (can be {@code null})
    * @param info query info
+   * @param props external properties
    */
-  private QueryContext(final Context context, final QueryContext parent, final QueryInfo info) {
+  private QueryContext(final Context context, final QueryContext parent, final QueryInfo info,
+      final HashMap<String, Object> props) {
     this.context = context;
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(this);
+    this.props = props;
   }
 
   /**
@@ -338,8 +340,8 @@ public final class QueryContext extends Job implements Closeable {
         final ItemList items2 = updates.items;
         final HashSet<Data> datas = updates.prepare(this);
         final StringList dbs = updates.databases();
-        check(items, datas, dbs);
-        check(items2, datas, dbs);
+        materialize(items, datas, dbs);
+        materialize(items2, datas, dbs);
 
         // invalidate current node set in context, apply updates
         if(context.data() != null) context.invalidate();
@@ -363,26 +365,24 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Checks the specified results, and replaces nodes with their copies if they will be
-   * affected by update operations.
+   * Replaces all nodes that will be affected by updates by copies.
    * @param items node cache
    * @param datas data references
    * @param dbs database names
    * @throws QueryException query exception
    */
-  private void check(final ItemList items, final HashSet<Data> datas, final StringList dbs)
+  private void materialize(final ItemList items, final HashSet<Data> datas, final StringList dbs)
       throws QueryException {
 
     final long is = items.size();
     for(int i = 0; i < is; i++) {
       final Item item = items.get(i);
-      // all updates are performed on database nodes
-      if(item instanceof FItem) throw BASEX_FUNCTION_X.get(null, item);
       final Data data = item.data();
-      if(data != null && (datas.contains(data) ||
-          !data.inMemory() && dbs.contains(data.meta.name))) {
-        items.set(i, ((DBNode) item).dbNodeCopy(context.options, this));
-      }
+      final boolean copy = data != null &&
+          (datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name));
+      final Item it = item.materialize(this, copy);
+      if(it == null) throw BASEX_FUNCTION_X.get(null, item);
+      items.set(i, it);
     }
   }
 
@@ -420,11 +420,21 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds the HTTP connection.
-   * @param value HTTP connection
+   * Assigns an external property.
+   * @param key key
+   * @param value value
    */
-  public void http(final Object value) {
-    http = value;
+  public void putProperty(final String key, final Object value) {
+    props.put(key, value);
+  }
+
+  /**
+   * Returns an external property.
+   * @param key key
+   * @return value (can be {@code null})
+   */
+  public Object getProperty(final String key) {
+    return props.get(key);
   }
 
   /**
@@ -624,7 +634,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // use standard iterator
     while((item = next(iter)) != null && items.size() < mx) {
-      item.materialize(null);
+      item.cache(null);
       items.add(item);
     }
     return items.value();

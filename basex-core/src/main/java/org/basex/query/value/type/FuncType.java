@@ -138,7 +138,9 @@ public class FuncType implements Type {
     for(int a = 0; a < al; a++) {
       if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
     }
-    for(final Ann ann : ft.anns) if(!anns.contains(ann)) return false;
+    for(final Ann ann : ft.anns) {
+      if(!anns.contains(ann)) return false;
+    }
     return true;
   }
 

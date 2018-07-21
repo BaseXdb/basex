@@ -38,14 +38,11 @@ public final class ArchiveOptions extends StandardFunc {
     }
 
     // create result element
-    Map map = Map.EMPTY;
-    if(format != null) {
-      map = map.put(Str.get(ArchOptions.FORMAT.name()), Str.get(format), ii);
-    }
-    if(level >= 0) {
-      final String lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
-      map = map.put(Str.get(ArchOptions.ALGORITHM.name()), Str.get(lvl), ii);
-    }
-    return map;
+    final MapBuilder mb = new MapBuilder();
+    if(format != null) mb.put(ArchOptions.FORMAT.name(), format);
+    if(level >= 0) mb.put(ArchOptions.ALGORITHM.name(),
+        level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN);
+
+    return mb.finish();
   }
 }

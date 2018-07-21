@@ -96,7 +96,8 @@ public final class EditorView extends View {
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
     tabs.addDragDrop();
-    tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+    tabs.setTabLayoutPolicy(gui.gopts.get(GUIOptions.SCROLLTABS) ? JTabbedPane.SCROLL_TAB_LAYOUT :
+      JTabbedPane.WRAP_TAB_LAYOUT);
     tabs.addMouseListener((MouseClickedListener) e -> {
       final int i = tabs.indexAtLocation(e.getX(), e.getY());
       if(i != -1 && SwingUtilities.isMiddleMouseButton(e)) {
@@ -341,18 +342,8 @@ public final class EditorView extends View {
    * @param files files to be opened
    */
   public void init(final ArrayList<IOFile> files) {
-    // open previous files; do not complain about missing files
-    final String[] fs = gui.gopts.get(GUIOptions.OPEN);
-    for(final String file : fs) open(new IOFile(file), false, false);
-
-    // open specified files
-    for(final IOFile file : files) open(file);
-
-    // initialize project root with path of first file
-    if(project.dir() == null) {
-      final IOFile f = fs.length == 0 ? files.isEmpty() ? null : files.get(0) : new IOFile(fs[0]);
-      if(f != null) project.rootPath(f.parent(), false);
-    }
+    for(final String file : gui.gopts.get(GUIOptions.OPEN)) files.add(new IOFile(file));
+    for(final IOFile file : files) open(file, true, false);
     gui.setTitle();
   }
 
@@ -603,20 +594,17 @@ public final class EditorView extends View {
   void refreshHistory(final IOFile file) {
     final StringList paths = new StringList();
     if(file != null) {
+      gui.gopts.setFile(GUIOptions.WORKPATH, file.parent());
       final String path = file.path();
-      gui.gopts.set(GUIOptions.WORKPATH, file.dir());
       paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
-    final String[] old = gui.gopts.get(GUIOptions.EDITOR);
-    final int ol = old.length;
-    for(int p = 0; paths.size() < BaseXHistory.MAX && p < ol; p++) {
-      final IO fl = IO.get(old[p]);
-      if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
+    for(final String old : gui.gopts.get(GUIOptions.EDITOR)) {
+      if(paths.size() < BaseXHistory.MAX) paths.addUnique(old);
     }
 
     // store sorted history
-    gui.gopts.set(GUIOptions.EDITOR, paths.finish());
+    gui.gopts.setFiles(GUIOptions.EDITOR, paths.finish());
     history.setEnabled(!paths.isEmpty());
   }
 

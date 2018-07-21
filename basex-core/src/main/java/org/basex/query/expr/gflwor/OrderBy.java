@@ -125,7 +125,9 @@ public final class OrderBy extends Clause {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final OrderKey key : keys) if(key.has(flags)) return true;
+    for(final OrderKey key : keys) {
+      if(key.has(flags)) return true;
+    }
     return false;
   }
 
@@ -142,7 +144,9 @@ public final class OrderBy extends Clause {
 
   @Override
   public boolean removable(final Var var) {
-    for(final OrderKey key : keys) if(!key.removable(var)) return false;
+    for(final OrderKey key : keys) {
+      if(!key.removable(var)) return false;
+    }
     return true;
   }
 
@@ -181,7 +185,9 @@ public final class OrderBy extends Clause {
 
     // add new variables, possible when an expression is inlined below this clause
     OUTER: for(int id = used.nextSet(0); id >= 0; id = used.nextSet(id + 1)) {
-      for(final VarRef ref : refs) if(ref.var.id == id) continue OUTER;
+      for(final VarRef ref : refs) {
+        if(ref.var.id == id) continue OUTER;
+      }
       refs = Array.add(refs, new VarRef(info, decl.get(id)));
     }
     return true;
