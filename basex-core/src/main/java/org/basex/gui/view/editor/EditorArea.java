@@ -183,7 +183,6 @@ public final class EditorArea extends TextPanel {
    */
   boolean save(final IOFile io) {
     final boolean rename = io != file;
-    System.out.println(tstamp);
     if(rename || modified || tstamp == 0) {
       try {
         io.write(getText());
