@@ -220,8 +220,7 @@ public final class RestXqModules {
           } else {
             for(final MediaType produce : func.produces) {
               if(produce.matches(accept) && qf(accept, "q") == clientQf &&
-                  (serverQf == -1 || qf(produce, "qs") == serverQf))
-                return true;
+                  (serverQf == -1 || qf(produce, "qs") == serverQf)) return true;
             }
           }
         }
