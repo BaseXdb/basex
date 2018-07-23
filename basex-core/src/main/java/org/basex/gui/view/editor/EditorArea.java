@@ -34,7 +34,7 @@ public final class EditorArea extends TextPanel {
 
   /** View reference. */
   private final EditorView view;
-  /** Timestamp. */
+  /** Timestamp. Set to {@code 0} if it has not been stored to disk. */
   private long tstamp;
 
   /**
@@ -92,18 +92,18 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Initializes the text.
-   * @param t text to be set
+   * @param text text to be set
    */
-  void initText(final byte[] t) {
-    last = t;
-    super.setText(t);
+  void initText(final byte[] text) {
+    last = text;
+    super.setText(text);
     hist.init(getText());
   }
 
   @Override
-  public void setText(final byte[] t) {
+  public void setText(final byte[] text) {
     last = getText();
-    super.setText(t);
+    super.setText(text);
   }
 
   @Override
@@ -157,12 +157,14 @@ public final class EditorArea extends TextPanel {
           setText(file.read());
           file(file, false);
           release(Action.PARSE);
+          tstamp = ts;
         } catch(final IOException ex) {
+          tstamp = 0;
+          view.refreshControls(this, true);
           Util.debug(ex);
           BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
         }
       }
-      tstamp = ts;
     }
   }
 
@@ -181,7 +183,8 @@ public final class EditorArea extends TextPanel {
    */
   boolean save(final IOFile io) {
     final boolean rename = io != file;
-    if(rename || modified) {
+    System.out.println(tstamp);
+    if(rename || modified || tstamp == 0) {
       try {
         io.write(getText());
         file(io, true);
