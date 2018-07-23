@@ -53,6 +53,9 @@ public interface WebText {
   /** Init call. */
   String INIT = ".init";
 
+  /** DBA String. */
+  String DBA = "dba";
+
   /** Error message. */
   String ANN_MISSING = "Path annotation missing.";
   /** Error message. */

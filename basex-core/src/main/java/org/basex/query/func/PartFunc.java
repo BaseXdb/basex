@@ -95,11 +95,11 @@ public final class PartFunc extends Arr {
     while(++a < al) args[a] = exprs[a - hl].value(qc);
 
     final AnnList anns = func.annotations();
-    final FuncType type = FuncType.get(anns, ft.declType, vars);
-    final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
-        false, func, args);
+    final boolean updating = anns.contains(Annotation.UPDATING);
+    final DynFuncCall ex = new DynFuncCall(info, sc, updating, false, func, args);
 
-    return new FuncItem(sc, anns, null, vars, type, fc, qc.focus, vs.stackSize());
+    final FuncType type = FuncType.get(anns, ft.declType, vars);
+    return new FuncItem(sc, anns, null, vars, type, ex, qc.focus, vs.stackSize());
   }
 
   @Override

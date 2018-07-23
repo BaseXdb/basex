@@ -631,15 +631,13 @@ public final class EditorView extends View {
    */
   private void closeEditor(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();
-    final int t = tabs.getTabCount();
-    // check if single tab is unchanged, or if user cancels operation
-    if((t == 1 && !ea.modified() && !ea.opened()) || !confirm(ea)) return;
+    if(ea.modified() && !confirm(ea)) return;
 
     // remove reference to last executed file
     if(execFile != null && ea.file().path().equals(execFile.path())) execFile = null;
     tabs.remove(ea);
     // no panels left: open default tab
-    if(t == 1) {
+    if(tabs.getTabCount() == 0) {
       addTab();
       SwingUtilities.invokeLater(this::toggleProject);
     } else {

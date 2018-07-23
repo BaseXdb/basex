@@ -18,11 +18,8 @@ public interface HTTPText {
   /** Path to web configuration file. */
   String WEBCONF = WEB_INF + "web.xml";
 
-  /** DBA String. */
-  String DBA = "dba";
-
-  /** Error: wrong authorization. */
+  /** Authentication error. */
   String WRONGAUTH_X = "% authentication expected.";
-  /** Error message. */
+  /** Unexpected error. */
   String UNEXPECTED_X = "Unexpected error: %";
 }

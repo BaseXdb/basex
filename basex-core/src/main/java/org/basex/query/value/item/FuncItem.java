@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
@@ -152,7 +153,8 @@ public final class FuncItem extends FItem implements Scope {
       args[p] = new VarRef(info, vars[p]).optimize(null);
     }
 
-    final Expr ex = new DynFuncCall(info, sc, expr.has(Flag.UPD), false, this, args);
+    final boolean updating = anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
+    final Expr ex = new DynFuncCall(info, sc, updating, false, this, args);
 
     final CompileContext cc = new CompileContext(qc);
     cc.pushScope(vs);

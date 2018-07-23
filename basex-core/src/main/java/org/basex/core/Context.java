@@ -81,7 +81,7 @@ public final class Context {
 
   /**
    * Constructor, called by clients, and adopting the variables of the specified context.
-   * The {@link #user} reference must be set after calling this method.
+   * The {@link #user} must be set after calling this method.
    * @param ctx main context
    */
   public Context(final Context ctx) {
@@ -90,7 +90,7 @@ public final class Context {
 
   /**
    * Constructor, called by clients, and adopting the variables of the main context.
-   * The {@link #user} reference must be set after calling this method.
+   * The {@link #user} must be set after calling this method.
    * @param ctx main context
    * @param client client info (can be {@code null})
    */
@@ -131,10 +131,9 @@ public final class Context {
 
   /**
    * Returns the user of this context.
-   * @return user
+   * @return user (can be {@code null} if it has not yet been assigned
    */
   public User user() {
-    if(user == null) throw Util.notExpected("User has not been assigned yet.");
     return user;
   }
 
