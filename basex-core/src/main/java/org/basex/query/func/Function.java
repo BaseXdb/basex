@@ -1317,7 +1317,7 @@ public enum Function {
       arg(ITEM_ZM, ITEM_ZM, ITEM_O), BLN_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_IF(UtilIf.class, "if(condition,then[,else])",
-      arg(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZO, UTIL_URI),
+      arg(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ITEM_AT(UtilItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
   /** XQuery function. */
