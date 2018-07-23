@@ -111,7 +111,6 @@ public final class RestXqModules {
 
     // remove functions with different specifity
     final RestXqFunction first = funcs.get(0);
-
     for(int l = funcs.size() - 1; l > 0; l--) {
       if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
     }
@@ -128,8 +127,9 @@ public final class RestXqModules {
       tb.add(Text.NL).add(Text.LI).addExt(func.function.name.prefixString());
       if(!func.produces.isEmpty()) tb.add(" ").addExt(func.produces);
     }
-    throw first.path == null ? first.error(ERROR_CONFLICT_X_X, error, tb)
-                             : first.error(PATH_CONFLICT_X_X, first.path, tb);
+    throw first.path == null ?
+      first.error(ERROR_CONFLICT_X_X, error, tb) :
+      first.error(PATH_CONFLICT_X_X, first.path, tb);
   }
 
   /**
@@ -219,8 +219,8 @@ public final class RestXqModules {
             if(qf(accept, "q") == clientQf) return true;
           } else {
             for(final MediaType produce : func.produces) {
-              if(produce.matches(accept) && qf(accept, "q") == clientQf
-                  && (serverQf == -1 || qf(produce, "qs") == serverQf))
+              if(produce.matches(accept) && qf(accept, "q") == clientQf &&
+                  (serverQf == -1 || qf(produce, "qs") == serverQf))
                 return true;
             }
           }

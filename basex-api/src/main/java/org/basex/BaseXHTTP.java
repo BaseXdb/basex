@@ -17,6 +17,7 @@ import org.basex.util.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.webapp.*;
 import org.eclipse.jetty.xml.*;
+
 /**
  * This is the main class for the starting the database HTTP services.
  *

@@ -62,13 +62,9 @@ public final class RestXqModule {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
+          if(rxf.parse(ctx)) functions.add(rxf);
           final WsFunction wxq = new WsFunction(sf, qc, this);
-          if(rxf.parse(ctx)) {
-            functions.add(rxf);
-            }
-          if(wxq.parse()) {
-            wsFunctions.add(wxq);
-          }
+          if(wxq.parse()) wsFunctions.add(wxq);
         }
       }
     }
