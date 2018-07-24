@@ -21,7 +21,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public FElem wadl() throws QueryException {
-    return RestXqModules.get(queryContext.context).wadl(connection());
+    return WebModules.get(queryContext.context).wadl(connection());
   }
 
   /**
@@ -48,7 +48,7 @@ public final class Restxq extends QueryModule {
    * Initializes the RESTXQ module cache.
    */
   public void init() {
-    RestXqModules.get(queryContext.context).init();
+    WebModules.get(queryContext.context).init();
   }
 
   /**

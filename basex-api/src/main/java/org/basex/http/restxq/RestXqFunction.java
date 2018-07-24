@@ -42,7 +42,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
+public final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
@@ -59,7 +59,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
   final TokenList allows = new TokenList();
 
   /** Associated module. */
-  private final RestXqModule module;
+  private final WebModule module;
   /** Query parameters. */
   private final ArrayList<WebParam> errorParams = new ArrayList<>();
 
@@ -87,7 +87,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
    * @param qc query context
    * @param module associated module
    */
-  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
+  public RestXqFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
     super(function, qc);
     this.module = module;
   }
@@ -119,7 +119,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  boolean parse(final Context ctx) throws QueryException, IOException {
+  public boolean parse(final Context ctx) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.params.length];
     boolean found = false;

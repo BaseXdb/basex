@@ -26,7 +26,7 @@ import org.basex.util.*;
  */
 public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   /** Associated module. */
-  private final RestXqModule module;
+  private final WebModule module;
 
   /**
    * The Constructor.
@@ -34,7 +34,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @param qc query context
    * @param module associated module
    */
-  public WsFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
+  public WsFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
     super(function, qc);
     this.module = module;
   }

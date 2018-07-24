@@ -147,7 +147,7 @@ public abstract class WsAdapter  extends WebSocketAdapter {
    */
   protected void findAndProcess(final Annotation ann, final Object msg,
       final Map<String, String> header) {
-    final RestXqModules rxm = RestXqModules.get(wsconnection.context);
+    final WebModules rxm = WebModules.get(wsconnection.context);
     WsFunction func = null;
     try {
       func = rxm.find(wsconnection, ann);

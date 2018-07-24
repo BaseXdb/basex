@@ -39,7 +39,7 @@ final class RestXqWadl {
    * @param modules available modules
    * @return WADL description
    */
-  synchronized FElem create(final HashMap<String, RestXqModule> modules) {
+  synchronized FElem create(final HashMap<String, WebModule> modules) {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
     final String base = conn.req.getRequestURL().toString();
@@ -47,7 +47,7 @@ final class RestXqWadl {
 
     // create children
     final TreeMap<String, FElem> map = new TreeMap<>();
-    for(final RestXqModule mod : modules.values()) {
+    for(final WebModule mod : modules.values()) {
       for(final RestXqFunction func : mod.functions()) {
         if(func.path == null) continue;
 

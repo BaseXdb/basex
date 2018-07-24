@@ -1,4 +1,4 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
@@ -10,6 +10,7 @@ import javax.servlet.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.io.*;
@@ -24,7 +25,7 @@ import org.basex.query.scope.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class RestXqModule {
+public final class WebModule {
   /** Supported methods. */
   private final ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** Supported Websocket Methods. */
@@ -38,7 +39,7 @@ public final class RestXqModule {
    * Constructor.
    * @param file xquery file
    */
-  RestXqModule(final IOFile file) {
+  public WebModule(final IOFile file) {
     this.file = file;
     time = file.timeStamp();
   }
@@ -50,7 +51,7 @@ public final class RestXqModule {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  boolean parse(final Context ctx) throws QueryException, IOException {
+  public boolean parse(final Context ctx) throws QueryException, IOException {
     functions.clear();
     wsFunctions.clear();
 
@@ -76,14 +77,14 @@ public final class RestXqModule {
    * Checks if the timestamp is still up-to-date.
    * @return result of check
    */
-  boolean uptodate() {
+  public boolean uptodate() {
     return time == file.timeStamp();
   }
 
   /**
    * Updates the timestamp.
    */
-  void touch() {
+  public void touch() {
     time = file.timeStamp();
   }
 
@@ -91,7 +92,7 @@ public final class RestXqModule {
    * Returns all functions.
    * @return functions
    */
-  ArrayList<RestXqFunction> functions() {
+  public ArrayList<RestXqFunction> functions() {
     return functions;
   }
 
@@ -99,7 +100,7 @@ public final class RestXqModule {
    * Returns all WebsocketFunctions.
    * @return functions
    */
-  ArrayList<WsFunction> wsFunctions() {
+  public ArrayList<WsFunction> wsFunctions() {
     return wsFunctions;
   }
 
@@ -113,7 +114,7 @@ public final class RestXqModule {
    * @throws IOException I/O exception
    * @throws ServletException servlet exception
    */
-  boolean process(final HTTPConnection conn, final RestXqFunction func, final Object ext)
+  public boolean process(final HTTPConnection conn, final RestXqFunction func, final Object ext)
       throws QueryException, IOException, ServletException {
 
     // create new XQuery instance

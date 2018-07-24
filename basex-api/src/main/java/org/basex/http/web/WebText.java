@@ -65,6 +65,8 @@ public interface WebText {
   /** Error message. */
   String ANN_TWICE_X_X = "Annotation %% is specified twice.";
   /** Error message. */
+  String ERR_FIND_WSFUNC = "Something went wrong in find wsxqfunction";
+  /** Error message. */
   String INV_TEMPLATE_X = "Invalid path template: \"%\".";
   /** Error message. */
   String INV_ENCODING_X = "Invalid URL encoding: \"%\".";
