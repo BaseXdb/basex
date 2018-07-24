@@ -312,10 +312,6 @@ public final class WebModules {
   }
 
   /**
-   * WEBSOCKET STUFF
-   */
-
-  /**
    * Returns the function that matches the current request.
    * @param conn WebSocketConnection
    * @param ann Annotation
@@ -325,7 +321,7 @@ public final class WebModules {
   public WsFunction find(final WsConnection conn, final Annotation ann)
       throws Exception {
     // collect all function candidates
-    List<WsFunction> funcs = findListWsXqFunctions(conn, ann);
+    List<WsFunction> funcs = findWsFunctions(conn, ann);
     if(funcs.isEmpty()) return null;
 
     final WsFunction first = funcs.get(0);
@@ -342,7 +338,7 @@ public final class WebModules {
    * @return list of matching functions, ordered by specifity
    * @throws Exception exception (including unexpected ones)
    */
-  private List<WsFunction> findListWsXqFunctions(final WsConnection conn,
+  private List<WsFunction> findWsFunctions(final WsConnection conn,
       final Annotation ann) throws Exception {
     // collect all functions
     final ArrayList<WsFunction> list = new ArrayList<>();

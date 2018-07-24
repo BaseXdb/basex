@@ -162,10 +162,6 @@ public final class WebModule {
     return null;
   }
 
-
-  /**
-   * WebsocketStuff
-   * */
   /**
    * Processes the HTTP request.
    * @param conn HTTP connection
