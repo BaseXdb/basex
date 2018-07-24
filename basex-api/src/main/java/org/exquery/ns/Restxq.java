@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.http.*;
 import org.basex.http.restxq.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;

@@ -1,4 +1,4 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
@@ -10,7 +10,7 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
-import org.basex.http.web.*;
+import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -103,7 +103,7 @@ public final class WebModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  RestXqFunction find(final HTTPConnection conn, final QNm error)
+  public RestXqFunction find(final HTTPConnection conn, final QNm error)
       throws QueryException, IOException {
 
     // collect all function candidates
@@ -140,7 +140,7 @@ public final class WebModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
+  public List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
     return find(conn, null, true);
   }
 

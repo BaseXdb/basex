@@ -5,6 +5,7 @@ import static org.basex.http.web.WebText.*;
 import javax.servlet.http.*;
 
 import org.basex.http.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;

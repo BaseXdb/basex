@@ -51,7 +51,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   /** Form parameters. */
   final ArrayList<WebParam> formParams = new ArrayList<>();
   /** Returned media types. */
-  final ArrayList<MediaType> produces = new ArrayList<>();
+  public final ArrayList<MediaType> produces = new ArrayList<>();
 
   /** Supported methods. */
   final Set<String> methods = new HashSet<>();
@@ -69,7 +69,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   private final ArrayList<MediaType> consumes = new ArrayList<>();
 
   /** Path (can be {@code null}). */
-  RestXqPath path;
+  public RestXqPath path;
   /** Singleton id (can be {@code null}). */
   String singleton;
 
@@ -260,7 +260,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @param perm permission flag
    * @return result of check
    */
-  boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
+  public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
     // check method, consumed and produced media type, and path or error
     if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
         produces(conn))) return false;
@@ -348,7 +348,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   }
 
   @Override
-  protected QueryException error(final String msg, final Object... ext) {
+  public QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
   }
 

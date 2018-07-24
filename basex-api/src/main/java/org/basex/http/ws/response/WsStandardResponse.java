@@ -30,7 +30,6 @@ public class WsStandardResponse implements WsResponse {
       ser.reset();
       ser.serialize(it);
       if(it instanceof Bin) {
-        //final byte[] bytes = ((Bin) it).binary(null);
         final byte[] bytes = ao.toArray();
         conn.sess.getRemote().sendBytes(ByteBuffer.wrap(bytes));
       } else {

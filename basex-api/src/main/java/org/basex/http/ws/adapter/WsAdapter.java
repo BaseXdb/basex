@@ -5,6 +5,7 @@ import static org.basex.http.web.WebText.*;
 import java.util.*;
 
 import org.basex.http.restxq.*;
+import org.basex.http.web.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.query.ann.*;
