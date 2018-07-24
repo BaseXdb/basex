@@ -35,8 +35,8 @@ public final class Atts extends ElementList {
 
   /**
    * Adds the next name/value pair.
-   * @param name name to be added
-   * @param value value to be added
+   * @param name name to be added (can be {@code null})
+   * @param value value to be added (can be {@code null})
    * @return self reference
    */
   public Atts add(final byte[] name, final byte[] value) {
