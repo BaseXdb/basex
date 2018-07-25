@@ -58,8 +58,6 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   /** Permissions (can be empty). */
   final TokenList allows = new TokenList();
 
-  /** Associated module. */
-  private final WebModule module;
   /** Query parameters. */
   private final ArrayList<WebParam> errorParams = new ArrayList<>();
 
@@ -85,11 +83,10 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * Constructor.
    * @param function associated user function
    * @param qc query context
-   * @param module associated module
+   * @param module The Webmodule
    */
   public RestXqFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
-    super(function, qc);
-    this.module = module;
+    super(function, qc, module);
   }
 
   /**

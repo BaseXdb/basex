@@ -29,6 +29,8 @@ public abstract class WebFunction {
   public final StaticFunc function;
   /** Serialization parameters. */
   public final SerializerOptions output;
+  /** Associated module. */
+  public final WebModule module;
   /** Header Parameters. */
   public final ArrayList<WebParam> headerParams = new ArrayList<>();
 
@@ -36,10 +38,12 @@ public abstract class WebFunction {
    * Constructor.
    * @param function associated user function
    * @param qc query context
+   * @param module The WebModule
    */
-  protected WebFunction(final StaticFunc function, final QueryContext qc) {
+  protected WebFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
     this.function = function;
     output = qc.serParams();
+    this.module = module;
   }
 
   /**

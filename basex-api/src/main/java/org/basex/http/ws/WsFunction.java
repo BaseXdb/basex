@@ -24,18 +24,15 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  */
 public class WsFunction extends WebFunction implements Comparable<WsFunction> {
-  /** Associated module. */
-  private final WebModule module;
 
   /**
    * The Constructor.
    * @param function associated user function
    * @param qc query context
-   * @param module associated module
+   * @param module The Webmodule
    */
   public WsFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
-    super(function, qc);
-    this.module = module;
+    super(function, qc, module);
   }
 
   /** The Path of the WsFunction. */
