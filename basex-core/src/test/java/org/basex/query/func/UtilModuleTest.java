@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
@@ -15,6 +16,19 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class UtilModuleTest extends QueryPlanTest {
+  /** Test method. */
+  @Test
+  public void iff() {
+    final Function func = Function._UTIL_IF;
+    query(func.args(" 1", 1), 1);
+    query(func.args(" ()", 1), "");
+
+    query(func.args(" 1", 1, 2), 1);
+    query(func.args(" ()", 1, 2), 2);
+    query(func.args(" (<a/>,<b/>)", 1, 2), 1);
+    error(func.args(" (1,2)", 1, 2), EBV_X);
+  }
+
   /** Test method. */
   @Test
   public void itemAt() {
