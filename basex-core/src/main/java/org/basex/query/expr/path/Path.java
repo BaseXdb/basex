@@ -926,10 +926,10 @@ public abstract class Path extends ParseExpr {
         }
         cc.updateFocus(steps[s]);
       }
-      return changed ? optimize(cc) : null;
     } finally {
       cc.removeFocus();
     }
+    return changed ? optimize(cc) : null;
   }
 
   @Override

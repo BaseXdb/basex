@@ -235,6 +235,14 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         exists(ValueAccess.class));
   }
 
+  /** Optimizations of predicates that are changed by optimizations. */
+  @Test public void gh1597() {
+    execute(new CreateDB(NAME, "<x>A</x>"));
+    check("let $s := 0 return *[if($s) then () else .//text() = 'A']", "<x>A</x>",
+        exists(ValueAccess.class));
+    check("let $s := 1 return *[if($s) then () else .//text() = 'A']", "", empty());
+  }
+
   /**
    * Creates a test database.
    */
