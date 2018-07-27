@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqWadl {
+public final class RestXqWadl {
   /** HTTP connection. */
   private final HTTPConnection conn;
 
@@ -30,7 +30,7 @@ final class RestXqWadl {
    * Constructor.
    * @param conn HTTP connection
    */
-  RestXqWadl(final HTTPConnection conn) {
+  public RestXqWadl(final HTTPConnection conn) {
     this.conn = conn;
   }
 
@@ -39,7 +39,7 @@ final class RestXqWadl {
    * @param modules available modules
    * @return WADL description
    */
-  synchronized FElem create(final HashMap<String, RestXqModule> modules) {
+  public synchronized FElem create(final HashMap<String, WebModule> modules) {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
     final String base = conn.req.getRequestURL().toString();
@@ -47,7 +47,7 @@ final class RestXqWadl {
 
     // create children
     final TreeMap<String, FElem> map = new TreeMap<>();
-    for(final RestXqModule mod : modules.values()) {
+    for(final WebModule mod : modules.values()) {
       for(final RestXqFunction func : mod.functions()) {
         if(func.path == null) continue;
 

@@ -1,4 +1,4 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
@@ -10,8 +10,11 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.http.restxq.*;
+import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -23,9 +26,9 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class RestXqModules {
+public final class WebModules {
   /** Singleton instance. */
-  private static volatile RestXqModules instance;
+  private static volatile WebModules instance;
 
   /** Current parsing state (additionally used as mutex). */
   private final AtomicBoolean parsed = new AtomicBoolean();
@@ -35,7 +38,7 @@ public final class RestXqModules {
   private final boolean cached;
 
   /** Module cache. */
-  private HashMap<String, RestXqModule> modules = new HashMap<>();
+  private HashMap<String, WebModule> modules = new HashMap<>();
   /** Last access. */
   private long last;
 
@@ -43,7 +46,7 @@ public final class RestXqModules {
    * Private constructor.
    * @param ctx database context
    */
-  private RestXqModules(final Context ctx) {
+  private WebModules(final Context ctx) {
     final StaticOptions sopts = ctx.soptions;
     final String webpath = sopts.get(StaticOptions.WEBPATH);
     final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
@@ -69,8 +72,8 @@ public final class RestXqModules {
    * @param ctx database context
    * @return instance
    */
-  public static RestXqModules get(final Context ctx) {
-    if(instance == null) instance = new RestXqModules(ctx);
+  public static WebModules get(final Context ctx) {
+    if(instance == null) instance = new WebModules(ctx);
     return instance;
   }
 
@@ -100,7 +103,7 @@ public final class RestXqModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  RestXqFunction find(final HTTPConnection conn, final QNm error)
+  public RestXqFunction find(final HTTPConnection conn, final QNm error)
       throws QueryException, IOException {
 
     // collect all function candidates
@@ -137,7 +140,7 @@ public final class RestXqModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
+  public List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
     return find(conn, null, true);
   }
 
@@ -155,7 +158,7 @@ public final class RestXqModules {
 
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqModule mod : cache(conn.context).values()) {
+    for(final WebModule mod : cache(conn.context).values()) {
       for(final RestXqFunction func : mod.functions()) {
         if(func.matches(conn, error, perm)) list.add(func);
       }
@@ -247,14 +250,14 @@ public final class RestXqModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private HashMap<String, RestXqModule> cache(final Context ctx)
+  private HashMap<String, WebModule> cache(final Context ctx)
       throws QueryException, IOException {
 
     synchronized(parsed) {
       if(!parsed.get()) {
         if(!path.exists()) throw HTTPCode.NO_RESTXQ.get();
 
-        final HashMap<String, RestXqModule> map = new HashMap<>();
+        final HashMap<String, WebModule> map = new HashMap<>();
         cache(ctx, path, map, modules);
         modules = map;
         parsed.set(cached);
@@ -274,7 +277,7 @@ public final class RestXqModules {
    * @throws IOException I/O exception
    */
   private static void cache(final Context ctx, final IOFile root,
-      final HashMap<String, RestXqModule> cache, final HashMap<String, RestXqModule> old)
+      final HashMap<String, WebModule> cache, final HashMap<String, WebModule> old)
       throws QueryException, IOException {
 
     // check if directory is to be skipped
@@ -289,14 +292,14 @@ public final class RestXqModules {
       } else {
         final String path = file.path();
         if(file.hasSuffix(IO.XQSUFFIXES)) {
-          RestXqModule module = old.get(path);
+          WebModule module = old.get(path);
           boolean parsed = false;
           if(module != null) {
             // check if module has been modified
             parsed = module.uptodate();
           } else {
             // create new module
-            module = new RestXqModule(file);
+            module = new WebModule(file);
           }
           // add module if it has been parsed, and if it contains annotations
           if(parsed || module.parse(ctx)) {
@@ -306,5 +309,46 @@ public final class RestXqModules {
         }
       }
     }
+  }
+
+  /**
+   * Returns the function that matches the current request.
+   * @param conn WebSocketConnection
+   * @param ann Annotation
+   * @return function, or {@code null} if no function matches
+   * @throws Exception exception (including unexpected ones)
+   */
+  public WsFunction find(final WsConnection conn, final Annotation ann)
+      throws Exception {
+    // collect all function candidates
+    List<WsFunction> funcs = findWsFunctions(conn, ann);
+    if(funcs.isEmpty()) return null;
+
+    final WsFunction first = funcs.get(0);
+
+    if(funcs.size() == 1) return first;
+
+    throw new Exception(ERR_FIND_WSFUNC);
+  }
+
+  /**
+   * Returns the functions that match the current request.
+   * @param conn WebSocketConnection
+   * @param ann Annotation
+   * @return list of matching functions, ordered by specifity
+   * @throws Exception exception (including unexpected ones)
+   */
+  private List<WsFunction> findWsFunctions(final WsConnection conn,
+      final Annotation ann) throws Exception {
+    // collect all functions
+    final ArrayList<WsFunction> list = new ArrayList<>();
+    for(final WebModule mod : cache(conn.context).values()) {
+      for(final WsFunction func : mod.wsFunctions()) {
+        if(func.matches(ann, new WsPath(conn.path()))) list.add(func);
+      }
+    }
+    // sort by specifity
+    Collections.sort(list);
+    return list;
   }
 }

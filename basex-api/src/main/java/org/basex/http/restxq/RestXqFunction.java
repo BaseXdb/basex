@@ -42,7 +42,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
+public final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
@@ -51,15 +51,13 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
   /** Form parameters. */
   final ArrayList<WebParam> formParams = new ArrayList<>();
   /** Returned media types. */
-  final ArrayList<MediaType> produces = new ArrayList<>();
+  public final ArrayList<MediaType> produces = new ArrayList<>();
 
   /** Supported methods. */
   final Set<String> methods = new HashSet<>();
   /** Permissions (can be empty). */
   final TokenList allows = new TokenList();
 
-  /** Associated module. */
-  private final RestXqModule module;
   /** Query parameters. */
   private final ArrayList<WebParam> errorParams = new ArrayList<>();
 
@@ -69,7 +67,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
   private final ArrayList<MediaType> consumes = new ArrayList<>();
 
   /** Path (can be {@code null}). */
-  RestXqPath path;
+  public RestXqPath path;
   /** Singleton id (can be {@code null}). */
   String singleton;
 
@@ -85,11 +83,10 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
    * Constructor.
    * @param function associated user function
    * @param qc query context
-   * @param module associated module
+   * @param module The Webmodule
    */
-  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
-    super(function, qc);
-    this.module = module;
+  public RestXqFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
+    super(function, qc, module);
   }
 
   /**
@@ -119,7 +116,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  boolean parse(final Context ctx) throws QueryException, IOException {
+  public boolean parse(final Context ctx) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.params.length];
     boolean found = false;
@@ -260,7 +257,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
    * @param perm permission flag
    * @return result of check
    */
-  boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
+  public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
     // check method, consumed and produced media type, and path or error
     if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
         produces(conn))) return false;
@@ -312,7 +309,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
     // bind header parameters
     for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      final Enumeration<?> en =  conn.req.getHeaders(rxp.name);
+      final Enumeration<?> en = conn.req.getHeaders(rxp.name);
       while(en.hasMoreElements()) {
         for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
       }
@@ -348,7 +345,7 @@ final class RestXqFunction extends WebFunction implements Comparable<RestXqFunct
   }
 
   @Override
-  protected QueryException error(final String msg, final Object... ext) {
+  public QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
   }
 

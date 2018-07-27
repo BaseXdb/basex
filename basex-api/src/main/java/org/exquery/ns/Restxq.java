@@ -3,7 +3,7 @@ package org.exquery.ns;
 import static org.basex.query.QueryError.*;
 
 import org.basex.http.*;
-import org.basex.http.restxq.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -21,7 +21,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public FElem wadl() throws QueryException {
-    return RestXqModules.get(queryContext.context).wadl(connection());
+    return WebModules.get(queryContext.context).wadl(connection());
   }
 
   /**
@@ -48,7 +48,7 @@ public final class Restxq extends QueryModule {
    * Initializes the RESTXQ module cache.
    */
   public void init() {
-    RestXqModules.get(queryContext.context).init();
+    WebModules.get(queryContext.context).init();
   }
 
   /**

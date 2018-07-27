@@ -65,6 +65,8 @@ public interface WebText {
   /** Error message. */
   String ANN_TWICE_X_X = "Annotation %% is specified twice.";
   /** Error message. */
+  String ERR_FIND_WSFUNC = "Something went wrong in find wsxqfunction";
+  /** Error message. */
   String INV_TEMPLATE_X = "Invalid path template: \"%\".";
   /** Error message. */
   String INV_ENCODING_X = "Invalid URL encoding: \"%\".";
@@ -104,6 +106,16 @@ public interface WebText {
   String ERROR_QS_X = "Invalid quality factor: qs=%";
   /** Error message. */
   String NO_VALUE_X = "'%' element has no string value.";
+  /** Error message. */
+  String XQUERY_MISSING_X = "XQuery Function missing for: %";
+  /** Error message. */
+  String PARAM_MISSING_X = "Params missing. Required Params: %";
+  /** Error message. */
+  String HEADER_MISSING = "Not all required headers are set";
+  /** Error message. */
+  String NO_WSID_FOUND = "Internal Error: No WebsocketclientId found";
+  /** Error Message. */
+  String WS_CAST_FAILED = "Internal Error: Casting of WebsocketClientid failed";
 
   /** QName. */
   QNm Q_STATUS = new QNm(STATUS);
