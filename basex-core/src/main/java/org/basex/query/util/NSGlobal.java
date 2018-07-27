@@ -82,6 +82,7 @@ public final class NSGlobal {
     NS.add(UTIL_PREFIX, UTIL_URI);
     NS.add(VALIDATE_PREFIX, VALIDATE_URI);
     NS.add(WEB_PREFIX, WEB_URI);
+    NS.add(WS_PREFIX, WS_URI);
     NS.add(XSLT_PREFIX, XSLT_URI);
     NS.add(XQUERY_PREFIX, XQUERY_URI);
   }

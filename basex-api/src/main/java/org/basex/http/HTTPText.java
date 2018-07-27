@@ -7,8 +7,11 @@ package org.basex.http;
  * @author Christian Gruen
  */
 public interface HTTPText {
-  /** HTTP String. */
+  /** HTTP string. */
   String HTTP = "HTTP";
+  /** WebSocket id string. */
+  String WEBSOCKET_ID = "WSID";
+
   /** WEB-INF directory. */
   String WEB_INF = "WEB-INF/";
   /** Path to jetty configuration file. */

@@ -55,7 +55,11 @@ public enum QueryError {
   /** Error code. */
   BASEX_RESTXQ_X(BASEX, "restxq", "%"),
   /** Error code. */
+  BASEX_WS_X(BASEX, "ws", "%"),
+  /** Error code. */
   BASEX_UPDATE(BASEX, "update", "Update target was not created by transform expression."),
+  /** Error code. */
+  BASEX_WS(BASEX, "ws", "WebSocket connection required."),
 
   // Admin Module
 

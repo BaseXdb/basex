@@ -3,25 +3,27 @@ package org.exquery.ns;
 import static org.basex.query.QueryError.*;
 
 import org.basex.http.*;
-import org.basex.http.restxq.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 /**
  * This module contains standard RESTXQ functions.
+ * The class name is {@code Restxq} instead of {@code RESTXQ}.
+ * Otherwise, it would be resolved to {@code r-e-s-t-x-q} in XQuery.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
 public final class Restxq extends QueryModule {
   /**
-   * Returns an {@code application.wadl} description with all RESTXQ endpoints.
+   * Returns an {@code application.wadl} description with all RESTXQ end-points.
    * @return WADL description
    * @throws QueryException query exception
    */
   public FElem wadl() throws QueryException {
-    return RestXqModules.get(queryContext.context).wadl(connection());
+    return WebModules.get(queryContext.context).wadl(connection());
   }
 
   /**
@@ -45,10 +47,10 @@ public final class Restxq extends QueryModule {
   }
 
   /**
-   * Initializes the RESTXQ module cache.
+   * Initializes the web module cache.
    */
   public void init() {
-    RestXqModules.get(queryContext.context).init();
+    WebModules.get(queryContext.context).init();
   }
 
   /**

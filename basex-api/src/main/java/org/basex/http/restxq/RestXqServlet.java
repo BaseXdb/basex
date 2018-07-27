@@ -5,6 +5,7 @@ import static org.basex.http.web.WebText.*;
 import javax.servlet.http.*;
 
 import org.basex.http.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -31,21 +32,21 @@ public final class RestXqServlet extends BaseXServlet {
     }
 
     // analyze input path
-    final RestXqModules rxm = RestXqModules.get(conn.context);
+    final WebModules modules = WebModules.get(conn.context);
 
     // initialize RESTXQ
     if(conn.path().equals('/' + INIT)) {
-      rxm.init();
+      modules.init();
       return;
     }
 
     // select the closest match for this request
-    RestXqFunction func = rxm.find(conn, null);
+    RestXqFunction func = modules.find(conn, null);
     if(func == null) throw HTTPCode.NO_XQUERY.get();
 
     try {
       boolean valid = true;
-      for(final RestXqFunction check : rxm.checks(conn)) {
+      for(final RestXqFunction check : modules.checks(conn)) {
         if(!check.process(conn, func)) {
           valid = false;
           break;
@@ -56,7 +57,7 @@ public final class RestXqServlet extends BaseXServlet {
       if(valid) func.process(conn, null);
     } catch(final QueryException ex) {
       // run optional error function
-      func = rxm.find(conn, ex.qname());
+      func = modules.find(conn, ex.qname());
       if(func == null) throw ex;
       func.process(conn, ex);
     }

@@ -105,6 +105,11 @@ public interface WebText {
   /** Error message. */
   String NO_VALUE_X = "'%' element has no string value.";
 
+  /** Error message. */
+  String WSPATH_CONFLICT_X_X = "Several functions found for path \"%\":%.";
+  /** Error message. */
+  String WS_MISSING_X = "No WebSockets function found that matches the request: %.";
+
   /** QName. */
   QNm Q_STATUS = new QNm(STATUS);
   /** QName. */

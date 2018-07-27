@@ -1,4 +1,4 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
@@ -10,9 +10,14 @@ import javax.servlet.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.http.restxq.*;
+import org.basex.http.ws.*;
+import org.basex.http.ws.response.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.scope.*;
 
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
@@ -20,9 +25,11 @@ import org.basex.query.func.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class RestXqModule {
+public final class WebModule {
   /** Supported methods. */
   private final ArrayList<RestXqFunction> functions = new ArrayList<>();
+  /** Supported WebSocket methods. */
+  private final ArrayList<WsFunction> wsFunctions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
   /** Parsing timestamp. */
@@ -32,7 +39,7 @@ public final class RestXqModule {
    * Constructor.
    * @param file xquery file
    */
-  RestXqModule(final IOFile file) {
+  public WebModule(final IOFile file) {
     this.file = file;
     time = file.timeStamp();
   }
@@ -44,8 +51,9 @@ public final class RestXqModule {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  boolean parse(final Context ctx) throws QueryException, IOException {
+  public boolean parse(final Context ctx) throws QueryException, IOException {
     functions.clear();
+    wsFunctions.clear();
 
     // loop through all functions
     try(QueryContext qc = qc(ctx)) {
@@ -56,24 +64,27 @@ public final class RestXqModule {
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
           if(rxf.parse(ctx)) functions.add(rxf);
+          final WsFunction wxq = new WsFunction(sf, qc, this);
+          if(wxq.parse()) wsFunctions.add(wxq);
         }
       }
     }
-    return !functions.isEmpty();
+    // Check if seperate Method is here necessessary
+    return !functions.isEmpty() || !wsFunctions.isEmpty();
   }
 
   /**
    * Checks if the timestamp is still up-to-date.
    * @return result of check
    */
-  boolean uptodate() {
+  public boolean uptodate() {
     return time == file.timeStamp();
   }
 
   /**
    * Updates the timestamp.
    */
-  void touch() {
+  public void touch() {
     time = file.timeStamp();
   }
 
@@ -81,12 +92,12 @@ public final class RestXqModule {
    * Returns all functions.
    * @return functions
    */
-  ArrayList<RestXqFunction> functions() {
+  public ArrayList<RestXqFunction> functions() {
     return functions;
   }
 
   /**
-   * Processes the HTTP request.
+   * Processes a RESTXQ request.
    * @param conn HTTP connection
    * @param func function to be processed
    * @param ext extended processing information (function, error; can be {@code null})
@@ -95,7 +106,7 @@ public final class RestXqModule {
    * @throws IOException I/O exception
    * @throws ServletException servlet exception
    */
-  boolean process(final HTTPConnection conn, final RestXqFunction func, final Object ext)
+  public boolean process(final HTTPConnection conn, final RestXqFunction func, final Object ext)
       throws QueryException, IOException, ServletException {
 
     // create new XQuery instance
@@ -108,6 +119,47 @@ public final class RestXqModule {
       final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
       rxf.parse(ctx);
       return new RestXqResponse(rxf, qc, conn).create(ext);
+    }
+  }
+
+  /**
+   * Returns all WebSocket functions.
+   * @return functions
+   */
+  public ArrayList<WsFunction> wsFunctions() {
+    return wsFunctions;
+  }
+
+  /**
+   * Processes a WebSocket request.
+   * @param conn connection
+   * @param func function to be processed
+   * @param message message (can be {@code null}; otherwise string or byte array)
+   * @param response response serializer
+   * @param header headers
+   * @param id client id
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public void process(final WsConnection conn, final WsFunction func, final Object message,
+      final WsResponse response, final Map<String, String> header, final String id)
+      throws QueryException, IOException {
+
+    final Context ctx = conn.context;
+    try(QueryContext qc = qc(ctx)) {
+      qc.putProperty(HTTPText.WEBSOCKET_ID, id);
+      final StaticFunc sf = find(qc, func.function);
+      // will only happen if file has been swapped between caching and parsing
+      if(sf == null) throw HTTPCode.NO_XQUERY.get();
+
+      final WsFunction wxf = new WsFunction(sf, qc, this);
+      wxf.parse();
+
+      final Expr[] args = new Expr[sf.params.length];
+      wxf.bind(args, qc, message, header);
+
+      qc.mainModule(MainModule.get(sf, args));
+      response.create(conn, wxf, qc);
     }
   }
 

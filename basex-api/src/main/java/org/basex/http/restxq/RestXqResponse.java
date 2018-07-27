@@ -26,7 +26,7 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class RestXqResponse {
+public final class RestXqResponse {
   /** Function. */
   private final RestXqFunction func;
   /** Query context. */
@@ -47,7 +47,8 @@ final class RestXqResponse {
    * @param qc query context
    * @param conn HTTP connection
    */
-  RestXqResponse(final RestXqFunction func, final QueryContext qc, final HTTPConnection conn) {
+  public RestXqResponse(final RestXqFunction func, final QueryContext qc,
+      final HTTPConnection conn) {
     this.func = func;
     this.qc = qc;
     this.conn = conn;
@@ -61,7 +62,7 @@ final class RestXqResponse {
    * @throws IOException I/O exception
    * @throws ServletException servlet exception
    */
-  boolean create(final Object ext) throws QueryException, IOException, ServletException {
+  public boolean create(final Object ext) throws QueryException, IOException, ServletException {
     // bind variables
     final StaticFunc sf = func.function;
     final Expr[] args = new Expr[sf.params.length];

@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.http.web.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -89,7 +90,7 @@ public abstract class RestXqTest extends HTTPTest {
     // create new module
     module().write(HEADER + function);
     // invalidate module cache
-    RestXqModules.get(context).init();
+    WebModules.get(context).init();
   }
 
   /**
