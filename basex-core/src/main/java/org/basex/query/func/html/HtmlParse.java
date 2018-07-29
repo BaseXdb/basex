@@ -28,7 +28,7 @@ public final class HtmlParse extends StandardFunc {
 
     final MainOptions opts = MainOptions.get();
     try {
-      final IO io = new IOContent(toToken(item));
+      final IO io = new IOContent(toBytes(item));
       return new DBNode(new org.basex.build.html.HtmlParser(io, opts, hopts));
     } catch(final IOException ex) {
       throw HTML_PARSE_X.get(info, ex);
