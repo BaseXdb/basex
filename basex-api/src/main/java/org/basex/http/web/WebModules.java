@@ -8,10 +8,13 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
+import javax.servlet.http.*;
+
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
+import org.basex.http.ws.adapter.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -88,11 +91,11 @@ public final class WebModules {
 
   /**
    * Returns a WADL description for all available URIs.
-   * @param conn HTTP connection
+   * @param req HTTP request
    * @return WADL description
    */
-  public FElem wadl(final HTTPConnection conn) {
-    return new RestXqWadl(conn).create(modules);
+  public FElem wadl(final HttpServletRequest req) {
+    return new RestXqWadl(req).create(modules);
   }
 
   /**
@@ -311,17 +314,17 @@ public final class WebModules {
 
   /**
    * Returns the WebSocket function that matches the current request.
-   * @param conn connection
+   * @param ws WebSocket
    * @param ann annotation
    * @return function, or {@code null} if no function matches
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public WsFunction find(final WsConnection conn, final Annotation ann)
+  public WsFunction find(final WsAdapter ws, final Annotation ann)
       throws QueryException, IOException {
 
     // collect all function candidates
-    final List<WsFunction> funcs = findWsFunctions(conn, ann);
+    final List<WsFunction> funcs = findWsFunctions(ws, ann);
     if(funcs.isEmpty()) return null;
 
     final WsFunction first = funcs.get(0);
@@ -337,20 +340,20 @@ public final class WebModules {
 
   /**
    * Returns the functions that match the current request.
-   * @param conn connection
+   * @param ws WebSocket
    * @param ann Annotation
    * @return list of matching functions, ordered by specifity
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private List<WsFunction> findWsFunctions(final WsConnection conn, final Annotation ann)
+  private List<WsFunction> findWsFunctions(final WsAdapter ws, final Annotation ann)
       throws QueryException, IOException {
 
     // collect all functions
     final ArrayList<WsFunction> list = new ArrayList<>();
-    for(final WebModule mod : cache(conn.context).values()) {
+    for(final WebModule mod : cache(ws.context).values()) {
       for(final WsFunction func : mod.wsFunctions()) {
-        if(func.matches(ann, new WsPath(conn.path()))) list.add(func);
+        if(func.matches(ann, new WsPath(ws.getPath()))) list.add(func);
       }
     }
     // sort by specifity

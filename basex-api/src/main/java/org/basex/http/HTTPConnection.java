@@ -68,7 +68,7 @@ public final class HTTPConnection implements ClientInfo {
 
     context = new Context(HTTPContext.context(), this);
     method = req.getMethod();
-    params = new HTTPParams(this);
+    params = new HTTPParams(req);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(Strings.UTF8);
@@ -107,8 +107,7 @@ public final class HTTPConnection implements ClientInfo {
    * @return content type
    */
   public MediaType contentType() {
-    final String ct = req.getContentType();
-    return new MediaType(ct == null ? "" : ct);
+    return mediaType(req);
   }
 
   /**
@@ -296,6 +295,16 @@ public final class HTTPConnection implements ClientInfo {
     if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return MediaType.TEXT_HTML;
     if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
     return MediaType.TEXT_PLAIN;
+  }
+
+  /**
+   * Returns the content type of a request, or an empty string.
+   * @param req servlet request
+   * @return content type
+   */
+  public static MediaType mediaType(final HttpServletRequest req) {
+    final String ct = req.getContentType();
+    return new MediaType(ct == null ? "" : ct);
   }
 
   // PRIVATE METHODS ==============================================================================

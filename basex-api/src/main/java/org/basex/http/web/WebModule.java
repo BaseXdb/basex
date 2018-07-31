@@ -12,7 +12,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
-import org.basex.http.ws.response.*;
+import org.basex.http.ws.adapter.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -132,22 +132,18 @@ public final class WebModule {
 
   /**
    * Processes a WebSocket request.
-   * @param conn connection
+   * @param ws WebSocket
    * @param func function to be processed
    * @param message message (can be {@code null}; otherwise string or byte array)
-   * @param response response serializer
-   * @param header headers
-   * @param id client id
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void process(final WsConnection conn, final WsFunction func, final Object message,
-      final WsResponse response, final Map<String, String> header, final String id)
+  public void process(final WsAdapter ws, final WsFunction func, final Object message)
       throws QueryException, IOException {
 
-    final Context ctx = conn.context;
+    final Context ctx = ws.context;
     try(QueryContext qc = qc(ctx)) {
-      qc.putProperty(HTTPText.WEBSOCKET_ID, id);
+      qc.putProperty(HTTPText.WEBSOCKET, ws);
       final StaticFunc sf = find(qc, func.function);
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();
@@ -156,10 +152,10 @@ public final class WebModule {
       wxf.parse();
 
       final Expr[] args = new Expr[sf.params.length];
-      wxf.bind(args, qc, message, header);
+      wxf.bind(args, qc, message, ws.headers);
 
       qc.mainModule(MainModule.get(sf, args));
-      response.create(conn, wxf, qc);
+      ws.response.create(ws, wxf, qc);
     }
   }
 

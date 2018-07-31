@@ -22,6 +22,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Request extends QueryModule {
+  /** HTTP parameters. */
+  private HTTPParams params;
+
   /**
    * Returns the method of a request.
    * @return method
@@ -144,17 +147,17 @@ public final class Request extends QueryModule {
   }
 
   /**
-   * Returns the names of all query parameters.
+   * Returns the names of all query and form parameters.
    * @return parameter names
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
   public Value parameterNames() throws QueryException {
     try {
-      final HTTPParams params = connection().params;
+      final HTTPParams hp = params();
       final TokenSet cache = new TokenSet();
-      for(final String name : params.map().keySet()) cache.add(name);
-      for(final String name : params.form(queryContext.context.options).keySet()) cache.add(name);
+      for(final String name : hp.query().keySet()) cache.add(name);
+      for(final String name : hp.form(queryContext.context.options).keySet()) cache.add(name);
       final TokenList names = new TokenList(cache.size());
       for(final byte[] name : cache) names.add(name);
       return StrSeq.get(names);
@@ -164,7 +167,7 @@ public final class Request extends QueryModule {
   }
 
   /**
-   * Returns the value of a specific query parameter.
+   * Returns the value of a specific query or form parameter.
    * @param key key to be requested
    * @return parameter value
    * @throws QueryException query exception
@@ -185,9 +188,9 @@ public final class Request extends QueryModule {
   public Value parameter(final Str key, final Value def) throws QueryException {
     try {
       final String name = key.toJava();
-      final HTTPParams params = connection().params;
-      final Value query = params.map().get(name);
-      final Value form = params.form(queryContext.context.options).get(name);
+      final HTTPParams hp = params();
+      final Value query = hp.query().get(name);
+      final Value form = hp.form(queryContext.context.options).get(name);
       if(query == null && form == null) return def;
       if(query == null) return form;
       if(form == null) return query;
@@ -296,22 +299,23 @@ public final class Request extends QueryModule {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Returns the servlet request instance.
-   * @return request
+   * Returns HTTP parameters.
+   * @return HTTP parameters
    * @throws QueryException query exception
    */
-  private HttpServletRequest request() throws QueryException {
-    return connection().req;
+  private HTTPParams params() throws QueryException {
+    if(params == null) params = new HTTPParams(request());
+    return params;
   }
 
   /**
-   * Returns the current HTTP connection.
-   * @return HTTP connection
+   * Returns the current HTTP servlet request.
+   * @return HTTP request
    * @throws QueryException query exception
    */
-  private HTTPConnection connection() throws QueryException {
-    final Object http = queryContext.getProperty(HTTPText.HTTP);
-    if(http == null) throw BASEX_HTTP.get(null);
-    return (HTTPConnection) http;
+  private HttpServletRequest request() throws QueryException {
+    final Object req = queryContext.getProperty(HTTPText.REQUEST);
+    if(req == null) throw BASEX_HTTP.get(null);
+    return (HttpServletRequest) req;
   }
 }

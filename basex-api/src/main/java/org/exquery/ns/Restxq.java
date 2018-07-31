@@ -2,6 +2,8 @@ package org.exquery.ns;
 
 import static org.basex.query.QueryError.*;
 
+import javax.servlet.http.*;
+
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
@@ -23,7 +25,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public FElem wadl() throws QueryException {
-    return WebModules.get(queryContext.context).wadl(connection());
+    return WebModules.get(queryContext.context).wadl(request());
   }
 
   /**
@@ -32,8 +34,8 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public Uri baseUri() throws QueryException {
-    final HTTPConnection conn = connection();
-    final String uri = conn.req.getRequestURI(), path = conn.req.getPathInfo();
+    final HttpServletRequest req = request();
+    final String uri = req.getRequestURI(), path = req.getPathInfo();
     return Uri.uri(path != null ? uri.substring(0, uri.length() - path.length()) : uri);
   }
 
@@ -43,7 +45,7 @@ public final class Restxq extends QueryModule {
    * @throws QueryException query exception
    */
   public Uri uri() throws QueryException {
-    return Uri.uri(connection().req.getRequestURI());
+    return Uri.uri(request().getRequestURI());
   }
 
   /**
@@ -54,13 +56,13 @@ public final class Restxq extends QueryModule {
   }
 
   /**
-   * Returns the current HTTP connection.
-   * @return HTTP connection
+   * Returns the current HTTP servlet request.
+   * @return HTTP request
    * @throws QueryException query exception
    */
-  private HTTPConnection connection() throws QueryException {
-    final Object http = queryContext.getProperty(HTTPText.HTTP);
-    if(http == null) throw BASEX_HTTP.get(null);
-    return (HTTPConnection) http;
+  private HttpServletRequest request() throws QueryException {
+    final Object req = queryContext.getProperty(HTTPText.REQUEST);
+    if(req == null) throw BASEX_HTTP.get(null);
+    return (HttpServletRequest) req;
   }
 }

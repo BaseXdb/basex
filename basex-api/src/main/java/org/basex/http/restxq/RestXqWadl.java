@@ -6,6 +6,8 @@ import static org.basex.util.Token.*;
 import java.util.*;
 import java.util.regex.*;
 
+import javax.servlet.http.*;
+
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.func.inspect.*;
@@ -23,15 +25,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class RestXqWadl {
-  /** HTTP connection. */
-  private final HTTPConnection conn;
+  /** HTTP request. */
+  private final HttpServletRequest req;
 
   /**
    * Constructor.
-   * @param conn HTTP connection
+   * @param req HTTP request
    */
-  public RestXqWadl(final HTTPConnection conn) {
-    this.conn = conn;
+  public RestXqWadl(final HttpServletRequest req) {
+    this.req = req;
   }
 
   /**
@@ -42,7 +44,7 @@ public final class RestXqWadl {
   public synchronized FElem create(final HashMap<String, WebModule> modules) {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
-    final String base = conn.req.getRequestURL().toString();
+    final String base = req.getRequestURL().toString();
     final FElem resources = elem("resources", application).add("base", base);
 
     // create children

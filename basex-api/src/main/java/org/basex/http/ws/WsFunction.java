@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.http.web.*;
-import org.basex.http.ws.response.*;
+import org.basex.http.ws.adapter.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -27,6 +27,8 @@ import org.basex.util.*;
 public class WsFunction extends WebFunction implements Comparable<WsFunction> {
   /** Path of the function. */
   public WsPath path;
+  /** Message parameter. */
+  public WebParam message;
 
   /**
    * Constructor.
@@ -69,20 +71,19 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * @throws QueryException exception
    */
   public boolean parse() throws QueryException {
-    boolean found = false;
     final boolean[] declared = new boolean[function.params.length];
     // counter for annotations that should occur only once
+    boolean found = false;
     int count = 0;
 
     for(final Ann ann : function.anns) {
       final Annotation sig = ann.sig;
-      if(sig == null) continue;
+      if(sig == null || !eq(sig.uri, QueryText.WS_URI)) continue;
 
-      found |= eq(sig.uri, QueryText.WS_URI);
-
+      found = true;
       final Item[] args = ann.args();
       switch(sig) {
-        case _WS_PARAM:
+        case _WS_HEADER_PARAM:
           final String name = toString(args[0]);
           final QNm var = checkVariable(toString(args[1]), declared);
           final int al = args.length;
@@ -98,7 +99,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
         case _WS_ERROR:
         case _WS_MESSAGE:
           final QNm msg = checkVariable(toString(args[1]), declared);
-          headerParams.add(new WebParam(msg, "message", null));
+          message = new WebParam(msg, "message", null);
           path = new WsPath(toString(args[0]));
           count++;
           break;
@@ -108,9 +109,8 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
     }
 
     if(found) {
-      if(path == null) throw error(function.info, ANN_MISSING);
-      if(count > 1 || count == 1 && !headerParams.isEmpty())
-        throw error(function.info, ANN_CONFLICT);
+      if(count == 0) throw error(function.info, ANN_MISSING);
+      if(count > 1) throw error(function.info, ANN_CONFLICT);
       final int dl = declared.length;
       for(int d = 0; d < dl; d++) {
         if(!declared[d]) throw error(function.info, VAR_UNDEFINED_X,
@@ -122,18 +122,14 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
 
   /**
    * Processes the request. Parses new modules and discards obsolete ones.
-   * @param conn connection
-   * @param message message (can be {@code null}; otherwise string or byte array)
-   * @param response response
-   * @param header header
-   * @param id client id
+   * @param ws WebSocket
+   * @param msg message (can be {@code null}; otherwise string or byte array)
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public void process(final WsConnection conn, final Object message, final WsResponse response,
-      final Map<String, String> header, final String id) throws IOException, QueryException {
+  public void process(final WsAdapter ws, final Object msg) throws IOException, QueryException {
     try {
-      module.process(conn, this, message, response, header, id);
+      module.process(ws, this, msg);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
       throw ex;
@@ -171,21 +167,24 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    * Binds the function parameters.
    * @param args arguments
    * @param qc query context
-   * @param message message (can be {@code null}; otherwise string or byte array)
+   * @param msg message (can be {@code null}; otherwise string or byte array)
    * @param header headers
    * @throws QueryException query exception
    */
-  public void bind(final Expr[] args, final QueryContext qc, final Object message,
+  public void bind(final Expr[] args, final QueryContext qc, final Object msg,
       final Map<String, String> header) throws QueryException {
 
     // cache headers and message
     final Map<String, Value> values = new HashMap<>();
-    if(header != null) header.forEach((k, v) -> values.put(k, new Atm(v)));
-    if(message != null) values.put("message", message instanceof byte[] ?
-      B64.get((byte[]) message) : Str.get((String) message));
+    header.forEach((k, v) -> values.put(k, new Atm(v)));
+    if(msg != null) values.put("message", msg instanceof byte[] ?
+      B64.get((byte[]) msg) : Str.get((String) msg));
 
     for(final WebParam rxp : headerParams) {
       bind(rxp.var, args, values.get(rxp.name), qc);
+    }
+    if(message != null) {
+      bind(message.var, args, values.get(message.name), qc);
     }
   }
 }

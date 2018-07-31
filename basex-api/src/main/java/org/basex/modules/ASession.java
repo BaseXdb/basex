@@ -37,11 +37,11 @@ final class ASession {
     this.qc = qc;
     this.id = id;
 
-    final Object http = qc.getProperty(HTTPText.HTTP);
-    if(http == null) throw BASEX_HTTP.get(null);
+    final Object req = qc.getProperty(HTTPText.REQUEST);
+    if(req == null) throw BASEX_HTTP.get(null);
 
     if(id == null) {
-      session = ((HTTPConnection) http).req.getSession();
+      session = ((HttpServletRequest) req).getSession();
     } else {
       session = SessionListener.sessions().get(id.toJava());
       if(session == null) throw SESSIONS_NOTFOUND_X.get(null, id);

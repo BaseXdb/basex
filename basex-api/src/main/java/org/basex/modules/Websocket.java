@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.http.*;
 import org.basex.http.ws.*;
+import org.basex.http.ws.adapter.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -26,9 +27,9 @@ public final class Websocket extends QueryModule {
    * @throws QueryException QueryException
    */
   public Str id() throws QueryException {
-    final Object id = queryContext.getProperty(HTTPText.WEBSOCKET_ID);
-    if(id == null) throw BASEX_WS.get(null);
-    return Str.get((String) id);
+    final Object ws = queryContext.getProperty(HTTPText.WEBSOCKET);
+    if(ws == null) throw BASEX_WS.get(null);
+    return Str.get(((WsAdapter) ws).id);
   }
 
   /**

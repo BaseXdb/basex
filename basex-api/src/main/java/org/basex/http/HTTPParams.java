@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.servlet.http.*;
+
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -21,8 +23,8 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class HTTPParams {
-  /** HTTP Connection. */
-  private final HTTPConnection conn;
+  /** HTTP request. */
+  private final HttpServletRequest req;
   /** Query parameters with string values. */
   private Map<String, String[]> strings;
   /** Query parameters with XQuery values. */
@@ -34,10 +36,10 @@ public final class HTTPParams {
 
   /**
    * Returns an immutable map with all query parameters.
-   * @param conn HTTP connection
+   * @param req HTTP request
    */
-  HTTPParams(final HTTPConnection conn) {
-    this.conn = conn;
+  public HTTPParams(final HttpServletRequest req) {
+    this.req = req;
   }
 
   /**
@@ -47,7 +49,7 @@ public final class HTTPParams {
    */
   public Map<String, String[]> stringMap() throws IOException {
     try {
-      if(strings == null) strings = conn.req.getParameterMap();
+      if(strings == null) strings = req.getParameterMap();
       return strings;
     } catch(final IllegalStateException ex) {
       // may be caused by too large input (#884)
@@ -56,7 +58,7 @@ public final class HTTPParams {
   }
 
   /**
-   * Binds form parameters.
+   * Returns form parameters.
    * @param options main options
    * @return parameters
    * @throws IOException I/O exception
@@ -65,7 +67,7 @@ public final class HTTPParams {
   public Map<String, Value> form(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
       form = new HashMap<>();
-      final MediaType mt = conn.contentType();
+      final MediaType mt = HTTPConnection.mediaType(req);
       if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         addMultipart(mt, options, form);
@@ -82,7 +84,7 @@ public final class HTTPParams {
    * @return query parameters
    * @throws IOException I/O exception
    */
-  public Map<String, Value> map() throws IOException {
+  public Map<String, Value> query() throws IOException {
     if(values == null) {
       values = new HashMap<>();
       stringMap().forEach((key, value) -> {
@@ -101,7 +103,7 @@ public final class HTTPParams {
    */
   public IOContent body() throws IOException {
     if(content == null) {
-      content = new IOContent(BufferInput.get(conn.req.getInputStream()).content());
+      content = new IOContent(BufferInput.get(req.getInputStream()).content());
     }
     return content;
   }

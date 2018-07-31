@@ -9,8 +9,11 @@ package org.basex.http;
 public interface HTTPText {
   /** HTTP string. */
   String HTTP = "HTTP";
-  /** WebSocket id string. */
-  String WEBSOCKET_ID = "WSID";
+
+  /** HTTP string. */
+  String REQUEST = "REQUEST";
+  /** WebSocket string. */
+  String WEBSOCKET = "WEBSOCKET";
 
   /** WEB-INF directory. */
   String WEB_INF = "WEB-INF/";

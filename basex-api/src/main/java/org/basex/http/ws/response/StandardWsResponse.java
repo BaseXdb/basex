@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.*;
 
 import org.basex.http.ws.*;
+import org.basex.http.ws.adapter.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 
@@ -15,17 +16,18 @@ import org.basex.query.ann.*;
  */
 public class StandardWsResponse implements WsResponse {
   @Override
-  public void create(final WsConnection conn, final WsFunction wxf, final QueryContext qc)
+  public void create(final WsAdapter ws, final WsFunction wxf, final QueryContext qc)
       throws IOException, QueryException {
 
     // don't send anything if WebSocket gets closed because the connection is already closed
+    // [JF] Maybe we should disallow results for functions annotated with %ws:close
     if(wxf.matches(Annotation._WS_CLOSE)) return;
 
     for(final Object value : WsPool.serialize(qc.iter(), wxf.output)) {
       if(value instanceof byte[]) {
-        conn.session.getRemote().sendBytes(ByteBuffer.wrap((byte[]) value));
+        ws.session.getRemote().sendBytes(ByteBuffer.wrap((byte[]) value));
       } else {
-        conn.session.getRemote().sendString((String) value);
+        ws.session.getRemote().sendString((String) value);
       }
     }
   }

@@ -13,8 +13,7 @@ public class WsCreator implements WebSocketCreator {
   @Override
   public Object createWebSocket(final ServletUpgradeRequest req,
       final ServletUpgradeResponse resp) {
-    final String path = req.getHttpServletRequest().getPathInfo();
-    return new StandardWs(path != null ? path : "/");
+    return new StandardWs(req.getHttpServletRequest());
   }
 
 }

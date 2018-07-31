@@ -300,7 +300,7 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
 
     // bind query and form parameters
     for(final WebParam rxp : queryParams) {
-      bind(rxp, args, conn.params.map().get(rxp.name), qc);
+      bind(rxp, args, conn.params.query().get(rxp.name), qc);
     }
     for(final WebParam rxp : formParams) {
       bind(rxp, args, conn.params.form(mo).get(rxp.name), qc);

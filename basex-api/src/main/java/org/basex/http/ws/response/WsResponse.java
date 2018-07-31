@@ -1,7 +1,9 @@
 package org.basex.http.ws.response;
 
 import java.io.*;
+
 import org.basex.http.ws.*;
+import org.basex.http.ws.adapter.*;
 import org.basex.query.*;
 
 /**
@@ -14,12 +16,11 @@ import org.basex.query.*;
 public interface WsResponse {
   /**
    * Creates the Response.
-   * @param conn The WsConnection
-   * @param wxf The WsFunction
-   * @param qc The QueryContext
-   * @throws IOException IOException
-   * @throws QueryException QueryException
+   * @param ws WebSocket
+   * @param wxf function to be called
+   * @param qc query context
+   * @throws IOException I/O Exception
+   * @throws QueryException query exception
    */
-  void create(WsConnection conn, WsFunction wxf, QueryContext qc)
-      throws IOException, QueryException;
+  void create(WsAdapter ws, WsFunction wxf, QueryContext qc) throws IOException, QueryException;
 }

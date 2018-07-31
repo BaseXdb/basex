@@ -70,7 +70,7 @@ public final class RestXqResponse {
 
     // assign function call and http context and register process
     qc.mainModule(MainModule.get(sf, args));
-    qc.putProperty(HTTPText.HTTP, conn);
+    qc.putProperty(HTTPText.REQUEST, conn.req);
     qc.jc().type(RESTXQ);
 
     final String sngl = func.singleton;
