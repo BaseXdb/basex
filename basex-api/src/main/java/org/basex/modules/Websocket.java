@@ -12,7 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
- * This module contains functions for processing lokal WebSockets.
+ * This module contains functions for processing local WebSockets.
  * The class name is {@code Websocket} instead of {@code WebSocket}.
  * Otherwise, it would be resolved to {@code web-socket} in XQuery.
  *
