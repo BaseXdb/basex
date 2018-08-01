@@ -38,7 +38,6 @@ public final class Websocket extends QueryModule {
    * @throws IOException I/O exception
    */
   public void broadcast(final Item message) throws QueryException, IOException {
-    System.out.println("Websocket broadcast");
     WsPool.get().broadcast(message, id());
   }
 
