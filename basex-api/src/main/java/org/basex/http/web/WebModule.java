@@ -140,8 +140,8 @@ public final class WebModule {
    */
   public void process(final WsAdapter ws, final WsFunction func, final Object message)
       throws QueryException, IOException {
-    final Context ctx = ws.context;
 
+    final Context ctx = ws.context;
     try(QueryContext qc = qc(ctx)) {
       qc.putProperty(HTTPText.WEBSOCKET, ws);
       final StaticFunc sf = find(qc, func.function);
