@@ -142,6 +142,7 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public void onWebSocketClose(final int statusCode, final String reason) {
+    System.out.println("WsAdapter close");
     findAndProcess(Annotation._WS_CLOSE, null);
     super.onWebSocketClose(statusCode, reason);
     removeWebSocket();

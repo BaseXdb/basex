@@ -21,6 +21,7 @@ public class StandardWsResponse implements WsResponse {
 
     // don't send anything if WebSocket gets closed because the connection is already closed
     // [JF] Maybe we should disallow results for functions annotated with %ws:close
+    System.out.println("Create Standardresponse");
     if(wxf.matches(Annotation._WS_CLOSE)) return;
 
     for(final Object value : WsPool.serialize(qc.iter(), wxf.output)) {

@@ -129,6 +129,7 @@ public class WsFunction extends WebFunction implements Comparable<WsFunction> {
    */
   public void process(final WsAdapter ws, final Object msg) throws IOException, QueryException {
     try {
+      System.out.println("WsFunction process msg: " + msg);
       module.process(ws, this, msg);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(function.info);
