@@ -141,16 +141,19 @@ public final class WebModule {
   public void process(final WsAdapter ws, final WsFunction func, final Object message)
       throws QueryException, IOException {
     final Context ctx = ws.context;
+
     try(QueryContext qc = qc(ctx)) {
       qc.putProperty(HTTPText.WEBSOCKET, ws);
       final StaticFunc sf = find(qc, func.function);
       // will only happen if file has been swapped between caching and parsing
       if(sf == null) throw HTTPCode.NO_XQUERY.get();
+
       final WsFunction wxf = new WsFunction(sf, qc, this);
       wxf.parse();
 
       final Expr[] args = new Expr[sf.params.length];
       wxf.bind(args, qc, message, ws.headers);
+
       qc.mainModule(MainModule.get(sf, args));
       ws.response.create(ws, wxf, qc);
     }
