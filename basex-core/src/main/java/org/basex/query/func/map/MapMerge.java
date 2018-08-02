@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
@@ -39,7 +40,9 @@ public final class MapMerge extends StandardFunc {
     if(type instanceof MapType) {
       // check if duplicates will be combined (if yes, adjust occurrence of return type)
       MapType mt = (MapType) type;
-      if(options(cc.qc).get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
+      // evaluate options (broaden type if values may be combined)
+      if(exprs.length < 2 || !(exprs[1] instanceof Value) ||
+        options(cc.qc).get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
         final SeqType st = mt.declType;
         mt = MapType.get(mt.keyType(), st.with(st.mayBeEmpty() ? Occ.ZERO_MORE : Occ.ONE_MORE));
       }
