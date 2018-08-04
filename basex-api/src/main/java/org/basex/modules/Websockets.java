@@ -47,35 +47,6 @@ public class Websockets {
   }
 
   /**
-   * Returns an attribute from the current client.
-   * @param id client id
-   * @param key key to be requested
-   * @return attribute value
-   */
-  public Value get(final Str id, final Str key) {
-    return WsPool.get().getAttribute(id.toJava(), key.toJava());
-  }
-
-  /**
-   * Assigns an attribute to the specified client.
-   * @param id client id
-   * @param key key of the attribute
-   * @param value value to be stored
-   */
-  public void set(final Str id, final Str key, final Value value) {
-    WsPool.get().setAttribute(id.toJava(), key.toJava(), value);
-  }
-
-  /**
-   * Removes a session attribute.
-   * @param id client id
-   * @param key key of the attribute
-   */
-  public void delete(final Str id, final Str key) {
-    WsPool.get().delete(id.toJava(), key.toJava());
-  }
-
-  /**
    * Returns the path of the specified client.
    * @param id client id
    * @return path
