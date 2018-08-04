@@ -110,6 +110,13 @@ public interface WebText {
   /** Error message. */
   String WS_MISSING_X = "No WebSockets function found that matches the request: %.";
 
+  /** Logging message. */
+  String WS_ADAPTER_ERROR = "Error in the websocket adapter. ";
+  /** Logging message. */
+  String WS_ADAPTER_CONNECT = "Websocket adapter connect called. ";
+  /** Logging message. */
+  String WS_ADAPTER_CLOSE = "Websocket adapter close called";
+
   /** QName. */
   QNm Q_STATUS = new QNm(STATUS);
   /** QName. */

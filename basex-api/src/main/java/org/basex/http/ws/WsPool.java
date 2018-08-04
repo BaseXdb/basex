@@ -94,9 +94,10 @@ public class WsPool {
    * Adds a WebSocket to the members list.
    * @param socket WebSocket
    * @return client id
+   * @throws IllegalStateException If HttpSession is not availiable
    */
-  public String join(final WsAdapter socket) {
-    final String id = UUID.randomUUID().toString();
+  public String join(final WsAdapter socket) throws IllegalStateException {
+    final String id = getHttpSessionId(socket);
     members.put(id, socket);
     membersInv.computeIfAbsent(socket, k -> new ArrayList<>(1)).add(id);
     return id;
@@ -107,9 +108,11 @@ public class WsPool {
    * @param socket WebSocket
    * @param channel name of channel
    * @return client id
+   * @throws IllegalStateException If HttpSession is not availiable
    */
-  public String joinChannel(final WsAdapter socket, final String channel) {
-    final String id = UUID.randomUUID().toString();
+  public String joinChannel(final WsAdapter socket, final String channel)
+      throws IllegalStateException {
+    final String id = getHttpSessionId(socket);
     members.put(id, socket);
     membersInv.computeIfAbsent(socket, k -> new ArrayList<>(1)).add(id);
     channels.computeIfAbsent(channel, k -> new ArrayList<>(1)).add(socket);
@@ -245,5 +248,23 @@ public class WsPool {
       ao.reset();
     }
     return list;
+  }
+
+  /**
+   * Returns the HttpSessionId if the HttpSession is set and alive.
+   * @param socket The WsAdapter
+   * @return The HttpSessionId as String
+   * @throws IllegalStateException If HttpSession is not availiable
+   */
+  private String getHttpSessionId(final WsAdapter socket) throws IllegalStateException {
+    String id = null;
+    if(socket.httpsession != null) {
+      try {
+        id = socket.httpsession.getId();
+      } catch(IllegalStateException ex) {
+        throw ex;
+      }
+    }
+    return id;
   }
 }
