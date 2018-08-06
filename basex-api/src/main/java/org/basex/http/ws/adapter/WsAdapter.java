@@ -161,7 +161,11 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return session.getRemoteAddress().toString();
+    try {
+      return session.getRemoteAddress().toString();
+    } catch (NullPointerException ex) {
+      return null;
+    }
   }
 
   @Override
@@ -178,6 +182,8 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
     try {
       httpsession.getCreationTime();
     } catch (IllegalStateException ex) {
+      httpsession = null;
+    } catch (NullPointerException ex2) {
       httpsession = null;
     }
 

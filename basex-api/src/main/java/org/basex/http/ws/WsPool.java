@@ -252,7 +252,7 @@ public class WsPool {
 
   /**
    * Returns the HttpSessionId if the HttpSession is set and alive.
-   * @param socket The WsAdapter
+   * @param socket The Wsadapter
    * @return The HttpSessionId as String
    * @throws IllegalStateException If HttpSession is not availiable
    */
