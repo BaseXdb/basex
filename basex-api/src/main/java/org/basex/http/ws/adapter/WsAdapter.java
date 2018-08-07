@@ -33,7 +33,7 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
   public final Context context;
   /** HTTP Session. */
   public HttpSession httpsession;
-  /** Client id. */
+  /** Client WebSocket id. */
   public String id;
   /** Response serializer. */
   public WsResponse response;
@@ -72,11 +72,7 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
     final UpgradeRequest ur = sess.getUpgradeRequest();
     final WsPool pool = WsPool.get();
     try {
-      if(path != null) {
-        id = pool.joinChannel(this, path.toString());
-      } else {
-        id = pool.join(this);
-      }
+      id = pool.join(this);
     } catch (IllegalStateException ex) {
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
     }

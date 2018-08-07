@@ -36,10 +36,6 @@ public final class StandardWs extends WsAdapter {
   @Override
   protected void removeWebSocket() {
     final WsPool pool = WsPool.get();
-    if(path == null) {
-      pool.remove(id);
-    } else {
-      pool.removeFromChannel(this, path.toString(), id);
-    }
+    pool.remove(id);
   }
 }

@@ -31,7 +31,7 @@ public final class Websocket extends QueryModule {
   }
 
   /**
-   * Broadcasts a message to all connected members without the sender.
+   * Broadcasts a message to all connected clients without the sender.
    * @param message message
    * @throws QueryException Query Exception
    * @throws IOException I/O exception

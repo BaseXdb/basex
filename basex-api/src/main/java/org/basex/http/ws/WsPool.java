@@ -24,11 +24,13 @@ import org.eclipse.jetty.websocket.api.*;
 public class WsPool {
   /** Singleton pool. */
   private static WsPool instance;
+  /** WebSocket prefix. */
+  private static final String PREFIX = "websocket";
+  /** Incrementing id. */
+  private static long websocketId = -1;
 
-  /** Members of the pool. id -> adapter. */
-  private final HashMap<String, WsAdapter> members = new HashMap<>();
-  /** Members per channel. */
-  private final HashMap<String, List<WsAdapter>> channels = new HashMap<>();
+  /** Clients of the pool. id -> adapter. */
+  private final HashMap<String, WsAdapter> clients = new HashMap<>();
 
   /**
    * Returns the pool instance.
@@ -45,7 +47,7 @@ public class WsPool {
    * @return path
    */
   public String path(final String id) {
-    return members.get(id).getPath();
+    return clients.get(id).getPath();
   }
 
   /**
@@ -53,62 +55,42 @@ public class WsPool {
    * @return client ids
    */
   public TokenList ids() {
-    final TokenList ids = new TokenList(members.size());
-    for(final String key : members.keySet()) ids.add(key);
+    final TokenList ids = new TokenList(clients.size());
+    for(final String key : clients.keySet()) ids.add(key);
     return ids;
   }
 
   /**
-   * Adds a WebSocket to the members list.
+   * Returns a new, unused WebSocket id.
+   * @return String WebSocket id
+   */
+  private synchronized String getId() {
+      websocketId = Math.max(0, websocketId + 1);
+      return PREFIX + websocketId;
+  }
+
+  /**
+   * Adds a WebSocket to the clients list.
    * @param socket WebSocket
    * @return client id
    * @throws IllegalStateException If HttpSession is not availiable
    */
   public String join(final WsAdapter socket) throws IllegalStateException {
-    final String id = getHttpSessionId(socket);
-    members.put(id, socket);
+    final String id = getId();
+    clients.put(id, socket);
     return id;
   }
 
   /**
-   * Adds a WebSocket to a specific channel.
-   * @param socket WebSocket
-   * @param channel name of channel
-   * @return client id
-   * @throws IllegalStateException If HttpSession is not availiable
-   */
-  public String joinChannel(final WsAdapter socket, final String channel)
-      throws IllegalStateException {
-    final String id = getHttpSessionId(socket);
-    members.put(id, socket);
-    channels.computeIfAbsent(channel, k -> new ArrayList<>(1)).add(socket);
-    return id;
-  }
-
-  /**
-   * Removes a WebSocket from the members list.
+   * Removes a WebSocket from the clients list.
    * @param id client id
    */
   public void remove(final String id) {
-    members.remove(id);
+    clients.remove(id);
   }
 
   /**
-   * Removes a member from a channel.
-   * @param socket WebSocket
-   * @param channel name of channel
-   * @param id client id
-   */
-  public void removeFromChannel(final WsAdapter socket, final String channel,
-      final String id) {
-    members.remove(id);
-
-    final List<WsAdapter> list = channels.get(channel);
-    if(list != null) list.remove(socket);
-  }
-
-  /**
-   * Sends a message to all connected members.
+   * Sends a message to all connected clients.
    * @param message message
    * @throws QueryException query exception
    * @throws IOException I/O exception
@@ -118,20 +100,20 @@ public class WsPool {
   }
 
   /**
-   * Sends a message to all connected members except to the one with the given id.
+   * Sends a message to all connected clients except to the one with the given id.
    * @param message message
    * @param pId The ID
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   public void broadcast(final Item message, final Str pId) throws QueryException, IOException {
-    for(final Entry<String, WsAdapter> entry : members.entrySet()) {
+    for(final Entry<String, WsAdapter> entry : clients.entrySet()) {
       final String id = entry.getKey();
       if(pId == null || !id.equals(pId.toJava())) {
         final WsAdapter ws = entry.getValue();
         final Session s = ws.getSession();
         if(s == null || !s.isOpen()) {
-          members.remove(id);
+          clients.remove(id);
         } else {
           checkAndSend(message, ws);
         }
@@ -147,8 +129,8 @@ public class WsPool {
    * @throws IOException I/O exception
    */
   public void send(final Item message, final Str id) throws QueryException, IOException {
-    final WsAdapter member = members.get(id.toJava());
-    if(member != null) checkAndSend(message, member);
+    final WsAdapter client = clients.get(id.toJava());
+    if(client != null) checkAndSend(message, client);
   }
 
   /**
@@ -196,19 +178,5 @@ public class WsPool {
       ao.reset();
     }
     return list;
-  }
-
-  /**
-   * Returns the HttpSessionId if the HttpSession is set and alive.
-   * @param socket The Wsadapter
-   * @return The HttpSessionId as String
-   * @throws IllegalStateException If HttpSession is not availiable
-   */
-  private String getHttpSessionId(final WsAdapter socket) throws IllegalStateException {
-    String id = null;
-    if(socket.httpsession != null) {
-      id = socket.httpsession.getId();
-    }
-    return id;
   }
 }
