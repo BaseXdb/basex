@@ -42,7 +42,6 @@ final class ASession {
       final Object ws = qc.getProperty(HTTPText.WEBSOCKET);
       if(ws != null) {
         session = ((WsAdapter) ws).httpsession;
-        if(session != null) return;
       } else {
         final Object req = qc.getProperty(HTTPText.REQUEST);
         if(req == null) throw BASEX_HTTP.get(null);
@@ -50,8 +49,8 @@ final class ASession {
       }
     } else {
       session = SessionListener.sessions().get(id.toJava());
-      if(session == null) throw SESSIONS_NOTFOUND_X.get(null, id);
     }
+    if(session == null) throw SESSIONS_NOTFOUND_X.get(null, id);
   }
 
   /**

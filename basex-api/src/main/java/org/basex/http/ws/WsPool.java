@@ -259,11 +259,7 @@ public class WsPool {
   private String getHttpSessionId(final WsAdapter socket) throws IllegalStateException {
     String id = null;
     if(socket.httpsession != null) {
-      try {
-        id = socket.httpsession.getId();
-      } catch(IllegalStateException ex) {
-        throw ex;
-      }
+      id = socket.httpsession.getId();
     }
     return id;
   }

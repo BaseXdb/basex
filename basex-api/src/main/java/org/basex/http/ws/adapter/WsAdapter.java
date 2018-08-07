@@ -2,6 +2,7 @@ package org.basex.http.ws.adapter;
 
 import static org.basex.http.web.WebText.*;
 
+import java.net.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -161,11 +162,7 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    try {
-      return session.getRemoteAddress().toString();
-    } catch (NullPointerException ex) {
-      return null;
-    }
+    return session != null ? session.getRemoteAddress().toString() : null;
   }
 
   @Override
@@ -180,17 +177,15 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
    */
   protected void findAndProcess(final Annotation ann, final Object message) {
     try {
-      httpsession.getCreationTime();
+      if(httpsession != null) httpsession.getCreationTime();
     } catch (IllegalStateException ex) {
-      httpsession = null;
-    } catch (NullPointerException ex2) {
       httpsession = null;
     }
 
     try {
       final WebModules modules = WebModules.get(context);
       final WsFunction func = modules.find(this, ann);
-      if(func == null) throw new Exception(Util.info(WS_MISSING_X, ann.toString()));
+      if(func == null) throw new Exception(Util.info(WS_MISSING_X, ann));
       else if(response != null) func.process(this, message);
     } catch(final RuntimeException ex) {
       throw ex;
