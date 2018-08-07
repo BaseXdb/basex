@@ -38,13 +38,13 @@ final class ASession {
     this.qc = qc;
     this.id = id;
 
+    final Object ws = qc.getProperty(HTTPText.WEBSOCKET);
+    final Object req = qc.getProperty(HTTPText.REQUEST);
+    if(ws == null && req == null) throw BASEX_HTTP.get(null);
     if(id == null) {
-      final Object ws = qc.getProperty(HTTPText.WEBSOCKET);
       if(ws != null) {
         session = ((WsAdapter) ws).httpsession;
       } else {
-        final Object req = qc.getProperty(HTTPText.REQUEST);
-        if(req == null) throw BASEX_HTTP.get(null);
         session = ((HttpServletRequest) req).getSession();
       }
     } else {

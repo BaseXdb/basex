@@ -13,7 +13,6 @@ import org.basex.http.web.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.query.ann.*;
-import org.basex.query.value.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.eclipse.jetty.websocket.api.*;
@@ -43,9 +42,6 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
   /** Header parameters. */
   public final Map<String, String> headers = new HashMap<>();
 
-  /** Attributes. */
-  protected final Map<String, Value> attributes = new HashMap<>();
-
   /**
    * Constructor.
    * @param req request
@@ -60,32 +56,6 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
     final Context ctx = HTTPContext.context();
     context = new Context(ctx, this);
     context.user(ctx.user());
-  }
-
-  /**
-   * Sets an attribute.
-   * @param key key
-   * @param value value
-   */
-  public void setAttribute(final String key, final Value value) {
-    attributes.put(key, value);
-  }
-
-  /**
-   * Returns the attribute value for the specified key.
-   * @param key key
-   * @return attribute value (can be {@code null})
-   */
-  public Value getAttribute(final String key) {
-    return attributes.get(key);
-  }
-
-  /**
-   * Deletes an attribute.
-   * @param key key
-   */
-  public void delete(final String key) {
-    attributes.remove(key);
   }
 
   /**

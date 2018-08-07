@@ -10,7 +10,6 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
 import org.eclipse.jetty.websocket.api.*;
@@ -28,8 +27,6 @@ public class WsPool {
 
   /** Members of the pool. id -> adapter. */
   private final HashMap<String, WsAdapter> members = new HashMap<>();
-  /** Members of the pool. adapter -> ids. */
-  private final HashMap<WsAdapter, List<String>> membersInv = new HashMap<>();
   /** Members per channel. */
   private final HashMap<String, List<WsAdapter>> channels = new HashMap<>();
 
@@ -40,35 +37,6 @@ public class WsPool {
   public static WsPool get() {
     if(instance == null) instance = new WsPool();
     return instance;
-  }
-
-  /**
-   * Assigns an attribute to the specified client.
-   * @param id client id
-   * @param key key of the attribute
-   * @param value value to be stored
-   */
-  public void setAttribute(final String id, final String key, final Value value) {
-    members.get(id).setAttribute(key, value);
-  }
-
-  /**
-   * Returns the attribute value for the specified key and the current client.
-   * @param id client id
-   * @param key key to be requested
-   * @return attribute value
-   */
-  public Value getAttribute(final String id, final String key) {
-    return members.get(id).getAttribute(key);
-  }
-
-  /**
-   * Removes a session attribute.
-   * @param id client id
-   * @param key key of the attribute
-   */
-  public void delete(final String id, final String key) {
-    members.get(id).delete(key);
   }
 
   /**
@@ -99,7 +67,6 @@ public class WsPool {
   public String join(final WsAdapter socket) throws IllegalStateException {
     final String id = getHttpSessionId(socket);
     members.put(id, socket);
-    membersInv.computeIfAbsent(socket, k -> new ArrayList<>(1)).add(id);
     return id;
   }
 
@@ -114,7 +81,6 @@ public class WsPool {
       throws IllegalStateException {
     final String id = getHttpSessionId(socket);
     members.put(id, socket);
-    membersInv.computeIfAbsent(socket, k -> new ArrayList<>(1)).add(id);
     channels.computeIfAbsent(channel, k -> new ArrayList<>(1)).add(socket);
     return id;
   }
@@ -124,9 +90,7 @@ public class WsPool {
    * @param id client id
    */
   public void remove(final String id) {
-    final WsAdapter ws = members.get(id);
     members.remove(id);
-    membersInv.remove(ws);
   }
 
   /**
@@ -137,14 +101,8 @@ public class WsPool {
    */
   public void removeFromChannel(final WsAdapter socket, final String channel,
       final String id) {
-    final WsAdapter ws = members.get(id);
     members.remove(id);
 
-    final List<String> inv = membersInv.get(ws);
-    if(inv != null) {
-      inv.remove(id);
-      if(inv.isEmpty()) membersInv.remove(ws);
-    }
     final List<WsAdapter> list = channels.get(channel);
     if(list != null) list.remove(socket);
   }
@@ -160,7 +118,6 @@ public class WsPool {
       final String id = entry.getKey();
       final WsAdapter ws = entry.getValue();
       if(!ws.getSession().isOpen()) {
-        membersInv.remove(ws);
         members.remove(id);
       } else {
         checkAndSend(message, ws);
@@ -182,7 +139,6 @@ public class WsPool {
         final WsAdapter ws = entry.getValue();
         final Session s = ws.getSession();
         if(s == null || !s.isOpen()) {
-          membersInv.remove(ws);
           members.remove(id);
         } else {
           checkAndSend(message, ws);
