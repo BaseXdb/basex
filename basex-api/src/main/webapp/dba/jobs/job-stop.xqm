@@ -40,7 +40,6 @@ function dba:job-discard(
   dba:job-stop($ids, 'discarded')
 };
 
-
 (:~
  : Stops jobs.
  : @param  $ids     job ids

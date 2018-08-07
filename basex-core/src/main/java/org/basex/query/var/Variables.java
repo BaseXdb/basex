@@ -37,9 +37,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   public StaticVar declare(final Var var, final AnnList anns, final Expr expr, final boolean ext,
       final String doc, final VarScope vs) throws QueryException {
     final StaticVar sv = new StaticVar(vs, anns, var, expr, ext, doc);
-    final VarEntry ve = vars.get(var.name);
-    if(ve != null) ve.setVar(sv);
-    else vars.put(var.name, new VarEntry(sv));
+    vars.computeIfAbsent(var.name, n -> new VarEntry()).setVar(sv);
     return sv;
   }
 
@@ -48,7 +46,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    for(final VarEntry e : vars.values()) e.var.checkUp();
+    for(final VarEntry ve : vars.values()) ve.var.checkUp();
   }
 
   /**
@@ -74,11 +72,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public StaticVarRef newRef(final QNm name, final StaticContext sc, final InputInfo info)
       throws QueryException {
-
     final StaticVarRef ref = new StaticVarRef(info, name, sc);
-    final VarEntry e = vars.get(name), entry = e != null ? e : new VarEntry(null);
-    if(e == null) vars.put(name, entry);
-    entry.addRef(ref);
+    vars.computeIfAbsent(name, n -> new VarEntry()).addRef(ref);
     return ref;
   }
 
@@ -122,14 +117,14 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   public void plan(final FElem plan) {
     if(vars.isEmpty()) return;
     final FElem elem = planElem();
-    for(final VarEntry v : vars.values()) v.var.plan(elem);
+    for(final VarEntry ve : vars.values()) ve.var.plan(elem);
     plan.add(elem);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final VarEntry v : vars.values()) sb.append(v.var);
+    for(final VarEntry ve : vars.values()) sb.append(ve.var);
     return sb.toString();
   }
 
@@ -139,14 +134,6 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     StaticVar var;
     /** Variable references. */
     final ArrayList<StaticVarRef> refs = new ArrayList<>(1);
-
-    /**
-     * Constructor.
-     * @param var variable, possibly {@code null}
-     */
-    VarEntry(final StaticVar var) {
-      this.var = var;
-    }
 
     /**
      * Sets the variable for existing references.

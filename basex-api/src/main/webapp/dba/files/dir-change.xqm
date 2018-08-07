@@ -25,7 +25,7 @@ function dba:dir-change(
     if(contains($dir, file:dir-separator())) then (
       $dir
     ) else (
-      file:path-to-native(session:directory() || $dir || '/')    
+      file:path-to-native(session:directory() || $dir || '/')
     )
   ),
   session:set($session:QUERY, ''),

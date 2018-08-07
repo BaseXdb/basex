@@ -98,9 +98,9 @@ var _running = 0;
 /**
  * Runs a query and shows the result.
  * @param {string} path  path to query service
- * @param {query}  query query to be evaluated
- * @param {func}   func  function that processes the result
- * @param {reset}  reset reset query (jump to first results)
+ * @param {string} query query to be evaluated
+ * @param {function} func  function that processes the result
+ * @param {boolean} reset reset query (jump to first results)
  */
 function query(path, query, func, reset) {
   _running++;
@@ -119,11 +119,15 @@ function query(path, query, func, reset) {
   var resource = document.getElementById("resource");
   var sort = document.getElementById("sort");
   var page = document.getElementById("page");
-  var url = path +
-    "?name=" + encodeURIComponent(name ? name.value : "") +
-    "&resource=" + encodeURIComponent(resource ? resource.value : "") +
-    "&sort=" + encodeURIComponent(sort ? sort.value : "") +
-    "&page=" + encodeURIComponent(page && !reset ? page.value : "1");
+  var time = document.getElementById("time");
+  var params =
+    (name ? "&name=" + encodeURIComponent(name.value) : "") +
+    (resource ? "&resource=" + encodeURIComponent(resource.value) : "") +
+    (sort ? "&sort=" + encodeURIComponent(sort.value) : "") +
+    (page && !reset ? "&page=" + encodeURIComponent(page.value) : "" ) +
+    (time && !reset ? "&time=" + encodeURIComponent(time.value) : "");
+  var url = path + params.replace(/^&/, "?");
+
   request("POST", url, query,
     function(request) {
       _running--;
@@ -162,7 +166,7 @@ var _logInput;
 /**
  * Queries all log entries of a log file.
  * @param {boolean} enforce enforce query execution
- * @param {reset}   reset   reset query (jump to first results)
+ * @param {boolean} reset reset query (jump to first results)
  */
 function logEntries(enforce, reset) {
   var input = document.getElementById("input").value.trim();
