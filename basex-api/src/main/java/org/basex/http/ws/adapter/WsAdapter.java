@@ -2,7 +2,6 @@ package org.basex.http.ws.adapter;
 
 import static org.basex.http.web.WebText.*;
 
-import java.net.*;
 import java.util.*;
 import java.util.function.*;
 
