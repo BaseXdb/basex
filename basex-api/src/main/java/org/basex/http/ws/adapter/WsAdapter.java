@@ -31,8 +31,6 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   /** Database context. */
   public final Context context;
-  /** Session for the connection; will be assigned when the connection is built up. */
-  public Session session;
   /** HTTP Session. */
   public HttpSession httpsession;
   /** Client id. */
@@ -98,7 +96,6 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
     final String[] names = { "Host", "Sec-WebSocket-Version" };
     for(final String name : names) addHeader.accept(name, ur.getHeader(name));
 
-    session = sess;
     findAndProcess(Annotation._WS_CONNECT, null);
   }
 
@@ -131,6 +128,7 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientAddress() {
+    Session session = getSession();
     return session != null ? session.getRemoteAddress().toString() : null;
   }
 

@@ -114,15 +114,7 @@ public class WsPool {
    * @throws IOException I/O exception
    */
   public void emit(final Item message) throws QueryException, IOException {
-    for(final Entry<String, WsAdapter> entry : members.entrySet()) {
-      final String id = entry.getKey();
-      final WsAdapter ws = entry.getValue();
-      if(!ws.getSession().isOpen()) {
-        members.remove(id);
-      } else {
-        checkAndSend(message, ws);
-      }
-    }
+    broadcast(message, null);
   }
 
   /**
@@ -135,7 +127,7 @@ public class WsPool {
   public void broadcast(final Item message, final Str pId) throws QueryException, IOException {
     for(final Entry<String, WsAdapter> entry : members.entrySet()) {
       final String id = entry.getKey();
-      if(!id.equals(pId.toJava())) {
+      if(pId == null || !id.equals(pId.toJava())) {
         final WsAdapter ws = entry.getValue();
         final Session s = ws.getSession();
         if(s == null || !s.isOpen()) {

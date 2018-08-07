@@ -26,9 +26,9 @@ public class StandardWsResponse implements WsResponse {
       if(wxf.matches(Annotation._WS_CLOSE)) continue;
 
       if(value instanceof byte[]) {
-        ws.session.getRemote().sendBytes(ByteBuffer.wrap((byte[]) value));
+        ws.getSession().getRemote().sendBytes(ByteBuffer.wrap((byte[]) value));
       } else {
-        ws.session.getRemote().sendString((String) value);
+        ws.getSession().getRemote().sendString((String) value);
       }
     }
   }
