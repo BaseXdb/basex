@@ -421,25 +421,25 @@ declare function html:table(
           for $header at $pos in $headers
           let $name := $header?key
           let $type := $header?type
+
+          (: format value :)
           let $v := $entry($name)
-          let $value :=
-            (: format value :)
-            try {
-              if($type = 'bytes') then (
-                prof:human(xs:integer($v))
-              ) else if($type = 'decimal') then (
-                format-number(number($v), '0.00')
-              ) else if($type = 'dateTime') then (
-                html:date(xs:dateTime($v))
-              ) else if($type = 'xml') then (
-                $v()
-              ) else (
-                string($v)
-              )
-            } catch * {
-              (: error: show original value :)
-              'Error: ' || $err:description
-            }
+          let $value := try {
+            if($type = 'bytes') then (
+              prof:human(if(exists($v)) then xs:integer($v) else 0)
+            ) else if($type = 'decimal') then (
+              format-number(if(exists($v)) then number($v) else 0, '0.00')
+            ) else if($type = 'dateTime') then (
+              html:date(xs:dateTime($v))
+            ) else if($type = 'xml') then (
+              $v()
+            ) else (
+              string($v)
+            )
+          } catch * {
+            (: error: show error message (for functions) or proceed with original value :)
+            if ($v instance of function(*)) then $err:description else $v
+          }
           return element td {
             attribute align { if($type = $html:NUMBER) then 'right' else 'left' },
             if($pos = 1 and $buttons) then (
