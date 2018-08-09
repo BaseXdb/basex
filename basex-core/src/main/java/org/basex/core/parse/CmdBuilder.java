@@ -60,12 +60,13 @@ public final class CmdBuilder {
   }
 
   /**
-   * Adds the specified argument as XQuery string.
+   * Adds the specified argument unchanged.
    * @param arg argument index
    * @return self instance
    */
-  public CmdBuilder xquery(final int arg) {
-    tb.add(' ').add(cmd.args[arg]);
+  public CmdBuilder add(final int arg) {
+    final String s = cmd.args[arg];
+    if(s != null) tb.add(' ').add(s);
     return this;
   }
 

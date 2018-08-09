@@ -97,6 +97,6 @@ public final class Store extends ACreate {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init().arg(S_TO, 0).arg(1);
+    cb.init().arg(S_TO, 0).add(1);
   }
 }

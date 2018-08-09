@@ -187,6 +187,6 @@ public final class CreateDB extends ACreate {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.CREATE + " " + CmdCreate.DB).args();
+    cb.init(Cmd.CREATE + " " + CmdCreate.DB).arg(0).add(1);
   }
 }

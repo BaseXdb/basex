@@ -76,6 +76,7 @@ public class CommandTest extends SandboxTest {
     ok(new Add(FN, FILE));
     ok(new Add("target/" + FN, FILE));
     ok(new Add("/", FILE));
+    ok(new Add("test.xml", "<x>te est</x>"));
   }
 
   /** Command test. */
@@ -162,10 +163,12 @@ public class CommandTest extends SandboxTest {
     ok(new CreateDB(NAME, FILE));
     ok(new InfoDB());
     ok(new CreateDB(NAME, FILE));
+    ok(new CreateDB(NAME, "<x>te est</x>"));
     ok(new CreateDB("abcde"));
     ok(new DropDB("abcde"));
     ok(new CreateDB("a.b"));
     ok(new DropDB("a.b"));
+
     // invalid database names
     no(new CreateDB(""));
     no(new CreateDB(" "));

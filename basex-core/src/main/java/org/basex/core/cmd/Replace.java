@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -23,13 +24,13 @@ public final class Replace extends ACreate {
    * @param path resource path
    */
   public Replace(final String path) {
-    super(Perm.WRITE, true, path);
+    this(path, null);
   }
 
   /**
    * Constructor.
    * @param path resource path
-   * @param input input file or XML string
+   * @param input input reference (local/remote file path or XML string; can be {@code null})
    */
   public Replace(final String path, final String input) {
     super(Perm.WRITE, true, path, input);
@@ -104,5 +105,10 @@ public final class Replace extends ACreate {
     auc.execute(false);
 
     return info(RES_REPLACED_X_X, ds + bs, jc().performance);
+  }
+
+  @Override
+  public void build(final CmdBuilder cb) {
+    cb.init().arg(0).add(1);
   }
 }

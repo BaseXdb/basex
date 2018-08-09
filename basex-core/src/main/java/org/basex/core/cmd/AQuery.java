@@ -260,7 +260,7 @@ public abstract class AQuery extends Command {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init().xquery(0);
+    cb.init().add(0);
   }
 
   @Override
