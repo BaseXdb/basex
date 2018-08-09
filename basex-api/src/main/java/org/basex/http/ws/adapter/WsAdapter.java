@@ -2,7 +2,6 @@ package org.basex.http.ws.adapter;
 
 import static org.basex.http.web.WebText.*;
 
-import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -14,7 +13,6 @@ import org.basex.http.web.*;
 import org.basex.http.ws.*;
 import org.basex.http.ws.response.*;
 import org.basex.query.ann.*;
-import org.basex.query.value.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.eclipse.jetty.websocket.api.*;
@@ -33,17 +31,14 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   /** Database context. */
   public final Context context;
-  /** Session for the connection; will be assigned when the connection is built up. */
-  public Session session;
-  /** Client id. */
+  /** HTTP Session. */
+  public HttpSession httpsession;
+  /** Client WebSocket id. */
   public String id;
   /** Response serializer. */
   public WsResponse response;
   /** Header parameters. */
   public final Map<String, String> headers = new HashMap<>();
-
-  /** Attributes. */
-  protected final Map<String, Value> attributes = new HashMap<>();
 
   /**
    * Constructor.
@@ -54,36 +49,11 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
     final String pi = req.getPathInfo();
     this.path = new WsPath(pi != null ? pi : "/");
     response = new StandardWsResponse();
+    httpsession = req.getSession();
 
     final Context ctx = HTTPContext.context();
     context = new Context(ctx, this);
     context.user(ctx.user());
-  }
-
-  /**
-   * Sets an attribute.
-   * @param key key
-   * @param value value
-   */
-  public void setAttribute(final String key, final Value value) {
-    attributes.put(key, value);
-  }
-
-  /**
-   * Returns the attribute value for the specified key.
-   * @param key key
-   * @return attribute value (can be {@code null})
-   */
-  public Value getAttribute(final String key) {
-    return attributes.get(key);
-  }
-
-  /**
-   * Deletes an attribute.
-   * @param key key
-   */
-  public void delete(final String key) {
-    attributes.remove(key);
   }
 
   /**
@@ -96,14 +66,15 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public void onWebSocketConnect(final Session sess) {
+    context.log.write(WS_ADAPTER_CONNECT, sess.toString(), null, context);
     super.onWebSocketConnect(sess);
 
     final UpgradeRequest ur = sess.getUpgradeRequest();
     final WsPool pool = WsPool.get();
-    if(path != null) {
-      id = pool.joinChannel(this, path.toString());
-    } else {
+    try {
       id = pool.join(this);
+    } catch (IllegalStateException ex) {
+      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
     }
 
     final BiConsumer<String, String> addHeader = (k, v) -> {
@@ -121,7 +92,6 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
     final String[] names = { "Host", "Sec-WebSocket-Version" };
     for(final String name : names) addHeader.accept(name, ur.getHeader(name));
 
-    session = sess;
     findAndProcess(Annotation._WS_CONNECT, null);
   }
 
@@ -133,8 +103,7 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
    */
   @Override
   public void onWebSocketError(final Throwable cause) {
-    // [JF] What happens if text message exceeds "maxTextMessageSize"? will this function be called?
-    // [JF] What is the default for maxTextMessageSize ?
+    context.log.write(WS_ADAPTER_ERROR, cause.getMessage(), null, context);
     findAndProcess(Annotation._WS_ERROR, cause.toString());
     super.getSession().close();
     removeWebSocket();
@@ -142,6 +111,7 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public void onWebSocketClose(final int statusCode, final String reason) {
+    context.log.write(WS_ADAPTER_CLOSE, reason, null, context);
     findAndProcess(Annotation._WS_CLOSE, null);
     super.onWebSocketClose(statusCode, reason);
     removeWebSocket();
@@ -154,7 +124,8 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return session.getRemoteAddress().toString();
+    Session session = getSession();
+    return session != null ? session.getRemoteAddress().toString() : null;
   }
 
   @Override
@@ -169,28 +140,24 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
    */
   protected void findAndProcess(final Annotation ann, final Object message) {
     try {
+      if(httpsession != null) httpsession.getCreationTime();
+    } catch (IllegalStateException ex) {
+      httpsession = null;
+    }
+
+    try {
       final WebModules modules = WebModules.get(context);
       final WsFunction func = modules.find(this, ann);
-      if(func == null) error(Util.info(WS_MISSING_X, ann.toString()), 404);
+      if(func == null) throw new Exception(Util.info(WS_MISSING_X, ann));
       else if(response != null) func.process(this, message);
+    } catch(final RuntimeException ex) {
+      throw ex;
     } catch(final Exception ex) {
       Util.debug(ex);
-      try {
-        error(ex.getMessage(), 400);
-      } catch(final Exception e) {
-        Util.debug(e);
-      }
+      // [JF] Alternative for raising error by ourselves: throw new RuntimeException(ex);
+      // Close exception with status code abnormal (not send/recieve by WebsocketClose)
+      // --> gets logged in console too!
+      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
     }
-  }
-
-  /**
-   * Sends an error to the client.
-   * @param message error message
-   * @param code error code
-   * @throws IOException I/O exception
-   */
-  private void error(final String message, final int code) throws IOException {
-    // [JF] Maybe it’s better to close the connection instead and send a real error to the client?
-    if(session.isOpen()) session.getRemote().sendString(code + ":" + message);
   }
 }

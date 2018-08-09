@@ -7,6 +7,7 @@ import java.util.*;
 import javax.servlet.http.*;
 
 import org.basex.http.*;
+import org.basex.http.ws.adapter.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -37,15 +38,19 @@ final class ASession {
     this.qc = qc;
     this.id = id;
 
+    final Object ws = qc.getProperty(HTTPText.WEBSOCKET);
     final Object req = qc.getProperty(HTTPText.REQUEST);
-    if(req == null) throw BASEX_HTTP.get(null);
-
+    if(ws == null && req == null) throw BASEX_HTTP.get(null);
     if(id == null) {
-      session = ((HttpServletRequest) req).getSession();
+      if(ws != null) {
+        session = ((WsAdapter) ws).httpsession;
+      } else {
+        session = ((HttpServletRequest) req).getSession();
+      }
     } else {
       session = SessionListener.sessions().get(id.toJava());
-      if(session == null) throw SESSIONS_NOTFOUND_X.get(null, id);
     }
+    if(session == null) throw SESSIONS_NOTFOUND_X.get(null, id);
   }
 
   /**

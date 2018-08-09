@@ -10,7 +10,6 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
 import org.eclipse.jetty.websocket.api.*;
@@ -25,13 +24,13 @@ import org.eclipse.jetty.websocket.api.*;
 public class WsPool {
   /** Singleton pool. */
   private static WsPool instance;
+  /** WebSocket prefix. */
+  private static final String PREFIX = "websocket";
+  /** Incrementing id. */
+  private static long websocketId = -1;
 
-  /** Members of the pool. id -> adapter. */
-  private final HashMap<String, WsAdapter> members = new HashMap<>();
-  /** Members of the pool. adapter -> ids. */
-  private final HashMap<WsAdapter, List<String>> membersInv = new HashMap<>();
-  /** Members per channel. */
-  private final HashMap<String, List<WsAdapter>> channels = new HashMap<>();
+  /** Clients of the pool. id -> adapter. */
+  private final HashMap<String, WsAdapter> clients = new HashMap<>();
 
   /**
    * Returns the pool instance.
@@ -43,41 +42,12 @@ public class WsPool {
   }
 
   /**
-   * Assigns an attribute to the specified client.
-   * @param id client id
-   * @param key key of the attribute
-   * @param value value to be stored
-   */
-  public void setAttribute(final String id, final String key, final Value value) {
-    members.get(id).setAttribute(key, value);
-  }
-
-  /**
-   * Returns the attribute value for the specified key and the current client.
-   * @param id client id
-   * @param key key to be requested
-   * @return attribute value
-   */
-  public Value getAttribute(final String id, final String key) {
-    return members.get(id).getAttribute(key);
-  }
-
-  /**
-   * Removes a session attribute.
-   * @param id client id
-   * @param key key of the attribute
-   */
-  public void delete(final String id, final String key) {
-    members.get(id).delete(key);
-  }
-
-  /**
    * Returns the path of the specified client.
    * @param id client id
    * @return path
    */
   public String path(final String id) {
-    return members.get(id).getPath();
+    return clients.get(id).getPath();
   }
 
   /**
@@ -85,102 +55,65 @@ public class WsPool {
    * @return client ids
    */
   public TokenList ids() {
-    final TokenList ids = new TokenList(members.size());
-    for(final String key : members.keySet()) ids.add(key);
+    final TokenList ids = new TokenList(clients.size());
+    for(final String key : clients.keySet()) ids.add(key);
     return ids;
   }
 
   /**
-   * Adds a WebSocket to the members list.
+   * Returns a new, unused WebSocket id.
+   * @return String WebSocket id
+   */
+  private synchronized String getId() {
+      websocketId = Math.max(0, websocketId + 1);
+      return PREFIX + websocketId;
+  }
+
+  /**
+   * Adds a WebSocket to the clients list.
    * @param socket WebSocket
    * @return client id
+   * @throws IllegalStateException If HttpSession is not availiable
    */
-  public String join(final WsAdapter socket) {
-    final String id = UUID.randomUUID().toString();
-    members.put(id, socket);
-    membersInv.computeIfAbsent(socket, k -> new ArrayList<>(1)).add(id);
+  public String join(final WsAdapter socket) throws IllegalStateException {
+    final String id = getId();
+    clients.put(id, socket);
     return id;
   }
 
   /**
-   * Adds a WebSocket to a specific channel.
-   * @param socket WebSocket
-   * @param channel name of channel
-   * @return client id
-   */
-  public String joinChannel(final WsAdapter socket, final String channel) {
-    final String id = UUID.randomUUID().toString();
-    members.put(id, socket);
-    membersInv.computeIfAbsent(socket, k -> new ArrayList<>(1)).add(id);
-    channels.computeIfAbsent(channel, k -> new ArrayList<>(1)).add(socket);
-    return id;
-  }
-
-  /**
-   * Removes a WebSocket from the members list.
+   * Removes a WebSocket from the clients list.
    * @param id client id
    */
   public void remove(final String id) {
-    final WsAdapter ws = members.get(id);
-    members.remove(id);
-    membersInv.remove(ws);
+    clients.remove(id);
   }
 
   /**
-   * Removes a member from a channel.
-   * @param socket WebSocket
-   * @param channel name of channel
-   * @param id client id
-   */
-  public void removeFromChannel(final WsAdapter socket, final String channel,
-      final String id) {
-    final WsAdapter ws = members.get(id);
-    members.remove(id);
-
-    final List<String> inv = membersInv.get(ws);
-    if(inv != null) {
-      inv.remove(id);
-      if(inv.isEmpty()) membersInv.remove(ws);
-    }
-    final List<WsAdapter> list = channels.get(channel);
-    if(list != null) list.remove(socket);
-  }
-
-  /**
-   * Sends a message to all connected members.
+   * Sends a message to all connected clients.
    * @param message message
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   public void emit(final Item message) throws QueryException, IOException {
-    for(final Entry<String, WsAdapter> entry : members.entrySet()) {
-      final String id = entry.getKey();
-      final WsAdapter ws = entry.getValue();
-      if(!ws.getSession().isOpen()) {
-        membersInv.remove(ws);
-        members.remove(id);
-      } else {
-        checkAndSend(message, ws);
-      }
-    }
+    broadcast(message, null);
   }
 
   /**
-   * Sends a message to all connected members except to the one with the given id.
+   * Sends a message to all connected clients except to the one with the given id.
    * @param message message
    * @param pId The ID
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   public void broadcast(final Item message, final Str pId) throws QueryException, IOException {
-    for(final Entry<String, WsAdapter> entry : members.entrySet()) {
+    for(final Entry<String, WsAdapter> entry : clients.entrySet()) {
       final String id = entry.getKey();
-      if(!id.equals(pId.toJava())) {
+      if(pId == null || !id.equals(pId.toJava())) {
         final WsAdapter ws = entry.getValue();
         final Session s = ws.getSession();
         if(s == null || !s.isOpen()) {
-          membersInv.remove(ws);
-          members.remove(id);
+          clients.remove(id);
         } else {
           checkAndSend(message, ws);
         }
@@ -196,8 +129,8 @@ public class WsPool {
    * @throws IOException I/O exception
    */
   public void send(final Item message, final Str id) throws QueryException, IOException {
-    final WsAdapter member = members.get(id.toJava());
-    if(member != null) checkAndSend(message, member);
+    final WsAdapter client = clients.get(id.toJava());
+    if(client != null) checkAndSend(message, client);
   }
 
   /**

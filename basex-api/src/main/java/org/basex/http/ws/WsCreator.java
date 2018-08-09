@@ -15,5 +15,4 @@ public class WsCreator implements WebSocketCreator {
       final ServletUpgradeResponse resp) {
     return new StandardWs(req.getHttpServletRequest());
   }
-
 }
