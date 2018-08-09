@@ -43,27 +43,28 @@ public class RegExParser implements RegExParserConstants {
       final boolean check) throws QueryException {
 
     // process modifiers
-    int m = 0;
-    boolean strip = false;
+    int flags = 0;
+    boolean strip = false, java = false;
     if(mod != null) {
-      for(final byte b : mod) {
-        if(b == 'i') m |= CASE_INSENSITIVE | UNICODE_CASE;
-        else if(b == 'm') m |= MULTILINE;
-        else if(b == 's') m |= DOTALL;
-        else if(b == 'q') m |= LITERAL;
-        else if(b == 'x') strip = true;
-        else throw REGMOD_X.get(info, (char) b);
+      for(final byte m : mod) {
+        if(m == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
+        else if(m == 'm') flags |= MULTILINE;
+        else if(m == 's') flags |= DOTALL;
+        else if(m == 'q') flags |= LITERAL;
+        else if(m == 'x') strip = true;
+        else if(m == 'j' || m == '!') java = true;
+        else if(m != ';') throw REGMOD_X.get(info, (char) m);
       }
     }
 
-    // no need to change anything
-    if((m & LITERAL) != 0) return Pattern.compile(string(regex), m);
+    // Java syntax, literal query: no need to change anything
+    if(java || (flags & LITERAL) != 0) return Pattern.compile(string(regex), flags);
 
     try {
-      final RegExParser parser = new RegExParser(regex, strip, (m & DOTALL) != 0,
-          (m & MULTILINE) != 0);
+      final RegExParser parser = new RegExParser(regex, strip, (flags & DOTALL) != 0,
+          (flags & MULTILINE) != 0);
       final String string = parser.parse().toString();
-      final Pattern pattern = Pattern.compile(string, m);
+      final Pattern pattern = Pattern.compile(string, flags);
       if(check) {
         // Circumvent Java RegEx behavior ("If MULTILINE mode is activated"...):
         // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt

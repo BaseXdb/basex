@@ -38,6 +38,13 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void analyzeString() {
+    final Function func = Function.ANALYZE_STRING;
+    query(func.args("a", "", "j") + "//fn:non-match/text()", "a");
+    error(func.args("a", ""), REGROUP);
+  }
+
+  /** Test method. */
   @Test public void apply() {
     final Function func = Function.APPLY;
     final String name = Util.className(func.clazz);
@@ -536,6 +543,9 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
     query(func.args("aaaa AAA 123", "(\\s+\\P{Ll}{3,280}?)", "$1@"), "aaaa AAA@ 123@");
     error(func.args("asdf", "a{12,3}", ""), REGPAT_X);
+
+    query(func.args("a", "", "x", "j"), "xax");
+    error(func.args("a", "", "x"), REGROUP);
   }
 
   /** Test method. */
@@ -772,6 +782,13 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" tokenize(<_>X</_>)"), "");
     query(func.args(" tokenize(<_>X Y</_>)"), "Y");
     query(func.args(" tokenize(<_>X Y Z</_>)"), "Y\nZ");
+  }
+
+  /** Test method. */
+  @Test public void tokenize() {
+    final Function func = Function.TOKENIZE;
+    query(func.args("a", "", "j"), "\na\n");
+    error(func.args("a", ""), REGROUP);
   }
 
   /** Test method. */

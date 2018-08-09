@@ -1,6 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.regex.*;
@@ -30,7 +29,6 @@ public final class FnTokenize extends RegEx {
     if(exprs.length < 2) return StrSeq.get(split(normalize(value), ' '));
 
     final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
-    if(pattern.matcher("").matches()) throw REGROUP.get(info);
 
     final TokenList tl = new TokenList();
     final String string = string(value);
