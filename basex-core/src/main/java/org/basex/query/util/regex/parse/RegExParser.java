@@ -57,10 +57,10 @@ public class RegExParser implements RegExParserConstants {
       }
     }
 
-    // Java syntax, literal query: no need to change anything
-    if(java || (flags & LITERAL) != 0) return Pattern.compile(string(regex), flags);
-
     try {
+      // Java syntax, literal query: no need to change anything
+      if(java || (flags & LITERAL) != 0) return Pattern.compile(string(regex), flags);
+
       final RegExParser parser = new RegExParser(regex, strip, (flags & DOTALL) != 0,
           (flags & MULTILINE) != 0);
       final String string = parser.parse().toString();
@@ -73,10 +73,7 @@ public class RegExParser implements RegExParserConstants {
         if(p.matcher("").matches()) throw REGROUP.get(info);
       }
       return pattern;
-    } catch(final ParseException ex) {
-      Util.debug(ex);
-      throw REGPAT_X.get(info, regex);
-    } catch(final TokenMgrError ex) {
+    } catch(final ParseException | PatternSyntaxException | TokenMgrError ex) {
       Util.debug(ex);
       throw REGPAT_X.get(info, regex);
     }

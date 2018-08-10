@@ -354,6 +354,15 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void matches() {
+    final Function func = Function.MATCHES;
+    query(func.args("a", ""), true);
+    query(func.args("a", "", "j"), true);
+    error(func.args("a", "+"), REGPAT_X);
+    error(func.args("a", "+", "j"), REGPAT_X);
+  }
+
+  /** Test method. */
   @Test public void min() {
     final Function func = Function.MIN;
     query(func.args(1), 1);
