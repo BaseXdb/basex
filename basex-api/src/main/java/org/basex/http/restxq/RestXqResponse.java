@@ -8,13 +8,13 @@ import java.io.*;
 import javax.servlet.*;
 
 import org.basex.http.*;
+import org.basex.http.web.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.scope.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -26,14 +26,12 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class RestXqResponse {
-  /** Function. */
-  private final RestXqFunction func;
-  /** Query context. */
-  private final QueryContext qc;
+public final class RestXqResponse extends WebResponse {
   /** HTTP connection. */
   private final HTTPConnection conn;
 
+  /** Function. */
+  private RestXqFunction func;
   /** Output stream. */
   private OutputStream out;
   /** Status message. */
@@ -43,41 +41,33 @@ public final class RestXqResponse {
 
   /**
    * Constructor.
-   * @param func function
-   * @param qc query context
    * @param conn HTTP connection
    */
-  public RestXqResponse(final RestXqFunction func, final QueryContext qc,
-      final HTTPConnection conn) {
-    this.func = func;
-    this.qc = qc;
+  public RestXqResponse(final HTTPConnection conn) {
+    super(conn.context);
     this.conn = conn;
   }
 
-  /**
-   * Evaluates the specified function and serializes the result.
-   * @param ext extended processing information (function, error; can be {@code null})
-   * @return {@code true} if function creates no result
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   * @throws ServletException servlet exception
-   */
-  public boolean create(final Object ext) throws QueryException, IOException, ServletException {
-    // bind variables
-    final StaticFunc sf = func.function;
-    final Expr[] args = new Expr[sf.params.length];
-    func.bind(conn, args, ext, qc);
-
-    // assign function call and http context and register process
-    qc.mainModule(MainModule.get(sf, args));
+  @Override
+  protected void init(final WebFunction function) throws QueryException, IOException {
+    func = new RestXqFunction(function.function, qc, function.module);
     qc.putProperty(HTTPText.REQUEST, conn.req);
-    qc.jc().type(RESTXQ);
+    qc.jc().type(WEBSOCKET);
+    func.parse(ctx);
+  }
 
+  @Override
+  protected void bind(final Expr[] args, final Object data) throws QueryException, IOException {
+    func.bind(args, data, conn, qc);
+  }
+
+  @Override
+  public boolean serialize() throws QueryException, IOException, ServletException {
     final String sngl = func.singleton;
     final RestXqSingleton singleton = sngl != null ? new RestXqSingleton(conn, sngl, qc) : null;
     String redirect = null, forward = null;
 
-    qc.register(qc.context);
+    qc.register(ctx);
     try {
       // evaluate query
       final Iter iter = qc.iter();
@@ -106,10 +96,10 @@ public final class RestXqResponse {
         // standard serialization (cache singleton requests)
         serialize(first, iter, singleton != null);
       }
-      return first == null;
+      return first != null;
     } finally {
       qc.close();
-      qc.unregister(qc.context);
+      qc.unregister(ctx);
       if(singleton != null) singleton.unregister();
 
       if(redirect != null) {

@@ -8,7 +8,7 @@ import org.eclipse.jetty.websocket.servlet.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-public class WsServlet extends WebSocketServlet {
+public final class WsServlet extends WebSocketServlet {
   @Override
   public void configure(final WebSocketServletFactory factory) {
     factory.setCreator(new WsCreator());

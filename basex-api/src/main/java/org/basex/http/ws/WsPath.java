@@ -8,10 +8,10 @@ import org.basex.http.web.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-public class WsPath extends WebPath implements Comparable<WsPath> {
+public final class WsPath extends WebPath implements Comparable<WsPath> {
   /**
    * Constructor.
-   * @param path String the Path
+   * @param path WebSocket path
    */
   public WsPath(final String path) {
     super(path);

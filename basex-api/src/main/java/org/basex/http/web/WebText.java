@@ -42,6 +42,8 @@ public interface WebText {
   /** Permission token. */
   String AUTHORIZATION = "authorization";
 
+  /** WebSocket string. */
+  String WEBSOCKET = "WebSocket";
   /** RESTXQ string. */
   String RESTXQ = "RESTXQ";
   /** WADL prefix. */
@@ -109,13 +111,6 @@ public interface WebText {
   String WSPATH_CONFLICT_X_X = "Several functions found for path \"%\":%.";
   /** Error message. */
   String WS_MISSING_X = "No WebSockets function found that matches the request: %.";
-
-  /** Logging message. */
-  String WS_ADAPTER_ERROR = "Error in the WebSocket adapter. ";
-  /** Logging message. */
-  String WS_ADAPTER_CONNECT = "WebSocket adapter connect called. ";
-  /** Logging message. */
-  String WS_ADAPTER_CLOSE = "WebSocket adapter close called";
 
   /** QName. */
   QNm Q_STATUS = new QNm(STATUS);

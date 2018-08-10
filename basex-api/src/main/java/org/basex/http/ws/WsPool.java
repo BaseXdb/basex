@@ -5,11 +5,8 @@ import java.nio.*;
 import java.util.*;
 import java.util.Map.*;
 
-import org.basex.http.ws.adapter.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
 import org.eclipse.jetty.websocket.api.*;
@@ -20,8 +17,7 @@ import org.eclipse.jetty.websocket.api.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-
-public class WsPool {
+public final class WsPool {
   /** Singleton pool. */
   private static WsPool instance;
   /** WebSocket prefix. */
@@ -30,13 +26,13 @@ public class WsPool {
   private static long websocketId = -1;
 
   /** Clients of the pool. id -> adapter. */
-  private final HashMap<String, WsAdapter> clients = new HashMap<>();
+  private final HashMap<String, WebSocket> clients = new HashMap<>();
 
   /**
    * Returns the pool instance.
    * @return instance
    */
-  public static WsPool get() {
+  public static synchronized WsPool get() {
     if(instance == null) instance = new WsPool();
     return instance;
   }
@@ -54,29 +50,19 @@ public class WsPool {
    * Returns the ids of all connected clients.
    * @return client ids
    */
-  public TokenList ids() {
-    final TokenList ids = new TokenList(clients.size());
+  public StringList ids() {
+    final StringList ids = new StringList(clients.size());
     for(final String key : clients.keySet()) ids.add(key);
     return ids;
-  }
-
-  /**
-   * Returns a new, unused WebSocket id.
-   * @return String WebSocket id
-   */
-  private synchronized String getId() {
-      websocketId = Math.max(0, websocketId + 1);
-      return PREFIX + websocketId;
   }
 
   /**
    * Adds a WebSocket to the clients list.
    * @param socket WebSocket
    * @return client id
-   * @throws IllegalStateException If HttpSession is not availiable
    */
-  public String join(final WsAdapter socket) throws IllegalStateException {
-    final String id = getId();
+  public String add(final WebSocket socket) {
+    final String id = createId();
     clients.put(id, socket);
     return id;
   }
@@ -85,7 +71,7 @@ public class WsPool {
    * Removes a WebSocket from the clients list.
    * @param id client id
    */
-  public void remove(final String id) {
+  void remove(final String id) {
     clients.remove(id);
   }
 
@@ -102,81 +88,73 @@ public class WsPool {
   /**
    * Sends a message to all connected clients except to the one with the given id.
    * @param message message
-   * @param pId The ID
+   * @param client The client id (can be {@code null})
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void broadcast(final Item message, final Str pId) throws QueryException, IOException {
-    for(final Entry<String, WsAdapter> entry : clients.entrySet()) {
+  public void broadcast(final Item message, final String client)
+      throws QueryException, IOException {
+
+    /* [JF] We need to check what happens if a client is removed from the hash map while we iterate
+     * through all entries. this can be tested by calling Performance.sleep(...) in the loop.
+     * we could possibly use a ConcurrentHashMap. */
+    final ArrayList<WebSocket> list = new ArrayList<>();
+    for(final Entry<String, WebSocket> entry : clients.entrySet()) {
       final String id = entry.getKey();
-      if(pId == null || !id.equals(pId.toJava())) {
-        final WsAdapter ws = entry.getValue();
-        final Session s = ws.getSession();
-        if(s == null || !s.isOpen()) {
-          clients.remove(id);
+      if(client == null || !client.equals(id)) list.add(entry.getValue());
+    };
+    send(message, list);
+  }
+
+  /**
+   * Sends a message to a specific clients.
+   * @param message message
+   * @param ids client ids
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public void send(final Item message, final String... ids) throws QueryException, IOException {
+    final ArrayList<WebSocket> list = new ArrayList<>();
+    for(final String id : ids) {
+      final WebSocket ws = clients.get(id);
+      if(ws != null) list.add(ws);
+    }
+    send(message, list);
+  }
+
+  /**
+   * Sends a message to the specified clients.
+   * @param message message
+   * @param websockets clients
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void send(final Item message, final ArrayList<WebSocket> websockets)
+      throws QueryException, IOException {
+
+    /* [JF] We need to check what happens if a client says goodbye while we send data.
+     *  if this happens, other clients must still receive their message.
+     *  this could be tested by calling Performance.sleep(...) before sending the data. */
+    final ArrayList<Object> values = WsResponse.serialize(message.iter(), new SerializerOptions());
+    for(final WebSocket ws : websockets) {
+      if(!ws.isConnected()) continue;
+      final RemoteEndpoint remote = ws.getSession().getRemote();
+      for(final Object value : values) {
+        if(value instanceof byte[]) {
+          remote.sendBytesByFuture(ByteBuffer.wrap((byte[]) value));
         } else {
-          checkAndSend(message, ws);
+          remote.sendStringByFuture((String) value);
         }
       }
-    };
-  }
-
-  /**
-   * Sends a message to a specific client.
-   * @param message message
-   * @param id client id
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  public void send(final Item message, final Str id) throws QueryException, IOException {
-    final WsAdapter client = clients.get(id.toJava());
-    if(client != null) checkAndSend(message, client);
-  }
-
-  /**
-   * Checks the message type and sends the message.
-   * @param message Object
-   * @param ws target WebSocket
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  private void checkAndSend(final Item message, final WsAdapter ws)
-      throws QueryException, IOException {
-
-    final RemoteEndpoint remote = ws.getSession().getRemote();
-    for(final Object value : serialize(message.iter(), new SerializerOptions())) {
-      if(value instanceof byte[]) {
-        remote.sendBytesByFuture(ByteBuffer.wrap((byte[]) value));
-      } else {
-        remote.sendStringByFuture((String) value);
-      }
     }
   }
 
   /**
-   * Serializes an XQuery value.
-   * @param iter value iterator
-   * @param opts serializer options
-   * @return serialized values (byte arrays and strings)
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
+   * Creates a new, unused WebSocket id.
+   * @return new id
    */
-  public static ArrayList<Object> serialize(final Iter iter, final SerializerOptions opts)
-      throws QueryException, IOException {
-
-    final ArrayList<Object> list = new ArrayList<>();
-    final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao, opts);
-    for(Item item; (item = iter.next()) != null;) {
-      ser.reset();
-      ser.serialize(item);
-      if(item instanceof Bin) {
-        list.add(ao.toArray());
-      } else {
-        list.add(ao.toString());
-      }
-      ao.reset();
-    }
-    return list;
+  private static synchronized String createId() {
+    websocketId = Math.max(0, websocketId + 1);
+    return PREFIX + websocketId;
   }
 }

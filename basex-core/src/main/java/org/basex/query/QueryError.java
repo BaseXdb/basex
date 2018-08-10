@@ -391,6 +391,8 @@ public enum QueryError {
   SESSIONS_SET_X(SESSIONS, "http", "Function items cannot be stored: %."),
   /** Error code. */
   SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Session not found: %."),
+  /** Error code. */
+  SESSIONS_NOTFOUND(SESSIONS, "not-found", "Session not available."),
 
   // SQL Module
 

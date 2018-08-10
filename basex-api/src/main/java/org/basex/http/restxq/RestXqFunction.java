@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.Set;
 import java.util.regex.*;
 
-import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.build.csv.*;
@@ -42,7 +41,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class RestXqFunction extends WebFunction implements Comparable<RestXqFunction> {
+public final class RestXqFunction extends WebFunction {
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
@@ -86,36 +85,10 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
    * @param module web module
    */
   public RestXqFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
-    super(function, qc, module);
+    super(function, module, qc);
   }
 
-  /**
-   * Processes the HTTP request.
-   * Parses new modules and discards obsolete ones.
-   * @param conn HTTP connection
-   * @param ext extended processing information (function, error; can be {@code null})
-   * @return {@code true} if function creates no result
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   * @throws ServletException servlet exception
-   */
-  boolean process(final HTTPConnection conn, final Object ext)
-      throws QueryException, IOException, ServletException {
-    try {
-      return module.process(conn, this, ext);
-    } catch(final QueryException ex) {
-      if(ex.file() == null) ex.info(function.info);
-      throw ex;
-    }
-  }
-
-  /**
-   * Checks a function for REST and permission annotations.
-   * @param ctx database context
-   * @return {@code true} if function contains relevant annotations
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
+  @Override
   public boolean parse(final Context ctx) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.params.length];
@@ -215,69 +188,16 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   }
 
   /**
-   * Assigns annotation values as options.
-   * @param <O> option type
-   * @param opts options instance
-   * @param ann annotation
-   * @return options instance
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  private static <O extends Options> O parse(final O opts, final Ann ann)
-      throws QueryException, IOException {
-    for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
-    return opts;
-  }
-
-  /**
-   * Add a HTTP method to the list of supported methods by this RESTXQ function.
-   * @param method HTTP method as a string
-   * @param body variable to which the HTTP request body to be bound (optional)
-   * @param declared variable declaration flags
-   * @param info input info
-   * @throws QueryException query exception
-   */
-  private void addMethod(final String method, final Item body, final boolean[] declared,
-      final InputInfo info) throws QueryException {
-
-    if(body != null && !body.isEmpty()) {
-      final HttpMethod m = HttpMethod.get(method);
-      if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
-      if(requestBody != null) throw error(info, ANN_BODYVAR);
-      requestBody = checkVariable(toString(body), declared);
-    }
-    if(methods.contains(method)) throw error(info, ANN_TWICE_X_X, "%", method);
-    methods.add(method);
-  }
-
-  /**
-   * Checks if an HTTP request matches this function and its constraints.
-   * @param conn HTTP connection
-   * @param err error code (assigned if error function is to be called)
-   * @param perm permission flag
-   * @return result of check
-   */
-  public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
-    // check method, consumed and produced media type, and path or error
-    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
-        produces(conn))) return false;
-
-    if(perm) return permission != null && permission.matches(conn);
-    if(err != null) return error != null && error.matches(err);
-    return path != null && path.matches(conn);
-  }
-
-  /**
    * Binds the annotated variables.
-   * @param conn HTTP connection
    * @param args arguments
    * @param ext extended processing information (can be {@code null})
+   * @param conn HTTP connection
    * @param qc query context
    * @throws QueryException exception
    * @throws IOException I/O exception
    */
-  void bind(final HTTPConnection conn, final Expr[] args, final Object ext, final QueryContext qc)
-      throws QueryException, IOException {
+  public void bind(final Expr[] args, final Object ext, final HTTPConnection conn,
+      final QueryContext qc) throws QueryException, IOException {
 
     // bind variables from segments
     if(path != null) {
@@ -344,6 +264,23 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
     }
   }
 
+  /**
+   * Checks if an HTTP request matches this function and its constraints.
+   * @param conn HTTP connection
+   * @param err error code (assigned if error function is to be called)
+   * @param perm permission flag
+   * @return result of check
+   */
+  public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
+    // check method, consumed and produced media type, and path or error
+    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
+        produces(conn))) return false;
+
+    if(perm) return permission != null && permission.matches(conn);
+    if(err != null) return error != null && error.matches(err);
+    return path != null && path.matches(conn);
+  }
+
   @Override
   public QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
@@ -361,13 +298,59 @@ public final class RestXqFunction extends WebFunction implements Comparable<Rest
   }
 
   @Override
-  public int compareTo(final RestXqFunction rxf) {
+  public int compareTo(final WebFunction func) {
+    if(!(func instanceof RestXqFunction)) return -1;
+
+    final RestXqFunction rxf = (RestXqFunction) func;
     if(path != null) return path.compareTo(rxf.path);
     if(error != null) return error.compareTo(rxf.error);
     return permission.compareTo(rxf.permission);
   }
 
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder().append(super.toString());
+    if(!produces.isEmpty()) sb.append(' ').append(produces);
+    return sb.toString();
+  }
+
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Assigns annotation values as options.
+   * @param <O> option type
+   * @param opts options instance
+   * @param ann annotation
+   * @return options instance
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private static <O extends Options> O parse(final O opts, final Ann ann)
+      throws QueryException, IOException {
+    for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
+    return opts;
+  }
+
+  /**
+   * Add a HTTP method to the list of supported methods by this RESTXQ function.
+   * @param method HTTP method as a string
+   * @param body variable to which the HTTP request body to be bound (optional)
+   * @param declared variable declaration flags
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void addMethod(final String method, final Item body, final boolean[] declared,
+      final InputInfo info) throws QueryException {
+
+    if(body != null && !body.isEmpty()) {
+      final HttpMethod m = HttpMethod.get(method);
+      if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
+      if(requestBody != null) throw error(info, ANN_BODYVAR);
+      requestBody = checkVariable(toString(body), declared);
+    }
+    if(methods.contains(method)) throw error(info, ANN_TWICE_X_X, "%", method);
+    methods.add(method);
+  }
 
   /**
    * Checks if the consumed content type matches.

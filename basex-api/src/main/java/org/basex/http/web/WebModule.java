@@ -6,21 +6,16 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import javax.servlet.*;
-
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
-import org.basex.http.ws.adapter.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.scope.*;
 
 /**
- * This class caches information on a single XQuery module with RESTXQ annotations.
+ * This class caches information on a single XQuery module with relevant annotations.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
@@ -45,7 +40,7 @@ public final class WebModule {
   }
 
   /**
-   * Checks the module for RESTXQ annotations.
+   * Checks the module for relevant annotations.
    * @param ctx database context
    * @return {@code true} if module contains relevant annotations
    * @throws QueryException query exception
@@ -65,12 +60,11 @@ public final class WebModule {
           final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
           if(rxf.parse(ctx)) functions.add(rxf);
           final WsFunction wxq = new WsFunction(sf, qc, this);
-          if(wxq.parse()) wsFunctions.add(wxq);
+          if(wxq.parse(ctx)) wsFunctions.add(wxq);
         }
       }
     }
-    // Check if seperate Method is here necessessary
-    return !functions.isEmpty() || !wsFunctions.isEmpty();
+    return !(functions.isEmpty() && wsFunctions.isEmpty());
   }
 
   /**
@@ -89,37 +83,11 @@ public final class WebModule {
   }
 
   /**
-   * Returns all functions.
+   * Returns all RESTXQ functions.
    * @return functions
    */
   public ArrayList<RestXqFunction> functions() {
     return functions;
-  }
-
-  /**
-   * Processes a RESTXQ request.
-   * @param conn HTTP connection
-   * @param func function to be processed
-   * @param ext extended processing information (function, error; can be {@code null})
-   * @return {@code true} if function creates no result
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   * @throws ServletException servlet exception
-   */
-  public boolean process(final HTTPConnection conn, final RestXqFunction func, final Object ext)
-      throws QueryException, IOException, ServletException {
-
-    // create new XQuery instance
-    final Context ctx = conn.context;
-    try(QueryContext qc = qc(ctx)) {
-      final StaticFunc sf = find(qc, func.function);
-      // will only happen if file has been swapped between caching and parsing
-      if(sf == null) throw HTTPCode.NO_XQUERY.get();
-
-      final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
-      rxf.parse(ctx);
-      return new RestXqResponse(rxf, qc, conn).create(ext);
-    }
   }
 
   /**
@@ -131,43 +99,12 @@ public final class WebModule {
   }
 
   /**
-   * Processes a WebSocket request.
-   * @param ws WebSocket
-   * @param func function to be processed
-   * @param message message (can be {@code null}; otherwise string or byte array)
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  public void process(final WsAdapter ws, final WsFunction func, final Object message)
-      throws QueryException, IOException {
-
-    final Context ctx = ws.context;
-    try(QueryContext qc = qc(ctx)) {
-      qc.putProperty(HTTPText.WEBSOCKET, ws);
-      final StaticFunc sf = find(qc, func.function);
-      // will only happen if file has been swapped between caching and parsing
-      if(sf == null) throw HTTPCode.NO_XQUERY.get();
-
-      final WsFunction wxf = new WsFunction(sf, qc, this);
-      wxf.parse();
-
-      final Expr[] args = new Expr[sf.params.length];
-      wxf.bind(args, qc, message, ws.headers);
-
-      qc.mainModule(MainModule.get(sf, args));
-      ws.response.create(ws, wxf, qc);
-    }
-  }
-
-  // PRIVATE METHODS ==============================================================================
-
-  /**
    * Retrieves a query context for the given module.
    * @param ctx database context
    * @return query context
    * @throws QueryException query exception
    */
-  private QueryContext qc(final Context ctx) throws QueryException {
+  public QueryContext qc(final Context ctx) throws QueryException {
     final QueryContext qc = new QueryContext(ctx);
     try {
       qc.parse(string(file.read()), file.path());
@@ -183,11 +120,13 @@ public final class WebModule {
    * @param qc query context.
    * @param func function to be found
    * @return function or {@code null}
+   * @throws HTTPException HTTP exception
    */
-  private static StaticFunc find(final QueryContext qc, final StaticFunc func) {
+  public StaticFunc find(final QueryContext qc, final StaticFunc func) throws HTTPException {
     for(final StaticFunc sf : qc.funcs.funcs()) {
       if(func.info.equals(sf.info)) return sf;
     }
-    return null;
+    // will only happen if file has been swapped between caching and parsing
+    throw HTTPCode.NO_XQUERY.get();
   }
 }

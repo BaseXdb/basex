@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 import javax.servlet.http.*;
@@ -14,7 +13,6 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
-import org.basex.http.ws.adapter.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -33,8 +31,6 @@ public final class WebModules {
   /** Singleton instance. */
   private static volatile WebModules instance;
 
-  /** Current parsing state (additionally used as mutex). */
-  private final AtomicBoolean parsed = new AtomicBoolean();
   /** RESTXQ path. */
   private final IOFile path;
   /** Indicates if modules should be parsed with every call. */
@@ -42,6 +38,8 @@ public final class WebModules {
 
   /** Module cache. */
   private HashMap<String, WebModule> modules = new HashMap<>();
+  /** Current parsing state. */
+  private boolean parsed;
   /** Last access. */
   private long last;
 
@@ -83,10 +81,8 @@ public final class WebModules {
   /**
    * Initializes the module cache.
    */
-  public void init() {
-    synchronized(parsed) {
-      parsed.set(false);
-    }
+  public synchronized void init() {
+    parsed = false;
   }
 
   /**
@@ -99,14 +95,14 @@ public final class WebModules {
   }
 
   /**
-   * Returns the function that matches the current request or the specified error code best.
+   * Returns a RESTXQ function that matches the current request or the specified error code best.
    * @param conn HTTP connection
    * @param error error code (assigned if error function is to be called)
    * @return function, or {@code null} if no function matches
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public RestXqFunction find(final HTTPConnection conn, final QNm error)
+  public RestXqFunction restxq(final HTTPConnection conn, final QNm error)
       throws QueryException, IOException {
 
     // collect all function candidates
@@ -126,29 +122,13 @@ public final class WebModules {
     if(funcs.size() == 1) return funcs.get(0);
 
     // show error if we are left with multiple function candidates
-    final TokenBuilder tb = new TokenBuilder();
-    for(final RestXqFunction func : funcs) {
-      tb.add(Text.NL).add(Text.LI).addExt(func.function.name.prefixString());
-      if(!func.produces.isEmpty()) tb.add(" ").addExt(func.produces);
-    }
     throw first.path == null ?
-      first.error(ERROR_CONFLICT_X_X, error, tb) :
-      first.error(PATH_CONFLICT_X_X, first.path, tb);
+      first.error(ERROR_CONFLICT_X_X, error, toString(funcs)) :
+      first.error(PATH_CONFLICT_X_X, first.path, toString(funcs));
   }
 
   /**
-   * Returns permission functions that match the current request.
-   * @param conn HTTP connection
-   * @return list of function, ordered by relevance
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  public List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
-    return find(conn, null, true);
-  }
-
-  /**
-   * Returns the RESTXQ functions that match the current request.
+   * Returns RESTXQ and permissions functions that match the current request.
    * @param conn HTTP connection
    * @param error error code (assigned if error function is to be called)
    * @param perm permission flag
@@ -159,16 +139,69 @@ public final class WebModules {
   private List<RestXqFunction> find(final HTTPConnection conn, final QNm error, final boolean perm)
       throws QueryException, IOException {
 
-    // collect all functions
+    // collect and sort all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final WebModule mod : cache(conn.context).values()) {
       for(final RestXqFunction func : mod.functions()) {
         if(func.matches(conn, error, perm)) list.add(func);
       }
     }
-    // sort by specifity
     Collections.sort(list);
     return list;
+  }
+
+  /**
+   * Returns permission functions that match the current request.
+   * @param conn HTTP connection
+   * @return list of function, ordered by relevance
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public List<RestXqFunction> checks(final HTTPConnection conn)
+      throws QueryException, IOException {
+    return find(conn, null, true);
+  }
+
+  /**
+   * Returns the WebSocket function that matches the current request.
+   * @param ws WebSocket
+   * @param ann annotation
+   * @return function, or {@code null} if no function matches
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public WsFunction websocket(final WebSocket ws, final Annotation ann)
+      throws QueryException, IOException {
+
+    // collect and sort all function candidates
+    final ArrayList<WsFunction> funcs = new ArrayList<>();
+    for(final WebModule mod : cache(ws.context).values()) {
+      for(final WsFunction func : mod.wsFunctions()) {
+        if(func.matches(ann, new WsPath(ws.getPath()))) funcs.add(func);
+      }
+    }
+    Collections.sort(funcs);
+
+    if(funcs.isEmpty()) return null;
+
+    final WsFunction first = funcs.get(0);
+    if(funcs.size() == 1) return first;
+
+    // show error if we are left with multiple function candidates
+    throw first.error(PATH_CONFLICT_X_X, first.path, toString(funcs));
+  }
+
+  /**
+   * Returns a string representation of the specified functions.
+   * @param funcs functions
+   * @return string
+   */
+  private String toString(final List<? extends WebFunction> funcs) {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final WebFunction func : funcs) {
+      tb.add(Text.NL).add(Text.LI).addExt(func);
+    }
+    return tb.toString();
   }
 
   /**
@@ -253,23 +286,23 @@ public final class WebModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private HashMap<String, WebModule> cache(final Context ctx) throws QueryException, IOException {
-    synchronized(parsed) {
-      if(!parsed.get()) {
-        if(!path.exists()) throw HTTPCode.NO_RESTXQ.get();
+  private synchronized HashMap<String, WebModule> cache(final Context ctx)
+      throws QueryException, IOException {
 
-        final HashMap<String, WebModule> map = new HashMap<>();
-        cache(ctx, path, map, modules);
-        modules = map;
-        parsed.set(cached);
-      }
-      last = System.currentTimeMillis();
-      return modules;
+    if(!parsed) {
+      if(!path.exists()) throw HTTPCode.NO_RESTXQ.get();
+
+      final HashMap<String, WebModule> map = new HashMap<>();
+      cache(ctx, path, map, modules);
+      modules = map;
+      parsed = cached;
     }
+    last = System.currentTimeMillis();
+    return modules;
   }
 
   /**
-   * Parses the specified path for RESTXQ modules and caches new entries.
+   * Parses the specified path for modules with relevant annotations and caches new entries.
    * @param root root path
    * @param ctx database context
    * @param cache cached modules
@@ -302,7 +335,7 @@ public final class WebModules {
             // create new module
             module = new WebModule(file);
           }
-          // add module if it has been parsed, and if it contains annotations
+          // add module if it has been parsed, and if it contains relevant annotations
           if(parsed || module.parse(ctx)) {
             module.touch();
             cache.put(path, module);
@@ -310,54 +343,5 @@ public final class WebModules {
         }
       }
     }
-  }
-
-  /**
-   * Returns the WebSocket function that matches the current request.
-   * @param ws WebSocket
-   * @param ann annotation
-   * @return function, or {@code null} if no function matches
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  public WsFunction find(final WsAdapter ws, final Annotation ann)
-      throws QueryException, IOException {
-
-    // collect all function candidates
-    final List<WsFunction> funcs = findWsFunctions(ws, ann);
-    if(funcs.isEmpty()) return null;
-
-    final WsFunction first = funcs.get(0);
-    if(funcs.size() == 1) return first;
-
-    // show error if we are left with multiple function candidates
-    final TokenBuilder tb = new TokenBuilder();
-    for(final WsFunction func : funcs) {
-      tb.add(Text.NL).add(Text.LI).addExt(func.function.name.prefixString());
-    }
-    throw first.error(PATH_CONFLICT_X_X, first.path, tb);
-  }
-
-  /**
-   * Returns the functions that match the current request.
-   * @param ws WebSocket
-   * @param ann Annotation
-   * @return list of matching functions, ordered by specifity
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  private List<WsFunction> findWsFunctions(final WsAdapter ws, final Annotation ann)
-      throws QueryException, IOException {
-
-    // collect all functions
-    final ArrayList<WsFunction> list = new ArrayList<>();
-    for(final WebModule mod : cache(ws.context).values()) {
-      for(final WsFunction func : mod.wsFunctions()) {
-        if(func.matches(ann, new WsPath(ws.getPath()))) list.add(func);
-      }
-    }
-    // sort by specifity
-    Collections.sort(list);
-    return list;
   }
 }

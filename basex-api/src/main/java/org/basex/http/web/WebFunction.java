@@ -3,9 +3,11 @@ package org.basex.http.web;
 import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -22,9 +24,10 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-public abstract class WebFunction {
+public abstract class WebFunction implements Comparable<WebFunction> {
   /** Single template pattern. */
   protected static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
+
   /** Associated function. */
   public final StaticFunc function;
   /** Serialization parameters. */
@@ -40,20 +43,21 @@ public abstract class WebFunction {
    * @param qc query context
    * @param module web module
    */
-  protected WebFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
+  protected WebFunction(final StaticFunc function, final WebModule module, final QueryContext qc) {
     this.function = function;
-    output = qc.serParams();
     this.module = module;
+    output = qc.serParams();
   }
 
   /**
-   * Returns the specified item as a string.
-   * @param item item
-   * @return string
+   * Checks a function for REST and permission annotations. This function is called both
+   * when a module is parsed, and when the function is prepared for evaluation.
+   * @param ctx database context
+   * @return {@code true} if function contains relevant annotations
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected static String toString(final Item item) {
-    return ((Str) item).toJava();
-  }
+  public abstract boolean parse(Context ctx) throws QueryException, IOException;
 
   /**
    * Creates an exception with the specified message.
@@ -136,5 +140,19 @@ public abstract class WebFunction {
         break;
       }
     }
+  }
+
+  /**
+   * Returns the specified item as a string.
+   * @param item item
+   * @return string
+   */
+  protected static String toString(final Item item) {
+    return ((Str) item).toJava();
+  }
+
+  @Override
+  public String toString() {
+    return Token.string(function.name.prefixString());
   }
 }

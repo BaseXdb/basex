@@ -41,25 +41,24 @@ public final class RestXqServlet extends BaseXServlet {
     }
 
     // select the closest match for this request
-    RestXqFunction func = modules.find(conn, null);
+    RestXqFunction func = modules.restxq(conn, null);
     if(func == null) throw HTTPCode.NO_XQUERY.get();
 
+    final RestXqResponse response = new RestXqResponse(conn);
     try {
-      boolean valid = true;
       for(final RestXqFunction check : modules.checks(conn)) {
-        if(!check.process(conn, func)) {
-          valid = false;
-          break;
-        }
+        // skip further checks if function results a result
+        if(response.create(check, func)) return;
       }
 
       // process function
-      if(valid) func.process(conn, null);
+      response.create(func, null);
+
     } catch(final QueryException ex) {
       // run optional error function
-      func = modules.find(conn, ex.qname());
+      func = modules.restxq(conn, ex.qname());
       if(func == null) throw ex;
-      func.process(conn, ex);
+      response.create(func, ex);
     }
   }
 

@@ -1,4 +1,4 @@
-package org.basex.http.ws.adapter;
+package org.basex.http.ws;
 
 import static org.basex.http.web.WebText.*;
 
@@ -10,46 +10,45 @@ import javax.servlet.http.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
-import org.basex.http.ws.*;
-import org.basex.http.ws.response.*;
 import org.basex.query.ann.*;
 import org.basex.server.*;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
- * This class defines an abstract WebSocket adapter. It inherits the Jetty WebSocket adapter.
+ * This class defines an abstract WebSocket. It inherits the Jetty WebSocket adapter.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
-  /** Servlet request. */
-  protected final HttpServletRequest req;
-  /** Path. */
-  protected final WsPath path;
-
+public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** Database context. */
   public final Context context;
-  /** HTTP Session. */
-  public HttpSession httpsession;
+
+  /** Header parameters. */
+  final Map<String, String> headers = new HashMap<>();
+  /** Servlet request. */
+  final HttpServletRequest req;
+
   /** Client WebSocket id. */
   public String id;
-  /** Response serializer. */
-  public WsResponse response;
-  /** Header parameters. */
-  public final Map<String, String> headers = new HashMap<>();
+  /** HTTP Session. */
+  public HttpSession session;
+
+  /** Path. */
+  private final WsPath path;
 
   /**
    * Constructor.
    * @param req request
    */
-  protected WsAdapter(final HttpServletRequest req) {
+  WebSocket(final HttpServletRequest req) {
     this.req = req;
+
     final String pi = req.getPathInfo();
     this.path = new WsPath(pi != null ? pi : "/");
-    response = new StandardWsResponse();
-    httpsession = req.getSession();
+    session = req.getSession();
 
     final Context ctx = HTTPContext.context();
     context = new Context(ctx, this);
@@ -66,22 +65,18 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public void onWebSocketConnect(final Session sess) {
-    context.log.write(WS_ADAPTER_CONNECT, sess.toString(), null, context);
     super.onWebSocketConnect(sess);
 
-    final UpgradeRequest ur = sess.getUpgradeRequest();
-    final WsPool pool = WsPool.get();
-    try {
-      id = pool.join(this);
-    } catch (IllegalStateException ex) {
-      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
-    }
+    // [JF] We’ll need to check which log messages will be the most sensible ones
+    context.log.write(LogType.REQUEST, sess.toString(), null, context);
+    id = WsPool.get().add(this);
 
+    // add headers (for binding them to the XQuery parameters in the corresponding bind method)
+    final UpgradeRequest ur = sess.getUpgradeRequest();
     final BiConsumer<String, String> addHeader = (k, v) -> {
       if(v != null) headers.put(k, v);
     };
 
-    // add headers (for binding them to the XQuery parameters in the corresponding bind method)
     addHeader.accept("Http-Version", ur.getHttpVersion());
     addHeader.accept("Origin", ur.getOrigin());
     addHeader.accept("Protocol-version", ur.getProtocolVersion());
@@ -103,29 +98,42 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
    */
   @Override
   public void onWebSocketError(final Throwable cause) {
-    context.log.write(WS_ADAPTER_ERROR, cause.getMessage(), null, context);
-    findAndProcess(Annotation._WS_ERROR, cause.toString());
-    super.getSession().close();
-    removeWebSocket();
+    // [JF] as super.onWebSocketError() does nothing...
+    // can we be sure that a connection will always be closed after an error?
+    try {
+      context.log.write(LogType.ERROR, cause.getMessage(), null, context);
+      findAndProcess(Annotation._WS_ERROR, cause.toString());
+    } finally {
+      WsPool.get().remove(id);
+      super.getSession().close();
+    }
   }
 
   @Override
-  public void onWebSocketClose(final int statusCode, final String reason) {
-    context.log.write(WS_ADAPTER_CLOSE, reason, null, context);
-    findAndProcess(Annotation._WS_CLOSE, null);
-    super.onWebSocketClose(statusCode, reason);
-    removeWebSocket();
+  public void onWebSocketClose(final int status, final String message) {
+    try {
+      context.log.write(Integer.toString(status), message, null, context);
+      findAndProcess(Annotation._WS_CLOSE, null);
+    } finally {
+      WsPool.get().remove(id);
+      super.onWebSocketClose(status, message);
+    }
   }
 
-  /**
-   * Removes the WebSocket from the pool. Removes it from all channels in the pool as well.
-   */
-  protected abstract void removeWebSocket();
+  @Override
+  public void onWebSocketText(final String message) {
+    findAndProcess(Annotation._WS_MESSAGE, message);
+  }
+
+  @Override
+  public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
+    findAndProcess(Annotation._WS_MESSAGE, payload);
+  }
 
   @Override
   public String clientAddress() {
-    Session session = getSession();
-    return session != null ? session.getRemoteAddress().toString() : null;
+    final Session ws = getSession();
+    return ws != null ? ws.getRemoteAddress().toString() : null;
   }
 
   @Override
@@ -138,25 +146,24 @@ public abstract class WsAdapter extends WebSocketAdapter implements ClientInfo {
    * @param ann annotation
    * @param message message (can be {@code null}; otherwise string or byte array)
    */
-  protected void findAndProcess(final Annotation ann, final Object message) {
+  private void findAndProcess(final Annotation ann, final Object message) {
+    // check if an HTTP session exists, and if it still valid
     try {
-      if(httpsession != null) httpsession.getCreationTime();
-    } catch (IllegalStateException ex) {
-      httpsession = null;
+      if(session != null) session.getCreationTime();
+    } catch(final IllegalStateException ex) {
+      session = null;
     }
 
     try {
-      final WebModules modules = WebModules.get(context);
-      final WsFunction func = modules.find(this, ann);
-      if(func == null) throw new Exception(Util.info(WS_MISSING_X, ann));
-      else if(response != null) func.process(this, message);
+      final WsFunction func = WebModules.get(context).websocket(this, ann);
+      // [JF] I am wondering if we should really enforce the implementation of all functions?
+      //  for example, there may be no need to do something if a client connects or says goodbye
+      if(func == null) throw new WebSocketException(Util.info(WS_MISSING_X, ann));
+      new WsResponse(this).create(func, message);
     } catch(final RuntimeException ex) {
       throw ex;
     } catch(final Exception ex) {
       Util.debug(ex);
-      // [JF] Alternative for raising error by ourselves: throw new RuntimeException(ex);
-      // Close exception with status code abnormal (not send/recieve by WebsocketClose)
-      // --> gets logged in console too!
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
     }
   }
