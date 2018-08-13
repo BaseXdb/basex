@@ -69,7 +69,7 @@ public final class Websocket extends QueryModule {
    */
   public void send(final Item message, final Value ids) throws QueryException, IOException {
     final StringList list = new StringList();
-    for(final Item id : ids) list.add(id.toString());
+    for(final Item id : ids) list.add(id.toString().replace("\"", ""));
     pool().send(message, list.finish());
   }
 
