@@ -3,7 +3,7 @@
  :
  : @author Christian Grün, BaseX Team, 2014-18
  :)
-module namespace dba = 'dba/databases';
+module namespace dba = 'dba/logs';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';

@@ -1,9 +1,9 @@
 (:~
- : Edit database.
+ : Edit user.
  :
  : @author Christian Grün, BaseX Team, 2014-18
  :)
-module namespace dba = 'dba/databases';
+module namespace dba = 'dba/users';
 
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 

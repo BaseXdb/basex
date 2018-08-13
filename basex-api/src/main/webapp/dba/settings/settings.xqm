@@ -33,7 +33,7 @@ function dba:settings(
     <tr>
       <td width='32%'>
         <form action="settings" method="post">
-          <h2>Settings » <button>Save</button></h2>
+          <h2>Settings » { html:button('save', 'Save') }</h2>
           <h3>Querying</h3>
           <table>
             {
@@ -62,10 +62,12 @@ function dba:settings(
       </td>
       <td class='vertical'/>
       <td width='32%'>
-        <h2>Global Options</h2>
-        <table>{
-          $system/tr[th][3]/preceding-sibling::tr[not(th)]
-        }</table>
+        <form action="settings-gc" method="post">
+          <h2>Global Options » { html:button('gc', 'GC') }</h2>
+          <table>{
+            $system/tr[th][3]/preceding-sibling::tr[not(th)]
+          }</table>
+        </form>
       </td>
       <td class='vertical'/>
       <td width='32%'>
