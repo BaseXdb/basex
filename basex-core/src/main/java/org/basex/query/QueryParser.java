@@ -412,7 +412,9 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(PAREN1)) {
           do {
             final Expr ex = literal();
-            if(!(ex instanceof Item)) throw error(ANNVALUE);
+            if(!(ex instanceof Item)) {
+              throw ex instanceof FnError ? ((FnError) ex).error(qc) : error(ANNVALUE);
+            }
             items.add((Item) ex);
           } while(wsConsumeWs(COMMA));
           wsCheck(PAREN2);
@@ -536,16 +538,15 @@ public class QueryParser extends InputParser {
       if(module != null) throw error(BASEX_OPTIONS3_X, qnm.local());
       qc.options.add(name, value, this);
 
-    } else if(eq(qnm.uri(), QUERY_URI)) {
+      // legacy: query prefix and uri will disappear in future version
+    } else if(eq(qnm.uri(), BASEX_URI) || eq(qnm.uri(), QUERY_URI)) {
       // query-specific options
       switch(name) {
         case READ_LOCK:
-          for(final byte[] lock : split(value, ','))
-            qc.readLocks.add(Locking.USER_PREFIX + string(lock).trim());
+          for(final String lock : Locking.queryLocks(value)) qc.readLocks.add(lock);
           break;
         case WRITE_LOCK:
-          for(final byte[] lock : split(value, ','))
-            qc.writeLocks.add(Locking.USER_PREFIX + string(lock).trim());
+          for(final String lock : Locking.queryLocks(value)) qc.writeLocks.add(lock);
           break;
         default:
           throw error(BASEX_OPTIONS1_X, name);

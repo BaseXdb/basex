@@ -75,7 +75,7 @@ public class DbList extends DbFn {
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
-      if(!visitor.lock(null)) return false;
+      if(!visitor.lock(null, false)) return false;
     } else {
       if(!dataLock(visitor, 0)) return false;
     }

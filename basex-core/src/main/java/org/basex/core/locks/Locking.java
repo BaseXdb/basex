@@ -1,6 +1,7 @@
 package org.basex.core.locks;
 
 import static org.basex.util.Prop.*;
+import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -9,6 +10,7 @@ import java.util.concurrent.locks.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Read and write locks on arbitrary strings.
@@ -30,11 +32,11 @@ import org.basex.util.*;
  */
 public final class Locking {
   /** Prefix for internal special locks. */
-  public static final String PREFIX = "%";
-  /** Prefix for user defined locks. */
-  public static final String USER_PREFIX = "+";
+  public static final String PREFIX = "I/";
+  /** Prefix for query locks. */
+  public static final String QUERY_PREFIX = "Q/";
   /** Prefix for locks in Java modules. */
-  public static final String MODULE_PREFIX = "&";
+  public static final String JAVA_PREFIX = "J/";
 
   /** Special lock identifier for database opened in current context; will be substituted. */
   public static final String CONTEXT = PREFIX + "CONTEXT";
@@ -204,6 +206,21 @@ public final class Locking {
       return lock;
     }
   }
+
+  /**
+   * Returns query lock keys.
+   * @param string string with lock keys
+   * @return locks
+   */
+  public static String[] queryLocks(final byte[] string) {
+    final StringList list = new StringList();
+    for(final byte[] lock : split(string, ',')) {
+      list.add(QUERY_PREFIX + string(lock).trim());
+    }
+    if(list.isEmpty()) list.add(QUERY_PREFIX);
+    return list.finish();
+  }
+
 
   @Override
   public String toString() {

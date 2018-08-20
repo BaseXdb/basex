@@ -83,7 +83,7 @@ public final class Root extends Simple {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(Locking.CONTEXT);
+    return visitor.lock(Locking.CONTEXT, false);
   }
 
   @Override

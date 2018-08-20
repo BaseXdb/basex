@@ -332,7 +332,7 @@ public final class RestXqFunction extends WebFunction {
   }
 
   /**
-   * Add a HTTP method to the list of supported methods by this RESTXQ function.
+   * Adds an HTTP method to the list of supported methods by this RESTXQ function.
    * @param method HTTP method as a string
    * @param body variable to which the HTTP request body to be bound (optional)
    * @param declared variable declaration flags
@@ -342,7 +342,7 @@ public final class RestXqFunction extends WebFunction {
   private void addMethod(final String method, final Item body, final boolean[] declared,
       final InputInfo info) throws QueryException {
 
-    if(body != null && !body.isEmpty()) {
+    if(body != null) {
       final HttpMethod m = HttpMethod.get(method);
       if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
       if(requestBody != null) throw error(info, ANN_BODYVAR);
@@ -408,7 +408,7 @@ public final class RestXqFunction extends WebFunction {
    * @param list list to add values to
    */
   private static void strings(final Ann ann, final ArrayList<MediaType> list) {
-    for(final Item item : ann.args()) list.add(new MediaType(toString(item)));
+    for(final Item arg : ann.args()) list.add(new MediaType(toString(arg)));
   }
 
   /**

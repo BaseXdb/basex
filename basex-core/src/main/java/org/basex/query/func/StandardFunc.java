@@ -482,7 +482,8 @@ public abstract class StandardFunc extends Arr {
    * @return result of check
    */
   protected final boolean dataLock(final ASTVisitor visitor, final int i) {
-    return visitor.lock(exprs[i] instanceof Str ? string(((Str) exprs[i]).string()) : null);
+    final String db = exprs[i] instanceof Str ? string(((Str) exprs[i]).string()) : null;
+    return visitor.lock(db, false);
   }
 
   @Override

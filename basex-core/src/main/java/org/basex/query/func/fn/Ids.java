@@ -139,6 +139,6 @@ abstract class Ids extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (exprs.length != 1 || visitor.lock(Locking.CONTEXT)) && super.accept(visitor);
+    return (exprs.length != 1 || visitor.lock(Locking.CONTEXT, false)) && super.accept(visitor);
   }
 }

@@ -80,6 +80,12 @@ public final class Extension extends Single {
   }
 
   @Override
+  public boolean accept(final ASTVisitor visitor) {
+    pragma.accept(visitor);
+    return super.accept(visitor);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof Extension &&
         pragma.equals(((Extension) obj).pragma) && super.equals(obj);

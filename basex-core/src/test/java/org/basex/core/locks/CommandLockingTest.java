@@ -47,8 +47,8 @@ public final class CommandLockingTest extends SandboxTest {
   private static final LockList BACKUP_NAME =
       new LockList().add(Locking.BACKUP).add(NAME);
   /** StringList containing java module test lock strings. */
-  private static final LockList MODULE_LIST = new LockList().add(Locking.MODULE_PREFIX
-      + QueryModuleTest.LOCK1).add(Locking.MODULE_PREFIX + QueryModuleTest.LOCK2);
+  private static final LockList MODULE_LIST = new LockList().add(Locking.JAVA_PREFIX
+      + QueryModuleTest.LOCK1).add(Locking.JAVA_PREFIX + QueryModuleTest.LOCK2);
 
   /**
    * Test commands affecting databases.

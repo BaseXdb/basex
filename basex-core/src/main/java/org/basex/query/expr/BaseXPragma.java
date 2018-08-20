@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
+import org.basex.core.locks.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -37,6 +39,15 @@ public final class BaseXPragma extends Pragma {
   @Override
   public boolean has(final Flag... flags) {
     return Flag.NDT.in(flags) && ndt;
+  }
+
+  @Override
+  public void accept(final ASTVisitor visitor) {
+    final byte[] nm = name.local();
+    final boolean read = Token.eq(nm, Annotation._BASEX_READ_LOCK.local());
+    final boolean write = Token.eq(nm, Annotation._BASEX_WRITE_LOCK.local());
+    if(!(read || write)) return;
+    for(final String lock : Locking.queryLocks(value)) visitor.lock(lock, write);
   }
 
   @Override

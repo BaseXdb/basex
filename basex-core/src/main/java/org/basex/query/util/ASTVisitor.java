@@ -88,10 +88,11 @@ public abstract class ASTVisitor {
    * Notifies the visitor of a database lock. Overwritten by {@link MainModule}.
    * Returns {@code false} if database lock cannot be statically detected.
    * @param db database to be locked ({@code null} if unknown)
+   * @param up updating flag
    * @return if more expressions should be visited ({@code true} by default)
    */
   @SuppressWarnings("unused")
-  public boolean lock(final String db) {
+  public boolean lock(final String db, final boolean up) {
     return true;
   }
 

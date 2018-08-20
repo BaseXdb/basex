@@ -45,7 +45,7 @@ public final class Flt extends ANum {
   }
 
   @Override
-  protected byte[] string() {
+  public byte[] string() {
     return Token.token(value);
   }
 

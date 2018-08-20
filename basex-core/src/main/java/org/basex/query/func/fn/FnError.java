@@ -24,8 +24,7 @@ public final class FnError extends StandardFunc {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        error(qc);
-        return null;
+        throw error(qc);
       }
     };
   }
@@ -58,17 +57,18 @@ public final class FnError extends StandardFunc {
   /**
    * Raises an error.
    * @param qc query context
+   * @return query exception
    * @throws QueryException query exception
    */
-  private void error(final QueryContext qc) throws QueryException {
+  public QueryException error(final QueryContext qc) throws QueryException {
     final int al = exprs.length;
-    if(al == 0) throw FUNERR1.get(info);
+    if(al == 0) return FUNERR1.get(info);
 
     QNm name = toQNm(exprs[0], qc, true);
     if(name == null) name = FUNERR1.qname();
 
     final String msg = al > 1 ? Token.string(toToken(exprs[1], qc)) : FUNERR1.desc;
     final Value value = al > 2 ? exprs[2].value(qc) : null;
-    throw new QueryException(info, name, msg).value(value);
+    return new QueryException(info, name, msg).value(value);
   }
 }

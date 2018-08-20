@@ -54,6 +54,10 @@ public final class DBPragma extends Pragma {
   }
 
   @Override
+  public void accept(final ASTVisitor visitor) {
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof DBPragma && option.equals(((DBPragma) obj).option) &&
         super.equals(obj);

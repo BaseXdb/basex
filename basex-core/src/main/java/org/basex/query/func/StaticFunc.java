@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -265,6 +266,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
+    for(final Ann ann : anns) {
+      final boolean write = ann.sig == Annotation._BASEX_WRITE_LOCK;
+      if(!(write || ann.sig == Annotation._BASEX_READ_LOCK)) continue;
+      for(final Item arg : ann.args()) {
+        for(final String lock : Locking.queryLocks(((Str) arg).string())) visitor.lock(lock, write);
+      }
+    }
+
     for(final Var var : params) {
       if(!visitor.declared(var)) return false;
     }

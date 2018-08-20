@@ -155,12 +155,12 @@ public final class MainModule extends Module {
 
   /**
    * Adds the names of the databases that may be touched by the module.
-   * @param lr lock result
+   * @param locks lock result
    * @param qc query context
    * @return result of check
    */
-  public boolean databases(final Locks lr, final QueryContext qc) {
-    return expr.accept(new LockVisitor(lr, qc));
+  public boolean databases(final Locks locks, final QueryContext qc) {
+    return expr.accept(new LockVisitor(locks, qc));
   }
 
   /**
@@ -171,26 +171,31 @@ public final class MainModule extends Module {
     /** Already visited scopes. */
     private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
     /** Reference to process list of locked databases. */
-    private final LockList locks;
+    private final Locks locks;
+    /** Updating flag. */
+    private final boolean updating;
     /** Focus level. */
     private int level;
 
     /**
      * Constructor.
-     * @param lr lock result
+     * @param locks lock result
      * @param qc query context
      */
-    private LockVisitor(final Locks lr, final QueryContext qc) {
-      locks = qc.updating ? lr.writes : lr.reads;
+    private LockVisitor(final Locks locks, final QueryContext qc) {
+      this.locks = locks;
+      updating = qc.updating;
       level = qc.ctxItem == null ? 0 : 1;
     }
 
     @Override
-    public boolean lock(final String db) {
+    public boolean lock(final String db, final boolean up) {
       // name is unknown at compile time: return false
       if(db == null) return false;
       // if context item is found on top level, it will refer to currently opened database
-      if(level == 0 || db != Locking.CONTEXT) locks.add(db);
+      if(level == 0 || db != Locking.CONTEXT) {
+        (updating || up ? locks.writes : locks.reads).add(db);
+      }
       return true;
     }
 
@@ -231,14 +236,14 @@ public final class MainModule extends Module {
 
     /**
      * Visits a scope.
-     * @param scp scope
+     * @param scope scope
      * @return if more expressions should be visited
      */
-    private boolean func(final Scope scp) {
-      if(funcs.containsKey(scp)) return true;
-      funcs.put(scp, null);
+    private boolean func(final Scope scope) {
+      if(funcs.containsKey(scope)) return true;
+      funcs.put(scope, null);
       enterFocus();
-      final boolean ac = scp.visit(this);
+      final boolean ac = scope.visit(this);
       exitFocus();
       return ac;
     }

@@ -70,7 +70,7 @@ public final class ContextValue extends Simple {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(Locking.CONTEXT) && super.accept(visitor);
+    return visitor.lock(Locking.CONTEXT, false) && super.accept(visitor);
   }
 
   @Override

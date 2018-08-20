@@ -66,17 +66,17 @@ public abstract class Docs extends StandardFunc {
   public final boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
       // lock default collection (only collection functions can have 0 arguments)
-      visitor.lock(Locking.COLLECTION);
+      visitor.lock(Locking.COLLECTION, false);
     } else {
       // check if input argument is a static string
       final Expr expr = exprs[0];
       if(expr instanceof Str) {
         // add local lock if argument may reference a database
         queryInput = queryInput(((Str) expr).string());
-        if(queryInput != null) visitor.lock(queryInput.dbName);
+        if(queryInput != null) visitor.lock(queryInput.dbName, false);
       } else if(expr != Empty.SEQ) {
         // otherwise, database cannot be locked statically
-        if(!visitor.lock(null)) return false;
+        if(!visitor.lock(null, false)) return false;
       }
     }
     return super.accept(visitor);

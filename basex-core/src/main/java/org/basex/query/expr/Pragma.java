@@ -52,6 +52,13 @@ public abstract class Pragma extends ExprInfo {
   abstract void finish(QueryContext qc, Object state);
 
   /**
+   * Traverses this expression, notifying the visitor of declared and used variables,
+   * and checking the tree for other recursive properties.
+   * @param visitor visitor
+   */
+  abstract void accept(ASTVisitor visitor);
+
+  /**
    * Indicates if an expression has one of the specified compiler properties.
    * @param flags flag to be checked
    * @return result of check
