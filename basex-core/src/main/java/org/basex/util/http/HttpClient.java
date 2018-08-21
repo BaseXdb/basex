@@ -28,13 +28,13 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.HttpRequest.*;
 import org.basex.util.options.Options.*;
-import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
 /**
  * HTTP Client.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Rositsa Shadura
+ * @author Michael Seiferle
  */
 public final class HttpClient {
   /** Input information. */
@@ -156,17 +156,38 @@ public final class HttpClient {
     final URLConnection uc = new IOUrl(url).connection();
     if(!(uc instanceof HttpURLConnection)) throw HC_ERROR_X.get(info, "Invalid URL: " + url);
 
-    final HttpURLConnection conn = (HttpURLConnection) uc;
+    HttpURLConnection conn = (HttpURLConnection) uc;
     final String method = request.attribute(METHOD);
     if(method != null) {
       try {
-        setRequestMethod(conn, method);
-      }
-         catch(final Exception ex) {
-          // dump new exception, return original exception
-          Util.debug(ex);
+        conn.setRequestMethod(method);
+      } catch(final ProtocolException ex) {
+        // method is not supported: try to inject method to circumvent check
+        try {
+          Class<?> clzz = conn.getClass();
+          try {
+            // implementation with delegator (sun.net.www.protocol.https.HttpsURLConnectionImpl)
+            // get actual connection
+            final Field f = clzz.getDeclaredField("delegate");
+            f.setAccessible(true);
+            conn = (HttpURLConnection) f.get(conn);
+            clzz = conn.getClass();
+          } catch(final Throwable ignore) {
+            // ignore error: dump exception if debug is enabled
+            Util.debug(ignore);
+          }
+
+          // assign request method
+          while(clzz != HttpURLConnection.class) clzz = clzz.getSuperclass();
+          final Field f = clzz.getDeclaredField("method");
+          f.setAccessible(true);
+          f.set(conn, method);
+        } catch(final Throwable ignore) {
+          // ignore error: dump exception if debug is enabled, return original exception
+          Util.debug(ignore);
           throw ex;
         }
+      }
       conn.setDoOutput(true);
 
       final String timeout = request.attribute(TIMEOUT);
@@ -181,30 +202,6 @@ public final class HttpClient {
       request.headers.forEach(conn::addRequestProperty);
     }
     return conn;
-  }
-
-  /**
-   * Sets the request method.
-   * For HTTPS connections the method must be set via its delegate.
-   * @param conn connection
-   * @param method method
-   */
-  private void setRequestMethod(final HttpURLConnection conn, final String method) {
-    try {
-      final Object target;
-      if (conn instanceof HttpsURLConnectionImpl) {
-        final Field delegate = HttpsURLConnectionImpl.class.getDeclaredField("delegate");
-        delegate.setAccessible(true);
-        target = delegate.get(conn);
-      } else {
-        target = conn;
-      }
-      final Field f = HttpURLConnection.class.getDeclaredField("method");
-      f.setAccessible(true);
-      f.set(target, method);
-    } catch (IllegalAccessException | NoSuchFieldException ex) {
-      throw new AssertionError(ex);
-    }
   }
 
   /**
