@@ -116,6 +116,21 @@ public final class UtilModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test
+  public void or() {
+    final Function func = Function._UTIL_OR;
+    query(func.args(1, 2), 1);
+    query(func.args(" <x/>", 2), "<x/>");
+    query(func.args(" (1 to 2)[. = 1]", 2), 1);
+    // test if second branch will be evaluated
+    query(func.args(" (1 to 2)[. != 0]", " (1 to 1000000000000)[. != 0]"), "1\n2");
+
+    query(func.args(" ()", 2), 2);
+    query(func.args(" ()", " <x/>"), "<x/>");
+    query(func.args(" (1 to 2)[. = 0]", " <x/>"), "<x/>");
+  }
+
+  /** Test method. */
+  @Test
   public void replicate() {
     final Function func = _UTIL_REPLICATE;
     final String name = Util.className(func.clazz);

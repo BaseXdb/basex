@@ -1326,6 +1326,8 @@ public enum Function {
   /** XQuery function. */
   _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
   /** XQuery function. */
+  _UTIL_OR(UtilOr.class, "or(items,default)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_REPLICATE(UtilReplicate.class, "replicate(items,count)",
       arg(ITEM_ZM, ITR_O), ITEM_ZM, UTIL_URI),
 
