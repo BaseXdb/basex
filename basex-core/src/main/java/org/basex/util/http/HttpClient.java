@@ -28,6 +28,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.HttpRequest.*;
 import org.basex.util.options.Options.*;
+import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
 /**
  * HTTP Client.
@@ -159,21 +160,13 @@ public final class HttpClient {
     final String method = request.attribute(METHOD);
     if(method != null) {
       try {
-        conn.setRequestMethod(method);
-      } catch(final ProtocolException ex) {
-        try {
-          // set field via reflection to circumvent string check
-          Class<?> c = conn.getClass();
-          while(c != HttpURLConnection.class) c = c.getSuperclass();
-          final Field f = c.getDeclaredField("method");
-          f.setAccessible(true);
-          f.set(conn, method);
-        } catch(final Throwable th) {
+        setRequestMethod(conn, method);
+      }
+         catch(final Exception ex) {
           // dump new exception, return original exception
-          Util.debug(th);
+          Util.debug(ex);
           throw ex;
         }
-      }
       conn.setDoOutput(true);
 
       final String timeout = request.attribute(TIMEOUT);
@@ -188,6 +181,30 @@ public final class HttpClient {
       request.headers.forEach(conn::addRequestProperty);
     }
     return conn;
+  }
+
+  /**
+   * Sets the request method.
+   * For HTTPS connections the method must be set via its delegate.
+   * @param conn connection
+   * @param method method
+   */
+  private void setRequestMethod(final HttpURLConnection conn, final String method) {
+    try {
+      final Object target;
+      if (conn instanceof HttpsURLConnectionImpl) {
+        final Field delegate = HttpsURLConnectionImpl.class.getDeclaredField("delegate");
+        delegate.setAccessible(true);
+        target = delegate.get(conn);
+      } else {
+        target = conn;
+      }
+      final Field f = HttpURLConnection.class.getDeclaredField("method");
+      f.setAccessible(true);
+      f.set(target, method);
+    } catch (IllegalAccessException | NoSuchFieldException ex) {
+      throw new AssertionError(ex);
+    }
   }
 
   /**
