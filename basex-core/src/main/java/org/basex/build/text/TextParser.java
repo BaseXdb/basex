@@ -1,5 +1,6 @@
 package org.basex.build.text;
 
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -30,6 +31,8 @@ public final class TextParser extends SingleParser {
   private final boolean lines;
   /** Encoding. */
   private final String encoding;
+  /** Current line. */
+  private int line;
 
   /**
    * Constructor.
@@ -62,5 +65,10 @@ public final class TextParser extends SingleParser {
     }
     if(!lines) builder.text(tb.finish());
     builder.closeElem();
+  }
+
+  @Override
+  public String detailedInfo() {
+    return Util.info(LINE_X, line);
   }
 }

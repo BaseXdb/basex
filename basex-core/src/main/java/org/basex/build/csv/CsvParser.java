@@ -18,6 +18,8 @@ import org.basex.io.*;
 public final class CsvParser extends SingleParser {
   /** CSV Parser options. */
   private final CsvParserOptions copts;
+  /** CSV Builder. */
+  private CsvBuilder csv;
 
   /**
    * Constructor.
@@ -41,10 +43,21 @@ public final class CsvParser extends SingleParser {
 
   @Override
   protected void parse() throws IOException {
+    csv = pushJob(new CsvBuilder(copts, builder));
     try {
-      pushJob(new CsvBuilder(copts, builder)).convert(source);
+      csv.convert(source);
     } finally {
       popJob();
     }
+  }
+
+  @Override
+  public String detailedInfo() {
+    return csv != null ? csv.detailedInfo() : super.detailedInfo();
+  }
+
+  @Override
+  public double progressInfo() {
+    return csv != null ? csv.progressInfo() : super.progressInfo();
   }
 }
