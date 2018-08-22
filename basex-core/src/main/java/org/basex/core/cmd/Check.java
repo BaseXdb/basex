@@ -31,7 +31,9 @@ public final class Check extends Command {
     Close.close(context);
 
     // input (can be path or XML string)
-    final String input = args[0];
+    final String input = args[0].trim();
+    if(input.isEmpty()) return true;
+
     // get path and database name, overwrite database name with generated name
     final IO io = IO.get(input);
     final String dbName = io.dbName();
