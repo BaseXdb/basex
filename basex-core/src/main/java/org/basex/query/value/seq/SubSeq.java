@@ -73,8 +73,8 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  public void cache(final InputInfo info) throws QueryException {
-    for(long i = 0; i < size; i++) itemAt(i).cache(info);
+  public void cache(final InputInfo info, final boolean lazy) throws QueryException {
+    for(long i = 0; i < size; i++) itemAt(i).cache(info, lazy);
   }
 
   @Override

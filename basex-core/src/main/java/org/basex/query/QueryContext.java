@@ -634,7 +634,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // use standard iterator
     while((item = next(iter)) != null && items.size() < mx) {
-      item.cache(null);
+      item.cache(null, false);
       items.add(item);
     }
     return items.value();

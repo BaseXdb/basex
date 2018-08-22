@@ -24,6 +24,8 @@ public final class StrLazy extends AStr implements Lazy {
   private final QueryError error;
   /** Validation flag. */
   private final boolean validate;
+  /** Caching flag. */
+  private boolean cache;
 
   /**
    * Constructor.
@@ -53,8 +55,32 @@ public final class StrLazy extends AStr implements Lazy {
 
   @Override
   public BufferInput input(final InputInfo info) throws QueryException {
-    if(isCached()) return super.input(info);
+    if(cache) cache(info);
+    return isCached() ? super.input(info) : get(info);
+  }
 
+  @Override
+  public void cache(final InputInfo info, final  boolean lazy) throws QueryException {
+    if(lazy) cache = true;
+    else cache(info);
+  }
+
+  @Override
+  public void cache(final InputInfo info) throws QueryException {
+    try {
+      if(!isCached()) value = get(info).content();
+    } catch(final IOException ex) {
+      throw error.get(info, ex);
+    }
+  }
+
+  /**
+   * Returns an input stream for the item.
+   * @param info input info
+   * @return stream
+   * @throws QueryException query exception
+   */
+  private BufferInput get(final InputInfo info) throws QueryException {
     TextInput ti = null;
     try {
       ti = new TextInput(input);
@@ -62,15 +88,6 @@ public final class StrLazy extends AStr implements Lazy {
       return ti;
     } catch(final IOException ex) {
       if(ti != null) try { ti.close(); } catch(final IOException ignore) { }
-      throw error.get(info, ex);
-    }
-  }
-
-  @Override
-  public void cache(final InputInfo info) throws QueryException {
-    try {
-      if(!isCached()) value = input(info).content();
-    } catch(final IOException ex) {
       throw error.get(info, ex);
     }
   }

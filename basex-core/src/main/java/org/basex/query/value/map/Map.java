@@ -62,8 +62,8 @@ public final class Map extends FItem {
   }
 
   @Override
-  public void cache(final InputInfo info) throws QueryException {
-    root.cache(info);
+  public void cache(final InputInfo info, final boolean lazy) throws QueryException {
+    root.cache(info, lazy);
   }
 
   @Override

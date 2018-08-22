@@ -22,6 +22,8 @@ public final class LazyModuleTest extends AdvancedQueryTest {
     query(_FILE_READ_TEXT.args(FILE), "<");
     query(func.args(_FILE_READ_BINARY.args(FILE)), "<");
     query(func.args(_FILE_READ_TEXT.args(FILE)), "<");
+    query(func.args(_FILE_READ_BINARY.args(FILE), " true()"), "<");
+    query(func.args(_FILE_READ_TEXT.args(FILE), " true()"), "<");
   }
 
   /** Test method. */
@@ -29,14 +31,21 @@ public final class LazyModuleTest extends AdvancedQueryTest {
   public void isLazy() {
     final Function func = _LAZY_IS_LAZY;
     query(func.args(_FILE_READ_BINARY.args(FILE)), true);
+    query(func.args(_FILE_READ_TEXT.args(FILE)), true);
     query(func.args("A"), false);
     query(func.args(_LAZY_CACHE.args(_FILE_READ_TEXT.args(FILE))), true);
+    query(func.args(_LAZY_CACHE.args(_FILE_READ_BINARY.args(FILE))), true);
   }
 
   /** Test method. */
   @Test
   public void isCached() {
     final Function func = _LAZY_IS_CACHED;
+    query(func.args(_FILE_READ_BINARY.args(FILE)), "false");
+    query(func.args(_LAZY_CACHE.args(_FILE_READ_BINARY.args(FILE))), "true");
+    query(func.args(_FILE_READ_TEXT.args(FILE)), "false");
+    query(func.args(_LAZY_CACHE.args(_FILE_READ_TEXT.args(FILE))), "true");
+
     query("let $bin := " + _FILE_READ_BINARY.args(FILE) + " return (" +
         func.args(" $bin") + ',' + _PROF_VOID.args(" $bin") + ',' + func.args(" $bin") + ')',
         "false\ntrue");

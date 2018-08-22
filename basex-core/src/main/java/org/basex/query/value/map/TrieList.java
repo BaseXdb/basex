@@ -261,10 +261,10 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  void cache(final InputInfo info) throws QueryException {
+  void cache(final InputInfo info, final boolean lazy) throws QueryException {
     for(int i = 0; i < size; i++) {
-      keys[i].cache(info);
-      values[i].cache(info);
+      keys[i].cache(info, lazy);
+      values[i].cache(info, lazy);
     }
   }
 

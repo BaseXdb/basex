@@ -19,6 +19,8 @@ public final class B64Lazy extends B64 implements Lazy {
   private final IO input;
   /** Error message. */
   private final QueryError error;
+  /** Caching flag. */
+  private boolean cache;
 
   /**
    * Constructor.
@@ -38,12 +40,19 @@ public final class B64Lazy extends B64 implements Lazy {
 
   @Override
   public BufferInput input(final InputInfo info) throws QueryException {
+    if(cache) cache(info);
     if(isCached()) return super.input(info);
     try {
       return BufferInput.get(input);
     } catch(final IOException ex) {
       throw error.get(info, ex);
     }
+  }
+
+  @Override
+  public void cache(final InputInfo info, final  boolean lazy) throws QueryException {
+    if(lazy) cache = true;
+    else cache(info);
   }
 
   @Override

@@ -209,9 +209,9 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void cache(final InputInfo info) throws QueryException {
+  void cache(final InputInfo info, final boolean lazy) throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null) nd.cache(info);
+      if(nd != null) nd.cache(info, lazy);
     }
   }
 

@@ -1121,7 +1121,7 @@ public enum Function {
   // Lazy Module
 
   /** XQuery function. */
-  _LAZY_CACHE(LazyCache.class, "cache(value)", arg(ITEM_ZM), ITEM_ZM, LAZY_URI),
+  _LAZY_CACHE(LazyCache.class, "cache(value[,lazy])", arg(ITEM_ZM, BLN_O), ITEM_ZM, LAZY_URI),
   /** XQuery function. */
   _LAZY_IS_CACHED(LazyIsCached.class, "is-cached(item)", arg(ITEM_O), BLN_O, LAZY_URI),
   /** XQuery function. */

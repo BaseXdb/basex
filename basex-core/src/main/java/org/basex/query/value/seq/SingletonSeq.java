@@ -40,8 +40,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public void cache(final InputInfo info) throws QueryException {
-    value.cache(info);
+  public void cache(final InputInfo info, final boolean lazy) throws QueryException {
+    value.cache(info, lazy);
   }
 
   @Override

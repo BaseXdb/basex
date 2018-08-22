@@ -202,9 +202,9 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  void cache(final InputInfo info) throws QueryException {
-    key.cache(info);
-    value.cache(info);
+  void cache(final InputInfo info, final boolean lazy) throws QueryException {
+    key.cache(info, lazy);
+    value.cache(info, lazy);
   }
 
   @Override

@@ -194,8 +194,8 @@ public abstract class Array extends FItem {
   public abstract Array remove(long pos, QueryContext qc);
 
   @Override
-  public final void cache(final InputInfo info) throws QueryException {
-    for(final Value value : members()) value.cache(info);
+  public final void cache(final InputInfo info, final boolean lazy) throws QueryException {
+    for(final Value value : members()) value.cache(info, lazy);
   }
 
   /**

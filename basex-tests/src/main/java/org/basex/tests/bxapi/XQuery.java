@@ -217,7 +217,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XdmValue value() {
     try {
       final Value value = qp.value();
-      value.cache(null);
+      value.cache(null, false);
       return XdmValue.get(value);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);

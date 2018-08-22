@@ -234,7 +234,7 @@ public abstract class Item extends Value {
 
   // Overwritten by Lazy, Map and Array.
   @Override
-  public void cache(final InputInfo info) throws QueryException { }
+  public void cache(final InputInfo info, final boolean lazy) throws QueryException { }
 
   // Overwritten by Array, FItem and ANode
   @Override

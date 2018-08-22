@@ -91,8 +91,8 @@ public abstract class TreeSeq extends Seq {
   public abstract BasicIter<Item> iter();
 
   @Override
-  public final void cache(final InputInfo info) throws QueryException {
-    for(final Item item : this) item.cache(info);
+  public final void cache(final InputInfo info, final boolean lazy) throws QueryException {
+    for(final Item item : this) item.cache(info, lazy);
   }
 
   @Override

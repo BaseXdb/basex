@@ -53,7 +53,7 @@ abstract class TrieNode {
     @Override
     void values(final ValueBuilder vs) { }
     @Override
-    void cache(final InputInfo info) { }
+    void cache(final InputInfo info, final boolean lazy) { }
     @Override
     boolean materialized() { return true; }
     @Override
@@ -207,9 +207,10 @@ abstract class TrieNode {
   /**
    * Caches all keys and values.
    * @param info input info
+   * @param lazy lazy caching
    * @throws QueryException query exception
    */
-  abstract void cache(InputInfo info) throws QueryException;
+  abstract void cache(InputInfo info, boolean lazy) throws QueryException;
 
   /**
    * Checks if all values are materialized.

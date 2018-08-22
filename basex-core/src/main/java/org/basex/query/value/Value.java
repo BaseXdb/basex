@@ -96,9 +96,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Caches lazy values.
    * @param info input info
+   * @param lazy lazy caching
    * @throws QueryException query exception
    */
-  public abstract void cache(InputInfo info) throws QueryException;
+  public abstract void cache(InputInfo info, boolean lazy) throws QueryException;
 
   /**
    * Computes the number of atomized items.
