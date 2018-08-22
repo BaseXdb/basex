@@ -1646,7 +1646,7 @@ public enum Function {
    * Returns the prefixed name of the annotation.
    * @return name
    */
-  byte[] id() {
+  public byte[] id() {
     final TokenBuilder tb = new TokenBuilder();
     if(!Token.eq(uri, FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     return tb.add(local()).finish();

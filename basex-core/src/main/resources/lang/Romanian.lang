@@ -332,6 +332,7 @@ separator            = Separator
 serialization        = Serialization Parameters
 sessions_%           = % sesiuni
 sessions_killed_%    = % sesiuni ucise.
+set_context          = Set as context
 show_atts            = Afişează atributele
 show_hidden_files    = Afisare fisiere ascunse
 show_invisible       = Afiseaza fisiere invizibile

@@ -79,7 +79,6 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     header = new BaseXHeader(INFO);
 
     timer = new BaseXLabel(" ").border(0, 4, 0, 0).resize(1.2f);
-    timer.setForeground(GUIConstants.dgray);
 
     area = new TextPanel(gui, false);
     area.setLinkListener(this);

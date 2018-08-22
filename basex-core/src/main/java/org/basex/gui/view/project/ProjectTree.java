@@ -14,6 +14,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.listener.*;
 import org.basex.io.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -52,7 +53,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     // add popup
     new BaseXPopup(this, view.gui,
-      new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
+      new OpenCmd(), new OpenExternalCmd(), new TestCmd(), new SetContextCmd(), null,
       new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
       new RefreshCmd(), null, new CopyPathCmd()
     );
@@ -321,6 +322,28 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public boolean enabled(final GUI main) {
       return selectedNode() != null;
+    }
+  }
+
+  /** Set context command. */
+  private final class SetContextCmd extends GUIPopupCmd {
+    /** Constructor. */
+    SetContextCmd() { super(SET_CONTEXT); }
+
+    @Override public void execute() {
+      final IOFile file = selectedNode().file;
+      try {
+        view.gui.editor.setContext(new DBNode(file));
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        BaseXDialog.error(view.gui, Util.info(ex));
+      }
+      view.gui.editor.refreshContext();
+    }
+
+    @Override public boolean enabled(final GUI main) {
+      final ProjectNode node = selectedNode();
+      return node != null && !node.file.isDir() && node.file.hasSuffix(IO.XMLSUFFIXES);
     }
   }
 }

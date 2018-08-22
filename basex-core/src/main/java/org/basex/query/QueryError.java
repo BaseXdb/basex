@@ -796,7 +796,7 @@ public enum QueryError {
   SERJSONSEQ(SERE, 23, "Value has more than one item."),
 
   /** Error code. */
-  NOCTX_X(XPDY, 2, "%: no context value bound."),
+  NOCTX_X(XPDY, 2, "%: Context is undeclared."),
   /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */
@@ -954,7 +954,7 @@ public enum QueryError {
   ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
 
   /** Error code. */
-  VARUNDEF_X(XPST, 8, "Undefined variable %."),
+  VARUNDEF_X(XPST, 8, "Undeclared variable %."),
   /** Error code. */
   CIRCREF_X(XPST, 8, "Static variable references itself: %"),
   /** Error code. */

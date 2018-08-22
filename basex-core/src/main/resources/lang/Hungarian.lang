@@ -332,6 +332,7 @@ separator            = Elválasztó
 serialization        = Sorszámozási paraméterek
 sessions_%           = % munkamenet
 sessions_killed_%    = % munkamenetek kilőve.
+set_context          = Set as context
 show_atts            = Attribútumok megjelenítése
 show_hidden_files    = Rejtett fájlok megjelenítése
 show_invisible       = Nem látható karakterek megjelenítése

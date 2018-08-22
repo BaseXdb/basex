@@ -8,14 +8,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 import java.util.Timer;
 import java.util.regex.*;
 
 import javax.swing.*;
 
 import org.basex.build.json.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
@@ -29,6 +32,9 @@ import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.parse.xml.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -70,9 +76,13 @@ public final class EditorView extends View {
   private final BaseXHeader header;
   /** Tabs. */
   private final BaseXTabs tabs;
+  /** Context. */
+  private final BaseXLabel context;
 
   /** Query file that has last been evaluated. */
   private IOFile execFile;
+  /** Main-memory document. */
+  private DBNode doc;
 
   /** Evaluation counter. */
   private int statusID;
@@ -137,8 +147,12 @@ public final class EditorView extends View {
     buttons.add(vars);
     buttons.add(test);
 
-    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
+    context = new BaseXLabel("").resize(1.2f);;
+    context.setForeground(GUIConstants.dgray);
+
+    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0));
     north.add(buttons, BorderLayout.WEST);
+    north.add(context, BorderLayout.CENTER);
     north.add(header, BorderLayout.EAST);
 
     // status and query pane
@@ -280,6 +294,42 @@ public final class EditorView extends View {
   @Override
   protected boolean db() {
     return false;
+  }
+
+  /**
+   * Refreshes the context label.
+   */
+  public void refreshContext() {
+    final TokenBuilder tb = new TokenBuilder();
+    final Context ctx = gui.context;
+
+    // check if context binding was set
+    for(final Entry<String, String> entry : ctx.options.toMap(MainOptions.BINDINGS).entrySet()) {
+      final String key = entry.getKey();
+      final Atm value = new Atm(entry.getValue());
+      if(key.isEmpty()) tb.add("xs:untypedAtomic(").addExt(value).add(')');
+    }
+    // check if database is opened
+    if(tb.isEmpty()) {
+      final Data data = gui.context.data();
+      if(data != null) tb.add(Function._DB_OPEN.args(data.meta.name).trim());
+    }
+    // check if main-memory document exists
+    if(tb.isEmpty()) {
+      if(doc != null) tb.add(Function.DOC.args(doc.data().meta.original).trim());
+    } else {
+      doc = null;
+    }
+    context.setText(tb.isEmpty() ? "" : CONTEXT + COLS + tb);
+  }
+
+  /**
+   * Sets a query context document.
+   * @param node document (can be {@code null})
+   */
+  public void setContext(final DBNode node) {
+    doc = node;
+    refreshContext();
   }
 
   /**
@@ -500,7 +550,9 @@ public final class EditorView extends View {
           input = string(ea.getText());
         }
         // execute query
-        gui.execute(true, new XQuery(input).baseURI(file.path()));
+        final XQuery cmd = new XQuery(input);
+        if(doc != null) cmd.bind(null, doc);
+        gui.execute(true, cmd.baseURI(file.path()));
         execFile = file;
       } else {
         // parse: replace empty query with empty sequence (suppresses errors for plain text files)

@@ -99,5 +99,6 @@ public final class DialogBindings extends BaseXDialog {
     if(!value.isEmpty()) bind.append('=').append(value.replaceAll(",", ",,")).append(',');
 
     gui.set(MainOptions.BINDINGS, bind.toString().replaceAll(",$", ""));
+    gui.editor.refreshContext();
   }
 }

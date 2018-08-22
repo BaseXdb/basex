@@ -332,6 +332,7 @@ separator            = Trennzeichen
 serialization        = Serialization Parameters
 sessions_%           = % Verbindung(en)
 sessions_killed_%    = % Verbindungen beendet.
+set_context          = Als Context setzen
 show_atts            = Zeige Attribute
 show_hidden_files    = Versteckte Dateien anzeigen
 show_invisible       = Zeige unsichtbare Zeichen

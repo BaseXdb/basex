@@ -29,7 +29,7 @@ import org.basex.util.*;
  */
 public abstract class AQuery extends Command {
   /** External variable bindings. */
-  protected final HashMap<String, String[]> vars = new HashMap<>();
+  protected final HashMap<String, Object> vars = new HashMap<>();
   /** External properties. */
   protected final HashMap<String, Object> props = new HashMap<>();
 
@@ -78,11 +78,19 @@ public abstract class AQuery extends Command {
           if(!compplan) queryPlan();
 
           final Performance perf = new Performance();
-          for(final Entry<String, String[]> entry : vars.entrySet()) {
+          for(final Entry<String, Object> entry : vars.entrySet()) {
             final String name = entry.getKey();
-            final String[] value = entry.getValue();
-            if(name == null) qp.context(value[0], value[1]);
-            else qp.bind(name, value[0], value[1]);
+            final Object value = entry.getValue();
+            if(value instanceof Value) {
+              final Value v = (Value) value;
+              if(name == null) qp.context(v);
+              else qp.bind(name, v);
+            } else {
+              // will always be a string array
+              final String[] strings = (String[]) value;
+              if(name == null) qp.context(strings[0], strings[1]);
+              else qp.bind(name, strings[0], strings[1]);
+            }
           }
 
           qp.compile();

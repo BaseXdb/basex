@@ -332,6 +332,7 @@ separator            = Тусгаарлагч
 serialization        = Serialization Parameters
 sessions_%           = % суулт (session)
 sessions_killed_%    = % суулт (session) устгагдсан.
+set_context          = Set as context
 show_atts            = Атрибутуудыг харах
 show_hidden_files    = Show hidden files
 show_invisible       = Show invisible characters

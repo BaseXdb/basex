@@ -332,6 +332,7 @@ separator            = Pemisah
 serialization        = Serialization Parameters
 sessions_%           = % sesi
 sessions_killed_%    = % sesi ditutup.
+set_context          = Set as context
 show_atts            = Tampilkan atribut
 show_hidden_files    = Tampilkan berkas tersembuyi
 show_invisible       = Tampilkan karakter tak terlihat

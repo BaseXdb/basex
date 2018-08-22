@@ -186,6 +186,8 @@ public interface Text {
   String ITEM = "Item";
   /** Query hits. */
   String ITEMS = "Items";
+  /** Context. */
+  String CONTEXT = "Context";
 
   /** Options error. */
   String OPT_OFFSET_X = "List counter for '%' is invalid.";
@@ -893,6 +895,8 @@ public interface Text {
   String SELECT_ALL = lang("select_all");
   /** Command info. */
   String COPY_PATH = lang("copy_path");
+  /** Command info. */
+  String SET_CONTEXT = lang("set_context");
   /** Command info. */
   String NEW = lang("new");
   /** Command info. */

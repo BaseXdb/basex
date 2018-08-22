@@ -332,6 +332,7 @@ separator            = 分隔符
 serialization        = Serialization Parameters
 sessions_%           = % 会话
 sessions_killed_%    = % 会话已终止
+set_context          = Set as context
 show_atts            = 显示属性
 show_hidden_files    = 显示隐藏文件
 show_invisible       = 显示不可见字符

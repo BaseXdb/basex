@@ -203,6 +203,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
       // initialize views if database was closed before
       if(newData) gui.notify.init();
       else if(cmd.updating(gui.context)) gui.notify.update();
+      gui.editor.refreshContext();
     }
     if(dialog != null) dialog.action(dialog);
     if(post != null) SwingUtilities.invokeLater(post);

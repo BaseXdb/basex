@@ -332,6 +332,7 @@ separator            = Separator
 serialization        = Serialization Parameters
 sessions_%           = % session(s)
 sessions_killed_%    = % sessions killed.
+set_context          = Set as context
 show_atts            = Show attributes
 show_hidden_files    = Show hidden files
 show_invisible       = Show invisible characters

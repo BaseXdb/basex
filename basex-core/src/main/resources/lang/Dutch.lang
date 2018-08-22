@@ -332,6 +332,7 @@ separator            = Scheidingsteken
 serialization        = Serialization Parameters
 sessions_%           = % sessie(s)
 sessions_killed_%    = % sessies gestopt.
+set_context          = Set as context
 show_atts            = Toon attributen
 show_hidden_files    = Toon verborgen bestanden
 show_invisible       = Toon onzichtbare karakters

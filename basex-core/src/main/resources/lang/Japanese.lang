@@ -332,6 +332,7 @@ separator            = セパレータ
 serialization        = Serialization Parameters
 sessions_%           = % セッション
 sessions_killed_%    = % セッションが切断されました。
+set_context          = Set as context
 show_atts            = 属性の表示
 show_hidden_files    = 隠しファイルを表示
 show_invisible       = 不可視文字の表示
