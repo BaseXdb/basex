@@ -104,10 +104,14 @@ public final class MainParser {
       pos = 0;
       final int al = a.length();
       if(p == al) continue;
+
       final StringBuilder sb = new StringBuilder();
       while(p < al) sb.append(a.charAt(p++));
       final String str = sb.toString();
-      return "-".equals(str) ? new Scanner(System.in).useDelimiter("\0").next() : str;
+      if(!str.equals("-")) return str;
+
+      final Scanner scanner = new Scanner(System.in).useDelimiter("\0");
+      return scanner.hasNext() ? scanner.next() : "";
     }
     return "";
   }

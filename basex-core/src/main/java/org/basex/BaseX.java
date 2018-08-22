@@ -87,9 +87,11 @@ public class BaseX extends CLI {
             break;
           case 'i':
             // open database or create main memory representation
-            execute(new Set(MainOptions.MAINMEM, true), false);
-            execute(new Check(value), verbose);
-            execute(new Set(MainOptions.MAINMEM, false), false);
+            if(!value.isEmpty()) {
+              execute(new Set(MainOptions.MAINMEM, true), false);
+              execute(new Check(value), verbose);
+              execute(new Set(MainOptions.MAINMEM, false), false);
+            }
             break;
           case 'I':
             // set context item binding
