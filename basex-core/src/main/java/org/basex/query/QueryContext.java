@@ -262,7 +262,7 @@ public final class QueryContext extends Job implements Closeable {
           final String key = entry.getKey();
           final Atm value = new Atm(entry.getValue());
           if(key.isEmpty()) {
-            if(ctxItem != null) context(value, root.sc);
+            if(ctxItem == null) context(value, root.sc);
           } else {
             final QNm name = qname(key, root.sc);
             if(!bindings.containsKey(name)) bind(name, value);
