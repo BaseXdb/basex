@@ -169,10 +169,10 @@ final class WebDAVService {
       throws IOException {
 
     final WebDAVQuery query = new WebDAVQuery(
-      "declare option db:chop 'false';" +
       "if(" + _DB_IS_RAW.args(" $db", " $path") + ')' +
       " then " + _DB_STORE.args(" $tdb", " $tpath", _DB_RETRIEVE.args(" $db", " $path")) +
-      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"));
+      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"),
+      "declare option db:chop 'false';");
     query.bind("db", db);
     query.bind("path", path);
     query.bind("tdb", tdb);
@@ -192,12 +192,12 @@ final class WebDAVService {
       throws IOException {
 
     final WebDAVQuery query = new WebDAVQuery(
-      "declare option db:chop 'false'; " +
       "for $d in " + _DB_LIST.args(" $db", " $path") +
       "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
       "if(" + _DB_IS_RAW.args(" $db", " $d") + ") " +
       "then " + _DB_STORE.args(" $tdb", " $t", _DB_RETRIEVE.args(" $db", " $d")) +
-      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"));
+      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"),
+      "declare option db:chop 'false';");
     query.bind("db", db);
     query.bind("path", path);
     query.bind("tdb", tdb);
@@ -217,9 +217,9 @@ final class WebDAVService {
       throws IOException {
 
     session().setOutputStream(out);
-    final String string = SerializerOptions.USE_CHARACTER_MAPS.arg(WEBDAV) +
-        (raw ? _DB_RETRIEVE : _DB_OPEN).args(" $db", " $path") + "[1]";
-    final WebDAVQuery query = new WebDAVQuery(string);
+    final WebDAVQuery query = new WebDAVQuery(
+      (raw ? _DB_RETRIEVE : _DB_OPEN).args(" $db", " $path") + "[1]",
+      SerializerOptions.USE_CHARACTER_MAPS.arg(WEBDAV));
     query.bind("db", db);
     query.bind("path", path);
     query.execute(session());

@@ -29,10 +29,12 @@ public final class JobContext {
   /** Root job. */
   private final Job job;
 
-  /** Job id. Will be set via if job is being registered. */
+  /** Job id. Will be set while job is registered. */
   private String id;
-  /** Job name. */
+  /** Job name (optional). */
   private String tp;
+  /** Job description (optional). */
+  private String desc;
 
   /**
    * Constructor.
@@ -71,6 +73,14 @@ public final class JobContext {
   }
 
   /**
+   * Sets a job description.
+   * @param description description
+   */
+  public void description(final String description) {
+    desc = description;
+  }
+
+  /**
    * Returns the job type.
    * @return name
    */
@@ -80,6 +90,6 @@ public final class JobContext {
 
   @Override
   public String toString() {
-    return job.toString();
+    return desc != null ? desc : job.toString();
   }
 }

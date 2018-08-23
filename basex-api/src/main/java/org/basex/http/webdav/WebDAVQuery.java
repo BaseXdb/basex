@@ -14,8 +14,10 @@ import org.basex.core.cmd.*;
  * @author Christian Gruen
  */
 final class WebDAVQuery {
-  /** String query. */
+  /** Query string. */
   private final String query;
+  /** Query prolog string. */
+  private final String prolog;
   /** Bindings. */
   private final HashMap<String, String> bindings = new HashMap<>();
 
@@ -24,7 +26,17 @@ final class WebDAVQuery {
    * @param query query string
    */
   WebDAVQuery(final String query) {
+    this(query, "");
+  }
+
+  /**
+   * Constructor.
+   * @param query query string
+   * @param prolog query prolog string
+   */
+  WebDAVQuery(final String query, final String prolog) {
     this.query = query;
+    this.prolog = prolog;
   }
 
   /**
@@ -45,7 +57,13 @@ final class WebDAVQuery {
    * @throws IOException I/O execution
    */
   String execute(final Session session) throws IOException {
-    final XQuery xquery = new XQuery(toString());
+    final StringBuilder sb = new StringBuilder();
+    for(final String name : bindings.keySet()) {
+      sb.append("declare variable $").append(name).append(" external;");
+    }
+    sb.append(prolog).append(query);
+
+    final XQuery xquery = new XQuery(sb.toString());
     for(final Entry<String, String> entry : bindings.entrySet()) {
       xquery.bind(entry.getKey(), entry.getValue());
     }
@@ -54,10 +72,6 @@ final class WebDAVQuery {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final String name : bindings.keySet()) {
-      sb.append("declare variable $").append(name).append(" external;");
-    }
-    return sb.append(query).toString();
+    return query;
   }
 }

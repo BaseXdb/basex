@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
+import org.basex.util.*;
 
 /**
  * This abstract class defines common methods of Web responses.
@@ -43,16 +44,18 @@ public abstract class WebResponse {
       throws QueryException, IOException, ServletException {
 
     final WebModule module = function.module;
+    final StaticFunc func = function.function;
     try {
       qc = module.qc(ctx);
       init(function);
-      final StaticFunc sf = function.module.find(qc, function.function);
+      final StaticFunc sf = function.module.find(qc, func);
       final Expr[] args = new Expr[sf.params.length];
       bind(args, data);
+      qc.jc().description(toString(func, args));
       qc.mainModule(MainModule.get(sf, args));
       return serialize();
     } catch(final QueryException ex) {
-      if(ex.file() == null) ex.info(function.function.info);
+      if(ex.file() == null) ex.info(func.info);
       throw ex;
     } finally {
       if(qc != null) qc.close();
@@ -85,4 +88,21 @@ public abstract class WebResponse {
    * @throws ServletException servlet exception
    */
   protected abstract boolean serialize() throws QueryException, IOException, ServletException;
+
+  /**
+   * Returns a job description for the specified function.
+   * @param func function
+   * @param args arguments
+   * @return description
+   */
+  private String toString(final StaticFunc func, final Expr[] args) {
+    final TokenBuilder tb = new TokenBuilder().addExt(func.info).add(Text.COLS);
+    tb.add(func.name.prefixString()).add('(');
+    final int al = args.length;
+    for(int a = 0; a < al; a++) {
+      if(a != 0) tb.add(", ");
+      tb.addExt(func.params[a].toErrorString()).add(" := ").addExt(args[a]);
+    }
+    return tb.add(')').toString();
+  }
 }

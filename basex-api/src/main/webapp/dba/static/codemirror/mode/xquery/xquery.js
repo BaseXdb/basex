@@ -261,7 +261,7 @@ CodeMirror.defineMode("xquery", function() {
 
 
       while (ch = stream.next()) {
-        if (ch ==  quote) {
+        if (ch == quote) {
           popStateStack(state);
           if(f) state.tokenize = f;
           break;

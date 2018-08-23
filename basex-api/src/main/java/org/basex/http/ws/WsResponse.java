@@ -43,7 +43,7 @@ public final class WsResponse extends WebResponse {
     func = new WsFunction(function.function, qc, function.module);
     qc.putProperty(HTTPText.WEBSOCKET, ws);
     qc.putProperty(HTTPText.REQUEST, ws.req);
-    qc.jc().type(RESTXQ);
+    qc.jc().type(WEBSOCKET);
     func.parse(ctx);
   }
 
