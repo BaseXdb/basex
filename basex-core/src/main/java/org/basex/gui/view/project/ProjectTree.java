@@ -331,14 +331,12 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     SetContextCmd() { super(SET_CONTEXT); }
 
     @Override public void execute() {
-      final IOFile file = selectedNode().file;
       try {
-        view.gui.editor.setContext(new DBNode(file));
+        view.gui.editor.setContext(new DBNode(selectedNode().file));
       } catch(final IOException ex) {
         Util.debug(ex);
         BaseXDialog.error(view.gui, Util.info(ex));
       }
-      view.gui.editor.refreshContext();
     }
 
     @Override public boolean enabled(final GUI main) {

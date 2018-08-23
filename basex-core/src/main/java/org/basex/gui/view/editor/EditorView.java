@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 import java.util.Timer;
 import java.util.regex.*;
 
@@ -20,6 +19,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.*;
+import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.gui.listener.*;
@@ -299,37 +299,50 @@ public final class EditorView extends View {
   /**
    * Refreshes the context label.
    */
-  public void refreshContext() {
-    final TokenBuilder tb = new TokenBuilder();
-    final Context ctx = gui.context;
-
-    // check if context binding was set
-    for(final Entry<String, String> entry : ctx.options.toMap(MainOptions.BINDINGS).entrySet()) {
-      final String key = entry.getKey();
-      final Atm value = new Atm(entry.getValue());
-      if(key.isEmpty()) tb.add("xs:untypedAtomic(").addExt(value).add(')');
-    }
-    // check if database is opened
-    if(tb.isEmpty()) {
-      final Data data = gui.context.data();
-      if(data != null) tb.add(Function._DB_OPEN.args(data.meta.name).trim());
-    }
-    // check if main-memory document exists
-    if(tb.isEmpty()) {
-      if(doc != null) tb.add(Function.DOC.args(doc.data().meta.original).trim());
-    } else {
-      doc = null;
-    }
-    context.setText(tb.isEmpty() ? "" : CONTEXT + COLS + tb);
+  public void refreshContextLabel() {
+    final String label = context();
+    context.setText(label.isEmpty() ? "" : CONTEXT + COLS + label);
   }
 
   /**
-   * Sets a query context document.
-   * @param node document (can be {@code null})
+   * Sets an editor context document.
+   * @param node document
    */
   public void setContext(final DBNode node) {
     doc = node;
-    refreshContext();
+    // close database
+    if(Close.close(gui.context)) gui.notify.init();
+    // remove context item binding
+    final HashMap<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
+    map.remove("");
+    DialogBindings.assign(map, gui);
+    // remove context label
+    refreshContextLabel();
+  }
+
+  /**
+   * Returns the current context string.
+   * @return context string (can be empty)
+   */
+  public String context() {
+    // check if context binding was set
+    String value = gui.context.options.toMap(MainOptions.BINDINGS).get("");
+    if(value != null) {
+      value = new TokenBuilder("xs:untypedAtomic(").addExt(new Atm(value)).add(')').toString();
+    }
+
+    // check if database is opened
+    if(value == null) {
+      final Data data = gui.context.data();
+      if(data != null) value = Function._DB_OPEN.args(data.meta.name).trim();
+    }
+    // check if main-memory document exists
+    if(value == null) {
+      if(doc != null) value = Function.DOC.args(doc.data().meta.original).trim();
+    } else {
+      doc = null;
+    }
+    return value != null ? value : "";
   }
 
   /**

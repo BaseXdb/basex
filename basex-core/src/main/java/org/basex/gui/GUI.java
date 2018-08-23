@@ -494,7 +494,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
         if(id == commandID.get() && !stopped) {
           // refresh editor info
-          editor.refreshContext();
+          editor.refreshContextLabel();
           // show status info
           status.setText(TIME_REQUIRED + COLS + time);
           // show number of hits

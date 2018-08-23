@@ -3,7 +3,8 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.util.Map.Entry;
+import java.util.*;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
@@ -51,6 +52,8 @@ public final class DialogBindings extends BaseXDialog {
       center.add(values[c]);
     }
     ctxitem = new BaseXTextField(this);
+    ctxitem.hint(gui.editor.context());
+
     center.add(ctxitem);
     set(center, BorderLayout.CENTER);
 
@@ -89,16 +92,31 @@ public final class DialogBindings extends BaseXDialog {
     if(!ok) return;
 
     super.close();
-    final StringBuilder bind = new StringBuilder();
+
+    final HashMap<String, String> map = new HashMap<>();
     for(int c = 0; c < MAX; c++) {
       final String name = names[c].getText().replaceAll("^\\s*\\$|\\s+$", "");
-      if(!name.isEmpty())
-        bind.append((name + '=' + values[c].getText()).replaceAll(",", ",,")).append(',');
+      if(!name.isEmpty()) map.put(name, values[c].getText());
     }
     final String value = ctxitem.getText();
-    if(!value.isEmpty()) bind.append('=').append(value.replaceAll(",", ",,")).append(',');
+    if(!value.isEmpty()) map.put("", value);
+    assign(map, gui);
 
-    gui.set(MainOptions.BINDINGS, bind.toString().replaceAll(",$", ""));
-    gui.editor.refreshContext();
+    gui.editor.refreshContextLabel();
+  }
+
+  /**
+   * Assigns variable bindings.
+   * @param map map with bindings
+   * @param gui GUI reference
+   */
+  public static void assign(final HashMap<String, String> map, final GUI gui) {
+    final StringBuilder sb = new StringBuilder();
+    for(final Entry<String, String> entry : map.entrySet()) {
+      final String name = entry.getKey(), value = entry.getValue();
+      if(sb.length() != 0) sb.append(',');
+      sb.append((name + '=' + value).replaceAll(",", ",,"));
+    }
+    gui.set(MainOptions.BINDINGS, sb.toString());
   }
 }
