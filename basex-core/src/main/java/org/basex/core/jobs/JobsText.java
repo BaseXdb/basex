@@ -31,4 +31,6 @@ public interface JobsText {
   byte[] READS = token("reads");
   /** Write locks. */
   byte[] WRITES = token("writes");
+  /** Time of registering. */
+  byte[] TIME = token("time");
 }

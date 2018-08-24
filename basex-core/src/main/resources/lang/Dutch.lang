@@ -369,6 +369,7 @@ target_path          = Doelpad
 team                 = Team
 text                 = Tekst
 text_index           = Tekst index
+time                 = Tijd
 time_required        = Benodigde tijd
 timeout_exceeded     = Timeout overschreden.
 timestamp            = Timestamp

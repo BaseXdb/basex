@@ -25,6 +25,8 @@ public final class JobContext {
   public Context context;
   /** Registered locks. */
   public final Locks locks = new Locks();
+  /** Time of creation. */
+  public final long time = System.currentTimeMillis();
 
   /** Root job. */
   private final Job job;

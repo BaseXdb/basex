@@ -369,6 +369,7 @@ target_path          = Chemin cible
 team                 = Équipe
 text                 = Texte
 text_index           = Index texte
+time                 = Temps
 time_required        = Temps d'exécution
 timeout_exceeded     = Délai expiré.
 timestamp            = Horodateur

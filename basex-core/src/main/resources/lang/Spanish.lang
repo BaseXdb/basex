@@ -369,6 +369,7 @@ target_path          = Ruta destino
 team                 = Equipo
 text                 = Texto
 text_index           = Índice del Texto
+time                 = Tiempo
 time_required        = Tiempo necesario
 timeout_exceeded     = Excedido el tiempo máximo de espera.
 timestamp            = Marca de tiempo

@@ -369,6 +369,7 @@ target_path          = Rintis tujuan
 team                 = Tim
 text                 = Teks
 text_index           = Indeks Teks
+time                 = Waktu
 time_required        = Waktu yang dibutuhkan
 timeout_exceeded     = Melebihi batas waktu.
 timestamp            = Tanda waktu

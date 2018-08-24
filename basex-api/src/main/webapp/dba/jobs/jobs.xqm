@@ -45,7 +45,8 @@ function dba:jobs(
             map { 'key': 'state', 'label': 'State' },
             map { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
             map { 'key': 'user', 'label': 'User' },
-            map { 'key': 'you', 'label': 'You' }
+            map { 'key': 'you', 'label': 'You' },
+            map { 'key': 'time', 'label': 'Time', 'type': 'dateTime', 'order': 'desc' }
           )
           let $entries :=
             let $curr := jobs:current()
@@ -62,7 +63,8 @@ function dba:jobs(
               'state': $details/@state,
               'duration': html:duration($sec),
               'user': $details/@user,
-              'you': if($id = $curr) then '✓' else '–'
+              'you': if($id = $curr) then '✓' else '–',
+              'time': $details/@time
             }
           let $buttons := (
             html:button('job-stop', 'Stop', true())

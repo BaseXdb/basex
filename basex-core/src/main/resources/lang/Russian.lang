@@ -369,6 +369,7 @@ target_path          = Путь
 team                 = Команда
 text                 = Текст
 text_index           = Текстовый индекс
+time                 = Time
 time_required        = Понадобилось времени
 timeout_exceeded     = Время ожидания вышло
 timestamp            = Метка времени

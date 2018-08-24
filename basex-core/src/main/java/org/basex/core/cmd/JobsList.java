@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import org.basex.core.jobs.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -43,6 +45,7 @@ public final class JobsList extends Command {
     table.header.add(END);
     table.header.add(READS);
     table.header.add(WRITES);
+    table.header.add(TIME);
 
     final JobPool jobs = context.jobs;
     for(final byte[] key : ids(context)) {
@@ -96,12 +99,29 @@ public final class JobsList extends Command {
     tl.add(job.state.toString().toLowerCase(Locale.ENGLISH));
     tl.add(jc.context.clientName());
     tl.add(ms >= 0 ? DTDur.get(ms).string(null) : EMPTY);
-    tl.add(jt != null ? Dtm.get(jt.start).string(null) : EMPTY);
-    tl.add(jt != null && jt.end != Long.MAX_VALUE ? Dtm.get(jt.end).string(null) : EMPTY);
+    tl.add(jt != null ? dateTime(jt.start) : EMPTY);
+    tl.add(jt != null && jt.end != Long.MAX_VALUE ? dateTime(jt.end) : EMPTY);
     tl.add(jc.locks.reads.toString());
     tl.add(jc.locks.writes.toString());
-    tl.add(chop(normalize(token(jc.toString())), max));
+    tl.add(dateTime(jc.time));
+    if(max != 0) tl.add(chop(normalize(token(jc.toString())), max));
     return tl;
+  }
+
+  /**
+   * Returns a timezone-adjusted dateTime representation.
+   * @param ms milliseconds since 01/01/1970
+   * @return string
+   */
+  private static byte[] dateTime(final long ms) {
+    final Dtm dtm = Dtm.get(ms);
+    final DTDur tz = new DTDur(BigDecimal.valueOf(TimeZone.getDefault().getOffset(ms) / 1000));
+    try {
+      dtm.timeZone(tz, true, null);
+    } catch(final QueryException ignore) {
+      Util.debug(ignore);
+    }
+    return dtm.string(null);
   }
 
   /**

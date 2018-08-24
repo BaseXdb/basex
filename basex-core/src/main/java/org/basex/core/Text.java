@@ -792,6 +792,8 @@ public interface Text {
   String READS = lang("reads");
   /** "Writes". */
   String WRITES = lang("writes");
+  /** "Time". */
+  String TIME = lang("time");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
 

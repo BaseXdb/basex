@@ -369,6 +369,7 @@ target_path          = Percorso objetivo
 team                 = Team
 text                 = Testo
 text_index           = Indice sul testo
+time                 = Tempo
 time_required        = Tempo necessario
 timeout_exceeded     = Il processo ha raggiunto il timeout.
 timestamp            = Data

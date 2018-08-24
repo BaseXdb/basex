@@ -369,6 +369,7 @@ target_path          = Célútvonal
 team                 = Csapat
 text                 = Szöveg
 text_index           = Szöveg index
+time                 = Idő
 time_required        = Idő szükséges
 timeout_exceeded     = Időtúllépés.
 timestamp            = Időbélyegző

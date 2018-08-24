@@ -369,6 +369,7 @@ target_path          = 目标路径
 team                 = 小组
 text                 = 文本
 text_index           = 文本索引
+time                 = Time
 time_required        = 需要的时间
 timeout_exceeded     = 超时
 timestamp            = 时间戳

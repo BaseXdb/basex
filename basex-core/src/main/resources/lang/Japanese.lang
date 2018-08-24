@@ -369,6 +369,7 @@ target_path          = ターゲットパス
 team                 = チーム
 text                 = テキスト
 text_index           = テキストインデックス
+time                 = Time
 time_required        = 所要時間
 timeout_exceeded     = タイムアウトになりました。
 timestamp            = タイムスタンプ

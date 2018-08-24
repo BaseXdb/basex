@@ -369,6 +369,7 @@ target_path          = Zielpfad
 team                 = Team
 text                 = Text
 text_index           = Text-Index
+time                 = Zeit
 time_required        = Benötigte Zeit
 timeout_exceeded     = Überschreitung des Time-Outs.
 timestamp            = Zeitstempel
