@@ -30,7 +30,7 @@ function dba:jump-page(
     let $max := options:get($options:MAXROWS)
     for $log at $pos in reverse(admin:logs($name, true()))
     where $log/@time = $time
-    return trace(($pos - 1) idiv $max + 1),
+    return ($pos - 1) idiv $max + 1,
     1
   ))
   return web:redirect('/dba/logs', map { 'name': $name, 'page': $page, 'time': $time })
