@@ -86,7 +86,7 @@ function dba:database(
               let $params := map { 'name': $name }
               let $options := map {
                 'sort': $sort,
-                'link': function($value) { $dba:SUB },
+                'link': $dba:SUB,
                 'page': $page,
                 'count': count(db:list($name))
               }

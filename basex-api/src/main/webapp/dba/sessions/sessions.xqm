@@ -73,9 +73,7 @@ function dba:sessions(
           return html:table($headers, $entries, $buttons, map { }, $options)
         }
         </form>
-      </td>
-      <td class='vertical'/>
-      <td>
+
         <h2>Database Sessions</h2>
         {
           let $headers := (

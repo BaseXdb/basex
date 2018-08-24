@@ -54,7 +54,7 @@ function dba:users(
             html:button('user-create', 'Create…'),
             html:button('user-drop', 'Drop', true())
           )
-          let $options := map { 'link': function($value) { 'user' }, 'sort': $sort }
+          let $options := map { 'link': 'user', 'sort': $sort }
           return html:table($headers, $entries, $buttons, map { }, $options)
         }
         </form>

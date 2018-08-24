@@ -35,7 +35,7 @@ function dba:jobs(
 ) as element(html) {
   html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>{
-      <td>
+      <td width='60%'>
         <form action="{ $dba:CAT }" method="post" class="update">
         <h2>Jobs</h2>
         {
@@ -86,7 +86,7 @@ function dba:jobs(
         let $cached := $details/@state = 'cached'
         return (
           <td class='vertical'/>,
-          <td>{
+          <td width='40%'>{
             <h3>{ $job }</h3>,
             if($details) then (
               <form action="jobs" method="post" id="jobs">

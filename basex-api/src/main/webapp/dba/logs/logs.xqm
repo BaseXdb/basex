@@ -83,21 +83,27 @@ function dba:logs(
           <input type='hidden' name='page' id='page' value='{ $page }'/>
           <input type='hidden' name='time' id='time' value='{ $time }'/>
           <div id='list'>{
-            let $headers := (
-              map { 'key': 'name', 'label': 'Name' },
-              map { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
-            )
-            let $entries := reverse(sort($files)) ! map {
-              'name': .,
-              'size': @size
-            }
             let $buttons := html:button('log-delete', 'Delete', true())
             let $params := map { 'sort': $sort }
-            let $options := map { 'link': function($value) { $dba:CAT } }
-            return html:table($headers, $entries, $buttons, $params, $options) update {
-              (: enrich link targets with current search string :)
-              .//a ! (insert node attribute onclick { 'addInput(this);' } into .)
-            }
+            let $headers := (
+              map { 'key': 'name', 'label': 'Name', 'type': 'xml' },
+              map { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
+            )
+            let $entries := 
+              for $entry in reverse(sort($files))
+              return map {
+                'name': function() {
+                  let $link := html:link(
+                    $entry, $dba:CAT, ($params, map { 'name': $entry })
+                  ) update {
+                    (: enrich link targets with current search string :)
+                    insert node attribute onclick { 'addInput(this);' } into .
+                  }
+                  return if ($name = $entry) then element b { $link } else $link
+                },
+                'size': $entry/@size
+              }
+            return html:table($headers, $entries, $buttons, $params, map { })
           }</div>
         </form>
       </td>

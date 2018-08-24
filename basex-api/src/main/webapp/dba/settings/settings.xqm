@@ -31,7 +31,7 @@ function dba:settings(
   let $system := html:properties(db:system())
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
-      <td width='32%'>
+      <td width='33%'>
         <form action="settings" method="post">
           <h2>Settings » { html:button('save', 'Save') }</h2>
           <h3>Querying</h3>
@@ -61,7 +61,7 @@ function dba:settings(
         </form>
       </td>
       <td class='vertical'/>
-      <td width='32%'>
+      <td width='33%'>
         <form action="settings-gc" method="post">
           <h2>Global Options » { html:button('gc', 'GC') }</h2>
           <table>{
@@ -70,7 +70,7 @@ function dba:settings(
         </form>
       </td>
       <td class='vertical'/>
-      <td width='32%'>
+      <td width='33%'>
         <h2>Local Options</h2>
         <table>{
           $system/tr[th][3]/following-sibling::tr

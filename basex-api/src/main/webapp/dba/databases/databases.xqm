@@ -77,9 +77,13 @@ function dba:databases(
               html:button('db-optimize-all', 'Optimize'),
               html:button('db-drop', 'Drop', true())
             )
-            let $link := function($value) { 'database' }
             let $count := map:size($names) + count($backups)
-            let $options := map { 'sort': $sort, 'link': $link, 'page': $page, 'count': $count }
+            let $options := map {
+              'sort': $sort,
+              'link': 'database',
+              'page': $page,
+              'count': $count
+            }
             return html:table($headers, $entries, $buttons, map { }, $options)
           }
         </form>

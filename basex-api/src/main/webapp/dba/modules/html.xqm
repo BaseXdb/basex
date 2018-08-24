@@ -448,7 +448,7 @@ declare function html:table(
               ' '
             ) else (),
             if($pos = 1 and exists($link)) then (
-              html:link($value, $link($value), ($params, map { $name: $value }))
+              html:link($value, $link, ($params, map { $name: $value }))
             ) else if($type = 'id') then () else (
               $value
             )
