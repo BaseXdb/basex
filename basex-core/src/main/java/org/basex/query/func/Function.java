@@ -820,7 +820,7 @@ public enum Function {
   /** XQuery function (legacy). */
   _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), DB_URI),
   /** XQuery function (legacy). */
-  _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
+  _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_PATH(DbPath.class, "path(node)", arg(NOD_O), STR_O, DB_URI),
   /** XQuery function. */
@@ -1264,7 +1264,7 @@ public enum Function {
   _UPDATE_APPLY(UpdateApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), EMP,
       flag(Flag.POS, UPD, NDT, HOF), UPDATE_URI),
   /** XQuery function. */
-  _UPDATE_CACHE(UpdateCache.class, "cache()", arg(), ITEM_ZO, flag(NDT), UPDATE_URI),
+  _UPDATE_CACHE(UpdateCache.class, "cache()", arg(), ITEM_ZM, flag(NDT), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_FOR_EACH(UpdateForEach.class, "for-each(items,function)",
       arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), EMP, flag(UPD, HOF), UPDATE_URI),
