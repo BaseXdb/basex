@@ -101,6 +101,16 @@
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
+  <!-- WebSocket Service (can be disabled by removing this entry) -->
+  <servlet>
+    <servlet-name>WebSocket</servlet-name>
+    <servlet-class>org.basex.http.ws.WsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WebSocket</servlet-name>
+    <url-pattern>/ws/*</url-pattern>
+  </servlet-mapping>
+
   <!-- REST Service (can be disabled by removing this entry) -->
   <servlet>
     <servlet-name>REST</servlet-name>

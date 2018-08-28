@@ -1,7 +1,5 @@
 package org.basex.http.ws;
 
-import static org.basex.http.web.WebText.*;
-
 import java.util.*;
 import java.util.function.*;
 
@@ -155,11 +153,9 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     }
 
     try {
+      // find function to evaluate
       final WsFunction func = WebModules.get(context).websocket(this, ann);
-      // [JF] I am wondering if we should really enforce the implementation of all functions?
-      //  for example, there may be no need to do something if a client connects or says goodbye
-      if(func == null) throw new WebSocketException(Util.info(WS_MISSING_X, ann));
-      new WsResponse(this).create(func, message);
+      if(func != null) new WsResponse(this).create(func, message);
     } catch(final RuntimeException ex) {
       throw ex;
     } catch(final Exception ex) {
