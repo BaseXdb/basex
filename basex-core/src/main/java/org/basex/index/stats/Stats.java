@@ -38,7 +38,7 @@ public final class Stats {
     values = new TokenIntMap();
     type = NONE;
     min = Double.MAX_VALUE;
-    max = Double.MIN_VALUE;
+    max = -Double.MAX_VALUE;
     leaf = true;
   }
 
