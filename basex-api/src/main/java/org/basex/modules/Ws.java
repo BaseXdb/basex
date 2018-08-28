@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-public final class Websocket extends QueryModule {
+public final class Ws extends QueryModule {
   /**
    * Returns the id of the current client.
    * @return client id
@@ -69,7 +69,9 @@ public final class Websocket extends QueryModule {
    */
   public void send(final Item message, final Value ids) throws QueryException, IOException {
     final StringList list = new StringList();
-    for(final Item id : ids) list.add(id.toString().replace("\"", ""));
+    for(final Item id : ids) {
+      list.add(id.toString().replace("\"", ""));
+    }
     pool().send(message, list.finish());
   }
 

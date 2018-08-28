@@ -54,6 +54,22 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   }
 
   /**
+   * Creates a new WebSocket instance.
+   * @param req request
+   * @return WebSocket or {@code null}
+   */
+  static WebSocket get(final HttpServletRequest req) {
+    final WebSocket ws = new WebSocket(req);
+    try {
+      if(!WebModules.get(ws.context).findWs(ws, null).isEmpty()) return ws;
+    } catch(final Exception ex) {
+      Util.debug(ex);
+      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
+    }
+    return null;
+  }
+
+  /**
    * Returns the client path.
    * @return path
    */

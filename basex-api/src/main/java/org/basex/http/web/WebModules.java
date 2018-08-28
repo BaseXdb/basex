@@ -163,6 +163,27 @@ public final class WebModules {
   }
 
   /**
+   * Returns all implementations for the given WebSocket.
+   * @param ws WebSocket
+   * @param ann annotation (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public ArrayList<WsFunction> findWs(final WebSocket ws, final Annotation ann)
+      throws QueryException, IOException {
+    final WsPath pth = new WsPath(ws.getPath());
+    final ArrayList<WsFunction> funcs = new ArrayList<>();
+    for(final WebModule mod : cache(ws.context).values()) {
+      for(final WsFunction func : mod.wsFunctions()) {
+        if(func.matches(ann, pth)) funcs.add(func);
+      }
+    }
+    Collections.sort(funcs);
+    return funcs;
+  }
+
+  /**
    * Returns the WebSocket function that matches the current request.
    * @param ws WebSocket
    * @param ann annotation
@@ -174,14 +195,7 @@ public final class WebModules {
       throws QueryException, IOException {
 
     // collect and sort all function candidates
-    final ArrayList<WsFunction> funcs = new ArrayList<>();
-    for(final WebModule mod : cache(ws.context).values()) {
-      for(final WsFunction func : mod.wsFunctions()) {
-        if(func.matches(ann, new WsPath(ws.getPath()))) funcs.add(func);
-      }
-    }
-    Collections.sort(funcs);
-
+    final ArrayList<WsFunction> funcs = findWs(ws, ann);
     if(funcs.isEmpty()) return null;
 
     final WsFunction first = funcs.get(0);

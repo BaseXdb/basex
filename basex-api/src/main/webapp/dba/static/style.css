@@ -36,6 +36,10 @@ td {
   border: 0;
 }
 
+.img {
+  vertical-align: top;
+}
+
 .slick {
   padding: 0 0 0 0;
 }
@@ -134,6 +138,11 @@ p {
 }
 
 .note {
+  color: #666666;
+}
+
+.footnote {
+  font-size: 70%;
   color: #666666;
 }
 

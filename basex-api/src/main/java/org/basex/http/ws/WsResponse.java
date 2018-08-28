@@ -58,7 +58,7 @@ public final class WsResponse extends WebResponse {
       // don't send anything if WebSocket gets closed because the connection is already closed
       // We have to do this check inside the loop because the XQuery function should get executed
       // too if it is a _WS_CLOSE function, just don't return a result.
-      if(func.matches(Annotation._WS_CLOSE)) continue;
+      if(func.matches(Annotation._WS_CLOSE, null)) continue;
 
       if(value instanceof byte[]) {
         ws.getSession().getRemote().sendBytes(ByteBuffer.wrap((byte[]) value));

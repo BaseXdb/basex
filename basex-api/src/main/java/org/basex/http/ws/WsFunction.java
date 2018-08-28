@@ -118,26 +118,14 @@ public final class WsFunction extends WebFunction {
   }
 
   /**
-   * Checks if a WebSocket request matches this annotation.
-   * @param annotation annotation the annotation parameter
-   * @return boolean result of the check
-   */
-  public boolean matches(final Annotation annotation) {
-    for(final Ann ann : function.anns) {
-      if(ann.sig == annotation) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Checks if an WebSocket request matches this Annotation and Path.
-   * @param annotation annotation
-   * @param pth path to compare to
+   * Checks if an WebSocket request matches this annotation and path.
+   * @param ann annotation (can be {@code null})
+   * @param pth path to compare to (can be {@code null})
    * @return boolean result of check
    */
-  public boolean matches(final Annotation annotation, final WsPath pth) {
-    for(final Ann ann : function.anns) {
-      if(path != null && ann.sig == annotation && path.compareTo(pth) == 0) return true;
+  public boolean matches(final Annotation ann, final WsPath pth) {
+    for(final Ann a : function.anns) {
+      if((ann == null || a.sig == ann) && (pth == null || path.compareTo(pth) == 0)) return true;
     }
     return false;
   }

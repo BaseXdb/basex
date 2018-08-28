@@ -11,6 +11,6 @@ import org.eclipse.jetty.websocket.servlet.*;
 public final class WsCreator implements WebSocketCreator {
   @Override
   public Object createWebSocket(final ServletUpgradeRequest req, final ServletUpgradeResponse res) {
-    return new WebSocket(req.getHttpServletRequest());
+    return WebSocket.get(req.getHttpServletRequest());
   }
 }
