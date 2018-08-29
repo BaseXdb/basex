@@ -112,8 +112,6 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
    */
   @Override
   public void onWebSocketError(final Throwable cause) {
-    // [JF] as super.onWebSocketError() does nothing...
-    // can we be sure that a connection will always be closed after an error?
     try {
       context.log.write(LogType.ERROR, cause.getMessage(), null, context);
       findAndProcess(Annotation._WS_ERROR, cause.toString());
@@ -153,6 +151,14 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   @Override
   public String clientName() {
     return context.user().name();
+  }
+
+  /**
+   * Closes the Websocket-Connection.
+   * @param reason The String Reason
+   * */
+  public void closeWebsocket(final String reason) {
+    getSession().close(StatusCode.NORMAL, reason);
   }
 
   /**

@@ -146,6 +146,10 @@ p {
   color: #666666;
 }
 
+.private {
+  color: red;
+}
+
 .small {
   height: 10px;
 }
