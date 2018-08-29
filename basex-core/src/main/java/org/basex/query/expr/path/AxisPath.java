@@ -17,9 +17,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AxisPath extends Path {
-  /** Thread-safe path caching. */
-  private final ThreadLocal<PathCache> caches = ThreadLocal.withInitial(PathCache::new);
-
   /**
    * Constructor.
    * @param info input info
@@ -32,7 +29,7 @@ public abstract class AxisPath extends Path {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final PathCache cache = caches.get();
+    final PathCache cache = qc.threads.get(this).get();
     switch(cache.state) {
       case INIT:
         // first invocation: initialize caching flag

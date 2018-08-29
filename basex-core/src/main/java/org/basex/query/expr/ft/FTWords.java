@@ -49,9 +49,6 @@ public final class FTWords extends FTExpr {
   /** Full-text options. */
   private FTOpt ftOpt;
 
-  /** Thread-safe full-text tokenizer. */
-  private final ThreadLocal<FTTokenizer> caches = new ThreadLocal<>();
-
   /**
    * Constructor for scan-based evaluation.
    * @param info input info
@@ -363,10 +360,11 @@ public final class FTWords extends FTExpr {
    * @return tokenizer
    */
   private FTTokenizer get(final QueryContext qc) {
-    FTTokenizer ftt = caches.get();
+    final ThreadLocal<FTTokenizer> tl = qc.threads.get(this);
+    FTTokenizer ftt = tl.get();
     if(ftt == null) {
       ftt = new FTTokenizer(ftOpt, qc, info);
-      caches.set(ftt);
+      tl.set(ftt);
     }
     return ftt;
   }

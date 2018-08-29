@@ -17,9 +17,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CmpHashG extends CmpG {
-  /** Thread-safe caching. */
-  private final ThreadLocal<CmpCache> caches = new ThreadLocal<>();
-
   /**
    * Constructor.
    * @param expr1 first expression
@@ -38,7 +35,7 @@ public final class CmpHashG extends CmpG {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr expr = super.optimize(cc);
     // invalidate cache if value was pre-evaluated
-    if(expr instanceof Value) caches.remove();
+    if(expr instanceof Value) cc.qc.threads.get(this).remove();
     return expr;
   }
 
@@ -54,10 +51,11 @@ public final class CmpHashG extends CmpG {
     final Value value2 = iter2.value();
     if(value2 != null && value2.size() > 1) {
       // first call: initialize cache
-      CmpCache cache = caches.get();
+      final ThreadLocal<CmpCache> tl = qc.threads.get(this);
+      CmpCache cache = tl.get();
       if(cache == null) {
         cache = new CmpCache();
-        caches.set(cache);
+        tl.set(cache);
       }
 
       // check if caching is enabled
@@ -98,49 +96,5 @@ public final class CmpHashG extends CmpG {
   @Override
   public String description() {
     return "hashed " + super.description();
-  }
-
-  /**
-   * Cached items.
-   * @author BaseX Team 2005-18, BSD License
-   * @author Christian Gruen
-   */
-  private final class CmpCache {
-    /** Cached items. */
-    private HashItemSet set = new HashItemSet(true);
-    /** Cached value (right-hand operand). */
-    private Value value;
-    /** Lazy iterator (right-hand operand). */
-    private Iter iter;
-    /** Cache hits. */
-    private int hits = Integer.MAX_VALUE;
-
-    /**
-     * Checks if caching is enabled. Assigns values required for caching.
-     * @param val value
-     * @param ir iterator
-     * @return result of check
-     */
-    private boolean active(final Value val, final Iter ir) {
-      // check if caching was dismissed
-      if(set == null) return false;
-
-      // check if this is the first call, of if the value to be cached has changed
-      if(value != val) {
-        // no cache hits: dismiss caching
-        if(hits < 1) {
-          set = null;
-          value = null;
-          iter = null;
-          return false;
-        }
-        // create new cache
-        set = new HashItemSet(true);
-        value = val;
-        iter = ir;
-        hits = 0;
-      }
-      return true;
-    }
   }
 }

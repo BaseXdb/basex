@@ -20,7 +20,7 @@ import org.basex.util.similarity.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class FTTokenizer {
+public final class FTTokenizer {
   /** Token comparator. */
   final TokenComparator cmp;
 
@@ -46,7 +46,7 @@ final class FTTokenizer {
    * @param qc query context
    * @param info input info
    */
-  FTTokenizer(final FTOpt opt, final QueryContext qc, final InputInfo info) {
+  public FTTokenizer(final FTOpt opt, final QueryContext qc, final InputInfo info) {
     this(opt, new Levenshtein(qc.context.options.get(MainOptions.LSERROR)), info);
   }
 
