@@ -27,7 +27,7 @@ public final class XMLDBCreate {
     try {
       // Register the database
       Class<?> c = Class.forName(DRIVER);
-      Database db = (Database) c.newInstance();
+      Database db = (Database) c.getDeclaredConstructor().newInstance();
       DatabaseManager.registerDatabase(db);
 
       System.out.println("\n* Create a new collection.");

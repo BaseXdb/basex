@@ -173,7 +173,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return main module
    * @throws QueryException query exception
    */
-  public Module parse(final String query, final String uri) throws QueryException {
+  public AModule parse(final String query, final String uri) throws QueryException {
     return parse(query, QueryProcessor.isLibrary(query), uri);
   }
 
@@ -185,7 +185,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return main module
    * @throws QueryException query exception
    */
-  public Module parse(final String query, final boolean library, final String uri)
+  public AModule parse(final String query, final boolean library, final String uri)
       throws QueryException {
     return library ? parseLibrary(query, uri) : parseMain(query, uri);
   }

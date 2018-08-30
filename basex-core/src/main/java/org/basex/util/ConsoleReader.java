@@ -143,7 +143,7 @@ public abstract class ConsoleReader implements AutoCloseable {
       readEcho = Reflect.method(readerC, "readLine", String.class, Character.class);
 
       // initialization
-      reader = readerC.newInstance();
+      reader = readerC.getDeclaredConstructor().newInstance();
 
       final Class<?> history = Reflect.find(JLINE_HISTORY);
       fileHistoryC = Reflect.find(JLINE_FILE_HISTORY);

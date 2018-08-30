@@ -57,7 +57,7 @@ public class ValidateRng extends ValidateFn {
             csr = Class.forName("com.thaiopensource.validate.rng.CompactSchemaReader");
 
           final Object ehInstance = vp.getField("ERROR_HANDLER").get(null);
-          final Object pmbInstance = pmb.newInstance();
+          final Object pmbInstance = pmb.getDeclaredConstructor().newInstance();
           pi.getMethod("put", pmb, Object.class).invoke(ehInstance, pmbInstance, handler);
 
           final Object srInstance = compact ? csr.getMethod("getInstance").invoke(null) : null;

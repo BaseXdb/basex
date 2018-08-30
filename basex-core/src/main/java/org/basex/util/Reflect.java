@@ -174,7 +174,7 @@ public final class Reflect {
    */
   public static <O> O get(final Class<O> clazz) {
     try {
-      return clazz != null ? clazz.newInstance() : null;
+      return clazz != null ? clazz.getDeclaredConstructor().newInstance() : null;
     } catch(final Throwable ex) {
       Util.debug(ex);
       return null;

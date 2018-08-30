@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.scope.Module;
+import org.basex.query.scope.AModule;
 import org.basex.query.scope.LibraryModule;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -63,7 +63,7 @@ public class XQueryParse extends StandardFunc {
     final String uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
 
     try(QueryContext qctx = new QueryContext(qc.context)) {
-      final Module mod = qctx.parse(string(query), uri);
+      final AModule mod = qctx.parse(string(query), uri);
       final FElem root;
       if(mod instanceof LibraryModule) {
         final LibraryModule lib = (LibraryModule) mod;

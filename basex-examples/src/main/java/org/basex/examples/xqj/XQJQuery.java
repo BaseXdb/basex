@@ -24,7 +24,8 @@ public final class XQJQuery {
     System.out.println("\n* Run query via XQJ:");
 
     // Create a new data source.
-    XQDataSource source = (XQDataSource) Class.forName(DRIVER).newInstance();
+    XQDataSource source = (XQDataSource) Class.forName(DRIVER).
+        getDeclaredConstructor().newInstance();
 
     // Build a connection to the specified driver.
     XQConnection conn = source.getConnection("admin", "admin");

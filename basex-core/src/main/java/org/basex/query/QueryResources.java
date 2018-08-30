@@ -117,7 +117,7 @@ public final class QueryResources {
     QueryResource value = external.get(resource);
     if(value == null) {
       try {
-        value = resource.newInstance();
+        value = resource.getDeclaredConstructor().newInstance();
         external.put(resource, value);
       } catch(final Throwable ex) {
         throw Util.notExpected(ex);

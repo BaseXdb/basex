@@ -34,7 +34,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
   public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
-    db = (Database) c.newInstance();
+    db = (Database) c.getDeclaredConstructor().newInstance();
     coll = db.getCollection(PATH, LOGIN, PW);
     serv = (CollectionManagementService) coll.getService(CMS, "1.0");
   }

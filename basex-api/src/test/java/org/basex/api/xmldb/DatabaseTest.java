@@ -23,7 +23,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
   @Before
   public void setUp() throws Exception {
     createDB();
-    database = (BXDatabase) Class.forName(DRIVER).newInstance();
+    database = (BXDatabase) Class.forName(DRIVER).getDeclaredConstructor().newInstance();
   }
 
   /**

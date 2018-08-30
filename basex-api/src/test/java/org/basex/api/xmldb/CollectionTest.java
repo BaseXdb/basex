@@ -31,7 +31,7 @@ public final class CollectionTest extends XMLDBBaseTest {
   public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
-    final Database database = (Database) c.newInstance();
+    final Database database = (Database) c.getDeclaredConstructor().newInstance();
     coll = database.getCollection(PATH, LOGIN, PW);
   }
 

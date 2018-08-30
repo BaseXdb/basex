@@ -36,7 +36,7 @@ public final class XMLDBQuery {
     try {
       // Register the database
       Class<?> c = Class.forName(DRIVER);
-      Database db = (Database) c.newInstance();
+      Database db = (Database) c.getDeclaredConstructor().newInstance();
       DatabaseManager.registerDatabase(db);
 
       // Receive the database

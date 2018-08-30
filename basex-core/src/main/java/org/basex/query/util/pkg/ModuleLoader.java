@@ -122,7 +122,7 @@ public final class ModuleLoader {
 
     // instantiate class
     try {
-      javaModules.add(clz.newInstance());
+      javaModules.add(clz.getDeclaredConstructor().newInstance());
       return true;
     } catch(final Throwable ex) {
       throw MODINST_X_X.get(info, className, ex);

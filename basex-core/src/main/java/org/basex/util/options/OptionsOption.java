@@ -61,7 +61,7 @@ public final class OptionsOption<O extends Options> extends Option<O> {
    */
   public O newInstance() {
     try {
-      return clazz.newInstance();
+      return clazz.getDeclaredConstructor().newInstance();
     } catch(final Exception ex) {
       throw Util.notExpected(ex);
     }

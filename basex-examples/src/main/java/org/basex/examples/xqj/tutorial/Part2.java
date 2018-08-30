@@ -29,7 +29,7 @@ public final class Part2 extends Main {
 
     String xqdsClassName = p.getProperty("ClassName");
     Class<?> xqdsClass = Class.forName(xqdsClassName);
-    XQDataSource xqds = (XQDataSource) xqdsClass.newInstance();
+    XQDataSource xqds = (XQDataSource) xqdsClass.getDeclaredConstructor().newInstance();
 
     // Connect with user name and password
     info("Connect with user name and password");

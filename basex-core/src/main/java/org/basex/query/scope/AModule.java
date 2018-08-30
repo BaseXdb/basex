@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public abstract class Module extends StaticScope {
+public abstract class AModule extends StaticScope {
   /** User-defined functions. */
   private final TokenObjMap<StaticFunc> funcs;
   /** Static variables. */
@@ -31,7 +31,7 @@ public abstract class Module extends StaticScope {
    * @param vars static variables (can be {@code null})
    * @param imports namespace URIs of imported modules (can be {@code null})
    */
-  Module(final StaticContext sc, final VarScope vs, final String doc, final InputInfo info,
+  AModule(final StaticContext sc, final VarScope vs, final String doc, final InputInfo info,
       final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
       final TokenSet imports) {
     super(sc, vs, doc, info);

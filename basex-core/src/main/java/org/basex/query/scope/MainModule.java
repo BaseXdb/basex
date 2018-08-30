@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
-public final class MainModule extends Module {
+public final class MainModule extends AModule {
   /** Declared type, {@code null} if not specified. */
   private final SeqType declType;
 
