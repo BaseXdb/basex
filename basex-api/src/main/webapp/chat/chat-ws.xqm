@@ -20,10 +20,8 @@ function chat:ws-message(
 ) as empty-sequence() {
   let $json := parse-json($message)
   let $type := $json?type
-  return if($type = 'message-global') then (
-    chat:message-global($json?text)
-  ) else if($type = 'message-private') then(
-    chat:message-private($json?text, $json?receiver)
+  return if($type = 'message') then (
+    chat:message($json?text, $json?to)
   ) else if($type = 'users') then (
     chat:users()
   ) else error()
@@ -34,10 +32,9 @@ function chat:ws-message(
  :)
 declare
   %ws:connect('/chat')
-  function chat:ws-connect() as empty-sequence() {
+function chat:ws-connect() as empty-sequence() {
   let $ws-ids := session:get($chat:ws-ID)
-  let $set-ws-sess := session:set($chat:ws-ID, ($ws-ids , ws:id()))
-  return ()
+  return session:set($chat:ws-ID, ($ws-ids, ws:id()))
 };
 
 (:~ 
@@ -47,52 +44,46 @@ declare
   %ws:close('/chat')
 function chat:ws-close() as empty-sequence() {
   let $ws-ids := session:get($chat:ws-ID)
-  let $del-ws-id := session:set($chat:ws-ID, $ws-ids[. != ws:id()])
-  return chat:users()
+  return (
+    session:set($chat:ws-ID, $ws-ids[. != ws:id()]),
+    chat:users()
+  )
 };
   
 (:~
- : Sends a user list to all clients.
+ : Sends a users list (all, active) to all registered clients.
  :)
 declare %private function chat:users() as empty-sequence() {
   ws:emit(json:serialize(map {
     'type': 'users',
-    'users': array { distinct-values(
+    'users': array { sort(user:list()) },
+    'active': array { distinct-values(
       sessions:ids() ! sessions:get(., $chat:ID)
     )}
   }))
 };
 
-(:~
- : Sends a message to all clients.
- :)
-declare %private function chat:message-global(
-  $text  as xs:string
-) as empty-sequence() {
-  ws:emit(json:serialize(map {
-    'type': 'message-global',
-    'text': serialize($text),
-    'user': session:get($chat:ID),
-    'date': format-time(current-time(), '[H02]:[m02]:[s02]')
-  }))
-};
-
 (:~ 
- : Sends a message to a specific user.
+ : Sends a message to all clients, or to the clients of a specific user.
+ : @param  $text  text to be sent
+ : @param  $to    receiver of a private message (optional)
  :)
-declare %private function chat:message-private(
-  $text as xs:string,
-  $name as xs:string
-) as empty-sequence(){
-  let $ws-sessions := (
-     for $session-id in sessions:ids()
-     where sessions:get($session-id,$chat:ID) = $name
-     return sessions:get($session-id,$chat:ws-ID)
-   )
-   return ws:send(json:serialize(map {
-    'type': 'message-private',
+declare %private function chat:message(
+  $text  as xs:string,
+  $to    as xs:string?
+) as empty-sequence() {
+  let $ws-ids := trace(if($to) then (
+    for $id in sessions:ids()
+    where sessions:get($id, $chat:ID) = $to
+    return sessions:get($id, $chat:ws-ID)
+  ) else (
+    ws:ids()
+  ))
+  return ws:send(json:serialize(map {
+    'type': 'message',
     'text': serialize($text),
-    'user': session:get($chat:ID),
-    'date': format-time(current-time(), '[H02]:[m02]:[s02]')
-  }), $ws-sessions)
+    'from': session:get($chat:ID),
+    'date': format-time(current-time(), '[H02]:[m02]:[s02]'),
+    'private': boolean($to)
+  }), $ws-ids)
 };
