@@ -28,11 +28,11 @@ declare function qt3ts:to-junit(
   let $catalog := doc($path || file:dir-separator() || 'catalog.xml'),
       $root    := replace(base-uri($catalog), 'catalog\.xml$', ''),
       $files   := qt3ts:get-files($root, $catalog),
-      $envs    := qt3ts:environments(map:new(), $catalog/catalog/environment, $files)
+      $envs    := qt3ts:environments(map{}, $catalog/catalog/environment, $files)
   let $files   :=
         qt3ts-java:test-suites(
           $package,
-          map:new((
+          map:merge((
             for $name in (if($test-sets = '*') then $catalog//test-set/@name else $test-sets)
             let $test-set := $catalog//test-set[@name = $name]
             return
@@ -44,7 +44,7 @@ declare function qt3ts:to-junit(
   let $path := $out-path || file:dir-separator() || $name || '.java'
   return (
     file:create-dir(replace($path, '[^/\\]+$', '')),
-    file:write($path, $files($name), map{ 'method' := 'text' })
+    file:write($path, $files($name), map{ 'method': 'text' })
   )
 };
 
@@ -71,11 +71,11 @@ declare function qt3ts:test-set(
       $desc := if($doc/test-set/description)
                  then $doc/test-set/description/string()
                  else 'Test-set ' || $name || '.'
-  let $tests := map:new((
+  let $tests := map:merge((
     for $test-case in $doc/test-set/test-case
     where every $dep in $test-case/dependency
       satisfies $supports($dep/@type, tokenize($dep/@value, ' '))
-    return map{ $test-case/@name := qt3ts:test-case($test-set, $test-case, $root, $envs, $file) }
+    return map{ $test-case/@name: qt3ts:test-case($test-set, $test-case, $root, $envs, $file) }
   ))
   return
     if($doc/*/dependency[not($supports(@type, tokenize(@value, ' ')))])
@@ -98,7 +98,7 @@ declare function qt3ts:test-case(
 ) as map(*) {
   let $desc := $test-case/description/string(),
       $env := $test-case/environment,
-      $mods := map:new((
+      $mods := map:merge((
           for $mod in $test-case/module
           return map:entry(
             xs:anyURI($mod/@uri/string()),
@@ -128,13 +128,13 @@ declare function qt3ts:test-case(
           some $spec in $dep/tokenize(@value, ' ')
           satisfies contains(trace($spec, 'spec'), '30') or contains($spec, '+')
   return map{
-    'description' := $desc,
-    'modules'     := $mods,
-    'environment' := $map,
-    'is_file'     := $is_file,
-    'test'        := $test,
-    'result'      := $result,
-    'xq10'        := not($xq30)
+    'description': $desc,
+    'modules'    : $mods,
+    'environment': $map,
+    'is_file'    : $is_file,
+    'test'       : $test,
+    'result'     : $result,
+    'xq10'       : not($xq30)
   }
 };
 
@@ -152,8 +152,8 @@ declare function qt3ts:result(
       case 'assert' return $assert/string()
       case 'assert-eq' return $assert/string()
       case 'assert-string-value' return map{
-          'normalize-space' := $assert/@normalize-space = ('true', '1'),
-          'result'          := $assert/string()
+          'normalize-space': $assert/@normalize-space = ('true', '1'),
+          'result'         : $assert/string()
         }
       case 'assert-permutation' return $assert/string()
       case 'assert-type' return $assert/string()
@@ -162,19 +162,19 @@ declare function qt3ts:result(
       case 'error' return $assert/@code/string()
       case 'assert-serialization-error' return $assert/@code/string()
       case 'assert-xml' return map{
-          'ignore-prefixes' := $assert/@ignore-prefixes = ('true', '1'),
-          'result' := if($assert/@file)
+          'ignore-prefixes': $assert/@ignore-prefixes = ('true', '1'),
+          'result': if($assert/@file)
             then
               let $path := $root || $file($assert/@file)
               return file:read-text($path, 'UTF-8')
             else $assert/string()
         }
       case 'serialization-matches' return map{
-          'flags' := ($assert/@flags/string(), '')[1],
-          'regex' := $assert/text()/string()
+          'flags': ($assert/@flags/string(), '')[1],
+          'regex': $assert/text()/string()
         }
-      case 'all-of' return map($assert/*, qt3ts:result(?, $file, $root))
-      case 'any-of' return map($assert/*, qt3ts:result(?, $file, $root))
+      case 'all-of' return map{} (: $assert/*, qt3ts:result(?, $file, $root)) :)
+      case 'any-of' return map{} (: ($assert/*, qt3ts:result(?, $file, $root)) :)
       default return qt3ts:debug('Unknown assertion', $name)
   )
 };
@@ -184,7 +184,7 @@ declare function qt3ts:environments(
   $envs as element(environment)*,
   $file as map(*)
 ) as map(*) {
-  map:new(
+  map:merge(
     ($map,
       for $env in $envs
       return if($env/@name)
@@ -203,59 +203,59 @@ declare function qt3ts:environment(
   return switch($name)
     case 'source'
       return map:entry($name, map{
-        'role' := $env/@role/string(),
-        'file' := $file($env/@file/string()),
-        'validation' := $env/@validation/string(),
-        'uri' := xs:anyURI($env/@uri/string())
+        'role' : $env/@role/string(),
+        'file' : $file($env/@file/string()),
+        'validation' : $env/@validation/string(),
+        'uri' : xs:anyURI($env/@uri/string())
       })
     case 'namespace'
       return map:entry($name, map{
-        'prefix' := $env/@prefix/string(),
-        'uri' := xs:anyURI($env/@uri/string())
+        'prefix' : $env/@prefix/string(),
+        'uri' : xs:anyURI($env/@uri/string())
       })
     case 'collation'
       return map:entry($name, map{
-        'uri' := xs:anyURI($env/@uri/string()),
-        'default' := $env/@default = 'true'
+        'uri' : xs:anyURI($env/@uri/string()),
+        'default' : $env/@default = 'true'
       })
     case 'collection'
       return map:entry($name, map{
-        'uri' := xs:anyURI($env/@uri/string()),
-        'docs' := map:new((
+        'uri' : xs:anyURI($env/@uri/string()),
+        'docs' : map:merge((
           for $src in $env/source
           return map:entry($src/@file, map{
-            'role' := $src/@role/string(),
-            'file' := $file($src/@file/string()),
-            'validation' := $src/@validation/string(),
-            'uri' := xs:anyURI($src/@uri/string())
+            'role' : $src/@role/string(),
+            'file' : $file($src/@file/string()),
+            'validation' : $src/@validation/string(),
+            'uri' : xs:anyURI($src/@uri/string())
           })
         ))
       })
     case 'decimal-format'
-      return map:entry($name, map:new((
+      return map:entry($name, map:merge((
         for $att in $env/@*
         return map:entry($att/name(), $att/string())
       )))
     case 'resource'
       return map:entry($name, map{
-        'file' := $file($env/@file/string()),
-        'media-type' := $env/@media-type/string(),
-        'encoding' := $env/@encoding/string(),
-        'uri' := xs:anyURI($env/@uri/string())
+        'file' : $file($env/@file/string()),
+        'media-type' : $env/@media-type/string(),
+        'encoding' : $env/@encoding/string(),
+        'uri' : xs:anyURI($env/@uri/string())
       })
     case 'schema'
       return map:entry($name, map{
-        'uri' := xs:anyURI($env/@uri/string()),
-        'file' := $file($env/@file/string())
+        'uri' : xs:anyURI($env/@uri/string()),
+        'file' : $file($env/@file/string())
       })
     case 'static-base-uri'
       return map:entry($name, xs:anyURI($env/@uri/string()))
     case 'param'
       return map:entry($name, map{
-        'name' := $env/@name/string(),
-        'select' := $env/@select/string(),
-        'as' := $env/@as/string(),
-        'declared' := $env/@declared != 'false'
+        'name' : $env/@name/string(),
+        'select' : $env/@select/string(),
+        'as' : $env/@as/string(),
+        'declared' : $env/@declared != 'false'
       })
     case 'context-item'
       return map:entry($name, $env/@select/string())
@@ -267,7 +267,7 @@ declare function qt3ts:get-files(
   $root as xs:string,
   $node as node()
 )  as map(*) {
-  map:new((
+  map:merge((
     let $root-len := string-length(file:path-to-native(substring($root, 9))) + 2,
         $uri := base-uri($node)
     for $file in $node//@file
@@ -286,7 +286,7 @@ declare function qt3ts:insert-with(
   $key as item(),
   $value as item()*
 ) as map(*) {
-  map:new(
+  map:merge(
     ( $map,
       map:entry(
         $key,

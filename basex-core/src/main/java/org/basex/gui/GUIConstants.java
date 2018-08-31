@@ -1,8 +1,10 @@
 package org.basex.gui;
 
+import static org.basex.gui.GUICommand.*;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.nio.charset.*;
 import java.util.*;
 
@@ -281,13 +283,14 @@ public final class GUIConstants {
   /** No modifier. */
   public static final int NO_MOD = 0;
   /** Shift key. */
-  public static final int SHIFT = Event.SHIFT_MASK;
+  public static final int SHIFT = InputEvent.SHIFT_DOWN_MASK;
   /** Alt key. */
-  public static final int ALT = Event.ALT_MASK;
+  public static final int ALT = InputEvent.ALT_DOWN_MASK;
   /** Control key. */
-  public static final int CTRL = Event.CTRL_MASK;
+  public static final int CTRL = InputEvent.CTRL_DOWN_MASK;
   /** Shortcut key (CTRL/META). */
-  public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
+  public static final int META = Prop.MAC ? InputEvent.META_DOWN_MASK :
+    InputEvent.CTRL_DOWN_MASK;
 
   // INITIALIZATION ===============================================================================
 

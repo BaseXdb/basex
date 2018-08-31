@@ -12,7 +12,7 @@ declare function qt3ts-java:test-suites(
   $package,
   $test-sets
 ) as map(*) {
-  map:new((
+  map:merge((
     $test-sets,
     for $path in map:keys($test-sets)
     let $parts   := tokenize($path, '/'),

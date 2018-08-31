@@ -43,9 +43,7 @@ public final class GUIInput extends BaseXCombo {
     BaseXLayout.resizeFont(this, 1.3f);
 
     completions = new BaseXCombo(main);
-    completions.addActionListener(e -> {
-      if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
-    });
+    completions.addActionListener(e -> completeInput());
     popup = new GUIInputPopup(completions);
 
     addKeyListener(new KeyAdapter() {
@@ -60,7 +58,7 @@ public final class GUIInput extends BaseXCombo {
           } else {
             updateHistory();
             // evaluate the input
-            if(e.getModifiers() == 0) gui.execute();
+            if(e.getModifiersEx() == 0) gui.execute();
           }
         }
 

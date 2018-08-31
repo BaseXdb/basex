@@ -150,7 +150,7 @@ public enum BaseXKeys {
    */
   public boolean is(final KeyEvent e) {
     final int c = e.getKeyCode();
-    final int m = e.getModifiers() | allowed;
+    final int m = e.getModifiersEx() | allowed;
     return m == (modifiers | allowed) &&
         (c == VK_UNDEFINED ? getExtendedKeyCodeForChar(e.getKeyChar()) : c) == key;
   }
@@ -161,7 +161,7 @@ public enum BaseXKeys {
    * @return result of check
    */
   public static boolean sc(final InputEvent e) {
-    return (META & e.getModifiers()) == META;
+    return (META & e.getModifiersEx()) == META;
   }
 
   /**
@@ -188,7 +188,7 @@ public enum BaseXKeys {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getKeyModifiersText(modifiers));
+    final StringBuilder sb = new StringBuilder(InputEvent.getModifiersExText(modifiers));
     if(sb.length() != 0) sb.append('+');
     return sb.append(getKeyText(key)).toString();
   }
@@ -199,10 +199,10 @@ public enum BaseXKeys {
    */
   String shortCut() {
     final StringBuilder sb = new StringBuilder();
-    if((modifiers & InputEvent.META_MASK) != 0) sb.append("meta").append(' ');
-    if((modifiers & InputEvent.CTRL_MASK) != 0) sb.append("ctrl").append(' ');
-    if((modifiers & InputEvent.ALT_MASK) != 0) sb.append("alt").append(' ');
-    if((modifiers & InputEvent.SHIFT_MASK) != 0) sb.append("shift").append(' ');
+    if((modifiers & InputEvent.META_DOWN_MASK) != 0) sb.append("meta").append(' ');
+    if((modifiers & InputEvent.CTRL_DOWN_MASK) != 0) sb.append("ctrl").append(' ');
+    if((modifiers & InputEvent.ALT_DOWN_MASK) != 0) sb.append("alt").append(' ');
+    if((modifiers & InputEvent.SHIFT_DOWN_MASK) != 0) sb.append("shift").append(' ');
 
     if(key == VK_ENTER) sb.append("ENTER");
     else if(key == VK_DELETE) sb.append("DELETE");
