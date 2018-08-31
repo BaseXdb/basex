@@ -72,13 +72,13 @@ declare %private function chat:message(
   $text  as xs:string,
   $to    as xs:string?
 ) as empty-sequence() {
-  let $ws-ids := trace(if($to) then (
+  let $ws-ids := if($to) then (
     for $id in sessions:ids()
     where sessions:get($id, $chat:ID) = $to
     return sessions:get($id, $chat:ws-ID)
   ) else (
     ws:ids()
-  ))
+  )
   return ws:send(json:serialize(map {
     'type': 'message',
     'text': serialize($text),
