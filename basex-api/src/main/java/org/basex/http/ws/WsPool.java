@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -26,8 +27,16 @@ public final class WsPool {
   private static long websocketId = -1;
 
   /** Clients of the pool. id -> adapter. */
-  private final HashMap<String, WebSocket> clients = new HashMap<>();
+  private final ConcurrentHashMap<String, WebSocket> clients = new ConcurrentHashMap<>();
 
+  /**
+   * Closes the WebsocketConnection.
+   * @param id The id of the Websocket.
+   * @param reason The String reason
+   * */
+  public void closeWebsocket(final String id, final String reason) {
+    clients.get(id).closeWebsocket(reason);
+  }
   /**
    * Returns the pool instance.
    * @return instance
@@ -95,9 +104,6 @@ public final class WsPool {
   public void broadcast(final Item message, final String client)
       throws QueryException, IOException {
 
-    /* [JF] We need to check what happens if a client is removed from the hash map while we iterate
-     * through all entries. this can be tested by calling Performance.sleep(...) in the loop.
-     * we could possibly use a ConcurrentHashMap. */
     final ArrayList<WebSocket> list = new ArrayList<>();
     for(final Entry<String, WebSocket> entry : clients.entrySet()) {
       final String id = entry.getKey();

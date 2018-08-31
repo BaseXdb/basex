@@ -51,18 +51,19 @@ function chat:main(
   
   chat:wrap((
     <p>
-      <input type='text' size='45' autofocus='true' placeholder='Write your message…'
+      <input type='text' size='60' autofocus='true' placeholder='Message to all users…'
              id='input' onkeydown='keyDown(event)' autocomplete='off'/>
     </p>,
     <table width='100%'>
       <tr>
-        <td width='60%'>
-          <div class='warning'>Messages:</div>
-          <div id='messages'/>
-        </td>
-        <td width='40%'>
-          <div class='warning'>Logged in users:</div>
+        <td width='100'>
+          <div class='note'>USERS (<b>online</b>)</div>
           <div id='users'/>
+        </td>
+        <td class='vertical'/>
+        <td>
+          <div class='note'>CHAT MESSAGES</div>
+          <div id='messages'/>
         </td>
       </tr>
     </table>

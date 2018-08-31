@@ -22,7 +22,7 @@ function page:start(
       <link rel="stylesheet" type="text/css" href="static/style.css"/>
     </head>
     <body>
-      <div class="right"><img src="static/basex.svg" width="96"/></div>
+      <div class="right"><img src="static/basex.svg"/></div>
       <h1>BaseX HTTP Services</h1>
       <div>Welcome to the BaseX HTTP Services. They allow you to:</div>
       <ul>
@@ -44,14 +44,20 @@ function page:start(
 
       <h3>Database Administration</h3>
 
-      <p>The <a href="dba">DBA</a> is a database administration interface
+      <p>The <a href="dba">Database Administration interface</a> (DBA) is completely
         written in RESTXQ. The DBA code serves as a good introduction on
-        how to build XQuery web applications.</p>
+        how to build complex XQuery web applications.</p>
 
       <h3>WebSocket Chat</h3>
 
-      <p>The <a href="chat">Chat</a> illustrates how bidirectional communication
-        can be realized in XQuery.</p>
+      <p>The <a href="chat">WebSocket Chat</a> illustrates how bidirectional communication
+        can be realized in XQuery. For a better experience when testing the chat,
+        consider the following steps:</p>
+        
+      <ol>
+        <li> Create different database users first (e.g. via the DBA)</li>
+        <li> Open 2, 3 different browsers and log in with different users</li>
+      </ol>
     </body>
   </html>
 };

@@ -5,7 +5,9 @@ import module namespace sessions = 'http://basex.org/modules/Sessions';
 import module namespace ws = 'http://basex.org/modules/ws';
 
 (:~ Session chat id. :)
-declare variable $chat:ID := 'chat';
+declare variable $chat:ID		  := 'chat';
+(:~ WebSocket ID of the WebSocket instance :)
+declare variable $chat:ws-ID   := 'ws-id';
 
 (:~ 
  : Processes a WebSocket message.
@@ -19,10 +21,20 @@ function chat:ws-message(
   let $json := parse-json($message)
   let $type := $json?type
   return if($type = 'message') then (
-    chat:message($json?text)
+    chat:message($json?text, $json?to)
   ) else if($type = 'users') then (
     chat:users()
   ) else error()
+};
+
+(:~ 
+ : Opens a WebSocket.
+ :)
+declare
+  %ws:connect('/chat')
+function chat:ws-connect() as empty-sequence() {
+  let $ws-ids := session:get($chat:ws-ID)
+  return session:set($chat:ws-ID, ($ws-ids, ws:id()))
 };
 
 (:~ 
@@ -31,31 +43,47 @@ function chat:ws-message(
 declare
   %ws:close('/chat')
 function chat:ws-close() as empty-sequence() {
-  chat:users()
+  let $ws-ids := session:get($chat:ws-ID)
+  return (
+    session:set($chat:ws-ID, $ws-ids[. != ws:id()]),
+    chat:users()
+  )
 };
   
 (:~
- : Sends a user list to all clients.
+ : Sends a users list (all, active) to all registered clients.
  :)
 declare %private function chat:users() as empty-sequence() {
   ws:emit(json:serialize(map {
     'type': 'users',
-    'users': array { distinct-values(
+    'users': array { sort(user:list()) },
+    'active': array { distinct-values(
       sessions:ids() ! sessions:get(., $chat:ID)
     )}
   }))
 };
 
-(:~
- : Sends a message to all clients.
+(:~ 
+ : Sends a message to all clients, or to the clients of a specific user.
+ : @param  $text  text to be sent
+ : @param  $to    receiver of a private message (optional)
  :)
 declare %private function chat:message(
-  $text  as xs:string
+  $text  as xs:string,
+  $to    as xs:string?
 ) as empty-sequence() {
-  ws:emit(json:serialize(map {
+  let $ws-ids := if($to) then (
+    for $id in sessions:ids()
+    where sessions:get($id, $chat:ID) = $to
+    return sessions:get($id, $chat:ws-ID)
+  ) else (
+    ws:ids()
+  )
+  return ws:send(json:serialize(map {
     'type': 'message',
     'text': serialize($text),
-    'user': session:get($chat:ID),
-    'date': format-time(current-time(), '[H02]:[m02]:[s02]')
-  }))
+    'from': session:get($chat:ID),
+    'date': format-time(current-time(), '[H02]:[m02]:[s02]'),
+    'private': boolean($to)
+  }), $ws-ids)
 };

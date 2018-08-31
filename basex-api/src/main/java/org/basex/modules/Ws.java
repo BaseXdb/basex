@@ -94,6 +94,24 @@ public final class Ws extends QueryModule {
   }
 
   /**
+   * Closes the WebSocketConnection of the Current client.
+   * @param reason The string reason
+   * @throws QueryException query exception
+   * */
+  public void closewebsocket(final Str reason) throws QueryException {
+    pool().closeWebsocket(id(), reason.toJava());
+  }
+
+  /**
+   * Closes the WebSocketConnection of a client.
+   * @param id The id of the WebSocket Connection.
+   * @param reason The string reason
+   * */
+  public void closewebsocket(final Str id, final Str reason) {
+    pool().closeWebsocket(id.toJava(), reason.toJava());
+  }
+
+  /**
    * Returns a reference to the WebSocket pool.
    * @return pool
    */
