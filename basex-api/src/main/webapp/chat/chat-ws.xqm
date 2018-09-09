@@ -53,6 +53,18 @@ function chat:ws-close() as empty-sequence() {
 };
   
 (:~
+ : Logs out the current user.
+ :)
+declare
+  %rest:path('/chat/logout')
+function chat:logout(
+) as element(rest:response) {
+  session:close(),
+  chat:users(),
+  web:redirect('/chat/login')
+};
+
+(:~
  : Sends a users list (all, active) to all registered clients.
  :)
 declare %private function chat:users() as empty-sequence() {

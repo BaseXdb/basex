@@ -95,17 +95,6 @@ function chat:check(
 };
 
 (:~
- : Logs out the current user.
- :)
-declare
-  %rest:path('/chat/logout')
-function chat:logout(
-) as element(rest:response) {
-  session:close(),
-  web:redirect('/chat/login')
-};
-
-(:~
  : Returns an HTML page.
  : @param $contents  page contents
  : @param $login     login page
