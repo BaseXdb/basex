@@ -24,6 +24,8 @@ function chat:ws-message(
     chat:message($json?text, $json?to)
   ) else if($type = 'users') then (
     chat:users()
+  ) else if($type = "ping") then(
+    chat:ping()
   ) else error()
 };
 
@@ -86,4 +88,13 @@ declare %private function chat:message(
     'date': format-time(current-time(), '[H02]:[m02]:[s02]'),
     'private': boolean($to)
   }), $ws-ids)
+};
+
+(:~
+  : Answers with a pong to a ping-message
+  :)
+declare %private function chat:ping(){
+  ws:send(json:serialize(map{
+    'type': 'pong'
+  }),ws:id())
 };
