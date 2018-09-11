@@ -36,13 +36,17 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   /** Path. */
   private final WsPath path;
+  /** Subprotocol */
+  private final String subprotocol;
 
   /**
    * Constructor.
    * @param req request
+   * @param subprotocol subprotocol
    */
-  WebSocket(final HttpServletRequest req) {
+  WebSocket(final HttpServletRequest req, final String subprotocol) {
     this.req = req;
+    this.subprotocol = subprotocol;
 
     final String pi = req.getPathInfo();
     this.path = new WsPath(pi != null ? pi : "/");
@@ -56,10 +60,11 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /**
    * Creates a new WebSocket instance.
    * @param req request
+   * @param subprotocol subprotocol
    * @return WebSocket or {@code null}
    */
-  static WebSocket get(final HttpServletRequest req) {
-    final WebSocket ws = new WebSocket(req);
+  static WebSocket get(final HttpServletRequest req, final String subprotocol) {
+    final WebSocket ws = new WebSocket(req, subprotocol);
     try {
       if(!WebModules.get(ws.context).findWs(ws, null).isEmpty()) return ws;
     } catch(final Exception ex) {
@@ -97,6 +102,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     addHeader.accept("QueryString", ur.getQueryString());
     addHeader.accept("IsSecure", String.valueOf(ur.isSecure()));
     addHeader.accept("RequestURI", ur.getRequestURI().toString());
+    addHeader.accept("Subprotocol", subprotocol);
 
     final String[] names = { "Host", "Sec-WebSocket-Version" };
     for(final String name : names) addHeader.accept(name, ur.getHeader(name));
