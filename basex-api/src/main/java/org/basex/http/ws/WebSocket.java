@@ -20,7 +20,7 @@ import org.eclipse.jetty.websocket.api.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-public final class WebSocket extends WebSocketAdapter implements ClientInfo {
+public class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** Database context. */
   public final Context context;
 
