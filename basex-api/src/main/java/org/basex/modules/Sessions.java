@@ -88,11 +88,11 @@ public final class Sessions extends QueryModule {
    * Updates a session attribute.
    * @param id session id
    * @param key key of the attribute
-   * @param item item to be stored
+   * @param value item to be stored
    * @throws QueryException query exception
    */
-  public void set(final Str id, final Str key, final Item item) throws QueryException {
-    session(id).set(key, item);
+  public void set(final Str id, final Str key, final Value value) throws QueryException {
+    session(id).set(key, value);
   }
 
   /**
