@@ -66,7 +66,7 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
   static WebSocket get(final HttpServletRequest req, final String subprotocol) {
     final WebSocket ws = new WebSocket(req, subprotocol);
     try {
-      if(!WebModules.get(ws.context).findWs(ws, null).isEmpty()) return ws;
+      if(!WebModules.get(ws.context).findWs(ws, null, ws.getPath()).isEmpty()) return ws;
     } catch(final Exception ex) {
       Util.debug(ex);
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
@@ -182,7 +182,7 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
 
     try {
       // find function to evaluate
-      final WsFunction func = WebModules.get(context).websocket(this, ann);
+      final WsFunction func = WebModules.get(context).websocket(this, ann, this.getPath());
       if(func != null) new WsResponse(this).create(func, message);
     } catch(final RuntimeException ex) {
       throw ex;

@@ -64,6 +64,9 @@ public final class WsFunction extends WebFunction {
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
+        case _WS_STOMP_CONNECT:
+        case _WS_STOMP_SUBSCRIBE:
+        case _WS_STOMP_UNSUBSCRIBE:
           path = new WsPath(toString(args[0]));
           count++;
           break;

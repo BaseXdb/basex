@@ -29,6 +29,34 @@ public final class WsPool {
   /** Clients of the pool. id -> adapter. */
   private final ConcurrentHashMap<String, WebSocket> clients = new ConcurrentHashMap<>();
 
+  /** Clients of the channels. channel -> list of websocketids */
+  private final ConcurrentHashMap<String, List<String>> channelWebsocketid = new ConcurrentHashMap<>();
+
+  /**
+   * Joins a Channel.
+   * @param channel channel
+   * @param websocketid websocketid
+   */
+  public void joinChannel(final String channel, final String websocketid) {
+    List<String> websocketids = channelWebsocketid.get(channel);
+    if(websocketids == null) {
+      websocketids = new ArrayList<>();
+    }
+    websocketids.add(websocketid);
+    channelWebsocketid.put(channel, websocketids);
+  }
+
+  /**
+   * Leaves a Channel.
+   * @param channel channel
+   * @param websocketid websocketid
+   */
+  public void leaveChannel(final String channel, final String websocketid) {
+    List<String> websocketids = channelWebsocketid.get(channel);
+    if(websocketids == null) return;
+    websocketids.remove(websocketid);
+    channelWebsocketid.put(channel, websocketids);
+  }
   /**
    * Closes the WebsocketConnection.
    * @param id The id of the Websocket.
@@ -112,6 +140,22 @@ public final class WsPool {
     send(message, list);
   }
 
+  /**
+   * Sends a Message to a Channel
+   * @param message message
+   * @param channel channel
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public void sendChannel(final Item message, final Str channel) throws QueryException, IOException {
+     final List<String> listWebsocketids = channelWebsocketid.get(channel.toJava());
+     final ArrayList<WebSocket> list = new ArrayList<>();
+     for(final String id : listWebsocketids) {
+       final WebSocket ws = clients.get(id);
+       if(ws != null) list.add(ws);
+     }
+     send(message,list);
+  };
   /**
    * Sends a message to a specific clients.
    * @param message message

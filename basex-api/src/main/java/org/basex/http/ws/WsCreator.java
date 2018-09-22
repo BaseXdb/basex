@@ -22,6 +22,10 @@ public final class WsCreator implements WebSocketCreator {
     String[] subprotocols = subprotString.split(",");
 
     for (String subprotocol : req.getSubProtocols()) {
+      if(subprotocol.equals("v12.stomp")){
+        res.setAcceptedSubProtocol(subprotocol);
+        return StompV12WebSocket.get(req.getHttpServletRequest(), subprotocol);
+      }
       if(Arrays.asList(subprotocols).contains(subprotocol)) {
         res.setAcceptedSubProtocol(subprotocol);
         return WebSocket.get(req.getHttpServletRequest(),subprotocol);
