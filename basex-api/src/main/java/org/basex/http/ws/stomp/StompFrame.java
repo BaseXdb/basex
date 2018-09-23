@@ -1,13 +1,10 @@
 package org.basex.http.ws.stomp;
 
-import static org.basex.http.web.WebText.*;
-
 import java.util.*;
 
 /**
  * Represents the a Frame in the Stomp Protocol.
  * @author BaseX Team 2005-18, BSD License
- * TODO: Body kann auch Binary sein -> neue klasse: StompBody ?
  */
 public abstract class StompFrame {
   /**

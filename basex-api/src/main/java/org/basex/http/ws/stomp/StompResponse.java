@@ -3,7 +3,6 @@ package org.basex.http.ws.stomp;
 import static org.basex.http.web.WebText.*;
 
 import java.io.*;
-import java.nio.*;
 import java.util.*;
 
 import org.basex.http.*;
@@ -12,7 +11,6 @@ import org.basex.http.ws.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -57,7 +55,7 @@ public final class StompResponse extends WebResponse {
   public boolean serialize() throws QueryException, IOException {
     qc.register(ctx);
     try {
-      for(final Object value : serialize(qc.iter(), func.output)) {
+      for(@SuppressWarnings("unused") final Object value : serialize(qc.iter(), func.output)) {
         // Dont write anything back to the clients, the XQuery-User has to do this via
         // Ws-Module sendStomp for Sending Stomp-Message-Frames
         continue;

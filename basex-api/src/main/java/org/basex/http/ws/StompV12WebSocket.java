@@ -18,26 +18,35 @@ import org.eclipse.jetty.websocket.api.*;
  * @author Johannes Finckh
  */
 /*
- * [JF] Fragen:
- * - Wenn HeaderParam der vom XQuery-Nutzer gefordert wird nicht existiert wird fehler geworfen -> eig sollte default verwendet werden?
- *    -> Passiert auch unabhängig von STOMP!
- *    -> Hier relevant für header wie HOST, ...
- * */
+ * [JF] Fragen: - Wenn HeaderParam der vom XQuery-Nutzer gefordert wird nicht existiert wird fehler
+ * geworfen -> eig sollte default verwendet werden? -> Passiert auch unabhängig von STOMP! -> Hier
+ * relevant für header wie HOST, ...
+ */
 public final class StompV12WebSocket extends WebSocket {
 
   /** Map for mapping stomids to the channels */
-  private Map<String,String> StompIdChannel = new HashMap<>();
+  private Map<String, String> StompIdChannel = new HashMap<>();
   /** List of all channels the WebSocket is connected to */
   private List<String> channels = new ArrayList<>();
   /** Map of stompids with ackmode */
-  private Map<String,String> stompAck = new HashMap<>();
+  private Map<String, String> stompAck = new HashMap<>();
+  /** Map of Transactionids with a List of StompFrames */
+  private Map<String, List<StompFrame>> transidStompframe = new HashMap<>();
+
+  /**
+   * Consumer for adding headers.
+   */
+  final BiConsumer<String, String> addHeader = (k, v) -> {
+    if(v != null) headers.put(k, v);
+  };
+
   /**
    * Constructor.
    * @param req request
    * @param subprotocol subprotocol
    */
   StompV12WebSocket(final HttpServletRequest req, final String subprotocol) {
-    super(req,subprotocol);
+    super(req, subprotocol);
   }
 
   /**
@@ -61,7 +70,7 @@ public final class StompV12WebSocket extends WebSocket {
    * Returns the Ack-Mode for the StompId.
    * @param stompId StompId
    * @return String ACK-Mode
-   * */
+   */
   public String getAckMode(final String stompId) {
     return stompAck.get(stompId);
   }
@@ -70,13 +79,47 @@ public final class StompV12WebSocket extends WebSocket {
    * Returns the StompId to a Channel.
    * @param channel Channel
    * @return String the stompId, can be {@code null};
-   * */
+   */
   public String getStompId(final String channel) {
-    for(String stompid: StompIdChannel.keySet()) {
-      if(StompIdChannel.get(stompid).equals(channel))
-        return stompid;
+    for(String stompid : StompIdChannel.keySet()) {
+      if(StompIdChannel.get(stompid).equals(channel)) return stompid;
     }
     return null;
+  }
+
+  /**
+   * Executes all StompFrames in the Transaction
+   * @param transactionId The id of the Transaction
+   */
+  private void commitTransaction(final String transactionId) {
+    List<StompFrame> frames = transidStompframe.get(transactionId);
+    if(frames == null) return;
+    for(StompFrame stompframe : frames) {
+      Map<String, String> stompheaders = stompframe.getHeaders();
+      switch(stompframe.getCommand()) {
+        case SEND:
+          findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(), stompheaders.get("destination"));
+          break;
+        case ACK:
+          String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
+          if(ackMode.equals("client")) {
+            WsPool.get().ackMessages(id, stompheaders.get("id"));
+          } else if(ackMode.equals("client-individual")) {
+            WsPool.get().ackMessage(id, stompheaders.get("id"));
+          }
+          break;
+        case NACK:
+          MessageObject mo = WsPool.get().discardMessage(id, stompheaders.get("id"));
+          if(mo == null) return;
+          addHeader.accept("messageid", mo.getMessageId());
+          addHeader.accept("message", mo.getMessage());
+          addHeader.accept("wsid", mo.getWebSocketId());
+          findAndProcess(Annotation._WS_STOMP_NACK, null, null);
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   @Override
@@ -84,15 +127,23 @@ public final class StompV12WebSocket extends WebSocket {
     super.onWebSocketConnect(sess);
   }
 
+  /**
+   * Sends an Errorframe
+   * @param message error message
+   * */
+  private void sendError(final String message) {
+    Map<String,String> cheaders = new HashMap<>();
+    cheaders.put("message", message);
+    ErrorFrame ef = new ErrorFrame(Commands.ERROR, cheaders, "");
+    super.getSession().getRemote().sendStringByFuture(ef.serializedFrame());
+  }
+
   @Override
   public void onWebSocketText(final String message) {
     StompFrame stompframe = parseStompFrame(message);
     if(stompframe == null) return;
-    Map<String,String> stompheaders = stompframe.getHeaders();
+    Map<String, String> stompheaders = stompframe.getHeaders();
     // Add the StompHeaders to the Headers
-    final BiConsumer<String, String> addHeader = (k, v) -> {
-      if(v != null) headers.put(k, v);
-    };
     stompheaders.forEach(addHeader);
 
     switch(stompframe.getCommand()) {
@@ -105,16 +156,28 @@ public final class StompV12WebSocket extends WebSocket {
         findAndProcess(Annotation._WS_STOMP_CONNECT, null, null);
         break;
       case SEND:
-        String destination = stompheaders.get("destination");
-        findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(), destination);
+        if(stompheaders.get("transaction") != null) {
+          // If the Message is in an transaction, dont execute it, add it to the transaction.
+          // Execute after Commit
+          if(!transidStompframe.containsKey(stompheaders.get("transaction"))) {
+            sendError("No Transaction found");
+            return;
+          }
+          List<StompFrame> sf = transidStompframe.get(stompheaders.get("transaction"));
+          if(sf == null) sf = new ArrayList<>();
+          sf.add(stompframe);
+        } else {
+          String destination = stompheaders.get("destination");
+          findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(), destination);
+        }
         break;
       case SUBSCRIBE:
         if(channels.contains(stompheaders.get("destination"))) {
-          // Throw error? -> subscribe only one time to thechannel
+          sendError("No Destination found");
           return;
         }
         channels.add(stompheaders.get("destination"));
-        StompIdChannel.put(stompheaders.get("id"),stompheaders.get("destination"));
+        StompIdChannel.put(stompheaders.get("id"), stompheaders.get("destination"));
         stompAck.put(stompheaders.get("id"), stompheaders.get("ack"));
         WsPool.get().joinChannel(stompheaders.get("destination"), id);
         findAndProcess(Annotation._WS_STOMP_SUBSCRIBE, null, stompheaders.get("destination"));
@@ -129,39 +192,63 @@ public final class StompV12WebSocket extends WebSocket {
         findAndProcess(Annotation._WS_STOMP_UNSUBSCRIBE, null, channel);
         break;
       case ACK:
-        // get the ackmode of the subscribtion
-        String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
-        if(ackMode.equals("client")) {
-          WsPool.get().ackMessages(id, stompheaders.get("id"));
-        } else if(ackMode.equals("client-individual")) {
-          WsPool.get().ackMessage(id, stompheaders.get("id"));
+        if(stompheaders.get("transaction") != null) {
+          // If the ACK is in an transaction, dont execute it, add it to the transaction.
+          // Execute after Commit
+          if(!transidStompframe.containsKey(stompheaders.get("transaction"))) {
+            sendError("No Transaction found");
+            return;
+          }
+          List<StompFrame> sf = transidStompframe.get(stompheaders.get("transaction"));
+          if(sf == null) sf = new ArrayList<>();
+          sf.add(stompframe);
+        } else {
+          // get the ackmode of the subscribtion
+          String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
+          if(ackMode.equals("client")) {
+            WsPool.get().ackMessages(id, stompheaders.get("id"));
+          } else if(ackMode.equals("client-individual")) {
+            WsPool.get().ackMessage(id, stompheaders.get("id"));
+          }
         }
         break;
       case NACK:
-         WsPool.get().discardMessage(id, stompheaders.get("id"));
-         break;
-      case BEGIN:
-        // tODO
-      case COMMIT:
-        // TODO
-      case ABORT:
-        // TODO
-      case DISCONNECT:
-        // TODO
-      case CONNECTED:
-        // ServerMSg
-      case ERROR:
-        // SErverMSg
-      case MESSAGE:
-        // ServerMSG
-      case RECEIPT:
-        // SErverMSG
-      default:
-        findAndProcess(Annotation._WS_MESSAGE, message,null);
+        if(stompheaders.get("transaction") != null) {
+          // If the NACK is in an transaction, dont execute it, add it to the transaction.
+          // Execute after Commit
+          if(!transidStompframe.containsKey(stompheaders.get("transaction"))) {
+            sendError("No Transaction found");
+            return;
+          }
+          List<StompFrame> sf = transidStompframe.get(stompheaders.get("transaction"));
+          if(sf == null) sf = new ArrayList<>();
+          sf.add(stompframe);
+        } else {
+          MessageObject mo = WsPool.get().discardMessage(id, stompheaders.get("id"));
+          if(mo == null) return;
+          addHeader.accept("messageid", mo.getMessageId());
+          addHeader.accept("message", mo.getMessage());
+          addHeader.accept("wsid", mo.getWebSocketId());
+          findAndProcess(Annotation._WS_STOMP_NACK, null, null);
+        }
         break;
-    };
+      case BEGIN:
+        transidStompframe.put(stompheaders.get("transaction"), null);
+        break;
+      case COMMIT:
+        commitTransaction(stompheaders.get("transaction"));
+        break;
+      case ABORT:
+        transidStompframe.remove(stompheaders.get("transaction"));
+        break;
+      case DISCONNECT:
+        if(transidStompframe.containsKey(stompheaders.get("transaction")))
+          transidStompframe.remove(stompheaders.get("transaction"));
+        break;
+      default:
+        break;
+    }
   }
-
 
   /**
    * Parses a Stringmessage to a StompFrame.

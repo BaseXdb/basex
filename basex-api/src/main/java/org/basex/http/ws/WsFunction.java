@@ -77,6 +77,9 @@ public final class WsFunction extends WebFunction {
           path = new WsPath(toString(args[0]));
           count++;
           break;
+        case _WS_STOMP_NACK:
+          count++;
+          break;
         default:
           break;
       }

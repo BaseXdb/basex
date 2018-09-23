@@ -187,20 +187,23 @@ public final class WsPool {
   }
 
   /**
-   * Discards a Message from the not-Acked-List
+   * Discards a Message from the not-Acked-List and returns the messageobject
    * @param wsId Id of the Websocket
    * @param messageId Id of the message
+   * @return MessageObject the message object
    * */
-  public void discardMessage(final String wsId, final String messageId) {
+  public MessageObject discardMessage(final String wsId, final String messageId) {
     SortedSet<MessageObject> messages = notAckedMessages.get(wsId);
-    if(messages == null) return;
+    if(messages == null) return null;
     Iterator<MessageObject> it = messages.iterator();
     while(it.hasNext()) {
       MessageObject object = it.next();
       if(object.getMessageId().equals(messageId)) {
         messages.remove(object);
+        return object;
       }
     }
+    return null;
   }
   /**
    * Deletes the messages to ack from the not acked set and adds it to the acked set
@@ -264,7 +267,7 @@ public final class WsPool {
          if(!ackmode.equals("auto")) {
            SortedSet<MessageObject> messages = notAckedMessages.get(wsId);
            if(messages == null) messages = new TreeSet<>();
-           messages.add(new MessageObject(messageUID, message.toJava()));
+           messages.add(new MessageObject(messageUID, message.toJava(),wsId));
            notAckedMessages.put(wsId, messages);
          }
 

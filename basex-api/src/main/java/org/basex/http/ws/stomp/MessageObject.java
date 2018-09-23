@@ -12,21 +12,33 @@ public class MessageObject implements Comparable<MessageObject> {
   private Date time;
   /** The message. */
   private String message;
+  /** The Websocket Id of the client that gets the message*/
+  private String wsid;
 
   /**
    * Constructor.
    * @param messageId The messageid
    * @param message The message string
+   * @param wsid The websocketid
    */
-  public MessageObject(final String messageId, final String message) {
+  public MessageObject(final String messageId, final String message, final String wsid) {
     this.messageId = messageId;
     this.message = message;
+    this.wsid = wsid;
     this.time = new Date();
   }
 
   @Override
   public int compareTo(MessageObject o) {
     return this.time.compareTo(o.time);
+  }
+
+  /**
+   * Returns the WebSocket-Id
+   * @return String websocketid
+   * */
+  public String getWebSocketId() {
+    return wsid;
   }
 
   /**
