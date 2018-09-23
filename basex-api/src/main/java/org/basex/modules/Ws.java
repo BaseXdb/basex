@@ -79,10 +79,8 @@ public final class Ws extends QueryModule {
    * Sends a message to a channel.
    * @param message message
    * @param channel channel
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  public void sendchannel(final Item message, final Str channel) throws QueryException, IOException {
+  public void sendchannel(final Str message, final Str channel) {
     pool().sendChannel(message, channel);
   }
   /**

@@ -29,6 +29,8 @@ public final class StompV12WebSocket extends WebSocket {
   private Map<String,String> StompIdChannel = new HashMap<>();
   /** List of all channels the WebSocket is connected to */
   private List<String> channels = new ArrayList<>();
+  /** Map of stompids with ackmode */
+  private Map<String,String> stompAck = new HashMap<>();
   /**
    * Constructor.
    * @param req request
@@ -51,6 +53,28 @@ public final class StompV12WebSocket extends WebSocket {
     } catch(final Exception ex) {
       Util.debug(ex);
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
+    }
+    return null;
+  }
+
+  /**
+   * Returns the Ack-Mode for the StompId.
+   * @param stompId StompId
+   * @return String ACK-Mode
+   * */
+  public String getAckMode(final String stompId) {
+    return stompAck.get(stompId);
+  }
+
+  /**
+   * Returns the StompId to a Channel.
+   * @param channel Channel
+   * @return String the stompId, can be {@code null};
+   * */
+  public String getStompId(final String channel) {
+    for(String stompid: StompIdChannel.keySet()) {
+      if(StompIdChannel.get(stompid).equals(channel))
+        return stompid;
     }
     return null;
   }
@@ -91,6 +115,7 @@ public final class StompV12WebSocket extends WebSocket {
         }
         channels.add(stompheaders.get("destination"));
         StompIdChannel.put(stompheaders.get("id"),stompheaders.get("destination"));
+        stompAck.put(stompheaders.get("id"), stompheaders.get("ack"));
         WsPool.get().joinChannel(stompheaders.get("destination"), id);
         findAndProcess(Annotation._WS_STOMP_SUBSCRIBE, null, stompheaders.get("destination"));
         break;
@@ -100,18 +125,37 @@ public final class StompV12WebSocket extends WebSocket {
         WsPool.get().leaveChannel(channel, id);
         channels.remove(channel);
         StompIdChannel.remove(stompheaders.get("id"));
+        stompAck.remove(stompheaders.get("id"));
         findAndProcess(Annotation._WS_STOMP_UNSUBSCRIBE, null, channel);
         break;
-      case ABORT:
       case ACK:
-      case BEGIN:
-      case COMMIT:
-      case CONNECTED:
-      case DISCONNECT:
-      case ERROR:
-      case MESSAGE:
+        // get the ackmode of the subscribtion
+        String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
+        if(ackMode.equals("client")) {
+          WsPool.get().ackMessages(id, stompheaders.get("id"));
+        } else if(ackMode.equals("client-individual")) {
+          WsPool.get().ackMessage(id, stompheaders.get("id"));
+        }
+        break;
       case NACK:
+         WsPool.get().discardMessage(id, stompheaders.get("id"));
+         break;
+      case BEGIN:
+        // tODO
+      case COMMIT:
+        // TODO
+      case ABORT:
+        // TODO
+      case DISCONNECT:
+        // TODO
+      case CONNECTED:
+        // ServerMSg
+      case ERROR:
+        // SErverMSg
+      case MESSAGE:
+        // ServerMSG
       case RECEIPT:
+        // SErverMSG
       default:
         findAndProcess(Annotation._WS_MESSAGE, message,null);
         break;
@@ -153,7 +197,7 @@ public final class StompV12WebSocket extends WebSocket {
     try {
       // find function to evaluate
       final WsFunction func = WebModules.get(context).websocket(this, ann, wspath);
-      if(func != null) new WsResponse(this).create(func, message);
+      if(func != null) new StompResponse(this).create(func, message);
     } catch(final RuntimeException ex) {
       throw ex;
     } catch(final Exception ex) {

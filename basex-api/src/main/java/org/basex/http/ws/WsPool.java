@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
 
+import org.basex.http.ws.stomp.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -31,6 +32,13 @@ public final class WsPool {
 
   /** Clients of the channels. channel -> list of websocketids */
   private final ConcurrentHashMap<String, List<String>> channelWebsocketid = new ConcurrentHashMap<>();
+
+  /** Open Messages -> Messages which want to be acknolodget but havnt yet */
+  private final Map<String,SortedSet<MessageObject>> notAckedMessages = new HashMap<>();
+  /** Acked Messages */
+  private final Map<String,SortedSet<MessageObject>> ackedMessages = new HashMap<>();
+  /** Map of MessageIds with their stompid */
+  private final Map<String,String> messageIdStompId = new HashMap<>();
 
   /**
    * Joins a Channel.
@@ -141,21 +149,136 @@ public final class WsPool {
   }
 
   /**
+   * Removes a Message from the not acked-list and puts it to the acked list.
+   * @param wsId Id of the Websocket
+   * @param messageId Id of the Message
+   * */
+  public void ackMessage(final String wsId, final String messageId) {
+    SortedSet<MessageObject> messages = notAckedMessages.get(wsId);
+    if(messages == null) return;
+    Iterator<MessageObject> it = messages.iterator();
+    while(it.hasNext()) {
+      MessageObject object = it.next();
+      if(object.getMessageId().equals(messageId)) {
+        SortedSet<MessageObject> toAck = new TreeSet<>();
+        toAck.add(object);
+        ackedMessages.put(wsId, ackMessages(toAck,messages,wsId));
+      }
+    }
+  }
+
+  /** Removes the Message with the id and all older messages from the not acked list and add
+   * it to the acked list.
+   * @param wsId Id of the Websocket
+   * @param messageId Id of the message
+   * */
+  public void ackMessages(final String wsId, final String messageId) {
+    SortedSet<MessageObject> messages = notAckedMessages.get(wsId);
+    if(messages == null) return;
+    Iterator<MessageObject> it = messages.iterator();
+    while(it.hasNext()) {
+      MessageObject object = it.next();
+      if(object.getMessageId().equals(messageId)) {
+        SortedSet<MessageObject> toAck = messages.subSet(messages.first(), object);
+        toAck.add(object);
+        ackedMessages.put(wsId, ackMessages(toAck, messages, wsId));
+      }
+    }
+  }
+
+  /**
+   * Discards a Message from the not-Acked-List
+   * @param wsId Id of the Websocket
+   * @param messageId Id of the message
+   * */
+  public void discardMessage(final String wsId, final String messageId) {
+    SortedSet<MessageObject> messages = notAckedMessages.get(wsId);
+    if(messages == null) return;
+    Iterator<MessageObject> it = messages.iterator();
+    while(it.hasNext()) {
+      MessageObject object = it.next();
+      if(object.getMessageId().equals(messageId)) {
+        messages.remove(object);
+      }
+    }
+  }
+  /**
+   * Deletes the messages to ack from the not acked set and adds it to the acked set
+   * @param toAck SortedSet of Messages to Ack
+   * @param notAcked SortedSet of Messages which are not acked yet
+   * @param wsId The WsID
+   * @return the new notAcked-SortedSet
+   */
+  private SortedSet<MessageObject> ackMessages(SortedSet<MessageObject> toAck,
+                                               SortedSet<MessageObject> notAcked,
+                                               String wsId) {
+    Iterator<MessageObject> it = toAck.iterator();
+    while(it.hasNext()) {
+      // Get the message to Ack
+      MessageObject ackme = it.next();
+      // Remote the message to ack from the not acked set
+      notAcked.remove(ackme);
+      // Add the Message to the ackedMessages
+      SortedSet<MessageObject> ackMsg = ackedMessages.get(wsId);
+      if(ackMsg == null) ackMsg = new TreeSet<>();
+      ackMsg.add(ackme);
+      ackedMessages.put(wsId, ackMsg);
+    }
+    return notAcked;
+  }
+
+  /**
+   * Returns the stompId to the messageId
+   * @param messageId the Messageid
+   * @return the stompid
+   * */
+  public String getStompIdToMessageId(final String messageId) {
+    return messageIdStompId.get(messageId);
+  }
+  /**
    * Sends a Message to a Channel
    * @param message message
    * @param channel channel
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  public void sendChannel(final Item message, final Str channel) throws QueryException, IOException {
+  public void sendChannel(final Str message, final Str channel) {
      final List<String> listWebsocketids = channelWebsocketid.get(channel.toJava());
-     final ArrayList<WebSocket> list = new ArrayList<>();
      for(final String id : listWebsocketids) {
        final WebSocket ws = clients.get(id);
-       if(ws != null) list.add(ws);
+       final StompV12WebSocket sws = (StompV12WebSocket) ws;
+       // Send the message here because each message has another messageid
+       if(sws != null) {
+         String messageUID = UUID.randomUUID().toString();
+         String stompId = sws.getStompId(channel.toJava());
+         String ackmode = sws.getAckMode(stompId);
+         String wsId = sws.id;
+
+         // Set the headers of the MessageFrame
+         Map<String, String> headers = new HashMap<>();
+         headers.put("destination", channel.toJava());
+         headers.put("message-id", messageUID);
+         headers.put("subscription", stompId);
+         headers.put("content-length", "" + message.toJava().length());
+         headers.put("content-type", "text/plain");
+
+         // Check if ACK Required, add it to notAckedMessages if required
+         if(!ackmode.equals("auto")) {
+           SortedSet<MessageObject> messages = notAckedMessages.get(wsId);
+           if(messages == null) messages = new TreeSet<>();
+           messages.add(new MessageObject(messageUID, message.toJava()));
+           notAckedMessages.put(wsId, messages);
+         }
+
+         // Add the Messageid with its stompId to the messageIdStompId-Map
+         messageIdStompId.put(messageUID, stompId);
+
+         // Create MessageFrame and send it to the RemoteEndpoint
+         MessageFrame mf = new MessageFrame(Commands.MESSAGE, headers, message.toJava());
+         final RemoteEndpoint remote = sws.getSession().getRemote();
+         remote.sendStringByFuture(mf.serializedFrame());
+       }
      }
-     send(message,list);
   };
+
   /**
    * Sends a message to a specific clients.
    * @param message message

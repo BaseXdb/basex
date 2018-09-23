@@ -25,9 +25,9 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
   public final Context context;
 
   /** Header parameters. */
-  final Map<String, String> headers = new HashMap<>();
+  public final Map<String, String> headers = new HashMap<>();
   /** Servlet request. */
-  final HttpServletRequest req;
+  public final HttpServletRequest req;
 
   /** Client WebSocket id. */
   public String id;
