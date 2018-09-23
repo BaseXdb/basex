@@ -7,6 +7,7 @@ import java.util.Map.*;
 import java.util.concurrent.*;
 
 import org.basex.http.ws.stomp.*;
+import org.basex.http.ws.stomp.frames.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;

@@ -7,6 +7,7 @@ import javax.servlet.http.*;
 
 import org.basex.http.web.*;
 import org.basex.http.ws.stomp.*;
+import org.basex.http.ws.stomp.frames.*;
 import org.basex.query.ann.*;
 import org.basex.util.*;
 import org.eclipse.jetty.websocket.api.*;
@@ -96,6 +97,7 @@ public final class StompV12WebSocket extends WebSocket {
     if(frames == null) return;
     for(StompFrame stompframe : frames) {
       Map<String, String> stompheaders = stompframe.getHeaders();
+      stompheaders.forEach(addHeader);
       switch(stompframe.getCommand()) {
         case SEND:
           findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(), stompheaders.get("destination"));
@@ -119,6 +121,12 @@ public final class StompV12WebSocket extends WebSocket {
         default:
           break;
       }
+      for(String headername : stompheaders.keySet()) {
+        headers.remove(headername);
+      }
+      headers.remove("messageid");
+      headers.remove("message");
+      headers.remove("wsid");
     }
   }
 
@@ -244,10 +252,21 @@ public final class StompV12WebSocket extends WebSocket {
       case DISCONNECT:
         if(transidStompframe.containsKey(stompheaders.get("transaction")))
           transidStompframe.remove(stompheaders.get("transaction"));
+
+        Map<String, String> ch = new HashMap<>();
+        ch.put("receipt-id", stompheaders.get("receipt"));
+        ReceiptFrame rf = new ReceiptFrame(Commands.RECEIPT, ch, "");
+        super.getSession().getRemote().sendStringByFuture(rf.serializedFrame());
         break;
       default:
         break;
     }
+    for(String headername : stompheaders.keySet()) {
+      headers.remove(headername);
+    }
+    headers.remove("messageid");
+    headers.remove("message");
+    headers.remove("wsid");
   }
 
   /**

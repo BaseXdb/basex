@@ -1,6 +1,8 @@
-package org.basex.http.ws.stomp;
+package org.basex.http.ws.stomp.frames;
 
 import java.util.*;
+
+import org.basex.http.ws.stomp.*;
 
 /**
  * Class for a Error Frame.

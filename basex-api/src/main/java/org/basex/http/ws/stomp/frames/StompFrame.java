@@ -1,6 +1,8 @@
-package org.basex.http.ws.stomp;
+package org.basex.http.ws.stomp.frames;
 
 import java.util.*;
+
+import org.basex.http.ws.stomp.*;
 
 /**
  * Represents the a Frame in the Stomp Protocol.
@@ -69,14 +71,19 @@ public abstract class StompFrame {
         break;
         // Transaction stuff
       case BEGIN:
+        returnFrame = new BeginFrame(cmd, header, message.substring(cmdhead.length() + 2));
         break;
       case COMMIT:
+        returnFrame = new CommitFrame(cmd, header, message.substring(cmdhead.length() + 2));
         break;
       case ABORT:
+        returnFrame = new AbortFrame(cmd, header, message.substring(cmdhead.length() + 2));
         break;
       case ACK:
+        returnFrame = new AckFrame(cmd, header, message.substring(cmdhead.length() + 2));
         break;
       case NACK:
+        returnFrame = new NackFrame(cmd, header, message.substring(cmdhead.length() + 2));
         break;
       case DISCONNECT:
         returnFrame = new DisconnectFrame(cmd, header, message.substring(cmdhead.length() + 2));
@@ -86,7 +93,6 @@ public abstract class StompFrame {
         returnFrame = new ConnectFrame(cmd, header, message.substring(cmdhead.length() + 2));
         break;
       default:
-        // TODO: What in default case?
         returnFrame = new SendFrame(cmd, header, message.substring(cmdhead.length() + 2));
     }
 
