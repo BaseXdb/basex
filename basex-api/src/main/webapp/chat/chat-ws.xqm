@@ -1,13 +1,6 @@
-module namespace chat = 'http://basex.org/modules/web-page';
+module namespace chat = 'chat';
 
-import module namespace session = 'http://basex.org/modules/Session';
-import module namespace sessions = 'http://basex.org/modules/Sessions';
-import module namespace ws = 'http://basex.org/modules/ws';
-
-(:~ Session chat id. :)
-declare variable $chat:ID		  := 'chat';
-(:~ WebSocket ID of the WebSocket instance :)
-declare variable $chat:ws-ID   := 'ws-id';
+import module namespace chat-util = 'chat/util' at 'chat-util.xqm';
 
 (:~ 
  : Processes a WebSocket message.
@@ -21,92 +14,33 @@ function chat:ws-message(
   let $json := parse-json($message)
   let $type := $json?type
   return if($type = 'message') then (
-    chat:message($json?text, $json?to)
+    chat-util:message($json?text, $json?to)
   ) else if($type = 'users') then (
-    chat:users()
+    chat-util:users()
   ) else if($type = "ping") then(
-    chat:ping()
+    (: do nothing :)
   ) else error()
 };
 
 (:~ 
- : Opens a WebSocket.
+ : Creates a WebSocket connection: Adds the WebSocket id to the list of ids
+ : that is stored in the session.
  :)
 declare
   %ws:connect('/chat')
 function chat:ws-connect() as empty-sequence() {
-  let $ws-ids := session:get($chat:ws-ID)
-  return session:set($chat:ws-ID, ($ws-ids, ws:id()))
+  let $ws-ids := session:get($chat-util:ws-ID)
+  return session:set($chat-util:ws-ID, ($ws-ids, ws:id()))
 };
 
 (:~ 
- : Closes a WebSocket.
+ : Closes a WebSocket connection: Removes the WebSocket id from the list of ids
+ : that is stored in the session.
  :)
 declare
   %ws:close('/chat')
 function chat:ws-close() as empty-sequence() {
-  let $ws-ids := session:get($chat:ws-ID)
-  return (
-    session:set($chat:ws-ID, $ws-ids[. != ws:id()]),
-    chat:users()
-  )
-};
-  
-(:~
- : Logs out the current user.
- :)
-declare
-  %rest:path('/chat/logout')
-function chat:logout(
-) as element(rest:response) {
-  session:close(),
-  chat:users(),
-  web:redirect('/chat/login')
-};
-
-(:~
- : Sends a users list (all, active) to all registered clients.
- :)
-declare %private function chat:users() as empty-sequence() {
-  ws:emit(json:serialize(map {
-    'type': 'users',
-    'users': array { sort(user:list()) },
-    'active': array { distinct-values(
-      sessions:ids() ! sessions:get(., $chat:ID)
-    )}
-  }))
-};
-
-(:~ 
- : Sends a message to all clients, or to the clients of a specific user.
- : @param  $text  text to be sent
- : @param  $to    receiver of a private message (optional)
- :)
-declare %private function chat:message(
-  $text  as xs:string,
-  $to    as xs:string?
-) as empty-sequence() {
-  let $ws-ids := if($to) then (
-    for $id in sessions:ids()
-    where sessions:get($id, $chat:ID) = $to
-    return sessions:get($id, $chat:ws-ID)
-  ) else (
-    ws:ids()
-  )
-  return ws:send(json:serialize(map {
-    'type': 'message',
-    'text': serialize($text),
-    'from': session:get($chat:ID),
-    'date': format-time(current-time(), '[H02]:[m02]:[s02]'),
-    'private': boolean($to)
-  }), $ws-ids)
-};
-
-(:~
-  : Answers with a pong to a ping-message
-  :)
-declare %private function chat:ping(){
-  ws:send(json:serialize(map{
-    'type': 'pong'
-  }),ws:id())
+  let $ws-ids := session:get($chat-util:ws-ID)
+  return session:set($chat-util:ws-ID, $ws-ids[. != ws:id()]),
+  chat-util:users()
 };
