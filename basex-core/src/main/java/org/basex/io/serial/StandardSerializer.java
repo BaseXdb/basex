@@ -44,7 +44,6 @@ public abstract class StandardSerializer extends OutputSerializer {
       throws IOException {
 
     super(os, sopts);
-    itemsep(null);
 
     // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
@@ -86,10 +85,7 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(more && itemsep != null) {
-      out.print(itemsep);
-      sep = false;
-    }
+    if(separate()) sep = false;
     super.serialize(item);
   }
 

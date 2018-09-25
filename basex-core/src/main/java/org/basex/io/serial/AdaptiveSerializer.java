@@ -54,7 +54,7 @@ public class AdaptiveSerializer extends OutputSerializer {
 
     if(omit) sopts.set(OMIT_XML_DECLARATION, YesNo.YES);
     indent = sopts.yes(INDENT);
-    itemsep("\n");
+    if(itemsep == null) itemsep = Token.token("\n");
   }
 
   @Override
@@ -65,7 +65,7 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   public final void serialize(final Item item) throws IOException {
-    if(more) out.print(itemsep);
+    separate();
     super.serialize(item);
   }
 
