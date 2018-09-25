@@ -50,13 +50,8 @@ public final class CmpHashG extends CmpG {
     // check if iterator is based on value with more than one item
     final Value value2 = iter2.value();
     if(value2 != null && value2.size() > 1) {
-      // first call: initialize cache
-      final ThreadLocal<CmpCache> tl = qc.threads.get(this);
-      CmpCache cache = tl.get();
-      if(cache == null) {
-        cache = new CmpCache();
-        tl.set(cache);
-      }
+      // retrieve cache (first call: initialize it)
+      final CmpCache cache = qc.threads.get(this).get();
 
       // check if caching is enabled
       if(cache.active(value2, iter2)) {
