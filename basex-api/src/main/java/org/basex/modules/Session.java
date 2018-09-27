@@ -59,40 +59,40 @@ public final class Session extends QueryModule {
    */
   @Requires(Permission.NONE)
   public Value get(final Str key) throws QueryException {
-    return session().get(key);
+    return get(key, null);
   }
 
   /**
-   * Returns a session attribute.
-   * @param key key to be requested
+   * Returns the value of a session attribute.
+   * @param name name of attribute
    * @param def default value
    * @return session attribute
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public Value get(final Str key, final Value def) throws QueryException {
-    return session().get(key, def);
+  public Value get(final Str name, final Value def) throws QueryException {
+    return session().get(name, def);
   }
 
   /**
-   * Updates a session attribute.
-   * @param key key of the attribute
+   * Assigns an attribute to the session.
+   * @param name name of attribute
    * @param value value to be stored
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public void set(final Str key, final Value value) throws QueryException {
-    session().set(key, value);
+  public void set(final Str name, final Value value) throws QueryException {
+    session().set(name, value);
   }
 
   /**
    * Removes a session attribute.
-   * @param key key of the attribute
+   * @param name name of attribute
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public void delete(final Str key) throws QueryException {
-    session().delete(key);
+  public void delete(final Str name) throws QueryException {
+    session().delete(name);
   }
 
   /**

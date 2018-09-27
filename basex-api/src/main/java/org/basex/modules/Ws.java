@@ -47,7 +47,6 @@ public final class Ws extends QueryModule {
     pool().emit(message);
   }
 
-
   /**
    * Broadcasts a message to all connected clients without the sender.
    * @param message message
@@ -74,20 +73,73 @@ public final class Ws extends QueryModule {
   }
 
   /**
+   * Returns the specified WebSocket attribute.
+   * @param id session id
+   * @param key key to be requested
+   * @return session attribute or {@code null}
+   * @throws QueryException query exception
+   */
+  public Value get(final Str id, final Str key) throws QueryException {
+    return get(id, key, null);
+  }
+
+  /**
+   * Returns the specified WebSocket attribute.
+   * @param id session id
+   * @param key key to be requested
+   * @param def default value
+   * @return session attribute or {@code null}
+   * @throws QueryException query exception
+   */
+  public Value get(final Str id, final Str key, final Value def) throws QueryException {
+    final Value value = client(id).atts.get(key.toJava());
+    return value != null ? value : def;
+  }
+
+  /**
+   * Updates a WebSocket attribute.
+   * @param id session id
+   * @param key key of the attribute
+   * @param value item to be stored
+   * @throws QueryException query exception
+   */
+  public void set(final Str id, final Str key, final Value value) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(queryContext);
+    for(final Item item : value) {
+      final Item it = item.materialize(queryContext, item.persistent());
+      if(it == null) throw WS_SET_X.get(null, item);
+      vb.add(it);
+    }
+    client(id).atts.put(key.toJava(), vb.value());
+  }
+
+  /**
+   * Removes a session attribute.
+   * @param id session id
+   * @param key key of the attribute
+   * @throws QueryException query exception
+   */
+  public void delete(final Str id, final Str key) throws QueryException {
+    client(id).atts.remove(key.toJava());
+  }
+
+  /**
    * Returns the path of the specified client.
    * @param id client id
    * @return path
+   * @throws QueryException query exception
    */
-  public String path(final Str id) {
-    return pool().client(id.toJava()).path().toString();
+  public String path(final Str id) throws QueryException {
+    return client(id).path.toString();
   }
 
   /**
    * Closes the connection of the specified client.
    * @param id client id
+   * @throws QueryException query exception
    */
-  public void close(final Str id) {
-    pool().client(id.toJava()).close();
+  public void close(final Str id) throws QueryException {
+    client(id).close();
   }
 
   /**
@@ -96,5 +148,17 @@ public final class Ws extends QueryModule {
    */
   private static WsPool pool() {
     return WsPool.get();
+  }
+
+  /**
+   * Returns the specified client from the WebSocket pool.
+   * @param id client id
+   * @return client
+   * @throws QueryException query exception
+   */
+  private static WebSocket client(final Str id) throws QueryException {
+    final WebSocket ws = pool().client(id.toJava());
+    if(ws == null) throw WS_NOTFOUND_X.get(null, id);
+    return ws;
   }
 }

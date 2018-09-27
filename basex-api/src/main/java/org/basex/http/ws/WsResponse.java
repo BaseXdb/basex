@@ -87,11 +87,13 @@ public final class WsResponse extends WebResponse {
       throws QueryException, IOException {
 
     final ArrayList<Object> list = new ArrayList<>();
-    final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao, opts);
+    final SerialMethod method = opts.get(SerializerOptions.METHOD);
     for(Item item; (item = iter.next()) != null;) {
-      ser.reset();
-      ser.serialize(item);
+      // serialize maps and arrays as JSON
+      final boolean json = method == SerialMethod.BASEX && item instanceof FItem;
+      opts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
+      // interpret result as binary or string
+      final ArrayOutput ao = item.serialize(opts);
       if(item instanceof Bin) {
         list.add(ao.toArray());
       } else {

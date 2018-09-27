@@ -62,47 +62,47 @@ public final class Sessions extends QueryModule {
   }
 
   /**
-   * Returns the specified session attribute of a session.
+   * Returns the value of a session attribute.
    * @param id session id
-   * @param key key to be requested
-   * @return session attribute
+   * @param name name of the attribute
+   * @return attribute value
    * @throws QueryException query exception
    */
-  public Value get(final Str id, final Str key) throws QueryException {
-    return session(id).get(key);
+  public Value get(final Str id, final Str name) throws QueryException {
+    return get(id, name, null);
   }
 
   /**
-   * Returns the specified session attribute of a session.
+   * Returns the value of a session attribute.
    * @param id session id
-   * @param key key to be requested
-   * @param def default item
-   * @return session attribute
+   * @param name name of the attribute
+   * @param def default value
+   * @return attribute value
    * @throws QueryException query exception
    */
-  public Value get(final Str id, final Str key, final Item def) throws QueryException {
-    return session(id).get(key, def);
+  public Value get(final Str id, final Str name, final Value def) throws QueryException {
+    return session(id).get(name, def);
   }
 
   /**
-   * Updates a session attribute.
+   * Assigns an attribute to the session.
    * @param id session id
-   * @param key key of the attribute
+   * @param name name of the attribute
    * @param value item to be stored
    * @throws QueryException query exception
    */
-  public void set(final Str id, final Str key, final Value value) throws QueryException {
-    session(id).set(key, value);
+  public void set(final Str id, final Str name, final Value value) throws QueryException {
+    session(id).set(name, value);
   }
 
   /**
    * Removes a session attribute.
    * @param id session id
-   * @param key key of the attribute
+   * @param name name of the attribute
    * @throws QueryException query exception
    */
-  public void delete(final Str id, final Str key) throws QueryException {
-    session(id).delete(key);
+  public void delete(final Str id, final Str name) throws QueryException {
+    session(id).delete(name);
   }
 
   /**

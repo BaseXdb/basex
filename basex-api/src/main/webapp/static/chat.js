@@ -3,7 +3,7 @@ var ws = new WebSocket(href);
 var to = "";
 
 ws.onopen = function(event) {
-  send("users", "");
+  // send regular ping to keep connection alive
   setInterval(function ping() {
     send("ping", "");
   }, 250000);
@@ -30,10 +30,6 @@ ws.onmessage = function(event) {
   } else {
     console.log("UNKNOWN COMMAND", event);
   }
-};
-
-ws.onclose = function(event) {
-  send("users", "");
 };
 
 // helper functions

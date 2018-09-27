@@ -1,6 +1,7 @@
 package org.basex.http.ws;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.*;
 
 import javax.servlet.http.*;
@@ -9,6 +10,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.ann.*;
+import org.basex.query.value.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
@@ -21,8 +23,12 @@ import org.eclipse.jetty.websocket.api.*;
  * @author Johannes Finckh
  */
 public final class WebSocket extends WebSocketAdapter implements ClientInfo {
+  /** WebSocket attributes. */
+  public final ConcurrentHashMap<String, Value> atts = new ConcurrentHashMap<>();
   /** Database context. */
   public final Context context;
+  /** Path. */
+  public final WsPath path;
 
   /** Header parameters. */
   final Map<String, String> headers = new HashMap<>();
@@ -33,9 +39,6 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   public String id;
   /** HTTP Session. */
   public HttpSession session;
-
-  /** Path. */
-  private final WsPath path;
 
   /**
    * Constructor.
@@ -67,14 +70,6 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
     }
     return null;
-  }
-
-  /**
-   * Returns the client path.
-   * @return path
-   */
-  public WsPath path() {
-    return path;
   }
 
   @Override

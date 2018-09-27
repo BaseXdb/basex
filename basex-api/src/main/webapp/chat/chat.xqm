@@ -1,3 +1,7 @@
+(:~
+ : Simple WebSocket chat. RESTXQ functions.
+ : @author BaseX Team, 2014-18
+ :)
 module namespace chat = 'chat';
 
 import module namespace chat-util = 'chat/util' at 'chat-util.xqm';
@@ -10,7 +14,7 @@ declare
   %rest:path('/chat')
   %output:method('html')
 function chat:chat() as element() {
-  if(session:get($chat-util:session-ID)) then (
+  if(session:get($chat-util:id)) then (
     chat:main()
   ) else (
     chat:login()
@@ -34,7 +38,7 @@ function chat:login-check(
 ) as element(rest:response) {
   try {
     user:check($name, $pass),
-    session:set($chat-util:session-ID, $name)
+    session:set($chat-util:id, $name)
   } catch user:* {
     (: login fails: no session info is set :)
   },
@@ -48,6 +52,7 @@ function chat:login-check(
 declare
   %rest:path('/chat/logout')
 function chat:logout() as element(rest:response) {
+  session:get($chat-util:id) ! chat-util:close(.),
   session:close(),
   web:redirect('/chat')
 };
@@ -103,7 +108,7 @@ declare %private function chat:main() as element(html) {
         </td>
       </tr>
     </table>
-  ), <script type="text/javascript" src="/static/chat.js"/>)
+  ), <script type='text/javascript' src='/static/chat.js'/>)
 };
 
 (:~
@@ -112,7 +117,7 @@ declare %private function chat:main() as element(html) {
  : @param $login     login page
  : @return HTML page
  :)
-declare function chat:wrap(
+declare %private function chat:wrap(
   $contents  as item()*,
   $headers   as element()*
 ) as element(html) {
@@ -127,10 +132,8 @@ declare function chat:wrap(
     <body>
       <span class='right'>
         {
-          for $id in session:get($chat-util:session-ID)
-          return <span>
-            <b>{ $id }</b> (<a href='/chat/logout'>logout</a>)
-          </span>
+          for $id in session:get($chat-util:id)
+          return <span><b>{ $id }</b> (<a href='/chat/logout'>logout</a>)</span>
         }
         &#xa0; <img src='/static/basex.svg' class='img'/>
       </span>
