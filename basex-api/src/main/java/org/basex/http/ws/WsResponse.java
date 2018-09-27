@@ -15,6 +15,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.eclipse.jetty.websocket.api.*;
 
 /**
  * Creates WebSocket reponses.
@@ -56,16 +57,17 @@ public final class WsResponse extends WebResponse {
   public boolean serialize() throws QueryException, IOException {
     qc.register(ctx);
     try {
+      final RemoteEndpoint remote = ws.getSession().getRemote();
       for(final Object value : serialize(qc.iter(), func.output)) {
         // don't send anything if WebSocket gets closed because the connection is already closed
         // We have to do this check inside the loop because the XQuery function should get executed
         // too if it is a _WS_CLOSE function, just don't return a result.
         if(func.matches(Annotation._WS_CLOSE, null)) continue;
 
-        if(value instanceof byte[]) {
-          ws.getSession().getRemote().sendBytes(ByteBuffer.wrap((byte[]) value));
+        if(value instanceof ByteBuffer) {
+          remote.sendBytes((ByteBuffer) value);
         } else {
-          ws.getSession().getRemote().sendString((String) value);
+          remote.sendString((String) value);
         }
       }
     } finally {
@@ -94,12 +96,7 @@ public final class WsResponse extends WebResponse {
       opts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
       // interpret result as binary or string
       final ArrayOutput ao = item.serialize(opts);
-      if(item instanceof Bin) {
-        list.add(ao.toArray());
-      } else {
-        list.add(ao.toString());
-      }
-      ao.reset();
+      list.add(item instanceof Bin ? ByteBuffer.wrap(ao.toArray()) : ao.toString());
     }
     return list;
   }

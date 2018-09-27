@@ -17,7 +17,10 @@ declare function chat-util:users() as empty-sequence() {
   ws:emit(map {
     'type': 'users',
     'users': array { sort(user:list()) },
-    'active': array { distinct-values(ws:ids() ! ws:get(., $chat-util:id))}
+    'active': array { distinct-values(
+      for $id in ws:ids()
+      return ws:get($id, $chat-util:id)
+    )}
   })
 };
 
@@ -30,11 +33,11 @@ declare function chat-util:message(
   $text  as xs:string,
   $to    as xs:string?
 ) as empty-sequence() {
-  let $ws-ids := ws:ids()[empty($to) or ws:get(., $chat-util:id) = $to]
+  let $ws-ids := ws:ids()[not($to) or ws:get(., $chat-util:id) = $to]
   return ws:send(map {
     'type': 'message',
     'text': serialize($text),
-    'from': session:get($chat-util:id),
+    'from': ws:get(ws:id(), $chat-util:id),
     'date': format-time(current-time(), '[H02]:[m02]:[s02]'),
     'private': boolean($to)
   }, $ws-ids)

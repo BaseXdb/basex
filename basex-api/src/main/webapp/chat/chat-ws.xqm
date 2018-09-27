@@ -29,8 +29,6 @@ function chat-ws:message(
   let $type := $json?type
   return if($type = 'message') then (
     chat-util:message($json?text, $json?to)
-  ) else if($type = 'users') then (
-    chat-util:users()
   ) else if($type = 'ping') then(
     (: do nothing :)
   ) else error()
