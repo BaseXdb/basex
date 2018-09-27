@@ -172,7 +172,7 @@ public final class WebModules {
    */
   public ArrayList<WsFunction> findWs(final WebSocket ws, final Annotation ann)
       throws QueryException, IOException {
-    final WsPath pth = new WsPath(ws.getPath());
+    final WsPath pth = ws.path();
     final ArrayList<WsFunction> funcs = new ArrayList<>();
     for(final WebModule mod : cache(ws.context).values()) {
       for(final WsFunction func : mod.wsFunctions()) {

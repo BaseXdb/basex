@@ -13,8 +13,6 @@ import org.basex.util.list.*;
 
 /**
  * This module contains functions for processing WebSockets.
- * The class name is {@code Websocket} instead of {@code WebSocket}.
- * Otherwise, it would be resolved to {@code web-socket} in XQuery.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
@@ -76,39 +74,20 @@ public final class Ws extends QueryModule {
   }
 
   /**
-   * Returns the path of the current client.
-   * @throws QueryException query exception
-   * @return path
-   */
-  public String path() throws QueryException {
-    return pool().path(id());
-  }
-
-  /**
    * Returns the path of the specified client.
-   * @param id id of client
+   * @param id client id
    * @return path
    */
   public String path(final Str id) {
-    return pool().path(id.toJava());
+    return pool().client(id.toJava()).path().toString();
   }
 
   /**
-   * Closes the WebSocketConnection of the Current client.
-   * @param reason The string reason
-   * @throws QueryException query exception
-   * */
-  public void closewebsocket(final Str reason) throws QueryException {
-    pool().closeWebsocket(id(), reason.toJava());
-  }
-
-  /**
-   * Closes the WebSocketConnection of a client.
-   * @param id The id of the WebSocket Connection.
-   * @param reason The string reason
-   * */
-  public void closewebsocket(final Str id, final Str reason) {
-    pool().closeWebsocket(id.toJava(), reason.toJava());
+   * Closes the connection of the specified client.
+   * @param id client id
+   */
+  public void close(final Str id) {
+    pool().client(id.toJava()).close();
   }
 
   /**

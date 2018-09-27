@@ -73,8 +73,8 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
    * Returns the client path.
    * @return path
    */
-  public String getPath() {
-    return path.toString();
+  public WsPath path() {
+    return path;
   }
 
   @Override
@@ -154,11 +154,10 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   }
 
   /**
-   * Closes the Websocket-Connection.
-   * @param reason The String Reason
-   * */
-  public void closeWebsocket(final String reason) {
-    getSession().close(StatusCode.NORMAL, reason);
+   * Closes the WebSocket connection.
+   */
+  public void close() {
+    getSession().close();
   }
 
   /**
