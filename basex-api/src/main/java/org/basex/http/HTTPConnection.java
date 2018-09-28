@@ -176,7 +176,7 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Sends an error with an info message.
+   * Handles an error with a short and a detailed info message.
    * @param code status code
    * @param info detailed information
    * @param log log message
@@ -188,7 +188,7 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Sends an error with an info message.
+   * Handles an error with an info message.
    * @param code status code
    * @param info info, sent as body
    * @throws IOException I/O exception
@@ -199,7 +199,7 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Sets the HTTP status code and message.
+   * Handles an HTTP status code and message.
    * @param code status code
    * @param message status message
    * @throws IOException I/O exception

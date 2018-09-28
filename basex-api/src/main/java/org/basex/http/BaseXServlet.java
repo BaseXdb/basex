@@ -63,7 +63,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final LoginException ex) {
       conn.error(SC_UNAUTHORIZED, Util.message(ex));
     } catch(final QueryException ex) {
-      conn.error(SC_BAD_REQUEST, ex.getLocalizedMessage(), Util.message(ex));
+      conn.error(SC_BAD_REQUEST, ex.getMessage(), Util.message(ex));
     } catch(final IOException ex) {
       conn.error(SC_BAD_REQUEST, Util.message(ex));
     } catch(final JobException ex) {
