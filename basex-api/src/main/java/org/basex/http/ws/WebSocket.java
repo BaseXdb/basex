@@ -1,5 +1,6 @@
 package org.basex.http.ws;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
@@ -176,7 +177,12 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       throw ex;
     } catch(final Exception ex) {
       Util.debug(ex);
-      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
+      try {
+        // In the case of an error, inform the client about it
+        getRemote().sendString(ex.getMessage());
+      } catch(IOException e) {
+        throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
+      }
     }
   }
 }
