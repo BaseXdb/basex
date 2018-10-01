@@ -90,6 +90,9 @@ public final class StaticOptions extends Options {
   public static final EnumOption<AuthMethod> AUTHMETHOD =
       new EnumOption<>("AUTHMETHOD", AuthMethod.BASIC);
 
+  /** WebSocket Origin. */
+  public static final StringOption WSORIGIN = new StringOption("WSORIGIN","");
+
   /** Authorization method. */
   public enum AuthMethod {
     /** Basic.  */ BASIC,

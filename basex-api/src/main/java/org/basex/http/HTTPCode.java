@@ -30,6 +30,9 @@ public enum HTTPCode {
   /** Error: 404, "RESTXQ directory not found.". */
   NO_RESTXQ(SC_NOT_FOUND, "RESTXQ directory not found."),
 
+  /** Forbidden Origin */
+  FORBIDDEN_ORIGIN(SC_FORBIDDEN,"Forbidden Origin"),
+
   /** Error 501, "Method not supported: %.". */
   NOT_IMPLEMENTED_X(SC_NOT_IMPLEMENTED, "Method not supported: %.");
 
