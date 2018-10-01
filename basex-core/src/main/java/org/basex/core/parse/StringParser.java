@@ -65,7 +65,7 @@ final class StringParser extends CommandParser {
           case BACKUP:
             return new CreateBackup(glob(cmd));
           case DATABASE: case DB:
-            return new CreateDB(name(cmd), remaining(null));
+            return new CreateDB(name(cmd), remaining(null, true));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
@@ -90,10 +90,10 @@ final class StringParser extends CommandParser {
         return new Check(string(cmd));
       case ADD:
         final String aa = key(S_TO, null) ? string(cmd) : null;
-        return new Add(aa, remaining(cmd));
+        return new Add(aa, remaining(cmd, true));
       case STORE:
         final String sa = key(S_TO, null) ? string(cmd) : null;
-        return new Store(sa, remaining(cmd));
+        return new Store(sa, remaining(cmd, true));
       case RETRIEVE:
         return new Retrieve(string(cmd));
       case DELETE:
@@ -101,7 +101,7 @@ final class StringParser extends CommandParser {
       case RENAME:
         return new Rename(string(cmd), string(cmd));
       case REPLACE:
-        return new Replace(string(cmd), remaining(cmd));
+        return new Replace(string(cmd), remaining(cmd, true));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -145,19 +145,19 @@ final class StringParser extends CommandParser {
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:
-        return new XQuery(remaining(cmd));
+        return new XQuery(remaining(cmd, false));
       case RUN:
         return new Run(string(cmd));
       case TEST:
         return new Test(string(cmd));
       case EXECUTE:
-        return new Execute(string(cmd, false));
+        return new Execute(remaining(cmd, true));
       case FIND:
-        return new Find(string(cmd, false));
+        return new Find(remaining(cmd, true));
       case GET:
         return new Get(name(null));
       case SET:
-        return new Set(name(cmd), string(null, false));
+        return new Set(name(cmd), string(null));
       case PASSWORD:
         return new Password(password());
       case HELP:
@@ -212,62 +212,55 @@ final class StringParser extends CommandParser {
   }
 
   /**
-   * Parses and returns a string, delimited by a space or semicolon.
-   * Quotes can be used to include spaces.
+   * Parses and returns a string, delimited by a semicolon or a space.
+   * The input can be wrapped with quotes.
    * @param cmd referring command; if specified, the result must not be empty
-   * @return string
+   * @return string or {@code null}
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
-    return string(cmd, true);
-  }
-
-  /**
-   * Parses and returns a string, delimited by a semicolon or, optionally, a space.
-   * Quotes can be used to include spaces.
-   * @param cmd referring command; if specified, the result must not be empty
-   * @param space stop when encountering space
-   * @return string
-   * @throws QueryException query exception
-   */
-  private String string(final Cmd cmd, final boolean space) throws QueryException {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
-    boolean q = false;
-    while(parser.more()) {
-      final char c = parser.curr();
-      if(!q && ((space ? c <= ' ' : c < ' ') || eoc())) break;
-      if(c == '"') q ^= true;
-      else sb.append(c);
+    boolean more = true, quoted = false;
+    while(more && parser.more()) {
+      final char ch = parser.curr();
+      if(quoted) {
+        if(ch == '"') more = false;
+      } else if(ch <= ' ' || eoc()) {
+        break;
+      } else if(ch == '"' && sb.length() == 0) {
+        quoted = true;
+      }
+      sb.append(ch);
       parser.consume();
     }
-    return finish(sb, cmd);
+    return finish(sb.toString().replaceAll("^\"|\"$", ""), cmd);
   }
 
   /**
    * Parses and returns the remaining string.
    * @param cmd referring command; if specified, the result must not be empty
-   * @return remaining string
+   * @param quotes strip leading and trailing quotes
+   * @return remaining string or {@code null}
    * @throws QueryException query exception
    */
-  private String remaining(final Cmd cmd) throws QueryException {
-    final StringBuilder sb = new StringBuilder();
+  private String remaining(final Cmd cmd, final boolean quotes) throws QueryException {
     consumeWS();
+    final StringBuilder sb = new StringBuilder();
     while(parser.more()) sb.append(parser.consume());
-    return finish(sb, cmd);
+    final String str = sb.toString();
+    return finish(quotes ? str.replaceAll("^\"|\"$", "") : str, cmd);
   }
 
   /**
    * Parses and returns a command. A command is limited to letters.
-   * @return name
+   * @return command or {@code null}
    * @throws QueryException query exception
    */
   private String command() throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    while(!eoc() && !ws(parser.curr())) {
-      sb.append(parser.consume());
-    }
+    while(!eoc() && !ws(parser.curr())) sb.append(parser.consume());
     return finish(sb, null);
   }
 
@@ -304,7 +297,7 @@ final class StringParser extends CommandParser {
   }
 
   /**
-   * Parses and returns a glob expression, which extends {@link #name(Cmd)} function
+   * Parses and returns a name, or a glob string that extends a {@link #name(Cmd)}
    * with asterisks, question marks and commands.
    * @param cmd referring command; if specified, the result must not be empty
    * @param glob allow glob syntax
@@ -352,7 +345,7 @@ final class StringParser extends CommandParser {
    * @return string result or {@code null}
    * @throws QueryException query exception
    */
-  private String finish(final StringBuilder string, final Cmd cmd) throws QueryException {
+  private String finish(final CharSequence string, final Cmd cmd) throws QueryException {
     if(string != null && string.length() != 0) return string.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
