@@ -65,7 +65,7 @@ final class StringParser extends CommandParser {
           case BACKUP:
             return new CreateBackup(glob(cmd));
           case DATABASE: case DB:
-            return new CreateDB(name(cmd), remaining(null, true));
+            return new CreateDB(name(cmd), remaining(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
@@ -90,10 +90,10 @@ final class StringParser extends CommandParser {
         return new Check(string(cmd));
       case ADD:
         final String aa = key(S_TO, null) ? string(cmd) : null;
-        return new Add(aa, remaining(cmd, true));
+        return new Add(aa, remaining(cmd));
       case STORE:
         final String sa = key(S_TO, null) ? string(cmd) : null;
-        return new Store(sa, remaining(cmd, true));
+        return new Store(sa, remaining(cmd));
       case RETRIEVE:
         return new Retrieve(string(cmd));
       case DELETE:
@@ -101,7 +101,7 @@ final class StringParser extends CommandParser {
       case RENAME:
         return new Rename(string(cmd), string(cmd));
       case REPLACE:
-        return new Replace(string(cmd), remaining(cmd, true));
+        return new Replace(string(cmd), remaining(cmd));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -242,21 +242,6 @@ final class StringParser extends CommandParser {
       parser.consume();
     }
     return finish(sb, cmd);
-  }
-
-  /**
-   * Parses and returns the remaining string.
-   * @param cmd referring command; if specified, the result must not be empty
-   * @param quotes strip heading and trailing quotes
-   * @return remaining string
-   * @throws QueryException query exception
-   */
-  private String remaining(final Cmd cmd, final boolean quotes) throws QueryException {
-    if(single) {
-      final String arg = remaining(cmd);
-      return arg != null && quotes ? arg.replace("^\"|\"$", "") : arg;
-    }
-    return string(cmd, false);
   }
 
   /**
