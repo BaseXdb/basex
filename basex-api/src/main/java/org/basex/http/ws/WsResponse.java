@@ -59,7 +59,8 @@ public final class WsResponse extends WebResponse {
     try {
       final ArrayList<Object> values = serialize(qc.iter(), func.output);
       // don't send anything if the WebSocket connection has been closed
-      if(func.matches(Annotation._WS_CLOSE, null)) {
+      if(!func.matches(Annotation._WS_CLOSE, null) &&
+         !func.matches(Annotation._WS_ERROR, null)) {
         for(final Object value : values) {
           final RemoteEndpoint remote = ws.getSession().getRemote();
           if(value instanceof ByteBuffer) {
