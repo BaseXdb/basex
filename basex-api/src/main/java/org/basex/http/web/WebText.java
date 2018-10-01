@@ -57,6 +57,8 @@ public interface WebText {
 
   /** DBA String. */
   String DBA = "dba";
+  /** ID String. */
+  String ID = "id";
 
   /** Error message. */
   String ANN_MISSING = "Path annotation missing.";

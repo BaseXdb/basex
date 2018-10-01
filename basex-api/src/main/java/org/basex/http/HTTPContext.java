@@ -8,6 +8,7 @@ import javax.servlet.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -109,5 +110,16 @@ public final class HTTPContext {
       context.close();
       context = null;
     }
+  }
+
+  /**
+   * Tries to convert the specified value to a string.
+   * @param value value
+   * @return return string or {@code null}
+   */
+  public static byte[] token(final Object value) {
+    if(value instanceof Str) return ((Str) value).string();
+    if(value instanceof Atm) return ((Atm) value).string(null);
+    return null;
   }
 }

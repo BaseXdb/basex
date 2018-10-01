@@ -9,13 +9,13 @@ package org.basex.server;
 public interface ClientInfo {
   /**
    * Returns the host and port of a client.
-   * @return string representation
+   * @return address of client
    */
   String clientAddress();
 
   /**
    * Returns the name of the current client.
-   * @return user name
+   * @return name of client
    */
   String clientName();
 }

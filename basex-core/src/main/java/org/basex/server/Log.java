@@ -113,7 +113,7 @@ public final class Log {
     final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
     final TokenBuilder tb = new TokenBuilder();
     tb.add(DateTime.format(date, DateTime.TIME));
-    tb.add('\t').add(address != null ? address : SERVER);
+    tb.add('\t').add(address != null ? address.replaceFirst("^/", "") : SERVER);
     tb.add('\t').add(user != null ? user : UserText.ADMIN);
     tb.add('\t').add(type);
     tb.add('\t').add(info != null ? chop(normalize(token(info)), ml) : EMPTY);

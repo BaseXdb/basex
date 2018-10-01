@@ -53,7 +53,7 @@ declare
   %rest:path('/chat/logout')
 function chat:logout() as element(rest:response) {
   session:get($chat-util:id) ! chat-util:close(.),
-  session:close(),
+  session:delete($chat-util:id),
   web:redirect('/chat')
 };
 
