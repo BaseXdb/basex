@@ -3,6 +3,7 @@ package org.basex.query.expr.path;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Document kind test.
@@ -16,7 +17,7 @@ public final class DocTest extends Test {
 
   /**
    * Constructor.
-   * @param test child test
+   * @param test child test (node test or element kind test)
    */
   public DocTest(final Test test) {
     super(NodeType.DOC);
@@ -67,6 +68,6 @@ public final class DocTest extends Test {
 
   @Override
   public String toString() {
-    return test.toString();
+    return new TokenBuilder(type.string()).add('(').addExt(test).add(')').toString();
   }
 }

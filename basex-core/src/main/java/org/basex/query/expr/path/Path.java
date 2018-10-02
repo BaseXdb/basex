@@ -1,9 +1,9 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.locks.*;
 import org.basex.data.*;
@@ -11,7 +11,6 @@ import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
-import org.basex.query.expr.constr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.util.*;
@@ -32,8 +31,8 @@ import org.basex.util.*;
  */
 public abstract class Path extends ParseExpr {
   /** XPath axes that are expected to be expensive when at the start of a path. */
-  private static final EnumSet<Axis> EXPENSIVE =
-      EnumSet.of(DESC, DESCORSELF, PREC, PRECSIBL, FOLL, FOLLSIBL);
+  private static final EnumSet<Axis> EXPENSIVE = EnumSet.of(
+      DESCENDANT, DESCENDANT_OR_SELF, PRECEDING, PRECEDING_SIBLING, FOLLOWING, FOLLOWING_SIBLING);
 
   /** Root expression (can be {@code null}). */
   public Expr root;
@@ -174,7 +173,8 @@ public abstract class Path extends ParseExpr {
 
     // simplify path with empty root expression or empty step
     final Value rt = rootValue(cc);
-    if((!cc.nestedFocus() || cc.qc.focus.value == null) && emptyPath(rt)) return cc.emptySeq(this);
+    if(emptyPath(!cc.nestedFocus() || cc.qc.focus.value == null ? rt : null))
+      return cc.emptySeq(this);
 
     seqType(cc, rt);
 
@@ -286,7 +286,7 @@ public abstract class Path extends ParseExpr {
    * @return context value, dummy item or {@code null}
    */
   private Value rootValue(final CompileContext cc) {
-    // no root expression: return context value (possibly empty)
+    // no root expression: return context value (possibly unassigned)
     if(root == null) return cc.qc.focus.value;
     // root is value: return root
     if(root instanceof Value) return (Value) root;
@@ -328,24 +328,24 @@ public abstract class Path extends ParseExpr {
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
       switch(step.axis) {
-        case ANC:
-        case ANCORSELF:
-        case PREC:
-        case PRECSIBL:
+        case ANCESTOR:
+        case ANCESTOR_OR_SELF:
+        case PRECEDING:
+        case PRECEDING_SIBLING:
           // backwards axes must be reordered
           return false;
-        case FOLL:
+        case FOLLOWING:
           // can overlap
           if(!atMostOne) return false;
           atMostOne = false;
           sameDepth = false;
           break;
-        case FOLLSIBL:
+        case FOLLOWING_SIBLING:
           // can overlap, preserves level
           if(!atMostOne) return false;
           atMostOne = false;
           break;
-        case ATTR:
+        case ATTRIBUTE:
           // only unique for exact QName matching
           atMostOne &= step.test.kind == Kind.URI_NAME;
           break;
@@ -354,8 +354,8 @@ public abstract class Path extends ParseExpr {
           if(!sameDepth) return false;
           atMostOne = false;
           break;
-        case DESC:
-        case DESCORSELF:
+        case DESCENDANT:
+        case DESCENDANT_OR_SELF:
           // non-overlapping if all nodes are on the same level
           if(!sameDepth) return false;
           atMostOne = false;
@@ -392,7 +392,7 @@ public abstract class Path extends ParseExpr {
     // unknown result size: single attribute with exact name test will return at most one result
     if(size < 0 && root == null && sl == 1 && last instanceof Step && cc.nestedFocus()) {
       final Step step = (Step) last;
-      if(step.axis == ATTR && step.test.one) {
+      if(step.axis == ATTRIBUTE && step.test.one) {
         occ = Occ.ZERO_ONE;
         step.exprType.assign(occ);
       }
@@ -458,7 +458,7 @@ public abstract class Path extends ParseExpr {
       final Step curr = axisStep(s);
       if(curr == null) return null;
 
-      final boolean desc = curr.axis == DESC;
+      final boolean desc = curr.axis == DESCENDANT;
       if(!desc && curr.axis != CHILD || curr.test.kind != Kind.NAME) return null;
 
       final int name = data.elemNames.id(curr.test.name.local());
@@ -485,74 +485,79 @@ public abstract class Path extends ParseExpr {
   private boolean emptyPath(final Value rt) {
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
-      if(emptyStep(rt, s)) return true;
-    }
-    return false;
-  }
+      final Step step1 = axisStep(s);
+      if(step1 == null) continue;
 
-  /**
-   * Checks if the specified step will never yield results.
-   * @param rt root value (can be {@code null})
-   * @param s index of step
-   * @return {@code true} if steps will never yield results
-   */
-  private boolean emptyStep(final Value rt, final int s) {
-    final Step step = axisStep(s);
-    if(step == null) return false;
+      final Axis axis1 = step1.axis;
+      NodeType type1 = step1.test.type;
 
-    final Axis axis = step.axis;
-    if(s == 0) {
-      // first location step:
-      if(root instanceof CAttr) {
-        // @.../child:: / @.../descendant::
-        if(axis == CHILD || axis == DESC) return true;
-      } else if(root instanceof Root || root instanceof CDoc ||
-          rt != null && rt.type == NodeType.DOC) {
-        switch(axis) {
-          case SELF:
-          case ANCORSELF:
-            if(step.test != KindTest.NOD && step.test != KindTest.DOC) return true;
-            break;
+      // check combination of axis and node test and axis
+      if(!type1.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE) && ((BooleanSupplier) () -> {
+        switch(axis1) {
+          case ATTRIBUTE:
+            return type1 != NodeType.ATT;
+          case ANCESTOR:
+          case PARENT:
+            return type1.oneOf(NodeType.ATT, NodeType.COM, NodeType.NSP, NodeType.PI, NodeType.TXT);
           case CHILD:
-          case DESC:
-            if(step.test == KindTest.DOC || step.test == KindTest.ATT) return true;
-            break;
-          case DESCORSELF:
-            if(step.test == KindTest.ATT) return true;
-            break;
+          case DESCENDANT:
+          case FOLLOWING:
+          case FOLLOWING_SIBLING:
+          case PRECEDING:
+          case PRECEDING_SIBLING:
+            return type1.oneOf(NodeType.ATT, NodeType.DEL, NodeType.DOC, NodeType.NSP);
           default:
+            return false;
+        }
+      }).getAsBoolean()) return true;
+
+      // skip further tests if previous expression is unknown or is no axis step
+      final Expr last = s != 0 ? axisStep(s - 1) : root != null ? root : rt;
+      if(last == null) continue;
+
+      // check step after expression that yields document nodes
+      final Type type0 = last.seqType().type;
+      if(type0.instanceOf(NodeType.DOC) && ((BooleanSupplier) () -> {
+        switch(axis1) {
+          case SELF:
+          case ANCESTOR_OR_SELF:
+            return !type1.oneOf(NodeType.NOD, NodeType.DOC);
+          case CHILD:
+          case DESCENDANT:
+            return type1.oneOf(NodeType.DOC, NodeType.ATT);
+          case DESCENDANT_OR_SELF:
+            return type1 == NodeType.ATT;
+          default:
+            // document {}/parent::, ...
             return true;
         }
-      }
-    } else {
-      // remaining steps:
-      final Step last = axisStep(s - 1);
-      if(last == null) return false;
+      }).getAsBoolean()) return true;
 
-      // .../self:: / .../descendant-or-self::
-      if(axis == SELF || axis == DESCORSELF) {
-        if(step.test == KindTest.NOD) return false;
-        // @.../..., text()/...
-        if(last.axis == ATTR && step.test.type != NodeType.ATT ||
-           last.test == KindTest.TXT && step.test != KindTest.TXT) return true;
-        if(axis == DESCORSELF) return false;
+      // skip further tests if previous node type is unknown, or if current test accepts all nodes
+      if(!type0.instanceOf(NodeType.NOD)) continue;
 
-        // .../self::
-        final QNm name = step.test.name, lastName = last.test.name;
-        if(lastName == null || name == null || lastName.local().length == 0 ||
-            name.local().length == 0) return false;
-        // ...X/...Y
-        return !name.eq(lastName);
-      }
-      // .../following-sibling:: / .../preceding-sibling::
-      if(axis == FOLLSIBL || axis == PRECSIBL) return last.axis == ATTR;
-      // .../descendant:: / .../child:: / .../attribute::
-      if(axis == DESC || axis == CHILD || axis == ATTR)
-        return last.axis == ATTR || last.test == KindTest.TXT || last.test == KindTest.COM ||
-           last.test == KindTest.PI || axis == ATTR && step.test == KindTest.NSP;
-      // .../parent:: / .../ancestor::
-      if(axis == PARENT || axis == ANC) return last.test == KindTest.DOC;
+      // check step after any other expression
+      if(((BooleanSupplier) () -> {
+        switch(axis1) {
+          // type of current step will not accept any nodes of previous step
+          // example: <a/>/self::text()
+          case SELF:
+            return type1 != NodeType.NOD && !type1.instanceOf(type0);
+          // .../descendant::, .../child::, .../attribute::
+          case DESCENDANT:
+          case CHILD:
+          case ATTRIBUTE:
+            return type0.oneOf(NodeType.ATT, NodeType.TXT, NodeType.COM, NodeType.PI, NodeType.NSP);
+          // .../following-sibling::, .../preceding-sibling::
+          case FOLLOWING_SIBLING:
+          case PRECEDING_SIBLING:
+            return type0 == NodeType.ATT;
+          default:
+            return false;
+        }
+      }).getAsBoolean()) return true;
     }
+
     return false;
   }
 
@@ -580,7 +585,7 @@ public abstract class Path extends ParseExpr {
 
       // ignore axes other than descendant, or numeric predicates
       final Step curr = axisStep(s);
-      if(curr == null || curr.axis != DESC || curr.positional()) continue;
+      if(curr == null || curr.axis != DESCENDANT || curr.positional()) continue;
 
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> nodes = pathNodes(data, s);
@@ -598,7 +603,7 @@ public abstract class Path extends ParseExpr {
         qnm.add(nm);
         nodes = PathIndex.parent(nodes);
       }
-      cc.info(OPTCHILD_X, steps[s]);
+      cc.info(QueryText.OPTCHILD_X, steps[s]);
 
       // build new steps
       int ts = qnm.size();
@@ -607,7 +612,7 @@ public abstract class Path extends ParseExpr {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
-          new NameTest(nm, Kind.NAME, false, null);
+          new NameTest(false, Kind.NAME, nm, null);
         stps[t] = Step.get(info, CHILD, nt, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
@@ -618,7 +623,7 @@ public abstract class Path extends ParseExpr {
     // check if all steps yield results; if not, return empty sequence
     final ArrayList<PathNode> nodes = pathNodes(cc);
     if(nodes != null && nodes.isEmpty()) {
-      cc.info(OPTPATH_X, path);
+      cc.info(QueryText.OPTPATH_X, path);
       return Empty.SEQ;
     }
 
@@ -684,7 +689,7 @@ public abstract class Path extends ParseExpr {
 
           if(ii.costs.results() == 0) {
             // no results...
-            cc.info(OPTNORESULTS_X, ii.step);
+            cc.info(QueryText.OPTNORESULTS_X, ii.step);
             return Empty.SEQ;
           }
 
@@ -715,11 +720,11 @@ public abstract class Path extends ParseExpr {
         final Axis invAxis = axisStep(s).axis.invert();
         if(s == 0) {
           // add document test for collections and axes other than ancestors
-          if(rootTest != KindTest.DOC || invAxis != ANC && invAxis != ANCORSELF)
+          if(rootTest != KindTest.DOC || invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF)
             invSteps.add(Step.get(info, invAxis, rootTest));
         } else {
           final Step prevStep = axisStep(s - 1);
-          final Axis newAxis = prevStep.axis == ATTR ? ATTR : invAxis;
+          final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : invAxis;
           invSteps.add(Step.get(info, newAxis, prevStep.test, prevStep.exprs));
         }
       }
@@ -805,12 +810,12 @@ public abstract class Path extends ParseExpr {
       // check for simple descendants-or-self step with succeeding step
       if(s < sl - 1 && step instanceof Step) {
         final Step curr = (Step) step;
-        if(curr.simple(DESCORSELF, false)) {
+        if(curr.simple(DESCENDANT_OR_SELF, false)) {
           // check succeeding step
           final Expr next = steps[s + 1];
           // descendant-or-self::node()/child::X -> descendant::X
           if(simpleChild(next)) {
-            ((Step) next).axis = DESC;
+            ((Step) next).axis = DESCENDANT;
             opt = true;
             continue;
           }
@@ -838,7 +843,7 @@ public abstract class Path extends ParseExpr {
     }
 
     if(opt) {
-      cc.info(OPTDESC);
+      cc.info(QueryText.OPTDESC);
       return stps.isEmpty() ? root : get(info, root, stps.finish());
     }
     return this;
@@ -853,7 +858,7 @@ public abstract class Path extends ParseExpr {
     if(expr instanceof Union || expr instanceof List) {
       final Arr array = (Arr) expr;
       if(childSteps(array)) {
-        for(final Expr ex : array.exprs) ((Step) ((Path) ex).steps[0]).axis = DESC;
+        for(final Expr ex : array.exprs) ((Step) ((Path) ex).steps[0]).axis = DESCENDANT;
         return new Union(array.info, array.exprs);
       }
     }

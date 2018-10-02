@@ -95,7 +95,7 @@ public enum NodeType implements Type {
   },
 
   /** Document element type. */
-  DEL("document-node(element())", NOD, ID.DEL) {
+  DEL("document-node(element())", DOC, ID.DEL) {
     @Override
     public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
         final InputInfo info) throws QueryException {

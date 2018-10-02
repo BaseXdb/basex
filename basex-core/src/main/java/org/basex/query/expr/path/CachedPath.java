@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-final class CachedPath extends AxisPath {
+public final class CachedPath extends AxisPath {
   /**
    * Constructor.
    * @param info input info

@@ -569,11 +569,8 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeArray() {
-    return !(zero() ||
-        type.instanceOf(AtomType.AAT) ||
-        type instanceof ListType ||
-        type instanceof MapType ||
-        type instanceof NodeType);
+    return !(zero() || type.instanceOf(AtomType.AAT) || type instanceof ListType ||
+      type instanceof MapType || type instanceof NodeType);
   }
 
   /**
@@ -608,10 +605,7 @@ public final class SeqType {
    * @return string
    */
   public String typeString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(zero() ? EMPTY_SEQUENCE + "()" : type);
-    if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
-    return sb.toString();
+    return zero() ? EMPTY_SEQUENCE + "()" : kind != null ? kind.toString() : type.toString();
   }
 
   @Override

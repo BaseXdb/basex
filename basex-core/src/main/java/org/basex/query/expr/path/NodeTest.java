@@ -25,7 +25,7 @@ public final class NodeTest extends Test {
 
   /**
    * Constructor.
-   * @param type node type
+   * @param type node type (element, attribute, processing instruction)
    * @param name node name
    */
   public NodeTest(final NodeType type, final QNm name) {
@@ -34,7 +34,7 @@ public final class NodeTest extends Test {
 
   /**
    * Constructor.
-   * @param type node type
+   * @param type node type (element, attribute, processing instruction)
    * @param name node name (can be {@code null} if extended node type is specified)
    * @param ext extended node type (can be {@code null})
    */
@@ -89,10 +89,10 @@ public final class NodeTest extends Test {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder().add(type.string()).add('(');
     if(name == null) tb.add('*');
     else tb.add(name.string());
     if(ext != null) tb.add(',').addExt(ext);
-    return tb.toString();
+    return tb.add(')').toString();
   }
 }

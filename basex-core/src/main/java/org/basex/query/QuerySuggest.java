@@ -69,8 +69,8 @@ public final class QuerySuggest extends QueryParser {
 
   @Override
   void checkAxis(final Axis axis) {
-    all = axis != Axis.CHILD && axis != Axis.DESC ?
-      new ArrayList<>() : PathIndex.desc(curr, axis == Axis.DESC);
+    all = axis != Axis.CHILD && axis != Axis.DESCENDANT ?
+      new ArrayList<>() : PathIndex.desc(curr, axis == Axis.DESCENDANT);
     curr = all;
     show = true;
   }

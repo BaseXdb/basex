@@ -119,6 +119,9 @@ public abstract class Step extends Preds {
     // compute result size
     if(!exprType(seqType(), size())) return cc.emptySeq(this);
 
+    // attribute axis will always yield attributes
+    if(axis == Axis.ATTRIBUTE) exprType.assign(NodeType.ATT);
+
     // choose best implementation
     return copyType(get(info, axis, test, exprs));
   }
@@ -170,12 +173,12 @@ public abstract class Step extends Preds {
     }
 
     // skip axes other than descendant, child, and attribute
-    if(axis != Axis.ATTR && axis != Axis.CHILD && axis != Axis.DESC &&
-       axis != Axis.DESCORSELF && axis != Axis.SELF) return null;
+    if(axis != Axis.ATTRIBUTE && axis != Axis.CHILD && axis != Axis.DESCENDANT &&
+       axis != Axis.DESCENDANT_OR_SELF && axis != Axis.SELF) return null;
 
     final ArrayList<PathNode> tmp = new ArrayList<>();
     for(final PathNode pn : nodes) {
-      if(axis == Axis.SELF || axis == Axis.DESCORSELF) {
+      if(axis == Axis.SELF || axis == Axis.DESCENDANT_OR_SELF) {
         if(kind == -1 || kind == pn.kind && (name == 0 || name == pn.name)) {
           if(!tmp.contains(pn)) tmp.add(pn);
         }
@@ -196,10 +199,10 @@ public abstract class Step extends Preds {
       final int kind) {
 
     for(final PathNode n : node.children) {
-      if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
+      if(axis == Axis.DESCENDANT || axis == Axis.DESCENDANT_OR_SELF) {
         add(n, nodes, name, kind);
       }
-      if(kind == -1 && n.kind != Data.ATTR ^ axis == Axis.ATTR ||
+      if(kind == -1 && n.kind != Data.ATTR ^ axis == Axis.ATTRIBUTE ||
          kind == n.kind && (name == 0 || name == n.name)) {
         if(!nodes.contains(n)) nodes.add(n);
       }
@@ -266,7 +269,7 @@ public abstract class Step extends Preds {
       if(axis == Axis.SELF) sb.append('.');
     }
     if(sb.length() == 0) {
-      if(axis == Axis.ATTR && test instanceof NameTest) sb.append('@');
+      if(axis == Axis.ATTRIBUTE && test instanceof NameTest) sb.append('@');
       else if(axis != Axis.CHILD) sb.append(axis).append("::");
       sb.append(test);
     }

@@ -100,7 +100,7 @@ public final class Find extends AQuery {
         preds.append("[text() contains text \"").append(term).append("\"]");
         // add valid name tests
         if(XMLToken.isName(token(term))) {
-          pre.append(r ? "/" : "").append(Axis.DESC).append("::*:").append(term).append(" | ");
+          pre.append(r ? "/" : "").append(Axis.DESCENDANT).append("::*:").append(term).append(" | ");
         }
       }
     }
@@ -109,7 +109,7 @@ public final class Find extends AQuery {
     // create final string
     final TokenBuilder tb = new TokenBuilder();
     final String name = "*";
-    tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + name + preds);
+    tb.add(pre + (r ? "/" : "") + Axis.DESCENDANT_OR_SELF + "::" + name + preds);
     return tb.toString();
   }
 
@@ -151,7 +151,7 @@ public final class Find extends AQuery {
       }
     }
     return tb.isEmpty() ? "/" : (root ? "/" : "") +
-        Axis.DESCORSELF + "::*:" + string(name) + tb;
+        Axis.DESCENDANT_OR_SELF + "::*:" + string(name) + tb;
   }
 
   /**

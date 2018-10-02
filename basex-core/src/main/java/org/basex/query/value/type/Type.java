@@ -204,6 +204,18 @@ public interface Type {
    */
   SeqType seqType(Occ occ);
 
+  /**
+   * Checks if this is one of the specified types.
+   * @param types types
+   * @return result of check
+   */
+  default boolean oneOf(final Type... types) {
+    for(final Type type : types) {
+      if(this == type) return true;
+    }
+    return false;
+  }
+
   // PUBLIC AND STATIC METHODS ====================================================================
 
   /**

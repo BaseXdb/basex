@@ -347,4 +347,59 @@ public final class RewritingsTest extends QueryPlanTest {
     check("function() { document {}/.. }()", "", empty(CDoc.class));
     check("declare function local:f() { document {}/.. }; local:f()", "", empty(CDoc.class));
   }
+
+  /** Static optimizations of paths without results (see also gh1630). */
+  @Test public void emptyPath() {
+    check("<a/>/<a/>", "<a/>", exists(MixedPath.class));
+
+    // check combination of axis and node test and axis
+    check("<e a='A'/>/attribute::text()", "", empty());
+    check("<e a='A'/>/attribute::attribute()", "a=\"A\"", exists(IterPath.class));
+    check("<e a='A'/>/ancestor::text()", "", empty());
+    check("<e a='A'/>/parent::text()", "", empty());
+    check("<e a='A'/>/parent::*", "", exists(IterPath.class));
+    check("attribute a { 0 }/child::attribute()", "", empty());
+    check("<e a='A'/>/attribute::a/child::attribute()", "", empty());
+    check("attribute a { 0 }/self::attribute()", "a=\"0\"", exists(IterPath.class));
+
+    // check step after expression that yields document nodes
+    check("document { <a/> }/self::*", "", empty());
+    check("document { <a/> }/self::*", "", empty());
+    check("document { <a/> }/self::text()", "", empty());
+    check("document { <a/> }/self::node()", "<a/>", exists(IterPath.class));
+    check("document { <a/> }/self::document-node()", "<a/>", exists(IterPath.class));
+
+    check("document { <a/> }/child::document-node()", "", empty());
+    check("document { <a/> }/child::attribute()", "", empty());
+    check("document { <a/> }/child::*", "<a/>", exists(IterPath.class));
+
+    check("document { <a/> }/descendant-or-self::attribute()", "", empty());
+    check("document { <a/> }/parent::node()", "", empty());
+    check("document { <a/> }/ancestor::node()", "", empty());
+    check("document { <a/> }/following::node()", "", empty());
+    check("document { <a/> }/preceding-sibling::node()", "", empty());
+
+    // skip further tests if previous node type is unknown, or if current test accepts all nodes
+    check("(<a/>, 1[.=0])/node()", "", exists(IterStep.class));
+
+    // check step after any other expression
+    check("<a/>/self::text()", "", empty());
+    check("comment {}/child::node()", "", empty());
+    check("text { 0 }/child::node()", "", empty());
+    check("attribute a { 0 }/following-sibling::node()", "", empty());
+    check("attribute a { 0 }/preceding-sibling::node()", "", empty());
+    check("comment { }/following-sibling::node()", "", exists(IterPath.class));
+    check("comment { }/preceding-sibling::node()", "", exists(IterStep.class));
+
+    check("attribute a { 0 }/child::node()", "", empty());
+    check("attribute a { 0 }/descendant::*", "", empty());
+    check("attribute a { 0 }/self::*", "", empty());
+
+    // namespaces
+    check("(<a/>,comment{})/child::namespace-node()", "", empty());
+    check("(<a/>,comment{})/descendant::namespace-node()", "", empty());
+    check("(<a/>,comment{})/attribute::namespace-node()", "", empty());
+    check("(<a/>,comment{})/self::namespace-node()", "", exists(IterStep.class));
+    check("(<a/>,comment{})/descendant-or-self::namespace-node()", "", exists(IterStep.class));
+  }
 }

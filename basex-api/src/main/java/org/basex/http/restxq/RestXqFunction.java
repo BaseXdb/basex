@@ -479,7 +479,7 @@ public final class RestXqFunction extends WebFunction {
       }
       // message
       if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS_X, qnm);
-      final NameTest test = new NameTest(qnm, kind, false, null);
+      final NameTest test = new NameTest(false, kind, qnm, null);
       if(last != null && last.kind != kind) throw error(INV_PRIORITY_X_X, last, test);
       if(!error.add(test)) throw error(INV_ERR_SAME_X, last);
       last = test;

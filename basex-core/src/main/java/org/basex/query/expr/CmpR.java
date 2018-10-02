@@ -242,7 +242,7 @@ public final class CmpR extends Single {
         if(step.test.kind != Kind.NAME) return null;
       } else {
         step = path.step(st);
-        if(!step.simple(Axis.ATTR, true)) return null;
+        if(!step.simple(Axis.ATTRIBUTE, true)) return null;
       }
       test = (NameTest) step.test;
     }
