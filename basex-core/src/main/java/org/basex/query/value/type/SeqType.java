@@ -292,16 +292,11 @@ public final class SeqType {
   public Value cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo info, final boolean error) throws QueryException {
 
+    // kind test is ignored (simple casts have no kind test)
     if(item.type.eq(type)) return item;
     try {
       if(!error && info != null) info.internal(true);
-      final Value value = type.cast(item, qc, sc, info);
-      if(kind != null) {
-        for(final Item it : value) {
-          if(!kind.eq(item)) throw typeError(it, type, info);
-        }
-      }
-      return value;
+      return type.cast(item, qc, sc, info);
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
