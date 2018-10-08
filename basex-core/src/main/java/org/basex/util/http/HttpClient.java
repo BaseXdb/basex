@@ -172,9 +172,9 @@ public final class HttpClient {
             f.setAccessible(true);
             conn = (HttpURLConnection) f.get(conn);
             clzz = conn.getClass();
-          } catch(final Throwable ignore) {
+          } catch(final Throwable e) {
             // ignore error: dump exception if debug is enabled
-            Util.debug(ignore);
+            Util.debug(e);
           }
 
           // assign request method
@@ -182,9 +182,9 @@ public final class HttpClient {
           final Field f = clzz.getDeclaredField("method");
           f.setAccessible(true);
           f.set(conn, method);
-        } catch(final Throwable ignore) {
+        } catch(final Throwable e) {
           // ignore error: dump exception if debug is enabled, return original exception
-          Util.debug(ignore);
+          Util.debug(e);
           throw ex;
         }
       }

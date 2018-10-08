@@ -20,8 +20,6 @@ import org.basex.query.value.seq.*;
  * @author Christian Gruen
  */
 public final class ExploreView extends View {
-  /** Header string. */
-  private final BaseXHeader header;
   /** Current search panel. */
   private final ExploreArea search;
   /** Filter button. */
@@ -35,7 +33,6 @@ public final class ExploreView extends View {
     super(EXPLOREVIEW, notifier);
     border(5).layout(new BorderLayout(0, 4));
 
-    header = new BaseXHeader(EXPLORER);
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
@@ -44,7 +41,7 @@ public final class ExploreView extends View {
 
     final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
-    b.add(header, BorderLayout.EAST);
+    b.add(new BaseXHeader(EXPLORER), BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     search = new ExploreArea(this);

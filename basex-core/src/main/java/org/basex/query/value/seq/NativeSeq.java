@@ -38,7 +38,7 @@ abstract class NativeSeq extends Seq {
   public final void cache(final InputInfo info, final boolean lazy) { }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo info) {
     return this;
   }
 

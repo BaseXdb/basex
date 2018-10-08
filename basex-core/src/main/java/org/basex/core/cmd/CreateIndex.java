@@ -32,7 +32,6 @@ public final class CreateIndex extends ACreate {
     final Data data = context.data();
 
     final CmdIndex ci = getOption(CmdIndex.class);
-    if(ci == null) return error(UNKNOWN_CMD_X, this);
     final IndexType type;
     switch(ci) {
       case TEXT:

@@ -139,7 +139,7 @@ public final class Dec extends ANum {
     try {
       if(!contains(value, 'e') && !contains(value, 'E'))
         return new BigDecimal(Token.string(value).trim());
-    } catch(final NumberFormatException ignored) { Util.debug(ignored); }
+    } catch(final NumberFormatException ex) { Util.debug(ex); }
     throw AtomType.DEC.castError(item, info);
   }
 }

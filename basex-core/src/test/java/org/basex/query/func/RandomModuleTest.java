@@ -63,6 +63,6 @@ public final class RandomModuleTest extends AdvancedQueryTest {
   public void uuid() {
     final String s1 = query(_RANDOM_UUID.args());
     final String s2 = query(_RANDOM_UUID.args());
-    assertFalse(s1.equals(s2));
+    assertNotEquals(s1, s2);
   }
 }

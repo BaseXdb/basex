@@ -125,7 +125,7 @@ public final class ReplaceValue extends NodeUpdate {
         final ANodeList nl = new ANodeList(new DBNode(tmp, p));
         l.add(new ReplaceContent(pre, data, info, nl));
       }
-      return l.toArray(new NodeUpdate[l.size()]);
+      return l.toArray(new NodeUpdate[0]);
     }
 
     // or a text node has to be deleted

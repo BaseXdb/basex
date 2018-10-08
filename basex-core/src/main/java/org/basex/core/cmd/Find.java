@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
-import org.basex.core.users.*;
 import org.basex.query.expr.path.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -34,7 +33,7 @@ public final class Find extends AQuery {
    * @param rt start from root node
    */
   public Find(final String query, final boolean rt) {
-    super(Perm.NONE, true, query);
+    super(true, query);
     root = rt;
   }
 
@@ -100,7 +99,8 @@ public final class Find extends AQuery {
         preds.append("[text() contains text \"").append(term).append("\"]");
         // add valid name tests
         if(XMLToken.isName(token(term))) {
-          pre.append(r ? "/" : "").append(Axis.DESCENDANT).append("::*:").append(term).append(" | ");
+          if(r) pre.append('/');
+          pre.append(Axis.DESCENDANT).append("::*:").append(term).append(" | ");
         }
       }
     }

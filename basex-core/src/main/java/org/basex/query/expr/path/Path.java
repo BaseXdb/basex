@@ -854,7 +854,7 @@ public abstract class Path extends ParseExpr {
    * @param expr input expression
    * @return rewriting flag or {@code null}
    */
-  private Expr mergeList(final Expr expr) {
+  private static Expr mergeList(final Expr expr) {
     if(expr instanceof Union || expr instanceof List) {
       final Arr array = (Arr) expr;
       if(childSteps(array)) {
@@ -887,7 +887,7 @@ public abstract class Path extends ParseExpr {
   private static boolean simpleChild(final Expr expr) {
     if(expr instanceof Step) {
       final Step step = (Step) expr;
-      if(step.axis == CHILD && !step.positional()) return true;
+      return step.axis == CHILD && !step.positional();
     }
     return false;
   }

@@ -1,12 +1,10 @@
 package org.basex.gui;
 
-import static org.basex.gui.GUICommand.*;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.nio.charset.*;
-import java.util.*;
 
 import javax.swing.*;
 
@@ -258,8 +256,7 @@ public final class GUIConstants {
 
   // initialize encodings
   static {
-    final SortedMap<String, Charset> cs = Charset.availableCharsets();
-    ENCODINGS = cs.keySet().toArray(new String[cs.size()]);
+    ENCODINGS = Charset.availableCharsets().keySet().toArray(new String[0]);
   }
 
   // FONTS ========================================================================================

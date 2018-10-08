@@ -58,8 +58,8 @@ public abstract class Preds extends Arr {
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
     boolean pos = false;
-    for(int e = 0; e < es; e++) {
-      Expr expr = exprs[e].optimizeEbv(cc);
+    for(final Expr ex : exprs) {
+      Expr expr = ex.optimizeEbv(cc);
       if(expr instanceof CmpG || expr instanceof CmpV) {
         final Cmp cmp = (Cmp) expr;
         final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
@@ -79,7 +79,7 @@ public abstract class Preds extends Arr {
           cc.info(OPTPRED_X, expr);
           final Expr[] ands = ((Arr) expr).exprs;
           final int m = ands.length;
-          for(int a = 0; a < m; a++) {
+          for (int a = 0; a < m; a++) {
             // wrap test with boolean() if the result is numeric
             expr = ands[a];
             if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);
@@ -101,7 +101,7 @@ public abstract class Preds extends Arr {
       // predicate will not yield any results
       if(expr == Bln.FALSE) return cc.emptySeq(this);
       // skip expression yielding true
-      if(exprs[e] != expr) cc.replaceWith(exprs[e], expr);
+      if(ex != expr) cc.replaceWith(ex, expr);
       pos = add(expr, list, pos, cc);
     }
     exprs = list.finish();
@@ -121,7 +121,7 @@ public abstract class Preds extends Arr {
 
     final boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
     if(expr == Bln.TRUE) {
-      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) () -> description());
+      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
     } else if(ps || !list.contains(expr) || expr.has(Flag.NDT)) {
       list.add(expr);
     }
@@ -200,7 +200,7 @@ public abstract class Preds extends Arr {
       Expr ex = expr;
       if(ex instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
         // E [ . ]  ->  E
-        cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) () -> description());
+        cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
         continue;
       } else if(ex instanceof SimpleMap) {
         // E [ . ! ... ]  ->  E [ ... ]

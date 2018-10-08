@@ -147,7 +147,7 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void distinctValues() {
     final Function func = Function.DISTINCT_VALUES;
 
-    query(func.args(" (1 to 100000000) ! 'a'") + "", "a");
+    query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
   }
 

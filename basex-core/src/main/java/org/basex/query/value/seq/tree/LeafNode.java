@@ -157,7 +157,6 @@ final class LeafNode implements Node<Item, Item> {
       System.arraycopy(values, 0, vals, l, p);
       System.arraycopy(values, p + 1, vals, l + p, r - 1 - p);
       out[0] = new LeafNode(vals);
-      out[1] = null;
       return out;
     }
 
@@ -169,7 +168,6 @@ final class LeafNode implements Node<Item, Item> {
       System.arraycopy(values, 0, vals, 0, p);
       System.arraycopy(values, p + 1, vals, p, l - 1 - p);
       System.arraycopy(rvals, 0, vals, l - 1, r);
-      out[1] = null;
       out[2] = new LeafNode(vals);
       return out;
     }

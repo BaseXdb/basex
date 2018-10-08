@@ -155,7 +155,7 @@ public final class WsFunction extends WebFunction {
    * @param ext error extension
    * @return exception
    */
-  private QueryException error(final InputInfo info, final String msg, final Object... ext) {
+  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
     return BASEX_WS_X.get(info, Util.info(msg, ext));
   }
 }

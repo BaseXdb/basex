@@ -616,7 +616,7 @@ public class Options implements Iterable<Option<?>> {
       final Object obj = f.get(null);
       if(obj instanceof Option) opts.add((Option<?>) obj);
     }
-    return opts.toArray(new Option[opts.size()]);
+    return opts.toArray(new Option[0]);
   }
 
   /**

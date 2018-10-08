@@ -45,7 +45,7 @@ final class TreeNodeCache {
       }
     }
     maxLevel = alil.size();
-    nodes = alil.toArray(new IntList[alil.size()]);
+    nodes = alil.toArray(new IntList[0]);
   }
 
   /**

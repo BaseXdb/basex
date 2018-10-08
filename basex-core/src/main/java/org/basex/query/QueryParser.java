@@ -1322,7 +1322,7 @@ public class QueryParser extends InputParser {
       groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
 
-    return new Switch(info, cond, groups.toArray(new SwitchGroup[groups.size()]));
+    return new Switch(info, cond, groups.toArray(new SwitchGroup[0]));
   }
 
   /**
@@ -1359,7 +1359,7 @@ public class QueryParser extends InputParser {
       }
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      final SeqType[] st = types.toArray(new SeqType[types.size()]);
+      final SeqType[] st = types.toArray(new SeqType[0]);
       cases = Array.add(cases, new TypeswitchGroup(info(), var, st, ret));
       localVars.closeScope(s);
       types.clear();
@@ -1801,7 +1801,7 @@ public class QueryParser extends InputParser {
       }
       pos += 2;
     } while(wsConsumeWs(PRAGMA));
-    return el.toArray(new Pragma[el.size()]);
+    return el.toArray(new Pragma[0]);
   }
 
   /**

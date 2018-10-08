@@ -124,8 +124,7 @@ public final class GUIMacOSX extends GUIMacOS {
         result = GUIMacOSX.invoke(this, method.getName());
       }
       // mark the current event as 'handled' if handler doesn't return a false boolean
-      GUIMacOSX.invoke(obj, "setHandled",
-        result != null && Boolean.class.isInstance(result) ? (Boolean) result : true);
+      GUIMacOSX.invoke(obj, "setHandled", result instanceof Boolean ? (Boolean) result : true);
       return null;
     }
 

@@ -398,10 +398,10 @@ public final class FElem extends FNode {
       for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
     }
     if(at != null) {
-      for(final ANode n : atts) at.add(n.materialize(qc, copy));
+      for(final ANode n : atts) at.add(n.materialize(qc, true));
     }
     if(ch != null) {
-      for(final ANode n : children) ch.add(n.materialize(qc, copy));
+      for(final ANode n : children) ch.add(n.materialize(qc, true));
     }
     return node.optimize();
   }

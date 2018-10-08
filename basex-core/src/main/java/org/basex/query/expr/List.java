@@ -53,7 +53,7 @@ public final class List extends Arr {
     final int ls = list.size();
     if(ls != exprs.length) {
       if(ls < 2) return cc.replaceWith(this, ls == 0 ? Empty.SEQ : list.get(0));
-      cc.info(OPTREMOVE_X_X, Empty.SEQ, (Supplier<?>) () -> description());
+      cc.info(OPTREMOVE_X_X, Empty.SEQ, (Supplier<?>) this::description);
       exprs = list.finish();
     }
 

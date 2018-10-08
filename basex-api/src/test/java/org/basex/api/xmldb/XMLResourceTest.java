@@ -164,11 +164,11 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     final XMLResource doc2 = (XMLResource) coll.createResource(DOC2, XMLResource.RESOURCE_TYPE);
     final XMLResource doc3 = (XMLResource) coll.createResource(DOC3, XMLResource.RESOURCE_TYPE);
 
-    final XMLReader reader2 = XMLReaderFactory.createXMLReader();
+    final XMLReader reader2 = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
     reader2.setContentHandler(doc2.setContentAsSAX());
     reader2.parse(new InputSource(DOCPATH + DOC2));
 
-    final XMLReader reader3 = XMLReaderFactory.createXMLReader();
+    final XMLReader reader3 = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
     reader3.setContentHandler(doc3.setContentAsSAX());
     reader3.parse(new InputSource(DOCPATH + DOC3));
 

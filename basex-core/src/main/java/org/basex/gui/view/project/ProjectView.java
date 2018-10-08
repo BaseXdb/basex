@@ -47,7 +47,7 @@ public final class ProjectView extends BaseXPanel {
   private boolean parsed;
 
   /** Remembers the last focused component. */
-  final FocusGainedListener lastfocus = (FocusGainedListener) e -> last = e.getComponent();
+  final FocusGainedListener lastfocus = e -> last = e.getComponent();
 
   /**
    * Constructor.
@@ -175,7 +175,7 @@ public final class ProjectView extends BaseXPanel {
    * @param file file to be found
    * @return result of check
    */
-  private boolean find(final Set<String> errPaths, final IOFile file) {
+  private static boolean find(final Set<String> errPaths, final IOFile file) {
     final String path = file.path();
     for(final String errPath : errPaths) {
       if(errPath.startsWith(path)) return true;

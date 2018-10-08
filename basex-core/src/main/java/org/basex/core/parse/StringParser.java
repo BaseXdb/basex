@@ -406,7 +406,7 @@ final class StringParser extends CommandParser {
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : startWith(complete, null)) {
       final byte[] sm = uc(token(s.name()));
-      if(ls.similar(name, sm) && Cmd.class.isInstance(s)) {
+      if(ls.similar(name, sm) && s instanceof Cmd) {
         throw error(alt, UNKNOWN_SIMILAR_X_X, name, sm);
       }
     }

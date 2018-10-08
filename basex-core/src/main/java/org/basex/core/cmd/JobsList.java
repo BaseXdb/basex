@@ -118,8 +118,8 @@ public final class JobsList extends Command {
     final DTDur tz = new DTDur(BigDecimal.valueOf(TimeZone.getDefault().getOffset(ms) / 1000));
     try {
       dtm.timeZone(tz, true, null);
-    } catch(final QueryException ignore) {
-      Util.debug(ignore);
+    } catch(final QueryException ex) {
+      Util.debug(ex);
     }
     return dtm.string(null);
   }

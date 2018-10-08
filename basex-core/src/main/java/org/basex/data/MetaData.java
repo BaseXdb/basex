@@ -62,13 +62,13 @@ public final class MetaData {
   /** Indicates if the full-text index is to be recreated. */
   public boolean createft;
   /** Text index: names to include. */
-  public String textinclude = "";
+  public String textinclude;
   /** Attribute index: names to include. */
-  public String attrinclude = "";
+  public String attrinclude;
   /** Token index: names to tokenize. */
-  public String tokeninclude = "";
+  public String tokeninclude;
   /** Full-text index: names to include. */
-  public String ftinclude = "";
+  public String ftinclude;
 
   /** Flag for full-text stemming. */
   public boolean stemming;
@@ -77,7 +77,7 @@ public final class MetaData {
   /** Flag for full-text diacritics removal. */
   public boolean diacritics;
   /** Full-text stopword file. */
-  public String stopwords = "";
+  public String stopwords;
 
   /** Maximum number of categories. */
   public int maxcats;

@@ -83,13 +83,13 @@ public final class TypeswitchGroup extends Single {
     final ArrayList<SeqType> tmp = new ArrayList<>();
     for(final SeqType st : types) {
       if(cache.contains(st)) {
-        cc.info(OPTREMOVE_X_X, st, (Supplier<?>) () -> description());
+        cc.info(OPTREMOVE_X_X, st, (Supplier<?>) this::description);
       } else {
         tmp.add(st);
         cache.add(st);
       }
     }
-    if(types.length != tmp.size()) types = tmp.toArray(new SeqType[tmp.size()]);
+    if(types.length != tmp.size()) types = tmp.toArray(new SeqType[0]);
     return types.length != 0;
   }
 

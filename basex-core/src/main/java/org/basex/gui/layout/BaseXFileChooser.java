@@ -142,7 +142,7 @@ public final class BaseXFileChooser {
     for(int f = 0; f < fl; f++) {
       // chop too long paths (usually result of copy'n'paste)
       String path = fls[f].getPath();
-      path.substring(0, Math.min(path.length(), 512));
+      path = path.substring(0, Math.min(path.length(), 512));
       if(fls[f].isDirectory()) path += '/';
       files[f] = new IOFile(path);
     }

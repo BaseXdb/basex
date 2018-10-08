@@ -172,7 +172,7 @@ public final class HTTPConnection implements ClientInfo {
         }
       }
     }
-    return list.toArray(new MediaType[list.size()]);
+    return list.toArray(new MediaType[0]);
   }
 
   /**

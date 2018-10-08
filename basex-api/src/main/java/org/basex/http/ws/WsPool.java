@@ -91,7 +91,7 @@ public final class WsPool {
     for(final Entry<String, WebSocket> entry : clients.entrySet()) {
       final String id = entry.getKey();
       if(client == null || !client.equals(id)) list.add(entry.getValue());
-    };
+    }
     send(message, list);
   }
 
@@ -127,7 +127,7 @@ public final class WsPool {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void send(final Item message, final ArrayList<WebSocket> websockets)
+  private static void send(final Item message, final ArrayList<WebSocket> websockets)
       throws QueryException, IOException {
 
     /* [JF] We need to check what happens if a client says goodbye while we send data.

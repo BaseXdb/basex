@@ -270,7 +270,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected boolean ignore(final ANode node) {
     if(ct > 0 && node.type == NodeType.ELM && eq(node.name(), META)) {
       final byte[] value = node.attribute(HTTPEQUIV);
-      if(value != null && eq(trim(value), CONTENT_TYPE)) return true;
+      return value != null && eq(trim(value), CONTENT_TYPE);
     }
     return false;
   }

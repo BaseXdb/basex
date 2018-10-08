@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public class HofId extends StandardFunc {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) {
     throw Util.notExpected();
   }
 

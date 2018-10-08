@@ -103,17 +103,15 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public void onWebSocketError(final Throwable cause) {
-    run("[WS-ERROR] " + req.getRequestURL() + ": " + cause.getMessage(), null, () -> {
-      findAndProcess(Annotation._WS_ERROR, cause.getMessage());
-    });
+    run("[WS-ERROR] " + req.getRequestURL() + ": " + cause.getMessage(), null,
+        () -> findAndProcess(Annotation._WS_ERROR, cause.getMessage()));
   }
 
   @Override
   public void onWebSocketClose(final int status, final String message) {
     try {
-      run("[WS-CLOSE] " + req.getRequestURL(), status, () -> {
-        findAndProcess(Annotation._WS_CLOSE, null);
-      });
+      run("[WS-CLOSE] " + req.getRequestURL(), status,
+          () -> findAndProcess(Annotation._WS_CLOSE, null));
     } finally {
       WsPool.get().remove(id);
       super.onWebSocketClose(status, message);

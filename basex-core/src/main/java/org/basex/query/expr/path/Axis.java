@@ -134,18 +134,6 @@ public enum Axis {
    */
   abstract BasicNodeIter iter(ANode n);
 
-  /**
-   * Checks if this is one of the specified axes.
-   * @param axes axes
-   * @return result of check
-   */
-  boolean oneOf(final Axis... axes) {
-    for(final Axis axis : axes) {
-      if(this == axis) return true;
-    }
-    return false;
-  }
-
   @Override
   public String toString() {
     return name;

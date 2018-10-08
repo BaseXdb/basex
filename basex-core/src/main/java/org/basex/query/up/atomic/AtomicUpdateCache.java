@@ -262,10 +262,8 @@ public final class AtomicUpdateCache {
       /* CASE 1: candidate operates on the subtree of T and appends a node to the end of
        * the subtree (target PRE may be equal)...
        * CASE 2: operates within subtree of T */
-      if(bu2.location <= fol && (bu2 instanceof Insert || bu2 instanceof InsertAttr) &&
-          bu2.parent >= pre && bu2.parent < fol || bu2.location < fol) {
-        return true;
-      }
+      return bu2.location <= fol && (bu2 instanceof Insert || bu2 instanceof InsertAttr) &&
+             bu2.parent >= pre && bu2.parent < fol || bu2.location < fol;
     }
     return false;
   }

@@ -25,7 +25,7 @@ import org.eclipse.jetty.websocket.api.*;
  */
 public final class WsResponse extends WebResponse {
   /** WebSocket. */
-  private WebSocket ws;
+  private final WebSocket ws;
 
   /** Function. */
   private WsFunction func;
@@ -40,7 +40,7 @@ public final class WsResponse extends WebResponse {
   }
 
   @Override
-  protected void init(final WebFunction function) throws QueryException, IOException {
+  protected void init(final WebFunction function) throws QueryException {
     func = new WsFunction(function.function, qc, function.module);
     qc.putProperty(HTTPText.WEBSOCKET, ws);
     qc.putProperty(HTTPText.REQUEST, ws.req);

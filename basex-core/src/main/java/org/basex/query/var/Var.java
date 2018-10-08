@@ -32,7 +32,7 @@ public final class Var extends ExprInfo {
   public Data data;
 
   /** Stack slot number. */
-  int slot = -1;
+  int slot;
 
   /** Actual type (by type inference). */
   private final ExprType exprType = new ExprType(SeqType.ITEM_ZM);

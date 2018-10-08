@@ -290,7 +290,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       throws QueryException {
 
     if(!inline(cc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
-    cc.info(OPTINLINE_X, (Supplier<?>) () -> id());
+    cc.info(OPTINLINE_X, (Supplier<?>) this::id);
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = exprs.length == 0 ? null : new LinkedList<>();

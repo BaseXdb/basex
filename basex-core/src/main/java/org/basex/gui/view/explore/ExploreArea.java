@@ -56,7 +56,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     all = new BaseXTextField(gui);
     all.addKeyListener(main);
-    all.addKeyListener((KeyReleasedListener) e -> query(false));
+    all.addKeyListener((KeyReleasedListener) e -> query());
     add(all, BorderLayout.NORTH);
 
     panel = new BaseXBack(false).layout(new TableLayout(32, 2, 10, 5));
@@ -92,7 +92,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     BaseXLayout.setWidth(txt, COMPW);
     txt.setPreferredSize(new Dimension(getPreferredSize().width, txt.getFont().getSize() + 11));
     txt.setMargin(new Insets(0, 0, 0, 10));
-    txt.addKeyListener((KeyReleasedListener) e -> query(false));
+    txt.addKeyListener((KeyReleasedListener) e -> query());
     txt.addKeyListener(main);
     panel.add(txt, pos);
   }
@@ -197,14 +197,13 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         panel.repaint();
       }
     }
-    query(false);
+    query();
   }
 
   /**
    * Runs a query.
-   * @param force force the execution of a new query
    */
-  private void query(final boolean force) {
+  private void query() {
     final TokenBuilder tb = new TokenBuilder();
     final Data data = gui.context.data();
 
@@ -271,7 +270,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     if(qu.isEmpty()) qu = rt || root ? "/" : ".";
 
-    if(!force && last.equals(qu)) return;
+    if(last.equals(qu)) return;
     last = qu;
     gui.simpleQuery(qu);
   }

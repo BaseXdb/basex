@@ -98,7 +98,7 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
    */
   private void initAboutMenu() throws Exception {
     //if(d.isSupported(Action.APP_ABOUT)) d.setAboutHandler(this);
-    final Method m = dClass.getMethod("setAboutHandler", new Class<?>[] { this.getClass()});
+    final Method m = dClass.getMethod("setAboutHandler", this.getClass());
     m.invoke(d, this);
   }
 
@@ -112,8 +112,7 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   //  new DialogAbout(main);
   //}
 @Override
-  public Object invoke(final Object proxy, final Method method, final Object[] args)
-      throws Throwable {
+  public Object invoke(final Object proxy, final Method method, final Object[] args) {
     if("handleAbout".equals(method.getName())) new DialogAbout(main);
     return null;
   }

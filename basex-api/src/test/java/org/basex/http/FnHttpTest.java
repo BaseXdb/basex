@@ -893,7 +893,7 @@ public class FnHttpTest extends HTTPTest {
    * @return output stream
    * @throws MalformedURLException exception
    */
-  private ByteArrayOutputStream fakeOutput() throws MalformedURLException {
+  private static ByteArrayOutputStream fakeOutput() throws MalformedURLException {
     return new FakeHttpConnection().getOutputStream();
   }
 }

@@ -42,7 +42,7 @@ public final class DBOptions {
    */
   public DBOptions(final Options options, final List<Option<?>> supported, final InputInfo info)
       throws QueryException {
-    this(options, supported.toArray(new Option<?>[supported.size()]), info);
+    this(options, supported.toArray(new Option<?>[0]), info);
   }
 
   /**

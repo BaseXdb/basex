@@ -122,7 +122,7 @@ public final class WebModule {
    * @return function or {@code null}
    * @throws HTTPException HTTP exception
    */
-  public StaticFunc find(final QueryContext qc, final StaticFunc func) throws HTTPException {
+  public static StaticFunc find(final QueryContext qc, final StaticFunc func) throws HTTPException {
     for(final StaticFunc sf : qc.funcs.funcs()) {
       if(func.info.equals(sf.info)) return sf;
     }

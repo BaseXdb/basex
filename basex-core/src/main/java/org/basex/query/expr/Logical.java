@@ -63,10 +63,10 @@ abstract class Logical extends Arr {
       if(and ? ex instanceof And : ex instanceof Or) {
         // flatten nested expressions
         for(final Expr exp : ((Logical) ex).exprs) list.add(exp);
-        cc.info(OPTFLAT_X_X, (Supplier<?>) () -> description(), ex);
+        cc.info(OPTFLAT_X_X, (Supplier<?>) this::description, ex);
       } else if(ex instanceof Value) {
         // pre-evaluate values
-        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) () -> description());
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         list.add(ex);

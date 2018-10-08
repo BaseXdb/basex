@@ -92,30 +92,30 @@ public final class BitArrayTest {
   public void preFill() {
     // map with zero entries
     BitArray ba = new BitArray(0, true);
-    assertEquals("Incorrect value", false, ba.get(0));
+    assertFalse("Incorrect value", ba.get(0));
     // map with one entry
     ba = new BitArray(1, true);
-    assertEquals("Incorrect value", true, ba.get(0));
-    assertEquals("Incorrect value", false, ba.get(1));
+    assertTrue("Incorrect value", ba.get(0));
+    assertFalse("Incorrect value", ba.get(1));
     // map with 63 entries
     int max = BitArray.WORD_SIZE - 1;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertEquals("Incorrect value", true, ba.get(i));
-    assertEquals("Incorrect value", false, ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
+    assertFalse("Incorrect value", ba.get(max));
     // map with 64 entries
     max = BitArray.WORD_SIZE;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertEquals("Incorrect value", true, ba.get(i));
-    assertEquals("Incorrect value", false, ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
+    assertFalse("Incorrect value", ba.get(max));
     // map with 65 entries
     max = BitArray.WORD_SIZE + 1;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertEquals("Incorrect value", true, ba.get(i));
-    assertEquals("Incorrect value", false, ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
+    assertFalse("Incorrect value", ba.get(max));
     // map with 1025 entries
     max = (BitArray.WORD_SIZE << 4) + 1;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertEquals("Incorrect value", true, ba.get(i));
-    assertEquals("Incorrect value", false, ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
+    assertFalse("Incorrect value", ba.get(max));
   }
 }

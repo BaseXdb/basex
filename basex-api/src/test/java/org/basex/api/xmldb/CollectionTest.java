@@ -9,7 +9,6 @@ import javax.xml.parsers.*;
 import org.junit.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
-import org.xml.sax.helpers.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
@@ -276,7 +275,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     // store SAX stream
     final XMLResource xml2 = (XMLResource) coll.createResource(
         DOC3, XMLResource.RESOURCE_TYPE);
-    final XMLReader reader = XMLReaderFactory.createXMLReader();
+    final XMLReader reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
     reader.setContentHandler(xml2.setContentAsSAX());
     reader.parse(new InputSource(DOCPATH + DOC3));
     coll.storeResource(xml2);

@@ -209,7 +209,7 @@ public final class IOFile extends IO {
         io.add(child.isDirectory() ? new IOFile(child.getPath() + '/') : new IOFile(child));
       }
     }
-    return io.toArray(new IOFile[io.size()]);
+    return io.toArray(new IOFile[0]);
   }
 
   /**
@@ -225,7 +225,7 @@ public final class IOFile extends IO {
     for(final File child : children) {
       io.add(child.isDirectory() ? new IOFile(child + "/") : new IOFile(child));
     }
-    return io.toArray(new IOFile[io.size()]);
+    return io.toArray(new IOFile[0]);
   }
 
   /**

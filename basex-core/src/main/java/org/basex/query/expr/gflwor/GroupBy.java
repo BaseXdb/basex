@@ -179,7 +179,7 @@ public final class GroupBy extends Clause {
         }
 
         // we're finished, copy the array so the list can be garbage-collected
-        return grps.toArray(new Group[grps.size()]);
+        return grps.toArray(new Group[0]);
       }
     };
   }

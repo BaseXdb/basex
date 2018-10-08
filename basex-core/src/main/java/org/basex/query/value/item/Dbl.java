@@ -160,8 +160,7 @@ public final class Dbl extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Dbl && value == ((Dbl) obj).value ||
-        this == NAN && obj == NAN;
+    return this == obj || obj instanceof Dbl && value == ((Dbl) obj).value;
   }
 
   /**

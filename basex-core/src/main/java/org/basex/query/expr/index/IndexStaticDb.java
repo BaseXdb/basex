@@ -90,7 +90,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  Data data(final QueryContext qc) throws QueryException {
+  Data data(final QueryContext qc) {
     return data;
   }
 

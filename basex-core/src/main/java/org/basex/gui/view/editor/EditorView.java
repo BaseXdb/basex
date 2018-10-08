@@ -72,8 +72,6 @@ public final class EditorView extends View {
   private final BaseXLabel pos;
   /** Splitter. */
   private final BaseXSplit split;
-  /** Header string. */
-  private final BaseXHeader header;
   /** Tabs. */
   private final BaseXTabs tabs;
   /** Context. */
@@ -100,8 +98,6 @@ public final class EditorView extends View {
     super(EDITORVIEW, notifier);
     layout(new BorderLayout());
     setBackground(PANEL);
-
-    header = new BaseXHeader(EDITOR);
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
@@ -147,13 +143,13 @@ public final class EditorView extends View {
     buttons.add(vars);
     buttons.add(test);
 
-    context = new BaseXLabel("").resize(1.2f);;
+    context = new BaseXLabel("").resize(1.2f);
     context.setForeground(GUIConstants.dgray);
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0));
     north.add(buttons, BorderLayout.WEST);
     north.add(context, BorderLayout.CENTER);
-    north.add(header, BorderLayout.EAST);
+    north.add(new BaseXHeader(EDITOR), BorderLayout.EAST);
 
     // status and query pane
     search.editor(addTab(), false);
@@ -1072,6 +1068,6 @@ public final class EditorView extends View {
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);
     }
-    return edits.toArray(new EditorArea[edits.size()]);
+    return edits.toArray(new EditorArea[0]);
   }
 }

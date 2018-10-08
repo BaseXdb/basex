@@ -43,6 +43,6 @@ public final class QueryJobSpec {
 
   @Override
   public String toString() {
-    return Util.className(this) + "[" + options + ',' + query + ']';
+    return Util.className(this) + '[' + options + ',' + query + ']';
   }
 }

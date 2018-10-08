@@ -54,7 +54,7 @@ public final class Or extends Logical {
       if(!list.contains(expr) || expr.has(Flag.NDT)) {
         list.add(cc.replaceWith(exprs[e], expr));
       } else {
-        cc.info(OPTREMOVE_X_X, exprs[e], (Supplier<?>) () -> description());
+        cc.info(OPTREMOVE_X_X, exprs[e], (Supplier<?>) this::description);
       }
     }
   }

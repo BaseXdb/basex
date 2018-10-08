@@ -46,7 +46,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
         while(true) {
           Item en = qc.next(entries);
           if(en == null) break;
-          en = checkElemToken(en);
+          checkElemToken(en);
           final IOFile file = new IOFile(root, string(en.string(info)));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);

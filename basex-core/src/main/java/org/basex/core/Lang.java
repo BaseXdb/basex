@@ -160,7 +160,7 @@ public final class Lang {
       if(lang.equals(Prop.language)) continue;
 
       read(lang);
-      for(final String text : set.toArray(new String[set.size()])) {
+      for(final String text : set.toArray(new String[0])) {
         if(TEXTS.remove(text) == null) sb.append("- ").append(text).append('\n');
       }
       if(sb.length() != 0) {
