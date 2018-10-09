@@ -38,7 +38,7 @@ public abstract class FNode extends ANode {
 
   @Override
   public final boolean is(final ANode node) {
-    return this == node || id == node.id;
+    return this == node;
   }
 
   @Override
