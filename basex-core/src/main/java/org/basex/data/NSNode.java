@@ -175,23 +175,27 @@ final class NSNode {
    */
   void delete(final int p, final int s) {
     // find the node to deleted
-    int d = find(p);
+    int i = find(p);
     // if the node is not directly contained as a child, either start at array index 0 or
     // proceed with the next node in the child array to search for descendants of pre
-    if(d == -1 || nodes[d].pre != p) ++d;
+    if(i == -1 || nodes[i].pre != p) ++i;
     // first pre value which is not deleted
     final int upper = p + s;
     // number of nodes to be deleted
     int num = 0;
     // determine number of nodes to be deleted
-    for(int i = d; i < size && nodes[i].pre < upper; ++i, ++num);
+    for(int n = i; n < size && nodes[n].pre < upper; ++n, ++num);
     // new size of child array
     size -= num;
 
-    // if all nodes are deleted, just create an empty array
-    if(size == 0) nodes = new NSNode[0];
-    // otherwise remove nodes from the child array
-    else if(num > 0) System.arraycopy(nodes, d + num, nodes, d, size - d);
+    if(size == 0) {
+      // if all nodes are deleted, just create an empty array
+      nodes = new NSNode[0];
+    } else if(num > 0) {
+      // otherwise remove nodes from the child array
+      System.arraycopy(nodes, i + num, nodes, i, size - i);
+      for(int n = size; n < size + num; n++) nodes[n] = null;
+    }
   }
 
   /**
@@ -199,15 +203,14 @@ final class NSNode {
    * @param node child node
    */
   void add(final NSNode node) {
-    if(size == nodes.length)
-      nodes = Array.copy(nodes, new NSNode[Array.newSize(size)]);
+    if(size == nodes.length) nodes = Array.copy(nodes, new NSNode[Array.newSize(size)]);
 
     // find inserting position
-    int s = find(node.pre);
-    if(s < 0 || node.pre != nodes[s].pre) s++;
+    int i = find(node.pre);
+    if(i < 0 || node.pre != nodes[i].pre) i++;
 
-    System.arraycopy(nodes, s, nodes, s + 1, size++ - s);
-    nodes[s] = node;
+    System.arraycopy(nodes, i, nodes, i + 1, size++ - i);
+    nodes[i] = node;
     node.parent = this;
   }
 
@@ -217,10 +220,10 @@ final class NSNode {
    * @param uri uri reference
    */
   void add(final int prefix, final int uri) {
-    final int s = values.length;
-    values = Arrays.copyOf(values, s + 2);
-    values[s] = prefix;
-    values[s + 1] = uri;
+    final int v = values.length;
+    values = Arrays.copyOf(values, v + 2);
+    values[v] = prefix;
+    values[v + 1] = uri;
   }
 
   /**

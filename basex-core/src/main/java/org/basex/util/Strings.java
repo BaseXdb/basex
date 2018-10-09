@@ -127,7 +127,7 @@ public final class Strings {
   }
 
   /**
-   * Deletes a character from the strings.
+   * Deletes a character from the string.
    * @param string string
    * @param ch character to be removed
    * @return resulting token
@@ -145,9 +145,9 @@ public final class Strings {
   }
 
   /**
-   * Checks if a character occurs in a strings.
+   * Checks if a string contains a character.
    * @param string string
-   * @param ch character to be found
+   * @param ch character to search for
    * @return result of check
    */
   public static boolean contains(final String string, final char ch) {

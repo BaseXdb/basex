@@ -154,8 +154,10 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    */
   public final E remove(final int index) {
     final E[] lst = list;
+    final int sz = --size;
     final E e = lst[index];
-    Array.move(lst, index + 1, -1, --size - index);
+    Array.move(lst, index + 1, -1, sz - index);
+    lst[sz] = null;
     return e;
   }
 
@@ -171,6 +173,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     for(int i = 0; i < sz; ++i) {
       if(!eq(lst[i], element)) lst[s++] = lst[i];
     }
+    for(int i = s; i < sz; i++) lst[i] = null;
     size = s;
     return sz != s;
   }
@@ -188,7 +191,11 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return the popped element
    */
   public final E pop() {
-    return list[--size];
+    final E[] lst = list;
+    final int sz = --size;
+    final E e = lst[sz];
+    lst[sz] = null;
+    return e;
   }
 
   /**

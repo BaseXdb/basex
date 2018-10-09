@@ -1021,7 +1021,7 @@ public final class Token {
   }
 
   /**
-   * Deletes a character from the token.
+   * Deletes a character from a token.
    * @param token token
    * @param ch character to be removed
    * @return resulting token
