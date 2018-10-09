@@ -252,7 +252,7 @@ public abstract class Data {
             if(t == EMPTY) {
               t = txt;
             } else {
-              if(tb == null) tb = new TokenBuilder(t);
+              if(tb == null) tb = new TokenBuilder().add(t);
               tb.add(txt);
             }
           }

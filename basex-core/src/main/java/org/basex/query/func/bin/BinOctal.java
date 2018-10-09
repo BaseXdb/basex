@@ -30,7 +30,7 @@ public final class BinOctal extends BinFn {
         // add leading zeroes
         final byte[] tmp = new byte[expl];
         Arrays.fill(tmp, 0, expl - binl, (byte) '0');
-        System.arraycopy(bin, 0, tmp, expl - binl, binl);
+        Array.copyFromStart(bin, binl, tmp, expl - binl);
         bin = tmp;
       }
       return B64.get(binary2bytes(bin));

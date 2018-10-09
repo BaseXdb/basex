@@ -426,11 +426,11 @@ public final class FElem extends FNode {
     if(ns != null) {
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
-        tb.add(' ').addExt(new FNSpace(ns.name(n), ns.value(n)));
+        tb.add(' ').add(new FNSpace(ns.name(n), ns.value(n)));
       }
     }
     if(atts != null) {
-      for(final ANode att : atts) tb.add(' ').addExt(att);
+      for(final ANode att : atts) tb.add(' ').add(att);
     }
     if(hasChildren()) {
       tb.add('>');

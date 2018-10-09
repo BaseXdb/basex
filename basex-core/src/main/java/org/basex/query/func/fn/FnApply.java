@@ -9,7 +9,7 @@ import org.basex.query.func.update.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -46,7 +46,7 @@ public class FnApply extends StandardFunc {
    * @throws QueryException query exception
    */
   protected Value[] values(final FItem func, final QueryContext qc) throws QueryException {
-    final Array array = toArray(exprs[1], qc);
+    final XQArray array = toArray(exprs[1], qc);
     final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, ar, as);
 
@@ -63,9 +63,9 @@ public class FnApply extends StandardFunc {
 
     // try to pass on types of array argument to function item
     if(type2 instanceof ArrayType) {
-      if(expr2 instanceof Array) {
+      if(expr2 instanceof XQArray) {
         // argument is a value: final types are known
-        final Array arr = (Array) expr2;
+        final XQArray arr = (XQArray) expr2;
         final int as = Math.max(0, (int) arr.arraySize());
         final SeqType[] args = new SeqType[as];
         for(int a = 0; a < as; a++) args[a] = arr.get(a).seqType();

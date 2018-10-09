@@ -235,7 +235,7 @@ public enum Annotation {
    * @return name
    */
   public byte[] local() {
-    return new TokenBuilder(desc.substring(0, desc.indexOf('('))).finish();
+    return token(desc.substring(0, desc.indexOf('(')));
   }
 
   /**

@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Sequence of items of type {@link Int xs:integer}, containing at least two of them.
@@ -102,19 +103,15 @@ public final class IntSeq extends NativeSeq {
   public static Value get(final int size, final Type type, final Value... values)
       throws QueryException {
 
-    final long[] tmp = new long[size];
-    int t = 0;
+    final LongList tmp = new LongList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) value.size();
       if(value instanceof IntSeq) {
-        final IntSeq seq = (IntSeq) value;
-        System.arraycopy(seq.values, 0, tmp, t, vs);
-        t += vs;
+        tmp.add(((IntSeq) value).values);
       } else {
-        for(final Item item : value) tmp[t++] = item.itr(null);
+        for(final Item item : value) tmp.add(item.itr(null));
       }
     }
-    return get(tmp, type);
+    return get(tmp.finish(), type);
   }
 }

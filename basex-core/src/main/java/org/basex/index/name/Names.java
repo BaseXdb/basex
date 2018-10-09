@@ -120,8 +120,8 @@ public final class Names extends TokenSet implements Index {
     final int[] ids = Array.createOrder(tl, false);
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(Text.LI_STRUCTURE + Text.HASH + Text.NL);
-    tb.add(Text.LI_ENTRIES + (size - 1) + Text.NL);
+    tb.add(Text.LI_STRUCTURE).add(Text.HASH).add(Text.NL);
+    tb.add(Text.LI_ENTRIES).addInt(size - 1).add(Text.NL);
     for(int i = 0; i < size - 1; i++) {
       final int id = ids[i];
       if(stats[id] == null) continue;

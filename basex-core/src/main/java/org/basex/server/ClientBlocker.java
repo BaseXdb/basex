@@ -29,6 +29,6 @@ public final class ClientBlocker {
    * @param client client address
    */
   public synchronized void remove(final byte[] client) {
-    blocked.delete(client);
+    blocked.remove(client);
   }
 }

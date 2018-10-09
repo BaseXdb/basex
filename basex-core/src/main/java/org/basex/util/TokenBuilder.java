@@ -44,7 +44,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
+   * Constructor with initial internal array size.
    * @param capacity initial array capacity
    */
   public TokenBuilder(final int capacity) {
@@ -52,30 +52,13 @@ public final class TokenBuilder {
   }
 
   /**
-   * Constructor, specifying an initial string.
-   * @param string initial string
-   */
-  public TokenBuilder(final String string) {
-    this(Token.token(string));
-  }
-
-  /**
-   * Constructor, specifying an initial token.
+   * Constructor with initial token.
    * @param token initial token
    */
   public TokenBuilder(final byte[] token) {
-    this(token.length + Array.CAPACITY);
-    size = token.length;
-    System.arraycopy(token, 0, chars, 0, size);
-  }
-
-  /**
-   * Constructor, specifying initial codepoints.
-   * @param cps initial codepoints
-   */
-  public TokenBuilder(final int[] cps) {
-    this(cps.length);
-    add(cps);
+    final int sz = token.length;
+    chars = Arrays.copyOf(token, sz);
+    size = sz;
   }
 
   /**
@@ -157,17 +140,8 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds the specified UTF8 codepoints.
-   * @param cps the codepoints to be added
-   * @return self reference
-   */
-  public TokenBuilder add(final int[] cps) {
-    for(final int cp : cps) add(cp);
-    return this;
-  }
-
-  /**
-   * Adds the specified UTF8 codepoint.
+   * Adds the specified integer as UTF8 codepoint.
+   * Call {@link #addInt(int)} to add the string value of an integer.
    * @param cp the codepoint to be added
    * @return self reference
    */
@@ -232,7 +206,7 @@ public final class TokenBuilder {
    * @param length number of bytes to be removed
    */
   public void delete(final int pos, final int length) {
-    Array.move(chars, pos + length, -length, size - pos - length);
+    Array.remove(chars, pos, length, size);
     size -= length;
   }
 
@@ -270,7 +244,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds another token to the token.
+   * Adds a token to the token.
    * @param token the token to be added
    * @return self reference
    */
@@ -279,7 +253,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds part of another token to the token.
+   * Adds the part of a token to the token.
    * @param token the token
    * @param start start position
    * @param end end position
@@ -291,7 +265,7 @@ public final class TokenBuilder {
       byte[] chrs = chars;
       final int cl = chrs.length, s = size, ns = s + l;
       if(ns > cl) chrs = Arrays.copyOf(chrs, Array.newSize(ns));
-      System.arraycopy(token, start, chrs, s, l);
+      Array.copy(token, start, l, chrs, s);
       chars = chrs;
       size = ns;
     }
@@ -317,25 +291,33 @@ public final class TokenBuilder {
     final int ol = objects.length;
     for(int o = 0; o < ol; o++) {
       if(o != 0) add(sep);
-      addExt(objects[o]);
+      add(objects[o]);
     }
     return this;
   }
 
   /**
-   * Adds the string representation of an object.
-   * The specified string may contain {@code "%"} characters as place holders.
-   * All place holders will be replaced by the specified extensions. If a digit is
-   * specified after the place holder character, it will be interpreted as insertion
-   * position.
-   *
-   * @param object object to be extended
-   * @param ext optional extensions
+   * Adds an object to the token.
+   * @param object the object to be added
    * @return self reference
    */
-  public TokenBuilder addExt(final Object object, final Object... ext) {
+  public TokenBuilder add(final Object object) {
+    return add(token(object));
+  }
+
+  /**
+   * Adds the string representation of an object.
+   * The specified string may contain {@code %} characters as place holders.
+   * All place holders will be replaced by the specified extensions. If a digit is specified
+   * after the place holder character, it will be interpreted as insertion position.
+   *
+   * @param object object to be extended
+   * @param extensions optional extension strings
+   * @return self reference
+   */
+  public TokenBuilder addExt(final Object object, final Object... extensions) {
     final byte[] t = token(object);
-    final int tl = t.length, el = ext.length;
+    final int tl = t.length, el = extensions.length;
     for(int i = 0, e = 0; i < tl; ++i) {
       if(t[i] != '%' || e == el) {
         addByte(t[i]);
@@ -344,40 +326,10 @@ public final class TokenBuilder {
         final boolean d = c >= '1' && c <= '9';
         if(d) ++i;
         final int n = d ? c - '1' : e++;
-        final Object o = n < el ? ext[n] : null;
-        addExt(o);
+        add(n < el ? extensions[n] : null);
       }
     }
     return this;
-  }
-
-  /**
-   * Returns a token representation of the specified object.
-   * <ul>
-   *   <li> byte arrays are returns as is.</li>
-   *   <li> {@code null} references are replaced by the string "{@code null}".</li>
-   *   <li> objects of type {@link Throwable} are converted to a string representation via
-   *        {@link Util#message}.</li>
-   *   <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
-   *   <li> for all other typer, {@link Object#toString} is called.</li>
-   * </ul>
-   * @param object object
-   * @return token
-   */
-  public static byte[] token(final Object object) {
-    if(object instanceof byte[]) return (byte[]) object;
-
-    final String s;
-    if(object == null) {
-      s = "null";
-    } else if(object instanceof Throwable) {
-      s = Util.message((Throwable) object);
-    } else if(object instanceof Class<?>) {
-      s = Util.className((Class<?>) object);
-    } else {
-      s = object.toString();
-    }
-    return Token.token(s);
   }
 
   /**
@@ -390,7 +342,7 @@ public final class TokenBuilder {
     while(s > 0 && ws(chrs[s - 1])) --s;
     int c = -1;
     while(++c < s && ws(chrs[c]));
-    if(c != 0 && c != s) Array.move(chrs, c, -c, s - c);
+    if(c != 0 && c != s) Array.remove(chrs, 0, c, s);
     size = s - c;
     return this;
   }

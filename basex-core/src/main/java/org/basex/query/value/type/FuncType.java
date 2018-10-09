@@ -255,7 +255,7 @@ public class FuncType implements Type {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(anns.toString()).add(FUNCTION).add('(');
+    final TokenBuilder tb = new TokenBuilder().add(anns).add(FUNCTION).add('(');
     if(this == SeqType.ANY_FUNC) {
       tb.add('*').add(')');
     } else {

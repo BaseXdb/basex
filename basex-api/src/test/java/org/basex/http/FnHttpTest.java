@@ -825,9 +825,8 @@ public class FnHttpTest extends HTTPTest {
       if(ret.type == NodeType.ELM) ret = reorderHeaders(ret);
       // compare items
       if(!new DeepEqual().equal(exp, ret)) {
-        final TokenBuilder tb = new TokenBuilder("Result ").addLong(e).add(" differs:\nReturned: ");
-        tb.addExt(ret.serialize()).add("\nExpected: ").addExt(exp.serialize());
-        fail(tb.toString());
+        fail(Strings.concat("Result ", e, " differs:\nReturned: ",
+            ret.serialize().finish(), "\nExpected: ", exp.serialize()));
       }
     }
   }

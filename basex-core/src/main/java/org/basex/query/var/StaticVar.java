@@ -145,7 +145,7 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public byte[] id() {
-    return Token.concat(new byte[] { '$' }, name.id());
+    return Token.concat(Token.DOLLAR, name.id());
   }
 
   /**
@@ -153,7 +153,7 @@ public final class StaticVar extends StaticDecl {
    * @return name
    */
   private String name() {
-    return new TokenBuilder().add(DOLLAR).add(name.string()).toString();
+    return Strings.concat(Token.DOLLAR, name.string());
   }
 
   /**
@@ -185,11 +185,11 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
+    final TokenBuilder tb = new TokenBuilder().add(DECLARE).add(' ').add(anns);
     tb.add(VARIABLE).add(' ').add(name());
-    if(declType != null) tb.add(' ').add(AS).add(' ').addExt(declType);
+    if(declType != null) tb.add(' ').add(AS).add(' ').add(declType);
     if(external) tb.add(' ').add(EXTERNAL);
-    if(expr != null) tb.add(' ').add(ASSIGN).add(' ').addExt(expr);
+    if(expr != null) tb.add(' ').add(ASSIGN).add(' ').add(expr);
     return tb.add(';').toString();
   }
 }

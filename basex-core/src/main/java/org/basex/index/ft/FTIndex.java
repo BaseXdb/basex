@@ -213,7 +213,7 @@ public final class FTIndex extends ValueIndex {
     final TokenBuilder tb = new TokenBuilder();
     final long l = inX.length() + inY.length() + inZ.length();
     tb.add(LI_NAMES).add(data.meta.ftinclude).add(NL);
-    tb.add(LI_SIZE + Performance.format(l) + NL);
+    tb.add(LI_SIZE).add(Performance.format(l)).add(NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     addOccs(stats);
@@ -452,7 +452,7 @@ public final class FTIndex extends ValueIndex {
 
       @Override
       public String toString() {
-        return new TokenBuilder(token).add('(').addExt(size).add("x)").toString();
+        return Strings.concat(token, '(', size, "x)");
       }
     };
   }

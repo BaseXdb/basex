@@ -211,9 +211,7 @@ public final class WebModules {
    */
   private static String toString(final List<? extends WebFunction> funcs) {
     final TokenBuilder tb = new TokenBuilder();
-    for(final WebFunction func : funcs) {
-      tb.add(Text.NL).add(Text.LI).addExt(func);
-    }
+    for(final WebFunction func : funcs) tb.add(Text.NL).add(Text.LI).add(func);
     return tb.toString();
   }
 

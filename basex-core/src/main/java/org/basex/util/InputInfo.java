@@ -122,8 +122,6 @@ public final class InputInfo {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(path == null ? "." : path).add(", ").addExt(line()).add('/').addExt(column());
-    return tb.toString();
+    return Strings.concat(path == null ? "." : path, ", ", line(), '/', column());
   }
 }

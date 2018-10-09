@@ -7,7 +7,7 @@ import java.util.*;
 import javax.xml.namespace.*;
 
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -96,7 +96,7 @@ public final class JavaMapping {
     new Pair(FTxt.class, NodeType.TXT),
     // function types
     new Pair(Array.class, SeqType.ANY_ARRAY),
-    new Pair(Map.class, SeqType.ANY_MAP),
+    new Pair(XQMap.class, SeqType.ANY_MAP),
   };
 
   static {

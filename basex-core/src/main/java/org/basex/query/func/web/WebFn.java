@@ -20,8 +20,8 @@ abstract class WebFn extends StandardFunc {
    * @return generated url
    * @throws QueryException query exception
    */
-  protected byte[] createUrl(final byte[] url, final Map map) throws QueryException {
-    final TokenBuilder tb = new TokenBuilder(url);
+  protected byte[] createUrl(final byte[] url, final XQMap map) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder().add(url);
     int c = 0;
     for(final Item key : map.keys()) {
       final byte[] name = key.string(info);

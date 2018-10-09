@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests the {@link Array#subArray(long, long, QueryContext)} method.
+ * Tests the {@link XQArray#subArray(long, long, QueryContext)} method.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
@@ -19,12 +19,12 @@ public final class ArraySliceTest extends ArrayTest {
   /** Exhaustively tests creating sub-arrays of arrays of a range of lengths. */
   @Test
   public void testSlice() {
-    Array arr = Array.empty();
+    XQArray arr = XQArray.empty();
     for(int len = 0; len < 180; len++) {
       assertEquals(len, arr.arraySize());
       for(int pos = 0; pos < len; pos++) {
         for(int k = 0; k <= len - pos; k++) {
-          final Array sub = arr.subArray(pos, k, qc);
+          final XQArray sub = arr.subArray(pos, k, qc);
           assertEquals(k, sub.arraySize());
           sub.checkInvariants();
           final Iterator<Value> iter = sub.iterator(0);

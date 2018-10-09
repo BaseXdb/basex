@@ -69,7 +69,7 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
     if(n < FingerTree.MAX_ARITY) {
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ch = new Node[n + 1];
-      System.arraycopy(children, 0, ch, 0, n - 1);
+      Array.copy(children, n - 1, ch);
       ch[n - 1] = a;
       ch[n] = b;
       out[pos - 1] = new InnerNode<>(ch);
@@ -80,8 +80,8 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
     final int ll = (n + 1) / 2, rl = n + 1 - ll;
     @SuppressWarnings("unchecked")
     final Node<N, E>[] ls = new Node[ll], rs = new Node[rl];
-    System.arraycopy(children, 0, ls, 0, ll);
-    System.arraycopy(children, ll, rs, 0, rl - 2);
+    Array.copy(children, ll, ls);
+    Array.copyToStart(children, ll, rl - 2, rs);
     rs[rl - 2] = a;
     rs[rl - 1] = b;
     out[pos - 1] = new InnerNode<>(ls);

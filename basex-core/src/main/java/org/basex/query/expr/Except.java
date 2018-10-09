@@ -65,7 +65,7 @@ public final class Except extends Set {
     final int el = exprs.length;
     for(int e = 1; e < el && !list.isEmpty(); e++) {
       final Iter iter = iters[e];
-      for(Item item; (item = qc.next(iter)) != null;) list.delete(toNode(item));
+      for(Item item; (item = qc.next(iter)) != null;) list.removeAll(toNode(item));
     }
     return list;
   }

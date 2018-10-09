@@ -331,11 +331,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
+    final TokenBuilder tb = new TokenBuilder().add(DECLARE).add(' ').add(anns);
     tb.add(FUNCTION).add(' ').add(name.prefixId());
     tb.add(PAREN1).addSep(params, SEP).add(PAREN2);
     if(declType != null) tb.add(' ' + AS + ' ' + declType);
-    if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
+    if(expr != null) tb.add(" { ").add(expr).add(" }; ");
     else tb.add(" external; ");
     return tb.toString();
   }

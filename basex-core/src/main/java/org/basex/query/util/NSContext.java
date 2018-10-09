@@ -41,7 +41,7 @@ public final class NSContext {
   public void delete(final byte[] prefix) {
     for(int s = ns.size() - 1; s >= 0; s--) {
       if(eq(prefix, ns.name(s))) {
-        ns.delete(s);
+        ns.remove(s);
         break;
       }
     }

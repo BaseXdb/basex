@@ -174,6 +174,7 @@ final class NSNode {
    * value which is to be deleted
    */
   void delete(final int p, final int s) {
+    final int sz = size;
     // find the node to deleted
     int i = find(p);
     // if the node is not directly contained as a child, either start at array index 0 or
@@ -184,7 +185,7 @@ final class NSNode {
     // number of nodes to be deleted
     int num = 0;
     // determine number of nodes to be deleted
-    for(int n = i; n < size && nodes[n].pre < upper; ++n, ++num);
+    for(int n = i; n < sz && nodes[n].pre < upper; ++n, ++num);
     // new size of child array
     size -= num;
 
@@ -193,8 +194,8 @@ final class NSNode {
       nodes = new NSNode[0];
     } else if(num > 0) {
       // otherwise remove nodes from the child array
-      System.arraycopy(nodes, i + num, nodes, i, size - i);
-      for(int n = size; n < size + num; n++) nodes[n] = null;
+      Array.remove(nodes, i, num, sz);
+      for(int n = size; n < sz; n++) nodes[n] = null;
     }
   }
 
@@ -209,7 +210,7 @@ final class NSNode {
     int i = find(node.pre);
     if(i < 0 || node.pre != nodes[i].pre) i++;
 
-    System.arraycopy(nodes, i, nodes, i + 1, size++ - i);
+    Array.insert(nodes, i, 1, size++, null);
     nodes[i] = node;
     node.parent = this;
   }
@@ -237,8 +238,8 @@ final class NSNode {
     for(int v = 0; v < vl; v += 2) {
       if(values[v + 1] != uri) continue;
       final int[] vals = new int[vl - 2];
-      System.arraycopy(values, 0, vals, 0, v);
-      System.arraycopy(values, v + 2, vals, v, vl - v - 2);
+      Array.copy(values, v, vals);
+      Array.copy(values, v + 2, vl - v - 2, vals, v);
       values = vals;
       break;
     }

@@ -37,8 +37,8 @@ public final class ArrayFlatten extends ArrayFn {
           final Item next = stack.peek().next();
           if(next == null) {
             stack.pop();
-          } else if(next instanceof Array) {
-            final Iterator<Value> members = ((Array) next).members().iterator();
+          } else if(next instanceof XQArray) {
+            final Iterator<Value> members = ((XQArray) next).members().iterator();
             stack.push(new Iter() {
               private Iter iter = Empty.ITER;
               @Override
@@ -94,8 +94,8 @@ public final class ArrayFlatten extends ArrayFn {
       throws QueryException {
     final Iter iter = expr.iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(item instanceof Array) {
-        for(final Value value : ((Array) item).members()) add(vb, value, qc);
+      if(item instanceof XQArray) {
+        for(final Value value : ((XQArray) item).members()) add(vb, value, qc);
       }
       else vb.add(item);
     }

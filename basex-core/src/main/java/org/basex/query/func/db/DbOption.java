@@ -35,7 +35,7 @@ public final class DbOption extends DbFn {
     if(value instanceof Boolean) return Bln.get((Boolean) value);
     if(value instanceof Integer) return Int.get((Integer) value);
     if(value instanceof Options) {
-      Map map = Map.EMPTY;
+      XQMap map = XQMap.EMPTY;
       final Options opts = (Options) value;
       for(final Option<?> opt : opts) {
         final Item item = item(opt.value());

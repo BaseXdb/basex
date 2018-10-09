@@ -142,7 +142,7 @@ public enum ListType implements Type {
 
   @Override
   public final String toString() {
-    return new TokenBuilder(NSGlobal.prefix(name.uri())).add(':').add(name.string()).toString();
+    return Strings.concat(NSGlobal.prefix(name.uri()), ':', name.string());
   }
 
   /**

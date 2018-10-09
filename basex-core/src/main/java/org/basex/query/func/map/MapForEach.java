@@ -24,7 +24,7 @@ public class MapForEach extends StandardFunc {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Map map = toMap(exprs[0], qc);
+    final XQMap map = toMap(exprs[0], qc);
     final FItem func = checkArity(exprs[1], 2, this instanceof UpdateMapForEach, qc);
     return map.forEach(func, qc, info);
   }

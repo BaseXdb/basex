@@ -26,8 +26,7 @@ public final class StringRangeTest extends QueryPlanTest {
     final Random rnd = new Random();
 
     // create initial document
-    final TokenBuilder tb = new TokenBuilder();
-    final TokenBuilder r = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder(), r = new TokenBuilder();
     tb.add("<xml>");
     for(int i = 100; i < 1000; i++) {
       // add numeric value

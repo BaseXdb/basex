@@ -479,7 +479,7 @@ public class DiskValues extends ValueIndex {
    */
   public final String toString(final boolean all) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(type).add(" INDEX, '").add(data.meta.name).add("':\n");
+    tb.add(type).add(" INDEX, '").add(data.meta.name).add("':\n");
     final int entries = size();
     for(int index = 0; index < entries; index++) {
       final long pos = idxr.read5(index * 5L);

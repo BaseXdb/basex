@@ -18,7 +18,7 @@ public final class WebRedirect extends WebFn {
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] url = createUrl(toToken(exprs[0], qc),
-        exprs.length < 2 ? Map.EMPTY : toMap(exprs[1], qc));
+        exprs.length < 2 ? XQMap.EMPTY : toMap(exprs[1], qc));
 
     final FElem hhead = new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI));
     hhead.add("name", "location").add("value", url);

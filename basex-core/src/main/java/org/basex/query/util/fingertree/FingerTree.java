@@ -3,6 +3,7 @@ package org.basex.query.util.fingertree;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * A node of a FingerTree.
@@ -245,16 +246,16 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
       final int mid = n / 2;
       @SuppressWarnings("unchecked")
       final Node<N, E>[] left = new Node[mid], right = new Node[n - mid];
-      System.arraycopy(nodes, 0, left, 0, mid);
-      System.arraycopy(nodes, mid, right, 0, n - mid);
+      Array.copy(nodes, mid, left);
+      Array.copyToStart(nodes, mid, n - mid, right);
       return DeepTree.get(left, right, size);
     }
 
     final int k = Math.min((n - MAX_ARITY) / 2, MAX_ARITY);
     @SuppressWarnings("unchecked")
     final Node<N, E>[] left = new Node[k], right = new Node[k];
-    System.arraycopy(nodes, 0, left, 0, k);
-    System.arraycopy(nodes, n - k, right, 0, k);
+    Array.copy(nodes, k, left);
+    Array.copyToStart(nodes, n - k, k, right);
     final long leftSize = DeepTree.size(left), rightSize = DeepTree.size(right);
 
     @SuppressWarnings("unchecked")
@@ -264,7 +265,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
       final int rem = ns - i, sz = (remaining - j + rem - 1) / rem;
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ch = new Node[sz];
-      System.arraycopy(nodes, j, ch, 0, sz);
+      Array.copyToStart(nodes, j, sz, ch);
       outNodes[i] = new InnerNode<>(ch);
       j += sz;
     }

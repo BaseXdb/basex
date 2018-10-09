@@ -174,7 +174,7 @@ public final class MemValues extends ValueIndex {
       ids = vals;
     } else {
       if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
-      System.arraycopy(vals, 0, ids, len, vl);
+      Array.copyFromStart(vals, vl, ids, len);
       if(ids[len - 1] > vals[0]) {
         if(reorder == null) reorder = new BoolList(values.size());
         reorder.set(id, true);
@@ -219,7 +219,7 @@ public final class MemValues extends ValueIndex {
    */
   public String toString(final boolean all) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(type).add(" INDEX, '").add(data.meta.name).add("':\n");
+    tb.add(type).add(" INDEX, '").add(data.meta.name).add("':\n");
     final int s = lenList.size();
     for(int m = 1; m < s; m++) {
       final int len = lenList.get(m);

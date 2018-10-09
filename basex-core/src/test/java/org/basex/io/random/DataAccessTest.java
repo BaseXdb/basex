@@ -3,6 +3,7 @@ package org.basex.io.random;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -426,8 +427,7 @@ public class DataAccessTest {
     final int[] len = numToByteArray(tl);
 
     final int ll = len.length;
-    final int[] bytes = new int[ll + tl];
-    System.arraycopy(len, 0, bytes, 0, ll);
+    final int[] bytes = Arrays.copyOf(len, ll + tl);
     for(int t = 0; t < tl; ++t) bytes[ll + t] = toUnsignedByte(token[t]);
     return bytes;
   }
@@ -440,11 +440,11 @@ public class DataAccessTest {
    */
   private static int[] longToByteArray(final long v) {
     return new int[] {
-        toUnsignedByte(v >>> 32),
-        toUnsignedByte(v >>> 24),
-        toUnsignedByte(v >>> 16),
-        toUnsignedByte(v >>>  8),
-        toUnsignedByte(v)
+      toUnsignedByte(v >>> 32),
+      toUnsignedByte(v >>> 24),
+      toUnsignedByte(v >>> 16),
+      toUnsignedByte(v >>>  8),
+      toUnsignedByte(v)
     };
   }
 

@@ -72,4 +72,11 @@ public final class TokenIntMap extends TokenSet {
     super.rehash(sz);
     values = Arrays.copyOf(values, sz);
   }
+
+  @Override
+  public String toString() {
+    final List<Object> v = new ArrayList<>();
+    for(final int value : values) v.add(Integer.valueOf(value));
+    return toString(keys, v.toArray());
+  }
 }

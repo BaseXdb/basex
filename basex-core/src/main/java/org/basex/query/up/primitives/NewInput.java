@@ -20,10 +20,10 @@ public final class NewInput {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.className(getClass())).add('[');
-    tb.add("path: \"").add(path).add("\", ");
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(Util.className(getClass())).add('[').add("path: \"").add(path).add("\", ");
     if(node != null) tb.add("node");
-    else tb.add("io: ").addExt(io);
+    else tb.add("io: ").add(io);
     return tb.add(']').toString();
   }
 }

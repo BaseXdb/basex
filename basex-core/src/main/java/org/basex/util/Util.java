@@ -31,7 +31,7 @@ public final class Util {
    * @return dummy object
    */
   public static String bug(final Throwable throwable) {
-    final TokenBuilder tb = new TokenBuilder(S_BUGINFO);
+    final TokenBuilder tb = new TokenBuilder().add(S_BUGINFO);
     tb.add(NL).add("Contact: ").add(Prop.MAILING_LIST);
     tb.add(NL).add("Version: ").add(Prop.TITLE);
     tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));

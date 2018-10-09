@@ -13,9 +13,9 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -616,7 +616,7 @@ public abstract class ParseExpr extends Expr {
    * @return map
    * @throws QueryException query exception
    */
-  protected Map toMap(final Expr expr, final QueryContext qc) throws QueryException {
+  protected XQMap toMap(final Expr expr, final QueryContext qc) throws QueryException {
     return toMap(toItem(expr, qc, SeqType.ANY_MAP));
   }
 
@@ -627,8 +627,8 @@ public abstract class ParseExpr extends Expr {
    * @return the map
    * @throws QueryException if the item is not a map
    */
-  protected Map toMap(final Item item) throws QueryException {
-    if(item instanceof Map) return (Map) item;
+  protected XQMap toMap(final Item item) throws QueryException {
+    if(item instanceof XQMap) return (XQMap) item;
     throw typeError(item, SeqType.ANY_MAP, info);
   }
 
@@ -639,7 +639,7 @@ public abstract class ParseExpr extends Expr {
    * @return array
    * @throws QueryException query exception
    */
-  protected Array toArray(final Expr expr, final QueryContext qc) throws QueryException {
+  protected XQArray toArray(final Expr expr, final QueryContext qc) throws QueryException {
     return toArray(toItem(expr, qc, SeqType.ANY_ARRAY));
   }
 
@@ -649,8 +649,8 @@ public abstract class ParseExpr extends Expr {
    * @return the array
    * @throws QueryException if the item is not an array
    */
-  protected Array toArray(final Item item) throws QueryException {
-    if(item instanceof Array) return (Array) item;
+  protected XQArray toArray(final Item item) throws QueryException {
+    if(item instanceof XQArray) return (XQArray) item;
     throw typeError(item, SeqType.ANY_ARRAY, info);
   }
 

@@ -379,12 +379,12 @@ public abstract class Formatter extends FormatUtil {
         final int c1 = tp.next(), c2 = tp.next(), c3 = tp.next(), c4 = tp.next();
         final int z1 = zeroes(c1), z2 = zeroes(c2), z3 = zeroes(c3), z4 = zeroes(c4);
         if(z1 == -1) {
-          tb.add(addZone(num, 0, new TokenBuilder("00"))).add(':');
-          tb.add(addZone(num, 1, new TokenBuilder("00")));
+          tb.add(addZone(num, 0, new TokenBuilder().add("00"))).add(':');
+          tb.add(addZone(num, 1, new TokenBuilder().add("00")));
         } else if(z2 == -1) {
           tb.add(addZone(num, 0, new TokenBuilder().add(c1)));
           if(c2 == -1) {
-            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder("00")));
+            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder().add("00")));
           } else {
             final TokenBuilder t = new TokenBuilder().add(z3 == -1 ? '0' : z3);
             if(z3 != -1 && z4 != -1) t.add(z4);
@@ -393,7 +393,7 @@ public abstract class Formatter extends FormatUtil {
         } else if(z3 == -1) {
           tb.add(addZone(num, 0, new TokenBuilder().add(c1).add(c2)));
           if(c3 == -1) {
-            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder("00")));
+            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder().add("00")));
           } else {
             final int c5 = tp.next(), z5 = zeroes(c5);
             final TokenBuilder t = new TokenBuilder().add(z4 == -1 ? '0' : z4);

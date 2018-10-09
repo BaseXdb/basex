@@ -82,7 +82,7 @@ public final class GroupBy extends Clause {
     final int gl = gs.length, vl = vs.length;
     final Var[] res = new Var[gl + vl];
     for(int g = 0; g < gl; g++) res[g] = gs[g].var;
-    System.arraycopy(vs, 0, res, gl, vl);
+    Array.copyFromStart(vs, vl, res, gl);
     return res;
   }
 
@@ -286,8 +286,8 @@ public final class GroupBy extends Clause {
     final int len = preExpr.length;
     for(int p = 0; p < post.length; p++) {
       if(!used.get(post[p].id)) {
-        preExpr = Array.delete(preExpr, p);
-        post = Array.delete(post, p--);
+        preExpr = Array.remove(preExpr, p);
+        post = Array.remove(post, p--);
       }
     }
     return preExpr.length < len;

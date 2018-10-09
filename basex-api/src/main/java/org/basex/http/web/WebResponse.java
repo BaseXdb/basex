@@ -96,12 +96,12 @@ public abstract class WebResponse {
    * @return description
    */
   private static String toString(final StaticFunc func, final Expr[] args) {
-    final TokenBuilder tb = new TokenBuilder().addExt(func.info).add(Text.COLS);
+    final TokenBuilder tb = new TokenBuilder().add(func.info).add(Text.COLS);
     tb.add(func.name.prefixString()).add('(');
     final int al = args.length;
     for(int a = 0; a < al; a++) {
       if(a != 0) tb.add(", ");
-      tb.addExt(func.params[a].toErrorString()).add(" := ").addExt(args[a]);
+      tb.add(func.params[a].toErrorString()).add(" := ").add(args[a]);
     }
     return tb.add(')').toString();
   }

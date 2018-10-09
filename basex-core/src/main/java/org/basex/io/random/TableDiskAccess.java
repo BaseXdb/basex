@@ -225,7 +225,7 @@ public final class TableDiskAccess extends TableAccess {
     for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
       final int off = cursor(i);
       final Buffer bf = bm.current();
-      System.arraycopy(entries, o, bf.data, off, IO.NODESIZE);
+      Array.copy(entries, o, IO.NODESIZE, bf.data, off);
       bf.dirty = true;
     }
   }
@@ -253,9 +253,8 @@ public final class TableDiskAccess extends TableAccess {
         // mark the page as empty
         usedPages.clear(pages[page]);
 
-        Array.move(fpres, page + 1, -1, used - page - 1);
-        Array.move(pages, page + 1, -1, used - page - 1);
-
+        Array.remove(fpres, page, 1, used);
+        Array.remove(pages, page, 1, used);
         --used;
         readPage(page);
       }
@@ -292,10 +291,10 @@ public final class TableDiskAccess extends TableAccess {
 
     // now remove them from the index
     if(unused > 0) {
-      Array.move(fpres, page, -unused, used - page);
-      Array.move(pages, page, -unused, used - page);
-      used -= unused;
       page -= unused;
+      Array.remove(fpres, page, unused, used);
+      Array.remove(pages, page, unused, used);
+      used -= unused;
     }
 
     // update index entry for this page
@@ -332,8 +331,7 @@ public final class TableDiskAccess extends TableAccess {
     // special case: all entries fit in the current page
     Buffer bf = bm.current();
     if(nold + nnew <= IO.BLOCKSIZE) {
-      Array.move(bf.data, split, nnew, moved);
-      System.arraycopy(entries, 0, bf.data, split, nnew);
+      Array.insert(bf.data, split, nnew, nold, entries);
       bf.dirty = true;
 
       // increment first pre-values of pages after the last modified page
@@ -346,14 +344,14 @@ public final class TableDiskAccess extends TableAccess {
 
     // append old entries at the end of the new entries
     final byte[] all = new byte[nnew + moved];
-    System.arraycopy(entries, 0, all, 0, nnew);
-    System.arraycopy(bf.data, split, all, nnew, moved);
+    Array.copy(entries, nnew, all);
+    Array.copy(bf.data, split, moved, all, nnew);
 
     // fill in the current page with new entries
     // number of bytes which fit in the first page
     int nrem = IO.BLOCKSIZE - split;
     if(nrem > 0) {
-      System.arraycopy(all, 0, bf.data, split, nrem);
+      Array.copyFromStart(all, nrem, bf.data, split);
       bf.dirty = true;
     }
 
@@ -370,8 +368,8 @@ public final class TableDiskAccess extends TableAccess {
           // copy the last records
           readPage(page + 1);
           bf = bm.current();
-          System.arraycopy(bf.data, 0, bf.data, remain, o);
-          System.arraycopy(all, all.length - remain, bf.data, 0, remain);
+          Array.copyFromStart(bf.data, o, bf.data, remain);
+          Array.copyToStart(all, all.length - remain, remain, bf.data);
           bf.dirty = true;
           // reduce the pre value, since it will be later incremented with nr
           fpres[page] -= remain >>> IO.NODEPOWER;
@@ -397,8 +395,8 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // make place for the pages where the new entries will be written
-    Array.move(fpres, page + 1, needed, used - page - 1);
-    Array.move(pages, page + 1, needed, used - page - 1);
+    Array.insert(fpres, page + 1, needed, used, null);
+    Array.insert(pages, page + 1, needed, used, null);
 
     // write the all remaining entries
     while(needed-- > 0) {
@@ -568,7 +566,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param l source length
    */
   private void copy(final byte[] s, final int sp, final byte[] d, final int dp, final int l) {
-    System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER, l << IO.NODEPOWER);
+    Array.copy(s, sp << IO.NODEPOWER, l << IO.NODEPOWER, d, dp << IO.NODEPOWER);
     bm.current().dirty = true;
   }
 
@@ -582,7 +580,7 @@ public final class TableDiskAccess extends TableAccess {
   private int write(final byte[] s, final int o) {
     final Buffer bf = bm.current();
     final int len = Math.min(IO.BLOCKSIZE, s.length - o);
-    System.arraycopy(s, o, bf.data, 0, len);
+    Array.copyToStart(s, o, len, bf.data);
     bf.dirty = true;
     return len;
   }

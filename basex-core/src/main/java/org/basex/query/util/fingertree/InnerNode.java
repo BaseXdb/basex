@@ -1,5 +1,7 @@
 package org.basex.query.util.fingertree;
 
+import org.basex.util.*;
+
 /**
  * An inner node containing nested sub-nodes.
  *
@@ -83,7 +85,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     if(!children[i].insert(subs, off, val)) {
       // no split
       final Node<N, E>[] out = children.clone();
-      System.arraycopy(subs, i == 0 ? 1 : 0, out, l, r - l + 1);
+      Array.copy(subs, i == 0 ? 1 : 0, r - l + 1, out, l);
       siblings[0] = left;
       siblings[1] = new InnerNode<>(out);
       siblings[2] = right;
@@ -93,15 +95,15 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     @SuppressWarnings("unchecked")
     final Node<N, E>[] temp = new Node[n + 1];
     if(i == 0) {
-      System.arraycopy(subs, 1, temp, 0, 3);
-      System.arraycopy(children, 2, temp, 3, n - 2);
+      Array.copyToStart(subs, 1, 3, temp);
+      Array.copy(children, 2, n - 2, temp, 3);
     } else if(i < n - 1) {
-      System.arraycopy(children, 0, temp, 0, l);
-      System.arraycopy(subs, 0, temp, l, 4);
-      System.arraycopy(children, r + 1, temp, l + 4, n - l - 3);
+      Array.copy(children, l, temp);
+      Array.copyFromStart(subs, 4, temp, l);
+      Array.copy(children, r + 1, n - l - 3, temp, l + 4);
     } else {
-      System.arraycopy(children, 0, temp, 0, n - 2);
-      System.arraycopy(subs, 0, temp, n - 2, 3);
+      Array.copy(children, n - 2, temp);
+      Array.copyFromStart(subs, 3, temp, n - 2);
     }
 
     if(n < FingerTree.MAX_ARITY) {
@@ -119,9 +121,9 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
         final Node<N, E>[] ch = ((InnerNode<N, E>) left).children;
         @SuppressWarnings("unchecked")
         final Node<N, E>[] ls = new Node[la + move], rs = new Node[n + 1 - move];
-        System.arraycopy(ch, 0, ls, 0, la);
-        System.arraycopy(temp, 0, ls, la, move);
-        System.arraycopy(temp, move, rs, 0, rs.length);
+        Array.copy(ch, la, ls);
+        Array.copyFromStart(temp, move, ls, la);
+        Array.copyToStart(temp, move, rs.length, rs);
         siblings[0] = new InnerNode<>(ls);
         siblings[1] = new InnerNode<>(rs);
         siblings[2] = right;
@@ -136,9 +138,9 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
         final Node<N, E>[] ch = ((InnerNode<N, E>) right).children;
         @SuppressWarnings("unchecked")
         final Node<N, E>[] ls = new Node[n + 1 - move], rs = new Node[ra + move];
-        System.arraycopy(temp, 0, ls, 0, ls.length);
-        System.arraycopy(temp, ls.length, rs, 0, move);
-        System.arraycopy(ch, 0, rs, move, ra);
+        Array.copy(temp, ls.length, ls);
+        Array.copyToStart(temp, ls.length, move, rs);
+        Array.copyFromStart(ch, ra, rs, move);
         siblings[0] = left;
         siblings[1] = new InnerNode<>(ls);
         siblings[2] = new InnerNode<>(rs);
@@ -152,10 +154,10 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       final int la = ch.length, k = la + n + 1, ml = k / 3, ll = k - 2 * ml, inL = la - ll;
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ls = new Node[ll], mid1 = new Node[ml], mid2 = new Node[ml];
-      System.arraycopy(ch, 0, ls, 0, ll);
-      System.arraycopy(ch, ll, mid1, 0, inL);
-      System.arraycopy(temp, 0, mid1, inL, ml - inL);
-      System.arraycopy(temp, ml - inL, mid2, 0, ml);
+      Array.copy(ch, ll, ls);
+      Array.copyToStart(ch, ll, inL, mid1);
+      Array.copyFromStart(temp, ml - inL, mid1, inL);
+      Array.copyToStart(temp, ml - inL, ml, mid2);
       siblings[0] = inL == 0 ? left : new InnerNode<>(ls);
       siblings[1] = new InnerNode<>(mid1);
       siblings[2] = new InnerNode<>(mid2);
@@ -169,10 +171,10 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       final int ra = ch.length, k = n + 1 + ra, ml = k / 3, rl = k - 2 * ml, inR = ra - rl;
       @SuppressWarnings("unchecked")
       final Node<N, E>[] mid1 = new Node[ml], mid2 = new Node[ml], rs = new Node[rl];
-      System.arraycopy(temp, 0, mid1, 0, ml);
-      System.arraycopy(temp, ml, mid2, 0, ml - inR);
-      System.arraycopy(ch, 0, mid2, ml - inR, inR);
-      System.arraycopy(ch, inR, rs, 0, rl);
+      Array.copy(temp, ml, mid1);
+      Array.copyToStart(temp, ml, ml - inR, mid2);
+      Array.copyFromStart(ch, inR, mid2, ml - inR);
+      Array.copyToStart(ch, inR, rl, rs);
       siblings[0] = null;
       siblings[1] = new InnerNode<>(mid1);
       siblings[2] = new InnerNode<>(mid2);
@@ -184,8 +186,8 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     final int ll = (n + 1) / 2, rl = n + 1 - ll;
     @SuppressWarnings("unchecked")
     final Node<N, E>[] ls = new Node[ll], rs = new Node[rl];
-    System.arraycopy(temp, 0, ls, 0, ll);
-    System.arraycopy(temp, ll, rs, 0, rl);
+    Array.copy(temp, ll, ls);
+    Array.copyToStart(temp, ll, rl, rs);
     siblings[0] = null;
     siblings[1] = new InnerNode<>(ls);
     siblings[2] = new InnerNode<>(rs);
@@ -226,12 +228,12 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ch = new Node[n - 1];
       if(i > 0) {
-        System.arraycopy(children, 0, ch, 0, i - 1);
+        Array.copy(children, i - 1, ch);
         ch[i - 1] = l;
       }
       if(i < n - 1) {
         ch[i] = r;
-        System.arraycopy(children, i + 2, ch, i + 1, n - i - 2);
+        Array.copy(children, i + 2, n - i - 2, ch, i + 1);
       }
       out[0] = left;
       out[1] = new InnerNode<>(ch);
@@ -248,8 +250,8 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       final int a = ch.length, move = (a - 1) / 2;
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ls = new Node[a - move], ms = new Node[move + 1];
-      System.arraycopy(ch, 0, ls, 0, a - move);
-      System.arraycopy(ch, a - move, ms, 0, move);
+      Array.copy(ch, a - move, ls);
+      Array.copyToStart(ch, a - move, move, ms);
       ms[move] = single;
       out[0] = new InnerNode<>(ls);
       out[1] = new InnerNode<>(ms);
@@ -264,8 +266,8 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ms = new Node[move + 1], rs = new Node[a - move];
       ms[0] = single;
-      System.arraycopy(ch, 0, ms, 1, move);
-      System.arraycopy(ch, move, rs, 0, rs.length);
+      Array.copyFromStart(ch, move, ms, 1);
+      Array.copyToStart(ch, move, rs.length, rs);
       out[0] = left;
       out[1] = new InnerNode<>(ms);
       out[2] = new InnerNode<>(rs);
@@ -278,7 +280,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       final int a = ch.length;
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ls = new Node[a + 1];
-      System.arraycopy(ch, 0, ls, 0, a);
+      Array.copy(ch, a, ls);
       ls[a] = single;
       out[0] = new InnerNode<>(ls);
       out[2] = right;
@@ -292,7 +294,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       @SuppressWarnings("unchecked")
       final Node<N, E>[] rs = new Node[a + 1];
       rs[0] = single;
-      System.arraycopy(ch, 0, rs, 1, a);
+      Array.copyFromStart(ch, a, rs, 1);
       out[0] = null;
       out[2] = new InnerNode<>(rs);
       return out;
@@ -339,7 +341,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
 
     // enough children for a full node
     final Node<N, E>[] subs = new Node[inBuffer];
-    System.arraycopy(buffer, 0, subs, 0, inBuffer);
+    Array.copy(buffer, inBuffer, subs);
     return new InnerNode<>(subs);
   }
 
@@ -384,7 +386,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     if(n < FingerTree.MAX_ARITY) {
       @SuppressWarnings("unchecked")
       final Node<N, E>[] ch = new Node[n + 1];
-      System.arraycopy(children, 1, ch, 2, n - 1);
+      Array.copy(children, 1, n - 1, ch, 2);
       ch[0] = a;
       ch[1] = b;
       nodes[pos - 1] = new InnerNode<>(ch);
@@ -395,10 +397,10 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     final int rl = (n + 1) / 2, ll = n + 1 - rl;
     @SuppressWarnings("unchecked")
     final Node<N, E>[] ls = new Node[ll], rs = new Node[rl];
-    System.arraycopy(children, 1, ls, 2, ll - 2);
+    Array.copy(children, 1, ll - 2, ls, 2);
     ls[0] = a;
     ls[1] = b;
-    System.arraycopy(children, ll - 1, rs, 0, rl);
+    Array.copyToStart(children, ll - 1, rl, rs);
     nodes[pos - 1] = new InnerNode<>(ls);
     nodes[pos] = new InnerNode<>(rs);
     return pos + 1;

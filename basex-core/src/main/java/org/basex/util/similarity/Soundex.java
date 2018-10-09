@@ -24,7 +24,6 @@ public final class Soundex {
 
   /**
    * Computes the Soundex value for the specified codepoints.
-   *
    * @param cps codepoint array
    * @return Soundex value
    */

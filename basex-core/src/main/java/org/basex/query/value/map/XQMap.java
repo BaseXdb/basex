@@ -10,7 +10,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -23,9 +23,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
-public final class Map extends FItem {
+public final class XQMap extends FItem {
   /** The empty map. */
-  public static final Map EMPTY = new Map(TrieNode.EMPTY);
+  public static final XQMap EMPTY = new XQMap(TrieNode.EMPTY);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
@@ -36,7 +36,7 @@ public final class Map extends FItem {
    * Constructor.
    * @param root map
    */
-  private Map(final TrieNode root) {
+  private XQMap(final TrieNode root) {
     super(SeqType.ANY_MAP, new AnnList());
     this.root = root;
   }
@@ -92,9 +92,9 @@ public final class Map extends FItem {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map delete(final Item key, final InputInfo info) throws QueryException {
+  public XQMap delete(final Item key, final InputInfo info) throws QueryException {
     final TrieNode del = root.delete(key.hash(info), key, 0, info);
-    return del == root ? this : del == null ? EMPTY : new Map(del);
+    return del == root ? this : del == null ? EMPTY : new XQMap(del);
   }
 
   /**
@@ -129,12 +129,12 @@ public final class Map extends FItem {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map addAll(final Map map, final MergeDuplicates merge, final InputInfo info,
+  public XQMap addAll(final XQMap map, final MergeDuplicates merge, final InputInfo info,
       final QueryContext qc) throws QueryException {
 
     if(map == EMPTY) return this;
     final TrieNode upd = root.addAll(map.root, 0, merge, info, qc);
-    return upd == map.root ? map : new Map(upd);
+    return upd == map.root ? map : new XQMap(upd);
   }
 
   @Override
@@ -143,7 +143,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
+  public XQMap coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
       final boolean opt) throws QueryException {
 
     if(instanceOf(ft, true)) return this;
@@ -188,9 +188,9 @@ public final class Map extends FItem {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map put(final Item key, final Value value, final InputInfo info) throws QueryException {
+  public XQMap put(final Item key, final Value value, final InputInfo info) throws QueryException {
     final TrieNode ins = root.put(key.hash(info), key, value, 0, info);
-    return ins == root ? this : new Map(ins);
+    return ins == root ? this : new XQMap(ins);
   }
 
   /**
@@ -238,8 +238,8 @@ public final class Map extends FItem {
   public boolean deep(final Item item, final InputInfo info, final Collation coll)
       throws QueryException {
 
-    if(item instanceof Map) return root.deep(info, ((Map) item).root, coll);
-    return item instanceof FItem && !(item instanceof Array) && super.deep(item, info, coll);
+    if(item instanceof XQMap) return root.deep(info, ((XQMap) item).root, coll);
+    return item instanceof FItem && !(item instanceof XQArray) && super.deep(item, info, coll);
   }
 
   @Override
@@ -308,8 +308,8 @@ public final class Map extends FItem {
           tb.add(',');
           if(indent) tb.add(' ');
         }
-        if(item instanceof Map) ((Map) item).string(indent, tb, level + 1, info);
-        else if(item instanceof Array) ((Array) item).string(indent, tb, level, info);
+        if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
+        else if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
         else tb.add(item.toString());
       }
       if(par) tb.add(')');

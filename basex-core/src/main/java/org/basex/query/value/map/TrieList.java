@@ -70,11 +70,11 @@ final class TrieList extends TrieNode {
           // create new arrays (modified due to #1297; performance improved)
           final int s = size - 1;
           final Item[] ks = new Item[s];
-          System.arraycopy(keys, 0, ks, 0, i);
-          System.arraycopy(keys, i + 1, ks, i, s - i);
+          Array.copy(keys, i, ks);
+          Array.copy(keys, i + 1, s - i, ks, i);
           final Value[] vs = new Value[s];
-          System.arraycopy(values, 0, vs, 0, i);
-          System.arraycopy(values, i + 1, vs, i, s - i);
+          Array.copy(values, i, vs);
+          Array.copy(values, i + 1, s - i, vs, i);
           return new TrieList(hs, ks, vs);
         }
       }

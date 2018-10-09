@@ -39,8 +39,7 @@ final class ReplaceContext {
     if(sc.string.isEmpty()) {
       text = txt;
     } else {
-      final TokenBuilder tb = new TokenBuilder(os);
-      tb.add(txt, 0, start);
+      final TokenBuilder tb = new TokenBuilder(os).add(txt, 0, start);
       if(sc.regex) {
         // regular expressions, ignoring position arrays
         int flags = Pattern.DOTALL;

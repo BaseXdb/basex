@@ -68,6 +68,6 @@ public final class DocTest extends Test {
 
   @Override
   public String toString() {
-    return new TokenBuilder(type.string()).add('(').addExt(test).add(')').toString();
+    return Strings.concat(type.string(), '(', test, ')');
   }
 }

@@ -324,7 +324,7 @@ public final class EditorView extends View {
     // check if context binding was set
     String value = gui.context.options.toMap(MainOptions.BINDINGS).get("");
     if(value != null) {
-      value = new TokenBuilder("xs:untypedAtomic(").addExt(new Atm(value)).add(')').toString();
+      value = Strings.concat("xs:untypedAtomic(", new Atm(value), ')');
     }
 
     // check if database is opened

@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
-final class EmptyArray extends Array {
+final class EmptyArray extends XQArray {
   /** The empty array. */
   static final EmptyArray INSTANCE = new EmptyArray();
 
@@ -21,12 +21,12 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array cons(final Value elem) {
+  public XQArray cons(final Value elem) {
     return new SmallArray(new Value[] { elem });
   }
 
   @Override
-  public Array snoc(final Value elem) {
+  public XQArray snoc(final Value elem) {
     return new SmallArray(new Value[] { elem });
   }
 
@@ -36,7 +36,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array put(final long pos, final Value val) {
+  public XQArray put(final long pos, final Value val) {
     throw Util.notExpected();
   }
 
@@ -46,7 +46,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array concat(final Array seq) {
+  public XQArray concat(final XQArray seq) {
     return seq;
   }
 
@@ -61,17 +61,17 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array init() {
+  public XQArray init() {
     throw Util.notExpected();
   }
 
   @Override
-  public Array tail() {
+  public XQArray tail() {
     throw Util.notExpected();
   }
 
   @Override
-  public Array subArray(final long pos, final long len, final QueryContext qc) {
+  public XQArray subArray(final long pos, final long len, final QueryContext qc) {
     return this;
   }
 
@@ -81,17 +81,17 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array reverseArray(final QueryContext qc) {
+  public XQArray reverseArray(final QueryContext qc) {
     return this;
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value value, final QueryContext qc) {
+  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
     return new SmallArray(new Value[] { value });
   }
 
   @Override
-  public Array remove(final long pos, final QueryContext qc) {
+  public XQArray remove(final long pos, final QueryContext qc) {
     throw Util.notExpected();
   }
 
@@ -106,7 +106,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  Array consSmall(final Value[] values) {
+  XQArray consSmall(final Value[] values) {
     return new SmallArray(values);
   }
 }

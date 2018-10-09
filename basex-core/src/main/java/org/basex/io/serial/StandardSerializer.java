@@ -10,7 +10,7 @@ import java.text.Normalizer.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -106,8 +106,8 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   protected void function(final FItem item) throws IOException {
-    if(!(item instanceof Array)) throw SERFUNC_X.getIO(item.seqType());
-    for(final Value value : ((Array) item).members()) {
+    if(!(item instanceof XQArray)) throw SERFUNC_X.getIO(item.seqType());
+    for(final Value value : ((XQArray) item).members()) {
       for(final Item it : value) serialize(it);
     }
   }

@@ -65,8 +65,8 @@ public final class MainModule extends AModule {
    * @param imports namespace URIs of imported modules (can be {@code null})
    */
   public MainModule(final VarScope vs, final Expr expr, final SeqType declType, final String doc,
-      final InputInfo info, final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
-      final TokenSet imports) {
+      final InputInfo info, final TokenObjMap<StaticFunc> funcs,
+      final TokenObjMap<StaticVar> vars, final TokenSet imports) {
 
     super(vs.sc, vs, doc, info, funcs, vars, imports);
     this.expr = expr;

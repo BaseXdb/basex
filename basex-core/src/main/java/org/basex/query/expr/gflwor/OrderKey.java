@@ -78,7 +78,7 @@ public final class OrderKey extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(expr.toString());
+    final TokenBuilder tb = new TokenBuilder().add(expr);
     if(desc) tb.add(' ').add(DESCENDING);
     tb.add(' ').add(EMPTYORD).add(' ').add(least ? LEAST : GREATEST);
     if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');

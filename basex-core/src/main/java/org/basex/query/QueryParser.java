@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryError.chop;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryText.DOLLAR;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
@@ -3550,7 +3551,7 @@ public class QueryParser extends InputParser {
             if(wsConsume(PAREN1)) {
               do {
                 final byte[] sl = stringLiteral();
-                if(except) opt.sw.delete(sl);
+                if(except) opt.sw.remove(sl);
                 else if(!union || !opt.sw.contains(sl)) opt.sw.add(sl);
               } while(wsConsume(COMMA));
               wsCheck(PAREN2);

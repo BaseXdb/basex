@@ -50,14 +50,14 @@ public final class BaseXSerializer extends AdaptiveSerializer {
   }
 
   @Override
-  protected void array(final Array item) throws IOException {
+  protected void array(final XQArray item) throws IOException {
     ++nested;
     super.array(item);
     --nested;
   }
 
   @Override
-  protected void map(final Map item) throws IOException {
+  protected void map(final XQMap item) throws IOException {
     ++nested;
     super.map(item);
     --nested;

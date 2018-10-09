@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Sequence of items of type {@link Bln xs:boolean}, containing at least two of them.
@@ -70,19 +71,15 @@ public final class BlnSeq extends NativeSeq {
    * @throws QueryException query exception
    */
   public static Value get(final int size, final Value... values) throws QueryException {
-    final boolean[] tmp = new boolean[size];
-    int t = 0;
+    final BoolList tmp = new BoolList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) value.size();
       if(value instanceof BlnSeq) {
-        final BlnSeq seq = (BlnSeq) value;
-        System.arraycopy(seq.values, 0, tmp, t, vs);
-        t += vs;
+        tmp.add(((BlnSeq) value).values);
       } else {
-        for(final Item item : value) tmp[t++] = item.bool(null);
+        for(final Item item : value) tmp.add(item.bool(null));
       }
     }
-    return get(tmp);
+    return get(tmp.finish());
   }
 }

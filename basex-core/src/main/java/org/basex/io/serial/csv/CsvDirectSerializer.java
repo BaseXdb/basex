@@ -106,9 +106,8 @@ public final class CsvDirectSerializer extends CsvSerializer {
       if(name == null) throw CSV_SERIALIZE_X.getIO(Util.inf("Invalid element name <%>", key));
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
-      final byte[] txt = old == null || old.length == 0 ? value :
-        value.length == 0 ? old : new TokenBuilder(old).add(',').add(value).finish();
-      data.put(name, txt);
+      data.put(name, old == null || old.length == 0 ? value :
+        value.length == 0 ? old : concat(old, ',', value));
     } else {
       data.put(token(data.size()), value);
     }

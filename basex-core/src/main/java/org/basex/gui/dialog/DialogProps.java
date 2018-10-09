@@ -212,7 +212,7 @@ public final class DialogProps extends BaseXDialog {
       SwingUtilities.invokeLater(() -> {
         infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :
           Token.token(HELP[idx]));
-        updated.delete(idx);
+        updated.removeAll(idx);
       });
     }
   }

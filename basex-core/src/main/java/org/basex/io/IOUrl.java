@@ -57,7 +57,7 @@ public final class IOUrl extends IO {
       conn = connection();
       return conn.getInputStream();
     } catch(final IOException ex) {
-      final TokenBuilder msg = new TokenBuilder(Util.message(ex));
+      final TokenBuilder msg = new TokenBuilder().add(ex);
       // try to retrieve more information on why the request failed
       if(conn instanceof HttpURLConnection) {
         final InputStream es = ((HttpURLConnection) conn).getErrorStream();

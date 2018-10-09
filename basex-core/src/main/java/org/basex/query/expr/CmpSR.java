@@ -175,7 +175,7 @@ public final class CmpSR extends Single {
     if(ii.costs == null) return false;
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
+    tb.add(mni ? '[' : '(').add(min).add(',').add(max).add(mxi ? ']' : ')');
     ii.create(new StringRangeAccess(info, sr, ii.db), true, info,
         Util.info(OPTINDEX_X_X, type + " string range", tb));
     return true;
@@ -209,9 +209,9 @@ public final class CmpSR extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(PAREN1);
+    final TokenBuilder tb = new TokenBuilder().add(PAREN1);
     if(min != null) tb.add('"').add(min).add('"').add(mni ? " <= " : " < ");
-    tb.addExt(expr);
+    tb.add(expr);
     if(max != null) tb.add(mxi ? " <= " : " < ").add('"').add(max).add('"');
     return tb.add(PAREN2).toString();
   }

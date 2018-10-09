@@ -5,7 +5,7 @@ import org.basex.query.*;
 import org.junit.*;
 
 /**
- * Tests for {@link Array#reverse(QueryContext)}.
+ * Tests for {@link XQArray#reverse(QueryContext)}.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler

@@ -53,14 +53,14 @@ public final class Atts extends ElementList {
   }
 
   /**
-   * Deletes the specified entry.
+   * Removes the element at the specified position.
    * @param index entry index
    * @return self reference
    */
-  public Atts delete(final int index) {
+  public Atts remove(final int index) {
     final int sz = size;
-    Array.move(nm, index + 1, -1, sz - index);
-    Array.move(vl, index + 1, -1, sz - index);
+    Array.remove(nm, index, 1, sz);
+    Array.remove(vl, index, 1, sz);
     nm[sz - 1] = null;
     vl[sz - 1] = null;
     --size;
@@ -142,7 +142,7 @@ public final class Atts extends ElementList {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
+    final TokenBuilder tb = new TokenBuilder().add(Util.className(this)).add('[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(", ");
       tb.add(nm[i]).add("=\"").add(vl[i]).add("\"");

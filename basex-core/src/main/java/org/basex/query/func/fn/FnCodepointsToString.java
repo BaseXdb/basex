@@ -46,7 +46,7 @@ public final class FnCodepointsToString extends StandardFunc {
    * Converts a single codepoint to a string.
    * @param value value
    * @param info input info
-   * @return codepoint as int
+   * @return codepoint as string
    * @throws QueryException query exception
    */
   private static Str toStr(final long value, final InputInfo info) throws QueryException {
@@ -59,7 +59,7 @@ public final class FnCodepointsToString extends StandardFunc {
    * Checks if the specified value is valid codepoint.
    * @param value codepoint
    * @param info input info
-   * @return codepoint as int
+   * @return codepoint as integer
    * @throws QueryException query exception
    */
   private static int check(final long value, final InputInfo info) throws QueryException {

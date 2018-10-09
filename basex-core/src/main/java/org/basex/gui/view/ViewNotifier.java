@@ -247,9 +247,9 @@ public final class ViewNotifier {
   private void checkHist() {
     final int hl = queries.length;
     if(hist + 1 == hl) {
-      Array.move(queries, 1, 0, hl - 1);
-      Array.move(cont, 1, 0, hl - 1);
-      Array.move(marked, 1, 0, hl - 1);
+      Array.remove(queries, 0, 1, hl);
+      Array.remove(cont, 0, 1, hl);
+      Array.remove(marked, 0, 1, hl);
       --hist;
     }
   }

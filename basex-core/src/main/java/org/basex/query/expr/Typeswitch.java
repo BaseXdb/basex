@@ -179,7 +179,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(TYPESWITCH + PAREN1 + cond + PAREN2 + ' ').addSep(groups, " ").
-        toString();
+    return new TokenBuilder().add(TYPESWITCH).add(PAREN1).add(cond).add(PAREN2).add(' ').
+        addSep(groups, " ").toString();
   }
 }

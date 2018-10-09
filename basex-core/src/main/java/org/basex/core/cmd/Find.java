@@ -107,10 +107,7 @@ public final class Find extends AQuery {
     if((pre.length() == 0) && (preds.length() == 0)) return root ? "/" : ".";
 
     // create final string
-    final TokenBuilder tb = new TokenBuilder();
-    final String name = "*";
-    tb.add(pre + (r ? "/" : "") + Axis.DESCENDANT_OR_SELF + "::" + name + preds);
-    return tb.toString();
+    return pre + (r ? "/" : "") + Axis.DESCENDANT_OR_SELF + "::*" + preds;
   }
 
   /**
@@ -122,8 +119,8 @@ public final class Find extends AQuery {
    * @param root root flag
    * @return query
    */
-  public static String findTable(final StringList filter, final TokenList cols, final BoolList elem,
-      final byte[] name, final boolean root) {
+  public static String findTable(final StringList filter, final TokenList cols,
+      final BoolList elem, final byte[] name, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
@@ -132,20 +129,13 @@ public final class Find extends AQuery {
       for(final String s : spl) {
         final byte[] term = trim(replace(token(s), '"', ' '));
         if(term.length == 0) continue;
-        tb.add('[');
-
         final boolean elm = elem.get(i);
-        tb.add(elm ? ".//" : "@");
-        tb.add("*:");
-        tb.add(cols.get(i));
+        tb.add('[').add(elm ? ".//" : "@").add("*:").add(cols.get(i));
 
         if(term[0] == '<' || term[0] == '>') {
-          tb.add(term[0]);
-          tb.addLong(calcNum(substring(term, 1)));
+          tb.add(term[0]).addLong(calcNum(substring(term, 1)));
         } else {
-          tb.add(" contains text \"");
-          tb.add(term);
-          tb.add('"');
+          tb.add(" contains text \"").add(term).add('"');
         }
         tb.add(']');
       }
@@ -155,8 +145,8 @@ public final class Find extends AQuery {
   }
 
   /**
-   * Returns an long value for the specified token. The suffixes "kb", "mb"
-   * and "gb" are considered in the calculation.
+   * Returns an long value for the specified token.
+   * The suffixes "kb", "mb" and "gb" are considered in the calculation.
    * @param tok token to be converted
    * @return long
    */

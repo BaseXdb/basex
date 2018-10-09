@@ -7,7 +7,7 @@ import java.text.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -96,7 +96,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     } else {
       final Item it = type.instanceOf(AtomType.DUR) ? new Dur((Dur) item) : item;
       try {
-        tb.addExt(it.type).add('(').add(Item.toString(it.string(null), true, false)).add(')');
+        tb.add(it.type).add('(').add(Item.toString(it.string(null), true, false)).add(')');
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }
@@ -106,10 +106,10 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   protected final void function(final FItem item) throws IOException {
-    if(item instanceof Array) {
-      array((Array) item);
-    } else if(item instanceof Map) {
-      map((Map) item);
+    if(item instanceof XQArray) {
+      array((XQArray) item);
+    } else if(item instanceof XQMap) {
+      map((XQMap) item);
     } else {
       final TokenBuilder tb = new TokenBuilder();
       final QNm fn = item.funcName();
@@ -134,7 +134,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @param array item
    * @throws IOException I/O exception
    */
-  protected void array(final Array array) throws IOException {
+  protected void array(final XQArray array) throws IOException {
     final TokenBuilder tb = new TokenBuilder().add('[');
     int c = 0;
     for(final Value value : array.members()) {
@@ -163,7 +163,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @param map item
    * @throws IOException I/O exception
    */
-  protected void map(final Map map) throws IOException {
+  protected void map(final XQMap map) throws IOException {
     final TokenBuilder tb = new TokenBuilder().add("map");
     if(indent) tb.add(' ');
     tb.add('{');

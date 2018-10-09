@@ -180,7 +180,7 @@ public final class TypeswitchGroup extends Single {
   @Override
   public String toString() {
     final int tl = types.length;
-    final TokenBuilder tb = new TokenBuilder(tl == 0 ? DEFAULT : CASE);
+    final TokenBuilder tb = new TokenBuilder().add(tl == 0 ? DEFAULT : CASE);
     if(var != null) {
       tb.add(' ').add(var.toString());
       if(tl != 0) tb.add(' ').add(AS);

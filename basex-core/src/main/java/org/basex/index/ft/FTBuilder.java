@@ -220,26 +220,23 @@ public final class FTBuilder extends IndexBuilder {
    * Merges temporary indexes for the current token.
    * @param out full-text data
    * @param il array mapping
-   * @param v full-text list
+   * @param list full-text list
    * @return written size
    * @throws IOException I/O exception
    */
-  private static int merge(final DataOutput out, final IntList il, final FTList[] v)
+  private static int merge(final DataOutput out, final IntList il, final FTList[] list)
       throws IOException {
 
-    final TokenBuilder tbp = new TokenBuilder();
-    final TokenBuilder tbo = new TokenBuilder();
-    tbp.add(new byte[4]);
-    tbo.add(new byte[4]);
+    final ByteList tbp = new ByteList().add(new byte[4]), tbo = new ByteList().add(new byte[4]);
     // merge full-text data of all sorted lists with the same token
     int s = 0;
     final int is = il.size();
     for(int j = 0; j < is; ++j) {
       final int m = il.get(j);
-      for(final int p : v[m].prv) tbp.add(Num.num(p));
-      for(final int p : v[m].pov) tbo.add(Num.num(p));
-      s += v[m].size;
-      v[m].next();
+      for(final int p : list[m].prv) tbp.add(Num.num(p));
+      for(final int p : list[m].pov) tbo.add(Num.num(p));
+      s += list[m].size;
+      list[m].next();
     }
     // write compressed pre and pos arrays
     final byte[] pr = tbp.finish();

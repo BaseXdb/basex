@@ -159,7 +159,7 @@ public final class OrderBy extends Clause {
   public Clause inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
     for(int r = refs.length; --r >= 0;) {
-      if(var.is(refs[r].var)) refs = Array.delete(refs, r);
+      if(var.is(refs[r].var)) refs = Array.remove(refs, r);
     }
     return inlineAll(keys, var, ex, cc) ? optimize(cc) : null;
   }
@@ -179,7 +179,7 @@ public final class OrderBy extends Clause {
     // delete unused variables
     final int len = refs.length;
     for(int r = refs.length; --r >= 0;) {
-      if(!used.get(refs[r].var.id)) refs = Array.delete(refs, r);
+      if(!used.get(refs[r].var.id)) refs = Array.remove(refs, r);
     }
     if(refs.length == used.cardinality()) return refs.length != len;
 

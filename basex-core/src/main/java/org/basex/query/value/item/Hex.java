@@ -104,6 +104,6 @@ public final class Hex extends Bin {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add('"').add(Token.hex(data, true)).add('"').toString();
+    return Strings.concat('"', Token.hex(data, true), '"');
   }
 }

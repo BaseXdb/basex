@@ -1590,11 +1590,11 @@ public enum Function {
     final SeqType[] st = new SeqType[arity];
     if(arity != 0 && minMax[1] == Integer.MAX_VALUE) {
       final int pl = params.length;
-      System.arraycopy(params, 0, st, 0, pl);
+      Array.copy(params, pl, st);
       final SeqType var = params[pl - 1];
       for(int p = pl; p < arity; p++) st[p] = var;
     } else {
-      System.arraycopy(params, 0, st, 0, arity);
+      Array.copy(params, arity, st);
     }
     return FuncType.get(anns, seqType, st);
   }
@@ -1632,7 +1632,7 @@ public enum Function {
    * @return name
    */
   public byte[] local() {
-    return new TokenBuilder(desc.substring(0, desc.indexOf('('))).finish();
+    return Token.token(desc.substring(0, desc.indexOf('(')));
   }
 
   /**
@@ -1681,9 +1681,9 @@ public enum Function {
       if(arg == null) {
         tb.add("()");
       } else if(arg instanceof Expr) {
-        tb.addExt(arg);
+        tb.add(arg);
       } else if(arg instanceof Number) {
-        tb.addExt(arg);
+        tb.add(arg);
       } else if(arg instanceof Boolean) {
         tb.add(arg + "()");
       } else {
@@ -1700,7 +1700,7 @@ public enum Function {
 
   @Override
   public final String toString() {
-    return new TokenBuilder(NSGlobal.prefix(uri)).add(':').add(desc).toString();
+    return Strings.concat(NSGlobal.prefix(uri), ':', desc);
   }
 
   /*

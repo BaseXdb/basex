@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests for {@link Array#insertBefore(long, Value, QueryContext)}.
+ * Tests for {@link XQArray#insertBefore(long, Value, QueryContext)}.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
@@ -21,7 +21,7 @@ public final class ArrayInsertTest extends ArrayTest {
   public void fuzzyTest() {
     final int n = 50_000;
     final ArrayList<Integer> list = new ArrayList<>(n);
-    Array arr = Array.empty();
+    XQArray arr = XQArray.empty();
 
     final Random rng = new Random(42);
     for(int i = 0; i < n; i++) {
@@ -47,14 +47,14 @@ public final class ArrayInsertTest extends ArrayTest {
   @Test
   public void insertTest() {
     final int n = 1_000;
-    Array seq = Array.empty();
+    XQArray seq = XQArray.empty();
 
     for(int i = 0; i < n; i++) seq = seq.snoc(Int.get(i));
     assertEquals(n, seq.arraySize());
 
     final Int val = Int.get(n);
     for(int i = 0; i <= n; i++) {
-      final Array seq2 = seq.insertBefore(i, val, qc);
+      final XQArray seq2 = seq.insertBefore(i, val, qc);
       assertEquals(n, ((Int) seq2.get(i)).itr());
       assertEquals(n + 1L, seq2.arraySize());
       for(int j = 0; j < n; j++) {

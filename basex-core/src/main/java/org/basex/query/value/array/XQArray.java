@@ -12,7 +12,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
-public abstract class Array extends FItem {
+public abstract class XQArray extends FItem {
   /** Minimum size of a leaf. */
   static final int MIN_LEAF = 8;
   /** Maximum size of a leaf. */
@@ -38,7 +38,7 @@ public abstract class Array extends FItem {
   /**
    * Default constructor.
    */
-  Array() {
+  XQArray() {
     super(SeqType.ANY_ARRAY, new AnnList());
   }
 
@@ -47,7 +47,7 @@ public abstract class Array extends FItem {
    * Running time: <i>O(1)</i> and no allocation
    * @return (unique) instance of an empty array
    */
-  public static Array empty() {
+  public static XQArray empty() {
     return EmptyArray.INSTANCE;
   }
 
@@ -56,7 +56,7 @@ public abstract class Array extends FItem {
    * @param elem the contained element
    * @return the singleton array
    */
-  public static Array singleton(final Value elem) {
+  public static XQArray singleton(final Value elem) {
     return new SmallArray(new Value[] { elem });
   }
 
@@ -66,7 +66,7 @@ public abstract class Array extends FItem {
    * @return the resulting array
    */
   @SafeVarargs
-  public static Array from(final Value... values) {
+  public static XQArray from(final Value... values) {
     final ArrayBuilder builder = new ArrayBuilder();
     for(final Value value : values) builder.append(value);
     return builder.freeze();
@@ -78,7 +78,7 @@ public abstract class Array extends FItem {
    * @param elem element to prepend
    * @return resulting array
    */
-  public abstract Array cons(Value elem);
+  public abstract XQArray cons(Value elem);
 
   /**
    * Appends an element to the back of this array.
@@ -86,7 +86,7 @@ public abstract class Array extends FItem {
    * @param elem element to append
    * @return resulting array
    */
-  public abstract Array snoc(Value elem);
+  public abstract XQArray snoc(Value elem);
 
   /**
    * Gets the element at the given position in this array.
@@ -103,7 +103,7 @@ public abstract class Array extends FItem {
    * @param val value to put into this array
    * @return resulting array
    */
-  public abstract Array put(long pos, Value val);
+  public abstract XQArray put(long pos, Value val);
 
   /**
    * Returns the number of elements in this array.
@@ -118,7 +118,7 @@ public abstract class Array extends FItem {
    * @param other array to append to the end of this array
    * @return resulting array
    */
-  public abstract Array concat(Array other);
+  public abstract XQArray concat(XQArray other);
 
   /**
    * First element of this array, equivalent to {@code array.get(0)}.
@@ -140,7 +140,7 @@ public abstract class Array extends FItem {
    * Running time: <i>O(1)*</i>
    * @return initial segment
    */
-  public abstract Array init();
+  public abstract XQArray init();
 
   /**
    * Tail segment of this array, i.e. an array containing all elements of this array (in the
@@ -148,7 +148,7 @@ public abstract class Array extends FItem {
    * Running time: <i>O(1)*</i>
    * @return tail segment
    */
-  public abstract Array tail();
+  public abstract XQArray tail();
 
   /**
    * Extracts a contiguous part of this array.
@@ -157,7 +157,7 @@ public abstract class Array extends FItem {
    * @param qc query context
    * @return the sub-array
    */
-  public abstract Array subArray(long pos, long len, QueryContext qc);
+  public abstract XQArray subArray(long pos, long len, QueryContext qc);
 
   /**
    * Returns an array with the same elements as this one, but their order reversed.
@@ -165,7 +165,7 @@ public abstract class Array extends FItem {
    * @param qc query context
    * @return reversed version of this array
    */
-  public abstract Array reverseArray(QueryContext qc);
+  public abstract XQArray reverseArray(QueryContext qc);
 
   /**
    * Checks if this array is empty.
@@ -182,7 +182,7 @@ public abstract class Array extends FItem {
    * @param qc query context
    * @return resulting array
    */
-  public abstract Array insertBefore(long pos, Value value, QueryContext qc);
+  public abstract XQArray insertBefore(long pos, Value value, QueryContext qc);
 
   /**
    * Removes the element at the given position in this array.
@@ -191,7 +191,7 @@ public abstract class Array extends FItem {
    * @param qc query context
    * @return resulting array
    */
-  public abstract Array remove(long pos, QueryContext qc);
+  public abstract XQArray remove(long pos, QueryContext qc);
 
   @Override
   public final void cache(final InputInfo info, final boolean lazy) throws QueryException {
@@ -220,10 +220,10 @@ public abstract class Array extends FItem {
 
   /**
    * Prepends the given elements to this array.
-   * @param values values, with length at most {@link Array#MAX_SMALL}
+   * @param values values, with length at most {@link XQArray#MAX_SMALL}
    * @return resulting array
    */
-  abstract Array consSmall(Value[] values);
+  abstract XQArray consSmall(Value[] values);
 
   /**
    * Returns an array containing the values at the indices {@code from} to {@code to - 1} in
@@ -240,7 +240,7 @@ public abstract class Array extends FItem {
     final Value[] out = new Value[to - from];
     final int in0 = Math.max(0, from), in1 = Math.min(to, values.length);
     final int out0 = Math.max(-from, 0);
-    System.arraycopy(values, in0, out, out0, in1 - in0);
+    Array.copy(values, in0, in1 - in0, out, out0);
     return out;
   }
 
@@ -253,8 +253,8 @@ public abstract class Array extends FItem {
   static Value[] concat(final Value[] values1, final Value[] values2) {
     final int l = values1.length, r = values2.length, n = l + r;
     final Value[] out = new Value[n];
-    System.arraycopy(values1, 0, out, 0, l);
-    System.arraycopy(values2, 0, out, l, r);
+    Array.copy(values1, l, out);
+    Array.copyFromStart(values2, r, out, l);
     return out;
   }
 
@@ -380,8 +380,8 @@ public abstract class Array extends FItem {
           if(indent) tb.add(' ');
         }
         final Item item = value.itemAt(i);
-        if(item instanceof Array) ((Array) item).string(indent, tb, level, info);
-        else if(item instanceof Map) ((Map) item).string(indent, tb, level + 1, info);
+        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
+        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
         else tb.add(item.toString());
       }
       if(vs != 1) tb.add(')');
@@ -443,8 +443,8 @@ public abstract class Array extends FItem {
   public final boolean deep(final Item item, final InputInfo info, final Collation coll)
       throws QueryException {
 
-    if(item instanceof Array) {
-      final Array o = (Array) item;
+    if(item instanceof XQArray) {
+      final XQArray o = (XQArray) item;
       if(arraySize() != o.arraySize()) return false;
       final Iterator<Value> iter1 = iterator(0), iter2 = o.iterator(0);
       while(iter1.hasNext()) {
@@ -454,7 +454,7 @@ public abstract class Array extends FItem {
       }
       return true;
     }
-    return item instanceof FItem && !(item instanceof Map) && super.deep(item, info, coll);
+    return item instanceof FItem && !(item instanceof XQMap) && super.deep(item, info, coll);
   }
 
   @Override
@@ -499,7 +499,7 @@ public abstract class Array extends FItem {
       if(vs != 1) tb.add('(');
       for(int i = 0; i < vs; i++) {
         if(i != 0) tb.add(", ");
-        tb.addExt(value.itemAt(i));
+        tb.add(value.itemAt(i));
       }
       if(vs != 1) tb.add(')');
     }

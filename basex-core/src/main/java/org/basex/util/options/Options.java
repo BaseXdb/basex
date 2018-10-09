@@ -15,7 +15,7 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -372,9 +372,9 @@ public class Options implements Iterable<Option<?>> {
     final String key = string(name.string(info));
     if(options.isEmpty()) {
       final byte[] val;
-      if(value instanceof Map) {
+      if(value instanceof XQMap) {
         final TokenBuilder tb = new TokenBuilder();
-        final Map map = (Map) value;
+        final XQMap map = (XQMap) value;
         for(final Item item : map.keys()) {
           if(!tb.isEmpty()) tb.add(',');
           tb.add(item.string(info)).add('=');
@@ -527,7 +527,7 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final Map map, final boolean error, final InputInfo info)
+  public final synchronized void assign(final XQMap map, final boolean error, final InputInfo info)
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {
@@ -754,8 +754,8 @@ public class Options implements Iterable<Option<?>> {
       }
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
-      if(item instanceof Map) {
-        o.assign((Map) item, error, info);
+      if(item instanceof XQMap) {
+        o.assign((XQMap) item, error, info);
       } else {
         throw new BaseXException(Text.OPT_MAP_X_X, option.name(), item);
       }

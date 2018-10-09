@@ -342,11 +342,11 @@ public class IdPreMap {
     if(i < rows) {
       final int destPos = i + 1;
       final int length = rows - i;
-      System.arraycopy(pres, i, pres, destPos, length);
-      System.arraycopy(fids, i, fids, destPos, length);
-      System.arraycopy(nids, i, nids, destPos, length);
-      System.arraycopy(incs, i, incs, destPos, length);
-      System.arraycopy(oids, i, oids, destPos, length);
+      Array.copy(pres, i, length, pres, destPos);
+      Array.copy(fids, i, length, fids, destPos);
+      Array.copy(nids, i, length, nids, destPos);
+      Array.copy(incs, i, length, incs, destPos);
+      Array.copy(oids, i, length, oids, destPos);
     }
     pres[i] = pre;
     fids[i] = fid;
@@ -365,11 +365,11 @@ public class IdPreMap {
     if(s <= e) {
       final int last = e + 1;
       final int length = rows - last;
-      System.arraycopy(pres, last, pres, s, length);
-      System.arraycopy(fids, last, fids, s, length);
-      System.arraycopy(nids, last, nids, s, length);
-      System.arraycopy(incs, last, incs, s, length);
-      System.arraycopy(oids, last, oids, s, length);
+      Array.copy(pres, last, length, pres, s);
+      Array.copy(fids, last, length, fids, s);
+      Array.copy(nids, last, length, nids, s);
+      Array.copy(incs, last, length, incs, s);
+      Array.copy(oids, last, length, oids, s);
       rows -= last - s;
     }
   }

@@ -193,7 +193,7 @@ public final class TextView extends View {
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
     final int cl = chop.length;
-    if(out.finished() && size >= cl) System.arraycopy(chop, 0, buf, size - cl, cl);
+    if(out.finished() && size >= cl) Array.copyFromStart(chop, cl, buf, size - cl);
     text.setText(buf, size);
     header.setText((out.finished() ? CHOPPED : "") + RESULT);
     home.setEnabled(gui.context.data() != null);

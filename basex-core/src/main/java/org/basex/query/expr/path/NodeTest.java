@@ -92,7 +92,7 @@ public final class NodeTest extends Test {
     final TokenBuilder tb = new TokenBuilder().add(type.string()).add('(');
     if(name == null) tb.add('*');
     else tb.add(name.string());
-    if(ext != null) tb.add(',').addExt(ext);
+    if(ext != null) tb.add(',').add(ext);
     return tb.add(')').toString();
   }
 }

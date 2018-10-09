@@ -83,10 +83,12 @@ public final class ViewData {
   public static byte[] text(final Data data, final int pre) {
     final int kind = data.kind(pre);
     switch(kind) {
-      case Data.ELEM: return data.name(pre, kind);
-      case Data.ATTR: return new TokenBuilder().add(ATT).add(data.name(pre, kind)).
-          add(ATT1).add(data.text(pre, false)).add(ATT2).finish();
-      default: return data.text(pre, true);
+      case Data.ELEM:
+        return data.name(pre, kind);
+      case Data.ATTR:
+        return Token.concat(ATT, data.name(pre, kind), ATT1, data.text(pre, false), ATT2);
+      default:
+        return data.text(pre, true);
     }
   }
 

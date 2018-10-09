@@ -97,8 +97,7 @@ public final class GroupSpec extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(var).add(' ').add(ASSIGN).add(' ').addExt(expr);
+    final TokenBuilder tb = new TokenBuilder().add(var).add(' ').add(ASSIGN).add(' ').add(expr);
     if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
     return tb.toString();
   }

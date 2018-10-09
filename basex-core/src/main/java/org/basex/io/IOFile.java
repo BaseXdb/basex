@@ -332,7 +332,7 @@ public final class IOFile extends IO {
   @Override
   public String url() {
     final String path = pth.startsWith("/") ? pth.substring(1) : pth;
-    final TokenBuilder tb = new TokenBuilder(FILEPREF).add("//");
+    final TokenBuilder tb = new TokenBuilder().add(FILEPREF).add("//");
     final int pl = path.length();
     for(int p = 0; p < pl; p++) {
       // replace spaces with %20

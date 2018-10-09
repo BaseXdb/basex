@@ -445,12 +445,12 @@ public final class HTTPConnection implements ClientInfo {
     try {
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
-        final TokenBuilder header = new TokenBuilder(auth.toString());
-        header.add(' ').addExt(Request.REALM).add("=\"").add(Prop.NAME).add('"');
+        final TokenBuilder header = new TokenBuilder();
+        header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
         if(auth == AuthMethod.DIGEST) {
           final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").addExt(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT).add('"');
-          header.add(',').addExt(Request.NONCE).add("=\"").add(nonce).add('"');
+          header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
+          header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
         }
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }

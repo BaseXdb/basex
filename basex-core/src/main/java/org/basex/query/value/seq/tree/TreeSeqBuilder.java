@@ -46,7 +46,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   public static Seq value(final Item[] items, final int size, final Type type) {
     if(size <= TreeSeq.MAX_SMALL) {
       final Item[] small = new Item[size];
-      System.arraycopy(items, 0, small, 0, size);
+      Array.copy(items, size, small);
       return new SmallSeq(small, type);
     }
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
@@ -161,10 +161,10 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       final Item[] temp = new Item[k];
       final int l = (mid - inLeft + CAP) % CAP, m = CAP - l;
       if(k <= m) {
-        System.arraycopy(vals, l, temp, 0, k);
+        Array.copyToStart(vals, l, k, temp);
       } else {
-        System.arraycopy(vals, l, temp, 0, m);
-        System.arraycopy(vals, 0, temp, m, k - m);
+        Array.copyToStart(vals, l, m, temp);
+        Array.copyFromStart(vals, k - m, temp, m);
       }
 
       inLeft = inRight = 0;
@@ -294,13 +294,12 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    */
   private Item[] items(final int from, final int n) {
     final Item[] arr = new Item[n];
-    final int p = ((from % CAP) + CAP) % CAP;
-    final int m = CAP - p;
+    final int p = ((from % CAP) + CAP) % CAP, m = CAP - p;
     if(n <= m) {
-      System.arraycopy(vals, p, arr, 0, n);
+      Array.copyToStart(vals, p, n, arr);
     } else {
-      System.arraycopy(vals, p, arr, 0, m);
-      System.arraycopy(vals, 0, arr, m, n - m);
+      Array.copyToStart(vals, p, m, arr);
+      Array.copyFromStart(vals, n - m, arr, m);
     }
     return arr;
   }

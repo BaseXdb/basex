@@ -113,7 +113,7 @@ public final class Bln extends Item {
 
   @Override
   public String toString() {
-    return new TokenBuilder(value ? Token.TRUE : Token.FALSE).add("()").toString();
+    return Strings.concat(value ? Token.TRUE : Token.FALSE, "()");
   }
 
   /**

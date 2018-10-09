@@ -327,8 +327,8 @@ abstract class MarkupSerializer extends StandardSerializer {
     level++;
     startOpen(new QNm(META));
     attribute(HTTPEQUIV, CONTENT_TYPE, false);
-    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MediaType.TEXT_HTML.toString() : media).
-        add("; ").add(CHARSET).add('=').add(encoding).finish(), false);
+    attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
+      CHARSET, '=', encoding), false);
     if(html) {
       out.print(ELEM_C);
     } else {

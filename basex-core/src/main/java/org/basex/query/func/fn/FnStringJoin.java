@@ -29,7 +29,7 @@ public final class FnStringJoin extends StandardFunc {
     if((item = iter.next()) == null) return Str.get(first);
 
     // join multiple strings
-    final TokenBuilder tb = new TokenBuilder(first);
+    final TokenBuilder tb = new TokenBuilder().add(first);
     do {
       tb.add(token).add(item.string(info));
     } while((item = qc.next(iter)) != null);

@@ -239,10 +239,7 @@ public final class WesternTokenizer extends Tokenizer {
    * @return current token
    */
   private byte[] token() {
-    final int sp = spos, l = epos - sp;
-    final byte[] tmp = new byte[l];
-    System.arraycopy(text, sp, tmp, 0, l);
-    return tmp;
+    return Arrays.copyOfRange(text, spos, epos);
   }
 
   @Override

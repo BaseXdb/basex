@@ -88,6 +88,6 @@ final class InvDocTest extends Test {
 
   @Override
   public String toString() {
-    return new TokenBuilder(NodeType.DOC.string()).add("(...)").toString();
+    return Strings.concat(NodeType.DOC.string(), "(...)");
   }
 }

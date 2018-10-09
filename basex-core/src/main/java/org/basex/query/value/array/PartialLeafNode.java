@@ -36,27 +36,27 @@ final class PartialLeafNode implements NodeLike<Value, Value> {
       final Value[] ls = ((PartialLeafNode) left).elems, rs = elems;
       final int l = ls.length, r = rs.length, n = l + r;
       final Value[] vals = new Value[n];
-      System.arraycopy(ls, 0, vals, 0, l);
-      System.arraycopy(rs, 0, vals, l, r);
-      nodes[pos - 1] = n < Array.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
+      Array.copy(ls, l, vals);
+      Array.copyFromStart(rs, r, vals, l);
+      nodes[pos - 1] = n < XQArray.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
       return pos;
     }
 
     final Value[] ls = ((LeafNode) left).values, rs = elems;
     final int l = ls.length, r = rs.length, n = l + r;
-    if(n <= Array.MAX_LEAF) {
+    if(n <= XQArray.MAX_LEAF) {
       final Value[] vals = new Value[n];
-      System.arraycopy(ls, 0, vals, 0, l);
-      System.arraycopy(rs, 0, vals, l, r);
+      Array.copy(ls, l, vals);
+      Array.copyFromStart(rs, r, vals, l);
       nodes[pos - 1] = new LeafNode(vals);
       return pos;
     }
 
     final int ll = n / 2, rl = n - ll, move = l - ll;
     final Value[] newLeft = new Value[ll], newRight = new Value[rl];
-    System.arraycopy(ls, 0, newLeft, 0, ll);
-    System.arraycopy(ls, ll, newRight, 0, move);
-    System.arraycopy(rs, 0, newRight, move, r);
+    Array.copy(ls, ll, newLeft);
+    Array.copyToStart(ls, ll, move, newRight);
+    Array.copyFromStart(rs, r, newRight, move);
     nodes[pos - 1] = new LeafNode(newLeft);
     nodes[pos] = new LeafNode(newRight);
     return pos + 1;

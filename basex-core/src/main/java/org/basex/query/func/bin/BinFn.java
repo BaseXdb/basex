@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Functions on binary data.
@@ -68,9 +69,9 @@ abstract class BinFn extends StandardFunc {
     if(bo == ByteOrder.BIG_ENDIAN) {
       final int s = 8 - l;
       if(neg) for(int i = 0; i < s; i++) tmp[i] = (byte) 0xFF;
-      System.arraycopy(bytes, o, tmp, s, l);
+      Array.copy(bytes, o, l, tmp, s);
     } else {
-      System.arraycopy(bytes, o, tmp, 0, l);
+      Array.copyToStart(bytes, o, l, tmp);
       if(neg) for(int i = l; i < 8; i++) tmp[i] = (byte) 0xFF;
     }
     return Int.get(ByteBuffer.wrap(tmp).order(bo).getLong());
@@ -124,9 +125,9 @@ abstract class BinFn extends StandardFunc {
     final byte[] tmp = new byte[(int) (bl + size)];
     if(left) {
       Arrays.fill(tmp, 0, (int) size, (byte) octet);
-      System.arraycopy(bytes, 0, tmp, (int) size, bl);
+      Array.copyFromStart(bytes, bl, tmp, (int) size);
     } else {
-      System.arraycopy(bytes, 0, tmp, 0, bl);
+      Array.copy(bytes, bl, tmp);
       Arrays.fill(tmp, bl, tmp.length, (byte) octet);
     }
     return B64.get(tmp);
@@ -152,7 +153,7 @@ abstract class BinFn extends StandardFunc {
    * @param off offset value (may be {@code null})
    * @param len length value (may be {@code null})
    * @param size size of input data
-   * @return bounds
+   * @return bounds (two integers)
    * @throws QueryException query exception
    */
   final int[] bounds(final Long off, final Long len, final int size) throws QueryException {

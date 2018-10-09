@@ -47,9 +47,11 @@ public final class FTPosData {
     int c = find(pre);
     if(c < 0) {
       c = -c - 1;
-      if(size == pos.length) pos = Arrays.copyOf(pos, Array.newSize(size));
-      Array.move(pos, c, 1, size++ - c);
+      final int sz = size;
+      if(sz == pos.length) pos = Arrays.copyOf(pos, Array.newSize(sz));
+      Array.insert(pos, c, 1, sz, null);
       pos[c] = new FTPos(pre, il);
+      size++;
     } else {
       pos[c].union(il);
     }

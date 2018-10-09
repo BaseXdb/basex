@@ -8,7 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -85,8 +85,8 @@ public final class Constr {
    * @throws QueryException query exception
    */
   private boolean add(final QueryContext qc, final Item item) throws QueryException {
-    if(item instanceof Array) {
-      for(final Value value : ((Array) item).members()) {
+    if(item instanceof XQArray) {
+      for(final Value value : ((XQArray) item).members()) {
         for(final Item it : value) {
           if(!add(qc, it)) return false;
         }

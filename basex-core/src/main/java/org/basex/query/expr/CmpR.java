@@ -215,7 +215,7 @@ public final class CmpR extends Single {
         token((int) nr.min).length != token((int) nr.max).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add('[').addExt(min).add(',').addExt(max).add(']');
+    tb.add('[').add(min).add(',').add(max).add(']');
     ii.create(new RangeAccess(info, nr, ii.db), true, info, Util.info(OPTINDEX_X_X, "range", tb));
     return true;
   }

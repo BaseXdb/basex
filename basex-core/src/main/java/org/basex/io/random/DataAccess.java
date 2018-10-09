@@ -192,19 +192,17 @@ public final class DataAccess implements Closeable {
    * @return byte array
    */
   public synchronized byte[] readBytes(final int len) {
-    int l = len;
-    int ll = IO.BLOCKSIZE - off;
+    int l = len, ll = IO.BLOCKSIZE - off;
     final byte[] b = new byte[l];
-
-    System.arraycopy(buffer(false).data, off, b, 0, Math.min(l, ll));
+    Array.copyToStart(buffer(false).data, off, Math.min(l, ll), b);
     if(l > ll) {
       l -= ll;
       while(l > IO.BLOCKSIZE) {
-        System.arraycopy(buffer(true).data, 0, b, ll, IO.BLOCKSIZE);
+        Array.copyFromStart(buffer(true).data, IO.BLOCKSIZE, b, ll);
         ll += IO.BLOCKSIZE;
         l -= IO.BLOCKSIZE;
       }
-      System.arraycopy(buffer(true).data, 0, b, ll, l);
+      Array.copyFromStart(buffer(true).data, l, b, ll);
     }
     off += l;
     return b;
@@ -314,7 +312,7 @@ public final class DataAccess implements Closeable {
     while(o < last) {
       final Buffer bf = buffer();
       final int l = Math.min(last - o, IO.BLOCKSIZE - off);
-      System.arraycopy(buffer, o, bf.data, off, l);
+      Array.copy(buffer, o, l, bf.data, off);
       bf.dirty = true;
       off += l;
       o += l;

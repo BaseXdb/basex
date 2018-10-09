@@ -66,7 +66,7 @@ public final class StopWords extends TokenSet {
     final byte[] content = normalize(file.read());
     final int s = Token.contains(content, ' ') ? ' ' : '\n';
     for(final byte[] sl : split(content, s)) {
-      if(exclude) delete(sl);
+      if(exclude) remove(sl);
       else put(sl);
     }
   }

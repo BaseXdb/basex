@@ -47,4 +47,11 @@ public final class TokenBoolMap extends TokenSet {
     super.rehash(sz);
     values = Arrays.copyOf(values, sz);
   }
+
+  @Override
+  public String toString() {
+    final List<Object> v = new ArrayList<>();
+    for(final boolean value : values) v.add(Boolean.valueOf(value));
+    return toString(keys, v.toArray());
+  }
 }

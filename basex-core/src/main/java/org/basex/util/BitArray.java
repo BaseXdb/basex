@@ -5,8 +5,7 @@ import static java.lang.Long.*;
 import java.util.*;
 
 /**
- * Bit array that grows when needed. The implementation is similar to
- * {@link BitSet}.
+ * Bit array that grows when needed. The implementation is similar to {@link BitSet}.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Dimitar Popov
@@ -84,10 +83,7 @@ public final class BitArray {
     // find the last index of a word which is different from 0:
     int i = words.length;
     while(--i >= 0 && words[i] == 0);
-
-    final long[] result = new long[++i];
-    System.arraycopy(words, 0, result, 0, i);
-    return result;
+    return Arrays.copyOf(words, ++i);
   }
 
   /**
@@ -187,9 +183,6 @@ public final class BitArray {
    * @param s new size
    */
   private void resize(final int s) {
-    final int wl = words.length;
-    final long[] tmp = new long[Math.max(wl << 1, s)];
-    System.arraycopy(words, 0, tmp, 0, wl);
-    words = tmp;
+    words = Arrays.copyOf(words, Math.max(words.length << 1, s));
   }
 }

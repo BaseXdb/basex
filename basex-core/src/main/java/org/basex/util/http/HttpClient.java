@@ -218,10 +218,7 @@ public final class HttpClient {
     } else {
       // otherwise @media-type of <http:body/> is considered
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
-      if(request.isMultipart) {
-        ct = new TokenBuilder().add(ct).add("; ").add(BOUNDARY).add('=').
-            add(request.boundary()).toString();
-      }
+      if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, '=', request.boundary());
     }
     conn.setRequestProperty(CONTENT_TYPE, ct);
   }
@@ -267,7 +264,7 @@ public final class HttpClient {
         writePayload(part.bodyContents, part.bodyAtts, ao);
 
         // write boundary preceded by "--"
-        out.write(new TokenBuilder().add("--").add(boundary).add(CRLF).finish());
+        out.write(concat("--", boundary, CRLF));
 
         // write headers
         for(final Entry<String, String> header : part.headers.entrySet())
@@ -279,7 +276,7 @@ public final class HttpClient {
         out.write(ao.finish());
         out.write(CRLF);
       }
-      out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
+      out.write(concat("--", boundary, "--", CRLF));
     } else {
       writePayload(request.payload, request.payloadAtts, out);
     }
@@ -295,7 +292,7 @@ public final class HttpClient {
    */
   public static void writeHeader(final String key, final String value, final OutputStream out)
       throws IOException {
-    out.write(new TokenBuilder().add(key).add(": ").add(value).add(CRLF).finish());
+    out.write(concat(key, ": ", value, CRLF));
   }
 
   /**

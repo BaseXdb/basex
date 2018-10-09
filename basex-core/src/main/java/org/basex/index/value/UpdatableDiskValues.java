@@ -179,7 +179,7 @@ public final class UpdatableDiskValues extends DiskValues {
    * @param newIndex new position
    */
   private void copy(final byte[] tmp, final int oldIndex, final int newIndex) {
-    System.arraycopy(tmp, oldIndex * 5, tmp, newIndex * 5, 5);
+    Array.copy(tmp, oldIndex * 5, 5, tmp, newIndex * 5);
     ctext.put(newIndex, ctext.put(oldIndex, null));
   }
 

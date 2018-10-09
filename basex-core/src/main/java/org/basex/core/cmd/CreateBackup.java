@@ -80,8 +80,8 @@ public final class CreateBackup extends ABackup {
       if(cmd != null) cmd.pushJob(zip);
       final IOFile dbpath = sopts.dbPath(db);
       final StringList files = dbpath.descendants();
-      // delete file indicating an update (this file is generated when using XQuery)
-      files.delete(DATAUPD + IO.BASEXSUFFIX);
+      // ignore file indicating an update (this file is generated when using XQuery)
+      files.removeAll(DATAUPD + IO.BASEXSUFFIX);
       zip.zip(dbpath, files);
     } finally {
       if(cmd != null) cmd.popJob();

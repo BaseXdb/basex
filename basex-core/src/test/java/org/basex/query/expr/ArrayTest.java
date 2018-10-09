@@ -239,7 +239,7 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("['x']([1])", "x");
   }
 
-  /** Tests if {@link Array#members()} uses the array's offset correctly. */
+  /** Tests if {@link XQArray#members()} uses the array's offset correctly. */
   @Test public void gh1047() {
     query("array:head(array:for-each(array:subarray([1,2,3], 2), function($x) { $x }))", 2);
     query("array:fold-left(array:tail([1,2,3]), (), function($res, $fn) { ($res, $fn) })", "2\n3");

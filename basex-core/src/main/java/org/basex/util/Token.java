@@ -3,6 +3,8 @@ package org.basex.util;
 import java.text.*;
 import java.util.*;
 
+import org.basex.io.out.*;
+
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.
  * A token is a UTF-8 encoded string. It is represented as a byte array.</p>
@@ -56,6 +58,8 @@ public final class Token {
   public static final byte[] SLASH = { '/' };
   /** Colon. */
   public static final byte[] COLON = { ':' };
+  /** Dollar. */
+  public static final byte[] DOLLAR = { '$' };
 
   /** Unicode replacement character. */
   public static final char REPLACEMENT = '\uFFFD';
@@ -215,6 +219,37 @@ public final class Token {
       Util.debug(ex);
       return EMPTY;
     }
+  }
+
+  /**
+   * Returns a token representation of the specified object.
+   * <ul>
+   *   <li> byte arrays are returned as-is.</li>
+   *   <li> {@code null} references are replaced by the string "{@code null}".</li>
+   *   <li> objects of type {@link Throwable} are converted to a string representation via
+   *        {@link Util#message}.</li>
+   *   <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
+   *   <li> for all other typer, {@link Object#toString} is called.</li>
+   * </ul>
+   * @param object object
+   * @return token
+   */
+  public static byte[] token(final Object object) {
+    if(object instanceof byte[]) return (byte[]) object;
+    if(object instanceof ArrayOutput) return ((ArrayOutput) object).finish();
+    if(object instanceof TokenBuilder) return ((TokenBuilder) object).finish();
+
+    final String s;
+    if(object == null) {
+      s = "null";
+    } else if(object instanceof Throwable) {
+      s = Util.message((Throwable) object);
+    } else if(object instanceof Class<?>) {
+      s = Util.className((Class<?>) object);
+    } else {
+      s = object.toString();
+    }
+    return Token.token(s);
   }
 
   /**
@@ -920,7 +955,7 @@ public final class Token {
     for(int i = 0; i < tl - 1; i++) {
       for(int j = i + 1; j < tl; j++) {
         if(eq(tokens[i], tokens[j])) {
-          Array.move(tokens, j + 1, -1, tl - j  - 1);
+          Array.remove(tokens, j, 1, tl);
           j--; tl--;
         }
       }
@@ -990,34 +1025,33 @@ public final class Token {
   }
 
   /**
-   * Concatenates two tokens.
-   * @param token1 first token
-   * @param token2 second token
-   * @return resulting array
+   * Concatenates multiple tokens.
+   * @param tokens tokens
+   * @return resulting token
    */
-  public static byte[] concat(final byte[] token1, final byte[] token2) {
-    final int tl1 = token1.length, tl2 = token2.length;
-    final byte[] tmp = new byte[tl1 + tl2];
-    System.arraycopy(token1, 0, tmp, 0, tl1);
-    System.arraycopy(token2, 0, tmp, tl1, tl2);
+  public static byte[] concat(final byte[]... tokens) {
+    int s = 0;
+    for(final byte[] token : tokens) s += token.length;
+    final byte[] tmp = new byte[s];
+    int i = 0;
+    for(final byte[] token : tokens) {
+      final int tl = token.length;
+      Array.copyFromStart(token, tl, tmp, i);
+      i += tl;
+    }
     return tmp;
   }
 
   /**
-   * Concatenates three tokens. A {@link TokenBuilder} instance can be used to
-   * concatenate more than three tokens.
-   * @param token1 first token
-   * @param token2 second token
-   * @param token3 third token
-   * @return resulting array
+   * Concatenates multiple objects.
+   * @param objects objects
+   * @return resulting token
    */
-  public static byte[] concat(final byte[] token1, final byte[] token2, final byte[] token3) {
-    final int tl1 = token1.length, tl2 = token2.length, tl3 = token3.length;
-    final byte[] tmp = new byte[tl1 + tl2 + tl3];
-    System.arraycopy(token1, 0, tmp, 0, tl1);
-    System.arraycopy(token2, 0, tmp, tl1, tl2);
-    System.arraycopy(token3, 0, tmp, tl1 + tl2, tl3);
-    return tmp;
+  public static byte[] concat(final Object... objects) {
+    final int ol = objects.length;
+    final byte[][] tokens = new byte[ol][];
+    for(int o = 0; o < ol; o++) tokens[o] = token(objects[o]);
+    return concat(tokens);
   }
 
   /**

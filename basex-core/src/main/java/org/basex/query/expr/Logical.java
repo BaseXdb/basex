@@ -125,7 +125,7 @@ abstract class Logical extends Arr {
 
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[e + 1];
-        System.arraycopy(exprs, 0, nw, 0, e);
+        Array.copy(exprs, e, nw);
         nw[e] = cc.error(qe, this);
         exprs = nw;
         changed = true;

@@ -54,7 +54,6 @@ public final class CTxt extends CNode {
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
-
     final Iter iter = expr.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(more) tb.add(' ');

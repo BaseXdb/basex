@@ -1597,9 +1597,7 @@ public enum QueryError {
    */
   public static QueryException typeError(final SeqType found, final SeqType type, final QNm name,
       final InputInfo info) {
-
-    final byte[] value = new TokenBuilder().add('$').add(name.string()).finish();
-    return INVTYPE_X_X_X.get(info, found, type, value);
+    return INVTYPE_X_X_X.get(info, found, type, Token.concat('$', name.string()));
   }
 
   /**

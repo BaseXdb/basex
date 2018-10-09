@@ -3,6 +3,7 @@ package org.basex.query.func.bin;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -28,12 +29,8 @@ public final class BinDecodeString extends BinFn {
     byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
     final int[] bounds = bounds(off, len, bl);
-
-    if(bounds[0] > 0 || bounds[1] < bl) {
-      final byte[] tmp = new byte[bounds[1]];
-      System.arraycopy(bytes, bounds[0], tmp, 0, bounds[1]);
-      bytes = tmp;
-    }
+    final int o = bounds[0], tl = bounds[1];
+    if(o > 0 || tl < bl) bytes = Arrays.copyOfRange(bytes, o, o + tl);
 
     try {
       return Str.get(ConvertFn.toString(new ArrayInput(bytes), encoding, true));

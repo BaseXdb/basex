@@ -72,7 +72,7 @@ public class IntList extends ElementList {
     int[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
-    System.arraycopy(elements, 0, lst, s, l);
+    Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;
     return this;
@@ -121,8 +121,7 @@ public class IntList extends ElementList {
     final int l = elements.length;
     if(l == 0) return;
     if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
-    Array.move(list, index, l, size - index);
-    System.arraycopy(elements, 0, list, index, l);
+    Array.insert(list, index, l, size, elements);
     size += l;
   }
 
@@ -130,7 +129,7 @@ public class IntList extends ElementList {
    * Removes all occurrences of the specified element from the list.
    * @param element element to be removed
    */
-  public final void delete(final int element) {
+  public final void removeAll(final int element) {
     final int[] lst = list;
     final int sz = size;
     int s = 0;
@@ -141,15 +140,16 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Deletes the element at the specified position.
-   * @param index index of the element to delete
-   * @return deleted element
+   * Removes the element at the specified position.
+   * @param index index of the element to remove
+   * @return removed element
    */
   public final int remove(final int index) {
     final int[] lst = list;
-    final int l = lst[index];
-    Array.move(lst, index + 1, -1, --size - index);
-    return l;
+    final int e = lst[index];
+    Array.remove(lst, index, 1, size);
+    --size;
+    return e;
   }
 
   /**
