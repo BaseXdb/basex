@@ -70,7 +70,7 @@ public final class FTBuilder extends IndexBuilder {
           final byte[] tok = lexer.nextToken();
           ++pos;
           // skip too long and stopword tokens
-          if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
+          if(tok.length <= data.meta.maxlen && !sw.contains(tok)) {
             // check if main memory is exhausted
             if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
               writeIndex(true);

@@ -51,7 +51,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  protected void read(final DataInput in) throws IOException {
+  public void read(final DataInput in) throws IOException {
     keys = in.readTokens();
     next = in.readNums();
     buckets = in.readNums();
@@ -84,7 +84,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @param key string to be added
    * @return {@code true} if the key did not exist yet and was stored
    */
-  public boolean add(final String key) {
+  public final boolean add(final String key) {
     return add(token(key));
   }
 

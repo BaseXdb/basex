@@ -37,7 +37,7 @@ public final class FTOptions extends FTExpr {
     qc.ftOpt(opt.assign(tmp));
     final Value value = qc.focus.value;
     try {
-      if(opt.sw != null && value != null && value.data() != null) opt.sw.comp(value.data());
+      if(opt.sw != null && value != null && value.data() != null) opt.sw.compile(value.data());
       return exprs[0].compile(cc);
     } finally {
       qc.ftOpt(tmp);

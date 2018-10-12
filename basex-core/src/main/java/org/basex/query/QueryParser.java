@@ -3542,7 +3542,8 @@ public class QueryParser extends InputParser {
         wsCheck(WORDS);
 
         if(opt.sw != null) throw error(FTDUP_X, STOP + ' ' + WORDS);
-        opt.sw = new StopWords();
+        final StopWords sw = new StopWords();
+        opt.sw = sw;
         if(wsConsumeWs(DEFAULT)) {
           if(!using) throw error(FTSTOP);
         } else if(using) {
@@ -3551,8 +3552,8 @@ public class QueryParser extends InputParser {
             if(wsConsume(PAREN1)) {
               do {
                 final byte[] sl = stringLiteral();
-                if(except) opt.sw.remove(sl);
-                else if(!union || !opt.sw.contains(sl)) opt.sw.add(sl);
+                if(except) sw.remove(sl);
+                else sw.add(sl);
               } while(wsConsume(COMMA));
               wsCheck(PAREN2);
             } else if(wsConsumeWs(AT)) {

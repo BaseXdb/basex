@@ -150,10 +150,11 @@ public final class FTWords extends FTExpr {
 
             int d = 0;
             FTIndexIterator ii = null;
+            final StopWords sw = ftOpt.sw;
             do {
               final byte[] tok = lexer.nextToken();
               len += tok.length;
-              if(ftOpt.sw != null && ftOpt.sw.contains(tok)) {
+              if(sw != null && sw.contains(tok)) {
                 ++d;
               } else {
                 final FTIndexIterator iter = lexer.get().length > data.meta.maxlen ?
@@ -399,11 +400,12 @@ public final class FTWords extends FTExpr {
       // summarize number of hits; break loop if no hits are expected
       final FTLexer lexer = new FTLexer(ftOpt);
       ii.costs = IndexCosts.ZERO;
+      final StopWords sw = ftOpt.sw;
       for(byte[] token : tokens) {
         lexer.init(token);
         while(lexer.hasNext()) {
           final byte[] tok = lexer.nextToken();
-          if(ftOpt.sw != null && ftOpt.sw.contains(tok)) continue;
+          if(sw != null && sw.contains(tok)) continue;
 
           if(ftOpt.is(WC)) {
             // don't use index if one of the terms starts with a wildcard
@@ -411,8 +413,8 @@ public final class FTWords extends FTExpr {
             if(token[0] == '.') return false;
             // don't use index if certain characters or more than 1 dot are found
             int d = 0;
-            for(final byte w : token) {
-              if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
+            for(final byte b : token) {
+              if(b == '{' || b == '\\' || b == '.' && ++d > 1) return false;
             }
           }
           // favor full-text index requests over exact queries
