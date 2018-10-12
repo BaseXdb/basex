@@ -87,7 +87,7 @@ public final class StrLazy extends AStr implements Lazy {
       ti.encoding(encoding).validate(validate);
       return ti;
     } catch(final IOException ex) {
-      if(ti != null) try { ti.close(); } catch(final IOException ignore) { }
+      if(ti != null) try { ti.close(); } catch(final IOException e) { Util.debug(e); }
       throw error.get(info, ex);
     }
   }

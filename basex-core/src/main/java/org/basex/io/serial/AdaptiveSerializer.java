@@ -4,6 +4,7 @@ import static org.basex.io.serial.SerializerOptions.*;
 
 import java.io.*;
 import java.text.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -92,7 +93,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     } else if(type == AtomType.DBL) {
       final double d = ((Dbl) item).dbl();
       if(Double.isInfinite(d) || Double.isNaN(d)) tb.add(((Dbl) item).string());
-      else tb.add(new DecimalFormat(DOUBLES, Token.LOC).format(d).toLowerCase());
+      else tb.add(new DecimalFormat(DOUBLES, Token.LOC).format(d).toLowerCase(Locale.ENGLISH));
     } else {
       final Item it = type.instanceOf(AtomType.DUR) ? new Dur((Dur) item) : item;
       try {

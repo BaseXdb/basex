@@ -202,7 +202,7 @@ public final class GUIMacOSX extends GUIMacOS {
       final Class<?>[] params = { Window.class, Boolean.TYPE };
       final Method method = util.getMethod("setWindowCanFullScreen", params);
       method.invoke(util, window, true);
-    } catch(final Exception ignore) { }
+    } catch(final Exception ex) { Util.debug(ex); }
   }
 
   /**

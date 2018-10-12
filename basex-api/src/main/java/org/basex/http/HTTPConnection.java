@@ -151,7 +151,7 @@ public final class HTTPConnection implements ClientInfo {
    * Returns all accepted media types.
    * @return accepted media types
    */
-  public MediaType[] accepts() {
+  public ArrayList<MediaType> accepts() {
     final String accepts = req.getHeader(ACCEPT);
     final ArrayList<MediaType> list = new ArrayList<>();
     if(accepts == null) {
@@ -172,7 +172,7 @@ public final class HTTPConnection implements ClientInfo {
         }
       }
     }
-    return list.toArray(new MediaType[0]);
+    return list;
   }
 
   /**

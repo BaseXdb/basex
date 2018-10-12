@@ -225,7 +225,7 @@ public final class WebModules {
       final HTTPConnection conn) {
 
     // find highest matching quality factors
-    final MediaType[] accepts = conn.accepts();
+    final ArrayList<MediaType> accepts = conn.accepts();
     double cQf = 0, sQf = 0;
     for(final RestXqFunction func : funcs) {
       for(final MediaType accept : accepts) {
@@ -257,7 +257,7 @@ public final class WebModules {
    * @return list of matching functions
    */
   private static List<RestXqFunction> bestQf(final List<RestXqFunction> funcs,
-      final MediaType[] accepts, final double clientQf, final double serverQf) {
+      final ArrayList<MediaType> accepts, final double clientQf, final double serverQf) {
 
     final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqFunction func : funcs) {

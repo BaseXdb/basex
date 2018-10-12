@@ -21,8 +21,6 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FElem extends FNode {
-  /** Dummy element. */
-  public static final FElem DUMMY = new FElem("");
   /** Element name. */
   private final QNm name;
 
