@@ -26,6 +26,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.http.HttpRequest.*;
 import org.basex.util.options.Options.*;
 
@@ -105,8 +106,7 @@ public final class HttpClient {
     final String user = request.attribute(USERNAME), pass = request.attribute(PASSWORD);
     if(user != null) {
       if(request.authMethod == AuthMethod.BASIC) {
-        conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' +
-            org.basex.util.Base64.encode(user + ':' + pass));
+        conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' + Base64.encode(user + ':' + pass));
 
       } else if(request.authMethod == AuthMethod.DIGEST) {
         conn.setRequestProperty(AUTHORIZATION, DIGEST);

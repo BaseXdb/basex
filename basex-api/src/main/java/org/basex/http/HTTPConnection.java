@@ -18,6 +18,7 @@ import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.http.*;
 
 /**
@@ -356,7 +357,7 @@ public final class HTTPConnection implements ClientInfo {
 
         if(auth == AuthMethod.BASIC) {
           final String details = am.length > 1 ? am[1] : "";
-          final String[] creds = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
+          final String[] creds = Strings.split(Base64.decode(details), ':', 2);
           user = user(creds[0]);
           if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException();
 

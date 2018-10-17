@@ -87,8 +87,8 @@ public final class IOUrl extends IO {
     conn.setConnectTimeout(TIMEOUT * 1000);
     // use basic authentication if credentials are contained in the url
     final String ui = url.getUserInfo();
-    if(ui != null) conn.setRequestProperty(HttpText.AUTHORIZATION, HttpText.BASIC + ' ' +
-        org.basex.util.Base64.encode(ui));
+    if(ui != null) conn.setRequestProperty(HttpText.AUTHORIZATION,
+        HttpText.BASIC + ' ' + Base64.encode(ui));
     return conn;
   }
 
