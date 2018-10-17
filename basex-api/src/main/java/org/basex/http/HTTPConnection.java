@@ -362,7 +362,7 @@ public final class HTTPConnection implements ClientInfo {
           if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException();
 
         } else {
-          final EnumMap<Request, String> map = HttpClient.digestHeaders(header);
+          final EnumMap<Request, String> map = HttpClient.authHeaders(header);
           user = user(map.get(Request.USERNAME));
 
           final String nonce = map.get(Request.NONCE), cnonce = map.get(Request.CNONCE);

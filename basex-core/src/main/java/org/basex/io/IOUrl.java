@@ -12,6 +12,7 @@ import javax.net.ssl.*;
 import javax.xml.transform.stream.*;
 
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -88,7 +89,7 @@ public final class IOUrl extends IO {
     // use basic authentication if credentials are contained in the url
     final String ui = url.getUserInfo();
     if(ui != null) conn.setRequestProperty(HttpText.AUTHORIZATION,
-        HttpText.BASIC + ' ' + Base64.encode(ui));
+        AuthMethod.BASIC + " " + Base64.encode(ui));
     return conn;
   }
 

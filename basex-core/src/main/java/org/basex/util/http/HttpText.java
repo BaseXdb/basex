@@ -35,11 +35,6 @@ public interface HttpText {
   /** HTTP header string. */
   String ACCEPT = "Accept";
 
-  /** HTTP basic authentication. */
-  String BASIC = "Basic";
-  /** HTTP digest authentication. */
-  String DIGEST = "Digest";
-
   /** Content-Disposition. */
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");
   /** Dashes. */
