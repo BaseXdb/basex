@@ -975,7 +975,7 @@ public class QueryParser extends InputParser {
     if(ex == null) ex = replace();
     if(ex == null) ex = updatingFunctionCall();
     if(ex == null) ex = copyModify();
-    if(ex == null) ex = or();
+    if(ex == null) ex = ternaryIf();
     return ex;
   }
 
@@ -1384,6 +1384,22 @@ public class QueryParser extends InputParser {
     final Expr thn = check(single(), NOIF);
     if(!wsConsumeWs(ELSE)) throw error(NOIF);
     final Expr els = check(single(), NOIF);
+    return new If(info, iff, thn, els);
+  }
+
+  /**
+   * Parses the "TernaryIfExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr ternaryIf() throws QueryException {
+    final Expr iff = or();
+    if(!wsConsumeWs(TERNARY1)) return iff;
+
+    final InputInfo info = info();
+    final Expr thn = check(or(), NOTERNARY);
+    if(!wsConsumeWs(TERNARY2)) throw error(NOTERNARY);
+    final Expr els = check(or(), NOTERNARY);
     return new If(info, iff, thn, els);
   }
 
@@ -1812,10 +1828,13 @@ public class QueryParser extends InputParser {
    */
   private Expr map() throws QueryException {
     final Expr ex = path();
-    if(ex != null && next() != '=' && wsConsumeWs(EXCL)) {
-      final ExprList el = new ExprList(ex);
-      do add(el, path()); while(next() != '=' && wsConsumeWs(EXCL));
-      return SimpleMap.get(info(), el.finish());
+    if(ex != null) {
+      final int next = next();
+      if(next != '=' && next != '!' && wsConsumeWs(EXCL)) {
+        final ExprList el = new ExprList(ex);
+        do add(el, path()); while(next() != '=' && wsConsumeWs(EXCL));
+        return SimpleMap.get(info(), el.finish());
+      }
     }
     return ex;
   }
@@ -2073,9 +2092,13 @@ public class QueryParser extends InputParser {
           final Expr[] args = argList.finish();
           ex = holes == null ? new DynFuncCall(info, sc, ex, args) :
             new PartFunc(sc, info, ex, args, holes);
-        } else if(consume(QUESTION)) {
-          // parses the "Lookup" rule
-          ex = new Lookup(info(), keySpecifier(), ex);
+        } else {
+          final int p = pos;
+          if(consume(QUESTION) && !consume(QUESTION)) {
+            // parses the "Lookup" rule
+            ex = new Lookup(info(), keySpecifier(), ex);
+          }
+          pos = p;
         }
       } while(ex != old);
     }
