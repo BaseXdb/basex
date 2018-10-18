@@ -255,7 +255,6 @@ public final class WsPool {
          String stompId = sws.getStompId(channel.toJava());
          String ackmode = sws.getAckMode(stompId);
          String wsId = sws.id;
-
          // Set the headers of the MessageFrame
          Map<String, String> headers = new HashMap<>();
          headers.put("destination", channel.toJava());
@@ -263,15 +262,13 @@ public final class WsPool {
          headers.put("subscription", stompId);
          headers.put("content-length", "" + message.toJava().length());
          headers.put("content-type", "text/plain");
-
          // Check if ACK Required, add it to notAckedMessages if required
-         if(!ackmode.equals("auto")) {
+         if(ackmode != null && !ackmode.equals("auto")) {
            SortedSet<MessageObject> messages = notAckedMessages.get(wsId);
            if(messages == null) messages = new TreeSet<>();
            messages.add(new MessageObject(messageUID, message.toJava(),wsId));
            notAckedMessages.put(wsId, messages);
          }
-
          // Add the Messageid with its stompId to the messageIdStompId-Map
          messageIdStompId.put(messageUID, stompId);
 
