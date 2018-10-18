@@ -153,21 +153,19 @@ public abstract class StompFrame {
    * */
   public String serializedFrame() {
     StringBuilder sb = new StringBuilder();
-    // Add Command
     sb.append(this.command);
-    sb.append((char) 13).append((char) 10);
+    sb.append("\n");
     // Add Headers
     if(this.header != null && this.header.size() >= 1) {
       this.header.forEach(
           (k, v) -> {
                       sb.append(k + ":" + v);
-                      sb.append((char) 13).append((char) 10);
+                      sb.append("\n");
                     });
     }
-    sb.append((char) 13).append((char) 10);
-    // Add the Body
+    sb.append("\n");
     sb.append(this.body);
-    sb.append((char) 0);
+    sb.append('\u0000');
     return sb.toString();
   }
 
