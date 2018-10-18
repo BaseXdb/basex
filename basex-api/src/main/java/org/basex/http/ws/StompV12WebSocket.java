@@ -100,7 +100,8 @@ public final class StompV12WebSocket extends WebSocket {
       stompheaders.forEach(addHeader);
       switch(stompframe.getCommand()) {
         case SEND:
-          findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(), stompheaders.get("destination"));
+          findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(),
+              stompheaders.get("destination"));
           break;
         case ACK:
           String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
@@ -138,9 +139,9 @@ public final class StompV12WebSocket extends WebSocket {
   /**
    * Sends an Errorframe
    * @param message error message
-   * */
+   */
   private void sendError(final String message) {
-    Map<String,String> cheaders = new HashMap<>();
+    Map<String, String> cheaders = new HashMap<>();
     cheaders.put("message", message);
     ErrorFrame ef = new ErrorFrame(Commands.ERROR, cheaders, "");
     super.getSession().getRemote().sendStringByFuture(ef.serializedFrame());
@@ -172,8 +173,12 @@ public final class StompV12WebSocket extends WebSocket {
             return;
           }
           List<StompFrame> sf = transidStompframe.get(stompheaders.get("transaction"));
-          if(sf == null) sf = new ArrayList<>();
+          if(sf == null) {
+            sf = new ArrayList<>();
+            transidStompframe.put(stompheaders.get("transaction"), sf);
+          }
           sf.add(stompframe);
+
         } else {
           String destination = stompheaders.get("destination");
           findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(), destination);
