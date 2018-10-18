@@ -49,8 +49,7 @@ public final class WsFunction extends WebFunction {
 
     for(final Ann ann : function.anns) {
       final Annotation sig = ann.sig;
-      if(sig == null || !eq(sig.uri, QueryText.WS_URI)) continue;
-
+      if(sig == null || (!eq(sig.uri, QueryText.WS_URI) && !eq(sig.uri, QueryText.WS_STOMP_URI)) ) continue;
       found = true;
       final Item[] args = ann.args();
       switch(sig) {
@@ -72,6 +71,7 @@ public final class WsFunction extends WebFunction {
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
+        case _WS_STOMP_MESSAGE:
           final QNm msg = checkVariable(toString(args[1]), declared);
           message = new WebParam(msg, "message", null);
           path = new WsPath(toString(args[0]));

@@ -100,7 +100,7 @@ public final class StompV12WebSocket extends WebSocket {
       stompheaders.forEach(addHeader);
       switch(stompframe.getCommand()) {
         case SEND:
-          findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(),
+          findAndProcess(Annotation._WS_STOMP_MESSAGE, stompframe.getBody(),
               stompheaders.get("destination"));
           break;
         case ACK:
@@ -181,7 +181,7 @@ public final class StompV12WebSocket extends WebSocket {
 
         } else {
           String destination = stompheaders.get("destination");
-          findAndProcess(Annotation._WS_MESSAGE, stompframe.getBody(), destination);
+          findAndProcess(Annotation._WS_STOMP_MESSAGE, stompframe.getBody(), destination);
         }
         break;
       case SUBSCRIBE:

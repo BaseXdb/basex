@@ -169,13 +169,15 @@ public enum Annotation {
   _WS_ERROR("error(path,message)", arg(STR_O, STR_O), WS_URI),
 
   /** XQuery annotation. */
-  _WS_STOMP_CONNECT("connect-stomp(path)",arg(STR_O), WS_URI),
+  _WS_STOMP_CONNECT("connect(path)",arg(STR_O), WS_STOMP_URI),
+  /** XQuery annotation. */
+  _WS_STOMP_MESSAGE("message(path,message)", arg(STR_O, STR_O), WS_STOMP_URI),
   /** XQuery annotation */
-  _WS_STOMP_SUBSCRIBE("subscribe-stomp(path)",arg(STR_O), WS_URI),
+  _WS_STOMP_SUBSCRIBE("subscribe(path)",arg(STR_O), WS_STOMP_URI),
   /** XQuery annotation */
-  _WS_STOMP_UNSUBSCRIBE("unsubscribe-stomp(path)",arg(STR_O), WS_URI),
+  _WS_STOMP_UNSUBSCRIBE("unsubscribe(path)",arg(STR_O), WS_STOMP_URI),
   /** XQuery annotation */
-  _WS_STOMP_NACK("nack-stomp()",arg(), WS_URI);
+  _WS_STOMP_NACK("nack()",arg(), WS_STOMP_URI);
 
   /** Argument types. */
   public final SeqType[] args;
