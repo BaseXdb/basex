@@ -3,7 +3,6 @@ package org.basex.query.scope;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.hash.*;
@@ -15,30 +14,17 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class LibraryModule extends AModule {
-  /** Name of library. */
-  public final QNm name;
-
   /**
    * Constructor.
-   * @param name of library
    * @param doc documentation
    * @param funcs user-defined functions
    * @param vars static variables
    * @param modules imported modules
    * @param sc static context
    */
-  public LibraryModule(final QNm name, final String doc, final TokenObjMap<StaticFunc> funcs,
+  public LibraryModule(final String doc, final TokenObjMap<StaticFunc> funcs,
       final TokenObjMap<StaticVar> vars, final TokenSet modules, final StaticContext sc) {
     super(sc, null, doc, null, funcs, vars, modules);
-    this.name = name;
-  }
-
-  /**
-   * Returns the module namespace URI.
-   * @return URI
-   */
-  public byte[] uri() {
-    return name.uri();
   }
 
   @Override

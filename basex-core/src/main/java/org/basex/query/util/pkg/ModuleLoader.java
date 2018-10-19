@@ -132,11 +132,10 @@ public final class ModuleLoader {
   /**
    * Returns a reference to the specified class.
    * @param name fully classified class name
-   * @return found class or {@code null}
-   * @throws Throwable any exception or error: {@link ClassNotFoundException},
-   *   {@link NoClassDefFoundError}, {@link LinkageError} or {@link ExceptionInInitializerError}.
+   * @return found class
+   * @throws ClassNotFoundException class not found exception
    */
-  public Class<?> findClass(final String name) throws Throwable {
+  public Class<?> findClass(final String name) throws ClassNotFoundException {
     // add cached URLs to class loader
     final int us = urls.size();
     if(us != 0) {

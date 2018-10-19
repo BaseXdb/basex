@@ -4,8 +4,8 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.scope.AModule;
-import org.basex.query.scope.LibraryModule;
+import org.basex.query.scope.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -66,10 +66,10 @@ public class XQueryParse extends StandardFunc {
       final AModule mod = qctx.parse(string(query), uri);
       final FElem root;
       if(mod instanceof LibraryModule) {
-        final LibraryModule lib = (LibraryModule) mod;
+        final QNm module = ((LibraryModule) mod).sc.module;
         root = new FElem(LIBRARY_MODULE);
-        root.add(PREFIX, lib.name.string());
-        root.add(URI, lib.name.uri());
+        root.add(PREFIX, module.string());
+        root.add(URI, module.uri());
       } else {
         root = new FElem(MAIN_MODULE);
         root.add(UPDATING, token(qctx.updating));

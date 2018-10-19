@@ -183,7 +183,7 @@ public abstract class JavaFunction extends Arr {
     final String className = java ? uri.substring(JAVAPREF.length()) :
       Strings.className(Strings.uri2path(uri));
 
-    // try to find function in imported Java modules
+    // function in imported Java module
     final ModuleLoader modules = qc.resources.modules();
     final Object module  = modules.findModule(className);
     if(module != null) {
@@ -194,21 +194,40 @@ public abstract class JavaFunction extends Arr {
       return new JavaModuleFunc(sc, info, module, meth, args, perm);
     }
 
-    // try to find matching Java variable or method
-    boolean clz = false;
-    try {
-      final Class<?> clazz = modules.findClass(className);
-      clz = true;
-      if(name.equals(NEW) || exists(clazz, name))
-        return new JavaFunc(sc, info, clazz, name, types, args);
-    } catch(final ClassNotFoundException ex) {
-      if(java) Util.debug(ex);
-    } catch(final Throwable th) {
-      throw JAVAINIT_X_X.get(info, Util.className(th), th);
+    /* skip Java class lookup if...
+     * - no java prefix was supplied, and
+     * - if URI equals namespace of library module or if it is globally declared
+     *
+     * examples:
+     * - declare function local:f($i) { if($i) then local:f($i - 1) else () }
+     * - module namespace _ = '_'; declare function _:_() { _:_() };
+     * - fn:does-not-exist(), util:not-available()
+     */
+    if(java || (sc.module == null || !eq(sc.module.uri(), qname.uri())) &&
+        NSGlobal.prefix(qname.uri()).length == 0) {
+
+      // Java constructor, function, or variable
+      Class<?> clazz = null;
+      try {
+        clazz = modules.findClass(className);
+      } catch(final ClassNotFoundException ex) {
+        if(java) Util.debug(ex);
+      } catch(final Throwable th) {
+        // catch linkage and other errors as well
+        throw JAVAINIT_X_X.get(info, Util.className(th), th);
+      }
+
+      if(clazz == null) {
+        // class not found, java prefix was specified
+        if(java) throw WHICHCLASS_X.get(info, className);
+      } else {
+        if(name.equals(NEW) || exists(clazz, name))
+          return new JavaFunc(sc, info, clazz, name, types, args);
+        // function not found, java prefix was specified
+        if(java) throw WHICHJAVA_X_X_X.get(info, className, name, args.length);
+      }
     }
 
-    // no function found: raise error only if "java:" prefix was specified
-    if(java) throw (clz ? WHICHJAVA_X_X_X : WHICHCLASS_X).get(info, className, name, args.length);
     return null;
   }
 

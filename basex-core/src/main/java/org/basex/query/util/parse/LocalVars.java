@@ -25,10 +25,10 @@ public final class LocalVars {
 
   /**
    * Constructor.
-   * @param qp query parser
+   * @param parser query parser
    */
-  public LocalVars(final QueryParser qp) {
-    this.qp = qp;
+  public LocalVars(final QueryParser parser) {
+    this.qp = parser;
   }
 
   /**
@@ -93,7 +93,7 @@ public final class LocalVars {
     // accept variable reference...
     // - if a variable uses the module or an imported URI, or
     // - if it is specified in the main module
-    if(qp.module == null || eq(qp.module.uri(), uri) || qp.modules.contains(uri))
+    if(qp.sc.module == null || eq(qp.sc.module.uri(), uri) || qp.modules.contains(uri))
       return qp.qc.vars.newRef(name, qp.sc, ii);
 
     throw qp.error(VARUNDEF_X, ii, '$' + string(name.string()));
