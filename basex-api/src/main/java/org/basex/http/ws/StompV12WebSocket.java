@@ -105,14 +105,26 @@ public final class StompV12WebSocket extends WebSocket {
           break;
         case ACK:
           String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
+          SortedSet<MessageObject> ackedMessages = null;
           if(ackMode.equals("client")) {
-            WsPool.get().ackMessages(id, stompheaders.get("id"));
+            ackedMessages = WsPool.get().removeMessagesFromNotAcked(id, stompheaders.get("id"));
           } else if(ackMode.equals("client-individual")) {
-            WsPool.get().ackMessage(id, stompheaders.get("id"));
+            ackedMessages = new TreeSet<>();
+            ackedMessages.add(WsPool.get().removeMessageFromNotAcked(id, stompheaders.get("id")));
+          } else {
+            break;
+          };
+          Iterator<MessageObject> it = ackedMessages.iterator();
+          while(it.hasNext()) {
+            MessageObject mo = it.next();
+            addHeader.accept("messageid", mo.getMessageId());
+            addHeader.accept("message", mo.getMessage());
+            addHeader.accept("wsid", mo.getWebSocketId());
+            findAndProcess(Annotation._WS_STOMP_ACK, null, null);
           }
           break;
         case NACK:
-          MessageObject mo = WsPool.get().discardMessage(id, stompheaders.get("id"));
+          MessageObject mo = WsPool.get().removeMessageFromNotAcked(id, stompheaders.get("id"));
           if(mo == null) return;
           addHeader.accept("messageid", mo.getMessageId());
           addHeader.accept("message", mo.getMessage());
@@ -149,12 +161,17 @@ public final class StompV12WebSocket extends WebSocket {
 
   @Override
   public void onWebSocketText(final String message) {
-    StompFrame stompframe = parseStompFrame(message);
+    StompFrame stompframe = null;
+    try {
+      stompframe = parseStompFrame(message);
+    }catch(CloseException ce){
+      sendError(ce.getMessage());
+      return;
+    }
     if(stompframe == null) return;
     Map<String, String> stompheaders = stompframe.getHeaders();
     // Add the StompHeaders to the Headers
     stompheaders.forEach(addHeader);
-
     switch(stompframe.getCommand()) {
       case CONNECT:
       case STOMP:
@@ -162,7 +179,7 @@ public final class StompV12WebSocket extends WebSocket {
         cHeader.put("version", "1.2");
         ConnectedFrame cf = new ConnectedFrame(Commands.CONNECTED, cHeader, "");
         super.getSession().getRemote().sendStringByFuture(cf.serializedFrame());
-        findAndProcess(Annotation._WS_STOMP_CONNECT, null, null);
+        //findAndProcess(Annotation._WS_STOMP_CONNECT, null, null);
         break;
       case SEND:
         if(stompheaders.get("transaction") != null) {
@@ -205,6 +222,7 @@ public final class StompV12WebSocket extends WebSocket {
         findAndProcess(Annotation._WS_STOMP_UNSUBSCRIBE, null, channel);
         break;
       case ACK:
+        SortedSet<MessageObject> ackedMessages = null;
         if(stompheaders.get("transaction") != null) {
           // If the ACK is in an transaction, dont execute it, add it to the transaction.
           // Execute after Commit
@@ -219,9 +237,21 @@ public final class StompV12WebSocket extends WebSocket {
           // get the ackmode of the subscribtion
           String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
           if(ackMode.equals("client")) {
-            WsPool.get().ackMessages(id, stompheaders.get("id"));
+            ackedMessages = WsPool.get().removeMessagesFromNotAcked(id, stompheaders.get("id"));
           } else if(ackMode.equals("client-individual")) {
-            WsPool.get().ackMessage(id, stompheaders.get("id"));
+            ackedMessages = new TreeSet<>();
+            ackedMessages.add(WsPool.get().removeMessageFromNotAcked(id, stompheaders.get("id")));
+          } else {
+            // If no Acks needed
+            return;
+          }
+          Iterator<MessageObject> it = ackedMessages.iterator();
+          while(it.hasNext()) {
+            MessageObject mo = it.next();
+            addHeader.accept("messageid", mo.getMessageId());
+            addHeader.accept("message", mo.getMessage());
+            addHeader.accept("wsid", mo.getWebSocketId());
+            findAndProcess(Annotation._WS_STOMP_ACK, null, null);
           }
         }
         break;
@@ -237,7 +267,7 @@ public final class StompV12WebSocket extends WebSocket {
           if(sf == null) sf = new ArrayList<>();
           sf.add(stompframe);
         } else {
-          MessageObject mo = WsPool.get().discardMessage(id, stompheaders.get("id"));
+          MessageObject mo = WsPool.get().removeMessageFromNotAcked(id, stompheaders.get("id"));
           if(mo == null) return;
           addHeader.accept("messageid", mo.getMessageId());
           addHeader.accept("message", mo.getMessage());
@@ -277,6 +307,7 @@ public final class StompV12WebSocket extends WebSocket {
   /**
    * Parses a Stringmessage to a StompFrame.
    * @param message String
+   * @throws CloseException close exception
    * @return the StompFrame
    */
   private StompFrame parseStompFrame(final String message) {

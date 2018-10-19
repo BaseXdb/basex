@@ -177,7 +177,9 @@ public enum Annotation {
   /** XQuery annotation */
   _WS_STOMP_UNSUBSCRIBE("unsubscribe(path)",arg(STR_O), WS_STOMP_URI),
   /** XQuery annotation */
-  _WS_STOMP_NACK("nack()",arg(), WS_STOMP_URI);
+  _WS_STOMP_NACK("nack()",arg(), WS_STOMP_URI),
+  /** XQuery annotation */
+  _WS_STOMP_ACK("ack()",arg(), WS_STOMP_URI);
 
   /** Argument types. */
   public final SeqType[] args;

@@ -98,9 +98,8 @@ public abstract class StompFrame {
 
     // Check if the Frame has all Headers set
     if(!returnFrame.checkValidity()) {
-       throw new HeadersException();
+       throw new HeadersException("Frame not valid! ");
     }
-
     return returnFrame;
   }
 
