@@ -1382,8 +1382,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAREN2);
     if(!wsConsumeWs(THEN)) throw error(NOIF);
     final Expr thn = check(single(), NOIF);
-    if(!wsConsumeWs(ELSE)) throw error(NOIF);
-    final Expr els = check(single(), NOIF);
+    final Expr els = wsConsumeWs(ELSE) ? check(single(), NOIF) : Empty.SEQ;
     return new If(info, iff, thn, els);
   }
 
