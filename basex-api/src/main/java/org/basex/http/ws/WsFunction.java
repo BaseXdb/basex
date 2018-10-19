@@ -78,6 +78,7 @@ public final class WsFunction extends WebFunction {
           count++;
           break;
         case _WS_STOMP_NACK:
+        case _WS_STOMP_ACK:
           count++;
           break;
         default:
@@ -131,7 +132,7 @@ public final class WsFunction extends WebFunction {
    */
   public boolean matches(final Annotation ann, final WsPath pth) {
     for(final Ann a : function.anns) {
-      if((ann == null || a.sig == ann) && (pth == null || path.compareTo(pth) == 0)) return true;
+      if((ann == null || a.sig == ann) && (pth == null || path == null || path.compareTo(pth) == 0)) return true;
     }
     return false;
   }
