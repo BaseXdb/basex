@@ -21,14 +21,14 @@ public final class LocalVars {
   /** Stack of variable contexts. */
   private final ArrayList<VarContext> vars = new ArrayList<>();
   /** Query parser. */
-  private final QueryParser qp;
+  private final QueryParser parser;
 
   /**
    * Constructor.
    * @param parser query parser
    */
   public LocalVars(final QueryParser parser) {
-    this.qp = parser;
+    this.parser = parser;
   }
 
   /**
@@ -64,7 +64,7 @@ public final class LocalVars {
     final int ls = vars.size();
     while(++l < ls) {
       final VarContext vctx = vars.get(l);
-      final Var local = new Var(var.name, var.seqType(), false, qp.qc, qp.sc, ii);
+      final Var local = new Var(var.name, var.seqType(), false, parser.qc, parser.sc, ii);
       vctx.add(local);
       vctx.bindings.put(local, new VarRef(ii, var));
       var = local;
@@ -93,10 +93,10 @@ public final class LocalVars {
     // accept variable reference...
     // - if a variable uses the module or an imported URI, or
     // - if it is specified in the main module
-    if(qp.sc.module == null || eq(qp.sc.module.uri(), uri) || qp.modules.contains(uri))
-      return qp.qc.vars.newRef(name, qp.sc, ii);
+    if(parser.sc.module == null || eq(parser.sc.module.uri(), uri) || parser.modules.contains(uri))
+      return parser.qc.vars.newRef(name, parser.sc, ii);
 
-    throw qp.error(VARUNDEF_X, ii, '$' + string(name.string()));
+    throw parser.error(VARUNDEF_X, ii, '$' + string(name.string()));
   }
 
   /**
@@ -104,7 +104,7 @@ public final class LocalVars {
    * @param global mapping for non-local variables
    */
   public void pushContext(final HashMap<Var, Expr> global) {
-    vars.add(new VarContext(global, qp.sc));
+    vars.add(new VarContext(global, parser.sc));
   }
 
   /**

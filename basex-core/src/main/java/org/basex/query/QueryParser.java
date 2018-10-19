@@ -243,7 +243,7 @@ public class QueryParser extends InputParser {
   private void finish(final MainModule mm) throws QueryException {
     if(more()) {
       if(alter != null) throw alterError(null);
-      final String rest = rest();
+      final String rest = remaining();
       pos++;
       if(mm == null) throw error(MODEXPR, rest);
       throw error(QUERYEND_X, rest);

@@ -460,8 +460,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       params[a] = vs.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, info);
       args[a] = new VarRef(info, params[a]);
     }
-    final TypedFunc call = qc.funcs.undeclaredFuncCall(name, args, sc, info);
-    return new Closure(info, name, null, params, call.func, new AnnList(), null, vs);
+    final TypedFunc tf = qc.funcs.undeclaredFuncCall(name, args, sc, info);
+    return new Closure(info, name, null, params, tf.func, new AnnList(), null, vs);
   }
 
   @Override
