@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.http.ws.*;
+import org.basex.http.ws.stomp.frames.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -61,6 +62,12 @@ public final class StompResponse extends WebResponse {
         continue;
       }
     } finally {
+      if(ws.headers.containsKey("receipt")) {
+        Map<String, String> cHeader = new HashMap<>();
+        cHeader.put("receipt-id", ws.headers.get("receipt"));
+        StompFrame receiptFrame = new ReceiptFrame(Commands.RECEIPT, cHeader, "");
+        ws.getSession().getRemote().sendStringByFuture(receiptFrame.serializedFrame());
+      }
       qc.close();
       qc.unregister(ctx);
     }
