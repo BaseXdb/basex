@@ -18,28 +18,18 @@ public final class TypedFunc {
   /**
    * Constructor.
    * @param func function expression
-   * @param anns annotations
+   */
+  TypedFunc(final Expr func) {
+    this(func, null);
+  }
+
+  /**
+   * Constructor.
+   * @param func function expression
+   * @param anns annotations (can be {@code null})
    */
   TypedFunc(final Expr func, final AnnList anns) {
     this.func = func;
-    this.anns = anns;
-  }
-
-  /**
-   * Creates a type constructor function.
-   * @param cast cast expression
-   * @return typed function
-   */
-  static TypedFunc constr(final Cast cast) {
-    return new TypedFunc(cast, new AnnList());
-  }
-
-  /**
-   * Creates a type constructor function.
-   * @param f java function
-   * @return typed function
-   */
-  static TypedFunc java(final JavaFunction f) {
-    return new TypedFunc(f, new AnnList());
+    this.anns = anns != null ? anns : new AnnList();
   }
 }

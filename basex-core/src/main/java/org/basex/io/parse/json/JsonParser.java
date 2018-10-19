@@ -77,7 +77,7 @@ final class JsonParser extends InputParser {
     consume('\uFEFF');
     skipWs();
     value();
-    if(more()) throw error("Unexpected trailing content: %", rest());
+    if(more()) throw error("Unexpected trailing content: %", remaining());
   }
 
   /**
@@ -116,7 +116,7 @@ final class JsonParser extends InputParser {
         if(consume("true")) conv.booleanLit(TRUE);
         else if(consume("false")) conv.booleanLit(FALSE);
         else if(consume("null")) conv.nullLit();
-        else throw error("Unexpected JSON value: '%'", rest());
+        else throw error("Unexpected JSON value: '%'", remaining());
         skipWs();
     }
   }
@@ -174,7 +174,7 @@ final class JsonParser extends InputParser {
   private byte[] unquoted() throws QueryIOException {
     int cp = more() ? input.codePointAt(pos) : -1;
     if(cp < 0 || !Character.isJavaIdentifierStart(cp))
-      throw error("Expected unquoted string, found %", rest());
+      throw error("Expected unquoted string, found %", remaining());
     tb.reset();
     do {
       tb.add(cp);

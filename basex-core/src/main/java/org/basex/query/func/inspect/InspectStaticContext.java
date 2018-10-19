@@ -40,7 +40,7 @@ public final class InspectStaticContext extends StandardFunc {
         return sctx.baseURI();
       case NAMESPACES:
         XQMap map = XQMap.EMPTY;
-        Atts nsp = sctx.ns.ns;
+        Atts nsp = sctx.ns.list;
         int ns = nsp.size();
         for(int n = 0; n < ns; n++) {
           map = map.put(Str.get(nsp.name(n)), Str.get(nsp.value(n)), info);

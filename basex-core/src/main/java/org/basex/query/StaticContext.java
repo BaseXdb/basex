@@ -35,8 +35,8 @@ public final class StaticContext {
   public byte[] funcNS = FN_URI;
   /** Expression contains dynamic function call. */
   public boolean dynFuncCall;
-  /** Static type of context value. */
-  SeqType contextType;
+  /** Name of module (not assigned for main module). */
+  public QNm module;
 
   /** Construction mode. */
   public boolean strip;
@@ -51,10 +51,13 @@ public final class StaticContext {
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean inheritNS = true;
 
-  /** Static Base URI. */
-  private Uri baseURI = Uri.EMPTY;
+  /** Static type of context value. */
+  SeqType contextType;
   /** Sets a module URI resolver. */
   UriResolver resolver;
+
+  /** Static Base URI. */
+  private Uri baseURI = Uri.EMPTY;
 
   /**
    * Constructor.

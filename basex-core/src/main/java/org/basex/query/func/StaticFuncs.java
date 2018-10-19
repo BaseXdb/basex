@@ -103,8 +103,12 @@ public final class StaticFuncs extends ExprInfo {
       if(qe != null) throw qe;
     }
     final byte[] sig = signature(name, args.length);
-    if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
-    return funcCall(name, args, sc, info);
+    FuncCache fc = funcs.get(sig);
+    if(fc == null) {
+      fc = new FuncCache(null);
+      funcs.put(sig, fc);
+    }
+    return fc.newCall(name, args, sc, info);
   }
 
   /**
@@ -261,7 +265,7 @@ public final class StaticFuncs extends ExprInfo {
 
     /**
      * Constructor.
-     * @param func function
+     * @param func function (can be {@code null})
      */
     FuncCache(final StaticFunc func) {
       this.func = func;
@@ -294,10 +298,8 @@ public final class StaticFuncs extends ExprInfo {
 
       final StaticFuncCall call = new StaticFuncCall(name, args, sc, info);
       calls.add(call);
-
       // [LW] should be deferred until the actual types are known (i.e. compile time)
-      return func == null ? new TypedFunc(call, new AnnList()) :
-        new TypedFunc(call.init(func), func.anns);
+      return func != null ? new TypedFunc(call.init(func), func.anns) : new TypedFunc(call);
     }
 
     /**

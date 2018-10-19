@@ -131,10 +131,10 @@ public class InputParser {
   }
 
   /**
-   * Returns the remaining, unscanned query substring.
+   * Returns a maximum of 15 remaining characters that have not yet been parsed.
    * @return query substring
    */
-  protected final String rest() {
+  protected final String remaining() {
     final StringBuilder sb = new StringBuilder();
     final int pl = Math.min(length, pos + 15);
     int p = pos;

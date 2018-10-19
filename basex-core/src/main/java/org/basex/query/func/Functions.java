@@ -307,53 +307,45 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Returns a function with the specified name and number of arguments.
+   * Returns a function call with the specified name and number of arguments.
    * @param name name of the function
    * @param args optional arguments
    * @param qc query context
    * @param sc static context
    * @param info input info
-   * @return function instance, {@code null} otherwise
+   * @return function call
    * @throws QueryException query exception
    */
-  public static TypedFunc get(final QNm name, final Expr[] args, final QueryContext qc,
+  public static Expr get(final QNm name, final Expr[] args, final QueryContext qc,
       final StaticContext sc, final InputInfo info) throws QueryException {
 
-    // get namespace and local name
-    // parse type constructors
+    // type constructors
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, args.length, info);
       final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
-      return TypedFunc.constr(new Cast(sc, info, args[0], to));
+      return new Cast(sc, info, args[0], to);
     }
 
     // built-in functions
     final StandardFunc sf = get().get(name, args, sc, info);
     if(sf != null) {
-      final AnnList anns = new AnnList();
-      if(sf.sig.has(Flag.UPD)) {
-        anns.add(new Ann(info, Annotation.UPDATING));
-        qc.updating();
-      }
-      return new TypedFunc(sf, anns);
+      if(sf.sig.has(Flag.UPD)) qc.updating();
+      return sf;
     }
 
     // user-defined function
     final TypedFunc tf = qc.funcs.funcCall(name, args, sc, info);
     if(tf != null) {
       if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
-      return tf;
+      return tf.func;
     }
 
     // Java function
     final JavaFunction jf = JavaFunction.get(name, args, qc, sc, info);
-    if(jf != null) return TypedFunc.java(jf);
+    if(jf != null) return jf;
 
-    // add user-defined function that has not been declared yet
-    if(FuncType.find(name) == null) return qc.funcs.undeclaredFuncCall(name, args, sc, info);
-
-    // no function found
-    return null;
+    // user-defined function that has not been declared yet
+    return qc.funcs.undeclaredFuncCall(name, args, sc, info).func;
   }
 
   /**

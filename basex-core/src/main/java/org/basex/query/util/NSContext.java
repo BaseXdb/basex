@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class NSContext {
   /** Static namespaces, containing prefixes and URIs. */
-  public final Atts ns = new Atts();
+  public final Atts list = new Atts();
   /** Dynamically added namespaces. */
   private Atts stack;
 
@@ -31,7 +31,7 @@ public final class NSContext {
     if(eq(prefix, XML, XMLNS)) throw BINDXML_X.get(info, prefix);
     if(eq(uri, XML_URI)) throw BINDXMLURI_X_X.get(info, uri, XML);
     if(eq(uri, XMLNS_URI)) throw BINDXMLURI_X_X.get(info, uri, XMLNS);
-    ns.add(prefix, uri);
+    list.add(prefix, uri);
   }
 
   /**
@@ -39,9 +39,9 @@ public final class NSContext {
    * @param prefix namespace prefix
    */
   public void delete(final byte[] prefix) {
-    for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(prefix, ns.name(s))) {
-        ns.remove(s);
+    for(int s = list.size() - 1; s >= 0; s--) {
+      if(eq(prefix, list.name(s))) {
+        list.remove(s);
         break;
       }
     }
@@ -54,8 +54,8 @@ public final class NSContext {
    * @return uri or {@code null}
    */
   public byte[] staticURI(final byte[] prefix) {
-    for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(ns.name(s), prefix)) return ns.value(s);
+    for(int s = list.size() - 1; s >= 0; s--) {
+      if(eq(list.name(s), prefix)) return list.value(s);
     }
     return null;
   }
