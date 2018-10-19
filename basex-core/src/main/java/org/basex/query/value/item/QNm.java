@@ -99,7 +99,7 @@ public final class QNm extends Item {
    */
   public QNm(final QName name) {
     this(token(name.getPrefix().isEmpty() ? name.getLocalPart() :
-      name.getPrefix() + ':' + name.getLocalPart()), token(name.getNamespaceURI()));
+      concat(name.getPrefix(), COLON, name.getLocalPart())), token(name.getNamespaceURI()));
   }
 
   /**
@@ -129,8 +129,7 @@ public final class QNm extends Item {
    * @return name
    */
   private static byte[] name(final byte[] prefix, final byte[] local) {
-    final int pl = prefix.length, ll = local.length;
-    return pl == 0 ? local : new TokenBuilder(pl + ll + 1).add(prefix).add(':').add(local).finish();
+    return prefix.length == 0 ? local : concat(prefix, COLON, local);
   }
 
   /**
@@ -310,7 +309,7 @@ public final class QNm extends Item {
     final byte[] u = uri();
     if(ns != null && Token.eq(u, ns)) return local();
     final byte[] p = NSGlobal.prefix(u);
-    return p.length != 0 ? concat(p, token(":"), local()) : id();
+    return p.length != 0 ? concat(p, token(COL), local()) : id();
   }
 
   /**
@@ -366,16 +365,16 @@ public final class QNm extends Item {
     if(ul != 0) {
       key[i++] = 'Q';
       key[i++] = '{';
-      System.arraycopy(uri, 0, key, i, ul);
+      Array.copyFromStart(uri, ul, key, i);
       key[i + ul] = '}';
       i += ul + 1;
     }
     if(pl != 0) {
-      System.arraycopy(prefix, 0, key, i, pl);
+      Array.copyFromStart(prefix, pl, key, i);
       key[i + pl] = ':';
       i += pl + 1;
     }
-    System.arraycopy(local, 0, key, i, local.length);
+    Array.copyFromStart(local, local.length, key, i);
     return key;
   }
 
@@ -386,8 +385,7 @@ public final class QNm extends Item {
    * @return QName as token
    */
   public static byte[] eqName(final byte[] uri, final byte[] local) {
-    return new TokenBuilder(QueryText.EQNAME).add(uri).add(QueryText.CURLY2).
-        add(local).finish();
+    return Token.concat(QueryText.EQNAME, uri, QueryText.CURLY2, local);
   }
 
   @Override

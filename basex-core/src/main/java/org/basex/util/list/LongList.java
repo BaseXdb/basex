@@ -53,7 +53,7 @@ public class LongList extends ElementList {
     long[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
-    System.arraycopy(elements, 0, lst, s, l);
+    Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;
     return this;

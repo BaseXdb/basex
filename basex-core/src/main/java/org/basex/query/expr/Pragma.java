@@ -85,7 +85,7 @@ public abstract class Pragma extends ExprInfo {
 
   @Override
   public final String toString() {
-    final TokenBuilder tb = new TokenBuilder(PRAGMA + ' ' + name + ' ');
+    final TokenBuilder tb = new TokenBuilder().add(PRAGMA + ' ' + name + ' ');
     if(value.length != 0) tb.add(value).add(' ');
     return tb.add(PRAGMA2).toString();
   }

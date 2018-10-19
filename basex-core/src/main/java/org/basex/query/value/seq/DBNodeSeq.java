@@ -71,7 +71,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo info) {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(qc, info));
     return vb.value();

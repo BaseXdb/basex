@@ -128,6 +128,13 @@ public final class MixedTest extends AdvancedQueryTest {
   @Test
   public void gh1567() {
     query("let $_ := '_' return document { <_/> }/*[self::*[name() = $_]]", "<_/>");
+    query("let $_ := '_' return document { <_/> }/*[self::*/name() = $_]", "<_/>");
+    query("let $_ := '_' return document { <_/> }/*[name(self::*) = $_]", "<_/>");
+    query("let $_ := '_' return document { <_/> }/*[name() = $_]", "<_/>");
+    query("document { <_/> }/*[self::*[name() = '_']]", "<_/>");
+    query("document { <_/> }/*[self::*/name() = '_']", "<_/>");
+    query("document { <_/> }/*[name(self::*) = '_']", "<_/>");
+    query("document { <_/> }/*[name() = '_']", "<_/>");
   }
 
   /** Optimizations of nested path expressions. */

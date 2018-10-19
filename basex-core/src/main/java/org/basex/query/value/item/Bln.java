@@ -32,11 +32,10 @@ public final class Bln extends Item {
 
   /**
    * Constructor, adding a full-text score.
-   * @param value boolean value
    * @param score score value
    */
-  private Bln(final boolean value, final double score) {
-    this(value);
+  private Bln(final double score) {
+    this(true);
     this.score = score;
   }
 
@@ -47,7 +46,7 @@ public final class Bln extends Item {
    * @return item
    */
   public static Bln get(final boolean value, final double score) {
-    return value && score != 0 ? new Bln(true, score) : get(value);
+    return value && score != 0 ? new Bln(score) : get(value);
   }
 
   /**
@@ -114,7 +113,7 @@ public final class Bln extends Item {
 
   @Override
   public String toString() {
-    return new TokenBuilder(value ? Token.TRUE : Token.FALSE).add("()").toString();
+    return Strings.concat(value ? Token.TRUE : Token.FALSE, "()");
   }
 
   /**

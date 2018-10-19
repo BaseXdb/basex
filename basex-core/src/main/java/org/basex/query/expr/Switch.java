@@ -112,7 +112,7 @@ public final class Switch extends ParseExpr {
     if(tmpGroups.size() != groups.length) {
       // branches have changed
       cc.info(OPTSIMPLE_X, this);
-      groups = tmpGroups.toArray(new SwitchGroup[tmpGroups.size()]);
+      groups = tmpGroups.toArray(new SwitchGroup[0]);
     }
 
     // return first expression if all return expressions are equal, or if only one branch is left

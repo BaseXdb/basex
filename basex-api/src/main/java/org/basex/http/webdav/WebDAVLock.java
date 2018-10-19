@@ -12,9 +12,9 @@ import com.bradmcevoy.http.*;
  */
 final class WebDAVLock {
   /** Lock token. */
-  LockToken token;
+  final LockToken token;
   /** Lock path. */
-  String path;
+  final String path;
 
   /**
    * Constructor.

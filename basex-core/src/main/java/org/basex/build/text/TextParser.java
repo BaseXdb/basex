@@ -58,6 +58,7 @@ public final class TextParser extends SingleParser {
           builder.openElem(LINE, atts, nsp);
           builder.text(tb.next());
           builder.closeElem();
+          line++;
         } else {
           tb.add(XMLToken.valid(ch) ? ch : REPLACEMENT);
         }

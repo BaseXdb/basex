@@ -45,6 +45,21 @@ public final class BoolList extends ElementList {
   }
 
   /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public BoolList add(final boolean... elements) {
+    boolean[] lst = list;
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    Array.copyFromStart(elements, l, lst, s);
+    list = lst;
+    size = ns;
+    return this;
+  }
+
+  /**
    * Returns the element at the specified index.
    * @param index index of the element to return
    * @return element

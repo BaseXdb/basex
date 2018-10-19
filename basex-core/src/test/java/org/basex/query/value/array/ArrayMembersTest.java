@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests for {@link Array#iterator(long)}.
+ * Tests for {@link XQArray#iterator(long)}.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
@@ -19,7 +19,7 @@ public final class ArrayMembersTest extends ArrayTest {
   @Test public void randomTest() {
     for(int n = 0; n < 1_000; n++) {
       final Random rng = new Random(1337 + n);
-      Array arr = Array.empty();
+      XQArray arr = XQArray.empty();
       final ArrayList<Integer> list = new ArrayList<>(n);
       for(int i = 0; i < n; i++) {
         final int insPos = rng.nextInt(i + 1);

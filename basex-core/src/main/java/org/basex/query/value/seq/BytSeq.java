@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Sequence of items of type {@link Int xs:byte}, containing at least two of them.
@@ -70,19 +71,15 @@ public final class BytSeq extends NativeSeq {
    * @throws QueryException query exception
    */
   public static Value get(final int size, final Value... values) throws QueryException {
-    final byte[] tmp = new byte[size];
-    int t = 0;
+    final ByteList tmp = new ByteList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) value.size();
       if(value instanceof BytSeq) {
-        final BytSeq seq = (BytSeq) value;
-        System.arraycopy(seq.values, 0, tmp, t, vs);
-        t += vs;
+        tmp.add(((BytSeq) value).values);
       } else {
-        for(final Item item : value) tmp[t++] = (byte) item.itr(null);
+        for(final Item item : value) tmp.add((byte) item.itr(null));
       }
     }
-    return get(tmp);
+    return get(tmp.finish());
   }
 }

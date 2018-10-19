@@ -75,10 +75,9 @@ public final class DecSeq extends NativeSeq {
     int t = 0;
     for(final Value value : values) {
       // speed up construction, depending on input
-      final int vs = (int) value.size();
       if(value instanceof DecSeq) {
-        final DecSeq seq = (DecSeq) value;
-        System.arraycopy(seq.values, 0, tmp, t, vs);
+        final int vs = (int) value.size();
+        Array.copyFromStart(((DecSeq) value).values, vs, tmp, t);
         t += vs;
       } else {
         for(final Item item : value) tmp[t++] = item.dec(null);

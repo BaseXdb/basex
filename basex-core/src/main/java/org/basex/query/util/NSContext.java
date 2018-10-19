@@ -21,37 +21,41 @@ public final class NSContext {
 
   /**
    * Validates and adds the specified namespace at parsing time.
-   * @param pref namespace prefix
+   * @param prefix namespace prefix
    * @param uri namespace URI
    * @param info input info
    * @throws QueryException query exception
    */
-  public void add(final byte[] pref, final byte[] uri, final InputInfo info) throws QueryException {
-    if(eq(pref, XML, XMLNS)) throw BINDXML_X.get(info, pref);
+  public void add(final byte[] prefix, final byte[] uri, final InputInfo info)
+      throws QueryException {
+    if(eq(prefix, XML, XMLNS)) throw BINDXML_X.get(info, prefix);
     if(eq(uri, XML_URI)) throw BINDXMLURI_X_X.get(info, uri, XML);
     if(eq(uri, XMLNS_URI)) throw BINDXMLURI_X_X.get(info, uri, XMLNS);
-    ns.add(pref, uri);
+    ns.add(prefix, uri);
   }
 
   /**
    * Deletes the specified namespace at parsing time.
-   * @param pref namespace prefix
+   * @param prefix namespace prefix
    */
-  public void delete(final byte[] pref) {
+  public void delete(final byte[] prefix) {
     for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(pref, ns.name(s))) ns.delete(s);
+      if(eq(prefix, ns.name(s))) {
+        ns.remove(s);
+        break;
+      }
     }
   }
 
   /**
    * Finds the namespace URI for the specified prefix if it is found
    * in statically declared namespaces.
-   * @param pref prefix of the namespace
+   * @param prefix prefix of the namespace
    * @return uri or {@code null}
    */
-  public byte[] staticURI(final byte[] pref) {
+  public byte[] staticURI(final byte[] prefix) {
     for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(ns.name(s), pref)) return ns.value(s);
+      if(eq(ns.name(s), prefix)) return ns.value(s);
     }
     return null;
   }
@@ -59,17 +63,17 @@ public final class NSContext {
   /**
    * Returns the namespace URI for the specified prefix if it is either found in the dynamic,
    * static or predefined namespaces.
-   * @param pref prefix of the namespace
+   * @param prefix prefix of the namespace
    * @return namespace URI or {@code null}
    */
-  public byte[] uri(final byte[] pref) {
+  public byte[] uri(final byte[] prefix) {
     if(stack != null) {
       for(int s = stack.size() - 1; s >= 0; s--) {
-        if(eq(stack.name(s), pref)) return stack.value(s);
+        if(eq(stack.name(s), prefix)) return stack.value(s);
       }
     }
-    final byte[] u = staticURI(pref);
-    return u == null ? pref.length == 0 ? null : NSGlobal.uri(pref) : u.length == 0 ? null : u;
+    final byte[] u = staticURI(prefix);
+    return u == null ? prefix.length == 0 ? null : NSGlobal.uri(prefix) : u.length == 0 ? null : u;
   }
 
   /**
@@ -82,19 +86,19 @@ public final class NSContext {
 
   /**
    * Sets the number of dynamic namespaces.
-   * @param s namespaces
+   * @param size number of namespaces
    */
-  public void size(final int s) {
-    stack().size(s);
+  public void size(final int size) {
+    stack().size(size);
   }
 
   /**
    * Adds a namespace to the namespace stack.
-   * @param pref namespace prefix
+   * @param prefix namespace prefix
    * @param uri namespace URI
    */
-  public void add(final byte[] pref, final byte[] uri) {
-    stack().add(pref, uri);
+  public void add(final byte[] prefix, final byte[] uri) {
+    stack().add(prefix, uri);
   }
 
   /**

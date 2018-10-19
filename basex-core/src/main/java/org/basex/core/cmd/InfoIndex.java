@@ -105,7 +105,7 @@ public final class InfoIndex extends AInfo {
   private static byte[] info(final String desc, final IndexType it, final Data data,
       final MainOptions options, final boolean avl) {
 
-    final TokenBuilder tb = new TokenBuilder(desc).add(NL);
+    final TokenBuilder tb = new TokenBuilder().add(desc).add(NL);
     if(avl) tb.add(data.info(it, options));
     else tb.add(LI).addExt(NOT_AVAILABLE, it).add(NL);
     return tb.add(NL).finish();

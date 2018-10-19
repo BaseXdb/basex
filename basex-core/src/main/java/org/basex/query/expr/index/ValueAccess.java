@@ -276,7 +276,7 @@ public final class ValueAccess extends IndexAccess {
     final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
         ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
     tb.add(func.args(db.source(), toExpr()).substring(1));
-    if(test != null) tb.add("/parent::").addExt(test);
+    if(test != null) tb.add("/parent::").add(test);
     return tb.toString();
   }
 

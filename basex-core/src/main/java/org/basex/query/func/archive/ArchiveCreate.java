@@ -73,7 +73,6 @@ public class ArchiveCreate extends ArchiveFn {
         throw ARCHIVE_FORMAT_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
       }
       if(Strings.eq(alg, STORED)) level = ZipEntry.STORED;
-      else if(Strings.eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
     }
     return level;
   }

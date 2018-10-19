@@ -26,7 +26,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
   /** Current state. */
   private State state = State.BUILD;
-  /** Indicates if binary search can be used. */
+  /** Indicates if all nodes are {@link DBNode}s and refer to the same database. */
   private boolean dbnodes;
 
   /**
@@ -122,20 +122,23 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public boolean delete(final ANode node) {
+  public boolean removeAll(final ANode node) {
     if(dbnodes) {
+      if(!(node instanceof DBNode)) return false;
       final int p = binarySearch((DBNode) node, 0, size);
       if(p < 0) return false;
       remove(p);
       return true;
     }
-    return super.delete(node);
+    return super.removeAll(node);
   }
 
   @Override
   public boolean contains(final ANode node) {
-    return dbnodes ? node instanceof DBNode && binarySearch((DBNode) node, 0, size) > -1 :
-      super.contains(node);
+    if(dbnodes) {
+      return node instanceof DBNode && binarySearch((DBNode) node, 0, size) > -1;
+    }
+    return super.contains(node);
   }
 
   @Override

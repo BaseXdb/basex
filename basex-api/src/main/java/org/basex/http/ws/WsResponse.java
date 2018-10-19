@@ -15,6 +15,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.eclipse.jetty.websocket.api.*;
 
 /**
  * Creates WebSocket reponses.
@@ -24,7 +25,7 @@ import org.basex.query.value.item.*;
  */
 public final class WsResponse extends WebResponse {
   /** WebSocket. */
-  private WebSocket ws;
+  private final WebSocket ws;
 
   /** Function. */
   private WsFunction func;
@@ -39,7 +40,7 @@ public final class WsResponse extends WebResponse {
   }
 
   @Override
-  protected void init(final WebFunction function) throws QueryException, IOException {
+  protected void init(final WebFunction function) throws QueryException {
     func = new WsFunction(function.function, qc, function.module);
     qc.putProperty(HTTPText.WEBSOCKET, ws);
     qc.putProperty(HTTPText.REQUEST, ws.req);
@@ -56,16 +57,17 @@ public final class WsResponse extends WebResponse {
   public boolean serialize() throws QueryException, IOException {
     qc.register(ctx);
     try {
-      for(final Object value : serialize(qc.iter(), func.output)) {
-        // don't send anything if WebSocket gets closed because the connection is already closed
-        // We have to do this check inside the loop because the XQuery function should get executed
-        // too if it is a _WS_CLOSE function, just don't return a result.
-        if(func.matches(Annotation._WS_CLOSE, null)) continue;
-
-        if(value instanceof byte[]) {
-          ws.getSession().getRemote().sendBytes(ByteBuffer.wrap((byte[]) value));
-        } else {
-          ws.getSession().getRemote().sendString((String) value);
+      final ArrayList<Object> values = serialize(qc.iter(), func.output);
+      // don't send anything if the WebSocket connection has been closed
+      if(!func.matches(Annotation._WS_CLOSE, null) &&
+         !func.matches(Annotation._WS_ERROR, null)) {
+        for(final Object value : values) {
+          final RemoteEndpoint remote = ws.getSession().getRemote();
+          if(value instanceof ByteBuffer) {
+            remote.sendBytes((ByteBuffer) value);
+          } else {
+            remote.sendString((String) value);
+          }
         }
       }
     } finally {
@@ -87,17 +89,14 @@ public final class WsResponse extends WebResponse {
       throws QueryException, IOException {
 
     final ArrayList<Object> list = new ArrayList<>();
-    final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao, opts);
+    final SerialMethod method = opts.get(SerializerOptions.METHOD);
     for(Item item; (item = iter.next()) != null;) {
-      ser.reset();
-      ser.serialize(item);
-      if(item instanceof Bin) {
-        list.add(ao.toArray());
-      } else {
-        list.add(ao.toString());
-      }
-      ao.reset();
+      // serialize maps and arrays as JSON
+      final boolean json = method == SerialMethod.BASEX && item instanceof FItem;
+      opts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
+      // interpret result as binary or string
+      final ArrayOutput ao = item.serialize(opts);
+      list.add(item instanceof Bin ? ByteBuffer.wrap(ao.toArray()) : ao.toString());
     }
     return list;
   }

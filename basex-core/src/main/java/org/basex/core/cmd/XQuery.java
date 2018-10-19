@@ -1,6 +1,5 @@
 package org.basex.core.cmd;
 
-import org.basex.core.users.*;
 import org.basex.query.value.*;
 
 /**
@@ -15,7 +14,7 @@ public final class XQuery extends AQuery {
    * @param query query to evaluate
    */
   public XQuery(final String query) {
-    super(Perm.NONE, false, query);
+    super(false, query);
   }
 
   @Override

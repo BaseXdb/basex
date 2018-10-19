@@ -213,7 +213,7 @@ public final class ModuleLoader {
     for(final PkgComponent comp : pkg.comps) {
       qp.module(new IOFile(modDir, comp.file).path(), comp.uri, info);
     }
-    if(toLoad.contains(id)) toLoad.remove(id);
+    toLoad.remove(id);
     loaded.add(id);
   }
 

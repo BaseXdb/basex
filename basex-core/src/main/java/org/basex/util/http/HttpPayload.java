@@ -22,10 +22,11 @@ import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.list.*;
 
 /**
@@ -192,10 +193,9 @@ public final class HttpPayload {
       parts.add(new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type.toString()));
     }
 
-    byte[] payload = extractPart(sep, end, type.parameters().get(CHARSET));
+    final byte[] payload = extractPart(sep, end, type.parameters().get(CHARSET));
     if(payloads != null) {
-      if(base64) payload = org.basex.util.Base64.decode(payload);
-      payloads.add(parse(payload, type));
+      payloads.add(parse(base64 ? Base64.decode(payload) : payload, type));
     }
     return true;
   }
@@ -281,7 +281,7 @@ public final class HttpPayload {
           Value value = data.get(name);
           if(filename != null) {
             // assign file and contents, join multiple files
-            final Map map = value instanceof Map ? (Map) value : Map.EMPTY;
+            final XQMap map = value instanceof XQMap ? (XQMap) value : XQMap.EMPTY;
             final Str file = Str.get(filename);
             final B64 contents = B64.get(cont.next());
             final Value files = new ItemList().add(map.get(file, info)).add(contents).value();

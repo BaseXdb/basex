@@ -28,9 +28,9 @@ public final class BinInsertBefore extends BinFn {
 
     final byte[] tmp = new byte[bl + xl];
     final int o = bounds[0];
-    System.arraycopy(bytes, 0, tmp, 0, o);
-    System.arraycopy(extra, 0, tmp, o, xl);
-    System.arraycopy(bytes, o, tmp, o + xl, bl - o);
+    Array.copy(bytes, o, tmp);
+    Array.copyFromStart(extra, xl, tmp, o);
+    Array.copy(bytes, o, bl - o, tmp, o + xl);
     return B64.get(tmp);
   }
 }

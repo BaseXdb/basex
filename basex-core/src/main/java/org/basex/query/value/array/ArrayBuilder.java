@@ -5,16 +5,16 @@ import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
- * A builder for creating an {@link Array} by prepending and appending elements.
+ * A builder for creating an {@link XQArray} by prepending and appending elements.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
 public final class ArrayBuilder {
   /** Capacity of the root. */
-  private static final int CAP = 2 * Array.MAX_DIGIT;
+  private static final int CAP = 2 * XQArray.MAX_DIGIT;
   /** Size of inner nodes. */
-  private static final int NODE_SIZE = (Array.MIN_LEAF + Array.MAX_LEAF + 1) / 2;
+  private static final int NODE_SIZE = (XQArray.MIN_LEAF + XQArray.MAX_LEAF + 1) / 2;
 
   /** Ring buffer containing the root-level elements. */
   private final Value[] vals = new Value[CAP];
@@ -34,11 +34,11 @@ public final class ArrayBuilder {
    * @return self reference for convenience
    */
   public ArrayBuilder prepend(final Value elem) {
-    if(inLeft < Array.MAX_DIGIT) {
+    if(inLeft < XQArray.MAX_DIGIT) {
       // just insert the element
       vals[(mid - inLeft + CAP - 1) % CAP] = elem;
       inLeft++;
-    } else if(tree.isEmpty() && inRight < Array.MAX_DIGIT) {
+    } else if(tree.isEmpty() && inRight < XQArray.MAX_DIGIT) {
       // move the middle to the left
       mid = (mid + CAP - 1) % CAP;
       vals[(mid - inLeft + CAP) % CAP] = elem;
@@ -71,11 +71,11 @@ public final class ArrayBuilder {
    * @return self reference for convenience
    */
   public ArrayBuilder append(final Value elem) {
-    if(inRight < Array.MAX_DIGIT) {
+    if(inRight < XQArray.MAX_DIGIT) {
       // just insert the element
       vals[(mid + inRight) % CAP] = elem;
       inRight++;
-    } else if(tree.isEmpty() && inLeft < Array.MAX_DIGIT) {
+    } else if(tree.isEmpty() && inLeft < XQArray.MAX_DIGIT) {
       // move the middle to the right
       mid = (mid + 1) % CAP;
       vals[(mid + inRight + CAP - 1) % CAP] = elem;
@@ -106,7 +106,7 @@ public final class ArrayBuilder {
    * @param arr array to append
    * @return self reference for convenience
    */
-  public ArrayBuilder append(final Array arr) {
+  public ArrayBuilder append(final XQArray arr) {
     if(!(arr instanceof BigArray)) {
       for(final Value value : arr.members()) append(value);
       return this;
@@ -127,10 +127,10 @@ public final class ArrayBuilder {
       final Value[] temp = new Value[k];
       final int l = (mid - inLeft + CAP) % CAP, m = CAP - l;
       if(k <= m) {
-        System.arraycopy(vals, l, temp, 0, k);
+        Array.copyToStart(vals, l, k, temp);
       } else {
-        System.arraycopy(vals, l, temp, 0, m);
-        System.arraycopy(vals, 0, temp, m, k - m);
+        Array.copyToStart(vals, l, m, temp);
+        Array.copyFromStart(vals, k - m, temp, m);
       }
 
       inLeft = inRight = 0;
@@ -142,7 +142,7 @@ public final class ArrayBuilder {
     }
 
     final int inMiddle = inRight + big.left.length,
-        leaves = (inMiddle + Array.MAX_LEAF - 1) / Array.MAX_LEAF,
+        leaves = (inMiddle + XQArray.MAX_LEAF - 1) / XQArray.MAX_LEAF,
         leafSize = (inMiddle + leaves - 1) / leaves;
     for(int i = 0, l = 0; l < leaves; l++) {
       final int inLeaf = Math.min(leafSize, inMiddle - i);
@@ -161,15 +161,15 @@ public final class ArrayBuilder {
   }
 
   /**
-   * Creates an {@link Array} containing the elements of this builder.
+   * Creates an {@link XQArray} containing the elements of this builder.
    * @return resulting array
    */
-  public Array freeze() {
+  public XQArray freeze() {
     final int n = inLeft + inRight;
-    if(n == 0) return Array.empty();
+    if(n == 0) return XQArray.empty();
 
     final int start = (mid - inLeft + CAP) % CAP;
-    if(n <= Array.MAX_SMALL) {
+    if(n <= XQArray.MAX_SMALL) {
       // small int array, fill directly
       final Value[] small = new Value[n];
       for(int i = 0; i < n; i++) small[i] = vals[(start + i) % CAP];

@@ -9,7 +9,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Inner node of a {@link Map}.
+ * Inner node of a {@link XQMap}.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
@@ -41,7 +41,7 @@ final class TrieBranch extends TrieNode {
    */
   TrieNode[] copyKids() {
     final TrieNode[] copy = new TrieNode[KIDS];
-    System.arraycopy(kids, 0, copy, 0, KIDS);
+    Array.copy(kids, KIDS, copy);
     return copy;
   }
 

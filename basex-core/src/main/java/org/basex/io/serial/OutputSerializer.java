@@ -63,9 +63,12 @@ public abstract class OutputSerializer extends Serializer {
     final int limit = sopts.get(LIMIT);
     if(limit != -1) po.setLimit(limit);
 
-    final byte[] nl = token(sopts.get(NEWLINE).newline());
-    if(nl.length != 1 || nl[0] != '\n') po = new NewlineOutput(po, nl);
+    final Newline nl = sopts.get(NEWLINE);
+    if(nl != Newline.NL) po = new NewlineOutput(po, token(nl.newline()));
     out = po;
+
+    final String is = sopts.get(ITEM_SEPARATOR);
+    if(is != null) itemsep = token(is);
   }
 
   @Override
@@ -84,7 +87,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Indents the next text.
+   * Prints indentation whitespaces.
    * @throws IOException I/O exception
    */
   protected void indent() throws IOException {
@@ -93,6 +96,17 @@ public abstract class OutputSerializer extends Serializer {
       final int ls = level * indents;
       for(int l = 0; l < ls; l++) out.print(tab);
     }
+  }
+
+  /**
+   * Prints an item separator.
+   * @throws IOException I/O exception
+   * @return boolean indicating if separator was printed
+   */
+  protected boolean separate() throws IOException {
+    if(!more || itemsep == null) return false;
+    out.print(itemsep);
+    return true;
   }
 
   /**
@@ -112,15 +126,6 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected void printChar(final int cp) throws IOException {
     out.print(cp);
-  }
-
-  /**
-   * Sets the item separator.
-   * @param def default separator
-   */
-  protected final void itemsep(final String def) {
-    final String is = sopts.get(ITEM_SEPARATOR);
-    itemsep = sopts.contains(ITEM_SEPARATOR) ? token(is) : def == null ? null : token(def);
   }
 
   /**

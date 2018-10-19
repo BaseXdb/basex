@@ -72,7 +72,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   protected static void error(final String query, final QueryError... error) {
     try {
       final String res = eval(query);
-      final TokenBuilder tb = new TokenBuilder("Query did not fail:\n");
+      final TokenBuilder tb = new TokenBuilder().add("Query did not fail:\n");
       tb.add(query).add("\n[E] Error: ");
       for(final QueryError e : error) tb.add(' ').add(e.qname().prefixId());
       fail(tb.add("\n[F] ").add(res).toString());
@@ -100,20 +100,23 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     for(final QueryError e : errors) found |= err != null ? err == e : e.qname().eq(ex.qname());
 
     if(!found) {
-      final TokenBuilder tb = new TokenBuilder("\n");
-      if(query != null) tb.add("Query: ").add(query).add("\n");
+      final TokenBuilder tb = new TokenBuilder().add('\n');
+      if(query != null) tb.add("Query: ").add(query).add('\n');
       tb.add("Error(s): ");
       if(err != null) {
         int c = 0;
         for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.name());
         ex.printStackTrace();
-        fail(tb.add("\nResult: ").add(err.name() + " (" + ex.getLocalizedMessage() + ')').
-            toString());
+        tb.add("\nResult: ").add(err.name() + " (" + ex.getLocalizedMessage() + ')');
       } else {
         int c = 0;
-        for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.qname().local());
-        fail(tb.add("\nResult: ").add(ex.qname().string()).toString());
+        for(final QueryError er : errors) {
+          if(c++ > 0) tb.add('/');
+          tb.add(er.qname().local());
+        }
+        tb.add("\nResult: ").add(ex.qname().string());
       }
+      fail(tb.toString());
     }
   }
 

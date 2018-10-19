@@ -56,11 +56,6 @@ public final class BufferOutput extends OutputStream {
   }
 
   @Override
-  public void write(final byte[] b) throws IOException {
-    super.write(b);
-  }
-
-  @Override
   public void flush() throws IOException {
     out.write(buffer, 0, pos);
     pos = 0;

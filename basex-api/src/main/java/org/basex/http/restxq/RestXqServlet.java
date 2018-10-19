@@ -7,7 +7,6 @@ import javax.servlet.http.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -66,22 +65,11 @@ public final class RestXqServlet extends BaseXServlet {
   public String username(final HTTPConnection http) {
     // try to retrieve session id (DBA, global one)
     final HttpSession session = http.req.getSession(false);
-    byte[] value = null;
     if(session != null) {
-      value = token(session.getAttribute("id"));
-      if((http.path() + '/').contains('/' + DBA + '/')) value = token(session.getAttribute(DBA));
+      final String id = (http.path() + '/').contains('/' + DBA + '/') ? DBA : ID;
+      final byte[] value = HTTPContext.token(session.getAttribute(id));
+      if(value != null) return Token.string(value);
     }
-    return value != null ? Token.string(Token.normalize(value)) : super.username(http);
-  }
-
-  /**
-   * Tries to convert the specified session value to a string.
-   * @param value value
-   * @return return string or {@code null}
-   */
-  private static byte[] token(final Object value) {
-    if(value instanceof Str) return ((Str) value).string();
-    if(value instanceof Atm) return ((Atm) value).string(null);
-    return null;
+    return super.username(http);
   }
 }

@@ -29,7 +29,7 @@ public final class MapMerge extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = exprs[0].iter(qc);
     final MergeDuplicates merge = options(qc).get(MergeOptions.DUPLICATES);
-    Map map = Map.EMPTY;
+    XQMap map = XQMap.EMPTY;
     for(Item item; (item = qc.next(maps)) != null;) map = map.addAll(toMap(item), merge, info, qc);
     return map;
   }

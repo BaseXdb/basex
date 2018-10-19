@@ -32,7 +32,7 @@ public final class Var extends ExprInfo {
   public Data data;
 
   /** Stack slot number. */
-  int slot = -1;
+  int slot;
 
   /** Actual type (by type inference). */
   private final ExprType exprType = new ExprType(SeqType.ITEM_ZM);
@@ -263,7 +263,7 @@ public final class Var extends ExprInfo {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(QueryText.NAME, '$' + Token.string(name.string()),
+    final FElem elem = planElem(QueryText.NAME, toErrorString(),
         Token.ID, Token.token(id), QueryText.TYPE, seqType());
     if(declType != null) elem.add(planAttr(QueryText.AS, declType.toString()));
     if(promote) elem.add(planAttr(QueryText.PROMOTE, true));
@@ -272,14 +272,13 @@ public final class Var extends ExprInfo {
 
   @Override
   public String toErrorString() {
-    return new TokenBuilder().add(QueryText.DOLLAR).add(name.string()).toString();
+    return Strings.concat(QueryText.DOLLAR, name.string());
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(QueryText.DOLLAR).add(name.string()).add('_').addInt(id);
-    if(declType != null) tb.add(' ').add(QueryText.AS).add(' ').addExt(declType);
+    final TokenBuilder tb = new TokenBuilder().add(toErrorString()).add('_').addInt(id);
+    if(declType != null) tb.add(' ').add(QueryText.AS).add(' ').add(declType);
     return tb.toString();
   }
 }

@@ -78,7 +78,7 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   final Expr opt(final OpV op, final CompileContext cc) throws QueryException {
-    Expr expr = optEqual(op, true, cc);
+    Expr expr = optEqual(op, this instanceof CmpV, cc);
     if(expr == this) expr = optFalse(op, cc);
     if(expr == this) expr = optCount(op, cc);
     if(expr == this) expr = optStringLength(op, cc);

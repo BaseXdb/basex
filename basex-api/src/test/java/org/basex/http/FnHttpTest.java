@@ -11,14 +11,15 @@ import java.net.*;
 import java.nio.charset.*;
 import java.util.*;
 import java.util.List;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
-import org.basex.query.QueryError.ErrType;
 import org.basex.query.*;
+import org.basex.query.QueryError.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -28,7 +29,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.basex.util.http.HttpRequest.Part;
+import org.basex.util.http.HttpRequest.*;
 import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.Test;
@@ -348,78 +349,60 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test public void errors() throws IOException {
     // Incorrect requests
-    final List<byte[]> falseReqs = new ArrayList<>();
+    final HashMap<String, String> queries = new HashMap<>();
 
-    // Request without method
-    final byte[] falseReq1 = token("<http:request "
+    queries.put("Request without method", "<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "href='" + REST_ROOT + "'/>");
-    falseReqs.add(falseReq1);
 
-    // Request with send-authorization and no credentials
-    final byte[] falseReq2 = token("<http:request "
-        + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='" + REST_ROOT + "' "
-        + "send-authorization='true'/>");
-    falseReqs.add(falseReq2);
+    queries.put("Request with send-authorization and only username",
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
+        + "method='GET' href='" + REST_ROOT + "' username='test'/>");
 
-    // Request with send-authorization and only username
-    final byte[] falseReq3 = token("<http:request "
-        + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='" + REST_ROOT + "' "
-        + "send-authorization='true' username='test'/>");
-    falseReqs.add(falseReq3);
-
-    // Request with body that has no media-type
-    final byte[] falseReq4 = token("<http:request "
-        + "xmlns:http='http://expath.org/ns/http-client' "
+    queries.put("Request with body that has no media-type",
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>" + "<http:body>"
         + "</http:body>" + "</http:request>");
-    falseReqs.add(falseReq4);
 
-    // Request with multipart that has no media-type
-    final byte[] falseReq5 = token("<http:request method='POST' "
-        + "xmlns:http='http://expath.org/ns/http-client' "
-        + "href='" + REST_ROOT + "'>" + "<http:multipart boundary='xxx'>"
+    queries.put("Request with multipart that has no media-type",
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
+        + " method='POST' href='" + REST_ROOT + "'>" + "<http:multipart boundary='xxx'>"
         + "</http:multipart>" + "</http:request>");
-    falseReqs.add(falseReq5);
 
-    // Request with multipart with part that has a body without media-type
-    final byte[] falseReq6 = token("<http:request method='POST' "
-        + "xmlns:http='http://expath.org/ns/http-client' "
-        + "href='" + REST_ROOT + "'>" + "<http:multipart boundary='xxx'>"
+    queries.put("Request with multipart with part that has a body without media-type",
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
+        + " method='POST' href='" + REST_ROOT + "'>" + "<http:multipart boundary='xxx'>"
         + "<http:header name='hdr1' value-='val1'/>"
         + "<http:body media-type='text/plain'>" + "Part1" + "</http:body>"
         + "<http:header name='hdr1' value-='val1'/>"
         + "<http:body>" + "Part1" + "</http:body>"
         + "</http:multipart>" + "</http:request>");
-    falseReqs.add(falseReq6);
 
-    // Request with schema different from http
-    final byte[] falseReq7 = token("<http:request "
-        + "xmlns:http='http://expath.org/ns/http-client' "
+    queries.put("Request with schema different from http",
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "href='ftp://basex.org'/>");
-    falseReqs.add(falseReq7);
 
-    // Request with content and method which must be empty
-    final byte[] falseReq8 = token("<http:request "
-        + "xmlns:http='http://expath.org/ns/http-client' "
+    queries.put("Request with content and method which must be empty",
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='DELETE' href='" + REST_ROOT + "'>"
         + "<http:body media-type='text/plain'>" + "</http:body>"
         + "</http:request>");
-    falseReqs.add(falseReq8);
 
-    for(final byte[] falseReq : falseReqs) {
-      final DBNode dbNode = new DBNode(new IOContent(falseReq));
+    final StringBuilder error = new StringBuilder();
+    for(final Entry<String, String> entry : queries.entrySet()) {
+      final String name = entry.getKey(), query = entry.getValue();
+      final DBNode dbNode = new DBNode(new IOContent(query));
       try {
         final HttpRequestParser rp = new HttpRequestParser(null);
         rp.parse(dbNode.children().next(), Empty.SEQ);
-        fail("Exception not thrown");
+        error.append(name + ": Request did not fail.");
       } catch (final QueryException ex) {
-        assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
+        if(!ex.getMessage().contains(ErrType.HC.toString())) {
+          error.append(name + ": Wrong error code (" + ex.getMessage() + ")");
+        }
       }
     }
-
+    if(error.length() != 0) fail(error.toString());
   }
 
   /**
@@ -825,9 +808,8 @@ public class FnHttpTest extends HTTPTest {
       if(ret.type == NodeType.ELM) ret = reorderHeaders(ret);
       // compare items
       if(!new DeepEqual().equal(exp, ret)) {
-        final TokenBuilder tb = new TokenBuilder("Result ").addLong(e).add(" differs:\nReturned: ");
-        tb.addExt(ret.serialize()).add("\nExpected: ").addExt(exp.serialize());
-        fail(tb.toString());
+        fail(Strings.concat("Result ", e, " differs:\nReturned: ",
+            ret.serialize().finish(), "\nExpected: ", exp.serialize()));
       }
     }
   }
@@ -893,7 +875,7 @@ public class FnHttpTest extends HTTPTest {
    * @return output stream
    * @throws MalformedURLException exception
    */
-  private ByteArrayOutputStream fakeOutput() throws MalformedURLException {
+  private static ByteArrayOutputStream fakeOutput() throws MalformedURLException {
     return new FakeHttpConnection().getOutputStream();
   }
 }

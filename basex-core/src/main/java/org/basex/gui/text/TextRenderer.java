@@ -490,7 +490,7 @@ final class TextRenderer extends BaseXBack {
           // draw character by character (required by Java 9), but combine zero-width characters
           cp = iter.next();
           int xx = x;
-          for(int cw = 0, xxx = xx + charWidth(cp); iter.more();) {
+          for(int cw, xxx = xx + charWidth(cp); iter.more();) {
             stringCache.reset();
             do {
               stringCache.add(cp);

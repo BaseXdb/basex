@@ -31,6 +31,6 @@ public final class QueryFocus {
 
   @Override
   public String toString() {
-    return Util.className(this) + "[" + value + ": " + pos + "/" + size + " ]";
+    return Util.className(this) + '[' + value + ": " + pos + '/' + size + " ]";
   }
 }

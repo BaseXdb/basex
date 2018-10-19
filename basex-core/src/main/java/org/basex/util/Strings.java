@@ -127,7 +127,7 @@ public final class Strings {
   }
 
   /**
-   * Deletes a character from the strings.
+   * Deletes a character from a string.
    * @param string string
    * @param ch character to be removed
    * @return resulting token
@@ -145,9 +145,9 @@ public final class Strings {
   }
 
   /**
-   * Checks if a character occurs in a strings.
+   * Checks if a string contains a character.
    * @param string string
-   * @param ch character to be found
+   * @param ch character to search for
    * @return result of check
    */
   public static boolean contains(final String string, final char ch) {
@@ -396,5 +396,14 @@ public final class Strings {
    */
   private static boolean equals(final char input, final char query) {
     return query == (Character.isUpperCase(query) ? input : Character.toLowerCase(input));
+  }
+
+  /**
+   * Concatenates multiple objects.
+   * @param objects objects
+   * @return resulting string
+   */
+  public static String concat(final Object... objects) {
+    return Token.string(Token.concat(objects));
   }
 }

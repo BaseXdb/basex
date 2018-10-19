@@ -1,6 +1,7 @@
 package org.basex.query.func.inspect;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryText.DOLLAR;
 import static org.basex.util.Token.*;
 
 import org.basex.io.*;
@@ -94,12 +95,12 @@ final class XQDoc extends Inspect {
       if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
       annotations(sf.anns, function);
 
-      final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(sf.anns);
-      tb.add(FUNCTION).add(' ').add(name.string()).add(PAREN1);
+      final TokenBuilder tb = new TokenBuilder();
+      tb.add(DECLARE).add(' ').add(sf.anns).add(FUNCTION).add(' ').add(name.string()).add(PAREN1);
       for(int i = 0; i < al; i++) {
         final Var var = sf.params[i];
         if(i > 0) tb.add(SEP);
-        tb.add(DOLLAR).add(var.name.string()).add(' ').add(AS).add(' ').addExt(tp.argTypes[i]);
+        tb.add(DOLLAR).add(var.name.string()).add(' ').add(AS).add(' ').add(tp.argTypes[i]);
       }
       tb.add(PAREN2).add(' ' + AS + ' ' + tp.declType);
       if(sf.expr == null) tb.add(" external");

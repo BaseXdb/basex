@@ -11,21 +11,21 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class KindTest extends Test {
-  /** Static text node test. */
-  public static final KindTest TXT = new KindTest(NodeType.TXT);
-  /** Static PI node test. */
-  public static final KindTest PI = new KindTest(NodeType.PI);
-  /** Static element node test. */
-  public static final KindTest ELM = new KindTest(NodeType.ELM);
-  /** Static document node test. */
+  /** Generic document node test. */
   public static final KindTest DOC = new KindTest(NodeType.DOC);
-  /** Static attribute node test. */
+  /** Generic element node test. */
+  public static final KindTest ELM = new KindTest(NodeType.ELM);
+  /** Generic attribute node test. */
   public static final KindTest ATT = new KindTest(NodeType.ATT);
-  /** Static comment node test. */
+  /** Generic PI node test. */
+  public static final KindTest PI = new KindTest(NodeType.PI);
+  /** Generic text node test. No other {@link NodeType#TXT} tests exist. */
+  public static final KindTest TXT = new KindTest(NodeType.TXT);
+  /** Generic comment node test. No other {@link NodeType#COM} tests exist. */
   public static final KindTest COM = new KindTest(NodeType.COM);
-  /** Static comment node test. */
+  /** Generic namespace node test. No other {@link NodeType#COM} tests exist. */
   public static final KindTest NSP = new KindTest(NodeType.NSP);
-  /** Static node test. */
+  /** Generic node test. No other {@link NodeType#NOD} tests exist. */
   public static final KindTest NOD = new KindTest(NodeType.NOD) {
     @Override
     public boolean eq(final ANode it) { return true; }

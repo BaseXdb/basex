@@ -74,7 +74,7 @@ public final class Typeswitch extends ParseExpr {
       if(group.removeTypes(cc, types)) newGroups.add(group);
     }
     if(groups.length != newGroups.size()) {
-      groups = newGroups.toArray(new TypeswitchGroup[newGroups.size()]);
+      groups = newGroups.toArray(new TypeswitchGroup[0]);
     }
 
     // return first expression if all return expressions are equal and use no variables
@@ -179,7 +179,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(TYPESWITCH + PAREN1 + cond + PAREN2 + ' ').addSep(groups, " ").
-        toString();
+    return new TokenBuilder().add(TYPESWITCH).add(PAREN1).add(cond).add(PAREN2).add(' ').
+        addSep(groups, " ").toString();
   }
 }

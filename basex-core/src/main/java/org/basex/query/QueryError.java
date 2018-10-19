@@ -388,9 +388,9 @@ public enum QueryError {
   /** Error code. */
   SESSIONS_GET_X(SESSIONS, "get", "Stored attribute is no value: %."),
   /** Error code. */
-  SESSIONS_SET_X(SESSIONS, "http", "Function items cannot be stored: %."),
+  SESSIONS_SET_X(SESSIONS, "set", "Function items cannot be stored: %."),
   /** Error code. */
-  SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Session not found: %."),
+  SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Unknown session: %."),
   /** Error code. */
   SESSIONS_NOTFOUND(SESSIONS, "not-found", "Session not available."),
 
@@ -479,6 +479,13 @@ public enum QueryError {
   WEB_INVALID1_X(WEB, "invalid", "URL contains invalid characters: %"),
   /** Error code. */
   WEB_INVALID2_X(WEB, "invalid", "%."),
+
+  // WebSocket Module
+
+  /** Error code. */
+  WS_SET_X(WS, "set", "Function items cannot be stored: %."),
+  /** Error code. */
+  WS_NOTFOUND_X(WS, "not-found", "Unknown WebSocket: %."),
 
   // XQuery Module
 
@@ -1442,6 +1449,7 @@ public enum QueryError {
     /** Error type. */ REPO(REPO_PREFIX,         REPO_URI),
     /** Error type. */ SESSION(SESSION_PREFIX,   SESSION_URI),
     /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
+    /** Error type. */ WS(WS_PREFIX,             WS_URI),
     /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
     /** Error type. */ UNIT(UNIT_PREFIX,         UNIT_URI),
     /** Error type. */ UTIL(UTIL_PREFIX,         UTIL_URI),
@@ -1589,9 +1597,7 @@ public enum QueryError {
    */
   public static QueryException typeError(final SeqType found, final SeqType type, final QNm name,
       final InputInfo info) {
-
-    final byte[] value = new TokenBuilder().add('$').add(name.string()).finish();
-    return INVTYPE_X_X_X.get(info, found, type, value);
+    return INVTYPE_X_X_X.get(info, found, type, Token.concat('$', name.string()));
   }
 
   /**

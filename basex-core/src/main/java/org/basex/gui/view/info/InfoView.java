@@ -187,7 +187,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   public String setInfo(final String info, final Command cmd, final String time, final boolean ok,
       final boolean reset) {
 
-    final TokenBuilder tb = new TokenBuilder(all);
+    final TokenBuilder tb = new TokenBuilder().add(all);
     final StringList eval = new StringList(1);
     final StringList comp = new StringList(1);
     final StringList plan = new StringList(1);

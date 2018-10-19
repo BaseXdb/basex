@@ -6,7 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class ArrayForEachPair extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Array array1 = toArray(exprs[0], qc), array2 = toArray(exprs[1], qc);
+    final XQArray array1 = toArray(exprs[0], qc), array2 = toArray(exprs[1], qc);
     final FItem func = checkArity(exprs[2], 2, qc);
     final ArrayBuilder builder = new ArrayBuilder();
     final Iterator<Value> as = array1.iterator(0), bs = array2.iterator(0);

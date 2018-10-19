@@ -45,7 +45,7 @@ final class TreeNodeCache {
       }
     }
     maxLevel = alil.size();
-    nodes = alil.toArray(new IntList[alil.size()]);
+    nodes = alil.toArray(new IntList[0]);
   }
 
   /**
@@ -79,8 +79,7 @@ final class TreeNodeCache {
     }
 
     final int[] rlp = findPre(pre);
-    final int rl = rlp[0];
-    final int ri = rlp[1];
+    final int rl = rlp[0], ri = rlp[1];
 
     // level pair
     bo[rl] = new TreeBorder(rl, ri, 1);
@@ -99,10 +98,7 @@ final class TreeNodeCache {
       bo[i] = new TreeBorder(i, min, c);
       ++h;
     }
-
-    final TreeBorder[] bon = new TreeBorder[h];
-    System.arraycopy(bo, rl, bon, 0, h);
-    return bon;
+    return Arrays.copyOfRange(bo, rl, rl + h);
   }
 
   /**

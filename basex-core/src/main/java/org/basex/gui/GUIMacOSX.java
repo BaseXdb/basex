@@ -124,8 +124,7 @@ public final class GUIMacOSX extends GUIMacOS {
         result = GUIMacOSX.invoke(this, method.getName());
       }
       // mark the current event as 'handled' if handler doesn't return a false boolean
-      GUIMacOSX.invoke(obj, "setHandled",
-        result != null && Boolean.class.isInstance(result) ? (Boolean) result : true);
+      GUIMacOSX.invoke(obj, "setHandled", result instanceof Boolean ? (Boolean) result : true);
       return null;
     }
 
@@ -203,7 +202,7 @@ public final class GUIMacOSX extends GUIMacOS {
       final Class<?>[] params = { Window.class, Boolean.TYPE };
       final Method method = util.getMethod("setWindowCanFullScreen", params);
       method.invoke(util, window, true);
-    } catch(final Exception ignore) { }
+    } catch(final Exception ex) { Util.debug(ex); }
   }
 
   /**

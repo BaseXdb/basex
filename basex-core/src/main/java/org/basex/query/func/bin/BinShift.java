@@ -1,6 +1,7 @@
 package org.basex.query.func.bin;
 
 import java.math.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -21,7 +22,7 @@ public final class BinShift extends StandardFunc {
     if(b64 == null) return null;
     if(by == 0) return b64;
 
-    byte[] bytes = b64.binary(info);
+    final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
     if(bl == 1 && by < 8) {
       if(by > 0)  return B64.get((byte) (bytes[0] << by));
@@ -32,11 +33,7 @@ public final class BinShift extends StandardFunc {
     int r = 0;
     if(by > 7) {
       tmp = new BigInteger(bytes).shiftLeft((int) by).toByteArray();
-      if(tmp.length != bl) {
-        bytes = tmp;
-        tmp = new byte[bl];
-        System.arraycopy(bytes, bytes.length - bl, tmp, 0, bl);
-      }
+      if(tmp.length != bl) tmp = Arrays.copyOfRange(tmp, tmp.length - bl, tmp.length);
     } else if(by > 0) {
       for(int i = bl - 1; i >= 0; i--) {
         final byte b = bytes[i];
@@ -63,9 +60,9 @@ public final class BinShift extends StandardFunc {
       tmp = bi.toByteArray();
       final int tl = tmp.length;
       if(tl != bl) {
-        bytes = tmp;
-        tmp = new byte[bl];
-        System.arraycopy(bytes, 0, tmp, bl - tl, tl);
+        final byte[] tmp2 = new byte[bl];
+        Array.copyFromStart(tmp, tl, tmp2, bl - tl);
+        tmp = tmp2;
       }
     }
     return B64.get(tmp);

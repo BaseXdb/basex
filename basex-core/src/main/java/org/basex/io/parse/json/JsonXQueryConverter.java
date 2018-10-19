@@ -10,7 +10,7 @@ import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -39,7 +39,7 @@ public final class JsonXQueryConverter extends JsonConverter {
   /** Stack for intermediate array values. */
   private final Stack<ValueList> arrays = new Stack<>();
   /** Stack for intermediate maps values. */
-  private final Stack<Map> maps = new Stack<>();
+  private final Stack<XQMap> maps = new Stack<>();
 
   /**
    * Constructor.
@@ -61,7 +61,7 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   void openObject() {
-    maps.push(Map.EMPTY);
+    maps.push(XQMap.EMPTY);
   }
 
   @Override

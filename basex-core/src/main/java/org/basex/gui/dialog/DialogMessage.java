@@ -55,7 +55,7 @@ public final class DialogMessage extends BaseXDialog {
       Collections.addAll(list, buttons);
       list.add(Text.B_OK);
     }
-    final BaseXBack bttns = newButtons(list.toArray(new Object[list.size()]));
+    final BaseXBack bttns = newButtons(list.toArray(new Object[0]));
     set(bttns, BorderLayout.SOUTH);
 
     SwingUtilities.invokeLater(((Container) bttns.getComponent(0)).getComponent(0)::

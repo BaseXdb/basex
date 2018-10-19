@@ -48,7 +48,7 @@ public final class UtilOr extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr items = exprs[0], def = exprs[1];
     if(items == Empty.SEQ) return def;
     final SeqType st = items.seqType();

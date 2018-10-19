@@ -81,7 +81,7 @@ public final class UpdIndexRandomTest extends SandboxTest {
     for(int r = 0; r < RUNS; r++) {
       final String path = "doc" + rnd.nextInt(DOCS);
       // create random document
-      final TokenBuilder doc = new TokenBuilder("<xml>");
+      final TokenBuilder doc = new TokenBuilder().add("<xml>");
 
       final int offset = rnd.nextInt(cap - DOCS);
       for(int i = 0; i < DOCS; i++) doc.add("<a>").add(words.get(offset + i)).add("</a>");
@@ -94,9 +94,12 @@ public final class UpdIndexRandomTest extends SandboxTest {
         final String expected = "<a>" + word + "</a>";
         final String result = query(query);
         if(!result.startsWith(expected)) {
-          fail(new TokenBuilder("\nExpected: " + expected +
-              "\nResult: " + result + "\nRun: " + r + "\nDoc: " + d +
-              "\nQuery: " + query + "\nDocument: " + doc).toString());
+          fail("\nExpected: " + expected +
+               "\nResult: " + result +
+               "\nRun: " + r +
+               "\nDoc: " + d +
+               "\nQuery: " + query +
+               "\nDocument: " + doc);
         }
       }
     }

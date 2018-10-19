@@ -118,10 +118,10 @@ public final class ServerLockingTest extends SandboxTest {
     final Client cl1 = new Client(c1, null, null);
     final Client cl2 = new Client(c2, null, null);
     final boolean await = test.await(2 * SLEEP + SYNC, TimeUnit.MILLISECONDS);
-    assertTrue(cl1.error, cl1.error == null);
-    assertTrue(cl2.error, cl2.error == null);
-    assertTrue(parallel ? "Parallel execution expected" : "Serial execution expected",
-                        parallel == await);
+    assertNull(cl1.error, cl1.error);
+    assertNull(cl2.error, cl2.error);
+    assertEquals(parallel ? "Parallel execution expected" : "Serial execution expected",
+      parallel, await);
   }
 
   /**
@@ -211,7 +211,7 @@ public final class ServerLockingTest extends SandboxTest {
 
     assertTrue(allDone.await(totalQueries * SLEEP, TimeUnit.MILLISECONDS));
     for(final Client client : clients) {
-      assertTrue(client.error, client.error == null);
+      assertNull(client.error, client.error);
     }
   }
 }

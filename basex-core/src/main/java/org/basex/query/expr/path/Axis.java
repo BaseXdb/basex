@@ -15,7 +15,7 @@ public enum Axis {
   // axes with longer names are parsed first
 
   /** Ancestor-or-self axis. */
-  ANCORSELF("ancestor-or-self", false) {
+  ANCESTOR_OR_SELF("ancestor-or-self", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.ancestorOrSelf();
@@ -23,7 +23,7 @@ public enum Axis {
   },
 
   /** Ancestor axis. */
-  ANC("ancestor", false) {
+  ANCESTOR("ancestor", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.ancestor();
@@ -31,7 +31,7 @@ public enum Axis {
   },
 
   /** Attribute axis. */
-  ATTR("attribute", true) {
+  ATTRIBUTE("attribute", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.attributes();
@@ -47,7 +47,7 @@ public enum Axis {
   },
 
   /** Descendant-or-self axis. */
-  DESCORSELF("descendant-or-self", true) {
+  DESCENDANT_OR_SELF("descendant-or-self", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.descendantOrSelf();
@@ -55,7 +55,7 @@ public enum Axis {
   },
 
   /** Descendant axis. */
-  DESC("descendant", true) {
+  DESCENDANT("descendant", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.descendant();
@@ -63,7 +63,7 @@ public enum Axis {
   },
 
   /** Following-Sibling axis. */
-  FOLLSIBL("following-sibling", false) {
+  FOLLOWING_SIBLING("following-sibling", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.followingSibling();
@@ -71,7 +71,7 @@ public enum Axis {
   },
 
   /** Following axis. */
-  FOLL("following", false) {
+  FOLLOWING("following", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.following();
@@ -87,7 +87,7 @@ public enum Axis {
   },
 
   /** Preceding-Sibling axis. */
-  PRECSIBL("preceding-sibling", false) {
+  PRECEDING_SIBLING("preceding-sibling", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.precedingSibling();
@@ -95,7 +95,7 @@ public enum Axis {
   },
 
   /** Preceding axis. */
-  PREC("preceding", false) {
+  PRECEDING("preceding", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
       return n.preceding();
@@ -145,19 +145,19 @@ public enum Axis {
    */
   final Axis invert() {
     switch(this) {
-      case ANC:        return DESC;
-      case ANCORSELF:  return DESCORSELF;
-      case ATTR:
-      case CHILD:      return PARENT;
-      case DESC:       return ANC;
-      case DESCORSELF: return ANCORSELF;
-      case FOLLSIBL:   return PRECSIBL;
-      case FOLL:       return PREC;
-      case PARENT:     return CHILD;
-      case PRECSIBL:   return FOLLSIBL;
-      case PREC:       return FOLL;
-      case SELF:       return SELF;
-      default:         throw Util.notExpected();
+      case ANCESTOR:           return DESCENDANT;
+      case ANCESTOR_OR_SELF:   return DESCENDANT_OR_SELF;
+      case ATTRIBUTE:
+      case CHILD:              return PARENT;
+      case DESCENDANT:         return ANCESTOR;
+      case DESCENDANT_OR_SELF: return ANCESTOR_OR_SELF;
+      case FOLLOWING_SIBLING:  return PRECEDING_SIBLING;
+      case FOLLOWING:          return PRECEDING;
+      case PARENT:             return CHILD;
+      case PRECEDING_SIBLING:  return FOLLOWING_SIBLING;
+      case PRECEDING:          return FOLLOWING;
+      case SELF:               return SELF;
+      default:                 throw Util.notExpected();
     }
   }
 }

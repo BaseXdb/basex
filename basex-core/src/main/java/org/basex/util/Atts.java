@@ -40,23 +40,31 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts add(final byte[] name, final byte[] value) {
-    if(size == nm.length) {
-      final int s = Array.newSize(size);
+    final int sz = size;
+    if(sz == nm.length) {
+      final int s = Array.newSize(sz);
       nm = Array.copyOf(nm, s);
       vl = Array.copyOf(vl, s);
     }
-    nm[size] = name;
-    vl[size++] = value;
+    nm[sz] = name;
+    vl[sz] = value;
+    ++size;
     return this;
   }
 
   /**
-   * Deletes the specified entry.
+   * Removes the element at the specified position.
    * @param index entry index
+   * @return self reference
    */
-  public void delete(final int index) {
-    Array.move(nm, index + 1, -1, --size - index);
-    Array.move(vl, index + 1, -1, size - index);
+  public Atts remove(final int index) {
+    final int sz = size;
+    Array.remove(nm, index, 1, sz);
+    Array.remove(vl, index, 1, sz);
+    nm[sz - 1] = null;
+    vl[sz - 1] = null;
+    --size;
+    return this;
   }
 
   /**
@@ -134,7 +142,7 @@ public final class Atts extends ElementList {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
+    final TokenBuilder tb = new TokenBuilder().add(Util.className(this)).add('[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(", ");
       tb.add(nm[i]).add("=\"").add(vl[i]).add("\"");

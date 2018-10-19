@@ -47,8 +47,8 @@ public final class TokenObjMap<E> extends TokenSet {
   }
 
   @Override
-  public int delete(final byte[] key) {
-    final int i = super.delete(key);
+  public int remove(final byte[] key) {
+    final int i = super.remove(key);
     values[i] = null;
     return i;
   }
@@ -67,15 +67,6 @@ public final class TokenObjMap<E> extends TokenSet {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] key : this) {
-      if(!tb.isEmpty()) tb.add(", ");
-      if(key != null) {
-        final Object val = values[id(key)];
-        tb.add('{').add(key).add(',').add(val == null ? "null" :  val.toString()).add('}');
-      }
-    }
-    return new TokenBuilder(Util.className(getClass())).add('[').add(tb.finish()).
-      add(']').toString();
+    return toString(keys, values);
   }
 }

@@ -94,7 +94,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     E[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) lst = Array.copy(lst, newList(newSize(ns)));
-    System.arraycopy(elements, 0, lst, s, l);
+    Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;
     return (L) this;
@@ -141,8 +141,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     E[] lst = list;
     final int sz = size;
     if(sz + l > lst.length) lst = Array.copy(lst, newList(newSize(sz + l)));
-    Array.move(lst, index, l, sz - index);
-    System.arraycopy(elements, 0, lst, index, l);
+    Array.insert(lst, index, l, sz, elements);
     list = lst;
     size = sz + l;
   }
@@ -155,7 +154,8 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   public final E remove(final int index) {
     final E[] lst = list;
     final E e = lst[index];
-    Array.move(lst, index + 1, -1, --size - index);
+    Array.remove(lst, index, 1, size);
+    lst[--size] = null;
     return e;
   }
 
@@ -164,13 +164,14 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @param element element to be removed
    * @return flag, indicating if any element was removed
    */
-  public boolean delete(final E element) {
+  public boolean removeAll(final E element) {
     final E[] lst = list;
     final int sz = size;
     int s = 0;
     for(int i = 0; i < sz; ++i) {
       if(!eq(lst[i], element)) lst[s++] = lst[i];
     }
+    for(int i = s; i < sz; i++) lst[i] = null;
     size = s;
     return sz != s;
   }
@@ -178,9 +179,12 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   /**
    * Removes all elements from the specified list.
    * @param elements elements
+   * @return flag, indicating if any element was removed
    */
-  public void delete(final L elements) {
-    for(final E e : elements) delete(e);
+  public boolean removeAll(final L elements) {
+    boolean rem = false;
+    for(final E e : elements) rem |= removeAll(e);
+    return rem;
   }
 
   /**
@@ -188,7 +192,11 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return the popped element
    */
   public final E pop() {
-    return list[--size];
+    final E[] lst = list;
+    final int sz = --size;
+    final E e = lst[sz];
+    lst[sz] = null;
+    return e;
   }
 
   /**

@@ -36,7 +36,7 @@ public final class StaticFuncs extends ExprInfo {
    * @return the function's signature
    */
   static byte[] signature(final QNm name, final long arity) {
-    return new TokenBuilder(name.prefixId()).add('#').addLong(arity).finish();
+    return concat(name.prefixId(), '#', arity);
   }
 
   /**

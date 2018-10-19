@@ -6,7 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.regex.parse.*;
-import org.basex.util.*;
+import org.basex.util.Token;
 import org.basex.util.hash.*;
 
 /**
@@ -32,10 +32,8 @@ abstract class RegEx extends StandardFunc {
       final boolean check) throws QueryException {
 
     final byte[] pat = toToken(regex, qc);
-    final byte[] mod = modifier != null ? toToken(modifier, qc) : null;
-    final TokenBuilder tb = new TokenBuilder(pat);
-    if(mod != null) tb.add(0).add(mod);
-    final byte[] key = tb.finish();
+    final byte[] mod = modifier != null ? toToken(modifier, qc) : Token.EMPTY;
+    final byte[] key = Token.concat(pat, '\b', mod);
 
     Pattern pattern;
     synchronized(patterns) {

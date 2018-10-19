@@ -173,7 +173,7 @@ public final class CElem extends CName {
       if(apref == null) {
         int i = 1;
         do {
-          apref = concat(pref, new byte[] { '_' }, token(i++));
+          apref = concat(pref, '_', i++);
         } while(ns.contains(apref));
         ns.add(apref, uri);
       }

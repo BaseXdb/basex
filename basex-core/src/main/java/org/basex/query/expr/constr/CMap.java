@@ -58,7 +58,7 @@ public final class CMap extends Arr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Map map = Map.EMPTY;
+    XQMap map = XQMap.EMPTY;
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       final Value key = exprs[e].atomValue(qc, info);
@@ -88,10 +88,11 @@ public final class CMap extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(QueryText.MAP).add(" {");
+    final TokenBuilder tb = new TokenBuilder().add(QueryText.MAP).add(" {");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      tb.add(e == 0 ? " " : ", ").addExt(exprs[e]).add(": ").addExt(exprs[e + 1]);
+      if(e != 0) tb.add(',');
+      tb.add(' ').add(exprs[e]).add(": ").add(exprs[e + 1]);
     }
     return tb.add(" }").toString();
   }

@@ -215,7 +215,7 @@ public final class CmpR extends Single {
         token((int) nr.min).length != token((int) nr.max).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add('[').addExt(min).add(',').addExt(max).add(']');
+    tb.add('[').add(min).add(',').add(max).add(']');
     ii.create(new RangeAccess(info, nr, ii.db), true, info, Util.info(OPTINDEX_X_X, "range", tb));
     return true;
   }
@@ -242,7 +242,7 @@ public final class CmpR extends Single {
         if(step.test.kind != Kind.NAME) return null;
       } else {
         step = path.step(st);
-        if(!step.simple(Axis.ATTR, true)) return null;
+        if(!step.simple(Axis.ATTRIBUTE, true)) return null;
       }
       test = (NameTest) step.test;
     }

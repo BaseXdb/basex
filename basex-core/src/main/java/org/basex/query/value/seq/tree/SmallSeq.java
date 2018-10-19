@@ -49,9 +49,9 @@ final class SmallSeq extends TreeSeq {
   public TreeSeq insert(final long pos, final Item value, final QueryContext qc) {
     final int p = (int) pos, n = items.length;
     final Item[] out = new Item[n + 1];
-    System.arraycopy(items, 0, out, 0, p);
+    Array.copy(items, p, out);
     out[p] = value;
-    System.arraycopy(items, p, out, p + 1, n - p);
+    Array.copy(items, p, n - p, out, p + 1);
 
     if(n < MAX_SMALL) return new SmallSeq(out, null);
     return new BigSeq(slice(out, 0, MIN_DIGIT), FingerTree.empty(),
@@ -64,8 +64,8 @@ final class SmallSeq extends TreeSeq {
     if(n == 2) return items[pos == 0 ? 1 : 0];
 
     final Item[] out = new Item[n - 1];
-    System.arraycopy(items, 0, out, 0, p);
-    System.arraycopy(items, p + 1, out, p, n - 1 - p);
+    Array.copy(items, p, out);
+    Array.copy(items, p + 1, n - 1 - p, out, p);
     return new SmallSeq(out, type);
   }
 
@@ -161,8 +161,8 @@ final class SmallSeq extends TreeSeq {
     }
 
     final Item[] out = new Item[n];
-    System.arraycopy(left, 0, out, 0, l);
-    System.arraycopy(items, 0, out, l, r);
+    Array.copy(left, l, out);
+    Array.copyFromStart(items, r, out, l);
     if(n <= MAX_SMALL) return new SmallSeq(out, null);
 
     final int mid = n / 2;

@@ -95,12 +95,12 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   protected void comment(final byte[] value) throws IOException {
-    print(new TokenBuilder(COMM_O).add(normalize(value)).add(COMM_C).finish(), COMM);
+    print(concat(COMM_O, normalize(value), COMM_C), COMM);
   }
 
   @Override
   protected void pi(final byte[] name, final byte[] value) throws IOException {
-    print(new TokenBuilder(PI_O).add(name).add(SPACE).add(value).add(PI_C).finish(), DOTData.PI);
+    print(concat(PI_O, name, SPACE, value, PI_C), DOTData.PI);
   }
 
   @Override

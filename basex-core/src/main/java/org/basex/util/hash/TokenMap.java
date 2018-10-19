@@ -46,8 +46,8 @@ public class TokenMap extends TokenSet {
   }
 
   @Override
-  public int delete(final byte[] key) {
-    final int i = super.delete(key);
+  public int remove(final byte[] key) {
+    final int i = super.remove(key);
     values[i] = null;
     return i;
   }
@@ -73,13 +73,7 @@ public class TokenMap extends TokenSet {
   }
 
   @Override
-  public final String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(int i = 1; i < size; i++) {
-      if(!tb.isEmpty()) tb.add(", ");
-      if(keys[i] != null) tb.add(keys[i]).add(" = ").add(values[i]);
-    }
-    return new TokenBuilder(Util.className(getClass())).add('[').add(tb.finish()).
-        add(']').toString();
+  public String toString() {
+    return toString(keys, values);
   }
 }

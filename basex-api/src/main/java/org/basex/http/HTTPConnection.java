@@ -18,6 +18,7 @@ import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.http.*;
 
 /**
@@ -151,7 +152,7 @@ public final class HTTPConnection implements ClientInfo {
    * Returns all accepted media types.
    * @return accepted media types
    */
-  public MediaType[] accepts() {
+  public ArrayList<MediaType> accepts() {
     final String accepts = req.getHeader(ACCEPT);
     final ArrayList<MediaType> list = new ArrayList<>();
     if(accepts == null) {
@@ -172,11 +173,11 @@ public final class HTTPConnection implements ClientInfo {
         }
       }
     }
-    return list.toArray(new MediaType[list.size()]);
+    return list;
   }
 
   /**
-   * Sends an error with an info message.
+   * Handles an error with a short and a detailed info message.
    * @param code status code
    * @param info detailed information
    * @param log log message
@@ -188,7 +189,7 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Sends an error with an info message.
+   * Handles an error with an info message.
    * @param code status code
    * @param info info, sent as body
    * @throws IOException I/O exception
@@ -199,7 +200,7 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Sets the HTTP status code and message.
+   * Handles an HTTP status code and message.
    * @param code status code
    * @param message status message
    * @throws IOException I/O exception
@@ -356,12 +357,12 @@ public final class HTTPConnection implements ClientInfo {
 
         if(auth == AuthMethod.BASIC) {
           final String details = am.length > 1 ? am[1] : "";
-          final String[] creds = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
+          final String[] creds = Strings.split(Base64.decode(details), ':', 2);
           user = user(creds[0]);
           if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException();
 
         } else {
-          final EnumMap<Request, String> map = HttpClient.digestHeaders(header);
+          final EnumMap<Request, String> map = HttpClient.authHeaders(header);
           user = user(map.get(Request.USERNAME));
 
           final String nonce = map.get(Request.NONCE), cnonce = map.get(Request.CNONCE);
@@ -445,12 +446,12 @@ public final class HTTPConnection implements ClientInfo {
     try {
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
-        final TokenBuilder header = new TokenBuilder(auth.toString());
-        header.add(' ').addExt(Request.REALM).add("=\"").add(Prop.NAME).add('"');
+        final TokenBuilder header = new TokenBuilder();
+        header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
         if(auth == AuthMethod.DIGEST) {
           final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").addExt(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT).add('"');
-          header.add(',').addExt(Request.NONCE).add("=\"").add(nonce).add('"');
+          header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
+          header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
         }
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }

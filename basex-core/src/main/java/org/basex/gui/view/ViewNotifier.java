@@ -181,7 +181,7 @@ public final class ViewNotifier {
     final DBNodes empty = new DBNodes(ctx.data()).ftpos(ctx.marked.ftpos());
     final DBNodes curr = quick ? ctx.current() : null;
     final DBNodes cmp = quick ? curr : ctx.marked;
-    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].equals(cmp)) {
+    if(cont[hist] == null ? cmp != null : !cont[hist].equals(cmp)) {
       checkHist();
       if(quick) {
         // store history entry
@@ -247,9 +247,9 @@ public final class ViewNotifier {
   private void checkHist() {
     final int hl = queries.length;
     if(hist + 1 == hl) {
-      Array.move(queries, 1, 0, hl - 1);
-      Array.move(cont, 1, 0, hl - 1);
-      Array.move(marked, 1, 0, hl - 1);
+      Array.remove(queries, 0, 1, hl);
+      Array.remove(cont, 0, 1, hl);
+      Array.remove(marked, 0, 1, hl);
       --hist;
     }
   }

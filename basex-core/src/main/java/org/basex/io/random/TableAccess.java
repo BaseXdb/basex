@@ -1,6 +1,7 @@
 package org.basex.io.random;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
@@ -127,9 +128,7 @@ public abstract class TableAccess {
     // handle the remaining entries if the two subtrees are of different size
     if(diff < 0) {
       // case1: new subtree bigger than old one, insert remaining new nodes
-      final byte[] tmp = new byte[entries.length - off];
-      System.arraycopy(entries, off, tmp, 0, tmp.length);
-      insert(last, tmp);
+      insert(last, Arrays.copyOfRange(entries, off, entries.length));
     } else if(diff > 0) {
       // case2: old subtree bigger than new one, delete remaining old nodes
       delete(last, diff);

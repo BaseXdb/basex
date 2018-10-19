@@ -83,10 +83,10 @@ public final class QueryStack {
   private void resize(final int len) {
     final int os = end;
     final Value[] nst = new Value[len];
-    System.arraycopy(stack, 0, nst, 0, os);
+    Array.copy(stack, os, nst);
     stack = nst;
     final Var[] nvr = new Var[len];
-    System.arraycopy(vars, 0, nvr, 0, os);
+    Array.copy(vars, os, nvr);
     vars = nvr;
   }
 

@@ -141,7 +141,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(body().toString()).add('(');
+    final TokenBuilder tb = new TokenBuilder().add(body()).add('(');
     int p = -1;
     final int es = exprs.length, hs = holes.length;
     for(int i = 0; i < hs; i++) {

@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -29,11 +29,11 @@ public final class ArrayType extends FuncType {
   }
 
   @Override
-  public Array cast(final Item item, final QueryContext qc, final StaticContext sc,
+  public XQArray cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo info) throws QueryException {
 
-    if(item instanceof Array) {
-      final Array a = (Array) item;
+    if(item instanceof XQArray) {
+      final XQArray a = (XQArray) item;
       if(a.instanceOf(this)) return a;
     }
     throw typeError(item, this, info);

@@ -150,7 +150,7 @@ public abstract class TreeSeq extends Seq {
     final Item[] out = new Item[to - from];
     final int in0 = Math.max(0, from), in1 = Math.min(to, items.length);
     final int out0 = Math.max(-from, 0);
-    System.arraycopy(items, in0, out, out0, in1 - in0);
+    Array.copy(items, in0, in1 - in0, out, out0);
     return out;
   }
 
@@ -163,8 +163,8 @@ public abstract class TreeSeq extends Seq {
   static Item[] concat(final Item[] as, final Item[] bs) {
     final int l = as.length, r = bs.length, n = l + r;
     final Item[] out = new Item[n];
-    System.arraycopy(as, 0, out, 0, l);
-    System.arraycopy(bs, 0, out, l, r);
+    Array.copy(as, l, out);
+    Array.copyFromStart(bs, r, out, l);
     return out;
   }
 }

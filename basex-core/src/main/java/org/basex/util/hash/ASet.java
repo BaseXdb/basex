@@ -2,6 +2,8 @@ package org.basex.util.hash;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * This is the basic structure of an efficient and memory-saving hash set.
  * The first entry of the token set (offset 0) will always be kept empty.
@@ -34,7 +36,7 @@ public abstract class ASet {
   }
 
   /**
-   * Resets the data structure. Must be called when data structure is initialized.
+   * Resets the data structure.
    */
   void clear() {
     Arrays.fill(buckets, 0);
@@ -94,4 +96,33 @@ public abstract class ASet {
    * @param newSize new hash size
    */
   protected abstract void rehash(int newSize);
+
+  /**
+   * Returns a string representation of the set or map.
+   * @param keys hash keys
+   * @return string
+   */
+  public String toString(final Object[] keys) {
+    return toString(keys, null);
+  }
+
+  /**
+   * Returns a string representation of the set or map.
+   * @param keys hash keys
+   * @param values hash values or {@code null}
+   * @return string
+   */
+  public String toString(final Object[] keys, final Object[] values) {
+    final TokenBuilder tb = new TokenBuilder().add(Util.className(this)).add('[');
+    boolean more = false;
+    for(int i = 1; i < size; i++) {
+      final Object key = keys[i];
+      if(key == null) continue;
+      if(more) tb.add(',');
+      tb.add(key);
+      if(values != null) tb.add('=').add(values[i]);
+      more = true;
+    }
+    return tb.add(']').toString();
+  }
 }

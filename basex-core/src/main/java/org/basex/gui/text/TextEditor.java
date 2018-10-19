@@ -512,12 +512,10 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   private boolean insert(final byte[] string, final int offset, final int rem) {
-    final int ts = size(), al = string.length;
-    final byte[] tmp = new byte[offset + al + ts - rem];
-    System.arraycopy(text, 0, tmp, 0, offset);
-    System.arraycopy(string, 0, tmp, offset, al);
-    System.arraycopy(text, rem, tmp, offset + al, ts - rem);
-    return text(tmp);
+    final int ts = size();
+    final ByteList bl = new ByteList(offset + string.length + ts - rem);
+    bl.add(text, 0, offset).add(string).add(text, rem, ts);
+    return text(bl.finish());
   }
 
   /**
@@ -644,11 +642,11 @@ public final class TextEditor {
     int i = s;
     for(final byte[] line : tl) {
       final int ll = line.length;
-      System.arraycopy(line, 0, tmp, i, ll);
+      Array.copyFromStart(line, ll, tmp, i);
       i += ll;
       if(i < e) tmp[i++] = '\n';
     }
-    if(i < e) System.arraycopy(tmp, e, tmp, i, ts - e);
+    if(i < e) Array.copy(tmp, e, ts - e, tmp, i);
     final boolean changed = text(i == e ? tmp : Arrays.copyOf(tmp, ts - e + i));
     select(s, i);
     return changed;
@@ -854,7 +852,7 @@ public final class TextEditor {
         if(cp == '<' && pos < p - 1) {
           // add closing element
           next();
-          sb.append("</").append(new TokenBuilder().add(text, pos, p)).append('>');
+          sb.append("</").append(Token.string(text, pos, p - pos)).append('>');
         }
         break;
       }
@@ -904,10 +902,7 @@ public final class TextEditor {
    */
   private void del() {
     final int s = Math.min(start, end), e = Math.max(start, end), ts = size();
-    final byte[] tmp = new byte[ts - e + s];
-    System.arraycopy(text, 0, tmp, 0, s);
-    System.arraycopy(text, e, tmp, s, ts - e);
-    text(tmp);
+    text(new ByteList(ts - e + s).add(text, 0, s).add(text, e, ts).finish());
     pos = s;
   }
 
@@ -1172,7 +1167,7 @@ public final class TextEditor {
     for(; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);
       if(cp >= ' ' && cp < TokenBuilder.PRIVATE_START || cp == 0x0A || cp == 0x09 ||
-          cp > TokenBuilder.PRIVATE_END) tb.add(cp);
+         cp > TokenBuilder.PRIVATE_END) tb.add(cp);
     }
     return tb.toString();
   }

@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * This is an efficient and memory-saving hash map for storing primitive integers.
+ * This is an efficient and memory-saving hash set for storing primitive integers.
  * It is related to the {@link TokenSet} class.
  *
  * @author BaseX Team 2005-18, BSD License
@@ -83,25 +83,6 @@ public class IntSet extends ASet {
   }
 
   /**
-   * Deletes the specified key.
-   * The deletion of keys will lead to empty entries. If {@link #size} is called after
-   * deletions, the original number of entries will be returned.
-   * @param key key
-   * @return deleted key or 0
-   */
-  int delete(final int key) {
-    final int b = key & buckets.length - 1;
-    for(int p = 0, i = buckets[b]; i != 0; p = i, i = next[i]) {
-      if(key != keys[i]) continue;
-      if(p == 0) buckets[b] = next[i];
-      else next[p] = next[next[i]];
-      keys[i] = 0;
-      return i;
-    }
-    return 0;
-  }
-
-  /**
    * Stores the specified key and returns its id, or returns the negative id if the
    * key has already been stored.
    * @param key key to be found
@@ -135,5 +116,12 @@ public class IntSet extends ASet {
    */
   public final int[] toArray() {
     return Arrays.copyOfRange(keys, 1, size);
+  }
+
+  @Override
+  public String toString() {
+    final List<Object> k = new ArrayList<>();
+    for(final int key : keys) k.add(Integer.valueOf(key));
+    return toString(k.toArray());
   }
 }

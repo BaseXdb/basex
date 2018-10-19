@@ -67,29 +67,12 @@ public final class WsPool {
     channelWebsocketid.put(channel, websocketids);
   }
   /**
-   * Closes the WebsocketConnection.
-   * @param id The id of the Websocket.
-   * @param reason The String reason
-   * */
-  public void closeWebsocket(final String id, final String reason) {
-    clients.get(id).closeWebsocket(reason);
-  }
-  /**
    * Returns the pool instance.
    * @return instance
    */
   public static synchronized WsPool get() {
     if(instance == null) instance = new WsPool();
     return instance;
-  }
-
-  /**
-   * Returns the path of the specified client.
-   * @param id client id
-   * @return path
-   */
-  public String path(final String id) {
-    return clients.get(id).getPath();
   }
 
   /**
@@ -145,7 +128,7 @@ public final class WsPool {
     for(final Entry<String, WebSocket> entry : clients.entrySet()) {
       final String id = entry.getKey();
       if(client == null || !client.equals(id)) list.add(entry.getValue());
-    };
+    }
     send(message, list);
   }
 
@@ -297,13 +280,22 @@ public final class WsPool {
   }
 
   /**
+   * Returns the client with the specified id.
+   * @param id client id
+   * @return client
+   */
+  public WebSocket client(final String id) {
+    return clients.get(id);
+  }
+
+  /**
    * Sends a message to the specified clients.
    * @param message message
    * @param websockets clients
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void send(final Item message, final ArrayList<WebSocket> websockets)
+  private static void send(final Item message, final ArrayList<WebSocket> websockets)
       throws QueryException, IOException {
 
     /* [JF] We need to check what happens if a client says goodbye while we send data.
@@ -314,8 +306,8 @@ public final class WsPool {
       if(!ws.isConnected()) continue;
       final RemoteEndpoint remote = ws.getSession().getRemote();
       for(final Object value : values) {
-        if(value instanceof byte[]) {
-          remote.sendBytesByFuture(ByteBuffer.wrap((byte[]) value));
+        if(value instanceof ByteBuffer) {
+          remote.sendBytesByFuture((ByteBuffer) value);
         } else {
           remote.sendStringByFuture((String) value);
         }

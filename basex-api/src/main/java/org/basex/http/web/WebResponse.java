@@ -48,7 +48,7 @@ public abstract class WebResponse {
     try {
       qc = module.qc(ctx);
       init(function);
-      final StaticFunc sf = function.module.find(qc, func);
+      final StaticFunc sf = WebModule.find(qc, func);
       final Expr[] args = new Expr[sf.params.length];
       bind(args, data);
       qc.jc().description(toString(func, args));
@@ -95,13 +95,13 @@ public abstract class WebResponse {
    * @param args arguments
    * @return description
    */
-  private String toString(final StaticFunc func, final Expr[] args) {
-    final TokenBuilder tb = new TokenBuilder().addExt(func.info).add(Text.COLS);
+  private static String toString(final StaticFunc func, final Expr[] args) {
+    final TokenBuilder tb = new TokenBuilder().add(func.info).add(Text.COLS);
     tb.add(func.name.prefixString()).add('(');
     final int al = args.length;
     for(int a = 0; a < al; a++) {
       if(a != 0) tb.add(", ");
-      tb.addExt(func.params[a].toErrorString()).add(" := ").addExt(args[a]);
+      tb.add(func.params[a].toErrorString()).add(" := ").add(args[a]);
     }
     return tb.add(')').toString();
   }

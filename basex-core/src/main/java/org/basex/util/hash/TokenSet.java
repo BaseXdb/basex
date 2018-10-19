@@ -51,7 +51,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  protected void read(final DataInput in) throws IOException {
+  public void read(final DataInput in) throws IOException {
     keys = in.readTokens();
     next = in.readNums();
     buckets = in.readNums();
@@ -84,7 +84,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @param key string to be added
    * @return {@code true} if the key did not exist yet and was stored
    */
-  public boolean add(final String key) {
+  public final boolean add(final String key) {
     return add(token(key));
   }
 
@@ -131,13 +131,13 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   /**
-   * Deletes the specified key.
+   * Removes the entry with the specified key.
    * The deletion of keys will lead to empty entries. If {@link #size} is called after
    * deletions, the original number of entries will be returned.
    * @param key key
    * @return id of the deleted key, or {@code 0} if the key did not exist
    */
-  public int delete(final byte[] key) {
+  public int remove(final byte[] key) {
     final int b = Token.hash(key) & buckets.length - 1;
     for(int p = 0, i = buckets[b]; i != 0; p = i, i = next[i]) {
       if(!eq(key, keys[i])) continue;
@@ -190,12 +190,6 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] key : this) {
-      if(!tb.isEmpty()) tb.add(", ");
-      if(key != null) tb.add(key);
-    }
-    return new TokenBuilder(Util.className(getClass())).add('[').add(tb.finish()).
-        add(']').toString();
+    return toString(keys);
   }
 }

@@ -123,7 +123,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   @Override
   public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo) {
     final WebDAVLock lock = WebDAVLocks.get().create(timeout, lockInfo, meta);
-    return lock == null ? failed(FailureReason.PRECONDITION_FAILED) : success(lock.token);
+    return success(lock.token);
   }
 
   /**

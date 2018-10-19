@@ -12,6 +12,7 @@ import javax.net.ssl.*;
 import javax.xml.transform.stream.*;
 
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -57,7 +58,7 @@ public final class IOUrl extends IO {
       conn = connection();
       return conn.getInputStream();
     } catch(final IOException ex) {
-      final TokenBuilder msg = new TokenBuilder(Util.message(ex));
+      final TokenBuilder msg = new TokenBuilder().add(ex);
       // try to retrieve more information on why the request failed
       if(conn instanceof HttpURLConnection) {
         final InputStream es = ((HttpURLConnection) conn).getErrorStream();
@@ -87,8 +88,8 @@ public final class IOUrl extends IO {
     conn.setConnectTimeout(TIMEOUT * 1000);
     // use basic authentication if credentials are contained in the url
     final String ui = url.getUserInfo();
-    if(ui != null) conn.setRequestProperty(HttpText.AUTHORIZATION, HttpText.BASIC + ' ' +
-        org.basex.util.Base64.encode(ui));
+    if(ui != null) conn.setRequestProperty(HttpText.AUTHORIZATION,
+        AuthMethod.BASIC + " " + Base64.encode(ui));
     return conn;
   }
 

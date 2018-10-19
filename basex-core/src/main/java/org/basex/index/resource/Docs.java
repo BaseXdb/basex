@@ -338,7 +338,9 @@ final class Docs {
     final TokenList tl = new TokenList();
     final int ds = paths().size();
     for(int d = 0; d < ds; d++) {
-      table.contents.add(tl.add(docList.get(d)).add(pathList.get(d)));
+      final int doc = docList != null ? docList.get(d) : 0;
+      final byte[] path = pathList != null ? pathList.get(d) : EMPTY;
+      table.contents.add(tl.add(doc).add(path));
     }
     return table.toString();
   }

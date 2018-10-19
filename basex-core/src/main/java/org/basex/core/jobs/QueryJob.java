@@ -100,7 +100,7 @@ public final class QueryJob extends Job implements Runnable {
    * @return milliseconds to wait
    * @throws QueryException query exception
    */
-  private long delay(final String string, final long min, final InputInfo info)
+  private static long delay(final String string, final long min, final InputInfo info)
       throws QueryException {
 
     final QueryDateTime qdt = new QueryDateTime();

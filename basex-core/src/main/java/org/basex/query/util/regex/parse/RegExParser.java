@@ -33,28 +33,26 @@ public class RegExParser implements RegExParserConstants {
   /**
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
-   * @param mod modifiers
+   * @param modifiers modifiers
    * @param info input info
    * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
-  public static Pattern parse(final byte[] regex, final byte[] mod, final InputInfo info,
+  public static Pattern parse(final byte[] regex, final byte[] modifiers, final InputInfo info,
       final boolean check) throws QueryException {
 
     // process modifiers
     int flags = 0;
     boolean strip = false, java = false;
-    if(mod != null) {
-      for(final byte m : mod) {
-        if(m == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
-        else if(m == 'm') flags |= MULTILINE;
-        else if(m == 's') flags |= DOTALL;
-        else if(m == 'q') flags |= LITERAL;
-        else if(m == 'x') strip = true;
-        else if(m == 'j' || m == '!') java = true;
-        else if(m != ';') throw REGMOD_X.get(info, (char) m);
-      }
+    for(final byte mod : modifiers) {
+      if(mod == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
+      else if(mod == 'm') flags |= MULTILINE;
+      else if(mod == 's') flags |= DOTALL;
+      else if(mod == 'q') flags |= LITERAL;
+      else if(mod == 'x') strip = true;
+      else if(mod == 'j' || mod == '!') java = true;
+      else if(mod != ';') throw REGMOD_X.get(info, (char) mod);
     }
 
     try {

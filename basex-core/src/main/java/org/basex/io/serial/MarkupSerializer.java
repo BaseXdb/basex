@@ -270,7 +270,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected boolean ignore(final ANode node) {
     if(ct > 0 && node.type == NodeType.ELM && eq(node.name(), META)) {
       final byte[] value = node.attribute(HTTPEQUIV);
-      if(value != null && eq(trim(value), CONTENT_TYPE)) return true;
+      return value != null && eq(trim(value), CONTENT_TYPE);
     }
     return false;
   }
@@ -327,8 +327,8 @@ abstract class MarkupSerializer extends StandardSerializer {
     level++;
     startOpen(new QNm(META));
     attribute(HTTPEQUIV, CONTENT_TYPE, false);
-    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MediaType.TEXT_HTML.toString() : media).
-        add("; ").add(CHARSET).add('=').add(encoding).finish(), false);
+    attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
+      CHARSET, '=', encoding), false);
     if(html) {
       out.print(ELEM_C);
     } else {

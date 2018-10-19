@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * A single binding of a {@link Map}.
+ * A single binding of a {@link XQMap}.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler

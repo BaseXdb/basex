@@ -36,8 +36,8 @@ final class PartialLeafNode implements NodeLike<Item, Item> {
       final Item[] ls = ((PartialLeafNode) left).elems, rs = elems;
       final int l = ls.length, r = rs.length, n = l + r;
       final Item[] vals = new Item[n];
-      System.arraycopy(ls, 0, vals, 0, l);
-      System.arraycopy(rs, 0, vals, l, r);
+      Array.copy(ls, l, vals);
+      Array.copyFromStart(rs, r, vals, l);
       nodes[pos - 1] = n < TreeSeq.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
       return pos;
     }
@@ -46,17 +46,17 @@ final class PartialLeafNode implements NodeLike<Item, Item> {
     final int l = ls.length, r = rs.length, n = l + r;
     if(n <= TreeSeq.MAX_LEAF) {
       final Item[] vals = new Item[n];
-      System.arraycopy(ls, 0, vals, 0, l);
-      System.arraycopy(rs, 0, vals, l, r);
+      Array.copy(ls, l, vals);
+      Array.copyFromStart(rs, r, vals, l);
       nodes[pos - 1] = new LeafNode(vals);
       return pos;
     }
 
     final int ll = n / 2, rl = n - ll, move = l - ll;
     final Item[] newLeft = new Item[ll], newRight = new Item[rl];
-    System.arraycopy(ls, 0, newLeft, 0, ll);
-    System.arraycopy(ls, ll, newRight, 0, move);
-    System.arraycopy(rs, 0, newRight, move, r);
+    Array.copy(ls, ll, newLeft);
+    Array.copyToStart(ls, ll, move, newRight);
+    Array.copyFromStart(rs, r, newRight, move);
     nodes[pos - 1] = new LeafNode(newLeft);
     nodes[pos] = new LeafNode(newRight);
     return pos + 1;

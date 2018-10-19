@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 abstract class TrieNode {
   /** Number of children on each level. */
-  static final int KIDS = 1 << Map.BITS;
+  static final int KIDS = 1 << XQMap.BITS;
   /** Mask for the bits used on the current level. */
   private static final int MASK = KIDS - 1;
 
@@ -236,7 +236,7 @@ abstract class TrieNode {
    * @return hash key
    */
   static int key(final int hash, final int level) {
-    return hash >>> level * Map.BITS & MASK;
+    return hash >>> level * XQMap.BITS & MASK;
   }
 
   /**
@@ -289,7 +289,7 @@ abstract class TrieNode {
   abstract StringBuilder append(StringBuilder sb, String indent);
 
   /**
-   * Recursive helper for {@link Map#toString()}.
+   * Recursive helper for {@link XQMap#toString()}.
    * @param sb string builder
    * @return reference to {@code sb}
    */

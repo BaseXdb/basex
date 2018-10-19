@@ -128,7 +128,7 @@ final class DialogCsvParser extends DialogParser {
 
     final boolean fixedsep = seps.getSelectedIndex() < CsvSep.values().length;
     sepchar.setEnabled(!fixedsep);
-    if(fixedsep) sepchar.setText(new TokenBuilder().add(copts.separator()).toString());
+    if(fixedsep) sepchar.setText(new String(Character.toChars(copts.separator())));
     return fixedsep || sepchar.getText().length() == 1;
   }
 

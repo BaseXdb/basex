@@ -268,12 +268,12 @@ public final class FuncItem extends FItem implements Scope {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add("(: ").add(name.prefixId()).add("#").addInt(arity()).add(" :) ");
-    tb.addExt(anns).add(FUNCTION).add('(');
+    tb.add(anns).add(FUNCTION).add('(');
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      if(p != 0) tb.add(",");
-      tb.addExt(error ? params[p].toErrorString() : params[p]);
+      if(p != 0) tb.add(',');
+      tb.add(error ? params[p].toErrorString() : params[p]);
     }
-    return tb.add(')').add(" as ").addExt(ft.declType).add(" {...}").toString();
+    return tb.add(')').add(" as ").add(ft.declType).add(" {...}").toString();
   }
 }

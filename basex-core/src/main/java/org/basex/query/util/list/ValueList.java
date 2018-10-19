@@ -42,7 +42,7 @@ public final class ValueList extends ObjectList<Value, ValueList> {
    * Creates an XQuery array from the contents of this list.
    * @return the array
    */
-  public Array array() {
+  public XQArray array() {
     final ArrayBuilder builder = new ArrayBuilder();
     for(int i = 0; i < size; i++) builder.append(list[i]);
     return builder.freeze();

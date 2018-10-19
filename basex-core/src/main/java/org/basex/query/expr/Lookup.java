@@ -10,9 +10,9 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -48,7 +48,7 @@ public final class Lookup extends Arr {
     // postfix expression
     final Expr ctx = exprs[1];
     if(exprType(ctx, keys)) {
-      if((ctx instanceof Map || ctx instanceof Array) && keys instanceof Value)
+      if((ctx instanceof XQMap || ctx instanceof XQArray) && keys instanceof Value)
         return cc.preEval(this);
 
       final long es = ctx.size();
@@ -124,15 +124,15 @@ public final class Lookup extends Arr {
     final Expr keys = exprs[0];
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(!(item instanceof Map || item instanceof Array)) throw LOOKUP_X.get(info, item);
+      if(!(item instanceof XQMap || item instanceof XQArray)) throw LOOKUP_X.get(info, item);
       final FItem fit = (FItem) item;
 
       if(keys == Str.WC) {
         // wildcard: add all values
-        if(fit instanceof Map) {
-          ((Map) fit).values(vb);
+        if(fit instanceof XQMap) {
+          ((XQMap) fit).values(vb);
         } else {
-          for(final Value value : ((Array) item).members()) vb.add(value);
+          for(final Value value : ((XQArray) item).members()) vb.add(value);
         }
       } else {
         final Iter ir = keys.atomIter(qc, info);

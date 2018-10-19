@@ -31,7 +31,7 @@ public class ArchiveExtractTo extends ArchiveFn {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         final String name = ze.getName();
-        if(hs == null || hs.delete(token(name)) != 0) {
+        if(hs == null || hs.remove(token(name)) != 0) {
           final Path file = path.resolve(name);
           if(ze.isDirectory()) {
             Files.createDirectories(file);

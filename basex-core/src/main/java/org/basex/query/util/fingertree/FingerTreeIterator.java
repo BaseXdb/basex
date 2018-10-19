@@ -226,7 +226,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
           final DeepTree<?, E> deep = (DeepTree<?, E>) mid;
           if(++tTop == trees.length) {
             final DeepTree<?, E>[] newTrees = new DeepTree[2 * tTop];
-            System.arraycopy(trees, 0, newTrees, 0, tTop);
+            Array.copy(trees, tTop, newTrees);
             trees = newTrees;
           }
           trees[tTop] = deep;
@@ -259,7 +259,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
     while(sub instanceof InnerNode) {
       if(++nTop == nodes.length) {
         final InnerNode<?, E>[] newNodes = new InnerNode[2 * nTop];
-        System.arraycopy(nodes, 0, newNodes, 0, nTop);
+        Array.copy(nodes, nTop, newNodes);
         nodes = newNodes;
         poss = Arrays.copyOf(poss, 2 * nTop);
       }
@@ -322,7 +322,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
           final DeepTree<?, E> deep = (DeepTree<?, E>) mid;
           if(++tTop == trees.length) {
             final DeepTree<?, E>[] newTrees = new DeepTree[2 * tTop];
-            System.arraycopy(trees, 0, newTrees, 0, tTop);
+            Array.copy(trees, tTop, newTrees);
             trees = newTrees;
           }
           trees[tTop] = deep;
@@ -355,7 +355,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
     while(sub instanceof InnerNode) {
       if(++nTop == nodes.length) {
         final InnerNode<?, E>[] newNodes = new InnerNode[2 * nTop];
-        System.arraycopy(nodes, 0, newNodes, 0, nTop);
+        Array.copy(nodes, nTop, newNodes);
         nodes = newNodes;
         poss = Arrays.copyOf(poss, 2 * nTop);
       }

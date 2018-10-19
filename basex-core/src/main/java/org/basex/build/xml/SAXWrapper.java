@@ -4,13 +4,13 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import javax.xml.parsers.*;
 import javax.xml.transform.sax.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
+import org.basex.io.parse.xml.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 
@@ -52,16 +52,7 @@ public final class SAXWrapper extends SingleParser {
     try {
       XMLReader reader = saxs.getXMLReader();
       if(reader == null) {
-        final boolean dtd = options.get(MainOptions.DTD);
-        final SAXParserFactory f = SAXParserFactory.newInstance();
-        f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
-        f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
-        f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
-
-        f.setNamespaceAware(true);
-        f.setValidating(false);
-        f.setXIncludeAware(options.get(MainOptions.XINCLUDE));
-        reader = f.newSAXParser().getXMLReader();
+        reader = XmlParser.reader(options.get(MainOptions.DTD), options.get(MainOptions.XINCLUDE));
       }
 
       saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),

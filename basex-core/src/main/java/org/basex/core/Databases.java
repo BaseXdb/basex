@@ -50,7 +50,7 @@ public final class Databases {
    * @return database and backup list
    */
   public StringList list() {
-    return list(true, true, null);
+    return list(true, null);
   }
 
   /**
@@ -59,18 +59,17 @@ public final class Databases {
    * @return database list
    */
   public StringList listDBs(final String name) {
-    return list(true, false, name);
+    return list(false, name);
   }
 
   /**
    * Returns the sorted names of all available databases and, optionally, backups.
    * Filters for {@code name} if not {@code null} with glob support.
-   * @param db return databases?
    * @param backup return backups?
    * @param name database pattern (may be {@code null})
    * @return database and backups list
    */
-  private StringList list(final boolean db, final boolean backup, final String name) {
+  private StringList list(final boolean backup, final String name) {
     final Pattern pt = name == null ? null : regex(name);
     final IOFile[] children = soptions.dbPath().children();
     final StringList list = new StringList(children.length);
@@ -81,7 +80,7 @@ public final class Databases {
       if(backup && fn.endsWith(IO.ZIPSUFFIX)) {
         final String nn = ZIPPATTERN.split(fn)[0];
         if(!nn.equals(fn)) add = nn;
-      } else if(db && f.isDir() && !fn.startsWith(".")) {
+      } else if(f.isDir() && !fn.startsWith(".")) {
         add = fn;
       }
       // add entry if it matches the pattern, and has not already been added

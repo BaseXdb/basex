@@ -57,13 +57,6 @@ public final class IntObjMap<E> extends IntSet {
   }
 
   @Override
-  public int delete(final int key) {
-    final int i = super.delete(key);
-    if(i != 0) values[i] = null;
-    return i;
-  }
-
-  @Override
   public void clear() {
     super.clear();
     Arrays.fill(values, null);
@@ -71,11 +64,8 @@ public final class IntObjMap<E> extends IntSet {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.className(this)).add('[');
-    for(int i = 1; i < size; i++) {
-      tb.add(Integer.toString(keys[i])).add(": ").addExt(get(keys[i]));
-      if(i < size - 1) tb.add(",\n\t");
-    }
-    return tb.add(']').toString();
+    final List<Object> k = new ArrayList<>();
+    for(final int key : keys) k.add(Integer.valueOf(key));
+    return toString(k.toArray(), values);
   }
 }

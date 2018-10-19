@@ -72,10 +72,10 @@ abstract class SqlFn extends StandardFunc {
     final AutoCloseable ac = conns.get(id);
     switch(mode) {
       case 1:
-        if(ac == null || !(ac instanceof Connection)) throw SQL_ID1_X.get(info, id);
+        if(!(ac instanceof Connection)) throw SQL_ID1_X.get(info, id);
         break;
       case 2:
-        if(ac == null || !(ac instanceof PreparedStatement)) throw SQL_ID2_X.get(info, id);
+        if(!(ac instanceof PreparedStatement)) throw SQL_ID2_X.get(info, id);
         break;
       default:
         if(ac == null) throw SQL_ID1_X.get(info, id);

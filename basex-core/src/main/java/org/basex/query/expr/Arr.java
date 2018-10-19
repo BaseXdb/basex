@@ -145,6 +145,6 @@ public abstract class Arr extends ParseExpr {
    * @return string representation
    */
   protected String toString(final String sep) {
-    return new TokenBuilder(PAREN1).addSep(exprs, sep).add(PAREN2).toString();
+    return new TokenBuilder().add(PAREN1).addSep(exprs, sep).add(PAREN2).toString();
   }
 }

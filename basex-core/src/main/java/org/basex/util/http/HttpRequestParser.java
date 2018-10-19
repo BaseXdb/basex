@@ -178,21 +178,17 @@ public final class HttpRequestParser {
     req.attributes.put(Request.METHOD, mth.toUpperCase(Locale.ENGLISH));
 
     // check parameters needed in case of authorization
-    final String sendAuth = req.attribute(Request.SEND_AUTHORIZATION);
-    if(sendAuth != null && Strings.yes(sendAuth)) {
-      final String us = req.attribute(Request.USERNAME);
-      if(us == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.USERNAME);
+    final String us = req.attribute(Request.USERNAME);
+    if(us != null) {
+      // check if password is supplied
       final String pw = req.attribute(Request.PASSWORD);
       if(pw == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.PASSWORD);
+      // check if authorization method is supplied (default is 'Basic')
       final String am = req.attribute(Request.AUTH_METHOD);
-      if(am != null && !am.isEmpty()) {
+      if(am != null) {
         req.authMethod = StaticOptions.AUTHMETHOD.get(am);
         if(req.authMethod == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
       }
-    } else {
-      req.attributes.remove(Request.USERNAME);
-      req.attributes.remove(Request.PASSWORD);
-      req.attributes.remove(Request.AUTH_METHOD);
     }
 
     // check other parameters

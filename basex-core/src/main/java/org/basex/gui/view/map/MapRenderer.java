@@ -183,7 +183,7 @@ final class MapRenderer {
         case 0:
           h = drawToken(rect, data, false);
           break;
-        case 1: case 2:
+        case 1:
           h = drawSentence(rect, data, false, rect.h);
           break;
       }
@@ -281,8 +281,7 @@ final class MapRenderer {
 
       int ct = 0;
       int wl = 0;  // word and line length
-      while(i < dl0 && ppl < dl2 && data2[ppl] > pl &&
-        (psl < dl1 && data1[psl] > sl || psl >= dl1)) {
+      while(i < dl0 && ppl < dl2 && data2[ppl] > pl && (psl >= dl1 || data1[psl] > sl)) {
         sl += data0[i];
         pl += data0[i];
         final int lastl = (int) (data0[i] * rect.thumbf);

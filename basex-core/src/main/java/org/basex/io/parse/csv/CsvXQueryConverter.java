@@ -49,10 +49,10 @@ public final class CsvXQueryConverter extends CsvConverter {
   }
 
   @Override
-  protected Map finish() throws QueryIOException {
+  protected XQMap finish() throws QueryIOException {
     if(row != null) rows.add(row.freeze());
     try {
-      Map map = Map.EMPTY;
+      XQMap map = XQMap.EMPTY;
       if(!headers.isEmpty()) {
         final ArrayBuilder names = new ArrayBuilder();
         for(final byte[] header : headers) names.append(Str.get(header));

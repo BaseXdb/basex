@@ -92,11 +92,7 @@ public final class Jobs {
    * @param id job id
    */
   public void remove(final String id) {
-    // request size every time (list may shrink)
-    for(int l = 0; l < list.size(); l++) {
-      final QueryJobSpec spec = list.get(l);
-      if(id.equals(spec.options.get(JobsOptions.ID))) list.remove(l);
-    }
+    list.removeIf(job -> id.equals(job.options.get(JobsOptions.ID)));
   }
 
   /**

@@ -92,8 +92,8 @@ public final class FuncOptions {
     if(item != null) {
       final TokenBuilder tb = new TokenBuilder();
       try {
-        if(item instanceof Map) {
-          options.assign((Map) item, !acceptUnknown, info);
+        if(item instanceof XQMap) {
+          options.assign((XQMap) item, !acceptUnknown, info);
         } else {
           if(test == null) throw MAP_X_X.get(info, item.type, item);
           if(!test.eq(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);

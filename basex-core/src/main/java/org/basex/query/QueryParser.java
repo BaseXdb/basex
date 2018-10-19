@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryError.chop;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryText.DOLLAR;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
@@ -1322,7 +1323,7 @@ public class QueryParser extends InputParser {
       groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
 
-    return new Switch(info, cond, groups.toArray(new SwitchGroup[groups.size()]));
+    return new Switch(info, cond, groups.toArray(new SwitchGroup[0]));
   }
 
   /**
@@ -1359,7 +1360,7 @@ public class QueryParser extends InputParser {
       }
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      final SeqType[] st = types.toArray(new SeqType[types.size()]);
+      final SeqType[] st = types.toArray(new SeqType[0]);
       cases = Array.add(cases, new TypeswitchGroup(info(), var, st, ret));
       localVars.closeScope(s);
       types.clear();
@@ -1801,7 +1802,7 @@ public class QueryParser extends InputParser {
       }
       pos += 2;
     } while(wsConsumeWs(PRAGMA));
-    return el.toArray(new Pragma[el.size()]);
+    return el.toArray(new Pragma[0]);
   }
 
   /**
@@ -1835,8 +1836,8 @@ public class QueryParser extends InputParser {
       final Expr ex;
       if(consume('/')) {
         // two slashes: absolute descendant path
-        checkAxis(Axis.DESC);
-        add(el, Step.get(info(), Axis.DESCORSELF, KindTest.NOD));
+        checkAxis(Axis.DESCENDANT);
+        add(el, Step.get(info(), Axis.DESCENDANT_OR_SELF, KindTest.NOD));
         mark();
         ex = step(true);
       } else {
@@ -1873,8 +1874,8 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, Step.get(info(), Axis.DESCORSELF, KindTest.NOD));
-          checkAxis(Axis.DESC);
+          add(el, Step.get(info(), Axis.DESCENDANT_OR_SELF, KindTest.NOD));
+          checkAxis(Axis.DESCENDANT);
         } else {
           checkAxis(Axis.CHILD);
         }
@@ -1940,7 +1941,7 @@ public class QueryParser extends InputParser {
       test = KindTest.NOD;
       checkTest(test, false);
     } else if(consume('@')) {
-      axis = Axis.ATTR;
+      axis = Axis.ATTRIBUTE;
       test = nodeTest(true, true);
       checkTest(test, true);
       if(test == null) {
@@ -1954,7 +1955,7 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(COLS)) {
           alterPos = pos;
           axis = ax;
-          final boolean attr = ax == Axis.ATTR;
+          final boolean attr = ax == Axis.ATTRIBUTE;
           test = nodeTest(attr, true);
           checkTest(test, attr);
           if(test == null) throw error(AXISMISS_X, axis);
@@ -1967,8 +1968,8 @@ public class QueryParser extends InputParser {
         axis = Axis.CHILD;
         test = nodeTest(false, true);
         if(test == KindTest.NSP) throw error(NSAXIS);
-        if(test != null && test.type == NodeType.ATT) axis = Axis.ATTR;
-        checkTest(test, axis == Axis.ATTR);
+        if(test != null && test.type == NodeType.ATT) axis = Axis.ATTRIBUTE;
+        checkTest(test, axis == Axis.ATTRIBUTE);
       }
       if(test == null) {
         if(error) throw error(STEPMISS_X, found());
@@ -1990,30 +1991,30 @@ public class QueryParser extends InputParser {
    * Parses the "NodeTest" rule.
    * Parses the "NameTest" rule.
    * Parses the "KindTest" rule.
-   * @param att attribute flag
+   * @param attr attribute flag
    * @param all check all tests, or only names
    * @return test or {@code null}
    * @throws QueryException query exception
    */
-  private Test nodeTest(final boolean att, final boolean all) throws QueryException {
+  private Test nodeTest(final boolean attr, final boolean all) throws QueryException {
     int p = pos;
     if(consume('*')) {
       p = pos;
       if(consume(':')) {
         // name test: *:name
-        if(!consume('*')) return new NameTest(new QNm(ncName(QNAME_X)), Kind.NAME, att, sc.elemNS);
+        if(!consume('*')) return new NameTest(attr, Kind.NAME, new QNm(ncName(QNAME_X)), sc.elemNS);
       }
       // name test: *
       pos = p;
-      return new NameTest(att);
+      return new NameTest(attr);
     }
 
     if(consume(EQNAME)) {
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
         // name test: Q{uri}*
-        final QNm nm = new QNm(COLON, uri);
-        return new NameTest(nm, Kind.URI, att, sc.elemNS);
+        final QNm name = new QNm(COLON, uri);
+        return new NameTest(attr, Kind.URI, name, sc.elemNS);
       }
     }
     pos = p;
@@ -2033,12 +2034,12 @@ public class QueryParser extends InputParser {
         if(!name.hasPrefix() && consume(COLWC)) {
           // name test: prefix:*
           name = new QNm(concat(name.string(), COLON));
-          qnames.add(name, !att, info);
-          return new NameTest(name, Kind.URI, att, sc.elemNS);
+          qnames.add(name, !attr, info);
+          return new NameTest(attr, Kind.URI, name, sc.elemNS);
         }
         // name test: prefix:name, name, Q{uri}name
-        qnames.add(name, !att, info);
-        return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
+        qnames.add(name, !attr, info);
+        return new NameTest(attr, Kind.URI_NAME, name, sc.elemNS);
       }
     }
     pos = p;
@@ -3541,7 +3542,8 @@ public class QueryParser extends InputParser {
         wsCheck(WORDS);
 
         if(opt.sw != null) throw error(FTDUP_X, STOP + ' ' + WORDS);
-        opt.sw = new StopWords();
+        final StopWords sw = new StopWords();
+        opt.sw = sw;
         if(wsConsumeWs(DEFAULT)) {
           if(!using) throw error(FTSTOP);
         } else if(using) {
@@ -3550,8 +3552,8 @@ public class QueryParser extends InputParser {
             if(wsConsume(PAREN1)) {
               do {
                 final byte[] sl = stringLiteral();
-                if(except) opt.sw.delete(sl);
-                else if(!union || !opt.sw.contains(sl)) opt.sw.add(sl);
+                if(except) sw.remove(sl);
+                else sw.add(sl);
               } while(wsConsume(COMMA));
               wsCheck(PAREN2);
             } else if(wsConsumeWs(AT)) {

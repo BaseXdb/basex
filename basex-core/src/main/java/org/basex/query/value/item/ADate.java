@@ -334,7 +334,7 @@ public abstract class ADate extends ADateDur {
       prefix(tb, minute(), 2);
       tb.add(':');
       if(sec.intValue() < 10) tb.add('0');
-      tb.addExt(Token.chopNumber(Token.token(sec().abs().toPlainString())));
+      tb.add(Token.chopNumber(Token.token(sec().abs().toPlainString())));
     }
     zone(tb);
     return tb.finish();

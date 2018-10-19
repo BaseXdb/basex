@@ -38,7 +38,7 @@ public final class Union extends Set {
     for(final Expr expr : exprs) {
       if(expr == Empty.SEQ) {
         // remove empty operands
-        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) () -> description());
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
       }

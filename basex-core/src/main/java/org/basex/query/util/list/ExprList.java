@@ -1,6 +1,7 @@
 package org.basex.query.util.list;
 
 import org.basex.query.expr.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -43,8 +44,8 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
   public static Expr[] concat(final Expr[] source, final Expr... add) {
     final int sl = source.length, al = add.length;
     final Expr[] tmp = new Expr[sl + al];
-    System.arraycopy(source, 0, tmp, 0, sl);
-    System.arraycopy(add, 0, tmp, sl, al);
+    Array.copy(source, sl, tmp);
+    Array.copyFromStart(add, al, tmp, sl);
     return tmp;
   }
 

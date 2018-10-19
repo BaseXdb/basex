@@ -155,9 +155,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(1);
     query("insert node attribute { QName('ns', 'pref:local') } { } into /*");
     final Data data = context.data();
-    assertEquals(false, data.nsFlag(0));
-    assertEquals(true, data.nsFlag(1));
-    assertEquals(false, data.nsFlag(2));
+    assertFalse(data.nsFlag(0));
+    assertTrue(data.nsFlag(1));
+    assertFalse(data.nsFlag(2));
     assertEquals(0, data.uriId(1, data.kind(1)));
     assertEquals(1, data.uriId(2, data.kind(2)));
     assertEquals("ns", string(data.nspaces.uri(1)));

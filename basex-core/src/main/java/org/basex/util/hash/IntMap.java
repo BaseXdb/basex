@@ -66,11 +66,9 @@ public final class IntMap extends IntSet {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.className(this)).add('[');
-    for(int i = 1; i < size; i++) {
-      tb.add(Integer.toString(keys[i])).add(": ").addExt(get(keys[i]));
-      if(i < size - 1) tb.add(",\n\t");
-    }
-    return tb.add(']').toString();
+    final List<Object> k = new ArrayList<>(), v = new ArrayList<>();
+    for(final int key : keys) k.add(Integer.valueOf(key));
+    for(final int value : values) v.add(Integer.valueOf(value));
+    return toString(k.toArray(), v.toArray());
   }
 }

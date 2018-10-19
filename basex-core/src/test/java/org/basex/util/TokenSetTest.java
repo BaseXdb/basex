@@ -43,7 +43,7 @@ public class TokenSetTest {
   /** Tests removed tokens. */
   @Test
   public void delete() {
-    for(final byte[] token : LIST) set.delete(token);
+    for(final byte[] token : LIST) set.remove(token);
     for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
   }
 
@@ -52,11 +52,11 @@ public class TokenSetTest {
   public void addDelete() {
     for(final byte[] token : LIST) set.add(token);
     for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
-    for(final byte[] token : LIST) set.delete(token);
+    for(final byte[] token : LIST) set.remove(token);
     for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
     for(final byte[] token : LIST) set.add(token);
     for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
-    for(final byte[] token : LIST) set.delete(token);
+    for(final byte[] token : LIST) set.remove(token);
     for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
   }
 }

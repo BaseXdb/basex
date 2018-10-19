@@ -294,10 +294,10 @@ public final class StompV12WebSocket extends WebSocket {
    * Finds a function and processes it.
    * @param ann annotation
    * @param message message (can be {@code null}; otherwise string or byte array)
-   * @param path The WebSocketFunctionPath (can be {@code null}; if null, use path of the websocket)
+   * @param wpath The WebSocketFunctionPath (can be {@code null}; if null, use path of the websocket)
    */
-  private void findAndProcess(final Annotation ann, final Object message, String path) {
-    String wspath = path == null ? this.getPath() : path;
+  private void findAndProcess(final Annotation ann, final Object message, final String wpath) {
+    String wspath = wpath == null ? this.getPath() : wpath;
     // check if an HTTP session exists, and if it still valid
     try {
       if(session != null) session.getCreationTime();

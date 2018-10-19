@@ -9,19 +9,19 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests for the {@link Array} data structure.
+ * Tests for the {@link XQArray} data structure.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
 public final class VariousArrayTest extends ArrayTest {
   /**
-   * Test for {@link Array#cons(Value)} and {@link Array#snoc(Value)}.
+   * Test for {@link XQArray#cons(Value)} and {@link XQArray#snoc(Value)}.
    */
   @Test
   public void consSnocTest() {
     final int n = 200_000;
-    Array seq = Array.empty();
+    XQArray seq = XQArray.empty();
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
       seq = seq.cons(val).snoc(val);
@@ -35,12 +35,12 @@ public final class VariousArrayTest extends ArrayTest {
   }
 
   /**
-   * Test an {@link Array} used as a FIFO queue.
+   * Test an {@link XQArray} used as a FIFO queue.
    */
   @Test
   public void queueTest() {
     final int n = 2_000_000, k = n / 100;
-    Array seq = Array.empty();
+    XQArray seq = XQArray.empty();
     for(int i = 0; i < k; i++) seq = seq.cons(Int.get(i));
 
     for(int i = k; i < n; i++) {
@@ -61,12 +61,12 @@ public final class VariousArrayTest extends ArrayTest {
   }
 
   /**
-   * Test an {@link Array} used as a LIFO stack.
+   * Test an {@link XQArray} used as a LIFO stack.
    */
   @Test
   public void stackTest() {
     final int n = 2_000_000;
-    Array seq = Array.empty();
+    XQArray seq = XQArray.empty();
 
     for(int i = 0; i < n; i++) {
       assertEquals(i, seq.arraySize());
@@ -88,12 +88,12 @@ public final class VariousArrayTest extends ArrayTest {
   }
 
   /**
-   * Test for {@link Array#members()}.
+   * Test for {@link XQArray#members()}.
    */
   @Test
   public void iteratorTest() {
     final int n = 1_000;
-    Array seq = Array.empty();
+    XQArray seq = XQArray.empty();
     assertFalse(seq.iterator(0).hasNext());
 
     for(int i = 0; i < n; i++) {
@@ -111,10 +111,10 @@ public final class VariousArrayTest extends ArrayTest {
     }
   }
 
-  /** Tests {@link Array#tail()}. */
+  /** Tests {@link XQArray#tail()}. */
   @Test
   public void tailTest() {
-    Array seq = Array.empty();
+    XQArray seq = XQArray.empty();
     for(int i = 0; i < 15; i++) {
       seq = seq.snoc(Int.get(i));
     }

@@ -103,24 +103,13 @@ public final class CsvDirectSerializer extends CsvSerializer {
     if(headers != null) {
       final byte[] key = atts && attv != null ? attv : elem.string();
       final byte[] name = XMLToken.decode(key, lax);
-      if(name == null) error("Invalid element name <%>", key);
+      if(name == null) throw CSV_SERIALIZE_X.getIO(Util.inf("Invalid element name <%>", key));
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
-      final byte[] txt = old == null || old.length == 0 ? value :
-        value.length == 0 ? old : new TokenBuilder(old).add(',').add(value).finish();
-      data.put(name, txt);
+      data.put(name, old == null || old.length == 0 ? value :
+        value.length == 0 ? old : concat(old, ',', value));
     } else {
       data.put(token(data.size()), value);
     }
-  }
-
-  /**
-   * Raises an error with the specified message.
-   * @param msg error message
-   * @param ext error details
-   * @throws IOException I/O exception
-   */
-  private static void error(final String msg, final Object... ext) throws IOException {
-    throw CSV_SERIALIZE_X.getIO(Util.inf(msg, ext));
   }
 }

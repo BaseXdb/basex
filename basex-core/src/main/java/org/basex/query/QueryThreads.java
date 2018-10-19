@@ -38,7 +38,7 @@ public final class QueryThreads {
    * @return cache
    */
   public ThreadLocal<CmpCache> get(final CmpHashG expr) {
-    return cmpCache.computeIfAbsent(expr, p -> new ThreadLocal<>());
+    return cmpCache.computeIfAbsent(expr, p -> ThreadLocal.withInitial(CmpCache::new));
   }
 
   /**

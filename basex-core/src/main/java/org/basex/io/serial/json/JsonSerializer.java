@@ -12,7 +12,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 import org.basex.util.options.Options.YesNo;
@@ -72,13 +72,13 @@ public abstract class JsonSerializer extends StandardSerializer {
   @Override
   public void function(final FItem item) throws IOException {
     try {
-      if(item instanceof Map) {
+      if(item instanceof XQMap) {
         level++;
         out.print('{');
 
         boolean s = false;
         final TokenSet set = nodups ? new TokenSet() : null;
-        final Map m = (Map) item;
+        final XQMap m = (XQMap) item;
         for(final Item key : m.keys()) {
           final byte[] name = key.string(null);
           if(nodups) {
@@ -98,12 +98,12 @@ public abstract class JsonSerializer extends StandardSerializer {
         indent();
         out.print('}');
 
-      } else if(item instanceof Array) {
+      } else if(item instanceof XQArray) {
         level++;
         out.print('[');
 
         boolean s = false;
-        for(final Value value : ((Array) item).members()) {
+        for(final Value value : ((XQArray) item).members()) {
           if(s) out.print(',');
           indent();
           serialize(value);

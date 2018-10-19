@@ -21,8 +21,6 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FElem extends FNode {
-  /** Dummy element. */
-  public static final FElem DUMMY = new FElem("");
   /** Element name. */
   private final QNm name;
 
@@ -398,10 +396,10 @@ public final class FElem extends FNode {
       for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
     }
     if(at != null) {
-      for(final ANode n : atts) at.add(n.materialize(qc, copy));
+      for(final ANode n : atts) at.add(n.materialize(qc, true));
     }
     if(ch != null) {
-      for(final ANode n : children) ch.add(n.materialize(qc, copy));
+      for(final ANode n : children) ch.add(n.materialize(qc, true));
     }
     return node.optimize();
   }
@@ -426,11 +424,11 @@ public final class FElem extends FNode {
     if(ns != null) {
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
-        tb.add(' ').addExt(new FNSpace(ns.name(n), ns.value(n)));
+        tb.add(' ').add(new FNSpace(ns.name(n), ns.value(n)));
       }
     }
     if(atts != null) {
-      for(final ANode att : atts) tb.add(' ').addExt(att);
+      for(final ANode att : atts) tb.add(' ').add(att);
     }
     if(hasChildren()) {
       tb.add('>');

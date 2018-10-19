@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class MapPut extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Map map = toMap(exprs[0], qc);
+    final XQMap map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
     final Value value = exprs[2].value(qc);
     return map.put(key, value, info);
@@ -33,7 +33,7 @@ public final class MapPut extends StandardFunc {
       if(type2 != null) {
         SeqType st = expr3.seqType();
         // merge types if input is expected to have at least one entry
-        if(!(expr1 instanceof Map && ((Map) expr1).mapSize() == 0)) {
+        if(!(expr1 instanceof XQMap && ((XQMap) expr1).mapSize() == 0)) {
           final MapType mt = (MapType) type1;
           type2 = mt.keyType().union(type2);
           st = mt.declType.union(expr3.seqType());

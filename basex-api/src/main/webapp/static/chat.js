@@ -2,14 +2,11 @@ var href = window.location.href.replace(/^http(.*)\/chat\/?$/, "ws$1/ws/chat");
 var ws = new WebSocket(href);
 var to = "";
 
-function pingpong() {
-  send("ping","");
-  setTimeout(pingpong, 299000);
-}
-
 ws.onopen = function(event) {
-  setTimeout(pingpong, 299000);
-  send("users", "");
+  // send regular ping to keep connection alive
+  setInterval(function ping() {
+    send("ping", "");
+  }, 250000);
 };
 
 ws.onmessage = function(event) {
@@ -33,10 +30,6 @@ ws.onmessage = function(event) {
   } else {
     console.log("UNKNOWN COMMAND", event);
   }
-};
-
-ws.onclose = function(event) {
-  send("users", "");
 };
 
 // helper functions

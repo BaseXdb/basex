@@ -81,7 +81,7 @@ public class B64 extends Bin {
 
   @Override
   public byte[] string(final InputInfo info) throws QueryException {
-    return org.basex.util.Base64.encode(binary(info));
+    return Base64.encode(binary(info));
   }
 
   @Override
@@ -107,7 +107,7 @@ public class B64 extends Bin {
    */
   public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
     try {
-      return org.basex.util.Base64.decode(item.string(info));
+      return Base64.decode(item.string(info));
     } catch(final IllegalArgumentException ex) {
       throw AtomType.B64.castError(item, info);
     }
@@ -122,7 +122,7 @@ public class B64 extends Bin {
    */
   public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
     try {
-      return org.basex.util.Base64.decode(value);
+      return Base64.decode(value);
     } catch(final IllegalArgumentException ex) {
       throw AtomType.B64.castError(value, info);
     }
@@ -130,6 +130,6 @@ public class B64 extends Bin {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", org.basex.util.Base64.encode(data));
+    return Util.info("\"%\"", Base64.encode(data));
   }
 }

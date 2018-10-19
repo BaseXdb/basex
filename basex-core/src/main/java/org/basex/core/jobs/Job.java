@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public abstract class Job {
   /** Child jobs. */
-  private final List<Job> children = Collections.synchronizedList(new ArrayList<Job>(0));
+  private final List<Job> children = Collections.synchronizedList(new ArrayList<>(0));
   /** Job context. */
   private JobContext jc = new JobContext(this);
   /** Timer. */

@@ -12,7 +12,7 @@ public final class History {
   /** Maximum number of entries to be stored. */
   private static final int MAX = 1024;
 
-  /** String history. */
+  /** Text history. */
   private final byte[][] hist;
   /** Caret history. */
   private final int[] caret;
@@ -124,8 +124,8 @@ public final class History {
     if(off == 0 && pos + 1 == MAX) off = 1;
     // remove entries
     if(off > 0) {
-      Array.move(hist, off, -off, MAX - off);
-      Array.move(caret, off, -off, MAX - off);
+      Array.remove(hist, 0, off, MAX);
+      Array.remove(caret, 0, off, MAX);
       saved -= off;
       pos -= off;
     }

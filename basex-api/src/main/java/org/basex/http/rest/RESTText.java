@@ -12,7 +12,7 @@ import org.basex.util.*;
  */
 interface RESTText {
   /** REST URI. */
-  byte[] REST_URI = new TokenBuilder(Prop.URL).add('/').add(QueryText.REST_PREFIX).finish();
+  byte[] REST_URI = Token.concat(Prop.URL, '/', QueryText.REST_PREFIX);
 
   /** Name. */
   QNm Q_DATABASES = new QNm(QueryText.REST_PREFIX, "databases", REST_URI);

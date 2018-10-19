@@ -1,19 +1,67 @@
-module namespace chat = 'http://basex.org/modules/web-page';
+(:~
+ : Simple WebSocket chat. RESTXQ functions.
+ : @author BaseX Team, 2014-18
+ :)
+module namespace chat = 'chat';
 
-import module namespace session = 'http://basex.org/modules/Session';
-import module namespace sessions = 'http://basex.org/modules/Sessions';
-
-(:~ Session chat id. :)
-declare variable $chat:ID := 'chat';
+import module namespace chat-util = 'chat/util' at 'chat-util.xqm';
 
 (:~
- : Login page.
- : @return page
+ : Login or main page.
+ : @return HTML page
+ :)  
+declare
+  %rest:path('/chat')
+  %output:method('html')
+function chat:chat() as element() {
+  if(session:get($chat-util:id)) then (
+    chat:main()
+  ) else (
+    chat:login()
+  )
+};
+
+(:~
+ : Checks the user input, registers the user and reloads the chat.
+ : @param  $name  user name
+ : @param  $pass  password
+ : @return redirection
+ :)  
+declare
+  %rest:POST
+  %rest:path('/chat/login-check')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('pass', '{$pass}')
+function chat:login-check(
+  $name  as xs:string,
+  $pass  as xs:string
+) as element(rest:response) {
+  try {
+    user:check($name, $pass),
+    session:set($chat-util:id, $name)
+  } catch user:* {
+    (: login fails: no session info is set :)
+  },
+  web:redirect('/chat')
+};
+
+(:~
+ : Logs out the current user, notifies all WebSocket clients, and redirects to the login page.
+ : @return redirection
  :)
 declare
-  %rest:path('/chat/login')
-  %output:method('html')
-function chat:login() as element(html) {
+  %rest:path('/chat/logout')
+function chat:logout() as element(rest:response) {
+  session:get($chat-util:id) ! chat-util:close(.),
+  session:delete($chat-util:id),
+  web:redirect('/chat')
+};
+
+(:~
+ : Returns the HTML login page.
+ : @return HTML page
+ :)
+declare %private function chat:login() as element(html) {
   chat:wrap((
     <div class='warning'>Please enter your credentials:</div>,
     <form action='/chat/login-check' method='post'>
@@ -38,17 +86,10 @@ function chat:login() as element(html) {
 };
 
 (:~
- : Main page.
- : @return HTML page or redirection
- :)  
-declare
-  %rest:path('/chat')
-  %output:method('html')
-function chat:main(
-) as item() {
-  let $id := session:get($chat:ID)
-  return if(empty($id)) then web:redirect('/chat/login') else
-  
+ : Returns the HTML main page.
+ : @return HTML page
+ :)
+declare %private function chat:main() as element(html) {
   chat:wrap((
     <p>
       <input type='text' size='60' autofocus='true' placeholder='Message to all users…'
@@ -67,38 +108,14 @@ function chat:main(
         </td>
       </tr>
     </table>
-  ), <script type="text/javascript" src="/static/chat.js"/>)
-};
-
-(:~
- : Checks the user input and redirects to the main page, or back to the login page.
- : @param  $name  user name
- : @param  $pass  password
- : @return redirection
- :)  
-declare
-  %rest:POST
-  %rest:path('/chat/login-check')
-  %rest:query-param('name', '{$name}')
-  %rest:query-param('pass', '{$pass}')
-function chat:check(
-  $name  as xs:string,
-  $pass  as xs:string
-) as element(rest:response) {
-  try {
-    user:check($name, $pass),
-    session:set($chat:ID, $name),
-    web:redirect('/chat')
-  } catch user:* {
-    web:redirect('/chat/login')
-  }
+  ), <script type='text/javascript' src='/static/chat.js'/>)
 };
 
 (:~
  : Returns an HTML page.
  : @param $contents  page contents
  : @param $login     login page
- : @return HTML
+ : @return HTML page
  :)
 declare %private function chat:wrap(
   $contents  as item()*,
@@ -115,10 +132,8 @@ declare %private function chat:wrap(
     <body>
       <span class='right'>
         {
-          for $id in session:get($chat:ID)
-          return <span>
-            <b>{ $id }</b> (<a href='/chat/logout'>logout</a>)
-          </span>
+          for $id in session:get($chat-util:id)
+          return <span><b>{ $id }</b> (<a href='/chat/logout'>logout</a>)</span>
         }
         &#xa0; <img src='/static/basex.svg' class='img'/>
       </span>

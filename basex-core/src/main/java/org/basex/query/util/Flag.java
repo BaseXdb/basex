@@ -45,17 +45,17 @@ public enum Flag {
   HOF;
 
   /**
-   * Removes a flag from the specified array.
+   * Removes this flag from the specified array.
    * @param flags flags
-   * @return resulting array
+   * @return new array
    */
   public Flag[] remove(final Flag[] flags) {
     final int i = indexOf(flags);
-    return i == -1 ? flags : Array.delete(flags, i);
+    return i == -1 ? flags : Array.remove(flags, i);
   }
 
   /**
-   * Checks if the flag is contained in the specified array.
+   * Checks this flag is contained in the specified array.
    * @param flags flags
    * @return result of check
    */

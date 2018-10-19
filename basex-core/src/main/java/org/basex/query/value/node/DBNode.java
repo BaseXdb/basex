@@ -190,7 +190,7 @@ public class DBNode extends ANode {
         final String path = data.meta.original;
         return Token.token(path.isEmpty() ? base : IO.get(path).merge(base).url());
       }
-      return new TokenBuilder().add('/').add(data.meta.name).add('/').add(base).finish();
+      return Token.concat('/', data.meta.name, '/', base);
     }
     final byte[] base = attribute(QNm.XML_BASE);
     return base != null ? base : Token.EMPTY;
@@ -456,7 +456,7 @@ public class DBNode extends ANode {
   private String toString(final boolean func) {
     if(func) return Function._DB_OPEN_PRE.args(data.meta.name, pre).substring(1);
 
-    final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
+    final TokenBuilder tb = new TokenBuilder().add(type.string()).add(' ');
     switch((NodeType) type) {
       case ATT:
       case PI:

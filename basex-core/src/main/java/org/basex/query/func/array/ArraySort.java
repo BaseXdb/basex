@@ -10,7 +10,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -24,7 +24,7 @@ import org.basex.util.*;
 public final class ArraySort extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Array array = toArray(exprs[0], qc);
+    final XQArray array = toArray(exprs[0], qc);
     Collation coll = sc.collation;
     if(exprs.length > 1) {
       final byte[] tok = toTokenOrNull(exprs[1], qc);

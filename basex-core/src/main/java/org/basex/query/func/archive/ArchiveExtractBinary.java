@@ -46,7 +46,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
-        if(!ze.isDirectory() && (hs == null || hs.delete(token(ze.getName())) != 0))
+        if(!ze.isDirectory() && (hs == null || hs.remove(token(ze.getName())) != 0))
           tl.add(in.read());
       }
     } catch(final IOException ex) {

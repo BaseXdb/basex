@@ -10,9 +10,9 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -89,7 +89,7 @@ public final class DynFuncCall extends FuncCall {
     }
 
     // maps and arrays can only contain evaluated values, so this is safe
-    if((func instanceof Map || func instanceof Array) && allAreValues(false))
+    if((func instanceof XQMap || func instanceof XQArray) && allAreValues(false))
       return cc.preEval(this);
 
     if(func instanceof XQFunctionExpr) {
@@ -210,7 +210,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(body().toString()).add('(');
+    final TokenBuilder tb = new TokenBuilder().add(body()).add('(');
     final int last = exprs.length - 1;
     for(int e = 0; e < last; e++) {
       tb.add(exprs[e].toString());

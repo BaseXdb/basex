@@ -1,6 +1,7 @@
 package org.basex.query.util.fingertree;
 
 import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * A <i>deep</i> node containing elements in the left and right digit and a sub-tree in
@@ -226,12 +227,12 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       final Node<N, E>[] ch = new Node[curr];
       final int inL = l - p;
       if(curr <= inL) {
-        System.arraycopy(as, p, ch, 0, curr);
+        Array.copyToStart(as, p, curr, ch);
       } else if(inL > 0) {
-        System.arraycopy(as, p, ch, 0, inL);
-        System.arraycopy(bs, 0, ch, inL, curr - inL);
+        Array.copyToStart(as, p, inL, ch);
+        Array.copyFromStart(bs, curr - inL, ch, inL);
       } else {
-        System.arraycopy(bs, -inL, ch, 0, curr);
+        Array.copyToStart(bs, -inL, curr, ch);
       }
       out[i] = new InnerNode<>(ch);
       p += curr;
@@ -317,14 +318,14 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       @SuppressWarnings("unchecked")
       final Node<N, E>[] temp = new Node[ll + 1];
       if(i > 0) {
-        System.arraycopy(left, 0, temp, 0, i - 1);
+        Array.copy(left, i - 1, temp);
         temp[i - 1] = siblings[0];
       }
       temp[i] = siblings[1];
       temp[i + 1] = siblings[2];
       if(i + 1 < ll) {
         temp[i + 2] = siblings[3];
-        System.arraycopy(left, i + 2, temp, i + 3, ll - i - 2);
+        Array.copy(left, i + 2, ll - i - 2, temp, i + 3);
       }
       if(ll < MAX_DIGIT) return new DeepTree<>(temp, leftSize + 1, middle, right, size + 1);
 
@@ -365,14 +366,14 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     @SuppressWarnings("unchecked")
     final Node<N, E>[] temp = new Node[rl + 1];
     if(i > 0) {
-      System.arraycopy(right, 0, temp, 0, i - 1);
+      Array.copy(right, i - 1, temp);
       temp[i - 1] = siblings[0];
     }
     temp[i] = siblings[1];
     temp[i + 1] = siblings[2];
     if(i + 1 < rl) {
       temp[i + 2] = siblings[3];
-      System.arraycopy(right, i + 2, temp, i + 3, rl - i - 2);
+      Array.copy(right, i + 2, rl - i - 2, temp, i + 3);
     }
     if(right.length < MAX_DIGIT) return new DeepTree<>(left, leftSize, middle, temp, size + 1);
 
@@ -419,9 +420,9 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     @SuppressWarnings("unchecked")
     final Node<N, E>[] newLeft = slice(left, 0, ll), ch = new Node[NODE_SIZE];
     final int inL = left.length - ll, inR = NODE_SIZE - inL - 1;
-    System.arraycopy(left, ll, ch, 0, inL);
+    Array.copyToStart(left, ll, inL, ch);
     ch[inL] = node;
-    System.arraycopy(right, 0, ch, inL + 1, inR);
+    Array.copyFromStart(right, inR, ch, inL + 1);
     final Node<N, E>[] newRight = slice(right, inR, MAX_DIGIT);
     final Node<Node<N, E>, E> newMid = new InnerNode<>(ch);
     return slice.setTree(get(newLeft, new SingletonTree<>(newMid), newRight, size - 1));
@@ -600,14 +601,14 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     final Node<N, E>[] out = new Node[n - 1];
     if(i > 0) {
       // nodes to the left
-      System.arraycopy(arr, 0, out, 0, i - 1);
+      Array.copy(arr, i - 1, out);
       out[i - 1] = l;
     }
 
     if(i < n - 1) {
       // nodes to the right
       out[i] = r;
-      System.arraycopy(arr, i + 2, out, i + 1, n - i - 2);
+      Array.copy(arr, i + 2, n - i - 2, out, i + 1);
     }
 
     return out;
@@ -762,7 +763,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     if(appendLeft) {
       int l = k + left.length;
       final Node<N, E>[] ls = slice(nodes, 0, l);
-      System.arraycopy(left, 0, ls, k, left.length);
+      Array.copyFromStart(left, left.length, ls, k);
       if(l <= MAX_DIGIT) return get(ls, middle, right);
 
       FingerTree<Node<N, E>, E> newMid = middle;
@@ -777,7 +778,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
     final int r = right.length + k;
     final Node<N, E>[] rs = slice(right, 0, r);
-    System.arraycopy(nodes, 0, rs, right.length, k);
+    Array.copyFromStart(nodes, k, rs, right.length);
     if(k + right.length <= MAX_DIGIT) return get(left, middle, rs);
 
     int i = 0;
@@ -866,8 +867,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    */
   static <N extends Node<?, ?>> long size(final N[] arr) {
     long size = 0;
-    for(final N o : arr)
-      size += o.size();
+    for(final N o : arr) size += o.size();
     return size;
   }
 
@@ -889,7 +889,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     final Node<N, E>[] out = new Node[to - from];
     final int in0 = Math.max(0, from), in1 = Math.min(to, arr.length);
     final int out0 = Math.max(-from, 0);
-    System.arraycopy(arr, in0, out, out0, in1 - in0);
+    Array.copy(arr, in0, in1 - in0, out, out0);
     return out;
   }
 }

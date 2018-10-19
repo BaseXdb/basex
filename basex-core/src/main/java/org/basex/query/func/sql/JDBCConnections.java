@@ -60,7 +60,7 @@ public final class JDBCConnections implements QueryResource {
    * @param id connection/prepared statement id
    */
   synchronized void remove(final Uri id) {
-    conns.delete(id.string());
+    conns.remove(id.string());
   }
 
   /**

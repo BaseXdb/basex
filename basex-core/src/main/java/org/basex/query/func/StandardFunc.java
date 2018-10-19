@@ -23,7 +23,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.Map;
+import org.basex.query.value.map.XQMap;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -371,7 +371,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     if(i < es) {
       final Item item = exprs[i].item(qc, info);
-      final Map map = item == null ? Map.EMPTY : toMap(item);
+      final XQMap map = item == null ? XQMap.EMPTY : toMap(item);
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it.type.isStringOrUntyped()) {
@@ -504,6 +504,6 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final String toString() {
-    return new TokenBuilder(sig.id()).add('(').addSep(exprs, SEP).add(')').toString();
+    return new TokenBuilder().add(sig.id()).add('(').addSep(exprs, SEP).add(')').toString();
   }
 }

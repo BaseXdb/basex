@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class ArraySubarray extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Array array = toArray(exprs[0], qc);
+    final XQArray array = toArray(exprs[0], qc);
     final long n = array.arraySize();
     final long from = toLong(exprs[1], qc) - 1;
     if(from < 0 || from > n) throw ARRAYBOUNDS_X_X.get(info, from + 1, n + 1);

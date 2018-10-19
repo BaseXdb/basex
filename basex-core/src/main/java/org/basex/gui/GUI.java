@@ -594,7 +594,8 @@ public final class GUI extends JFrame implements BaseXWindow {
       else control.remove(comp);
     }
     setContentBorder();
-    (fullscr == null ? getRootPane() : fullscr).validate();
+    final Component frame = fullscr == null ? getRootPane() : fullscr;
+    frame.validate();
     refreshControls();
   }
 

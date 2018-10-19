@@ -96,7 +96,7 @@ public final class PathNode {
 
     final int cl = children.length;
     final PathNode[] nodes = new PathNode[cl + 1];
-    System.arraycopy(children, 0, nodes, 0, cl);
+    Array.copy(children, cl, nodes);
     nodes[cl] = child;
     children = nodes;
     return child;

@@ -26,6 +26,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.http.HttpRequest.*;
 import org.basex.util.options.Options.*;
 
@@ -69,11 +70,14 @@ public final class HttpClient {
       // parse request data, set properties
       final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
       final String status = req.attribute(STATUS_ONLY);
+      final String sendAuth = req.attribute(SEND_AUTHORIZATION);
+
       final boolean body = status == null || !Strings.yes(status);
+      final boolean challenge = sendAuth == null || !Strings.yes(sendAuth);
       final String url = href == null || href.length == 0 ? req.attribute(HREF) : string(href);
 
       if(url == null || url.isEmpty()) throw HC_URL.get(info);
-      conn = connect(url, req);
+      conn = connect(url, req, challenge);
 
       if(!req.payload.isEmpty() || !req.parts.isEmpty()) {
         setContentType(conn, req);
@@ -93,52 +97,84 @@ public final class HttpClient {
    * Opens an HTTP connection.
    * @param url HTTP URL to open connection to
    * @param request request
+   * @param challenge send challenge
    * @return HTTP connection
    * @throws QueryException query exception
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection connect(final String url, final HttpRequest request)
-      throws QueryException, IOException {
+  private HttpURLConnection connect(final String url, final HttpRequest request,
+      final boolean challenge) throws QueryException, IOException {
 
+    // create connection, check if authentication data was supplied
     HttpURLConnection conn = connection(url, request);
     final String user = request.attribute(USERNAME), pass = request.attribute(PASSWORD);
-    if(user != null) {
-      if(request.authMethod == AuthMethod.BASIC) {
-        conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' +
-            org.basex.util.Base64.encode(user + ':' + pass));
+    if(user == null) return conn;
 
-      } else if(request.authMethod == AuthMethod.DIGEST) {
-        conn.setRequestProperty(AUTHORIZATION, DIGEST);
-
-        final EnumMap<Request, String> map = digestHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
-        final String
-          realm = map.get(REALM),
-          nonce = map.get(NONCE),
-          uri = conn.getURL().getPath(),
-          qop = map.get(QOP),
-          nc = "00000001",
-          cnonce = Strings.md5(Long.toString(System.nanoTime())),
-          ha1 = Strings.md5(user + ':' + realm + ':' + pass),
-          ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
-          rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2),
-          creds = USERNAME + "=\"" + user + "\","
-                + REALM + "=\"" + realm + "\","
-                + NONCE + "=\"" + nonce + "\","
-                + URI + "=\"" + uri + "\","
-                + QOP + '=' + qop + ','
-                + NC + '=' + nc + ','
-                + CNONCE + "=\"" + cnonce + "\","
-                + RESPONSE + "=\"" + rsp + "\","
-                + ALGORITHM + '=' + MD5 + ','
-                + OPAQUE + "=\"" + map.get(OPAQUE) + '"';
-
-        conn.disconnect();
+    // Basic authentication
+    final AuthMethod am = request.authMethod;
+    if(am == AuthMethod.BASIC) {
+      if(challenge) {
+        // send challenge, create new connection
+        if(challenge(conn, am) == null) return null;
         conn = connection(url, request);
-        conn.setRequestProperty(AUTHORIZATION, DIGEST + ' ' + creds);
       }
+      // send credentials
+      conn.setRequestProperty(AUTHORIZATION, am + " " + Base64.encode(user + ':' + pass));
+
+    } else if(am == AuthMethod.DIGEST) {
+      final EnumMap<Request, String> map = challenge(conn, am);
+      if(map == null) return null;
+
+      // generate authorization string
+      final String
+        realm = map.get(REALM),
+        nonce = map.get(NONCE),
+        uri = conn.getURL().getPath(),
+        qop = map.get(QOP),
+        nc = "00000001",
+        cnonce = Strings.md5(Long.toString(System.nanoTime())),
+        ha1 = Strings.md5(user + ':' + realm + ':' + pass),
+        ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
+        rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2);
+
+      conn = connection(url, request);
+      conn.setRequestProperty(AUTHORIZATION, am + " " +
+        USERNAME + "=\"" + user + "\","
+        + REALM + "=\"" + realm + "\","
+        + NONCE + "=\"" + nonce + "\","
+        + URI + "=\"" + uri + "\","
+        + QOP + '=' + qop + ','
+        + NC + '=' + nc + ','
+        + CNONCE + "=\"" + cnonce + "\","
+        + RESPONSE + "=\"" + rsp + "\","
+        + ALGORITHM + '=' + MD5 + ','
+        + OPAQUE + "=\"" + map.get(OPAQUE) + '"');
     }
     return conn;
+  }
+
+  /**
+   * Sends a challenge.
+   * @param conn HTTP connection
+   * @param am authentication method
+   * @return authentication data
+   * @throws IOException I/O exception
+   */
+  private static EnumMap<Request, String> challenge(final HttpURLConnection conn,
+      final AuthMethod am) throws IOException {
+
+    // skip authentication if server needs no credentials or raises an error
+    conn.setRequestProperty(AUTHORIZATION, am.toString());
+    if(conn.getResponseCode() != 401) return null;
+
+    // skip authentication if authentication method differs
+    final EnumMap<Request, String> map = authHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
+    if(!am.toString().equals(map.get(AUTH_METHOD))) return null;
+
+    // disconnect, return map
+    conn.disconnect();
+    return map;
   }
 
   /**
@@ -172,9 +208,9 @@ public final class HttpClient {
             f.setAccessible(true);
             conn = (HttpURLConnection) f.get(conn);
             clzz = conn.getClass();
-          } catch(final Throwable ignore) {
+          } catch(final Throwable e) {
             // ignore error: dump exception if debug is enabled
-            Util.debug(ignore);
+            Util.debug(e);
           }
 
           // assign request method
@@ -182,9 +218,9 @@ public final class HttpClient {
           final Field f = clzz.getDeclaredField("method");
           f.setAccessible(true);
           f.set(conn, method);
-        } catch(final Throwable ignore) {
+        } catch(final Throwable e) {
           // ignore error: dump exception if debug is enabled, return original exception
-          Util.debug(ignore);
+          Util.debug(e);
           throw ex;
         }
       }
@@ -218,20 +254,17 @@ public final class HttpClient {
     } else {
       // otherwise @media-type of <http:body/> is considered
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
-      if(request.isMultipart) {
-        ct = new TokenBuilder().add(ct).add("; ").add(BOUNDARY).add('=').
-            add(request.boundary()).toString();
-      }
+      if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, '=', request.boundary());
     }
     conn.setRequestProperty(CONTENT_TYPE, ct);
   }
 
   /**
-   * Parses the header for digest authentication.
+   * Returns the authentication headers.
    * @param auth authorization string
    * @return values values
    */
-  public static EnumMap<Request, String> digestHeaders(final String auth) {
+  public static EnumMap<Request, String> authHeaders(final String auth) {
     final EnumMap<Request, String> values = new EnumMap<>(Request.class);
     if(auth != null) {
       final String[] parts = Strings.split(auth, ' ', 2);
@@ -267,7 +300,7 @@ public final class HttpClient {
         writePayload(part.bodyContents, part.bodyAtts, ao);
 
         // write boundary preceded by "--"
-        out.write(new TokenBuilder().add("--").add(boundary).add(CRLF).finish());
+        out.write(concat("--", boundary, CRLF));
 
         // write headers
         for(final Entry<String, String> header : part.headers.entrySet())
@@ -279,7 +312,7 @@ public final class HttpClient {
         out.write(ao.finish());
         out.write(CRLF);
       }
-      out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
+      out.write(concat("--", boundary, "--", CRLF));
     } else {
       writePayload(request.payload, request.payloadAtts, out);
     }
@@ -295,7 +328,7 @@ public final class HttpClient {
    */
   public static void writeHeader(final String key, final String value, final OutputStream out)
       throws IOException {
-    out.write(new TokenBuilder().add(key).add(": ").add(value).add(CRLF).finish());
+    out.write(concat(key, ": ", value, CRLF));
   }
 
   /**

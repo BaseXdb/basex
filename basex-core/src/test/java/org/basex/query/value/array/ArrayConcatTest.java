@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests for {@link Array#concat(Array)}.
+ * Tests for {@link XQArray#concat(XQArray)}.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
@@ -23,7 +23,7 @@ public final class ArrayConcatTest extends ArrayTest {
         rng.setSeed(10L * n + k);
         final int l = rng.nextInt(n + 1), r = n - l;
 
-        Array a1 = Array.empty(), b1 = Array.empty();
+        XQArray a1 = XQArray.empty(), b1 = XQArray.empty();
         final ArrayList<Integer> a2 = new ArrayList<>(l), b2 = new ArrayList<>(r);
         for(int i = 0; i < l; i++) {
           final int pos = rng.nextInt(i + 1);
@@ -60,8 +60,8 @@ public final class ArrayConcatTest extends ArrayTest {
    */
   @Test
   public void concatTest() {
-    Array seq1 = Array.empty();
-    Array seq2 = Array.empty();
+    XQArray seq1 = XQArray.empty();
+    XQArray seq2 = XQArray.empty();
     final int n = 200_000;
     for(int i = 0; i < n; i++) {
       final Value value = Int.get(i);
@@ -71,7 +71,7 @@ public final class ArrayConcatTest extends ArrayTest {
 
     assertEquals(n, seq1.arraySize());
     assertEquals(n, seq2.arraySize());
-    final Array seq = seq1.concat(seq2);
+    final XQArray seq = seq1.concat(seq2);
     assertEquals(2 * n, seq.arraySize());
 
     for(int i = 0; i < 2 * n; i++) {

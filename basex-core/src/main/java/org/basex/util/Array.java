@@ -28,7 +28,7 @@ public final class Array {
    */
   public static byte[][] copyOf(final byte[][] array, final int size) {
     final byte[][] tmp = new byte[size][];
-    System.arraycopy(array, 0, tmp, 0, Math.min(size, array.length));
+    copy(array, Math.min(size, array.length), tmp);
     return tmp;
   }
 
@@ -40,7 +40,7 @@ public final class Array {
    */
   public static int[][] copyOf(final int[][] array, final int size) {
     final int[][] tmp = new int[size][];
-    System.arraycopy(array, 0, tmp, 0, Math.min(size, array.length));
+    copy(array, Math.min(size, array.length), tmp);
     return tmp;
   }
 
@@ -52,7 +52,7 @@ public final class Array {
    */
   public static String[] copyOf(final String[] array, final int size) {
     final String[] tmp = new String[size];
-    System.arraycopy(array, 0, tmp, 0, Math.min(size, array.length));
+    copy(array, Math.min(size, array.length), tmp);
     return tmp;
   }
 
@@ -85,39 +85,100 @@ public final class Array {
   }
 
   /**
-   * Moves entries inside an array.
+   * Inserts entries into an array.
    * @param array array
-   * @param pos position
-   * @param off move offset
-   * @param size number of entries to move
+   * @param index insertion index
+   * @param add number of entries to add
+   * @param length number of valid array entries
+   * @param entries entries to be inserted (can be {@code null})
    */
-  public static void move(final Object array, final int pos, final int off, final int size) {
-    System.arraycopy(array, pos, array, pos + off, size);
+  public static void insert(final Object array, final int index, final int add, final int length,
+      final Object entries) {
+    System.arraycopy(array, index, array, index + add, length - index);
+    if(entries != null) copyFromStart(entries, add, array, index);
   }
 
   /**
-   * Copies entries from one array to another.
+   * Removes entries inside an array.
+   * @param array array
+   * @param index index of first entry to be removed
+   * @param del number of entries to remove
+   * @param length number of valid array entries
+   */
+  public static void remove(final Object array, final int index, final int del, final int length) {
+    System.arraycopy(array, index + del, array, index, length - index - del);
+  }
+
+  /**
+   * Copies first entries from one array to another array.
+   * @param array source array
+   * @param index index of source array
+   * @param length number of array entries to be copied
+   * @param target target array
+   * @param trgIndex index of target array
+   */
+  public static void copy(final Object array, final int index, final int length,
+      final Object target, final int trgIndex) {
+    System.arraycopy(array, index, target, trgIndex, length);
+  }
+
+  /**
+   * Copies first entries from one array to another array.
+   * @param source source array
+   * @param length number of array entries to be copied
+   * @param target target array
+   */
+  public static void copy(final Object source, final int length, final Object target) {
+    copyFromStart(source, length, target, 0);
+  }
+
+  /**
+   * Copies first entries from one array to another array.
+   * @param source source array
+   * @param length number of array entries to be copied
+   * @param target target array
+   * @param index target index
+   */
+  public static void copyFromStart(final Object source, final int length, final Object target,
+      final int index) {
+    System.arraycopy(source, 0, target, index, length);
+  }
+
+  /**
+   * Copies first entries from one array to beginning of another array.
+   * @param source source array
+   * @param index index of first entry to copy
+   * @param length number of array entries to be copied
+   * @param target target array
+   */
+  public static void copyToStart(final Object source, final int index, final int length,
+      final Object target) {
+    System.arraycopy(source, index, target, 0, length);
+  }
+
+  /**
+   * Copies entries from one array to another array.
    * @param <T> object type
    * @param source source array
    * @param target target array
    * @return object
    */
   public static <T> T[] copy(final T[] source, final T[] target) {
-    System.arraycopy(source, 0, target, 0, Math.min(source.length, target.length));
+    copy(source, Math.min(source.length, target.length), target);
     return target;
   }
 
   /**
    * Removes an array entry at the specified position.
    * @param array array to be resized
-   * @param pos position
+   * @param index index of entry
    * @param <T> array type
    * @return new array
    */
-  public static <T> T[] delete(final T[] array, final int pos) {
+  public static <T> T[] remove(final T[] array, final int index) {
     final int s = array.length - 1;
     final T[] tmp = Arrays.copyOf(array, s);
-    System.arraycopy(array, pos + 1, tmp, pos, s - pos);
+    System.arraycopy(array, index + 1, tmp, index, s - index);
     return tmp;
   }
 
@@ -183,7 +244,7 @@ public final class Array {
   }
 
   /**
-   * Reverses the order of the elements in the given array.
+   * Reverses the order of the entries in the given array.
    * @param array array
    */
   public static void reverse(final byte[] array) {
@@ -191,13 +252,13 @@ public final class Array {
   }
 
   /**
-   * Reverses the order of all elements in the given interval.
+   * Reverses the order of all entries in the given interval.
    * @param array array
-   * @param pos position of first element of the interval
-   * @param len length of the interval
+   * @param index index of first entry of the interval
+   * @param length length of the interval
    */
-  private static void reverse(final byte[] array, final int pos, final int len) {
-    for(int l = pos, r = pos + len - 1; l < r; l++, r--) {
+  private static void reverse(final byte[] array, final int index, final int length) {
+    for(int l = index, r = index + length - 1; l < r; l++, r--) {
       final byte tmp = array[l];
       array[l] = array[r];
       array[r] = tmp;
@@ -205,13 +266,13 @@ public final class Array {
   }
 
   /**
-   * Reverses the order of all elements in the given interval.
+   * Reverses the order of all entries in the given interval.
    * @param array array
-   * @param pos position of first element of the interval
-   * @param len length of the interval
+   * @param index index of first entry of the interval
+   * @param length length of the interval
    */
-  public static void reverse(final Object[] array, final int pos, final int len) {
-    for(int l = pos, r = pos + len - 1; l < r; l++, r--) {
+  public static void reverse(final Object[] array, final int index, final int length) {
+    for(int l = index, r = index + length - 1; l < r; l++, r--) {
       final Object tmp = array[l];
       array[l] = array[r];
       array[r] = tmp;

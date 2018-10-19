@@ -15,6 +15,6 @@ public final class FnGenerateId extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
-    return node == null ? Str.ZERO : Str.get(new TokenBuilder(Token.ID).addInt(node.id).finish());
+    return node == null ? Str.ZERO : Str.get(Token.concat(Token.ID, node.id));
   }
 }

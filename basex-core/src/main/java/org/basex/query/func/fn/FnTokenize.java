@@ -39,7 +39,7 @@ public final class FnTokenize extends RegEx {
         tl.add(string.substring(start, matcher.start()));
         start = matcher.end();
       }
-      tl.add(string.substring(start, string.length()));
+      tl.add(string.substring(start));
     }
     return StrSeq.get(tl);
   }

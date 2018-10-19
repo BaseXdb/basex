@@ -4,7 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.array.Array;
+import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -46,7 +46,7 @@ public final class CArray extends Arr {
   }
 
   @Override
-  public Array item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ArrayBuilder builder = new ArrayBuilder();
     if(seq) {
       for(final Expr expr : exprs) builder.append(expr.value(qc));
@@ -81,7 +81,8 @@ public final class CArray extends Arr {
 
     final TokenBuilder tb = new TokenBuilder().add(seq ? "[" : QueryText.ARRAY + " {");
     for(int e = 0; e < el; e++) {
-      tb.add(e == 0 ? " " : ", ").addExt(exprs[e]);
+      if(e != 0) tb.add(',');
+      tb.add(' ').add(exprs[e]);
     }
     return tb.add(seq ? " ]" : " }").toString();
   }

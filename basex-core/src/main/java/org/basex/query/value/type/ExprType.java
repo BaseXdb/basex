@@ -106,8 +106,7 @@ public final class ExprType {
    */
   public void assign(final Type type, final Occ occ, final long sz) {
     if(sz >= 0) {
-      final Occ oc = sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : sz > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE;
-      assign(seqType.with(type, oc), sz);
+      assign(seqType.with(type, sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : Occ.ONE_MORE), sz);
     } else {
       assign(type, occ);
     }

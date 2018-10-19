@@ -21,23 +21,23 @@ public final class NameTest extends Test {
 
   /**
    * Empty constructor ('*').
-   * @param attr attribute flag
+   * @param attr attribute flag (element otherwise)
    */
   public NameTest(final boolean attr) {
-    this(null, Kind.WILDCARD, attr, null);
+    this(attr, Kind.WILDCARD, null, null);
   }
 
   /**
    * Constructor.
-   * @param name name (may be {@code null})
+   * @param attr attribute flag (element otherwise)
    * @param kind kind of name test
-   * @param attr attribute flag
+   * @param name name (may be {@code null})
    * @param defNS default element namespace (may be {@code null})
    */
-  public NameTest(final QNm name, final Kind kind, final boolean attr, final byte[] defNS) {
+  public NameTest(final boolean attr, final Kind kind, final QNm name, final byte[] defNS) {
     super(attr ? NodeType.ATT : NodeType.ELM);
-    this.name = name;
     this.kind = kind;
+    this.name = name;
     this.defNS = defNS != null ? defNS : Token.EMPTY;
     local = name != null ? name.local() : null;
     one = kind == Kind.URI_NAME;

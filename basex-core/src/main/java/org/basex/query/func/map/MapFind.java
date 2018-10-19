@@ -22,7 +22,7 @@ public final class MapFind extends StandardFunc {
   }
 
   @Override
-  public Array value(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final ArrayBuilder builder = new ArrayBuilder();
     find(exprs[0].iter(qc), toAtomItem(exprs[1], qc), builder, qc);
     return builder.freeze();
@@ -40,15 +40,15 @@ public final class MapFind extends StandardFunc {
       final QueryContext qc) throws QueryException {
 
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(item instanceof Map) {
-        final Map map = (Map) item;
+      if(item instanceof XQMap) {
+        final XQMap map = (XQMap) item;
         final Value value = map.get(key, info);
         if(value != Empty.SEQ) builder.append(value);
         for(final Item it : map.keys()) {
           find(map.get(it, info).iter(), key, builder, qc);
         }
-      } else if(item instanceof Array) {
-        for(final Value value : ((Array) item).members()) {
+      } else if(item instanceof XQArray) {
+        for(final Value value : ((XQArray) item).members()) {
           find(value.iter(), key, builder, qc);
         }
       }

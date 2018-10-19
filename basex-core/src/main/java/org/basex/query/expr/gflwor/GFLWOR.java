@@ -148,7 +148,7 @@ public final class GFLWOR extends ParseExpr {
 
       // remove FLWOR expressions when all clauses were removed
       if(clauses.isEmpty()) {
-        cc.info(QueryText.OPTSIMPLE_X, (Supplier<?>) () -> description());
+        cc.info(QueryText.OPTSIMPLE_X, (Supplier<?>) this::description);
         return ret;
       }
 

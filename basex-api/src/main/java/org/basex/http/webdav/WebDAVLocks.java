@@ -43,7 +43,7 @@ public final class WebDAVLocks {
   /**
    * Refreshes a lock.
    * @param id token id
-   * @return refreshed lock
+   * @return refreshed lock (can be {@code null})
    */
   synchronized WebDAVLock refreshLock(final String id) {
     final WebDAVLock lock = locks.get(id);
@@ -54,7 +54,7 @@ public final class WebDAVLocks {
   /**
    * Returns a lock token for the given path.
    * @param meta meta data
-   * @return removed lock token
+   * @return removed lock token (can be {@code null})
    */
   synchronized LockToken lockOn(final WebDAVMetaData meta) {
     final String path = meta.db + '/' + meta.path;

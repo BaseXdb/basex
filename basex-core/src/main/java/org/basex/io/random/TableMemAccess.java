@@ -131,8 +131,8 @@ public final class TableMemAccess extends TableAccess {
       buf1 = Arrays.copyOf(buf1, s);
       buf2 = Arrays.copyOf(buf2, s);
     }
-    System.arraycopy(buf1, op, buf1, np, l);
-    System.arraycopy(buf2, op, buf2, np, l);
+    Array.copy(buf1, op, l, buf1, np);
+    Array.copy(buf2, op, l, buf2, np);
     meta.size += np - op;
   }
 

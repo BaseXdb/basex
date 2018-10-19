@@ -1,6 +1,10 @@
 package org.basex.http.ws;
 
+import static org.basex.http.web.WebText.*;
+
+import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.*;
 
 import javax.servlet.http.*;
@@ -9,6 +13,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.ann.*;
+import org.basex.query.value.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
@@ -21,8 +26,12 @@ import org.eclipse.jetty.websocket.api.*;
  * @author Johannes Finckh
  */
 public class WebSocket extends WebSocketAdapter implements ClientInfo {
+  /** WebSocket attributes. */
+  public final ConcurrentHashMap<String, Value> atts = new ConcurrentHashMap<>();
   /** Database context. */
   public final Context context;
+  /** Path. */
+  public final WsPath path;
 
   /** Header parameters. */
   public final Map<String, String> headers = new HashMap<>();
@@ -34,8 +43,6 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** HTTP Session. */
   public HttpSession session;
 
-  /** Path. */
-  private final WsPath path;
   /** Subprotocol */
   private final String subprotocol;
 
@@ -85,16 +92,14 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
   @Override
   public void onWebSocketConnect(final Session sess) {
     super.onWebSocketConnect(sess);
-
-    // [JF] We’ll need to check which log messages will be the most sensible ones
-    context.log.write(LogType.REQUEST, sess.toString(), null, context);
     id = WsPool.get().add(this);
 
-    // add headers (for binding them to the XQuery parameters in the corresponding bind method)
-    final UpgradeRequest ur = sess.getUpgradeRequest();
-    final BiConsumer<String, String> addHeader = (k, v) -> {
-      if(v != null) headers.put(k, v);
-    };
+    run("[WS-OPEN] " + req.getRequestURL(), null, () -> {
+      // add headers (for binding them to the XQuery parameters in the corresponding bind method)
+      final UpgradeRequest ur = sess.getUpgradeRequest();
+      final BiConsumer<String, String> addHeader = (k, v) -> {
+        if(v != null) headers.put(k, v);
+      };
 
     addHeader.accept("Http-Version", ur.getHttpVersion());
     addHeader.accept("Origin", ur.getOrigin());
@@ -104,34 +109,24 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
     addHeader.accept("RequestURI", ur.getRequestURI().toString());
     addHeader.accept("Subprotocol", subprotocol);
 
-    final String[] names = { "Host", "Sec-WebSocket-Version" };
-    for(final String name : names) addHeader.accept(name, ur.getHeader(name));
+      final String[] names = { "Host", "Sec-WebSocket-Version" };
+      for(final String name : names) addHeader.accept(name, ur.getHeader(name));
 
-    findAndProcess(Annotation._WS_CONNECT, null);
+      findAndProcess(Annotation._WS_CONNECT, null);
+    });
   }
 
-  /*
-   * This is a way for the internal implementation to notify of exceptions that occurred during the
-   * WebSocket processing. Usually this occurs from bad / malformed incoming packets. (example:
-   * bad UTF8 data, frames that are too big, violations of the spec). This will result in the
-   * Session being closed by the implementing side.
-   */
   @Override
   public void onWebSocketError(final Throwable cause) {
-    try {
-      context.log.write(LogType.ERROR, cause.getMessage(), null, context);
-      findAndProcess(Annotation._WS_ERROR, cause.toString());
-    } finally {
-      WsPool.get().remove(id);
-      super.getSession().close();
-    }
+    run("[WS-ERROR] " + req.getRequestURL() + ": " + cause.getMessage(), null,
+        () -> findAndProcess(Annotation._WS_ERROR, cause.getMessage()));
   }
 
   @Override
   public void onWebSocketClose(final int status, final String message) {
     try {
-      context.log.write(Integer.toString(status), message, null, context);
-      findAndProcess(Annotation._WS_CLOSE, null);
+      run("[WS-CLOSE] " + req.getRequestURL(), status,
+          () -> findAndProcess(Annotation._WS_CLOSE, null));
     } finally {
       WsPool.get().remove(id);
       super.onWebSocketClose(status, message);
@@ -156,15 +151,18 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientName() {
-    return context.user().name();
+    Object obj = atts.get(ID);
+    if(obj == null && session != null) obj = session.getAttribute(ID);
+    final byte[] value = HTTPContext.token(obj);
+    return value != null ? Token.string(value) : context.user().name();
   }
 
   /**
-   * Closes the Websocket-Connection.
-   * @param reason The String Reason
-   * */
-  public void closeWebsocket(final String reason) {
-    getSession().close(StatusCode.NORMAL, reason);
+   * Closes the WebSocket connection.
+   */
+  public void close() {
+    WsPool.get().remove(id);
+    getSession().close();
   }
 
   /**
@@ -184,11 +182,35 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
       // find function to evaluate
       final WsFunction func = WebModules.get(context).websocket(this, ann, this.getPath());
       if(func != null) new WsResponse(this).create(func, message);
-    } catch(final RuntimeException ex) {
-      throw ex;
     } catch(final Exception ex) {
       Util.debug(ex);
-      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
+      try {
+        // in the case of an error, inform the client about it.
+        // workflow is analogous to QueryException handling in BaseXServlet class
+        getRemote().sendString(ex.getMessage());
+      } catch(final IOException e) {
+        Util.debug(e);
+      }
+      throw ex instanceof RuntimeException ? (RuntimeException) ex :
+        new CloseException(StatusCode.ABNORMAL, ex);
     }
+  }
+
+  /**
+   * Runs a function and creates log output.
+   * @param info log string
+   * @param status close status
+   * @param func function to be run
+   */
+  private void run(final String info, final Integer status, final Runnable func) {
+    context.log.write(LogType.REQUEST, info, null, context);
+    final Performance perf = new Performance();
+    try {
+      func.run();
+    } catch (final Exception ex) {
+      context.log.write(LogType.ERROR, "", perf, context);
+      throw ex;
+    }
+    context.log.write((status != null ? status : LogType.OK).toString(), "", perf, context);
   }
 }

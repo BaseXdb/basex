@@ -69,7 +69,7 @@ public final class QueryContext extends Job implements Closeable {
   public Updates updates;
 
   /** Global database options (will be reassigned after query execution). */
-  QueryOptions options = new QueryOptions(this);
+  final QueryOptions options = new QueryOptions(this);
 
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();

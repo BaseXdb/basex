@@ -136,12 +136,12 @@ public final class FDoc extends FNode {
   @Override
   public ID typeId() {
     // check if a document has a single element as child
-    return (children.size() == 1 && children.get(0).type == NodeType.ELM
-        ? NodeType.DEL : type).id();
+    return (children.size() == 1 && children.get(0).type == NodeType.ELM ?
+      NodeType.DEL : type).id();
   }
 
   @Override
   public String toString() {
-    return new TokenBuilder(QueryText.DOCUMENT).add(" { ").add(uri).add(" }").toString();
+    return Strings.concat(QueryText.DOCUMENT, " { ", uri, " }");
   }
 }

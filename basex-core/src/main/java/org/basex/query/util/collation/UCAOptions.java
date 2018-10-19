@@ -81,7 +81,7 @@ public final class UCAOptions extends CollationOptions {
 
     if(contains(STRENGTH)) {
       final String v = get(STRENGTH);
-      final Integer s;
+      final int s;
       if(eq(v, "primary", "1")) s = 0;         // Collator.PRIMARY
       else if(eq(v, "secondary", "2")) s = 1;  // Collator.SECONDARY
       else if(eq(v, "tertiary", "3")) s = 2;   // Collator.TERTIARY

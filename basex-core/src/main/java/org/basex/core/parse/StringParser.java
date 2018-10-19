@@ -145,19 +145,19 @@ final class StringParser extends CommandParser {
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:
-        return new XQuery(remaining(cmd));
+        return new XQuery(remaining(cmd, false));
       case RUN:
         return new Run(string(cmd));
       case TEST:
         return new Test(string(cmd));
       case EXECUTE:
-        return new Execute(string(cmd, false));
+        return new Execute(remaining(cmd, true));
       case FIND:
-        return new Find(string(cmd, false));
+        return new Find(remaining(cmd, true));
       case GET:
         return new Get(name(null));
       case SET:
-        return new Set(name(cmd), string(null, false));
+        return new Set(name(cmd), string(null));
       case PASSWORD:
         return new Password(password());
       case HELP:
@@ -212,77 +212,55 @@ final class StringParser extends CommandParser {
   }
 
   /**
-   * Parses and returns a string, delimited by a space or semicolon.
-   * Quotes can be used to include spaces.
+   * Parses and returns a string, delimited by a semicolon or a space.
+   * The input can be wrapped with quotes.
    * @param cmd referring command; if specified, the result must not be empty
-   * @return string
+   * @return string or {@code null}
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
-    return string(cmd, true);
-  }
-
-  /**
-   * Parses and returns a string, delimited by a semicolon or, optionally, a space.
-   * Quotes can be used to include spaces.
-   * @param cmd referring command; if specified, the result must not be empty
-   * @param space stop when encountering space
-   * @return string
-   * @throws QueryException query exception
-   */
-  private String string(final Cmd cmd, final boolean space) throws QueryException {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
-    boolean q = false;
-    while(parser.more()) {
-      final char c = parser.curr();
-      if(!q && ((space ? c <= ' ' : c < ' ') || eoc())) break;
-      if(c == '"') q ^= true;
-      else sb.append(c);
+    boolean more = true, quoted = false;
+    while(more && parser.more()) {
+      final char ch = parser.curr();
+      if(quoted) {
+        if(ch == '"') more = false;
+      } else if(ch <= ' ' || eoc()) {
+        break;
+      } else if(ch == '"' && sb.length() == 0) {
+        quoted = true;
+      }
+      sb.append(ch);
       parser.consume();
     }
-    return finish(sb, cmd);
+    return finish(sb.toString().replaceAll("^\"|\"$", ""), cmd);
   }
 
   /**
    * Parses and returns the remaining string.
    * @param cmd referring command; if specified, the result must not be empty
-   * @param quotes strip heading and trailing quotes
-   * @return remaining string
+   * @param quotes strip leading and trailing quotes
+   * @return remaining string or {@code null}
    * @throws QueryException query exception
    */
   private String remaining(final Cmd cmd, final boolean quotes) throws QueryException {
-    if(single) {
-      final String arg = remaining(cmd);
-      return arg != null && quotes ? arg.replace("^\"|\"$", "") : arg;
-    }
-    return string(cmd, false);
-  }
-
-  /**
-   * Parses and returns the remaining string.
-   * @param cmd referring command; if specified, the result must not be empty
-   * @return remaining string
-   * @throws QueryException query exception
-   */
-  private String remaining(final Cmd cmd) throws QueryException {
-    final StringBuilder sb = new StringBuilder();
     consumeWS();
+    final StringBuilder sb = new StringBuilder();
     while(parser.more()) sb.append(parser.consume());
-    return finish(sb, cmd);
+    final String str = sb.toString();
+    return finish(quotes ? str.replaceAll("^\"|\"$", "") : str, cmd);
   }
 
   /**
    * Parses and returns a command. A command is limited to letters.
-   * @return name
+   * @return command or {@code null}
    * @throws QueryException query exception
    */
   private String command() throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    while(!eoc() && !ws(parser.curr())) {
-      sb.append(parser.consume());
-    }
+    while(!eoc() && !ws(parser.curr())) sb.append(parser.consume());
     return finish(sb, null);
   }
 
@@ -319,7 +297,7 @@ final class StringParser extends CommandParser {
   }
 
   /**
-   * Parses and returns a glob expression, which extends {@link #name(Cmd)} function
+   * Parses and returns a name, or a glob string that extends a {@link #name(Cmd)}
    * with asterisks, question marks and commands.
    * @param cmd referring command; if specified, the result must not be empty
    * @param glob allow glob syntax
@@ -367,7 +345,7 @@ final class StringParser extends CommandParser {
    * @return string result or {@code null}
    * @throws QueryException query exception
    */
-  private String finish(final StringBuilder string, final Cmd cmd) throws QueryException {
+  private String finish(final CharSequence string, final Cmd cmd) throws QueryException {
     if(string != null && string.length() != 0) return string.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
@@ -428,7 +406,7 @@ final class StringParser extends CommandParser {
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : startWith(complete, null)) {
       final byte[] sm = uc(token(s.name()));
-      if(ls.similar(name, sm) && Cmd.class.isInstance(s)) {
+      if(ls.similar(name, sm) && s instanceof Cmd) {
         throw error(alt, UNKNOWN_SIMILAR_X_X, name, sm);
       }
     }

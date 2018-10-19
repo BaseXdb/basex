@@ -482,7 +482,10 @@ public final class DecFormatter extends FormatUtil {
     }
     // add suffix
     res.add(pic.suffix.toArray());
-    return new TokenBuilder(res.finish()).finish();
+
+    final TokenBuilder tb = new TokenBuilder(res.size());
+    for(final int r : res.finish()) tb.add(r);
+    return tb.finish();
   }
 
   /** Picture variables. */
