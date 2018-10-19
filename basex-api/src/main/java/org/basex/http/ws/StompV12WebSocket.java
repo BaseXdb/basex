@@ -159,7 +159,7 @@ public final class StompV12WebSocket extends WebSocket {
       case CONNECT:
       case STOMP:
         Map<String, String> cHeader = new HashMap<>();
-        cHeader.put("version", "1.1");
+        cHeader.put("version", "1.2");
         ConnectedFrame cf = new ConnectedFrame(Commands.CONNECTED, cHeader, "");
         super.getSession().getRemote().sendStringByFuture(cf.serializedFrame());
         findAndProcess(Annotation._WS_STOMP_CONNECT, null, null);
