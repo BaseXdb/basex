@@ -14,9 +14,12 @@ import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.ann.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
@@ -34,7 +37,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   public final WsPath path;
 
   /** Header parameters. */
-  final Map<String, String> headers = new HashMap<>();
+  final Map<String, Value> headers = new HashMap<>();
   /** Servlet request. */
   final HttpServletRequest req;
 
@@ -84,18 +87,19 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       // add headers (for binding them to the XQuery parameters in the corresponding bind method)
       final UpgradeRequest ur = sess.getUpgradeRequest();
       final BiConsumer<String, String> addHeader = (k, v) -> {
-        if(v != null) headers.put(k, v);
+        if(v != null) headers.put(k, new Atm(v));
       };
 
-      addHeader.accept("Http-Version", ur.getHttpVersion());
-      addHeader.accept("Origin", ur.getOrigin());
-      addHeader.accept("Protocol-version", ur.getProtocolVersion());
-      addHeader.accept("QueryString", ur.getQueryString());
-      addHeader.accept("IsSecure", String.valueOf(ur.isSecure()));
-      addHeader.accept("RequestURI", ur.getRequestURI().toString());
-
-      final String[] names = { "Host", "Sec-WebSocket-Version" };
-      for(final String name : names) addHeader.accept(name, ur.getHeader(name));
+      addHeader.accept("http-version", ur.getHttpVersion());
+      addHeader.accept("origin", ur.getOrigin());
+      addHeader.accept("protocol-version", ur.getProtocolVersion());
+      addHeader.accept("query-string", ur.getQueryString());
+      addHeader.accept("is-secure", String.valueOf(ur.isSecure()));
+      addHeader.accept("request-uri", ur.getRequestURI().toString());
+      addHeader.accept("host", ur.getHost());
+      final TokenList protocols = new TokenList();
+      for(final String protocol : ur.getSubProtocols()) protocols.add(protocol);
+      headers.put("sub-protocols", StrSeq.get(protocols));
 
       findAndProcess(Annotation._WS_CONNECT, null);
     });

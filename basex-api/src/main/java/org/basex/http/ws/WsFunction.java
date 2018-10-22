@@ -95,16 +95,12 @@ public final class WsFunction extends WebFunction {
    * Binds the function parameters.
    * @param args arguments
    * @param msg message (can be {@code null}; otherwise string or byte array)
-   * @param header headers
+   * @param values header values
    * @param qc query context
    * @throws QueryException query exception
    */
-  public void bind(final Expr[] args, final Object msg, final Map<String, String> header,
+  public void bind(final Expr[] args, final Object msg, final Map<String, Value> values,
       final QueryContext qc) throws QueryException {
-
-    // cache headers and message
-    final Map<String, Value> values = new HashMap<>();
-    header.forEach((k, v) -> values.put(k, new Atm(v)));
 
     if(msg != null) values.put("message", msg instanceof byte[] ?
       B64.get((byte[]) msg) : Str.get((String) msg));
