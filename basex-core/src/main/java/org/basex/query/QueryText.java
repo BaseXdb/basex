@@ -237,6 +237,7 @@ public interface QueryText {
   /** Parser token. */ String ARROW = "=>";
   /** Parser token. */ String TERNARY1 = "??";
   /** Parser token. */ String TERNARY2 = "!!";
+  /** Parser token. */ String ELVIS = "?:";
 
   /** Java prefix. */ String JAVAPREF = "java:";
 

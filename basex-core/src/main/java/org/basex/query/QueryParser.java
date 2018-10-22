@@ -1389,14 +1389,25 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr ternaryIf() throws QueryException {
-    final Expr iff = or();
+    final Expr iff = elvis();
     if(!wsConsumeWs(TERNARY1)) return iff;
 
     final InputInfo info = info();
-    final Expr thn = check(or(), NOTERNARY);
+    final Expr thn = check(elvis(), NOTERNARY);
     if(!wsConsumeWs(TERNARY2)) throw error(NOTERNARY);
-    final Expr els = check(or(), NOTERNARY);
+    final Expr els = check(elvis(), NOTERNARY);
     return new If(info, iff, thn, els);
+  }
+
+  /**
+   * Parses the "ElvisExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr elvis() throws QueryException {
+    final Expr ex = or();
+    if(!wsConsumeWs(ELVIS)) return ex;
+    return Function._UTIL_OR.get(sc, info(), ex, check(or(), NOELVIS));
   }
 
   /**
@@ -2090,7 +2101,7 @@ public class QueryParser extends InputParser {
             new PartFunc(sc, info, ex, args, holes);
         } else {
           final int p = pos;
-          if(consume(QUESTION) && !consume(QUESTION)) {
+          if(consume(QUESTION) && !consume(QUESTION) && !consume(':')) {
             // parses the "Lookup" rule
             ex = new Lookup(info(), keySpecifier(), ex);
           } else {
