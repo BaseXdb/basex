@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Global namespaces.
@@ -12,10 +13,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NSGlobal {
-  /** Namespace: prefixes and namespace URIs. */
+  /** Namespaces: prefixes and namespace URIs. */
   public static final Atts NS = new Atts();
-  /** Reserved namespaces. */
-  private static final int RESERVED;
+  /** Mapping: prefix to URI. */
+  private static final TokenMap URIS = new TokenMap();
+  /** Mapping: URI to prefix. */
+  private static final TokenMap PREFIXES = new TokenMap();
+  /** URIs of reserved namespaces. */
+  private static final TokenSet RESERVED = new TokenSet();
 
   static {
     // reserved namespaces
@@ -27,7 +32,7 @@ public final class NSGlobal {
     NS.add(MAP_PREFIX, MAP_URI);
     NS.add(ARRAY_PREFIX, ARRAY_URI);
     NS.add(ANN_PREFIX, XQ_URI);
-    RESERVED = NS.size();
+    for(int s = NS.size() - 1; s >= 0; s--) RESERVED.add(NS.value(s));
 
     // additional XQuery namespaces
     NS.add(LOCAL_PREFIX, LOCAL_URI);
@@ -86,6 +91,12 @@ public final class NSGlobal {
     NS.add(WS_PREFIX, WS_URI);
     NS.add(XSLT_PREFIX, XSLT_URI);
     NS.add(XQUERY_PREFIX, XQUERY_URI);
+
+    for(int s = NS.size() - 1; s >= 0; s--) {
+      final byte[] prefix = NS.name(s), uri = NS.value(s);
+      URIS.put(prefix, uri);
+      PREFIXES.put(uri, prefix);
+    }
   }
 
   /** Private constructor. */
@@ -97,10 +108,7 @@ public final class NSGlobal {
    * @return uri or {@code null}
    */
   public static byte[] uri(final byte[] pref) {
-    for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.name(s), pref)) return NS.value(s);
-    }
-    return null;
+    return URIS.get(pref);
   }
 
   /**
@@ -109,10 +117,8 @@ public final class NSGlobal {
    * @return prefix, or empty string
    */
   public static byte[] prefix(final byte[] uri) {
-    for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.value(s), uri)) return NS.name(s);
-    }
-    return EMPTY;
+    final byte[] prefix = PREFIXES.get(uri);
+    return prefix != null ? prefix : EMPTY;
   }
 
   /**
@@ -121,9 +127,6 @@ public final class NSGlobal {
    * @return result of check
    */
   public static boolean reserved(final byte[] uri) {
-    for(int s = RESERVED - 1; s >= 0; s--) {
-      if(eq(NS.value(s), uri)) return true;
-    }
-    return false;
+    return RESERVED.contains(uri);
   }
 }
