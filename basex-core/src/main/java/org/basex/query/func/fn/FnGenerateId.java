@@ -22,7 +22,7 @@ public final class FnGenerateId extends ContextFn {
       final DBNode dbnode = (DBNode) node;
       tb.addInt(dbnode.data().dbid).add('-').addInt(dbnode.pre());
     } else {
-      tb.add(node.id);
+      tb.addInt(node.id);
     }
     return Str.get(tb.finish());
   }
