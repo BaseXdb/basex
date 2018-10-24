@@ -281,6 +281,8 @@ public final class BaseXHTTP extends CLI {
         stop = true;
       }
     }
+    // do not evaluate command if additional service will be started
+    if(service) commands.clear();
   }
 
   // STATIC METHODS ===============================================================================

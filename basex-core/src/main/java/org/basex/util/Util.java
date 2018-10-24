@@ -267,7 +267,8 @@ public final class Util {
   }
 
   /**
-   * Starts the specified class in a separate process.
+   * Starts the specified class in a separate process. A -D (daemon) flag will be added to the
+   * command-line options.
    * @param clazz class to start
    * @param args command-line arguments
    * @return reference to a {@link Process} instance representing the started process

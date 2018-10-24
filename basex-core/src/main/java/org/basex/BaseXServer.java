@@ -261,6 +261,8 @@ public final class BaseXServer extends CLI implements Runnable {
         }
       }
     }
+    // do not evaluate command if additional service will be started
+    if(service) commands.clear();
   }
 
   @Override
