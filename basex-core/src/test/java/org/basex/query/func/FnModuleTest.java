@@ -311,6 +311,15 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void generateId() {
+    final Function func = Function.GENERATE_ID;
+
+    // GH-1633: ensure that database nodes return identical id
+    query("count(distinct-values((document { <x/> } update {}) ! (*, *) ! " +
+        func.args(" .") + "))", "1");
+  }
+
+  /** Test method. */
   @Test public void head() {
     final Function func = Function.HEAD;
     final String name = Util.className(func.clazz);

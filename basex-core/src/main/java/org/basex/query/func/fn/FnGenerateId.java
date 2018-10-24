@@ -15,6 +15,15 @@ public final class FnGenerateId extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
-    return node == null ? Str.ZERO : Str.get(Token.concat(Token.ID, node.id));
+    if(node == null) return Str.ZERO;
+
+    final TokenBuilder tb = new TokenBuilder(Token.ID);
+    if(node instanceof DBNode) {
+      final DBNode dbnode = (DBNode) node;
+      tb.addInt(dbnode.data().dbid).add('-').addInt(dbnode.pre());
+    } else {
+      tb.add(node.id);
+    }
+    return Str.get(tb.finish());
   }
 }
