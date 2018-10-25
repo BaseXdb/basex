@@ -34,7 +34,12 @@ public final class StompV12WebSocket extends WebSocket {
   private Map<String, String> stompAck = new HashMap<>();
   /** Map of Transactionids with a List of StompFrames */
   private Map<String, List<StompFrame>> transidStompframe = new HashMap<>();
-
+  /** Timer for HeartBeats */
+  private Timer heartbeatTimer;
+  /** Checktimer for the Clientheartbeats*/
+  private Timer clientHeartbeatCheck;
+  /** Time of the last received Message*/
+  private LastActivity lastActivity;
   /**
    * Constructor.
    * @param req request
@@ -88,14 +93,22 @@ public final class StompV12WebSocket extends WebSocket {
 
   @Override
   public void onWebSocketConnect(final Session sess) {
+    lastActivity = new LastActivity();
     super.onWebSocketConnect(sess);
   }
 
   @Override
   public void onWebSocketText(final String message) {
+    lastActivity.setLastActivity();
+    if(message.equals("\n")) {
+      super.getSession().getRemote().sendStringByFuture("\n");
+      return;
+    }
     StompFrame stompframe = null;
     try {stompframe = parseStompFrame(message);}
     catch(CloseException ce) {
+      if(heartbeatTimer != null) heartbeatTimer.cancel();
+      if(clientHeartbeatCheck != null) clientHeartbeatCheck.cancel();
       sendError(ce.getMessage());
       return;
     }
@@ -108,6 +121,26 @@ public final class StompV12WebSocket extends WebSocket {
       case STOMP:
         Map<String, String> cHeader = new HashMap<>();
         cHeader.put("version", "1.2");
+
+        // Configure Heartbeat
+        String heartbeat = stompheaders.get("heart-beat");
+        if(heartbeat != null) {
+          String[] hbVals = heartbeat.split(",");
+          int clientServer = Integer.parseInt(hbVals[0]);
+          int serverClient = Integer.parseInt(hbVals[1]);
+          cHeader.put("heart-beat",serverClient + "," + clientServer);
+          if(serverClient > 0 ) {
+            heartbeatTimer = new Timer();
+            heartbeatTimer.scheduleAtFixedRate(new HeartBeat(super.getRemote()), serverClient, serverClient);
+          }
+          if(clientServer > 0) {
+            clientHeartbeatCheck = new Timer();
+            clientHeartbeatCheck.scheduleAtFixedRate(
+                new ClientHeartBeat(super.getSession(),lastActivity,clientServer),
+                                    clientServer, clientServer);
+          };
+        }
+
         ConnectedFrame cf = new ConnectedFrame(Commands.CONNECTED, cHeader, "");
         super.getSession().getRemote().sendStringByFuture(cf.serializedFrame());
         findAndProcess(Annotation._WS_STOMP_CONNECT, null, null);
@@ -168,6 +201,8 @@ public final class StompV12WebSocket extends WebSocket {
         Map<String, String> ch = new HashMap<>();
         ch.put("receipt-id", stompheaders.get("receipt"));
         ReceiptFrame rf = new ReceiptFrame(Commands.RECEIPT, ch, "");
+        if(heartbeatTimer != null) heartbeatTimer.cancel();
+        if(clientHeartbeatCheck != null) clientHeartbeatCheck.cancel();
         super.getSession().getRemote().sendStringByFuture(rf.serializedFrame());
         break;
       default:
@@ -178,6 +213,20 @@ public final class StompV12WebSocket extends WebSocket {
     headers.remove("messageid");
     headers.remove("message");
     headers.remove("wsid");
+  }
+
+  @Override
+  public void onWebSocketError(final Throwable cause) {
+    if(heartbeatTimer != null) heartbeatTimer.cancel();
+    if(clientHeartbeatCheck != null) clientHeartbeatCheck.cancel();
+    super.onWebSocketError(cause);
+  }
+
+  @Override
+  public void onWebSocketClose(final int status, final String message) {
+    if(heartbeatTimer != null) heartbeatTimer.cancel();
+    if(clientHeartbeatCheck != null) clientHeartbeatCheck.cancel();
+    super.onWebSocketClose(status, message);
   }
 
   /**
@@ -191,6 +240,8 @@ public final class StompV12WebSocket extends WebSocket {
     try {stompframe = StompFrame.parse(message);}
     catch(HeadersException e) {
       Util.debug(e);
+      if(heartbeatTimer != null) heartbeatTimer.cancel();
+      if(clientHeartbeatCheck != null) clientHeartbeatCheck.cancel();
       throw new CloseException(StatusCode.ABNORMAL, e.getMessage());
     }
     return stompframe;
@@ -217,6 +268,8 @@ public final class StompV12WebSocket extends WebSocket {
     catch(final RuntimeException ex) {throw ex;}
     catch(final Exception ex) {
       Util.debug(ex);
+      if(heartbeatTimer != null) heartbeatTimer.cancel();
+      if(clientHeartbeatCheck != null) clientHeartbeatCheck.cancel();
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
     }
   }
