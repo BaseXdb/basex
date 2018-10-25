@@ -37,7 +37,7 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
   public final WsPath path;
 
   /** Header parameters. */
-  final Map<String, Value> headers = new HashMap<>();
+  public final Map<String, Value> headers = new HashMap<>();
   /** Servlet request. */
   public final HttpServletRequest req;
 
@@ -46,17 +46,12 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** HTTP Session. */
   public HttpSession session;
 
-  /** Subprotocol */
-  private final String subprotocol;
-
   /**
    * Constructor.
    * @param req request
-   * @param subprotocol subprotocol
    */
-  WebSocket(final HttpServletRequest req, final String subprotocol) {
+  WebSocket(final HttpServletRequest req) {
     this.req = req;
-    this.subprotocol = subprotocol;
 
     final String pi = req.getPathInfo();
     this.path = new WsPath(pi != null ? pi : "/");
@@ -70,11 +65,10 @@ public class WebSocket extends WebSocketAdapter implements ClientInfo {
   /**
    * Creates a new WebSocket instance.
    * @param req request
-   * @param subprotocol subprotocol
    * @return WebSocket or {@code null}
    */
-  static WebSocket get(final HttpServletRequest req, final String subprotocol) {
-    final WebSocket ws = new WebSocket(req, subprotocol);
+  static WebSocket get(final HttpServletRequest req) {
+    final WebSocket ws = new WebSocket(req);
     try {
       if(!WebModules.get(ws.context).findWs(ws, null, ws.getPath()).isEmpty()) return ws;
     } catch(final Exception ex) {

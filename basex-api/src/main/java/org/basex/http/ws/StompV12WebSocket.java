@@ -9,6 +9,7 @@ import org.basex.http.web.*;
 import org.basex.http.ws.stomp.*;
 import org.basex.http.ws.stomp.frames.*;
 import org.basex.query.ann.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.eclipse.jetty.websocket.api.*;
 
@@ -37,20 +38,18 @@ public final class StompV12WebSocket extends WebSocket {
   /**
    * Constructor.
    * @param req request
-   * @param subprotocol subprotocol
    */
-  StompV12WebSocket(final HttpServletRequest req, final String subprotocol) {
-    super(req, subprotocol);
+  StompV12WebSocket(final HttpServletRequest req) {
+    super(req);
   }
 
   /**
    * Creates a new WebSocket instance.
    * @param req request
-   * @param subprotocol subprotocol
    * @return WebSocket or {@code null}
    */
-  static StompV12WebSocket get(final HttpServletRequest req, final String subprotocol) {
-    final StompV12WebSocket ws = new StompV12WebSocket(req, subprotocol);
+  static StompV12WebSocket get(final HttpServletRequest req) {
+    final StompV12WebSocket ws = new StompV12WebSocket(req);
     try { if(!WebModules.get(ws.context).findWs(ws, null, ws.getPath()).isEmpty()) return ws;}
     catch(final Exception ex) {
       Util.debug(ex);
@@ -63,7 +62,7 @@ public final class StompV12WebSocket extends WebSocket {
    * Consumer for adding headers.
    */
   final BiConsumer<String, String> addHeader = (k, v) -> {
-    if(v != null) headers.put(k, v);
+    if(v != null) headers.put(k, new Atm(v));
   };
 
   /**
@@ -127,9 +126,12 @@ public final class StompV12WebSocket extends WebSocket {
           return;
         }
         channels.add(stompheaders.get("destination"));
-        StompIdChannel.put(stompheaders.get("id"), stompheaders.get("destination"));
-        stompAck.put(stompheaders.get("id"), stompheaders.get("ack"));
-        WsPool.get().joinChannel(stompheaders.get("destination"), id);
+        StompIdChannel.put(stompheaders.get("id"),
+                           stompheaders.get("destination"));
+        stompAck.put(stompheaders.get("id"),
+                     stompheaders.get("ack"));
+        WsPool.get().joinChannel(stompheaders.get("destination"),
+                                 id);
         findAndProcess(Annotation._WS_STOMP_SUBSCRIBE, null, stompheaders.get("destination"));
         break;
       case UNSUBSCRIBE:
@@ -229,7 +231,7 @@ public final class StompV12WebSocket extends WebSocket {
     String ackMode = getAckMode(WsPool.get().getStompIdToMessageId(stompheaders.get("id")));
     SortedSet<MessageObject> ackedMessages = null;
     if(ackMode.equals("client"))
-      ackedMessages = WsPool.get().removeMessagesFromNotAcked(id, stompheaders.get("id"));
+      ackedMessages = WsPool.get().removeMessagesFromNotAcked(id,stompheaders.get("id"));
     else if(ackMode.equals("client-individual")) {
       ackedMessages = new TreeSet<>();
       ackedMessages.add(WsPool.get().removeMessageFromNotAcked(id, stompheaders.get("id")));

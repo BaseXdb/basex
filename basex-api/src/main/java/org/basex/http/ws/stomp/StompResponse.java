@@ -64,7 +64,7 @@ public final class StompResponse extends WebResponse {
     } finally {
       if(ws.headers.containsKey("receipt")) {
         Map<String, String> cHeader = new HashMap<>();
-        cHeader.put("receipt-id", ws.headers.get("receipt"));
+        cHeader.put("receipt-id", (String) ws.headers.get("receipt").toJava());
         StompFrame receiptFrame = new ReceiptFrame(Commands.RECEIPT, cHeader, "");
         ws.getSession().getRemote().sendStringByFuture(receiptFrame.serializedFrame());
       }
