@@ -89,6 +89,8 @@ public final class StaticOptions extends Options {
   /** Default authentication method. */
   public static final EnumOption<AuthMethod> AUTHMETHOD =
       new EnumOption<>("AUTHMETHOD", AuthMethod.BASIC);
+  /** Websocket Supported SubProtocols*/
+  public static final StringOption WSSUBPROTOCOLS = new StringOption("WSSUBPROTOCOLS", "");
 
   /** Authorization method. */
   public enum AuthMethod {

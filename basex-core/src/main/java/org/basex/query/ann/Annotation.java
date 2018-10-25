@@ -166,7 +166,20 @@ public enum Annotation {
   _WS_HEADER_PARAM("header-param(name,variable[,default,...])",
       arg(STR_O, STR_O, ITEM_O), WS_URI, false),
   /** XQuery annotation. */
-  _WS_ERROR("error(path,message)", arg(STR_O, STR_O), WS_URI);
+  _WS_ERROR("error(path,message)", arg(STR_O, STR_O), WS_URI),
+
+  /** XQuery annotation. */
+  _WS_STOMP_CONNECT("connect(path)",arg(STR_O), WS_STOMP_URI),
+  /** XQuery annotation. */
+  _WS_STOMP_MESSAGE("message(path,message)", arg(STR_O, STR_O), WS_STOMP_URI),
+  /** XQuery annotation */
+  _WS_STOMP_SUBSCRIBE("subscribe(path)",arg(STR_O), WS_STOMP_URI),
+  /** XQuery annotation */
+  _WS_STOMP_UNSUBSCRIBE("unsubscribe(path)",arg(STR_O), WS_STOMP_URI),
+  /** XQuery annotation */
+  _WS_STOMP_NACK("nack()",arg(), WS_STOMP_URI),
+  /** XQuery annotation */
+  _WS_STOMP_ACK("ack()",arg(), WS_STOMP_URI);
 
   /** Argument types. */
   public final SeqType[] args;

@@ -296,6 +296,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] VALIDATE_PREFIX = token("validate");
   /** XQuery prefix. */ byte[] WEB_PREFIX = token("web");
   /** XQuery prefix. */ byte[] WS_PREFIX = token("ws");
+  /** XQuery prefix. */ byte[] WS_STOMP_PREFIX = token("ws-stomp");
   /** XQuery prefix. */ byte[] XQUERY_PREFIX = token("xquery");
   /** XQuery prefix. */ byte[] XS_PREFIX = token("xs");
   /** XQuery prefix. */ byte[] XSI_PREFIX = token("xsi");
@@ -371,6 +372,7 @@ public interface QueryText {
   /** BaseX URI. */ byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");
   /** BaseX URI. */ byte[] WEB_URI = token(BXMODULES_URI + "web");
   /** BaseX URI. */ byte[] WS_URI = token(BXMODULES_URI + "ws");
+  /** BaseX URI. */ byte[] WS_STOMP_URI = token(BXMODULES_URI + "ws-stomp");
   /** BaseX URI. */ byte[] XQUERY_URI = token(BXMODULES_URI + "xquery");
   /** BaseX URI. */ byte[] XSLT_URI = token(BXMODULES_URI + "xslt");
 

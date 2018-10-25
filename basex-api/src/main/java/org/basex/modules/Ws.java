@@ -72,8 +72,16 @@ public final class Ws extends QueryModule {
     pool().send(message, list.finish());
   }
 
+  /** Sends a message to a channel.
+   * @param message message
+   * @param channel channel
+   */
+  public void sendchannel(final Str message, final Str channel) {
+    pool().sendChannel(message, channel);
+  }
+  
   /**
-   * Returns the specified WebSocket attribute.
+   * Returns the path of the current client.
    * @param id session id
    * @param key key to be requested
    * @return session attribute or {@code null}

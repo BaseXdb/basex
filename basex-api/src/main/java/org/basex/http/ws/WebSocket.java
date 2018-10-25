@@ -28,7 +28,7 @@ import org.eclipse.jetty.websocket.api.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Johannes Finckh
  */
-public final class WebSocket extends WebSocketAdapter implements ClientInfo {
+public class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** WebSocket attributes. */
   public final ConcurrentHashMap<String, Value> atts = new ConcurrentHashMap<>();
   /** Database context. */
@@ -39,19 +39,24 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** Header parameters. */
   final Map<String, Value> headers = new HashMap<>();
   /** Servlet request. */
-  final HttpServletRequest req;
+  public final HttpServletRequest req;
 
   /** Client WebSocket id. */
   public String id;
   /** HTTP Session. */
   public HttpSession session;
 
+  /** Subprotocol */
+  private final String subprotocol;
+
   /**
    * Constructor.
    * @param req request
+   * @param subprotocol subprotocol
    */
-  WebSocket(final HttpServletRequest req) {
+  WebSocket(final HttpServletRequest req, final String subprotocol) {
     this.req = req;
+    this.subprotocol = subprotocol;
 
     final String pi = req.getPathInfo();
     this.path = new WsPath(pi != null ? pi : "/");
@@ -65,17 +70,26 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /**
    * Creates a new WebSocket instance.
    * @param req request
+   * @param subprotocol subprotocol
    * @return WebSocket or {@code null}
    */
-  static WebSocket get(final HttpServletRequest req) {
-    final WebSocket ws = new WebSocket(req);
+  static WebSocket get(final HttpServletRequest req, final String subprotocol) {
+    final WebSocket ws = new WebSocket(req, subprotocol);
     try {
-      if(!WebModules.get(ws.context).findWs(ws, null).isEmpty()) return ws;
+      if(!WebModules.get(ws.context).findWs(ws, null, ws.getPath()).isEmpty()) return ws;
     } catch(final Exception ex) {
       Util.debug(ex);
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
     }
     return null;
+  }
+
+  /**
+   * Returns the client path.
+   * @return path
+   */
+  public String getPath() {
+    return path.toString();
   }
 
   @Override
@@ -169,7 +183,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
     try {
       // find function to evaluate
-      final WsFunction func = WebModules.get(context).websocket(this, ann);
+      final WsFunction func = WebModules.get(context).websocket(this, ann, this.getPath());
       if(func != null) new WsResponse(this).create(func, message);
     } catch(final Exception ex) {
       Util.debug(ex);
