@@ -64,10 +64,6 @@ public final class BaseXHTTP extends CLI {
     super(null, args);
     // context must be initialized after parsing of arguments
     context = HTTPContext.context();
-    // execute initial command-line arguments
-    for(final Pair<String, String> cmd : commands) {
-      if(!execute(cmd)) return;
-    }
 
     // create jetty instance and set default context to HTTP path
     final StaticOptions sopts = context.soptions;
@@ -151,6 +147,11 @@ public final class BaseXHTTP extends CLI {
     // log server start at very end (logging flag could have been updated by web.xml)
     for(final ServerConnector conn : conns) {
       context.log.writeServer(LogType.OK, Util.info(startX, conn.getPort()));
+    }
+
+    // execute initial command-line arguments
+    for(final Pair<String, String> cmd : commands) {
+      if(!execute(cmd)) return;
     }
 
     // start persistent jobs
@@ -281,6 +282,8 @@ public final class BaseXHTTP extends CLI {
         stop = true;
       }
     }
+    // do not evaluate command if additional service will be started
+    if(service) commands.clear();
   }
 
   // STATIC METHODS ===============================================================================

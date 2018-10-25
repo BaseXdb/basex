@@ -106,11 +106,14 @@
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>9.4.8.v20171121</version>
+        <version>9.4.12.v20180830</version>
         <configuration>
           <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8985</stopPort>
+          <supportedPackagings>
+            <supportedPackaging>jar</supportedPackaging>
+          </supportedPackagings>
         </configuration>
       </plugin>
     </plugins>

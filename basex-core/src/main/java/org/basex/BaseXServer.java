@@ -73,10 +73,6 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(ctx, args);
-    // execute initial command-line arguments
-    for(final Pair<String, String> cmd : commands) {
-      if(!execute(cmd)) return;
-    }
 
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
@@ -127,6 +123,11 @@ public final class BaseXServer extends CLI implements Runnable {
 
     // show info when server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+
+    // execute initial command-line arguments
+    for(final Pair<String, String> cmd : commands) {
+      if(!execute(cmd)) return;
+    }
   }
 
   @Override
@@ -261,6 +262,8 @@ public final class BaseXServer extends CLI implements Runnable {
         }
       }
     }
+    // do not evaluate command if additional service will be started
+    if(service) commands.clear();
   }
 
   @Override
