@@ -27,29 +27,37 @@ declare variable $options:TIMEOUT := 'timeout';
 declare variable $options:MEMORY := 'memory';
 (:~ Permission when running queries. :)
 declare variable $options:PERMISSION := 'permission';
+(:~ Show DBA log entries. :)
+declare variable $options:IGNORE-DBA := 'ignore-dba';
 
 (:~ Options file. :)
 declare %private variable $options:FILE := $options:DBA-DIRECTORY || '.dba.xml';
 
-(:~ Options. :)
+(:~ Default options. :)
+declare %basex:lazy %private variable $options:DEFAULTS := map {
+  $options:MAXCHARS  : 200000,
+  $options:MAXROWS   : 200,
+  $options:TIMEOUT   : 30,
+  $options:MEMORY    : 500,
+  $options:PERMISSION: 'admin',
+  $options:IGNORE-DBA: false()
+};
+
+(:~ Currently assigned options. :)
 declare %basex:lazy %private variable $options:OPTIONS := (
-  let $defaults := map {
-    $options:MAXCHARS  : 200000,
-    $options:MAXROWS   : 200,
-    $options:TIMEOUT   : 30,
-    $options:MEMORY    : 500,
-    $options:PERMISSION: 'admin'
-  }
-  return if(file:exists($options:FILE)) then (
+  if(file:exists($options:FILE)) then (
     try {
       (: merge defaults with saved options :)
       let $options := fetch:xml($options:FILE)/options
       return map:merge(
-        map:for-each($defaults, function($key, $value) {
+        map:for-each($options:DEFAULTS, function($key, $value) {
           map:entry($key,
             let $option := $options/*[name() = $key]
             return if($option) then (
-              if($value instance of xs:numeric) then xs:integer($option) else xs:string($option)
+              typeswitch($value)
+                case xs:numeric  return xs:integer($option)
+                case xs:boolean  return xs:boolean($option)
+                default          return xs:string($option)
             ) else (
               $value
             )
@@ -58,10 +66,10 @@ declare %basex:lazy %private variable $options:OPTIONS := (
       )
     } catch * {
       (: use defaults if an error occurs while parsing the options :)
-      $defaults
+      $options:DEFAULTS
     }
   ) else (
-    $defaults
+    $options:DEFAULTS
   )
 );
 
@@ -84,7 +92,7 @@ declare function options:save(
   $options  as map(*)
 ) as empty-sequence() {
   file:write($options:FILE, element options {
-    map:for-each($options:OPTIONS, function($key, $value) {
+    map:for-each($options:DEFAULTS, function($key, $value) {
       element { $key } { ($options($key), $value)[1] }
     })
   })

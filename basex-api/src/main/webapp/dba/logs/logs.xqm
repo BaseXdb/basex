@@ -112,7 +112,7 @@ function dba:logs(
         if($name) then (
           <form action='log-download' method='post' id='resources' autocomplete='off'>
             <h3>{
-              $name, ':&#xa0;',
+              $name, '&#xa0;',
               <input type='hidden' name='name' value='{ $name }'/>,
               <input size='40' id='input' name='input' value='{ $input }'
                 title='Enter regular expression'
@@ -167,6 +167,7 @@ function dba:log(
     map { 'key': 'message', 'label': 'Message', 'type': 'xml' }
   )
   let $entries :=
+    let $ignore-dba := options:get($options:IGNORE-DBA)
     let $input-exists := boolean($input)
     let $highlight := function($string, $found) {
       if($found) then (
@@ -181,8 +182,10 @@ function dba:log(
     let $user := data($log/@user)
     let $message := data($log/text())
     let $user-found := $input-exists and contains($user, $input)
-    let $message-found := $input-exists and matches($message, $input, 'i')
-    where not($input-exists) or $user-found or $message-found
+    let $message-found := $input-exists and not($user-found) and matches($message, $input, 'i')
+    where (not($input-exists) or $user-found or $message-found) and (
+      not($ignore-dba and contains($message, '/dba'))
+    )
     return map {
       'time': function() {
         let $value := string($log/@time)
@@ -201,10 +204,7 @@ function dba:log(
       'message': function() { $highlight($message, $message-found) }
     }
   let $params := map { 'name': $name, 'input': $input }
-  let $options := map {
-    'sort': $sort,
-    'page': if($page) then xs:integer($page) else ()
-  }
+  let $options := map { 'sort': $sort, 'page': xs:integer($page) }
   return html:table($headers, $entries, (), $params, $options)
 };
 

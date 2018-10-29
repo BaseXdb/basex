@@ -29,17 +29,35 @@ function dba:settings(
   $info   as xs:string?
 ) as element(html) {
   let $system := html:properties(db:system())
+  let $table-row := function($items) {
+    <tr><td>{ $items }</td></tr>
+  }
+  let $number := function($key, $label) {
+    $table-row((
+      $label,
+      <br/>,
+      <input name="{ $key }" type="number" value="{ options:get($key) }"/>
+    ))
+  }
+  let $boolean := function($key, $label) {
+    $table-row((
+      <input name='{ $key }' type='checkbox' value='true'/> update {
+        if(options:get($key)) then insert node attribute checked {} into . else ()
+      },
+      $label
+    ))
+  }
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='33%'>
         <form action="settings" method="post">
           <h2>Settings » { html:button('save', 'Save') }</h2>
-          <h3>Querying</h3>
+          <h3>Queries</h3>
           <table>
             {
-              dba:input($options:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
-              dba:input($options:MEMORY, 'Memory limit, in MB (0 = disabled)'),
-              dba:input($options:MAXCHARS, 'Maximum output size')
+              $number($options:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
+              $number($options:MEMORY, 'Memory limit, in MB (0 = disabled)'),
+              $number($options:MAXCHARS, 'Maximum output size')
             }
             <tr>
               <td colspan='2'>Permission:</td>
@@ -55,9 +73,13 @@ function dba:settings(
             </tr>
           </table>
           <h3>Tables</h3>
-          <table>
-            { dba:input($options:MAXROWS,  'Displayed table rows') }
-          </table>
+          <table>{
+            $number($options:MAXROWS,  'Displayed table rows')
+          }</table>
+          <h3>Logs</h3>
+          <table>{
+            $boolean($options:IGNORE-DBA, 'Ignore DBA log entries')
+          }</table>
         </form>
       </td>
       <td class='vertical'/>
@@ -78,23 +100,6 @@ function dba:settings(
       </td>
     </tr>
   )
-};
-
-(:~
- : Returns a text input component.
- : @param  $key    key
- : @param  $label  label
- : @return table row
- :)
-declare %private function dba:input(
-  $key    as xs:string,
-  $value  as xs:string
-) as element(tr)* {
-  <tr>
-    <td>{ $value }:<br/>
-      <input name="{ $key }" type="number" value="{ options:get($key) }"/>
-    </td>
-  </tr>
 };
 
 (:~

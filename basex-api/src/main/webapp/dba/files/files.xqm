@@ -26,11 +26,13 @@ declare
   %rest:query-param("sort",  "{$sort}", "")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
+  %rest:query-param("page",  "{$page}", "1")
   %output:method("html")
 function dba:files(
   $sort   as xs:string,
   $error  as xs:string?,
-  $info   as xs:string?
+  $info   as xs:string?,
+  $page   as xs:string
 ) as element(html) {
   let $dir := session:directory()
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
@@ -112,7 +114,7 @@ function dba:files(
               }
             }
           let $buttons := html:button('file-delete', 'Delete', true())
-          let $options := map { 'sort': $sort }
+          let $options := map { 'sort': $sort, 'page': xs:integer($page) }
           return html:table($headers, $entries, $buttons, map { }, $options)
         }</form>
 

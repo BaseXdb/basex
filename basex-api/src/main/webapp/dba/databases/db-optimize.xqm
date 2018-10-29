@@ -55,7 +55,7 @@ function dba:create(
           <table>
             <tr>
               <td colspan="2">
-                { html:checkbox("all", 'all', exists($all), 'Full optimization') }
+                { html:checkbox('all', 'all', exists($all), 'Full optimization') }
                 <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>
                 <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>
                 <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>

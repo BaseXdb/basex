@@ -357,27 +357,24 @@ declare function html:table(
   return (
     (: result summary :)
     let $count := head(($count, count($sorted-entries)))
-    let $last-page := $count < $start + $max
-    let $single-page := not($page) or ($page = 1 and $last-page)
+    let $single-page := not($page) or ($page = 1 and $count < $start + $max)
     return element h4 {
-      if($single-page) then () else
-        $start || '-' || min(($count, $start + $max - 1)) || ' of ',
-      $count, ' ',
-      if($count = 0) then 'Entries.' else
-        if($count = 1) then 'Entry:' else ' Entries:',
+      $count,
+      if($count = 1) then ' Entry' else 'Entries',
 
       if($single-page) then () else (
-        ' &#xa0; ',
-        let $first := '«', $prev := '‹'
-        return if($page = 1) then ($first, $prev) else (
-          html:link($first, '', ($params, map { 'page': 1, 'sort': $sort })), ' ',
-          html:link($prev, '', ($params, map { 'page': $page - 1, 'sort': $sort }))
-        ),
-        ' ',
-        let $last := '»', $next := '›'
-        return if($last-page) then ($next, $last) else (
-          html:link($next, '', ($params, map { 'page': $page + 1, 'sort': $sort })), ' ',
-          html:link($last, '', ($params, map { 'page': ($count - 1) idiv $max + 1, 'sort': $sort }))
+        '(Page: ',
+        let $last := ($count - 1) idiv $max + 1
+        let $pages := distinct-values((
+          1, $page - ($last idiv 10), $page - 1, $page, $page + 1, $page + ($last idiv 10), $last
+        ))[. >= 1 and . <= $last]
+        for $p at $pos in $pages
+        let $suffix := (if($p = $last) then ')' else ' ') ||
+          (if($pages[$pos + 1] > $p + 1) then ' … ' else ())
+        return (
+          if ($page = $p) then $p || $suffix else (
+            html:link(string($p), '', ($params, map { 'page': $p, 'sort': $sort })), $suffix
+          )
         )
       )
     },
