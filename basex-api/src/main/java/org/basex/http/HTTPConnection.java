@@ -461,8 +461,10 @@ public final class HTTPConnection implements ClientInfo {
         res.setStatus(c);
       } else {
         // do not allow Jetty to create a custom error html page
-        res.setStatus(c, message);
+        // control characters and non-ASCII codes will be removed (GH-1632)
+        res.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
       }
+
       if(info != null) {
         res.setContentType(MediaType.TEXT_PLAIN.toString());
         res.getOutputStream().write(new TokenBuilder(token(info)).normalize().finish());
