@@ -112,7 +112,7 @@ declare function html:wrap(
             </table>
           </td>
           <td class='slick'>
-            <img src="static/basex.svg"/>
+            <a href='/'><img src='static/basex.svg'/></a>
           </td>
         </tr>
       </table>

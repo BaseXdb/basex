@@ -135,7 +135,7 @@ declare %private function chat:wrap(
           for $id in session:get($chat-util:id)
           return <span><b>{ $id }</b> (<a href='/chat/logout'>logout</a>)</span>
         }
-        &#xa0; <img src='/static/basex.svg' class='img'/>
+        &#xa0; <a href='/'><img src='static/basex.svg' class='img'/></a>
       </span>
       <h1>BaseX WebSocket Chat</h1>
       { $contents }

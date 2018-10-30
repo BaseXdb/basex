@@ -22,7 +22,7 @@ function page:start(
       <link rel="stylesheet" type="text/css" href="static/style.css"/>
     </head>
     <body>
-      <div class="right"><img src="static/basex.svg"/></div>
+      <div class="right"><a href='/'><img src="static/basex.svg"/></a></div>
       <h1>BaseX HTTP Services</h1>
       <div>Welcome to the BaseX HTTP Services. They allow you to:</div>
       <ul>
@@ -31,32 +31,37 @@ function page:start(
         <li>use full-duplex communication with
           <a href="http://docs.basex.org/wiki/WebSocket">WebSockets</a>,</li>
         <li>query and modify databases via <a href="http://docs.basex.org/wiki/REST">REST</a>
-          (try <a href='rest'>here</a>) and,</li>
+          (try <a href='rest'>here</a>), and</li>
         <li>browse and update resources via
-          <a href="http://docs.basex.org/wiki/WebDAV">WebDAV</a>, and</li>
+          <a href="http://docs.basex.org/wiki/WebDAV">WebDAV</a>.</li>
       </ul>
 
       <p>Find more information on the
         <a href="http://docs.basex.org/wiki/Web_Application">Web Application</a>
         page in our documentation.</p>
 
-      <h2>Sample Applications</h2>
+      <p>The following sample applications give you a glimpse of how applications
+        can be written with BaseX:</p>
 
-      <h3>Database Administration</h3>
+      <h3><a href="dba">DBA: Database Administration</a></h3>
 
-      <p>The <a href="dba">Database Administration interface</a> (DBA) is completely
-        written in RESTXQ. The DBA code serves as a good introduction on
-        how to build complex XQuery web applications.</p>
+      <p>The Database Administration interface is completely
+        written in RESTXQ.<br/>
+        The source code helps to understand how complex
+        web applications can be built with XQuery.
+      </p>
 
-      <h3>WebSocket Chat</h3>
+      <h3><a href="chat">WebSocket Chat</a></h3>
 
-      <p>The <a href="chat">WebSocket Chat</a> illustrates how bidirectional communication
-        can be realized in XQuery. For a better experience when testing the chat,
-        consider the following steps:</p>
+      <p>The chat application demonstrates how bidirectional communication
+        is realized with BaseX.<br/>
+        For a better experience when testing the chat,
+        consider the following steps:
+      </p>
         
       <ol>
-        <li> Create different database users first (e.g. via the DBA)</li>
-        <li> Open 2, 3 different browsers and log in with different users</li>
+        <li> Create different database users first (e.g. via the DBA).</li>
+        <li> Open two different browsers and log in with different users.</li>
       </ol>
     </body>
   </html>

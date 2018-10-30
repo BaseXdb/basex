@@ -5,6 +5,7 @@
 module namespace chat-ws = 'chat-ws';
 
 import module namespace chat-util = 'chat/util' at 'chat-util.xqm';
+import module namespace request = "http://exquery.org/ns/request";
 
 (:~ 
  : Creates a WebSocket connection. Registers the user and notifies all clients.
