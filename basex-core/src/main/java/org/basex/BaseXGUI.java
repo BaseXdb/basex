@@ -88,8 +88,6 @@ public final class BaseXGUI extends Main {
    */
   private static void init(final GUIOptions opts) {
     try {
-      // Mac: move main menu bar from application window into default menu at the top of the screen
-      System.setProperty("apple.laf.useScreenMenuBar", "true");
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
       // set look and feel
