@@ -31,7 +31,7 @@ public class QueryException extends Exception {
   private final QNm name;
   /** Error value. */
   private Value value = Empty.SEQ;
-  /** Error reference. */
+  /** Error reference ({@code null} for dynamic error messages). */
   private QueryError error;
   /** Code suggestions. */
   private StringList suggest;
@@ -63,7 +63,7 @@ public class QueryException extends Exception {
 
   /**
    * Default constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param error error reference
    * @param ext error extension
    */
@@ -74,7 +74,7 @@ public class QueryException extends Exception {
 
   /**
    * Constructor, specifying the error code and message as string.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param name error code
    * @param message error message
    * @param ext error extension

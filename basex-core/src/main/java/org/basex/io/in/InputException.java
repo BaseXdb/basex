@@ -11,13 +11,6 @@ import java.io.*;
 public class InputException extends IOException {
   /**
    * Constructor.
-   */
-  InputException() {
-    this("Invalid input, or wrong encoding specified");
-  }
-
-  /**
-   * Constructor.
    * @param msg error message
    */
   InputException(final String msg) {

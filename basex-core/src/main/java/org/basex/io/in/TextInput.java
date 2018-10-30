@@ -107,13 +107,13 @@ public class TextInput extends BufferInput {
 
   /**
    * Sets a new encoding.
-   * @param enc encoding (ignored if {@code null} or an empty string)
+   * @param encoding encoding (ignored if {@code null} or an empty string)
    * @return self reference
    * @throws IOException I/O Exception
    */
-  public TextInput encoding(final String enc) throws IOException {
-    if(enc != null && !enc.isEmpty()) {
-      String e = normEncoding(enc);
+  public TextInput encoding(final String encoding) throws IOException {
+    if(encoding != null && !encoding.isEmpty()) {
+      String e = normEncoding(encoding);
       if(e == UTF16) e = decoder.encoding == UTF16LE ? UTF16LE : UTF16BE;
       decoder = TextDecoder.get(e);
       decoder.validate = validate;
@@ -122,18 +122,18 @@ public class TextInput extends BufferInput {
   }
 
   /**
-   * Returns the next character.
+   * Returns the next codepoint.
    * @return next codepoint
    * @throws IOException I/O exception
    */
   @Override
   public int read() throws IOException {
-    final int ch = decoder.read(this);
-    if(ch != -1 && !XMLToken.valid(ch)) {
-      if(validate) throw new EncodingException(ch);
+    final int cp = decoder.read(this);
+    if(cp != -1 && !XMLToken.valid(cp)) {
+      if(validate) throw new InputException("Invalid XML character: #" + cp);
       return Token.REPLACEMENT;
     }
-    return ch;
+    return cp;
   }
 
   @Override

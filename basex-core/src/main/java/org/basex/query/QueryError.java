@@ -332,6 +332,8 @@ public enum QueryError {
   /** Error code. */
   JSON_PARSE_X(JSON, "parse", "%."),
   /** Error code. */
+  JSON_DUPL_X_X_X(JSON, "parse", "(%:%): %."),
+  /** Error code. */
   JSON_PARSE_X_X_X(JSON, "parse", "(%:%): %."),
   /** Error code. */
   JSON_SERIALIZE_X(JSON, "serialize", "%."),
@@ -735,7 +737,7 @@ public enum QueryError {
   /** Error code. */
   INVCHARS_X(FOUT, 1190, "%."),
   /** Error code. */
-  WHICHCHARS_X(FOUT, 1200, "Resource contains invalid input: %."),
+  WHICHCHARS_X(FOUT, 1200, "%."),
 
   /** Error code. */
   FTWEIGHT_X(FTDY, 16, "Weight value out of range: %."),

@@ -64,25 +64,22 @@ public abstract class Parse extends StandardFunc {
         if(rp.length > 1) enc = rp[1];
       }
 
-      try(InputStream is = io.inputStream()) {
-        try(TextInput ti = new TextInput(io)) {
-          ti.encoding(enc).validate(true);
-          if(!check) return Str.get(ti.content());
+      try(InputStream is = io.inputStream(); TextInput ti = new TextInput(io)) {
+        ti.encoding(enc).validate(true);
+        if(!check) return Str.get(ti.content());
 
-          while(ti.read() != -1);
-          return Bln.TRUE;
-        }
+        while(ti.read() != -1);
+        return Bln.TRUE;
+      } catch(final IOException ex) {
+        if(check) return Bln.FALSE;
+        if(ex instanceof DecodingException) throw WHICHCHARS_X.get(info, ex);
+        if(ex instanceof InputException) throw INVCHARS_X.get(info, ex);
+        throw RESNF_X.get(info, io);
       }
+
     } catch(final QueryException ex) {
       if(check && !ex.error().is(ErrType.XPTY)) return Bln.FALSE;
       throw ex;
-    } catch(final IOException ex) {
-      if(check) return Bln.FALSE;
-      if(ex instanceof InputException) {
-        final boolean inv = ex instanceof EncodingException || enc != null;
-        throw (inv ? INVCHARS_X : WHICHCHARS_X).get(info, ex);
-      }
-      throw RESNF_X.get(info, io);
     }
   }
 

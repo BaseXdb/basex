@@ -61,7 +61,7 @@ public final class Token {
   /** Dollar. */
   public static final byte[] DOLLAR = { '$' };
 
-  /** Unicode replacement character. */
+  /** Unicode replacement codepoint (\\uFFFD). */
   public static final char REPLACEMENT = '\uFFFD';
 
   /** Maximum length for hash calculation. */

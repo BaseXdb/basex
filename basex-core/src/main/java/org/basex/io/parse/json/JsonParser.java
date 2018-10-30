@@ -76,7 +76,11 @@ final class JsonParser extends InputParser {
   private void parse() throws QueryIOException {
     consume('\uFEFF');
     skipWs();
-    value();
+    try {
+      value();
+    } catch(final StackOverflowError er) {
+      throw error("Input is too deeply nested");
+    }
     if(more()) throw error("Unexpected trailing content: %", remaining());
   }
 
@@ -134,7 +138,7 @@ final class JsonParser extends InputParser {
         final byte[] key = !liberal || curr() == '"' ? string() : unquoted();
         final boolean dupl = set.contains(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
-          throw error(JSON_PARSE_X, "Key \"%\" occurs more than once", key);
+          throw error(JSON_DUPL_X_X_X, "Key \"%\" occurs more than once", key);
 
         final boolean add = !(dupl && duplicates == JsonDuplicates.USE_FIRST);
         conv.openPair(key, add);

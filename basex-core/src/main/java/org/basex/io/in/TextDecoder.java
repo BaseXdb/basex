@@ -23,9 +23,9 @@ abstract class TextDecoder {
   boolean validate;
 
   /**
-   * Returns the next character.
+   * Returns the next codepoint.
    * @param ti text input
-   * @return next character
+   * @return next codepoint
    * @throws IOException I/O exception
    */
   abstract int read(TextInput ti) throws IOException;
@@ -48,13 +48,14 @@ abstract class TextDecoder {
   }
 
   /**
-   * Processes an invalid character. Throws an exception if input must be valid,
-   * or returns a replacement character as replacement.
-   * @return question mark
+   * Processes an invalid codepoint. Throws an exception if input must be valid,
+   * or returns the Unicode replacement codepoint (\\uFFFD).
+   * @param cp questionable code point
+   * @return replacement codepoint
    * @throws IOException I/O exception
    */
-  final int invalid() throws IOException {
-    if(validate) throw new InputException();
+  final int invalid(final int cp) throws IOException {
+    if(validate) throw new DecodingException("Decoding error: x" + Integer.toHexString(cp & 0xFF));
     return Token.REPLACEMENT;
   }
 
@@ -67,12 +68,12 @@ abstract class TextDecoder {
     int read(final TextInput ti) throws IOException {
       int ch = ti.readByte();
       if(ch < 0x80) return ch;
-      if(ch < 0xC0) return invalid();
+      if(ch < 0xC0) return invalid(ch);
       cache[0] = (byte) ch;
       final int cl = Token.cl((byte) ch);
       for(int c = 1; c < cl; ++c) {
         ch = ti.readByte();
-        if(ch < 0x80) return invalid();
+        if(ch < 0x80) return invalid(ch);
         cache[c] = (byte) ch;
       }
       return Token.cp(cache, 0);
@@ -86,7 +87,7 @@ abstract class TextDecoder {
       final int a = ti.readByte();
       if(a < 0) return a;
       final int b = ti.readByte();
-      if(b < 0) return invalid();
+      if(b < 0) return invalid(b);
       return a | b << 8;
     }
   }
@@ -98,7 +99,7 @@ abstract class TextDecoder {
       final int a = ti.readByte();
       if(a < 0) return a;
       final int b = ti.readByte();
-      if(b < 0) return invalid();
+      if(b < 0) return invalid(b);
       return a << 8 | b;
     }
   }
@@ -110,11 +111,11 @@ abstract class TextDecoder {
       final int a = ti.readByte();
       if(a < 0) return a;
       final int b = ti.readByte();
-      if(b < 0) return invalid();
+      if(b < 0) return invalid(b);
       final int c = ti.readByte();
-      if(c < 0) return invalid();
+      if(c < 0) return invalid(c);
       final int d = ti.readByte();
-      if(d < 0) return invalid();
+      if(d < 0) return invalid(d);
       return a << 24 | b << 16 | c << 8 | d;
     }
   }
@@ -139,7 +140,7 @@ abstract class TextDecoder {
       try {
         csd = Charset.forName(enc).newDecoder();
       } catch(final Exception ex) {
-        throw new EncodingException(ex);
+        throw new DecodingException(ex);
       }
     }
 
@@ -156,13 +157,13 @@ abstract class TextDecoder {
         csd.reset();
         final CoderResult cr = csd.decode(inc, outc, true);
         if(cr.isMalformed()) continue;
-        // return character
+        // return codepoint
         int i = 0;
         final int os = outc.position();
         for(int o = 0; o < os; ++o) i |= outc.get(o) << (o << 3);
         return i;
       }
-      return c == 0 ? -1 : invalid();
+      return c == 0 ? -1 : invalid(c);
     }
   }
 }

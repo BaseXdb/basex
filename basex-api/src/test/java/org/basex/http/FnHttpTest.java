@@ -643,7 +643,7 @@ public class FnHttpTest extends HTTPTest {
       conn.contentType = "text/plain; CHARSET=\\C\\P\\1\\2\\5\\2";
       new HttpResponse(null, ctx.options).getResponse(conn, true, null);
       fail("Encoding exception expected");
-    } catch(final EncodingException expected) { }
+    } catch(final DecodingException expected) { }
   }
 
   /**
