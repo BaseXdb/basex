@@ -73,8 +73,11 @@ public final class GUIMenu extends JMenuBar {
    */
   public static JMenuItem newItem(final GUICommand cmd, final GUI gui, final StringBuilder mnem) {
     final String desc = cmd.label();
-    final JMenuItem item = cmd.toggle() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
-    item.addActionListener(e -> cmd.execute(gui));
+    final JMenuItem item = cmd.toggle() && (!Prop.MAC || Prop.JAVA8) ?
+      new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
+    item.addActionListener(e -> {
+      if(!gui.updating) cmd.execute(gui);
+    });
     BaseXLayout.setMnemonic(item, mnem);
     return item;
   }
