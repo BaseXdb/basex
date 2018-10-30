@@ -18,6 +18,8 @@ import org.basex.util.*;
 public abstract class GUIMacOS {
   /** Reference to the main UI. */
   final GUI main;
+  /** System property identifier. */
+  private static final String P_SCREEN_MENU_BAR = "apple.laf.useScreenMenuBar";
 
   /**
    * Creates a Java-specific instance of this class.
@@ -26,6 +28,8 @@ public abstract class GUIMacOS {
    */
   static GUIMacOS get(final GUI main) {
     try {
+      // show menu in the screen menu instead of inside the application window
+      System.setProperty(P_SCREEN_MENU_BAR, "true");
       return Prop.JAVA8 ? new GUIMacOSX(main) : new GUIMacOSX9(main);
     } catch(final Exception ex) {
       Util.errln("Failed to initialize native Mac OS X interface:");

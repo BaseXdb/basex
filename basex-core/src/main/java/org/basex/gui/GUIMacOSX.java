@@ -23,8 +23,6 @@ public final class GUIMacOSX extends GUIMacOS {
 
   /** System property identifier. */
   private static final String P_ABOUT_NAME = "com.apple.mrj.application.apple.menu.about.name";
-  /** System property identifier. */
-  private static final String P_SCREEN_MENU_BAR = "apple.laf.useScreenMenuBar";
 
   /** Empty class array. */
   private static final Class<?>[] EC = {};
@@ -44,8 +42,6 @@ public final class GUIMacOSX extends GUIMacOS {
 
     // name for the dock icon and the application menu
     System.setProperty(P_ABOUT_NAME, Prop.NAME);
-    // show menu in the screen menu instead of inside the application window
-    System.setProperty(P_SCREEN_MENU_BAR, "true");
 
     // load native java classes...
     /* Reference to the loaded 'Application' class. */
