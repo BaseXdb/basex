@@ -60,18 +60,6 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   }
 
   @Override
-  public void adjustMenuBar(final GUI gui, final GUIMenu menu) {
-    //if(d != null && d.isSupported(Desktop.Action.APP_MENU_BAR)) d.setDefaultMenuBar(menu);
-    try {
-      final Class<?>[] params = { Class.forName("javax.swing.JMenuBar")};
-      final Method m = dClass.getDeclaredMethod("setDefaultMenuBar", params);
-      m.invoke(d, menu);
-    } catch(final Exception ex) {
-      Util.debug(ex);
-    }
-  }
-
-  @Override
   public void setBadge(final String value) {
     //if(tb != null && tb.isSupported(Taskbar.Feature.ICON_BADGE_TEXT)) tb.setIconBadge(value);
   }

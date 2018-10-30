@@ -94,11 +94,6 @@ public final class GUIMacOSX extends GUIMacOS {
     invoke(appObj, "setDockIconBadge", String.class, value);
   }
 
-  @Override
-  public void adjustMenuBar(final GUI gui, final GUIMenu menu) {
-    gui.setJMenuBar(menu);
-  }
-
   /**
    * Handler for the native application events.
    * @author Bastian Lemke
