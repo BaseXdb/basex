@@ -7,6 +7,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.zip.*;
 
+import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -37,7 +39,9 @@ public class ArchiveExtractTo extends ArchiveFn {
             Files.createDirectories(file);
           } else {
             Files.createDirectories(file.getParent());
-            Files.write(file, in.read());
+            try(BufferOutput out = new BufferOutput(new IOFile(file.toFile()))) {
+              in.write(out);
+            }
           }
         }
       }

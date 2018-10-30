@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -46,8 +47,11 @@ public class ArchiveExtractBinary extends ArchiveFn {
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
-        if(!ze.isDirectory() && (hs == null || hs.remove(token(ze.getName())) != 0))
-          tl.add(in.read());
+        if(!ze.isDirectory() && (hs == null || hs.remove(token(ze.getName())) != 0)) {
+          final ArrayOutput out = new ArrayOutput();
+          in.write(out);
+          tl.add(out.finish());
+        }
       }
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);

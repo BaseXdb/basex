@@ -7,7 +7,6 @@ import java.util.zip.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -18,9 +17,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class ArchiveIn implements Closeable {
-  /** Buffer. */
-  private final byte[] data = new byte[IO.BLOCKSIZE];
-
   /**
    * Returns a new instance of an archive reader.
    * @param bi buffer input
@@ -68,14 +64,13 @@ abstract class ArchiveIn implements Closeable {
   public abstract int read(byte[] d) throws IOException;
 
   /**
-   * Reads the next entry.
-   * @return entry
+   * Writes the next entry to the specified output stream.
+   * @param out output stream
    * @throws IOException I/O exception
    */
-  byte[] read() throws IOException {
-    final ArrayOutput ao = new ArrayOutput();
-    for(int c; (c = read(data)) != -1;) ao.write(data, 0, c);
-    return ao.finish();
+  final void write(final OutputStream out) throws IOException {
+    final byte[] data = new byte[IO.BLOCKSIZE];
+    for(int c; (c = read(data)) != -1;) out.write(data, 0, c);
   }
 
   @Override
