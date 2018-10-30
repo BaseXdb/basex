@@ -73,13 +73,6 @@ public abstract class GUIMacOS {
   public abstract void init();
 
   /**
-   * Moves main menu bar from application window into default menu at the top of the screen.
-   * @param gui main BaseX UI
-   * @param menu menu to be adjusted
-   */
-  public abstract void adjustMenuBar(GUI gui, GUIMenu menu);
-
-  /**
    * Enables native full screen.
    * @param window the window
    */

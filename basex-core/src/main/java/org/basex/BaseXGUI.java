@@ -34,6 +34,8 @@ public final class BaseXGUI extends Main {
    */
   public static void main(final String... args) {
     try {
+      /* Moves main menu bar from application window into default menu at the top of the screen. */
+      if (Prop.MAC) System.setProperty("apple.laf.useScreenMenuBar", "true");
       new BaseXGUI(args);
     } catch(final BaseXException ex) {
       Util.errln(ex);

@@ -145,10 +145,8 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     // add menu bar
     menu = new GUIMenu(this);
-    if(osxGUI != null) osxGUI.adjustMenuBar(this, menu);
-    else setJMenuBar(menu);
-
     if(osxGUI != null) osxGUI.init();
+    setJMenuBar(menu);
 
     buttons = new BaseXBack(new BorderLayout());
     toolbar = new GUIToolBar(TOOLBAR, this);
