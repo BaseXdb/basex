@@ -21,13 +21,13 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("9.1 RC1");
+  public static final String VERSION = version("9.1");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
   public static final String TEAM1 = "Michael Seiferle, Alexander Holupirek";
   /** Co-authors (2). */
-  public static final String TEAM2 = "Marc H. Scholl, Sabine Teubner";
+  public static final String TEAM2 = "Marc H. Scholl, Sabine Teubner, Dominik Abend";
   /** Entity. */
   public static final String ENTITY = NAME + " Team";
   /** Project namespace. */

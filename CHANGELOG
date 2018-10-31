@@ -1,3 +1,22 @@
+VERSION 9.1 (October 31, 2018) -----------------------------------------
+
+ WebSockets:
+ - New web service for full-duplex client/server communication
+ - WebSocket Module: functions for organizing WebSocket connections
+ - Embedded sample chat application
+
+ XQuery:
+ - syntax extensions: Elvis operator, ternary if, if without else
+ - local locks via pragmas and function annotations
+ - Jobs Module: record and return registration times
+ - Database Module: faster processing of value index functions
+ - Update Module, update:output: support for caching maps and arrays
+ - ENFORCEINDEX option: support for predicates with dynamic values
+ 
+ GUI:
+ - Mac, Windows: Improved rendering support for latest Java versions
+ - Choose and display context for XQuery editor expressions
+
 VERSION 9.0.2 (May 31, 2018) -------------------------------------------
 
  Critical bug fixes:
