@@ -32,6 +32,8 @@ public abstract class QueryTest extends SandboxTest {
     int fail = 0;
 
     for(final Object[] qu : queries) {
+      if(qu.length == 0) continue;
+
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
       final Value cmp = correct ? (Value) qu[1] : null;

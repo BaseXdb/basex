@@ -3,7 +3,7 @@ package org.basex.query.simple;
 import org.basex.query.*;
 
 /**
- * XQuery 3.0 tests (former: 1.1).
+ * XQuery 3.0 tests.
  *
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
