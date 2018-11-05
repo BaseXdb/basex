@@ -234,8 +234,9 @@ public final class GFLWOR extends ParseExpr {
     calcSize();
 
     final long size = size();
-    if(size != -1 && !has(Flag.NDT)) {
+    if(size != -1 && !has(Flag.NDT, Flag.UPD)) {
       if(size == 0) return cc.emptySeq(this);
+
       Expr rep = null;
       if(ret instanceof Value) {
         // rewrite expression with next value as singleton sequence
@@ -244,7 +245,7 @@ public final class GFLWOR extends ParseExpr {
         // skip expression that relies on the context
         if(size == 1) {
           rep = ret;
-        } else if(!ret.has(Flag.NDT, Flag.CNS)) {
+        } else if(!ret.has(Flag.CNS)) {
           // replace expression with replicated expression
           rep = cc.function(Function._UTIL_REPLICATE, info, ret, Int.get(size / ret.size()));
         }

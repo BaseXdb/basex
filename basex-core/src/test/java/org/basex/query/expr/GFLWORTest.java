@@ -289,6 +289,16 @@ public final class GFLWORTest extends QueryPlanTest {
     );
   }
 
+  /** Preserve empty updating results. */
+  @Test public void gh1636() {
+    check("<a>x</a> update {" +
+        " let $fn := function($n) { delete node $n/text() }" +
+        " for $f in ($fn, $fn)" +
+        " return updating $f(.)" +
+        "}", "<a/>", exists(GFLWOR.class)
+    );
+  }
+
   /** Ensures that non-deterministic expressions are not inlined. */
   @Test public void dontInlineNDTTest() {
     check("let $rnd := random:double() return (1 to 10) ! $rnd",
