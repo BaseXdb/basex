@@ -113,7 +113,7 @@ public final class GUIConstants {
   }, {
     C_SHOWEDITOR, C_SHOWPROJECT, C_FILESEARCH, SEPARATOR,
     C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
-    GUIMacOS.nativeFullscreen() ? null : C_FULL
+    Prop.MAC && GUIMacOS.nativeFullscreen() ? null : C_FULL
   }, {
     C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE,
   }, {
