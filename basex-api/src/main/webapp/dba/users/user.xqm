@@ -70,7 +70,7 @@ function dba:user(
                 </tr>
               ),
               <tr>
-                <td>Passsword:</td>
+                <td>Password:</td>
                 <td>
                   <input type="password" name="pw" value="{ $pw }" id="pw"/> &#xa0;
                   <span class='note'>
