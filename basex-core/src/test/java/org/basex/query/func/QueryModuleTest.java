@@ -1,6 +1,8 @@
 package org.basex.query.func;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -60,14 +62,35 @@ public final class QueryModuleTest extends QueryModule {
   /**
    * Read lock.
    */
-  @Lock(read = { LOCK1, LOCK2})
+  @Lock(read = { LOCK1, LOCK2 })
   public void readLock() { }
 
   /**
    * Write locks.
    */
-  @Lock(write = { LOCK1, LOCK2})
+  @Lock(write = { LOCK1, LOCK2 })
   public void writeLock() { }
+
+  /**
+   * Ignore argument.
+   * @param e expression
+   */
+  public void ignore(@SuppressWarnings("unused") final Expr e) { }
+
+  /**
+   * Compute faculty.
+   * @param e expression
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public Int faculty(final Expr e) throws QueryException {
+    final Iter iter = e.iter(queryContext);
+    long c = 1;
+    for(Item item; (item = iter.next()) != null;) {
+      c *= item.itr(null);
+    }
+    return Int.get(c);
+  }
 
   /**
    * Throws an exception.

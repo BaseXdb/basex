@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.java.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -70,7 +71,7 @@ public final class Functions extends TokenSet {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      throw FUNCTYPES_X_X_X.get(info, name.string(), arguments(arity), 1);
+      throw FUNCARITY_X_X_X.get(info, name.string(), arguments(arity), 1);
     }
 
     // include similar function name in error message
@@ -78,9 +79,12 @@ public final class Functions extends TokenSet {
     for(final AtomType tp : AtomType.VALUES) {
       if(tp.parent == null) continue;
       final byte[] u = tp.name.uri();
-      if(eq(u, XS_URI) && tp != AtomType.NOT && tp != AtomType.AAT && ls.similar(
-          lc(ln), lc(tp.string()))) throw FUNCSIMILAR_X_X.get(info, name.prefixId(), tp.toString());
+      if(eq(u, XS_URI) && tp != AtomType.NOT && tp != AtomType.AAT &&
+          ls.similar(lc(ln), lc(tp.string()))) {
+        throw FUNCSIMILAR_X_X.get(info, name.prefixId(), tp.toString());
+      }
     }
+
     // no similar name: constructor function found, or abstract type specified
     throw WHICHFUNC_X.get(info, name.prefixId());
   }
@@ -124,17 +128,17 @@ public final class Functions extends TokenSet {
 
   /**
    * Raises an error for the wrong number of function arguments.
-   * @param func function
-   * @param arity number of arguments
+   * @param function function
+   * @param arity number of supplied arguments
    * @param arities expected arities
    * @param info input info
    * @return error
    */
-  public static QueryException wrongArity(final Object func, final long arity,
+  public static QueryException wrongArity(final Object function, final long arity,
       final IntList arities, final InputInfo info) {
 
-    final int as = arities.sort().size();
-    if(as == 0) return FUNCARGNUM_X_X.get(info, func, arguments(arity));
+    final int as = arities.sort().distinct().size();
+    if(as == 0) return FUNCARITY_X_X.get(info, function, arguments(arity));
 
     int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
     for(int a = 0; a < as; a++) {
@@ -152,7 +156,7 @@ public final class Functions extends TokenSet {
         ext.append(arities.get(a));
       }
     }
-    return FUNCTYPES_X_X_X.get(info, func, arguments(arity), ext);
+    return FUNCARITY_X_X_X.get(info, function, arguments(arity), ext);
   }
 
   /**
@@ -276,7 +280,7 @@ public final class Functions extends TokenSet {
       params[v] = vs.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
       args[v] = new VarRef(info, params[v]);
     }
-    final JavaFunction jf = JavaFunction.get(name, args, qc, sc, info);
+    final JavaCall jf = JavaCall.get(name, args, qc, sc, info);
     return jf == null ? null : new FuncLit(anns, name, params, jf, st, vs, info);
   }
 
@@ -341,7 +345,7 @@ public final class Functions extends TokenSet {
     }
 
     // Java function
-    final JavaFunction jf = JavaFunction.get(name, args, qc, sc, info);
+    final JavaCall jf = JavaCall.get(name, args, qc, sc, info);
     if(jf != null) return jf;
 
     // user-defined function that has not been declared yet

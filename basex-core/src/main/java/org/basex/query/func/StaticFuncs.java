@@ -205,19 +205,16 @@ public final class StaticFuncs extends ExprInfo {
    */
   public QueryException similarError(final QNm name, final InputInfo info) {
     // find local functions
-    QueryException qe = null;
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        qe = FUNCSIMILAR_X_X.get(info, name.prefixString(), sf.name.prefixString());
-        break;
+        return FUNCSIMILAR_X_X.get(info, name.prefixString(), sf.name.prefixString());
       }
     }
     // find global function
-    if(qe == null) qe = Functions.get().similarError(name, info);
-    return qe;
+    return Functions.get().similarError(name, info);
   }
 
   /**

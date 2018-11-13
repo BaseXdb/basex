@@ -1,4 +1,4 @@
-package org.basex.query.func;
+package org.basex.query.func.java;
 
 import java.math.*;
 import java.net.*;

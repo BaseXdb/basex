@@ -445,8 +445,11 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public final synchronized String error(final String name) {
-    final String sim = similar(name);
-    return Util.info(sim != null ? Text.UNKNOWN_OPT_SIMILAR_X_X : Text.UNKNOWN_OPTION_X, name, sim);
+    final byte[] similar = Levenshtein.similar(token(name), list -> {
+      for(final String opts : options.keySet()) list.add(opts);
+    });
+    return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, name, similar) :
+      Util.info(Text.UNKNOWN_OPTION_X, name);
   }
 
   /**
@@ -848,19 +851,5 @@ public class Options implements Iterable<Option<?>> {
       throw Util.notExpected("Unsupported option: " + option);
     }
     return true;
-  }
-
-  /**
-   * Returns an option name similar to the specified string.
-   * @param name name to be found
-   * @return similar name or {@code null}
-   */
-  private String similar(final String name) {
-    final byte[] nm = token(name);
-    final Levenshtein ls = new Levenshtein();
-    for(final String opts : options.keySet()) {
-      if(ls.similar(nm, token(opts))) return opts;
-    }
-    return null;
   }
 }

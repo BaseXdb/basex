@@ -19,6 +19,7 @@ import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.*;
+import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.*;
@@ -684,7 +685,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // no type specified: return original value or convert Java object
     if(type == null || type.isEmpty()) {
-      return object instanceof Value ? (Value) object : JavaFunction.toValue(object, this, sc);
+      return object instanceof Value ? (Value) object : JavaCall.toValue(object, this, sc);
     }
 
     // convert to json

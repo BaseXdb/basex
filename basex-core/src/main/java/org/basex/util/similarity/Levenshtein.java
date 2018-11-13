@@ -1,7 +1,11 @@
 package org.basex.util.similarity;
 
-import static org.basex.util.Token.*;
 import static org.basex.util.FTToken.*;
+import static org.basex.util.Token.*;
+
+import java.util.function.*;
+
+import org.basex.util.list.*;
 
 /**
  * <p>Damerau-Levenshtein algorithm. Based on the publications from Levenshtein (1965):
@@ -33,6 +37,24 @@ public final class Levenshtein {
    */
   public Levenshtein(final int error) {
     this.error = error;
+  }
+
+  /**
+   * Returns the first similar entry.
+   * @param token token to be compared
+   * @param tokens tokens to be compared
+   * @return similar token or {@code null}
+   */
+  public static byte[] similar(final byte[] token, final Consumer<TokenList> tokens) {
+    final TokenList list = new TokenList();
+    tokens.accept(list);
+
+    final Levenshtein ls = new Levenshtein();
+    final byte[] t = lc(token);
+    for(final byte[] sub : list) {
+      if(ls.similar(t, lc(sub))) return sub;
+    }
+    return null;
   }
 
   /**

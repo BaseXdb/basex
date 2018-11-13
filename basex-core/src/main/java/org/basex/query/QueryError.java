@@ -982,21 +982,21 @@ public enum QueryError {
   /** Error code. */
   FUNCSIMILAR_X_X(XPST, 17, "Unknown function: % (similar: %)."),
   /** Error code. */
-  FUNCARGNUM_X_X(XPST, 17, "%: % supplied."),
+  FUNCARITY_X_X(XPST, 17, "%: % supplied."),
   /** Error code. */
-  FUNCTYPES_X_X_X(XPST, 17, "%: % supplied, % expected."),
+  FUNCARITY_X_X_X(XPST, 17, "%: % supplied, % expected."),
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
-  WHICHJAVA_X_X_X(XPST, 17, "Java function is unknown: %:%#%."),
-  /** Error code. */
-  WHICHCLASS_X(XPST, 17, "Java class is unknown: %."),
-  /** Error code. */
-  JAVAAMB_X_X_X(XPST, 17, "Java function is ambiguous: %:%#%."),
-  /** Error code. */
-  JAVACONSAMB_X(XPST, 17, "Java constructor is ambiguous: %."),
-  /** Error code. */
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
+  /** Error code. */
+  WHICHCLASS_X(XPST, 17, "Unknown class: %."),
+  /** Error code. */
+  JAVACONSTR_X_X(XPST, 17, "Unknown constructor: %#%."),
+  /** Error code. */
+  JAVAMULTIFUNC_X_X(XPST, 17, "%: Multiple functions with %."),
+  /** Error code. */
+  JAVAARGS_X_X(XPST, 17, "% cannot be called with (%)."),
   /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
 
@@ -1010,16 +1010,18 @@ public enum QueryError {
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
   /** Error code. */
-  WHICHCONSTR_X_X(XPTY, 4, "Unknown Java constructor: %(%)."),
+  DYNARGS_X_X(XPTY, 4, "% cannot be called with (%)."),
   /** Error code. */
-  WHICHMETHOD_X_X(XPTY, 4, "Unknown Java method: %(%)."),
+  DYNMULTIFUNC_X_X(XPTY, 4, "%: Multiple functions with %."),
   /** Error code. */
-  JAVAARGS_X_X_X(XPTY, 4, "Function %(%) cannot be called with (%)."),
+  DYNMULTICONS_X_X(XPTY, 4, "%: Multiple constructors with %."),
   /** Error code. */
-  JAVAERROR_X_X_X(XPTY, 4, "%(%): %."),
+  JAVAARGS_X_X_X(XPTY, 4, "%(%) expected, (%) found."),
+  /** Error code. */
+  JAVAINVOKE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
+  /** Error code. */
+  JAVAEVAL_X_X_X(XPTY, 4, "%. Caused by: %(%)."),
 
-  /** Error code. */
-  JAVAARITY_X_X_X_X(XPTY, 4, "Java function %:%#%: % supplied."),
   /** Error code. */
   ZEROFUNCS_X_X(XPTY, 4, "Zero-arity functions expected, % found: %."),
   /** Error code. */
