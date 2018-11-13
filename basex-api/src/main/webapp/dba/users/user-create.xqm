@@ -57,7 +57,7 @@ function dba:user-create(
               </td>
             </tr>
             <tr>
-              <td>Passsword:</td>
+              <td>Password:</td>
               <td>
                 <input type='password' name='pw' value='{ $pw }' id='pw'
                   autocomplete='new-password'/>
