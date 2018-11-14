@@ -23,6 +23,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
@@ -377,16 +378,26 @@ public abstract class JavaCall extends Arr {
   }
 
   /**
-   * Returns a function descriptor.
+   * Returns an XQuery string representation of the Java entity of this expression.
    * @return string
    */
   abstract String desc();
 
   /**
-   * Returns a name of the Java entity.
+   * Returns the name of the Java entity.
    * @return string
    */
   abstract String name();
+
+  @Override
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(NAME, name()), exprs);
+  }
+
+  @Override
+  public final String description() {
+    return desc() + "(...)";
+  }
 
   @Override
   public final String toString() {

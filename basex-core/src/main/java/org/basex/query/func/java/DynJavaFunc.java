@@ -1,6 +1,7 @@
 package org.basex.query.func.java;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -64,7 +65,7 @@ final class DynJavaFunc extends DynJavaCall {
       } else {
         arities.add(al);
       }
-    } catch(final Exception ex) {
+    } catch(final NoSuchFieldException ex) {
       // field not found
     }
 
@@ -84,7 +85,7 @@ final class DynJavaFunc extends DynJavaCall {
     if(field != null || !methods.isEmpty()) return true;
     if(!enforce) return false;
 
-    throw noFunction(name, arity, clazz.getName() + '.' + name, arities, types, info,
+    throw noFunction(name, arity, name(), arities, types, info,
       (Consumer<TokenList>) list -> {
         for(final Method m : clazz.getMethods()) list.add(m.getName());
         for(final Field f : clazz.getFields()) list.add(f.getName());
@@ -188,10 +189,10 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final DynJavaFunc func = new DynJavaFunc(clazz, name, types, copyAll(cc, vm, exprs), sc, info);
-    func.field = field;
-    func.methods = methods;
-    return func;
+    final DynJavaFunc f = new DynJavaFunc(clazz, name, types, copyAll(cc, vm, exprs), sc, info);
+    f.field = field;
+    f.methods = methods;
+    return f;
   }
 
   @Override
@@ -202,11 +203,11 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   String desc() {
-    return "Q{java:" + clazz.getName() + '}' + name;
+    return EQNAME + JAVAPREF + clazz.getName() + CURLY2 + name;
   }
 
   @Override
   String name() {
-    return clazz.getName() + '.' + name;
+    return clazz.getName() + COL + name;
   }
 }

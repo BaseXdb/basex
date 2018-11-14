@@ -1,11 +1,8 @@
 package org.basex.query.func.java;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -46,15 +43,5 @@ abstract class DynJavaCall extends JavaCall {
     if(!(obj instanceof DynJavaCall)) return false;
     final DynJavaCall j = (DynJavaCall) obj;
     return clazz.equals(j.clazz) && Array.equals(types, j.types) && super.equals(obj);
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, desc()), exprs);
-  }
-
-  @Override
-  public final String description() {
-    return desc() + "(...)";
   }
 }

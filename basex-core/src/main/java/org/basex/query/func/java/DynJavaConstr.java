@@ -1,6 +1,7 @@
 package org.basex.query.func.java;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -53,7 +54,7 @@ final class DynJavaConstr extends DynJavaCall {
     if(!constrs.isEmpty()) return true;
     if(!enforce) return false;
 
-    throw JAVACONSTR_X_X.get(info, clazz.getName(), el);
+    throw JAVACONSTR_X_X.get(info, name(), el);
   }
 
   @Override
@@ -83,11 +84,6 @@ final class DynJavaConstr extends DynJavaCall {
   }
 
   @Override
-  String desc() {
-    return "Q{" + QueryText.JAVAPREF + ':' + clazz.getName() + '}' + QueryText.NEW;
-  }
-
-  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final DynJavaConstr c = new DynJavaConstr(clazz, types, copyAll(cc, vm, exprs), sc, info);
     c.constrs = constrs;
@@ -97,6 +93,11 @@ final class DynJavaConstr extends DynJavaCall {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof DynJavaConstr && super.equals(obj);
+  }
+
+  @Override
+  String desc() {
+    return EQNAME + JAVAPREF + clazz.getName() + CURLY2 + NEW;
   }
 
   @Override

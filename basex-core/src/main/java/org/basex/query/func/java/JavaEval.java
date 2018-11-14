@@ -177,29 +177,29 @@ final class JavaEval {
   }
 
   /**
-   * Returns a string representation of the types of the specified arguments.
-   * @param objects arguments
+   * Returns a string representation of the XQuery or Java types of the specified arguments.
+   * @param args arguments
    * @return types string
    */
-  private static String types(final Object[] objects) {
+  private static String types(final Object[] args) {
     final StringBuilder sb = new StringBuilder();
-    for(final Object object : objects) {
+    for(final Object arg : args) {
       if(sb.length() != 0) sb.append(", ");
-      sb.append(type(object));
+      sb.append(type(arg));
     }
     return sb.toString();
   }
 
   /**
-   * Returns a string representation of type of the specified argument.
-   * @param object argument
+   * Returns a string representation of the XQuery or Java type of the specified argument.
+   * @param arg argument
    * @return type string
    */
-  private static String type(final Object object) {
-    if(object instanceof Value) {
-      final Value v = (Value) object;
-      return v instanceof Jav ? Util.className(((Jav) object).toJava()) : v.seqType().toString();
+  private static String type(final Object arg) {
+    if(arg instanceof Value) {
+      final Value v = (Value) arg;
+      return v instanceof Jav ? Util.className(((Jav) arg).toJava()) : v.seqType().toString();
     }
-    return Util.className(object);
+    return Util.className(arg);
   }
 }

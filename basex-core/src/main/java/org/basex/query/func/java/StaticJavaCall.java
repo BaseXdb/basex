@@ -10,7 +10,6 @@ import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.Array;
@@ -87,8 +86,11 @@ final class StaticJavaCall extends JavaCall {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, desc()), exprs);
+  public boolean has(final Flag... flags) {
+    return Flag.NDT.in(flags) && method.getAnnotation(Deterministic.class) == null ||
+      (Flag.CTX.in(flags) || Flag.POS.in(flags)) &&
+      method.getAnnotation(FocusDependent.class) != null ||
+      super.has(flags);
   }
 
   @Override
@@ -101,25 +103,12 @@ final class StaticJavaCall extends JavaCall {
   }
 
   @Override
-  public boolean has(final Flag... flags) {
-    return Flag.NDT.in(flags) && method.getAnnotation(Deterministic.class) == null ||
-      (Flag.CTX.in(flags) || Flag.POS.in(flags)) &&
-      method.getAnnotation(FocusDependent.class) != null ||
-      super.has(flags);
-  }
-
-  @Override
-  public String description() {
-    return desc() + "(...)";
-  }
-
-  @Override
   String desc() {
-    return Util.className(module) + ':' + method.getName();
+    return name();
   }
 
   @Override
   String name() {
-    return desc();
+    return Util.className(module) + COL + method.getName();
   }
 }
