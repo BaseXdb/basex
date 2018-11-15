@@ -576,7 +576,7 @@ public final class EditorView extends View {
       } catch(final IOException ex) {
         info(ex);
       }
-    } else if(script || file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.XSLSUFFIXES)) {
+    } else if(script || file.hasSuffix(gui.gopts.xmlSuffixes()) || file.hasSuffix(IO.XSLSUFFIXES)) {
       final ArrayInput ai = new ArrayInput(text);
       try {
         // check XML syntax

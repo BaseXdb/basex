@@ -1250,8 +1250,8 @@ public interface Text {
   String DATABASE_PATH = lang("database_path");
   /** Repository path. */
   String REPOSITORY_PATH = lang("repository_path");
-  /** Interactions. */
-  String GUI_INTERACTIONS = lang("gui_interactions");
+  /** Suffixes. */
+  String FILE_SUFFIXES_X = lang("file_suffixes_%");
   /** Limits. */
   String LIMITS = lang("limits");
   /** Look and feel. */

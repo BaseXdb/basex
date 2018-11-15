@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -36,12 +35,12 @@ final class DialogVisualPrefs extends BaseXBack {
   private final BaseXSlider mapWeight;
   /** Show attributes. */
   private final BaseXCheckBox mapAtts;
+  /** Focus checkbox. */
+  private final BaseXCheckBox mousefocus;
   /** Select layout algorithm. */
   private final BaseXCombo mapOffsets;
   /** Simple file dialog checkbox. */
   private final BaseXCombo lookfeel;
-  /** Serialization parameters. */
-  private final BaseXSerial serial;
 
   /** Look and feels. */
   private final StringList classes = new StringList();
@@ -57,6 +56,7 @@ final class DialogVisualPrefs extends BaseXBack {
     final GUIOptions gopts = dialog.gui.gopts;
     scrollTabs = new BaseXCheckBox(dialog, SCROLL_TABS, GUIOptions.SCROLLTABS, gopts);
     showNames = new BaseXCheckBox(dialog, SHOW_NAME_ATTS, GUIOptions.SHOWNAME, gopts);
+    mousefocus = new BaseXCheckBox(dialog, RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts);
     treeSlims = new BaseXCheckBox(dialog, ADJUST_NODES, GUIOptions.TREESLIMS, gopts);
     treeAtts = new BaseXCheckBox(dialog, SHOW_ATTS, GUIOptions.TREEATTS, gopts);
     mapAlgo = new BaseXCombo(dialog, GUIOptions.MAPALGO, gopts, MAP_LAYOUTS);
@@ -79,8 +79,6 @@ final class DialogVisualPrefs extends BaseXBack {
     lookfeel = new BaseXCombo(dialog, lafs.finish());
     lookfeel.setSelectedIndex(i);
 
-    serial = new BaseXSerial(dialog, gui.context.options.get(MainOptions.SERIALIZER));
-
     BaseXBack p = new BaseXBack().layout(new RowLayout(8)), pp;
     pp = new BaseXBack(new RowLayout());
     pp.add(new BaseXLabel(JAVA_LF + COL, true, true));
@@ -92,9 +90,8 @@ final class DialogVisualPrefs extends BaseXBack {
     pp = new BaseXBack(new RowLayout());
     pp.add(new BaseXLabel(GENERAL + COL, true, true));
     pp.add(showNames);
+    pp.add(mousefocus);
     p.add(pp);
-
-    p.add(serial);
 
     add(p);
 
@@ -128,6 +125,7 @@ final class DialogVisualPrefs extends BaseXBack {
    * @return success flag
    */
   boolean action() {
+    mousefocus.assign();
     treeSlims.assign();
     treeAtts.assign();
     mapAtts.assign();
@@ -171,19 +169,5 @@ final class DialogVisualPrefs extends BaseXBack {
       if(Reflect.find(laf) != null) sl.add(laf);
     }
     return sl;
-  }
-
-  /**
-   * Updates the panel.
-   */
-  void update() {
-    serial.init(gui.context.options.get(MainOptions.SERIALIZER));
-  }
-
-  /**
-   * Closes the panel.
-   */
-  void cancel() {
-    gui.set(MainOptions.SERIALIZER, serial.options());
   }
 }

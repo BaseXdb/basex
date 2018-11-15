@@ -107,6 +107,9 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SCROLLTABS = new BooleanOption("SCROLLTABS", true);
   /** Focus follows mouse. */
   public static final BooleanOption MOUSEFOCUS = new BooleanOption("MOUSEFOCUS", false);
+  /** XML suffixes. */
+  public static final StringOption XMLSUFFIXES =
+      new StringOption("XMLSUFFIXES", "xml,xsd,svg,rdf,rss,rng,sch,xhtml");
 
   /** Sort ascending. */
   public static final BooleanOption ASCSORT = new BooleanOption("ASCSORT", true);
@@ -259,5 +262,15 @@ public final class GUIOptions extends Options {
    */
   public synchronized void setFile(final StringOption option, final IOFile file) {
     set(option, file.normalize().path());
+  }
+
+  /**
+   * Returns the supported XML suffixes.
+   * @return XML suffixes
+   */
+  public synchronized String[] xmlSuffixes() {
+    final StringList list = new StringList();
+    for(final String suffix : get(XMLSUFFIXES).split("\\W+")) list.add('.' + suffix);
+    return list.finish();
   }
 }

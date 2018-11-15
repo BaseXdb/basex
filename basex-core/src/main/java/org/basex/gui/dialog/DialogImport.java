@@ -225,7 +225,7 @@ final class DialogImport extends BaseXBack {
     if(i != -1) {
       // analyze file suffix
       final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-      if(eq(suf, IO.XMLSUFFIXES) || eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
+      if(eq(suf, gui.gopts.xmlSuffixes()) || eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
       else if(eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
       else if(eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
       else if(eq(suf, IO.TXTSUFFIXES)) type = MainParser.TEXT;

@@ -55,7 +55,7 @@ public final class BaseXFileChooser {
    * @return self reference
    */
   public BaseXFileChooser textFilters() {
-    filter(XML_DOCUMENTS, IO.XMLSUFFIXES);
+    filter(XML_DOCUMENTS, win.gui().gopts.xmlSuffixes());
     filter(XSL_DOCUMENTS, IO.XSLSUFFIXES);
     filter(HTML_DOCUMENTS, IO.HTMLSUFFIXES);
     filter(JSON_DOCUMENTS, IO.JSONSUFFIX);

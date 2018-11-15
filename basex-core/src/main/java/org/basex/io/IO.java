@@ -72,9 +72,6 @@ public abstract class IO {
     ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, TARSUFFIX, XARSUFFIX,
     ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".epub"
   };
-  /** XML suffixes. */
-  public static final String[] XMLSUFFIXES =
-    { XMLSUFFIX, ".xsd", ".svg", ".rdf", ".rss", ".rng", ".sch", ".xhtml" };
   /** XSL suffixes. */
   public static final String[] XSLSUFFIXES = { ".xsl", ".xslt", ".fo", ".fob" };
   /** HTML suffixes. */

@@ -340,8 +340,8 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     }
 
     @Override public boolean enabled(final GUI main) {
-      final ProjectNode node = selectedNode();
-      return node != null && !node.file.isDir() && node.file.hasSuffix(IO.XMLSUFFIXES);
+      final ProjectNode pn = selectedNode();
+      return pn != null && !pn.file.isDir() && pn.file.hasSuffix(view.gui.gopts.xmlSuffixes());
     }
   }
 }
