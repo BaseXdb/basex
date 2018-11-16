@@ -157,7 +157,7 @@ final class StringParser extends CommandParser {
       case GET:
         return new Get(name(null));
       case SET:
-        return new Set(name(cmd), string(null));
+        return new Set(name(cmd), remaining(null, true));
       case PASSWORD:
         return new Password(password());
       case HELP:
