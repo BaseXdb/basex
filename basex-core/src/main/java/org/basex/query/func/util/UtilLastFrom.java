@@ -3,7 +3,6 @@ package org.basex.query.func.util;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -35,11 +34,15 @@ public final class UtilLastFrom extends StandardFunc {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zeroOrOne()) return expr;
+
+    // ignore standard limitation for large values
+    if(expr instanceof Value) return ((Value) expr).itemAt(expr.size() - 1);
+
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+    if(expr.isFunction(Function.REVERSE))
+      return cc.function(Function.HEAD, info, ((Arr) expr).exprs);
 
     // check for large values and fn:reverse function
-    return expr instanceof Value ? ((Value) expr).itemAt(expr.size() - 1) :
-           expr instanceof FnReverse ? cc.function(Function.HEAD, info, ((Arr) expr).exprs) :
-           this;
+    return this;
   }
 }

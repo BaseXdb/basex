@@ -91,13 +91,14 @@ public final class Pos extends Arr {
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
 
-    final Item item1 = exprs[0].atomItem(qc, info);
+    final Expr[] ex = exprs;
+    final Item item1 = ex[0].atomItem(qc, info);
     if(item1 == null) return Bln.FALSE;
     final long pos = qc.focus.pos;
     final double start = toDouble(item1);
-    if(eq()) return Bln.get(pos == start);
+    if(ex[0] == ex[1]) return Bln.get(pos == start);
 
-    final Item item2 = exprs[1].atomItem(qc, info);
+    final Item item2 = ex[1].atomItem(qc, info);
     if(item2 == null) return Bln.FALSE;
     final double end = toDouble(item2);
     return Bln.get(pos >= start && pos <= end);
@@ -116,21 +117,12 @@ public final class Pos extends Arr {
    */
   Expr intersect(final Pos pos, final InputInfo ii) {
     final Expr[] r1 = exprs, r2 = pos.exprs;
-    if(!eq() && !pos.eq()) {
+    if(r1[0] != r1[1] && r2[0] != r2[1]) {
       final Expr min = r1[0] == Int.ONE ? r2[0] : r2[0] == Int.ONE ? r1[0] : null;
       final Expr max = r1[1] == Int.MAX ? r2[1] : r2[1] == Int.MAX ? r1[1] : null;
       if(min != null && max != null) return new Pos(ii, min, max);
     }
     return null;
-  }
-
-  /**
-   * Checks if minimum and maximum expressions are identical.
-   * @return result of check
-   */
-  private boolean eq() {
-    final Expr[] ex = exprs;
-    return ex[0] == ex[1];
   }
 
   @Override
@@ -155,8 +147,10 @@ public final class Pos extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(PAREN1).append("position() = ").append(exprs[0]);
-    if(!eq()) sb.append(' ' + TO + ' ').append(exprs[1]);
+    final Expr[] ex = exprs;
+    final StringBuilder sb = new StringBuilder();
+    sb.append(PAREN1).append(Function.POSITION).append(" = ").append(ex[0]);
+    if(ex[0] != ex[1]) sb.append(' ' + TO + ' ').append(ex[1]);
     return sb.append(PAREN2).toString();
   }
 }

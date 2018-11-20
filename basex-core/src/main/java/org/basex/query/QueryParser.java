@@ -410,7 +410,7 @@ public class QueryParser extends InputParser {
           do {
             final Expr ex = literal();
             if(!(ex instanceof Item)) {
-              throw ex instanceof FnError ? ((FnError) ex).error(qc) : error(ANNVALUE);
+              throw ex.isFunction(Function.ERROR) ? ((FnError) ex).error(qc) : error(ANNVALUE);
             }
             items.add((Item) ex);
           } while(wsConsumeWs(COMMA));
@@ -2194,7 +2194,7 @@ public class QueryParser extends InputParser {
     // numeric literal
     final Expr num = numericLiteral(ch);
     if(num != null) {
-      if(num instanceof FnError || num instanceof Int) return num;
+      if(num.isFunction(Function.ERROR) || num instanceof Int) return num;
       throw error(NUMBERITR_X_X, num.seqType(), num);
     }
     return Str.get(ncName(KEYSPEC));
@@ -2273,7 +2273,7 @@ public class QueryParser extends InputParser {
       if(keyword(name)) throw error(RESERVED_X, name.local());
       final char ch = curr();
       final Expr num = numericLiteral(ch);
-      if(num instanceof FnError) return num;
+      if(num != null && num.isFunction(Function.ERROR)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, num == null ? ch == 0 ? "" : ch : tok);
       final long a = ((Int) num).itr();
       if(a > Integer.MAX_VALUE) return FnError.get(RANGE_X.get(info(), num), SeqType.ITEM_ZM, sc);

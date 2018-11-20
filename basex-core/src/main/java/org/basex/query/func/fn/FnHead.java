@@ -26,10 +26,12 @@ public final class FnHead extends StandardFunc {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zeroOrOne()) return expr;
+
+    // ignore standard limitation for large values
     if(expr instanceof Value) return ((Value) expr).itemAt(0);
 
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
-    if(expr instanceof FnReverse)
+    if(expr.isFunction(Function.REVERSE))
       return cc.function(Function._UTIL_LAST_FROM, info, ((Arr) expr).exprs);
 
     // faster retrieval of single line

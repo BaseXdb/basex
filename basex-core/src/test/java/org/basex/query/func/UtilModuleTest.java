@@ -18,8 +18,17 @@ import org.junit.*;
 public final class UtilModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
+  public void deepEquals() {
+    final Function func = _UTIL_DEEP_EQUAL;
+    query(func.args(1, 1), true);
+    query(func.args(1, 1, "ALLNODES"), true);
+    error(func.args("(1 to 2)", "(1 to 2)", "X"), QueryError.INVALIDOPTION_X);
+  }
+
+  /** Test method. */
+  @Test
   public void iff() {
-    final Function func = Function._UTIL_IF;
+    final Function func = _UTIL_IF;
     query(func.args(" 1", 1), 1);
     query(func.args(" ()", 1), "");
 
@@ -32,7 +41,7 @@ public final class UtilModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void itemAt() {
-    final Function func = Function._UTIL_ITEM_AT;
+    final Function func = _UTIL_ITEM_AT;
     final String name = Util.className(func.clazz);
 
     query(func.args(" ()", 1), "");
@@ -71,7 +80,7 @@ public final class UtilModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void itemRange() {
-    final Function func = Function._UTIL_ITEM_RANGE;
+    final Function func = _UTIL_ITEM_RANGE;
     query(func.args(" ()", 1, 2), "");
     query(func.args(1, 1, 2), 1);
     query(func.args(1, 0, 2), 1);
@@ -117,7 +126,7 @@ public final class UtilModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void or() {
-    final Function func = Function._UTIL_OR;
+    final Function func = _UTIL_OR;
     query(func.args(1, 2), 1);
     query(func.args(" <x/>", 2), "<x/>");
     query(func.args(" (1 to 2)[. = 1]", 2), 1);
@@ -160,14 +169,5 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" <a/>", " <_>2</_>"), "<a/>\n<a/>", type(name, "element()*"));
 
     error(func.args(1, -1), QueryError.UTIL_NEGATIVE_X);
-  }
-
-  /** Test method. */
-  @Test
-  public void deepEquals() {
-    final Function func = _UTIL_DEEP_EQUAL;
-    query(func.args(1, 1), true);
-    query(func.args(1, 1, "ALLNODES"), true);
-    error(func.args("(1 to 2)", "(1 to 2)", "X"), QueryError.INVALIDOPTION_X);
   }
 }

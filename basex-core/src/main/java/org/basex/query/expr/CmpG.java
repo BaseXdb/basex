@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
+import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -305,7 +306,7 @@ public class CmpG extends Cmp {
     if(op != OpG.EQ || coll != null) return false;
 
     Expr expr1 = exprs[0];
-    final boolean tokenize = expr1 instanceof FnTokenize;
+    final boolean tokenize = expr1.isFunction(Function.TOKENIZE);
     if(tokenize) expr1 = ((FnTokenize) expr1).input();
     return ii.create(exprs[1], ii.type(expr1, tokenize ? IndexType.TOKEN : null), info, false);
   }

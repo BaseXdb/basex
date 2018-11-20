@@ -117,9 +117,9 @@ public abstract class Filter extends Preds {
     // evaluate positional predicates: build new root expression
     Expr rt = root;
     boolean opt = false;
-    for(final Expr expr : exprs) {
+    for(final Expr pred : exprs) {
       exp = null;
-      if(expr.isFunction(Function.LAST)) {
+      if(pred.isFunction(Function.LAST)) {
         if(rt instanceof Value) {
           // value: replace with last item
           exp = ((Value) rt).itemAt(rt.size() - 1);
@@ -127,8 +127,8 @@ public abstract class Filter extends Preds {
           // rewrite positional predicate to util:last-from
           exp = cc.function(Function._UTIL_LAST_FROM, info, rt);
         }
-      } else if(expr instanceof ItrPos) {
-        final ItrPos pos = (ItrPos) expr;
+      } else if(pred instanceof ItrPos) {
+        final ItrPos pos = (ItrPos) pred;
         if(rt instanceof Value) {
           // value: replace with subsequence
           final long size = pos.min - 1, len = Math.min(pos.max, rt.size()) - size;
@@ -142,8 +142,8 @@ public abstract class Filter extends Preds {
           exp = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
               Int.get(pos.max));
         }
-      } else if(expr instanceof Pos) {
-        final Pos pos = (Pos) expr;
+      } else if(pred instanceof Pos) {
+        final Pos pos = (Pos) pred;
         if(pos.exprs[0] == pos.exprs[1]) {
           // example: expr[pos] -> util:item-at(expr, pos.min)
           exp = cc.function(Function._UTIL_ITEM_AT, info, rt, pos.exprs[0]);
@@ -151,12 +151,12 @@ public abstract class Filter extends Preds {
           // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
           exp = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
         }
-      } else if(numeric(expr)) {
+      } else if(numeric(pred)) {
         /* - rewrite positional predicate to util:item-at
          *   example: expr[pos] -> util:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets
          *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        exp = cc.function(Function._UTIL_ITEM_AT, info, rt, expr);
+        exp = cc.function(Function._UTIL_ITEM_AT, info, rt, pred);
       }
 
       if(exp != null) {
@@ -165,7 +165,7 @@ public abstract class Filter extends Preds {
         opt = true;
       } else {
         // no optimization: create new filter expression, or add predicate to temporary filter
-        rt = rt != root && rt instanceof Filter ? ((Filter) rt).addPred(expr) : get(info, rt, expr);
+        rt = rt != root && rt instanceof Filter ? ((Filter) rt).addPred(pred) : get(info, rt, pred);
       }
     }
 

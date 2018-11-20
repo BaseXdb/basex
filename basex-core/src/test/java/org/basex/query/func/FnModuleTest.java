@@ -786,7 +786,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // known result size
     query(func.args(" <_>1</_> + 1"), "");
-    query(func.args(" (<_>1</_> + 1, 2)"), 2);
+    query(func.args(" (<_>1</_> + 1, 3)"), 3);
     query(func.args(" prof:void(())"), "");
 
     // unknown result size
