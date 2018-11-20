@@ -66,7 +66,7 @@ public abstract class Preds extends Arr {
         if(cmp1.isFunction(Function.POSITION)) {
           // position() = last()  ->  last()
           // position() = $n (xs:numeric)  ->  $n
-          if(numeric(cmp2)) {
+          if(numeric(cmp2) || cmp2.isFunction(Function.LAST)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
               expr = cc.replaceWith(expr, cmp2);
