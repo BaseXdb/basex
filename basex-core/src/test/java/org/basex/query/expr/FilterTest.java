@@ -293,4 +293,9 @@ public final class FilterTest extends AdvancedQueryTest {
     query("collection('" + NAME + "')[2]", "<two/>");
     query("db:open('" + NAME + "')[2]", "<two/>");
   }
+
+  /** Start position (GH-1641). */
+  @Test public void nested() {
+    query("((1 to 2)[. != 0])[position() != .]", "");
+  }
 }

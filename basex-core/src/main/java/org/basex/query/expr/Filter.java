@@ -114,7 +114,7 @@ public abstract class Filter extends Preds {
       return copyType(new IterFilter(info, root, exprs));
     }
 
-    // evaluate positional predicates
+    // evaluate positional predicates: build new root expression
     Expr rt = root;
     boolean opt = false;
     for(final Expr expr : exprs) {
@@ -160,11 +160,12 @@ public abstract class Filter extends Preds {
       }
 
       if(exp != null) {
+        // predicate was optimized: replace old with new expression
         rt = exp;
         opt = true;
       } else {
-        // rebuild filter if no optimization can be applied
-        rt = rt instanceof Filter ? ((Filter) rt).addPred(expr) : get(info, rt, expr);
+        // no optimization: create new filter expression, or add predicate to temporary filter
+        rt = rt != root && rt instanceof Filter ? ((Filter) rt).addPred(expr) : get(info, rt, expr);
       }
     }
 
