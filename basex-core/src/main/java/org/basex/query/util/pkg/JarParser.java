@@ -48,7 +48,6 @@ final class JarParser {
         // ignore namespace to improve compatibility
         if(eq(E_JAR, name.local())) desc.jars.add(next.string());
         else if(eq(E_CLASS, name.local())) desc.classes.add(next.string());
-        // [CG] Packaging: add warning if unknown elements are encountered
       }
       if(desc.jars.isEmpty()) throw REPO_PARSE_X_X.get(info, io.name(), NOJARS);
       if(desc.classes.isEmpty()) throw REPO_PARSE_X_X.get(info, io.name(), NOCLASSES);

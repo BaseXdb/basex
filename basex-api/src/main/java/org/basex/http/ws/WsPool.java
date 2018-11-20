@@ -130,9 +130,6 @@ public final class WsPool {
   private static void send(final Item message, final ArrayList<WebSocket> websockets)
       throws QueryException, IOException {
 
-    /* [JF] We need to check what happens if a client says goodbye while we send data.
-     *  if this happens, other clients must still receive their message.
-     *  this could be tested by calling Performance.sleep(...) before sending the data. */
     final ArrayList<Object> values = WsResponse.serialize(message.iter(), new SerializerOptions());
     for(final WebSocket ws : websockets) {
       if(!ws.isConnected()) continue;
