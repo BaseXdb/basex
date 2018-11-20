@@ -25,15 +25,15 @@ public final class FnNot extends StandardFunc {
     final Expr expr = exprs[0].optimizeEbv(cc);
 
     // not(empty(A)) -> exists(A)
-    if(expr.isFunction(Function.EMPTY)) {
+    if(Function.EMPTY.is(expr)) {
       return cc.function(Function.EXISTS, info, ((FnEmpty) expr).exprs);
     }
     // not(exists(A)) -> empty(A)
-    if(expr.isFunction(Function.EXISTS)) {
+    if(Function.EXISTS.is(expr)) {
       return cc.function(Function.EMPTY, info, exprs = ((FnExists) expr).exprs);
     }
     // not(not(A)) -> boolean(A)
-    if(expr.isFunction(Function.NOT)) {
+    if(Function.NOT.is(expr)) {
       return FnBoolean.get(((FnNot) expr).exprs[0], info, cc.sc());
     }
     // not('a' = 'b') -> 'a' != 'b'

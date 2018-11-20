@@ -168,11 +168,6 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final boolean isFunction(final Function f) {
-    return sig == f;
-  }
-
-  @Override
   public boolean isVacuous() {
     return !has(Flag.UPD) && size() == 0;
   }

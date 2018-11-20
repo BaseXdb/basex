@@ -339,16 +339,6 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if this expression is a certain function.
-   * @param func function definition
-   * @return result of check
-   */
-  @SuppressWarnings("unused")
-  public boolean isFunction(final Function func) {
-    return false;
-  }
-
-  /**
    * Checks if this expression is deterministic, performs no updates, does not access the context
    * value and position, and calls no higher-order function.
    * @return result of check

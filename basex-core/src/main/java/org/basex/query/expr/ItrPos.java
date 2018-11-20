@@ -81,7 +81,7 @@ public final class ItrPos extends Simple {
    */
   public static Expr get(final Cmp cmp, final OpV op, final InputInfo info) {
     final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-    if(!cmp1.isFunction(Function.POSITION)) return cmp;
+    if(!Function.POSITION.is(cmp1)) return cmp;
 
     if(cmp2 instanceof RangeSeq && op == OpV.EQ) {
       final long[] range = ((RangeSeq) cmp2).range(false);

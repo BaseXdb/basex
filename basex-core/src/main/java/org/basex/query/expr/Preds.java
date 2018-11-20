@@ -63,10 +63,10 @@ public abstract class Preds extends Arr {
       if(expr instanceof CmpG || expr instanceof CmpV) {
         final Cmp cmp = (Cmp) expr;
         final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-        if(cmp1.isFunction(Function.POSITION)) {
+        if(Function.POSITION.is(cmp1)) {
           // position() = last()  ->  last()
           // position() = $n (xs:numeric)  ->  $n
-          if(numeric(cmp2) || cmp2.isFunction(Function.LAST)) {
+          if(numeric(cmp2) || Function.LAST.is(cmp2)) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
               expr = cc.replaceWith(expr, cmp2);
@@ -140,7 +140,7 @@ public abstract class Preds extends Arr {
 
     // check positional predicates
     for(final Expr expr : exprs) {
-      if(expr.isFunction(Function.LAST)) {
+      if(Function.LAST.is(expr)) {
         // use minimum of old value and 1
         max = Math.min(max, 1);
       } else if(expr instanceof ItrPos) {

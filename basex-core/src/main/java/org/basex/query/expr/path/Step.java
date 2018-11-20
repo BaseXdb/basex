@@ -47,7 +47,7 @@ public abstract class Step extends Preds {
 
     // optimize single last() functions
     Step step = null;
-    if(preds.length == 1 && preds[0].isFunction(Function.LAST)) {
+    if(preds.length == 1 && Function.LAST.is(preds[0])) {
       step = new IterLastStep(info, axis, test, preds);
     } else {
       // check for simple positional predicates

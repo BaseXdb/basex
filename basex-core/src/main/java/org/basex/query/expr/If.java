@@ -69,7 +69,7 @@ public final class If extends Arr {
     if(exprs[0].equals(exprs[1]) && !cond.has(Flag.NDT)) return cc.replaceWith(this, exprs[0]);
 
     // if not(A) then B else C -> if A then C else B
-    if(cond.isFunction(Function.NOT)) {
+    if(Function.NOT.is(cond)) {
       cc.info(OPTSWAP_X, this);
       cond = ((Arr) cond).exprs[0];
       final Expr tmp = exprs[0];

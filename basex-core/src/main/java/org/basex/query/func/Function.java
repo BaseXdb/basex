@@ -1565,6 +1565,15 @@ public enum Function {
   }
 
   /**
+   * Checks if the specified expression is an instance of this function.
+   * @param ex expression
+   * @return result of check
+   */
+  public final boolean is(final Expr ex) {
+    return ex instanceof StandardFunc && ((StandardFunc) ex).sig == this;
+  }
+
+  /**
    * Returns the namespace URI of this function.
    * @return function
    */
