@@ -26,6 +26,34 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void exceptLast() {
+    final Function func = _UTIL_EXCEPT_LAST;
+
+    // static rewrites
+    query(func.args(" ()"), "");
+    query(func.args("A"), "");
+    query(func.args(" (1,2)"), 1);
+    query(func.args(" (1 to 3)"), "1\n2");
+
+    // known result size
+    query(func.args(" <_>1</_> + 1"), "");
+    query(func.args(" (<_>1</_> + 1, 3)"), 2);
+    query(func.args(" prof:void(())"), "");
+
+    // unknown result size
+    query(func.args(" 1[. = 0]"), "");
+    query(func.args(" 1[. = 1]"), "");
+    query(func.args(" (1 to 2)[. = 0]"), "");
+    query(func.args(" (1 to 4)[. < 3]"), 1);
+
+    // value-based iterator
+    query(func.args(" tokenize(<_></_>)"), "");
+    query(func.args(" tokenize(<_>X</_>)"), "");
+    query(func.args(" tokenize(<_>X Y</_>)"), "X");
+    query(func.args(" tokenize(<_>X Y Z</_>)"), "X\nY");
+  }
+
+  /** Test method. */
   @Test
   public void iff() {
     final Function func = _UTIL_IF;

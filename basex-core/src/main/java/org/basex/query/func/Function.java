@@ -1312,6 +1312,8 @@ public enum Function {
   _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_O), BLN_O, UTIL_URI),
   /** XQuery function. */
+  _UTIL_EXCEPT_LAST(UtilExceptLast.class, "except-last(items)", arg(ITEM_ZM), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_IF(UtilIf.class, "if(condition,then[,else])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
